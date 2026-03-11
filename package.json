@@ -9,7 +9,11 @@
     "build:mastra": "mastra build",
     "test": "vitest --run",
     "test:watch": "vitest",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "codegen": "graphql-codegen --config codegen.ts",
+    "types:extract": "node scripts/extract-graphql-types.mjs",
+    "types:update": "npm run codegen && npm run types:extract",
+    "validate:qids": "node scripts/validate-qids.mjs"
   },
   "engines": {
     "node": "20.x"
@@ -17,6 +21,7 @@
   "devDependencies": {
     "@event-calendar/core": "^3.4.0",
     "@event-calendar/time-grid": "^3.4.0",
+    "@graphql-codegen/cli": "6.1.2",
     "@sveltejs/adapter-node": "^5.2.12",
     "@sveltejs/adapter-static": "^3.0.8",
     "@sveltejs/adapter-vercel": "^5.7.2",
@@ -30,6 +35,7 @@
     "autoprefixer": "^10.4.20",
     "bufferutil": "^4.0.8",
     "fast-check": "^4.3.0",
+    "graphql": "^16.12.0",
     "happy-dom": "^20.0.8",
     "jsdom": "^27.0.1",
     "layercake": "^8.4.3",
@@ -48,7 +54,9 @@
     "typescript": "^5.5.4",
     "utf-8-validate": "^5.0.10",
     "vite-plugin-devtools-json": "^1.0.0",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "@graphql-codegen/typescript": "5.0.8",
+    "@graphql-codegen/introspection": "5.0.0"
   },
   "dependencies": {
     "@1lev1/svelte-share": "^0.0.9",

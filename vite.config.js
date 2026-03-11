@@ -2,10 +2,16 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { sentrySvelteKit } from '@sentry/sveltekit';
 import tailwindcss from "@tailwindcss/vite";
 import fs from 'fs'
+import path from 'path';
 //import {defineConfig} from 'vite';
 import devtoolsJson from 'vite-plugin-devtools-json';
 /** @type {import('vite').UserConfig} */
 const config = {
+  resolve: {
+    alias: {
+      '$generated': path.resolve('./src/generated')
+    }
+  },
   ssr: {
     noExternal: [
       'three', 

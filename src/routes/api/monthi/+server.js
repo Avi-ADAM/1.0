@@ -19,6 +19,7 @@ const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER
 let que3 = ``
 let suc = []
 export async function GET(req) {
+  console.log("monthi api called")
       //get mesimabetahalich sort by iskvua
  let que = `{
   mesimabetahaliches (filters:{iskvua:{eq: true},forappruval: { eq: false },finnished:{ eq: false }}) {data{ id}} 
@@ -73,8 +74,13 @@ createFiniapruval(
 }){data {id }}`;
       } else {
         let hr = 0
-        if (at.finnished_missions.data != null){
-          hr = at.finnished_missions.data.attributes.noofhours;
+        const fmData = at.finnished_missions?.data
+        if (fmData != null) {
+          if (Array.isArray(fmData)) {
+            hr = fmData.reduce((sum, item) => sum + (item?.attributes?.noofhours ?? 0), 0)
+          } else if (fmData?.attributes?.noofhours != null) {
+            hr = fmData.attributes.noofhours
+          }
         }
           fm = `createFinnishedMission(
              data: {

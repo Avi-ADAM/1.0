@@ -278,6 +278,7 @@
                     : ''
                 } }}}
              admaticedai  createdAt hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks 
+             monter{monthStart hours isDone hoursDone}
              users_permissions_user {data{ id attributes{ username profilePic {data{attributes{ url }}}}}}}}}
             open_missions (filters:{archived:{eq: false }}) {data{  id attributes{ name hearotMeyuchadot descrip noofhours perhour sqadualed
                                     privatlinks publicklinks

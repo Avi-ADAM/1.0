@@ -12,12 +12,26 @@
       "./src/lib/types"
     ],
     "paths": {
-      "$lib": ["src/lib"],
-      "$lib/*": ["src/lib/*"]
+      "$lib": [
+        "src/lib"
+      ],
+      "$lib/*": [
+        "src/lib/*"
+      ],
+      "$generated": [
+        "src/generated"
+      ],
+      "$generated/*": [
+        "src/generated/*"
+      ]
     }
   },
   "extends": "./.svelte-kit/tsconfig.json",
-  "exclude": ["dist", ".mastra", "node_modules"],
+  "exclude": [
+    "dist",
+    ".mastra",
+    "node_modules"
+  ],
   "include": [
     "src/**/*.d.ts",
     "src/**/*.ts",
@@ -25,6 +39,7 @@
     "src/**/*.svelte",
     "service-worker.js",
     "src/lib/func/animation.ts",
-    "src/lib/types/**/*"
+    "src/lib/types/**/*",
+    "src/lib/translations/ar/negotiation.json"
   ]
 }

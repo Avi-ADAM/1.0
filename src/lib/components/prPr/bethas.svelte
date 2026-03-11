@@ -147,12 +147,33 @@ onMount(async () => {
     const sho = {"he": "שווי המשימה", "en": "mission vallue"}
     const ro = {"he": "תפקיד", "en": "role"}
     const acts = {"he":"דיון ומטלות","en":"chat & actions"}
+    const prevMonths = {"he":"חודשים קודמים","en":"Previous months"}
+    const monthCol = {"he":"חודש","en":"Month"}
+    const hoursAssigned = {"he":"שעות הוקצו","en":"Hours assigned"}
+    const hoursDone = {"he":"שעות בוצעו","en":"Hours done"}
+    const statusCol = {"he":"סטטוס","en":"Status"}
+    const completed = {"he":"הושלם","en":"Completed"}
+    const inProgress = {"he":"בתהליך","en":"In progress"}
+    const totalAllMonths = {"he":"סה״כ כל החודשים","en":"Total all months"}
     const des = {"he":"תיאור","en":"decription"}
     let w = $state(0);
    
     let id = $state(0)
     function chat (id,isNew,smalldes){
       onChat?.({id,isNew,smalldes,"nameChatPartner":{"he":"דיון על משימה בתהליך ","en":"chat on mission in progress"}})
+    }
+    function formatMonthLabel(monthStart) {
+      if (!monthStart) return '-'
+      const d = new Date(monthStart)
+      return $lang === 'he' ? d.toLocaleDateString('he-IL', { month: 'long', year: 'numeric' }) : d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+    }
+    function getMonterList(monter) {
+      if (!monter || !Array.isArray(monter) || monter.length === 0) return []
+      return [...monter].sort((a, b) => new Date(b.monthStart || 0) - new Date(a.monthStart || 0))
+    }
+    function getTotalMonterHours(monter) {
+      const list = getMonterList(monter)
+      return list.reduce((sum, m) => sum + (m.hoursDone ?? 0), 0)
     }
 </script>
    
@@ -245,7 +266,12 @@ onMount(async () => {
     <div class="bg-barbi text-xs md:text-xl font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style="width: {data.attributes.status == null ? 0 : data.attributes.status}%">{data.attributes.status == null ? 0 : data.attributes.status}%</div>
   </div>
           </td>
-          <td><p class="md:text-xl text-sm">{data.attributes.howmanyhoursalready == null ? 0 : data.attributes.howmanyhoursalready.toLocaleString('en-US', {maximumFractionDigits:2})} / {data.attributes.hoursassinged.toLocaleString('en-US', {maximumFractionDigits:2})}</p></td>
+          <td>
+            <p class="md:text-xl text-sm">{data.attributes.howmanyhoursalready == null ? 0 : data.attributes.howmanyhoursalready.toLocaleString('en-US', {maximumFractionDigits:2})} / {data.attributes.hoursassinged.toLocaleString('en-US', {maximumFractionDigits:2})}</p>
+            {#if getTotalMonterHours(data.attributes?.monter) > 0}
+            <p class="text-xs text-white/80">({totalAllMonths[$lang]}: {(getTotalMonterHours(data.attributes?.monter) + (data.attributes.howmanyhoursalready ?? 0)).toLocaleString('en-US', {maximumFractionDigits:2})})</p>
+            {/if}
+          </td>
           <!----<td><p class="md:text-xl text-sm">{(data.attributes.hoursassinged * data.attributes.perhour).toLocaleString('en-US', {maximumFractionDigits:2}) }</p></td>-->
           <td >
             {#each data.attributes.tafkidims.data as taf, i} 
@@ -286,6 +312,39 @@ onMount(async () => {
         </tbody>
     </table>
     </div>
+        {#if getMonterList(data.attributes?.monter).length > 0}
+        <div class="px-4 pb-4">
+          <h3 class="text-lg font-semibold text-white mb-2">{prevMonths[$lang]}</h3>
+          <div class="overflow-x-auto rounded border border-white/20">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-white/10">
+                  <th class="px-3 py-2 text-right">{monthCol[$lang]}</th>
+                  <th class="px-3 py-2 text-right">{hoursAssigned[$lang]}</th>
+                  <th class="px-3 py-2 text-right">{hoursDone[$lang]}</th>
+                  <th class="px-3 py-2 text-right">{statusCol[$lang]}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {#each getMonterList(data.attributes?.monter) as m}
+                <tr class="border-t border-white/10">
+                  <td class="px-3 py-2">{formatMonthLabel(m.monthStart)}</td>
+                  <td class="px-3 py-2">{m.hours ?? 0}</td>
+                  <td class="px-3 py-2">{m.hoursDone ?? 0}</td>
+                  <td class="px-3 py-2">
+                    {#if m.isDone || (m.hours > 0 && (m.hoursDone ?? 0) >= m.hours)}
+                      <span class="text-green-400">{completed[$lang]}</span>
+                    {:else}
+                      <span class="text-amber-400">{inProgress[$lang]}</span>
+                    {/if}
+                  </td>
+                </tr>
+                {/each}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {/if}
         <button class="m-2 text-white" onclick={() =>{isOpen = true
               id = data.id}} ><Plus/></button>
     </div>

@@ -3,8 +3,23 @@
 const HTTP_ST_ENDPOINT = import.meta.env.VITE_URL
 const ep = HTTP_ST_ENDPOINT + "/graphql"
 import { qids } from './qids.js'
+import { validateAllQids, validateQuery } from './qidsValidator.js'
 import { json, error } from '@sveltejs/kit'
 const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER;
+
+// ─── Validate all qids on server startup (dev only) ───
+const isDev = import.meta.env.DEV;
+if (isDev) {
+	console.log('\n🔍 [qids] Running schema validation...');
+	try {
+		const result = validateAllQids(qids, { strict: false, silent: false });
+		if (result.valid) {
+			console.log('✅ [qids] All queries match the schema!\n');
+		}
+	} catch (e) {
+		console.warn('⚠️ [qids] Schema validation error:', e.message);
+	}
+}
 
 export async function POST({ request, cookies }) {
 	const data = await request.json();
@@ -13,6 +28,15 @@ export async function POST({ request, cookies }) {
 
 	if (!query) {
 		throw error(400, 'queId or query is required');
+	}
+
+	// In dev mode, validate raw queries (not from qids) before executing
+	if (isDev && !data?.data?.queId && data?.data?.query) {
+		const validation = validateQuery('raw-query', data.data.query);
+		if (!validation.valid) {
+			console.error('❌ [qids] Raw query validation failed:');
+			validation.errors.forEach(e => console.error(`   ${e}`));
+		}
 	}
 
 	let isSer = data.isSer ?? false;
