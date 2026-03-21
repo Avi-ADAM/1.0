@@ -21,6 +21,7 @@ import { sendAskMessageConfig } from './sendAskMessage.js';
 import { timerStartConfig } from './timerStart.js';
 import { timerStopConfig } from './timerStop.js';
 import { timerSaveConfig } from './timerSave.js';
+import { timerLogUpdateConfig } from './timerLogUpdate.js';
 import { approveSheirutpendConfig } from './approveSheirutpend.js';
 import { rejectSheirutpendConfig } from './rejectSheirutpend.js';
 import { addVoteConfig } from './addVote.js';
@@ -52,6 +53,7 @@ export function registerAllActions(): void {
   registerAction(timerStartConfig);
   registerAction(timerStopConfig);
   registerAction(timerSaveConfig);
+  registerAction(timerLogUpdateConfig);
 
   // Sheirutpend actions
   registerAction(approveSheirutpendConfig);
@@ -87,6 +89,7 @@ export {
   timerStartConfig,
   timerStopConfig,
   timerSaveConfig,
+  timerLogUpdateConfig,
   approveSheirutpendConfig,
   rejectSheirutpendConfig,
   addVoteConfig,

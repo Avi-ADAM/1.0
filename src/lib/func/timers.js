@@ -218,7 +218,7 @@ export function calculateTotalHours(timers) {
 /**
  * Updates a timer with specific parameters (tasks or segments)
  */
-export async function updateTimer(timer, whatToUpdate, params = {}, fetch) {
+export async function updateTimer(timer, whatToUpdate, params = {}, fetch, projectId = '', userId = '') {
   if (!timer) return null;
   
   switch (whatToUpdate) {
@@ -235,22 +235,26 @@ export async function updateTimer(timer, whatToUpdate, params = {}, fetch) {
 
       const updateParams = {
         timerId: timer.id.toString(),
+        projectId: projectId.toString(),
+        userId: userId.toString(),
         totalHours: totalTime,
         timers: timers,
         isSer: params.isSer
       };
       
-      return await executeTimerAction('timerStop', updateParams, fetch);
+      return await executeTimerAction('timerLogUpdate', updateParams, fetch);
     }
     
     case 'tasks': {
       const paramsToUpdate = {
         timerId: timer.id.toString(),
+        projectId: projectId.toString(),
+        userId: userId.toString(),
         tasks: (params.selectedTaskIds || []).map(id => id.toString()),
         isSer: params.isSer
       };
       
-      return await executeTimerAction('timerStop', paramsToUpdate, fetch);
+      return await executeTimerAction('timerLogUpdate', paramsToUpdate, fetch);
     }
     
     default:
@@ -262,7 +266,7 @@ export async function updateTimer(timer, whatToUpdate, params = {}, fetch) {
 /**
  * Clears a single interval from the timer
  */
-export async function handleClearSingle(index, timer, fetch, isSer = false) {
+export async function handleClearSingle(index, timer, fetch, isSer = false, projectId = '', userId = '') {
   let timers = [...(timer.attributes.activeTimer.data.attributes.timers || [])];
   
   const total = timer.attributes.activeTimer.data.attributes.totalHours || 0;
@@ -272,9 +276,13 @@ export async function handleClearSingle(index, timer, fetch, isSer = false) {
   
   let newTotal = total - duration;
   timers.splice(index, 1);
+  
+  const timerData = timer.attributes?.activeTimer?.data || timer;
 
-  return await executeTimerAction('timerStop', {
-    timerId: timer.attributes.activeTimer.data.id.toString(),
+  return await executeTimerAction('timerLogUpdate', {
+    timerId: timerData.id.toString(),
+    projectId: projectId.toString(),
+    userId: userId.toString(),
     isActive: false,
     totalHours: newTotal,
     timers: timers.map(t => ({ start: t.start, stop: t.stop })),
@@ -285,9 +293,12 @@ export async function handleClearSingle(index, timer, fetch, isSer = false) {
 /**
  * Clears all intervals from the timer
  */
-export async function handleClearAll(timer, fetch, isSer = false) {
-  return await executeTimerAction('timerStop', {
-    timerId: timer.attributes.activeTimer.data.id.toString(),
+export async function handleClearAll(timer, fetch, isSer = false, projectId = '', userId = '') {
+  const timerData = timer.attributes?.activeTimer?.data || timer;
+  return await executeTimerAction('timerLogUpdate', {
+    timerId: timerData.id.toString(),
+    projectId: projectId.toString(),
+    userId: userId.toString(),
     isActive: false,
     totalHours: 0,
     timers: [],
@@ -332,7 +343,7 @@ export async function recalculateMissionHours(missionId, fetch) {
       }, '11saveTimer', null, null, false, fetch);
     }
 
-    return { savedHours, totalHours: savedHours };
+    return { savedHours, unsavedHours: 0, totalHours: savedHours };
   } catch (error) {
     console.error("Error recalculating mission hours:", error);
     return null;

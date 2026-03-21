@@ -9,7 +9,6 @@
   }
 
   let { votes = [], members = [], activeOrder = 0 }: Props = $props();
-
   // Computed
   let voteStatus = $derived(
     members.map((member) => {

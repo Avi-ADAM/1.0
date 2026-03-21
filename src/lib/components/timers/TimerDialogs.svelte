@@ -10,7 +10,8 @@
     handleClearSingle,
     updateTimer,
     saveTimer,
-    recalculateMissionHours
+    recalculateMissionHours,
+    calculateTotalHours
   } from '$lib/func/timers.js';
   import { timers, updateTimers } from '$lib/stores/timers';
   import { page } from '$app/state';
@@ -120,9 +121,8 @@
 
   async function localClearAllTimers() {
     try {
-      // Call the existing handleClearAll function for the current timer.
-      // It should return the updated activeTimer data object.
-      const updatedActiveTimerData = await handleClearAll(timer, fetch);
+      // Pass project and user IDs for the dedicated action
+      const updatedActiveTimerData = await handleClearAll(timer, fetch, false, timer.projectId, page.data.uid);
       // Check the response: if valid, update the store and dispatch event.
       if (updatedActiveTimerData) {
         console.log(updatedActiveTimerData);
@@ -190,7 +190,7 @@
       );
 
     try {
-      const x = await handleClearSingle(i, originalTimer, fetch);
+      const x = await handleClearSingle(i, originalTimer, fetch, false, timer.projectId, page.data.uid);
       if (x) {
         onUpdateTimer?.({
           timer: x,
@@ -209,7 +209,9 @@
       timer.attributes.activeTimer.data,
       'tasks',
       { selectedTaskIds },
-      fetch
+      fetch,
+      timer.projectId,
+      page.data.uid
     ).then((x) => {
       if (x) {
         onUpdateTimer?.({
@@ -327,12 +329,14 @@
         isEditing: false
       };
 
-      // API call to update the timer
+      // API call to update the timer with project and user context
       await updateTimer(
         timer.attributes.activeTimer.data, // Timer object
         'timers', // Specify what to update
         { oldLap, newLap, index }, // Pass oldLap, newLap, and index
-        fetch // Fetch function
+        fetch, // Fetch function
+        timer.projectId,
+        page.data.uid
       );
 
       // Update the store with the modified timer
@@ -381,11 +385,16 @@
     const result = await recalculateMissionHours(timer.mId, fetch);
 
     if (result) {
-      const { savedHours, unsavedHours, totalHours } = result;
+      const { savedHours } = result;
+      // Calculate unsaved hours from the current active timer data
+      const currentTimers = timer?.attributes?.activeTimer?.data?.attributes?.timers || [];
+      const unsavedHours = calculateTotalHours(currentTimers);
+      const displayTotal = savedHours + unsavedHours;
+
       // Format for display
       const msg = {
-        en: `Recalculation Complete:\nSaved Hours: ${savedHours.toFixed(2)}\nUnsaved (Running): ${unsavedHours.toFixed(2)}\nTotal: ${totalHours.toFixed(2)}`,
-        he: `חישוב מחדש הושלם:\nשעות שנשמרו: ${savedHours.toFixed(2)}\nשעות לא שמורות (רץ): ${unsavedHours.toFixed(2)}\nסך הכל: ${totalHours.toFixed(2)}`
+        en: `Recalculation Complete:\nSaved Hours: ${savedHours.toFixed(2)}\nUnsaved (Running): ${unsavedHours.toFixed(2)}\nTotal: ${displayTotal.toFixed(2)}`,
+        he: `חישוב מחדש הושלם:\nשעות שנשמרו: ${savedHours.toFixed(2)}\nשעות לא שמורות (רץ): ${unsavedHours.toFixed(2)}\nסך הכל: ${displayTotal.toFixed(2)}`
       };
       toast.success(msg[$lang], { duration: 5000 });
     } else {

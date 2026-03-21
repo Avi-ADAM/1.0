@@ -22,6 +22,8 @@
     "@event-calendar/core": "^3.4.0",
     "@event-calendar/time-grid": "^3.4.0",
     "@graphql-codegen/cli": "6.1.2",
+    "@graphql-codegen/introspection": "5.0.0",
+    "@graphql-codegen/typescript": "5.0.8",
     "@sveltejs/adapter-node": "^5.2.12",
     "@sveltejs/adapter-static": "^3.0.8",
     "@sveltejs/adapter-vercel": "^5.7.2",
@@ -34,6 +36,7 @@
     "@threlte/preprocess": "^0.0.2",
     "autoprefixer": "^10.4.20",
     "bufferutil": "^4.0.8",
+    "dotenv": "^17.3.1",
     "fast-check": "^4.3.0",
     "graphql": "^16.12.0",
     "happy-dom": "^20.0.8",
@@ -54,9 +57,7 @@
     "typescript": "^5.5.4",
     "utf-8-validate": "^5.0.10",
     "vite-plugin-devtools-json": "^1.0.0",
-    "vitest": "^3.2.4",
-    "@graphql-codegen/typescript": "5.0.8",
-    "@graphql-codegen/introspection": "5.0.0"
+    "vitest": "^3.2.4"
   },
   "dependencies": {
     "@1lev1/svelte-share": "^0.0.9",
@@ -79,6 +80,7 @@
     "@mastra/memory": "^0.14.3",
     "@mediakular/gridcraft": "1.0.5-beta",
     "@number-flow/svelte": "^0.3.3",
+    "@pinecone-database/pinecone": "^7.1.0",
     "@sentry/sveltekit": "^8.27.0",
     "@svelte-plugins/datepicker": "^1.0.9",
     "@tailwindcss/vite": "^4.1.11",
@@ -106,7 +108,6 @@
     "d3-scale": "^4.0.2",
     "d3-shape": "^3.2.0",
     "date-fns": "^3.6.0",
-    "dotenv": "^16.4.5",
     "firebase": "^10.13.1",
     "jquery": "^3.7.1",
     "jsrepo": "^2.4.3",
