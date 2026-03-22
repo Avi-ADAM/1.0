@@ -12,7 +12,7 @@
   // import AddSkil from './addSkil.svelte';
   import { skillsNew } from '../../stores/skillsNew.js';
   import MultiSelect from 'svelte-multiselect';
-  import Addnewsk from '../addnew/addNewSkill.svelte';
+  import SkillSelector from '../ui/SkillSelector.svelte';
   import Addneww from '../addnew/addnewWorkway.svelte';
   import Addnewv from '../addnew/addnewval.svelte';
   import Addnewr from '../addnew/addNewRole.svelte';
@@ -32,7 +32,6 @@
   let listt = [];
   let error1 = null;
   async function get() {
-   
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
@@ -113,7 +112,7 @@ console.log("skillslist",skillslist);
     }
     if (datan !== 'mash') {
       let list = data.map((c) => c.id);
-     
+
       const cookieValueId = document.cookie
         .split('; ')
         .find((row) => row.startsWith('id='))
@@ -353,7 +352,7 @@ console.log("skillslist",skillslist);
   }
   async function updi() {
     let res = [];
-   
+
     token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     const parseJSON = (resp) => (resp.json ? resp.json() : resp);
@@ -478,7 +477,7 @@ console.log("skillslist",skillslist);
   async function edit(id) {
     g = true;
     console.log(id);
-   
+
     token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     const parseJSON = (resp) => (resp.json ? resp.json() : resp);
@@ -619,7 +618,9 @@ console.log("skillslist",skillslist);
     }
   });
 
-  let filteredAllvn = $derived(allvn.filter(v => !data.some(d => d.attributes[valc] === v)));
+  let filteredAllvn = $derived(
+    allvn.filter((v) => !data.some((d) => d.attributes[valc] === v))
+  );
 
   let anim = $derived(
     datan == 'work' || datan == 'val' ? -(width / 2) : width / 2
@@ -714,82 +715,83 @@ console.log("skillslist",skillslist);
         {edbef[$lang]}{Valname}{edaft[$lang]}
       </p>
       {#if data.length > 0}
-       <div
-        class="  flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 mb-1"
-      >
-        {#each data as da, i (da.id)}
-          <div
-            transition:slide|local={{
-              delay: 150,
-              duration: 1000,
-              easing: quintOut
-            }}>
-            {#if datan === 'mash'}
-              <Tile
-                big={width > 640}
-                sm={width > 640}
-                bg={bgi}
-                gr={datan === 'mash' && da.attributes.panui === false
-                  ? true
-                  : false}
-                word={da.attributes[valc]}
-              >
-                {#if da.attributes.panui != false}
-                  <button
-                    class="text-barbi hover:text-red-700"
-                    title={less[$lang]}
-                    onclick={() => min(da.id, da.attributes[valc])}
-                    aria-label={less[$lang]}
-                    ><svg style="width:17px;height:17px" viewBox="0 0 24 24">
-                      <path
-                        fill="currentColor"
-                        d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
-                      />
-                    </svg></button
-                  >
-                  <button
-                    class=" hover:bg-gold text-barbi rounded-full"
-                    title={edito[$lang]}
-                    onclick={() => edit(da.id)}
-                    aria-label={edito[$lang]}
-                    ><svg style="width:17px;height:17px" viewBox="0 0 24 24">
-                      <path
-                        fill="currentColor"
-                        d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z"
-                      />
-                    </svg>
-                  </button>
-                {:else}
-                  <button
-                    class=" hover:bg-barbi text-barbi rounded-full"
-                    title={onin[$lang]}
-                    aria-label={onin[$lang]}
-                  >
-                    <Grow width="17" height="17" /></button
-                  >
-                {/if}
-              </Tile>
-            {:else}
-             <div
-                class="text-center text-sm text-lturk md:text-xl"
-                title={less[$lang]}
-                onclick={() => min(da.id, da.attributes[valc])}
-              >
-              <Tile
-                big={width > 640}
-                sm={width > 640}
-                bg={bgi}
-                closei={true}
-                closeiline={false}
-                gr={datan === 'mash' && da.attributes.panui === false
-                  ? true
-                  : false}
-                word={da.attributes[valc]}
-              />
-              </div>
-            {/if}
-          </div>
-        {/each}
+        <div
+          class="  flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 mb-1"
+        >
+          {#each data as da, i (da.id)}
+            <div
+              transition:slide|local={{
+                delay: 150,
+                duration: 1000,
+                easing: quintOut
+              }}
+            >
+              {#if datan === 'mash'}
+                <Tile
+                  big={width > 640}
+                  sm={width > 640}
+                  bg={bgi}
+                  gr={datan === 'mash' && da.attributes.panui === false
+                    ? true
+                    : false}
+                  word={da.attributes[valc]}
+                >
+                  {#if da.attributes.panui != false}
+                    <button
+                      class="text-barbi hover:text-red-700"
+                      title={less[$lang]}
+                      onclick={() => min(da.id, da.attributes[valc])}
+                      aria-label={less[$lang]}
+                      ><svg style="width:17px;height:17px" viewBox="0 0 24 24">
+                        <path
+                          fill="currentColor"
+                          d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
+                        />
+                      </svg></button
+                    >
+                    <button
+                      class=" hover:bg-gold text-barbi rounded-full"
+                      title={edito[$lang]}
+                      onclick={() => edit(da.id)}
+                      aria-label={edito[$lang]}
+                      ><svg style="width:17px;height:17px" viewBox="0 0 24 24">
+                        <path
+                          fill="currentColor"
+                          d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z"
+                        />
+                      </svg>
+                    </button>
+                  {:else}
+                    <button
+                      class=" hover:bg-barbi text-barbi rounded-full"
+                      title={onin[$lang]}
+                      aria-label={onin[$lang]}
+                    >
+                      <Grow width="17" height="17" /></button
+                    >
+                  {/if}
+                </Tile>
+              {:else}
+                <div
+                  class="text-center text-sm text-lturk md:text-xl"
+                  title={less[$lang]}
+                  onclick={() => min(da.id, da.attributes[valc])}
+                >
+                  <Tile
+                    big={width > 640}
+                    sm={width > 640}
+                    bg={bgi}
+                    closei={true}
+                    closeiline={false}
+                    gr={datan === 'mash' && da.attributes.panui === false
+                      ? true
+                      : false}
+                    word={da.attributes[valc]}
+                  />
+                </div>
+              {/if}
+            </div>
+          {/each}
         </div>
         {#if datan === 'mash' && yy == 2}
           <button
@@ -807,32 +809,35 @@ console.log("skillslist",skillslist);
         {/if}
       {/if}
       <br />
-
-      <div>
-        <h3 class="text-center text-sm text-barbi">
-          {adbf[$lang]}{Valname}{adaf[$lang]}
-        </h3>
-        <div class="flex justify-center">
-          <MultiSelect
-            bind:selected={data.selected2}
-            outerDivClass="!bg-gold !text-barbi"
-            inputClass="!bg-gold !text-barbi"
-            liSelectedClass="!bg-barbi !text-gold"
-            bind:searchText
-            noMatchingOptionsMsg={addn[$lang]}
-            {placeholder}
-            options={filteredAllvn}
-            --sms-width={'200px'}
-            loading={newcontent}
-            onadd={handleAdd}
-          />
-         
+      {#if datan != 'skil'}
+        <div>
+          <h3 class="text-center text-sm text-barbi">
+            {adbf[$lang]}{Valname}{adaf[$lang]}
+          </h3>
+          <div class="flex justify-center">
+            <MultiSelect
+              bind:selected={data.selected2}
+              outerDivClass="!bg-gold !text-barbi"
+              inputClass="!bg-gold !text-barbi"
+              liSelectedClass="!bg-barbi !text-gold"
+              bind:searchText
+              noMatchingOptionsMsg={addn[$lang]}
+              {placeholder}
+              options={filteredAllvn}
+              --sms-width={'200px'}
+              loading={newcontent}
+              onadd={handleAdd}
+            />
+          </div>
         </div>
-      </div>
-      <!--      allowUserOptions={"append"}-->
-     
+        <!--      allowUserOptions={"append"}-->
+      {/if}
       {#if datan == 'skil'}
-        <Addnewsk rn={allvn} onAddnewskill={addnew} bind:addS />
+        <SkillSelector
+          bind:selectedSkills={data.selected2}
+          {placeholder}
+          autoCreate={true}
+        />
       {:else if datan == 'taf'}
         <Addnewr rn={allvn} onAddnewrole={addnew} bind:addR />
       {:else if datan == 'mash'}
@@ -843,10 +848,12 @@ console.log("skillslist",skillslist);
         <Addneww rn={allvn} onAddww={addnew} bind:addW />
       {/if}
     </div>
-    <br/>
+    <br />
     {#if datan === 'mash' && data?.selected2?.length > 0}
-    <Button onClick={() => adm(data.selected2)} text={save} aria-label={save}>✅</Button>
-  {/if}
+      <Button onClick={() => adm(data.selected2)} text={save} aria-label={save}
+        >✅</Button
+      >
+    {/if}
     {#if datan !== 'mash' && yy > 0}
       <Button
         variant="default"
