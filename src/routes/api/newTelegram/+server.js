@@ -107,9 +107,11 @@ const translations = {
   } // Add other EN translations if needed
 };
 
+import { TELEGRAM_BOT_TOKEN_NEW, GEMINI_API_KEY } from '$env/static/private';
+
 // --- הגדרות ומשתנים גלובליים ---
-const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
-const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY;
+const Token = TELEGRAM_BOT_TOKEN_NEW;
+const geminiApiKey = GEMINI_API_KEY;
 
 if (!Token) throw new Error("Telegram Bot Token not found!");
 if (!geminiApiKey) throw new Error("Gemini API Key not found!");

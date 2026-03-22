@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import { ZOHO } from '$env/static/private';
 
 export async function POST({ request }) {
     const data = await request.json();
@@ -14,7 +15,7 @@ export async function POST({ request }) {
         port: 465,
         auth: {
           user: "notifications@1lev1.com",	
-          pass: import.meta.env.VITE_ZOHO,
+          pass: ZOHO,
         },
 });
   

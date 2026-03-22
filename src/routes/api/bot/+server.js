@@ -2,9 +2,10 @@ import { json } from '@sveltejs/kit';
 import { t, locale, loadTranslations } from '$lib/translations';
 import { startTimer, stopTimer } from '$lib/func/timers.js';
 import { sendToSer } from '$lib/send/sendToSer.js';
+import { GEMINI_API_KEY } from '$env/static/private';
 import { SITE_CONTEXT, createGeminiClient } from '$lib/bot/context.js';
 
-const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY;
+const geminiApiKey = GEMINI_API_KEY;
 
 const geminiModel = createGeminiClient(geminiApiKey);
 

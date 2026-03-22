@@ -2,32 +2,20 @@
 // index אחד, namespace לכל קטגוריה: skills / roles / methods
 import { Pinecone } from '@pinecone-database/pinecone';
 
+import { PINECONE, PINECONE_INDEX } from '$env/static/private';
+
 const getPineconeKey = () => {
-    let key = '';
-    if (typeof process !== 'undefined' && process.env && process.env.PINECONE) key = process.env.PINECONE;
-    if (!key) {
-        try {
-            // @ts-ignore
-            if (import.meta && import.meta.env) key = import.meta.env.VITE_PINECONE || import.meta.env.PINECONE || '';
-        } catch { }
-    }
+    const key = PINECONE || '';
     console.log('Pinecone Key found (length):', key?.length || 0);
     return key;
 };
 
 const getIndexName = () => {
-    let name = '';
-    if (typeof process !== 'undefined' && process.env && process.env.PINECONE_INDEX) name = process.env.PINECONE_INDEX;
-    if (!name) {
-        try {
-            // @ts-ignore
-            if (import.meta && import.meta.env) name = import.meta.env.VITE_PINECONE_INDEX || import.meta.env.PINECONE_INDEX || '';
-        } catch { }
-    }
-    const finalName = name || 'missions';
-    console.log('Pinecone Index Name:', finalName);
-    return finalName;
+    const name = PINECONE_INDEX || 'missions';
+    console.log('Pinecone Index Name:', name);
+    return name;
 };
+
 
 let pcInstance: Pinecone | null = null;
 const getPc = () => {

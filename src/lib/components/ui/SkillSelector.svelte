@@ -15,7 +15,9 @@
     selectedSkills = $bindable([]),
     placeholder = undefined,
     color = '--gold',
-    autoCreate = true // Whether to automatically create appended skills on the server
+    autoCreate = true, // Whether to automatically create appended skills on the server
+    onadd = undefined,
+    onremove = undefined
   } = $props();
 
   let defaultPlaceholder = $derived(
@@ -280,6 +282,8 @@
     bind:searchText
     bind:selected={selectedSkills}
     placeholder={actualPlaceholder}
+    {onadd}
+    {onremove}
     {options}
   />
 

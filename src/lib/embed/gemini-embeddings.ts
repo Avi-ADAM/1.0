@@ -1,22 +1,7 @@
-// lib/gemini-embeddings.ts
-// Gemini text-embedding-004 — חינמי, 768 מימדים, תומך עברית ואנגלית
-const getApiKey = () => {
-    if (typeof process !== 'undefined' && process.env && process.env.GEMINI_API_KEY) {
-        return process.env.GEMINI_API_KEY;
-    }
-    try {
-        // @ts-ignore
-        if (import.meta && import.meta.env) {
-            // @ts-ignore
-            return import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.VITE_GOOGLE_API || '';
-        }
-    } catch {
-        // ignore
-    }
-    return '';
-};
+import { GEMINI_API_KEY as KEY_PRIORITY, GOOGLE_API as KEY_BACKUP } from '$env/static/private';
 
-const GEMINI_API_KEY = getApiKey();
+const GEMINI_API_KEY = KEY_PRIORITY || KEY_BACKUP || '';
+
 const GEMINI_MODEL = 'gemini-embedding-2-preview';
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta';
 // Gemini מגביל ל-100 טקסטים לקריאה ב-batchEmbedContents

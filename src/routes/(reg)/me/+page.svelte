@@ -241,7 +241,6 @@
     lango;
   let cards = $state(true);
   async function start() {
- 
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
@@ -517,7 +516,6 @@
     githublink = $state(),
     noMail = $state();
   async function sendD() {
-  
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
@@ -778,18 +776,18 @@
     }
   }
   //
-  $effect(async()=>{
-    if(page.url.searchParams.has('action')) {
+  $effect(async () => {
+    if (page.url.searchParams.has('action')) {
       await tick();
-      if(page.url.searchParams.get('action') === 'createproject'){
+      if (page.url.searchParams.get('action') === 'createproject') {
         iwant = false;
         addP = true;
-      } else if(page.url.searchParams.get('action') === 'editbasic') {
+      } else if (page.url.searchParams.get('action') === 'editbasic') {
         isOpen = true;
         a = 1;
       }
     }
-  })
+  });
   function guid() {
     isG = true;
     run();
@@ -900,7 +898,6 @@
       
       // Update server to mark guide as not viewed (so it can show again)
       try {
-       
         if (page.data.tok) {
           const bearer1 = 'bearer' + ' ' + page.data.tok;
           await fetch(`${baseUrl}/graphql`, {
@@ -936,7 +933,6 @@
       
       // Update server to mark guide as viewed
       try {
-        
         if (page.data.tok) {
           const bearer1 = 'bearer' + ' ' + page.data.tok;
           await fetch(`${baseUrl}/graphql`, {
@@ -987,7 +983,7 @@
               machshirs={meData?.machshirs.data}
               projectIds={meData.projects_1s.data.map((c) => c.id)}
               isGuidMe={!isG}
-              onGuidMeChange={(value) => isG = !value}
+              onGuidMeChange={(value) => (isG = !value)}
               checked={cards}
               lango={$lang}
               uid={meDataa.data.me.id}
@@ -1325,7 +1321,7 @@
                 }}
                 title={crnfr[$lang]}
               >
-             <CrNewProject/>
+                <CrNewProject />
               </button>
             </div>
 

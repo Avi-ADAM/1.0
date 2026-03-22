@@ -13,6 +13,7 @@
   import { skillsNew } from '../../stores/skillsNew.js';
   import MultiSelect from 'svelte-multiselect';
   import SkillSelector from '../ui/SkillSelector.svelte';
+  import { skil } from '$lib/components/prPr/mi.js';
   import Addneww from '../addnew/addnewWorkway.svelte';
   import Addnewv from '../addnew/addnewval.svelte';
   import Addnewr from '../addnew/addNewRole.svelte';
@@ -111,7 +112,7 @@ console.log("skillslist",skillslist);
       more = `localizations { data{attributes{ ${valc} }}}`;
     }
     if (datan !== 'mash') {
-      let list = data.map((c) => c.id);
+      let list = data.map((c) => `"${c.id}"`);
 
       const cookieValueId = document.cookie
         .split('; ')
@@ -191,11 +192,39 @@ console.log("skillslist",skillslist);
   });
   function find_id(arra) {
     var arr = [];
+    const baseSource = datan === 'skil' ? $skil : meData;
+    // Combine with current data to ensure we don't lose items already in sync
+    const sourceData = [...baseSource, ...data];
+    const nameField = datan === 'skil' ? 'skillName' : valc;
+
     for (let j = 0; j < arra.length; j++) {
-      for (let i = 0; i < meData.length; i++) {
-        if (meData[i].attributes[valc] === arra[j]) {
-          arr.push(meData[i].id);
+      const searchName = arra[j];
+      let foundId = null;
+
+      for (let i = 0; i < sourceData.length; i++) {
+        if (!sourceData[i].attributes) continue;
+        let name = sourceData[i].attributes[nameField];
+        let heName = name;
+
+        // Check localizations if available (for skills)
+        if (
+          datan === 'skil' &&
+          sourceData[i].attributes.localizations?.data?.length > 0
+        ) {
+          heName =
+            sourceData[i].attributes.localizations.data[0].attributes[
+              nameField
+            ];
         }
+
+        if (name === searchName || heName === searchName) {
+          foundId = sourceData[i].id;
+          break;
+        }
+      }
+
+      if (foundId) {
+        arr.push(foundId);
       }
     }
     return arr;
@@ -213,11 +242,10 @@ console.log("skillslist",skillslist);
   }
 
   const filterByReference = (allob, id) => {
-    console.log(id);
     let res = [];
     res = allob.filter((el) => {
-      return id.find((element) => {
-        return element === el.id;
+      return id.some((element) => {
+        return String(element) === String(el.id);
       });
     });
     return res;
@@ -241,7 +269,8 @@ console.log("skillslist",skillslist);
       let array3 = old.concat(neww);
       array3 = [...new Set([...old, ...neww])];
 
-      const resp = filterByReference(meData, array3);
+      const sourceData = datan === 'skil' ? $skil : meData;
+      const resp = filterByReference(sourceData, array3);
       const datana = resp;
       onAdd?.({
         data: datana,
@@ -613,8 +642,18 @@ console.log("skillslist",skillslist);
   let addW = $state(false);
 
   $effect(() => {
-    if (data && data.selected2 === undefined) {
-      data.selected2 = [];
+    if (
+      data &&
+      (data.selected2 === undefined ||
+        (data.length > 0 && data.selected2.length === 0))
+    ) {
+      if (datan === 'skil' && data.length > 0) {
+        data.selected2 = data.map(
+          (d) => d.attributes[valc] || d.attributes.skillName
+        );
+      } else if (data.selected2 === undefined) {
+        data.selected2 = [];
+      }
     }
   });
 
@@ -625,6 +664,34 @@ console.log("skillslist",skillslist);
   let anim = $derived(
     datan == 'work' || datan == 'val' ? -(width / 2) : width / 2
   );
+  $effect(() => {
+    if (datan === 'skil' && data.selected2 && $skil) {
+      const labels = data.selected2;
+      const ids = find_id(labels);
+
+      // Only sync if we found IDs for ALL selected labels.
+      // This prevents mass removal while new skills are being created.
+      if (ids.length < labels.length) return;
+
+      // Only sync if they represent a different set of IDs than what we currently have
+      const existingIds = data.map((d) => String(d.id)).sort();
+      const targetIds = [...new Set(ids.map((id) => String(id)))].sort();
+
+      if (JSON.stringify(existingIds) !== JSON.stringify(targetIds)) {
+        // Deduplicate source data to prevent duplicate keys in the UI
+        const deduplicatedSource = Array.from(
+          new Map([...$skil, ...data].map((item) => [String(item.id), item])).values()
+        );
+        const objects = filterByReference(deduplicatedSource, ids);
+        onAdd?.({
+          data: objects,
+          linkp: kish,
+          valc: valc,
+          a: datan
+        });
+      }
+    }
+  });
 </script>
 
 {#if masss === true}
@@ -767,11 +834,11 @@ console.log("skillslist",skillslist);
                       title={onin[$lang]}
                       aria-label={onin[$lang]}
                     >
-                      <Grow width="17" height="17" /></button
+                      <Grow width={17} height={17} /></button
                     >
                   {/if}
                 </Tile>
-              {:else}
+              {:else if datan !== 'skil'}
                 <div
                   class="text-center text-sm text-lturk md:text-xl"
                   title={less[$lang]}
@@ -835,6 +902,12 @@ console.log("skillslist",skillslist);
       {#if datan == 'skil'}
         <SkillSelector
           bind:selectedSkills={data.selected2}
+          onadd={() => {
+            yy = 1;
+          }}
+          onremove={() => {
+            yy = 2;
+          }}
           {placeholder}
           autoCreate={true}
         />

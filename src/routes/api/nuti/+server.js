@@ -1,6 +1,7 @@
 import { render } from 'svelty-email';
 import PendJustCreated from '$lib/components/mail/pendJustCreated.svelte';
 import nodemailer from 'nodemailer';
+import { ZOHO } from '$env/static/private';
 
 async function sendMail(
   restime,
@@ -24,7 +25,7 @@ async function sendMail(
     port: 465,
     auth: {
       user: "notifications@1lev1.com",	
-      pass: import.meta.env.VITE_ZOHO,
+      pass: ZOHO,
     },
   });
   
