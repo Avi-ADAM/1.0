@@ -1,5 +1,5 @@
 <script>
-  import MultiSelect from 'svelte-multiselect';
+  import SkillSelector from '$lib/components/ui/SkillSelector.svelte';
   import { userName } from '../../stores/store.js';
   import { lang } from '$lib/stores/lang.js';
   import { page } from '$app/state';
@@ -7,112 +7,16 @@
   import { show } from './store-show.js';
   import { skills1 } from './skills1.js';
   import { onMount } from 'svelte';
-  import jskill from '$lib/data/skills.json';
-  import enjskill from '$lib/data/skillsen.json';
-  let skills2 = $state([]);
-  let error1 = null;
-  let addskil = 0;
-  const baseUrl = import.meta.env.VITE_URL;
+  import { skil } from '$lib/components/prPr/mi.js';
+  import Skip from '$lib/celim/icons/skip.svelte';
+
   let { onProgres } = $props();
-  let newcontent = $state(true);
-  onMount(async () => {
-    if ($lang == 'he') {
-      skills2 = jskill;
-    } else if ($lang == 'en') {
-      skills2 = enjskill;
-    }
-    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-    const checkStatus = (resp) => {
-      if (resp.status >= 200 && resp.status < 300) {
-        return resp;
-      }
-      return parseJSON(resp).then((resp) => {
-        throw resp;
-      });
-    };
-    const headers = {
-      'Content-Type': 'application/json'
-    };
-
-    try {
-      const res = await fetch(baseUrl + '/graphql', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `query {
-  skills (sort: "skillName") { data{ id attributes{ skillName ${$lang == 'he' ? 'localizations { data {attributes{skillName} }}' : ''}}
-}
-} }
-              `
-        })
-      })
-        .then(checkStatus)
-        .then(parseJSON);
-      skills2 = res.data.skills.data;
-      if ($lang == 'he') {
-        for (var i = 0; i < skills2.length; i++) {
-          if (skills2[i].attributes.localizations.data.length > 0) {
-            skills2[i].attributes.skillName =
-              skills2[i].attributes.localizations.data[0].attributes.skillName;
-          }
-        }
-      }
-      skills2 = skills2;
-      console.log(skills2);
-
-      // טעינת הכישורים שנבחרו בעבר
-      const currentSkills = $skills1;
-      if (currentSkills && currentSkills.length > 0) {
-        const skillNames = currentSkills
-          .map((skillId) => {
-            const skill = skills2.find((s) => s.id == skillId);
-            return skill ? skill.attributes.skillName : null;
-          })
-          .filter(Boolean);
-        selected = skillNames;
-      }
-
-      newcontent = false;
-    } catch (e) {
-      error1 = e;
-    }
-  });
-
-  function find_skill_id(skill_name_arr) {
-    var arr = [];
-    for (let j = 0; j < skill_name_arr.length; j++) {
-      for (let i = 0; i < skills2.length; i++) {
-        if (skills2[i].attributes.skillName === skill_name_arr[j]) {
-          arr.push(skills2[i].id);
-        }
-      }
-    }
-    return arr;
-  }
 
   let selected = $state([]);
-  const placeholder = `${$lang == 'he' ? 'הכישורים שלי' : 'My skills'}`;
-
   let userName_value = $state();
   let show_value = 0;
 
-  // טעינת הנתונים מה-store כשהקומפוננט נטען
-  onMount(() => {
-    const currentSkills = $skills1;
-    if (currentSkills && currentSkills.length > 0 && skills2.length > 0) {
-      // המרת מזהים חזרה לשמות כישורים
-      const skillNames = currentSkills
-        .map((skillId) => {
-          const skill = skills2.find((s) => s.id == skillId);
-          return skill ? skill.attributes.skillName : null;
-        })
-        .filter(Boolean);
-      selected = skillNames;
-    }
-  });
-
+  // Subscribe to stores
   userName.subscribe((value) => {
     userName_value = value;
   });
@@ -121,97 +25,81 @@
     show_value = newValue;
   });
 
+  onMount(() => {
+    // Load previously selected skills from store and map IDs to strings
+    const currentSkills = $skills1;
+    if (
+      currentSkills &&
+      currentSkills.length > 0 &&
+      $skil &&
+      $skil.length > 0
+    ) {
+      selected = currentSkills
+        .map((skillId) => {
+          const s = $skil.find((item) => item.id == skillId);
+          if (s) {
+            let name = s.attributes?.skillName || '';
+            if (
+              $lang === 'he' &&
+              s.attributes?.localizations?.data?.length > 0
+            ) {
+              name = s.attributes.localizations.data[0].attributes.skillName;
+            }
+            return name;
+          }
+          return null;
+        })
+        .filter(Boolean);
+    }
+  });
+
+  // Map strings back to IDs and save before navigating
+  function find_skill_id(skill_name_arr) {
+    var arr = [];
+    for (let j = 0; j < skill_name_arr.length; j++) {
+      for (let i = 0; i < $skil.length; i++) {
+        let name = $skil[i].attributes?.skillName || '';
+        let heName = name;
+        if ($skil[i].attributes?.localizations?.data?.length > 0) {
+          heName =
+            $skil[i].attributes.localizations.data[0].attributes.skillName;
+        }
+
+        if (name === skill_name_arr[j] || heName === skill_name_arr[j]) {
+          arr.push($skil[i].id);
+          break;
+        }
+      }
+    }
+    return arr;
+  }
+
+  function saveToStore() {
+    // SkillSelector automatically creates new items on the server
+    // and adds them to $skil, so we just need to find their IDs here.
+    const skillIds = find_skill_id(selected);
+    skills1.set(skillIds);
+  }
+
   function increment() {
-    newnew();
+    saveToStore();
     show.update((n) => n + 1);
     onProgres?.({ tx: 0, txx: 16 });
   }
+
   function toend() {
-    newnew();
+    saveToStore();
     show.set(5);
     onProgres?.({ tx: 0, txx: 4 });
   }
+
   function back() {
-    newnew();
+    saveToStore();
     show.update((n) => n - 1);
     onProgres?.({ tx: 600, txx: 20 });
   }
 
-  import Skip from '$lib/celim/icons/skip.svelte';
-
-  let meData = [];
-  async function newnew() {
-    for (let i = 0; i < selected.length; i++) {
-      if (!skills2.map((c) => c.attributes.skillName).includes(selected[i])) {
-        //create new and update skills
-        console.log(selected, skills2);
-        let link = baseUrl + '/graphql';
-        let d = new Date();
-        try {
-          await fetch(link, {
-            method: 'POST',
-
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              query: `mutation  createSkill {
-  createSkill(data: {  skillName: "${selected[i]}",
-        publishedAt: "${d.toISOString()}"}) {
-    data {
-      id
-      attributes {
-        skillName
-      }
-
-       }
-    }
-}`
-            })
-          })
-            .then((r) => r.json())
-            .then((data) => (meData = data));
-          const newOb = meData.data.createSkill.data;
-          // יצירת מערך חדש במקום שינוי הקיים - חשוב לריאקטיביות
-          skills2 = [...skills2, newOb];
-          let userName_value = $userName;
-          let data = {
-            name: userName_value,
-            action: 'create כישור חדש בשם:',
-            det: `${selected[i]}`
-          };
-          fetch('/api/ste', {
-            method: 'POST', // or 'PUT'
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-          })
-            .then((response) => response)
-            .then((data) => {
-              console.log('Success:', data);
-            })
-            .catch((error) => {
-              console.error('Error:', error);
-            });
-        } catch (error) {
-          console.log('צריך לתקן:', error.response);
-          error1 = error;
-          console.log(error1);
-        }
-      }
-    }
-    const skillIds = find_skill_id(selected);
-    console.log('Selected skills:', selected);
-    console.log('Found skill IDs:', skillIds);
-    console.log('Current skills2:', skills2);
-    skills1.set(skillIds);
-    console.log('Updated skills1:', $skills1);
-  }
-
-  let ugug = $state(``);
-
-  let addn = $derived({ he: `הוספת "${ugug}"`, en: `Create "${ugug}"` });
+  // Assets and text
   const srca = {
     he: 'https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg',
     en: 'https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg'
@@ -232,24 +120,18 @@
   <br />
   {ws[$lang]}
 </h1>
+
 <div dir={$lang == 'en' ? 'ltr' : 'rtl'} class="input-2">
-  <MultiSelect
-    loading={newcontent}
-    --sms-width="var(--multiselect-width)"
-    outerDivClass="!bg-gold !text-barbi"
-    inputClass="!bg-gold !text-barbi"
-    liSelectedClass="!bg-barbi !text-gold"
-    createOptionMsg={addn[$lang]}
-    allowUserOptions={'append'}
-    bind:searchText={ugug}
-    bind:selected
-    {placeholder}
-    options={skills2.map((c) => c.attributes.skillName)}
-  />
+  <!-- Integration of the new SkillSelector -->
+  <div style="width: var(--multiselect-width, 80vw); max-width: 600px;">
+    <SkillSelector bind:selectedSkills={selected} color="--gold" />
+  </div>
 </div>
+
 <button class="button-in-1-2" onclick={back}>
   <img alt="go" style="height:15vh;" src={srca[$lang]} />
 </button>
+
 <button
   class="button-end bg-sturk p-1 rounded-full"
   onclick={toend}
@@ -257,6 +139,7 @@
 >
   <Skip />
 </button>
+
 <button class="button-2" onclick={increment}>
   <img alt="go" style="height:15vh;" src={srcb[$lang]} />
 </button>
@@ -306,7 +189,7 @@
       justify-self: center;
       display: flex;
       justify-content: center;
-      --multiselect-width: 30vw;
+      --multiselect-width: 80vw;
     }
   }
   .input-2-2 {
@@ -343,6 +226,6 @@
     justify-self: center;
     display: flex;
     justify-content: center;
-    --multiselect-width: auto;
+    --multiselect-width: 25vw;
   }
 </style>

@@ -13,7 +13,7 @@
    */
 
   /** @type {Props} */
-  let { isOpen = false, title = '', children, onClose } = $props();
+  let { isOpen = $bindable(false), title = '', children, onClose } = $props();
   
     function closeModal() {
       onClose?.();

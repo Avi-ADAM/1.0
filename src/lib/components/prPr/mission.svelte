@@ -17,7 +17,7 @@
   import MultiSelect from 'svelte-multiselect';
   import { lang } from '$lib/stores/lang.js';
   import Addnewro from '../addnew/addNewRole.svelte';
-  import AddNewSkill from '../addnew/addNewSkill.svelte';
+  import SkillSelector from '../ui/SkillSelector.svelte';
   //import AddNewWorkway from '../addnew/addnewWorkway.svelte';
   import { RingLoader } from 'svelte-loading-spinners';
   import { addslashes } from '$lib/func/uti/string.js';
@@ -1385,7 +1385,7 @@
                   {/key}
                 </div>
                 <div class='my-2'>
-                    <mark class="text-barbi  text-sm lg:text-2xl">{requireSkills[$lang]}</mark>
+                    <mark class="text-barbi  text-sm lg:text-2xl">{requireSkills[$lang]}:</mark>
     <button onclick={() => (ske = !ske)}>{#if ske}<Done/>{:else}<EditIcon/>{/if}</button>
     {#if !ske}
     {#if miData[0].selectedSkills.length > 0}
@@ -1398,54 +1398,26 @@
         </div>
         {/if}
         {:else}
-        {#if page.data.isDesktop}
-        <div class="border border-gold flex  lg:p-4 flex-row justify-center align-middle p-2">
-
-        <MultiSelect
-        outerDivClass="!bg-gold !text-barbi"
-        inputClass="!bg-gold !text-barbi"
-        liSelectedClass="!bg-barbi !text-gold"
-        --sms-open-z-index={10000}
-        loading={newcontent}
-        onchange={() => (miData = miData)}
-        bind:selected={miData[0].selectedSkills}
-        placeholder={placeholder1[$lang]}
-        options={$skil.map((c) => c.attributes.skillName)}
-        noMatchingOptionsMsg={nom[$lang]}
-      />
-      <AddNewSkill
-        mid={miData[0].id}
-        onAddnewskill={addnew}
-        {addS}
-        roles1={roles}
-      />
-                </div>
-                {:else}
-                <MobileModal onClose={()=> ske = false} bind:isOpen={ske} title="{placeholder1[$lang]}">
-                  <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
-
-                    <MultiSelect
-                    outerDivClass="!bg-gold !text-barbi"
-                    inputClass="!bg-gold !text-barbi"
-                    liSelectedClass="!bg-barbi !text-gold"
-                    --sms-open-z-index={10000}
-                    loading={newcontent}
-                    onchange={() => (miData = miData)}
-                    bind:selected={miData[0].selectedSkills}
-                    placeholder={placeholder1[$lang]}
-                    options={$skil.map((c) => c.attributes.skillName)}
-                    noMatchingOptionsMsg={nom[$lang]}
-                  />
-                  <AddNewSkill
-                    mid={miData[0].id}
-                    onAddnewskill={addnew}
-                    {addS}
-                    roles1={roles}
-                  />
-                  <button onclick={()=> ske = false}><Done/></button>
-                            </div>
-                </MobileModal>
-      {/if}
+         {#if page.data.isDesktop}
+        <div class="border border-gold flex w-full lg:p-4 flex-row justify-center align-middle p-2">
+          <SkillSelector
+            bind:selectedSkills={miData[0].selectedSkills}
+            placeholder={placeholder1[$lang]}
+            autoCreate={true}
+          />
+        </div>
+        {:else}
+        <MobileModal onClose={()=> ske = false} bind:isOpen={ske} title="{placeholder1[$lang]}">
+          <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
+            <SkillSelector
+              bind:selectedSkills={miData[0].selectedSkills}
+              placeholder={placeholder1[$lang]}
+              autoCreate={true}
+            />
+            <button onclick={()=> ske = false}><Done/></button>
+          </div>
+        </MobileModal>
+        {/if}
       {/if}
     </div>   
     <div class='my-2'>

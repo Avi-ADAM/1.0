@@ -11,18 +11,19 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { STRAPI_TOKEN, GROQ_API_KEY } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 // ─── CONFIG ────────────────────────────────────────────────────────────────────
 
-const STRAPI_URL = process.env.STRAPI_URL ?? 'http://localhost:1337';
-const STRAPI_TOKEN = process.env.STRAPI_TOKEN ?? '';
-const GROQ_API_KEY = process.env.GROQ_API_KEY ?? '';
-const GROQ_MODEL = process.env.GROQ_MODEL ?? 'llama3-70b-8192';
+const STRAPI_URL = import.meta.env.VITE_URL ?? 'http://localhost:1337';
+const GROQ_MODEL = env.GROQ_MODEL ?? 'llama-3.1-8b-instant';
 
 // ─── HELPERS ───────────────────────────────────────────────────────────────────
 
 /** Strapi 4 authenticated fetch */
 async function strapiFetch(path: string, options: RequestInit = {}) {
+  console.log(`[StrapiFetch] Requesting: ${path}`);
   const res = await fetch(`${STRAPI_URL}${path}`, {
     ...options,
     headers: {
@@ -34,6 +35,7 @@ async function strapiFetch(path: string, options: RequestInit = {}) {
 
   if (!res.ok) {
     const text = await res.text();
+    console.error(`[StrapiFetch] Error [${res.status}] ${path}: ${text}`);
     throw new Error(`Strapi 4 error [${res.status}] ${path}: ${text}`);
   }
 
@@ -58,6 +60,11 @@ async function translateWithGroq(
   targetLocale: string,
   targetLanguageName: string
 ): Promise<string> {
+  console.log(`[Groq] Translating: ${text}`);
+  console.log(`[Groq] Target locale: ${targetLocale}`);
+  console.log(`[Groq] Target language name: ${targetLanguageName}`);
+  console.log(`[Groq] API Key: ${GROQ_API_KEY}`);
+  console.log(`[Groq] Model: ${GROQ_MODEL}`);
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -81,6 +88,7 @@ Return ONLY the translated text with no extra commentary or formatting.`,
 
   if (!res.ok) {
     const err = await res.text();
+    console.error(`[Groq] Error [${res.status}]: ${err}`);
     throw new Error(`Groq error [${res.status}]: ${err}`);
   }
 
@@ -175,6 +183,20 @@ async function createLocalization(
   });
 }
 
+/** Update an existing Strapi 4 entry */
+async function updateEntry(contentType: string, id: number, attributes: Record<string, unknown>) {
+  console.log(`[Strapi] Updating entry: ${contentType}/${id}`);
+  return strapiFetch(`/api/${contentType}/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify({ data: attributes }),
+  });
+}
+
+/** Check if text contains Hebrew characters */
+function isHebrew(text: string): boolean {
+  return /[\u0590-\u05FF]/.test(text);
+}
+
 // ─── ROUTE HANDLER ─────────────────────────────────────────────────────────────
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -182,13 +204,16 @@ export const POST: RequestHandler = async ({ request }) => {
 
   try {
     body = await request.json();
+    console.log('[Translations API] Received request:', body);
   } catch {
+    console.error('[Translations API] Failed to parse JSON body');
     return json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
   const { contentType, entryId, sourceLocale } = body;
 
   if (!contentType || !entryId || !sourceLocale) {
+    console.error('[Translations API] Missing required fields', { contentType, entryId, sourceLocale });
     return json(
       { error: 'Missing required fields: contentType, entryId, sourceLocale' },
       { status: 400 }
@@ -197,32 +222,76 @@ export const POST: RequestHandler = async ({ request }) => {
 
   try {
     // 1. Fetch all available locales
+    console.log('[Translations API] Fetching locales...');
     const allLocales = await getLocales();
-    const targetLocales = allLocales.filter((l) => l.code !== sourceLocale);
+
+    // 2. Fetch the source entry
+    console.log(`[Translations API] Fetching source entry: ${contentType}/${entryId} (locale: ${sourceLocale})`);
+    const sourceEntry = await getEntry(contentType, entryId, sourceLocale);
+
+    if (!sourceEntry || !sourceEntry.attributes) {
+      console.error('[Translations API] Source entry not found or missing attributes');
+      throw new Error('Source entry not found or missing attributes');
+    }
+
+    const sourceAttributes: Record<string, unknown> = sourceEntry.attributes;
+
+    // --- Detect if this is actually Hebrew content in a non-Hebrew locale ---
+    const containsHebrew = Object.values(sourceAttributes).some(
+      (v) => typeof v === 'string' && isHebrew(v)
+    );
+
+    let actualSourceLocale = sourceLocale;
+    let isMismatch = false;
+
+    if (sourceLocale !== 'he' && containsHebrew) {
+      console.log(`[Translations API] MISMATCH: Detected Hebrew text in '${sourceLocale}' locale.`);
+      actualSourceLocale = 'he';
+      isMismatch = true;
+
+      // Ensure 'he' localization exists with the Hebrew text
+      try {
+        await createLocalization(contentType, entryId, 'he', sourceAttributes);
+        console.log('[Translations API] Created Hebrew localization as original source.');
+      } catch (e) {
+        console.warn('[Translations API] Hebrew localization might already exist or failed:', e);
+      }
+    }
+
+    // Target locales are all except the actual source (usually 'he' in mistyped cases)
+    const targetLocales = allLocales.filter((l) => l.code !== actualSourceLocale);
+    console.log(`[Translations API] Target locales for translation:`, targetLocales.map(l => l.code));
 
     if (targetLocales.length === 0) {
       return json({ message: 'No other locales found. Nothing to translate.' });
     }
 
-    // 2. Fetch the source entry
-    const sourceEntry = await getEntry(contentType, entryId, sourceLocale);
-    const sourceAttributes: Record<string, unknown> = sourceEntry.attributes;
-
-    // 3. Translate & create each localization
+    // 3. Translate & process each target localization
     const results: { locale: string; status: string; error?: string }[] = [];
 
     for (const targetLocale of targetLocales) {
+      console.log(`[Translations API] Processing locale: ${targetLocale.code} (${targetLocale.name})`);
       try {
         const translatedAttributes = await translateAttributes(
           sourceAttributes,
           targetLocale.code,
           targetLocale.name
         );
+        console.log(`[Translations API] Translation complete for ${targetLocale.code}`);
 
-        await createLocalization(contentType, entryId, targetLocale.code, translatedAttributes);
-
-        results.push({ locale: targetLocale.code, status: 'created' });
+        if (isMismatch && targetLocale.code === sourceLocale) {
+          // If we had a mismatch, we need to UPDATE the original entry (which has the wrong language)
+          console.log(`[Translations API] Updating original ${sourceLocale} entry with translated text...`);
+          await updateEntry(contentType, entryId, translatedAttributes);
+          results.push({ locale: targetLocale.code, status: 'updated' });
+        } else {
+          // Normal case: create a new localization
+          console.log(`[Translations API] Creating localization for ${targetLocale.code}...`);
+          await createLocalization(contentType, entryId, targetLocale.code, translatedAttributes);
+          results.push({ locale: targetLocale.code, status: 'created' });
+        }
       } catch (err) {
+        console.error(`[Translations API] Error for locale ${targetLocale.code}:`, err);
         results.push({
           locale: targetLocale.code,
           status: 'error',
@@ -231,6 +300,7 @@ export const POST: RequestHandler = async ({ request }) => {
       }
     }
 
+    console.log('[Translations API] Final results:', results);
     return json({
       entryId,
       contentType,
@@ -239,6 +309,7 @@ export const POST: RequestHandler = async ({ request }) => {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
+    console.error('[Translations API] Global error:', message, err);
     return json({ error: message }, { status: 500 });
   }
 };
