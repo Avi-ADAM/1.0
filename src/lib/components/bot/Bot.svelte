@@ -86,6 +86,13 @@
     visible = false;
     goto('/chat');
   }
+
+  function autoResize(e) {
+    const target = e.currentTarget;
+    if (!target) return;
+    target.style.height = 'auto';
+    target.style.height = Math.min(target.scrollHeight, 120) + 'px';
+  }
 </script>
 
 {#if !isOnChatPage}
@@ -228,12 +235,7 @@
                      transition-all duration-200 ease-in-out
                      shadow-sm hover:shadow-md"
               style="min-height: 44px; max-height: 120px;"
-              oninput={(e) => {
-                // Auto-resize textarea
-                e.target.style.height = 'auto';
-                e.target.style.height =
-                  Math.min(e.target.scrollHeight, 120) + 'px';
-              }}
+              oninput={autoResize}
             ></textarea>
           </div>
           <button

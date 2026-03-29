@@ -5,6 +5,13 @@ import { mastra } from '../../../mastra';
 import { createUnregisteredBotAgent } from '../../../mastra/agents/nonreg-bot.js';
 import { t } from '$lib/translations';
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': 'https://www.1lev1.com',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Credentials': 'true',
+};
+
 /**
  * Enhanced Chat API — connected to Mastra agents.
  * Used by the expanded /chat page for rich, tool-capable conversations.
@@ -41,7 +48,7 @@ export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
       content: t.get('bot.noMessageReceived'),
       reply: t.get('bot.noMessageReceived'),
       components: []
-    });
+    }, { headers: corsHeaders });
   }
 
   try {
@@ -104,7 +111,7 @@ export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
       if (components.length > 0) response.components = components;
 
       console.log('📤 Nonreg bot response:', response);
-      return json(response);
+      return json(response, { headers: corsHeaders });
     }
 
     // ── Registered user → Mastra workflow ──
@@ -171,7 +178,7 @@ export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
     }
 
     console.log('📤 Mastra workflow response:', response);
-    return json(response);
+    return json(response, { headers: corsHeaders });
   } catch (error) {
     console.error('❌ Chat API Error:', error);
     return json(
@@ -182,7 +189,7 @@ export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
         error: true,
         details: (error as Error).message
       },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 };
@@ -225,11 +232,6 @@ function detectRenderComponents(userText: string) {
 export async function OPTIONS() {
   return new Response(null, {
     status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': 'https://www.1lev1.com',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-      'Access-Control-Allow-Credentials': 'true',
-    },
+    headers: corsHeaders,
   });
 }

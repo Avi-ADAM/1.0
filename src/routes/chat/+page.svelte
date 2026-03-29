@@ -23,14 +23,31 @@
   // ── Suggestions & Quick Actions ───────────────────────────
   const suggestions = $derived(
     userId
-      ? [$t('bot.sugUserWhatAreTasks'), $t('bot.sugUserStartTimer'), $t('bot.sugUserShowPartnerships')]
-      : [$t('bot.sugGuestWhatCanYouDo'), $t('bot.sugGuestHowToRegister'), $t('bot.sugGuestTellMeAbout')]
+      ? [
+          $t('bot.sugUserWhatAreTasks'),
+          $t('bot.sugUserStartTimer'),
+          $t('bot.sugUserShowPartnerships')
+        ]
+      : [
+          $t('bot.sugGuestWhatCanYouDo'),
+          $t('bot.sugGuestHowToRegister'),
+          $t('bot.sugGuestTellMeAbout')
+        ]
   );
 
   const quickSuggestions = $derived(
     userId
-      ? [$t('bot.qsUserStopTimer'), $t('bot.qsUserActiveTimers'), $t('bot.qsUserShowVotes'), $t('bot.qsUserNavProfile')]
-      : [$t('bot.qsGuestHome'), $t('bot.qsGuestLogin'), $t('bot.qsGuestSearchProjects')]
+      ? [
+          $t('bot.qsUserStopTimer'),
+          $t('bot.qsUserActiveTimers'),
+          $t('bot.qsUserShowVotes'),
+          $t('bot.qsUserNavProfile')
+        ]
+      : [
+          $t('bot.qsGuestHome'),
+          $t('bot.qsGuestLogin'),
+          $t('bot.qsGuestSearchProjects')
+        ]
   );
 
   const showWelcomeSuggestions = $derived(messages.length <= 1 && !loading);
@@ -202,7 +219,11 @@
   <!-- ── Header ────────────────────────────────────────── -->
   <header class="header">
     <div class="header-right">
-      <button class="back-btn" onclick={goBack} aria-label={$t('bot.chatActionBack')}>
+      <button
+        class="back-btn"
+        onclick={goBack}
+        aria-label={$t('bot.chatActionBack')}
+      >
         <svg
           width="18"
           height="18"
@@ -247,7 +268,11 @@
     </div>
 
     <div class="header-actions">
-      <button class="action-btn" onclick={clearChat} title={$t('bot.chatNewConversationTitle')}>
+      <button
+        class="action-btn"
+        onclick={clearChat}
+        title={$t('bot.chatNewConversationTitle')}
+      >
         <svg
           width="16"
           height="16"
@@ -310,7 +335,9 @@
       <!-- Welcome suggestions -->
       {#if showWelcomeSuggestions}
         <div class="suggestion-group">
-          <span class="suggestion-label">{$t('bot.chatQuickSuggestionsTitle')}</span>
+          <span class="suggestion-label"
+            >{$t('bot.chatQuickSuggestionsTitle')}</span
+          >
           <div class="chips">
             {#each suggestions as s}
               <button class="chip" onclick={() => send(s)}>{s}</button>
