@@ -2,7 +2,7 @@
   import { tick, onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
-  import { browser } from '$app/environment';
+  import { browser, dev } from '$app/environment';
   import { locale, t } from '$lib/translations';
   import { idPr } from '$lib/stores/idPr';
   import { chatMessages, type BotMessage } from '$lib/stores/chatStore';
@@ -117,7 +117,8 @@
     await scrollToBottom();
 
     try {
-      const res = await fetch('/api/chat', {
+      const apiUrl = dev ? '/api/chat' : 'https://rend.1lev1.com/api/chat';
+      const res = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -4,7 +4,7 @@
   import { goto } from '$app/navigation';
   import { idPr } from '$lib/stores/idPr';
   import { Circle3 } from 'svelte-loading-spinners';
-  import { browser } from '$app/environment';
+  import { browser, dev } from '$app/environment';
   import { page } from '$app/stores';
   import { chatMessages } from '$lib/stores/chatStore';
 
@@ -49,7 +49,8 @@
         content: m.text
       }));
 
-      const response = await fetch('/api/chat', {
+      const apiUrl = dev ? '/api/chat' : 'https://rend.1lev1.com/api/chat';
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
