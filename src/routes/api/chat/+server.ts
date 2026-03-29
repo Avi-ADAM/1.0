@@ -12,7 +12,7 @@ import { t } from '$lib/translations';
  */
 export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
   const body = await request.json();
-
+  console.log('📥 Chat API received request:', JSON.stringify(body, null, 2));
   // ── Flexible Payload Parsing (Supports both /chat and legacy /mastra-v2 formats) ──
   const userId = body.userId || body.user?.id;
   const lang = body.lang || body.user?.lang || 'he';
