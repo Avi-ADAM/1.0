@@ -1,15 +1,13 @@
-import { Agent } from '@mastra/core';
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { Agent } from '@mastra/core/agent';
+import { createGoogleModel, createGroqModel, hasGroqModelConfig } from '../lib/createModel';
 import { SITE_CONTEXT } from '../../lib/bot/context.js';
 import { navigateToPageTool } from '../tools/navigateToPageTool.js';
 import { getSitePagesTool } from '../tools/siteNavigationTool.js';
 import { getPageContextTool } from '../tools/pageContextTool.js';
 
 export const createUnregisteredBotAgent = (apiKey: string, lang: string = 'he') => {
-  const google = createGoogleGenerativeAI({
-    apiKey
-  });
   return new Agent({
+    id: 'lev1infoassistant',
     name: 'lev1infoassistant',
     instructions: `
 You are a helpful information assistant for the 1lev1.com platform (1💗1). You can only answer questions about the platform based on the provided context.
@@ -45,8 +43,11 @@ When users ask about:
 - Navigation or exploring the site - provide helpful guidance using the available tools
 - Questions about the current page, its structure, or actions - use getPageContextTool
     `,
-    model: google('gemini-2.5-flash'),
-    tools: [getSitePagesTool, navigateToPageTool, getPageContextTool],
+    model: [
+      ...(hasGroqModelConfig() ? [{ model: createGroqModel(), maxRetries: 2 }] : []),
+      { model: createGoogleModel(apiKey, 'gemini-flash-lite-latest'), maxRetries: 2 },
+        ],
+    tools: { getSitePagesTool, navigateToPageTool, getPageContextTool },
 
   });
 };

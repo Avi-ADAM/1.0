@@ -13,5 +13,5 @@ export const SITE_CONTEXT = `
 export function createGeminiClient(apiKey) {
   if (!apiKey) throw new Error('Gemini API Key not found!');
   const genAI = new GoogleGenerativeAI(apiKey);
-  return genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+  return genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
 }

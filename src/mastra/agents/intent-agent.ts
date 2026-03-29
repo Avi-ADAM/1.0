@@ -1,11 +1,13 @@
-import { Agent } from '@mastra/core';
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { Agent } from '@mastra/core/agent';
+import {
+  createGoogleModel,
+  createGroqModel,
+  hasGoogleModelConfig,
+  hasGroqModelConfig
+} from '../lib/createModel';
 
-export function createIntentAgent(apiKey: string, language: string = 'he') {
-  const google = createGoogleGenerativeAI({
-    apiKey
-  });
-  const systemPrompt =
+export function createIntentAgent(apiKey?: string, language: string = 'he') {
+const systemPrompt =
     language === 'he'
       ? `
 אתה סוכן ניתוח כוונות. המשימה שלך היא לנתח את הודעת המשתמש ולזהות את הכוונה העיקרית.
@@ -107,8 +109,18 @@ No context: "how do I create a new timer?" -> {"type": "general", "confidence": 
 `;
 
   return new Agent({
+    id: 'IntentAgent',
     name: 'IntentAgent',
+
     instructions: systemPrompt,
-    model: google('gemini-2.5-flash-lite')
+    model:
+      hasGroqModelConfig() && hasGoogleModelConfig(apiKey)
+        ? [
+            { model: createGroqModel(), maxRetries: 2 },
+            { model: createGoogleModel(apiKey), maxRetries: 2 }
+          ]
+        : hasGroqModelConfig()
+          ? createGroqModel()
+          : createGoogleModel(apiKey)
   });
 }

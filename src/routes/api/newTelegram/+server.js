@@ -19,92 +19,92 @@ const SITE_CONTEXT = `
 
 // --- תרגומים וקבועים ---
 const translations = {
-  he: {
-    welcome: 'ברוך בואך ל-1💗1',
-    welcomeRegistered: '{{username}}, ברוך בואך ל-1💗1', // Changed for clarity
-    login: '<<login להתחברות>>',
-    register: '<<to registration להרשמה>>',
-    registerNotify: '<<register for nutification הרשמה לעדכונים>>',
-    startTimerBtn: '<<start timer ⏳ הפעלת טיימר>>',
-    stopTimerBtn: '<<stop timer ⌛ עצירת טיימר>>',
-    helpText: 'כאן תוכל להירשם לעדכונים מפלטפורמת 1💗1 שלנו, או להשתמש בי כעוזר לניהול הטיימרים שלך.',
-    timerStarted: 'טיימר הופעל בהצלחה',
-    timerStartedMission: 'טיימר הופעל בהצלחה למשימה "{{missionName}}"',
-    chooseStart: 'בחירת משימה להפעלת טיימר',
-    timerStopped: 'טיימר נעצר בהצלחה',
-    chooseStop: 'בחירת משימה לעצירת טיימר',
-    selectTasks: 'בחירת המטלות שברצונך לקשר לטיימר:',
-    taskAdded: 'המטלה "{{name}}" נוספה בהצלחה',
-    taskRemoved: 'המטלה "{{name}}" הוסרה בהצלחה',
-    tasksUpdated: 'המטלות עודכנו בהצלחה',
-    viewTimer: '<< 👁️ צפייה בטיימר>>',
-    saveTasksBtn: '<< 💾 שמירת מטלות>>',
-    editTimerBtn: '<<edit timer ✏️ עריכת טיימר>>',
-    updateTasksBtn: '<<update tasks 📝 עדכון משימות>>',
-    saveTimerBtn: '<<save timer 🕒 שמירת טיימר>>',
-    timerSaved: 'הטיימר נשמר בהצלחה',
-    aiUnderstandError: 'מצטער, לא הצלחתי להבין את בקשתך. נסה/י לנסח אחרת או השתמש/י בכפתורים.',
-    aiActionFailed: 'אופסס, אירעה שגיאה בעת ביצוע הפעולה המבוקשת.',
-    notRegisteredWelcome: `ברוך הבא לבוט של 1💗1!\n1💗1 היא פלטפורמה לשיתוף פעולה מבוסס הסכמה (${SITE_CONTEXT.split('\n')[1].trim()}).\nנראה שחשבון הטלגרם שלך אינו מקושר עדיין לחשבון משתמש פעיל.`,
-    notRegisteredPrompt: 'ניתן להירשם לאתר, להתחבר אם יש לך חשבון, או לשאול אותי שאלות על הפלטפורמה.',
-    askAboutPlatform: '<< 🤔 שאלות על הפלטפורמה >>', // New button text
-    noTasksToStart: 'לא נמצאו משימות פעילות שניתן להתחיל עבורן טיימר.',
-    noTasksToStop: 'לא נמצאו טיימרים פעילים שניתן לעצור.',
-    askWhichTaskToStart: 'לאיזו משימה ברצונך להתחיל טיימר?',
-    askWhichTaskToStop: 'לאיזו משימה ברצונך לעצור את הטיימר?',
-    generalError: 'אירעה שגיאה, יש לנסות שוב מאוחר יותר.',
-    timerNotFound: 'הטיימר המבוקש לא נמצא או שאינו פעיל.',
-    missionNotFound: 'המשימה המבוקשת לא נמצאה.',
-    taskNotFound: 'המטלה המבוקשת לא נמצאה.',
-    updateFailed: 'עדכון המטלות נכשל.',
-    unauthorized: 'פעולה לא מורשית.',
-    askMeAnything: 'את/ה יכול/ה לשאול אותי כל דבר על 1lev1.com!',
-    infoSent: 'הנה מידע נוסף על 1lev1:',
-    backToStart: '<< חזרה >>'
-  },
-  en: {
-    welcome: 'Welcome to 1💗1',
-    welcomeRegistered: '{{username}}, Welcome to 1💗1',
-    login: '<<login>>',
-    register: '<<to registration>>',
-    registerNotify: '<<register for notifications>>',
-    startTimerBtn: '<<start timer ⏳>>',
-    stopTimerBtn: '<<stop timer ⌛>>',
-    helpText: 'Here you can register for updates from our 1💗1 platform, or use me as an assistant to manage your timers.',
-    timerStarted: 'Timer started successfully',
-    timerStartedMission: 'Timer started successfully for mission "{{missionName}}"',
-    chooseStart: 'Choose mission to start timer',
-    timerStopped: 'Timer stopped successfully',
-    chooseStop: 'Choose mission to stop timer',
-    selectTasks: 'Select the tasks you want to link to the timer:',
-    taskAdded: 'Task "{{name}}" added successfully',
-    taskRemoved: 'Task "{{name}}" removed successfully',
-    tasksUpdated: 'Tasks updated successfully',
-    viewTimer: '<<view timer 👁️>>',
-    saveTasksBtn: '<< 💾 save tasks>>',
-    editTimerBtn: '<<edit timer ✏️>>',
-    updateTasksBtn: '<<update tasks 📝>>',
-    saveTimerBtn: '<<save timer 🕒>>',
-    timerSaved: 'Timer saved successfully',
-    aiUnderstandError: 'Sorry, I couldn\'t understand your request. Please try rephrasing or use the buttons.',
-    aiActionFailed: 'Sorry, an error occurred while performing the requested action.',
-    notRegisteredWelcome: `Welcome to the 1💗1 Bot!\n1💗1 is a platform for consent-based collaboration (${SITE_CONTEXT.split('\n')[1].trim()}).\nIt seems your Telegram account is not yet linked to an active user account.`,
-    notRegisteredPrompt: 'You can register on the website, log in if you have an account, or ask me questions about the platform.',
-    askAboutPlatform: '<< 🤔 Ask About the Platform >>',
-    noTasksToStart: 'No active missions found to start a timer for.',
-    noTasksToStop: 'No active timers found to stop.',
-    askWhichTaskToStart: 'Which mission would you like to start a timer for?',
-    askWhichTaskToStop: 'Which mission would you like to stop the timer for?',
-    generalError: 'An error occurred, please try again later.',
-    timerNotFound: 'The requested timer was not found or is inactive.',
-    missionNotFound: 'The requested mission was not found.',
-    taskNotFound: 'The requested task was not found.',
-    updateFailed: 'Failed to update tasks.',
-    unauthorized: 'Unauthorized action.',
-    askMeAnything: 'You can ask me anything about 1lev1.com!',
-    infoSent: 'Here is more information about 1lev1:',
-    backToStart: '<< Back >>'
-  } // Add other EN translations if needed
+    he: {
+        welcome: 'ברוך בואך ל-1💗1',
+        welcomeRegistered: '{{username}}, ברוך בואך ל-1💗1', // Changed for clarity
+        login: '<<login להתחברות>>',
+        register: '<<to registration להרשמה>>',
+        registerNotify: '<<register for nutification הרשמה לעדכונים>>',
+        startTimerBtn: '<<start timer ⏳ הפעלת טיימר>>',
+        stopTimerBtn: '<<stop timer ⌛ עצירת טיימר>>',
+        helpText: 'כאן תוכל להירשם לעדכונים מפלטפורמת 1💗1 שלנו, או להשתמש בי כעוזר לניהול הטיימרים שלך.',
+        timerStarted: 'טיימר הופעל בהצלחה',
+        timerStartedMission: 'טיימר הופעל בהצלחה למשימה "{{missionName}}"',
+        chooseStart: 'בחירת משימה להפעלת טיימר',
+        timerStopped: 'טיימר נעצר בהצלחה',
+        chooseStop: 'בחירת משימה לעצירת טיימר',
+        selectTasks: 'בחירת המטלות שברצונך לקשר לטיימר:',
+        taskAdded: 'המטלה "{{name}}" נוספה בהצלחה',
+        taskRemoved: 'המטלה "{{name}}" הוסרה בהצלחה',
+        tasksUpdated: 'המטלות עודכנו בהצלחה',
+        viewTimer: '<< 👁️ צפייה בטיימר>>',
+        saveTasksBtn: '<< 💾 שמירת מטלות>>',
+        editTimerBtn: '<<edit timer ✏️ עריכת טיימר>>',
+        updateTasksBtn: '<<update tasks 📝 עדכון משימות>>',
+        saveTimerBtn: '<<save timer 🕒 שמירת טיימר>>',
+        timerSaved: 'הטיימר נשמר בהצלחה',
+        aiUnderstandError: 'מצטער, לא הצלחתי להבין את בקשתך. נסה/י לנסח אחרת או השתמש/י בכפתורים.',
+        aiActionFailed: 'אופסס, אירעה שגיאה בעת ביצוע הפעולה המבוקשת.',
+        notRegisteredWelcome: `ברוך הבא לבוט של 1💗1!\n1💗1 היא פלטפורמה לשיתוף פעולה מבוסס הסכמה (${SITE_CONTEXT.split('\n')[1].trim()}).\nנראה שחשבון הטלגרם שלך אינו מקושר עדיין לחשבון משתמש פעיל.`,
+        notRegisteredPrompt: 'ניתן להירשם לאתר, להתחבר אם יש לך חשבון, או לשאול אותי שאלות על הפלטפורמה.',
+        askAboutPlatform: '<< 🤔 שאלות על הפלטפורמה >>', // New button text
+        noTasksToStart: 'לא נמצאו משימות פעילות שניתן להתחיל עבורן טיימר.',
+        noTasksToStop: 'לא נמצאו טיימרים פעילים שניתן לעצור.',
+        askWhichTaskToStart: 'לאיזו משימה ברצונך להתחיל טיימר?',
+        askWhichTaskToStop: 'לאיזו משימה ברצונך לעצור את הטיימר?',
+        generalError: 'אירעה שגיאה, יש לנסות שוב מאוחר יותר.',
+        timerNotFound: 'הטיימר המבוקש לא נמצא או שאינו פעיל.',
+        missionNotFound: 'המשימה המבוקשת לא נמצאה.',
+        taskNotFound: 'המטלה המבוקשת לא נמצאה.',
+        updateFailed: 'עדכון המטלות נכשל.',
+        unauthorized: 'פעולה לא מורשית.',
+        askMeAnything: 'את/ה יכול/ה לשאול אותי כל דבר על 1lev1.com!',
+        infoSent: 'הנה מידע נוסף על 1lev1:',
+        backToStart: '<< חזרה >>'
+    },
+    en: {
+        welcome: 'Welcome to 1💗1',
+        welcomeRegistered: '{{username}}, Welcome to 1💗1',
+        login: '<<login>>',
+        register: '<<to registration>>',
+        registerNotify: '<<register for notifications>>',
+        startTimerBtn: '<<start timer ⏳>>',
+        stopTimerBtn: '<<stop timer ⌛>>',
+        helpText: 'Here you can register for updates from our 1💗1 platform, or use me as an assistant to manage your timers.',
+        timerStarted: 'Timer started successfully',
+        timerStartedMission: 'Timer started successfully for mission "{{missionName}}"',
+        chooseStart: 'Choose mission to start timer',
+        timerStopped: 'Timer stopped successfully',
+        chooseStop: 'Choose mission to stop timer',
+        selectTasks: 'Select the tasks you want to link to the timer:',
+        taskAdded: 'Task "{{name}}" added successfully',
+        taskRemoved: 'Task "{{name}}" removed successfully',
+        tasksUpdated: 'Tasks updated successfully',
+        viewTimer: '<<view timer 👁️>>',
+        saveTasksBtn: '<< 💾 save tasks>>',
+        editTimerBtn: '<<edit timer ✏️>>',
+        updateTasksBtn: '<<update tasks 📝>>',
+        saveTimerBtn: '<<save timer 🕒>>',
+        timerSaved: 'Timer saved successfully',
+        aiUnderstandError: 'Sorry, I couldn\'t understand your request. Please try rephrasing or use the buttons.',
+        aiActionFailed: 'Sorry, an error occurred while performing the requested action.',
+        notRegisteredWelcome: `Welcome to the 1💗1 Bot!\n1💗1 is a platform for consent-based collaboration (${SITE_CONTEXT.split('\n')[1].trim()}).\nIt seems your Telegram account is not yet linked to an active user account.`,
+        notRegisteredPrompt: 'You can register on the website, log in if you have an account, or ask me questions about the platform.',
+        askAboutPlatform: '<< 🤔 Ask About the Platform >>',
+        noTasksToStart: 'No active missions found to start a timer for.',
+        noTasksToStop: 'No active timers found to stop.',
+        askWhichTaskToStart: 'Which mission would you like to start a timer for?',
+        askWhichTaskToStop: 'Which mission would you like to stop the timer for?',
+        generalError: 'An error occurred, please try again later.',
+        timerNotFound: 'The requested timer was not found or is inactive.',
+        missionNotFound: 'The requested mission was not found.',
+        taskNotFound: 'The requested task was not found.',
+        updateFailed: 'Failed to update tasks.',
+        unauthorized: 'Unauthorized action.',
+        askMeAnything: 'You can ask me anything about 1lev1.com!',
+        infoSent: 'Here is more information about 1lev1:',
+        backToStart: '<< Back >>'
+    } // Add other EN translations if needed
 };
 
 import { TELEGRAM_BOT_TOKEN_NEW, GEMINI_API_KEY } from '$env/static/private';
@@ -118,7 +118,7 @@ if (!geminiApiKey) throw new Error("Gemini API Key not found!");
 
 const bot = new Telegraf(Token);
 const genAI = new GoogleGenerativeAI(geminiApiKey);
-const geminiModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+const geminiModel = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
 
 let allD = [];
 let appIds = [];
@@ -126,36 +126,36 @@ let appIds = [];
 // --- פונקציות עזר ---
 
 async function fetchUserData(fetchInstance) {
-  try {
-    console.log("fetchUserData: Fetching user data...");
-    const res = await sendToSer({}, '7getTelegramIds', 0, 0, true, fetchInstance);
-    allD = res?.data?.usersPermissionsUsers?.data || [];
-    appIds = allD
-      .map(item => item?.attributes?.telegramId ? Number(item.attributes.telegramId) : 0)
-      .filter(id => id !== 0);
-    console.log(`fetchUserData: Fetched ${allD.length} users, ${appIds.length} linked Telegram IDs.`);
-  } catch (error) {
-    console.error('fetchUserData Error:', error);
-    allD = []; appIds = [];
-  }
+    try {
+        console.log("fetchUserData: Fetching user data...");
+        const res = await sendToSer({}, '7getTelegramIds', 0, 0, true, fetchInstance);
+        allD = res?.data?.usersPermissionsUsers?.data || [];
+        appIds = allD
+            .map(item => item?.attributes?.telegramId ? Number(item.attributes.telegramId) : 0)
+            .filter(id => id !== 0);
+        console.log(`fetchUserData: Fetched ${allD.length} users, ${appIds.length} linked Telegram IDs.`);
+    } catch (error) {
+        console.error('fetchUserData Error:', error);
+        allD = []; appIds = [];
+    }
 }
 
 function getUserInfo(chatId) {
-  const userData = allD.find((x) => x?.attributes?.telegramId == chatId);
-  if (!userData) return null;
-  return {
-    username: userData.attributes.username,
-    uid: userData.id,
-    lang: userData.attributes.lang || 'he',
-  };
+    const userData = allD.find((x) => x?.attributes?.telegramId == chatId);
+    if (!userData) return null;
+    return {
+        username: userData.attributes.username,
+        uid: userData.id,
+        lang: userData.attributes.lang || 'he',
+    };
 }
 
 function getText(key, lang = 'he', replacements = {}) {
-  let text = translations[lang]?.[key] ?? translations['he']?.[key] ?? translations['en']?.[key] ?? key;
-  for (const placeholder in replacements) {
-    text = text.replace(`{{${placeholder}}}`, replacements[placeholder]);
-  }
-  return text;
+    let text = translations[lang]?.[key] ?? translations['he']?.[key] ?? translations['en']?.[key] ?? key;
+    for (const placeholder in replacements) {
+        text = text.replace(`{{${placeholder}}}`, replacements[placeholder]);
+    }
+    return text;
 }
 
 async function getUserMissions(uid, fetchInstance, onlyStartable = false, onlyStoppable = false) {
@@ -217,7 +217,7 @@ Your JSON response:
         const response = await result.response;
         const jsonResponse = response.text().trim().replace(/```json/g, '').replace(/```/g, '');
         const relevantIds = JSON.parse(jsonResponse);
-        
+
         // מחזיר רק את ה-IDs של המשימות הרלוונטיות
         return relevantIds;
     } catch (error) {
@@ -236,7 +236,7 @@ async function understandUserIntent(userText, uid, lang, fetchInstance) {
 
     // מציאת משימות רלוונטיות לבקשה
     const relevantMissions = await findRelevantMissions(userText, startableMissions, lang);
-    
+
     const missionListText = startableMissions.map(m => `- "${m.name}" (ID: ${m.id})`).join('\n');
     const activeTimersText = stoppableMissions.map(m => `- "${m.name}" (ID: ${m.id})`).join('\n');
 
@@ -341,31 +341,31 @@ bot.use(async (ctx, next) => {
 // --- Bot Handlers ---
 
 bot.start(async (ctx) => {
-  const userInfo = ctx.state.userInfo;
-  const lang = ctx.state.lang;
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
 
-  if (userInfo) {
-    // Registered user - Filled keyboard
-    ctx.reply(
-      getText('welcomeRegistered', lang, { username: userInfo.username }),
-      Markup.inlineKeyboard([
-        [Markup.button.url(getText('login', lang), 'https://1lev1.com/login')],
-        [Markup.button.callback(getText('startTimerBtn', lang), `timerStart-${userInfo.uid}`)],
-        [Markup.button.callback(getText('stopTimerBtn', lang), `timerStop-${userInfo.uid}`)]
-      ]).resize()
-    );
-  } else {
-    // Unregistered user - Filled keyboard
-    await ctx.reply(getText('notRegisteredWelcome', lang));
-    ctx.reply(
-      getText('notRegisteredPrompt', lang),
-      Markup.inlineKeyboard([
-        [Markup.button.url(getText('register', lang), 'https://1lev1.com')],
-        [Markup.button.url(getText('login', lang), 'https://1lev1.com/login')],
-        [Markup.button.callback(getText('askAboutPlatform', lang), 'ask_about_platform')]
-      ]).resize()
-    );
-  }
+    if (userInfo) {
+        // Registered user - Filled keyboard
+        ctx.reply(
+            getText('welcomeRegistered', lang, { username: userInfo.username }),
+            Markup.inlineKeyboard([
+                [Markup.button.url(getText('login', lang), 'https://1lev1.com/login')],
+                [Markup.button.callback(getText('startTimerBtn', lang), `timerStart-${userInfo.uid}`)],
+                [Markup.button.callback(getText('stopTimerBtn', lang), `timerStop-${userInfo.uid}`)]
+            ]).resize()
+        );
+    } else {
+        // Unregistered user - Filled keyboard
+        await ctx.reply(getText('notRegisteredWelcome', lang));
+        ctx.reply(
+            getText('notRegisteredPrompt', lang),
+            Markup.inlineKeyboard([
+                [Markup.button.url(getText('register', lang), 'https://1lev1.com')],
+                [Markup.button.url(getText('login', lang), 'https://1lev1.com/login')],
+                [Markup.button.callback(getText('askAboutPlatform', lang), 'ask_about_platform')]
+            ]).resize()
+        );
+    }
 });
 
 bot.action('ask_about_platform', async (ctx) => {
@@ -377,84 +377,84 @@ bot.action('ask_about_platform', async (ctx) => {
 });
 
 bot.help((ctx) => {
-  const lang = ctx.state.lang;
-  // Filled keyboard for help
-  ctx.reply(
-    getText('helpText', lang),
-    Markup.inlineKeyboard([
-        [Markup.button.url(getText('register', lang), 'https://1lev1.com')],
-        [Markup.button.url(getText('login', lang), 'https://1lev1.com/login')],
-        [Markup.button.url(getText('registerNotify', lang), 'https://1lev1.com/me')]
-    ]).resize()
-  );
+    const lang = ctx.state.lang;
+    // Filled keyboard for help
+    ctx.reply(
+        getText('helpText', lang),
+        Markup.inlineKeyboard([
+            [Markup.button.url(getText('register', lang), 'https://1lev1.com')],
+            [Markup.button.url(getText('login', lang), 'https://1lev1.com/login')],
+            [Markup.button.url(getText('registerNotify', lang), 'https://1lev1.com/me')]
+        ]).resize()
+    );
 });
 
 // --- Action Handlers (Using global fetch for helpers) ---
 
 // Start Timer - Step 1: Choose Mission
 bot.action(/^timerStart-(\d+)$/, async (ctx) => {
-  const userId = ctx.match[1];
-  const userInfo = ctx.state.userInfo;
-  const lang = ctx.state.lang;
-  const fetch = ctx.update.fetch;
-  if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+    const userId = ctx.match[1];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    const fetch = ctx.update.fetch;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
-  try {
-      const missions = await getUserMissions(userId, fetch, true);
+    try {
+        const missions = await getUserMissions(userId, fetch, true);
 
-      if (missions.length > 0) {
-        const buttons = missions.map(item => [
-          Markup.button.callback(
-            `${item.name} ⏲️ ${item.projectName}`,
-            `startTimer-${item.id}-${userId}`
-          )
-        ]);
-        await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
-        ctx.reply(getText('chooseStart', lang), Markup.inlineKeyboard(buttons).resize());
-      } else {
-        await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
-        ctx.reply(getText('noTasksToStart', lang));
-      }
-  } catch (error) {
-      console.error("Error in timerStart-1:", error);
-      ctx.reply(getText('aiActionFailed', lang));
-  }
-  await ctx.answerCbQuery();
+        if (missions.length > 0) {
+            const buttons = missions.map(item => [
+                Markup.button.callback(
+                    `${item.name} ⏲️ ${item.projectName}`,
+                    `startTimer-${item.id}-${userId}`
+                )
+            ]);
+            await ctx.editMessageReplyMarkup(undefined).catch(() => { });
+            ctx.reply(getText('chooseStart', lang), Markup.inlineKeyboard(buttons).resize());
+        } else {
+            await ctx.editMessageReplyMarkup(undefined).catch(() => { });
+            ctx.reply(getText('noTasksToStart', lang));
+        }
+    } catch (error) {
+        console.error("Error in timerStart-1:", error);
+        ctx.reply(getText('aiActionFailed', lang));
+    }
+    await ctx.answerCbQuery();
 });
 
 // Start Timer - Step 2: Execute Start
 bot.action(/^startTimer-(\d+)-(\d+)$/, async (ctx) => {
-  const missionId = ctx.match[1];
-  const userId = ctx.match[2];
-  const userInfo = ctx.state.userInfo;
-  const lang = ctx.state.lang;
-  const fetch = ctx.update.fetch;
-  if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+    const missionId = ctx.match[1];
+    const userId = ctx.match[2];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    const fetch = ctx.update.fetch;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
-  try {
-      const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch); // GLOBAL fetch
-      const activeTimer = missionData?.data?.mesimabetahalich?.data?.attributes?.activeTimer;
-      const timerId = activeTimer?.data?.id || 0;
-      const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
-      if (!projectId) throw new Error(`Project ID not found for mission ${missionId}`);
+    try {
+        const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch); // GLOBAL fetch
+        const activeTimer = missionData?.data?.mesimabetahalich?.data?.attributes?.activeTimer;
+        const timerId = activeTimer?.data?.id || 0;
+        const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
+        if (!projectId) throw new Error(`Project ID not found for mission ${missionId}`);
 
-      const res = await startTimer(activeTimer, missionId, userId, projectId, fetch, timerId, true); // GLOBAL fetch
+        const res = await startTimer(activeTimer, missionId, userId, projectId, fetch, timerId, true); // GLOBAL fetch
 
-      if (res) {
-          await ctx.editMessageReplyMarkup(undefined).catch(()=>{}); // Remove choice buttons
-          ctx.reply(getText('timerStarted', lang)); // Filled reply
-      } else {
-          await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
-          ctx.reply(getText('aiActionFailed', lang)); // Filled reply
-          throw new Error("startTimer failed");
-      }
-  } catch (error) {
-      console.error("Error in startTimer-2:", error);
-      await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
-      ctx.reply(getText('aiActionFailed', lang)); // Filled reply
-  }
-  // Answer query only if not answered by error/success paths
-  if (!ctx.answered) await ctx.answerCbQuery();
+        if (res) {
+            await ctx.editMessageReplyMarkup(undefined).catch(() => { }); // Remove choice buttons
+            ctx.reply(getText('timerStarted', lang)); // Filled reply
+        } else {
+            await ctx.editMessageReplyMarkup(undefined).catch(() => { });
+            ctx.reply(getText('aiActionFailed', lang)); // Filled reply
+            throw new Error("startTimer failed");
+        }
+    } catch (error) {
+        console.error("Error in startTimer-2:", error);
+        await ctx.editMessageReplyMarkup(undefined).catch(() => { });
+        ctx.reply(getText('aiActionFailed', lang)); // Filled reply
+    }
+    // Answer query only if not answered by error/success paths
+    if (!ctx.answered) await ctx.answerCbQuery();
 });
 
 // Stop Timer - Step 1: Choose Mission
@@ -469,16 +469,16 @@ bot.action(/^timerStop-(\d+)$/, async (ctx) => {
         const missions = await getUserMissions(userId, fetch, false, true);
 
         if (missions.length > 0) {
-           const buttons = missions.map(item => [
-             Markup.button.callback(
-               `${item.name} ⏲️ ${item.projectName}`,
-               `stopTimer-${item.id}-${userId}`
-             )
-           ]);
-           await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
-           ctx.reply(getText('chooseStop', lang), Markup.inlineKeyboard(buttons).resize());
+            const buttons = missions.map(item => [
+                Markup.button.callback(
+                    `${item.name} ⏲️ ${item.projectName}`,
+                    `stopTimer-${item.id}-${userId}`
+                )
+            ]);
+            await ctx.editMessageReplyMarkup(undefined).catch(() => { });
+            ctx.reply(getText('chooseStop', lang), Markup.inlineKeyboard(buttons).resize());
         } else {
-            await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
+            await ctx.editMessageReplyMarkup(undefined).catch(() => { });
             ctx.reply(getText('noTasksToStop', lang));
         }
     } catch (error) {
@@ -490,91 +490,91 @@ bot.action(/^timerStop-(\d+)$/, async (ctx) => {
 
 // Stop Timer - Step 2: Execute Stop
 bot.action(/^stopTimer-(\d+)-(\d+)$/, async (ctx) => {
-  const missionId = ctx.match[1];
-  const userId = ctx.match[2];
-  const userInfo = ctx.state.userInfo;
-  const lang = ctx.state.lang;
-  const fetch = ctx.update.fetch;
-  if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+    const missionId = ctx.match[1];
+    const userId = ctx.match[2];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    const fetch = ctx.update.fetch;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
-  try {
-    const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch); // GLOBAL fetch
-    const activeTimerData = missionData?.data?.mesimabetahalich?.data?.attributes?.activeTimer?.data;
-    if (!activeTimerData || !activeTimerData.attributes.isActive) {
-        await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
-        ctx.reply(getText('timerNotFound', lang));
-        return ctx.answerCbQuery(getText('timerNotFound', lang));
-    }
+    try {
+        const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch); // GLOBAL fetch
+        const activeTimerData = missionData?.data?.mesimabetahalich?.data?.attributes?.activeTimer?.data;
+        if (!activeTimerData || !activeTimerData.attributes.isActive) {
+            await ctx.editMessageReplyMarkup(undefined).catch(() => { });
+            ctx.reply(getText('timerNotFound', lang));
+            return ctx.answerCbQuery(getText('timerNotFound', lang));
+        }
 
-    const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
-    const stoppedTimer = await stopTimer(activeTimerData, fetch, true, projectId, userId); // GLOBAL fetch
+        const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
+        const stoppedTimer = await stopTimer(activeTimerData, fetch, true, projectId, userId); // GLOBAL fetch
 
-    const timerAttributes = stoppedTimer?.updateTimer?.data?.attributes || stoppedTimer?.attributes;
+        const timerAttributes = stoppedTimer?.updateTimer?.data?.attributes || stoppedTimer?.attributes;
 
-    if (timerAttributes && timerAttributes.isActive === false) {
-        await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
-        // Filled reply with keyboard
-        ctx.reply(
-            getText('timerStopped', lang),
-            Markup.inlineKeyboard([
-                 [Markup.button.url(getText('editTimerBtn', lang), 'https://1lev1.com/timers')],
-                 [Markup.button.callback(getText('updateTasksBtn', lang), `updateTasks-${missionId}-${userId}-${activeTimerData.id}`)],
-                 [Markup.button.callback(getText('saveTimerBtn', lang), `saveTimer-${missionId}-${userId}-${activeTimerData.id}`)]
-            ]).resize()
-        );
-    } else {
-        await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
+        if (timerAttributes && timerAttributes.isActive === false) {
+            await ctx.editMessageReplyMarkup(undefined).catch(() => { });
+            // Filled reply with keyboard
+            ctx.reply(
+                getText('timerStopped', lang),
+                Markup.inlineKeyboard([
+                    [Markup.button.url(getText('editTimerBtn', lang), 'https://1lev1.com/timers')],
+                    [Markup.button.callback(getText('updateTasksBtn', lang), `updateTasks-${missionId}-${userId}-${activeTimerData.id}`)],
+                    [Markup.button.callback(getText('saveTimerBtn', lang), `saveTimer-${missionId}-${userId}-${activeTimerData.id}`)]
+                ]).resize()
+            );
+        } else {
+            await ctx.editMessageReplyMarkup(undefined).catch(() => { });
+            ctx.reply(getText('aiActionFailed', lang));
+            throw new Error("stopTimer failed");
+        }
+    } catch (error) {
+        console.error("Error in stopTimer-2:", error);
+        await ctx.editMessageReplyMarkup(undefined).catch(() => { });
         ctx.reply(getText('aiActionFailed', lang));
-        throw new Error("stopTimer failed");
     }
-  } catch (error) {
-      console.error("Error in stopTimer-2:", error);
-      await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
-      ctx.reply(getText('aiActionFailed', lang));
-  }
-  if (!ctx.answered) await ctx.answerCbQuery();
+    if (!ctx.answered) await ctx.answerCbQuery();
 });
 
 // Save Timer
 bot.action(/^saveTimer-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
-  const missionId = ctx.match[1];
-  const userId = ctx.match[2];
-  const timerId = ctx.match[3];
-  const userInfo = ctx.state.userInfo;
-  const lang = ctx.state.lang;
-  const fetch = ctx.update.fetch;
-  if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+    const missionId = ctx.match[1];
+    const userId = ctx.match[2];
+    const timerId = ctx.match[3];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    const fetch = ctx.update.fetch;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
-  try {
-     const timerData = await sendToSer({ missionId: missionId }, '36getMissionTimer', 0, 0, true, fetch);
-     const timerToSave = timerData?.data?.mesimabetahalich?.data?.attributes?.timers?.data?.find(t => t.id == timerId);
-     if (!timerToSave) {
-         await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
-         ctx.reply(getText('timerNotFound', lang));
-         return ctx.answerCbQuery(getText('timerNotFound', lang));
-     }
+    try {
+        const timerData = await sendToSer({ missionId: missionId }, '36getMissionTimer', 0, 0, true, fetch);
+        const timerToSave = timerData?.data?.mesimabetahalich?.data?.attributes?.timers?.data?.find(t => t.id == timerId);
+        if (!timerToSave) {
+            await ctx.editMessageReplyMarkup(undefined).catch(() => { });
+            ctx.reply(getText('timerNotFound', lang));
+            return ctx.answerCbQuery(getText('timerNotFound', lang));
+        }
 
-     const projectId = timerData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
-     const savedTimer = await saveTimer(timerToSave, missionId, fetch, true, null, projectId, userId);
+        const projectId = timerData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
+        const savedTimer = await saveTimer(timerToSave, missionId, fetch, true, null, projectId, userId);
 
-     if (savedTimer) {
-         await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
-         // Filled reply with keyboard
-         ctx.reply(
-             getText('timerSaved', lang),
-             Markup.inlineKeyboard([[Markup.button.url(getText('viewTimer', lang), 'https://1lev1.com/timers')]]).resize()
-         );
-     } else {
-         await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
-         ctx.reply(getText('aiActionFailed', lang));
-         throw new Error("saveTimer failed");
-     }
-  } catch(error) {
-      console.error("Error in saveTimer action:", error);
-      await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
-      ctx.reply(getText('aiActionFailed', lang));
-  }
-   if (!ctx.answered) await ctx.answerCbQuery();
+        if (savedTimer) {
+            await ctx.editMessageReplyMarkup(undefined).catch(() => { });
+            // Filled reply with keyboard
+            ctx.reply(
+                getText('timerSaved', lang),
+                Markup.inlineKeyboard([[Markup.button.url(getText('viewTimer', lang), 'https://1lev1.com/timers')]]).resize()
+            );
+        } else {
+            await ctx.editMessageReplyMarkup(undefined).catch(() => { });
+            ctx.reply(getText('aiActionFailed', lang));
+            throw new Error("saveTimer failed");
+        }
+    } catch (error) {
+        console.error("Error in saveTimer action:", error);
+        await ctx.editMessageReplyMarkup(undefined).catch(() => { });
+        ctx.reply(getText('aiActionFailed', lang));
+    }
+    if (!ctx.answered) await ctx.answerCbQuery();
 });
 
 // Update Tasks - Show list
@@ -595,16 +595,16 @@ bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
         const timerData = await sendToSer({ missionId: missionId }, '36getMissionTimer', 0, 0, true, fetch);
         const activeTimer = timerData?.data?.attributes?.activeTimer?.data;
         if (!activeTimer) {
-             await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
-             ctx.reply(getText('timerNotFound', lang));
-             return ctx.answerCbQuery(getText('timerNotFound', lang));
+            await ctx.editMessageReplyMarkup(undefined).catch(() => { });
+            ctx.reply(getText('timerNotFound', lang));
+            return ctx.answerCbQuery(getText('timerNotFound', lang));
         }
 
         const allTasks = currentMission.tasks;
         const selectedTaskIds = activeTimer.attributes.acts?.data?.map(t => t.id) || [];
 
         if (!allTasks || allTasks.length === 0) {
-            await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
+            await ctx.editMessageReplyMarkup(undefined).catch(() => { });
             ctx.reply(getText('noTasksToStart', lang));
             return ctx.answerCbQuery("No tasks found.");
         }
@@ -616,12 +616,12 @@ bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
         taskButtons.push([Markup.button.callback(getText('saveTasksBtn', lang), `saveTasks-${missionId}-${userId}-${timerId}`)]);
         taskButtons.push([Markup.button.callback(getText('backToStart', lang), `timerStart-${userId}`)]);
 
-        await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
+        await ctx.editMessageReplyMarkup(undefined).catch(() => { });
         ctx.reply(getText('selectTasks', lang), Markup.inlineKeyboard(taskButtons).resize());
 
     } catch (error) {
         console.error("Error in updateTasks action:", error);
-        await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
+        await ctx.editMessageReplyMarkup(undefined).catch(() => { });
         ctx.reply(getText('aiActionFailed', lang));
     }
     if (!ctx.answered) await ctx.answerCbQuery();
@@ -629,68 +629,68 @@ bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
 
 // Toggle Task Selection
 bot.action(/^toggleTask-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
-  const missionId = ctx.match[1];
-  const userId = ctx.match[2];
-  const timerId = ctx.match[3];
-  const taskId = ctx.match[4];
-  const userInfo = ctx.state.userInfo;
-  const lang = ctx.state.lang;
-  const fetch = ctx.update.fetch;
-  if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+    const missionId = ctx.match[1];
+    const userId = ctx.match[2];
+    const timerId = ctx.match[3];
+    const taskId = ctx.match[4];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    const fetch = ctx.update.fetch;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
-  try {
-      const timerData = await sendToSer({ missionId: timerId }, '36getMissionTimer', 0, 0, true, fetch);
-      const activeTimer = timerData?.data?.attributes?.activeTimer?.data;
-      if (!activeTimer) throw new Error(`Timer ${timerId} not found.`);
+    try {
+        const timerData = await sendToSer({ missionId: timerId }, '36getMissionTimer', 0, 0, true, fetch);
+        const activeTimer = timerData?.data?.attributes?.activeTimer?.data;
+        if (!activeTimer) throw new Error(`Timer ${timerId} not found.`);
 
-      const selectedTasks = activeTimer.attributes.acts?.data || [];
-      const selectedTaskIds = selectedTasks.map(t => t.id);
-      const isCurrentlySelected = selectedTaskIds.includes(taskId);
+        const selectedTasks = activeTimer.attributes.acts?.data || [];
+        const selectedTaskIds = selectedTasks.map(t => t.id);
+        const isCurrentlySelected = selectedTaskIds.includes(taskId);
 
-      const newSelectedTaskIds = isCurrentlySelected
-          ? selectedTaskIds.filter(id => id != taskId)
-          : [...selectedTaskIds, taskId];
+        const newSelectedTaskIds = isCurrentlySelected
+            ? selectedTaskIds.filter(id => id != taskId)
+            : [...selectedTaskIds, taskId];
 
-      const updatedTimer = await updateTimer(activeTimer, 'tasks', { acts: newSelectedTaskIds, isSer: true }, fetch);
+        const updatedTimer = await updateTimer(activeTimer, 'tasks', { acts: newSelectedTaskIds, isSer: true }, fetch);
 
-      if (updatedTimer) {
-          const missionDetails = await getUserMissions(userId, fetch);
-          const currentMission = missionDetails.find(m => m.id == missionId);
-          if (!currentMission) throw new Error(`Mission ${missionId} not found after task toggle.`);
-          const allTasks = currentMission.tasks;
-          const task = allTasks.find(t => t.id == taskId);
-          const taskName = task ? task.name : `ID ${taskId}`;
+        if (updatedTimer) {
+            const missionDetails = await getUserMissions(userId, fetch);
+            const currentMission = missionDetails.find(m => m.id == missionId);
+            if (!currentMission) throw new Error(`Mission ${missionId} not found after task toggle.`);
+            const allTasks = currentMission.tasks;
+            const task = allTasks.find(t => t.id == taskId);
+            const taskName = task ? task.name : `ID ${taskId}`;
 
-          const latestSelectedTaskIds = updatedTimer.attributes.acts?.data?.map(t => t.id) || [];
+            const latestSelectedTaskIds = updatedTimer.attributes.acts?.data?.map(t => t.id) || [];
 
-          const taskButtons = allTasks.map(t => {
-             const isSelected = latestSelectedTaskIds.includes(t.id);
-             return [Markup.button.callback(`${isSelected ? '✅ ' : '⬜ '}${t.name}`, `toggleTask-${missionId}-${userId}-${timerId}-${t.id}`)];
-          });
-          taskButtons.push([Markup.button.callback(getText('saveTasksBtn', lang), `saveTasks-${missionId}-${userId}-${timerId}`)]);
-          taskButtons.push([Markup.button.callback(getText('backToStart', lang), `timerStart-${userId}`)]);
+            const taskButtons = allTasks.map(t => {
+                const isSelected = latestSelectedTaskIds.includes(t.id);
+                return [Markup.button.callback(`${isSelected ? '✅ ' : '⬜ '}${t.name}`, `toggleTask-${missionId}-${userId}-${timerId}-${t.id}`)];
+            });
+            taskButtons.push([Markup.button.callback(getText('saveTasksBtn', lang), `saveTasks-${missionId}-${userId}-${timerId}`)]);
+            taskButtons.push([Markup.button.callback(getText('backToStart', lang), `timerStart-${userId}`)]);
 
-          const confirmationText = isCurrentlySelected
-            ? getText('taskRemoved', lang, { name: taskName })
-            : getText('taskAdded', lang, { name: taskName });
+            const confirmationText = isCurrentlySelected
+                ? getText('taskRemoved', lang, { name: taskName })
+                : getText('taskAdded', lang, { name: taskName });
 
-          await ctx.answerCbQuery(confirmationText);
+            await ctx.answerCbQuery(confirmationText);
 
-          await ctx.editMessageText(
-              getText('selectTasks', lang),
-              Markup.inlineKeyboard(taskButtons).resize()
-          );
+            await ctx.editMessageText(
+                getText('selectTasks', lang),
+                Markup.inlineKeyboard(taskButtons).resize()
+            );
 
-      } else {
-          await ctx.answerCbQuery(getText('updateFailed', lang));
-          throw new Error("Update timer failed during toggle");
-      }
-  } catch (error) {
-       console.error(`Error toggling task action ${taskId}:`, error);
-       if (!ctx.answered) await ctx.answerCbQuery(getText('aiActionFailed', lang));
-       try { await ctx.editMessageText(getText('aiActionFailed', lang) + "\n" + getText('selectTasks', lang), ctx.callbackQuery.message.reply_markup); }
-       catch (editError) { ctx.reply(getText('aiActionFailed', lang)); }
-  }
+        } else {
+            await ctx.answerCbQuery(getText('updateFailed', lang));
+            throw new Error("Update timer failed during toggle");
+        }
+    } catch (error) {
+        console.error(`Error toggling task action ${taskId}:`, error);
+        if (!ctx.answered) await ctx.answerCbQuery(getText('aiActionFailed', lang));
+        try { await ctx.editMessageText(getText('aiActionFailed', lang) + "\n" + getText('selectTasks', lang), ctx.callbackQuery.message.reply_markup); }
+        catch (editError) { ctx.reply(getText('aiActionFailed', lang)); }
+    }
 });
 
 // Confirm Task Save ("Done" button)
@@ -753,7 +753,7 @@ bot.on('text', async (ctx) => {
                     // אם יש משימות רלוונטיות, הצג רק אותן
                     if (aiResponse.parameters?.relevantMissions?.length > 0) {
                         const relevantMissions = await getUserMissions(userInfo.uid, fetch, true);
-                        const filteredMissions = relevantMissions.filter(m => 
+                        const filteredMissions = relevantMissions.filter(m =>
                             aiResponse.parameters.relevantMissions.includes(m.id)
                         );
                         const buttons = filteredMissions.map(item => [
@@ -782,136 +782,136 @@ bot.on('text', async (ctx) => {
                 break;
 
             case 'stop_timer':
-                 if (aiResponse.parameters?.missionId) {
-                     const missionId = aiResponse.parameters.missionId;
-                     try {
-                         const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch);
-                         const activeTimerData = missionData?.data?.mesimabetahalich?.data?.attributes?.activeTimer?.data;
-                         if (!activeTimerData || !activeTimerData.attributes.isActive) {
-                             ctx.reply(getText('timerNotFound', lang));
-                             return;
-                         }
-                         const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
-                         const stoppedTimer = await stopTimer(activeTimerData, fetch, true, projectId, userInfo.uid);
-                         const timerAttributes = stoppedTimer?.updateTimer?.data?.attributes || stoppedTimer?.attributes;
+                if (aiResponse.parameters?.missionId) {
+                    const missionId = aiResponse.parameters.missionId;
+                    try {
+                        const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch);
+                        const activeTimerData = missionData?.data?.mesimabetahalich?.data?.attributes?.activeTimer?.data;
+                        if (!activeTimerData || !activeTimerData.attributes.isActive) {
+                            ctx.reply(getText('timerNotFound', lang));
+                            return;
+                        }
+                        const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
+                        const stoppedTimer = await stopTimer(activeTimerData, fetch, true, projectId, userInfo.uid);
+                        const timerAttributes = stoppedTimer?.updateTimer?.data?.attributes || stoppedTimer?.attributes;
 
-                         if (timerAttributes && !timerAttributes.isActive) {
-                             ctx.reply(getText('timerStopped', lang), Markup.inlineKeyboard([
+                        if (timerAttributes && !timerAttributes.isActive) {
+                            ctx.reply(getText('timerStopped', lang), Markup.inlineKeyboard([
                                 [Markup.button.url(getText('editTimerBtn', lang), 'https://1lev1.com/timers')],
                                 [Markup.button.callback(getText('updateTasksBtn', lang), `updateTasks-${missionId}-${userInfo.uid}-${activeTimerData.id}`)],
                                 [Markup.button.callback(getText('saveTimerBtn', lang), `saveTimer-${missionId}-${userInfo.uid}-${activeTimerData.id}`)]
-                             ]).resize());
-                         } else { throw new Error("Stop failed via AI"); }
-                     } catch (error) {
-                         console.error(`AI Error stopping timer:`, error);
-                         ctx.reply(getText('aiActionFailed', lang));
-                     }
-                 } else {
-                     ctx.reply(getText('askWhichTaskToStop', lang));
-                 }
-                 break;
+                            ]).resize());
+                        } else { throw new Error("Stop failed via AI"); }
+                    } catch (error) {
+                        console.error(`AI Error stopping timer:`, error);
+                        ctx.reply(getText('aiActionFailed', lang));
+                    }
+                } else {
+                    ctx.reply(getText('askWhichTaskToStop', lang));
+                }
+                break;
 
             case 'clarify_start':
-                 const startableMissions = await getUserMissions(userInfo.uid, fetch, true);
-                 if (startableMissions.length > 0) {
-                     // אם יש משימות רלוונטיות, הצג רק אותן
-                     if (aiResponse.parameters?.relevantMissions?.length > 0) {
-                         const filteredMissions = startableMissions.filter(m => 
-                             aiResponse.parameters.relevantMissions.includes(m.id)
-                         );
-                         const buttons = filteredMissions.map(item => [
-                             Markup.button.callback(
-                                 `${item.name} ⏲️ ${item.projectName}`,
-                                 `startTimer-${item.id}-${userInfo.uid}`
-                             )
-                         ]);
-                         ctx.reply(getText('chooseStart', lang), Markup.inlineKeyboard(buttons).resize());
-                     } else {
-                         // אם אין משימות רלוונטיות, הצג את כל המשימות
-                         const buttons = startableMissions.map(item => [
-                             Markup.button.callback(
-                                 `${item.name} ⏲️ ${item.projectName}`,
-                                 `startTimer-${item.id}-${userInfo.uid}`
-                             )
-                         ]);
-                         ctx.reply(getText('askWhichTaskToStart', lang), Markup.inlineKeyboard(buttons).resize());
-                     }
-                 } else {
-                     ctx.reply(getText('noTasksToStart', lang));
-                 }
-                 break;
+                const startableMissions = await getUserMissions(userInfo.uid, fetch, true);
+                if (startableMissions.length > 0) {
+                    // אם יש משימות רלוונטיות, הצג רק אותן
+                    if (aiResponse.parameters?.relevantMissions?.length > 0) {
+                        const filteredMissions = startableMissions.filter(m =>
+                            aiResponse.parameters.relevantMissions.includes(m.id)
+                        );
+                        const buttons = filteredMissions.map(item => [
+                            Markup.button.callback(
+                                `${item.name} ⏲️ ${item.projectName}`,
+                                `startTimer-${item.id}-${userInfo.uid}`
+                            )
+                        ]);
+                        ctx.reply(getText('chooseStart', lang), Markup.inlineKeyboard(buttons).resize());
+                    } else {
+                        // אם אין משימות רלוונטיות, הצג את כל המשימות
+                        const buttons = startableMissions.map(item => [
+                            Markup.button.callback(
+                                `${item.name} ⏲️ ${item.projectName}`,
+                                `startTimer-${item.id}-${userInfo.uid}`
+                            )
+                        ]);
+                        ctx.reply(getText('askWhichTaskToStart', lang), Markup.inlineKeyboard(buttons).resize());
+                    }
+                } else {
+                    ctx.reply(getText('noTasksToStart', lang));
+                }
+                break;
 
             case 'clarify_stop':
-                 const stoppableMissions = await getUserMissions(userInfo.uid, fetch, false, true);
-                 if (stoppableMissions.length > 0) {
-                     const buttons = stoppableMissions.map(item => [Markup.button.callback(`${item.name} ⏲️ ${item.projectName}`, `stopTimer-${item.id}-${userInfo.uid}`)]);
-                     ctx.reply(getText('askWhichTaskToStop', lang), Markup.inlineKeyboard(buttons).resize());
-                 } else { ctx.reply(getText('noTasksToStop', lang)); }
-                 break;
+                const stoppableMissions = await getUserMissions(userInfo.uid, fetch, false, true);
+                if (stoppableMissions.length > 0) {
+                    const buttons = stoppableMissions.map(item => [Markup.button.callback(`${item.name} ⏲️ ${item.projectName}`, `stopTimer-${item.id}-${userInfo.uid}`)]);
+                    ctx.reply(getText('askWhichTaskToStop', lang), Markup.inlineKeyboard(buttons).resize());
+                } else { ctx.reply(getText('noTasksToStop', lang)); }
+                break;
 
             case 'ask_help':
-                 const helpAnswer = await answerUnregisteredUserQuery(userText, lang);
-                 ctx.reply(helpAnswer);
-                 ctx.reply(
-                   getText('helpText', lang),
-                   Markup.inlineKeyboard([
-                       [Markup.button.url(getText('login', lang), 'https://1lev1.com/login')],
-                       [Markup.button.callback(getText('startTimerBtn', lang), `timerStart-${userInfo.uid}`)],
-                       [Markup.button.callback(getText('stopTimerBtn', lang), `timerStop-${userInfo.uid}`)]
-                   ]).resize()
-                 );
-                 break;
+                const helpAnswer = await answerUnregisteredUserQuery(userText, lang);
+                ctx.reply(helpAnswer);
+                ctx.reply(
+                    getText('helpText', lang),
+                    Markup.inlineKeyboard([
+                        [Markup.button.url(getText('login', lang), 'https://1lev1.com/login')],
+                        [Markup.button.callback(getText('startTimerBtn', lang), `timerStart-${userInfo.uid}`)],
+                        [Markup.button.callback(getText('stopTimerBtn', lang), `timerStop-${userInfo.uid}`)]
+                    ]).resize()
+                );
+                break;
 
             case 'error':
-                 console.error("Gemini intent error:", aiResponse.details);
-                 ctx.reply(getText('aiUnderstandError', lang));
-                 break;
+                console.error("Gemini intent error:", aiResponse.details);
+                ctx.reply(getText('aiUnderstandError', lang));
+                break;
             case 'unknown':
             default:
-                 ctx.reply(getText('aiUnderstandError', lang));
-                 break;
+                ctx.reply(getText('aiUnderstandError', lang));
+                break;
         }
     } else {
         // Unregistered User: Use Gemini for Q&A
         const answer = await answerUnregisteredUserQuery(userText, lang);
         await ctx.reply(answer);
         await ctx.reply(
-          getText('notRegisteredPrompt', lang),
-          Markup.inlineKeyboard([
-             [Markup.button.url(getText('register', lang), 'https://1lev1.com')],
-             [Markup.button.url(getText('login', lang), 'https://1lev1.com/login')],
-             [Markup.button.callback(getText('askAboutPlatform', lang), 'ask_about_platform')]
-          ]).resize()
+            getText('notRegisteredPrompt', lang),
+            Markup.inlineKeyboard([
+                [Markup.button.url(getText('register', lang), 'https://1lev1.com')],
+                [Markup.button.url(getText('login', lang), 'https://1lev1.com/login')],
+                [Markup.button.callback(getText('askAboutPlatform', lang), 'ask_about_platform')]
+            ]).resize()
         );
     }
 });
 
 // --- SvelteKit POST Endpoint ---
 export async function POST({ request, fetch: svelteFetch }) {
-  try {
-    const data = await request.json();
-    // console.log("Incoming Telegram Update:", JSON.stringify(data, null, 2));
+    try {
+        const data = await request.json();
+        // console.log("Incoming Telegram Update:", JSON.stringify(data, null, 2));
 
-    await fetchUserData(svelteFetch);
+        await fetchUserData(svelteFetch);
 
-    // Add fetch to context before handling update
-    data.fetch = svelteFetch;
+        // Add fetch to context before handling update
+        data.fetch = svelteFetch;
 
-    // Pass svelteFetch to bot.handleUpdate
-    await bot.handleUpdate(data);
+        // Pass svelteFetch to bot.handleUpdate
+        await bot.handleUpdate(data);
 
-    return new Response('', { status: 200 });
-  } catch (error) {
-    console.error('--- ERROR in SvelteKit POST Handler ---', error, error.stack);
-    return new Response('Internal Server Error', { status: 500 });
-  }
+        return new Response('', { status: 200 });
+    } catch (error) {
+        console.error('--- ERROR in SvelteKit POST Handler ---', error, error.stack);
+        return new Response('Internal Server Error', { status: 500 });
+    }
 }
 
 // --- Fallback Error Handler ---
 bot.catch((err, ctx) => {
-  console.error(`Telegraf Error caught for update type ${ctx.updateType}:`, err);
-  const lang = ctx?.state?.lang || 'he';
-  if (ctx.updateType !== 'callback_query' || !ctx.answered) {
-       ctx.reply(getText('generalError', lang)).catch(e => console.error("Error sending error reply:", e));
-  }
+    console.error(`Telegraf Error caught for update type ${ctx.updateType}:`, err);
+    const lang = ctx?.state?.lang || 'he';
+    if (ctx.updateType !== 'callback_query' || !ctx.answered) {
+        ctx.reply(getText('generalError', lang)).catch(e => console.error("Error sending error reply:", e));
+    }
 });

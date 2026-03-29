@@ -1,5 +1,5 @@
 import { sendToSer } from './../send/sendToSer.js';
-import { browser } from '$app/environment';
+const browser = typeof window !== 'undefined';
 
 /**
  * Executes a timer action via the unified action system.

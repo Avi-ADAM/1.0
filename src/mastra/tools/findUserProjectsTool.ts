@@ -1,4 +1,4 @@
-import { createTool } from '@mastra/core';
+import { createTool } from '@mastra/core/tools'
 import { z } from 'zod';
 import { sendToSer } from '../../lib/send/sendToSer';
 
@@ -40,7 +40,7 @@ export const findUserProjectsTool = createTool({
     success: z.boolean(),
     message: z.string().optional()
   }),
-  execute: async ({ context }) => {
+  execute: async (inputData) => {
     try {
       const { userId, query } = context;
       const globalContext = global.botContext || {};

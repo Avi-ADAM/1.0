@@ -1,4 +1,4 @@
-import { createTool } from '@mastra/core';
+import { createTool } from '@mastra/core/tools'
 import { z } from 'zod';
 import { getContextForPath } from '../../lib/bot/pageContexts';
 
@@ -8,9 +8,9 @@ export const getPageContextTool = createTool({
     inputSchema: z.object({
         path: z.string().describe('The URL path of the current page')
     }),
-    execute: async ({ context }) => {
-        console.log('🔍 getPageContextTool executing for path:', context.path);
-        const contextData = getContextForPath(context.path);
+    execute: async (inputData) => {
+        console.log('🔍 getPageContextTool executing for path:', inputData.path);
+        const contextData = getContextForPath(inputData.path);
         return {
             success: true,
             context: contextData

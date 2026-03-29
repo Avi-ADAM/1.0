@@ -1,9 +1,9 @@
-import { createTool } from '@mastra/core';
+import { createTool } from '@mastra/core/tools'
 import { z } from 'zod';
 
 export const getChatHistoryTool = createTool({
   id: 'getChatHistoryTool',
-  description: 'Get extended chat history when needed for context. Use this when you need to reference earlier parts of the conversation.',
+  description: 'Get extended chat history when needed for inputData. Use this when you need to reference earlier parts of the conversation.',
   inputSchema: z.object({
     limit: z.number().optional().default(20).describe('Number of messages to retrieve from history'),
     searchTerm: z.string().optional().describe('Optional search term to find specific messages in history')
@@ -16,7 +16,7 @@ export const getChatHistoryTool = createTool({
     })),
     totalMessages: z.number()
   }),
-  execute: async ({ context }) => {
+  execute: async (inputData) => {
     const { limit = 20, searchTerm } = context;
     
     // Get the full history from global context if available

@@ -1,4 +1,4 @@
-import { createTool } from '@mastra/core';
+import { createTool } from '@mastra/core/tools'
 import { z } from 'zod';
 import { sendToSer } from '../../lib/send/sendToSer';
 import { fuzzyMissionMatch, sortMissionsByRelevance } from '../../lib/utils/fuzzyMatch.js';
@@ -45,7 +45,7 @@ export const findMissionTool = createTool({
       projectName: z.string(),
     })).describe('A list of missions matching the search query.'),
   }),
-  execute: async ({ context }) => {
+  execute: async (inputData) => {
     const { missionName } = context;
     const globalContext = global.botContext || {};
     const userId = globalContext.userId;

@@ -2,7 +2,8 @@ import { json } from '@sveltejs/kit';
 import { t, locale, loadTranslations } from '$lib/translations';
 import { createEnhancedBotAgent } from '../../../mastra/agents/reg-bot.ts';
 import { createUnregisteredBotAgent } from '../../../mastra/agents/nonreg-bot.ts';
-import { GOOGLE_GENERATIVE_AI_API_KEY } from '$env/static/private';
+import { DEFAULT_AGENT_MAX_STEPS } from '../../../mastra/lib/agent-response.ts';
+import { GEMINI_API_KEY } from '$env/static/private';
 
 export async function POST({ request, fetch, cookies }) {
   const { action, payload, user } = await request.json();
@@ -15,7 +16,7 @@ export async function POST({ request, fetch, cookies }) {
     // Handle unregistered user queries
     if (action === 'ask') {
       const unregisteredAgent = createUnregisteredBotAgent(
-        GOOGLE_GENERATIVE_AI_API_KEY,
+        GEMINI_API_KEY,
         lang
       );
 
@@ -31,7 +32,10 @@ export async function POST({ request, fetch, cookies }) {
         content: payload.text
       });
 
-      const result = await unregisteredAgent.generateVNext(messages);
+      const result = await unregisteredAgent.generate(messages, {
+        maxSteps: DEFAULT_AGENT_MAX_STEPS,
+        toolChoice: 'auto'
+      });
 
       return json({
         reply: result.text || t.get('bot.understandingError')
@@ -44,7 +48,7 @@ export async function POST({ request, fetch, cookies }) {
     }
 
     const registeredAgent = createEnhancedBotAgent(
-      GOOGLE_GENERATIVE_AI_API_KEY,
+      GEMINI_API_KEY,
       lang,
       user.id
     );
@@ -68,7 +72,10 @@ export async function POST({ request, fetch, cookies }) {
     };
 
     // Execute the agent with access to tools
-    const result = await registeredAgent.generateVNext(messages);
+    const result = await registeredAgent.generate(messages, {
+      maxSteps: DEFAULT_AGENT_MAX_STEPS,
+      toolChoice: 'auto'
+    });
 
     // Debug: Log the full result to see what tools were called
     console.log('=== MASTRA AGENT RESULT ===');

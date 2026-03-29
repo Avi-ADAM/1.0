@@ -1,4 +1,4 @@
-import { createTool } from '@mastra/core';
+import { createTool } from '@mastra/core/tools'
 import { z } from 'zod';
 import { sendToSer } from '../../lib/send/sendToSer.js';
 import { startTimer, stopTimer } from '../../lib/func/timers.js';
@@ -16,7 +16,7 @@ export const startTimerTool = createTool({
     timerId: z.string().optional(),
     error: z.string().optional()
   }),
-  execute: async ({ context }) => {
+  execute: async (inputData) => {
     const { missionId } = context;
     const globalContext = global.botContext || {};
     const userId = globalContext.userId;
@@ -74,7 +74,7 @@ export const stopTimerTool = createTool({
     duration: z.number().optional(),
     error: z.string().optional()
   }),
-  execute: async ({ context }) => {
+  execute: async (inputData) => {
     const { missionId } = context;
     const globalContext = global.botContext || {};
     const fetchInstance = globalContext.fetchInstance;

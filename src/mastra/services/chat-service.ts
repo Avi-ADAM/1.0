@@ -2,13 +2,17 @@ import { createIntentAgent } from '../agents/intent-agent';
 import { createTimerAgent } from '../agents/timer-agent';
 import { createNavigationAgent } from '../agents/navigation-agent';
 import { createGeneralHelpAgent } from '../agents/help-agent';
+import {
+  DEFAULT_AGENT_MAX_STEPS,
+  getAgentReply
+} from '../lib/agent-response';
 
 interface ChatInput {
   message: string;
   history: Array<{ user: boolean; text: string }>;
   userId?: string;
   language: string;
-  apiKey: string;
+  apiKey?: string;
   fetchInstance?: any;
 }
 
@@ -17,8 +21,8 @@ interface IntentResult {
   confidence: number;
   details: {
     action?: string;
-    target?: string;
-    context?: string;
+    target?: string | null;
+    context?: string | null;
   };
 }
 
@@ -73,11 +77,11 @@ export class ChatService {
   private static async analyzeIntent(
     message: string, 
     language: string, 
-    apiKey: string
+    apiKey?: string
   ): Promise<IntentResult> {
     const intentAgent = createIntentAgent(apiKey, language);
 
-    const result = await intentAgent.generateVNext([
+    const result = await intentAgent.generate([
       {
         role: 'user',
         content: message
@@ -100,7 +104,7 @@ export class ChatService {
     history: Array<{ user: boolean; text: string }>;
     userId?: string;
     language: string;
-    apiKey: string;
+    apiKey?: string;
     intent: IntentResult;
     fetchInstance?: any;
   }): Promise<{ agentResult: any; agentType: string }> {
@@ -122,7 +126,8 @@ export class ChatService {
       global.botContext = {
         fetchInstance: fetchInstance,
         userId: userId,
-        intent: intent
+        intent: intent,
+        currentMessage: message
       };
     }
 
@@ -163,7 +168,10 @@ export class ChatService {
     });
 
     console.log(`🤖 Executing ${agentType} agent`);
-    const result = await agent.generateVNext(messages);
+    const result = await agent.generate(messages, {
+      maxSteps: DEFAULT_AGENT_MAX_STEPS,
+      toolChoice: 'auto'
+    });
 
     return {
       agentResult: result,
@@ -179,7 +187,7 @@ export class ChatService {
     const { agentResult, agentType, intent } = params;
 
     let response: ChatOutput = {
-      reply: agentResult.text,
+      reply: getAgentReply(agentResult),
       intent: intent,
       agentType: agentType
     };

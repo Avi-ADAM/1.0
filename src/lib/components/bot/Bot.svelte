@@ -5,17 +5,26 @@
   import { idPr } from '$lib/stores/idPr';
   import { Circle3 } from 'svelte-loading-spinners';
   import { browser } from '$app/environment';
-
   import { page } from '$app/stores';
+  import { chatMessages } from '$lib/stores/chatStore';
 
   let { data } = $props();
   let user = $derived(data.uid ? true : false);
+  let isOnChatPage = $derived($page.url.pathname === '/chat');
 
   let visible = $state(false);
   let messages = $state([]);
   let userInput = $state('');
   let loading = $state(false);
   let messagesContainer = $state(null);
+
+  // Sync store → local state
+  $effect(() => {
+    const unsub = chatMessages.subscribe((stored) => {
+      messages = stored;
+    });
+    return unsub;
+  });
 
   $effect(() => {
     if (messagesContainer) {
@@ -24,71 +33,61 @@
     }
   });
 
-  $effect(() => {
-    if (browser) {
-      const storedMessages = localStorage.getItem('bot_message_history');
-      if (storedMessages) {
-        messages = JSON.parse(storedMessages);
-      }
-    }
-  });
-
-  $effect(() => {
-    if (browser) {
-      localStorage.setItem('bot_message_history', JSON.stringify(messages));
-    }
-  });
-
   async function handleSend() {
     if (!userInput.trim()) return;
 
     const currentInput = userInput;
     const messageHistory = [...messages];
-    messages = [...messages, { text: currentInput, user: true }];
+
+    chatMessages.addMessage({ text: currentInput, user: true });
     userInput = '';
     loading = true;
 
     try {
-      const action = user ? 'timer' : 'ask';
-      console.log('DATA UID', data?.uid);
-      const response = await fetch('/api/mastra-v2', {
+      const apiMessages = [...messageHistory, { text: currentInput, user: true }].map(m => ({
+        role: m.user ? 'user' : 'assistant',
+        content: m.text
+      }));
+
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action,
-          payload: {
-            text: currentInput,
-            history: messageHistory,
-            currentPath: $page.url.pathname // Added current path
-          },
-          user: { id: data.uid ?? null, lang: data.lang }
+          messages: apiMessages,
+          userId: data.uid ?? null,
+          lang: data.lang,
+          currentPath: $page.url.pathname
         })
       });
 
       const responseData = await response.json();
-      if (responseData.reply) {
-        messages = [...messages, { text: responseData.reply, user: false }];
+      const replyText = responseData.content || responseData.reply;
+      
+      if (replyText) {
+        chatMessages.addMessage({ text: replyText, user: false });
       }
       if (responseData.navigation?.url) {
         goto(responseData.navigation.url);
-        console.log('Navigating to:', responseData.navigation);
         if (responseData.navigation?.idPr) {
           idPr.set(responseData.navigation.idPr);
         }
-        visible = false; // Close the bot after navigation
+        visible = false;
       }
     } catch (error) {
       console.error('Error sending message to bot:', error);
-      messages = [...messages, { text: $t('bot.errorMessage'), user: false }];
+      chatMessages.addMessage({ text: $t('bot.errorMessage'), user: false });
     } finally {
       loading = false;
     }
   }
-  $effect(() => {
-    console.log($locale, 'locale');
-  });
+
+  function expandToFullPage() {
+    visible = false;
+    goto('/chat');
+  }
 </script>
 
+{#if !isOnChatPage}
 <div
   dir={$locale == 'he' || $locale == 'ar' ? 'rtl' : 'ltr'}
   class="fixed bottom-12 {$locale == 'he' || $locale == 'ar'
@@ -119,26 +118,51 @@
         <h2 class="text-lg font-semibold text-bluesun drop-shadow-sm">
           {user ? $t('bot.timerTitle') : $t('bot.welcomeTitle')}
         </h2>
-        <button
-          onclick={() => (visible = false)}
-          class="text-bluesun hover:text-red-600 bg-gold transition-colors duration-200 p-1 rounded-full hover:bg-white/20"
-          aria-label="Close bot"
-        >
-          <svg
-            class="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
+        <div class="flex items-center gap-1">
+          <!-- Expand to full page button -->
+          <button
+            onclick={expandToFullPage}
+            class="text-bluesun hover:text-blue-600 bg-gold transition-colors duration-200 p-1 rounded-full hover:bg-white/20"
+            aria-label="Expand chat"
+            title={$locale === 'he' ? 'פתח צ׳אט מלא' : 'Open full chat'}
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"
-            ></path>
-          </svg>
-        </button>
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5"
+              ></path>
+            </svg>
+          </button>
+          <!-- Close button -->
+          <button
+            onclick={() => (visible = false)}
+            class="text-bluesun hover:text-red-600 bg-gold transition-colors duration-200 p-1 rounded-full hover:bg-white/20"
+            aria-label="Close bot"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
+        </div>
       </div>
       <div
         bind:this={messagesContainer}
@@ -153,7 +177,7 @@
             </div>
           </div>
         {/if}
-        {#each messages as message}
+        {#each messages as message, i (i)}
           <div class="chat {message.user ? 'chat-end' : 'chat-start'}">
             <div
               style="white-space: pre-wrap;"
@@ -240,6 +264,7 @@
     </div>
   {/if}
 </div>
+{/if}
 
 <style>
   .chat {

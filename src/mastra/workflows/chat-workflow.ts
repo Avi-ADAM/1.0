@@ -4,14 +4,18 @@ import { createIntentAgent } from '../agents/intent-agent';
 import { createTimerAgent } from '../agents/timer-agent';
 import { createNavigationAgent } from '../agents/navigation-agent';
 import { createGeneralHelpAgent } from '../agents/help-agent';
+import {
+  DEFAULT_AGENT_MAX_STEPS,
+  getAgentReply
+} from '../lib/agent-response';
 
 interface IntentResult {
   type: 'timer' | 'navigation' | 'general';
   confidence: number;
   details: {
     action?: string;
-    target?: string;
-    context?: string;
+    target?: string | null;
+    context?: string | null;
   };
 }
 
@@ -22,6 +26,27 @@ interface ChatOutput {
   navigation?: any;
   timerAction?: any;
   dataUpdate?: any;
+  components?: {
+    type: 'voting' | 'summary' | 'proposal' | 'mission_list' | string;
+    props: any;
+  }[];
+}
+
+const intentDetailsSchema = z.object({
+  action: z.string().optional().nullable(),
+  target: z.string().optional().nullable(),
+  context: z.string().optional().nullable()
+});
+
+function normalizeIntent(intent: IntentResult): IntentResult {
+  return {
+    ...intent,
+    details: {
+      action: intent.details?.action ?? undefined,
+      target: intent.details?.target ?? undefined,
+      context: intent.details?.context ?? undefined
+    }
+  };
 }
 
 // Step definitions
@@ -38,7 +63,7 @@ const analyzeIntent = createStep({
     ),
     userId: z.string().optional(),
     language: z.string(),
-    apiKey: z.string(),
+    apiKey: z.string().optional(),
     fetchInstance: z.any().optional(),
     currentPath: z.string().optional()
   }),
@@ -52,17 +77,13 @@ const analyzeIntent = createStep({
     ),
     userId: z.string().optional(),
     language: z.string(),
-    apiKey: z.string(),
+    apiKey: z.string().optional(),
     fetchInstance: z.any().optional(),
     currentPath: z.string().optional(),
     intent: z.object({
       type: z.enum(['timer', 'navigation', 'general']),
       confidence: z.number(),
-      details: z.object({
-        action: z.string().optional(),
-        target: z.string().optional(),
-        context: z.string().optional()
-      })
+      details: intentDetailsSchema
     })
   }),
   execute: async ({ inputData }) => {
@@ -85,7 +106,8 @@ const analyzeIntent = createStep({
       content: message
     });
 
-    const result = await intentAgent.generateVNext(contextMessages);
+    let result: any;
+    result = await intentAgent.generate(contextMessages as any);
 
     let intent: IntentResult;
     try {
@@ -104,7 +126,7 @@ const analyzeIntent = createStep({
         jsonText = jsonObjectMatch[0];
       }
 
-      intent = JSON.parse(jsonText);
+      intent = normalizeIntent(JSON.parse(jsonText));
 
       // Validate the parsed intent has required fields
       if (!intent.type || !intent.confidence || !intent.details) {
@@ -120,7 +142,7 @@ const analyzeIntent = createStep({
       if (messageText.includes('טיימר') || messageText.includes('timer') ||
         messageText.includes('התחל') || messageText.includes('start') ||
         messageText.includes('עצור') || messageText.includes('stop')) {
-        intent = {
+        intent = normalizeIntent({
           type: 'timer' as const,
           confidence: 0.7,
           details: {
@@ -128,9 +150,9 @@ const analyzeIntent = createStep({
             target: null,
             context: 'fallback_parsing'
           }
-        };
+        });
       } else {
-        intent = {
+        intent = normalizeIntent({
           type: 'general' as const,
           confidence: 0.5,
           details: {
@@ -138,7 +160,7 @@ const analyzeIntent = createStep({
             target: null,
             context: 'parsing_failed'
           }
-        };
+        });
       }
     }
 
@@ -165,17 +187,13 @@ const routeToAgent = createStep({
     ),
     userId: z.string().optional(),
     language: z.string(),
-    apiKey: z.string(),
+    apiKey: z.string().optional(),
     fetchInstance: z.any().optional(),
     currentPath: z.string().optional(),
     intent: z.object({
       type: z.enum(['timer', 'navigation', 'general']),
       confidence: z.number(),
-      details: z.object({
-        action: z.string().optional(),
-        target: z.string().optional(),
-        context: z.string().optional()
-      })
+      details: intentDetailsSchema
     })
   }),
   outputSchema: z.object({
@@ -184,11 +202,7 @@ const routeToAgent = createStep({
     intent: z.object({
       type: z.enum(['timer', 'navigation', 'general']),
       confidence: z.number(),
-      details: z.object({
-        action: z.string().optional(),
-        target: z.string().optional(),
-        context: z.string().optional()
-      })
+      details: intentDetailsSchema
     })
   }),
   execute: async ({ inputData }) => {
@@ -209,7 +223,9 @@ const routeToAgent = createStep({
     global.botContext = {
       fetchInstance: fetchInstance,
       userId: userId,
-      fullHistory: history // Store full history for getChatHistoryTool
+      fullHistory: history, // Store full history for getChatHistoryTool
+      currentMessage: message,
+      intent
     };
 
     let agent: any;
@@ -256,10 +272,14 @@ const routeToAgent = createStep({
       messages.map((m) => `${m.role}: ${m.content.substring(0, 50)}...`)
     );
 
-    const result = await agent.generateVNext(messages, {
+    console.log('📤 Routing input intent details:', JSON.stringify(intent.details, null, 2));
+
+    const result = await agent.generate(messages, {
       fetchInstance: fetchInstance,
       userId: userId,
-      intent: intent
+      intent: intent,
+      maxSteps: DEFAULT_AGENT_MAX_STEPS,
+      toolChoice: 'auto'
     });
     function logAgentResult(result: any) {
       const cleanResult = {
@@ -307,11 +327,7 @@ const processResponse = createStep({
     intent: z.object({
       type: z.enum(['timer', 'navigation', 'general']),
       confidence: z.number(),
-      details: z.object({
-        action: z.string().optional(),
-        target: z.string().optional(),
-        context: z.string().optional()
-      })
+      details: intentDetailsSchema
     })
   }),
   outputSchema: z.object({
@@ -320,17 +336,21 @@ const processResponse = createStep({
     agentType: z.string().optional(),
     navigation: z.any().optional(),
     timerAction: z.any().optional(),
-    dataUpdate: z.any().optional()
+    dataUpdate: z.any().optional(),
+    components: z.array(z.any()).optional()
   }),
   execute: async ({ inputData }) => {
     const { agentResult, agentType, intent } = inputData;
-    console.log('⚙️ Processing agent response', agentResult.response);
+    console.log('⚙️ Processing agent response. Agent text:', agentResult.text);
+    console.log('⚙️ Agent tool results (if any):', agentResult.response?.messages?.filter((m: any) => m.role === 'tool')?.length || 0);
 
     let response: ChatOutput = {
-      reply: agentResult.text,
-      intent: intent,
+      reply: getAgentReply(agentResult),
+      intent: intent as any,
       agentType: agentType
     };
+    const hasMissionListComponent = () =>
+      Boolean(response.components?.some((component) => component.type === 'mission_list'));
 
     // Extract tool results if any
     if (agentResult.response && agentResult.response.messages) {
@@ -340,34 +360,90 @@ const processResponse = createStep({
 
       for (const toolMessage of toolMessages) {
         for (const toolResult of toolMessage.content) {
-          console.log(
-            '🔧 Tool executed:',
-            toolResult.toolName,
-            toolResult.output
-          );
+          const name = toolResult.toolName;
+          const output = toolResult.output?.value || toolResult.output;
+          
+          console.log(`🔧 Tool executed: ${name}`, output);
 
           // Handle navigation
-          if (
-            toolResult.toolName === 'navigateToPageTool' &&
-            toolResult.output?.value?.success
-          ) {
-            response.navigation = toolResult.output.value.navigation;
+          if ((name === 'navigateToPageTool' || name === 'navigateToPage') && output?.success) {
+            response.navigation = output.navigation;
           }
 
           // Handle timer actions
           if (
-            toolResult.toolName === 'timerActionTool' &&
-            toolResult.output?.value
+            (
+              name === 'timerActionTool' ||
+              name === 'timerAction' ||
+              name === 'start_timer' ||
+              name === 'stop_timer'
+            ) &&
+            output
           ) {
-            response.timerAction = toolResult.output.value;
+            response.timerAction = output;
           }
 
           // Handle data updates
+          if ((name === 'updateDataTool' || name === 'updateData') && output) {
+            response.dataUpdate = output;
+          }
+
+          // Handle mission list representation (interactive buttons)
           if (
-            toolResult.toolName === 'updateDataTool' &&
-            toolResult.output?.value
+            (name === 'listUserMissions' || name === 'listUserMissionsTool') &&
+            output?.success &&
+            output?.missions?.length > 1
           ) {
-            response.dataUpdate = toolResult.output.value;
+            console.log('✨ Generating mission list component for UI');
+            if (!response.components) response.components = [];
+            
+            // Ensure we don't duplicate the list if multiple tools return missions
+            const missions = output.missions.map((m: any) => ({
+              id: m.id,
+              name: m.name,
+              projectName: m.projectName || 'פרויקט כללי',
+              action: 'start_timer'
+            }));
+
+            if (!hasMissionListComponent()) {
+              response.components.push({
+                type: 'mission_list',
+                props: { missions }
+              });
+            }
+
+            if (intent?.type === 'timer' && intent?.details?.action === 'start') {
+              response.reply = 'מצאתי כמה משימות מתאימות. בחר מהרשימה את המשימה שתרצה להפעיל עבורה טיימר.';
+            }
+          }
+
+          if (
+            (
+              name === 'timerActionTool' ||
+              name === 'timerAction' ||
+              name === 'start_timer' ||
+              name === 'stop_timer'
+            ) &&
+            output?.requiresSelection &&
+            output?.missions?.length > 1
+          ) {
+            if (!response.components) response.components = [];
+
+            response.reply = 'מצאתי כמה משימות מתאימות. בחר מהרשימה את המשימה שתרצה להפעיל עבורה טיימר.';
+            response.timerAction = undefined;
+            if (!hasMissionListComponent()) {
+              response.components.push({
+                type: 'mission_list',
+                props: {
+                  missions: output.missions.map((m: any) => ({
+                    id: m.id,
+                    name: m.name,
+                    projectName: m.projectName || 'פרויקט כללי',
+                    action: 'start_timer'
+                  }))
+                }
+              });
+            }
           }
         }
       }
@@ -391,7 +467,7 @@ const chatWorkflow = createWorkflow({
     ),
     userId: z.string().optional(),
     language: z.string(),
-    apiKey: z.string(),
+    apiKey: z.string().optional(),
     fetchInstance: z.any().optional(),
     currentPath: z.string().optional()
   }),
@@ -401,7 +477,8 @@ const chatWorkflow = createWorkflow({
     agentType: z.string().optional(),
     navigation: z.any().optional(),
     timerAction: z.any().optional(),
-    dataUpdate: z.any().optional()
+    dataUpdate: z.any().optional(),
+    components: z.array(z.any()).optional()
   })
 })
   .then(analyzeIntent)

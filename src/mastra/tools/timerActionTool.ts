@@ -1,4 +1,4 @@
-import { createTool } from '@mastra/core';
+import { createTool } from '@mastra/core/tools'
 import { z } from 'zod';
 import { sendToSer } from '../../lib/send/sendToSer.js';
 import { startTimer, stopTimer } from '../../lib/func/timers.js';
@@ -17,11 +17,13 @@ export const timerActionTool = createTool({
         'Specific mission ID (optional, will find active timer if not provided)'
       )
   }),
-  execute: async ({ context }) => {
-    const { action, missionId } = context;
+  execute: async (inputData) => {
+    const { action, missionId } = inputData;
     const globalContext = global.botContext || {};
     const userId = globalContext.userId;
     const fetchInstance = globalContext.fetchInstance;
+    const currentMessage = globalContext.currentMessage || '';
+    const lastMissionSearch = globalContext.lastMissionSearch;
 
     if (!userId || !fetchInstance) {
       return {
@@ -34,6 +36,34 @@ export const timerActionTool = createTool({
     console.log(`Executing timer action: ${action}`, { missionId, userId });
 
     try {
+      const userExplicitlySelectedMission =
+        typeof currentMessage === 'string' &&
+        (/מזהה\s*:\s*\d+/i.test(currentMessage) ||
+          /\bid\s*:\s*\d+\b/i.test(currentMessage));
+
+      if (
+        action === 'start' &&
+        missionId &&
+        lastMissionSearch?.missionName &&
+        lastMissionSearch?.totalCount > 1 &&
+        !userExplicitlySelectedMission
+      ) {
+        const listedMissionIds = new Set(
+          (lastMissionSearch.missions || []).map((mission: { id: string }) => mission.id)
+        );
+
+        if (listedMissionIds.has(missionId)) {
+          return {
+            success: false,
+            message: 'Multiple matching missions found. Please choose one from the list before starting a timer.',
+            action,
+            error: 'ambiguous_mission_selection',
+            requiresSelection: true,
+            missions: lastMissionSearch.missions
+          };
+        }
+      }
+
       let targetMissionId = missionId;
       let mission = null;
 
@@ -127,9 +157,9 @@ export const timerActionTool = createTool({
             targetMissionId,
             userId,
             projectId,
+            fetchInstance,
             timerId,
-            false,
-            fetchInstance
+            false
           );
 
           return {
@@ -151,7 +181,13 @@ export const timerActionTool = createTool({
             };
           }
 
-          await stopTimer(activeTimerData, fetchInstance, false);
+          await stopTimer(
+            activeTimerData,
+            fetchInstance,
+            false,
+            projectId,
+            userId
+          );
 
           // Calculate duration
           const timers = activeTimerData.attributes.timers || [];

@@ -1,7 +1,7 @@
 
 import { Mastra } from '@mastra/core/mastra';
 import { PinoLogger } from '@mastra/loggers';
-import { Agent } from '@mastra/core';
+import { Agent } from '@mastra/core/agent';
 import { LibSQLStore } from '@mastra/libsql';
 import { chatWorkflow } from './workflows/chat-workflow';
 import { createUnregisteredBotAgent } from './agents/nonreg-bot';
@@ -28,7 +28,8 @@ export const mastra = new Mastra({
   },
   storage: new LibSQLStore({
     // stores telemetry, evals, ... into memory storage, if it needs to persist, change to file:../mastra.db
-    url: ':memory:'
+    url: ':memory:',
+    id: 'libsql-storage'
   }),
   logger: new PinoLogger({
     name: 'Mastra',

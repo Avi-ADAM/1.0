@@ -10,3 +10,5 @@ node_modules
 .mastra
 # Sentry Config File
 .sentryclirc
+/build
+/dist

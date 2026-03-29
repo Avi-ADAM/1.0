@@ -1,4 +1,4 @@
-import { createTool } from '@mastra/core/tools';
+import { createTool } from '@mastra/core/tools'
 import { z } from 'zod';
 
 interface GeocodingResponse {
@@ -35,8 +35,8 @@ export const weatherTool = createTool({
     conditions: z.string(),
     location: z.string(),
   }),
-  execute: async ({ context }) => {
-    return await getWeather(context.location);
+  execute: async (inputData) => {
+    return await getWeather(inputData.location);
   },
 });
 

@@ -1,4 +1,4 @@
-import { createTool } from '@mastra/core';
+import { createTool } from '@mastra/core/tools'
 import { z } from 'zod';
 import { createTimerAgent } from '../agents/timer-agent';
 import { createNavigationAgent } from '../agents/navigation-agent';
@@ -19,7 +19,8 @@ export const delegateToAgentTool = createTool({
       .optional()
       .describe('Additional context about why this delegation is needed')
   }),
-  execute: async ({ agentType, userMessage, context }) => {
+  execute: async (inputData) => {
+    const { agentType, userMessage, context } = inputData;
     try {
       console.log(
         `🔄 Help agent delegating to ${agentType} agent:`,
@@ -80,7 +81,7 @@ export const delegateToAgentTool = createTool({
       });
 
       // Execute the specialized agent
-      const result = await agent.generateVNext(messages, {
+      const result = await agent.generate(messages, {
         fetchInstance,
         userId
       });

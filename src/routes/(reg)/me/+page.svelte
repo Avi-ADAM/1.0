@@ -1,6 +1,6 @@
 <script>
   import Dialog from '$lib/celim/ui/dialog.svelte';
-  import { page } from '$app/state'
+  import { page } from '$app/state';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import { liUN } from '$lib/stores/liUN.js';
   import Arrow from '$lib/celim/icons/arrow.svelte';

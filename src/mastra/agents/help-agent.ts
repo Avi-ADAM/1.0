@@ -1,15 +1,12 @@
-import { Agent } from '@mastra/core';
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { Agent } from '@mastra/core/agent';
+import { createGoogleModel, createGroqModel, hasGroqModelConfig } from '../lib/createModel';
 import { getChatHistoryTool } from '../tools/getChatHistoryTool';
 import { getSitePagesTool } from '../tools/siteNavigationTool';
 import { delegateToAgentTool } from '../tools/delegateToAgentTool';
 import { getPageContextTool } from '../tools/pageContextTool';
 import { SITE_CONTEXT } from '../../lib/bot/context.js';
 export function createGeneralHelpAgent(apiKey: string, language: string = 'he') {
-  const google = createGoogleGenerativeAI({
-    apiKey
-  });
-  const systemPrompt =
+const systemPrompt =
     language === 'he'
       ? `
 אתה סוכן עזרה כללי עבור האתר 1💗1 (1lev1.com). אתה עוזר למשתמשים עם שאלות כלליות על האתר והשימוש בו.
@@ -77,9 +74,13 @@ Always be helpful and friendly, and provide comprehensive answers based on the a
 `;
 
   return new Agent({
+    id: 'GeneralHelpAgent',
     name: 'GeneralHelpAgent',
     instructions: systemPrompt,
-    model: google('gemini-2.5-flash-lite'),
+    model: [
+      ...(hasGroqModelConfig() ? [{ model: createGroqModel(), maxRetries: 2 }] : []),
+         { model: createGoogleModel(apiKey, 'gemini-flash-lite-latest'), maxRetries: 2 },
+        ],
     tools: { getChatHistoryTool, getSitePagesTool, delegateToAgentTool, getPageContextTool }
   });
 }

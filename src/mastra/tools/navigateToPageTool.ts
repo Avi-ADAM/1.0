@@ -1,4 +1,4 @@
-import { createTool } from '@mastra/core';
+import { createTool } from '@mastra/core/tools'
 import { z } from 'zod';
 
 export const navigateToPageTool = createTool({
@@ -16,7 +16,7 @@ export const navigateToPageTool = createTool({
       idPr: z.string().optional(),
     }),
   }),
-  execute: async ({ context }) => {
+  execute: async (inputData) => {
     const { url, pageName, idPr } = context;
     console.log(`🧭 Navigating to page: ${pageName} at ${url}${idPr ? ' for project ID ' + idPr : ''}`);
     return {

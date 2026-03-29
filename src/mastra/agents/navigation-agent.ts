@@ -1,5 +1,5 @@
-import { Agent } from '@mastra/core';
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { Agent } from '@mastra/core/agent';
+import { createGoogleModel, createGroqModel, hasGroqModelConfig } from '../lib/createModel';
 import { navigateToPageTool } from '../tools/navigateToPageTool';
 import { findUserProjectsTool } from '../tools/findUserProjectsTool';
 import { getSitePagesTool } from '../tools/siteNavigationTool';
@@ -10,12 +10,8 @@ export function createNavigationAgent(
   language: string = 'he',
   userId: any = null
 ) {
-  console.log('🌐 Creating navigation agent with language:', language);
-  const google = createGoogleGenerativeAI({
-    apiKey
-  });
-
-  const systemPrompt =
+  console.log('נ Creating navigation agent with language:', language);
+const systemPrompt =
     language === 'he'
       ? `
   userId: ${userId || 'guest'} 
@@ -134,7 +130,7 @@ export function createNavigationAgent(
 `
       : `
 userId: ${userId || 'guest'}
-You are a specialized navigation agent for the 1lev1.com (1💗1) site. You help users navigate the website efficiently.
+You are a specialized navigation agent for the 1lev1.com (1נ’—1) site. You help users navigate the website efficiently.
 
 Your tools:
 - getSitePagesTool: to get a complete list of all available pages on the site
@@ -158,7 +154,7 @@ Your tools:
 - **ALWAYS** use 'findUserProjectsTool' when the user mentions any project name or wants to navigate to a project.
 - Match the mentioned project name with the list to find the correct project ID ('idPr').
 - Use the 'navigateToPageTool' with the URL set to '/moach' and the 'idPr' of the matched project.
-- Example: User says "go to project ABC" → findUserProjectsTool(query="ABC") → navigate to '/moach' with that project's ID.
+- Example: User says "go to project ABC" ג†’ findUserProjectsTool(query="ABC") ג†’ navigate to '/moach' with that project's ID.
 - **NEVER** skip the findUserProjectsTool step - always search for the project first.
 
 ## CRITICAL: When user mentions ANY project name, you MUST:
@@ -167,7 +163,7 @@ Your tools:
 3. Call navigateToPageTool with url="/moach" and the project's idPr
 
 ## Important Guidelines:
-- Always respond in user's language: ${language === 'he' ? 'Hebrew (עברית)' : language === 'ar' ? 'Arabic (العربية)' : 'English'}
+- Always respond in user's language: ${language === 'he' ? 'Hebrew (׳¢׳‘׳¨׳™׳×)' : language === 'ar' ? 'Arabic (״§„״¹״±״¨״©)' : 'English'}
 - Navigation must work: ALWAYS use tools for navigation requests - never just describe what to do
 - Project navigation: Always find project ID using findUserProjectsTool before navigating
 - Be context-aware: Use previous conversation context
@@ -186,10 +182,13 @@ Your tools:
 `;
 
   return new Agent({
+    id: 'NavigationAgent',
     name: 'NavigationAgent',
     instructions: systemPrompt,
-    model: google('gemini-2.0-flash'),
-    tools: { getSitePagesTool, navigateToPageTool, findUserProjectsTool, getChatHistoryTool },
-    toolChoice: 'auto' // Ensure tools are used when appropriate
+    model: [
+      ...(hasGroqModelConfig() ? [{ model: createGroqModel(), maxRetries: 2 }] : []),
+      { model: createGoogleModel(apiKey, 'gemini-flash-lite-latest'), maxRetries: 2 },
+       ],
+    tools: { getSitePagesTool, navigateToPageTool, findUserProjectsTool, getChatHistoryTool }
   });
 }

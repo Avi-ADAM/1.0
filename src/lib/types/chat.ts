@@ -16,9 +16,16 @@ export interface PartnershipData {
   members: number;
 }
 
+export interface MissionInfo {
+  id: string;
+  name: string;
+  projectName: string;
+  action: 'start_timer' | 'stop_timer';
+}
+
 export interface ChatComponent {
-  type: 'voting' | 'summary' | 'proposal';
-  props: VotingProps | { partnerships: PartnershipData[] } | Record<string, unknown>;
+  type: 'voting' | 'summary' | 'proposal' | 'mission_list';
+  props: VotingProps | { partnerships: PartnershipData[] } | { missions: MissionInfo[] } | Record<string, unknown>;
 }
 
 export interface ChatMessage {

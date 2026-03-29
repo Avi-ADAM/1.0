@@ -10,26 +10,44 @@ export const config = {
     loaders: [
         {
             locale: 'he',
+            key: 'bot',
+            routes: [/^\/chat/],
+            loader: async () => (await import('./he/bot.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'bot',
+            routes: [/^\/chat/],
+            loader: async () => (await import('./ar/bot.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'bot',
+            routes: [/^\/chat/],
+            loader: async () => (await import('./en/bot.json')).default,
+        },
+        {
+            locale: 'he',
             key: 'negotiation',
-            routes: [/^\/negotiation/], 
+            routes: [/^\/negotiation/],
             loader: async () => (await import('./he/negotiation.json')).default,
         },
-           {
+        {
             locale: 'ar',
             key: 'negotiation',
-            routes: [/^\/negotiation/], 
+            routes: [/^\/negotiation/],
             loader: async () => (await import('./ar/negotiation.json')).default,
         },
-           {
+        {
             locale: 'en',
             key: 'negotiation',
-            routes: [/^\/negotiation/], 
+            routes: [/^\/negotiation/],
             loader: async () => (await import('./en/negotiation.json')).default,
         },
         {
             locale: 'en',
             key: 'love',
-            routes: ['/love'], 
+            routes: ['/love'],
             loader: async () => (await import('./en/love.json')).default,
         },
         {
@@ -65,7 +83,7 @@ export const config = {
         {
             locale: 'he',
             key: 'love',
-            routes: ['/love'], 
+            routes: ['/love'],
             loader: async () => (await import('./he/love.json')).default,
         },
         {
@@ -96,13 +114,13 @@ export const config = {
         {
             locale: 'he',
             key: 'countries',
-            routes: ['/love'], 
+            routes: ['/love'],
             loader: async () => (await import('./he/countries.json')).default,
         },
         {
             locale: 'ar',
             key: 'love',
-            routes: ['/love'], 
+            routes: ['/love'],
             loader: async () => (await import('./ar/love.json')).default,
         },
         {
