@@ -58,7 +58,7 @@ export function createGoogleModel(
 
 export function createGroqModel(
   apiKey?: string,
-  modelId: string = 'llama-3.1-8b-instant'
+  modelId: string = 'llama-3.3-70b-versatile'
 ) {
   const resolvedApiKey = resolveGroqApiKey(apiKey);
 

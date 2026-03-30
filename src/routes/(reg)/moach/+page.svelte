@@ -41,6 +41,7 @@
   import Fini from '$lib/components/prPr/fini.svelte';
   import Hach from '$lib/components/prPr/hachcal.svelte';
   import Finisin from '$lib/components/prPr/finisin.svelte';
+  import TaskModal from '$lib/components/prPr/tasks/taskModal.svelte';
 
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { fly } from 'svelte/transition';
@@ -57,11 +58,16 @@
     userProjects
   } from '$lib/stores/pendMisMes';
   import { SendTo } from '$lib/send/sendTo.svelte';
-  import { projectTimersStore, fetchProjectTimers } from '$lib/stores/projectTimers.js';
+  import {
+    projectTimersStore,
+    fetchProjectTimers
+  } from '$lib/stores/projectTimers.js';
   let idL;
   let success = $state(false);
   let isOpen = $state(false);
   let isOpenM = $state(false);
+  let selectedAct = $state(null);
+  let modalOpen = $state(false);
   let a = $state(0);
   let fmiData = $state([]);
   let tahaS = $state(false);
@@ -431,10 +437,10 @@
                 srcP = project.profilePic.data.attributes.url;
               }
               trili = meData.tosplits.data;
-              
+
               // Load project timers for active timer indicators
               await fetchProjectTimers($idPr, fetch);
-              
+
               // pre(projectUsers, fmiData)
             } else {
               if (res.error && res.error.status == 401)
@@ -1179,10 +1185,48 @@
     } else if (is == 'openM') {
       isOpen = true;
       a = 6;
+    } else if (is == 'done') {
+      isOpen = true;
+      a = 7;
     } else if (is == 'assign') {
       isOpen = true;
       a = 9;
     }
+  }
+  function openActModal(actOrId) {
+    console.log(actOrId);
+    if (!actOrId) return;
+
+    // If it's a string or number, it's an ID. If it has no attributes, it might be a partial object with ID
+    const actId = typeof actOrId === 'object' ? actOrId.id : actOrId;
+    console.log(actId);
+    // Find the full act data from meData.acts
+    const fullAct = meData?.acts?.data?.find((a) => a.id == actId);
+    console.log(fullAct);
+    if (fullAct) {
+      console.log(fullAct, 'fullAct');
+      const flat = {
+        id: fullAct.id,
+        ...fullAct.attributes,
+        vali: fullAct.attributes.vali || { data: null },
+        my: fullAct.attributes.my || { data: [] },
+        mesimabetahaliches: fullAct.attributes.mesimabetahaliches || {
+          data: []
+        },
+        tafkidims: fullAct.attributes.tafkidims || { data: [] }
+      };
+      selectedAct = flat;
+      modalOpen = true;
+    }
+
+    if (selectedAct) {
+      modalOpen = true;
+    }
+  }
+
+  function closeActModal() {
+    modalOpen = false;
+    selectedAct = null;
   }
   let hover = false;
   let bmiss = $state();
@@ -1325,6 +1369,7 @@
   import Button from '$lib/celim/ui/button.svelte';
   import { link } from 'd3-shape';
   import CrNewProject from '$lib/celim/icons/crNewProject.svelte';
+  import Kanbanboard from '$lib/components/prPr/Kanbanboard.svelte';
 
   onDestroy(() => {
     if (unsubscribe) {
@@ -1522,6 +1567,26 @@
     idPr.set(0);
     loadProjects(true);
   }
+  function handleMissionMoved(event) {
+    const { missionId, itemType, destKind, destCol } = event;
+
+    // גרירה לעמודת "הושלמו" → פתח חלון הכנסת שעות (רק למשימות)
+    if (destKind === 'done' && itemType === 'mission') {
+      who = missionId;
+      a = 7;
+      isOpen = true;
+      return;
+    }
+
+    // TODO: לשלב כאן את ה-Unified Action System לשינוי סטטוס
+    // עבור missions: sourceKind → destKind ← mutation מתאימה
+    // עבור acts:     mutation של אישור/אימות (myIshur / valiIshur / naasa)
+    //
+    // לבינתיים: toast + refresh
+    toast.success($lang === 'he' ? 'סטטוס עודכן' : 'Status updated');
+    setTimeout(() => start(), 1500);
+  }
+  const kanbanT = { he: 'קאנבן', en: 'Kanban' };
 </script>
 
 <svelte:head>
@@ -1616,7 +1681,9 @@
             {:else if a == 6}
               <OpenM {who} projectName={projectname} {omiData} />
             {:else if a == 7}
-              <Finisin {who} {fmiData} />
+              <div class="min-h-[400px] flex flex-col items-stretch">
+                <Finisin {who} {fmiData} />
+              </div>
             {:else if a === 8}
               {#key clicked}
                 <Diun
@@ -1906,19 +1973,25 @@ pointer-events: none;"
             {#each projectUsers as user}
               {@const projectTimerData = $projectTimersStore[$idPr]?.data}
               {@const timers = projectTimerData?.timers?.data || []}
-              {@const hasActiveTimer = timers.some(timer => {
+              {@const hasActiveTimer = timers.some((timer) => {
                 const timerAttrs = timer.attributes;
-                const missionUserId = timerAttrs?.mesimabetahalich?.data?.attributes?.users_permissions_user?.data?.id;
+                const missionUserId =
+                  timerAttrs?.mesimabetahalich?.data?.attributes
+                    ?.users_permissions_user?.data?.id;
                 const isActive = timerAttrs?.isActive === true;
-                
+
                 return missionUserId == user.id && isActive;
               })}
               <button
                 title={`${user.attributes.username}${hasActiveTimer ? ' 🟢 פעיל כעת' : ''}`}
                 onclick={() => goto(`/user/${user.id}`)}
-                class="relative transition-all duration-300 {hasActiveTimer ? 'scale-110' : ''}"
+                class="relative transition-all duration-300 {hasActiveTimer
+                  ? 'scale-110'
+                  : ''}"
                 ><img
-                  class="inline-block h-8 w-8 rounded-full ring-2 transition-all duration-300 {hasActiveTimer ? 'ring-green-400 ring-4 shadow-lg shadow-green-400/50' : 'ring-gold'}"
+                  class="inline-block h-8 w-8 rounded-full ring-2 transition-all duration-300 {hasActiveTimer
+                    ? 'ring-green-400 ring-4 shadow-lg shadow-green-400/50'
+                    : 'ring-gold'}"
                   src={user.attributes.profilePic.data != null
                     ? user.attributes.profilePic.data.attributes.url
                     : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
@@ -1926,8 +1999,12 @@ pointer-events: none;"
                 />
                 {#if hasActiveTimer}
                   <span class="absolute -top-1 -right-1 flex h-4 w-4">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-4 w-4 bg-green-500 border-2 border-white shadow-lg"></span>
+                    <span
+                      class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"
+                    ></span>
+                    <span
+                      class="relative inline-flex rounded-full h-4 w-4 bg-green-500 border-2 border-white shadow-lg"
+                    ></span>
                   </span>
                 {/if}
               </button>
@@ -2055,7 +2132,23 @@ pointer-events: none;"
               </h2>
             </div></button
           >
+          <button
+            onclick={() => (tab = 11)}
+            class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab ==
+            11
+              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold'
+              : 'bg-gradient-to-r from-gra via-grb  to-gre text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
+            title={kanbanT[$lang]}
+            ><div
+              class="flex flex-col items-center justify-center align-middle"
+            >
+              <h2 style={tab == 11 ? '' : 'text-shadow:1px 1px #fff ;'}>
+                {kanbanT[$lang]}
+              </h2>
+            </div></button
+          >
           <!-- <button
+
                 onclick={() => (tab = 6)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 6 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={shirutims[$lang]}
@@ -2418,7 +2511,11 @@ pointer-events: none;"
               class="rounded-lg"
               style=" margin: 20px auto;  overflow-x: auto; background: linear-gradient(to right, #25c481, #25b7c4);background: -webkit-linear-gradient(left, #25c481, #25b7c4); "
             >
-              <Bethas {bmiData} onChat={openChat} />
+              <Bethas
+                {bmiData}
+                onChat={openChat}
+                onActClick={(act) => openActModal(act)}
+              />
             </div>
             <!--{:else if tab === 6}
                      <div class="p-8">
@@ -2450,6 +2547,19 @@ pointer-events: none;"
             >
               <Sidur />
             </div>
+          {:else if tab === 11}
+            <div class="p-2">
+              <Kanbanboard
+                openMissions={omiData}
+                pendingMissions={pmiData}
+                inProgressMissions={bmiData}
+                finishedMissions={fmiData}
+                acts={meData?.acts?.data ?? []}
+                onCardClick={(e) => openDescrip(e)}
+                onActClick={(act) => openActModal(act)}
+                onMissionMoved={handleMissionMoved}
+              />
+            </div>
           {:else if tab === 9}
             <ActsTable acts={meData.acts.data} onTaskClick={openDescrip} />
           {:else if tab === 10}
@@ -2462,6 +2572,7 @@ pointer-events: none;"
             </div>
           {/if}
         </div>
+        <TaskModal act={selectedAct} open={modalOpen} onClose={closeActModal} />
         <div class=" m-4" bind:this={openss}>
           {#if openMS === true && omiData.length > 0}
             <span>
