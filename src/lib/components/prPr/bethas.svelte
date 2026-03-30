@@ -418,9 +418,9 @@
                           </thead>
                         </table>
                       </div>
-                      <div class="tbl-content mb-2">
+                      <div class="tbl-content d mb-2">
                         <table cellpadding="0" cellspacing="0" border="0">
-                          <tbody>
+                          <tbody class="">
                             {#each data.attributes.acts.data as datai, i}
                               <tr
                                 transition:slide={{
