@@ -8,6 +8,7 @@
   import { contriesi } from './contries.js';
   import { lang } from '$lib/stores/lang.js';
   import { fbl } from '$lib/stores/fbl.js';
+  import { t } from '$lib/translations';
 
   import { RingLoader } from 'svelte-loading-spinners';
   import { skills1 } from './skills1.js';
@@ -279,24 +280,6 @@
     he: 'https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg',
     en: 'https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg'
   };
-  const addn = { he: 'יצירת סיסמה', en: 'Create new password' };
-  const what = { he: 'מה היא מילת הקסם שלך?', en: 'what is Your magic word?' };
-  const val1 = {
-    he: 'על הססמה להכיל לפחות 8 תווים',
-    en: 'be at least 8 characters'
-  };
-  const val2 = {
-    he: 'ולפחות אות אחת גדולה באנגלית',
-    en: 'must contain a capital letter'
-  };
-  const val3 = { he: 'ולפחות מספר אחד', en: 'must contain a number' };
-  const arr1 = {
-    he: 'אם לא התקבל מייל הרשמה נא לפנות ל-',
-    en: "if you didn't recive email, reach us at-"
-  };
-  const arr2 = { he: 'יש לבדוק את המייל,', en: 'please check your email,' };
-  const arr3 = { he: 'משהו השתבש,', en: 'something is wrong,' };
-  const om = { he: 'רק רגע בבקשה', en: 'one moment please' };
 </script>
 
 <main>
@@ -306,10 +289,10 @@
       increment();
     }}
   >
-    <h1 title={addn[$lang]} class="midscreenText-2">
+    <h1 title={$t('auth.registration.password.title')} class="midscreenText-2">
       {userName_value}
       <br />
-      {what[$lang]}
+      {$t('auth.registration.password.question')}
     </h1>
     <div style="display: none;">
       <input
@@ -326,7 +309,7 @@
         type={showPassword ? 'text' : 'password'}
         name="email"
         class="input"
-        placeholder={addn[$lang]}
+        placeholder={$t('auth.registration.password.title')}
         oninput={validatePassword}
         onblur={getV}
       />
@@ -349,16 +332,12 @@
     <ul dir="rtl">
       <li>
         {validations[2] ? '🏆' : '❌'}
-        {val1[$lang]}
+        {$t('auth.registration.password.validation.minLength')}
       </li>
       <li>
         {validations[3] ? '🏆' : '❌'}
-        {val2[$lang]}
+        {$t('auth.registration.password.validation.capitalLetter')}
       </li>
-      <!--<li>{validations[3] ? "🏆" : "❌"} {val3[$lang]}</li>
-			<li>
-				{validations[3] ? "🏆" : "❌"}  ולפחות סמל אחד מאלו($&+,:;=?@#) must contain one symbol ($&+,:;=?@#)
-			</li>-->
     </ul>
     {#if already === false}
       <div dir={$lang == 'en' ? 'ltr' : 'rtl'} class="but">
@@ -379,7 +358,7 @@
         style="margin: 0 auto;"
         class="flex flex-col text-center items-center justify-center"
       >
-        <h3 class="text-barbi">{om[$lang]}</h3>
+        <h3 class="text-barbi">{$t('auth.registration.password.pleaseWait')}</h3>
         <br />
         <RingLoader size="140" color="#ff00ae" unit="px" duration="2s"
         ></RingLoader>
@@ -387,9 +366,9 @@
     {:else if errr.k === true}
       <h2 class=" bg-white text-red">
         {errr.m}
-        {arr3[$lang]}<br />
-        {arr2[$lang]}<br />
-        {arr1[$lang]}baruch@1lev1.com
+        {$t('auth.registration.password.errors.somethingWrong')}<br />
+        {$t('auth.registration.password.errors.checkEmail')}<br />
+        {$t('auth.registration.password.errors.contactUs')}baruch@1lev1.com
       </h2>
     {/if}
   </form>

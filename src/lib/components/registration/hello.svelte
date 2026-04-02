@@ -1,32 +1,13 @@
-﻿<script>
+<script>
   import { userName } from '../../stores/store.js';
   import { show } from './store-show.js';
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
 
   import { fly } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
   import { onMount } from 'svelte';
-  let first = {
-    he: '         לחיצה לפתיחת ',
-    en: 'click to open          ',
-    ar: '      انقر للفتح'
-  };
-  let second = {
-    he: '               1💗1',
-    en: '1💗1               ',
-    ar: '              1💗1'
-  };
-  let sh = { he: 'שלום', en: 'Hello', ar: 'مرحبا' };
-  let sh2 = { he: ' הסכמתך התקבלה!', en: '', ar: 'تم استلام موافقتك!' };
-  let sh3 = { he: 'הגעת למקום ה-', en: 'You are the ', ar: 'أنت ال ' };
-  let sh1 = { he: '', en: 'th to agree', ar: ' للموافقة' };
-  let sh4 = {
-    he: 'כעת ביכולתך לפתוח',
-    en: 'Now you can open',
-    ar: 'الآن يمكنك الفتح'
-  };
-  let sh5 = { he: 'את', en: '', ar: '' };
-  let sh6 = { he: '1💗1 לפתיחת', en: 'Open 1💗1', ar: 'فتح 1💗1' };
+  
   let dira = { he: 'rtl', en: 'ltr', ar: 'rtl' };
   function reverseString(str) {
     return str.split('').reverse().join('');
@@ -82,16 +63,16 @@
 
 <div class="midscreenText-2">
   <h1 class="a1" dir={dira[$lang]}>
-    {sh[$lang]}
+    {$t('auth.registration.hello.greeting')}
     {$userName}
   </h1>
   <h1 class="a2" dir={dira[$lang]}>
-    {sh2[$lang]}
-    {sh3[$lang]}{idx}{sh1[$lang]}
+    {$t('auth.registration.hello.agreementReceived')}
+    {$t('auth.registration.hello.youAreThe')}{idx}{$t('auth.registration.hello.toAgree')}
   </h1>
   <h1 class="a3" dir={dira[$lang]}>
-    {sh4[$lang]}
-    {sh5[$lang]}
+    {$t('auth.registration.hello.nowYouCan')}
+    {$t('auth.registration.hello.the')}
     1💗1
   </h1>
 </div>
@@ -99,7 +80,7 @@
  -->
 <button
   out:fly={{ y: -600, x: 2000, opacity: 0.6, duration: 2200 }}
-  title={sh6[$lang]}
+  title={$t('auth.registration.hello.openApp')}
   class="button"
   onclick={increment}
 >
@@ -190,11 +171,11 @@
       class="tex"
       style="fill: url(#gradient-2); font-family: Arial, sans-serif; font-size: 62px; letter-spacing: 6.1px; stroke: url(#gradient-0); stroke-width: 2.29039px; text-anchor: middle; white-space: pre;"
       transform="matrix(1.540934, 0, 0, 1.078712, -522.814819, -41.794453)"
-      ><tspan x="1365.63" y="486.829">{first[$lang]}</tspan><tspan
+      ><tspan x="1365.63" y="486.829">{$t('auth.registration.hello.clickToOpen')}</tspan><tspan
         x="1365.63"
         dy="1em">​</tspan
       ><tspan x="1365.63" dy="1em">​</tspan><tspan x="1365.63" dy="1em">​</tspan
-      ><tspan>{second[$lang]}</tspan></text
+      ><tspan>{$t('auth.registration.hello.appName')}</tspan></text
     >
     <text
       class="tex"
