@@ -377,8 +377,7 @@
     </button>
   </div>
 
-  {#key arr1}
-    <div
+  <div
       id="content-area"
       dir="ltr"
       bind:clientWidth={w}
@@ -977,7 +976,6 @@
         />
       </div>
     </div>
-  {/key}
 </div>
 
 <style>

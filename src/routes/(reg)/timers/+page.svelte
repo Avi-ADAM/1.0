@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
+  import { locale } from '$lib/translations';
   import {
     fetchTimers,
     initialWebSocketForTimer,
@@ -203,6 +204,7 @@
   // פונקציה נפרדת למירכוז התצוגה - מאפשרת קריאה חוזרת אם צריך
   function centerViewOnLoad() {
     setTimeout(() => {
+      console.log('centerViewOnLoad', $locale);
       const container = document.getElementById('screen');
       const content = document.getElementById('timer-content');
       if (container && content) {
@@ -212,8 +214,10 @@
           const contentCenter = { x: w / 2, y: h / 2 };
 
           // חישוב כמה לגלול כדי למרכז את התוכן
-          const scrollLeft = contentCenter.x - container.clientWidth / 2;
-          const scrollTop = contentCenter.y - container.clientHeight / 2;
+          const scrollLeft =
+            (container.scrollWidth - container.clientWidth) / 2;
+          const scrollTop =
+            (container.scrollHeight - container.clientHeight) / 2;
 
           console.log('גלילה אל:', scrollLeft, scrollTop, 'גודל תוכן:', w, h);
 
@@ -262,6 +266,7 @@
 
 <div
   id="screen"
+  dir="ltr"
   bind:clientWidth={ow}
   bind:clientHeight={oh}
   style="position: fixed; width: 100vw; height: 100vh; top: 0; left: 0; max-width: 100vw; max-height: 100vh;"
@@ -276,24 +281,22 @@
       style="position: relative; width: {w}px; height: {h}px;"
       class="screen d"
     >
-      {#key $timers}
-        {#each $timers as timer, index (timer.id)}
-          <Timer
-            orders={orders[index]}
-            missionId={timer.mId}
-            {tx}
-            {size}
-            {bigsize}
-            {add}
-            {center}
-            {tiltAngle}
-            {hover}
-            {project}
-            {linke}
-            hoursAssigned={timer.hoursAssigned}
-          />
-        {/each}
-      {/key}
+      {#each $timers as timer, index (timer.id)}
+        <Timer
+          orders={orders[index]}
+          missionId={timer.mId}
+          {tx}
+          {size}
+          {bigsize}
+          {add}
+          {center}
+          {tiltAngle}
+          {hover}
+          {project}
+          {linke}
+          hoursAssigned={timer.hoursAssigned}
+        />
+      {/each}
 
       <!-- סמן מרכז - שימושי לפיתוח - להסרת ההערה לצורך בדיקות -->
       <!-- <div class="center-marker"></div> -->

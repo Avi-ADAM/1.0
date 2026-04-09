@@ -9,6 +9,54 @@ let currentFetch = null;
 let fetchTimeout = null; // Add a variable to hold the timeout ID
 let timerUnsubscribe = null; // For unsubscribing from notifications
 
+// ===== Edit Lock System =====
+// Prevents remote socket updates from overwriting locally-edited timers
+const editLocks = new Map(); // missionId -> timestamp
+
+/**
+ * Lock a timer to prevent remote updates while editing locally.
+ * @param {string|number} missionId
+ */
+export function lockTimerForEdit(missionId) {
+    console.log('[Timers] Locking timer for edit:', missionId);
+    editLocks.set(String(missionId), Date.now());
+}
+
+/**
+ * Unlock a timer, allowing remote updates again.
+ * Optionally triggers an immediate refresh to sync with server.
+ * @param {string|number} missionId
+ * @param {{ refresh?: boolean }} options
+ */
+export function unlockTimerForEdit(missionId, options = {}) {
+    console.log('[Timers] Unlocking timer for edit:', missionId);
+    editLocks.delete(String(missionId));
+    
+    // After unlocking, optionally refresh to get latest server state
+    if (options.refresh && currentUid && currentFetch) {
+        setTimeout(() => {
+            fetchTimers(currentUid, currentFetch, { isRemoteUpdate: true });
+        }, 500);
+    }
+}
+
+/**
+ * Check if a timer is currently locked for local editing.
+ * Locks auto-expire after 60 seconds as a safety net.
+ * @param {string|number} missionId
+ * @returns {boolean}
+ */
+export function isTimerLocked(missionId) {
+    const lockTime = editLocks.get(String(missionId));
+    if (!lockTime) return false;
+    // Auto-expire lock after 60 seconds (safety net)
+    if (Date.now() - lockTime > 60000) {
+        editLocks.delete(String(missionId));
+        return false;
+    }
+    return true;
+}
+
 /**
  * Initialize timer updates listener using the new socketClient.
  * This replaces the old WebSocket-based timer updates.
@@ -49,7 +97,7 @@ export function initialWebSocketForTimer(id, token, fetch) {
             fetchTimeout = setTimeout(() => {
                 if (currentUid && currentFetch) {
                     console.log('[Timers] Refreshing timers after notification');
-                    fetchTimers(currentUid, currentFetch);
+                    fetchTimers(currentUid, currentFetch, { isRemoteUpdate: true });
                 } else {
                     console.error('[Timers] Cannot reload timers: uid or fetch not available.');
                 }
@@ -101,12 +149,60 @@ if (browser) {
 }
 
 /**
+ * Smart merge: updates timers store while respecting edit locks.
+ * Locked timers keep their current local state.
+ * Unlocked timers get updated from the server (source of truth).
+ * New timers are added, removed timers are removed (unless locked).
+ * 
+ * @param {Array} newTimers - Fresh timer data from server
+ */
+function mergeTimers(newTimers) {
+    const currentTimers = get(timers);
+    
+    // Build a map of new timers by mId for O(1) lookup
+    const newTimerMap = new Map(newTimers.map(t => [String(t.mId), t]));
+    const currentTimerMap = new Map(currentTimers.map(t => [String(t.mId), t]));
+    
+    const merged = [];
+    
+    // Process all new timers (update existing or add new)
+    for (const newTimer of newTimers) {
+        const mId = String(newTimer.mId);
+        const existing = currentTimerMap.get(mId);
+        
+        if (existing && isTimerLocked(mId)) {
+            // Timer is locked for editing - keep the local version
+            console.log('[Timers] Skipping locked timer:', mId);
+            merged.push(existing);
+        } else {
+            // Not locked - use server data (source of truth)
+            merged.push(newTimer);
+        }
+    }
+    
+    // Keep locked timers that might have been removed from server
+    // (edge case: timer removed while user is editing it)
+    for (const current of currentTimers) {
+        const mId = String(current.mId);
+        if (!newTimerMap.has(mId) && isTimerLocked(mId)) {
+            console.log('[Timers] Keeping locked timer not in server:', mId);
+            merged.push(current);
+        }
+    }
+    
+    timers.set(merged);
+}
+
+/**
  * Fetches all active timers for the current user and stores them in the "timers" store.
  * @param {string} uid - The user ID to fetch the timers for.
+ * @param {Function} fetch - Fetch function
+ * @param {{ isRemoteUpdate?: boolean }} options - Options
  */
-export async function fetchTimers(uid, fetch) {
+export async function fetchTimers(uid, fetch, options = {}) {
+    const { isRemoteUpdate = false } = options;
+    
     // Ensure a user ID is provided
-
     if (!uid) {
         console.error('[Timers] User ID is missing. Redirecting to login...');
         if (browser) {
@@ -124,7 +220,7 @@ export async function fetchTimers(uid, fetch) {
                 res.data.usersPermissionsUser.data.attributes &&
                 res.data.usersPermissionsUser.data.attributes.mesimabetahaliches
             ) {
-                let timers = res.data.usersPermissionsUser.data.attributes.mesimabetahaliches.data.map(
+                let newTimers = res.data.usersPermissionsUser.data.attributes.mesimabetahaliches.data.map(
                     (t) => {
                         // NO ACTIVE TIMER
                         let totalMilliseconds = 0;
@@ -167,7 +263,12 @@ export async function fetchTimers(uid, fetch) {
                     }
                 );
 
-                updateTimers(timers);
+                // Use smart merge for remote updates, full replace for initial load
+                if (isRemoteUpdate) {
+                    mergeTimers(newTimers);
+                } else {
+                    updateTimers(newTimers);
+                }
             } else {
                 console.error('Invalid API response:', res);
                 updateTimers([]); // Ensure timers is an empty array on error
@@ -191,3 +292,4 @@ export const getStoredTimers = () => {
     const stored = localStorage.getItem('timers');
     return JSON.parse(stored) || [];
 };
+

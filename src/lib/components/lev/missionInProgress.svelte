@@ -17,7 +17,7 @@
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import { SendTo } from '$lib/send/sendTo.svelte';
   import axios from 'axios';
-  import { timers, updateTimers } from '$lib/stores/timers.js';
+  import { timers, updateTimers, lockTimerForEdit } from '$lib/stores/timers.js';
   import { startTimer } from '$lib/func/timers.js';
   import { stopTimer } from '$lib/func/timers.js';
   /**
@@ -276,6 +276,7 @@
           const { hours, minutes, seconds } = getTimeComponents(localZman);
           elapsedTime = `${hours}:${minutes}:${seconds}`;
           showSaveDialog = true;
+          lockTimerForEdit(mId);
           dialogEdit = false;
         }
       }

@@ -168,8 +168,7 @@
   {#each adder as add}
     {@html add}
   {/each}
-  {#key arr1}
-    {#each arr1 as buble, i}
+  {#each arr1 as buble, i}
       {#if buble.ani === 'vidu' && milon.desi == true}
         <div class:normSml={modal == false} class="vidu normSml">
           <Vid
@@ -692,7 +691,6 @@
         </div>
       {/if}
     {/each}
-  {/key}
   <!--
         <div  class="normSml desi" style="display:'';"><DecisionMaking  decisionName={"?לפתוח קבוצת ווצאפ"} projectName={"פסיפס"} projectId={6}/></div> 
     <div class="normSml desi"><DecisionMaking decisionName={"?מה לבנות קודם"} projectId={2} projectName={"BARB"} src={"barbi.jpeg"} deadLine={"10.7.2021"}/></div> 

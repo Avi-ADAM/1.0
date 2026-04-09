@@ -3,7 +3,7 @@
   import NumberFlow, { NumberFlowGroup } from '@number-flow/svelte';
   import { onDestroy, untrack } from 'svelte';
   import { page } from '$app/state';
-  import { timers, updateTimers } from '$lib/stores/timers';
+  import { timers, updateTimers, lockTimerForEdit } from '$lib/stores/timers';
   import { lang } from '$lib/stores/lang';
   import TimerDialogs from './TimerDialogs.svelte';
 
@@ -196,6 +196,7 @@
         const { hours, minutes, seconds } = getTimeComponents(localZman);
         elapsedTime = `${hours}:${minutes}:${seconds}`;
         showSaveDialog = true;
+        lockTimerForEdit(missionId);
         dialogEdit = false;
       }
     } catch (e) {
@@ -643,8 +644,8 @@
       <g
         transform="translate(80,0)"
         class="control-button"
-        onclick={() => (showSaveDialog = true)}
-        onkeypress={() => (showSaveDialog = true)}
+        onclick={() => { showSaveDialog = true; lockTimerForEdit(missionId); }}
+        onkeypress={() => { showSaveDialog = true; lockTimerForEdit(missionId); }}
         style="cursor: pointer;"
         role="button"
         tabindex="0"

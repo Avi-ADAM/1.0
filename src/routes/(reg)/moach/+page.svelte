@@ -2022,7 +2022,7 @@ pointer-events: none;"
             onclick={() => (tab = 1)}
             class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab ==
             1
-              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold'
+              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-blue-800'
               : 'bg-gradient-to-r from-gra via-grb  to-gre text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
             title={maini[$lang]}
             ><div
@@ -2038,7 +2038,7 @@ pointer-events: none;"
             onclick={() => (tab = 2)}
             class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab ==
             2
-              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold'
+              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-blue-800'
               : 'bg-gradient-to-r from-gra via-grb  to-gre text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
             title={neww[$lang]}
             ><div
@@ -2054,7 +2054,7 @@ pointer-events: none;"
             onclick={() => (tab = 3)}
             class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab ==
             3
-              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold'
+              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-blue-800'
               : 'bg-gradient-to-r from-gra via-grb  to-gre text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
             title={gann[$lang]}
             ><div
@@ -2070,7 +2070,7 @@ pointer-events: none;"
             onclick={() => (tab = 4)}
             class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab ==
             4
-              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold'
+              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-blue-800'
               : 'bg-gradient-to-r from-gra via-grb  to-gre text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
             title={haluka[$lang]}
             ><div
@@ -2087,7 +2087,7 @@ pointer-events: none;"
               onclick={() => (tab = 5)}
               class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab ==
               5
-                ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold'
+                ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-blue-800'
                 : 'bg-gradient-to-r from-gra via-grb  to-gre text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
               title={bet[$lang]}
               ><div
@@ -2105,7 +2105,7 @@ pointer-events: none;"
               onclick={() => (tab = 9)}
               class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab ==
               9
-                ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold'
+                ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-blue-800'
                 : 'bg-gradient-to-r from-gra via-grb  to-gre text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
               title={actL[$lang]}
               ><div
@@ -2121,7 +2121,7 @@ pointer-events: none;"
             onclick={() => (tab = 10)}
             class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab ==
             10
-              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold'
+              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-blue-800'
               : 'bg-gradient-to-r from-gra via-grb  to-gre text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
             title={timersT[$lang]}
             ><div
@@ -2136,7 +2136,7 @@ pointer-events: none;"
             onclick={() => (tab = 11)}
             class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab ==
             11
-              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold'
+              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-blue-800'
               : 'bg-gradient-to-r from-gra via-grb  to-gre text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
             title={kanbanT[$lang]}
             ><div
@@ -2163,7 +2163,7 @@ pointer-events: none;"
             onclick={() => (tab = 7)}
             class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab ==
             7
-              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold'
+              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-blue-800'
               : 'bg-gradient-to-r from-gra via-grb  to-gre text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
             title={mechirot[$lang]}
             ><div
@@ -2179,7 +2179,7 @@ pointer-events: none;"
             onclick={() => (tab = 8)}
             class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab ==
             8
-              ? 'bg-gradient-to-r from-barbi via-fuchsia-400 to-mpink text-gold '
+              ? 'bg-gradient-to-r from-barbi via-fuchsia-400 to-mpink text-blue-800'
               : ' bg-gradient-to-r from-gra via-grb  to-grc text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
             title={sidd[$lang]}
             ><div

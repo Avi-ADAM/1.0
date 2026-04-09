@@ -13,7 +13,7 @@
     recalculateMissionHours,
     calculateTotalHours
   } from '$lib/func/timers.js';
-  import { timers, updateTimers } from '$lib/stores/timers';
+  import { timers, updateTimers, lockTimerForEdit, unlockTimerForEdit } from '$lib/stores/timers';
   import { page } from '$app/state';
 
   /**
@@ -112,11 +112,13 @@
   function closeDialog() {
     showSaveDialog = false;
     dialogEdit = true;
+    unlockTimerForEdit(timer.mId, { refresh: true });
   }
 
   function handleClearTimer() {
     showSaveDialog = false;
     showClearDialog = true;
+    lockTimerForEdit(timer.mId);
   }
 
   async function localClearAllTimers() {
@@ -157,6 +159,7 @@
         });
 
         showClearDialog = false;
+        unlockTimerForEdit(timer.mId, { refresh: true });
         const successMessage = {
           he: 'ניקוי הטיימרים בוצע בהצלחה',
           en: 'Timers cleared successfully'
@@ -227,6 +230,7 @@
             (task) => task.id
           ) ?? [];
         taskSearchTerm = '';
+        unlockTimerForEdit(timer.mId, { refresh: true });
         toast.success(`${succsessText[$lang]}`);
       }
     });
@@ -237,6 +241,7 @@
     showClearDialog = false;
     dialogEdit = true;
     showSaveFinal = true;
+    lockTimerForEdit(timer.mId);
   }
 
   async function handleSaveTimerFinal() {
@@ -269,6 +274,7 @@
       showSaveFinal = false;
       showSaveDialog = false;
       dialogEdit = false;
+      unlockTimerForEdit(timer.mId, { refresh: true });
 
       const successMessage = {
         he: 'הטיימר נשמר בהצלחה',
@@ -290,6 +296,7 @@
   let editingTimer = null;
 
   function handleStartEdit(index, timerEntry) {
+    lockTimerForEdit(timer.mId);
     // Create a copy of the timer entry with editing fields
     timer.attributes.activeTimer.data.attributes.timers =
       timer.attributes.activeTimer.data.attributes.timers.map((t, i) => {
@@ -341,16 +348,27 @@
 
       // Update the store with the modified timer
       updateTimers($timers.map((t) => (t.mId === timer.mId ? timer : t)));
+      unlockTimerForEdit(timer.mId, { refresh: true });
     } catch (error) {
       console.error('Failed to update timer:', error);
       // Rollback changes
       timer = originalTimer;
+      unlockTimerForEdit(timer.mId, { refresh: true });
     }
   }
 
   function handleCancelEdit(index) {
-    timer.attributes.activeTimer.data.attributes.timers[index].isEditing =
-      false;
+    const updatedTimer = structuredClone($state.snapshot(timer));
+    updatedTimer.attributes.activeTimer.data.attributes.timers[index].isEditing = false;
+    timer = updatedTimer;
+    
+    // Check if any other timer entries are still editing
+    const anyStillEditing = timer.attributes.activeTimer.data.attributes.timers.some(
+      (t, i) => i !== index && t.isEditing
+    );
+    if (!anyStillEditing) {
+      unlockTimerForEdit(timer.mId, { refresh: true });
+    }
   }
 
   async function handleAddInterval() {
@@ -363,7 +381,9 @@
       editStop: now.toISOString().slice(0, 16)
     };
 
-    timer.attributes.activeTimer.data.attributes.timers.push(newInterval);
+    const updatedTimer = structuredClone($state.snapshot(timer));
+    updatedTimer.attributes.activeTimer.data.attributes.timers.push(newInterval);
+    timer = updatedTimer;
 
     // Update the store
     updateTimers($timers.map((t) => (t.mId === timer.mId ? timer : t)));
@@ -437,7 +457,7 @@
 <DialogOverlay
   style="z-index: 700;"
   isOpen={showClearDialog}
-  onDismiss={() => (showClearDialog = false)}
+  onDismiss={() => { showClearDialog = false; unlockTimerForEdit(timer.mId, { refresh: true }); }}
 >
   <div
     style="z-index: 700;"
@@ -446,7 +466,7 @@
     <DialogContent aria-label="clear-timer-options" class="timer-dialog">
       <button
         class="close-button"
-        onclick={() => (showClearDialog = false)}
+        onclick={() => { showClearDialog = false; unlockTimerForEdit(timer.mId, { refresh: true }); }}
         aria-label="Close dialog"
       >
         <svg
@@ -660,13 +680,13 @@
 <DialogOverlay
   style="z-index: 700;"
   isOpen={showSaveFinal}
-  onDismiss={() => (showSaveFinal = false)}
+  onDismiss={() => { showSaveFinal = false; unlockTimerForEdit(timer.mId, { refresh: true }); }}
 >
   <div style="z-index: 700;" transition:fly={{ y: -100, duration: 500 }}>
     <DialogContent aria-label="timer-options" class="timer-dialog">
       <button
         class="close-button"
-        onclick={() => (showSaveFinal = false)}
+        onclick={() => { showSaveFinal = false; unlockTimerForEdit(timer.mId, { refresh: true }); }}
         aria-label="Close dialog"
       >
         <svg

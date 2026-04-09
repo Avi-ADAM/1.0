@@ -69,11 +69,37 @@ export const processedPends: Readable<DisplayItem[]> = derived(
  * Automatically recomputes when mtahaStore, projectsStore, or timers changes.
  * Timer data is pulled from the timers store for real-time updates.
  * Returns an array of DisplayItem objects ready for rendering.
+ * 
+ * Uses caching to prevent unnecessary re-renders:
+ * Only emits new values when the actual data content changes,
+ * not just when the timers store reference changes.
  */
-export const processedMtaha: Readable<DisplayItem[]> = derived(
-  [mtahaStore, projectsStore, timers],
-  ([$mtaha, $projects, $timers]) => processMtaha($mtaha, $projects, $timers)
-);
+export const processedMtaha: Readable<DisplayItem[]> = (() => {
+  let previousResult: DisplayItem[] = [];
+  let previousTimerSignatures = '';
+  
+  return derived(
+    [mtahaStore, projectsStore, timers],
+    ([$mtaha, $projects, $timers], set) => {
+      // Build a "signature" of the timer data relevant to mtaha
+      // Only zman (elapsed time) and running state matter for display
+      const timerSig = $timers
+        .map(t => `${t.mId}:${t.running ? 1 : 0}:${Math.floor((t.zman || 0) / 60000)}`)
+        .join('|');
+      
+      // If mtaha data and timer signatures haven't changed, DO NOT call set!
+      // This explicitly prevents Svelte from propagating identical array references (safe_not_equal)
+      if (timerSig === previousTimerSignatures && previousResult.length === ($mtaha?.length || 0)) {
+        return; // Exit without calling set
+      }
+      
+      previousTimerSignatures = timerSig;
+      previousResult = processMtaha($mtaha, $projects, $timers);
+      set(previousResult);
+    },
+    [] // Initial value
+  );
+})();
 
 /**
  * Derived store for processed approval requests

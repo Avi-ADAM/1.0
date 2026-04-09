@@ -297,9 +297,7 @@
   });
 </script>
 
-{#key arr1}
-  {#key low}
-    {#if arr1.length > 0}
+{#if arr1.length > 0}
       <div
         dir={$lang == 'he' ? 'rtl' : 'ltr'}
         bind:clientWidth={h}
@@ -1161,8 +1159,7 @@
         <Button onClick={() => goto('/me')} text={toProfile} />
       </div>
     {/if}
-  {/key}
-{/key}
+
 
 <style>
   .body {
