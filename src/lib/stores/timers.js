@@ -31,7 +31,7 @@ export function lockTimerForEdit(missionId) {
 export function unlockTimerForEdit(missionId, options = {}) {
     console.log('[Timers] Unlocking timer for edit:', missionId);
     editLocks.delete(String(missionId));
-    
+
     // After unlocking, optionally refresh to get latest server state
     if (options.refresh && currentUid && currentFetch) {
         setTimeout(() => {
@@ -62,11 +62,10 @@ export function isTimerLocked(missionId) {
  * This replaces the old WebSocket-based timer updates.
  * 
  * @param {string} id - User ID
- * @param {string} token - JWT token (no longer used, kept for backwards compatibility)
  * @param {Function} fetch - Fetch function for making HTTP requests
  * @returns {Function} Unsubscribe function to stop listening
  */
-export function initialWebSocketForTimer(id, token, fetch) {
+export function initialWebSocketForTimer(id, fetch) {
     currentUid = id;
     currentFetch = fetch;
 
@@ -158,18 +157,18 @@ if (browser) {
  */
 function mergeTimers(newTimers) {
     const currentTimers = get(timers);
-    
+
     // Build a map of new timers by mId for O(1) lookup
     const newTimerMap = new Map(newTimers.map(t => [String(t.mId), t]));
     const currentTimerMap = new Map(currentTimers.map(t => [String(t.mId), t]));
-    
+
     const merged = [];
-    
+
     // Process all new timers (update existing or add new)
     for (const newTimer of newTimers) {
         const mId = String(newTimer.mId);
         const existing = currentTimerMap.get(mId);
-        
+
         if (existing && isTimerLocked(mId)) {
             // Timer is locked for editing - keep the local version
             console.log('[Timers] Skipping locked timer:', mId);
@@ -179,7 +178,7 @@ function mergeTimers(newTimers) {
             merged.push(newTimer);
         }
     }
-    
+
     // Keep locked timers that might have been removed from server
     // (edge case: timer removed while user is editing it)
     for (const current of currentTimers) {
@@ -189,7 +188,7 @@ function mergeTimers(newTimers) {
             merged.push(current);
         }
     }
-    
+
     timers.set(merged);
 }
 
@@ -201,7 +200,7 @@ function mergeTimers(newTimers) {
  */
 export async function fetchTimers(uid, fetch, options = {}) {
     const { isRemoteUpdate = false } = options;
-    
+
     // Ensure a user ID is provided
     if (!uid) {
         console.error('[Timers] User ID is missing. Redirecting to login...');
@@ -243,7 +242,7 @@ export async function fetchTimers(uid, fetch, options = {}) {
 
 
                         const url = t.attributes.project?.data?.attributes?.profilePic?.data?.attributes?.url;
-                        const fullUrl =  url
+                        const fullUrl = url
 
                         return {
                             ...t,

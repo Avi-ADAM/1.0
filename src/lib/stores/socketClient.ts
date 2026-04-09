@@ -67,7 +67,13 @@ type NotificationListener = (notification: NotificationPayload) => void;
 /**
  * Socket.IO client configuration
  */
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
+let SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
+
+// Replace localhost with actual hostname for LAN access on other devices
+if (browser && SOCKET_URL.includes('localhost') && window.location.hostname !== 'localhost') {
+  SOCKET_URL = SOCKET_URL.replace('localhost', window.location.hostname);
+}
+
 const MAX_RECONNECT_ATTEMPTS = 10;
 const RECONNECT_DELAY = 1000; // Start with 1 second
 

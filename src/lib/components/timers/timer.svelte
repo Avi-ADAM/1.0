@@ -76,7 +76,10 @@
     }
 
     return () => {
-      if (timerInterval) clearInterval(timerInterval);
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
     };
   });
 

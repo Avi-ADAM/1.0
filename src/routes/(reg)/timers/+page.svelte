@@ -64,7 +64,6 @@
     // Initialize the timer listener using the new socketClient-based approach
     timerCleanup = initialWebSocketForTimer(
       page.data.uid,
-      page.data.tok,
       fetch
     );
   });
