@@ -148,7 +148,7 @@
       await fetchTimers(page.data.uid, fetch);
 
       // Initialize WebSocket for timer updates (uses the new socketClient-based approach)
-      timerCleanup = initialWebSocketForTimer(page.data.uid, '', fetch);
+      timerCleanup = initialWebSocketForTimer(page.data.uid, fetch);
 
       // Setup socket listeners using new architecture
       unsubscribeSocket = setupSocketListeners(page.data.uid, '', data.lang);

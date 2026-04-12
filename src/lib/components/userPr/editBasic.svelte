@@ -104,7 +104,19 @@
       guidResumed: 'המדריך חזר! יש לרענן את העמוד',
       guidStopped: 'המדריך לא יוצג שוב',
       error: 'אירעה שגיאה',
-      nutiSuccess: 'נרשמת בהצלחה להתראות במכשיר זה'
+      nutiSuccess: 'נרשמת בהצלחה להתראות במכשיר זה',
+      apiKeys: 'מפתחות API',
+      apiKeysDesc: 'השתמש במפתחות אלו לחיבור סוכן ה-AI שלך לחשבונך.',
+      createKey: 'צור מפתח חדש',
+      keyName: 'שם המפתח',
+      noKeys: 'אין מפתחות עדיין',
+      deleteKey: 'מחק',
+      copied: 'הועתק',
+      copy: 'העתק',
+      newKeySuccess: 'המפתח נוצר בהצלחה',
+      saveKeyWarning: 'שמור אותו עכשיו - הוא לא יוצג שוב.',
+      cancel: 'ביטול',
+      create: 'צור'
     },
     en: {
       head: 'Edit Profile',
@@ -143,7 +155,19 @@
       guidResumed: 'Guide is back! Please refresh the page',
       guidStopped: 'The guide will not be shown again',
       error: 'An error occurred',
-      nutiSuccess: 'Successfully registered for notifications on this device'
+      nutiSuccess: 'Successfully registered for notifications on this device',
+      apiKeys: 'API Keys',
+      apiKeysDesc: 'Use these keys to connect your AI agent to your account.',
+      createKey: 'Create New Key',
+      keyName: 'Key Name',
+      noKeys: 'No keys yet',
+      deleteKey: 'Delete',
+      copied: 'Copied',
+      copy: 'Copy',
+      newKeySuccess: 'Key created successfully',
+      saveKeyWarning: 'Save it now - it will not be shown again.',
+      cancel: 'Cancel',
+      create: 'Create'
     }
   };
 
@@ -180,7 +204,82 @@
       checked,
       noMail
     };
+    fetchKeys();
   });
+
+  // API Keys state
+  let keys = $state([]);
+  let isCreatingKey = $state(false);
+  let newKeyName = $state('');
+  let lastCreatedKey = $state(null);
+  let copiedKey = $state(false);
+
+  async function fetchKeys() {
+    try {
+      const response = await fetch('/api/api-keys');
+      if (response.ok) {
+        keys = await response.json();
+      }
+    } catch (e) {
+      console.error('Failed to fetch keys', e);
+    }
+  }
+
+  async function createKey() {
+    if (!newKeyName.trim()) return;
+    try {
+      const response = await fetch('/api/api-keys', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: newKeyName
+        })
+      });
+      if (response.ok) {
+        const result = await response.json();
+        lastCreatedKey = result;
+        newKeyName = '';
+        isCreatingKey = false;
+        await fetchKeys();
+        toast.success(t[$lang].newKeySuccess);
+      } else {
+        const err = await response.json();
+        toast.error(err.message || 'Error creating key');
+      }
+    } catch (e) {
+      toast.error('Error creating key');
+    }
+  }
+
+  async function deleteKey(id, name) {
+    if (
+      !confirm(
+        $lang === 'he'
+          ? `למחוק את המפתח "${name}"?`
+          : `Delete key "${name}"?`
+      )
+    )
+      return;
+    try {
+      const response = await fetch(`/api/api-keys?id=${id}`, {
+        method: 'DELETE'
+      });
+      if (response.ok) {
+        await fetchKeys();
+        toast.success('Key deleted');
+      }
+    } catch (e) {
+      toast.error('Error deleting key');
+    }
+  }
+
+  function copyKey(key: string) {
+    navigator.clipboard.writeText(key);
+    copiedKey = true;
+    setTimeout(() => (copiedKey = false), 2000);
+  }
 
   $effect(() => {
     console.log(initialValues);
@@ -454,7 +553,7 @@
             class="w-full p-2 border rounded-md bg-barbi text-lg text-gold"
           >
             <option value="na" selected>{t[$lang].freeDay}</option>
-            {#each dayValues as day, i}
+            {#each dayValues as day, i (day)}
               <option value={day}>{days[$lang][i]}</option>
             {/each}
           </select>
@@ -494,6 +593,114 @@
             loading={pressed}
           />
         {/if}
+      </CardContent>
+    </Card>
+
+    <!-- API Keys -->
+    <Card>
+      <CardHeader>
+        <CardTitle>{t[$lang].apiKeys}</CardTitle>
+        <CardDescription>{t[$lang].apiKeysDesc}</CardDescription>
+      </CardHeader>
+      <CardContent class="space-y-4">
+        {#if lastCreatedKey}
+          <div class="bg-green-50 border border-green-300 rounded-lg p-4 mb-4">
+            <p class="font-semibold text-green-800 mb-1">
+              ✅ {t[$lang].newKeySuccess}: <strong>{lastCreatedKey.name}</strong
+              >
+            </p>
+            <p class="text-sm text-green-700 mb-2">
+              {t[$lang].saveKeyWarning}
+            </p>
+            <div
+              class="flex items-center gap-2 bg-white border border-green-200 rounded p-2 font-mono text-sm break-all text-black"
+            >
+              <span class="flex-1 select-all">{lastCreatedKey.raw}</span>
+              <button
+                onclick={() => copyKey(lastCreatedKey.raw)}
+                class="shrink-0 text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+              >
+                {copiedKey ? t[$lang].copied : t[$lang].copy}
+              </button>
+            </div>
+            <button
+              onclick={() => (lastCreatedKey = null)}
+              class="mt-3 text-xs text-gray-500 hover:underline"
+            >
+              {t[$lang].cancel}
+            </button>
+          </div>
+        {/if}
+
+        {#if isCreatingKey}
+          <div class="space-y-2 bg-gray-50/50 p-3 rounded-lg border">
+            <label
+              for="api-key-name"
+              class="block text-sm font-medium text-gold"
+              >{t[$lang].keyName}</label
+            >
+            <div class="flex gap-2">
+              <input
+                id="api-key-name"
+                bind:value={newKeyName}
+                placeholder="Claude Desktop"
+                class="flex-1 border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold bg-transparent text-gold"
+                required
+                minlength="2"
+              />
+              <button
+                onclick={createKey}
+                class="px-4 py-2 bg-gold text-barbi rounded text-sm font-bold hover:brightness-110"
+              >
+                {t[$lang].create}
+              </button>
+              <button
+                onclick={() => (isCreatingKey = false)}
+                class="px-4 py-2 border rounded text-sm hover:bg-gray-100/10 text-gold shadow-md"
+              >
+                {t[$lang].cancel}
+              </button>
+            </div>
+          </div>
+        {:else}
+          <Button
+            text={{ he: t.he.createKey, en: t.en.createKey }}
+            onClick={() => (isCreatingKey = true)}
+          />
+        {/if}
+
+        <div class="space-y-2 mt-4">
+          {#if keys.length === 0}
+            <p class="text-gray-400 text-sm text-center py-4 border rounded-lg">
+              {t[$lang].noKeys}
+            </p>
+          {:else}
+            <div
+              class="divide-y border rounded-lg overflow-hidden bg-white/5 shadow-inner"
+            >
+              {#each keys as key (key.id)}
+                <div
+                  class="flex items-center justify-between px-4 py-3 hover:bg-white/5 transition-colors"
+                >
+                  <div class="flex-1 min-w-0">
+                    <p class="font-medium text-sm text-gold truncate">
+                      {key.name}
+                    </p>
+                    <p class="text-xs text-gray-400 font-mono">
+                      ···· {key.key_prefix}
+                    </p>
+                  </div>
+                  <button
+                    onclick={() => deleteKey(key.id, key.name)}
+                    class="text-xs text-red-400 hover:text-red-300 hover:underline ms-2"
+                  >
+                    {t[$lang].deleteKey}
+                  </button>
+                </div>
+              {/each}
+            </div>
+          {/if}
+        </div>
       </CardContent>
     </Card>
 
