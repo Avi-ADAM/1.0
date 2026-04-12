@@ -80,10 +80,12 @@ export function extractUserIdFromKey(raw: string): number | null {
 export async function verifyApiKey(rawKey: string) {
   // 1. חלץ userId מהמפתח — בלי לשאול את Strapi
   const userId = extractUserIdFromKey(rawKey);
+  console.log(`[API Keys] Verifying key for userId: ${userId}`);
   if (!userId) return null;
 
   // 2. שלוף רק מפתחות של אותו משתמש (סט קטן בהרבה)
   const hash = hashKey(rawKey);
+  console.log(`[API Keys] Generated hash: ${hash.slice(0, 10)}...`);
   const res  = await fetch(
     `${STRAPI_URL}/api/api-keys` +
     `?filters[user][id][$eq]=${userId}` +
@@ -92,8 +94,17 @@ export async function verifyApiKey(rawKey: string) {
     { headers: { Authorization: `Bearer ${STRAPI_TOKEN}` } }
   );
 
-  if (!res.ok) return null;
+  console.log(`[API Keys] Strapi request status: ${res.status} for user ${userId}`);
+  
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error(`[API Keys] Strapi error response: ${errorText}`);
+    return null;
+  }
+  
   const { data } = await res.json();
+  console.log(`[API Keys] Strapi returned ${data?.length || 0} matching keys`);
+  
   if (!data?.length) return null;
 
   return data[0].attributes.user?.data ?? null;
