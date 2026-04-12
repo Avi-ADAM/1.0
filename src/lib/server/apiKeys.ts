@@ -86,45 +86,62 @@ export async function verifyApiKey(rawKey: string) {
   // 2. שלוף רק מפתחות של אותו משתמש (סט קטן בהרבה)
   const hash = hashKey(rawKey);
   console.log(`[API Keys] Generated hash: ${hash.slice(0, 10)}...`);
-  const res  = await fetch(
-    `${STRAPI_URL}/api/api-keys` +
-    `?filters[key_hash][$eq]=${hash}` +
-    `&populate=*`,
-    { headers: { Authorization: `Bearer ${STRAPI_TOKEN}` } }
-  );
+  const query = `
+    query GetApiKey($hash: String!) {
+      apiKeys(filters: { key_hash: { eq: $hash } }) {
+        data {
+          id
+          attributes {
+            users_permissions_user {
+              data {
+                id
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const res = await fetch(`${STRAPI_URL}/graphql`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${STRAPI_TOKEN}`
+    },
+    body: JSON.stringify({
+      query,
+      variables: { hash }
+    })
+  });
 
   console.log(`[API Keys] Using Strapi Token starting with: ${STRAPI_TOKEN.slice(0, 4)}...`);
-  console.log(`[API Keys] Strapi request status: ${res.status} for search by hash`);
+  console.log(`[API Keys] GraphQL request status: ${res.status}`);
   
   if (!res.ok) {
     const errorText = await res.text();
-    console.error(`[API Keys] Strapi error response: ${errorText}`);
+    console.error(`[API Keys] GraphQL error: ${errorText}`);
     return null;
   }
   
-  const { data } = await res.json();
-  console.log(`[API Keys] Strapi returned ${data?.length || 0} matching keys`);
+  const { data: gqlData, errors } = await res.json();
   
-  if (!data?.length) return null;
-
-  const keyData = data[0].attributes;
-  console.log(`[API Keys] Key data attributes: ${Object.keys(keyData).join(', ')}`);
-
-  // חיפוש דינמי של אובייקט המשתמש בתוך ה-Attributes
-  // אנחנו מחפשים שדה שמכיל 'data' ויש לו 'id'
-  let userObj = null;
-  for (const key of Object.keys(keyData)) {
-    if (keyData[key]?.data?.id) {
-       userObj = keyData[key].data;
-       console.log(`[API Keys] Found potential user relation in field: ${key}`);
-       break;
-    }
+  if (errors) {
+    console.error(`[API Keys] GraphQL Errors: ${JSON.stringify(errors)}`);
+    return null;
   }
 
-  const keyUserId = userObj?.id;
-  console.log(`[API Keys] Extracted keyUserId: ${keyUserId} (type: ${typeof keyUserId})`);
+  const keys = gqlData?.apiKeys?.data || [];
+  console.log(`[API Keys] GraphQL returned ${keys.length} matching keys`);
+  
+  if (keys.length === 0) return null;
 
-  // השוואה בטוחה בין ה-userId מהמפתח ל-userId שחולץ (שניהם כמספרים)
+  const keyData = keys[0].attributes;
+  const userObj = keyData.users_permissions_user?.data;
+  const keyUserId = userObj?.id;
+
+  console.log(`[API Keys] Extracted keyUserId: ${keyUserId}`);
+
   if (keyUserId && parseInt(keyUserId) === parseInt(userId)) {
       console.log(`[API Keys] Match found! Authorized as user ${keyUserId}`);
       return userObj;
