@@ -88,9 +88,9 @@ export async function verifyApiKey(rawKey: string) {
   console.log(`[API Keys] Generated hash: ${hash.slice(0, 10)}...`);
   const res  = await fetch(
     `${STRAPI_URL}/api/api-keys` +
-    `?filters[user][id][$eq]=${userId}` +
+    `?filters[users_permissions_user][id][$eq]=${userId}` +
     `&filters[key_hash][$eq]=${hash}` +
-    `&populate=user&fields[0]=id`,
+    `&populate=users_permissions_user&fields[0]=id`,
     { headers: { Authorization: `Bearer ${STRAPI_TOKEN}` } }
   );
 
@@ -107,5 +107,5 @@ export async function verifyApiKey(rawKey: string) {
   
   if (!data?.length) return null;
 
-  return data[0].attributes.user?.data ?? null;
+  return data[0].attributes.users_permissions_user?.data ?? null;
 }
