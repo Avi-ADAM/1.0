@@ -89,7 +89,7 @@ export async function verifyApiKey(rawKey: string) {
   const res  = await fetch(
     `${STRAPI_URL}/api/api-keys` +
     `?filters[key_hash][$eq]=${hash}` +
-    `&populate=users_permissions_user`,
+    `&populate=*`,
     { headers: { Authorization: `Bearer ${STRAPI_TOKEN}` } }
   );
 
@@ -110,10 +110,18 @@ export async function verifyApiKey(rawKey: string) {
   const keyData = data[0].attributes;
   console.log(`[API Keys] Key data attributes: ${Object.keys(keyData).join(', ')}`);
 
-  // Try both potential relation names
-  const userObj = keyData.users_permissions_user?.data || keyData.user?.data;
-  const keyUserId = userObj?.id;
+  // חיפוש דינמי של אובייקט המשתמש בתוך ה-Attributes
+  // אנחנו מחפשים שדה שמכיל 'data' ויש לו 'id'
+  let userObj = null;
+  for (const key of Object.keys(keyData)) {
+    if (keyData[key]?.data?.id) {
+       userObj = keyData[key].data;
+       console.log(`[API Keys] Found potential user relation in field: ${key}`);
+       break;
+    }
+  }
 
+  const keyUserId = userObj?.id;
   console.log(`[API Keys] Extracted keyUserId: ${keyUserId} (type: ${typeof keyUserId})`);
 
   // השוואה בטוחה בין ה-userId מהמפתח ל-userId שחולץ (שניהם כמספרים)
