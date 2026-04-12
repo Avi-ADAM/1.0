@@ -59,6 +59,20 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
     if (authHeader) {
         apiKey = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
         user = await verifyApiKey(apiKey);
+        console.log(`[MCP] Request from ${user ? 'authenticated user: ' + user.id : 'unauthenticated client'} at ${url.pathname} (${request.method})`);
+    } else {
+        console.log(`[MCP] Unauthenticated request to ${url.pathname} (${request.method})`);
+    }
+
+    // Check if body is empty for POST requests
+    if (request.method === 'POST') {
+        const contentType = request.headers.get('content-type');
+        if (contentType?.includes('application/json')) {
+            // We can't easily read the body here without consuming it, 
+            // but we can at least log the content length
+            const contentLength = request.headers.get('content-length');
+            console.log(`[MCP] POST body content-length: ${contentLength}`);
+        }
     }
 
     let agentsToExpose: any = {};
@@ -135,6 +149,7 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
 
     // 4. Start HTTP Transport (serverless mode since this is an Edge/SvelteKit +server function context)
     try {
+        console.log(`[MCP] Starting HTTP transport for ${request.method} ${url.pathname}`);
         await mcpServer.startHTTP({
             url,
             // Our path matches this endpoint exactly
@@ -146,7 +161,11 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
             }
         });
     } catch (e: any) {
-        console.error("MCPServer startHTTP Error:", e);
+        console.error("[MCP] MCPServer startHTTP Error:", e);
+        // If it's a JSON parse error in the body, it might be an empty request
+        if (e.message?.includes('JSON') || e.cause?.message?.includes('JSON')) {
+            console.error("[MCP] Possible empty or malformed JSON body received");
+        }
         throw error(500, `MCP Server startHTTP Error: ${e.message}`);
     }
 

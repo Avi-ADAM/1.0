@@ -28,6 +28,7 @@ async function handleMcpRequest(request: Request, apiKey: string, url: URL, svel
         userId: user.id.toString(),
         fetchInstance: svelteFetch
     };
+    console.log(`[MCP] Request from authenticated user: ${user.id} via apiKey endpoint at ${url.pathname}`);
 
     // Extract valid agents handling missing description fields properly (needed by MCPServer logic)
     const agentsToExpose: any = {};
@@ -83,6 +84,7 @@ async function handleMcpRequest(request: Request, apiKey: string, url: URL, svel
 
     // 4. Start HTTP Transport (serverless mode since this is an Edge/SvelteKit +server function context)
     try {
+        console.log(`[MCP] Starting HTTP transport for ${request.method} ${url.pathname}`);
         await mcpServer.startHTTP({
             url,
             // Our path matches this endpoint exactly
@@ -94,7 +96,11 @@ async function handleMcpRequest(request: Request, apiKey: string, url: URL, svel
             }
         });
     } catch (e: any) {
-        console.error("MCPServer startHTTP Error:", e);
+        console.error("[MCP] MCPServer startHTTP Error:", e);
+        // If it's a JSON parse error in the body, it might be an empty request
+        if (e.message?.includes('JSON') || e.cause?.message?.includes('JSON')) {
+            console.error("[MCP] Possible empty or malformed JSON body received");
+        }
         throw error(500, `MCP Server startHTTP Error: ${e.message}`);
     }
 
