@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import 'dotenv/config';
 
 const STRAPI_URL   = process.env.STRAPI_URL!;
-const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN!;
+const STRAPI_TOKEN = process.env.STRAPI_API_NEW!;
 
 export const KEY_PREFIX = '1lev1_';
 const ALLOWED_HOSTS = (process.env.MCP_ALLOWED_HOSTS ?? '').split(',');
@@ -94,6 +94,7 @@ export async function verifyApiKey(rawKey: string) {
     { headers: { Authorization: `Bearer ${STRAPI_TOKEN}` } }
   );
 
+  console.log(`[API Keys] Using Strapi Token starting with: ${STRAPI_TOKEN.slice(0, 4)}...`);
   console.log(`[API Keys] Strapi request status: ${res.status} for user ${userId}`);
   
   if (!res.ok) {
