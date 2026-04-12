@@ -108,12 +108,18 @@ export async function verifyApiKey(rawKey: string) {
   if (!data?.length) return null;
 
   const keyData = data[0].attributes;
-  const keyUserId = keyData.users_permissions_user?.data?.id;
+  console.log(`[API Keys] Key data attributes: ${Object.keys(keyData).join(', ')}`);
+
+  // Try both potential relation names
+  const userObj = keyData.users_permissions_user?.data || keyData.user?.data;
+  const keyUserId = userObj?.id;
+
+  console.log(`[API Keys] Extracted keyUserId: ${keyUserId} (type: ${typeof keyUserId})`);
 
   // השוואה בטוחה בין ה-userId מהמפתח ל-userId שחולץ (שניהם כמספרים)
   if (keyUserId && parseInt(keyUserId) === parseInt(userId)) {
       console.log(`[API Keys] Match found! Authorized as user ${keyUserId}`);
-      return keyData.users_permissions_user.data;
+      return userObj;
   }
 
   console.warn(`[API Keys] Key exists but user mismatch: Key belongs to ${keyUserId}, request is for ${userId}`);
