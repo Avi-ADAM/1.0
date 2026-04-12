@@ -56,7 +56,7 @@ export const getMissionDetailsTool = createTool({
     success: z.boolean(),
     error: z.string().optional()
   }),
-  execute: async (inputData) => {
+  execute: async (inputData, context) => {
     const { missionId } = inputData;
     const globalContext = global.botContext || {};
     const fetchInstance = globalContext.fetchInstance;
@@ -121,7 +121,7 @@ export const listUserMissionsTool = createTool({
     success: z.boolean(),
     error: z.string().optional()
   }),
-  execute: async (inputData) => {
+  execute: async (inputData, context) => {
     const { filter, projectId, projectName, missionName, limit } = inputData;
     const globalContext = global.botContext || {};
     const userId = globalContext.userId;
@@ -269,7 +269,7 @@ export const getMissionStatsTool = createTool({
     success: z.boolean(),
     error: z.string().optional()
   }),
-  execute: async (inputData) => {
+  execute: async (inputData, context) => {
     const { projectId } = inputData;
     const globalContext = global.botContext || {};
     const userId = globalContext.userId;
@@ -359,7 +359,7 @@ export const getActiveTimersTool = createTool({
     success: z.boolean(),
     error: z.string().optional()
   }),
-  execute: async (inputData) => {
+  execute: async (inputData, context) => {
     const { includeDetails } = inputData;
     const globalContext = global.botContext || {};
     const userId = globalContext.userId;
@@ -419,7 +419,7 @@ export const getTimerHistoryTool = createTool({
     success: z.boolean(),
     error: z.string().optional()
   }),
-  execute: async (inputData) => {
+  execute: async (inputData, context) => {
     const { missionId, projectId, days, limit } = inputData;
     const globalContext = global.botContext || {};
     const userId = globalContext.userId;
@@ -491,7 +491,7 @@ export const startTimerWithNotesTool = createTool({
     missionName: z.string().optional(),
     error: z.string().optional()
   }),
-  execute: async (inputData) => {
+  execute: async (inputData, context) => {
     const { missionId, notes, taskId } = inputData;
     const globalContext = global.botContext || {};
     const userId = globalContext.userId;
@@ -557,7 +557,7 @@ export const stopTimerWithSummaryTool = createTool({
     missionName: z.string().optional(),
     error: z.string().optional()
   }),
-  execute: async (inputData) => {
+  execute: async (inputData, context) => {
     const { missionId, summary, completedTasks } = inputData;
     const globalContext = global.botContext || {};
     const fetchInstance = globalContext.fetchInstance;

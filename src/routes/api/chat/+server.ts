@@ -35,10 +35,13 @@ export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
     rawMessages = [...legacyHistory, { role: 'user', content: body.payload.text }];
   }
 
-  // Convert to intermediate Mastra history format
-  const history = rawMessages.map((m: { role: string; content: string }) => ({
+  // Preserve rich history for Mastra agents (essential for Gemini thought signatures)
+  const history = rawMessages.map((m: any) => ({
     text: m.content,
-    user: m.role === 'user'
+    user: m.role === 'user',
+    role: m.role,
+    content: m.content,
+    parts: m.parts // Preserve Gemini/AI-SDK parts if present
   }));
 
   // Get the last user message
@@ -63,7 +66,11 @@ export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
       if (history.length > 1) {
         const recentHistory = history.slice(-11, -1); // exclude current message
         for (const msg of recentHistory) {
-          agentMessages.push({ role: msg.user ? 'user' : 'assistant', content: msg.text });
+          agentMessages.push({
+            role: msg.role || (msg.user ? 'user' : 'assistant'),
+            content: msg.content || msg.text,
+            ...(msg.parts ? { parts: msg.parts } : {})
+          });
         }
       }
 

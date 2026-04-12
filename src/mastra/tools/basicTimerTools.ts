@@ -16,8 +16,8 @@ export const startTimerTool = createTool({
     timerId: z.string().optional(),
     error: z.string().optional()
   }),
-  execute: async (inputData) => {
-    const { missionId } = context;
+  execute: async (inputData, context) => {
+    const { missionId } = inputData;
     const globalContext = global.botContext || {};
     const userId = globalContext.userId;
     const fetchInstance = globalContext.fetchInstance;
@@ -74,8 +74,8 @@ export const stopTimerTool = createTool({
     duration: z.number().optional(),
     error: z.string().optional()
   }),
-  execute: async (inputData) => {
-    const { missionId } = context;
+  execute: async (inputData, context) => {
+    const { missionId } = inputData;
     const globalContext = global.botContext || {};
     const fetchInstance = globalContext.fetchInstance;
     

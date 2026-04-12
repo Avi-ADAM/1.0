@@ -45,8 +45,8 @@ export const findMissionTool = createTool({
       projectName: z.string(),
     })).describe('A list of missions matching the search query.'),
   }),
-  execute: async (inputData) => {
-    const { missionName } = context;
+  execute: async (inputData, context) => {
+    const { missionName } = inputData;
     const globalContext = global.botContext || {};
     const userId = globalContext.userId;
     const fetchInstance = globalContext.fetchInstance;

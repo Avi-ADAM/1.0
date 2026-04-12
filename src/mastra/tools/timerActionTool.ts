@@ -17,7 +17,7 @@ export const timerActionTool = createTool({
         'Specific mission ID (optional, will find active timer if not provided)'
       )
   }),
-  execute: async (inputData) => {
+  execute: async (inputData, context) => {
     const { action, missionId } = inputData;
     const globalContext = global.botContext || {};
     const userId = globalContext.userId;

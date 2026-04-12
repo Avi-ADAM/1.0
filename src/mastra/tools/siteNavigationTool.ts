@@ -17,7 +17,7 @@ export const getSitePagesTool = createTool({
     outputSchema: z.object({
         pages: z.array(PageSchema).describe('An array of page objects.')
     }),
-    execute: async () => {
+    execute: async (inputData, context) => {
         const pages = [
           {
             "name": "Home",

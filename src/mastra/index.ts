@@ -15,16 +15,8 @@ export const mastra = new Mastra({
   agents: {
     IntentAgent: createIntentAgent(),
     NavigationAgent: createNavigationAgent('apiKey','language','useId'),
-    unregisteredBotAgent: createUnregisteredBotAgent('lang') as Agent<
-      any,
-      ToolsInput,
-      Record<string, Metric>
-    >,
-    enhancedBotAgent: createEnhancedBotAgent('lang') as Agent<
-      any,
-      ToolsInput,
-      Record<string, Metric>
-    >
+    unregisteredBotAgent: createUnregisteredBotAgent('lang') as Agent<any, any>,
+    enhancedBotAgent: createEnhancedBotAgent('lang') as Agent<any, any>
   },
   storage: new LibSQLStore({
     // stores telemetry, evals, ... into memory storage, if it needs to persist, change to file:../mastra.db

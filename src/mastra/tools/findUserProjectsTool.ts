@@ -40,9 +40,9 @@ export const findUserProjectsTool = createTool({
     success: z.boolean(),
     message: z.string().optional()
   }),
-  execute: async (inputData) => {
+  execute: async (inputData, context) => {
     try {
-      const { userId, query } = context;
+      const { userId, query } = inputData;
       const globalContext = global.botContext || {};
       const fetchInstance = globalContext.fetchInstance;
       

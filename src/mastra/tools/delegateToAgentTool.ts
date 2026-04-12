@@ -19,8 +19,8 @@ export const delegateToAgentTool = createTool({
       .optional()
       .describe('Additional context about why this delegation is needed')
   }),
-  execute: async (inputData) => {
-    const { agentType, userMessage, context } = inputData;
+  execute: async (inputData, context) => {
+    const { agentType, userMessage, context: delegationContext } = inputData;
     try {
       console.log(
         `🔄 Help agent delegating to ${agentType} agent:`,
@@ -70,8 +70,9 @@ export const delegateToAgentTool = createTool({
       // Build conversation context - use recent history plus current message
       const recentHistory = (fullHistory || []).slice(-5);
       const messages = recentHistory.map((msg: any) => ({
-        role: msg.user ? 'user' : 'assistant',
-        content: msg.text
+        role: msg.role || (msg.user ? 'user' : 'assistant'),
+        content: msg.content || msg.text,
+        ...(msg.parts ? { parts: msg.parts } : {})
       }));
 
       // Add the current message
@@ -131,7 +132,7 @@ export const delegateToAgentTool = createTool({
         agentType,
         response: result.text,
         toolResults,
-        context: context || `Delegated to ${agentType} agent`
+        context: delegationContext || `Delegated to ${agentType} agent`
       };
     } catch (error) {
       console.error(`❌ Error delegating to ${agentType} agent:`, error);

@@ -16,8 +16,8 @@ export const navigateToPageTool = createTool({
       idPr: z.string().optional(),
     }),
   }),
-  execute: async (inputData) => {
-    const { url, pageName, idPr } = context;
+  execute: async (inputData, context) => {
+    const { url, pageName, idPr } = inputData;
     console.log(`🧭 Navigating to page: ${pageName} at ${url}${idPr ? ' for project ID ' + idPr : ''}`);
     return {
       success: true,

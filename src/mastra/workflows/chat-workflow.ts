@@ -55,12 +55,7 @@ const analyzeIntent = createStep({
   description: 'Analyze user intent from message',
   inputSchema: z.object({
     message: z.string(),
-    history: z.array(
-      z.object({
-        user: z.boolean(),
-        text: z.string()
-      })
-    ),
+    history: z.array(z.any()),
     userId: z.string().optional(),
     language: z.string(),
     apiKey: z.string().optional(),
@@ -69,12 +64,7 @@ const analyzeIntent = createStep({
   }),
   outputSchema: z.object({
     message: z.string(),
-    history: z.array(
-      z.object({
-        user: z.boolean(),
-        text: z.string()
-      })
-    ),
+    history: z.array(z.any()),
     userId: z.string().optional(),
     language: z.string(),
     apiKey: z.string().optional(),
@@ -96,8 +86,9 @@ const analyzeIntent = createStep({
     // Include last 5 messages for context but focus on the current message
     const recentHistory = history.slice(-5);
     const contextMessages = recentHistory.map((msg: any) => ({
-      role: msg.user ? 'user' : 'assistant',
-      content: msg.text
+      role: msg.role || (msg.user ? 'user' : 'assistant'),
+      content: msg.content || msg.text,
+      ...(msg.parts ? { parts: msg.parts } : {})
     }));
 
     // Add current message
@@ -179,12 +170,7 @@ const routeToAgent = createStep({
   description: 'Route to appropriate agent based on intent',
   inputSchema: z.object({
     message: z.string(),
-    history: z.array(
-      z.object({
-        user: z.boolean(),
-        text: z.string()
-      })
-    ),
+    history: z.array(z.any()),
     userId: z.string().optional(),
     language: z.string(),
     apiKey: z.string().optional(),
@@ -255,8 +241,9 @@ const routeToAgent = createStep({
     // Build conversation messages - limit to last 10 messages to avoid context overflow
     const recentHistory = history.slice(-10);
     const messages = recentHistory.map((msg: any) => ({
-      role: msg.user ? 'user' : 'assistant',
-      content: msg.text
+      role: msg.role || (msg.user ? 'user' : 'assistant'),
+      content: msg.content || msg.text,
+      ...(msg.parts ? { parts: msg.parts } : {})
     }));
 
     messages.push({
@@ -459,12 +446,7 @@ const chatWorkflow = createWorkflow({
   id: 'chat-workflow',
   inputSchema: z.object({
     message: z.string(),
-    history: z.array(
-      z.object({
-        user: z.boolean(),
-        text: z.string()
-      })
-    ),
+    history: z.array(z.any()),
     userId: z.string().optional(),
     language: z.string(),
     apiKey: z.string().optional(),
@@ -488,3 +470,5 @@ const chatWorkflow = createWorkflow({
 chatWorkflow.commit();
 
 export { chatWorkflow };
+
+

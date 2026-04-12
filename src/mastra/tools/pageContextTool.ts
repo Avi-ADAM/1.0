@@ -8,7 +8,7 @@ export const getPageContextTool = createTool({
     inputSchema: z.object({
         path: z.string().describe('The URL path of the current page')
     }),
-    execute: async (inputData) => {
+    execute: async (inputData, context) => {
         console.log('🔍 getPageContextTool executing for path:', inputData.path);
         const contextData = getContextForPath(inputData.path);
         return {
