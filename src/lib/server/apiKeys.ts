@@ -88,14 +88,13 @@ export async function verifyApiKey(rawKey: string) {
   console.log(`[API Keys] Generated hash: ${hash.slice(0, 10)}...`);
   const res  = await fetch(
     `${STRAPI_URL}/api/api-keys` +
-    `?filters[users_permissions_user][id][$eq]=${userId}` +
-    `&filters[key_hash][$eq]=${hash}` +
-    `&populate=users_permissions_user&fields[0]=id`,
+    `?filters[key_hash][$eq]=${hash}` +
+    `&populate=users_permissions_user`,
     { headers: { Authorization: `Bearer ${STRAPI_TOKEN}` } }
   );
 
   console.log(`[API Keys] Using Strapi Token starting with: ${STRAPI_TOKEN.slice(0, 4)}...`);
-  console.log(`[API Keys] Strapi request status: ${res.status} for user ${userId}`);
+  console.log(`[API Keys] Strapi request status: ${res.status} for search by hash`);
   
   if (!res.ok) {
     const errorText = await res.text();
@@ -108,5 +107,15 @@ export async function verifyApiKey(rawKey: string) {
   
   if (!data?.length) return null;
 
-  return data[0].attributes.users_permissions_user?.data ?? null;
+  const keyData = data[0].attributes;
+  const keyUserId = keyData.users_permissions_user?.data?.id;
+
+  // השוואה בטוחה בין ה-userId מהמפתח ל-userId שחולץ (שניהם כמספרים)
+  if (keyUserId && parseInt(keyUserId) === parseInt(userId)) {
+      console.log(`[API Keys] Match found! Authorized as user ${keyUserId}`);
+      return keyData.users_permissions_user.data;
+  }
+
+  console.warn(`[API Keys] Key exists but user mismatch: Key belongs to ${keyUserId}, request is for ${userId}`);
+  return null;
 }
