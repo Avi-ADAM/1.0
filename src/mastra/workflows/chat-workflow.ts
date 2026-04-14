@@ -84,12 +84,18 @@ const analyzeIntent = createStep({
 
     // Build conversation context for intent analysis
     // Include last 5 messages for context but focus on the current message
+    // Strip parts/tool-call data to avoid Gemini thought_signature errors
     const recentHistory = history.slice(-5);
-    const contextMessages = recentHistory.map((msg: any) => ({
-      role: msg.role || (msg.user ? 'user' : 'assistant'),
-      content: msg.content || msg.text,
-      ...(msg.parts ? { parts: msg.parts } : {})
-    }));
+    const contextMessages = recentHistory
+      .filter((msg: any) => {
+        const content = msg.content || msg.text || '';
+        const role = msg.role || (msg.user ? 'user' : 'assistant');
+        return typeof content === 'string' && content.trim() !== '' && role !== 'tool';
+      })
+      .map((msg: any) => ({
+        role: msg.role || (msg.user ? 'user' : 'assistant'),
+        content: msg.content || msg.text
+      }));
 
     // Add current message
     contextMessages.push({
@@ -209,7 +215,8 @@ const routeToAgent = createStep({
     global.botContext = {
       fetchInstance: fetchInstance,
       userId: userId,
-      fullHistory: history, // Store full history for getChatHistoryTool
+      isInternalBot: true, // JWT-authenticated — ownership checks are relaxed
+      fullHistory: history,
       currentMessage: message,
       intent
     };
@@ -239,12 +246,25 @@ const routeToAgent = createStep({
     }
 
     // Build conversation messages - limit to last 10 messages to avoid context overflow
+    // For Google/Gemini models: strip any messages that contain tool calls or non-text parts
+    // to avoid the "thought_signature" error when replaying history with tool invocations.
     const recentHistory = history.slice(-10);
-    const messages = recentHistory.map((msg: any) => ({
-      role: msg.role || (msg.user ? 'user' : 'assistant'),
-      content: msg.content || msg.text,
-      ...(msg.parts ? { parts: msg.parts } : {})
-    }));
+    const messages = recentHistory
+      .filter((msg: any) => {
+        const content = msg.content || msg.text || '';
+        // Keep only plain text messages (user or assistant with text content)
+        if (typeof content !== 'string' || content.trim() === '') return false;
+        // Drop messages that were tool calls/results (role === 'tool')
+        const role = msg.role || (msg.user ? 'user' : 'assistant');
+        if (role === 'tool') return false;
+        return true;
+      })
+      .map((msg: any) => ({
+        role: msg.role || (msg.user ? 'user' : 'assistant'),
+        content: msg.content || msg.text
+        // Intentionally omit `parts` — Gemini requires thought_signatures on tool-call parts
+        // from previous turns, which we don't have when replaying from client-side history.
+      }));
 
     messages.push({
       role: 'user',

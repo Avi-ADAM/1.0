@@ -24,12 +24,11 @@
     if (selectedId) return;
     selectedId = missionId;
 
-    // Send a structured command that the agent can easily parse
-    // Providing both the name and the ID ensures the agent knows exactly which one
+    // Build the command directly to avoid i18n interpolation issues
     const command =
       action === 'start_timer'
-        ? $t('bot.startTimerCommand', { missionName, missionId } as any)
-        : $t('bot.stopTimerCommand', { missionName, missionId } as any);
+        ? `הפעלת טיימר עבור המשימה "${missionName}" (מזהה: ${missionId})`
+        : `עצירת טיימר עבור המשימה "${missionName}" (מזהה: ${missionId})`;
 
     onAction(command);
   }

@@ -2,6 +2,7 @@ import { createTool } from '@mastra/core/tools'
 import { z } from 'zod';
 import { sendToSer } from '../../lib/send/sendToSer.js';
 import { startTimer, stopTimer } from '../../lib/func/timers.js';
+import { getMcpContext, isMissionMember } from '../../lib/server/mcpContext.js';
 
 export const timerActionTool = createTool({
   id: 'timerActionTool',
@@ -17,21 +18,22 @@ export const timerActionTool = createTool({
         'Specific mission ID (optional, will find active timer if not provided)'
       )
   }),
-  execute: async (inputData, context) => {
+  execute: async (inputData) => {
     const { action, missionId } = inputData;
-    const globalContext = global.botContext || {};
-    const userId = globalContext.userId;
-    const fetchInstance = globalContext.fetchInstance;
-    const currentMessage = globalContext.currentMessage || '';
-    const lastMissionSearch = globalContext.lastMissionSearch;
+    const ctx = getMcpContext();
 
-    if (!userId || !fetchInstance) {
+    if (!ctx?.userId || !ctx?.fetchInstance) {
       return {
         success: false,
         message: 'Missing user context',
         action: action
       };
     }
+
+    const userId = ctx.userId;
+    const fetchInstance = ctx.fetchInstance;
+    const currentMessage = ctx.currentMessage || '';
+    const lastMissionSearch = ctx.lastMissionSearch;
 
     console.log(`Executing timer action: ${action}`, { missionId, userId });
 
@@ -78,7 +80,7 @@ export const timerActionTool = createTool({
           fetchInstance
         );
         const missions =
-          res?.data?.usersPermissionsUser?.data?.attributes?.mesimabetahaliches
+          (res as any)?.data?.usersPermissionsUser?.data?.attributes?.mesimabetahaliches
             ?.data ?? [];
 
         // Find mission with active timer for stop/pause actions
@@ -117,7 +119,7 @@ export const timerActionTool = createTool({
           false,
           fetchInstance
         );
-        mission = missionData?.data?.mesimabetahalich?.data;
+        mission = (missionData as any)?.data?.mesimabetahalich?.data;
 
         if (!mission) {
           return {
@@ -127,6 +129,18 @@ export const timerActionTool = createTool({
           };
         }
       }
+
+      // ── Ownership check ──────────────────────────────────────────────
+      // Only the user assigned to the mission (or the mission owner) may
+      // start / stop timers on it.
+      if (!isMissionMember(mission.attributes)) {
+        return {
+          success: false,
+          message: 'You are not authorized to manage timers for this mission',
+          action: action
+        };
+      }
+      // ─────────────────────────────────────────────────────────────────
 
       const activeTimer = mission.attributes?.activeTimer;
       const timerId = activeTimer?.data?.id || 0;

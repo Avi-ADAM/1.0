@@ -63,14 +63,14 @@ export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
 
       const agentMessages = [];
       // Include recent history for context (last 10 messages)
+      // Strip parts/tool-call data to avoid Gemini thought_signature errors
       if (history.length > 1) {
         const recentHistory = history.slice(-11, -1); // exclude current message
         for (const msg of recentHistory) {
-          agentMessages.push({
-            role: msg.role || (msg.user ? 'user' : 'assistant'),
-            content: msg.content || msg.text,
-            ...(msg.parts ? { parts: msg.parts } : {})
-          });
+          const role = msg.role || (msg.user ? 'user' : 'assistant');
+          const content = msg.content || msg.text;
+          if (role === 'tool' || !content || typeof content !== 'string') continue;
+          agentMessages.push({ role, content });
         }
       }
 
@@ -122,10 +122,10 @@ export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
     }
 
     // ── Registered user → Mastra workflow ──
-    // @ts-expect-error global context for Mastra tools
     global.botContext = {
       fetchInstance: fetch,
       userId: userId?.toString() || 'anonymous',
+      isInternalBot: true, // JWT-authenticated session
       currentPath
     };
 

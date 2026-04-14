@@ -1,6 +1,7 @@
 import { MCPServer } from '@mastra/mcp';
 import { mastra } from '../../../mastra'; // Our global instance
 import { verifyApiKey } from '$lib/server/apiKeys';
+import { setMcpContext } from '$lib/server/mcpContext';
 import { toReqRes, toFetchResponse } from 'fetch-to-node';
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
@@ -81,11 +82,13 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
 
     if (user) {
         // --- AUTHENTICATED MODE ---
-        // Set global context for tools (like timerActionTool) which rely on it to identify who is performing the action
-        global.botContext = {
+        // Set per-request context so tools know which user is acting.
+        // Using setMcpContext instead of writing to global directly ensures
+        // the userId is always tied to the verified API key owner.
+        setMcpContext({
             userId: user.id.toString(),
             fetchInstance: svelteFetch
-        };
+        });
 
         // Extract valid agents handling missing description fields properly
         for (const [key, agent] of Object.entries((mastra as any).agents || {})) {
