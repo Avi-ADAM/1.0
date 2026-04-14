@@ -60,13 +60,14 @@ export const getMissionDetailsTool = createTool({
     const { missionId } = inputData;
     const globalContext = global.botContext || {};
     const fetchInstance = globalContext.fetchInstance;
+    const isServerRequest = !globalContext.isInternalBot;
     
     if (!fetchInstance) {
       return { success: false, error: 'Missing fetch context' };
     }
 
     try {
-      const res = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, false, fetchInstance);
+      const res = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, isServerRequest, fetchInstance);
       const missionData = res?.data?.mesimabetahalich?.data;
       
       if (!missionData) {
@@ -126,13 +127,14 @@ export const listUserMissionsTool = createTool({
     const globalContext = global.botContext || {};
     const userId = globalContext.userId;
     const fetchInstance = globalContext.fetchInstance;
+    const isServerRequest = !globalContext.isInternalBot;
     
     if (!userId || !fetchInstance) {
       return { missions: [], totalCount: 0, success: false, error: 'Missing user context' };
     }
 
     try {
-      const res = await sendToSer({ id: userId }, '8getMissionsOnProgress', 0, 0, true, fetchInstance);
+      const res = await sendToSer({ id: userId }, '8getMissionsOnProgress', 0, 0, isServerRequest, fetchInstance);
       
       // Debug logging to understand the API response structure
       console.log('API Response structure:', {
@@ -274,6 +276,7 @@ export const getMissionStatsTool = createTool({
     const globalContext = global.botContext || {};
     const userId = globalContext.userId;
     const fetchInstance = globalContext.fetchInstance;
+    const isServerRequest = !globalContext.isInternalBot;
     
     if (!userId || !fetchInstance) {
       return { 
@@ -287,7 +290,7 @@ export const getMissionStatsTool = createTool({
     }
 
     try {
-      const res = await sendToSer({ id: userId }, '8getMissionsOnProgress', 0, 0, true, fetchInstance);
+      const res = await sendToSer({ id: userId }, '8getMissionsOnProgress', 0, 0, isServerRequest, fetchInstance);
       let missions = res?.data?.usersPermissionsUser?.data?.attributes?.mesimabetahaliches?.data ?? [];
 
       if (projectId) {
@@ -364,13 +367,14 @@ export const getActiveTimersTool = createTool({
     const globalContext = global.botContext || {};
     const userId = globalContext.userId;
     const fetchInstance = globalContext.fetchInstance;
+    const isServerRequest = !globalContext.isInternalBot;
     
     if (!userId || !fetchInstance) {
       return { timers: [], totalActive: 0, success: false, error: 'Missing user context' };
     }
 
     try {
-      const res = await sendToSer({ id: userId }, '8getMissionsOnProgress', 0, 0, true, fetchInstance);
+      const res = await sendToSer({ id: userId }, '8getMissionsOnProgress', 0, 0, isServerRequest, fetchInstance);
       const missions = res?.data?.usersPermissionsUser?.data?.attributes?.mesimabetahaliches?.data ?? [];
 
       const activeTimerMissions = missions.filter(item => 
@@ -424,6 +428,7 @@ export const getTimerHistoryTool = createTool({
     const globalContext = global.botContext || {};
     const userId = globalContext.userId;
     const fetchInstance = globalContext.fetchInstance;
+    const isServerRequest = !globalContext.isInternalBot;
     
     if (!userId || !fetchInstance) {
       return { timers: [], totalCount: 0, totalDuration: 0, success: false, error: 'Missing user context' };
@@ -438,7 +443,7 @@ export const getTimerHistoryTool = createTool({
         projectId, 
         days, 
         limit 
-      }, 'getTimerHistory', 0, 0, false, fetchInstance);
+      }, 'getTimerHistory', 0, 0, isServerRequest, fetchInstance);
       
       const timerHistory = res?.data?.timers || [];
       
@@ -496,13 +501,14 @@ export const startTimerWithNotesTool = createTool({
     const globalContext = global.botContext || {};
     const userId = globalContext.userId;
     const fetchInstance = globalContext.fetchInstance;
+    const isServerRequest = !globalContext.isInternalBot;
     
     if (!userId || !fetchInstance) {
       return { success: false, message: 'Missing user context', error: 'Missing user context' };
     }
 
     try {
-      const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, false, fetchInstance);
+      const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, isServerRequest, fetchInstance);
       const mission = missionData?.data?.mesimabetahalich?.data;
       
       if (!mission) {
@@ -523,7 +529,7 @@ export const startTimerWithNotesTool = createTool({
       }
 
       // Start timer with additional parameters
-      await startTimer(activeTimer, missionId, userId, projectId, timerId, false, fetchInstance, {
+      await startTimer(activeTimer, missionId, userId, projectId, fetchInstance, timerId, isServerRequest, {
         notes,
         taskId
       });
@@ -561,13 +567,14 @@ export const stopTimerWithSummaryTool = createTool({
     const { missionId, summary, completedTasks } = inputData;
     const globalContext = global.botContext || {};
     const fetchInstance = globalContext.fetchInstance;
+    const isServerRequest = !globalContext.isInternalBot;
     
     if (!fetchInstance) {
       return { success: false, message: 'Missing fetch context', error: 'Missing fetch context' };
     }
 
     try {
-      const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, false, fetchInstance);
+      const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, isServerRequest, fetchInstance);
       const mission = missionData?.data?.mesimabetahalich?.data;
       
       if (!mission) {
@@ -582,7 +589,7 @@ export const stopTimerWithSummaryTool = createTool({
       }
 
       // Stop timer with additional parameters
-      await stopTimer(activeTimerData, fetchInstance, false, {
+      await stopTimer(activeTimerData, fetchInstance, isServerRequest, {
         summary,
         completedTasks
       });

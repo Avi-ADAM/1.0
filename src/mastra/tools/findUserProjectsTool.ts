@@ -2,9 +2,9 @@ import { createTool } from '@mastra/core/tools'
 import { z } from 'zod';
 import { sendToSer } from '../../lib/send/sendToSer';
 
-async function findUserProjects(userId: number, fetch: any) {
+async function findUserProjects(userId: number, fetch: any, isServerRequest = false) {
   try {
-    const res = await sendToSer({ uid: userId }, "64getUserProjectList", userId, 0, false, fetch);
+    const res = await sendToSer({ uid: userId }, "64getUserProjectList", userId, 0, isServerRequest, fetch);
     console.log('📡 sendToSer response:', JSON.stringify(res, null, 2));
     const projectsData = res?.data?.usersPermissionsUser?.data?.attributes?.projects_1s?.data;
     
@@ -45,6 +45,7 @@ export const findUserProjectsTool = createTool({
       const { userId, query } = inputData;
       const globalContext = global.botContext || {};
       const fetchInstance = globalContext.fetchInstance;
+      const isServerRequest = !globalContext.isInternalBot;
       
       console.log('🔍 findUserProjectsTool - userId:', userId, 'query:', query);
       
@@ -56,7 +57,7 @@ export const findUserProjectsTool = createTool({
         };
       }
 
-      const projects = await findUserProjects(parseInt(userId), fetchInstance);
+      const projects = await findUserProjects(parseInt(userId), fetchInstance, isServerRequest);
       console.log(`📋 Found ${projects.length} projects for user ${userId}`);
       
       // Filter projects if query provided

@@ -32,6 +32,7 @@ export const timerActionTool = createTool({
 
     const userId = ctx.userId;
     const fetchInstance = ctx.fetchInstance;
+    const isServerRequest = !ctx.isInternalBot;
     const currentMessage = ctx.currentMessage || '';
     const lastMissionSearch = ctx.lastMissionSearch;
 
@@ -116,7 +117,7 @@ export const timerActionTool = createTool({
           '36getMissionTimer',
           0,
           0,
-          false,
+          isServerRequest,
           fetchInstance
         );
         mission = (missionData as any)?.data?.mesimabetahalich?.data;
@@ -173,7 +174,7 @@ export const timerActionTool = createTool({
             projectId,
             fetchInstance,
             timerId,
-            false
+            isServerRequest
           );
 
           return {
@@ -198,7 +199,7 @@ export const timerActionTool = createTool({
           await stopTimer(
             activeTimerData,
             fetchInstance,
-            false,
+            isServerRequest,
             projectId,
             userId
           );

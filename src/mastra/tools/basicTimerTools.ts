@@ -21,13 +21,14 @@ export const startTimerTool = createTool({
     const globalContext = global.botContext || {};
     const userId = globalContext.userId;
     const fetchInstance = globalContext.fetchInstance;
+    const isServerRequest = !globalContext.isInternalBot;
     
     if (!userId || !fetchInstance) {
       return { success: false, message: 'Missing user context', error: 'Missing user context' };
     }
 
     try {
-      const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, false, fetchInstance);
+      const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, isServerRequest, fetchInstance);
       const mission = missionData?.data?.mesimabetahalich?.data;
       
       if (!mission) {
@@ -47,7 +48,7 @@ export const startTimerTool = createTool({
         return { success: false, message: `Timer for ${missionName} is already active`, error: 'Timer already active' };
       }
 
-      await startTimer(activeTimer, missionId, userId, projectId, timerId, false, fetchInstance);
+      await startTimer(activeTimer, missionId, userId, projectId, fetchInstance, timerId, isServerRequest);
       
       return { 
         success: true, 
@@ -78,13 +79,14 @@ export const stopTimerTool = createTool({
     const { missionId } = inputData;
     const globalContext = global.botContext || {};
     const fetchInstance = globalContext.fetchInstance;
+    const isServerRequest = !globalContext.isInternalBot;
     
     if (!fetchInstance) {
       return { success: false, message: 'Missing fetch context', error: 'Missing fetch context' };
     }
 
     try {
-      const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, false, fetchInstance);
+      const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, isServerRequest, fetchInstance);
       const mission = missionData?.data?.mesimabetahalich?.data;
       
       if (!mission) {
@@ -98,7 +100,7 @@ export const stopTimerTool = createTool({
         return { success: false, message: `No active timer found for ${missionName}`, error: 'No active timer' };
       }
 
-      await stopTimer(activeTimerData, fetchInstance, false);
+      await stopTimer(activeTimerData, fetchInstance, isServerRequest);
       
       // Calculate duration
       const startTime = new Date(activeTimerData.attributes.timers[activeTimerData.attributes.timers.length - 1].startTime);

@@ -3,9 +3,9 @@ import { z } from 'zod';
 import { sendToSer } from '../../lib/send/sendToSer';
 import { fuzzyMissionMatch, sortMissionsByRelevance } from '../../lib/utils/fuzzyMatch.js';
 
-async function findUserMissions(userId: string, fetch: any, missionName?: string) {
+async function findUserMissions(userId: string, fetch: any, isServerRequest = false, missionName?: string) {
   try {
-    const res = await sendToSer({ id: userId }, '8getMissionsOnProgress', 0, 0, true, fetch);
+    const res = await sendToSer({ id: userId }, '8getMissionsOnProgress', 0, 0, isServerRequest, fetch);
     let missions = res?.data?.usersPermissionsUser?.data?.attributes?.mesimabetahaliches?.data ?? [];
 
     if (missionName) {
@@ -50,11 +50,12 @@ export const findMissionTool = createTool({
     const globalContext = global.botContext || {};
     const userId = globalContext.userId;
     const fetchInstance = globalContext.fetchInstance;
+    const isServerRequest = !globalContext.isInternalBot;
      
     if (!userId || !fetchInstance) {
       throw new Error('User context is required to find missions.');
     }
-    const missions = await findUserMissions(userId, fetchInstance, missionName);
+    const missions = await findUserMissions(userId, fetchInstance, isServerRequest, missionName);
     return { missions };
   },
 });
