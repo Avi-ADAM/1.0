@@ -158,6 +158,7 @@ export const qids = {
               lang 
               mesimabetahaliches(filters:{finnished:{ne: true },forappruval: { ne: true }}) {data{id
                attributes{name stname timer howmanyhoursalready hoursassinged
+              users_permissions_user{data{id}}
               acts{data{id attributes{shem myIshur link hashivut valiIshur des dateF dateS status naasa}}}
                activeTimer{data{id
                 attributes{start totalHours timers{start stop} acts{data{id}} isActive saved}}} 
@@ -511,6 +512,7 @@ export const qids = {
       id
       attributes {
         name
+         users_permissions_user{data{id}}
          project{data{id}}
         activeTimer {
           data {

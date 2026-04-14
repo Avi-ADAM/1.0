@@ -95,9 +95,20 @@ export function isMissionMember(missionAttributes: any): boolean {
   // Internal bot: trust the JWT-verified userId, skip membership check
   if (ctx.isInternalBot) return true;
 
-  // External MCP: verify the API-key owner is assigned to the mission
+  // External MCP: verify the API-key owner is the mission owner
+  // (`users_permissions_user` is the canonical ownership field in Strapi).
+  const ownerId = missionAttributes?.users_permissions_user?.data?.id;
+  if (ownerId != null) {
+    return String(ownerId) === String(ctx.userId);
+  }
+
+  // Backward-compatible fallback for legacy payloads that still expose `users`.
   const assignedUsers: Array<{ id: string | number }> =
     missionAttributes?.users?.data ?? [];
+  if (assignedUsers.length > 0) {
+    return assignedUsers.some((u) => String(u.id) === String(ctx.userId));
+  }
 
-  return assignedUsers.some((u) => String(u.id) === String(ctx.userId));
+  // Fail closed if no ownership data was returned by GraphQL.
+  return false;
 }
