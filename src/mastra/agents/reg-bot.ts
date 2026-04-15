@@ -10,6 +10,7 @@ import { timerActionTool } from '../tools/timerActionTool';
 import { getSitePagesTool } from '../tools/siteNavigationTool';
 import { navigateToPageTool } from '../tools/navigateToPageTool';
 import { findMissionTool } from '../tools/findMissionTool';
+import { createProjectTool } from '../tools/createProjectTool';
 import { findUserProjectsTool } from '../tools/findUserProjectsTool';
 import { getPageContextTool } from '../tools/pageContextTool';
 import { SITE_CONTEXT } from '../../lib/bot/context.js';
@@ -48,6 +49,7 @@ Core workflows:
 - Mission details: listUserMissionsTool / getMissionDetailsTool
 - Mission statistics: getMissionStatsTool
 - Project navigation: findUserProjectsTool -> navigateToPageTool
+- Create Partnership/Embroidery: createProjectTool
 - General navigation: getSitePagesTool -> navigateToPageTool
 
 Behavior rules:
@@ -73,6 +75,7 @@ Behavior rules:
       timerActionTool,
       getSitePagesTool,
       navigateToPageTool,
+      createProjectTool,
       findMissionTool,
       findUserProjectsTool,
       getPageContextTool
