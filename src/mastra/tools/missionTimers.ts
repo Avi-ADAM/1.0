@@ -388,7 +388,7 @@ export const getActiveTimersTool = createTool({
           missionId: mission.id,
           missionName: mission.attributes.name,
           projectName: mission.attributes.project?.data?.attributes?.projectName || 'N/A',
-          startTime: timerData.attributes.startTime,
+          startTime: timerData.attributes.startTime || timerData.attributes.start || '',
           isActive: true,
           description: timerData.attributes.description || ''
         };

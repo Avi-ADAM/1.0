@@ -208,11 +208,17 @@ export const timerActionTool = createTool({
           const timers = activeTimerData.attributes.timers || [];
           let duration = 0;
           if (timers.length > 0) {
-            const startTime = new Date(timers[timers.length - 1].startTime);
-            const endTime = new Date();
-            duration = Math.round(
-              (endTime.getTime() - startTime.getTime()) / (1000 * 60)
-            ); // minutes
+            const lastTimerEntry = timers[timers.length - 1];
+            const startRaw = lastTimerEntry?.start ?? lastTimerEntry?.startTime;
+            if (startRaw) {
+              const startTime = new Date(startRaw);
+              const endTime = new Date();
+              if (!Number.isNaN(startTime.getTime())) {
+                duration = Math.round(
+                  (endTime.getTime() - startTime.getTime()) / (1000 * 60)
+                ); // minutes
+              }
+            }
           }
 
           return {
