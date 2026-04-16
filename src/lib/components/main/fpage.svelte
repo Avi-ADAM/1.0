@@ -201,6 +201,13 @@
       >
     {/if}
     <a
+      class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5"
+      data-sveltekit-prefetch
+      href="/faq"
+    >
+      {$t('home.nav.faq')}</a
+    >
+    <a
       class="text-barbi border-2 border-lturk text-bold hover:text-gold text-center bg-gold hover:bg-barbi px-1 py-0.5"
       data-sveltekit-prefetch
       href="/love">{$t('home.nav.agreementMap')}</a

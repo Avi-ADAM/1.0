@@ -45,6 +45,24 @@ export const config = {
             loader: async () => (await import('./en/negotiation.json')).default,
         },
         {
+            locale: 'he',
+            key: 'faq',
+            routes: [/^\/faq/],
+            loader: async () => (await import('./he/faq.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'faq',
+            routes: [/^\/faq/],
+            loader: async () => (await import('./ar/faq.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'faq',
+            routes: [/^\/faq/],
+            loader: async () => (await import('./en/faq.json')).default,
+        },
+        {
             locale: 'en',
             key: 'love',
             routes: ['/love'],
