@@ -4,7 +4,7 @@ import { Memory } from '@mastra/memory';
 import { LibSQLStore } from '@mastra/libsql';
 import { weatherTool } from '../tools/weather-tool';
 const google = createGoogleGenerativeAI({
-  apiKey: import.meta.env?.VITE_OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY,
+  apiKey: import.meta.env?.VITE_GOOGLE_API || process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY,
 });
 
 export const weatherAgent = new Agent({
@@ -23,7 +23,7 @@ export const weatherAgent = new Agent({
 
       Use the weatherTool to fetch current weather data.
 `,
-  model: google('gemini-3-flash-preview'),
+  model: google('gemini-flash-latest'),
   tools: { weatherTool },
   memory: new Memory({
     storage: new LibSQLStore({

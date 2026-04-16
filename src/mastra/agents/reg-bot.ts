@@ -10,11 +10,11 @@ import { timerActionTool } from '../tools/timerActionTool';
 import { getSitePagesTool } from '../tools/siteNavigationTool';
 import { navigateToPageTool } from '../tools/navigateToPageTool';
 import { findMissionTool } from '../tools/findMissionTool';
+import { createProjectTool } from '../tools/createProjectTool';
 import { findUserProjectsTool } from '../tools/findUserProjectsTool';
 import { getPageContextTool } from '../tools/pageContextTool';
 import { SITE_CONTEXT } from '../../lib/bot/context.js';
-import { createGoogleModel } from '../lib/createModel';
-import { createGroqModel, hasGroqModelConfig } from '../lib/createModel';
+import { createGoogleModel, createGroqModel, createNvidiaModel, hasGroqModelConfig, hasNvidiaModelConfig, hasGoogleModelConfig } from '../lib/createModel';
 
 export const createEnhancedBotAgent = (
   apiKey: string,
@@ -48,6 +48,7 @@ Core workflows:
 - Mission details: listUserMissionsTool / getMissionDetailsTool
 - Mission statistics: getMissionStatsTool
 - Project navigation: findUserProjectsTool -> navigateToPageTool
+- Create Partnership/Embroidery: createProjectTool
 - General navigation: getSitePagesTool -> navigateToPageTool
 
 Behavior rules:
@@ -58,12 +59,23 @@ Behavior rules:
 - If multiple mission matches exist, present choices instead of guessing.
 - If the request is ambiguous, ask a short clarification question.
 `,
-    model: [
-      ...(hasGroqModelConfig()
-        ? [{ model: createGroqModel(), maxRetries: 2 }]
-        : []),
-      { model: createGoogleModel(apiKey, 'gemini-flash-lite-latest'), maxRetries: 2 }
-    ],
+    model: (() => {
+      const models = [];
+      
+      // Priority order: Google Flash (thinkingBudget=0) > Google Flash Lite > Groq > NVIDIA
+      if (hasGoogleModelConfig(apiKey)) {
+        models.push({ model: createGoogleModel(apiKey, 'gemini-flash-latest', { thinkingBudget: 0 }), maxRetries: 2 });
+        models.push({ model: createGoogleModel(apiKey, 'gemini-flash-lite-latest'), maxRetries: 2 });
+      }
+      if (hasGroqModelConfig()) {
+        models.push({ model: createGroqModel(), maxRetries: 2 });
+      }
+      if (hasNvidiaModelConfig(apiKey)) {
+        models.push({ model: createNvidiaModel(apiKey), maxRetries: 1 });
+      }
+      
+      return models.length > 0 ? models : [{ model: createGoogleModel(apiKey, 'gemini-flash-latest', { thinkingBudget: 0 }), maxRetries: 2 }];
+    })(),
     tools: {
       getMissionDetailsTool,
       listUserMissionsTool,
@@ -73,6 +85,7 @@ Behavior rules:
       timerActionTool,
       getSitePagesTool,
       navigateToPageTool,
+      createProjectTool,
       findMissionTool,
       findUserProjectsTool,
       getPageContextTool

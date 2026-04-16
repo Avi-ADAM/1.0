@@ -4,6 +4,7 @@
    import { quintOut } from "svelte/easing";
     import {addslashes} from '$lib/func/uti/string.js'
     import { idPr } from '../../stores/idPr.js';
+    import { baciStore, resetBaciStore } from '$lib/stores/baciStore.js';
     import axios from 'axios';
     import { goto } from '$app/navigation';
     import AddnewVal from './addnewval.svelte';
@@ -21,27 +22,19 @@ let a = $state(0);
 let success = $state(false)
     let before = $state(false);
     let url1 = baseUrl+"/api/upload";
-    let linkP = $state("");
-    let desP = $state("");
-    let desPl = $state("");
     let resP;
-    let projectName_value = $state("");
     let token; 
-    let timeToP = $state("already");
    let idL;
 let run = [];
-let imageId = 50;
 let files;
   let shgi = $state(false);
-    let restime = $state();
     let nam;
-    let ont = $state(false)
 async function sendP () {
-  if(projectName_value.length < 1){
+  if($baciStore.projectName_value.length < 1){
     naex = {"he": "שם הריקמה חייב להיות ארוך יותר", "en": "please choose name for the FreeMate"}
     shgi = true 
   }else{
-    if (run.includes(projectName_value)){
+    if (run.includes($baciStore.projectName_value)){
    naex = {"he":"השם כבר קיים נא לבחור שם אחר" , "en":"name already exists please try another name"}
   shgi = true; 
 } else{
@@ -65,7 +58,7 @@ if (files) {
                 },
             })
             .then(({ data }) => {
-                 imageId = data[0].id;
+                 $baciStore.imageId = data[0].id;
                  sendPP()
             })
             .catch(error => {
@@ -100,16 +93,16 @@ async function sendPP(){
                         query: `mutation { createProject(
        data: {
          user_1s: ${idL},
-        projectName: "${projectName_value}",
+        projectName: "${$baciStore.projectName_value}",
         publishedAt: "${d.toISOString()}",
-        publicDescription: """${addslashes(desP)}""",
-        linkToWebsite: """${addslashes(linkP)}""",
-        descripFor: """${addslashes(desPl)}""",
-        vallues:[${find_value_id(selected)}],
-        restime: ${restime},
-        timeToP:${timeToP},
-         profilePic: ${imageId}, 
-         isOt:${ont}       
+        publicDescription: """${addslashes($baciStore.desP)}""",
+        linkToWebsite: """${addslashes($baciStore.linkP)}""",
+        descripFor: """${addslashes($baciStore.desPl)}""",
+        vallues:[${find_value_id($baciStore.selected)}],
+        restime: ${$baciStore.restime},
+        timeToP:${$baciStore.timeToP},
+         profilePic: ${$baciStore.imageId},
+         isOt:${$baciStore.ont}
         }  
   ){
   data { id attributes{ projectName}}
@@ -124,7 +117,7 @@ async function sendPP(){
          idPr.set(resP.data.createProject.data.id);
         before = true;
             loading = false;
-    let data = {"name": userName_value, "action": "יצר ריקמה חדשה בשם:", "det": `${projectName_value} והתיאור: ${desP}` }
+    let data = {"name": userName_value, "action": "יצר ריקמה חדשה בשם:", "det": `${$baciStore.projectName_value} והתיאור: ${$baciStore.desP}` }
    fetch("/api/ste", {
   method: 'POST', // or 'PUT'
   headers: {
@@ -135,6 +128,7 @@ async function sendPP(){
   .then((response) => response)
   .then((data) => {
     console.log('Success:', data);
+       resetBaciStore();
        goto("/moach", );
   })
   .catch((error) => {
@@ -210,7 +204,6 @@ let suc = $state(false);
      };
 
 
-    let selected = $state([]);
         const placeholder = `${$lang == "he" ? "ערכים ומטרות" : "vallues and goals"}`;
 
  function project (id) {
@@ -242,10 +235,10 @@ let suc = $state(false);
 
   async function newnew (){
     let meData = []
-  for (let i = 0; i<selected.length ;i++){
-    if (!vallues.map(c => c.attributes.valueName).includes(selected[i])){
+  for (let i = 0; i<$baciStore.selected.length ;i++){
+    if (!vallues.map(c => c.attributes.valueName).includes($baciStore.selected[i])){
       //create new and update vallues
-        console.log(selected,vallues)
+        console.log($baciStore.selected,vallues)
   let link =baseUrl+"/graphql" ;
   let d = new Date
         try {
@@ -258,7 +251,7 @@ let suc = $state(false);
         body: 
         JSON.stringify({query: 
            `mutation  createVallue {
-  createVallue(data: {  valueName: "${selected[i]}",
+  createVallue(data: {  valueName: "${$baciStore.selected[i]}",
         publishedAt: "${d.toISOString()}"}) {
     data {
       id
@@ -278,7 +271,7 @@ const newOb = meData.data.createVallue.data;
     newValues.push(newOb);
        
     vallues = newValues;
-    let data = {"name": userName_value, "action": "create ערך חדש בשם:", "det": `${selected[i]}`}
+    let data = {"name": userName_value, "action": "create ערך חדש בשם:", "det": `${$baciStore.selected[i]}`}
    fetch("/api/ste", {
   method: 'POST', // or 'PUT'
   headers: {
@@ -378,7 +371,7 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
 <br>
 
         <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
-  <input name="des" bind:value={projectName_value}  
+  <input name="des" bind:value={$baciStore.projectName_value}
  type='text' class='input'required >
   <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="des" class='label'>{frn[$lang]}</label>
   <span class='line'></span>
@@ -394,11 +387,11 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
 <br>
 <div class="w-full">
 <h2 class="text-barbi">{teure[$lang]}</h2>
-<RichText bind:outpot={desP}/>
+<RichText bind:outpot={$baciStore.desP}/>
 </div>
 <!----
    <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
-  <textarea name="s"  bind:value={desPl}     
+  <textarea name="s"  bind:value={$baciStore.desPl}
  type='text' class='input d' required></textarea>
   <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="s" class='label'>{prte[$lang]}</label>
   <span class='line'></span>
@@ -406,10 +399,10 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
 <div class="w-full">
     <h2 class="text-barbi">{prte[$lang]}</h2>
 
-<RichText bind:outpot={desPl}/>
+<RichText bind:outpot={$baciStore.desPl}/>
 </div>
  <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
-  <input name="de"    bind:value={linkP}     
+  <input name="de"    bind:value={$baciStore.linkP}
  type='text' class='input' required>
   <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="de" class='label'>{wel[$lang]}</label>
   <span class='line'></span>
@@ -439,7 +432,7 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
      allowUserOptions={"append"}
       loading={newcontent}
       bind:searchText={ugug}
-     bind:selected
+     bind:selected={$baciStore.selected}
      {placeholder}
      options={vallues.map(c => c.attributes.valueName)}
      />
@@ -456,7 +449,7 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
      allowUserOptions={"append"}
       loading={newcontent}
       bind:searchText={ugug}
-     bind:selected
+     bind:selected={$baciStore.selected}
      {placeholder}
      options={vallues.map(c => c.attributes.valueName)}
      />
@@ -466,7 +459,7 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
   <br>
  <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-gold">{hre[$lang]}</h2>
-    <select class:round={$lang == "he"} class:rounden={$lang == "en"} bind:value={restime} class=" form-select appearance-none
+    <select class:round={$lang == "he"} class:rounden={$lang == "en"} bind:value={$baciStore.restime} class=" form-select appearance-none
       block
       w-full
       px-3
@@ -490,7 +483,7 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
 </div>
 <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-gold">{timeto[$lang]}</h2>
-    <select class:round={$lang == "he"} class:rounden={$lang == "en"} bind:value={timeToP} class=" form-select appearance-none
+    <select class:round={$lang == "he"} class:rounden={$lang == "en"} bind:value={$baciStore.timeToP} class=" form-select appearance-none
       block
       w-full
       px-3
@@ -519,7 +512,7 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
 <Chooser tr={{"he":"ריקמה מתמשכת","en":"continuous"}}   
   fl={{"he":"ריקמה חד פעמית","en":"one timed"}} 
   level={{"he":"הריקמה מיועדת להיות אירוע חד פעמי או מתמשך? לדוגמה: הפקת אירוע או הקמת עסק להפקת אירועים","en":"those the FreeMates intend to be a one time think or a continouse one? for exmple: event production vs openting a production company"}} 
-  bind:checked={ont} />
+  bind:checked={$baciStore.ont} />
   <!-- הדוגמה א טובה צריך לתת פתיחה של מסעדה מול אירוע חד פעמי, גם כדאי לשים בשורה נפרדת של הערות 
 {#if ont == true}
 <h3 class="text-barbi">{inc[$lang]}</h3>

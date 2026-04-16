@@ -16,6 +16,7 @@
   import axios from 'axios';
   import { draw } from 'svelte/transition';
   import Addnew from '$lib/components/addnew/baci.svelte';
+  import { baciStore } from '$lib/stores/baciStore.js';
   import Addnewp from '$lib/components/userPr/uploadPic.svelte';
   import { uPic } from '$lib/stores/uPic.js';
   import Edit from '$lib/components/userPr/edit.svelte';
@@ -779,6 +780,20 @@
     if (page.url.searchParams.has('action')) {
       await tick();
       if (page.url.searchParams.get('action') === 'createproject') {
+        const params = page.url.searchParams;
+        baciStore.update((s) => ({
+          ...s,
+          projectName_value: params.get('name') || s.projectName_value,
+          desP: params.get('desc') || s.desP,
+          desPl: params.get('details') || s.desPl,
+          linkP: params.get('url') || s.linkP,
+          selected: params.get('vals')
+            ? params.get('vals').split(',').filter(Boolean)
+            : s.selected,
+          restime: params.get('res') || s.restime,
+          timeToP: params.get('profit') || s.timeToP,
+          ont: params.has('ont') ? params.get('ont') === 'true' : s.ont
+        }));
         iwant = false;
         addP = true;
       } else if (page.url.searchParams.get('action') === 'editbasic') {

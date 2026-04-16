@@ -1,5 +1,5 @@
 import { Agent } from '@mastra/core/agent';
-import { createGoogleModel, createGroqModel, hasGroqModelConfig } from '../lib/createModel';
+import { createGoogleModel, createGroqModel, createNvidiaModel, hasGroqModelConfig, hasNvidiaModelConfig, hasGoogleModelConfig } from '../lib/createModel';
 import { SITE_CONTEXT } from '../../lib/bot/context.js';
 import { navigateToPageTool } from '../tools/navigateToPageTool.js';
 import { getSitePagesTool } from '../tools/siteNavigationTool.js';
@@ -43,10 +43,23 @@ When users ask about:
 - Navigation or exploring the site - provide helpful guidance using the available tools
 - Questions about the current page, its structure, or actions - use getPageContextTool
     `,
-    model: [
-      ...(hasGroqModelConfig() ? [{ model: createGroqModel(), maxRetries: 2 }] : []),
-      { model: createGoogleModel(apiKey, 'gemini-flash-lite-latest'), maxRetries: 2 },
-        ],
+    model: (() => {
+      const models = [];
+      
+      // Priority order: Google Flash (thinkingBudget=0) > Google Flash Lite > Groq > NVIDIA
+      if (hasGoogleModelConfig(apiKey)) {
+        models.push({ model: createGoogleModel(apiKey, 'gemini-flash-latest', { thinkingBudget: 0 }), maxRetries: 2 });
+        models.push({ model: createGoogleModel(apiKey, 'gemini-flash-lite-latest'), maxRetries: 2 });
+      }
+      if (hasGroqModelConfig()) {
+        models.push({ model: createGroqModel(), maxRetries: 2 });
+      }
+      if (hasNvidiaModelConfig(apiKey)) {
+        models.push({ model: createNvidiaModel(apiKey), maxRetries: 1 });
+      }
+      
+      return models.length > 0 ? models : [{ model: createGoogleModel(apiKey, 'gemini-flash-latest', { thinkingBudget: 0 }), maxRetries: 2 }];
+    })(),
     tools: { getSitePagesTool, navigateToPageTool, getPageContextTool },
 
   });
