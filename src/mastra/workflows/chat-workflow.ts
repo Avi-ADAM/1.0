@@ -26,6 +26,8 @@ interface ChatOutput {
   navigation?: any;
   timerAction?: any;
   dataUpdate?: any;
+  projectCreation?: any;
+  rawAgentMessages?: any[];
   components?: {
     type: 'voting' | 'summary' | 'proposal' | 'mission_list' | string;
     props: any;
@@ -90,7 +92,18 @@ const analyzeIntent = createStep({
       .filter((msg: any) => {
         const content = msg.content || msg.text || '';
         const role = msg.role || (msg.user ? 'user' : 'assistant');
-        return typeof content === 'string' && content.trim() !== '' && role !== 'tool';
+        // Keep only plain text messages (user or assistant with text content)
+        if (typeof content !== 'string' || content.trim() === '') return false;
+        // Drop messages that were tool calls/results (role === 'tool')
+        if (role === 'tool') return false;
+        // Drop messages that contain parts with function calls (Gemini thought_signature issue)
+        if (msg.parts && Array.isArray(msg.parts)) {
+          const hasFunctionCall = msg.parts.some((part: any) =>
+            part.functionCall || part.function_call || (part.type === 'function_call')
+          );
+          if (hasFunctionCall) return false;
+        }
+        return true;
       })
       .map((msg: any) => ({
         role: msg.role || (msg.user ? 'user' : 'assistant'),
@@ -257,6 +270,13 @@ const routeToAgent = createStep({
         // Drop messages that were tool calls/results (role === 'tool')
         const role = msg.role || (msg.user ? 'user' : 'assistant');
         if (role === 'tool') return false;
+        // Drop messages that contain parts with function calls (Gemini thought_signature issue)
+        if (msg.parts && Array.isArray(msg.parts)) {
+          const hasFunctionCall = msg.parts.some((part: any) =>
+            part.functionCall || part.function_call || (part.type === 'function_call')
+          );
+          if (hasFunctionCall) return false;
+        }
         return true;
       })
       .map((msg: any) => ({
@@ -344,6 +364,8 @@ const processResponse = createStep({
     navigation: z.any().optional(),
     timerAction: z.any().optional(),
     dataUpdate: z.any().optional(),
+    projectCreation: z.any().optional(),
+    rawAgentMessages: z.array(z.any()).optional(),
     components: z.array(z.any()).optional()
   }),
   execute: async ({ inputData }) => {
@@ -354,7 +376,8 @@ const processResponse = createStep({
     let response: ChatOutput = {
       reply: getAgentReply(agentResult),
       intent: intent as any,
-      agentType: agentType
+      agentType: agentType,
+      rawAgentMessages: agentResult.response?.messages
     };
     const hasMissionListComponent = () =>
       Boolean(response.components?.some((component) => component.type === 'mission_list'));
@@ -393,6 +416,14 @@ const processResponse = createStep({
           // Handle data updates
           if ((name === 'updateDataTool' || name === 'updateData') && output) {
             response.dataUpdate = output;
+          }
+
+          // Handle new project creation
+          if (name === 'createProjectTool' && output?.success) {
+            response.projectCreation = output;
+            if (output.navigation) {
+              response.navigation = output.navigation;
+            }
           }
 
           // Handle mission list representation (interactive buttons)
@@ -480,6 +511,7 @@ const chatWorkflow = createWorkflow({
     navigation: z.any().optional(),
     timerAction: z.any().optional(),
     dataUpdate: z.any().optional(),
+    projectCreation: z.any().optional(),
     components: z.array(z.any()).optional()
   })
 })

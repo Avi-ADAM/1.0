@@ -19,7 +19,7 @@ const corsHeaders = {
  */
 export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
   const body = await request.json();
-  console.log('📥 Chat API received request:', JSON.stringify(body, null, 2));
+  console.log('📥 Chat API:', body.userId ? `user=${body.userId}` : 'unregistered', `lang=${body.lang || body.user?.lang || 'he'}`);
   // ── Flexible Payload Parsing (Supports both /chat and legacy /mastra-v2 formats) ──
   const userId = body.userId || body.user?.id;
   const lang = body.lang || body.user?.lang || 'he';
@@ -86,6 +86,7 @@ export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
         reply: result.text || t.get('bot.responseProcessingError'), // Essential for Bot.svelte compatibility
         components: [],
         agentType: 'nonregistered',
+        rawAgentMessages: result.response?.messages,
         ...result // Pass through all Mastra metadata (usage, etc.)
       };
 
@@ -117,7 +118,7 @@ export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
       const components = detectRenderComponents(lastUserMessage.content);
       if (components.length > 0) response.components = components;
 
-      console.log('📤 Nonreg bot response:', response);
+      console.log('📤 Nonreg bot response: reply=', result.text?.slice(0, 80));
       return json(response, { headers: corsHeaders });
     }
 
@@ -150,10 +151,18 @@ export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
       result = await run.resume(startParams);
     }
 
-    console.log('✅ Workflow completed, processing result...');
+    console.log('✅ Workflow completed');
     const outputData = result.result || result.outputData || result.data || result;
     
-    console.log('✅ Workflow output raw:', JSON.stringify(outputData, null, 2));
+    if (result.status === 'failed') {
+      const err = outputData?.error || result.error;
+      const step = result.stepExecutionPath?.at(-1);
+      console.error(`❌ Workflow failed @ ${step}: [${err?.name}] ${err?.message}`);
+      if (err?.url) console.error(`   → URL: ${err.url} | status: ${err?.statusCode}`);
+      if (err?.responseBody) console.error(`   → Body: ${String(err.responseBody).slice(0, 200)}`);
+    } else {
+      console.log('📊 Workflow result: intent=', outputData?.intent?.type, '| agent=', outputData?.agentType, '| reply=', outputData?.reply?.slice(0, 80));
+    }
 
     const response: Record<string, unknown> = {
       components: [], // Default empty
@@ -184,7 +193,7 @@ export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
       (response.components as any[]).push(...detectedComponents);
     }
 
-    console.log('📤 Mastra workflow response:', response);
+    console.log('📤 Workflow response: content=', String(response.content).slice(0, 80), '| nav=', !!response.navigation, '| timer=', !!response.timerAction);
     return json(response, { headers: corsHeaders });
   } catch (error) {
     console.error('❌ Chat API Error:', error);

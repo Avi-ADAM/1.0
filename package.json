@@ -63,6 +63,7 @@
     "@1lev1/svelte-share": "^0.0.9",
     "@ai-sdk/google": "^3.0.53",
     "@ai-sdk/groq": "^3.0.31",
+    "@ai-sdk/openai": "^3.0.53",
     "@capacitor/android": "^6.1.2",
     "@capacitor/cli": "^6.1.2",
     "@capacitor/core": "^6.1.2",

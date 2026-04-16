@@ -69,11 +69,29 @@ export const delegateToAgentTool = createTool({
 
       // Build conversation context - use recent history plus current message
       const recentHistory = (fullHistory || []).slice(-5);
-      const messages = recentHistory.map((msg: any) => ({
-        role: msg.role || (msg.user ? 'user' : 'assistant'),
-        content: msg.content || msg.text,
-        ...(msg.parts ? { parts: msg.parts } : {})
-      }));
+      const messages = recentHistory
+        .filter((msg: any) => {
+          const content = msg.content || msg.text || '';
+          const role = msg.role || (msg.user ? 'user' : 'assistant');
+          // Keep only plain text messages (user or assistant with text content)
+          if (typeof content !== 'string' || content.trim() === '') return false;
+          // Drop messages that were tool calls/results (role === 'tool')
+          if (role === 'tool') return false;
+          // Drop messages that contain parts with function calls (Gemini thought_signature issue)
+          if (msg.parts && Array.isArray(msg.parts)) {
+            const hasFunctionCall = msg.parts.some((part: any) =>
+              part.functionCall || part.function_call || (part.type === 'function_call')
+            );
+            if (hasFunctionCall) return false;
+          }
+          return true;
+        })
+        .map((msg: any) => ({
+          role: msg.role || (msg.user ? 'user' : 'assistant'),
+          content: msg.content || msg.text
+          // Intentionally omit `parts` — Gemini requires thought_signatures on tool-call parts
+          // from previous turns, which we don't have when replaying from client-side history.
+        }));
 
       // Add the current message
       messages.push({

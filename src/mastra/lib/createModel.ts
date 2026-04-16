@@ -1,6 +1,7 @@
 import { config as loadDotenv } from 'dotenv';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { createGroq } from '@ai-sdk/groq';
+import { createOpenAI } from '@ai-sdk/openai';
 
 loadDotenv();
 
@@ -32,17 +33,69 @@ function resolveGroqApiKey(apiKey?: string) {
   );
 }
 
-export function hasGoogleModelConfig(apiKey?: string) {
-  return Boolean(resolveGoogleApiKey(apiKey));
+function resolveNvidiaApiKey(apiKey?: string) {
+  return (
+    apiKey ||
+    getEnvValue('NVIDIA_API_KEY') ||
+    getEnvValue('TOGETHER_API_KEY') ||
+    process.env.NVIDIA_API_KEY ||
+    process.env.TOGETHER_API_KEY ||
+    ''
+  );
+}
+
+function resolveOpenAIApiKey() {
+  return (
+    getEnvValue('OPENAI_API_KEY') ||
+    getEnvValue('OPENAI') ||
+    process.env.OPENAI_API_KEY ||
+    process.env.OPENAI ||
+    ''
+  );
+}
+
+export function hasNvidiaModelConfig(apiKey?: string) {
+  return Boolean(resolveNvidiaApiKey(apiKey));
+}
+
+export function hasOpenAIModelConfig() {
+  return Boolean(resolveOpenAIApiKey());
+}
+
+export function createNvidiaModel(
+  apiKey?: string,
+  modelId: string = 'meta/llama-3.1-8b-instruct'
+) {
+  const resolvedApiKey = resolveNvidiaApiKey(apiKey);
+
+  if (!resolvedApiKey) {
+    throw new Error(
+      'Missing NVIDIA API key. Set NVIDIA_API_KEY or TOGETHER_API_KEY.'
+    );
+  }
+
+  // Using NVIDIA API via OpenAI-compatible endpoint (chat/completions, not responses)
+  const nvidia = createOpenAI({
+    apiKey: resolvedApiKey,
+    baseURL: 'https://integrate.api.nvidia.com/v1',
+    compatibility: 'compatible',
+  });
+  // Use .chat() explicitly to avoid the new Responses API endpoint
+  return nvidia.chat(modelId);
 }
 
 export function hasGroqModelConfig(apiKey?: string) {
   return Boolean(resolveGroqApiKey(apiKey));
 }
 
+export function hasGoogleModelConfig(apiKey?: string) {
+  return Boolean(resolveGoogleApiKey(apiKey));
+}
+
 export function createGoogleModel(
   apiKey?: string,
-  modelId: string = 'gemini-flash-lite-latest'
+  modelId: string = 'gemini-flash-lite-latest',
+  options?: { thinkingBudget?: number }
 ) {
   const resolvedApiKey = resolveGoogleApiKey(apiKey);
 
@@ -53,7 +106,20 @@ export function createGoogleModel(
   }
 
   const google = createGoogleGenerativeAI({ apiKey: resolvedApiKey });
-  return google(modelId);
+
+  // Pass providerOptions to disable thinking (thinkingBudget=0) to avoid
+  // errors when the model returns thinking tokens alongside tool calls
+  const providerOptions = options?.thinkingBudget !== undefined
+    ? {
+        google: {
+          thinkingConfig: {
+            thinkingBudget: options.thinkingBudget,
+          },
+        },
+      }
+    : undefined;
+
+  return google(modelId, providerOptions ? { providerOptions } : undefined);
 }
 
 export function createGroqModel(
@@ -69,3 +135,17 @@ export function createGroqModel(
   const groq = createGroq({ apiKey: resolvedApiKey });
   return groq(modelId);
 }
+
+export function createOpenAIModel(
+  modelId: string = 'gpt-4o-mini'
+) {
+  const resolvedApiKey = resolveOpenAIApiKey();
+
+  if (!resolvedApiKey) {
+    throw new Error('Missing OpenAI API key. Set OPENAI_API_KEY.');
+  }
+
+  const openai = createOpenAI({ apiKey: resolvedApiKey });
+  return openai(modelId);
+}
+
