@@ -209,12 +209,12 @@ export const qids = {
                         descrip   missionName 
                             } }}
        }
-`,'14changeOnline': `mutation ChangeOnline($id: ID!, $online: Boolean) {
+`, '14changeOnline': `mutation ChangeOnline($id: ID!, $online: Boolean) {
    UpdatePgishauser(id: $id, data: {online: $online}) {data{id attributes{ online}}}
 }`,
-"15createPgishauser": `mutation CreatePgishauser($id: ID!) {
+  "15createPgishauser": `mutation CreatePgishauser($id: ID!) {
   createPgishauser(data: {users_permissions_user: $id}) {data{id}}
-}`,'16createPgisha': `mutation CreatePgisha($ids: [ID],$name: String, $desc: String,pendIds:[ID]) {
+}`, '16createPgisha': `mutation CreatePgisha($ids: [ID],$name: String, $desc: String,pendIds:[ID]) {
   createPgisha(data: {pgishausers: $ids,pgishauserpends:$pendIds, name: $name, desc: $desc}) {data{id}}
 }` , '17getUsers': `query GetUsers {
   usersPermissionsUsers{
@@ -235,7 +235,7 @@ export const qids = {
   "19CreatePendMeeting": `mutation CreatePgishauserPend($id: ID!,$pgishaId:ID) {
   createPgishauserpend(data: {users_permissions_user: $id,pgisha: $pgishaId}) {data{id}}
   }`,
-   "20CreateUserMeeting": `mutation CreateUserMeeting($id: ID!,$pgishaId:[ID],$uid:String,$publishedAt:DateTime) {
+  "20CreateUserMeeting": `mutation CreateUserMeeting($id: ID!,$pgishaId:[ID],$uid:String,$publishedAt:DateTime) {
   createPgishauser(data: {users_permissions_user: $id,pgishas: $pgishaId,uid:$uid,
                publishedAt:$publishedAt
 }) {data{id}}
@@ -311,7 +311,7 @@ export const qids = {
           }
 }
 }`,
-'25UserArr1': `query GetUserArr1($uid: ID!) {	
+  '25UserArr1': `query GetUserArr1($uid: ID!) {	
   usersPermissionsUser(id: $uid) {
    data{
             id
@@ -322,11 +322,11 @@ export const qids = {
           }
 }
 }`,
-'26addUserArr1': `mutation AddUserArr1($uid: ID!, $arr: JSON, $arrDate: DateTime) {
+  '26addUserArr1': `mutation AddUserArr1($uid: ID!, $arr: JSON, $arrDate: DateTime) {
   updateUsersPermissionsUser(id: $uid, data: { arr1: $arr, arrdate: $arrDate}) 
   {data{id}}
 }`,
-	'27getFiniApp': `query GetFiniApp($id: ID!) {
+  '27getFiniApp': `query GetFiniApp($id: ID!) {
    finiapruval(id:'$id'){
    data{
    id attributes{
@@ -334,7 +334,7 @@ export const qids = {
    }}
    }
 }`,
-"27GetOpenMissionsRegTr": `query GetOpenMissionsRegTr($start: Int, $limit: Int)
+  "27GetOpenMissionsRegTr": `query GetOpenMissionsRegTr($start: Int, $limit: Int)
 {  openMissions(pagination: { start: $start, limit: $limit }) {
     data{
       id 
@@ -362,7 +362,7 @@ export const qids = {
     }
   }
 }`,
-"28GetOpenMissionsReg": `query GetOpenMissionsReg($start: Int, $limit: Int)
+  "28GetOpenMissionsReg": `query GetOpenMissionsReg($start: Int, $limit: Int)
 {  openMissions(pagination: { start: $start, limit: $limit }) {
     data{
       id 
@@ -390,7 +390,7 @@ export const qids = {
     }
   }
 }`,
-"29GetOpenMissionsNonregTr": `query GetOpenMissionsNonregTr($start: Int, $limit: Int)
+  "29GetOpenMissionsNonregTr": `query GetOpenMissionsNonregTr($start: Int, $limit: Int)
 {  openMissions(pagination: { start: $start, limit: $limit }) {
     data{
       id
@@ -413,7 +413,7 @@ export const qids = {
     }
   }
 }`,
-"30GetOpenMissionsNonreg": `query GetOpenMissionsNonreg($start: Int, $limit: Int)
+  "30GetOpenMissionsNonreg": `query GetOpenMissionsNonreg($start: Int, $limit: Int)
 {  openMissions(pagination: { start: $start, limit: $limit }) {
     data{
       id
@@ -436,7 +436,7 @@ export const qids = {
     }
   }
 }`,
-"31updateTask": `mutation UpdateTask($id: ID!,$myIshur: Boolean,$valiIshur: Boolean, $isAssigned: Boolean, $uid: [ID], $mesimabetahaliches: [ID]) {
+  "31updateTask": `mutation UpdateTask($id: ID!,$myIshur: Boolean,$valiIshur: Boolean, $isAssigned: Boolean, $uid: [ID], $mesimabetahaliches: [ID]) {
      updateAct(id: $id,
       data: {
              isAssigned: $isAssigned,
@@ -448,14 +448,14 @@ export const qids = {
     
   ) {data{id attributes{ shem my {data{id}}}}}
 }`,
-"32createTimeGrama": `mutation CreateTimegrama($date: DateTime,$decision: ID,$tosplit: ID, $finiapruval: ID, $whatami: String, $ask: ID) {
+  "32createTimeGrama": `mutation CreateTimegrama($date: DateTime,$decision: ID,$tosplit: ID, $finiapruval: ID, $whatami: String, $ask: ID) {
   createTimegrama(data: {date: $date, whatami: $whatami, ask: $ask, finiapruval: $finiapruval,decision:$decision,tosplit:$tosplit}) {
     data {
       id
     }   
   }
 }`,
-'33CreateTimer':`
+  '33CreateTimer': `
         mutation CreateTimer($missionId: ID!, $start: DateTime!, $userId: ID!, $projectId: ID!) {
           createTimer(
             data: {
@@ -478,7 +478,7 @@ export const qids = {
           }
         }
       `,
-      '34UpdateTimer': `
+  '34UpdateTimer': `
       mutation UpdateTimer($saved: Boolean,$timerId: ID!,$tasks: [ID], $newStart: DateTime , $timers:[ComponentNewTimesInput], $totalHours:Float, $isActive: Boolean) {
         updateTimer(id: $timerId,
           data: {
@@ -499,14 +499,14 @@ export const qids = {
         }
       }
     `,
-    "35updateTimeGrama": `mutation UpdateTimegrama($date: DateTime,$done: Boolean, $id: ID!) {
+  "35updateTimeGrama": `mutation UpdateTimegrama($date: DateTime,$done: Boolean, $id: ID!) {
   updateTimegrama(id: $id, data: {date: $date, done: $done}) {
     data {
       id
     }   
   }
 }`,
-'36getMissionTimer': `query GetMissionTimer($missionId: ID!) {
+  '36getMissionTimer': `query GetMissionTimer($missionId: ID!) {
   mesimabetahalich(id: $missionId) {
     data {
       id
@@ -539,7 +539,7 @@ export const qids = {
   }
 }
 `,
-'37getUserTimers':  `query GetUserTimers($id: ID!) {
+  '37getUserTimers': `query GetUserTimers($id: ID!) {
   usersPermissionsUser(id: $id) {
     data{
       id
@@ -563,7 +563,7 @@ export const qids = {
   }
  }
 `,
-'38getProjectTimers':  `query GetProjectTimers($id: ID!) {
+  '38getProjectTimers': `query GetProjectTimers($id: ID!) {
   project(id: $id) {
     data{
       id
@@ -595,7 +595,7 @@ export const qids = {
   }
  }
 `,
-'39GetNegotiation': `
+  '39GetNegotiation': `
       query GetNegotiation($id: ID!) {
         negotiation(id: $id) {
           data {
@@ -732,7 +732,7 @@ export const qids = {
         }
       }
     `,
-    "43updateProfilePic":  `
+  "43updateProfilePic": `
 mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
   updateProject(
     id: $projectId,
@@ -754,7 +754,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
   }
 }
 `,
-"44updateWelcomeCard": `mutation UpdateWelcomeCard($id: ID!, $clicked: Boolean!) {
+  "44updateWelcomeCard": `mutation UpdateWelcomeCard($id: ID!, $clicked: Boolean!) {
   updateWelcomTop(
     id: $id,
     data: { clicked: $clicked }
@@ -767,7 +767,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }
 }`,
-'45deleteMachshir': `mutation deleteMachshir($id: ID!) {
+  '45deleteMachshir': `mutation deleteMachshir($id: ID!) {
     deleteMachshir(id: $id) {
       data {
         id
@@ -976,7 +976,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       data: { status: $status }
     ) { data { id } }
   }`,
-"64getUserProjectList": `query GetUserProjectList($uid: ID!) {
+  "64getUserProjectList": `query GetUserProjectList($uid: ID!) {
     usersPermissionsUser(id: $uid) {
       data {
         id
@@ -1001,7 +1001,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
-  
+
   "65checkProjectMembership": `query CheckProjectMembership($uid: ID!, $projectId: ID!) {
     usersPermissionsUser(id: $uid) {
       data {
@@ -1026,7 +1026,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
-  
+
   "66getProjectsCount": `query GetProjectsCount {
     projects {
       meta {
@@ -1036,7 +1036,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
-  
+
   "67getMembersCount": `query GetMembersCount {
     chezins {
       meta {
@@ -1046,7 +1046,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
-  
+
   "68updateTosplit": `mutation UpdateTosplit($id: ID!, $halukas: [ID], $hervachti: [ComponentProjectsHervachtiInput], $sales: [ID]) {
     updateTosplit(
       id: $id,
@@ -1084,8 +1084,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
-  
-"71createSheirutpend": `mutation CreateSheirutpend(
+
+  "71createSheirutpend": `mutation CreateSheirutpend(
   $project: ID!,
   $userId: ID!,
   $matanots: [ID],
@@ -1122,7 +1122,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }
 }`,
-  
+
   "69createHaluka": `mutation CreateHaluka($data: HalukaInput!) {
     createHaluka(data: $data) {
       data {
@@ -1130,7 +1130,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
-  
+
   "70updateHaluka": `mutation UpdateHaluka($id: ID!, $amount: Float, $usersend: ID, $userrecive: ID) {
     updateHaluka(
       id: $id,
@@ -1173,7 +1173,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
-  
+
   "71updateSaleSplited": `mutation UpdateSaleSplited($id: ID!, $splited: Boolean, $pending: Boolean, $tosplits: [ID]) {
     updateSale(
       id: $id,
@@ -1193,7 +1193,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
-  
+
   "72createMesimabetahalich": `mutation CreateMesimabetahalich(
     $projectId: ID!,
     $missId: ID!,
@@ -1236,7 +1236,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
-  
+
   "73archiveOpenMission": `mutation ArchiveOpenMission($openMid: ID!) {
     updateOpenMission(id: $openMid, data: { archived: true }) {
       data {
@@ -1249,7 +1249,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
-  
+
   "74addUserToProject": `mutation AddUserToProject($projectId: ID!, $userIds: [ID]!) {
     updateProject(id: $projectId, data: { user_1s: $userIds }) {
       data {
@@ -1268,7 +1268,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
-  
+
   "75createWelcomeTop": `mutation CreateWelcomeTop($userId: ID!, $projectId: ID!, $publishedAt: DateTime!) {
     createWelcomTop(data: {
       users_permissions_user: $userId,
@@ -1280,7 +1280,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
-  
+
   "76archiveAsk": `mutation ArchiveAsk($askId: ID!, $vots: [ComponentProjectsVotsInput]) {
     updateAsk(id: $askId, data: { archived: true, vots: $vots }) {
       data {
@@ -1288,7 +1288,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
-  
+
   "77createMonter": `mutation CreateMonter($mesimabetahalikhId: ID!, $start: DateTime!, $finish: DateTime) {
     createMonter(data: {
       mesimabetahalich: $mesimabetahalikhId,
@@ -1301,7 +1301,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
-  
+
   "78archiveMultipleAsks": `mutation ArchiveMultipleAsks($askIds: [ID]!) {
     updateAsks(ids: $askIds, data: { archived: true }) {
       data {
@@ -2162,6 +2162,9 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
               project {
                 data {
                   id
+                  attributes {
+                    projectName
+                  }
                 }
               }
               acts {
@@ -2171,6 +2174,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                     shem
                     myIshur
                     link
+                    vali{data{id attributes{ username profilePic {data{attributes{ url }}}}}}
                     hashivut
                     valiIshur
                     des
@@ -3714,7 +3718,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           }
         }
       }`,
-      "89getUsersCount": `query GetUsersCount {
+  '89getUsersCount': `query GetUsersCount {
     usersPermissionsUsers {
       meta {
         pagination {
@@ -3723,4 +3727,49 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
+  '90myActsQuery': `query MyActs($idL: ID!) {
+  usersPermissionsUser(id: $idL) {
+    data {
+      id
+      attributes {
+        mesimabetahaliches(
+          filters: { forappruval: { eq: false }, finnished: { eq: false } }
+        ) {
+          data {
+            id
+            attributes {
+              name
+              project {
+                data {
+                  id
+                  attributes {
+                  projectName
+                  }
+                }
+              }
+              acts {
+                data {
+                  id
+                  attributes {
+                    shem
+                    myIshur
+                    link
+                    hashivut
+                    valiIshur
+                    vali{data{id attributes{ username profilePic {data{attributes{ url }}}}}}
+                    des
+                    dateF
+                    dateS
+                    status
+                    naasa
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`
 };

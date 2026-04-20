@@ -101,3 +101,35 @@ export async function fetchOpenMissions(baseUrl, token, keysSorted, lang) {
     throw error;
   }
 }
+
+/**
+ * Fetch specific mission data for the /myacts page
+ * 
+ * @param {string | number} idL - The user ID
+ * @returns {Promise<any>}
+ */
+export async function fetchMyActs(idL) {
+  try {
+    const response = await fetch('/api/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        data: {
+          queId: '90myActsQuery',
+          arg: { idL }
+        }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('Error in fetchMyActs:', error);
+    throw error;
+  }
+}

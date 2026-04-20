@@ -254,7 +254,7 @@
             projectName
             descripFor
             publicDescription
-             acts{data{id attributes{shem
+             acts{data{id attributes{shem hashivut
                tafkidims {data{ id attributes{ roleDescription ${
                  $lang == 'he'
                    ? 'localizations{data {attributes{ roleDescription}} }'
@@ -276,7 +276,7 @@
             mesimabetahaliches (filters:{finnished:{eq: false}}) {data{
              id attributes{ status  iskvua 
                           forums{data{id}}
-              acts{data{id attributes{shem dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}}
+              acts{data{id attributes{shem dateS hashivut naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}}
                des dateF vali{data{id}} myIshur valiIshur status mesimabetahaliches{data{id}}}}}
                 tafkidims {data{ id attributes{ roleDescription ${
                   $lang == 'he'

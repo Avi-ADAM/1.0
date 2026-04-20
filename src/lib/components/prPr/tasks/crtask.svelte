@@ -13,6 +13,7 @@
       link = editdata.link;
       mimatai = editdata.dateS;
       adMatai = editdata.dateF;
+      hashivut = editdata.hashivut || 'white';
     }
     if (id > 0) {
       const bmi = bmiData.filter((t) => t.id == id);
@@ -71,6 +72,7 @@
     teur = $bindable(''),
     selected = $bindable([]),
     link = $bindable(''),
+    hashivut = $bindable('white'),
     onDone,
     onAdd
   } = $props();
@@ -188,6 +190,7 @@
             ${tt}
              ${st}
              ${fd}
+             hashivut: "${hashivut}",
                   }
     
   ) {data{id attributes{ shem my {data{id}}}}}
@@ -222,7 +225,8 @@
           shem: name,
           link,
           dateS: mimatai,
-          dateF: adMatai
+          dateF: adMatai,
+          hashivut
         }
       });
     }
@@ -255,6 +259,14 @@
   const neerdes = { he: 'חובה להזין שם', en: 'must enter name' };
   const pers = { he: 'משימה בתהליך', en: 'mission in progress' };
   const role = { he: 'תפקידים', en: 'roles' };
+
+  const urgencyLabel = { he: 'רמת דחיפות', en: 'Urgency level' };
+  const urgencyOptions = [
+    { value: 'white', label: { he: 'לבן (רגיל)', en: 'White (Normal)' }, color: 'bg-white' },
+    { value: 'green', label: { he: 'ירוק (נמוך)', en: 'Green (Low)' }, color: 'bg-green-500' },
+    { value: 'yellow', label: { he: 'צהוב (בינוני)', en: 'Yellow (Medium)' }, color: 'bg-yellow-400' },
+    { value: 'red', label: { he: 'אדום (גבוה)', en: 'Red (High)' }, color: 'bg-red-500' }
+  ];
   //TODO: validation of dateF after dateS
 </script>
 
@@ -310,6 +322,36 @@
     >
     <span class="line"></span>
   </div>
+
+  <div class="flex flex-col items-center gap-3 my-4 p-4 bg-slate-50/50 rounded-xl w-full max-w-md border border-slate-100 shadow-sm">
+    <span class="text-sm font-semibold text-barbi">{urgencyLabel[$lang]}</span>
+    <div class="flex gap-5">
+      {#each urgencyOptions as option}
+        <button
+          type="button"
+          onclick={() => hashivut = option.value}
+          class="group relative flex flex-col items-center gap-1 transition-all duration-300 transform active:scale-95"
+          title={option.label[$lang]}
+        >
+          <div 
+            class="w-10 h-10 rounded-xl border-2 shadow-lg transition-all duration-300 {option.color} 
+            {hashivut === option.value ? 'border-barbi scale-110 ring-4 ring-barbi/20 shadow-barbi/20' : 'border-slate-200 opacity-60 grayscale-[0.3] hover:opacity-100 hover:grayscale-0 hover:scale-105'}
+            {option.value === 'white' ? 'border-slate-300' : ''}"
+          ></div>
+          <span class="text-[10px] font-medium transition-colors {hashivut === option.value ? 'text-barbi font-bold' : 'text-slate-500'}">
+            {option.label[$lang]}
+          </span>
+          
+          {#if hashivut === option.value}
+            <div class="absolute -top-1 -right-1 w-4 h-4 bg-barbi text-white rounded-full flex items-center justify-center text-[8px] animate-bounce shadow-md">
+              ✓
+            </div>
+          {/if}
+        </button>
+      {/each}
+    </div>
+  </div>
+
   {#if fromMis != true}
     <h2 class="text-barbi text-center text-sm sm:text-xl">:{level[$lang]}</h2>
 

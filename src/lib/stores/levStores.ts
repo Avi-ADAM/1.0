@@ -342,6 +342,9 @@ export const pendsStore: Writable<PendMissionData[]> = writable([]);
 /** Missions in progress (mtaha) */
 export const mtahaStore: Writable<InProgressMissionData[]> = writable([]);
 
+/** Personal acts store (myacts) */
+export const myActsStore: Writable<any[]> = writable([]);
+
 /** Resource suggestions (huca) */
 export const resourceSuggestionsStore: Writable<ResourceSuggestionData[]> = writable([]);
 

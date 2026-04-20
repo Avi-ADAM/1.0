@@ -98,6 +98,29 @@
     }
   ];
 
+  const URGENCY = {
+    white: {
+      he: 'רגיל',
+      en: 'Normal',
+      cls: 'bg-slate-50 text-slate-600 border-slate-200'
+    },
+    green: {
+      he: 'נמוך',
+      en: 'Low',
+      cls: 'bg-emerald-50 text-emerald-600 border-emerald-200'
+    },
+    yellow: {
+      he: 'בינוני',
+      en: 'Medium',
+      cls: 'bg-amber-50 text-amber-600 border-amber-200'
+    },
+    red: {
+      he: 'דחוף',
+      en: 'Urgent',
+      cls: 'bg-rose-50 text-rose-600 border-rose-200'
+    }
+  };
+
   const ICONS = ['📋', '🎯', '🤝', '⚙️', '🏁', '✅'];
 
   const isHe = $derived($lang === 'he');
@@ -114,6 +137,7 @@
 </script>
 
 {#if open && act}
+  {@const uCfg = URGENCY[act.hashivut] || URGENCY.white}
   <!-- backdrop -->
   <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
   <div
@@ -153,6 +177,14 @@
               {BADGE[stage()][isHe ? 'he' : 'en']}
             </span>
           {/if}
+          <!-- urgency badge -->
+
+          <span
+            class="text-[10px] font-bold px-2 py-1 rounded-full border shadow-sm
+                   {uCfg.cls}"
+          >
+            {uCfg[isHe ? 'he' : 'en']}
+          </span>
           <!-- close -->
           <button
             onclick={onClose}

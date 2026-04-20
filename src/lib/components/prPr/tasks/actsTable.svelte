@@ -11,6 +11,7 @@
   import RichText from '$lib/celim/ui/richText.svelte';
   import NameAndPname from '$lib/components/grid/nameAndPname.svelte';
   import NameField from '$lib/components/grid/nameField.svelte';
+  import UrgencyBadge from '$lib/components/grid/urgencyBadge.svelte';
   import { onMount } from 'svelte';
   import Tile from '$lib/celim/tile.svelte';
   import Button from '$lib/celim/ui/button.svelte';
@@ -60,6 +61,7 @@
   const vali = { he: 'נוצר ע"י', en: 'created by' };
   const approve = { he: 'אישור', en: 'Approve' };
   const pending = { he: 'ממתין לאישור', en: 'Pending Approval' };
+  const urgencyLabel = { he: 'דחיפות', en: 'Urgency' };
   let theme = PrelineTheme;
 
   let columns = $state([
@@ -68,6 +70,12 @@
       title: name[$lang],
       accessor: (row) => row.shem,
       renderComponent: NameField
+    },
+    {
+      key: 'hashivut',
+      title: urgencyLabel[$lang],
+      accessor: (row) => row.hashivut || 'white',
+      renderComponent: UrgencyBadge
     },
     {
       key: 'vali',
