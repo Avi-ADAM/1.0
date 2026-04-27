@@ -582,7 +582,7 @@ meta {
       meData = result.data.createChezin;
       fpval.set(meData.data.id);
       if (agreeToBasicTerms && !agreedToFullAgreement) {
-        show.set(1);
+        show.set(5);
       }
       let linko = `ref=true&id=${$fpval}&con=${find_contry_id(selected)}&un=${$liUN}&em=${$email}`;
       linkos.set(linko);

@@ -2,6 +2,7 @@
   import MultiSelect from 'svelte-multiselect';
   import { userName } from '../../stores/store.js';
   import { email } from '../registration/email.js';
+  import { show } from '../registration/store-show.js';
   import { regHelper } from '../../stores/regHelper.js';
   import { goto } from '$app/navigation';
   import * as yup from 'yup';
@@ -675,6 +676,7 @@
       userName.set($form.name);
       email.set($form.email);
       regHelper.set(1);
+      show.set(5);
       datar = data;
       already = true;
       liUN.set($form.name);

@@ -418,7 +418,7 @@ console.log("t")
             regHelper.set(1);
                     meData = response.data;
                 fpval.set(meData.data.id)
-                show.set(0)
+                show.set(5)
                 console.log($fpval, $contriesi, "from after")
             datar = data;
 

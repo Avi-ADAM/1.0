@@ -6,17 +6,78 @@
 </svelte:head>
 
 <script>
-  import Amana1 from "$lib/components/main/amanar.svelte"
+  import Amana1 from '$lib/components/main/amanar.svelte';
+  import One from '$lib/components/main/bein.svelte';
+  import { regHelper } from '$lib/stores/regHelper.js';
+  import { onMount } from 'svelte';
+  import { userName } from '$lib/stores/store.js';
+  import { email } from '$lib/components/registration/email.js';
+  import { show } from '$lib/components/registration/store-show.js';
+  import { goto } from '$app/navigation';
+
+  let idx = $state(1);
+  let user = $state();
+  let kvar = $state();
+
+  let regHelperL = $state(0);
+  regHelper.subscribe((value) => {
+    regHelperL = value;
+  });
+
+  onMount(async () => {
+    if (document.cookie) {
+      const unt = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('un='));
+      if (unt != null) {
+        const un = document.cookie
+          .split('; ')
+          .find((row) => row.startsWith('un='))
+          .split('=')[1];
+        userName.set(decodeURIComponent(un));
+      }
+      const regt = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('id='));
+      if (regt != null) {
+        const reg = document.cookie
+          .split('; ')
+          .find((row) => row.startsWith('id='))
+          .split('=')[1];
+        user = reg;
+      }
+      const cookieValuet = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('email='));
+      if (cookieValuet != null) {
+        const cookieValue = document.cookie
+          .split('; ')
+          .find((row) => row.startsWith('email='))
+          .split('=')[1];
+        kvar = cookieValue;
+        email.set(cookieValue);
+      }
+      const cookieValueti = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('await='));
+      if (cookieValueti != null) {
+        kvar = true;
+        show.set(6);
+      }
+    }
+    if (user > 0) {
+      goto('/lev');
+    }
+  });
 </script>
 
 <div class="main">
-
-
-
-
-<Amana1/>
-	
-   </div>
+  {#if kvar || regHelperL == 1}
+    <One {idx} />
+  {:else}
+    <Amana1 {idx} />
+  {/if}
+</div>
 <style>
 
 
