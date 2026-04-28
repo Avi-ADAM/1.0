@@ -676,7 +676,7 @@
       userName.set($form.name);
       email.set($form.email);
       regHelper.set(1);
-      show.set(5);
+      show.set(1);
       datar = data;
       already = true;
       liUN.set($form.name);
@@ -693,10 +693,6 @@
     }
   });
 
-  function show() {
-    const amana = document.getElementById('amana-show');
-    const lines = document.getElementById('lines');
-  }
   let trans = $state(false);
   function tran() {
     trans = !trans;
@@ -997,8 +993,8 @@
                   ? `${selected.length < 2 ? selected : selected.join(' وجميع سكان ')}`
                   : '__'}</span
               >
-              ويعيشون وفقًا لهذا الإيمان، سأتخلى عن سلاحي وعن الشرطيين المسلحين
-              من دولة
+              ويعيشون وفقًا لهذا الإيمان، سأتخلى عن سلاحي وعن الشرطيين المسلحين من
+              دولة
               <span
                 style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);"
                 >{selected.length > 0

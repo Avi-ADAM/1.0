@@ -1,11 +1,4 @@
-﻿
-
-   
-<svelte:head>
-	<title>اتفاقية الأمن والسلام العالمي</title>
-</svelte:head>
-
-<script>
+﻿<script>
   import Amana1 from '$lib/components/main/amanar.svelte';
   import One from '$lib/components/main/bein.svelte';
   import { regHelper } from '$lib/stores/regHelper.js';
@@ -62,7 +55,7 @@
         .find((row) => row.startsWith('await='));
       if (cookieValueti != null) {
         kvar = true;
-        show.set(6);
+        show.set(1);
       }
     }
     if (user > 0) {
@@ -71,6 +64,10 @@
   });
 </script>
 
+<svelte:head>
+  <title>اتفاقية الأمن والسلام العالمي</title>
+</svelte:head>
+
 <div class="main">
   {#if kvar || regHelperL == 1}
     <One {idx} />
@@ -78,54 +75,53 @@
     <Amana1 {idx} />
   {/if}
 </div>
+
 <style>
+  :root {
+    --primary-light: #a6f9d6;
+    --primary: #5be2a9;
+    --primary-dark: #53ce9a;
+    --secondary: #1e2145;
+    --white: #fff;
+    --grey: #e6e6ff;
+    --grey-dark: #6d7098;
+    --red: #ff6b6b;
+  }
 
+  *,
+  *:after,
+  *:before {
+    box-sizing: border-box;
+  }
+  @media (min-width: 1100px) {
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100vh;
+      box-sizing: border-box;
+      margin: 0px;
+      background-image: url(https://res.cloudinary.com/love1/image/upload/v1639597594/Prismatic-Hearts-World-Map-4_ge7z9u.svg);
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+  }
 
-	:root {
-  --primary-light: #a6f9d6;
-  --primary: #5be2a9;
-  --primary-dark: #53ce9a;
-  --secondary: #1e2145;
-  --white: #fff;
-  --grey: #e6e6ff;
-  --grey-dark: #6d7098;
-  --red: #ff6b6b;
-}
-
-*, *:after, *:before {
-	box-sizing: border-box;
-}
-@media (min-width: 1100px) {
-  
-.main {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		width: 100%;
-    height: 100vh;
-		box-sizing: border-box;
-      margin:0px ;
-     background-image: url(https://res.cloudinary.com/love1/image/upload/v1639597594/Prismatic-Hearts-World-Map-4_ge7z9u.svg);
-background-position: center; 
-  background-repeat: no-repeat; 
-  background-size: cover;
-	} 
-}
-
-@media (max-width: 1099px) {
-.main {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-	
-	} 
-}
-@media (max-width: 720px) {
-.main {
-		flex: 1;
-		display: flex;
- width: 100vw;	
- padding: 0;
-	} 
-}
+  @media (max-width: 1099px) {
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+  @media (max-width: 720px) {
+    .main {
+      flex: 1;
+      display: flex;
+      width: 100vw;
+      padding: 0;
+    }
+  }
 </style>

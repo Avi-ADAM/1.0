@@ -19,11 +19,11 @@
   });
 
   /** @type {{ idx?: number, mode?: "registration" | "onboarding" }} */
-  let { idx = 1, mode = "registration" } = $props();
+  let { idx = 1, mode = 'registration' } = $props();
 
   $effect(() => {
-    if (mode === "onboarding" && show_value === 5) {
-      goto("/me");
+    if (mode === 'onboarding' && show_value === 5) {
+      goto('/me');
     }
   });
 
@@ -36,9 +36,11 @@
 
   // 0→1 progress fraction over steps 1–5
   let progress = $derived(
-    mode === "onboarding"
+    mode === 'onboarding'
       ? Math.min((show_value - 1) / 3, 1) // Steps 1-4 for onboarding
-      : show_value === 5 ? 1 : 0 // Step 5 for registration
+      : show_value >= 1
+        ? Math.min((show_value - 1) / 4, 1)
+        : 0 // Step 5 for registration
   );
 
   // Tab definitions — can only navigate backward
@@ -51,9 +53,7 @@
   ];
 
   const tabDefs = $derived(
-    mode === "onboarding"
-      ? allTabs.slice(0, 4)
-      : allTabs.slice(4)
+    mode === 'onboarding' ? allTabs.slice(0, 4) : allTabs
   );
 
   function goToTab(step) {
@@ -103,7 +103,7 @@
        JOURNEY STRIP  — brain ← key traveling ←
        Visible only during steps 1–5
   ═══════════════════════════════════════════ -->
-  {#if (mode === "onboarding" && show_value >= 1 && show_value <= 4) || (mode === "registration" && show_value === 5)}
+  {#if (mode === 'onboarding' && show_value >= 1 && show_value <= 4) || (mode === 'registration' && show_value >= 1 && show_value <= 5)}
     <div
       class="journey-strip"
       dir={$lang === 'en' ? 'ltr' : 'rtl'}
@@ -119,7 +119,7 @@
       <div class="j-rail-col">
         <!-- Step dots -->
         <div class="j-dots">
-          {#each (mode === "onboarding" ? [1, 2, 3, 4] : [5]) as s}
+          {#each mode === 'onboarding' ? [1, 2, 3, 4] : [1, 2, 3, 4, 5] as s}
             <div
               class="j-dot"
               class:j-dot-done={show_value > s}
@@ -159,12 +159,14 @@
 
         <!-- Label -->
         <div class="j-step-label">
-          {#if mode === "onboarding"}
+          {#if mode === 'onboarding'}
             {$lang === 'en'
               ? `Step ${show_value} of 4`
               : `שלב ${show_value} מתוך 4`}
           {:else}
-             {$lang === 'en' ? 'Final Step' : 'שלב אחרון'}
+            {$lang === 'en'
+              ? `Step ${show_value} of 5`
+              : `שלב ${show_value} מתוך 5`}
           {/if}
         </div>
       </div>
@@ -224,16 +226,16 @@
     <!-- Shimmer edge -->
     <div class="card-shim"></div>
 
-    {#if mode === "onboarding" && show_value >= 1 && show_value <= 4}
+    {#if mode === 'onboarding' && show_value >= 1 && show_value <= 4}
       <div class="skip-container">
-         <a href="/me" class="skip-link">
-            {$lang === 'en' ? 'Skip to profile' : 'עבור לפרופיל'}
-         </a>
+        <a href="/me" class="skip-link">
+          {$lang === 'en' ? 'Skip to profile' : 'עבור לפרופיל'}
+        </a>
       </div>
     {/if}
 
     <!-- TABS — visible steps 1–5, can navigate backward -->
-    {#if (mode === "onboarding" && show_value >= 1 && show_value <= 4) || (mode === "registration" && show_value === 5)}
+    {#if (mode === 'onboarding' && show_value >= 1 && show_value <= 4) || (mode === 'registration' && show_value >= 1 && show_value <= 5)}
       <nav
         class="tabs-bar"
         dir={$lang === 'en' ? 'ltr' : 'rtl'}
