@@ -13,7 +13,8 @@
   import { skillsNew } from '../../stores/skillsNew.js';
   import MultiSelect from 'svelte-multiselect';
   import SkillSelector from '../ui/SkillSelector.svelte';
-  import { skil } from '$lib/components/prPr/mi.js';
+  import ValueSelector from '../ui/ValueSelector.svelte';
+  import { skil, valluesStore } from '$lib/components/prPr/mi.js';
   import Addneww from '../addnew/addnewWorkway.svelte';
   import Addnewv from '../addnew/addnewval.svelte';
   import Addnewr from '../addnew/addNewRole.svelte';
@@ -192,10 +193,12 @@ console.log("skillslist",skillslist);
   });
   function find_id(arra) {
     var arr = [];
-    const baseSource = datan === 'skil' ? $skil : meData;
+    const baseSource =
+      datan === 'skil' ? $skil : datan === 'val' ? $valluesStore : meData;
     // Combine with current data to ensure we don't lose items already in sync
     const sourceData = [...baseSource, ...data];
-    const nameField = datan === 'skil' ? 'skillName' : valc;
+    const nameField =
+      datan === 'skil' ? 'skillName' : datan === 'val' ? 'valueName' : valc;
 
     for (let j = 0; j < arra.length; j++) {
       const searchName = arra[j];
@@ -206,9 +209,9 @@ console.log("skillslist",skillslist);
         let name = sourceData[i].attributes[nameField];
         let heName = name;
 
-        // Check localizations if available (for skills)
+        // Check localizations if available (for skills and values)
         if (
-          datan === 'skil' &&
+          (datan === 'skil' || datan === 'val') &&
           sourceData[i].attributes.localizations?.data?.length > 0
         ) {
           heName =
@@ -651,8 +654,39 @@ console.log("skillslist",skillslist);
         data.selected2 = data.map(
           (d) => d.attributes[valc] || d.attributes.skillName
         );
+      } else if (datan === 'val' && data.length > 0) {
+        data.selected2 = data.map(
+          (d) => d.attributes[valc] || d.attributes.valueName
+        );
       } else if (data.selected2 === undefined) {
         data.selected2 = [];
+      }
+    }
+  });
+
+  $effect(() => {
+    if (datan === 'val' && data.selected2 && $valluesStore) {
+      const labels = data.selected2;
+      const ids = find_id(labels);
+
+      if (ids.length < labels.length) return;
+
+      const existingIds = data.map((d) => String(d.id)).sort();
+      const targetIds = [...new Set(ids.map((id) => String(id)))].sort();
+
+      if (JSON.stringify(existingIds) !== JSON.stringify(targetIds)) {
+        const deduplicatedSource = Array.from(
+          new Map(
+            [...$valluesStore, ...data].map((item) => [String(item.id), item])
+          ).values()
+        );
+        const objects = filterByReference(deduplicatedSource, ids);
+        onAdd?.({
+          data: objects,
+          linkp: kish,
+          valc: valc,
+          a: datan
+        });
       }
     }
   });
@@ -878,7 +912,7 @@ console.log("skillslist",skillslist);
         {/if}
       {/if}
       <br />
-      {#if datan != 'skil'}
+      {#if datan != 'skil' && datan != 'val'}
         <div>
           <h3 class="text-center text-sm text-barbi">
             {adbf[$lang]}{Valname}{adaf[$lang]}
@@ -913,12 +947,22 @@ console.log("skillslist",skillslist);
           {placeholder}
           autoCreate={true}
         />
+      {:else if datan == 'val'}
+        <ValueSelector
+          bind:selectedValues={data.selected2}
+          onadd={() => {
+            yy = 1;
+          }}
+          onremove={() => {
+            yy = 2;
+          }}
+          {placeholder}
+          autoCreate={true}
+        />
       {:else if datan == 'taf'}
         <Addnewr rn={allvn} onAddnewrole={addnew} bind:addR />
       {:else if datan == 'mash'}
         <Addnewn rr={13} onNewn={addnewM} bind:addW />
-      {:else if datan == 'val'}
-        <Addnewv rn={allvn} onAddnew={addnew} />
       {:else if datan == 'work'}
         <Addneww rn={allvn} onAddww={addnew} bind:addW />
       {/if}
