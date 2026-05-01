@@ -13,6 +13,7 @@
   import { skillsNew } from '../../stores/skillsNew.js';
   import MultiSelect from 'svelte-multiselect';
   import SkillSelector from '../ui/SkillSelector.svelte';
+  import RoleSelector from '../ui/RoleSelector.svelte';
   import { skil } from '$lib/components/prPr/mi.js';
   import Addneww from '../addnew/addnewWorkway.svelte';
   import Addnewv from '../addnew/addnewval.svelte';
@@ -680,7 +681,9 @@ console.log("skillslist",skillslist);
       if (JSON.stringify(existingIds) !== JSON.stringify(targetIds)) {
         // Deduplicate source data to prevent duplicate keys in the UI
         const deduplicatedSource = Array.from(
-          new Map([...$skil, ...data].map((item) => [String(item.id), item])).values()
+          new Map(
+            [...$skil, ...data].map((item) => [String(item.id), item])
+          ).values()
         );
         const objects = filterByReference(deduplicatedSource, ids);
         onAdd?.({
@@ -838,7 +841,7 @@ console.log("skillslist",skillslist);
                     >
                   {/if}
                 </Tile>
-              {:else if datan !== 'skil'}
+              {:else if datan !== 'skil' && datan !== 'taf'}
                 <div
                   class="text-center text-sm text-lturk md:text-xl"
                   title={less[$lang]}
@@ -876,7 +879,7 @@ console.log("skillslist",skillslist);
         {/if}
       {/if}
       <br />
-      {#if datan != 'skil'}
+      {#if datan != 'skil' && datan != 'taf'}
         <div>
           <h3 class="text-center text-sm text-barbi">
             {adbf[$lang]}{Valname}{adaf[$lang]}
@@ -912,7 +915,17 @@ console.log("skillslist",skillslist);
           autoCreate={true}
         />
       {:else if datan == 'taf'}
-        <Addnewr rn={allvn} onAddnewrole={addnew} bind:addR />
+        <RoleSelector
+          bind:selectedRoles={data.selected2}
+          onadd={() => {
+            yy = 1;
+          }}
+          onremove={() => {
+            yy = 2;
+          }}
+          {placeholder}
+          autoCreate={true}
+        />
       {:else if datan == 'mash'}
         <Addnewn rr={13} onNewn={addnewM} bind:addW />
       {:else if datan == 'val'}
