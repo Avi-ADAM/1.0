@@ -719,7 +719,7 @@ console.log("skillslist",skillslist);
   </div>
 {:else if addSl == false}
   <div
-    class="another button-perl"
+    class="another"
     style="margin: auto"
     in:fly={{ x: anim, duration: 1500 }}
     out:fly={{ x: anim - width / 5, y: -100, duration: 1500, opacity: 0.5 }}
@@ -732,7 +732,7 @@ console.log("skillslist",skillslist);
     </h2>
     {#if data.length > 0}
       <div
-        class="  flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 mb-1"
+        class="flex sm:flex-row flex-wrap justify-center align-middle inner-scroll d cd p-2 mb-1"
       >
         {#each data as dat, i}
           <p class="m-0" style="text-shadow:none; white-space:none;">
@@ -997,10 +997,7 @@ console.log("skillslist",skillslist);
     .t {
       font-size: 13px;
     }
-    .d {
-      max-height: 15vh;
-      overflow-y: scroll;
-    }
+
     .another {
       max-height: 20vh;
       min-height: 20vh;
@@ -1017,32 +1014,42 @@ console.log("skillslist",skillslist);
     }
   }
   .another {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+  }
+
+  :global(.dark) .another {
+    background: rgba(15, 23, 42, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .another {
     text-shadow: 1px 1px aqua;
-    padding: 1em;
-    /* background: -webkit-linear-gradient(top, #8f6B29, #FDE08D, #DF9F28);
-	background-image: linear-gradient(top, #8f6B29, #FDE08D, #DF9F28);
-
-     background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438850/to_ha8xmq.svg);
-     background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-           filter: drop-shadow(0 25px 25px rgba(1, 61, 61, 0.15));
-
-    */
+    padding: 0.6em;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     text-align: center;
-    max-height: 25vh;
-    min-height: 25vh;
+    max-height: 28vh;
     max-width: 37vw;
     min-width: 27vw;
     color: #9900cd;
+    overflow: visible;
   }
-  .d {
+
+  .inner-scroll {
     max-height: 20vh;
-    overflow-y: scroll;
+    width: 100%;
+    overflow-y: auto;
+  }
+  .th {
+    margin-top: 0.2em;
+    margin-bottom: 0.2em;
+    line-height: 1.1;
   }
   @media (min-width: 528px) {
     .another {
