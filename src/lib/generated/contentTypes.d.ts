@@ -982,11 +982,6 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::vote.vote'
     >;
-    pgishauser: Attribute.Relation<
-      'plugin::users-permissions.user',
-      'oneToOne',
-      'api::pgishauser.pgishauser'
-    >;
     pgishauserpends: Attribute.Relation<
       'plugin::users-permissions.user',
       'oneToMany',
@@ -1039,6 +1034,59 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'plugin::users-permissions.user',
       'manyToMany',
       'api::deal.deal'
+    >;
+    sheirutpends: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::sheirutpend.sheirutpend'
+    >;
+    sheirutnegos: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::sheirutnego.sheirutnego'
+    >;
+    pgishas: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::pgisha.pgisha'
+    >;
+    pgishausers: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::pgishauser.pgishauser'
+    >;
+    pgishasPendStrat: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::pgisha.pgisha'
+    >;
+    iGotMOneyForSheirut: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'manyToMany',
+      'api::sheirut.sheirut'
+    >;
+    forum_last_seens: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::forum-last-seen.forum-last-seen'
+    >;
+    lat: Attribute.Decimal;
+    lng: Attribute.Decimal;
+    radius: Attribute.BigInteger;
+    api_keys: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::api-key.api-key'
+    >;
+    sheiruts_iCanGetMonay: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'manyToMany',
+      'api::sheirut.sheirut'
+    >;
+    sheiruts: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'manyToMany',
+      'api::sheirut.sheirut'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -1214,6 +1262,11 @@ export interface ApiActAct extends Schema.CollectionType {
       'manyToMany',
       'api::negopendmission.negopendmission'
     >;
+    partofs: Attribute.Relation<
+      'api::act.act',
+      'manyToMany',
+      'api::partof.partof'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1261,6 +1314,42 @@ export interface ApiActtActt extends Schema.CollectionType {
   };
 }
 
+export interface ApiApiKeyApiKey extends Schema.CollectionType {
+  collectionName: 'api_keys';
+  info: {
+    singularName: 'api-key';
+    pluralName: 'api-keys';
+    displayName: 'api_key';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    name: Attribute.String;
+    key_hash: Attribute.String;
+    key_prefix: Attribute.String;
+    users_permissions_user: Attribute.Relation<
+      'api::api-key.api-key',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::api-key.api-key',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::api-key.api-key',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiAskAsk extends Schema.CollectionType {
   collectionName: 'asks';
   info: {
@@ -1303,6 +1392,11 @@ export interface ApiAskAsk extends Schema.CollectionType {
       'api::ask.ask',
       'manyToMany',
       'api::forum.forum'
+    >;
+    partofs: Attribute.Relation<
+      'api::ask.ask',
+      'manyToMany',
+      'api::partof.partof'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -1355,6 +1449,11 @@ export interface ApiAskmAskm extends Schema.CollectionType {
       'api::timegrama.timegrama'
     >;
     chat: Attribute.Component<'projects.vots', true>;
+    partofs: Attribute.Relation<
+      'api::askm.askm',
+      'manyToMany',
+      'api::partof.partof'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1492,6 +1591,11 @@ export interface ApiCategoryCategory extends Schema.CollectionType {
       'manyToMany',
       'api::sheirut.sheirut'
     >;
+    ratsons: Attribute.Relation<
+      'api::category.category',
+      'manyToMany',
+      'api::ratson.ratson'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1526,8 +1630,6 @@ export interface ApiChezinChezin extends Schema.CollectionType {
     description: '';
   };
   options: {
-    increments: true;
-    timestamps: true;
     draftAndPublish: true;
   };
   pluginOptions: {
@@ -1591,6 +1693,13 @@ export interface ApiChezinChezin extends Schema.CollectionType {
       'oneToOne',
       'plugin::users-permissions.user'
     >;
+    fullAgreement: Attribute.Boolean &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Attribute.DefaultTo<false>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -2093,6 +2202,11 @@ export interface ApiFiniapruvalFiniapruval extends Schema.CollectionType {
       'manyToOne',
       'api::finnished-mission.finnished-mission'
     >;
+    partofs: Attribute.Relation<
+      'api::finiapruval.finiapruval',
+      'manyToMany',
+      'api::partof.partof'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -2248,6 +2362,12 @@ export interface ApiFinnishedMissionFinnishedMission
           localized: true;
         };
       }>;
+    isglobal: Attribute.Boolean &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -2319,6 +2439,26 @@ export interface ApiForumForum extends Schema.CollectionType {
       'oneToOne',
       'api::haluka.haluka'
     >;
+    sheirutpend: Attribute.Relation<
+      'api::forum.forum',
+      'oneToOne',
+      'api::sheirutpend.sheirutpend'
+    >;
+    sheiruts: Attribute.Relation<
+      'api::forum.forum',
+      'manyToMany',
+      'api::sheirut.sheirut'
+    >;
+    forum_last_seens: Attribute.Relation<
+      'api::forum.forum',
+      'oneToMany',
+      'api::forum-last-seen.forum-last-seen'
+    >;
+    partofs: Attribute.Relation<
+      'api::forum.forum',
+      'manyToMany',
+      'api::partof.partof'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -2330,6 +2470,46 @@ export interface ApiForumForum extends Schema.CollectionType {
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'api::forum.forum',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiForumLastSeenForumLastSeen extends Schema.CollectionType {
+  collectionName: 'forum_last_seens';
+  info: {
+    singularName: 'forum-last-seen';
+    pluralName: 'forum-last-seens';
+    displayName: 'forum-last-seen';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    archived: Attribute.Boolean;
+    lastReadAt: Attribute.DateTime;
+    forum: Attribute.Relation<
+      'api::forum-last-seen.forum-last-seen',
+      'manyToOne',
+      'api::forum.forum'
+    >;
+    users_permissions_user: Attribute.Relation<
+      'api::forum-last-seen.forum-last-seen',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::forum-last-seen.forum-last-seen',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::forum-last-seen.forum-last-seen',
       'oneToOne',
       'admin::user'
     > &
@@ -3103,6 +3283,34 @@ export interface ApiMatanotMatanot extends Schema.CollectionType {
           localized: false;
         };
       }>;
+    sheirutpends: Attribute.Relation<
+      'api::matanot.matanot',
+      'manyToMany',
+      'api::sheirutpend.sheirutpend'
+    >;
+    lng: Attribute.Decimal &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    lat: Attribute.Decimal &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    radius: Attribute.BigInteger &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    ratsons: Attribute.Relation<
+      'api::matanot.matanot',
+      'manyToMany',
+      'api::ratson.ratson'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -3308,6 +3516,12 @@ export interface ApiMesimabetahalichMesimabetahalich
       'api::mesimabetahalich.mesimabetahalich',
       'oneToMany',
       'api::decision.decision'
+    >;
+    isglobal: Attribute.Boolean & Attribute.DefaultTo<false>;
+    open_missions: Attribute.Relation<
+      'api::mesimabetahalich.mesimabetahalich',
+      'manyToMany',
+      'api::open-mission.open-mission'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -3740,6 +3954,7 @@ export interface ApiNegopendmissionNegopendmission
       'manyToOne',
       'api::open-mission.open-mission'
     >;
+    total: Attribute.Decimal;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -4214,6 +4429,18 @@ export interface ApiOpenMissionOpenMission extends Schema.CollectionType {
       'oneToMany',
       'api::negopendmission.negopendmission'
     >;
+    isglobal: Attribute.Boolean &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }> &
+      Attribute.DefaultTo<false>;
+    mesimabetahaliches: Attribute.Relation<
+      'api::open-mission.open-mission',
+      'manyToMany',
+      'api::mesimabetahalich.mesimabetahalich'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -4275,6 +4502,41 @@ export interface ApiPartofPartof extends Schema.CollectionType {
       'api::partof.partof',
       'manyToMany',
       'api::matanot.matanot'
+    >;
+    acts: Attribute.Relation<
+      'api::partof.partof',
+      'manyToMany',
+      'api::act.act'
+    >;
+    asks: Attribute.Relation<
+      'api::partof.partof',
+      'manyToMany',
+      'api::ask.ask'
+    >;
+    finiapruvals: Attribute.Relation<
+      'api::partof.partof',
+      'manyToMany',
+      'api::finiapruval.finiapruval'
+    >;
+    askms: Attribute.Relation<
+      'api::partof.partof',
+      'manyToMany',
+      'api::askm.askm'
+    >;
+    forums: Attribute.Relation<
+      'api::partof.partof',
+      'manyToMany',
+      'api::forum.forum'
+    >;
+    pmashes: Attribute.Relation<
+      'api::partof.partof',
+      'manyToMany',
+      'api::pmash.pmash'
+    >;
+    pendms: Attribute.Relation<
+      'api::partof.partof',
+      'manyToMany',
+      'api::pendm.pendm'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -4381,6 +4643,12 @@ export interface ApiPendmPendm extends Schema.CollectionType {
     users: Attribute.Component<'projects.pendmnego', true>;
     howMeny: Attribute.BigInteger;
     acts: Attribute.Relation<'api::pendm.pendm', 'oneToMany', 'api::act.act'>;
+    isglobal: Attribute.Boolean & Attribute.DefaultTo<false>;
+    partofs: Attribute.Relation<
+      'api::pendm.pendm',
+      'manyToMany',
+      'api::partof.partof'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -4471,6 +4739,46 @@ export interface ApiPgishaPgisha extends Schema.CollectionType {
           localized: true;
         };
       }>;
+    videoLink: Attribute.String &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    meetingStartedAt: Attribute.DateTime &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    isLive: Attribute.Boolean &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    startedBy: Attribute.Relation<
+      'api::pgisha.pgisha',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    pendingStart: Attribute.Boolean &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    startRequestedAt: Attribute.DateTime &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    startRequestedBy: Attribute.Relation<
+      'api::pgisha.pgisha',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -4501,6 +4809,7 @@ export interface ApiPgishauserPgishauser extends Schema.CollectionType {
     singularName: 'pgishauser';
     pluralName: 'pgishausers';
     displayName: 'pgishauser';
+    description: '';
   };
   options: {
     draftAndPublish: true;
@@ -4515,9 +4824,10 @@ export interface ApiPgishauserPgishauser extends Schema.CollectionType {
     >;
     users_permissions_user: Attribute.Relation<
       'api::pgishauser.pgishauser',
-      'oneToOne',
+      'manyToOne',
       'plugin::users-permissions.user'
     >;
+    readyForStart: Attribute.Boolean;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -4636,6 +4946,11 @@ export interface ApiPmashPmash extends Schema.CollectionType {
       'oneToMany',
       'api::nego-mash.nego-mash'
     >;
+    partofs: Attribute.Relation<
+      'api::pmash.pmash',
+      'manyToMany',
+      'api::partof.partof'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -4660,6 +4975,7 @@ export interface ApiPositionPosition extends Schema.CollectionType {
     singularName: 'position';
     pluralName: 'positions';
     displayName: 'Position';
+    description: '';
   };
   options: {
     draftAndPublish: true;
@@ -4692,6 +5008,7 @@ export interface ApiPositionPosition extends Schema.CollectionType {
       'manyToMany',
       'api::filtertag.filtertag'
     >;
+    aiMeta: Attribute.Text;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -5148,6 +5465,48 @@ export interface ApiProjectProject extends Schema.CollectionType {
   };
 }
 
+export interface ApiProviderProfileProviderProfile
+  extends Schema.CollectionType {
+  collectionName: 'provider_profiles';
+  info: {
+    singularName: 'provider-profile';
+    pluralName: 'provider-profiles';
+    displayName: 'provider_profile';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    owner_id: Attribute.String;
+    owner_type: Attribute.Enumeration<['user', 'project']>;
+    display_name: Attribute.Text;
+    bio_raw: Attribute.Text;
+    lat: Attribute.Decimal;
+    lng: Attribute.Decimal;
+    radius_km: Attribute.Integer;
+    archived: Attribute.Boolean;
+    ai_meta: Attribute.JSON;
+    pinecone_id: Attribute.String;
+    avg_rating: Attribute.Decimal;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::provider-profile.provider-profile',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::provider-profile.provider-profile',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiRatsonRatson extends Schema.CollectionType {
   collectionName: 'ratsons';
   info: {
@@ -5255,6 +5614,90 @@ export interface ApiRatsonRatson extends Schema.CollectionType {
         };
       }>;
     link: Attribute.String &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    matanots: Attribute.Relation<
+      'api::ratson.ratson',
+      'manyToMany',
+      'api::matanot.matanot'
+    >;
+    ai_meta: Attribute.JSON &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    lat: Attribute.Decimal &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    lng: Attribute.Decimal &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    radius: Attribute.BigInteger &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    location_hint: Attribute.Text &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    frequency: Attribute.Text &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    language: Attribute.String &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    age_group: Attribute.String &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    categories: Attribute.Relation<
+      'api::ratson.ratson',
+      'manyToMany',
+      'api::category.category'
+    >;
+    sub_category: Attribute.String &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    access_mode: Attribute.Enumeration<
+      ['personal', 'free_threshold', 'pay_to_access']
+    > &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    pinecone_id: Attribute.String &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    isOnline: Attribute.Boolean &
       Attribute.SetPluginOptions<{
         i18n: {
           localized: true;
@@ -5457,6 +5900,11 @@ export interface ApiSaleSale extends Schema.CollectionType {
       'api::tosplit.tosplit'
     >;
     pending: Attribute.Boolean;
+    sheiruts: Attribute.Relation<
+      'api::sale.sale',
+      'manyToMany',
+      'api::sheirut.sheirut'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -5601,6 +6049,100 @@ export interface ApiSheirutSheirut extends Schema.CollectionType {
       'manyToOne',
       'api::matanot.matanot'
     >;
+    forums: Attribute.Relation<
+      'api::sheirut.sheirut',
+      'manyToMany',
+      'api::forum.forum'
+    >;
+    users_permissions_users: Attribute.Relation<
+      'api::sheirut.sheirut',
+      'manyToMany',
+      'plugin::users-permissions.user'
+    >;
+    price: Attribute.Decimal &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    quant: Attribute.Decimal &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    startDate: Attribute.DateTime &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    finnishDate: Attribute.DateTime &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    total: Attribute.Decimal &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    weFinnish: Attribute.Relation<
+      'api::sheirut.sheirut',
+      'oneToMany',
+      'api::vote.vote'
+    >;
+    iGotIt: Attribute.Boolean &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }> &
+      Attribute.DefaultTo<false>;
+    iCanGetMonay: Attribute.Relation<
+      'api::sheirut.sheirut',
+      'manyToMany',
+      'plugin::users-permissions.user'
+    >;
+    iTransferMoney: Attribute.Boolean &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }> &
+      Attribute.DefaultTo<false>;
+    iTransferedTo: Attribute.Relation<
+      'api::sheirut.sheirut',
+      'manyToMany',
+      'plugin::users-permissions.user'
+    >;
+    iGotMoney: Attribute.Component<'projects.i-got-money', true> &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    moneyTransfered: Attribute.Boolean &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }> &
+      Attribute.DefaultTo<false>;
+    productExepted: Attribute.Boolean &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }> &
+      Attribute.DefaultTo<false>;
+    sales: Attribute.Relation<
+      'api::sheirut.sheirut',
+      'manyToMany',
+      'api::sale.sale'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -5621,6 +6163,52 @@ export interface ApiSheirutSheirut extends Schema.CollectionType {
       'api::sheirut.sheirut'
     >;
     locale: Attribute.String;
+  };
+}
+
+export interface ApiSheirutnegoSheirutnego extends Schema.CollectionType {
+  collectionName: 'sheirutnegos';
+  info: {
+    singularName: 'sheirutnego';
+    pluralName: 'sheirutnegos';
+    displayName: 'sheirutnego';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    sheirutpend: Attribute.Relation<
+      'api::sheirutnego.sheirutnego',
+      'manyToOne',
+      'api::sheirutpend.sheirutpend'
+    >;
+    price: Attribute.Decimal;
+    quant: Attribute.Decimal;
+    startDate: Attribute.DateTime;
+    finnishDate: Attribute.DateTime;
+    isOriginal: Attribute.Boolean;
+    users_permissions_user: Attribute.Relation<
+      'api::sheirutnego.sheirutnego',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    vots: Attribute.Component<'projects.vots', true>;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::sheirutnego.sheirutnego',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::sheirutnego.sheirutnego',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
   };
 }
 
@@ -5646,12 +6234,6 @@ export interface ApiSheirutpendSheirutpend extends Schema.CollectionType {
       'oneToOne',
       'api::sheirut.sheirut'
     >;
-    chat: Attribute.Component<'projects.chatre', true> &
-      Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }>;
     project: Attribute.Relation<
       'api::sheirutpend.sheirutpend',
       'manyToOne',
@@ -5674,6 +6256,67 @@ export interface ApiSheirutpendSheirutpend extends Schema.CollectionType {
       'api::sheirutpend.sheirutpend',
       'oneToOne',
       'api::timegrama.timegrama'
+    >;
+    matanots: Attribute.Relation<
+      'api::sheirutpend.sheirutpend',
+      'manyToMany',
+      'api::matanot.matanot'
+    >;
+    forum: Attribute.Relation<
+      'api::sheirutpend.sheirutpend',
+      'oneToOne',
+      'api::forum.forum'
+    >;
+    users_permissions_user: Attribute.Relation<
+      'api::sheirutpend.sheirutpend',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    price: Attribute.Decimal &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    quant: Attribute.Decimal &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    startDate: Attribute.DateTime &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    finnishDate: Attribute.DateTime &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    appruved: Attribute.Boolean &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    sheirutnegos: Attribute.Relation<
+      'api::sheirutpend.sheirutpend',
+      'oneToMany',
+      'api::sheirutnego.sheirutnego'
+    >;
+    total: Attribute.Decimal &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
+    votes: Attribute.Relation<
+      'api::sheirutpend.sheirutpend',
+      'oneToMany',
+      'api::vote.vote'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -6698,6 +7341,7 @@ export interface ApiVoteVote extends Schema.CollectionType {
     singularName: 'vote';
     pluralName: 'votes';
     displayName: 'vote';
+    description: '';
   };
   options: {
     draftAndPublish: false;
@@ -6725,6 +7369,19 @@ export interface ApiVoteVote extends Schema.CollectionType {
       'api::vote.vote',
       'manyToOne',
       'api::timer.timer'
+    >;
+    why: Attribute.Text;
+    order: Attribute.Integer;
+    sheirutpend: Attribute.Relation<
+      'api::vote.vote',
+      'manyToOne',
+      'api::sheirutpend.sheirutpend'
+    >;
+    what: Attribute.Boolean;
+    sheirut: Attribute.Relation<
+      'api::vote.vote',
+      'manyToOne',
+      'api::sheirut.sheirut'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -7101,6 +7758,7 @@ declare module '@strapi/types' {
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
       'api::act.act': ApiActAct;
       'api::actt.actt': ApiActtActt;
+      'api::api-key.api-key': ApiApiKeyApiKey;
       'api::ask.ask': ApiAskAsk;
       'api::askm.askm': ApiAskmAskm;
       'api::askwant.askwant': ApiAskwantAskwant;
@@ -7117,6 +7775,7 @@ declare module '@strapi/types' {
       'api::finiapruval.finiapruval': ApiFiniapruvalFiniapruval;
       'api::finnished-mission.finnished-mission': ApiFinnishedMissionFinnishedMission;
       'api::forum.forum': ApiForumForum;
+      'api::forum-last-seen.forum-last-seen': ApiForumLastSeenForumLastSeen;
       'api::haamada.haamada': ApiHaamadaHaamada;
       'api::haamadapruv.haamadapruv': ApiHaamadapruvHaamadapruv;
       'api::haluka.haluka': ApiHalukaHaluka;
@@ -7147,12 +7806,14 @@ declare module '@strapi/types' {
       'api::pmash.pmash': ApiPmashPmash;
       'api::position.position': ApiPositionPosition;
       'api::project.project': ApiProjectProject;
+      'api::provider-profile.provider-profile': ApiProviderProfileProviderProfile;
       'api::ratson.ratson': ApiRatsonRatson;
       'api::richtext.richtext': ApiRichtextRichtext;
       'api::rikmash.rikmash': ApiRikmashRikmash;
       'api::sale.sale': ApiSaleSale;
       'api::seeder.seeder': ApiSeederSeeder;
       'api::sheirut.sheirut': ApiSheirutSheirut;
+      'api::sheirutnego.sheirutnego': ApiSheirutnegoSheirutnego;
       'api::sheirutpend.sheirutpend': ApiSheirutpendSheirutpend;
       'api::sidur.sidur': ApiSidurSidur;
       'api::skill.skill': ApiSkillSkill;

@@ -8,7 +8,7 @@
  * @param {Object} params - Parameters for creating the mission
  * @param {string} params.projectId - Project ID
  * @param {string} params.missId - Mission ID
- * @param {string} params.openMid - Open mission ID
+ * @param {string} params.openMid - Open mission ID (sets `open_missions` relation on the created mesimabetahalich for chain reconstruction)
  * @param {string} params.askId - Ask ID (optional, for voting scenarios)
  * @param {string} params.userId - User ID who will perform the mission
  * @param {string} params.currentUserId - Current logged in user ID
@@ -27,6 +27,7 @@
  * @param {Array} params.projectUserIds - All project user IDs
  * @param {Array} params.userss - Current votes (optional, for voting scenarios)
  * @param {boolean} params.newnew - Whether user is new to project
+ * @param {string | null} params.processId - Process anchor ID (optional)
  * @param {Function} params.sendToSer - sendToSer function
  * @returns {Promise<Object>} The mutation result
  */
@@ -52,6 +53,7 @@ export async function createMesimabetahalich({
   projectUserIds = [],
   userss = [],
   newnew,
+  processId = null,
   sendToSer
 }) {
   const d = new Date();
@@ -74,6 +76,7 @@ export async function createMesimabetahalich({
       projectId,
       missId,
       userId,
+      openMid,
       openmissionName,
       missionDetails: missionDetails || '',
       nhours,
@@ -96,6 +99,39 @@ export async function createMesimabetahalich({
 
   if (!mesimabetahalikhResult?.data?.createMesimabetahalich) {
     throw new Error('Failed to create mesimabetahalich');
+  }
+
+  const createdMesimabetahalichId =
+    mesimabetahalikhResult.data.createMesimabetahalich.data.id;
+
+  let inheritedProcessIds = [];
+  if (processId) {
+    inheritedProcessIds = [String(processId)];
+  } else if (openMid) {
+    const partofResult = await sendToSer(
+      { id: openMid },
+      '97getOpenMissionPartofs',
+      null,
+      null,
+      false,
+      fetch
+    );
+    inheritedProcessIds =
+      partofResult?.data?.openMission?.data?.attributes?.partofs?.data?.map((entry) => String(entry.id)) || [];
+  }
+
+  if (inheritedProcessIds.length > 0) {
+    await sendToSer(
+      {
+        id: createdMesimabetahalichId,
+        partofIds: inheritedProcessIds
+      },
+      '95updateMesimabetahalichPartofs',
+      null,
+      null,
+      false,
+      fetch
+    );
   }
 
   // Step 2: Archive open mission

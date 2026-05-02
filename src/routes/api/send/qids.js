@@ -1198,6 +1198,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $projectId: ID!,
     $missId: ID!,
     $userId: ID!,
+    $openMid: ID,
     $openmissionName: String!,
     $missionDetails: String,
     $nhours: Float!,
@@ -1226,12 +1227,43 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       tafkidims: $tafkidims,
       publishedAt: $publishedAt,
       admaticedai: $deadline,
-      start: $sqedualed
+      start: $sqedualed,
+      open_missions: [$openMid]
     }) {
       data {
         id
         attributes {
           project { data { id } }
+        }
+      }
+    }
+  }`,
+
+  "getFinnishedMission": `query GetFinnishedMission($id: ID!) {
+    finnishedMission(id: $id) {
+      data {
+        id
+        attributes {
+          missionName
+          start
+          finish
+          why
+          total
+          noofhours
+          perhour
+          descrip
+          hearotMeyuchadot
+          createdAt
+          mesimabetahalich { data { id } }
+          users_permissions_user {
+            data {
+              id
+              attributes {
+                username
+                profilePic { data { attributes { url } } }
+              }
+            }
+          }
         }
       }
     }
@@ -3582,6 +3614,176 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
             }
           }
         }
+        sheiruts {
+          data {
+            id
+            attributes {
+              project {
+                data {
+                  id
+                  attributes {
+                    projectName
+                    user_1s {
+                      data {
+                        id
+                        attributes {
+                          username
+                          profilePic {
+                            data {
+                              attributes {
+                                url
+                                formats
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    profilePic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              name
+              descrip
+              equaliSplited
+              oneTime
+              archived
+              isApruved
+              price
+              quant
+              startDate
+              finnishDate
+              total
+              iGotIt
+              iTransferMoney
+              iGotMoney { iGotMoney users_permissions_user { data { id } } }
+              moneyTransfered
+              productExepted
+              weFinnish {
+                data {
+                  id
+                  attributes {
+                    what
+                    order
+                    why
+                    users_permissions_user {
+                      data {
+                        id
+                      }
+                    }
+                  }
+                }
+              }
+              iCanGetMonay {
+                data {
+                  id
+                  attributes {
+                    username
+                    profilePic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              iTransferedTo {
+                data {
+                  id
+                  attributes {
+                    username
+                    profilePic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              users_permissions_users {
+                data {
+                  id
+                  attributes {
+                    username
+                    profilePic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              matanot {
+                data {
+                  id
+                  attributes {
+                    name
+                    desc
+                    price
+                    quant
+                    kindOf
+                    pic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              forums {
+                data {
+                  id
+                  attributes {
+                    messages(pagination: { limit: 50 }) {
+                      data {
+                        id
+                        attributes {
+                          content
+                          createdAt
+                          users_permissions_user {
+                            data {
+                              id
+                              attributes {
+                                username
+                                profilePic {
+                                  data {
+                                    attributes {
+                                      url
+                                      formats
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -3771,5 +3973,508 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }
-}`
+}`,
+  '91createPartof': `mutation CreatePartof($default: Boolean) {
+    createPartof(data: { default: $default }) {
+      data {
+        id
+        attributes {
+          default
+        }
+      }
+    }
+  }`,
+  '92updateForumSubject': `mutation UpdateForumSubject($id: ID!, $subject: String!, $spec: ENUM_FORUM_SPEC, $done: Boolean) {
+    updateForum(
+      id: $id
+      data: {
+        subject: $subject
+        spec: $spec
+        done: $done
+      }
+    ) {
+      data {
+        id
+        attributes {
+          subject
+          spec
+          done
+        }
+      }
+    }
+  }`,
+  '93updateOpenMissionPartofs': `mutation UpdateOpenMissionPartofs($id: ID!, $partofIds: [ID]) {
+    updateOpenMission(id: $id, data: { partofs: $partofIds }) {
+      data {
+        id
+        attributes {
+          partofs { data { id } }
+        }
+      }
+    }
+  }`,
+  '94updateOpenMashaabimPartofs': `mutation UpdateOpenMashaabimPartofs($id: ID!, $partofIds: [ID]) {
+    updateOpenMashaabim(id: $id, data: { partofs: $partofIds }) {
+      data {
+        id
+        attributes {
+          partofs { data { id } }
+        }
+      }
+    }
+  }`,
+  '95updateMesimabetahalichPartofs': `mutation UpdateMesimabetahalichPartofs($id: ID!, $partofIds: [ID]) {
+    updateMesimabetahalich(id: $id, data: { partofs: $partofIds }) {
+      data {
+        id
+        attributes {
+          partofs { data { id } }
+        }
+      }
+    }
+  }`,
+  '96updateMaapPartofs': `mutation UpdateMaapPartofs($id: ID!, $partofIds: [ID]) {
+    updateMaap(id: $id, data: { partofs: $partofIds }) {
+      data {
+        id
+        attributes {
+          partofs { data { id } }
+        }
+      }
+    }
+  }`,
+  '97getOpenMissionPartofs': `query GetOpenMissionPartofs($id: ID!) {
+    openMission(id: $id) {
+      data {
+        id
+        attributes {
+          partofs {
+            data {
+              id
+            }
+          }
+        }
+      }
+    }
+  }`,
+  '98getAskForums': `query GetAskForums($id: ID!) {
+    ask(id: $id) {
+      data {
+        id
+        attributes {
+          forums {
+            data {
+              id
+            }
+          }
+        }
+      }
+    }
+  }`,
+  '99updateAskForums': `mutation UpdateAskForums($id: ID!, $forumIds: [ID]) {
+    updateAsk(id: $id, data: { forums: $forumIds }) {
+      data {
+        id
+        attributes {
+          forums { data { id } }
+        }
+      }
+    }
+  }`,
+  '100getMesimabetahalichForums': `query GetMesimabetahalichForums($id: ID!) {
+    mesimabetahalich(id: $id) {
+      data {
+        id
+        attributes {
+          forums {
+            data {
+              id
+            }
+          }
+        }
+      }
+    }
+  }`,
+  '101updateMesimabetahalichForums': `mutation UpdateMesimabetahalichForums($id: ID!, $forumIds: [ID]) {
+    updateMesimabetahalich(id: $id, data: { forums: $forumIds }) {
+      data {
+        id
+        attributes {
+          forums { data { id } }
+        }
+      }
+    }
+  }`,
+  '102projectProcessesQuery': `query ProjectProcessesQuery($projectId: ID!) {
+    project(id: $projectId) {
+      data {
+        id
+        attributes {
+          projectName
+          forums(sort: ["updatedAt:desc"]) {
+            data {
+              id
+              attributes {
+                subject
+                spec
+                done
+                updatedAt
+                messages(sort: ["when:asc"]) {
+                  data {
+                    id
+                    attributes {
+                      content
+                      when
+                      users_permissions_user {
+                        data {
+                          id
+                          attributes {
+                            username
+                            profilePic {
+                              data {
+                                attributes {
+                                  url
+                                  formats
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          pendms(filters: { archived: { ne: true } }) {
+            data {
+              id
+              attributes {
+                name
+                descrip
+                hearotMeyuchadot
+                createdAt
+                noofhours
+                perhour
+                users {
+                  what
+                  ide
+                  zman
+                  users_permissions_user {
+                    data {
+                      id
+                      attributes {
+                        username
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          pmashes(filters: { archived: { ne: true } }) {
+            data {
+              id
+              attributes {
+                name
+                descrip
+                spnot
+                createdAt
+                hm
+                price
+                easy
+                kindOf
+                users {
+                  what
+                  ide
+                  zman
+                  users_permissions_user {
+                    data {
+                      id
+                      attributes {
+                        username
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          open_missions(filters: { archived: { ne: true } }) {
+            data {
+              id
+              attributes {
+                name
+                descrip
+                hearotMeyuchadot
+                createdAt
+                noofhours
+                perhour
+                partofs { data { id } }
+                asks(filters: { archived: { ne: true } }) {
+                  data {
+                    id
+                    attributes {
+                      createdAt
+                      forums { data { id } }
+                      users_permissions_user {
+                        data {
+                          id
+                          attributes {
+                            username
+                          }
+                        }
+                      }
+                      vots {
+                        what
+                        users_permissions_user {
+                          data { id }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          open_mashaabims(filters: { archived: { ne: true } }) {
+            data {
+              id
+              attributes {
+                name
+                descrip
+                spnot
+                createdAt
+                price
+                easy
+                hm
+                kindOf
+                partofs { data { id } }
+                askms(filters: { archived: { ne: true } }) {
+                  data {
+                    id
+                    attributes {
+                      createdAt
+                      users_permissions_user {
+                        data {
+                          id
+                          attributes {
+                            username
+                          }
+                        }
+                      }
+                      vots {
+                        what
+                        users_permissions_user {
+                          data { id }
+                        }
+                      }
+                    }
+                  }
+                }
+                maap {
+                  data {
+                    id
+                    attributes {
+                      createdAt
+                      vots {
+                        what
+                        users_permissions_user {
+                          data { id }
+                        }
+                      }
+                    }
+                  }
+                }
+                rikmashes {
+                  data {
+                    id
+                    attributes {
+                      createdAt
+                      total
+                      name
+                    }
+                  }
+                }
+              }
+            }
+          }
+          mesimabetahaliches(filters: { finnished: { ne: true } }) {
+            data {
+              id
+              attributes {
+                name
+                descrip
+                createdAt
+                hoursassinged
+                howmanyhoursalready
+                perhour
+                partofs { data { id } }
+                forums { data { id } }
+                users_permissions_user {
+                  data {
+                    id
+                    attributes {
+                      username
+                    }
+                  }
+                }
+                finiapruvals {
+                  data {
+                    id
+                    attributes {
+                      createdAt
+                      missname
+                      noofhours
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+  '102getMesimabetahalichForFinish': `query GetMesimabetahalichForFinish($id: ID!) {
+    mesimabetahalich(id: $id) {
+      data {
+        id
+        attributes {
+          name
+          descrip
+          howmanyhoursalready
+          hoursassinged
+          perhour
+          project {
+            data {
+              id
+              attributes {
+                projectName
+                restime
+                profilePic {
+                  data {
+                    attributes {
+                      url
+                      formats
+                    }
+                  }
+                }
+                user_1s {
+                  data {
+                    id
+                  }
+                }
+              }
+            }
+          }
+          mission {
+            data {
+              id
+            }
+          }
+          users_permissions_user {
+            data {
+              id
+            }
+          }
+          activeTimer {
+            data {
+              id
+              attributes {
+                isActive
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+  '103createFinnishedMission': `mutation CreateFinnishedMission(
+    $missionName: String,
+    $why: String,
+    $what: ID,
+    $noofhours: Float,
+    $mesimabetahalich: ID,
+    $perhour: Float,
+    $total: Float,
+    $project: ID,
+    $descrip: String,
+    $users_permissions_user: ID,
+    $publishedAt: DateTime,
+    $mission: ID
+  ) {
+    createFinnishedMission(
+      data: {
+        missionName: $missionName,
+        why: $why,
+        what: $what,
+        noofhours: $noofhours,
+        mesimabetahalich: $mesimabetahalich,
+        perhour: $perhour,
+        total: $total,
+        project: $project,
+        descrip: $descrip,
+        users_permissions_user: $users_permissions_user,
+        publishedAt: $publishedAt,
+        mission: $mission
+      }
+    ) {
+      data {
+        id
+      }
+    }
+  }`,
+  '104createFiniapruval': `mutation CreateFiniapruval(
+    $missname: String,
+    $what: ID,
+    $why: String,
+    $noofhours: Float,
+    $mesimabetahalich: ID,
+    $project: ID,
+    $publishedAt: DateTime,
+    $users_permissions_user: ID,
+    $vots: [ComponentVotsVotInput]
+  ) {
+    createFiniapruval(
+      data: {
+        missname: $missname,
+        what: $what,
+        why: $why,
+        noofhours: $noofhours,
+        mesimabetahalich: $mesimabetahalich,
+        project: $project,
+        publishedAt: $publishedAt,
+        users_permissions_user: $users_permissions_user,
+        vots: $vots
+      }
+    ) {
+      data {
+        id
+      }
+    }
+  }`,
+  '105updateMesimabetahalichForFinish': `mutation UpdateMesimabetahalichForFinish(
+    $id: ID!,
+    $finnished: Boolean,
+    $forappruval: Boolean
+  ) {
+    updateMesimabetahalich(
+      id: $id,
+      data: {
+        finnished: $finnished,
+        forappruval: $forappruval
+      }
+    ) {
+      data {
+        id
+        attributes {
+          finnished
+          forappruval
+          howmanyhoursalready
+        }
+      }
+    }
+  }`
 };
