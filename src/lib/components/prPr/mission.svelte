@@ -41,9 +41,10 @@
   import ShiftsIcon from '$lib/celim/icons/shiftsIcon.svelte';
   import MobileModal from '$lib/celim/ui/mobileModal.svelte';
   import { page } from '$app/state';
+  import { attachEntityToProcess } from '$lib/client/actionClient';
   const baseUrl = import.meta.env.VITE_URL;
 
-  let { pu = [], vallues = [], onClose, newcontent = true, newcontentR = true, newcontentW = true, pn, pl, restime, id, userslength = 0, projectId, name = '' } = $props();
+  let { pu = [], vallues = [], onClose, newcontent = true, newcontentR = true, newcontentW = true, pn, pl, restime, id, userslength = 0, projectId, name = '', processContext = null } = $props();
   let token;
   let miData = $state([
     {
@@ -391,6 +392,24 @@
           console.log(miDatan);
           console.log(element.myM, userslength);
           if (miDatan.data != null) {
+            const createdEntityId =
+              linkop == 'createPendm'
+                ? miDatan?.data?.createPendm?.data?.id
+                : miDatan?.data?.createOpenMission?.data?.id;
+
+            if (processContext?.processId && createdEntityId) {
+              await attachEntityToProcess(
+                {
+                  processId: String(processContext.processId),
+                  projectId: String(projectId),
+                  entityType: linkop == 'createPendm' ? 'pendm' : 'openMission',
+                  entityId: String(createdEntityId),
+                  name: element.missionName
+                },
+                { showErrorToast: false }
+              );
+            }
+
             if (element.checklist) {
               for (let i = 0; i < element.checklist.length; i++) {
                 const momentx = moment(
@@ -595,6 +614,18 @@
           toast.warning(er[$lang]);
         } else {
           console.log(t);
+          if (processContext?.processId) {
+            await attachEntityToProcess(
+              {
+                processId: String(processContext.processId),
+                projectId: String(projectId),
+                entityType: 'mesimabetahalich',
+                entityId: String(t.data.createMesimabetahalich.data.id),
+                name: element.missionName
+              },
+              { showErrorToast: false }
+            );
+          }
           //get id add checklist
           if (element.checklist) {
             for (let i = 0; i < element.checklist.length; i++) {

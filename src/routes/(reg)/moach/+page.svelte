@@ -174,6 +174,9 @@
   let rikmashes = $state([]);
   let lll = $state();
   let opmash = $state([]);
+  let chainExtraOmiData = $state([]);
+  let chainExtraPmiData = $state([]);
+  let chainExtraLoading = $state(false);
   let actdata = [];
   let noofopenm = $state(0);
   let salee = $state([]);
@@ -270,12 +273,14 @@
             sheiruts{data{ id attributes{name descrip equaliSplited oneTime isApruved}}}
             sales {data{ id attributes{ in date pending splited tosplits{data{id}} note matanot {data{id attributes{ name }}} users_permissions_user {data{ id attributes{ username}}}}}}
             matanotofs {data{ id attributes{ name price quant kindOf startDate finnishDate }}}
-            finnished_missions {data{ id attributes{ missionName start finish mesimabetahalich {data{attributes{ createdAt}}} createdAt why total descrip hearotMeyuchadot noofhours perhour users_permissions_user {data{ id attributes{ username}}}}}}
+            finnished_missions {data{ id attributes{ missionName start finish mesimabetahalich {data{ id attributes{ createdAt}}} createdAt why total descrip hearotMeyuchadot noofhours perhour users_permissions_user {data{ id attributes{ username}}}}}}
             rikmashes{data{ id attributes{ name kindOf total hm price agprice sp { data{id} } spnot users_permissions_user {data{ id attributes {username}}}}}}
              user_1s {data{ id attributes{email noMail lang username profilePic {data{attributes{ url formats}}}}}}
-            mesimabetahaliches (filters:{finnished:{eq: false}}) {data{
-             id attributes{ status  iskvua 
+            mesimabetahaliches {data{
+             id attributes{ status  iskvua finnished
                           forums{data{id}}
+                          open_missions{data{id}}
+                          finiapruvals{data{id attributes{missname archived}}}
               acts{data{id attributes{shem dateS hashivut naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}}
                des dateF vali{data{id}} myIshur valiIshur status mesimabetahaliches{data{id}}}}}
                 tafkidims {data{ id attributes{ roleDescription ${
@@ -283,13 +288,14 @@
                     ? 'localizations{data {attributes{ roleDescription}} }'
                     : ''
                 } }}}
-             admaticedai  createdAt hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks 
+             admaticedai  createdAt hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks
              monter{monthStart hours isDone hoursDone}
              users_permissions_user {data{ id attributes{ username profilePic {data{attributes{ url }}}}}}}}}
             open_missions (filters:{archived:{eq: false }}) {data{  id attributes{ name hearotMeyuchadot descrip noofhours perhour sqadualed
                                     privatlinks publicklinks
                                     acts{data{id attributes{shem dateS}}}
                                     rishon {data{ id}}
+                                    pendm{data{id}}
                                     skills {data{ id attributes{ skillName ${
                                       $lang == 'he'
                                         ? 'localizations{data {attributes{ skillName}} }'
@@ -306,6 +312,10 @@
                                         : ''
                                     } } }}
                                     mission {data{ id}}
+                                    asks {data{ id attributes { archived
+                                      users_permissions_user {data{ id attributes{ username profilePic {data{attributes{ url }}}}}}
+                                      forums {data{ id }}
+                                    }}}
                                     createdAt
   } }}
                         open_mashaabims (filters: {archived:{eq: false }}){data{id attributes{ kindOf hm descrip price easy name spnot sqadualed sqadualedf }}}
@@ -669,6 +679,7 @@
     }, 15000);
     toast.success(`${fnnn[$lang]}`);
     start();
+    refreshProcesses();
   }
   let meDatamm = $state([]);
   async function updi() {
@@ -720,6 +731,7 @@
     }, 15000);
     toast.success(cloma[$lang]);
     start();
+    refreshProcesses();
   }
   let noofopen = $state(2);
 
@@ -1370,6 +1382,10 @@
   import { link } from 'd3-shape';
   import CrNewProject from '$lib/celim/icons/crNewProject.svelte';
   import Kanbanboard from '$lib/components/prPr/Kanbanboard.svelte';
+  import ProcessCreator from '$lib/components/process/ProcessCreator.svelte';
+  import ProcessBoard from '$lib/components/process/ProcessBoard.svelte';
+  import ProcessChainView from '$lib/components/process/ProcessChainView.svelte';
+  import { loadProjectProcesses } from '$lib/utils/processes';
 
   onDestroy(() => {
     if (unsubscribe) {
@@ -1586,7 +1602,203 @@
     toast.success($lang === 'he' ? 'סטטוס עודכן' : 'Status updated');
     setTimeout(() => start(), 1500);
   }
+  let processes = $state([]);
+  let selectedProcess = $state(null);
+  let processLoading = $state(false);
+  let processError = $state('');
+  const processTab = { he: 'תהליכים', en: 'Processes' };
+  const chooseProcessFirst = {
+    he: 'קודם בוחרים או יוצרים תהליך, ואז מוסיפים משימות או משאבים.',
+    en: 'Create or select a process first, then add missions or resources.'
+  };
+  let createMode = $state(null);
+  const createMissionT = { he: 'משימה', en: 'Mission' };
+  const createMissionDesc = { he: 'יצירת פעולה עצמאית לריקמה', en: 'Create a standalone mission' };
+  const createResourceT = { he: 'משאב', en: 'Resource' };
+  const createResourceDesc = { he: 'הוספת משאב נדרש לריקמה', en: 'Add a needed resource' };
+  const createProcessT = { he: 'תהליך', en: 'Process' };
+  const createProcessDesc = { he: 'ניהול תהליך הכולל משימות ומשאבים', en: 'Manage a process containing missions and resources' };
+  const backBtn = { he: 'חזרה', en: 'Back' };
+  const optionallyAddContent = { he: 'ניתן להוסיף משימות ומשאבים לתהליך', en: 'Optionally add missions and resources to this process' };
+
+  async function refreshProcesses() {
+    if (!$idPr) return;
+    processLoading = true;
+    processError = '';
+    try {
+      processes = await loadProjectProcesses(String($idPr), fetch);
+      if (selectedProcess?.id) {
+        selectedProcess =
+          processes.find((entry) => entry.id === selectedProcess.id) ||
+          selectedProcess;
+      }
+    } catch (error) {
+      processError =
+        error instanceof Error ? error.message : 'Failed to load processes';
+    } finally {
+      processLoading = false;
+    }
+  }
+
+  function handleProcessCreated(data) {
+    selectedProcess = {
+      id: String(data.processId),
+      projectId: String(data.projectId),
+      title: data.name,
+      description: data.description || '',
+      mainForumId: String(data.mainForumId),
+      stageCounts: {
+        pending: 0,
+        negotiation: 0,
+        open: 0,
+        candidates: 0,
+        execution: 0,
+        approval: 0,
+        completion: 0
+      },
+      stages: [],
+      nextExpectedStage: 'pending'
+    };
+    refreshProcesses();
+  }
+
+  function handleProcessSelected(process) {
+    selectedProcess = process;
+  }
+
+  // ── Chain extra data (tab 13) ──────────────────────────────────────────────
+  // Fetches archived open_missions + pendms referenced in the chain data but
+  // excluded from the main query's archived:false filters.
+  // Results are cached in localStorage (30-min TTL, per project).
+  async function fetchChainExtraData() {
+    if (chainExtraLoading) return;
+
+    // Read reactive state FIRST so the $effect always tracks these dependencies,
+    // even when we return early from cache. This ensures the effect re-runs when
+    // the main data finishes loading.
+    const knownOmIds = new Set(omiData.map((om) => String(om.id)));
+    const neededOmIds = [
+      ...new Set(
+        bmiData.flatMap((b) =>
+          (b.attributes?.open_missions?.data ?? []).map((om) => String(om.id))
+        )
+      )
+    ].filter((id) => id && !knownOmIds.has(id));
+
+    const knownPmIds = new Set(pmiData.map((p) => String(p.id)));
+    const neededPmIds = [
+      ...new Set([
+        // From acts (chains with mesimabetahalich)
+        ...(meData?.acts?.data ?? [])
+          .map((a) => String(a.attributes?.pendm?.data?.id ?? ''))
+          .filter(Boolean),
+        // From open_missions direct FK — catches chains without acts yet
+        ...omiData
+          .map((om) => String(om?.attributes?.pendm?.data?.id ?? ''))
+          .filter(Boolean)
+      ])
+    ].filter((id) => !knownPmIds.has(id));
+
+    if (neededOmIds.length === 0 && neededPmIds.length === 0) return;
+
+    // Check localStorage cache — but only accept it if it covers ALL needed IDs.
+    // (Stale empty caches from earlier runs are rejected here.)
+    const cacheKey = `pcv_extra_v4_${$idPr}`;
+    try {
+      const raw = localStorage.getItem(cacheKey);
+      if (raw) {
+        const { ts, o, p } = JSON.parse(raw);
+        if (Date.now() - ts < 30 * 60 * 1000) {
+          const cachedOmIds = new Set((o ?? []).map((e) => String(e.id)));
+          const cachedPmIds = new Set((p ?? []).map((e) => String(e.id)));
+          if (
+            neededOmIds.every((id) => cachedOmIds.has(id)) &&
+            neededPmIds.every((id) => cachedPmIds.has(id))
+          ) {
+            chainExtraOmiData = o ?? [];
+            chainExtraPmiData = p ?? [];
+            return;
+          }
+        }
+      }
+    } catch {
+      /* ignore parse errors */
+    }
+
+    chainExtraLoading = true;
+    try {
+      const parts = [];
+      if (neededOmIds.length > 0) {
+        parts.push(`
+          extraOm: openMissions(filters:{id:{in:[${neededOmIds.map((id) => `"${id}"`).join(',')}]}}) {
+            data { id attributes { name noofhours perhour sqadualed privatlinks publicklinks
+              rishon{data{id}} mission{data{id}} acts{data{id attributes{shem dateS}}} createdAt
+              asks {data{ id attributes { archived
+                users_permissions_user {data{ id attributes{ username profilePic {data{attributes{ url }}}}}}
+                forums {data{ id }}
+              }}}
+            }}
+          }
+        `);
+      }
+      if (neededPmIds.length > 0) {
+        parts.push(`
+          extraPendm: pendms(filters:{id:{in:[${neededPmIds.map((id) => `"${id}"`).join(',')}]}}) {
+            data { id attributes { name createdAt dates noofhours perhour mission{data{id}}
+              users { what why id users_permissions_user { data { id attributes { username } } } }
+            }}
+          }
+        `);
+      }
+
+      const token = page.data.tok;
+      const res = await fetch(baseUrl + '/graphql', {
+        method: 'POST',
+        headers: {
+          Authorization: 'bearer ' + token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ query: `{ ${parts.join('\n')} }` })
+      });
+      const json = await res.json();
+      if (json?.errors?.length) {
+        console.error('fetchChainExtraData GraphQL errors', json.errors);
+      }
+
+      const newOmi = json?.data?.extraOm?.data ?? [];
+      const newPmi = json?.data?.extraPendm?.data ?? [];
+      chainExtraOmiData = newOmi;
+      chainExtraPmiData = newPmi;
+
+      try {
+        localStorage.setItem(
+          cacheKey,
+          JSON.stringify({ ts: Date.now(), o: newOmi, p: newPmi })
+        );
+        localStorage.removeItem(`pcv_extra_${$idPr}`);   // remove old v1 key
+        localStorage.removeItem(`pcv_extra_v3_${$idPr}`); // remove old v3 key
+      } catch {
+        /* quota exceeded — ignore */
+      }
+    } catch (e) {
+      console.error('fetchChainExtraData failed', e);
+    } finally {
+      chainExtraLoading = false;
+    }
+  }
+
+  $effect(() => {
+    if ($idPr) {
+      refreshProcesses();
+    }
+  });
+
+  $effect(() => {
+    if (tab === 13) fetchChainExtraData();
+  });
+
   const kanbanT = { he: 'קאנבן', en: 'Kanban' };
+  const processChainsT = { he: 'שרשראות תהליך', en: 'Process Chains' };
 </script>
 
 <svelte:head>
@@ -2147,6 +2359,36 @@ pointer-events: none;"
               </h2>
             </div></button
           >
+          <button
+            onclick={() => (tab = 12)}
+            class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab ==
+            12
+              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-blue-800'
+              : 'bg-gradient-to-r from-gra via-grb  to-gre text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
+            title={processTab[$lang]}
+            ><div
+              class="flex flex-col items-center justify-center align-middle"
+            >
+              <h2 style={tab == 12 ? '' : 'text-shadow:1px 1px #fff ;'}>
+                {processTab[$lang]}
+              </h2>
+            </div></button
+          >
+          <button
+            onclick={() => (tab = 13)}
+            class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab ==
+            13
+              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-blue-800'
+              : 'bg-gradient-to-r from-gra via-grb  to-gre text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
+            title={processChainsT[$lang]}
+            ><div
+              class="flex flex-col items-center justify-center align-middle"
+            >
+              <h2 style={tab == 13 ? '' : 'text-shadow:1px 1px #fff ;'}>
+                {processChainsT[$lang]}
+              </h2>
+            </div></button
+          >
           <!-- <button
 
                 onclick={() => (tab = 6)}
@@ -2224,189 +2466,237 @@ pointer-events: none;"
                 </div>{/if}
             </div>
           {:else if tab == 2}
-            <!--
-  <div>
- <Fini users={projectUsers} {fmiData}/></div>-->
-
-            <div class=" hhh">
-              {#if hovered}
-                <button onclick={hosa} onmouseleave={bighand}
-                  ><img
-                    title={hosafa[$lang]}
-                    style="max-width:45vw; max-height:45vw;"
-                    width="240px"
-                    height="240px"
-                    src="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg"
-                    alt="cheked"
-                  /></button
-                >
-              {:else}
-                <Hand
-                  onHosa={hosa}
-                  onProgres={bighand}
-                  onTrym={trym}
-                  {noofopen}
-                  {openMS}
-                  {addM}
-                  hosafa={hosafa[$lang]}
-                />
-              {/if}
-              {#if hoveredd}
-                <button onclick={masi} onmouseleave={bighandd}
-                  ><img
-                    title={hosafat[$lang]}
-                    style="max-width:45vw; max-height:45vw;"
-                    width="240px"
-                    height="240px"
-                    src="https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg"
-                    alt="cheked"
-                  /></button
-                >
-              {:else}
-                <Handd
-                  onTrym={tryma}
-                  onMasi={masi}
-                  onBighandd={bighandd}
-                  {noofopenm}
-                  {openMA}
-                  {addN}
-                  hosafat={hosafat[$lang]}
-                />
-              {/if}
-
-              <!--{#if gan == false}
-<button onclick={()=>gan = true} class="border mx-2  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre px-2 drop-shadow-lg shadow-gold"title={gann[$lang]}><div class="flex flex-col items-center justify-center align-middle"><p style="text-shadow:1px 1px var(--gold) ;">{gann[$lang]}</p><Scab/></div></button>
-{/if}
-
-{#if sid == false}
-<button onclick={()=>sid = true} class="border mx-2  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre px-2 drop-shadow-lg shadow-gold"  title={sidd[$lang]}><div class="flex flex-col items-center justify-center align-middle"><p style="text-shadow:1px 1px var(--gold) ;">{sidd[$lang]}</p><Siduri/></div></button>
-{/if}
-{#if bmiData.length > 0 }
-<br> <br>
-{#if bett == false}
-<button onclick={()=>bett = true} class="border mx-2  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre px-2 drop-shadow-lg shadow-gold" title={bet[$lang]}><div class="flex flex-col items-center justify-center align-middle"><p style="text-shadow:1px 1px var(--gold) ;">{bet[$lang]}</p><Taskk/></div></button>
-{/if}
-{/if}
--->
-            </div>
-
-            <!-- כפתור שרק איתו יש את האפשרות כנ"ל על משאבים
-  כן להוסיף סקשן שמראה את שלל סוגי המשימות בדיפולט
-כולל לפי יוזרים וכו-->
-
-            <div>
-              {#if addM === true}
-                <div
-                  bind:this={hosaf}
-                  class=" m-4 border-2 h-screen border-barbi rounded"
-                >
+            {#if !createMode}
+              <!-- 3-way mode chooser -->
+              <div class="flex flex-col items-center gap-8 py-10 px-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 w-full max-w-3xl mx-auto">
+                  <!-- Mission card -->
                   <button
-                    title={cencel[$lang]}
-                    onclick={closeM}
-                    class=" hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full"
-                    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                      <path
-                        fill="currentColor"
-                        d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
-                      />
-                    </svg></button
+                    onclick={() => { createMode = 'mission'; }}
+                    class="group flex flex-col items-center gap-4 p-8 border border-barbi hover:border-gold rounded-2xl bg-gradient-to-br from-gra via-grb to-gre hover:from-barbi hover:via-fuchsia-400 hover:to-mpink transition-all duration-300 drop-shadow-lg shadow-gold"
                   >
-                  <ChoosMission
-                    {roles}
-                    {mission1}
-                    bind:selected={blabla}
-                    onMessage={callbackFunction}
-                    onAdd={add}
-                    onClose={close}
-                    pn={projectname}
-                    pl={srcP}
-                    {restime}
-                    {projectUsers}
-                    {alit}
-                  />
-                </div>
-              {/if}
-            </div>
+                    <div class="text-barbi group-hover:text-blue-800 transition-colors">
+                      <svg style="width:52px;height:52px" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/>
+                      </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-barbi group-hover:text-blue-800">{createMissionT[$lang]}</h3>
+                    <p class="text-xs text-barbi/70 group-hover:text-blue-800/70">{createMissionDesc[$lang]}</p>
+                  </button>
 
-            <div bind:this={cow}>
-              {#if load === true}
-                <div
-                  class="grid justify-center items-center border-2 border-barbi rounded p-4"
-                >
-                  <Lowding />
-                </div>
-              {/if}
-              {#if showvd == true}
-                {#key miData}
-                  <Mission
-                    pn={projectname}
-                    pl={srcP}
-                    {restime}
-                    {newcontent}
-                    {newcontentR}
-                    {newcontentW}
-                    pu={projectUsers}
-                    userslength={projectUsers.length}
-                    vallues={alit}
-                    {miData}
-                    projectId={$idPr}
-                    onRemove={removeF}
-                    onClose={close}
-                  />
-                {/key}
-              {/if}
-            </div>
-
-            <div class=" m-4" bind:this={dow}>
-              {#if addN == true}
-                <div
-                  bind:this={fff}
-                  id="hosafn"
-                  class="m-4 border-2 border-barbi rounded"
-                >
+                  <!-- Resource card -->
                   <button
-                    title={cencel[$lang]}
-                    onclick={() => (addN = false)}
-                    class=" hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full"
-                    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                      <path
-                        fill="currentColor"
-                        d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
-                      />
-                    </svg></button
+                    onclick={() => { createMode = 'resource'; }}
+                    class="group flex flex-col items-center gap-4 p-8 border border-barbi hover:border-gold rounded-2xl bg-gradient-to-br from-gra via-grb to-gre hover:from-barbi hover:via-fuchsia-400 hover:to-mpink transition-all duration-300 drop-shadow-lg shadow-gold"
                   >
-                  <ChoosNeed
-                    onStr={() => (loadr = false)}
-                    onAdd={needad}
-                    onAddm={needadm}
-                    selectedi={needr}
-                  />
-                </div>
-              {/if}
+                    <div class="text-barbi group-hover:text-blue-800 transition-colors">
+                      <svg style="width:52px;height:52px" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18-.21 0-.41-.06-.57-.18l-7.9-4.44A1 1 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.32-.18.72-.18 1.14 0l7.9 4.44c.32.17.53.5.53.88v9M12 4.15L10.11 5.22 16 8.61l1.96-1.11L12 4.15M6.04 7.5L12 10.85l1.96-1.1-5.88-3.4L6.04 7.5M5 15.91l6 3.38v-6.71L5 9.21v6.7M19 15.91V9.21l-6 3.37v6.71l6-3.38z"/>
+                      </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-barbi group-hover:text-blue-800">{createResourceT[$lang]}</h3>
+                    <p class="text-xs text-barbi/70 group-hover:text-blue-800/70">{createResourceDesc[$lang]}</p>
+                  </button>
 
-              <div class=" m-4" bind:this={lll}>
-                {#if loadr === true}
-                  <div
-                    class="grid justify-center items-center border-2 border-barbi rounded p-4"
+                  <!-- Process card -->
+                  <button
+                    onclick={() => { createMode = 'process'; }}
+                    class="group flex flex-col items-center gap-4 p-8 border border-gold hover:border-gold rounded-2xl bg-gradient-to-br from-gra via-grb to-gre hover:from-barbi hover:via-fuchsia-400 hover:to-mpink transition-all duration-300 drop-shadow-lg shadow-gold"
                   >
-                    <Lowding />
+                    <div class="text-gold group-hover:text-blue-800 transition-colors">
+                      <svg style="width:52px;height:52px" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                      </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-barbi group-hover:text-blue-800">{createProcessT[$lang]}</h3>
+                    <p class="text-xs text-barbi/70 group-hover:text-blue-800/70">{createProcessDesc[$lang]}</p>
+                  </button>
+                </div>
+              </div>
+
+            {:else if createMode === 'mission'}
+              <!-- Mission creation flow -->
+              <div class="m-4">
+                <button
+                  onclick={() => { createMode = null; addM = false; showvd = false; blabla = []; }}
+                  class="flex items-center gap-1 text-barbi hover:text-gold transition-colors mb-6"
+                >
+                  <svg style="width:20px;height:20px" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                  <span class="text-sm font-medium">{backBtn[$lang]}</span>
+                </button>
+              </div>
+              <div class="hhh">
+                {#if hovered}
+                  <button onclick={hosa} onmouseleave={bighand}
+                    ><img title={hosafa[$lang]} style="max-width:45vw; max-height:45vw;" width="240px" height="240px"
+                      src="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg" alt="cheked"/></button>
+                {:else}
+                  <Hand onHosa={hosa} onProgres={bighand} onTrym={trym} {noofopen} {openMS} {addM} hosafa={hosafa[$lang]} />
+                {/if}
+              </div>
+              <div>
+                {#if addM === true}
+                  <div bind:this={hosaf} class="m-4 border-2 h-screen border-barbi rounded">
+                    <button title={cencel[$lang]} onclick={closeM} class="hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full">
+                      <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"/>
+                      </svg>
+                    </button>
+                    <ChoosMission {roles} {mission1} bind:selected={blabla} onMessage={callbackFunction}
+                      onAdd={add} onClose={close} pn={projectname} pl={srcP} {restime} {projectUsers} {alit}
+                      processContext={selectedProcess} />
                   </div>
                 {/if}
-                {#if totalneed === true}
-                  <TotalNeeds
-                    pn={projectname}
-                    pl={srcP}
-                    {restime}
-                    pu={projectUsers}
-                    projectId={$idPr}
-                    userslength={projectUsers.length}
-                    {needr}
-                    meData={meDatamm}
-                    onClose={clo}
-                    onRemove={wdwd}
-                  />{/if}
               </div>
-            </div>
+              <div bind:this={cow}>
+                {#if load === true}
+                  <div class="grid justify-center items-center border-2 border-barbi rounded p-4"><Lowding /></div>
+                {/if}
+                {#if showvd == true}
+                  {#key miData}
+                    <Mission pn={projectname} pl={srcP} {restime} {newcontent} {newcontentR} {newcontentW}
+                      pu={projectUsers} userslength={projectUsers.length} vallues={alit} {miData}
+                      projectId={$idPr} processContext={selectedProcess} onRemove={removeF} onClose={close} />
+                  {/key}
+                {/if}
+              </div>
+
+            {:else if createMode === 'resource'}
+              <!-- Resource creation flow -->
+              <div class="m-4">
+                <button
+                  onclick={() => { createMode = null; addN = false; totalneed = false; meDatamm = []; needr = []; }}
+                  class="flex items-center gap-1 text-barbi hover:text-gold transition-colors mb-6"
+                >
+                  <svg style="width:20px;height:20px" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                  <span class="text-sm font-medium">{backBtn[$lang]}</span>
+                </button>
+              </div>
+              <div class="hhh">
+                {#if hoveredd}
+                  <button onclick={masi} onmouseleave={bighandd}
+                    ><img title={hosafat[$lang]} style="max-width:45vw; max-height:45vw;" width="240px" height="240px"
+                      src="https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg" alt="cheked"/></button>
+                {:else}
+                  <Handd onTrym={tryma} onMasi={masi} onBighandd={bighandd} {noofopenm} {openMA} {addN} hosafat={hosafat[$lang]} />
+                {/if}
+              </div>
+              <div class="m-4" bind:this={dow}>
+                {#if addN == true}
+                  <div bind:this={fff} id="hosafn" class="m-4 border-2 border-barbi rounded">
+                    <button title={cencel[$lang]} onclick={() => (addN = false)} class="hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full">
+                      <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"/>
+                      </svg>
+                    </button>
+                    <ChoosNeed onStr={() => (loadr = false)} onAdd={needad} onAddm={needadm} selectedi={needr} />
+                  </div>
+                {/if}
+                <div class="m-4" bind:this={lll}>
+                  {#if loadr === true}
+                    <div class="grid justify-center items-center border-2 border-barbi rounded p-4"><Lowding /></div>
+                  {/if}
+                  {#if totalneed === true}
+                    <TotalNeeds pn={projectname} pl={srcP} {restime} pu={projectUsers} projectId={$idPr}
+                      userslength={projectUsers.length} {needr} meData={meDatamm} processContext={selectedProcess}
+                      onClose={clo} onRemove={wdwd} />
+                  {/if}
+                </div>
+              </div>
+
+            {:else if createMode === 'process'}
+              <!-- Process creation flow -->
+              <div class="m-4">
+                <button
+                  onclick={() => { createMode = null; selectedProcess = null; addM = false; showvd = false; addN = false; totalneed = false; }}
+                  class="flex items-center gap-1 text-barbi hover:text-gold transition-colors mb-4"
+                >
+                  <svg style="width:20px;height:20px" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                  <span class="text-sm font-medium">{backBtn[$lang]}</span>
+                </button>
+                <div class="space-y-4">
+                  <ProcessCreator projectId={$idPr} {processes} selectedProcessId={selectedProcess?.id || ''}
+                    onCreated={handleProcessCreated} onSelect={handleProcessSelected} />
+                  {#if processError}
+                    <p class="text-sm text-rose-300">{processError}</p>
+                  {/if}
+                </div>
+              </div>
+
+              {#if selectedProcess}
+                <div class="border-t border-barbi/30 mt-4 pt-4 mx-4">
+                  <p class="text-sm text-barbi/60 mb-4 text-center">{optionallyAddContent[$lang]}</p>
+                  <div class="hhh">
+                    {#if hovered}
+                      <button onclick={hosa} onmouseleave={bighand}
+                        ><img title={hosafa[$lang]} style="max-width:45vw; max-height:45vw;" width="240px" height="240px"
+                          src="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg" alt="cheked"/></button>
+                    {:else}
+                      <Hand onHosa={hosa} onProgres={bighand} onTrym={trym} {noofopen} {openMS} {addM} hosafa={hosafa[$lang]} />
+                    {/if}
+                    {#if hoveredd}
+                      <button onclick={masi} onmouseleave={bighandd}
+                        ><img title={hosafat[$lang]} style="max-width:45vw; max-height:45vw;" width="240px" height="240px"
+                          src="https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg" alt="cheked"/></button>
+                    {:else}
+                      <Handd onTrym={tryma} onMasi={masi} onBighandd={bighandd} {noofopenm} {openMA} {addN} hosafat={hosafat[$lang]} />
+                    {/if}
+                  </div>
+                  <div>
+                    {#if addM === true}
+                      <div bind:this={hosaf} class="m-4 border-2 h-screen border-barbi rounded">
+                        <button title={cencel[$lang]} onclick={closeM} class="hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full">
+                          <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"/>
+                          </svg>
+                        </button>
+                        <ChoosMission {roles} {mission1} bind:selected={blabla} onMessage={callbackFunction}
+                          onAdd={add} onClose={close} pn={projectname} pl={srcP} {restime} {projectUsers} {alit}
+                          processContext={selectedProcess} />
+                      </div>
+                    {/if}
+                  </div>
+                  <div bind:this={cow}>
+                    {#if load === true}
+                      <div class="grid justify-center items-center border-2 border-barbi rounded p-4"><Lowding /></div>
+                    {/if}
+                    {#if showvd == true}
+                      {#key miData}
+                        <Mission pn={projectname} pl={srcP} {restime} {newcontent} {newcontentR} {newcontentW}
+                          pu={projectUsers} userslength={projectUsers.length} vallues={alit} {miData}
+                          projectId={$idPr} processContext={selectedProcess} onRemove={removeF} onClose={close} />
+                      {/key}
+                    {/if}
+                  </div>
+                  <div class="m-4" bind:this={dow}>
+                    {#if addN == true}
+                      <div bind:this={fff} id="hosafn" class="m-4 border-2 border-barbi rounded">
+                        <button title={cencel[$lang]} onclick={() => (addN = false)} class="hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full">
+                          <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                            <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"/>
+                          </svg>
+                        </button>
+                        <ChoosNeed onStr={() => (loadr = false)} onAdd={needad} onAddm={needadm} selectedi={needr} />
+                      </div>
+                    {/if}
+                    <div class="m-4" bind:this={lll}>
+                      {#if loadr === true}
+                        <div class="grid justify-center items-center border-2 border-barbi rounded p-4"><Lowding /></div>
+                      {/if}
+                      {#if totalneed === true}
+                        <TotalNeeds pn={projectname} pl={srcP} {restime} pu={projectUsers} projectId={$idPr}
+                          userslength={projectUsers.length} {needr} meData={meDatamm} processContext={selectedProcess}
+                          onClose={clo} onRemove={wdwd} />
+                      {/if}
+                    </div>
+                  </div>
+                </div>
+              {:else}
+                <div class="m-4 rounded-lg border border-dashed border-gold p-4 text-center text-gold">
+                  {chooseProcessFirst[$lang]}
+                </div>
+              {/if}
+            {/if}
           {:else if tab == 3}
             <div dir={$lang == 'he' ? 'rtl' : 'ltr'} class="pt-2">
               {#if pmiData.length > 0}
@@ -2547,6 +2837,47 @@ pointer-events: none;"
             >
               <Sidur />
             </div>
+          {:else if tab === 12}
+            <div class="p-2" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
+              {#if processLoading}
+                <div
+                  class="grid justify-center items-center border-2 border-barbi rounded p-4"
+                >
+                  <Lowding />
+                </div>
+              {:else if processError}
+                <div
+                  class="rounded-lg border border-rose-300 bg-rose-50 p-4 text-sm text-rose-700"
+                >
+                  {processError}
+                </div>
+              {:else}
+                <ProcessBoard
+                  {processes}
+                  selectable={true}
+                  selectedProcessId={selectedProcess?.id || ''}
+                  onSelect={handleProcessSelected}
+                />
+              {/if}
+            </div>
+          {:else if tab === 13}
+            <ProcessChainView
+              {pmiData}
+              {omiData}
+              {bmiData}
+              {fmiData}
+              {opmash}
+              {rikmashes}
+              acts={meData?.acts?.data ?? []}
+              extraOmiData={chainExtraOmiData}
+              extraPmiData={chainExtraPmiData}
+              {projectUsers}
+              isLoadingExtra={chainExtraLoading}
+              onOpenModal={openDescrip}
+              onOpenActModal={openActModal}
+              onOpenChat={openChat}
+              lang={$lang}
+            />
           {:else if tab === 11}
             <div class="p-2">
               <Kanbanboard

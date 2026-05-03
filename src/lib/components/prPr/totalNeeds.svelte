@@ -11,6 +11,7 @@
   import { calcX } from '$lib/func/calcX.svelte';
   import { SendTo } from '$lib/send/sendTo.svelte';
   import Button from '$lib/celim/ui/button.svelte';
+  import { attachEntityToProcess } from '$lib/client/actionClient';
 
   let token;
   let mash = [];
@@ -362,6 +363,19 @@
           .then((r) => r.json())
           .then((data) => (miDatan = data));
         console.log(miDatan);
+        const createdEntityId = miDatan?.data?.[linkop]?.data?.id;
+        if (processContext?.processId && createdEntityId) {
+          await attachEntityToProcess(
+            {
+              processId: String(processContext.processId),
+              projectId: String(projectId),
+              entityType: linkop === 'createPmash' ? 'pmash' : 'openMashaabim',
+              entityId: String(createdEntityId),
+              name: data.attributes.name
+            },
+            { showErrorToast: false }
+          );
+        }
         if (isAssigned) {
           let hiluz = miDatan.data[linkop].data.id;
           let que = ``;
@@ -666,7 +680,8 @@ vots: [${userss},
     userslength = 0,
     meData = $bindable([]),
     onRemove,
-    onClose
+    onClose,
+    processContext = null
   } = $props();
   let miDatan = [];
   let error1 = $state(null);

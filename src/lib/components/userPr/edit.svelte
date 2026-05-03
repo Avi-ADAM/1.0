@@ -14,7 +14,7 @@
   import MultiSelect from 'svelte-multiselect';
   import SkillSelector from '../ui/SkillSelector.svelte';
   import RoleSelector from '../ui/RoleSelector.svelte';
-  import { skil } from '$lib/components/prPr/mi.js';
+  import { skil, role } from '$lib/components/prPr/mi.js';
   import Addneww from '../addnew/addnewWorkway.svelte';
   import Addnewv from '../addnew/addnewval.svelte';
   import Addnewr from '../addnew/addNewRole.svelte';
@@ -193,7 +193,7 @@ console.log("skillslist",skillslist);
   });
   function find_id(arra) {
     var arr = [];
-    const baseSource = datan === 'skil' ? $skil : meData;
+    const baseSource = datan === 'skil' ? $skil : datan === 'taf' ? $role : meData;
     // Combine with current data to ensure we don't lose items already in sync
     const sourceData = [...baseSource, ...data];
     const nameField = datan === 'skil' ? 'skillName' : valc;
@@ -648,9 +648,9 @@ console.log("skillslist",skillslist);
       (data.selected2 === undefined ||
         (data.length > 0 && data.selected2.length === 0))
     ) {
-      if (datan === 'skil' && data.length > 0) {
+      if ((datan === 'skil' || datan === 'taf') && data.length > 0) {
         data.selected2 = data.map(
-          (d) => d.attributes[valc] || d.attributes.skillName
+          (d) => d.attributes[valc] || d.attributes.skillName || d.attributes.roleDescription
         );
       } else if (data.selected2 === undefined) {
         data.selected2 = [];
@@ -683,6 +683,33 @@ console.log("skillslist",skillslist);
         const deduplicatedSource = Array.from(
           new Map(
             [...$skil, ...data].map((item) => [String(item.id), item])
+          ).values()
+        );
+        const objects = filterByReference(deduplicatedSource, ids);
+        onAdd?.({
+          data: objects,
+          linkp: kish,
+          valc: valc,
+          a: datan
+        });
+      }
+    }
+  });
+
+  $effect(() => {
+    if (datan === 'taf' && data.selected2 && $role) {
+      const labels = data.selected2;
+      const ids = find_id(labels);
+
+      if (ids.length < labels.length) return;
+
+      const existingIds = data.map((d) => String(d.id)).sort();
+      const targetIds = [...new Set(ids.map((id) => String(id)))].sort();
+
+      if (JSON.stringify(existingIds) !== JSON.stringify(targetIds)) {
+        const deduplicatedSource = Array.from(
+          new Map(
+            [...$role, ...data].map((item) => [String(item.id), item])
           ).values()
         );
         const objects = filterByReference(deduplicatedSource, ids);

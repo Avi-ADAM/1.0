@@ -82,7 +82,6 @@
                     { value: 66, label: 'Equatorial Guinea', heb: 'גינאה המשוונית'},
                     { value: 65, label: 'Eritrea', heb: 'אריתראה'},
                     { value: 69, label: 'Estonia', heb: 'אסטוניה'},
-                    { value: 250, label: 'Eswatini', heb: 'אסוואטיני'},
                     { value: 70, label: 'Ethiopia', heb: 'אתיופיה'},
                     { value: 67, label: 'Falkland Islands (Malvinas)', heb: 'איי מאלבינס (איי פוקלנד)'},
                     { value: 68, label: 'Faroe Islands', heb: 'איי פארו'},

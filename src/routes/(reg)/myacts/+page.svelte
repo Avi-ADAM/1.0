@@ -5,7 +5,6 @@
   import MyActs from '$lib/components/prPr/tasks/Myacts.svelte';
 
   let { data } = $props();
-
   onMount(async () => {
     // 1. Check if we already have data in either store
     if ($mtahaStore.length > 0 || $myActsStore.length > 0) {
@@ -18,7 +17,9 @@
 
     try {
       const res = await fetchMyActs(userId);
-      const fetchedMesimot = res.data?.usersPermissionsUser?.data?.attributes?.mesimabetahaliches?.data;
+      const fetchedMesimot =
+        res.data?.usersPermissionsUser?.data?.attributes?.mesimabetahaliches
+          ?.data;
       if (fetchedMesimot) {
         myActsStore.set(fetchedMesimot);
       }
