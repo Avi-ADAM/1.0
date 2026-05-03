@@ -15,8 +15,8 @@
 ```text
 src/routes/(reg)/moach/
 ├── [projectId]/
-│   ├── +layout.svelte        # רכיבי UI משותפים (כותרת, ניווט טאבים)
-│   ├── +layout.js            # Load function לנתוני פרויקט בסיסיים
+│   ├── +layout.svelte        # רכיבי UI משותפים (AuthorityBadge, כותרת, ניווט טאבים, טיימרים פעילים)
+│   ├── +layout.js            # Load function לנתוני פרויקט בסיסיים ואיניציאליזציה של טיימרים
 │   ├── main/                 # טאב ראשי (תיאור, ערכים)
 │   │   └── +page.svelte
 │   ├── tasks/                # טאב פעולות (ActsTable)
@@ -57,9 +57,10 @@ export const projectData = $state({
 ```
 
 ### מניעת כפילות נתונים
-1.  **Layout Load:** ימשוך נתונים בסיסיים הנדרשים לכל הדפים (שם פרויקט, לוגו, רשימת חברים).
-2.  **Page Load:** כל דף (טאב) ימשוך רק את הנתונים הייעודיים לו (למשל, טאב גאנט ימשוך משימות).
-3.  **Caching:** ה-Store יבדוק אם הנתונים כבר קיימים והאם הם "טריים" לפני ביצוע שאילתה חדשה.
+1.  **Layout Load:** ימשוך נתונים בסיסיים הנדרשים לכל הדפים (שם פרויקט, לוגו דרך `AuthorityBadge`, רשימת חברים ולינקים חברתיים).
+2.  **Timers Sync:** ה-Layout יבצע `fetchProjectTimers` כדי להציג אינדיקטורים פעילים על גבי תמונות הפרופיל של המשתמשים.
+3.  **Page Load:** כל דף (טאב) ימשוך רק את הנתונים הייעודיים לו (למשל, טאב גאנט ימשוך משימות).
+4.  **Caching:** ה-Store יבדוק אם הנתונים כבר קיימים והאם הם "טריים" לפני ביצוע שאילתה חדשה.
 
 ## 4. אבטחה ושאילתות (QIDS)
 
@@ -113,5 +114,6 @@ export const projectData = $state({
 ## 7. דגשים טכניים חשובים
 *   **URL vs Store:** ה-URL הוא ה-Source of Truth לזהות הפרויקט. ה-Store הוא ה-Source of Truth לתוכן.
 *   **Loading States:** שימוש ב-SvelteKit Loaders מאפשר להציג Loading יפה (skeleton או ספינר) בזמן המעבר בין דפים.
-*   **Shared Components:** רכיבים כמו `TaskModal` יועברו ל-Layout הראשי כדי לאפשר פתיחה שלהם מכל טאב ללא תלות בדף הספציפי.
+*   **Shared Components:** רכיבים כמו `TaskModal` ו-`AuthorityBadge` יועברו ל-Layout הראשי כדי לאפשר פתיחה שלהם מכל טאב ללא תלות בדף הספציפי.
 *   **Backward Compatibility:** ה-Store `idPr` ימשיך להתקיים כגשר זמני עבור רכיבי Legacy עד שכולם יועברו להסתמכות על נתוני ה-URL.
+*   **Navigation:** כפתור ה-"חזרה לרשימת רקמות" יטופל ברמת ה-Layout ויאפס את ה-`idPr` או ינווט ל-`/moach` ללא מזהה פרויקט.
