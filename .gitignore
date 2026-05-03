@@ -12,3 +12,9 @@ node_modules
 .sentryclirc
 /build
 /dist
+/scratch
+ca.crt
+ca.key
+cert.crt
+cert.key
+/brain

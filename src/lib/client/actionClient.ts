@@ -207,6 +207,36 @@ export interface TimerSaveParams {
   tasks?: string[];
 }
 
+export interface CreateProcessParams {
+  projectId: string;
+  name: string;
+  description?: string;
+}
+
+export interface AttachEntityToProcessParams {
+  processId: string;
+  projectId: string;
+  entityType: 'pendm' | 'pmash' | 'openMission' | 'openMashaabim' | 'mesimabetahalich' | 'maap';
+  entityId: string;
+  name?: string;
+}
+
+export interface EnsureProcessForumParams {
+  processId: string;
+  projectId: string;
+  forumId?: string;
+  name?: string;
+}
+
+export interface EnsureStageForumParams {
+  processId: string;
+  projectId: string;
+  entityType: 'ask' | 'mesimabetahalich';
+  entityId: string;
+  forumId?: string;
+  name?: string;
+}
+
 export type ActionKey =
   | 'updateTask'
   | 'createHaluka'
@@ -218,9 +248,17 @@ export type ActionKey =
   | 'addVote'
   | 'approveSheirutpend'
   | 'rejectSheirutpend'
+  | 'createProcess'
+  | 'attachEntityToProcess'
+  | 'ensureProcessForum'
+  | 'ensureStageForum'
   ;
 
 export interface ActionParamsMap {
+  createProcess: CreateProcessParams;
+  attachEntityToProcess: AttachEntityToProcessParams;
+  ensureProcessForum: EnsureProcessForumParams;
+  ensureStageForum: EnsureStageForumParams;
   timerSave: TimerSaveParams;
   addVote: {
     type: 'pend' | 'sheirutpend';
@@ -609,6 +647,34 @@ export async function rejectSheirutpend(
   options: ExecuteActionOptions = {}
 ): Promise<ActionResponse> {
   return executeAction('rejectSheirutpend', params, options);
+}
+
+export async function createProcess(
+  params: CreateProcessParams,
+  options: ExecuteActionOptions = {}
+): Promise<ActionResponse> {
+  return executeAction('createProcess', params, options);
+}
+
+export async function attachEntityToProcess(
+  params: AttachEntityToProcessParams,
+  options: ExecuteActionOptions = {}
+): Promise<ActionResponse> {
+  return executeAction('attachEntityToProcess', params, options);
+}
+
+export async function ensureProcessForum(
+  params: EnsureProcessForumParams,
+  options: ExecuteActionOptions = {}
+): Promise<ActionResponse> {
+  return executeAction('ensureProcessForum', params, options);
+}
+
+export async function ensureStageForum(
+  params: EnsureStageForumParams,
+  options: ExecuteActionOptions = {}
+): Promise<ActionResponse> {
+  return executeAction('ensureStageForum', params, options);
 }
 
 // ============================================================================

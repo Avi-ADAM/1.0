@@ -14,7 +14,8 @@
   import MultiSelect from 'svelte-multiselect';
   import SkillSelector from '../ui/SkillSelector.svelte';
   import ValueSelector from '../ui/ValueSelector.svelte';
-  import { skil, valluesStore } from '$lib/components/prPr/mi.js';
+  import RoleSelector from '../ui/RoleSelector.svelte';
+  import { skil, role ,valluesStore} from '$lib/components/prPr/mi.js';
   import Addneww from '../addnew/addnewWorkway.svelte';
   import Addnewv from '../addnew/addnewval.svelte';
   import Addnewr from '../addnew/addNewRole.svelte';
@@ -194,7 +195,7 @@ console.log("skillslist",skillslist);
   function find_id(arra) {
     var arr = [];
     const baseSource =
-      datan === 'skil' ? $skil : datan === 'val' ? $valluesStore : meData;
+      datan === 'skil' ? $skil : datan === 'val' ? $valluesStore : datan === 'taf' ? $role : meData;
     // Combine with current data to ensure we don't lose items already in sync
     const sourceData = [...baseSource, ...data];
     const nameField =
@@ -650,9 +651,9 @@ console.log("skillslist",skillslist);
       (data.selected2 === undefined ||
         (data.length > 0 && data.selected2.length === 0))
     ) {
-      if (datan === 'skil' && data.length > 0) {
+      if ((datan === 'skil' || datan === 'taf') && data.length > 0) {
         data.selected2 = data.map(
-          (d) => d.attributes[valc] || d.attributes.skillName
+          (d) => d.attributes[valc] || d.attributes.skillName || d.attributes.roleDescription
         );
       } else if (datan === 'val' && data.length > 0) {
         data.selected2 = data.map(
@@ -716,6 +717,33 @@ console.log("skillslist",skillslist);
         const deduplicatedSource = Array.from(
           new Map(
             [...$skil, ...data].map((item) => [String(item.id), item])
+          ).values()
+        );
+        const objects = filterByReference(deduplicatedSource, ids);
+        onAdd?.({
+          data: objects,
+          linkp: kish,
+          valc: valc,
+          a: datan
+        });
+      }
+    }
+  });
+
+  $effect(() => {
+    if (datan === 'taf' && data.selected2 && $role) {
+      const labels = data.selected2;
+      const ids = find_id(labels);
+
+      if (ids.length < labels.length) return;
+
+      const existingIds = data.map((d) => String(d.id)).sort();
+      const targetIds = [...new Set(ids.map((id) => String(id)))].sort();
+
+      if (JSON.stringify(existingIds) !== JSON.stringify(targetIds)) {
+        const deduplicatedSource = Array.from(
+          new Map(
+            [...$role, ...data].map((item) => [String(item.id), item])
           ).values()
         );
         const objects = filterByReference(deduplicatedSource, ids);
@@ -874,7 +902,7 @@ console.log("skillslist",skillslist);
                     >
                   {/if}
                 </Tile>
-              {:else if datan !== 'skil'}
+              {:else if datan !== 'skil' && datan !== 'taf'}
                 <div
                   class="text-center text-sm text-lturk md:text-xl"
                   title={less[$lang]}
@@ -912,7 +940,7 @@ console.log("skillslist",skillslist);
         {/if}
       {/if}
       <br />
-      {#if datan != 'skil' && datan != 'val'}
+      {#if datan != 'skil' && datan != 'val' && datan != 'taf'}
         <div>
           <h3 class="text-center text-sm text-barbi">
             {adbf[$lang]}{Valname}{adaf[$lang]}
@@ -960,7 +988,17 @@ console.log("skillslist",skillslist);
           autoCreate={true}
         />
       {:else if datan == 'taf'}
-        <Addnewr rn={allvn} onAddnewrole={addnew} bind:addR />
+        <RoleSelector
+          bind:selectedRoles={data.selected2}
+          onadd={() => {
+            yy = 1;
+          }}
+          onremove={() => {
+            yy = 2;
+          }}
+          {placeholder}
+          autoCreate={true}
+        />
       {:else if datan == 'mash'}
         <Addnewn rr={13} onNewn={addnewM} bind:addW />
       {:else if datan == 'work'}

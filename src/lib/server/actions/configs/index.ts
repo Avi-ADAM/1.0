@@ -26,6 +26,11 @@ import { approveSheirutpendConfig } from './approveSheirutpend.js';
 import { rejectSheirutpendConfig } from './rejectSheirutpend.js';
 import { addVoteConfig } from './addVote.js';
 import { ensureSheirutForumConfig } from './ensureSheirutForum.js';
+import { createProcessConfig } from './createProcess.js';
+import { attachEntityToProcessConfig } from './attachEntityToProcess.js';
+import { ensureProcessForumConfig } from './ensureProcessForum.js';
+import { ensureStageForumConfig } from './ensureStageForum.js';
+//import { completeMissionConfig } from './completeMission.js';
 import { chatActions } from './chat.js';
 
 /**

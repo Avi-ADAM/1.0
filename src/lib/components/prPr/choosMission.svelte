@@ -22,7 +22,7 @@
  */
 
 /** @type {Props} */
- let { mission1 = [], children, pn, pl, restime, projectUsers, alit, onClose, selected = $bindable([]) } = $props();
+ let { mission1 = [], children, pn, pl, restime, projectUsers, alit, onClose, selected = $bindable([]), processContext = null } = $props();
  const baseUrl = import.meta.env.VITE_URL
 
  let newcontent = $state(true);
@@ -243,6 +243,7 @@ function closeMobileModal() {
         userslength={projectUsers.length}
         vallues={alit}
         projectId={$idPr}
+        {processContext}
         onClose={onClose}/>
         {/if}
  </div>

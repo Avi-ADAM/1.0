@@ -255,6 +255,22 @@ export interface ProjectsHervachti extends Schema.Component {
   };
 }
 
+export interface ProjectsIGotMoney extends Schema.Component {
+  collectionName: 'components_projects_i_got_monies';
+  info: {
+    displayName: 'iGotMoney';
+    icon: 'gate';
+  };
+  attributes: {
+    iGotMoney: Attribute.Boolean;
+    users_permissions_user: Attribute.Relation<
+      'projects.i-got-money',
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
 export interface ProjectsMeeting extends Schema.Component {
   collectionName: 'components_projects_meetings';
   info: {
@@ -427,6 +443,7 @@ declare module '@strapi/types' {
       'new.user-and-ishur': NewUserAndIshur;
       'projects.chatre': ProjectsChatre;
       'projects.hervachti': ProjectsHervachti;
+      'projects.i-got-money': ProjectsIGotMoney;
       'projects.meeting': ProjectsMeeting;
       'projects.monter': ProjectsMonter;
       'projects.negodes': ProjectsNegodes;

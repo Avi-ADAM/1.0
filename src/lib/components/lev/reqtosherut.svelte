@@ -213,6 +213,7 @@
              users_permissions_user: "${userId}",
               tafkidims: [${tafkidimsa}],
                       publishedAt: "${d.toISOString()}",
+                      open_missions:[${openMid}],
             ${date}
             ${sdate}
                   }
@@ -315,7 +316,8 @@ ${adduser}
              publicklinks: "${publicklinks}", 
              users_permissions_user: "${userId}",
              tafkidims: [${tafkidimsa}],
-                     publishedAt: "${d.toISOString()}",
+             publishedAt: "${d.toISOString()}",
+             open_missions:[${openMid}],
             ${date}
             ${sdate}
                   }
