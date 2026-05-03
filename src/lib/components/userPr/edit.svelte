@@ -902,7 +902,7 @@ console.log("skillslist",skillslist);
                     >
                   {/if}
                 </Tile>
-              {:else if datan !== 'skil' && datan !== 'taf'}
+              {:else if datan !== 'skil' && datan !== 'taf' && datan !== 'val'}
                 <div
                   class="text-center text-sm text-lturk md:text-xl"
                   title={less[$lang]}
