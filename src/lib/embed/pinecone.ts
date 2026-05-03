@@ -35,7 +35,7 @@ const getIndex = () => {
     }
 };
 // namespace לכל קטגוריה
-export type VocabNamespace = 'skills' | 'roles' | 'methods' | 'missions' | 'work_ways';
+export type VocabNamespace = 'skills' | 'roles' | 'methods' | 'missions' | 'work_ways' | 'vallues';
 
 export type PineconeRecord = {
     id: string;
