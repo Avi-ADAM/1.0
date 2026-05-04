@@ -30,7 +30,7 @@ import { createProcessConfig } from './createProcess.js';
 import { attachEntityToProcessConfig } from './attachEntityToProcess.js';
 import { ensureProcessForumConfig } from './ensureProcessForum.js';
 import { ensureStageForumConfig } from './ensureStageForum.js';
-//import { completeMissionConfig } from './completeMission.js';
+import { completeMissionConfig } from './completeMission.js';
 import { chatActions } from './chat.js';
 
 /**
@@ -67,6 +67,11 @@ export function registerAllActions(): void {
 
   // Sheirut forum helpers
   registerAction(ensureSheirutForumConfig);
+  registerAction(createProcessConfig);
+  registerAction(attachEntityToProcessConfig);
+  registerAction(ensureProcessForumConfig);
+  registerAction(ensureStageForumConfig);
+  registerAction(completeMissionConfig);
 
   // Chat actions
   chatActions.forEach(registerAction);
@@ -99,5 +104,10 @@ export {
   rejectSheirutpendConfig,
   addVoteConfig,
   ensureSheirutForumConfig,
+  createProcessConfig,
+  attachEntityToProcessConfig,
+  ensureProcessForumConfig,
+  ensureStageForumConfig,
+  completeMissionConfig,
   chatActions
 };

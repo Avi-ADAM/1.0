@@ -15,8 +15,6 @@
   import { onMount, onDestroy } from 'svelte';
   import { betha } from './storess/betha.js';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
-  import { SendTo } from '$lib/send/sendTo.svelte';
-  import axios from 'axios';
   import { timers, updateTimers, lockTimerForEdit } from '$lib/stores/timers.js';
   import { startTimer } from '$lib/func/timers.js';
   import { stopTimer } from '$lib/func/timers.js';
@@ -525,187 +523,80 @@ timer: 0
   let activE = $state();
   let why = $state();
   let what = $state();
-  let tofinished = ``;
-  let tofinished1 = ``;
-  let tofinished2 = ``;
-  let toapprove1 = ``;
-  let toapprove = ``;
-  let appi = ``;
   let butt = $state(false);
   async function afterwhy() {
     butt = true;
     already = true;
-    let d = new Date();
 
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
-    let newwhat = false;
-    if (what && what[0]) {
-      //upload
-      let url1 = `${baseUrl}/api/upload`;
-      let files = what[0] ?? what;
-      let file = new FormData();
-      file.append('files', files);
-      try {
-        const resp = await axios.post(url1, file, {
-          headers: {
-            Authorization: bearer1
-          }
-        });
-        console.log(resp.data);
-        const imageId = resp.data[0].id;
-        newwhat = imageId;
-      } catch (err) {
-        // Handle Error Here
-        console.error(err);
-      }
-
-      /*axios
-     .post( url1, file ,{
-                    headers: {
-                        Authorization: bearer1,
-                    },
-                })
-                .then(({ data }) => {
-                    const imageId = data[0].id;
-                  newwhat = imageId
-                  console.log(newwhat,data)
-                  })
-      .catch(error => {
-        console.log('צריך לתקן:', error.response);
-                });*/
-    }
-    console.log('here', newwhat);
+    // --- keep local validations for fast UX feedback ---
     if (!why && !what) {
       activE = errorM.ein;
-    } else if (running) {
-      activE = errorM.timer;
-    } else {
-      if (noofpu === 1) {
-        console.log(hoursdon);
-        tofinished1 = `finnished: true`;
-        tofinished2 = `finnished: true`;
-        appi = ``;
-        tofinished = `
-   createFinnishedMission(
-             data: {
-              missionName: "${missionName}",
-              why: "${why}",
-              ${newwhat != false ? `what: "${newwhat}",` : ``}
-              noofhours: ${hoursdon},
-              mesimabetahalich: ${mId},
-              perhour: ${perhour},
-              total: ${perhour * hoursdon},
-              project: ${projectId},
-              descrip: "${missionDetails}",
-              users_permissions_user: "${idL}",
-                     publishedAt: "${d.toISOString()}", 
-              mission: ${missId}
-   }
-){data {id }}`;
-      } else if (noofpu > 1) {
-        toapprove1 = `forappruval: true`;
-        appi = `
-createFiniapruval(
-     data: {
-      missname: "${missionName}",
-      ${newwhat != false ? `what: "${newwhat}",` : ``}
-      why: "${why}",
-      noofhours: ${hoursdon},
-      mesimabetahalich: ${mId},
-      project: "${projectId}",
-              publishedAt: "${d.toISOString()}",
-            users_permissions_user: "${idL}",
-       vots:[ 
-    {
-      what: true
-      users_permissions_user: "${idL}"
+      butt = false;
+      already = false;
+      return;
     }
-  ]
-}){data {id }}`;
-      }
+    if (running) {
+      activE = errorM.timer;
+      butt = false;
+      already = false;
+      return;
+    }
 
-      //files shit from updatepic - done
-      //כמה בפרןויקט אם 1 אז אישור מיידי , ליצור בועת אישור אם חוק דורש - done beside roles
-
+    // --- 1) upload file through SvelteKit endpoint ---
+    let newwhat = false;
+    if (what && what[0]) {
+      const files = what[0] ?? what;
+      const fd = new FormData();
+      fd.append('files', files);
       try {
-        await fetch(linkg, {
+        const resp = await fetch('/api/upload', {
           method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          //add already declined ids
-          body: JSON.stringify({
-            query: `mutation 
-                        { 
-updateMesimabetahalich(
- id: "${mId}"
-  data: {
-    ${toapprove1}
-${tofinished1}
-  }
-) {data{id attributes{ forappruval finnished howmanyhoursalready}}}
-${appi}
-${tofinished}
-}
-`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
-        if (noofpu > 1) {
-          //timegrama
-          let timegramaId = miDatan.data.createFiniapruval.data.id;
-          let x = calcX(restime);
-          let fd = new Date(Date.now() + x);
-          await sendToSer(
-            { whatami: 'finiapruval', finiapruval: timegramaId, date: fd },
-            '32createTimeGrama',
-            null,
-            null,
-            false,
-            fetch
-          );
-          //nutify project users
-          let data = {
-            pn: projectName,
-            pl: src,
-            pu: pu,
-            pid: projectId,
-            uid: idL,
-            kind: 'finiappmi',
-            name: missionName
-          };
-          fetch('/api/nuti', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-          })
-            .then((response) => response)
-            .then((data) => {
-              console.log('Success:', data);
-            })
-            .catch((error) => {
-              console.error('Error:', error);
-            });
-        }
-        isOpen = false;
-        onDone?.({ ani: 'minp', coinlapach: coinlapach });
-      } catch (e) {
-        error1 = e;
-        console.log(error1);
-        isOpen = true;
-        activE = error1;
+          body: fd
+        });
+        if (!resp.ok) throw new Error('Upload failed');
+        const data = await resp.json();
+        newwhat = data[0]?.id ?? false;
+        console.log('upload ok', newwhat);
+      } catch (err) {
+        console.error('upload failed', err);
+        activE = 'העלאת הקובץ נכשלה, נסה שוב';
+        butt = false;
+        already = false;
+        return;
       }
+    }
+
+    // --- 2) call the unified server action ---
+    try {
+      const res = await fetch('/api/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actionKey: 'completeMission',
+          params: {
+            missionId: String(mId),
+            why: why ?? '',
+            what: newwhat ? String(newwhat) : undefined,
+            hoursdon: hoursdon
+          }
+        })
+      });
+      const result = await res.json();
+      console.log('completeMission action result', result);
+
+      if (!result.success) {
+        throw new Error(result.error?.message || 'Action failed');
+      }
+
+      isOpen = false;
+      onDone?.({ ani: 'minp', coinlapach: coinlapach });
+    } catch (e) {
+      error1 = e;
+      console.log(error1);
+      isOpen = true;
+      activE = error1?.message ?? error1;
+      butt = false;
+      already = false;
     }
   }
   let swiperRef = null;
