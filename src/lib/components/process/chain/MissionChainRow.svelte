@@ -8,6 +8,7 @@
     chain,
     loadedItems,
     loadingIds,
+    projectId,
     projectUsers = [],
     onOpenModal,
     onOpenActModal,
@@ -442,7 +443,7 @@
 
       <!-- Footer: link to full page (future) -->
       <div class="exp-footer">
-        <a href="/moach/process/{chain.id}" class="open-page-link" tabindex="0">
+        <a href="/moach/{projectId}/processes/{chain.id}" class="open-page-link" tabindex="0">
           {t.openPage}
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path

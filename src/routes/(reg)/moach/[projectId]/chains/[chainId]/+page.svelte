@@ -14,7 +14,8 @@
   // ---------------------------------------------------------------------------
   // Route param
   // ---------------------------------------------------------------------------
-  let processId = $derived(page.params.processid);
+  let projectId = $derived(page.params.projectId);
+  let processId = $derived(page.params.chainId);
 
   // ---------------------------------------------------------------------------
   // i18n
@@ -132,8 +133,7 @@
   // Data loading
   // ---------------------------------------------------------------------------
   $effect(() => {
-    const projectId = $idPr;
-    if (!projectId || projectId === 0) {
+    if (!projectId) {
       loading = false;
       return;
     }
@@ -257,7 +257,7 @@
 
   <!-- ── Back navigation ──────────────────────────────────────────────────── -->
   <div class="pp-nav">
-    <button type="button" class="pp-back" onclick={() => goto('/moach')}>
+    <button type="button" class="pp-back" onclick={() => goto(`/moach/${projectId}/chains`)}>
       <svg viewBox="0 0 24 24" aria-hidden="true">
         {#if $lang === 'he'}
           <polyline points="9 18 15 12 9 6" />
@@ -299,7 +299,7 @@
       <p class="pp-state-title">{t.notFound}</p>
       <p class="pp-state-sub">{t.notFoundSub}</p>
       <code class="pp-id-pill">{processId}</code>
-      <button type="button" class="pp-cta" onclick={() => goto('/moach')}>
+      <button type="button" class="pp-cta" onclick={() => goto(`/moach/${projectId}/chains`)}>
         {t.back}
       </button>
     </div>

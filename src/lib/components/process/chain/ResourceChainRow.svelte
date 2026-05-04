@@ -4,6 +4,7 @@
 
   let {
     chain,
+    projectId,
     onOpenModal,
     isExpanded = false,
     onToggle,
@@ -281,7 +282,7 @@
       </div>
 
       <div class="exp-footer">
-        <a href="/moach/process/{chain.id}" class="open-page-link">
+        <a href="/moach/{projectId}/processes/{chain.id}" class="open-page-link">
           {t.openPage}
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />

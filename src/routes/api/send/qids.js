@@ -1,4 +1,4 @@
-export const qids = {
+const qids_base = {
   '1chatsend': `mutation  CreateMessage($fid : ID, $fidn: Int, $idL: ID , $da: DateTime, $mes: String)
     {createMessage(
        data: {
@@ -824,7 +824,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                 restime
                 timeToP
                 profilePic { data { attributes { url } } }
-                open_missions {
+                openMissions {
                   data {
                     id
                     attributes {
@@ -866,7 +866,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           vallues { data { attributes { valueName localizations { data { attributes { valueName } } } } } }
           publicDescription
           profilePic { data { attributes { url formats } } }
-          open_missions(filters: { archived: { eq: false } }) { data { id attributes { name } } }
+          openMissions(filters: { archived: { eq: false } }) { data { id attributes { name } } }
         }
       }
     }
@@ -1228,7 +1228,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       publishedAt: $publishedAt,
       admaticedai: $deadline,
       start: $sqedualed,
-      open_missions: [$openMid]
+      openMissions: [$openMid]
     }) {
       data {
         id
@@ -2240,7 +2240,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           data {
             id
             attributes {
-              open_missions(filters: { archived: { eq: false } }) {
+              openMissions(filters: { archived: { eq: false } }) {
                 data {
                   id
                   attributes {
@@ -2299,7 +2299,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           data {
             id
             attributes {
-              open_missions(filters: { archived: { eq: false } }) {
+              openMissions(filters: { archived: { eq: false } }) {
                 data {
                   id
                   attributes {
@@ -3594,7 +3594,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                   }
                 }
               }
-              open_missions(filters: { archived: { eq: false } }) {
+              openMissions(filters: { archived: { eq: false } }) {
                 data {
                   id
                   attributes {
@@ -4201,7 +4201,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
               }
             }
           }
-          open_missions(filters: { archived: { ne: true } }) {
+          openMissions(filters: { archived: { ne: true } }) {
             data {
               id
               attributes {
@@ -4477,4 +4477,196 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`
+};
+
+export const moachQids = {
+  'getProjectBaseInfo': `query GetProjectBaseInfo($pid: ID!) {
+    project(id: $pid) {
+      data {
+        attributes {
+          projectName
+          descripFor
+          publicDescription
+          profilePic { data { attributes { url formats } } }
+          user_1s { data { id attributes { email username lang profilePic { data { attributes { url formats } } } } } }
+          restime githublink fblink discordlink drivelink twiterlink watsapplink
+          vallues { data { id attributes { valueName localizations { data { attributes { valueName } } } } } }
+          acts{data{id attributes{shem hashivut isAssigned open_mission{data{id attributes {name}}} pendm{data{id attributes{name}}}
+                 dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}}
+                 des dateF vali{data{id attributes{ username profilePic {data{attributes{ url }}}}}}
+                 myIshur valiIshur status mesimabetahaliches{data{id
+                  attributes{name forums{data{id}}}}}}}}
+          sheiruts{data{ id attributes{name descrip equaliSplited oneTime isApruved}}}
+        }
+      }
+    }
+  }`,
+  'getProjectMissions': `query GetProjectMissions($pid: ID!) {
+    project(id: $pid) {
+      data {
+        attributes {
+          openMissions(filters: { archived: { eq: false } }) {
+            data {
+              id
+              attributes {
+                name hearotMeyuchadot descrip noofhours perhour sqadualed
+                privatlinks publicklinks acts { data { id attributes { shem dateS } } }
+                tafkidims { data { id attributes { roleDescription } } }
+                skills { data { id attributes { skillName } } }
+                work_ways { data { id attributes { workWayName } } }
+              }
+            }
+          }
+          mesimabetahaliches(filters: { finnished: { ne: true } }) {
+            data {
+              id
+              attributes {
+                name status iskvua howmanyhoursalready perhour hoursassinged
+                users_permissions_user { data { id attributes { username } } }
+              }
+            }
+          }
+          pendms(filters: { archived: { eq: false } }) {
+            data {
+              id
+              attributes {
+                name descrip noofhours perhour createdAt
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+  'getProjectFinancials': `query GetProjectFinancials($pid: ID!) {
+    project(id: $pid) {
+      data {
+        attributes {
+          tosplits(filters: { finished: { eq: false } }) {
+            data {
+              id
+              attributes {
+                name prectentage halukas { data { id attributes { confirmed userrecive { data { id } } amount usersend { data { id } } } } }
+                hervachti { users_permissions_user { data { id attributes { hervachti } } } noten mekabel amount }
+                vots { what users_permissions_user { data { id } } }
+              }
+            }
+          }
+          sales {
+            data {
+              id
+              attributes {
+                in date pending splited note tosplits { data { id } }
+                matanot { data { id attributes { name } } }
+                users_permissions_user { data { id attributes { username } } }
+              }
+            }
+          }
+          matanotofs {
+            data {
+              id
+              attributes {
+                name price quant kindOf startDate finnishDate
+              }
+            }
+          }
+          rikmashes {
+            data {
+              id
+              attributes {
+                name kindOf total hm price agprice sp { data { id } } spnot
+                users_permissions_user { data { id attributes { username } } }
+              }
+            }
+          }
+          finnished_missions {
+            data {
+              id
+              attributes {
+                missionName start finish createdAt why total descrip hearotMeyuchadot noofhours perhour
+                users_permissions_user { data { id attributes { username } } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+  'getProjectProcesses': `query GetProjectProcesses($pid: ID!) {
+    project(id: $pid) {
+      data {
+        attributes {
+          projectName
+          processes {
+            data {
+              id
+              attributes {
+                name descrip createdAt
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+  'getProjectVotes': `query GetProjectVotes($pid: ID!) {
+    project(id: $pid) {
+      data {
+        attributes {
+          tosplits(filters: { finished: { eq: false } }) {
+            data { id attributes { name vots { what why users_permissions_user { data { id attributes { username } } } } } }
+          }
+          asks(filters: { archived: { eq: false } }) {
+            data { id attributes { open_mission { data { attributes { name } } } vots { what why users_permissions_user { data { id attributes { username } } } } } }
+          }
+          decisions(filters: { archived: { eq: false } }) {
+            data { id attributes { kind vots { what why users_permissions_user { data { id attributes { username } } } } } }
+          }
+        }
+      }
+    }
+  }`,
+  'getMissionInProgress': `query GetMissionInProgress($id: ID!) {
+    mesimabetahalich(id: $id) {
+      data {
+        id
+        attributes {
+          name status iskvua howmanyhoursalready hoursassinged perhour
+          users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          forums { data { id attributes { messages { data { id attributes { content when } } } } } }
+          acts { data { id attributes { shem naasa status } } }
+          finiapruvals { data { id attributes { missname archived } } }
+          descrip
+        }
+      }
+    }
+  }`,
+  'getVote': `query GetVote($id: ID!) {
+    vot(id: $id) {
+      data {
+        id
+        attributes {
+          what why zman order
+          users_permissions_user { data { id attributes { username } } }
+        }
+      }
+    }
+  }`,
+  'getAct': `query GetAct($id: ID!) {
+    act(id: $id) {
+      data {
+        id
+        attributes {
+          shem des status naasa dateS dateF link
+          my { data { id attributes { username } } }
+          vali { data { id attributes { username } } }
+        }
+      }
+    }
+  }`
+};
+
+export const qids = {
+    ...qids_base,
+    ...moachQids
 };

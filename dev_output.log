@@ -1,0 +1,501 @@
+
+> dev
+> vite dev --host
+
+7:42:55 AM [vite-plugin-svelte] WARNING: The following packages have a svelte field in their package.json but no exports condition for svelte.
+
+svelte-accessible-dialog@2.1.3
+svelte-agnostic-draggable@0.2.0
+svelte-forms-lib@2.0.1
+svelte-touch-to-mouse@1.0.0
+svelte-tour@1.0.7
+swiper@8.4.7
+svead@0.0.4
+svelte-calendar@3.1.6
+
+Please see https://github.com/sveltejs/vite-plugin-svelte/blob/main/docs/faq.md#missing-exports-condition for details.
+Port 5173 is in use, trying another one...
+
+  VITE v6.3.5  ready in 3858 ms
+
+  ➜  Local:   http://localhost:5174/
+  ➜  Network: http://192.168.0.2:5174/
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+en /moach
+Loading translations...
+/moach
+en /moach
+8:03:53 AM [vite-plugin-svelte] src/routes/(reg)/+layout.svelte:123:3 Unused CSS selector ".ww2"
+https://svelte.dev/e/css_unused_selector
+8:03:53 AM [vite-plugin-svelte] src/routes/(reg)/+layout.svelte:129:4 Unused CSS selector ".ww3"
+https://svelte.dev/e/css_unused_selector
+8:03:53 AM [vite-plugin-svelte] src/routes/(reg)/+layout.svelte:137:4 Unused CSS selector ".ww1"
+https://svelte.dev/e/css_unused_selector
+8:03:53 AM [vite-plugin-svelte] src/routes/(reg)/+layout.svelte:143:1 Unused CSS selector ".ww"
+https://svelte.dev/e/css_unused_selector
+8:03:54 AM [vite-plugin-svelte] src/routes/(reg)/moach/+page.svelte:1806:2 `<link>` will be treated as an HTML element unless it begins with a capital letter
+https://svelte.dev/e/component_name_lowercase
+8:03:54 AM [vite-plugin-svelte] src/routes/(reg)/moach/+page.svelte:1811:2 `<link>` will be treated as an HTML element unless it begins with a capital letter
+https://svelte.dev/e/component_name_lowercase
+8:03:54 AM [vite-plugin-svelte] src/routes/(reg)/moach/+page.svelte:2023:12 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:03:54 AM [vite-plugin-svelte] src/routes/(reg)/moach/+page.svelte:2035:12 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:03:54 AM [vite-plugin-svelte] src/routes/(reg)/moach/+page.svelte:2048:10 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:03:54 AM [vite-plugin-svelte] src/routes/(reg)/moach/+page.svelte:2076:12 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:03:54 AM [vite-plugin-svelte] src/routes/(reg)/moach/+page.svelte:2540:20 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:03:54 AM [vite-plugin-svelte] src/routes/(reg)/moach/+page.svelte:2587:20 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:03:54 AM [vite-plugin-svelte] src/routes/(reg)/moach/+page.svelte:2648:24 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:03:54 AM [vite-plugin-svelte] src/routes/(reg)/moach/+page.svelte:2674:24 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:03:54 AM [vite-plugin-svelte] src/routes/(reg)/moach/+page.svelte:2766:20 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:03:54 AM [vite-plugin-svelte] src/routes/(reg)/moach/+page.svelte:2910:14 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:03:54 AM [vite-plugin-svelte] src/routes/(reg)/moach/+page.svelte:2924:12 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:03:54 AM [vite-plugin-svelte] src/routes/(reg)/moach/+page.svelte:2944:12 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:03:54 AM [vite-plugin-svelte] src/routes/(reg)/moach/+page.svelte:2957:12 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:03:54 AM [vite-plugin-svelte] src/routes/(reg)/moach/+page.svelte:2980:16 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:03:54 AM [vite-plugin-svelte] src/routes/(reg)/moach/+page.svelte:2999:18 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:03:54 AM [vite-plugin-svelte] src/routes/(reg)/moach/+page.svelte:3138:2 Unused CSS selector ".textlink:hover"
+https://svelte.dev/e/css_unused_selector
+[vite:css][postcss] @import must precede all other statements (besides @charset or empty @layer)
+1640|    --range-pip-in-range-text: hsl(180, 25.4%, 24.7%);
+1641|  }
+1642|  @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Cinzel:wght@400;600&display=swap');
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1643|
+1644|  :root {
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:24:4 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:27:4 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:32:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:33:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:35:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:36:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:37:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:38:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:39:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:42:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:43:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:44:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:45:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:46:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:47:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:49:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:50:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:67:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:68:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:73:8 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:75:8 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:80:8 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:82:8 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:89:8 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:90:8 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:97:8 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:98:8 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:113:12 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:116:12 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:121:14 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:133:10 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:136:12 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:139:12 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/icons/grow.svelte:142:12 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/main/ThemeToggle.svelte:43:6 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:04:02 AM [vite-plugin-svelte] src/lib/celim/main/ThemeToggle.svelte:50:8 Self-closing HTML tags for non-void elements are ambiguous — use `<span ...></span>` rather than `<span ... />`
+https://svelte.dev/e/element_invalid_self_closing_tag
+8:04:02 AM [vite-plugin-svelte] src/lib/components/prPr/bethas.svelte:299:45 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:04:02 AM [vite-plugin-svelte] src/lib/components/prPr/bethas.svelte:408:18 `<div>` cannot be a child of `<tbody>`. `<tbody>` only allows these children: `<tr>`, `<style>`, `<script>`, `<template>`. When rendering this component on the server, the resulting HTML will be modified by the browser (by moving, removing, or inserting elements), likely resulting in a `hydration_mismatch` warning
+https://svelte.dev/e/node_invalid_placement_ssr
+8:04:02 AM [vite-plugin-svelte] src/lib/components/footer/foot.svelte:190:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/components/footer/foot.svelte:191:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/components/footer/foot.svelte:192:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/components/footer/foot.svelte:193:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/components/footer/foot.svelte:194:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:02 AM [vite-plugin-svelte] src/lib/components/footer/foot.svelte:203:14 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:04:02 AM [vite-plugin-svelte] src/lib/components/footer/foot.svelte:302:2 Unused CSS selector ".ww2"
+https://svelte.dev/e/css_unused_selector
+8:04:02 AM [vite-plugin-svelte] src/lib/components/footer/foot.svelte:308:2 Unused CSS selector ".ww3"
+https://svelte.dev/e/css_unused_selector
+8:04:02 AM [vite-plugin-svelte] src/lib/components/footer/foot.svelte:315:2 Unused CSS selector ".ww1"
+https://svelte.dev/e/css_unused_selector
+8:04:02 AM [vite-plugin-svelte] src/lib/components/footer/foot.svelte:321:2 Unused CSS selector ".online"
+https://svelte.dev/e/css_unused_selector
+8:04:02 AM [vite-plugin-svelte] src/lib/components/footer/foot.svelte:344:2 Unused CSS selector ".ww"
+https://svelte.dev/e/css_unused_selector
+8:04:03 AM [vite-plugin-svelte] src/lib/components/addnew/newIwant.svelte:431:6 Screenreaders already announce `<img>` elements as an image
+https://svelte.dev/e/a11y_img_redundant_alt
+8:04:03 AM [vite-plugin-svelte] src/lib/components/addnew/newIwant.svelte:702:2 Unused CSS selector ".cen"
+https://svelte.dev/e/css_unused_selector
+8:04:03 AM [vite-plugin-svelte] src/lib/components/addnew/newIwant.svelte:786:2 Unused CSS selector "img.bg"
+https://svelte.dev/e/css_unused_selector
+8:04:03 AM [vite-plugin-svelte] src/lib/components/addnew/newIwant.svelte:799:4 Unused CSS selector "img.bg"
+https://svelte.dev/e/css_unused_selector
+8:04:06 AM [vite-plugin-svelte] src/lib/celim/lowding.svelte:61:3 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:06 AM [vite-plugin-svelte] src/lib/celim/lowding.svelte:62:3 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:06 AM [vite-plugin-svelte] src/lib/celim/lowding.svelte:64:9 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:06 AM [vite-plugin-svelte] src/lib/celim/lowding.svelte:65:11 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:06 AM [vite-plugin-svelte] src/lib/celim/lowding.svelte:71:9 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:06 AM [vite-plugin-svelte] src/lib/celim/lowding.svelte:78:5 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:06 AM [vite-plugin-svelte] src/lib/celim/lowding.svelte:79:5 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:06 AM [vite-plugin-svelte] src/lib/celim/lowding.svelte:80:5 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:06 AM [vite-plugin-svelte] src/lib/celim/lowding.svelte:81:5 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:06 AM [vite-plugin-svelte] src/lib/celim/lowding.svelte:84:5 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:06 AM [vite-plugin-svelte] src/lib/celim/lowding.svelte:85:5 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:06 AM [vite-plugin-svelte] src/lib/celim/lowding.svelte:86:5 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:06 AM [vite-plugin-svelte] src/lib/celim/lowding.svelte:87:5 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:06 AM [vite-plugin-svelte] src/lib/celim/lowding.svelte:88:5 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:06 AM [vite-plugin-svelte] src/lib/celim/lowding.svelte:89:5 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:06 AM [vite-plugin-svelte] src/lib/celim/lowding.svelte:90:5 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:06 AM [vite-plugin-svelte] src/lib/celim/lowding.svelte:92:5 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:06 AM [vite-plugin-svelte] src/lib/celim/lowding.svelte:93:5 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:06 AM [vite-plugin-svelte] src/lib/celim/lowding.svelte:103:11 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+[vite:css][postcss] @import must precede all other statements (besides @charset or empty @layer)
+63 |    /* demo styles */
+64 |
+65 |    @import url(https://fonts.googleapis.com/css?family=Roboto:400,500,300,700);
+   |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+66 |    /*
+67 |  section{
+8:04:07 AM [vite-plugin-svelte] src/lib/celim/icons/pub.svelte:16:4 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:07 AM [vite-plugin-svelte] src/lib/celim/icons/pub.svelte:18:4 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:07 AM [vite-plugin-svelte] src/lib/celim/icons/pub.svelte:20:4 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:07 AM [vite-plugin-svelte] src/lib/celim/icons/pub.svelte:21:4 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:07 AM [vite-plugin-svelte] src/lib/celim/icons/pub.svelte:22:4 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:07 AM [vite-plugin-svelte] src/lib/celim/icons/pub.svelte:27:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:07 AM [vite-plugin-svelte] src/lib/celim/icons/pub.svelte:28:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:07 AM [vite-plugin-svelte] src/lib/celim/icons/pub.svelte:30:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:07 AM [vite-plugin-svelte] src/lib/celim/icons/pub.svelte:31:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:07 AM [vite-plugin-svelte] src/lib/celim/icons/pub.svelte:33:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:07 AM [vite-plugin-svelte] src/lib/celim/icons/pub.svelte:34:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:07 AM [vite-plugin-svelte] src/lib/celim/icons/pub.svelte:35:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:07 AM [vite-plugin-svelte] src/lib/celim/icons/pub.svelte:36:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:07 AM [vite-plugin-svelte] src/lib/celim/icons/pub.svelte:37:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:07 AM [vite-plugin-svelte] src/lib/celim/icons/pub.svelte:38:6 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:07 AM [vite-plugin-svelte] src/lib/celim/icons/pub.svelte:254:12 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:07 AM [vite-plugin-svelte] src/lib/celim/icons/pub.svelte:257:12 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:07 AM [vite-plugin-svelte] src/lib/celim/icons/pub.svelte:262:14 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:07 AM [vite-plugin-svelte] src/lib/celim/icons/pub.svelte:326:10 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:07 AM [vite-plugin-svelte] src/lib/celim/icons/pub.svelte:329:12 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:07 AM [vite-plugin-svelte] src/lib/celim/icons/pub.svelte:332:12 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:07 AM [vite-plugin-svelte] src/lib/celim/icons/pub.svelte:335:12 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:07 AM [vite-plugin-svelte] src/lib/components/prPr/gantt/gant.svelte:274:4 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:04:07 AM [vite-plugin-svelte] src/lib/components/prPr/gantt/gant.svelte:275:8 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:04:07 AM [vite-plugin-svelte] src/lib/components/header/header.svelte:30:0 Non-interactive element `<img>` should not be assigned mouse or keyboard event listeners
+https://svelte.dev/e/a11y_no_noninteractive_element_interactions
+8:04:07 AM [vite-plugin-svelte] src/lib/components/header/header.svelte:36:0 Non-interactive element `<img>` should not be assigned mouse or keyboard event listeners
+https://svelte.dev/e/a11y_no_noninteractive_element_interactions
+8:04:12 AM [vite-plugin-svelte] src/lib/components/prPr/editp.svelte:309:5 Unused CSS selector ".sp"
+https://svelte.dev/e/css_unused_selector
+8:04:12 AM [vite-plugin-svelte] src/lib/components/prPr/editp.svelte:314:2 Unused CSS selector ".aft"
+https://svelte.dev/e/css_unused_selector
+8:04:12 AM [vite-plugin-svelte] src/lib/celim/ui/richText.svelte:399:8 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:04:12 AM [vite-plugin-svelte] src/lib/celim/ui/richText.svelte:416:8 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:04:12 AM [vite-plugin-svelte] src/lib/celim/ui/richText.svelte:450:10 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:04:12 AM [vite-plugin-svelte] src/lib/components/addnew/addnewval.svelte:120:0 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:04:12 AM [vite-plugin-svelte] src/lib/components/addnew/addnewval.svelte:142:0 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:04:12 AM [vite-plugin-svelte] src/lib/components/prPr/hand.svelte:144:186 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:12 AM [vite-plugin-svelte] src/lib/components/prPr/hand.svelte:145:268 Attributes should not contain ':' characters to prevent ambiguity with Svelte directives
+https://svelte.dev/e/attribute_illegal_colon
+8:04:12 AM [vite-plugin-svelte] src/lib/components/prPr/hand.svelte:148:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+8:04:12 AM [vite-plugin-svelte] src/lib/components/prPr/hand.svelte:148:4 `<g>` with a mouseenter or click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+8:04:12 AM [vite-plugin-svelte] src/lib/components/prPr/hand.svelte:239:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+8:04:12 AM [vite-plugin-svelte] src/lib/components/prPr/hand.svelte:239:4 `<g>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+8:04:12 AM [vite-plugin-svelte] src/lib/components/prPr/hand.svelte:258:0 Unused CSS selector ".curved-text"
+https://svelte.dev/e/css_unused_selector
+8:04:12 AM [vite-plugin-svelte] src/lib/components/prPr/handd.svelte:128:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+8:04:12 AM [vite-plugin-svelte] src/lib/components/prPr/handd.svelte:128:4 `<a>` with a click or mouseenter handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+8:04:12 AM [vite-plugin-svelte] src/lib/components/prPr/handd.svelte:128:4 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:04:12 AM [vite-plugin-svelte] src/lib/components/prPr/handd.svelte:207:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+8:04:12 AM [vite-plugin-svelte] src/lib/components/prPr/handd.svelte:207:4 `<g>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+8:04:12 AM [vite-plugin-svelte] src/lib/components/prPr/handd.svelte:220:0 Unused CSS selector "#curve"
+https://svelte.dev/e/css_unused_selector
+8:04:12 AM [vite-plugin-svelte] src/lib/components/prPr/handd.svelte:224:0 Unused CSS selector ".curved-text"
+https://svelte.dev/e/css_unused_selector
+8:04:12 AM [vite-plugin-svelte] src/lib/components/prPr/mashmam.svelte:255:2 Unused CSS selector ".ggd"
+https://svelte.dev/e/css_unused_selector
+8:04:12 AM [vite-plugin-svelte] src/lib/components/prPr/mashmam.svelte:278:2 Unused CSS selector ".ggd:hover"
+https://svelte.dev/e/css_unused_selector
+8:04:13 AM [vite-plugin-svelte] src/lib/components/footer/chatSmall.svelte:68:14 This reference only captures the initial value of `messagesArray`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+8:04:14 AM [vite-plugin-svelte] src/lib/components/prPr/column/_components/AxisX.svelte:120:2 Unused CSS selector ".axis.snapTicks .tick:last-child text"
+https://svelte.dev/e/css_unused_selector
+8:04:14 AM [vite-plugin-svelte] src/lib/components/prPr/column/_components/AxisX.svelte:123:2 Unused CSS selector ".axis.snapTicks .tick.tick-0 text"
+https://svelte.dev/e/css_unused_selector
+8:04:17 AM [vite-plugin-svelte] src/lib/components/prPr/whowhat.svelte:941:2 Unused CSS selector ".ggd"
+https://svelte.dev/e/css_unused_selector
+8:04:17 AM [vite-plugin-svelte] src/lib/components/prPr/whowhat.svelte:964:2 Unused CSS selector ".ggd:hover"
+https://svelte.dev/e/css_unused_selector
+8:04:18 AM [vite-plugin-svelte] src/lib/components/prPr/mission.svelte:1312:88 Quoted attributes on components and custom elements will be stringified in a future version of Svelte. If this isn't what you want, remove the quotes
+https://svelte.dev/e/attribute_quoted
+8:04:18 AM [vite-plugin-svelte] src/lib/components/prPr/mission.svelte:1441:66 Quoted attributes on components and custom elements will be stringified in a future version of Svelte. If this isn't what you want, remove the quotes
+https://svelte.dev/e/attribute_quoted
+8:04:18 AM [vite-plugin-svelte] src/lib/components/prPr/mission.svelte:1548:72 Quoted attributes on components and custom elements will be stringified in a future version of Svelte. If this isn't what you want, remove the quotes
+https://svelte.dev/e/attribute_quoted
+8:04:18 AM [vite-plugin-svelte] src/lib/components/prPr/mission.svelte:1763:2 Unused CSS selector "textarea::-webkit-resizer"
+https://svelte.dev/e/css_unused_selector
+8:04:18 AM [vite-plugin-svelte] src/lib/components/prPr/mission.svelte:1782:2 Unused CSS selector ".ggd"
+https://svelte.dev/e/css_unused_selector
+8:04:18 AM [vite-plugin-svelte] src/lib/components/prPr/mission.svelte:1795:2 Unused CSS selector ".ggr"
+https://svelte.dev/e/css_unused_selector
+8:04:18 AM [vite-plugin-svelte] src/lib/components/prPr/mission.svelte:1805:2 Unused CSS selector ".ggr:hover"
+https://svelte.dev/e/css_unused_selector
+8:04:18 AM [vite-plugin-svelte] src/lib/components/prPr/mission.svelte:1807:2 Unused CSS selector ".ggd:hover"
+https://svelte.dev/e/css_unused_selector
+8:04:18 AM [vite-plugin-svelte] src/lib/components/prPr/mission.svelte:1811:2 Unused CSS selector ".dd"
+https://svelte.dev/e/css_unused_selector
+8:04:18 AM [vite-plugin-svelte] src/lib/components/prPr/mission.svelte:1818:2 Unused CSS selector ".body"
+https://svelte.dev/e/css_unused_selector
+8:04:18 AM [vite-plugin-svelte] src/lib/components/prPr/mission.svelte:1884:2 Unused CSS selector "#check table"
+https://svelte.dev/e/css_unused_selector
+8:04:18 AM [vite-plugin-svelte] src/lib/components/prPr/mission.svelte:1887:2 Unused CSS selector ".tbl-header"
+https://svelte.dev/e/css_unused_selector
+8:04:18 AM [vite-plugin-svelte] src/lib/components/prPr/mission.svelte:1891:2 Unused CSS selector ".tbl-content"
+https://svelte.dev/e/css_unused_selector
+8:04:18 AM [vite-plugin-svelte] src/lib/components/prPr/mission.svelte:1898:2 Unused CSS selector "#check th"
+https://svelte.dev/e/css_unused_selector
+8:04:18 AM [vite-plugin-svelte] src/lib/components/prPr/mission.svelte:1906:2 Unused CSS selector "#check td"
+https://svelte.dev/e/css_unused_selector
+8:04:18 AM [vite-plugin-svelte] src/lib/components/addnew/addNewRole.svelte:222:0 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:04:18 AM [vite-plugin-svelte] src/lib/components/addnew/addNewRole.svelte:265:4 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:04:18 AM [vite-plugin-svelte] src/lib/components/addnew/addNewRole.svelte:273:6 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:04:18 AM [vite-plugin-svelte] src/lib/components/addnew/addNewSkillToRole.svelte:119:2 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:04:18 AM [vite-plugin-svelte] src/lib/components/ui/SkillSelector.svelte:328:10 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:04:18 AM [vite-plugin-svelte] src/lib/celim/ui/input/numberInput.svelte:29:8 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:04:18 AM [vite-plugin-svelte] src/lib/celim/ui/input/numberInput.svelte:36:8 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:04:18 AM [vite-plugin-svelte] src/lib/celim/ui/mobileModal.svelte:24:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+8:04:18 AM [vite-plugin-svelte] src/lib/celim/ui/mobileModal.svelte:24:4 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+8:04:18 AM [vite-plugin-svelte] src/lib/celim/ui/mobileModal.svelte:25:6 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+8:04:18 AM [vite-plugin-svelte] src/lib/celim/ui/mobileModal.svelte:25:6 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+8:04:18 AM [vite-plugin-svelte] src/lib/components/addnew/addNewNeed.svelte:100:2 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/totalNeeds.svelte:814:6 This element is implicitly closed by the following `</div>`, which can cause an unexpected DOM structure. Add an explicit `</table>` to avoid surprises.
+https://svelte.dev/e/element_implicitly_closed
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/totalNeeds.svelte:826:16 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/totalNeeds.svelte:1244:2 Unused CSS selector ".ggd"
+https://svelte.dev/e/css_unused_selector
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/totalNeeds.svelte:1269:2 Unused CSS selector ".ggd:hover"
+https://svelte.dev/e/css_unused_selector
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/newOpn.svelte:96:8 `<span>` with a mouseenter or mouseleave handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/newOpn.svelte:96:195 `<span>` with a mouseenter or mouseleave handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/newOpn.svelte:96:387 `<span>` with a mouseenter or mouseleave handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/newOpn.svelte:160:16 Quoted attributes on components and custom elements will be stringified in a future version of Svelte. If this isn't what you want, remove the quotes
+https://svelte.dev/e/attribute_quoted
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/newOpn.svelte:161:2 Quoted attributes on components and custom elements will be stringified in a future version of Svelte. If this isn't what you want, remove the quotes
+https://svelte.dev/e/attribute_quoted
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/newOpn.svelte:164:2 Quoted attributes on components and custom elements will be stringified in a future version of Svelte. If this isn't what you want, remove the quotes
+https://svelte.dev/e/attribute_quoted
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/pendsM.svelte:268:6 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/pendsM.svelte:268:6 `<circle>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/pendsM.svelte:269:6 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/pendsM.svelte:269:6 `<circle>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/pendsM.svelte:271:6 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/pendsM.svelte:271:6 `<circle>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/pendsM.svelte:357:6 Unused CSS selector ".full"
+https://svelte.dev/e/css_unused_selector
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/betaha.svelte:249:16 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/fini.svelte:311:12 `<circle>` with a mouseenter handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/fini.svelte:332:2 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/fini.svelte:533:2 Unused CSS selector ".ggd"
+https://svelte.dev/e/css_unused_selector
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/fini.svelte:556:2 Unused CSS selector ".ggd:hover"
+https://svelte.dev/e/css_unused_selector
+8:04:19 AM [vite-plugin-svelte] src/lib/celim/tooltipb.svelte:29:0 `<span>` with a mouseenter, mouseleave or mousemove handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/finisin.svelte:295:2 Unused CSS selector ".badge.badge-single"
+https://svelte.dev/e/css_unused_selector
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/finisin.svelte:323:2 Unused CSS selector ".cards-scroll.single-mode"
+https://svelte.dev/e/css_unused_selector
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/finisin.svelte:360:2 Unused CSS selector ".single-mode .task-card"
+https://svelte.dev/e/css_unused_selector
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/hachcal.svelte:199:3 Unused CSS selector ".ggd"
+https://svelte.dev/e/css_unused_selector
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/hachcal.svelte:223:25 Unused CSS selector ".ggd:hover"
+https://svelte.dev/e/css_unused_selector
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/tasks/taskModal.svelte:143:2 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/sheirut/sheirutShow.svelte:136:16 Quoted attributes on components and custom elements will be stringified in a future version of Svelte. If this isn't what you want, remove the quotes
+https://svelte.dev/e/attribute_quoted
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/sheirut/sheirutShow.svelte:137:2 Quoted attributes on components and custom elements will be stringified in a future version of Svelte. If this isn't what you want, remove the quotes
+https://svelte.dev/e/attribute_quoted
+8:04:19 AM [vite-plugin-svelte] src/lib/components/prPr/sheirut/sheirutShow.svelte:140:2 Quoted attributes on components and custom elements will be stringified in a future version of Svelte. If this isn't what you want, remove the quotes
+https://svelte.dev/e/attribute_quoted
+8:04:20 AM [vite-plugin-svelte] src/lib/components/prPr/tasks/actsTable.svelte:453:14 Quoted attributes on components and custom elements will be stringified in a future version of Svelte. If this isn't what you want, remove the quotes
+https://svelte.dev/e/attribute_quoted
+8:04:20 AM [vite-plugin-svelte] src/lib/components/grid/nameAndPname.svelte:241:12 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+8:04:21 AM [vite-plugin-svelte] src/lib/components/prPr/timersOfUsers.svelte:11:16 This reference only captures the initial value of `timersData`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+8:04:21 AM [vite-plugin-svelte] src/lib/components/prPr/ProjectTimersCalendar.svelte:449:2 `<div>` with a keypress or click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+8:04:21 AM [vite-plugin-svelte] src/lib/components/prPr/ProjectTimersCalendar.svelte:450:4 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+8:04:21 AM [vite-plugin-svelte] src/lib/components/prPr/ProjectTimersCalendar.svelte:450:4 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+8:04:21 AM [vite-plugin-svelte] src/lib/components/ui/AuthorityBadge.svelte:138:2 Unused CSS selector ".pink-glow .outer-ring"
+https://svelte.dev/e/css_unused_selector
+8:04:21 AM [vite-plugin-svelte] src/lib/components/ui/AuthorityBadge.svelte:171:2 Unused CSS selector ".curved-text.rtl"
+https://svelte.dev/e/css_unused_selector
+8:04:21 AM [vite-plugin-svelte] src/lib/components/ui/AuthorityBadge.svelte:173:2 Unused CSS selector ".animate-spin-slow"
+https://svelte.dev/e/css_unused_selector
+8:04:21 AM [vite-plugin-svelte] src/lib/components/ui/AuthorityBadge.svelte:190:2 Unused CSS selector ".member-badge .label"
+https://svelte.dev/e/css_unused_selector
+8:04:21 AM [vite-plugin-svelte] src/lib/components/process/ProcessChainView.svelte:406:2 Unused CSS selector ".pcv-card--expanded"
+https://svelte.dev/e/css_unused_selector
+8:04:21 AM [vite-plugin-svelte] src/lib/components/process/ProcessChainView.svelte:412:2 Unused CSS selector ".pcv-card--resource.pcv-card--expanded"
+https://svelte.dev/e/css_unused_selector
+8:04:21 AM [vite-plugin-svelte] src/lib/components/process/chain/ChainNode.svelte:50:4 `<button>` cannot be a child of `<button>`. When rendering this component on the server, the resulting HTML will be modified by the browser (by moving, removing, or inserting elements), likely resulting in a `hydration_mismatch` warning
+https://svelte.dev/e/node_invalid_placement_ssr
+8:04:21 AM [vite-plugin-svelte] src/lib/components/process/chain/AsksNode.svelte:166:2 Unused CSS selector ".chevron--up"
+https://svelte.dev/e/css_unused_selector
+[vite:css][postcss] @import must precede all other statements (besides @charset or empty @layer)
+1640|    --range-pip-in-range-text: hsl(180, 25.4%, 24.7%);
+1641|  }
+1642|  @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&family=Cinzel:wght@400;600&display=swap');
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1643|
+1644|  :root {
+[vite:css][postcss] @import must precede all other statements (besides @charset or empty @layer)
+63 |    /* demo styles */
+64 |
+65 |    @import url(https://fonts.googleapis.com/css?family=Roboto:400,500,300,700);
+   |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+66 |    /*
+67 |  section{
+8:04:36 AM [vite] (client) ✨ new dependencies optimized: d3-path, d3-time, d3-time-format, d3-color, internmap, just-throttle
+8:04:36 AM [vite] (client) ✨ optimized dependencies changed. reloading
