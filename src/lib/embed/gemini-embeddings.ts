@@ -1,6 +1,4 @@
-import { GEMINI_API_KEY as KEY_PRIORITY, GOOGLE_API as KEY_BACKUP } from '$env/static/private';
-
-const GEMINI_API_KEY = KEY_PRIORITY || KEY_BACKUP || '';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API || '';
 
 const GEMINI_MODEL = 'gemini-embedding-2-preview';
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta';

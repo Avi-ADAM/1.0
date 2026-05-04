@@ -18,13 +18,13 @@ export async function load({ locals, params, fetch }) {
     if (node) {
       archived = node.archived === true;
       const title = {
-        he: `1💗1 | מתנה "${node.name}" בריקמה: ${node.projectcreates?.data?.[0]?.attributes?.projectName || ''}`,
-        en: `1💗1 | Gift "${node.name}" on freeMates: ${node.projectcreates?.data?.[0]?.attributes?.projectName || ''}`
+        he: `1💗1 | מוצר "${node.name}" בריקמה: ${node.projectcreates?.data?.[0]?.attributes?.projectName || ''}`,
+        en: `1💗1 | product "${node.name}" on freeMates: ${node.projectcreates?.data?.[0]?.attributes?.projectName || ''}`
       };
       alld = { ...node, id: dataNode.id, title };
     }
   } catch (e) {
-    console.error('gift load error', e);
+    console.error('product load error', e);
   }
 
   return {

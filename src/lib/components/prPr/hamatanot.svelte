@@ -16,26 +16,26 @@
   import Close from '$lib/celim/close.svelte';
   import ShareButtons from '$lib/components/share/shareButtons/index.svelte';
   import { toast } from 'svelte-sonner';
-  
+
   /** @type {Record<string, number>} */
   let fermatana = $state({});
-  
+
   let showTableModal = $state(false);
-  
+
   /** @type {Record<string, Record<string, number>>} */
   let ferdate = $state({});
-  
+
   /** @type {Array<{key: string, value: number}>} */
   let arr = $state([]);
-  
+
   /** @type {Array<Record<string, string | number>>} */
   let arrt = $state([]);
-  
+
   /** @type {string | undefined} */
   let kindOf = $state();
-  
+
   let kindUlimit = $state(false);
-  
+
   /**
    * @typedef {Object} MatanaAttributes
    * @property {string} name - Gift name
@@ -43,7 +43,7 @@
    * @property {number} quant - Available quantity (-1 for unlimited)
    * @property {string} kindOf - Type: 'total', 'monthly', 'yearly', or 'unlimited'
    */
-  
+
   /**
    * @typedef {Object} Matana
    * @property {string} id - Gift ID
@@ -53,7 +53,7 @@
    * @property {number} attributes.quant
    * @property {string} attributes.kindOf
    */
-  
+
   /**
    * @typedef {Object} SaleAttributes
    * @property {number} in - Sale amount
@@ -69,13 +69,13 @@
    * @property {Object} users_permissions_user.data.attributes
    * @property {string} users_permissions_user.data.attributes.username
    */
-  
+
   /**
    * @typedef {Object} Sale
    * @property {string} id - Sale ID
    * @property {SaleAttributes} attributes
    */
-  
+
   /**
    * @typedef {Object} ProjectUser
    * @property {string} id - User ID
@@ -86,7 +86,7 @@
    * @property {Object} [attributes.profilePic.data.attributes]
    * @property {string} [attributes.profilePic.data.attributes.url]
    */
-  
+
   let {
     /** @type {Array<any>} */
     fmiData = [],
@@ -137,25 +137,25 @@
     let oldob = bmiData;
     const x = oldob.map((c) => c.id);
     const indexy = x.indexOf(id);
-    
+
     // עדכון כמות רק אם יש un (לא unlimited) והאינדקס נמצא
     if (un !== undefined && indexy !== -1) {
       oldob[indexy].quant = un;
       bmiData = oldob;
     }
-    
+
     isOpen = false;
     a = 0;
     salee.push(event.matana);
   };
-  
+
   function saleUnlimited() {
     // עבור מוצרים unlimited - סגירת הדיאלוג בלבד
     // המכירה כבר נוצרה בשרת, אין צורך לעדכן כמות
     isOpen = false;
     a = 0;
-  };
-  
+  }
+
   function done(event) {
     isOpen = false;
     a = 0;
@@ -192,7 +192,7 @@
   const errmsg = { he: ' אירעה שגיאה', en: 'error' };
   const trya = { he: 'לנסות שוב', en: 'try again' };
   const erhe = { he: 'הכנסות ממתינות לחלוקה', en: 'awited spliting earnings' };
-  const our = { he: 'המתנות שלנו', en: "our gift's" };
+  const our = { he: 'המוצרים שלנו', en: "our product's" };
   const nm = { he: 'שם', en: 'name' };
   const pric = { he: 'מחיר', en: 'price' };
   const quanti = { he: 'כמות מצויה', en: 'available quantity' };
@@ -202,8 +202,8 @@
   const pye = { he: 'שנתי', en: 'yearly' };
   const unl = { he: 'ללא הגבלה', en: 'unlimited' };
   const res = { he: 'דיווח על מכירה', en: 'report sale' };
-  const cr = { he: ' יצירת מתנה חדשה', en: 'create new gift' };
-  const gn = { he: 'שם המתנה', en: 'gift name' };
+  const cr = { he: ' יצירת מוצר חדש', en: 'create new product' };
+  const gn = { he: 'שם המוצר', en: 'product name' };
   const qu = { he: 'סכום', en: 'amount' };
   const whoo = { he: 'הכסף ממתין אצל: ', en: 'who guard the money' };
   const noteLabel = { he: 'הערה:', en: 'Note:' };
@@ -217,7 +217,7 @@
   const downloadCsv = { he: 'הורדת CSV', en: 'Download CSV' };
   const closeBtn = { he: 'סגור', en: 'Close' };
   const salesTable = { he: 'טבלת מכירות', en: 'Sales Table' };
-  const giftName = { he: 'שם מתנה', en: 'Gift Name' };
+  const giftName = { he: 'שם המוצר', en: 'Product Name' };
   const amount = { he: 'סכום', en: 'Amount' };
   const soldBy = { he: 'נמכר על ידי', en: 'Sold By' };
   const dateLabel = { he: 'תאריך', en: 'Date' };
@@ -226,7 +226,7 @@
   const splitStatus = { he: 'חולק', en: 'Split' };
   const pendingStatus = { he: 'בהצבעה', en: 'Pending' };
   const awaitingStatus = { he: 'ממתין', en: 'Awaiting' };
-  
+
   function exportToCSV() {
     const headers = [
       giftName[$lang],
@@ -236,14 +236,14 @@
       statusLabel[$lang],
       noteText[$lang]
     ];
-    
-    const rows = salee.map(sale => {
-      const status = sale.attributes.splited 
+
+    const rows = salee.map((sale) => {
+      const status = sale.attributes.splited
         ? splitStatus[$lang]
-        : sale.attributes.pending 
-        ? pendingStatus[$lang]
-        : awaitingStatus[$lang];
-      
+        : sale.attributes.pending
+          ? pendingStatus[$lang]
+          : awaitingStatus[$lang];
+
       return [
         sale.attributes.matanot.data.attributes.name,
         sale.attributes.in,
@@ -253,13 +253,15 @@
         sale.attributes.note || ''
       ];
     });
-    
+
     const csvContent = [
       headers.join(','),
-      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(','))
     ].join('\n');
-    
-    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+
+    const blob = new Blob(['\ufeff' + csvContent], {
+      type: 'text/csv;charset=utf-8;'
+    });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
@@ -268,8 +270,10 @@
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
-    toast.success($lang === 'he' ? 'הקובץ הורד בהצלחה' : 'File downloaded successfully');
+
+    toast.success(
+      $lang === 'he' ? 'הקובץ הורד בהצלחה' : 'File downloaded successfully'
+    );
   }
   $effect(() => {
     // Show all sales in graphs
@@ -346,7 +350,7 @@
     totalSales = salee.reduce((total, s) => total + s.attributes.in, 0);
     // Count all unsplited sales (including pending ones) - these are awaiting split
     allin = salee
-      .filter(s => !s.attributes.splited)
+      .filter((s) => !s.attributes.splited)
       .reduce((total, s) => total + s.attributes.in, 0);
   });
 </script>
@@ -400,13 +404,17 @@
   </div>
 </DialogOverlay>
 <div class="sm:flex sm:flex-col sm:justify-evenly overflow-x-hidden max-w-full">
-  <div class="flex flex-col sm:flex-row sm:justify-evenly overflow-x-hidden max-w-full">
+  <div
+    class="flex flex-col sm:flex-row sm:justify-evenly overflow-x-hidden max-w-full"
+  >
     <div>
       <div class="dd md:items-center">
         <div class="bodyi items-center d">
           {#if bmiData.length > 0}
             <div class="gifts-header">
-              <h1 class="md:text-center text-2xl md:text-2xl font-bold underline decoration-mturk text-center">
+              <h1
+                class="md:text-center text-2xl md:text-2xl font-bold underline decoration-mturk text-center"
+              >
                 {our[$lang]}
               </h1>
             </div>
@@ -420,17 +428,26 @@
                     </a>
                   </div>
                   <div class="card-body">
-                    <p class="gift-price"><strong>{pric[$lang]}:</strong> {data.attributes.price}</p>
-                    <p class="gift-quantity"><strong>{quanti[$lang]}:</strong>
+                    <p class="gift-price">
+                      <strong>{pric[$lang]}:</strong>
+                      {data.attributes.price}
+                    </p>
+                    <p class="gift-quantity">
+                      <strong>{quanti[$lang]}:</strong>
                       {#if data.attributes.quant > 0 || data.attributes.quant === -1}
                         {#if data.attributes.kindOf == 'unlimited'}
                           <span>{unl[$lang]}</span>
                         {:else}
-                          {data.attributes.quant === -1 ? ($lang === 'he' ? 'ללא הגבלה' : 'Unlimited') : data.attributes.quant}
+                          {data.attributes.quant === -1
+                            ? $lang === 'he'
+                              ? 'ללא הגבלה'
+                              : 'Unlimited'
+                            : data.attributes.quant}
                         {/if}
                       {/if}
                     </p>
-                    <p class="gift-kind"><strong>{kinde[$lang]}:</strong>
+                    <p class="gift-kind">
+                      <strong>{kinde[$lang]}:</strong>
                       {#if data.attributes.kindOf == 'total'}
                         {py[$lang]}
                       {:else if data.attributes.kindOf == 'monthly'}
@@ -444,24 +461,53 @@
                   </div>
                   <div class="card-actions">
                     <div class="share-button-container">
-                      <ShareButtons slug="gift/{data.id}" title={data.attributes.name} desc={`Check out this amazing gift: ${data.attributes.name} for ${data.attributes.price}`} />
+                      <ShareButtons
+                        slug="gift/{data.id}"
+                        title={data.attributes.name}
+                        desc={`Check out this amazing gift: ${data.attributes.name} for ${data.attributes.price}`}
+                      />
                     </div>
-                    <button 
-                      class="report-sale-btn" 
-                      title={res[$lang]} 
+                    <button
+                      class="report-sale-btn"
+                      title={res[$lang]}
                       aria-label={res[$lang]}
-                      onclick={() => sell(data.id, data.attributes.price, data.attributes.quant, data.attributes.kindOf)}
+                      onclick={() =>
+                        sell(
+                          data.id,
+                          data.attributes.price,
+                          data.attributes.quant,
+                          data.attributes.kindOf
+                        )}
                     >
-                      <svg class="svggg" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 496 496" style="width:32px;height:32px;" xml:space="preserve">
+                      <svg
+                        class="svggg"
+                        version="1.1"
+                        id="Layer_1"
+                        xmlns="http://www.w3.org/2000/svg"
+                        xmlns:xlink="http://www.w3.org/1999/xlink"
+                        x="0px"
+                        y="0px"
+                        viewBox="0 0 496 496"
+                        style="width:32px;height:32px;"
+                        xml:space="preserve"
+                      >
                         <g>
                           <g>
                             <g>
-                              <path d="M256,32.408V24h-16v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4h-8c-2.208,0-4-1.792-4-4v-4h-16v4c0,9.656,6.88,17.736,16,19.592V104h16v-8.408c9.12-1.856,16-9.936,16-19.592c0-11.024-8.976-20-20-20h-8c-2.208,0-4-1.792-4-4s1.792-4,4-4h8c2.208,0,4,1.792,4,4v4h16v-4C272,42.344,265.12,34.264,256,32.408z"/>
-                              <path d="M104,128.408V120H88v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4h-8c-2.208,0-4-1.792-4-4v-4H72v4c0,9.656,6.88,17.736,16,19.592V200h16v-8.408c9.12-1.856,16-9.936,16-19.592c0-11.024-8.976-20-20-20h-8c-2.208,0-4-1.792-4-4s1.792-4,4-4h8c2.208,0,4,1.792,4,4v4h16v-4C120,138.344,113.12,130.264,104,128.408z"/>
-                              <path d="M400,48c-35.288,0-64,28.712-64,64c0,32.144,23.848,58.752,54.76,63.256C387.664,184.928,378.688,192,368,192H256v-64.552c31.52-3.96,56-30.872,56-63.448c0-35.288-28.712-64-64-64c-35.288,0-64,28.712-64,64c0,32.576,24.48,59.488,56,63.448V240H128c-10.688,0-19.664-7.072-22.76-16.744C136.152,218.752,160,192.144,160,160c0-35.288-28.712-64-64-64c-35.288,0-64,28.712-64,64c0,32.84,24.872,59.952,56.768,63.56C92.312,242.008,108.536,256,128,256h112v16H104v64h16.76l16,160h222.48l16-160H392v-64H256v-64h112c19.464,0,35.688-13.992,39.232-32.44C439.128,171.952,464,144.84,464,112C464,76.712,435.288,48,400,48z M96,208c-26.472,0-48-21.528-48-48s21.528-48,48-48s48,21.528,48,48S122.472,208,96,208z M344.76,480H151.24l-14.4-144h222.32L344.76,480z M376,288v32H120v-32H376z M248,112c-26.472,0-48-21.528-48-48s21.528-48,48-48s48,21.528,48,48S274.472,112,248,112z M400,160c-26.472,0-48-21.528-48-48s21.528-48,48-48s48,21.528,48,48S426.472,160,400,160z"/>
-                              <path d="M408,80.408V72h-16v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4h-8c-2.208,0-4-1.792-4-4v-4h-16v4c0,9.656,6.88,17.736,16,19.592V152h16v-8.408c9.12-1.856,16-9.936,16-19.592c0-11.024-8.976-20-20-20h-8c-2.208,0-4-1.792-4-4s1.792-4,4-4h8c2.208,0,4,1.792,4,4v4h16v-4C424,90.344,417.12,82.264,408,80.408z"/>
-                              <rect x="320" y="352" width="16" height="16"/>
-                              <rect x="160" y="352" width="144" height="16"/>
+                              <path
+                                d="M256,32.408V24h-16v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4h-8c-2.208,0-4-1.792-4-4v-4h-16v4c0,9.656,6.88,17.736,16,19.592V104h16v-8.408c9.12-1.856,16-9.936,16-19.592c0-11.024-8.976-20-20-20h-8c-2.208,0-4-1.792-4-4s1.792-4,4-4h8c2.208,0,4,1.792,4,4v4h16v-4C272,42.344,265.12,34.264,256,32.408z"
+                              />
+                              <path
+                                d="M104,128.408V120H88v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4h-8c-2.208,0-4-1.792-4-4v-4H72v4c0,9.656,6.88,17.736,16,19.592V200h16v-8.408c9.12-1.856,16-9.936,16-19.592c0-11.024-8.976-20-20-20h-8c-2.208,0-4-1.792-4-4s1.792-4,4-4h8c2.208,0,4,1.792,4,4v4h16v-4C120,138.344,113.12,130.264,104,128.408z"
+                              />
+                              <path
+                                d="M400,48c-35.288,0-64,28.712-64,64c0,32.144,23.848,58.752,54.76,63.256C387.664,184.928,378.688,192,368,192H256v-64.552c31.52-3.96,56-30.872,56-63.448c0-35.288-28.712-64-64-64c-35.288,0-64,28.712-64,64c0,32.576,24.48,59.488,56,63.448V240H128c-10.688,0-19.664-7.072-22.76-16.744C136.152,218.752,160,192.144,160,160c0-35.288-28.712-64-64-64c-35.288,0-64,28.712-64,64c0,32.84,24.872,59.952,56.768,63.56C92.312,242.008,108.536,256,128,256h112v16H104v64h16.76l16,160h222.48l16-160H392v-64H256v-64h112c19.464,0,35.688-13.992,39.232-32.44C439.128,171.952,464,144.84,464,112C464,76.712,435.288,48,400,48z M96,208c-26.472,0-48-21.528-48-48s21.528-48,48-48s48,21.528,48,48S122.472,208,96,208z M344.76,480H151.24l-14.4-144h222.32L344.76,480z M376,288v32H120v-32H376z M248,112c-26.472,0-48-21.528-48-48s21.528-48,48-48s48,21.528,48,48S274.472,112,248,112z M400,160c-26.472,0-48-21.528-48-48s21.528-48,48-48s48,21.528,48,48S426.472,160,400,160z"
+                              />
+                              <path
+                                d="M408,80.408V72h-16v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4h-8c-2.208,0-4-1.792-4-4v-4h-16v4c0,9.656,6.88,17.736,16,19.592V152h16v-8.408c9.12-1.856,16-9.936,16-19.592c0-11.024-8.976-20-20-20h-8c-2.208,0-4-1.792-4-4s1.792-4,4-4h8c2.208,0,4,1.792,4,4v4h16v-4C424,90.344,417.12,82.264,408,80.408z"
+                              />
+                              <rect x="320" y="352" width="16" height="16" />
+                              <rect x="160" y="352" width="144" height="16" />
                             </g>
                           </g>
                         </g>
@@ -480,7 +526,9 @@
       >
     </div>
     {#if salee.length > 0}
-      <div class=" text-center border-2 border-barbi rounded m-4 flex flex-col overflow-x-hidden max-w-full">
+      <div
+        class=" text-center border-2 border-barbi rounded m-4 flex flex-col overflow-x-hidden max-w-full"
+      >
         <div class="flex justify-between items-center px-4 pt-4">
           <h1
             class="md:text-center text-2xl md:text-2xl font-bold underline decoration-mturk"
@@ -489,7 +537,7 @@
           </h1>
           <button
             class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg transition-all duration-300"
-            onclick={() => showTableModal = true}
+            onclick={() => (showTableModal = true)}
             aria-label={tableView[$lang]}
           >
             📊 {tableView[$lang]}
@@ -498,14 +546,23 @@
         <div class="flex d overflow-x-auto w-full">
           {#each salee as data, i}
             <div
-              class="relative bg-colorfulGrad justify-between flex flex-col py-2  px-5 m-2 rounded shadow-2xl shadow-fuchsia-400 {data.attributes.splited ? 'opacity-50 border-2 border-green-500' : data.attributes.pending ? 'opacity-75 border-2 border-blue-500' : ''}"
+              class="relative bg-colorfulGrad justify-between flex flex-col py-2 px-5 m-2 rounded shadow-2xl shadow-fuchsia-400 {data
+                .attributes.splited
+                ? 'opacity-50 border-2 border-green-500'
+                : data.attributes.pending
+                  ? 'opacity-75 border-2 border-blue-500'
+                  : ''}"
             >
               {#if data.attributes.splited}
-                <div class="absolute -top-3 -right-3 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                <div
+                  class="absolute -top-3 -right-3 bg-green-500 text-white text-xs px-2 py-1 rounded"
+                >
                   ✓ {$lang === 'he' ? 'חולק' : 'Split'}
                 </div>
               {:else if data.attributes.pending}
-                <div class="absolute -top-3 -right-3 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                <div
+                  class="absolute -top-3 -right-3 bg-blue-500 text-white text-xs px-2 py-1 rounded"
+                >
                   ⏳ {$lang === 'he' ? 'בהצבעה' : 'Pending'}
                 </div>
               {/if}
@@ -520,7 +577,9 @@
               </div>
 
               <!-- Amount with Enhanced Design -->
-              <div class="mb-4 p-2 bg-gradient-to-r from-gold/10 to-mpink/10 rounded-lg border border-gold/20">
+              <div
+                class="mb-4 p-2 bg-gradient-to-r from-gold/10 to-mpink/10 rounded-lg border border-gold/20"
+              >
                 <p
                   class="text-xl font-semibold text-center bg-gradient-to-r from-cyan-500 to-barbi bg-clip-text text-transparent"
                   title={qu[$lang]}
@@ -530,17 +589,22 @@
               </div>
 
               <!-- User Info with Avatar -->
-              <div class="flex items-center justify-between space-x-3 mb-3"
-                title={whoo[$lang]}>
+              <div
+                class="flex items-center justify-between space-x-3 mb-3"
+                title={whoo[$lang]}
+              >
                 <div class="flex items-center space-x-3">
-                    <img
-                      class="w-6 h-6 rounded-full ring-2 ring-gold shadow-md hover:ring-mpink transition-all duration-300 transform hover:scale-105"
-                      src={getSrc(data.attributes.users_permissions_user.data.id)}
-                      alt="User avatar"
-                    />
+                  <img
+                    class="w-6 h-6 rounded-full ring-2 ring-gold shadow-md hover:ring-mpink transition-all duration-300 transform hover:scale-105"
+                    src={getSrc(data.attributes.users_permissions_user.data.id)}
+                    alt="User avatar"
+                  />
                   <div class="flex flex-col">
-                    <h5 class="text-barbi font-bold text-sm hover:text-gold transition-colors duration-200">
-                      {data.attributes.users_permissions_user.data.attributes.username}
+                    <h5
+                      class="text-barbi font-bold text-sm hover:text-gold transition-colors duration-200"
+                    >
+                      {data.attributes.users_permissions_user.data.attributes
+                        .username}
                     </h5>
                   </div>
                 </div>
@@ -548,14 +612,20 @@
 
               <!-- Note Section with Modern Card Design -->
               {#if data.attributes.note}
-                <div class="mt-4 p-3 bg-gradient-to-br from-barbi/5 to-gold/5 rounded-xl border-l-4 border-gold/30 backdrop-blur-sm">
+                <div
+                  class="mt-4 p-3 bg-gradient-to-br from-barbi/5 to-gold/5 rounded-xl border-l-4 border-gold/30 backdrop-blur-sm"
+                >
                   <div class="flex items-center mb-2">
                     <div class="w-2 h-2 bg-gold rounded-full mr-2"></div>
-                    <small class="text-barbi/70 font-semibold text-xs uppercase tracking-wider">
+                    <small
+                      class="text-barbi/70 font-semibold text-xs uppercase tracking-wider"
+                    >
                       {noteLabel[$lang]}
                     </small>
                   </div>
-                  <p class="text-sm text-barbi/90 leading-relaxed italic border-t border-barbi/20 pt-2">
+                  <p
+                    class="text-sm text-barbi/90 leading-relaxed italic border-t border-barbi/20 pt-2"
+                  >
                     {data.attributes.note}
                   </p>
                 </div>
@@ -567,19 +637,27 @@
           class="button-silver m-1 mt-2 py-4 px-8 mx-auto text-barbi rounded"
         >
           <div class="mb-2">
-            <h2 class="text-sm font-medium">{$lang === 'he' ? 'סך הכל מכירות:' : 'Total Sales:'}</h2>
+            <h2 class="text-sm font-medium">
+              {$lang === 'he' ? 'סך הכל מכירות:' : 'Total Sales:'}
+            </h2>
             <p class="font-bold text-lg">{totalSales}</p>
           </div>
-          {#if salee.some(s => s.attributes.splited || s.attributes.pending)}
+          {#if salee.some((s) => s.attributes.splited || s.attributes.pending)}
             <div class="border-t border-barbi/30 pt-2">
-              <h2 class="text-sm font-medium">{$lang === 'he' ? 'ממתין לחלוקה:' : 'Awaiting Split:'}</h2>
+              <h2 class="text-sm font-medium">
+                {$lang === 'he' ? 'ממתין לחלוקה:' : 'Awaiting Split:'}
+              </h2>
               <p class="font-bold text-lg">{allin}</p>
             </div>
-            {#if salee.some(s => s.attributes.pending)}
+            {#if salee.some((s) => s.attributes.pending)}
               <div class="border-t border-barbi/30 pt-2 mt-2">
-                <h2 class="text-sm font-medium text-blue-600">{$lang === 'he' ? 'בהצבעה:' : 'In Voting:'}</h2>
+                <h2 class="text-sm font-medium text-blue-600">
+                  {$lang === 'he' ? 'בהצבעה:' : 'In Voting:'}
+                </h2>
                 <p class="font-bold text-lg text-blue-600">
-                  {salee.filter(s => s.attributes.pending).reduce((total, s) => total + s.attributes.in, 0)}
+                  {salee
+                    .filter((s) => s.attributes.pending)
+                    .reduce((total, s) => total + s.attributes.in, 0)}
                 </p>
               </div>
             {/if}
@@ -645,13 +723,24 @@
 
 <!-- Table Modal -->
 {#if showTableModal}
-  <DialogOverlay style="z-index: 800;" isOpen={showTableModal} onDismiss={() => showTableModal = false}>
+  <DialogOverlay
+    style="z-index: 800;"
+    isOpen={showTableModal}
+    onDismiss={() => (showTableModal = false)}
+  >
     <div
       style="z-index: 800;"
       transition:fly|local={{ y: 450, opacity: 0.5, duration: 500 }}
     >
-      <DialogContent class=" table-modal-content" aria-label={salesTable[$lang]}>
-        <div style="z-index: 800;" dir={$lang == 'he' ? 'rtl' : 'ltr'} class="p-6 max-h-[90vh] overflow-y-auto">
+      <DialogContent
+        class=" table-modal-content"
+        aria-label={salesTable[$lang]}
+      >
+        <div
+          style="z-index: 800;"
+          dir={$lang == 'he' ? 'rtl' : 'ltr'}
+          class="p-6 max-h-[90vh] overflow-y-auto"
+        >
           <div class="flex justify-between items-center mb-4">
             <h2 class="text-2xl font-bold text-barbi">{salesTable[$lang]}</h2>
             <div class="flex gap-2">
@@ -664,14 +753,14 @@
               </button>
               <button
                 class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg transition-all duration-300"
-                onclick={() => showTableModal = false}
+                onclick={() => (showTableModal = false)}
                 aria-label={closeBtn[$lang]}
               >
                 ✕ {closeBtn[$lang]}
               </button>
             </div>
           </div>
-          
+
           <div class="overflow-x-auto">
             <table class="sales-table w-full">
               <thead>
@@ -687,31 +776,55 @@
               </thead>
               <tbody>
                 {#each salee as sale, index}
-                  <tr class={sale.attributes.splited ? 'split-row' : sale.attributes.pending ? 'pending-row' : ''}>
+                  <tr
+                    class={sale.attributes.splited
+                      ? 'split-row'
+                      : sale.attributes.pending
+                        ? 'pending-row'
+                        : ''}
+                  >
                     <td>{index + 1}</td>
-                    <td class="font-semibold">{sale.attributes.matanot.data.attributes.name}</td>
+                    <td class="font-semibold"
+                      >{sale.attributes.matanot.data.attributes.name}</td
+                    >
                     <td class="font-bold">₪{sale.attributes.in}</td>
                     <td>
                       <div class="flex items-center gap-2">
                         <img
                           class="w-6 h-6 rounded-full"
-                          src={getSrc(sale.attributes.users_permissions_user.data.id)}
+                          src={getSrc(
+                            sale.attributes.users_permissions_user.data.id
+                          )}
                           alt="User avatar"
                         />
-                        {sale.attributes.users_permissions_user.data.attributes.username}
+                        {sale.attributes.users_permissions_user.data.attributes
+                          .username}
                       </div>
                     </td>
-                    <td>{dayjs(sale.attributes.date).format('DD/MM/YYYY HH:mm')}</td>
+                    <td
+                      >{dayjs(sale.attributes.date).format(
+                        'DD/MM/YYYY HH:mm'
+                      )}</td
+                    >
                     <td>
                       {#if sale.attributes.splited}
-                        <span class="status-badge split-badge">✓ {splitStatus[$lang]}</span>
+                        <span class="status-badge split-badge"
+                          >✓ {splitStatus[$lang]}</span
+                        >
                       {:else if sale.attributes.pending}
-                        <span class="status-badge pending-badge">⏳ {pendingStatus[$lang]}</span>
+                        <span class="status-badge pending-badge"
+                          >⏳ {pendingStatus[$lang]}</span
+                        >
                       {:else}
-                        <span class="status-badge awaiting-badge">{awaitingStatus[$lang]}</span>
+                        <span class="status-badge awaiting-badge"
+                          >{awaitingStatus[$lang]}</span
+                        >
                       {/if}
                     </td>
-                    <td class="max-w-xs truncate" title={sale.attributes.note || ''}>
+                    <td
+                      class="max-w-xs truncate"
+                      title={sale.attributes.note || ''}
+                    >
                       {sale.attributes.note || '-'}
                     </td>
                   </tr>
@@ -791,13 +904,15 @@
     border: 2px solid rgb(103, 232, 249);
     border-radius: 10px;
     padding: 1rem;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
   }
 
   .gift-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   }
 
   .card-header {
@@ -864,14 +979,14 @@
     padding: 0.5rem;
     border-radius: 50%;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
   .report-sale-btn:hover {
     background: var(--barbi-pink);
     border-color: var(--gold);
     transform: scale(1.1);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
 
   .report-sale-btn:hover .svggg {
@@ -881,7 +996,9 @@
 
   .svggg {
     fill: var(--barbi-pink);
-    transition: fill 0.3s ease, transform 0.3s ease;
+    transition:
+      fill 0.3s ease,
+      transform 0.3s ease;
   }
 
   .report-sale-btn:hover .svggg {

@@ -38,7 +38,7 @@
 
   // Translations
   const t = {
-    gift: { he: 'מתנה', en: 'Gift' },
+    gift: { he: 'מוצר', en: 'Product' },
     seeProject: { he: 'לצפיה בפרויקט', en: 'See project' },
     buyNow: { he: 'לרכישה', en: 'Buy now' },
     notAvailable: { he: 'לא זמין', en: 'Not available' },
