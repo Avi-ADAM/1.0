@@ -12,14 +12,11 @@
   let lang;
   const baseUrl = import.meta.env.VITE_URL;
 
-  let idL;
-  let bearer1;
   let token;
   function percentage(partialValue, totalValue) {
     return (100 * partialValue) / totalValue;
   }
   import Cards from './cards/fini.svelte';
-  import { archiveTimeGrama } from '$lib/func/send/timeGrama.svelte';
   /**
    * @typedef {Object} Props
    * @property {boolean} [isVisible]
@@ -136,7 +133,6 @@
   let tryo = $state('116%');
   let tryot = $state('-10.5%');
   let tryoti = $state('-5.25%');
-  let whattid;
   function xyz() {
     ok = percentage(noofusersOk, noofpu);
     nook = percentage(noofusersNo, noofpu);
@@ -202,151 +198,50 @@
     slideTo(0);
   }
   let error1;
-  let miDatan = [];
-  let linkg = baseUrl + '/graphql';
-
-  function objToString(obj) {
-    let str = '';
-    for (let i = 0; i < obj.length; i++) {
-      for (const [p, val] of Object.entries(obj[i])) {
-        if ((typeof val == 'string') | 'number' | 'boolean') {
-          str += `{${p}:${val}\n},`;
-        } else if (typeof val == 'null') {
-          str += `{${p}:${val.map((c) => c.id)}\n},`;
-        }
-      }
+  async function callCloseFiniapruval(vote, whyText) {
+    try {
+      const res = await fetch('/api/action', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          actionKey: 'closeFiniapruval',
+          params: {
+            finiapruvalId: String(askId),
+            timegramaId: timegramaId ? String(timegramaId) : undefined,
+            vote,
+            why: whyText || undefined,
+            projectId: String(projectId)
+          }
+        })
+      });
+      const data = await res.json();
+      console.log('closeFiniapruval result', data);
+      return data;
+    } catch (e) {
+      error1 = e;
+      console.error(e);
+      return null;
     }
-    return str;
   }
-  const userss = objToString(users);
-  let welcome = ``;
-  let adduser = ``;
-  let adduser2 = ``;
+
   async function agree() {
     already = true;
     noofusersOk += 1;
     noofusersWaiting -= 1;
     ser = xyz();
-    let d = new Date();
-    const date = deadline !== undefined ? ` admaticedai: ${deadline}` : ``;
-
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
     uids.push(userId);
     uids = uids;
-    console.log(uids);
-    //add rating for app +5 for declin -5, nego mean demends for apruval
-    if (noofpu === noofusersOk) {
-      console.log('create new finnished and add vote and archive fiapp');
-      try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation 
-                        { createFinnishedMission(
-             data: {
-              missionName: "${missionBName}",
-              why: "${why}",
-              ${whattid ? `what: "${whattid}",` : ``}
-              noofhours: ${nhours},
-              mesimabetahalich: ${mId},
-              perhour: ${valph},
-              total: ${valph * nhours},
-              project: ${projectId},
-              hearotMeyuchadot: "${hearotMeyuchadot}",
-              descrip: "${missionDetails}",
-              users_permissions_user: "${userId}",
-              finiapruvals: "${askId}",
-                      publishedAt: "${d.toISOString()}",
-              mission: ${missId}
-   
-}){data {id }}
-updateMesimabetahalich(
-    id: "${mId}"
-  data: {finnished: true}
-) {data{id attributes{ finnished}}}
- updateFiniapruval(
-                id: "${askId}" 
-                    data: { archived: true,
-    vots: [${userss}, 
-       {
-        what: true
-        users_permissions_user: "${idL}"
-      }
-    ]}
-        
-    ){data{id}}
-}
-`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
-        //TODO: archive timegrama
-        archiveTimeGrama(timegramaId, fetch);
-        onAcsept?.({
-          ani: 'fini',
-          coinlapach: coinlapach
-        });
-      } catch (e) {
-        error1 = e;
-        console.log(error1);
-      }
-    } else {
-      console.log('just add vote to asked and update to not show for me again');
-      try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation 
-                        {
-                            updateFiniapruval(
-              id: "${askId}" 
-                                data: { vots: [${userss}, 
-                                       {
-                                        what: true
-                                        users_permissions_user: "${idL}"
-                                      }
-                                    ]}
-                            
-                        ){data{id}}
-                     
-                    }
-`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
-        onAcsept?.({
-          ani: 'fini',
-          coinlapach: coinlapach
-        });
-      } catch (e) {
-        error1 = e;
-        console.log(error1);
-      }
+
+    const result = await callCloseFiniapruval(true, undefined);
+    if (result?.data?.success) {
+      onAcsept?.({ ani: 'fini', coinlapach });
     }
   }
+
   function ask() {
     already = true;
-
-    console.log('nego');
-    // text and more hours if needed ,
     masa = true;
     no = false;
     isOpen = true;
@@ -354,52 +249,10 @@ updateMesimabetahalich(
 
   async function decline() {
     already = true;
-    // negativ rating and reason text!! בועה שמראה לאחרחם את ההתנגדות הסיבה ואפשרות להגיב
-
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
-    try {
-      await fetch(linkg, {
-        method: 'POST',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        //add already declined ids
-        body: JSON.stringify({
-          query: `mutation 
-                        { 
-    updateFiniapruval(
-    id: "${askId}"
-  data: {vots: [${userss}, 
-                                       {
-                                           why: "${whyy}"
-                                        what: false
-                                        users_permissions_user: "${idL}"
-                                      }
-                                    ] 
-}
-) {data {id }}
-}
-`
-        })
-      }) //attributes{ vots {id}}
-        .then((r) => r.json())
-        .then((data) => (miDatan = data));
-      console.log(miDatan);
+    const result = await callCloseFiniapruval(false, whyy);
+    if (result?.data?.success) {
       isOpen = false;
-      onDecline?.({
-        ani: 'fini',
-        coinlapach: coinlapach
-      });
-    } catch (e) {
-      error1 = e;
-      console.log(error1);
+      onDecline?.({ ani: 'fini', coinlapach });
     }
   }
   function open() {

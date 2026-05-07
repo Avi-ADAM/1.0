@@ -1,5 +1,5 @@
 <script>
-	import Daterange from './../../celim/ui/daterange.svelte';
+  import Daterange from './../../celim/ui/daterange.svelte';
   import Crtask from '$lib/components/prPr/tasks/crtask.svelte';
   import Plus from '$lib/celim/plus.svelte';
   import ExpandTask from '$lib/components/prPr/tasks/expandTask.svelte';
@@ -12,6 +12,7 @@
   import { userName } from '$lib/stores/store.js';
   import { SendTo } from '$lib/send/sendTo.svelte';
   import { toast } from 'svelte-sonner';
+  import { confettiStore } from '$lib/stores/confettiStore';
   import { onMount } from 'svelte';
   let myDate = '11:00';
   import MultiSelect from 'svelte-multiselect';
@@ -21,13 +22,13 @@
   //import AddNewWorkway from '../addnew/addnewWorkway.svelte';
   import { RingLoader } from 'svelte-loading-spinners';
   import { addslashes } from '$lib/func/uti/string.js';
-  
+
   import tr from '$lib/translations/tr.json';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { quintOut } from 'svelte/easing';
   import Expand from '$lib/celim/icons/expand.svelte';
   import { crTask } from '$lib/func/moach/crtask.svelte';
-  import  { sendToSer } from '$lib/send/sendToSer.js';
+  import { sendToSer } from '$lib/send/sendToSer.js';
   import Button from '$lib/celim/ui/button.svelte';
   import Tile from '$lib/celim/tile.svelte';
   import TextInput from '$lib/celim/ui/input/textInput.svelte';
@@ -44,7 +45,22 @@
   import { attachEntityToProcess } from '$lib/client/actionClient';
   const baseUrl = import.meta.env.VITE_URL;
 
-  let { pu = [], vallues = [], onClose, newcontent = true, newcontentR = true, newcontentW = true, pn, pl, restime, id, userslength = 0, projectId, name = '', processContext = null } = $props();
+  let {
+    pu = [],
+    vallues = [],
+    onClose,
+    newcontent = true,
+    newcontentR = true,
+    newcontentW = true,
+    pn,
+    pl,
+    restime,
+    id,
+    userslength = 0,
+    projectId,
+    name = '',
+    processContext = null
+  } = $props();
   let token;
   let miData = $state([
     {
@@ -55,7 +71,7 @@
       id: 0,
       missionName: '',
       valph: 50,
-      nhours:1,
+      nhours: 1,
       iskvua: false,
       date: null,
       dates: null,
@@ -65,7 +81,7 @@
       privatlinks: ``
     }
   ]);
-  
+
   let error1 = null;
   let roles1 = $state($role);
   let x = 168;
@@ -97,7 +113,10 @@
         let t = c.data.mission.data;
         if ($lang == 'he') {
           for (let i = 0; i < t.attributes.skills.data.length; i++) {
-            if (t.attributes.skills.data[i].attributes.localizations.data.length > 0) {
+            if (
+              t.attributes.skills.data[i].attributes.localizations.data.length >
+              0
+            ) {
               t.attributes.skills.data[i].attributes.skillName =
                 t.attributes.skills.data[
                   i
@@ -105,7 +124,10 @@
             }
           }
           for (let i = 0; i < t.attributes.tafkidims.data.length; i++) {
-            if (t.attributes.tafkidims.data[i].attributes.localizations.data.length > 0) {
+            if (
+              t.attributes.tafkidims.data[i].attributes.localizations.data
+                .length > 0
+            ) {
               t.attributes.tafkidims.data[i].attributes.roleDescription =
                 t.attributes.tafkidims.data[
                   i
@@ -114,7 +136,10 @@
           }
           console.log(t.attributes.tafkidims.data, 't.attributes.roles.data');
           for (let i = 0; i < t.attributes.work_ways.data.length; i++) {
-            if (t.attributes.work_ways.data[i].attributes.localizations.data.length > 0) {
+            if (
+              t.attributes.work_ways.data[i].attributes.localizations.data
+                .length > 0
+            ) {
               t.attributes.work_ways.data[i].attributes.workWayName =
                 t.attributes.work_ways.data[
                   i
@@ -189,7 +214,7 @@
     }
     return id;
   }
-  const placeholder = {'he': 'סוג המשימה', 'en': 'mission type'}
+  const placeholder = { he: 'סוג המשימה', en: 'mission type' };
   let selected = [];
   const placeholder1 = {
     he: 'בחירת כל הכישורים הרלוונטיים',
@@ -234,7 +259,7 @@
     // ולידציה שהיוזר חבר ברקמה מהקוקיות ומאקספורט של רשימת חברים
     // א השמה של לעצמי אם לבד לעשות קוורי למיסיון אין פרוגרס ריקמה גדול לאסקד
     // סיימתי את המשימה אם לבד השמה של קוורי לפינישד מיסיון אם עוד לפיניאפרובל
-    
+
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
@@ -245,23 +270,36 @@
     let bearer1 = 'bearer' + ' ' + token;
     let d = new Date();
     let fd = new Date(Date.now() + x);
-    let element = miData[0]
-        const skills = find_skill_id(element.selectedSkills);
-      const work_ways = find_workway_id(element.selectedWorkways);
-      const tafkidims = find_role_id(element.selectedRoles);
-      console.log(skills,work_ways,tafkidims,element.selectedRoles)
-        if (element.id === 0) {
-            await sendToSer({skills,tafkidims,descrip:element.descrip,missionName:element.missionName,publishedAt:fd},'21createMission',null,null,null,fetch).then((res) => {
-                console.log(res)
-                element.id = res.data.createMission.data.id;
-                element = element
-                console.log(element)
-            });
-        }
-      if (userslength > 1) {
-        linkop = 'createPendm';
-        qwerys = 'pendm';
-        pendq = ` users: [
+    let element = miData[0];
+    const skills = find_skill_id(element.selectedSkills);
+    const work_ways = find_workway_id(element.selectedWorkways);
+    const tafkidims = find_role_id(element.selectedRoles);
+    console.log(skills, work_ways, tafkidims, element.selectedRoles);
+    if (element.id === 0) {
+      await sendToSer(
+        {
+          skills,
+          tafkidims,
+          descrip: element.descrip,
+          missionName: element.missionName,
+          publishedAt: fd
+        },
+        '21createMission',
+        null,
+        null,
+        null,
+        fetch
+      ).then((res) => {
+        console.log(res);
+        element.id = res.data.createMission.data.id;
+        element = element;
+        console.log(element);
+      });
+    }
+    if (userslength > 1) {
+      linkop = 'createPendm';
+      qwerys = 'pendm';
+      pendq = ` users: [
      {
       what: true
       users_permissions_user: "${idL}"
@@ -270,21 +308,21 @@
       zman: "${d.toISOString()}"
     }
   ]`;
-      } else if (userslength === 1) {
-        linkop = 'createOpenMission';
-        qwerys = 'openMission';
-        toadd = `isRishon: false`;
-      }
-      if (element.myM === true && userslength > 1) {
-        rishon4 = `rishon: "${element.rishon}",
+    } else if (userslength === 1) {
+      linkop = 'createOpenMission';
+      qwerys = 'openMission';
+      toadd = `isRishon: false`;
+    }
+    if (element.myM === true && userslength > 1) {
+      rishon4 = `rishon: "${element.rishon}",
                   archived: true,
                   isRishon: true`;
-        linkop = 'createOpenMission';
-        qwerys = 'openMission';
-        pendq = ``;
-        //create asked or in progres if alone
-        //as
-        /*  if (userslength === 1) {
+      linkop = 'createOpenMission';
+      qwerys = 'openMission';
+      pendq = ``;
+      //create asked or in progres if alone
+      //as
+      /*  if (userslength === 1) {
 
         } else {
           //ליצור אופן ואז לחלץ אידי וליצור אסקד
@@ -300,67 +338,66 @@
     ask {id}
   }`
         }*/
-      } else if (element.myM === true && userslength == 1) {
-        daleg = true;
+    } else if (element.myM === true && userslength == 1) {
+      daleg = true;
+    } else {
+      rishon4 = ``;
+    }
+    if (element.done === true) {
+      rishonves4 = `rishonves: "${rishonves}"`;
+      //create finiapruval or finished if alone
+      if (userslength === 1) {
       } else {
-        rishon4 = ``;
       }
-      if (element.done === true) {
-        rishonves4 = `rishonves: "${rishonves}"`;
-        //create finiapruval or finished if alone
-        if (userslength === 1) {
-        } else {
-        }
-      } else {
-        rishonves4 = ``;
-      }
-     
-      const nhours = element.nhours > 0 ? element.nhours : 0;
-      const valph = element.valph > 0 ? element.valph : 0;
-      let momentx = moment(element.date, 'HH:mm DD/MM/YYYY ');
-      let momebtt = moment(element.dates, 'HH:mm DD/MM/YYYY ');
-      const date =
-        element.date !== undefined &&
-        element.date !== 'undefined' &&
-        element.date !== null
-          ? ` ${daleg == false ? 'sqadualed' : 'start'}: "${momentx.toISOString()}",`
-          : ``;
-      const dates =
-        element.dates !== undefined &&
-        element.dates !== 'undefined' &&
-        element.dates !== null
-          ? `${daleg == false ? 'dates' : 'admaticedai'} : "${momebtt.toISOString()}",`
-          : ``;
-      const pb =
-        element.publicklinks !== undefined &&
-        element.publicklinks !== 'undefined'
-          ? `publicklinks: """${element.publicklinks}""",`
-          : ``;
-      const pv =
-        element.privatlinks !== undefined && element.privatlinks !== 'undefined'
-          ? `privatlinks: """${element.privatlinks}""",`
-          : '';
-      const heee =
-        element.spnot !== undefined && element.spnot !== 'undefined'
-          ? `hearotMeyuchadot: """${element.spnot}""",`
-          : '';
-      const deee =
-        element.descrip !== undefined && element.descrip !== 'undefined'
-          ? `descrip: """${element.descrip}""",`
-          : '';
-      //publicklinks save to mission also othet new data
-      // הפרדה של קישורים בפסיק
-      let link = baseUrl + '/graphql';
-      if (daleg == false) {
-        try {
-          await fetch(link, {
-            method: 'POST',
-            headers: {
-              Authorization: bearer1,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              query: `mutation { ${linkop}(
+    } else {
+      rishonves4 = ``;
+    }
+
+    const nhours = element.nhours > 0 ? element.nhours : 0;
+    const valph = element.valph > 0 ? element.valph : 0;
+    let momentx = moment(element.date, 'HH:mm DD/MM/YYYY ');
+    let momebtt = moment(element.dates, 'HH:mm DD/MM/YYYY ');
+    const date =
+      element.date !== undefined &&
+      element.date !== 'undefined' &&
+      element.date !== null
+        ? ` ${daleg == false ? 'sqadualed' : 'start'}: "${momentx.toISOString()}",`
+        : ``;
+    const dates =
+      element.dates !== undefined &&
+      element.dates !== 'undefined' &&
+      element.dates !== null
+        ? `${daleg == false ? 'dates' : 'admaticedai'} : "${momebtt.toISOString()}",`
+        : ``;
+    const pb =
+      element.publicklinks !== undefined && element.publicklinks !== 'undefined'
+        ? `publicklinks: """${element.publicklinks}""",`
+        : ``;
+    const pv =
+      element.privatlinks !== undefined && element.privatlinks !== 'undefined'
+        ? `privatlinks: """${element.privatlinks}""",`
+        : '';
+    const heee =
+      element.spnot !== undefined && element.spnot !== 'undefined'
+        ? `hearotMeyuchadot: """${element.spnot}""",`
+        : '';
+    const deee =
+      element.descrip !== undefined && element.descrip !== 'undefined'
+        ? `descrip: """${element.descrip}""",`
+        : '';
+    //publicklinks save to mission also othet new data
+    // הפרדה של קישורים בפסיק
+    let link = baseUrl + '/graphql';
+    if (daleg == false) {
+      try {
+        await fetch(link, {
+          method: 'POST',
+          headers: {
+            Authorization: bearer1,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            query: `mutation { ${linkop}(
       data: {project: "${projectId}",
              mission:  "${element.id}",
              work_ways: [${work_ways}],
@@ -385,73 +422,73 @@
     }
   ) {data{id attributes{ project{data{ id} }}}}
 } `
-            })
           })
-            .then((r) => r.json())
-            .then((data) => (miDatan = data));
-          console.log(miDatan);
-          console.log(element.myM, userslength);
-          if (miDatan.data != null) {
-            const createdEntityId =
-              linkop == 'createPendm'
-                ? miDatan?.data?.createPendm?.data?.id
-                : miDatan?.data?.createOpenMission?.data?.id;
+        })
+          .then((r) => r.json())
+          .then((data) => (miDatan = data));
+        console.log(miDatan);
+        console.log(element.myM, userslength);
+        if (miDatan.data != null) {
+          const createdEntityId =
+            linkop == 'createPendm'
+              ? miDatan?.data?.createPendm?.data?.id
+              : miDatan?.data?.createOpenMission?.data?.id;
 
-            if (processContext?.processId && createdEntityId) {
-              await attachEntityToProcess(
-                {
-                  processId: String(processContext.processId),
-                  projectId: String(projectId),
-                  entityType: linkop == 'createPendm' ? 'pendm' : 'openMission',
-                  entityId: String(createdEntityId),
-                  name: element.missionName
-                },
-                { showErrorToast: false }
+          if (processContext?.processId && createdEntityId) {
+            await attachEntityToProcess(
+              {
+                processId: String(processContext.processId),
+                projectId: String(projectId),
+                entityType: linkop == 'createPendm' ? 'pendm' : 'openMission',
+                entityId: String(createdEntityId),
+                name: element.missionName
+              },
+              { showErrorToast: false }
+            );
+          }
+
+          if (element.checklist) {
+            for (let i = 0; i < element.checklist.length; i++) {
+              const momentx = moment(
+                element.checklist[i].dateS,
+                'HH:mm DD/MM/YYYY '
+              );
+              const momebtt = moment(
+                element.checklist[i].dateF,
+                'HH:mm DD/MM/YYYY '
+              );
+              crTask(
+                projectId,
+                null,
+                null,
+                linkop == 'createPendm'
+                  ? miDatan.data.createPendm.data.id
+                  : null,
+                linkop == 'createOpenMission'
+                  ? miDatan.data.createOpenMission.data.id
+                  : null,
+                momentx.toISOString(),
+                momebtt.toISOString(),
+                null,
+                element.checklist[i].shem,
+                element.checklist[i].des,
+                element.checklist[i].link,
+                idL
               );
             }
-
-            if (element.checklist) {
-              for (let i = 0; i < element.checklist.length; i++) {
-                const momentx = moment(
-                  element.checklist[i].dateS,
-                  'HH:mm DD/MM/YYYY '
-                );
-                const momebtt = moment(
-                  element.checklist[i].dateF,
-                  'HH:mm DD/MM/YYYY '
-                );
-                crTask(
-                  projectId,
-                  null,
-                  null,
-                  linkop == 'createPendm'
-                    ? miDatan.data.createPendm.data.id
-                    : null,
-                  linkop == 'createOpenMission'
-                    ? miDatan.data.createOpenMission.data.id
-                    : null,
-                  momentx.toISOString(),
-                  momebtt.toISOString(),
-                  null,
-                  element.checklist[i].shem,
-                  element.checklist[i].des,
-                  element.checklist[i].link,
-                  idL
-                );
-              }
-            }
-            if (element.myM === true && userslength > 1) {
-              let lechaletz = miDatan.data.createOpenMission.data.id;
-              let link = baseUrl + '/graphql';
-              try {
-                await fetch(link, {
-                  method: 'POST',
-                  headers: {
-                    Authorization: bearer1,
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({
-                    query: `mutation {  
+          }
+          if (element.myM === true && userslength > 1) {
+            let lechaletz = miDatan.data.createOpenMission.data.id;
+            let link = baseUrl + '/graphql';
+            try {
+              await fetch(link, {
+                method: 'POST',
+                headers: {
+                  Authorization: bearer1,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  query: `mutation {  
   createAsk(
       data:{ 
         publishedAt: "${d.toISOString()}",
@@ -473,14 +510,14 @@
     data {id}
   }
   }`
-                  })
                 })
-                  .then((r) => r.json())
-                  .then((data) => (miDatana = data));
-                console.log(miDatana);
-                if (miDatana != null) {
-                  let hiluzask = miDatana.data.createAsk.data.id;
-                  let quee = `mutation 
+              })
+                .then((r) => r.json())
+                .then((data) => (miDatana = data));
+              console.log(miDatana);
+              if (miDatana != null) {
+                let hiluzask = miDatana.data.createAsk.data.id;
+                let quee = `mutation 
                         {createTimegrama(
     data:{
       date: "${fd.toISOString()}",
@@ -491,46 +528,42 @@
     data {id}
   }
 }`;
-                  SendTo(quee);
-                  let data = {
-                    pu: pu,
-                    pn: pn,
-                    pl: pl,
-                    restime: restime,
-                    pid: projectId,
-                    uid: idL,
-                    kind: 'pendAsk',
-                    name: element.missionName,
-                    rishon: element.rishon
-                  };
-                  fetch('/api/nuti', {
-                    method: 'POST', // or 'PUT'
-                    headers: {
-                      'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
+                SendTo(quee);
+                let data = {
+                  pu: pu,
+                  pn: pn,
+                  pl: pl,
+                  restime: restime,
+                  pid: projectId,
+                  uid: idL,
+                  kind: 'pendAsk',
+                  name: element.missionName,
+                  rishon: element.rishon
+                };
+                fetch('/api/nuti', {
+                  method: 'POST', // or 'PUT'
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(data)
+                })
+                  .then((response) => response)
+                  .then((data) => {
+                    console.log('Success:', data);
+                    handleSuccess(miDatan);
                   })
-                    .then((response) => response)
-                    .then((data) => {
-                        loading = false
-                        success = true
-                      console.log('Success:', data);
-                      onClose?.({
-                        md: miDatan
-                      });
-                    })
-                    .catch((error) => {
-                        error = true
-                      console.error('Error:', error);
-                    });
-                }
-              } catch (e) {
-                error1 = e;
+                  .catch((error) => {
+                    error = true;
+                    console.error('Error:', error);
+                  });
               }
-            } else if (element.myM != true && userslength > 1) {
-              //Tdo:
-              let hiluzpend = miDatan.data.createPendm.data.id;
-              let quee = `mutation 
+            } catch (e) {
+              error1 = e;
+            }
+          } else if (element.myM != true && userslength > 1) {
+            //Tdo:
+            let hiluzpend = miDatan.data.createPendm.data.id;
+            let quee = `mutation 
                         {createTimegrama(
     data:{
       date: "${fd.toISOString()}",
@@ -541,55 +574,47 @@
     data {id}
   }
 }`;
-              let v = await SendTo(quee);
-              console.log(v);
-              let data = {
-                pn: pn,
-                pl: pl,
-                pu: pu,
-                pid: projectId,
-                uid: idL,
-                kind: 'pend',
-                name: addslashes(element.missionName)
-              };
-              fetch('/api/nuti', {
-                method: 'POST', // or 'PUT'
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
+            let v = await SendTo(quee);
+            console.log(v);
+            let data = {
+              pn: pn,
+              pl: pl,
+              pu: pu,
+              pid: projectId,
+              uid: idL,
+              kind: 'pend',
+              name: addslashes(element.missionName)
+            };
+            fetch('/api/nuti', {
+              method: 'POST', // or 'PUT'
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(data)
+            })
+              .then((response) => response)
+              .then((data) => {
+                console.log('Success:', data);
+                handleSuccess(miDatan);
               })
-                .then((response) => response)
-                .then((data) => {
-                  console.log('Success:', data);
-                  loading = false
-                  success = true
-                  onClose?.({
-                    md: miDatan
-                  });
-                })
-                .catch((error) => {
-                  console.error('Error:', error);
-                });
-            } else {
-                loading = false
-                success = true
-              onClose?.({
-                md: miDatan
+              .catch((error) => {
+                console.error('Error:', error);
               });
-            }
           } else {
-            loading = false
-            error = true
-            toast.warning(er[$lang]);
+            handleSuccess(miDatan);
           }
-        } catch (e) {
-          error1 = e;
-          loading = false
-          error = true
+        } else {
+          loading = false;
+          error = true;
+          toast.warning(er[$lang]);
         }
-      } else {
-        let qu = `mutation 
+      } catch (e) {
+        error1 = e;
+        loading = false;
+        error = true;
+      }
+    } else {
+      let qu = `mutation 
                         { createMesimabetahalich(
       data: {project: "${projectId}",
              mission:  "${element.id}",
@@ -609,67 +634,59 @@
   ) {data{id attributes{project{data{id }}}}}
   }
 `;
-        let t = await SendTo(qu);
-        if (t?.data == null) {
-          toast.warning(er[$lang]);
-        } else {
-          console.log(t);
-          if (processContext?.processId) {
-            await attachEntityToProcess(
-              {
-                processId: String(processContext.processId),
-                projectId: String(projectId),
-                entityType: 'mesimabetahalich',
-                entityId: String(t.data.createMesimabetahalich.data.id),
-                name: element.missionName
-              },
-              { showErrorToast: false }
+      let t = await SendTo(qu);
+      if (t?.data == null) {
+        toast.warning(er[$lang]);
+      } else {
+        console.log(t);
+        if (processContext?.processId) {
+          await attachEntityToProcess(
+            {
+              processId: String(processContext.processId),
+              projectId: String(projectId),
+              entityType: 'mesimabetahalich',
+              entityId: String(t.data.createMesimabetahalich.data.id),
+              name: element.missionName
+            },
+            { showErrorToast: false }
+          );
+        }
+        //get id add checklist
+        if (element.checklist) {
+          for (let i = 0; i < element.checklist.length; i++) {
+            const momentx = moment(
+              element.checklist[i].dateS,
+              'HH:mm DD/MM/YYYY '
+            );
+            const momebtt = moment(
+              element.checklist[i].dateF,
+              'HH:mm DD/MM/YYYY '
+            );
+            crTask(
+              projectId,
+              t.data.createMesimabetahalich.data.id,
+              null,
+              null,
+              null,
+              momentx.toISOString(),
+              momebtt.toISOString(),
+              null,
+              element.checklist[i].shem,
+              element.checklist[i].des,
+              element.checklist[i].link,
+              idL
             );
           }
-          //get id add checklist
-          if (element.checklist) {
-            for (let i = 0; i < element.checklist.length; i++) {
-              const momentx = moment(
-                element.checklist[i].dateS,
-                'HH:mm DD/MM/YYYY '
-              );
-              const momebtt = moment(
-                element.checklist[i].dateF,
-                'HH:mm DD/MM/YYYY '
-              );
-              crTask(
-                projectId,
-                t.data.createMesimabetahalich.data.id,
-                null,
-                null,
-                null,
-                momentx.toISOString(),
-                momebtt.toISOString(),
-                null,
-                element.checklist[i].shem,
-                element.checklist[i].des,
-                element.checklist[i].link,
-                idL
-              );
-            }
-          }
-          loading = false
-          success = true
-          onClose?.({
-            md: miDatan
-          });
         }
+        handleSuccess(miDatan);
       }
-    
+    }
   }
-
 
   let cencel = ' ביטול';
   let addS = false;
   let rishon = 0;
   let rishonves = 0;
-
-
 
   function shifter(a) {
     if (a == true) {
@@ -794,10 +811,10 @@
     he: `יצירת והוספת: "${searchText}"`,
     en: `Create "${searchText}"`
   });
-  const perho = {"he":"לשעה","en":"per hour"}
-        const hourss = {"he":"שעות","en":"hours"}
-        const monhly = {"he":"בחודש", "en": "per month"}
-        const total = {"he":"סך הכל","en": "total"}
+  const perho = { he: 'לשעה', en: 'per hour' };
+  const hourss = { he: 'שעות', en: 'hours' };
+  const monhly = { he: 'בחודש', en: 'per month' };
+  const total = { he: 'סך הכל', en: 'total' };
   const isshi = {
     he: 'האם זו משימת משמרות?',
     en: 'is it shifts mission? '
@@ -960,7 +977,7 @@
   const iskvuFl = {
     he: 'משימה חד פעמית',
     en: 'one time mission'
-  };  
+  };
   const hmh = {
     he: ' כמה שעות זה אמור לקחת בסך הכל?',
     en: 'how many hours should it take?'
@@ -1035,7 +1052,7 @@
   const checklistH = {
     he: 'רשימת מטלות',
     en: 'checklist'
-  } 
+  };
   const requiredRoles = {
     he: 'הגדרת תפקיד:',
     en: 'role assigned:'
@@ -1049,17 +1066,30 @@
     en: 'choosen missions'
   };
 
-  let error = $state(false), success = $state(false), loading = $state(false)  
+  let error = $state(false),
+    success = $state(false),
+    loading = $state(false);
+  const successMsg = {
+    he: 'המשימה פורסמה בהצלחה!',
+    en: 'Mission published successfully!'
+  };
+
+  function handleSuccess(md) {
+    loading = false;
+    success = true;
+    confettiStore.trigger();
+    toast.success(successMsg[$lang]);
+    onClose?.({ md });
+  }
+
   const tri = tr;
-  let wid = $state(0)
+  let wid = $state(0);
   //TODO: כמות לכל משימה עד אינסוף
   let dialog = $state(1);
   let misid = $state(0);
   let itemid = $state(0);
   let editdata = $state(-1);
-  function hover(){
-
-  }
+  function hover() {}
   let dateE = $state(false);
   let descripE = $state(false);
   let missionNameE = $state(false);
@@ -1071,9 +1101,7 @@
   let shiftE = $state(false);
   let publinkE = $state(false);
   let mislinkE = $state(false);
-  function disout (){
-
-  }
+  function disout() {}
 </script>
 
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer}>
@@ -1107,124 +1135,123 @@
               </h1>
             </caption>
             <thead>
-            <tr class="gg">
-              <th class="gg ddd">{headingd[$lang]}</th>
-              {#each days as day}
-                <td class="gg" style="font-size: 1rem">{day.name[$lang]}</td>
-              {/each}
-            </tr>
+              <tr class="gg">
+                <th class="gg ddd">{headingd[$lang]}</th>
+                {#each days as day}
+                  <td class="gg" style="font-size: 1rem">{day.name[$lang]}</td>
+                {/each}
+              </tr>
             </thead>
             <tbody>
-            <tr>
-              <th class="ddd">{headinga[$lang]}</th>
-              {#each days as day}
-                <td
-                  ><SveltyPicker
-                    inputClasses="form-control"
-                    format="hh:ii"
-                    bind:value={day.st}
-                  ></SveltyPicker>
-                </td>
-              {/each}
-            </tr>
-            <tr>
-              <th class="ddd">{headingb[$lang]}</th>
-              {#each days as day}
-                <td
-                  ><SveltyPicker
-                    inputClasses="form-control"
-                    format="hh:ii"
-                    bind:value={day.cl}
-                  ></SveltyPicker></td
-                >
-              {/each}
-            </tr>
-            <tr>
-              <th class="ddd">{headingc[$lang]}</th>
-              {#each days as day, i}
-                <td>
-                  <div dir={$lang == 'he' ? 'rtl' : 'ltr'} class="textinput">
-                    <input
-                      type="number"
-                      id={`shif${i}`}
-                      onchange={() => shifterr(i)}
-                      name="parti"
-                      bind:value={day.shiftp}
-                      class="input"
-                      required
-                    />
-                    <label for={`shif${i}`} class="label"
-                      >{headingc[$lang]}</label
-                    >
-                    <span class="line"></span>
-                  </div></td
-                >
-              {/each}
-            </tr>
-
-            {#each shift as shi, t}
               <tr>
-                <th class="ddd">{headinge[$lang]} {t + 1}</th>
-                {#each days as day, i}
-                  {#if day.shifts[t] != undefined}
-                    <td
-                      ><SveltyPicker
-                        inputClasses="form-control"
-                        format="hh:ii"
-                        bind:value={day.shifts[t].st}
-                      ></SveltyPicker></td
-                    >
-                  {:else}
-                    <td></td>
-                  {/if}
+                <th class="ddd">{headinga[$lang]}</th>
+                {#each days as day}
+                  <td
+                    ><SveltyPicker
+                      inputClasses="form-control"
+                      format="hh:ii"
+                      bind:value={day.st}
+                    ></SveltyPicker>
+                  </td>
                 {/each}
               </tr>
               <tr>
-                <th class="ddd">{headingf[$lang]} {t + 1}</th>
-                {#each days as day, i}
-                  {#if day.shifts[t] != undefined}
-                    <td
-                      ><SveltyPicker
-                        inputClasses="form-control"
-                        format="hh:ii"
-                        bind:value={day.shifts[t].cl}
-                      ></SveltyPicker></td
-                    >
-                  {:else}
-                    <td></td>
-                  {/if}
+                <th class="ddd">{headingb[$lang]}</th>
+                {#each days as day}
+                  <td
+                    ><SveltyPicker
+                      inputClasses="form-control"
+                      format="hh:ii"
+                      bind:value={day.cl}
+                    ></SveltyPicker></td
+                  >
                 {/each}
               </tr>
               <tr>
-                <th class="ddd">{headingr[$lang]} {t + 1}</th>
+                <th class="ddd">{headingc[$lang]}</th>
                 {#each days as day, i}
-                  {#if day.shifts[t] != undefined}
-                    <td style="font-size: 3rem">
-                      <div
-                        dir={$lang == 'he' ? 'rtl' : 'ltr'}
-                        class="textinput"
+                  <td>
+                    <div dir={$lang == 'he' ? 'rtl' : 'ltr'} class="textinput">
+                      <input
+                        type="number"
+                        id={`shif${i}`}
+                        onchange={() => shifterr(i)}
+                        name="parti"
+                        bind:value={day.shiftp}
+                        class="input"
+                        required
+                      />
+                      <label for={`shif${i}`} class="label"
+                        >{headingc[$lang]}</label
                       >
-                        <input
-                          type="number"
-                          id={`part${i}`}
-                          name="part"
-                          bind:value={day.shifts[t].ii}
-                          class="input"
-                          required
-                        />
-                        <label for={`part${i}`} class="label"
-                          >{headingr[$lang]}</label
-                        >
-                        <span class="line"></span>
-                      </div>
-                    </td>
-                  {:else}
-                    <td></td>
-                  {/if}
+                      <span class="line"></span>
+                    </div></td
+                  >
                 {/each}
               </tr>
-              
-            {/each}
+
+              {#each shift as shi, t}
+                <tr>
+                  <th class="ddd">{headinge[$lang]} {t + 1}</th>
+                  {#each days as day, i}
+                    {#if day.shifts[t] != undefined}
+                      <td
+                        ><SveltyPicker
+                          inputClasses="form-control"
+                          format="hh:ii"
+                          bind:value={day.shifts[t].st}
+                        ></SveltyPicker></td
+                      >
+                    {:else}
+                      <td></td>
+                    {/if}
+                  {/each}
+                </tr>
+                <tr>
+                  <th class="ddd">{headingf[$lang]} {t + 1}</th>
+                  {#each days as day, i}
+                    {#if day.shifts[t] != undefined}
+                      <td
+                        ><SveltyPicker
+                          inputClasses="form-control"
+                          format="hh:ii"
+                          bind:value={day.shifts[t].cl}
+                        ></SveltyPicker></td
+                      >
+                    {:else}
+                      <td></td>
+                    {/if}
+                  {/each}
+                </tr>
+                <tr>
+                  <th class="ddd">{headingr[$lang]} {t + 1}</th>
+                  {#each days as day, i}
+                    {#if day.shifts[t] != undefined}
+                      <td style="font-size: 3rem">
+                        <div
+                          dir={$lang == 'he' ? 'rtl' : 'ltr'}
+                          class="textinput"
+                        >
+                          <input
+                            type="number"
+                            id={`part${i}`}
+                            name="part"
+                            bind:value={day.shifts[t].ii}
+                            class="input"
+                            required
+                          />
+                          <label for={`part${i}`} class="label"
+                            >{headingr[$lang]}</label
+                          >
+                          <span class="line"></span>
+                        </div>
+                      </td>
+                    {:else}
+                      <td></td>
+                    {/if}
+                  {/each}
+                </tr>
+              {/each}
             </tbody>
           </table>
         </div>
@@ -1268,291 +1295,375 @@
   </div>
 </DialogOverlay>
 
-
-<div bind:clientWidth={wid} dir="{$lang == 'he' ? 'rtl' : 'ltr'}"  style="overflow-y:auto" class=" d sm:pt-4 w-full">
-    <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
+<div
+  bind:clientWidth={wid}
+  dir={$lang == 'he' ? 'rtl' : 'ltr'}
+  style="overflow-y:auto"
+  class=" d sm:pt-4 w-full"
+>
+  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
     </div>-->
-    <div class=" py-3 ">
-
-    <div  class="  bg-transparent rounded-b lg:rounded-b-none lg:rounded-r p-4  leading-normal ">
-         <div  class="mb-8">
-              <div class="  mb-2">
-            <div class="px-2">
-                {#if missionNameE == false}
-            <h2 class="text-barbi text-{$lang == "en" ? 'left' : 'right'}  font-bold text-xl lg:text-4xl underline "
-            >{miData[0].missionName}<button onclick={() => (missionNameE = true)}><EditIcon/></button></h2>
-                {:else}
-                <TextInput bind:text={miData[0].missionName}/><button onclick={() => (missionNameE = false)}><Done/></button>
-                {/if}
-          {#if gloading == false}
-            <h3 class="text-barbi  
-            text-{$lang == "en" ? 'left' : 'right'} 
-            font-bold text-lg lg:text-2xl underline "><mark>{tri?.common?.description[$lang]}:</mark><button 
-            onclick={() => (descripE = !descripE)}>{#if descripE}<Done/>{:else}<EditIcon/>{/if}</button></h3>
-            {#if descripE}
-            <RichText bind:outpot={miData[0].descrip}  />
-            {:else if miData[0].descrip}
-            <RichText outpot={miData[0].descrip} sml={true} editable={false}/>
+  <div class=" py-3">
+    <div
+      class="  bg-transparent rounded-b lg:rounded-b-none lg:rounded-r p-4 leading-normal"
+    >
+      <div class="mb-8">
+        <div class="  mb-2">
+          <div class="px-2">
+            {#if missionNameE == false}
+              <h2
+                class="text-barbi text-{$lang == 'en'
+                  ? 'left'
+                  : 'right'}  font-bold text-xl lg:text-4xl underline"
+              >
+                {miData[0].missionName}<button
+                  onclick={() => (missionNameE = true)}><EditIcon /></button
+                >
+              </h2>
+            {:else}
+              <TextInput bind:text={miData[0].missionName} /><button
+                onclick={() => (missionNameE = false)}><Done /></button
+              >
             {/if}
+            {#if gloading == false}
+              <h3
+                class="text-barbi
+            text-{$lang == 'en' ? 'left' : 'right'} 
+            font-bold text-lg lg:text-2xl underline"
+              >
+                <mark>{tri?.common?.description[$lang]}:</mark><button
+                  onclick={() => (descripE = !descripE)}
+                  >{#if descripE}<Done />{:else}<EditIcon />{/if}</button
+                >
+              </h3>
+              {#if descripE}
+                <RichText bind:outpot={miData[0].descrip} />
+              {:else if miData[0].descrip}
+                <RichText
+                  outpot={miData[0].descrip}
+                  sml={true}
+                  editable={false}
+                />
+              {/if}
             {/if}
-         <!----   <h3 class="text-barbi font-bold text-lg lg:text-2xl underline ">
+            <!----   <h3 class="text-barbi font-bold text-lg lg:text-2xl underline ">
             {tri?.mission?.specialNotes[$lang]}</h3>
     <RichText bind:outpot={miData[0].spnot} editable={spnotE}/>-->
-    
-                                <p
-                  style="line-height: 1;"
-                  class="text-md  flex items-center lg:text-2xl {dateE ? 'm-0' : " m-5"} lg:m-5"
-                >
-             
-                  <img
-                    class=" {dateE ? 'hidden' : "w-6 mx-2"} lg:block lg:w-12 lg:mx-2 "
-                    src="https://res.cloudinary.com/love1/image/upload/v1699831987/FX13_calendar2_jlxcn1.svg"
-                    alt="howmuch"
-                  />
-                  <Daterange onEdit={()=> dateE = true} onEditStop={()=> dateE = false} dir="{$lang == 'he' ? 'rtl' : 'ltr'}" bind:start={miData[0].date} bind:finnish={miData[0].dates} />
-                  </p>
-     <div class="md:text-xl text-lg md:flex-row {valphE ?  "flex-col" : ''} justify-start text-gray-100 flex items-center space-x-2 lg:text-2xl m-5">
-       
-        <img  class="w-12 lg:w-24"
-          src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-<span>
-    {#if valphE == false}
-        {miData[0].valph.toLocaleString('en-US', {maximumFractionDigits:2})} 
-         {:else} 
-    <NumberInput bind:value={miData[0].valph} />{/if}
-    {perho[$lang]}
-    </span><span> ✖ </span><span 
-          >{#if valphE == false}
-           {miData[0].nhours.toLocaleString('en-US', {maximumFractionDigits:2})}
-           {:else} 
-           <NumberInput bind:value={miData[0].nhours} />
-           {/if}
-           {hourss[$lang]} {miData[0].iskvua ? monhly[$lang] : total[$lang] }
-           </span
-           > <span> = </span> <span  
-            >{(miData[0].nhours * miData[0].valph).toLocaleString('en-US', {maximumFractionDigits:2})}
-            {miData[0].iskvua ? monhly[$lang] : total[$lang] } </span>
-            {#if valphE}
-            <span>{iskvua[$lang]}
-            <Chooser bind:checked={miData[0].iskvua} tr={iskvu} fl={iskvuFl}/></span>
-            {/if}
-          <button
-          onclick={() => (valphE = !valphE)} 
-         > {#if valphE}<Done/>{:else}<EditIcon/>{/if}</button>
 
-                </div>
-                <div class="my-2">
-                    <mark class="text-barbi  text-sm lg:text-2xl">{checklistH[$lang]}:</mark>
-                    {#key miData}
-              
-                        {#if miData[0].checklist}
-                          <ul transition:slide={{ duration: 1000, easing: quintOut }}>
-                            {#each miData[0].checklist as datai, t}
-                              <li>
-                                <div
-                                  class="flex flex-row space-x-2 items-start border-y-2 border-y-mturk"
-                                >
-                                  <span class="p-1">✅</span>
-                                  <h2 class="md:text-xl p-1">{datai.shem}</h2>
-                                  <button
-                                    class="bg-gold p-0.5 m-0.5 rounded text-barb"
-                                    onclick={() => {
-                                      dialog = 3;
-                                      misid = miData[0].id;
-                                      itemid = t;
-                                      isOpen = true;
-                                    }}
-                                    title={tri?.mission?.seechecklist[$lang]}
-                                  >
-                                    <Expand /></button
-                                  >
-        
-                                  <button
-                                    onclick={() => {
-                                      dialog = 2;
-                                      misid = miData[0].id;
-                                      itemid = t;
-                                      editdata = datai;
-                                      isOpen = true;
-                                    }}
-                                    class="bg-gold p-0.5 m-0.5 rounded">🖍️</button
-                                  >
-                                  <button
-                                    onclick={() => {
-                                      miData[0].checklist.splice(t, 1);
-                                      miData = miData;
-                                    }}
-                                    class="bg-gold p-0.5 m-0.5 rounded">✖️</button
-                                  >
-                                </div>
-                              </li>
-                            {/each}
-                          </ul>
-        
+            <p
+              style="line-height: 1;"
+              class="text-md flex items-center lg:text-2xl {dateE
+                ? 'm-0'
+                : ' m-5'} lg:m-5"
+            >
+              <img
+                class=" {dateE
+                  ? 'hidden'
+                  : 'w-6 mx-2'} lg:block lg:w-12 lg:mx-2"
+                src="https://res.cloudinary.com/love1/image/upload/v1699831987/FX13_calendar2_jlxcn1.svg"
+                alt="howmuch"
+              />
+              <Daterange
+                onEdit={() => (dateE = true)}
+                onEditStop={() => (dateE = false)}
+                dir={$lang == 'he' ? 'rtl' : 'ltr'}
+                bind:start={miData[0].date}
+                bind:finnish={miData[0].dates}
+              />
+            </p>
+            <div
+              class="md:text-xl text-lg md:flex-row {valphE
+                ? 'flex-col'
+                : ''} justify-start text-barbie flex items-center space-x-2 lg:text-2xl m-5"
+            >
+              <img
+                class="w-12 lg:w-24"
+                src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg"
+                alt="howmuch"
+              />
+              <span class="text-barbie">
+                {#if valphE == false}
+                  {miData[0].valph.toLocaleString('en-US', {
+                    maximumFractionDigits: 2
+                  })}
+                {:else}
+                  <NumberInput bind:value={miData[0].valph} />{/if}
+                {perho[$lang]}
+              </span><span> ✖ </span><span
+                >{#if valphE == false}
+                  {miData[0].nhours.toLocaleString('en-US', {
+                    maximumFractionDigits: 2
+                  })}
+                {:else}
+                  <NumberInput bind:value={miData[0].nhours} />
+                {/if}
+                {hourss[$lang]}
+                {miData[0].iskvua ? monhly[$lang] : total[$lang]}
+              </span> <span> = </span>
+              <span
+                >{(miData[0].nhours * miData[0].valph).toLocaleString('en-US', {
+                  maximumFractionDigits: 2
+                })}
+                {miData[0].iskvua ? monhly[$lang] : total[$lang]}
+              </span>
+              {#if valphE}
+                <span
+                  >{iskvua[$lang]}
+                  <Chooser
+                    bind:checked={miData[0].iskvua}
+                    tr={iskvu}
+                    fl={iskvuFl}
+                  /></span
+                >
+              {/if}
+              <button onclick={() => (valphE = !valphE)}>
+                {#if valphE}<Done />{:else}<EditIcon />{/if}</button
+              >
+            </div>
+            <div class="my-2">
+              <mark class="text-barbi text-sm lg:text-2xl"
+                >{checklistH[$lang]}:</mark
+              >
+              {#key miData}
+                {#if miData[0].checklist}
+                  <ul transition:slide={{ duration: 1000, easing: quintOut }}>
+                    {#each miData[0].checklist as datai, t}
+                      <li>
+                        <div
+                          class="flex flex-row space-x-2 items-start border-y-2 border-y-mturk"
+                        >
+                          <span class="p-1">✅</span>
+                          <h2 class="md:text-xl p-1">{datai.shem}</h2>
                           <button
+                            class="bg-gold p-0.5 m-0.5 rounded text-barb"
                             onclick={() => {
                               dialog = 3;
                               misid = miData[0].id;
-                              itemid = -1;
+                              itemid = t;
                               isOpen = true;
                             }}
                             title={tri?.mission?.seechecklist[$lang]}
                           >
                             <Expand /></button
                           >
-                          <!--expand list of items with checkmark as list counter and x for deliting-->
-                        {/if}
-                        <button
-                          title=" {tri?.mission?.checklistadd[$lang]}"
-                          onclick={() => {
-                            dialog = 2;
-                            misid = miData[0].id;
-                            editdata = -1;
-                            itemid = -1;
-                            isOpen = true;
-                          }}><Plus /></button
-                        >
 
-                  {/key}
+                          <button
+                            onclick={() => {
+                              dialog = 2;
+                              misid = miData[0].id;
+                              itemid = t;
+                              editdata = datai;
+                              isOpen = true;
+                            }}
+                            class="bg-gold p-0.5 m-0.5 rounded">🖍️</button
+                          >
+                          <button
+                            onclick={() => {
+                              miData[0].checklist.splice(t, 1);
+                              miData = miData;
+                            }}
+                            class="bg-gold p-0.5 m-0.5 rounded">✖️</button
+                          >
+                        </div>
+                      </li>
+                    {/each}
+                  </ul>
+
+                  <button
+                    onclick={() => {
+                      dialog = 3;
+                      misid = miData[0].id;
+                      itemid = -1;
+                      isOpen = true;
+                    }}
+                    title={tri?.mission?.seechecklist[$lang]}
+                  >
+                    <Expand /></button
+                  >
+                  <!--expand list of items with checkmark as list counter and x for deliting-->
+                {/if}
+                <button
+                  title=" {tri?.mission?.checklistadd[$lang]}"
+                  onclick={() => {
+                    dialog = 2;
+                    misid = miData[0].id;
+                    editdata = -1;
+                    itemid = -1;
+                    isOpen = true;
+                  }}><Plus /></button
+                >
+              {/key}
+            </div>
+            <div class="my-2">
+              <mark class="text-barbi text-sm lg:text-2xl"
+                >{requireSkills[$lang]}:</mark
+              >
+              <button onclick={() => (ske = !ske)}
+                >{#if ske}<Done />{:else}<EditIcon />{/if}</button
+              >
+              {#if !ske}
+                {#if miData[0].selectedSkills.length > 0}
+                  <div
+                    class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 lg:p-4"
+                  >
+                    {#each miData[0].selectedSkills as skill}
+                      <p>
+                        <Tile
+                          sm={wid > 555 ? true : false}
+                          big={wid > 555 ? true : false}
+                          pink={true}
+                          word={skill}
+                        />
+                      </p>
+                    {/each}
+                  </div>
+                {/if}
+              {:else if page.data.isDesktop}
+                <div
+                  class="border border-gold flex w-full lg:p-4 flex-row justify-center align-middle p-2"
+                >
+                  <SkillSelector
+                    bind:selectedSkills={miData[0].selectedSkills}
+                    placeholder={placeholder1[$lang]}
+                    autoCreate={true}
+                  />
                 </div>
-                <div class='my-2'>
-                    <mark class="text-barbi  text-sm lg:text-2xl">{requireSkills[$lang]}:</mark>
-    <button onclick={() => (ske = !ske)}>{#if ske}<Done/>{:else}<EditIcon/>{/if}</button>
-    {#if !ske}
-    {#if miData[0].selectedSkills.length > 0}
-
-    <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 lg:p-4 ">
-        {#each miData[0].selectedSkills as skill}
-        <p  >
-        <Tile sm={wid > 555 ? true : false} big={wid > 555 ? true : false}  pink={true} word={skill}/></p>
-                {/each}
-        </div>
-        {/if}
-        {:else}
-         {#if page.data.isDesktop}
-        <div class="border border-gold flex w-full lg:p-4 flex-row justify-center align-middle p-2">
-          <SkillSelector
-            bind:selectedSkills={miData[0].selectedSkills}
-            placeholder={placeholder1[$lang]}
-            autoCreate={true}
-          />
-        </div>
-        {:else}
-        <MobileModal onClose={()=> ske = false} bind:isOpen={ske} title="{placeholder1[$lang]}">
-          <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
-            <SkillSelector
-              bind:selectedSkills={miData[0].selectedSkills}
-              placeholder={placeholder1[$lang]}
-              autoCreate={true}
-            />
-            <button onclick={()=> ske = false}><Done/></button>
-          </div>
-        </MobileModal>
-        {/if}
-      {/if}
-    </div>   
-    <div class='my-2'>
-        <mark class="text-sm text-barbi lg:text-2xl">{requiredRoles[$lang]}</mark>
-                <button onclick={() => (roleE = !roleE)}>{#if roleE}<Done/>{:else}<EditIcon/>{/if}</button>
-                    {#if !roleE}
-                {#if miData[0].selectedRoles.length > 0}  
-
-                <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle d  cd p-2">
-                    {#each miData[0].selectedRoles as rol}
-                    <p onmouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
-    <Tile sm={wid > 555 ? true : false} big={wid > 555 ? true : false}  word={rol} wow={true}/></p>
-        {/each}
-      </div>
-      {/if}
-      {:else}
-      {#if page.data.isDesktop}
-      <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
-      <MultiSelect
-      outerDivClass="!bg-gold !text-barbi"
-      inputClass="!bg-gold !text-barbi"
-      liSelectedClass="!bg-barbi !text-gold"
-      --sms-open-z-index={10000}
-      loading={newcontentR}
-      bind:selected={miData[0].selectedRoles}
-      onchange={() => (miData = miData)}
-      onadd={(event) => console.log(event)}
-      placeholder={placeholder5[$lang]}
-      options={$role.map((c) => c.attributes.roleDescription)}
-    />
-    <Addnewro
-      mid={miData[0].id}
-      onAddnewrole={addnewrole}
-    />
-    </div>
-  {:else}
-  <MobileModal onClose={()=> roleE = false} bind:isOpen={roleE} title={placeholder5[$lang]}>
-    <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
-      <MultiSelect
-      outerDivClass="!bg-gold !text-barbi"
-      inputClass="!bg-gold !text-barbi"
-      liSelectedClass="!bg-barbi !text-gold"
-      --sms-open-z-index={10000}
-      loading={newcontentR}
-      bind:selected={miData[0].selectedRoles}
-      onchange={() => (miData = miData)}
-      onadd={(event) => console.log(event)}
-      placeholder={placeholder5[$lang]}
-      options={$role.map((c) => c.attributes.roleDescription)}
-    />
-    <Addnewro
-      mid={miData[0].id}
-      onAddnewrole={addnewrole}
-    />
-    <button onclick={()=> roleE = false}><Done/></button>
-    </div>
-  </MobileModal>
-  {/if}
-    {/if}
-    </div>
-    <div class='my-2'>
-        <mark class="text-sm lg:text-2xl text-barbi">{requiredWW[$lang]}</mark>
-        <button onclick={() => (wwe = !wwe)}>{#if wwe}<Done/>{:else}<EditIcon/>{/if}</button>
-        {#if !wwe}
-        {#if miData[0].selectedWorkways.length > 0}
-
-      <div class="border border-gold flex sm:flex-row flex-wrap lg:p-4 justify-center align-middle d cd p-2 ">
-          {#each miData[0].selectedWorkways as rol}
-          <p onmouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
-              <Tile bg="gold" sm={wid > 555 ? true : false} big={wid > 555 ? true : false}  word={rol}/>
-          </p>
-          {/each}
-          </div>
-          {/if}
-          {:else}
-          {#if page.data.isDesktop}
-          <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
-            <MultiSelect
-              outerDivClass="!bg-gold !text-barbi"
-              inputClass="!bg-gold !text-barbi"
-              liSelectedClass="!bg-barbi !text-gold"
-              --sms-open-z-index={10000}
-                createOptionMsg={addn[$lang]}
-                allowUserOptions={true}
-                bind:searchText
-                loading={newcontentW}
-                bind:selected={miData[0].selectedWorkways}
-                placeholder={placeholder[$lang]}
-                options={$ww.map((c) => c.attributes.workWayName)}
-                onchange={(e) => {
-                  addW(miData[0].selectedWorkways, miData[0].id, e);
-                }}
-              />
-              </div>
-             
               {:else}
-              <MobileModal onClose={()=> wwe = false} bind:isOpen={wwe} title="{placeholder[$lang]}">
-                <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
-
+                <MobileModal
+                  onClose={() => (ske = false)}
+                  bind:isOpen={ske}
+                  title={placeholder1[$lang]}
+                >
+                  <div
+                    class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2"
+                  >
+                    <SkillSelector
+                      bind:selectedSkills={miData[0].selectedSkills}
+                      placeholder={placeholder1[$lang]}
+                      autoCreate={true}
+                    />
+                    <button onclick={() => (ske = false)}><Done /></button>
+                  </div>
+                </MobileModal>
+              {/if}
+            </div>
+            <div class="my-2">
+              <mark class="text-sm text-barbi lg:text-2xl"
+                >{requiredRoles[$lang]}</mark
+              >
+              <button onclick={() => (roleE = !roleE)}
+                >{#if roleE}<Done />{:else}<EditIcon />{/if}</button
+              >
+              {#if !roleE}
+                {#if miData[0].selectedRoles.length > 0}
+                  <div
+                    class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle d cd p-2"
+                  >
+                    {#each miData[0].selectedRoles as rol}
+                      <p
+                        onmouseenter={() =>
+                          hover({ he: 'תפקיד מבוקש', en: 'requested role' })}
+                        onmouseleave={() => hover('0')}
+                        class="m-0"
+                        style="text-shadow:none;"
+                      >
+                        <Tile
+                          sm={wid > 555 ? true : false}
+                          big={wid > 555 ? true : false}
+                          word={rol}
+                          wow={true}
+                        />
+                      </p>
+                    {/each}
+                  </div>
+                {/if}
+              {:else if page.data.isDesktop}
+                <div
+                  class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2"
+                >
                   <MultiSelect
-                  outerDivClass="!bg-gold !text-barbi"
-                  inputClass="!bg-gold !text-barbi"
-                  liSelectedClass="!bg-barbi !text-gold"
-                  --sms-open-z-index={10000}
+                    outerDivClass="!bg-gold !text-barbi"
+                    inputClass="!bg-gold !text-barbi"
+                    liSelectedClass="!bg-barbi !text-gold"
+                    --sms-open-z-index={10000}
+                    loading={newcontentR}
+                    bind:selected={miData[0].selectedRoles}
+                    onchange={() => (miData = miData)}
+                    onadd={(event) => console.log(event)}
+                    placeholder={placeholder5[$lang]}
+                    options={$role.map((c) => c.attributes.roleDescription)}
+                  />
+                  <Addnewro mid={miData[0].id} onAddnewrole={addnewrole} />
+                </div>
+              {:else}
+                <MobileModal
+                  onClose={() => (roleE = false)}
+                  bind:isOpen={roleE}
+                  title={placeholder5[$lang]}
+                >
+                  <div
+                    class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2"
+                  >
+                    <MultiSelect
+                      outerDivClass="!bg-gold !text-barbi"
+                      inputClass="!bg-gold !text-barbi"
+                      liSelectedClass="!bg-barbi !text-gold"
+                      --sms-open-z-index={10000}
+                      loading={newcontentR}
+                      bind:selected={miData[0].selectedRoles}
+                      onchange={() => (miData = miData)}
+                      onadd={(event) => console.log(event)}
+                      placeholder={placeholder5[$lang]}
+                      options={$role.map((c) => c.attributes.roleDescription)}
+                    />
+                    <Addnewro mid={miData[0].id} onAddnewrole={addnewrole} />
+                    <button onclick={() => (roleE = false)}><Done /></button>
+                  </div>
+                </MobileModal>
+              {/if}
+            </div>
+            <div class="my-2">
+              <mark class="text-sm lg:text-2xl text-barbi"
+                >{requiredWW[$lang]}</mark
+              >
+              <button onclick={() => (wwe = !wwe)}
+                >{#if wwe}<Done />{:else}<EditIcon />{/if}</button
+              >
+              {#if !wwe}
+                {#if miData[0].selectedWorkways.length > 0}
+                  <div
+                    class="border border-gold flex sm:flex-row flex-wrap lg:p-4 justify-center align-middle d cd p-2"
+                  >
+                    {#each miData[0].selectedWorkways as rol}
+                      <p
+                        onmouseenter={() =>
+                          hover({
+                            he: 'דרכי עבודה מבוקשות',
+                            en: 'ways of work for the mission'
+                          })}
+                        onmouseleave={() => hover('0')}
+                        class="m-0"
+                        style="text-shadow:none;"
+                      >
+                        <Tile
+                          bg="gold"
+                          sm={wid > 555 ? true : false}
+                          big={wid > 555 ? true : false}
+                          word={rol}
+                        />
+                      </p>
+                    {/each}
+                  </div>
+                {/if}
+              {:else if page.data.isDesktop}
+                <div
+                  class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2"
+                >
+                  <MultiSelect
+                    outerDivClass="!bg-gold !text-barbi"
+                    inputClass="!bg-gold !text-barbi"
+                    liSelectedClass="!bg-barbi !text-gold"
+                    --sms-open-z-index={10000}
                     createOptionMsg={addn[$lang]}
                     allowUserOptions={true}
                     bind:searchText
@@ -1564,106 +1675,177 @@
                       addW(miData[0].selectedWorkways, miData[0].id, e);
                     }}
                   />
-                  <button onclick={()=> wwe = false}><Done/></button>
+                </div>
+              {:else}
+                <MobileModal
+                  onClose={() => (wwe = false)}
+                  bind:isOpen={wwe}
+                  title={placeholder[$lang]}
+                >
+                  <div
+                    class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2"
+                  >
+                    <MultiSelect
+                      outerDivClass="!bg-gold !text-barbi"
+                      inputClass="!bg-gold !text-barbi"
+                      liSelectedClass="!bg-barbi !text-gold"
+                      --sms-open-z-index={10000}
+                      createOptionMsg={addn[$lang]}
+                      allowUserOptions={true}
+                      bind:searchText
+                      loading={newcontentW}
+                      bind:selected={miData[0].selectedWorkways}
+                      placeholder={placeholder[$lang]}
+                      options={$ww.map((c) => c.attributes.workWayName)}
+                      onchange={(e) => {
+                        addW(miData[0].selectedWorkways, miData[0].id, e);
+                      }}
+                    />
+                    <button onclick={() => (wwe = false)}><Done /></button>
                   </div>
-                  </MobileModal>
-                  {/if}
-                  {/if}
-        </div>
-        <div>
-            {#if assignE}
-            {#if userslength > 1}
-            <mark>{tri?.mission?.assingTo[$lang]}</mark>
-            <p>{tri?.mission?.assingHelp[
-                $lang
-              ]}</p>
-            <MultiSelect
-            outerDivClass="!bg-gold !text-barbi"
-            inputClass="!bg-gold !text-barbi"
-            liSelectedClass="!bg-barbi !text-gold"
-            --sms-open-z-index={10000}
-            bind:selected={miData[0].rishoni}
-            placeholder={pll[$lang]}
-            options={pu.map((c) => c.attributes.username)}
-            maxSelect={1}
-            onchange={function () {
-              miData[0].rishon = find_user_id(miData[0].rishoni);
-              miData[0].myM = true;
-            }}
-          />
-          {:else}
-          <mark>{tri?.mission?.assingToMe[$lang]}</mark>
-          <p>{tri?.mission?.assingHelp[$lang]}</p>
-          <input
-              bind:checked={miData[0].myM}
-              type="checkbox" id="tomeC" name="tome" value="tome" onclick={()=> miData[0].rishon == idL}>
-          <label for="tome">{tri?.mission?.assingToMe[$lang]}</label>
-          {/if}
-          <button title="{tri?.mission?.assingTo[$lang] + ' ' + tri?.mission?.assingHelp[
-            $lang
-          ]}" onclick={() => (assignE = !assignE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-        ><Done/></button>
-          {/if}
-        </div>
-        <div>
-            {#if publinkE}
-            <mark>{tri?.mission?.publicLinks[$lang]}</mark>
-            <TextInput bind:text={miData[0].publicklinks} lebel={tri?.mission?.publicLinks}/>
-            <button onclick={() => (publinkE = !publinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                title='{tri?.mission?.publicLinks[$lang]}'><Done/></button>
-            {/if}
-        </div>
-        <div>
-            {#if mislinkE}
-            <mark>{tri?.mission?.linkToMission[$lang]}</mark>
-            <TextInput bind:text={miData[0].privatlinks} lebel={tri?.mission?.linkToMission}/>
-            <button onclick={() => (mislinkE = !mislinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                title="{tri?.mission?.linkToMission[$lang]}"><Done/></button >
-            {/if}
-        </div>
-        <div>
-            {#if shiftE}
-           
-            <input
-            bind:checked={miData[0].isshif}
-            type="checkbox"
-            id="isss"
-            name="is"
-            value="no"
-            onchange={() => shifter(miData[0].isshif)}
-          />
-          <label for="isss"><mark>{isshi[$lang]}</mark></label>
-          {#if miData[0].isshif == true}
-            <button onclick={() => shifter(miData[0].isshif)}
-                >{editsi[$lang]}</button
-              >
-            {/if}
-            <button onclick={() => (shiftE = !shiftE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                title="{isshi[$lang]}"><Done/></button>
-            {/if}
-        </div>
-        <div class="flex flex-row items-center justify-start my-4 space-x-3"	>
-           {#if !publinkE} <button onclick={() => (publinkE = !publinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                title='{tri?.mission?.publicLinks[$lang]}'><LinkIcon/></button>{/if}
-            {#if !assignE}<button title="{tri?.mission?.assingTo[$lang] + ' ' + tri?.mission?.assingHelp[
-                $lang
-              ]}" onclick={() => (assignE = !assignE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-            ><AddPerson/></button>{/if}
-            {#if !mislinkE}<button onclick={() => (mislinkE = !mislinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-               title="{tri?.mission?.linkToMission[$lang]}"><LinkToIcon/></button >{/if}
-               {#if !shiftE} <button onclick={() => (shiftE = !shiftE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-               title="{isshi[$lang]}"><ShiftsIcon/></button>{/if}
-        </div>
-        <div class="align-self-end justify-items-end">
-            <Button text={acti} onClick={increment} {loading} {success} {error}/>
-       </div>
-        </div>
+                </MobileModal>
+              {/if}
+            </div>
+            <div>
+              {#if assignE}
+                {#if userslength > 1}
+                  <mark>{tri?.mission?.assingTo[$lang]}</mark>
+                  <p>{tri?.mission?.assingHelp[$lang]}</p>
+                  <MultiSelect
+                    outerDivClass="!bg-gold !text-barbi"
+                    inputClass="!bg-gold !text-barbi"
+                    liSelectedClass="!bg-barbi !text-gold"
+                    --sms-open-z-index={10000}
+                    bind:selected={miData[0].rishoni}
+                    placeholder={pll[$lang]}
+                    options={pu.map((c) => c.attributes.username)}
+                    maxSelect={1}
+                    onchange={function () {
+                      miData[0].rishon = find_user_id(miData[0].rishoni);
+                      miData[0].myM = true;
+                    }}
+                  />
+                {:else}
+                  <mark>{tri?.mission?.assingToMe[$lang]}</mark>
+                  <p>{tri?.mission?.assingHelp[$lang]}</p>
+                  <input
+                    bind:checked={miData[0].myM}
+                    type="checkbox"
+                    id="tomeC"
+                    name="tome"
+                    value="tome"
+                    onclick={() => miData[0].rishon == idL}
+                  />
+                  <label for="tome">{tri?.mission?.assingToMe[$lang]}</label>
+                {/if}
+                <button
+                  title={tri?.mission?.assingTo[$lang] +
+                    ' ' +
+                    tri?.mission?.assingHelp[$lang]}
+                  onclick={() => (assignE = !assignE)}
+                  class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+                  ><Done /></button
+                >
+              {/if}
+            </div>
+            <div>
+              {#if publinkE}
+                <mark>{tri?.mission?.publicLinks[$lang]}</mark>
+                <TextInput
+                  bind:text={miData[0].publicklinks}
+                  lebel={tri?.mission?.publicLinks}
+                />
+                <button
+                  onclick={() => (publinkE = !publinkE)}
+                  class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+                  title={tri?.mission?.publicLinks[$lang]}><Done /></button
+                >
+              {/if}
+            </div>
+            <div>
+              {#if mislinkE}
+                <mark>{tri?.mission?.linkToMission[$lang]}</mark>
+                <TextInput
+                  bind:text={miData[0].privatlinks}
+                  lebel={tri?.mission?.linkToMission}
+                />
+                <button
+                  onclick={() => (mislinkE = !mislinkE)}
+                  class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+                  title={tri?.mission?.linkToMission[$lang]}><Done /></button
+                >
+              {/if}
+            </div>
+            <div>
+              {#if shiftE}
+                <input
+                  bind:checked={miData[0].isshif}
+                  type="checkbox"
+                  id="isss"
+                  name="is"
+                  value="no"
+                  onchange={() => shifter(miData[0].isshif)}
+                />
+                <label for="isss"><mark>{isshi[$lang]}</mark></label>
+                {#if miData[0].isshif == true}
+                  <button onclick={() => shifter(miData[0].isshif)}
+                    >{editsi[$lang]}</button
+                  >
+                {/if}
+                <button
+                  onclick={() => (shiftE = !shiftE)}
+                  class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+                  title={isshi[$lang]}><Done /></button
+                >
+              {/if}
+            </div>
+            <div
+              class="flex flex-row items-center justify-start my-4 space-x-3"
+            >
+              {#if !publinkE}
+                <button
+                  onclick={() => (publinkE = !publinkE)}
+                  class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+                  title={tri?.mission?.publicLinks[$lang]}><LinkIcon /></button
+                >{/if}
+              {#if !assignE}<button
+                  title={tri?.mission?.assingTo[$lang] +
+                    ' ' +
+                    tri?.mission?.assingHelp[$lang]}
+                  onclick={() => (assignE = !assignE)}
+                  class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+                  ><AddPerson /></button
+                >{/if}
+              {#if !mislinkE}<button
+                  onclick={() => (mislinkE = !mislinkE)}
+                  class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+                  title={tri?.mission?.linkToMission[$lang]}
+                  ><LinkToIcon /></button
+                >{/if}
+              {#if !shiftE}
+                <button
+                  onclick={() => (shiftE = !shiftE)}
+                  class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+                  title={isshi[$lang]}><ShiftsIcon /></button
+                >{/if}
+            </div>
+            <div class="align-self-end justify-items-end">
+              <Button
+                text={acti}
+                onClick={increment}
+                {loading}
+                {success}
+                {error}
+              />
+            </div>
           </div>
-          </div>
-          </div>
-          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
- <!-- <div class="dd md:items-center  rounded p-4">
+
+<!-- <div class="dd md:items-center  rounded p-4">
     <div class="body items-center d">
       <table dir={$lang == 'he' ? 'rtl' : 'ltr'}>
       
@@ -1681,10 +1863,8 @@
           </td>
           {/each}
       </tr>-->
-       
-    
-         
-        <!--<tr style="display:none" id="doneC" >
+
+<!--<tr style="display:none" id="doneC" >
       <th>ביצעתי כבר את המשימה</th>
       {#each miData as data, i}
       <td>
@@ -1720,8 +1900,8 @@
       </table>
     </div>
     <div>-->
-     
-      <!--confety-->
+
+<!--confety-->
 
 <style>
   .ddd {
@@ -1858,9 +2038,6 @@
     background: rgb(132, 241, 223);
   }
 
-
-
- 
   .textinput {
     position: relative;
     width: 100%;
@@ -1935,12 +2112,9 @@
   }
 
   .input:focus ~ .line,
-  .input:valid ~ .line
- {
+  .input:valid ~ .line {
     width: 100%;
   }
-
- 
 
   .input:focus ~ .label,
   .input:valid ~ .label {
@@ -1948,6 +2122,4 @@
     color: #2196f3;
     top: 0;
   }
-
-
 </style>

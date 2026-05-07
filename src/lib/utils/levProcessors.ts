@@ -892,7 +892,7 @@ export function processAsked(
       role: applyLocalization(omData.tafkidims?.data ? omData.tafkidims : { data: [] }),
       deadline: omData.dates,
       acts: omData.acts,
-      decid: omData.declined.data,
+      decid: omData.declined?.data ?? [],
       negopendmissions: omData.negopendmissions?.data || [],
       sqedualed: omData.sqadualed,
       publicklinks: omData.publicklinks,

@@ -1613,13 +1613,25 @@
   };
   let createMode = $state(null);
   const createMissionT = { he: 'משימה', en: 'Mission' };
-  const createMissionDesc = { he: 'יצירת פעולה עצמאית לריקמה', en: 'Create a standalone mission' };
+  const createMissionDesc = {
+    he: 'יצירת פעולה עצמאית לריקמה',
+    en: 'Create a standalone mission'
+  };
   const createResourceT = { he: 'משאב', en: 'Resource' };
-  const createResourceDesc = { he: 'הוספת משאב נדרש לריקמה', en: 'Add a needed resource' };
+  const createResourceDesc = {
+    he: 'הוספת משאב נדרש לריקמה',
+    en: 'Add a needed resource'
+  };
   const createProcessT = { he: 'תהליך', en: 'Process' };
-  const createProcessDesc = { he: 'ניהול תהליך הכולל משימות ומשאבים', en: 'Manage a process containing missions and resources' };
+  const createProcessDesc = {
+    he: 'ניהול תהליך הכולל משימות ומשאבים',
+    en: 'Manage a process containing missions and resources'
+  };
   const backBtn = { he: 'חזרה', en: 'Back' };
-  const optionallyAddContent = { he: 'ניתן להוסיף משימות ומשאבים לתהליך', en: 'Optionally add missions and resources to this process' };
+  const optionallyAddContent = {
+    he: 'ניתן להוסיף משימות ומשאבים לתהליך',
+    en: 'Optionally add missions and resources to this process'
+  };
 
   async function refreshProcesses() {
     if (!$idPr) return;
@@ -1775,7 +1787,7 @@
           cacheKey,
           JSON.stringify({ ts: Date.now(), o: newOmi, p: newPmi })
         );
-        localStorage.removeItem(`pcv_extra_${$idPr}`);   // remove old v1 key
+        localStorage.removeItem(`pcv_extra_${$idPr}`); // remove old v1 key
         localStorage.removeItem(`pcv_extra_v3_${$idPr}`); // remove old v3 key
       } catch {
         /* quota exceeded — ignore */
@@ -2469,154 +2481,335 @@ pointer-events: none;"
             {#if !createMode}
               <!-- 3-way mode chooser -->
               <div class="flex flex-col items-center gap-8 py-10 px-4">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 w-full max-w-3xl mx-auto">
+                <div
+                  class="grid grid-cols-1 sm:grid-cols-3 gap-5 w-full max-w-3xl mx-auto"
+                >
                   <!-- Mission card -->
                   <button
-                    onclick={() => { createMode = 'mission'; }}
+                    onclick={() => {
+                      createMode = 'mission';
+                    }}
                     class="group flex flex-col items-center gap-4 p-8 border border-barbi hover:border-gold rounded-2xl bg-gradient-to-br from-gra via-grb to-gre hover:from-barbi hover:via-fuchsia-400 hover:to-mpink transition-all duration-300 drop-shadow-lg shadow-gold"
                   >
-                    <div class="text-barbi group-hover:text-blue-800 transition-colors">
+                    <div
+                      class="text-barbi group-hover:text-blue-800 transition-colors"
+                    >
                       <svg style="width:52px;height:52px" viewBox="0 0 24 24">
-                        <path fill="currentColor" d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/>
+                        <path
+                          fill="currentColor"
+                          d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"
+                        />
                       </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-barbi group-hover:text-blue-800">{createMissionT[$lang]}</h3>
-                    <p class="text-xs text-barbi/70 group-hover:text-blue-800/70">{createMissionDesc[$lang]}</p>
+
+                    <h3
+                      class="text-xl font-bold text-barbi group-hover:text-blue-800"
+                    >
+                      {createMissionT[$lang]}
+                    </h3>
+                    <p
+                      class="text-xs text-barbi/70 group-hover:text-blue-800/70"
+                    >
+                      {createMissionDesc[$lang]}
+                    </p>
                   </button>
 
                   <!-- Resource card -->
                   <button
-                    onclick={() => { createMode = 'resource'; }}
+                    onclick={() => {
+                      createMode = 'resource';
+                    }}
                     class="group flex flex-col items-center gap-4 p-8 border border-barbi hover:border-gold rounded-2xl bg-gradient-to-br from-gra via-grb to-gre hover:from-barbi hover:via-fuchsia-400 hover:to-mpink transition-all duration-300 drop-shadow-lg shadow-gold"
                   >
-                    <div class="text-barbi group-hover:text-blue-800 transition-colors">
+                    <div
+                      class="text-barbi group-hover:text-blue-800 transition-colors"
+                    >
                       <svg style="width:52px;height:52px" viewBox="0 0 24 24">
-                        <path fill="currentColor" d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18-.21 0-.41-.06-.57-.18l-7.9-4.44A1 1 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.32-.18.72-.18 1.14 0l7.9 4.44c.32.17.53.5.53.88v9M12 4.15L10.11 5.22 16 8.61l1.96-1.11L12 4.15M6.04 7.5L12 10.85l1.96-1.1-5.88-3.4L6.04 7.5M5 15.91l6 3.38v-6.71L5 9.21v6.7M19 15.91V9.21l-6 3.37v6.71l6-3.38z"/>
+                        <path
+                          fill="currentColor"
+                          d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18-.21 0-.41-.06-.57-.18l-7.9-4.44A1 1 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.32-.18.72-.18 1.14 0l7.9 4.44c.32.17.53.5.53.88v9M12 4.15L10.11 5.22 16 8.61l1.96-1.11L12 4.15M6.04 7.5L12 10.85l1.96-1.1-5.88-3.4L6.04 7.5M5 15.91l6 3.38v-6.71L5 9.21v6.7M19 15.91V9.21l-6 3.37v6.71l6-3.38z"
+                        />
                       </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-barbi group-hover:text-blue-800">{createResourceT[$lang]}</h3>
-                    <p class="text-xs text-barbi/70 group-hover:text-blue-800/70">{createResourceDesc[$lang]}</p>
+                    <h3
+                      class="text-xl font-bold text-barbi group-hover:text-blue-800"
+                    >
+                      {createResourceT[$lang]}
+                    </h3>
+                    <p
+                      class="text-xs text-barbi/70 group-hover:text-blue-800/70"
+                    >
+                      {createResourceDesc[$lang]}
+                    </p>
                   </button>
 
                   <!-- Process card -->
                   <button
-                    onclick={() => { createMode = 'process'; }}
+                    onclick={() => {
+                      createMode = 'process';
+                    }}
                     class="group flex flex-col items-center gap-4 p-8 border border-gold hover:border-gold rounded-2xl bg-gradient-to-br from-gra via-grb to-gre hover:from-barbi hover:via-fuchsia-400 hover:to-mpink transition-all duration-300 drop-shadow-lg shadow-gold"
                   >
-                    <div class="text-gold group-hover:text-blue-800 transition-colors">
+                    <div
+                      class="text-gold group-hover:text-blue-800 transition-colors"
+                    >
                       <svg style="width:52px;height:52px" viewBox="0 0 24 24">
-                        <path fill="currentColor" d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                        <path
+                          fill="currentColor"
+                          d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"
+                        />
                       </svg>
                     </div>
-                    <h3 class="text-xl font-bold text-barbi group-hover:text-blue-800">{createProcessT[$lang]}</h3>
-                    <p class="text-xs text-barbi/70 group-hover:text-blue-800/70">{createProcessDesc[$lang]}</p>
+                    <h3
+                      class="text-xl font-bold text-barbi group-hover:text-blue-800"
+                    >
+                      {createProcessT[$lang]}
+                    </h3>
+                    <p
+                      class="text-xs text-barbi/70 group-hover:text-blue-800/70"
+                    >
+                      {createProcessDesc[$lang]}
+                    </p>
                   </button>
                 </div>
               </div>
-
             {:else if createMode === 'mission'}
               <!-- Mission creation flow -->
               <div class="m-4">
                 <button
-                  onclick={() => { createMode = null; addM = false; showvd = false; blabla = []; }}
+                  onclick={() => {
+                    createMode = null;
+                    addM = false;
+                    showvd = false;
+                    blabla = [];
+                  }}
                   class="flex items-center gap-1 text-barbi hover:text-gold transition-colors mb-6"
                 >
-                  <svg style="width:20px;height:20px" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                  <svg style="width:20px;height:20px" viewBox="0 0 24 24"
+                    ><path
+                      fill="currentColor"
+                      d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+                    /></svg
+                  >
                   <span class="text-sm font-medium">{backBtn[$lang]}</span>
                 </button>
               </div>
               <div class="hhh">
                 {#if hovered}
                   <button onclick={hosa} onmouseleave={bighand}
-                    ><img title={hosafa[$lang]} style="max-width:45vw; max-height:45vw;" width="240px" height="240px"
-                      src="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg" alt="cheked"/></button>
+                    ><img
+                      title={hosafa[$lang]}
+                      style="max-width:45vw; max-height:45vw;"
+                      width="240px"
+                      height="240px"
+                      src="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg"
+                      alt="cheked"
+                    /></button
+                  >
                 {:else}
-                  <Hand onHosa={hosa} onProgres={bighand} onTrym={trym} {noofopen} {openMS} {addM} hosafa={hosafa[$lang]} />
+                  <Hand
+                    onHosa={hosa}
+                    onProgres={bighand}
+                    onTrym={trym}
+                    {noofopen}
+                    {openMS}
+                    {addM}
+                    hosafa={hosafa[$lang]}
+                  />
                 {/if}
               </div>
               <div>
                 {#if addM === true}
-                  <div bind:this={hosaf} class="m-4 border-2 h-screen border-barbi rounded">
-                    <button title={cencel[$lang]} onclick={closeM} class="hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full">
+                  <div
+                    bind:this={hosaf}
+                    class="m-4 border-2 h-screen border-barbi rounded"
+                  >
+                    <button
+                      title={cencel[$lang]}
+                      onclick={closeM}
+                      class="hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full"
+                    >
                       <svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                        <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"/>
+                        <path
+                          fill="currentColor"
+                          d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                        />
                       </svg>
                     </button>
-                    <ChoosMission {roles} {mission1} bind:selected={blabla} onMessage={callbackFunction}
-                      onAdd={add} onClose={close} pn={projectname} pl={srcP} {restime} {projectUsers} {alit}
-                      processContext={selectedProcess} />
+                    <ChoosMission
+                      {roles}
+                      {mission1}
+                      bind:selected={blabla}
+                      onMessage={callbackFunction}
+                      onAdd={add}
+                      onClose={close}
+                      pn={projectname}
+                      pl={srcP}
+                      {restime}
+                      {projectUsers}
+                      {alit}
+                      processContext={selectedProcess}
+                    />
                   </div>
                 {/if}
               </div>
               <div bind:this={cow}>
                 {#if load === true}
-                  <div class="grid justify-center items-center border-2 border-barbi rounded p-4"><Lowding /></div>
+                  <div
+                    class="grid justify-center items-center border-2 border-barbi rounded p-4"
+                  >
+                    <Lowding />
+                  </div>
                 {/if}
                 {#if showvd == true}
                   {#key miData}
-                    <Mission pn={projectname} pl={srcP} {restime} {newcontent} {newcontentR} {newcontentW}
-                      pu={projectUsers} userslength={projectUsers.length} vallues={alit} {miData}
-                      projectId={$idPr} processContext={selectedProcess} onRemove={removeF} onClose={close} />
+                    <Mission
+                      pn={projectname}
+                      pl={srcP}
+                      {restime}
+                      {newcontent}
+                      {newcontentR}
+                      {newcontentW}
+                      pu={projectUsers}
+                      userslength={projectUsers.length}
+                      vallues={alit}
+                      {miData}
+                      projectId={$idPr}
+                      processContext={selectedProcess}
+                      onRemove={removeF}
+                      onClose={close}
+                    />
                   {/key}
                 {/if}
               </div>
-
             {:else if createMode === 'resource'}
               <!-- Resource creation flow -->
               <div class="m-4">
                 <button
-                  onclick={() => { createMode = null; addN = false; totalneed = false; meDatamm = []; needr = []; }}
+                  onclick={() => {
+                    createMode = null;
+                    addN = false;
+                    totalneed = false;
+                    meDatamm = [];
+                    needr = [];
+                  }}
                   class="flex items-center gap-1 text-barbi hover:text-gold transition-colors mb-6"
                 >
-                  <svg style="width:20px;height:20px" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                  <svg style="width:20px;height:20px" viewBox="0 0 24 24"
+                    ><path
+                      fill="currentColor"
+                      d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+                    /></svg
+                  >
                   <span class="text-sm font-medium">{backBtn[$lang]}</span>
                 </button>
               </div>
               <div class="hhh">
                 {#if hoveredd}
                   <button onclick={masi} onmouseleave={bighandd}
-                    ><img title={hosafat[$lang]} style="max-width:45vw; max-height:45vw;" width="240px" height="240px"
-                      src="https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg" alt="cheked"/></button>
+                    ><img
+                      title={hosafat[$lang]}
+                      style="max-width:45vw; max-height:45vw;"
+                      width="240px"
+                      height="240px"
+                      src="https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg"
+                      alt="cheked"
+                    /></button
+                  >
                 {:else}
-                  <Handd onTrym={tryma} onMasi={masi} onBighandd={bighandd} {noofopenm} {openMA} {addN} hosafat={hosafat[$lang]} />
+                  <Handd
+                    onTrym={tryma}
+                    onMasi={masi}
+                    onBighandd={bighandd}
+                    {noofopenm}
+                    {openMA}
+                    {addN}
+                    hosafat={hosafat[$lang]}
+                  />
                 {/if}
               </div>
               <div class="m-4" bind:this={dow}>
                 {#if addN == true}
-                  <div bind:this={fff} id="hosafn" class="m-4 border-2 border-barbi rounded">
-                    <button title={cencel[$lang]} onclick={() => (addN = false)} class="hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full">
+                  <div
+                    bind:this={fff}
+                    id="hosafn"
+                    class="m-4 border-2 border-barbi rounded"
+                  >
+                    <button
+                      title={cencel[$lang]}
+                      onclick={() => (addN = false)}
+                      class="hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full"
+                    >
                       <svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                        <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"/>
+                        <path
+                          fill="currentColor"
+                          d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                        />
                       </svg>
                     </button>
-                    <ChoosNeed onStr={() => (loadr = false)} onAdd={needad} onAddm={needadm} selectedi={needr} />
+                    <ChoosNeed
+                      onStr={() => (loadr = false)}
+                      onAdd={needad}
+                      onAddm={needadm}
+                      selectedi={needr}
+                    />
                   </div>
                 {/if}
                 <div class="m-4" bind:this={lll}>
                   {#if loadr === true}
-                    <div class="grid justify-center items-center border-2 border-barbi rounded p-4"><Lowding /></div>
+                    <div
+                      class="grid justify-center items-center border-2 border-barbi rounded p-4"
+                    >
+                      <Lowding />
+                    </div>
                   {/if}
                   {#if totalneed === true}
-                    <TotalNeeds pn={projectname} pl={srcP} {restime} pu={projectUsers} projectId={$idPr}
-                      userslength={projectUsers.length} {needr} meData={meDatamm} processContext={selectedProcess}
-                      onClose={clo} onRemove={wdwd} />
+                    <TotalNeeds
+                      pn={projectname}
+                      pl={srcP}
+                      {restime}
+                      pu={projectUsers}
+                      projectId={$idPr}
+                      userslength={projectUsers.length}
+                      {needr}
+                      meData={meDatamm}
+                      processContext={selectedProcess}
+                      onClose={clo}
+                      onRemove={wdwd}
+                    />
                   {/if}
                 </div>
               </div>
-
             {:else if createMode === 'process'}
               <!-- Process creation flow -->
               <div class="m-4">
                 <button
-                  onclick={() => { createMode = null; selectedProcess = null; addM = false; showvd = false; addN = false; totalneed = false; }}
+                  onclick={() => {
+                    createMode = null;
+                    selectedProcess = null;
+                    addM = false;
+                    showvd = false;
+                    addN = false;
+                    totalneed = false;
+                  }}
                   class="flex items-center gap-1 text-barbi hover:text-gold transition-colors mb-4"
                 >
-                  <svg style="width:20px;height:20px" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                  <svg style="width:20px;height:20px" viewBox="0 0 24 24"
+                    ><path
+                      fill="currentColor"
+                      d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+                    /></svg
+                  >
                   <span class="text-sm font-medium">{backBtn[$lang]}</span>
                 </button>
                 <div class="space-y-4">
-                  <ProcessCreator projectId={$idPr} {processes} selectedProcessId={selectedProcess?.id || ''}
-                    onCreated={handleProcessCreated} onSelect={handleProcessSelected} />
+                  <ProcessCreator
+                    projectId={$idPr}
+                    {processes}
+                    selectedProcessId={selectedProcess?.id || ''}
+                    onCreated={handleProcessCreated}
+                    onSelect={handleProcessSelected}
+                  />
                   {#if processError}
                     <p class="text-sm text-rose-300">{processError}</p>
                   {/if}
@@ -2625,74 +2818,182 @@ pointer-events: none;"
 
               {#if selectedProcess}
                 <div class="border-t border-barbi/30 mt-4 pt-4 mx-4">
-                  <p class="text-sm text-barbi/60 mb-4 text-center">{optionallyAddContent[$lang]}</p>
+                  <p class="text-sm text-barbi/60 mb-4 text-center">
+                    {optionallyAddContent[$lang]}
+                  </p>
                   <div class="hhh">
                     {#if hovered}
                       <button onclick={hosa} onmouseleave={bighand}
-                        ><img title={hosafa[$lang]} style="max-width:45vw; max-height:45vw;" width="240px" height="240px"
-                          src="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg" alt="cheked"/></button>
+                        ><img
+                          title={hosafa[$lang]}
+                          style="max-width:45vw; max-height:45vw;"
+                          width="240px"
+                          height="240px"
+                          src="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg"
+                          alt="cheked"
+                        /></button
+                      >
                     {:else}
-                      <Hand onHosa={hosa} onProgres={bighand} onTrym={trym} {noofopen} {openMS} {addM} hosafa={hosafa[$lang]} />
+                      <Hand
+                        onHosa={hosa}
+                        onProgres={bighand}
+                        onTrym={trym}
+                        {noofopen}
+                        {openMS}
+                        {addM}
+                        hosafa={hosafa[$lang]}
+                      />
                     {/if}
                     {#if hoveredd}
                       <button onclick={masi} onmouseleave={bighandd}
-                        ><img title={hosafat[$lang]} style="max-width:45vw; max-height:45vw;" width="240px" height="240px"
-                          src="https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg" alt="cheked"/></button>
+                        ><img
+                          title={hosafat[$lang]}
+                          style="max-width:45vw; max-height:45vw;"
+                          width="240px"
+                          height="240px"
+                          src="https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg"
+                          alt="cheked"
+                        /></button
+                      >
                     {:else}
-                      <Handd onTrym={tryma} onMasi={masi} onBighandd={bighandd} {noofopenm} {openMA} {addN} hosafat={hosafat[$lang]} />
+                      <Handd
+                        onTrym={tryma}
+                        onMasi={masi}
+                        onBighandd={bighandd}
+                        {noofopenm}
+                        {openMA}
+                        {addN}
+                        hosafat={hosafat[$lang]}
+                      />
                     {/if}
                   </div>
                   <div>
                     {#if addM === true}
-                      <div bind:this={hosaf} class="m-4 border-2 h-screen border-barbi rounded">
-                        <button title={cencel[$lang]} onclick={closeM} class="hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full">
-                          <svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                            <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"/>
+                      <div
+                        bind:this={hosaf}
+                        class="m-4 border-2 h-screen border-barbi rounded"
+                      >
+                        <button
+                          title={cencel[$lang]}
+                          onclick={closeM}
+                          class="hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full"
+                        >
+                          <svg
+                            style="width:24px;height:24px"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              fill="currentColor"
+                              d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                            />
                           </svg>
                         </button>
-                        <ChoosMission {roles} {mission1} bind:selected={blabla} onMessage={callbackFunction}
-                          onAdd={add} onClose={close} pn={projectname} pl={srcP} {restime} {projectUsers} {alit}
-                          processContext={selectedProcess} />
+                        <ChoosMission
+                          {roles}
+                          {mission1}
+                          bind:selected={blabla}
+                          onMessage={callbackFunction}
+                          onAdd={add}
+                          onClose={close}
+                          pn={projectname}
+                          pl={srcP}
+                          {restime}
+                          {projectUsers}
+                          {alit}
+                          processContext={selectedProcess}
+                        />
                       </div>
                     {/if}
                   </div>
                   <div bind:this={cow}>
                     {#if load === true}
-                      <div class="grid justify-center items-center border-2 border-barbi rounded p-4"><Lowding /></div>
+                      <div
+                        class="grid justify-center items-center border-2 border-barbi rounded p-4"
+                      >
+                        <Lowding />
+                      </div>
                     {/if}
                     {#if showvd == true}
                       {#key miData}
-                        <Mission pn={projectname} pl={srcP} {restime} {newcontent} {newcontentR} {newcontentW}
-                          pu={projectUsers} userslength={projectUsers.length} vallues={alit} {miData}
-                          projectId={$idPr} processContext={selectedProcess} onRemove={removeF} onClose={close} />
+                        <Mission
+                          pn={projectname}
+                          pl={srcP}
+                          {restime}
+                          {newcontent}
+                          {newcontentR}
+                          {newcontentW}
+                          pu={projectUsers}
+                          userslength={projectUsers.length}
+                          vallues={alit}
+                          {miData}
+                          projectId={$idPr}
+                          processContext={selectedProcess}
+                          onRemove={removeF}
+                          onClose={close}
+                        />
                       {/key}
                     {/if}
                   </div>
                   <div class="m-4" bind:this={dow}>
                     {#if addN == true}
-                      <div bind:this={fff} id="hosafn" class="m-4 border-2 border-barbi rounded">
-                        <button title={cencel[$lang]} onclick={() => (addN = false)} class="hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full">
-                          <svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                            <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"/>
+                      <div
+                        bind:this={fff}
+                        id="hosafn"
+                        class="m-4 border-2 border-barbi rounded"
+                      >
+                        <button
+                          title={cencel[$lang]}
+                          onclick={() => (addN = false)}
+                          class="hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full"
+                        >
+                          <svg
+                            style="width:24px;height:24px"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              fill="currentColor"
+                              d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                            />
                           </svg>
                         </button>
-                        <ChoosNeed onStr={() => (loadr = false)} onAdd={needad} onAddm={needadm} selectedi={needr} />
+                        <ChoosNeed
+                          onStr={() => (loadr = false)}
+                          onAdd={needad}
+                          onAddm={needadm}
+                          selectedi={needr}
+                        />
                       </div>
                     {/if}
                     <div class="m-4" bind:this={lll}>
                       {#if loadr === true}
-                        <div class="grid justify-center items-center border-2 border-barbi rounded p-4"><Lowding /></div>
+                        <div
+                          class="grid justify-center items-center border-2 border-barbi rounded p-4"
+                        >
+                          <Lowding />
+                        </div>
                       {/if}
                       {#if totalneed === true}
-                        <TotalNeeds pn={projectname} pl={srcP} {restime} pu={projectUsers} projectId={$idPr}
-                          userslength={projectUsers.length} {needr} meData={meDatamm} processContext={selectedProcess}
-                          onClose={clo} onRemove={wdwd} />
+                        <TotalNeeds
+                          pn={projectname}
+                          pl={srcP}
+                          {restime}
+                          pu={projectUsers}
+                          projectId={$idPr}
+                          userslength={projectUsers.length}
+                          {needr}
+                          meData={meDatamm}
+                          processContext={selectedProcess}
+                          onClose={clo}
+                          onRemove={wdwd}
+                        />
                       {/if}
                     </div>
                   </div>
                 </div>
               {:else}
-                <div class="m-4 rounded-lg border border-dashed border-gold p-4 text-center text-gold">
+                <div
+                  class="m-4 rounded-lg border border-dashed border-gold p-4 text-center text-gold"
+                >
                   {chooseProcessFirst[$lang]}
                 </div>
               {/if}

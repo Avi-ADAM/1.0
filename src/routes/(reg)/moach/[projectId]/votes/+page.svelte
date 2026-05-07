@@ -1,8 +1,6 @@
 <script>
-  const moachStore = getMoachStore();
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
-  import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { onMount } from 'svelte';
   import Lowding from '$lib/celim/lowding.svelte';
@@ -51,16 +49,18 @@
       </section>
     {/if}
 
-    <!-- Join Requests -->
-    {#if votesData.asks?.data?.length > 0}
-       <section class="bg-white p-6 rounded-xl shadow-sm">
+    <!-- Join Requests (nested inside openMissions) -->
+    {#if votesData.openMissions?.data?.some(m => m.attributes.asks?.data?.length > 0)}
+      <section class="bg-white p-6 rounded-xl shadow-sm">
         <h2 class="text-lg font-bold mb-4">{t.joinVotes}</h2>
         <div class="space-y-4">
-          {#each votesData.asks.data as ask}
-            <div class="p-4 border rounded-lg flex justify-between items-center">
-              <span>Join request for: {ask.attributes.open_mission?.data?.attributes?.name}</span>
-              <span class="text-xs bg-gray-100 px-2 py-1 rounded">{ask.attributes.vots?.length || 0} votes</span>
-            </div>
+          {#each votesData.openMissions.data as mission}
+            {#each mission.attributes.asks?.data || [] as ask}
+              <div class="p-4 border rounded-lg flex justify-between items-center">
+                <span>{t.joinVotes}: {mission.attributes.name}</span>
+                <span class="text-xs bg-gray-100 px-2 py-1 rounded">{ask.attributes.vots?.length || 0} votes</span>
+              </div>
+            {/each}
           {/each}
         </div>
       </section>

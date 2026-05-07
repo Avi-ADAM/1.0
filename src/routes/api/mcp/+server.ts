@@ -18,6 +18,7 @@ import { findMissionTool } from '../../../mastra/tools/findMissionTool';
 import { findUserProjectsTool } from '../../../mastra/tools/findUserProjectsTool';
 import { getPageContextTool } from '../../../mastra/tools/pageContextTool';
 import { createProjectTool } from '../../../mastra/tools/createProjectTool';
+import { createTaskTool } from '../../../mastra/tools/createTaskTool';
 
 // --- Public Tools for Unauthenticated Users ---
 
@@ -121,6 +122,7 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
             findUserProjectsTool,
             getPageContextTool,
             createProjectTool,
+            createTaskTool,
             howToConnect // Included even in auth mode for convenience
         };
     } else {

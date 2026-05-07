@@ -13,6 +13,8 @@ onMessage(messaging, (payload) => {
   import '../app.postcss';
   import { Toaster } from 'svelte-sonner';
   import { lang, doesLang, langUs } from '$lib/stores/lang.js';
+  import SucssesConf from '$lib/celim/sucssesConf.svelte';
+  import { confettiStore } from '$lib/stores/confettiStore';
   import { theme, themeConfig } from '$lib/stores/theme';
   import { onMount } from 'svelte';
   import { locale } from '$lib/translations';
@@ -190,5 +192,6 @@ onMessage(messaging, (payload) => {
     closeButton
     position="top-center"
   />
+  <SucssesConf success={$confettiStore} />
   <Bot {data} />
 </main>

@@ -252,7 +252,10 @@ export type ActionKey =
   | 'attachEntityToProcess'
   | 'ensureProcessForum'
   | 'ensureStageForum'
+  | 'updateProjectDetails'
+  | 'createResource'
   ;
+
 
 export interface ActionParamsMap {
   createProcess: CreateProcessParams;
@@ -275,7 +278,22 @@ export interface ActionParamsMap {
     id: string;
     projectId: string;
   };
+  createResource: {
+    projectId: string;
+    name: string;
+    description?: string;
+    price?: number;
+    kindOf?: string;
+    hm?: number;
+    spnot?: string;
+    easy?: number;
+    linkto?: string;
+    mashaabimId?: string;
+    startDate?: string;
+    endDate?: string;
+  };
 }
+
 
 // ============================================================================
 // Core Action Execution
@@ -676,6 +694,14 @@ export async function ensureStageForum(
 ): Promise<ActionResponse> {
   return executeAction('ensureStageForum', params, options);
 }
+
+export async function createResource(
+  params: ActionParamsMap['createResource'],
+  options: ExecuteActionOptions = {}
+): Promise<ActionResponse> {
+  return executeAction('createResource', params, options);
+}
+
 
 // ============================================================================
 // User Feedback Helpers

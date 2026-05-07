@@ -162,14 +162,22 @@ export async function saveTimer(timer, missionID, fetch, isSer = false, tasks = 
       return null;
     }
 
-    // Calculate total hours
-    let sessionHours = timer.attributes?.activeTimer?.data?.attributes?.totalHours || 0;
-    if (timer.attributes?.activeTimer?.data?.attributes?.timers) {
-      sessionHours = calculateTotalHours(timer.attributes.activeTimer.data.attributes.timers);
-    }
-    
+    const timerSegments = timer.attributes?.activeTimer?.data?.attributes?.timers || [];
+    // totalHours is set server-side by stopTimer and is always accurate.
+    // calculateTotalHours only counts segments that have both start+stop,
+    // so it returns 0 if the store is stale (last segment still "open").
+    // Math.max covers both cases: fresh store ↔ stale store.
+    const totalHoursFromServer = timer.attributes?.activeTimer?.data?.attributes?.totalHours || 0;
+    const fromSegments = calculateTotalHours(timerSegments);
+    const sessionHours = Math.max(totalHoursFromServer, fromSegments);
+    console.log('[saveTimer] hours calc:', { totalHoursFromServer, fromSegments, sessionHours });
+
+    const now = new Date();
+    // hoursInMonth handles open segments by using Date.now() for missing stop — always safe.
+    const sessionHoursThisMonth = hoursInMonth(timerSegments, now.getFullYear(), now.getMonth());
+
     const currentHoursAlready = timer.attributes?.howmanyhoursalready || 0;
-    const totalToSave = sessionHours + currentHoursAlready;
+    const newHowManyHours = currentHoursAlready + sessionHoursThisMonth;
 
     const params = {
       missionId: missionID.toString(),
@@ -177,8 +185,9 @@ export async function saveTimer(timer, missionID, fetch, isSer = false, tasks = 
       timerId: timer.attributes?.activeTimer?.data?.id?.toString(),
       projectId: projectId.toString(),
       userId: userId.toString(),
-      howmanyhoursalready: totalToSave,
-      totalHours: sessionHours,
+      howmanyhoursalready: newHowManyHours,
+      sessionHoursTotal: sessionHours,
+      sessionHoursThisMonth,
       stname: "saved",
       x: 0,
       tasks: tasks || [],
@@ -190,6 +199,32 @@ export async function saveTimer(timer, missionID, fetch, isSer = false, tasks = 
     console.error("Error in saveTimer:", error);
     return null;
   }
+}
+
+/**
+ * Calculates hours from timer intervals that fall within a specific month.
+ * Segments crossing month boundaries are clipped to the month.
+ * @param {Array} timers - Array of timer segments with start and stop
+ * @param {number} year - Full year (e.g. 2026)
+ * @param {number} month - 0-indexed month (0=Jan)
+ * @returns {number} - Hours within that month
+ */
+export function hoursInMonth(timers, year, month) {
+  if (!timers || !Array.isArray(timers) || timers.length === 0) return 0;
+  const monthStart = new Date(year, month, 1).getTime();
+  const monthEnd = new Date(year, month + 1, 1).getTime();
+  let total = 0;
+  for (const seg of timers) {
+    if (!seg.start) continue;
+    const start = new Date(seg.start).getTime();
+    const stop = seg.stop ? new Date(seg.stop).getTime() : Date.now();
+    const clampedStart = Math.max(start, monthStart);
+    const clampedStop = Math.min(stop, monthEnd);
+    if (clampedStop > clampedStart) {
+      total += (clampedStop - clampedStart) / 1000 / 3600;
+    }
+  }
+  return total;
 }
 
 /**

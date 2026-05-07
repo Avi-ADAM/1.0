@@ -1,8 +1,8 @@
 <script>
-  const moachStore = getMoachStore();
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
+  const moachStore = getMoachStore();
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { onMount } from 'svelte';
   import Lowding from '$lib/celim/lowding.svelte';

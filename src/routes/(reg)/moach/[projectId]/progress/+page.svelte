@@ -1,74 +1,50 @@
 <script>
-  const moachStore = getMoachStore();
   import Bethas from '$lib/components/prPr/bethas.svelte';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   import { page } from '$app/state';
-  import { sendToSer } from '$lib/send/sendToSer.js';
-  import { onMount } from 'svelte';
-  import Lowding from '$lib/celim/lowding.svelte';
+  import { untrack } from 'svelte';
+
+  let { data } = $props();
+  const moachStore = getMoachStore();
 
   let projectId = $derived(page.params.projectId);
-  let projectData = $derived(moachStore.state.projects[projectId]);
-  let missions = $derived(projectData?.missions);
 
-  let loading = $state(false);
-
-  onMount(async () => {
-    if (!moachStore.isDataFresh(projectId, 'missions')) {
-      loading = true;
-      try {
-        const res = await sendToSer({ pid: projectId }, 'getProjectMissions', null, null, false, fetch);
-        if (res?.data?.project?.data?.attributes) {
-          moachStore.updateProjectData(projectId, 'missions', res.data.project.data.attributes);
-        }
-      } finally {
-        loading = false;
-      }
+  // Seed store from server data whenever fresh data arrives
+  $effect(() => {
+    if (data.missions && projectId) {
+      untrack(() => moachStore.updateProjectData(projectId, 'missions', data.missions));
     }
   });
 
-  import ActionModal from '$lib/components/moach/ActionModal.svelte';
+  let projectData = $derived(moachStore.state.projects[projectId]);
+  let missions = $derived(projectData?.missions ?? data.missions);
+
+  let modalState = $state({ isOpen: false, a: 0, who: null });
 
   function handleChat(id) {
-    console.log('Open chat', id);
     modalState.who = id;
-    modalState.a = 8; // Diun (Not yet fully ported but reserving)
+    modalState.a = 8;
     modalState.isOpen = true;
   }
 
   function handleActClick(act) {
-    console.log('Act clicked', act);
-    modalState.who = act.id;
-    modalState.a = 9; // ChooseM
+    modalState.who = act.id ?? act;
+    modalState.a = 9;
     modalState.isOpen = true;
   }
-
-  let modalState = $state({
-    isOpen: false,
-    a: 0,
-    who: null
-  });
 </script>
 
-<div class="progress-page rounded-lg overflow-auto"
-     style="margin: 20px auto; background: linear-gradient(to right, #25c481, #25b7c4);">
-  <ActionModal
-    bind:isOpen={modalState.isOpen}
-    bind:a={modalState.a}
-    who={modalState.who}
-    projectId={projectId}
-    projectData={projectData}
-  />
-
-  {#if loading && !missions}
-    <div class="flex justify-center p-12">
-      <Lowding />
-    </div>
-  {:else if missions}
+<div
+  class="progress-page rounded-lg overflow-auto"
+  style="margin: 20px auto; background: linear-gradient(to right, #25c481, #25b7c4);"
+>
+  {#if missions}
     <Bethas
-      bmiData={missions.mesimabetahaliches?.data || []}
+      bmiData={missions.mesimabetahaliches?.data ?? []}
       onChat={handleChat}
       onActClick={handleActClick}
     />
+  {:else}
+    <div class="flex justify-center p-12 text-white">טוען...</div>
   {/if}
 </div>

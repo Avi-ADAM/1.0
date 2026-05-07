@@ -1,5 +1,6 @@
 import { browser } from '$app/environment';
 import { setContext, getContext } from 'svelte';
+import { sendToSer } from '$lib/send/sendToSer.js';
 
 const STORAGE_KEY = 'moach.cache.v1';
 const MOACH_STORE_KEY = Symbol('MOACH_STORE');
@@ -15,7 +16,9 @@ export function createMoachStore() {
   let state = $state({
     projects: {},   // { [projectId]: { base, missions, financials, entities: {}, _ts: { base: Date, ... } } }
     currentId: null,
-    loading: false
+    loading: false,
+    modal: { open: false, kind: null, id: null },  // kind: 'betha'|'pendm'|'openM'|'done'|'assign'
+    actModal: { open: false, actData: null }
   });
 
   if (browser) {
@@ -68,6 +71,28 @@ export function createMoachStore() {
         delete state.projects[pid]._ts[type];
         persist();
       }
+    },
+
+    async refreshBase(pid, fetch) {
+      const res = await sendToSer({ pid }, 'getProjectBaseInfoWithAuth', 0, 0, false, fetch);
+      const attrs = res?.data?.project?.data?.attributes;
+      if (attrs) this.updateProjectData(pid, 'base', attrs);
+    },
+
+    openModal(kind, id) {
+      state.modal = { open: true, kind, id };
+    },
+
+    closeModal() {
+      state.modal = { open: false, kind: null, id: null };
+    },
+
+    openActModal(actData) {
+      state.actModal = { open: true, actData };
+    },
+
+    closeActModal() {
+      state.actModal = { open: false, actData: null };
     }
   };
 }

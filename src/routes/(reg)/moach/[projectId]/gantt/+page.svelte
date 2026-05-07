@@ -1,12 +1,12 @@
 <script>
-  const moachStore = getMoachStore();
-  import Gantt from '$lib/components/prPr/gantt/gant.svelte';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
+  import Gantt from '$lib/components/prPr/gantt/gant.svelte';
   import { page } from '$app/state';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { onMount } from 'svelte';
   import Lowding from '$lib/celim/lowding.svelte';
 
+  const moachStore = getMoachStore();
   let projectId = $derived(page.params.projectId);
   let projectData = $derived(moachStore.state.projects[projectId]);
   let missions = $derived(projectData?.missions);
@@ -35,10 +35,10 @@
     </div>
   {:else if missions}
     <Gantt
-      mesimabetahaliches={missions.mesimabetahaliches?.data || []}
-      pendms={missions.pendms?.data || []}
-      open_missions={missions.open_missions?.data || []}
-      finnished_missions={missions.finnished_missions?.data || []}
+      bmiData={missions.mesimabetahaliches?.data || []}
+      pmiData={missions.pendms?.data || []}
+      omiData={missions.open_missions?.data || []}
+      fmiData={missions.finnished_missions?.data || []}
     />
   {/if}
 </div>

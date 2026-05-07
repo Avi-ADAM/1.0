@@ -1,7 +1,11 @@
 <script>
     import { onMount } from 'svelte';
     import moment from 'moment';
+    import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
     let SvelteGantt, SvelteGanttTable, MomentSvelteGanttDateAdapter;
+    const moachStore = getMoachStore();
+
+    const colorToKind = { blue: 'betha', green: 'pendm', orange: 'openM', pink: 'done' };
 
    /**
     * @typedef {Object} Props
@@ -74,7 +78,13 @@
     }
     console.log(options)
         window.gantt = gantt = new SvelteGantt({ target: document.getElementById('example-gantt'), props: options });
-    	gantt.api.tasks.on.select((task) => onSelected({ id:task}));
+    	gantt.api.tasks.on.select((task) => {
+            const selected = task[0]?.model;
+            if (!selected) return;
+            const kind = colorToKind[selected.classes];
+            const id = Math.floor(selected.id);
+            if (kind) moachStore.openModal(kind, id);
+        });
 
     });
 	
@@ -98,7 +108,11 @@
                 generation
             });
 			
-			const from = fmiData[i].attributes.start == null ? moment(fmiData[i].attributes.mesimabetahalich.data.attributes.createdAt) : moment(fmiData[i].attributes.start)//todo first timer start
+			const from = fmiData[i].attributes.start != null
+                ? moment(fmiData[i].attributes.start)
+                : fmiData[i].attributes.mesimabetahalich?.data?.attributes?.createdAt
+                    ? moment(fmiData[i].attributes.mesimabetahalich.data.attributes.createdAt)
+                    : moment(fmiData[i].attributes.createdAt)//todo first timer start
             
             const to = fmiData[i].attributes.finnish == null ? moment(fmiData[i].attributes.createdAt) : moment(fmiData[i].attributes.finnish)//todo last timer end
             tasks.push({
@@ -125,9 +139,18 @@
                 generation
             });
 			
-			const from = moment(bmiData[i].attributes.createdAt)
-            let rand_l = bmiData[i].attributes.hoursassinged / 2
-            const to = from.clone().add(rand_l, 'days')
+			const from = bmiData[i].attributes.start
+                ? moment(bmiData[i].attributes.start)
+                : moment(bmiData[i].attributes.createdAt)
+            let to;
+            if (bmiData[i].attributes.iskvua) {
+                to = bmiData[i].attributes.dates
+                    ? moment(bmiData[i].attributes.dates)
+                    : moment().add(5, 'years')
+            } else {
+                let rand_l = bmiData[i].attributes.hoursassinged / 2
+                to = from.clone().add(rand_l, 'days')
+            }
             tasks.push({
                 type: 'task',
                 id: bmiData[i].id,

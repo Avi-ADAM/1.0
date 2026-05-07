@@ -2,7 +2,6 @@
   import { lang } from '$lib/stores/lang.js';
   import RichText from '$lib/celim/ui/richText.svelte';
   import Tile from '$lib/celim/tile.svelte';
-  import { onMount } from 'svelte';
 
   let { data } = $props();
 
@@ -31,7 +30,9 @@
     {/if}
 
     {#if projectBase.descripFor}
-      <section class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-primary">
+      <section
+        class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-primary"
+      >
         <RichText editable={false} outpot={projectBase.descripFor} />
       </section>
     {/if}
@@ -39,13 +40,17 @@
     {#if vallues.length > 0}
       <section class="bg-white p-6 rounded-xl shadow-sm">
         <h2 class="text-xl font-bold text-primary mb-4">{t.vap}</h2>
-        <div class="flex flex-wrap justify-center gap-2 p-4 bg-gray-50 rounded-lg border border-gold">
+        <div
+          class="flex flex-wrap justify-center gap-2 p-4 bg-gray-50 rounded-lg border border-gold"
+        >
           {#each vallues as vallue}
             <Tile
               bg="gold"
               sm={innerWidth > 500}
               big={innerWidth > 500}
-              word={vallue.attributes.valueName}
+              word={vallue.attributes.localizations?.data?.find(
+                (l) => l.attributes?.locale == $lang
+              )?.attributes?.valueName ?? vallue.attributes.valueName}
             />
           {/each}
         </div>
