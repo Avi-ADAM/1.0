@@ -1,5 +1,5 @@
 <script>
-  import { page } from '$app/state';
+  import { page, navigating } from '$app/state';
   import { goto } from '$app/navigation';
   import { lang } from '$lib/stores/lang.js';
   import { idPr } from '$lib/stores/idPr.js';
@@ -127,6 +127,12 @@
   };
 
   let t = $derived(i18n[$lang] || i18n.en);
+
+  let pendingTabId = $derived(
+    navigating?.to?.url?.pathname
+      ? (tabs.find((tab) => navigating.to.url.pathname.includes(`/${tab.id}`))?.id ?? null)
+      : null
+  );
 
   const tabs = [
     { id: 'main', label: 'main' },
@@ -362,7 +368,8 @@
               class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold px-4 py-2 drop-shadow-lg shadow-gold transition-all
               {isActive(tab.id)
                 ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-blue-800 font-bold'
-                : 'bg-gradient-to-r from-gra via-grb  to-gre text-purple-700 font-bold'}"
+                : 'bg-gradient-to-r from-gra via-grb  to-gre text-purple-700 font-bold'}
+              {pendingTabId === tab.id ? 'animate-pulse opacity-70 scale-95' : ''}"
               style={!isActive(tab.id) ? 'text-shadow:1px 1px #fff;' : ''}
             >
               {t[tab.label]}

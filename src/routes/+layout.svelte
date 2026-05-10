@@ -19,6 +19,7 @@ onMessage(messaging, (payload) => {
   import { onMount } from 'svelte';
   import { locale } from '$lib/translations';
   import { goto } from '$app/navigation';
+  import { navigating } from '$app/state';
   import { browser } from '$app/environment';
   import ThemeToggle from '$lib/celim/main/ThemeToggle.svelte';
   import { Bot } from '$lib/components/bot';
@@ -182,6 +183,12 @@ onMessage(messaging, (payload) => {
   });
 </script>
 
+{#if navigating.delta}
+  <div class="nav-progress-track">
+    <div class="nav-progress-bar"></div>
+  </div>
+{/if}
+
 <main>
   {@render children?.()}
   <Toaster
@@ -195,3 +202,33 @@ onMessage(messaging, (payload) => {
   <SucssesConf success={$confettiStore} />
   <Bot {data} />
 </main>
+
+<style>
+  .nav-progress-track {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    height: 3px;
+    background: transparent;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .nav-progress-bar {
+    height: 100%;
+    width: 40%;
+    background: linear-gradient(90deg, #d946ef, #f59e0b, #a855f7);
+    animation: navslide 1s ease-in-out infinite;
+  }
+
+  @keyframes navslide {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(350%);
+    }
+  }
+</style>

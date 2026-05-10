@@ -22,10 +22,13 @@
    * @typedef {Object} Props
    * @property {Array<any>} [acts]
    * @property {(payload: { id: any; kind: string }) => void} [onTaskClick] - Callback when a task is clicked.
+   * @property {(() => void) | undefined} [onCreateClick] - Called when the create task button is clicked.
    */
 
   /** @type {Props} */
-  let { acts = $bindable([]), onTaskClick, onRowClick } = $props();
+  let { acts = $bindable([]), onTaskClick, onRowClick, onCreateClick } = $props();
+
+  const createLabel = { he: 'מטלה חדשה', en: 'New Task', ar: 'مهمة جديدة' };
   let paging = $state(new PagingData(
     1, // currentPage
     20, // itemsPerPage
@@ -383,50 +386,64 @@
   class="w-full px-2 text-center bg-gold dark:bg-barbi dark:text-gold text-barbi"
   dir={$lang == 'he' ? 'rtl' : 'ltr'}
 >
-  <div class="flex flex-row max-w-full overflow-x-auto d">
-    <button onclick={() => handleFilterClick(0)}>
-      <Tile
-        big={false}
-        sm={false}
-        bg="gold"
-        word={myTasks[$lang]}
-        closei={!isMyTasksActive}
-        openi={isMyTasksActive}
-      />
-    </button>
-    <button onclick={() => handleFilterClick(1)}>
-      <Tile
-        big={false}
-        sm={false}
-        bg="gold"
-        word={valiTasks[$lang]}
-        closei={!isCreatedByMeActive}
-        openi={isCreatedByMeActive}
-      />
-    </button>
-    <button onclick={() => handleFilterClick(2)}>
-      <Tile
-        big={false}
-        sm={false}
-        bg="gold"
-        word={emptyTasks[$lang]}
-        closei={!isUnassignedActive}
-        openi={isUnassignedActive}
-      />
-    </button>
-    {#if filtersUi.length > 0}
-      {#each filtersUi as ui, i}
-        <button onclick={() => handleFilterClick(i + 3)}>
-          <Tile
-            big={false}
-            sm={false}
-            bg={ui.color}
-            word={ui.word[$lang]}
-            closei={!ui.checked}
-            openi={ui.checked}
-          />
-        </button>
-      {/each}
+  <div class="flex items-center gap-2">
+    <div class="flex flex-row flex-1 overflow-x-auto d min-w-0">
+      <button onclick={() => handleFilterClick(0)}>
+        <Tile
+          big={false}
+          sm={false}
+          bg="gold"
+          word={myTasks[$lang]}
+          closei={!isMyTasksActive}
+          openi={isMyTasksActive}
+        />
+      </button>
+      <button onclick={() => handleFilterClick(1)}>
+        <Tile
+          big={false}
+          sm={false}
+          bg="gold"
+          word={valiTasks[$lang]}
+          closei={!isCreatedByMeActive}
+          openi={isCreatedByMeActive}
+        />
+      </button>
+      <button onclick={() => handleFilterClick(2)}>
+        <Tile
+          big={false}
+          sm={false}
+          bg="gold"
+          word={emptyTasks[$lang]}
+          closei={!isUnassignedActive}
+          openi={isUnassignedActive}
+        />
+      </button>
+      {#if filtersUi.length > 0}
+        {#each filtersUi as ui, i}
+          <button onclick={() => handleFilterClick(i + 3)}>
+            <Tile
+              big={false}
+              sm={false}
+              bg={ui.color}
+              word={ui.word[$lang]}
+              closei={!ui.checked}
+              openi={ui.checked}
+            />
+          </button>
+        {/each}
+      {/if}
+    </div>
+    {#if onCreateClick}
+      <button
+        onclick={onCreateClick}
+        class="flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg bg-barbi text-gold font-bold text-sm hover:bg-barbi/80 transition-colors"
+        title={createLabel[$lang] ?? createLabel.en}
+      >
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+        </svg>
+        {createLabel[$lang] ?? createLabel.en}
+      </button>
     {/if}
   </div>
   <Grid data={filteredActs} bind:columns {theme} {paging} />

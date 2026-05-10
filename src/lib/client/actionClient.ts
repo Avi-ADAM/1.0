@@ -238,6 +238,7 @@ export interface EnsureStageForumParams {
 }
 
 export type ActionKey =
+  | 'createTask'
   | 'updateTask'
   | 'createHaluka'
   | 'createTosplit'
@@ -257,7 +258,22 @@ export type ActionKey =
   ;
 
 
+export interface CreateTaskParams {
+  projectId: string;
+  name: string;
+  description?: string;
+  link?: string;
+  isAssigned?: boolean;
+  assignedUserId?: string;
+  missionId?: string;
+  tafkidims?: string[];
+  hashivut?: string;
+  dateS?: string;
+  dateF?: string;
+}
+
 export interface ActionParamsMap {
+  createTask: CreateTaskParams;
   createProcess: CreateProcessParams;
   attachEntityToProcess: AttachEntityToProcessParams;
   ensureProcessForum: EnsureProcessForumParams;
@@ -704,6 +720,13 @@ export async function createResource(
   options: ExecuteActionOptions = {}
 ): Promise<ActionResponse> {
   return executeAction('createResource', params, options);
+}
+
+export async function createTask(
+  params: CreateTaskParams,
+  options: ExecuteActionOptions = {}
+): Promise<ActionResponse> {
+  return executeAction('createTask', params, options);
 }
 
 

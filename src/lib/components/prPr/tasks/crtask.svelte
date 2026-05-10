@@ -104,10 +104,6 @@
     }
     return [id, uid];
   }
-  let miDatan = [];
-  const baseUrl = import.meta.env.VITE_URL;
-
-  let linkg = baseUrl + '/graphql';
   let loading = $state(false);
   let success = $state(false);
   let error = $state(false);
@@ -125,90 +121,57 @@
           loading = false;
         } else {
           error = false;
-          let d = new Date();
           neEr = false;
           seEr = false;
-          let tt = ``
-          let personal = ``
-          let tafkidims = ``
-          let mtaha = ``
-          if(isPersonal){
-            const ob = find_se_id(selected);
-            userMevatzeaId = ob[1];
-            mtaha = ob[0];
-            tt = userMevatzeaId == userMevakeshId ? ` myIshur: true,` : ``;
-            personal = `
-               my: "${userMevatzeaId}",               
-               mesimabetahaliches: "${mtaha}",`
 
-          }else{
-            const tafkidim = find_tafkidims_id(selected)
-            console.log(tafkidim)
-            tafkidims = `
-              tafkidims: [${tafkidim}],`
-          }
-
-          console.log(moment(mimatai, 'HH:mm DD/MM/YYYY'));
           let momentx = moment(mimatai, 'HH:mm DD/MM/YYYY ');
           let momebtt = moment(adMatai, 'HH:mm DD/MM/YYYY ');
-          const st =
-            mimatai !== undefined && mimatai !== null
-              ? `dateS: "${momentx.toISOString()}",`
-              : ``;
-          ///is before?
-          const fd =
-            adMatai !== undefined && adMatai !== null
-              ? `dateF: "${momebtt.toISOString()}",`
-              : ``;
-          
-          const cookieValueId = document.cookie
-            .split('; ')
-            .find((row) => row.startsWith('id='))
-            .split('=')[1];
-          userMevakeshId = cookieValueId;
-          let token = page.data.tok;
-          let bearer1 = 'bearer' + ' ' + token;
+
+          /** @type {Record<string, any>} */
+          const params = {
+            projectId: $idPr,
+            name,
+            description: teur,
+            link,
+            isAssigned: isPersonal,
+            hashivut
+          };
+
+          if (mimatai !== undefined && mimatai !== null) {
+            params.dateS = momentx.toISOString();
+          }
+          if (adMatai !== undefined && adMatai !== null) {
+            params.dateF = momebtt.toISOString();
+          }
+
+          if (isPersonal) {
+            const ob = find_se_id(selected);
+            userMevatzeaId = ob[1];
+            params.assignedUserId = String(ob[1]);
+            params.missionId = String(ob[0]);
+          } else {
+            params.tafkidims = find_tafkidims_id(selected);
+          }
+
           try {
-            await fetch(linkg, {
+            const res = await fetch('/api/action', {
               method: 'POST',
-              headers: {
-                Authorization: bearer1,
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                query: `mutation 
-                        { createAct(
-      data: {project: "${$idPr}",
-             vali: "${userMevakeshId}",
-             des:  """${teur}""",
-             shem: """${name}""",
-             link: "${link}",
-             publishedAt: "${d.toISOString()}",
-             isAssigned: ${isPersonal},
-             ${personal}
-             ${tafkidims}
-            ${tt}
-             ${st}
-             ${fd}
-             hashivut: "${hashivut}",
-                  }
-    
-  ) {data{id attributes{ shem my {data{id}}}}}
-}
-`
-              })
-            })
-              .then((r) => r.json())
-              .then((data) => (miDatan = data));
-            loading = false;
-            success = true;
-            onDone?.({
-              id: miDatan.data.createAct.data.id,
-              name: miDatan.data.createAct.data.attributes.shem,
-              user: miDatan.data.createAct.data.attributes.my?.data?.id ?? null
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ actionKey: 'createTask', params })
             });
+            const result = await res.json();
+            loading = false;
+            if (result.success) {
+              success = true;
+              onDone?.({
+                id: result.data.id,
+                name: result.data.attributes.shem,
+                user: result.data.attributes.my?.data?.id ?? null
+              });
+            } else {
+              error = true;
+            }
           } catch (e) {
-            const error1 = e;
             loading = false;
             error = true;
           }

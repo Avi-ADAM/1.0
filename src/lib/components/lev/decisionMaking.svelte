@@ -1,5 +1,4 @@
 <script>
-  import { pinch } from 'svelte-gestures';
   import { Drawer } from 'vaul-svelte';
   import { ProgressBar } from 'progressbar-svelte';
   import { goto } from '$app/navigation';
