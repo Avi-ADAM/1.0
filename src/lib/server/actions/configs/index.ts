@@ -118,7 +118,7 @@ export {
   addVoteConfig,
   ensureSheirutForumConfig,
   closeFiniapruvalConfig,
-  updateProjectDetailsConfig
+  updateProjectDetailsConfig,
   createProcessConfig,
   attachEntityToProcessConfig,
   ensureProcessForumConfig,
