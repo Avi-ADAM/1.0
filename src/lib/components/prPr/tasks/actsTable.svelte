@@ -25,7 +25,7 @@
    */
 
   /** @type {Props} */
-  let { acts = $bindable([]), onTaskClick } = $props();
+  let { acts = $bindable([]), onTaskClick, onRowClick } = $props();
   let paging = $state(new PagingData(
     1, // currentPage
     20, // itemsPerPage
@@ -68,7 +68,7 @@
     {
       key: 'shem',
       title: name[$lang],
-      accessor: (row) => row.shem,
+      accessor: (row) => ({ value: row.shem, onClick: () => onRowClick?.(row) }),
       renderComponent: NameField
     },
     {
@@ -176,10 +176,8 @@
     }
   ]);
 
-  let myid = page.data.uid;
-  let filteredActs = $state([]);
-  
-    let uiFilters = $state([]);
+  let myid = $derived(String(page.data.uid ?? ''));
+  let uiFilters = $state([]);
   
   const myTasks = { en: 'my assigned tasks', he: 'מטלות שאני מבצע' };
   const valiTasks = { en: 'tasks I created', he: 'מטלות שיצרתי' };
@@ -193,61 +191,35 @@
   let isCreatedByMeActive = $state(false); // מתחיל דלוק
   let isUnassignedActive = $state(false);
 
-  let filters = $state([]);
-  $effect(() => {
-    filters = [
-      {
-        key: 'myTasks',
-        columns: 'my',
-        filter: (val) => {
-          if (!filters[0].active) return true;
-          return val?.my?.data?.some((user) => user.id === myid);
-        },
-        active: false
-      },
-      {
-        key: 'tasksICreated',
-        columns: 'vali',
-        filter: (val) => {
-          if (!filters[1].active) return true;
-          return val?.vali?.data?.id === myid;
-        },
-        active: false
-      },
-      {
-        key: 'unassignedTasks',
-        columns: 'my',
-        filter: (val) => {
-          if (!filters[2].active) return true;
-          return !val?.my?.data || val.my.data.length === 0;
-        },
-        active: false
-      },
-      ...uiFilters
-    ];
-  });
-  
-  function updateFilteredActs() {
-    const activeFilter = filters.find((f) => f.active);
-    if (!activeFilter) {
-        filteredActs = acts; // אם אין פילטר פעיל, החזר את כל ה-acts
-    } else {
-        filteredActs = acts.filter((item) => {
-            // בדוק אם הפילטר פעיל
-            return activeFilter.filter(item);
-        });
+  let filters = $state([
+    {
+      key: 'myTasks',
+      columns: 'my',
+      filter: (val) => val?.my?.data?.some((user) => String(user.id) === myid),
+      active: false
+    },
+    {
+      key: 'tasksICreated',
+      columns: 'vali',
+      filter: (val) => String(val?.vali?.data?.id ?? '') === myid,
+      active: false
+    },
+    {
+      key: 'unassignedTasks',
+      columns: 'my',
+      filter: (val) => !val?.my?.data || val.my.data.length === 0,
+      active: false
     }
-    
-    // הוסף כאן לולאה כדי לבדוק את כל הפילטרים הפעילים
-    filters.forEach((filter) => {
-        if (filter.active) {
-            filteredActs = filteredActs.filter((item) => filter.filter(item));
-        }
-    });
-    filteredActs = filteredActs;
-    console.log("Filtered acts after applying filters:", filteredActs, uiFilters); // הוסף לוג כאן
+  ]);
 
-  }
+  let filteredActs = $derived.by(() => {
+    const activeFilters = filters.filter((f) => f.active);
+    if (activeFilters.length === 0) {
+      return [...acts];
+    } else {
+      return acts.filter((item) => activeFilters.every((f) => f.filter(item)));
+    }
+  });
 
   function handleFilterClick(filterIndex) {
     console.log(`Filter ${filterIndex} clicked`,filters);
@@ -316,8 +288,6 @@
       filtersUi = filtersUi;
     }
     }
-    updateFilteredActs();
-
   }
 
   function handleApprove(taskId, event) {
@@ -340,65 +310,72 @@
    
   }
 
-  onMount(() => {
-    const reformatArray = (arr) => {
-      if (!Array.isArray(arr)) return [];
+  const reformatArray = (arr) => {
+    if (!Array.isArray(arr)) return [];
 
-      return arr
-        .map((item) => {
-          if (!item || !item.id || !item.attributes) return null;
+    return arr
+      .map((item) => {
+        if (!item || !item.id || !item.attributes) return null;
 
-          const attributes = item.attributes || {};
-          return {
-            id: item.id,
-            ...attributes,
-            vali: attributes.vali || { data: null },
-            my: attributes.my || { data: [] },
-            mesimabetahaliches: attributes.mesimabetahaliches || { data: [] },
-            tafkidims: attributes.tafkidims || { data: [] }
-          };
-        })
-        .filter(Boolean);
-    };
+        const attributes = item.attributes || {};
+        return {
+          id: item.id,
+          ...attributes,
+          vali: attributes.vali || { data: null },
+          my: attributes.my || { data: [] },
+          mesimabetahaliches: attributes.mesimabetahaliches || { data: [] },
+          tafkidims: attributes.tafkidims || { data: [] }
+        };
+      })
+      .filter(Boolean);
+  };
 
-    acts = reformatArray(acts);
-    updateFilteredActs();
-    let counter = 0;
-    let colors = ["blue", "green", "yellow", "red", "purple", "indigo","pink" , "gray"];
+  let previousRawActs = $state();
+
+  $effect(() => {
+    if (acts && acts.length > 0 && acts[0].attributes) {
+      acts = reformatArray(acts);
+      
+      let counter = 0;
+      let colors = ["blue", "green", "yellow", "red", "purple", "indigo","pink" , "gray"];
+      let newFiltersUi = [];
+      let newUiFilters = [];
+
       for (let i = 0; i < acts.length; i++) {
-          if(acts[i].isAssigned === false){
-              for (let t = 0; t < acts[i].tafkidims.data.length; t++) {
-                  if(filtersUi.length === 0 || !filtersUi.map(e => e.id).includes(acts[i].tafkidims.data[t].id)){
-                      filtersUi.push({
-                        id: acts[i].tafkidims.data[t].id,
-                        word: {
-                            he: acts[i].tafkidims.data[t].attributes?.localizations?.data ? acts[i].tafkidims.data[t].attributes.localizations.data[0].attributes.roleDescription : acts[i].tafkidims.data[t].attributes.roleDescription,
-                            en: acts[i].tafkidims.data[t].attributes.roleDescription
-                        },
-                        checked: false,
-                        color: colors[counter]
-                      })
-                      counter < 7 ? counter += 1 : counter = 0;
-                      filtersUi = filtersUi
-                      uiFilters = [
-                        ...uiFilters,{
-                          filter: (val) => {
-                            return val.tafkidims && val.tafkidims.data?.some(e => e.id === acts[i].tafkidims.data[t].id) && val.isAssigned  === false;
-                        },
-                          active: false,
-                          key: acts[i].tafkidims.data[t].id + 3,
-                          columns: "tafkidims"
-                      }]
-                  }
-              }
+        if (!acts[i].isAssigned) {
+          for (let t = 0; t < acts[i].tafkidims.data.length; t++) {
+            if (newFiltersUi.length === 0 || !newFiltersUi.map(e => e.id).includes(acts[i].tafkidims.data[t].id)) {
+              newFiltersUi.push({
+                id: acts[i].tafkidims.data[t].id,
+                word: {
+                  he: acts[i].tafkidims.data[t].attributes?.localizations?.data ? acts[i].tafkidims.data[t].attributes.localizations.data[0].attributes.roleDescription : acts[i].tafkidims.data[t].attributes.roleDescription,
+                  en: acts[i].tafkidims.data[t].attributes.roleDescription
+                },
+                checked: false,
+                color: colors[counter]
+              });
+              counter < 7 ? counter += 1 : counter = 0;
+              newUiFilters.push({
+                filter: (val) => {
+                  return val.tafkidims && val.tafkidims.data?.some(e => e.id === acts[i].tafkidims.data[t].id) && !val.isAssigned;
+                },
+                active: false,
+                key: acts[i].tafkidims.data[t].id + 3,
+                columns: "tafkidims"
+              });
+            }
           }
+        }
       }
-      uiFilters = uiFilters
-      filters = filters
-      console.log("ONMOUNT",filtersUi,filters)
-      updateFilteredActs();
-      console.log("ONMOUNT2",filtersUi,filters)
-
+      filtersUi = newFiltersUi;
+      uiFilters = newUiFilters;
+      filters = [...filters.slice(0, 3), ...uiFilters];
+    } else if (acts && acts.length === 0 && acts !== previousRawActs) {
+      filtersUi = [];
+      uiFilters = [];
+      filters = [...filters.slice(0, 3)];
+    }
+    previousRawActs = acts;
   });
 </script>
 
@@ -408,58 +385,50 @@
 >
   <div class="flex flex-row max-w-full overflow-x-auto d">
     <button onclick={() => handleFilterClick(0)}>
-      {#key isMyTasksActive}
-        <Tile
-          big={false}
-          sm={false}
-          bg="gold"
-          word={myTasks[$lang]}
-          closei={!isMyTasksActive}
-          openi={isMyTasksActive}
-        />
-      {/key}
+      <Tile
+        big={false}
+        sm={false}
+        bg="gold"
+        word={myTasks[$lang]}
+        closei={!isMyTasksActive}
+        openi={isMyTasksActive}
+      />
     </button>
     <button onclick={() => handleFilterClick(1)}>
-      {#key isCreatedByMeActive}
-        <Tile
-          big={false}
-          sm={false}
-          bg="gold"
-          word={valiTasks[$lang]}
-          closei={!isCreatedByMeActive}
-          openi={isCreatedByMeActive}
-        />
-      {/key}
+      <Tile
+        big={false}
+        sm={false}
+        bg="gold"
+        word={valiTasks[$lang]}
+        closei={!isCreatedByMeActive}
+        openi={isCreatedByMeActive}
+      />
     </button>
     <button onclick={() => handleFilterClick(2)}>
-      {#key isUnassignedActive}
-        <Tile
-          big={false}
-          sm={false}
-          bg="gold"
-          word={emptyTasks[$lang]}
-          closei={!isUnassignedActive}
-          openi={isUnassignedActive}
-        />
-      {/key}
+      <Tile
+        big={false}
+        sm={false}
+        bg="gold"
+        word={emptyTasks[$lang]}
+        closei={!isUnassignedActive}
+        openi={isUnassignedActive}
+      />
     </button>
     {#if filtersUi.length > 0}
-      {#each filtersUi as ui,i}
-      {#key filtersUi}
-        <button onclick={() => handleFilterClick(i+3)}>
-            <Tile
-              big={false}
-              sm={false}
-              bg="{ui.color}"
-              word={ui.word[$lang]}
-              closei={!ui.checked}
-              openi={ui.checked}
-            />
+      {#each filtersUi as ui, i}
+        <button onclick={() => handleFilterClick(i + 3)}>
+          <Tile
+            big={false}
+            sm={false}
+            bg={ui.color}
+            word={ui.word[$lang]}
+            closei={!ui.checked}
+            openi={ui.checked}
+          />
         </button>
-        {/key}
       {/each}
     {/if}
   </div>
-  <Grid data={filteredActs} bind:columns {theme} {paging} bind:filters />
+  <Grid data={filteredActs} bind:columns {theme} {paging} />
   <span dir="ltr"> <GridFooter data={filteredActs} {theme} bind:paging /></span>
 </div>

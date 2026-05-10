@@ -1,94 +1,130 @@
 <script module>
-  //archive finniapruval
-  //else
+  // Automatic finiapruval close after timegrama deadline passes
 
   import { SendTo } from '$lib/send/sendTo.svelte';
   const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER;
-  export async function finiapp(id, taid) {
-    console.log(id);
-    //get by id
 
-    let d = new Date();
-    let qu = `{
-  finiapruval (id:${id}) {data{ id attributes{
-    vots{what users_permissions_user {data {id}}} 
-    archived noofhours missname why iskvua
-    mesimabetahalich{data{id attributes{ perhour mission{data{id}}}}}
-    project{data{id}}
-    what{data{id}}
-    users_permissions_user{data{id}}
-    month
-    finnished_mission{data{id attributes{ noofhours perhour total isFinished iskvua}}}
-}}} 
- }`;
-    try {
-      let res = await SendTo(qu, VITE_ADMINMONTHER).then((res) => (res = res));
-      console.log(res);
-      if (res.data != null) {
-        console.log(res.data, 'pip');
-        if (res.data.finiapruval.data.attributes.archived != true) {
-          //calculate votes if there is false
-          if (res.data.finiapruval.data.attributes.vots.length > 0) {
-            if (
-              !res.data.finiapruval.data.attributes.vots
-                .map((c) => c.what)
-                .includes(false)
-            ) {
-              //if no no
-              //check for finished mision and update it if no create finnished mission
-          
-                let qub2 = `mutation {
-                                  createFinnishedMission(
-                                    data: {
-                                    publishedAt: "${d.toISOString()}",
-                                      finiapruvals: "${res.data.finiapruval.data.id}",
-                                      missionName: "${res.data.finiapruval.data.attributes.missname}",
-                                      project: "${res.data.finiapruval.data.attributes.project.data.id}",
-                                      perhour: ${res.data.finiapruval.data.attributes.mesimabetahalich.data.attributes.perhour},
-                                      noofhours: ${res.data.finiapruval.data.attributes.noofhours ?? 0},
-                                      total: ${(res.data.finiapruval.data.attributes.noofhours * res.data.finiapruval.data.attributes.mesimabetahalich.data.attributes.perhour) ?? 0},
-                                     ${res.data.finiapruval.data.attributes.iskvua === true ? `iskvua: true
-                                      isFinished: false,
-                                      month: "${res.data.finiapruval.data.attributes.month}",` : ``} 
-                                      mission: "${res.data.finiapruval.data.attributes.mesimabetahalich.data.attributes.mission.data.id}",
-                                      why: "${res.data.finiapruval.data.attributes.why}",
-                                      mesimabetahalich: "${res.data.finiapruval.data.attributes.mesimabetahalich.data.id}",
-                                      users_permissions_user: "${res.data.finiapruval.data.attributes.users_permissions_user.data.id}",
-                                      ${res.data.finiapruval.data.attributes.what.data?.id ? `what: ${res.data.finiapruval.data.attributes.what.data.id}` : ``},
-                                    }
-                                  ){data{id}}
-                                  updateFiniapruval(
-                                    id: "${id}"
-                                    data: {
-                                      archived: true
-                                    }
-                                  ){data{id}}
-                                  updateTimegrama(
-                                    id: ${taid}
-                                    data: {
-                                      done: true
-                                    }
-                                  ){data{id}}
-                                }`;
-                    try {
-                      let res3 = await SendTo(qub2, VITE_ADMINMONTHER).then(
-                        (res3) => (res3 = res3)
-                      );
-                      console.log(res3, 'finiapp res3');
-                     
-                      if (res3.data != null) {
-                        return 'sucsses' + id;
-                      }
-                    } catch (e) {
-                      console.error(e);
-                    }
-              }
-            }
-          }
+  export async function finiapp(id, taid) {
+    console.log('finiapp auto-close', id);
+    const d = new Date();
+
+    // Fetch finiapruval with all data needed to decide close path
+    const qu = `{ finiapruval(id: ${id}) { data { id attributes {
+      archived isTimerSave noofhours missname why iskvua month
+      vots { what users_permissions_user { data { id } } }
+      mesimabetahalich { data { id attributes {
+        perhour totalHoursSaved
+        mission { data { id } }
+        project { data { id attributes { user_1s { data { id } } } } }
+        finnished_missions(filters: { isNotFinished: { eq: true } }) {
+          data { id attributes { noofhours perhour } }
         }
-      
+      }}}
+      project { data { id } }
+      users_permissions_user { data { id } }
+      what { data { id } }
+    }}}}`;
+
+    try {
+      const res = await SendTo(qu, VITE_ADMINMONTHER);
+      if (!res?.data?.finiapruval?.data) return;
+
+      const fini = res.data.finiapruval.data;
+      const fa = fini.attributes;
+
+      if (fa.archived) return;
+
+      // Check that all votes are yes (auto-close: no new vote added, just trigger deadline)
+      const vots = fa.vots ?? [];
+      const hasNo = vots.some(v => v.what === false);
+      if (hasNo) {
+        console.log('finiapp: has negative vote, skipping auto-close', id);
+        return;
+      }
+
+      const isTimerSave = fa.isTimerSave === true;
+      const mba = fa.mesimabetahalich.data;
+      const mbaa = mba.attributes;
+      const noofhours = fa.noofhours ?? 0;
+      const perhour = mbaa.perhour ?? 0;
+      const projectId = fa.project.data.id;
+      const userId = fa.users_permissions_user.data.id;
+
+      let finnishedMissionMutation = '';
+
+      if (isTimerSave) {
+        // Timer save: update or create the single active FinnishedMission (isNotFinished:true)
+        const existingFm = mbaa.finnished_missions?.data?.[0];
+
+        if (existingFm) {
+          const newHours = (existingFm.attributes.noofhours ?? 0) + noofhours;
+          finnishedMissionMutation = `
+            updateFinnishedMission(id: "${existingFm.id}", data: {
+              noofhours: ${newHours},
+              total: ${newHours * perhour}
+            }) { data { id } }
+            updateMesimabetahalich(id: "${mba.id}", data: {
+              totalHoursSaved: ${(mbaa.totalHoursSaved ?? 0) + noofhours}
+            }) { data { id } }
+          `;
+        } else {
+          finnishedMissionMutation = `
+            createFinnishedMission(data: {
+              missionName: "${fa.missname}",
+              why: "${fa.why ?? 'timer save'}",
+              noofhours: ${noofhours},
+              mesimabetahalich: "${mba.id}",
+              mission: "${mbaa.mission.data.id}",
+              perhour: ${perhour},
+              total: ${noofhours * perhour},
+              project: "${projectId}",
+              users_permissions_user: "${userId}",
+              isNotFinished: true,
+              isFinished: false,
+              publishedAt: "${d.toISOString()}"
+            }) { data { id } }
+            updateMesimabetahalich(id: "${mba.id}", data: {
+              totalHoursSaved: ${(mbaa.totalHoursSaved ?? 0) + noofhours}
+            }) { data { id } }
+          `;
+        }
+      } else {
+        // Mission completion: create final FinnishedMission + mark mission done
+        const existingFms = mbaa.finnished_missions?.data ?? [];
+        const accumulatedHours = existingFms.reduce((sum, fm) => sum + (fm.attributes?.noofhours ?? 0), 0);
+        const totalHours = accumulatedHours + noofhours;
+
+        finnishedMissionMutation = `
+          createFinnishedMission(data: {
+            missionName: "${fa.missname}",
+            why: "${fa.why ?? ''}",
+            noofhours: ${totalHours},
+            mesimabetahalich: "${mba.id}",
+            mission: "${mbaa.mission.data.id}",
+            perhour: ${perhour},
+            total: ${totalHours * perhour},
+            project: "${projectId}",
+            users_permissions_user: "${userId}",
+            isFinished: true,
+            finiapruvals: "${id}",
+            publishedAt: "${d.toISOString()}"
+          }) { data { id } }
+          updateMesimabetahalich(id: "${mba.id}", data: { finnished: true }) { data { id } }
+        `;
+      }
+
+      const closeMutation = `mutation {
+        ${finnishedMissionMutation}
+        updateFiniapruval(id: "${id}", data: { archived: true }) { data { id } }
+        updateTimegrama(id: ${taid}, data: { done: true }) { data { id } }
+      }`;
+
+      const res2 = await SendTo(closeMutation, VITE_ADMINMONTHER);
+      console.log('finiapp close result', res2);
+      if (res2?.data) return 'sucsses' + id;
+
     } catch (e) {
-      console.error(e);
+      console.error('finiapp error', e);
     }
   }
 </script>

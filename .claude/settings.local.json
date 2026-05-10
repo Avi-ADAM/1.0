@@ -4,7 +4,13 @@
       "mcp__Claude_in_Chrome__tabs_context_mcp",
       "Bash(node -e ' *)",
       "mcp__Claude_Preview__preview_start",
-      "Bash(grep -iE \"agent|ai|claude|guide|md$\")"
+      "Bash(grep -iE \"agent|ai|claude|guide|md$\")",
+      "Bash(npx tsc *)",
+      "Bash(xargs grep:*)"
     ]
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "svelte"
+  ]
 }

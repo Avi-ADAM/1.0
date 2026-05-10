@@ -5,6 +5,7 @@
    * @typedef {Object} Props
    * @property {boolean} [addM]
    * @property {boolean} [openMS]
+   * @property {boolean} [showText]
    * @property {number} [noofopen]
    * @property {string} [hosafa]
    * @property {() => void} [onProgres] - Callback for progress event.
@@ -16,6 +17,7 @@
   let {
     addM = false,
     openMS = false,
+    showText = true,
     noofopen = 0,
     hosafa = "",
     onProgres,
@@ -138,12 +140,14 @@ function trym (){
     <circle r="305.714" cy="529.652" cx="372.047" id="circle4138" fill="rgb(31, 28, 36)" style=" fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1;"/>
     <circle r="120" cy="492.047" cx="446.181" id="circle4198" style="fill: url(#linearGradient4214); fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1;" transform="matrix(0, 1, 1, 0, -126.658417, 91.985069)"/>
     <circle fill="url(#linearGradient4196)" style=" fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1;" id="path4180" cx="365.389" cy="538.166" r="100"/>
+   {#if showText}
    <g transform="matrix(3.031137, 0, 0, 3.031137, 372.679657, 593.32428)">
          <path id="curve" d="M -64.983 -33.564 C -61.345 -35.597 -47.782 -81.5 -0.468 -80.97 C 46.095 -80.44 62.939 -33.076 64.737 -30.119"/>
 
       <text id="text2" class="s-y1SdroFNffHn" fill="rgb(171, 55, 200)" style=" font-size: 32.9909px; line-height: 121.037px; stroke-width: 42px; word-spacing: -0.8px; white-space: pre;" bx:origin="0.691816 1.299581"><textPath fill="rgb(171, 55, 200)" style=" font-size: 32.9909px; line-height: 121.037px; stroke-width: 42px; word-spacing: -0.8px; white-space: pre;" startOffset="0" class="s-y1SdroFNffHn" xlink:href="#curve">{text[$lang]} </textPath></text>
       <text id="text3" class="s-y1SdroFNffHn" fill="url(#linearGradient42480)" style=" font-size: 32.9909px; line-height: 121.037px; paint-order: stroke markers; stroke-width: 42px; word-spacing: -0.8px; white-space: pre;" transform="matrix(1, 0, 0, 1, -0.998111, 0)" bx:origin="0.691816 1.299581"><textPath startOffset="0" class="s-y1SdroFNffHn">{text[$lang]}</textPath></text>
     </g>
+    {/if}
     {#if addM == false}
     <g id="button"  onmouseenter={bighand} onclick={hosa} style="">
       <title>{hosafa}</title>
@@ -235,7 +239,7 @@ function trym (){
     <path d="M 372.047 192.183 C 187.585 192.183 38.049 341.719 38.049 526.181 C 38.049 710.643 187.585 860.179 372.047 860.179 C 556.509 860.179 706.045 710.643 706.045 526.181 C 706.045 341.719 556.509 192.183 372.047 192.183 Z M 372.047 212.007 C 545.56 212.007 686.221 352.667 686.221 526.181 C 686.221 699.694 545.56 840.355 372.047 840.355 C 198.534 840.355 57.873 699.694 57.873 526.181 C 57.873 352.667 198.534 212.007 372.047 212.007 Z" id="circle4344" class="s-y1SdroFNffHn" style="opacity: 0.7; fill: rgb(31, 28, 36); fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1;"/>
   
 
-  {#if openMS === false}
+  {#if showText && openMS === false}
     <g class="gg" transform="matrix(1, 0, 0, 1, -1.574639, 41.588951)"  onclick={trym} style="">
       <title>הצגת ועריכת פעולות פתוחות</title>
       <rect style=  "opacity: 0.9; fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1; " id="rect-1" width="340.857" height="100.571" x="202.619" y="620.895" ry="2.542"/>

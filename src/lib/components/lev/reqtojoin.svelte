@@ -524,7 +524,9 @@
     noofusersNo += 1;
     noofusersWaiting -= 1;
     ser = xyz();
-    const declineda = declined.map((c) => c.id);
+    const declineda = (Array.isArray(declined) ? declined : []).map(
+      (c) => c.id
+    );
     declineda.push(userId);
     console.log('decline1');
 

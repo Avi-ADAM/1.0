@@ -8,6 +8,7 @@
   import MoachIcon from '$lib/celim/icons/moachIcon.svelte';
   import Lev from '$lib/celim/lev.svelte';
   import ProfileMenu from '$lib/components/footer/ProfileMenu.svelte';
+  import { idPr } from '$lib/stores/idPr';
   /**
    * @typedef {Object} Props
    * @property {string} [initialRout]
@@ -39,6 +40,9 @@
     <button
       onclick={() => {
         activeRoute = 'moach';
+        if ($idPr != null) {
+          idPr.set(null);
+        }
         goto('/moach');
       }}
       type="button"

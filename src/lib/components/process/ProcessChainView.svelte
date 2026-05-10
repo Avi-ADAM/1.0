@@ -28,6 +28,7 @@
     acts           = [],
     extraOmiData   = [],
     extraPmiData   = [],
+    projectId      = '',
     projectUsers   = [],
     isLoadingExtra = false,
     onOpenModal,
@@ -170,6 +171,7 @@
                 {chain}
                 {loadedItems}
                 {loadingIds}
+                {projectId}
                 {projectUsers}
                 {onOpenModal}
                 {onOpenActModal}
@@ -203,6 +205,7 @@
             >
               <ResourceChainRow
                 {chain}
+                {projectId}
                 {onOpenModal}
                 {isExpanded}
                 onToggle={() => toggleChain(chain.id)}
@@ -244,6 +247,7 @@
                   {chain}
                   {loadedItems}
                   {loadingIds}
+                  {projectId}
                   {projectUsers}
                   {onOpenModal}
                   {onOpenActModal}

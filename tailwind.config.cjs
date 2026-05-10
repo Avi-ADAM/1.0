@@ -29,16 +29,16 @@ const config = {
     extend: {
       fontFamily: {
         'rubik': ['Rubik', 'sans-serif'],
-        'litt':	['Bellefair', 'Gan']
+        'litt': ['Bellefair', 'Gan']
       },
       backgroundImage: {
         goldGrad:
           'linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771c, #FBF5B7, #B38728, #FCF6BA, #BF953F)',
-          goldTobr:
+        goldTobr:
           'linear-gradient(to bottom right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771c, #FBF5B7, #B38728, #FCF6BA, #BF953F)',
-          liteGoldTobr:
+        liteGoldTobr:
           'linear-gradient(to bottom right, #BF953F, #EEE8AA, #B38728)',
-          goldShain:
+        goldShain:
           'linear-gradient(110deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771c, #FBF5B7, #B38728, #FCF6BA, #BF953F)',
         customGradient:
           'linear-gradient(to right, #ff7e5f, #feb47b, #86e3ce, #d4a5a5, #ffdfd3, #d4a5a5, #86e3ce, #feb47b, #ff7e5f)',
@@ -47,7 +47,7 @@ const config = {
       },
       animation: {
         shine: "shine 2s linear infinite",
-        gradientx: 'gradientx 8s linear infinite',
+        gradientx: 'gradientx 25s linear infinite',
         gradientxslow: 'gradientx 16s linear infinite',
         gradienty: 'gradienty 8s linear infinite'
       },
@@ -62,7 +62,7 @@ const config = {
           from: { backgroundPosition: "0 0" },
           to: { backgroundPosition: "-200% 0" },
         },
-        
+
       },
       colors: {
         ...defaultTheme.colors,
@@ -99,18 +99,18 @@ const config = {
       }
     }
   },
-  Plugins:[
-    plugin(function({ addVariant }) {
+  Plugins: [
+    plugin(function ({ addVariant }) {
       // הוספת variants עבור personal ו-business
       addVariant('personal', '.personal &');
       addVariant('business', '.business &');
-      
+
       // variants עם מצבים נוספים
       addVariant('personal-hover', '.personal &:hover');
       addVariant('business-hover', '.business &:hover');
       addVariant('personal-focus', '.personal &:focus');
       addVariant('business-focus', '.business &:focus');
-      
+
       // variants עם responsive
       addVariant('personal-sm', '@media (min-width: 640px) { .personal & }');
       addVariant('personal-md', '@media (min-width: 768px) { .personal & }');
@@ -118,22 +118,22 @@ const config = {
       addVariant('business-sm', '@media (min-width: 640px) { .business & }');
       addVariant('business-md', '@media (min-width: 768px) { .business & }');
       addVariant('business-lg', '@media (min-width: 1024px) { .business & }');
-        }),
-      plugin(function({ addUtilities }) {
-        addUtilities({
-          '.animate-fade-in-up': {
-            'animation': 'fadeInUp 0.6s ease-out',
-          },
-          '.animate-slide-in-right': {
-            'animation': 'slideInRight 0.5s ease-out',
-          },
-          '.animate-bounce-in': {
-            'animation': 'bounceIn 0.8s ease-out',
-          },
-        });
-      }),
+    }),
+    plugin(function ({ addUtilities }) {
+      addUtilities({
+        '.animate-fade-in-up': {
+          'animation': 'fadeInUp 0.6s ease-out',
+        },
+        '.animate-slide-in-right': {
+          'animation': 'slideInRight 0.5s ease-out',
+        },
+        '.animate-bounce-in': {
+          'animation': 'bounceIn 0.8s ease-out',
+        },
+      });
+    }),
 
-  ],  
+  ],
 };
 
 module.exports = config;

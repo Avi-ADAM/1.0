@@ -30,8 +30,14 @@ import { createProcessConfig } from './createProcess.js';
 import { attachEntityToProcessConfig } from './attachEntityToProcess.js';
 import { ensureProcessForumConfig } from './ensureProcessForum.js';
 import { ensureStageForumConfig } from './ensureStageForum.js';
+import { closeFiniapruvalConfig } from './closeFiniapruval.js';
+import { updateProjectDetailsConfig } from './updateProjectDetails.js';
 import { completeMissionConfig } from './completeMission.js';
 import { chatActions } from './chat.js';
+
+import { createTaskAction } from './createTask.js';
+import { createResourceAction } from './createResource.js';
+
 
 /**
  * Register all actions
@@ -41,6 +47,9 @@ import { chatActions } from './chat.js';
  */
 export function registerAllActions(): void {
   // Register all actions
+  registerAction(createTaskAction);
+  registerAction(createResourceAction);
+
   registerAction(updateTaskAction);
   registerAction(approveHalukaConfig);
   registerAction(createHalukaConfig);
@@ -73,6 +82,10 @@ export function registerAllActions(): void {
   registerAction(ensureStageForumConfig);
   registerAction(completeMissionConfig);
 
+  // Finiapruval voting and closing
+  registerAction(closeFiniapruvalConfig);
+  registerAction(updateProjectDetailsConfig);
+
   // Chat actions
   chatActions.forEach(registerAction);
 
@@ -104,6 +117,8 @@ export {
   rejectSheirutpendConfig,
   addVoteConfig,
   ensureSheirutForumConfig,
+  closeFiniapruvalConfig,
+  updateProjectDetailsConfig
   createProcessConfig,
   attachEntityToProcessConfig,
   ensureProcessForumConfig,

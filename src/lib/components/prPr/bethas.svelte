@@ -35,7 +35,7 @@
       bmiData[i].tid = [];
       bmiData[i].isAct = false;
       bmiData[i].open = false;
-      for (var j = 0; j < bmiData[i].attributes.tafkidims.data.length; j++) {
+      for (var j = 0; j < (bmiData[i].attributes.tafkidims?.data?.length ?? 0); j++) {
         bmiData[i].tid.push(bmiData[i].attributes.tafkidims.data[j].id);
         if (bmiData[i].attributes.tafkidims.data[j].id in xx) {
           bmiData[i].attributes.tafkidims.data[j].color =
@@ -333,11 +333,9 @@
                       <div>
                         <Tile
                           animate={true}
-                          src={data.attributes.users_permissions_user.data
-                            .attributes.profilePic.data != null
-                            ? data.attributes.users_permissions_user.data
-                                .attributes.profilePic.data.attributes.url
-                            : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
+                          src={data.attributes.users_permissions_user?.data
+                            ?.attributes?.profilePic?.data?.attributes?.url
+                            ?? 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
                           alt="Medium avatar"
                           pic={true}
                           big={w > 500 ? true : false}
@@ -389,7 +387,7 @@
                   </td>
                   <!----<td><p class="md:text-xl text-sm">{(data.attributes.hoursassinged * data.attributes.perhour).toLocaleString('en-US', {maximumFractionDigits:2}) }</p></td>-->
                   <td>
-                    {#each data.attributes.tafkidims.data as taf, i}
+                    {#each data.attributes.tafkidims?.data ?? [] as taf, i}
                       <Tile
                         big={w > 500 ? true : false}
                         sm={w > 500 ? true : false}

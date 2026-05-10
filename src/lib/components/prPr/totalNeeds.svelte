@@ -706,7 +706,10 @@ vots: [${userss},
 
   const tableHeaders = {
     startDate: { he: 'תאריך התחלה', en: 'Start Date' },
-    maxValue: { he: 'שווי מקסימלי סה"כ', en: 'Total Maximum Value' },
+    totalPrice: { he: 'סה"כ מחיר', en: 'Total Price' },
+    totalMaxValue: { he: 'סה"כ שווי מקסימלי', en: 'Total Max Value' },
+    grandTotalPrice: { he: 'סך הכל - מחיר', en: 'Grand Total - Price' },
+    grandTotalMax: { he: 'סך הכל - שווי מקסימלי', en: 'Grand Total - Max Value' },
     selectedResources: { he: 'משאבים שנבחרו', en: 'Selected Resources' },
     invalidPrice: { he: 'לא יכולה להיות קטנה מ-0', en: 'Cannot be less than 0' }
   };
@@ -992,24 +995,27 @@ vots: [${userss},
             <th>{componentTexts.quantity[$lang]}</th>
             {#each meData as data, i}
               <td>
-                <div
-                  style="display:{kc ? '' : 'none'};"
-                  dir="rtl"
-                  class="textinput"
-                >
-                  <input
-                    onchange={() => myMissionH()}
-                    bind:value={data.hm}
-                    type="number"
-                    class="input"
-                    required
-                  />
-                  <label for="name" class="label">{componentTexts.quantity[$lang]}</label>
-                  <span class="line"></span>
-                </div>
-                {#if data.hm < 0}<small class="bg-red-800 text-slate-50 px-2"
-                    >{tableHeaders.invalidPrice[$lang]}</small
-                  >{/if}
+                {#if data.kc}
+                  <div
+                    dir="rtl"
+                    class="textinput"
+                  >
+                    <input
+                      onchange={() => myMissionH()}
+                      bind:value={data.hm}
+                      type="number"
+                      class="input"
+                      required
+                    />
+                    <label for="name" class="label">{componentTexts.quantity[$lang]}</label>
+                    <span class="line"></span>
+                  </div>
+                  {#if data.hm < 0}<small class="bg-red-800 text-slate-50 px-2"
+                      >{tableHeaders.invalidPrice[$lang]}</small
+                    >{/if}
+                {:else}
+                  <span class="text-gray-400 text-sm">—</span>
+                {/if}
               </td>{/each}
           </tr>
           <tr style="display:{ky ? '' : 'none'};">
@@ -1121,7 +1127,7 @@ vots: [${userss},
               </td>{/each}
           </tr>
           <tr style="display:{kc || ky ? '' : 'none'};">
-            <th>{tableHeaders.maxValue[$lang]}</th>
+            <th>{tableHeaders.totalPrice[$lang]}</th>
             {#each meData as data, i}
               <td>
                 <h3
@@ -1137,7 +1143,7 @@ vots: [${userss},
               </td>{/each}
           </tr>
           <tr style="display:{kc || ky ? '' : 'none'};">
-            <th>{tableHeaders.maxValue[$lang]}</th>
+            <th>{tableHeaders.totalMaxValue[$lang]}</th>
             {#each meData as data, i}
               <td>
                 <h3
@@ -1150,6 +1156,25 @@ vots: [${userss},
                 >
                   {data.totaltotal}
                 </h3>
+              </td>{/each}
+          </tr>
+          <!-- שורת סיכום כולל -->
+          <tr class="ggd">
+            <th class="ggd">{tableHeaders.grandTotalPrice[$lang]}</th>
+            {#each meData as data, i}
+              <td class="ggd">
+                <strong>
+                  {(+data.total || 0).toLocaleString()}
+                </strong>
+              </td>{/each}
+          </tr>
+          <tr class="ggd">
+            <th class="ggd">{tableHeaders.grandTotalMax[$lang]}</th>
+            {#each meData as data, i}
+              <td class="ggd">
+                <strong>
+                  {(+data.totaltotal || 0).toLocaleString()}
+                </strong>
               </td>{/each}
           </tr>
           <tr>

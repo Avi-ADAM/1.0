@@ -2,100 +2,98 @@
   import { page } from '$app/state';
   import Arrow from '$lib/celim/icons/arrow.svelte';
   import Button from '$lib/celim/ui/button.svelte';
-  import MultiSelect from 'svelte-multiselect';
   import { lang } from '$lib/stores/lang.js';
-  import {sendToSer} from '$lib/send/sendToSer.js';
-   let placeholder = {
+  import { sendToSer } from '$lib/send/sendToSer.js';
+  import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
+
+  const moachStore = getMoachStore();
+  let projectId = $derived(page.params.projectId);
+
+  const placeholder = {
     he: 'בחירת משימה בתהליך',
-    ar: ' اختيار المهمة المتابعة',
+    ar: 'اختيار المهمة المتابعة',
     en: 'choose mission in progress'
   };
-  let loading = $state(false);
-  
-  let error = $state(false);
-  
-  let success = $state(false);
-  
+
+  const noM = {
+    he: 'לא נמצאו משימות בתהליך עבורך כדאי ליצור משימה חדשה בטאב יצירה',
+    en: 'no missions in progress found for you, you may want to create a new one in the "add" tab',
+    ar: 'لم يتم العثور على مهام في الحالة المتابعة لك، قد تريد إنشاء مهمة جديدة في علامة "إضافة"'
+  };
+
   /**
    * @typedef {Object} Props
    * @property {any} taskId
    * @property {Array<any>} [bmiData]
-   * @property {() => void} [onClose] - Callback when the component should close.
+   * @property {() => void} [onClose]
    */
 
   /** @type {Props} */
   let { taskId, bmiData = [], onClose } = $props();
 
-   async function add () {
-    loading = true
-    
-    console.log(selected);
-    const selectedMission = filtered.find(
-      (mission) => mission.attributes.name === selected[0]
-    );
-    const selectedId = selectedMission ? selectedMission.id : null; // קבלת ה-ID המתאים
+  let loading = $state(false);
+  let error = $state(false);
+  let success = $state(false);
+  let selected = $state('');
 
-    console.log(selectedId); // הדפסת ה-ID
-    await sendToSer (
-        {
-            mesimabetahaliches: [selectedId],
-            uid: [page.data.uid],
-            isAssigned: true,
-            id: taskId
-        },
-        '31updateTask'
-        ,null,null,false,fetch
-    ).then((data) => {
-        console.log(data);
-        if (data.data != null) {
-          loading = false
-          success = true
-          setTimeout(() => {
-            onClose?.();
-          }, 5000);
-        }else{
-          loading = false
-          error = true
-        }
-    }).catch((error) => {
-        console.log(error);
-        loading = false
-        error = true
-    });
-    //TODO: update task on table directly or from io connection
-  };
-  let filtered = bmiData.filter(
+  let filtered = $derived(bmiData.filter(
     (e) => e.attributes.users_permissions_user.data.id === page.data.uid
-  );
-  
-  let selected = $state([]);
-  const noM = {
-    he: 'לא נמצאו משימות בתהליך עבורך כדאי ליצור משימה חדשה בטאב יצירה',
-    en: 'no missions in progress found for you, you may want to create a new one in the "add" tab ',
-    ar: 'لم يتم العثور على مهام في الحالة المتابعة لك، قد تريد إنشاء مهمة جديدة في علامة "إضافة" '
-  };
+  ));
+
+  async function add() {
+    loading = true;
+    const selectedMission = filtered.find((m) => m.attributes.name === selected);
+    const selectedId = selectedMission?.id ?? null;
+
+    await sendToSer(
+      {
+        mesimabetahaliches: [selectedId],
+        uid: [page.data.uid],
+        isAssigned: true,
+        id: taskId
+      },
+      '31updateTask',
+      null,
+      null,
+      false,
+      fetch
+    ).then((data) => {
+      if (data.data != null) {
+        loading = false;
+        success = true;
+        moachStore.refreshBase(projectId, fetch);
+        setTimeout(() => onClose?.(), 5000);
+      } else {
+        loading = false;
+        error = true;
+      }
+    }).catch(() => {
+      loading = false;
+      error = true;
+    });
+  }
 </script>
-{#key bmiData}
+
 {#if filtered.length !== 0}
-<h2 class="text-gold text-center text-lg">{placeholder[$lang]}</h2>
-  <div class=" w-full flex-row flex items-center justify-center space-x-2">
-    <MultiSelect
-      ulOptionsClass="bg-gold"
-      liSelectedClass="bg-barbi text-gold"
-      bind:selected
-      placeholder={placeholder[$lang]}
-      options={filtered.map((c) => c.attributes.name)}
-      maxSelect={1}
-    />
-    {#if selected[0]}
-      <Button onClick={add} {loading} {success} {error}
-        ><Arrow back={$lang == 'en' ? true : false} /></Button
-      >
+  <h2 class="text-gold text-center text-lg">{placeholder[$lang]}</h2>
+  <div class="w-full flex flex-row items-center justify-center gap-2 p-4">
+    <select
+      bind:value={selected}
+      class="bg-gold text-barbi font-bold rounded-lg px-3 py-2 border border-barbi focus:outline-none focus:ring-2 focus:ring-barbi"
+    >
+      <option value="">{placeholder[$lang]}</option>
+      {#each filtered as mission}
+        <option value={mission.attributes.name}>{mission.attributes.name}</option>
+      {/each}
+    </select>
+    {#if selected}
+      <Button onClick={add} {loading} {success} {error}>
+        <Arrow back={$lang === 'en'} />
+      </Button>
     {/if}
   </div>
 {:else}
-<span class="text-sm text-gold">
-  {noM[$lang]}
-</span>
+  <span class="text-sm text-gold block p-4 text-center">
+    {noM[$lang]}
+  </span>
 {/if}
-{/key}
