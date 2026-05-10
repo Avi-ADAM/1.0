@@ -420,8 +420,11 @@ export type Askm = {
   archived: Scalars['Boolean']['output'];
   chat?: Maybe<Array<Maybe<ComponentProjectsVots>>>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
+  isSelfProposal?: Maybe<Scalars['Boolean']['output']>;
   open_mashaabim?: Maybe<OpenMashaabimEntityResponse>;
   partofs?: Maybe<PartofRelationResponseCollection>;
+  pendingMainVote?: Maybe<Scalars['Boolean']['output']>;
+  pmash?: Maybe<PmashEntityResponse>;
   project?: Maybe<ProjectEntityResponse>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   sp?: Maybe<SpEntityResponse>;
@@ -475,10 +478,13 @@ export type AskmFiltersInput = {
   chat?: InputMaybe<ComponentProjectsVotsFiltersInput>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
   id?: InputMaybe<IdFilterInput>;
+  isSelfProposal?: InputMaybe<BooleanFilterInput>;
   not?: InputMaybe<AskmFiltersInput>;
   open_mashaabim?: InputMaybe<OpenMashaabimFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<AskmFiltersInput>>>;
   partofs?: InputMaybe<PartofFiltersInput>;
+  pendingMainVote?: InputMaybe<BooleanFilterInput>;
+  pmash?: InputMaybe<PmashFiltersInput>;
   project?: InputMaybe<ProjectFiltersInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   sp?: InputMaybe<SpFiltersInput>;
@@ -491,8 +497,11 @@ export type AskmFiltersInput = {
 export type AskmInput = {
   archived?: InputMaybe<Scalars['Boolean']['input']>;
   chat?: InputMaybe<Array<InputMaybe<ComponentProjectsVotsInput>>>;
+  isSelfProposal?: InputMaybe<Scalars['Boolean']['input']>;
   open_mashaabim?: InputMaybe<Scalars['ID']['input']>;
   partofs?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  pendingMainVote?: InputMaybe<Scalars['Boolean']['input']>;
+  pmash?: InputMaybe<Scalars['ID']['input']>;
   project?: InputMaybe<Scalars['ID']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   sp?: InputMaybe<Scalars['ID']['input']>;
@@ -1881,7 +1890,10 @@ export type Decision = {
   archived: Scalars['Boolean']['output'];
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   decisionName?: Maybe<Scalars['String']['output']>;
+  discord?: Maybe<Scalars['String']['output']>;
+  drive?: Maybe<Scalars['String']['output']>;
   forums?: Maybe<ForumRelationResponseCollection>;
+  github?: Maybe<Scalars['String']['output']>;
   kind?: Maybe<Enum_Decision_Kind>;
   matanot?: Maybe<MatanotEntityResponse>;
   moreHours?: Maybe<MesimabetahalichEntityResponse>;
@@ -1897,11 +1909,13 @@ export type Decision = {
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   timegrama?: Maybe<TimegramaEntityResponse>;
   timtoM?: Maybe<Scalars['String']['output']>;
+  twitter?: Maybe<Scalars['String']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   valluesadd?: Maybe<VallueRelationResponseCollection>;
   valluesles?: Maybe<VallueRelationResponseCollection>;
   votes?: Maybe<VoteRelationResponseCollection>;
   vots?: Maybe<Array<Maybe<ComponentProjectsVots>>>;
+  whatsapp?: Maybe<Scalars['String']['output']>;
 };
 
 
@@ -1979,7 +1993,10 @@ export type DecisionFiltersInput = {
   archived?: InputMaybe<BooleanFilterInput>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
   decisionName?: InputMaybe<StringFilterInput>;
+  discord?: InputMaybe<StringFilterInput>;
+  drive?: InputMaybe<StringFilterInput>;
   forums?: InputMaybe<ForumFiltersInput>;
+  github?: InputMaybe<StringFilterInput>;
   id?: InputMaybe<IdFilterInput>;
   kind?: InputMaybe<StringFilterInput>;
   matanot?: InputMaybe<MatanotFiltersInput>;
@@ -1997,17 +2014,22 @@ export type DecisionFiltersInput = {
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   timegrama?: InputMaybe<TimegramaFiltersInput>;
   timtoM?: InputMaybe<StringFilterInput>;
+  twitter?: InputMaybe<StringFilterInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
   valluesadd?: InputMaybe<VallueFiltersInput>;
   valluesles?: InputMaybe<VallueFiltersInput>;
   votes?: InputMaybe<VoteFiltersInput>;
   vots?: InputMaybe<ComponentProjectsVotsFiltersInput>;
+  whatsapp?: InputMaybe<StringFilterInput>;
 };
 
 export type DecisionInput = {
   archived?: InputMaybe<Scalars['Boolean']['input']>;
   decisionName?: InputMaybe<Scalars['String']['input']>;
+  discord?: InputMaybe<Scalars['String']['input']>;
+  drive?: InputMaybe<Scalars['String']['input']>;
   forums?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  github?: InputMaybe<Scalars['String']['input']>;
   kind?: InputMaybe<Enum_Decision_Kind>;
   matanot?: InputMaybe<Scalars['ID']['input']>;
   moreHours?: InputMaybe<Scalars['ID']['input']>;
@@ -2023,10 +2045,12 @@ export type DecisionInput = {
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   timegrama?: InputMaybe<Scalars['ID']['input']>;
   timtoM?: InputMaybe<Scalars['String']['input']>;
+  twitter?: InputMaybe<Scalars['String']['input']>;
   valluesadd?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   valluesles?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   votes?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   vots?: InputMaybe<Array<InputMaybe<ComponentProjectsVotsInput>>>;
+  whatsapp?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type DecisionRelationResponseCollection = {
@@ -2153,6 +2177,9 @@ export enum Enum_Contentreleasesreleaseaction_Type {
 }
 
 export enum Enum_Decision_Kind {
+  Discord = 'discord',
+  Drive = 'drive',
+  Github = 'github',
   Name = 'name',
   NewFlink = 'newFlink',
   NewWlink = 'newWlink',
@@ -2161,8 +2188,10 @@ export enum Enum_Decision_Kind {
   Prides = 'prides',
   Pubdes = 'pubdes',
   TimtoM = 'timtoM',
+  Twitter = 'twitter',
   Vallueadd = 'vallueadd',
-  Vallueles = 'vallueles'
+  Vallueles = 'vallueles',
+  Whatsapp = 'whatsapp'
 }
 
 export enum Enum_Forum_Spec {
@@ -2378,6 +2407,7 @@ export type Finiapruval = {
   archived?: Maybe<Scalars['Boolean']['output']>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   finnished_mission?: Maybe<FinnishedMissionEntityResponse>;
+  isTimerSave?: Maybe<Scalars['Boolean']['output']>;
   iskvua?: Maybe<Scalars['Boolean']['output']>;
   mesimabetahalich?: Maybe<MesimabetahalichEntityResponse>;
   missname?: Maybe<Scalars['String']['output']>;
@@ -2387,6 +2417,7 @@ export type Finiapruval = {
   project?: Maybe<ProjectEntityResponse>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   timegrama?: Maybe<TimegramaEntityResponse>;
+  timer?: Maybe<TimerEntityResponse>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   users_permissions_user?: Maybe<UsersPermissionsUserEntityResponse>;
   vots?: Maybe<Array<Maybe<ComponentProjectsVots>>>;
@@ -2438,6 +2469,7 @@ export type FiniapruvalFiltersInput = {
   createdAt?: InputMaybe<DateTimeFilterInput>;
   finnished_mission?: InputMaybe<FinnishedMissionFiltersInput>;
   id?: InputMaybe<IdFilterInput>;
+  isTimerSave?: InputMaybe<BooleanFilterInput>;
   iskvua?: InputMaybe<BooleanFilterInput>;
   mesimabetahalich?: InputMaybe<MesimabetahalichFiltersInput>;
   missname?: InputMaybe<StringFilterInput>;
@@ -2449,6 +2481,7 @@ export type FiniapruvalFiltersInput = {
   project?: InputMaybe<ProjectFiltersInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   timegrama?: InputMaybe<TimegramaFiltersInput>;
+  timer?: InputMaybe<TimerFiltersInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
   users_permissions_user?: InputMaybe<UsersPermissionsUserFiltersInput>;
   vots?: InputMaybe<ComponentProjectsVotsFiltersInput>;
@@ -2458,6 +2491,7 @@ export type FiniapruvalFiltersInput = {
 export type FiniapruvalInput = {
   archived?: InputMaybe<Scalars['Boolean']['input']>;
   finnished_mission?: InputMaybe<Scalars['ID']['input']>;
+  isTimerSave?: InputMaybe<Scalars['Boolean']['input']>;
   iskvua?: InputMaybe<Scalars['Boolean']['input']>;
   mesimabetahalich?: InputMaybe<Scalars['ID']['input']>;
   missname?: InputMaybe<Scalars['String']['input']>;
@@ -2467,6 +2501,7 @@ export type FiniapruvalInput = {
   project?: InputMaybe<Scalars['ID']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   timegrama?: InputMaybe<Scalars['ID']['input']>;
+  timer?: InputMaybe<Scalars['ID']['input']>;
   users_permissions_user?: InputMaybe<Scalars['ID']['input']>;
   vots?: InputMaybe<Array<InputMaybe<ComponentProjectsVotsInput>>>;
   what?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -2488,6 +2523,7 @@ export type FinnishedMission = {
   idYesod?: Maybe<Scalars['Boolean']['output']>;
   isFinished?: Maybe<Scalars['Boolean']['output']>;
   isMust?: Maybe<Scalars['Boolean']['output']>;
+  isNotFinished?: Maybe<Scalars['Boolean']['output']>;
   isglobal?: Maybe<Scalars['Boolean']['output']>;
   iskvua?: Maybe<Scalars['Boolean']['output']>;
   locale?: Maybe<Scalars['String']['output']>;
@@ -2568,6 +2604,7 @@ export type FinnishedMissionFiltersInput = {
   idYesod?: InputMaybe<BooleanFilterInput>;
   isFinished?: InputMaybe<BooleanFilterInput>;
   isMust?: InputMaybe<BooleanFilterInput>;
+  isNotFinished?: InputMaybe<BooleanFilterInput>;
   isglobal?: InputMaybe<BooleanFilterInput>;
   iskvua?: InputMaybe<BooleanFilterInput>;
   locale?: InputMaybe<StringFilterInput>;
@@ -2598,6 +2635,7 @@ export type FinnishedMissionInput = {
   idYesod?: InputMaybe<Scalars['Boolean']['input']>;
   isFinished?: InputMaybe<Scalars['Boolean']['input']>;
   isMust?: InputMaybe<Scalars['Boolean']['input']>;
+  isNotFinished?: InputMaybe<Scalars['Boolean']['input']>;
   isglobal?: InputMaybe<Scalars['Boolean']['input']>;
   iskvua?: InputMaybe<Scalars['Boolean']['input']>;
   mesimabetahalich?: InputMaybe<Scalars['ID']['input']>;
@@ -3354,11 +3392,13 @@ export type Maap = {
   __typename?: 'Maap';
   archived: Scalars['Boolean']['output'];
   createdAt?: Maybe<Scalars['DateTime']['output']>;
+  isSelfProposal?: Maybe<Scalars['Boolean']['output']>;
   locale?: Maybe<Scalars['String']['output']>;
   localizations?: Maybe<MaapRelationResponseCollection>;
   name?: Maybe<Scalars['String']['output']>;
   open_mashaabim?: Maybe<OpenMashaabimEntityResponse>;
   partofs?: Maybe<PartofRelationResponseCollection>;
+  pmash?: Maybe<PmashEntityResponse>;
   project?: Maybe<ProjectEntityResponse>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   rikmash?: Maybe<RikmashEntityResponse>;
@@ -3412,6 +3452,7 @@ export type MaapFiltersInput = {
   archived?: InputMaybe<BooleanFilterInput>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
   id?: InputMaybe<IdFilterInput>;
+  isSelfProposal?: InputMaybe<BooleanFilterInput>;
   locale?: InputMaybe<StringFilterInput>;
   localizations?: InputMaybe<MaapFiltersInput>;
   name?: InputMaybe<StringFilterInput>;
@@ -3419,6 +3460,7 @@ export type MaapFiltersInput = {
   open_mashaabim?: InputMaybe<OpenMashaabimFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<MaapFiltersInput>>>;
   partofs?: InputMaybe<PartofFiltersInput>;
+  pmash?: InputMaybe<PmashFiltersInput>;
   project?: InputMaybe<ProjectFiltersInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   rikmash?: InputMaybe<RikmashFiltersInput>;
@@ -3430,9 +3472,11 @@ export type MaapFiltersInput = {
 
 export type MaapInput = {
   archived?: InputMaybe<Scalars['Boolean']['input']>;
+  isSelfProposal?: InputMaybe<Scalars['Boolean']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   open_mashaabim?: InputMaybe<Scalars['ID']['input']>;
   partofs?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  pmash?: InputMaybe<Scalars['ID']['input']>;
   project?: InputMaybe<Scalars['ID']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   rikmash?: InputMaybe<Scalars['ID']['input']>;
@@ -4081,6 +4125,7 @@ export type Mesimabetahalich = {
   timegramas?: Maybe<TimegramaRelationResponseCollection>;
   timer?: Maybe<Scalars['Float']['output']>;
   timers?: Maybe<TimerRelationResponseCollection>;
+  totalHoursSaved?: Maybe<Scalars['Float']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   users_permissions_user?: Maybe<UsersPermissionsUserEntityResponse>;
   zohars?: Maybe<ZoharRelationResponseCollection>;
@@ -4253,6 +4298,7 @@ export type MesimabetahalichFiltersInput = {
   timegramas?: InputMaybe<TimegramaFiltersInput>;
   timer?: InputMaybe<FloatFilterInput>;
   timers?: InputMaybe<TimerFiltersInput>;
+  totalHoursSaved?: InputMaybe<FloatFilterInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
   users_permissions_user?: InputMaybe<UsersPermissionsUserFiltersInput>;
   zohars?: InputMaybe<ZoharFiltersInput>;
@@ -4296,6 +4342,7 @@ export type MesimabetahalichInput = {
   timegramas?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   timer?: InputMaybe<Scalars['Float']['input']>;
   timers?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  totalHoursSaved?: InputMaybe<Scalars['Float']['input']>;
   users_permissions_user?: InputMaybe<Scalars['ID']['input']>;
   zohars?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
 };
@@ -8246,15 +8293,19 @@ export type PgishauserpendRelationResponseCollection = {
 export type Pmash = {
   __typename?: 'Pmash';
   archived: Scalars['Boolean']['output'];
+  askm?: Maybe<AskmEntityResponse>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   descrip?: Maybe<Scalars['String']['output']>;
   diun?: Maybe<Array<Maybe<ComponentProjectsVots>>>;
   easy?: Maybe<Scalars['Float']['output']>;
   hm?: Maybe<Scalars['Float']['output']>;
+  isMaap?: Maybe<Scalars['Boolean']['output']>;
   isMust?: Maybe<Scalars['Boolean']['output']>;
+  isSelfProposal?: Maybe<Scalars['Boolean']['output']>;
   isYesod?: Maybe<Scalars['Boolean']['output']>;
   kindOf?: Maybe<Enum_Pmash_Kindof>;
   linkto?: Maybe<Scalars['String']['output']>;
+  maap?: Maybe<MaapEntityResponse>;
   mashaabim?: Maybe<MashaabimEntityResponse>;
   name?: Maybe<Scalars['String']['output']>;
   nego_mashes?: Maybe<NegoMashRelationResponseCollection>;
@@ -8264,6 +8315,7 @@ export type Pmash = {
   price?: Maybe<Scalars['Float']['output']>;
   project?: Maybe<ProjectEntityResponse>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
+  selfProposalUser?: Maybe<UsersPermissionsUserEntityResponse>;
   spnot?: Maybe<Scalars['String']['output']>;
   sqadualed?: Maybe<Scalars['DateTime']['output']>;
   sqadualedf?: Maybe<Scalars['DateTime']['output']>;
@@ -8328,16 +8380,20 @@ export type PmashEntityResponseCollection = {
 export type PmashFiltersInput = {
   and?: InputMaybe<Array<InputMaybe<PmashFiltersInput>>>;
   archived?: InputMaybe<BooleanFilterInput>;
+  askm?: InputMaybe<AskmFiltersInput>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
   descrip?: InputMaybe<StringFilterInput>;
   diun?: InputMaybe<ComponentProjectsVotsFiltersInput>;
   easy?: InputMaybe<FloatFilterInput>;
   hm?: InputMaybe<FloatFilterInput>;
   id?: InputMaybe<IdFilterInput>;
+  isMaap?: InputMaybe<BooleanFilterInput>;
   isMust?: InputMaybe<BooleanFilterInput>;
+  isSelfProposal?: InputMaybe<BooleanFilterInput>;
   isYesod?: InputMaybe<BooleanFilterInput>;
   kindOf?: InputMaybe<StringFilterInput>;
   linkto?: InputMaybe<StringFilterInput>;
+  maap?: InputMaybe<MaapFiltersInput>;
   mashaabim?: InputMaybe<MashaabimFiltersInput>;
   name?: InputMaybe<StringFilterInput>;
   nego_mashes?: InputMaybe<NegoMashFiltersInput>;
@@ -8349,6 +8405,7 @@ export type PmashFiltersInput = {
   price?: InputMaybe<FloatFilterInput>;
   project?: InputMaybe<ProjectFiltersInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
+  selfProposalUser?: InputMaybe<UsersPermissionsUserFiltersInput>;
   spnot?: InputMaybe<StringFilterInput>;
   sqadualed?: InputMaybe<DateTimeFilterInput>;
   sqadualedf?: InputMaybe<DateTimeFilterInput>;
@@ -8359,14 +8416,18 @@ export type PmashFiltersInput = {
 
 export type PmashInput = {
   archived?: InputMaybe<Scalars['Boolean']['input']>;
+  askm?: InputMaybe<Scalars['ID']['input']>;
   descrip?: InputMaybe<Scalars['String']['input']>;
   diun?: InputMaybe<Array<InputMaybe<ComponentProjectsVotsInput>>>;
   easy?: InputMaybe<Scalars['Float']['input']>;
   hm?: InputMaybe<Scalars['Float']['input']>;
+  isMaap?: InputMaybe<Scalars['Boolean']['input']>;
   isMust?: InputMaybe<Scalars['Boolean']['input']>;
+  isSelfProposal?: InputMaybe<Scalars['Boolean']['input']>;
   isYesod?: InputMaybe<Scalars['Boolean']['input']>;
   kindOf?: InputMaybe<Enum_Pmash_Kindof>;
   linkto?: InputMaybe<Scalars['String']['input']>;
+  maap?: InputMaybe<Scalars['ID']['input']>;
   mashaabim?: InputMaybe<Scalars['ID']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   nego_mashes?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -8376,6 +8437,7 @@ export type PmashInput = {
   price?: InputMaybe<Scalars['Float']['input']>;
   project?: InputMaybe<Scalars['ID']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  selfProposalUser?: InputMaybe<Scalars['ID']['input']>;
   spnot?: InputMaybe<Scalars['String']['input']>;
   sqadualed?: InputMaybe<Scalars['DateTime']['input']>;
   sqadualedf?: InputMaybe<Scalars['DateTime']['input']>;
@@ -12115,6 +12177,7 @@ export type Timer = {
   acts?: Maybe<ActRelationResponseCollection>;
   appruved?: Maybe<Scalars['Boolean']['output']>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
+  finiapruvals?: Maybe<FiniapruvalRelationResponseCollection>;
   finnish?: Maybe<Scalars['DateTime']['output']>;
   forApruve?: Maybe<Scalars['Boolean']['output']>;
   isActive?: Maybe<Scalars['Boolean']['output']>;
@@ -12139,6 +12202,14 @@ export type Timer = {
 
 export type TimerActsArgs = {
   filters?: InputMaybe<ActFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type TimerFiniapruvalsArgs = {
+  filters?: InputMaybe<FiniapruvalFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
   publicationState?: InputMaybe<PublicationState>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -12195,6 +12266,7 @@ export type TimerFiltersInput = {
   and?: InputMaybe<Array<InputMaybe<TimerFiltersInput>>>;
   appruved?: InputMaybe<BooleanFilterInput>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
+  finiapruvals?: InputMaybe<FiniapruvalFiltersInput>;
   finnish?: InputMaybe<DateTimeFilterInput>;
   forApruve?: InputMaybe<BooleanFilterInput>;
   id?: InputMaybe<IdFilterInput>;
@@ -12222,6 +12294,7 @@ export type TimerInput = {
   activeMesimabetahalich?: InputMaybe<Scalars['ID']['input']>;
   acts?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   appruved?: InputMaybe<Scalars['Boolean']['input']>;
+  finiapruvals?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   finnish?: InputMaybe<Scalars['DateTime']['input']>;
   forApruve?: InputMaybe<Scalars['Boolean']['input']>;
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
@@ -12802,6 +12875,7 @@ export type UsersPermissionsUser = {
   pgishasPendStrat?: Maybe<PgishaRelationResponseCollection>;
   pgishauserpends?: Maybe<PgishauserpendRelationResponseCollection>;
   pgishausers?: Maybe<PgishauserRelationResponseCollection>;
+  pmashes?: Maybe<PmashRelationResponseCollection>;
   positionsAuthor?: Maybe<PositionRelationResponseCollection>;
   positionsVoted?: Maybe<PositionRelationResponseCollection>;
   preferCards?: Maybe<Scalars['Boolean']['output']>;
@@ -13124,6 +13198,14 @@ export type UsersPermissionsUserPgishausersArgs = {
 };
 
 
+export type UsersPermissionsUserPmashesArgs = {
+  filters?: InputMaybe<PmashFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
 export type UsersPermissionsUserPositionsAuthorArgs = {
   filters?: InputMaybe<PositionFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
@@ -13372,6 +13454,7 @@ export type UsersPermissionsUserFiltersInput = {
   pgishasPendStrat?: InputMaybe<PgishaFiltersInput>;
   pgishauserpends?: InputMaybe<PgishauserpendFiltersInput>;
   pgishausers?: InputMaybe<PgishauserFiltersInput>;
+  pmashes?: InputMaybe<PmashFiltersInput>;
   positionsAuthor?: InputMaybe<PositionFiltersInput>;
   positionsVoted?: InputMaybe<PositionFiltersInput>;
   preferCards?: InputMaybe<BooleanFilterInput>;
@@ -13475,6 +13558,7 @@ export type UsersPermissionsUserInput = {
   pgishasPendStrat?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   pgishauserpends?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   pgishausers?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  pmashes?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   positionsAuthor?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   positionsVoted?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   preferCards?: InputMaybe<Scalars['Boolean']['input']>;

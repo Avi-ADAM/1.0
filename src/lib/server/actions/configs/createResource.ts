@@ -32,6 +32,54 @@ async function gql(
   return json.data;
 }
 
+async function ensureMashaabim(
+  fetchFn: typeof fetch,
+  jwt: string,
+  input: {
+    id?: unknown;
+    name: string;
+    description?: string;
+    price?: number;
+    kindOf?: string;
+    linkto?: string;
+    publishedAt: string;
+  }
+) {
+  if (input.id) return String(input.id);
+
+  const existing = await gql(fetchFn, jwt, `
+    query FindMashaabim($name: String!) {
+      mashaabims(filters: { name: { eqi: $name } }, pagination: { limit: 1 }) {
+        data { id }
+      }
+    }
+  `, { name: input.name });
+
+  const existingId = existing?.mashaabims?.data?.[0]?.id;
+  if (existingId) return String(existingId);
+
+  const created = await gql(fetchFn, jwt, `
+    mutation CreateMashaabim($data: MashaabimInput!) {
+      createMashaabim(data: $data) {
+        data { id }
+      }
+    }
+  `, {
+    data: {
+      name: input.name,
+      descrip: input.description || '',
+      price: input.price || 0,
+      kindOf: input.kindOf || 'total',
+      linkto: input.linkto || '',
+      publishedAt: input.publishedAt
+    }
+  });
+
+  const createdId = created?.createMashaabim?.data?.id;
+  if (!createdId) throw new Error('Failed to create Mashaabim');
+  return String(createdId);
+}
+
 // ─── handler ───────────────────────────────────────────────────────────────
 const createResourceHandler: ActionExecutionHandler = async (params, context) => {
   const {
@@ -58,6 +106,15 @@ const createResourceHandler: ActionExecutionHandler = async (params, context) =>
   const f = context.fetch as typeof fetch;
   const jwt = context.jwt as string;
   const userId = context.userId as string;
+  const ensuredMashaabimId = await ensureMashaabim(f, jwt, {
+    id: mashaabimId,
+    name,
+    description,
+    price,
+    kindOf,
+    linkto,
+    publishedAt: now
+  });
 
   // ── 1. Determine project member count ───────────────────────────────────
   const projectData = await gql(f, jwt, `
@@ -94,7 +151,7 @@ const createResourceHandler: ActionExecutionHandler = async (params, context) =>
     archived:    isAssigned   // archived=true means it's self-assigned / claimed
   };
 
-  if (mashaabimId)  resourceData.mashaabim  = mashaabimId;
+  resourceData.mashaabim = ensuredMashaabimId;
   if (startDate)    resourceData.sqadualed  = startDate;
   if (endDate)      resourceData.sqadualedf = endDate;
 
@@ -106,6 +163,11 @@ const createResourceHandler: ActionExecutionHandler = async (params, context) =>
       order: 0,
       zman:  now
     }];
+    if (isAssigned) {
+      resourceData.isSelfProposal   = true;
+      resourceData.selfProposalUser = userId;
+      resourceData.isMaap           = isReceived; // true = delivered already (Maap flow), false = pending vote (Askm flow)
+    }
   }
 
   // ── 3. Create the main resource record ──────────────────────────────────
@@ -125,7 +187,7 @@ const createResourceHandler: ActionExecutionHandler = async (params, context) =>
     let spId = existingSpId ?? null;
 
     // 4a. Create a new Sp (personal resource record) if no existing one
-    if (!spId && mashaabimId) {
+    if (!spId) {
       const spData = await gql(f, jwt, `
         mutation CreateSp($data: SpInput!) {
           createSp(data: $data) { data { id } }
@@ -138,13 +200,13 @@ const createResourceHandler: ActionExecutionHandler = async (params, context) =>
           unit:       hm     || null,
           spnot:      spnot  || '',
           price:      price  || 0,
-          myp:        (easy  || 0) > 0,
+          myp:        easy   || 0,
           linkto:     linkto || '',
           users_permissions_user: userId,
-          mashaabim:  mashaabimId,
+          mashaabim:  ensuredMashaabimId,
           publishedAt: now,
-          ...(startDate ? { startDate } : {}),
-          ...(endDate   ? { finishDate: endDate } : {})
+          ...(startDate ? { sdate: startDate } : {}),
+          ...(endDate   ? { fdate: endDate } : {})
         }
       });
       spId = spData?.createSp?.data?.id ?? null;
@@ -187,9 +249,6 @@ const createResourceHandler: ActionExecutionHandler = async (params, context) =>
           mutation CreateRikmash($data: RikmashInput!) {
             createRikmash(data: $data) { data { id } }
           }
-          mutation UpdateSp($id: ID!, $data: SpInput!) {
-            updateSp(id: $id, data: $data) { data { id } }
-          }
         `, {
           data: {
             publishedAt:    now,
@@ -219,7 +278,78 @@ const createResourceHandler: ActionExecutionHandler = async (params, context) =>
     }
   }
 
-  // ── 5. Create Timegrama for Pmash (deadline tracking) ──────────────────
+  // ── 5. Multi-user self-assignment follow-up ─────────────────────────────
+  if (isAssigned && isPmash) {
+    let spId = existingSpId ?? null;
+
+    // 5a. Create a new Sp if no existing one was supplied
+    if (!spId) {
+      const spData = await gql(f, jwt, `
+        mutation CreateSp($data: SpInput!) {
+          createSp(data: $data) { data { id } }
+        }
+      `, {
+        data: {
+          name,
+          descrip:    description,
+          kindOf:     kindOf || null,
+          unit:       hm     || null,
+          spnot:      spnot  || '',
+          price:      price  || 0,
+          myp:        easy   || 0,
+          linkto:     linkto || '',
+          users_permissions_user: userId,
+          mashaabim:  ensuredMashaabimId,
+          publishedAt: now,
+          ...(startDate ? { sdate: startDate } : {}),
+          ...(endDate   ? { fdate: endDate }   : {})
+        }
+      });
+      spId = spData?.createSp?.data?.id ?? null;
+    }
+
+    if (spId) {
+      if (!isReceived) {
+        // 5b-i. Resource not yet received: create Askm (pending the main Pmash vote)
+        //       The proposer's vote is pre-cast in favour.
+        await gql(f, jwt, `
+          mutation CreateAskm($data: AskmInput!) {
+            createAskm(data: $data) { data { id } }
+          }
+        `, {
+          data: {
+            publishedAt:    now,
+            project:        projectId,
+            sp:             spId,
+            pmash:          createdId,
+            isSelfProposal: true,
+            pendingMainVote: true,
+            vots: [{ what: true, users_permissions_user: userId }]
+          }
+        });
+      } else {
+        // 5b-ii. Resource already received: create Maap linked to Pmash
+        //        The proposer has already delivered — mark isSelfProposal so the
+        //        UI knows this Maap depends on the Pmash vote outcome.
+        await gql(f, jwt, `
+          mutation CreateMaap($data: MaapInput!) {
+            createMaap(data: $data) { data { id } }
+          }
+        `, {
+          data: {
+            project:        projectId,
+            name,
+            sp:             spId,
+            publishedAt:    now,
+            pmash:          createdId,
+            isSelfProposal: true
+          }
+        });
+      }
+    }
+  }
+
+  // ── 6. Create Timegrama for Pmash (deadline tracking) ──────────────────
   if (isPmash && restime) {
     // Calculate deadline offset from restime string (e.g. "7d", "2h")
     let offsetMs = 0;

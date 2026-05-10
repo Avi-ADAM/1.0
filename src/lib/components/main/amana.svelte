@@ -499,7 +499,7 @@ meta {
       window.location.origin + '/hascama?agreed=true'
     );
 
-    let agreementUrl = `https://agreement.1lev1.com?return=${returnUrl}&lang=${$locale}`;
+    let agreementUrl = `https://agreement.1lev1.com/hascama?return=${returnUrl}&lang=${$locale}`;
     if (formName) agreementUrl += `&name=${encodeURIComponent(formName)}`;
     if (formEmail) agreementUrl += `&email=${encodeURIComponent(formEmail)}`;
     if (selected.length > 0)
@@ -965,7 +965,7 @@ meta {
                   </li>
                   <li>
                     <a
-                      href="https://agreement.1lev1.com"
+                      href="https://agreement.1lev1.com/hascama"
                       onclick={(e) => {
                         e.preventDefault();
                         goToAgreementSite();

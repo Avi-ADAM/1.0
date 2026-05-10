@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-05-04
+> Last updated: 2026-05-10
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -103,8 +103,11 @@ These are the main content types in the Strapi backend.
 | `archived` | `Scalars['Boolean']['output']` |
 | `chat` | `Maybe<Array<Maybe<ComponentProjectsVots>>>` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `isSelfProposal` | `Maybe<Scalars['Boolean']['output']>` |
 | `open_mashaabim` | `Maybe<OpenMashaabimEntityResponse>` |
 | `partofs` | `Maybe<PartofRelationResponseCollection>` |
+| `pendingMainVote` | `Maybe<Scalars['Boolean']['output']>` |
+| `pmash` | `Maybe<PmashEntityResponse>` |
 | `project` | `Maybe<ProjectEntityResponse>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `sp` | `Maybe<SpEntityResponse>` |
@@ -244,7 +247,10 @@ These are the main content types in the Strapi backend.
 | `archived` | `Scalars['Boolean']['output']` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `decisionName` | `Maybe<Scalars['String']['output']>` |
+| `discord` | `Maybe<Scalars['String']['output']>` |
+| `drive` | `Maybe<Scalars['String']['output']>` |
 | `forums` | `Maybe<ForumRelationResponseCollection>` |
+| `github` | `Maybe<Scalars['String']['output']>` |
 | `kind` | `Maybe<Enum_Decision_Kind>` |
 | `matanot` | `Maybe<MatanotEntityResponse>` |
 | `moreHours` | `Maybe<MesimabetahalichEntityResponse>` |
@@ -260,11 +266,13 @@ These are the main content types in the Strapi backend.
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `timegrama` | `Maybe<TimegramaEntityResponse>` |
 | `timtoM` | `Maybe<Scalars['String']['output']>` |
+| `twitter` | `Maybe<Scalars['String']['output']>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `valluesadd` | `Maybe<VallueRelationResponseCollection>` |
 | `valluesles` | `Maybe<VallueRelationResponseCollection>` |
 | `votes` | `Maybe<VoteRelationResponseCollection>` |
 | `vots` | `Maybe<Array<Maybe<ComponentProjectsVots>>>` |
+| `whatsapp` | `Maybe<Scalars['String']['output']>` |
 
 ### Deffinition
 | Field | Type |
@@ -297,6 +305,7 @@ These are the main content types in the Strapi backend.
 | `archived` | `Maybe<Scalars['Boolean']['output']>` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `finnished_mission` | `Maybe<FinnishedMissionEntityResponse>` |
+| `isTimerSave` | `Maybe<Scalars['Boolean']['output']>` |
 | `iskvua` | `Maybe<Scalars['Boolean']['output']>` |
 | `mesimabetahalich` | `Maybe<MesimabetahalichEntityResponse>` |
 | `missname` | `Maybe<Scalars['String']['output']>` |
@@ -306,6 +315,7 @@ These are the main content types in the Strapi backend.
 | `project` | `Maybe<ProjectEntityResponse>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `timegrama` | `Maybe<TimegramaEntityResponse>` |
+| `timer` | `Maybe<TimerEntityResponse>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `users_permissions_user` | `Maybe<UsersPermissionsUserEntityResponse>` |
 | `vots` | `Maybe<Array<Maybe<ComponentProjectsVots>>>` |
@@ -323,6 +333,7 @@ These are the main content types in the Strapi backend.
 | `idYesod` | `Maybe<Scalars['Boolean']['output']>` |
 | `isFinished` | `Maybe<Scalars['Boolean']['output']>` |
 | `isMust` | `Maybe<Scalars['Boolean']['output']>` |
+| `isNotFinished` | `Maybe<Scalars['Boolean']['output']>` |
 | `isglobal` | `Maybe<Scalars['Boolean']['output']>` |
 | `iskvua` | `Maybe<Scalars['Boolean']['output']>` |
 | `locale` | `Maybe<Scalars['String']['output']>` |
@@ -458,11 +469,13 @@ These are the main content types in the Strapi backend.
 |-------|------|
 | `archived` | `Scalars['Boolean']['output']` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `isSelfProposal` | `Maybe<Scalars['Boolean']['output']>` |
 | `locale` | `Maybe<Scalars['String']['output']>` |
 | `localizations` | `Maybe<MaapRelationResponseCollection>` |
 | `name` | `Maybe<Scalars['String']['output']>` |
 | `open_mashaabim` | `Maybe<OpenMashaabimEntityResponse>` |
 | `partofs` | `Maybe<PartofRelationResponseCollection>` |
+| `pmash` | `Maybe<PmashEntityResponse>` |
 | `project` | `Maybe<ProjectEntityResponse>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `rikmash` | `Maybe<RikmashEntityResponse>` |
@@ -610,6 +623,7 @@ These are the main content types in the Strapi backend.
 | `timegramas` | `Maybe<TimegramaRelationResponseCollection>` |
 | `timer` | `Maybe<Scalars['Float']['output']>` |
 | `timers` | `Maybe<TimerRelationResponseCollection>` |
+| `totalHoursSaved` | `Maybe<Scalars['Float']['output']>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `users_permissions_user` | `Maybe<UsersPermissionsUserEntityResponse>` |
 | `zohars` | `Maybe<ZoharRelationResponseCollection>` |
@@ -1260,15 +1274,19 @@ These are the main content types in the Strapi backend.
 | Field | Type |
 |-------|------|
 | `archived` | `Scalars['Boolean']['output']` |
+| `askm` | `Maybe<AskmEntityResponse>` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `descrip` | `Maybe<Scalars['String']['output']>` |
 | `diun` | `Maybe<Array<Maybe<ComponentProjectsVots>>>` |
 | `easy` | `Maybe<Scalars['Float']['output']>` |
 | `hm` | `Maybe<Scalars['Float']['output']>` |
+| `isMaap` | `Maybe<Scalars['Boolean']['output']>` |
 | `isMust` | `Maybe<Scalars['Boolean']['output']>` |
+| `isSelfProposal` | `Maybe<Scalars['Boolean']['output']>` |
 | `isYesod` | `Maybe<Scalars['Boolean']['output']>` |
 | `kindOf` | `Maybe<Enum_Pmash_Kindof>` |
 | `linkto` | `Maybe<Scalars['String']['output']>` |
+| `maap` | `Maybe<MaapEntityResponse>` |
 | `mashaabim` | `Maybe<MashaabimEntityResponse>` |
 | `name` | `Maybe<Scalars['String']['output']>` |
 | `nego_mashes` | `Maybe<NegoMashRelationResponseCollection>` |
@@ -1278,6 +1296,7 @@ These are the main content types in the Strapi backend.
 | `price` | `Maybe<Scalars['Float']['output']>` |
 | `project` | `Maybe<ProjectEntityResponse>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `selfProposalUser` | `Maybe<UsersPermissionsUserEntityResponse>` |
 | `spnot` | `Maybe<Scalars['String']['output']>` |
 | `sqadualed` | `Maybe<Scalars['DateTime']['output']>` |
 | `sqadualedf` | `Maybe<Scalars['DateTime']['output']>` |
@@ -1895,6 +1914,7 @@ These are the main content types in the Strapi backend.
 | `acts` | `Maybe<ActRelationResponseCollection>` |
 | `appruved` | `Maybe<Scalars['Boolean']['output']>` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `finiapruvals` | `Maybe<FiniapruvalRelationResponseCollection>` |
 | `finnish` | `Maybe<Scalars['DateTime']['output']>` |
 | `forApruve` | `Maybe<Scalars['Boolean']['output']>` |
 | `isActive` | `Maybe<Scalars['Boolean']['output']>` |
@@ -2113,6 +2133,7 @@ These are the main content types in the Strapi backend.
 | `pgishasPendStrat` | `Maybe<PgishaRelationResponseCollection>` |
 | `pgishauserpends` | `Maybe<PgishauserpendRelationResponseCollection>` |
 | `pgishausers` | `Maybe<PgishauserRelationResponseCollection>` |
+| `pmashes` | `Maybe<PmashRelationResponseCollection>` |
 | `positionsAuthor` | `Maybe<PositionRelationResponseCollection>` |
 | `positionsVoted` | `Maybe<PositionRelationResponseCollection>` |
 | `preferCards` | `Maybe<Scalars['Boolean']['output']>` |
@@ -2927,8 +2948,11 @@ Used for creating/updating content.
 |-------|------|
 | `archived` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `chat` | `InputMaybe<Array<InputMaybe<ComponentProjectsVotsInput>>>` |
+| `isSelfProposal` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `open_mashaabim` | `InputMaybe<Scalars['ID']['input']>` |
 | `partofs` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `pendingMainVote` | `InputMaybe<Scalars['Boolean']['input']>` |
+| `pmash` | `InputMaybe<Scalars['ID']['input']>` |
 | `project` | `InputMaybe<Scalars['ID']['input']>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `sp` | `InputMaybe<Scalars['ID']['input']>` |
@@ -3115,7 +3139,10 @@ Used for creating/updating content.
 |-------|------|
 | `archived` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `decisionName` | `InputMaybe<Scalars['String']['input']>` |
+| `discord` | `InputMaybe<Scalars['String']['input']>` |
+| `drive` | `InputMaybe<Scalars['String']['input']>` |
 | `forums` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `github` | `InputMaybe<Scalars['String']['input']>` |
 | `kind` | `InputMaybe<Enum_Decision_Kind>` |
 | `matanot` | `InputMaybe<Scalars['ID']['input']>` |
 | `moreHours` | `InputMaybe<Scalars['ID']['input']>` |
@@ -3131,10 +3158,12 @@ Used for creating/updating content.
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `timegrama` | `InputMaybe<Scalars['ID']['input']>` |
 | `timtoM` | `InputMaybe<Scalars['String']['input']>` |
+| `twitter` | `InputMaybe<Scalars['String']['input']>` |
 | `valluesadd` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `valluesles` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `votes` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `vots` | `InputMaybe<Array<InputMaybe<ComponentProjectsVotsInput>>>` |
+| `whatsapp` | `InputMaybe<Scalars['String']['input']>` |
 
 ### DeffinitionInput
 | Field | Type |
@@ -3165,6 +3194,7 @@ Used for creating/updating content.
 |-------|------|
 | `archived` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `finnished_mission` | `InputMaybe<Scalars['ID']['input']>` |
+| `isTimerSave` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `iskvua` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `mesimabetahalich` | `InputMaybe<Scalars['ID']['input']>` |
 | `missname` | `InputMaybe<Scalars['String']['input']>` |
@@ -3174,6 +3204,7 @@ Used for creating/updating content.
 | `project` | `InputMaybe<Scalars['ID']['input']>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `timegrama` | `InputMaybe<Scalars['ID']['input']>` |
+| `timer` | `InputMaybe<Scalars['ID']['input']>` |
 | `users_permissions_user` | `InputMaybe<Scalars['ID']['input']>` |
 | `vots` | `InputMaybe<Array<InputMaybe<ComponentProjectsVotsInput>>>` |
 | `what` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -3189,6 +3220,7 @@ Used for creating/updating content.
 | `idYesod` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `isFinished` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `isMust` | `InputMaybe<Scalars['Boolean']['input']>` |
+| `isNotFinished` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `isglobal` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `iskvua` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `mesimabetahalich` | `InputMaybe<Scalars['ID']['input']>` |
@@ -3426,9 +3458,11 @@ Used for creating/updating content.
 | Field | Type |
 |-------|------|
 | `archived` | `InputMaybe<Scalars['Boolean']['input']>` |
+| `isSelfProposal` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `name` | `InputMaybe<Scalars['String']['input']>` |
 | `open_mashaabim` | `InputMaybe<Scalars['ID']['input']>` |
 | `partofs` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `pmash` | `InputMaybe<Scalars['ID']['input']>` |
 | `project` | `InputMaybe<Scalars['ID']['input']>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `rikmash` | `InputMaybe<Scalars['ID']['input']>` |
@@ -3558,6 +3592,7 @@ Used for creating/updating content.
 | `timegramas` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `timer` | `InputMaybe<Scalars['Float']['input']>` |
 | `timers` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `totalHoursSaved` | `InputMaybe<Scalars['Float']['input']>` |
 | `users_permissions_user` | `InputMaybe<Scalars['ID']['input']>` |
 | `zohars` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 
@@ -3859,14 +3894,18 @@ Used for creating/updating content.
 | Field | Type |
 |-------|------|
 | `archived` | `InputMaybe<Scalars['Boolean']['input']>` |
+| `askm` | `InputMaybe<Scalars['ID']['input']>` |
 | `descrip` | `InputMaybe<Scalars['String']['input']>` |
 | `diun` | `InputMaybe<Array<InputMaybe<ComponentProjectsVotsInput>>>` |
 | `easy` | `InputMaybe<Scalars['Float']['input']>` |
 | `hm` | `InputMaybe<Scalars['Float']['input']>` |
+| `isMaap` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `isMust` | `InputMaybe<Scalars['Boolean']['input']>` |
+| `isSelfProposal` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `isYesod` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `kindOf` | `InputMaybe<Enum_Pmash_Kindof>` |
 | `linkto` | `InputMaybe<Scalars['String']['input']>` |
+| `maap` | `InputMaybe<Scalars['ID']['input']>` |
 | `mashaabim` | `InputMaybe<Scalars['ID']['input']>` |
 | `name` | `InputMaybe<Scalars['String']['input']>` |
 | `nego_mashes` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -3876,6 +3915,7 @@ Used for creating/updating content.
 | `price` | `InputMaybe<Scalars['Float']['input']>` |
 | `project` | `InputMaybe<Scalars['ID']['input']>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `selfProposalUser` | `InputMaybe<Scalars['ID']['input']>` |
 | `spnot` | `InputMaybe<Scalars['String']['input']>` |
 | `sqadualed` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `sqadualedf` | `InputMaybe<Scalars['DateTime']['input']>` |
@@ -4286,6 +4326,7 @@ Used for creating/updating content.
 | `activeMesimabetahalich` | `InputMaybe<Scalars['ID']['input']>` |
 | `acts` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `appruved` | `InputMaybe<Scalars['Boolean']['input']>` |
+| `finiapruvals` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `finnish` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `forApruve` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `isActive` | `InputMaybe<Scalars['Boolean']['input']>` |
@@ -4453,6 +4494,7 @@ Used for creating/updating content.
 | `pgishasPendStrat` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `pgishauserpends` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `pgishausers` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `pmashes` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `positionsAuthor` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `positionsVoted` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `preferCards` | `InputMaybe<Scalars['Boolean']['input']>` |
@@ -4600,7 +4642,7 @@ Fields: `and`, `createdAt`, `id`, `key_hash`, `key_prefix`, `name`, `not`, `or`,
 Fields: `and`, `archived`, `chat`, `createdAt`, `forums`, `id`, `not`, `open_mission`, `or`, `partofs`, `project`, `publishedAt`, `timegrama`, `updatedAt`, `users_permissions_user`, `vots`
 
 #### AskmFiltersInput
-Fields: `and`, `archived`, `chat`, `createdAt`, `id`, `not`, `open_mashaabim`, `or`, `partofs`, `project`, `publishedAt`, `sp`, `timegrama`, `updatedAt`, `users_permissions_user`, `vots`
+Fields: `and`, `archived`, `chat`, `createdAt`, `id`, `isSelfProposal`, `not`, `open_mashaabim`, `or`, `partofs`, `pendingMainVote`, `pmash`, `project`, `publishedAt`, `sp`, `timegrama`, `updatedAt`, `users_permissions_user`, `vots`
 
 #### AskwantFiltersInput
 Fields: `and`, `archived`, `chat`, `createdAt`, `id`, `not`, `or`, `project`, `sheirut`, `timegrama`, `updatedAt`, `users_permissions_user`, `vots`
@@ -4633,7 +4675,7 @@ Fields: `and`, `createdAt`, `desc`, `head`, `id`, `not`, `or`, `publishedAt`, `s
 Fields: `and`, `costumers`, `createdAt`, `id`, `not`, `or`, `publishedAt`, `salers`, `updatedAt`
 
 #### DecisionFiltersInput
-Fields: `and`, `archived`, `createdAt`, `decisionName`, `forums`, `id`, `kind`, `matanot`, `moreHours`, `negodes`, `newFlink`, `newHours`, `newWlink`, `newname`, `newprides`, `newpubdes`, `not`, `or`, `projects`, `publishedAt`, `timegrama`, `timtoM`, `updatedAt`, `valluesadd`, `valluesles`, `votes`, `vots`
+Fields: `and`, `archived`, `createdAt`, `decisionName`, `discord`, `drive`, `forums`, `github`, `id`, `kind`, `matanot`, `moreHours`, `negodes`, `newFlink`, `newHours`, `newWlink`, `newname`, `newprides`, `newpubdes`, `not`, `or`, `projects`, `publishedAt`, `timegrama`, `timtoM`, `twitter`, `updatedAt`, `valluesadd`, `valluesles`, `votes`, `vots`, `whatsapp`
 
 #### DeffinitionFiltersInput
 Fields: `and`, `countries`, `createdAt`, `deffinitionName`, `free_people`, `id`, `locale`, `localizations`, `not`, `or`, `projects`, `publishedAt`, `updatedAt`
@@ -4642,10 +4684,10 @@ Fields: `and`, `countries`, `createdAt`, `deffinitionName`, `free_people`, `id`,
 Fields: `and`, `createdAt`, `id`, `locale`, `localizations`, `name`, `not`, `or`, `positions`, `publishedAt`, `updatedAt`, `users_permissions_users`
 
 #### FiniapruvalFiltersInput
-Fields: `and`, `archived`, `createdAt`, `finnished_mission`, `id`, `iskvua`, `mesimabetahalich`, `missname`, `month`, `noofhours`, `not`, `or`, `partofs`, `project`, `publishedAt`, `timegrama`, `updatedAt`, `users_permissions_user`, `vots`, `why`
+Fields: `and`, `archived`, `createdAt`, `finnished_mission`, `id`, `isTimerSave`, `iskvua`, `mesimabetahalich`, `missname`, `month`, `noofhours`, `not`, `or`, `partofs`, `project`, `publishedAt`, `timegrama`, `timer`, `updatedAt`, `users_permissions_user`, `vots`, `why`
 
 #### FinnishedMissionFiltersInput
-Fields: `and`, `createdAt`, `descrip`, `finiapruvals`, `finish`, `hearotMeyuchadot`, `id`, `idYesod`, `isFinished`, `isMust`, `isglobal`, `iskvua`, `locale`, `localizations`, `mesimabetahalich`, `mission`, `missionName`, `month`, `noofhours`, `not`, `or`, `perhour`, `project`, `publishedAt`, `start`, `tafkidims`, `total`, `updatedAt`, `users_permissions_user`, `why`
+Fields: `and`, `createdAt`, `descrip`, `finiapruvals`, `finish`, `hearotMeyuchadot`, `id`, `idYesod`, `isFinished`, `isMust`, `isNotFinished`, `isglobal`, `iskvua`, `locale`, `localizations`, `mesimabetahalich`, `mission`, `missionName`, `month`, `noofhours`, `not`, `or`, `perhour`, `project`, `publishedAt`, `start`, `tafkidims`, `total`, `updatedAt`, `users_permissions_user`, `why`
 
 #### ForumFiltersInput
 Fields: `acts`, `and`, `asks`, `createdAt`, `decisions`, `done`, `forum_last_seens`, `haluka`, `id`, `mesimabetahaliches`, `messages`, `not`, `or`, `partofs`, `pgisha`, `project`, `publishedAt`, `sheirutpend`, `sheiruts`, `spec`, `subject`, `updatedAt`
@@ -4672,7 +4714,7 @@ Fields: `and`, `approved`, `createdAt`, `id`, `not`, `or`, `publishedAt`, `updat
 Fields: `and`, `code`, `createdAt`, `id`, `name`, `not`, `or`, `updatedAt`
 
 #### MaapFiltersInput
-Fields: `and`, `archived`, `createdAt`, `id`, `locale`, `localizations`, `name`, `not`, `open_mashaabim`, `or`, `partofs`, `project`, `publishedAt`, `rikmash`, `sp`, `timegrama`, `updatedAt`, `vots`
+Fields: `and`, `archived`, `createdAt`, `id`, `isSelfProposal`, `locale`, `localizations`, `name`, `not`, `open_mashaabim`, `or`, `partofs`, `pmash`, `project`, `publishedAt`, `rikmash`, `sp`, `timegrama`, `updatedAt`, `vots`
 
 #### MachshirFiltersInput
 Fields: `and`, `archived`, `createdAt`, `id`, `jsoni`, `not`, `or`, `projects`, `publishedAt`, `updatedAt`, `users_permissions_user`
@@ -4690,7 +4732,7 @@ Fields: `and`, `appruved`, `archived`, `bakashas`, `categories`, `createdAt`, `d
 Fields: `and`, `createdAt`, `halukas`, `id`, `locale`, `localizations`, `name`, `not`, `or`, `publishedAt`, `simbol`, `updatedAt`
 
 #### MesimabetahalichFiltersInput
-Fields: `activeTimer`, `acts`, `admaticedai`, `and`, `createdAt`, `dates`, `decisions`, `descrip`, `finiapruvals`, `finnished`, `finnished_missions`, `forappruval`, `forums`, `hearotMeyuchadot`, `hoursassinged`, `howmanyhoursalready`, `id`, `isMust`, `isYesod`, `isglobal`, `iskvua`, `mission`, `monter`, `monters`, `name`, `not`, `open_missions`, `or`, `partofs`, `perhour`, `privatlinks`, `project`, `publicklinks`, `publishedAt`, `seeders`, `start`, `status`, `stname`, `tafkidims`, `timegramas`, `timer`, `timers`, `updatedAt`, `users_permissions_user`, `zohars`
+Fields: `activeTimer`, `acts`, `admaticedai`, `and`, `createdAt`, `dates`, `decisions`, `descrip`, `finiapruvals`, `finnished`, `finnished_missions`, `forappruval`, `forums`, `hearotMeyuchadot`, `hoursassinged`, `howmanyhoursalready`, `id`, `isMust`, `isYesod`, `isglobal`, `iskvua`, `mission`, `monter`, `monters`, `name`, `not`, `open_missions`, `or`, `partofs`, `perhour`, `privatlinks`, `project`, `publicklinks`, `publishedAt`, `seeders`, `start`, `status`, `stname`, `tafkidims`, `timegramas`, `timer`, `timers`, `totalHoursSaved`, `updatedAt`, `users_permissions_user`, `zohars`
 
 #### MessageFiltersInput
 Fields: `and`, `archived`, `content`, `createdAt`, `editHistory`, `fid`, `forum`, `id`, `not`, `or`, `publishedAt`, `raplyTo`, `replys`, `seen`, `updatedAt`, `users_permissions_user`, `when`
@@ -4738,7 +4780,7 @@ Fields: `and`, `available`, `createdAt`, `id`, `not`, `or`, `pgishas`, `publishe
 Fields: `and`, `approved`, `archived`, `createdAt`, `id`, `not`, `or`, `pgisha`, `updatedAt`, `users_permissions_user`
 
 #### PmashFiltersInput
-Fields: `and`, `archived`, `createdAt`, `descrip`, `diun`, `easy`, `hm`, `id`, `isMust`, `isYesod`, `kindOf`, `linkto`, `mashaabim`, `name`, `nego_mashes`, `negom`, `not`, `open_mashaabim`, `or`, `partofs`, `price`, `project`, `publishedAt`, `spnot`, `sqadualed`, `sqadualedf`, `timegrama`, `updatedAt`, `users`
+Fields: `and`, `archived`, `askm`, `createdAt`, `descrip`, `diun`, `easy`, `hm`, `id`, `isMaap`, `isMust`, `isSelfProposal`, `isYesod`, `kindOf`, `linkto`, `maap`, `mashaabim`, `name`, `nego_mashes`, `negom`, `not`, `open_mashaabim`, `or`, `partofs`, `price`, `project`, `publishedAt`, `selfProposalUser`, `spnot`, `sqadualed`, `sqadualedf`, `timegrama`, `updatedAt`, `users`
 
 #### PositionFiltersInput
 Fields: `aiMeta`, `and`, `author`, `authorEmail`, `createdAt`, `description`, `heading`, `id`, `intensity`, `location`, `negotiation`, `not`, `or`, `order`, `publishedAt`, `tags`, `updatedAt`, `voters`, `votes`
@@ -4795,7 +4837,7 @@ Fields: `amort`, `amortf`, `amorth`, `amorts`, `amortt`, `and`, `createdAt`, `em
 Fields: `act`, `actt`, `and`, `ask`, `askm`, `askwant`, `createdAt`, `date`, `decision`, `done`, `finiapruval`, `id`, `maap`, `mesimabetahalich`, `not`, `or`, `pendm`, `pmash`, `sheirutpend`, `timer`, `tosplit`, `updatedAt`, `whatami`
 
 #### TimerFiltersInput
-Fields: `activeMesimabetahalich`, `acts`, `and`, `appruved`, `createdAt`, `finnish`, `forApruve`, `id`, `isActive`, `locale`, `localizations`, `mashabetahalich`, `mesimabetahalich`, `not`, `or`, `project`, `saveLinks`, `saveText`, `saved`, `start`, `timegrama`, `timers`, `totalHours`, `updatedAt`, `users_permissions_user`, `votes`
+Fields: `activeMesimabetahalich`, `acts`, `and`, `appruved`, `createdAt`, `finiapruvals`, `finnish`, `forApruve`, `id`, `isActive`, `locale`, `localizations`, `mashabetahalich`, `mesimabetahalich`, `not`, `or`, `project`, `saveLinks`, `saveText`, `saved`, `start`, `timegrama`, `timers`, `totalHours`, `updatedAt`, `users_permissions_user`, `votes`
 
 #### TosplitFiltersInput
 Fields: `and`, `createdAt`, `finished`, `halukas`, `hervachti`, `id`, `locale`, `localizations`, `name`, `not`, `or`, `prectentage`, `project`, `publishedAt`, `sales`, `timegrama`, `updatedAt`, `vots`, `whynow`
@@ -4816,7 +4858,7 @@ Fields: `action`, `and`, `createdAt`, `id`, `not`, `or`, `role`, `updatedAt`
 Fields: `and`, `createdAt`, `description`, `id`, `name`, `not`, `or`, `permissions`, `type`, `updatedAt`, `users`
 
 #### UsersPermissionsUserFiltersInput
-Fields: `acts`, `actsVali`, `and`, `api_keys`, `arr1`, `arrdate`, `askeds`, `askms`, `asks`, `askwants`, `bio`, `blocked`, `chezin`, `city`, `confirmationToken`, `confirmed`, `createdAt`, `cuntries`, `deals`, `declined`, `declinedByP`, `declinedm`, `device_token`, `discordlink`, `email`, `fblink`, `filtertags`, `finiapruvals`, `finnished_missions`, `forum_last_seens`, `frd`, `free_person`, `githublink`, `haamadas`, `halukasend`, `halukasres`, `haskama`, `haskamac`, `haskamaz`, `hatzaas`, `hervachti`, `iGotMOneyForSheirut`, `id`, `isSigned`, `lang`, `lat`, `levManualAlready`, `lng`, `machshirs`, `mashaabims`, `mesimabetahaliches`, `messages`, `moachManualAlready`, `nego_mashes`, `negopendmissions`, `negotiations`, `negotiationsIparticipante`, `noMail`, `noOfHoursProject1`, `not`, `open_missions`, `or`, `password`, `pendms`, `pendmsforme`, `pgishas`, `pgishasPendStrat`, `pgishauserpends`, `pgishausers`, `positionsAuthor`, `positionsVoted`, `preferCards`, `profilManualAlready`, `projects_1s`, `provider`, `radius`, `ratsons`, `resetPasswordToken`, `rikmashes`, `rishonvesopen`, `role`, `sales`, `sheirutnegos`, `sheirutpends`, `sheiruts`, `sheiruts_iCanGetMonay`, `shekelsPerHoureProject1`, `skills`, `socketId`, `sphmin`, `sps`, `tafkidims`, `telegramId`, `timeForVid`, `timers`, `twiterlink`, `updatedAt`, `username`, `vallues`, `videoval`, `votes`, `wants`, `welcom_tops`, `work_ways`, `zohars`
+Fields: `acts`, `actsVali`, `and`, `api_keys`, `arr1`, `arrdate`, `askeds`, `askms`, `asks`, `askwants`, `bio`, `blocked`, `chezin`, `city`, `confirmationToken`, `confirmed`, `createdAt`, `cuntries`, `deals`, `declined`, `declinedByP`, `declinedm`, `device_token`, `discordlink`, `email`, `fblink`, `filtertags`, `finiapruvals`, `finnished_missions`, `forum_last_seens`, `frd`, `free_person`, `githublink`, `haamadas`, `halukasend`, `halukasres`, `haskama`, `haskamac`, `haskamaz`, `hatzaas`, `hervachti`, `iGotMOneyForSheirut`, `id`, `isSigned`, `lang`, `lat`, `levManualAlready`, `lng`, `machshirs`, `mashaabims`, `mesimabetahaliches`, `messages`, `moachManualAlready`, `nego_mashes`, `negopendmissions`, `negotiations`, `negotiationsIparticipante`, `noMail`, `noOfHoursProject1`, `not`, `open_missions`, `or`, `password`, `pendms`, `pendmsforme`, `pgishas`, `pgishasPendStrat`, `pgishauserpends`, `pgishausers`, `pmashes`, `positionsAuthor`, `positionsVoted`, `preferCards`, `profilManualAlready`, `projects_1s`, `provider`, `radius`, `ratsons`, `resetPasswordToken`, `rikmashes`, `rishonvesopen`, `role`, `sales`, `sheirutnegos`, `sheirutpends`, `sheiruts`, `sheiruts_iCanGetMonay`, `shekelsPerHoureProject1`, `skills`, `socketId`, `sphmin`, `sps`, `tafkidims`, `telegramId`, `timeForVid`, `timers`, `twiterlink`, `updatedAt`, `username`, `vallues`, `videoval`, `votes`, `wants`, `welcom_tops`, `work_ways`, `zohars`
 
 #### VallueFiltersInput
 Fields: `and`, `createdAt`, `decisions`, `decisionsles`, `descrip`, `id`, `locale`, `localizations`, `not`, `open_missions`, `or`, `pendms`, `projects`, `publishedAt`, `ratsons`, `updatedAt`, `users`, `valueName`
@@ -5223,7 +5265,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 14164 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 14248 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

@@ -393,8 +393,8 @@
 
             const result = await executeAction('createHaluka', { data: halukaData });
             
-            if (result.success && result.data?.data?.createHaluka?.data?.id) {
-              halukaIds.push(result.data.data.createHaluka.data.id);
+            if (result.success && result.data?.createHaluka?.data?.id) {
+              halukaIds.push(result.data.createHaluka.data.id);
             } else {
               console.error('Failed to create haluka:', result.error);
             }
@@ -439,7 +439,7 @@
 
       const tosplitResult = await executeAction('createTosplit', { data: tosplitData });
 
-      if (!tosplitResult.success || !tosplitResult.data?.data?.createTosplit?.data?.id) {
+      if (!tosplitResult.success || !tosplitResult.data?.createTosplit?.data?.id) {
         const errorMsg = typeof tosplitResult.error === 'string' 
           ? tosplitResult.error 
           : tosplitResult.error?.message || 'Failed to create tosplit';
@@ -449,7 +449,7 @@
         return;
       }
 
-      const tosplitId = tosplitResult.data.data.createTosplit.data.id;
+      const tosplitId = tosplitResult.data.createTosplit.data.id;
       console.log('Tosplit created successfully:', tosplitId);
 
       // Step 5: Update each sale to mark as pending (waiting for votes)

@@ -5035,7 +5035,24 @@ export const moachQids = {
       data { id }
     }
   }`,
-  'getMashaabims': `query getMashaabims { mashaabims { data { id attributes { name descrip price kindOf linkto } } } }`
+  'getMashaabims': `query getMashaabims { mashaabims { data { id attributes { name descrip price kindOf linkto } } } }`,
+  'getUserSpByMashaabim': `query GetUserSpByMashaabim($idL: ID!, $mashaabimId: ID!) {
+    usersPermissionsUser(id: $idL) {
+      data {
+        attributes {
+          sps(filters: { mashaabim: { id: { eq: $mashaabimId } }, archived: { eq: false }, panui: { ne: false } }) {
+            data {
+              id
+              attributes {
+                name
+                panui
+              }
+            }
+          }
+        }
+      }
+    }
+  }`
 };
 
 export const qids = {

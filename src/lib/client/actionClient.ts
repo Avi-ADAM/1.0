@@ -291,6 +291,10 @@ export interface ActionParamsMap {
     mashaabimId?: string;
     startDate?: string;
     endDate?: string;
+    isAssigned?: boolean;
+    isReceived?: boolean;
+    existingSpId?: string;
+    restime?: string;
   };
 }
 

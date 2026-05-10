@@ -10,6 +10,7 @@
    * @property {boolean} [barbi]
    * @property {boolean} [noNegative]
    * @property {any} [noMoreThen]
+   * @property {(value: number) => void} [onValueChange]
    */
 
   /** @type {Props} */
@@ -19,7 +20,8 @@
     buttomLebel = '',
     barbi = false,
     noNegative = false,
-    noMoreThen = -1
+    noMoreThen = -1,
+    onValueChange
   } = $props();
 
   // Localization for toast messages
@@ -43,6 +45,11 @@
   let isDecrementDisabled = $derived(noNegative && value <= 0);
   let currentMessages = $derived(messages[$lang] || messages.he);
 
+  function setValue(newValue) {
+    value = newValue;
+    onValueChange?.(value);
+  }
+
   // Function to handle incrementing value
   function increment() {
     if (noMoreThen >= 0 && value >= noMoreThen) {
@@ -57,9 +64,9 @@
     }
 
     if (noMoreThen >= 0) {
-      value = Math.min(noMoreThen, value + 1);
+      setValue(Math.min(noMoreThen, value + 1));
     } else {
-      value++;
+      setValue(value + 1);
     }
   }
 
@@ -72,9 +79,9 @@
     }
 
     if (noNegative) {
-      value = Math.max(0, value - 1);
+      setValue(Math.max(0, value - 1));
     } else {
-      value--;
+      setValue(value - 1);
     }
   }
 
@@ -82,9 +89,9 @@
   function handleInput(event) {
     let newValue = Number(event.target.value);
     if ((noNegative && newValue < 0) || isNaN(newValue)) {
-      value = 0; // Reset to zero if negative
+      setValue(0); // Reset to zero if negative
     } else {
-      value = newValue; // Set to the new value
+      setValue(newValue); // Set to the new value
     }
   }
 </script>

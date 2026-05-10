@@ -1,6 +1,5 @@
 <script>
   import { onMount } from 'svelte';
-  import { page } from '$app/state';
   import MultiSelect from 'svelte-multiselect';
   import { lang } from '$lib/stores/lang.js';
   import { sendToSer } from '$lib/send/sendToSer.js';
@@ -21,19 +20,27 @@
    */
 
   /** @type {Props} */
-  let { projectId, userslength = 1, restime = '', onCreated, onCancel } = $props();
+  let {
+    projectId,
+    userslength = 1,
+    restime = '',
+    onCreated,
+    onCancel
+  } = $props();
 
   let mashaabimTemplates = $state([]);
   let isLoading = $state(true);
   let isSubmitting = $state(false);
   let selectedTemplateName = $state([]);
   let searchText = $state('');
+  let hydratedTemplateId = $state(null);
 
   // Form fields
   let name = $state('');
   let description = $state('');
   let price = $state(0);
   let maxInvestment = $state(0);
+  let maxInvestmentTouched = $state(false);
   let kindOf = $state('total');
   let hm = $state(1);
   let linkto = $state('');
@@ -43,17 +50,19 @@
 
   // --- Self-assignment (רלוונטי רק כשיש משתמש יחיד בפרויקט) ---
   let isSelfAssigned = $state(false);
-  let isReceived = $state(false);       // האם המשאב כבר התקבל?
-  let existingSpOptions = $state([]);   // Sp קיימים של המשתמש למשאב זה
-  let selectedSpName = $state([]);      // MultiSelect
-  let createNewSp = $state(false);      // יצירת Sp חדש
+  let isReceived = $state(false); // האם המשאב כבר התקבל?
+  let existingSpOptions = $state([]); // Sp קיימים של המשתמש למשאב זה
+  let selectedSpName = $state([]); // MultiSelect
+  let createNewSp = $state(false); // יצירת Sp חדש
   let loadingSpOptions = $state(false);
 
   // derived: ID של Sp נבחר קיים
   let selectedSpId = $derived(
     (() => {
       if (!selectedSpName.length) return null;
-      const found = existingSpOptions.find(s => s.attributes.name === selectedSpName[0]);
+      const found = existingSpOptions.find(
+        (s) => s.attributes.name === selectedSpName[0]
+      );
       return found?.id ?? null;
     })()
   );
@@ -68,9 +77,18 @@
     kindOf === 'perUnit'
       ? price * hm
       : kindOf === 'monthly' && startDate && endDate
-        ? +(price * Math.max(moment(endDate).diff(moment(startDate), 'months', true), 0)).toFixed(2)
+        ? +(
+            price *
+            Math.max(moment(endDate).diff(moment(startDate), 'months', true), 0)
+          ).toFixed(2)
         : kindOf === 'yearly' && startDate && endDate
-          ? +(price * Math.max(moment(endDate).diff(moment(startDate), 'years', true), 0)).toFixed(2)
+          ? +(
+              price *
+              Math.max(
+                moment(endDate).diff(moment(startDate), 'years', true),
+                0
+              )
+            ).toFixed(2)
           : price
   );
 
@@ -80,14 +98,26 @@
       return kindOf === 'perUnit'
         ? mx * hm
         : kindOf === 'monthly' && startDate && endDate
-          ? +(mx * Math.max(moment(endDate).diff(moment(startDate), 'months', true), 0)).toFixed(2)
+          ? +(
+              mx *
+              Math.max(
+                moment(endDate).diff(moment(startDate), 'months', true),
+                0
+              )
+            ).toFixed(2)
           : kindOf === 'yearly' && startDate && endDate
-            ? +(mx * Math.max(moment(endDate).diff(moment(startDate), 'years', true), 0)).toFixed(2)
+            ? +(
+                mx *
+                Math.max(
+                  moment(endDate).diff(moment(startDate), 'years', true),
+                  0
+                )
+              ).toFixed(2)
             : mx;
     })()
   );
 
-  let showForm = $state(false);
+  let showForm = $state(true);
 
   const i18n = {
     he: {
@@ -97,7 +127,7 @@
       name: 'שם המשאב',
       description: 'תיאור',
       price: 'שווי / מחיר',
-      maxInvestment: 'שווי מקסימלי להשקעה',
+      maxInvestment: 'שווי לחישוב בפרויקט',
       maxInvestmentHint: 'הצעת ערך גבוה יותר שמכיל את הסיכון',
       kindOf: 'סוג שווי',
       quantity: 'כמות',
@@ -111,7 +141,7 @@
       success: 'דרישת המשאב פורסמה בהצלחה',
       error: 'שגיאה בפרסום דרישת המשאב',
       totalPrice: 'סה"כ עלות משוערת',
-      totalMax: 'סה"כ שווי מקסימלי',
+      totalMax: 'סה"כ שווי בריקמה',
       summaryTitle: 'סיכום עלות',
       selfAssign: 'השמה לעצמי',
       selfAssignHint: 'לחץ לסמן שאתה תספק משאב זה',
@@ -120,6 +150,9 @@
       resourceReceived: 'האם המשאב התקבל?',
       resourceReceivedHint: 'סמן אם קיבלת את המשאב כבר',
       noMatchingSp: 'אין לך משאבים מתאימים',
+      noSpForResource: 'אין לך את המשאב הזה',
+      confirmCreateSp: 'כן, צור משאב חדש',
+      newSpWillBeCreated: 'משאב חדש ייווצר עבורך',
       kinds: {
         total: 'עלות חד פעמית',
         monthly: 'חודשי',
@@ -158,6 +191,9 @@
       resourceReceived: 'Was the resource received?',
       resourceReceivedHint: 'Check if you already received the resource',
       noMatchingSp: 'No matching resources found',
+      noSpForResource: "You don't have this resource",
+      confirmCreateSp: 'Yes, create new resource',
+      newSpWillBeCreated: 'A new resource will be created for you',
       kinds: {
         total: 'One-time cost',
         monthly: 'Monthly',
@@ -172,14 +208,7 @@
 
   onMount(async () => {
     try {
-      const result = await sendToSer(
-        {},
-        'getMashaabims',
-        0,
-        0,
-        false,
-        window.fetch
-      );
+      const result = await sendToSer({}, 'getMashaabims', 0, 0, false, fetch);
       if (result && result.data && result.data.mashaabims) {
         mashaabimTemplates = result.data.mashaabims.data || [];
       } else {
@@ -193,34 +222,76 @@
     }
   });
 
+  function normalizeResourceName(value) {
+    return String(value || '').trim().toLocaleLowerCase();
+  }
+
+  function findResourceTemplateByName(value) {
+    const normalized = normalizeResourceName(value);
+    if (!normalized) return null;
+    return (
+      mashaabimTemplates.find(
+        (template) =>
+          normalizeResourceName(template?.attributes?.name) === normalized
+      ) ?? null
+    );
+  }
+
+  function resetSelfAssignmentState() {
+    isSelfAssigned = false;
+    isReceived = false;
+    existingSpOptions = [];
+    selectedSpName = [];
+    createNewSp = false;
+  }
+
+  function handlePriceInput(value) {
+    price = value ?? 0;
+    if (!maxInvestmentTouched) {
+      maxInvestment = price;
+    }
+  }
+
+  function handleMaxInvestmentInput(value) {
+    maxInvestmentTouched = true;
+    maxInvestment = value ?? 0;
+  }
+
+  function handleStartDateInput(value) {
+    startDate = value;
+    if (endDate && startDate && endDate < startDate) {
+      endDate = startDate;
+    }
+  }
+
+  function hydrateFromResourceName(value) {
+    const template = findResourceTemplateByName(value);
+    if (!template) {
+      hydratedTemplateId = null;
+      resetSelfAssignmentState();
+      return;
+    }
+
+    if (hydratedTemplateId === template.id) return;
+    hydratedTemplateId = template.id;
+    name = template.attributes.name || value;
+    description = template.attributes.descrip || '';
+    price = template.attributes.price || 0;
+    maxInvestment = template.attributes.easy || template.attributes.price || 0;
+    maxInvestmentTouched = Boolean(
+      template.attributes.easy &&
+        template.attributes.easy !== template.attributes.price
+    );
+    kindOf = template.attributes.kindOf || 'total';
+    linkto = template.attributes.linkto || '';
+    resetSelfAssignmentState();
+  }
+
   function handleSelect() {
     if (selectedTemplateName.length > 0) {
       const selectedName = selectedTemplateName[0];
-      const template = mashaabimTemplates.find(
-        (t) => t.attributes.name === selectedName
-      );
-
       name = selectedName;
-      if (template) {
-        description = template.attributes.descrip || '';
-        price = template.attributes.price || 0;
-        maxInvestment = template.attributes.easy || template.attributes.price || 0;
-        kindOf = template.attributes.kindOf || 'total';
-        linkto = template.attributes.linkto || '';
-      } else {
-        // Reset if it's a new name
-        description = '';
-        price = 0;
-        maxInvestment = 0;
-        kindOf = 'total';
-        linkto = '';
-      }
-      // Reset self-assignment state
-      isSelfAssigned = false;
-      isReceived = false;
-      existingSpOptions = [];
-      selectedSpName = [];
-      createNewSp = false;
+      hydrateFromResourceName(selectedName);
       showForm = true;
     }
   }
@@ -229,33 +300,27 @@
    * טוען את רשימת ה-Sp הקיימים של המשתמש הנוכחי עבור המשאב (mashaabim) שנבחר.
    */
   async function loadSpOptions() {
-    const template = mashaabimTemplates.find(t => t.attributes.name === name);
+    const template = findResourceTemplateByName(name);
     if (!template?.id) {
-      // אין תבנית Mashaabim – אין מה לחפש, ניצור Sp חדש אוטומטית
-      createNewSp = true;
+      existingSpOptions = [];
       return;
     }
     loadingSpOptions = true;
     try {
       const result = await sendToSer(
-        {},
+        { idL: '0', mashaabimId: template.id },
         'getUserSpByMashaabim',
-        template.id,  // mashaabimId as extra arg – adjust query key as needed
+        0,
         0,
         false,
-        window.fetch
+        fetch
       );
-      // The query returns current user's sps filtered by mashaabim id
       const sps =
         result?.data?.usersPermissionsUser?.data?.attributes?.sps?.data ?? [];
       existingSpOptions = sps;
-      if (sps.length === 0) {
-        // אין Sp קיים – נסמן יצירת חדש אוטומטית
-        createNewSp = true;
-      }
     } catch (e) {
       console.error('Failed to load Sp options:', e);
-      createNewSp = true;
+      existingSpOptions = [];
     } finally {
       loadingSpOptions = false;
     }
@@ -277,26 +342,28 @@
   async function handleSubmit() {
     isSubmitting = true;
     try {
-      const selectedTemplate = mashaabimTemplates.find(
-        (t) => t.attributes.name === name
-      );
+      const selectedTemplate = findResourceTemplateByName(name);
 
       const result = await createResource({
         projectId,
         name,
         description,
         price,
-        easy: maxInvestment,
+        easy: maxInvestment || price,
         kindOf,
         hm: showQuantity ? hm : 1,
         linkto,
         spnot,
         mashaabimId: selectedTemplate?.id,
-        startDate: showDates && startDate ? new Date(startDate).toISOString() : undefined,
-        endDate:   showDates && endDate   ? new Date(endDate).toISOString()   : undefined,
+        startDate:
+          showDates && startDate
+            ? new Date(startDate).toISOString()
+            : undefined,
+        endDate:
+          showDates && endDate ? new Date(endDate).toISOString() : undefined,
         // Self-assignment
         isAssigned: isSingleUser && isSelfAssigned,
-        isReceived:  isSingleUser && isSelfAssigned && isReceived,
+        isReceived: isSingleUser && isSelfAssigned && isReceived,
         existingSpId: selectedSpId ?? undefined,
         restime: restime || undefined
       });
@@ -347,11 +414,11 @@
       <div class="flex items-center gap-2">
         <div class="flex-grow">
           <MultiSelect
-            outerDivClass="!bg-slate-800 !border-barbi/30 focus-within:!border-barbi !text-white !rounded-xl !p-2"
+            outerDivClass="!bg-pink-900 !border-gold/30 focus-within:!border-gold !text-white !rounded-xl !p-2 shadow-inner"
             inputClass="!bg-transparent !text-white"
-            ulOptionsClass="!bg-slate-800 !border-barbi/30 !text-white !rounded-xl"
-            liOptionClass="!text-white hover:!bg-barbi/20"
-            liSelectedClass="!bg-barbi !text-white"
+            ulOptionsClass="!bg-pink-900 !border-gold/30 !text-white !rounded-xl"
+            liOptionClass="!text-white hover:!bg-gold/20"
+            liSelectedClass="!bg-gold !text-white"
             loading={isLoading}
             placeholder={t.selectPlaceholder}
             options={mashaabimTemplates.map((t) => t.attributes.name)}
@@ -379,35 +446,49 @@
           <input
             type="text"
             bind:value={name}
+            list="resource-name-options"
+            oninput={() => hydrateFromResourceName(name)}
             required
-            class="bg-slate-800 border border-barbi/30 rounded-xl p-3 text-white focus:border-barbi outline-none transition-colors"
+            class="bg-pink-950/30 border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all shadow-sm"
           />
+          <datalist id="resource-name-options">
+            {#each mashaabimTemplates as template (template.id)}
+              <option value={template.attributes.name}></option>
+            {/each}
+          </datalist>
         </div>
         <div class="flex flex-col">
           <label class="text-sm text-barbie mb-1">{t.kindOf}</label>
           <select
             bind:value={kindOf}
-            class="bg-slate-800 border border-barbi/30 rounded-xl p-3 text-white focus:border-barbi outline-none transition-colors"
+            class="bg-pink-950/30 border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all shadow-sm"
           >
-            {#each Object.entries(t.kinds) as [val, label]}
-              <option value={val}>{label}</option>
+            {#each Object.entries(t.kinds) as [val, label] (val)}
+              <option value={val} class="bg-pink-900">{label}</option>
             {/each}
           </select>
         </div>
 
         <div class="flex flex-col">
-          <label class="text-sm text-barbie mb-1">{t.price}</label>
-          <NumberInput bind:value={price} />
+          <label class="text-sm text-barbie mb-1 font-medium">{t.price}</label>
+          <NumberInput value={price} onValueChange={handlePriceInput} />
         </div>
         <div class="flex flex-col">
-          <label class="text-sm text-barbie mb-1">{t.maxInvestment}</label>
-          <p class="text-xs text-gray-400 mb-1">{t.maxInvestmentHint}</p>
-          <NumberInput bind:value={maxInvestment} />
+          <label class="text-sm text-barbie mb-1 font-medium"
+            >{t.maxInvestment}</label
+          >
+          <p class="text-xs text-barbie/80 mb-1">{t.maxInvestmentHint}</p>
+          <NumberInput
+            value={maxInvestment}
+            onValueChange={handleMaxInvestmentInput}
+          />
         </div>
 
         {#if showQuantity}
           <div class="md:col-span-2 flex flex-col">
-            <label class="text-sm text-barbie mb-1">{t.quantity}</label>
+            <label class="text-sm text-barbie mb-1 font-medium"
+              >{t.quantity}</label
+            >
             <NumberInput bind:value={hm} />
           </div>
         {/if}
@@ -417,8 +498,9 @@
             <label class="text-sm text-barbie mb-1">{t.startDate}</label>
             <input
               type="date"
-              bind:value={startDate}
-              class="bg-slate-800 border border-barbi/30 rounded-xl p-3 text-white focus:border-barbi outline-none transition-colors"
+              value={startDate}
+              onchange={(event) => handleStartDateInput(event.currentTarget.value)}
+              class="bg-pink-950/30 border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all"
             />
           </div>
           <div class="flex flex-col">
@@ -426,7 +508,8 @@
             <input
               type="date"
               bind:value={endDate}
-              class="bg-slate-800 border border-barbi/30 rounded-xl p-3 text-white focus:border-barbi outline-none transition-colors"
+              min={startDate || undefined}
+              class="bg-pink-950/30 border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all"
             />
           </div>
         {/if}
@@ -437,7 +520,7 @@
             type="url"
             bind:value={linkto}
             placeholder="https://..."
-            class="bg-slate-800 border border-barbi/30 rounded-xl p-3 text-white focus:border-barbi outline-none transition-colors"
+            class="bg-pink-950/30 placeholder:text-barbie border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all shadow-sm"
           />
         </div>
 
@@ -445,7 +528,7 @@
           <label class="text-sm text-barbie mb-1">{t.description}</label>
           <textarea
             bind:value={description}
-            class="w-full bg-slate-800 border border-barbi/30 rounded-xl p-3 text-white focus:border-barbi outline-none transition-colors h-24 resize-none"
+            class="w-full bg-pink-950/30 border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all h-24 resize-none shadow-sm"
           ></textarea>
         </div>
 
@@ -453,27 +536,33 @@
           <label class="text-sm text-barbie mb-1">{t.notes}</label>
           <textarea
             bind:value={spnot}
-            class="w-full bg-slate-800 border border-barbi/30 rounded-xl p-3 text-white focus:border-barbi outline-none transition-colors h-20 resize-none"
+            class="w-full bg-pink-950/30 border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all h-20 resize-none shadow-sm"
           ></textarea>
         </div>
       </div>
 
       <!-- השמה לעצמי – מוצג רק כשיש משתמש יחיד בפרויקט -->
       {#if isSingleUser}
-        <div class="self-assign-box rounded-2xl border border-blue-500/30 bg-slate-800/60 backdrop-blur-sm p-4 space-y-3">
+        <div
+          class="self-assign-box rounded-2xl border border-gold bg-pink-950/20 backdrop-blur-sm p-4 space-y-3"
+        >
           <div class="flex items-center justify-between">
             <div>
-              <h3 class="text-sm font-semibold text-blue-300 uppercase tracking-wider">{t.selfAssign}</h3>
-              <p class="text-xs text-gray-400 mt-0.5">{t.selfAssignHint}</p>
+              <h3
+                class="text-sm font-semibold text-barbie/80 uppercase tracking-wider"
+              >
+                {t.selfAssign}
+              </h3>
+              <p class="text-xs text-barbie/90 mt-0.5">{t.selfAssignHint}</p>
             </div>
             <button
               type="button"
               onclick={toggleSelfAssign}
               class="px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-2"
-              class:bg-blue-600={!isSelfAssigned}
-              class:hover:bg-blue-500={!isSelfAssigned}
-              class:bg-green-600={isSelfAssigned}
-              class:hover:bg-green-500={isSelfAssigned}
+              class:bg-pink-600={!isSelfAssigned}
+              class:hover:bg-pink-500={!isSelfAssigned}
+              class:bg-gold-600={isSelfAssigned}
+              class:hover:bg-gold-500={isSelfAssigned}
               class:text-white={true}
             >
               {t.selfAssign}
@@ -484,64 +573,83 @@
           {#if isSelfAssigned}
             <div class="space-y-3 animate-in fade-in duration-300">
               {#if loadingSpOptions}
-                <div class="text-center text-gray-400 text-sm py-2">טוען...</div>
-              {:else}
-                <!-- בחירת Sp קיים (אם יש) -->
-                {#if existingSpOptions.length > 0}
-                  <div>
-                    <label class="text-xs text-blue-300 font-semibold uppercase tracking-wider mb-1 block">
-                      {t.chooseExistingSp}
-                    </label>
-                    <MultiSelect
-                      outerDivClass="!bg-slate-700 !border-blue-500/30 focus-within:!border-blue-400 !text-white !rounded-xl !p-2"
-                      inputClass="!bg-transparent !text-white"
-                      ulOptionsClass="!bg-slate-800 !border-blue-500/30 !text-white !rounded-xl"
-                      liOptionClass="!text-white hover:!bg-blue-500/20"
-                      liSelectedClass="!bg-blue-600 !text-white"
-                      placeholder={t.chooseExistingSp}
-                      options={existingSpOptions.map(s => s.attributes.name)}
-                      bind:selected={selectedSpName}
-                      noMatchingOptionsMsg={t.noMatchingSp}
-                      maxSelect={1}
-                      onchange={() => { if (selectedSpName.length > 0) createNewSp = false; }}
-                    />
-                  </div>
-                {/if}
-
-                <!-- כפתור "יצירת Sp חדש" -->
-                <button
-                  type="button"
-                  onclick={() => { createNewSp = !createNewSp; if (createNewSp) selectedSpName = []; }}
-                  class="w-full px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
-                  class:bg-slate-700={!createNewSp}
-                  class:hover:bg-slate-600={!createNewSp}
-                  class:bg-green-700={createNewSp}
-                  class:hover:bg-green-600={createNewSp}
-                  class:text-white={true}
-                >
-                  {t.createNewSp}
-                  {#if createNewSp}<span>✓</span>{/if}
-                </button>
-
-                <!-- כפתור "קיבלתי" – מופיע כשנבחר Sp קיים או נסמן "חדש" -->
-                {#if selectedSpName.length > 0 || createNewSp}
+                <div class="text-center text-barbie text-sm py-2">טוען...</div>
+              {:else if existingSpOptions.length > 0}
+                <!-- יש SPs קיימים – בחר מהם -->
+                <div>
+                  <label
+                    class="text-xs text-barbie font-semibold uppercase tracking-wider mb-1 block"
+                  >
+                    {t.chooseExistingSp}
+                  </label>
+                  <MultiSelect
+                    outerDivClass="!bg-pink-900/40 !border-gold focus-within:!border-gold !text-white !rounded-xl !p-2"
+                    inputClass="!bg-transparent !text-white"
+                    ulOptionsClass="!bg-pink-900 !border-gold !text-white !rounded-xl"
+                    liOptionClass="!text-white hover:!bg-gold-500/20"
+                    liSelectedClass="!bg-gold-600 !text-white"
+                    placeholder={t.chooseExistingSp}
+                    options={existingSpOptions.map((s) => s.attributes.name)}
+                    bind:selected={selectedSpName}
+                    noMatchingOptionsMsg={t.noMatchingSp}
+                    maxSelect={1}
+                  />
+                </div>
+                {#if selectedSpName.length > 0}
                   <button
                     type="button"
                     onclick={() => (isReceived = !isReceived)}
-                    class="w-full px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
-                    class:bg-slate-700={!isReceived}
-                    class:hover:bg-slate-600={!isReceived}
-                    class:bg-amber-600={isReceived}
-                    class:hover:bg-amber-500={isReceived}
+                    class="w-full px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-sm"
+                    class:bg-pink-800={!isReceived}
+                    class:hover:bg-pink-700={!isReceived}
+                    class:bg-pink-500={isReceived}
+                    class:hover:bg-pink-400={isReceived}
                     class:text-white={true}
                   >
                     {t.resourceReceived}
                     {#if isReceived}<span>✓</span>{/if}
                   </button>
                   {#if isReceived}
-                    <p class="text-xs text-amber-300/70 text-center">{t.resourceReceivedHint}</p>
+                    <p class="text-xs text-pink-200/70 text-center">
+                      {t.resourceReceivedHint}
+                    </p>
                   {/if}
                 {/if}
+              {:else if !createNewSp}
+                <!-- אין SPs – שאל אם ליצור חדש -->
+                <div class="text-center space-y-3 py-2">
+                  <p class="text-sm font-semibold text-barbie">{t.noSpForResource}</p>
+                  <button
+                    type="button"
+                    onclick={() => (createNewSp = true)}
+                    class="w-full px-4 py-2 text-sm font-semibold rounded-xl bg-pink-800 hover:bg-pink-700 text-white transition-all duration-200 shadow-sm"
+                  >
+                    {t.confirmCreateSp}
+                  </button>
+                </div>
+              {:else}
+                <!-- createNewSp = true – SP חדש ייוצר -->
+                <div class="space-y-3">
+                  <p class="text-sm text-center text-barbie/90">{t.newSpWillBeCreated}</p>
+                  <button
+                    type="button"
+                    onclick={() => (isReceived = !isReceived)}
+                    class="w-full px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-sm"
+                    class:bg-pink-800={!isReceived}
+                    class:hover:bg-pink-700={!isReceived}
+                    class:bg-pink-500={isReceived}
+                    class:hover:bg-pink-400={isReceived}
+                    class:text-white={true}
+                  >
+                    {t.resourceReceived}
+                    {#if isReceived}<span>✓</span>{/if}
+                  </button>
+                  {#if isReceived}
+                    <p class="text-xs text-pink-200/70 text-center">
+                      {t.resourceReceivedHint}
+                    </p>
+                  {/if}
+                </div>
               {/if}
             </div>
           {/if}
@@ -549,16 +657,26 @@
       {/if}
 
       <!-- סיכום עלות -->
-      <div class="summary-box mt-4 rounded-2xl border border-barbi/40 bg-slate-800/60 backdrop-blur-sm p-4 space-y-3">
-        <h3 class="text-sm font-semibold text-barbi uppercase tracking-wider">{t.summaryTitle}</h3>
+      <div
+        class="summary-box mt-4 rounded-2xl border border-gold-500/40 bg-pink-950/20 backdrop-blur-sm p-4 space-y-3 shadow-lg"
+      >
+        <h3
+          class="text-sm font-semibold text-gold-400 uppercase tracking-wider"
+        >
+          {t.summaryTitle}
+        </h3>
         <div class="grid grid-cols-2 gap-3">
           <div class="summary-item">
             <span class="summary-label">{t.totalPrice}</span>
-            <span class="summary-value price">{(+totalPrice || 0).toLocaleString()} ₪</span>
+            <span class="summary-value price"
+              >{(+totalPrice || 0).toLocaleString()} ₪</span
+            >
           </div>
           <div class="summary-item">
             <span class="summary-label">{t.totalMax}</span>
-            <span class="summary-value max">{(+totalMax || 0).toLocaleString()} ₪</span>
+            <span class="summary-value max"
+              >{(+totalMax || 0).toLocaleString()} ₪</span
+            >
           </div>
         </div>
       </div>
@@ -569,12 +687,15 @@
           disabled={isSubmitting || !name}
           loading={isSubmitting}
           text={{ he: t.submit, en: t.submit }}
-          class="flex-grow !py-4 text-lg font-bold !bg-barbi hover:!bg-barbi/80"
+          class="flex-grow !py-4 text-lg font-bold !bg-gold-600 hover:!bg-gold !text-pink-950 shadow-md"
         />
         <Button
-          onClick={() => (showForm = false)}
+          onClick={() => {
+            if (onCancel) onCancel();
+            else showForm = false;
+          }}
           text={{ he: t.cancel, en: t.cancel }}
-          class="!bg-slate-700 hover:!bg-slate-600"
+          class="!bg-pink-900 hover:!bg-pink-800 !text-pink-200"
         />
       </div>
     </div>
@@ -586,20 +707,20 @@
     border: none !important;
   }
   :global(.svelte-multiselect ul.options) {
-    background-color: #1e293b !important;
-    border: 1px solid rgba(220, 38, 127, 0.3) !important;
+    background-color: #500724 !important; /* pink-950 */
+    border: 1px solid rgba(251, 191, 36, 0.3) !important; /* gold-400 */
     border-radius: 0.75rem !important;
     color: white !important;
   }
   :global(.svelte-multiselect ul.options li.selected) {
-    background-color: #dc267f !important;
+    background-color: #d97706 !important; /* gold-600 */
     color: white !important;
   }
   :global(.svelte-multiselect ul.options li) {
     color: white !important;
   }
   :global(.svelte-multiselect ul.options li:hover) {
-    background-color: rgba(220, 38, 127, 0.2) !important;
+    background-color: rgba(251, 191, 36, 0.2) !important;
   }
 
   .summary-box {
@@ -613,33 +734,41 @@
     padding: 0.75rem 1rem;
     border-radius: 0.75rem;
     background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.1);
   }
 
   .summary-label {
     font-size: 0.7rem;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #94a3b8;
+    color: var(--barbie-pink); /* pink-100 */
   }
 
   .summary-value {
     font-size: 1.4rem;
-    font-weight: 700;
+    font-weight: 800;
     line-height: 1;
   }
 
   .summary-value.price {
-    color: #f0abfc; /* barbi-like lilac */
+    color: var(--barbie-pink); /* pink-200 */
+    text-shadow: 0 0 10px rgba(244, 114, 182, 0.3);
   }
 
   .summary-value.max {
-    color: #fbbf24; /* amber / gold */
+    color: var(--gold); /* gold-300 */
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 </style>
