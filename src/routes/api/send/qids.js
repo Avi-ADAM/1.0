@@ -4394,7 +4394,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
   '103createFinnishedMission': `mutation CreateFinnishedMission(
     $missionName: String,
     $why: String,
-    $what: ID,
+    $what: [ID],
     $noofhours: Float,
     $mesimabetahalich: ID,
     $perhour: Float,
@@ -4428,14 +4428,14 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
   }`,
   '104createFiniapruval': `mutation CreateFiniapruval(
     $missname: String,
-    $what: ID,
+    $what: [ID],
     $why: String,
     $noofhours: Float,
     $mesimabetahalich: ID,
     $project: ID,
     $publishedAt: DateTime,
     $users_permissions_user: ID,
-    $vots: [ComponentVotsVotInput]
+    $vots: [ComponentProjectsVotsInput]
   ) {
     createFiniapruval(
       data: {

@@ -32,7 +32,7 @@ import { ensureProcessForumConfig } from './ensureProcessForum.js';
 import { ensureStageForumConfig } from './ensureStageForum.js';
 import { closeFiniapruvalConfig } from './closeFiniapruval.js';
 import { updateProjectDetailsConfig } from './updateProjectDetails.js';
-//import { completeMissionConfig } from './completeMission.js';
+import { completeMissionConfig } from './completeMission.js';
 import { chatActions } from './chat.js';
 
 import { createTaskAction } from './createTask.js';
@@ -76,6 +76,11 @@ export function registerAllActions(): void {
 
   // Sheirut forum helpers
   registerAction(ensureSheirutForumConfig);
+  registerAction(createProcessConfig);
+  registerAction(attachEntityToProcessConfig);
+  registerAction(ensureProcessForumConfig);
+  registerAction(ensureStageForumConfig);
+  registerAction(completeMissionConfig);
 
   // Finiapruval voting and closing
   registerAction(closeFiniapruvalConfig);
@@ -113,6 +118,11 @@ export {
   addVoteConfig,
   ensureSheirutForumConfig,
   closeFiniapruvalConfig,
-  chatActions,
   updateProjectDetailsConfig
+  createProcessConfig,
+  attachEntityToProcessConfig,
+  ensureProcessForumConfig,
+  ensureStageForumConfig,
+  completeMissionConfig,
+  chatActions
 };

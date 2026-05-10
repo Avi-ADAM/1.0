@@ -2,16 +2,14 @@
 // index אחד, namespace לכל קטגוריה: skills / roles / methods
 import { Pinecone } from '@pinecone-database/pinecone';
 
-import { PINECONE, PINECONE_INDEX } from '$env/static/private';
-
 const getPineconeKey = () => {
-    const key = PINECONE || '';
+    const key = process.env.PINECONE || '';
     console.log('Pinecone Key found (length):', key?.length || 0);
     return key;
 };
 
 const getIndexName = () => {
-    const name = PINECONE_INDEX || 'missions';
+    const name = process.env.PINECONE_INDEX || 'missions';
     console.log('Pinecone Index Name:', name);
     return name;
 };
