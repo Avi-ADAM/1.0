@@ -6,7 +6,10 @@
       "mcp__Claude_Preview__preview_start",
       "Bash(grep -iE \"agent|ai|claude|guide|md$\")",
       "Bash(npx tsc *)",
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "Bash(grep -n 'let.*=\\\\|export let\\\\|$props\\\\|askId\\\\|projectId\\\\|users\\\\|noofpu' 'C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\lib\\\\components\\\\lev\\\\reqtosherut.svelte')",
+      "Bash(grep -n '$props\\\\|let.*projectId\\\\|let.*askId\\\\|let.*users\\\\b\\\\|let.*noofpu\\\\|let.*userId' 'C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\lib\\\\components\\\\lev\\\\reqtosherut.svelte')",
+      "Bash(grep -n '$props\\\\|let.*kind\\\\|let.*askId\\\\|let.*users\\\\b\\\\|let.*noofpu\\\\|export let' 'C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\lib\\\\components\\\\lev\\\\decisionMaking.svelte')"
     ]
   },
   "enableAllProjectMcpServers": true,

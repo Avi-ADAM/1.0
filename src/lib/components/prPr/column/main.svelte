@@ -35,7 +35,10 @@
 
   const series = stackData(data);
 
-  const formatTickY = d => format(`.${precisionFixed(d)}s`)(d);
+  const formatTickY = d => {
+    if (d === 0 || !isFinite(d) || isNaN(d)) return '0';
+    return format(`.${precisionFixed(d)}s`)(d);
+  };
 </script>
 
 <style>

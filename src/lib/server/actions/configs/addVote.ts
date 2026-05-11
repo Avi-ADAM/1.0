@@ -17,8 +17,8 @@ const addVoteHandler: ActionExecutionHandler = async (params, context, util) => 
   const { strapi } = util;
 
   // Validation
-  if (!type || !['pend', 'sheirutpend'].includes(type)) {
-    throw new Error('Invalid type. Must be "pend" or "sheirutpend"');
+  if (!type || !['pend', 'sheirutpend', 'ask', 'decision'].includes(type)) {
+    throw new Error('Invalid type. Must be "pend", "sheirutpend", "ask", or "decision"');
   }
 
   if (!id || !projectId) {
@@ -26,6 +26,126 @@ const addVoteHandler: ActionExecutionHandler = async (params, context, util) => 
   }
 
   const voteOrder = order || 0;
+
+  // --- Logic for Ask (Component Based, 3+ members simple vote) ---
+  if (type === 'ask') {
+    const { existingComponentData } = params;
+
+    const now = new Date();
+    const newVote = {
+      what: true,
+      users_permissions_user: userId,
+      ide: parseInt(String(userId), 10),
+      zman: now.toISOString()
+    };
+
+    const existingVots = Array.isArray(existingComponentData)
+      ? existingComponentData.map((v: any) => {
+          const raw = {
+            what: v.what ?? v.attributes?.what,
+            users_permissions_user:
+              v.users_permissions_user?.data?.id ??
+              v.users_permissions_user?.id ??
+              v.users_permissions_user,
+            ide: v.ide ?? v.attributes?.ide,
+            zman: v.zman ?? v.attributes?.zman,
+            order: v.order ?? v.attributes?.order ?? 0
+          };
+          if (raw.ide !== undefined && raw.ide !== null) {
+            raw.ide = parseInt(String(raw.ide), 10);
+          }
+          return raw;
+        })
+      : [];
+
+    const allVots = [...existingVots, newVote];
+
+    const result = await strapi.execute('120addVoteToAsk', { askId: id, vots: allVots }, context.jwt, context.fetch);
+
+    if (!result || result.errors) {
+      throw new Error(`AddVoteToAsk failed: ${JSON.stringify(result?.errors || 'Unknown error')}`);
+    }
+
+    const strapiVote = {
+      what: true,
+      users_permissions_user: { data: { id: String(userId) } },
+      ide: parseInt(String(userId), 10),
+      zman: now.toISOString(),
+      order: 0
+    };
+
+    return {
+      data: { id, newVote: strapiVote },
+      updateStrategy: {
+        type: 'partialUpdate',
+        config: {
+          dataKeys: ['asked'],
+          updateFunction: 'appendVote'
+        }
+      }
+    };
+  }
+
+  // --- Logic for Decision (Component Based, project config vote) ---
+  if (type === 'decision') {
+    const { existingComponentData } = params;
+
+    const now = new Date();
+    const newVote = {
+      what: true,
+      users_permissions_user: userId,
+      ide: parseInt(String(userId), 10),
+      zman: now.toISOString(),
+      order: 0
+    };
+
+    const existingVots = Array.isArray(existingComponentData)
+      ? existingComponentData.map((v: any) => {
+          const raw = {
+            what: v.what ?? v.attributes?.what,
+            users_permissions_user:
+              v.users_permissions_user?.data?.id ??
+              v.users_permissions_user?.id ??
+              v.users_permissions_user,
+            ide: v.ide ?? v.attributes?.ide,
+            zman: v.zman ?? v.attributes?.zman,
+            order: v.order ?? v.attributes?.order ?? 0
+          };
+          if (raw.ide !== undefined && raw.ide !== null) {
+            raw.ide = parseInt(String(raw.ide), 10);
+          }
+          return raw;
+        })
+      : [];
+
+    const allVots = [...existingVots, newVote];
+
+    const result = await strapi.execute('121addVoteToDecision', { decisionId: id, vots: allVots }, context.jwt, context.fetch);
+
+    if (!result || result.errors) {
+      throw new Error(`AddVoteToDecision failed: ${JSON.stringify(result?.errors || 'Unknown error')}`);
+    }
+
+    // Return new vote in Strapi nested format so socket handler can append to store
+    const strapiVote = {
+      what: true,
+      users_permissions_user: { data: { id: String(userId) } },
+      ide: parseInt(String(userId), 10),
+      zman: now.toISOString(),
+      order: 0
+    };
+
+    return {
+      data: { id, newVote: strapiVote },
+      updateStrategy: {
+        type: 'partialUpdate',
+        config: {
+          dataKeys: ['decisions'],
+          updateFunction: 'appendVote'
+        }
+      }
+    };
+  }
 
   // --- Logic for SheirutPend (Relation Based) ---
   if (type === 'sheirutpend') {
@@ -212,8 +332,8 @@ export const addVoteConfig: ActionConfig = {
     type: {
       type: 'string',
       required: true,
-      validate: (value) => ['pend', 'sheirutpend'].includes(value),
-      description: 'Type of item: "pend" or "sheirutpend"'
+      validate: (value) => ['pend', 'sheirutpend', 'ask', 'decision'].includes(value),
+      description: 'Type of item: "pend", "sheirutpend", "ask", or "decision"'
     },
     id: {
       type: 'string',

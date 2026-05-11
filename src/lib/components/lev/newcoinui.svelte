@@ -211,6 +211,9 @@
    * @property {number} [beta]
    * @property {number} [pen]
    * @property {number} [sug]
+   * @property {number} [saless]
+   * @property {number} [sheirutps]
+   * @property {number} [purchasesn]
    * @property {boolean} [low]
    * @property {any} nam
    * @property {number} [wel]
@@ -248,6 +251,9 @@
     beta = 13,
     pen = 17,
     sug = 17,
+    saless = 0,
+    sheirutps = 0,
+    purchasesn = 0,
     low = false,
     nam,
     wel = 13,
@@ -266,7 +272,10 @@
       ppmash: true,
       pmashs: true,
       pmaap: true,
-      askmap: true
+      askmap: true,
+      sheirutp: true,
+      sales: true,
+      purchases: true
     }),
     sml = false
   } = $props();

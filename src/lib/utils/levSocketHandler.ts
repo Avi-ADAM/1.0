@@ -383,8 +383,8 @@ export function updateFiappStore(data: Partial<ApprovalData> & { id: string }): 
 
 /**
  * Update asked (join requests) store
- * 
- * @param data - Ask data
+ *
+ * @param data - Ask data (may include newVote to append to users/vots)
  */
 export function updateAskedStore(data: Partial<AskData> & { id: string }): void {
   if (!data || !data.id) {
@@ -404,7 +404,23 @@ export function updateAskedStore(data: Partial<AskData> & { id: string }): void 
 
     if (index !== -1) {
       console.log('✏️ [levSocketHandler] Updating existing asked', { id: data.id });
-      current[index] = { ...current[index], ...data };
+
+      const newVote = (data as any).newVote;
+      if (newVote) {
+        const existing = current[index];
+        const existingUsers = Array.isArray((existing as any).users) ? (existing as any).users : [];
+        const voterId = newVote.users_permissions_user?.data?.id;
+        const alreadyVoted = voterId
+          ? existingUsers.some((v: any) => v?.users_permissions_user?.data?.id === voterId)
+          : false;
+
+        if (!alreadyVoted) {
+          const updatedUsers = [...existingUsers, newVote];
+          current[index] = { ...existing, users: updatedUsers, vots: updatedUsers };
+        }
+      } else {
+        current[index] = { ...current[index], ...data };
+      }
     } else {
       console.log('➕ [levSocketHandler] Adding new asked', { id: data.id });
       current.push(data as AskData);
@@ -614,8 +630,8 @@ export function updateTransfersStore(data: Partial<TransferData> & { id: string 
 
 /**
  * Update decisions store
- * 
- * @param data - Decision data
+ *
+ * @param data - Decision data (may include newVote to append to users/vots)
  */
 export function updateDecisionsStore(data: Partial<DecisionData> & { id: string }): void {
   if (!data || !data.id) {
@@ -635,7 +651,24 @@ export function updateDecisionsStore(data: Partial<DecisionData> & { id: string 
 
     if (index !== -1) {
       console.log('✏️ [levSocketHandler] Updating existing decision', { id: data.id });
-      current[index] = { ...current[index], ...data };
+
+      const newVote = (data as any).newVote;
+      if (newVote) {
+        // Append new vote to users/vots — derived store re-derives noofusersOk etc.
+        const existing = current[index];
+        const existingUsers = Array.isArray(existing.users) ? existing.users : [];
+        const voterId = newVote.users_permissions_user?.data?.id;
+        const alreadyVoted = voterId
+          ? existingUsers.some((v: any) => v?.users_permissions_user?.data?.id === voterId)
+          : false;
+
+        if (!alreadyVoted) {
+          const updatedUsers = [...existingUsers, newVote];
+          current[index] = { ...existing, users: updatedUsers, vots: updatedUsers };
+        }
+      } else {
+        current[index] = { ...current[index], ...data };
+      }
     } else {
       console.log('➕ [levSocketHandler] Adding new decision', { id: data.id });
       current.push(data as DecisionData);

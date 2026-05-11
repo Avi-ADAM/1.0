@@ -17,6 +17,9 @@ let fiap = $state("fiap");
  let pmashs = $state("pmashs");
  let pmaap = $state("pmaap");
  let askmap = $state("askmap");
+let sheirutp = $state("sheirutp");
+let sales = $state("sales");
+let purchases = $state("purchases");
 function disp (event) { 
 const value = event.id
     if (value !== "true"){
@@ -57,6 +60,9 @@ fiap = "fiap";
  pmashs = "pmashs";
  pmaap = "pmaap";
           askmap = "askmap";
+  sheirutp = "sheirutp";
+  sales = "sales";
+  purchases = "purchases";
 
   }
 
@@ -201,6 +207,9 @@ u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפ
     mashs = 17,
     maap = 17,
     askma = 13,
+    saless = 0,
+    sheirutps = 0,
+    purchasesn = 0,
     low = true,
     cards = $bindable(false)
   } = $props();

@@ -4686,6 +4686,22 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         }
       }
     }
+  }`,
+
+  '120addVoteToAsk': `mutation AddVoteToAsk($askId: ID!, $vots: [ComponentProjectsVotsInput]) {
+    updateAsk(id: $askId, data: { vots: $vots }) {
+      data {
+        id
+      }
+    }
+  }`,
+
+  '121addVoteToDecision': `mutation AddVoteToDecision($decisionId: ID!, $vots: [ComponentProjectsVotsInput]) {
+    updateDecision(id: $decisionId, data: { vots: $vots }) {
+      data {
+        id
+      }
+    }
   }`
 };
 

@@ -1,5 +1,6 @@
 <script>
   import { Drawer } from 'vaul-svelte';
+  import { executeAction } from '$lib/client/actionClient';
   import { ProgressBar } from 'progressbar-svelte';
   import { goto } from '$app/navigation';
   import { lang } from '$lib/stores/lang.js';
@@ -223,7 +224,7 @@
     pmcli += 1;
     if (pmcli >= 2) {
       idPr.set(id);
-      goto('/moach');
+      goto(`/moach/${id}`);
     }
   }
   function objToString(obj) {
@@ -355,60 +356,19 @@
         console.log(error1);
       }
     } else {
-      console.log('just add vote to asked and update to not show for me again');
-      let que = ``;
-      if (kind != 'sheirutpends') {
-        `updateSheirutpends(id:"${projectId}"
-        data:{
-           vots: [${userss}, 
-              {
-               what: true
-               ide:${idL}
-               zman: "${d.toISOString()}"
-               order:0
-               users_permissions_user: "${idL}"
-             }
-           ]}          
-        }){data{id}}
-        `;
-      } else {
-        que = `    
- updateDecision(
-              id: "${askId}"
-       data: {
-           vots: [${userss}, 
-              {
-                ide:${idL}
-               zman: "${d.toISOString()}"
-               order:0
-              what: true
-              users_permissions_user: "${idL}"
-            }
-          ]}
-         ){data{id}}`;
-      }
+      // 3+ members: record vote on the Decision entity via action (handles notifications + socket)
       try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation 
-                        {
-                           ${que}
-                    }
-`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
-        onAcsept?.({
-          ani: 'askedma',
-          coinlapach: coinlapach
+        const result = await executeAction('addVote', {
+          type: 'decision',
+          id: askId,
+          projectId: projectId,
+          existingComponentData: users
         });
+        if (result.success) {
+          onAcsept?.({ ani: 'askedma', coinlapach: coinlapach });
+        } else {
+          error1 = result.error;
+        }
       } catch (e) {
         error1 = e;
         console.log(error1);
@@ -472,6 +432,7 @@
   }
   import Card from './cards/hachlata.svelte';
   import { SendTo } from '$lib/send/sendTo.svelte';
+  import { idPr } from '$lib/stores/idPr';
   const newlogo = { he: 'הלוגו החדש שמוצע', en: 'new Logo offered' };
   const oldob = { he: 'הלוגו העכשווי', en: 'old Logo' };
 

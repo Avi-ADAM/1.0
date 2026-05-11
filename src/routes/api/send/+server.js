@@ -104,6 +104,12 @@ export async function POST({ request, cookies }) {
 
 		// Fallback for unexpected response structure from the server.
 		console.error('Unexpected response structure:', newd);
+
+		// Strapi returns { data: null, error: { status: 401, ... } } for auth failures
+		if (newd.error?.status === 401 || newd.error?.name === 'UnauthorizedError') {
+			throw error(401, newd.error?.message || 'Unauthorized');
+		}
+
 		return json({ error: 'Unexpected response from server', details: newd }, { status: 500 });
 
 	} catch (e) {

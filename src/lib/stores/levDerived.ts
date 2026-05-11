@@ -14,6 +14,7 @@ import {
   resourceSuggestionsStore,
   sheirutpStore,
   salesStore,
+  purchasesStore,
   askedResourcesStore,
   decisionsStore,
   projectsStore,
@@ -37,6 +38,7 @@ import {
   processDecisions,
   processProductRequests,
   processSales,
+  processPurchases,
   mergeAndSort,
   type DisplayItem
 } from '$lib/utils/levProcessors';
@@ -241,6 +243,14 @@ export const processedSales: Readable<DisplayItem[]> = derived(
   ([$sales, $projects]) => processSales($sales, $projects)
 );
 
+/**
+ * Derived store for processed purchases (sheiruts where customer)
+ */
+export const processedPurchases: Readable<DisplayItem[]> = derived(
+  [purchasesStore, projectsStore],
+  ([$purchases, $projects]) => processPurchases($purchases, $projects)
+);
+
 // ========== Final Merged Array ==========
 
 /**
@@ -284,6 +294,7 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
     processedDecisions,
     processedSheirutp,
     processedSales,
+    processedPurchases,
     milon,
     projectFilter
   ],
@@ -303,6 +314,7 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
     $decisions,
     $sheirutp,
     $sales,
+    $purchases,
     $milon,
     $projectFilter
   ]) => {
@@ -322,7 +334,8 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
       $transfers,
       $decisions,
       $sheirutp,
-      $sales
+      $sales,
+      $purchases
     );
 
     // Step 2: Apply milon filtering (visibility settings)
@@ -359,6 +372,8 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
           return $milon.sheirutp;
         case 'sales':
           return $milon.sales;
+        case 'buy':
+          return $milon.purchases;
         case 'hachla':
           return $milon.hachla;
         default:

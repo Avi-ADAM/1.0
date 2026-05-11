@@ -1,5 +1,6 @@
 <script>
   import { ProgressBar } from 'progressbar-svelte';
+  import { executeAction } from '$lib/client/actionClient';
   import { goto } from '$app/navigation';
   import dayjs from 'dayjs';
   import { lang } from '$lib/stores/lang.js';
@@ -441,40 +442,19 @@ ${adduser2}
         console.log(error1);
       }
     } else {
-      console.log('just add vote to asked and update to not show for me again');
+      // 3+ members: just record the vote via action (handles notifications + socket)
       try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation 
-                        {
-                            updateAsk(
-                         id: "${askId}" 
-                                data: { vots: [${userss}, 
-                                       {
-                                        what: true
-                                        users_permissions_user: "${idL}"
-                                        ide:${idL}
-                                        zman:"${d.toISOString()}"
-                                      }
-                                    ]}
-                        ){data{id}}
-                     
-                    }
-`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
-        onAcsept?.({
-          ani: 'asked',
-          coinlapach: coinlapach
+        const result = await executeAction('addVote', {
+          type: 'ask',
+          id: askId,
+          projectId: projectId,
+          existingComponentData: users
         });
+        if (result.success) {
+          onAcsept?.({ ani: 'asked', coinlapach: coinlapach });
+        } else {
+          error1 = result.error;
+        }
       } catch (e) {
         error1 = e;
         console.log(error1);

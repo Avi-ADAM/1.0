@@ -104,7 +104,7 @@
         return;
       }
 
-      let finishDate = endDate || '';
+      let finishDate = endDate ? new Date(endDate).toISOString() : null;
 
       const response = await fetch('/api/action', {
         method: 'POST',
@@ -117,7 +117,7 @@
             userId: userId,
             matanots: [data.mId],
             startDate: new Date(startDate).toISOString(),
-            finnishDate: finishDate || null,
+            finnishDate: finishDate,
             price: price,
             quant: quantity,
             total: totalPrice

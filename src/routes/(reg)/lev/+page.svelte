@@ -268,6 +268,9 @@
           maap={displayItems.filter((i) => i.ani === 'wegets').length}
           askma={displayItems.filter((i) => i.ani === 'askedm').length}
           hachlot={displayItems.filter((i) => i.ani === 'hachlatot').length}
+          saless={displayItems.filter((i) => i.ani === 'sale').length}
+          sheirutps={displayItems.filter((i) => i.ani === 'sheirutp').length}
+          purchasesn={displayItems.filter((i) => i.ani === 'buy').length}
         />
       </div>
     {:else}
@@ -286,7 +289,10 @@
           ppmash: true,
           pmashs: true,
           pmaap: true,
-          askmap: true
+          askmap: true,
+          sheirutp: true,
+          sales: true,
+          purchases: true
         }}
         onMesima={mesima}
         onUser={user}
@@ -308,6 +314,9 @@
         sug={displayItems.filter((i) => i.ani === 'meData').length}
         wel={displayItems.filter((i) => i.ani === 'walcomen').length}
         ask={displayItems.filter((i) => i.ani === 'askedcoin').length}
+        saless={displayItems.filter((i) => i.ani === 'sale').length}
+        sheirutps={displayItems.filter((i) => i.ani === 'sheirutp').length}
+        purchasesn={displayItems.filter((i) => i.ani === 'buy').length}
         nam={$userStore?.username || page.data.username}
         picLink={$userStore?.profilePic || ''}
         total={''}

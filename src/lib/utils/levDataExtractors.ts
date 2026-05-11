@@ -1150,11 +1150,119 @@ export function extractProductRequests(userData: any): ProductRequestData[] {
 }
 
 /**
+ * Helper to map raw sheirut data to SaleData structure
+ */
+function mapSaleData(sheirut: any, projectId: string, userData: any, mode: 'sale' | 'buy'): SaleData {
+  const attrs = sheirut.attributes;
+  const customer = attrs.users_permissions_users?.data[0];
+  const firstMatana = attrs.matanots?.data?.[0]?.attributes;
+  const forumData = attrs.forums?.data?.[0];
+
+  // Extract iCanGetMonay user
+  const iCanGetMonayUser = attrs.iCanGetMonay?.data;
+  const iCanGetMonay = iCanGetMonayUser ? {
+    id: iCanGetMonayUser.id,
+    username: iCanGetMonayUser.attributes?.username || '',
+    profilePic: iCanGetMonayUser.attributes?.profilePic?.data?.attributes?.url
+  } : undefined;
+
+  // Extract iTransferedTo user
+  const iTransferedToUser = attrs.iTransferedTo?.data;
+  const iTransferedTo = iTransferedToUser ? {
+    id: iTransferedToUser.id,
+    username: iTransferedToUser.attributes?.username || '',
+    profilePic: iTransferedToUser.attributes?.profilePic?.data?.attributes?.url
+  } : undefined;
+
+  // Extract weFinnish votes
+  const weFinnish = attrs.weFinnish?.data?.map((v: any) => ({
+    id: v.id,
+    what: v.attributes?.what,
+    order: v.attributes?.order,
+    why: v.attributes?.why,
+    users_permissions_user: v.attributes?.users_permissions_user
+  })) || [];
+
+  // Extract forum messages
+  const messages = forumData?.attributes?.messages?.data?.map((m: any) => ({
+    id: m.id,
+    content: m.attributes?.content,
+    createdAt: m.attributes?.createdAt,
+    userId: m.attributes?.users_permissions_user?.data?.id,
+    username: m.attributes?.users_permissions_user?.data?.attributes?.username,
+    userPic: m.attributes?.users_permissions_user?.data?.attributes?.profilePic?.data?.attributes?.url
+  })) || [];
+
+  // Fetch project details either from param or nested data
+  const projectInfo = attrs.project?.data;
+  const projectName = projectInfo?.attributes?.projectName || userData.attributes?.projects_1s?.data?.find((p: any) => p.id === projectId)?.attributes?.projectName;
+  const projectSrc = projectInfo?.attributes?.profilePic?.data?.attributes?.url || userData.attributes?.projects_1s?.data?.find((p: any) => p.id === projectId)?.attributes?.profilePic?.data?.attributes?.url;
+
+  return {
+    id: sheirut.id,
+    projectId: projectId,
+    projectName: projectName,
+    projectSrc: projectSrc,
+    members: projectInfo?.attributes?.user_1s?.data?.map((u: any) => ({
+      id: u.id,
+      username: u.attributes?.username,
+      profilePic: u.attributes?.profilePic?.data?.attributes?.url
+    })) || userData.attributes?.projects_1s?.data?.find((p: any) => p.id === projectId)?.attributes?.user_1s?.data?.map((u: any) => ({
+      id: u.id,
+      username: u.attributes?.username,
+      profilePic: u.attributes?.profilePic?.data?.attributes?.url
+    })) || [],
+
+    // Customer info
+    customerId: customer?.id || userData.id, // Fallback to current user if it's a purchase
+    customerName: customer?.attributes?.username || userData.attributes?.username,
+    customerSrc: customer?.attributes?.profilePic?.data?.attributes?.url || userData.attributes?.profilePic?.data?.attributes?.url,
+
+    // Product details
+    name: firstMatana?.name || attrs.name || '',
+    descrip: firstMatana?.desc || attrs.descrip || '',
+    price: attrs.price || firstMatana?.price || 0,
+    quant: attrs.quant || firstMatana?.quant || 0,
+    total: attrs.total || 0,
+    kindOf: firstMatana?.kindOf || '',
+    startDate: attrs.startDate,
+    finnishDate: attrs.finnishDate,
+    productPic: firstMatana?.pic?.data?.attributes?.url,
+
+    // Status flags
+    isApruved: attrs.isApruved || false,
+    iGotIt: attrs.iGotIt || false,
+    iTransferMoney: attrs.iTransferMoney || false,
+    moneyTransfered: attrs.moneyTransfered || false,
+    productExepted: attrs.productExepted || false,
+
+    // Money handling
+    iCanGetMonay,
+    iTransferedTo,
+    iGotMoney: attrs.iGotMoney || [],
+
+    // Delivery confirmation voting
+    weFinnish,
+
+    // Communication
+    forumId: forumData?.id || -1,
+    messages,
+
+    // Additional fields
+    matanots: attrs.matanots?.data || [],
+    equaliSplited: attrs.equaliSplited || false,
+    oneTime: attrs.oneTime || false,
+    myid: userData.id,
+
+    // Processor metadata
+    ani: mode,
+    azmi: mode
+  };
+}
+
+/**
  * Extract approved sales (sheiruts) from GraphQL user data
  * These are active sales that project members need to manage
- * 
- * @param userData - Raw GraphQL response data
- * @returns Array of sale data
  */
 export function extractSales(userData: any): SaleData[] {
   const sales: SaleData[] = [];
@@ -1163,127 +1271,48 @@ export function extractSales(userData: any): SaleData[] {
     return sales;
   }
 
-  const projects = userData.attributes.projects_1s.data;
-
-  for (const project of projects) {
+  for (const project of userData.attributes.projects_1s.data) {
     if (!project?.attributes?.sheiruts?.data) {
       continue;
     }
 
     for (const sheirut of project.attributes.sheiruts.data) {
-      if (!sheirut?.id || !sheirut?.attributes) {
-        continue;
-      }
+      if (!sheirut?.id || !sheirut?.attributes) continue;
 
       const attrs = sheirut.attributes;
+      if (attrs.archived || !attrs.isApruved) continue;
+      if (attrs.moneyTransfered && attrs.productExepted) continue;
 
-      // Skip archived sales
-      if (attrs.archived === true) {
-        continue;
-      }
-
-      // Only include approved sales that are not fully completed
-      if (!attrs.isApruved) {
-        continue;
-      }
-
-      // Skip if both money transferred and product delivered
-      if (attrs.moneyTransfered === true && attrs.productExepted === true) {
-        continue;
-      }
-
-      const customer = attrs.users_permissions_users?.data[0];
-      const firstMatana = attrs.matanots?.data?.[0]?.attributes;
-      const forumData = attrs.forums?.data?.[0];
-
-      // Extract iCanGetMonay user
-      const iCanGetMonayUser = attrs.iCanGetMonay?.data;
-      const iCanGetMonay = iCanGetMonayUser ? {
-        id: iCanGetMonayUser.id,
-        username: iCanGetMonayUser.attributes?.username || '',
-        profilePic: iCanGetMonayUser.attributes?.profilePic?.data?.attributes?.url
-      } : undefined;
-
-      // Extract iTransferedTo user
-      const iTransferedToUser = attrs.iTransferedTo?.data;
-      const iTransferedTo = iTransferedToUser ? {
-        id: iTransferedToUser.id,
-        username: iTransferedToUser.attributes?.username || '',
-        profilePic: iTransferedToUser.attributes?.profilePic?.data?.attributes?.url
-      } : undefined;
-
-      // Extract weFinnish votes
-      const weFinnish = attrs.weFinnish?.data?.map((v: any) => ({
-        id: v.id,
-        what: v.attributes?.what,
-        order: v.attributes?.order,
-        why: v.attributes?.why,
-        users_permissions_user: v.attributes?.users_permissions_user
-      })) || [];
-
-      // Extract forum messages
-      const messages = forumData?.attributes?.messages?.data?.map((m: any) => ({
-        id: m.id,
-        content: m.attributes?.content,
-        createdAt: m.attributes?.createdAt,
-        userId: m.attributes?.users_permissions_user?.data?.id,
-        username: m.attributes?.users_permissions_user?.data?.attributes?.username,
-        userPic: m.attributes?.users_permissions_user?.data?.attributes?.profilePic?.data?.attributes?.url
-      })) || [];
-
-      sales.push({
-        id: sheirut.id,
-        projectId: project.id,
-        projectName: project.attributes.projectName,
-        projectSrc: project.attributes.profilePic?.data?.attributes?.url,
-
-        // Customer info
-        customerId: customer?.id || '',
-        customerName: customer?.attributes?.username || '',
-        customerSrc: customer?.attributes?.profilePic?.data?.attributes?.url,
-
-        // Product details
-        name: firstMatana?.name || attrs.name || '',
-        descrip: firstMatana?.desc || attrs.descrip || '',
-        price: attrs.price || firstMatana?.price || 0,
-        quant: attrs.quant || firstMatana?.quant || 0,
-        total: attrs.total || 0,
-        kindOf: firstMatana?.kindOf || '',
-        startDate: attrs.startDate,
-        finnishDate: attrs.finnishDate,
-        productPic: firstMatana?.pic?.data?.attributes?.url,
-
-        // Status flags
-        isApruved: attrs.isApruved || false,
-        iGotIt: attrs.iGotIt || false,
-        iTransferMoney: attrs.iTransferMoney || false,
-        moneyTransfered: attrs.moneyTransfered || false,
-        productExepted: attrs.productExepted || false,
-
-        // Money handling
-        iCanGetMonay,
-        iTransferedTo,
-        iGotMoney: attrs.iGotMoney || [],
-
-        // Delivery confirmation voting
-        weFinnish,
-
-        // Communication
-        forumId: forumData?.id,
-        messages,
-
-        // Additional fields
-        matanots: attrs.matanots?.data || [],
-        equaliSplited: attrs.equaliSplited || false,
-        oneTime: attrs.oneTime || false,
-        myid: userData.id,
-
-        // Processor metadata
-        ani: 'sale',
-        azmi: 'sale'
-      });
+      sales.push(mapSaleData(sheirut, project.id, userData, 'sale'));
     }
   }
 
   return sales;
+}
+
+/**
+ * Extract purchases (sheiruts where user is customer) from GraphQL user data
+ */
+export function extractPurchases(userData: any): SaleData[] {
+  const purchases: SaleData[] = [];
+
+  if (!userData?.attributes?.sheiruts?.data) {
+    return purchases;
+  }
+
+  for (const sheirut of userData.attributes.sheiruts.data) {
+    if (!sheirut?.id || !sheirut?.attributes) continue;
+
+    const attrs = sheirut.attributes;
+    if (attrs.archived || !attrs.isApruved) continue;
+    
+    // For purchases, we might want to keep the card even if completed for a while, 
+    // but follow similar logic as seller side for now to prevent clutter.
+    if (attrs.moneyTransfered && attrs.productExepted) continue;
+
+    const projectId = attrs.project?.data?.id || '';
+    purchases.push(mapSaleData(sheirut, projectId, userData, 'buy'));
+  }
+
+  return purchases;
 }

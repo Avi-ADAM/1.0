@@ -30,6 +30,7 @@ import {
   decisionsStore,
   sheirutpStore,
   salesStore,
+  purchasesStore,
   saveSnapshot,
   loadSnapshot,
   clearSnapshot,
@@ -54,7 +55,8 @@ import {
   extractTransfers,
   extractDecisions,
   extractProductRequests,
-  extractSales
+  extractSales,
+  extractPurchases
 } from './levDataExtractors';
 import { fetchMainUserData, fetchOpenMissions } from './levGraphQLQueries';
 
@@ -168,6 +170,7 @@ export async function initializeLevData(
     // Check if it's an authentication error
     if (error instanceof Error) {
       if (error.message.includes('401') || error.message.includes('403') || error.message.includes('Unauthorized')) {
+        clearSnapshot(); // Remove stale cached data so it's not shown on next visit
         throw new Error('Authentication failed. Please log in again.');
       }
     }
@@ -226,6 +229,7 @@ export function restoreFromSnapshot(snapshot: SnapshotData): void {
     decisionsStore.set(snapshot.data.decisions);
     sheirutpStore.set(snapshot.data.sheirutp || []);
     salesStore.set(snapshot.data.sales || []);
+    purchasesStore.set(snapshot.data.purchases || []);
 
     console.log('✅ [levDataLoader] All stores restored from snapshot');
   } catch (error) {
@@ -351,10 +355,15 @@ export function populateStores(data: any, userId: string): void {
     sheirutpStore.set(sheirutp);
     console.log(`✅ [levDataLoader] Sheirutpends set (${sheirutp.length} items)`);
 
-    // Extract and set sales (approved sales)
+    // Extract and set sales (approved sales for seller side)
     const salesData = extractSales(userData);
     salesStore.set(salesData);
     console.log(`✅ [levDataLoader] Sales set (${salesData.length} items)`);
+
+    // Extract and set purchases (approved sales for buyer side)
+    const purchaseData = extractPurchases(userData);
+    purchasesStore.set(purchaseData);
+    console.log(`✅ [levDataLoader] Purchases set (${purchaseData.length} items)`);
 
     console.log('✅ [levDataLoader] All stores populated successfully');
   } catch (error) {
@@ -401,7 +410,8 @@ export function saveCurrentSnapshot(): void {
         decisions: get(decisionsStore),
         resourceSuggestions: get(resourceSuggestionsStore),
         sheirutp: get(sheirutpStore),
-        sales: get(salesStore)
+        sales: get(salesStore),
+        purchases: get(purchasesStore)
       }
     };
 

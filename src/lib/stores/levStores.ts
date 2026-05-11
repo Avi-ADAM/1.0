@@ -384,6 +384,9 @@ export const sheirutpStore: Writable<ProductRequestData[]> = writable([]);
 /** Approved sales (sheiruts) */
 export const salesStore: Writable<SaleData[]> = writable([]);
 
+/** My purchases (sheiruts where I am the customer) */
+export const purchasesStore: Writable<SaleData[]> = writable([]);
+
 // ========== UI State Stores ==========
 
 /** Current view mode: true = cards, false = coins */
@@ -404,7 +407,8 @@ export const milon: Writable<MilonConfig> = writable({
   pmaap: true,    // בקשות משאבים
   askmap: true,   // בקשות משאבים ממני
   sheirutp: true, // בקשות שירות
-  sales: true     // מכירות מאושרות
+  sales: true,    // מכירות מאושרות
+  purchases: true // קניות שלי
 });
 
 /** Current project filter (null = all projects) */
@@ -437,6 +441,7 @@ export interface SnapshotData {
     resourceSuggestions: ResourceSuggestionData[];
     sheirutp: ProductRequestData[];
     sales: SaleData[];
+    purchases: SaleData[];
   };
 }
 

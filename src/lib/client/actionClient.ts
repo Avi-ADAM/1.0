@@ -280,7 +280,7 @@ export interface ActionParamsMap {
   ensureStageForum: EnsureStageForumParams;
   timerSave: TimerSaveParams;
   addVote: {
-    type: 'pend' | 'sheirutpend';
+    type: 'pend' | 'sheirutpend' | 'ask' | 'decision';
     id: string;
     projectId: string;
     existingComponentData?: any[];

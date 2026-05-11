@@ -24,6 +24,8 @@
   let pmaap = 'pmaap';
   let askmap = 'askmap';
   let sheirutp = 'sheirutp';
+  let purchases = 'purchases';
+  let hachla = 'hachla';
   let selectedProjectName = $state(null);
   // נאחסן את כל המצבים באובייקט אחד
   let states = $state({
@@ -38,7 +40,9 @@
     pmashs,
     pmaap,
     askmap,
-    sheirutp
+    sheirutp,
+    purchases,
+    hachla
   });
   onMount(async () => {
     if (filterKind === 'projects') {
@@ -172,6 +176,11 @@
           he: 'הצגת בקשות להצטרפות ולהשקעת משאבים ברקמות בלבד',
           en: 'show only requests to join and invest resorces on freeMates'
         };
+      } else if (num === 'u') {
+        fir = {
+          he: 'הצגת הקניות שלי בלבד',
+          en: 'show only my purchases'
+        };
       }
     } else {
       fir = {
@@ -221,6 +230,7 @@
     askma = 13,
     hachlot = 9,
     sheirutps = 13,
+    purchasesn = 0,
     low = true,
     onHover,
     onShowonly,
@@ -352,6 +362,15 @@
         he: `בקשות שירות (${sheirutps})`,
         en: `Service Requests (${sheirutps})`
       }
+    },
+    {
+      name: 'purchases',
+      val: true,
+      color: 'blue',
+      word: {
+        he: `קניות שלי (${purchasesn})`,
+        en: `My Purchases (${purchasesn})`
+      }
     }
   ]);
 </script>
@@ -362,7 +381,7 @@
   {#if filterKind == 'kind'}
     {#each milon.filter((item) => {
       // מיפוי של שמות ה-items לערכים המספריים שלהם
-      const valueMap = { fiap: fia, sugg: sug, pend: pen, asks: ask, betaha: beta, desi: des, ppmash: pmash, pmashs: mashs, pmaap: maap, askmap: askma, hachla: null, sheirutp: sheirutps }; // אין ערך מספרי
+      const valueMap = { fiap: fia, sugg: sug, pend: pen, asks: ask, betaha: beta, desi: des, ppmash: pmash, pmashs: mashs, pmaap: maap, askmap: askma, hachla: hachlot, sheirutp: sheirutps, purchases: purchasesn }; // אין ערך מספרי
 
       // מחזיר true רק אם יש ערך מספרי והוא גדול מ-0
       return valueMap[item.name] > 0;

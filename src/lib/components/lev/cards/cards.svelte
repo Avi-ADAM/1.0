@@ -16,6 +16,7 @@
   import Vid from '../../../components/lev/didiget.svelte';
   import ProductRequestCard from './ProductRequestCard.svelte';
   import SaleCard from './SaleCard.svelte';
+  import CustomerSaleCard from './CustomerSaleCard.svelte';
   //import { fly } from 'svelte/transition';
   import { onMount } from 'svelte';
   import Header from './../../header/header.svelte';
@@ -47,7 +48,8 @@
     askma = 13,
     hachlot = 99,
     saless = 99,
-    sheirutps = 99
+    sheirutps = 99,
+    purchasesn = 0
   } = $props();
 
   let milon = $state({
@@ -65,7 +67,8 @@
     hachla: true,
     vidu: true,
     sheirutp: true,
-    sales: true
+    sales: true,
+    purchases: true
   });
   // Import Swiper styles
   import 'swiper/css';
@@ -241,21 +244,21 @@
   $effect(() => {
     console.log(swiperRef, 'swiperREF');
     if (!isScrolable.value) {
-      if (swiperRef) {
+      if (swiperRef && !swiperRef.destroyed) {
         swiperRef.allowTouchMove = false;
         swiperRef.allowSlideNext = false;
         swiperRef.allowSlidePrev = false;
-        swiperRef.mousewheel.disable();
+        swiperRef.mousewheel?.disable();
         swiperRef.disable();
         swiperRef.update();
       }
     } else {
-      if (swiperRef) {
+      if (swiperRef && !swiperRef.destroyed) {
         swiperRef.enable();
         swiperRef.allowTouchMove = true;
         swiperRef.allowSlideNext = true;
         swiperRef.allowSlidePrev = true;
-        swiperRef.mousewheel.enable();
+        swiperRef.mousewheel?.enable();
         swiperRef.update();
       }
     }
@@ -453,6 +456,9 @@
                     {maap}
                     {askma}
                     {hachlot}
+                    {saless}
+                    {sheirutps}
+                    {purchasesn}
                     filterKind="kind"
                   />
                 {/if}
@@ -559,6 +565,18 @@
                       ? 'swipr-slidemobile'
                       : 'swiper-slidec'} "
                     ><SaleCard
+                      {buble}
+                      isFirst={currentIndex === i}
+                      onProj={proj}
+                      {onChat}
+                    /></SwiperSlide
+                  >
+                {:else if buble.ani === 'buy' && milon.sales == true}
+                  <SwiperSlide
+                    class="{isMobileOrTablet()
+                      ? 'swipr-slidemobile'
+                      : 'swiper-slidec'} "
+                    ><CustomerSaleCard
                       {buble}
                       isFirst={currentIndex === i}
                       onProj={proj}

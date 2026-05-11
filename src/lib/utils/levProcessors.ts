@@ -1978,6 +1978,7 @@ export function processProductRequests(
 
     const myid = request.myid;
     const users = request.vots || [];
+    const user_1s = getProjectUsers(request.projectId) || [];
 
     // Calculate max order for "Active" vote version
     const maxOrder = users.reduce((max: number, v: any) => Math.max(max, v.order || 0), 0);
@@ -2047,6 +2048,7 @@ export function processProductRequests(
 
       // Status Fields
       users,
+      user_1s,
       uids, // All voters (history included)
       already,
       mypos,
@@ -2157,6 +2159,62 @@ export function processSales(
 
       // Pass through all sale data
       ...sale
+    };
+  });
+}
+
+/**
+ * Process approved purchases into display items
+ * 
+ * @param purchases - Array of purchase data
+ * @param projects - Array of project data for lookups
+ * @returns Array of display items ready for rendering
+ */
+export function processPurchases(
+  purchases: SaleData[],
+  projects: ProjectData[]
+): DisplayItem[] {
+  if (!purchases || !Array.isArray(purchases)) {
+    return [];
+  }
+
+  return purchases.map(purchase => {
+    const projectInfo = createProjectInfo(purchase.projectId);
+    const myid = purchase.myid;
+    
+    // For purchases, priority logic might be different
+    let basePriority = 15;
+    if (!purchase.iGotIt) {
+      basePriority = 5; // Should confirm receipt
+    } else if (!purchase.iTransferMoney) {
+      basePriority = 10; // Should pay
+    } else if (purchase.iGotIt && purchase.iTransferMoney && !purchase.moneyTransfered) {
+      basePriority = 20; // Waiting for seller confirmation
+    }
+
+    const status = {
+      iGotIt: purchase.iGotIt,
+      iTransferMoney: purchase.iTransferMoney,
+      sellerConfirmedMoney: purchase.moneyTransfered,
+      sellerSaysDelivered: purchase.productExepted
+    };
+
+    return {
+      // Common display fields
+      ani: 'buy',
+      azmi: 'buy',
+      pl: basePriority,
+      coinlapach: `buy-${purchase.id}`,
+
+      // Project Info
+      ...projectInfo,
+      src: projectInfo.src2 || '',
+
+      // Purchase-specific status
+      status,
+
+      // Pass through all data
+      ...purchase
     };
   });
 }
