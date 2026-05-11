@@ -331,6 +331,11 @@
           : null
       };
 
+      if (newLap.stop && new Date(newLap.stop) <= new Date(newLap.start)) {
+        toast.error($lang === 'he' ? 'שעת הסוף חייבת להיות אחרי שעת ההתחלה' : 'End time must be after start time');
+        return;
+      }
+
       timer.attributes.activeTimer.data.attributes.timers[index] = {
         ...timerEntry,
         ...newLap,
@@ -378,8 +383,8 @@
       start: now.toISOString(),
       stop: now.toISOString(),
       isEditing: true,
-      editStart: now.toISOString().slice(0, 16),
-      editStop: now.toISOString().slice(0, 16)
+      editStart: toLocalDatetimeString(now.toISOString()),
+      editStop: toLocalDatetimeString(now.toISOString())
     };
 
     const updatedTimer = structuredClone($state.snapshot(timer));
