@@ -248,7 +248,7 @@ export interface SaleData {
     id: string;
     username: string;
     profilePic?: string;
-  };
+  }[];  // manyToMany - list of project members who can receive money
   iTransferedTo?: {
     id: string;
     username: string;

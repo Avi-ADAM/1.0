@@ -47,7 +47,9 @@
 
           const result = await response.json();
           if (!result.success) {
-            throw new Error(result.error?.message || 'Failed to create chat forum.');
+            throw new Error(
+              result.error?.message || 'Failed to create chat forum.'
+            );
           }
 
           const newForumId = result.data?.forumId;
@@ -130,10 +132,84 @@
         en: 'You should receive the money',
         ar: 'يجب أن تستلم المال'
       }
+    },
+    moneyReceivers: {
+      he: 'מקבלי הכסף',
+      en: 'Money Recipients',
+      ar: 'مستلمو المال'
+    },
+    noReceiver: {
+      he: 'מלאו מקבל כסף',
+      en: 'Set a money receiver',
+      ar: 'حدد مستلم المال'
+    },
+    noReceiverDesc: {
+      he: 'כדי שהלקוח יוכל להעביר לכם כסף, הגש.י את עצמך כמקבל.ת',
+      en: 'So the customer can transfer money to you, add yourself as a recipient',
+      ar: 'حتى يتمكن العميل من تحويل الأموال إليك، أضف نفسك كمستلم'
+    },
+    addMyself: {
+      he: 'הוסף אותי כמקבל כסף',
+      en: 'Add me as money recipient',
+      ar: 'أضفني كمستلم'
+    },
+    removeMyself: {
+      he: 'הסר אותי מהרשימה',
+      en: 'Remove me from list',
+      ar: 'أزلني من القائمة'
     }
   };
 
   let isProcessing = $state(false);
+  let isTogglingReceiver = $state(false);
+
+  const moneyReceivers = $derived(
+    Array.isArray(buble.iCanGetMonay) ? buble.iCanGetMonay : []
+  );
+  const iAmReceiver = $derived(
+    moneyReceivers.some((u) => String(u.id) === String(buble.myid))
+  );
+
+  async function handleToggleReceiver() {
+    if (isTogglingReceiver) return;
+    isTogglingReceiver = true;
+    const action = iAmReceiver ? 'remove' : 'add';
+    try {
+      const res = await fetch('/api/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actionKey: 'toggleMoneyReceiver',
+          params: { id: buble.id, projectId: buble.projectId, action }
+        })
+      });
+      const result = await res.json();
+      if (!result.success) throw new Error(result.error?.message || 'Failed');
+
+      if (action === 'add') {
+        buble.iCanGetMonay = [
+          ...moneyReceivers,
+          {
+            id: buble.myid,
+            username: buble.myUsername || '?',
+            profilePic: buble.myProfilePic
+          }
+        ];
+      } else {
+        buble.iCanGetMonay = moneyReceivers.filter(
+          (u) => String(u.id) !== String(buble.myid)
+        );
+      }
+      toast.success(
+        action === 'add' ? t.addMyself[$lang] : t.removeMyself[$lang]
+      );
+    } catch (err) {
+      console.error(err);
+      toast.error(t.error[$lang]);
+    } finally {
+      isTogglingReceiver = false;
+    }
+  }
 
   async function handleConfirmDelivery() {
     if (isProcessing || buble.alreadyVoted) return;
@@ -430,36 +506,92 @@
       </div>
     {/if}
 
-    <!-- Money Recipient Info -->
-    {#if buble.iCanGetMonay}
+    <!-- Money Receivers Section -->
+    <div
+      class="rounded-xl border overflow-hidden"
+      class:border-red-200={moneyReceivers.length === 0}
+      class:dark:border-red-800={moneyReceivers.length === 0}
+      class:border-yellow-200={moneyReceivers.length > 0}
+      class:dark:border-yellow-700={moneyReceivers.length > 0}
+    >
       <div
-        class="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-xl border border-yellow-200 dark:border-yellow-700"
+        class="text-[10px] font-semibold uppercase px-3 pt-2 pb-1"
+        class:text-red-600={moneyReceivers.length === 0}
+        class:dark:text-red-400={moneyReceivers.length === 0}
+        class:text-yellow-700={moneyReceivers.length > 0}
+        class:dark:text-yellow-400={moneyReceivers.length > 0}
       >
-        <div
-          class="text-[10px] text-yellow-700 dark:text-yellow-400 uppercase font-semibold mb-2"
-        >
-          {$lang === 'he' ? 'מקבל הכסף' : 'Money Recipient'}
-        </div>
-        <div class="flex items-center gap-3">
-          {#if buble.iCanGetMonay.profilePic}
-            <img
-              src={buble.iCanGetMonay.profilePic}
-              alt={buble.iCanGetMonay.username}
-              class="w-10 h-10 rounded-full object-cover border-2 border-yellow-400/50"
-            />
-          {:else}
-            <div
-              class="w-10 h-10 rounded-full bg-yellow-400/20 flex items-center justify-center text-yellow-600 font-bold text-sm"
-            >
-              {buble.iCanGetMonay.username?.charAt(0)}
-            </div>
-          {/if}
-          <span class="font-semibold text-gray-800 dark:text-gray-200">
-            {buble.iCanGetMonay.username}
-          </span>
-        </div>
+        {t.moneyReceivers[$lang]}
       </div>
-    {/if}
+
+      {#if moneyReceivers.length === 0}
+        <!-- Empty state: call to action -->
+        <div class="bg-red-50 dark:bg-red-900/10 p-3">
+          <p class="font-bold text-red-700 dark:text-red-300 text-sm">
+            {t.noReceiver[$lang]}
+          </p>
+          <p class="text-xs text-red-600 dark:text-red-400 mt-1">
+            {t.noReceiverDesc[$lang]}
+          </p>
+          <button
+            class="mt-3 w-full py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-bold text-xs transition-all disabled:opacity-50"
+            onclick={handleToggleReceiver}
+            disabled={isTogglingReceiver}
+          >
+            {isTogglingReceiver ? t.submitting[$lang] : t.addMyself[$lang]}
+          </button>
+        </div>
+      {:else}
+        <!-- List of receivers + self-add/remove -->
+        <div class="bg-yellow-50 dark:bg-yellow-900/10 p-3 space-y-2">
+          {#each moneyReceivers as u (u.id)}
+            <div class="flex items-center gap-2">
+              {#if u.profilePic}
+                <img
+                  src={u.profilePic}
+                  alt={u.username}
+                  class="w-8 h-8 rounded-full object-cover border border-yellow-300"
+                />
+              {:else}
+                <div
+                  class="w-8 h-8 rounded-full bg-yellow-200 dark:bg-yellow-800 flex items-center justify-center text-yellow-700 dark:text-yellow-300 font-bold text-xs"
+                >
+                  {u.username?.charAt(0)}
+                </div>
+              {/if}
+              <span
+                class="text-sm font-semibold text-gray-800 dark:text-gray-200"
+                >{u.username}</span
+              >
+              {#if String(u.id) === String(buble.myid)}
+                <span
+                  class="mr-auto text-[9px] bg-yellow-200 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 px-2 py-0.5 rounded-full font-bold"
+                  >אתה</span
+                >
+              {/if}
+            </div>
+          {/each}
+
+          {#if iAmReceiver}
+            <button
+              class="w-full py-1.5 rounded-lg border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 text-xs font-semibold hover:bg-red-50 dark:hover:bg-red-900/20 transition-all disabled:opacity-50 mt-1"
+              onclick={handleToggleReceiver}
+              disabled={isTogglingReceiver}
+            >
+              {isTogglingReceiver ? t.submitting[$lang] : t.removeMyself[$lang]}
+            </button>
+          {:else}
+            <button
+              class="w-full py-1.5 rounded-lg border border-yellow-400 dark:border-yellow-600 text-yellow-700 dark:text-yellow-300 text-xs font-semibold hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-all disabled:opacity-50 mt-1"
+              onclick={handleToggleReceiver}
+              disabled={isTogglingReceiver}
+            >
+              {isTogglingReceiver ? t.submitting[$lang] : t.addMyself[$lang]}
+            </button>
+          {/if}
+        </div>
+      {/if}
+    </div>
   </div>
 
   <!-- Vote Status Display -->

@@ -1158,13 +1158,17 @@ function mapSaleData(sheirut: any, projectId: string, userData: any, mode: 'sale
   const firstMatana = attrs.matanots?.data?.[0]?.attributes;
   const forumData = attrs.forums?.data?.[0];
 
-  // Extract iCanGetMonay user
-  const iCanGetMonayUser = attrs.iCanGetMonay?.data;
-  const iCanGetMonay = iCanGetMonayUser ? {
-    id: iCanGetMonayUser.id,
-    username: iCanGetMonayUser.attributes?.username || '',
-    profilePic: iCanGetMonayUser.attributes?.profilePic?.data?.attributes?.url
-  } : undefined;
+  // Extract iCanGetMonay users (manyToMany - array)
+  const iCanGetMonayData = attrs.iCanGetMonay?.data;
+  const iCanGetMonay = Array.isArray(iCanGetMonayData)
+    ? iCanGetMonayData.map((u: any) => ({
+        id: u.id,
+        username: u.attributes?.username || '',
+        profilePic: u.attributes?.profilePic?.data?.attributes?.url
+      }))
+    : iCanGetMonayData
+      ? [{ id: iCanGetMonayData.id, username: iCanGetMonayData.attributes?.username || '', profilePic: iCanGetMonayData.attributes?.profilePic?.data?.attributes?.url }]
+      : [];
 
   // Extract iTransferedTo user
   const iTransferedToUser = attrs.iTransferedTo?.data;
@@ -1216,7 +1220,7 @@ function mapSaleData(sheirut: any, projectId: string, userData: any, mode: 'sale
     // Customer info
     customerId: customer?.id || userData.id, // Fallback to current user if it's a purchase
     customerName: customer?.attributes?.username || userData.attributes?.username,
-    customerSrc: customer?.attributes?.profilePic?.data?.attributes?.url || userData.attributes?.profilePic?.data?.attributes?.url,
+    customerSrc: customer?.attributes?.profilePic?.data?.attributes?.url,
 
     // Product details
     name: firstMatana?.name || attrs.name || '',
@@ -1253,6 +1257,8 @@ function mapSaleData(sheirut: any, projectId: string, userData: any, mode: 'sale
     equaliSplited: attrs.equaliSplited || false,
     oneTime: attrs.oneTime || false,
     myid: userData.id,
+    myUsername: userData.attributes?.username || '',
+    myProfilePic: userData.attributes?.profilePic?.data?.attributes?.url,
 
     // Processor metadata
     ani: mode,

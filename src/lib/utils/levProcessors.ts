@@ -2106,9 +2106,9 @@ export function processSales(
     const memberCount = projectInfo.noof || 0;
     const deliveryPending = memberCount - deliveryConfirmedCount;
 
-    // Check if current user can receive money
-    const canReceiveMoney = !sale.iCanGetMonay;
-    const isMoneyRecipient = sale.iCanGetMonay?.id === myid;
+    // Check if current user can receive money (iCanGetMonay is now an array)
+    const moneyReceivers = sale.iCanGetMonay || [];
+    const isMoneyRecipient = moneyReceivers.some((u: any) => String(u.id) === String(myid));
 
     // Check if money was transferred to current user
     const moneyTransferredToMe = sale.iTransferedTo?.id === myid && sale.iTransferMoney;
@@ -2153,7 +2153,6 @@ export function processSales(
       myDeliveryVote,
       deliveryConfirmedCount,
       deliveryPending,
-      canReceiveMoney,
       isMoneyRecipient,
       moneyTransferredToMe,
 

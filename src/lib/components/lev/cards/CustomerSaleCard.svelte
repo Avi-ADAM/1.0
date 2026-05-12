@@ -46,7 +46,9 @@
 
           const result = await response.json();
           if (!result.success) {
-            throw new Error(result.error?.message || 'Failed to create chat forum.');
+            throw new Error(
+              result.error?.message || 'Failed to create chat forum.'
+            );
           }
 
           const newForumId = result.data?.forumId;
@@ -77,17 +79,27 @@
     confirmReceipt: {
       he: 'אישור קבלת מוצר',
       en: 'Confirm Receipt',
-      ar: 'תאקיה'
+      ar: 'تأكيد الاستلام'
     },
     confirmTransfer: {
       he: 'עדכון העברת כסף',
       en: 'Confirm Money Transfer',
-      ar: 'תאקיה'
+      ar: 'تأكيد التحويل'
     },
     selectSeller: {
-      he: 'בחר למי העברת:',
+      he: ' למי להעביר את התשלום:',
       en: 'Select who you paid:',
-      ar: 'תאקיה'
+      ar: 'اختر من دفعت له'
+    },
+    noReceivers: {
+      he: 'עדיין אין חברי פרויקט שאישרו שיכולים לקבל כסף',
+      en: 'No members confirmed they can receive money yet',
+      ar: 'لا أعضاء وافقوا على استلام المال بعد'
+    },
+    askInChat: {
+      he: 'כדאי לבקש בצ׳אט',
+      en: 'Ask in chat',
+      ar: 'اسأل في المحادثة'
     },
     chat: { he: 'צ׳אט', en: 'Chat', ar: 'محادثة' },
     creatingChat: {
@@ -114,10 +126,10 @@
     statusLabels: {
       iGotIt: { he: 'קיבלתי', en: 'I received', ar: 'استلمת' },
       iPaid: { he: 'שילמתי', en: 'I paid', ar: 'דפעת' },
-      sellersClaimDelivered: { 
-        he: 'המוכרים טוענים שמסרו', 
-        en: 'Sellers claim delivered', 
-        ar: 'תאקיה' 
+      sellersClaimDelivered: {
+        he: 'המוכרים טוענים שמסרו',
+        en: 'Sellers claim delivered',
+        ar: 'תאקיה'
       },
       sellerConfirmedMoney: {
         he: 'המוכר אישר שקיבל',
@@ -206,7 +218,10 @@
   // Check if the recipient confirmed money
   const isMoneyConfirmedByRecipient = $derived.by(() => {
     if (!buble.iTransferedTo || !buble.iGotMoney) return false;
-    return buble.iGotMoney.some((gm: any) => gm.users_permissions_user?.data?.id === buble.iTransferedTo.id);
+    return buble.iGotMoney.some(
+      (gm: any) =>
+        gm.users_permissions_user?.data?.id === buble.iTransferedTo.id
+    );
   });
 
   const statusItems = $derived.by(() => {
@@ -219,10 +234,16 @@
       items.push({ label: t.statusLabels.iPaid[$lang], color: 'blue' });
     }
     if (buble.weFinnish && buble.weFinnish.length > 0) {
-      items.push({ label: t.statusLabels.sellersClaimDelivered[$lang], color: 'orange' });
+      items.push({
+        label: t.statusLabels.sellersClaimDelivered[$lang],
+        color: 'orange'
+      });
     }
     if (isMoneyConfirmedByRecipient) {
-      items.push({ label: t.statusLabels.sellerConfirmedMoney[$lang], color: 'green' });
+      items.push({
+        label: t.statusLabels.sellerConfirmedMoney[$lang],
+        color: 'green'
+      });
     }
 
     return items;
@@ -378,32 +399,58 @@
 
     <!-- Money Transfer Selection -->
     {#if !buble.iTransferMoney}
-      <div class="bg-indigo-50 dark:bg-indigo-900/20 p-3 rounded-xl border border-indigo-200 dark:border-indigo-700">
-        <div class="text-[10px] text-indigo-700 dark:text-indigo-400 uppercase font-semibold mb-2">
+      <div
+        class="bg-indigo-50 dark:bg-indigo-900/20 p-3 rounded-xl border border-indigo-200 dark:border-indigo-700"
+      >
+        <div
+          class="text-[10px] text-indigo-700 dark:text-indigo-400 uppercase font-semibold mb-2"
+        >
           {t.selectSeller[$lang]}
         </div>
         <div class="flex flex-wrap gap-2">
-          {#each buble.members || [] as member}
+          {#each buble.iCanGetMonay || [] as member}
             <button
               class="flex items-center gap-2 p-2 rounded-lg bg-white dark:bg-gray-800 border border-indigo-200 dark:border-indigo-700 hover:border-indigo-500 transition-all text-xs"
               onclick={() => handleConfirmTransfer(member.id)}
               disabled={isProcessing}
             >
               {#if member.profilePic}
-                <img src={member.profilePic} alt={member.username} class="w-6 h-6 rounded-full object-cover" />
+                <img
+                  src={member.profilePic}
+                  alt={member.username}
+                  class="w-6 h-6 rounded-full object-cover"
+                />
               {:else}
-                <div class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">
+                <div
+                  class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold"
+                >
                   {member.username?.charAt(0)}
                 </div>
               {/if}
               <span>{member.username}</span>
             </button>
+          {:else}
+            <div class="flex items-center justify-between w-full gap-2">
+              <span class="text-xs text-gray-500 dark:text-gray-400 italic">
+                {t.noReceivers[$lang]}
+              </span>
+              <button
+                class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 underline underline-offset-2 hover:text-indigo-800 transition-colors shrink-0"
+                onclick={handleOpenChat}
+              >
+                {t.askInChat[$lang]}
+              </button>
+            </div>
           {/each}
         </div>
       </div>
     {:else if buble.iTransferedTo}
-      <div class="bg-green-50 dark:bg-green-900/20 p-3 rounded-xl border border-green-200 dark:border-green-700">
-        <div class="text-[10px] text-green-700 dark:text-green-400 uppercase font-semibold mb-2">
+      <div
+        class="bg-green-50 dark:bg-green-900/20 p-3 rounded-xl border border-green-200 dark:border-green-700"
+      >
+        <div
+          class="text-[10px] text-green-700 dark:text-green-400 uppercase font-semibold mb-2"
+        >
           {t.statusLabels.moneyRecipient[$lang]}
         </div>
         <div class="flex items-center gap-3">

@@ -37,6 +37,7 @@ import { chatActions } from './chat.js';
 
 import { createTaskAction } from './createTask.js';
 import { createResourceAction } from './createResource.js';
+import { toggleMoneyReceiverConfig } from './toggleMoneyReceiver.js';
 
 
 /**
@@ -88,6 +89,9 @@ export function registerAllActions(): void {
 
   // Chat actions
   chatActions.forEach(registerAction);
+
+  // Sheirut money receiver
+  registerAction(toggleMoneyReceiverConfig);
 
   // Future actions will be registered here
   // registerAction(createTaskAction);
