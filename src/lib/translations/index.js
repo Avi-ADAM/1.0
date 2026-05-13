@@ -64,6 +64,24 @@ export const config = {
         },
         {
             locale: 'he',
+            key: 'guide',
+            routes: [/^(?:\/he|\/en|\/ar)?\/guid/],
+            loader: async () => (await import('./he/guide.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'guide',
+            routes: [/^(?:\/he|\/en|\/ar)?\/guid/],
+            loader: async () => (await import('./en/guide.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'guide',
+            routes: [/^(?:\/he|\/en|\/ar)?\/guid/],
+            loader: async () => (await import('./ar/guide.json')).default,
+        },
+        {
+            locale: 'he',
             key: 'faq',
             routes: [/^\/faq/],
             loader: async () => (await import('./he/faq.json')).default,
