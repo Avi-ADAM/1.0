@@ -125,7 +125,7 @@ function validateActionConfig(config: ActionConfig): void {
       throw new Error(`Action "${config.key}": Auth rule must have a "type" field`);
     }
 
-    if (!['jwt', 'projectMember', 'role', 'custom'].includes(rule.type)) {
+    if (!['jwt', 'projectMember', 'sheirutCustomer', 'role', 'custom', 'or'].includes(rule.type)) {
       throw new Error(
         `Action "${config.key}": Auth rule has invalid type "${rule.type}"`
       );

@@ -79,7 +79,7 @@ export interface ParamRule {
  */
 export interface AuthRule {
   /** Type of authorization check */
-  type: 'jwt' | 'projectMember' | 'role' | 'custom';
+  type: 'jwt' | 'projectMember' | 'sheirutCustomer' | 'role' | 'custom' | 'or';
 
   /** Configuration specific to the auth rule type */
   config?: AuthRuleConfig;
@@ -95,6 +95,9 @@ export interface AuthRuleConfig {
   /** Parameter name containing project ID (for projectMember check) */
   projectIdParam?: string;
 
+  /** Parameter name containing sheirut ID (for sheirutCustomer check) */
+  sheirutIdParam?: string;
+
   /** Required role name (for role check) */
   requiredRole?: string;
 
@@ -104,6 +107,9 @@ export interface AuthRuleConfig {
     params: Record<string, any>,
     context: ActionContext
   ) => Promise<AuthorizationResult>;
+
+  /** Sub-rules for 'or' type — passes if ANY sub-rule passes */
+  rules?: AuthRule[];
 }
 
 /**

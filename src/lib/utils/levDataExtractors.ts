@@ -1170,13 +1170,29 @@ function mapSaleData(sheirut: any, projectId: string, userData: any, mode: 'sale
       ? [{ id: iCanGetMonayData.id, username: iCanGetMonayData.attributes?.username || '', profilePic: iCanGetMonayData.attributes?.profilePic?.data?.attributes?.url }]
       : [];
 
-  // Extract iTransferedTo user
+  // Extract iTransferedTo user (from sheirut field, fallback)
   const iTransferedToUser = attrs.iTransferedTo?.data;
-  const iTransferedTo = iTransferedToUser ? {
+  const iTransferedToFromSheirut = iTransferedToUser ? {
     id: iTransferedToUser.id,
     username: iTransferedToUser.attributes?.username || '',
     profilePic: iTransferedToUser.attributes?.profilePic?.data?.attributes?.url
   } : undefined;
+
+  // Extract haluka (sheirut money transfer tracking)
+  const halukaData = attrs.halukas?.data?.[0];
+  const halukaId = halukaData?.id ? String(halukaData.id) : null;
+  const halukaAttrs = halukaData?.attributes;
+  const halukaForumId = halukaAttrs?.forum?.data?.id ? String(halukaAttrs.forum.data.id) : null;
+  const senderconf = halukaAttrs?.senderconf || false;
+  const halukaConfirmed = halukaAttrs?.confirmed || false;
+  const halukaReceiverData = halukaAttrs?.userrecive?.data;
+  const iTransferedTo = halukaReceiverData
+    ? {
+        id: halukaReceiverData.id,
+        username: halukaReceiverData.attributes?.username || '',
+        profilePic: halukaReceiverData.attributes?.profilePic?.data?.attributes?.url
+      }
+    : iTransferedToFromSheirut;
 
   // Extract weFinnish votes
   const weFinnish = attrs.weFinnish?.data?.map((v: any) => ({
@@ -1236,7 +1252,7 @@ function mapSaleData(sheirut: any, projectId: string, userData: any, mode: 'sale
     // Status flags
     isApruved: attrs.isApruved || false,
     iGotIt: attrs.iGotIt || false,
-    iTransferMoney: attrs.iTransferMoney || false,
+    iTransferMoney: !!halukaId || attrs.iTransferMoney || false,
     moneyTransfered: attrs.moneyTransfered || false,
     productExepted: attrs.productExepted || false,
 
@@ -1244,6 +1260,12 @@ function mapSaleData(sheirut: any, projectId: string, userData: any, mode: 'sale
     iCanGetMonay,
     iTransferedTo,
     iGotMoney: attrs.iGotMoney || [],
+
+    // Haluka (money transfer tracking)
+    halukaId,
+    halukaForumId,
+    senderconf,
+    halukaConfirmed,
 
     // Delivery confirmation voting
     weFinnish,

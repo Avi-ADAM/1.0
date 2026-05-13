@@ -44,6 +44,22 @@ const qids_base = {
       data { id }
     }
   }`,
+  '2cGetMoneyReceivers': `query GetMoneyReceivers($id: ID!) {
+    sheirut(id: $id) {
+      data {
+        attributes {
+          iCanGetMonay {
+            data { id }
+          }
+        }
+      }
+    }
+  }`,
+  '2aSetMoneyReceivers': `mutation SetMoneyReceivers($id: ID!, $userIds: [ID]) {
+    updateSheirut(id: $id, data: { iCanGetMonay: $userIds }) {
+      data { id }
+    }
+  }`,
   '3projectJSONQue': `query GetProjectJSON($pid: ID!) {
   project(id: $pid) {
     data {
@@ -1027,6 +1043,17 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }`,
 
+  "65checkSheirutCustomer": `query CheckSheirutCustomer($uid: ID!, $sheirutId: ID!) {
+    sheirutpends(filters: {
+      sheirut: { id: { eq: $sheirutId } },
+      users_permissions_user: { id: { eq: $uid } }
+    }) {
+      data {
+        id
+      }
+    }
+  }`,
+
   "66getProjectsCount": `query GetProjectsCount {
     projects {
       meta {
@@ -1194,6 +1221,35 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }`,
 
+  "71.5getHaluka": `query GetHaluka($id: ID!) {
+    haluka(id: $id) {
+      data {
+        id
+        attributes {
+          usersend { data { id } }
+          userrecive { data { id } }
+          senderconf
+          confirmed
+          forum { data { id } }
+          amount
+          ushar
+        }
+      }
+    }
+  }`,
+
+  "71.6confirmHaluka": `mutation ConfirmHaluka($id: ID!, $senderconf: Boolean, $confirmed: Boolean) {
+    updateHaluka(id: $id, data: { senderconf: $senderconf, confirmed: $confirmed }) {
+      data {
+        id
+        attributes {
+          senderconf
+          confirmed
+        }
+      }
+    }
+  }`,
+
   "72createMesimabetahalich": `mutation CreateMesimabetahalich(
     $projectId: ID!,
     $missId: ID!,
@@ -1228,7 +1284,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       publishedAt: $publishedAt,
       admaticedai: $deadline,
       start: $sqedualed,
-      openMissions: [$openMid]
+      open_missions: [$openMid]
     }) {
       data {
         id
@@ -2494,6 +2550,27 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                                     }
                                   }
                                 }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    halukas(filters: { ushar: { eq: true } }) {
+                      data {
+                        id
+                        attributes {
+                          senderconf
+                          confirmed
+                          amount
+                          forum { data { id } }
+                          usersend { data { id } }
+                          userrecive {
+                            data {
+                              id
+                              attributes {
+                                username
+                                profilePic { data { attributes { url formats } } }
                               }
                             }
                           }
@@ -3775,6 +3852,27 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                               }
                             }
                           }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              halukas(filters: { ushar: { eq: true } }) {
+                data {
+                  id
+                  attributes {
+                    senderconf
+                    confirmed
+                    amount
+                    forum { data { id } }
+                    usersend { data { id } }
+                    userrecive {
+                      data {
+                        id
+                        attributes {
+                          username
+                          profilePic { data { attributes { url formats } } }
                         }
                       }
                     }

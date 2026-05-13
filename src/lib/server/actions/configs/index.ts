@@ -38,6 +38,9 @@ import { chatActions } from './chat.js';
 import { createTaskAction } from './createTask.js';
 import { createResourceAction } from './createResource.js';
 import { toggleMoneyReceiverConfig } from './toggleMoneyReceiver.js';
+import { createSheirutHalukaConfig } from './createSheirutHaluka.js';
+import { confirmSheirutHalukaConfig } from './confirmSheirutHaluka.js';
+import { ensureHalukaForumConfig } from './ensureHalukaForum.js';
 
 
 /**
@@ -92,6 +95,11 @@ export function registerAllActions(): void {
 
   // Sheirut money receiver
   registerAction(toggleMoneyReceiverConfig);
+
+  // Sheirut haluka (money transfer tracking)
+  registerAction(createSheirutHalukaConfig);
+  registerAction(confirmSheirutHalukaConfig);
+  registerAction(ensureHalukaForumConfig);
 
   // Future actions will be registered here
   // registerAction(createTaskAction);

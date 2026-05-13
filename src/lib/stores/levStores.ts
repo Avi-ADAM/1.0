@@ -263,6 +263,12 @@ export interface SaleData {
   forumId?: string;
   messages?: any[];
 
+  // Haluka (money transfer tracking)
+  halukaId?: string | null;
+  halukaForumId?: string | null;
+  senderconf?: boolean;
+  halukaConfirmed?: boolean;
+
   // Additional fields
   matanots?: any[];
   equaliSplited?: boolean;

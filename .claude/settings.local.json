@@ -9,7 +9,12 @@
       "Bash(xargs grep:*)",
       "Bash(grep -n 'let.*=\\\\|export let\\\\|$props\\\\|askId\\\\|projectId\\\\|users\\\\|noofpu' 'C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\lib\\\\components\\\\lev\\\\reqtosherut.svelte')",
       "Bash(grep -n '$props\\\\|let.*projectId\\\\|let.*askId\\\\|let.*users\\\\b\\\\|let.*noofpu\\\\|let.*userId' 'C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\lib\\\\components\\\\lev\\\\reqtosherut.svelte')",
-      "Bash(grep -n '$props\\\\|let.*kind\\\\|let.*askId\\\\|let.*users\\\\b\\\\|let.*noofpu\\\\|export let' 'C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\lib\\\\components\\\\lev\\\\decisionMaking.svelte')"
+      "Bash(grep -n '$props\\\\|let.*kind\\\\|let.*askId\\\\|let.*users\\\\b\\\\|let.*noofpu\\\\|export let' 'C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\lib\\\\components\\\\lev\\\\decisionMaking.svelte')",
+      "Bash(python3 *)",
+      "Bash(node *)",
+      "mcp__ide__getDiagnostics",
+      "Bash(grep -n '\"[0-9][0-9][^\"]*\".*`' \"C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\routes\\\\api\\\\send\\\\qids.js\")",
+      "Bash(grep -n \"'[0-9][0-9][^']*':.*\\\\`\\\\|\\\\\"[0-9][0-9][^\\\\\"]*\\\\\".*\\\\`\" \"C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\routes\\\\api\\\\send\\\\qids.js\")"
     ]
   },
   "enableAllProjectMcpServers": true,

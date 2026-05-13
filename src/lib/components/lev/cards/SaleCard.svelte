@@ -7,6 +7,7 @@
   import { isMobileOrTablet } from '$lib/utilities/device';
   import CardHeader from './CardHeader.svelte';
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
+  import SheirutHalukaCard from './SheirutHalukaCard.svelte';
 
   let {
     buble,
@@ -592,6 +593,25 @@
         </div>
       {/if}
     </div>
+
+    <!-- Haluka transfer tracking card -->
+    {#if buble.halukaId}
+      <SheirutHalukaCard
+        halukaId={String(buble.halukaId)}
+        senderId={String(buble.customerId)}
+        receiverId={String(buble.iTransferedTo?.id ?? '')}
+        senderName={buble.customerName ?? ''}
+        receiverName={buble.iTransferedTo?.username ?? ''}
+        senderPic={buble.customerSrc}
+        receiverPic={buble.iTransferedTo?.profilePic}
+        amount={buble.total ?? buble.price}
+        bind:forumId={buble.halukaForumId}
+        bind:senderconf={buble.senderconf}
+        bind:confirmed={buble.halukaConfirmed}
+        myId={String(buble.myid)}
+        projectId={String(buble.projectId)}
+      />
+    {/if}
   </div>
 
   <!-- Vote Status Display -->

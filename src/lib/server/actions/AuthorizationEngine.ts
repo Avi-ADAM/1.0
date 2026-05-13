@@ -98,13 +98,19 @@ export class AuthorizationEngine {
         
       case 'projectMember':
         return await this.checkProjectMembership(rule, userId, params, context);
-        
+
+      case 'sheirutCustomer':
+        return await this.checkSheirutCustomer(rule, userId, params, context);
+
+      case 'or':
+        return await this.checkOr(rule, userId, params, context);
+
       case 'role':
         return await this.checkRole(rule, userId, params, context);
-        
+
       case 'custom':
         return await this.checkCustom(rule, userId, params, context);
-        
+
       default:
         return {
           authorized: false,
@@ -201,6 +207,84 @@ export class AuthorizationEngine {
     }
   }
   
+  /**
+   * Check if user is the customer of a sheirut (has a sheirutpend for it)
+   */
+  private async checkSheirutCustomer(
+    rule: AuthRule,
+    userId: string,
+    params: Record<string, any>,
+    context: ActionContext
+  ): Promise<AuthorizationResult> {
+    const sheirutIdParam = rule.config?.sheirutIdParam || 'sheirutId';
+    const sheirutId = this.getNestedValue(params, sheirutIdParam);
+
+    if (!sheirutId) {
+      return {
+        authorized: false,
+        reason: rule.errorMessage || `Sheirut ID parameter "${sheirutIdParam}" is required for this action`
+      };
+    }
+
+    try {
+      const result = await this.strapiClient.execute(
+        '65checkSheirutCustomer',
+        { uid: userId, sheirutId: String(sheirutId) },
+        context.jwt,
+        context.fetch
+      );
+
+      const pends = result?.data?.sheirutpends?.data || [];
+      if (pends.length === 0) {
+        return {
+          authorized: false,
+          reason: rule.errorMessage || 'User is not the customer of this sheirut'
+        };
+      }
+
+      return { authorized: true };
+    } catch (error) {
+      console.error('Sheirut customer check failed:', error);
+      return {
+        authorized: false,
+        reason: rule.errorMessage || 'Failed to verify sheirut customer status'
+      };
+    }
+  }
+
+  /**
+   * Pass if ANY of the sub-rules passes (OR logic)
+   */
+  private async checkOr(
+    rule: AuthRule,
+    userId: string,
+    params: Record<string, any>,
+    context: ActionContext
+  ): Promise<AuthorizationResult> {
+    const subRules = rule.config?.rules;
+
+    if (!subRules || subRules.length === 0) {
+      return {
+        authorized: false,
+        reason: 'OR authorization rule has no sub-rules configured'
+      };
+    }
+
+    const failures: string[] = [];
+    for (const subRule of subRules) {
+      const result = await this.checkRule(subRule, userId, params, context);
+      if (result.authorized) {
+        return { authorized: true };
+      }
+      failures.push(result.reason || 'Unauthorized');
+    }
+
+    return {
+      authorized: false,
+      reason: rule.errorMessage || failures.join(' | ')
+    };
+  }
+
   /**
    * Check if user has a required role
    * 

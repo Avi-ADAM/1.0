@@ -6,6 +6,10 @@
   import { isMobileOrTablet } from '$lib/utilities/device';
   import CardHeader from './CardHeader.svelte';
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
+  import SheirutHalukaCard from './SheirutHalukaCard.svelte';
+  import { idd } from '$lib/stores/idd.js';
+  import { username } from '$lib/stores/pendMisMes.js';
+  import { uPic } from '$lib/stores/uPic.js';
 
   let {
     buble,
@@ -81,20 +85,15 @@
       en: 'Confirm Receipt',
       ar: 'تأكيد الاستلام'
     },
-    confirmTransfer: {
-      he: 'עדכון העברת כסף',
-      en: 'Confirm Money Transfer',
-      ar: 'تأكيد التحويل'
-    },
     selectSeller: {
-      he: ' למי להעביר את התשלום:',
-      en: 'Select who you paid:',
-      ar: 'اختر من دفعت له'
+      he: 'בחר את מי לתאם איתו את ההעברה:',
+      en: 'Select who to coordinate the transfer with:',
+      ar: 'اختر من تنسق معه التحويل'
     },
     noReceivers: {
-      he: 'עדיין אין חברי פרויקט שאישרו שיכולים לקבל כסף',
-      en: 'No members confirmed they can receive money yet',
-      ar: 'لا أعضاء وافقوا على استلام المال بعد'
+      he: 'עדיין אין חברי פרויקט שציינו שיכולים לקבל כסף',
+      en: 'No project members indicated they can receive money yet',
+      ar: 'لا يوجد أعضاء أشاروا أنهم يستطيعون استلام المال بعد'
     },
     askInChat: {
       he: 'כדאי לבקש בצ׳אט',
@@ -114,9 +113,9 @@
       ar: 'تم تأكيد الاستلام'
     },
     successTransfer: {
-      he: 'עדכנת על העברת הכסף',
-      en: 'Transfer updated',
-      ar: 'تم تحديث التحويل'
+      he: 'נפתח תהליך ההעברה',
+      en: 'Transfer process started',
+      ar: 'تم بدء عملية التحويل'
     },
     error: {
       he: 'שגיאה בביצוע הפעולה',
@@ -125,21 +124,21 @@
     },
     statusLabels: {
       iGotIt: { he: 'קיבלתי', en: 'I received', ar: 'استلمת' },
-      iPaid: { he: 'שילמתי', en: 'I paid', ar: 'דפעת' },
+      transferInProgress: { he: 'בתהליך העברה', en: 'Transfer in progress', ar: 'التحويل قيد التنفيذ' },
       sellersClaimDelivered: {
         he: 'המוכרים טוענים שמסרו',
         en: 'Sellers claim delivered',
-        ar: 'תאקיה'
+        ar: 'يدّعي البائعون أنهم سلّموا'
       },
       sellerConfirmedMoney: {
-        he: 'המוכר אישר שקיבל',
-        en: 'Seller confirmed money',
-        ar: 'תאקיה'
+        he: 'המקבל אישר קבלת הכסף',
+        en: 'Recipient confirmed receipt',
+        ar: 'أكد المستلم استلام المال'
       },
-      moneyRecipient: {
-        he: 'העברת ל:',
-        en: 'Transferred to:',
-        ar: 'תאקיה'
+      coordinatingWith: {
+        he: 'בתיאום עם:',
+        en: 'Coordinating with:',
+        ar: 'بالتنسيق مع:'
       }
     }
   };
@@ -178,7 +177,7 @@
     }
   }
 
-  async function handleConfirmTransfer(sellerId: string) {
+  async function handleConfirmTransfer(receiverId: string) {
     if (isProcessing || buble.iTransferMoney) return;
 
     isProcessing = true;
@@ -187,12 +186,12 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          actionKey: 'updateSheirut',
+          actionKey: 'createSheirutHaluka',
           params: {
-            id: buble.id,
-            projectId: buble.projectId,
-            iTransferMoney: true,
-            iTransferedTo: sellerId
+            sheirutId: String(buble.id),
+            projectId: String(buble.projectId),
+            receiverId,
+            amount: buble.total ?? buble.price ?? 0
           }
         })
       });
@@ -201,9 +200,13 @@
       if (!result.success) throw new Error(result.error?.message || 'Failed');
 
       buble.iTransferMoney = true;
-      const selectedSeller = buble.members?.find((m: any) => m.id === sellerId);
-      if (selectedSeller) {
-        buble.iTransferedTo = selectedSeller;
+      buble.halukaId = String(result.data?.halukaId);
+      buble.halukaForumId = null;
+      buble.senderconf = false;
+      buble.halukaConfirmed = false;
+      const selectedReceiver = buble.iCanGetMonay?.find((m: any) => String(m.id) === String(receiverId));
+      if (selectedReceiver) {
+        buble.iTransferedTo = selectedReceiver;
       }
       showSellerSelect = false;
       toast.success(t.successTransfer[$lang]);
@@ -231,7 +234,7 @@
       items.push({ label: t.statusLabels.iGotIt[$lang], color: 'green' });
     }
     if (buble.iTransferMoney) {
-      items.push({ label: t.statusLabels.iPaid[$lang], color: 'blue' });
+      items.push({ label: t.statusLabels.transferInProgress[$lang], color: 'blue' });
     }
     if (buble.weFinnish && buble.weFinnish.length > 0) {
       items.push({
@@ -444,41 +447,22 @@
           {/each}
         </div>
       </div>
-    {:else if buble.iTransferedTo}
-      <div
-        class="bg-green-50 dark:bg-green-900/20 p-3 rounded-xl border border-green-200 dark:border-green-700"
-      >
-        <div
-          class="text-[10px] text-green-700 dark:text-green-400 uppercase font-semibold mb-2"
-        >
-          {t.statusLabels.moneyRecipient[$lang]}
-        </div>
-        <div class="flex items-center gap-3">
-          {#if buble.iTransferedTo.profilePic}
-            <img
-              src={buble.iTransferedTo.profilePic}
-              alt={buble.iTransferedTo.username}
-              class="w-10 h-10 rounded-full object-cover border-2 border-green-400/50"
-            />
-          {:else}
-            <div
-              class="w-10 h-10 rounded-full bg-green-400/20 flex items-center justify-center text-green-600 font-bold text-sm"
-            >
-              {buble.iTransferedTo.username?.charAt(0)}
-            </div>
-          {/if}
-          <div class="flex flex-col">
-            <span class="font-semibold text-gray-800 dark:text-gray-200">
-              {buble.iTransferedTo.username}
-            </span>
-            {#if isMoneyConfirmedByRecipient}
-              <span class="text-[10px] text-green-600 font-bold uppercase">
-                {t.statusLabels.sellerConfirmedMoney[$lang]}
-              </span>
-            {/if}
-          </div>
-        </div>
-      </div>
+    {:else if buble.halukaId}
+      <SheirutHalukaCard
+        halukaId={String(buble.halukaId)}
+        senderId={String($idd)}
+        receiverId={String(buble.iTransferedTo?.id ?? '')}
+        senderName={$username}
+        receiverName={buble.iTransferedTo?.username ?? ''}
+        senderPic={$uPic}
+        receiverPic={buble.iTransferedTo?.profilePic}
+        amount={buble.total ?? buble.price}
+        bind:forumId={buble.halukaForumId}
+        bind:senderconf={buble.senderconf}
+        bind:confirmed={buble.halukaConfirmed}
+        myId={String($idd)}
+        projectId={String(buble.projectId)}
+      />
     {/if}
   </div>
 

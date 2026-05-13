@@ -73,9 +73,13 @@ export const ensureSheirutForumConfig: ActionConfig = {
   authRules: [
     { type: 'jwt' },
     {
-      type: 'projectMember',
+      type: 'or',
+      errorMessage: 'User is not a project member or a customer of this sheirut',
       config: {
-        projectIdParam: 'projectId'
+        rules: [
+          { type: 'projectMember', config: { projectIdParam: 'projectId' } },
+          { type: 'sheirutCustomer', config: { sheirutIdParam: 'sheirutId' } }
+        ]
       }
     }
   ],
