@@ -4800,6 +4800,14 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         id
       }
     }
+  }`,
+
+  '122addWeFinnishVote': `mutation CreateWeFinnishVote($sheirut: ID, $user: ID) {
+    createVote(data: { sheirut: $sheirut, users_permissions_user: $user, what: true }) {
+      data {
+        id
+      }
+    }
   }`
 };
 
@@ -5149,6 +5157,470 @@ export const moachQids = {
       data { id }
     }
   }`,
+  '103getForumThreadById': `query GetForumThreadById($forumId: ID!) {
+    forum(id: $forumId) {
+      data {
+        ...ForumThreadCore
+      }
+    }
+  }
+
+  fragment ForumThreadCore on ForumEntity {
+    id
+    attributes {
+      subject
+      spec
+      done
+      createdAt
+      publishedAt
+      updatedAt
+      messages(filters: { archived: { ne: true } }, sort: ["when:asc"], pagination: { limit: 500 }) {
+        data {
+          id
+          attributes {
+            content
+            when
+            users_permissions_user {
+              data {
+                id
+                attributes {
+                  username
+                  profilePic { data { attributes { url formats } } }
+                }
+              }
+            }
+          }
+        }
+      }
+      project { data { ...ForumProjectCore } }
+      haluka {
+        data {
+          id
+          attributes {
+            amount
+            usersend { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            userrecive { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            project { data { ...ForumProjectCore } }
+          }
+        }
+      }
+      pgisha {
+        data {
+          id
+          attributes {
+            name
+            desc
+            publishedAt
+            pgishausers {
+              data {
+                id
+                attributes {
+                  users_permissions_user {
+                    data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      asks {
+        data {
+          id
+          attributes {
+            users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            project { data { ...ForumProjectCore } }
+          }
+        }
+      }
+      sheiruts {
+        data {
+          id
+          attributes {
+            name
+            descrip
+            project { data { ...ForumProjectCore } }
+            users_permissions_users { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            sheirutpend {
+              data {
+                id
+                attributes {
+                  users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+                }
+              }
+            }
+          }
+        }
+      }
+      sheirutpend {
+        data {
+          id
+          attributes {
+            users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            project { data { ...ForumProjectCore } }
+            sheirut { data { id attributes { name project { data { ...ForumProjectCore } } } } }
+          }
+        }
+      }
+      mesimabetahaliches {
+        data {
+          id
+          attributes {
+            name
+            descrip
+            project { data { ...ForumProjectCore } }
+          }
+        }
+      }
+    }
+  }
+
+  fragment ForumProjectCore on ProjectEntity {
+    id
+    attributes {
+      projectName
+      profilePic { data { attributes { url formats } } }
+      user_1s {
+        data {
+          id
+          attributes {
+            username
+            profilePic { data { attributes { url formats } } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '105getForumSummaryById': `query GetForumSummaryById($forumId: ID!) {
+    forum(id: $forumId) {
+      data {
+        ...ForumSummaryCore
+      }
+    }
+  }
+
+  fragment ForumSummaryCore on ForumEntity {
+    id
+    attributes {
+      subject
+      spec
+      done
+      createdAt
+      publishedAt
+      updatedAt
+      messages(filters: { archived: { ne: true } }, sort: ["when:desc"], pagination: { limit: 1 }) {
+        data {
+          id
+          attributes {
+            content
+            when
+            users_permissions_user {
+              data { id attributes { username profilePic { data { attributes { url formats } } } } }
+            }
+          }
+        }
+      }
+      project { data { ...ForumProjectSummaryCore } }
+      haluka {
+        data {
+          id
+          attributes {
+            amount
+            usersend { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            userrecive { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            project { data { ...ForumProjectSummaryCore } }
+          }
+        }
+      }
+      pgisha {
+        data {
+          id
+          attributes {
+            name
+            desc
+            publishedAt
+            pgishausers {
+              data {
+                id
+                attributes {
+                  users_permissions_user {
+                    data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      asks {
+        data {
+          id
+          attributes {
+            users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            project { data { ...ForumProjectSummaryCore } }
+          }
+        }
+      }
+      sheiruts {
+        data {
+          id
+          attributes {
+            name
+            descrip
+            project { data { ...ForumProjectSummaryCore } }
+            users_permissions_users { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            sheirutpend {
+              data {
+                id
+                attributes {
+                  users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+                }
+              }
+            }
+          }
+        }
+      }
+      sheirutpend {
+        data {
+          id
+          attributes {
+            users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            project { data { ...ForumProjectSummaryCore } }
+            sheirut { data { id attributes { name project { data { ...ForumProjectSummaryCore } } } } }
+          }
+        }
+      }
+      mesimabetahaliches {
+        data {
+          id
+          attributes {
+            name
+            descrip
+            project { data { ...ForumProjectSummaryCore } }
+          }
+        }
+      }
+    }
+  }
+
+  fragment ForumProjectSummaryCore on ProjectEntity {
+    id
+    attributes {
+      projectName
+      profilePic { data { attributes { url formats } } }
+      user_1s {
+        data {
+          id
+          attributes {
+            username
+            profilePic { data { attributes { url formats } } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '104getUserForumSources': `query GetUserForumSources($uid: ID!) {
+    usersPermissionsUser(id: $uid) {
+      data {
+        id
+        attributes {
+          username
+          projects_1s {
+            data {
+              id
+              attributes {
+                projectName
+                profilePic { data { attributes { url formats } } }
+                forums(sort: ["updatedAt:desc"], pagination: { limit: 100 }) {
+                  data { ...ForumListCore }
+                }
+              }
+            }
+          }
+          halukasres {
+            data {
+              id
+              attributes {
+                forum { data { ...ForumListCore } }
+              }
+            }
+          }
+          halukasend {
+            data {
+              id
+              attributes {
+                forum { data { ...ForumListCore } }
+              }
+            }
+          }
+          pgishausers {
+            data {
+              id
+              attributes {
+                pgishas {
+                  data {
+                    id
+                    attributes {
+                      forum { data { ...ForumListCore } }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          asks {
+            data {
+              id
+              attributes {
+                forums { data { ...ForumListCore } }
+              }
+            }
+          }
+          sheirutpends {
+            data {
+              id
+              attributes {
+                forum { data { ...ForumListCore } }
+                sheirut { data { id attributes { forums { data { ...ForumListCore } } } } }
+              }
+            }
+          }
+          sheiruts {
+            data {
+              id
+              attributes {
+                forums { data { ...ForumListCore } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  fragment ForumListCore on ForumEntity {
+    id
+    attributes {
+      subject
+      spec
+      done
+      createdAt
+      publishedAt
+      updatedAt
+      messages(filters: { archived: { ne: true } }, sort: ["when:desc"], pagination: { limit: 1 }) {
+        data {
+          id
+          attributes {
+            content
+            when
+            users_permissions_user {
+              data { id attributes { username profilePic { data { attributes { url formats } } } } }
+            }
+          }
+        }
+      }
+      project { data { ...ForumListProjectCore } }
+      haluka {
+        data {
+          id
+          attributes {
+            amount
+            usersend { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            userrecive { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            project { data { ...ForumListProjectCore } }
+          }
+        }
+      }
+      pgisha {
+        data {
+          id
+          attributes {
+            name
+            desc
+            publishedAt
+            pgishausers {
+              data {
+                id
+                attributes {
+                  users_permissions_user {
+                    data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      asks {
+        data {
+          id
+          attributes {
+            users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            project { data { ...ForumListProjectCore } }
+          }
+        }
+      }
+      sheiruts {
+        data {
+          id
+          attributes {
+            name
+            descrip
+            project { data { ...ForumListProjectCore } }
+            users_permissions_users { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            sheirutpend {
+              data {
+                id
+                attributes {
+                  users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+                }
+              }
+            }
+          }
+        }
+      }
+      sheirutpend {
+        data {
+          id
+          attributes {
+            users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+            project { data { ...ForumListProjectCore } }
+            sheirut { data { id attributes { name project { data { ...ForumListProjectCore } } } } }
+          }
+        }
+      }
+      mesimabetahaliches {
+        data {
+          id
+          attributes {
+            name
+            descrip
+            project { data { ...ForumListProjectCore } }
+          }
+        }
+      }
+    }
+  }
+
+  fragment ForumListProjectCore on ProjectEntity {
+    id
+    attributes {
+      projectName
+      profilePic { data { attributes { url formats } } }
+      user_1s {
+        data {
+          id
+          attributes {
+            username
+            profilePic { data { attributes { url formats } } }
+          }
+        }
+      }
+    }
+  }`,
+
   'getMashaabims': `query getMashaabims { mashaabims { data { id attributes { name descrip price kindOf linkto } } } }`,
   'getUserSpByMashaabim': `query GetUserSpByMashaabim($idL: ID!, $mashaabimId: ID!) {
     usersPermissionsUser(id: $idL) {

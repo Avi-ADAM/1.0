@@ -41,6 +41,7 @@ import { toggleMoneyReceiverConfig } from './toggleMoneyReceiver.js';
 import { createSheirutHalukaConfig } from './createSheirutHaluka.js';
 import { confirmSheirutHalukaConfig } from './confirmSheirutHaluka.js';
 import { ensureHalukaForumConfig } from './ensureHalukaForum.js';
+import { forumReadActions } from './forum.js';
 
 
 /**
@@ -92,6 +93,7 @@ export function registerAllActions(): void {
 
   // Chat actions
   chatActions.forEach(registerAction);
+  forumReadActions.forEach(registerAction);
 
   // Sheirut money receiver
   registerAction(toggleMoneyReceiverConfig);
@@ -136,5 +138,6 @@ export {
   ensureProcessForumConfig,
   ensureStageForumConfig,
   completeMissionConfig,
-  chatActions
+  chatActions,
+  forumReadActions
 };

@@ -8,7 +8,7 @@
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
   import SheirutHalukaCard from './SheirutHalukaCard.svelte';
   import { idd } from '$lib/stores/idd.js';
-  import { username } from '$lib/stores/pendMisMes.js';
+  import { forum, username } from '$lib/stores/pendMisMes.js';
   import { uPic } from '$lib/stores/uPic.js';
 
   let {
@@ -32,6 +32,17 @@
 
     if (onChat) {
       if (buble.forumId && buble.forumId !== -1) {
+        const md = {
+          pid: Number(buble.projectId),
+          title: { he: 'אישור מכירה', en: 'Sale Approval' },
+          transferDetails: buble.name
+        };
+        const tempF = $forum;
+        tempF[buble.forumId] = {
+          ...tempF[buble.forumId],
+          md: { ...(tempF[buble.forumId]?.md || {}), ...md }
+        };
+        forum.set(tempF);
         onChat({ forumId: buble.forumId, sheirutId: buble.id });
       } else {
         isCreatingChat = true;
@@ -61,6 +72,18 @@
           }
 
           buble.forumId = newForumId;
+          const md = {
+            pid: Number(buble.projectId),
+            title: { he: 'אישור מכירה', en: 'Sale Approval' },
+            transferDetails: buble.name
+          };
+          const tempF = $forum;
+          tempF[newForumId] = {
+            loading: false,
+            messages: tempF[newForumId]?.messages || [],
+            md
+          };
+          forum.set(tempF);
           onChat({ forumId: newForumId, sheirutId: buble.id });
         } catch (err) {
           console.error(err);
@@ -217,6 +240,39 @@
       isProcessing = false;
     }
   }
+
+  // Members for weFinnish display: sellers (flat→Strapi format) + customer
+  const weFinnishMembers = $derived.by(() => {
+    const sellers = (buble.members || []).map((m: any) => ({
+      id: m.id,
+      attributes: {
+        username: m.username,
+        profilePic: { data: { attributes: { url: m.profilePic || null } } }
+      }
+    }));
+    const customer = {
+      id: buble.customerId,
+      attributes: {
+        username: buble.customerName,
+        profilePic: { data: { attributes: { url: buble.customerSrc || null } } }
+      }
+    };
+    return [...sellers, customer];
+  });
+
+  // Votes for weFinnish display: actual votes + synthetic customer vote when iGotIt
+  const weFinnishVotes = $derived.by(() => {
+    const votes = [...(buble.weFinnish || [])];
+    if (buble.iGotIt) {
+      votes.push({
+        id: 'customer-iGotIt',
+        what: true,
+        order: 0,
+        users_permissions_user: { data: { id: buble.customerId } }
+      });
+    }
+    return votes;
+  });
 
   // Check if the recipient confirmed money
   const isMoneyConfirmedByRecipient = $derived.by(() => {
@@ -473,9 +529,9 @@
         {t.statusLabels.sellersClaimDelivered[$lang]}
       </div>
       <VoteStatusDisplay
-        votes={buble.weFinnish}
-        members={buble.members || []}
-        activeOrder={1}
+        votes={weFinnishVotes}
+        members={weFinnishMembers}
+        activeOrder={0}
       />
     </div>
   {/if}

@@ -17,8 +17,8 @@ const addVoteHandler: ActionExecutionHandler = async (params, context, util) => 
   const { strapi } = util;
 
   // Validation
-  if (!type || !['pend', 'sheirutpend', 'ask', 'decision'].includes(type)) {
-    throw new Error('Invalid type. Must be "pend", "sheirutpend", "ask", or "decision"');
+  if (!type || !['pend', 'sheirutpend', 'ask', 'decision', 'weFinnish'].includes(type)) {
+    throw new Error('Invalid type. Must be "pend", "sheirutpend", "ask", "decision", or "weFinnish"');
   }
 
   if (!id || !projectId) {
@@ -261,6 +261,38 @@ const addVoteHandler: ActionExecutionHandler = async (params, context, util) => 
     };
   }
 
+  // --- Logic for weFinnish (Relation Based - Sheirut delivery confirmation) ---
+  if (type === 'weFinnish') {
+    const result = await strapi.execute(
+      '122addWeFinnishVote',
+      { sheirut: id, user: userId },
+      context.jwt,
+      context.fetch
+    );
+
+    if (!result || result.errors) {
+      throw new Error(`CreateWeFinnishVote failed: ${JSON.stringify(result?.errors || 'Unknown error')}`);
+    }
+
+    const newVoteId = result.data?.createVote?.data?.id;
+
+    return {
+      data: {
+        id,
+        newVoteId,
+        userId,
+        success: true
+      },
+      updateStrategy: {
+        type: 'partialUpdate',
+        config: {
+          dataKeys: ['sheiruts'],
+          updateFunction: 'refreshVotes'
+        }
+      }
+    };
+  }
+
   // --- Logic for Pend (Component Based - Legacy) ---
 
   // בניית קומפוננטה חדשה של הצבעה
@@ -332,8 +364,8 @@ export const addVoteConfig: ActionConfig = {
     type: {
       type: 'string',
       required: true,
-      validate: (value) => ['pend', 'sheirutpend', 'ask', 'decision'].includes(value),
-      description: 'Type of item: "pend", "sheirutpend", "ask", or "decision"'
+      validate: (value) => ['pend', 'sheirutpend', 'ask', 'decision', 'weFinnish'].includes(value),
+      description: 'Type of item: "pend", "sheirutpend", "ask", "decision", or "weFinnish"'
     },
     id: {
       type: 'string',

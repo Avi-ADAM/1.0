@@ -79,7 +79,7 @@ export interface ParamRule {
  */
 export interface AuthRule {
   /** Type of authorization check */
-  type: 'jwt' | 'projectMember' | 'sheirutCustomer' | 'role' | 'custom' | 'or';
+  type: 'jwt' | 'projectMember' | 'sheirutCustomer' | 'forumParticipant' | 'role' | 'custom' | 'or';
 
   /** Configuration specific to the auth rule type */
   config?: AuthRuleConfig;
@@ -97,6 +97,9 @@ export interface AuthRuleConfig {
 
   /** Parameter name containing sheirut ID (for sheirutCustomer check) */
   sheirutIdParam?: string;
+
+  /** Parameter name containing forum ID (for forumParticipant check) */
+  forumIdParam?: string;
 
   /** Required role name (for role check) */
   requiredRole?: string;

@@ -13,6 +13,7 @@ import type {
   AuthorizationResult,
   ActionContext
 } from './types.js';
+import { authorizeForumParticipant } from './forumAccess.js';
 
 /**
  * StrapiClient interface for dependency injection
@@ -101,6 +102,9 @@ export class AuthorizationEngine {
 
       case 'sheirutCustomer':
         return await this.checkSheirutCustomer(rule, userId, params, context);
+
+      case 'forumParticipant':
+        return await this.checkForumParticipant(rule, userId, params, context);
 
       case 'or':
         return await this.checkOr(rule, userId, params, context);
@@ -248,6 +252,41 @@ export class AuthorizationEngine {
       return {
         authorized: false,
         reason: rule.errorMessage || 'Failed to verify sheirut customer status'
+      };
+    }
+  }
+
+  /**
+   * Check if user can access a forum according to the forum's owning relation.
+   */
+  private async checkForumParticipant(
+    rule: AuthRule,
+    userId: string,
+    params: Record<string, any>,
+    context: ActionContext
+  ): Promise<AuthorizationResult> {
+    const forumIdParam = rule.config?.forumIdParam || 'forumId';
+    const forumId = this.getNestedValue(params, forumIdParam);
+
+    if (!forumId) {
+      return {
+        authorized: false,
+        reason: rule.errorMessage || `Forum ID parameter "${forumIdParam}" is required for this action`
+      };
+    }
+
+    try {
+      return await authorizeForumParticipant(
+        this.strapiClient,
+        userId,
+        String(forumId),
+        context
+      );
+    } catch (error) {
+      console.error('Forum participant check failed:', error);
+      return {
+        authorized: false,
+        reason: rule.errorMessage || 'Failed to verify forum access'
       };
     }
   }

@@ -110,6 +110,11 @@
       en: 'Action failed',
       ar: 'فشل الإجراء'
     },
+    deliveryVotes: {
+      he: 'אישורי מסירה',
+      en: 'Delivery Confirmations',
+      ar: 'تأكيدات التسليم'
+    },
     statusLabels: {
       customerGotIt: {
         he: 'הלקוח קיבל',
@@ -222,7 +227,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           actionKey: 'addVote',
-          payload: {
+          params: {
             type: 'weFinnish',
             id: buble.id,
             projectId: buble.projectId
@@ -271,6 +276,39 @@
       isProcessing = false;
     }
   }
+
+  // Members list: project members (flat→Strapi format) + customer
+  const weFinnishMembers = $derived.by(() => {
+    const sellers = (buble.members || []).map((m: any) => ({
+      id: m.id,
+      attributes: {
+        username: m.username,
+        profilePic: { data: { attributes: { url: m.profilePic || null } } }
+      }
+    }));
+    const customer = {
+      id: buble.customerId,
+      attributes: {
+        username: buble.customerName,
+        profilePic: { data: { attributes: { url: buble.customerSrc || null } } }
+      }
+    };
+    return [...sellers, customer];
+  });
+
+  // Votes: actual weFinnish + synthetic vote for customer when iGotIt
+  const weFinnishVotes = $derived.by(() => {
+    const votes = [...(buble.weFinnish || [])];
+    if (buble.iGotIt) {
+      votes.push({
+        id: 'customer-iGotIt',
+        what: true,
+        order: 0,
+        users_permissions_user: { data: { id: buble.customerId } }
+      });
+    }
+    return votes;
+  });
 
   // Compute status display
   const statusItems = $derived.by(() => {
@@ -615,15 +653,16 @@
   </div>
 
   <!-- Vote Status Display -->
-  {#if buble.user_1s && buble.user_1s.length > 0}
-    <div class="px-4">
-      <VoteStatusDisplay
-        votes={buble.weFinnish || []}
-        members={buble.user_1s}
-        activeOrder={1}
-      />
+  <div class="px-4 pb-2">
+    <div class="text-[10px] text-green-600 uppercase font-bold mb-1">
+      {t.deliveryVotes[$lang]}
     </div>
-  {/if}
+    <VoteStatusDisplay
+      votes={weFinnishVotes}
+      members={weFinnishMembers}
+      activeOrder={0}
+    />
+  </div>
 
   <!-- Actions -->
   <div
@@ -679,8 +718,8 @@
       </button>
     {/if}
 
-    <!-- Confirm Money Button (only for money recipient) -->
-    {#if buble.moneyTransferredToMe && !buble.moneyTransfered}
+    <!-- Confirm Money Button (only for money recipient, only when no haluka) -->
+    {#if buble.moneyTransferredToMe && !buble.moneyTransfered && !buble.halukaId}
       <button
         class="flex-1 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all disabled:opacity-50"
         onclick={handleConfirmMoney}

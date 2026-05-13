@@ -150,9 +150,11 @@
     rikmaName={md.projectName || ''}
     onRect={afreact}
     smalldes={md.mesimaName || md.transferDetails || ''}
-    nameChatPartner={md.transferDetails
-      ? { he: "צ'אט על העברת כסף", en: 'chat on money transfer' }[$lang]
-      : nameChatPartner[$lang]}
+    nameChatPartner={md.title
+      ? (typeof md.title === 'string' ? md.title : md.title[$lang])
+      : md.transferDetails
+        ? { he: "צ'אט על העברת כסף", en: 'chat on money transfer' }[$lang]
+        : nameChatPartner[$lang]}
     mypos={true}
     bind:clicked
     pendId={$nowChatId}

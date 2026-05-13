@@ -1,18 +1,27 @@
 
 import type { ActionConfig } from '../types.js';
+import { getForumEntity, normalizeForum, participantIdsForForum } from '../forumAccess.js';
 
 export const chatActions: ActionConfig[] = [
     {
         key: 'createChatMessage',
         description: 'Create a new message in a forum with multi-channel notifications',
         graphqlOperation: async (params, context, { strapi }) => {
-            const { forumId, message, md, username } = params;
+            const { forumId, message } = params;
             const userId = context.userId;
             const publishedAt = new Date().toISOString();
 
             // Basic validation
             if (!forumId) throw new Error('Forum ID is required');
             if (!message || !message.trim()) throw new Error('Message content is required');
+
+            const forumEntity = await getForumEntity(strapi, String(forumId), context, 'summary');
+            const forumView = normalizeForum(forumEntity, String(userId));
+            if (!forumEntity || !forumView) throw new Error('Forum not found');
+
+            const userRes = await strapi.execute('24userJSONQue', { uid: userId }, context.jwt, context.fetch);
+            const senderName =
+                userRes?.data?.usersPermissionsUser?.data?.attributes?.username || 'User';
 
             // 1. Execute the GraphQL operation to save the message
             const result = await strapi.execute(
@@ -35,28 +44,9 @@ export const chatActions: ActionConfig[] = [
             const messageId = result.data?.createMessage?.data?.id;
 
             // 2. Prepare dynamic data for the notification orchestrator
-            // We extract these from the 'md' object passed from the frontend
-            const projectName = md?.projectName || '';
-            const taskName = md?.mesimaName || md?.transferDetails || '';
-
-            // Construct recipient rule based on md.participants
-            let recipientsRule = {
-                type: 'projectMembers',
-                config: {
-                    projectIdParam: 'md.pid', // Path in params
-                    excludeSender: true
-                }
-            };
-
-            if (md?.participants && Array.isArray(md.participants) && md.participants.length > 0) {
-                recipientsRule = {
-                    type: 'specificUsers',
-                    config: {
-                        userIdsParam: 'md.participants', // Path in params
-                        excludeSender: true
-                    }
-                } as any;
-            }
+            const projectName = forumView.projectName || '';
+            const taskName = forumView.title || '';
+            const recipients = participantIdsForForum(forumEntity);
 
             // Return data for the next steps (notification/updateStrategy)
             // We include both flat properties for placeholders and a 'data' object for result passing
@@ -65,20 +55,22 @@ export const chatActions: ActionConfig[] = [
                 messageId,
                 forumId,
                 message: message.trim(),
-                username: username || 'User',
+                username: senderName,
                 projectName,
                 taskName,
-                projectId: md?.pid,
+                projectId: forumView.projectId,
+                recipients,
                 // Nested data for frontend/ActionService
                 data: {
                     messageId,
                     forumId,
-                    success: true
+                    success: true,
+                    projectId: forumView.projectId
                 },
                 updateStrategy: {
                     type: 'partialUpdate',
                     config: {
-                        dataKeys: ['chat'],
+                        dataKeys: ['app:forums', `app:forum:${forumId}`],
                         forumId
                     }
                 }
@@ -91,17 +83,15 @@ export const chatActions: ActionConfig[] = [
             username: { type: 'string', required: false }
         },
         authRules: [
-            { type: 'jwt' }
+            { type: 'jwt' },
+            { type: 'forumParticipant', config: { forumIdParam: 'forumId' } }
         ],
         notification: {
             recipients: {
-                // We use a rule that can look into the params
                 type: 'specificUsers',
                 config: {
-                    // If md.participants exists, use it. Otherwise, look for projectId.
-                    // The NotificationOrchestrator's specificUsers rule has a fallback to projectMembers if projectIdParam is provided.
-                    userIdsParam: 'md.participants',
-                    projectIdParam: 'md.pid',
+                    userIdsParam: 'recipients',
+                    projectIdParam: 'projectId',
                     excludeSender: true
                 }
             },
@@ -118,7 +108,7 @@ export const chatActions: ActionConfig[] = [
             channels: ['socket', 'push', 'email', 'telegram'],
             metadata: {
                 priority: 'normal',
-                url: '/project/{{projectId}}/forum/{{forumId}}',
+                url: '/forum/{{forumId}}',
                 forumId: '{{forumId}}',
                 type: 'chatMessage'
             }

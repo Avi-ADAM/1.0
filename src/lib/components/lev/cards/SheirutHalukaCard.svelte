@@ -1,7 +1,12 @@
 <script lang="ts">
   import { lang } from '$lib/stores/lang.js';
   import { toast } from 'svelte-sonner';
-  import { nowChatId, isChatOpen, newChat, forum } from '$lib/stores/pendMisMes.js';
+  import {
+    nowChatId,
+    isChatOpen,
+    newChat,
+    forum
+  } from '$lib/stores/pendMisMes.js';
 
   let {
     halukaId,
@@ -142,12 +147,18 @@
       halukId: Number(halukaId),
       senderId,
       receiverId,
-      participants: [senderId, receiverId]
+      participants: [senderId, receiverId],
+      title: { he: 'סיכום העברת כספים', en: 'Money Transfer Summary' },
+      transferDetails: `${senderName} → ${receiverName}${amount != null ? ` (${amount})` : ''}`
     };
 
     if (chatForumId && chatForumId !== '-1') {
       const tempF = $forum;
-      tempF[chatForumId] = { loading: false, messages: tempF[chatForumId]?.messages || [], md };
+      tempF[chatForumId] = {
+        loading: false,
+        messages: tempF[chatForumId]?.messages || [],
+        md
+      };
       forum.set(tempF);
       nowChatId.set(Number(chatForumId));
       isChatOpen.set(true);
@@ -169,11 +180,17 @@
 >
   <!-- Header -->
   <div class="flex items-center justify-between">
-    <span class="text-[10px] font-bold uppercase {isComplete ? 'text-green-700 dark:text-green-400' : 'text-amber-700 dark:text-amber-400'}">
+    <span
+      class="text-[10px] font-bold uppercase {isComplete
+        ? 'text-green-700 dark:text-green-400'
+        : 'text-amber-700 dark:text-amber-400'}"
+    >
       {t.transferStatus[$lang]}
     </span>
     {#if isComplete}
-      <span class="text-[10px] font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/50 px-2 py-0.5 rounded-full">
+      <span
+        class="text-[10px] font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/50 px-2 py-0.5 rounded-full"
+      >
         ✓ {t.complete[$lang]}
       </span>
     {/if}
@@ -183,12 +200,16 @@
   <div class="flex items-center justify-between gap-2">
     <!-- Sender -->
     <div class="flex flex-col items-center gap-1 flex-1 min-w-0">
-      <div class="text-[9px] text-gray-500 dark:text-gray-400 uppercase">{t.senderLabel[$lang]}</div>
+      <div class="text-[9px] text-gray-500 dark:text-gray-400 uppercase">
+        {t.senderLabel[$lang]}
+      </div>
       {#if senderPic}
         <img
           src={senderPic}
           alt={senderName}
-          class="w-9 h-9 rounded-full object-cover border-2 {senderconf ? 'border-green-400' : 'border-amber-300'}"
+          class="w-9 h-9 rounded-full object-cover border-2 {senderconf
+            ? 'border-green-400'
+            : 'border-amber-300'}"
         />
       {:else}
         <div
@@ -199,11 +220,15 @@
           {senderName?.charAt(0) || '?'}
         </div>
       {/if}
-      <div class="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center truncate w-full px-1">
+      <div
+        class="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center truncate w-full px-1"
+      >
         {senderName}
       </div>
       {#if senderconf}
-        <span class="text-[9px] text-green-600 dark:text-green-400 font-bold">✓</span>
+        <span class="text-[9px] text-green-600 dark:text-green-400 font-bold"
+          >✓</span
+        >
       {:else}
         <span class="text-[9px] text-gray-400">–</span>
       {/if}
@@ -212,21 +237,39 @@
     <!-- Arrow + Amount -->
     <div class="flex flex-col items-center gap-1 shrink-0">
       {#if amount != null}
-        <span class="text-sm font-black text-amber-700 dark:text-amber-300">{amount}</span>
+        <span class="text-sm font-black text-amber-700 dark:text-amber-300"
+          >{amount}</span
+        >
       {/if}
-      <svg class="w-8 h-4 text-gray-400" fill="none" viewBox="0 0 32 12">
-        <path d="M0 6h26M20 1l7 5-7 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <svg
+        class="w-8 h-4 text-gray-400 {$lang == 'he' || $lang == 'ar'
+          ? 'rotate-180'
+          : ''}"
+        fill="none"
+        viewBox="0 0 32 12"
+      >
+        <path
+          d="M0 6h26M20 1l7 5-7 5"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
       </svg>
     </div>
 
     <!-- Receiver -->
     <div class="flex flex-col items-center gap-1 flex-1 min-w-0">
-      <div class="text-[9px] text-gray-500 dark:text-gray-400 uppercase">{t.receiverLabel[$lang]}</div>
+      <div class="text-[9px] text-gray-500 dark:text-gray-400 uppercase">
+        {t.receiverLabel[$lang]}
+      </div>
       {#if receiverPic}
         <img
           src={receiverPic}
           alt={receiverName}
-          class="w-9 h-9 rounded-full object-cover border-2 {confirmed ? 'border-green-400' : 'border-amber-300'}"
+          class="w-9 h-9 rounded-full object-cover border-2 {confirmed
+            ? 'border-green-400'
+            : 'border-amber-300'}"
         />
       {:else}
         <div
@@ -237,11 +280,15 @@
           {receiverName?.charAt(0) || '?'}
         </div>
       {/if}
-      <div class="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center truncate w-full px-1">
+      <div
+        class="text-xs font-semibold text-gray-700 dark:text-gray-300 text-center truncate w-full px-1"
+      >
         {receiverName}
       </div>
       {#if confirmed}
-        <span class="text-[9px] text-green-600 dark:text-green-400 font-bold">✓</span>
+        <span class="text-[9px] text-green-600 dark:text-green-400 font-bold"
+          >✓</span
+        >
       {:else}
         <span class="text-[9px] text-gray-400">–</span>
       {/if}
@@ -249,22 +296,40 @@
   </div>
 
   <!-- Confirmation status text -->
-  <div class="flex justify-between text-[10px] text-gray-500 dark:text-gray-400 px-1">
-    <span>{senderconf ? t.senderConfirmed[$lang] : t.pendingConfirm[$lang]}</span>
-    <span>{confirmed ? t.receiverConfirmed[$lang] : t.pendingConfirm[$lang]}</span>
+  <div
+    class="flex justify-between text-[10px] text-gray-500 dark:text-gray-400 px-1"
+  >
+    <span
+      >{senderconf ? t.senderConfirmed[$lang] : t.pendingConfirm[$lang]}</span
+    >
+    <span
+      >{confirmed ? t.receiverConfirmed[$lang] : t.pendingConfirm[$lang]}</span
+    >
   </div>
 
   <!-- Actions — only for participants -->
   {#if isParticipant}
-    <div class="flex gap-2 pt-1 border-t {isComplete ? 'border-green-200 dark:border-green-700' : 'border-amber-200 dark:border-amber-700'}">
+    <div
+      class="flex gap-2 pt-1 border-t {isComplete
+        ? 'border-green-200 dark:border-green-700'
+        : 'border-amber-200 dark:border-amber-700'}"
+    >
       <!-- Private chat button -->
       <button
         class="py-1.5 px-2 bg-white dark:bg-gray-800 border border-blue-400 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-xs font-bold rounded-lg flex items-center gap-1 disabled:opacity-50 shrink-0"
         onclick={handleOpenChat}
         disabled={isOpeningChat}
       >
-        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        <svg
+          class="w-3.5 h-3.5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
             d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
           />
         </svg>

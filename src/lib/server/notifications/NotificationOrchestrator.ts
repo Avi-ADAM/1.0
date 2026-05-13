@@ -245,7 +245,9 @@ export class NotificationOrchestrator {
 
       case 'specificUsers':
         const userIdsParam = rule.config?.userIdsParam || 'userIds';
-        const userIds = this.getNestedValue(params, userIdsParam);
+        const userIds =
+          this.getNestedValue(params, userIdsParam) ||
+          (actionResult ? this.getNestedValue(actionResult, userIdsParam) : undefined);
 
         if (userIds && Array.isArray(userIds)) {
           // Fetch profiles for specific users directly
@@ -260,7 +262,9 @@ export class NotificationOrchestrator {
 
         // Fallback to project members filtering (legacy behavior)
         const projectIdForSpecific = rule.config?.projectIdParam || 'projectId';
-        const projectIdValue = this.getNestedValue(params, projectIdForSpecific);
+        const projectIdValue =
+          this.getNestedValue(params, projectIdForSpecific) ||
+          (actionResult ? this.getNestedValue(actionResult, projectIdForSpecific) : undefined);
         if (projectIdValue) {
           const allMembers = await this.getProjectMembers(projectIdValue, context);
           return allMembers;

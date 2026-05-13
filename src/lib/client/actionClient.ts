@@ -255,6 +255,9 @@ export type ActionKey =
   | 'ensureStageForum'
   | 'updateProjectDetails'
   | 'createResource'
+  | 'getUserForums'
+  | 'getForumThread'
+  | 'createChatMessage'
   ;
 
 
@@ -311,6 +314,16 @@ export interface ActionParamsMap {
     isReceived?: boolean;
     existingSpId?: string;
     restime?: string;
+  };
+  getUserForums: Record<string, never>;
+  getForumThread: {
+    forumId: string;
+  };
+  createChatMessage: {
+    forumId: string;
+    message: string;
+    md?: Record<string, any>;
+    username?: string;
   };
 }
 
