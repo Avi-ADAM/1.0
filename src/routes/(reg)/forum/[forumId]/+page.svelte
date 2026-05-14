@@ -1,6 +1,5 @@
 <script lang="ts">
   import { goto, invalidate } from '$app/navigation';
-  import { onMount } from 'svelte';
   import { ArrowLeft, Copy } from '@lucide/svelte';
   import { toast } from 'svelte-sonner';
   import Diun from '$lib/components/lev/diun.svelte';
@@ -29,7 +28,11 @@
 
   let clicked = $state(false);
   let liveForum = $derived($forumStore[data.forum.id]);
-  let messages = $derived(liveForum?.messages || data.forum.messages || []);
+  let messages = $derived(
+    (liveForum?.messages?.length ?? 0) >= (data.forum.messages?.length ?? 0)
+      ? liveForum?.messages ?? []
+      : data.forum.messages ?? []
+  );
 
   const copy = {
     he: {
@@ -54,17 +57,21 @@
 
   let t = $derived(copy[$lang] || copy.he);
 
-  onMount(() => {
-    forumStore.update((current) => ({
-      ...current,
-      [data.forum.id]: {
-        id: data.forum.id,
-        subject: data.forum.title,
-        messages: data.forum.messages,
-        loading: false,
-        md: data.forum.md
-      }
-    }));
+  $effect(() => {
+    const { id, title, messages: serverMessages, md } = data.forum;
+    forumStore.update((current) => {
+      const existing = current[id]?.messages ?? [];
+      return {
+        ...current,
+        [id]: {
+          id,
+          subject: title,
+          messages: existing.length > serverMessages.length ? existing : serverMessages,
+          loading: false,
+          md
+        }
+      };
+    });
   });
 
   async function sendMessage(event: { why: string }) {

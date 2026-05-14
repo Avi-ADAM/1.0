@@ -108,19 +108,22 @@
   }
 
   function seedForums() {
-    const seeded = Object.fromEntries(
-      data.forums.map((forum) => [
-        String(forum.id),
-        {
-          id: String(forum.id),
+    forumStore.update((current) => {
+      const updates: Record<string, any> = {};
+      for (const forum of data.forums) {
+        const id = String(forum.id);
+        const seeded = seedMessages(forum);
+        const existing = current[id]?.messages || [];
+        updates[id] = {
+          id,
           subject: forum.title,
-          messages: seedMessages(forum),
+          messages: existing.length > seeded.length ? existing : seeded,
           loading: false,
           md: forum.md || {}
-        }
-      ])
-    );
-    forumStore.update((current) => ({ ...current, ...seeded }));
+        };
+      }
+      return { ...current, ...updates };
+    });
   }
 
   function showBlockedNotice() {
