@@ -13,7 +13,7 @@
   import { SendTo } from '$lib/send/sendTo.svelte';
   import { toast } from 'svelte-sonner';
   import { confettiStore } from '$lib/stores/confettiStore';
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
   let myDate = '11:00';
   import MultiSelect from 'svelte-multiselect';
   import { lang } from '$lib/stores/lang.js';
@@ -59,6 +59,7 @@
     userslength = 0,
     projectId,
     name = '',
+    missionTemplates = [],
     processContext = null
   } = $props();
   let token;
@@ -179,7 +180,96 @@
     }
     x = x;
     console.log(new Date(Date.now() + x).toLocaleString());
+
+    if (id === 0 && name) {
+      hydrateFromMissionName(name);
+    }
   });
+
+  $effect(() => {
+    const nameToHydrate = miData[0].missionName;
+    if (nameToHydrate) {
+      untrack(() => hydrateFromMissionName(nameToHydrate));
+    }
+  });
+
+  let lastHydratedValues = $state({
+    descrip: '',
+    skills: [],
+    roles: [],
+    workways: []
+  });
+
+  function hydrateFromMissionName(value) {
+    if (!value) return;
+    const template = missionTemplates.find(
+      (t) => t.attributes.missionName.trim() === value.trim()
+    );
+    if (!template) return;
+
+    const attributes = template.attributes;
+
+    // Smart update for description
+    const templateDescrip = attributes.descrip || '';
+    const currentDescrip = miData[0].descrip || '';
+    const isDescEmpty =
+      !currentDescrip ||
+      currentDescrip === '<p></p>' ||
+      currentDescrip === '<p><br></p>';
+
+    if (isDescEmpty || currentDescrip === lastHydratedValues.descrip) {
+      miData[0].descrip = templateDescrip;
+      lastHydratedValues.descrip = templateDescrip;
+    }
+
+    // Smart update for skills
+    const templateSkills = (attributes.skills?.data || []).map((s) => {
+      if ($lang === 'he' && s.attributes.localizations?.data?.[0]) {
+        return s.attributes.localizations.data[0].attributes.skillName;
+      }
+      return s.attributes.skillName;
+    });
+    if (
+      miData[0].selectedSkills.length === 0 ||
+      JSON.stringify(miData[0].selectedSkills) ===
+        JSON.stringify(lastHydratedValues.skills)
+    ) {
+      miData[0].selectedSkills = [...templateSkills];
+      lastHydratedValues.skills = [...templateSkills];
+    }
+
+    // Smart update for roles
+    const templateRoles = (attributes.tafkidims?.data || []).map((r) => {
+      if ($lang === 'he' && r.attributes.localizations?.data?.[0]) {
+        return r.attributes.localizations.data[0].attributes.roleDescription;
+      }
+      return r.attributes.roleDescription;
+    });
+    if (
+      miData[0].selectedRoles.length === 0 ||
+      JSON.stringify(miData[0].selectedRoles) ===
+        JSON.stringify(lastHydratedValues.roles)
+    ) {
+      miData[0].selectedRoles = [...templateRoles];
+      lastHydratedValues.roles = [...templateRoles];
+    }
+
+    // Smart update for workways
+    const templateWorkways = (attributes.work_ways?.data || []).map((w) => {
+      if ($lang === 'he' && w.attributes.localizations?.data?.[0]) {
+        return w.attributes.localizations.data[0].attributes.workWayName;
+      }
+      return w.attributes.workWayName;
+    });
+    if (
+      miData[0].selectedWorkways.length === 0 ||
+      JSON.stringify(miData[0].selectedWorkways) ===
+        JSON.stringify(lastHydratedValues.workways)
+    ) {
+      miData[0].selectedWorkways = [...templateWorkways];
+      lastHydratedValues.workways = [...templateWorkways];
+    }
+  }
 
   function find_role_id(role_name_arr) {
     let arr = [];
@@ -1092,7 +1182,7 @@
   function hover() {}
   let dateE = $state(false);
   let descripE = $state(false);
-  let missionNameE = $state(false);
+  let missionNameE = $state(id === 0);
   let valphE = $state(false);
   let ske = $state(false);
   let roleE = $state(false);
@@ -1313,17 +1403,28 @@
             {#if missionNameE == false}
               <h2
                 class="text-barbi text-{$lang == 'en'
-                  ? 'left'
-                  : 'right'}  font-bold text-xl lg:text-4xl underline"
+                   ? 'left'
+                   : 'right'}  font-bold text-xl lg:text-4xl underline"
               >
                 {miData[0].missionName}<button
                   onclick={() => (missionNameE = true)}><EditIcon /></button
                 >
               </h2>
             {:else}
-              <TextInput bind:text={miData[0].missionName} /><button
-                onclick={() => (missionNameE = false)}><Done /></button
-              >
+              <div class="flex flex-col">
+                <input
+                  type="text"
+                  bind:value={miData[0].missionName}
+                  list="mission-name-options"
+                  class="bg-pink-950/30 border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all shadow-sm"
+                />
+                <datalist id="mission-name-options">
+                  {#each missionTemplates as template (template.id)}
+                    <option value={template.attributes.missionName}></option>
+                  {/each}
+                </datalist>
+              </div>
+              <button onclick={() => (missionNameE = false)}><Done /></button>
             {/if}
             {#if gloading == false}
               <h3

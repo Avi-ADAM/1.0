@@ -75,6 +75,11 @@ export function extractUserIdFromKey(raw: string): number | null {
   return Number.isFinite(userId) ? userId : null;
 }
 
+// ─── Cache קצר-טווח למניעת שאילתות כפולות לStrapi ──────────────
+
+const KEY_CACHE = new Map<string, { user: any; expiresAt: number }>();
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 דקות
+
 // ─── verifyApiKey מהיר יותר עם userId ────────────────────────────
 
 export async function verifyApiKey(rawKey: string) {
@@ -82,6 +87,13 @@ export async function verifyApiKey(rawKey: string) {
   const userId = extractUserIdFromKey(rawKey);
   console.log(`[API Keys] Verifying key for userId: ${userId}`);
   if (!userId) return null;
+
+  // 2. בדוק cache לפני שאילתה לStrapi
+  const cached = KEY_CACHE.get(rawKey);
+  if (cached && cached.expiresAt > Date.now()) {
+    console.log(`[API Keys] Cache hit for userId: ${userId}`);
+    return cached.user;
+  }
 
   // 2. שלוף רק מפתחות של אותו משתמש (סט קטן בהרבה)
   const hash = hashKey(rawKey);
@@ -144,6 +156,7 @@ export async function verifyApiKey(rawKey: string) {
 
   if (keyUserId && parseInt(keyUserId) === parseInt(userId)) {
       console.log(`[API Keys] Match found! Authorized as user ${keyUserId}`);
+      KEY_CACHE.set(rawKey, { user: userObj, expiresAt: Date.now() + CACHE_TTL_MS });
       return userObj;
   }
 

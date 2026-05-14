@@ -39,6 +39,7 @@
   let element = $state();
   let editor = $state();
   let menu = $state();
+  let editorHtml = '';
 
   let activeStates = $state({
     bold: false,
@@ -226,6 +227,7 @@
         const html = editor.getHTML();
         const jsonc = editor.getJSON();
         outjson = jsonc;
+        editorHtml = html;
         outpot = html; // תמיד מחזיר HTML החוצה
       }
     });
@@ -234,6 +236,14 @@
   onDestroy(() => {
     if (editor) {
       editor.destroy();
+    }
+  });
+
+  $effect(() => {
+    const newVal = outpot;
+    if (!editor) return;
+    if (newVal !== editorHtml) {
+      editor.commands.setContent(newVal || '');
     }
   });
 

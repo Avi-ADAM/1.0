@@ -29,6 +29,12 @@
 let newcontentR = $state(true);
 let newcontentW = $state(true);
 let error8
+
+import { onMount } from 'svelte';
+onMount(() => {
+  findT();
+});
+
 async function findT() {
     /*TODO: כאשר מחפשים כישורים וכן לגבי כל שאר האובייקטים להציג את היגרסה העברית והאנגלית כך שהחיפוש יוכל למצוא את כולן*/ 
     const parseJSON = (resp) => (resp.json ? resp.json() : resp);
@@ -133,25 +139,22 @@ let id = $state(0)
 let ugug = $state(``);
 let addn = $derived({"he":`יצירת משימה חדשה: "${ugug}"`,"en": `Create new mission: "${ugug}"`});
 let name = $state("")
- function add(){
-  let isNew = false
-  if (selected.length > 0) {
-    before = true;
-          before = false;
-          findT()
-          
-  if (!mission1.map(c => c.attributes.missionName).includes(selected[0])){
-    isNew = true
-    name = selected[0]
-    id = 0;
-  }else{
-    name = selected[0]   
-    id = find_mission_id(selected)
-  }
 
- }
+ function add(){
+  if (selected.length > 0) {
+    findT();
+    if (!mission1.map(c => c.attributes.missionName).includes(selected[0])){
+      name = selected[0]
+      id = 0;
+    } else {
+      name = selected[0]   
+      id = find_mission_id(selected)[0] || 0;
+    }
+    before = false;
+  }
 }
-let before = $state(true);
+
+let before = $state(false);
  const mn = {
   "he": "שם המשימה",
   "en": "mission name"
@@ -202,32 +205,6 @@ function closeMobileModal() {
           {#if selected[0]}
         <Button onClick={add} ><Arrow back={$lang == "en" ? true : false}/></Button>
         {/if}</div>
-      <!--  {:else}
-        <Button onClick={openMobileModal} text={placeholder} />
-
-        <MobileModal isOpen={showMobileModal} title={placeholder[$lang]}>
-          <div  class=" w-full flex-row	flex items-center justify-center  space-x-2">
-            <MultiSelect
-            --sms-open-z-index={10000}
-            closeDropdownOnSelect='desktop'
-            ulOptionsClass="bg-gold"
-            liSelectedClass='bg-barbi text-gold'
-          loading={mission1.length > 0 ? false : true}
-          onFocus={() => {!page?.data?.isDesktop ?  showFoot.set(false) : null}}
-          onBlur={() => {!page?.data?.isDesktop ?  showFoot.set(true) : null}}
-          createOptionMsg={addn[$lang]}
-          allowUserOptions={"append"}
-           bind:searchText={ugug}
-            bind:selected
-            placeholder={placeholder[$lang]}
-            options={mission1.map(c => c.attributes.missionName)}
-          maxSelect={1}
-            />
-            {#if selected[0]}
-          <Button onClick={add} ><Arrow back={$lang == "en" ? true : false}/></Button>
-          {/if}</div>
-        </MobileModal>
-      {/if}-->
         {/if}
 {#if before == false}
         <Mission    
@@ -244,6 +221,7 @@ function closeMobileModal() {
         vallues={alit}
         projectId={$idPr}
         {processContext}
+        missionTemplates={mission1}
         onClose={onClose}/>
         {/if}
  </div>

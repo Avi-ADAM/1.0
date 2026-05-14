@@ -4944,7 +4944,13 @@ export const moachQids = {
     }
   }`,
   'getMissionTemplates': `query GetMissionTemplates {
-    missions { data { id attributes { missionName } } }
+    missions { data { id attributes { 
+      missionName 
+      descrip
+      skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
+      tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+      work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
+    } } }
   }`,
   'getProjectFinancials': `query GetProjectFinancials($pid: ID!) {
     project(id: $pid) {

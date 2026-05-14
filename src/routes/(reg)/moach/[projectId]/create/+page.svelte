@@ -10,6 +10,7 @@
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   import ResourceCreator from '$lib/components/resource/ResourceCreator.svelte';
   import Mashman from '$lib/components/prPr/mashmam.svelte';
+  import Handp from '$lib/components/prPr/handp.svelte';
   import { invalidateAll } from '$app/navigation';
 
   const moachStore = getMoachStore();
@@ -21,6 +22,8 @@
   let openMS = $state(false);
   let addN = $state(false);
   let openMA = $state(false);
+  let hovered = $state(false);
+  let hoveredd = $state(false);
 
   let projectBase = $derived(data.projectBase);
   // projectMissionsData = full project.attributes from getProjectMissions query
@@ -107,7 +110,7 @@
   }
 
   function bighand() {
-    // hover state is handled inside the Hand SVG via onmouseenter
+    hovered = !hovered;
   }
 
   function trym() {
@@ -132,58 +135,88 @@
   }
 </script>
 
+<svelte:head>
+  <link rel="preload" as="image" href="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg" />
+  <link rel="preload" as="image" href="https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg" />
+</svelte:head>
+
 <div class="create-page p-4">
-  {#if !createMode}
+
+  <!-- כרטיסים עם עיגולים מוטמעים — נעלמים כשפורם פתוח -->
+  {#if !addM && !openMS && !addN && !openMA && createMode !== 'process'}
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto py-12">
-      <!-- Mission -->
-      <button
-        onclick={() => (createMode = 'mission')}
-        class="group flex flex-col items-center gap-4 p-8 border border-barbi hover:border-gold rounded-2xl bg-gradient-to-br from-gra via-grb to-gre hover:from-barbi hover:via-fuchsia-400 hover:to-mpink transition-all duration-300 drop-shadow-lg shadow-gold"
-      >
-        <div class="p-4 bg-gray-50 rounded-xl transition-colors group-hover:bg-pink-50">
-          <svg class="w-12 h-12 text-primary" viewBox="0 0 24 24"
-            ><path fill="currentColor" d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z" /></svg
-          >
-        </div>
-        <h3 class="text-lg font-bold mt-4">{t.mission}</h3>
-        <p class="text-sm text-gray-500">{t.missionDesc}</p>
-      </button>
 
-      <!-- Resource -->
-      <button
-        onclick={() => (createMode = 'resource')}
-        class="group flex flex-col items-center gap-4 p-8 border border-barbi hover:border-gold rounded-2xl bg-gradient-to-br from-gra via-grb to-gre hover:from-barbi hover:via-fuchsia-400 hover:to-mpink transition-all duration-300 drop-shadow-lg shadow-gold"
-      >
-        <div class="p-4 bg-gray-50 rounded-xl transition-colors group-hover:bg-pink-50">
-          <svg class="w-12 h-12 text-primary" viewBox="0 0 24 24"
-            ><path
-              fill="currentColor"
-              d="M21 16.5c0 .38-.21.71-.53.88l-7.9 4.44c-.16.12-.36.18-.57.18-.21 0-.41-.06-.57-.18l-7.9-4.44A1 1 0 0 1 3 16.5v-9c0-.38.21-.71.53-.88l7.9-4.44c.32-.18.72-.18 1.14 0l7.9 4.44c.32.17.53.5.53.88v9M12 4.15L10.11 5.22 16 8.61l1.96-1.11L12 4.15M6.04 7.5L12 10.85l1.96-1.1-5.88-3.4L6.04 7.5M5 15.91l6 3.38v-6.71L5 9.21v6.7M19 15.91V9.21l-6 3.37v6.71l6-3.38z"
-            /></svg
-          >
-        </div>
-        <h3 class="text-lg font-bold mt-4">{t.resource}</h3>
-        <p class="text-sm text-gray-500">{t.resourceDesc}</p>
-      </button>
+      <!-- משימה -->
+      <div class="flex flex-col items-center gap-3 p-6 border border-barbi rounded-2xl bg-gradient-to-br from-gra via-grb to-gre drop-shadow-lg shadow-gold">
+        <h3 class="text-lg font-bold">{t.mission}</h3>
+        <p class="text-sm text-gray-500 text-center">{t.missionDesc}</p>
+        {#if hovered}
+          <button onclick={hosa} onmouseleave={() => (hovered = false)}>
+            <img
+              title={hosafa[$lang]}
+              style="max-width:45vw; max-height:45vw;"
+              width="240"
+              height="240"
+              src="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg"
+              alt="add mission"
+            />
+          </button>
+        {:else}
+          <Hand
+            onHosa={hosa}
+            onProgres={bighand}
+            onTrym={trym}
+            {noofopen}
+            {openMS}
+            {addM}
+            hosafa={hosafa[$lang]}
+          />
+        {/if}
+      </div>
 
-      <!-- Process -->
-      <button
-        onclick={() => (createMode = 'process')}
-        class="group flex flex-col items-center gap-4 p-8 border border-barbi hover:border-gold rounded-2xl bg-gradient-to-br from-gra via-grb to-gre hover:from-barbi hover:via-fuchsia-400 hover:to-mpink transition-all duration-300 drop-shadow-lg shadow-gold"
-      >
-        <div class="p-4 bg-gray-50 rounded-xl transition-colors group-hover:bg-pink-50">
-          <svg class="w-12 h-12 text-primary" viewBox="0 0 24 24"
-            ><path
-              fill="currentColor"
-              d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"
-            /></svg
-          >
-        </div>
-        <h3 class="text-lg font-bold mt-4">{t.process}</h3>
-        <p class="text-sm text-gray-500">{t.processDesc}</p>
-      </button>
+      <!-- משאב -->
+      <div class="flex flex-col items-center gap-3 p-6 border border-barbi rounded-2xl bg-gradient-to-br from-gra via-grb to-gre drop-shadow-lg shadow-gold">
+        <h3 class="text-lg font-bold">{t.resource}</h3>
+        <p class="text-sm text-gray-500 text-center">{t.resourceDesc}</p>
+        {#if hoveredd}
+          <button onclick={() => (addN = true)} onmouseleave={() => (hoveredd = false)}>
+            <img
+              title={hosafat[$lang]}
+              style="max-width:45vw; max-height:45vw;"
+              width="240"
+              height="240"
+              src="https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg"
+              alt="add resource"
+            />
+          </button>
+        {:else}
+          <Handd
+            {addN}
+            {openMA}
+            hosafat={hosafat[$lang]}
+            noofopenm={combinedResources.length}
+            onMasi={() => (addN = true)}
+            onBighandd={() => (hoveredd = !hoveredd)}
+            onTrym={() => (openMA = true)}
+          />
+        {/if}
+      </div>
+
+      <!-- תהליך -->
+      <div class="flex flex-col items-center gap-3 p-6 border border-barbi rounded-2xl bg-gradient-to-br from-gra via-grb to-gre drop-shadow-lg shadow-gold">
+        <h3 class="text-lg font-bold">{t.process}</h3>
+        <p class="text-sm text-gray-500 text-center">{t.processDesc}</p>
+        <Handp
+          hosafap={t.process}
+          onClick={() => (createMode = 'process')}
+        />
+      </div>
+
     </div>
-  {:else}
+  {/if}
+
+  <!-- פורמים — עם כפתור חזרה -->
+  {#if addM || openMS || addN || openMA || createMode === 'process'}
     <div class="max-w-4xl mx-auto">
       <button
         onclick={handleBack}
@@ -200,112 +233,69 @@
         {t.back}
       </button>
 
-      {#if createMode === 'mission'}
-        {#if !addM && !openMS}
-          <div class="flex flex-col items-center gap-4 py-2">
-            <p class="text-2xl font-bold text-primary animate-pulse text-center">
-              {t.clickHandMission}
-            </p>
-            <div class="flex justify-center">
-              <Hand
-                onHosa={hosa}
-                onProgres={bighand}
-                onTrym={trym}
-                {noofopen}
-                {openMS}
-                {addM}
-                hosafa=""
-                showText={false}
-              />
-            </div>
+      <!-- פורמי משימה -->
+      {#if openMS}
+        <div class="m-4 border-2 border-barbi rounded bg-white/80 backdrop-blur-sm shadow-xl">
+          <div class="p-2 flex justify-end">
+            <button
+              onclick={() => (openMS = false)}
+              aria-label={t.back}
+              class="hover:bg-barbi text-gold hover:text-white font-bold p-1 rounded-full transition-colors"
+            >
+              <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
+              </svg>
+            </button>
           </div>
-        {/if}
-
-        <div>
-          {#if openMS}
-            <div class="m-4 border-2 border-barbi rounded bg-white/80 backdrop-blur-sm shadow-xl">
-              <div class="p-2 flex justify-end">
-                <button
-                  onclick={() => (openMS = false)}
-                  aria-label={t.back}
-                  class="hover:bg-barbi text-gold hover:text-white font-bold p-1 rounded-full transition-colors"
-                >
-                  <svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
-                  </svg>
-                </button>
-              </div>
-              <OpenM {omiData} projectName={pn} />
-            </div>
-          {/if}
-          {#if addM}
-            <div class="m-4 border-2 border-barbi rounded bg-white/80 backdrop-blur-sm shadow-xl">
-              <div class="p-2 flex justify-end">
-                <button
-                  onclick={closeM}
-                  aria-label={t.back}
-                  class="hover:bg-barbi text-gold hover:text-white font-bold p-1 rounded-full transition-colors"
-                >
-                  <svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                    <path
-                      fill="currentColor"
-                      d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
-                    />
-                  </svg>
-                </button>
-              </div>
-              <ChoosMission mission1={missionTemplates} {pn} {pl} {restime} {projectUsers} {alit} onClose={closeM} />
-            </div>
-          {/if}
+          <OpenM {omiData} projectName={pn} />
         </div>
-      {:else if createMode === 'resource'}
-        {#if !addN && !openMA}
-          <div class="flex flex-col items-center gap-4 py-2">
-            <p class="text-2xl font-bold text-primary animate-pulse text-center">
-              {t.clickHandResource}
-            </p>
-            <div class="flex justify-center">
-              <Handd
-                {addN}
-                {openMA}
-                hosafat=""
-                showText={false}
-                onMasi={() => { addN = true; }}
-                onBighandd={() => {}}
-                onTrym={() => { openMA = true; }}
-              />
-            </div>
+      {/if}
+      {#if addM}
+        <div class="m-4 border-2 border-barbi rounded bg-white/80 backdrop-blur-sm shadow-xl">
+          <div class="p-2 flex justify-end">
+            <button
+              onclick={closeM}
+              aria-label={t.back}
+              class="hover:bg-barbi text-gold hover:text-white font-bold p-1 rounded-full transition-colors"
+            >
+              <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
+              </svg>
+            </button>
           </div>
-        {/if}
-
-        <div>
-          {#if openMA}
-            <div class="m-4 border-2 border-barbi rounded bg-white/80 backdrop-blur-sm shadow-xl">
-              <div class="p-2 flex justify-end">
-                <button
-                  onclick={() => (openMA = false)}
-                  aria-label={t.back}
-                  class="hover:bg-barbi text-gold hover:text-white font-bold p-1 rounded-full transition-colors"
-                >
-                  <svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
-                  </svg>
-                </button>
-              </div>
-              <Mashman meData={combinedResources} />
-            </div>
-          {/if}
-          {#if addN}
-            <div class="m-4 border-2 border-barbi rounded bg-white/80 backdrop-blur-sm shadow-xl p-6">
-              <ResourceCreator 
-                {projectId} 
-                onCreated={handleCreated}
-                onCancel={() => (addN = false)}
-              />
-            </div>
-          {/if}
+          <ChoosMission mission1={missionTemplates} {pn} {pl} {restime} {projectUsers} {alit} onClose={closeM} />
         </div>
-      {:else if createMode === 'process'}
+      {/if}
+
+      <!-- פורמי משאב -->
+      {#if openMA}
+        <div class="m-4 border-2 border-barbi rounded bg-white/80 backdrop-blur-sm shadow-xl">
+          <div class="p-2 flex justify-end">
+            <button
+              onclick={() => (openMA = false)}
+              aria-label={t.back}
+              class="hover:bg-barbi text-gold hover:text-white font-bold p-1 rounded-full transition-colors"
+            >
+              <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
+              </svg>
+            </button>
+          </div>
+          <Mashman meData={combinedResources} />
+        </div>
+      {/if}
+      {#if addN}
+        <div class="m-4 border-2 border-barbi rounded bg-white/80 backdrop-blur-sm shadow-xl p-6">
+          <ResourceCreator
+            {projectId}
+            onCreated={handleCreated}
+            onCancel={() => (addN = false)}
+          />
+        </div>
+      {/if}
+
+      <!-- תהליך -->
+      {#if createMode === 'process'}
         <ProcessCreator
           projectId={page.params.projectId}
           onCreated={() => { createMode = null; }}
@@ -314,4 +304,5 @@
       {/if}
     </div>
   {/if}
+
 </div>
