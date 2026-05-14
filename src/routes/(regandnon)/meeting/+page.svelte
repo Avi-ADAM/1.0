@@ -426,6 +426,14 @@
   let t = $derived(titles[$lang] || titles.he);
 </script>
 
+<svelte:head>
+  <title>{$lang === 'he' ? 'פגישות · 1lev1' : 'Meetings · 1lev1'}</title>
+  <meta name="description" content={$lang === 'he' ? 'תיאום פגישות והתנהלות משותפת' : 'Schedule and manage collaborative meetings'} />
+  <meta property="og:title" content={$lang === 'he' ? 'פגישות · 1lev1' : 'Meetings · 1lev1'} />
+  <meta property="og:description" content={$lang === 'he' ? 'תיאום פגישות והתנהלות משותפת' : 'Schedule and manage collaborative meetings'} />
+  <meta property="og:type" content="website" />
+</svelte:head>
+
 <div
   class="min-h-screen pb-16 bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 text-white p-6"
   dir={$lang === 'he' ? 'rtl' : 'ltr'}

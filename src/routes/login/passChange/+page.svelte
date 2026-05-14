@@ -11,7 +11,7 @@
 let passwordx;
 let errorl = $state(null);
 let before = $state(true);
-  
+
 
 function shaneh () {
   console.log("1")
@@ -35,7 +35,7 @@ axios
     console.log('An error occurred:', error.response);
   errorl = error.response.data ;
   })};
- 
+
 	let strength = $state(0);
 	let validations = $state([]);
 	let showPassword = $state(false);
@@ -49,26 +49,31 @@ axios
 			password.search(/[$&+,:;=?@#]/) > -1,
 		];
 		strength = validations.reduce((acc, cur) => acc + cur, 0);
-		
+
 	}
 	function getV (e){
     passwordx = e.target.value
 	}
 	const crnp = {"he":"יצירת סיסמה חדשה","en":"create new password"}
-	    const val1 = {"he":"על הססמה להכיל לפחות 8 אותיות","en": "be at least 8 characters"}
+    const val1 = {"he":"על הססמה להכיל לפחות 8 אותיות","en": "be at least 8 characters"}
   const val2 = {"he":"ולפחות אות אחת גדולה באנגלית","en": "must contain a capital letter"}
   const val3 = {"he":"ולפחות מספר אחד","en": "must contain a number"}
   const arr2 = {"he":"הסיסמה שונתה בהצלחה","en": "the password has been changed"}
- 
+
 </script>
+
+<svelte:head>
+  <title>{$lang === 'he' ? 'שינוי סיסמה' : $lang === 'ar' ? 'تغيير كلمة المرور' : 'Change Password'} · 1lev1</title>
+</svelte:head>
+
 {#if before}
 <div>
         <div>
             {#if errorl}
-                        <h1 
+                        <h1
                         style="color:var(--barbi-pink); font-size:13px; font-weight:bold background-color: white; opacity: 0.7;"
                         >{errorl} </h1>
-       {/if} 
+       {/if}
     </div>
 
 
@@ -76,7 +81,7 @@ axios
 
 <main>
 	<form onsubmit={preventDefault(shaneh)}>
-		 
+
 
 		<div class="field">
 			<input
@@ -96,7 +101,7 @@ axios
 				{showPassword ? "🔒" : "👁"}
 			</span>
 		</div>
-				
+
 
 		<div class="strength">
 			<span class="bar bar-1" class:bar-show={strength > 0}></span>

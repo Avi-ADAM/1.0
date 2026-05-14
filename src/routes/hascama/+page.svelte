@@ -200,6 +200,11 @@ regHelperL = 0;
 </script>
 
 <svelte:head>
+  <title>{$lang === 'he' ? 'הסכמה · 1lev1' : 'Agreement · 1lev1'}</title>
+  <meta name="description" content={$lang === 'he' ? 'הצהרת העקרונות של 1lev1 — חיים בחופש, בהסכמה הדדית ובלי אלימות' : '1lev1 principles declaration — living in freedom, mutual agreement and without violence'} />
+  <meta property="og:title" content={$lang === 'he' ? 'הסכמה · 1lev1' : 'Agreement · 1lev1'} />
+  <meta property="og:description" content={$lang === 'he' ? 'הצהרת העקרונות של 1lev1 — חיים בחופש, בהסכמה הדדית ובלי אלימות' : '1lev1 principles declaration — living in freedom, mutual agreement and without violence'} />
+  <meta property="og:type" content="website" />
   <script>
     nl_pos = 'br';
     nl_color = 'pink';

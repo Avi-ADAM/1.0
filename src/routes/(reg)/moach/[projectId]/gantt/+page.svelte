@@ -5,6 +5,7 @@
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { onMount } from 'svelte';
   import Lowding from '$lib/celim/lowding.svelte';
+  import { lang } from '$lib/stores/lang.js';
 
   const moachStore = getMoachStore();
   let projectId = $derived(page.params.projectId);
@@ -27,6 +28,10 @@
     }
   });
 </script>
+
+<svelte:head>
+  <title>{page.data.projectBase?.projectName ? `${page.data.projectBase.projectName} · ` : ''}{$lang === 'he' ? 'גאנט' : $lang === 'ar' ? 'جانت' : 'Gantt'} · 1lev1</title>
+</svelte:head>
 
 <div class="gantt-page p-4 bg-white rounded-xl shadow-sm overflow-hidden">
   {#if loading && !missions}

@@ -186,6 +186,10 @@
   }
 </script>
 
+<svelte:head>
+  <title>{data.projectBase?.projectName ? `${data.projectBase.projectName} · ` : ''}{$lang === 'he' ? 'שרשראות' : $lang === 'ar' ? 'سلاسل' : 'Chains'} · 1lev1</title>
+</svelte:head>
+
 <div class="chains-page p-4">
   {#if loading && (!missions || !financials)}
     <div class="flex justify-center p-12">

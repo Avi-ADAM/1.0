@@ -27,6 +27,10 @@
   let t = $derived(i18n[$lang] || i18n.en);
 </script>
 
+<svelte:head>
+  <title>{page.data.projectBase?.projectName ? `${page.data.projectBase.projectName} · ` : ''}{$lang === 'he' ? 'הצבעות' : $lang === 'ar' ? 'التصويتات' : 'Votes'} · 1lev1</title>
+</svelte:head>
+
 <div class="votes-page space-y-8">
   <h1 class="text-2xl font-bold text-primary">{t.title}</h1>
 

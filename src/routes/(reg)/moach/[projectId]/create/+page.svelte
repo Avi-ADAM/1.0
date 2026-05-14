@@ -136,6 +136,7 @@
 </script>
 
 <svelte:head>
+  <title>{data.projectBase?.projectName ? `${data.projectBase.projectName} · ` : ''}{$lang === 'he' ? 'יצירה' : $lang === 'ar' ? 'إنشاء' : 'Create'} · 1lev1</title>
   <link rel="preload" as="image" href="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg" />
   <link rel="preload" as="image" href="https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg" />
 </svelte:head>

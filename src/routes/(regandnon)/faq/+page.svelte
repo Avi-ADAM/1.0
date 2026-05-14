@@ -5,6 +5,14 @@
   const questionKeys = Array.from({ length: questionCount }, (_, i) => i + 1);
 </script>
 
+<svelte:head>
+  <title>{$t('faq.title')} · 1lev1</title>
+  <meta name="description" content={$locale === 'he' ? 'שאלות ותשובות נפוצות על 1lev1' : 'Frequently asked questions about 1lev1'} />
+  <meta property="og:title" content="{$t('faq.title')} · 1lev1" />
+  <meta property="og:description" content={$locale === 'he' ? 'שאלות ותשובות נפוצות על 1lev1' : 'Frequently asked questions about 1lev1'} />
+  <meta property="og:type" content="website" />
+</svelte:head>
+
 <div class="faq-container" dir={$locale === 'en' ? 'ltr' : 'rtl'}>
   <h1>{$t('faq.title')}</h1>
 

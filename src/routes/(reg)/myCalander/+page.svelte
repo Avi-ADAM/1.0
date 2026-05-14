@@ -8,7 +8,7 @@
     let timersData = $state(null);
     let userId = data.uid;
     let isLoading = $state(true);
-    
+
     // טען את הנתונים מהשרת
     async function loadTimers() {
       isLoading = true;
@@ -16,14 +16,18 @@
       timersData = await sendToSer( { id: userId },'37getUserTimers',userId,null,false,fetch);
       isLoading = false;
     }
-    
+
     onMount(loadTimers);
     const loadingText = {
       he: 'טוען נתונים...',
       en: 'Loading data...'
     };
   </script>
-  
+
+<svelte:head>
+  <title>{$lang === 'he' ? 'לוח שנה' : $lang === 'ar' ? 'التقويم' : 'Calendar'} · 1lev1</title>
+</svelte:head>
+
   {#if isLoading}
     <div class="flex justify-center items-center p-8">
         <p class="text-lg">{loadingText[$lang]}</p>

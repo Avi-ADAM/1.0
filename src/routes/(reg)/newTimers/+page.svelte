@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
     import { fetchTimers , timers} from '$lib/stores/timers'
     import Timer from '$lib/components/timers/timer.svelte'
+    import { lang } from '$lib/stores/lang.js'
 	let hoverText = '0';
 	let tx = $state(200);
 	$effect(() => {
@@ -223,6 +224,10 @@
         orders = checkLines($timers);
     }
 </script>
+
+<svelte:head>
+  <title>{$lang === 'he' ? 'טיימרים' : $lang === 'ar' ? 'المؤقتات' : 'Timers'} · 1lev1</title>
+</svelte:head>
 
 <div id="screen" bind:clientWidth={ow} bind:clientHeight={oh} 
      style="position: fixed; width: 100vw; height: 100vh; top: 0; left: 0; max-width: 100vw; max-height: 100vh;" 

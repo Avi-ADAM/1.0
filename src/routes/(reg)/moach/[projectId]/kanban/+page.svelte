@@ -6,6 +6,7 @@
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { onMount } from 'svelte';
   import Lowding from '$lib/celim/lowding.svelte';
+  import { lang } from '$lib/stores/lang.js';
 
   let projectId = $derived(page.params.projectId);
   let projectData = $derived(moachStore.state.projects[projectId]);
@@ -45,6 +46,10 @@
     moachStore.openModal(e.kind, e.id);
   }
 </script>
+
+<svelte:head>
+  <title>{page.data.projectBase?.projectName ? `${page.data.projectBase.projectName} · ` : ''}{$lang === 'he' ? 'קאנבן' : $lang === 'ar' ? 'كانبان' : 'Kanban'} · 1lev1</title>
+</svelte:head>
 
 <div class="kanban-page p-2">
   {#if loading && !missions}

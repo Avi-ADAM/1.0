@@ -3,6 +3,7 @@
   import { userStore, mtahaStore, myActsStore } from '$lib/stores/levStores';
   import { fetchMyActs } from '$lib/utils/levGraphQLQueries';
   import MyActs from '$lib/components/prPr/tasks/Myacts.svelte';
+  import { lang } from '$lib/stores/lang.js';
 
   let { data } = $props();
   onMount(async () => {
@@ -33,5 +34,9 @@
     $mtahaStore.length > 0 ? $mtahaStore : $myActsStore
   );
 </script>
+
+<svelte:head>
+  <title>{$lang === 'he' ? 'הפעולות שלי' : $lang === 'ar' ? 'أعمالي' : 'My Acts'} · 1lev1</title>
+</svelte:head>
 
 <MyActs mesimot={mesimotToDisplay} />

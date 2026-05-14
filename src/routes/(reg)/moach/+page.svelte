@@ -27,6 +27,10 @@
   }
 </script>
 
+<svelte:head>
+  <title>{{ he: 'הריקמות שלי', en: 'My Projects', ar: 'مشاريعي' }[$lang] ?? 'My Projects'} · 1lev1</title>
+</svelte:head>
+
 <div
   class="alli bg-[radial-gradient(circle_at_50%,theme(colors.slate.400),theme(colors.slate.500)_10%,theme(colors.slate.600)_20%,theme(colors.slate.800),theme(colors.slate.900),#19031d)]"
 ></div>

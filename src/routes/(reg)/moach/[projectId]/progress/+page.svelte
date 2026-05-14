@@ -3,6 +3,7 @@
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   import { page } from '$app/state';
   import { untrack } from 'svelte';
+  import { lang } from '$lib/stores/lang.js';
 
   let { data } = $props();
   const moachStore = getMoachStore();
@@ -33,6 +34,10 @@
     modalState.isOpen = true;
   }
 </script>
+
+<svelte:head>
+  <title>{data.projectBase?.projectName ? `${data.projectBase.projectName} · ` : ''}{$lang === 'he' ? 'בתהליך' : $lang === 'ar' ? 'قيد التنفيذ' : 'Progress'} · 1lev1</title>
+</svelte:head>
 
 <div
   class="progress-page rounded-lg overflow-auto"

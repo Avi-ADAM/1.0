@@ -50,6 +50,10 @@
   let t = $derived(i18n[$lang] || i18n.en);
 </script>
 
+<svelte:head>
+  <title>{page.data.projectBase?.projectName ? `${page.data.projectBase.projectName} · ` : ''}{$lang === 'he' ? 'חלוקה' : $lang === 'ar' ? 'تقسيم' : 'Split'} · 1lev1</title>
+</svelte:head>
+
 <div class="split-page space-y-8">
   {#if loading && !financials}
     <div class="flex justify-center p-12">

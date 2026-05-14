@@ -302,6 +302,10 @@
   );
 </script>
 
+<svelte:head>
+  <title>{data.meeting?.title ?? ($lang === 'he' ? 'פגישה' : 'Meeting')} · 1lev1</title>
+</svelte:head>
+
 <div
   class="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 text-white"
   dir={$lang === 'he' ? 'rtl' : 'ltr'}

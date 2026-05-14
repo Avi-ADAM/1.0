@@ -3,6 +3,7 @@
   import TimersOfUsers from '$lib/components/prPr/timersOfUsers.svelte';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   import ActionModal from '$lib/components/moach/ActionModal.svelte';
+  import { lang } from '$lib/stores/lang.js';
 
   const moachStore = getMoachStore();
   let projectId = $derived(page.params.projectId);
@@ -20,6 +21,10 @@
     modalState.isOpen = true;
   }
 </script>
+
+<svelte:head>
+  <title>{page.data.projectBase?.projectName ? `${page.data.projectBase.projectName} · ` : ''}{$lang === 'he' ? 'טיימרים' : $lang === 'ar' ? 'مؤقتات' : 'Timers'} · 1lev1</title>
+</svelte:head>
 
 <div class="timers-page">
   <ActionModal

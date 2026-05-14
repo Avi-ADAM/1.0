@@ -2,6 +2,7 @@
   import Sheirut from '$lib/components/prPr/sheirut.svelte';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   import { page } from '$app/state';
+  import { lang } from '$lib/stores/lang.js';
 
   const moachStore = getMoachStore();
 
@@ -10,6 +11,10 @@
 
   // Note: Tab 6 was commented out in the monolith, but structure is here for restoration.
 </script>
+
+<svelte:head>
+  <title>{page.data.projectBase?.projectName ? `${page.data.projectBase.projectName} · ` : ''}{$lang === 'he' ? 'שירותים' : $lang === 'ar' ? 'الخدمات' : 'Services'} · 1lev1</title>
+</svelte:head>
 
 <div class="services-page p-8 bg-white rounded-xl shadow-sm">
   {#if projectBase}

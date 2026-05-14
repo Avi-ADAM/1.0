@@ -22,6 +22,10 @@
   let t = $derived(copy[$lang] || copy.he);
 </script>
 
+<svelte:head>
+  <title>פורומים · 1lev1</title>
+</svelte:head>
+
 <div class="grid h-full min-h-[60vh] place-items-center p-8 text-center">
   <div class="max-w-md">
     <div class="mx-auto mb-6 grid h-20 w-20 place-items-center rounded-full border border-gold/50 bg-gold/10 text-3xl font-black text-gold shadow-lg shadow-fuchsia-500/15">

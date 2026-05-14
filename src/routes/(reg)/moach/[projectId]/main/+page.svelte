@@ -19,6 +19,10 @@
   let innerWidth = $state(0);
 </script>
 
+<svelte:head>
+  <title>{projectBase?.projectName ? `${projectBase.projectName} · ` : ''}{$lang === 'he' ? 'ראשי' : $lang === 'ar' ? 'الرئيسية' : 'Main'} · 1lev1</title>
+</svelte:head>
+
 <svelte:window bind:innerWidth />
 
 <div class="space-y-8">

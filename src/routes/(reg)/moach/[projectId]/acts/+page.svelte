@@ -4,6 +4,7 @@
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   import { page } from '$app/state';
   import { invalidateAll } from '$app/navigation';
+  import { lang } from '$lib/stores/lang.js';
 
   const moachStore = getMoachStore();
 
@@ -45,6 +46,10 @@
     await invalidateAll();
   }
 </script>
+
+<svelte:head>
+  <title>{data.projectBase?.projectName ? `${data.projectBase.projectName} · ` : ''}{$lang === 'he' ? 'פעולות' : $lang === 'ar' ? 'أعمال' : 'Acts'} · 1lev1</title>
+</svelte:head>
 
 <div class="acts-page">
   <ActsTable
