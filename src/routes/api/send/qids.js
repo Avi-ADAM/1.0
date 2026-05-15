@@ -4808,7 +4808,168 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         id
       }
     }
-  }`
+  }`,
+
+  '85levHubSummary': `query LevHubSummary($idL: ID!) {
+  usersPermissionsUser(id: $idL) {
+    data {
+      id
+      attributes {
+        username
+        hervachti
+        profilePic {
+          data {
+            attributes {
+              url
+            }
+          }
+        }
+        asks(filters: { archived: { eq: false } }) {
+          data {
+            id
+            attributes {
+              timegrama {
+                data {
+                  attributes {
+                    date
+                  }
+                }
+              }
+              vots {
+                what
+                users_permissions_user {
+                  data {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        }
+        askms(filters: { archived: { eq: false } }) {
+          data {
+            id
+            attributes {
+              timegrama {
+                data {
+                  attributes {
+                    date
+                  }
+                }
+              }
+              vots {
+                what
+                users_permissions_user {
+                  data {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        }
+        sheiruts(filters: { archived: { eq: false }, isApruved: { eq: true } }) {
+          data {
+            id
+            attributes {
+              moneyTransfered
+              productExepted
+            }
+          }
+        }
+        mesimabetahaliches(
+          filters: { forappruval: { eq: false }, finnished: { eq: false } }
+        ) {
+          data {
+            id
+          }
+        }
+        projects_1s {
+          data {
+            id
+            attributes {
+              decisions(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    timegrama {
+                      data {
+                        attributes {
+                          date
+                        }
+                      }
+                    }
+                    vots {
+                      what
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              tosplits(filters: { finished: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    vots {
+                      what
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              sheirutpends(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    timegrama {
+                      data {
+                        attributes {
+                          date
+                        }
+                      }
+                    }
+                    votes {
+                      data {
+                        id
+                        attributes {
+                          what
+                          users_permissions_user {
+                            data {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              sheiruts(
+                filters: { archived: { eq: false }, isApruved: { eq: true } }
+              ) {
+                data {
+                  id
+                  attributes {
+                    moneyTransfered
+                    productExepted
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`
 };
 
 export const moachQids = {
