@@ -18,86 +18,113 @@ export interface HubSummary {
 
 const URGENT_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24h
 
-function userHasVoted(vots: any[], uid: string): boolean {
-  if (!Array.isArray(vots)) return false;
-  return vots.some(
-    (v) => v?.users_permissions_user?.data?.id === uid && v?.what != null
+function isUrgent(deadlineStr?: string): boolean {
+  if (!deadlineStr) return false;
+  const t = new Date(deadlineStr).getTime();
+  const now = Date.now();
+  return t > now && t - now < URGENT_THRESHOLD_MS;
+}
+
+/**
+ * Items that use ordered voting rounds (pendms, tosplits, sheirutpends).
+ * orderon = max(negoCount, max vote order).
+ * User still needs to vote when they have no vote with order === orderon.
+ */
+function needsOrderedVote(vots: any[], negoCount: number, uid: string): boolean {
+  const maxVoteOrder = vots.reduce((max, v) => Math.max(max, v.order ?? 0), 0);
+  const orderon = Math.max(negoCount, maxVoteOrder);
+  return !vots.some(
+    (v) => v.users_permissions_user?.data?.id === uid && (v.order ?? 0) === orderon
   );
 }
 
-function isUrgent(deadlineStr?: string): boolean {
-  if (!deadlineStr) return false;
-  const deadline = new Date(deadlineStr).getTime();
-  return deadline - Date.now() < URGENT_THRESHOLD_MS && deadline > Date.now();
+/**
+ * Items that use simple voting (finiapruvals, askms, maaps, decisions).
+ * User still needs to vote when they have no vote entry at all.
+ */
+function needsSimpleVote(vots: any[], uid: string): boolean {
+  return !vots.some((v) => v.users_permissions_user?.data?.id === uid);
 }
 
 function processHubSummary(raw: any, uid: string): HubSummary {
   const userData = raw?.data?.usersPermissionsUser?.data;
   if (!userData) {
-    return { kpi: { votes: 0, urgent: 0, suggestions: 0, activePurchases: 0, activeSales: 0 }, topFive: [], username: '' };
+    return {
+      kpi: { votes: 0, urgent: 0, suggestions: 0, activePurchases: 0, activeSales: 0 },
+      topFive: [],
+      username: ''
+    };
   }
 
   const attrs = userData.attributes;
   let votes = 0;
   let urgent = 0;
 
-  // asks
-  for (const ask of attrs.asks?.data ?? []) {
-    const a = ask.attributes;
-    if (!userHasVoted(a.vots, uid)) {
-      votes++;
-      if (isUrgent(a.timegrama?.data?.attributes?.date)) urgent++;
-    }
-  }
-
-  // askms
-  for (const askm of attrs.askms?.data ?? []) {
-    const a = askm.attributes;
-    if (!userHasVoted(a.vots, uid)) {
-      votes++;
-      if (isUrgent(a.timegrama?.data?.attributes?.date)) urgent++;
-    }
-  }
-
-  // project-level items
   for (const project of attrs.projects_1s?.data ?? []) {
     const pa = project.attributes;
 
-    // decisions
-    for (const dec of pa.decisions?.data ?? []) {
-      const da = dec.attributes;
-      if (!userHasVoted(da.vots, uid)) {
+    // pendms – ordered (negopendmissions count matters for orderon)
+    for (const pend of pa.pendms?.data ?? []) {
+      const a = pend.attributes;
+      const negoCount = a.negopendmissions?.data?.length ?? 0;
+      const vots = a.users ?? [];
+      if (needsOrderedVote(vots, negoCount, uid)) {
         votes++;
-        if (isUrgent(da.timegrama?.data?.attributes?.date)) urgent++;
+        if (isUrgent(a.timegrama?.data?.attributes?.date)) urgent++;
       }
     }
 
-    // tosplits (halukas)
-    for (const ts of pa.tosplits?.data ?? []) {
-      if (!userHasVoted(ts.attributes.vots, uid)) votes++;
+    // finiapruvals – simple (no order)
+    for (const fin of pa.finiapruvals?.data ?? []) {
+      const a = fin.attributes;
+      if (needsSimpleVote(a.vots ?? [], uid)) {
+        votes++;
+        if (isUrgent(a.timegrama?.data?.attributes?.date)) urgent++;
+      }
     }
 
-    // sheirutpends – votes are relational (Vote entity)
+    // askms – simple (no order)
+    for (const askm of pa.askms?.data ?? []) {
+      if (needsSimpleVote(askm.attributes.vots ?? [], uid)) votes++;
+    }
+
+    // maaps – simple (no order)
+    for (const maap of pa.maaps?.data ?? []) {
+      if (needsSimpleVote(maap.attributes.vots ?? [], uid)) votes++;
+    }
+
+    // decisions – simple (any vote counts)
+    for (const dec of pa.decisions?.data ?? []) {
+      if (needsSimpleVote(dec.attributes.vots ?? [], uid)) votes++;
+    }
+
+    // tosplits – ordered
+    for (const ts of pa.tosplits?.data ?? []) {
+      if (needsOrderedVote(ts.attributes.vots ?? [], 0, uid)) votes++;
+    }
+
+    // sheirutpends – ordered, relational votes (Vote entity)
     for (const sp of pa.sheirutpends?.data ?? []) {
-      const spAttrs = sp.attributes;
-      const spVots = (spAttrs.votes?.data ?? []).map((v: any) => ({
-        what: v.attributes.what,
-        users_permissions_user: v.attributes.users_permissions_user
+      const a = sp.attributes;
+      const normalizedVots = (a.votes?.data ?? []).map((v: any) => ({
+        order: v.attributes?.order,
+        what: v.attributes?.what,
+        users_permissions_user: v.attributes?.users_permissions_user
       }));
-      if (!userHasVoted(spVots, uid)) {
+      if (needsOrderedVote(normalizedVots, 0, uid)) {
         votes++;
-        if (isUrgent(spAttrs.timegrama?.data?.attributes?.date)) urgent++;
+        if (isUrgent(a.timegrama?.data?.attributes?.date)) urgent++;
       }
     }
   }
 
-  // Active purchases (user as buyer)
+  // Active purchases (user as buyer – sheiruts directly on user)
   const activePurchases = (attrs.sheiruts?.data ?? []).filter((s: any) => {
     const sa = s.attributes;
     return !(sa.moneyTransfered && sa.productExepted);
   }).length;
 
-  // Active sales (user as seller, through projects_1s)
+  // Active sales (user as seller – sheiruts via projects_1s)
   let activeSales = 0;
   for (const project of attrs.projects_1s?.data ?? []) {
     activeSales += (project.attributes.sheiruts?.data ?? []).filter((s: any) => {
@@ -106,7 +133,7 @@ function processHubSummary(raw: any, uid: string): HubSummary {
     }).length;
   }
 
-  // suggestions: active missions count (simplified – full match needs skills, done client-side)
+  // suggestions proxy: active missions the user is working in
   const suggestions = attrs.mesimabetahaliches?.data?.length ?? 0;
 
   return {

@@ -4824,50 +4824,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
             }
           }
         }
-        asks(filters: { archived: { eq: false } }) {
-          data {
-            id
-            attributes {
-              timegrama {
-                data {
-                  attributes {
-                    date
-                  }
-                }
-              }
-              vots {
-                what
-                users_permissions_user {
-                  data {
-                    id
-                  }
-                }
-              }
-            }
-          }
-        }
-        askms(filters: { archived: { eq: false } }) {
-          data {
-            id
-            attributes {
-              timegrama {
-                data {
-                  attributes {
-                    date
-                  }
-                }
-              }
-              vots {
-                what
-                users_permissions_user {
-                  data {
-                    id
-                  }
-                }
-              }
-            }
-          }
-        }
+        # Purchases (user as buyer)
         sheiruts(filters: { archived: { eq: false }, isApruved: { eq: true } }) {
           data {
             id
@@ -4877,6 +4834,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
             }
           }
         }
+        # Active missions count (proxy for suggestions KPI)
         mesimabetahaliches(
           filters: { forappruval: { eq: false }, finnished: { eq: false } }
         ) {
@@ -4888,7 +4846,37 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           data {
             id
             attributes {
-              decisions(filters: { archived: { eq: false } }) {
+              # Mission applications – members vote via pendms.users (ordered)
+              pendms(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    timegrama {
+                      data {
+                        attributes {
+                          date
+                        }
+                      }
+                    }
+                    negopendmissions {
+                      data {
+                        id
+                      }
+                    }
+                    users {
+                      what
+                      order
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              # Completion approvals – members vote via finiapruvals.vots (no order)
+              finiapruvals(filters: { archived: { eq: false } }) {
                 data {
                   id
                   attributes {
@@ -4910,7 +4898,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                   }
                 }
               }
-              tosplits(filters: { finished: { eq: false } }) {
+              # Resource requests – members vote via askms.vots (no order)
+              askms(filters: { archived: { eq: false } }) {
                 data {
                   id
                   attributes {
@@ -4925,6 +4914,56 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                   }
                 }
               }
+              # Resource approvals – members vote via maaps.vots (no order)
+              maaps(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    vots {
+                      what
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              # Project decisions – members vote via decisions.vots (no orderon, any vote counts)
+              decisions(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    vots {
+                      what
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              # Split proposals – members vote via tosplits.vots (ordered)
+              tosplits(filters: { finished: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    vots {
+                      what
+                      order
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              # Service purchase requests – members vote via sheirutpends.votes (relational, ordered)
               sheirutpends(filters: { archived: { eq: false } }) {
                 data {
                   id
@@ -4941,6 +4980,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                         id
                         attributes {
                           what
+                          order
                           users_permissions_user {
                             data {
                               id
@@ -4952,6 +4992,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                   }
                 }
               }
+              # Sales (user as seller)
               sheiruts(
                 filters: { archived: { eq: false }, isApruved: { eq: true } }
               ) {
