@@ -2,6 +2,7 @@
   import SkillSelector from '$lib/components/ui/SkillSelector.svelte';
   import { userName } from '../../stores/store.js';
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import { page } from '$app/state';
 
   import { show } from './store-show.js';
@@ -108,17 +109,12 @@
     he: 'https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg',
     en: 'https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg'
   };
-  const ws = { he: 'מה הן היכולות והכישורים שלך?', en: 'What you can do?' };
-  const skipt = {
-    he: 'דילוג לסוף ההרשמה, ניתן יהיה להוסיף את הפרטים בכל עת מעמוד הפרופיל',
-    en: 'skip to end of registration, you can always add those details from your profile page'
-  };
 </script>
 
 <h1 class="midscreenText-2">
   {userName_value}
   <br />
-  {ws[$lang]}
+  {$t('auth.registration.skills.question')}
 </h1>
 
 <div dir={$lang == 'en' ? 'ltr' : 'rtl'} class="input-2">
@@ -135,7 +131,7 @@
 <button
   class="button-end bg-sturk p-1 rounded-full"
   onclick={toend}
-  title={skipt[$lang]}
+  title={$t('auth.registration.skills.skipToEnd')}
 >
   <Skip />
 </button>

@@ -21,6 +21,7 @@
     onProgres
   } = $props();
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import jroles from '$lib/data/tafkidim.json';
   import enjrole from '$lib/data/tafkidimEn.json';
   let roles1 = $state([]);
