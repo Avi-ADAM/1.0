@@ -1,0 +1,14 @@
+{
+  "title": "העסקאות שלי",
+  "subtitle": "עקוב אחרי כל המוצרים ומצב ביצועם בזמן אמת",
+  "my_purchases": "קניות שלי",
+  "my_sales": "מכירות שלי",
+  "pending_requests": "בקשות ממתינות",
+  "active_purchases": "קניות פעילות",
+  "active_sales": "מכירות פעילות",
+  "pending_requests_label": "בקשות רכישה ממתינות לאישור",
+  "no_active_purchases": "אין לך עדיין קניות פעילות",
+  "no_active_sales": "אין לך עדיין מכירות פעילות",
+  "no_pending_requests": "אין בקשות ממתינות",
+  "logo_alt": "לוגו עסקאות"
+}

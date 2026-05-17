@@ -33,6 +33,12 @@ export const config = {
             loader: async () => (await import('./en/tasks.json')).default,
         },
         {
+            locale: 'en',
+            key: 'deals',
+            routes: [/^(?:\/he|\/en|\/ar)?\/deals/],
+            loader: async () => (await import('./en/deals.json')).default,
+        },
+        {
             locale: 'ar',
             key: 'bot',
             routes: [/^(?:\/he|\/en|\/ar)?\/chat/],
@@ -154,6 +160,12 @@ export const config = {
             loader: async () => (await import('./he/countries.json')).default,
         },
         {
+            locale: 'he',
+            key: 'deals',
+            routes: [/^(?:\/he|\/en|\/ar)?\/deals/],
+            loader: async () => (await import('./he/deals.json')).default,
+        },
+        {
             locale: 'ar',
             key: 'love',
             routes: ['/love'],
@@ -188,6 +200,12 @@ export const config = {
             locale: 'ar',
             key: 'countries',
             loader: async () => (await import('./ar/countries.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'deals',
+            routes: [/^(?:\/he|\/en|\/ar)?\/deals/],
+            loader: async () => (await import('./ar/deals.json')).default,
         },
     ],
 };

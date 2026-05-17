@@ -1118,6 +1118,7 @@ export function extractProductRequests(userData: any): ProductRequestData[] {
         quant: attrs.quant || firstMatana?.quant || 0,
         total: attrs.total || 0,
         kindOf: firstMatana?.kindOf || sheirut?.kindOf || '',
+        pricingMode: firstMatana?.pricingMode,
         src: firstMatana?.pic?.data?.attributes?.url,
         startDate: attrs.startDate,
         finishDate: attrs.finnishDate,
@@ -1132,6 +1133,9 @@ export function extractProductRequests(userData: any): ProductRequestData[] {
         })) || [],
         createdAt: attrs.createdAt,
         myid: userData.id,
+
+        // Forum / chat
+        forumId: attrs.forum?.data?.id || null,
 
         // Relations
         sheirutId: attrs.sheirut?.data?.id,
@@ -1152,7 +1156,7 @@ export function extractProductRequests(userData: any): ProductRequestData[] {
 /**
  * Helper to map raw sheirut data to SaleData structure
  */
-function mapSaleData(sheirut: any, projectId: string, userData: any, mode: 'sale' | 'buy'): SaleData {
+export function mapSaleData(sheirut: any, projectId: string, userData: any, mode: 'sale' | 'buy'): SaleData {
   const attrs = sheirut.attributes;
   const customer = attrs.users_permissions_users?.data[0];
   const firstMatana = attrs.matanots?.data?.[0]?.attributes;

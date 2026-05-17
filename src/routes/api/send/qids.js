@@ -44,6 +44,11 @@ const qids_base = {
       data { id }
     }
   }`,
+  '2linkForumToSheirutpend': `mutation LinkForumToSheirutpend($id: ID!, $forumId: ID!) {
+    updateSheirutpend(id: $id, data: { forum: $forumId }) {
+      data { id }
+    }
+  }`,
   '2cGetMoneyReceivers': `query GetMoneyReceivers($id: ID!) {
     sheirut(id: $id) {
       data {
@@ -831,6 +836,53 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           archived
           startDate
           finnishDate
+          pricingMode
+          marginPct
+          estimatedPrice
+          status_of_voting
+          appruved
+          process {
+            data {
+              id
+              attributes {
+                forums { data { id attributes { subject spec } } }
+              }
+            }
+          }
+          matanot_recipe_missions {
+            data {
+              id
+              attributes {
+                hoursPerUnit unitsPerProduct ratePerHour mode notes
+                pendm { data { id attributes { name descrip } } }
+                mesimabetahalich {
+                  data {
+                    id
+                    attributes { name howmanyhoursalready hoursassinged }
+                  }
+                }
+              }
+            }
+          }
+          matanot_recipe_resources {
+            data {
+              id
+              attributes {
+                quantityPerUnit pricePerUnit kindOf mode notes
+                pmash { data { id attributes { name } } }
+                mashabetahalich {
+                  data {
+                    id
+                    attributes { name 
+                        pricePerUnit
+                        kindOf
+                        descrip
+                    }
+                  }
+                }
+              }
+            }
+          }
           projectcreates {
             data {
               id
@@ -1037,6 +1089,19 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                 createdAt
               }
             }
+          }
+        }
+      }
+    }
+  }`,
+
+  "65checkSheirutpendRequester": `query CheckSheirutpendRequester($uid: ID!, $sheirutpendId: ID!) {
+    sheirutpend(id: $sheirutpendId) {
+      data {
+        id
+        attributes {
+          users_permissions_user {
+            data { id }
           }
         }
       }
@@ -1449,6 +1514,9 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                     }
                   }
                 }
+                user_1s {
+                  data { id }
+                }
               }
             }
           }
@@ -1493,6 +1561,9 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                 name
                 desc
                 kindOf
+                pricingMode
+                estimatedPrice
+                marginPct
                 pic {
                   data {
                     attributes {
@@ -1501,7 +1572,40 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                     }
                   }
                 }
+                matanot_recipe_missions {
+                  data {
+                    id
+                    attributes {
+                      hoursPerUnit
+                      unitsPerProduct
+                      ratePerHour
+                      mode
+                      notes
+                      pendm { data { id attributes { name descrip noofhours perhour mission { data { id } } } } }
+                      mesimabetahalich { data { id attributes { name howmanyhoursalready hoursassinged } } }
+                    }
+                  }
+                }
+                matanot_recipe_resources {
+                  data {
+                    id
+                    attributes {
+                      quantityPerUnit
+                      pricePerUnit
+                      kindOf
+                      mode
+                      notes
+                      pmash { data { id attributes { name price hm kindOf descrip } } }
+                      mashabetahalich { data { id attributes { name pricePerUnit kindOf descrip } } }
+                    }
+                  }
+                }
               }
+            }
+          }
+          forum {
+            data {
+              id
             }
           }
           votes { data {id attributes{
@@ -2859,7 +2963,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                   }
                 }
               }
-              pmashes(filters: { archived: { eq: false } }) {
+              pmashes(filters: { archived: { eq: false }, matanot_recipe_resources: { id: { null: true } } }) {
                 data {
                   id
                   attributes {
@@ -3467,7 +3571,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                   }
                 }
               }
-              pendms(filters: { archived: { eq: false } }) {
+              pendms(filters: { archived: { eq: false }, matanot_recipe_missions: { id: { null: true } } }) {
                 data {
                   id
                   attributes {
@@ -4808,6 +4912,646 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         id
       }
     }
+  }`,
+  '123dealsForUser': `query DealsForUser($idL: ID!) {
+    usersPermissionsUser(id: $idL) {
+      data {
+        id
+        attributes {
+          username
+          profilePic { data { attributes { url formats } } }
+          sheiruts {
+            data {
+              id
+              attributes {
+                name descrip equaliSplited oneTime archived isApruved
+                price quant total startDate finnishDate
+                iGotIt iTransferMoney moneyTransfered productExepted
+                iGotMoney { iGotMoney users_permissions_user { data { id } } }
+                weFinnish {
+                  data { id attributes { what order why users_permissions_user { data { id } } } }
+                }
+                iCanGetMonay {
+                  data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                }
+                iTransferedTo {
+                  data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                }
+                users_permissions_users {
+                  data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                }
+                matanot {
+                  data { id attributes { name desc price quant kindOf pic { data { attributes { url formats } } } } }
+                }
+                forums {
+                  data {
+                    id
+                    attributes {
+                      messages(pagination: { limit: 50 }) {
+                        data {
+                          id
+                          attributes {
+                            content createdAt
+                            users_permissions_user {
+                              data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                halukas(filters: { ushar: { eq: true } }) {
+                  data {
+                    id
+                    attributes {
+                      senderconf confirmed amount
+                      forum { data { id } }
+                      usersend { data { id } }
+                      userrecive { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+                    }
+                  }
+                }
+                project {
+                  data {
+                    id
+                    attributes {
+                      projectName
+                      profilePic { data { attributes { url formats } } }
+                      user_1s {
+                        data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          sheirutpends(filters: { archived: { eq: false } }) {
+            data {
+              id
+              attributes {
+                price quant total startDate finnishDate createdAt
+                forum { data { id } }
+                matanots {
+                  data {
+                    id
+                    attributes {
+                      name kindOf pricingMode estimatedPrice marginPct
+                      pic { data { attributes { url } } }
+                      matanot_recipe_missions {
+                        data { id attributes { hoursPerUnit unitsPerProduct ratePerHour mode notes
+                          pendm { data { id attributes { name } } }
+                          mesimabetahalich { data { id attributes { name } } }
+                        } }
+                      }
+                      matanot_recipe_resources {
+                        data { id attributes { quantityPerUnit pricePerUnit kindOf mode notes
+                          pmash { data { id attributes { name } } }
+                          mashabetahalich { data { id attributes { name pricePerUnit kindOf } } }
+                        } }
+                      }
+                    }
+                  }
+                }
+                project {
+                  data { id attributes { projectName profilePic { data { attributes { url } } } } }
+                }
+              }
+            }
+          }
+          projects_1s {
+            data {
+              id
+              attributes {
+                projectName
+                profilePic { data { attributes { url formats } } }
+                user_1s {
+                  data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                }
+                sheiruts {
+                  data {
+                    id
+                    attributes {
+                      name descrip equaliSplited oneTime archived isApruved
+                      price quant total startDate finnishDate
+                      iGotIt iTransferMoney moneyTransfered productExepted
+                      iGotMoney { iGotMoney users_permissions_user { data { id } } }
+                      weFinnish {
+                        data { id attributes { what order why users_permissions_user { data { id } } } }
+                      }
+                      iCanGetMonay {
+                        data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                      }
+                      iTransferedTo {
+                        data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                      }
+                      users_permissions_users {
+                        data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                      }
+                      matanot {
+                        data { id attributes { name desc price quant kindOf pic { data { attributes { url formats } } } } }
+                      }
+                      forums {
+                        data {
+                          id
+                          attributes {
+                            messages(pagination: { limit: 50 }) {
+                              data {
+                                id
+                                attributes {
+                                  content createdAt
+                                  users_permissions_user {
+                                    data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                      halukas(filters: { ushar: { eq: true } }) {
+                        data {
+                          id
+                          attributes {
+                            senderconf confirmed amount
+                            forum { data { id } }
+                            usersend { data { id } }
+                            userrecive { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                sheirutpends(filters: { archived: { eq: false } }) {
+                  data {
+                    id
+                    attributes {
+                      price quant total startDate finnishDate createdAt
+                      forum { data { id } }
+                      matanots {
+                        data {
+                          id
+                          attributes {
+                            name kindOf pricingMode estimatedPrice marginPct
+                            pic { data { attributes { url } } }
+                            matanot_recipe_missions {
+                              data { id attributes { hoursPerUnit unitsPerProduct ratePerHour mode notes
+                                pendm { data { id attributes { name } } }
+                                mesimabetahalich { data { id attributes { name } } }
+                              } }
+                            }
+                            matanot_recipe_resources {
+                              data { id attributes { quantityPerUnit pricePerUnit kindOf mode notes
+                                pmash { data { id attributes { name } } }
+                                mashabetahalich { data { id attributes { name pricePerUnit kindOf } } }
+                              } }
+                            }
+                          }
+                        }
+                      }
+                      users_permissions_user {
+                        data { id attributes { username profilePic { data { attributes { url } } } } }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+  '125userPendingForMatanot': `query UserPendingForMatanot($uid: ID!, $matId: ID!) {
+    sheirutpends(filters: {
+      users_permissions_user: { id: { eq: $uid } },
+      matanots: { id: { in: [$matId] } },
+      archived: { eq: false }
+    }) {
+      data {
+        id
+        attributes {
+          price quant total startDate finnishDate createdAt
+          project { data { id attributes { projectName } } }
+        }
+      }
+    }
+  }`,
+  '124sheirutForDeal': `query SheirutForDeal($id: ID!) {
+    sheirut(id: $id) {
+      data {
+        id
+        attributes {
+          name descrip equaliSplited oneTime archived isApruved
+          price quant total startDate finnishDate
+          iGotIt iTransferMoney moneyTransfered productExepted
+          iGotMoney { iGotMoney users_permissions_user { data { id } } }
+          weFinnish {
+            data { id attributes { what order why users_permissions_user { data { id } } } }
+          }
+          iCanGetMonay {
+            data { id attributes { username profilePic { data { attributes { url formats } } } } }
+          }
+          iTransferedTo {
+            data { id attributes { username profilePic { data { attributes { url formats } } } } }
+          }
+          users_permissions_users {
+            data { id attributes { username profilePic { data { attributes { url formats } } } } }
+          }
+          matanot {
+            data { id attributes { name desc price quant kindOf pic { data { attributes { url formats } } } } }
+          }
+          forums {
+            data {
+              id
+              attributes {
+                messages(pagination: { limit: 50 }) {
+                  data {
+                    id
+                    attributes {
+                      content createdAt
+                      users_permissions_user {
+                        data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          halukas(filters: { ushar: { eq: true } }) {
+            data {
+              id
+              attributes {
+                senderconf confirmed amount
+                forum { data { id } }
+                usersend { data { id } }
+                userrecive { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+              }
+            }
+          }
+          project {
+            data {
+              id
+              attributes {
+                projectName
+                profilePic { data { attributes { url formats } } }
+                user_1s {
+                  data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  '125createMatanotRecipeMission': `mutation CreateMatanotRecipeMission(
+    $matanot: ID!,
+    $pendm: ID,
+    $mesimabetahalich: ID,
+    $hoursPerUnit: Float!,
+    $unitsPerProduct: Float,
+    $ratePerHour: Float,
+    $mode: ENUM_MATANOTRECIPEMISSION_MODE,
+    $notes: String,
+    $partof: ID,
+    $publishedAt: DateTime
+  ) {
+    createMatanotRecipeMission(data: {
+      matanot: $matanot,
+      pendm: $pendm,
+      mesimabetahalich: $mesimabetahalich,
+      hoursPerUnit: $hoursPerUnit,
+      unitsPerProduct: $unitsPerProduct,
+      ratePerHour: $ratePerHour,
+      mode: $mode,
+      notes: $notes,
+      partof: $partof,
+      publishedAt: $publishedAt
+    }) {
+      data { id attributes { hoursPerUnit unitsPerProduct mode } }
+    }
+  }`,
+
+  '126updateMatanotRecipeMission': `mutation UpdateMatanotRecipeMission(
+    $id: ID!,
+    $hoursPerUnit: Float,
+    $unitsPerProduct: Float,
+    $ratePerHour: Float,
+    $mode: ENUM_MATANOTRECIPEMISSION_MODE,
+    $notes: String,
+    $mesimabetahalich: ID
+  ) {
+    updateMatanotRecipeMission(id: $id, data: {
+      hoursPerUnit: $hoursPerUnit,
+      unitsPerProduct: $unitsPerProduct,
+      ratePerHour: $ratePerHour,
+      mode: $mode,
+      notes: $notes,
+      mesimabetahalich: $mesimabetahalich
+    }) {
+      data { id attributes { hoursPerUnit unitsPerProduct mode } }
+    }
+  }`,
+
+  '127deleteMatanotRecipeMission': `mutation DeleteMatanotRecipeMission($id: ID!) {
+    deleteMatanotRecipeMission(id: $id) {
+      data { id }
+    }
+  }`,
+
+  '128createMatanotRecipeResource': `mutation CreateMatanotRecipeResource(
+    $matanot: ID!,
+    $pmash: ID,
+    $mashabetahalich: ID,
+    $quantityPerUnit: Float!,
+    $pricePerUnit: Float,
+    $kindOf: ENUM_MATANOTRECIPERESOURCE_KINDOF,
+    $mode: ENUM_MATANOTRECIPERESOURCE_MODE,
+    $notes: String,
+    $publishedAt: DateTime
+  ) {
+    createMatanotRecipeResource(data: {
+      matanot: $matanot,
+      pmash: $pmash,
+      mashabetahalich: $mashabetahalich,
+      quantityPerUnit: $quantityPerUnit,
+      pricePerUnit: $pricePerUnit,
+      kindOf: $kindOf,
+      mode: $mode,
+      notes: $notes,
+      publishedAt: $publishedAt
+    }) {
+      data { id attributes { quantityPerUnit pricePerUnit mode } }
+    }
+  }`,
+
+  '129updateMatanotRecipeResource': `mutation UpdateMatanotRecipeResource(
+    $id: ID!,
+    $quantityPerUnit: Float,
+    $pricePerUnit: Float,
+    $mode: ENUM_MATANOTRECIPERESOURCE_MODE,
+    $notes: String,
+    $pmash: ID,
+    $mashabetahalich: ID
+  ) {
+    updateMatanotRecipeResource(id: $id, data: {
+      quantityPerUnit: $quantityPerUnit,
+      pricePerUnit: $pricePerUnit,
+      mode: $mode,
+      notes: $notes,
+      pmash: $pmash,
+      mashabetahalich: $mashabetahalich
+    }) {
+      data { id attributes { quantityPerUnit pricePerUnit mode } }
+    }
+  }`,
+
+  '130deleteMatanotRecipeResource': `mutation DeleteMatanotRecipeResource($id: ID!) {
+    deleteMatanotRecipeResource(id: $id) {
+      data { id }
+    }
+  }`,
+
+  '131createSheirutFulfillment': `mutation CreateSheirutFulfillment(
+    $sheirut: ID!,
+    $matanot: ID!,
+    $quantity: Float!,
+    $process: ID,
+    $agreedPrice: Float,
+    $status: ENUM_SHEIRUTFULFILLMENT_STATUS,
+    $publishedAt: DateTime
+  ) {
+    createSheirutFulfillment(data: {
+      sheirut: $sheirut,
+      matanot: $matanot,
+      quantity: $quantity,
+      process: $process,
+      agreedPrice: $agreedPrice,
+      status: $status,
+      publishedAt: $publishedAt
+    }) {
+      data {
+        id
+        attributes { quantity agreedPrice status }
+      }
+    }
+  }`,
+
+  '132updateSheirutFulfillment': `mutation UpdateSheirutFulfillment(
+    $id: ID!,
+    $agreedPrice: Float,
+    $status: ENUM_SHEIRUTFULFILLMENT_STATUS,
+    $createdMissions: [ID],
+    $createdMaaps: [ID],
+    $createdPmashes: [ID]
+  ) {
+    updateSheirutFulfillment(id: $id, data: {
+      agreedPrice: $agreedPrice,
+      status: $status,
+      createdMissions: $createdMissions,
+      createdMaaps: $createdMaaps,
+      createdPmashes: $createdPmashes
+    }) {
+      data { id attributes { agreedPrice status } }
+    }
+  }`,
+
+  '133queryComplexMatanot': `query QueryComplexMatanot($id: ID!) {
+    matanot(id: $id) {
+      data {
+        id
+        attributes {
+          name desc price quant kindOf
+          pricingMode marginPct estimatedPrice currency
+          status_of_voting appruved
+          pic { data { attributes { url formats } } }
+          projectcreates { data { id attributes { projectName } } }
+          process {
+            data {
+              id
+              attributes {
+                forums { data { id attributes { subject spec } } }
+              }
+            }
+          }
+          matanot_recipe_missions {
+            data {
+              id
+              attributes {
+                hoursPerUnit unitsPerProduct ratePerHour mode notes
+                pendm { data { id attributes { name descrip } } }
+                mesimabetahalich {
+                  data {
+                    id
+                    attributes { name howmanyhoursalready hoursassinged status }
+                  }
+                }
+                partof { data { id } }
+              }
+            }
+          }
+          matanot_recipe_resources {
+            data {
+              id
+              attributes {
+                quantityPerUnit pricePerUnit kindOf mode notes
+                pmash { data { id attributes { name } } }
+                mashabetahalich {
+                  data {
+                    id
+                    attributes { name 
+                        pricePerUnit
+                        kindOf
+                        descrip
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  '134updateMatanotStatus': `mutation UpdateMatanotStatus(
+    $id: ID!,
+    $status_of_voting: ENUM_MATANOT_STATUS_OF_VOTING,
+    $pricingMode: ENUM_MATANOT_PRICINGMODE,
+    $estimatedPrice: Float,
+    $marginPct: Float,
+    $process: ID
+  ) {
+    updateMatanot(id: $id, data: {
+      status_of_voting: $status_of_voting,
+      pricingMode: $pricingMode,
+      estimatedPrice: $estimatedPrice,
+      marginPct: $marginPct,
+      process: $process
+    }) {
+      data {
+        id
+        attributes { status_of_voting pricingMode estimatedPrice marginPct }
+      }
+    }
+  }`,
+
+  '135approveMatanot': `mutation ApproveMatanot($id: ID!) {
+    updateMatanot(id: $id, data: { status_of_voting: active, appruved: true }) {
+      data {
+        id
+        attributes { status_of_voting appruved }
+      }
+    }
+  }`,
+
+  '136createMatanot': `mutation CreateMatanot(
+    $projectcreates: ID!,
+    $name: String!,
+    $desc: JSON,
+    $price: Float,
+    $quant: Float,
+    $kindOf: ENUM_MATANOT_KINDOF,
+    $pic: ID,
+    $startDate: DateTime,
+    $finnishDate: DateTime,
+    $oneForeProject: Boolean,
+    $pricingMode: ENUM_MATANOT_PRICINGMODE,
+    $marginPct: Float,
+    $estimatedPrice: Float,
+    $status_of_voting: ENUM_MATANOT_STATUS_OF_VOTING,
+    $process: ID,
+    $publishedAt: DateTime
+  ) {
+    createMatanot(data: {
+      projectcreates: [$projectcreates],
+      name: $name,
+      desc: $desc,
+      price: $price,
+      quant: $quant,
+      kindOf: $kindOf,
+      pic: $pic,
+      startDate: $startDate,
+      finnishDate: $finnishDate,
+      oneForeProject: $oneForeProject,
+      pricingMode: $pricingMode,
+      marginPct: $marginPct,
+      estimatedPrice: $estimatedPrice,
+      status_of_voting: $status_of_voting,
+      process: $process,
+      publishedAt: $publishedAt
+    }) {
+      data {
+        id
+        attributes {
+          name desc price quant kindOf
+          pricingMode marginPct estimatedPrice status_of_voting
+          process { data { id } }
+        }
+      }
+    }
+  }`,
+
+  '137createPendmForRecipe': `mutation CreatePendmForRecipe(
+    $name: String,
+    $project: ID,
+    $perhour: Float,
+    $noofhours: Float,
+    $descrip: String,
+    $publishedAt: DateTime
+  ) {
+    createPendm(data: {
+      name: $name,
+      project: $project,
+      isglobal: true,
+      perhour: $perhour,
+      noofhours: $noofhours,
+      descrip: $descrip,
+      publishedAt: $publishedAt
+    }) {
+      data { id attributes { name isglobal perhour noofhours } }
+    }
+  }`,
+
+  '138createPmashForRecipe': `mutation CreatePmashForRecipe(
+    $name: String,
+    $project: ID,
+    $price: Float,
+    $easy: Float,
+    $hm: Float,
+    $kindOf: ENUM_PMASH_KINDOF,
+    $descrip: String,
+    $publishedAt: DateTime
+  ) {
+    createPmash(data: {
+      name: $name,
+      project: $project,
+      price: $price,
+      easy: $easy,
+      hm: $hm,
+      kindOf: $kindOf,
+      descrip: $descrip,
+      publishedAt: $publishedAt
+    }) {
+      data { id attributes { name price hm kindOf } }
+    }
+  }`,
+
+  '139createMesimabetahalich': `mutation CreateMesimabetahalich($data: MesimabetahalichInput!) {
+    createMesimabetahalich(data: $data) { data { id } }
+  }`,
+
+  '140createAct': `mutation CreateAct($data: ActInput!) {
+    createAct(data: $data) { data { id } }
+  }`,
+
+  '141createMaap': `mutation CreateMaap($data: MaapInput!) {
+    createMaap(data: $data) { data { id } }
   }`
 };
 

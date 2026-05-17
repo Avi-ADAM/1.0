@@ -26,6 +26,7 @@ import { approveSheirutpendConfig } from './approveSheirutpend.js';
 import { rejectSheirutpendConfig } from './rejectSheirutpend.js';
 import { addVoteConfig } from './addVote.js';
 import { ensureSheirutForumConfig } from './ensureSheirutForum.js';
+import { ensureSheirutpendForumConfig } from './ensureSheirutpendForum.js';
 import { createProcessConfig } from './createProcess.js';
 import { attachEntityToProcessConfig } from './attachEntityToProcess.js';
 import { ensureProcessForumConfig } from './ensureProcessForum.js';
@@ -42,6 +43,8 @@ import { createSheirutHalukaConfig } from './createSheirutHaluka.js';
 import { confirmSheirutHalukaConfig } from './confirmSheirutHaluka.js';
 import { ensureHalukaForumConfig } from './ensureHalukaForum.js';
 import { forumReadActions } from './forum.js';
+import { createComplexMatanotConfig } from './createComplexMatanot.js';
+import { approveMatanotConfig } from './approveMatanot.js';
 
 
 /**
@@ -81,6 +84,7 @@ export function registerAllActions(): void {
 
   // Sheirut forum helpers
   registerAction(ensureSheirutForumConfig);
+  registerAction(ensureSheirutpendForumConfig);
   registerAction(createProcessConfig);
   registerAction(attachEntityToProcessConfig);
   registerAction(ensureProcessForumConfig);
@@ -102,6 +106,10 @@ export function registerAllActions(): void {
   registerAction(createSheirutHalukaConfig);
   registerAction(confirmSheirutHalukaConfig);
   registerAction(ensureHalukaForumConfig);
+
+  // Complex matanot (BOM products)
+  registerAction(createComplexMatanotConfig);
+  registerAction(approveMatanotConfig);
 
   // Future actions will be registered here
   // registerAction(createTaskAction);
@@ -131,6 +139,7 @@ export {
   rejectSheirutpendConfig,
   addVoteConfig,
   ensureSheirutForumConfig,
+  ensureSheirutpendForumConfig,
   closeFiniapruvalConfig,
   updateProjectDetailsConfig,
   createProcessConfig,
@@ -139,5 +148,7 @@ export {
   ensureStageForumConfig,
   completeMissionConfig,
   chatActions,
-  forumReadActions
+  forumReadActions,
+  createComplexMatanotConfig,
+  approveMatanotConfig
 };

@@ -25,7 +25,7 @@
   let error1;
   let miDatan = [];
   let linkg = import.meta.env.VITE_URL + '/graphql';
-  const unlimited = { he: 'ללא הגבלה', en: 'unlimited' };
+  const unlimited = { he: 'ליחידה - ללא הגבלה', en: 'unlimited' };
   const cr = { he: ' יצירת מוצר חדש', en: 'create new product' };
   const unlimitedMo = { he: 'לכל יחידה', en: 'for each unit' };
   const ot = { he: 'עלות חד פעמית', en: 'one time' };

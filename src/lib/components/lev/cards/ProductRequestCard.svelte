@@ -7,14 +7,15 @@
   import { isMobileOrTablet } from '$lib/utilities/device';
   import CardHeader from './CardHeader.svelte';
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
+  import MatanotPublicView from '$lib/components/products/MatanotPublicView.svelte';
   import { addVote, rejectSheirutpend } from '$lib/client/actionClient';
+  import { goto } from '$app/navigation';
+  import { forum, nowChatId, isChatOpen, initialForum } from '$lib/stores/pendMisMes.js';
 
   let { buble, isFirst = false, glowColor = 'barbi', onProj } = $props();
 
-  function handleProjectClick() {
-    if (onProj && buble.projectId) {
-      onProj({ id: buble.projectId });
-    }
+  function handleViewRequest() {
+    goto(`/deals/request/${buble.id}`);
   }
 
   const t = {
@@ -37,17 +38,93 @@
       en: 'Request rejected',
       ar: 'تم رفض الطلب'
     },
-    error: { he: 'שגיאה בביצוע הפעולה', en: 'Action failed', ar: 'فشل الإجراء' }
+    error: { he: 'שגיאה בביצוע הפעולה', en: 'Action failed', ar: 'فشل الإجراء' },
+    chat: { he: 'צ׳אט', en: 'Chat', ar: 'محادثة' },
+    creatingChat: { he: 'יוצר צ׳אט...', en: 'Creating chat...', ar: 'جاري إنشاء محادثة...' },
+    viewRequest: { he: 'לצפיה בבקשה', en: 'View Request', ar: 'عرض الطلب' }
   };
 
   let isProcessing = $state(false);
+  let isCreatingChat = $state(false);
+
+  const isComplexProduct = $derived(buble.pricingMode && buble.pricingMode !== 'fixed');
+
+  const matanotForView = $derived.by(() => {
+    if (!isComplexProduct || !buble.matanots?.[0]) return null;
+    const m = buble.matanots[0];
+    const attrs = m.attributes ?? {};
+    return {
+      id: m.id,
+      name: attrs.name,
+      pricingMode: attrs.pricingMode,
+      estimatedPrice: attrs.estimatedPrice,
+      marginPct: attrs.marginPct,
+      matanot_recipe_missions: attrs.matanot_recipe_missions,
+      matanot_recipe_resources: attrs.matanot_recipe_resources
+    };
+  });
+
+  async function handleOpenChat() {
+    if (isCreatingChat) return;
+
+    let forumId = buble.forumId;
+
+    if (!forumId) {
+      isCreatingChat = true;
+      try {
+        const response = await fetch('/api/action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            actionKey: 'ensureSheirutpendForum',
+            params: {
+              projectId: String(buble.projectId),
+              sheirutpendId: String(buble.id)
+            }
+          })
+        });
+
+        const result = await response.json();
+        if (!result.success) throw new Error(result.error?.message || 'Failed to create chat forum.');
+
+        forumId = result.data?.forumId ?? result.forumId;
+        if (!forumId) throw new Error('Failed to create chat forum.');
+
+        buble.forumId = forumId;
+      } catch (err) {
+        console.error(err);
+        toast.error(t.error[$lang]);
+        isCreatingChat = false;
+        return;
+      } finally {
+        isCreatingChat = false;
+      }
+    }
+
+    const md = {
+      pid: Number(buble.projectId),
+      projectName: buble.projectName,
+      projectPic: buble.projectSrc,
+      title: buble.name,
+      requestUrl: `/deals/request/${buble.id}`
+    };
+
+    const tempF = $forum;
+    tempF[forumId] = {
+      loading: false,
+      messages: tempF[forumId]?.messages || [],
+      md
+    };
+    forum.set(tempF);
+    initialForum(false, [String(forumId)], 0);
+    nowChatId.set(forumId);
+    isChatOpen.set(true);
+  }
 
   async function handleAction(action) {
     if (isProcessing) return;
 
-    // רק approve משתמש ב-addVote (עבור מקרה שעדיין יש כאלה שלא הצביעו)
     if (action === 'reject') {
-      // reject נשאר עם approveSheirutpend/rejectSheirutpend הקיימים
       isProcessing = true;
       try {
         const result = await rejectSheirutpend({
@@ -67,7 +144,6 @@
       return;
     }
 
-    // approve - משתמש ב-addVote
     isProcessing = true;
 
     try {
@@ -119,7 +195,7 @@
           ? '2, 255, 187'
           : '2, 255, 187'}
 >
-  <!-- Golden Header with AuthorityBadge -->
+  <!-- Header with "View Request" button -->
   <CardHeader
     logoSrc={buble.projectSrc}
     projectName={buble.projectName}
@@ -130,8 +206,16 @@
       : buble.ani}
     cardTitle={buble.name}
     {glowColor}
-    onProjectClick={handleProjectClick}
-  />
+  >
+    {#snippet actions()}
+      <button
+        onclick={(e) => { e.stopPropagation(); handleViewRequest(); }}
+        class="px-3 py-1 text-barbi hover:text-gold hover:bg-barbi bg-gold rounded-lg text-sm font-semibold transition-all shadow-sm hover:shadow-md"
+      >
+        {t.viewRequest[$lang]}
+      </button>
+    {/snippet}
+  </CardHeader>
 
   <!-- Content -->
   <div
@@ -160,9 +244,13 @@
         <div class="text-[10px] text-gray-500 uppercase">
           {t.requestFrom[$lang]}
         </div>
-        <div class="font-bold text-gray-800 dark:text-gray-200">
+        <a
+          href="/user/{buble.userId}"
+          onclick={(e) => e.stopPropagation()}
+          class="font-bold text-gray-800 dark:text-gray-200 hover:text-barbi transition-colors"
+        >
           {buble.username}
-        </div>
+        </a>
       </div>
     </div>
 
@@ -249,6 +337,13 @@
         {/if}
       </div>
     {/if}
+
+    <!-- BOM / Recipe for complex products -->
+    {#if isComplexProduct && matanotForView}
+      <div class="border-t border-gray-100 dark:border-gray-700 pt-3">
+        <MatanotPublicView matanot={matanotForView} />
+      </div>
+    {/if}
   </div>
 
   <!-- Vote Status Display -->
@@ -266,16 +361,43 @@
   <div
     class="p-4 bg-gray-50 dark:bg-gray-900/50 flex gap-3 border-t border-gray-100 dark:border-gray-700"
   >
+    <!-- Chat Button -->
+    <button
+      class="py-2 px-3 bg-white dark:bg-gray-800 border-2 border-blue-500 text-blue-500 hover:bg-blue-50 font-bold rounded-xl transition-all flex items-center gap-2 disabled:opacity-50"
+      onclick={(e) => { e.stopPropagation(); handleOpenChat(); }}
+      disabled={isCreatingChat}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="w-5 h-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+        />
+      </svg>
+      {#if isCreatingChat}
+        {t.creatingChat[$lang]}
+      {:else}
+        {t.chat[$lang]}
+      {/if}
+    </button>
+
     <button
       class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 font-bold rounded-xl transition-all disabled:opacity-50"
-      onclick={() => handleAction('reject')}
+      onclick={(e) => { e.stopPropagation(); handleAction('reject'); }}
       disabled={isProcessing}
     >
       {t.refuse[$lang]}
     </button>
     <button
       class="flex-2 py-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all disabled:opacity-50"
-      onclick={() => handleAction('approve')}
+      onclick={(e) => { e.stopPropagation(); handleAction('approve'); }}
       disabled={isProcessing || buble.already}
     >
       {#if isProcessing}

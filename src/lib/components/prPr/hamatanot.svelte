@@ -203,6 +203,7 @@
   const unl = { he: 'ללא הגבלה', en: 'unlimited' };
   const res = { he: 'דיווח על מכירה', en: 'report sale' };
   const cr = { he: ' יצירת מוצר חדש', en: 'create new product' };
+  const crCx = { he: 'מוצר מורכב', en: 'complex product' };
   const gn = { he: 'שם המוצר', en: 'product name' };
   const qu = { he: 'סכום', en: 'amount' };
   const whoo = { he: 'הכסף ממתין אצל: ', en: 'who guard the money' };
@@ -440,7 +441,7 @@
                         {:else}
                           {data.attributes.quant === -1
                             ? $lang === 'he'
-                              ? 'ללא הגבלה'
+                              ? 'ליחידה - ללא הגבלה'
                               : 'Unlimited'
                             : data.attributes.quant}
                         {/if}
@@ -520,10 +521,18 @@
           {/if}
         </div>
       </div>
-      <button
-        class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
-        onclick={addnew}>{cr[$lang]}</button
-      >
+      <div class="flex flex-wrap gap-2 justify-center">
+        <button
+          class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
+          onclick={addnew}>{cr[$lang]}</button
+        >
+        <a
+          href="/moach/{$idPr}/sales/new"
+          class="border border-gold hover:border-barbi bg-gold/10 hover:bg-gold/20 text-gold hover:text-barbi font-bold py-2 px-4 rounded-lg text-center"
+        >
+          {crCx[$lang]}
+        </a>
+      </div>
     </div>
     {#if salee.length > 0}
       <div

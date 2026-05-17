@@ -15,7 +15,15 @@
       "mcp__ide__getDiagnostics",
       "Bash(grep -n '\"[0-9][0-9][^\"]*\".*`' \"C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\routes\\\\api\\\\send\\\\qids.js\")",
       "Bash(grep -n \"'[0-9][0-9][^']*':.*\\\\`\\\\|\\\\\"[0-9][0-9][^\\\\\"]*\\\\\".*\\\\`\" \"C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\routes\\\\api\\\\send\\\\qids.js\")",
-      "Bash(sort -t\"'\" -k2 -n)"
+      "Bash(sort -t\"'\" -k2 -n)",
+      "Bash(dir /b \"C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\routes\")",
+      "Bash(findstr /v \".test\")",
+      "mcp__svelte__svelte-autofixer",
+      "Bash(sort -t\"'\" -k2 -V)",
+      "Bash(./node_modules/.bin/svelte-check --threshold error)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\deals\\request"
     ]
   },
   "enableAllProjectMcpServers": true,

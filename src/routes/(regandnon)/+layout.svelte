@@ -34,7 +34,7 @@
         goto('login');
       }
     }
-    if (data.tok) {
+    if (data.tok && data.uid) {
       console.log('auted');
       isAuthed = true;
       initialForum(true, [], data.uid);

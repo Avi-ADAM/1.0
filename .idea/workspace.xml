@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="95e10908-753e-4b5e-a7b6-37b180d77d7c" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mcp.json" beforeDir="false" afterPath="$PROJECT_DIR$/.mcp.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/AppHeader.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/AppHeader.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/addnew/addNewSkill.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/addnew/addNewSkill.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/prPr/hamatanot.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/prPr/hamatanot.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/jobs/sync-vocabulary.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/jobs/sync-vocabulary.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/server/actions/configs/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/server/actions/configs/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/translations/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/translations/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/utils/levDataExtractors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/utils/levDataExtractors.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/(regandnon)/gift/[id]/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(regandnon)/gift/[id]/+page.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/api/send/qids.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/api/send/qids.js" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 3
+}]]></component>
+  <component name="ProjectId" id="3DlFmumb1ycG8fgtvL8NwrTdXeT" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "JavaScript Debug.localhost:5173.executor": "Debug",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "javascript.preferred.runtime.type.id": "node",
+    "last_opened_file_path": "C:/Users/babay/Documents/GitHub/1.0main",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "yarn",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="localhost:5173" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:5173/">
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JavaScript Debug.localhost:5173" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-WS-253.31033.133" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="95e10908-753e-4b5e-a7b6-37b180d77d7c" name="Changes" comment="" />
+      <created>1778848920472</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1778848920472</updated>
+      <workItem from="1778848921944" duration="7860000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
