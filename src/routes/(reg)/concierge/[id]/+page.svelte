@@ -2,7 +2,6 @@
   import { onMount, onDestroy } from 'svelte';
   import { showFoot } from '$lib/stores/showFoot.js';
   import { goto } from '$app/navigation';
-  import { resolve } from '$app/paths';
 
   onMount(() => showFoot.set(false));
   onDestroy(() => showFoot.set(true));
@@ -135,10 +134,10 @@
     </div>
 
     <nav class="hdr-nav hide-sm">
-      <a href={resolve('/lev')} class="nav-lnk">הסקירה שלי</a>
-      <a href={resolve('/concierge')} class="nav-lnk nav-act">משאלות</a>
-      <a href={resolve('/deals')} class="nav-lnk">דילים</a>
-      <a href={resolve('/moach')} class="nav-lnk">ריקמות</a>
+      <a href="/lev" class="nav-lnk">הסקירה שלי</a>
+      <a href="/concierge" class="nav-lnk nav-act">משאלות</a>
+      <a href="/deals" class="nav-lnk">דילים</a>
+      <a href="/moach" class="nav-lnk">ריקמות</a>
     </nav>
 
     <div class="hdr-right">
@@ -169,7 +168,7 @@
         <div class="topbar-right">
           <span class="code-lbl hide-xs">קוד משאלה</span>
           <code class="wish-code">{WISH_CODE}</code>
-          <a href={resolve('/concierge/new')} class="btn-ghost btn-xs">+ משאלה חדשה</a>
+          <a href="/concierge/new" class="btn-ghost btn-xs">+ משאלה חדשה</a>
           <button class="btn-ghost btn-xs hide-xs">📤 שתפי</button>
         </div>
       </div>
