@@ -20,7 +20,16 @@
       "Bash(findstr /v \".test\")",
       "mcp__svelte__svelte-autofixer",
       "Bash(sort -t\"'\" -k2 -V)",
-      "Bash(./node_modules/.bin/svelte-check --threshold error)"
+      "Bash(./node_modules/.bin/svelte-check --threshold error)",
+      "WebFetch(domain:api.anthropic.com)",
+      "PowerShell(New-Item *)",
+      "PowerShell(Get-ChildItem *)",
+      "Skill(svelte-code-writer)",
+      "Bash(mkdir -p \"C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\routes\\\\\\(reg\\)\\\\concierge\\\\[id]\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\routes\\\\\\(reg\\)\\\\concierge\\\\new\")",
+      "Bash(npx @sveltejs/mcp svelte-autofixer ./src/routes/\\\\\\(reg\\\\\\)/concierge/\\\\[id\\\\]/+page.svelte)",
+      "Bash(npx @sveltejs/mcp svelte-autofixer ./src/routes/\\\\\\(reg\\\\\\)/concierge/new/+page.svelte)",
+      "Bash(npx @sveltejs/mcp get-documentation '$app/paths')"
     ],
     "additionalDirectories": [
       "c:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\deals\\request"

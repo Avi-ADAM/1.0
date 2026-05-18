@@ -1,0 +1,523 @@
+<script>
+  import { onMount, onDestroy } from 'svelte';
+  import { showFoot } from '$lib/stores/showFoot.js';
+  import { goto } from '$app/navigation';
+  import { resolve } from '$app/paths';
+
+  onMount(() => showFoot.set(false));
+  onDestroy(() => showFoot.set(true));
+
+  /* ===== Inspiration seeds ===== */
+  const SEEDS = [
+    { icon: '🎁', label: 'מתנה לאדם אהוב',          hint: 'יום חופש, חוויה, התרגשות' },
+    { icon: '🛠', label: 'משימה שאני לא מצליחה לבד', hint: 'תיקון, סידור, פרויקט' },
+    { icon: '🌿', label: 'אירוע קטן בקהילה',          hint: 'מפגש, סדנה, יוזמה' },
+    { icon: '✈',  label: 'תכנון נסיעה',               hint: 'יעד, מלון, לינה' },
+    { icon: '👶', label: 'תמיכה במשפחה',              hint: 'השגחה, בישול, ליווי' },
+    { icon: '✍',  label: 'משאלה חופשית',              hint: 'ספרי הכל בחופשיות' },
+  ];
+
+  /* ===== Demo extraction (shown in Lev rail while drafting) ===== */
+  const DEMO_MISSIONS  = [
+    { name: 'בייביסיטר',  imp: 'must' },
+    { name: 'הסעה',        imp: 'must' },
+    { name: 'טיפול ספא',   imp: 'must' },
+  ];
+  const DEMO_RESOURCES = [
+    { name: 'מקום שקט',     imp: 'must' },
+    { name: 'ארוחה במסעדה', imp: 'nice' },
+  ];
+
+  const LEV_HINTS = [
+    { kind: 'question',   text: 'באיזה תאריך? יום שמסביב יעזור לי לחפש זמינויות.' },
+    { kind: 'suggestion', text: 'נראה שהמשאלה מתמקדת בארגון חוויה לאדם אחר.' },
+    { kind: 'suggestion', text: 'כדאי לציין אם תרצי שתופתע, או שתהיה שותפה לתכנון.' },
+  ];
+
+  const ALL_VALUES = ['הסכמה','שוויון','קהילתיות','שקיפות','נגישות','אקולוגיה','הדדיות','יצירתיות','נדיבות','אמון'];
+
+  const DETAIL_JEWELS = [
+    { icon:'📅', label:'מתי',               placeholder:'לחצי לבחור תאריך',              value:'ה׳, 19 ביוני',  accent:'gold'  },
+    { icon:'📍', label:'היכן',              placeholder:'עיר, אזור, או הביתה',           value:'חיפה והקריות',  accent:'blue'  },
+    { icon:'💰', label:'תקציב',             placeholder:'טווח גמיש או לפי הצעה',          value:'₪ 850–1,200',  accent:'green' },
+    { icon:'👥', label:'מי יכול להציע',     placeholder:'פתוח לכל / רק חברות',          value:'',              accent:'barbi' },
+    { icon:'🔒', label:'מי יכול לראות',     placeholder:'פרטי · ריקמות · קהילה · כולם', value:'',              accent:'gold'  },
+    { icon:'🤝', label:'האם להזמין שותפים', placeholder:'כן — אישית, או דרך Lev',       value:'',              accent:'green' },
+  ];
+
+  const ACCENT = {
+    gold:  { ring:'rgba(238,232,170,0.4)', glow:'rgba(238,232,170,0.25)', text:'#fde68a', rgb:'238,232,170' },
+    barbi: { ring:'rgba(255,77,158,0.5)',  glow:'rgba(255,77,158,0.3)',   text:'#ff4d9e', rgb:'255,77,158'  },
+    blue:  { ring:'rgba(116,191,255,0.4)', glow:'rgba(116,191,255,0.25)', text:'#74bfff', rgb:'116,191,255' },
+    green: { ring:'rgba(2,255,187,0.4)',   glow:'rgba(2,255,187,0.25)',   text:'#02ffbb', rgb:'2,255,187'   },
+  };
+
+  const STEPS = [
+    { id:0, en:'WISH',       he:'משאלה' },
+    { id:1, en:'UNDERSTAND', he:'הבנה'  },
+    { id:2, en:'PROPOSALS',  he:'הצעות' },
+    { id:3, en:'CONSENT',    he:'הסכמה' },
+  ];
+
+  /* ===== Form state ===== */
+  let title  = $state('יום חופש לאמא ליום הולדתה');
+  let body   = $state('אמא שלי מטפלת בילדים כל יום ובקרוב יום הולדתה. אני רוצה לתת לה יום שלם משוחרר — טיפול ספא, ארוחה טובה, מישהי שתשגיח על הילדים, ובן אדם שיבטיח שתגיע ותחזור בשלום.');
+  let values = $state(['הדדיות', 'נדיבות']);
+
+  const words    = $derived(body.trim() ? body.trim().split(/\s+/).length : 0);
+  const fullness = $derived(Math.min(1, words / 50));
+  const isReady  = $derived(title.trim().length > 6 && body.trim().length > 30);
+
+  function toggleValue(v) {
+    values = values.includes(v) ? values.filter(x => x !== v) : [...values, v];
+  }
+
+  function pickSeed(seed) {
+    title = seed.label;
+  }
+
+  function accentStyle(acc, hasVal) {
+    const a = ACCENT[acc] || ACCENT.gold;
+    return hasVal
+      ? `border-color:${a.ring};box-shadow:0 0 18px ${a.glow}`
+      : 'border-color:rgba(255,255,255,0.06)';
+  }
+  function accentText(acc, hasVal) {
+    return hasVal ? (ACCENT[acc] || ACCENT.gold).text : '#52493e';
+  }
+  function accentBg(acc, hasVal) {
+    if (!hasVal) return 'rgba(255,255,255,0.03)';
+    const r = (ACCENT[acc] || ACCENT.gold).rgb;
+    return `rgba(${r},0.1)`;
+  }
+
+  function gemCls(imp) { return imp === 'must' ? 'gem' : 'gem gem-gold'; }
+</script>
+
+<!-- ===================================================================
+     NEW WISH — form page (mock, design-only)
+     =================================================================== -->
+<div class="cp" dir="rtl">
+
+  <!-- ── HEADER ─────────────────────────────────────────────────────── -->
+  <header class="hdr">
+    <div class="hdr-logo">
+      <img src="/coin-logo.png" class="hdr-coin" alt="1lev1" />
+      <div class="hdr-brand">
+        <span class="hdr-dot"></span>
+        <span class="hdr-name">Concierge</span>
+        <span class="hdr-sub hide-xs">· קונסיירז׳</span>
+      </div>
+    </div>
+    <nav class="hdr-nav hide-sm">
+      <a href={resolve('/lev')} class="nav-lnk">הסקירה שלי</a>
+      <a href={resolve('/concierge')} class="nav-lnk nav-act">משאלות</a>
+      <a href={resolve('/deals')} class="nav-lnk">דילים</a>
+      <a href={resolve('/moach')} class="nav-lnk">ריקמות</a>
+    </nav>
+    <div class="hdr-right">
+      <button class="notif-btn" aria-label="התראות">🔔<span class="notif-pip"></span></button>
+      <button class="av-btn">בר״</button>
+    </div>
+  </header>
+
+  <!-- ── SHELL ──────────────────────────────────────────────────────── -->
+  <div class="shell">
+    <div class="wrap">
+
+      <!-- TOP BAR: steps + back link -->
+      <div class="topbar anim">
+        <div class="steps">
+          {#each STEPS as step, i (step.id)}
+            {@const st = i === 0 ? 'active' : ''}
+            <div class="step {st}">
+              <span class="step-dot">{step.id + 1}</span>
+              <span class="step-en hide-xs">{step.en}</span>
+              <span class="step-he hide-xs">· {step.he}</span>
+            </div>
+            {#if i < STEPS.length - 1}<span class="step-sep"></span>{/if}
+          {/each}
+        </div>
+        <a href={resolve('/concierge')} class="btn-ghost btn-xs">⟵ חזרה לרשימת המשאלות שלי</a>
+      </div>
+
+      <!-- OPENING INCANTATION -->
+      <div class="anim anim-d1" style="text-align:center;padding:24px 0 6px">
+        <div class="incant-rule">◈ ─────  משאלה חדשה  ───── ◈</div>
+        <h1 class="incant-h1">מה תרצי שיקרה?</h1>
+        <p class="incant-p">
+          ספרי בלשונך. אנחנו נמצא את האנשים, נציע איך לחבר, ואת תוכלי לאשר.<br />
+          <span style="color:#fde68a">שום דבר לא יוצא החוצה עד שתפרסמי.</span>
+        </p>
+      </div>
+
+      <!-- INSPIRATION SEEDS -->
+      <div class="seeds anim anim-d2">
+        {#each SEEDS as seed (seed.label)}
+          <button class="seed-card" onclick={() => pickSeed(seed)}>
+            <span class="seed-icon">{seed.icon}</span>
+            <div style="min-width:0;text-align:start">
+              <div class="seed-label">{seed.label}</div>
+              <div class="seed-hint">{seed.hint}</div>
+            </div>
+          </button>
+        {/each}
+      </div>
+
+      <!-- TWO-COLUMN COMPOSE LAYOUT -->
+      <div class="compose-layout">
+
+        <!-- ── LEFT: writing area ── -->
+        <div>
+
+          <!-- WISH SCROLL (writing surface) -->
+          <div class="scroll-frame anim anim-d3">
+            <span class="corner corner-tl"></span>
+            <span class="corner corner-tr"></span>
+            <span class="corner corner-bl"></span>
+            <span class="corner corner-br"></span>
+
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+              <span style="width:8px;height:8px;border-radius:50%;background:#ff4d9e;box-shadow:0 0 12px #ff4d9e"></span>
+              <span style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#fde68a">
+                משאלה חדשה · טיוטה
+              </span>
+              <span style="flex:1"></span>
+              <span style="font-family:'Bellefair',serif;font-size:12px;color:#52493e">נשמר אוטומטית · עכשיו</span>
+            </div>
+
+            <!-- Title -->
+            <input
+              bind:value={title}
+              placeholder="במשפט אחד — מה תרצי שיקרה?"
+              class="wish-title-inp"
+              maxlength="120"
+            />
+
+            <!-- Body -->
+            <div style="position:relative;margin-top:18px">
+              <textarea
+                bind:value={body}
+                placeholder="פרטי בחופשיות. בשביל מי? איפה? מתי? מה חשוב? מה נחמד אם יקרה? — אל תדאגי לסדר, Lev תעזור לסדר."
+                class="wish-body-inp"
+                rows="7"
+              ></textarea>
+
+              <!-- Toolbar -->
+              <div class="scroll-toolbar">
+                <div style="display:flex;gap:6px">
+                  <button class="tool-btn" title="מיקרופון">🎙</button>
+                  <button class="tool-btn" title="צרפי תמונה">📎</button>
+                  <button class="tool-btn" title="הצעת ניסוח של Lev">✨</button>
+                  <button class="tool-btn" title="שפה">⇄</button>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px">
+                  <span style="font-family:'Bellefair',serif;font-size:12px;color:#52493e">{words} מילים</span>
+                  <div class="word-gauge">
+                    <div class="word-fill" style="width:{fullness*100}%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div><!-- /scroll-frame -->
+
+          <!-- PRACTICAL DETAILS -->
+          <div class="subsection">פרטים מעשיים</div>
+          <div class="jewels-grid">
+            {#each DETAIL_JEWELS as j (j.label)}
+              {@const has = !!j.value}
+              <button class="detail-jewel" style={accentStyle(j.accent, has)}>
+                <span class="jewel-icon" style="background:{accentBg(j.accent, has)}">{j.icon}</span>
+                <div style="flex:1;min-width:0;text-align:start">
+                  <div class="jewel-label">{j.label}</div>
+                  <div class="jewel-val" style="color:{accentText(j.accent, has)}">{j.value || j.placeholder}</div>
+                </div>
+                <span style="font-size:12px;color:#52493e">›</span>
+              </button>
+            {/each}
+          </div>
+
+          <!-- VALUES -->
+          <div class="subsection">ערכים שחשובים לי</div>
+          <div class="values-grid anim anim-d4">
+            {#each ALL_VALUES as v (v)}
+              {@const on = values.includes(v)}
+              <button class="val-pill {on ? 'on' : ''}" onclick={() => toggleValue(v)}>{v}</button>
+            {/each}
+          </div>
+
+          <!-- PUBLISH BAR -->
+          <div class="publish-bar">
+            <div style="display:flex;align-items:center;gap:14px;min-width:0">
+              <span class="pub-dot {isReady ? 'ready' : ''}">{isReady ? '✓' : '◯'}</span>
+              <div style="min-width:0">
+                <div class="pub-status">{isReady ? 'מוכן לשלוח אל Lev' : 'אצטרך עוד קצת'}</div>
+                <div class="pub-hint">
+                  {isReady
+                    ? 'ברגע שתאשרי — אחפש שותפות מתאימות ואחזיר תכנית להסכמתך.'
+                    : 'כתבי כותרת קצרה ועוד כמה שורות תיאור — וזה מספיק.'}
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <button class="btn-ghost">שמרי טיוטה</button>
+              <button
+                class="btn-jewel pub-btn"
+                disabled={!isReady}
+                onclick={() => isReady && goto(resolve('/concierge/demo-wish-id'))}
+                style="opacity:{isReady?1:0.5};background:{isReady?'linear-gradient(135deg,#bf953f,#fcf6ba 30%,#b38728 60%,#aa771c)':'linear-gradient(135deg,#c8155f,#ff4d9e)'};color:{isReady?'#574010':'#fde68a'};text-shadow:{isReady?'1px 1px 0 rgba(255,255,255,0.5)':'none'}"
+              >✨ פרסמי את המשאלה</button>
+            </div>
+          </div>
+
+          <div style="margin-top:14px;text-align:center;font-family:'Bellefair',serif;font-size:12px;color:#52493e">
+            ברגע שתפרסמי, Lev תסיים פירוק בדקות, ואת תראי הצעות תוך שעה־שעתיים.
+          </div>
+        </div><!-- /left col -->
+
+        <!-- ── RIGHT: Lev assist panel ── -->
+        <div class="lev-rail anim anim-d3">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+            <div style="position:relative">
+              <img src="/botlogo.jpeg" style="width:36px;height:36px;border-radius:50%;border:2px solid rgba(116,191,255,.4)" alt="Lev" />
+              <span style="position:absolute;bottom:-2px;inset-inline-end:-2px;width:12px;height:12px;border-radius:50%;background:#02ffbb;border:2px solid #0e0d0c;box-shadow:0 0 10px #02ffbb"></span>
+            </div>
+            <div>
+              <div style="font-family:'Cinzel',serif;font-size:13px;color:#74bfff;letter-spacing:.18em">LEV</div>
+              <div style="font-family:'Bellefair',serif;font-size:11px;color:#52493e">מקשיבה ומסמנת בעדינות</div>
+            </div>
+          </div>
+
+          <!-- Live extraction preview -->
+          <div class="section-label" style="margin:6px 0 8px">
+            <span class="lead" style="display:flex;align-items:center;gap:8px">
+              <span class="gem" style="width:6px;height:6px"></span>
+              מה אני מזהה עד עכשיו · {DEMO_MISSIONS.length + DEMO_RESOURCES.length}
+            </span>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div>
+              <div class="lev-col-lbl">✦ משימות</div>
+              <div style="display:flex;flex-wrap:wrap;gap:5px">
+                {#each DEMO_MISSIONS as m (m.name)}
+                  <span class="chip {m.imp}" style="font-size:11.5px;padding:3px 9px">
+                    <span class="{gemCls(m.imp)}" style="width:5px;height:5px"></span>{m.name}
+                  </span>
+                {/each}
+              </div>
+            </div>
+            <div>
+              <div class="lev-col-lbl">◐ משאבים</div>
+              <div style="display:flex;flex-wrap:wrap;gap:5px">
+                {#each DEMO_RESOURCES as r (r.name)}
+                  <span class="chip {r.imp}" style="font-size:11.5px;padding:3px 9px">
+                    <span class="{gemCls(r.imp)}" style="width:5px;height:5px"></span>{r.name}
+                  </span>
+                {/each}
+              </div>
+            </div>
+          </div>
+
+          <!-- Lev suggestions -->
+          <div style="margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.05)">
+            <div class="lev-col-lbl" style="margin-bottom:10px">הצעות עדינות</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              {#each LEV_HINTS as hint (hint.text)}
+                <div style="padding:10px 12px;border-radius:10px;background:{hint.kind==='question'?'rgba(238,232,170,.05)':'rgba(116,191,255,.04)'};border:1px solid {hint.kind==='question'?'rgba(238,232,170,.15)':'rgba(116,191,255,.15)'};display:flex;gap:8px">
+                  <span style="font-size:11px;color:{hint.kind==='question'?'#fde68a':'#74bfff'};margin-top:1px">{hint.kind==='question'?'?':'✶'}</span>
+                  <div style="font-family:'Bellefair',serif;font-size:12.5px;color:#ede5d8;line-height:1.5">{hint.text}</div>
+                </div>
+              {/each}
+            </div>
+          </div>
+
+          <!-- Privacy hint -->
+          <div style="margin-top:16px;padding:10px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;display:flex;gap:10px;align-items:flex-start">
+            <span style="font-size:13px">🔒</span>
+            <div style="font-family:'Bellefair',serif;font-size:11.5px;color:#9a8f80;line-height:1.55">
+              כל מה שאני קוראת נשאר בינך לבינינו עד שתאשרי. שום שותף לא רואה כלום עד שתפרסמי.
+            </div>
+          </div>
+        </div><!-- /lev-rail -->
+
+      </div><!-- /compose-layout -->
+    </div><!-- /wrap -->
+  </div><!-- /shell -->
+</div><!-- /cp -->
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bellefair&family=Cinzel:wght@400;600;700&family=Heebo:wght@300;400;500;600;700;800&display=swap');
+
+  /* ── Page ── */
+  .cp { background:#070606; color:#ede5d8; font-family:'Heebo','Rubik',system-ui,sans-serif; min-height:100vh; position:relative; }
+  .cp::before {
+    content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 70% 50% at 10% -10%,  rgba(200,150,12,.10) 0%,transparent 55%),
+      radial-gradient(ellipse 60% 65% at 90% 110%,  rgba(200,21,95,.09)  0%,transparent 55%),
+      radial-gradient(ellipse 50% 40% at 50%  50%,  rgba(2,255,187,.035) 0%,transparent 60%);
+  }
+  .shell { position:relative; z-index:1; min-height:100vh; padding-bottom:80px; }
+  .wrap  { max-width:1180px; margin:0 auto; padding:0 14px; }
+  @media(min-width:640px)  { .wrap { padding:0 22px; } }
+  @media(min-width:1024px) { .wrap { padding:0 28px; } }
+
+  /* ── Responsive ── */
+  @media(max-width:479px) { .hide-xs { display:none !important; } }
+  @media(max-width:767px) { .hide-sm { display:none !important; } }
+
+  /* ── Animations ── */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  .anim    { animation:fadeUp .45s cubic-bezier(.16,1,.3,1) both; }
+  .anim-d1 { animation-delay:.04s; }
+  .anim-d2 { animation-delay:.10s; }
+  .anim-d3 { animation-delay:.18s; }
+  .anim-d4 { animation-delay:.26s; }
+
+  /* ── Header (same as main screen) ── */
+  .hdr { position:sticky; top:0; z-index:100; background:rgba(7,6,6,.84); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid rgba(200,150,12,.2); padding:0 14px; height:60px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  @media(min-width:640px) { .hdr { padding:0 24px; height:64px; } }
+  .hdr-logo  { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+  .hdr-coin  { width:28px; height:28px; border-radius:50%; box-shadow:0 0 14px rgba(238,232,170,.4); }
+  .hdr-brand { display:flex; align-items:center; gap:8px; }
+  .hdr-dot   { width:6px; height:6px; border-radius:50%; background:#02ffbb; box-shadow:0 0 10px #02ffbb; }
+  .hdr-name  { font-family:'Cinzel',serif; font-size:clamp(13px,3vw,18px); color:#f0c040; letter-spacing:.22em; text-transform:uppercase; }
+  .hdr-sub   { font-family:'Bellefair',serif; font-size:13px; color:#9a8f80; }
+  .hdr-nav   { display:flex; gap:20px; align-items:center; }
+  .nav-lnk   { font-size:13px; color:#9a8f80; text-decoration:none; letter-spacing:.02em; }
+  .nav-act   { color:#fde68a; text-shadow:0 0 12px rgba(238,232,170,.4); }
+  .hdr-right  { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+  .notif-btn  { position:relative; width:34px; height:34px; display:flex; align-items:center; justify-content:center; border-radius:10px; background:#171512; border:1px solid rgba(255,255,255,.06); cursor:pointer; font-size:14px; color:#fde68a; }
+  .notif-pip  { position:absolute; top:6px; left:6px; width:7px; height:7px; border-radius:50%; background:#ff4d9e; box-shadow:0 0 8px #ff4d9e; }
+  .av-btn     { width:34px; height:34px; border-radius:50%; border:2px solid #eee8aa; background:linear-gradient(135deg,#201d19,#2a2520); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#f0c040; cursor:pointer; }
+
+  /* ── Top bar ── */
+  .topbar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; padding:16px 0 10px; }
+
+  /* ── Steps ── */
+  .steps    { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+  .step     { display:flex; align-items:center; gap:5px; font-size:11px; color:#52493e; }
+  .step-dot { width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-family:'Cinzel',serif; font-weight:700; font-size:10px; background:rgba(255,255,255,.04); color:#52493e; border:1px solid rgba(255,255,255,.08); flex-shrink:0; }
+  .step.active .step-dot { background:linear-gradient(135deg,#c8155f,#ff4d9e); color:#fde68a; border-color:rgba(255,77,158,.5); box-shadow:0 0 18px rgba(255,77,158,.5); }
+  .step.active { color:#ff4d9e; }
+  .step-en  { font-family:'Cinzel',serif; letter-spacing:.18em; text-transform:uppercase; font-size:10px; }
+  .step-he  { font-family:'Bellefair',serif; font-size:12px; }
+  .step-sep { width:22px; height:1px; background:rgba(255,255,255,.08); flex-shrink:0; }
+
+  /* ── Buttons ── */
+  .btn-jewel { display:inline-flex; align-items:center; gap:8px; padding:12px 22px; border:none; cursor:pointer; border-radius:14px; font-family:'Sababa','Heebo',sans-serif; font-weight:700; font-size:15px; color:#fde68a; white-space:nowrap; background:linear-gradient(135deg,#c8155f,#ff4d9e); box-shadow:inset 1px 1px 0 rgba(255,255,255,.25),inset -1px -1px 0 rgba(0,0,0,.4),0 6px 20px rgba(200,21,95,.4); transition:transform .2s; }
+  .btn-jewel:hover:not(:disabled) { transform:translateY(-1px); }
+  .btn-ghost { background:transparent; border:1px solid rgba(255,255,255,.1); color:#9a8f80; padding:9px 16px; border-radius:12px; font-size:13px; cursor:pointer; transition:all .2s; text-decoration:none; display:inline-flex; align-items:center; white-space:nowrap; }
+  .btn-ghost:hover { color:#ede5d8; border-color:rgba(238,232,170,.3); background:rgba(238,232,170,.04); }
+  .btn-xs   { padding:7px 12px; font-size:12px; }
+
+  /* ── Gems ── */
+  .gem { width:8px; height:8px; display:inline-block; background:linear-gradient(135deg,#ff4d9e,#c8155f); transform:rotate(45deg); box-shadow:0 0 12px rgba(255,77,158,.7); flex-shrink:0; }
+  .gem-gold { background:linear-gradient(135deg,#fde68a,#aa771c); box-shadow:0 0 12px rgba(238,232,170,.7); }
+
+  /* ── Section label ── */
+  .section-label { font-size:11px; font-weight:700; color:#9a8f80; letter-spacing:.24em; text-transform:uppercase; display:flex; align-items:center; gap:14px; }
+  .section-label::before,.section-label::after { content:''; flex:1; height:1px; background:linear-gradient(to right,transparent,rgba(255,255,255,.08),transparent); }
+  .section-label .lead { flex:0 0 auto; }
+
+  /* ── Chips ── */
+  .chip { display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:999px; font-family:'Bellefair',serif; font-size:12.5px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); color:#ede5d8; }
+  .chip.must { background:rgba(255,0,146,.10); border-color:rgba(255,0,146,.35); color:#ff4d9e; }
+  .chip.nice { background:rgba(238,232,170,.07); border-color:rgba(238,232,170,.25); color:#fde68a; }
+
+  /* ── Opening incantation ── */
+  .incant-rule { font-family:'Cinzel',serif; font-size:11px; letter-spacing:.36em; text-transform:uppercase; color:#9a8f80; margin-bottom:12px; }
+  .incant-h1   { margin:0; font-family:'Sababa','Heebo',sans-serif; font-size:clamp(28px,8vw,44px); font-weight:700; line-height:1.1; color:#ede5d8; }
+  .incant-p    { margin:14px auto 0; font-family:'Bellefair',serif; font-size:clamp(14px,2.5vw,17px); color:#9a8f80; line-height:1.6; max-width:560px; }
+
+  /* ── Inspiration seeds ── */
+  .seeds { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:8px; margin-top:20px; }
+  @media(min-width:640px) { .seeds { grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; } }
+  .seed-card  { display:flex; gap:10px; align-items:center; padding:11px 12px; background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.06); border-radius:14px; cursor:pointer; transition:all .2s; text-align:start; }
+  .seed-card:hover { border-color:rgba(238,232,170,.32); background:rgba(238,232,170,.04); transform:translateY(-1px); }
+  .seed-icon  { font-size:17px; opacity:.95; }
+  .seed-label { font-family:'Bellefair',serif; font-size:13px; color:#ede5d8; line-height:1.2; }
+  .seed-hint  { font-size:10px; color:#52493e; margin-top:2px; }
+
+  /* ── Compose layout ── */
+  .compose-layout { display:grid; grid-template-columns:1fr; gap:24px; align-items:start; margin-top:16px; }
+  @media(min-width:1024px) { .compose-layout { grid-template-columns:1fr 320px; } }
+
+  /* ── Writing scroll ── */
+  .scroll-frame {
+    position:relative; padding:24px 20px 20px; border-radius:22px;
+    background:linear-gradient(180deg,rgba(238,232,170,.04) 0%,rgba(7,6,6,0) 30%),linear-gradient(180deg,rgba(255,77,158,.025),rgba(7,6,6,0)),#0e0d0c;
+    border:1px solid rgba(238,232,170,.2);
+    box-shadow:0 0 0 1px rgba(238,232,170,.06) inset,0 30px 80px rgba(0,0,0,.4);
+  }
+  @media(min-width:640px) { .scroll-frame { padding:28px 32px 24px; border-radius:24px; } }
+
+  .corner { position:absolute; width:14px; height:14px; background:linear-gradient(135deg,#fde68a,#aa771c); transform:rotate(45deg); box-shadow:0 0 14px rgba(238,232,170,.7); border-radius:2px; }
+  .corner-tl { top:-7px; inset-inline-start:22px; }
+  .corner-tr { top:-7px; inset-inline-end:22px; background:linear-gradient(135deg,#ff4d9e,#c8155f); box-shadow:0 0 14px rgba(255,77,158,.7); }
+  .corner-bl { bottom:-7px; inset-inline-start:22px; background:linear-gradient(135deg,#ff4d9e,#c8155f); box-shadow:0 0 14px rgba(255,77,158,.7); }
+  .corner-br { bottom:-7px; inset-inline-end:22px; }
+
+  .wish-title-inp {
+    width:100%; box-sizing:border-box; background:transparent; border:none; outline:none;
+    padding:6px 0 12px; border-bottom:1px solid rgba(238,232,170,.18);
+    font-family:'Sababa','Heebo',sans-serif; font-size:clamp(22px,5vw,32px); font-weight:700; color:#ede5d8; line-height:1.2;
+    transition:border-color .2s;
+  }
+  .wish-title-inp::placeholder { color:#52493e; font-weight:400; font-family:'Bellefair',serif; }
+  .wish-title-inp:focus { border-bottom-color:rgba(238,232,170,.5); }
+
+  .wish-body-inp {
+    width:100%; box-sizing:border-box; background:transparent; border:none; outline:none;
+    font-family:'Bellefair',serif; font-size:clamp(14px,2vw,17px); color:#ede5d8; line-height:1.7; resize:vertical; min-height:160px;
+  }
+  .wish-body-inp::placeholder { color:#52493e; line-height:1.7; }
+
+  .scroll-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:12px; border-top:1px solid rgba(238,232,170,.12); padding-top:12px; }
+  .tool-btn { width:32px; height:32px; border-radius:9px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); color:#c8bba8; cursor:pointer; font-size:14px; transition:all .2s; }
+  .tool-btn:hover { background:rgba(238,232,170,.1); border-color:rgba(238,232,170,.3); color:#fde68a; transform:translateY(-1px); }
+
+  .word-gauge { width:70px; height:4px; border-radius:999px; background:rgba(255,255,255,.06); overflow:hidden; }
+  .word-fill  { height:100%; background:linear-gradient(90deg,#c8155f,#fde68a,#02ffbb); transition:width .3s; border-radius:999px; box-shadow:0 0 10px rgba(238,232,170,.4); }
+
+  /* ── Subsection heading ── */
+  .subsection { font-family:'Cinzel',serif; font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:#fde68a; margin:26px 0 10px; display:flex; align-items:center; gap:10px; }
+  .subsection::after { content:''; flex:1; height:1px; background:linear-gradient(to left,transparent,rgba(238,232,170,.18)); }
+
+  /* ── Detail jewels ── */
+  .jewels-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:8px; }
+  .detail-jewel { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:14px; background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.06); cursor:pointer; transition:all .2s; width:100%; text-align:start; }
+  .detail-jewel:hover { background:rgba(238,232,170,.04); border-color:rgba(238,232,170,.25); transform:translateY(-1px); }
+  .jewel-icon  { font-size:18px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:8px; flex-shrink:0; }
+  .jewel-label { font-size:9px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:#9a8f80; }
+  .jewel-val   { font-family:'Bellefair',serif; font-size:14px; margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  /* ── Values picker ── */
+  .values-grid { display:flex; flex-wrap:wrap; gap:6px; }
+  .val-pill { padding:6px 13px; border-radius:999px; border:1px solid rgba(255,255,255,.08); background:transparent; color:#9a8f80; font-family:'Bellefair',serif; font-size:13px; cursor:pointer; transition:all .2s; }
+  .val-pill.on { border-color:rgba(255,77,158,.5); background:rgba(255,77,158,.12); color:#ff4d9e; }
+
+  /* ── Publish bar ── */
+  .publish-bar {
+    display:flex; align-items:center; justify-content:space-between; margin-top:32px; padding:16px 18px;
+    border-radius:18px;
+    background:radial-gradient(120% 80% at 0% 0%,rgba(238,232,170,.06),transparent 60%),radial-gradient(120% 80% at 100% 100%,rgba(200,21,95,.08),transparent 60%),#0e0d0c;
+    border:1px solid rgba(238,232,170,.22); gap:14px; flex-wrap:wrap;
+  }
+  .pub-dot {
+    width:40px; height:40px; border-radius:50%; flex-shrink:0;
+    background:linear-gradient(135deg,#201d19,#2a2520); border:2px solid rgba(238,232,170,.3);
+    display:flex; align-items:center; justify-content:center; font-size:16px; color:#52493e;
+    transition:all .3s;
+  }
+  .pub-dot.ready { background:linear-gradient(135deg,#02ffbb,#037d5b); border-color:#02ffbb; color:#0e0d0c; box-shadow:0 0 18px rgba(2,255,187,.5); }
+  .pub-status { font-family:'Sababa','Heebo',sans-serif; font-size:17px; color:#ede5d8; }
+  .pub-hint   { font-family:'Bellefair',serif; font-size:12.5px; color:#9a8f80; margin-top:2px; }
+  .pub-btn    { padding:11px 20px; font-size:14px; }
+
+  /* ── Lev rail ── */
+  .lev-rail { background:#171512; border:1px solid rgba(116,191,255,.18); border-radius:20px; padding:18px; box-shadow:0 0 30px rgba(116,191,255,.06); }
+  @media(min-width:1024px) { .lev-rail { position:sticky; top:80px; } }
+  .lev-col-lbl { font-size:9px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:#9a8f80; margin-bottom:6px; }
+</style>
