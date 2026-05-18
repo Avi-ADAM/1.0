@@ -2,7 +2,6 @@
   import { onMount, onDestroy } from 'svelte';
   import { showFoot } from '$lib/stores/showFoot.js';
   import { goto } from '$app/navigation';
-  import { resolve } from '$app/paths';
 
   onMount(() => showFoot.set(false));
   onDestroy(() => showFoot.set(true));
@@ -110,10 +109,10 @@
       </div>
     </div>
     <nav class="hdr-nav hide-sm">
-      <a href={resolve('/lev')} class="nav-lnk">הסקירה שלי</a>
-      <a href={resolve('/concierge')} class="nav-lnk nav-act">משאלות</a>
-      <a href={resolve('/deals')} class="nav-lnk">דילים</a>
-      <a href={resolve('/moach')} class="nav-lnk">ריקמות</a>
+      <a href="/lev" class="nav-lnk">הסקירה שלי</a>
+      <a href="/concierge" class="nav-lnk nav-act">משאלות</a>
+      <a href="/deals" class="nav-lnk">דילים</a>
+      <a href="/moach" class="nav-lnk">ריקמות</a>
     </nav>
     <div class="hdr-right">
       <button class="notif-btn" aria-label="התראות">🔔<span class="notif-pip"></span></button>
@@ -138,7 +137,7 @@
             {#if i < STEPS.length - 1}<span class="step-sep"></span>{/if}
           {/each}
         </div>
-        <a href={resolve('/concierge')} class="btn-ghost btn-xs">⟵ חזרה לרשימת המשאלות שלי</a>
+        <a href="/concierge" class="btn-ghost btn-xs">⟵ חזרה לרשימת המשאלות שלי</a>
       </div>
 
       <!-- OPENING INCANTATION -->
@@ -264,7 +263,7 @@
               <button
                 class="btn-jewel pub-btn"
                 disabled={!isReady}
-                onclick={() => isReady && goto(resolve('/concierge/demo-wish-id'))}
+                onclick={() => isReady && goto('/concierge/demo-wish-id')}
                 style="opacity:{isReady?1:0.5};background:{isReady?'linear-gradient(135deg,#bf953f,#fcf6ba 30%,#b38728 60%,#aa771c)':'linear-gradient(135deg,#c8155f,#ff4d9e)'};color:{isReady?'#574010':'#fde68a'};text-shadow:{isReady?'1px 1px 0 rgba(255,255,255,0.5)':'none'}"
               >✨ פרסמי את המשאלה</button>
             </div>
