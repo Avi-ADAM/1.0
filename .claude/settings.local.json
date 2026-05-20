@@ -29,7 +29,12 @@
       "Bash(mkdir -p \"C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\routes\\\\\\(reg\\)\\\\concierge\\\\new\")",
       "Bash(npx @sveltejs/mcp svelte-autofixer ./src/routes/\\\\\\(reg\\\\\\)/concierge/\\\\[id\\\\]/+page.svelte)",
       "Bash(npx @sveltejs/mcp svelte-autofixer ./src/routes/\\\\\\(reg\\\\\\)/concierge/new/+page.svelte)",
-      "Bash(npx @sveltejs/mcp get-documentation '$app/paths')"
+      "Bash(npx @sveltejs/mcp get-documentation '$app/paths')",
+      "Bash(python *)",
+      "Bash(dir \"C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\routes\")",
+      "Bash(where python3 *)",
+      "Bash(where python *)",
+      "Bash(grep -rn 'import.*store-show\\\\|from.*store-show\\\\|show\\\\.set\\\\|show\\\\.subscribe\\\\|$show\\\\b' src/)"
     ],
     "additionalDirectories": [
       "c:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\deals\\request"

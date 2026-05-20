@@ -86,6 +86,34 @@ export async function handle({ event, resolve }) {
       headers: { Location: '/hascama' }
     });
   }
+
+  // /hascama?ref=true&id=...&con=...&un=...&em=...&lang=...  ← sister-site referral
+  if (event.url.pathname === '/hascama' && event.url.searchParams.get('ref') === 'true') {
+    const p = event.url.searchParams;
+    const oneYear = new Date();
+    oneYear.setFullYear(oneYear.getFullYear() + 1);
+    const exp = oneYear.toUTCString();
+
+    const headers = new Headers({ Location: '/signup' });
+    const setCookie = (name, value) => {
+      if (value == null || value === '') return;
+      headers.append('Set-Cookie', `${name}=${encodeURIComponent(value)}; Path=/; Expires=${exp}; SameSite=Lax`);
+    };
+
+    const em = p.get('em');
+    const un = p.get('un');
+    const id = p.get('id');
+    const con = p.get('con');
+    const refLang = p.get('lang');
+
+    if (refLang && ['he', 'en', 'ar'].includes(refLang)) setCookie('lang', refLang);
+    if (em) setCookie('email', em);
+    if (un) setCookie('un', un);
+    if (id) setCookie('fpval', id);
+    if (con) setCookie('contriesi', con);
+
+    return new Response('Redirect', { status: 303, headers });
+  }
   if (event.url.pathname === '/' && event.locals.tok) {
     return new Response('Redirect', {
       status: 303,

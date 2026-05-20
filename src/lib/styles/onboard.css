@@ -1,0 +1,392 @@
+/* ============================================================
+   1💗1 Onboarding — Shared visual language
+   Extracted from mockup `1lev1 Onboarding Flow.html`.
+   Reuses the cream/gold/barbi pink "ornate jewel" aesthetic.
+   ============================================================ */
+
+.onboard-root {
+  --gold:         #eee8aa;
+  --gold-warm:    #ffd700;
+  --gold-deep:    #aa771c;
+  --gold-shadow:  #574010;
+  --gold-mist:    #fff8dc;
+  --barbi:        #ff0092;
+  --pink:         #e91e8c;
+  --pink-deep:    #c8155f;
+  --gold-gra-a:   #bf953f;
+  --gold-gra-b:   #fcf6ba;
+  --gold-gra-c:   #b38728;
+  --gold-gra-e:   #aa771c;
+  --cream:        #fff8e1;
+  --cream-pink:   #fde8f0;
+  --cream-deep:   #ffe4b5;
+  --ink:          #574010;
+}
+
+/* ── Screen frame — every onboarding screen sits inside this ── */
+.onboard-root .screen {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  background: radial-gradient(
+    ellipse at 30% 20%,
+    var(--cream) 0%,
+    var(--cream-pink) 45%,
+    var(--cream-deep) 100%
+  );
+  font-family: 'Heebo', sans-serif;
+  color: var(--gold-shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 22px 16px 28px;
+  direction: rtl;
+}
+
+.onboard-root .screen::before,
+.onboard-root .screen::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.32;
+  pointer-events: none;
+  z-index: 0;
+}
+.onboard-root .screen::before {
+  width: 340px; height: 340px;
+  background: radial-gradient(circle, var(--gold-warm), var(--gold-deep));
+  top: -120px; left: -100px;
+}
+.onboard-root .screen::after {
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, #ff69b4, var(--pink));
+  bottom: -100px; right: -90px;
+}
+
+/* ── Journey strip ── */
+.onboard-root .j-strip {
+  position: relative; z-index: 5;
+  display: flex; align-items: center; gap: 10px;
+  width: min(94vw, 520px);
+  background: rgba(255, 248, 220, 0.6);
+  backdrop-filter: blur(16px) saturate(160%);
+  border: 1.5px solid rgba(218, 165, 32, 0.38);
+  border-radius: 99px;
+  padding: 9px 14px;
+  box-shadow:
+    0 4px 24px rgba(218, 165, 32, 0.14),
+    0 1px 0 rgba(255, 215, 0, 0.28) inset;
+}
+.onboard-root .j-end { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; width: 44px; }
+.onboard-root .j-end .icn { font-size: 1.5rem; line-height: 1; }
+.onboard-root .j-end .lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; color: #b8860b; text-transform: uppercase; }
+.onboard-root .j-col { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+.onboard-root .j-dots { display: flex; justify-content: space-between; padding: 0 3px; }
+.onboard-root .j-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  border: 2px solid rgba(218, 165, 32, 0.35);
+  background: rgba(255, 255, 255, 0.5);
+  transition: all 0.4s ease;
+}
+.onboard-root .j-dot.done { background: linear-gradient(135deg, var(--gold-deep), #ff69b4); border-color: var(--gold-deep); }
+.onboard-root .j-dot.active { background: linear-gradient(135deg, var(--gold-warm), var(--pink)); border-color: var(--pink); transform: scale(1.28); box-shadow: 0 0 10px rgba(233,30,140,0.5); }
+.onboard-root .j-track {
+  position: relative; height: 8px;
+  background: rgba(218, 165, 32, 0.12);
+  border-radius: 99px;
+  border: 1px solid rgba(218, 165, 32, 0.22);
+}
+.onboard-root .j-fill {
+  position: absolute; inset: 0 auto 0 0;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--gold-deep), #ff69b4, var(--gold-warm));
+  box-shadow: 0 0 8px rgba(218, 165, 32, 0.45);
+  transition: width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.onboard-root .j-label { text-align: center; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: #b8860b; text-transform: uppercase; }
+
+/* ── Glass card stage ── */
+.onboard-root .glass-card {
+  position: relative; z-index: 4;
+  width: min(94vw, 520px);
+  background: rgba(255, 248, 220, 0.6);
+  backdrop-filter: blur(24px) saturate(180%);
+  border: 1.5px solid rgba(218, 165, 32, 0.4);
+  border-radius: 28px;
+  box-shadow:
+    0 8px 48px rgba(218, 165, 32, 0.15),
+    0 2px 0 rgba(255, 215, 0, 0.32) inset,
+    0 -1px 0 rgba(233, 30, 140, 0.11) inset;
+  display: flex; flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  padding: 16px 14px 22px;
+}
+.onboard-root .glass-card::before {
+  content: '';
+  position: absolute; top: 0; left: 8%; right: 8%; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold-warm) 30%, #ff69b4 70%, transparent);
+  border-radius: 99px;
+}
+
+/* ── Tabs strip ── */
+.onboard-root .tabs {
+  display: flex; gap: 4px; padding: 4px 0 6px;
+  width: 100%; flex-wrap: wrap; justify-content: center;
+}
+.onboard-root .tab {
+  display: flex; align-items: center; gap: 4px;
+  padding: 5px 11px;
+  border-radius: 99px;
+  border: 1.5px solid rgba(218, 165, 32, 0.28);
+  background: rgba(255, 248, 220, 0.52);
+  font-family: 'Heebo', sans-serif;
+  font-size: 11px; font-weight: 700;
+  color: #9a6b10;
+}
+.onboard-root .tab.active {
+  background: linear-gradient(135deg, var(--gold-deep), var(--pink));
+  color: #fff; border-color: transparent;
+  box-shadow: 0 3px 14px rgba(218, 165, 32, 0.33);
+}
+.onboard-root .tab.done { background: rgba(255, 215, 0, 0.14); border-color: rgba(218, 165, 32, 0.48); color: #7a5e00; }
+.onboard-root .tabs-sep {
+  width: 88%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(218, 165, 32, 0.3) 30%, rgba(233, 30, 140, 0.2) 70%, transparent);
+  margin: 4px 0 8px;
+}
+
+/* ── Heart background ── */
+.onboard-root .heart-bg {
+  position: relative;
+  width: 320px; height: 280px;
+  margin: 0 auto;
+  flex-shrink: 0;
+}
+.onboard-root .heart-bg svg.heart-shape { width: 100%; height: 100%; display: block; }
+
+/* ── Gold plaque ── */
+.onboard-root .plaque {
+  position: relative;
+  padding: 18px 24px;
+  background:
+    linear-gradient(135deg,
+      var(--gold-gra-a) 0%,
+      var(--gold-gra-b) 22%,
+      var(--gold-gra-c) 50%,
+      var(--gold-gra-b) 78%,
+      var(--gold-gra-e) 100%);
+  border-radius: 18px 6px 18px 6px / 22px 8px 22px 8px;
+  border: 2px solid rgba(87, 64, 16, 0.45);
+  box-shadow:
+    0 8px 24px rgba(122, 98, 0, 0.45),
+    inset 1px 1px 0 rgba(255,255,255,0.7),
+    inset -1px -1px 0 rgba(0,0,0,0.28);
+  color: var(--pink-deep);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+  font-family: 'Sababa', 'Heebo', sans-serif;
+  font-weight: 700;
+  text-align: center;
+  min-width: 240px;
+}
+.onboard-root .plaque::before,
+.onboard-root .plaque::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, var(--gold-deep) 60%, #000);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+.onboard-root .plaque::before { left: 12px; }
+.onboard-root .plaque::after  { right: 12px; }
+.onboard-root .plaque .plaque-title { margin: 0; font-family: inherit; font-weight: 700; font-size: 22px; line-height: 1.25; color: var(--pink); }
+.onboard-root .plaque .plaque-sub { margin-top: 4px; font-size: 12px; color: var(--pink-deep); font-weight: 600; }
+.onboard-root .plaque-on-heart {
+  position: absolute;
+  left: 50%; top: 22%;
+  transform: translateX(-50%);
+  z-index: 2;
+  width: 84%;
+}
+
+/* ── Buttons ── */
+.onboard-root .btn {
+  font-family: 'Sababa', 'Heebo', sans-serif;
+  font-weight: 700;
+  border: none; cursor: pointer;
+  padding: 11px 22px;
+  border-radius: 99px;
+  font-size: 15px;
+  transition: transform 0.18s, box-shadow 0.18s;
+  display: inline-flex; align-items: center; gap: 8px;
+  justify-content: center;
+  text-decoration: none;
+}
+.onboard-root .btn:hover:not(:disabled) { transform: translateY(-1px); }
+.onboard-root .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+.onboard-root .btn-key {
+  background: linear-gradient(135deg, var(--gold-gra-a), var(--gold-gra-b) 30%, var(--gold-gra-c) 60%, var(--gold-gra-e));
+  color: var(--gold-shadow);
+  border: 1.5px solid var(--gold-deep);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+  box-shadow: 0 4px 14px rgba(122, 98, 0, 0.35), inset 1px 1px 0 rgba(255,255,255,0.55);
+}
+.onboard-root .btn-barbi {
+  background: linear-gradient(135deg, var(--pink), var(--barbi));
+  color: #fff;
+  box-shadow: 0 4px 18px rgba(233, 30, 140, 0.4);
+}
+.onboard-root .btn-ghost {
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--gold-shadow);
+  border: 1.5px solid rgba(218, 165, 32, 0.45);
+}
+.onboard-root .btn-skip {
+  background: rgba(255, 255, 255, 0.42);
+  color: #9a6b10;
+  border: 1.5px dashed rgba(218, 165, 32, 0.5);
+  font-size: 13px;
+  padding: 8px 16px;
+}
+
+/* ── Form ── */
+.onboard-root .field { width: 100%; display: flex; flex-direction: column; gap: 5px; }
+.onboard-root .field-label {
+  font-family: 'Heebo'; font-size: 12px; font-weight: 700;
+  color: #9a6b10; letter-spacing: 0.04em;
+}
+.onboard-root .input {
+  font-family: 'Heebo'; font-size: 15px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(218, 165, 32, 0.45);
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  width: 100%;
+}
+.onboard-root .input:focus { border-color: var(--pink); box-shadow: 0 0 0 3px rgba(233, 30, 140, 0.18); }
+.onboard-root .input::placeholder { color: rgba(154, 107, 16, 0.5); }
+.onboard-root textarea.input { resize: none; min-height: 100px; }
+
+/* ── Option Tiles ── */
+.onboard-root .option-card {
+  position: relative;
+  padding: 18px 16px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1.5px solid rgba(218, 165, 32, 0.4);
+  border-radius: 22px;
+  cursor: pointer;
+  transition: all 0.22s;
+  text-align: right;
+  box-shadow: 0 4px 16px rgba(218, 165, 32, 0.1);
+  width: 100%;
+  font-family: 'Heebo', sans-serif;
+}
+.onboard-root .option-card:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--pink);
+  box-shadow: 0 8px 28px rgba(233, 30, 140, 0.2);
+}
+.onboard-root .option-card.selected {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.18), rgba(233, 30, 140, 0.1));
+  border-color: var(--pink);
+  box-shadow: 0 6px 22px rgba(233, 30, 140, 0.25), 0 0 0 3px rgba(233, 30, 140, 0.12);
+}
+.onboard-root .option-card.disabled { opacity: 0.55; cursor: not-allowed; }
+.onboard-root .option-card .opt-emoji { font-size: 32px; display: block; margin-bottom: 6px; }
+.onboard-root .option-card .opt-title {
+  font-family: 'Sababa', 'Heebo';
+  font-size: 17px; font-weight: 700;
+  color: var(--pink-deep);
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+.onboard-root .option-card .opt-sub {
+  font-size: 12px; color: var(--gold-shadow);
+  line-height: 1.45; margin: 0;
+}
+
+/* ── Chips ── */
+.onboard-root .chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 11px;
+  border-radius: 99px;
+  border: 1.5px solid rgba(218, 165, 32, 0.4);
+  background: rgba(255, 248, 220, 0.7);
+  font-size: 12px; font-weight: 600;
+  color: var(--gold-shadow);
+}
+.onboard-root .chip.matched {
+  background: linear-gradient(135deg, rgba(2, 255, 187, 0.18), rgba(255, 215, 0, 0.15));
+  border-color: rgba(2, 200, 130, 0.5);
+  color: #035a3e;
+}
+.onboard-root .chip.suggested {
+  background: rgba(255, 215, 0, 0.15);
+  border-color: rgba(218, 165, 32, 0.55);
+  color: #7a5e00;
+}
+.onboard-root .chip.new {
+  background: linear-gradient(135deg, rgba(233, 30, 140, 0.12), rgba(255, 215, 0, 0.1));
+  border-color: var(--pink);
+  color: var(--pink-deep);
+}
+.onboard-root .chip .x {
+  cursor: pointer; opacity: 0.55; font-weight: 900;
+  background: none; border: none; padding: 0; color: inherit;
+}
+
+/* ── Tile / Ribbon ── */
+.onboard-root .tile-info {
+  background: linear-gradient(135deg, var(--gold-gra-b) 0%, var(--gold) 60%, var(--gold-gra-a) 100%);
+  border-radius: 14px;
+  padding: 12px 16px;
+  border: 1.5px solid rgba(122, 98, 0, 0.35);
+  font-family: 'Heebo';
+  font-size: 13px;
+  color: var(--gold-shadow);
+  line-height: 1.45;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.45);
+  box-shadow: inset 1px 1px 0 rgba(255,255,255,0.6), 0 3px 12px rgba(122, 98, 0, 0.18);
+}
+.onboard-root .banner-ribbon {
+  position: relative;
+  display: inline-block;
+  padding: 8px 22px;
+  background: linear-gradient(135deg, var(--gold-gra-a), var(--gold-gra-b) 30%, var(--gold-gra-c) 60%, var(--gold-gra-e));
+  color: var(--pink-deep);
+  font-family: 'Sababa', 'Heebo';
+  font-weight: 700;
+  font-size: 14px;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.55);
+  clip-path: polygon(8% 0, 92% 0, 100% 50%, 92% 100%, 8% 100%, 0 50%);
+}
+
+/* ── Section subtitles ── */
+.onboard-root .sect-sub {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #b8860b;
+  margin: 14px 0 6px;
+  width: 100%;
+  text-align: center;
+}
+
+/* ── Animations ── */
+@keyframes onboard-spin { to { transform: rotate(360deg); } }
+@keyframes onboard-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.08); opacity: 0.85; } }
+@keyframes onboard-float {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-6px) rotate(3deg); }
+}
+.onboard-root .spin { animation: onboard-spin 2.2s linear infinite; }
+.onboard-root .pulse { animation: onboard-pulse 2s ease-in-out infinite; }
+.onboard-root .float { animation: onboard-float 3s ease-in-out infinite; }

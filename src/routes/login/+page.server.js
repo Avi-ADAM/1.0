@@ -7,7 +7,7 @@ export const actions = {
         const data = await request.formData();
         const email = data.get('email');
         const password = data.get('password');
-        const redirectTo = String(data.get('from') || '/me'); // Get 'from' parameter, default to '/me'
+        const redirectTo = String(data.get('from') || '/onboard'); // new users land on onboard fork
 
         if (!email || !password) {
             return {
@@ -75,7 +75,7 @@ export const actions = {
                 httpOnly: false 
             });
             
-            cookies.set('un', user.username, {
+            cookies.set('un', user.name || user.username, {
                 ...cookieOptions,
                 httpOnly: false
             });

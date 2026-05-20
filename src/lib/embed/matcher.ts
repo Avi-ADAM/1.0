@@ -10,6 +10,7 @@ export type MatchResult = {
     existingId?: string;
     existingLabel?: string;
     similarity?: number;
+    synonyms?: string[];
 };
 
 // סף matching — אפשר לכוונן אחרי שרואים תוצאות אמיתיות
@@ -17,6 +18,10 @@ const THRESHOLDS = {
     MATCH: 0.88,
     SUGGESTION: 0.72,
 };
+
+// אותו normalize שבו SkillSelector.svelte משתמש: trim + lowercase
+// "React" === "react" === "  REACT " → אותה מילה
+const normalize = (s: string) => s.trim().toLowerCase();
 
 // ─── match פריט אחד מול namespace ────────────────────────────────────────────
 
@@ -32,6 +37,17 @@ async function matchOne(
     }
 
     const best = matches[0];
+
+    // Case-insensitive exact match → אף פעם לא נטעה ב"React" מול "react"
+    if (normalize(input) === normalize(best.label)) {
+        return {
+            input,
+            status: 'matched',
+            existingId: best.id,
+            existingLabel: best.label,
+            similarity: best.score,
+        };
+    }
 
     if (best.score >= THRESHOLDS.MATCH) {
         return {
@@ -64,8 +80,16 @@ export async function matchCategory(
 ): Promise<MatchResult[]> {
     if (inputs.length === 0) return [];
 
+    // dedupe לפי normalized form — "React" ו-"react" מאותו CV → קריאה אחת בלבד
+    const seen = new Map<string, string>(); // normalized → first original
+    for (const raw of inputs) {
+        const key = normalize(raw);
+        if (key && !seen.has(key)) seen.set(key, raw.trim());
+    }
+    const unique = [...seen.values()];
+
     // כל הפריטים במקביל — Gemini + Pinecone לכל אחד
-    return Promise.all(inputs.map((input) => matchOne(input, namespace)));
+    return Promise.all(unique.map((input) => matchOne(input, namespace)));
 }
 
 // ─── match כל הקטגוריות ──────────────────────────────────────────────────────
@@ -75,12 +99,14 @@ export async function matchAllCategories(extracted: {
     roles: string[];
     methods: string[];   // work_ways — מהבית / מהמשרד / משרה מלאה וכו׳
     missions?: string[];   // אופציונלי — אם Claude חילץ משימות שניתן להתאים
+    vallues?: string[];    // ערכים מובילים — אופציונלי
 }) {
-    const [skillResults, roleResults, methodResults, missionResults] = await Promise.all([
+    const [skillResults, roleResults, methodResults, missionResults, valluesResults] = await Promise.all([
         matchCategory(extracted.skills, 'skills'),
         matchCategory(extracted.roles, 'roles'),
         matchCategory(extracted.methods, 'work_ways'),  // methods → work_ways namespace
         matchCategory(extracted.missions ?? [], 'missions'),
+        matchCategory(extracted.vallues ?? [], 'vallues'),
     ]);
 
     function split(results: MatchResult[]) {
@@ -95,10 +121,11 @@ export async function matchAllCategories(extracted: {
     const r = split(roleResults);
     const m = split(methodResults);
     const ms = split(missionResults);
+    const v = split(valluesResults);
 
     return {
-        matched: { skills: s.matched, roles: r.matched, methods: m.matched, missions: ms.matched },
-        suggestions: { skills: s.suggestions, roles: r.suggestions, methods: m.suggestions, missions: ms.suggestions },
-        newItems: { skills: s.newItems, roles: r.newItems, methods: m.newItems, missions: ms.newItems },
+        matched: { skills: s.matched, roles: r.matched, methods: m.matched, missions: ms.matched, vallues: v.matched },
+        suggestions: { skills: s.suggestions, roles: r.suggestions, methods: m.suggestions, missions: ms.suggestions, vallues: v.suggestions },
+        newItems: { skills: s.newItems, roles: r.newItems, methods: m.newItems, missions: ms.newItems, vallues: v.newItems },
     };
 }

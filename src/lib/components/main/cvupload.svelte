@@ -1,45 +1,27 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-
-  // ─── Types ───────────────────────────────────────────────────────────────────
-
-  type MatchResult = {
-    input: string;
-    status: 'matched' | 'suggestion' | 'new';
-    existingId?: string;
-    existingLabel?: string;
-    similarity?: number;
-  };
-
-  type MatchGroup = {
-    skills: MatchResult[];
-    roles: MatchResult[];
-    methods: MatchResult[];
-  };
-
-  type WorkflowOutput = {
-    matched: MatchGroup;
-    suggestions: MatchGroup;
-    newItems: MatchGroup;
-    tasks: string[];
-  };
+  import { locale, t } from '$lib/translations';
+  import { get } from 'svelte/store';
+  import { fly } from 'svelte/transition';
 
   // ─── State ───────────────────────────────────────────────────────────────────
 
-  let step: 'upload' | 'loading' | 'review' = $state('upload');
+  let step: 'upload' | 'loading' = $state('upload');
   let error = $state('');
   let dragging = $state(false);
-  let saving = $state(false);
 
-  let data: WorkflowOutput | null = $state(null);
-
-  // משתמש יכול לאשר/לדחות suggestions ו-newItems
-  // suggestion שאושר → ישתמש ב-existingId
-  // suggestion שנדחה → יוצר חדש
-  // newItem שנדחה → מוסר מהפרופיל
-  type Decision = 'accept' | 'reject' | 'pending';
-  let suggestionDecisions: Record<string, Decision> = $state({});
-  let newItemDecisions: Record<string, Decision> = $state({});
+  // Staged progress used while step === 'loading'.
+  // Each stage flips to 'done' as the request crosses each milestone.
+  type Stage = 'pending' | 'active' | 'done';
+  type StageKey = 'parse' | 'extract' | 'match' | 'ready';
+  let stages: Record<StageKey, Stage> = $state({
+    parse: 'pending',
+    extract: 'pending',
+    match: 'pending',
+    ready: 'pending'
+  });
+  let elapsed = $state(0); // sec, drives the visual time-line so users see progress
+  let elapsedTimer: ReturnType<typeof setInterval> | null = null;
 
   // ─── Upload ──────────────────────────────────────────────────────────────────
 
@@ -52,53 +34,65 @@
     'application/rtf'
   ];
 
+  function startStages() {
+    stages = { parse: 'active', extract: 'pending', match: 'pending', ready: 'pending' };
+    elapsed = 0;
+    elapsedTimer = setInterval(() => {
+      elapsed += 1;
+      // Heuristic: rotate "active" as time passes — parse ~0–2s, extract ~2–8s, match ~8–14s.
+      if (elapsed === 2 && stages.parse === 'active') {
+        stages = { ...stages, parse: 'done', extract: 'active' };
+      } else if (elapsed === 8 && stages.extract === 'active') {
+        stages = { ...stages, extract: 'done', match: 'active' };
+      }
+    }, 1000);
+  }
+  function stopStages(success: boolean) {
+    if (elapsedTimer) clearInterval(elapsedTimer);
+    elapsedTimer = null;
+    if (success) {
+      stages = { parse: 'done', extract: 'done', match: 'done', ready: 'done' };
+    }
+  }
+
   async function handleFile(file: File) {
     if (file.size > 5 * 1024 * 1024) {
-      error = 'הקובץ גדול מדי — עד 5MB';
+      error = $t('onboard.provider.cv_page.err_size') || 'הקובץ גדול מדי — עד 5MB';
       return;
     }
     if (!ACCEPTED_TYPES.includes(file.type)) {
-      error = 'פורמט לא נתמך';
+      error = $t('onboard.provider.cv_page.err_format') || 'פורמט לא נתמך';
       return;
     }
 
     error = '';
     step = 'loading';
+    startStages();
 
     const form = new FormData();
     form.append('cv', file);
+    form.append('lang', get(locale) ?? 'he');
 
     try {
-      const res = await fetch('/api/analyze-cv', {
-        method: 'POST',
-        body: form
-      });
+      const res = await fetch('/api/analyze-cv', { method: 'POST', body: form });
       if (!res.ok) {
         const b = await res.json().catch(() => ({}));
         throw new Error(b.message ?? `שגיאה ${res.status}`);
       }
-      data = (await res.json()) as WorkflowOutput;
+      const data = await res.json();
 
-      // אתחל decisions ל-pending
-      const allSuggestions = [
-        ...data.suggestions.skills,
-        ...data.suggestions.roles,
-        ...data.suggestions.methods
-      ];
-      const allNew = [
-        ...data.newItems.skills,
-        ...data.newItems.roles,
-        ...data.newItems.methods
-      ];
-      allSuggestions.forEach((s) => {
-        suggestionDecisions[s.input] = 'pending';
-      });
-      allNew.forEach((n) => {
-        newItemDecisions[n.input] = 'pending';
-      });
+      try {
+        sessionStorage.setItem('onboard.cvResult', JSON.stringify(data));
+        sessionStorage.setItem('onboard.source', 'cv');
+      } catch {
+        // session storage may be disabled — non-fatal
+      }
 
-      step = 'review';
+      stopStages(true);
+      // Small delay so the user sees the final ✓ row before navigating.
+      setTimeout(() => goto('/onboard/provider/review'), 450);
     } catch (err: unknown) {
+      stopStages(false);
       error = err instanceof Error ? err.message : 'שגיאה לא צפויה';
       step = 'upload';
     }
@@ -116,80 +110,17 @@
     if (f) handleFile(f);
   }
 
-  // ─── Save ────────────────────────────────────────────────────────────────────
-
-  async function confirmProfile() {
-    if (!data) return;
-    saving = true;
-
-    // בנה פרופיל סופי: רק מה שאושר
-    const resolvedSkills = [
-      ...data.matched.skills.map((s) => ({
-        id: s.existingId!,
-        label: s.existingLabel!
-      })),
-      ...data.suggestions.skills
-        .filter((s) => suggestionDecisions[s.input] === 'accept')
-        .map((s) => ({ id: s.existingId!, label: s.existingLabel! })),
-      ...data.suggestions.skills
-        .filter((s) => suggestionDecisions[s.input] === 'reject')
-        .map((s) => ({ id: null, label: s.input })), // יוצר חדש
-      ...data.newItems.skills
-        .filter((s) => newItemDecisions[s.input] !== 'reject')
-        .map((s) => ({ id: null, label: s.input }))
-    ];
-
-    // (זהה ל-roles ו-methods — בפרודקשן כדאי לפקטר לפונקציה)
-
-    try {
-      await fetch(`${import.meta.env.VITE_STRAPI_URL}/api/user-profiles`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          data: {
-            skills: resolvedSkills,
-            tasks: data.tasks
-            // roles, methods — זהה
-          }
-        })
-      });
-      goto('/onboarding/matches');
-    } catch {
-      error = 'שגיאה בשמירה, נסה שוב';
-    } finally {
-      saving = false;
-    }
-  }
-
-  // ─── Helpers ─────────────────────────────────────────────────────────────────
-
-  function pct(sim?: number) {
-    return sim != null ? `${Math.round(sim * 100)}%` : '';
-  }
-
-  function hasSuggestions(d: WorkflowOutput) {
-    return (
-      d.suggestions.skills.length +
-        d.suggestions.roles.length +
-        d.suggestions.methods.length >
-      0
-    );
-  }
-
-  function hasNew(d: WorkflowOutput) {
-    return (
-      d.newItems.skills.length +
-        d.newItems.roles.length +
-        d.newItems.methods.length >
-      0
-    );
-  }
+  const stageList: { key: StageKey; label: string; icon: string }[] = $derived([
+    { key: 'parse',   label: $t('onboard.provider.cv_page.stage_parse')   || 'קריאת הקובץ',         icon: '📄' },
+    { key: 'extract', label: $t('onboard.provider.cv_page.stage_extract') || 'חילוץ עם AI',         icon: '✨' },
+    { key: 'match',   label: $t('onboard.provider.cv_page.stage_match')   || 'התאמה לרשימות באתר',  icon: '🔗' },
+    { key: 'ready',   label: $t('onboard.provider.cv_page.stage_ready')   || 'מוכן לאישור',          icon: '🗝' }
+  ]);
 </script>
 
 <!-- ─── Upload ─────────────────────────────────────────────────────────────── -->
 {#if step === 'upload'}
-  <section>
-    <h1>העלאת קורות חיים</h1>
+  <section class="zone-wrap">
     {#if error}<p class="error">{error}</p>{/if}
 
     <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -207,8 +138,8 @@
       ondrop={onDrop}
       onclick={() => document.getElementById('cv-input')?.click()}
     >
-      <p class="icon">↑</p>
-      <p>גררו לכאן או לחצו להעלאה</p>
+      <p class="icon">📄</p>
+      <p class="big">{$t('onboard.provider.cv_page.drop_title') || 'גררו לכאן או לחצו להעלאה'}</p>
       <p class="sub">PDF · Word · RTF · טקסט — עד 5MB</p>
     </div>
     <input
@@ -221,357 +152,158 @@
   </section>
 {/if}
 
-<!-- ─── Loading ───────────────────────────────────────────────────────────── -->
+<!-- ─── Loading (staged checklist) ─────────────────────────────────────────── -->
 {#if step === 'loading'}
-  <section class="center">
-    <div class="spinner"></div>
-    <p>מנתח ומתאים לרשימות הקיימות...</p>
-  </section>
-{/if}
-
-<!-- ─── Review ────────────────────────────────────────────────────────────── -->
-{#if step === 'review' && data}
-  <section>
-    <h1>תוצאות הניתוח</h1>
-    {#if error}<p class="error">{error}</p>{/if}
-
-    <!-- ── אושרו אוטומטית ───────────────────────────────────────────────── -->
-    <div class="group">
-      <div class="group-header matched-header">
-        <span class="dot green"></span>
-        אותרו ב-Lev1 — מוסיפים אוטומטית
-      </div>
-
-      {#each ['skills', 'roles', 'methods'] as cat}
-        {#if data.matched[cat as keyof typeof data.matched].length > 0}
-          <div class="sub-label">
-            {cat === 'skills'
-              ? 'כישורים'
-              : cat === 'roles'
-                ? 'תפקידים'
-                : 'דרכי עשיה'}
-          </div>
-          <div class="tags">
-            {#each data.matched[cat as keyof typeof data.matched] as item}
-              <span class="tag matched" title="דמיון: {pct(item.similarity)}">
-                {item.existingLabel}
-                <small>{pct(item.similarity)}</small>
-              </span>
-            {/each}
-          </div>
-        {/if}
-      {/each}
+  <section class="loading-card" in:fly={{ y: 8, duration: 280 }}>
+    <div class="loading-title">
+      <span class="dot-spin"></span>
+      {$t('onboard.provider.cv_page.loading_title') || 'מנתח את קורות החיים שלך'}
+      <span class="elapsed">· {elapsed}s</span>
     </div>
-
-    <!-- ── הצעות — מחכות לאישור ──────────────────────────────────────────── -->
-    {#if hasSuggestions(data)}
-      <div class="group">
-        <div class="group-header suggestion-header">
-          <span class="dot amber"></span>
-          דומה לקיים — בחר מה להשתמש
-        </div>
-        <p class="hint">
-          בחרנו דומה מהמערכת. אם זה נכון — אשר. אם לא — נוסיף חדש.
-        </p>
-
-        {#each ['skills', 'roles', 'methods'] as cat}
-          {#each data.suggestions[cat as keyof typeof data.suggestions] as item}
-            <div class="suggestion-row">
-              <div class="suggestion-labels">
-                <span class="label-new">{item.input}</span>
-                <span class="arrow">→</span>
-                <span class="label-existing">{item.existingLabel}</span>
-                <small class="sim">{pct(item.similarity)}</small>
-              </div>
-              <div class="btn-group">
-                <button
-                  class="btn-accept"
-                  class:active={suggestionDecisions[item.input] === 'accept'}
-                  onclick={() => (suggestionDecisions[item.input] = 'accept')}
-                  >כן, השתמש בקיים</button
-                >
-                <button
-                  class="btn-reject"
-                  class:active={suggestionDecisions[item.input] === 'reject'}
-                  onclick={() => (suggestionDecisions[item.input] = 'reject')}
-                  >לא, הוסף חדש</button
-                >
-              </div>
-            </div>
-          {/each}
-        {/each}
-      </div>
-    {/if}
-
-    <!-- ── חדשים לגמרי ────────────────────────────────────────────────────── -->
-    {#if hasNew(data)}
-      <div class="group">
-        <div class="group-header new-header">
-          <span class="dot blue"></span>
-          חדשים במערכת — יתווספו לאוצר המילים
-        </div>
-        <p class="hint">
-          הפריטים האלה לא קיימים עדיין ב-Lev1. יתווספו בעת האישור.
-        </p>
-
-        {#each ['skills', 'roles', 'methods'] as cat}
-          {#if data.newItems[cat as keyof typeof data.newItems].length > 0}
-            <div class="sub-label">
-              {cat === 'skills'
-                ? 'כישורים'
-                : cat === 'roles'
-                  ? 'תפקידים'
-                  : 'דרכי עשיה'}
-            </div>
-            <div class="tags">
-              {#each data.newItems[cat as keyof typeof data.newItems] as item}
-                <span
-                  class="tag new-item"
-                  class:rejected={newItemDecisions[item.input] === 'reject'}
-                  onclick={() => {
-                    newItemDecisions[item.input] =
-                      newItemDecisions[item.input] === 'reject'
-                        ? 'pending'
-                        : 'reject';
-                  }}
-                  title="לחץ להסרה"
-                >
-                  {item.input}
-                  {newItemDecisions[item.input] === 'reject' ? '✕' : '+'}
-                </span>
-              {/each}
-            </div>
-          {/if}
-        {/each}
-      </div>
-    {/if}
-
-    <!-- ── משימות ──────────────────────────────────────────────────────────── -->
-    {#if data.tasks.length > 0}
-      <div class="group">
-        <div class="group-header">משימות והישגים</div>
-        <ul class="tasks-list">
-          {#each data.tasks as task}
-            <li>{task}</li>
-          {/each}
-        </ul>
-      </div>
-    {/if}
-
-    <button class="primary" onclick={confirmProfile} disabled={saving}>
-      {saving ? 'שומר...' : 'אישור והמשך לשותפויות ←'}
-    </button>
+    <ul class="stage-list">
+      {#each stageList as s (s.key)}
+        <li class="stage" class:active={stages[s.key] === 'active'} class:done={stages[s.key] === 'done'}>
+          <span class="stage-mark">
+            {#if stages[s.key] === 'done'}✓{:else if stages[s.key] === 'active'}<span class="ring"></span>{:else}◯{/if}
+          </span>
+          <span class="stage-icon">{s.icon}</span>
+          <span class="stage-label">{s.label}</span>
+        </li>
+      {/each}
+    </ul>
+    <p class="hint">{$t('onboard.provider.cv_page.loading_hint') || 'התהליך לוקח בדרך כלל 10-15 שניות'}</p>
   </section>
 {/if}
 
 <style>
+  .zone-wrap { width: 100%; }
   .error {
     color: #c0392b;
-    font-size: 14px;
+    font-size: 13px;
+    text-align: center;
+    margin-bottom: 8px;
   }
   .drop-zone {
-    border: 2px dashed #ccc;
-    padding: 2rem;
+    border: 2px dashed rgba(218, 165, 32, 0.45);
+    padding: 1.8rem 1rem;
     text-align: center;
     cursor: pointer;
-    border-radius: 12px;
+    border-radius: 14px;
+    background: rgba(255, 248, 220, 0.35);
+    transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
   }
+  .drop-zone:hover { transform: translateY(-1px); }
   .drop-zone.dragging {
-    border-color: #378add;
-    background: #f0f7ff;
+    border-color: #c98a16;
+    background: rgba(246, 195, 77, 0.18);
   }
-  .icon {
-    font-size: 24px;
-    margin: 0;
-  }
-  .sub {
-    font-size: 13px;
-    color: #888;
-  }
-  .spinner {
-    width: 32px;
-    height: 32px;
-    border: 3px solid #eee;
-    border-top-color: #378add;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 1rem;
-  }
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-  .center {
-    text-align: center;
-    padding: 3rem;
-  }
+  .icon { font-size: 36px; margin: 0 0 2px; }
+  .big { font-weight: 700; color: #6c4a07; margin: 0; }
+  .sub { font-size: 12px; color: #9a6b10; margin: 4px 0 0; }
 
-  .group {
-    border: 0.5px solid #e5e5e5;
-    border-radius: 12px;
-    padding: 1rem 1.25rem;
-    margin-bottom: 1rem;
+  /* ── loading checklist ── */
+  .loading-card {
+    width: 100%;
+    background: linear-gradient(140deg, rgba(255, 248, 220, 0.7), rgba(246, 195, 77, 0.18));
+    border: 1px solid rgba(218, 165, 32, 0.4);
+    border-radius: 16px;
+    padding: 14px 16px;
+    backdrop-filter: blur(6px);
   }
-  .group-header {
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 0.75rem;
+  .loading-title {
     display: flex;
     align-items: center;
     gap: 8px;
+    font-weight: 700;
+    color: #6c4a07;
+    font-size: 14px;
+    margin-bottom: 12px;
   }
-  .matched-header {
-    color: #085041;
+  .elapsed {
+    margin-inline-start: auto;
+    font-weight: 500;
+    color: #9a6b10;
+    font-size: 12px;
   }
-  .suggestion-header {
-    color: #633806;
-  }
-  .new-header {
-    color: #0c447c;
-  }
-  .hint {
-    font-size: 13px;
-    color: #888;
-    margin: -0.25rem 0 0.75rem;
-  }
-  .sub-label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #aaa;
-    margin: 0.5rem 0 0.3rem;
-  }
-
-  .dot {
-    width: 8px;
-    height: 8px;
+  .dot-spin {
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    display: inline-block;
+    background: linear-gradient(135deg, #f6c34d, #c98a16);
+    box-shadow: 0 0 0 0 rgba(246, 195, 77, 0.6);
+    animation: pulse 1.4s ease-out infinite;
   }
-  .dot.green {
-    background: #1d9e75;
-  }
-  .dot.amber {
-    background: #ba7517;
-  }
-  .dot.blue {
-    background: #378add;
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(246, 195, 77, 0.55); }
+    70% { box-shadow: 0 0 0 10px rgba(246, 195, 77, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(246, 195, 77, 0); }
   }
 
-  .tags {
+  .stage-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+    flex-direction: column;
+    gap: 8px;
   }
-  .tag {
+  .stage {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid rgba(218, 165, 32, 0.2);
+    color: #9a6b10;
+    font-size: 13.5px;
+    transition: background 200ms ease, color 200ms ease, transform 200ms ease;
+  }
+  .stage.active {
+    background: rgba(246, 195, 77, 0.25);
+    border-color: #c98a16;
+    color: #6c4a07;
+    font-weight: 700;
+    transform: translateX(0);
+  }
+  .stage.done {
+    background: rgba(2, 200, 130, 0.12);
+    border-color: rgba(2, 200, 130, 0.4);
+    color: #035a3e;
+  }
+  .stage-mark {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: 4px 11px;
-    border-radius: 99px;
-    font-size: 13px;
-    cursor: default;
-  }
-  .tag small {
-    font-size: 10px;
-    opacity: 0.6;
-  }
-  .tag.matched {
-    background: #e1f5ee;
-    color: #085041;
-  }
-  .tag.new-item {
-    background: #e6f1fb;
-    color: #0c447c;
-    cursor: pointer;
-    transition: opacity 0.15s;
-  }
-  .tag.new-item.rejected {
-    background: #f5f5f5;
-    color: #aaa;
-    text-decoration: line-through;
-  }
-
-  .suggestion-row {
-    border: 0.5px solid #f0e0c0;
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    margin-bottom: 0.5rem;
-    background: #fdf8f0;
-  }
-  .suggestion-labels {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 0.5rem;
-    font-size: 14px;
-  }
-  .label-new {
-    color: #333;
-  }
-  .label-existing {
-    color: #085041;
-    font-weight: 500;
-  }
-  .arrow {
-    color: #aaa;
-  }
-  .sim {
-    font-size: 11px;
-    color: #aaa;
-    margin-right: auto;
-  }
-  .btn-group {
-    display: flex;
-    gap: 6px;
-  }
-  .btn-accept,
-  .btn-reject {
-    padding: 4px 12px;
-    border-radius: 6px;
+    justify-content: center;
     font-size: 12px;
-    cursor: pointer;
-    border: 0.5px solid;
-    transition: all 0.15s;
+    font-weight: 900;
+    background: rgba(255, 255, 255, 0.7);
+    flex-shrink: 0;
   }
-  .btn-accept {
-    border-color: #1d9e75;
-    color: #085041;
-    background: transparent;
+  .stage.done .stage-mark {
+    background: linear-gradient(135deg, #02ffbb, #02c882);
+    color: #023d29;
   }
-  .btn-accept.active {
-    background: #e1f5ee;
+  .ring {
+    width: 12px;
+    height: 12px;
+    border: 2px solid #c98a16;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
   }
-  .btn-reject {
-    border-color: #ccc;
-    color: #888;
-    background: transparent;
+  @keyframes spin {
+    to { transform: rotate(360deg); }
   }
-  .btn-reject.active {
-    background: #f5f5f5;
-  }
-
-  .tasks-list {
-    margin: 0;
-    padding-right: 1.25rem;
-    font-size: 14px;
-    line-height: 1.8;
-    color: #444;
-  }
-  .primary {
-    width: 100%;
-    padding: 12px;
-    background: #378add;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 15px;
-    cursor: pointer;
-    margin-top: 1rem;
-  }
-  .primary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+  .stage-icon { font-size: 16px; }
+  .stage-label { flex: 1; }
+  .hint {
+    margin: 10px 2px 0;
+    font-size: 11px;
+    color: #9a6b10;
+    text-align: center;
   }
 </style>

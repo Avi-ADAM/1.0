@@ -1,0 +1,223 @@
+{
+  "title": "Choose Path · 1💗1",
+  "journey": "Step 3 · Path Selection",
+  "plaque": {
+    "title": "We'd love to know you",
+    "sub": "How would you like to integrate into the Rikma network of 1💗1?"
+  },
+  "tile_info": "This affects what we offer — we match the pace to who you are.",
+  "tracks": {
+    "provider": {
+      "title": "Want to offer skills and join a Rikma",
+      "sub": "Let's build a profile displaying your capabilities, to integrate as an equal partner in Rikmas (consensual partnerships), participate in voting and profit sharing, or provide a collective response to client demands.",
+      "meta": "~ 4 min · Profile built from CV or manually",
+      "chips": ["Skills Profile", "Join a Rikma", "Profit Sharing"]
+    },
+    "business": {
+      "title": "Have a business or a project idea",
+      "sub": "Set up a new Rikma (consensual partnership) or wrap an existing business — to recruit equal partners, manage profits and decisions together, and above all connect directly to a stream of clients and projects in the system.",
+      "meta": "~ 5 min · Extracted from site or free description",
+      "chips": ["Set up Rikma & Partners", "Voting & Profit Sharing", "Connect to Projects & Clients"]
+    }
+  },
+  "done": {
+    "title": "You've Arrived! · 1💗1",
+    "journey": "You've Arrived! Profile Ready",
+    "plaque": {
+      "title": "So glad you made it!",
+      "sub": "Your profile is live and breathing"
+    },
+    "info": "🎉 Profile saved. The Concierge is already starting to look for matches, potential Rikmas and client wishes.<br /><b>Where to continue from here?</b>",
+    "choices": {
+      "matches": {
+        "title": "To your profile + user guide",
+        "sub": "The Concierge is already looking for matching Rikmas and client demands. Let's learn how to manage a consensual partnership on the go.",
+        "meta": "Recommended — The natural way to continue",
+        "chips": {
+          "realtime": "✨ Real-time suggestions",
+          "guide": "📖 Short guide"
+        }
+      },
+      "business": {
+        "title": "Set up a Rikma (Partnership)",
+        "sub": "Have a project idea, product or partnership? It's time to set up a Rikma, recruit partners and connect to client projects in the system.",
+        "meta": "Can also be done later from profile",
+        "chips": {
+          "project": "Set up a Rikma",
+          "products": "Voting & Profits",
+          "partners": "Partners & Clients"
+        }
+      }
+    }
+  },
+  "provider": {
+    "title": "Build Provider Profile · 1💗1",
+    "journey": "Step 4 · Profile Building",
+    "plaque": {
+      "title": "How shall we start building?",
+      "sub": "One method · Can be edited later"
+    },
+    "or": "or",
+    "choices": {
+      "cv": {
+        "title": "Upload CV",
+        "sub": "AI will extract your skills and experience from the CV to match you with suitable Rikmas and projects.",
+        "meta": "~ 30 sec · PDF · DOCX · TXT",
+        "chips": {
+          "suggested": "⚡ Recommended",
+          "success": "90% succeed"
+        }
+      },
+      "describe": {
+        "title": "Describe in your own words",
+        "sub": "Write freely about your skills, desires and experience. The AI will connect you with suitable Rikmas.",
+        "meta": "~ 2 min · 2-3 paragraphs",
+        "chips": {
+          "free": "✍️ Free"
+        }
+      },
+      "manual": {
+        "title": "Manual fill in four steps",
+        "sub": "Values → Skills → Roles → Style.",
+        "meta": "~ 4 min · No AI"
+      }
+    },
+    "cv_page": {
+      "title": "Upload CV · 1💗1",
+      "journey": "Step 4 · CV Processing",
+      "plaque": {
+        "title": "Drag CV here",
+        "sub": "Everything stays with us · Nothing is exposed"
+      },
+      "info": "✨ The AI will extract your skills and experience from the CV — so we can offer you suitable Rikmas and consensual co-management. You can always edit.",
+      "back_choice": "← Back to choice"
+    },
+    "describe_page": {
+      "title": "Tell about yourself · 1💗1",
+      "journey": "Step 4 · Personal Story",
+      "plaque": {
+        "title": "Tell us about yourself",
+        "sub": "AI will extract skills and values to match you with suitable Rikmas"
+      },
+      "info": "✨ 2-3 free paragraphs: what are your skills, which Rikmas are you interested in joining as an equal partner, and what value do you wish to bring.",
+      "label": "Your story",
+      "placeholder": "Example: Fullstack development with 5 years of experience. Interested in joining early-stage startups as a technology partner, especially in education and health. Daily routine involves React & Node.js, database design and lead development...",
+      "analyzing": "✨ Analyzing story...",
+      "working": "Lev is working..."
+    },
+    "review_page": {
+      "title": "Confirm Profile · 1💗1",
+      "journey": "Step 5 · Profile Confirmation",
+      "loading": "Loading...",
+      "plaque": {
+        "title": "Here's what we found",
+        "sub": "Mark what is correct · Everything can be edited"
+      },
+      "summary": "✓ Found {{total}} items · <b>{{matched}}</b> matching · <b>{{suggested}}</b> suggestions · <b>{{newItems}}</b> new",
+      "sections": {
+        "vallues": {
+          "label": "Top Values"
+        },
+        "skills": {
+          "label": "Skills"
+        },
+        "roles": {
+          "label": "Roles"
+        },
+        "methods": {
+          "label": "Work Style"
+        },
+        "missions": {
+          "label": "Missions you are capable of doing",
+          "hint": "Click on a mission to remove · It can be edited and added later"
+        }
+      },
+      "close_to": "Close to: {{label}}",
+      "resources": {
+        "label": "📦 Resources to share",
+        "hint": "Physical items in your possession that can be offered — click to select"
+      },
+      "save_failed": "Save failed ({{status}})",
+      "network_error": "Network error — please try again",
+      "actions": {
+        "skip": "Skip to finish 🗝",
+        "saving": "Saving...",
+        "edit": "Continue to edit ✍️"
+      },
+      "next_hint": "In editing we will add more values, refine skills, select missions and resources from the lists on the site. You can always edit from the profile."
+    },
+    "tabs": {
+      "values": "Values",
+      "skills": "Skills",
+      "roles": "Roles",
+      "style": "Style"
+    }
+  },
+  "actions": {
+    "skip": "Skip · I'll choose later",
+    "continue": "Continue 🗝",
+    "going": "Moving...",
+    "back": "← Back",
+    "skip_manual": "Skip to manual fill",
+    "choose_other": "← Choose other"
+  },
+  "business": {
+    "title": "Set up a Rikma (Partnership) · 1💗1",
+    "journey": "Step 4 · Building the Rikma",
+    "plaque": {
+      "title": "Tell us about your Rikma",
+      "sub": "Consensual partnership, profit sharing and direct connection to clients"
+    },
+    "choices": {
+      "url": {
+        "title": "I have a website or business page",
+        "sub": "Paste URL — AI will set up the Rikma, define areas of activity, and extract matches for partners and client projects.",
+        "meta": "~ 45 sec · Everything can be edited",
+        "chips": {
+          "fast": "⚡ Fastest",
+          "public": "Public URL"
+        }
+      },
+      "describe": {
+        "title": "Describe in your own words",
+        "sub": "2-3 free paragraphs. Write about the Rikma, your needs and how you'd like to address client projects.",
+        "meta": "~ 2 min · AI will build a draft"
+      },
+      "manual": {
+        "title": "Manual fill",
+        "sub": "Field by field. No AI.",
+        "meta": "~ 5 min · Most accurate"
+      }
+    },
+    "url_page": {
+      "title": "Paste Link to Rikma · 1💗1",
+      "journey": "Step 5 · Setting up Rikma",
+      "plaque": {
+        "title": "Paste Rikma link",
+        "sub": "Website / Landing Page / Facebook / Instagram"
+      },
+      "info": "⚡ AI will read the page and automatically set up the Rikma, including the project name, description, and required skills for partners — you can always edit.",
+      "label": "Link",
+      "hint_ok": "✓ Looks good",
+      "hint_err": "Paste full address — including https://",
+      "analyzing": "✨ Analyzing the page...",
+      "scanning": "Lev is scanning..."
+    },
+    "describe_page": {
+      "title": "Describe Rikma · 1💗1",
+      "journey": "Step 5 · Setting up Rikma",
+      "plaque": {
+        "title": "Tell us about the Rikma",
+        "sub": "AI will build a Rikma draft, partner definitions and matching client projects"
+      },
+      "info": "✨ 2-3 free paragraphs: about your Rikma or project, what kind of partners you need, and what skills would complement you.",
+      "label": "Description",
+      "placeholder": "Example: Setting up a Rikma (partnership) connecting local farmers to direct consumers. Partner needed to lead marketing and sales, with experience in community management and social networks. Equal partnership offered, including consensual decision-making and structured profit sharing...",
+      "char_count": "chars",
+      "can_continue": "✓ Can continue",
+      "min_chars": "Please reach at least {{count}}",
+      "analyzing": "✨ Analyzing text...",
+      "working": "Lev is working..."
+    }
+  }
+}

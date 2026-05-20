@@ -10,6 +10,12 @@ export const config = {
     loaders: [
         {
             locale: 'he',
+            key: 'onboard',
+            routes: [/^(?:\/he|\/en|\/ar)?\/onboard/],
+            loader: async () => (await import('./he/onboard.json')).default,
+        },
+        {
+            locale: 'he',
             key: 'bot',
             routes: [/^(?:\/he|\/en|\/ar)?\/chat/],
             loader: async () => (await import('./he/bot.json')).default,
@@ -22,9 +28,21 @@ export const config = {
         },
         {
             locale: 'ar',
+            key: 'onboard',
+            routes: [/^(?:\/he|\/en|\/ar)?\/onboard/],
+            loader: async () => (await import('./ar/onboard.json')).default,
+        },
+        {
+            locale: 'ar',
             key: 'tasks',
             routes: [/^(?:\/he|\/en|\/ar)?\/myacts/],
             loader: async () => (await import('./ar/tasks.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'onboard',
+            routes: [/^(?:\/he|\/en|\/ar)?\/onboard/],
+            loader: async () => (await import('./en/onboard.json')).default,
         },
         {
             locale: 'en',

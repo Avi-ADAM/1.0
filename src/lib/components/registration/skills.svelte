@@ -25,32 +25,31 @@
     show_value = newValue;
   });
 
-  onMount(() => {
-    // Load previously selected skills from store and map IDs to strings
-    const currentSkills = $skills1;
-    if (
-      currentSkills &&
-      currentSkills.length > 0 &&
-      $skil &&
-      $skil.length > 0
-    ) {
-      selected = currentSkills
-        .map((skillId) => {
-          const s = $skil.find((item) => item.id == skillId);
-          if (s) {
-            let name = s.attributes?.skillName || '';
-            if (
-              $lang === 'he' &&
-              s.attributes?.localizations?.data?.length > 0
-            ) {
-              name = s.attributes.localizations.data[0].attributes.skillName;
-            }
-            return name;
-          }
-          return null;
-        })
-        .filter(Boolean);
-    }
+  // Seed `selected` from $skills1 (IDs) reactively. We can't use a one-shot
+  // onMount here because SkillSelector lazily refreshes $skil (via the _fresh
+  // guard), so when arriving from /onboard/provider/review the brand-new skill
+  // IDs may not be in $skil yet at mount time. Watching $skil lets the names
+  // fill in as soon as the fresh fetch lands. Once we've mapped every ID we
+  // stop seeding so user edits in MultiSelect aren't overwritten.
+  let seedComplete = $state(false);
+  $effect(() => {
+    if (seedComplete) return;
+    const ids = $skills1;
+    if (!ids || ids.length === 0 || !$skil || $skil.length === 0) return;
+    const mapped = ids
+      .map((skillId) => {
+        const s = $skil.find((item) => item.id == skillId);
+        if (!s) return null;
+        let name = s.attributes?.skillName || '';
+        if ($lang === 'he' && s.attributes?.localizations?.data?.length > 0) {
+          name = s.attributes.localizations.data[0].attributes.skillName;
+        }
+        return name;
+      })
+      .filter(Boolean);
+    if (mapped.length === 0) return;
+    selected = mapped;
+    if (mapped.length === ids.length) seedComplete = true;
   });
 
   // Map strings back to IDs and save before navigating
@@ -190,6 +189,16 @@
       display: flex;
       justify-content: center;
       --multiselect-width: 80vw;
+    }
+    /* Keep the gold back/skip/next arrows reachable when the multiselect
+       grows past the viewport — otherwise a user with many selected chips
+       has no visible way to advance. */
+    .button-in-1-2,
+    .button-2,
+    .button-end {
+      position: sticky;
+      bottom: 8px;
+      z-index: 5;
     }
   }
   .input-2-2 {

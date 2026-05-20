@@ -331,6 +331,15 @@
       align-self: center;
       justify-self: center;
     }
+    /* Keep the gold back/skip/next arrows reachable when the multiselect
+       grows past the viewport on small screens. */
+    .button-in-2,
+    .button-2,
+    .button-end {
+      position: sticky;
+      bottom: 8px;
+      z-index: 5;
+    }
   }
   .button-in-2 {
     grid-column: 1/2;

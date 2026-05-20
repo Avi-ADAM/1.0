@@ -4,14 +4,15 @@ import { PinoLogger } from '@mastra/loggers';
 import { Agent } from '@mastra/core/agent';
 import { LibSQLStore } from '@mastra/libsql';
 import { chatWorkflow } from './workflows/chat-workflow';
+import { analyzeCvWorkflow } from './workflows/analyze-cv';
 import { createUnregisteredBotAgent } from './agents/nonreg-bot';
 import { createEnhancedBotAgent } from './agents/reg-bot';
  import { createNavigationAgent } from './agents/navigation-agent'
  import { createIntentAgent } from './agents/intent-agent'
 
- 
+
 export const mastra = new Mastra({
-  workflows: { chatWorkflow },
+  workflows: { chatWorkflow, 'analyze-cv': analyzeCvWorkflow },
   agents: {
     IntentAgent: createIntentAgent(),
     NavigationAgent: createNavigationAgent('apiKey','language','useId'),
