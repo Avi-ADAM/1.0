@@ -7,7 +7,18 @@ import { Agent } from '@mastra/core/agent';
 import { z } from 'zod';
 import { createGoogleModel } from '../lib/createModel';
 import { matchAllCategories } from '../../lib/embed/matcher';
-import { PDFParse } from 'pdf-parse';
+
+// Polyfill global DOM objects required by pdfjs-dist when running in serverless environments (like Vercel)
+// where @napi-rs/canvas cannot be loaded.
+if (typeof globalThis.DOMMatrix === 'undefined') {
+  globalThis.DOMMatrix = class DOMMatrix {} as any;
+}
+if (typeof globalThis.ImageData === 'undefined') {
+  globalThis.ImageData = class ImageData {} as any;
+}
+if (typeof globalThis.Path2D === 'undefined') {
+  globalThis.Path2D = class Path2D {} as any;
+}
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
@@ -91,6 +102,7 @@ const extractTextStep = createStep({
     let detectedFormat = SUPPORTED_TYPES[mimeType] ?? ext ?? 'unknown';
 
     if (mimeType === 'application/pdf' || ext === 'pdf') {
+      const { PDFParse } = await import('pdf-parse');
       const parser = new PDFParse({ data: new Uint8Array(fileBuffer) });
       try {
         text = (await parser.getText()).text;
