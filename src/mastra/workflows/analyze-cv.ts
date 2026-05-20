@@ -102,6 +102,16 @@ const extractTextStep = createStep({
     let detectedFormat = SUPPORTED_TYPES[mimeType] ?? ext ?? 'unknown';
 
     if (mimeType === 'application/pdf' || ext === 'pdf') {
+      // pdfjs-dist tries to load its worker via `await import(workerSrc)` where
+      // workerSrc is a runtime string ("./pdf.worker.mjs"). On Vercel serverless
+      // the bundler cannot track that dynamic specifier, so the worker file is
+      // missing from the function output and the "fake worker" setup fails.
+      // Pre-importing the module with a literal specifier makes Rollup bundle
+      // it, and pdfjs-dist will use `globalThis.pdfjsWorker.WorkerMessageHandler`
+      // instead of attempting the dynamic import.
+      if (!(globalThis as any).pdfjsWorker) {
+        (globalThis as any).pdfjsWorker = await import('pdfjs-dist/legacy/build/pdf.worker.mjs');
+      }
       const { PDFParse } = await import('pdf-parse');
       const parser = new PDFParse({ data: new Uint8Array(fileBuffer) });
       try {

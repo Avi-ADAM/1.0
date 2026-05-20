@@ -34,7 +34,16 @@
       "Bash(dir \"C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\routes\")",
       "Bash(where python3 *)",
       "Bash(where python *)",
-      "Bash(grep -rn 'import.*store-show\\\\|from.*store-show\\\\|show\\\\.set\\\\|show\\\\.subscribe\\\\|$show\\\\b' src/)"
+      "Bash(grep -rn 'import.*store-show\\\\|from.*store-show\\\\|show\\\\.set\\\\|show\\\\.subscribe\\\\|$show\\\\b' src/)",
+      "Bash(ls \"C:\\\\\\\\Users\\\\\\\\babay\\\\\\\\Documents\\\\\\\\GitHub\\\\\\\\1.0main\\\\\\\\node_modules\\\\\\\\pdf-parse\")",
+      "Bash(ls \"C:\\\\\\\\Users\\\\\\\\babay\\\\\\\\Documents\\\\\\\\GitHub\\\\\\\\1.0main\\\\\\\\node_modules\\\\\\\\pdf-parse\\\\\\\\dist\\\\\\\\node\")",
+      "Bash(ls \"C:\\\\\\\\Users\\\\\\\\babay\\\\\\\\Documents\\\\\\\\GitHub\\\\\\\\1.0main\\\\\\\\node_modules\\\\\\\\pdfjs-dist\\\\\\\\legacy\\\\\\\\build\")",
+      "Bash(ls *)",
+      "Bash(grep -E \"worker|fake|disableWorker\" \"C:\\\\\\\\Users\\\\\\\\babay\\\\\\\\Documents\\\\\\\\GitHub\\\\\\\\1.0main\\\\\\\\node_modules\\\\\\\\pdf-parse\\\\\\\\dist\\\\\\\\pdf-parse\\\\\\\\esm\\\\\\\\index.js\")",
+      "Bash(head -100 \"C:\\\\\\\\Users\\\\\\\\babay\\\\\\\\Documents\\\\\\\\GitHub\\\\\\\\1.0main\\\\\\\\node_modules\\\\\\\\pdf-parse\\\\\\\\dist\\\\\\\\pdf-parse\\\\\\\\esm\\\\\\\\index.js\")",
+      "Bash(grep -n \"WorkerMessageHandler\" \"C:\\\\\\\\Users\\\\\\\\babay\\\\\\\\Documents\\\\\\\\GitHub\\\\\\\\1.0main\\\\\\\\node_modules\\\\\\\\pdfjs-dist\\\\\\\\legacy\\\\\\\\build\\\\\\\\pdf.worker.mjs\")",
+      "Bash(cat \"C:\\\\\\\\Users\\\\\\\\babay\\\\\\\\Documents\\\\\\\\GitHub\\\\\\\\1.0main\\\\\\\\svelte.config.js\")",
+      "Bash(grep -E \"exports|legacy\" \"C:\\\\\\\\Users\\\\\\\\babay\\\\\\\\Documents\\\\\\\\GitHub\\\\\\\\1.0main\\\\\\\\node_modules\\\\\\\\pdfjs-dist\\\\\\\\package.json\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\deals\\request"
