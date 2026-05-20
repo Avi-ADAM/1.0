@@ -89,6 +89,15 @@
         "title": "Drag CV here",
         "sub": "Everything stays with us · Nothing is exposed"
       },
+      "drop_title": "Drag and drop your CV here or click to upload",
+      "loading_title": "Analyzing your CV",
+      "loading_hint": "The process usually takes 10-15 seconds",
+      "stage_parse": "Reading the file",
+      "stage_extract": "AI extraction",
+      "stage_match": "Matching with site lists",
+      "stage_ready": "Ready for confirmation",
+      "err_size": "File is too large — up to 5MB",
+      "err_format": "Unsupported format",
       "info": "✨ The AI will extract your skills and experience from the CV — so we can offer you suitable Rikmas and consensual co-management. You can always edit.",
       "back_choice": "← Back to choice"
     },
