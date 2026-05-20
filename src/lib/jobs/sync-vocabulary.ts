@@ -319,6 +319,12 @@ export async function syncVocabulary() {
     console.log(`\n✅ סנכרון הושלם ב-${((Date.now() - start) / 1000).toFixed(1)}s`);
 }
 
-console.log('PINECONE_API_KEY:', process.env.PINECONE ? '✓' : '✗ חסר');
-console.log('STRAPI_URL:', process.env.VITE_URL ?? '✗ חסר');
-syncVocabulary().catch(err => { console.error('❌', err); process.exit(1); });
+// הרצה כסקריפט עצמאי בלבד (npx tsx src/lib/jobs/sync-vocabulary.ts).
+// אם הקובץ מיובא ע"י endpoint או מודול אחר — לא להריץ אוטומטית, אחרת build נופל.
+import { fileURLToPath } from 'url';
+const isDirectRun = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];
+if (isDirectRun) {
+    console.log('PINECONE_API_KEY:', process.env.PINECONE ? '✓' : '✗ חסר');
+    console.log('STRAPI_URL:', process.env.VITE_URL ?? '✗ חסר');
+    syncVocabulary().catch(err => { console.error('❌', err); process.exit(1); });
+}
