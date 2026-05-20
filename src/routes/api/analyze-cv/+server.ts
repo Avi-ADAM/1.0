@@ -74,6 +74,18 @@ export const POST: RequestHandler = async ({ request, cookies, url }) => {
         };
     }
 
+    const OVERLOAD_MSG = 'שירותי ה-AI עמוסים כרגע. אנא נסי שוב בעוד כחצי דקה.';
+
+    function isOverloadError(e: unknown): boolean {
+        if (!e || typeof e !== 'object') return false;
+        const anyErr = e as any;
+        if (anyErr.code === 'AI_OVERLOADED') return true;
+        if (anyErr.message === 'AI_OVERLOADED') return true;
+        const status = anyErr.statusCode ?? anyErr.cause?.statusCode;
+        if (status === 503 || status === 429) return true;
+        return /overload|unavailable|high demand|rate limit|quota/i.test(anyErr.message ?? '');
+    }
+
     try {
         const run = await mastra.getWorkflow('analyze-cv').createRun();
 
@@ -81,12 +93,23 @@ export const POST: RequestHandler = async ({ request, cookies, url }) => {
 
         if (result.status === 'failed') {
             console.error('Mastra workflow failed:', result.error);
+            if (isOverloadError(result.error)) {
+                throw error(503, OVERLOAD_MSG);
+            }
             throw error(500, result.error?.message ?? 'שגיאה בניתוח הקובץ');
         }
 
         return json(result.result);
 
     } catch (err: unknown) {
+        // SvelteKit HttpError — rethrow so our 503/4xx status is preserved.
+        if (err && typeof err === 'object' && 'status' in err && 'body' in err) {
+            throw err;
+        }
+        if (isOverloadError(err)) {
+            console.error('analyze-cv overload:', (err as any)?.message);
+            throw error(503, OVERLOAD_MSG);
+        }
         const msg = err instanceof Error ? err.message : 'שגיאה לא צפויה';
         console.error('analyze-cv error:', msg);
         throw error(500, msg);

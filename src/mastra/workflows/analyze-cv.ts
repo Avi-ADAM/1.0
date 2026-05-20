@@ -5,7 +5,14 @@
 import { createWorkflow, createStep } from '@mastra/core/workflows';
 import { Agent } from '@mastra/core/agent';
 import { z } from 'zod';
-import { createGoogleModel } from '../lib/createModel';
+import {
+  createGoogleModel,
+  createGroqModel,
+  createNvidiaModel,
+  hasGoogleModelConfig,
+  hasGroqModelConfig,
+  hasNvidiaModelConfig
+} from '../lib/createModel';
 import { matchAllCategories } from '../../lib/embed/matcher';
 
 // Polyfill global DOM objects required by pdfjs-dist when running in serverless environments (like Vercel)
@@ -208,12 +215,30 @@ const analyzeWithGeminiStep = createStep({
     const primaryName = LANG_NAMES[lang];
     const others = (['he', 'en', 'ar'] as Lang[]).filter((l) => l !== lang);
 
+    // Multi-provider fallback: Mastra's Agent retries each model in order
+    // when one fails (e.g. Gemini 503 overload). Mirrors the chat agents in
+    // src/mastra/agents/*.
+    const models: Array<{ model: any; maxRetries: number }> = [];
+    if (hasGoogleModelConfig()) {
+      models.push({ model: createGoogleModel(undefined, 'gemini-flash-latest', { thinkingBudget: 0 }), maxRetries: 2 });
+      models.push({ model: createGoogleModel(undefined, 'gemini-flash-lite-latest'), maxRetries: 2 });
+    }
+    if (hasGroqModelConfig()) {
+      models.push({ model: createGroqModel(), maxRetries: 1 });
+    }
+    if (hasNvidiaModelConfig()) {
+      models.push({ model: createNvidiaModel(), maxRetries: 1 });
+    }
+    if (models.length === 0) {
+      throw new Error('No AI provider configured for CV extraction.');
+    }
+
     const agent = new Agent({
       id: 'CvExtractor',
       name: 'CvExtractor',
       instructions:
         'You extract structured data from CVs and free-text descriptions. Return JSON only — no explanations, no markdown fences.',
-      model: createGoogleModel(undefined, 'gemini-flash-latest', { thinkingBudget: 0 }),
+      model: models,
     });
 
     const prompt = `Analyze the following text (a CV or free-text self-description) and return JSON ONLY:
@@ -256,7 +281,27 @@ ATOMICITY rules (very important for skills):
 ${inputData.text.slice(0, 12000)}
 ---`;
 
-    const result = await agent.generate([{ role: 'user', content: prompt }]);
+    let result;
+    try {
+      result = await agent.generate([{ role: 'user', content: prompt }]);
+    } catch (err: any) {
+      // If every provider in the fallback chain is overloaded, surface a
+      // dedicated overload error so the route handler can return a 503 with a
+      // "try again in ~30s" message instead of a generic 500.
+      const status = err?.statusCode ?? err?.cause?.statusCode;
+      const isOverload =
+        status === 503 ||
+        status === 429 ||
+        err?.isRetryable === true ||
+        /overload|unavailable|high demand|rate limit|quota/i.test(err?.message ?? '');
+      if (isOverload) {
+        const overloadErr = new Error('AI_OVERLOADED');
+        (overloadErr as any).code = 'AI_OVERLOADED';
+        (overloadErr as any).cause = err;
+        throw overloadErr;
+      }
+      throw err;
+    }
 
     const cleaned = (result.text ?? '')
       .replace(/^```json\s*/i, '')
