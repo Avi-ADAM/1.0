@@ -27,11 +27,37 @@
   import Tile from '$lib/celim/tile.svelte';
   let vallues = $state([]);
   let error1 = null;
-  let newcontent = $state(true);
+  // Start false — local JSON is immediately available so no initial spinner.
+  // A background Strapi fetch refreshes options (including newly-created entries).
+  let newcontent = $state(false);
+
+  // Reactive seeding from $valluss IDs → names (mirrors the pattern in skills.svelte).
+  // Runs whenever $valluss changes OR vallues list updates (e.g. after Strapi fetch).
+  let seedComplete = $state(false);
+  $effect(() => {
+    if (seedComplete) return;
+    const ids = $valluss;
+    if (!ids || ids.length === 0) return;
+    if (!vallues || vallues.length === 0) return;
+    const mapped = ids
+      .map((vallueId) => {
+        const v = vallues.find((item) => item.id == vallueId);
+        if (!v) return null;
+        return v.attributes?.valueName || null;
+      })
+      .filter(Boolean);
+    if (mapped.length === 0) return;
+    selected = mapped;
+    // Mark complete only when every requested ID was resolved so we retry
+    // after the Strapi fetch if some IDs were missing from the local JSON.
+    if (mapped.length === ids.length) seedComplete = true;
+  });
+
   onMount(async () => {
+    // Seed from local JSON immediately so options are available with no delay.
     if ($lang == 'he') {
       vallues = jvals;
-    } else if (lang == 'en') {
+    } else if ($lang == 'en') {
       vallues = enjvals;
     }
     const parseJSON = (resp) => (resp.json ? resp.json() : resp);
@@ -43,9 +69,6 @@
         throw resp;
       });
     };
-    const headers = {
-      'Content-Type': 'application/json'
-    };
 
     try {
       const res = await fetch(baseUrl + '/graphql', {
@@ -55,7 +78,7 @@
         },
         body: JSON.stringify({
           query: `query {
-  vallues (sort: "valueName:asc"){
+  vallues (sort: "valueName:asc", pagination: { limit: 1000 }){
     data{
       id
       attributes {valueName ${$lang == 'he' ? 'localizations{ data { attributes{ valueName } } }' : ''}}
@@ -67,30 +90,21 @@
       })
         .then(checkStatus)
         .then(parseJSON);
-      vallues = res.data.vallues.data;
+      const freshVallues = res.data.vallues.data;
       if ($lang == 'he') {
-        for (var i = 0; i < vallues.length; i++) {
-          if (vallues[i].attributes.localizations.data.length > 0) {
-            vallues[i].attributes.valueName =
-              vallues[i].attributes.localizations.data[0].attributes.valueName;
+        for (var i = 0; i < freshVallues.length; i++) {
+          if (freshVallues[i].attributes.localizations?.data?.length > 0) {
+            freshVallues[i].attributes.valueName =
+              freshVallues[i].attributes.localizations.data[0].attributes.valueName;
           }
         }
       }
-      vallues = vallues;
-
-      // טעינת הערכים שנבחרו בעבר
-      const currentVallues = $valluss;
-      if (currentVallues && currentVallues.length > 0) {
-        const vallueNames = currentVallues
-          .map((vallueId) => {
-            const vallue = vallues.find((v) => v.id == vallueId);
-            return vallue ? vallue.attributes.valueName : null;
-          })
-          .filter(Boolean);
-        selected = vallueNames;
-      }
-
-      newcontent = false;
+      // Updating vallues triggers the $effect above to re-seed only if
+      // seedComplete is still false (i.e. some IDs were absent from local JSON
+      // because they were just created during the CV review step).
+      // If seedComplete is already true, the $effect short-circuits and user
+      // edits are preserved.
+      vallues = freshVallues;
     } catch (e) {
       error1 = e;
     }

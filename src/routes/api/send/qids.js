@@ -114,16 +114,33 @@ const qids_base = {
                                        $fulfilled:Boolean,
                                        $name: String,
                                        $des:String,
-                                       $allowJoin : Boolean, 
-                                       $vallues: [ID], 
-                                       $longDes:String, 
+                                       $allowJoin : Boolean,
+                                       $vallues: [ID],
+                                       $longDes:String,
                                        $bounti: Boolean,
                                        $totalbounti: Float,
                                        $users_permissions_users: [ID],
                                        $missions:[ID],
                                        $mashaabims:[ID],
                                        $link: String,
-                                       $publishedAt: DateTime)
+                                       $publishedAt: DateTime,
+                                       $status_ratson: Enum_Ratson_Status_Ratson,
+                                       $access_mode: Enum_Ratson_Access_Mode,
+                                       $categories: [ID],
+                                       $sub_category: String,
+                                       $language: String,
+                                       $lat: Float,
+                                       $lng: Float,
+                                       $radius: Long,
+                                       $location_hint: String,
+                                       $frequency: String,
+                                       $isOnline: Boolean,
+                                       $age_group: String,
+                                       $ai_meta: JSON,
+                                       $chat_forum: ID,
+                                       $process: ID,
+                                       $extracted_missions: [ComponentNewExtractedMissionsInput],
+                                       $extracted_resources: [ComponentNewExtractedResourcesInput])
                         { createRatson(
       data: {startDate:$startDate,
              desc: $des,
@@ -140,9 +157,26 @@ const qids_base = {
              totalbounti:$totalbounti,
              users_permissions_users:$users_permissions_users,
              missions: $missions,
-             mashaabims:$mashaabims
+             mashaabims:$mashaabims,
+             status_ratson: $status_ratson,
+             access_mode: $access_mode,
+             categories: $categories,
+             sub_category: $sub_category,
+             language: $language,
+             lat: $lat,
+             lng: $lng,
+             radius: $radius,
+             location_hint: $location_hint,
+             frequency: $frequency,
+             isOnline: $isOnline,
+             age_group: $age_group,
+             ai_meta: $ai_meta,
+             chat_forum: $chat_forum,
+             process: $process,
+             extracted_missions: $extracted_missions,
+             extracted_resources: $extracted_resources
                   }
-    
+
   ) {data{id}}
 }`,
   '6addTelegram': `mutation UpdateUsersPermissionsUser($telegramId:String ,
@@ -5552,6 +5586,421 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
 
   '141createMaap': `mutation CreateMaap($data: MaapInput!) {
     createMaap(data: $data) { data { id } }
+  }`,
+
+  /* ─────────────────────────────────────────────────────────────────────
+   * Concierge / Ratson — read-only queries (PLAN_CONCIERGE §2.5)
+   * Schema additions in §2.1 (status_ratson, extracted_*, chat_forum,
+   * process, derivedComplexMatanot, fulfillment_score, last_matched_at)
+   * and entities ratson-proposal, ratson-match-job (§2.2 / §2.3).
+   * ─────────────────────────────────────────────────────────────────── */
+
+  '105queryRatsonWithProposals': `query QueryRatsonWithProposals($id: ID!) {
+    ratson(id: $id) {
+      data {
+        id
+        attributes {
+          name
+          desc
+          longDes
+          startDate
+          finnishDate
+          fulfilled
+          allowJoin
+          bounti
+          totalbounti
+          language
+          age_group
+          frequency
+          isOnline
+          lat
+          lng
+          radius
+          location_hint
+          sub_category
+          access_mode
+          ai_meta
+          pinecone_id
+          status_ratson
+          fulfillment_score
+          last_matched_at
+          logo { data { attributes { url formats } } }
+          users_permissions_users {
+            data { id attributes { username } }
+          }
+          vallues { data { id attributes { valueName } } }
+          categories { data { id attributes { name } } }
+          missions { data { id attributes { missionName } } }
+          mashaabims { data { id attributes { name } } }
+          matanots { data { id attributes { name } } }
+          extracted_missions {
+            id
+            name
+            hoursEst
+            importance
+            notes
+            missions { data { id attributes { missionName } } }
+          }
+          extracted_resources {
+            id
+            name
+            kindOf
+            quantityEst
+            importance
+            notes
+            mashaabims { data { id attributes { name } } }
+          }
+          chat_forum { data { id } }
+          process { data { id } }
+          derivedComplexMatanot { data { id attributes { name } } }
+        }
+      }
+    }
+    ratsonProposals(
+      filters: { ratson: { id: { eq: $id } } }
+      sort: ["match_score:desc","createdAt:desc"]
+      pagination: { limit: 50 }
+    ) {
+      data {
+        id
+        attributes {
+          kind
+          status_proposal
+          match_score
+          total_price
+          auto_generated
+          createdAt
+          proposer_users {
+            data { id attributes { username } }
+          }
+          project { data { id attributes { projectName } } }
+          matanot { data { id attributes { name } } }
+          matbea { data { id attributes { name simbol } } }
+          forum { data { id } }
+          negos { data { id } }
+          covered_missions { id extracted_mission_idx hours price }
+          covered_resources { id extracted_resource_idx quantity price }
+        }
+      }
+    }
+  }`,
+
+  '106listMyRatsons': `query ListMyRatsons($uid: ID!) {
+    ratsons(
+      filters: { users_permissions_users: { id: { eq: $uid } } }
+      sort: ["createdAt:desc"]
+      pagination: { limit: 60 }
+    ) {
+      data {
+        id
+        attributes {
+          name
+          desc
+          longDes
+          startDate
+          finnishDate
+          fulfilled
+          totalbounti
+          access_mode
+          status_ratson
+          fulfillment_score
+          last_matched_at
+          createdAt
+          vallues { data { id attributes { valueName } } }
+          categories { data { id attributes { name } } }
+          missions { data { id attributes { missionName } } }
+          mashaabims { data { id attributes { name } } }
+          extracted_missions { id name importance }
+          extracted_resources { id name importance }
+        }
+      }
+    }
+  }`,
+
+  '100updateRatson': `mutation UpdateRatson(
+    $id: ID!,
+    $name: String,
+    $desc: String,
+    $longDes: String,
+    $startDate: DateTime,
+    $finnishDate: DateTime,
+    $fulfilled: Boolean,
+    $allowJoin: Boolean,
+    $bounti: Boolean,
+    $totalbounti: Float,
+    $logo: ID,
+    $vallues: [ID],
+    $categories: [ID],
+    $missions: [ID],
+    $mashaabims: [ID],
+    $matanots: [ID],
+    $matanots_offered: [ID],
+    $users_permissions_users: [ID],
+    $status_ratson: Enum_Ratson_Status_Ratson,
+    $access_mode: Enum_Ratson_Access_Mode,
+    $sub_category: String,
+    $language: String,
+    $lat: Float,
+    $lng: Float,
+    $radius: Long,
+    $location_hint: String,
+    $frequency: String,
+    $isOnline: Boolean,
+    $age_group: String,
+    $ai_meta: JSON,
+    $pinecone_id: String,
+    $fulfillment_score: Float,
+    $last_matched_at: DateTime,
+    $chat_forum: ID,
+    $process: ID,
+    $derivedComplexMatanot: ID,
+    $extracted_missions: [ComponentNewExtractedMissionsInput],
+    $extracted_resources: [ComponentNewExtractedResourcesInput]
+  ) {
+    updateRatson(
+      id: $id,
+      data: {
+        name: $name,
+        desc: $desc,
+        longDes: $longDes,
+        startDate: $startDate,
+        finnishDate: $finnishDate,
+        fulfilled: $fulfilled,
+        allowJoin: $allowJoin,
+        bounti: $bounti,
+        totalbounti: $totalbounti,
+        logo: $logo,
+        vallues: $vallues,
+        categories: $categories,
+        missions: $missions,
+        mashaabims: $mashaabims,
+        matanots: $matanots,
+        matanots_offered: $matanots_offered,
+        users_permissions_users: $users_permissions_users,
+        status_ratson: $status_ratson,
+        access_mode: $access_mode,
+        sub_category: $sub_category,
+        language: $language,
+        lat: $lat,
+        lng: $lng,
+        radius: $radius,
+        location_hint: $location_hint,
+        frequency: $frequency,
+        isOnline: $isOnline,
+        age_group: $age_group,
+        ai_meta: $ai_meta,
+        pinecone_id: $pinecone_id,
+        fulfillment_score: $fulfillment_score,
+        last_matched_at: $last_matched_at,
+        chat_forum: $chat_forum,
+        process: $process,
+        derivedComplexMatanot: $derivedComplexMatanot,
+        extracted_missions: $extracted_missions,
+        extracted_resources: $extracted_resources
+      }
+    ) {
+      data { id attributes { status_ratson fulfillment_score last_matched_at } }
+    }
+  }`,
+
+  '101createRatsonProposal': `mutation CreateRatsonProposal(
+    $ratson: ID!,
+    $kind: Enum_Ratsonproposal_Kind,
+    $status_proposal: Enum_Ratsonproposal_Status_Proposal,
+    $matanot: ID,
+    $project: ID,
+    $proposer_users: [ID],
+    $total_price: Float,
+    $matbea: ID,
+    $forum: ID,
+    $match_score: Float,
+    $auto_generated: Boolean,
+    $covered_missions: [ComponentNewCoveredMissionsInput],
+    $covered_resources: [ComponentNewCoveredResourcesInput],
+    $publishedAt: DateTime
+  ) {
+    createRatsonProposal(
+      data: {
+        ratson: $ratson,
+        kind: $kind,
+        status_proposal: $status_proposal,
+        matanot: $matanot,
+        project: $project,
+        proposer_users: $proposer_users,
+        total_price: $total_price,
+        matbea: $matbea,
+        forum: $forum,
+        match_score: $match_score,
+        auto_generated: $auto_generated,
+        covered_missions: $covered_missions,
+        covered_resources: $covered_resources,
+        publishedAt: $publishedAt
+      }
+    ) {
+      data { id attributes { status_proposal kind match_score } }
+    }
+  }`,
+
+  '102updateRatsonProposal': `mutation UpdateRatsonProposal(
+    $id: ID!,
+    $kind: Enum_Ratsonproposal_Kind,
+    $status_proposal: Enum_Ratsonproposal_Status_Proposal,
+    $matanot: ID,
+    $project: ID,
+    $proposer_users: [ID],
+    $total_price: Float,
+    $matbea: ID,
+    $forum: ID,
+    $match_score: Float,
+    $auto_generated: Boolean,
+    $covered_missions: [ComponentNewCoveredMissionsInput],
+    $covered_resources: [ComponentNewCoveredResourcesInput],
+    $negos: [ID]
+  ) {
+    updateRatsonProposal(
+      id: $id,
+      data: {
+        kind: $kind,
+        status_proposal: $status_proposal,
+        matanot: $matanot,
+        project: $project,
+        proposer_users: $proposer_users,
+        total_price: $total_price,
+        matbea: $matbea,
+        forum: $forum,
+        match_score: $match_score,
+        auto_generated: $auto_generated,
+        covered_missions: $covered_missions,
+        covered_resources: $covered_resources,
+        negos: $negos
+      }
+    ) {
+      data { id attributes { status_proposal match_score } }
+    }
+  }`,
+
+  '107listRatsonsForProject': `query ListRatsonsForProject($projectId: ID!, $limit: Int) {
+    ratsonProposals(
+      filters: { project: { id: { eq: $projectId } } }
+      sort: ["createdAt:desc"]
+      pagination: { limit: $limit }
+    ) {
+      data {
+        id
+        attributes {
+          status_proposal
+          kind
+          match_score
+          createdAt
+          ratson {
+            data {
+              id
+              attributes {
+                name
+                longDes
+                status_ratson
+                totalbounti
+                startDate
+                finnishDate
+                createdAt
+                vallues { data { id attributes { valueName } } }
+                categories { data { id attributes { name } } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  '108createRatsonMatchJob': `mutation CreateRatsonMatchJob(
+    $ratson: ID!,
+    $mode: Enum_Ratsonmatchjob_Mode,
+    $started_at: DateTime,
+    $finished_at: DateTime,
+    $proposals_created: Int,
+    $error: String,
+    $publishedAt: DateTime
+  ) {
+    createRatsonMatchJob(
+      data: {
+        ratson: $ratson,
+        mode: $mode,
+        started_at: $started_at,
+        finished_at: $finished_at,
+        proposals_created: $proposals_created,
+        error: $error,
+        publishedAt: $publishedAt
+      }
+    ) {
+      data { id attributes { mode proposals_created } }
+    }
+  }`,
+
+  '110listCandidateMatanots': `query ListCandidateMatanots($limit: Int) {
+    matanots(
+      filters: {
+        archived: { eq: false }
+        status_of_voting: { eq: active }
+      }
+      pagination: { limit: $limit }
+    ) {
+      data {
+        id
+        attributes {
+          name
+          sub_category
+          price
+          estimatedPrice
+          lat
+          lng
+          radius
+          categories { data { id attributes { name } } }
+          projectcreates {
+            data {
+              id
+              attributes {
+                projectName
+                vallues { data { id attributes { valueName } } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  '109listOpenRatsons': `query ListOpenRatsons($limit: Int) {
+    ratsons(
+      filters: {
+        fulfilled: { eq: false }
+        status_ratson: { in: [open, matching, negotiating] }
+      }
+      sort: ["createdAt:desc"]
+      pagination: { limit: $limit }
+    ) {
+      data {
+        id
+        attributes {
+          name
+          desc
+          longDes
+          startDate
+          finnishDate
+          totalbounti
+          lat
+          lng
+          sub_category
+          status_ratson
+          createdAt
+          users_permissions_users {
+            data { id attributes { username } }
+          }
+          vallues { data { id attributes { valueName } } }
+          categories { data { id attributes { name } } }
+        }
+      }
+    }
   }`
 };
 
