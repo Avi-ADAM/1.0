@@ -146,6 +146,9 @@ export interface NotificationConfig {
   /** Email template component name (optional, defaults to 'SimpleNuti') */
   emailTemplate?: string;
 
+  /** Extra props passed directly to the email template (for templates beyond SimpleNuti) */
+  emailTemplateData?: Record<string, any>;
+
   /** Additional metadata for notifications */
   metadata?: NotificationMetadata;
 }

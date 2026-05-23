@@ -52,6 +52,16 @@ export const updateTaskAction: ActionConfig = {
       type: 'array',
       required: false,
       description: 'Array of mission IDs associated with the task'
+    },
+    naasa: {
+      type: 'boolean',
+      required: false,
+      description: 'Mark task as done'
+    },
+    status: {
+      type: 'number',
+      required: false,
+      description: 'Progress status (0–100)'
     }
   },
   

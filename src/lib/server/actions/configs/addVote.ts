@@ -17,8 +17,8 @@ const addVoteHandler: ActionExecutionHandler = async (params, context, util) => 
   const { strapi } = util;
 
   // Validation
-  if (!type || !['pend', 'sheirutpend', 'ask', 'decision', 'weFinnish'].includes(type)) {
-    throw new Error('Invalid type. Must be "pend", "sheirutpend", "ask", "decision", or "weFinnish"');
+  if (!type || !['pend', 'sheirutpend', 'ask', 'decision', 'weFinnish', 'tosplit'].includes(type)) {
+    throw new Error('Invalid type. Must be "pend", "sheirutpend", "ask", "decision", "weFinnish", or "tosplit"');
   }
 
   if (!id || !projectId) {
@@ -293,6 +293,40 @@ const addVoteHandler: ActionExecutionHandler = async (params, context, util) => 
     };
   }
 
+  // --- Logic for Tosplit (Component Based - partial vote, not yet allVoted) ---
+  if (type === 'tosplit') {
+    const { existingComponentData } = params;
+    const now = new Date();
+
+    const existingVots = Array.isArray(existingComponentData)
+      ? existingComponentData.map((v: any) => ({
+          what: v.what ?? v.attributes?.what ?? true,
+          users_permissions_user:
+            v.users_permissions_user?.data?.id ??
+            v.users_permissions_user?.id ??
+            v.users_permissions_user,
+        }))
+      : [];
+
+    const allVots = [...existingVots, { what: true, users_permissions_user: userId }];
+
+    const result = await strapi.execute(
+      '124addVoteToTosplit',
+      { id, vots: allVots },
+      context.jwt,
+      context.fetch
+    );
+
+    if (!result || result.errors) {
+      throw new Error(`AddVoteToTosplit failed: ${JSON.stringify(result?.errors || 'Unknown error')}`);
+    }
+
+    return {
+      data: { id, success: true },
+      updateStrategy: { type: 'none' }
+    };
+  }
+
   // --- Logic for Pend (Component Based - Legacy) ---
 
   // בניית קומפוננטה חדשה של הצבעה
@@ -364,8 +398,8 @@ export const addVoteConfig: ActionConfig = {
     type: {
       type: 'string',
       required: true,
-      validate: (value) => ['pend', 'sheirutpend', 'ask', 'decision', 'weFinnish'].includes(value),
-      description: 'Type of item: "pend", "sheirutpend", "ask", "decision", or "weFinnish"'
+      validate: (value) => ['pend', 'sheirutpend', 'ask', 'decision', 'weFinnish', 'tosplit'].includes(value),
+      description: 'Type of item: "pend", "sheirutpend", "ask", "decision", "weFinnish", or "tosplit"'
     },
     id: {
       type: 'string',
