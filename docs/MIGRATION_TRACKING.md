@@ -12,10 +12,10 @@
 
 | מדד | ערך |
 |-----|-----|
-| Actions קיימים (הוגרו) | ~45 |
+| Actions קיימים (הוגרו) | ~63 |
 | קריאות sendToSer במערכת | ~280 |
-| קבצי components עם POST ישן | ~28 |
-| POST operations לא מוגרות | ~50 |
+| קבצי components עם POST ישן | ~25 |
+| POST operations לא מוגרות | ~36 |
 | GET operations לא מוגרות | ~20 |
 
 ---
@@ -30,13 +30,25 @@
 
 | פעולה | קובץ | שורות | Pattern ישן | Action חדש | Notifications נדרשות | סטטוס |
 |-------|------|--------|-------------|------------|----------------------|--------|
-| שליחת email notification על בקשת שירות | `lev/reqtosherut.svelte` | 272–285 | `fetch('/api/sma', POST)` | `sendSheirutRequestEmail` | מבקש + חברי פרויקט | `[ ]` |
-| שליחת email notification על בקשת שירות (2) | `lev/reqtosherut.svelte` | 421–434 | `fetch('/api/sma', POST)` | `sendSheirutRequestEmail` | מבקש + חברי פרויקט | `[ ]` |
-| אישור הלוקה (כולם אישרו) | `lev/halukaask.svelte` | 170–182 | `fetch('/api/approveHaluka', POST)` | `approveHaluka` ← **קיים!** לבדוק אם מחובר | משתתפים + פרויקט | `[ ]` |
-| עדכון לחיצה על כרטיס ברוך הבא | `lev/welcomeTo.svelte` | 41–57 | `fetch('/graphql', mutation updateWelcomTop)` | `updateWelcomeCard` | — | `[ ]` |
-| סטטוס task (taskishor/busabe/updStat) | `lev/missionInProgress.svelte` | 720–727, 742–749, 764–771 | `sendToSer(...)` × 3 | `updateTaskStatus` | חברי פרויקט (real-time) | `[ ]` |
-| לחיצה על כרטיס ברוך הבא | `lev/cards/welcomeToCard.svelte` | 26 | `sendToSer(...)` | `updateWelcomeCard` | — | `[ ]` |
-| בקשת join לפרויקט | `lev/reqtojoin.svelte` | 354–361, 428–435 | `sendToSer(...)` × 2 | `requestProjectJoin` | מנהל פרויקט | `[ ]` |
+| אישור קבלה למשימה (solo + allVoted) + email | `lev/reqtosherut.svelte` | agree() | `fetch('/graphql')` × 2 + `fetch('/api/sma')` × 2 | `finalizeAskAcceptance` | accepted user (email) + project members (socket) | `[x]` 2026-05-22 |
+| אישור הלוקה (כולם אישרו) + הצבעה חלקית | `lev/halukaask.svelte` | agree() | `fetch('/api/approveHaluka', POST)` + raw GraphQL | `approveHaluka` (custom handler) + `addVote(type:'tosplit')` | משתתפים + פרויקט | `[x]` 2026-05-22 |
+| עדכון לחיצה על כרטיס ברוך הבא | `lev/welcomeTo.svelte` | — | — | — | — | קובץ לא קיים, דילוג |
+| סטטוס task (taskishor/busabe/updStat) | `lev/missionInProgress.svelte` | taskishor/busabe/updStat | `sendToSer(61/62/63)` × 3 | `updateTask` (extended 31updateTask with naasa+status) | חברי פרויקט (real-time) | `[x]` 2026-05-22 |
+| עדכון אחוז התקדמות משימה | `lev/missionInProgress.svelte` | stat() | `fetch('/graphql')` inline mutation | `updateMissionStatus` | חברי פרויקט (socket) | `[x]` 2026-05-22 |
+| שמירת שעות טיימר ישן למשימה | `lev/missionInProgress.svelte` | save() | `fetch('/graphql')` → `11saveTimer` | `updateMissionTimerState` (save mode: hoursdon) | חברי פרויקט (socket) | `[x]` 2026-05-22 |
+| ניקוי טיימר ישן למשימה | `lev/missionInProgress.svelte` | handleClearClick() | `fetch('/graphql')` → `10stopTimer` | `updateMissionTimerState` (clear mode) | חברי פרויקט (socket) | `[x]` 2026-05-22 |
+| לחיצה על כרטיס ברוך הבא | `lev/cards/welcomeToCard.svelte` | onChatClick | `sendToSer(44updateWelcomeCard)` | `updateWelcomeCard` | — | `[x]` 2026-05-22 |
+| אישור join למשימה (solo + allVoted) + member add | `lev/reqtojoin.svelte` | agree() | `sendToSer(...)` × 2 + raw fetch | `finalizeJoinAcceptance` + `addVote(type:'ask')` | new member (email) + project members (socket) | `[x]` 2026-05-22 |
+| הצבעה על pending mission (YES/NO) + consensus → OpenMission | `lev/pandingMesima.svelte` | agree()/decline()/afterwhy() | `sendToSer(85)` + raw GraphQL | `voteOnPendm` (server-authoritative: DB fetch, orderon calc, consensus check) | project members (socket) | `[x]` 2026-05-22 |
+| הוספת תגובה/דיון ל-pendm | `lev/pandingMesima.svelte` | afreact() | `sendToSer(...)` raw GraphQL | `addDiunEntry` (entityType:'pendm') | project members (socket) | `[x]` 2026-05-22 |
+| הצבעה על pending resource (YES/NO) + consensus → OpenMashaabim | `lev/pmas.svelte` | agree()/decline()/afterwhy() | `sendToSer(...)` + raw GraphQL | `voteOnPmash` (server-authoritative: DB fetch, orderon calc, consensus check) | project members (socket) | `[x]` 2026-05-22 |
+| הוספת תגובה/דיון ל-pmash | `lev/pmas.svelte` | afreact() | `sendToSer(...)` raw GraphQL | `addDiunEntry` (entityType:'pmash') | project members (socket) | `[x]` 2026-05-22 |
+| הצבעה על בקשת משאב (YES/NO) + consensus → Rikmash | `lev/weget.svelte` | agree()/decline() | `fetch('/graphql')` × 2 (inline mutations) | `voteOnMaap` (server-authoritative: DB fetch, agprice calc, consensus → Rikmash+Sp.panui=false) | project members (socket) | `[x]` 2026-05-22 |
+| אישור שליחת כסף (sender) | `lev/didiget.svelte` | agree() kind='send' | `fetch('/graphql')` inline mutation → senderconf:true | `confirmHaluka` (kind:'send' — server verifies usersend) | חברי פרויקט (socket) | `[x]` 2026-05-22 |
+| אישור קבלת כסף (receiver) + חלוקת hervachti | `lev/didiget.svelte` | agree() kind='receive' | `SendTo(updateUser×n)` + `SendTo(updateHaluka)` + client-side spCheck | `confirmHaluka` (kind:'receive' — server-side spCheck + hervachti distribution) | חברי פרויקט (socket) | `[x]` 2026-05-22 |
+| הוספת תגובה להעברת כסף | `lev/didiget.svelte` | afreact() | `fetch('/graphql')` inline mutation chatre (broken objToString) | `addHalukaChatEntry` (server fetches current chatre, appends, saves back) | חברי פרויקט (socket) | `[x]` 2026-05-22 |
+| הצבעה על החלטת פרויקט — שינוי לוגו (kind=pic) + consensus | `lev/decisionMaking.svelte` | agree() kind!='sheirutpends' | `fetch('/graphql')` × broken (template literal discarded + que() as tagged template) — consensus never fired | `voteOnDecision` (server-authoritative: DB fetch, dedup, consensus → archiveDecision + updateProject.profilePic + markTimegrama) | חברי פרויקט (socket) | `[x]` 2026-05-22 |
+| הצבעה על sheirutpend מ-decisionMaking | `lev/decisionMaking.svelte` | agree() kind='sheirutpends' | `addVote(type:'decision')` בטעות לכל ה-kinds | `addVote(type:'sheirutpend')` — ה-action הנכון הקיים (handles consensus → createSheirut) | חברי פרויקט (socket) | `[x]` 2026-05-22 |
 
 ---
 
@@ -196,6 +208,28 @@
 | `updateProjectDetails` | `configs/updateProjectDetails.ts` | עדכון פרטי פרויקט |
 | `createComplexMatanot` | `configs/createComplexMatanot.ts` | BOM מורכב |
 | `approveMatanot` | `configs/approveMatanot.ts` | אישור BOM |
+| `finalizeAskAcceptance` | `configs/finalizeAskAcceptance.ts` | קבלה למשימה (solo/allVoted) + email MissionAccepted |
+| `finalizeJoinAcceptance` | `configs/finalizeJoinAcceptance.ts` | הוספת user לפרויקט (reqtojoin — allVoted) |
+| `updateWelcomeCard` | `configs/updateWelcomeCard.ts` | עדכון welcome card (נראה/נסגר) |
+| `createMashaabimRequest` | `configs/createMashaabimRequest.ts` | יצירת בקשת משאבים (mashaabim) |
+| `applyToMission` | `configs/applyToMission.ts` | הגשת מועמדות למשימה פתוחה |
+| `declineOpenMission` | `configs/declineOpenMission.ts` | דחיית משימה פתוחה |
+| `declineMissionRequest` | `configs/declineMissionRequest.ts` | דחיית בקשת משימה ע"י חבר פרויקט |
+| `finalizeAskmAcceptance` | `configs/finalizeAskmAcceptance.ts` | קבלת מועמד ל-Askm (solo/allVoted) |
+| `declineAskmRequest` | `configs/declineAskmRequest.ts` | דחיית בקשת Askm |
+| `voteOnPendm` | `configs/voteOnPendm.ts` | הצבעה על pending mission — שרת-authoritative (DB fetch, orderon, consensus → OpenMission) |
+| `voteOnPmash` | `configs/voteOnPmash.ts` | הצבעה על pending resource — שרת-authoritative (DB fetch, orderon, consensus → OpenMashaabim) |
+| `addDiunEntry` | `configs/addDiunEntry.ts` | הוספת תגובה/דיון ל-pendm או pmash |
+| `createRatson` | `configs/createRatson.ts` | יצירת רצון/wish (concierge flow) |
+| `matchRatson` | `configs/matchRatson.ts` | התאמת רצון לפרויקט |
+| `acceptRatsonProposal` | `configs/acceptRatsonProposal.ts` | אישור הצעת התאמה לרצון |
+| `rejectRatsonProposal` | `configs/rejectRatsonProposal.ts` | דחיית הצעת התאמה לרצון |
+| `voteOnMaap` | `configs/voteOnMaap.ts` | הצבעה על בקשת משאב (Maap/weget) — שרת-authoritative (DB fetch, agprice calc, consensus → Rikmash + Sp.panui=false) |
+| `updateMissionStatus` | `configs/updateMissionStatus.ts` | עדכון אחוז התקדמות (status 0–100) על Mesimabetahalich |
+| `updateMissionTimerState` | `configs/updateMissionTimerState.ts` | שמירה/ניקוי שדות טיימר ישנים על Mesimabetahalich (save=hoursdon / clear) |
+| `confirmHaluka` | `configs/confirmHaluka.ts` | אישור Haluka ע"י שולח (senderconf) או מקבל (confirmed + spCheck + hervachti distribution) |
+| `addHalukaChatEntry` | `configs/addHalukaChatEntry.ts` | הוספת entry לchatre של Haluka (שרת מביא מה-DB ומוסיף) |
+| `voteOnDecision` | `configs/voteOnDecision.ts` | הצבעה על החלטת פרויקט — server-authoritative (DB fetch, dedup, consensus → archiveDecision + updateProject.profilePic (pic) + markTimegrama) |
 
 ---
 
@@ -204,4 +238,4 @@
 1. **עדיפות ראשונה:** טבלאות 🔴 — POST מ-components. אלה בלי notifications ו-real-time
 2. **לפני migration:** בדוק שה-action לא כבר קיים ברשימת "הוגרו"
 3. **לא למחוק sendToSer** עד שכל ה-`[ ]` הפכו ל-`[x]`
-4. **תאריך עדכון אחרון:** 2026-05-21
+4. **תאריך עדכון אחרון:** 2026-05-22 (didiget.svelte complete)

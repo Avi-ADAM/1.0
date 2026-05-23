@@ -491,16 +491,18 @@ const qids_base = {
     }
   }
 }`,
-  "31updateTask": `mutation UpdateTask($id: ID!,$myIshur: Boolean,$valiIshur: Boolean, $isAssigned: Boolean, $uid: [ID], $mesimabetahaliches: [ID]) {
+  "31updateTask": `mutation UpdateTask($id: ID!,$myIshur: Boolean,$valiIshur: Boolean, $isAssigned: Boolean, $uid: [ID], $mesimabetahaliches: [ID], $naasa: Boolean, $status: Int) {
      updateAct(id: $id,
       data: {
              isAssigned: $isAssigned,
              myIshur: $myIshur,
              valiIshur: $valiIshur,
               my:$uid,
-              mesimabetahaliches: $mesimabetahaliches
+              mesimabetahaliches: $mesimabetahaliches,
+              naasa: $naasa,
+              status: $status
                   }
-    
+
   ) {data{id attributes{ shem my {data{id}}}}}
 }`,
   "32createTimeGrama": `mutation CreateTimegrama($date: DateTime,$decision: ID,$tosplit: ID, $finiapruval: ID, $whatami: String, $ask: ID) {
@@ -1689,6 +1691,11 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
+  '124addVoteToTosplit': `mutation AddVoteToTosplit($id: ID!, $vots: [ComponentProjectsVotsInput]) {
+    updateTosplit(id: $id, data: { vots: $vots }) {
+      data { id }
+    }
+  }`,
   '73updateSheirutpend': `mutation UpdateSheirutpend($id: ID!, $data: SheirutpendInput!) {
     updateSheirutpend(id: $id, data: $data) {
       data {
@@ -1696,6 +1703,338 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
+  // ── Pendm / Pmash vote actions ────────────────────────────────────────────
+  '142getPendmForVote': `query GetPendmForVote($id: ID!) {
+    pendm(id: $id) {
+      data {
+        id
+        attributes {
+          name descrip hearotMeyuchadot noofhours perhour iskvua privatlinks publicklinks sqadualed dates
+          mission { data { id } }
+          skills { data { id } }
+          tafkidims { data { id } }
+          work_ways { data { id } }
+          vallues { data { id } }
+          negopendmissions { data { id } }
+          users {
+            what order ide zman why
+            users_permissions_user { data { id } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '143archivePendmWithVotes': `mutation ArchivePendmWithVotes($id: ID!, $users: [ComponentProjectsVotsInput!]!) {
+    updatePendm(id: $id, data: { archived: true, users: $users }) {
+      data { id }
+    }
+  }`,
+
+  '144getPmashForVote': `query GetPmashForVote($id: ID!) {
+    pmash(id: $id) {
+      data {
+        id
+        attributes {
+          name descrip spnot kindOf hm price easy linkto sqadualed sqadualedf
+          mashaabim { data { id } }
+          timegrama { data { id } }
+          users {
+            what order ide zman why
+            users_permissions_user { data { id } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '145archivePmashWithVotes': `mutation ArchivePmashWithVotes($id: ID!, $users: [ComponentProjectsVotsInput!]!) {
+    updatePmash(id: $id, data: { archived: true, users: $users }) {
+      data { id }
+    }
+  }`,
+
+  '146addVoteToPmash': `mutation AddVoteToPmash($id: ID!, $users: [ComponentProjectsVotsInput!]!) {
+    updatePmash(id: $id, data: { users: $users }) {
+      data {
+        id
+        attributes {
+          users {
+            what order ide zman
+            users_permissions_user { data { id } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '147getPendmDiun': `query GetPendmDiun($id: ID!) {
+    pendm(id: $id) {
+      data {
+        id
+        attributes {
+          diun {
+            id what why order zman ide
+            users_permissions_user { data { id } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '148getPmashDiun': `query GetPmashDiun($id: ID!) {
+    pmash(id: $id) {
+      data {
+        id
+        attributes {
+          diun {
+            id what why order zman ide
+            users_permissions_user { data { id } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '149updatePendmDiun': `mutation UpdatePendmDiun($id: ID!, $diun: [ComponentProjectsDiunInput!]!) {
+    updatePendm(id: $id, data: { diun: $diun }) {
+      data {
+        id
+        attributes {
+          diun {
+            id what why order zman ide
+            users_permissions_user { data { id } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '150updatePmashDiun': `mutation UpdatePmashDiun($id: ID!, $diun: [ComponentProjectsDiunInput!]!) {
+    updatePmash(id: $id, data: { diun: $diun }) {
+      data {
+        id
+        attributes {
+          diun {
+            id what why order zman ide
+            users_permissions_user { data { id } }
+          }
+        }
+      }
+    }
+  }`,
+
+  // ── Mission in-progress updates ──────────────────────────────────────────
+  '154updateMissionStatus': `mutation UpdateMissionStatus($id: ID!, $status: Int) {
+    updateMesimabetahalich(id: $id, data: { status: $status }) {
+      data { id attributes { status } }
+    }
+  }`,
+
+  // ── Maap (resource application) vote actions ──────────────────────────────
+  '151getMaapForVote': `query GetMaapForVote($id: ID!) {
+    maap(id: $id) {
+      data {
+        id
+        attributes {
+          name
+          vots {
+            id
+            what
+            why
+            users_permissions_user { data { id } }
+          }
+          sp {
+            data {
+              id
+              attributes {
+                unit
+                myp
+                users_permissions_user { data { id } }
+              }
+            }
+          }
+          open_mashaabim {
+            data {
+              id
+              attributes {
+                name
+                easy
+                price
+                sqadualed
+                sqadualedf
+                spnot
+                kindOf
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  '152archiveMaapWithVotes': `mutation ArchiveMaapWithVotes($id: ID!, $vots: [ComponentProjectsVotsInput]) {
+    updateMaap(id: $id, data: { archived: true, vots: $vots }) {
+      data { id }
+    }
+  }`,
+
+  '153addVoteToMaap': `mutation AddVoteToMaap($id: ID!, $vots: [ComponentProjectsVotsInput]) {
+    updateMaap(id: $id, data: { vots: $vots }) {
+      data { id }
+    }
+  }`,
+
+  // ── Haluka (money transfer) receiver-confirmation + chat ──────────────────
+  '155getHalukaForReceive': `query GetHalukaForReceive($id: ID!) {
+    haluka(id: $id) {
+      data {
+        id
+        attributes {
+          usersend { data { id } }
+          userrecive { data { id } }
+          senderconf
+          confirmed
+          tosplit {
+            data {
+              id
+              attributes {
+                halukas {
+                  data {
+                    id
+                    attributes {
+                      confirmed
+                    }
+                  }
+                }
+                hervachti {
+                  users_permissions_user {
+                    data {
+                      id
+                      attributes {
+                        hervachti
+                      }
+                    }
+                  }
+                  noten
+                  mekabel
+                  amount
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  '156getHalukaChatre': `query GetHalukaChatre($id: ID!) {
+    haluka(id: $id) {
+      data {
+        id
+        attributes {
+          chatre {
+            when
+            send { data { id } }
+            freetext
+            seen
+          }
+        }
+      }
+    }
+  }`,
+
+  '157updateHalukaChatre': `mutation UpdateHalukaChatre($id: ID!, $chatre: [ComponentProjectsChatreInput]) {
+    updateHaluka(id: $id, data: { chatre: $chatre }) {
+      data {
+        id
+        attributes {
+          chatre {
+            freetext
+            send { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            when
+            seen
+          }
+        }
+      }
+    }
+  }`,
+
+  '158updateUserHervachti': `mutation UpdateUserHervachti($id: ID!, $hervachti: Float) {
+    updateUsersPermissionsUser(id: $id, data: { hervachti: $hervachti }) {
+      data { id }
+    }
+  }`,
+
+  // ── Decision (project vote) ────────────────────────────────────────────────
+  '159getDecisionForVote': `query GetDecisionForVote($id: ID!) {
+    decision(id: $id) {
+      data {
+        id
+        attributes {
+          kind
+          archived
+          newpic { data { id } }
+          timegrama { data { id } }
+          newname
+          newpubdes
+          newprides
+          newFlink
+          newWlink
+          timtoM
+          valluesadd { data { id } }
+          valluesles { data { id } }
+          vots {
+            id
+            what
+            ide
+            zman
+            order
+            users_permissions_user { data { id } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '160archiveDecision': `mutation ArchiveDecision($id: ID!, $vots: [ComponentProjectsVotsInput]) {
+    updateDecision(id: $id, data: { archived: true, vots: $vots }) {
+      data { id }
+    }
+  }`,
+
+  // ── Decision display info (for card UI: shows current value vs. proposed) ──
+  '161getDecisionDisplayInfo': `query GetDecisionDisplayInfo($id: ID!, $pid: ID!) {
+    decision(id: $id) {
+      data {
+        attributes {
+          kind
+          newname
+          newpubdes
+          newprides
+          newFlink
+          newWlink
+          timtoM
+          valluesadd { data { id attributes { valueName } } }
+          valluesles { data { id attributes { valueName } } }
+        }
+      }
+    }
+    project(id: $pid) {
+      data {
+        attributes {
+          projectName
+          publicDescription
+          descripFor
+          fblink
+          linkToWebsite
+          restime
+          vallues { data { id attributes { valueName } } }
+        }
+      }
+    }
+  }`,
+
   '85addVoteToPend': `mutation AddVoteToPend($id: ID!, $users: [ComponentProjectsVotsInput!]!) {
     updatePendm(id: $id, data: { users: $users }) {
       data {
@@ -2093,6 +2432,60 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         }
       }
     }`,
+  '128getProjectMembersAndRestime': `query GetProjectMembersAndRestime($pid: ID!) {
+    project(id: $pid) {
+      data {
+        attributes {
+          restime
+          user_1s { data { id } }
+        }
+      }
+    }
+  }`,
+  '125createAskm': `mutation CreateAskm($publishedAt: DateTime!, $openMashaabimId: ID!, $projectId: ID!, $spId: ID!, $userId: ID!) {
+    createAskm(data: {
+      publishedAt: $publishedAt,
+      open_mashaabim: $openMashaabimId,
+      project: $projectId,
+      sp: $spId,
+      users_permissions_user: $userId
+    }) { data { id } }
+  }`,
+  '126updateSpDeclined': `mutation UpdateSpDeclined($id: ID!, $openMashaabimId: ID!) {
+    updateSp(id: $id, data: { declinedm: $openMashaabimId }) {
+      data { id }
+    }
+  }`,
+  '127createTimegramaForAskm': `mutation CreateTimegramaForAskm($date: DateTime!, $askmId: ID!) {
+    createTimegrama(data: { date: $date, whatami: "askm", askm: $askmId }) {
+      data { id }
+    }
+  }`,
+  '129updateUserDeclined': `mutation UpdateUserDeclined($userId: ID!, $declinedList: [ID]) {
+    updateUsersPermissionsUser(id: $userId, data: { declined: $declinedList }) {
+      data { id }
+    }
+  }`,
+  '130updateOpenMissionDeclined': `mutation UpdateOpenMissionDeclined($id: ID!, $declinedIds: [ID]) {
+    updateOpenMission(id: $id, data: { declined: $declinedIds }) {
+      data { id }
+    }
+  }`,
+  '131archiveOpenMashaabim': `mutation ArchiveOpenMashaabim($id: ID!) {
+    updateOpenMashaabim(id: $id, data: { archived: true }) {
+      data { id }
+    }
+  }`,
+  '132archiveAskmWithVotes': `mutation ArchiveAskmWithVotes($id: ID!, $vots: [ComponentProjectsVotsInput]) {
+    updateAskm(id: $id, data: { archived: true, vots: $vots }) {
+      data { id }
+    }
+  }`,
+  '133addVoteToAskm': `mutation AddVoteToAskm($id: ID!, $vots: [ComponentProjectsVotsInput]) {
+    updateAskm(id: $id, data: { vots: $vots }) {
+      data { id }
+    }
+  }`,
   '83levMainUserQuery': `query LevMainUserQuery($idL: ID!) {
   usersPermissionsUser(id: $idL) {
     data {
@@ -5027,6 +5420,15 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
               attributes {
                 price quant total startDate finnishDate createdAt
                 forum { data { id } }
+                ratson_proposal {
+                  data {
+                    id
+                    attributes {
+                      kind
+                      ratson { data { id attributes { name } } }
+                    }
+                  }
+                }
                 matanots {
                   data {
                     id
@@ -5124,6 +5526,15 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                     attributes {
                       price quant total startDate finnishDate createdAt
                       forum { data { id } }
+                      ratson_proposal {
+                        data {
+                          id
+                          attributes {
+                            kind
+                            ratson { data { id attributes { name } } }
+                          }
+                        }
+                      }
                       matanots {
                         data {
                           id
@@ -5998,6 +6409,157 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           }
           vallues { data { id attributes { valueName } } }
           categories { data { id attributes { name } } }
+        }
+      }
+    }
+  }`,
+
+  // ── Mission creation / edit ────────────────────────────────────────────────
+
+  '162getMissionForEdit': `query GetMissionForEdit($id: ID!) {
+    mission(id: $id) {
+      data {
+        id
+        attributes {
+          missionName
+          descrip
+          skills {
+            data {
+              id
+              attributes {
+                skillName
+                localizations { data { attributes { skillName } } }
+              }
+            }
+          }
+          tafkidims {
+            data {
+              id
+              attributes {
+                roleDescription
+                localizations { data { attributes { roleDescription } } }
+              }
+            }
+          }
+          work_ways {
+            data {
+              id
+              attributes {
+                workWayName
+                localizations { data { attributes { workWayName } } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  '163createPendm': `mutation CreatePendmFull(
+    $projectId: ID!
+    $missionId: ID!
+    $name: String!
+    $descrip: String
+    $skills: [ID]
+    $tafkidims: [ID]
+    $workWays: [ID]
+    $vallues: [ID]
+    $noofhours: Float
+    $perhour: Float
+    $iskvua: Boolean
+    $sqadualed: DateTime
+    $dates: DateTime
+    $publicklinks: String
+    $privatlinks: String
+    $hearotMeyuchadot: String
+    $users: [ComponentProjectsVotsInput]
+    $publishedAt: DateTime!
+  ) {
+    createPendm(data: {
+      project: $projectId
+      mission: $missionId
+      name: $name
+      descrip: $descrip
+      skills: $skills
+      tafkidims: $tafkidims
+      work_ways: $workWays
+      vallues: $vallues
+      noofhours: $noofhours
+      perhour: $perhour
+      iskvua: $iskvua
+      sqadualed: $sqadualed
+      dates: $dates
+      publicklinks: $publicklinks
+      privatlinks: $privatlinks
+      hearotMeyuchadot: $hearotMeyuchadot
+      users: $users
+      publishedAt: $publishedAt
+    }) {
+      data { id }
+    }
+  }`,
+
+  '164createOpenMission': `mutation CreateOpenMissionFull(
+    $projectId: ID!
+    $missionId: ID!
+    $name: String!
+    $descrip: String
+    $skills: [ID]
+    $tafkidims: [ID]
+    $workWays: [ID]
+    $vallues: [ID]
+    $noofhours: Float
+    $perhour: Float
+    $iskvua: Boolean
+    $sqadualed: DateTime
+    $dates: DateTime
+    $publicklinks: String
+    $privatlinks: String
+    $hearotMeyuchadot: String
+    $isRishon: Boolean
+    $rishon: ID
+    $archived: Boolean
+    $publishedAt: DateTime!
+  ) {
+    createOpenMission(data: {
+      project: $projectId
+      mission: $missionId
+      name: $name
+      descrip: $descrip
+      skills: $skills
+      tafkidims: $tafkidims
+      work_ways: $workWays
+      vallues: $vallues
+      noofhours: $noofhours
+      perhour: $perhour
+      iskvua: $iskvua
+      sqadualed: $sqadualed
+      dates: $dates
+      publicklinks: $publicklinks
+      privatlinks: $privatlinks
+      hearotMeyuchadot: $hearotMeyuchadot
+      isRishon: $isRishon
+      rishon: $rishon
+      archived: $archived
+      publishedAt: $publishedAt
+    }) {
+      data { id }
+    }
+  }`,
+
+  '165createTimegramaForPendm': `mutation CreateTimegramaForPendm($date: DateTime!, $pendmId: ID!) {
+    createTimegrama(data: { date: $date, whatami: "pendm", pendm: $pendmId }) {
+      data { id }
+    }
+  }`,
+
+  '166createWorkWay': `mutation CreateWorkWay($name: String!, $publishedAt: DateTime!) {
+    createWorkWay(data: { workWayName: $name, publishedAt: $publishedAt }) {
+      data {
+        id
+        attributes {
+          workWayName
+          localizations { data { attributes { workWayName } } }
         }
       }
     }

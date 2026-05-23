@@ -43,10 +43,23 @@
       "Bash(head -100 \"C:\\\\\\\\Users\\\\\\\\babay\\\\\\\\Documents\\\\\\\\GitHub\\\\\\\\1.0main\\\\\\\\node_modules\\\\\\\\pdf-parse\\\\\\\\dist\\\\\\\\pdf-parse\\\\\\\\esm\\\\\\\\index.js\")",
       "Bash(grep -n \"WorkerMessageHandler\" \"C:\\\\\\\\Users\\\\\\\\babay\\\\\\\\Documents\\\\\\\\GitHub\\\\\\\\1.0main\\\\\\\\node_modules\\\\\\\\pdfjs-dist\\\\\\\\legacy\\\\\\\\build\\\\\\\\pdf.worker.mjs\")",
       "Bash(cat \"C:\\\\\\\\Users\\\\\\\\babay\\\\\\\\Documents\\\\\\\\GitHub\\\\\\\\1.0main\\\\\\\\svelte.config.js\")",
-      "Bash(grep -E \"exports|legacy\" \"C:\\\\\\\\Users\\\\\\\\babay\\\\\\\\Documents\\\\\\\\GitHub\\\\\\\\1.0main\\\\\\\\node_modules\\\\\\\\pdfjs-dist\\\\\\\\package.json\")"
+      "Bash(grep -E \"exports|legacy\" \"C:\\\\\\\\Users\\\\\\\\babay\\\\\\\\Documents\\\\\\\\GitHub\\\\\\\\1.0main\\\\\\\\node_modules\\\\\\\\pdfjs-dist\\\\\\\\package.json\")",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\lib\\\\bot\" -Recurse -File | ForEach-Object { $_.FullName })",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\routes\\\\api\\\\bot\" -Recurse -File | ForEach-Object { $_.FullName })",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\routes\\\\api\\\\newTelegram\" -Recurse -File | ForEach-Object { $_.FullName })",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\lib\\\\components\\\\bot\" -Recurse -File | ForEach-Object { $_.FullName })",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\routes\\\\\\(reg\\)\\\\timers\" -Recurse -File | ForEach-Object { $_.FullName })",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\routes\\\\\\(reg\\)\\\\newTimers\" -Recurse -File | ForEach-Object { $_.FullName })",
+      "Bash(xargs wc -l)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\lib\\\\components\\\\timers\" -Recurse -File | ForEach-Object { $_.FullName })",
+      "Bash(yarn svelte-check *)",
+      "Bash(node_modules/.bin/svelte-check --threshold error)",
+      "Bash(grep *)"
     ],
     "additionalDirectories": [
-      "c:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\deals\\request"
+      "c:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\deals\\request",
+      "C:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\(regandnon)\\wish",
+      "C:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\(reg)\\moach\\[projectId]"
     ]
   },
   "enableAllProjectMcpServers": true,

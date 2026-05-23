@@ -202,6 +202,65 @@ job log לריצות ה‑matching (להבדל בין ידני, מתוזמן, AI
 
 ---
 
+## 5.1. שער ההסכמה (consent gate) — איך M5 עובד בפועל
+
+**עיקרון:** ההצעה בוחרת רק מי מועמד; ה-`Sheirutpend` הקיים הוא מנגנון ההסכמה. ראשון לקוחה מאשרת מצידה, ואז ה-Sheirutpend מאסף `vots` מהספקים. **רק כש-`createSheirutFromPending` רץ בהצלחה — הדיל קיים והעבודה מתחילה.**
+
+### זרימה
+
+```
+ratson_proposal.status='suggested'  ← matchRatson יצר
+        ↓ הלקוחה לוחצת "אני בוחרת"
+ratson_proposal.status='accepted'   ← acceptRatsonProposal:
+        ↓                              · יוצר Sheirutpend (state: vots=[], appruved=false)
+        ↓                              · קושר Sheirutpend.matanots=[proposal.matanot]
+        ↓                              · push לכל הספקים הרלוונטיים (notification של createSheirutpend הקיים)
+Sheirutpend.vots מצטברים
+        ↓ כשמושג הסף (ראה למטה)
+createSheirutFromPending רץ → Sheirut נוצר → BOM מופעל (אם מורכב)
+        ↓
+ratson_proposal.status='accepted' (סופי) + ratson.status_ratson='fulfilled' אם זו הצעה אחרונה
+```
+
+### מי צריך לאשרר ובאיזה סף
+
+- **מתנה פשוטה** (`matanot.pricingMode='fixed'` או `oneForeProject=true`): **חבר פרויקט אחד** מספיק. `approveSheirutpend` של חבר ראשון → `createSheirutFromPending` רץ. תואם הפטרן הקיים ב-`createSheirutpend`/`approveSheirutpend`.
+- **מתנה מורכבת** (`pricingMode='estimated'`/`quote`, יש `matanot_recipe_missions[]`/`matanot_recipe_resources[]`): **כל החברים המעורבים חייבים לאשרר פה אחד**. "מעורב" = רשום ב-`recipeMission.pendm.rishon` או ב-`recipeResource.pmash.selfProposalUser` (התפקידים שהוקצו עם המתכון).
+
+> זה אומר: ההצעה מ-`matchRatson` שואלת רק את העובדה "המוצר קיים ופנוי". איכות ההסכמה נשפטת ע"י Sheirutpend.appruved — אם רק יוצרת המתנה אישרה אבל לא הספק שמיועד למשימה, הסף לא הושג והדיל לא נסגר.
+
+### לוח זמנים (לא אישרור אוטומטי)
+
+- כשהלקוחה לוחצת "accept" — נכתב `Sheirutpend.createdAt`.
+- ברירת מחדל: **72 שעות** למסעף ה-`vots` להגיע לסף. תזכורות אוטומטיות ב-T-24h ו-T-2h לכל מי שעוד לא הצביע (cron בנפרד, M5.1).
+- חוסר תגובה ≠ הסכמה. אם הסף לא הושג בחלון → `Sheirutpend.archived=true` + `ratson_proposal.status_proposal='expired'`, התראה ללקוחה ("חלון הזמן עבר, אפשר לבחור מועמד אחר").
+
+### דחייה
+
+- **דחיית הלקוחה**: לפני accept — `rejectRatsonProposal` → status='rejected', שקט (אין spam לספק). אחרי accept — `cancelRatsonProposal` (לא במסגרת M5).
+- **דחיית ספק**: חבר אחד שמצביע `no` ב-Sheirutpend → לוגיקת `approveSheirutpend`/`closeFiniapruval` כבר סוגרת את ה-Sheirutpend כדחויה. אנחנו רק מסנכרנים `ratson_proposal.status_proposal='rejected'` + התראה ללקוחה ("הציפייה בוטלה מצד הספק").
+
+### פעולות חדשות (M5)
+
+| Action | מי קורא | מה עושה |
+|---|---|---|
+| `acceptRatsonProposal` | הלקוחה | `viewed → accepted`. מפעיל `createSheirutpend` (משתמש בפעולה הקיימת ←). מחזיר `{ proposalId, sheirutpendId }`. |
+| `rejectRatsonProposal` | הלקוחה | `suggested/viewed → rejected`. שקט, ללא Sheirutpend. |
+| `viewRatsonProposal` | הלקוחה | `suggested → viewed`. push לספק ("X בדקה את ההצעה"). |
+| `closeRatsonProposalExpired` | cron M5.1 | סורק Sheirutpend.archived=false עם createdAt+72h<now → archives + מסנכרן `ratson_proposal.status='expired'`. |
+
+### התראות (תואם להחלטה שמיפינו)
+
+- matching אוטומטי → שקט
+- `viewed` → push לכל proposer_users (low priority)
+- `accepted` ע"י לקוחה (→ Sheirutpend נוצר) → push לחברי הפרויקט הרלוונטיים, **HIGH priority** (פעולה נדרשת)
+- חבר אישר ב-Sheirutpend → push לאחרים בקבוצה (progress) + ללקוחה (T+ הצבעה)
+- כל הנדרשים אישרו → Sheirut נוצר → push לכולם ("המעגל נסגר — מתחילים")
+- ספק/חבר דחה → push ללקוחה ("הציפייה בוטלה")
+- expired → push ללקוחה
+
+---
+
 ## 6. אלגוריתם Matching (M3 → M6.5)
 
 ### 6.1 שלב Keyword (M3)
