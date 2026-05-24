@@ -96,12 +96,13 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
   })();
 
   if (what === true && yesMemberCount >= totalMembers && totalMembers > 0) {
-    // ── Full YES consensus: create OpenMission + archive pendm ──────────────
+    // ── Full YES consensus: create OpenMission + archive pendm + mark timegrama done ──
     const skillIds = (attrs.skills?.data ?? []).map((s: any) => s.id);
     const tafkidimIds = (attrs.tafkidims?.data ?? []).map((t: any) => t.id);
     const workwayIds = (attrs.work_ways?.data ?? []).map((w: any) => w.id);
     const vallueIds = (attrs.vallues?.data ?? []).map((v: any) => v.id);
     const missionId = attrs.mission?.data?.id;
+    const timegramaId = attrs.timegrama?.data?.id;
 
     const sqadualedFrag = attrs.sqadualed ? `sqadualed: "${attrs.sqadualed}"` : '';
     const datesFrag = attrs.dates ? `dates: "${attrs.dates}"` : '';
@@ -118,15 +119,20 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
       .map((v) => {
         const parts = [
           `what:${v.what}`,
-          `users_permissions_user:"${v.users_permissions_user}"`,
+          `users_permissions_user:${parseInt(String(v.users_permissions_user), 10)}`,
           `order:${v.order ?? 0}`,
-          `ide:"${v.ide ?? v.users_permissions_user}"`,
+          `ide:${parseInt(String(v.ide ?? v.users_permissions_user), 10)}`,
           `zman:"${v.zman}"`,
         ];
         if (v.why) parts.push(`why:"${v.why}"`);
         return `{${parts.join(' ')}}`;
       })
       .join(',');
+
+    // updateTimegrama fragment (only if timegrama exists)
+    const timegramaFrag = timegramaId
+      ? `updateTimegrama(id: "${timegramaId}", data: { done: true }) { data { id } }`
+      : '';
 
     const combinedMutation = `mutation {
       createOpenMission(data: {
@@ -154,6 +160,8 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
         archived: true,
         users: [${votsStr}]
       }) { data { id } }
+
+      ${timegramaFrag}
     }`;
 
     const res = await context.fetch(graphqlUrl, {

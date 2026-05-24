@@ -49,7 +49,7 @@ const addDiunEntryHandler: ActionExecutionHandler = async (params, context, { st
       users_permissions_user: String(uid),
       order: d.order ?? 0,
       zman: d.zman ?? now.toISOString(),
-      ide: d.ide ?? uid,
+      ide: Number(d.ide ?? uid),
     };
     if (d.why) row.why = d.why;
     return row;
@@ -60,7 +60,7 @@ const addDiunEntryHandler: ActionExecutionHandler = async (params, context, { st
     users_permissions_user: String(context.userId),
     order: nextOrder,
     zman: now.toISOString(),
-    ide: String(context.userId),
+    ide: Number(context.userId),
     why: why ?? '',
   };
 

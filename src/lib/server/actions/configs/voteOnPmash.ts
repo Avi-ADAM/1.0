@@ -116,9 +116,9 @@ const voteOnPmashHandler: ActionExecutionHandler = async (params, context, { str
       .map((v) => {
         const parts = [
           `what:${v.what}`,
-          `users_permissions_user:"${v.users_permissions_user}"`,
+          `users_permissions_user:${parseInt(String(v.users_permissions_user), 10)}`,
           `order:${v.order ?? 0}`,
-          `ide:"${v.ide ?? v.users_permissions_user}"`,
+          `ide:${parseInt(String(v.ide ?? v.users_permissions_user), 10)}`,
           `zman:"${v.zman}"`,
         ];
         if (v.why) parts.push(`why:"${v.why}"`);

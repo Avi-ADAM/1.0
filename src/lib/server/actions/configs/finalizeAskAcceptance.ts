@@ -14,7 +14,7 @@ function formatVotesForInline(votes: any[]): string {
     const order = attrs.order ?? 0;
     const ide = attrs.ide ?? uid;
     const zman = attrs.zman ?? new Date().toISOString();
-    return `{what:${what} users_permissions_user:"${uid}" order:${order} ide:"${ide}" zman:"${zman}"}`;
+    return `{what:${what} users_permissions_user:${parseInt(String(uid), 10)} order:${order} ide:${parseInt(String(ide), 10)} zman:"${zman}"}`;
   }).join(',');
 }
 

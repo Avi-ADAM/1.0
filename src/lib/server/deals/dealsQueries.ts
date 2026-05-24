@@ -19,6 +19,11 @@ export interface PendingRequestData {
   requesterName?: string;
   requesterPic?: string;
   createdAt?: string;
+  /** Set when the Sheirutpend was opened from a Ratson (wish) — PLAN_CONCIERGE §5.1. */
+  sourceRatsonId?: string;
+  sourceRatsonName?: string;
+  sourceProposalId?: string;
+  sourceProposalKind?: string;
 }
 
 function mapSheirutpend(node: any, projectId?: string, projectName?: string): PendingRequestData {
@@ -27,6 +32,8 @@ function mapSheirutpend(node: any, projectId?: string, projectName?: string): Pe
   const mAttrs = matanot?.attributes ?? {};
   const proj = attrs.project?.data;
   const user = attrs.users_permissions_user?.data;
+  const rp = attrs.ratson_proposal?.data;
+  const rpRatson = rp?.attributes?.ratson?.data;
 
   return {
     id: String(node.id),
@@ -44,7 +51,11 @@ function mapSheirutpend(node: any, projectId?: string, projectName?: string): Pe
     requesterId: user?.id ? String(user.id) : undefined,
     requesterName: user?.attributes?.username || undefined,
     requesterPic: user?.attributes?.profilePic?.data?.attributes?.url || undefined,
-    createdAt: attrs.createdAt || undefined
+    createdAt: attrs.createdAt || undefined,
+    sourceRatsonId: rpRatson?.id ? String(rpRatson.id) : undefined,
+    sourceRatsonName: rpRatson?.attributes?.name || undefined,
+    sourceProposalId: rp?.id ? String(rp.id) : undefined,
+    sourceProposalKind: rp?.attributes?.kind || undefined
   };
 }
 

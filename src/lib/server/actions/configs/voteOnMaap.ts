@@ -136,7 +136,7 @@ const voteOnMaapHandler: ActionExecutionHandler = async (params, context, { stra
       // Serialise vots for inline GraphQL
       const votsStr = allVots
         .map((v) => {
-          const parts = [`what:${v.what}`, `users_permissions_user:"${v.users_permissions_user}"`];
+          const parts = [`what:${v.what}`, `users_permissions_user:${parseInt(String(v.users_permissions_user), 10)}`];
           if (v.why) parts.push(`why:"${v.why.replace(/"/g, '\\"')}"`);
           return `{${parts.join(' ')}}`;
         })

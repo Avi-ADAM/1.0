@@ -3,29 +3,59 @@
   import { showFoot } from '$lib/stores/showFoot.js';
   import { goto } from '$app/navigation';
 
+  /** @type {{ data: { wish: any | null; proposals: any[]; loadOk: boolean; uid?: string; isOwner: boolean } }} */
+  let { data } = $props();
+
   onMount(() => showFoot.set(false));
   onDestroy(() => showFoot.set(true));
 
-  /* ===== Mock data (§8 of PLAN_CONCIERGE) ===== */
-  const WISH_TEXT  = 'אני רוצה לארגן יום חופש לאמא שלי';
-  const WISH_LONG  = 'אמא שלי מטפלת בילדים כל יום ובקרוב יום הולדתה. אני רוצה לתת לה יום שלם משוחרר — טיפול ספא, ארוחה טובה, מישהי שתשגיח על הילדים, ובן אדם שיבטיח שתגיע ותחזור בשלום. מבקשת לארגן את הכל מראש בלי שתעשה אפילו פנייה אחת.';
-  const WISH_AVATAR = 'נב';
-  const WISH_AUTHOR = 'נעה ב.';
-  const WISH_CODE   = 'R-7f3a91';
+  /* ===== Mock fallback (§8 of PLAN_CONCIERGE) — used when wish not loaded yet ===== */
+  const MOCK_WISH_TEXT   = 'אני רוצה לארגן יום חופש לאמא שלי';
+  const MOCK_WISH_LONG   = 'אמא שלי מטפלת בילדים כל יום ובקרוב יום הולדתה. אני רוצה לתת לה יום שלם משוחרר — טיפול ספא, ארוחה טובה, מישהי שתשגיח על הילדים, ובן אדם שיבטיח שתגיע ותחזור בשלום. מבקשת לארגן את הכל מראש בלי שתעשה אפילו פנייה אחת.';
+  const MOCK_WISH_AVATAR = 'נב';
+  const MOCK_WISH_AUTHOR = 'נעה ב.';
+  const MOCK_WISH_CODE   = 'R-7f3a91';
 
-  const MISSIONS = [
+  const MOCK_MISSIONS = [
     { name: 'בייביסיטר',    hours: 6,   imp: 'must' },
     { name: 'הסעה',          hours: 2,   imp: 'must' },
     { name: 'טיפול ספא',     hours: 2,   imp: 'must' },
     { name: 'הזמנת מסעדה',   hours: 0.5, imp: 'nice' },
   ];
-  const RESOURCES = [
+  const MOCK_RESOURCES = [
     { name: 'מקום שקט וצמחי', qty: 1, imp: 'must' },
     { name: 'ארוחה לשניים',   qty: 2, imp: 'nice' },
     { name: 'זר פרחים',       qty: 1, imp: 'nice' },
   ];
 
-  const PLAN_ROWS = [
+  /* ===== Resolved (real if present, mock otherwise) ===== */
+  const WISH_TEXT   = $derived(data?.wish?.name      ?? MOCK_WISH_TEXT);
+  const WISH_LONG   = $derived(data?.wish?.longDes   ?? MOCK_WISH_LONG);
+  const WISH_AVATAR = $derived(data?.wish?.ownerAvatar ?? MOCK_WISH_AVATAR);
+  const WISH_AUTHOR = $derived(data?.wish?.ownerName   ?? MOCK_WISH_AUTHOR);
+  const WISH_CODE   = $derived(data?.wish?.code        ?? MOCK_WISH_CODE);
+
+  const MISSIONS = $derived(
+    data?.wish?.extractedMissions?.length
+      ? data.wish.extractedMissions.map((m) => ({
+          name: m.name,
+          hours: m.hoursEst ?? 0,
+          imp: m.importance === 'must' ? 'must' : 'nice',
+        }))
+      : MOCK_MISSIONS
+  );
+  const RESOURCES = $derived(
+    data?.wish?.extractedResources?.length
+      ? data.wish.extractedResources.map((r) => ({
+          name: r.name,
+          qty: r.quantityEst ?? 1,
+          imp: r.importance === 'must' ? 'must' : 'nice',
+        }))
+      : MOCK_RESOURCES
+  );
+
+  /* ===== Mock fallbacks (used when no real proposals are loaded yet) ===== */
+  const MOCK_PLAN_ROWS = [
     {
       need: { title: 'טיפול ספא 2 שעות', detail: 'עיסוי גוף + פנים. עדיפות למטפלת אישה, אווירה שקטה, ללא מוזיקה רועשת.', kind: 'משימה', imp: 'must', hours: 2, bestPrice: 420 },
       providers: [
@@ -52,19 +82,140 @@
     },
   ];
 
-  const HARMONY = [
+  const MOCK_HARMONY = [
     { id: 'me',   label: 'נב', state: 'accepted', isOwner: true },
     { id: 'spa',  label: 'נג', state: 'accepted' },
     { id: 'sit',  label: 'תל', state: 'accepted' },
     { id: 'lift', label: 'יכ', state: 'pending' },
   ];
 
-  const TOTAL_LINES = [
+  const MOCK_TOTAL_LINES = [
     { label: 'טיפול ספא',        provider: 'נועה גולן · ספא טבע',  price: 420, status: 'accepted' },
     { label: 'בייביסיטר 6 שעות', provider: 'תמר ל. · אמהות עוזרות', price: 360, status: 'accepted' },
     { label: 'הסעה הלוך וחזור',  provider: 'יואב כ. · Lift',       price: 110, status: 'pending'  },
     { label: 'ארוחה במסעדה',      provider: null,                   price: 0,   status: 'open'     },
   ];
+
+  /* ===== Bridge real proposals + extracted_* → display shapes ===== */
+  function proposalStatusToProviderStatus(s) {
+    if (s === 'accepted') return 'accepted';
+    if (s === 'rejected' || s === 'expired') return 'rejected';
+    return 'matching';
+  }
+  function buildPlanRows(wish, proposals) {
+    if (!wish) return [];
+    const rows = [];
+
+    const mkRow = (item, idx, kindHe, isResource) => {
+      const providers = proposals
+        .filter((p) => {
+          const list = isResource ? p.coveredResources : p.coveredMissions;
+          if (!list?.length) return false;
+          return list.some((c) =>
+            String(isResource ? c.extractedResourceIdx : c.extractedMissionIdx) === String(idx)
+            || String(isResource ? c.extractedResourceIdx : c.extractedMissionIdx) === String(item.id)
+          );
+        })
+        .map((p) => {
+          const line = (isResource ? p.coveredResources : p.coveredMissions)
+            .find((c) =>
+              String(isResource ? c.extractedResourceIdx : c.extractedMissionIdx) === String(idx)
+              || String(isResource ? c.extractedResourceIdx : c.extractedMissionIdx) === String(item.id)
+            );
+          return {
+            proposalId: p.id,
+            name: p.proposerName,
+            project: p.proposerProject?.name || (p.matanot?.name ?? ''),
+            avatar: p.proposerAvatar,
+            status: proposalStatusToProviderStatus(p.status),
+            rawStatus: p.status,
+            score: p.matchScore ?? 0,
+            hours: isResource ? null : (line?.hours ?? null),
+            qty: isResource ? (line?.quantity ?? null) : null,
+            price: line?.price ?? p.totalPrice ?? 0,
+            note: '',
+            badges: [
+              p.autoGenerated ? 'התאמה אוטומטית' : 'יוזמה אישית',
+              p.kind === 'existing_matanot' ? 'מוצר קיים' : p.kind === 'custom_offer' ? 'הצעה חדשה' : p.kind,
+            ].filter(Boolean),
+          };
+        });
+
+      const bestPrice = providers.reduce((min, pr) => (pr.price && (!min || pr.price < min) ? pr.price : min), null);
+
+      return {
+        need: {
+          title: item.name + (item.hoursEst ? ` · ${item.hoursEst} שע׳` : item.quantityEst ? ` · ×${item.quantityEst}` : ''),
+          detail: item.notes || '',
+          kind: kindHe,
+          imp: item.importance === 'must' ? 'must' : 'nice',
+          hours: item.hoursEst ?? null,
+          bestPrice,
+        },
+        providers,
+      };
+    };
+
+    (wish.extractedMissions ?? []).forEach((m, i) => rows.push(mkRow(m, i, 'משימה', false)));
+    (wish.extractedResources ?? []).forEach((r, i) => rows.push(mkRow(r, i, 'משאב', true)));
+    return rows;
+  }
+  function buildHarmony(wish, proposals) {
+    if (!wish) return [];
+    const items = [{ id: 'owner', label: wish.ownerAvatar, state: 'accepted', isOwner: true }];
+    proposals.forEach((p) => {
+      items.push({
+        id: `p-${p.id}`,
+        label: p.proposerAvatar,
+        state:
+          p.status === 'accepted' ? 'accepted'
+          : p.status === 'rejected' || p.status === 'expired' ? 'rejected'
+          : 'pending',
+      });
+    });
+    return items.filter((x) => x.state !== 'rejected');
+  }
+  function buildTotalLines(wish, proposals) {
+    if (!wish) return [];
+    const lines = [];
+
+    const addLine = (item, idx, isResource) => {
+      const matching = proposals.find((p) => {
+        const list = isResource ? p.coveredResources : p.coveredMissions;
+        return list?.some((c) =>
+          String(isResource ? c.extractedResourceIdx : c.extractedMissionIdx) === String(idx)
+          || String(isResource ? c.extractedResourceIdx : c.extractedMissionIdx) === String(item.id)
+        );
+      });
+      const line = matching
+        ? (isResource ? matching.coveredResources : matching.coveredMissions)
+            .find((c) =>
+              String(isResource ? c.extractedResourceIdx : c.extractedMissionIdx) === String(idx)
+              || String(isResource ? c.extractedResourceIdx : c.extractedMissionIdx) === String(item.id)
+            )
+        : null;
+      lines.push({
+        label: item.name,
+        provider: matching ? `${matching.proposerName}${matching.proposerProject?.name ? ' · ' + matching.proposerProject.name : ''}` : null,
+        price: line?.price ?? matching?.totalPrice ?? 0,
+        status: matching
+          ? (matching.status === 'accepted' ? 'accepted'
+            : matching.status === 'rejected' || matching.status === 'expired' ? 'rejected'
+            : 'pending')
+          : 'open',
+      });
+    };
+
+    (wish.extractedMissions ?? []).forEach((m, i) => addLine(m, i, false));
+    (wish.extractedResources ?? []).forEach((r, i) => addLine(r, i, true));
+    return lines.filter((l) => l.status !== 'rejected');
+  }
+
+  /* ===== Resolved (real if proposals/extracted present, mock otherwise) ===== */
+  const HAS_REAL = $derived(!!data?.wish && ((data.wish.extractedMissions?.length ?? 0) > 0 || (data.wish.extractedResources?.length ?? 0) > 0));
+  const PLAN_ROWS   = $derived(HAS_REAL ? buildPlanRows(data.wish, data.proposals ?? [])  : MOCK_PLAN_ROWS);
+  const HARMONY     = $derived(HAS_REAL ? buildHarmony(data.wish, data.proposals ?? [])    : MOCK_HARMONY);
+  const TOTAL_LINES = $derived(HAS_REAL ? buildTotalLines(data.wish, data.proposals ?? []) : MOCK_TOTAL_LINES);
 
   const FORUM_MSGS = [
     { from: 'נועה גולן', role: 'ספא טבע',               time: 'לפני שעה', color: 'green', text: 'אישרתי. הפכנו את החלון של 10:00 לרשום שמה. שולחת לכם את כתובת הסוויטה.' },
@@ -93,6 +244,37 @@
   /* ===== State ===== */
   let activeTab = $state('active');
   let extractionApproved = $state(true);
+  let proposalBusy = $state(/** @type {Record<string, 'accepting' | 'rejecting' | null>} */({}));
+  let proposalError = $state('');
+  const isOwner = $derived(!!data?.isOwner);
+  const wishId   = $derived(data?.wish?.id ?? null);
+
+  async function callProposalAction(actionKey, proposalId) {
+    if (!proposalId || !wishId) return;
+    proposalBusy = { ...proposalBusy, [proposalId]: actionKey === 'acceptRatsonProposal' ? 'accepting' : 'rejecting' };
+    proposalError = '';
+    try {
+      const res = await fetch('/api/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actionKey,
+          params: { proposalId, ratsonId: wishId }
+        })
+      });
+      const out = await res.json();
+      if (!out?.success) throw new Error(out?.error || 'הפעולה נכשלה');
+      // Soft refresh — reload the page to pick up new server state.
+      window.location.reload();
+    } catch (err) {
+      console.error('[concierge/[id]] action failed:', err);
+      proposalError = err instanceof Error ? err.message : 'אירעה שגיאה';
+    } finally {
+      proposalBusy = { ...proposalBusy, [proposalId]: null };
+    }
+  }
+  const acceptProposal = (id) => callProposalAction('acceptRatsonProposal', id);
+  const rejectProposal = (id) => callProposalAction('rejectRatsonProposal', id);
 
   /* ===== Derived ===== */
   const grandTotal   = $derived(TOTAL_LINES.reduce((s, l) => s + l.price, 0));
@@ -257,6 +439,12 @@
             {/each}
           </div>
 
+          {#if proposalError}
+            <div style="margin-bottom:14px;padding:10px 14px;background:rgba(255,77,158,.06);border:1px solid rgba(255,77,158,.3);border-radius:12px;font-family:'Bellefair',serif;font-size:13px;color:#ff4d9e">
+              {proposalError}
+            </div>
+          {/if}
+
           {#each PLAN_ROWS as row, ri (row.need.title)}
             {@const met = row.providers.some(p => p.status === 'accepted' || p.status === 'pending')}
             <div class="plan-row {met ? 'met' : ''}" style="animation-delay:{(ri+2)*0.08}s">
@@ -307,6 +495,24 @@
                         <span class="sbadge ready" style="padding:4px 10px;font-size:10px">שותפים</span>
                       {:else if p.status === 'pending'}
                         <span class="sbadge pending" style="padding:4px 10px;font-size:10px">ממתינה</span>
+                      {:else if p.proposalId && isOwner}
+                        {@const busy = proposalBusy[p.proposalId]}
+                        <div style="display:flex;gap:6px">
+                          <button
+                            class="btn-jewel"
+                            style="padding:6px 14px;font-size:12px"
+                            disabled={!!busy}
+                            onclick={() => acceptProposal(p.proposalId)}
+                          >{busy === 'accepting' ? '⏳' : '✓ אני בוחרת'}</button>
+                          <button
+                            class="btn-ghost"
+                            style="padding:6px 12px;font-size:12px"
+                            disabled={!!busy}
+                            onclick={() => rejectProposal(p.proposalId)}
+                          >{busy === 'rejecting' ? '⏳' : 'דחי'}</button>
+                        </div>
+                      {:else if p.proposalId}
+                        <span class="sbadge pending" style="padding:4px 10px;font-size:10px">בבחינה</span>
                       {:else}
                         <button class="btn-ghost" style="padding:6px 14px;font-size:12px">שלחי הזמנה</button>
                       {/if}

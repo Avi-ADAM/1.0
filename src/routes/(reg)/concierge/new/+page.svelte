@@ -1,7 +1,9 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
+  import { fade } from 'svelte/transition';
   import { showFoot } from '$lib/stores/showFoot.js';
   import { goto } from '$app/navigation';
+  import LocationPicker from '$lib/components/location/LocationPicker.svelte';
 
   onMount(() => showFoot.set(false));
   onDestroy(() => showFoot.set(true));
@@ -36,12 +38,27 @@
   const ALL_VALUES = ['הסכמה','שוויון','קהילתיות','שקיפות','נגישות','אקולוגיה','הדדיות','יצירתיות','נדיבות','אמון'];
 
   const DETAIL_JEWELS = [
-    { icon:'📅', label:'מתי',               placeholder:'לחצי לבחור תאריך',              value:'ה׳, 19 ביוני',  accent:'gold'  },
-    { icon:'📍', label:'היכן',              placeholder:'עיר, אזור, או הביתה',           value:'חיפה והקריות',  accent:'blue'  },
-    { icon:'💰', label:'תקציב',             placeholder:'טווח גמיש או לפי הצעה',          value:'₪ 850–1,200',  accent:'green' },
-    { icon:'👥', label:'מי יכול להציע',     placeholder:'פתוח לכל / רק חברות',          value:'',              accent:'barbi' },
-    { icon:'🔒', label:'מי יכול לראות',     placeholder:'פרטי · ריקמות · קהילה · כולם', value:'',              accent:'gold'  },
-    { icon:'🤝', label:'האם להזמין שותפים', placeholder:'כן — אישית, או דרך Lev',       value:'',              accent:'green' },
+    { icon:'📅', label:'מתי',               placeholder:'לחצי לבחור תאריך',                            accent:'gold'  },
+    { icon:'📍', label:'היכן',              placeholder:'עיר, אזור, או הביתה',                          accent:'blue'  },
+    { icon:'💰', label:'תקציב',             placeholder:'טווח גמיש או לפי הצעה',                        accent:'green' },
+    { icon:'👥', label:'מי יכול להציע',     placeholder:'פתוח לכל / רק חברות',                        accent:'barbi' },
+    { icon:'🔒', label:'מי יכול לראות',     placeholder:'פרטי · ריקמות בלבד · קהילה',                accent:'gold'  },
+    { icon:'🤝', label:'האם להזמין שותפים', placeholder:'כן — אישית, או דרך Lev',                     accent:'green' },
+  ];
+
+  const WHO_CAN_OFFER_OPTIONS = [
+    { value: true,  label: 'פתוח לכל',          hint: 'כל מי שיש לה מוצר מתאים יכולה להציע.' },
+    { value: false, label: 'ריקמות שלי בלבד',   hint: 'רק חברות פרויקטים שאני בהם יוכלו להציע.' },
+  ];
+  const WHO_CAN_SEE_OPTIONS = [
+    { value: 'personal',       label: 'פרטי',                hint: 'רק את רואה. לא תיכנס למסך הציבורי.' },
+    { value: 'free_threshold', label: 'פתוח לקהילה',         hint: 'מופיע במסך משאלות הקהילה לכל הרשומים.' },
+    { value: 'pay_to_access',  label: 'גישה בתשלום',         hint: 'גישה למשאלה דרך טוקן/תשלום (M+).' },
+  ];
+  const INVITE_PARTNERS_OPTIONS = [
+    { value: 'lev',    label: 'דרך Lev',  hint: 'Lev תמצא ותפנה אוטומטית.' },
+    { value: 'manual', label: 'אני אזמין',hint: 'אזמין אישית את מי שאני רוצה.' },
+    { value: 'none',   label: 'בלי',      hint: 'לא להזמין אף אחת — אני אבחר מתוך מה שיש.' },
   ];
 
   const ACCENT = {
@@ -62,10 +79,135 @@
   let title  = $state('יום חופש לאמא ליום הולדתה');
   let body   = $state('אמא שלי מטפלת בילדים כל יום ובקרוב יום הולדתה. אני רוצה לתת לה יום שלם משוחרר — טיפול ספא, ארוחה טובה, מישהי שתשגיח על הילדים, ובן אדם שיבטיח שתגיע ותחזור בשלום.');
   let values = $state(['הדדיות', 'נדיבות']);
+  let location = $state({
+    location_mode: 'unspecified',
+    isOnline: false,
+    lat: null,
+    lng: null,
+    radius: 15,
+    location_hint: ''
+  });
+  let locationModalOpen = $state(false);
+  let editingJewel = $state(/** @type {number|null} */(null));
+  let publishing = $state(false);
+  let publishError = $state('');
+
+  /* Jewel-bound state (values surface on the squares) */
+  let startDate    = $state('');               // ISO yyyy-mm-dd (empty = none)
+  let finnishDate  = $state('');               // ISO yyyy-mm-dd
+  let budgetAmount = $state(/** @type {number|null} */(null));
+  let whoCanOffer  = $state(true);             // → allowJoin
+  let whoCanSee    = $state('personal');       // → access_mode
+  let invitePartners = $state('lev');          // UI-only for now (no Ratson field)
+
+  /* Display formatters */
+  const HE_MONTHS_FULL = ['בינואר','בפברואר','במרץ','באפריל','במאי','ביוני','ביולי','באוגוסט','בספטמבר','באוקטובר','בנובמבר','בדצמבר'];
+  function fmtDayMon(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '';
+    return `${d.getDate()} ${HE_MONTHS_FULL[d.getMonth()]}`;
+  }
+  const whenJewelValue = $derived.by(() => {
+    if (!startDate && !finnishDate) return '';
+    if (startDate && finnishDate && startDate !== finnishDate) return `${fmtDayMon(startDate)} → ${fmtDayMon(finnishDate)}`;
+    return fmtDayMon(startDate || finnishDate);
+  });
+  const budgetJewelValue = $derived(
+    typeof budgetAmount === 'number' && Number.isFinite(budgetAmount) && budgetAmount > 0
+      ? `₪ ${budgetAmount.toLocaleString('he-IL')}`
+      : ''
+  );
+  const whoCanOfferJewelValue = $derived(
+    WHO_CAN_OFFER_OPTIONS.find((o) => o.value === whoCanOffer)?.label || ''
+  );
+  const whoCanSeeJewelValue = $derived(
+    WHO_CAN_SEE_OPTIONS.find((o) => o.value === whoCanSee)?.label || ''
+  );
+  const invitePartnersJewelValue = $derived(
+    INVITE_PARTNERS_OPTIONS.find((o) => o.value === invitePartners)?.label || ''
+  );
 
   const words    = $derived(body.trim() ? body.trim().split(/\s+/).length : 0);
   const fullness = $derived(Math.min(1, words / 50));
-  const isReady  = $derived(title.trim().length > 6 && body.trim().length > 30);
+  const isReady  = $derived(title.trim().length > 6 && body.trim().length > 30 && !publishing);
+  const LOCATION_JEWEL_INDEX = 1;
+  const hasLocationPoint = $derived(
+    typeof location.lat === 'number' &&
+      Number.isFinite(location.lat) &&
+      typeof location.lng === 'number' &&
+      Number.isFinite(location.lng)
+  );
+  const hasLocationValue = $derived(
+    location.location_mode !== 'unspecified' ||
+      hasLocationPoint ||
+      Boolean(location.location_hint?.trim())
+  );
+  const locationJewelValue = $derived.by(() => {
+    if (location.location_mode === 'online') return 'אונליין';
+    if (hasLocationPoint) {
+      const hint = location.location_hint?.trim() || 'מיקום נבחר';
+      return `${hint} · ${location.radius || 15} ק״מ`;
+    }
+    return location.location_hint?.trim() || '';
+  });
+
+  async function publish() {
+    if (!isReady) return;
+    publishing = true;
+    publishError = '';
+    try {
+      const hasBudget = typeof budgetAmount === 'number' && Number.isFinite(budgetAmount) && budgetAmount > 0;
+      const createRes = await fetch('/api/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actionKey: 'createRatson',
+          params: {
+            name: title.trim(),
+            desc: title.trim(),
+            longDes: body.trim(),
+            status_ratson: 'open',
+            access_mode: whoCanSee,
+            allowJoin: whoCanOffer,
+            bounti: hasBudget,
+            totalbounti: hasBudget ? budgetAmount : 0,
+            startDate: startDate ? new Date(startDate).toISOString() : null,
+            finnishDate: finnishDate ? new Date(finnishDate).toISOString() : null,
+            isOnline: location.location_mode === 'online',
+            lat: location.lat,
+            lng: location.lng,
+            radius: location.radius,
+            location_hint: location.location_hint,
+            ai_meta: invitePartners !== 'lev' ? { invitePartners } : null
+          }
+        })
+      });
+      const created = await createRes.json();
+      if (!created?.success || !created?.result?.ratsonId) {
+        throw new Error(created?.error || 'Failed to create wish');
+      }
+      const ratsonId = created.result.ratsonId;
+
+      // Fire matching but don't block navigation — the detail page will
+      // refresh on its own and pick up the new proposals.
+      fetch('/api/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actionKey: 'matchRatson',
+          params: { ratsonId, mode: 'keyword' }
+        })
+      }).catch((err) => console.warn('[concierge/new] matchRatson dispatch failed:', err));
+
+      goto(`/concierge/${ratsonId}`);
+    } catch (err) {
+      console.error('[concierge/new] publish failed:', err);
+      publishError = err instanceof Error ? err.message : 'אירעה שגיאה ביצירת המשאלה';
+    } finally {
+      publishing = false;
+    }
+  }
 
   function toggleValue(v) {
     values = values.includes(v) ? values.filter(x => x !== v) : [...values, v];
@@ -74,6 +216,80 @@
   function pickSeed(seed) {
     title = seed.label;
   }
+
+  function openLocationModal() {
+    locationModalOpen = true;
+  }
+
+  function closeLocationModal() {
+    locationModalOpen = false;
+  }
+
+  function closeJewelModal() {
+    editingJewel = null;
+  }
+
+  function handleWindowKeydown(event) {
+    if (event.key === 'Escape') {
+      if (locationModalOpen) closeLocationModal();
+      if (editingJewel !== null) closeJewelModal();
+    }
+  }
+
+  function handleLocationBackdropClick(event) {
+    if (event.currentTarget === event.target) closeLocationModal();
+  }
+
+  function handleJewelBackdropClick(event) {
+    if (event.currentTarget === event.target) closeJewelModal();
+  }
+
+  function handleDetailJewelClick(index) {
+    if (index === LOCATION_JEWEL_INDEX) {
+      openLocationModal();
+    } else {
+      editingJewel = index;
+    }
+  }
+
+  function detailJewelHasValue(jewel, index) {
+    if (index === LOCATION_JEWEL_INDEX) return hasLocationValue;
+    if (index === 0) return Boolean(whenJewelValue);
+    if (index === 2) return Boolean(budgetJewelValue);
+    if (index === 3) return whoCanOffer !== true; // 'pתוח לכל' is default → only highlight when changed
+    if (index === 4) return whoCanSee !== 'personal';
+    if (index === 5) return invitePartners !== 'lev';
+    return false;
+  }
+
+  function detailJewelValue(jewel, index) {
+    if (index === LOCATION_JEWEL_INDEX) return locationJewelValue || jewel.placeholder;
+    if (index === 0) return whenJewelValue || jewel.placeholder;
+    if (index === 2) return budgetJewelValue || jewel.placeholder;
+    if (index === 3) return whoCanOfferJewelValue || jewel.placeholder;
+    if (index === 4) return whoCanSeeJewelValue || jewel.placeholder;
+    if (index === 5) return invitePartnersJewelValue || jewel.placeholder;
+    return jewel.placeholder;
+  }
+
+  /* Quick budget presets */
+  const BUDGET_PRESETS = [100, 250, 500, 1000, 2500];
+  function pickBudgetPreset(v) { budgetAmount = v; }
+  function clearBudget() { budgetAmount = null; }
+
+  /* Quick date presets */
+  function setDatePreset(daysFromNow) {
+    const d = new Date();
+    d.setDate(d.getDate() + daysFromNow);
+    const iso = d.toISOString().slice(0, 10);
+    if (!startDate || startDate === finnishDate) {
+      startDate = iso;
+      finnishDate = iso;
+    } else {
+      finnishDate = iso;
+    }
+  }
+  function clearDates() { startDate = ''; finnishDate = ''; }
 
   function accentStyle(acc, hasVal) {
     const a = ACCENT[acc] || ACCENT.gold;
@@ -92,6 +308,8 @@
 
   function gemCls(imp) { return imp === 'must' ? 'gem' : 'gem gem-gold'; }
 </script>
+
+<svelte:window onkeydown={handleWindowKeydown} />
 
 <!-- ===================================================================
      NEW WISH — form page (mock, design-only)
@@ -223,13 +441,20 @@
           <!-- PRACTICAL DETAILS -->
           <div class="subsection">פרטים מעשיים</div>
           <div class="jewels-grid">
-            {#each DETAIL_JEWELS as j (j.label)}
-              {@const has = !!j.value}
-              <button class="detail-jewel" style={accentStyle(j.accent, has)}>
+            {#each DETAIL_JEWELS as j, i (j.label)}
+              {@const has = detailJewelHasValue(j, i)}
+              <button
+                class:location-trigger={i === LOCATION_JEWEL_INDEX}
+                class="detail-jewel"
+                style={accentStyle(j.accent, has)}
+                aria-haspopup={i === LOCATION_JEWEL_INDEX ? 'dialog' : undefined}
+                aria-expanded={i === LOCATION_JEWEL_INDEX ? locationModalOpen : undefined}
+                onclick={() => handleDetailJewelClick(i)}
+              >
                 <span class="jewel-icon" style="background:{accentBg(j.accent, has)}">{j.icon}</span>
                 <div style="flex:1;min-width:0;text-align:start">
                   <div class="jewel-label">{j.label}</div>
-                  <div class="jewel-val" style="color:{accentText(j.accent, has)}">{j.value || j.placeholder}</div>
+                  <div class="jewel-val" style="color:{accentText(j.accent, has)}">{detailJewelValue(j, i)}</div>
                 </div>
                 <span style="font-size:12px;color:#52493e">›</span>
               </button>
@@ -263,15 +488,20 @@
               <button
                 class="btn-jewel pub-btn"
                 disabled={!isReady}
-                onclick={() => isReady && goto('/concierge/demo-wish-id')}
+                onclick={publish}
                 style="opacity:{isReady?1:0.5};background:{isReady?'linear-gradient(135deg,#bf953f,#fcf6ba 30%,#b38728 60%,#aa771c)':'linear-gradient(135deg,#c8155f,#ff4d9e)'};color:{isReady?'#574010':'#fde68a'};text-shadow:{isReady?'1px 1px 0 rgba(255,255,255,0.5)':'none'}"
-              >✨ פרסמי את המשאלה</button>
+              >{publishing ? '⏳ שולחת אל Lev…' : '✨ פרסמי את המשאלה'}</button>
             </div>
           </div>
 
           <div style="margin-top:14px;text-align:center;font-family:'Bellefair',serif;font-size:12px;color:#52493e">
             ברגע שתפרסמי, Lev תסיים פירוק בדקות, ואת תראי הצעות תוך שעה־שעתיים.
           </div>
+          {#if publishError}
+            <div style="margin-top:10px;padding:10px 14px;background:rgba(255,77,158,.06);border:1px solid rgba(255,77,158,.3);border-radius:12px;font-family:'Bellefair',serif;font-size:13px;color:#ff4d9e;text-align:center">
+              {publishError}
+            </div>
+          {/if}
         </div><!-- /left col -->
 
         <!-- ── RIGHT: Lev assist panel ── -->
@@ -343,6 +573,166 @@
       </div><!-- /compose-layout -->
     </div><!-- /wrap -->
   </div><!-- /shell -->
+
+  {#if locationModalOpen}
+    <div
+      class="location-modal-backdrop"
+      role="presentation"
+      onclick={handleLocationBackdropClick}
+      transition:fade={{ duration: 140 }}
+    >
+      <div
+        class="location-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="location-modal-title"
+      >
+        <div class="location-modal-head">
+          <div>
+            <div class="modal-eyebrow">Location</div>
+            <h2 id="location-modal-title">איפה זה קורה?</h2>
+          </div>
+          <button class="modal-close" type="button" aria-label="סגירת בחירת מיקום" onclick={closeLocationModal}>×</button>
+        </div>
+
+        <LocationPicker
+          bind:value={location}
+          label="מיקום המשאלה"
+          helper="בחרי אם זה אונליין, פיזי או היברידי. הנקודה והרדיוס יעזרו ל-Lev להציע ספקים קרובים."
+          height="420px"
+        />
+
+        <div class="location-modal-actions">
+          <button class="btn-ghost" type="button" onclick={closeLocationModal}>סגירה</button>
+          <button class="btn-jewel modal-save" type="button" onclick={closeLocationModal}>שמירת מיקום</button>
+        </div>
+      </div>
+    </div>
+  {/if}
+
+  {#if editingJewel !== null}
+    <div
+      class="location-modal-backdrop"
+      role="presentation"
+      onclick={handleJewelBackdropClick}
+      transition:fade={{ duration: 140 }}
+    >
+      <div
+        class="location-modal jewel-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="jewel-modal-title"
+      >
+        <div class="location-modal-head">
+          <div>
+            <div class="modal-eyebrow">{DETAIL_JEWELS[editingJewel].icon} · {DETAIL_JEWELS[editingJewel].label}</div>
+            <h2 id="jewel-modal-title">
+              {editingJewel === 0 ? 'מתי זה יקרה?'
+                : editingJewel === 2 ? 'כמה את מוכנה לתת?'
+                : editingJewel === 3 ? 'מי יכולה להציע?'
+                : editingJewel === 4 ? 'מי יכולה לראות?'
+                : 'איך להזמין שותפים?'}
+            </h2>
+          </div>
+          <button class="modal-close" type="button" aria-label="סגירה" onclick={closeJewelModal}>×</button>
+        </div>
+
+        <div class="jewel-modal-body">
+          {#if editingJewel === 0}
+            <!-- When -->
+            <div class="field-grid">
+              <label class="field">
+                <span class="field-lbl">מתי להתחיל</span>
+                <input type="date" bind:value={startDate} class="field-inp" />
+              </label>
+              <label class="field">
+                <span class="field-lbl">מתי לסיים</span>
+                <input type="date" bind:value={finnishDate} class="field-inp" />
+              </label>
+            </div>
+            <div class="presets">
+              <button type="button" class="preset-pill" onclick={() => setDatePreset(0)}>היום</button>
+              <button type="button" class="preset-pill" onclick={() => setDatePreset(1)}>מחר</button>
+              <button type="button" class="preset-pill" onclick={() => setDatePreset(7)}>תוך שבוע</button>
+              <button type="button" class="preset-pill" onclick={() => setDatePreset(30)}>תוך חודש</button>
+              <button type="button" class="preset-pill ghost" onclick={clearDates}>לנקות</button>
+            </div>
+            <p class="modal-hint">לא חובה לבחור — אפשר להשאיר ריק ו-Lev תציע מועדים גמישים.</p>
+
+          {:else if editingJewel === 2}
+            <!-- Budget -->
+            <label class="field">
+              <span class="field-lbl">סכום מקסימלי (₪)</span>
+              <input
+                type="number"
+                inputmode="numeric"
+                min="0"
+                step="50"
+                bind:value={budgetAmount}
+                placeholder="למשל 500"
+                class="field-inp"
+              />
+            </label>
+            <div class="presets">
+              {#each BUDGET_PRESETS as v (v)}
+                <button type="button" class="preset-pill" onclick={() => pickBudgetPreset(v)}>₪ {v.toLocaleString('he-IL')}</button>
+              {/each}
+              <button type="button" class="preset-pill ghost" onclick={clearBudget}>בלי תקרה</button>
+            </div>
+            <p class="modal-hint">סכום מירבי. הצעות יוצגו ממוין לפי איכות התאמה ולא רק לפי מחיר.</p>
+
+          {:else if editingJewel === 3}
+            <!-- Who can offer -->
+            <div class="radio-list">
+              {#each WHO_CAN_OFFER_OPTIONS as opt (opt.label)}
+                <label class="radio-row {whoCanOffer === opt.value ? 'on' : ''}">
+                  <input type="radio" name="whoCanOffer" value={opt.value} checked={whoCanOffer === opt.value} onchange={() => whoCanOffer = opt.value} />
+                  <div>
+                    <div class="radio-label">{opt.label}</div>
+                    <div class="radio-hint">{opt.hint}</div>
+                  </div>
+                </label>
+              {/each}
+            </div>
+
+          {:else if editingJewel === 4}
+            <!-- Who can see (access_mode) -->
+            <div class="radio-list">
+              {#each WHO_CAN_SEE_OPTIONS as opt (opt.value)}
+                <label class="radio-row {whoCanSee === opt.value ? 'on' : ''}">
+                  <input type="radio" name="whoCanSee" value={opt.value} checked={whoCanSee === opt.value} onchange={() => whoCanSee = opt.value} />
+                  <div>
+                    <div class="radio-label">{opt.label}</div>
+                    <div class="radio-hint">{opt.hint}</div>
+                  </div>
+                </label>
+              {/each}
+            </div>
+
+          {:else if editingJewel === 5}
+            <!-- Invite partners -->
+            <div class="radio-list">
+              {#each INVITE_PARTNERS_OPTIONS as opt (opt.value)}
+                <label class="radio-row {invitePartners === opt.value ? 'on' : ''}">
+                  <input type="radio" name="invitePartners" value={opt.value} checked={invitePartners === opt.value} onchange={() => invitePartners = opt.value} />
+                  <div>
+                    <div class="radio-label">{opt.label}</div>
+                    <div class="radio-hint">{opt.hint}</div>
+                  </div>
+                </label>
+              {/each}
+            </div>
+            <p class="modal-hint">בחירה זו עוזרת ל־Lev להבין כמה ביוזמה לקחת בעצמה ועד כמה לחכות לך.</p>
+          {/if}
+        </div>
+
+        <div class="location-modal-actions">
+          <button class="btn-ghost" type="button" onclick={closeJewelModal}>סגירה</button>
+          <button class="btn-jewel modal-save" type="button" onclick={closeJewelModal}>שמירה</button>
+        </div>
+      </div>
+    </div>
+  {/if}
 </div><!-- /cp -->
 
 <style>
@@ -488,9 +878,121 @@
   .jewels-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:8px; }
   .detail-jewel { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:14px; background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.06); cursor:pointer; transition:all .2s; width:100%; text-align:start; }
   .detail-jewel:hover { background:rgba(238,232,170,.04); border-color:rgba(238,232,170,.25); transform:translateY(-1px); }
+  .detail-jewel.location-trigger { position:relative; }
+  .detail-jewel.location-trigger::after { content:''; position:absolute; inset:6px; border-radius:12px; border:1px solid rgba(116,191,255,.08); pointer-events:none; }
   .jewel-icon  { font-size:18px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:8px; flex-shrink:0; }
   .jewel-label { font-size:9px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:#9a8f80; }
   .jewel-val   { font-family:'Bellefair',serif; font-size:14px; margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  /* Modal */
+  .location-modal-backdrop {
+    position:fixed;
+    inset:0;
+    z-index:220;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    background:rgba(7,6,6,.78);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+  }
+  .location-modal {
+    width:min(940px,100%);
+    max-height:min(88vh,860px);
+    overflow:auto;
+    border-radius:20px;
+    border:1px solid rgba(116,191,255,.28);
+    background:linear-gradient(180deg,rgba(116,191,255,.06),rgba(7,6,6,.98) 26%),#0e0d0c;
+    box-shadow:0 24px 80px rgba(0,0,0,.62),0 0 0 1px rgba(255,255,255,.04) inset;
+    padding:16px;
+  }
+  .location-modal-head {
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:14px;
+    margin-bottom:12px;
+  }
+  .modal-eyebrow {
+    font-family:'Cinzel',serif;
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    color:#74bfff;
+  }
+  .location-modal h2 {
+    margin:2px 0 0;
+    font-family:'Sababa','Heebo',sans-serif;
+    font-size:clamp(20px,5vw,28px);
+    line-height:1.15;
+    color:#ede5d8;
+  }
+  .modal-close {
+    width:36px;
+    height:36px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,.1);
+    background:rgba(255,255,255,.03);
+    color:#c8bba8;
+    cursor:pointer;
+    font-size:24px;
+    line-height:1;
+  }
+  .modal-close:hover {
+    border-color:rgba(238,232,170,.32);
+    color:#fde68a;
+    background:rgba(238,232,170,.06);
+  }
+  .location-modal-actions {
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:14px;
+    flex-wrap:wrap;
+  }
+  .modal-save { padding:9px 18px; font-size:14px; }
+
+  /* ── Generic jewel modal body ── */
+  .jewel-modal { max-width:520px; }
+  .jewel-modal-body { display:flex; flex-direction:column; gap:14px; }
+  .field-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  @media(max-width:520px) { .field-grid { grid-template-columns:1fr; } }
+  .field { display:flex; flex-direction:column; gap:6px; }
+  .field-lbl { font-family:'Cinzel',serif; font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:#9a8f80; }
+  .field-inp {
+    width:100%; box-sizing:border-box; padding:10px 12px;
+    background:rgba(255,255,255,.03); border:1px solid rgba(238,232,170,.18); color:#ede5d8;
+    border-radius:10px; font-family:'Bellefair',serif; font-size:14px; outline:none;
+    transition:border-color .2s;
+  }
+  .field-inp:focus { border-color:rgba(238,232,170,.4); }
+  .field-inp::-webkit-calendar-picker-indicator { filter:invert(0.7); cursor:pointer; }
+
+  .presets { display:flex; flex-wrap:wrap; gap:6px; }
+  .preset-pill {
+    padding:6px 12px; border-radius:999px; cursor:pointer;
+    border:1px solid rgba(238,232,170,.22); background:rgba(238,232,170,.05); color:#fde68a;
+    font-family:'Bellefair',serif; font-size:12.5px; transition:all .2s;
+  }
+  .preset-pill:hover { border-color:rgba(238,232,170,.5); background:rgba(238,232,170,.1); }
+  .preset-pill.ghost { background:transparent; border-color:rgba(255,255,255,.1); color:#9a8f80; }
+  .preset-pill.ghost:hover { color:#ede5d8; border-color:rgba(238,232,170,.3); }
+
+  .modal-hint { margin:0; font-family:'Bellefair',serif; font-size:12.5px; color:#52493e; line-height:1.55; }
+
+  .radio-list { display:flex; flex-direction:column; gap:8px; }
+  .radio-row {
+    display:flex; gap:11px; align-items:flex-start; padding:12px 14px; cursor:pointer;
+    border:1px solid rgba(255,255,255,.06); background:rgba(255,255,255,.02); border-radius:12px;
+    transition:all .2s;
+  }
+  .radio-row:hover { border-color:rgba(238,232,170,.25); }
+  .radio-row.on { border-color:rgba(255,77,158,.5); background:rgba(255,77,158,.06); box-shadow:0 0 14px rgba(255,77,158,.1); }
+  .radio-row input[type="radio"] { accent-color:#ff4d9e; margin-top:3px; flex-shrink:0; }
+  .radio-label { font-family:'Bellefair',serif; font-size:14px; color:#ede5d8; }
+  .radio-hint  { font-family:'Bellefair',serif; font-size:12px; color:#9a8f80; margin-top:3px; line-height:1.45; }
 
   /* ── Values picker ── */
   .values-grid { display:flex; flex-wrap:wrap; gap:6px; }

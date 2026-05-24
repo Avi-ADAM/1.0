@@ -1716,6 +1716,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           work_ways { data { id } }
           vallues { data { id } }
           negopendmissions { data { id } }
+          timegrama { data { id } }
           users {
             what order ide zman why
             users_permissions_user { data { id } }
@@ -1725,7 +1726,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }`,
 
-  '143archivePendmWithVotes': `mutation ArchivePendmWithVotes($id: ID!, $users: [ComponentProjectsVotsInput!]!) {
+  '143archivePendmWithVotes': `mutation ArchivePendmWithVotes($id: ID!, $users: [ComponentProjectsPendmnegoInput!]!) {
     updatePendm(id: $id, data: { archived: true, users: $users }) {
       data { id }
     }
@@ -1796,7 +1797,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }`,
 
-  '149updatePendmDiun': `mutation UpdatePendmDiun($id: ID!, $diun: [ComponentProjectsDiunInput!]!) {
+  '149updatePendmDiun': `mutation UpdatePendmDiun($id: ID!, $diun: [ComponentProjectsVotsInput]) {
     updatePendm(id: $id, data: { diun: $diun }) {
       data {
         id
@@ -1810,7 +1811,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }`,
 
-  '150updatePmashDiun': `mutation UpdatePmashDiun($id: ID!, $diun: [ComponentProjectsDiunInput!]!) {
+  '150updatePmashDiun': `mutation UpdatePmashDiun($id: ID!, $diun: [ComponentProjectsVotsInput]) {
     updatePmash(id: $id, data: { diun: $diun }) {
       data {
         id
@@ -2035,7 +2036,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }`,
 
-  '85addVoteToPend': `mutation AddVoteToPend($id: ID!, $users: [ComponentProjectsVotsInput!]!) {
+  '85addVoteToPend': `mutation AddVoteToPend($id: ID!, $users: [ComponentProjectsPendmnegoInput!]!) {
     updatePendm(id: $id, data: { users: $users }) {
       data {
         id
@@ -6472,7 +6473,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $publicklinks: String
     $privatlinks: String
     $hearotMeyuchadot: String
-    $users: [ComponentProjectsVotsInput]
+    $users: [ComponentProjectsPendmnegoInput]
     $publishedAt: DateTime!
   ) {
     createPendm(data: {
