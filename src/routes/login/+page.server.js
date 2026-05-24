@@ -27,24 +27,28 @@ export const actions = {
 
             const isProduction = import.meta.env.PROD;
 
-            // SameSite=Lax is correct for cross-subdomain same-site access (socket.1lev1.com).
-            // SameSite=None was wrong here — it's for truly cross-site contexts and causes
-            // browsers to reject cookies from fetch() responses in some configurations.
+            // No `domain` attribute → host-only cookie.
+            // Setting domain: '.1lev1.com' caused the browser to reject every
+            // cookie when the app runs on a non-matching origin (e.g. a Vercel
+            // preview URL), resulting in raw-cookie-header: (none) on the very
+            // next request and an immediate redirect back to /login.
+            // Host-only cookies are sent to whatever host the app is running on,
+            // whether that is 1lev1.com, www.1lev1.com, or *.vercel.app.
             const cookieOptions = {
                 path: '/',
                 expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
                 secure: isProduction,
-                sameSite: /** @type {'lax'} */ ('lax'),
-                domain: isProduction ? '.1lev1.com' : undefined
+                sameSite: /** @type {'lax'} */ ('lax')
             };
 
-            // Clean up zombie cookies from previous sessions/deploys.
+            // Clean up any zombie cookies from previous sessions or old deploys
+            // that may have been set with explicit domain attributes.
             const cookiesToDelete = ['jwt', 'id', 'un', 'when', 'email'];
             const deleteVariations = [
-                { path: '/' },
-                { path: '/', domain: '.1lev1.com' },
-                { path: '/', domain: 'www.1lev1.com' },
-                { path: '/', domain: '1lev1.com' }
+                { path: '/' },                          // host-only (current scheme)
+                { path: '/', domain: '.1lev1.com' },    // old wildcard domain cookies
+                { path: '/', domain: 'www.1lev1.com' }, // old www-specific cookies
+                { path: '/', domain: '1lev1.com' }      // old root-domain cookies
             ];
             for (const name of cookiesToDelete) {
                 for (const opts of deleteVariations) {

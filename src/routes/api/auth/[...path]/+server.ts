@@ -35,12 +35,12 @@ const ALLOWED: Record<string, AuthAction> = {
 
 function buildCookieOptions() {
   const isProduction = import.meta.env.PROD;
+  // No domain attribute → host-only cookie, works on any deployment URL.
   return {
     path: '/',
     expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
     secure: isProduction,
-    sameSite: 'lax' as const,
-    domain: isProduction ? '.1lev1.com' : undefined // subdomain support only in production
+    sameSite: 'lax' as const
   };
 }
 
