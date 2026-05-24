@@ -27,18 +27,16 @@ export const actions = {
 
             const isProduction = import.meta.env.PROD;
 
-            // No `domain` attribute → host-only cookie.
-            // Setting domain: '.1lev1.com' caused the browser to reject every
-            // cookie when the app runs on a non-matching origin (e.g. a Vercel
-            // preview URL), resulting in raw-cookie-header: (none) on the very
-            // next request and an immediate redirect back to /login.
-            // Host-only cookies are sent to whatever host the app is running on,
-            // whether that is 1lev1.com, www.1lev1.com, or *.vercel.app.
+            // domain: '.1lev1.com' is required so socket.1lev1.com receives
+            // the JWT cookie during the WebSocket handshake.
+            // sameSite: 'lax' (not 'none') — cross-subdomain is same-site so
+            // Lax is sufficient and more broadly compatible than None.
             const cookieOptions = {
                 path: '/',
                 expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
                 secure: isProduction,
-                sameSite: /** @type {'lax'} */ ('lax')
+                sameSite: /** @type {'lax'} */ ('lax'),
+                domain: isProduction ? '.1lev1.com' : undefined
             };
 
             // Clean up any zombie cookies from previous sessions or old deploys

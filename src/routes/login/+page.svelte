@@ -54,14 +54,18 @@
       action="?/login"
       use:enhance={() => {
         active = true;
+        // Capture the intended destination before the async response arrives.
+        // We use the URL param directly rather than result.data because some
+        // SvelteKit versions do not populate result.data for plain-object
+        // returns, which would silently skip the navigation.
+        const dest = page.url.searchParams.get('from') || '/onboard';
         return async ({ result, update }) => {
-          if (result.type === 'success' && result.data?.redirectTo) {
-            // The action returned a 200 response with Set-Cookie headers.
-            // A full browser navigation guarantees the cookies are stored
-            // and sent with the next request before the server reads them.
-            window.location.href = /** @type {string} */ (result.data.redirectTo);
+          if (result.type === 'success') {
+            // Full browser navigation so the auth cookies set by the action
+            // are definitely in the cookie jar before the next request.
+            window.location.href = dest;
           } else {
-            // Errors or unexpected responses — let SvelteKit update the form.
+            // Errors / unexpected — let SvelteKit show the form error.
             await update();
             active = false;
           }
