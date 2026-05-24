@@ -40,31 +40,6 @@
     }
   });
 
-  import { onMount } from 'svelte';
-
-  // Client-side aggressive cookie cleanup for legacy sessions
-  onMount(() => {
-    // List of cookies to possibly clear
-    const cookiesToClear = ['jwt', 'id', 'un', 'when', 'email'];
-
-    // Helper to delete a cookie by setting expired date
-    const eraseCookie = (name, domain) => {
-      let cookieStr = `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
-      if (domain) {
-        cookieStr += ` Domain=${domain};`;
-      }
-      document.cookie = cookieStr;
-    };
-
-    cookiesToClear.forEach((name) => {
-      eraseCookie(name); // Clears host-only / current domain
-      eraseCookie(name, '.1lev1.com'); // Clears wildcard domain
-      eraseCookie(name, 'www.1lev1.com'); // Clears specific subdomain
-      eraseCookie(name, '1lev1.com'); // Clears root domain
-    });
-    console.log('Legacy cookies cleared on client mount');
-  });
-
   let loginError = $state(null); // State for displaying login errors
 </script>
 
@@ -80,14 +55,13 @@
       use:enhance={() => {
         active = true;
         return async ({ result, update }) => {
-          if (result.type === 'redirect') {
-            // Use a full browser navigation so the new auth cookies are
-            // included in the next request. Client-side goto() can race
-            // against the browser storing the Set-Cookie headers from the
-            // action response, causing the layout server guard to see no
-            // token and redirect straight back to /login.
-            window.location.href = result.location;
+          if (result.type === 'success' && result.data?.redirectTo) {
+            // The action returned a 200 response with Set-Cookie headers.
+            // A full browser navigation guarantees the cookies are stored
+            // and sent with the next request before the server reads them.
+            window.location.href = /** @type {string} */ (result.data.redirectTo);
           } else {
+            // Errors or unexpected responses — let SvelteKit update the form.
             await update();
             active = false;
           }
