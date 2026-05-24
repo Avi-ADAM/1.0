@@ -27,26 +27,25 @@ export const actions = {
 
             const isProduction = import.meta.env.PROD;
 
-            // domain: '.1lev1.com' is required so socket.1lev1.com receives
-            // the JWT cookie during the WebSocket handshake.
-            // sameSite: 'lax' (not 'none') — cross-subdomain is same-site so
-            // Lax is sufficient and more broadly compatible than None.
+            // No domain attribute → host-only cookies, stored by every browser.
+            // sameSite: 'lax' is sufficient for same-site cross-subdomain requests.
+            // JWT is NOT httpOnly so the socket client can read it from document.cookie
+            // and pass it to socket.1lev1.com during the WebSocket handshake.
             const cookieOptions = {
                 path: '/',
                 expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
                 secure: isProduction,
-                sameSite: /** @type {'lax'} */ ('lax'),
-                domain: isProduction ? '.1lev1.com' : undefined
+                sameSite: /** @type {'lax'} */ ('lax')
             };
 
-            // Clean up any zombie cookies from previous sessions or old deploys
-            // that may have been set with explicit domain attributes.
+            // Clean up any zombie cookies from previous sessions that had explicit
+            // domain attributes (old deployments).
             const cookiesToDelete = ['jwt', 'id', 'un', 'when', 'email'];
             const deleteVariations = [
-                { path: '/' },                          // host-only (current scheme)
-                { path: '/', domain: '.1lev1.com' },    // old wildcard domain cookies
-                { path: '/', domain: 'www.1lev1.com' }, // old www-specific cookies
-                { path: '/', domain: '1lev1.com' }      // old root-domain cookies
+                { path: '/' },
+                { path: '/', domain: '.1lev1.com' },
+                { path: '/', domain: 'www.1lev1.com' },
+                { path: '/', domain: '1lev1.com' }
             ];
             for (const name of cookiesToDelete) {
                 for (const opts of deleteVariations) {
@@ -54,7 +53,7 @@ export const actions = {
                 }
             }
 
-            cookies.set('jwt', jwt,                          { ...cookieOptions, httpOnly: true  });
+            cookies.set('jwt', jwt,                          { ...cookieOptions, httpOnly: false });
             cookies.set('id',  String(user.id),              { ...cookieOptions, httpOnly: false });
             cookies.set('un',  user.name || user.username,   { ...cookieOptions, httpOnly: false });
             cookies.set('when', Date.now().toString(),        { ...cookieOptions, httpOnly: false });

@@ -35,12 +35,13 @@ const ALLOWED: Record<string, AuthAction> = {
 
 function buildCookieOptions() {
   const isProduction = import.meta.env.PROD;
+  // No domain attribute → host-only cookies, accepted by all browsers.
+  // JWT is NOT httpOnly so the socket client can read it from document.cookie.
   return {
     path: '/',
     expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
     secure: isProduction,
-    sameSite: 'lax' as const,
-    domain: isProduction ? '.1lev1.com' : undefined
+    sameSite: 'lax' as const
   };
 }
 
@@ -98,7 +99,7 @@ export const POST: RequestHandler = async ({ params, request, cookies, fetch }) 
     // Persist a returned JWT server-side and strip it from the client payload.
     if (action.setsSession && data?.jwt) {
       const opts = buildCookieOptions();
-      cookies.set('jwt', data.jwt, { ...opts, httpOnly: true });
+      cookies.set('jwt', data.jwt, { ...opts, httpOnly: false });
 
       if (data.user) {
         if (data.user.id != null) {
