@@ -351,26 +351,12 @@
   }
 
   async function handleChangePassword() {
-    const token = page.data.tok;
-    if (!token) {
-      errorl = 'Authentication error';
-      return;
-    }
-
     try {
-      await axios.post(
-        `${import.meta.env.VITE_URL}/api/auth/change-password`,
-        {
-          currentPassword: passi,
-          password: passwordx,
-          passwordConfirmation: passwordx
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
+      await axios.post('/api/auth/change-password', {
+        currentPassword: passi,
+        password: passwordx,
+        passwordConfirmation: passwordx
+      });
       toast.success(t[$lang].passChanged);
       beforePasswordChange = false;
     } catch (err) {

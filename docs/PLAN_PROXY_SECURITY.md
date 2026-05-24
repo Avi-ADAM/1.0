@@ -103,9 +103,32 @@ const res = await sendToSer({ /* variables */ }, "NNqueryId", 0, 0, false, fetch
 ### 3.2 העברת ה-REST לפרוקסי
 
 - **upload**: כל פנייה ישירה → `/api/upload` (קיים).
-- **auth** (login / register / change-password / reset): ליצור route דק
-  `src/routes/api/auth/[...]/+server.ts` שמעביר ל-Strapi בצד שרת ומגדיר את ה-cookie
-  ה-httpOnly. הלקוח לא רואה את הטוקן בכלל.
+- **auth** (login / register / change-password / reset): route דק
+  `src/routes/api/auth/[...path]/+server.ts` שמעביר ל-Strapi בצד שרת ומגדיר את
+  ה-cookie ה-httpOnly. הלקוח לא רואה את הטוקן בכלל. **בוצע ✅** (2026-05-24).
+
+#### מצב ה-auth proxy (`src/routes/api/auth/[...path]/+server.ts`)
+
+Whitelist של פעולות מותרות; כל השאר → 404. פעולות שמחזירות `jwt` →
+ה-jwt נשמר כ-cookie httpOnly בצד שרת ומנוקה מה-response (הלקוח לא רואה טוקן).
+`change-password` לוקח את הטוקן מה-cookie, לא מהלקוח.
+
+| פעולה | requiresAuth | setsSession | callers שהוגרו |
+|-------|:---:|:---:|----|
+| `local` (login) | ✗ | ✓ | — (login נשאר ב-`login/+page.server.js`, צד שרת, לא דליפה) |
+| `local/register` | ✗ | ✓ | ⏳ `registration/password.svelte` (נדחה — מסובך עם onboarding) |
+| `change-password` | ✓ | ✓ | `userPr/editBasic.svelte` ✅ |
+| `forgot-password` | ✗ | ✗ | `login/passwordReset/+page.svelte` ✅ |
+| `reset-password` | ✗ | ✓ | `login/passChange/+page.svelte` ✅ |
+| `send-email-confirmation` | ✗ | ✗ | `signup/check-email/+page.svelte` ✅ (כבר קרא לנתיב היחסי) |
+
+> **הערה:** `login/+page.server.js` ו-`signup/+page.server.js` כבר רצים בצד שרת
+> ומגדירים cookie httpOnly נכון — **אינם דליפה** ולא חייבים את הפרוקסי (פנייה
+> צד-שרת ל-Strapi עובדת גם כש-Strapi נעול ל-localhost). אפשר לאחד אותם על
+> הפרוקסי בעתיד לשם עקביות, אך אין דחיפות.
+>
+> **נותר ב-auth:** הגירת ה-register ב-`registration/password.svelte` (פנייה
+> ישירה מהלקוח) — דורש זהירות עם לוגיקת ה-cookies של ה-onboarding.
 
 ### 3.3 היפוך ה-server loads (רק אחרי שכל הצרכנים הוגרו)
 
@@ -130,7 +153,7 @@ const res = await sendToSer({ /* variables */ }, "NNqueryId", 0, 0, false, fetch
 - [ ] הגירת `prPr/*` (3)
 - [ ] הגירת `sales/SaleComponent`, `registration/newppp`
 - [ ] הגירת routes שמשתמשים בטוקן (`newlev`/`initializeLevData`, `me`, `oldlev`, ...)
-- [ ] יצירת `/api/auth` proxy + העברת login/register/reset/change-password
+- [x] יצירת `/api/auth` proxy (2026-05-24) + העברת change-password/forgot/reset/send-email-confirmation; register נדחה
 - [ ] העברת כל ה-uploads ל-`/api/upload`
 - [ ] היפוך 4 נקודות החשיפה ל-flag בוליאני (3.3)
 - [ ] הוספת guardrail (3.4) ו-grep מאמת = 0
