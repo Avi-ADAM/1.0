@@ -1355,7 +1355,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $projectId: ID!,
     $missId: ID!,
     $userId: ID!,
-    $openMid: ID,
+    $openMid: [ID],
     $openmissionName: String!,
     $missionDetails: String,
     $nhours: Float!,
@@ -1385,7 +1385,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       publishedAt: $publishedAt,
       admaticedai: $deadline,
       start: $sqedualed,
-      open_missions: [$openMid]
+      open_missions: $openMid
     }) {
       data {
         id
@@ -3553,6 +3553,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                 data {
                   id
                   attributes {
+                    isSelfProposal
+                    pendingMainVote
                     vots {
                       what
                       zman

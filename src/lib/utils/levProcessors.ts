@@ -939,6 +939,8 @@ export function processAskedResources(
   }
 
   return askedResources.map(res => {
+    // Destructure src so the final ...passThrough spread doesn't overwrite the computed fallback
+    const { src: rawSrc, ...passThrough } = res;
     const projectInfo = createProjectInfo(res.projectId);
     const myid = res.myid;
 
@@ -984,7 +986,9 @@ export function processAskedResources(
       coinlapach: `askm-${res.id}`,
 
       ...projectInfo,
-      src: res.src || projectInfo.src2 || '', // requesting user pic
+      // rawSrc is the requester's profile pic URL (may be empty if no pic set);
+      // fall back to project pic, then the generic placeholder
+      src: rawSrc || projectInfo.src2 || 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png',
       src2: projectInfo.src2, // project pic
 
       // Fields
@@ -1019,8 +1023,8 @@ export function processAskedResources(
       noofusersWaiting: noofusersWaiting,
 
 
-      // Pass through
-      ...res
+      // Pass through (src excluded to preserve the fallback computed above)
+      ...passThrough
     };
   });
 }

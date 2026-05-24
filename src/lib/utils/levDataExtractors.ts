@@ -1055,6 +1055,9 @@ export function extractAskedResources(userData: any): AskedResourceData[] {
         pid: project.attributes.user_1s?.data?.map((u: any) => u.id) || [],
         ani: 'askedm',
         azmi: 'ziruf',
+        // Self-proposal flags (set by createResource when a project member self-assigns)
+        isSelfProposal: askAttributes.isSelfProposal ?? false,
+        pendingMainVote: askAttributes.pendingMainVote ?? false,
         // Additional fields for compatibility
         createdAt: askAttributes.createdAt,
         chat: askAttributes.chat || [],
