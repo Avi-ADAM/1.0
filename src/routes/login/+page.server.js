@@ -43,14 +43,29 @@ export const actions = {
                 domain: onOwnDomain ? '.1lev1.com' : undefined
             };
 
-            // Clean up any zombie cookies from previous sessions that had explicit
-            // domain attributes (old deployments).
+            // Clean up zombie cookies from previous sessions that had different
+            // domain scopes than the cookie we are about to set.
+            //
+            // CRITICAL: do NOT add a delete variation whose Domain attribute is
+            // canonically equal to the SET's Domain (`.1lev1.com`). Per RFC 6265
+            // §5.2.3 the browser strips the leading dot, so `Domain=1lev1.com`
+            // and `Domain=.1lev1.com` are the SAME cookie. SvelteKit, however,
+            // keys its internal cookie Map by the RAW string (see
+            // node_modules/@sveltejs/kit/src/runtime/server/cookie.js
+            // `generate_cookie_key`), so both end up as separate Set-Cookie
+            // headers in the response. The delete-without-dot is emitted AFTER
+            // the set and silently wipes the JWT — the browser ends up with no
+            // auth cookies and bounces back to /login. That was the prod bug.
+            //
+            // We only delete scopes that the SET does not touch:
+            //   - host-only (no Domain attribute) — kills old host-only zombies
+            //   - Domain=www.1lev1.com — kills old www-pinned zombies
+            // The `.1lev1.com` delete is omitted because the SET below already
+            // overwrites that exact key inside SvelteKit's cookie Map.
             const cookiesToDelete = ['jwt', 'id', 'un', 'when', 'email'];
             const deleteVariations = [
                 { path: '/' },
-                { path: '/', domain: '.1lev1.com' },
-                { path: '/', domain: 'www.1lev1.com' },
-                { path: '/', domain: '1lev1.com' }
+                { path: '/', domain: 'www.1lev1.com' }
             ];
             for (const name of cookiesToDelete) {
                 for (const opts of deleteVariations) {

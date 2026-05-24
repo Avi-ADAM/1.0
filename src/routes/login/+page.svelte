@@ -55,17 +55,18 @@
       use:enhance={() => {
         active = true;
         // Capture the intended destination before the async response arrives.
-        // We use the URL param directly rather than result.data because some
-        // SvelteKit versions do not populate result.data for plain-object
-        // returns, which would silently skip the navigation.
-        const dest = page.url.searchParams.get('from') || '/onboard';
+        const fallbackDest = page.url.searchParams.get('from') || '/onboard';
         return async ({ result, update }) => {
-          if (result.type === 'success') {
+          // NB: result.type === 'success' just means the action returned
+          // (didn't throw / didn't call fail()). It does NOT mean the login
+          // itself succeeded — the action returns { success: false, error }
+          // on wrong-password etc. We must inspect result.data.success.
+          if (result.type === 'success' && result.data?.success) {
             // Full browser navigation so the auth cookies set by the action
             // are definitely in the cookie jar before the next request.
-            window.location.href = dest;
+            window.location.href = result.data.redirectTo || fallbackDest;
           } else {
-            // Errors / unexpected — let SvelteKit show the form error.
+            // Wrong password / server error — surface the message on the page.
             await update();
             active = false;
           }
