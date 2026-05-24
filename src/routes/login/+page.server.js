@@ -33,6 +33,7 @@ export const actions = {
             // host: on a non-matching origin (e.g. a *.vercel.app preview) the
             // browser silently rejects a .1lev1.com cookie, so we fall back to a
             // host-only cookie there.
+            console.log(url.hostname, 'on own domain? ', url.hostname === '1lev1.com' || url.hostname.endsWith('.1lev1.com'));
             const onOwnDomain = url.hostname === '1lev1.com' || url.hostname.endsWith('.1lev1.com');
             const cookieOptions = {
                 path: '/',
@@ -57,11 +58,11 @@ export const actions = {
                 }
             }
 
-            cookies.set('jwt', jwt,                          { ...cookieOptions, httpOnly: true  });
-            cookies.set('id',  String(user.id),              { ...cookieOptions, httpOnly: false });
-            cookies.set('un',  user.name || user.username,   { ...cookieOptions, httpOnly: false });
-            cookies.set('when', Date.now().toString(),        { ...cookieOptions, httpOnly: false });
-            cookies.set('email', String(email),              { ...cookieOptions, httpOnly: false });
+            cookies.set('jwt', jwt, { ...cookieOptions, httpOnly: true });
+            cookies.set('id', String(user.id), { ...cookieOptions, httpOnly: false });
+            cookies.set('un', user.name || user.username, { ...cookieOptions, httpOnly: false });
+            cookies.set('when', Date.now().toString(), { ...cookieOptions, httpOnly: false });
+            cookies.set('email', String(email), { ...cookieOptions, httpOnly: false });
 
             console.log('login success, redirecting to', redirectTo);
 
