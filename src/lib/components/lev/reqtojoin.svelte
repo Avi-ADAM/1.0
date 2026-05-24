@@ -180,10 +180,6 @@
 
   let ser = $state(xyz());
 
-  let idL;
-  let bearer1;
-  let token;
-
   let ucli = $state(0);
 
   let pcli = $state(0);
@@ -239,45 +235,7 @@
     slideTo(0);
   }
   let error1;
-  let miDatan = [];
-  const baseUrl = import.meta.env.VITE_URL;
 
-  let linkg = baseUrl + '/graphql';
-
-  function objToString(obj) {
-    let str = '';
-    for (let i = 0; i < obj.length; i++) {
-      let innerStr = '';
-      for (const [p, val] of Object.entries(obj[i])) {
-        if (
-          p === 'users_permissions_user' &&
-          typeof val === 'object' &&
-          val !== null &&
-          val.data &&
-          val.data.id
-        ) {
-          innerStr += `${p}:"${val.data.id}"\n`;
-        } else if (typeof val === 'string') {
-          innerStr += `${p}:"${val}"\n`;
-        } else if (typeof val === 'number' || typeof val === 'boolean') {
-          innerStr += `${p}:${val}\n`;
-        } else if (val === null) {
-          // Handle null values if needed, based on the desired output.
-          // The example output shows `why: null` is omitted, so we might omit it too.
-          // For now, let's explicitly include it as `key:null` if it's a direct null.
-          // If it's an array that was null, the original code had `val.map(c => c.id)`, which would error.
-          // Based on the example, `why: null` was just omitted.
-          // Let's omit nulls for now, as the example output doesn't show `why: null`.
-        }
-      }
-      if (innerStr.length > 0) {
-        str += `{${innerStr}},`;
-      }
-    }
-    return str;
-  }
-
-  const userss = objToString(users);
   $effect(() => {
     console.log('noofusersOk', noofusersOk, openMid);
   });
@@ -286,218 +244,100 @@
     noofusersOk += 1;
     noofusersWaiting -= 1;
     ser = xyz();
-    const d = new Date();
     const tafkidimsa = role.data.map((c) => c.id);
+    // Snapshot before push so action can correctly detect new-member status
+    const existingMemberIdsBefore = [...pid];
 
-    const sdate =
-      sqedualed !== undefined && sqedualed != null
-        ? `start: "${sqedualed}"`
-        : ``;
-    const date =
-      deadline !== undefined && deadline != null
-        ? ` admaticedai: "${deadline}"`
-        : ``;
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    console.log(idL);
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
-    let newnew = false;
-    console.log(pid);
-    if (pid.includes(userId)) {
-    } else {
-      newnew = true;
+    if (!pid.includes(userId)) {
       pid.push(userId);
       pid = pid;
     }
-    //add to pr users create missioninprogres, create welcom ballun;  first check for no of pr users and full consent ,(delete or save for refernce but put archive ) openM and asked
+
     if (noofpu === 1) {
-      console.log('agree, ecsepted');
-
       try {
-        const { createMesimabetahalich, afterMesimabetahalikhCreation } =
-          await import('$lib/utils/createMesimabetahalich.js');
-
-        miDatan = await createMesimabetahalich({
+        const result = await executeAction('finalizeJoinAcceptance', {
+          variant: 'solo',
           projectId,
           missId,
           openMid,
           askId,
-          userId,
-          currentUserId: idL,
+          acceptedUserId: userId,
+          acceptedUserName: useraplyname,
           openmissionName,
           missionDetails,
           nhours,
           valph,
           iskvua,
-          hearotMeyuchadot,
           privatlinks,
           publicklinks,
-          tafkidims: role.data,
-          deadline,
+          hearotMeyuchadot,
+          tafkidims: tafkidimsa,
           sqedualed,
+          deadline,
           timegramaId,
-          projectUserIds: pid,
-          userss: users,
-          newnew,
-          sendToSer
-        });
-
-        console.log(miDatan);
-
-        // Get project user data if new user for email
-        let projectUserData = null;
-        if (newnew) {
-          const projectData = await sendToSer(
-            { id: projectId },
-            '49GetProjectById',
-            null,
-            null,
-            false,
-            fetch
-          );
-          projectUserData =
-            projectData?.data?.project?.data?.attributes?.user_1s?.data;
-        }
-
-        await afterMesimabetahalikhCreation({
-          miDatan,
-          isNewUser: newnew,
-          iskvua,
-          sqedualed,
-          deadline,
-          userId,
-          currentUserId: idL,
-          useraplyname,
+          existingMemberIds: existingMemberIdsBefore,
+          existingVotes: users,
           projectName,
-          src2,
-          openmissionName,
-          lang: $lang,
-          sendToSer,
-          projectUserData
+          projectSrc: src2,
         });
-
-        onAcsept?.({
-          ani: 'asked',
-          coinlapach: coinlapach
-        });
+        if (result.success) {
+          onAcsept?.({ ani: 'asked', coinlapach: coinlapach });
+        } else {
+          error1 = result.error;
+        }
       } catch (e) {
         error1 = e;
         console.log(error1);
       }
     } else if (noofpu === noofusersOk) {
-      console.log('create new as above and add vote and archive asked');
-      //arcive all other asks
       try {
-        const { createMesimabetahalich, afterMesimabetahalikhCreation } =
-          await import('$lib/utils/createMesimabetahalich.js');
-
-        miDatan = await createMesimabetahalich({
+        const result = await executeAction('finalizeJoinAcceptance', {
+          variant: 'allVoted',
           projectId,
           missId,
           openMid,
           askId,
-          userId,
-          currentUserId: idL,
+          acceptedUserId: userId,
+          acceptedUserName: useraplyname,
           openmissionName,
           missionDetails,
           nhours,
           valph,
           iskvua,
-          hearotMeyuchadot,
           privatlinks,
           publicklinks,
-          tafkidims: role.data,
-          deadline,
+          hearotMeyuchadot,
+          tafkidims: tafkidimsa,
           sqedualed,
+          deadline,
           timegramaId,
-          projectUserIds: pid,
-          userss: users,
-          newnew,
-          sendToSer
-        });
-
-        console.log(miDatan);
-
-        // Get project user data if new user for email
-        let projectUserData = null;
-        if (newnew) {
-          const projectData = await sendToSer(
-            { id: projectId },
-            '49GetProjectById',
-            null,
-            null,
-            false,
-            fetch
-          );
-          projectUserData =
-            projectData?.data?.project?.data?.attributes?.user_1s?.data;
-        }
-
-        await afterMesimabetahalikhCreation({
-          miDatan,
-          isNewUser: newnew,
-          iskvua,
-          sqedualed,
-          deadline,
-          userId,
-          currentUserId: idL,
-          useraplyname,
+          existingMemberIds: existingMemberIdsBefore,
+          existingVotes: users,
           projectName,
-          src2,
-          openmissionName,
-          lang: $lang,
-          sendToSer,
-          projectUserData
+          projectSrc: src2,
         });
-
-        onAcsept?.({
-          ani: 'asked',
-          coinlapach: coinlapach
-        });
+        if (result.success) {
+          onAcsept?.({ ani: 'asked', coinlapach: coinlapach });
+        } else {
+          error1 = result.error;
+        }
       } catch (e) {
         error1 = e;
         console.log(error1);
       }
     } else {
-      console.log('just add vote to asked and update to not show for me again');
-      console.log(userss, users);
       try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation 
-                        {
-                            updateAsk(
-                         id: "${askId}" 
-                                data: { vots: [${userss}, 
-                                       {
-                                        what: true
-                                        users_permissions_user: "${idL}"
-                                        ide:${idL}
-                                        zman:"${d.toISOString()}"
-                                      }
-                                    ]}
-                        ){data{id}}
-                     
-                    }
-`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
-        onAcsept?.({
-          ani: 'asked',
-          coinlapach: coinlapach
+        const result = await executeAction('addVote', {
+          type: 'ask',
+          id: askId,
+          projectId: projectId,
+          existingComponentData: users
         });
+        if (result.success) {
+          onAcsept?.({ ani: 'asked', coinlapach: coinlapach });
+        } else {
+          error1 = result.error;
+        }
       } catch (e) {
         error1 = e;
         console.log(error1);
@@ -524,57 +364,26 @@
     noofusersNo += 1;
     noofusersWaiting -= 1;
     ser = xyz();
-    const declineda = (Array.isArray(declined) ? declined : []).map(
-      (c) => c.id
-    );
-    declineda.push(userId);
-    console.log('decline1');
 
-    // delete asked coin forever but keep asked on user ////matrix(1, 0, 0, 1, -61.718609, -47.72295)
     if (noofpu === 1) {
-      console.log('decline2');
-
-      const cookieValueId = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('id='))
-        .split('=')[1];
-      idL = cookieValueId;
-      console.log(idL);
-      token = page.data.tok;
-      bearer1 = 'bearer' + ' ' + token;
+      const existingDeclinedIds = (Array.isArray(declined) ? declined : []).map((c) => String(c.id));
       try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          //add already declined ids
-          body: JSON.stringify({
-            query: `mutation 
-                        { 
-updateOpenMission(
- id: "${openMid}"
-  data: {declined: [${declineda}]}
-) {data{id attributes{ declined {data{id}}}}}
-}
-`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
-        onDecline?.({
-          ani: 'asked',
-          coinlapach: coinlapach
+        const result = await executeAction('declineMissionRequest', {
+          openMissionId: String(openMid),
+          projectId: String(projectId),
+          declinedUserId: String(userId),
+          existingDeclinedIds,
         });
+        if (result.success) {
+          onDecline?.({ ani: 'asked', coinlapach });
+        } else {
+          error1 = result.error;
+        }
       } catch (e) {
         error1 = e;
-        console.log(error1);
       }
     } else if (noofpu > 1) {
-      console.log('if another uprove explain why you decline');
-      //todo
+      // TODO: multi-voter decline
     }
   }
   let hovered = $state(false);
@@ -614,12 +423,6 @@ updateOpenMission(
     console.log(why);
     let d = new Date();
     //  loading = true;
-
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
 
     try {
       const response = await fetch('/api/action', {
@@ -699,7 +502,7 @@ updateOpenMission(
     pendMisMes,
     initialForum
   } from '$lib/stores/pendMisMes.js';
-  import { sendToSer } from '$lib/send/sendToSer.js';
+  import { executeAction } from '$lib/client/actionClient';
   import NegoM from '../prPr/negoM.svelte';
   import { getProjectData } from '$lib/stores/projectStore.js';
   import { page } from '$app/state';

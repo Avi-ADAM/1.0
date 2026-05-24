@@ -14,7 +14,7 @@ function formatVotesForInline(votes: any[]): string {
     const order = attrs.order ?? 0;
     const ide = attrs.ide ?? uid;
     const zman = attrs.zman ?? new Date().toISOString();
-    return `{what:${what} users_permissions_user:"${uid}" order:${order} ide:"${ide}" zman:"${zman}"}`;
+    return `{what:${what} users_permissions_user:${uid} order:${order} ide:${ide} zman:"${zman}"}`;
   }).join(',');
 }
 
@@ -112,7 +112,7 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
 
     updateAsk(id: "${askId}", data: {
       archived: true,
-      vots: [${votesStr}${votesStr ? ',' : ''}{ what: true users_permissions_user: "${voterUserId}" }]
+      vots: [${votesStr}${votesStr ? ',' : ''}{ what: true users_permissions_user: ${voterUserId} }]
     }) { data { id } }
   }`;
 
