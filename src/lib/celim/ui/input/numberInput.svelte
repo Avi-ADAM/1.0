@@ -19,7 +19,8 @@
         notMin = true
     } = $props();
     $effect(() => {
-        if (value < 0 && notMin) value = 0
+        if (typeof value === 'string') value = parseFloat(/** @type {any} */(value)) || 0;
+        if (value < 0 && notMin) value = 0;
     });
 </script>
 

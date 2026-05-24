@@ -208,7 +208,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
         ...commonFields,
         isRishon: false,
         rishon: null,
-        archived: null,
+        archived: false,
       },
       context.jwt,
       context.fetch,

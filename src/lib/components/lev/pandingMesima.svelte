@@ -117,11 +117,7 @@
     onHover,
     onModal
   } = $props();
-  let miDatan = [];
   let error1;
-  let bearer1;
-  let token;
-  let idL;
   let no = $state(false);
   let masa = $state(false);
   let why = '';
@@ -206,203 +202,36 @@
     });
   }
 
-  function objToString(obj) {
-    let str = '';
-    for (let i = 0; i < obj.length; i++) {
-      const length = Object.keys(obj[i]).length;
-      let t = 0;
-      for (const [p, val] of Object.entries(obj[i])) {
-        const last = t === length - 1;
-        if (t == 0) {
-          str += '{';
-        }
-        t++;
-        if (typeof val == 'string') {
-          str += `${p}:"${val}"\n`;
-        } else if (typeof val == 'number' || typeof val == 'boolean') {
-          str += `${p}:${val}\n`;
-        } else if (typeof val == 'null' || typeof val === 'object') {
-          str += `${p}:${val?.data ? '"' + val?.data?.id + '"' : val}\n`;
-        } else {
-          str += `${p}:${val}\n`;
-        }
-        if (last) {
-          str += '},';
-        }
-        if (t == 0) {
-          str += '{';
-        }
-      }
-    }
-    return str;
-  }
-
-  function objToStringC(obj) {
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    let str = '';
-    for (let i = 0; i < obj.length; i++) {
-      if (obj[i].users_permissions_user.id == idL) {
-        obj[i].order = 1;
-      }
-      const length = Object.keys(obj[i]).length;
-      let t = 0;
-      for (const [p, val] of Object.entries(obj[i])) {
-        const last = t === length - 1;
-        t++;
-        if (typeof val == 'string') {
-          str += `${p}:"${val}"\n`;
-        } else if ((typeof val == 'number') | 'boolean') {
-          str += `${p}:${val}\n`;
-        } else if (typeof val == 'null') {
-          str += `${p}:${val.map((c) => c.id)}\n`;
-        }
-        if (last) {
-          str += '},';
-        }
-        if (t == 1) {
-          str += '{';
-        }
-      }
-    }
-    return str;
-  }
-  let whyy = ``;
   let allr = $state(false);
-  const baseUrl = import.meta.env.VITE_URL;
+  let forceRect = $state(false);
 
-  let linkg = baseUrl + '/graphql';
-  let userss = objToString(users);
   async function agree(alr) {
-    let d = new Date();
+    // Optimistic UI update
     if (alr == 'alr') {
       allr = true;
       already = true;
       noofusersOk += 1;
       noofusersNo -= 1;
       ser = xyz();
-      userss = objToStringC(users);
     } else {
       already = true;
       noofusersOk += 1;
       noofusersWaiting -= 1;
       ser = xyz();
     }
-    const date =
-      mdate !== undefined && mdate !== null ? ` sqadualed: "${mdate}"` : ``;
-    const dates =
-      mdates !== undefined && mdates !== null ? ` dates: "${mdates}"` : ``;
 
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
-    if (noofusersOk === noofusers) {
-      const skillsa = (skills?.data || skills)?.map((c) => c.id) || [];
-      const tafkidimsa = (tafkidims?.data || tafkidims)?.map((c) => c.id) || [];
-      const workwaysa = (workways?.data || workways)?.map((c) => c.id) || [];
-      const valluesa = (vallues?.data || vallues)?.map((c) => c.id) || [];
-      try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body:
-            //TODO: isMust isYesod isshift howMeny
-            JSON.stringify({
-              query: `mutation { createOpenMission(
-      data: {project: "${projectId}",
-             mission:  "${missionId}",
-             iskvua: ${isKavua},
-             work_ways: [${workwaysa}],
-             hearotMeyuchadot: """${hearotMeyuchadot}""",
-             name: "${name}",
-                     publishedAt: "${d.toISOString()}",
-             descrip: """${descrip}""",
-             skills: [${skillsa}], 
-             tafkidims: [${tafkidimsa}],
-             vallues:  [${valluesa}],
-             noofhours: ${noofhours},
-             perhour: ${perhour},   
-             privatlinks: """${privatlinks}""",
-             publicklinks: """${publicklinks}""",
-             ${date} 
-             ${dates}
-    }
-  ) {data{attributes {project{data{ id} }}}}
-  updatePendm(
-   id: ${pendId}
-      data: { users:[  ${userss}, 
-
-     {
-      what: true
-      users_permissions_user: "${idL}"
-      order: ${ordern}
-      ide: ${idL}
-      zman: "${d.toISOString()}"
-    }
-  ],
- archived: true
- }
-  ){data{attributes{ users { users_permissions_user {data{ id}}}}}}
- } `
-              //update pendm add consent from second and  archived,,, make coin desapire
-            })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
+    try {
+      const result = await executeAction('voteOnPendm', {
+        pendId: String(pendId),
+        projectId: String(projectId),
+        what: true,
+      });
+      if (result.success && result.data?.consensus) {
         coinLapach();
-      } catch (e) {
-        error1 = e;
-        console.log(error1);
-        toast.warning(er[$lang]);
       }
-
-      console.log('will create mission');
-    } else {
-      console.log('will add vote');
-      try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation { updatePendm(
-     id: ${pendId}
-      data: { users:[  ${userss}, 
-
-     {
-      what: true
-      users_permissions_user: "${idL}"
-      order:${ordern}
-      ide: ${idL}
-      zman:"${d.toISOString()}"
-    }
-  ]}
-  ){data {attributes{ users { users_permissions_user{data { id}}}}}}
- } `
-            // make coin desapire
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
-      } catch (e) {
-        error1 = e;
-        console.log(error1);
-        toast.warning(er[$lang]);
-      }
+    } catch (e) {
+      error1 = e;
+      toast.warning(er[$lang]);
     }
   }
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
@@ -412,6 +241,7 @@
     masa = false;
     diunm = true;
     loading = false;
+    forceRect = true;
     isOpen = true;
   }
   let masaalr = $state(false);
@@ -431,78 +261,47 @@
     }
   }
 
-  let archivedtru = ``;
-
   function decline(alr) {
     if (alr == 'alr') {
+      // Changing vote from YES → NO immediately (no dialog needed)
       allr = true;
-      isOpen = true;
+      isOpen = false;
       already = true;
       noofusersNo += 1;
       noofusersOk -= 1;
       ser = xyz();
-      userss = objToStringC(users);
-      //  ordern = `order: 2`
-      if (noofusersNo === noofusers) {
-        archivedtru = `archived: true,`;
-      }
-      afterwhy();
+      afterwhy(); // fire without event (no why text)
     } else {
+      // First-time NO vote: open dialog to enter reason
       already = true;
       no = true;
       diunm = true;
       isOpen = true;
     }
   }
+
   async function afterwhy(event) {
-    if (event) {
-      why = event.why;
-      whyy = `why: "${why}"`;
-    }
+    const whyText = event?.why ?? '';
     loading = true;
     noofusersNo += 1;
     noofusersWaiting -= 1;
     ser = xyz();
 
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
     try {
-      await fetch(linkg, {
-        method: 'POST',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `mutation { updatePendm(
-     id: ${pendId}
-      data: { 
-       ${archivedtru}
-        users:[  ${userss}, 
-     {
-      what: false
-      ${whyy}
-      users_permissions_user: "${idL}"
-    }
-  ]}
-  ){data {attributes{ users { users_permissions_user{data { id}}}}}}
-} `
-          // make coin desapire
-        })
-      })
-        .then((r) => r.json())
-        .then((data) => (miDatan = data));
-      console.log(miDatan);
-      coinLapach();
+      const result = await executeAction('voteOnPendm', {
+        pendId: String(pendId),
+        projectId: String(projectId),
+        what: false,
+        ...(whyText ? { why: whyText } : {}),
+      });
+      loading = false;
+      if (result.success) {
+        coinLapach();
+      }
     } catch (e) {
       error1 = e;
+      loading = false;
       toast.warning(er[$lang]);
-      console.log(error1);
     }
   }
   const close = () => {
@@ -517,6 +316,7 @@
     no = false;
     masa = false;
     allr = false;
+    forceRect = false;
   };
 
   function afternego(event) {
@@ -534,64 +334,31 @@
     isOpen = true;
   }
   async function afreact(event) {
-    let diunim = ``;
-    if (diun !== null) {
-      const diu = objToString(diun);
-      diunim = `${diu}`;
-    }
     why = event.why;
-    console.log(why);
-    let d = new Date();
-    //  loading = true;
-
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
-    let dataa = {
-      data: {
-        diun: [
-          ...diun,
-          {
-            what: mypos,
-            users_permissions_user: idL,
-            why: why,
-            order: (order += 1),
-            zman: d.toISOString(),
-            ide: idL
-          }
-        ]
-      }
+    const diunEntry = {
+      what: mypos,
+      users_permissions_user: page.data.id,
+      why,
+      order: (order += 1),
+      zman: new Date().toISOString(),
+      ide: page.data.id
     };
+
     try {
-      await fetch(`${baseUrl}/api/pendms/${pendId}?populate=*`, {
-        method: 'PUT',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(dataa)
-      })
-        .then((r) => r.json())
-        .then((data) => (miDatan = data));
-      console.log(miDatan);
-      nowId.set(
-        miDatan.data.attributes.diun[miDatan.data.attributes.diun.length - 1].id
-      );
-      diun.push({
+      const result = await executeAction('addDiunEntry', {
+        entityType: 'pendm',
+        entityId: String(pendId),
+        projectId: String(projectId),
         what: mypos,
-        users_permissions_user: idL,
-        why: why,
-        order: (order += 1),
-        zman: d.toISOString(),
-        ide: idL
+        why,
       });
-      diun = diun;
-      clicked = false;
-      //   loading = false;
+      if (result.success) {
+        const newDiunId = result.data?.newDiunId;
+        if (newDiunId) nowId.set(newDiunId);
+        diun.push(diunEntry);
+        diun = diun;
+        clicked = false;
+      }
     } catch (e) {
       error1 = e;
       console.log(error1);
@@ -699,6 +466,7 @@
   import { toast } from 'svelte-sonner';
   import { Drawer } from 'vaul-svelte';
   import { page } from '$app/state';
+  import { executeAction } from '$lib/client/actionClient';
 
   function claf(event) {
     let o = event.alr;
@@ -794,7 +562,7 @@
               onNo={afterwhy}
               {no}
               bind:clicked
-              rect={noofusersOk > 0 && noofusersNo > 0 ? true : false}
+              rect={forceRect || (noofusersOk > 0 && noofusersNo > 0)}
               smalldes={projectName}
               nameChatPartner={`הצבעה על ${name}`}
               {mypos}
