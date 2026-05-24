@@ -79,9 +79,18 @@
       action="?/login"
       use:enhance={() => {
         active = true;
-        return async ({ update }) => {
-          await update();
-          active = false;
+        return async ({ result, update }) => {
+          if (result.type === 'redirect') {
+            // Use a full browser navigation so the new auth cookies are
+            // included in the next request. Client-side goto() can race
+            // against the browser storing the Set-Cookie headers from the
+            // action response, causing the layout server guard to see no
+            // token and redirect straight back to /login.
+            window.location.href = result.location;
+          } else {
+            await update();
+            active = false;
+          }
         };
       }}
       in:fade
