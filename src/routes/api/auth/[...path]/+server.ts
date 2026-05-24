@@ -38,8 +38,8 @@ function buildCookieOptions() {
   return {
     path: '/',
     expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-    secure: isProduction, // required for sameSite: 'none'
-    sameSite: (isProduction ? 'none' : 'lax') as 'none' | 'lax',
+    secure: isProduction,
+    sameSite: 'lax' as const,
     domain: isProduction ? '.1lev1.com' : undefined // subdomain support only in production
   };
 }

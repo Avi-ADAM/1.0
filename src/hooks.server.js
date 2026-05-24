@@ -73,7 +73,17 @@ export async function handle({ event, resolve }) {
   event.locals.uid = event.cookies.get('id') || false;
   event.locals.un = event.cookies.get('un') || false;
   event.locals.email = event.cookies.get('email') || false;
-  console.log(lang,event.url.pathname)
+
+  // Temporary auth debug — remove once cookie issue is confirmed resolved.
+  const authRoutes = ['/onboard', '/lev', '/moach', '/forum', '/me'];
+  if (authRoutes.some(r => event.url.pathname.startsWith(r))) {
+    const rawCookie = event.request.headers.get('cookie') ?? '(none)';
+    const hasTok = !!event.locals.tok;
+    const hasId  = !!event.locals.uid;
+    console.log(`[auth-debug] ${event.url.pathname} | jwt=${hasTok} id=${hasId} | raw-cookie-header: ${rawCookie.slice(0, 200)}`);
+  }
+
+  console.log(lang, event.url.pathname);
   // Set language cookie based on URL path
   if (event.url.pathname === '/en' || event.url.pathname === '/ar' || event.url.pathname === '/he') {
     event.cookies.set('lang', lang, { path: '/' });
