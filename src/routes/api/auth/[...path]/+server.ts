@@ -33,15 +33,19 @@ const ALLOWED: Record<string, AuthAction> = {
   'send-email-confirmation': { requiresAuth: false, setsSession: false }
 };
 
-function buildCookieOptions() {
+function buildCookieOptions(hostname: string) {
   const isProduction = import.meta.env.PROD;
-  // No domain attribute → host-only cookies, accepted by all browsers.
-  // JWT is NOT httpOnly so the socket client can read it from document.cookie.
+  // Scope to .1lev1.com so socket.1lev1.com receives the JWT during the
+  // (same-site) WebSocket handshake — but only when actually served from a
+  // 1lev1.com host. On a non-matching origin (e.g. a *.vercel.app preview) the
+  // browser rejects a .1lev1.com cookie, so fall back to a host-only cookie.
+  const onOwnDomain = hostname === '1lev1.com' || hostname.endsWith('.1lev1.com');
   return {
     path: '/',
     expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
     secure: isProduction,
-    sameSite: 'lax' as const
+    sameSite: 'lax' as const,
+    domain: onOwnDomain ? '.1lev1.com' : undefined
   };
 }
 
@@ -50,7 +54,7 @@ type StrapiAuthResult = {
   user?: { id?: number | string; username?: string; name?: string; email?: string };
 };
 
-export const POST: RequestHandler = async ({ params, request, cookies, fetch }) => {
+export const POST: RequestHandler = async ({ params, request, cookies, fetch, url }) => {
   const path = (params.path ?? '').replace(/^\/+|\/+$/g, '');
   const action = ALLOWED[path];
 
@@ -98,8 +102,8 @@ export const POST: RequestHandler = async ({ params, request, cookies, fetch }) 
 
     // Persist a returned JWT server-side and strip it from the client payload.
     if (action.setsSession && data?.jwt) {
-      const opts = buildCookieOptions();
-      cookies.set('jwt', data.jwt, { ...opts, httpOnly: false });
+      const opts = buildCookieOptions(url.hostname);
+      cookies.set('jwt', data.jwt, { ...opts, httpOnly: true });
 
       if (data.user) {
         if (data.user.id != null) {

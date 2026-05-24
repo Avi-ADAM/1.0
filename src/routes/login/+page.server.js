@@ -1,7 +1,7 @@
 const baseUrl = import.meta.env.VITE_URL;
 
 export const actions = {
-    login: async ({ request, cookies }) => {
+    login: async ({ request, cookies, url }) => {
         const data = await request.formData();
         const email = data.get('email');
         const password = data.get('password');
@@ -27,15 +27,19 @@ export const actions = {
 
             const isProduction = import.meta.env.PROD;
 
-            // No domain attribute → host-only cookies, stored by every browser.
-            // sameSite: 'lax' is sufficient for same-site cross-subdomain requests.
-            // JWT is NOT httpOnly so the socket client can read it from document.cookie
-            // and pass it to socket.1lev1.com during the WebSocket handshake.
+            // Scope the cookie to .1lev1.com so socket.1lev1.com receives the JWT
+            // during the (same-site) WebSocket handshake — this is the config that
+            // has worked for years. But ONLY when actually served from a 1lev1.com
+            // host: on a non-matching origin (e.g. a *.vercel.app preview) the
+            // browser silently rejects a .1lev1.com cookie, so we fall back to a
+            // host-only cookie there.
+            const onOwnDomain = url.hostname === '1lev1.com' || url.hostname.endsWith('.1lev1.com');
             const cookieOptions = {
                 path: '/',
                 expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
                 secure: isProduction,
-                sameSite: /** @type {'lax'} */ ('lax')
+                sameSite: /** @type {'lax'} */ ('lax'),
+                domain: onOwnDomain ? '.1lev1.com' : undefined
             };
 
             // Clean up any zombie cookies from previous sessions that had explicit
@@ -53,7 +57,7 @@ export const actions = {
                 }
             }
 
-            cookies.set('jwt', jwt,                          { ...cookieOptions, httpOnly: false });
+            cookies.set('jwt', jwt,                          { ...cookieOptions, httpOnly: true  });
             cookies.set('id',  String(user.id),              { ...cookieOptions, httpOnly: false });
             cookies.set('un',  user.name || user.username,   { ...cookieOptions, httpOnly: false });
             cookies.set('when', Date.now().toString(),        { ...cookieOptions, httpOnly: false });
