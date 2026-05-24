@@ -39,41 +39,31 @@ console.log('Message received. ', payload);
 
   /** @type {Props} */
   let { data, children } = $props();
-let isAuthed = $state(false);
+// isAuthed is derived synchronously from server data so there is no
+// flash of the login wall after a successful login redirect.
+let isAuthed = $state(!!data.tok);
 let token;
 onMount(async () => {
-
+    // Check session expiry via the 'when' cookie
     const cookieRe = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('when='))
-  if (cookieRe != null) {
-  const cookieR = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('when='))
-  .split('=')[1];
-  const today = Date.now()
-  if(new Date(cookieR +2592000000) < today ){
-    goto("login")
-  }
-  }
-    if (data.tok){
-      console.log("auted")
-    isAuthed = true
-    initialForum(true,[],data.uid)
-    console.log(data.uid,$forum)
-    initialWebS(data.tok,data.uid)
-    initialWebSP(data.tok,data.uid)
+      .split('; ')
+      .find(row => row.startsWith('when='));
+    if (cookieRe != null) {
+      const cookieR = cookieRe.split('=')[1];
+      const today = Date.now();
+      if (new Date(+cookieR + 2592000000) < today) {
+        goto('/login');
+        return;
+      }
+    }
 
-} else {
-   // jwt is httpOnly now; rely on server-provided token or the 'when' cookie for auth flag
-  const cookieT = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('when='))
-    ?.split('=')[1];
-  if (cookieT != null) {
-    isAuthed = true;
-  }
-}
+    if (data.tok) {
+      console.log('authed');
+      initialForum(true, [], data.uid);
+      console.log(data.uid, $forum);
+      initialWebS(data.tok, data.uid);
+      initialWebSP(data.tok, data.uid);
+    }
 });
 function reg (){
   if ($lang && $lang == "he"){
