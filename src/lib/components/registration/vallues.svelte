@@ -47,7 +47,8 @@
       })
       .filter(Boolean);
     if (mapped.length === 0) return;
-    selected = mapped;
+    // Deduplicate to prevent each_key_duplicate inside svelte-multiselect
+    selected = [...new Set(mapped)];
     // Mark complete only when every requested ID was resolved so we retry
     // after the Strapi fetch if some IDs were missing from the local JSON.
     if (mapped.length === ids.length) seedComplete = true;
@@ -90,7 +91,7 @@
       })
         .then(checkStatus)
         .then(parseJSON);
-      const freshVallues = res.data.vallues.data;
+      let freshVallues = res.data.vallues.data;
       if ($lang == 'he') {
         for (var i = 0; i < freshVallues.length; i++) {
           if (freshVallues[i].attributes.localizations?.data?.length > 0) {
@@ -99,6 +100,16 @@
           }
         }
       }
+      // Deduplicate by valueName so the options array never contains duplicate
+      // strings — svelte-multiselect uses option values as keys and throws
+      // each_key_duplicate when two items share the same display name.
+      const seen = new Set();
+      freshVallues = freshVallues.filter((v) => {
+        const name = v.attributes?.valueName;
+        if (!name || seen.has(name)) return false;
+        seen.add(name);
+        return true;
+      });
       // Updating vallues triggers the $effect above to re-seed only if
       // seedComplete is still false (i.e. some IDs were absent from local JSON
       // because they were just created during the CV review step).
@@ -175,7 +186,7 @@
       id
       attributes {
         valueName
-      } 
+      }
 
        }
     }
@@ -184,7 +195,18 @@
           })
             .then((r) => r.json())
             .then((data) => (meData = data));
-          const newOb = meData.data.createVallue.data;
+          // Guard: GraphQL might return errors instead of data
+          const newOb = meData?.data?.createVallue?.data;
+          if (!newOb) {
+            console.warn('[vallues] createVallue returned no data', meData?.errors);
+            continue;
+          }
+          // Avoid duplicates — the item may already be in the list if it was
+          // fetched from Strapi concurrently or created in a previous call.
+          const alreadyExists = vallues.some(
+            (v) => v.id == newOb.id || v.attributes?.valueName === newOb.attributes?.valueName
+          );
+          if (alreadyExists) continue;
           const newValues = vallues;
           newValues.push(newOb);
 
@@ -282,7 +304,7 @@
     bind:searchText={ugug}
     bind:selected
     {placeholder}
-    options={vallues.map((c) => c.attributes.valueName)}
+    options={[...new Set(vallues.map((c) => c.attributes.valueName).filter(Boolean))]}
   />
 </div>
 
@@ -397,17 +419,19 @@
     grid-row: 5 / 6;
     text-align: center;
   }
+  /* Dropdown opens DOWNWARD so it stays on-screen on mobile.
+     z-index is kept high so it floats above the sticky navigation buttons. */
   :global(.input-2 .options) {
-    bottom: 100% !important;
-    top: auto !important;
-    margin-top: 0 !important;
-    margin-bottom: 5px !important;
-    max-height: 30vh !important;
+    top: 100% !important;
+    bottom: auto !important;
+    margin-top: 5px !important;
+    margin-bottom: 0 !important;
+    max-height: 40vh !important;
     overflow-y: auto !important;
     z-index: 9999 !important;
     background: var(--gold) !important;
     border: 2px solid var(--barbi-pink) !important;
     border-radius: 12px !important;
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18) !important;
   }
 </style>

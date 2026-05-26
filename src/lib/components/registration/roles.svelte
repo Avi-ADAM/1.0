@@ -77,18 +77,26 @@
       })
         .then(checkStatus)
         .then(parseJSON);
-      roles1 = res.data.tafkidims.data;
+      let freshRoles = res.data.tafkidims.data;
       if ($lang == 'he') {
-        for (var i = 0; i < roles1.length; i++) {
-          if (roles1[i].attributes.localizations.data.length > 0) {
-            roles1[i].attributes.roleDescription =
-              roles1[
+        for (var i = 0; i < freshRoles.length; i++) {
+          if (freshRoles[i].attributes.localizations.data.length > 0) {
+            freshRoles[i].attributes.roleDescription =
+              freshRoles[
                 i
               ].attributes.localizations.data[0].attributes.roleDescription;
           }
         }
       }
-      roles1 = roles1;
+      // Deduplicate by roleDescription to prevent each_key_duplicate in MultiSelect
+      const seenR = new Set();
+      freshRoles = freshRoles.filter((r) => {
+        const name = r.attributes?.roleDescription;
+        if (!name || seenR.has(name)) return false;
+        seenR.add(name);
+        return true;
+      });
+      roles1 = freshRoles;
 
       // טעינת התפקידים שנבחרו בעבר
       const currentRoles = $roles2;
@@ -249,7 +257,7 @@
     bind:searchText={ugug}
     bind:selected
     {placeholder}
-    options={roles1.map((c) => c.attributes.roleDescription)}
+    options={[...new Set(roles1.map((c) => c.attributes.roleDescription).filter(Boolean))]}
   />
 </div>
 <button class="button-in-1-2" onclick={back}>

@@ -292,7 +292,10 @@
 
     <!-- STEP CONTENT -->
     <div class="steps-area">
-      {#if show_value === 0}
+      {#if show_value === 0 && mode !== 'onboarding'}
+        <!-- Step 0 (Hello/greeting) is registration-only.
+             In onboarding mode the manual/+page.svelte onMount guards
+             against show < 1, so this branch is never reached. -->
         <div
           class="step-wrap"
           in:fly={{

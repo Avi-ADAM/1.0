@@ -44,10 +44,14 @@
       // ignore — Bein will simply start empty
     }
 
-    // Only start from step 1 on a fresh entry. If we're already inside the
-    // wizard (e.g. user navigated back via browser, or refreshed mid-flow),
-    // keep them on the current step instead of resetting.
-    if (get(show) === 0) {
+    // Keep the current step if mid-wizard (steps 1-4 are valid for onboarding).
+    // Reset to 1 if:
+    //  • show === 0  →  fresh entry
+    //  • show > 4   →  stale value left over from the registration flow
+    //                  (steps 5 / 6 are registration-only and would show the
+    //                  wrong screen or auto-redirect away)
+    const currentShow = get(show);
+    if (currentShow < 1 || currentShow > 4) {
       show.set(1);
     }
   });
