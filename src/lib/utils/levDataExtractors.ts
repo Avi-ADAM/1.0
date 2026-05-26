@@ -1077,6 +1077,7 @@ export function extractAskedResources(userData: any): AskedResourceData[] {
         deadline: omData.sqadualed,
         openName: omData.name,
         omid: askAttributes.open_mashaabim?.data?.id,
+        pmashId: askAttributes.pmash?.data?.id,
         askId: askm.id,
         // Voting and user info
         users: askAttributes.vots || [],

@@ -11,6 +11,7 @@
   import { formatTime } from './utils.js';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { goto } from '$app/navigation';
+  import { page } from '$app/state';
   import { idPr } from '../../stores/idPr.js';
   import { onMount, onDestroy } from 'svelte';
   import { betha } from './storess/betha.js';
@@ -649,6 +650,26 @@
       toast.warning(`${er[$lang]}`, { description: e.message });
     }
   }
+  async function valiIshor(id) {
+    try {
+      const result = await executeAction('updateTask', {
+        id: String(id),
+        projectId: String(projectId),
+        valiIshur: true
+      });
+      if (result.success) {
+        toast.success(suc[$lang]);
+        // Final approval — task fully done, remove from list
+        localTasks = localTasks.filter((t) => t.id != id);
+        op = {};
+      } else {
+        toast.warning(er[$lang]);
+      }
+    } catch (e) {
+      console.error(e);
+      toast.warning(`${er[$lang]}`, { description: e.message });
+    }
+  }
   async function updStat(id, st, i) {
     try {
       const result = await executeAction('updateTask', {
@@ -733,8 +754,13 @@
   let rotation = $derived(((lapse / 1000 / 60) * 360) % 360);
   let op = $state({});
   let msdonf = $derived(hoursdon * 3600000);
-  // Local mutable copy of tasks for optimistic UI updates
+  // Local mutable copy of tasks for optimistic UI updates.
+  // For the sender: tasks prop doesn't change (excludeSender:true) → optimistic update persists.
+  // For receivers: levSocketHandler updates mtahaStore → tasks prop changes → $effect syncs here.
   let localTasks = $state([...tasks]);
+  $effect(() => {
+    localTasks = [...tasks];
+  });
 </script>
 
 <TimerDialogs
@@ -983,14 +1009,37 @@
                       {/if}
                     {/key}
 
-                    <!-- Approval / Done button -->
+                    <!-- Approval / Done / Validate button -->
                     <div class="flex pt-0.5">
-                      {#if task.attributes.myIshur == false}
+                      {#if task.attributes.naasa === true}
+                        {#if String(task.attributes.vali?.data?.id) === String(page.data.uid)}
+                          <!-- Current user is the validator → can give final approval -->
+                          <button
+                            onclick={() => valiIshor(task.id)}
+                            class="flex-1 py-1.5 text-xs font-bold bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 transition-all flex items-center justify-center gap-1"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24">
+                              <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                            {$locale === 'he' ? 'אשר סיום' : 'Approve'}
+                          </button>
+                        {:else}
+                          <!-- Waiting for validator -->
+                          <span class="flex-1 py-1.5 text-xs text-center text-amber-600 bg-amber-50 border border-amber-200 rounded-lg font-medium flex items-center justify-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24">
+                              <path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                            </svg>
+                            {$locale === 'he' ? 'ממתין לאישור' : 'Pending approval'}
+                          </span>
+                        {/if}
+                      {:else if task.attributes.myIshur == false}
+                        <!-- Assignee hasn't confirmed yet -->
                         <button
                           onclick={() => taskishor(task.id)}
                           class="flex-1 py-1.5 text-xs font-semibold border-2 border-gray-300 text-gray-600 rounded-lg hover:border-purple-500 hover:text-purple-700 transition-all bg-white"
                         >{ishur[$lang]}</button>
                       {:else}
+                        <!-- Assignee confirmed → can mark as done -->
                         <button
                           onclick={() => busabe(task.id)}
                           class="flex-1 py-1.5 text-xs font-bold bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-lg hover:from-green-600 hover:to-teal-600 transition-all"

@@ -575,6 +575,8 @@
             missId={buble.missId}
             id={buble.id}
             openMid={buble.omid}
+            isRishon={buble.isSelfProposal}
+            pmashId={buble.pmashId}
             stylef={buble.stylef}
             st={buble.st}
             declined={buble.decid}

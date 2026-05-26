@@ -1,66 +1,39 @@
-<script>
+שי<script>
     import { fly } from 'svelte/transition';
 import { Confetti } from "svelte-confetti"
 import { lang } from '$lib/stores/lang.js';
 import {
     idPr
 } from './../../stores/idPr.js';
+import { executeAction } from '$lib/client/actionClient';
 let error1
 import {
     goto } from '$app/navigation';
   let {
     onHover,
     id,
+    welcomId,
+    coinlapach,
+    onCoinLapach,
     username,
     projectName,
     projectSrc
   } = $props();
  // import { height } from '@event-calendar/common';
 let confe = $state(false)
-const baseUrl = import.meta.env.VITE_URL
 
 async function project(id) {
     confe = false
     confe = true
     idPr.set(id);
     goto("/moach",);
-        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-        const checkStatus = (resp) => {
-        if (resp.status >= 200 && resp.status < 300) {
-          return resp;
-        }
-        return parseJSON(resp).then((resp) => {
-          throw resp;
-        });
-      };
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-    
-        try {
-            const res = await fetch(baseUrl+"/graphql", {
-              method: "POST",
-              headers: {
-                 'Content-Type': 'application/json'
-              },body: JSON.stringify({
-                        query: `mutation { updateWelcomTop(
-    id:${id} 
-      data: { clicked: true }
-    
-  ){
-      data {
-        id
-      }
-  }
-  }
-              `})
-            }).then(checkStatus)
-          .then(parseJSON);
-           let idv = res.data.id;
-           console.log(idv)
-                    } catch (e) {
-            error1 = e
-        }
+    const result = await executeAction('updateWelcomeCard', { id: welcomId, clicked: true });
+    if (result.success) {
+        onCoinLapach?.({ coinlapach });
+    } else {
+        error1 = result.error;
+        console.error('Error updating welcome card:', result.error);
+    }
     //make it desapire for good
 };
 let hovered = $state(false);

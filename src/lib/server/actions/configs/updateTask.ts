@@ -109,8 +109,7 @@ export const updateTaskAction: ActionConfig = {
   updateStrategy: {
     type: 'partialUpdate',
     config: {
-      dataKeys: ['arr1'], // Update task list in user's arr1
-      updateFunction: 'refreshTaskList'
+      dataKeys: ['tasks'] // task update — handled by levSocketHandler + component subscription
     }
   }
 };

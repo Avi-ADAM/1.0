@@ -64,30 +64,17 @@ const voteOnMaapHandler: ActionExecutionHandler = async (params, context, { stra
   const sp = attrs.sp?.data;
   const om = attrs.open_mashaabim?.data;
 
-  if (!sp) throw new Error(`Maap ${askId} has no associated Sp`);
-  if (!om) throw new Error(`Maap ${askId} has no associated OpenMashaabim`);
+  if (!sp) throw new Error(`Maap ${askId} has no associated Sp — cannot proceed`);
+  // om (open_mashaabim) is optional: some Maaps come from Pmash/Sherut flows and have no om.
+  // If present → full Rikmash with om data.
+  // If absent but sp present → Rikmash with Sp+Maap data only (no open_mashaabim link).
 
   const spId: string = sp.id;
-  const openMid: string = om.id;
 
   // Fields from Sp
   const myp: number = sp.attributes?.myp ?? 0;
   const hm: number = sp.attributes?.unit ?? 1;
   const applicantId: string = String(sp.attributes?.users_permissions_user?.data?.id ?? '');
-
-  // Fields from OpenMashaabim
-  const omAttrs = om.attributes ?? {};
-  const easy: number = omAttrs.easy ?? 0;
-  const price: number = omAttrs.price ?? 0;
-  const kindOf: string = omAttrs.kindOf ?? 'total';
-  const spnot: string = omAttrs.spnot ?? '';
-  const missionBName: string = (omAttrs.name ?? '').replace(/"/g, '\\"');
-  const sqadualed: string | undefined = omAttrs.sqadualed;
-  const sqadualedf: string | undefined = omAttrs.sqadualedf;
-
-  // Compute agreed price and total server-side
-  const agprice = (myp + easy) / 2;
-  const total = computeTotal(kindOf, agprice, hm, sqadualed, sqadualedf);
 
   // 2. Fetch project members for quorum
   const projectRes = await strapi.execute('3projectJSONQue', { pid: projectId }, context.jwt, context.fetch);
@@ -125,6 +112,23 @@ const voteOnMaapHandler: ActionExecutionHandler = async (params, context, { stra
 
     if (yesCount >= totalMembers && totalMembers > 0) {
       // ── Full YES consensus: create Rikmash + archive Maap + mark Sp.panui=false ──────
+      // om (open_mashaabim) may be absent on Maaps created from Pmash/Sherut flows;
+      // in that case we fall back to Sp data + Maap name. No om = no open_mashaabim link.
+
+      const omAttrs = om?.attributes ?? {};
+      const easy: number = omAttrs.easy ?? 0;
+      const price: number = omAttrs.price ?? 0;
+      const kindOf: string = omAttrs.kindOf ?? 'total';
+      const spnot: string = omAttrs.spnot ?? '';
+      // Prefer om.name; fall back to the Maap's own name field
+      const missionBName: string = ((omAttrs.name ?? attrs.name ?? '') as string).replace(/"/g, '\\"');
+      const sqadualed: string | undefined = omAttrs.sqadualed;
+      const sqadualedf: string | undefined = omAttrs.sqadualedf;
+
+      // agprice: average of applicant offer (myp) and project offer (easy).
+      // Without om, easy=0 so agprice = myp/2 would be wrong — use myp directly.
+      const agprice = om ? (myp + easy) / 2 : myp;
+      const total = computeTotal(kindOf, agprice, hm, sqadualed, sqadualedf);
 
       const strapiUrl = process.env.VITE_URL ?? 'https://tovmeod.1lev1.com';
       const graphqlUrl = `${strapiUrl}/graphql`;
@@ -142,7 +146,8 @@ const voteOnMaapHandler: ActionExecutionHandler = async (params, context, { stra
         })
         .join(',');
 
-      // Optional date fragments
+      // Optional fragments — omit fields that have no data
+      const openMidFrag = om ? `open_mashaabim: "${om.id}",` : '';
       const sqadualedFrag = sqadualed
         ? `sqadualed: "${new Date(sqadualed).toISOString()}",`
         : '';
@@ -161,9 +166,9 @@ const voteOnMaapHandler: ActionExecutionHandler = async (params, context, { stra
           agprice: ${agprice},
           project: "${projectId}",
           hm: ${hm},
-          open_mashaabim: "${openMid}",
+          ${openMidFrag}
           spnot: """${spnot.replace(/"""/g, '"')}""",
-          maap: "${askId}",
+          maaps: ["${askId}"],
           users_permissions_user: "${applicantId}",
           sp: "${spId}",
           ${sqadualedFrag}

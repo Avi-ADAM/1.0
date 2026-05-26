@@ -9,6 +9,7 @@
   import { idPr } from './../../stores/idPr.js';
   import { onMount } from 'svelte';
   import moment from 'moment';
+  import { executeAction } from '$lib/client/actionClient';
   let dialogOpen = $state(false);
   /**
    * @typedef {Object} Props
@@ -109,10 +110,6 @@
   } = $props();
   let resP = [];
   let lang;
-
-  let idL;
-  let bearer1;
-  let token;
   import { Swiper, SwiperSlide } from 'swiper/svelte';
 
   // Import Swiper styles
@@ -142,13 +139,8 @@
     slideTo(0);
   }
   let error1;
-  let miDatan = [];
-  const baseUrl = import.meta.env.VITE_URL;
-
-  let linkg = baseUrl + '/graphql';
 
   let monts = $state(0);
-  let total;
   let yers = $state();
 
   function percentage(partialValue, totalValue) {
@@ -228,150 +220,24 @@
     monts = a.diff(b, 'months', true).toFixed(2);
   });
 
-  function objToString(obj) {
-    let str = '';
-    for (let i = 0; i < obj.length; i++) {
-      for (const [p, val] of Object.entries(obj[i])) {
-        if ((typeof val == 'string') | 'number' | 'boolean') {
-          str += `{${p}:${val}\n},`;
-        } else if (typeof val == 'null') {
-          str += `{${p}:${val.map((c) => c.id)}\n},`;
-        }
-      }
-    }
-    return str;
-  }
-  const userss = objToString(users);
-
   async function agree() {
-    let d = new Date();
+    // Optimistic UI update
     already = true;
     noofusersOk += 1;
     noofusersWaiting -= 1;
     ser = xyz();
-    if (kindOf === 'perUnit') {
-      total = agprice * hm;
-    } else if (kindOf === 'total' || kindOf === 'rent') {
-      total = agprice;
-    } else if (kindOf === 'monthly') {
-      total = agprice * monts;
-    } else if (kindOf === 'yearly') {
-      total = agprice * yers;
-    }
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
-    uids.push(userId);
-    uids = uids;
-    console.log(uids);
-    const date =
-      sqadualed !== undefined
-        ? `sqadualed: "${new Date(sqadualed).toISOString()}",`
-        : ``;
-    const sdate =
-      sqadualedf !== undefined
-        ? `sqadualef: "${new Date(sqadualedf).toISOString()}",`
-        : ``;
-    //add rating for app +5 for declin -5, nego mean demends for apruval
-    if (noofpu === noofusersOk) {
-      console.log('create new finnished and add vote and archive fiapp');
-      try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation 
-                        { createRikmash(
-             data: {
-                      publishedAt: "${d.toISOString()}",
-                 total: ${total},
-              name: "${missionBName}",
-              kindOf: ${kindOf},
-              price: ${price},
-              agprice: ${agprice},
-              project: ${projectId},
-              hm: ${hm},
-              open_mashaabim: "${openMid}",
-              spnot: "${spnot}",
-              maap: "${askId}",
-              users_permissions_user: "${userId}",
-              sp: "${spid}",
-              ${date}
-               ${sdate}
-}){data {id }}
-updateMaap(
- id: "${askId}"
-  data: {archived: true,
-vots: [${userss}, 
-       {
-        what: true
-        users_permissions_user: "${idL}"
+    try {
+      const result = await executeAction('voteOnMaap', {
+        askId: String(askId),
+        projectId: String(projectId),
+        what: true,
+      });
+      if (result.success && result.data?.consensus) {
+        onAcsept?.({ ani: 'finim', coinlapach });
       }
-    ]}
-) {data{id attributes{ archived}}}
-updateSp( 
-  id: "${spid}"
-  data: {panui: false}
-){data{id}}
-}
-`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
-        onAcsept?.({
-          ani: 'finim',
-          coinlapach: coinlapach
-        });
-      } catch (e) {
-        error1 = e;
-        console.log(error1);
-      }
-    } else {
-      console.log('just add vote to asked and update to not show for me again');
-      try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation 
-                        {
-                            updateMaap(
-                           id: "${askId}" 
-                                data: { vots: [${userss}, 
-                                       {
-                                        what: true
-                                        users_permissions_user: "${idL}"
-                                      }
-                                    ]}
-                        ){data{id}}
-                     
-                    }
-`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
-        onAcsept?.({
-          ani: 'finim',
-          coinlapach: coinlapach
-        });
-      } catch (e) {
-        error1 = e;
-        console.log(error1);
-      }
+    } catch (e) {
+      error1 = e;
+      console.log(error1);
     }
   }
   function ask() {
@@ -383,50 +249,18 @@ updateSp(
   }
 
   async function decline() {
+    // Optimistic UI update
     already = true;
     noofusersNo += 1;
     noofusersWaiting -= 1;
     ser = xyz();
-    // negativ rating and reason text!! בועה שמראה לאחרחם את ההתנגדות הסיבה ואפשרות להגיב
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
+    isOpen = false;
     try {
-      await fetch(linkg, {
-        method: 'POST',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        //add already declined ids
-        body: JSON.stringify({
-          query: `mutation 
-                        { 
-updateMaap(
-   id: "${askId}"
-  data: {vots: [${userss}, 
-                                       {
-                                           why: "${whyy}"
-                                        what: false
-                                        users_permissions_user: "${idL}"
-                                      }
-                                    ] }
-) {data {id attributes{vots {id}}}}
-}
-`
-        })
-      })
-        .then((r) => r.json())
-        .then((data) => (miDatan = data));
-      console.log(miDatan);
-      isOpen = false;
-      onDecline?.({
-        ani: 'finim',
-        coinlapach: coinlapach
+      await executeAction('voteOnMaap', {
+        askId: String(askId),
+        projectId: String(projectId),
+        what: false,
+        ...(whyy.trim() ? { why: whyy } : {}),
       });
     } catch (e) {
       error1 = e;
@@ -481,7 +315,6 @@ updateMaap(
     onHover?.({ id: u });
   }
   import Cards from './cards/dowegeot.svelte';
-  import { page } from '$app/state';
 </script>
 
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">

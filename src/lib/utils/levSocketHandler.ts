@@ -254,6 +254,11 @@ async function handlePartialUpdate(
           }
           break;
 
+        case 'tasks':
+          console.log('📋 [levSocketHandler] Task updated — applying targeted store update');
+          updateTaskInMtahaStore(data);
+          break;
+
         case 'chat':
           console.log('💬 [levSocketHandler] Chat update triggered - handled by pendMisMes listener');
           break;
@@ -675,6 +680,59 @@ export function updateDecisionsStore(data: Partial<DecisionData> & { id: string 
     }
 
     return [...current];
+  });
+}
+
+/**
+ * Update a single task (Act) inside the mtaha (in-progress missions) store.
+ *
+ * Tasks are stored as mission.acts[]. We find the mission that owns the task
+ * by scanning all acts arrays, then update or remove the task in-place.
+ *
+ * @param data - Flat task data extracted from the Strapi notification payload
+ */
+export function updateTaskInMtahaStore(data: any): void {
+  if (!data?.id) {
+    console.warn('⚠️ [levSocketHandler] updateTaskInMtahaStore: missing id');
+    return;
+  }
+
+  const taskId = String(data.id);
+  console.log('🔄 [levSocketHandler] Updating task in mtahaStore', { taskId });
+
+  mtahaStore.update(missions => {
+    let changed = false;
+
+    const updated = missions.map(mission => {
+      const acts: any[] = mission.acts || [];
+      const idx = acts.findIndex((t: any) => String(t.id) === taskId);
+      if (idx === -1) return mission;
+
+      changed = true;
+      let newActs: any[];
+
+      if (data.naasa === true) {
+        // Task marked as done → remove from list
+        console.log('🗑️ [levSocketHandler] Removing completed task', { taskId });
+        newActs = acts.filter((_: any, i: number) => i !== idx);
+      } else {
+        // Merge updated attributes into the existing task
+        console.log('✏️ [levSocketHandler] Updating task attributes', { taskId });
+        newActs = [...acts];
+        newActs[idx] = {
+          ...newActs[idx],
+          attributes: { ...newActs[idx].attributes, ...data }
+        };
+      }
+
+      return { ...mission, acts: newActs };
+    });
+
+    if (!changed) {
+      console.warn('⚠️ [levSocketHandler] Task not found in any mission', { taskId });
+    }
+
+    return changed ? updated : missions;
   });
 }
 
