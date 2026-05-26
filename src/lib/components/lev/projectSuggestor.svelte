@@ -2771,7 +2771,7 @@
               <button
                 onmouseenter={() => hover({ he: 'אני רוצה', en: 'Yes I want' })}
                 onmouseleave={() => hover('0')}
-                onclick={agree(oid)}
+                onclick={() => agree(oid)}
                 class="btn a"
                 name="requestToJoin"
                 ><svg
@@ -2793,7 +2793,7 @@
                 onmouseenter={() =>
                   hover({ he: 'לא מתאים לי', en: 'not for me' })}
                 onmouseleave={() => hover('0')}
-                onclick={decline(oid)}
+                onclick={() => decline(oid)}
                 class="btn b"
                 name="decline"
                 ><svg

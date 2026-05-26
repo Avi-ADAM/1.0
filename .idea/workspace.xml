@@ -10,24 +10,16 @@
       <change beforePath="$PROJECT_DIR$/src/lib/components/deals/PendingRequestCard.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/deals/PendingRequestCard.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/cards/hachlata.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/cards/hachlata.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/cards/rektom.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/cards/rektom.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/coinui.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/coinui.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/decisionMaking.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/decisionMaking.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/halukaask.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/halukaask.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/mashsuggest.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/mashsuggest.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/missionInProgress.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/missionInProgress.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/pmas.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/pmas.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/projectSuggestor.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/projectSuggestor.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/reqtom.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/reqtom.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/reqtosherut.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/reqtosherut.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/weget.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/weget.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/welcomTo.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/welcomTo.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/mail/mail.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/mail/mail.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/server/actions/configs/createMashaabimRequest.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/server/actions/configs/createMashaabimRequest.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/server/actions/configs/finalizeAskmAcceptance.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/server/actions/configs/finalizeAskmAcceptance.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/server/actions/configs/updateTask.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/server/actions/configs/updateTask.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/server/actions/configs/voteOnMaap.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/server/actions/configs/voteOnMaap.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/utils/levDataExtractors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/utils/levDataExtractors.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/utils/levSocketHandler.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/utils/levSocketHandler.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -107,7 +99,7 @@
       <option name="presentableId" value="Default" />
       <updated>1778848920472</updated>
       <workItem from="1778848921944" duration="7860000" />
-      <workItem from="1779725764144" duration="14155000" />
+      <workItem from="1779725764144" duration="14850000" />
     </task>
     <task id="LOCAL‎-00001" summary="144.5 migration wishes">
       <option name="closed" value="true" />
@@ -141,7 +133,15 @@
       <option name="project" value="LOCAL‎" />
       <updated>1779790883565</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL‎-00005" summary="144.9 migration">
+      <option name="closed" value="true" />
+      <created>1779794809998</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL‎-00005" />
+      <option name="project" value="LOCAL‎" />
+      <updated>1779794809998</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
