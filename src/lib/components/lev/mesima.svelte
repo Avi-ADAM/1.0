@@ -1,64 +1,27 @@
 <script>
-  import { page } from '$app/state';
 import Tile from '$lib/celim/tile.svelte'
 import { lang } from '$lib/stores/lang.js'
   import { RingLoader
 } from 'svelte-loading-spinners';
-const baseUrl = import.meta.env.VITE_URL
+import { sendToSer } from '$lib/send/sendToSer.js';
+import RichText from '$lib/celim/ui/richText.svelte'
   let { missionId, onProject } = $props();
 let projectUsers =[];
-let token;
 let idL;
 let srcP;
 let error1 = null;
 let projecto = [];
 async function xyd () {
-   
+
   const cookieValueId = document.cookie
   .split('; ')
   .find(row => row.startsWith('id='))
   .split('=')[1];
   idL = cookieValueId;
-    token  = page.data.tok;
     let datar;
-    let bearer1 = 'bearer' + ' ' + token;
-        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-        const checkStatus = (resp) => {
-        if (resp.status >= 200 && resp.status < 300) {
-          return resp;
-        }
-        return parseJSON(resp).then((resp) => {
-          throw resp;
-        });
-      };
-      const headers = {
-        'Content-Type': 'application/json'   
-      };
-        let link = baseUrl+"/graphql" ;
         try {
-             await fetch(link, {
-              method: 'POST',
-       
-        headers: {
-            'Authorization': bearer1,
-            'Content-Type': 'application/json'
-                  },
-        body: 
-        JSON.stringify({query: 
-          `{  openMission (id:${missionId}) {data{attributes{ sqadualed
-             project {data{ id attributes{ projectName timeToP profilePic {data{ attributes{url  }}}}}}
-            tafkidims {data{attributes{roleDescription ${$lang == 'he' ? 'localizations{data{attributes{ roleDescription }}}' : ""}}}}
-            skills {data{attributes{skillName ${$lang == 'he' ? 'localizations{data{attributes{skillName }}}' : ""}}}}
-            descrip
-            hearotMeyuchadot
-            name dates
-            work_ways {data{attributes{workWayName ${$lang == 'he' ? 'localizations{data{attributes{workWayName }}}' : ""}}}}
-            noofhours perhour   }}}
-        }`
-        })
-})
-  .then(r => r.json())
-  .then(data => datar = data.data.openMission.data.attributes);
+            const res = await sendToSer({ id: missionId }, "51GetOpenMissionById", 0, 0, false, fetch);
+            datar = res.data.openMission.data.attributes;
   if ($lang != "en" ){
               for (let i = 0; i < datar.skills.data.length; i++){
                 if (datar.skills.data[i].attributes.localizations.data.length > 0){
@@ -123,27 +86,27 @@ async function xyd () {
             <span onmouseenter={()=>hover({"he":"שווי לשעה","en":"vallue per hour"})} onmouseleave={()=>hover("0")} > {data.perhour.toLocaleString('en-US', {maximumFractionDigits:2})} לשעה </span> * <span onmouseenter={()=>hover({"he":"כמות השעות", "en":"amount of hours"})} onmouseleave={()=>hover("0")}  > {data.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span onmouseenter={()=>hover({"he":"סך הכל","en": "total"})} onmouseleave={()=>hover("0")}>{(data.noofhours * data.perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
       </p>
       <div style="font-size: 17px;" class="  mb-2"><h2 class="text-barbi font-bold">{data.name}</h2></div>
-  {#if data.descrip !== null && data.descrip !== "null"  && data.descrip !== "undefined"  && data.descrip !== undefined} <p class="cd d max-h-16 text-gray-700 text-base">{data.descrip}</p>{/if}
+  {#if data.descrip !== null && data.descrip !== "null"  && data.descrip !== "undefined"  && data.descrip !== undefined} <RichText outpot={data.descrip} editable={false} /> {/if}
 {#if data.hearotMeyuchadot}
-     <p onmouseenter={()=>hover("הערות")} onmouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm d">{data.hearotMeyuchadot !== undefined && data.hearotMeyuchadot !== null && data.hearotMeyuchadot !== "undefined" ? data.hearotMeyuchadot : ""}</p>
+  <RichText outpot={data.hearotMeyuchadot} editable={false} />
      {/if}
-    {#if data.skills.length > 0}
+    {#if data.skills.data.length > 0}
             <small class="text-barbi text-sm ">כישורים נדרשים:</small>
-            <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 "> 
-               {#each data.skills as skill}<p onmouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} onmouseleave={()=>hover("0")}  >
+            <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 ">
+               {#each data.skills.data as skill}<p onmouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} onmouseleave={()=>hover("0")}  >
                 <Tile pink={true} word={skill.attributes.skillName}/></p>
                 {/each}
     </div>
     {/if}
-     {#if data.tafkidims.length > 0}  <small class="text-sm text-barbi">תפקידים נדרשים:</small>
-            <div class="border border-gold flex flex-row  flex-wrap justify-center align-middle d  cd p-2">  
-              {#each data.tafkidims as rol}
+     {#if data.tafkidims.data.length > 0}  <small class="text-sm text-barbi">תפקידים נדרשים:</small>
+            <div class="border border-gold flex flex-row  flex-wrap justify-center align-middle d  cd p-2">
+              {#each data.tafkidims.data as rol}
               <p onmouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
         <Tile word={rol.attributes.roleDescription} wow={true}/></p>{/each}
     </div>{/if}
-    {#if data.work_ways.length > 0}  <small class="text-sm text-barbi">דרכי העבודה:</small>
-            <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 "> 
-                {#each data.work_ways as rol}<p onmouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
+    {#if data.work_ways.data.length > 0}  <small class="text-sm text-barbi">דרכי העבודה:</small>
+            <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 ">
+                {#each data.work_ways.data as rol}<p onmouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
               <Tile bg="gold"   word={rol.attributes.workWayName}/></p>{/each}
     </div>{/if}
            <button onclick={()=>project(data.project.data.id)} class="px-4 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-sm mt-2 border-2 border-gold" >לצפיה בריקמה </button >

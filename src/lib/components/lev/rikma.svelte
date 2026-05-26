@@ -7,14 +7,12 @@ import { lang } from '$lib/stores/lang.js'
   import { RingLoader
 } from 'svelte-loading-spinners';
   import RichText from '$lib/celim/ui/richText.svelte';
-  import { page } from '$app/state';
+  import { sendToSer } from '$lib/send/sendToSer.js';
 let projectUsers =$state([]);
-let token;
 let idL;
 let srcP = $state();
 let error1 = null;
 let vallues  = $state([])
-const baseUrl = import.meta.env.VITE_URL
 
       let linkP  =$state([])
        let githublink = $state();
@@ -26,40 +24,9 @@ async function xyd () {
   .find(row => row.startsWith('id='))
   .split('=')[1];
   idL = cookieValueId;
-    token  = page.data.tok; 
-    let bearer1 = 'bearer' + ' ' + token;
-        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-        const checkStatus = (resp) => {
-        if (resp.status >= 200 && resp.status < 300) {
-          return resp;
-        }
-        return parseJSON(resp).then((resp) => {
-          throw resp;
-        });
-      };
-      const headers = {
-        'Content-Type': 'application/json'   
-      };
-        let link = baseUrl+"/graphql" ;
         try {
-             await fetch(link, {
-              method: 'POST',
-       
-        headers: {
-            'Authorization': bearer1,
-            'Content-Type': 'application/json'
-                  },
-        body: 
-        JSON.stringify({query: 
-          `{  project (id:${projectId}) {data{attributes{ projectName  user_1s {data{ id attributes{ username profilePic {data{attributes{ url}}}}}}
-          linkToWebsite     
-           githublink fblink discordlink  twiterlink  vallues {data{attributes{ valueName ${$lang == 'he' ? 'localizations{data{attributes{ valueName }}}' : ""}}}}
-                        publicDescription    profilePic {data{attributes{ url formats }}}   open_missions (filters:{archived:{eq: false} }) {data{ id attributes{ name}}}}
-        }}}`
-        })
-})
-  .then(r => r.json())
-  .then(data => project = data.data.project.data);
+            const res = await sendToSer({ id: projectId }, "49GetProjectById", 0, 0, false, fetch);
+            project = res.data.project.data;
             projectUsers = project.attributes.user_1s.data;
             projecto = project.attributes.open_missions.data;
                 vallues = project.attributes.vallues.data;
@@ -86,11 +53,10 @@ async function xyd () {
     };
 
     function us (x){
-      console.log(x)
-      onUser?.(x);
+      onUser?.({id: x});
     }
      function mesima (x){
-      onMesima?.(x);
+      onMesima?.({id: x});
     }
     function hover(c){
       console.log("hover")
@@ -216,7 +182,7 @@ async function xyd () {
 <h3 style="color: var(--barbi-pink) ;text-shadow: 1px 1px var(--gold);" class="5">{frm[$lang]}</h3>
 <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 "> 
                 {#each projecto as om }<p onmouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})}
-                   onmouseleave={()=>hover("0")} class="m-0 cursor-pointer hover:scale-105	" style="text-shadow:none;" onclick={mesima(om.id)}>
+                   onmouseleave={()=>hover("0")} class="m-0 cursor-pointer hover:scale-105	" style="text-shadow:none;" onclick={()=>mesima(om.id)}>
               <Tile bg="wow"   word={om.attributes.name}/></p>{/each}
     </div>
 </div>

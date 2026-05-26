@@ -1,7 +1,7 @@
 <script>
-  import { page } from '$app/state';
  import { lang } from '$lib/stores/lang.js'
   import { onMount } from 'svelte';
+  import { sendToSer } from '$lib/send/sendToSer.js';
   let { userId, onProj } = $props();
 function pr (x){
   onProj?.({id:x})
@@ -11,7 +11,6 @@ let fblink = $state(), twiterlink = $state(), discordlink = $state(), githublink
 let load = $state(false)
 let projects =$state([]);
 let uskill =$state([]);
-let token;
 let idL;
 let srcU = $state("https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png");
 let uww = $state([]);
@@ -20,58 +19,17 @@ let ur = $state([]);
 let val = $state([]);
 let mash = $state([])
 let error1 = null;
-const baseUrl = import.meta.env.VITE_URL
 
      onMount(async () => {
-   
+
   const cookieValueId = document.cookie
   .split('; ')
   .find(row => row.startsWith('id='))
   .split('=')[1];
   idL = cookieValueId;
-    token  = page.data.tok;
-    let bearer1 = 'bearer' + ' ' + token;
-        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-        const checkStatus = (resp) => {
-        if (resp.status >= 200 && resp.status < 300) {
-          return resp;
-        }
-        return parseJSON(resp).then((resp) => {
-          throw resp;
-        });
-      };
-      const headers = {
-        'Content-Type': 'application/json'   
-      };
-       let link = baseUrl+"/graphql" ;
         try {
-             await fetch(link, {
-              method: 'POST',
-       
-        headers: {
-            'Authorization': bearer1,
-            'Content-Type': 'application/json'
-                  },
-        body: 
-        JSON.stringify({query: 
-          `{  usersPermissionsUser (id:${userId}) { data{attributes{
-             fblink twiterlink discordlink githublink
-            bio
-            username 
-                        finnished_missions { data{attributes{ missionName }}}
-            profilePic { data{attributes{url formats }}}
-            projects_1s {data{ id attributes{ projectName}}} 
-            sps (filters: {archived:{eq: false }}) {data{id attributes { name panui}}}
-            skills {data{ id attributes{ skillName ${$lang == 'he' ? 'localizations{  data{attributes{skillName }}}' : ""}} }}
-            tafkidims {data{ id attributes{ roleDescription ${$lang == 'he' ? 'localizations{ data{attributes{roleDescription }}}' : ""}}}}
-            vallues {data{ id attributes{ valueName ${$lang == 'he' ? 'localizations{ data{attributes{valueName }}}' : ""}}}}
-            work_ways {data{ id attributes{workWayName ${$lang == 'he' ? 'localizations{ data{attributes{workWayName }}}' : ""}}}}
-                            }}}
-        }`
-        })
-})
-  .then(r => r.json())
-  .then(data => user = data.data.user);
+            const res = await sendToSer({ id: userId }, "52GetUserById", 0, 0, false, fetch);
+            user = res.data.usersPermissionsUser.data.attributes;
             projects = user.projects_1s.data;
             load = true
             uskill = user.skills.data;
@@ -216,7 +174,7 @@ const mm = {"he": "משימות","en":"missions"}
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
         {#each projects as data, i}
        <span style="font-size:25px;" class="font-bold hover:scale-110 text-gold bg-barbi rounded-lg px-1 my-1 ">
-          <button class="text-gold hover:text-mturk "   onclick={pr(data.id)} >{data.attributes.projectName}</button>
+          <button class="text-gold hover:text-mturk "   onclick={()=>pr(data.id)} >{data.attributes.projectName}</button>
        </span>
        {/each}
     </div>

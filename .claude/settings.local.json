@@ -54,7 +54,8 @@
       "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0main\\\\src\\\\lib\\\\components\\\\timers\" -Recurse -File | ForEach-Object { $_.FullName })",
       "Bash(yarn svelte-check *)",
       "Bash(node_modules/.bin/svelte-check --threshold error)",
-      "Bash(grep *)"
+      "Bash(grep *)",
+      "Bash(git log *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\deals\\request",

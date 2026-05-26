@@ -4,13 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="95e10908-753e-4b5e-a7b6-37b180d77d7c" name="Changes" comment="">
+    <list default="true" id="95e10908-753e-4b5e-a7b6-37b180d77d7c" name="Changes" comment="144.5 migration wishes">
       <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.mcp.json" beforeDir="false" afterPath="$PROJECT_DIR$/.mcp.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/PLAN_PROXY_SECURITY.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/PLAN_PROXY_SECURITY.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/deals/PendingRequestCard.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/deals/PendingRequestCard.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/cards/cards.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/cards/cards.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/cards/hachlata.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/cards/hachlata.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/cards/rektom.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/cards/rektom.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/decisionMaking.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/decisionMaking.svelte" afterDir="false" />
@@ -20,21 +18,14 @@
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/mashsuggest.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/mashsuggest.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/mesima.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/mesima.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/missionInProgress.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/missionInProgress.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/newcoinui.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/newcoinui.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/pmas.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/pmas.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/projectSuggestor.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/projectSuggestor.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/reqtom.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/reqtom.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/reqtosherut.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/reqtosherut.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/rikma.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/rikma.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/weget.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/weget.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/welcomTo.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/welcomTo.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/mail/mail.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/mail/mail.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/server/actions/configs/addVote.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/server/actions/configs/addVote.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/server/actions/configs/approveHaluka.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/server/actions/configs/approveHaluka.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/server/actions/configs/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/server/actions/configs/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/utils/levDataExtractors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/utils/levDataExtractors.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/utils/salesUtils.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/utils/salesUtils.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/(reg)/moach/[projectId]/+layout.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(reg)/moach/[projectId]/+layout.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/api/send/qids.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/api/send/qids.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +34,21 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "Avi-ADAM"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Avi-ADAM/1.0.git",
+    "accountId": "f11a4daf-2e4e-492f-872d-dec955f4f253"
+  }
+}]]></component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
@@ -98,11 +104,35 @@
       <option name="presentableId" value="Default" />
       <updated>1778848920472</updated>
       <workItem from="1778848921944" duration="7860000" />
-      <workItem from="1779725764144" duration="3967000" />
+      <workItem from="1779725764144" duration="6333000" />
     </task>
+    <task id="LOCAL‎-00001" summary="144.5 migration wishes">
+      <option name="closed" value="true" />
+      <created>1779782132625</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL‎-00001" />
+      <option name="project" value="LOCAL‎" />
+      <updated>1779782132626</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="144.5 migration wishes" />
+    <option name="LAST_COMMIT_MESSAGE" value="144.5 migration wishes" />
   </component>
 </project>
