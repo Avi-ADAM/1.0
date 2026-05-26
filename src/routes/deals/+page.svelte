@@ -45,6 +45,26 @@
     <img src="/deals%20logo.png" alt={$t('deals.logo_alt')} class="page-logo" />
   </div>
 
+  <!-- Quick Action Links -->
+  <div class="quick-links anim">
+    <a href="/sales-center" class="quick-card quick-card--gold">
+      <span class="quick-icon">🏪</span>
+      <span class="quick-body">
+        <span class="quick-title">{$t('deals.quick_sales_center')}</span>
+        <span class="quick-hint">{$t('deals.quick_sales_center_hint')}</span>
+      </span>
+      <span class="quick-arrow">←</span>
+    </a>
+    <a href="/concierge" class="quick-card quick-card--pink">
+      <span class="quick-icon">🎩</span>
+      <span class="quick-body">
+        <span class="quick-title">{$t('deals.quick_concierge')}</span>
+        <span class="quick-hint">{$t('deals.quick_concierge_hint')}</span>
+      </span>
+      <span class="quick-arrow">←</span>
+    </a>
+  </div>
+
   <!-- Tabs -->
   <div class="tabs anim">
     <button
@@ -86,9 +106,25 @@
 
     {#if deals.length === 0}
       <div class="empty">
-        {tab === 'purchase'
-          ? $t('deals.no_active_purchases')
-          : $t('deals.no_active_sales')}
+        <p class="empty-text">
+          {tab === 'purchase'
+            ? $t('deals.no_active_purchases')
+            : $t('deals.no_active_sales')}
+        </p>
+        <p class="empty-sub">
+          {tab === 'purchase'
+            ? $t('deals.cta_concierge_desc')
+            : $t('deals.cta_sales_center_desc')}
+        </p>
+        {#if tab === 'purchase'}
+          <a href="/concierge" class="empty-cta empty-cta--pink">
+            🎩 {$t('deals.cta_find_products')}
+          </a>
+        {:else}
+          <a href="/sales-center" class="empty-cta empty-cta--gold">
+            🏪 {$t('deals.cta_start_selling')}
+          </a>
+        {/if}
       </div>
     {:else}
       <div class="deals-grid">
@@ -101,7 +137,13 @@
     <div class="section-label">{$t('deals.pending_requests_label')}</div>
 
     {#if pendingAll.length === 0}
-      <div class="empty">{$t('deals.no_pending_requests')}</div>
+      <div class="empty">
+        <p class="empty-text">{$t('deals.no_pending_requests')}</p>
+        <p class="empty-sub">{$t('deals.cta_concierge_desc')}</p>
+        <a href="/concierge" class="empty-cta empty-cta--pink">
+          🎩 {$t('deals.cta_find_products')}
+        </a>
+      </div>
     {:else}
       <div class="deals-grid">
         {#each pendingBuy as req (req.id)}
@@ -120,7 +162,7 @@
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
     gap: 16px;
   }
   .page-title {
@@ -141,6 +183,75 @@
   .page-sub {
     font-size: 13px;
     color: var(--tm);
+  }
+
+  /* ── Quick Action Links ── */
+  .quick-links {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .quick-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 12px;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    cursor: pointer;
+  }
+  .quick-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+  .quick-card--gold {
+    background: var(--gold-d, rgba(212, 175, 55, 0.12));
+    border-color: var(--gold, rgba(212, 175, 55, 0.3));
+  }
+  .quick-card--gold:hover {
+    background: rgba(212, 175, 55, 0.2);
+  }
+  .quick-card--pink {
+    background: var(--pink-d, rgba(255, 100, 150, 0.1));
+    border-color: var(--pink, rgba(255, 100, 150, 0.3));
+  }
+  .quick-card--pink:hover {
+    background: rgba(255, 100, 150, 0.18);
+  }
+  .quick-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .quick-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+  }
+  .quick-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .quick-hint {
+    font-size: 11px;
+    color: var(--tm);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .quick-arrow {
+    font-size: 14px;
+    color: var(--tm);
+    flex-shrink: 0;
+    opacity: 0.6;
   }
 
   .tabs {
@@ -210,20 +321,65 @@
     gap: 18px;
   }
 
+  /* ── Enhanced Empty State ── */
   .empty {
     text-align: center;
     color: var(--tm);
     font-size: 14px;
-    padding: 60px 20px;
+    padding: 48px 24px;
     background: var(--s2);
     border: 1px dashed var(--border);
     border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .empty-text {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+  }
+  .empty-sub {
+    font-size: 13px;
+    color: var(--tm);
+    margin: 0;
+  }
+  .empty-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .empty-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  }
+  .empty-cta--gold {
+    background: var(--gold-d, rgba(212, 175, 55, 0.18));
+    color: var(--gold-l, #d4af37);
+    border: 1px solid var(--gold, rgba(212, 175, 55, 0.4));
+  }
+  .empty-cta--pink {
+    background: var(--pink-d, rgba(255, 100, 150, 0.12));
+    color: var(--pink-l, #ff6496);
+    border: 1px solid var(--pink, rgba(255, 100, 150, 0.35));
   }
 
   @media (max-width: 600px) {
     .page-top {
       flex-direction: column;
       align-items: flex-start;
+    }
+    .quick-links {
+      flex-direction: column;
     }
     .deals-grid {
       grid-template-columns: 1fr;
