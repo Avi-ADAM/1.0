@@ -782,7 +782,10 @@ export function extractTransfers(userData: any): TransferData[] {
           forumId: attrs.forum?.data?.id,
           pendId: el.id,
           chat: attrs.chatre || [],
-          senderconf: attrs.senderconf,
+          // האם הנותן (usersend) אישר שהעביר — נשאב מהשרת (Haluka.senderconf)
+          senderconf: attrs.senderconf || false,
+          // האם המקבל (userrecive) אישר שקיבל — נשאב מהשרת (Haluka.confirmed)
+          confirmed: attrs.confirmed || false,
 
           // Nested tosplit data if available
           shear: attrs.tosplit?.data?.attributes?.halukas?.data || [],

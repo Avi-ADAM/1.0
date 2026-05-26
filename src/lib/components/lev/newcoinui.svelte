@@ -424,6 +424,7 @@
               send={buble.send}
               recive={buble.recive}
               sendcon={buble.senderconf}
+              confirmed={buble.confirmed}
               coinlapach={buble.coinlapach}
               messege={buble.messege}
               already={buble.already}
@@ -956,7 +957,7 @@
               notes={buble.hearotMeyuchadot}
               src={buble.srcb}
               mashName={buble.mashname}
-              projectId={buble.projectid}
+              projectId={buble.projectId}
               descrip={buble.descrip}
               spnot={buble.spnot}
               easy={buble.easy}

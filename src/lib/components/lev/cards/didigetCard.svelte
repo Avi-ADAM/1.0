@@ -248,12 +248,43 @@
     <!-- Avatars Row -->
     <div class="flex flex-row items-center justify-center gap-6 mt-2">
       <div class="text-center">
-        <img
-          src={sendpropic ||
-            'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
-          class="rounded-full w-16 h-16 mb-2 mx-auto border-2 border-barbi shadow-sm"
-          alt="Avatar"
-        />
+        <div class="relative w-16 h-16 mb-2 mx-auto">
+          <img
+            src={sendpropic ||
+              'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
+            class="rounded-full w-16 h-16 border-2 border-barbi shadow-sm"
+            alt="Avatar"
+          />
+          {#if sendcon}
+            <span
+              class="absolute -bottom-1 -right-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white border-2 border-white dark:border-gray-800 shadow"
+              title={kind == 'send'
+                ? translations.confirmedTransfer[$lang]
+                : translations.senderConfirmed[$lang](sendname, amount)}
+              aria-label="אישר העברה"
+            >
+              <svg viewBox="0 0 24 24" class="w-3.5 h-3.5"
+                ><path
+                  fill="currentColor"
+                  d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"
+                /></svg
+              >
+            </span>
+          {:else}
+            <span
+              class="absolute -bottom-1 -right-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-700 text-white border-2 border-white dark:border-gray-800 shadow"
+              title="טרם אישר העברה"
+              aria-label="טרם אישר העברה"
+            >
+              <svg viewBox="0 0 24 24" class="w-3.5 h-3.5"
+                ><path
+                  fill="currentColor"
+                  d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"
+                /></svg
+              >
+            </span>
+          {/if}
+        </div>
         <h5
           class="text-sm font-bold text-gray-800 dark:text-gray-100 leading-tight"
         >
@@ -281,12 +312,41 @@
       </div>
 
       <div class="text-center">
-        <img
-          src={respropic ||
-            'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
-          class="rounded-full w-16 h-16 mb-2 mx-auto border-2 border-gold shadow-sm"
-          alt="Avatar"
-        />
+        <div class="relative w-16 h-16 mb-2 mx-auto">
+          <img
+            src={respropic ||
+              'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
+            class="rounded-full w-16 h-16 border-2 border-gold shadow-sm"
+            alt="Avatar"
+          />
+          {#if confirmed}
+            <span
+              class="absolute -bottom-1 -right-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white border-2 border-white dark:border-gray-800 shadow"
+              title="אישר קבלה"
+              aria-label="אישר קבלה"
+            >
+              <svg viewBox="0 0 24 24" class="w-3.5 h-3.5"
+                ><path
+                  fill="currentColor"
+                  d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"
+                /></svg
+              >
+            </span>
+          {:else}
+            <span
+              class="absolute -bottom-1 -right-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-700 text-white border-2 border-white dark:border-gray-800 shadow"
+              title="טרם אישר קבלה"
+              aria-label="טרם אישר קבלה"
+            >
+              <svg viewBox="0 0 24 24" class="w-3.5 h-3.5"
+                ><path
+                  fill="currentColor"
+                  d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"
+                /></svg
+              >
+            </span>
+          {/if}
+        </div>
         <h5
           class="text-sm font-bold text-gray-800 dark:text-gray-100 leading-tight"
         >

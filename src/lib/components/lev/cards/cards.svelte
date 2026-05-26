@@ -610,7 +610,7 @@
                       resname={buble.resname}
                       kind={buble.kind}
                       amount={buble.amount}
-                      sendcon={buble.sendcon}
+                      sendcon={buble.senderconf}
                       confirmed={buble.confirmed}
                       already={buble.already}
                       shear={buble.shear}
