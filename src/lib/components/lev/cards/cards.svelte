@@ -1006,6 +1006,7 @@
                       myp={buble.myp}
                       easy={buble.easy}
                       spnot={buble.spnot}
+                      hearotMeyuchadot={buble.spnot}
                       price={buble.price}
                       deadline={buble.deadline}
                       missId={buble.missId}
@@ -1015,6 +1016,11 @@
                       st={buble.st}
                       declined={buble.decid}
                       spid={buble.spid}
+                      timegramaId={buble.timegramaId}
+                      isRishon={buble.isSelfProposal === true}
+                      pendingMainVote={buble.pendingMainVote === true}
+                      negopendmissions={buble.negopendmissions || []}
+                      orderon={buble.orderon || 0}
                     /></SwiperSlide
                   >
                 {:else if buble.ani === 'meData' && milon.sugg == true}

@@ -6,16 +6,34 @@
   <component name="ChangeListManager">
     <list default="true" id="95e10908-753e-4b5e-a7b6-37b180d77d7c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.claude/settings.local.json" beforeDir="false" afterPath="$PROJECT_DIR$/.claude/settings.local.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.mcp.json" beforeDir="false" afterPath="$PROJECT_DIR$/.mcp.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/components/AppHeader.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/AppHeader.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/components/addnew/addNewSkill.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/addnew/addNewSkill.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/components/prPr/hamatanot.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/prPr/hamatanot.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/jobs/sync-vocabulary.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/jobs/sync-vocabulary.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/PLAN_PROXY_SECURITY.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/PLAN_PROXY_SECURITY.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/deals/PendingRequestCard.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/deals/PendingRequestCard.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/cards/cards.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/cards/cards.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/cards/hachlata.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/cards/hachlata.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/cards/rektom.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/cards/rektom.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/decisionMaking.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/decisionMaking.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/didiget.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/didiget.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/halukaask.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/halukaask.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/hevel.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/hevel.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/mashsuggest.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/mashsuggest.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/mesima.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/mesima.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/missionInProgress.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/missionInProgress.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/newcoinui.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/newcoinui.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/pmas.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/pmas.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/reqtom.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/reqtom.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/reqtosherut.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/reqtosherut.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/rikma.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/rikma.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/weget.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/weget.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/welcomTo.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/welcomTo.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/mail/mail.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/mail/mail.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/server/actions/configs/addVote.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/server/actions/configs/addVote.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/server/actions/configs/approveHaluka.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/server/actions/configs/approveHaluka.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/server/actions/configs/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/server/actions/configs/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/translations/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/translations/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/types.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/utils/levDataExtractors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/utils/levDataExtractors.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/(regandnon)/gift/[id]/+page.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(regandnon)/gift/[id]/+page.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/utils/salesUtils.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/utils/salesUtils.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/(reg)/moach/[projectId]/+layout.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/(reg)/moach/[projectId]/+layout.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/routes/api/send/qids.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/api/send/qids.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -26,9 +44,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 3
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
   <component name="ProjectId" id="3DlFmumb1ycG8fgtvL8NwrTdXeT" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -51,6 +69,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "yarn",
+    "ts.external.directory.path": "C:\\Users\\babay\\Documents\\GitHub\\1.0main\\node_modules\\typescript\\lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -79,6 +98,7 @@
       <option name="presentableId" value="Default" />
       <updated>1778848920472</updated>
       <workItem from="1778848921944" duration="7860000" />
+      <workItem from="1779725764144" duration="3967000" />
     </task>
     <servers />
   </component>

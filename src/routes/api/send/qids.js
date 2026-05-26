@@ -3621,12 +3621,47 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                         }
                       }
                     }
+                    pmash {
+                      data {
+                        id
+                        attributes {
+                          name
+                          descrip
+                          spnot
+                          price
+                          easy
+                          hm
+                          kindOf
+                          sqadualed
+                          sqadualedf
+                        }
+                      }
+                    }
                     sp {
                       data {
                         id
                         attributes {
+                          name
+                          descrip
                           price
                           myp
+                          spnot
+                          users_permissions_user {
+                            data {
+                              id
+                              attributes {
+                                username
+                                profilePic {
+                                  data {
+                                    attributes {
+                                      url
+                                      formats
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -6564,6 +6599,15 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           workWayName
           localizations { data { attributes { workWayName } } }
         }
+      }
+    }
+  }`,
+
+  '167getUserHervachti': `query GetUserHervachti($id: ID!) {
+    usersPermissionsUser(id: $id) {
+      data {
+        id
+        attributes { hervachti }
       }
     }
   }`

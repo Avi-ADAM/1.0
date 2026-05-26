@@ -76,6 +76,7 @@
       shifts: 'משמרות',
       processes: 'תהליכים',
       votes: 'הצבעות',
+      wishes: 'משאלות נכנסות',
       editPic: 'עריכת תמונה',
       upload: 'העלאה',
       editDetails: 'עריכת פרטים',
@@ -97,6 +98,7 @@
       shifts: 'Shifts',
       processes: 'Processes',
       votes: 'Votes',
+      wishes: 'Incoming wishes',
       editPic: 'Edit Picture',
       upload: 'Upload',
       editDetails: 'Edit Details',
@@ -118,6 +120,7 @@
       shifts: 'مناوبات',
       processes: 'العمليات',
       votes: 'التصويتات',
+      wishes: 'الرغبات الواردة',
       editPic: 'تعدיל الصورة',
       upload: 'تحميل',
       editDetails: 'تعدיל التفاصيل',
@@ -147,6 +150,7 @@
     { id: 'processes', label: 'processes' },
     { id: 'split', label: 'split' },
     { id: 'sales', label: 'sales' },
+    { id: 'wishes', label: 'wishes' },
     { id: 'votes', label: 'votes' },
     { id: 'shifts', label: 'shifts' }
   ];

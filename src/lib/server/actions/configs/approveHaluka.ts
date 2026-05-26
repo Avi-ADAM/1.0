@@ -5,13 +5,16 @@
  * 1. Mark tosplit finished + record votes (79approveTosplit)
  * 2. Mark all related sales as splited (80updateSale)
  * 3. Mark all halukot as ushar/approved (81updateHaluka)
+ * 4. Apply hervachti deltas to non-giver/non-receiver participants
+ *    (server fetches each user's CURRENT balance and adds the delta — never
+ *    trusts a client-supplied absolute amount).
  * Notifications are sent by the NotificationOrchestrator.
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 
 const approveHalukaHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
-  const { tosplitId, userId, users = [], halukot = [], sales = [] } = params;
+  const { tosplitId, userId, users = [], halukot = [], sales = [], hervachUpdates = [] } = params;
 
   // Build vots array: all existing votes + current user's vote
   const vots = (Array.isArray(users) ? users : []).map((u: any) => ({
@@ -51,6 +54,35 @@ const approveHalukaHandler: ActionExecutionHandler = async (params, context, { s
       await strapi.execute('81updateHaluka', { halukaId: haluka.id ?? haluka }, context.jwt, context.fetch);
     } catch (e) {
       console.error(`[approveHaluka] haluka ${haluka.id ?? haluka} update failed:`, e);
+    }
+  }
+
+  // Step 4: hervachti balance updates for participants (excluding giver/receiver).
+  // Client passes [{ userId, amountDelta }]; server reads CURRENT hervachti
+  // from DB and applies delta, so a malicious client cannot set arbitrary values.
+  for (const upd of (Array.isArray(hervachUpdates) ? hervachUpdates : [])) {
+    const uid = String(upd?.userId ?? '');
+    const delta = Number(upd?.amountDelta ?? 0);
+    if (!uid || !Number.isFinite(delta) || delta === 0) continue;
+    try {
+      const cur = await strapi.execute(
+        '167getUserHervachti',
+        { id: uid },
+        context.jwt,
+        context.fetch
+      );
+      const currentBalance = Number(
+        cur?.usersPermissionsUser?.data?.attributes?.hervachti ?? 0
+      );
+      const next = currentBalance + delta;
+      await strapi.execute(
+        '158updateUserHervachti',
+        { id: uid, hervachti: next },
+        context.jwt,
+        context.fetch
+      );
+    } catch (e) {
+      console.error(`[approveHaluka] hervachti update for user ${uid} failed:`, e);
     }
   }
 
@@ -95,6 +127,11 @@ export const approveHalukaConfig: ActionConfig = {
       type: 'array',
       required: false,
       description: 'Sales to mark splited (falls back to tosplit response)'
+    },
+    hervachUpdates: {
+      type: 'array',
+      required: false,
+      description: 'Per-user hervachti deltas to apply: [{ userId, amountDelta }]. Server reads current balance and adds delta.'
     },
     projectId: {
       type: 'string',

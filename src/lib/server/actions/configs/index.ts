@@ -53,6 +53,7 @@ import { finalizeAskAcceptanceConfig } from './finalizeAskAcceptance.js';
 import { finalizeJoinAcceptanceConfig } from './finalizeJoinAcceptance.js';
 import { updateWelcomeCardConfig } from './updateWelcomeCard.js';
 import { createMashaabimRequestConfig } from './createMashaabimRequest.js';
+import { declineSpForMashaabimConfig } from './declineSpForMashaabim.js';
 import { applyToMissionConfig } from './applyToMission.js';
 import { declineOpenMissionConfig } from './declineOpenMission.js';
 import { declineMissionRequestConfig } from './declineMissionRequest.js';
@@ -148,6 +149,7 @@ export function registerAllActions(): void {
 
   // Mashaabim (resource) request
   registerAction(createMashaabimRequestConfig);
+  registerAction(declineSpForMashaabimConfig);
 
   // Open mission: apply / decline
   registerAction(applyToMissionConfig);

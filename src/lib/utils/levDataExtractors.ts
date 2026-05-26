@@ -1019,34 +1019,65 @@ export function extractAskedResources(userData: any): AskedResourceData[] {
 
       const askAttributes = askm.attributes;
       const openMashaabimAttrs = askAttributes.open_mashaabim?.data?.attributes || {};
+      const pmashAttrs         = askAttributes.pmash?.data?.attributes || {};
+      const spAttrs            = askAttributes.sp?.data?.attributes || {};
+      const spUserData         = spAttrs.users_permissions_user?.data;
+      const spUserAttrs        = spUserData?.attributes || {};
+
+      // For Scenario 2 (isSelfProposal), users_permissions_user is NOT set on the askm —
+      // the proposer identity lives on the linked `sp`.
       const userAttrs = askAttributes.users_permissions_user?.data?.attributes || {};
+      const userId    = askAttributes.users_permissions_user?.data?.id || spUserData?.id || '';
+
+      // Prefer pmash data (actual resource) over open_mashaabim (the open need template)
+      // when both exist. For Scenario 2, pmash is the only source; omData is empty.
+      const omData = {
+        name:      pmashAttrs.name      || openMashaabimAttrs.name      || '',
+        descrip:   pmashAttrs.descrip   || openMashaabimAttrs.descrip   || '',
+        spnot:     pmashAttrs.spnot     || openMashaabimAttrs.spnot     || '',
+        price:     pmashAttrs.price     || openMashaabimAttrs.price     || 0,
+        easy:      pmashAttrs.easy      || openMashaabimAttrs.easy      || '',
+        hm:        pmashAttrs.hm        || openMashaabimAttrs.hm        || '',
+        kindOf:    pmashAttrs.kindOf    || openMashaabimAttrs.kindOf    || '',
+        sqadualed: pmashAttrs.sqadualed || openMashaabimAttrs.sqadualed || '',
+      };
+
+      // Profile pic: prefer the askm's own users_permissions_user, fall back to sp owner
+      const profilePic =
+        userAttrs?.profilePic?.data?.attributes?.formats?.thumbnail?.url ||
+        userAttrs?.profilePic?.data?.attributes?.url ||
+        spUserAttrs?.profilePic?.data?.attributes?.formats?.thumbnail?.url ||
+        spUserAttrs?.profilePic?.data?.attributes?.url || '';
+
+      // Username: prefer askm user, fall back to sp owner
+      const resolvedUsername = userAttrs.username || spUserAttrs.username || '';
+
       const projectAttrs = project.attributes;
 
       askedResources.push({
         id: askm.id,
         projectId: project.id,
-        uid: askAttributes.users_permissions_user?.data?.id || '',
-        username: userAttrs.username || '',
+        uid: userId,
+        username: resolvedUsername,
         requestType: 'askm',
         priority: 2,
-        // Core mission info
-        src: userAttrs?.profilePic?.data?.attributes?.formats?.thumbnail?.url ||
-          userAttrs?.profilePic?.data?.attributes?.url || '',
-        price: openMashaabimAttrs.price || 0,
-        easy: openMashaabimAttrs.easy || '',
-        spnot: openMashaabimAttrs.spnot || '',
-        descrip: openMashaabimAttrs.descrip || '',
-        hm: openMashaabimAttrs.hm || '',
-        myp: askAttributes.sp?.data?.attributes?.myp || 0,
-        kindOf: openMashaabimAttrs.kindOf || '',
+        // Core display info (merged from pmash + open_mashaabim)
+        src: profilePic,
+        price: omData.price,
+        easy: omData.easy,
+        spnot: omData.spnot,
+        descrip: omData.descrip,
+        hm: omData.hm,
+        myp: spAttrs.myp || 0,
+        kindOf: omData.kindOf,
         spid: askAttributes.sp?.data?.id,
-        deadline: openMashaabimAttrs.sqadualed || '',
-        openName: openMashaabimAttrs.name || '',
+        deadline: omData.sqadualed,
+        openName: omData.name,
         omid: askAttributes.open_mashaabim?.data?.id,
         askId: askm.id,
         // Voting and user info
         users: askAttributes.vots || [],
-        name: openMashaabimAttrs.name || '',
+        name: omData.name,  // merged: pmash.name ?? open_mashaabim.name
         projectName: projectAttrs.projectName || '',
         noof: (project.attributes.user_1s?.data?.length || 0),
         src2: projectAttrs?.profilePic?.data?.attributes?.url ||

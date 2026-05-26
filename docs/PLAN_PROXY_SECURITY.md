@@ -148,6 +148,16 @@ Whitelist של פעולות מותרות; כל השאר → 404. פעולות ש
 
 - [ ] מיפוי סופי של כל צרכני `page.data.tok`/`.jwt` (פקודת ה-grep למעלה)
 - [ ] הגירת `lev/*` (13 קבצים) לפרוקסי — לתאם עם `MIGRATION_TRACKING.md`
+  - [x] `welcomTo.svelte` → `updateWelcomeCard` action (2026-05-25)
+  - [x] `hevel.svelte` → `sendToSer('52GetUserById')` (2026-05-25, גם תוקן באג גישה ל-`usersPermissionsUser`)
+  - [x] `mesima.svelte` → `sendToSer('51GetOpenMissionById')` (2026-05-25)
+  - [x] `rikma.svelte` → `sendToSer('49GetProjectById')` (2026-05-25)
+  - [x] `mashsuggest.svelte` `decline(oid)` → `declineSpForMashaabim` action חדש (2026-05-25)
+  - [x] `halukaask.svelte` `agree` hervachti loop → קופל לתוך `approveHaluka` עם `hervachUpdates` (2026-05-25; qid חדש `167getUserHervachti`, server קורא current balance ומחיל delta)
+  - [x] `halukaask.svelte` `afterwhy()` (decline עם why) → הורחב `addVote` עם `what`/`why` אופציונליים לסניף ה-`tosplit` (2026-05-25). הקובץ עכשיו נקי לחלוטין מ-`page.data.tok`/`/graphql`/`bearer`.
+  - [x] `reqtosherut.svelte` `decline()` `if (noofpu===1)` → `declineMissionRequest` קיים (2026-05-25; הערה: ה-action ה"נכון" היה `declineMissionRequest` ולא `declineOpenMission` — האחרון מעדכן `user.declined`, ה-mutation המקורית עדכנה `openMission.declined`)
+  - [~] `projectSuggestornew.svelte` `less`/`decline` (#11, #12) — **קובץ לא בשימוש; מדלגים**
+  - [ ] `mashsuggest`/`reqtom`/`reqtosherut` chat replies — **חסום sidequest** (ראה 3.6)
 - [ ] הגירת `addnew/*` (4)
 - [ ] הגירת `userPr/*` (4) — כולל `editBasic` change-password ל-auth proxy
 - [ ] הגירת `prPr/*` (3)
@@ -158,6 +168,32 @@ Whitelist של פעולות מותרות; כל השאר → 404. פעולות ש
 - [ ] היפוך 4 נקודות החשיפה ל-flag בוליאני (3.3)
 - [ ] הוספת guardrail (3.4) ו-grep מאמת = 0
 - [ ] בדיקת רגרסיה ידנית בדפדפן: login, lev, העלאת קובץ, שינוי סיסמה
+
+### 3.6 Sidequest — מיגרציית chat לאובייקט Forum (חוסם 3 קבצים)
+
+שלוש פונקציות chat ב-`lev/` עדיין שומרות את ההודעות **כמערך component בתוך ה-entity
+עצמו** (ולא כ-relation ל-`forum` עם `messages`). זוהי הדרך הארכאית; המערכת כבר עברה
+ברוב המקומות לעבוד עם `forum` ייעודי + `createMessage` (qid `1chatsend`). לכן
+הקבצים הבאים **לא יוגרו ל-action בלקוח בלבד** — הם דורשים מיגרציה שכוללת:
+
+1. **שינוי סכמה ב-Strapi:** הוספת relation `forum` ל-`askm` / `ask` (אם לא קיים)
+   והפסקת השימוש בשדה ה-component `chat`.
+2. **One-off migration job:** העברת ההודעות הקיימות מ-component `chat` לתוך
+   forum + messages, ויצירת forum רטרואקטיבי לכל askm/ask קיים.
+3. **בלקוח:** החלפת ה-PUT לתוספת לתוך מערך → קריאה ל-actions הקיימים
+   (`createForum*`, `1chatsend` דרך action / sendToSer).
+
+| קובץ | פונקציה | מצב נוכחי | מה דרוש |
+|------|---------|-----------|---------|
+| `mashsuggest.svelte` | `replyToMash` (~255-303) | `PUT /api/askms/${askId}` עם append ל-`chat[]` | forum על askm + `createMessage` |
+| `reqtom.svelte` | chat reply (~420-475) | `PUT /api/askms/${askId}` עם append ל-`chat[]` | forum על askm + `createMessage` |
+| `reqtosherut.svelte` | chat reply (~325-370) | `PUT /api/asks/${askId}` עם append ל-`chat[]` | forum על ask + `createMessage` |
+
+**יתרון:** ה-actions ליצירת פורום (`2forumCr`, `2forumCrBasic`) ולהוספת הודעה
+(`1chatsend`) כבר קיימים ומאומתים — רק צריך לחבר.
+
+**עד שהמיגרציה תתבצע:** שלוש הפונקציות האלה ימשיכו לחשוף `page.data.tok` בלקוח.
+ב-checklist 3.5 הן ייחשבו "חסומות sidequest", לא "לא הוגרו".
 
 ---
 

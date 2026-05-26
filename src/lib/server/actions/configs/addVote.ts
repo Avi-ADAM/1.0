@@ -294,21 +294,33 @@ const addVoteHandler: ActionExecutionHandler = async (params, context, util) => 
   }
 
   // --- Logic for Tosplit (Component Based - partial vote, not yet allVoted) ---
+  // Supports both positive (default) and negative (decline) votes:
+  // pass `what: false` + `why: "..."` to record a decline.
   if (type === 'tosplit') {
-    const { existingComponentData } = params;
-    const now = new Date();
+    const { existingComponentData, what, why } = params;
+    const newWhat = typeof what === 'boolean' ? what : true;
+    const newWhy = typeof why === 'string' ? why : '';
 
     const existingVots = Array.isArray(existingComponentData)
-      ? existingComponentData.map((v: any) => ({
-          what: v.what ?? v.attributes?.what ?? true,
-          users_permissions_user:
-            v.users_permissions_user?.data?.id ??
-            v.users_permissions_user?.id ??
-            v.users_permissions_user,
-        }))
+      ? existingComponentData.map((v: any) => {
+          const mapped: any = {
+            what: v.what ?? v.attributes?.what ?? true,
+            users_permissions_user:
+              v.users_permissions_user?.data?.id ??
+              v.users_permissions_user?.id ??
+              v.users_permissions_user,
+          };
+          const existingWhy = v.why ?? v.attributes?.why;
+          if (typeof existingWhy === 'string' && existingWhy.length > 0) {
+            mapped.why = existingWhy;
+          }
+          return mapped;
+        })
       : [];
 
-    const allVots = [...existingVots, { what: true, users_permissions_user: userId }];
+    const newVote: any = { what: newWhat, users_permissions_user: userId };
+    if (newWhy.length > 0) newVote.why = newWhy;
+    const allVots = [...existingVots, newVote];
 
     const result = await strapi.execute(
       '124addVoteToTosplit',
@@ -322,7 +334,7 @@ const addVoteHandler: ActionExecutionHandler = async (params, context, util) => 
     }
 
     return {
-      data: { id, success: true },
+      data: { id, success: true, what: newWhat },
       updateStrategy: { type: 'none' }
     };
   }
@@ -420,6 +432,16 @@ export const addVoteConfig: ActionConfig = {
       type: 'number',
       required: false,
       description: 'Order number for the vote (defaults to 0)'
+    },
+    what: {
+      type: 'boolean',
+      required: false,
+      description: 'Vote value: true (approve, default) or false (decline). Currently supported by type=tosplit.'
+    },
+    why: {
+      type: 'string',
+      required: false,
+      description: 'Optional reason text for the vote (used with what=false). Currently supported by type=tosplit.'
     }
   },
 
