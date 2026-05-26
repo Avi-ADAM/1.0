@@ -98,7 +98,6 @@
     forumId,
     onModal
   } = $props();
-  const baseUrl = import.meta.env.VITE_URL;
   let storeTimer = $state();
   let localZman = $derived(storeTimer?.zman || 0);
   let isRunning = $derived(storeTimer?.running || false);
@@ -113,7 +112,6 @@
   let show = true;
   let dialogOpen = $state(false);
   let mstotal = hourstotal * 3600000;
-  let idL;
   let showSaveDialog = $state(false);
   let showClearDialog = $state(false);
   let showSaveFinal = $state(false);
@@ -364,64 +362,25 @@
   }
 
   async function handleClearClick() {
+    // Local state reset
     clearInterval(timer);
     lapse = 0;
     x = 0;
     running = false;
-    // tdtd[coinlapach - 1].stname = '0';
-    // tdtd[coinlapach - 1].timer = 0;
-    // tdtd[coinlapach - 1].hoursdon = false;
-    // tdtd[coinlapach - 1].ch = true;
-    // tdtd[coinlapach - 1].x = 0;
-    // tdtd[coinlapach - 1].lapse = 0;
-    //   tdtd[coinlapach - 1].running = false;
-    // betha.set(tdtd);
-
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
     try {
-      await fetch(linkg, {
-        method: 'POST',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        //add already declined ids
-        body: JSON.stringify({
-          query: `mutation 
-                        { 
-updateMesimabetahalich(
-   id: "${mId}"
-  data: {
-stname: "0",
-timer: 0
-  }
-) {data{id attributes{ stname timer}}}
-}
-`
-        })
-      })
-        .then((r) => r.json())
-        .then((data) => (miCatan = data));
-      console.log(miCatan);
+      await executeAction('updateMissionTimerState', {
+        mId: String(mId),
+        projectId: String(projectId),
+        // no hoursdon → clear-only mode
+      });
     } catch (e) {
       error1 = e;
       console.log(error1);
     }
   }
-  let miCatan = [];
 
-  let miDatan;
-  let token;
-  let bearer1;
-
-  let linkg = baseUrl + '/graphql';
   async function save() {
+    // Local state: compute new cumulative hours
     const saved = lapse * 2.7777777777778e-7 + x * 2.7777777777778e-7;
     const noofnew = hoursdon + saved;
     hoursdon = noofnew;
@@ -431,48 +390,12 @@ timer: 0
     lapse = 0;
     x = 0;
     running = false;
-    //   tdtd[coinlapach - 1].stname = '0';
-    //   tdtd[coinlapach - 1].timer = 0;
-    //   tdtd[coinlapach - 1].hoursdon = hoursdon;
-    //   tdtd[coinlapach - 1].ch = true;
-    //   tdtd[coinlapach - 1].x = 0;
-    //   tdtd[coinlapach - 1].lapse = 0;
-    //   tdtd[coinlapach - 1].zman = msdon;
-    //   tdtd[coinlapach - 1].running = false;
-
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
     try {
-      await fetch(linkg, {
-        method: 'POST',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        //add already declined ids
-        body: JSON.stringify({
-          query: `mutation 
-                        { 
-   updateMesimabetahalich(
-   id: "${mId}"
-  data: {
-   howmanyhoursalready: ${hoursdon},
-   stname: "0",
-    timer: 0
- }
- ) {data{id attributes{ howmanyhoursalready}}}
- }
-`
-        })
-      })
-        .then((r) => r.json())
-        .then((data) => (miDatan = data));
-      console.log(miDatan);
+      await executeAction('updateMissionTimerState', {
+        mId: String(mId),
+        projectId: String(projectId),
+        hoursdon,          // save mode — server persists new cumulative hours
+      });
       betha.set(tdtd);
     } catch (e) {
       error1 = e;
@@ -658,9 +581,8 @@ timer: 0
     onHover?.({ id: u });
   }
   import Cards from './cards/inpro.svelte';
-  import { sendToSer } from '$lib/send/sendToSer.js';
+  import { executeAction } from '$lib/client/actionClient';
   import { calcX } from '$lib/func/calcX.svelte';
-  import { page } from '$app/state';
 
   function claf(event) {
     let o = event.alr;
@@ -669,45 +591,17 @@ timer: 0
   }
   async function stat() {
     a = 3;
-    console.log(status[0]);
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
     try {
-      console.log('try');
-      await fetch(linkg, {
-        method: 'POST',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        //add already declined ids
-        body: JSON.stringify({
-          query: `mutation 
-                        { 
-   updateMesimabetahalich(
-    id: "${mId}"
-  data: {
-   status: ${status[0]},
-  }
- ) {data{id }}
- }
-`
-        })
-      })
-        .then((r) => r.json())
-        .then((data) => (miDatan = data));
-      console.log(miDatan);
+      await executeAction('updateMissionStatus', {
+        mId: String(mId),
+        projectId: String(projectId),
+        status: status[0],
+      });
       isOpen = false;
       toast.success(`${success[$lang]}`);
     } catch (e) {
       error1 = e;
       isOpen = false;
-      console.log(error1);
       toast.warning(er[$lang]);
     }
   }
@@ -717,59 +611,52 @@ timer: 0
   }
   async function taskishor(id) {
     try {
-      const res = await sendToSer(
-        { id, myIshur: true },
-        '61ApproveAct',
-        null,
-        null,
-        false,
-        fetch
-      );
-      if (res.data) {
+      const result = await executeAction('updateTask', {
+        id: String(id),
+        projectId: String(projectId),
+        myIshur: true
+      });
+      if (result.success) {
         toast.success(suc[$lang]);
+        // Optimistic UI: switch button to "done" style
+        const task = localTasks.find((t) => t.id == id);
+        if (task) task.attributes.myIshur = true;
       } else {
         toast.warning(er[$lang]);
       }
     } catch (e) {
       console.error(e);
-      toast.warning(`${er[$lang]}`, {
-        description: e.status + ': ' + e.message
-      });
+      toast.warning(`${er[$lang]}`, { description: e.message });
     }
   }
   async function busabe(id) {
     try {
-      const res = await sendToSer(
-        { id, naasa: true },
-        '62MarkActDone',
-        null,
-        null,
-        false,
-        fetch
-      );
-      if (res.data) {
+      const result = await executeAction('updateTask', {
+        id: String(id),
+        projectId: String(projectId),
+        naasa: true
+      });
+      if (result.success) {
         toast.success(suc[$lang]);
+        // Optimistic UI: remove task from list and reset slider states
+        localTasks = localTasks.filter((t) => t.id != id);
+        op = {};
       } else {
         toast.warning(er[$lang]);
       }
     } catch (e) {
       console.error(e);
-      toast.warning(`${er[$lang]}`, {
-        description: e.status + ': ' + e.message
-      });
+      toast.warning(`${er[$lang]}`, { description: e.message });
     }
   }
   async function updStat(id, st, i) {
     try {
-      const res = await sendToSer(
-        { id, status: st[0] },
-        '63SetActStatus',
-        null,
-        null,
-        false,
-        fetch
-      );
-      if (res.data) {
+      const result = await executeAction('updateTask', {
+        id: String(id),
+        projectId: String(projectId),
+        status: st[0]
+      });
+      if (result.success) {
         toast.success(suc[$lang]);
         op[i] = false;
       } else {
@@ -777,9 +664,7 @@ timer: 0
       }
     } catch (e) {
       console.error(e);
-      toast.warning(`${er[$lang]}`, {
-        description: e.status + ': ' + e.message
-      });
+      toast.warning(`${er[$lang]}`, { description: e.message });
     }
   }
   let a = $state(1);
@@ -848,6 +733,8 @@ timer: 0
   let rotation = $derived(((lapse / 1000 / 60) * 360) % 360);
   let op = $state({});
   let msdonf = $derived(hoursdon * 3600000);
+  // Local mutable copy of tasks for optimistic UI updates
+  let localTasks = $state([...tasks]);
 </script>
 
 <TimerDialogs
@@ -1017,68 +904,103 @@ timer: 0
         {:else if a == 3}
           <h2>{rega[$lang]}</h2>
         {:else if a == 4}
-          <div>
-            {#each tasks as task, i}
-              <div
-                class="bg-pink-100 m-2 p-2 flex flex-col justify-center align-middle border border-yellow-300"
-              >
-                <h2 class="text-center underline">{task.attributes.shem}</h2>
-                <p class="text-center">{task.attributes.des}</p>
-                {#key op}
-                  {#if op[i] != true}
-                    <div
-                      onmouseenter={() => hover(sta[$lang])}
-                      onmouseleave={() => hover('0')}
-                      onclick={() => clicked(i)}
-                      onkeypress={() => clicked(i)}
-                      role="button"
-                      tabindex="0"
-                      class=" border rounded-2xl border-barbi hover:border-gold"
-                    >
-                      <div
-                        class=" rounded-2xl bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre"
-                        style="width: {task.attributes.status == null
-                          ? 0
-                          : task.attributes.status}%"
-                      >
-                        {task.attributes.status != null
-                          ? task.attributes.status
-                          : '0'}%
-                      </div>
+          <div class="space-y-3">
+            <!-- Tasks header -->
+            <div class="flex items-center gap-2">
+              <h5 class="text-base font-bold text-gray-800">
+                {$locale === 'he' ? 'מטלות' : 'Tasks'}
+              </h5>
+              <span
+                class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-blue-600 rounded-full"
+              >{tasks.length}</span>
+            </div>
+
+            <!-- Task list -->
+            <div class="space-y-2 max-h-[55vh] overflow-y-auto pr-1">
+              {#each localTasks as task, i}
+                <div
+                  class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+                >
+                  <!-- Task name + description -->
+                  <div
+                    class="px-3 py-2 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-gray-100"
+                  >
+                    <h6 class="font-bold text-gray-800 text-sm leading-snug">
+                      {task.attributes.shem}
+                    </h6>
+                    {#if task.attributes.des}
+                      <p class="text-gray-500 text-xs mt-0.5 leading-relaxed">
+                        {task.attributes.des}
+                      </p>
+                    {/if}
+                  </div>
+
+                  <!-- Progress + buttons -->
+                  <div class="px-3 py-2 space-y-2">
+                    {#key op}
+                      {#if op[i] != true}
+                        <!-- Progress bar (click to edit) -->
+                        <div
+                          onmouseenter={() => hover(sta[$lang])}
+                          onmouseleave={() => hover('0')}
+                          onclick={() => clicked(i)}
+                          onkeypress={() => clicked(i)}
+                          role="button"
+                          tabindex="0"
+                          title={$locale === 'he' ? 'לחץ לעדכון התקדמות' : 'Click to update progress'}
+                          class="cursor-pointer border-2 rounded-xl border-purple-300 hover:border-purple-500 overflow-hidden transition-colors bg-gray-50"
+                        >
+                          <div
+                            class="bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300 flex items-center justify-center"
+                            style="width: {task.attributes.status == null ? 0 : task.attributes.status}%; min-height: 1.75rem;"
+                          >
+                            {#if (task.attributes.status || 0) > 10}
+                              <span class="text-white text-xs font-bold px-1"
+                                >{task.attributes.status}%</span
+                              >
+                            {/if}
+                          </div>
+                          {#if !(task.attributes.status > 0)}
+                            <div class="text-center text-xs text-gray-400 py-1">0%</div>
+                          {/if}
+                        </div>
+                      {:else if op[i] == true}
+                        <div class="space-y-2" dir="ltr">
+                          <RangeSlider
+                            bind:values={task.attributes.status}
+                            suffix="%"
+                            pipstep="20"
+                            float
+                            pips
+                            all="label"
+                            hoverable
+                          />
+                          <button
+                            onclick={() => updStat(task.id, task.attributes.status, i)}
+                            class="w-full py-1.5 text-sm font-bold bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all"
+                          >{ishur[$lang]}</button>
+                        </div>
+                      {/if}
+                    {/key}
+
+                    <!-- Approval / Done button -->
+                    <div class="flex pt-0.5">
+                      {#if task.attributes.myIshur == false}
+                        <button
+                          onclick={() => taskishor(task.id)}
+                          class="flex-1 py-1.5 text-xs font-semibold border-2 border-gray-300 text-gray-600 rounded-lg hover:border-purple-500 hover:text-purple-700 transition-all bg-white"
+                        >{ishur[$lang]}</button>
+                      {:else}
+                        <button
+                          onclick={() => busabe(task.id)}
+                          class="flex-1 py-1.5 text-xs font-bold bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-lg hover:from-green-600 hover:to-teal-600 transition-all"
+                        >{busa[$lang]}</button>
+                      {/if}
                     </div>
-                  {:else if op[i] == true}
-                    <RangeSlider
-                      bind:values={task.attributes.status}
-                      suffix="%"
-                      pipstep="20"
-                      float
-                      pips
-                      all="label"
-                      hoverable
-                    />
-                    <button
-                      onclick={() =>
-                        updStat(task.id, task.attributes.status, i)}
-                      class="button-gold px-5 py-1 mx-auto hover:text-barbi"
-                      >{ishur[$lang]}</button
-                    >
-                  {/if}
-                {/key}
-                {#if task.attributes.myIshur == false}
-                  <button
-                    onclick={taskishor(task.id)}
-                    class="mx-auto button-silver my-1 px-5 py-1 hover:text-barbi"
-                    >{ishur[$lang]}</button
-                  >
-                {:else}
-                  <button
-                    onclick={busabe(task.id)}
-                    class="button-pinkgold mx-auto my-1 px-5 py-1 hover:text-barbi"
-                    >{busa[$lang]}</button
-                  >
-                {/if}
-              </div>
-            {/each}
+                  </div>
+                </div>
+              {/each}
+            </div>
           </div>
         {/if}
       </div></DialogContent
@@ -1119,13 +1041,13 @@ timer: 0
     >
       <SwiperSlide class="swiper-slideg"
         ><div id="normSml">
-          {#if tasks.length > 0}
+          {#if localTasks.length > 0}
             <div
               onclick={opentask}
               onkeypress={opentask}
               class="absolute inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-red-500 border-2 border-white rounded-full top-0 right-0 dark:border-gray-900"
             >
-              {tasks.length}
+              {localTasks.length}
             </div>
           {/if}
           <svg
@@ -2269,7 +2191,7 @@ timer: 0
                   bind:showSaveDialog
                   {low}
                   {storeTimer}
-                  {tasks}
+                  tasks={localTasks}
                   {dueDateOrCountToDedline}
                   {hearotMeyuchadot}
                   {x}
@@ -2312,7 +2234,7 @@ timer: 0
     {isVisible}
     bind:showSaveDialog
     {low}
-    {tasks}
+    tasks={localTasks}
     {storeTimer}
     {forumId}
     {dueDateOrCountToDedline}

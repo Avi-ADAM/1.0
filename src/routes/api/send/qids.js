@@ -5182,7 +5182,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $project: ID,
     $publishedAt: DateTime,
     $users_permissions_user: ID,
-    $vots: [ComponentVotsVotInput],
+    $vots: [ComponentProjectsVotsInput],
     $timer: ID,
     $month: Date
   ) {
@@ -5282,7 +5282,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
 
   '118updateFiniapruvalVots': `mutation UpdateFiniapruvalVots(
     $id: ID!,
-    $vots: [ComponentVotsVotInput],
+    $vots: [ComponentProjectsVotsInput],
     $archived: Boolean
   ) {
     updateFiniapruval(id: $id, data: { vots: $vots, archived: $archived }) {
