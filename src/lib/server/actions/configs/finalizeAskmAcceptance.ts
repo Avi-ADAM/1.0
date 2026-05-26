@@ -4,6 +4,8 @@ const finalizeAskmAcceptanceHandler: ActionExecutionHandler = async (params, con
   const {
     variant,           // 'solo' | 'allVoted' | 'partial'
     openMashaabimId,
+    isSelfProposal = false,
+    pmashId,           // present when isSelfProposal=true; Askm has pmash relation instead of open_mashaabim
     askmId,
     projectId,
     spId,
@@ -60,6 +62,13 @@ const finalizeAskmAcceptanceHandler: ActionExecutionHandler = async (params, con
   // solo or allVoted: full acceptance flow
   const newnew = !existingMemberIds.map(String).includes(String(acceptedUserId));
 
+  // isSelfProposal Askms have a pmash relation instead of open_mashaabim — skip OM steps only then
+  console.log('[finalizeAskmAcceptance] canSkipOm check:', { isSelfProposal, pmashId, openMashaabimId });
+  const canSkipOm = isSelfProposal === true;
+  if (!canSkipOm && !openMashaabimId) {
+    throw new Error('openMashaabimId is required for non-self-proposal Askm acceptance');
+  }
+
   // 1. Create Maap
   await strapi.execute(
     '141createMaap',
@@ -69,15 +78,17 @@ const finalizeAskmAcceptanceHandler: ActionExecutionHandler = async (params, con
         name: missionName,
         sp: spId,
         publishedAt: now.toISOString(),
-        open_mashaabim: openMashaabimId,
+        ...(canSkipOm ? {} : { open_mashaabim: openMashaabimId }),
       },
     },
     context.jwt,
     context.fetch
   );
 
-  // 2. Archive OpenMashaabim
-  await strapi.execute('131archiveOpenMashaabim', { id: openMashaabimId }, context.jwt, context.fetch);
+  // 2. Archive OpenMashaabim (skipped for isSelfProposal+pmash Askms — no OM exists)
+  if (!canSkipOm) {
+    await strapi.execute('131archiveOpenMashaabim', { id: openMashaabimId }, context.jwt, context.fetch);
+  }
 
   // 3. If new member: createWelcomTop + addUserToProject
   if (newnew) {
@@ -119,6 +130,8 @@ export const finalizeAskmAcceptanceConfig: ActionConfig = {
   paramSchema: {
     variant: { type: 'string', required: true },
     openMashaabimId: { type: 'string', required: false },
+    isSelfProposal: { type: 'boolean', required: false },
+    pmashId: { type: 'string', required: false },
     askmId: { type: 'string', required: true },
     projectId: { type: 'string', required: true },
     spId: { type: 'string', required: false },

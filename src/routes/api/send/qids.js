@@ -2678,6 +2678,9 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                   }
                 }
               }
+              isSelfProposal
+              sp { data { id } }
+              pmash { data { id } }
             }
           }
         }

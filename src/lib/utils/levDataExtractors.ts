@@ -640,7 +640,7 @@ export function extractHalukas(userData: any): HalukaData[] {
         // Data needed for rashbi logic
         name: attrs.name || '',
         users: attrs.vots || [],
-        halukot: attrs.halukas || { data: [] },
+        halukot: attrs.halukas?.data || [],
         hervach: attrs.hervachti || [],
         pendId: tosplit.id,
 

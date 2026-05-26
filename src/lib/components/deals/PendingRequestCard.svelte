@@ -59,6 +59,20 @@
     <span class="badge">⏳ {kind === 'buy' ? 'ממתינה לאישור' : 'בקשה נכנסת'}</span>
   </div>
 
+  {#if req.sourceRatsonId}
+    <a
+      href={`/concierge/${req.sourceRatsonId}`}
+      class="wish-source"
+      onclick={(e) => e.stopPropagation()}
+      title="הגיע ממשאלה — לחצי לפתיחה"
+    >
+      <span class="ws-gem"></span>
+      <span class="ws-label">הגיע ממשאלה</span>
+      <span class="ws-name">{req.sourceRatsonName || ''}</span>
+      <span class="ws-arrow">›</span>
+    </a>
+  {/if}
+
   <div class="chips">
     <span class="chip">{category}</span>
     {#if kind === 'sell' && req.requesterName}
@@ -200,4 +214,44 @@
     color: var(--text);
   }
   .mv.gold { color: var(--gold-l); }
+
+  /* Wish-source pill — shown only when Sheirutpend came from a Ratson */
+  .wish-source {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 10px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(255,77,158,0.12), rgba(238,232,170,0.08));
+    border: 1px solid rgba(255,77,158,0.35);
+    color: var(--pink-l);
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
+    max-width: 100%;
+    transition: all 0.2s;
+  }
+  .wish-source:hover {
+    border-color: rgba(255,77,158,0.6);
+    background: linear-gradient(135deg, rgba(255,77,158,0.18), rgba(238,232,170,0.12));
+    transform: translateY(-1px);
+  }
+  .ws-gem {
+    width: 7px; height: 7px;
+    background: linear-gradient(135deg, #ff4d9e, #c8155f);
+    transform: rotate(45deg);
+    box-shadow: 0 0 8px rgba(255,77,158,0.6);
+    flex-shrink: 0;
+  }
+  .ws-label { letter-spacing: 0.5px; opacity: 0.9; }
+  .ws-name {
+    color: var(--gold-l);
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 180px;
+  }
+  .ws-arrow { opacity: 0.7; }
 </style>

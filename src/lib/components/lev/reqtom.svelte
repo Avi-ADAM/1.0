@@ -4,8 +4,6 @@
   import { goto } from '$app/navigation';
   import Chaticon from '../../celim/chaticon.svelte';
   import { Drawer } from 'vaul-svelte';
-  import { getProjectData } from '$lib/stores/projectStore.js';
-
   import { clickOutside } from './outsidclick.js';
   import { fly } from 'svelte/transition';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
@@ -100,7 +98,8 @@
     noofpu = 0,
     publicklinks,
     privatlinks,
-    hearotMeyuchadot,
+    hearotMeyuchadot = '',
+    spnot = '',
     nhours = 0,
     valph = 0,
     missId,
@@ -121,14 +120,42 @@
     spid,
     cards = false,
     chat = $bindable([]),
-    order = $bindable(0)
+    order = $bindable(0),
+    // שדות חדשים למשא ומתן
+    timegramaId,
+    isRishon = false,         // = isSelfProposal: חבר פרויקט שיצר ישירות → כותרת מיוחדת + מו"מ
+    pmashId = undefined,      // pmash relation id — present on isSelfProposal Askms
+    pendingMainVote = false,  // = הצבעה כפולה: גם על הצורך וגם שהחבר נותן אותו
+    negopendmissions = [],
+    orderon = 0,
   } = $props();
   let dialogOpen = $state(false);
   let resP = [];
 
-  let idL;
-  let bearer1;
-  let token;
+  // Negotiation state management
+  let negotiationMode = $state(false);
+  let negotiationLoading = $state(false);
+
+  function toggleNegotiationMode() {
+    negotiationMode = !negotiationMode;
+    if (negotiationMode) {
+      already = true;
+      masa = true;
+      isOpen = true;
+    }
+  }
+
+  function afternego() {
+    isOpen = false;
+    negotiationLoading = false;
+    masa = false;
+    negotiationMode = false;
+    onAcsept?.({ ani: 'askedma', coinlapach });
+  }
+
+  import { executeAction } from '$lib/client/actionClient';
+  import Nego from '../prPr/negoPend.svelte';
+  import { getProjectData } from '$lib/stores/projectStore.js';
   import { Swiper, SwiperSlide } from 'swiper/svelte';
 
   // Import Swiper styles
@@ -159,7 +186,6 @@
   }
   let error1;
   let miDatan = [];
-  let linkg = baseUrl + '/graphql';
 
   function percentage(partialValue, totalValue) {
     return (100 * partialValue) / totalValue;
@@ -233,233 +259,59 @@
       goto('/moach');
     }
   }
-  function objToString(obj) {
-    if (!obj || !Array.isArray(obj)) return '';
-    return obj
-      .map((item) => {
-        let fields = [];
-        for (const [key, val] of Object.entries(item)) {
-          if (val === null || val === undefined || key === '__typename')
-            continue;
-
-          // Handle Strapi relation objects (e.g. users_permissions_user: {data: {id: ...}})
-          if (typeof val === 'object' && val !== null && !Array.isArray(val)) {
-            if (val.data && val.data.id) {
-              fields.push(`${key}: "${val.data.id}"`);
-            } else if (val.id) {
-              fields.push(`${key}: "${val.id}"`);
-            } else {
-              // Fallback: This might still produce quoted keys if it's a raw object,
-              // but we'll try to stick to primitives and known ID patterns.
-              fields.push(`${key}: ${JSON.stringify(val)}`);
-            }
-          } else {
-            // Primitives (strings, numbers, booleans)
-            fields.push(`${key}: ${JSON.stringify(val)}`);
-          }
-        }
-        return `{${fields.join(', ')}}`;
-      })
-      .join(', ');
-  }
-  const userss = objToString(users);
-  let welcome = ``;
-  let adduser = ``;
-  let adduser2 = ``;
   async function agree() {
-    let d = new Date();
+    const isFirst = noofusersOk === 0 && noofusersNo === 0;
     already = true;
-    let isFirst = noofusersOk === 0 && noofusersNo === 0;
     noofusersOk += 1;
     noofusersWaiting -= 1;
     ser = xyz();
-    const date = deadline !== undefined ? ` admaticedai: ${deadline}` : ``;
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    console.log(idL);
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
+    const existingMemberIdsBefore = [...pid];
 
-    console.log(uids);
-    if (pid.includes(userId)) {
-      welcome = ``;
-      adduser2 = ``;
-      adduser = ``;
-      console.log(welcome, 'member');
-    } else {
+    if (!pid.includes(userId)) {
       pid.push(userId);
       pid = pid;
-      welcome = `createWelcomTop(
-    data: {users_permissions_user: "${userId}",
-          project: "${projectId}",
-          publishedAt: "${d.toISOString()}",      
-        }
-    ) {data{id}}`;
-      adduser = `updateProject(
-       id: "${projectId}"
-      data: {user_1s: ["${idL}","${userId}"]}
-       ){data{attributes {user_1s {data{id}}}}}`;
-      adduser2 = `updateProject(
-      id: "${projectId}"
-     data: {user_1s: [${pid}]}
-      ){data {attributes{user_1s {data{id}}}}}`;
-      console.log(welcome, 'not member');
     }
-    //add to pr users create missioninprogres, create welcom ballun;  first check for no of pr users and full consent ,(delete or save for refernce but put archive ) openM and asked
-    if (noofpu === 1) {
-      try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation 
-                        { createMaap(
-      data: {project: "${projectId}",
-             name: "${openmissionName}",
-             sp: "${spid}",
-            publishedAt: "${d.toISOString()}",         
-             open_mashaabim: ${openMid}
-                  }
-  ) {data{attributes{project{data{id }}}}}
 
-  updateOpenMashaabim(
-  id: "${openMid}"
-  data: {archived: true}
- ) {data{id attributes{ archived}}}
- ${welcome}
- ${adduser}
- updateAskm(
-               id: "${askId}" 
-                                data: { archived: true,
-                                    vots: [${userss}${userss ? ',' : ''}
-                                       {
-                                        what: true
-                                        users_permissions_user: "${idL}"
-                                      }
-                                    ]}
-                        ){data{id}}
-}
-`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
-        onAcsept?.({
-          ani: 'askedma',
-          coinlapach: coinlapach
+    if (noofpu === 1 || noofpu === noofusersOk) {
+      const variant = noofpu === 1 ? 'solo' : 'allVoted';
+      try {
+        const result = await executeAction('finalizeAskmAcceptance', {
+          variant,
+          openMashaabimId: openMid != null ? String(openMid) : undefined,
+          isSelfProposal: isRishon,
+          pmashId: pmashId != null ? String(pmashId) : undefined,
+          askmId: String(askId),
+          projectId: String(projectId),
+          spId: String(spid),
+          missionName: openmissionName,
+          acceptedUserId: String(userId),
+          existingMemberIds: existingMemberIdsBefore,
+          existingVotes: users,
         });
+        if (result.success) {
+          onAcsept?.({ ani: 'askedma', coinlapach });
+        } else {
+          error1 = result.error;
+        }
       } catch (e) {
         error1 = e;
-        console.log(error1);
-      }
-    } else if (noofpu === noofusersOk) {
-      console.log('create new as above and add vote and archive asked');
-
-      try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation 
-                        { createMaap(
-      data: {project: "${projectId}",
-             name: "${openmissionName}",
-             sp: "${spid}",
-                     publishedAt: "${d.toISOString()}",
-             open_mashaabim: ${openMid}
-                  }
-  ) {data{attributes{project{data{id}} }}}
-
-updateOpenMashaabim(
-  id: "${openMid}"
-  data: {archived: true}
-) {data{id attributes{ archived}}}
-${welcome}
-${adduser2}
- updateAskm(
-            id: "${askId}" 
-                                data: { archived: true,
-                                    vots: [${userss}${userss ? ',' : ''}
-                                       {
-                                        what: true
-                                        users_permissions_user: "${idL}"
-                                      }
-                                    ]}
-                        ){data{id}}
-}
-`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
-        onAcsept?.({
-          ani: 'askedma',
-          coinlapach: coinlapach
-        });
-      } catch (e) {
-        error1 = e;
-        console.log(error1);
       }
     } else {
-      console.log('just add vote to asked and update to not show for me again');
-      let timeG = ``;
-      if (isFirst) {
-        let fd = getProjectData(projectId, 'finishDate');
-        timeG = `createTimegrama(
-          data: {
-            date: "${fd.toISOString()}",
-            whatami: "askm",
-            askm: "${askId}"
-          }
-        ){
-            data {id}
-          }`;
-      }
       try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation 
-                        {
-                            updateAskm(
-                          id: "${askId}" 
-                                data: { vots: [${userss}${userss ? ',' : ''} 
-                                       {
-                                        what: true
-                                        users_permissions_user: "${idL}"
-                                      }
-                                    ]}
-                        ){data{id}}
-                        ${timeG}
-                    }
-`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
-        onAcsept?.({
-          ani: 'askedma',
-          coinlapach: coinlapach
+        const result = await executeAction('finalizeAskmAcceptance', {
+          variant: 'partial',
+          askmId: String(askId),
+          projectId: String(projectId),
+          existingVotes: users,
+          isFirstVote: isFirst,
         });
+        if (result.success) {
+          onAcsept?.({ ani: 'askedma', coinlapach });
+        } else {
+          error1 = result.error;
+        }
       } catch (e) {
         error1 = e;
-        console.log(error1);
       }
     }
   }
@@ -472,58 +324,23 @@ ${adduser2}
     noofusersNo += 1;
     noofusersWaiting -= 1;
     ser = xyz();
-    const declineda = declined.map((c) => c.id);
-    declineda.push(userId);
 
-    // delete asked coin forever but keep asked on user ////matrix(1, 0, 0, 1, -61.718609, -47.72295)
     if (noofpu === 1) {
-      const cookieValueId = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('id='))
-        .split('=')[1];
-      idL = cookieValueId;
-      token = page.data.tok;
-      bearer1 = 'bearer' + ' ' + token;
       try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          //add already declined ids
-          body: JSON.stringify({
-            query: `mutation 
-                        { 
-updateAskm(
-  id: "${id}"
-  data: {vots: [${userss}${userss ? ',' : ''}
-                                       {
-                                        what: false
-                                        users_permissions_user: "${idL}"
-                                      }
-                                    ],
-                                  archived: true
-}
-) {data{id }}
-}
-`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
-        onDecline?.({
-          ani: 'askedma',
-          coinlapach: coinlapach
+        const result = await executeAction('declineAskmRequest', {
+          askmId: String(id),
+          projectId: String(projectId),
+          existingVotes: users,
         });
+        if (result.success) {
+          onDecline?.({ ani: 'askedma', coinlapach });
+        } else {
+          error1 = result.error;
+        }
       } catch (e) {
         error1 = e;
-        console.log(error1);
       }
     } else if (noofpu > 1) {
-      console.log('if another uprove explain why you decline');
-      //TODO: add decline reason to db
       alert('soon');
     }
   }
@@ -589,10 +406,17 @@ updateAskm(
 
   let isOpen = $state(false),
     diunm = $state(false),
+    masa = $state(false),
     loading = false;
   const close = () => {
     isOpen = false;
     diunm = false;
+    // Reset negotiation state when closing without saving
+    if (negotiationMode && !negotiationLoading) {
+      already = false;
+    }
+    masa = false;
+    negotiationMode = false;
   };
   async function afreact(event) {
     let why = event.why;
@@ -658,66 +482,87 @@ updateAskm(
 
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
   <div transition:fly={{ y: 450, opacity: 0.5, duration: 2000 }}>
-    <DialogContent class="chat" aria-label="form">
-      <div dir="rtl" class="grid items-center justify-center aling-center">
-        <button
-          onclick={close}
-          style="margin: 0 auto;"
-          class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-          title={tit[$lang]}
-          ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-            <path
-              fill="currentColor"
-              d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+    {#if masa === true}
+      <DialogContent aria-label="form" class="nego">
+        <div dir="rtl" class="grid items-center justify-center text-center">
+          <button
+            onclick={close}
+            style="margin: 0 auto;"
+            class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+            title={tit[$lang]}
+          >
+            <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+              />
+            </svg>
+          </button>
+          {#if negotiationLoading}
+            <RingLoader size="260" color="#ff00ae" unit="px" duration="2s" />
+          {:else}
+            <Nego
+              masaalr={false}
+              onLoad={() => (negotiationLoading = true)}
+              onClose={afternego}
+              descrip={missionDetails}
+              {projectName}
+              name1={openmissionName}
+              spnot={hearotMeyuchadot || spnot}
+              price={myp || price}
+              easy={easy || 0}
+              hm={nhours || 0}
+              {timegramaId}
+              {projectId}
+              total={myp || price}
+              noofusers={noofpu}
+              pendId={id}
+              linkto={''}
+              sqadualed={null}
+              sqadualedf={deadline}
+              {users}
+              ordern={orderon}
+              restime={getProjectData(projectId, 'restime')}
             />
-          </svg></button
-        >
-        {#if loading === true}
-          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s" />
-          <!--   
-{:else if masa === true}
-
-<Nego
-      onLoad={()=>loading = true}
-        onClose={afternego}
-  descrip ={descrip}
-  projectName ={projectName}
-  name1 ={name}
-  spnot = {hearotMeyuchadot}
-  kindOf ={kindOf}
-  hm = {hm}
-  {timegramaId}
-  projectId = {projectId}
-  total ={total}
-  noofusers={noofusers}
-  price={price}
-  easy = {easy}
-  linkto = {linkto}
-  pendId ={pendId}
-  mshaabId={mshaabId}
-  sqadualedf={sqadualedf}
-  sqadualed={sqadualed}
-  users={users}
-{restime}
-/>-->
-        {:else if diunm === true}
-          <Diun
-            onRect={afreact}
-            smalldes={projectName + '-' + openmissionName}
-            nameChatPartner={`${chatdes2[$lang]} ${useraplyname}
+          {/if}
+        </div>
+      </DialogContent>
+    {:else if diunm === true}
+      <DialogContent class="chat" aria-label="form">
+        <div dir="rtl" class="grid items-center justify-center aling-center">
+          <button
+            onclick={close}
+            style="margin: 0 auto;"
+            class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+            title={tit[$lang]}
+            ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+              />
+            </svg></button
+          >
+          {#if loading === true}
+            <RingLoader size="260" color="#ff00ae" unit="px" duration="2s" />
+          {:else if diunm === true}
+            <Diun
+              onRect={afreact}
+              smalldes={projectName + '-' + openmissionName}
+              nameChatPartner={`${chatdes2[$lang]} ${useraplyname}
    ${projectName} `}
-            mypos={true}
-            rect={true}
-            {clicked}
-            pendId={askId}
-            profilePicChatPartner={src.length > 0
-              ? src
-              : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
-            ani="askedMa"
-          />
-        {/if}
-      </div>
-    </DialogContent>
+              mypos={true}
+              rect={true}
+              {clicked}
+              pendId={askId}
+              profilePicChatPartner={src.length > 0
+                ? src
+                : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
+              ani="askedMa"
+            />
+          {/if}
+        </div>
+      </DialogContent>
+    {/if}
   </div>
 </DialogOverlay>
 
@@ -823,7 +668,9 @@ updateAskm(
                     width="56px"
                     height="56px"
                     alt={useraplyname}
-                    {src}
+                    src={src && src.length > 0
+                      ? src
+                      : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
                     style="border-radius: 50%;"
                   />
                 </foreignObject>
@@ -1037,6 +884,7 @@ updateAskm(
                 onTochat={tochat}
                 onAgree={() => agree()}
                 onDecline={() => decline()}
+                onNego={isRishon ? toggleNegotiationMode : () => decline()}
                 onHover={hoverc}
                 {already}
                 {projectName}
@@ -1046,6 +894,8 @@ updateAskm(
                 {easy}
                 {myp}
                 {price}
+                {hearotMeyuchadot}
+                {spnot}
                 {noofusersWaiting}
                 {useraplyname}
                 {noofusersOk}
@@ -1055,6 +905,10 @@ updateAskm(
                 {noofusersNo}
                 {users}
                 {projectId}
+                {isRishon}
+                {negotiationMode}
+                {negopendmissions}
+                {orderon}
               />
             </div>
           </Drawer.Content>
@@ -1067,6 +921,7 @@ updateAskm(
     onTochat={tochat}
     onAgree={() => agree()}
     onDecline={() => decline()}
+    onNego={isRishon ? toggleNegotiationMode : () => decline()}
     onHover={hoverc}
     {isVisible}
     {already}
@@ -1079,6 +934,8 @@ updateAskm(
     {easy}
     {myp}
     {price}
+    {hearotMeyuchadot}
+    {spnot}
     {noofusersWaiting}
     {useraplyname}
     {noofusersOk}
@@ -1086,6 +943,10 @@ updateAskm(
     {openmissionName}
     {missionDetails}
     {noofusersNo}
+    {isRishon}
+    {negotiationMode}
+    {negopendmissions}
+    {orderon}
   />
 {/if}
 
@@ -1315,6 +1176,38 @@ updateAskm(
     .timg {
       height: 32px;
       height: 32px;
+    }
+  }
+
+  /* ─── Dialog overlays ─── */
+  :global([data-svelte-dialog-overlay].overlay) {
+    z-index: 1000;
+  }
+  :global([data-svelte-dialog-content].nego) {
+    z-index: 1000;
+    padding: 10px;
+    background-color: #242526;
+    width: 80vw;
+  }
+  :global([data-svelte-dialog-content].chat) {
+    z-index: 1000;
+    padding: 0px;
+    background-color: #242526;
+    margin: 0px;
+    height: 70vh;
+    aspect-ratio: 1/1.7;
+    margin-top: 30vh;
+    border-radius: 10%;
+  }
+  @media (min-width: 600px) {
+    :global([data-svelte-dialog-content].nego) {
+      width: 50vw;
+    }
+    :global([data-svelte-dialog-content].chat) {
+      height: 80vh;
+      aspect-ratio: 1/2;
+      margin-top: 20vh;
+      border-radius: 15%;
     }
   }
 </style>

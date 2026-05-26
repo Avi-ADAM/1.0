@@ -86,11 +86,6 @@ export const createMashaabimRequestConfig: ActionConfig = {
 
   authRules: [
     { type: 'jwt' },
-    {
-      type: 'projectMember',
-      config: { projectIdParam: 'projectId' },
-      errorMessage: 'Must be a project member to request a resource'
-    }
   ],
 
   notification: {
