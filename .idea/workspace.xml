@@ -4,22 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="95e10908-753e-4b5e-a7b6-37b180d77d7c" name="Changes" comment="144.9 migration">
+;    <list default="true" id="95e10908-753e-4b5e-a7b6-37b180d77d7c" name="Changes" comment="145.1 migration">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.mcp.json" beforeDir="false" afterPath="$PROJECT_DIR$/.mcp.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/deals/PendingRequestCard.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/deals/PendingRequestCard.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/cards/hachlata.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/cards/hachlata.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/cards/rektom.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/cards/rektom.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/decisionMaking.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/decisionMaking.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/halukaask.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/halukaask.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/mashsuggest.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/mashsuggest.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/pmas.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/pmas.svelte" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/projectSuggestor.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/projectSuggestor.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/reqtom.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/reqtom.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/lev/reqtosherut.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/reqtosherut.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/components/mail/mail.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/mail/mail.svelte" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/server/actions/configs/createMashaabimRequest.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/server/actions/configs/createMashaabimRequest.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/lib/server/actions/configs/finalizeAskmAcceptance.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/server/actions/configs/finalizeAskmAcceptance.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/utils/levDataExtractors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/utils/levDataExtractors.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/api/send/qids.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/api/send/qids.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -99,7 +99,7 @@
       <option name="presentableId" value="Default" />
       <updated>1778848920472</updated>
       <workItem from="1778848921944" duration="7860000" />
-      <workItem from="1779725764144" duration="14850000" />
+      <workItem from="1779725764144" duration="17194000" />
     </task>
     <task id="LOCAL‎-00001" summary="144.5 migration wishes">
       <option name="closed" value="true" />
@@ -141,7 +141,15 @@
       <option name="project" value="LOCAL‎" />
       <updated>1779794809998</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL‎-00006" summary="145 migration">
+      <option name="closed" value="true" />
+      <created>1779796197917</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL‎-00006" />
+      <option name="project" value="LOCAL‎" />
+      <updated>1779796197917</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -164,6 +172,8 @@
     <MESSAGE value="144.7 migration" />
     <MESSAGE value="144.8 migration" />
     <MESSAGE value="144.9 migration" />
-    <option name="LAST_COMMIT_MESSAGE" value="144.9 migration" />
+    <MESSAGE value="145 migration" />
+    <MESSAGE value="145.1 migration" />
+    <option name="LAST_COMMIT_MESSAGE" value="145.1 migration" />
   </component>
 </project>
