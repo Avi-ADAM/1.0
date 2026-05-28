@@ -85,6 +85,17 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
 
   const allVots = [...previousVotes, newVote];
 
+  // Vote in Strapi-nested shape, so receiving clients (levSocketHandler →
+  // pends store) can append it and let processPends() recompute the counts.
+  const strapiVote: Record<string, any> = {
+    what: Boolean(what),
+    users_permissions_user: { data: { id: strUserId } },
+    order: orderon,
+    ide: parseInt(strUserId, 10),
+    zman: now.toISOString(),
+  };
+  if (why) strapiVote.why = why;
+
   // 5. Count YES votes at orderon among project members
   const yesMemberCount = (() => {
     const yesSet = new Set(
@@ -175,13 +186,15 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
       throw new Error(`voteOnPendm consensus mutation failed: ${JSON.stringify(responseData.errors)}`);
     }
 
+    // Consensus archives the pendm and creates an OpenMission — both the
+    // disappearing pend and the new mission must reflect everywhere, so refresh.
     return {
       data: {
         openMissionId: responseData.data?.createOpenMission?.data?.id,
         pendId,
         consensus: true,
       },
-      updateStrategy: { type: 'none' },
+      updateStrategy: { type: 'fullRefresh' },
     };
   }
 
@@ -201,13 +214,20 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
 
   if (archiveOnNo) {
     await strapi.execute('143archivePendmWithVotes', { id: pendId, users: allVots }, context.jwt, context.fetch);
-  } else {
-    await strapi.execute('85addVoteToPend', { id: pendId, users: allVots }, context.jwt, context.fetch);
+    // Full NO consensus archives the pendm — it must disappear for everyone.
+    return {
+      data: { pendId, consensus: false, archived: true },
+      updateStrategy: { type: 'fullRefresh' },
+    };
   }
 
+  await strapi.execute('85addVoteToPend', { id: pendId, users: allVots }, context.jwt, context.fetch);
+
+  // Regular vote: broadcast the single new vote so every project member (and the
+  // voter's other devices) appends it and re-derives the live vote counts.
   return {
-    data: { pendId, consensus: false, archived: archiveOnNo },
-    updateStrategy: { type: 'none' },
+    data: { id: pendId, newVote: strapiVote, consensus: false, archived: false },
+    updateStrategy: { type: 'partialUpdate', config: { dataKeys: ['pends'] } },
   };
 };
 

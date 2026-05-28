@@ -174,6 +174,48 @@ function extractData(data: any): any {
 }
 
 /**
+ * Extract a voter id from a vote object regardless of shape
+ * (nested Strapi relation, flat id, or `ide` fallback).
+ */
+function voterIdOf(vote: any): string | undefined {
+  const id =
+    vote?.users_permissions_user?.data?.id ??
+    vote?.users_permissions_user?.id ??
+    vote?.users_permissions_user ??
+    vote?.ide;
+  return id != null ? String(id) : undefined;
+}
+
+/**
+ * Append a vote to an item's vote array idempotently.
+ *
+ * Removes any prior vote by the same voter (optionally only at the same `order`,
+ * to preserve historical votes from earlier negotiation rounds) and appends the
+ * new one. This makes the update safe to apply repeatedly — including the echo
+ * the voting device receives for its own action — without double counting, and
+ * it correctly reflects a member changing their vote.
+ *
+ * Returns the new array, or null when the vote can't be identified (caller should
+ * then leave the store untouched).
+ */
+function mergeVote(existing: any[] | undefined, newVote: any, matchOrder: boolean): any[] | null {
+  const voterId = voterIdOf(newVote);
+  if (!voterId) return null;
+
+  const arr = Array.isArray(existing) ? existing : [];
+  const order = newVote.order ?? 0;
+
+  const filtered = arr.filter((v: any) => {
+    if (voterIdOf(v) !== voterId) return true;
+    // Same voter: drop the conflicting vote so the new one replaces it.
+    if (matchOrder) return (v.order ?? 0) !== order; // keep votes from other rounds
+    return false;
+  });
+
+  return [...filtered, newVote];
+}
+
+/**
  * Handle partial update of specific stores
  * 
  * This updates only the stores specified in dataKeys with the provided data.
@@ -309,7 +351,17 @@ export function updatePendsStore(data: Partial<PendMissionData> & { id: string }
     if (index !== -1) {
       // Update existing item
       console.log('✏️ [levSocketHandler] Updating existing pend', { id: data.id });
-      current[index] = { ...current[index], ...data };
+
+      const newVote = (data as any).newVote;
+      if (newVote) {
+        // Append the vote (order-aware) so processPends re-derives the counts.
+        const merged = mergeVote((current[index] as any).users, newVote, true);
+        if (merged) {
+          current[index] = { ...current[index], users: merged } as PendMissionData;
+        }
+      } else {
+        current[index] = { ...current[index], ...data };
+      }
     } else {
       // Add new item
       console.log('➕ [levSocketHandler] Adding new pend', { id: data.id });
@@ -491,7 +543,16 @@ export function updatePmashesStore(data: Partial<PendResourceData> & { id: strin
 
     if (index !== -1) {
       console.log('✏️ [levSocketHandler] Updating existing pmash', { id: data.id });
-      current[index] = { ...current[index], ...data };
+
+      const newVote = (data as any).newVote;
+      if (newVote) {
+        const merged = mergeVote((current[index] as any).users, newVote, true);
+        if (merged) {
+          current[index] = { ...current[index], users: merged } as PendResourceData;
+        }
+      } else {
+        current[index] = { ...current[index], ...data };
+      }
     } else {
       console.log('➕ [levSocketHandler] Adding new pmash', { id: data.id });
       current.push(data as PendResourceData);
@@ -524,7 +585,17 @@ export function updateWegetsStore(data: Partial<ResourceRequestData> & { id: str
 
     if (index !== -1) {
       console.log('✏️ [levSocketHandler] Updating existing weget', { id: data.id });
-      current[index] = { ...current[index], ...data };
+
+      const newVote = (data as any).newVote;
+      if (newVote) {
+        // Maap/weget votes live on `vots` and have no order (one vote per member).
+        const merged = mergeVote((current[index] as any).vots, newVote, false);
+        if (merged) {
+          current[index] = { ...current[index], vots: merged } as ResourceRequestData;
+        }
+      } else {
+        current[index] = { ...current[index], ...data };
+      }
     } else {
       console.log('➕ [levSocketHandler] Adding new weget', { id: data.id });
       current.push(data as ResourceRequestData);

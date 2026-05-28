@@ -192,9 +192,10 @@ const voteOnDecisionHandler: ActionExecutionHandler = async (params, context, { 
       );
     }
 
+    // Consensus archives the Decision and applies the project change — refresh everywhere.
     return {
       data: { decisionId, consensus: true, kind },
-      updateStrategy: { type: 'none' },
+      updateStrategy: { type: 'fullRefresh' },
     };
   } else {
     // ── NON-CONSENSUS: save updated vots ─────────────────────────────────────
@@ -205,9 +206,19 @@ const voteOnDecisionHandler: ActionExecutionHandler = async (params, context, { 
       context.fetch,
     );
 
+    // Vote in Strapi-nested shape so the decisions store can append it and
+    // processDecisions() recomputes the live counts for every member + device.
+    const strapiVote = {
+      what: true,
+      users_permissions_user: { data: { id: String(userId) } },
+      ide: parseInt(String(userId), 10),
+      zman: now.toISOString(),
+      order: 0,
+    };
+
     return {
-      data: { decisionId, consensus: false, kind, newVote },
-      updateStrategy: { type: 'none' },
+      data: { id: decisionId, newVote: strapiVote, consensus: false, kind },
+      updateStrategy: { type: 'partialUpdate', config: { dataKeys: ['decisions'] } },
     };
   }
 };
@@ -250,7 +261,7 @@ export const voteOnDecisionConfig: ActionConfig = {
   notification: {
     recipients: {
       type: 'projectMembers',
-      config: { projectIdParam: 'projectId', excludeSender: true },
+      config: { projectIdParam: 'projectId', excludeSender: false },
     },
     templates: {
       title: { he: 'הצבעה על החלטת פרויקט', en: 'Project decision vote' },
