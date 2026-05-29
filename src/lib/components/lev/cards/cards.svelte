@@ -241,6 +241,18 @@
       filteredArr = arr1;
     }
   });
+
+  // Stable identity signature for the Swiper #key. arr1/filteredArr get a NEW
+  // array reference whenever a timer ticks or toggles (processedMtaha re-emits on
+  // the timers store), which would otherwise tear down & rebuild the Swiper and
+  // snap it back to slide 0. Keying on the *set of cards* (+ active project filter)
+  // means the Swiper only rebuilds when cards are added/removed/reordered or the
+  // filter changes — not when a card's live timer updates.
+  let swiperKey = $derived(
+    (currentProjectIdFilter ?? 'all') +
+      '|' +
+      filteredArr.map((b) => b.coinlapach).join(',')
+  );
   $effect(() => {
     console.log(swiperRef, 'swiperREF');
     if (!isScrolable.value) {
@@ -486,7 +498,7 @@
           onmouseenter={() => hoverede()}
           onmouseleave={() => hoverede()}
         >
-          {#key filteredArr}
+          {#key swiperKey}
             <Swiper
               releaseOnEdges={true}
               direction={!isMobileOrTablet() ? 'horizontal' : 'vertical'}

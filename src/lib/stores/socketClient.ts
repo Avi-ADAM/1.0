@@ -78,6 +78,24 @@ const MAX_RECONNECT_ATTEMPTS = 10;
 const RECONNECT_DELAY = 1000; // Start with 1 second
 
 /**
+ * Unique id for THIS browser tab. Used for echo-suppression: actions tag their
+ * socket notifications with this id so the originating tab can ignore its own
+ * echo (it already updated optimistically), while other devices/tabs of the
+ * same user — which have different ids — still sync normally.
+ */
+export const CLIENT_ID: string =
+  browser && typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `c_${Math.random().toString(36).slice(2)}_${Date.now()}`;
+
+if (browser) {
+  // Expose globally so non-socket modules (e.g. $lib/func/timers.js, which also
+  // runs server-side for the Telegram bot) can read it without importing this
+  // browser-only module.
+  (window as any).__timerClientId = CLIENT_ID;
+}
+
+/**
  * Create the socket client store
  */
 function createSocketClient() {
