@@ -154,7 +154,8 @@ export class NotificationOrchestrator {
             filteredRecipients,
             notificationData,
             config.emailTemplate || 'SimpleNuti',
-            context
+            context,
+            config.emailTemplateData
           )
         );
       }

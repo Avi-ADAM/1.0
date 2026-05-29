@@ -6,7 +6,7 @@ import { lang } from '$lib/stores/lang';
   import { idPr } from "$lib/stores/idPr";
   import RichText from "$lib/celim/ui/richText.svelte";
   import Close from "$lib/celim/close.svelte";
-  import { sendToSer } from "$lib/send/sendToSer";
+  import { executeAction } from '$lib/client/actionClient';
 let {
   onCoinLapach,
   coinlapach,
@@ -20,17 +20,13 @@ let {
   src = "https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png"
 } = $props();
 const onProjectClick = () => {idPr.set(projectId); goto("/moach")}
-async function onChatClick  () { 
-  console.log(welcomId," clicked to chat"
-  )
-  await sendToSer({ id: welcomId, clicked: true },'44updateWelcomeCard',null,null,false,fetch)
-  .then((data) => {
-    if (data?.data?.updateWelcomTop?.data.attributes.clicked == true) {
-      onCoinLapach?.({coinlapach:coinlapach})
-    } else {
-      console.error("Error updating welcome card:", data);
-    }
-  })
+async function onChatClick() {
+  const result = await executeAction('updateWelcomeCard', { id: welcomId, clicked: true });
+  if (result.success) {
+    onCoinLapach?.({ coinlapach });
+  } else {
+    console.error('Error updating welcome card:', result.error);
+  }
 }
 let isHovered = $state(false);
 let showConfetti = $state(false);

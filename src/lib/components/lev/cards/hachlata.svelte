@@ -66,7 +66,11 @@
     projectId,
     users = [],
     activeOrder = 0,
-    onProj
+    onProj,
+    /** @type {string} current value of the project field being changed */
+    currentValue = '',
+    /** @type {string} proposed new value */
+    newValue = '',
   } = $props();
   let user_1s = $derived.by(() => {
     return getProjectData(projectId, 'us') || [];
@@ -195,6 +199,69 @@
               : equaliSplitedFl[$lang]}
           </h5>
         </div>
+      </div>
+    {:else if kind !== 'sheirutpends' && kind !== 'pic' && (currentValue || newValue)}
+      <!-- Generic before/after display for text-based decision kinds -->
+      <div
+        class="space-y-3 bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700"
+      >
+        {#if kind === 'vallueles'}
+          <!-- Removing values: show what will be removed -->
+          <div class="flex flex-col gap-1">
+            <span class="text-xs font-semibold text-red-500 dark:text-red-400 uppercase tracking-wide flex items-center gap-1">
+              <span>🗑️</span>
+              {$lang === 'he' ? 'יוסרו מהפרויקט' : 'Will be removed'}
+            </span>
+            <p class="text-gray-700 dark:text-gray-200 text-sm bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg border border-red-200 dark:border-red-800">
+              {currentValue}
+            </p>
+          </div>
+        {:else if kind === 'vallueadd'}
+          <!-- Adding values: show what will be added -->
+          <div class="flex flex-col gap-1">
+            <span class="text-xs font-semibold text-green-600 dark:text-green-400 uppercase tracking-wide flex items-center gap-1">
+              <span>➕</span>
+              {$lang === 'he' ? 'יתווספו לפרויקט' : 'Will be added'}
+            </span>
+            <p class="text-gray-700 dark:text-gray-200 text-sm bg-green-50 dark:bg-green-900/20 px-3 py-2 rounded-lg border border-green-200 dark:border-green-800">
+              {newValue}
+            </p>
+          </div>
+        {:else}
+          <!-- Before → After display for all other kinds -->
+          {#if currentValue}
+            <div class="flex flex-col gap-1">
+              <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide flex items-center gap-1">
+                <span>📌</span>
+                {$lang === 'he' ? 'כרגע' : 'Current'}
+              </span>
+              <p class="text-gray-600 dark:text-gray-400 text-sm bg-white dark:bg-gray-800 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 line-through opacity-70 break-all">
+                {currentValue}
+              </p>
+            </div>
+          {/if}
+          {#if newValue}
+            <div class="flex items-center justify-center text-barbi dark:text-mpink text-lg my-1">↓</div>
+            <div class="flex flex-col gap-1">
+              <span class="text-xs font-semibold text-barbi dark:text-mpink uppercase tracking-wide flex items-center gap-1">
+                <span>✨</span>
+                {$lang === 'he' ? 'מוצע' : 'Proposed'}
+              </span>
+              <p class="text-gray-800 dark:text-gray-100 text-sm bg-barbi/5 dark:bg-mpink/10 px-3 py-2 rounded-lg border border-barbi/30 dark:border-mpink/30 font-medium break-all">
+                {newValue}
+              </p>
+            </div>
+          {/if}
+        {/if}
+      </div>
+    {:else if kind !== 'sheirutpends' && kind !== 'pic' && !currentValue && !newValue}
+      <!-- Loading state for text-based kinds before data arrives -->
+      <div class="flex items-center justify-center py-6 text-gray-400 dark:text-gray-500">
+        <svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+        </svg>
+        <span class="text-sm">{$lang === 'he' ? 'טוען פרטים...' : 'Loading details...'}</span>
       </div>
     {:else if kind == 'pic'}
       <div

@@ -1,0 +1,22 @@
+{
+  "title": "My Deals",
+  "subtitle": "Track all products and their status in real-time",
+  "my_purchases": "My Purchases",
+  "my_sales": "My Sales",
+  "pending_requests": "Pending Requests",
+  "active_purchases": "Active Purchases",
+  "active_sales": "Active Sales",
+  "pending_requests_label": "Purchase requests awaiting approval",
+  "no_active_purchases": "You don't have active purchases yet",
+  "no_active_sales": "You don't have active sales yet",
+  "no_pending_requests": "No pending requests",
+  "logo_alt": "deals logo",
+  "quick_sales_center": "Sales Center",
+  "quick_sales_center_hint": "Sell products from your projects",
+  "quick_concierge": "Concierge",
+  "quick_concierge_hint": "Purchase requests & wishes",
+  "cta_start_selling": "Open Sales Center",
+  "cta_find_products": "Search via Concierge",
+  "cta_sales_center_desc": "Go to the Sales Center to add a new sale",
+  "cta_concierge_desc": "Post a wish and find what you're looking for"
+}

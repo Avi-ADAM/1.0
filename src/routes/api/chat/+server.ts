@@ -4,6 +4,7 @@ import { json } from '@sveltejs/kit';
 import { mastra } from '../../../mastra';
 import { createUnregisteredBotAgent } from '../../../mastra/agents/nonreg-bot.js';
 import { t } from '$lib/translations';
+import { sendToSer } from '$lib/send/sendToSer.js';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': 'https://www.1lev1.com',
@@ -186,11 +187,16 @@ export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
     
     // Detect rich UI components (supplemental)
     const detectedComponents = detectRenderComponents(lastUserMessage.content);
-    if (detectedComponents.length > 0) {
+    const missionNameHint: string | null = outputData.intent?.details?.target ?? null;
+    const timerEditComponents = userId
+      ? await detectTimerEditComponents(lastUserMessage.content, userId.toString(), fetch, missionNameHint)
+      : [];
+    const allExtra = [...detectedComponents, ...timerEditComponents];
+    if (allExtra.length > 0) {
       if (!Array.isArray(response.components)) {
         response.components = [];
       }
-      (response.components as any[]).push(...detectedComponents);
+      (response.components as any[]).push(...allExtra);
     }
 
     console.log('📤 Workflow response: content=', String(response.content).slice(0, 80), '| nav=', !!response.navigation, '| timer=', !!response.timerAction);
@@ -210,6 +216,79 @@ export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
   }
 };
 
+
+// ── Timer interval edit component detection ──────────────
+// Matches intent to edit/correct timer times regardless of exact phrasing.
+// Hebrew: any combo of (ערוך/לערוך/עריכת/שנה/תקן) near (טיימר/זמן/שעות/קטע/זמנים)
+// English: edit/fix/correct/adjust near timer/interval/time/hours
+const TIMER_EDIT_PATTERN = new RegExp(
+  // Hebrew — verb near noun (up to 20 chars apart, or noun near verb)
+  '(ערו[ךכ]|לערוך|עריכת|שינוי|שנה|תקן|לתקן)(.{0,20})(טיימר|זמן|שעות|קטע|זמנים)' +
+  '|(טיימר|זמן|שעות|קטע|זמנים)(.{0,20})(ערו[ךכ]|לערוך|עריכת|שינוי|שנה|תקן|לתקן)' +
+  // English
+  '|edit.{0,15}(timer|interval|time|hours)' +
+  '|(fix|correct|adjust|change|update).{0,15}(timer|interval|time|hours)',
+  'i'
+);
+
+async function detectTimerEditComponents(
+  userText: string,
+  userId: string,
+  fetchInstance: Function,
+  missionNameHint: string | null = null
+): Promise<any[]> {
+  if (!TIMER_EDIT_PATTERN.test(userText)) return [];
+
+  try {
+    const res = await sendToSer({ id: userId }, '8getMissionsOnProgress', 0, 0, false, fetchInstance);
+    const missions = (res as any)?.data?.usersPermissionsUser?.data?.attributes?.mesimabetahaliches?.data ?? [];
+
+    // Only include missions that have at least one completed interval
+    let withTimers = missions.filter((m: any) => {
+      const intervals = m.attributes.activeTimer?.data?.attributes?.timers;
+      return Array.isArray(intervals) && intervals.some((iv: any) => iv.start && iv.stop);
+    });
+    if (withTimers.length === 0) return [];
+
+    // If we know which mission the user asked about, narrow down to just that one.
+    // Score each mission by how many words from the hint appear in its name.
+    if (missionNameHint) {
+      const hintWords = missionNameHint
+        .toLowerCase()
+        .split(/\s+/)
+        .filter((w) => w.length > 1);
+
+      const scored = withTimers.map((m: any) => {
+        const name = (m.attributes.name || '').toLowerCase();
+        const score = hintWords.reduce((s: number, w: string) => s + (name.includes(w) ? 1 : 0), 0);
+        return { m, score };
+      });
+
+      const bestScore = Math.max(...scored.map((x: any) => x.score));
+      if (bestScore > 0) {
+        // Keep only missions that share the most words with the hint
+        withTimers = scored
+          .filter((x: any) => x.score === bestScore)
+          .map((x: any) => x.m);
+      }
+      // If bestScore === 0 nothing matched the hint — fall through and show all
+    }
+
+    return withTimers.map((mission: any) => ({
+      type: 'timer_edit',
+      props: {
+        missionId: mission.id,
+        missionName: mission.attributes.name,
+        timerId: mission.attributes.activeTimer.data.id,
+        projectId: mission.attributes.project?.data?.id || '',
+        intervals: mission.attributes.activeTimer.data.attributes.timers || []
+      }
+    }));
+  } catch (err) {
+    console.error('detectTimerEditComponents error:', err);
+    return [];
+  }
+}
 
 // ── Rich component detection ─────────────────────────────
 function detectRenderComponents(userText: string) {

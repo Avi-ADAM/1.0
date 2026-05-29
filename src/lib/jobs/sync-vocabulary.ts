@@ -7,7 +7,7 @@ import { embedBatch } from '../embed/gemini-embeddings';
 import { upsertVectors, fetchExistingIds, type VocabNamespace } from '../embed/pinecone';
 
 const STRAPI_URL = process.env.VITE_URL!;
-const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN!;
+const STRAPI_TOKEN = process.env.NEW_S!;
 
 // ─── Embedding cache ──────────────────────────────────────────────────────────
 // שומר embeddings ל-JSON אחרי Gemini — אם הריצה נכשלת, הפעם הבאה דולגת על Gemini
@@ -94,11 +94,21 @@ type RawWorkWay = {
     }>;
 };
 
+type RawVallue = {
+    id: string;
+    attributes: L<{
+        valueName: string;
+        descrip?: string;
+    }>;
+};
+
 // ─── GraphQL ──────────────────────────────────────────────────────────────────
 
 const LOC = (field: string) => `localizations { data { attributes { ${field} } } }`;
 
 async function gql<T>(query: string): Promise<T> {
+    console.log('GraphQL query:', query);
+    console.log('STRAPI_TOKEN:', STRAPI_TOKEN );
     const res = await fetch(`${STRAPI_URL}/graphql`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${STRAPI_TOKEN}` },
@@ -106,6 +116,7 @@ async function gql<T>(query: string): Promise<T> {
     });
     if (!res.ok) throw new Error(`GraphQL error: ${res.status}`);
     const json = await res.json();
+    console.log('GraphQL response:', JSON.stringify(json, null, 2));
     if (json.errors) throw new Error(json.errors[0].message);
     return json.data;
 }
@@ -152,6 +163,15 @@ async function fetchWorkWays(): Promise<RawWorkWay[]> {
         }}}
     }`);
     return data.workWays.data;
+}
+
+async function fetchVallues(): Promise<RawVallue[]> {
+    const data = await gql<{ vallues: { data: RawVallue[] } }>(`query {
+        vallues(pagination: { pageSize: 500 }) { data { id attributes {
+            valueName descrip ${LOC('valueName descrip')}
+        }}}
+    }`);
+    return data.vallues.data;
 }
 
 // ─── Label builders ───────────────────────────────────────────────────────────
@@ -205,6 +225,16 @@ function buildWorkWayLabel(w: RawWorkWay): string {
     return [
         names.join(' / '),
         missions.length ? `משימות / Missions: ${[...new Set(missions)].join(', ')}` : '',
+    ].filter(Boolean).join('. ');
+}
+
+function buildVallueLabel(v: RawVallue): string {
+    const a = v.attributes;
+    const names = allLocales(a.valueName, a.localizations, 'valueName');
+    const descrips = allLocales(a.descrip ?? '', a.localizations, 'descrip').filter(Boolean);
+    return [
+        names.join(' / '),
+        descrips.length ? descrips.join('. ') : '',
     ].filter(Boolean).join('. ');
 }
 
@@ -276,18 +306,25 @@ export async function syncVocabulary() {
     console.log('🔄 מתחיל סנכרון vocabulary...');
     const start = Date.now();
 
-    const [skills, roles, missions, workWays] = await Promise.all([
-        fetchSkills(), fetchRoles(), fetchMissions(), fetchWorkWays(),
+    const [skills, roles, missions, workWays, vallues] = await Promise.all([
+        fetchSkills(), fetchRoles(), fetchMissions(), fetchWorkWays(), fetchVallues(),
     ]);
 
     await syncNamespace('skills', skills.map(s => ({ id: s.id, label: s.attributes.skillName, enrichedLabel: buildSkillLabel(s) })));
     await syncNamespace('roles', roles.map(r => ({ id: r.id, label: r.attributes.roleDescription, enrichedLabel: buildRoleLabel(r) })));
     await syncNamespace('missions', missions.map(m => ({ id: m.id, label: m.attributes.missionName, enrichedLabel: buildMissionLabel(m) })));
     await syncNamespace('work_ways', workWays.map(w => ({ id: w.id, label: w.attributes.workWayName, enrichedLabel: buildWorkWayLabel(w) })));
+    await syncNamespace('vallues', vallues.map(v => ({ id: v.id, label: v.attributes.valueName, enrichedLabel: buildVallueLabel(v) })));
 
     console.log(`\n✅ סנכרון הושלם ב-${((Date.now() - start) / 1000).toFixed(1)}s`);
 }
 
-console.log('PINECONE_API_KEY:', process.env.PINECONE ? '✓' : '✗ חסר');
-console.log('STRAPI_URL:', process.env.VITE_URL ?? '✗ חסר');
-syncVocabulary().catch(err => { console.error('❌', err); process.exit(1); });
+// הרצה כסקריפט עצמאי בלבד (npx tsx src/lib/jobs/sync-vocabulary.ts).
+// אם הקובץ מיובא ע"י endpoint או מודול אחר — לא להריץ אוטומטית, אחרת build נופל.
+import { fileURLToPath } from 'url';
+const isDirectRun = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];
+if (isDirectRun) {
+    console.log('PINECONE_API_KEY:', process.env.PINECONE ? '✓' : '✗ חסר');
+    console.log('STRAPI_URL:', process.env.VITE_URL ?? '✗ חסר');
+    syncVocabulary().catch(err => { console.error('❌', err); process.exit(1); });
+}

@@ -17,8 +17,8 @@ const addVoteHandler: ActionExecutionHandler = async (params, context, util) => 
   const { strapi } = util;
 
   // Validation
-  if (!type || !['pend', 'sheirutpend', 'ask', 'decision', 'weFinnish'].includes(type)) {
-    throw new Error('Invalid type. Must be "pend", "sheirutpend", "ask", "decision", or "weFinnish"');
+  if (!type || !['pend', 'sheirutpend', 'ask', 'decision', 'weFinnish', 'tosplit'].includes(type)) {
+    throw new Error('Invalid type. Must be "pend", "sheirutpend", "ask", "decision", "weFinnish", or "tosplit"');
   }
 
   if (!id || !projectId) {
@@ -293,6 +293,52 @@ const addVoteHandler: ActionExecutionHandler = async (params, context, util) => 
     };
   }
 
+  // --- Logic for Tosplit (Component Based - partial vote, not yet allVoted) ---
+  // Supports both positive (default) and negative (decline) votes:
+  // pass `what: false` + `why: "..."` to record a decline.
+  if (type === 'tosplit') {
+    const { existingComponentData, what, why } = params;
+    const newWhat = typeof what === 'boolean' ? what : true;
+    const newWhy = typeof why === 'string' ? why : '';
+
+    const existingVots = Array.isArray(existingComponentData)
+      ? existingComponentData.map((v: any) => {
+          const mapped: any = {
+            what: v.what ?? v.attributes?.what ?? true,
+            users_permissions_user:
+              v.users_permissions_user?.data?.id ??
+              v.users_permissions_user?.id ??
+              v.users_permissions_user,
+          };
+          const existingWhy = v.why ?? v.attributes?.why;
+          if (typeof existingWhy === 'string' && existingWhy.length > 0) {
+            mapped.why = existingWhy;
+          }
+          return mapped;
+        })
+      : [];
+
+    const newVote: any = { what: newWhat, users_permissions_user: userId };
+    if (newWhy.length > 0) newVote.why = newWhy;
+    const allVots = [...existingVots, newVote];
+
+    const result = await strapi.execute(
+      '124addVoteToTosplit',
+      { id, vots: allVots },
+      context.jwt,
+      context.fetch
+    );
+
+    if (!result || result.errors) {
+      throw new Error(`AddVoteToTosplit failed: ${JSON.stringify(result?.errors || 'Unknown error')}`);
+    }
+
+    return {
+      data: { id, success: true, what: newWhat },
+      updateStrategy: { type: 'none' }
+    };
+  }
+
   // --- Logic for Pend (Component Based - Legacy) ---
 
   // בניית קומפוננטה חדשה של הצבעה
@@ -364,8 +410,8 @@ export const addVoteConfig: ActionConfig = {
     type: {
       type: 'string',
       required: true,
-      validate: (value) => ['pend', 'sheirutpend', 'ask', 'decision', 'weFinnish'].includes(value),
-      description: 'Type of item: "pend", "sheirutpend", "ask", "decision", or "weFinnish"'
+      validate: (value) => ['pend', 'sheirutpend', 'ask', 'decision', 'weFinnish', 'tosplit'].includes(value),
+      description: 'Type of item: "pend", "sheirutpend", "ask", "decision", "weFinnish", or "tosplit"'
     },
     id: {
       type: 'string',
@@ -386,6 +432,16 @@ export const addVoteConfig: ActionConfig = {
       type: 'number',
       required: false,
       description: 'Order number for the vote (defaults to 0)'
+    },
+    what: {
+      type: 'boolean',
+      required: false,
+      description: 'Vote value: true (approve, default) or false (decline). Currently supported by type=tosplit.'
+    },
+    why: {
+      type: 'string',
+      required: false,
+      description: 'Optional reason text for the vote (used with what=false). Currently supported by type=tosplit.'
     }
   },
 

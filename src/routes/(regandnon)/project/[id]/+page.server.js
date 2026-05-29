@@ -20,11 +20,14 @@ async function awaitapi(projectId, lang, tok, fetch) {
   return projectData;
 }
 
-export const load = async ({ locals, params, fetch }) => {
+export const load = async ({ locals, params, fetch, depends }) => {
   const projectId = params.id;
   const lang = locals.lang;
   const tok = locals.tok;
   const uid = locals.uid;
+  // Tag this load so a realtime vote/decision notification can re-run it
+  // via invalidate(`project:${projectId}`) from the page.
+  depends(`project:${projectId}`);
 console.log(projectId)
   let isRegisteredUser = tok != false;
 console.log(isRegisteredUser)

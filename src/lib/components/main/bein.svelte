@@ -12,6 +12,12 @@
   import Roles from '../registration/roles.svelte';
   import Vallues from '../registration/vallues.svelte';
   import { spring } from 'svelte/motion';
+  import { skills1 } from '../registration/skills1.js';
+  import { roles2 } from '../registration/roles2.js';
+  import { workways1 } from '../registration/workways1.js';
+  import { valluss } from '../registration/valluss.js';
+  import { get } from 'svelte/store';
+  import { locale } from '$lib/translations';
 
   let show_value = $state(0);
   show.subscribe((newValue) => {
@@ -21,14 +27,42 @@
   /** @type {{ idx?: number, mode?: "registration" | "onboarding" }} */
   let { idx = 1, mode = 'registration' } = $props();
 
+  // Onboarding mode skips the Password step. We persist the wizard's stores to
+  // the user profile when step 4 → 5 completes, then redirect to /onboard/done.
+  // Registration mode still goes through password.svelte which has its own save.
+  let onboardingSaving = $state(false);
+
+  async function persistOnboarding() {
+    if (onboardingSaving) return;
+    onboardingSaving = true;
+    try {
+      const payload = {
+        skills:  (get(skills1)   ?? []).map((id) => ({ name: '', existingId: String(id) })),
+        roles:   (get(roles2)    ?? []).map((id) => ({ name: '', existingId: String(id) })),
+        methods: (get(workways1) ?? []).map((id) => ({ name: '', existingId: String(id) })),
+        vallues: (get(valluss)   ?? []).map((id) => ({ name: '', existingId: String(id) })),
+        lang: get(locale) ?? 'he'
+      };
+      await fetch('/api/onboard/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    } catch (e) {
+      console.warn('[bein] onboarding save failed', e);
+    } finally {
+      onboardingSaving = false;
+    }
+  }
+
   $effect(() => {
     if (mode === 'onboarding' && show_value === 5) {
-      goto('/me');
+      persistOnboarding().then(() => goto('/onboard/done'));
     }
   });
 
   let w = $state(1);
-  const txx = spring(600 + (() => w * 20), { stiffness: 0.55, damping: 0.99 });
+  const txx = spring(600, { stiffness: 0.55, damping: 0.99 });
 
   function add(event) {
     txx.set(event.tx + w * event.txx);
@@ -226,14 +260,6 @@
     <!-- Shimmer edge -->
     <div class="card-shim"></div>
 
-    {#if mode === 'onboarding' && show_value >= 1 && show_value <= 4}
-      <div class="skip-container">
-        <a href="/me" class="skip-link">
-          {$lang === 'en' ? 'Skip to profile' : 'עבור לפרופיל'}
-        </a>
-      </div>
-    {/if}
-
     <!-- TABS — visible steps 1–5, can navigate backward -->
     {#if (mode === 'onboarding' && show_value >= 1 && show_value <= 4) || (mode === 'registration' && show_value >= 1 && show_value <= 5)}
       <nav
@@ -266,7 +292,10 @@
 
     <!-- STEP CONTENT -->
     <div class="steps-area">
-      {#if show_value === 0}
+      {#if show_value === 0 && mode !== 'onboarding'}
+        <!-- Step 0 (Hello/greeting) is registration-only.
+             In onboarding mode the manual/+page.svelte onMount guards
+             against show < 1, so this branch is never reached. -->
         <div
           class="step-wrap"
           in:fly={{
@@ -390,8 +419,7 @@
   .page-shell {
     position: relative;
     width: 100vw;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
     background: radial-gradient(
       ellipse at 30% 20%,
       #fff8e1 0%,
@@ -404,6 +432,7 @@
     align-items: center;
     justify-content: center;
     gap: 14px;
+    padding-block: 14px 24px;
   }
 
   /* ── Blobs ── */
@@ -628,7 +657,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    overflow: hidden;
+    /* overflow: visible so the sticky .tabs-bar can pin to the viewport
+       while the rest of the card scrolls past it. */
+    overflow: visible;
   }
   .card-shim {
     position: absolute;
@@ -656,6 +687,18 @@
     width: 100%;
     justify-content: center;
     flex-wrap: wrap;
+    /* Pin to viewport top so the user always knows which step they're on,
+       even when the multiselect content below scrolls past. Parents (e.g.
+       the onboarding manual page with its own sticky back-bar) can offset
+       this with --bein-tabs-top. */
+    position: sticky;
+    top: var(--bein-tabs-top, 0);
+    z-index: 30;
+    background: rgba(255, 248, 220, 0.92);
+    backdrop-filter: blur(14px) saturate(180%);
+    -webkit-backdrop-filter: blur(14px) saturate(180%);
+    border-radius: 28px 28px 0 0;
+    border-bottom: 1px solid rgba(218, 165, 32, 0.18);
   }
   .tabs-bar::-webkit-scrollbar {
     display: none;
@@ -747,23 +790,6 @@
 
   .steps-area > :global(.step-wrap) {
     grid-area: 1 / 1;
-  }
-
-  .skip-container {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    padding: 10px 20px 0;
-  }
-  .skip-link {
-    font-size: 0.9rem;
-    color: #8b6914;
-    text-decoration: underline;
-    cursor: pointer;
-    font-weight: 600;
-  }
-  .skip-link:hover {
-    color: #e91e8c;
   }
 
   /* ── Success ── */

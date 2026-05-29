@@ -40,31 +40,6 @@
     }
   });
 
-  import { onMount } from 'svelte';
-
-  // Client-side aggressive cookie cleanup for legacy sessions
-  onMount(() => {
-    // List of cookies to possibly clear
-    const cookiesToClear = ['jwt', 'id', 'un', 'when', 'email'];
-
-    // Helper to delete a cookie by setting expired date
-    const eraseCookie = (name, domain) => {
-      let cookieStr = `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
-      if (domain) {
-        cookieStr += ` Domain=${domain};`;
-      }
-      document.cookie = cookieStr;
-    };
-
-    cookiesToClear.forEach((name) => {
-      eraseCookie(name); // Clears host-only / current domain
-      eraseCookie(name, '.1lev1.com'); // Clears wildcard domain
-      eraseCookie(name, 'www.1lev1.com'); // Clears specific subdomain
-      eraseCookie(name, '1lev1.com'); // Clears root domain
-    });
-    console.log('Legacy cookies cleared on client mount');
-  });
-
   let loginError = $state(null); // State for displaying login errors
 </script>
 
@@ -79,9 +54,22 @@
       action="?/login"
       use:enhance={() => {
         active = true;
-        return async ({ update }) => {
-          await update();
-          active = false;
+        // Capture the intended destination before the async response arrives.
+        const fallbackDest = page.url.searchParams.get('from') || '/onboard';
+        return async ({ result, update }) => {
+          // NB: result.type === 'success' just means the action returned
+          // (didn't throw / didn't call fail()). It does NOT mean the login
+          // itself succeeded — the action returns { success: false, error }
+          // on wrong-password etc. We must inspect result.data.success.
+          if (result.type === 'success' && result.data?.success) {
+            // Full browser navigation so the auth cookies set by the action
+            // are definitely in the cookie jar before the next request.
+            window.location.href = result.data.redirectTo || fallbackDest;
+          } else {
+            // Wrong password / server error — surface the message on the page.
+            await update();
+            active = false;
+          }
         };
       }}
       in:fade

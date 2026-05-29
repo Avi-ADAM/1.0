@@ -103,6 +103,9 @@ export class AuthorizationEngine {
       case 'sheirutCustomer':
         return await this.checkSheirutCustomer(rule, userId, params, context);
 
+      case 'sheirutpendRequester':
+        return await this.checkSheirutpendRequester(rule, userId, params, context);
+
       case 'forumParticipant':
         return await this.checkForumParticipant(rule, userId, params, context);
 
@@ -252,6 +255,51 @@ export class AuthorizationEngine {
       return {
         authorized: false,
         reason: rule.errorMessage || 'Failed to verify sheirut customer status'
+      };
+    }
+  }
+
+  /**
+   * Check if user is the requester (users_permissions_user) of a sheirutpend
+   */
+  private async checkSheirutpendRequester(
+    rule: AuthRule,
+    userId: string,
+    params: Record<string, any>,
+    context: ActionContext
+  ): Promise<AuthorizationResult> {
+    const sheirutpendIdParam = rule.config?.sheirutpendIdParam || 'sheirutpendId';
+    const sheirutpendId = this.getNestedValue(params, sheirutpendIdParam);
+
+    if (!sheirutpendId) {
+      return {
+        authorized: false,
+        reason: rule.errorMessage || `Sheirutpend ID parameter "${sheirutpendIdParam}" is required`
+      };
+    }
+
+    try {
+      const result = await this.strapiClient.execute(
+        '65checkSheirutpendRequester',
+        { uid: userId, sheirutpendId: String(sheirutpendId) },
+        context.jwt,
+        context.fetch
+      );
+
+      const requesterId = result?.data?.sheirutpend?.data?.attributes?.users_permissions_user?.data?.id;
+      if (!requesterId || String(requesterId) !== String(userId)) {
+        return {
+          authorized: false,
+          reason: rule.errorMessage || 'User is not the requester of this sheirutpend'
+        };
+      }
+
+      return { authorized: true };
+    } catch (error) {
+      console.error('Sheirutpend requester check failed:', error);
+      return {
+        authorized: false,
+        reason: rule.errorMessage || 'Failed to verify sheirutpend requester'
       };
     }
   }

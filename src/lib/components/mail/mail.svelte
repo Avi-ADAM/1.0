@@ -11,7 +11,7 @@
 		Section,
 		Text
 	} from 'svelty-email';
-const msg2 = { "he": "לחיצה כדי להתחיל את המשימה: ", "en": "start your new mission: " }
+const msg2 = { "he": "לחיצה כדי לצפות בפרויקט: ", "en": "click to view the project: " }
   /**
    * @typedef {Object} Props
    * @property {any} user
@@ -31,7 +31,7 @@ const msg2 = { "he": "לחיצה כדי להתחיל את המשימה: ", "en":
     projectSrc = "https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png",
     lang = "he"
   } = $props();
-const msgk = { "he": `המשימה שלך אושרה פה אחד והנך עכשיו חלק מריקמת ${projectName}`, "en": "your mission was appruved Unanimously, you are now part of the FreeMates:" }
+const msgk = { "he": `בקשת השירות שלך אושרה! אתה כלקוח של הפרויקט ${projectName}`, "en": `Your service request was accepted! You are now a client of the project ${projectName}` }
 const hallo = {"he":"!","en":"Hello, "}
 const shalom = {"he":" שלום","en":"!"}
 const mt = {"he":"!מזל טוב", "en": "Congratulations!" }

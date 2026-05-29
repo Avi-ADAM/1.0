@@ -50,18 +50,26 @@
       })
         .then(checkStatus)
         .then(parseJSON);
-      workways2 = res.data.workWays.data;
+      let freshWorkways = res.data.workWays.data;
       if ($lang == 'he') {
-        for (var i = 0; i < workways2.length; i++) {
-          if (workways2[i].attributes.localizations.data.length > 0) {
-            workways2[i].attributes.workWayName =
-              workways2[
+        for (var i = 0; i < freshWorkways.length; i++) {
+          if (freshWorkways[i].attributes.localizations.data.length > 0) {
+            freshWorkways[i].attributes.workWayName =
+              freshWorkways[
                 i
               ].attributes.localizations.data[0].attributes.workWayName;
           }
         }
       }
-      workways2 = workways2;
+      // Deduplicate by workWayName to prevent each_key_duplicate in MultiSelect
+      const seenW = new Set();
+      freshWorkways = freshWorkways.filter((w) => {
+        const name = w.attributes?.workWayName;
+        if (!name || seenW.has(name)) return false;
+        seenW.add(name);
+        return true;
+      });
+      workways2 = freshWorkways;
 
       // טעינת דרכי העבודה שנבחרו בעבר
       const currentWorkways = $workways1;
@@ -248,7 +256,7 @@
     bind:searchText
     bind:selected
     {placeholder}
-    options={workways2.map((c) => c.attributes.workWayName)}
+    options={[...new Set(workways2.map((c) => c.attributes.workWayName).filter(Boolean))]}
   />
 </div>
 
@@ -303,6 +311,15 @@
       align-self: center;
       justify-self: center;
       --multiselect-width: 30vw;
+    }
+    /* Keep the gold back/skip/next arrows reachable when the multiselect
+       grows past the viewport on small screens. */
+    .button-in-1-2,
+    .button-2,
+    .button-end {
+      position: sticky;
+      bottom: 8px;
+      z-index: 5;
     }
   }
 

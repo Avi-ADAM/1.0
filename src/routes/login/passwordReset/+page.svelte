@@ -6,12 +6,11 @@
     let email = $state();
     let before = $state(true);
     let erori = $state();
-    const baseUrl = import.meta.env.VITE_URL
 
-    function onSubmit () {   
+    function onSubmit () {
 // Request API.
 axios
-  .post(baseUrl+'/api/auth/forgot-password', {
+  .post('/api/auth/forgot-password', {
     email: email,
   })
   .then(response => {

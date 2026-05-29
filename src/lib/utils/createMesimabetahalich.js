@@ -76,7 +76,7 @@ export async function createMesimabetahalich({
       projectId,
       missId,
       userId,
-      openMid,
+      openMid: openMid ? [openMid] : null,
       openmissionName,
       missionDetails: missionDetails || '',
       nhours,

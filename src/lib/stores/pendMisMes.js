@@ -73,6 +73,10 @@ export async function initialForum (all = false,ids = [],myId = 0){
   const idsLiteral = idsToFetch.map((fid) => `"${fid}"`).join(',');
   let que = ``
   if(all == true){
+    if (!myId || myId === false) {
+      console.warn('[initialForum] Skipping: no valid user id');
+      return;
+    }
     isChatLoading.set(true)
       que = `{
        usersPermissionsUser (id:${myId}) {data{ attributes{

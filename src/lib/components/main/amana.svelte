@@ -567,13 +567,10 @@ meta {
 
       g = false;
       already = true;
-      document.cookie =
-        `email=${mail}; expires=` + new Date(2027, 0, 1).toUTCString();
-      document.cookie =
-        `un=${formName}; expires=` + new Date(2027, 0, 1).toUTCString();
-      document.cookie =
-        `country=${find_contry_id(selected)}; expires=` +
-        new Date(2027, 0, 1).toUTCString();
+      const expiresDate = new Date(2027, 0, 1).toUTCString();
+      document.cookie = `email=${mail}; expires=${expiresDate}`;
+      document.cookie = `un=${encodeURIComponent(formName)}; expires=${expiresDate}`;
+      document.cookie = `country=${find_contry_id(selected)}; expires=${expiresDate}`;
       userName.set(formName);
       liUN.set(formName);
       email.set(mail);
@@ -581,11 +578,10 @@ meta {
       regHelper.set(1);
       meData = result.data.createChezin;
       fpval.set(meData.data.id);
-      if (agreeToBasicTerms && !agreedToFullAgreement) {
-        show.set(1);
-      }
+      document.cookie = `fpval=${meData.data.id}; expires=${expiresDate}`;
       let linko = `ref=true&id=${$fpval}&con=${find_contry_id(selected)}&un=${$liUN}&em=${$email}`;
       linkos.set(linko);
+      goto('/signup');
     } catch (error) {
       g = false;
       erorim.st = true;
@@ -868,7 +864,10 @@ meta {
                 outerDivClass="custom-multiselect-outer"
                 inputClass="custom-multiselect-input"
                 liSelectedClass="custom-multiselect-selected"
-                --sms-options-bg={'rgba(153, 100, 136, 1)'}
+                liOptionClass="custom-multiselect-option"
+                ulOptionsClass="custom-multiselect-options"
+                --sms-options-bg={'rgba(30, 25, 55, 0.98)'}
+                --sms-active-color={'rgba(255, 0, 174, 0.6)'}
                 placeholder={$t('home.amana.form.locationPlaceholder')}
                 options={country.map((c) =>
                   $locale === 'he' ? c.heb : c.label
@@ -1670,6 +1669,28 @@ meta {
   :global(.custom-multiselect-selected) {
     background: rgba(255, 0, 174, 0.3) !important;
     border-radius: 8px !important;
+  }
+
+  :global(.custom-multiselect-options),
+  :global(.custom-multiselect-outer ul.options) {
+    background: rgba(30, 25, 55, 0.98) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  :global(.custom-multiselect-option),
+  :global(.custom-multiselect-outer ul.options li) {
+    color: #ffffff !important;
+    background: transparent !important;
+  }
+
+  :global(.custom-multiselect-outer ul.options li:hover),
+  :global(.custom-multiselect-outer ul.options li.active) {
+    background: rgba(255, 0, 174, 0.45) !important;
+    color: #ffffff !important;
   }
 
   /* Agreement Section */

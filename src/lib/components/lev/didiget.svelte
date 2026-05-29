@@ -3,9 +3,9 @@
   import Diun from './diun.svelte';
   import { toast } from 'svelte-sonner';
   import DidigetCard from './cards/didigetCard.svelte';
+  import { executeAction } from '$lib/client/actionClient';
 
   let dialogOpen = $state(false);
-  const baseUrl = import.meta.env.VITE_URL;
   import { lang } from '$lib/stores/lang.js';
   import Lowbtni from '$lib/celim/lowbtn.svelte';
   const ishur = { he: 'אישור קבלת', en: 'approve of reciving' };
@@ -24,7 +24,6 @@
   import moment from 'moment';
   import { ProgressBar } from 'progressbar-svelte';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
-  import { SendTo } from '$lib/send/sendTo.svelte';
   import Cards from './cards/haluka.svelte';
   /**
    * @typedef {Object} Props
@@ -46,7 +45,8 @@
    * @property {string} [amount]
    * @property {string} [send]
    * @property {string} [recive]
-   * @property {boolean} [sendcon]
+   * @property {boolean} [sendcon] - האם הנותן אישר שהעביר
+   * @property {boolean} [confirmed] - האם המקבל אישר שקיבל
    * @property {string} [coinlapach]
    * @property {boolean} [already]
    * @property {any} [whyno]
@@ -83,6 +83,7 @@
     send = '',
     recive = '',
     sendcon = false,
+    confirmed = false,
     coinlapach = '',
     already = $bindable(false),
     whyno = [],
@@ -97,13 +98,17 @@
     onProj,
     onModal
   } = $props();
-  let miDatan = [];
   let error1;
-  let bearer1;
-  let token;
-  let idL;
   let no = $state(false);
   let masa = $state(false);
+  // האם אני (המשתמש הנוכחי) כבר אישרתי - תלוי בכיוון (שולח/מקבל)
+  const iConfirmed = $derived(
+    already || (kind === 'send' ? sendcon : confirmed)
+  );
+  // האם הצד השני אישר
+  const otherConfirmed = $derived(
+    kind === 'send' ? confirmed : sendcon
+  );
   function percentage(partialValue, totalValue) {
     return (100 * partialValue) / totalValue;
   }
@@ -159,22 +164,6 @@
     });
   }
 
-  function objToString(obj) {
-    let str = '';
-    for (let i = 0; i < obj.length; i++) {
-      for (const [p, val] of Object.entries(obj[i])) {
-        if ((typeof val == 'number') | 'boolean') {
-          str += `{${p}:${val}\n},`;
-        } else if (typeof val == 'string') {
-          str += `{${p}:"${val}"\n},`;
-        } else if (typeof val == 'null') {
-          str += `{${p}:${val.map((c) => c.id)}\n},`;
-        }
-      }
-    }
-    return str;
-  }
-  let linkg = baseUrl + '/graphql';
   const suc = { he: 'בוצע בהצלחה', en: 'appruved sucssefully!' };
   const er = {
     he: 'אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל  ',
@@ -186,119 +175,27 @@
     if (alr == 'alr') {
       alert('soon');
     } else {
-      let miDatani = [];
       already = true;
       noofusersOk += 1;
       noofusersWaiting -= 1;
       ser = xyz();
 
-      const cookieValueId = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('id='))
-        .split('=')[1];
-      idL = cookieValueId;
-      token = page.data.tok;
-      bearer1 = 'bearer' + ' ' + token;
-      console.log('kind value:', kind);
-      if (kind == 'send') {
-        try {
-          await fetch(linkg, {
-            method: 'POST',
-            headers: {
-              Authorization: bearer1,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              query: `mutation { 
-  updateHaluka(
-      id: ${pendId}
-      data: { 
- senderconf: true
- }
-  ){data {id}}
- } `
-            })
-          })
-            .then((r) => r.json())
-            .then((data) => (miDatan = data));
-          console.log(miDatan);
+      try {
+        const result = await executeAction('confirmHaluka', {
+          halukaId: String(pendId),
+          projectId: String(projectId),
+          kind: kind === 'send' ? 'send' : 'receive',
+        });
+        if (result.success) {
+          toast.success(suc[$lang]);
           coinLapach();
-        } catch (e) {
-          error1 = e;
-          console.log(error1);
+        } else {
+          toast.warning(er[$lang]);
         }
-      } else if (kind == 'recive' || kind == 'receive') {
-        let add = ``;
-
-        let allsp = spCheck();
-        console.log(hervachti, allsp, shear);
-
-        if (allsp == true) {
-          for (let u = 0; u < hervachti.length; u++) {
-            const element = hervachti[u];
-            if (element.noten == true || element.mekabel == true) {
-              const iduse = element.users_permissions_user.data.id;
-              const amount =
-                element.users_permissions_user.data.attributes.hervachti +
-                element.amount;
-              add = `
-        mutation {
-        updateUsersPermissionsUser(
-    id:${iduse} 
-      data: { hervachti: ${amount} }
-    
-  ){
-      data {
-        id
-  }
-}
-}
-        `;
-              let t = await SendTo(add);
-              if (t?.data == null) {
-                toast.warning(er[$lang]);
-              } else {
-                console.log(t);
-              }
-            }
-          }
-        }
-        let que = `mutation { 
-  updateHaluka(
-      id: ${pendId}
-      data: { 
-        confirmed: true
- }
-  ){data {id}}
- } `;
-        console.log(que);
-        try {
-          let res = await SendTo(que).then((res) => (res = res));
-          console.log(res);
-          if (res.data != null) {
-            toast.success(suc[$lang]);
-            coinLapach();
-          } else {
-            toast.warning(er[$lang]);
-          }
-        } catch (e) {
-          console.error(e);
-          toast.warning(`${er[$lang]}.${e.status},${e.message}`);
-        }
+      } catch (e) {
+        error1 = e;
+        console.log(error1);
       }
-    }
-  }
-  function spCheck() {
-    if (shear.length > 1) {
-      for (let i = 0; i < shear.length; i++) {
-        const element = shear[i];
-        if (element.id != pendId) {
-          if (element.attributes.confirmed != true) return false;
-        }
-      }
-      return true;
-    } else {
-      return true;
     }
   }
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
@@ -485,61 +382,24 @@ id: ${pendId}
   }
   async function afreact(event) {
     why = event.why;
-    const diunim = objToString(chat);
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
-    let d = new Date();
     try {
-      await fetch(linkg, {
-        method: 'POST',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `mutation { updateHaluka(
-id: ${pendId}
-      data: { chatre:[  ${diunim}, 
-         
-     {
-      when: "${d.toISOString()}"
-      send: "${idL}"
-      freetext: "${why}"
-    }
-  ]}
-  ){data {id attributes{chatre{freetext send {data{id attributes{username profilePic{data{attributes{url}}}}}}when seen} }}}
-} `
-          // make coin desapire
-        })
-      })
-        .then((r) => r.json())
-        .then((data) => (miDatan = data));
-      console.log(miDatan);
-      if (miDatan.data?.updateHaluka.data.attributes.chatre) {
-        const chati = miDatan.data?.updateHaluka.data.attributes.chatre;
-        messege = [];
-        for (let t = 0; t < chati.length; t++) {
-          messege.push({
-            message: chati.freetext,
-            when: chati.when,
-            pic: chati.send.data.attributes.profilePic?.data.attributes.url,
-            sentByMe: chati.send.data.id === idL ? true : false,
-            seen: chati.seen
-          });
-        }
-        messege = messege;
+      const result = await executeAction('addHalukaChatEntry', {
+        halukaId: String(pendId),
+        projectId: String(projectId),
+        text: why,
+      });
+      if (result.success && result.data?.chatre) {
+        const chati = result.data.chatre;
+        messege = chati.map((c) => ({
+          message: c.freetext,
+          when: c.when,
+          pic: c.send?.data?.attributes?.profilePic?.data?.attributes?.url,
+          sentByMe: c.send?.data?.id === String(myid),
+          seen: c.seen,
+        }));
         toast.success(`${fnnn[$lang]}`);
-
-        setTimeout(function () {
-          isOpen = false;
-        }, 15000);
+        setTimeout(() => { isOpen = false; }, 15000);
       }
-      //todo send mail to secund one
     } catch (e) {
       error1 = e;
       console.log(error1);
@@ -557,7 +417,6 @@ id: ${pendId}
   // import required modules
   import { EffectFlip, Navigation } from 'swiper';
   import { Drawer } from 'vaul-svelte';
-  import { page } from '$app/state';
 
   let swiperRef = null;
 
@@ -820,7 +679,7 @@ id: ${pendId}
               {amount}
             </h4>{/if}
           {#if low == false}
-            {#if already === false}
+            {#if !iConfirmed}
               <button
                 onmouseenter={() => hover(apru[$lang])}
                 onmouseleave={() => hover('0')}
@@ -866,51 +725,89 @@ id: ${pendId}
                   /></svg
                 ></button
               >
-            {:else if already === true}
-              <button
-                onmouseenter={() => hover(apru[$lang])}
+            {:else}
+              <!-- חיווי: אישרתי שהעברתי/קיבלתי -->
+              <div
+                role="img"
+                aria-label={kind === 'send'
+                  ? 'אישרת שהעברת את הכסף'
+                  : 'אישרת שקיבלת את הכסף'}
+                onmouseenter={() =>
+                  hover(
+                    kind === 'send'
+                      ? 'אישרת שהעברת את הכסף'
+                      : 'אישרת שקיבלת את הכסף'
+                  )}
                 onmouseleave={() => hover('0')}
-                onclick={() => nego('alr')}
+                class="btn a indicator-ok"
                 style="margin: 0;"
-                class="btn a"
-                name="negotiate"
-                title="משא ומתן"
                 ><svg
                   xmlns="http://www.w3.org/2000/svg"
-                  xmlns:xlink="http://www.w3.org/1999/xlink"
                   version="1.1"
                   class="btin"
                   viewBox="0 0 24 24"
                   ><path
-                    d="M12.75,3.94C13.75,3.22 14.91,2.86 16.22,2.86C16.94,2.86 17.73,3.05 18.59,3.45C19.45,3.84 20.13,4.3 20.63,4.83C21.66,6.11 22.09,7.6 21.94,9.3C21.78,11 21.22,12.33 20.25,13.27L12.66,20.86C12.47,21.05 12.23,21.14 11.95,21.14C11.67,21.14 11.44,21.05 11.25,20.86C11.06,20.67 10.97,20.44 10.97,20.16C10.97,19.88 11.06,19.64 11.25,19.45L15.84,14.86C16.09,14.64 16.09,14.41 15.84,14.16C15.59,13.91 15.36,13.91 15.14,14.16L10.55,18.75C10.36,18.94 10.13,19.03 9.84,19.03C9.56,19.03 9.33,18.94 9.14,18.75C8.95,18.56 8.86,18.33 8.86,18.05C8.86,17.77 8.95,17.53 9.14,17.34L13.73,12.75C14,12.5 14,12.25 13.73,12C13.5,11.75 13.28,11.75 13.03,12L8.44,16.64C8.25,16.83 8,16.92 7.73,16.92C7.45,16.92 7.21,16.83 7,16.64C6.8,16.45 6.7,16.22 6.7,15.94C6.7,15.66 6.81,15.41 7.03,15.19L11.63,10.59C11.88,10.34 11.88,10.11 11.63,9.89C11.38,9.67 11.14,9.67 10.92,9.89L6.28,14.5C6.06,14.7 5.83,14.81 5.58,14.81C5.3,14.81 5.06,14.71 4.88,14.5C4.69,14.3 4.59,14.06 4.59,13.78C4.59,13.5 4.69,13.27 4.88,13.08C7.94,10 9.83,8.14 10.55,7.45L14.11,10.97C14.5,11.34 14.95,11.53 15.5,11.53C16.2,11.53 16.75,11.25 17.16,10.69C17.44,10.28 17.54,9.83 17.46,9.33C17.38,8.83 17.17,8.41 16.83,8.06L12.75,3.94M14.81,10.27L10.55,6L3.47,13.08C2.63,12.23 2.15,10.93 2.04,9.16C1.93,7.4 2.41,5.87 3.47,4.59C4.66,3.41 6.08,2.81 7.73,2.81C9.39,2.81 10.8,3.41 11.95,4.59L16.22,8.86C16.41,9.05 16.5,9.28 16.5,9.56C16.5,9.84 16.41,10.08 16.22,10.27C16.03,10.45 15.8,10.55 15.5,10.55C15.23,10.55 15,10.45 14.81,10.27V10.27Z"
+                    fill="currentColor"
+                    d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"
                   /></svg
-                ></button
-              >
+                >
+              </div>
               <button
                 onmouseenter={() => hover(mes[$lang])}
                 onmouseleave={() => hover('0')}
-                onclick={() => decline('alr')}
+                onclick={() => react()}
                 style="margin: 0;"
                 class="btn b"
-                name="decline"
-                title="התנגדות"
-                ><svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  xmlns:xlink="http://www.w3.org/1999/xlink"
-                  version="1.1"
-                  class="btin"
-                  viewBox="0 0 24 24"
-                  ><path
-                    d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
-                  /></svg
-                ></button
+                name="chat"><Chaticon /></button
               >
-              <button
-                onmouseenter={() => hover(noo[$lang])}
-                onmouseleave={() => hover('0')}
-                class="text-barbi bg-gold j c"
-                onclick={() => react()}>תגובה</button
-              >
+              {#if !otherConfirmed}
+                <!-- חיווי: ממתין לאישור מהצד השני -->
+                <div
+                  role="img"
+                  aria-label={kind === 'send'
+                    ? `ממתין שהמקבל ${resname} יאשר קבלה`
+                    : `ממתין שהנותן ${sendname} יאשר העברה`}
+                  onmouseenter={() =>
+                    hover(
+                      kind === 'send'
+                        ? `ממתין שהמקבל ${resname} יאשר קבלה`
+                        : `ממתין שהנותן ${sendname} יאשר העברה`
+                    )}
+                  onmouseleave={() => hover('0')}
+                  class="btn c indicator-wait"
+                  style="margin: 0;"
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    version="1.1"
+                    class="btin"
+                    viewBox="0 0 24 24"
+                    ><path
+                      fill="currentColor"
+                      d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"
+                    /></svg
+                  >
+                </div>
+              {:else}
+                <!-- חיווי: הושלם בהצלחה -->
+                <div
+                  role="img"
+                  aria-label="ההעברה הושלמה"
+                  onmouseenter={() => hover('ההעברה הושלמה בהצלחה')}
+                  onmouseleave={() => hover('0')}
+                  class="btn c indicator-ok"
+                  style="margin: 0;"
+                  ><svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    version="1.1"
+                    class="btin"
+                    viewBox="0 0 24 24"
+                    ><path
+                      fill="currentColor"
+                      d="M0.41,13.41L6,19L7.41,17.58L2.83,13M22.24,5.58L11.66,16.17L7.5,12L6.07,13.41L11.66,19L23.66,7M18,7L16.59,5.58L10.24,11.92L11.66,13.34L18,7Z"
+                    /></svg
+                  >
+                </div>
+              {/if}
               <!----   {:else if already === true && mypos === false && diun.length > 0  && allr === false}
  <button on:mouseenter={()=>hover("אישור")} 
             on:mouseleave={()=>hover("0")} on:click={() => agree("alr")} style="margin: 0;" class = "btn a" name="requestToJoin" title="אישור"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
@@ -959,6 +856,7 @@ id: ${pendId}
                 {kind}
                 {amount}
                 {sendcon}
+                {confirmed}
                 {low}
               />
             </div>
@@ -987,6 +885,7 @@ id: ${pendId}
     {kind}
     {amount}
     {sendcon}
+    {confirmed}
     {low}
   />
 {/if}
@@ -1230,6 +1129,46 @@ id: ${pendId}
   }
 
   .btn:hover {
+    opacity: 1;
+    padding: 6px;
+  }
+
+  /* חיווי: אישור (✓ ירוק) */
+  .indicator-ok {
+    background-color: #7ee081;
+    color: var(--barbi-pink);
+    border-radius: 50%;
+    text-align: center;
+    opacity: 0.9;
+    transition: 0.3s;
+    padding: 2px;
+    margin-right: 4px;
+    margin-left: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .indicator-ok:hover {
+    opacity: 1;
+    padding: 6px;
+  }
+
+  /* חיווי: ממתין (שעון כחול) */
+  .indicator-wait {
+    background-color: #0000cc;
+    color: #fff;
+    border-radius: 50%;
+    text-align: center;
+    opacity: 0.85;
+    transition: 0.3s;
+    padding: 2px;
+    margin-right: 4px;
+    margin-left: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .indicator-wait:hover {
     opacity: 1;
     padding: 6px;
   }

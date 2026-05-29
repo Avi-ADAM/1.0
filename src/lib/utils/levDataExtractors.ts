@@ -640,7 +640,7 @@ export function extractHalukas(userData: any): HalukaData[] {
         // Data needed for rashbi logic
         name: attrs.name || '',
         users: attrs.vots || [],
-        halukot: attrs.halukas || { data: [] },
+        halukot: attrs.halukas?.data || [],
         hervach: attrs.hervachti || [],
         pendId: tosplit.id,
 
@@ -782,7 +782,10 @@ export function extractTransfers(userData: any): TransferData[] {
           forumId: attrs.forum?.data?.id,
           pendId: el.id,
           chat: attrs.chatre || [],
-          senderconf: attrs.senderconf,
+          // האם הנותן (usersend) אישר שהעביר — נשאב מהשרת (Haluka.senderconf)
+          senderconf: attrs.senderconf || false,
+          // האם המקבל (userrecive) אישר שקיבל — נשאב מהשרת (Haluka.confirmed)
+          confirmed: attrs.confirmed || false,
 
           // Nested tosplit data if available
           shear: attrs.tosplit?.data?.attributes?.halukas?.data || [],
@@ -1019,34 +1022,66 @@ export function extractAskedResources(userData: any): AskedResourceData[] {
 
       const askAttributes = askm.attributes;
       const openMashaabimAttrs = askAttributes.open_mashaabim?.data?.attributes || {};
+      const pmashAttrs         = askAttributes.pmash?.data?.attributes || {};
+      const spAttrs            = askAttributes.sp?.data?.attributes || {};
+      const spUserData         = spAttrs.users_permissions_user?.data;
+      const spUserAttrs        = spUserData?.attributes || {};
+
+      // For Scenario 2 (isSelfProposal), users_permissions_user is NOT set on the askm —
+      // the proposer identity lives on the linked `sp`.
       const userAttrs = askAttributes.users_permissions_user?.data?.attributes || {};
+      const userId    = askAttributes.users_permissions_user?.data?.id || spUserData?.id || '';
+
+      // Prefer pmash data (actual resource) over open_mashaabim (the open need template)
+      // when both exist. For Scenario 2, pmash is the only source; omData is empty.
+      const omData = {
+        name:      pmashAttrs.name      || openMashaabimAttrs.name      || '',
+        descrip:   pmashAttrs.descrip   || openMashaabimAttrs.descrip   || '',
+        spnot:     pmashAttrs.spnot     || openMashaabimAttrs.spnot     || '',
+        price:     pmashAttrs.price     || openMashaabimAttrs.price     || 0,
+        easy:      pmashAttrs.easy      || openMashaabimAttrs.easy      || '',
+        hm:        pmashAttrs.hm        || openMashaabimAttrs.hm        || '',
+        kindOf:    pmashAttrs.kindOf    || openMashaabimAttrs.kindOf    || '',
+        sqadualed: pmashAttrs.sqadualed || openMashaabimAttrs.sqadualed || '',
+      };
+
+      // Profile pic: prefer the askm's own users_permissions_user, fall back to sp owner
+      const profilePic =
+        userAttrs?.profilePic?.data?.attributes?.formats?.thumbnail?.url ||
+        userAttrs?.profilePic?.data?.attributes?.url ||
+        spUserAttrs?.profilePic?.data?.attributes?.formats?.thumbnail?.url ||
+        spUserAttrs?.profilePic?.data?.attributes?.url || '';
+
+      // Username: prefer askm user, fall back to sp owner
+      const resolvedUsername = userAttrs.username || spUserAttrs.username || '';
+
       const projectAttrs = project.attributes;
 
       askedResources.push({
         id: askm.id,
         projectId: project.id,
-        uid: askAttributes.users_permissions_user?.data?.id || '',
-        username: userAttrs.username || '',
+        uid: userId,
+        username: resolvedUsername,
         requestType: 'askm',
         priority: 2,
-        // Core mission info
-        src: userAttrs?.profilePic?.data?.attributes?.formats?.thumbnail?.url ||
-          userAttrs?.profilePic?.data?.attributes?.url || '',
-        price: openMashaabimAttrs.price || 0,
-        easy: openMashaabimAttrs.easy || '',
-        spnot: openMashaabimAttrs.spnot || '',
-        descrip: openMashaabimAttrs.descrip || '',
-        hm: openMashaabimAttrs.hm || '',
-        myp: askAttributes.sp?.data?.attributes?.myp || 0,
-        kindOf: openMashaabimAttrs.kindOf || '',
+        // Core display info (merged from pmash + open_mashaabim)
+        src: profilePic,
+        price: omData.price,
+        easy: omData.easy,
+        spnot: omData.spnot,
+        descrip: omData.descrip,
+        hm: omData.hm,
+        myp: spAttrs.myp || 0,
+        kindOf: omData.kindOf,
         spid: askAttributes.sp?.data?.id,
-        deadline: openMashaabimAttrs.sqadualed || '',
-        openName: openMashaabimAttrs.name || '',
+        deadline: omData.sqadualed,
+        openName: omData.name,
         omid: askAttributes.open_mashaabim?.data?.id,
+        pmashId: askAttributes.pmash?.data?.id,
         askId: askm.id,
         // Voting and user info
         users: askAttributes.vots || [],
-        name: openMashaabimAttrs.name || '',
+        name: omData.name,  // merged: pmash.name ?? open_mashaabim.name
         projectName: projectAttrs.projectName || '',
         noof: (project.attributes.user_1s?.data?.length || 0),
         src2: projectAttrs?.profilePic?.data?.attributes?.url ||
@@ -1055,6 +1090,9 @@ export function extractAskedResources(userData: any): AskedResourceData[] {
         pid: project.attributes.user_1s?.data?.map((u: any) => u.id) || [],
         ani: 'askedm',
         azmi: 'ziruf',
+        // Self-proposal flags (set by createResource when a project member self-assigns)
+        isSelfProposal: askAttributes.isSelfProposal ?? false,
+        pendingMainVote: askAttributes.pendingMainVote ?? false,
         // Additional fields for compatibility
         createdAt: askAttributes.createdAt,
         chat: askAttributes.chat || [],
@@ -1118,6 +1156,7 @@ export function extractProductRequests(userData: any): ProductRequestData[] {
         quant: attrs.quant || firstMatana?.quant || 0,
         total: attrs.total || 0,
         kindOf: firstMatana?.kindOf || sheirut?.kindOf || '',
+        pricingMode: firstMatana?.pricingMode,
         src: firstMatana?.pic?.data?.attributes?.url,
         startDate: attrs.startDate,
         finishDate: attrs.finnishDate,
@@ -1132,6 +1171,9 @@ export function extractProductRequests(userData: any): ProductRequestData[] {
         })) || [],
         createdAt: attrs.createdAt,
         myid: userData.id,
+
+        // Forum / chat
+        forumId: attrs.forum?.data?.id || null,
 
         // Relations
         sheirutId: attrs.sheirut?.data?.id,
@@ -1152,7 +1194,7 @@ export function extractProductRequests(userData: any): ProductRequestData[] {
 /**
  * Helper to map raw sheirut data to SaleData structure
  */
-function mapSaleData(sheirut: any, projectId: string, userData: any, mode: 'sale' | 'buy'): SaleData {
+export function mapSaleData(sheirut: any, projectId: string, userData: any, mode: 'sale' | 'buy'): SaleData {
   const attrs = sheirut.attributes;
   const customer = attrs.users_permissions_users?.data[0];
   const firstMatana = attrs.matanots?.data?.[0]?.attributes;

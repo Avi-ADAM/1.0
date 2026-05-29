@@ -750,90 +750,111 @@
     isG = true;
     run();
   }
-  const title = { he: 'פרופיל והגדרות 1💗1', en: '1💗1 profile and settings' };
-  const deletew = { he: 'מחיקה', en: 'delete' };
-  const om = { he: 'רק רגע בבקשה', en: 'one moment please' };
+  const title = { he: 'פרופיל והגדרות 1💗1', en: '1💗1 profile and settings', ar: '1💗1 الملف الشخصي والإعدادات' };
+  const deletew = { he: 'מחיקה', en: 'delete', ar: 'حذف' };
+  const om = { he: 'רק רגע בבקשה', en: 'one moment please', ar: 'لحظة من فضلك' };
   const message1 = {
     he: 'לחיצה על הכתר מובילה ללב 1💗1, שם נמצאות ההצעות, ההצבעות והפעולות השונות',
-    en: 'click on the crown to move to the heart of 1💗1, there are offers, voting and various actions'
+    en: 'click on the crown to move to the heart of 1💗1, there are offers, voting and various actions',
+    ar: 'انقر على التاج للانتقال إلى قلب 1💗1، حيث توجد العروض والتصويت والإجراءات المختلفة'
   };
-  const levtitle = { he: 'ללב 1💗1', en: 'to the heart of 1💗1' };
+  const levtitle = { he: 'ללב 1💗1', en: 'to the heart of 1💗1', ar: 'إلى قلب 1💗1' };
   const message2 = {
     he: 'רשימת הכישורים שלך, לחיצה על כפתור העריכה להוספת או הסרת כישורים',
-    en: 'list of your skills, press the edit button below to add more skills or to remove some from your list'
+    en: 'list of your skills, press the edit button below to add more skills or to remove some from your list',
+    ar: 'قائمة مهاراتك، اضغط على زر التعديل أدناه لإضافة أو إزالة المهارات'
   };
   const message3 = {
     he: 'רשימת התפקידים, עריכה להוספת או הסרת תפקידים, יש ללחוץ על כפתור האישור למטה כדי שהעריכה תישמר',
-    en: 'youre roles list, after adding or removing remember to press the button below to save your edit'
+    en: 'youre roles list, after adding or removing remember to press the button below to save your edit',
+    ar: 'قائمة أدوارك، بعد الإضافة أو الإزالة اضغط على الزر أدناه لحفظ التعديل'
   };
   const message4 = {
     he: 'רשימת המשאבים שלך (למטה מימין), נציע לך רקמות שנדרשים להן המשאבים שהצעת',
-    en: "Bottom right is youre resource list, on the heart you'll get offers from FreeMates who need them"
+    en: "Bottom right is youre resource list, on the heart you'll get offers from FreeMates who need them",
+    ar: 'أسفل اليمين قائمة مواردك، في القلب ستحصل على عروض من الأعضاء الذين يحتاجونها'
   };
   const message5 = {
     he: 'רשימת הערכים שלך, אנו נציע לך רקמות שמקדמות ערכים כמו אלו שבחרת',
-    en: 'list of your Vallues, we will offer you FreeMates who promoting those vallues'
+    en: 'list of your Vallues, we will offer you FreeMates who promoting those vallues',
+    ar: 'قائمة قيمك، سنقترح لك مجموعات تعزز تلك القيم'
   };
   const message6 = {
     he: 'רשימת דרכי היצירה שלך (למטה משמאל), אנו נציע לך משימות שעשייתן היא בתנאים שהצבת',
-    en: 'Bottom left are your ways of creation list, we will offer you missions that accsept those terms'
+    en: 'Bottom left are your ways of creation list, we will offer you missions that accsept those terms',
+    ar: 'أسفل اليسار قائمة طرق الإبداع، سنقترح لك مهام تقبل تلك الشروط'
   };
   const message7 = {
     he: 'עריכת תמונת הפרופיל',
-    en: 'edit your profile picture'
+    en: 'edit your profile picture',
+    ar: 'تعديل صورة الملف الشخصي'
   };
   const message8 = {
     he: ' העלאת תמונת פרופיל חדשה',
-    en: 'upload new profile picture'
+    en: 'upload new profile picture',
+    ar: 'رفع صورة ملف شخصي جديدة'
   };
   const message9 = {
     he: 'רשימת הרקמות שלך, ריקמה היא קבוצה שמשתפת פעולה, לחיצה על שם הריקמה למעבר למוח שלה, המנורה למטה משמשת בכדי ליצור ריקמה חדשה',
-    en: 'your FreeMates list, FreeMates is a group who Collaborate, press on FreeMates name to go to her Brain, the lamp bellow is for creating a new FreeMates'
+    en: 'your FreeMates list, FreeMates is a group who Collaborate, press on FreeMates name to go to her Brain, the lamp bellow is for creating a new FreeMates',
+    ar: 'قائمة مجموعاتك، FreeMates مجموعة تتعاون معاً، اضغط على اسم المجموعة للانتقال إلى عقلها، المصباح أدناه لإنشاء مجموعة جديدة'
   };
-  const myfr = { he: 'הרקמות שלי', en: 'My FreeMates' };
-  const crnfr = { he: 'יצירת ריקמה חדשה', en: 'create a new FreeMates' };
+  const myfr = { he: 'הרקמות שלי', en: 'My FreeMates', ar: 'مجموعاتي' };
+  const crnfr = { he: 'יצירת ריקמה חדשה', en: 'create a new FreeMates', ar: 'إنشاء مجموعة جديدة' };
   const message10 = {
     he: 'כמה הרווחת עד כה (היהלום למטה במרכז), סכום הכסף הכולל שקיבלת מרקמות מופיע כאן',
-    en: 'The Diamond down shows how much you earn from FreeMates so far'
+    en: 'The Diamond down shows how much you earn from FreeMates so far',
+    ar: 'الماسة أدناه تعرض مجموع أرباحك من المجموعات حتى الآن'
   };
-  const sofartit = { he: 'סך הכל הרווחתי', en: 'total earnings' };
+  const sofartit = { he: 'סך הכל הרווחתי', en: 'total earnings', ar: 'إجمالي الأرباح' };
   const editbas = {
     he: 'עריכת פרטים בסיסיים והגדרות',
-    en: 'Edit Basic Information and Settings'
+    en: 'Edit Basic Information and Settings',
+    ar: 'تعديل المعلومات الأساسية والإعدادات'
   };
   const message11 = {
     he: 'עריכת פרטים והגדרות, הפעלת התראות במכשיר, בחירת יום חופשי וביטול הצגת המדריך',
-    en: 'edit your info, settings, add device alerts, choosing a free day and cencel guid'
+    en: 'edit your info, settings, add device alerts, choosing a free day and cencel guid',
+    ar: 'تعديل بياناتك والإعدادات، إضافة تنبيهات الجهاز، اختيار يوم إجازة وإلغاء الدليل'
   };
-  const cencel = { he: 'ביטול', en: 'cencel' };
-  const sk = { he: 'כישורים', en: 'skills' };
-  const rl = { he: 'תפקידים', en: 'roles' };
-  const ms = { he: 'משאבים', en: 'resources' };
-  const ar = { he: 'ערכים', en: 'Vallues' };
-  const ww = { he: 'דרכי היצירה', en: 'ways of creation' };
-  const plv = { he: 'בחירת ערכים', en: 'choose Vallues' };
-  const pls = { he: 'בחירת כישורים', en: 'choose skills' };
-  const plm = { he: 'בחירת משאבים', en: 'choose resources' };
-  const plw = { he: 'בחירת דרכי יצירה', en: 'choose ways of creation' };
-  const plt = { he: 'בחירת תפקידים', en: 'choose roles' };
+  const message12 = {
+    he: 'סרגל הניווט התחתון - מוח הרקמות, צ\'אט, יצירת פרויקט חדש, הלב ותפריט הפרופיל',
+    en: 'Bottom navigation bar - Brain of FreeMates, Chat, Create new project, Heart, and Profile menu',
+    ar: 'شريط التنقل السفلي - عقل المجموعات، المحادثة، إنشاء مشروع جديد، القلب، وقائمة الملف الشخصي'
+  };
+  const cencel = { he: 'ביטול', en: 'cencel', ar: 'إلغاء' };
+  const sk = { he: 'כישורים', en: 'skills', ar: 'مهارات' };
+  const rl = { he: 'תפקידים', en: 'roles', ar: 'أدوار' };
+  const ms = { he: 'משאבים', en: 'resources', ar: 'موارد' };
+  const ar = { he: 'ערכים', en: 'Vallues', ar: 'قيم' };
+  const ww = { he: 'דרכי היצירה', en: 'ways of creation', ar: 'طرق الإبداع' };
+  const plv = { he: 'בחירת ערכים', en: 'choose Vallues', ar: 'اختيار قيم' };
+  const pls = { he: 'בחירת כישורים', en: 'choose skills', ar: 'اختيار مهارات' };
+  const plm = { he: 'בחירת משאבים', en: 'choose resources', ar: 'اختيار موارد' };
+  const plw = { he: 'בחירת דרכי יצירה', en: 'choose ways of creation', ar: 'اختيار طرق الإبداع' };
+  const plt = { he: 'בחירת תפקידים', en: 'choose roles', ar: 'اختيار أدوار' };
   let width = $state(),
     height = $state();
   let showSaveDialog = $state(false);
   const dialogHeader = {
     he: 'הצגת מדריך משתמש',
-    en: 'Show User Guide'
+    en: 'Show User Guide',
+    ar: 'عرض دليل المستخدم'
   };
   const innerText = {
     he: 'האם ברצונך לראות מדריך שימוש ב1💗1? \n (ניתן לבטל או להחזיר את הדו שיח הזה בפעמים הבאות בתפריט ההגדרות) ',
-    en: 'Would you like to see the user guide?'
+    en: 'Would you like to see the user guide?',
+    ar: 'هل تريد رؤية دليل استخدام 1💗1؟ \n (يمكنك إلغاء أو إعادة هذا الحوار في المرات القادمة من قائمة الإعدادات)'
   };
   const innerDialogButton = {
     he: 'אשמח',
-    en: 'Yes'
+    en: 'Yes',
+    ar: 'نعم'
   };
   const clearButton = {
     he: 'לא',
-    en: 'No'
+    en: 'No',
+    ar: 'لا'
   };
 </script>
 
@@ -1280,6 +1301,9 @@
             </div>
           </TourItem>
         </div>
+      <TourItem message={message12[$lang]}>
+        <div class="footer-tour-anchor" aria-hidden="true"></div>
+      </TourItem>
       </div>
     </div>
   {:else if addP == true}
@@ -1755,5 +1779,15 @@
       -webkit-transform: rotate(360deg);
       transform: rotate(360deg);
     }
+  }
+
+  .footer-tour-anchor {
+    position: fixed;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
   }
 </style>

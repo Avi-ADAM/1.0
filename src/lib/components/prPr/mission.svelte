@@ -9,8 +9,6 @@
   import Close from '$lib/celim/close.svelte';
   import SveltyPicker from 'svelty-picker';
   import moment from 'moment';
-  import { userName } from '$lib/stores/store.js';
-  import { SendTo } from '$lib/send/sendTo.svelte';
   import { toast } from 'svelte-sonner';
   import { confettiStore } from '$lib/stores/confettiStore';
   import { onMount, untrack } from 'svelte';
@@ -19,16 +17,11 @@
   import { lang } from '$lib/stores/lang.js';
   import Addnewro from '../addnew/addNewRole.svelte';
   import SkillSelector from '../ui/SkillSelector.svelte';
-  //import AddNewWorkway from '../addnew/addnewWorkway.svelte';
-  import { RingLoader } from 'svelte-loading-spinners';
-  import { addslashes } from '$lib/func/uti/string.js';
-
   import tr from '$lib/translations/tr.json';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { quintOut } from 'svelte/easing';
   import Expand from '$lib/celim/icons/expand.svelte';
-  import { crTask } from '$lib/func/moach/crtask.svelte';
-  import { sendToSer } from '$lib/send/sendToSer.js';
+  import { executeAction } from '$lib/client/actionClient';
   import Button from '$lib/celim/ui/button.svelte';
   import Tile from '$lib/celim/tile.svelte';
   import TextInput from '$lib/celim/ui/input/textInput.svelte';
@@ -42,8 +35,6 @@
   import ShiftsIcon from '$lib/celim/icons/shiftsIcon.svelte';
   import MobileModal from '$lib/celim/ui/mobileModal.svelte';
   import { page } from '$app/state';
-  import { attachEntityToProcess } from '$lib/client/actionClient';
-  const baseUrl = import.meta.env.VITE_URL;
 
   let {
     pu = [],
@@ -62,7 +53,6 @@
     missionTemplates = [],
     processContext = null
   } = $props();
-  let token;
   let miData = $state([
     {
       selectedSkills: [],
@@ -85,101 +75,37 @@
 
   let error1 = null;
   let roles1 = $state($role);
-  let x = 168;
   let gloading = $state(false);
   onMount(async () => {
     if (id !== 0) {
       gloading = true;
       miData[0].missionName = name;
       miData = miData;
-      let query = `{  mission (id:${id}){data{ id attributes{
-          descrip missionName 
-          skills {data{ id attributes{ skillName ${
-            $lang == 'he' ? 'localizations{data {attributes{ skillName}} }' : ''
-          } }}}
-          tafkidims {data{ id attributes{ roleDescription ${
-            $lang == 'he'
-              ? 'localizations{data {attributes{ roleDescription}} }'
-              : ''
-          }}}}
-          work_ways {data{ id attributes{ workWayName ${
-            $lang == 'he'
-              ? 'localizations{data {attributes{ workWayName}} }'
-              : ''
-          } } }}
-        } }}}`;
-      SendTo(query).then((c) => {
-        console.log(c);
-        console.log(c.data.mission.data);
-        let t = c.data.mission.data;
-        if ($lang == 'he') {
-          for (let i = 0; i < t.attributes.skills.data.length; i++) {
-            if (
-              t.attributes.skills.data[i].attributes.localizations.data.length >
-              0
-            ) {
-              t.attributes.skills.data[i].attributes.skillName =
-                t.attributes.skills.data[
-                  i
-                ].attributes.localizations.data[0].attributes.skillName;
-            }
-          }
-          for (let i = 0; i < t.attributes.tafkidims.data.length; i++) {
-            if (
-              t.attributes.tafkidims.data[i].attributes.localizations.data
-                .length > 0
-            ) {
-              t.attributes.tafkidims.data[i].attributes.roleDescription =
-                t.attributes.tafkidims.data[
-                  i
-                ].attributes.localizations.data[0].attributes.roleDescription;
-            }
-          }
-          console.log(t.attributes.tafkidims.data, 't.attributes.roles.data');
-          for (let i = 0; i < t.attributes.work_ways.data.length; i++) {
-            if (
-              t.attributes.work_ways.data[i].attributes.localizations.data
-                .length > 0
-            ) {
-              t.attributes.work_ways.data[i].attributes.workWayName =
-                t.attributes.work_ways.data[
-                  i
-                ].attributes.localizations.data[0].attributes.workWayName;
-            }
-          }
+      try {
+        const result = await executeAction('getMissionForEdit', {
+          missionId: String(id),
+          lang: $lang,
+        });
+        if (result.success && result.data) {
+          const d = result.data;
+          miData[0].missionName = d.missionName;
+          miData[0].descrip = d.descrip;
+          miData[0].selectedSkills = d.skillNames;
+          miData[0].selectedRoles = d.roleNames;
+          miData[0].selectedWorkways = d.workwayNames;
+          miData[0].id = parseInt(String(d.missionId), 10);
+          miData = miData;
         }
-        t = t;
-        console.log(t, 't 111');
-        miData[0].selectedSkills = t.attributes.skills.data.map(
-          (c) => c.attributes.skillName
-        );
-        miData[0].selectedRoles = t.attributes.tafkidims.data.map(
-          (c) => c.attributes.roleDescription
-        );
-        miData[0].descrip = t.attributes.descrip;
-        miData[0].missionName = t.attributes.missionName;
-        miData[0].id = t.id;
-        miData = miData;
+      } catch (e) {
+        error1 = e;
+      } finally {
         gloading = false;
-        console.log(miData);
-      });
+      }
     } else {
       miData[0].missionName = name;
       miData = miData;
       gloading = false;
     }
-
-    if (restime == 'feh') {
-      x = 48 * 60 * 60 * 1000;
-    } else if (restime == 'sth') {
-      x = 72 * 60 * 60 * 1000;
-    } else if (restime == 'nsh') {
-      x = 96 * 60 * 60 * 1000;
-    } else if (restime == 'sevend') {
-      x = 168 * 60 * 60 * 1000;
-    }
-    x = x;
-    console.log(new Date(Date.now() + x).toLocaleString());
 
     if (id === 0 && name) {
       hydrateFromMissionName(name);
@@ -206,6 +132,10 @@
       (t) => t.attributes.missionName.trim() === value.trim()
     );
     if (!template) return;
+
+    // Store the template's Mission ID so createMission sends existingMissionId
+    // instead of trying to create a duplicate (which hits the unique constraint)
+    miData[0].id = parseInt(String(template.id), 10);
 
     const attributes = template.attributes;
 
@@ -333,443 +263,67 @@
     }
     return arr;
   }
-  let idL;
-  let miDatana = $state([]);
-  let miDatan = $state([]);
-  let linkop;
-  let pendq = '';
-  let qwerys = ``;
-  let rishon4 = ``;
-  let rishonves4 = ``;
-  let already = false;
-  let toadd = ``;
-  let daleg = false;
   async function increment() {
     loading = true;
-    // ולידציה שהיוזר חבר ברקמה מהקוקיות ומאקספורט של רשימת חברים
-    // א השמה של לעצמי אם לבד לעשות קוורי למיסיון אין פרוגרס ריקמה גדול לאסקד
-    // סיימתי את המשימה אם לבד השמה של קוורי לפינישד מיסיון אם עוד לפיניאפרובל
-
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    console.log(idL);
-    token = page.data.tok;
-    let bearer1 = 'bearer' + ' ' + token;
-    let d = new Date();
-    let fd = new Date(Date.now() + x);
-    let element = miData[0];
+    const element = miData[0];
     const skills = find_skill_id(element.selectedSkills);
     const work_ways = find_workway_id(element.selectedWorkways);
     const tafkidims = find_role_id(element.selectedRoles);
-    console.log(skills, work_ways, tafkidims, element.selectedRoles);
-    if (element.id === 0) {
-      await sendToSer(
-        {
-          skills,
-          tafkidims,
-          descrip: element.descrip,
-          missionName: element.missionName,
-          publishedAt: fd
-        },
-        '21createMission',
-        null,
-        null,
-        null,
-        fetch
-      ).then((res) => {
-        console.log(res);
-        element.id = res.data.createMission.data.id;
-        element = element;
-        console.log(element);
-      });
-    }
-    if (userslength > 1) {
-      linkop = 'createPendm';
-      qwerys = 'pendm';
-      pendq = ` users: [
-     {
-      what: true
-      users_permissions_user: "${idL}"
-      ide: ${idL}
-      order: 0
-      zman: "${d.toISOString()}"
-    }
-  ]`;
-    } else if (userslength === 1) {
-      linkop = 'createOpenMission';
-      qwerys = 'openMission';
-      toadd = `isRishon: false`;
-    }
-    if (element.myM === true && userslength > 1) {
-      rishon4 = `rishon: "${element.rishon}",
-                  archived: true,
-                  isRishon: true`;
-      linkop = 'createOpenMission';
-      qwerys = 'openMission';
-      pendq = ``;
-      //create asked or in progres if alone
-      //as
-      /*  if (userslength === 1) {
 
-        } else {
-          //ליצור אופן ואז לחלץ אידי וליצור אסקד
-   `
-  createAsk(
-    input: {
-      data:{ open_mission: ${lechaletz},
-            project: ${projectId},
-            users_permissions_user: ${idL}
+    let dateStart;
+    let dateEnd;
+    if (element.date && element.date !== 'undefined' && element.date !== null) {
+      dateStart = moment(element.date, 'HH:mm DD/MM/YYYY').toISOString();
     }
+    if (element.dates && element.dates !== 'undefined' && element.dates !== null) {
+      dateEnd = moment(element.dates, 'HH:mm DD/MM/YYYY').toISOString();
     }
-  ){
-    ask {id}
-  }`
-        }*/
-    } else if (element.myM === true && userslength == 1) {
-      daleg = true;
-    } else {
-      rishon4 = ``;
-    }
-    if (element.done === true) {
-      rishonves4 = `rishonves: "${rishonves}"`;
-      //create finiapruval or finished if alone
-      if (userslength === 1) {
+
+    // Determine assignedUserId:
+    //   Branch 2 — multi-user, specific member: send their actual ID
+    //   Branch 4 — solo self-assign: send 'self'; server always uses context.userId
+    let assignedUserId;
+    if (element.myM === true) {
+      if (userslength > 1) {
+        assignedUserId = String(element.rishon);
       } else {
+        assignedUserId = 'self';
       }
-    } else {
-      rishonves4 = ``;
     }
 
-    const nhours = element.nhours > 0 ? element.nhours : 0;
-    const valph = element.valph > 0 ? element.valph : 0;
-    let momentx = moment(element.date, 'HH:mm DD/MM/YYYY ');
-    let momebtt = moment(element.dates, 'HH:mm DD/MM/YYYY ');
-    const date =
-      element.date !== undefined &&
-      element.date !== 'undefined' &&
-      element.date !== null
-        ? ` ${daleg == false ? 'sqadualed' : 'start'}: "${momentx.toISOString()}",`
-        : ``;
-    const dates =
-      element.dates !== undefined &&
-      element.dates !== 'undefined' &&
-      element.dates !== null
-        ? `${daleg == false ? 'dates' : 'admaticedai'} : "${momebtt.toISOString()}",`
-        : ``;
-    const pb =
-      element.publicklinks !== undefined && element.publicklinks !== 'undefined'
-        ? `publicklinks: """${element.publicklinks}""",`
-        : ``;
-    const pv =
-      element.privatlinks !== undefined && element.privatlinks !== 'undefined'
-        ? `privatlinks: """${element.privatlinks}""",`
-        : '';
-    const heee =
-      element.spnot !== undefined && element.spnot !== 'undefined'
-        ? `hearotMeyuchadot: """${element.spnot}""",`
-        : '';
-    const deee =
-      element.descrip !== undefined && element.descrip !== 'undefined'
-        ? `descrip: """${element.descrip}""",`
-        : '';
-    //publicklinks save to mission also othet new data
-    // הפרדה של קישורים בפסיק
-    let link = baseUrl + '/graphql';
-    if (daleg == false) {
-      try {
-        await fetch(link, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation { ${linkop}(
-      data: {project: "${projectId}",
-             mission:  "${element.id}",
-             work_ways: [${work_ways}],
-             name: """${element.missionName}""",
-             skills: [${skills}], 
-             tafkidims: [${tafkidims}],
-             vallues:  [${vallues}],
-             noofhours: ${nhours},
-             perhour: ${valph},
-             publishedAt: "${d.toISOString()}",
-             ${deee}
-              ${pb}
-              ${pv}
-              ${heee}
-             iskvua: ${element.iskvua != true ? false : true},
-             ${date} 
-             ${dates}
-             ${rishon4}
-             ${rishonves4}
-             ${pendq} 
-            ${toadd}
-    }
-  ) {data{id attributes{ project{data{ id} }}}}
-} `
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
-        console.log(element.myM, userslength);
-        if (miDatan.data != null) {
-          const createdEntityId =
-            linkop == 'createPendm'
-              ? miDatan?.data?.createPendm?.data?.id
-              : miDatan?.data?.createOpenMission?.data?.id;
-
-          if (processContext?.processId && createdEntityId) {
-            await attachEntityToProcess(
-              {
-                processId: String(processContext.processId),
-                projectId: String(projectId),
-                entityType: linkop == 'createPendm' ? 'pendm' : 'openMission',
-                entityId: String(createdEntityId),
-                name: element.missionName
-              },
-              { showErrorToast: false }
-            );
-          }
-
-          if (element.checklist) {
-            for (let i = 0; i < element.checklist.length; i++) {
-              const momentx = moment(
-                element.checklist[i].dateS,
-                'HH:mm DD/MM/YYYY '
-              );
-              const momebtt = moment(
-                element.checklist[i].dateF,
-                'HH:mm DD/MM/YYYY '
-              );
-              crTask(
-                projectId,
-                null,
-                null,
-                linkop == 'createPendm'
-                  ? miDatan.data.createPendm.data.id
-                  : null,
-                linkop == 'createOpenMission'
-                  ? miDatan.data.createOpenMission.data.id
-                  : null,
-                momentx.toISOString(),
-                momebtt.toISOString(),
-                null,
-                element.checklist[i].shem,
-                element.checklist[i].des,
-                element.checklist[i].link,
-                idL
-              );
-            }
-          }
-          if (element.myM === true && userslength > 1) {
-            let lechaletz = miDatan.data.createOpenMission.data.id;
-            let link = baseUrl + '/graphql';
-            try {
-              await fetch(link, {
-                method: 'POST',
-                headers: {
-                  Authorization: bearer1,
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                  query: `mutation {  
-  createAsk(
-      data:{ 
-        publishedAt: "${d.toISOString()}",
-        open_mission: ${lechaletz},
-            project: ${projectId},
-            users_permissions_user: ${element.rishon},
-            vots: [
-     {
-      what: true
-      users_permissions_user: "${idL}"
-      ide: ${idL}
-      order: 0
-      zman: "${d.toISOString()}"
-    }
-  ]
-    }
-
-  ){
-    data {id}
-  }
-  }`
-                })
-              })
-                .then((r) => r.json())
-                .then((data) => (miDatana = data));
-              console.log(miDatana);
-              if (miDatana != null) {
-                let hiluzask = miDatana.data.createAsk.data.id;
-                let quee = `mutation 
-                        {createTimegrama(
-    data:{
-      date: "${fd.toISOString()}",
-      ask: "${hiluzask}",
-      whatami: "ask",
-    }
-  ){
-    data {id}
-  }
-}`;
-                SendTo(quee);
-                let data = {
-                  pu: pu,
-                  pn: pn,
-                  pl: pl,
-                  restime: restime,
-                  pid: projectId,
-                  uid: idL,
-                  kind: 'pendAsk',
-                  name: element.missionName,
-                  rishon: element.rishon
-                };
-                fetch('/api/nuti', {
-                  method: 'POST', // or 'PUT'
-                  headers: {
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify(data)
-                })
-                  .then((response) => response)
-                  .then((data) => {
-                    console.log('Success:', data);
-                    handleSuccess(miDatan);
-                  })
-                  .catch((error) => {
-                    error = true;
-                    console.error('Error:', error);
-                  });
-              }
-            } catch (e) {
-              error1 = e;
-            }
-          } else if (element.myM != true && userslength > 1) {
-            //Tdo:
-            let hiluzpend = miDatan.data.createPendm.data.id;
-            let quee = `mutation 
-                        {createTimegrama(
-    data:{
-      date: "${fd.toISOString()}",
-      whatami: "pendm",
-      pendm:  "${hiluzpend}",
-    }
-  ){
-    data {id}
-  }
-}`;
-            let v = await SendTo(quee);
-            console.log(v);
-            let data = {
-              pn: pn,
-              pl: pl,
-              pu: pu,
-              pid: projectId,
-              uid: idL,
-              kind: 'pend',
-              name: addslashes(element.missionName)
-            };
-            fetch('/api/nuti', {
-              method: 'POST', // or 'PUT'
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(data)
-            })
-              .then((response) => response)
-              .then((data) => {
-                console.log('Success:', data);
-                handleSuccess(miDatan);
-              })
-              .catch((error) => {
-                console.error('Error:', error);
-              });
-          } else {
-            handleSuccess(miDatan);
-          }
-        } else {
-          loading = false;
-          error = true;
-          toast.warning(er[$lang]);
-        }
-      } catch (e) {
-        error1 = e;
+    try {
+      const result = await executeAction('createMission', {
+        projectId: String(projectId),
+        existingMissionId: element.id !== 0 ? String(element.id) : undefined,
+        missionName: element.missionName,
+        descrip: element.descrip,
+        skillIds: skills.map(String),
+        roleIds: tafkidims.map(String),
+        workwayIds: work_ways.map(String),
+        vallueIds: (vallues || []).map(String),
+        nhours: Number(element.nhours),
+        valph: Number(element.valph),
+        iskvua: element.iskvua,
+        dateStart,
+        dateEnd,
+        publicklinks: element.publicklinks,
+        privatlinks: element.privatlinks,
+        spnot: element.spnot,
+        assignedUserId,
+        checklist: element.checklist || [],
+        processId: processContext?.processId ? String(processContext.processId) : undefined,
+      });
+      if (result.success) {
+        handleSuccess(result.data);
+      } else {
         loading = false;
         error = true;
-      }
-    } else {
-      let qu = `mutation 
-                        { createMesimabetahalich(
-      data: {project: "${projectId}",
-             mission:  "${element.id}",
-             ${heee}
-             name: "${addslashes(element.missionName)}",
-             ${deee}
-             hoursassinged: ${nhours},
-             perhour: ${valph}, 
-             iskvua:${element.iskvua != true ? false : true}, 
-             ${pb}
-              ${pv} 
-             users_permissions_user: "${idL}",
-              tafkidims: [${tafkidims}],
-                      publishedAt: "${d.toISOString()}",
-              ${date} 
-             ${dates}                  }
-  ) {data{id attributes{project{data{id }}}}}
-  }
-`;
-      let t = await SendTo(qu);
-      if (t?.data == null) {
         toast.warning(er[$lang]);
-      } else {
-        console.log(t);
-        if (processContext?.processId) {
-          await attachEntityToProcess(
-            {
-              processId: String(processContext.processId),
-              projectId: String(projectId),
-              entityType: 'mesimabetahalich',
-              entityId: String(t.data.createMesimabetahalich.data.id),
-              name: element.missionName
-            },
-            { showErrorToast: false }
-          );
-        }
-        //get id add checklist
-        if (element.checklist) {
-          for (let i = 0; i < element.checklist.length; i++) {
-            const momentx = moment(
-              element.checklist[i].dateS,
-              'HH:mm DD/MM/YYYY '
-            );
-            const momebtt = moment(
-              element.checklist[i].dateF,
-              'HH:mm DD/MM/YYYY '
-            );
-            crTask(
-              projectId,
-              t.data.createMesimabetahalich.data.id,
-              null,
-              null,
-              null,
-              momentx.toISOString(),
-              momebtt.toISOString(),
-              null,
-              element.checklist[i].shem,
-              element.checklist[i].des,
-              element.checklist[i].link,
-              idL
-            );
-          }
-        }
-        handleSuccess(miDatan);
       }
+    } catch (e) {
+      error1 = e;
+      loading = false;
+      error = true;
     }
   }
 
@@ -817,79 +371,30 @@
     miData[index].selectedRoles.push(newN);
     miData = miData;
   }
-  //תהיה חזק,רגוע ושמח
   //add new workway option
-  let meDataw = [];
   async function newnew(selectedWorkways) {
-    console.log(selectedWorkways, $ww);
     for (let i = 0; i < selectedWorkways.length; i++) {
       if (
         !$ww.map((c) => c.attributes.workWayName).includes(selectedWorkways[i])
       ) {
-        //create new and update workways2
-        let d = new Date();
-        let link = baseUrl + '/graphql';
         try {
-          await fetch(link, {
-            method: 'POST',
-
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              query: `mutation  createWorkWay {
-  createWorkWay(data: {  workWayName: "${selectedWorkways[i]}",
-        publishedAt: "${d.toISOString()}"
-           }) {
-    data {
-      id
-      attributes {
-        workWayName ${$lang == 'he' ? 'localizations { data {attributes{workWayName} }}' : ''}
-      } 
-
-       }
-    }
-}`
-            })
-          })
-            .then((r) => r.json())
-            .then((data) => (meDataw = data));
-          const newOb = meDataw.data.createWorkWay.data;
-          const newValues = $ww;
-          newValues.push(newOb);
-
-          $ww.set(newValues);
-          //    const newN = meData.data.createWorkWay.data.attributes.workWayName;
-
-          let userName_value = $userName;
-          let datau = {
-            name: userName_value,
-            action: 'create דרך יצירה חדשה בשם:',
-            det: newN
-          };
-          fetch('/api/ste', {
-            method: 'POST', // or 'PUT'
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(datau)
-          })
-            .then((response) => response)
-            .then((data) => {
-              console.log('Success:', data, datau);
-            })
-            .catch((error) => {
-              console.error('Error:', error);
-            });
-        } catch (error) {
-          console.log('צריך לתקן:', error.response);
-          error = error1;
-          console.log(error1);
+          const result = await executeAction('createWorkWay', {
+            workWayName: selectedWorkways[i],
+          });
+          if (result.success && result.data) {
+            const newOb = {
+              id: result.data.id,
+              attributes: { workWayName: result.data.workWayName }
+            };
+            const newValues = $ww;
+            newValues.push(newOb);
+            ww.set(newValues);
+          }
+        } catch (err) {
+          console.log('Failed to create workway:', err);
         }
       }
     }
-
-    //workways1.set(find_workway_id(selected));
   }
   let searchText = $state(``);
 
@@ -1835,7 +1340,7 @@
                     id="tomeC"
                     name="tome"
                     value="tome"
-                    onclick={() => miData[0].rishon == idL}
+                    onclick={() => { miData[0].rishon = 'self'; }}
                   />
                   <label for="tome">{tri?.mission?.assingToMe[$lang]}</label>
                 {/if}

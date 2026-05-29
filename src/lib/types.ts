@@ -1,7 +1,11 @@
-export type DealStatus     = 'active' | 'pending' | 'approval' | 'done';
-export type MissionStatus  = 'done' | 'in-progress' | 'waiting' | 'needs-approval';
-export type TimelineStatus = 'done' | 'active' | 'future';
-export type AuthorType     = 'client' | 'creator' | 'manager';
+export type DealStatus          = 'active' | 'pending' | 'approval' | 'done';
+export type MissionStatus       = 'done' | 'in-progress' | 'waiting' | 'needs-approval';
+export type TimelineStatus      = 'done' | 'active' | 'future';
+export type AuthorType          = 'client' | 'creator' | 'manager';
+export type PricingMode         = 'fixed' | 'estimated' | 'quote';
+export type MatanotProductStatus = 'draft' | 'voting' | 'active' | 'archived';
+export type BomMissionMode      = 'createNew' | 'consumeExisting';
+export type BomResourceMode     = 'createNew' | 'consumeExisting' | 'reuseSp';
 
 export interface Deal {
   id: string;
@@ -20,6 +24,12 @@ export interface Deal {
   endDate: string;
   pendingApprovalCount: number;
   progressPct: number;
+  kind?: 'sale' | 'purchase';
+  sheirutId?: string;
+  pricingMode?: PricingMode;
+  status_of_voting?: MatanotProductStatus;
+  fulfillmentId?: string;
+  matanodId?: string;
 }
 
 export interface Mission {
@@ -85,6 +95,13 @@ export interface DealDetailData extends Deal {
   parties: Party[];
   pendingApprovals: PendingApproval[];
   costBreakdown: CostBreakdown;
+  recipeMissions?: BomMission[];
+  recipeResources?: BomResource[];
+  mainForumId?: string;
+  processId?: string;
+  estimatedPrice?: number;
+  marginPct?: number;
+  matanotStatus?: MatanotProductStatus;
 }
 
 export interface DashboardStats {
@@ -93,4 +110,25 @@ export interface DashboardStats {
   totalCost: number;
   pendingApprovals: number;
   completedDeals: number;
+}
+
+export interface BomMission {
+  id: string;
+  name: string;
+  hoursPerUnit: number;
+  hoursDelivered: number;
+  status: MissionStatus;
+  mode: BomMissionMode;
+  mesimabetahalichId?: string;
+}
+
+export interface BomResource {
+  id: string;
+  name: string;
+  quantityPerUnit: number;
+  pricePerUnit: number;
+  delivered: boolean;
+  status: 'pending' | 'ordered' | 'delivered';
+  mode: BomResourceMode;
+  openMashaabimId?: string;
 }

@@ -27,11 +27,38 @@
   import Tile from '$lib/celim/tile.svelte';
   let vallues = $state([]);
   let error1 = null;
-  let newcontent = $state(true);
+  // Start false — local JSON is immediately available so no initial spinner.
+  // A background Strapi fetch refreshes options (including newly-created entries).
+  let newcontent = $state(false);
+
+  // Reactive seeding from $valluss IDs → names (mirrors the pattern in skills.svelte).
+  // Runs whenever $valluss changes OR vallues list updates (e.g. after Strapi fetch).
+  let seedComplete = $state(false);
+  $effect(() => {
+    if (seedComplete) return;
+    const ids = $valluss;
+    if (!ids || ids.length === 0) return;
+    if (!vallues || vallues.length === 0) return;
+    const mapped = ids
+      .map((vallueId) => {
+        const v = vallues.find((item) => item.id == vallueId);
+        if (!v) return null;
+        return v.attributes?.valueName || null;
+      })
+      .filter(Boolean);
+    if (mapped.length === 0) return;
+    // Deduplicate to prevent each_key_duplicate inside svelte-multiselect
+    selected = [...new Set(mapped)];
+    // Mark complete only when every requested ID was resolved so we retry
+    // after the Strapi fetch if some IDs were missing from the local JSON.
+    if (mapped.length === ids.length) seedComplete = true;
+  });
+
   onMount(async () => {
+    // Seed from local JSON immediately so options are available with no delay.
     if ($lang == 'he') {
       vallues = jvals;
-    } else if (lang == 'en') {
+    } else if ($lang == 'en') {
       vallues = enjvals;
     }
     const parseJSON = (resp) => (resp.json ? resp.json() : resp);
@@ -43,9 +70,6 @@
         throw resp;
       });
     };
-    const headers = {
-      'Content-Type': 'application/json'
-    };
 
     try {
       const res = await fetch(baseUrl + '/graphql', {
@@ -55,7 +79,7 @@
         },
         body: JSON.stringify({
           query: `query {
-  vallues (sort: "valueName:asc"){
+  vallues (sort: "valueName:asc", pagination: { limit: 1000 }){
     data{
       id
       attributes {valueName ${$lang == 'he' ? 'localizations{ data { attributes{ valueName } } }' : ''}}
@@ -67,30 +91,31 @@
       })
         .then(checkStatus)
         .then(parseJSON);
-      vallues = res.data.vallues.data;
+      let freshVallues = res.data.vallues.data;
       if ($lang == 'he') {
-        for (var i = 0; i < vallues.length; i++) {
-          if (vallues[i].attributes.localizations.data.length > 0) {
-            vallues[i].attributes.valueName =
-              vallues[i].attributes.localizations.data[0].attributes.valueName;
+        for (var i = 0; i < freshVallues.length; i++) {
+          if (freshVallues[i].attributes.localizations?.data?.length > 0) {
+            freshVallues[i].attributes.valueName =
+              freshVallues[i].attributes.localizations.data[0].attributes.valueName;
           }
         }
       }
-      vallues = vallues;
-
-      // טעינת הערכים שנבחרו בעבר
-      const currentVallues = $valluss;
-      if (currentVallues && currentVallues.length > 0) {
-        const vallueNames = currentVallues
-          .map((vallueId) => {
-            const vallue = vallues.find((v) => v.id == vallueId);
-            return vallue ? vallue.attributes.valueName : null;
-          })
-          .filter(Boolean);
-        selected = vallueNames;
-      }
-
-      newcontent = false;
+      // Deduplicate by valueName so the options array never contains duplicate
+      // strings — svelte-multiselect uses option values as keys and throws
+      // each_key_duplicate when two items share the same display name.
+      const seen = new Set();
+      freshVallues = freshVallues.filter((v) => {
+        const name = v.attributes?.valueName;
+        if (!name || seen.has(name)) return false;
+        seen.add(name);
+        return true;
+      });
+      // Updating vallues triggers the $effect above to re-seed only if
+      // seedComplete is still false (i.e. some IDs were absent from local JSON
+      // because they were just created during the CV review step).
+      // If seedComplete is already true, the $effect short-circuits and user
+      // edits are preserved.
+      vallues = freshVallues;
     } catch (e) {
       error1 = e;
     }
@@ -161,7 +186,7 @@
       id
       attributes {
         valueName
-      } 
+      }
 
        }
     }
@@ -170,7 +195,18 @@
           })
             .then((r) => r.json())
             .then((data) => (meData = data));
-          const newOb = meData.data.createVallue.data;
+          // Guard: GraphQL might return errors instead of data
+          const newOb = meData?.data?.createVallue?.data;
+          if (!newOb) {
+            console.warn('[vallues] createVallue returned no data', meData?.errors);
+            continue;
+          }
+          // Avoid duplicates — the item may already be in the list if it was
+          // fetched from Strapi concurrently or created in a previous call.
+          const alreadyExists = vallues.some(
+            (v) => v.id == newOb.id || v.attributes?.valueName === newOb.attributes?.valueName
+          );
+          if (alreadyExists) continue;
           const newValues = vallues;
           newValues.push(newOb);
 
@@ -268,7 +304,7 @@
     bind:searchText={ugug}
     bind:selected
     {placeholder}
-    options={vallues.map((c) => c.attributes.valueName)}
+    options={[...new Set(vallues.map((c) => c.attributes.valueName).filter(Boolean))]}
   />
 </div>
 
@@ -331,6 +367,15 @@
       align-self: center;
       justify-self: center;
     }
+    /* Keep the gold back/skip/next arrows reachable when the multiselect
+       grows past the viewport on small screens. */
+    .button-in-2,
+    .button-2,
+    .button-end {
+      position: sticky;
+      bottom: 8px;
+      z-index: 5;
+    }
   }
   .button-in-2 {
     grid-column: 1/2;
@@ -374,17 +419,19 @@
     grid-row: 5 / 6;
     text-align: center;
   }
+  /* Dropdown opens DOWNWARD so it stays on-screen on mobile.
+     z-index is kept high so it floats above the sticky navigation buttons. */
   :global(.input-2 .options) {
-    bottom: 100% !important;
-    top: auto !important;
-    margin-top: 0 !important;
-    margin-bottom: 5px !important;
-    max-height: 30vh !important;
+    top: 100% !important;
+    bottom: auto !important;
+    margin-top: 5px !important;
+    margin-bottom: 0 !important;
+    max-height: 40vh !important;
     overflow-y: auto !important;
     z-index: 9999 !important;
     background: var(--gold) !important;
     border: 2px solid var(--barbi-pink) !important;
     border-radius: 12px !important;
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18) !important;
   }
 </style>

@@ -6,13 +6,13 @@
   import { ShareButtons } from '@1lev1/svelte-share';
   import { RingLoader } from 'svelte-loading-spinners';
   import { goto } from '$app/navigation';
-  import { invalidate } from '$app/navigation';
   import SaleComponent from '$lib/components/sales/SaleComponent.svelte';
   import { projectMembershipService } from '$lib/services/projectMembershipService.js';
   import { salesService } from '$lib/services/salesService.js';
   import { getCurrentUserId } from '$lib/utils/authUtils.js';
   import { toast } from 'svelte-sonner';
   import NumberInput from '$lib/celim/ui/numberInput.svelte';
+  import MatanotPublicView from '$lib/components/products/MatanotPublicView.svelte';
 
   // Icon imports (using SVG strings inline for performance if icons aren't provided via library)
   // Assuming standard icons or library usage in your project context.
@@ -36,21 +36,33 @@
   let isSubmitting = $state(false);
   let totalPrice = $state(0);
 
+  // Derived: does the user already have a pending request for this product?
+  const hasPendingRequest = $derived((data.existingRequests ?? []).length > 0);
+  const firstPendingId = $derived((data.existingRequests ?? [])[0]?.id ?? null);
+
   // Translations
   const t = {
     gift: { he: 'מוצר', en: 'Product' },
     seeProject: { he: 'לצפיה בפרויקט', en: 'See project' },
     buyNow: { he: 'לרכישה', en: 'Buy now' },
     notAvailable: { he: 'לא זמין', en: 'Not available' },
-    unlimited: { he: 'ללא הגבלה', en: 'Unlimited' },
+    unlimited: { he: 'ליחידה - ללא הגבלה', en: 'Unlimited' },
     monthly: { he: 'חודשי', en: 'Monthly' },
     yearly: { he: 'שנתי', en: 'Yearly' },
     perUnit: { he: 'ליחידה', en: 'Per unit' },
-    loginInfo: {
-      he: 'בכדי לבקש להצטרף לצוות ולבצע את המשימה וגם בכדי לקבל הצעות למשימות, לפתוח רקמות (פרויקטים) חדשות ולהתנהל בהן בהסכמה יש להתחבר או להירשם',
-      en: 'You need to login to join the team or make purchases'
+    inviteTitle: {
+      he: 'הירשמ/י כדי לרכוש',
+      en: 'Register to Purchase',
+      ar: 'سجّل للشراء'
     },
-    toLogin: { he: 'להתחברות', en: 'Login' },
+    inviteSubtitle: {
+      he: 'התחבר/י או הירשמ/י כדי לרכוש את המוצר בשקיפות מלאה',
+      en: 'Login or register to buy this product with full transparency',
+      ar: 'سجّل الدخول أو أنشئ حساباً لشراء هذا المنتج بشفافية تامة'
+    },
+    toLogin: { he: 'התחברות', en: 'Login', ar: 'تسجيل الدخول' },
+    toRegister: { he: 'הרשמה', en: 'Register', ar: 'إنشاء حساب' },
+    orText: { he: 'או', en: 'or', ar: 'أو' },
     left: { he: 'נותרו', en: 'left' },
     reportSale: { he: 'דיווח מכירה (מנהלים)', en: 'Report Sale (Admin)' },
     hideReport: { he: 'סגור דיווח', en: 'Close Report' },
@@ -68,6 +80,16 @@
     cantOrderMore: {
       he: 'לא ניתן להזמין יותר מ-',
       en: 'Cannot order more than '
+    },
+    complexPriceMaxLabel: {
+      he: 'מחיר מקסימלי',
+      en: 'Maximum price',
+      ar: 'السعر الأقصى'
+    },
+    complexPriceExplain: {
+      he: 'המחיר המוצג הוא המקסימלי — בהנחה שכל המשאבים והמשימות ייצרכו במלואם. בפועל תשלמ/י רק על שעות המשימות וכמות המשאבים שנצרכו בפועל. אם יידרש יותר מהמשוער, תקבל/י בקשת אישור להוצאות נוספות.',
+      en: 'The price shown is the maximum — assuming all resources and tasks are fully consumed. In practice, you pay only for actual task hours and resources used. If more than estimated is needed, you will receive an overhead approval request.',
+      ar: 'السعر المعروض هو الحد الأقصى — بافتراض استهلاك جميع الموارد والمهام بالكامل. في الواقع، تدفع فقط مقابل ساعات المهام والموارد المستخدمة فعلياً. إذا احتجت إلى أكثر من المقدّر، ستتلقى طلب موافقة على التكاليف الإضافية.'
     }
   };
 
@@ -134,7 +156,10 @@
       showPurchaseForm = false;
       isSubmitting = false;
       toast.success(t.saleSuccess[$lang]);
-      await invalidate(() => true);
+
+      // Redirect to the pending request page (or /deals as fallback)
+      const newId = result?.data?.createSheirutpend?.data?.id;
+      await goto(newId ? `/deals/request/${newId}` : '/deals');
     } catch (error) {
       console.error('Error creating service request:', error);
       toast.error(t.saleError[$lang]);
@@ -203,9 +228,21 @@
     goto(`/login?from=gift/${data.mId}`);
   }
 
+  function register(e) {
+    e?.preventDefault?.();
+    goto(`/hascama?from=gift/${data.mId}`);
+  }
+
   function isValidDate(d) {
     return d && new Date(d).getFullYear() > 1970;
   }
+
+  const isComplexProduct = $derived(
+    data.alld?.pricingMode && data.alld.pricingMode !== 'fixed'
+  );
+  const matanotForView = $derived(
+    data.alld ? { id: data.mId, ...data.alld } : null
+  );
 
   // Derived Values
   let title = data.alld?.name
@@ -385,6 +422,23 @@
               </div>
             </div>
 
+            <!-- Complex product BOM view -->
+            {#if isComplexProduct && matanotForView}
+              <div class="mb-4">
+                <MatanotPublicView matanot={matanotForView} />
+              </div>
+              <div
+                class="mb-6 flex gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm dark:border-amber-700/40 dark:bg-amber-900/20"
+                dir={$lang === 'ar' ? 'rtl' : $lang === 'he' ? 'rtl' : 'ltr'}
+              >
+                <span class="mt-0.5 shrink-0 text-amber-500">ℹ️</span>
+                <div class="text-amber-800 dark:text-amber-300">
+                  <span class="font-bold">{t.complexPriceMaxLabel[$lang]}: </span>
+                  {t.complexPriceExplain[$lang]}
+                </div>
+              </div>
+            {/if}
+
             <!-- Dates -->
             {#if isValidDate(data.alld.startDate) || isValidDate(data.alld.finnishDate)}
               <div
@@ -416,6 +470,20 @@
           <!-- Actions Area -->
           <div class="mt-auto">
             {#if page.data.tok}
+              {#if hasPendingRequest}
+                <a
+                  href={firstPendingId ? `/deals/request/${firstPendingId}` : '/deals'}
+                  class="flex items-center gap-3 mb-4 px-4 py-3 rounded-lg border border-gold/40 bg-gold/10 text-sm font-semibold text-gold hover:bg-gold/20 transition-colors"
+                >
+                  <span class="text-lg">⏳</span>
+                  <span>
+                    {$lang === 'he'
+                      ? 'כבר שלחת בקשת רכישה — לצפייה בבקשה'
+                      : 'You already submitted a purchase request — view it'}
+                  </span>
+                  <span class="mr-auto rtl:ml-auto rtl:mr-0">←</span>
+                </a>
+              {/if}
               <div class="flex flex-wrap items-center gap-4">
                 <button
                   class="flex-1 min-w-[140px] py-3 px-6 text-lg font-bold rounded-lg shadow-md transition-all
@@ -448,6 +516,14 @@
                 <div
                   class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700"
                 >
+                  <a
+                    href={`/gift/${data.mId}/edit`}
+                    class="text-sm font-semibold text-barbi underline mb-3 inline-block"
+                  >
+                    {$lang === 'he'
+                      ? '✎ עריכת BOM / מוצר'
+                      : '✎ Edit BOM / product'}
+                  </a>
                   <button
                     class="text-sm font-semibold text-gray-500 hover:text-barbi flex items-center gap-2 transition-colors"
                     onclick={toggleSaleInterface}
@@ -480,23 +556,40 @@
             {:else}
               <!-- Not Logged In State -->
               <div
-                class="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg text-center mt-4"
+                class="mt-4 rounded-xl border border-barbi/20 bg-gradient-to-br from-white to-barbi/5 dark:from-gray-800 dark:to-barbi/10 p-5 text-center shadow-sm"
               >
+                <div class="mb-1 text-2xl">🛒</div>
+                <h3 class="mb-1 text-base font-bold text-barbi">
+                  {t.inviteTitle[$lang]}
+                </h3>
                 <p
-                  class="text-gray-600 dark:text-gray-300 text-sm mb-3 leading-relaxed"
+                  class="mb-4 text-sm leading-relaxed text-gray-500 dark:text-gray-400"
                 >
-                  {t.loginInfo[$lang]}
+                  {t.inviteSubtitle[$lang]}
                 </p>
-                <div class="font-bold text-xl text-barbi mb-3">
-                  {data.alld.price}
-                  {data.alld.currency}
-                </div>
-                <button
-                  class="w-full py-2 px-4 rounded font-bold text-white bg-gradient-to-r from-gray-400 to-gray-500 hover:from-barbi hover:to-mpink transition-all shadow-sm"
-                  onclick={login}
+
+                <div
+                  class="mb-4 rounded-lg bg-barbi/10 px-4 py-2 text-xl font-bold text-barbi"
                 >
-                  {t.toLogin[$lang]}
-                </button>
+                  {data.alld.price}
+                  {data.alld.currency ?? ''}
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <button
+                    class="flex-1 rounded-lg bg-gradient-to-r from-barbi to-mpink py-2.5 px-4 font-bold text-gold shadow-md transition-all hover:brightness-110"
+                    onclick={register}
+                  >
+                    {t.toRegister[$lang]}
+                  </button>
+                  <span class="text-xs text-gray-400">{t.orText[$lang]}</span>
+                  <button
+                    class="flex-1 rounded-lg border border-barbi/40 py-2.5 px-4 font-bold text-barbi transition-all hover:bg-barbi/10"
+                    onclick={login}
+                  >
+                    {t.toLogin[$lang]}
+                  </button>
+                </div>
               </div>
             {/if}
           </div>

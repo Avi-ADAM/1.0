@@ -26,6 +26,7 @@ import { approveSheirutpendConfig } from './approveSheirutpend.js';
 import { rejectSheirutpendConfig } from './rejectSheirutpend.js';
 import { addVoteConfig } from './addVote.js';
 import { ensureSheirutForumConfig } from './ensureSheirutForum.js';
+import { ensureSheirutpendForumConfig } from './ensureSheirutpendForum.js';
 import { createProcessConfig } from './createProcess.js';
 import { attachEntityToProcessConfig } from './attachEntityToProcess.js';
 import { ensureProcessForumConfig } from './ensureProcessForum.js';
@@ -42,6 +43,35 @@ import { createSheirutHalukaConfig } from './createSheirutHaluka.js';
 import { confirmSheirutHalukaConfig } from './confirmSheirutHaluka.js';
 import { ensureHalukaForumConfig } from './ensureHalukaForum.js';
 import { forumReadActions } from './forum.js';
+import { createComplexMatanotConfig } from './createComplexMatanot.js';
+import { approveMatanotConfig } from './approveMatanot.js';
+import { createRatsonConfig } from './createRatson.js';
+import { matchRatsonConfig } from './matchRatson.js';
+import { acceptRatsonProposalConfig } from './acceptRatsonProposal.js';
+import { rejectRatsonProposalConfig } from './rejectRatsonProposal.js';
+import { finalizeAskAcceptanceConfig } from './finalizeAskAcceptance.js';
+import { finalizeJoinAcceptanceConfig } from './finalizeJoinAcceptance.js';
+import { updateWelcomeCardConfig } from './updateWelcomeCard.js';
+import { createMashaabimRequestConfig } from './createMashaabimRequest.js';
+import { declineSpForMashaabimConfig } from './declineSpForMashaabim.js';
+import { applyToMissionConfig } from './applyToMission.js';
+import { declineOpenMissionConfig } from './declineOpenMission.js';
+import { declineMissionRequestConfig } from './declineMissionRequest.js';
+import { finalizeAskmAcceptanceConfig } from './finalizeAskmAcceptance.js';
+import { declineAskmRequestConfig } from './declineAskmRequest.js';
+import { voteOnPendmConfig } from './voteOnPendm.js';
+import { voteOnPmashConfig } from './voteOnPmash.js';
+import { addDiunEntryConfig } from './addDiunEntry.js';
+import { voteOnMaapConfig } from './voteOnMaap.js';
+import { updateMissionStatusConfig } from './updateMissionStatus.js';
+import { updateMissionTimerStateConfig } from './updateMissionTimerState.js';
+import { confirmHalukaConfig } from './confirmHaluka.js';
+import { addHalukaChatEntryConfig } from './addHalukaChatEntry.js';
+import { voteOnDecisionConfig } from './voteOnDecision.js';
+import { getDecisionDetailsConfig } from './getDecisionDetails.js';
+import { getMissionForEditConfig } from './getMissionForEdit.js';
+import { createWorkWayConfig } from './createWorkWay.js';
+import { createMissionConfig } from './createMission.js';
 
 
 /**
@@ -81,6 +111,7 @@ export function registerAllActions(): void {
 
   // Sheirut forum helpers
   registerAction(ensureSheirutForumConfig);
+  registerAction(ensureSheirutpendForumConfig);
   registerAction(createProcessConfig);
   registerAction(attachEntityToProcessConfig);
   registerAction(ensureProcessForumConfig);
@@ -102,6 +133,65 @@ export function registerAllActions(): void {
   registerAction(createSheirutHalukaConfig);
   registerAction(confirmSheirutHalukaConfig);
   registerAction(ensureHalukaForumConfig);
+
+  // Complex matanot (BOM products)
+  registerAction(createComplexMatanotConfig);
+  registerAction(approveMatanotConfig);
+
+  // Mission acceptance finalizer (reqtosherut solo/allVoted cases)
+  registerAction(finalizeAskAcceptanceConfig);
+
+  // Member join finalizer (reqtojoin — adds user to project.user_1s)
+  registerAction(finalizeJoinAcceptanceConfig);
+
+  // Welcome card dismiss
+  registerAction(updateWelcomeCardConfig);
+
+  // Mashaabim (resource) request
+  registerAction(createMashaabimRequestConfig);
+  registerAction(declineSpForMashaabimConfig);
+
+  // Open mission: apply / decline
+  registerAction(applyToMissionConfig);
+  registerAction(declineOpenMissionConfig);
+
+  // Mission request: project-member decline / Askm accept+decline
+  registerAction(declineMissionRequestConfig);
+  registerAction(finalizeAskmAcceptanceConfig);
+  registerAction(declineAskmRequestConfig);
+
+  // Pendm / Pmash vote actions + discussion
+  registerAction(voteOnPendmConfig);
+  registerAction(voteOnPmashConfig);
+  registerAction(addDiunEntryConfig);
+
+  // Maap (resource application) vote
+  registerAction(voteOnMaapConfig);
+
+  // Mission in-progress: status slider + legacy timer save/clear
+  registerAction(updateMissionStatusConfig);
+  registerAction(updateMissionTimerStateConfig);
+
+  // Haluka (money transfer) confirmation + chat
+  registerAction(confirmHalukaConfig);
+  registerAction(addHalukaChatEntryConfig);
+
+  // Decision (project-level vote: logo change, etc.)
+  registerAction(voteOnDecisionConfig);
+
+  // Concierge / Ratson (wish flow — PLAN_CONCIERGE)
+  registerAction(createRatsonConfig);
+  registerAction(matchRatsonConfig);
+  registerAction(acceptRatsonProposalConfig);
+  registerAction(rejectRatsonProposalConfig);
+
+  // Decision card display (read action — current vs. proposed values)
+  registerAction(getDecisionDetailsConfig);
+
+  // Mission creation (all 4 branches) + supporting read/create actions
+  registerAction(getMissionForEditConfig);
+  registerAction(createWorkWayConfig);
+  registerAction(createMissionConfig);
 
   // Future actions will be registered here
   // registerAction(createTaskAction);
@@ -131,6 +221,7 @@ export {
   rejectSheirutpendConfig,
   addVoteConfig,
   ensureSheirutForumConfig,
+  ensureSheirutpendForumConfig,
   closeFiniapruvalConfig,
   updateProjectDetailsConfig,
   createProcessConfig,
@@ -139,5 +230,16 @@ export {
   ensureStageForumConfig,
   completeMissionConfig,
   chatActions,
-  forumReadActions
+  forumReadActions,
+  createComplexMatanotConfig,
+  approveMatanotConfig,
+  createRatsonConfig,
+  matchRatsonConfig,
+  acceptRatsonProposalConfig,
+  rejectRatsonProposalConfig,
+  finalizeJoinAcceptanceConfig,
+  confirmHalukaConfig,
+  addHalukaChatEntryConfig,
+  voteOnDecisionConfig,
+  getDecisionDetailsConfig
 };

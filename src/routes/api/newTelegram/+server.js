@@ -1,7 +1,7 @@
 // create a server with telegraf to listen for new messages
 import { Telegraf, Markup } from 'telegraf';
-import { sendToSer } from '$lib/send/sendToSer.js'; // Assuming sendToSer uses fetch internally
-import { startTimer, stopTimer, saveTimer, updateTimer } from '$lib/func/timers.js'; // Assuming these use sendToSer or fetch
+import { sendToSer } from '$lib/send/sendToSer.js';
+import { startTimer, stopTimer, saveTimer, updateTimer } from '$lib/func/timers.js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 // createServer is likely not needed when using SvelteKit endpoint for webhook
 // import { createServer } from 'https';
@@ -60,7 +60,18 @@ const translations = {
         unauthorized: 'פעולה לא מורשית.',
         askMeAnything: 'את/ה יכול/ה לשאול אותי כל דבר על 1lev1.com!',
         infoSent: 'הנה מידע נוסף על 1lev1:',
-        backToStart: '<< חזרה >>'
+        backToStart: '<< חזרה >>',
+        editIntervalsBtn: '✏️ עריכת קטעי זמן',
+        chooseInterval: 'בחר/י קטע זמן לעריכה:',
+        editStartBtn: '✏️ שנה שעת התחלה',
+        editEndBtn: '✏️ שנה שעת סיום',
+        editIntervalPrompt: 'שלח/י תאריך ושעה חדשים בפורמט:\nDD/MM/YYYY HH:MM\nלדוגמא: 22/05/2026 14:30',
+        intervalUpdated: '✅ הקטע עודכן בהצלחה',
+        invalidDateTime: '❌ תאריך/שעה לא תקינים. השתמש/י בפורמט: DD/MM/YYYY HH:MM',
+        endBeforeStart: '❌ שעת הסיום חייבת להיות אחרי שעת ההתחלה',
+        noIntervals: 'אין קטעי זמן מוגמרים לעריכה.',
+        backToIntervals: '<< חזרה לרשימת קטעים',
+        cancelEdit: '❌ ביטול עריכה'
     },
     en: {
         welcome: 'Welcome to 1💗1',
@@ -103,7 +114,18 @@ const translations = {
         unauthorized: 'Unauthorized action.',
         askMeAnything: 'You can ask me anything about 1lev1.com!',
         infoSent: 'Here is more information about 1lev1:',
-        backToStart: '<< Back >>'
+        backToStart: '<< Back >>',
+        editIntervalsBtn: '✏️ Edit Time Intervals',
+        chooseInterval: 'Choose an interval to edit:',
+        editStartBtn: '✏️ Edit Start Time',
+        editEndBtn: '✏️ Edit End Time',
+        editIntervalPrompt: 'Send new date and time in format:\nDD/MM/YYYY HH:MM\nExample: 22/05/2026 14:30',
+        intervalUpdated: '✅ Interval updated successfully',
+        invalidDateTime: '❌ Invalid date/time. Use format: DD/MM/YYYY HH:MM',
+        endBeforeStart: '❌ End time must be after start time',
+        noIntervals: 'No completed intervals to edit.',
+        backToIntervals: '<< Back to intervals list',
+        cancelEdit: '❌ Cancel edit'
     } // Add other EN translations if needed
 };
 
@@ -122,6 +144,39 @@ const geminiModel = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" }
 
 let allD = [];
 let appIds = [];
+
+// State for tracking pending datetime edits per user
+const pendingEdits = new Map();
+// key: userId string, value: { missionId, timerId, projectId, index, field, intervals, totalHours }
+
+// --- Helper functions for interval editing ---
+
+function formatInterval(interval, index, lang) {
+    const start = new Date(interval.start);
+    const stop = interval.stop ? new Date(interval.stop) : null;
+    const dateStr = start.toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US', { day: '2-digit', month: '2-digit' });
+    const startTime = start.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', hour12: false });
+    const stopTime = stop
+        ? stop.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', hour12: false })
+        : '---';
+    return `${index + 1}. ${dateStr} | ${startTime}→${stopTime}`;
+}
+
+function parseUserDateTime(text) {
+    const match = text.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})\s+(\d{1,2}):(\d{2})$/);
+    if (!match) return null;
+    let [, day, month, year, hours, minutes] = match;
+    day = day.padStart(2, '0');
+    month = month.padStart(2, '0');
+    if (year.length === 2) year = '20' + year;
+    const h = parseInt(hours), mi = parseInt(minutes);
+    const m = parseInt(month), d = parseInt(day);
+    if (m < 1 || m > 12 || d < 1 || d > 31 || h < 0 || h > 23 || mi < 0 || mi > 59) return null;
+    // Parse as local time (user's timezone); toISOString converts to UTC
+    const date = new Date(`${year}-${month}-${day}T${hours.padStart(2, '0')}:${minutes}:00`);
+    if (isNaN(date.getTime())) return null;
+    return date.toISOString();
+}
 
 // --- פונקציות עזר ---
 
@@ -518,6 +573,7 @@ bot.action(/^stopTimer-(\d+)-(\d+)$/, async (ctx) => {
                 getText('timerStopped', lang),
                 Markup.inlineKeyboard([
                     [Markup.button.url(getText('editTimerBtn', lang), 'https://1lev1.com/timers')],
+                    [Markup.button.callback(getText('editIntervalsBtn', lang), `editTimerIntervals-${missionId}-${userId}-${activeTimerData.id}`)],
                     [Markup.button.callback(getText('updateTasksBtn', lang), `updateTasks-${missionId}-${userId}-${activeTimerData.id}`)],
                     [Markup.button.callback(getText('saveTimerBtn', lang), `saveTimer-${missionId}-${userId}-${activeTimerData.id}`)]
                 ]).resize()
@@ -719,6 +775,165 @@ bot.action(/^saveTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
     }
 });
 
+// --- Timer Interval Edit Handlers ---
+
+// Step 1: Show list of completed intervals for a timer
+bot.action(/^editTimerIntervals-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
+    const missionId = ctx.match[1];
+    const userId = ctx.match[2];
+    const timerId = ctx.match[3];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    const fetch = ctx.update.fetch;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    try {
+        const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch);
+        const timerData = missionData?.data?.mesimabetahalich?.data?.attributes?.activeTimer?.data;
+
+        if (!timerData) {
+            await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+            ctx.reply(getText('timerNotFound', lang));
+            return ctx.answerCbQuery();
+        }
+
+        const allIntervals = timerData.attributes.timers || [];
+        // Only show completed intervals (have both start and stop)
+        const completedIntervals = allIntervals
+            .map((interval, i) => ({ interval, i }))
+            .filter(({ interval }) => interval.start && interval.stop);
+
+        if (completedIntervals.length === 0) {
+            await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+            ctx.reply(getText('noIntervals', lang));
+            return ctx.answerCbQuery();
+        }
+
+        const buttons = completedIntervals.map(({ interval, i }) => [
+            Markup.button.callback(
+                formatInterval(interval, i, lang),
+                `editInterval-${missionId}-${userId}-${timerId}-${i}`
+            )
+        ]);
+
+        await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+        ctx.reply(getText('chooseInterval', lang), Markup.inlineKeyboard(buttons).resize());
+    } catch (error) {
+        console.error('Error in editTimerIntervals:', error);
+        ctx.reply(getText('aiActionFailed', lang));
+    }
+    await ctx.answerCbQuery();
+});
+
+// Step 2: Show "Edit Start" / "Edit End" options for a specific interval
+bot.action(/^editInterval-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
+    const missionId = ctx.match[1];
+    const userId = ctx.match[2];
+    const timerId = ctx.match[3];
+    const index = parseInt(ctx.match[4]);
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    const fetch = ctx.update.fetch;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    try {
+        const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch);
+        const timerData = missionData?.data?.mesimabetahalich?.data?.attributes?.activeTimer?.data;
+        const interval = timerData?.attributes?.timers?.[index];
+
+        if (!interval) {
+            ctx.reply(getText('timerNotFound', lang));
+            return ctx.answerCbQuery();
+        }
+
+        const intervalText = formatInterval(interval, index, lang);
+        const buttons = [
+            [Markup.button.callback(getText('editStartBtn', lang), `editIntervalField-${missionId}-${userId}-${timerId}-${index}-start`)],
+            [Markup.button.callback(getText('editEndBtn', lang), `editIntervalField-${missionId}-${userId}-${timerId}-${index}-end`)],
+            [Markup.button.callback(getText('backToIntervals', lang), `editTimerIntervals-${missionId}-${userId}-${timerId}`)]
+        ];
+
+        await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+        const whatToEdit = lang === 'he' ? 'מה ברצונך לשנות?' : 'What would you like to edit?';
+        ctx.reply(`${intervalText}\n\n${whatToEdit}`, Markup.inlineKeyboard(buttons).resize());
+    } catch (error) {
+        console.error('Error in editInterval:', error);
+        ctx.reply(getText('aiActionFailed', lang));
+    }
+    await ctx.answerCbQuery();
+});
+
+// Step 3: Set pending edit state and prompt user for new datetime
+bot.action(/^editIntervalField-(\d+)-(\d+)-(\d+)-(\d+)-(start|end)$/, async (ctx) => {
+    const missionId = ctx.match[1];
+    const userId = ctx.match[2];
+    const timerId = ctx.match[3];
+    const index = parseInt(ctx.match[4]);
+    const field = ctx.match[5];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    const fetch = ctx.update.fetch;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    try {
+        const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch);
+        const timerData = missionData?.data?.mesimabetahalich?.data?.attributes?.activeTimer?.data;
+        const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
+
+        if (!timerData) {
+            ctx.reply(getText('timerNotFound', lang));
+            return ctx.answerCbQuery();
+        }
+
+        const intervals = timerData.attributes.timers || [];
+        const interval = intervals[index];
+        if (!interval) {
+            ctx.reply(getText('timerNotFound', lang));
+            return ctx.answerCbQuery();
+        }
+
+        // Show current value for context
+        const currentVal = field === 'start' ? interval.start : interval.stop;
+        const currentFormatted = currentVal
+            ? new Date(currentVal).toLocaleString(lang === 'he' ? 'he-IL' : 'en-US', {
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit', hour12: false
+              })
+            : '---';
+
+        pendingEdits.set(userInfo.uid.toString(), {
+            missionId, timerId, projectId,
+            index, field, intervals,
+            totalHours: timerData.attributes.totalHours || 0
+        });
+
+        await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+        const currentLabel = lang === 'he' ? 'ערך נוכחי' : 'Current value';
+        ctx.reply(
+            `${currentLabel}: ${currentFormatted}\n\n${getText('editIntervalPrompt', lang)}`,
+            Markup.inlineKeyboard([
+                [Markup.button.callback(getText('cancelEdit', lang), `cancelEdit-${userId}`)]
+            ]).resize()
+        );
+    } catch (error) {
+        console.error('Error in editIntervalField:', error);
+        ctx.reply(getText('aiActionFailed', lang));
+    }
+    await ctx.answerCbQuery();
+});
+
+// Cancel edit
+bot.action(/^cancelEdit-(\d+)$/, async (ctx) => {
+    const userId = ctx.match[1];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    pendingEdits.delete(userInfo.uid.toString());
+    await ctx.answerCbQuery(lang === 'he' ? 'העריכה בוטלה' : 'Edit cancelled');
+    await ctx.editMessageText(lang === 'he' ? 'העריכה בוטלה.' : 'Edit cancelled.').catch(() => {});
+});
+
 // --- Text Message Handler (Using global fetch for helpers) ---
 bot.on('text', async (ctx) => {
     const userText = ctx.message.text;
@@ -729,6 +944,59 @@ bot.on('text', async (ctx) => {
     if (userText.startsWith('/')) return;
 
     if (userInfo) {
+        // Handle pending datetime input for interval editing
+        const uid = userInfo.uid.toString();
+        if (pendingEdits.has(uid)) {
+            const cancelWords = ['ביטול', 'בטל', 'cancel', 'stop', 'quit'];
+            if (cancelWords.includes(userText.trim().toLowerCase())) {
+                pendingEdits.delete(uid);
+                await ctx.reply(lang === 'he' ? 'העריכה בוטלה.' : 'Edit cancelled.');
+                return;
+            }
+
+            const newDateTime = parseUserDateTime(userText);
+            if (!newDateTime) {
+                await ctx.reply(getText('invalidDateTime', lang));
+                return;
+            }
+
+            const pending = pendingEdits.get(uid);
+            const currentInterval = pending.intervals[pending.index];
+            const oldLap = { start: currentInterval.start, stop: currentInterval.stop };
+            const newLap = pending.field === 'start'
+                ? { start: newDateTime, stop: currentInterval.stop }
+                : { start: currentInterval.start, stop: newDateTime };
+
+            if (newLap.stop && new Date(newLap.stop) <= new Date(newLap.start)) {
+                await ctx.reply(getText('endBeforeStart', lang));
+                return;
+            }
+
+            const timerObj = {
+                id: pending.timerId,
+                attributes: { timers: pending.intervals, totalHours: pending.totalHours }
+            };
+
+            try {
+                const result = await updateTimer(
+                    timerObj, 'timers',
+                    { oldLap, newLap, index: pending.index, isSer: true },
+                    fetch, pending.projectId, userInfo.uid
+                );
+                pendingEdits.delete(uid);
+                if (result) {
+                    await ctx.reply(getText('intervalUpdated', lang));
+                } else {
+                    await ctx.reply(getText('aiActionFailed', lang));
+                }
+            } catch (error) {
+                console.error('Error updating timer interval from text:', error);
+                pendingEdits.delete(uid);
+                await ctx.reply(getText('aiActionFailed', lang));
+            }
+            return;
+        }
+
         const aiResponse = await understandUserIntent(userText, userInfo.uid, lang, fetch);
 
         switch (aiResponse.intent) {
@@ -798,6 +1066,7 @@ bot.on('text', async (ctx) => {
                         if (timerAttributes && !timerAttributes.isActive) {
                             ctx.reply(getText('timerStopped', lang), Markup.inlineKeyboard([
                                 [Markup.button.url(getText('editTimerBtn', lang), 'https://1lev1.com/timers')],
+                                [Markup.button.callback(getText('editIntervalsBtn', lang), `editTimerIntervals-${missionId}-${userInfo.uid}-${activeTimerData.id}`)],
                                 [Markup.button.callback(getText('updateTasksBtn', lang), `updateTasks-${missionId}-${userInfo.uid}-${activeTimerData.id}`)],
                                 [Markup.button.callback(getText('saveTimerBtn', lang), `saveTimer-${missionId}-${userInfo.uid}-${activeTimerData.id}`)]
                             ]).resize());

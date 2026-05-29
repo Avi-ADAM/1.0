@@ -1,0 +1,22 @@
+{
+  "title": "העסקאות שלי",
+  "subtitle": "עקוב אחרי כל המוצרים ומצב ביצועם בזמן אמת",
+  "my_purchases": "קניות שלי",
+  "my_sales": "מכירות שלי",
+  "pending_requests": "בקשות ממתינות",
+  "active_purchases": "קניות פעילות",
+  "active_sales": "מכירות פעילות",
+  "pending_requests_label": "בקשות רכישה ממתינות לאישור",
+  "no_active_purchases": "אין לך עדיין קניות פעילות",
+  "no_active_sales": "אין לך עדיין מכירות פעילות",
+  "no_pending_requests": "אין בקשות ממתינות",
+  "logo_alt": "לוגו עסקאות",
+  "quick_sales_center": "מרכז מכירות",
+  "quick_sales_center_hint": "מכור מוצרים מהפרויקטים שלך",
+  "quick_concierge": "קונסיירז׳",
+  "quick_concierge_hint": "בקשות ומשאלות לקנייה",
+  "cta_start_selling": "פתח מרכז מכירות",
+  "cta_find_products": "חפש דרך קונסיירז׳",
+  "cta_sales_center_desc": "עבור למרכז המכירות כדי להוסיף מכירה חדשה",
+  "cta_concierge_desc": "פרסם משאלה ומצא מה שאתה מחפש"
+}

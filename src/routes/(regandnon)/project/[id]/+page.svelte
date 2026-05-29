@@ -1,50 +1,87 @@
 <script>
   import Header from '$lib/components/header/header.svelte';
-  import { goto } from '$app/navigation';
+  import { goto, invalidate } from '$app/navigation';
+  import { onMount, onDestroy } from 'svelte';
   import { lang } from '$lib/stores/lang.js';
   import { RingLoader } from 'svelte-loading-spinners';
   import Close from '$lib/celim/close.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
   import Tile from '$lib/celim/tile.svelte';
+  import { socketClient } from '$lib/stores/socketClient';
 
   // ייבוא הקומפוננטה החדשה (נניח שהיא באותה תיקייה או בתיקיית הקומפוננטות)
   import AuthorityBadge from '$lib/components/ui/AuthorityBadge.svelte';
 
   let { data } = $props();
-  let projectId = data.projectId;
-  let project = data.projectData;
-  let isRegisteredUser = data.isRegisteredUser;
+  // Derived so navigating between /project/A and /project/B (same component
+  // instance, reused by SvelteKit) keeps these — and the socket listener — current.
+  let projectId = $derived(data.projectId);
+  let isRegisteredUser = $derived(data.isRegisteredUser);
 
-  let projectUsers = project?.attributes?.user_1s?.data || [];
-  let projecto = project?.attributes?.open_missions?.data || [];
-  let vallues = $state(project?.attributes?.vallues?.data || []);
+  // Derived from load data so a realtime invalidate(`project:${id}`) re-renders
+  // the team, missions, logo, links and values (e.g. after a decision passes).
+  let project = $derived(data.projectData);
+  let projectUsers = $derived(project?.attributes?.user_1s?.data || []);
+  let projecto = $derived(project?.attributes?.open_missions?.data || []);
 
   // תמונה - בדיקת תקינות
-  let srcP = project?.attributes?.profilePic?.data
-    ? project.attributes.profilePic.data.attributes.formats?.thumbnail?.url ||
-      project.attributes.profilePic.data.attributes.url
-    : null;
+  let srcP = $derived(
+    project?.attributes?.profilePic?.data
+      ? project.attributes.profilePic.data.attributes.formats?.thumbnail?.url ||
+          project.attributes.profilePic.data.attributes.url
+      : null
+  );
 
-  let linkP = project?.attributes?.linkToWebsite;
-  let githublink = project?.attributes?.githubLink;
-  let fblink = project?.attributes?.fblink;
-  let discordlink = project?.attributes?.discordLink;
-  let twiterlink = project?.attributes?.twiterLink;
+  let linkP = $derived(project?.attributes?.linkToWebsite);
+  let githublink = $derived(project?.attributes?.githubLink);
+  let fblink = $derived(project?.attributes?.fblink);
+  let discordlink = $derived(project?.attributes?.discordLink);
+  let twiterlink = $derived(project?.attributes?.twiterLink);
 
   const showl = { he: '🎁 הצגת התוצרים שלנו', en: '🎁 Our Products' };
   let show = $state(false);
 
-  // טיפול בתרגום ערכים
+  // Values, re-synced from the (possibly re-fetched) project and translated for he.
+  let vallues = $state([]);
   $effect(() => {
-    if ($lang == 'he' && vallues.length > 0) {
-      for (let i = 0; i < vallues.length; i++) {
-        if (vallues[i].attributes.localizations.data.length > 0) {
-          vallues[i].attributes.valueName =
-            vallues[i].attributes.localizations.data[0].attributes.valueName;
+    const base = data.projectData?.attributes?.vallues?.data || [];
+    if ($lang == 'he') {
+      for (let i = 0; i < base.length; i++) {
+        const loc = base[i]?.attributes?.localizations?.data;
+        if (loc && loc.length > 0) {
+          base[i].attributes.valueName = loc[0].attributes.valueName;
         }
       }
     }
+    vallues = base;
   });
+
+  // Realtime: re-run the page load when a vote/decision lands for this project.
+  // Only registered users hold an authenticated socket connection.
+  const PROJECT_REFRESH_TYPES = [
+    'pendmVote',
+    'pmashVote',
+    'maapVote',
+    'decisionVote',
+    'voteUpdate'
+  ];
+  let socketUnsub;
+  onMount(() => {
+    if (!isRegisteredUser) return;
+    socketUnsub = socketClient.onNotification((n) => {
+      const type = n?.metadata?.type || n?.data?.type;
+      const notifProjectId = n?.actionParams?.projectId || n?.data?.projectId;
+      if (
+        notifProjectId &&
+        String(notifProjectId) === String(projectId) &&
+        type &&
+        PROJECT_REFRESH_TYPES.includes(type)
+      ) {
+        invalidate(`project:${projectId}`);
+      }
+    });
+  });
+  onDestroy(() => socketUnsub?.());
 
   function us(x) {
     goto(`/user/${x}`);

@@ -13,6 +13,7 @@ const config = {
     }
   },
   ssr: {
+    external: ['pdf-parse'],
     noExternal: [
       'three', 
       'troika-three-text',

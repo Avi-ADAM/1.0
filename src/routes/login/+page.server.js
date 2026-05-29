@@ -1,109 +1,98 @@
-import { redirect } from '@sveltejs/kit';
-
 const baseUrl = import.meta.env.VITE_URL;
 
 export const actions = {
-    login: async ({ request, cookies }) => {
+    login: async ({ request, cookies, url }) => {
         const data = await request.formData();
         const email = data.get('email');
         const password = data.get('password');
-        const redirectTo = String(data.get('from') || '/me'); // Get 'from' parameter, default to '/me'
+        const redirectTo = String(data.get('from') || '/onboard');
 
         if (!email || !password) {
-            return {
-                success: false,
-                error: 'Please fill all fields.'
-            };
+            return { success: false, error: 'Please fill all fields.' };
         }
 
-        let response;
         try {
-            response = await fetch(`${baseUrl}/api/auth/local`, {
+            const response = await fetch(`${baseUrl}/api/auth/local`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ identifier: email, password })
             });
 
-            if (!response.ok) { // Check if the response was successful (e.g., 2xx status)
+            if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error.message || 'Login failed');
             }
 
             const { jwt, user } = await response.json();
 
-            // Set cookies on the server
-            // domain: '.1lev1.com' allows subdomain access (socket.1lev1.com)
             const isProduction = import.meta.env.PROD;
-            
-            // In production: use 'none' for cross-subdomain (requires secure: true)
-            // In development: use 'lax' for localhost (no domain/secure needed)
+
+            // Scope the cookie to .1lev1.com so socket.1lev1.com receives the JWT
+            // during the (same-site) WebSocket handshake — this is the config that
+            // has worked for years. But ONLY when actually served from a 1lev1.com
+            // host: on a non-matching origin (e.g. a *.vercel.app preview) the
+            // browser silently rejects a .1lev1.com cookie, so we fall back to a
+            // host-only cookie there.
+            console.log(url.hostname, 'on own domain? ', url.hostname === '1lev1.com' || url.hostname.endsWith('.1lev1.com'));
+            const onOwnDomain = url.hostname === '1lev1.com' || url.hostname.endsWith('.1lev1.com');
             const cookieOptions = {
                 path: '/',
                 expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-                secure: isProduction, // Required for sameSite: 'none'
-                sameSite: isProduction ? /** @type {'none'} */ ('none') : /** @type {'lax'} */ ('lax'),
-                domain: isProduction ? '.1lev1.com' : undefined // Subdomain support only in production
+                secure: isProduction,
+                sameSite: /** @type {'lax'} */ ('lax'),
+                domain: onOwnDomain ? '.1lev1.com' : undefined
             };
 
-            // JWT cookie - now httpOnly for security, preventing client-side exposure.
-            
-            // Aggressively clean up potential "zombie" cookies from previous sessions/deploys.
-            // We iterate over multiple domain possibilities to catch stubborn cookies (like those set specifically on 'www').
+            // Clean up zombie cookies from previous sessions that had different
+            // domain scopes than the cookie we are about to set.
+            //
+            // CRITICAL: do NOT add a delete variation whose Domain attribute is
+            // canonically equal to the SET's Domain (`.1lev1.com`). Per RFC 6265
+            // §5.2.3 the browser strips the leading dot, so `Domain=1lev1.com`
+            // and `Domain=.1lev1.com` are the SAME cookie. SvelteKit, however,
+            // keys its internal cookie Map by the RAW string (see
+            // node_modules/@sveltejs/kit/src/runtime/server/cookie.js
+            // `generate_cookie_key`), so both end up as separate Set-Cookie
+            // headers in the response. The delete-without-dot is emitted AFTER
+            // the set and silently wipes the JWT — the browser ends up with no
+            // auth cookies and bounces back to /login. That was the prod bug.
+            //
+            // We only delete scopes that the SET does not touch:
+            //   - host-only (no Domain attribute) — kills old host-only zombies
+            //   - Domain=www.1lev1.com — kills old www-pinned zombies
+            // The `.1lev1.com` delete is omitted because the SET below already
+            // overwrites that exact key inside SvelteKit's cookie Map.
             const cookiesToDelete = ['jwt', 'id', 'un', 'when', 'email'];
             const deleteVariations = [
-                { path: '/' },                         // Standard HostOnly (current domain)
-                { path: '/', domain: '.1lev1.com' },   // Wildcard for all subdomains
-                { path: '/', domain: 'www.1lev1.com' },// Explicit WWW subdomain (crucial for the issue you saw)
-                { path: '/', domain: '1lev1.com' }     // Explicit root domain
+                { path: '/' },
+                { path: '/', domain: 'www.1lev1.com' }
             ];
-
             for (const name of cookiesToDelete) {
                 for (const opts of deleteVariations) {
                     cookies.delete(name, opts);
                 }
             }
-            
 
-            // JWT cookie - now httpOnly for security, preventing client-side exposure.
-            cookies.set('jwt', jwt, {
-                ...cookieOptions,
-                httpOnly: true 
-            });
-            
-            cookies.set('id', String(user.id), {
-                ...cookieOptions,
-                httpOnly: false 
-            });
-            
-            cookies.set('un', user.username, {
-                ...cookieOptions,
-                httpOnly: false
-            });
-            
-            cookies.set('when', Date.now().toString(), {
-                ...cookieOptions,
-                httpOnly: false
-            });
-            
-            cookies.set('email', String(email), {
-                ...cookieOptions,
-                httpOnly: false
-            });
+            cookies.set('jwt', jwt, { ...cookieOptions, httpOnly: true });
+            cookies.set('id', String(user.id), { ...cookieOptions, httpOnly: false });
+            cookies.set('un', user.name || user.username, { ...cookieOptions, httpOnly: false });
+            cookies.set('when', Date.now().toString(), { ...cookieOptions, httpOnly: false });
+            cookies.set('email', String(email), { ...cookieOptions, httpOnly: false });
 
-            console.log('success');
-            // If everything is successful, throw the redirect
-            throw redirect(303, redirectTo); // Use the determined redirect path
+            console.log('login success, redirecting to', redirectTo);
+
+            // Return the redirect target instead of throwing redirect().
+            // Throwing redirect() inside use:enhance can strip Set-Cookie headers
+            // from the action response before the browser can store the cookies.
+            // The client-side enhance callback will do a full browser navigation
+            // once it receives this success response (with the cookies already set).
+            return { success: true, redirectTo };
 
         } catch (err) {
             console.error('Login error:', err);
-            // If the error is a SvelteKit redirect, re-throw it so SvelteKit handles it
-            if (err && err.status === 303 && err.location) {
-                throw err;
-            }
-            // Otherwise, return a generic error message
             return {
                 success: false,
-                error: err.message || 'An unexpected error occurred.'
+                error: /** @type {Error} */ (err).message || 'An unexpected error occurred.'
             };
         }
     }

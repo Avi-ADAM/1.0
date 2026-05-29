@@ -21,7 +21,8 @@ export class EmailService {
     recipients: UserProfile[],
     notification: NotificationData,
     templateName: string = 'SimpleNuti',
-    context: ActionContext
+    context: ActionContext,
+    templateData?: Record<string, any>
   ): Promise<void> {
     // Filter users who don't want email (noMail flag)
     const emailRecipients = recipients.filter(user => user.noMail !== true);
@@ -40,8 +41,8 @@ export class EmailService {
     const template = await this.loadTemplate(templateName);
 
     // Send emails to all recipients
-    const emailPromises = emailRecipients.map(user => 
-      this.sendToUser(user, notification, template, render, context)
+    const emailPromises = emailRecipients.map(user =>
+      this.sendToUser(user, notification, template, render, context, templateData)
     );
 
     // Wait for all emails to be sent (but don't fail if some fail)
@@ -69,7 +70,8 @@ export class EmailService {
     notification: NotificationData,
     template: any,
     render: any,
-    context: ActionContext
+    context: ActionContext,
+    templateData?: Record<string, any>
   ): Promise<void> {
     try {
       // Determine language - use user's language if it's supported, otherwise fall back to context language
@@ -81,7 +83,8 @@ export class EmailService {
         body: notification.body,
         username: user.username,
         previewText: notification.title,
-        lang
+        lang,
+        ...(templateData || {})
       });
 
       // Prepare email data for the sendMail API
@@ -115,17 +118,23 @@ export class EmailService {
    */
   private async loadTemplate(templateName: string): Promise<any> {
     try {
-      // Currently only SimpleNuti is supported
-      // In the future, this can be extended to support multiple templates
-      if (templateName === 'SimpleNuti') {
-        const module = await import('$lib/components/mail/simpleNuti.svelte');
+      const templates: Record<string, () => Promise<any>> = {
+        SimpleNuti: () => import('$lib/components/mail/simpleNuti.svelte'),
+        PendJustCreated: () => import('$lib/components/mail/pendJustCreated.svelte'),
+        HalukaApproved: () => import('$lib/components/mail/HalukaApproved.svelte'),
+        ComeVoteJoin: () => import('$lib/components/mail/comeVoteJoin.svelte'),
+        MissionAccepted: () => import('$lib/components/mail/mail.svelte'),
+      };
+
+      const loader = templates[templateName];
+      if (loader) {
+        const module = await loader();
         return module.default;
       }
 
-      // Default to SimpleNuti if template not found
       console.warn(`EmailService: Template '${templateName}' not found, using SimpleNuti`);
-      const module = await import('$lib/components/mail/simpleNuti.svelte');
-      return module.default;
+      const fallback = await import('$lib/components/mail/simpleNuti.svelte');
+      return fallback.default;
     } catch (error) {
       console.error(`EmailService: Failed to load template '${templateName}':`, error);
       throw error;

@@ -47,7 +47,7 @@
       share: 'שיתוף',
       viewProduct: 'צפייה במוצר',
       type: 'סוג',
-      unlimited: 'ללא הגבלה'
+      unlimited: 'ליחידה - ללא הגבלה'
     },
     en: {
       title: 'Sales Center',
@@ -83,14 +83,13 @@
   onMount(async () => {
     try {
       // Get authentication data from cookies
-      
 
       const cookieValueId = document.cookie
         .split('; ')
         .find((row) => row.startsWith('id='))
         ?.split('=')[1];
 
-      if ( !cookieValueId) {
+      if (!cookieValueId) {
         error = 'Authentication required';
         loading = false;
         return;
@@ -205,7 +204,7 @@
     const productIndex = products.findIndex((p) => p.id === productId);
     if (productIndex !== -1) {
       const currentQuantity = products[productIndex].attributes.quant;
-      
+
       // Don't update quantity if it's unlimited (-1)
       if (currentQuantity !== -1) {
         const newQuantity = Math.max(0, currentQuantity - saleData.unit);
@@ -466,19 +465,21 @@
           </div>
         </div>
       {:else}
-        <div               dir={$lang === 'he' ? 'rtl' : 'ltr'}
- class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+        <div
+          dir={$lang === 'he' ? 'rtl' : 'ltr'}
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10"
+        >
           {#each filteredProducts as product (product.id)}
             <div
               class="bg-white/10 backdrop-blur-md rounded-lg shadow-lg border border-white/20 hover:shadow-xl hover:bg-white/15 transition-all duration-300 overflow-hidden"
               dir={$lang === 'he' ? 'rtl' : 'ltr'}
             >
               <!-- Product Header -->
-              <div class="p-6 pb-4"    dir={$lang === 'he' ? 'rtl' : 'ltr'}>
+              <div class="p-6 pb-4" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
                 <div
                   class="flex flex-row justify-between items-start mb-4"
-
-               dir={$lang === 'he' ? 'rtl' : 'ltr'}>
+                  dir={$lang === 'he' ? 'rtl' : 'ltr'}
+                >
                   <div
                     class="flex-1 min-w-0 {$lang === 'he'
                       ? 'text-right'
@@ -495,10 +496,7 @@
                   </div>
 
                   <!-- Action Buttons -->
-                  <div
-                    class="flex gap-2 "
-                      dir={$lang === 'he' ? 'rtl' : ''}
-                  >
+                  <div class="flex gap-2" dir={$lang === 'he' ? 'rtl' : ''}>
                     <button
                       onclick={() =>
                         shareProduct(product.id, product.attributes.name)}
@@ -552,9 +550,7 @@
 
                 <!-- Product Details -->
                 <div class="space-y-3 mb-4">
-                  <div
-                    class="flex justify-between items-center "
-                  >
+                  <div class="flex justify-between items-center">
                     <span class="text-royal-blue/80 text-sm glow-text"
                       >{t.price}:</span
                     >
@@ -566,22 +562,20 @@
                     </span>
                   </div>
 
-                  <div
-                    class="flex justify-between items-center "
-                  >
+                  <div class="flex justify-between items-center">
                     <span class="text-royal-blue/80 text-sm glow-text"
                       >{t.quantity}:</span
                     >
                     <span
                       class="font-bold text-royal-blue drop-shadow glow-text"
                     >
-                      {product.attributes.quant === -1 ? t.unlimited : product.attributes.quant}
+                      {product.attributes.quant === -1
+                        ? t.unlimited
+                        : product.attributes.quant}
                     </span>
                   </div>
 
-                  <div
-                    class="flex justify-between items-center "
-                  >
+                  <div class="flex justify-between items-center">
                     <span class="text-royal-blue/80 text-sm glow-text"
                       >{t.type}:</span
                     >
@@ -785,8 +779,6 @@
     text-shadow: none;
   }
 
-
-
   [dir='rtl'] .space-x-2 > * + * {
     margin-left: 0;
     margin-right: 0.5rem;
@@ -796,9 +788,6 @@
     margin-left: 0.5rem;
     margin-right: 0;
   }
-
-
- 
 
   /* Royal Blue Color Definition */
   .text-royal-blue {

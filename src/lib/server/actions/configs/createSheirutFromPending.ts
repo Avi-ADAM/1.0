@@ -1,4 +1,3 @@
-
 import type { ActionConfig, ActionExecutionHandler } from '../types';
 
 const createSheirutFromPendingHandler: ActionExecutionHandler = async (params, context, util) => {
@@ -55,7 +54,96 @@ const createSheirutFromPendingHandler: ActionExecutionHandler = async (params, c
         throw new Error("Failed to create Sheirut object");
     }
 
-    // 4. Update Pending Request
+    // 4a. Activate BOM for complex matanot (pricingMode !== 'fixed')
+    const firstMatanot = spData.matanots?.data?.[0];
+    const pricingMode = firstMatanot?.attributes?.pricingMode;
+
+    if (pricingMode && pricingMode !== 'fixed' && firstMatanot) {
+        const now = new Date().toISOString();
+        const matanot = firstMatanot.attributes;
+        const recipeMissions: any[] = matanot.matanot_recipe_missions?.data ?? [];
+        const recipeResources: any[] = matanot.matanot_recipe_resources?.data ?? [];
+
+        for (const rm of recipeMissions) {
+            const attrs = rm.attributes;
+            const existingMesima = attrs.mesimabetahalich?.data;
+            const pendm = attrs.pendm?.data;
+            let mesimaId: string | null = existingMesima?.id ? String(existingMesima.id) : null;
+
+            if (!mesimaId && attrs.mode !== 'consumeExisting') {
+                try {
+                    // Assign to the seller (rishon on pendm) who committed to doing this mission,
+                    // not the client (buyer) who ordered the product.
+                    const sellerId = pendm?.attributes?.rishon?.data?.id
+                        ? String(pendm.attributes.rishon.data.id)
+                        : context.userId;
+                    const mesData: Record<string, unknown> = {
+                        project: projectId,
+                        name: pendm?.attributes?.name || attrs.notes || `${matanot.name} - משימה`,
+                        descrip: pendm?.attributes?.descrip || '',
+                        hoursassinged: Number(attrs.hoursPerUnit) || 0,
+                        perhour: Number(attrs.ratePerHour) || 0,
+                        users_permissions_user: sellerId,
+                        publishedAt: now,
+                    };
+                    const missionId = pendm?.attributes?.mission?.data?.id;
+                    if (missionId) mesData.mission = String(missionId);
+
+                    const mesRes = await strapi.execute('139createMesimabetahalich', { data: mesData }, context.jwt, context.fetch);
+                    mesimaId = mesRes?.data?.createMesimabetahalich?.data?.id
+                        ? String(mesRes.data.createMesimabetahalich.data.id)
+                        : null;
+                } catch (err) {
+                    console.warn('[createSheirutFromPending] createMesimabetahalich failed:', err);
+                }
+            }
+
+            if (mesimaId) {
+                try {
+                    await strapi.execute('140createAct', {
+                        data: {
+                            project: projectId,
+                            shem: `יש לך מוצר ליצור - ${matanot.name}`,
+                            des: `נדרשת לבצע משימה "${pendm?.attributes?.name || attrs.notes || ''}" עבור ${matanot.name}`,
+                            isAssigned: true,
+                            my: sellerId,
+                            vali: sellerId,
+                            mesimabetahaliches: mesimaId,
+                            publishedAt: now,
+                        }
+                    }, context.jwt, context.fetch);
+                } catch (err) {
+                    console.warn('[createSheirutFromPending] createAct reminder failed:', err);
+                }
+            }
+        }
+
+        for (const rr of recipeResources) {
+            const attrs = rr.attributes;
+            if (attrs.mode === 'consumeExisting' || attrs.mashabetahalich?.data?.id) {
+                // consumeExisting mashabetahalich: handled in M5.5 (reservedQuantity + MaapCycle flow)
+                continue;
+            }
+            const pmash = attrs.pmash?.data;
+            if (!pmash?.id) continue;
+
+            try {
+                await strapi.execute('141createMaap', {
+                    data: {
+                        project: projectId,
+                        name: pmash.attributes?.name || `${matanot.name} - משאב`,
+                        pmash: String(pmash.id),
+                        archived: false,
+                        publishedAt: now,
+                    }
+                }, context.jwt, context.fetch);
+            } catch (err) {
+                console.warn('[createSheirutFromPending] createMaap failed:', err);
+            }
+        }
+    }
+
+    // 4b. Update Pending Request
     // Mark as approved and archived, link to new service
     await strapi.execute('73updateSheirutpend', {
         id: spId,

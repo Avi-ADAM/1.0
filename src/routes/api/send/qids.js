@@ -44,6 +44,11 @@ const qids_base = {
       data { id }
     }
   }`,
+  '2linkForumToSheirutpend': `mutation LinkForumToSheirutpend($id: ID!, $forumId: ID!) {
+    updateSheirutpend(id: $id, data: { forum: $forumId }) {
+      data { id }
+    }
+  }`,
   '2cGetMoneyReceivers': `query GetMoneyReceivers($id: ID!) {
     sheirut(id: $id) {
       data {
@@ -109,16 +114,33 @@ const qids_base = {
                                        $fulfilled:Boolean,
                                        $name: String,
                                        $des:String,
-                                       $allowJoin : Boolean, 
-                                       $vallues: [ID], 
-                                       $longDes:String, 
+                                       $allowJoin : Boolean,
+                                       $vallues: [ID],
+                                       $longDes:String,
                                        $bounti: Boolean,
                                        $totalbounti: Float,
                                        $users_permissions_users: [ID],
                                        $missions:[ID],
                                        $mashaabims:[ID],
                                        $link: String,
-                                       $publishedAt: DateTime)
+                                       $publishedAt: DateTime,
+                                       $status_ratson: Enum_Ratson_Status_Ratson,
+                                       $access_mode: Enum_Ratson_Access_Mode,
+                                       $categories: [ID],
+                                       $sub_category: String,
+                                       $language: String,
+                                       $lat: Float,
+                                       $lng: Float,
+                                       $radius: Long,
+                                       $location_hint: String,
+                                       $frequency: String,
+                                       $isOnline: Boolean,
+                                       $age_group: String,
+                                       $ai_meta: JSON,
+                                       $chat_forum: ID,
+                                       $process: ID,
+                                       $extracted_missions: [ComponentNewExtractedMissionsInput],
+                                       $extracted_resources: [ComponentNewExtractedResourcesInput])
                         { createRatson(
       data: {startDate:$startDate,
              desc: $des,
@@ -135,9 +157,26 @@ const qids_base = {
              totalbounti:$totalbounti,
              users_permissions_users:$users_permissions_users,
              missions: $missions,
-             mashaabims:$mashaabims
+             mashaabims:$mashaabims,
+             status_ratson: $status_ratson,
+             access_mode: $access_mode,
+             categories: $categories,
+             sub_category: $sub_category,
+             language: $language,
+             lat: $lat,
+             lng: $lng,
+             radius: $radius,
+             location_hint: $location_hint,
+             frequency: $frequency,
+             isOnline: $isOnline,
+             age_group: $age_group,
+             ai_meta: $ai_meta,
+             chat_forum: $chat_forum,
+             process: $process,
+             extracted_missions: $extracted_missions,
+             extracted_resources: $extracted_resources
                   }
-    
+
   ) {data{id}}
 }`,
   '6addTelegram': `mutation UpdateUsersPermissionsUser($telegramId:String ,
@@ -452,16 +491,18 @@ const qids_base = {
     }
   }
 }`,
-  "31updateTask": `mutation UpdateTask($id: ID!,$myIshur: Boolean,$valiIshur: Boolean, $isAssigned: Boolean, $uid: [ID], $mesimabetahaliches: [ID]) {
+  "31updateTask": `mutation UpdateTask($id: ID!,$myIshur: Boolean,$valiIshur: Boolean, $isAssigned: Boolean, $uid: [ID], $mesimabetahaliches: [ID], $naasa: Boolean, $status: Int) {
      updateAct(id: $id,
       data: {
              isAssigned: $isAssigned,
              myIshur: $myIshur,
              valiIshur: $valiIshur,
               my:$uid,
-              mesimabetahaliches: $mesimabetahaliches
+              mesimabetahaliches: $mesimabetahaliches,
+              naasa: $naasa,
+              status: $status
                   }
-    
+
   ) {data{id attributes{ shem my {data{id}}}}}
 }`,
   "32createTimeGrama": `mutation CreateTimegrama($date: DateTime,$decision: ID,$tosplit: ID, $finiapruval: ID, $whatami: String, $ask: ID) {
@@ -831,6 +872,53 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           archived
           startDate
           finnishDate
+          pricingMode
+          marginPct
+          estimatedPrice
+          status_of_voting
+          appruved
+          process {
+            data {
+              id
+              attributes {
+                forums { data { id attributes { subject spec } } }
+              }
+            }
+          }
+          matanot_recipe_missions {
+            data {
+              id
+              attributes {
+                hoursPerUnit unitsPerProduct ratePerHour mode notes
+                pendm { data { id attributes { name descrip } } }
+                mesimabetahalich {
+                  data {
+                    id
+                    attributes { name howmanyhoursalready hoursassinged }
+                  }
+                }
+              }
+            }
+          }
+          matanot_recipe_resources {
+            data {
+              id
+              attributes {
+                quantityPerUnit pricePerUnit kindOf mode notes
+                pmash { data { id attributes { name } } }
+                mashabetahalich {
+                  data {
+                    id
+                    attributes { name 
+                        pricePerUnit
+                        kindOf
+                        descrip
+                    }
+                  }
+                }
+              }
+            }
+          }
           projectcreates {
             data {
               id
@@ -1037,6 +1125,19 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                 createdAt
               }
             }
+          }
+        }
+      }
+    }
+  }`,
+
+  "65checkSheirutpendRequester": `query CheckSheirutpendRequester($uid: ID!, $sheirutpendId: ID!) {
+    sheirutpend(id: $sheirutpendId) {
+      data {
+        id
+        attributes {
+          users_permissions_user {
+            data { id }
           }
         }
       }
@@ -1254,7 +1355,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $projectId: ID!,
     $missId: ID!,
     $userId: ID!,
-    $openMid: ID,
+    $openMid: [ID],
     $openmissionName: String!,
     $missionDetails: String,
     $nhours: Float!,
@@ -1284,7 +1385,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       publishedAt: $publishedAt,
       admaticedai: $deadline,
       start: $sqedualed,
-      open_missions: [$openMid]
+      open_missions: $openMid
     }) {
       data {
         id
@@ -1449,6 +1550,9 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                     }
                   }
                 }
+                user_1s {
+                  data { id }
+                }
               }
             }
           }
@@ -1493,6 +1597,9 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                 name
                 desc
                 kindOf
+                pricingMode
+                estimatedPrice
+                marginPct
                 pic {
                   data {
                     attributes {
@@ -1501,7 +1608,40 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                     }
                   }
                 }
+                matanot_recipe_missions {
+                  data {
+                    id
+                    attributes {
+                      hoursPerUnit
+                      unitsPerProduct
+                      ratePerHour
+                      mode
+                      notes
+                      pendm { data { id attributes { name descrip noofhours perhour mission { data { id } } } } }
+                      mesimabetahalich { data { id attributes { name howmanyhoursalready hoursassinged } } }
+                    }
+                  }
+                }
+                matanot_recipe_resources {
+                  data {
+                    id
+                    attributes {
+                      quantityPerUnit
+                      pricePerUnit
+                      kindOf
+                      mode
+                      notes
+                      pmash { data { id attributes { name price hm kindOf descrip } } }
+                      mashabetahalich { data { id attributes { name pricePerUnit kindOf descrip } } }
+                    }
+                  }
+                }
               }
+            }
+          }
+          forum {
+            data {
+              id
             }
           }
           votes { data {id attributes{
@@ -1551,6 +1691,11 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
+  '124addVoteToTosplit': `mutation AddVoteToTosplit($id: ID!, $vots: [ComponentProjectsVotsInput]) {
+    updateTosplit(id: $id, data: { vots: $vots }) {
+      data { id }
+    }
+  }`,
   '73updateSheirutpend': `mutation UpdateSheirutpend($id: ID!, $data: SheirutpendInput!) {
     updateSheirutpend(id: $id, data: $data) {
       data {
@@ -1558,7 +1703,340 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
-  '85addVoteToPend': `mutation AddVoteToPend($id: ID!, $users: [ComponentProjectsVotsInput!]!) {
+  // ── Pendm / Pmash vote actions ────────────────────────────────────────────
+  '142getPendmForVote': `query GetPendmForVote($id: ID!) {
+    pendm(id: $id) {
+      data {
+        id
+        attributes {
+          name descrip hearotMeyuchadot noofhours perhour iskvua privatlinks publicklinks sqadualed dates
+          mission { data { id } }
+          skills { data { id } }
+          tafkidims { data { id } }
+          work_ways { data { id } }
+          vallues { data { id } }
+          negopendmissions { data { id } }
+          timegrama { data { id } }
+          users {
+            what order ide zman why
+            users_permissions_user { data { id } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '143archivePendmWithVotes': `mutation ArchivePendmWithVotes($id: ID!, $users: [ComponentProjectsPendmnegoInput!]!) {
+    updatePendm(id: $id, data: { archived: true, users: $users }) {
+      data { id }
+    }
+  }`,
+
+  '144getPmashForVote': `query GetPmashForVote($id: ID!) {
+    pmash(id: $id) {
+      data {
+        id
+        attributes {
+          name descrip spnot kindOf hm price easy linkto sqadualed sqadualedf
+          mashaabim { data { id } }
+          timegrama { data { id } }
+          users {
+            what order ide zman why
+            users_permissions_user { data { id } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '145archivePmashWithVotes': `mutation ArchivePmashWithVotes($id: ID!, $users: [ComponentProjectsVotsInput!]!) {
+    updatePmash(id: $id, data: { archived: true, users: $users }) {
+      data { id }
+    }
+  }`,
+
+  '146addVoteToPmash': `mutation AddVoteToPmash($id: ID!, $users: [ComponentProjectsVotsInput!]!) {
+    updatePmash(id: $id, data: { users: $users }) {
+      data {
+        id
+        attributes {
+          users {
+            what order ide zman
+            users_permissions_user { data { id } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '147getPendmDiun': `query GetPendmDiun($id: ID!) {
+    pendm(id: $id) {
+      data {
+        id
+        attributes {
+          diun {
+            id what why order zman ide
+            users_permissions_user { data { id } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '148getPmashDiun': `query GetPmashDiun($id: ID!) {
+    pmash(id: $id) {
+      data {
+        id
+        attributes {
+          diun {
+            id what why order zman ide
+            users_permissions_user { data { id } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '149updatePendmDiun': `mutation UpdatePendmDiun($id: ID!, $diun: [ComponentProjectsVotsInput]) {
+    updatePendm(id: $id, data: { diun: $diun }) {
+      data {
+        id
+        attributes {
+          diun {
+            id what why order zman ide
+            users_permissions_user { data { id } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '150updatePmashDiun': `mutation UpdatePmashDiun($id: ID!, $diun: [ComponentProjectsVotsInput]) {
+    updatePmash(id: $id, data: { diun: $diun }) {
+      data {
+        id
+        attributes {
+          diun {
+            id what why order zman ide
+            users_permissions_user { data { id } }
+          }
+        }
+      }
+    }
+  }`,
+
+  // ── Mission in-progress updates ──────────────────────────────────────────
+  '154updateMissionStatus': `mutation UpdateMissionStatus($id: ID!, $status: Int) {
+    updateMesimabetahalich(id: $id, data: { status: $status }) {
+      data { id attributes { status } }
+    }
+  }`,
+
+  // ── Maap (resource application) vote actions ──────────────────────────────
+  '151getMaapForVote': `query GetMaapForVote($id: ID!) {
+    maap(id: $id) {
+      data {
+        id
+        attributes {
+          name
+          vots {
+            id
+            what
+            why
+            users_permissions_user { data { id } }
+          }
+          sp {
+            data {
+              id
+              attributes {
+                unit
+                myp
+                users_permissions_user { data { id } }
+              }
+            }
+          }
+          open_mashaabim {
+            data {
+              id
+              attributes {
+                name
+                easy
+                price
+                sqadualed
+                sqadualedf
+                spnot
+                kindOf
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  '152archiveMaapWithVotes': `mutation ArchiveMaapWithVotes($id: ID!, $vots: [ComponentProjectsVotsInput]) {
+    updateMaap(id: $id, data: { archived: true, vots: $vots }) {
+      data { id }
+    }
+  }`,
+
+  '153addVoteToMaap': `mutation AddVoteToMaap($id: ID!, $vots: [ComponentProjectsVotsInput]) {
+    updateMaap(id: $id, data: { vots: $vots }) {
+      data { id }
+    }
+  }`,
+
+  // ── Haluka (money transfer) receiver-confirmation + chat ──────────────────
+  '155getHalukaForReceive': `query GetHalukaForReceive($id: ID!) {
+    haluka(id: $id) {
+      data {
+        id
+        attributes {
+          usersend { data { id } }
+          userrecive { data { id } }
+          senderconf
+          confirmed
+          tosplit {
+            data {
+              id
+              attributes {
+                halukas {
+                  data {
+                    id
+                    attributes {
+                      confirmed
+                    }
+                  }
+                }
+                hervachti {
+                  users_permissions_user {
+                    data {
+                      id
+                      attributes {
+                        hervachti
+                      }
+                    }
+                  }
+                  noten
+                  mekabel
+                  amount
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  '156getHalukaChatre': `query GetHalukaChatre($id: ID!) {
+    haluka(id: $id) {
+      data {
+        id
+        attributes {
+          chatre {
+            when
+            send { data { id } }
+            freetext
+            seen
+          }
+        }
+      }
+    }
+  }`,
+
+  '157updateHalukaChatre': `mutation UpdateHalukaChatre($id: ID!, $chatre: [ComponentProjectsChatreInput]) {
+    updateHaluka(id: $id, data: { chatre: $chatre }) {
+      data {
+        id
+        attributes {
+          chatre {
+            freetext
+            send { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            when
+            seen
+          }
+        }
+      }
+    }
+  }`,
+
+  '158updateUserHervachti': `mutation UpdateUserHervachti($id: ID!, $hervachti: Float) {
+    updateUsersPermissionsUser(id: $id, data: { hervachti: $hervachti }) {
+      data { id }
+    }
+  }`,
+
+  // ── Decision (project vote) ────────────────────────────────────────────────
+  '159getDecisionForVote': `query GetDecisionForVote($id: ID!) {
+    decision(id: $id) {
+      data {
+        id
+        attributes {
+          kind
+          archived
+          newpic { data { id } }
+          timegrama { data { id } }
+          newname
+          newpubdes
+          newprides
+          newFlink
+          newWlink
+          timtoM
+          valluesadd { data { id } }
+          valluesles { data { id } }
+          vots {
+            id
+            what
+            ide
+            zman
+            order
+            users_permissions_user { data { id } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '160archiveDecision': `mutation ArchiveDecision($id: ID!, $vots: [ComponentProjectsVotsInput]) {
+    updateDecision(id: $id, data: { archived: true, vots: $vots }) {
+      data { id }
+    }
+  }`,
+
+  // ── Decision display info (for card UI: shows current value vs. proposed) ──
+  '161getDecisionDisplayInfo': `query GetDecisionDisplayInfo($id: ID!, $pid: ID!) {
+    decision(id: $id) {
+      data {
+        attributes {
+          kind
+          newname
+          newpubdes
+          newprides
+          newFlink
+          newWlink
+          timtoM
+          valluesadd { data { id attributes { valueName } } }
+          valluesles { data { id attributes { valueName } } }
+        }
+      }
+    }
+    project(id: $pid) {
+      data {
+        attributes {
+          projectName
+          publicDescription
+          descripFor
+          fblink
+          linkToWebsite
+          restime
+          vallues { data { id attributes { valueName } } }
+        }
+      }
+    }
+  }`,
+
+  '85addVoteToPend': `mutation AddVoteToPend($id: ID!, $users: [ComponentProjectsPendmnegoInput!]!) {
     updatePendm(id: $id, data: { users: $users }) {
       data {
         id
@@ -1955,6 +2433,60 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         }
       }
     }`,
+  '128getProjectMembersAndRestime': `query GetProjectMembersAndRestime($pid: ID!) {
+    project(id: $pid) {
+      data {
+        attributes {
+          restime
+          user_1s { data { id } }
+        }
+      }
+    }
+  }`,
+  '125createAskm': `mutation CreateAskm($publishedAt: DateTime!, $openMashaabimId: ID!, $projectId: ID!, $spId: ID!, $userId: ID!) {
+    createAskm(data: {
+      publishedAt: $publishedAt,
+      open_mashaabim: $openMashaabimId,
+      project: $projectId,
+      sp: $spId,
+      users_permissions_user: $userId
+    }) { data { id } }
+  }`,
+  '126updateSpDeclined': `mutation UpdateSpDeclined($id: ID!, $openMashaabimId: ID!) {
+    updateSp(id: $id, data: { declinedm: $openMashaabimId }) {
+      data { id }
+    }
+  }`,
+  '127createTimegramaForAskm': `mutation CreateTimegramaForAskm($date: DateTime!, $askmId: ID!) {
+    createTimegrama(data: { date: $date, whatami: "askm", askm: $askmId }) {
+      data { id }
+    }
+  }`,
+  '129updateUserDeclined': `mutation UpdateUserDeclined($userId: ID!, $declinedList: [ID]) {
+    updateUsersPermissionsUser(id: $userId, data: { declined: $declinedList }) {
+      data { id }
+    }
+  }`,
+  '130updateOpenMissionDeclined': `mutation UpdateOpenMissionDeclined($id: ID!, $declinedIds: [ID]) {
+    updateOpenMission(id: $id, data: { declined: $declinedIds }) {
+      data { id }
+    }
+  }`,
+  '131archiveOpenMashaabim': `mutation ArchiveOpenMashaabim($id: ID!) {
+    updateOpenMashaabim(id: $id, data: { archived: true }) {
+      data { id }
+    }
+  }`,
+  '132archiveAskmWithVotes': `mutation ArchiveAskmWithVotes($id: ID!, $vots: [ComponentProjectsVotsInput]) {
+    updateAskm(id: $id, data: { archived: true, vots: $vots }) {
+      data { id }
+    }
+  }`,
+  '133addVoteToAskm': `mutation AddVoteToAskm($id: ID!, $vots: [ComponentProjectsVotsInput]) {
+    updateAskm(id: $id, data: { vots: $vots }) {
+      data { id }
+    }
+  }`,
   '83levMainUserQuery': `query LevMainUserQuery($idL: ID!) {
   usersPermissionsUser(id: $idL) {
     data {
@@ -2146,6 +2678,9 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                   }
                 }
               }
+              isSelfProposal
+              sp { data { id } }
+              pmash { data { id } }
             }
           }
         }
@@ -2859,7 +3394,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                   }
                 }
               }
-              pmashes(filters: { archived: { eq: false } }) {
+              pmashes(filters: { archived: { eq: false }, matanot_recipe_resources: { id: { null: true } } }) {
                 data {
                   id
                   attributes {
@@ -3021,6 +3556,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                 data {
                   id
                   attributes {
+                    isSelfProposal
+                    pendingMainVote
                     vots {
                       what
                       zman
@@ -3087,12 +3624,47 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                         }
                       }
                     }
+                    pmash {
+                      data {
+                        id
+                        attributes {
+                          name
+                          descrip
+                          spnot
+                          price
+                          easy
+                          hm
+                          kindOf
+                          sqadualed
+                          sqadualedf
+                        }
+                      }
+                    }
                     sp {
                       data {
                         id
                         attributes {
+                          name
+                          descrip
                           price
                           myp
+                          spnot
+                          users_permissions_user {
+                            data {
+                              id
+                              attributes {
+                                username
+                                profilePic {
+                                  data {
+                                    attributes {
+                                      url
+                                      formats
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -3467,7 +4039,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                   }
                 }
               }
-              pendms(filters: { archived: { eq: false } }) {
+              pendms(filters: { archived: { eq: false }, matanot_recipe_missions: { id: { null: true } } }) {
                 data {
                   id
                   attributes {
@@ -4613,7 +5185,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $project: ID,
     $publishedAt: DateTime,
     $users_permissions_user: ID,
-    $vots: [ComponentVotsVotInput],
+    $vots: [ComponentProjectsVotsInput],
     $timer: ID,
     $month: Date
   ) {
@@ -4713,7 +5285,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
 
   '118updateFiniapruvalVots': `mutation UpdateFiniapruvalVots(
     $id: ID!,
-    $vots: [ComponentVotsVotInput],
+    $vots: [ComponentProjectsVotsInput],
     $archived: Boolean
   ) {
     updateFiniapruval(id: $id, data: { vots: $vots, archived: $archived }) {
@@ -4809,181 +5381,47 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
-
-  '85levHubSummary': `query LevHubSummary($idL: ID!) {
-  usersPermissionsUser(id: $idL) {
-    data {
-      id
-      attributes {
-        username
-        hervachti
-        profilePic {
-          data {
-            attributes {
-              url
-            }
-          }
-        }
-        # Purchases (user as buyer)
-        sheiruts(filters: { archived: { eq: false }, isApruved: { eq: true } }) {
-          data {
-            id
-            attributes {
-              moneyTransfered
-              productExepted
-            }
-          }
-        }
-        # Active missions count (proxy for suggestions KPI)
-        mesimabetahaliches(
-          filters: { forappruval: { eq: false }, finnished: { eq: false } }
-        ) {
-          data {
-            id
-          }
-        }
-        projects_1s {
-          data {
-            id
-            attributes {
-              # Mission applications – members vote via pendms.users (ordered)
-              pendms(filters: { archived: { eq: false } }) {
-                data {
-                  id
-                  attributes {
-                    timegrama {
-                      data {
-                        attributes {
-                          date
-                        }
-                      }
-                    }
-                    negopendmissions {
-                      data {
-                        id
-                      }
-                    }
-                    users {
-                      what
-                      order
-                      users_permissions_user {
+  '123dealsForUser': `query DealsForUser($idL: ID!) {
+    usersPermissionsUser(id: $idL) {
+      data {
+        id
+        attributes {
+          username
+          profilePic { data { attributes { url formats } } }
+          sheiruts {
+            data {
+              id
+              attributes {
+                name descrip equaliSplited oneTime archived isApruved
+                price quant total startDate finnishDate
+                iGotIt iTransferMoney moneyTransfered productExepted
+                iGotMoney { iGotMoney users_permissions_user { data { id } } }
+                weFinnish {
+                  data { id attributes { what order why users_permissions_user { data { id } } } }
+                }
+                iCanGetMonay {
+                  data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                }
+                iTransferedTo {
+                  data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                }
+                users_permissions_users {
+                  data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                }
+                matanot {
+                  data { id attributes { name desc price quant kindOf pic { data { attributes { url formats } } } } }
+                }
+                forums {
+                  data {
+                    id
+                    attributes {
+                      messages(pagination: { limit: 50 }) {
                         data {
                           id
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-              # Completion approvals – members vote via finiapruvals.vots (no order)
-              finiapruvals(filters: { archived: { eq: false } }) {
-                data {
-                  id
-                  attributes {
-                    timegrama {
-                      data {
-                        attributes {
-                          date
-                        }
-                      }
-                    }
-                    vots {
-                      what
-                      users_permissions_user {
-                        data {
-                          id
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-              # Resource requests – members vote via askms.vots (no order)
-              askms(filters: { archived: { eq: false } }) {
-                data {
-                  id
-                  attributes {
-                    vots {
-                      what
-                      users_permissions_user {
-                        data {
-                          id
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-              # Resource approvals – members vote via maaps.vots (no order)
-              maaps(filters: { archived: { eq: false } }) {
-                data {
-                  id
-                  attributes {
-                    vots {
-                      what
-                      users_permissions_user {
-                        data {
-                          id
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-              # Project decisions – members vote via decisions.vots (no orderon, any vote counts)
-              decisions(filters: { archived: { eq: false } }) {
-                data {
-                  id
-                  attributes {
-                    vots {
-                      what
-                      users_permissions_user {
-                        data {
-                          id
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-              # Split proposals – members vote via tosplits.vots (ordered)
-              tosplits(filters: { finished: { eq: false } }) {
-                data {
-                  id
-                  attributes {
-                    vots {
-                      what
-                      order
-                      users_permissions_user {
-                        data {
-                          id
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-              # Service purchase requests – members vote via sheirutpends.votes (relational, ordered)
-              sheirutpends(filters: { archived: { eq: false } }) {
-                data {
-                  id
-                  attributes {
-                    timegrama {
-                      data {
-                        attributes {
-                          date
-                        }
-                      }
-                    }
-                    votes {
-                      data {
-                        id
-                        attributes {
-                          what
-                          order
-                          users_permissions_user {
-                            data {
-                              id
+                          attributes {
+                            content createdAt
+                            users_permissions_user {
+                              data { id attributes { username profilePic { data { attributes { url formats } } } } }
                             }
                           }
                         }
@@ -4991,16 +5429,178 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                     }
                   }
                 }
+                halukas(filters: { ushar: { eq: true } }) {
+                  data {
+                    id
+                    attributes {
+                      senderconf confirmed amount
+                      forum { data { id } }
+                      usersend { data { id } }
+                      userrecive { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+                    }
+                  }
+                }
+                project {
+                  data {
+                    id
+                    attributes {
+                      projectName
+                      profilePic { data { attributes { url formats } } }
+                      user_1s {
+                        data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                      }
+                    }
+                  }
+                }
               }
-              # Sales (user as seller)
-              sheiruts(
-                filters: { archived: { eq: false }, isApruved: { eq: true } }
-              ) {
-                data {
-                  id
-                  attributes {
-                    moneyTransfered
-                    productExepted
+            }
+          }
+          sheirutpends(filters: { archived: { eq: false } }) {
+            data {
+              id
+              attributes {
+                price quant total startDate finnishDate createdAt
+                forum { data { id } }
+                ratson_proposal {
+                  data {
+                    id
+                    attributes {
+                      kind
+                      ratson { data { id attributes { name } } }
+                    }
+                  }
+                }
+                matanots {
+                  data {
+                    id
+                    attributes {
+                      name kindOf pricingMode estimatedPrice marginPct
+                      pic { data { attributes { url } } }
+                      matanot_recipe_missions {
+                        data { id attributes { hoursPerUnit unitsPerProduct ratePerHour mode notes
+                          pendm { data { id attributes { name } } }
+                          mesimabetahalich { data { id attributes { name } } }
+                        } }
+                      }
+                      matanot_recipe_resources {
+                        data { id attributes { quantityPerUnit pricePerUnit kindOf mode notes
+                          pmash { data { id attributes { name } } }
+                          mashabetahalich { data { id attributes { name pricePerUnit kindOf } } }
+                        } }
+                      }
+                    }
+                  }
+                }
+                project {
+                  data { id attributes { projectName profilePic { data { attributes { url } } } } }
+                }
+              }
+            }
+          }
+          projects_1s {
+            data {
+              id
+              attributes {
+                projectName
+                profilePic { data { attributes { url formats } } }
+                user_1s {
+                  data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                }
+                sheiruts {
+                  data {
+                    id
+                    attributes {
+                      name descrip equaliSplited oneTime archived isApruved
+                      price quant total startDate finnishDate
+                      iGotIt iTransferMoney moneyTransfered productExepted
+                      iGotMoney { iGotMoney users_permissions_user { data { id } } }
+                      weFinnish {
+                        data { id attributes { what order why users_permissions_user { data { id } } } }
+                      }
+                      iCanGetMonay {
+                        data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                      }
+                      iTransferedTo {
+                        data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                      }
+                      users_permissions_users {
+                        data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                      }
+                      matanot {
+                        data { id attributes { name desc price quant kindOf pic { data { attributes { url formats } } } } }
+                      }
+                      forums {
+                        data {
+                          id
+                          attributes {
+                            messages(pagination: { limit: 50 }) {
+                              data {
+                                id
+                                attributes {
+                                  content createdAt
+                                  users_permissions_user {
+                                    data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                      halukas(filters: { ushar: { eq: true } }) {
+                        data {
+                          id
+                          attributes {
+                            senderconf confirmed amount
+                            forum { data { id } }
+                            usersend { data { id } }
+                            userrecive { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                sheirutpends(filters: { archived: { eq: false } }) {
+                  data {
+                    id
+                    attributes {
+                      price quant total startDate finnishDate createdAt
+                      forum { data { id } }
+                      ratson_proposal {
+                        data {
+                          id
+                          attributes {
+                            kind
+                            ratson { data { id attributes { name } } }
+                          }
+                        }
+                      }
+                      matanots {
+                        data {
+                          id
+                          attributes {
+                            name kindOf pricingMode estimatedPrice marginPct
+                            pic { data { attributes { url } } }
+                            matanot_recipe_missions {
+                              data { id attributes { hoursPerUnit unitsPerProduct ratePerHour mode notes
+                                pendm { data { id attributes { name } } }
+                                mesimabetahalich { data { id attributes { name } } }
+                              } }
+                            }
+                            matanot_recipe_resources {
+                              data { id attributes { quantityPerUnit pricePerUnit kindOf mode notes
+                                pmash { data { id attributes { name } } }
+                                mashabetahalich { data { id attributes { name pricePerUnit kindOf } } }
+                              } }
+                            }
+                          }
+                        }
+                      }
+                      users_permissions_user {
+                        data { id attributes { username profilePic { data { attributes { url } } } } }
+                      }
+                    }
                   }
                 }
               }
@@ -5009,8 +5609,1011 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         }
       }
     }
-  }
-}`
+  }`,
+  '125userPendingForMatanot': `query UserPendingForMatanot($uid: ID!, $matId: ID!) {
+    sheirutpends(filters: {
+      users_permissions_user: { id: { eq: $uid } },
+      matanots: { id: { in: [$matId] } },
+      archived: { eq: false }
+    }) {
+      data {
+        id
+        attributes {
+          price quant total startDate finnishDate createdAt
+          project { data { id attributes { projectName } } }
+        }
+      }
+    }
+  }`,
+  '124sheirutForDeal': `query SheirutForDeal($id: ID!) {
+    sheirut(id: $id) {
+      data {
+        id
+        attributes {
+          name descrip equaliSplited oneTime archived isApruved
+          price quant total startDate finnishDate
+          iGotIt iTransferMoney moneyTransfered productExepted
+          iGotMoney { iGotMoney users_permissions_user { data { id } } }
+          weFinnish {
+            data { id attributes { what order why users_permissions_user { data { id } } } }
+          }
+          iCanGetMonay {
+            data { id attributes { username profilePic { data { attributes { url formats } } } } }
+          }
+          iTransferedTo {
+            data { id attributes { username profilePic { data { attributes { url formats } } } } }
+          }
+          users_permissions_users {
+            data { id attributes { username profilePic { data { attributes { url formats } } } } }
+          }
+          matanot {
+            data { id attributes { name desc price quant kindOf pic { data { attributes { url formats } } } } }
+          }
+          forums {
+            data {
+              id
+              attributes {
+                messages(pagination: { limit: 50 }) {
+                  data {
+                    id
+                    attributes {
+                      content createdAt
+                      users_permissions_user {
+                        data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          halukas(filters: { ushar: { eq: true } }) {
+            data {
+              id
+              attributes {
+                senderconf confirmed amount
+                forum { data { id } }
+                usersend { data { id } }
+                userrecive { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+              }
+            }
+          }
+          project {
+            data {
+              id
+              attributes {
+                projectName
+                profilePic { data { attributes { url formats } } }
+                user_1s {
+                  data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  '125createMatanotRecipeMission': `mutation CreateMatanotRecipeMission(
+    $matanot: ID!,
+    $pendm: ID,
+    $mesimabetahalich: ID,
+    $hoursPerUnit: Float!,
+    $unitsPerProduct: Float,
+    $ratePerHour: Float,
+    $mode: ENUM_MATANOTRECIPEMISSION_MODE,
+    $notes: String,
+    $partof: ID,
+    $publishedAt: DateTime
+  ) {
+    createMatanotRecipeMission(data: {
+      matanot: $matanot,
+      pendm: $pendm,
+      mesimabetahalich: $mesimabetahalich,
+      hoursPerUnit: $hoursPerUnit,
+      unitsPerProduct: $unitsPerProduct,
+      ratePerHour: $ratePerHour,
+      mode: $mode,
+      notes: $notes,
+      partof: $partof,
+      publishedAt: $publishedAt
+    }) {
+      data { id attributes { hoursPerUnit unitsPerProduct mode } }
+    }
+  }`,
+
+  '126updateMatanotRecipeMission': `mutation UpdateMatanotRecipeMission(
+    $id: ID!,
+    $hoursPerUnit: Float,
+    $unitsPerProduct: Float,
+    $ratePerHour: Float,
+    $mode: ENUM_MATANOTRECIPEMISSION_MODE,
+    $notes: String,
+    $mesimabetahalich: ID
+  ) {
+    updateMatanotRecipeMission(id: $id, data: {
+      hoursPerUnit: $hoursPerUnit,
+      unitsPerProduct: $unitsPerProduct,
+      ratePerHour: $ratePerHour,
+      mode: $mode,
+      notes: $notes,
+      mesimabetahalich: $mesimabetahalich
+    }) {
+      data { id attributes { hoursPerUnit unitsPerProduct mode } }
+    }
+  }`,
+
+  '127deleteMatanotRecipeMission': `mutation DeleteMatanotRecipeMission($id: ID!) {
+    deleteMatanotRecipeMission(id: $id) {
+      data { id }
+    }
+  }`,
+
+  '128createMatanotRecipeResource': `mutation CreateMatanotRecipeResource(
+    $matanot: ID!,
+    $pmash: ID,
+    $mashabetahalich: ID,
+    $quantityPerUnit: Float!,
+    $pricePerUnit: Float,
+    $kindOf: ENUM_MATANOTRECIPERESOURCE_KINDOF,
+    $mode: ENUM_MATANOTRECIPERESOURCE_MODE,
+    $notes: String,
+    $publishedAt: DateTime
+  ) {
+    createMatanotRecipeResource(data: {
+      matanot: $matanot,
+      pmash: $pmash,
+      mashabetahalich: $mashabetahalich,
+      quantityPerUnit: $quantityPerUnit,
+      pricePerUnit: $pricePerUnit,
+      kindOf: $kindOf,
+      mode: $mode,
+      notes: $notes,
+      publishedAt: $publishedAt
+    }) {
+      data { id attributes { quantityPerUnit pricePerUnit mode } }
+    }
+  }`,
+
+  '129updateMatanotRecipeResource': `mutation UpdateMatanotRecipeResource(
+    $id: ID!,
+    $quantityPerUnit: Float,
+    $pricePerUnit: Float,
+    $mode: ENUM_MATANOTRECIPERESOURCE_MODE,
+    $notes: String,
+    $pmash: ID,
+    $mashabetahalich: ID
+  ) {
+    updateMatanotRecipeResource(id: $id, data: {
+      quantityPerUnit: $quantityPerUnit,
+      pricePerUnit: $pricePerUnit,
+      mode: $mode,
+      notes: $notes,
+      pmash: $pmash,
+      mashabetahalich: $mashabetahalich
+    }) {
+      data { id attributes { quantityPerUnit pricePerUnit mode } }
+    }
+  }`,
+
+  '130deleteMatanotRecipeResource': `mutation DeleteMatanotRecipeResource($id: ID!) {
+    deleteMatanotRecipeResource(id: $id) {
+      data { id }
+    }
+  }`,
+
+  '131createSheirutFulfillment': `mutation CreateSheirutFulfillment(
+    $sheirut: ID!,
+    $matanot: ID!,
+    $quantity: Float!,
+    $process: ID,
+    $agreedPrice: Float,
+    $status: ENUM_SHEIRUTFULFILLMENT_STATUS,
+    $publishedAt: DateTime
+  ) {
+    createSheirutFulfillment(data: {
+      sheirut: $sheirut,
+      matanot: $matanot,
+      quantity: $quantity,
+      process: $process,
+      agreedPrice: $agreedPrice,
+      status: $status,
+      publishedAt: $publishedAt
+    }) {
+      data {
+        id
+        attributes { quantity agreedPrice status }
+      }
+    }
+  }`,
+
+  '132updateSheirutFulfillment': `mutation UpdateSheirutFulfillment(
+    $id: ID!,
+    $agreedPrice: Float,
+    $status: ENUM_SHEIRUTFULFILLMENT_STATUS,
+    $createdMissions: [ID],
+    $createdMaaps: [ID],
+    $createdPmashes: [ID]
+  ) {
+    updateSheirutFulfillment(id: $id, data: {
+      agreedPrice: $agreedPrice,
+      status: $status,
+      createdMissions: $createdMissions,
+      createdMaaps: $createdMaaps,
+      createdPmashes: $createdPmashes
+    }) {
+      data { id attributes { agreedPrice status } }
+    }
+  }`,
+
+  '133queryComplexMatanot': `query QueryComplexMatanot($id: ID!) {
+    matanot(id: $id) {
+      data {
+        id
+        attributes {
+          name desc price quant kindOf
+          pricingMode marginPct estimatedPrice currency
+          status_of_voting appruved
+          pic { data { attributes { url formats } } }
+          projectcreates { data { id attributes { projectName } } }
+          process {
+            data {
+              id
+              attributes {
+                forums { data { id attributes { subject spec } } }
+              }
+            }
+          }
+          matanot_recipe_missions {
+            data {
+              id
+              attributes {
+                hoursPerUnit unitsPerProduct ratePerHour mode notes
+                pendm { data { id attributes { name descrip } } }
+                mesimabetahalich {
+                  data {
+                    id
+                    attributes { name howmanyhoursalready hoursassinged status }
+                  }
+                }
+                partof { data { id } }
+              }
+            }
+          }
+          matanot_recipe_resources {
+            data {
+              id
+              attributes {
+                quantityPerUnit pricePerUnit kindOf mode notes
+                pmash { data { id attributes { name } } }
+                mashabetahalich {
+                  data {
+                    id
+                    attributes { name 
+                        pricePerUnit
+                        kindOf
+                        descrip
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  '134updateMatanotStatus': `mutation UpdateMatanotStatus(
+    $id: ID!,
+    $status_of_voting: ENUM_MATANOT_STATUS_OF_VOTING,
+    $pricingMode: ENUM_MATANOT_PRICINGMODE,
+    $estimatedPrice: Float,
+    $marginPct: Float,
+    $process: ID
+  ) {
+    updateMatanot(id: $id, data: {
+      status_of_voting: $status_of_voting,
+      pricingMode: $pricingMode,
+      estimatedPrice: $estimatedPrice,
+      marginPct: $marginPct,
+      process: $process
+    }) {
+      data {
+        id
+        attributes { status_of_voting pricingMode estimatedPrice marginPct }
+      }
+    }
+  }`,
+
+  '135approveMatanot': `mutation ApproveMatanot($id: ID!) {
+    updateMatanot(id: $id, data: { status_of_voting: active, appruved: true }) {
+      data {
+        id
+        attributes { status_of_voting appruved }
+      }
+    }
+  }`,
+
+  '136createMatanot': `mutation CreateMatanot(
+    $projectcreates: ID!,
+    $name: String!,
+    $desc: JSON,
+    $price: Float,
+    $quant: Float,
+    $kindOf: ENUM_MATANOT_KINDOF,
+    $pic: ID,
+    $startDate: DateTime,
+    $finnishDate: DateTime,
+    $oneForeProject: Boolean,
+    $pricingMode: ENUM_MATANOT_PRICINGMODE,
+    $marginPct: Float,
+    $estimatedPrice: Float,
+    $status_of_voting: ENUM_MATANOT_STATUS_OF_VOTING,
+    $process: ID,
+    $publishedAt: DateTime
+  ) {
+    createMatanot(data: {
+      projectcreates: [$projectcreates],
+      name: $name,
+      desc: $desc,
+      price: $price,
+      quant: $quant,
+      kindOf: $kindOf,
+      pic: $pic,
+      startDate: $startDate,
+      finnishDate: $finnishDate,
+      oneForeProject: $oneForeProject,
+      pricingMode: $pricingMode,
+      marginPct: $marginPct,
+      estimatedPrice: $estimatedPrice,
+      status_of_voting: $status_of_voting,
+      process: $process,
+      publishedAt: $publishedAt
+    }) {
+      data {
+        id
+        attributes {
+          name desc price quant kindOf
+          pricingMode marginPct estimatedPrice status_of_voting
+          process { data { id } }
+        }
+      }
+    }
+  }`,
+
+  '137createPendmForRecipe': `mutation CreatePendmForRecipe(
+    $name: String,
+    $project: ID,
+    $perhour: Float,
+    $noofhours: Float,
+    $descrip: String,
+    $publishedAt: DateTime
+  ) {
+    createPendm(data: {
+      name: $name,
+      project: $project,
+      isglobal: true,
+      perhour: $perhour,
+      noofhours: $noofhours,
+      descrip: $descrip,
+      publishedAt: $publishedAt
+    }) {
+      data { id attributes { name isglobal perhour noofhours } }
+    }
+  }`,
+
+  '138createPmashForRecipe': `mutation CreatePmashForRecipe(
+    $name: String,
+    $project: ID,
+    $price: Float,
+    $easy: Float,
+    $hm: Float,
+    $kindOf: ENUM_PMASH_KINDOF,
+    $descrip: String,
+    $publishedAt: DateTime
+  ) {
+    createPmash(data: {
+      name: $name,
+      project: $project,
+      price: $price,
+      easy: $easy,
+      hm: $hm,
+      kindOf: $kindOf,
+      descrip: $descrip,
+      publishedAt: $publishedAt
+    }) {
+      data { id attributes { name price hm kindOf } }
+    }
+  }`,
+
+  '139createMesimabetahalich': `mutation CreateMesimabetahalich($data: MesimabetahalichInput!) {
+    createMesimabetahalich(data: $data) { data { id } }
+  }`,
+
+  '140createAct': `mutation CreateAct($data: ActInput!) {
+    createAct(data: $data) { data { id } }
+  }`,
+
+  '141createMaap': `mutation CreateMaap($data: MaapInput!) {
+    createMaap(data: $data) { data { id } }
+  }`,
+
+  /* ─────────────────────────────────────────────────────────────────────
+   * Concierge / Ratson — read-only queries (PLAN_CONCIERGE §2.5)
+   * Schema additions in §2.1 (status_ratson, extracted_*, chat_forum,
+   * process, derivedComplexMatanot, fulfillment_score, last_matched_at)
+   * and entities ratson-proposal, ratson-match-job (§2.2 / §2.3).
+   * ─────────────────────────────────────────────────────────────────── */
+
+  '105queryRatsonWithProposals': `query QueryRatsonWithProposals($id: ID!) {
+    ratson(id: $id) {
+      data {
+        id
+        attributes {
+          name
+          desc
+          longDes
+          startDate
+          finnishDate
+          fulfilled
+          allowJoin
+          bounti
+          totalbounti
+          language
+          age_group
+          frequency
+          isOnline
+          lat
+          lng
+          radius
+          location_hint
+          sub_category
+          access_mode
+          ai_meta
+          pinecone_id
+          status_ratson
+          fulfillment_score
+          last_matched_at
+          logo { data { attributes { url formats } } }
+          users_permissions_users {
+            data { id attributes { username } }
+          }
+          vallues { data { id attributes { valueName } } }
+          categories { data { id attributes { name } } }
+          missions { data { id attributes { missionName } } }
+          mashaabims { data { id attributes { name } } }
+          matanots { data { id attributes { name } } }
+          extracted_missions {
+            id
+            name
+            hoursEst
+            importance
+            notes
+            missions { data { id attributes { missionName } } }
+          }
+          extracted_resources {
+            id
+            name
+            kindOf
+            quantityEst
+            importance
+            notes
+            mashaabims { data { id attributes { name } } }
+          }
+          chat_forum { data { id } }
+          process { data { id } }
+          derivedComplexMatanot { data { id attributes { name } } }
+        }
+      }
+    }
+    ratsonProposals(
+      filters: { ratson: { id: { eq: $id } } }
+      sort: ["match_score:desc","createdAt:desc"]
+      pagination: { limit: 50 }
+    ) {
+      data {
+        id
+        attributes {
+          kind
+          status_proposal
+          match_score
+          total_price
+          auto_generated
+          createdAt
+          proposer_users {
+            data { id attributes { username } }
+          }
+          project { data { id attributes { projectName } } }
+          matanot { data { id attributes { name } } }
+          matbea { data { id attributes { name simbol } } }
+          forum { data { id } }
+          negos { data { id } }
+          covered_missions { id extracted_mission_idx hours price }
+          covered_resources { id extracted_resource_idx quantity price }
+        }
+      }
+    }
+  }`,
+
+  '106listMyRatsons': `query ListMyRatsons($uid: ID!) {
+    ratsons(
+      filters: { users_permissions_users: { id: { eq: $uid } } }
+      sort: ["createdAt:desc"]
+      pagination: { limit: 60 }
+    ) {
+      data {
+        id
+        attributes {
+          name
+          desc
+          longDes
+          startDate
+          finnishDate
+          fulfilled
+          totalbounti
+          access_mode
+          status_ratson
+          fulfillment_score
+          last_matched_at
+          createdAt
+          vallues { data { id attributes { valueName } } }
+          categories { data { id attributes { name } } }
+          missions { data { id attributes { missionName } } }
+          mashaabims { data { id attributes { name } } }
+          extracted_missions { id name importance }
+          extracted_resources { id name importance }
+        }
+      }
+    }
+  }`,
+
+  '100updateRatson': `mutation UpdateRatson(
+    $id: ID!,
+    $name: String,
+    $desc: String,
+    $longDes: String,
+    $startDate: DateTime,
+    $finnishDate: DateTime,
+    $fulfilled: Boolean,
+    $allowJoin: Boolean,
+    $bounti: Boolean,
+    $totalbounti: Float,
+    $logo: ID,
+    $vallues: [ID],
+    $categories: [ID],
+    $missions: [ID],
+    $mashaabims: [ID],
+    $matanots: [ID],
+    $matanots_offered: [ID],
+    $users_permissions_users: [ID],
+    $status_ratson: Enum_Ratson_Status_Ratson,
+    $access_mode: Enum_Ratson_Access_Mode,
+    $sub_category: String,
+    $language: String,
+    $lat: Float,
+    $lng: Float,
+    $radius: Long,
+    $location_hint: String,
+    $frequency: String,
+    $isOnline: Boolean,
+    $age_group: String,
+    $ai_meta: JSON,
+    $pinecone_id: String,
+    $fulfillment_score: Float,
+    $last_matched_at: DateTime,
+    $chat_forum: ID,
+    $process: ID,
+    $derivedComplexMatanot: ID,
+    $extracted_missions: [ComponentNewExtractedMissionsInput],
+    $extracted_resources: [ComponentNewExtractedResourcesInput]
+  ) {
+    updateRatson(
+      id: $id,
+      data: {
+        name: $name,
+        desc: $desc,
+        longDes: $longDes,
+        startDate: $startDate,
+        finnishDate: $finnishDate,
+        fulfilled: $fulfilled,
+        allowJoin: $allowJoin,
+        bounti: $bounti,
+        totalbounti: $totalbounti,
+        logo: $logo,
+        vallues: $vallues,
+        categories: $categories,
+        missions: $missions,
+        mashaabims: $mashaabims,
+        matanots: $matanots,
+        matanots_offered: $matanots_offered,
+        users_permissions_users: $users_permissions_users,
+        status_ratson: $status_ratson,
+        access_mode: $access_mode,
+        sub_category: $sub_category,
+        language: $language,
+        lat: $lat,
+        lng: $lng,
+        radius: $radius,
+        location_hint: $location_hint,
+        frequency: $frequency,
+        isOnline: $isOnline,
+        age_group: $age_group,
+        ai_meta: $ai_meta,
+        pinecone_id: $pinecone_id,
+        fulfillment_score: $fulfillment_score,
+        last_matched_at: $last_matched_at,
+        chat_forum: $chat_forum,
+        process: $process,
+        derivedComplexMatanot: $derivedComplexMatanot,
+        extracted_missions: $extracted_missions,
+        extracted_resources: $extracted_resources
+      }
+    ) {
+      data { id attributes { status_ratson fulfillment_score last_matched_at } }
+    }
+  }`,
+
+  '101createRatsonProposal': `mutation CreateRatsonProposal(
+    $ratson: ID!,
+    $kind: Enum_Ratsonproposal_Kind,
+    $status_proposal: Enum_Ratsonproposal_Status_Proposal,
+    $matanot: ID,
+    $project: ID,
+    $proposer_users: [ID],
+    $total_price: Float,
+    $matbea: ID,
+    $forum: ID,
+    $match_score: Float,
+    $auto_generated: Boolean,
+    $covered_missions: [ComponentNewCoveredMissionsInput],
+    $covered_resources: [ComponentNewCoveredResourcesInput],
+    $publishedAt: DateTime
+  ) {
+    createRatsonProposal(
+      data: {
+        ratson: $ratson,
+        kind: $kind,
+        status_proposal: $status_proposal,
+        matanot: $matanot,
+        project: $project,
+        proposer_users: $proposer_users,
+        total_price: $total_price,
+        matbea: $matbea,
+        forum: $forum,
+        match_score: $match_score,
+        auto_generated: $auto_generated,
+        covered_missions: $covered_missions,
+        covered_resources: $covered_resources,
+        publishedAt: $publishedAt
+      }
+    ) {
+      data { id attributes { status_proposal kind match_score } }
+    }
+  }`,
+
+  '102updateRatsonProposal': `mutation UpdateRatsonProposal(
+    $id: ID!,
+    $kind: Enum_Ratsonproposal_Kind,
+    $status_proposal: Enum_Ratsonproposal_Status_Proposal,
+    $matanot: ID,
+    $project: ID,
+    $proposer_users: [ID],
+    $total_price: Float,
+    $matbea: ID,
+    $forum: ID,
+    $match_score: Float,
+    $auto_generated: Boolean,
+    $covered_missions: [ComponentNewCoveredMissionsInput],
+    $covered_resources: [ComponentNewCoveredResourcesInput],
+    $negos: [ID]
+  ) {
+    updateRatsonProposal(
+      id: $id,
+      data: {
+        kind: $kind,
+        status_proposal: $status_proposal,
+        matanot: $matanot,
+        project: $project,
+        proposer_users: $proposer_users,
+        total_price: $total_price,
+        matbea: $matbea,
+        forum: $forum,
+        match_score: $match_score,
+        auto_generated: $auto_generated,
+        covered_missions: $covered_missions,
+        covered_resources: $covered_resources,
+        negos: $negos
+      }
+    ) {
+      data { id attributes { status_proposal match_score } }
+    }
+  }`,
+
+  '107listRatsonsForProject': `query ListRatsonsForProject($projectId: ID!, $limit: Int) {
+    ratsonProposals(
+      filters: { project: { id: { eq: $projectId } } }
+      sort: ["createdAt:desc"]
+      pagination: { limit: $limit }
+    ) {
+      data {
+        id
+        attributes {
+          status_proposal
+          kind
+          match_score
+          createdAt
+          ratson {
+            data {
+              id
+              attributes {
+                name
+                longDes
+                status_ratson
+                totalbounti
+                startDate
+                finnishDate
+                createdAt
+                vallues { data { id attributes { valueName } } }
+                categories { data { id attributes { name } } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  '108createRatsonMatchJob': `mutation CreateRatsonMatchJob(
+    $ratson: ID!,
+    $mode: Enum_Ratsonmatchjob_Mode,
+    $started_at: DateTime,
+    $finished_at: DateTime,
+    $proposals_created: Int,
+    $error: String,
+    $publishedAt: DateTime
+  ) {
+    createRatsonMatchJob(
+      data: {
+        ratson: $ratson,
+        mode: $mode,
+        started_at: $started_at,
+        finished_at: $finished_at,
+        proposals_created: $proposals_created,
+        error: $error,
+        publishedAt: $publishedAt
+      }
+    ) {
+      data { id attributes { mode proposals_created } }
+    }
+  }`,
+
+  '110listCandidateMatanots': `query ListCandidateMatanots($limit: Int) {
+    matanots(
+      filters: {
+        archived: { eq: false }
+        status_of_voting: { eq: active }
+      }
+      pagination: { limit: $limit }
+    ) {
+      data {
+        id
+        attributes {
+          name
+          sub_category
+          price
+          estimatedPrice
+          lat
+          lng
+          radius
+          categories { data { id attributes { name } } }
+          projectcreates {
+            data {
+              id
+              attributes {
+                projectName
+                vallues { data { id attributes { valueName } } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  '109listOpenRatsons': `query ListOpenRatsons($limit: Int) {
+    ratsons(
+      filters: {
+        fulfilled: { eq: false }
+        status_ratson: { in: [open, matching, negotiating] }
+      }
+      sort: ["createdAt:desc"]
+      pagination: { limit: $limit }
+    ) {
+      data {
+        id
+        attributes {
+          name
+          desc
+          longDes
+          startDate
+          finnishDate
+          totalbounti
+          lat
+          lng
+          sub_category
+          status_ratson
+          createdAt
+          users_permissions_users {
+            data { id attributes { username } }
+          }
+          vallues { data { id attributes { valueName } } }
+          categories { data { id attributes { name } } }
+        }
+      }
+    }
+  }`,
+
+  // ── Mission creation / edit ────────────────────────────────────────────────
+
+  '162getMissionForEdit': `query GetMissionForEdit($id: ID!) {
+    mission(id: $id) {
+      data {
+        id
+        attributes {
+          missionName
+          descrip
+          skills {
+            data {
+              id
+              attributes {
+                skillName
+                localizations { data { attributes { skillName } } }
+              }
+            }
+          }
+          tafkidims {
+            data {
+              id
+              attributes {
+                roleDescription
+                localizations { data { attributes { roleDescription } } }
+              }
+            }
+          }
+          work_ways {
+            data {
+              id
+              attributes {
+                workWayName
+                localizations { data { attributes { workWayName } } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  '163createPendm': `mutation CreatePendmFull(
+    $projectId: ID!
+    $missionId: ID!
+    $name: String!
+    $descrip: String
+    $skills: [ID]
+    $tafkidims: [ID]
+    $workWays: [ID]
+    $vallues: [ID]
+    $noofhours: Float
+    $perhour: Float
+    $iskvua: Boolean
+    $sqadualed: DateTime
+    $dates: DateTime
+    $publicklinks: String
+    $privatlinks: String
+    $hearotMeyuchadot: String
+    $users: [ComponentProjectsPendmnegoInput]
+    $publishedAt: DateTime!
+  ) {
+    createPendm(data: {
+      project: $projectId
+      mission: $missionId
+      name: $name
+      descrip: $descrip
+      skills: $skills
+      tafkidims: $tafkidims
+      work_ways: $workWays
+      vallues: $vallues
+      noofhours: $noofhours
+      perhour: $perhour
+      iskvua: $iskvua
+      sqadualed: $sqadualed
+      dates: $dates
+      publicklinks: $publicklinks
+      privatlinks: $privatlinks
+      hearotMeyuchadot: $hearotMeyuchadot
+      users: $users
+      publishedAt: $publishedAt
+    }) {
+      data { id }
+    }
+  }`,
+
+  '164createOpenMission': `mutation CreateOpenMissionFull(
+    $projectId: ID!
+    $missionId: ID!
+    $name: String!
+    $descrip: String
+    $skills: [ID]
+    $tafkidims: [ID]
+    $workWays: [ID]
+    $vallues: [ID]
+    $noofhours: Float
+    $perhour: Float
+    $iskvua: Boolean
+    $sqadualed: DateTime
+    $dates: DateTime
+    $publicklinks: String
+    $privatlinks: String
+    $hearotMeyuchadot: String
+    $isRishon: Boolean
+    $rishon: ID
+    $archived: Boolean
+    $publishedAt: DateTime!
+  ) {
+    createOpenMission(data: {
+      project: $projectId
+      mission: $missionId
+      name: $name
+      descrip: $descrip
+      skills: $skills
+      tafkidims: $tafkidims
+      work_ways: $workWays
+      vallues: $vallues
+      noofhours: $noofhours
+      perhour: $perhour
+      iskvua: $iskvua
+      sqadualed: $sqadualed
+      dates: $dates
+      publicklinks: $publicklinks
+      privatlinks: $privatlinks
+      hearotMeyuchadot: $hearotMeyuchadot
+      isRishon: $isRishon
+      rishon: $rishon
+      archived: $archived
+      publishedAt: $publishedAt
+    }) {
+      data { id }
+    }
+  }`,
+
+  '165createTimegramaForPendm': `mutation CreateTimegramaForPendm($date: DateTime!, $pendmId: ID!) {
+    createTimegrama(data: { date: $date, whatami: "pendm", pendm: $pendmId }) {
+      data { id }
+    }
+  }`,
+
+  '166createWorkWay': `mutation CreateWorkWay($name: String!, $publishedAt: DateTime!) {
+    createWorkWay(data: { workWayName: $name, publishedAt: $publishedAt }) {
+      data {
+        id
+        attributes {
+          workWayName
+          localizations { data { attributes { workWayName } } }
+        }
+      }
+    }
+  }`,
+
+  '167getUserHervachti': `query GetUserHervachti($id: ID!) {
+    usersPermissionsUser(id: $id) {
+      data {
+        id
+        attributes { hervachti }
+      }
+    }
+  }`
 };
 
 export const moachQids = {
@@ -5850,6 +7453,208 @@ export const moachQids = {
 };
 
 export const qids = {
+  '85levHubSummary': `query LevHubSummary($idL: ID!) {
+  usersPermissionsUser(id: $idL) {
+    data {
+      id
+      attributes {
+        username
+        hervachti
+        profilePic {
+          data {
+            attributes {
+              url
+            }
+          }
+        }
+        # Purchases (user as buyer)
+        sheiruts(filters: { archived: { eq: false }, isApruved: { eq: true } }) {
+          data {
+            id
+            attributes {
+              moneyTransfered
+              productExepted
+            }
+          }
+        }
+        # Active missions count (proxy for suggestions KPI)
+        mesimabetahaliches(
+          filters: { forappruval: { eq: false }, finnished: { eq: false } }
+        ) {
+          data {
+            id
+          }
+        }
+        projects_1s {
+          data {
+            id
+            attributes {
+              # Mission applications – members vote via pendms.users (ordered)
+              pendms(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    timegrama {
+                      data {
+                        attributes {
+                          date
+                        }
+                      }
+                    }
+                    negopendmissions {
+                      data {
+                        id
+                      }
+                    }
+                    users {
+                      what
+                      order
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              # Completion approvals – members vote via finiapruvals.vots (no order)
+              finiapruvals(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    timegrama {
+                      data {
+                        attributes {
+                          date
+                        }
+                      }
+                    }
+                    vots {
+                      what
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              # Resource requests – members vote via askms.vots (no order)
+              askms(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    vots {
+                      what
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              # Resource approvals – members vote via maaps.vots (no order)
+              maaps(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    vots {
+                      what
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              # Project decisions – members vote via decisions.vots (no orderon, any vote counts)
+              decisions(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    vots {
+                      what
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              # Split proposals – members vote via tosplits.vots (ordered)
+              tosplits(filters: { finished: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    vots {
+                      what
+                      order
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              # Service purchase requests – members vote via sheirutpends.votes (relational, ordered)
+              sheirutpends(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    timegrama {
+                      data {
+                        attributes {
+                          date
+                        }
+                      }
+                    }
+                    votes {
+                      data {
+                        id
+                        attributes {
+                          what
+                          order
+                          users_permissions_user {
+                            data {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              # Sales (user as seller)
+              sheiruts(
+                filters: { archived: { eq: false }, isApruved: { eq: true } }
+              ) {
+                data {
+                  id
+                  attributes {
+                    moneyTransfered
+                    productExepted
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`,
+
   ...qids_base,
   ...moachQids
 };

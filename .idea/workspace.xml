@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+;    <list default="true" id="95e10908-753e-4b5e-a7b6-37b180d77d7c" name="Changes" comment="145.1 migration">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mcp.json" beforeDir="false" afterPath="$PROJECT_DIR$/.mcp.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/deals/PendingRequestCard.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/deals/PendingRequestCard.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/cards/hachlata.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/cards/hachlata.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/cards/rektom.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/cards/rektom.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/halukaask.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/halukaask.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/mashsuggest.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/mashsuggest.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/pmas.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/pmas.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/reqtom.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/reqtom.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/lev/reqtosherut.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/lev/reqtosherut.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/components/mail/mail.svelte" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/components/mail/mail.svelte" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/server/actions/configs/createMashaabimRequest.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/server/actions/configs/createMashaabimRequest.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/server/actions/configs/finalizeAskmAcceptance.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/server/actions/configs/finalizeAskmAcceptance.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/utils/levDataExtractors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/utils/levDataExtractors.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/routes/api/send/qids.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/api/send/qids.js" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "Avi-ADAM"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Avi-ADAM/1.0.git",
+    "accountId": "f11a4daf-2e4e-492f-872d-dec955f4f253"
+  }
+}]]></component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="3DlFmumb1ycG8fgtvL8NwrTdXeT" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "JavaScript Debug.localhost:5173.executor": "Debug",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "javascript.preferred.runtime.type.id": "node",
+    "last_opened_file_path": "C:/Users/babay/Documents/GitHub/1.0main",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "yarn",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "ts.external.directory.path": "C:\\Users\\babay\\Documents\\GitHub\\1.0main\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="localhost:5173" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:5173/">
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JavaScript Debug.localhost:5173" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-WS-253.31033.133" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="95e10908-753e-4b5e-a7b6-37b180d77d7c" name="Changes" comment="" />
+      <created>1778848920472</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1778848920472</updated>
+      <workItem from="1778848921944" duration="7860000" />
+      <workItem from="1779725764144" duration="17194000" />
+    </task>
+    <task id="LOCAL‎-00001" summary="144.5 migration wishes">
+      <option name="closed" value="true" />
+      <created>1779782132625</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL‎-00001" />
+      <option name="project" value="LOCAL‎" />
+      <updated>1779782132626</updated>
+    </task>
+    <task id="LOCAL‎-00002" summary="144.6 migration">
+      <option name="closed" value="true" />
+      <created>1779785687744</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL‎-00002" />
+      <option name="project" value="LOCAL‎" />
+      <updated>1779785687744</updated>
+    </task>
+    <task id="LOCAL‎-00003" summary="144.7 migration">
+      <option name="closed" value="true" />
+      <created>1779789148653</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL‎-00003" />
+      <option name="project" value="LOCAL‎" />
+      <updated>1779789148653</updated>
+    </task>
+    <task id="LOCAL‎-00004" summary="144.8 migration">
+      <option name="closed" value="true" />
+      <created>1779790883565</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL‎-00004" />
+      <option name="project" value="LOCAL‎" />
+      <updated>1779790883565</updated>
+    </task>
+    <task id="LOCAL‎-00005" summary="144.9 migration">
+      <option name="closed" value="true" />
+      <created>1779794809998</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL‎-00005" />
+      <option name="project" value="LOCAL‎" />
+      <updated>1779794809998</updated>
+    </task>
+    <task id="LOCAL‎-00006" summary="145 migration">
+      <option name="closed" value="true" />
+      <created>1779796197917</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL‎-00006" />
+      <option name="project" value="LOCAL‎" />
+      <updated>1779796197917</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="144.5 migration wishes" />
+    <MESSAGE value="144.6 migration" />
+    <MESSAGE value="144.7 migration" />
+    <MESSAGE value="144.8 migration" />
+    <MESSAGE value="144.9 migration" />
+    <MESSAGE value="145 migration" />
+    <MESSAGE value="145.1 migration" />
+    <option name="LAST_COMMIT_MESSAGE" value="145.1 migration" />
+  </component>
+</project>

@@ -1,15 +1,38 @@
+<script lang="ts">
+  import { page } from '$app/stores';
+
+  const user = $derived($page.data.user || $page.data);
+  const userName = $derived(user?.username || user?.un || 'אורח');
+  const profilePic = $derived(user?.profilePic);
+  
+  const initials = $derived(
+    userName
+      .split(' ')
+      .filter(Boolean)
+      .map((n: string) => n[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase() || '??'
+  );
+</script>
+
 <header class="header">
-  <div class="logo">
-    <div class="logo-dot"></div>
-    MATAN
-  </div>
+  <a href="/deals" class="logo">
+    <img src="/deals logo.png" alt="Deals" class="logo-img" />
+  </a>
   <div class="right">
     <div class="badge">לקוח פרימיום</div>
     <button class="notif" aria-label="התראות">
       <span>🔔</span>
       <div class="notif-dot"></div>
     </button>
-    <button class="avatar" aria-label="פרופיל">ד״ר</button>
+    <button class="avatar" title={userName} aria-label="פרופיל">
+      {#if profilePic}
+        <img src={profilePic} alt={userName} class="avatar-img" />
+      {:else}
+        {initials}
+      {/if}
+    </button>
   </div>
 </header>
 
@@ -30,22 +53,21 @@
   }
 
   .logo {
-    font-family: 'Cinzel', serif;
-    font-size: 18px;
-    color: var(--gold-l);
-    letter-spacing: 3px;
-    text-transform: uppercase;
     display: flex;
     align-items: center;
     gap: 10px;
     user-select: none;
+    text-decoration: none;
+    transition: transform 0.2s;
   }
-  .logo-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--pink-l);
-    box-shadow: 0 0 10px var(--pink-l);
+  .logo:hover {
+    transform: scale(1.02);
+  }
+  .logo-img {
+    height: 32px;
+    width: auto;
+    display: block;
+    filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.2));
   }
 
   .right {
@@ -78,7 +100,9 @@
     transition: border-color 0.2s;
     font-size: 15px;
   }
-  .notif:hover { border-color: var(--border-g); }
+  .notif:hover {
+    border-color: var(--border-g);
+  }
   .notif-dot {
     position: absolute;
     top: 7px;
@@ -104,12 +128,30 @@
     color: var(--gold-l);
     cursor: pointer;
     font-family: 'Heebo', sans-serif;
-    transition: border-color 0.2s;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    padding: 0;
+    overflow: hidden;
   }
-  .avatar:hover { border-color: var(--gold-l); }
+  .avatar:hover {
+    border-color: var(--gold-l);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+  }
+  .avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
   @media (max-width: 600px) {
-    .header { padding: 0 16px; }
-    .badge  { display: none; }
+    .header {
+      padding: 0 16px;
+    }
+    .badge {
+      display: none;
+    }
   }
 </style>
+
+

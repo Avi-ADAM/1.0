@@ -3,6 +3,7 @@
   import VotingCard from './components/VotingCard.svelte';
   import PartnershipGrid from './components/PartnershipGrid.svelte';
   import MissionList from './components/MissionList.svelte';
+  import TimerEditCard from './components/TimerEditCard.svelte';
 
   let {
     message,
@@ -72,6 +73,8 @@
           <PartnershipGrid {...comp.props} />
         {:else if comp.type === 'mission_list'}
           <MissionList {...comp.props} {onAction} />
+        {:else if comp.type === 'timer_edit'}
+          <TimerEditCard {...comp.props} />
         {/if}
       {/each}
     {/if}

@@ -6,12 +6,11 @@
   import { lang } from '$lib/stores/lang.js';
   import Close from '../../celim/close.svelte';
   import { onMount } from 'svelte';
-  import { page } from '$app/state';
   import { clickOutside } from './outsidclick.js';
   import { fly } from 'svelte/transition';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
 
-  const baseUrl = import.meta.env.VITE_URL;
+  // baseUrl removed — actions go through /api/action, not direct GraphQL
   /**
    * @typedef {Object} Props
    * @property {boolean} [isVisible]
@@ -105,27 +104,43 @@
     onUser,
     onChat
   } = $props();
+  let decisionCurrentValue = $state('');
+  let decisionNewValue = $state('');
+
   onMount(async () => {
     console.log('HACHLATA!!!');
-    if (kind == 'pic') {
+    st = 115;
+    if (kind === 'pic') {
       openmissionName = {
         he: `הצבעה על שינוי הלוגו`,
         en: 'vote on Logo change'
       };
-      st = 115;
-    } else {
+    } else if (kind === 'sheirutpends') {
       openmissionName = {
         he: 'הצבעה על יצירת שירות חדש',
         en: 'vote on creating new service'
       };
-      st = 115;
+    } else if (askId && projectId) {
+      // Fetch current vs. proposed values for all other decision kinds
+      try {
+        const result = await executeAction('getDecisionDetails', {
+          decisionId: String(askId),
+          projectId: String(projectId),
+        });
+        if (result.success && result.data) {
+          const { fieldLabel, currentValue, newValue } = result.data;
+          if (fieldLabel) {
+            openmissionName = fieldLabel;
+          }
+          decisionCurrentValue = currentValue ?? '';
+          decisionNewValue = newValue ?? '';
+        }
+      } catch (e) {
+        console.warn('getDecisionDetails failed:', e);
+      }
     }
   });
-  let idL;
-  let bearer1;
-  let token;
   import { Swiper, SwiperSlide } from 'swiper/svelte';
-  import { sendToSer } from '$lib/send/sendToSer.js';
 
   // Import Swiper styles
   import 'swiper/css';
@@ -154,8 +169,6 @@
     slideTo(0);
   }
   let error1;
-  let miDatan = [];
-  let linkg = baseUrl + '/graphql';
 
   function percentage(partialValue, totalValue) {
     return (100 * partialValue) / totalValue;
@@ -227,152 +240,46 @@
       goto(`/moach/${id}`);
     }
   }
-  function objToString(obj) {
-    let str = '';
-    for (let i = 0; i < obj.length; i++) {
-      for (const [p, val] of Object.entries(obj[i])) {
-        if ((typeof val == 'string') | 'number' | 'boolean') {
-          str += `{${p}:${val}\n},`;
-        } else if (typeof val == 'null') {
-          str += `{${p}:${val.map((c) => c.id)}\n},`;
-        }
-      }
-    }
-    return str;
-  }
-  const userss = objToString(users);
-  let welcome = ``;
-  let adduser = ``;
-  let adduser2 = ``;
   async function agree() {
     already = true;
     noofusersOk += 1;
     noofusersWaiting -= 1;
     ser = xyz();
-    const date = deadline !== undefined ? ` admaticedai: ${deadline}` : ``;
-    // jwt is httpOnly now; read token from server-provided page data
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    console.log(idL);
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
-    let update = ``;
-    let d = new Date();
-    if (kind == 'pic') {
-      update = `ProfilePic: "${newpicid}"`;
-    }
-    console.log(uids);
-    if (noofpu === noofusersOk) {
-      let que = ``;
-      if (kind != 'sheirutpends') {
-        `updateSheirutpends(id:"${projectId}"
-        data:{
-          archived: true,
-           vots: [${userss}, 
-              {
-               what: true
-               ide:${idL}
-               zman: "${d.toISOString()}"
-               order:0
-               users_permissions_user: "${idL}"
-             }
-           ]}          
-        }){data{id}}
-        updateSheirut(id:"${spdata.sheirut.data.id}"
-        data:{
-          isApruved:true
-        }){data{id}}
-        `;
-      } else {
-        que`    updateProject(
-     id: "${projectId}"
-      data: {
-        ${update}
-                  }
-  ) {data{id }}
- updateDecision(
-              id: "${askId}"
-       data: { archived: true,
-           vots: [${userss}, 
-              {
-                ide:${idL}
-               zman: "${d.toISOString()}"
-               order:0
-              what: true
-              users_permissions_user: "${idL}"
-            }
-          ]}
-         ){data{id}}`;
-      }
-      try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation {
-                     ${que}
-}
-`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
-        if (miDatan.data != null) {
-          let que4 = `mutation { 
-             updateTimegrama(
-     id: ${timegramaId}
-             data:{
-              done: true
-             }){
-              data{id}
-             }
-            }
-              `;
-          try {
-            let res4 = await SendTo(que4, VITE_ADMINMONTHER).then(
-              (res4) => (res4 = res4)
-            );
-            console.log(res4, 'ask res4 ');
-            if (res4.data != null) {
-              console.log(res4.data, 'ask res4 ');
-              onAcsept?.({
-                ani: 'askedma',
-                coinlapach: coinlapach
-              });
-            }
-          } catch (e) {
-            console.error(e);
-          }
-        }
-      } catch (e) {
-        error1 = e;
-        console.log(error1);
-      }
-    } else {
-      // 3+ members: record vote on the Decision entity via action (handles notifications + socket)
-      try {
+
+    try {
+      if (kind === 'sheirutpends') {
+        // Use existing sheirutpend vote action — handles consensus → createSheirut internally
         const result = await executeAction('addVote', {
-          type: 'decision',
-          id: askId,
-          projectId: projectId,
-          existingComponentData: users
+          type: 'sheirutpend',
+          id: String(askId),
+          projectId: String(projectId),
         });
         if (result.success) {
-          onAcsept?.({ ani: 'askedma', coinlapach: coinlapach });
+          onAcsept?.({ ani: 'askedma', coinlapach });
         } else {
           error1 = result.error;
         }
-      } catch (e) {
-        error1 = e;
-        console.log(error1);
+      } else {
+        // Decision vote (pic, etc.) — server-authoritative consensus check
+        const result = await executeAction('voteOnDecision', {
+          decisionId: String(askId),
+          projectId: String(projectId),
+          kind: String(kind),
+          ...(newpicid != null ? { newpicid: String(newpicid) } : {}),
+          ...(timegramaId != null ? { timegramaId: String(timegramaId) } : {}),
+        });
+        if (result.success) {
+          if (result.data?.consensus) {
+            onAcsept?.({ ani: 'askedma', coinlapach });
+          }
+          // Non-consensus: UI already updated locally (noofusersOk++)
+        } else {
+          error1 = result.error;
+        }
       }
+    } catch (e) {
+      error1 = e;
+      console.log(error1);
     }
   }
   async function decline() {
@@ -431,7 +338,6 @@
     onHover?.({ id: u[$lang] });
   }
   import Card from './cards/hachlata.svelte';
-  import { SendTo } from '$lib/send/sendTo.svelte';
   import { idPr } from '$lib/stores/idPr';
   const newlogo = { he: 'הלוגו החדש שמוצע', en: 'new Logo offered' };
   const oldob = { he: 'הלוגו העכשווי', en: 'old Logo' };
@@ -1340,6 +1246,8 @@
                 {users}
                 {projectId}
                 {onProj}
+                currentValue={decisionCurrentValue}
+                newValue={decisionNewValue}
               />
             </div>
           </Drawer.Content>
@@ -1371,6 +1279,8 @@
     {openmissionName}
     {missionDetails}
     {noofusersNo}
+    currentValue={decisionCurrentValue}
+    newValue={decisionNewValue}
   />
 {/if}
 

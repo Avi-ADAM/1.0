@@ -154,11 +154,7 @@ export const userUtils = {
   formatUserDisplayName(user) {
     if (!user || !user.attributes) return '';
     
-    const { username, firstName, lastName } = user.attributes;
-    
-    if (firstName && lastName) {
-      return `${firstName} ${lastName} (${username})`;
-    }
+    const { username } = user.attributes;
     
     return username || '';
   },
@@ -175,12 +171,8 @@ export const userUtils = {
     const term = searchTerm.toLowerCase();
     return users.filter(user => {
       const username = user.attributes?.username?.toLowerCase() || '';
-      const firstName = user.attributes?.firstName?.toLowerCase() || '';
-      const lastName = user.attributes?.lastName?.toLowerCase() || '';
       
-      return username.includes(term) || 
-             firstName.includes(term) || 
-             lastName.includes(term);
+      return username.includes(term);
     });
   },
 

@@ -6,7 +6,6 @@
  	import { page } from '$app/state'
     const email = page.url.searchParams.get('code')
 	import { lang } from '$lib/stores/lang.js'
-	const baseUrl = import.meta.env.VITE_URL
 
 let passwordx;
 let errorl = $state(null);
@@ -20,7 +19,7 @@ function shaneh () {
 
   // Request API.
 axios
-  .post(baseUrl+'/api/auth/reset-password', {
+  .post('/api/auth/reset-password', {
     code: email,
     password: passwordx,
     passwordConfirmation: passwordx,

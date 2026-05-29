@@ -2,22 +2,45 @@
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
   import { sendToSer } from '$lib/send/sendToSer.js';
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import Lowding from '$lib/celim/lowding.svelte';
   import { goto } from '$app/navigation';
+  import { socketClient } from '$lib/stores/socketClient';
 
   let projectId = $derived(page.params.projectId);
   let votesData = $state(null);
   let loading = $state(true);
 
-  onMount(async () => {
+  async function loadVotes() {
     try {
       const res = await sendToSer({ pid: projectId }, 'getProjectVotes', null, null, false, fetch);
       votesData = res?.data?.project?.data?.attributes;
     } finally {
       loading = false;
     }
+  }
+
+  // Realtime: refresh the open-votes list whenever a vote lands for this project.
+  const VOTE_TYPES = ['pendmVote', 'pmashVote', 'maapVote', 'decisionVote', 'voteUpdate'];
+  let socketUnsub;
+
+  onMount(() => {
+    loadVotes();
+    socketUnsub = socketClient.onNotification((n) => {
+      const type = n?.metadata?.type || n?.data?.type;
+      const notifProjectId = n?.actionParams?.projectId || n?.data?.projectId;
+      if (
+        notifProjectId &&
+        String(notifProjectId) === String(projectId) &&
+        type &&
+        VOTE_TYPES.includes(type)
+      ) {
+        loadVotes();
+      }
+    });
   });
+
+  onDestroy(() => socketUnsub?.());
 
   const i18n = {
     he: { title: 'הצבעות פתוחות', splitVotes: 'הצבעות חלוקה', joinVotes: 'בקשות הצטרפות', decisionVotes: 'החלטות' },

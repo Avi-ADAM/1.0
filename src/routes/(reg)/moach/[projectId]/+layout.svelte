@@ -43,13 +43,29 @@
     socketUnsubscribe = socketClient.onNotification((notification) => {
       console.log('[MoachLayout] Socket notification:', notification);
 
+      if (!projectId) return;
+
+      // Ignore notifications that belong to a different project (the socket
+      // delivers events for every project the user is a member of).
+      const notifProjectId =
+        notification.actionParams?.projectId || notification.data?.projectId;
+      if (notifProjectId && String(notifProjectId) !== String(projectId)) return;
+
       // If notification implies data change, invalidate store cache
       // type could be 'mission', 'base', 'financials' etc depending on backend payload
       const type = notification.metadata?.type || notification.data?.type;
-      if (type && projectId) {
+
+      // Vote notifications (incl. consensus, which may create a mission/resource
+      // or change project details) touch several cached sections.
+      const VOTE_TYPES = ['pendmVote', 'pmashVote', 'maapVote', 'decisionVote', 'voteUpdate'];
+
+      if (type && VOTE_TYPES.includes(type)) {
+        moachStore.invalidate(projectId, 'base');
+        moachStore.invalidate(projectId, 'missions');
+        moachStore.invalidate(projectId, 'financials');
+      } else if (type) {
         moachStore.invalidate(projectId, type);
-        // Optionally trigger re-fetch immediately for active tab
-      } else if (projectId) {
+      } else {
         // Broad invalidation if type unknown
         moachStore.invalidate(projectId, 'base');
         moachStore.invalidate(projectId, 'missions');
@@ -76,6 +92,7 @@
       shifts: 'משמרות',
       processes: 'תהליכים',
       votes: 'הצבעות',
+      wishes: 'משאלות נכנסות',
       editPic: 'עריכת תמונה',
       upload: 'העלאה',
       editDetails: 'עריכת פרטים',
@@ -97,6 +114,7 @@
       shifts: 'Shifts',
       processes: 'Processes',
       votes: 'Votes',
+      wishes: 'Incoming wishes',
       editPic: 'Edit Picture',
       upload: 'Upload',
       editDetails: 'Edit Details',
@@ -118,6 +136,7 @@
       shifts: 'مناوبات',
       processes: 'العمليات',
       votes: 'التصويتات',
+      wishes: 'الرغبات الواردة',
       editPic: 'تعدיל الصورة',
       upload: 'تحميل',
       editDetails: 'تعدיל التفاصيل',
@@ -147,6 +166,7 @@
     { id: 'processes', label: 'processes' },
     { id: 'split', label: 'split' },
     { id: 'sales', label: 'sales' },
+    { id: 'wishes', label: 'wishes' },
     { id: 'votes', label: 'votes' },
     { id: 'shifts', label: 'shifts' }
   ];

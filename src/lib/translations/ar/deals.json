@@ -1,0 +1,14 @@
+{
+  "title": "صفقاتي",
+  "subtitle": "تتبع جميع المنتجات وحالتها في الوقت الفعلي",
+  "my_purchases": "مشترياتي",
+  "my_sales": "مبيعاتي",
+  "pending_requests": "الطلبات المعلقة",
+  "active_purchases": "المشتريات النشطة",
+  "active_sales": "المبيعات النشطة",
+  "pending_requests_label": "طلبات الشراء في انتظار الموافقة",
+  "no_active_purchases": "ليس لديك مشتريات نشطة بعد",
+  "no_active_sales": "ليس لديك مبيعات نشطة بعد",
+  "no_pending_requests": "لا توجد طلبات معلقة",
+  "logo_alt": "شعار الصفقات"
+}

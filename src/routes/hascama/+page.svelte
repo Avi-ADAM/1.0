@@ -1,21 +1,13 @@
 <script>
   import { preventDefault } from 'svelte/legacy';
 
-  import { liUN } from '$lib/stores/liUN.js';
   import { fbl } from '$lib/stores/fbl.js';
 
-  import { lang, langUs, doesLang } from '$lib/stores/lang.js';
-  import { locale } from '$lib/translations';
-  import { page } from '$app/state';
-  //const emaili = page.url.searchParams.get('code')
+  import { lang } from '$lib/stores/lang.js';
   import { goto } from '$app/navigation';
   import Mobile from '$lib/components/front/mobile.svelte';
   import { userName } from '$lib/stores/store.js';
   import Amana1 from '$lib/components/main/amana.svelte';
-  import One from '$lib/components/main/bein.svelte';
-  import { show } from '$lib/components/registration/store-show.js';
-  import { contriesi } from '$lib/components/registration/contries.js';
-  import { fpval } from '$lib/components/registration/fpval.js';
   import { regHelper } from '$lib/stores/regHelper.js';
   import { onMount } from 'svelte';
   import { email } from '$lib/components/registration/email.js';
@@ -27,33 +19,7 @@
 
   let user = 0;
 
-  let kvar = $state();
   onMount(async () => {
-    const x = page.url.searchParams.get('ref');
-    if (x != null) {
-      userName.set(decodeURIComponent(page.url.searchParams.get('un')));
-      kvar = page.url.searchParams.get('em');
-      email.set(decodeURIComponent(page.url.searchParams.get('em')));
-      const langParam = decodeURIComponent(page.url.searchParams.get('lang'));
-      // Sync both stores
-      lang.set(langParam);
-      locale.set(langParam);
-      langUs.set(langParam);
-      doesLang.set(true);
-      const oneYearFromNow = new Date();
-      oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
-
-      document.cookie = `lang=${page.url.searchParams.get('lang')}; expires=${oneYearFromNow.toUTCString()}; path=/; SameSite=Strict`;
-      document.cookie = `email=${page.url.searchParams.get('em')}; expires=${oneYearFromNow.toUTCString()}; path=/; SameSite=Strict`;
-      document.cookie = `un=${page.url.searchParams.get('un')}; expires=${oneYearFromNow.toUTCString()}; path=/; SameSite=Strict`;
-      liUN.set(decodeURIComponent(page.url.searchParams.get('un')));
-      const array = page.url.searchParams.get('con').split(',');
-
-      contriesi.set(array);
-      regHelper.set(1);
-      fpval.set(page.url.searchParams.get('id'));
-      console.log(x, kvar, user, $contriesi);
-    }
     if (document.cookie) {
       const unt = document.cookie
         .split('; ')
@@ -84,19 +50,16 @@
           .split('; ')
           .find((row) => row.startsWith('email='))
           .split('=')[1];
-        kvar = cookieValue;
         email.set(cookieValue);
+        goto('/signup');
+        return;
       }
       const cookieValueti = document.cookie
         .split('; ')
         .find((row) => row.startsWith('await='));
       if (cookieValueti != null) {
-        const cookieValue = document.cookie
-          .split('; ')
-          .find((row) => row.startsWith('await='))
-          .split('=')[1];
-        kvar = true;
-        show.set(6);
+        goto('/signup/check-email');
+        return;
       }
     }
     if (user > 0) {
@@ -221,14 +184,7 @@ regHelperL = 0;
   <!--{#if user > 0}
 { goto("/lev", )}
 {:else}-->
-  {#if kvar}
-    <One {idx} />
-
-    <!--
-todo: אמנה חתומה ל5 שניות ואז להעביר לעמוד הבית לקחת פרטים מהקוקיות או מלוקלסטורג'-->
-  {:else if regHelperL == 1}
-    <One {idx} />
-  {:else if regHelperL == 0}
+  {#if regHelperL == 0}
     <Amana1 {idx} />
   {:else if regHelperL == -1}
     <Mobile />
