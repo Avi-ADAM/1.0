@@ -1,0 +1,52 @@
+{
+  "title": "The Complete 1💗1 Guide",
+  "human_section": "Guide for Humans",
+  "ai_section": "Guide for AI Agents",
+  "glossary": {
+    "title": "Glossary",
+    "pendm_label": "Pendm (Pending Mission)",
+    "pendm_desc": "A proposal for a new mission currently in the initial negotiation stage before becoming an open mission.",
+    "rikma_label": "Rikma (Partnership)",
+    "rikma_desc": "A partnership or project where members collaborate and share profits.",
+    "decision_time_label": "Decision Time",
+    "decision_time_desc": "The timeframe defined in the Rikma during which members can respond, object, or make counter-proposals before an action is automatically approved."
+  },
+  "steps": {
+    "open_rikma": {
+      "title": "How to Open a Rikma",
+      "human": "To open a new Rikma, go to the 'Join' page or use the bot. You need to define a name, description, values, and decision time.",
+      "ai": "Use the createProjectTool with the appropriate parameters (name, description, values, etc.). Ensure you provide a valid URL for registration completion.",
+      "screenshot_placeholder": "[Screenshot: New Rikma creation form]"
+    },
+    "create_task": {
+      "title": "How to Create Tasks",
+      "human": "Within the Rikma page, you can add a 'Pending Mission' (Pendm). Define the essence of the task and the proposed reward.",
+      "ai": "Send a request to create a pendm object linked to the pid (Project ID). Use the actionClient or crTask function.",
+      "screenshot_placeholder": "[Screenshot: Add task button and pendm definition screen]"
+    },
+    "approval_process": {
+      "title": "Task Approval and Negotiation Process",
+      "human": "Every Pendm enters a negotiation period. Each new proposal pushes back the timer counting down to the decision time, restarting it according to the Rikma's definition. Once confirmed, the mission becomes 'Open' and offers for execution can be received.",
+      "ai": "Monitor the pendm status. Note that any update to task fields resets the consensus timer.",
+      "screenshot_placeholder": "[Screenshot: Negotiation timeline and active timer]"
+    },
+    "automatic_approval": {
+      "title": "Automatic Approval",
+      "human": "Once at least one project member approves, and the decision time has passed without any objectors, the proposal is automatically approved.",
+      "ai": "Check the approvals field and the time elapsed since the last update against the Rikma's decision_time setting.",
+      "screenshot_placeholder": "[Screenshot: Project member approval indicator and countdown to automatic approval]"
+    },
+    "execution_timers": {
+      "title": "Task Execution and Timers",
+      "human": "During task execution, you can start and stop a timer from various places: the Telegram bot, MCP interface, the Heart page (main page), or a dedicated timers page.",
+      "ai": "Timers can be operated via the bot API or by updating an act object with start and end times.",
+      "screenshot_placeholder": "[Screenshot: Timer interface in Telegram and on the Heart page]"
+    },
+    "archiving": {
+      "title": "Completion, Approval, and Archiving",
+      "human": "Upon completing a task, you can upload a proof file. Project members vote for approval. Once approved, the hours and contribution are recorded in the Rikma (archived) and count towards your value in the project.",
+      "ai": "Upload a file to Strapi and link it to the relevant act. Wait for 'approved' status before archiving.",
+      "screenshot_placeholder": "[Screenshot: File upload screen and final approval vote]"
+    }
+  }
+}
