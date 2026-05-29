@@ -1,4 +1,6 @@
 <script lang="ts">
+  import tr from '$lib/translations/tr.json';
+  import { lang } from '$lib/stores/lang.js';
   import type { Mission, MissionStatus } from '$lib/types';
 
   let { missions }: { missions: Mission[] } = $props();
@@ -19,8 +21,8 @@
 
   function statusText(m: Mission): string {
     switch (m.status) {
-      case 'done':           return '✓ שולם';
-      case 'needs-approval': return '⚡ לאישור';
+      case 'done':           return tr.deals.missionPaid[$lang];
+      case 'needs-approval': return tr.deals.missionNeedsApproval[$lang];
       case 'in-progress':    return Math.round((m.hoursDone / m.hours) * 100) + '%';
       default:               return '—';
     }
@@ -43,7 +45,7 @@
         {#if m.sub}<div class="sub">{m.sub}</div>{/if}
       </div>
       <div class="right">
-        <div class="hours">{m.hours} שע׳</div>
+        <div class="hours">{m.hours} {tr.deals.hoursShort[$lang]}</div>
         <div class="status" style="color:{STATUS_COLOR[m.status]}">{statusText(m)}</div>
       </div>
     </div>

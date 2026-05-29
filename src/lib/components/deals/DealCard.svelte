@@ -1,16 +1,17 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import tr from '$lib/translations/tr.json';
   import { lang } from '$lib/stores/lang.js';
   import type { Deal } from '$lib/types';
 
   let { deal }: { deal: Deal } = $props();
 
-  const STATUS = {
-    active: { label: 'בביצוע', cls: 'active' },
-    pending: { label: 'בתיאום', cls: 'pending' },
-    approval: { label: 'ממתין לאישור', cls: 'approval' },
-    done: { label: 'הושלם ✓', cls: 'done' }
-  } as const;
+  const STATUS = $derived({
+    active: { label: tr.deals.statusInProgress[$lang], cls: 'active' },
+    pending: { label: tr.deals.statusCoordination[$lang], cls: 'pending' },
+    approval: { label: tr.deals.pendingApproval[$lang], cls: 'approval' },
+    done: { label: tr.deals.statusDone[$lang], cls: 'done' }
+  });
 
   const progressVariant = $derived(
     deal.status === 'done' ? 'green' : deal.status === 'pending' ? 'pink' : ''
@@ -42,7 +43,7 @@
   <div class="chips">
     <span class="chip">{deal.category}</span>
     {#if deal.pendingApprovalCount > 0}
-      <span class="chip warn">⚡ {deal.pendingApprovalCount} לאישור</span>
+      <span class="chip warn">⚡ {deal.pendingApprovalCount} {tr.deals.approvalCount[$lang]}</span>
     {/if}
   </div>
 
@@ -52,7 +53,7 @@
 
   <!-- Progress -->
   <div class="prog-header">
-    <span class="prog-label">משימות הושלמו</span>
+    <span class="prog-label">{tr.deals.missionsCompleted[$lang]}</span>
     <span class="prog-pct">{deal.progressPct}%</span>
   </div>
   <div class="prog-track">
@@ -65,15 +66,15 @@
   <!-- Meta -->
   <div class="meta">
     <div class="meta-item">
-      <div class="ml">עלות כוללת</div>
+      <div class="ml">{tr.deals.totalCost[$lang]}</div>
       <div class="mv gold">₪ {deal.totalCost.toLocaleString()}</div>
     </div>
     <div class="meta-item">
-      <div class="ml">שולם</div>
+      <div class="ml">{tr.deals.paid[$lang]}</div>
       <div class="mv">₪ {deal.paid.toLocaleString()}</div>
     </div>
     <div class="meta-item">
-      <div class="ml">סיום משוער</div>
+      <div class="ml">{tr.deals.estimatedEnd[$lang]}</div>
       <div class="mv">{deal.endDate}</div>
     </div>
   </div>

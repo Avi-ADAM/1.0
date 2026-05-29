@@ -102,9 +102,11 @@
     return arr;
   }
 
+  import tr from '$lib/translations/tr.json';
+
   let selected = $state([]);
 
-  const placeholder = `${$lang == 'he' ? 'דרכי יצירה מתאימות' : 'ways of creation'}`;
+  const placeholder = tr.reg.workwaysPlaceholder[$lang];
 
   let userName_value = $state();
   let show_value = 0;
