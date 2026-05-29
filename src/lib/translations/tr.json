@@ -1172,5 +1172,17 @@
             "en": "Timeline",
             "ar": "الجدول الزمني"
         }
+    },
+    "pages": {
+        "homeTitle": {
+            "he": "1lev1 - ליצור יחד, בהסכמה",
+            "en": "1lev1 - Create Together, by Agreement",
+            "ar": "1lev1 - نبني معاً، بالاتفاق"
+        },
+        "homeDescription": {
+            "he": "פלטפורמה לשיתוף פעולה הוגן — משימות, חלוקת רווחים ושקיפות מלאה",
+            "en": "Fair collaboration platform — missions, profit sharing and full transparency",
+            "ar": "منصة للتعاون العادل — مهام، تقاسم الأرباح والشفافية"
+        }
     }
 }
