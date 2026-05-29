@@ -88,7 +88,8 @@ export const timerLogUpdateConfig: ActionConfig = {
         metadata: {
             priority: 'low',
             type: 'timerEdit',
-            url: '/lev?project={{projectId}}'
+            url: '/lev?project={{projectId}}',
+            originClientId: '{{originClientId}}'
         }
     },
 

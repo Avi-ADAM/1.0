@@ -1,0 +1,61 @@
+<script lang="ts">
+  import { lang } from '$lib/stores/lang.js';
+
+  interface Props {
+    votes: number;
+    urgent: number;
+    suggestions: number;
+    activePurchases: number;
+    activeSales: number;
+  }
+
+  let { votes, urgent, suggestions, activePurchases, activeSales }: Props = $props();
+
+  const t = {
+    he: {
+      votes: 'הצבעות',
+      urgent: 'דחוף',
+      suggestions: 'הצעות',
+      purchases: 'קניות',
+      sales: 'מכירות'
+    },
+    en: {
+      votes: 'Votes',
+      urgent: 'Urgent',
+      suggestions: 'Proposals',
+      purchases: 'Purchases',
+      sales: 'Sales'
+    }
+  };
+
+  let labels = $derived(t[$lang as keyof typeof t] ?? t.he);
+
+  const chips = $derived([
+    { icon: '🗳', count: votes,           label: labels.votes,       href: '/kind/vote',       red: false,        pulse: urgent > 0 },
+    { icon: '⏰', count: urgent,          label: labels.urgent,      href: '/kind/vote',       red: urgent > 0,   pulse: urgent > 0 },
+    { icon: '💼', count: suggestions,     label: labels.suggestions, href: '/kind/suggestion', red: false,        pulse: false },
+    { icon: '🛒', count: activePurchases, label: labels.purchases,   href: '/kind/sale',       red: false,        pulse: false },
+    { icon: '💰', count: activeSales,     label: labels.sales,       href: '/kind/sale',       red: false,        pulse: false }
+  ]);
+</script>
+
+<nav
+  dir="rtl"
+  aria-label="סיכום פעילות"
+  class="sticky top-0 z-30 flex flex-wrap gap-2 px-3 py-2 bg-bluesun/90 backdrop-blur-sm border-b border-white/10 shadow-sm"
+>
+  {#each chips as chip (chip.label)}
+    <a
+      href={chip.href}
+      class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium no-underline transition-all
+             {chip.red && chip.count > 0
+               ? 'bg-red-500/20 text-red-300 border border-red-400/40 hover:bg-red-500/30'
+               : 'bg-white/10 text-white/80 border border-white/15 hover:bg-white/20'}
+             {chip.pulse && chip.count > 0 ? 'animate-pulse' : ''}"
+    >
+      <span class="text-base leading-none">{chip.icon}</span>
+      <span class="font-bold">{chip.count}</span>
+      <span class="opacity-70">{chip.label}</span>
+    </a>
+  {/each}
+</nav>

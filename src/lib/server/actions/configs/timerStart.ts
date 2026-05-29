@@ -108,7 +108,8 @@ export const timerStartConfig: ActionConfig = {
         metadata: {
             priority: 'normal',
             type: 'timerUpdate',
-            url: '/lev?project={{projectId}}'
+            url: '/lev?project={{projectId}}',
+            originClientId: '{{originClientId}}'
         }
     },
 

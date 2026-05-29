@@ -81,12 +81,27 @@ export function initialWebSocketForTimer(id, fetch) {
     timerUnsubscribe = socketClient.onNotification((notification) => {
         console.log('[Timers] Received notification:', notification);
 
-        // Check if this is a timer-related notification
+        // Check if this is a timer-related notification.
+        // Covers all timer events: 'timerUpdate' (start/stop/save) and
+        // 'timerEdit' (log edits / clear / task changes). Previously only
+        // 'timerUpdate' was handled, so parallel time-edits never synced.
         const meta = notification.metadata || {};
         const notificationType = meta.type;
+        const isTimerNotification =
+            typeof notificationType === 'string' && notificationType.startsWith('timer');
 
-        if (notificationType === 'timerUpdate') {
-            console.log('[Timers] Timer update notification received');
+        if (isTimerNotification) {
+            // Skip our own echo: if this notification originated from this very
+            // browser tab, we already applied the change optimistically. Other
+            // devices/tabs of the same user have a different clientId and still sync.
+            const myClientId =
+                typeof window !== 'undefined' ? window.__timerClientId : undefined;
+            if (meta.originClientId && myClientId && meta.originClientId === myClientId) {
+                console.log('[Timers] Ignoring self-originated timer echo');
+                return;
+            }
+
+            console.log('[Timers] Timer update notification received:', notificationType);
 
             // Debounce the fetchTimers call to prevent multiple rapid fetches
             if (fetchTimeout) {

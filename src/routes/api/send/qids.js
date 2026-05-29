@@ -7453,6 +7453,208 @@ export const moachQids = {
 };
 
 export const qids = {
+  '85levHubSummary': `query LevHubSummary($idL: ID!) {
+  usersPermissionsUser(id: $idL) {
+    data {
+      id
+      attributes {
+        username
+        hervachti
+        profilePic {
+          data {
+            attributes {
+              url
+            }
+          }
+        }
+        # Purchases (user as buyer)
+        sheiruts(filters: { archived: { eq: false }, isApruved: { eq: true } }) {
+          data {
+            id
+            attributes {
+              moneyTransfered
+              productExepted
+            }
+          }
+        }
+        # Active missions count (proxy for suggestions KPI)
+        mesimabetahaliches(
+          filters: { forappruval: { eq: false }, finnished: { eq: false } }
+        ) {
+          data {
+            id
+          }
+        }
+        projects_1s {
+          data {
+            id
+            attributes {
+              # Mission applications – members vote via pendms.users (ordered)
+              pendms(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    timegrama {
+                      data {
+                        attributes {
+                          date
+                        }
+                      }
+                    }
+                    negopendmissions {
+                      data {
+                        id
+                      }
+                    }
+                    users {
+                      what
+                      order
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              # Completion approvals – members vote via finiapruvals.vots (no order)
+              finiapruvals(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    timegrama {
+                      data {
+                        attributes {
+                          date
+                        }
+                      }
+                    }
+                    vots {
+                      what
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              # Resource requests – members vote via askms.vots (no order)
+              askms(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    vots {
+                      what
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              # Resource approvals – members vote via maaps.vots (no order)
+              maaps(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    vots {
+                      what
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              # Project decisions – members vote via decisions.vots (no orderon, any vote counts)
+              decisions(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    vots {
+                      what
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              # Split proposals – members vote via tosplits.vots (ordered)
+              tosplits(filters: { finished: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    vots {
+                      what
+                      order
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              # Service purchase requests – members vote via sheirutpends.votes (relational, ordered)
+              sheirutpends(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    timegrama {
+                      data {
+                        attributes {
+                          date
+                        }
+                      }
+                    }
+                    votes {
+                      data {
+                        id
+                        attributes {
+                          what
+                          order
+                          users_permissions_user {
+                            data {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              # Sales (user as seller)
+              sheiruts(
+                filters: { archived: { eq: false }, isApruved: { eq: true } }
+              ) {
+                data {
+                  id
+                  attributes {
+                    moneyTransfered
+                    productExepted
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`,
+
   ...qids_base,
   ...moachQids
 };
