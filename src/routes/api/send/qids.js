@@ -652,143 +652,389 @@ const qids_base = {
   }
  }
 `,
+  // ── Consensus / Negotiation qids ──────────────────────────────────────────
+  // Note: voters is a JSON field (array of voter-ids), not a relation.
+  // New fields added in Strapi migration: visibility, shareToken, isLocal,
+  // scaleMin, scaleMax, places (→Cuntry), isAnchor, pole, kind,
+  // relativePlacement, authorExternalId, authorType on Position,
+  // and the Argument content-type.
+
   '39GetNegotiation': `
-      query GetNegotiation($id: ID!) {
-        negotiation(id: $id) {
-          data {
-            id
-            attributes {
-              topic
-              description
-              status
-              maxRounds
-              currentRound
-              creator {
-                data {
-                  attributes {
-                    username
-                    email
-                  }
+    query GetNegotiation($id: ID!) {
+      negotiation(id: $id) {
+        data {
+          id
+          attributes {
+            topic
+            description
+            status
+            maxRounds
+            currentRound
+            visibility
+            shareToken
+            isLocal
+            scaleMin
+            scaleMax
+            places {
+              data {
+                id
+                attributes { name }
+              }
+            }
+            creator {
+              data {
+                attributes {
+                  username
+                  email
                 }
               }
-              positions {
-                data {
-                  id
-                  attributes {
-                    heading
-                    description
-                    aiMeta
-                    author{
-                    data{
-                      attributes{
+            }
+            positions {
+              data {
+                id
+                attributes {
+                  heading
+                  description
+                  aiMeta
+                  author {
+                    data {
+                      attributes {
                         username
                         email
                       }
                     }
                   }
-                    authorEmail
-                    votes
-                    voters{
-                    data{
-                      attributes{
-                        username
-                        email
-                      }
-                    }
-                  }
-                    location
-                    intensity
-                    tags{
-                    data{
-                      attributes{
-                        name
-                      }
-                    }
-                  }
-                    order
-                  }
+                  authorEmail
+                  authorExternalId
+                  authorType
+                  votes
+                  voters
+                  location
+                  intensity
+                  tags
+                  order
+                  isAnchor
+                  pole
+                  kind
+                  relativePlacement
                 }
               }
-              participants {
-                data {
-                  id
-                  attributes {
-                    username
-                    email
-                  }
+            }
+            participants {
+              data {
+                id
+                attributes {
+                  username
+                  email
                 }
               }
             }
           }
         }
       }
-    `,
+    }
+  `,
+
+  // arg: { topic, description, maxRounds, status, currentRound, createdBy,
+  //        createdByEmail, ownerExternalId, visibility, shareToken, isLocal,
+  //        placeIds, publishedAt }
+  // Registered users only (no service token).
   '40CreateNegotiation': `
-      mutation CreateNegotiation($data: NegotiationInput!) {
-        createNegotiation(data: $data) {
-          data {
-            id
-            attributes {
-              topic
-              description
-            }
+    mutation CreateNegotiation(
+      $topic: String!,
+      $description: String,
+      $status: String,
+      $maxRounds: Int,
+      $currentRound: Int,
+      $createdBy: ID,
+      $createdByEmail: String,
+      $ownerExternalId: String,
+      $visibility: ENUM_NEGOTIATION_VISIBILITY,
+      $shareToken: String,
+      $isLocal: Boolean,
+      $placeIds: [ID],
+      $publishedAt: DateTime
+    ) {
+      createNegotiation(data: {
+        topic: $topic,
+        description: $description,
+        status: $status,
+        maxRounds: $maxRounds,
+        currentRound: $currentRound,
+        creator: $createdBy,
+        createdByEmail: $createdByEmail,
+        ownerExternalId: $ownerExternalId,
+        visibility: $visibility,
+        shareToken: $shareToken,
+        isLocal: $isLocal,
+        places: $placeIds,
+        publishedAt: $publishedAt
+      }) {
+        data {
+          id
+          attributes {
+            topic
+            shareToken
           }
         }
       }
-    `,
+    }
+  `,
+
+  // arg: { negotiationId, heading, description, author (ID), authorEmail,
+  //        location, order, intensity, votes, voters (JSON), aiMeta, tags,
+  //        kind, pole, isAnchor, relativePlacement, publishedAt,
+  //        __identity (service path only — injected by server) }
+  // Server injects authorEmail/authorExternalId/authorType from __identity for service calls.
   '41CreatePosition': `
-      mutation CreatePosition($data: PositionInput!) {
-        createPosition(data: $data) {
-          data {
-            id
-            attributes {
-              heading
-              description
-              aiMeta
-              author{
-              data{
-                attributes{
-                  username
-                  email
-                }
-              }
-            }
-              votes
-              voters{
-              data{
-                attributes{
-                  username
-                  email
-                }
-              }
-            }
-              location
-              order
-            }
+    mutation CreatePosition(
+      $negotiationId: ID!,
+      $heading: String!,
+      $description: String,
+      $author: ID,
+      $authorEmail: String,
+      $authorExternalId: String,
+      $authorType: ENUM_POSITION_AUTHORTYPE,
+      $location: Int,
+      $order: Int,
+      $intensity: Int,
+      $votes: Int,
+      $voters: JSON,
+      $aiMeta: JSON,
+      $tags: JSON,
+      $kind: ENUM_POSITION_KIND,
+      $pole: ENUM_POSITION_POLE,
+      $isAnchor: Boolean,
+      $relativePlacement: JSON,
+      $publishedAt: DateTime
+    ) {
+      createPosition(data: {
+        negotiation: $negotiationId,
+        heading: $heading,
+        description: $description,
+        author: $author,
+        authorEmail: $authorEmail,
+        authorExternalId: $authorExternalId,
+        authorType: $authorType,
+        location: $location,
+        order: $order,
+        intensity: $intensity,
+        votes: $votes,
+        voters: $voters,
+        aiMeta: $aiMeta,
+        tags: $tags,
+        kind: $kind,
+        pole: $pole,
+        isAnchor: $isAnchor,
+        relativePlacement: $relativePlacement,
+        publishedAt: $publishedAt
+      }) {
+        data {
+          id
+          attributes {
+            heading
+            description
+            votes
+            voters
+            location
+            order
+            kind
+            pole
+            isAnchor
+            authorType
+            authorExternalId
           }
         }
       }
-    `,
+    }
+  `,
+
+  // Editing only (heading / description / location by registered owner via JWT).
+  // Voting (support: true) is intercepted by +server.js and handled server-side
+  // with idempotent read-then-write logic — the qid string is never sent to Strapi.
   '42UpdatePosition': `
-      mutation UpdatePosition($id: ID!, $data: PositionInput!) {
-        updatePosition(id: $id, data: $data) {
-          data {
-            id
-            attributes {
-              votes
-              voters{
-              data{
-                attributes{
-                  username
-                  email
-                }
-              }
-            }
-            }
+    mutation UpdatePosition($id: ID!, $heading: String, $description: String, $location: Int) {
+      updatePosition(id: $id, data: {
+        heading: $heading,
+        description: $description,
+        location: $location
+      }) {
+        data {
+          id
+          attributes {
+            heading
+            description
+            location
+            votes
+            voters
           }
         }
       }
-    `,
+    }
+  `,
+
+  // ── New consensus qids ────────────────────────────────────────────────────
+
+  // arg: { token }  — accessible to guests via share-link
+  'GetNegotiationByToken': `
+    query GetNegotiationByToken($token: String!) {
+      negotiations(filters: { shareToken: { eq: $token } }) {
+        data {
+          id
+          attributes {
+            topic
+            description
+            status
+            maxRounds
+            currentRound
+            visibility
+            shareToken
+            isLocal
+            scaleMin
+            scaleMax
+            places { data { id attributes { name } } }
+            creator { data { attributes { username email } } }
+            positions {
+              data {
+                id
+                attributes {
+                  heading
+                  description
+                  aiMeta
+                  authorEmail
+                  authorExternalId
+                  authorType
+                  votes
+                  voters
+                  location
+                  intensity
+                  order
+                  isAnchor
+                  pole
+                  kind
+                  relativePlacement
+                }
+              }
+            }
+            participants { data { id attributes { username email } } }
+          }
+        }
+      }
+    }
+  `,
+
+  // arg: { placeId }
+  'ListLocalNegotiations': `
+    query ListLocalNegotiations($placeId: ID!) {
+      negotiations(filters: {
+        places: { id: { eq: $placeId } },
+        visibility: { in: ["local", "unlisted"] }
+      }) {
+        data {
+          id
+          attributes {
+            topic
+            description
+            currentRound
+            maxRounds
+            visibility
+            shareToken
+            positions { data { id } }
+          }
+        }
+      }
+    }
+  `,
+
+  // arg: { positionId }
+  'ListArguments': `
+    query ListArguments($positionId: ID!) {
+      arguments(
+        filters: { position: { id: { eq: $positionId } } },
+        sort: ["votes:desc"]
+      ) {
+        data {
+          id
+          attributes {
+            body
+            stance
+            votes
+            voters
+            authorName
+            authorType
+            createdAt
+          }
+        }
+      }
+    }
+  `,
+
+  // arg: { negotiationId, positionId, stance, body, publishedAt,
+  //        __identity (server injects authorName/Email/ExternalId/Type) }
+  'CreateArgument': `
+    mutation CreateArgument(
+      $negotiationId: ID!,
+      $positionId: ID!,
+      $stance: ENUM_ARGUMENT_STANCE!,
+      $body: String!,
+      $authorName: String,
+      $authorEmail: String,
+      $authorExternalId: String,
+      $authorType: ENUM_ARGUMENT_AUTHORTYPE,
+      $publishedAt: DateTime
+    ) {
+      createArgument(data: {
+        negotiation: $negotiationId,
+        position: $positionId,
+        stance: $stance,
+        body: $body,
+        authorName: $authorName,
+        authorEmail: $authorEmail,
+        authorExternalId: $authorExternalId,
+        authorType: $authorType,
+        votes: 0,
+        voters: [],
+        publishedAt: $publishedAt
+      }) {
+        data {
+          id
+          attributes {
+            body
+            stance
+            votes
+            voters
+            authorName
+            authorType
+          }
+        }
+      }
+    }
+  `,
+
+  // Voting (support: true) intercepted by server for idempotent handling.
+  // Editing (body update) uses this qid directly — not in consensus spec yet.
+  'UpdateArgument': `
+    mutation UpdateArgument($id: ID!, $body: String) {
+      updateArgument(id: $id, data: { body: $body }) {
+        data {
+          id
+          attributes { votes voters body }
+        }
+      }
+    }
+  `,
+
+  // arg: {}  — returns all Cuntry records as "places"
+  'ListPlaces': `
+    query ListPlaces {
+      cuntries {
+        data {
+          id
+          attributes { name }
+        }
+      }
+    }
+  `,
   "43updateProfilePic": `
 mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
   updateProject(
