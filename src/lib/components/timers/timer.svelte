@@ -1,7 +1,7 @@
 <script>
   import { startTimer, stopTimer } from '$lib/func/timers.js';
   import NumberFlow, { NumberFlowGroup } from '@number-flow/svelte';
-  import { onDestroy, untrack } from 'svelte';
+  import { untrack } from 'svelte';
   import { page } from '$app/state';
   import { timers, updateTimers, lockTimerForEdit } from '$lib/stores/timers';
   import { lang } from '$lib/stores/lang';
@@ -41,46 +41,38 @@
 
   // 2. Local Display State
   let localZman = $state(0);
-  let timerInterval = null; // Changed from $state() to regular variable to avoid effect dependency loop
 
-  // 3. Reactive effect to manage the visual timer loop
-  // This automatically runs whenever the store changes `isRunning`, `storeTotalHours`, or `storeTimers`
+  // Clock is defined by two *primitive values*: the running segment's start time
+  // and the accumulated base hours. Deriving these as primitives means a remote
+  // refresh that replaces the timer object WITHOUT changing the running segment
+  // will NOT re-trigger the effect below (Svelte short-circuits equal derived
+  // values), so the ticking interval stays stable — no jump / double animation.
+  let runningStartMs = $derived(
+    isRunning && storeTimers.length > 0
+      ? new Date(storeTimers[storeTimers.length - 1].start).getTime()
+      : null
+  );
+  let baseMs = $derived(storeTotalHours * 3600000);
+
+  // 3. Reactive effect to manage the visual timer loop.
+  // Re-runs only when the clock-defining values actually change.
   $effect(() => {
-    // If running, we calculate time based on start time + accumulated
-    if (isRunning) {
-      if (storeTimers.length > 0) {
-        const lastTimer = storeTimers[storeTimers.length - 1];
-        const startTime = new Date(lastTimer.start).getTime();
+    const start = runningStartMs;
+    const base = baseMs;
 
-        // Immediate update
-        localZman = Date.now() - startTime + storeTotalHours * 3600000;
-
-        // Start interval if not already running
-        if (!timerInterval) {
-          timerInterval = setInterval(() => {
-            localZman = Date.now() - startTime + storeTotalHours * 3600000;
-          }, 100);
-        }
-      }
-    } else {
-      // If stopped, just show the stored total hours
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
-      localZman = storeTotalHours * 3600000;
-
-      // Update formatted time when stopped (for dialogs)
-      const { hours, minutes, seconds } = getTimeComponents(localZman);
-      elapsedTime = `${hours}:${minutes}:${seconds}`;
+    if (start != null) {
+      const tick = () => {
+        localZman = Date.now() - start + base;
+      };
+      tick(); // immediate update
+      const id = setInterval(tick, 100);
+      return () => clearInterval(id);
     }
 
-    return () => {
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
-    };
+    // Stopped: show stored total and refresh formatted time (for dialogs)
+    localZman = base;
+    const { hours, minutes, seconds } = getTimeComponents(localZman);
+    elapsedTime = `${hours}:${minutes}:${seconds}`;
   });
 
   // Initialize selected tasks when timer loads
@@ -217,10 +209,7 @@
     }
   }
 
-  // Cleanup
-  onDestroy(() => {
-    if (timerInterval) clearInterval(timerInterval);
-  });
+  // Cleanup: the $effect above owns the interval and tears it down on destroy.
 
   function getTimeComponents(milliseconds) {
     if (!milliseconds) return { hours: 0, minutes: 0, seconds: 0 };

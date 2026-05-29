@@ -143,7 +143,7 @@ export const timerSaveConfig: ActionConfig = {
             body: { he: 'השעות נוספו למשימה בהצלחה', en: 'Hours have been added to the mission', ar: 'تمت إضافة الساعات إلى المهمة' }
         },
         channels: ['socket', 'push'],
-        metadata: { priority: 'normal', type: 'timerUpdate', url: '/lev?project={{projectId}}' }
+        metadata: { priority: 'normal', type: 'timerUpdate', url: '/lev?project={{projectId}}', originClientId: '{{originClientId}}' }
     },
 
     updateStrategy: {

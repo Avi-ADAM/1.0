@@ -201,6 +201,24 @@
     orders = checkLines($timers);
   });
 
+  // Preserve the scroll position across $timers updates. Starting/stopping a timer
+  // replaces the whole array, which reflows the absolutely-positioned radial layout;
+  // because the container scrolls smoothly the browser can't anchor it and jumps
+  // (e.g. to the bottom). Capture before the DOM flush and restore right after.
+  let savedScroll = { left: 0, top: 0 };
+  $effect.pre(() => {
+    $timers; // track changes
+    const el = document.getElementById('screen');
+    if (el) savedScroll = { left: el.scrollLeft, top: el.scrollTop };
+  });
+  $effect(() => {
+    $timers; // track changes
+    const el = document.getElementById('screen');
+    if (el && (el.scrollLeft !== savedScroll.left || el.scrollTop !== savedScroll.top)) {
+      el.scrollTo({ left: savedScroll.left, top: savedScroll.top, behavior: 'auto' });
+    }
+  });
+
   // פונקציה נפרדת למירכוז התצוגה - מאפשרת קריאה חוזרת אם צריך
   function centerViewOnLoad() {
     setTimeout(() => {

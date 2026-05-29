@@ -2,6 +2,18 @@ import { sendToSer } from './../send/sendToSer.js';
 const browser = typeof window !== 'undefined';
 
 /**
+ * Normalize an action result into the bare timer entity ({ id, attributes }).
+ * The action endpoint returns the raw GraphQL `data` (e.g. { updateTimer: { data } }
+ * or { createTimer: { data } }), but the timers store expects activeTimer.data to be
+ * the entity itself. Without this, updateStore() would receive the wrong shape and
+ * the live clock would read 0.
+ */
+function unwrapTimerResult(res) {
+  if (!res) return res;
+  return res.createTimer?.data ?? res.updateTimer?.data ?? res;
+}
+
+/**
  * Executes a timer action via the unified action system.
  * 
  * @param {string} actionType - 'timerStart', 'timerStop', or 'timerSave'
@@ -15,6 +27,14 @@ async function executeTimerAction(actionType, params, fetchFn = null) {
   
   try {
     const useFetch = fetchFn || fetch;
+
+    // Tag the action with this tab's client id (browser only) so the resulting
+    // socket notification can be ignored by the originating tab (echo-suppression).
+    // Server-side callers (Telegram bot) have no clientId, so all browsers sync.
+    if (browser && typeof window !== 'undefined' && window.__timerClientId) {
+      params = { ...params, originClientId: window.__timerClientId };
+    }
+
     const bodyPayload = {
       actionKey: actionType,
       params
@@ -96,8 +116,8 @@ export async function startTimer(activeTimer, missionID, uId, pId, fetch, timerI
     console.log("Timer is already active");
     return activeTimer.data;
   }
-  
-  return await executeTimerAction('timerStart', params, fetch);
+
+  return unwrapTimerResult(await executeTimerAction('timerStart', params, fetch));
 }
 
 // Function to stop the timer
@@ -138,7 +158,7 @@ export async function stopTimer(timer, fetch, isSer = false, projectId = '', use
         isSer: isSer
       };
 
-      return await executeTimerAction('timerStop', params, fetch);
+      return unwrapTimerResult(await executeTimerAction('timerStop', params, fetch));
     }
   }
   return timer;
@@ -277,9 +297,9 @@ export async function updateTimer(timer, whatToUpdate, params = {}, fetch, proje
         isSer: params.isSer
       };
       
-      return await executeTimerAction('timerLogUpdate', updateParams, fetch);
+      return unwrapTimerResult(await executeTimerAction('timerLogUpdate', updateParams, fetch));
     }
-    
+
     case 'tasks': {
       const paramsToUpdate = {
         timerId: timer.id.toString(),
@@ -289,9 +309,9 @@ export async function updateTimer(timer, whatToUpdate, params = {}, fetch, proje
         isSer: params.isSer
       };
       
-      return await executeTimerAction('timerLogUpdate', paramsToUpdate, fetch);
+      return unwrapTimerResult(await executeTimerAction('timerLogUpdate', paramsToUpdate, fetch));
     }
-    
+
     default:
       console.warn(`[Timers] Unknown update type: ${whatToUpdate}`);
       return null;
@@ -314,7 +334,7 @@ export async function handleClearSingle(index, timer, fetch, isSer = false, proj
   
   const timerData = timer.attributes?.activeTimer?.data || timer;
 
-  return await executeTimerAction('timerLogUpdate', {
+  return unwrapTimerResult(await executeTimerAction('timerLogUpdate', {
     timerId: timerData.id.toString(),
     projectId: projectId.toString(),
     userId: userId.toString(),
@@ -322,7 +342,7 @@ export async function handleClearSingle(index, timer, fetch, isSer = false, proj
     totalHours: newTotal,
     timers: timers.map(t => ({ start: t.start, stop: t.stop })),
     isSer: isSer
-  }, fetch);
+  }, fetch));
 }
 
 /**
@@ -330,7 +350,7 @@ export async function handleClearSingle(index, timer, fetch, isSer = false, proj
  */
 export async function handleClearAll(timer, fetch, isSer = false, projectId = '', userId = '') {
   const timerData = timer.attributes?.activeTimer?.data || timer;
-  return await executeTimerAction('timerLogUpdate', {
+  return unwrapTimerResult(await executeTimerAction('timerLogUpdate', {
     timerId: timerData.id.toString(),
     projectId: projectId.toString(),
     userId: userId.toString(),
@@ -338,7 +358,7 @@ export async function handleClearAll(timer, fetch, isSer = false, projectId = ''
     totalHours: 0,
     timers: [],
     isSer: isSer
-  }, fetch);
+  }, fetch));
 }
 
 /**

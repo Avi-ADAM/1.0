@@ -12,8 +12,7 @@
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { goto } from '$app/navigation';
   import { idPr } from '../../stores/idPr.js';
-  import { onMount, onDestroy } from 'svelte';
-  import { betha } from './storess/betha.js';
+  import { onMount } from 'svelte';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import { timers, updateTimers, lockTimerForEdit } from '$lib/stores/timers.js';
   import { startTimer } from '$lib/func/timers.js';
@@ -99,16 +98,82 @@
     onModal
   } = $props();
   const baseUrl = import.meta.env.VITE_URL;
-  let storeTimer = $state();
-  let localZman = $derived(storeTimer?.zman || 0);
-  let isRunning = $derived(storeTimer?.running || false);
+
+  // ===== Single source of truth: the $timers store =====
+  // All timer state is DERIVED from the store (same model as timer.svelte).
+  // No local clock, no parallel mutable state — so remote socket updates from
+  // other devices/tabs reflect here immediately and the animation can't desync.
+  let storeTimer = $derived($timers?.find((t) => t.mId == mId));
+  let isRunning = $derived(!!storeTimer?.running);
+  let activeTimerData = $derived(
+    storeTimer?.attributes?.activeTimer?.data?.attributes
+  );
+  let storeTotalHours = $derived(activeTimerData?.totalHours || 0);
+  let storeTimers = $derived(activeTimerData?.timers || []);
+
+  // Live display clock, defined by primitive values so a remote refresh that
+  // doesn't change the running segment won't restart the interval (no jump).
+  let localZman = $state(0);
+  let runningStartMs = $derived(
+    isRunning && storeTimers.length > 0
+      ? new Date(storeTimers[storeTimers.length - 1].start).getTime()
+      : null
+  );
+  let baseMs = $derived(storeTotalHours * 3600000);
+  $effect(() => {
+    const start = runningStartMs;
+    const base = baseMs;
+    if (start != null) {
+      const tick = () => {
+        localZman = Date.now() - start + base;
+      };
+      tick();
+      const id = setInterval(tick, 100);
+      return () => clearInterval(id);
+    }
+    localZman = base;
+    const { hours, minutes, seconds } = getTimeComponents(localZman);
+    elapsedTime = `${hours}:${minutes}:${seconds}`;
+  });
+
+  // Mirror the live clock / store into the bindable props the coin + card read.
+  let running = $derived(isRunning);
+  $effect(() => {
+    zman = localZman;
+  });
+  $effect(() => {
+    lapse = localZman;
+  });
+  $effect(() => {
+    const h = storeTimer?.attributes?.howmanyhoursalready;
+    if (h !== undefined && h !== null) hoursdon = h;
+  });
+
+  // Helper: write a timer update back to the global store (optimistic + result).
+  function updateStore(isRun, res = null) {
+    updateTimers(
+      $timers.map((t) =>
+        t.mId === mId
+          ? {
+              ...t,
+              running: isRun,
+              attributes: {
+                ...t.attributes,
+                activeTimer: {
+                  ...t.attributes.activeTimer,
+                  data: res || t.attributes.activeTimer?.data,
+                  isActive: isRun
+                }
+              }
+            }
+          : t
+      )
+    );
+  }
+
   function percentage(partialValue, totalValue) {
     return (100 * partialValue) / totalValue;
   }
-  let tdtd = [];
-  betha.subscribe((value) => {
-    tdtd = value;
-  });
 
   let show = true;
   let dialogOpen = $state(false);
@@ -148,6 +213,7 @@
 
   let miatan;
   onMount(async () => {
+    // Normalize `status` into the [value] array shape the RangeSlider expects.
     if (status == null) {
       status = 0;
     }
@@ -158,48 +224,10 @@
       status = status;
     }
 
-    // Get current timer from store - use loose equality (==) for string/number comparison
-    const currentTimer = $timers.find((t) => t.mId == mId);
-
-    if (currentTimer?.attributes?.activeTimer?.data) {
-      const timerData = currentTimer.attributes.activeTimer.data;
-
-      if (timerData.attributes.isActive) {
-        console.log('Timer is running', timerData);
-
-        // Get the timers array from the timer data
-        let timers = timerData.attributes.timers;
-
-        if (timers && timers.length > 0) {
-          // Get the most recent timer entry
-          let lastTimer = timers[timers.length - 1];
-
-          // Calculate elapsed time since the last start
-          let startTime = new Date(lastTimer.start).getTime();
-          let currentTime = Date.now();
-
-          // Update local state
-          lapse =
-            currentTime - startTime + timerData.attributes.totalHours * 3600000;
-          running = true;
-
-          // Start the timer interval
-          const startTime2 = Date.now() - lapse;
-          timer = setInterval(() => {
-            lapse = Date.now() - startTime2;
-          }, 1);
-        }
-      } else if (timerData.attributes.isActive == false) {
-        console.log('Timer is stopped', timerData);
-        let totalHours = timerData.attributes.totalHours;
-        x = totalHours * 3600000;
-        lapse = totalHours * 3600000;
-        running = false;
-      }
-    }
-
+    // Initialize selected tasks from the active timer (display state is derived
+    // live from the store via the $effect block above — no manual interval here).
     selectedTasks =
-      currentTimer?.attributes?.activeTimer?.data?.attributes?.acts?.data?.map(
+      storeTimer?.attributes?.activeTimer?.data?.attributes?.acts?.data?.map(
         (task) => task.id
       ) ?? [];
   });
@@ -211,75 +239,38 @@
     nutifi("1💗1 טיימר נעצר",text,"lev" )
         }**/
 
-  let timer;
-  let running = $state(false);
   let error1;
 
   async function azor() {
-    clearInterval(timer);
-    running = false;
-    zmani += lapse;
-    x += lapse;
-    lapse = 0;
-    //  tdtd[coinlapach - 1].stname = 'stopi';
-    //  tdtd[coinlapach - 1].timer = x;
-    //  tdtd[coinlapach - 1].hoursdon = false;
-    //  tdtd[coinlapach - 1].ch = true;
-    //  tdtd[coinlapach - 1].x = x;
-    //  tdtd[coinlapach - 1].lapse = 0;
-    //  betha.set(tdtd);
+    const timerDataToStop = storeTimer?.attributes?.activeTimer?.data;
+    if (!timerDataToStop) return;
 
+    // 1. Optimistic stop (UI reflects the store immediately)
+    updateStore(false);
+
+    // 2. Server action (routes through /api/action → broadcasts socket to other devices)
     try {
-      // Get current timer from store
-      const currentTimer = $timers.find((t) => t.mId === mId)?.attributes
-        ?.activeTimer?.data;
+      const result = await stopTimer(
+        timerDataToStop,
+        fetch,
+        false,
+        projectId,
+        page.data.uid
+      );
 
-      if (currentTimer) {
-        // Get user ID from cookie (similar to how start() does it)
-        const cookieValueId = document.cookie
-          .split('; ')
-          .find((row) => row.startsWith('id='))
-          ?.split('=')[1];
+      if (result) {
+        updateStore(false, result);
 
-        const result = await stopTimer(
-          currentTimer,
-          fetch,
-          false,
-          projectId,
-          cookieValueId
-        );
-
-        if (result) {
-          // Update timers store
-          updateTimers(
-            $timers.map((t) =>
-              t.mId === mId
-                ? {
-                    ...t,
-                    running: false,
-                    attributes: {
-                      ...t.attributes,
-                      activeTimer: {
-                        ...t.attributes.activeTimer,
-                        data: result,
-                        isActive: false
-                      }
-                    }
-                  }
-                : t
-            )
-          );
-
-          toast.info(azori[$lang]);
-          const { hours, minutes, seconds } = getTimeComponents(localZman);
-          elapsedTime = `${hours}:${minutes}:${seconds}`;
-          showSaveDialog = true;
-          lockTimerForEdit(mId);
-          dialogEdit = false;
-        }
+        toast.info(azori[$lang]);
+        const { hours, minutes, seconds } = getTimeComponents(localZman);
+        elapsedTime = `${hours}:${minutes}:${seconds}`;
+        showSaveDialog = true;
+        lockTimerForEdit(mId);
+        dialogEdit = false;
       }
     } catch (e) {
       error1 = e;
+      updateStore(true); // revert
       toast.warning(er[$lang]);
       console.error('Error stopping timer:', e);
     }
@@ -298,187 +289,61 @@
     };
   }
   async function start() {
-    const startTime = Date.now() - lapse;
-    timer = setInterval(() => {
-      lapse = Date.now() - startTime;
-    }, 1);
-    running = true;
-    stname = Date.now();
-    // tdtd[coinlapach - 1].stname = stname;
-    // tdtd[coinlapach - 1].timer = x;
-    // tdtd[coinlapach - 1].hoursdon = false;
-    // tdtd[coinlapach - 1].ch = true;
-    // tdtd[coinlapach - 1].x = x;
-    // tdtd[coinlapach - 1].lapse = lapse;
-    // tdtd[coinlapach - 1].running = true;
-    // betha.set(tdtd);
+    const activeTimer = storeTimer?.attributes?.activeTimer;
+    const currentData = activeTimer?.data;
+    const currentTimerId = currentData?.attributes?.saved ? 0 : currentData?.id || 0;
+    const now = new Date().toISOString();
 
+    // 1. Optimistic start: append a new running segment
+    const currentTimers = currentData?.attributes?.timers || [];
+    const optimisticData = {
+      ...currentData,
+      id: currentData?.id,
+      attributes: {
+        ...currentData?.attributes,
+        isActive: true,
+        timers: [...currentTimers, { start: now, stop: null }]
+      }
+    };
+    updateStore(true, optimisticData);
+
+    // 2. Server action (broadcasts socket to other devices/tabs)
     try {
-      // Get current timer from store if exists
-      const currentTimer = $timers.find((t) => t.mId === mId)?.attributes
-        ?.activeTimer;
-      const timerId = currentTimer?.data?.id || 0;
-
-      // Get user ID from cookie
-      const cookieValueId = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('id='))
-        ?.split('=')[1];
-
-      // Start timer using new logic
       const result = await startTimer(
-        currentTimer,
+        activeTimer,
         mId,
-        cookieValueId,
+        page.data.uid,
         projectId,
         fetch,
-        timerId,
+        currentTimerId,
         false
       );
-
-      if (result) {
-        // Update timers store
-        updateTimers(
-          $timers.map((t) =>
-            t.mId === mId
-              ? {
-                  ...t,
-                  running: true,
-                  attributes: {
-                    ...t.attributes,
-                    activeTimer: {
-                      ...t.attributes.activeTimer,
-                      data: result,
-                      isActive: true
-                    }
-                  }
-                }
-              : t
-          )
-        );
-      }
+      if (result) updateStore(true, result);
     } catch (e) {
       error1 = e;
+      updateStore(false); // revert
       console.error('Error starting timer:', e);
     }
   }
 
-  async function handleClearClick() {
-    clearInterval(timer);
-    lapse = 0;
-    x = 0;
-    running = false;
-    // tdtd[coinlapach - 1].stname = '0';
-    // tdtd[coinlapach - 1].timer = 0;
-    // tdtd[coinlapach - 1].hoursdon = false;
-    // tdtd[coinlapach - 1].ch = true;
-    // tdtd[coinlapach - 1].x = 0;
-    // tdtd[coinlapach - 1].lapse = 0;
-    //   tdtd[coinlapach - 1].running = false;
-    // betha.set(tdtd);
+  // Save / clear are handled by the shared TimerDialogs (which routes through the
+  // unified action system and therefore broadcasts to other devices). The card's
+  // onSave/onClear simply open the relevant dialog and lock the timer for editing.
+  function save() {
+    showSaveDialog = true;
+    dialogEdit = false;
+    lockTimerForEdit(mId);
+  }
 
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
-    try {
-      await fetch(linkg, {
-        method: 'POST',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        //add already declined ids
-        body: JSON.stringify({
-          query: `mutation 
-                        { 
-updateMesimabetahalich(
-   id: "${mId}"
-  data: {
-stname: "0",
-timer: 0
+  function handleClearClick() {
+    showClearDialog = true;
+    lockTimerForEdit(mId);
   }
-) {data{id attributes{ stname timer}}}
-}
-`
-        })
-      })
-        .then((r) => r.json())
-        .then((data) => (miCatan = data));
-      console.log(miCatan);
-    } catch (e) {
-      error1 = e;
-      console.log(error1);
-    }
-  }
-  let miCatan = [];
 
   let miDatan;
   let token;
   let bearer1;
-
   let linkg = baseUrl + '/graphql';
-  async function save() {
-    const saved = lapse * 2.7777777777778e-7 + x * 2.7777777777778e-7;
-    const noofnew = hoursdon + saved;
-    hoursdon = noofnew;
-    clearInterval(timer);
-    const msdon = hoursdon * 3600000;
-    zman = msdon;
-    lapse = 0;
-    x = 0;
-    running = false;
-    //   tdtd[coinlapach - 1].stname = '0';
-    //   tdtd[coinlapach - 1].timer = 0;
-    //   tdtd[coinlapach - 1].hoursdon = hoursdon;
-    //   tdtd[coinlapach - 1].ch = true;
-    //   tdtd[coinlapach - 1].x = 0;
-    //   tdtd[coinlapach - 1].lapse = 0;
-    //   tdtd[coinlapach - 1].zman = msdon;
-    //   tdtd[coinlapach - 1].running = false;
-
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
-    try {
-      await fetch(linkg, {
-        method: 'POST',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        //add already declined ids
-        body: JSON.stringify({
-          query: `mutation 
-                        { 
-   updateMesimabetahalich(
-   id: "${mId}"
-  data: {
-   howmanyhoursalready: ${hoursdon},
-   stname: "0",
-    timer: 0
- }
- ) {data{id attributes{ howmanyhoursalready}}}
- }
-`
-        })
-      })
-        .then((r) => r.json())
-        .then((data) => (miDatan = data));
-      console.log(miDatan);
-      betha.set(tdtd);
-    } catch (e) {
-      error1 = e;
-      console.log(error1);
-    }
-  }
 
   // this is a very imperfect way to have the dials rotate smoothly back to 0
   // set a transition on the minutes and seconds dial, but only when lapse is set to 0
@@ -797,31 +662,8 @@ timer: 0
   const success = { he: 'נשמר בהצלחה', en: 'saved successfully' };
   const rega = { he: 'שניה בבקשה', en: 'one moment please' };
   const editButton = { he: 'עריכת הטיימר', en: 'edit Timer' };
-  onDestroy(() => {
-    if (timer) {
-      clearInterval(timer);
-    }
-  });
-  onMount(() => {
-    storeTimer = $timers?.find((t) => t.mId == mId);
-    if (storeTimer) {
-      console.log('Timer found:', storeTimer);
-    } else {
-      console.log('No timer found for missionId:', mId);
-    }
-  });
-
-  // Watch for changes in timers store and update storeTimer reactively
-  $effect(() => {
-    const foundTimer = $timers?.find((t) => t.mId == mId);
-    if (foundTimer && !storeTimer) {
-      storeTimer = foundTimer;
-    }
-  });
-
-  $effect(() => {
-    zman = msdonf + lapse + x;
-  });
+  // storeTimer is derived from $timers, and the live clock drives `zman`/`localZman`
+  // via the $effect block near the top — no manual onMount/interval needed here.
   $effect(() => {
     if (percentage(zman, mstotal) == 90) {
       let text = `שלום ${usernames} נשארו רק עשרה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה`;
@@ -847,11 +689,10 @@ timer: 0
   // multiply the value by 60 for the seconds dial to have a full rotation every second
   let rotation = $derived(((lapse / 1000 / 60) * 360) % 360);
   let op = $state({});
-  let msdonf = $derived(hoursdon * 3600000);
 </script>
 
 <TimerDialogs
-  bind:timer={storeTimer}
+  timer={storeTimer}
   bind:showSaveDialog
   bind:showClearDialog
   bind:showSaveFinal
@@ -861,54 +702,28 @@ timer: 0
   bind:taskSearchTerm
   onUpdate-timer={({ detail }) => {
     if (detail.timer) {
-      storeTimer.attributes.activeTimer.data = detail.timer;
-      storeTimer.attributes.activeTimer.isActive = detail.running;
+      // Write the result back to the global store (single source of truth);
+      // storeTimer/isRunning/zman re-derive automatically.
+      updateStore(detail.running, detail.timer);
 
       if (detail.hoursdon !== undefined) {
-        storeTimer.attributes.howmanyhoursalready = detail.hoursdon;
-      }
-
-      // Update global timers store
-      updateTimers(
-        $timers.map((t) =>
-          t.mId === storeTimer.mId
-            ? {
-                ...t,
-                running: detail.running,
-                attributes: {
-                  ...t.attributes,
-                  howmanyhoursalready:
-                    detail.hoursdon !== undefined
-                      ? detail.hoursdon
-                      : t.attributes.howmanyhoursalready,
-                  activeTimer: {
-                    ...t.attributes.activeTimer,
-                    data: detail.timer,
-                    isActive: detail.running
+        updateTimers(
+          $timers.map((t) =>
+            t.mId === mId
+              ? {
+                  ...t,
+                  attributes: {
+                    ...t.attributes,
+                    howmanyhoursalready: detail.hoursdon
                   }
                 }
-              }
-            : t
-        )
-      );
-
-      // Reset localZman specifically for clear operations
-      if (!detail.running && detail.timer?.attributes?.timers?.length === 0) {
-        storeTimer.zman = 0;
-        localZman = 0;
-      } else {
-        // Otherwise, update based on totalHours (for save, update, etc.)
-        storeTimer.zman = (detail.timer?.attributes?.totalHours || 0) * 3600000;
-        localZman = (detail.timer?.attributes?.totalHours || 0) * 3600000;
+              : t
+          )
+        );
       }
-      // Ensure isRunning state is also updated based on the event
-      isRunning = detail.running;
     } else {
-      // Handle cases where detail.timer might be null or undefined if necessary
       console.warn('update-timer event received without timer data:', detail);
-      storeTimer.zman = 0;
-      localZman = 0; // Default to 0 if timer data is missing
-      isRunning = false;
+      updateStore(false);
     }
   }}
 />
