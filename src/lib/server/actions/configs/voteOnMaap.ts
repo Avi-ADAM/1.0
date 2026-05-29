@@ -104,6 +104,15 @@ const voteOnMaapHandler: ActionExecutionHandler = async (params, context, { stra
 
   const allVots = [...previousVotes, newVote];
 
+  // Vote in Strapi-nested shape for the wegets store (processWeget recomputes counts).
+  const strapiVote: Record<string, any> = {
+    what: Boolean(what),
+    users_permissions_user: { data: { id: strUserId } },
+    ide: parseInt(strUserId, 10),
+    zman: now.toISOString(),
+  };
+  if (why) strapiVote.why = why;
+
   // 4. Check YES consensus: all project members voted YES
   if (what === true) {
     const yesCount = allVots.filter(
@@ -194,13 +203,14 @@ const voteOnMaapHandler: ActionExecutionHandler = async (params, context, { stra
         throw new Error(`voteOnMaap consensus mutation failed: ${JSON.stringify(responseData.errors)}`);
       }
 
+      // Consensus archives the Maap and creates a Rikmash — refresh everywhere.
       return {
         data: {
           askId,
           rikmashId: responseData.data?.createRikmash?.data?.id,
           consensus: true,
         },
-        updateStrategy: { type: 'none' },
+        updateStrategy: { type: 'fullRefresh' },
       };
     }
   }
@@ -208,9 +218,10 @@ const voteOnMaapHandler: ActionExecutionHandler = async (params, context, { stra
   // ── No full YES consensus (or this is a NO vote) — save updated vots ──────
   await strapi.execute('153addVoteToMaap', { id: askId, vots: allVots }, context.jwt, context.fetch);
 
+  // Regular vote: broadcast the single new vote for live count updates everywhere.
   return {
-    data: { askId, consensus: false },
-    updateStrategy: { type: 'none' },
+    data: { id: askId, newVote: strapiVote, consensus: false },
+    updateStrategy: { type: 'partialUpdate', config: { dataKeys: ['wegets'] } },
   };
 };
 

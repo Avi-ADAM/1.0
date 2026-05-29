@@ -82,6 +82,16 @@ const voteOnPmashHandler: ActionExecutionHandler = async (params, context, { str
 
   const allVots = [...previousVotes, newVote];
 
+  // Vote in Strapi-nested shape for the pmashes store (processPmash recomputes counts).
+  const strapiVote: Record<string, any> = {
+    what: Boolean(what),
+    users_permissions_user: { data: { id: strUserId } },
+    order: orderon,
+    ide: parseInt(strUserId, 10),
+    zman: now.toISOString(),
+  };
+  if (why) strapiVote.why = why;
+
   // 5. Count YES votes at orderon among project members
   const yesMemberCount = (() => {
     const yesSet = new Set(
@@ -168,9 +178,10 @@ const voteOnPmashHandler: ActionExecutionHandler = async (params, context, { str
       throw new Error(`voteOnPmash consensus mutation failed: ${JSON.stringify(responseData.errors)}`);
     }
 
+    // Consensus archives the pmash and creates an OpenMashaabim — refresh everywhere.
     return {
       data: { pmashId, consensus: true },
-      updateStrategy: { type: 'none' },
+      updateStrategy: { type: 'fullRefresh' },
     };
   }
 
@@ -190,13 +201,19 @@ const voteOnPmashHandler: ActionExecutionHandler = async (params, context, { str
 
   if (archiveOnNo) {
     await strapi.execute('145archivePmashWithVotes', { id: pmashId, users: allVots }, context.jwt, context.fetch);
-  } else {
-    await strapi.execute('146addVoteToPmash', { id: pmashId, users: allVots }, context.jwt, context.fetch);
+    // Full NO consensus archives the pmash — it must disappear for everyone.
+    return {
+      data: { pmashId, consensus: false, archived: true },
+      updateStrategy: { type: 'fullRefresh' },
+    };
   }
 
+  await strapi.execute('146addVoteToPmash', { id: pmashId, users: allVots }, context.jwt, context.fetch);
+
+  // Regular vote: broadcast the single new vote for live count updates everywhere.
   return {
-    data: { pmashId, consensus: false, archived: archiveOnNo },
-    updateStrategy: { type: 'none' },
+    data: { id: pmashId, newVote: strapiVote, consensus: false, archived: false },
+    updateStrategy: { type: 'partialUpdate', config: { dataKeys: ['pmashes'] } },
   };
 };
 
