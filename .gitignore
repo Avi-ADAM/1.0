@@ -18,3 +18,4 @@ ca.key
 cert.crt
 cert.key
 /brain
+.claude/worktrees/
