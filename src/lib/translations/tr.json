@@ -1184,5 +1184,67 @@
             "en": "Fair collaboration platform — missions, profit sharing and full transparency",
             "ar": "منصة للتعاون العادل — مهام، تقاسم الأرباح والشفافية"
         }
+    },
+    "hub": {
+        "votes": {
+            "he": "הצבעות",
+            "en": "Votes",
+            "ar": "التصويتات"
+        },
+        "urgent": {
+            "he": "דחוף",
+            "en": "Urgent",
+            "ar": "عاجل"
+        },
+        "suggestions": {
+            "he": "הצעות",
+            "en": "Proposals",
+            "ar": "المقترحات"
+        },
+        "purchases": {
+            "he": "קניות",
+            "en": "Purchases",
+            "ar": "المشتريات"
+        },
+        "sales": {
+            "he": "מכירות",
+            "en": "Sales",
+            "ar": "المبيعات"
+        },
+        "activitySummary": {
+            "he": "סיכום פעילות",
+            "en": "Activity Summary",
+            "ar": "ملخص النشاط"
+        },
+        "urgentVoteMsg": {
+            "he": "הצבעה דחופה מסתיימת בקרוב!",
+            "en": "urgent vote expiring soon!",
+            "ar": "تصويت عاجل على وشك الانتهاء!"
+        },
+        "handleBtn": {
+            "he": "לטיפול",
+            "en": "Handle",
+            "ar": "معالجة"
+        },
+        "customPurchaseText": {
+            "he": "צור קנייה מותאמת אישית",
+            "en": "Create a custom purchase",
+            "ar": "إنشاء عملية شراء مخصصة"
+        },
+        "customPurchaseSub": {
+            "he": "תאר מה אתה צריך ומצא שותפים",
+            "en": "Describe what you need and find partners",
+            "ar": "صف ما تحتاجه وابحث عن شركاء"
+        },
+        "startBtn": {
+            "he": "התחל",
+            "en": "Start",
+            "ar": "ابدأ"
+        },
+        "noActivity": {
+            "he": "אין פעילות כרגע",
+            "en": "No activity right now",
+            "ar": "لا يوجد نشاط حالياً"
+        }
     }
 }

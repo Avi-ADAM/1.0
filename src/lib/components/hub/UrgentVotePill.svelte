@@ -1,5 +1,6 @@
 <script lang="ts">
   import { lang } from '$lib/stores/lang.js';
+  import tr from '$lib/translations/tr.json';
 
   interface Props {
     count: number;
@@ -8,12 +9,7 @@
 
   let { count, href = '/kind/vote' }: Props = $props();
 
-  const t = {
-    he: { msg: 'הצבעה דחופה מסתיימת בקרוב!', btn: 'לטיפול' },
-    en: { msg: 'urgent vote expiring soon!', btn: 'Handle' }
-  };
-
-  let labels = $derived(t[$lang as keyof typeof t] ?? t.he);
+  let labels = $derived({ msg: tr.hub.urgentVoteMsg[$lang], btn: tr.hub.handleBtn[$lang] });
 </script>
 
 {#if count > 0}
