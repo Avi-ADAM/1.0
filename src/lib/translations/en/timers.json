@@ -1,0 +1,19 @@
+{
+  "saveTimer": "Save Timer",
+  "editTimer": "Edit Timer",
+  "saveTimerBtn": "Save Timer",
+  "updateTasks": "Task update",
+  "editTimes": "Edit Times",
+  "updateHint": "you can update the tasks you are currently working on or edit the timer times",
+  "clearTimer": "Clear Timer",
+  "manageTime": "Manage Times",
+  "clearAll": "Clear All",
+  "noTimes": "No times to manage",
+  "chooseTasks": "Choose tasks",
+  "update": "Update",
+  "timerUpdated": "Timer updated successfully",
+  "clearSuccess": "Timers cleared successfully",
+  "clearError": "Failed to clear timers",
+  "saveSuccess": "Timer saved successfully",
+  "saveError": "Error saving timer"
+}
