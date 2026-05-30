@@ -2,6 +2,7 @@
   import { role, ww, skil } from '$lib/components/prPr/mi.js';
   import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang';
+  import { t } from '$lib/translations';
   import tr from '$lib/translations/tr.json';
   import Text from '../conf/text.svelte';
   import Elements from '../conf/elements.svelte';
@@ -154,10 +155,6 @@
   let masa = false;
   let data;
   let isOpen;
-  const less = {
-    he: 'הסרה',
-    en: 'remove'
-  };
   let placeholder4 = `בחירת תפקידים`;
   let roles = $state($role);
   let why = '';

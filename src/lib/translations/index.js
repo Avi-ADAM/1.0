@@ -273,6 +273,21 @@ export const config = {
             key: 'timers',
             loader: async () => (await import('./ar/timers.json')).default,
         },
+        {
+            locale: 'he',
+            key: 'project',
+            loader: async () => (await import('./he/project.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'project',
+            loader: async () => (await import('./en/project.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'project',
+            loader: async () => (await import('./ar/project.json')).default,
+        },
     ],
 };
 

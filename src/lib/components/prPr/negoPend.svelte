@@ -8,6 +8,7 @@
   const tri = tr;
   import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang';
+  import { t } from '$lib/translations';
   import { montsi } from '$lib/func/montsi.svelte';
   import moment from 'moment';
   import { toast } from 'svelte-sonner';
@@ -93,10 +94,6 @@
   } = $props();
 
   let userss;
-  const less = {
-    he: 'הסרה',
-    en: 'remove'
-  };
   let descrip2 = $state(descrip);
   let name2 = $state(name1);
   let sqadualed2 = $state(sqadualed);
