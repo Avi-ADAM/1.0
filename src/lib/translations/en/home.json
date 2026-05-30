@@ -52,6 +52,25 @@
   "loading": {
     "title": "Loading a three-dimensional design element"
   },
+  "sections": {
+    "problemTitle": "Know that feeling?",
+    "howTitle": "How to start — in 4 steps",
+    "faqTitle": "Frequently asked questions",
+    "ctaFinalTitle": "Ready to create a Rikma?",
+    "ctaFinalSub": "Join the platform where every contribution becomes ownership — by full agreement."
+  },
+  "concierge": {
+    "eyebrow": "◈ Personal Concierge ◈",
+    "title": "Want something? Don't search for it — ask for it.",
+    "subtitle": "Tell us in your own words what you need, and around your wish a group will form to make it happen — a new product, from scratch.",
+    "flow": "You tell us → Lev breaks it down → a group of providers forms → you approve & receive",
+    "customerTitle": "For customers",
+    "customerDesc": "No categories, no chasing vendors. Describe what you want and get a complete plan to approve. Nothing goes out until you publish.",
+    "customerCta": "Tell us what you want ✨",
+    "providerTitle": "For business owners & providers",
+    "providerDesc": "Customers are already searching — let them find you. Every wish that includes what you offer reaches you as a warm, pre-matched lead, with partners who complete you into a whole package.",
+    "providerCta": "Get leads — join as a provider"
+  },
   "maze": {
     "title": "Let's clear things up",
     "subtitle": "Everything you need to know before joining",

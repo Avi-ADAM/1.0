@@ -31,6 +31,7 @@ onMount(()=>{
     fi = false,
     hover = false,
     scrolli = false,
+    scrollProgress = 0,
     size = {w:0,h:0}
   } = $props();
 
@@ -153,7 +154,7 @@ let isHovering = false, isPointerDown = false
 <T.AmbientLight  intensity={1} />
 
 
-<T.SpotLight position={poz} />
+<T.SpotLight position={poz} intensity={1 + scrollProgress * 1.5} />
 
 <T.DirectionalLight  intensity={0.81} position={{ y: -20, z: -5, x: 5 }} />
 <T.DirectionalLight  intensity={0.91} position={{ y: 10, z: 10 }} />

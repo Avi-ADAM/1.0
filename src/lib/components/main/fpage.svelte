@@ -53,6 +53,9 @@
 
   let scrolli = $state(false);
 
+  // התקדמות גלילה (0..1) של פאנל התוכן — מניע שינוי עדין בסצנת ה‑3D
+  let scrollProgress = $state(0);
+
   let loading = $state(false),
     loadinga = $state(false),
     w = $state(0),
@@ -240,7 +243,10 @@
         <CircleProgresBar progress={$progress} />
       </div>
     {/if}
-    <div class="w-full h-full">
+    <div
+      class="w-full h-full transition-transform duration-300 ease-out"
+      style="transform: translateY({scrollProgress * -5}%) scale({1 + scrollProgress * 0.1});"
+    >
       <Canvas {size}>
         <ResizeHandler {size} />
         <Scene
@@ -248,6 +254,7 @@
           {size}
           hover={btna == true || btnb == true ? true : false}
           {scrolli}
+          {scrollProgress}
         />
       </Canvas>
     </div>
@@ -259,6 +266,9 @@
     class="relative d z-10 w-full h-screen overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-barbi scrollbar-track-transparent"
     onscroll={(e) => {
       scrolli = true;
+      const el = e.currentTarget;
+      const max = el.scrollHeight - el.clientHeight;
+      scrollProgress = max > 0 ? Math.min(1, Math.max(0, el.scrollTop / max)) : 0;
       if (window.scrollTimer) clearTimeout(window.scrollTimer);
       window.scrollTimer = setTimeout(() => (scrolli = false), 150);
     }}
@@ -514,6 +524,168 @@
             </button>
           </div>
         </div>
+      </div>
+
+      <!-- ===== גלילה ארוכה: בלוקים אינפורמטיביים וממירים ===== -->
+      <div
+        class="w-full max-w-xl flex flex-col gap-10 mt-12"
+        style="font-family:'Sababa',sans-serif;"
+      >
+        <!-- בלוק: הבעיה / הזדהות -->
+        <section class="text-center">
+          <h2 class="text-rose-700 font-bold text-2xl mb-4">
+            {$t('home.sections.problemTitle')}
+          </h2>
+          <div class="flex flex-col gap-3">
+            <p
+              class="bg-white/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-3 text-slate-900 shadow"
+            >
+              {$t('home.intro.q1')}
+            </p>
+            <p
+              class="bg-white/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-3 text-slate-900 shadow"
+            >
+              {$t('home.intro.q2')}
+            </p>
+          </div>
+        </section>
+
+        <!-- בלוק: איך זה עובד ב‑4 צעדים -->
+        <section>
+          <h2 class="text-rose-700 font-bold text-2xl mb-4 text-center">
+            {$t('home.sections.howTitle')}
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {#each ['s1', 's2', 's3', 's4'] as s, i}
+              <div
+                class="relative bg-gradient-to-br from-amber-100 via-amber-200 to-rose-100 border-2 border-gold rounded-lg p-4 shadow"
+              >
+                <div
+                  class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-barbi text-gold font-bold flex items-center justify-center shadow-md"
+                >
+                  {i + 1}
+                </div>
+                <h3 class="text-rose-700 font-bold mb-1">
+                  {$t(`home.maze.flow.${s}.title`)}
+                </h3>
+                <p class="text-slate-800 text-sm leading-relaxed">
+                  {$t(`home.maze.flow.${s}.desc`)}
+                </p>
+              </div>
+            {/each}
+          </div>
+        </section>
+
+        <!-- בלוק: הקונסיירז' (דו‑קהלי) -->
+        <section>
+          <p class="text-center text-barbi font-bold tracking-widest mb-1">
+            {$t('home.concierge.eyebrow')}
+          </p>
+          <h2 class="text-rose-700 font-bold text-2xl mb-2 text-center">
+            {$t('home.concierge.title')}
+          </h2>
+          <p class="text-center text-slate-800 mb-2">
+            {$t('home.concierge.subtitle')}
+          </p>
+          <p class="text-center text-rose-600 text-sm mb-5">
+            {$t('home.concierge.flow')}
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div
+              class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
+            >
+              <h3 class="text-rose-700 font-bold text-lg mb-2">
+                {$t('home.concierge.customerTitle')}
+              </h3>
+              <p class="text-slate-800 text-sm leading-relaxed mb-4 grow">
+                {$t('home.concierge.customerDesc')}
+              </p>
+              <button
+                class="bg-barbi hover:bg-white hover:text-barbi text-gold font-semibold px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:scale-105"
+                onclick={() => goto('/concierge/new')}
+              >
+                {$t('home.concierge.customerCta')}
+              </button>
+            </div>
+            <div
+              class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
+            >
+              <h3 class="text-rose-700 font-bold text-lg mb-2">
+                {$t('home.concierge.providerTitle')}
+              </h3>
+              <p class="text-slate-800 text-sm leading-relaxed mb-4 grow">
+                {$t('home.concierge.providerDesc')}
+              </p>
+              <button
+                class="bg-gold hover:bg-barbi hover:text-gold text-barbi font-semibold px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:scale-105"
+                onclick={() => goto('/concierge')}
+              >
+                {$t('home.concierge.providerCta')}
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- בלוק: שאלות נפוצות -->
+        <section>
+          <h2 class="text-rose-700 font-bold text-2xl mb-4 text-center">
+            {$t('home.sections.faqTitle')}
+          </h2>
+          <div class="flex flex-col gap-2">
+            {#each ['1', '2', '3', '5', '6'] as q}
+              <details
+                class="bg-white/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-2 shadow"
+              >
+                <summary class="text-rose-700 font-semibold cursor-pointer py-1">
+                  {$t(`home.maze.faq.q${q}`)}
+                </summary>
+                <p class="text-slate-800 text-sm leading-relaxed pt-2">
+                  {$t(`home.maze.faq.a${q}`)}
+                </p>
+              </details>
+            {/each}
+          </div>
+        </section>
+
+        <!-- בלוק: קריאה לפעולה סופית -->
+        <section class="mb-8">
+          <div
+            class="bg-gradient-to-br from-gold via-barbi to-gold px-5 py-6 rounded-2xl border-2 border-gold shadow-xl text-center"
+          >
+            <h2 class="text-2xl font-bold text-white mb-2">
+              {$t('home.sections.ctaFinalTitle')}
+            </h2>
+            <p class="text-white/90 mb-4">
+              {$t('home.sections.ctaFinalSub')}
+            </p>
+            <div class="flex gap-3 justify-center flex-wrap">
+              <button
+                class="bg-white text-barbi font-bold px-5 py-2 rounded-xl shadow-lg hover:scale-105 transition-all duration-300"
+                onclick={() => {
+                  goto('/login');
+                  fi = true;
+                }}
+              >
+                {$t('home.cta.login')}
+              </button>
+              <button
+                class="bg-barbi text-gold font-bold px-5 py-2 rounded-xl shadow-lg hover:scale-105 transition-all duration-300"
+                onclick={() => {
+                  goto(
+                    $locale == 'he'
+                      ? '/hascama'
+                      : $locale == 'ar'
+                        ? '/aitifaqia'
+                        : '/convention'
+                  );
+                  fi = true;
+                }}
+              >
+                {$t('home.cta.register')}
+              </button>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   </div>
