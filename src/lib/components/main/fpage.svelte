@@ -330,37 +330,13 @@
             class="text-rose-700 font-bold text-xl mb-2 text-center"
             style="font-family: 'Sababa', sans-serif; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);"
           >
-            {#if $locale === 'he'}
-              💗 למה אנחנו שונים?
-            {:else if $locale === 'ar'}
-              💗 لماذا نحن مختلفون؟
-            {:else}
-              💗 Why We're Different
-            {/if}
+            {$t('home.fpage.whyDifferentTitle')}
           </h2>
           <p
             class="text-slate-900 text-md leading-relaxed text-center"
             style="font-family: 'Sababa', sans-serif;"
           >
-            {#if $locale === 'he'}
-              1💗1 היא לא סתם פלטפורמה עסקית - <strong class="text-rose-600"
-                >אנחנו חלק מתנועה עולמית</strong
-              >
-              של אנשים שבוחרים ליצור יחד בהסכמה וללא כפיה. כל ריקמה שנוצרת כאן היא
-              הוכחה חיה שאפשר ליצור אחרת.
-            {:else if $locale === 'ar'}
-              1💗1 ليست مجرد منصة عمل - <strong class="text-rose-600"
-                >نحن جزء من حركة عالمية</strong
-              >
-              من الأشخاص الذين يختارون العمل بالتوافق وليس بالإكراه. كل شراكة هنا
-              هي دليل حي على إمكانية العمل بشكل مختلف.
-            {:else}
-              1💗1 isn't just a business platform - <strong
-                class="text-rose-600">we're part of a global movement</strong
-              >
-              of people choosing to work in mutual agreement, not coercion. Every
-              partnership here is living proof that working differently is possible.
-            {/if}
+            {@html $t('home.fpage.whyDifferentDesc')}
           </p>
           <div class="mt-3 text-center">
             <a
@@ -372,13 +348,7 @@
               class="inline-block bg-barbi hover:bg-white hover:text-barbi text-gold font-semibold px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
               style="font-family: 'Sababa', sans-serif;"
             >
-              {#if $locale === 'he'}
-                גלו את ההסכמה העולמית ←
-              {:else if $locale === 'ar'}
-                اكتشف الاتفاق العالمي ←
-              {:else}
-                Discover the Global Agreement ➜
-              {/if}
+              {$t('home.fpage.discoverAgreement')}
             </a>
           </div>
         </div>
@@ -473,7 +443,7 @@
                 <div class="text-gold text-2xl">•</div>
                 <div class="bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
                   <div class="text-2xl font-bold text-gold">{membersCount}</div>
-                  <div class="text-white text-sm">חתמו על ההסכמה</div>
+                  <div class="text-white text-sm">{$t('home.fpage.agreedOnAgreement')}</div>
                 </div>
               </div>
             </div>

@@ -17,7 +17,7 @@
   import { workways1 } from '../registration/workways1.js';
   import { valluss } from '../registration/valluss.js';
   import { get } from 'svelte/store';
-  import { locale } from '$lib/translations';
+  import { locale, t } from '$lib/translations';
 
   let show_value = $state(0);
   show.subscribe((newValue) => {
@@ -78,13 +78,13 @@
   );
 
   // Tab definitions — can only navigate backward
-  const allTabs = [
-    { icon: '💡', he: 'ערכים', en: 'Values', step: 1 },
-    { icon: '🛠', he: 'כישורים', en: 'Skills', step: 2 },
-    { icon: '🎭', he: 'תפקידים', en: 'Roles', step: 3 },
-    { icon: '🌿', he: 'סגנון', en: 'Style', step: 4 },
-    { icon: '🔑', he: 'סיסמה', en: 'Password', step: 5 }
-  ];
+  const allTabs = $derived([
+    { icon: '💡', label: $t('home.bein.tabValues'), step: 1 },
+    { icon: '🛠', label: $t('home.bein.tabSkills'), step: 2 },
+    { icon: '🎭', label: $t('home.bein.tabRoles'), step: 3 },
+    { icon: '🌿', label: $t('home.bein.tabStyle'), step: 4 },
+    { icon: '🔑', label: $t('home.bein.tabPassword'), step: 5 }
+  ]);
 
   const tabDefs = $derived(
     mode === 'onboarding' ? allTabs.slice(0, 4) : allTabs
@@ -96,20 +96,14 @@
     }
   }
 
-  let title = { he: 'הרשמה ל-1💗1', en: '1💗1 registration' };
-  let tu = {
-    he: 'מייל אישור נשלח. תודה',
-    en: 'please check your email, thank you'
-  };
-  let see = { he: 'ולהתראות בקרוב', en: 'see you soon!' };
-  const buttn = {
-    he: 'לכל בעיה לחצו לשלוח לנו מייל',
-    en: 'if you did not receive please click here to contact us'
-  };
+  let title = $derived($t('home.bein.title'));
+  let tu = $derived($t('home.bein.confirmEmail'));
+  let see = $derived($t('home.bein.seeSoon'));
+  const buttn = $derived($t('home.bein.contactMessage'));
 </script>
 
 <svelte:head>
-  <title>{title[$lang]}</title>
+  <title>{title}</title>
   <link
     href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Heebo:wght@300;400;600;700&display=swap"
     rel="stylesheet"
@@ -275,10 +269,10 @@
             class:tab-future={show_value < tab.step}
             onclick={() => goToTab(tab.step)}
             disabled={show_value <= tab.step}
-            title={tab[$lang]}
+            title={tab.label}
           >
             <span class="tab-icon">{tab.icon}</span>
-            <span class="tab-label">{tab[$lang]}</span>
+            <span class="tab-label">{tab.label}</span>
             {#if show_value > tab.step}
               <span class="tab-check">✓</span>
             {/if}
@@ -398,11 +392,11 @@
         >
           <div class="success-card" dir={$lang === 'en' ? 'ltr' : 'rtl'}>
             <div class="success-heart">💗</div>
-            <h1 class="success-title">{tu[$lang]}</h1>
+            <h1 class="success-title">{tu}</h1>
             <p class="success-name">{$userName}</p>
-            <p class="success-sub">{see[$lang]}</p>
+            <p class="success-sub">{see}</p>
             <a href="mailto:baruch@1lev1.com" class="contact-link"
-              >{buttn[$lang]}</a
+              >{buttn}</a
             >
           </div>
         </div>

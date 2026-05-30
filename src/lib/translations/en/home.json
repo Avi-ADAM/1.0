@@ -184,5 +184,40 @@
       "close": "Close",
       "justAMoment": "Just a moment..."
     }
+  },
+  "setitle": "Creating a new reality, together",
+  "introQuestions": {
+    "q1": "Do you feel you have something to give – but it's hard alone?",
+    "q2": "Do you know you're meant for more – but looking for the right people to walk with?"
+  },
+  "features2": {
+    "passiveIncome": "Real passive income – lifetime profits, based on investment, based on agreement",
+    "ledger": "Distributed digital ledger – full transparency, no bureaucracy",
+    "sharingItems": "Sharing items and abundance between Rikmas and people – recycling, connecting, and earning",
+    "freedomCharter": "Want to walk with us? It's simple. You need to agree to the Global Freedom Charter – a document of values, not laws.",
+    "agreementMapText": "Your agreement will appear on the Agreement Map and open the way for you to create a new reality",
+    "rikmaDefinition": "A Rikma is a group of people with different skills and resources, creating together a product or providing a service and sharing profits based on relative investment and agreement"
+  },
+  "fpage": {
+    "whyDifferentTitle": "💗 Why We're Different",
+    "whyDifferentDesc": "1💗1 isn't just a business platform - <strong>we're part of a global movement</strong> of people choosing to work in mutual agreement, not coercion. Every partnership here is living proof that working differently is possible.",
+    "discoverAgreement": "Discover the Global Agreement ➜",
+    "agreedOnAgreement": "Agreed on the Agreement"
+  },
+  "tooltip": {
+    "name": "Name",
+    "iso3": "ISO3",
+    "agreements": "Agreements"
+  },
+  "bein": {
+    "title": "1💗1 registration",
+    "confirmEmail": "please check your email, thank you",
+    "seeSoon": "see you soon!",
+    "contactMessage": "if you did not receive please click here to contact us",
+    "tabValues": "Values",
+    "tabSkills": "Skills",
+    "tabRoles": "Roles",
+    "tabStyle": "Style",
+    "tabPassword": "Password"
   }
 }
