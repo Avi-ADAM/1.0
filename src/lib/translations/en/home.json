@@ -56,8 +56,29 @@
     "problemTitle": "Know that feeling?",
     "howTitle": "How to start — in 4 steps",
     "faqTitle": "Frequently asked questions",
+    "featuresTitle": "Everything you need to run a partnership — in one place",
+    "featuresSub": "Real tools already built into the system, not promises.",
     "ctaFinalTitle": "Ready to create a Rikma?",
-    "ctaFinalSub": "Join the platform where every contribution becomes ownership — by full agreement."
+    "ctaFinalSub": "Join the platform where every contribution becomes ownership — by full agreement.",
+    "navFeatures": "Capabilities",
+    "navHow": "How it works",
+    "navConcierge": "Concierge",
+    "navFaq": "FAQ",
+    "ctaTop": "Start a Rikma"
+  },
+  "platform": {
+    "projectMgmt_t": "Your whole project at a glance",
+    "projectMgmt_d": "Kanban boards, Gantt, processes, tasks and shifts — the entire Rikma organized in one place, transparent to all.",
+    "negotiation_t": "Smart negotiation system",
+    "negotiation_d": "A built-in AI negotiation tool that analyzes positions, suggests compromises and guides you to a fair agreement — without expensive mediation.",
+    "onboarding_t": "Smart onboarding",
+    "onboarding_d": "Upload a CV or a link to your site/business, and the AI automatically maps your skills, roles and best-fit Rikmas.",
+    "telegram_t": "Control from Telegram",
+    "telegram_d": "Start timers, get notifications and take actions straight from the Telegram bot — no need to open your computer.",
+    "aiBot_t": "AI assistant & agents (MCP)",
+    "aiBot_d": "A built-in bot that navigates, opens tasks and sums up the situation for you. You can even connect external AI agents to operate the Rikma via MCP.",
+    "transparency_t": "Transparency & decisions by agreement",
+    "transparency_d": "Every action and decision is logged in real time, and resolutions pass through voting and consensus with a defined 'decision time'."
   },
   "concierge": {
     "eyebrow": "◈ Personal Concierge ◈",

@@ -56,6 +56,12 @@
   // התקדמות גלילה (0..1) של פאנל התוכן — מניע שינוי עדין בסצנת ה‑3D
   let scrollProgress = $state(0);
 
+  // גלילה חלקה לעוגן בתוך פאנל התוכן (#text)
+  function scrollToId(id) {
+    const el = document.getElementById(id);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   let loading = $state(false),
     loadinga = $state(false),
     w = $state(0),
@@ -146,6 +152,36 @@
   {image}
   url={pageurl[$lang]}
 />
+<!-- Sticky header: anchor nav + CTA -->
+<header
+  dir={$locale === 'he' || $locale === 'ar' ? 'rtl' : 'ltr'}
+  class="hidden sm:flex fixed top-0 inset-x-0 z-[600] items-center justify-between px-6 py-2 bg-white/40 backdrop-blur-md border-b border-white/40 shadow-sm"
+  style="font-family:'Sababa',sans-serif;"
+>
+  <img
+    src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"
+    alt="1lev1"
+    class="w-9 h-9 drop-shadow"
+    style="animation:none;"
+  />
+  <nav class="flex items-center gap-5 text-barbi font-bold">
+    <button class="hover:text-gold transition-colors" onclick={() => scrollToId('features')}>{$t('home.sections.navFeatures')}</button>
+    <button class="hover:text-gold transition-colors" onclick={() => scrollToId('how')}>{$t('home.sections.navHow')}</button>
+    <button class="hover:text-gold transition-colors" onclick={() => scrollToId('concierge')}>{$t('home.sections.navConcierge')}</button>
+    <button class="hover:text-gold transition-colors" onclick={() => scrollToId('faq')}>{$t('home.sections.navFaq')}</button>
+  </nav>
+  <button
+    class="bg-barbi text-gold hover:bg-white hover:text-barbi font-bold px-4 py-1.5 rounded-xl shadow-md hover:scale-105 transition-all duration-300"
+    onclick={() => {
+      goto(
+        $locale == 'he' ? '/hascama' : $locale == 'ar' ? '/aitifaqia' : '/convention'
+      );
+      fi = true;
+    }}
+  >
+    {$t('home.sections.ctaTop')}
+  </button>
+</header>
 <div
   style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ; z-index: 699;"
 >
@@ -550,8 +586,33 @@
           </div>
         </section>
 
+        <!-- בלוק: יכולות הפלטפורמה -->
+        <section id="features" class="scroll-mt-16">
+          <h2 class="text-rose-700 font-bold text-2xl mb-1 text-center">
+            {$t('home.sections.featuresTitle')}
+          </h2>
+          <p class="text-center text-slate-700 text-sm mb-5">
+            {$t('home.sections.featuresSub')}
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {#each [['🗂️', 'projectMgmt'], ['🤝', 'negotiation'], ['🚀', 'onboarding'], ['📲', 'telegram'], ['🤖', 'aiBot'], ['🔍', 'transparency']] as [icon, key]}
+              <div
+                class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
+              >
+                <div class="text-2xl mb-1">{icon}</div>
+                <h3 class="text-rose-700 font-bold mb-1">
+                  {$t(`home.platform.${key}_t`)}
+                </h3>
+                <p class="text-slate-800 text-sm leading-relaxed">
+                  {$t(`home.platform.${key}_d`)}
+                </p>
+              </div>
+            {/each}
+          </div>
+        </section>
+
         <!-- בלוק: איך זה עובד ב‑4 צעדים -->
-        <section>
+        <section id="how" class="scroll-mt-16">
           <h2 class="text-rose-700 font-bold text-2xl mb-4 text-center">
             {$t('home.sections.howTitle')}
           </h2>
@@ -577,7 +638,7 @@
         </section>
 
         <!-- בלוק: הקונסיירז' (דו‑קהלי) -->
-        <section>
+        <section id="concierge" class="scroll-mt-16">
           <p class="text-center text-barbi font-bold tracking-widest mb-1">
             {$t('home.concierge.eyebrow')}
           </p>
@@ -627,7 +688,7 @@
         </section>
 
         <!-- בלוק: שאלות נפוצות -->
-        <section>
+        <section id="faq" class="scroll-mt-16">
           <h2 class="text-rose-700 font-bold text-2xl mb-4 text-center">
             {$t('home.sections.faqTitle')}
           </h2>
