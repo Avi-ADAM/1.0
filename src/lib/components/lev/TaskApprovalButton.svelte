@@ -24,7 +24,8 @@
   import { updateTask, displayActionSuccess, displayActionError } from '$lib/client/actionClient';
   import type { ActionResponse } from '$lib/client/actionClient';
   import { lang } from '$lib/stores/lang.js';
-  
+  import { t } from '$lib/translations';
+
   interface Props {
     taskId: string;
     projectId: string;
@@ -44,18 +45,11 @@
   let loading = $state(false);
   let approved = $state(false);
   
-  const labels = {
-    approve: { he: 'אישור', en: 'Approve' },
-    approving: { he: 'מאשר...', en: 'Approving...' },
-    approved: { he: 'אושר', en: 'Approved' },
-    successMessage: { he: 'המשימה אושרה בהצלחה!', en: 'Task approved successfully!' }
-  };
-  
   async function handleApprove() {
     if (loading || approved) return;
-    
+
     loading = true;
-    
+
     try {
       // NEW SYSTEM: Using the unified action client
       const response: ActionResponse = await updateTask({
@@ -64,7 +58,7 @@
         myIshur: true
       }, {
         showSuccessToast: true,
-        successMessage: labels.successMessage[$lang],
+        successMessage: $t('lev.taskApproval.successMessage'),
         showErrorToast: true,
         onSuccess: (data) => {
           console.log('Task approved successfully:', data);
@@ -131,23 +125,23 @@
   class="task-approval-button"
   class:loading
   class:approved
-  aria-label={labels.approve[$lang]}
+  aria-label={$t('lev.taskApproval.approve')}
 >
   {#if approved}
     <svg class="icon checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
       <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
     </svg>
-    <span>{labels.approved[$lang]}</span>
+    <span>{$t('lev.taskApproval.approved')}</span>
   {:else if loading}
     <svg class="icon spinner" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
       <path fill="currentColor" d="M12 4V2A10 10 0 0 0 2 12h2a8 8 0 0 1 8-8z"/>
     </svg>
-    <span>{labels.approving[$lang]}</span>
+    <span>{$t('lev.taskApproval.approving')}</span>
   {:else}
     <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
       <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
     </svg>
-    <span>{labels.approve[$lang]}</span>
+    <span>{$t('lev.taskApproval.approve')}</span>
   {/if}
 </button>
 

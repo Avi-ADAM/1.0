@@ -1,6 +1,7 @@
 <script>
 import Tile from '$lib/celim/tile.svelte'
 import { lang } from '$lib/stores/lang.js'
+import { t } from '$lib/translations'
   import { RingLoader
 } from 'svelte-loading-spinners';
 import { sendToSer } from '$lib/send/sendToSer.js';
@@ -56,8 +57,6 @@ async function xyd () {
       //
     }
     let data = xyd();
-    const headi = {"he":"הצעה למשימה", "en":"suggested mission"}
-    const om = {"he":"משימה פתוחה", "en": "open mission"}
 </script>
  {#await data}
  <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
@@ -73,7 +72,7 @@ async function xyd () {
          </div>
          <div class="flex flex-col leading-tight">
             <div class="sm:text-sm text-md mt-1 flex items-center">
-               <span class="text-barbi text-center mr-3 sm:text-2xl text-sm">{headi[$lang]}</span>
+               <span class="text-barbi text-center mr-3 sm:text-2xl text-sm">{$t('lev.mesima.suggestedMission')}</span>
             </div>
             <span style=" text-shadow: 1px 1px white;" class="pn ml-1 text-sm sm:text-lg text-barbi ">{data.project.data.attributes.projectName}</span>
          </div>
@@ -122,7 +121,7 @@ async function xyd () {
   <table dir="rtl" >
     <caption class="sm:text-right md:text-center text-right ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
-      >{om[$lang]}</h1>
+      >{$t('lev.mesima.openMission')}</h1>
     </caption>
         
     <tr class="ggr" style:top={ "1px"}>

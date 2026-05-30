@@ -16,6 +16,7 @@
   import { slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import { onMount } from 'svelte';
   let why = $state('');
   /**
@@ -70,38 +71,14 @@
   };
   let dow = $state();
 
-  // תרגומים עבור ה-label
-  const labelTexts = {
-    money: {
-      he: "פרטים שיעזרו לההעברה להתבצע (מספר חשבון, פרטי העברה וכו')",
-      en: 'Details to help complete the transfer (account number, transfer details, etc.)',
-      ar: 'تفاصيل للمساعدة في إتمام التحويل (رقم الحساب، تفاصيل التحويل، إلخ)'
-    },
-    rejection: {
-      he: 'נימוק לדחייה (מינימום 27 תווים)',
-      en: 'Reason for rejection (minimum 27 characters)',
-      ar: 'سبب الرفض (27 حرفًا على الأقل)'
-    },
-    discussion: {
-      he: 'הודעה - נא להתייחס להודעות קודמות',
-      en: 'Message - please refer to previous messages',
-      ar: 'رسالة - يرجى الرجوع إلى الرسائل السابقة'
-    },
-    forum: {
-      he: 'כתוב הודעה...',
-      en: 'Write a message...',
-      ar: 'اكتب رسالة...'
-    }
-  };
-
   let labelText = $derived(
     money
-      ? labelTexts.money[$lang]
+      ? $t('lev.diun.labelMoney')
       : no
-        ? labelTexts.rejection[$lang]
+        ? $t('lev.diun.labelRejection')
         : ani === 'forum' || ani === 'new-forum'
-          ? labelTexts.forum[$lang]
-          : labelTexts.discussion[$lang]
+          ? $t('lev.diun.labelForum')
+          : $t('lev.diun.labelDiscussion')
   );
   async function click() {
     if (why.length > 0) {

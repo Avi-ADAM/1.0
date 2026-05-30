@@ -14,6 +14,7 @@
   import { onMount } from 'svelte';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import Cards from './cards/pma.svelte';
   import { nowId } from '$lib/stores/pendMisMes';
   import { toast } from 'svelte-sonner';
@@ -106,10 +107,6 @@
     nego_mashes = [],
     timeGramaDate = null
   } = $props();
-  const er = {
-    he: 'אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ',
-    en: 'error: please try again, if the problem continue contact at baruch@1lev1.com'
-  };
   let dialogOpen = $state(false);
   const baseUrl = import.meta.env.VITE_URL;
   let miDatan = [];
@@ -344,7 +341,7 @@
       } catch (e) {
         error1 = e;
         console.log(error1);
-        toast.warning(er[$lang]);
+        toast.warning($t('lev.pmas.error'));
       }
     } else {
       try {
@@ -379,7 +376,7 @@
       } catch (e) {
         error1 = e;
         console.log(error1);
-        toast.warning(er[$lang]);
+        toast.warning($t('lev.pmas.error'));
       }
     }
   }
@@ -468,7 +465,7 @@
     } catch (e) {
       error1 = e;
       console.log(error1);
-      toast.warning(er[$lang]);
+      toast.warning($t('lev.pmas.error'));
     }
   }
   const close = () => {

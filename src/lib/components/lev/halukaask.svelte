@@ -5,6 +5,7 @@
   import { goto } from '$app/navigation';
   import { idPr } from '../../stores/idPr.js';
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import { toast } from 'svelte-sonner';
   import moment from 'moment';
   import { ProgressBar } from 'progressbar-svelte';
@@ -190,11 +191,7 @@
           console.log('Haluka approved successfully:', result);
           miDatan = result.data;
 
-          const successMsg = {
-            he: 'החלוקה אושרה בהצלחה! 🎉',
-            en: 'Division approved successfully! 🎉'
-          };
-          toast.success(successMsg[$lang] || successMsg.he);
+          toast.success($t('lev.haluka.successMessage'));
 
           // Update hervachti for users
           console.log('Starting hervach updates, count:', hervach.length);
@@ -256,11 +253,7 @@
         } catch (e) {
           error1 = e;
           console.error('Error approving haluka:', e);
-          const errorMsg = {
-            he: 'שגיאה באישור החלוקה. נסה שוב.',
-            en: 'Error approving division. Please try again.'
-          };
-          toast.error(errorMsg[$lang] || errorMsg.he);
+          toast.error($t('lev.haluka.errorMessage'));
         }
       } else {
         // Not all users approved yet - just add vote

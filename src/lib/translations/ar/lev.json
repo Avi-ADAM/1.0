@@ -6,7 +6,16 @@
     "descriptionPlaceholder": "صف إكمال المهمة بالكلمات...",
     "submitButton": "إرسال للموافقة",
     "pleaseWait": "لحظة من فضلك...",
-    "cancel": "إلغاء"
+    "cancel": "إلغاء",
+    "timerStopped": "تم إيقاف المؤقت بنجاح",
+    "success": "تمت العملية بنجاح!",
+    "error": "خطأ: يرجى المحاولة مرة أخرى، إذا استمرت المشكلة تواصل على baruch@1lev1.com",
+    "statusLabel": "حالة تقدم تنفيذ المهمة",
+    "save": "حفظ",
+    "done": "تم",
+    "saved": "تم الحفظ بنجاح",
+    "oneMonent": "لحظة من فضلك",
+    "editTimer": "تعديل المؤقت"
   },
   "cards": {
     "approve": "أريد",
@@ -99,5 +108,69 @@
       "monthlyHours": "ساعات شهرية",
       "totalHoursLabel": "إجمالي الساعات"
     }
+  },
+  "taskApproval": {
+    "approve": "موافقة",
+    "approving": "جارٍ الموافقة...",
+    "approved": "تمت الموافقة",
+    "successMessage": "تمت الموافقة على المهمة بنجاح!"
+  },
+  "reqtojoin": {
+    "chatWith": "دردشة مع",
+    "onJoining": "بشأن انضمامه إلى الشبكة"
+  },
+  "reqtosherut": {
+    "chatWith": "دردشة مع",
+    "onJoining": "بشأن انضمامه إلى الشبكة"
+  },
+  "mashsuggest": {
+    "cancel": "إغلاق",
+    "chatOnJoining": "دردشة حول الانضمام إلى الشبكة"
+  },
+  "pandingMesima": {
+    "error": "خطأ: يرجى المحاولة مرة أخرى، إذا استمرت المشكلة تواصل على baruch@1lev1.com"
+  },
+  "haluka": {
+    "successMessage": "تمت الموافقة على التوزيع بنجاح! 🎉",
+    "errorMessage": "خطأ في الموافقة على التوزيع. يرجى المحاولة مرة أخرى."
+  },
+  "reqtom": {
+    "voteTitle": "التصويت على طلب الانضمام إلى الشبكة ومشاركة مورد",
+    "heartOf": "قلب 1💗1",
+    "clickToProfile": "انقر مرتين لعرض ملف {name}",
+    "resourceName": "اسم المورد المقترح",
+    "clickToPublic": "انقر مرتين لعرض الصفحة العامة للشبكة",
+    "clickToBrain": "انقر مرتين للانتقال إلى مركز الشبكة {projectName}",
+    "cancel": "إغلاق",
+    "chatOnJoining": "دردشة حول الانضمام إلى الشبكة"
+  },
+  "pmas": {
+    "error": "خطأ: يرجى المحاولة مرة أخرى، إذا استمرت المشكلة تواصل على baruch@1lev1.com"
+  },
+  "diun": {
+    "labelMoney": "تفاصيل للمساعدة في إتمام التحويل (رقم الحساب، تفاصيل التحويل، إلخ)",
+    "labelRejection": "سبب الرفض (27 حرفًا على الأقل)",
+    "labelDiscussion": "رسالة - يرجى الرجوع إلى الرسائل السابقة",
+    "labelForum": "اكتب رسالة..."
+  },
+  "productRequest": {
+    "request": "طلب"
+  },
+  "didiget": {
+    "approveOf": "تأكيد استلام",
+    "from": "من",
+    "success": "تمت العملية بنجاح!",
+    "error": "خطأ: يرجى المحاولة مرة أخرى، إذا استمرت المشكلة تواصل على baruch@1lev1.com",
+    "messageSent": "تم إرسال الرسالة بنجاح"
+  },
+  "mesima": {
+    "suggestedMission": "مهمة مقترحة",
+    "openMission": "مهمة مفتوحة"
+  },
+  "welcomTo": {
+    "joined": "مرحباً بك في الشبكة",
+    "toHeadquarters": "للدخول إلى مقر الشبكة",
+    "welcome": "أهلاً وسهلاً بك في شبكتك الجديدة",
+    "heartOf": "قلب 1💗1"
   }
 }

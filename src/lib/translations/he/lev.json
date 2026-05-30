@@ -6,7 +6,16 @@
     "descriptionPlaceholder": "נא לתאר במילים את סיום המשימה...",
     "submitButton": "שליחה לאישור",
     "pleaseWait": "רק רגע...",
-    "cancel": "ביטול"
+    "cancel": "ביטול",
+    "timerStopped": "הטיימר נעצר בהצלחה",
+    "success": "בוצע בהצלחה",
+    "error": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ",
+    "statusLabel": "סטטוס התקדמות ביצוע המשימה",
+    "save": "אישור",
+    "done": "בוצע בהצלחה",
+    "saved": "נשמר בהצלחה",
+    "oneMonent": "שניה בבקשה",
+    "editTimer": "עריכת הטיימר"
   },
   "cards": {
     "approve": "אני רוצה",
@@ -99,5 +108,69 @@
       "monthlyHours": "שעות חודשיות",
       "totalHoursLabel": "שעות סך הכל"
     }
+  },
+  "taskApproval": {
+    "approve": "אישור",
+    "approving": "מאשר...",
+    "approved": "אושר",
+    "successMessage": "המשימה אושרה בהצלחה!"
+  },
+  "reqtojoin": {
+    "chatWith": "צ'אט עם",
+    "onJoining": "על צירופו לריקמה"
+  },
+  "reqtosherut": {
+    "chatWith": "צ'אט עם",
+    "onJoining": "על צירופו לריקמה"
+  },
+  "mashsuggest": {
+    "cancel": "ביטול",
+    "chatOnJoining": "צ'אט על הצטרפות לריקמה"
+  },
+  "pandingMesima": {
+    "error": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל "
+  },
+  "haluka": {
+    "successMessage": "החלוקה אושרה בהצלחה! 🎉",
+    "errorMessage": "שגיאה באישור החלוקה. נסה שוב."
+  },
+  "reqtom": {
+    "voteTitle": "הצבעה על בקשה לשיתוף משאב והצטרפות לרקמה",
+    "heartOf": "לב 1💗1",
+    "clickToProfile": "לחיצה למעבר לעמוד הפרופיל של {name}",
+    "resourceName": "שם המשאב המוצע",
+    "clickToPublic": "לחיצה למעבר לעמוד הציבורי של הריקמה",
+    "clickToBrain": "לחיצה למעבר למוח הריקמה {projectName}",
+    "cancel": "ביטול",
+    "chatOnJoining": "צ'אט על הצטרפות לריקמה"
+  },
+  "pmas": {
+    "error": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל "
+  },
+  "diun": {
+    "labelMoney": "פרטים שיעזרו לההעברה להתבצע (מספר חשבון, פרטי העברה וכו')",
+    "labelRejection": "נימוק לדחייה (מינימום 27 תווים)",
+    "labelDiscussion": "הודעה - נא להתייחס להודעות קודמות",
+    "labelForum": "כתוב הודעה..."
+  },
+  "productRequest": {
+    "request": "בקשה"
+  },
+  "didiget": {
+    "approveOf": "אישור קבלת",
+    "from": "מאת",
+    "success": "בוצע בהצלחה",
+    "error": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל  ",
+    "messageSent": "ההודעה נשלחה בהצלחה"
+  },
+  "mesima": {
+    "suggestedMission": "הצעה למשימה",
+    "openMission": "משימה פתוחה"
+  },
+  "welcomTo": {
+    "joined": "הצטרפת לרקמה",
+    "toHeadquarters": "לכניסה למטה הריקמה",
+    "welcome": "קבלת פנים לרגל הצטרפותך לריקמה חדשה",
+    "heartOf": "לב 1💗1"
   }
 }

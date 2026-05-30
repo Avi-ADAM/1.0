@@ -231,7 +231,7 @@
       }
     } catch (e) {
       error1 = e;
-      toast.warning(er[$lang]);
+      toast.warning($t('lev.pandingMesima.error'));
     }
   }
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
@@ -301,7 +301,7 @@
     } catch (e) {
       error1 = e;
       loading = false;
-      toast.warning(er[$lang]);
+      toast.warning($t('lev.pandingMesima.error'));
     }
   }
   const close = () => {
@@ -362,13 +362,9 @@
     } catch (e) {
       error1 = e;
       console.log(error1);
-      toast.warning(er[$lang]);
+      toast.warning($t('lev.pandingMesima.error'));
     }
   }
-  const er = {
-    he: 'אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ',
-    en: 'error: please try again, if the problem continue contact at baruch@1lev1.com'
-  };
 
   let clicked = $state(false);
   let pcli = $state(0);
@@ -462,6 +458,7 @@
   import Cards from './cards/pending.svelte';
   import { oneLangAdj } from '$lib/func/oneLangAdj.svelte';
   import { lang } from '$lib/stores/lang';
+  import { t } from '$lib/translations';
   import { nowId } from '$lib/stores/pendMisMes';
   import { toast } from 'svelte-sonner';
   import { Drawer } from 'vaul-svelte';

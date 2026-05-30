@@ -1,5 +1,6 @@
 <script>
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import { fly } from 'svelte/transition';
       	import { Drawer } from 'vaul-svelte';
   import { clickOutside } from './outsidclick.js';
@@ -363,8 +364,6 @@
       console.log(error1);
     }
   }
-  const tit = { he: 'ביטול', en: 'close' };
-  const chatdes2 = { he: "צ'אט על הצטרפות לריקמה", en: 'chat on joining' };
 </script>
 
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
@@ -375,7 +374,7 @@
           onclick={close}
           style="margin: 0 auto;"
           class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-          title={tit[$lang]}
+          title={$t('lev.mashsuggest.cancel')}
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
             <path
               fill="currentColor"
@@ -415,7 +414,7 @@
           <Diun
             onRect={afreact}
             smalldes={projectName + '-' + mashName}
-            nameChatPartner={`${chatdes2[$lang]}
+            nameChatPartner={`${$t('lev.mashsuggest.chatOnJoining')}
                               ${projectName} `}
             mypos={true}
             rect={true}

@@ -6,7 +6,16 @@
     "descriptionPlaceholder": "Describe the mission completion in words...",
     "submitButton": "Submit for Approval",
     "pleaseWait": "Please wait...",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "timerStopped": "timer stopped sucsesfully",
+    "success": "appruved sucssefully!",
+    "error": "error: please try again, if the problem continue contact at baruch@1lev1.com",
+    "statusLabel": "status of mission progress",
+    "save": "save",
+    "done": "done",
+    "saved": "saved successfully",
+    "oneMonent": "one moment please",
+    "editTimer": "edit Timer"
   },
   "cards": {
     "approve": "I want",
@@ -99,5 +108,69 @@
       "monthlyHours": "Monthly hours",
       "totalHoursLabel": "Total hours"
     }
+  },
+  "taskApproval": {
+    "approve": "Approve",
+    "approving": "Approving...",
+    "approved": "Approved",
+    "successMessage": "Task approved successfully!"
+  },
+  "reqtojoin": {
+    "chatWith": "chat with",
+    "onJoining": "on joining"
+  },
+  "reqtosherut": {
+    "chatWith": "chat with",
+    "onJoining": "on joining"
+  },
+  "mashsuggest": {
+    "cancel": "close",
+    "chatOnJoining": "chat on joining"
+  },
+  "pandingMesima": {
+    "error": "error: please try again, if the problem continue contact at baruch@1lev1.com"
+  },
+  "haluka": {
+    "successMessage": "Division approved successfully! 🎉",
+    "errorMessage": "Error approving division. Please try again."
+  },
+  "reqtom": {
+    "voteTitle": "vote on request to join the FreeMates and share a resorce ",
+    "heartOf": "the heart of 1💗1",
+    "clickToProfile": "click twice to see {name} profile",
+    "resourceName": "name of the suggested resorce",
+    "clickToPublic": "click twice to see FreeMates public page",
+    "clickToBrain": "click twice to go to the {projectName} Brain",
+    "cancel": "close",
+    "chatOnJoining": "chat on joining"
+  },
+  "pmas": {
+    "error": "error: please try again, if the problem continue contact at baruch@1lev1.com"
+  },
+  "diun": {
+    "labelMoney": "Details to help complete the transfer (account number, transfer details, etc.)",
+    "labelRejection": "Reason for rejection (minimum 27 characters)",
+    "labelDiscussion": "Message - please refer to previous messages",
+    "labelForum": "Write a message..."
+  },
+  "productRequest": {
+    "request": "Request"
+  },
+  "didiget": {
+    "approveOf": "approve of reciving",
+    "from": "from",
+    "success": "appruved sucssefully!",
+    "error": "error: please try again, if the problem continue contact at baruch@1lev1.com",
+    "messageSent": "messege send sucsessfully"
+  },
+  "mesima": {
+    "suggestedMission": "suggested mission",
+    "openMission": "open mission"
+  },
+  "welcomTo": {
+    "joined": "welcome to the FreeMates",
+    "toHeadquarters": "to the FreeMates headquarters",
+    "welcome": "welcome to new FreeMates",
+    "heartOf": "the heart of 1💗1"
   }
 }
