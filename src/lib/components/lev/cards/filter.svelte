@@ -1,16 +1,11 @@
 <script>
   import Tile from '$lib/celim/tile.svelte';
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import { onMount } from 'svelte';
 
-  let fir = {
-    he: 'לב המערכת, לחיצה על היהלומים לסינון הפעולות',
-    en: '1💗1-heart, click on the diamonds to sort the actions'
-  };
-  let u = {
-    he: 'לב המערכת, לחיצה על היהלומים לסינון הפעולות',
-    en: '1💗1-heart, click on the diamonds to sort the actions'
-  };
+  let fir = $t('lev.cards.filter.heartDesc');
+  let u = $t('lev.cards.filter.heartDesc');
 
   let sugg = 'sugg';
   let pend = 'pend';
@@ -117,78 +112,36 @@
     hovere = !hovere;
     if (hovere === true) {
       if (num === 'a') {
-        fir = {
-          he: 'הצגת הצעות לרקמות בלבד',
-          en: 'show only suggested mission in freemates'
-        };
+        fir = $t('lev.cards.filter.showSuggestions');
       } else if (num === 'b') {
-        fir = {
-          he: 'הצגת הצבעות על משימות חדשות',
-          en: "show only vot's on new mission"
-        };
+        fir = $t('lev.cards.filter.showVotes');
       } else if (num === 'c') {
-        fir = {
-          he: 'הצגת בקשות הצטרפות לרקמות בלבד',
-          en: 'show only requests for doing missions for FreeMates'
-        };
+        fir = $t('lev.cards.filter.showJoinRequests');
       } else if (num === 'd') {
-        fir = {
-          he: 'הצגת בקשות לחלוקת כספים בלבד',
-          en: 'show only vots on money splitings'
-        };
+        fir = $t('lev.cards.filter.showSplitRequests');
       } else if (num === 'e') {
-        fir = {
-          he: 'הצגת פעולות בתהליך ביצוע בלבד',
-          en: 'show only my missions in progress'
-        };
+        fir = $t('lev.cards.filter.showInProgress');
       } else if (num === 'f') {
-        fir = {
-          he: 'הצגת קבלות פנים לרקמות בלבד',
-          en: 'show only wellcomes to FreeMates'
-        };
+        fir = $t('lev.cards.filter.showWelcome');
       } else if (num === 'g') {
-        fir = {
-          he: 'הצגת אישור פעולות שהסתיימו בלבד',
-          en: 'show only approval of finnished missions'
-        };
+        fir = $t('lev.cards.filter.showCompletionApproval');
       } else if (num === 'h') {
-        fir = {
-          he: 'ללוח הבקרה האישי',
-          en: 'click to go to your controle room'
-        };
+        fir = $t('lev.cards.filter.personalDashboard');
       } else if (num === 'q') {
-        fir = {
-          he: 'הצגת אישור קבלת משאבים לרקמות בלבד',
-          en: 'show only vote on approval of reciving resorses'
-        };
+        fir = $t('lev.cards.filter.showResourceApproval');
       } else if (num === 'j') {
-        fir = {
-          he: 'הצגת הצעות להשקעת משאבים ברקמות בלבד',
-          en: 'show only suggested investments of resorses in FreeMates'
-        };
+        fir = $t('lev.cards.filter.showResourceInvestment');
       } else if (num === 'y') {
-        fir = {
-          he: 'הצגת הצבעות על בקשת משאבים לרקמות בלבד',
-          en: "show only vot's on new resource for FreeMates"
-        };
+        fir = $t('lev.cards.filter.showResourceVotes');
       } else if (num === 'x') {
-        fir = {
-          he: 'הצגת בקשות להצטרפות ולהשקעת משאבים ברקמות בלבד',
-          en: 'show only requests to join and invest resorces on freeMates'
-        };
+        fir = $t('lev.cards.filter.showJoinAndInvest');
       } else if (num === 'u') {
-        fir = {
-          he: 'הצגת הקניות שלי בלבד',
-          en: 'show only my purchases'
-        };
+        fir = $t('lev.cards.filter.showMyPurchases');
       }
     } else {
-      fir = {
-        he: 'לב המערכת, לחיצה על היהלומים לסינון הפעולות',
-        en: '1💗1 heart, click on the diamonds to sort the actions'
-      };
+      fir = $t('lev.cards.filter.heartDesc');
     }
-    onHover?.({ id: fir[$lang] });
+    onHover?.({ id: fir });
   }
 
   /**
@@ -238,23 +191,17 @@
   } = $props();
   let hovered = false;
   function hoverede(x) {
-    let t = { he: 'לב המערכת', en: 'heart of 1💗1' };
+    let tLabel = $t('lev.cards.filter.heartTitle');
     if (x == 'x') {
-      t = {
-        he: 'שינוי התצוגה ממטבעות לקלפים',
-        en: 'change the view from coins to cards'
-      };
+      tLabel = $t('lev.cards.filter.switchView');
     }
     hovered = !hovered;
     if (hovered == false) {
-      u = t;
+      u = tLabel;
     } else {
-      u = {
-        he: 'לב המערכת, לחיצה על היהלומים לסינון הפעולות',
-        en: '1💗1-heart, click on the diamonds to sort the actions'
-      };
+      u = $t('lev.cards.filter.heartDesc');
     }
-    onHover?.({ id: u[$lang] });
+    onHover?.({ id: u });
   }
   $effect(() => {
     console.log('milon', milon);

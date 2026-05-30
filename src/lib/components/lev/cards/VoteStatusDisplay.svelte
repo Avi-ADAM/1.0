@@ -1,5 +1,6 @@
 <script lang="ts">
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import { fade } from 'svelte/transition';
 
   interface Props {
@@ -60,12 +61,6 @@
     })
   );
 
-  const t = {
-    approved: { he: 'אישרו', en: 'Approved', ar: 'وافقت' },
-    old_version: { he: 'גרסה קודמת', en: 'Old Version', ar: 'نسخة قديمة' },
-    waiting: { he: 'טרם הצביעו', en: 'Waiting', ar: 'في انتظار' },
-    rejected: { he: 'התנגדו', en: 'Rejected', ar: 'رفض' }
-  };
 
   // Grouping for display
   let groups = $derived({
@@ -95,7 +90,7 @@
         >
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
-        {t.approved[$lang]} ({groups.approved.length})
+        {$t('lev.cards.voteStatus.approved')} ({groups.approved.length})
       </div>
       <div class="flex flex-wrap gap-2">
         {#each groups.approved as user}
@@ -141,7 +136,7 @@
           <line x1="18" y1="6" x2="6" y2="18"></line>
           <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
-        {t.rejected[$lang]} ({groups.rejected.length})
+        {$t('lev.cards.voteStatus.rejected')} ({groups.rejected.length})
       </div>
       <div class="flex flex-wrap gap-2">
         {#each groups.rejected as user}
@@ -188,7 +183,7 @@
           <line x1="12" y1="16" x2="12" y2="12"></line>
           <line x1="12" y1="8" x2="12.01" y2="8"></line>
         </svg>
-        {t.old_version[$lang]} ({groups.old_version.length})
+        {$t('lev.cards.voteStatus.oldVersion')} ({groups.old_version.length})
       </div>
       <div class="flex flex-wrap gap-2">
         {#each groups.old_version as user}
@@ -234,7 +229,7 @@
           <circle cx="12" cy="12" r="10"></circle>
           <polyline points="12 6 12 12 16 14"></polyline>
         </svg>
-        {t.waiting[$lang]} ({groups.waiting.length})
+        {$t('lev.cards.voteStatus.waiting')} ({groups.waiting.length})
       </div>
       <div class="flex flex-wrap gap-2">
         {#each groups.waiting as user}
