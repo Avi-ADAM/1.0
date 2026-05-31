@@ -268,6 +268,15 @@ type LocationScope = {
 - `onMount(async () => import('maplibre-gl'))`
 - או guard עם `browser` מ־`$app/environment`.
 
+#### Progress 2026-05-29
+
+- Added `LocationPicker` to the mission creation form in `src/lib/components/prPr/mission.svelte`.
+- Added per-resource `LocationPicker` controls to `src/lib/components/prPr/totalNeeds.svelte`.
+- Mission creation payloads now carry the shared location scope as `isOnline`, `lat`, `lng`, `radius`, and `location_hint`; `createMission` accepts these params.
+- `createResource` also accepts the same params for the future action-based resource path.
+- Persistence to `pendm` / `openMission` / `pmash` / `openMashaabim` / `sp` is still blocked until the Strapi schema and generated GraphQL inputs expose these fields.
+- `location_mode` remains a UI-level value until the Strapi schema/codegen exposes a concrete enum/input field for each target entity.
+
 ### שלב 3: מפת עסקים
 
 רכיב:
@@ -323,4 +332,3 @@ type LocationScope = {
 - [Google Maps JavaScript API usage and billing](https://developers.google.com/maps/documentation/javascript/usage-and-billing)
 - [Mapbox pricing](https://www.mapbox.com/pricing)
 - [MapTiler API documentation](https://docs.maptiler.com/cloud/api/)
-

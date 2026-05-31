@@ -162,7 +162,7 @@ Whitelist של פעולות מותרות; כל השאר → 404. פעולות ש
 - [ ] הגירת `userPr/*` (4) — כולל `editBasic` change-password ל-auth proxy
 - [ ] הגירת `prPr/*` (3)
 - [ ] הגירת `sales/SaleComponent`, `registration/newppp`
-- [ ] הגירת routes שמשתמשים בטוקן (`newlev`/`initializeLevData`, `me`, `oldlev`, ...)
+- [ ] הגירת routes שמשתמשים בטוקן (`newlev` הושלם ✅ 2026-05-29, `me`, `oldlev`, ...)
 - [x] יצירת `/api/auth` proxy (2026-05-24) + העברת change-password/forgot/reset/send-email-confirmation; register נדחה
 - [ ] העברת כל ה-uploads ל-`/api/upload`
 - [ ] היפוך 4 נקודות החשיפה ל-flag בוליאני (3.3)

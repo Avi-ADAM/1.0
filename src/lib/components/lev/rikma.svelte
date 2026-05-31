@@ -9,7 +9,6 @@ import { lang } from '$lib/stores/lang.js'
   import RichText from '$lib/celim/ui/richText.svelte';
   import { sendToSer } from '$lib/send/sendToSer.js';
 let projectUsers =$state([]);
-let idL;
 let srcP = $state();
 let error1 = null;
 let vallues  = $state([])
@@ -19,11 +18,6 @@ let vallues  = $state([])
          let fblink = $state(), discordlink = $state(), twiterlink = $state();
 let projecto = $state([]);
 async function xyd () {
-  const cookieValueId = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('id='))
-  .split('=')[1];
-  idL = cookieValueId;
         try {
             const res = await sendToSer({ id: projectId }, "49GetProjectById", 0, 0, false, fetch);
             project = res.data.project.data;

@@ -454,13 +454,13 @@
               name={buble.name}
               src={buble.src}
               projectId={buble.projectId}
-              noofusersOk={buble.noofusersOk}
-              noofusersNo={buble.noofusersNo}
-              noofusersWaiting={buble.noofusersWaiting}
+              bind:noofusersOk={buble.noofusersOk}
+              bind:noofusersNo={buble.noofusersNo}
+              bind:noofusersWaiting={buble.noofusersWaiting}
               noofusers={buble.noofusers}
-              already={buble.already}
+              bind:already={buble.already}
               created_at={buble.created_at}
-              users={buble.users}
+              bind:users={buble.users}
               diun={buble.diun}
               order={buble.order}
               {low}

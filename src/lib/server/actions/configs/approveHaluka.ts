@@ -31,12 +31,12 @@ const approveHalukaHandler: ActionExecutionHandler = async (params, context, { s
     context.fetch
   );
 
-  if (!tosplitResult?.updateTosplit?.data) {
+  if (!tosplitResult?.data?.updateTosplit?.data) {
     throw new Error('Failed to update tosplit');
   }
 
   const salesData: any[] =
-    tosplitResult.updateTosplit.data.attributes?.sales?.data ||
+    tosplitResult.data.updateTosplit.data.attributes?.sales?.data ||
     (Array.isArray(sales) ? sales.map((s: any) => ({ id: s.id ?? s })) : []);
 
   // Step 2: mark each sale as splited
@@ -72,7 +72,7 @@ const approveHalukaHandler: ActionExecutionHandler = async (params, context, { s
         context.fetch
       );
       const currentBalance = Number(
-        cur?.usersPermissionsUser?.data?.attributes?.hervachti ?? 0
+        cur?.data?.usersPermissionsUser?.data?.attributes?.hervachti ?? 0
       );
       const next = currentBalance + delta;
       await strapi.execute(

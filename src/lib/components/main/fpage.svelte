@@ -53,6 +53,15 @@
 
   let scrolli = $state(false);
 
+  // התקדמות גלילה (0..1) של פאנל התוכן — מניע שינוי עדין בסצנת ה‑3D
+  let scrollProgress = $state(0);
+
+  // גלילה חלקה לעוגן בתוך פאנל התוכן (#text)
+  function scrollToId(id) {
+    const el = document.getElementById(id);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   let loading = $state(false),
     loadinga = $state(false),
     w = $state(0),
@@ -143,76 +152,130 @@
   {image}
   url={pageurl[$lang]}
 />
-<div
-  style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ; z-index: 699;"
->
+{#snippet utilityNav(compact = false)}
   {#if trans === false}
-    <button onclick={() => (trans = !trans)}
-      ><img
-        class="shadow-xl rounded"
+    <button type="button" onclick={() => (trans = !trans)}>
+      <img
+        class="shadow-xl rounded {compact ? 'w-7 h-7' : ''}"
         alt="translat-icon-by-barbi"
         src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"
-      /></button
-    >
+      />
+    </button>
   {:else}
     <button
+      type="button"
       onclick={() => (trans = !trans)}
-      class=" text-barbi hover:text-gold p-0.5"
-      ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+      class="text-barbi hover:text-gold p-0.5"
+    >
+      <svg class="w-6 h-6" viewBox="0 0 24 24">
         <path
           fill="currentColor"
           d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
         />
-      </svg></button
-    >
+      </svg>
+    </button>
     {#if $lang != 'en'}
       <button
+        type="button"
         onclick={() => change('en')}
         title="change language to English"
-        class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5"
-        >{$t('home.languages.en')}</button
+        class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
       >
+        {$t('home.languages.en')}
+      </button>
     {/if}
-
     {#if $lang != 'ar'}
       <button
+        type="button"
         onclick={() => change('ar')}
         title="change language to Arabic"
-        class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5"
-        >{$t('home.languages.ar')}</button
+        class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
       >
+        {$t('home.languages.ar')}
+      </button>
     {/if}
     {#if $lang != 'he'}
       <button
+        type="button"
         onclick={() => change('he')}
         title="change language to Hebrew"
-        class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5"
-        >{$t('home.languages.he')}</button
+        class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
       >
+        {$t('home.languages.he')}
+      </button>
     {/if}
     {#if $lang == 'he'}
       <a
-        class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5"
-        title=" 1💗1 אודות "
-        data-sveltekit-prefetch
-        href="/about"
+        class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
+        title=" ההסכמה אודות "
+        target="_blank"
+        href="https://agreement.1lev1.com"
       >
-        {$t('home.nav.about')}</a
-      >
+        {$t('home.nav.about')}
+      </a>
     {/if}
     <a
-      class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5"
+      class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
       data-sveltekit-prefetch
       href="/faq"
     >
-      {$t('home.nav.faq')}</a
-    >
+      {$t('home.nav.faq')}
+    </a>
     <a
-      class="text-barbi border-2 border-lturk text-bold hover:text-gold text-center bg-gold hover:bg-barbi px-1 py-0.5"
-      data-sveltekit-prefetch
-      href="/love">{$t('home.nav.agreementMap')}</a
+      class="text-barbi border-2 border-lturk font-bold hover:text-gold text-center bg-gold hover:bg-barbi px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
+      target="_blank"
+      href="https://agreement.1lev1.com/love"
     >
+      {$t('home.nav.agreementMap')}
+    </a>
   {/if}
+{/snippet}
+
+<!-- Sticky header: anchor nav + שפות/קישורים + CTA (מחשב) -->
+<header
+  dir={$locale === 'he' || $locale === 'ar' ? 'rtl' : 'ltr'}
+  class="hidden sm:flex fixed top-0 inset-x-0 z-[600] items-center gap-4 px-6 py-2 bg-white/40 backdrop-blur-md border-b border-white/40 shadow-sm"
+  style="font-family:'Sababa',sans-serif;"
+>
+  <img
+    src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"
+    alt="1lev1"
+    class="w-9 h-9 shrink-0 drop-shadow"
+    style="animation:none;"
+  />
+  <nav class="flex flex-1 items-center justify-center gap-4 min-w-0 text-barbi font-bold text-sm lg:text-base">
+    <button type="button" class="hover:text-gold transition-colors whitespace-nowrap" onclick={() => scrollToId('features')}>{$t('home.sections.navFeatures')}</button>
+    <button type="button" class="hover:text-gold transition-colors whitespace-nowrap" onclick={() => scrollToId('how')}>{$t('home.sections.navHow')}</button>
+    <button type="button" class="hover:text-gold transition-colors whitespace-nowrap" onclick={() => scrollToId('concierge')}>{$t('home.sections.navConcierge')}</button>
+    <button type="button" class="hover:text-gold transition-colors whitespace-nowrap" onclick={() => scrollToId('who')}>{$t('home.sections.whoTitle')}</button>
+    <button type="button" class="hover:text-gold transition-colors whitespace-nowrap" onclick={() => scrollToId('faq')}>{$t('home.sections.navFaq')}</button>
+  </nav>
+  <div
+    class="flex shrink-0 items-center gap-2"
+    class:flex-row={trans}
+    class:flex-wrap={trans}
+  >
+    {@render utilityNav(true)}
+  </div>
+  <button
+    type="button"
+    class="shrink-0 bg-barbi text-gold hover:bg-white hover:text-barbi font-bold px-4 py-1.5 rounded-xl shadow-md hover:scale-105 transition-all duration-300 whitespace-nowrap"
+    onclick={() => {
+      goto(
+        $locale == 'he' ? '/hascama' : $locale == 'ar' ? '/aitifaqia' : '/convention'
+      );
+      fi = true;
+    }}
+  >
+    {$t('home.sections.ctaTop')}
+  </button>
+</header>
+
+<!-- תפריט שפה/קישורים צף — מובייל בלבד -->
+<div
+  class="sm:hidden absolute left-[1%] top-[1%] z-[699] flex flex-col"
+>
+  {@render utilityNav()}
 </div>
 
 <div
@@ -240,7 +303,10 @@
         <CircleProgresBar progress={$progress} />
       </div>
     {/if}
-    <div class="w-full h-full">
+    <div
+      class="w-full h-full transition-transform duration-300 ease-out"
+      style="transform: translateY({scrollProgress * -5}%) scale({1 + scrollProgress * 0.1});"
+    >
       <Canvas {size}>
         <ResizeHandler {size} />
         <Scene
@@ -248,6 +314,7 @@
           {size}
           hover={btna == true || btnb == true ? true : false}
           {scrolli}
+          {scrollProgress}
         />
       </Canvas>
     </div>
@@ -259,6 +326,9 @@
     class="relative d z-10 w-full h-screen overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-barbi scrollbar-track-transparent"
     onscroll={(e) => {
       scrolli = true;
+      const el = e.currentTarget;
+      const max = el.scrollHeight - el.clientHeight;
+      scrollProgress = max > 0 ? Math.min(1, Math.max(0, el.scrollTop / max)) : 0;
       if (window.scrollTimer) clearTimeout(window.scrollTimer);
       window.scrollTimer = setTimeout(() => (scrolli = false), 150);
     }}
@@ -280,14 +350,14 @@
       <div
         dir="ltr"
         style="text-shadow:none;"
-        class="pt-2 sm:pt-6 font-bold sm:text-2xl text-xl text-transparent
+        class="pt-2 sm:pt-6 font-bold sm:text-2xl text-2xl text-transparent
           bg-clip-text bg-[length:auto_200%] animate-gradienty
           bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]
           flex-wrap flex flex-row"
       >
         <div class="flip">
           <h1
-            class="font-bold sm:text-4xl text-2xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
+            class="font-bold sm:text-4xl text-3xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
             bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
           >
             1
@@ -295,7 +365,7 @@
         </div>
         <div>
           <h1
-            class="font-bold mt-2 sm:text-xl text-lg text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
+            class="font-bold mt-2 sm:text-xl text-xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
           bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
           >
             💗
@@ -303,7 +373,7 @@
         </div>
         <div>
           <h1
-            class="font-bold sm:text-4xl text-2xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
+            class="font-bold sm:text-4xl text-3xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
             bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
           >
             1
@@ -311,14 +381,13 @@
         </div>
       </div>
 
-      <div class="sababa mt-2 mb-8">
-        <AnimatedHeadline
-          wordWrapperClass="overflow-hidden inline-block align-bottom transition-all duration-500 ease-in-out"
-          wordClass="font-['Sababa'] font-bold sm:text-2xl text-lg overflow-hidden inline-block align-bottom text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx 
-          bg-[linear-gradient(to_right,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]"
-          type="rotate-1"
-          texts={headlines}
-        />
+      <div
+        class="sababa mt-2 mb-8 font-bold sm:text-2xl text-xl text-transparent
+          bg-clip-text bg-[length:auto_200%] animate-gradienty
+          bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
+        style="text-shadow:none;"
+      >
+        <AnimatedHeadline wait={3000} fade={500} slide={300} y={1000} texts={headlines} />
       </div>
 
       <!-- Content Cards -->
@@ -327,13 +396,13 @@
           class="bg-gradient-to-br from-amber-200 via-amber-300 to-rose-200 opacity-80 px-4 py-3 mt-2 rounded-lg border-2 border-gold shadow-xl backdrop-blur-sm"
         >
           <h2
-            class="text-rose-700 font-bold text-xl mb-2 text-center"
+            class="text-rose-700 font-bold text-2xl sm:text-xl mb-2 text-center"
             style="font-family: 'Sababa', sans-serif; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);"
           >
             {$t('home.fpage.whyDifferentTitle')}
           </h2>
           <p
-            class="text-slate-900 text-md leading-relaxed text-center"
+            class="text-slate-900 text-lg sm:text-base leading-relaxed text-center"
             style="font-family: 'Sababa', sans-serif;"
           >
             {@html $t('home.fpage.whyDifferentDesc')}
@@ -345,7 +414,7 @@
                 : $locale === 'ar'
                   ? '/aitifaqia'
                   : '/convention'}
-              class="inline-block bg-barbi hover:bg-white hover:text-barbi text-gold font-semibold px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+              class="inline-block bg-barbi hover:bg-white hover:text-barbi text-gold font-semibold text-lg sm:text-base px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
               style="font-family: 'Sababa', sans-serif;"
             >
               {$t('home.fpage.discoverAgreement')}
@@ -419,7 +488,7 @@
           {#if statsLoaded}
             <div class="text-center">
               <p
-                class="text-white font-semibold text-lg mb-2"
+                class="text-white font-semibold text-xl sm:text-lg mb-2"
                 style="font-family: 'Sababa', sans-serif;"
               >
                 {$t('home.stats.currently')}
@@ -429,14 +498,14 @@
                   <div class="text-2xl font-bold text-gold">
                     {projectsCount}
                   </div>
-                  <div class="text-white text-sm">
+                  <div class="text-white text-base sm:text-sm">
                     {$t('home.stats.partnerships')}
                   </div>
                 </div>
                 <div class="text-gold text-2xl">•</div>
                 <div class="bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
                   <div class="text-2xl font-bold text-gold">{usersCount}</div>
-                  <div class="text-white text-sm">
+                  <div class="text-white text-base sm:text-sm">
                     {$t('home.stats.members')}
                   </div>
                 </div>
@@ -449,7 +518,7 @@
             </div>
           {:else}
             <div
-              class="text-center text-white font-semibold"
+              class="text-center text-white font-semibold text-lg sm:text-base"
               style="font-family: 'Sababa', sans-serif;"
             >
               {$t('home.stats.loading')}
@@ -463,7 +532,7 @@
         >
           <div style="font-family:Gan, Power;" class="flex flex-col gap-3">
             <button
-              class="transition-all duration-300 flex flex-row justify-center items-center text-barbi px-4 py-2 text-xl bg-white hover:text-slate-800 rounded-xl shadow-lg"
+              class="transition-all duration-300 flex flex-row justify-center items-center text-barbi px-4 py-2 text-2xl sm:text-xl bg-white hover:text-slate-800 rounded-xl shadow-lg"
               onclick={() => {
                 goto('/login');
                 loadinga = true;
@@ -473,7 +542,7 @@
               {$t('home.cta.login')}
             </button>
             <button
-              class="transition-all duration-300 text-barbi px-4 py-2 text-xl bg-gold hover:text-slate-800 rounded-xl flex flex-row justify-center items-center shadow-lg"
+              class="transition-all duration-300 text-barbi px-4 py-2 text-2xl sm:text-xl bg-gold hover:text-slate-800 rounded-xl flex flex-row justify-center items-center shadow-lg"
               onclick={() => {
                 goto('/hascama');
                 loading = true;
@@ -484,6 +553,271 @@
             </button>
           </div>
         </div>
+      </div>
+
+      <!-- ===== גלילה ארוכה: בלוקים אינפורמטיביים וממירים ===== -->
+      <div
+        class="w-full max-w-xl flex flex-col gap-10 mt-12"
+        style="font-family:'Sababa',sans-serif;"
+      >
+        <!-- בלוק: הבעיה / הזדהות -->
+        <section class="text-center">
+          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-4">
+            {$t('home.sections.problemTitle')}
+          </h2>
+          <div class="flex flex-col gap-3">
+            <p
+              class="bg-white/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-3 text-slate-900 text-lg sm:text-base shadow"
+            >
+              {$t('home.intro.q1')}
+            </p>
+            <p
+              class="bg-white/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-3 text-slate-900 text-lg sm:text-base shadow"
+            >
+              {$t('home.intro.q2')}
+            </p>
+          </div>
+        </section>
+
+        <!-- בלוק: יכולות הפלטפורמה -->
+        <section id="features" class="scroll-mt-16">
+          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center">
+            {$t('home.sections.featuresTitle')}
+          </h2>
+          <p class="text-center text-slate-700 text-base sm:text-sm mb-5">
+            {$t('home.sections.featuresSub')}
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {#each [['🗂️', 'projectMgmt'], ['🤝', 'negotiation'], ['🚀', 'onboarding'], ['📲', 'telegram'], ['🤖', 'aiBot'], ['🔍', 'transparency']] as [icon, key]}
+              <div
+                class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
+              >
+                <div class="text-2xl mb-1">{icon}</div>
+                <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
+                  {$t(`home.platform.${key}_t`)}
+                </h3>
+                <p class="text-slate-800 text-base sm:text-sm leading-relaxed">
+                  {$t(`home.platform.${key}_d`)}
+                </p>
+              </div>
+            {/each}
+          </div>
+        </section>
+
+        <!-- בלוק: איך זה עובד ב‑4 צעדים -->
+        <section id="how" class="scroll-mt-16">
+          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-4 text-center">
+            {$t('home.sections.howTitle')}
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {#each ['s1', 's2', 's3', 's4'] as s, i}
+              <div
+                class="relative bg-gradient-to-br from-amber-100 via-amber-200 to-rose-100 border-2 border-gold rounded-lg p-4 shadow"
+              >
+                <div
+                  class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-barbi text-gold font-bold flex items-center justify-center shadow-md"
+                >
+                  {i + 1}
+                </div>
+                <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
+                  {$t(`home.maze.flow.${s}.title`)}
+                </h3>
+                <p class="text-slate-800 text-base sm:text-sm leading-relaxed">
+                  {$t(`home.maze.flow.${s}.desc`)}
+                </p>
+              </div>
+            {/each}
+          </div>
+        </section>
+
+        <!-- בלוק: הקונסיירז' (דו‑קהלי) -->
+        <section id="concierge" class="scroll-mt-16">
+          <p class="text-center text-barbi font-bold text-base sm:text-sm tracking-widest mb-1">
+            {$t('home.concierge.eyebrow')}
+          </p>
+          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-2 text-center">
+            {$t('home.concierge.title')}
+          </h2>
+          <p class="text-center text-slate-800 text-lg sm:text-base mb-2">
+            {$t('home.concierge.subtitle')}
+          </p>
+          <p class="text-center text-rose-600 text-base sm:text-sm mb-5">
+            {$t('home.concierge.flow')}
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div
+              class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
+            >
+              <h3 class="text-rose-700 font-bold text-xl sm:text-lg mb-2">
+                {$t('home.concierge.customerTitle')}
+              </h3>
+              <p class="text-slate-800 text-base sm:text-sm leading-relaxed mb-4 grow">
+                {$t('home.concierge.customerDesc')}
+              </p>
+              <button
+                class="bg-barbi hover:bg-white hover:text-barbi text-gold font-semibold text-lg sm:text-base px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:scale-105"
+                onclick={() => goto('/concierge/new')}
+              >
+                {$t('home.concierge.customerCta')}
+              </button>
+            </div>
+            <div
+              class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
+            >
+              <h3 class="text-rose-700 font-bold text-xl sm:text-lg mb-2">
+                {$t('home.concierge.providerTitle')}
+              </h3>
+              <p class="text-slate-800 text-base sm:text-sm leading-relaxed mb-4 grow">
+                {$t('home.concierge.providerDesc')}
+              </p>
+              <button
+                class="bg-gold hover:bg-barbi hover:text-gold text-barbi font-semibold text-lg sm:text-base px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:scale-105"
+                onclick={() => goto('/concierge')}
+              >
+                {$t('home.concierge.providerCta')}
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- בלוק: למי זה מתאים -->
+        <section id="who" class="scroll-mt-16">
+          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center">
+            {$t('home.sections.whoTitle')}
+          </h2>
+          <p class="text-center text-slate-700 text-base sm:text-sm mb-5">
+            {$t('home.sections.whoSub')}
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {#each [['🧑‍🎨', 'whoFreelancer'], ['🏪', 'whoBusiness'], ['🌱', 'whoCreators']] as [icon, key]}
+              <div
+                class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col text-center"
+              >
+                <div class="text-3xl mb-1">{icon}</div>
+                <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
+                  {$t(`home.sections.${key}_t`)}
+                </h3>
+                <p class="text-slate-800 text-base sm:text-sm leading-relaxed">
+                  {$t(`home.sections.${key}_d`)}
+                </p>
+              </div>
+            {/each}
+          </div>
+        </section>
+
+        <!-- בלוק: הוכחה חברתית / תנועה עולמית -->
+        <section class="text-center">
+          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1">
+            {$t('home.sections.proofTitle')}
+          </h2>
+          <p class="text-slate-700 text-base sm:text-sm mb-4 max-w-md mx-auto">
+            {$t('home.sections.proofSub')}
+          </p>
+          <div class="flex justify-center items-stretch gap-3 flex-wrap">
+            <div class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]">
+              <div class="text-2xl font-bold text-white">{projectsCount}</div>
+              <div class="text-white/90 text-sm sm:text-xs">{$t('home.sections.proofStatProjects')}</div>
+            </div>
+            <div class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]">
+              <div class="text-2xl font-bold text-white">{usersCount}</div>
+              <div class="text-white/90 text-sm sm:text-xs">{$t('home.sections.proofStatMembers')}</div>
+            </div>
+            <div class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]">
+              <div class="text-2xl font-bold text-white">{membersCount}</div>
+              <div class="text-white/90 text-sm sm:text-xs">{$t('home.sections.proofStatSigners')}</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- בלוק: מפת ההסכמה הגלובלית -->
+        <section class="text-center">
+          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1">
+            {$t('home.sections.mapTitle')}
+          </h2>
+          <p class="text-slate-700 text-base sm:text-sm mb-4 max-w-md mx-auto">
+            {$t('home.sections.mapSub')}
+          </p>
+          <a
+            href="/love"
+            data-sveltekit-prefetch
+            class="inline-block bg-barbi hover:bg-white hover:text-barbi text-gold font-semibold text-lg sm:text-base px-5 py-2 rounded-lg shadow-md hover:scale-105 transition-all duration-300"
+          >
+            🗺️ {$t('home.sections.mapCta')}
+          </a>
+        </section>
+
+        <!-- בלוק: מודל / תמחור -->
+        <section class="text-center">
+          <div class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-2xl px-5 py-5 shadow">
+            <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1">
+              {$t('home.sections.modelTitle')}
+            </h2>
+            <p class="text-slate-800 text-lg sm:text-base leading-relaxed max-w-md mx-auto">
+              {$t('home.sections.modelSub')}
+            </p>
+          </div>
+        </section>
+
+        <!-- בלוק: שאלות נפוצות -->
+        <section id="faq" class="scroll-mt-16">
+          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-4 text-center">
+            {$t('home.sections.faqTitle')}
+          </h2>
+          <div class="flex flex-col gap-2">
+            {#each ['1', '2', '3', '5', '6'] as q}
+              <details
+                class="bg-white/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-2 shadow"
+              >
+                <summary class="text-rose-700 font-semibold text-lg sm:text-base cursor-pointer py-1">
+                  {$t(`home.maze.faq.q${q}`)}
+                </summary>
+                <p class="text-slate-800 text-base sm:text-sm leading-relaxed pt-2">
+                  {$t(`home.maze.faq.a${q}`)}
+                </p>
+              </details>
+            {/each}
+          </div>
+        </section>
+
+        <!-- בלוק: קריאה לפעולה סופית -->
+        <section class="mb-8">
+          <div
+            class="bg-gradient-to-br from-gold via-barbi to-gold px-5 py-6 rounded-2xl border-2 border-gold shadow-xl text-center"
+          >
+            <h2 class="text-3xl sm:text-2xl font-bold text-white mb-2">
+              {$t('home.sections.ctaFinalTitle')}
+            </h2>
+            <p class="text-white/90 text-lg sm:text-base mb-4">
+              {$t('home.sections.ctaFinalSub')}
+            </p>
+            <div class="flex gap-3 justify-center flex-wrap">
+              <button
+                class="bg-white text-barbi font-bold text-lg sm:text-base px-5 py-2 rounded-xl shadow-lg hover:scale-105 transition-all duration-300"
+                onclick={() => {
+                  goto('/login');
+                  fi = true;
+                }}
+              >
+                {$t('home.cta.login')}
+              </button>
+              <button
+                class="bg-barbi text-gold font-bold text-lg sm:text-base px-5 py-2 rounded-xl shadow-lg hover:scale-105 transition-all duration-300"
+                onclick={() => {
+                  goto(
+                    $locale == 'he'
+                      ? '/hascama'
+                      : $locale == 'ar'
+                        ? '/aitifaqia'
+                        : '/convention'
+                  );
+                  fi = true;
+                }}
+              >
+                {$t('home.cta.register')}
+              </button>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   </div>
@@ -541,10 +875,16 @@
 </div>
 
 <style>
-  .sababa > span,
-  .sababa > div > span {
+  .sababa :global(span) {
     font-family: 'Sababa', system-ui !important;
     text-shadow: none;
+    color: inherit;
+  }
+  @media (max-width: 639px) {
+    .sababa :global(span) {
+      font-size: 1.35rem;
+      line-height: 1.45;
+    }
   }
   .flip {
     -moz-transform: scale(-1, 1);

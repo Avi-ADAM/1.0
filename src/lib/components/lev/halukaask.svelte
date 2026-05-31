@@ -11,7 +11,6 @@
   import { ProgressBar } from 'progressbar-svelte';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   let dialogOpen = $state(false);
-  const baseUrl = import.meta.env.VITE_URL;
   /**
    * @typedef {Object} Props
    * @property {boolean} [isVisible]
@@ -66,7 +65,7 @@
     already = $bindable(false),
     created_at,
     pendId,
-    users,
+    users = $bindable([]),
     diun = [],
     order = $bindable(diun.length),
     cards = false,
@@ -77,13 +76,43 @@
   } = $props();
   let miDatan = [];
   let error1;
-  let bearer1;
-  let token;
   let idL;
   let no = $state(false);
   let masa = $state(false);
   function percentage(partialValue, totalValue) {
     return (100 * partialValue) / totalValue;
+  }
+
+  /** @param {{ what: boolean, why?: string }} vote */
+  function appendOptimisticVote(vote) {
+    const cookieValueId = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('id='))
+      ?.split('=')[1];
+    if (!cookieValueId) return;
+
+    const uid = parseInt(String(cookieValueId), 10);
+    const existing = Array.isArray(users) ? users : [];
+    const alreadyVoted = existing.some(
+      (v) =>
+        String(
+          v.users_permissions_user?.data?.id ??
+            v.users_permissions_user?.id ??
+            v.ide
+        ) === String(cookieValueId)
+    );
+    if (alreadyVoted) return;
+
+    users = [
+      ...existing,
+      {
+        what: vote.what,
+        users_permissions_user: { data: { id: String(cookieValueId) } },
+        ide: uid,
+        order: order ?? 0,
+        ...(vote.why ? { why: vote.why } : {})
+      }
+    ];
   }
   let ok;
   let nook;
@@ -147,8 +176,6 @@
     }
     return str;
   }
-  let linkg = baseUrl + '/graphql';
-
   async function agree(alr) {
     if (alr == 'alr') {
       alert('soon');
@@ -157,141 +184,64 @@
       noofusersOk += 1;
       noofusersWaiting -= 1;
       ser = xyz();
+      appendOptimisticVote({ what: true });
 
       const cookieValueId = document.cookie
         .split('; ')
         .find((row) => row.startsWith('id='))
         ?.split('=')[1];
-
       idL = cookieValueId;
 
       if (noofusersOk === noofusers) {
-        // All users approved - use new API endpoint
+        // All users approved — build hervachti deltas from local hervach.
+        // We pass only { userId, amountDelta }; the server fetches the
+        // current balance and applies the delta atomically (never trusts
+        // a client-supplied absolute amount).
+        const hervachUpdates = (hervach || [])
+          .filter((el) => el?.noten !== true && el?.mekabel !== true)
+          .map((el) => ({
+            userId: String(el?.users_permissions_user?.data?.id ?? ''),
+            amountDelta: Number(el?.amount ?? 0)
+          }))
+          .filter((u) => u.userId && Number.isFinite(u.amountDelta) && u.amountDelta !== 0);
+
         try {
-          const response = await fetch('/api/approveHaluka', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              tosplitId: pendId,
-              userId: idL,
-              users: users,
-              halukot: halukot,
-              sales: sales || []
-            })
+          const result = await executeAction('approveHaluka', {
+            tosplitId: pendId,
+            userId: idL,
+            users,
+            halukot,
+            sales: sales || [],
+            hervachUpdates,
+            projectId
           });
 
-          const result = await response.json();
-
           if (!result.success) {
-            throw new Error(result.error || 'Failed to approve haluka');
+            throw new Error(result.error?.message || 'Failed to approve haluka');
           }
 
-          console.log('Haluka approved successfully:', result);
           miDatan = result.data;
-
-          toast.success($t('lev.haluka.successMessage'));
-
-          // Update hervachti for users
-          console.log('Starting hervach updates, count:', hervach.length);
-          for (let o = 0; o < hervach.length; o++) {
-            const element = hervach[o];
-            console.log(
-              `Hervach ${o + 1}/${hervach.length}:`,
-              element.noten,
-              element.mekabel,
-              element.users_permissions_user.data.id,
-              element.users_permissions_user.data.attributes.hervachti,
-              element.amount
-            );
-
-            if (element.noten != true && element.mekabel != true) {
-              const iduse = element.users_permissions_user.data.id;
-              const amount =
-                element.users_permissions_user.data.attributes.hervachti +
-                element.amount;
-              console.log(`Updating user ${iduse} hervachti to ${amount}`);
-
-              try {
-                const token = page.data.tok;
-                const bearer1 = 'bearer ' + token;
-
-                const response = await fetch(linkg, {
-                  method: 'POST',
-                  headers: {
-                    Authorization: bearer1,
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({
-                    query: `mutation {
-                      updateUsersPermissionsUser(
-                        id: ${iduse}
-                        data: { hervachti: ${amount} }
-                      ) {
-                        data {
-                          id
-                        }
-                      }
-                    }`
-                  })
-                });
-
-                const hervachResult = await response.json();
-                console.log(
-                  `User ${iduse} hervachti updated successfully:`,
-                  hervachResult
-                );
-              } catch (e) {
-                error1 = e;
-                console.error(`Error updating user ${iduse} hervachti:`, e);
-              }
-            }
-          }
+          const successMsg = { he: 'החלוקה אושרה בהצלחה! 🎉', en: 'Division approved successfully! 🎉' };
+          toast.success(successMsg[$lang] || successMsg.he);
 
           coinLapach();
         } catch (e) {
           error1 = e;
-          console.error('Error approving haluka:', e);
-          toast.error($t('lev.haluka.errorMessage'));
+          const errorMsg = { he: 'שגיאה באישור החלוקה. נסה שוב.', en: 'Error approving division. Please try again.' };
+          toast.error(errorMsg[$lang] || errorMsg.he);
         }
       } else {
-        // Not all users approved yet - just add vote
+        // Not all users approved yet — add partial vote
         try {
-          const userss = objToString(users);
-          const token = page.data.tok;
-          const bearer1 = 'bearer ' + token;
-
-          await fetch(linkg, {
-            method: 'POST',
-            headers: {
-              Authorization: bearer1,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              query: `mutation {
-                updateTosplit(
-                  id: "${pendId}"
-                  data: {
-                    vots: [
-                      ${userss ? userss + ',' : ''}
-                      {
-                        what: true
-                        users_permissions_user: "${idL}"
-                      }
-                    ]
-                  }
-                ) {
-                  data {
-                    id
-                  }
-                }
-              }`
-            })
-          })
-            .then((r) => r.json())
-            .then((data) => (miDatan = data));
-          console.log(miDatan);
+          const result = await executeAction('addVote', {
+            type: 'tosplit',
+            id: pendId,
+            projectId,
+            existingComponentData: users
+          });
+          if (!result.success) {
+            throw new Error(result.error?.message || 'Failed to add vote');
+          }
         } catch (e) {
           error1 = e;
           console.log(error1);
@@ -299,6 +249,7 @@
       }
     }
   }
+  import { executeAction } from '$lib/client/actionClient';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   async function nego(alr) {
     already = true;
@@ -330,43 +281,22 @@
       noofusersNo += 1;
       noofusersWaiting -= 1;
       ser = xyz();
-      const userss = objToString(users);
-      const diunim = objToString(diun);
-
-      const cookieValueId = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('id='))
-        .split('=')[1];
-      idL = cookieValueId;
-      token = page.data.tok;
-      bearer1 = 'bearer' + ' ' + token;
+      appendOptimisticVote({ what: false, why });
       try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation {  updateTosplit(
-id: ${pendId}
-      data: { vots:[  ${userss ? userss + ',' : ''}      
-     {
-      what: false
-      why: "${why}"
-      users_permissions_user: "${idL}"
-    }
-  ],
- }
-  ){data { vots { users_permissions_user {data{ id}}}}}
-} `
-            // make coin desapire
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
-        coinLapach();
+        const result = await executeAction('addVote', {
+          type: 'tosplit',
+          id: pendId,
+          projectId,
+          existingComponentData: users,
+          what: false,
+          why
+        });
+        if (result.success) {
+          miDatan = result.data;
+          coinLapach();
+        } else {
+          error1 = result.error;
+        }
       } catch (e) {
         error1 = e;
         console.log(error1);
@@ -479,7 +409,6 @@ id: ${pendId}
     onHover?.({ id: u });
   }
   import Cards from './cards/haluka.svelte';
-  import { page } from '$app/state';
 
   function claf(event) {
     let o = event.alr;
@@ -845,13 +774,15 @@ id: ${pendId}
                 onDecline={decline}
                 onHover={hoverc}
                 {why}
-                {already}
+                bind:already
+                bind:users
+                bind:noofusersOk
+                bind:noofusersNo
+                bind:noofusersWaiting
                 {projectName}
                 {src}
-                {noofusersWaiting}
-                {noofusersOk}
-                {users}
-                {noofusersNo}
+                {noofusers}
+                activeOrder={order}
                 {projectId}
               />
             </div>
@@ -867,14 +798,16 @@ id: ${pendId}
     onHover={hoverc}
     {isVisible}
     {why}
-    {users}
+    bind:users
+    bind:already
+    bind:noofusersOk
+    bind:noofusersNo
+    bind:noofusersWaiting
     {projectId}
-    {already}
     {projectName}
     {src}
-    {noofusersWaiting}
-    {noofusersOk}
-    {noofusersNo}
+    {noofusers}
+    activeOrder={order}
     {halukot}
     {hervach}
   />
