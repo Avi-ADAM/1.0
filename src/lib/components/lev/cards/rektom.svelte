@@ -130,7 +130,7 @@
   const cardTypeText = $derived(
     isRishon
       ? { he: 'אישרור השמה ושיתוף משאב', en: 'Resource Assignment & Share Approval' }
-      : { he: 'אישרור בקשת משאב', en: 'Resource Request Approval' }
+      : { he: 'אישרור בקשה לשיתוף משאב', en: 'Resource Request Approval' }
   );
 
   // הצגת הערות מיוחדות (hearotMeyuchadot או spnot)
