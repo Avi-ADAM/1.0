@@ -4,6 +4,7 @@
   import { goto } from '$app/navigation';
   import dayjs from 'dayjs';
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import { clickOutside } from './outsidclick.js';
 
   import { fly } from 'svelte/transition';
@@ -736,8 +737,6 @@ updateOpenMission(
   let isOpen = $state(false),
     loading = false,
     diunm = $state(false);
-  const chatdes = { he: "צ'אט עם", en: 'chat with' };
-  const chatdes2 = { he: 'על צירופו לריקמה', en: 'on joining' };
   const close = () => {
     isOpen = false;
     diunm = false;
@@ -793,7 +792,7 @@ updateOpenMission(
           <Diun
             onRect={afreact}
             smalldes={projectName + '-' + openmissionName}
-            nameChatPartner={`${chatdes[$lang]} ${useraplyname} ${chatdes2[$lang]}`}
+            nameChatPartner={`${$t('lev.reqtosherut.chatWith')} ${useraplyname} ${$t('lev.reqtosherut.onJoining')}`}
             mypos={true}
             {clicked}
             pendId={askId}

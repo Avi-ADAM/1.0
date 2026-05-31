@@ -1,5 +1,7 @@
 <script lang="ts">
   import Panel from '$lib/components/Panel.svelte';
+  import tr from '$lib/translations/tr.json';
+  import { lang } from '$lib/stores/lang.js';
   import type { PendingApproval } from '$lib/types';
 
   let {
@@ -16,22 +18,22 @@
 </script>
 
 {#if approvals.length > 0}
-  <Panel title="ממתין לאישורך" titleColor="var(--pink-l)">
+  <Panel title={tr.deals.pendingApprovalTitle[$lang]} titleColor="var(--pink-l)">
     {#each approvals as a (a.id)}
       <div class="item">
         <div class="item-name">{a.name}</div>
         <div class="item-sub">
           {#if a.type === 'mission'}
-            משימה חדשה · {a.hours} שע׳ · ₪ {a.cost.toLocaleString()}
+            {tr.deals.newMission[$lang]} · {a.hours} {tr.deals.hoursShort[$lang]} · ₪ {a.cost.toLocaleString()}
           {:else}
-            משאב חדש · ₪ {a.cost.toLocaleString()}
+            {tr.deals.newResource[$lang]} · ₪ {a.cost.toLocaleString()}
           {/if}
         </div>
         <div class="btns">
           <button class="btn-approve" onclick={() => onApprove(a.id)} disabled={isProcessing}>
-            {isProcessing ? '...' : '✓ אשר'}
+            {isProcessing ? '...' : tr.deals.approveBtn[$lang]}
           </button>
-          <button class="btn-reject"  onclick={() => onReject(a.id)} disabled={isProcessing}>✗ דחה</button>
+          <button class="btn-reject"  onclick={() => onReject(a.id)} disabled={isProcessing}>{tr.deals.rejectBtn[$lang]}</button>
         </div>
       </div>
     {/each}

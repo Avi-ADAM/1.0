@@ -1,4 +1,6 @@
 <script>
+  import { t } from '$lib/translations';
+
   let {
     label,
     name,
@@ -22,7 +24,6 @@
   let badgeClass = $derived(badgeMap[statusColor] ?? 'bdg-grey');
   let ariaLabel  = $derived(status ? `${label}: ${name} — ${status}` : `${label}: ${name}`);
 
-  const chatLabel = { he: 'פתח צ׳אט', en: 'Open chat', ar: 'فتح الدردشة' };
 </script>
 
 <button type="button" class="cn" aria-label={ariaLabel} onclick={onClick}>
@@ -50,7 +51,7 @@
     <button
       type="button"
       class="cn-chat"
-      aria-label={chatLabel[lang] ?? chatLabel.en}
+      aria-label={$t('process.node.chatLabel')}
       onclick={(e) => { e.stopPropagation(); onChatClick(); }}
     >
       <svg viewBox="0 0 24 24" aria-hidden="true">

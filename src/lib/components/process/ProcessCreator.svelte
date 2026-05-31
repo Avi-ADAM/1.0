@@ -1,6 +1,7 @@
 <script>
   import { createProcess } from '$lib/client/actionClient';
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { Button } from '$lib/components/ui/button';
 
@@ -17,21 +18,6 @@
   let loading = $state(false);
   let error = $state('');
 
-  const t = {
-    title: { he: 'יצירת תהליך', en: 'Create process' },
-    subtitle: {
-      he: 'קודם יוצרים צורך, ואז מוסיפים אליו משימות, משאבים ומטלות.',
-      en: 'Create the need first, then add missions or resources.'
-    },
-    name: { he: 'שם התהליך', en: 'Process name' },
-    description: { he: 'תיאור הצורך', en: 'Need description' },
-    create: { he: 'צור תהליך', en: 'Create process' },
-    pickExisting: {
-      he: 'או המשך תהליך קיים',
-      en: 'Or continue an existing process'
-    },
-    useThis: { he: 'בחר', en: 'Use' }
-  };
 
   async function submit() {
     if (!name.trim()) {
@@ -69,13 +55,13 @@
   dir={$lang === 'he' ? 'rtl' : 'ltr'}
 >
   <div class="mb-4">
-    <h3 class="text-lg font-semibold text-barbi">{t.title[$lang]}</h3>
-    <p class="text-sm text-barbi/70">{t.subtitle[$lang]}</p>
+    <h3 class="text-lg font-semibold text-barbi">{$t('process.creator.title')}</h3>
+    <p class="text-sm text-barbi/70">{$t('process.creator.subtitle')}</p>
   </div>
 
   <div class="grid gap-4">
     <label class="grid gap-1 text-sm font-medium text-barbi">
-      <span>{t.name[$lang]}</span>
+      <span>{$t('process.creator.name')}</span>
       <input
         bind:value={name}
         class="rounded-md border border-gold/50 px-3 py-2 text-barbi focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold/40"
@@ -83,7 +69,7 @@
     </label>
 
     <div class="grid gap-1 text-sm font-medium text-barbi">
-      <span>{t.description[$lang]}</span>
+      <span>{$t('process.creator.description')}</span>
       <RichText bind:outpot={description} sml={true} />
     </div>
   </div>
@@ -99,14 +85,14 @@
       disabled={loading}
       class="border border-gold bg-barbi text-white hover:bg-barbi/80"
     >
-      {t.create[$lang]}
+      {$t('process.creator.create')}
     </Button>
   </div>
 
   {#if processes.length > 0}
     <div class="mt-6 border-t border-gold/30 pt-4">
       <h4 class="mb-3 text-sm font-semibold text-barbi">
-        {t.pickExisting[$lang]}
+        {$t('process.creator.pickExisting')}
       </h4>
       <div class="grid gap-2">
         {#each processes as process}
@@ -129,7 +115,7 @@
               </div>
               <span
                 class="rounded-full border border-gold/50 bg-gold/10 px-2 py-1 text-xs text-barbi"
-                >{t.useThis[$lang]}</span
+                >{$t('process.creator.useThis')}</span
               >
             </div>
           </button>

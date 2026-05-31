@@ -1,0 +1,29 @@
+{
+  "creator": {
+    "title": "Create process",
+    "subtitle": "Create the need first, then add missions or resources.",
+    "name": "Process name",
+    "description": "Need description",
+    "create": "Create process",
+    "pickExisting": "Or continue an existing process",
+    "useThis": "Use"
+  },
+  "board": {
+    "empty": "No processes yet for this project.",
+    "stages": {
+      "need": "Need",
+      "pending": "Pending",
+      "open": "Open",
+      "candidates": "Candidates",
+      "execution": "Execution",
+      "approval": "Final approval",
+      "completion": "Completion"
+    },
+    "next": "Next stage",
+    "forum": "Main forum",
+    "select": "Select for add flow"
+  },
+  "node": {
+    "chatLabel": "Open chat"
+  }
+}

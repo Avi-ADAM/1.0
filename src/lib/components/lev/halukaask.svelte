@@ -5,6 +5,7 @@
   import { goto } from '$app/navigation';
   import { idPr } from '../../stores/idPr.js';
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import { toast } from 'svelte-sonner';
   import moment from 'moment';
   import { ProgressBar } from 'progressbar-svelte';

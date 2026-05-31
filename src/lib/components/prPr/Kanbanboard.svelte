@@ -1,6 +1,7 @@
 <!-- src/lib/components/prPr/kanban/KanbanBoard.svelte -->
 <script lang="ts">
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
 
   interface RawItem {
     id: string;
@@ -36,7 +37,7 @@
 
   interface KanbanColumn {
     id: string;
-    title: { he: string; en: string };
+    titleKey: string;
     accent: string;
     glow: string;
     dotColor: string;
@@ -179,7 +180,7 @@
   let columns: KanbanColumn[] = $state([
     {
       id: 'open',
-      title: { he: 'פתוחות', en: 'Open' },
+      titleKey: 'project.kanban.columnOpen',
       accent: 'border-emerald-400/60 text-emerald-400',
       glow: 'bg-emerald-500/5',
       dotColor: 'bg-emerald-400',
@@ -189,7 +190,7 @@
     },
     {
       id: 'pending',
-      title: { he: 'ממתין לאישור', en: 'Pending' },
+      titleKey: 'project.kanban.columnPending',
       accent: 'border-amber-400/60 text-amber-400',
       glow: 'bg-amber-500/5',
       dotColor: 'bg-amber-400',
@@ -199,7 +200,7 @@
     },
     {
       id: 'progress',
-      title: { he: 'בתהליך', en: 'In Progress' },
+      titleKey: 'project.kanban.columnInProgress',
       accent: 'border-sky-400/60 text-sky-400',
       glow: 'bg-sky-500/5',
       dotColor: 'bg-sky-400',
@@ -209,7 +210,7 @@
     },
     {
       id: 'done',
-      title: { he: 'הושלמו', en: 'Done' },
+      titleKey: 'project.kanban.columnDone',
       accent: 'border-fuchsia-400/60 text-fuchsia-400',
       glow: 'bg-fuchsia-500/5',
       dotColor: 'bg-fuchsia-400',
@@ -337,22 +338,6 @@
       destKind: toCol.kind
     });
   }
-
-  const i18n = {
-    empty: { he: 'ריק - גרור לכאן', en: 'Empty - drop here' },
-    moveTo: { he: 'העבר לעמודה:', en: 'Move to column:' },
-    cancel: { he: 'ביטול', en: 'Cancel' },
-    click: { he: 'לחץ לפרטים', en: 'Tap for details' },
-    task: { he: 'מטלה', en: 'Task' },
-    mission: { he: 'משימה', en: 'Mission' },
-    pendApproval: { he: 'ממתין לאישור', en: 'Pending approval' },
-    pendValidation: { he: 'ממתין לאימות', en: 'Pending validation' },
-    scrollHint: { he: 'גלול בין כל העמודות', en: 'Scroll between all columns' },
-    missions: { he: 'משימות', en: 'missions' },
-    tasks: { he: 'מטלות', en: 'tasks' },
-    next: { he: 'הבא', en: 'Next' },
-    back: { he: 'הקודם', en: 'Back' }
-  } as const;
 
   function fmtDate(iso?: string) {
     if (!iso) return '';
@@ -496,13 +481,13 @@
           <span
             class="text-[10px] font-bold uppercase tracking-wider
                        bg-orange-500/20 text-orange-400 border border-orange-500/30
-                       rounded-full px-2.5 py-0.5">{i18n.task[$lang]}</span
+                       rounded-full px-2.5 py-0.5">{$t('project.kanban.task')}</span
           >
         {:else}
           <span
             class="text-[10px] font-bold uppercase tracking-wider
                        bg-barbi/20 text-barbi border border-barbi/30
-                       rounded-full px-2.5 py-0.5">{i18n.mission[$lang]}</span
+                       rounded-full px-2.5 py-0.5">{$t('project.kanban.mission')}</span
           >
         {/if}
       </div>
@@ -511,7 +496,7 @@
         {selectedCard.name}
       </p>
       <p class="text-slate-400 text-sm text-center mb-5">
-        {i18n.moveTo[$lang]}
+        {$t('project.kanban.moveTo')}
       </p>
 
       <div class="grid grid-cols-2 gap-3">
@@ -524,7 +509,7 @@
             <span
               class="inline-block w-2 h-2 rounded-full {col.dotColor} me-1.5 opacity-80"
             ></span>
-            {col.title[$lang]}
+            {$t(col.titleKey)}
           </button>
         {/each}
       </div>
@@ -532,7 +517,7 @@
       <button
         class="w-full mt-4 py-2 rounded-xl text-slate-400 text-sm
                hover:text-slate-200 hover:bg-slate-700/40 transition-colors"
-        onclick={closeMoveSheet}>{i18n.cancel[$lang]}</button
+        onclick={closeMoveSheet}>{$t('project.kanban.cancel')}</button
       >
     </div>
   </div>
@@ -546,7 +531,7 @@
     {#each columns as col}
       <div class="flex items-center gap-1.5">
         <span class="w-2 h-2 rounded-full {col.dotColor}"></span>
-        <span class="text-slate-400">{col.title[$lang]}</span>
+        <span class="text-slate-400">{$t(col.titleKey)}</span>
         <span class="font-bold {col.accent.split(' ')[1]}"
           >{col.items.length}</span
         >
@@ -556,13 +541,13 @@
     <span class="inline-flex items-center gap-1 text-slate-500">
       <span class="w-1.5 h-1.5 rounded-sm bg-barbi/70"></span>
       {totalMissions}
-      {i18n.missions[$lang]}
+      {$t('project.kanban.missions')}
     </span>
     {#if totalActs > 0}
       <span class="inline-flex items-center gap-1 text-slate-500">
         <span class="w-1.5 h-1.5 rounded-sm bg-orange-400/70"></span>
         {totalActs}
-        {i18n.tasks[$lang]}
+        {$t('project.kanban.tasks')}
       </span>
     {/if}
   </div>
@@ -575,11 +560,9 @@
         class="inline-flex items-center gap-1 rounded-full border border-slate-700/70 bg-slate-800/70 px-3 py-1.5 text-xs text-slate-300 transition-colors hover:border-slate-500 hover:text-slate-100 disabled:cursor-not-allowed disabled:opacity-35"
         onclick={() => scrollColumns('back')}
         disabled={!canScrollBack}
-        aria-label={$lang === 'he'
-          ? 'גלול לעמודה הקודמת'
-          : 'Scroll to previous column'}
+        aria-label={$t('project.kanban.back')}
       >
-        <span dir="rtl">{i18n.back[$lang]}</span>
+        <span dir="rtl">{$t('project.kanban.back')}</span>
 
         <svg
           class="h-3 w-3 shrink-0"
@@ -602,9 +585,7 @@
         class="inline-flex items-center gap-1 rounded-full border border-slate-700/70 bg-slate-800/70 px-3 py-1.5 text-xs text-slate-300 transition-colors hover:border-slate-500 hover:text-slate-100 disabled:cursor-not-allowed disabled:opacity-35"
         onclick={() => scrollColumns('forward')}
         disabled={!canScrollForward}
-        aria-label={$lang === 'he'
-          ? 'גלול לעמודה הבאה'
-          : 'Scroll to next column'}
+        aria-label={$t('project.kanban.next')}
       >
         <svg
           class="h-3 w-3 shrink-0"
@@ -620,7 +601,7 @@
             stroke-linejoin="round"
           />
         </svg>
-        <span dir="rtl">{i18n.next[$lang]}</span>
+        <span dir="rtl">{$t('project.kanban.next')}</span>
       </button>
     {:else}
       <button
@@ -629,7 +610,7 @@
         class="inline-flex items-center gap-1 rounded-full border border-slate-700/70 bg-slate-800/70 px-3 py-1.5 text-xs text-slate-300 transition-colors hover:border-slate-500 hover:text-slate-100 disabled:cursor-not-allowed disabled:opacity-35"
         onclick={() => scrollColumns('back')}
         disabled={!canScrollBack}
-        aria-label="Scroll to previous column"
+        aria-label={$t('project.kanban.back')}
       >
         <svg
           class="h-3 w-3 shrink-0"
@@ -645,7 +626,7 @@
             stroke-linejoin="round"
           />
         </svg>
-        <span>Prev</span>
+        <span>{$t('project.kanban.back')}</span>
       </button>
       <button
         type="button"
@@ -653,9 +634,9 @@
         class="inline-flex items-center gap-1 rounded-full border border-slate-700/70 bg-slate-800/70 px-3 py-1.5 text-xs text-slate-300 transition-colors hover:border-slate-500 hover:text-slate-100 disabled:cursor-not-allowed disabled:opacity-35"
         onclick={() => scrollColumns('forward')}
         disabled={!canScrollForward}
-        aria-label="Scroll to next column"
+        aria-label={$t('project.kanban.next')}
       >
-        <span>Next</span>
+        <span>{$t('project.kanban.next')}</span>
         <svg
           class="h-3 w-3 shrink-0"
           viewBox="0 0 20 20"
@@ -699,7 +680,7 @@
         ondragleave={onDragLeave}
         ondrop={(e) => onDrop(e, col.id)}
         role="region"
-        aria-label={col.title[$lang]}
+        aria-label={$t(col.titleKey)}
       >
         <!-- Column header -->
         <div class="flex items-center justify-between px-3 pt-3 pb-2">
@@ -709,7 +690,7 @@
                          {isOver ? 'animate-pulse' : ''}"
             ></span>
             <h3 class="font-bold text-sm {col.accent.split(' ')[1]}">
-              {col.title[$lang]}
+              {$t(col.titleKey)}
             </h3>
           </div>
 
@@ -729,12 +710,12 @@
                 <span class="text-slate-300 flex items-center gap-1">
                   <span class="w-1.5 h-1.5 rounded-sm bg-barbi/80"></span>
                   {missionCount}
-                  {i18n.missions[$lang]}
+                  {$t('project.kanban.missions')}
                 </span>
                 <span class="text-slate-300 flex items-center gap-1">
                   <span class="w-1.5 h-1.5 rounded-sm bg-orange-400/80"></span>
                   {actCount}
-                  {i18n.tasks[$lang]}
+                  {$t('project.kanban.tasks')}
                 </span>
               </div>
             {/if}
@@ -775,7 +756,7 @@
               role="button"
               tabindex="0"
               onkeypress={(e) => e.key === 'Enter' && fireCardClick(item)}
-              title={col.kind !== 'done' ? i18n.click[$lang] : item.name}
+              title={col.kind !== 'done' ? $t('project.kanban.click') : item.name}
             >
               <!-- Accent stripe: barbi for missions, orange for acts -->
               <div
@@ -793,7 +774,7 @@
                                bg-orange-500/15 text-orange-400 border border-orange-500/25
                                rounded-full px-1.5 py-px leading-tight"
                   >
-                    {i18n.task[$lang]}
+                    {$t('project.kanban.task')}
                   </span>
                 {:else}
                   <span
@@ -801,7 +782,7 @@
                                bg-barbi/15 text-barbi border border-barbi/25
                                rounded-full px-1.5 py-px leading-tight"
                   >
-                    {i18n.mission[$lang]}
+                    {$t('project.kanban.mission')}
                   </span>
                 {/if}
 
@@ -928,7 +909,7 @@
                         class="text-[9px] bg-amber-500/15 text-amber-400
                                    border border-amber-500/25 rounded-full px-1.5 py-px leading-tight"
                       >
-                        ⏳ {i18n.pendApproval[$lang]}
+                        ⏳ {$t('project.kanban.pendApproval')}
                       </span>
                     {/if}
                     {#if item.pendingValidation}
@@ -936,7 +917,7 @@
                         class="text-[9px] bg-sky-500/15 text-sky-400
                                    border border-sky-500/25 rounded-full px-1.5 py-px leading-tight"
                       >
-                        🔍 {i18n.pendValidation[$lang]}
+                        🔍 {$t('project.kanban.pendValidation')}
                       </span>
                     {/if}
                   </div>
@@ -974,7 +955,7 @@
                         ? '◎'
                         : '●'}
                 </div>
-                <p class="text-slate-600 text-xs">{i18n.empty[$lang]}</p>
+                <p class="text-slate-600 text-xs">{$t('project.kanban.empty')}</p>
               </div>
             </div>
           {/each}
@@ -984,7 +965,7 @@
   </div>
 
   <p class="text-center text-[11px] text-slate-700 mt-1 md:hidden select-none">
-    {i18n.scrollHint[$lang]}
+    {$t('project.kanban.scrollHint')}
   </p>
 </div>
 

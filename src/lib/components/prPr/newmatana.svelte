@@ -2,6 +2,7 @@
   import { mi } from '$lib/components/prPr/mi.js';
   import { idPr } from '../../stores/idPr.js';
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import Checkbox from '$lib/celim/ui/input/checkbox.svelte';
   import TextInput from '$lib/celim/ui/input/textInput.svelte';
   import NumberInput from '$lib/celim/ui/numberInput.svelte';
@@ -25,29 +26,12 @@
   let error1;
   let miDatan = [];
   let linkg = import.meta.env.VITE_URL + '/graphql';
-  const unlimited = { he: 'ליחידה - ללא הגבלה', en: 'unlimited' };
-  const cr = { he: ' יצירת מוצר חדש', en: 'create new product' };
-  const unlimitedMo = { he: 'לכל יחידה', en: 'for each unit' };
-  const ot = { he: 'עלות חד פעמית', en: 'one time' };
-  const py = { he: 'ליחידה', en: 'per unit' };
-  const pm = { he: 'חודשי', en: 'monthly' };
-  const pye = { he: 'שנתי', en: 'yearly' };
-  const avail = { he: 'כמות מצויה', en: 'Available Quantity' };
-  const nameT = { he: 'שם', en: 'Name' };
-  const priceT = { he: 'מחיר', en: 'Price' };
-  const typeT = { he: 'סוג', en: 'Type' };
-  const startT = { he: 'תאריך התחלת זמינות', en: 'Start Availablity Date' };
-  const endT = { he: 'תאריך סיום זמינות', en: 'End Availablity Date' };
-  const totalT = { he: 'סהכ', en: 'Total' };
-  const addG = { he: 'הוספת מוצר', en: 'Add product' };
-  const optional = { he: 'לא חובה למלא', en: 'optional' };
 
   let croppedImage = $state(null);
   const baseUrl = import.meta.env.VITE_URL;
 
   let url1 = baseUrl + '/api/upload';
 
-  const descriptionT = { he: 'תיאור', en: 'Description' };
 
   async function add() {
     loading = true;
@@ -176,19 +160,19 @@
 </script>
 
 <div class="flex flex-col align-middle justify-center gap-x-2">
-  <h2 class="text-barbi font-bold text-center underline">{cr[$lang]}</h2>
-  <TextInput lebel={nameT} bind:text={name} />
+  <h2 class="text-barbi font-bold text-center underline">{$t('project.newmatana.create')}</h2>
+  <TextInput lebel={{ he: 'שם', en: 'Name', ar: 'الاسم' }} bind:text={name} />
   <br />
-  <small class="text-center text-barbi">{descriptionT[$lang]}:</small>
+  <small class="text-center text-barbi">{$t('project.newmatana.description')}:</small>
   <RichText bind:outpot={description} editable={true} />
   <NumberInput
     bind:value={price}
-    topLebel={priceT[$lang]}
+    topLebel={$t('project.newmatana.price')}
     barbi={true}
     noNegative={true}
   />
 
-  <h2 class="text-center text-barbi">{typeT[$lang]}</h2>
+  <h2 class="text-center text-barbi">{$t('project.newmatana.type')}</h2>
   <select
     bind:value={kindOf}
     class="round form-select appearance-none
@@ -206,51 +190,51 @@
         m-0
         focus:text-barbi focus:bg-gold focus:border-barbi focus:outline-none"
   >
-    <option value="" disabled selected hidden>{py[$lang]}</option>
-    <option value="monthly">{pm[$lang]}</option>
-    <option value="yearly">{pye[$lang]}</option>
-    <option value="total">{py[$lang]}</option>
-    <option value="unlimited">{unlimited[$lang]}</option>
+    <option value="" disabled selected hidden>{$t('project.newmatana.perUnit')}</option>
+    <option value="monthly">{$t('project.newmatana.monthly')}</option>
+    <option value="yearly">{$t('project.newmatana.yearly')}</option>
+    <option value="total">{$t('project.newmatana.perUnit')}</option>
+    <option value="unlimited">{$t('project.newmatana.unlimited')}</option>
   </select>
   {#key unlimitedM}
     {#if kindOf !== 'unlimited' && unlimitedM === false}
       <NumberInput
         bind:value={quant}
-        topLebel={avail[$lang]}
+        topLebel={$t('project.newmatana.availableQuantity')}
         barbi={true}
         noNegative={true}
       />
     {/if}
   {/key}
   {#if kindOf == 'monthly' || kindOf == 'yearly'}
-    <Checkbox bind:value={unlimitedM} lebel={unlimited} />
+    <Checkbox bind:value={unlimitedM} lebel={{ he: 'ליחידה - ללא הגבלה', en: 'unlimited', ar: 'غير محدود' }} />
     <small class="text-center text-barbi"
-      >{startT[$lang]} - {optional[$lang]}</small
+      >{$t('project.newmatana.startDate')} - {$t('project.newmatana.optional')}</small
     >
     <input
       class="bg-gold hover:bg-mtork border-2 border-barbi rounded max-w-full"
       type="datetime-local"
-      placeholder={startT[$lang]}
+      placeholder={$t('project.newmatana.startDate')}
       bind:value={dates}
     />
     <br />
     <small class="text-center text-barbi"
-      >{endT[$lang]} - {optional[$lang]}</small
+      >{$t('project.newmatana.endDate')} - {$t('project.newmatana.optional')}</small
     >
     <input
       class="bg-gold hover:bg-mtork border-2 border-barbi rounded max-w-full"
       type="datetime-local"
-      placeholder={endT[$lang]}
+      placeholder={$t('project.newmatana.endDate')}
       bind:value={datef}
       min={dates}
     />
     <br />
   {/if}
-  <small class="text-center text-barbi">{totalT[$lang]}:</small>
+  <small class="text-center text-barbi">{$t('project.newmatana.total')}:</small>
   <h2 class="text-center text-barbi">
     {totalV.toLocaleString()}
     {#if unlimitedM === true || kindOf == 'unlimited'}
-      {unlimitedMo[$lang]}
+      {$t('project.newmatana.forEachUnit')}
     {/if}
   </h2>
 
@@ -265,7 +249,7 @@
   <br />
   <Checkbox
     bind:value={oneForeProject}
-    lebel={{ he: 'מוצר יחיד לפרויקט', en: 'one product for one project' }}
+    lebel={{ he: 'מוצר יחיד לפרויקט', en: 'one product for one project', ar: 'منتج واحد لكل مشروع' }}
   />
-  <Button text={addG} onClick={add} {loading} {success} {error} />
+  <Button text={{ he: 'הוספת מוצר', en: 'Add product', ar: 'إضافة منتج' }} onClick={add} {loading} {success} {error} />
 </div>

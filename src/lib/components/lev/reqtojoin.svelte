@@ -5,6 +5,7 @@
 
   import dayjs from 'dayjs';
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import { clickOutside } from './outsidclick.js';
 
   import { fly } from 'svelte/transition';
@@ -519,8 +520,6 @@
     loading = $state(false),
     diunm = $state(false),
     masa = $state(false);
-  const chatdes = { he: "צ'אט עם", en: 'chat with' };
-  const chatdes2 = { he: 'על צירופו לריקמה', en: 'on joining' };
   const close = () => {
     isOpen = false;
     diunm = false;
@@ -597,7 +596,7 @@
           <Diun
             onRect={afreact}
             smalldes={projectName + '-' + openmissionName}
-            nameChatPartner={`${chatdes[$lang]} ${useraplyname} ${chatdes2[$lang]}`}
+            nameChatPartner={`${$t('lev.reqtojoin.chatWith')} ${useraplyname} ${$t('lev.reqtojoin.onJoining')}`}
             mypos={true}
             {clicked}
             pendId={forumId}

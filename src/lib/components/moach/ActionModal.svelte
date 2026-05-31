@@ -2,6 +2,7 @@
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { lang } from '$lib/stores/lang.js';
   import Lowding from '$lib/celim/lowding.svelte';
+  import tr from '$lib/translations/tr.json';
 
   // Components for different states
   import PendsM from '$lib/components/prPr/pendsM.svelte';
@@ -18,10 +19,7 @@
     projectData
   } = $props();
 
-  const errmsg = {
-    he: 'אופס, משהו השתבש. כדאי לנסות שוב',
-    en: 'Oops, something went wrong. Please try again'
-  };
+  const errmsg = tr.ui.errorMsg;
 
   function closer() {
     isOpen = false;
@@ -71,7 +69,7 @@
               class="px-6 py-2 bg-gold text-barbi rounded-full font-bold hover:bg-white transition-colors"
               onclick={() => (a = 0)}
             >
-              {$lang == 'he' ? 'לנסות שוב' : 'Try Again'}
+              {tr.ui.tryAgain[$lang]}
             </button>
           </div>
         {:else if a == 4}

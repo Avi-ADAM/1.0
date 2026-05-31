@@ -6,7 +6,16 @@
     "descriptionPlaceholder": "صف إكمال المهمة بالكلمات...",
     "submitButton": "إرسال للموافقة",
     "pleaseWait": "لحظة من فضلك...",
-    "cancel": "إلغاء"
+    "cancel": "إلغاء",
+    "timerStopped": "تم إيقاف المؤقت بنجاح",
+    "success": "تمت العملية بنجاح!",
+    "error": "خطأ: يرجى المحاولة مرة أخرى، إذا استمرت المشكلة تواصل على baruch@1lev1.com",
+    "statusLabel": "حالة تقدم تنفيذ المهمة",
+    "save": "حفظ",
+    "done": "تم",
+    "saved": "تم الحفظ بنجاح",
+    "oneMonent": "لحظة من فضلك",
+    "editTimer": "تعديل المؤقت"
   },
   "cards": {
     "approve": "أريد",
@@ -18,6 +27,150 @@
     "replyChat": "رد",
     "negotiate": "تفاوض",
     "newNegotiation": "تفاوض جديد",
-    "toNegotiate": "للتفاوض"
+    "toNegotiate": "للتفاوض",
+    "saleCard": {
+      "customer": "العميل:",
+      "product": "المنتج:",
+      "price": "السعر:",
+      "quantity": "الكمية:",
+      "total": "المجموع:",
+      "startDate": "البداية:",
+      "endDate": "النهاية:",
+      "confirmDelivery": "تأكيد التسليم",
+      "confirmPayment": "استلمت المال",
+      "chat": "محادثة",
+      "creatingChat": "جاري إنشاء محادثة...",
+      "processing": "جاري المعالجة...",
+      "deliveryConfirmed": "تم تأكيد التسليم",
+      "paymentConfirmed": "تم تأكيد استلام المال",
+      "operationError": "فشل الإجراء",
+      "deliveryApprovals": "تأكيدات التسليم",
+      "customerReceived": "استلم العميل",
+      "customerPaid": "دفع العميل",
+      "moneyReceived": "تم استلام المال",
+      "delivered": "تم التسليم",
+      "awaitingApproval": "في انتظار تأكيدك",
+      "youShouldReceive": "يجب أن تستلم المال",
+      "moneyReceivers": "مستلمو المال",
+      "addReceiver": "حدد مستلم المال",
+      "addReceiverHint": "حتى يتمكن العميل من تحويل الأموال إليك، أضف نفسك كمستلم",
+      "addMeReceiver": "أضفني كمستلم",
+      "removeMeReceiver": "أزلني من القائمة"
+    },
+    "voteStatus": {
+      "approved": "وافقوا",
+      "oldVersion": "نسخة قديمة",
+      "waiting": "لم يصوتوا بعد",
+      "rejected": "رفضوا"
+    },
+    "filter": {
+      "heartTitle": "قلب النظام",
+      "heartDesc": "قلب النظام، انقر على الماسات لتصفية الإجراءات",
+      "switchView": "تغيير العرض من العملات إلى البطاقات",
+      "showSuggestions": "عرض المقترحات للمجموعات فقط",
+      "showVotes": "عرض التصويتات على المهام الجديدة فقط",
+      "showJoinRequests": "عرض طلبات الانضمام للمجموعات فقط",
+      "showSplitRequests": "عرض التصويتات على توزيع الأموال فقط",
+      "showInProgress": "عرض مهامي قيد التنفيذ فقط",
+      "showWelcome": "عرض رسائل الترحيب بالمجموعات فقط",
+      "showCompletionApproval": "عرض موافقات إتمام المهام فقط",
+      "personalDashboard": "الانتقال إلى لوحة التحكم الشخصية",
+      "showResourceApproval": "عرض موافقات استلام الموارد للمجموعات فقط",
+      "showResourceInvestment": "عرض مقترحات استثمار الموارد في المجموعات فقط",
+      "showResourceVotes": "عرض التصويتات على طلبات الموارد للمجموعات فقط",
+      "showJoinAndInvest": "عرض طلبات الانضمام واستثمار الموارد في المجموعات فقط",
+      "showMyPurchases": "عرض مشترياتي فقط"
+    },
+    "voteCard": {
+      "neged": "يلزم توضيح",
+      "totalVotes": "إجمالي الأصوات للتوضيح",
+      "inFavor": "مؤيد",
+      "notYet": "لم يصوت",
+      "notVotedYet": "لم يصوتوا بعد",
+      "perYear": "في السنة",
+      "oneYear": "سنة واحدة",
+      "years": "سنوات",
+      "inTotal": "المجموع",
+      "oneMonth": "شهر واحد"
+    },
+    "inpro": {
+      "missionInProgress": "مهمة قيد التنفيذ",
+      "progressStatus": "حالة تقدم تنفيذ المهمة",
+      "missionDetails": "تفاصيل المهمة",
+      "notes": "ملاحظات",
+      "hoursDone": "الساعات المنجزة والمحفوظة",
+      "from": "من",
+      "timer": "مؤقت",
+      "totalHours": "إجمالي الساعات المخصصة للمهمة",
+      "hoursCount": "عدد الساعات المنجزة والمحفوظة",
+      "completionApproval": "موافقة على استلام مورد بنجاح",
+      "editTimer": "تعديل المؤقت",
+      "monthlyHours": "ساعات شهرية",
+      "totalHoursLabel": "إجمالي الساعات"
+    }
+  },
+  "taskApproval": {
+    "approve": "موافقة",
+    "approving": "جارٍ الموافقة...",
+    "approved": "تمت الموافقة",
+    "successMessage": "تمت الموافقة على المهمة بنجاح!"
+  },
+  "reqtojoin": {
+    "chatWith": "دردشة مع",
+    "onJoining": "بشأن انضمامه إلى الشبكة"
+  },
+  "reqtosherut": {
+    "chatWith": "دردشة مع",
+    "onJoining": "بشأن انضمامه إلى الشبكة"
+  },
+  "mashsuggest": {
+    "cancel": "إغلاق",
+    "chatOnJoining": "دردشة حول الانضمام إلى الشبكة"
+  },
+  "pandingMesima": {
+    "error": "خطأ: يرجى المحاولة مرة أخرى، إذا استمرت المشكلة تواصل على baruch@1lev1.com"
+  },
+  "haluka": {
+    "successMessage": "تمت الموافقة على التوزيع بنجاح! 🎉",
+    "errorMessage": "خطأ في الموافقة على التوزيع. يرجى المحاولة مرة أخرى."
+  },
+  "reqtom": {
+    "voteTitle": "التصويت على طلب الانضمام إلى الشبكة ومشاركة مورد",
+    "heartOf": "قلب 1💗1",
+    "clickToProfile": "انقر مرتين لعرض ملف {name}",
+    "resourceName": "اسم المورد المقترح",
+    "clickToPublic": "انقر مرتين لعرض الصفحة العامة للشبكة",
+    "clickToBrain": "انقر مرتين للانتقال إلى مركز الشبكة {projectName}",
+    "cancel": "إغلاق",
+    "chatOnJoining": "دردشة حول الانضمام إلى الشبكة"
+  },
+  "pmas": {
+    "error": "خطأ: يرجى المحاولة مرة أخرى، إذا استمرت المشكلة تواصل على baruch@1lev1.com"
+  },
+  "diun": {
+    "labelMoney": "تفاصيل للمساعدة في إتمام التحويل (رقم الحساب، تفاصيل التحويل، إلخ)",
+    "labelRejection": "سبب الرفض (27 حرفًا على الأقل)",
+    "labelDiscussion": "رسالة - يرجى الرجوع إلى الرسائل السابقة",
+    "labelForum": "اكتب رسالة..."
+  },
+  "productRequest": {
+    "request": "طلب"
+  },
+  "didiget": {
+    "approveOf": "تأكيد استلام",
+    "from": "من",
+    "success": "تمت العملية بنجاح!",
+    "error": "خطأ: يرجى المحاولة مرة أخرى، إذا استمرت المشكلة تواصل على baruch@1lev1.com",
+    "messageSent": "تم إرسال الرسالة بنجاح"
+  },
+  "mesima": {
+    "suggestedMission": "مهمة مقترحة",
+    "openMission": "مهمة مفتوحة"
+  },
+  "welcomTo": {
+    "joined": "مرحباً بك في الشبكة",
+    "toHeadquarters": "للدخول إلى مقر الشبكة",
+    "welcome": "أهلاً وسهلاً بك في شبكتك الجديدة",
+    "heartOf": "قلب 1💗1"
   }
 }

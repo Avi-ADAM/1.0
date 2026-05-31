@@ -1,4 +1,7 @@
 <script lang="ts">
+  import tr from '$lib/translations/tr.json';
+  import { lang } from '$lib/stores/lang.js';
+
   let {
     done,
     inProgress,
@@ -81,20 +84,20 @@
   <!-- Legend -->
   <div class="legend">
     <div class="row">
-      <div class="dot-group"><div class="dot gold"></div><span>הושלמו</span></div>
-      <span class="val">{done} משימות</span>
+      <div class="dot-group"><div class="dot gold"></div><span>{tr.deals.donutCompleted[$lang]}</span></div>
+      <span class="val">{done} {tr.deals.donutMissions[$lang]}</span>
     </div>
     <div class="row">
-      <div class="dot-group"><div class="dot pink"></div><span>בביצוע</span></div>
-      <span class="val">{inProgress} משימות</span>
+      <div class="dot-group"><div class="dot pink"></div><span>{tr.deals.donutInProgress[$lang]}</span></div>
+      <span class="val">{inProgress} {tr.deals.donutMissions[$lang]}</span>
     </div>
     <div class="row">
-      <div class="dot-group"><div class="dot dim"></div><span>טרם החלו</span></div>
-      <span class="val">{total - done - inProgress} משימות</span>
+      <div class="dot-group"><div class="dot dim"></div><span>{tr.deals.donutNotStarted[$lang]}</span></div>
+      <span class="val">{total - done - inProgress} {tr.deals.donutMissions[$lang]}</span>
     </div>
     <div class="hours">
-      <div class="hours-label">סה״כ שעות</div>
-      <div class="hours-value">{hoursDone} / {hoursTotal} שע׳</div>
+      <div class="hours-label">{tr.deals.donutTotalHours[$lang]}</div>
+      <div class="hours-value">{hoursDone} / {hoursTotal} {tr.deals.hoursShort[$lang]}</div>
     </div>
   </div>
 </div>

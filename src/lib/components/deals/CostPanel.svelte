@@ -1,5 +1,7 @@
 <script lang="ts">
   import Panel from '$lib/components/Panel.svelte';
+  import tr from '$lib/translations/tr.json';
+  import { lang } from '$lib/stores/lang.js';
   import type { CostBreakdown } from '$lib/types';
 
   let {
@@ -18,37 +20,37 @@
   const paidPct   = $derived(Math.round((paid / totalCost) * 100));
 </script>
 
-<Panel title="עלויות">
+<Panel title={tr.deals.costsTitle[$lang]}>
   <!-- Total box -->
   <div class="total-box">
-    <span class="total-label">עלות כוללת</span>
+    <span class="total-label">{tr.deals.totalCost[$lang]}</span>
     <span class="total-value"><span class="sym">₪</span>{totalCost.toLocaleString()}</span>
   </div>
 
   <!-- Breakdown rows -->
   <div class="rows">
     <div class="row">
-      <span class="l">משימות</span>
+      <span class="l">{tr.deals.missions[$lang]}</span>
       <span class="v">₪ {costBreakdown.missions.toLocaleString()}</span>
     </div>
     <div class="row">
-      <span class="l">משאבים</span>
+      <span class="l">{tr.deals.resources[$lang]}</span>
       <span class="v">₪ {costBreakdown.resources.toLocaleString()}</span>
     </div>
 
     <div class="divider"></div>
 
     <div class="row">
-      <span class="l">שולם עד כה</span>
+      <span class="l">{tr.deals.paidSoFar[$lang]}</span>
       <span class="v paid">₪ {paid.toLocaleString()}</span>
     </div>
     <div class="row">
-      <span class="l">יתרה לתשלום</span>
+      <span class="l">{tr.deals.remaining[$lang]}</span>
       <span class="v pending">₪ {remaining.toLocaleString()}</span>
     </div>
     {#if pendingCost > 0}
       <div class="row">
-        <span class="l">ממתין לאישור</span>
+        <span class="l">{tr.deals.pendingApproval[$lang]}</span>
         <span class="v approval">₪ {pendingCost.toLocaleString()}</span>
       </div>
     {/if}
@@ -60,13 +62,13 @@
       <div class="prog-fill" style="width:{paidPct}%"></div>
     </div>
     <div class="prog-labels">
-      <span>שולם {paidPct}%</span>
-      <span>יתרה {100 - paidPct}%</span>
+      <span>{tr.deals.paid[$lang]} {paidPct}%</span>
+      <span>{tr.deals.balance[$lang]} {100 - paidPct}%</span>
     </div>
   </div>
 
   <!-- Pay CTA -->
-  <button class="pay-btn">💳 תשלום הבא →</button>
+  <button class="pay-btn">{tr.deals.nextPayment[$lang]}</button>
 </Panel>
 
 <style>

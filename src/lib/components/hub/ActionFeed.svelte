@@ -1,5 +1,6 @@
 <script lang="ts">
   import { lang } from '$lib/stores/lang.js';
+  import tr from '$lib/translations/tr.json';
 
   interface FeedItem {
     id: string;
@@ -17,12 +18,7 @@
 
   let { items }: Props = $props();
 
-  const t = {
-    he: { empty: 'אין פעילות כרגע' },
-    en: { empty: 'No activity right now' }
-  };
-
-  let labels = $derived(t[$lang as keyof typeof t] ?? t.he);
+  let labels = $derived({ empty: tr.hub.noActivity[$lang] });
 </script>
 
 <section dir="rtl" class="space-y-2">

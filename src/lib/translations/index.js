@@ -243,6 +243,51 @@ export const config = {
             routes: [/^(?:\/he|\/en|\/ar)?\/deals/],
             loader: async () => (await import('./ar/deals.json')).default,
         },
+        {
+            locale: 'he',
+            key: 'process',
+            loader: async () => (await import('./he/process.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'process',
+            loader: async () => (await import('./en/process.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'process',
+            loader: async () => (await import('./ar/process.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'timers',
+            loader: async () => (await import('./he/timers.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'timers',
+            loader: async () => (await import('./en/timers.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'timers',
+            loader: async () => (await import('./ar/timers.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'project',
+            loader: async () => (await import('./he/project.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'project',
+            loader: async () => (await import('./en/project.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'project',
+            loader: async () => (await import('./ar/project.json')).default,
+        },
     ],
 };
 

@@ -1,5 +1,6 @@
 <script>
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
 
   let {
     processes = [],
@@ -7,27 +8,11 @@
     selectedProcessId = '',
     onSelect
   } = $props();
-
-  const t = {
-    empty: { he: 'עדיין אין תהליכים לפרויקט הזה.', en: 'No processes yet for this project.' },
-    stages: {
-      need: { he: 'צורך', en: 'Need' },
-      pending: { he: 'ממתין', en: 'Pending' },
-      open: { he: 'פתוח', en: 'Open' },
-      candidates: { he: 'מועמדים', en: 'Candidates' },
-      execution: { he: 'ביצוע', en: 'Execution' },
-      approval: { he: 'אישור', en: 'Final approval' },
-      completion: { he: 'השלמה', en: 'Completion' }
-    },
-    next: { he: 'השלב הבא', en: 'Next stage' },
-    forum: { he: 'פורום ראשי', en: 'Main forum' },
-    select: { he: 'בחר לתוספות', en: 'Select for add flow' }
-  };
 </script>
 
 {#if processes.length === 0}
   <div class="rounded-lg border border-dashed border-slate-300 bg-white/50 p-6 text-center text-slate-600">
-    {t.empty[$lang]}
+    {$t('process.board.empty')}
   </div>
 {:else}
   <div class="grid gap-4">
@@ -42,7 +27,7 @@
           </div>
           <div class="flex flex-wrap items-center gap-2">
             <a href={'/forum/' + process.mainForumId} class="rounded-full border border-slate-300 px-3 py-1 text-xs font-medium text-slate-700">
-              {t.forum[$lang]} #{process.mainForumId}
+              {$t('process.board.forum')} #{process.mainForumId}
             </a>
             {#if selectable}
               <button
@@ -50,7 +35,7 @@
                 class:selected={selectedProcessId === process.id}
                 class="rounded-full border border-slate-300 px-3 py-1 text-xs font-medium text-slate-700 selected"
               >
-                {t.select[$lang]}
+                {$t('process.board.select')}
               </button>
             {/if}
           </div>
@@ -61,7 +46,7 @@
             <div class="rounded-md border border-slate-200 bg-slate-50 p-3">
               <div class="mb-2 flex items-center justify-between gap-2">
                 <h4 class="text-sm font-semibold text-slate-800">
-                  {t.stages[stage.key]?.[$lang] || stage.label}
+                  {$t(`process.board.stages.${stage.key}`) || stage.label}
                 </h4>
                 <span class="rounded-full bg-white px-2 py-0.5 text-xs text-slate-600">
                   {stage.items.length}
@@ -89,7 +74,7 @@
         </div>
 
         <div class="mt-4 rounded-md bg-slate-900 px-3 py-2 text-xs font-medium text-white">
-          {t.next[$lang]}: {t.stages[process.nextExpectedStage]?.[$lang] || process.nextExpectedStage}
+          {$t('process.board.next')}: {$t(`process.board.stages.${process.nextExpectedStage}`) || process.nextExpectedStage}
         </div>
       </section>
     {/each}

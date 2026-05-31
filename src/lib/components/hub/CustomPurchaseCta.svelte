@@ -1,12 +1,12 @@
 <script lang="ts">
   import { lang } from '$lib/stores/lang.js';
+  import tr from '$lib/translations/tr.json';
 
-  const t = {
-    he: { text: 'צור קנייה מותאמת אישית', sub: 'תאר מה אתה צריך ומצא שותפים', btn: 'התחל' },
-    en: { text: 'Create a custom purchase', sub: 'Describe what you need and find partners', btn: 'Start' }
-  };
-
-  let labels = $derived(t[$lang as keyof typeof t] ?? t.he);
+  let labels = $derived({
+    text: tr.hub.customPurchaseText[$lang],
+    sub: tr.hub.customPurchaseSub[$lang],
+    btn: tr.hub.startBtn[$lang]
+  });
 </script>
 
 <a

@@ -3,6 +3,7 @@
   import { fly, slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
   import { lang } from '$lib/stores/lang';
+  import { t } from '$lib/translations';
   import { toast } from 'svelte-sonner';
   import { formatTime } from '$lib/func/uti/formatTime';
   import {
@@ -41,72 +42,6 @@
     taskSearchTerm = $bindable(''),
     onUpdateTimer
   } = $props();
-
-  // טקסטים לדיאלוגים
-  const dialogHeader = {
-    en: 'Save Timer',
-    he: 'שמירת טיימר'
-  };
-
-  const dialogEditT = {
-    en: 'Edit Timer',
-    he: 'עריכת טיימר'
-  };
-
-  const innerDialogButton = {
-    en: 'Save Timer',
-    he: 'שמירת הטיימר'
-  };
-
-  const innerButtonT = {
-    en: 'Task update',
-    he: 'עדכון מטלות'
-  };
-
-  const clearButtonT = {
-    he: 'עריכת זמנים',
-    en: 'Edit Times'
-  };
-
-  const innerTextT = {
-    he: 'באפשרותך לעדכן אלו מטלות בביצוע כעת או לערוך את הזמנים של הטיימר',
-    en: 'you can update the tasks you are currently working on or edit the timer times'
-  };
-
-  const clearButton = {
-    en: 'Clear Timer',
-    he: 'ניקוי הטיימר'
-  };
-
-  const clearDialogText = {
-    title: {
-      he: 'ניהול זמנים',
-      en: 'Manage Times'
-    },
-    clearAll: {
-      he: 'נקה הכל',
-      en: 'Clear All'
-    },
-    noTimers: {
-      he: 'אין זמנים לניהול',
-      en: 'No times to manage'
-    }
-  };
-
-  const choose = {
-    en: 'Choose tasks',
-    he: 'בחירת המטלות בהן עסקת'
-  };
-
-  const updateButton = {
-    en: 'Update',
-    he: 'עדכון'
-  };
-
-  const succsessText = {
-    en: 'Timer updated successfully',
-    he: 'הטיימר עודכן בהצלחה'
-  };
 
   // פונקציות
   function closeDialog() {
@@ -160,25 +95,13 @@
 
         showClearDialog = false;
         unlockTimerForEdit(timer.mId, { refresh: true });
-        const successMessage = {
-          he: 'ניקוי הטיימרים בוצע בהצלחה',
-          en: 'Timers cleared successfully'
-        };
-        toast.success(successMessage[$lang]);
+        toast.success($t('timers.clearSuccess'));
       } else {
-        const errorMessage = {
-          he: 'ניקוי הטיימרים נכשל',
-          en: 'Failed to clear timers'
-        };
-        toast.error(errorMessage[$lang]);
+        toast.error($t('timers.clearError'));
       }
     } catch (error) {
       console.error('Error clearing timers:', error);
-      const errorMessage = {
-        he: 'ניקוי הטיימרים נכשל',
-        en: 'Failed to clear timers'
-      };
-      toast.error(errorMessage[$lang]);
+      toast.error($t('timers.clearError'));
     }
   }
   async function localHandleClearSingle(i, timer) {
@@ -231,7 +154,7 @@
           ) ?? [];
         taskSearchTerm = '';
         unlockTimerForEdit(timer.mId, { refresh: true });
-        toast.success(`${succsessText[$lang]}`);
+        toast.success($t('timers.timerUpdated'));
       }
     });
   }
@@ -276,19 +199,9 @@
       dialogEdit = false;
       unlockTimerForEdit(timer.mId, { refresh: true });
 
-      const successMessage = {
-        he: 'הטיימר נשמר בהצלחה',
-        en: 'Timer saved successfully'
-      };
-
-      toast.success(successMessage[$lang]);
+      toast.success($t('timers.saveSuccess'));
     } else {
-      const errorMessage = {
-        he: 'שגיאה בשמירת הטיימר',
-        en: 'Error saving timer'
-      };
-
-      toast.error(errorMessage[$lang]);
+      toast.error($t('timers.saveError'));
     }
   }
 
@@ -443,10 +356,13 @@
         )
       : 'No timer available'
   );
-  let innerText = $derived({
-    en: `Timer stopped at ${lastTimerDuration}. Would you like to save this time or clear it?`,
-    he: `הטיימר נעצר לאחר ${lastTimerDuration}. האם ברצונך לשמור את הזמן או לנקות אותו?`
-  });
+  let innerText = $derived(
+    $lang === 'he'
+      ? `הטיימר נעצר לאחר ${lastTimerDuration}. האם ברצונך לשמור את הזמן או לנקות אותו?`
+      : $lang === 'ar'
+        ? `توقف المؤقت عند ${lastTimerDuration}. هل تريد حفظ هذا الوقت أو مسحه؟`
+        : `Timer stopped at ${lastTimerDuration}. Would you like to save this time or clear it?`
+  );
   let filteredTasks = $derived(
     timer?.attributes?.acts?.data?.filter(
       (task) =>
@@ -485,7 +401,7 @@
         </svg>
       </button>
       <div class="dialog-content mt-4" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
-        <h2 class="dialog-title">{clearDialogText.title[$lang]}</h2>
+        <h2 class="dialog-title">{$t('timers.manageTime')}</h2>
 
         {#if timer?.attributes?.activeTimer?.data?.attributes?.timers?.length}
           <div class="timer-list d">
@@ -608,7 +524,7 @@
               style="background: linear-gradient(to right, #4ade80, #3b82f6); color: black;"
               onclick={handleSaveTimer}
             >
-              {innerDialogButton[$lang]}
+              {$t('timers.saveTimerBtn')}
             </button>
             <button
               class="recalc-btn"
@@ -624,10 +540,10 @@
             onclick={() => localClearAllTimers()}
             aria-label="Clear all timers"
           >
-            {clearDialogText.clearAll[$lang]}
+            {$t('timers.clearAll')}
           </button>
         {:else}
-          <p class="no-timers">{clearDialogText.noTimers[$lang]}</p>
+          <p class="no-timers">{$t('timers.noTimes')}</p>
         {/if}
       </div>
     </DialogContent>
@@ -661,19 +577,19 @@
       </button>
       <div class="dialog-content mt-4" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
         <h2 class="dialog-title">
-          {dialogEdit == true ? dialogEditT[$lang] : dialogHeader[$lang]}
+          {dialogEdit == true ? $t('timers.editTimer') : $t('timers.saveTimer')}
         </h2>
         <p class="dialog-message">
-          {dialogEdit == true ? innerTextT[$lang] : innerText[$lang]}
+          {dialogEdit == true ? $t('timers.updateHint') : innerText}
         </p>
         <div class="dialog-buttons">
           <button class="save-btn" onclick={handleSaveTimer}>
             {dialogEdit == true
-              ? innerButtonT[$lang]
-              : innerDialogButton[$lang]}
+              ? $t('timers.updateTasks')
+              : $t('timers.saveTimerBtn')}
           </button>
           <button class="clear-btn" onclick={handleClearTimer}>
-            {dialogEdit == true ? clearButtonT[$lang] : clearButton[$lang]}
+            {dialogEdit == true ? $t('timers.editTimes') : $t('timers.clearTimer')}
           </button>
         </div>
       </div>
@@ -704,9 +620,9 @@
         </svg>
       </button>
       <div class="dialog-content mt-4" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
-        <h2 class="dialog-title">{dialogHeader[$lang]}</h2>
+        <h2 class="dialog-title">{$t('timers.saveTimer')}</h2>
         {#if filteredTasks.length}
-          <h3>{choose[$lang]}</h3>
+          <h3>{$t('timers.chooseTasks')}</h3>
           <div class="task-selection">
             <input
               type="text"
@@ -743,21 +659,21 @@
             onclick={handleSaveTimerFinal}
             disabled={elapsedTime === '00:00:00' && dialogEdit != true}
           >
-            {innerDialogButton[$lang]}
+            {$t('timers.saveTimerBtn')}
           </button>
           {#if filteredTasks.length > 0}
             <button
               class="px-4 py-2 rounded font-bold text-black bg-gradient-to-r from-yellow-400 to-orange-400 transform transition-transform hover:-translate-y-1"
               onclick={handleUpdateTimer}
             >
-              {updateButton[$lang]}
+              {$t('timers.update')}
             </button>
           {/if}
           <button
             class="px-4 py-2 rounded font-bold text-white bg-gradient-to-r from-pink-500 to-red-500 transform transition-transform hover:-translate-y-1"
             onclick={handleClearTimer}
           >
-            {clearButton[$lang]}
+            {$t('timers.clearTimer')}
           </button>
         </div>
       </div>
