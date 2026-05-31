@@ -179,7 +179,7 @@
         type="button"
         onclick={() => change('en')}
         title="change language to English"
-        class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-sm whitespace-nowrap"
+        class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
       >
         {$t('home.languages.en')}
       </button>
@@ -189,7 +189,7 @@
         type="button"
         onclick={() => change('ar')}
         title="change language to Arabic"
-        class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-sm whitespace-nowrap"
+        class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
       >
         {$t('home.languages.ar')}
       </button>
@@ -199,14 +199,14 @@
         type="button"
         onclick={() => change('he')}
         title="change language to Hebrew"
-        class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-sm whitespace-nowrap"
+        class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
       >
         {$t('home.languages.he')}
       </button>
     {/if}
     {#if $lang == 'he'}
       <a
-        class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-sm whitespace-nowrap"
+        class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
         title=" 1💗1 אודות "
         data-sveltekit-prefetch
         href="/about"
@@ -215,14 +215,14 @@
       </a>
     {/if}
     <a
-      class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-sm whitespace-nowrap"
+      class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
       data-sveltekit-prefetch
       href="/faq"
     >
       {$t('home.nav.faq')}
     </a>
     <a
-      class="text-barbi border-2 border-lturk font-bold hover:text-gold text-center bg-gold hover:bg-barbi px-1.5 py-0.5 rounded text-sm whitespace-nowrap"
+      class="text-barbi border-2 border-lturk font-bold hover:text-gold text-center bg-gold hover:bg-barbi px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
       data-sveltekit-prefetch
       href="/love"
     >
@@ -350,14 +350,14 @@
       <div
         dir="ltr"
         style="text-shadow:none;"
-        class="pt-2 sm:pt-6 font-bold sm:text-2xl text-xl text-transparent
+        class="pt-2 sm:pt-6 font-bold sm:text-2xl text-2xl text-transparent
           bg-clip-text bg-[length:auto_200%] animate-gradienty
           bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]
           flex-wrap flex flex-row"
       >
         <div class="flip">
           <h1
-            class="font-bold sm:text-4xl text-2xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
+            class="font-bold sm:text-4xl text-3xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
             bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
           >
             1
@@ -365,7 +365,7 @@
         </div>
         <div>
           <h1
-            class="font-bold mt-2 sm:text-xl text-lg text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
+            class="font-bold mt-2 sm:text-xl text-xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
           bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
           >
             💗
@@ -373,7 +373,7 @@
         </div>
         <div>
           <h1
-            class="font-bold sm:text-4xl text-2xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
+            class="font-bold sm:text-4xl text-3xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
             bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
           >
             1
@@ -382,7 +382,7 @@
       </div>
 
       <div
-        class="sababa mt-2 mb-8 font-bold sm:text-2xl text-lg text-transparent
+        class="sababa mt-2 mb-8 font-bold sm:text-2xl text-xl text-transparent
           bg-clip-text bg-[length:auto_200%] animate-gradienty
           bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
         style="text-shadow:none;"
@@ -396,7 +396,7 @@
           class="bg-gradient-to-br from-amber-200 via-amber-300 to-rose-200 opacity-80 px-4 py-3 mt-2 rounded-lg border-2 border-gold shadow-xl backdrop-blur-sm"
         >
           <h2
-            class="text-rose-700 font-bold text-xl mb-2 text-center"
+            class="text-rose-700 font-bold text-2xl sm:text-xl mb-2 text-center"
             style="font-family: 'Sababa', sans-serif; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);"
           >
             {#if $locale === 'he'}
@@ -408,7 +408,7 @@
             {/if}
           </h2>
           <p
-            class="text-slate-900 text-md leading-relaxed text-center"
+            class="text-slate-900 text-lg sm:text-base leading-relaxed text-center"
             style="font-family: 'Sababa', sans-serif;"
           >
             {#if $locale === 'he'}
@@ -438,7 +438,7 @@
                 : $locale === 'ar'
                   ? '/aitifaqia'
                   : '/convention'}
-              class="inline-block bg-barbi hover:bg-white hover:text-barbi text-gold font-semibold px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+              class="inline-block bg-barbi hover:bg-white hover:text-barbi text-gold font-semibold text-lg sm:text-base px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
               style="font-family: 'Sababa', sans-serif;"
             >
               {#if $locale === 'he'}
@@ -518,7 +518,7 @@
           {#if statsLoaded}
             <div class="text-center">
               <p
-                class="text-white font-semibold text-lg mb-2"
+                class="text-white font-semibold text-xl sm:text-lg mb-2"
                 style="font-family: 'Sababa', sans-serif;"
               >
                 {$t('home.stats.currently')}
@@ -528,27 +528,27 @@
                   <div class="text-2xl font-bold text-gold">
                     {projectsCount}
                   </div>
-                  <div class="text-white text-sm">
+                  <div class="text-white text-base sm:text-sm">
                     {$t('home.stats.partnerships')}
                   </div>
                 </div>
                 <div class="text-gold text-2xl">•</div>
                 <div class="bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
                   <div class="text-2xl font-bold text-gold">{usersCount}</div>
-                  <div class="text-white text-sm">
+                  <div class="text-white text-base sm:text-sm">
                     {$t('home.stats.members')}
                   </div>
                 </div>
                 <div class="text-gold text-2xl">•</div>
                 <div class="bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
                   <div class="text-2xl font-bold text-gold">{membersCount}</div>
-                  <div class="text-white text-sm">חתמו על ההסכמה</div>
+                  <div class="text-white text-base sm:text-sm">חתמו על ההסכמה</div>
                 </div>
               </div>
             </div>
           {:else}
             <div
-              class="text-center text-white font-semibold"
+              class="text-center text-white font-semibold text-lg sm:text-base"
               style="font-family: 'Sababa', sans-serif;"
             >
               {$t('home.stats.loading')}
@@ -562,7 +562,7 @@
         >
           <div style="font-family:Gan, Power;" class="flex flex-col gap-3">
             <button
-              class="transition-all duration-300 flex flex-row justify-center items-center text-barbi px-4 py-2 text-xl bg-white hover:text-slate-800 rounded-xl shadow-lg"
+              class="transition-all duration-300 flex flex-row justify-center items-center text-barbi px-4 py-2 text-2xl sm:text-xl bg-white hover:text-slate-800 rounded-xl shadow-lg"
               onclick={() => {
                 goto('/login');
                 loadinga = true;
@@ -572,7 +572,7 @@
               {$t('home.cta.login')}
             </button>
             <button
-              class="transition-all duration-300 text-barbi px-4 py-2 text-xl bg-gold hover:text-slate-800 rounded-xl flex flex-row justify-center items-center shadow-lg"
+              class="transition-all duration-300 text-barbi px-4 py-2 text-2xl sm:text-xl bg-gold hover:text-slate-800 rounded-xl flex flex-row justify-center items-center shadow-lg"
               onclick={() => {
                 goto('/hascama');
                 loading = true;
@@ -592,17 +592,17 @@
       >
         <!-- בלוק: הבעיה / הזדהות -->
         <section class="text-center">
-          <h2 class="text-rose-700 font-bold text-2xl mb-4">
+          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-4">
             {$t('home.sections.problemTitle')}
           </h2>
           <div class="flex flex-col gap-3">
             <p
-              class="bg-white/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-3 text-slate-900 shadow"
+              class="bg-white/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-3 text-slate-900 text-lg sm:text-base shadow"
             >
               {$t('home.intro.q1')}
             </p>
             <p
-              class="bg-white/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-3 text-slate-900 shadow"
+              class="bg-white/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-3 text-slate-900 text-lg sm:text-base shadow"
             >
               {$t('home.intro.q2')}
             </p>
@@ -611,10 +611,10 @@
 
         <!-- בלוק: יכולות הפלטפורמה -->
         <section id="features" class="scroll-mt-16">
-          <h2 class="text-rose-700 font-bold text-2xl mb-1 text-center">
+          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center">
             {$t('home.sections.featuresTitle')}
           </h2>
-          <p class="text-center text-slate-700 text-sm mb-5">
+          <p class="text-center text-slate-700 text-base sm:text-sm mb-5">
             {$t('home.sections.featuresSub')}
           </p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -623,10 +623,10 @@
                 class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
               >
                 <div class="text-2xl mb-1">{icon}</div>
-                <h3 class="text-rose-700 font-bold mb-1">
+                <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
                   {$t(`home.platform.${key}_t`)}
                 </h3>
-                <p class="text-slate-800 text-sm leading-relaxed">
+                <p class="text-slate-800 text-base sm:text-sm leading-relaxed">
                   {$t(`home.platform.${key}_d`)}
                 </p>
               </div>
@@ -636,7 +636,7 @@
 
         <!-- בלוק: איך זה עובד ב‑4 צעדים -->
         <section id="how" class="scroll-mt-16">
-          <h2 class="text-rose-700 font-bold text-2xl mb-4 text-center">
+          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-4 text-center">
             {$t('home.sections.howTitle')}
           </h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -649,10 +649,10 @@
                 >
                   {i + 1}
                 </div>
-                <h3 class="text-rose-700 font-bold mb-1">
+                <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
                   {$t(`home.maze.flow.${s}.title`)}
                 </h3>
-                <p class="text-slate-800 text-sm leading-relaxed">
+                <p class="text-slate-800 text-base sm:text-sm leading-relaxed">
                   {$t(`home.maze.flow.${s}.desc`)}
                 </p>
               </div>
@@ -662,30 +662,30 @@
 
         <!-- בלוק: הקונסיירז' (דו‑קהלי) -->
         <section id="concierge" class="scroll-mt-16">
-          <p class="text-center text-barbi font-bold tracking-widest mb-1">
+          <p class="text-center text-barbi font-bold text-base sm:text-sm tracking-widest mb-1">
             {$t('home.concierge.eyebrow')}
           </p>
-          <h2 class="text-rose-700 font-bold text-2xl mb-2 text-center">
+          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-2 text-center">
             {$t('home.concierge.title')}
           </h2>
-          <p class="text-center text-slate-800 mb-2">
+          <p class="text-center text-slate-800 text-lg sm:text-base mb-2">
             {$t('home.concierge.subtitle')}
           </p>
-          <p class="text-center text-rose-600 text-sm mb-5">
+          <p class="text-center text-rose-600 text-base sm:text-sm mb-5">
             {$t('home.concierge.flow')}
           </p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div
               class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
             >
-              <h3 class="text-rose-700 font-bold text-lg mb-2">
+              <h3 class="text-rose-700 font-bold text-xl sm:text-lg mb-2">
                 {$t('home.concierge.customerTitle')}
               </h3>
-              <p class="text-slate-800 text-sm leading-relaxed mb-4 grow">
+              <p class="text-slate-800 text-base sm:text-sm leading-relaxed mb-4 grow">
                 {$t('home.concierge.customerDesc')}
               </p>
               <button
-                class="bg-barbi hover:bg-white hover:text-barbi text-gold font-semibold px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:scale-105"
+                class="bg-barbi hover:bg-white hover:text-barbi text-gold font-semibold text-lg sm:text-base px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:scale-105"
                 onclick={() => goto('/concierge/new')}
               >
                 {$t('home.concierge.customerCta')}
@@ -694,14 +694,14 @@
             <div
               class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
             >
-              <h3 class="text-rose-700 font-bold text-lg mb-2">
+              <h3 class="text-rose-700 font-bold text-xl sm:text-lg mb-2">
                 {$t('home.concierge.providerTitle')}
               </h3>
-              <p class="text-slate-800 text-sm leading-relaxed mb-4 grow">
+              <p class="text-slate-800 text-base sm:text-sm leading-relaxed mb-4 grow">
                 {$t('home.concierge.providerDesc')}
               </p>
               <button
-                class="bg-gold hover:bg-barbi hover:text-gold text-barbi font-semibold px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:scale-105"
+                class="bg-gold hover:bg-barbi hover:text-gold text-barbi font-semibold text-lg sm:text-base px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:scale-105"
                 onclick={() => goto('/concierge')}
               >
                 {$t('home.concierge.providerCta')}
@@ -712,10 +712,10 @@
 
         <!-- בלוק: למי זה מתאים -->
         <section id="who" class="scroll-mt-16">
-          <h2 class="text-rose-700 font-bold text-2xl mb-1 text-center">
+          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center">
             {$t('home.sections.whoTitle')}
           </h2>
-          <p class="text-center text-slate-700 text-sm mb-5">
+          <p class="text-center text-slate-700 text-base sm:text-sm mb-5">
             {$t('home.sections.whoSub')}
           </p>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -724,10 +724,10 @@
                 class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col text-center"
               >
                 <div class="text-3xl mb-1">{icon}</div>
-                <h3 class="text-rose-700 font-bold mb-1">
+                <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
                   {$t(`home.sections.${key}_t`)}
                 </h3>
-                <p class="text-slate-800 text-sm leading-relaxed">
+                <p class="text-slate-800 text-base sm:text-sm leading-relaxed">
                   {$t(`home.sections.${key}_d`)}
                 </p>
               </div>
@@ -737,40 +737,40 @@
 
         <!-- בלוק: הוכחה חברתית / תנועה עולמית -->
         <section class="text-center">
-          <h2 class="text-rose-700 font-bold text-2xl mb-1">
+          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1">
             {$t('home.sections.proofTitle')}
           </h2>
-          <p class="text-slate-700 text-sm mb-4 max-w-md mx-auto">
+          <p class="text-slate-700 text-base sm:text-sm mb-4 max-w-md mx-auto">
             {$t('home.sections.proofSub')}
           </p>
           <div class="flex justify-center items-stretch gap-3 flex-wrap">
             <div class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]">
               <div class="text-2xl font-bold text-white">{projectsCount}</div>
-              <div class="text-white/90 text-xs">{$t('home.sections.proofStatProjects')}</div>
+              <div class="text-white/90 text-sm sm:text-xs">{$t('home.sections.proofStatProjects')}</div>
             </div>
             <div class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]">
               <div class="text-2xl font-bold text-white">{usersCount}</div>
-              <div class="text-white/90 text-xs">{$t('home.sections.proofStatMembers')}</div>
+              <div class="text-white/90 text-sm sm:text-xs">{$t('home.sections.proofStatMembers')}</div>
             </div>
             <div class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]">
               <div class="text-2xl font-bold text-white">{membersCount}</div>
-              <div class="text-white/90 text-xs">{$t('home.sections.proofStatSigners')}</div>
+              <div class="text-white/90 text-sm sm:text-xs">{$t('home.sections.proofStatSigners')}</div>
             </div>
           </div>
         </section>
 
         <!-- בלוק: מפת ההסכמה הגלובלית -->
         <section class="text-center">
-          <h2 class="text-rose-700 font-bold text-2xl mb-1">
+          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1">
             {$t('home.sections.mapTitle')}
           </h2>
-          <p class="text-slate-700 text-sm mb-4 max-w-md mx-auto">
+          <p class="text-slate-700 text-base sm:text-sm mb-4 max-w-md mx-auto">
             {$t('home.sections.mapSub')}
           </p>
           <a
             href="/love"
             data-sveltekit-prefetch
-            class="inline-block bg-barbi hover:bg-white hover:text-barbi text-gold font-semibold px-5 py-2 rounded-lg shadow-md hover:scale-105 transition-all duration-300"
+            class="inline-block bg-barbi hover:bg-white hover:text-barbi text-gold font-semibold text-lg sm:text-base px-5 py-2 rounded-lg shadow-md hover:scale-105 transition-all duration-300"
           >
             🗺️ {$t('home.sections.mapCta')}
           </a>
@@ -779,10 +779,10 @@
         <!-- בלוק: מודל / תמחור -->
         <section class="text-center">
           <div class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-2xl px-5 py-5 shadow">
-            <h2 class="text-rose-700 font-bold text-2xl mb-1">
+            <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1">
               {$t('home.sections.modelTitle')}
             </h2>
-            <p class="text-slate-800 leading-relaxed max-w-md mx-auto">
+            <p class="text-slate-800 text-lg sm:text-base leading-relaxed max-w-md mx-auto">
               {$t('home.sections.modelSub')}
             </p>
           </div>
@@ -790,7 +790,7 @@
 
         <!-- בלוק: שאלות נפוצות -->
         <section id="faq" class="scroll-mt-16">
-          <h2 class="text-rose-700 font-bold text-2xl mb-4 text-center">
+          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-4 text-center">
             {$t('home.sections.faqTitle')}
           </h2>
           <div class="flex flex-col gap-2">
@@ -798,10 +798,10 @@
               <details
                 class="bg-white/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-2 shadow"
               >
-                <summary class="text-rose-700 font-semibold cursor-pointer py-1">
+                <summary class="text-rose-700 font-semibold text-lg sm:text-base cursor-pointer py-1">
                   {$t(`home.maze.faq.q${q}`)}
                 </summary>
-                <p class="text-slate-800 text-sm leading-relaxed pt-2">
+                <p class="text-slate-800 text-base sm:text-sm leading-relaxed pt-2">
                   {$t(`home.maze.faq.a${q}`)}
                 </p>
               </details>
@@ -814,15 +814,15 @@
           <div
             class="bg-gradient-to-br from-gold via-barbi to-gold px-5 py-6 rounded-2xl border-2 border-gold shadow-xl text-center"
           >
-            <h2 class="text-2xl font-bold text-white mb-2">
+            <h2 class="text-3xl sm:text-2xl font-bold text-white mb-2">
               {$t('home.sections.ctaFinalTitle')}
             </h2>
-            <p class="text-white/90 mb-4">
+            <p class="text-white/90 text-lg sm:text-base mb-4">
               {$t('home.sections.ctaFinalSub')}
             </p>
             <div class="flex gap-3 justify-center flex-wrap">
               <button
-                class="bg-white text-barbi font-bold px-5 py-2 rounded-xl shadow-lg hover:scale-105 transition-all duration-300"
+                class="bg-white text-barbi font-bold text-lg sm:text-base px-5 py-2 rounded-xl shadow-lg hover:scale-105 transition-all duration-300"
                 onclick={() => {
                   goto('/login');
                   fi = true;
@@ -831,7 +831,7 @@
                 {$t('home.cta.login')}
               </button>
               <button
-                class="bg-barbi text-gold font-bold px-5 py-2 rounded-xl shadow-lg hover:scale-105 transition-all duration-300"
+                class="bg-barbi text-gold font-bold text-lg sm:text-base px-5 py-2 rounded-xl shadow-lg hover:scale-105 transition-all duration-300"
                 onclick={() => {
                   goto(
                     $locale == 'he'
@@ -909,6 +909,12 @@
     font-family: 'Sababa', system-ui !important;
     text-shadow: none;
     color: inherit;
+  }
+  @media (max-width: 639px) {
+    .sababa :global(span) {
+      font-size: 1.35rem;
+      line-height: 1.45;
+    }
   }
   .flip {
     -moz-transform: scale(-1, 1);
