@@ -34,6 +34,7 @@
   import SveltyPicker from 'svelty-picker';
 
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import Button from '$lib/celim/ui/button.svelte';
   import { page } from '$app/state';
   /**
@@ -194,48 +195,18 @@
       });
     }
   }
-  const level = {
-    he: 'השמה למשימה בתהליך ספציפית או להציע לפי תפקיד',
-    en: 'do you want to assing it to spesific mission and person or to to offer it to all projecr mambers of a choosen role'
-  };
-  const sedes = { he: ' שליחה', en: 'send' };
-  const placeholderdf = { he: 'תאריך סיום', en: 'end date' };
-  const placeholderds = {
-    he: 'תאריך התחלה (אם רלוונטי)',
-    en: 'starting date (if relevant)'
-  };
-  const heading = { he: 'יצירת מטלה חדשה', en: 'create new task' };
-  const editheading = { he: 'עריכת מטלה', en: 'edit task' };
-
-  const namede = { he: 'שם למטלה', en: 'task name' };
-  const desde = { he: 'תיאור קצר', en: 'task description' };
-  const placeholder = {
-    he: 'בחירת משימה בתהליך',
-    en: 'choose mission in progress'
-  };
-  const placeholderoles = { he: 'בחירת תפקיד', en: 'choose role' };
-  const linkdes = { he: 'לינק רלוונטי', en: 'relevante link' };
-  const seerdes = {
-    he: 'נא לבחור משימה בתהליך לשיוך המטלה',
-    en: 'please choose one mission in progress'
-  };
-  const neerdes = { he: 'חובה להזין שם', en: 'must enter name' };
-  const pers = { he: 'משימה בתהליך', en: 'mission in progress' };
-  const role = { he: 'תפקידים', en: 'roles' };
-
-  const urgencyLabel = { he: 'רמת דחיפות', en: 'Urgency level' };
-  const urgencyOptions = [
-    { value: 'white', label: { he: 'לבן (רגיל)', en: 'White (Normal)' }, color: 'bg-white' },
-    { value: 'green', label: { he: 'ירוק (נמוך)', en: 'Green (Low)' }, color: 'bg-green-500' },
-    { value: 'yellow', label: { he: 'צהוב (בינוני)', en: 'Yellow (Medium)' }, color: 'bg-yellow-400' },
-    { value: 'red', label: { he: 'אדום (גבוה)', en: 'Red (High)' }, color: 'bg-red-500' }
-  ];
+  const urgencyOptions = $derived([
+    { value: 'white', label: $t('mission.crtask.urgencyWhite'), color: 'bg-white' },
+    { value: 'green', label: $t('mission.crtask.urgencyGreen'), color: 'bg-green-500' },
+    { value: 'yellow', label: $t('mission.crtask.urgencyYellow'), color: 'bg-yellow-400' },
+    { value: 'red', label: $t('mission.crtask.urgencyRed'), color: 'bg-red-500' }
+  ]);
   //TODO: validation of dateF after dateS
 </script>
 
 <div class="flex flex-col items-center justify-center">
   <h1 class="text-barbi">
-    {isEdit == false ? heading[$lang] : editheading[$lang]}
+    {isEdit == false ? $t('mission.crtask.heading') : $t('mission.crtask.editHeading')}
   </h1>
   <div dir={$lang == 'en' ? 'ltr' : 'rtl'} class="textinput">
     <input name="des" bind:value={name} type="text" class="input" required />
@@ -243,23 +214,23 @@
       style:right={$lang == 'he' ? '0' : 'none'}
       style:left={$lang == 'en' ? '0' : 'none'}
       for="des"
-      class="label">{namede[$lang]}</label
+      class="label">{$t('mission.crtask.taskName')}</label
     >
     <span class="line"></span>
   </div>
   {#if neEr == true}
-    <small class="text-red-900 bg-slate-200 px-2">{neerdes[$lang]}</small>
+    <small class="text-red-900 bg-slate-200 px-2">{$t('mission.crtask.nameRequired')}</small>
   {/if}
   <br /><span>
     <SveltyPicker
-      placeholder={placeholderds[$lang]}
+      placeholder={$t('mission.crtask.startDate')}
       inputClasses="form-control"
       format=" hh:ii dd/mm/yyyy"
       bind:value={mimatai}
     ></SveltyPicker>
   </span> <br />
   <SveltyPicker
-    placeholder={placeholderdf[$lang]}
+    placeholder={$t('mission.crtask.endDate')}
     inputClasses="form-control"
     format=" hh:ii dd/mm/yyyy"
     bind:value={adMatai}
@@ -270,7 +241,7 @@
       style:right={$lang == 'he' ? '0' : 'none'}
       style:left={$lang == 'en' ? '0' : 'none'}
       for="des"
-      class="label">{linkdes[$lang]}</label
+      class="label">{$t('mission.crtask.relevantLink')}</label
     >
     <span class="line"></span>
   </div>
@@ -281,20 +252,20 @@
       style:right={$lang == 'he' ? '0' : 'none'}
       style:left={$lang == 'en' ? '0' : 'none'}
       for="es"
-      class="label">{desde[$lang]}</label
+      class="label">{$t('mission.crtask.taskDescription')}</label
     >
     <span class="line"></span>
   </div>
 
   <div class="flex flex-col items-center gap-3 my-4 p-4 bg-slate-50/50 rounded-xl w-full max-w-md border border-slate-100 shadow-sm">
-    <span class="text-sm font-semibold text-barbi">{urgencyLabel[$lang]}</span>
+    <span class="text-sm font-semibold text-barbi">{$t('mission.crtask.urgencyLevel')}</span>
     <div class="flex gap-5">
       {#each urgencyOptions as option}
         <button
           type="button"
           onclick={() => hashivut = option.value}
           class="group relative flex flex-col items-center gap-1 transition-all duration-300 transform active:scale-95"
-          title={option.label[$lang]}
+          title={option.label}
         >
           <div 
             class="w-10 h-10 rounded-xl border-2 shadow-lg transition-all duration-300 {option.color} 
@@ -302,7 +273,7 @@
             {option.value === 'white' ? 'border-slate-300' : ''}"
           ></div>
           <span class="text-[10px] font-medium transition-colors {hashivut === option.value ? 'text-barbi font-bold' : 'text-slate-500'}">
-            {option.label[$lang]}
+            {option.label}
           </span>
           
           {#if hashivut === option.value}
@@ -316,7 +287,7 @@
   </div>
 
   {#if fromMis != true}
-    <h2 class="text-barbi text-center text-sm sm:text-xl">:{level[$lang]}</h2>
+    <h2 class="text-barbi text-center text-sm sm:text-xl">:{$t('mission.crtask.assignmentLevel')}</h2>
 
     <div class="flex items-center justify-center" dir="ltr">
       <label
@@ -331,11 +302,11 @@
         />
         <span
           class="px-4 py-2 rounded-l-md text-barbi peer-checked:text-gray-900 bg-mturk peer-checked:bg-gold"
-          >{role[$lang]}</span
+          >{$t('mission.crtask.roles')}</span
         >
         <span
           class="px-4 py-2 rounded-r-md peer-checked:text-barbi bg-gold peer-checked:bg-mturk"
-          >{pers[$lang]}</span
+          >{$t('mission.crtask.missionInProgress')}</span
         >
       </label>
     </div>
@@ -346,7 +317,7 @@
       liSelectedClass="!bg-barbi !text-gold"
         bind:selected
         maxSelect=1
-        placeholder={placeholder[$lang]}
+        placeholder={$t('mission.crtask.chooseMission')}
         options={bmiData.map(
           (it) =>
             it.attributes.users_permissions_user.data.attributes.username +
@@ -362,15 +333,15 @@
       inputClass="!bg-gold !text-barbi"
       liSelectedClass="!bg-barbi !text-gold"
         bind:selected
-        placeholder={placeholderoles[$lang]}
+        placeholder={$t('mission.crtask.chooseRole')}
         options={proles.map((pr) => pr.name)}
       />
     {/if}
   {/if}
   {#if seEr == true}
-    <small class="text-red-900 bg-slate-200 px-2">{seerdes[$lang]}</small>
+    <small class="text-red-900 bg-slate-200 px-2">{$t('mission.crtask.missionRequired')}</small>
   {/if}
   <hr class="h-2" />
-  <Button onClick={sub} {loading} {success} text={sedes} {error} />
+  <Button onClick={sub} {loading} {success} text={{ he: $t('mission.crtask.send'), en: $t('mission.crtask.send'), ar: $t('mission.crtask.send') }} {error} />
 </div>
 

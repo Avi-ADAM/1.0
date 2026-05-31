@@ -6,6 +6,7 @@
   //import { beforeUpdate } from 'svelte';
   import moment from 'moment';
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import MultiSelect from 'svelte-multiselect';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { calcX } from '$lib/func/calcX.svelte';
@@ -22,18 +23,9 @@
   let resourceReceivedByRow = $state({}); // מעקב אחר קבלת משאב לכל שורה
 
   // טקסט קבוע ליצירת משאב חדש
-  const NEW_RESOURCE_TEXT = {
-    he: 'יצירת משאב חדש...',
-    en: 'Creating new resource...'
-  };
+  const NEW_RESOURCE_TEXT = $derived($t('mission.totalNeeds.createResource'));
 
-  // טקסט לכפתור קבלת משאב
-  const RESOURCE_RECEIVED_TEXT = {
-    he: 'האם המשאב התקבל?',
-    en: 'Was the resource received?'
-  };
-
-  const selfAssign = { he: 'השמה לעצמי', en: 'Self Assignment' };
+  const selfAssign = $derived($t('mission.totalNeeds.selfAssign'));
 
   async function loadUserResources(resourceId) {
     const que1 = `query { 
@@ -112,7 +104,7 @@
     // מסמנים שנבחר משאב חדש
     newResourceByRow[index] = true;
     // מאפסים בחירות קודמות בשורה זו
-    meData[index].selectedResource = [NEW_RESOURCE_TEXT[$lang]]; // שימוש בטקסט ידידותי למשתמש
+    meData[index].selectedResource = [NEW_RESOURCE_TEXT]; // שימוש בטקסט ידידותי למשתמש
     meData = meData; // מעדכן את הריאקטיביות
     console.log(
       'Creating new resource for:',
@@ -704,23 +696,6 @@ vots: [${userss},
     }
   }
 
-  const tableHeaders = {
-    startDate: { he: 'תאריך התחלה', en: 'Start Date' },
-    totalPrice: { he: 'סה"כ מחיר', en: 'Total Price' },
-    totalMaxValue: { he: 'סה"כ שווי מקסימלי', en: 'Total Max Value' },
-    grandTotalPrice: { he: 'סך הכל - מחיר', en: 'Grand Total - Price' },
-    grandTotalMax: { he: 'סך הכל - שווי מקסימלי', en: 'Grand Total - Max Value' },
-    selectedResources: { he: 'משאבים שנבחרו', en: 'Selected Resources' },
-    invalidPrice: { he: 'לא יכולה להיות קטנה מ-0', en: 'Cannot be less than 0' }
-  };
-
-  const buttonText = { 
-    publishResources: { he: 'פרסום משאבים', en: 'Publish Resources' }
-  };
-
-  const ot = { he: 'עלות חד פעמית', en: 'one time' };
-  const py = { he: 'ליחידה', en: 'per unit' };
-  const pm = { he: 'חודשי', en: 'monthly' };
   const pye = { he: 'שנתי', en: 'yearly' };
   const re = { he: 'השכרה לזמן קצוב', en: 'rent' };
   const assignTo = { he: 'הקצה ל', en: 'Assign to' };
@@ -817,7 +792,7 @@ vots: [${userss},
       <table dir="rtl">
         <caption class="sm:text-right md:text-center text-right">
           <h1 class="md:text-center text-2xl md:text-2xl font-bold">
-            {tableHeaders.selectedResources[$lang]}
+            {$t('mission.totalNeeds.selectedResources')}
           </h1>
         </caption>
         <tbody>
@@ -895,10 +870,10 @@ vots: [${userss},
                           m-0
                           focus:text-barbi focus:bg-gold focus:border-barbi focus:outline-none"
                 >
-                  <option value="total">{ot[$lang]}</option>
-                  <option value="monthly">{pm[$lang]}</option>
+                  <option value="total">{$t('mission.totalNeeds.oneTime')}</option>
+                  <option value="monthly">{$t('mission.totalNeeds.monthly')}</option>
                   <option value="yearly">{pye[$lang]}</option>
-                  <option value="perUnit">{py[$lang]}</option>
+                  <option value="perUnit">{$t('mission.totalNeeds.perUnit')}</option>
                   <option value="rent">{re[$lang]}</option>
                 </select>
               </td>
@@ -906,7 +881,7 @@ vots: [${userss},
           </tr>
           {#if userslength === 1}
             <tr>
-              <th>{selfAssign[$lang]}</th>
+              <th>{selfAssign}</th>
               {#each meData as data, i}
                 <td>
                   <div class="space-y-2">
@@ -918,7 +893,7 @@ vots: [${userss},
                       class:hover:bg-green-600={data.assignedTo?.length === 1}
                       onclick={() => toggleSelfAssign(data, i)}
                     >
-                      <span>{selfAssign[$lang]}</span>
+                      <span>{selfAssign}</span>
                       {#if data.assignedTo?.length}
                         <span class="ml-2 text-white">✓</span>
                       {/if}
@@ -978,7 +953,7 @@ vots: [${userss},
                             class:hover:bg-green-600={resourceReceivedByRow[i]}
                             onclick={() => toggleResourceReceived(i)}
                           >
-                            <span>{RESOURCE_RECEIVED_TEXT[$lang]}</span>
+                            <span>{$t('mission.totalNeeds.resourceReceived')}</span>
                             {#if resourceReceivedByRow[i]}
                               <span class="ml-2 text-white">✓</span>
                             {/if}
@@ -1011,7 +986,7 @@ vots: [${userss},
                     <span class="line"></span>
                   </div>
                   {#if data.hm < 0}<small class="bg-red-800 text-slate-50 px-2"
-                      >{tableHeaders.invalidPrice[$lang]}</small
+                      >{$t('mission.totalNeeds.invalidPrice')}</small
                     >{/if}
                 {:else}
                   <span class="text-gray-400 text-sm">—</span>
@@ -1019,7 +994,7 @@ vots: [${userss},
               </td>{/each}
           </tr>
           <tr style="display:{ky ? '' : 'none'};">
-            <th>{tableHeaders.startDate[$lang]}</th>
+            <th>{$t('mission.totalNeeds.startDate')}</th>
             {#each meData as data, i}
               <td
                 ><input
@@ -1085,13 +1060,13 @@ vots: [${userss},
                     ><span style="display:{meData[i].r ? '' : 'none'};"
                       >{componentTexts.forPeriod[$lang]}</span
                     ><span style="display:{meData[i].kc ? '' : 'none'};"
-                      >{py[$lang]}</span
+                      >{$t('mission.totalNeeds.perUnit')}</span
                     >
                   </label>
                   <span class="line"></span>
                 </div>
                 {#if data.attributes.price < 0}<small class="bg-red-800 text-slate-50 px-2"
-                    >{tableHeaders.invalidPrice[$lang]}</small
+                    >{$t('mission.totalNeeds.invalidPrice')}</small
                   >{/if}
               </td>{/each}
           </tr>
@@ -1115,19 +1090,19 @@ vots: [${userss},
                     ><span style="display:{meData[i].r ? '' : 'none'};"
                       >{componentTexts.forPeriod[$lang]}</span
                     ><span style="display:{meData[i].kc ? '' : 'none'};"
-                      >{py[$lang]}</span
+                      >{$t('mission.totalNeeds.perUnit')}</span
                     >
                   </label>
                   <span class="line"></span>
                 </div>
                 {#if data.attributes.easy < 0}<small
                     class="bg-red-800 text-slate-50 px-2"
-                    >{tableHeaders.invalidPrice[$lang]}</small
+                    >{$t('mission.totalNeeds.invalidPrice')}</small
                   >{/if}
               </td>{/each}
           </tr>
           <tr style="display:{kc || ky ? '' : 'none'};">
-            <th>{tableHeaders.totalPrice[$lang]}</th>
+            <th>{$t('mission.totalNeeds.totalPrice')}</th>
             {#each meData as data, i}
               <td>
                 <h3
@@ -1143,7 +1118,7 @@ vots: [${userss},
               </td>{/each}
           </tr>
           <tr style="display:{kc || ky ? '' : 'none'};">
-            <th>{tableHeaders.totalMaxValue[$lang]}</th>
+            <th>{$t('mission.totalNeeds.totalMaxValue')}</th>
             {#each meData as data, i}
               <td>
                 <h3
@@ -1160,7 +1135,7 @@ vots: [${userss},
           </tr>
           <!-- שורת סיכום כולל -->
           <tr class="ggd">
-            <th class="ggd">{tableHeaders.grandTotalPrice[$lang]}</th>
+            <th class="ggd">{$t('mission.totalNeeds.grandTotalPrice')}</th>
             {#each meData as data, i}
               <td class="ggd">
                 <strong>
@@ -1169,7 +1144,7 @@ vots: [${userss},
               </td>{/each}
           </tr>
           <tr class="ggd">
-            <th class="ggd">{tableHeaders.grandTotalMax[$lang]}</th>
+            <th class="ggd">{$t('mission.totalNeeds.grandTotalMax')}</th>
             {#each meData as data, i}
               <td class="ggd">
                 <strong>
@@ -1199,7 +1174,7 @@ vots: [${userss},
     <div>
         <br>
         <Button 
-          text={buttonText.publishResources}
+          text={{ he: $t('mission.totalNeeds.publishResources'), en: $t('mission.totalNeeds.publishResources'), ar: $t('mission.totalNeeds.publishResources') }}
           onClick={createResources}
           {loading}
           {success}

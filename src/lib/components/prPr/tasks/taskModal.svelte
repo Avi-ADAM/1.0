@@ -1,5 +1,6 @@
 <script>
   import { lang } from '$lib/stores/lang';
+  import { t } from '$lib/translations';
 
   /**
    * @typedef {Object} Props
