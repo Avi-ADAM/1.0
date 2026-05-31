@@ -35,6 +35,7 @@
   import ShiftsIcon from '$lib/celim/icons/shiftsIcon.svelte';
   import MobileModal from '$lib/celim/ui/mobileModal.svelte';
   import { page } from '$app/state';
+  import LocationPicker from '$lib/components/location/LocationPicker.svelte';
 
   let {
     pu = [],
@@ -66,6 +67,14 @@
       iskvua: false,
       date: null,
       dates: null,
+      location: {
+        location_mode: 'unspecified',
+        isOnline: false,
+        lat: null,
+        lng: null,
+        radius: 15,
+        location_hint: ''
+      },
       myM: false,
       rishoni: [],
       publicklinks: ``,
@@ -306,6 +315,11 @@
         iskvua: element.iskvua,
         dateStart,
         dateEnd,
+        isOnline: element.location?.location_mode === 'online',
+        lat: normalizeLocationNumber(element.location?.lat),
+        lng: normalizeLocationNumber(element.location?.lng),
+        radius: normalizeLocationNumber(element.location?.radius),
+        location_hint: element.location?.location_hint || null,
         publicklinks: element.publicklinks,
         privatlinks: element.privatlinks,
         spnot: element.spnot,
@@ -648,6 +662,15 @@
     he: 'רשימת מטלות',
     en: 'checklist'
   };
+  const locationTexts = {
+    title: { he: 'location', en: 'location' },
+    helper: {
+      he: 'online, onsite or hybrid location scope',
+      en: 'Choose whether this is online, onsite or hybrid, and its service radius.'
+    },
+    empty: { he: 'no location set', en: 'No location set' },
+    selected: { he: 'selected location', en: 'Selected location' }
+  };
   const requiredRoles = {
     he: 'הגדרת תפקיד:',
     en: 'role assigned:'
@@ -696,7 +719,39 @@
   let shiftE = $state(false);
   let publinkE = $state(false);
   let mislinkE = $state(false);
+  let locationE = $state(false);
   function disout() {}
+
+  function normalizeLocationNumber(value) {
+    return typeof value === 'number' && Number.isFinite(value) ? value : null;
+  }
+
+  function hasLocationPoint(location) {
+    return (
+      typeof location?.lat === 'number' &&
+      Number.isFinite(location.lat) &&
+      typeof location?.lng === 'number' &&
+      Number.isFinite(location.lng)
+    );
+  }
+
+  function hasLocationValue(location) {
+    return (
+      location?.location_mode !== 'unspecified' ||
+      hasLocationPoint(location) ||
+      Boolean(location?.location_hint?.trim())
+    );
+  }
+
+  function locationSummary(location) {
+    if (!location || !hasLocationValue(location)) return locationTexts.empty[$lang];
+    if (location.location_mode === 'online') return 'Online';
+    if (hasLocationPoint(location)) {
+      const hint = location.location_hint?.trim() || locationTexts.selected[$lang];
+      return `${hint} - ${location.radius || 15} km`;
+    }
+    return location.location_hint?.trim() || locationTexts.selected[$lang];
+  }
 </script>
 
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer}>
@@ -977,6 +1032,35 @@
                 bind:finnish={miData[0].dates}
               />
             </p>
+            <div class="my-2">
+              <mark class="text-barbi text-sm lg:text-2xl"
+                >{locationTexts.title[$lang]}:</mark
+              >
+              <button onclick={() => (locationE = !locationE)}
+                >{#if locationE}<Done />{:else}<EditIcon />{/if}</button
+              >
+              {#if locationE}
+                <div class="my-3">
+                  <LocationPicker
+                    bind:value={miData[0].location}
+                    label={locationTexts.title[$lang]}
+                    helper={locationTexts.helper[$lang]}
+                    height="300px"
+                  />
+                </div>
+              {:else if hasLocationValue(miData[0].location)}
+                <div
+                  class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle d cd p-2"
+                >
+                  <Tile
+                    bg="gold"
+                    sm={wid > 555 ? true : false}
+                    big={wid > 555 ? true : false}
+                    word={locationSummary(miData[0].location)}
+                  />
+                </div>
+              {/if}
+            </div>
             <div
               class="md:text-xl text-lg md:flex-row {valphE
                 ? 'flex-col'
