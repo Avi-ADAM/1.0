@@ -2689,13 +2689,15 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
-  '125createAskm': `mutation CreateAskm($publishedAt: DateTime!, $openMashaabimId: ID!, $projectId: ID!, $spId: ID!, $userId: ID!) {
+  '125createAskm': `mutation CreateAskm($publishedAt: DateTime!, $openMashaabimId: ID!, $projectId: ID!, $spId: ID!, $userId: ID!, $vots: [ComponentProjectsVotsInput], $archived: Boolean) {
     createAskm(data: {
       publishedAt: $publishedAt,
       open_mashaabim: $openMashaabimId,
       project: $projectId,
       sp: $spId,
-      users_permissions_user: $userId
+      users_permissions_user: $userId,
+      vots: $vots,
+      archived: $archived
     }) { data { id } }
   }`,
   '126updateSpDeclined': `mutation UpdateSpDeclined($id: ID!, $openMashaabimId: ID!) {

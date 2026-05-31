@@ -1,39 +1,33 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import {
+  resolveOpenMashaabimName,
+  runResourceAskmAcceptance,
+} from '../helpers/runResourceAskmAcceptance.js';
+
+/** Initial "in favor" vote when the requester is already a project member (reqtom / availiableResorce pattern). */
+function buildRequesterVote(userId: string, at: Date) {
+  const uid = String(userId);
+  const parsedIde = parseInt(uid, 10);
+  return {
+    what: true,
+    users_permissions_user: uid,
+    ...(Number.isFinite(parsedIde) ? { ide: parsedIde } : {}),
+    zman: at.toISOString(),
+  };
+}
 
 const createMashaabimRequestHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const {
     openMashaabimId,
     projectId,
     spId,
+    missionName: missionNameParam,
   } = params;
 
   const now = new Date();
+  const requesterId = String(context.userId);
 
-  // Step 1: create Askm + update Sp.declinedm
-  const askmRes = await strapi.execute(
-    '125createAskm',
-    {
-      publishedAt: now.toISOString(),
-      openMashaabimId,
-      projectId,
-      spId,
-      userId: context.userId,
-    },
-    context.jwt,
-    context.fetch
-  );
-
-  const askmId = askmRes?.createAskm?.data?.id;
-  if (!askmId) throw new Error('Failed to create Askm');
-
-  await strapi.execute(
-    '126updateSpDeclined',
-    { id: spId, openMashaabimId },
-    context.jwt,
-    context.fetch
-  );
-
-  // Step 2: fetch project members + restime in one call
+  // Step 1: project members + restime
   const projectRes = await strapi.execute(
     '128getProjectMembersAndRestime',
     { pid: projectId },
@@ -44,8 +38,79 @@ const createMashaabimRequestHandler: ActionExecutionHandler = async (params, con
   const memberIds: string[] =
     (projectAttrs?.user_1s?.data || []).map((m: any) => String(m.id));
   const restime: string = projectAttrs?.restime ?? '';
+  const isProjectMember = memberIds.includes(requesterId);
+  const isSoloMemberProject = isProjectMember && memberIds.length === 1;
 
-  // Step 3: create Timegrama deadline
+  // Step 2: create Askm
+  const askmVariables: Record<string, unknown> = {
+    publishedAt: now.toISOString(),
+    openMashaabimId,
+    projectId,
+    spId,
+    userId: requesterId,
+  };
+
+  if (isProjectMember) {
+    askmVariables.vots = [buildRequesterVote(requesterId, now)];
+  }
+  if (isSoloMemberProject) {
+    askmVariables.archived = true;
+  }
+
+  const askmRes = await strapi.execute(
+    '125createAskm',
+    askmVariables,
+    context.jwt,
+    context.fetch
+  );
+
+  const askmId = askmRes?.data?.createAskm?.data?.id;
+  if (!askmId) throw new Error('Failed to create Askm');
+
+  await strapi.execute(
+    '126updateSpDeclined',
+    { id: spId, openMashaabimId },
+    context.jwt,
+    context.fetch
+  );
+
+  // Step 3: solo member — skip voting UI; run full acceptance (Maap + archive OM)
+  if (isSoloMemberProject) {
+    const missionName = await resolveOpenMashaabimName(
+      strapi,
+      context,
+      String(openMashaabimId),
+      missionNameParam
+    );
+
+    await runResourceAskmAcceptance(strapi, context, {
+      askmId: String(askmId),
+      openMashaabimId: String(openMashaabimId),
+      projectId: String(projectId),
+      spId: String(spId),
+      missionName,
+      acceptedUserId: requesterId,
+      existingMemberIds: memberIds,
+      skipAskmArchive: true,
+    });
+
+    const recipientIds = Array.from(new Set(memberIds.filter(Boolean)));
+
+    return {
+      data: {
+        askmId,
+        spId,
+        openMashaabimId,
+        isProjectMember: true,
+        castInitialVote: true,
+        autoFinalized: true,
+      },
+      recipientIds,
+      updateStrategy: { type: 'none' },
+    };
+  }
+
+  // Step 4: deadline Timegrama (pending approval path only)
   const resMs: Record<string, number> = {
     feh: 48 * 3_600_000,
     sth: 72 * 3_600_000,
@@ -63,11 +128,17 @@ const createMashaabimRequestHandler: ActionExecutionHandler = async (params, con
     );
   }
 
-  // Suggester (current user) included in recipients for cross-device sync
-  const recipientIds = Array.from(new Set([...memberIds, String(context.userId)].filter(Boolean)));
+  const recipientIds = Array.from(new Set([...memberIds, requesterId].filter(Boolean)));
 
   return {
-    data: { askmId, spId, openMashaabimId },
+    data: {
+      askmId,
+      spId,
+      openMashaabimId,
+      isProjectMember,
+      castInitialVote: isProjectMember,
+      autoFinalized: false,
+    },
     recipientIds,
     updateStrategy: { type: 'none' },
   };
@@ -75,31 +146,31 @@ const createMashaabimRequestHandler: ActionExecutionHandler = async (params, con
 
 export const createMashaabimRequestConfig: ActionConfig = {
   key: 'createMashaabimRequest',
-  description: 'Record a resource-offer request: creates Askm, marks Sp as applied, creates deadline Timegrama. Notifies project members + suggester via socket.',
+  description:
+    'Record a resource-offer request: creates Askm, marks Sp as applied, creates deadline Timegrama. Project members get an initial in-favor vote. Solo-member projects auto-approve (archived Askm + Maap + archive OM).',
   graphqlOperation: createMashaabimRequestHandler,
 
   paramSchema: {
     openMashaabimId: { type: 'string', required: true },
     projectId: { type: 'string', required: true },
     spId: { type: 'string', required: true },
+    missionName: { type: 'string', required: false },
   },
 
-  authRules: [
-    { type: 'jwt' },
-  ],
+  authRules: [{ type: 'jwt' }],
 
   notification: {
     recipients: {
       type: 'specificUsers',
-      config: { userIdsParam: 'recipientIds' }
+      config: { userIdsParam: 'recipientIds' },
     },
     templates: {
       title: { he: 'בקשה למשאב', en: 'Resource request' },
-      body: { he: `יש בקשה חדשה למשאב בפרויקט`, en: 'A new resource request was submitted' }
+      body: { he: `יש בקשה חדשה למשאב בפרויקט`, en: 'A new resource request was submitted' },
     },
     channels: ['socket'],
-    metadata: { type: 'mashaabimRequest', url: 'lev' }
+    metadata: { type: 'mashaabimRequest', url: 'lev' },
   },
 
-  updateStrategy: { type: 'none' }
+  updateStrategy: { type: 'none' },
 };

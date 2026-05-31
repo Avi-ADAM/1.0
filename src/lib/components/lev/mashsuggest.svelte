@@ -49,72 +49,18 @@
     already = true;
     const ds = declineddarra;
     ds.push(`${id}`);
-    let d = new Date();
-  
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    uId = cookieValueId;
-    token = page.data.tok;
-    let bearer1 = 'bearer' + ' ' + token;
-    let link = baseUrl+'/graphql';
     try {
-      await fetch(link, {
-        method: 'POST',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `mutation { 
-  createAskm(
-      data:{ 
-        publishedAt: "${d.toISOString()}",
-        open_mashaabim: ${id},
-            project: ${projectId},
-            sp: ${oid},
-            users_permissions_user: ${uId}
-    }
-  ){
-    data {id}
-  }
-  updateSp(
-    id: "${oid}" 
-    data: {declinedm: "${id}" }
-  ){
-      data {
-        attributes{
-          declinedm{
-            data{
-              id
-            }
-          }
-        }
+      const result = await executeAction('createMashaabimRequest', {
+        openMashaabimId: String(id),
+        projectId: String(projectId),
+        spId: String(oid),
+        missionName: mashName != null ? String(mashName) : undefined,
+      });
+      if (result.success) {
+        less();
+      } else {
+        error1 = result.error;
       }
-  }
-}`
-        })
-      })
-        .then((r) => r.json())
-        .then((data) => (miData = data));
-      console.log(miData);
-      let hiluzId = miData.data.createAskm.data.id;
-        let x = calcX(restime)
-      let fd = new Date(Date.now() + x)
-            let quee = `mutation 
-                        {createTimegrama(
-             data:{
-               date: "${fd.toISOString()}",
-               whatami: "askm",
-               askm: ${hiluzId},
-             }
-           ){
-             data {id}
-           }
-         }`;
-      SendTo(quee);
-      less();
     } catch (e) {
       error1 = e;
     }
@@ -126,48 +72,19 @@
 
   async function decline(oid) {
     already = true;
-    console.log('decline', oid);
     const ds = declineddarra;
     ds.push(`${oid}`);
-    console.log(ds);
-    
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    uId = cookieValueId;
-    token = page.data.tok;
-    let bearer1 = 'bearer' + ' ' + token;
-    let link = baseUrl+'/graphql';
     try {
-      await fetch(link, {
-        method: 'POST',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `mutation { updateSp(
-   id: "${oid}" 
-      data: {declinedm: "${id}" }
-  ){
-      data {
-        attributes{
-          declinedm{
-            data{
-              id
-            }
-          }
-        }
+      const result = await executeAction('declineSpForMashaabim', {
+        spId: String(oid),
+        openMashaabimId: String(id),
+        projectId: String(projectId)
+      });
+      if (result.success) {
+        less();
+      } else {
+        error1 = result.error;
       }
-  }
-}`
-        })
-      })
-        .then((r) => r.json())
-        .then((data) => (miData = data));
-      console.log(miData);
-      less(oid);
     } catch (e) {
       error1 = e;
     }
@@ -207,6 +124,7 @@
     onHover?.({ id: u });
   }
   import Cards from './cards/sugestma.svelte';
+  import { executeAction } from '$lib/client/actionClient';
   import { SendTo } from '$lib/send/sendTo.svelte';
   import { DialogContent, DialogOverlay } from 'svelte-accessible-dialog';
   import { RingLoader } from 'svelte-loading-spinners';
@@ -538,7 +456,7 @@ role="button"
               <button
                 onmouseenter={() => hover(' אני רוצה')}
                 onmouseleave={() => hover('0')}
-                onclick={agree(oid)}
+                onclick={() => agree(oid)}
                 class="btn a"
                 name="requestToJoin"
                 ><svg
@@ -559,7 +477,7 @@ role="button"
               <button
                 onmouseenter={() => hover('לא מתאים לי')}
                 onmouseleave={() => hover('0')}
-                onclick={decline(oid)}
+                onclick={() => decline(oid)}
                 class="btn b"
                 name="decline"
                 ><svg

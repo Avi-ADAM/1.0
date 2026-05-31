@@ -1106,7 +1106,7 @@
                       notes={buble.hearotMeyuchadot}
                       src={buble.srcb}
                       mashName={buble.mashname}
-                      projectId={buble.projectid}
+                      projectId={buble.projectId}
                       descrip={buble.descrip}
                       spnot={buble.spnot}
                       easy={buble.easy}
