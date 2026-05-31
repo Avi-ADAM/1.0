@@ -152,27 +152,114 @@
   {image}
   url={pageurl[$lang]}
 />
-<!-- Sticky header: anchor nav + CTA -->
+{#snippet utilityNav(compact = false)}
+  {#if trans === false}
+    <button type="button" onclick={() => (trans = !trans)}>
+      <img
+        class="shadow-xl rounded {compact ? 'w-7 h-7' : ''}"
+        alt="translat-icon-by-barbi"
+        src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"
+      />
+    </button>
+  {:else}
+    <button
+      type="button"
+      onclick={() => (trans = !trans)}
+      class="text-barbi hover:text-gold p-0.5"
+    >
+      <svg class="w-6 h-6" viewBox="0 0 24 24">
+        <path
+          fill="currentColor"
+          d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+        />
+      </svg>
+    </button>
+    {#if $lang != 'en'}
+      <button
+        type="button"
+        onclick={() => change('en')}
+        title="change language to English"
+        class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-sm whitespace-nowrap"
+      >
+        {$t('home.languages.en')}
+      </button>
+    {/if}
+    {#if $lang != 'ar'}
+      <button
+        type="button"
+        onclick={() => change('ar')}
+        title="change language to Arabic"
+        class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-sm whitespace-nowrap"
+      >
+        {$t('home.languages.ar')}
+      </button>
+    {/if}
+    {#if $lang != 'he'}
+      <button
+        type="button"
+        onclick={() => change('he')}
+        title="change language to Hebrew"
+        class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-sm whitespace-nowrap"
+      >
+        {$t('home.languages.he')}
+      </button>
+    {/if}
+    {#if $lang == 'he'}
+      <a
+        class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-sm whitespace-nowrap"
+        title=" 1💗1 אודות "
+        data-sveltekit-prefetch
+        href="/about"
+      >
+        {$t('home.nav.about')}
+      </a>
+    {/if}
+    <a
+      class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-sm whitespace-nowrap"
+      data-sveltekit-prefetch
+      href="/faq"
+    >
+      {$t('home.nav.faq')}
+    </a>
+    <a
+      class="text-barbi border-2 border-lturk font-bold hover:text-gold text-center bg-gold hover:bg-barbi px-1.5 py-0.5 rounded text-sm whitespace-nowrap"
+      data-sveltekit-prefetch
+      href="/love"
+    >
+      {$t('home.nav.agreementMap')}
+    </a>
+  {/if}
+{/snippet}
+
+<!-- Sticky header: anchor nav + שפות/קישורים + CTA (מחשב) -->
 <header
   dir={$locale === 'he' || $locale === 'ar' ? 'rtl' : 'ltr'}
-  class="hidden sm:flex fixed top-0 inset-x-0 z-[600] items-center justify-between px-6 py-2 bg-white/40 backdrop-blur-md border-b border-white/40 shadow-sm"
+  class="hidden sm:flex fixed top-0 inset-x-0 z-[600] items-center gap-4 px-6 py-2 bg-white/40 backdrop-blur-md border-b border-white/40 shadow-sm"
   style="font-family:'Sababa',sans-serif;"
 >
   <img
     src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"
     alt="1lev1"
-    class="w-9 h-9 drop-shadow"
+    class="w-9 h-9 shrink-0 drop-shadow"
     style="animation:none;"
   />
-  <nav class="flex items-center gap-5 text-barbi font-bold">
-    <button class="hover:text-gold transition-colors" onclick={() => scrollToId('features')}>{$t('home.sections.navFeatures')}</button>
-    <button class="hover:text-gold transition-colors" onclick={() => scrollToId('how')}>{$t('home.sections.navHow')}</button>
-    <button class="hover:text-gold transition-colors" onclick={() => scrollToId('concierge')}>{$t('home.sections.navConcierge')}</button>
-    <button class="hover:text-gold transition-colors" onclick={() => scrollToId('who')}>{$t('home.sections.whoTitle')}</button>
-    <button class="hover:text-gold transition-colors" onclick={() => scrollToId('faq')}>{$t('home.sections.navFaq')}</button>
+  <nav class="flex flex-1 items-center justify-center gap-4 min-w-0 text-barbi font-bold text-sm lg:text-base">
+    <button type="button" class="hover:text-gold transition-colors whitespace-nowrap" onclick={() => scrollToId('features')}>{$t('home.sections.navFeatures')}</button>
+    <button type="button" class="hover:text-gold transition-colors whitespace-nowrap" onclick={() => scrollToId('how')}>{$t('home.sections.navHow')}</button>
+    <button type="button" class="hover:text-gold transition-colors whitespace-nowrap" onclick={() => scrollToId('concierge')}>{$t('home.sections.navConcierge')}</button>
+    <button type="button" class="hover:text-gold transition-colors whitespace-nowrap" onclick={() => scrollToId('who')}>{$t('home.sections.whoTitle')}</button>
+    <button type="button" class="hover:text-gold transition-colors whitespace-nowrap" onclick={() => scrollToId('faq')}>{$t('home.sections.navFaq')}</button>
   </nav>
+  <div
+    class="flex shrink-0 items-center gap-2"
+    class:flex-row={trans}
+    class:flex-wrap={trans}
+  >
+    {@render utilityNav(true)}
+  </div>
   <button
-    class="bg-barbi text-gold hover:bg-white hover:text-barbi font-bold px-4 py-1.5 rounded-xl shadow-md hover:scale-105 transition-all duration-300"
+    type="button"
+    class="shrink-0 bg-barbi text-gold hover:bg-white hover:text-barbi font-bold px-4 py-1.5 rounded-xl shadow-md hover:scale-105 transition-all duration-300 whitespace-nowrap"
     onclick={() => {
       goto(
         $locale == 'he' ? '/hascama' : $locale == 'ar' ? '/aitifaqia' : '/convention'
@@ -183,76 +270,12 @@
     {$t('home.sections.ctaTop')}
   </button>
 </header>
-<div
-  style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ; z-index: 699;"
->
-  {#if trans === false}
-    <button onclick={() => (trans = !trans)}
-      ><img
-        class="shadow-xl rounded"
-        alt="translat-icon-by-barbi"
-        src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"
-      /></button
-    >
-  {:else}
-    <button
-      onclick={() => (trans = !trans)}
-      class=" text-barbi hover:text-gold p-0.5"
-      ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-        <path
-          fill="currentColor"
-          d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
-        />
-      </svg></button
-    >
-    {#if $lang != 'en'}
-      <button
-        onclick={() => change('en')}
-        title="change language to English"
-        class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5"
-        >{$t('home.languages.en')}</button
-      >
-    {/if}
 
-    {#if $lang != 'ar'}
-      <button
-        onclick={() => change('ar')}
-        title="change language to Arabic"
-        class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5"
-        >{$t('home.languages.ar')}</button
-      >
-    {/if}
-    {#if $lang != 'he'}
-      <button
-        onclick={() => change('he')}
-        title="change language to Hebrew"
-        class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5"
-        >{$t('home.languages.he')}</button
-      >
-    {/if}
-    {#if $lang == 'he'}
-      <a
-        class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5"
-        title=" 1💗1 אודות "
-        data-sveltekit-prefetch
-        href="/about"
-      >
-        {$t('home.nav.about')}</a
-      >
-    {/if}
-    <a
-      class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5"
-      data-sveltekit-prefetch
-      href="/faq"
-    >
-      {$t('home.nav.faq')}</a
-    >
-    <a
-      class="text-barbi border-2 border-lturk text-bold hover:text-gold text-center bg-gold hover:bg-barbi px-1 py-0.5"
-      data-sveltekit-prefetch
-      href="/love">{$t('home.nav.agreementMap')}</a
-    >
-  {/if}
+<!-- תפריט שפה/קישורים צף — מובייל בלבד -->
+<div
+  class="sm:hidden absolute left-[1%] top-[1%] z-[699] flex flex-col"
+>
+  {@render utilityNav()}
 </div>
 
 <div
@@ -358,14 +381,13 @@
         </div>
       </div>
 
-      <div class="sababa mt-2 mb-8">
-        <AnimatedHeadline
-          wordWrapperClass="overflow-hidden inline-block align-bottom transition-all duration-500 ease-in-out"
-          wordClass="font-['Sababa'] font-bold sm:text-2xl text-lg overflow-hidden inline-block align-bottom text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx 
-          bg-[linear-gradient(to_right,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]"
-          type="rotate-1"
-          texts={headlines}
-        />
+      <div
+        class="sababa mt-2 mb-8 font-bold sm:text-2xl text-lg text-transparent
+          bg-clip-text bg-[length:auto_200%] animate-gradienty
+          bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
+        style="text-shadow:none;"
+      >
+        <AnimatedHeadline wait={3000} fade={500} slide={300} y={1000} texts={headlines} />
       </div>
 
       <!-- Content Cards -->
@@ -883,10 +905,10 @@
 </div>
 
 <style>
-  .sababa > span,
-  .sababa > div > span {
+  .sababa :global(span) {
     font-family: 'Sababa', system-ui !important;
     text-shadow: none;
+    color: inherit;
   }
   .flip {
     -moz-transform: scale(-1, 1);

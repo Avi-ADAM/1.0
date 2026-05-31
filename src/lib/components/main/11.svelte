@@ -122,15 +122,14 @@ const geometry = new CylinderGeometry( 5, 5, 0.5, 32 );
 
     <!--כתר-->
     <T.Mesh
-    c
       rotation={[0+$top/3 ,(poz.y/2),0]}  
       geometry={gltf.nodes.node_id102.geometry}
       material={gltf.materials['310']}
-      position={[-0.01, fi == true?2.4+$top/2 :2.4-$top/8, 0.31]}
+      position={[-0.01, fi == true ? 1.9+$top/2 : 1.9-$top/8, 0.31]}
       scale={0.01+$top/433}
     />
-      <T.SpotLight position={[-0.01, $top+2.4, 0.31]} />
-      <T.SpotLight position={[-0.01, 2.4-$top/8, 0.31]}/>
+      <T.SpotLight position={[-0.01, $top+1.9, 0.31]} />
+      <T.SpotLight position={[-0.01, 1.9-$top/8, 0.31]}/>
       {#each arr as ar , i}
       <T.Mesh
       geometry={gltf.nodes.node_id6.geometry}

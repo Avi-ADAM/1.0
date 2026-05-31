@@ -238,4 +238,4 @@
 1. **עדיפות ראשונה:** טבלאות 🔴 — POST מ-components. אלה בלי notifications ו-real-time
 2. **לפני migration:** בדוק שה-action לא כבר קיים ברשימת "הוגרו"
 3. **לא למחוק sendToSer** עד שכל ה-`[ ]` הפכו ל-`[x]`
-4. **תאריך עדכון אחרון:** 2026-05-22 (didiget.svelte complete)
+4. **תאריך עדכון אחרון:** 2026-05-29 (newlev page secured, unused GraphQL vars cleaned)
