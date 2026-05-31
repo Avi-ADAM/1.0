@@ -1,15 +1,14 @@
 <script>
   import tr from '$lib/translations/tr.json';
   import Text from '../conf/text.svelte';
-  import Number from '../conf/number.svelte';
+  import NumberField from '../conf/number.svelte';
   import DateNego from '../conf/dateNego.svelte';
-  import Barb from '../conf/stackBar.svelte';
+  import TotalBar from '../conf/barb.svelte';
   import KindOfnego from '$lib/components/conf/kindOfnego.svelte';
   const tri = tr;
   import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang';
-  import { montsi } from '$lib/func/montsi.svelte';
-  import moment from 'moment';
+  import { montsi, toIsoDateString } from '$lib/func/montsi.svelte';
   import { toast } from 'svelte-sonner';
   import Rich from '../conf/rich.svelte';
   import { page } from '$app/state';
@@ -178,15 +177,22 @@
       rishon4nego,
       rishonves4nego;
 
-    const negoss = ``;
-  
-    const cookieValueId = document.cookie
+    const idCookie = document.cookie
       .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
+      .find((row) => row.startsWith('id='));
+    idL = idCookie?.split('=')[1];
     token = page.data.tok;
     bearer1 = 'bearer' + ' ' + token;
+
+    if (!pendId) {
+      toast.error(tr?.toasts?.er?.[$lang] ?? 'Missing resource id');
+      return;
+    }
+    if (!idL) {
+      toast.error(tr?.toasts?.er?.[$lang] ?? 'Missing user id');
+      return;
+    }
+
     if (rishon !== 0) {
       rishon4 = `rishon: "${rishon}"`;
     } else {
@@ -197,26 +203,22 @@
       sqadualed4 = ``;
       sqadualed4nego = ``;
     } else {
-      let momebtt = moment(sqadualed2, 'HH:mm DD/MM/YYYY ') || null;
+      const sqadualedIso = toIsoDateString(sqadualed2);
       sqadualed4nego =
         sqadualed !== undefined ? ` sqadualed: "${sqadualed}",` : ``;
       sqadualed4 =
-        sqadualed2 !== undefined && sqadualed2 != null
-          ? ` sqadualed: "${momebtt.toISOString()}",`
-          : ``;
+        sqadualedIso != null ? ` sqadualed: "${sqadualedIso}",` : ``;
       what4 = false;
     }
     if (sqadualedf === sqadualedf2) {
       sqadualedf4 = ``;
       sqadualedf4nego = ``;
     } else {
-      let momebtt = moment(sqadualedf2, 'HH:mm DD/MM/YYYY ') || null;
+      const sqadualedfIso = toIsoDateString(sqadualedf2);
       sqadualedf4nego =
         sqadualedf !== undefined ? ` sqadualedf: "${sqadualedf}",` : ``;
       sqadualedf4 =
-        sqadualedf2 !== undefined && sqadualedf2 != null
-          ? ` sqadualedf: "${momebtt.toISOString()}"`
-          : ``;
+        sqadualedfIso != null ? ` sqadualedf: "${sqadualedfIso}"` : ``;
       what4 = false;
     }
     if (name1 === name2) {
@@ -276,7 +278,7 @@
       what4 = false;
     }
 
-    let fd = new Date(Date.now() + x);
+    let fd = new Date(Date.now() + (x ?? 48 * 60 * 60 * 1000));
     let d = new Date();
     let another = ``;
     if (
@@ -297,21 +299,25 @@
       } else {
         userss = objToString(users);
       }
+
+      const timegramaMutation = timegramaId
+        ? `updateTimegrama(
+     id: ${timegramaId}
+             data:{
+      date: "${fd.toISOString()}",
+             }){data {id}}`
+        : '';
+
       try {
-        await fetch(linkg, {
+        const response = await fetch(linkg, {
           method: 'POST',
           headers: {
             Authorization: bearer1,
             'Content-Type': 'application/json'
           },
-          //${negoss} {rishons} {rishonveses}?
           body: JSON.stringify({
             query: `mutation { 
-             updateTimegrama(
-     id: ${timegramaId}
-             data:{
-      date: "${fd.toISOString()}",
-             }){data {id}}
+             ${timegramaMutation}
              createNegoMash(
               data:{
               users_permissions_user:"${idL}",
@@ -352,18 +358,21 @@
       }
   ){data {  id}}
 } `
-            // make coin desapire
           })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
+        });
+        const data = await response.json();
+        miDatan = data;
+        if (data?.errors?.length) {
+          console.error(data.errors);
+          toast.error(tr?.toasts?.er?.[$lang] ?? 'Error');
+          return;
+        }
         toast.success(tr?.toasts.suc[$lang]);
         close();
       } catch (e) {
         error1 = e;
         console.log(error1);
-        toast.success(tr?.toasts.er[$lang]);
+        toast.error(tr?.toasts?.er?.[$lang] ?? 'Error');
       }
     }
   }
@@ -384,20 +393,65 @@
     console.log(new Date(Date.now() + x).toLocaleString(), restime);
   });
 
-  let datai = $derived([
+  const effectiveHmNew = $derived(
+    kindOfb === 'total' ? 1 : Number(hm2) || 0
+  );
+  const effectiveHmOrig = $derived(
+    kindOf === 'total' ? 1 : Number(hm) || 0
+  );
+
+  const montsiNew = $derived(
+    Number(montsi(kindOfb, sqadualed2, sqadualedf2)) || 1
+  );
+  const montsiOrig = $derived(
+    Number(montsi(kindOf, sqadualed, sqadualedf)) || 1
+  );
+
+  const totalNew = $derived(
+    Number(price2) * effectiveHmNew * montsiNew
+  );
+  const totalEasyNew = $derived(
+    Number(easy2) * effectiveHmNew * montsiNew
+  );
+  const totalOrig = $derived(
+    Number(price) * effectiveHmOrig * montsiOrig
+  );
+  const totalEasyOrig = $derived(
+    Number(easy) * effectiveHmOrig * montsiOrig
+  );
+
+  const valuesChanged = $derived(
+    Number(price) !== Number(price2) ||
+      effectiveHmOrig !== effectiveHmNew ||
+      kindOf !== kindOfb ||
+      Number(easy) !== Number(easy2) ||
+      sqadualed !== sqadualed2 ||
+      sqadualedf !== sqadualedf2
+  );
+
+  const chartKey = $derived(
+    `${price2}-${hm2}-${easy2}-${kindOfb}-${sqadualed2}-${sqadualedf2}`
+  );
+
+  const datai = $derived([
     {
-      leb: `${tri?.nego?.new[$lang]},${price2 * hm2 * montsi(kindOfb, sqadualed2, sqadualedf2, true)}| ${tri?.mash?.shovile[$lang]},${easy2 * hm2 * montsi(kindOfb, sqadualed2, sqadualedf2, true)}`,
-      value: price2 * hm2 * montsi(kindOfb, sqadualed2, sqadualedf2, true),
-      vallue2:
-        easy2 * hm2 * montsi(kindOfb, sqadualed2, sqadualedf2, true) -
-        price2 * hm2 * montsi(kindOfb, sqadualed2, sqadualedf2, true)
+      leb: `${tri?.nego?.new[$lang]},${totalNew.toLocaleString()}`,
+      value: totalNew
     },
     {
-      leb: `${tri?.nego?.original[$lang]},${price * hm * montsi(kindOf, sqadualed, sqadualedf, true)} | ${tri?.mash?.shovile[$lang]},${easy * hm * montsi(kindOf, sqadualed, sqadualedf, true)}`,
-      value: price * hm * montsi(kindOf, sqadualed, sqadualedf, true),
-      vallue2:
-        easy * hm * montsi(kindOf, sqadualed, sqadualedf, true) -
-        price * hm * montsi(kindOf, sqadualed, sqadualedf, true)
+      leb: `${tri?.nego?.original[$lang]},${totalOrig.toLocaleString()}`,
+      value: totalOrig
+    }
+  ]);
+
+  const dataiEasy = $derived([
+    {
+      leb: `${tri?.nego?.new[$lang]},${totalEasyNew.toLocaleString()}`,
+      value: totalEasyNew
+    },
+    {
+      leb: `${tri?.nego?.original[$lang]},${totalEasyOrig.toLocaleString()}`,
+      value: totalEasyOrig
     }
   ]);
 </script>
@@ -419,14 +473,14 @@
     <KindOfnego {kindOf} bind:kindOfb lebel={tri?.mash.kindof} />
 
     {#if !(kindOf == 'total' && kindOfb == 'total')}
-      <Number number={hm} bind:numberb={hm2} lebel={tri?.mash?.noof[$lang]} />
+      <NumberField number={hm} bind:numberb={hm2} lebel={tri?.mash?.noof[$lang]} />
     {/if}
-    <Number
+    <NumberField
       number={price}
       bind:numberb={price2}
       lebel={tri?.mash?.shovi[$lang]}
     />
-    <Number
+    <NumberField
       number={easy}
       bind:numberb={easy2}
       lebel={tri?.mash?.shovile[$lang]}
@@ -466,30 +520,45 @@
     class="border border-gold border-opacity-80 rounded m-2 flex flex-col align-middle justify-center gap-x-2"
   >
     <h2 class="underline decoration-mturk">{tri?.mash.tota[$lang]}</h2>
-    {#if price == price2 && hm == hm2 && kindOf == kindOfb && easy == easy2}
-      {#if (price > 0) & (hm > 0)}
-        {(
-          price *
-          hm *
-          montsi(kindOf, sqadualed, sqadualedf, true)
-        ).toLocaleString()}
-        {#if price != easy}
-          {tri?.mash?.shovile[$lang]}:
-          {(
-            easy *
-            hm *
-            montsi(kindOf, sqadualed, sqadualedf, true)
-          ).toLocaleString()}
+    {#if valuesChanged}
+      <div class="flex flex-col gap-2">
+        <div>
+          <p class="text-gold">
+            {tri?.mash?.shovi[$lang]}: {totalNew.toLocaleString()}
+            <span class="text-barbi text-sm">
+              ({tri?.nego?.original[$lang]}: {totalOrig.toLocaleString()})
+            </span>
+          </p>
+          {#key chartKey}
+            <div class="w-1/2 mx-auto">
+              <TotalBar datai={datai} />
+            </div>
+          {/key}
+        </div>
+        {#if Number(easy) !== Number(easy2) || Number(price) !== Number(price2)}
+          <div>
+            <p class="text-gold">
+              {tri?.mash?.shovile[$lang]}: {totalEasyNew.toLocaleString()}
+              <span class="text-barbi text-sm">
+                ({tri?.nego?.original[$lang]}: {totalEasyOrig.toLocaleString()})
+              </span>
+            </p>
+            {#key `${chartKey}-easy`}
+              <div class="w-1/2 mx-auto">
+                <TotalBar datai={dataiEasy} />
+              </div>
+            {/key}
+          </div>
         {/if}
-      {:else}
-        <p>0</p>
+      </div>
+    {:else if totalNew > 0}
+      {totalNew.toLocaleString()}
+      {#if Number(price2) !== Number(easy2)}
+        {tri?.mash?.shovile[$lang]}:
+        {totalEasyNew.toLocaleString()}
       {/if}
     {:else}
-      {#key datai}
-        <div class="w-1/2 mx-auto">
-          <Barb {datai} />
-        </div>
-      {/key}
+      <p>0</p>
     {/if}
   </div>
 

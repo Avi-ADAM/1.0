@@ -10,9 +10,9 @@
   const xKey = 'value';
   const yKey = 'leb';
 
-  datai.forEach(d => {
-    d[xKey] = +d[xKey];
-  });
+  const chartData = $derived(
+    datai.map((d) => ({ ...d, [xKey]: +d[xKey] }))
+  );
 </script>
 
 <style>
@@ -35,7 +35,7 @@
     y={yKey}
     yScale={scaleBand().paddingInner(0.05)}
     xDomain={[0, null]}
-    data={datai}
+    data={chartData}
   >
     <Svg>
       <AxisX
@@ -50,7 +50,7 @@
     </Svg>
      <Html>
       <Tooltip
-        dataset={datai}
+        dataset={chartData}
       />
     </Html>
   </LayerCake>

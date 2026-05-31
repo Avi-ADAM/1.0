@@ -89,7 +89,11 @@ function checkAll (a, b){
 <div dir="rtl" class=' max-w-sm mx-auto'>
   <small>{lebel[$lang]}</small>
 
-    <SveltyPicker inputClasses="form-control" format="hh:ii dd/mm/yyyy" bind:value={dateb}></SveltyPicker>
+    <SveltyPicker
+      inputClasses="form-control"
+      format="hh:ii dd/mm/yyyy"
+      bind:value={dateb}
+    ></SveltyPicker>
 </div><button onclick={()=>{edit = false
 checkAll(date,dateb)
 }}>✅</button>

@@ -27,7 +27,7 @@ function normalizeVote(v: any): Record<string, any> {
     what: v.what ?? true,
     users_permissions_user: String(uid),
     order: v.order ?? 0,
-    ide: v.ide ?? uid,
+    ide: parseInt(String(v.ide ?? uid), 10),
     zman: v.zman ?? new Date().toISOString(),
   };
   if (v.why) row.why = v.why;
@@ -78,7 +78,7 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
     what: Boolean(what),
     users_permissions_user: strUserId,
     order: orderon,
-    ide: strUserId,
+    ide: parseInt(strUserId, 10),
     zman: now.toISOString(),
   };
   if (why) newVote.why = why;

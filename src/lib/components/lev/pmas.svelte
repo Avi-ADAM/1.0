@@ -1,7 +1,7 @@
 <script>
   import Diun from './diun.svelte';
   import { Drawer } from 'vaul-svelte';
-
+  import { executeAction } from '$lib/client/actionClient';
   import { RingLoader } from 'svelte-loading-spinners';
   import Chaticon from '../../celim/chaticon.svelte';
   import { clickOutside } from './outsidclick.js';
@@ -111,12 +111,7 @@
     en: 'error: please try again, if the problem continue contact at baruch@1lev1.com'
   };
   let dialogOpen = $state(false);
-  const baseUrl = import.meta.env.VITE_URL;
-  let miDatan = [];
   let error1;
-  let bearer1;
-  let token;
-  let idL;
   let no = $state(false);
   let masa = $state(false);
   let monts = $state(0);
@@ -191,196 +186,33 @@
     });
   }
 
-  function objToString(obj) {
-    let str = '';
-    for (let i = 0; i < obj.length; i++) {
-      const length = Object.keys(obj[i]).length;
-      let t = 0;
-      for (const [p, val] of Object.entries(obj[i])) {
-        const last = t === length - 1;
-        if (t == 0) {
-          str += '{';
-        }
-        t++;
-        if (typeof val == 'string') {
-          str += `${p}:"${val}"\n`;
-        } else if (typeof val == 'number' || typeof val == 'boolean') {
-          str += `${p}:${val}\n`;
-        } else if (typeof val == 'null' || typeof val === 'object') {
-          str += `${p}:${val?.data ? '"' + val?.data?.id + '"' : val}\n`;
-        } else {
-          str += `${p}:${val}\n`;
-        }
-        if (last) {
-          str += '},';
-        }
-        if (t == 0) {
-          str += '{';
-        }
-      }
-    }
-    return str;
-  }
-  function objToStringC(obj) {
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    let str = '';
-    for (let i = 0; i < obj.length; i++) {
-      if (obj[i].users_permissions_user.data.id == idL) {
-        obj[i].order = 1;
-      }
-      const length = Object.keys(obj[i]).length;
-      let t = 0;
-      for (const [p, val] of Object.entries(obj[i])) {
-        const last = t === length - 1;
-        t++;
-        if (typeof val == 'string') {
-          str += `${p}:"${val}"\n`;
-        } else if ((typeof val == 'number') | 'boolean') {
-          str += `${p}:${val}\n`;
-        } else if (typeof val == 'null') {
-          str += `${p}:${val.map((c) => c.id)}\n`;
-        }
-        if (last) {
-          str += '},';
-        }
-        if (t == 1) {
-          str += '{';
-        }
-      }
-    }
-    return str;
-  }
-  let whyy = ``;
-  let linkg = baseUrl + '/graphql';
-  let userss = objToString(users);
+  let allr = $state(false);
+
   async function agree(alr) {
-    let d = new Date();
+    // Optimistic UI update
     if (alr == 'alr') {
       allr = true;
       already = true;
       noofusersOk += 1;
       noofusersNo -= 1;
-      userss = objToStringC(users);
     } else {
       already = true;
       noofusersOk += 1;
       noofusersWaiting -= 1;
     }
-    const date =
-      sqadualed !== undefined
-        ? `sqadualed: "${new Date(sqadualed).toISOString()}",`
-        : ``;
-    const sdate =
-      sqadualedf !== undefined
-        ? `sqadualedf: "${new Date(sqadualedf).toISOString()}",`
-        : ``;
 
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
-    if (noofusersOk === noofusers) {
-      try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation { createOpenMashaabim(
-      data: {project: "${projectId}",
-             spnot: """${hearotMeyuchadot}""",
-             name: "${name}",
-             descrip: """${descrip}""",
-             kindOf: ${kindOf},
-             hm: ${hm},
-             price: ${price},
-             easy: ${easy},
-             linkto: "${linkto}",
-             pmash: "${pendId}",
-             publishedAt: "${d.toISOString()}",
-             mashaabim: "${mshaabId}"
-             ${date} 
-             ${sdate}
-    }
-  ) {data{attributes {project{data{ id }}}}}
-  updatePmash(
-  id: ${pendId}
-      data: { users:[  ${userss}, 
-     {
-      what: true
-      users_permissions_user: "${idL}"
-      order: ${ordern}
-         ide: ${idL}
-      zman: "${d.toISOString()}"
-    }
-  ],
- archived: true
- }
-  ){data{attributes { users { users_permissions_user {data{ id}}}}}}
-  updateTimegrama(
-    id: ${timegramaId}
-    data: {
-      done: true
-    }
-  ){data{id}}
- } `
-            //update pendm add consent from second and  archived,,, make coin desapire
-            //TODO: archive timegrama
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
+    try {
+      const result = await executeAction('voteOnPmash', {
+        pmashId: String(pendId),
+        projectId: String(projectId),
+        what: true,
+      });
+      if (result.success && result.data?.consensus) {
         coinLapach();
-      } catch (e) {
-        error1 = e;
-        console.log(error1);
-        toast.warning(er[$lang]);
       }
-    } else {
-      try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation { updatePmash(
-      id: ${pendId}
-      data: { users:[  ${userss}, 
-         
-     {
-      what: true
-      users_permissions_user: "${idL}"
-      order: ${ordern}
-      ide: ${idL}
-      zman: "${d.toISOString()}"
-    }
-  ]}
-  ){data{attributes { users { users_permissions_user {data{ id}}}}}}
-} `
-            // make coin desapire
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
-        onCoinLapach?.({ ani: 'pendma', coinlapach: coinlapach });
-      } catch (e) {
-        error1 = e;
-        console.log(error1);
-        toast.warning(er[$lang]);
-      }
+    } catch (e) {
+      error1 = e;
+      toast.warning(er[$lang]);
     }
   }
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
@@ -392,82 +224,45 @@
     isOpen = true;
     console.log(no);
   }
-  let archivedtru = ``;
-
   function decline(alr) {
     if (alr == 'alr') {
+      // Changing vote from YES → NO immediately
       allr = true;
-      isOpen = true;
+      isOpen = false;
       already = true;
       noofusersNo += 1;
       noofusersOk -= 1;
-      userss = objToStringC(users);
-      if (noofusersNo === noofusers) {
-        archivedtru = `archived: true,`;
-      }
       afterwhy();
     } else {
+      // First time NO: open dialog for reason
       already = true;
       no = true;
       diunm = true;
       isOpen = true;
-      //create why alert (from smui) add validation for minimum
-      // send why with userss, create way to show why for all agreed users and for them to response.
     }
   }
 
   async function afterwhy(event) {
-    if (event) {
-      why = event.why;
-      whyy = `why: "${why}"`;
-    }
+    const whyText = event?.why ?? '';
     loading = true;
     noofusersNo += 1;
     noofusersWaiting -= 1;
 
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
     try {
-      await fetch(linkg, {
-        method: 'POST',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `mutation { updatePmash(
-     id: ${pendId}
-      data: { 
-        ${archivedtru}
-        users:[  ${userss}, 
-     {
-      what: false
-      ${whyy}
-      users_permissions_user: "${idL}"
-      order: ${ordern}
-      ide: ${idL}
-      zman:"${d.toISOString()}"
-    }
-  ]}
-  ){data{attributes { users { users_permissions_user {data{ id}}}}}}
-} `
-          // make coin desapire
-        })
-      })
-        .then((r) => r.json())
-        .then((data) => (miDatan = data));
-      console.log(miDatan);
+      const result = await executeAction('voteOnPmash', {
+        pmashId: String(pendId),
+        projectId: String(projectId),
+        what: false,
+        ...(whyText ? { why: whyText } : {}),
+      });
       loading = false;
       isOpen = false;
-      coinLapach();
+      if (result.success) {
+        coinLapach();
+      }
     } catch (e) {
       error1 = e;
-      console.log(error1);
+      loading = false;
       toast.warning(er[$lang]);
     }
   }
@@ -509,70 +304,37 @@
     }
   }
   let rect = false;
-  let allr = $state(false);
   async function react() {
     allr = true;
     rect = true;
     isOpen = true;
   }
   async function afreact(event) {
-    let diunim = ``;
-    if (diun !== null) {
-      const diu = objToString(diun);
-      diunim = `${diu}`;
-    }
     why = event.why;
-    console.log(why);
-    let d = new Date();
-    //  loading = true;
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
-    let dataa = {
-      data: {
-        diun: [
-          ...diun,
-          {
-            what: mypos,
-            users_permissions_user: idL,
-            why: why,
-            order: (order += 1),
-            zman: d.toISOString(),
-            ide: idL
-          }
-        ]
-      }
+    const diunEntry = {
+      what: mypos,
+      users_permissions_user: page.data.id,
+      why,
+      order: (order += 1),
+      zman: new Date().toISOString(),
+      ide: page.data.id
     };
+
     try {
-      await fetch(`${baseUrl}/api/pmashes/${pendId}?populate=*`, {
-        method: 'PUT',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(dataa)
-      })
-        .then((r) => r.json())
-        .then((data) => (miDatan = data));
-      console.log(miDatan);
-      nowId.set(
-        miDatan.data.attributes.diun[miDatan.data.attributes.diun.length - 1].id
-      );
-      diun.push({
+      const result = await executeAction('addDiunEntry', {
+        entityType: 'pmash',
+        entityId: String(pendId),
+        projectId: String(projectId),
         what: mypos,
-        users_permissions_user: idL,
-        why: why,
-        order: (order += 1),
-        zman: d.toISOString(),
-        ide: idL
+        why,
       });
-      diun = diun;
-      clicked = false;
-      //   loading = false;
+      if (result.success) {
+        const newDiunId = result.data?.newDiunId;
+        if (newDiunId) nowId.set(newDiunId);
+        diun.push(diunEntry);
+        diun = diun;
+        clicked = false;
+      }
     } catch (e) {
       error1 = e;
       console.log(error1);

@@ -25,27 +25,41 @@ import { lang } from '$lib/stores/lang.js'
     splebel = null,
     stepState = 2,
     number,
-    numberb = $bindable(number),
+    numberb = $bindable(),
     lebel
   } = $props();
     let edit = $state(false)
 let show2 = $state(false)
 let datai = $state([])
+const fieldId = `number-${Math.random().toString(36).slice(2, 9)}`
+
+function commitEdit() {
+  const n = Number(numberb)
+  if (n >= 0) {
+    numberb = n
+    edit = false
+    checkAll(number, numberb)
+    updateDatai()
+  } else {
+    alert(tr.common.noLesFromZero[$lang])
+  }
+}
 function checkAll(a,b){
   datai[0].value = b
   datai[1].value = a
 }
 
 function updateDatai() {
-  if (old.length > 0) {
+  const oldValues = old ?? [];
+  if (oldValues.length > 0) {
     datai = [
       { leb: `${tr?.nego?.new[$lang]},${numberb}`, value: Number(numberb) },
       { leb: `${tr?.nego?.original[$lang]},${number}`, value: Number(number) }
     ];
-    for (let i = 0; i < old.length; i++) {
-      console.log(old[i]);
-      if (old[i] != null) {
-        datai.push({ value: Number(old[i]), leb: `${tr?.nego?.oldno[$lang]}-${i + 1},${old[i]}` });
+    for (let i = 0; i < oldValues.length; i++) {
+      console.log(oldValues[i]);
+      if (oldValues[i] != null) {
+        datai.push({ value: Number(oldValues[i]), leb: `${tr?.nego?.oldno[$lang]}-${i + 1},${oldValues[i]}` });
       }
     }
   } else {
@@ -67,7 +81,7 @@ $effect.pre(() => {
            class:text-barbi={splebel == false}
            class:text-wow={splebel == true}
            class:hidden={splebel == null}>{tr?.mission.perMonth[$lang]}</span></h2>
-       {#if number == numberb} 
+       {#if Number(number) === Number(numberb)} 
        <p class="text-gold">{number}</p>
        {:else}
        <div dir="rtl" class='w-1/2 mx-auto'>
@@ -77,8 +91,8 @@ $effect.pre(() => {
        </div>
         {/if}
        <button onclick={()=>edit = true}>
-            {#if number == numberb}🖍️{:else}✏️{/if}</button>
-        {#if number != numberb && show2 != true}
+            {#if Number(number) === Number(numberb)}🖍️{:else}✏️{/if}</button>
+        {#if Number(number) !== Number(numberb) && show2 != true}
         <button onclick={()=>show2 = true}>📑</button>
         {:else if show2 == true}
         <div class="flex flex-col items-center flex-wrap justify-center m-4">
@@ -91,7 +105,7 @@ $effect.pre(() => {
         <small class:text-right={$lang == "he"} class="text-gold">{tr?.nego.sugestion[$lang]}:</small>
         <p class="text-gold">{numberb}</p>
         </div>
-        {#each old  as o, i}
+        {#each old ?? [] as o, i}
         <div class="flex flex-row justify-center items-center">
         <small class:text-right={$lang == "he"} class="text-gold p-4">{tr?.nego.oldno[$lang]}:{i+1}</small>
         <p class="text-gold">{o ?? number}</p></div>
@@ -104,16 +118,20 @@ $effect.pre(() => {
 <RangeSlider bind:values={status} pipstep="20" float pips all="label" hoverable />
 --> 
 <div dir="rtl" class='textinput max-w-sm mx-auto'>
-  <input type="number"  id="numberb" name="numberb" bind:value={numberb} class='input' required>
-  <label for="numberb" class='label' >{lebel}</label>
+  <input
+    type="number"
+    id={fieldId}
+    name={fieldId}
+    value={numberb}
+    oninput={(e) => {
+      numberb = e.currentTarget.valueAsNumber;
+    }}
+    class="input"
+    required
+  />
+  <label for={fieldId} class='label' >{lebel}</label>
   <span class='line '></span>
-</div><button onclick={()=>{if(Number(numberb) >= 0){ edit = false
-checkAll(number,numberb)
-updateDatai()
-} else{
-  console.log(numberb,Number(numberb))
-  alert(tr.common.noLesFromZero[$lang])
-}}}>✅</button>
+</div><button onclick={commitEdit}>✅</button>
 {/if}
 </div>
 <style>

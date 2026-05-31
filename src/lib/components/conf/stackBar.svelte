@@ -15,21 +15,30 @@
   const yKey = 'leb';
   const zKey = 'key';
 
-  const seriesNames = Object.keys(datai[0]).filter(d => d !== yKey);
   const seriesColors = ['#FF0092', '#EEE8AA', '#c4e2ed', '#f7f6e3'];
 
-  /* --------------------------------------------
-   * Cast data
-   */
-  datai.forEach(d => {
-    seriesNames.forEach(name => {
-      d[name] = +d[name];
+  const seriesNames = $derived(
+    Object.keys(datai[0] ?? {}).filter((d) => d !== yKey)
+  );
+
+  const chartData = $derived.by(() => {
+    const names = seriesNames;
+    return datai.map((d) => {
+      const row = { ...d };
+      names.forEach((name) => {
+        row[name] = +row[name];
+      });
+      return row;
     });
   });
 
-  const formatTickX = d => format(`.${precisionFixed(d)}s`)(d);
+  const formatTickX = (d) => {
+    if (!Number.isFinite(d)) return '';
+    const p = precisionFixed(Math.abs(d));
+    return format(`.${p}s`)(d);
+  };
 
-  const stackedData = stack(datai, seriesNames);
+  const stackedData = $derived(stack(chartData, seriesNames));
 </script>
 
 <style>
