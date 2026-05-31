@@ -8,6 +8,7 @@
     PagingData
   } from '@mediakular/gridcraft';
   import { lang } from '$lib/stores/lang';
+  import { t } from '$lib/translations';
   import RichText from '$lib/celim/ui/richText.svelte';
   import NameAndPname from '$lib/components/grid/nameAndPname.svelte';
   import NameField from '$lib/components/grid/nameField.svelte';
@@ -28,7 +29,6 @@
   /** @type {Props} */
   let { acts = $bindable([]), onTaskClick, onRowClick, onCreateClick } = $props();
 
-  const createLabel = { he: 'מטלה חדשה', en: 'New Task', ar: 'مهمة جديدة' };
   let paging = $state(new PagingData(
     1, // currentPage
     20, // itemsPerPage
@@ -57,32 +57,24 @@
     });
   }
   let filtersUi  = $state([]);
-  const name = { he: ' שם', en: 'name' };
-  const des = { he: 'תיאור', en: 'description' };
-  const my = { he: 'מבוצע ע"י', en: 'assigned to' };
-  const datest = { he: 'תאריך', en: 'date' };
-  const vali = { he: 'נוצר ע"י', en: 'created by' };
-  const approve = { he: 'אישור', en: 'Approve' };
-  const pending = { he: 'ממתין לאישור', en: 'Pending Approval' };
-  const urgencyLabel = { he: 'דחיפות', en: 'Urgency' };
   let theme = PrelineTheme;
 
   let columns = $state([
     {
       key: 'shem',
-      title: name[$lang],
+      title: $t('mission.actsTable.name'),
       accessor: (row) => ({ value: row.shem, onClick: () => onRowClick?.(row) }),
       renderComponent: NameField
     },
     {
       key: 'hashivut',
-      title: urgencyLabel[$lang],
+      title: $t('mission.actsTable.urgency'),
       accessor: (row) => row.hashivut || 'white',
       renderComponent: UrgencyBadge
     },
     {
       key: 'vali',
-      title: vali[$lang],
+      title: $t('mission.actsTable.createdBy'),
       sortValue: (row) => row.vali.data?.id,
       accessor: (row) => {
         const valiData = row?.vali?.data?.attributes;
@@ -106,7 +98,7 @@
     },
     {
       key: 'my',
-      title: my[$lang],
+      title: $t('mission.actsTable.assignedTo'),
       sortValue: (row) => row.my?.data?.[0]?.id || 0,
       accessor: (row) => {
         const myData = row.my?.data?.[0]?.attributes;
@@ -153,7 +145,7 @@
     },
     {
       key: 'des',
-      title: des[$lang],
+      title: $t('mission.actsTable.description'),
       sortable: false,
       accessor: (row) => {
         return {
@@ -168,7 +160,7 @@
     },
     {
       key: 'sqadualed',
-      title: datest[$lang],
+      title: $t('mission.actsTable.date'),
       accessor: (row) => {
         return {
           value: row.dateS,
@@ -182,12 +174,6 @@
   let myid = $derived(String(page.data.uid ?? ''));
   let uiFilters = $state([]);
   
-  const myTasks = { en: 'my assigned tasks', he: 'מטלות שאני מבצע' };
-  const valiTasks = { en: 'tasks I created', he: 'מטלות שיצרתי' };
-  const emptyTasks = {
-    en: 'tasks pending assingment',
-    he: 'מטלות ממתינות להשמה'
-  };
 
   // משתנים חיצוניים למצב הפילטרים
   let isMyTasksActive = $state(false); // מתחיל דלוק
@@ -393,7 +379,7 @@
           big={false}
           sm={false}
           bg="gold"
-          word={myTasks[$lang]}
+          word={$t('mission.actsTable.myTasks')}
           closei={!isMyTasksActive}
           openi={isMyTasksActive}
         />
@@ -403,7 +389,7 @@
           big={false}
           sm={false}
           bg="gold"
-          word={valiTasks[$lang]}
+          word={$t('mission.actsTable.myCreatedTasks')}
           closei={!isCreatedByMeActive}
           openi={isCreatedByMeActive}
         />
@@ -413,7 +399,7 @@
           big={false}
           sm={false}
           bg="gold"
-          word={emptyTasks[$lang]}
+          word={$t('mission.actsTable.pendingAssignment')}
           closei={!isUnassignedActive}
           openi={isUnassignedActive}
         />
@@ -437,12 +423,12 @@
       <button
         onclick={onCreateClick}
         class="flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg bg-barbi text-gold font-bold text-sm hover:bg-barbi/80 transition-colors"
-        title={createLabel[$lang] ?? createLabel.en}
+        title={$t('mission.actsTable.newTask')}
       >
         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
           <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
         </svg>
-        {createLabel[$lang] ?? createLabel.en}
+        {$t('mission.actsTable.newTask')}
       </button>
     {/if}
   </div>

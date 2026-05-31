@@ -288,6 +288,21 @@ export const config = {
             key: 'project',
             loader: async () => (await import('./ar/project.json')).default,
         },
+        {
+            locale: 'he',
+            key: 'mission',
+            loader: async () => (await import('./he/mission.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'mission',
+            loader: async () => (await import('./en/mission.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'mission',
+            loader: async () => (await import('./ar/mission.json')).default,
+        },
     ],
 };
 
