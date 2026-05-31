@@ -168,6 +168,7 @@
     <button class="hover:text-gold transition-colors" onclick={() => scrollToId('features')}>{$t('home.sections.navFeatures')}</button>
     <button class="hover:text-gold transition-colors" onclick={() => scrollToId('how')}>{$t('home.sections.navHow')}</button>
     <button class="hover:text-gold transition-colors" onclick={() => scrollToId('concierge')}>{$t('home.sections.navConcierge')}</button>
+    <button class="hover:text-gold transition-colors" onclick={() => scrollToId('who')}>{$t('home.sections.whoTitle')}</button>
     <button class="hover:text-gold transition-colors" onclick={() => scrollToId('faq')}>{$t('home.sections.navFaq')}</button>
   </nav>
   <button
@@ -684,6 +685,84 @@
                 {$t('home.concierge.providerCta')}
               </button>
             </div>
+          </div>
+        </section>
+
+        <!-- בלוק: למי זה מתאים -->
+        <section id="who" class="scroll-mt-16">
+          <h2 class="text-rose-700 font-bold text-2xl mb-1 text-center">
+            {$t('home.sections.whoTitle')}
+          </h2>
+          <p class="text-center text-slate-700 text-sm mb-5">
+            {$t('home.sections.whoSub')}
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {#each [['🧑‍🎨', 'whoFreelancer'], ['🏪', 'whoBusiness'], ['🌱', 'whoCreators']] as [icon, key]}
+              <div
+                class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col text-center"
+              >
+                <div class="text-3xl mb-1">{icon}</div>
+                <h3 class="text-rose-700 font-bold mb-1">
+                  {$t(`home.sections.${key}_t`)}
+                </h3>
+                <p class="text-slate-800 text-sm leading-relaxed">
+                  {$t(`home.sections.${key}_d`)}
+                </p>
+              </div>
+            {/each}
+          </div>
+        </section>
+
+        <!-- בלוק: הוכחה חברתית / תנועה עולמית -->
+        <section class="text-center">
+          <h2 class="text-rose-700 font-bold text-2xl mb-1">
+            {$t('home.sections.proofTitle')}
+          </h2>
+          <p class="text-slate-700 text-sm mb-4 max-w-md mx-auto">
+            {$t('home.sections.proofSub')}
+          </p>
+          <div class="flex justify-center items-stretch gap-3 flex-wrap">
+            <div class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]">
+              <div class="text-2xl font-bold text-white">{projectsCount}</div>
+              <div class="text-white/90 text-xs">{$t('home.sections.proofStatProjects')}</div>
+            </div>
+            <div class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]">
+              <div class="text-2xl font-bold text-white">{usersCount}</div>
+              <div class="text-white/90 text-xs">{$t('home.sections.proofStatMembers')}</div>
+            </div>
+            <div class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]">
+              <div class="text-2xl font-bold text-white">{membersCount}</div>
+              <div class="text-white/90 text-xs">{$t('home.sections.proofStatSigners')}</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- בלוק: מפת ההסכמה הגלובלית -->
+        <section class="text-center">
+          <h2 class="text-rose-700 font-bold text-2xl mb-1">
+            {$t('home.sections.mapTitle')}
+          </h2>
+          <p class="text-slate-700 text-sm mb-4 max-w-md mx-auto">
+            {$t('home.sections.mapSub')}
+          </p>
+          <a
+            href="/love"
+            data-sveltekit-prefetch
+            class="inline-block bg-barbi hover:bg-white hover:text-barbi text-gold font-semibold px-5 py-2 rounded-lg shadow-md hover:scale-105 transition-all duration-300"
+          >
+            🗺️ {$t('home.sections.mapCta')}
+          </a>
+        </section>
+
+        <!-- בלוק: מודל / תמחור -->
+        <section class="text-center">
+          <div class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-2xl px-5 py-5 shadow">
+            <h2 class="text-rose-700 font-bold text-2xl mb-1">
+              {$t('home.sections.modelTitle')}
+            </h2>
+            <p class="text-slate-800 leading-relaxed max-w-md mx-auto">
+              {$t('home.sections.modelSub')}
+            </p>
           </div>
         </section>
 
