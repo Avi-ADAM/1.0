@@ -1,5 +1,7 @@
 <script lang="ts">
   import StatsCard from './StatsCard.svelte';
+  import tr from '$lib/translations/tr.json';
+  import { lang } from '$lib/stores/lang.js';
   import type { DashboardStats } from '$lib/types';
 
   let { stats }: { stats: DashboardStats } = $props();
@@ -7,29 +9,29 @@
 
 <div class="row">
   <StatsCard
-    label="עסקאות פעילות"
+    label={tr.deals.activeDeals[$lang]}
     value={stats.activeDeals}
-    sub='<span style="color:#4ade80">↑ 1</span> מהחודש שעבר'
+    sub={`<span style="color:#4ade80">↑ 1</span> ${tr.deals.fromLastMonth[$lang]}`}
     icon="⚡"
     variant="gold"
   />
   <StatsCard
-    label='סה״כ שולם'
+    label={tr.deals.totalPaid[$lang]}
     value="₪ {stats.totalPaid.toLocaleString()}"
-    sub="מתוך {stats.totalCost.toLocaleString()} ₪"
+    sub="{tr.deals.outOf[$lang]} {stats.totalCost.toLocaleString()} ₪"
     icon="₪"
   />
   <StatsCard
-    label="ממתין לאישורך"
+    label={tr.deals.pendingApprovalTitle[$lang]}
     value={stats.pendingApprovals}
-    sub="פריטים חדשים"
+    sub={tr.deals.newItems[$lang]}
     icon="⏳"
     variant="pink"
   />
   <StatsCard
-    label="הושלמו"
+    label={tr.deals.completed[$lang]}
     value={stats.completedDeals}
-    sub="מוצר במלואו"
+    sub={tr.deals.fullProduct[$lang]}
     icon="✓"
   />
 </div>

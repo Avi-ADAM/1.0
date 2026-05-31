@@ -1,5 +1,6 @@
 <script>
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
 
   /**
    * @typedef {Object} Props
@@ -11,20 +12,11 @@
   /** @type {Props} */
   let { evt, offset = -35, children } = $props();
 
-  const translations = {
-    name: {
-      en: 'Name',
-      he: 'שם'
-    },
-    iso3: {
-      en: 'ISO3',
-      he: 'ISO3'
-    },
-    agrees: {
-      en: 'Agreements',
-      he: 'הסכמות'
-    }
-  };
+  const translations = $derived({
+    name: $t('home.tooltip.name'),
+    iso3: $t('home.tooltip.iso3'),
+    agrees: $t('home.tooltip.agreements')
+  });
 
   let mouseEvent = $derived(evt && evt.detail && evt.detail.e ? evt.detail.e : null);
   let tooltipData = $derived(evt && evt.detail && evt.detail.props ? evt.detail.props : null);

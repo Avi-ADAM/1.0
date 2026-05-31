@@ -8,6 +8,7 @@
   import { toast } from 'svelte-sonner';
   import { SendTo } from '$lib/send/sendTo.svelte';
   import { page } from '$app/state';
+  import tr from '$lib/translations/tr.json';
 
   /**
    * @typedef {Object} Props
@@ -48,10 +49,7 @@
   let total = $state(0);
   let hm = $state(1);
   let note = $state('');
-  let placeholder = {
-    he: 'אצל מי הכסף',
-    en: 'With whom is the money'
-  };
+  let placeholder = tr.sales.withWhomMoney;
   let already = $state(false);
   let per = $state(false);
   let dates = $state(null);
@@ -226,7 +224,7 @@
       }
     } catch (e) {
       console.log('Sale error:', e);
-      const errorMessage = e.message || ($lang === 'he' ? 'שגיאה בביצוע המכירה' : 'Error processing sale');
+      const errorMessage = e.message || tr.sales.saleError[$lang];
       onError?.(errorMessage, currentOperationId);
     } finally {
       // Reset the operation state
@@ -236,23 +234,20 @@
   }
 
   // Localization strings
-  const change = { he: 'שינוי תאריך מכירה', en: 'change sale date' };
-  const quantT = { he: 'כמה יחידות?', en: 'How many units?' };
-  const forEachT = { he: 'כמה ליחידה?', en: 'How many per unit?' };
-  const perMonth = { he: 'לחודש', en: 'per month' };
-  const perYear = { he: 'לשנה', en: 'per year' };
-  const datesEmessage = { he: 'אין תאריך התחלה', en: 'No start date' };
-  const noFinnish = {
-    he: 'אין תאריך סיום, ניתן להשאיר ירק אם רוצים מכירה מתמשכת עד אשר תבוטל באופן יזום',
-    en: 'No finish date is provided, it is possible to leave it blank if you want a perpetual sale until canceled'
-  };
-  const noSelected = { he: ' שדה אצל מי הכסף נשאר ריק ', en: 'No user selected' };
-  const start = { he: 'תאריך התחלה', en: 'Start Date' };
-  const end = { he: 'תאריך סיום', en: 'End Date' };
-  const addL = { he: 'הוספת מכירה', en: 'Add Sale' };
-  const totalT = { he: 'סה"כ', en: 'Total' };
-  const noteT = { he: 'הערה (אופציונלי)', en: 'Note (optional)' };
-  const notePlaceholder = { he: 'הוספת הערה למכירה...', en: 'Add a note to the sale...' };
+  const change = tr.sales.changeSaleDate;
+  const quantT = tr.sales.howManyUnits;
+  const forEachT = tr.sales.howManyPerUnit;
+  const perMonth = tr.sales.perMonth;
+  const perYear = tr.sales.perYear;
+  const datesEmessage = tr.sales.noStartDate;
+  const noFinnish = tr.sales.noEndDate;
+  const noSelected = tr.sales.noUserSelected;
+  const start = tr.sales.startDate;
+  const end = tr.sales.endDate;
+  const addL = tr.sales.addSale;
+  const totalT = tr.sales.total;
+  const noteT = tr.sales.noteOptional;
+  const notePlaceholder = tr.sales.notePlaceholder;
 
   $effect(() => {
     dayjs.locale($lang);

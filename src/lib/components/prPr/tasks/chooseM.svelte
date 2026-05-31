@@ -3,23 +3,13 @@
   import Arrow from '$lib/celim/icons/arrow.svelte';
   import Button from '$lib/celim/ui/button.svelte';
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
 
   const moachStore = getMoachStore();
   let projectId = $derived(page.params.projectId);
 
-  const placeholder = {
-    he: 'בחירת משימה בתהליך',
-    ar: 'اختيار المهمة المتابعة',
-    en: 'choose mission in progress'
-  };
-
-  const noM = {
-    he: 'לא נמצאו משימות בתהליך עבורך כדאי ליצור משימה חדשה בטאב יצירה',
-    en: 'no missions in progress found for you, you may want to create a new one in the "add" tab',
-    ar: 'لم يتم العثور على مهام في الحالة المتابعة لك، قد تريد إنشاء مهمة جديدة في علامة "إضافة"'
-  };
 
   /**
    * @typedef {Object} Props
@@ -75,13 +65,13 @@
 </script>
 
 {#if filtered.length !== 0}
-  <h2 class="text-gold text-center text-lg">{placeholder[$lang]}</h2>
+  <h2 class="text-gold text-center text-lg">{$t('mission.chooseM.heading')}</h2>
   <div class="w-full flex flex-row items-center justify-center gap-2 p-4">
     <select
       bind:value={selected}
       class="bg-gold text-barbi font-bold rounded-lg px-3 py-2 border border-barbi focus:outline-none focus:ring-2 focus:ring-barbi"
     >
-      <option value="">{placeholder[$lang]}</option>
+      <option value="">{$t('mission.chooseM.heading')}</option>
       {#each filtered as mission}
         <option value={mission.attributes.name}>{mission.attributes.name}</option>
       {/each}
@@ -94,6 +84,6 @@
   </div>
 {:else}
   <span class="text-sm text-gold block p-4 text-center">
-    {noM[$lang]}
+    {$t('mission.chooseM.emptyState')}
   </span>
 {/if}

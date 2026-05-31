@@ -1,5 +1,6 @@
 <script lang="ts">
   import { lang } from '$lib/stores/lang.js';
+  import tr from '$lib/translations/tr.json';
 
   interface Props {
     votes: number;
@@ -11,24 +12,13 @@
 
   let { votes, urgent, suggestions, activePurchases, activeSales }: Props = $props();
 
-  const t = {
-    he: {
-      votes: 'הצבעות',
-      urgent: 'דחוף',
-      suggestions: 'הצעות',
-      purchases: 'קניות',
-      sales: 'מכירות'
-    },
-    en: {
-      votes: 'Votes',
-      urgent: 'Urgent',
-      suggestions: 'Proposals',
-      purchases: 'Purchases',
-      sales: 'Sales'
-    }
-  };
-
-  let labels = $derived(t[$lang as keyof typeof t] ?? t.he);
+  let labels = $derived({
+    votes: tr.hub.votes[$lang],
+    urgent: tr.hub.urgent[$lang],
+    suggestions: tr.hub.suggestions[$lang],
+    purchases: tr.hub.purchases[$lang],
+    sales: tr.hub.sales[$lang]
+  });
 
   const chips = $derived([
     { icon: '🗳', count: votes,           label: labels.votes,       href: '/kind/vote',       red: false,        pulse: urgent > 0 },
@@ -41,7 +31,7 @@
 
 <nav
   dir="rtl"
-  aria-label="סיכום פעילות"
+  aria-label={tr.hub.activitySummary[$lang]}
   class="sticky top-0 z-30 flex flex-wrap gap-2 px-3 py-2 bg-bluesun/90 backdrop-blur-sm border-b border-white/10 shadow-sm"
 >
   {#each chips as chip (chip.label)}

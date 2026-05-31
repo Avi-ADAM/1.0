@@ -92,10 +92,6 @@
   } = $props();
 
   let userss;
-  const less = {
-    he: 'הסרה',
-    en: 'remove'
-  };
   let descrip2 = $state(descrip);
   let name2 = $state(name1);
   let sqadualed2 = $state(sqadualed);

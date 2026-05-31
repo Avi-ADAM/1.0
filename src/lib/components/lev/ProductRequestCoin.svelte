@@ -1,11 +1,8 @@
 <script lang="ts">
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
 
   let { buble } = $props();
-
-  const t = {
-    request: { he: 'בקשה', en: 'Request', ar: 'طلب' }
-  };
 </script>
 
 <div
@@ -52,7 +49,7 @@
       class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white p-1 text-center transition-opacity duration-200"
     >
       <span class="text-[8px] font-bold uppercase tracking-tighter opacity-80"
-        >{t.request[$lang]}</span
+        >{$t('lev.productRequest.request')}</span
       >
       <span class="text-[10px] font-extrabold leading-tight line-clamp-2"
         >{buble.name}</span

@@ -15,6 +15,9 @@
   let myDate = '11:00';
   import MultiSelect from 'svelte-multiselect';
   import { lang } from '$lib/stores/lang.js';
+  import heMission from '$lib/translations/he/mission.json';
+  import enMission from '$lib/translations/en/mission.json';
+  import arMission from '$lib/translations/ar/mission.json';
   import Addnewro from '../addnew/addNewRole.svelte';
   import SkillSelector from '../ui/SkillSelector.svelte';
   import tr from '$lib/translations/tr.json';
@@ -54,6 +57,11 @@
     missionTemplates = [],
     processContext = null
   } = $props();
+
+  const missionByLang = { he: heMission, en: enMission, ar: arMission };
+  const mf = $derived((missionByLang[$lang] ?? missionByLang.he).form);
+  const ml = $derived((missionByLang[$lang] ?? missionByLang.he).location);
+
   let miData = $state([
     {
       selectedSkills: [],
@@ -243,23 +251,10 @@
     }
     return id;
   }
-  const placeholder = { he: 'סוג המשימה', en: 'mission type' };
   let selected = [];
-  const placeholder1 = {
-    he: 'בחירת כל הכישורים הרלוונטיים',
-    en: 'choose more skills'
-  };
   let skills2 = $state($skil);
   let roles = $state($role);
   let selected3;
-  const placeholder5 = {
-    he: 'בחירת תפקיד',
-    en: 'choose mission role'
-  };
-  const pll = {
-    he: 'בחירה של 1',
-    en: 'choose FreeMates member'
-  };
 
   function find_skill_id(skill_name_arr) {
     let arr = [];
@@ -332,7 +327,7 @@
       } else {
         loading = false;
         error = true;
-        toast.warning(er[$lang]);
+        toast.warning(mf.errorMessage);
       }
     } catch (e) {
       error1 = e;
@@ -416,28 +411,10 @@
   const closer = () => {
     isOpen = false;
   };
-  let addn = $derived({
-    he: `יצירת והוספת: "${searchText}"`,
-    en: `Create "${searchText}"`
-  });
-  const perho = { he: 'לשעה', en: 'per hour' };
-  const hourss = { he: 'שעות', en: 'hours' };
-  const monhly = { he: 'בחודש', en: 'per month' };
-  const total = { he: 'סך הכל', en: 'total' };
-  const isshi = {
-    he: 'האם זו משימת משמרות?',
-    en: 'is it shifts mission? '
-  };
-  const editsi = {
-    he: 'עריכת סידור המשמרות',
-    en: 'edit shifts'
-  };
+  let addn = $derived(`${mf.missionType}: "${searchText}"`);
   let days = $state([
     {
-      name: {
-        he: 'ראשון',
-        en: 'Sunday'
-      },
+      nameKey: 'sunday',
       id: 1,
       st: '11:00',
       cl: '17:00',
@@ -451,10 +428,7 @@
       ]
     },
     {
-      name: {
-        he: 'שני',
-        en: 'Monday'
-      },
+      nameKey: 'monday',
       id: 2,
       st: '11:00',
       cl: '17:00',
@@ -468,10 +442,7 @@
       ]
     },
     {
-      name: {
-        he: 'שלישי',
-        en: 'Tuesday'
-      },
+      nameKey: 'tuesday',
       id: 3,
       st: '11:00',
       cl: '17:00',
@@ -485,10 +456,7 @@
       ]
     },
     {
-      name: {
-        he: 'רביעי',
-        en: 'Wednesday'
-      },
+      nameKey: 'wednesday',
       id: 4,
       st: '11:00',
       cl: '17:00',
@@ -502,10 +470,7 @@
       ]
     },
     {
-      name: {
-        he: 'חמישי',
-        en: 'Thursday'
-      },
+      nameKey: 'thursday',
       id: 5,
       st: '11:00',
       cl: '17:00',
@@ -519,10 +484,7 @@
       ]
     },
     {
-      name: {
-        he: 'שישי',
-        en: 'Friday'
-      },
+      nameKey: 'friday',
       id: 6,
       st: '11:00',
       cl: '17:00',
@@ -536,10 +498,7 @@
       ]
     },
     {
-      name: {
-        he: 'שבת',
-        en: 'Saturday'
-      },
+      nameKey: 'saturday',
       id: 7,
       st: null,
       cl: null,
@@ -547,76 +506,6 @@
       shifts: []
     }
   ]);
-  const headingd = {
-    he: 'יום בשבוע',
-    en: 'week day'
-  };
-  const headinga = {
-    he: 'שעת פתיחה',
-    en: 'opening hour'
-  };
-  const headingb = {
-    he: 'שעת סגירה',
-    en: 'closing hour'
-  };
-  const headingc = {
-    he: 'מספר המשמרות',
-    en: 'number of shifts'
-  };
-  const headinge = {
-    he: 'שעת פתיחת משמרת',
-    en: 'starting hour for shift'
-  };
-  const headingf = {
-    he: 'שעת סגירת משמרת',
-    en: 'finishing hour for shift'
-  };
-  const headingr = {
-    he: 'כמה במשמרת הזו',
-    en: 'shift partisipant number'
-  };
-  const iskvua = {
-    he: 'האם זו משימה קבועה?',
-    en: 'is that a constant mission?'
-  };
-  const iskvu = {
-    he: 'משימה קבועה',
-    en: 'constant mission'
-  };
-  const iskvuFl = {
-    he: 'משימה חד פעמית',
-    en: 'one time mission'
-  };
-  const hmh = {
-    he: ' כמה שעות זה אמור לקחת בסך הכל?',
-    en: 'how many hours should it take?'
-  };
-  const hms = {
-    he: 'כמה שעות בחודש?',
-    en: 'how many hours per month'
-  };
-  const htt = {
-    he: 'מספר השעות',
-    en: 'number of hours'
-  };
-  const leho = {
-    he: 'לחודש:',
-    en: 'per month:'
-  };
-  const acti = {
-    he: 'פרסום',
-    en: 'publish'
-  };
-  const er = {
-    he: 'אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל  ',
-    en: 'error: please try again, if the problem continue contact at baruch@1lev1.com'
-  };
-  const removeMission = {
-    he: 'הסרת המשימה שנבחרה',
-    en: 'remove this mission'
-  };
-  const nama = { he: 'שם', en: 'name' };
-  const des = { he: 'תיאור', en: 'decription' };
   let shift = $state([
     {
       ii: 1
@@ -650,53 +539,15 @@
   }
 
   function kova() {}
-  const nom = {
-    he: 'חסר ברשימה, ניתן להוסיפו עם הכפתור "הוספת כישור חדש" למטה',
-    en: 'Missing, you can use the "Add new Skill" button bellow to add it'
-  };
-  const requireSkills = {
-    he: 'כישורים נדרשים:',
-    en: 'required skills:'
-  };
-  const checklistH = {
-    he: 'רשימת מטלות',
-    en: 'checklist'
-  };
-  const locationTexts = {
-    title: { he: 'location', en: 'location' },
-    helper: {
-      he: 'online, onsite or hybrid location scope',
-      en: 'Choose whether this is online, onsite or hybrid, and its service radius.'
-    },
-    empty: { he: 'no location set', en: 'No location set' },
-    selected: { he: 'selected location', en: 'Selected location' }
-  };
-  const requiredRoles = {
-    he: 'הגדרת תפקיד:',
-    en: 'role assigned:'
-  };
-  const requiredWW = {
-    he: 'דרכי עבודה מבוקשות:',
-    en: 'ways of work for the mission:'
-  };
-  const cm = {
-    he: 'משימות שנבחרו',
-    en: 'choosen missions'
-  };
 
   let error = $state(false),
     success = $state(false),
     loading = $state(false);
-  const successMsg = {
-    he: 'המשימה פורסמה בהצלחה!',
-    en: 'Mission published successfully!'
-  };
-
   function handleSuccess(md) {
     loading = false;
     success = true;
     confettiStore.trigger();
-    toast.success(successMsg[$lang]);
+    toast.success(mf.publishedSuccess);
     onClose?.({ md });
   }
 
@@ -744,13 +595,13 @@
   }
 
   function locationSummary(location) {
-    if (!location || !hasLocationValue(location)) return locationTexts.empty[$lang];
-    if (location.location_mode === 'online') return 'Online';
+    if (!location || !hasLocationValue(location)) return ml.empty;
+    if (location.location_mode === 'online') return ml.online;
     if (hasLocationPoint(location)) {
-      const hint = location.location_hint?.trim() || locationTexts.selected[$lang];
+      const hint = location.location_hint?.trim() || ml.selected;
       return `${hint} - ${location.radius || 15} km`;
     }
-    return location.location_hint?.trim() || locationTexts.selected[$lang];
+    return location.location_hint?.trim() || ml.selected;
   }
 </script>
 
@@ -781,20 +632,20 @@
           >
             <caption class="sm:text-right md:text-center text-right">
               <h1 class="md:text-center text-2xl md:text-2xl font-bold">
-                {editsi[$lang]}
+                {mf.editShift}
               </h1>
             </caption>
             <thead>
               <tr class="gg">
-                <th class="gg ddd">{headingd[$lang]}</th>
+                <th class="gg ddd">{mf.dayOfWeek}</th>
                 {#each days as day}
-                  <td class="gg" style="font-size: 1rem">{day.name[$lang]}</td>
+                  <td class="gg" style="font-size: 1rem">{mf.days[day.nameKey]}</td>
                 {/each}
               </tr>
             </thead>
             <tbody>
               <tr>
-                <th class="ddd">{headinga[$lang]}</th>
+                <th class="ddd">{mf.openTime}</th>
                 {#each days as day}
                   <td
                     ><SveltyPicker
@@ -806,7 +657,7 @@
                 {/each}
               </tr>
               <tr>
-                <th class="ddd">{headingb[$lang]}</th>
+                <th class="ddd">{mf.closeTime}</th>
                 {#each days as day}
                   <td
                     ><SveltyPicker
@@ -818,7 +669,7 @@
                 {/each}
               </tr>
               <tr>
-                <th class="ddd">{headingc[$lang]}</th>
+                <th class="ddd">{mf.numShifts}</th>
                 {#each days as day, i}
                   <td>
                     <div dir={$lang == 'he' ? 'rtl' : 'ltr'} class="textinput">
@@ -832,7 +683,7 @@
                         required
                       />
                       <label for={`shif${i}`} class="label"
-                        >{headingc[$lang]}</label
+                        >{mf.numShifts}</label
                       >
                       <span class="line"></span>
                     </div></td
@@ -842,7 +693,7 @@
 
               {#each shift as shi, t}
                 <tr>
-                  <th class="ddd">{headinge[$lang]} {t + 1}</th>
+                  <th class="ddd">{mf.shiftOpen} {t + 1}</th>
                   {#each days as day, i}
                     {#if day.shifts[t] != undefined}
                       <td
@@ -858,7 +709,7 @@
                   {/each}
                 </tr>
                 <tr>
-                  <th class="ddd">{headingf[$lang]} {t + 1}</th>
+                  <th class="ddd">{mf.shiftClose} {t + 1}</th>
                   {#each days as day, i}
                     {#if day.shifts[t] != undefined}
                       <td
@@ -874,7 +725,7 @@
                   {/each}
                 </tr>
                 <tr>
-                  <th class="ddd">{headingr[$lang]} {t + 1}</th>
+                  <th class="ddd">{mf.perShift} {t + 1}</th>
                   {#each days as day, i}
                     {#if day.shifts[t] != undefined}
                       <td style="font-size: 3rem">
@@ -891,7 +742,7 @@
                             required
                           />
                           <label for={`part${i}`} class="label"
-                            >{headingr[$lang]}</label
+                            >{mf.perShift}</label
                           >
                           <span class="line"></span>
                         </div>
@@ -1034,7 +885,7 @@
             </p>
             <div class="my-2">
               <mark class="text-barbi text-sm lg:text-2xl"
-                >{locationTexts.title[$lang]}:</mark
+                >{ml.title}:</mark
               >
               <button onclick={() => (locationE = !locationE)}
                 >{#if locationE}<Done />{:else}<EditIcon />{/if}</button
@@ -1043,8 +894,8 @@
                 <div class="my-3">
                   <LocationPicker
                     bind:value={miData[0].location}
-                    label={locationTexts.title[$lang]}
-                    helper={locationTexts.helper[$lang]}
+                    label={ml.title}
+                    helper={ml.helper}
                     height="300px"
                   />
                 </div>
@@ -1078,7 +929,7 @@
                   })}
                 {:else}
                   <NumberInput bind:value={miData[0].valph} />{/if}
-                {perho[$lang]}
+                {mf.perHour}
               </span><span> ✖ </span><span
                 >{#if valphE == false}
                   {miData[0].nhours.toLocaleString('en-US', {
@@ -1087,22 +938,22 @@
                 {:else}
                   <NumberInput bind:value={miData[0].nhours} />
                 {/if}
-                {hourss[$lang]}
-                {miData[0].iskvua ? monhly[$lang] : total[$lang]}
+                {mf.hours}
+                {miData[0].iskvua ? mf.perMonth : mf.total}
               </span> <span> = </span>
               <span
                 >{(miData[0].nhours * miData[0].valph).toLocaleString('en-US', {
                   maximumFractionDigits: 2
                 })}
-                {miData[0].iskvua ? monhly[$lang] : total[$lang]}
+                {miData[0].iskvua ? mf.perMonth : mf.total}
               </span>
               {#if valphE}
                 <span
-                  >{iskvua[$lang]}
+                  >{mf.isRecurring}
                   <Chooser
                     bind:checked={miData[0].iskvua}
-                    tr={iskvu}
-                    fl={iskvuFl}
+                    tr={{ he: mf.recurring, en: mf.recurring }}
+                    fl={{ he: mf.oneTime, en: mf.oneTime }}
                   /></span
                 >
               {/if}
@@ -1112,7 +963,7 @@
             </div>
             <div class="my-2">
               <mark class="text-barbi text-sm lg:text-2xl"
-                >{checklistH[$lang]}:</mark
+                >{mf.tasksList}:</mark
               >
               {#key miData}
                 {#if miData[0].checklist}
@@ -1186,7 +1037,7 @@
             </div>
             <div class="my-2">
               <mark class="text-barbi text-sm lg:text-2xl"
-                >{requireSkills[$lang]}:</mark
+                >{mf.requiredSkills}:</mark
               >
               <button onclick={() => (ske = !ske)}
                 >{#if ske}<Done />{:else}<EditIcon />{/if}</button
@@ -1214,7 +1065,7 @@
                 >
                   <SkillSelector
                     bind:selectedSkills={miData[0].selectedSkills}
-                    placeholder={placeholder1[$lang]}
+                    placeholder={mf.skillsPlaceholder}
                     autoCreate={true}
                   />
                 </div>
@@ -1222,14 +1073,14 @@
                 <MobileModal
                   onClose={() => (ske = false)}
                   bind:isOpen={ske}
-                  title={placeholder1[$lang]}
+                  title={mf.skillsPlaceholder}
                 >
                   <div
                     class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2"
                   >
                     <SkillSelector
                       bind:selectedSkills={miData[0].selectedSkills}
-                      placeholder={placeholder1[$lang]}
+                      placeholder={mf.skillsPlaceholder}
                       autoCreate={true}
                     />
                     <button onclick={() => (ske = false)}><Done /></button>
@@ -1239,7 +1090,7 @@
             </div>
             <div class="my-2">
               <mark class="text-sm text-barbi lg:text-2xl"
-                >{requiredRoles[$lang]}</mark
+                >{mf.roleDefinition}</mark
               >
               <button onclick={() => (roleE = !roleE)}
                 >{#if roleE}<Done />{:else}<EditIcon />{/if}</button
@@ -1252,7 +1103,7 @@
                     {#each miData[0].selectedRoles as rol}
                       <p
                         onmouseenter={() =>
-                          hover({ he: 'תפקיד מבוקש', en: 'requested role' })}
+                          hover(mf.requestedRole)}
                         onmouseleave={() => hover('0')}
                         class="m-0"
                         style="text-shadow:none;"
@@ -1280,7 +1131,7 @@
                     bind:selected={miData[0].selectedRoles}
                     onchange={() => (miData = miData)}
                     onadd={(event) => console.log(event)}
-                    placeholder={placeholder5[$lang]}
+                    placeholder={mf.rolePlaceholder}
                     options={$role.map((c) => c.attributes.roleDescription)}
                   />
                   <Addnewro mid={miData[0].id} onAddnewrole={addnewrole} />
@@ -1289,7 +1140,7 @@
                 <MobileModal
                   onClose={() => (roleE = false)}
                   bind:isOpen={roleE}
-                  title={placeholder5[$lang]}
+                  title={mf.rolePlaceholder}
                 >
                   <div
                     class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2"
@@ -1303,7 +1154,7 @@
                       bind:selected={miData[0].selectedRoles}
                       onchange={() => (miData = miData)}
                       onadd={(event) => console.log(event)}
-                      placeholder={placeholder5[$lang]}
+                      placeholder={mf.rolePlaceholder}
                       options={$role.map((c) => c.attributes.roleDescription)}
                     />
                     <Addnewro mid={miData[0].id} onAddnewrole={addnewrole} />
@@ -1314,7 +1165,7 @@
             </div>
             <div class="my-2">
               <mark class="text-sm lg:text-2xl text-barbi"
-                >{requiredWW[$lang]}</mark
+                >{mf.workways}</mark
               >
               <button onclick={() => (wwe = !wwe)}
                 >{#if wwe}<Done />{:else}<EditIcon />{/if}</button
@@ -1327,10 +1178,7 @@
                     {#each miData[0].selectedWorkways as rol}
                       <p
                         onmouseenter={() =>
-                          hover({
-                            he: 'דרכי עבודה מבוקשות',
-                            en: 'ways of work for the mission'
-                          })}
+                          hover(mf.requestedWorkways)}
                         onmouseleave={() => hover('0')}
                         class="m-0"
                         style="text-shadow:none;"
@@ -1354,12 +1202,12 @@
                     inputClass="!bg-gold !text-barbi"
                     liSelectedClass="!bg-barbi !text-gold"
                     --sms-open-z-index={10000}
-                    createOptionMsg={addn[$lang]}
+                    createOptionMsg={addn}
                     allowUserOptions={true}
                     bind:searchText
                     loading={newcontentW}
                     bind:selected={miData[0].selectedWorkways}
-                    placeholder={placeholder[$lang]}
+                    placeholder={mf.missionType}
                     options={$ww.map((c) => c.attributes.workWayName)}
                     onchange={(e) => {
                       addW(miData[0].selectedWorkways, miData[0].id, e);
@@ -1370,7 +1218,7 @@
                 <MobileModal
                   onClose={() => (wwe = false)}
                   bind:isOpen={wwe}
-                  title={placeholder[$lang]}
+                  title={mf.missionType}
                 >
                   <div
                     class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2"
@@ -1380,12 +1228,12 @@
                       inputClass="!bg-gold !text-barbi"
                       liSelectedClass="!bg-barbi !text-gold"
                       --sms-open-z-index={10000}
-                      createOptionMsg={addn[$lang]}
+                      createOptionMsg={addn}
                       allowUserOptions={true}
                       bind:searchText
                       loading={newcontentW}
                       bind:selected={miData[0].selectedWorkways}
-                      placeholder={placeholder[$lang]}
+                      placeholder={mf.missionType}
                       options={$ww.map((c) => c.attributes.workWayName)}
                       onchange={(e) => {
                         addW(miData[0].selectedWorkways, miData[0].id, e);
@@ -1407,7 +1255,7 @@
                     liSelectedClass="!bg-barbi !text-gold"
                     --sms-open-z-index={10000}
                     bind:selected={miData[0].rishoni}
-                    placeholder={pll[$lang]}
+                    placeholder={mf.searchUser}
                     options={pu.map((c) => c.attributes.username)}
                     maxSelect={1}
                     onchange={function () {
@@ -1476,16 +1324,16 @@
                   value="no"
                   onchange={() => shifter(miData[0].isshif)}
                 />
-                <label for="isss"><mark>{isshi[$lang]}</mark></label>
+                <label for="isss"><mark>{mf.isShift}</mark></label>
                 {#if miData[0].isshif == true}
                   <button onclick={() => shifter(miData[0].isshif)}
-                    >{editsi[$lang]}</button
+                    >{mf.editShift}</button
                   >
                 {/if}
                 <button
                   onclick={() => (shiftE = !shiftE)}
                   class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                  title={isshi[$lang]}><Done /></button
+                  title={mf.isShift}><Done /></button
                 >
               {/if}
             </div>
@@ -1516,12 +1364,12 @@
                 <button
                   onclick={() => (shiftE = !shiftE)}
                   class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                  title={isshi[$lang]}><ShiftsIcon /></button
+                  title={mf.isShift}><ShiftsIcon /></button
                 >{/if}
             </div>
             <div class="align-self-end justify-items-end">
               <Button
-                text={acti}
+                text={{ he: mf.publish, en: mf.publish, ar: mf.publish }}
                 onClick={increment}
                 {loading}
                 {success}
@@ -1535,64 +1383,6 @@
   </div>
 </div>
 
-<!-- <div class="dd md:items-center  rounded p-4">
-    <div class="body items-center d">
-      <table dir={$lang == 'he' ? 'rtl' : 'ltr'}>
-      
-       
-       
-         add to server real private link in addition to linkto mission-<tr>
-          <th>{tri?.mission?.privatLinks[$lang]}</th>
-          {#each miData as data, i}
-          <td>
-              <div dir="{$lang == "he" ? "rtl" : "ltr"}" class='textinput'>
-                  <input type="text"  id="link" name="link"    bind:value={data.privatlinks} class='input' required>
-                  <label for="link" class='label'>{tri?.mission?.privatLinks[$lang]}</label>
-                  <span class='line'></span>
-              </div>
-          </td>
-          {/each}
-      </tr>-->
-
-<!--<tr style="display:none" id="doneC" >
-      <th>ביצעתי כבר את המשימה</th>
-      {#each miData as data, i}
-      <td>
-        <input 
-        bind:checked={data.done} 
-        type="checkbox" id="done" name="done" value="done" onclick={()=> myMissionH()}>
-        <label for="done">ביצעתי כבר את המשימה</label>
-      </td>
-      {/each}
-    </tr><tr style="display:none" id="hoursC">
-      <th>כמה שעות זה לקח לי? </th>
-      {#each miData as data, i}
-      <td>        <div dir="{$lang == "he" ? "rtl" : "ltr"}" class='textinput'>
-  <input type="number" placeholder="0" id="hours" name="hours"   bind:value={data.nhours} class='input' required>
-  <label for="hours" class='label'>כמה שעות זה לקח לי? </label>
-  <span class='line'></span>
-</div>
-      </td>
-      {/each}
-    </tr><tr style="display:none" id="vallueperhourC">
-      <th>כמה שווה שעה? </th>
-      {#each miData as data, i}
-      <td>
-                           <div dir="{$lang == "he" ? "rtl" : "ltr"}" class='textinput'>
-  <input type="number"  id="vallueperhour" name="vallueperhour" placeholder="0"
-                                           bind:value={data.valph} class='input' required>
-  <label for="vallueperhour" class='label'>כמה שווה שעה? </label>
-  <span class='line'></span>
-</div>
-      </td>
-      {/each}
-  </tr>
-      </table>
-    </div>
-    <div>-->
-
-<!--confety-->
-
 <style>
   .ddd {
     position: sticky;
@@ -1600,7 +1390,7 @@
   }
 
   :global([data-svelte-dialog-content].contenti) {
-    background-color: rgba(rgb(247, 250, 36), 0.5);
+    background-color: rgba(247, 250, 36, 0.5);
     width: 90vw;
   }
 

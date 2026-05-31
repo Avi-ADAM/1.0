@@ -133,8 +133,10 @@
     return arr;
   }
 
+  import tr from '$lib/translations/tr.json';
+
   let selected = $state([]);
-  const placeholder = `${$lang == 'he' ? ' בחירת ערכים ומטרות' : 'vallues and goals'}`;
+  const placeholder = tr.reg.valuesPlaceholder[$lang];
 
   userName.subscribe((value) => {
     userName_value = value;

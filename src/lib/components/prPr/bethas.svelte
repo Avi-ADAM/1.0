@@ -1,5 +1,6 @@
 <script>
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import Crtask from '$lib/components/prPr/tasks/crtask.svelte';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import Plus from '$lib/celim/plus.svelte';
@@ -108,13 +109,9 @@
   const closer = () => {
     isOpen = false;
   };
-  const doneMes = {
-    he: 'המטלה נוצרה בהצלחה',
-    en: 'task has created sucsefully'
-  };
   function done() {
     isOpen = false;
-    toast.success(doneMes[$lang]);
+    toast.success($t('mission.bethas.taskCreated'));
     //TODO: email add to table
   }
   let {
@@ -162,10 +159,6 @@
             }
         }*/
   }
-  const hed = { he: 'משימות בתהליך ביצוע', en: 'mission in progress' };
-  const nam = { he: 'שם המשימה ', en: 'mission name' };
-  const nama = { he: 'שם המטלה ', en: 'action name' };
-
   const who = { he: ' על ידי', en: 'by' };
   const pro = { he: 'אחוז ביצוע', en: 'progress' };
   const hd = { he: 'שעות שהושמו / בוצעו', en: 'hours asigned/ done' };
@@ -230,7 +223,7 @@
   </div>
 </DialogOverlay>
 <section dir={$lang == 'he' ? 'rtl' : 'ltr'} bind:clientWidth={w}>
-  <h1>{hed[$lang]}</h1>
+  <h1>{$t('mission.bethas.heading')}</h1>
   <button onclick={() => (isOpen = true)}><Plus /></button>
   <div>
     {#each soter as x, i}
@@ -251,8 +244,8 @@
       <thead>
         <tr>
           <th class="sm:text-xl text-sm">{acts[$lang]}</th>
-          <th class="sm:text-xl text-sm">{nam[$lang]}</th>
-          <th class="sm:text-xl text-sm">{who[$lang]}</th>
+          <th class="sm:text-xl text-sm">{$t('mission.bethas.missionName')}</th>
+          <th class="sm:text-xl text-sm">{$t('mission.bethas.by')}</th>
           <th class="sm:text-xl text-sm">{pro[$lang]}</th>
           <th class="sm:text-xl text-sm">{hd[$lang]}</th>
           <!--- <th class="sm:text-xl text-sm">{sho[$lang]}</th>-->
@@ -409,7 +402,7 @@
                         <table cellpadding="0" cellspacing="0" border="0">
                           <thead>
                             <tr class="sm:text-xl text-lg">
-                              <th class="sm:text-xl text-sm">{nama[$lang]}</th>
+                              <th class="sm:text-xl text-sm">{$t('mission.bethas.actionName')}</th>
                               <th class="sm:text-xl text-sm">{des[$lang]}</th>
                               <th class="sm:text-xl text-sm">{pro[$lang]}</th>
                             </tr>

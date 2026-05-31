@@ -1,18 +1,20 @@
 <script lang="ts">
   import Panel from '$lib/components/Panel.svelte';
+  import tr from '$lib/translations/tr.json';
+  import { lang } from '$lib/stores/lang.js';
   import type { Resource } from '$lib/types';
 
   let { resources }: { resources: Resource[] } = $props();
 </script>
 
-<Panel title="משאבים מקושרים למוצר" actionLabel="+ הוסף משאב">
+<Panel title={tr.deals.resourcesTitle[$lang]} actionLabel={tr.deals.addResource[$lang]}>
   {#each resources as r (r.id)}
     <div class="res">
       <div class="row">
         <span class="name" class:warn={r.needsApproval}>
           {#if r.needsApproval}⚡ {/if}{r.name}
           {#if r.needsApproval}
-            <span class="tag">ממתין לאישורך</span>
+            <span class="tag">{tr.deals.pendingYourApproval[$lang]}</span>
           {/if}
         </span>
         <span class="cost" class:warn={r.needsApproval}>₪ {r.cost.toLocaleString()}</span>

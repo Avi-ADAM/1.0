@@ -2,6 +2,7 @@
     import { fly } from 'svelte/transition';
 import { Confetti } from "svelte-confetti"
 import { lang } from '$lib/stores/lang.js';
+import { t } from '$lib/translations';
 import {
     idPr
 } from './../../stores/idPr.js';
@@ -37,19 +38,15 @@ async function project(id) {
     //make it desapire for good
 };
 let hovered = $state(false);
-let des = {'he' :"קבלת פנים לרגל הצטרפותך לריקמה חדשה", en: 'welcome to new FreeMates'}
-let dif = {'he':'לב 1💗1', en: 'the heart of 1💗1'}
-const texta = {he: "הצטרפת לרקמה", en: "welcome to the FreeMates"}
-const btnText = {he: "לכניסה למטה הריקמה", en: "to the FreeMates headquarters"}
-let u = des[$lang]
+let u = $t('lev.welcomTo.welcome')
 
 function hoverede(){
     confe = !confe
    hovered = !hovered
     if (hovered == false){
-    u = dif[$lang]
+    u = $t('lev.welcomTo.heartOf')
   } else {
-u = des[$lang]
+u = $t('lev.welcomTo.welcome')
   }
   onHover?.({id: u});
  }
@@ -175,11 +172,11 @@ class="hover:scale-290 duration-1000 ease-in-out" transition:fly|local={{y: 250,
    
     </circle>
      <text text-anchor="middle" width="27" overflow="scroll"  x="28.5" y="18" fill="#FF0092" style="font-size:8px; fill: #FF0092; stroke-width: 0.1px;" >{username}</text>
- <text text-anchor="middle"  x="28.5" y="24" fill="#FF0092" style="font-size:8px; fill: #FF0092; stroke-width: 0.1px;" >{texta[$lang]}</text>
+ <text text-anchor="middle"  x="28.5" y="24" fill="#FF0092" style="font-size:8px; fill: #FF0092; stroke-width: 0.1px;" >{$t('lev.welcomTo.joined')}</text>
         <text text-anchor="middle" width="21" overflow="scroll"  x="28.5" y="32" fill="#FF0092" style="font-size:8px; fill: #FF0092; stroke-width: 0.1px;" >{projectName}</text>
      <rect x="8.5" y="34" width="40" height="10" strock="green" fill="pink" fill-opacity="0.4">
         </rect>
-                <text  x="28.5" y="42" text-anchor="middle" onkeypress={() =>project(id)} class="btn" style="font-size:8px;" onclick={() =>project(id)}>{btnText[$lang]}</text>
+                <text  x="28.5" y="42" text-anchor="middle" onkeypress={() =>project(id)} class="btn" style="font-size:8px;" onclick={() =>project(id)}>{$t('lev.welcomTo.toHeadquarters')}</text>
 
     </svg>
 

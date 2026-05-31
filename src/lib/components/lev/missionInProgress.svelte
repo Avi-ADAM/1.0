@@ -261,7 +261,7 @@
       if (result) {
         updateStore(false, result);
 
-        toast.info(azori[$lang]);
+        toast.info($t('lev.missionInProgress.timerStopped'));
         const { hours, minutes, seconds } = getTimeComponents(localZman);
         elapsedTime = `${hours}:${minutes}:${seconds}`;
         showSaveDialog = true;
@@ -271,14 +271,10 @@
     } catch (e) {
       error1 = e;
       updateStore(true); // revert
-      toast.warning(er[$lang]);
+      toast.warning($t('lev.missionInProgress.error'));
       console.error('Error stopping timer:', e);
     }
   }
-  const azori = {
-    he: 'הטיימר נעצר בהצלחה',
-    en: 'timer stopped sucsesfully'
-  };
   function getTimeComponents(milliseconds) {
     if (!milliseconds) return { hours: 0, minutes: 0, seconds: 0 };
     const totalSeconds = Math.floor(milliseconds / 1000);
@@ -537,11 +533,11 @@
         status: status[0],
       });
       isOpen = false;
-      toast.success(`${success[$lang]}`);
+      toast.success(`${$t('lev.missionInProgress.saved')}`);
     } catch (e) {
       error1 = e;
       isOpen = false;
-      toast.warning(er[$lang]);
+      toast.warning($t('lev.missionInProgress.error'));
     }
   }
   function clicked(t) {
@@ -556,16 +552,16 @@
         myIshur: true
       });
       if (result.success) {
-        toast.success(suc[$lang]);
+        toast.success($t('lev.missionInProgress.success'));
         // Optimistic UI: switch button to "done" style
         const task = localTasks.find((t) => t.id == id);
         if (task) task.attributes.myIshur = true;
       } else {
-        toast.warning(er[$lang]);
+        toast.warning($t('lev.missionInProgress.error'));
       }
     } catch (e) {
       console.error(e);
-      toast.warning(`${er[$lang]}`, { description: e.message });
+      toast.warning(`${$t('lev.missionInProgress.error')}`, { description: e.message });
     }
   }
   async function busabe(id) {
@@ -576,16 +572,16 @@
         naasa: true
       });
       if (result.success) {
-        toast.success(suc[$lang]);
+        toast.success($t('lev.missionInProgress.success'));
         // Optimistic UI: remove task from list and reset slider states
         localTasks = localTasks.filter((t) => t.id != id);
         op = {};
       } else {
-        toast.warning(er[$lang]);
+        toast.warning($t('lev.missionInProgress.error'));
       }
     } catch (e) {
       console.error(e);
-      toast.warning(`${er[$lang]}`, { description: e.message });
+      toast.warning(`${$t('lev.missionInProgress.error')}`, { description: e.message });
     }
   }
   async function valiIshor(id) {
@@ -596,16 +592,16 @@
         valiIshur: true
       });
       if (result.success) {
-        toast.success(suc[$lang]);
+        toast.success($t('lev.missionInProgress.success'));
         // Final approval — task fully done, remove from list
         localTasks = localTasks.filter((t) => t.id != id);
         op = {};
       } else {
-        toast.warning(er[$lang]);
+        toast.warning($t('lev.missionInProgress.error'));
       }
     } catch (e) {
       console.error(e);
-      toast.warning(`${er[$lang]}`, { description: e.message });
+      toast.warning(`${$t('lev.missionInProgress.error')}`, { description: e.message });
     }
   }
   async function updStat(id, st, i) {
@@ -616,31 +612,17 @@
         status: st[0]
       });
       if (result.success) {
-        toast.success(suc[$lang]);
+        toast.success($t('lev.missionInProgress.success'));
         op[i] = false;
       } else {
-        toast.warning(er[$lang]);
+        toast.warning($t('lev.missionInProgress.error'));
       }
     } catch (e) {
       console.error(e);
-      toast.warning(`${er[$lang]}`, { description: e.message });
+      toast.warning(`${$t('lev.missionInProgress.error')}`, { description: e.message });
     }
   }
   let a = $state(1);
-  const suc = { he: 'בוצע בהצלחה', en: 'appruved sucssefully!' };
-  const er = {
-    he: 'אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ',
-    en: 'error: please try again, if the problem continue contact at baruch@1lev1.com'
-  };
-  const sta = {
-    he: 'סטטוס התקדמות ביצוע המשימה',
-    en: 'status of mission progress'
-  };
-  const ishur = { he: 'אישור', en: 'save' };
-  const busa = { he: 'בוצע בהצלחה', en: 'done' };
-  const success = { he: 'נשמר בהצלחה', en: 'saved successfully' };
-  const rega = { he: 'שניה בבקשה', en: 'one moment please' };
-  const editButton = { he: 'עריכת הטיימר', en: 'edit Timer' };
   // storeTimer is derived from $timers, and the live clock drives `zman`/`localZman`
   // via the $effect block near the top — no manual onMount/interval needed here.
   $effect(() => {
@@ -798,7 +780,7 @@
             dir="ltr"
             class="flex flex-col justify-center items-center w-full"
           >
-            <h2 class="text-center">{sta[$lang]}</h2>
+            <h2 class="text-center">{$t('lev.missionInProgress.statusLabel')}</h2>
             <div class="w-full">
               <RangeSlider
                 bind:values={status}
@@ -813,11 +795,11 @@
             <button
               onclick={stat}
               class="text-center text-barbi border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb to-gr-c"
-              >{ishur[$lang]}</button
+              >{$t('lev.missionInProgress.save')}</button
             >
           </div>
         {:else if a == 3}
-          <h2>{rega[$lang]}</h2>
+          <h2>{$t('lev.missionInProgress.oneMonent')}</h2>
         {:else if a == 4}
           <div class="space-y-3">
             <!-- Tasks header -->
@@ -856,7 +838,7 @@
                       {#if op[i] != true}
                         <!-- Progress bar (click to edit) -->
                         <div
-                          onmouseenter={() => hover(sta[$lang])}
+                          onmouseenter={() => hover($t('lev.missionInProgress.statusLabel'))}
                           onmouseleave={() => hover('0')}
                           onclick={() => clicked(i)}
                           onkeypress={() => clicked(i)}
@@ -893,7 +875,7 @@
                           <button
                             onclick={() => updStat(task.id, task.attributes.status, i)}
                             class="w-full py-1.5 text-sm font-bold bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all"
-                          >{ishur[$lang]}</button>
+                          >{$t('lev.missionInProgress.save')}</button>
                         </div>
                       {/if}
                     {/key}
@@ -926,13 +908,13 @@
                         <button
                           onclick={() => taskishor(task.id)}
                           class="flex-1 py-1.5 text-xs font-semibold border-2 border-gray-300 text-gray-600 rounded-lg hover:border-purple-500 hover:text-purple-700 transition-all bg-white"
-                        >{ishur[$lang]}</button>
+                        >{$t('lev.missionInProgress.save')}</button>
                       {:else}
                         <!-- Assignee confirmed → can mark as done -->
                         <button
                           onclick={() => busabe(task.id)}
                           class="flex-1 py-1.5 text-xs font-bold bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-lg hover:from-green-600 hover:to-teal-600 transition-all"
-                        >{busa[$lang]}</button>
+                        >{$t('lev.missionInProgress.done')}</button>
                       {/if}
                     </div>
                   </div>
@@ -2002,7 +1984,7 @@
           </h5>
 
           <div
-            onmouseenter={() => hover(sta[$lang])}
+            onmouseenter={() => hover($t('lev.missionInProgress.statusLabel'))}
             onmouseleave={() => hover('0')}
             class="de border rounded-2xl border-barbi hover:border-gold"
             onclick={function () {

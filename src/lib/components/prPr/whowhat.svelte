@@ -1,5 +1,6 @@
 <script>
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import pic from './../../celim/pic.js';
   import { idPr } from '../../stores/idPr.js';
   import { onMount } from 'svelte';
@@ -741,38 +742,6 @@
       checkSplitChanges();
     }
   }
-  const head = { he: 'טבלת חישוב', en: 'coculation table' };
-  const name = { he: 'שם', en: 'name' };
-  const pres = { he: 'החלק מהרווח', en: 'profit precentage' };
-  const amho = { he: 'הסכום שממתין אצלי', en: 'amount that I guard' };
-  const amtog = { he: 'סכום להעביר', en: 'amount to give' };
-  const amtor = { he: 'סכום לקבל', en: 'amount to recive' };
-  const movto = { he: ' להעביר אל:', en: 'give to:' };
-  const perof = { he: 'אחוז ברקמה', en: 'precentage in the FreeMate' };
-  const appbu = { he: 'אישור ובקשת חלוקה', en: 'confirm split' };
-  const ft = {
-    he: 'הוגשה הצעה לחלוקה והיא בתהליך אישור:',
-    en: 'suggestion to split has been requested and its in appruval process:'
-  };
-  const sofar = { he: 'עד כה', en: 'so far' };
-  const there = { he: 'ישנן', en: 'there are' };
-  const vots = { he: 'הצבעות', en: 'vots' };
-  const onvo = { he: 'ישנה הצבעה אחת', en: 'there is one vote' };
-  const toap = { he: 'בעד', en: 'in favor' };
-  const ag = { he: 'נגד', en: 'against' };
-  const and = { he: 'ו', en: 'and' };
-  const noy = { he: 'שעוד לא הצביעו', en: 'that didnt vote yet' };
-  const splitChangedTitle = {
-    he: 'שינוי בחלוקה זוהה',
-    en: 'Split Changes Detected'
-  };
-  const splitChangedDesc = {
-    he: 'הסכומים או אופן החלוקה השתנו מאז ההצעה המקורית. האם ברצונך לעדכן את ההצעה לחלוקה החדשה?',
-    en: 'The amounts or split method have changed since the original proposal. Would you like to update the proposal to the new split values?'
-  };
-  const updateSplit = { he: 'עדכון חלוקה', en: 'Update Split' };
-  const cancel = { he: 'ביטול', en: 'Cancel' };
-  const changesDetected = { he: 'שינויים שזוהו:', en: 'Changes detected:' };
 </script>
 
 <div class="dd md:items-center">
@@ -780,7 +749,7 @@
     <table dir="rtl">
       <caption class="sm:text-right md:text-center text-right">
         <h1 class="md:text-center text-2xl md:text-2xl font-bold">
-          {head[$lang]}
+          {$t('mission.whowhat.calculationTable')}
         </h1>
       </caption>
       <tbody>
@@ -793,13 +762,13 @@
           {/each}
         </tr>
         <tr class="ggr">
-          <th class="ggr">{name[$lang]}</th>
+          <th class="ggr">{$t('mission.whowhat.name')}</th>
           {#each ulist as data, i}
             <td class="ggr">{data.username}</td>
           {/each}
         </tr>
         <tr>
-          <th>{pres[$lang]}</th>
+          <th>{$t('mission.whowhat.profitShare')}</th>
           {#each ulist as data, i}
             <td>
               {#if revach > 0}
@@ -810,7 +779,7 @@
             </td>
           {/each}
         </tr><tr>
-          <th>{amho[$lang]}</th>
+          <th>{$t('mission.whowhat.myAmount')}</th>
           {#each ulist as data, i}
             <td>
               {#if data.ihave > 0}
@@ -821,7 +790,7 @@
             </td>
           {/each}
         </tr><tr>
-          <th>{amtog[$lang]}</th>
+          <th>{$t('mission.whowhat.amountToGive')}</th>
           {#each ulist as data, i}
             <td>
               {#if revach > 0 && data.ihave - data.x > 0}
@@ -833,7 +802,7 @@
           {/each}
         </tr>
         <tr>
-          <th>{movto[$lang]}</th>
+          <th>{$t('mission.whowhat.giveTo')}</th>
           {#each ulist as data, i}
             <td>
               {#if data.le}
@@ -846,7 +815,7 @@
           {/each}
         </tr>
         <tr>
-          <th>{amtor[$lang]}</th>
+          <th>{$t('mission.whowhat.amountToReceive')}</th>
           {#each ulist as data, i}
             <td>
               {#if revach > 0 && data.ihave - data.x < 0}
@@ -857,7 +826,7 @@
             </td>
           {/each}
         </tr><tr>
-          <th>{perof[$lang]}</th>
+          <th>{$t('mission.whowhat.percentageInRikma')}</th>
           {#each ulist as data, i}
             <td>{data.p.toFixed(2)}</td>
           {/each}
@@ -867,7 +836,7 @@
 <br>
     {#if availableForNewSplit > 0 && revach > 0 && !hatzaa}
       <Button
-        text={appbu}
+        text={{ he: $t('mission.whowhat.confirmSplit'), en: $t('mission.whowhat.confirmSplit'), ar: $t('mission.whowhat.confirmSplit') }}
         loading={isLoading}
         success={isSuccess}
         error={isError}
@@ -879,14 +848,14 @@
     {#if showUpdateSuggestion}
       <div class="border border-yellow-500 bg-yellow-50 m-2 p-4 rounded">
         <h2 class="font-bold text-yellow-800 mb-2">
-          {splitChangedTitle[$lang]}
+          {$t('mission.whowhat.splitChanged')}
         </h2>
         <p class="text-yellow-700 mb-3">
-          {splitChangedDesc[$lang]}
+          {$t('mission.whowhat.splitChangedMsg')}
         </p>
         {#if changesList.length > 0}
           <div class="bg-yellow-100 p-3 rounded mb-3 border border-yellow-300">
-            <strong class="block mb-2 text-yellow-800">{changesDetected[$lang]}</strong>
+            <strong class="block mb-2 text-yellow-800">{$t('mission.whowhat.changesDetected')}</strong>
             <div class="space-y-2 bg-white p-2 rounded border">
               {#each changesList as change}
                 <ComparisonDisplay 
@@ -903,13 +872,13 @@
             class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded"
             onclick={updateTosplit}
           >
-            {updateSplit[$lang]}
+            {$t('mission.whowhat.updateSplit')}
           </button>
           <button
             class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
             onclick={() => (showUpdateSuggestion = false)}
           >
-            {cancel[$lang]}
+            {$t('mission.whowhat.cancel')}
           </button>
         </div>
       </div>
@@ -918,8 +887,8 @@
     {#if hatzaa == true}
       <div class="border border-barbi m-2 p-2  bg-gold">
         <h1 class="font-bold">
-          {ft[$lang]}<br />
-          {` ${sofar[$lang]} ${noofok > 1 ? `${there[$lang]} ${noofok} ${vots[$lang]}` : onvo[$lang]} ${toap[$lang]} ${noofno > 0 ? `, ${noofno} ${ag[$lang]} ` : ''} ${noofw > 0 ? `${and[$lang]}-${noofw} ${noy[$lang]}` : ''}`}
+          {$t('mission.whowhat.proposalPending')}<br />
+          {` ${$t('mission.whowhat.soFar')} ${noofok > 1 ? `${$t('mission.whowhat.thereAre')} ${noofok} ${$t('mission.whowhat.votes')}` : $t('mission.whowhat.oneVote')} ${$t('mission.whowhat.inFavor')} ${noofno > 0 ? `, ${noofno} ${$t('mission.whowhat.against')} ` : ''} ${noofw > 0 ? `${$t('mission.whowhat.and')}-${noofw} ${$t('mission.whowhat.notVotedYet')}` : ''}`}
         </h1>
       </div>{/if}
   </div>

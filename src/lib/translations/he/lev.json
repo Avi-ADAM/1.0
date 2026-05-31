@@ -6,7 +6,16 @@
     "descriptionPlaceholder": "נא לתאר במילים את סיום המשימה...",
     "submitButton": "שליחה לאישור",
     "pleaseWait": "רק רגע...",
-    "cancel": "ביטול"
+    "cancel": "ביטול",
+    "timerStopped": "הטיימר נעצר בהצלחה",
+    "success": "בוצע בהצלחה",
+    "error": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ",
+    "statusLabel": "סטטוס התקדמות ביצוע המשימה",
+    "save": "אישור",
+    "done": "בוצע בהצלחה",
+    "saved": "נשמר בהצלחה",
+    "oneMonent": "שניה בבקשה",
+    "editTimer": "עריכת הטיימר"
   },
   "cards": {
     "approve": "אני רוצה",
@@ -18,6 +27,150 @@
     "replyChat": "תגובה",
     "negotiate": "משא ומתן",
     "newNegotiation": "משא ומתן חדש",
-    "toNegotiate": "למו\"מ"
+    "toNegotiate": "למו\"מ",
+    "saleCard": {
+      "customer": "לקוח:",
+      "product": "מוצר:",
+      "price": "מחיר:",
+      "quantity": "כמות:",
+      "total": "סה\"כ:",
+      "startDate": "התחלה:",
+      "endDate": "סיום:",
+      "confirmDelivery": "אישור משלוח",
+      "confirmPayment": "קיבלתי את הכסף",
+      "chat": "צ׳אט",
+      "creatingChat": "יוצר צ׳אט...",
+      "processing": "מעבד...",
+      "deliveryConfirmed": "אישרת את המשלוח",
+      "paymentConfirmed": "אישרת קבלת הכסף",
+      "operationError": "שגיאה בביצוע הפעולה",
+      "deliveryApprovals": "אישורי מסירה",
+      "customerReceived": "הלקוח קיבל",
+      "customerPaid": "הלקוח שילם",
+      "moneyReceived": "הכסף התקבל",
+      "delivered": "נמסר",
+      "awaitingApproval": "ממתין לאישורך",
+      "youShouldReceive": "אתה אמור לקבל את הכסף",
+      "moneyReceivers": "מקבלי הכסף",
+      "addReceiver": "מלאו מקבל כסף",
+      "addReceiverHint": "כדי שהלקוח יוכל להעביר לכם כסף, הגש.י את עצמך כמקבל.ת",
+      "addMeReceiver": "הוסף אותי כמקבל כסף",
+      "removeMeReceiver": "הסר אותי מהרשימה"
+    },
+    "voteStatus": {
+      "approved": "אישרו",
+      "oldVersion": "גרסה קודמת",
+      "waiting": "טרם הצביעו",
+      "rejected": "התנגדו"
+    },
+    "filter": {
+      "heartTitle": "לב המערכת",
+      "heartDesc": "לב המערכת, לחיצה על היהלומים לסינון הפעולות",
+      "switchView": "שינוי התצוגה ממטבעות לקלפים",
+      "showSuggestions": "הצגת הצעות לרקמות בלבד",
+      "showVotes": "הצגת הצבעות על משימות חדשות",
+      "showJoinRequests": "הצגת בקשות הצטרפות לרקמות בלבד",
+      "showSplitRequests": "הצגת בקשות לחלוקת כספים בלבד",
+      "showInProgress": "הצגת פעולות בתהליך ביצוע בלבד",
+      "showWelcome": "הצגת קבלות פנים לרקמות בלבד",
+      "showCompletionApproval": "הצגת אישור פעולות שהסתיימו בלבד",
+      "personalDashboard": "ללוח הבקרה האישי",
+      "showResourceApproval": "הצגת אישור קבלת משאבים לרקמות בלבד",
+      "showResourceInvestment": "הצגת הצעות להשקעת משאבים ברקמות בלבד",
+      "showResourceVotes": "הצגת הצבעות על בקשת משאבים לרקמות בלבד",
+      "showJoinAndInvest": "הצגת בקשות להצטרפות ולהשקעת משאבים ברקמות בלבד",
+      "showMyPurchases": "הצגת הקניות שלי בלבד"
+    },
+    "voteCard": {
+      "neged": "נדרש בירור",
+      "totalVotes": "סך ההצבעות להליך בירור",
+      "inFavor": "בעד",
+      "notYet": "טרם",
+      "notVotedYet": "לא הצביעו",
+      "perYear": "לשנה",
+      "oneYear": "שנה אחת",
+      "years": "שנים",
+      "inTotal": "סך הכל",
+      "oneMonth": "חודש אחד"
+    },
+    "inpro": {
+      "missionInProgress": "משימה בתהליך ביצוע",
+      "progressStatus": "סטטוס התקדמות ביצוע המשימה",
+      "missionDetails": "פרטי המשימה",
+      "notes": "הערות",
+      "hoursDone": "שעות בוצעו ונשמרו",
+      "from": "מתוך",
+      "timer": "מונה זמן",
+      "totalHours": "מספר השעות שהוקצו למשימה",
+      "hoursCount": "מספר השעות שבוצעו ונשמרו",
+      "completionApproval": "אישור קבלת משאב בהצבלה",
+      "editTimer": "עריכת הטיימר",
+      "monthlyHours": "שעות חודשיות",
+      "totalHoursLabel": "שעות סך הכל"
+    }
+  },
+  "taskApproval": {
+    "approve": "אישור",
+    "approving": "מאשר...",
+    "approved": "אושר",
+    "successMessage": "המשימה אושרה בהצלחה!"
+  },
+  "reqtojoin": {
+    "chatWith": "צ'אט עם",
+    "onJoining": "על צירופו לריקמה"
+  },
+  "reqtosherut": {
+    "chatWith": "צ'אט עם",
+    "onJoining": "על צירופו לריקמה"
+  },
+  "mashsuggest": {
+    "cancel": "ביטול",
+    "chatOnJoining": "צ'אט על הצטרפות לריקמה"
+  },
+  "pandingMesima": {
+    "error": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל "
+  },
+  "haluka": {
+    "successMessage": "החלוקה אושרה בהצלחה! 🎉",
+    "errorMessage": "שגיאה באישור החלוקה. נסה שוב."
+  },
+  "reqtom": {
+    "voteTitle": "הצבעה על בקשה לשיתוף משאב והצטרפות לרקמה",
+    "heartOf": "לב 1💗1",
+    "clickToProfile": "לחיצה למעבר לעמוד הפרופיל של {name}",
+    "resourceName": "שם המשאב המוצע",
+    "clickToPublic": "לחיצה למעבר לעמוד הציבורי של הריקמה",
+    "clickToBrain": "לחיצה למעבר למוח הריקמה {projectName}",
+    "cancel": "ביטול",
+    "chatOnJoining": "צ'אט על הצטרפות לריקמה"
+  },
+  "pmas": {
+    "error": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל "
+  },
+  "diun": {
+    "labelMoney": "פרטים שיעזרו לההעברה להתבצע (מספר חשבון, פרטי העברה וכו')",
+    "labelRejection": "נימוק לדחייה (מינימום 27 תווים)",
+    "labelDiscussion": "הודעה - נא להתייחס להודעות קודמות",
+    "labelForum": "כתוב הודעה..."
+  },
+  "productRequest": {
+    "request": "בקשה"
+  },
+  "didiget": {
+    "approveOf": "אישור קבלת",
+    "from": "מאת",
+    "success": "בוצע בהצלחה",
+    "error": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל  ",
+    "messageSent": "ההודעה נשלחה בהצלחה"
+  },
+  "mesima": {
+    "suggestedMission": "הצעה למשימה",
+    "openMission": "משימה פתוחה"
+  },
+  "welcomTo": {
+    "joined": "הצטרפת לרקמה",
+    "toHeadquarters": "לכניסה למטה הריקמה",
+    "welcome": "קבלת פנים לרגל הצטרפותך לריקמה חדשה",
+    "heartOf": "לב 1💗1"
   }
 }

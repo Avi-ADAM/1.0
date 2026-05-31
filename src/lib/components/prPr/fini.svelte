@@ -1,6 +1,7 @@
 <script>
   import Tooltip from './../../celim/tooltipb.svelte';
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import pic from './../../celim/pic.js';
   import Finisin from './finisin.svelte';
 
@@ -217,61 +218,12 @@
     }
   }
   let xy = $state(false);
-  const hea = { he: 'חלוקת שווי הריקמה', en: 'FreeMate value distribution' };
-  const cl = { he: 'סגירת הפירוט', en: 'close the details' };
-  const pehe = { he: 'פעולות שבוצעו ואושרו', en: 'approved missions' };
-  const details = { he: 'פירוט', en: 'Details' };
-  const options = { he: 'אפשרויות', en: 'Options' };
-  const name = { he: 'שם', en: 'Name' };
-  const description = { he: 'תיאור', en: 'Description' };
-  const executionDate = { he: 'תאריך ביצוע', en: 'Execution Date' };
-  const publicLinks = { he: 'קישורים ציבוריים', en: 'Public Links' };
-  const privateNotes = {
-    he: 'הערות יחודיות לריקמה שלי',
-    en: 'My unique notes for FreeMate'
-  };
-  const privateLinks = {
-    he: 'קישורים יחודיים לריקמה שלי',
-    en: 'My unique links for FreeMate'
-  };
-  const hoursTaken = { he: 'כמה שעות זה לקח', en: 'Hours Taken' };
-  const valuePerHour = { he: 'כמה שווה שעה', en: 'Value Per Hour' };
-  const totalValueForMission = {
-    he: 'שווי סך הכל למשימה',
-    en: 'Total Value for Mission'
-  };
-  const closingComments = { he: 'הערות סיום', en: 'Closing Comments' };
-  const doneBy = { he: 'בוצע על ידי', en: 'Done By' };
-  const approvedResources = {
-    he: 'משאבים שהתקבלו ואושרו',
-    en: 'Approved Resources'
-  };
-  const type = { he: 'סוג', en: 'Type' };
-  const amount = { he: 'כמות', en: 'Amount' };
-  const startDate = { he: 'תאריך התחלה', en: 'Start Date' };
-  const endDate = { he: 'תאריך סיום', en: 'End Date' };
-  const specialNotes = { he: 'הערות מיוחדות', en: 'Special Notes' };
-  const maxVal = {
-    he: 'שווי מקסימלי לחישוב בריקמה',
-    en: 'Maximum value for FreeMate calculation'
-  };
-  const monetaryValue = { he: 'שווי כספי', en: 'Monetary Value' };
-  const perMonth = { he: 'לכל חודש', en: 'per month' };
-  const perYear = { he: 'לכל שנה', en: 'per year' };
-  const forPeriod = { he: 'לכל התקופה', en: 'for the whole period' };
-  const perUnit = { he: 'ליחידה', en: 'per unit' };
-  const totalCost = { he: 'עלות סה"כ', en: 'Total Cost' };
-  const productLink = {
-    he: 'לינק לפרטי מוצר\\ מחיר \\ רכישה',
-    en: 'Link to product details/price/purchase'
-  };
-  const sharedBy = { he: 'שותף על ידי', en: 'Shared By' };
 </script>
 
 {#if hagdel === false}
   <div style=" margin-left: auto; margin-right:auto;">
     <h1 style=" margin-top: 20px ;" class="text-barbi text-bold text-2xl">
-      {hea[$lang]}
+      {$t('project.fini.heading')}
     </h1>
     <div class="yy">
       <Tooltip title="{fir}: {ssec}%">
@@ -326,11 +278,11 @@
   </div>
   <button
     class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2 rounded-full"
-    onclick={() => (hagdel = true)}>{details[$lang]}</button
+    onclick={() => (hagdel = true)}>{$t('project.fini.details')}</button
   ><br />
 {:else}
   <button
-    title={cl[$lang]}
+    title={$t('project.fini.closeDetails')}
     onclick={() => (hagdel = false)}
     class=" hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full"
     ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -349,7 +301,7 @@
         <table dir="rtl">
           <caption class="sm:text-right md:text-center text-right">
             <h1 class="md:text-center text-2xl md:text-2xl font-bold">
-              {approvedResources[$lang]}
+              {$t('project.fini.approvedResources')}
             </h1>
           </caption>
           <thead>
@@ -362,7 +314,7 @@
               {/each}
             </tr>
             <tr class="ggr">
-              <th class="ggr">{name[$lang]}</th>
+              <th class="ggr">{$t('project.fini.name')}</th>
               {#each meData as data, i}
                 <td class="ggr">
                   {data.attributes.name}
@@ -370,7 +322,7 @@
               {/each}
             </tr>
             <tr>
-              <th>{description[$lang]}</th>
+              <th>{$t('project.fini.description')}</th>
               {#each meData as data, i}
                 <td>
                   {#if data.attributes.descrip}
@@ -379,7 +331,7 @@
               {/each}
             </tr>
             <tr>
-              <th>{type[$lang]}</th>
+              <th>{$t('project.fini.type')}</th>
               {#each meData as data, i}
                 <td>
                   <h1>{data.attributes.kindOf}</h1>
@@ -387,14 +339,14 @@
               {/each}
             </tr>
             <tr style="display:{kc ? '' : 'none'};">
-              <th>{amount[$lang]}</th>
+              <th>{$t('project.fini.amount')}</th>
               {#each meData as data, i}
                 <td>
                   {data.attributes.hm}
                 </td>
               {/each}
             </tr><tr style="display:{ky ? '' : 'none'};">
-              <th>{startDate[$lang]} </th>
+              <th>{$t('project.fini.startDate')} </th>
               {#each meData as data, i}
                 <td
                   ><h1 style="display:{meData[i].ky ? '' : 'none'};">
@@ -406,7 +358,7 @@
               {/each}
             </tr>
             <tr style="display:{ky ? '' : 'none'};">
-              <th>{endDate[$lang]} </th>
+              <th>{$t('project.fini.endDate')} </th>
               {#each meData as data, i}
                 <td
                   ><h1 style="display:{meData[i].ky ? '' : 'none'};">
@@ -418,7 +370,7 @@
               {/each}
             </tr>
             <tr>
-              <th>{specialNotes[$lang]}</th>
+              <th>{$t('project.fini.specialNotes')}</th>
               {#each meData as data, i}
                 <td
                   >{#if data.attributes.spnot}
@@ -434,26 +386,26 @@
   {/each}
     </tr>--><tr
             >
-              <th>{maxVal[$lang]}</th>
+              <th>{$t('project.fini.maxValue')}</th>
               {#each meData as data, i}
                 <td>
                   <small for="name"
-                    >{monetaryValue[$lang]}
+                    >{$t('project.fini.monetaryValue')}
                     <span style="display:{meData[i].m ? '' : 'none'};"
-                      >{perMonth[$lang]}</span
+                      >{$t('project.fini.perMonth')}</span
                     ><span style="display:{meData[i].y ? '' : 'none'};"
-                      >{perYear[$lang]}</span
+                      >{$t('project.fini.perYear')}</span
                     ><span style="display:{meData[i].r ? '' : 'none'};"
-                      >{forPeriod[$lang]}</span
+                      >{$t('project.fini.forPeriod')}</span
                     ><span style="display:{meData[i].kc ? '' : 'none'};"
-                      >{perUnit[$lang]}</span
+                      >{$t('project.fini.perUnit')}</span
                     >
                   </small>
                   {data.attributes.agprice.toFixed(2)}
                 </td>
               {/each}
             </tr><tr style="display:{kc || ky ? '' : 'none'};">
-              <th>{totalCost[$lang]}</th>
+              <th>{$t('project.fini.totalCost')}</th>
               {#each meData as data, i}
                 <td>
                   <h3
@@ -467,14 +419,14 @@
               {/each}
             </tr>
             <tr>
-              <th>{productLink[$lang]}</th>
+              <th>{$t('project.fini.purchaseLink')}</th>
               {#each meData as data, i}
                 <td
                   >{#if data.attributes.linkto}{data.attributes.linkto}{/if}
                 </td>
               {/each}
             </tr><tr>
-              <th>{sharedBy[$lang]}</th>
+              <th>{$t('project.fini.sharedBy')}</th>
               {#each meData as data, i}
                 <td>
                   {data.attributes.users_permissions_user.data.attributes

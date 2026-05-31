@@ -9,6 +9,7 @@
   } from '$lib/embed/vocab-creation';
   import { sanitizeUserInput } from '$lib/func/uti/sanitizeUserInput.svelte';
   import { onMount, untrack } from 'svelte';
+  import tr from '$lib/translations/tr.json';
 
   // --- Props ---
   let {
@@ -20,9 +21,7 @@
     onremove = undefined
   } = $props();
 
-  let defaultPlaceholder = $derived(
-    $lang === 'he' ? 'חיפוש או בחירת כישורים' : 'Search or select skills'
-  );
+  let defaultPlaceholder = $derived(tr.selector.searchSkills[$lang]);
   let actualPlaceholder = $derived(placeholder || defaultPlaceholder);
   const baseUrl = import.meta.env.VITE_URL;
 
@@ -140,16 +139,9 @@
 
   // --- Messages ---
   const dupMsg = {
-    he: {
-      found: 'כישור זהה כבר קיים במערכת:',
-      similar: 'דומה מאוד לכישור קיים:',
-      override: 'הוסף בכל זאת'
-    },
-    en: {
-      found: 'An identical skill already exists:',
-      similar: 'Very similar to an existing skill:',
-      override: 'Add anyway'
-    }
+    he: { found: tr.selector.identicalSkill.he, similar: tr.selector.similarSkill.he, override: tr.ui.addAnyway.he },
+    en: { found: tr.selector.identicalSkill.en, similar: tr.selector.similarSkill.en, override: tr.ui.addAnyway.en },
+    ar: { found: tr.selector.identicalSkill.ar, similar: tr.selector.similarSkill.ar, override: tr.ui.addAnyway.ar }
   };
 
   const pct = (sim) => `${Math.round(sim * 100)}%`;
@@ -258,8 +250,9 @@
   }
 
   let addnMsg = $derived({
-    he: `הוספת "${searchText}"`,
-    en: `Create "${searchText}"`
+    he: `${tr.selector.addPrefix.he} "${searchText}"`,
+    en: `${tr.selector.addPrefix.en} "${searchText}"`,
+    ar: `${tr.selector.addPrefix.ar} "${searchText}"`
   });
 </script>
 
@@ -290,9 +283,7 @@
   <div class="mt-2 text-sm min-h-[30px] flex px-2 transition-all">
     {#if dupStatus === 'checking'}
       <div class="opacity-60 text-gold flex items-center">
-        <span class="checking-dot"
-          >{$lang === 'he' ? 'מחפש התאמות...' : 'Searching...'}</span
-        >
+        <span class="checking-dot">{tr.ui.searching[$lang]}</span>
       </div>
     {:else if dupMatch}
       <div
@@ -322,13 +313,13 @@
             class="px-3 py-1 bg-white bg-opacity-20 hover:bg-opacity-40 hover:scale-105 rounded-full transition-all text-gold font-bold"
             onclick={() => acceptSuggestion(dupMatch)}
           >
-            {$lang === 'he' ? 'בחר והוסף' : 'Select'}
+            {tr.ui.selectAndAdd[$lang]}
           </button>
 
           <button
             class="p-1 hover:bg-white hover:bg-opacity-10 rounded-full transition-all text-white font-bold"
             onclick={dismissDuplicate}
-            title={$lang === 'he' ? 'התעלם' : 'Dismiss'}
+            title={tr.ui.dismiss[$lang]}
           >
             <svg style="width:20px;height:20px" viewBox="0 0 24 24">
               <path

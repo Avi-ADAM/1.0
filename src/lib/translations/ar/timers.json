@@ -1,0 +1,19 @@
+{
+  "saveTimer": "حفظ المؤقت",
+  "editTimer": "تعديل المؤقت",
+  "saveTimerBtn": "حفظ المؤقت",
+  "updateTasks": "تحديث المهام",
+  "editTimes": "تعديل الأوقات",
+  "updateHint": "يمكنك تحديث المهام التي تعمل عليها حالياً أو تعديل أوقات المؤقت",
+  "clearTimer": "مسح المؤقت",
+  "manageTime": "إدارة الأوقات",
+  "clearAll": "مسح الكل",
+  "noTimes": "لا توجد أوقات للإدارة",
+  "chooseTasks": "اختر المهام",
+  "update": "تحديث",
+  "timerUpdated": "تم تحديث المؤقت بنجاح",
+  "clearSuccess": "تم مسح المؤقتات بنجاح",
+  "clearError": "فشل مسح المؤقتات",
+  "saveSuccess": "تم حفظ المؤقت بنجاح",
+  "saveError": "خطأ في حفظ المؤقت"
+}

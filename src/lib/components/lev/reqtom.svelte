@@ -1,5 +1,6 @@
 <script>
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import { ProgressBar } from 'progressbar-svelte';
   import { goto } from '$app/navigation';
   import Chaticon from '../../celim/chaticon.svelte';
@@ -348,15 +349,10 @@
 
   let w = $state(0);
 
-  const u = {
-    he: 'הצבעה על בקשה לשיתוף משאב והצטרפות לרקמה',
-    en: 'vote on request to join the FreeMates and share a resorce '
-  };
-  const levi = { he: 'לב 1💗1', en: 'the heart of 1💗1' };
   function hover(id) {
     let ut;
     if (id == '0') {
-      ut = u[$lang];
+      ut = $t('lev.reqtom.voteTitle');
     } else {
       ut = id;
     }
@@ -366,9 +362,9 @@
     hovered = !hovered;
     let ut;
     if (hovered == false) {
-      ut = levi[$lang];
+      ut = $t('lev.reqtom.heartOf');
     } else {
-      ut = u[$lang];
+      ut = $t('lev.reqtom.voteTitle');
     }
     onHover?.({ id: ut });
   }
@@ -376,29 +372,12 @@
   function hoverc(event) {
     let ut;
     if (event.x == '0') {
-      ut = u[$lang];
+      ut = $t('lev.reqtom.voteTitle');
     } else {
       ut = event.x;
     }
     onHover?.({ id: ut });
   }
-
-  const clicktoup = {
-    he: ` לחיצה למעבר לעמוד הפרופיל של ${useraplyname}`,
-    en: `click twice to see ${useraplyname} profile`
-  };
-  const resorcename = {
-    he: ' שם המשאב המוצע',
-    en: 'name of the suggested resorce'
-  };
-  const clicktofree = {
-    he: 'לחיצה למעבר לעמוד הציבורי של הריקמה',
-    en: 'click twice to see FreeMates public page'
-  };
-  const clicktobrain = {
-    he: ` לחיצה למעבר למוח הריקמה ${projectName}`,
-    en: `click twice to go to the ${projectName} Brain`
-  };
   function tochat() {
     isOpen = true;
     diunm = true;
@@ -476,8 +455,6 @@
       console.log(error1);
     }
   }
-  const tit = { he: 'ביטול', en: 'close' };
-  const chatdes2 = { he: "צ'אט על הצטרפות לריקמה", en: 'chat on joining' };
 </script>
 
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
@@ -489,7 +466,7 @@
             onclick={close}
             style="margin: 0 auto;"
             class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-            title={tit[$lang]}
+            title={$t('lev.reqtom.cancel')}
           >
             <svg style="width:24px;height:24px" viewBox="0 0 24 24">
               <path
@@ -534,7 +511,7 @@
             onclick={close}
             style="margin: 0 auto;"
             class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-            title={tit[$lang]}
+            title={$t('lev.reqtom.cancel')}
             ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
@@ -548,7 +525,7 @@
             <Diun
               onRect={afreact}
               smalldes={projectName + '-' + openmissionName}
-              nameChatPartner={`${chatdes2[$lang]} ${useraplyname}
+              nameChatPartner={`${$t('lev.reqtom.chatOnJoining')} ${useraplyname}
    ${projectName} `}
               mypos={true}
               rect={true}
@@ -650,7 +627,7 @@
                 tabindex="0"
                 onkeypress={() => linke('u')}
                 onclick={() => linke('u')}
-                onmouseenter={() => hover(clicktoup[$lang])}
+                onmouseenter={() => hover($t('lev.reqtom.clickToProfile', { name: useraplyname }))}
                 onmouseleave={() => hover('0')}
                 x="0"
                 y="40"
@@ -696,7 +673,7 @@
               >
                 <textPath
                   role="contentinfo"
-                  onmouseenter={() => hover(resorcename[$lang])}
+                  onmouseenter={() => hover($t('lev.reqtom.resourceName'))}
                   onmouseleave={() => hover('0')}
                   color="#EEE8AA"
                   x="-90"
@@ -713,7 +690,7 @@
                 tabindex="0"
                 onkeypress={() => linke('p')}
                 onclick={() => linke('p')}
-                onmouseenter={() => hover(clicktofree[$lang])}
+                onmouseenter={() => hover($t('lev.reqtom.clickToPublic'))}
                 onmouseleave={() => hover('0')}
                 data-sveltekit-prefetch
                 x="0"
@@ -737,7 +714,7 @@
               >
                 <button
                   onclick={() => project()}
-                  onmouseenter={() => hover(clicktobrain[$lang])}
+                  onmouseenter={() => hover($t('lev.reqtom.clickToBrain', { projectName }))}
                   onmouseleave={() => hover('0')}
                 >
                   <img

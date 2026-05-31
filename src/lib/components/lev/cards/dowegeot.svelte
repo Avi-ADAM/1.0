@@ -1,5 +1,6 @@
 <script>
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte';
@@ -101,19 +102,6 @@
     if (onProj) onProj();
   }
 
-  const neged = { he: 'נדרש בירור', en: 'negotiation needed' };
-  const negedT = {
-    he: 'סך ההצבעות להליך בירור',
-    en: 'total votes for negotiation'
-  };
-  const bead = { he: 'בעד', en: 'in favor' };
-  const notyet = { he: 'טרם', en: 'not yet' };
-  const notyetT = { he: 'לא הצביעו', en: 'not voted yet' };
-  const leshana = { he: 'לשנה', en: 'per year' };
-  const oneyear = { he: 'שנה אחת', en: 'one year' };
-  const years = { he: 'שנים', en: 'years' };
-  const intotal = { he: 'סך הכל', en: 'in total' };
-  const onemonth = { he: 'חודש אחד', en: 'one month' };
   const lehodesh = { he: 'לחודש', en: 'per month' };
   const months = { he: 'חודשים', en: 'months' };
   const perunit = { he: 'ליחידה', en: 'per unit' };
@@ -233,7 +221,7 @@
               {(agprice * hm).toLocaleString('en-US', {
                 maximumFractionDigits: 2
               })}
-              {intotal[$lang]}
+              {$t('lev.cards.voteCard.inTotal')}
             </span>
           </p>
         {:else if kindOf === 'total' || kindOf === 'rent'}
@@ -265,7 +253,7 @@
               onmouseleave={() => hover('0')}
               style="color:var(--barbi-pink)"
             >
-              {monts == 1 ? `${onemonth[$lang]}` : `${monts} ${months[$lang]}`}
+              {monts == 1 ? `${$t('lev.cards.voteCard.oneMonth')}` : `${monts} ${months[$lang]}`}
             </span>
             =
             <span
@@ -273,7 +261,7 @@
               onmouseleave={() => hover('0')}
               class="font-bold"
             >
-              {intotal[$lang]}
+              {$t('lev.cards.voteCard.inTotal')}
               {(agprice * monts).toLocaleString('en-US', {
                 maximumFractionDigits: 2
               })}
@@ -288,7 +276,7 @@
               style="color:var(--barbi-pink)"
             >
               {agprice.toLocaleString('en-US', { maximumFractionDigits: 2 })}
-              {leshana[$lang]}
+              {$t('lev.cards.voteCard.perYear')}
             </span>
             *
             <span
@@ -297,7 +285,7 @@
               onmouseleave={() => hover('0')}
               style="color:var(--barbi-pink)"
             >
-              {yers == 1 ? `${oneyear[$lang]}` : `${yers} ${years[$lang]}`}
+              {yers == 1 ? `${$t('lev.cards.voteCard.oneYear')}` : `${yers} ${$t('lev.cards.voteCard.years')}`}
             </span>
             =
             <span
@@ -305,7 +293,7 @@
               onmouseleave={() => hover('0')}
               class="font-bold"
             >
-              {intotal[$lang]}
+              {$t('lev.cards.voteCard.inTotal')}
               {(agprice * yers).toLocaleString('en-US', {
                 maximumFractionDigits: 2
               })}

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import tr from '$lib/translations/tr.json';
   import { lang } from '$lib/stores/lang.js';
   import type { PendingRequestData } from '$lib/server/deals/dealsQueries';
 
@@ -17,22 +18,23 @@
     unlimited: 'linear-gradient(135deg,#0f0a0a,#200a0a)',
     daily: 'linear-gradient(135deg,#0a1010,#0f1e1e)'
   };
-  const KIND_LABEL: Record<string, string> = {
-    monthly: 'מינוי חודשי',
-    yearly: 'מינוי שנתי',
-    total: 'תשלום חד פעמי',
-    unlimited: 'ליחידה - ללא הגבלה',
-    daily: 'יומי'
-  };
 
   let {
     req,
     kind
   }: { req: PendingRequestData; kind: 'buy' | 'sell' } = $props();
 
+  const KIND_LABEL = $derived<Record<string, string>>({
+    monthly: tr.deals.kindMonthly[$lang],
+    yearly: tr.deals.kindYearly[$lang],
+    total: tr.deals.kindTotal[$lang],
+    unlimited: tr.deals.kindUnlimited[$lang],
+    daily: tr.deals.kindDaily[$lang]
+  });
+
   const icon = $derived(KIND_ICON[req.productKindOf ?? ''] ?? '🎁');
   const bg = $derived(KIND_BG[req.productKindOf ?? ''] ?? 'linear-gradient(135deg,#1a1200,#2e2000)');
-  const category = $derived(KIND_LABEL[req.productKindOf ?? ''] ?? 'מכירה');
+  const category = $derived(KIND_LABEL[req.productKindOf ?? ''] ?? tr.deals.kindDefault[$lang]);
 
   function formatDate(iso?: string) {
     if (!iso) return '—';
@@ -56,7 +58,7 @@
 >
   <div class="toper">
     <div class="icon" style="background:{bg}">{icon}</div>
-    <span class="badge">⏳ {kind === 'buy' ? 'ממתינה לאישור' : 'בקשה נכנסת'}</span>
+    <span class="badge">⏳ {kind === 'buy' ? tr.deals.pendingBuy[$lang] : tr.deals.pendingSell[$lang]}</span>
   </div>
 
   {#if req.sourceRatsonId}
@@ -64,10 +66,10 @@
       href={`/concierge/${req.sourceRatsonId}`}
       class="wish-source"
       onclick={(e) => e.stopPropagation()}
-      title="הגיע ממשאלה — לחצי לפתיחה"
+      title={tr.deals.fromWishTitle[$lang]}
     >
       <span class="ws-gem"></span>
-      <span class="ws-label">הגיע ממשאלה</span>
+      <span class="ws-label">{tr.deals.fromWish[$lang]}</span>
       <span class="ws-name">{req.sourceRatsonName || ''}</span>
       <span class="ws-arrow">›</span>
     </a>
@@ -85,15 +87,15 @@
 
   <div class="meta">
     <div class="meta-item">
-      <div class="ml">סה"כ</div>
+      <div class="ml">{tr.deals.metaTotal[$lang]}</div>
       <div class="mv gold">₪ {Number(req.total || 0).toLocaleString()}</div>
     </div>
     <div class="meta-item">
-      <div class="ml">כמות</div>
+      <div class="ml">{tr.deals.metaQuantity[$lang]}</div>
       <div class="mv">{req.quant}</div>
     </div>
     <div class="meta-item">
-      <div class="ml">תאריך בקשה</div>
+      <div class="ml">{tr.deals.metaRequestDate[$lang]}</div>
       <div class="mv">{formatDate(req.createdAt)}</div>
     </div>
   </div>

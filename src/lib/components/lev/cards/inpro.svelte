@@ -1,6 +1,7 @@
 <script>
   import { formatTime } from './../utils.js';
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import {
     nowChatId,
     isChatOpen,
@@ -160,23 +161,6 @@
       ? new Date(dueDateOrCountToDedline)
       : null
   );
-  const sta = {
-    he: 'סטטוס התקדמות ביצוע המשימה',
-    en: 'status of mission progress'
-  };
-  const deta = { he: 'פרטי המשימה', en: 'mission details' };
-  const notes = { he: 'הערות', en: 'notes' };
-  const hoursdonTitle = { he: 'שעות בוצעו ונשמרו', en: 'hours done and saved' };
-  const from = { he: 'מתוך', en: 'from' };
-  const timero = { he: 'מונה זמן', en: 'timer' };
-  const totalTitle = {
-    he: 'מספר השעות שהוקצו למשימה',
-    en: 'total hours assigned to the mission'
-  };
-  const nooftitle = {
-    he: 'מספר השעות שבוצעו ונשמרו',
-    en: 'number of hours done and saved'
-  };
   const options = {
     weekday: 'long',
     year: 'numeric',
@@ -184,12 +168,10 @@
     day: 'numeric'
   };
   console.log(hearotMeyuchadot);
-  const hed = { he: 'משימה בתהליך ביצוע ', en: 'mission in progress' };
   let totali = $derived({
     he: `${iskvua == true ? 'שעות חודשיות' : 'שעות סך הכל'}`,
     en: `${iskvua == true ? 'monthly hours' : 'total hours'}`
   });
-  const editButton = { he: 'עריכת הטיימר', en: 'edit Timer' };
 </script>
 
 <div
@@ -224,7 +206,7 @@
   <CardHeader
     logoSrc={src}
     {projectName}
-    cardType={hed[$lang]}
+    cardType={$t('lev.cards.inpro.missionInProgress')}
     cardTitle={missionName}
     memberCount={noOfusers}
     {glowColor}
@@ -276,7 +258,7 @@
         class="bg-goldGrad bg-[length:200%_auto] animate-gradientx text-center text-wow p-3 sm:text-3xl text-2xl rounded-xl"
         style:font-family="Digital"
         role="contentinfo"
-        onmouseenter={() => hover(timero[$lang])}
+        onmouseenter={() => hover($t('lev.cards.inpro.timer'))}
         onmouseleave={() => hover('0')}
         style="font-weight: 300; letter-spacing: 2px; text-shadow: 2px 2px rgba(0,0,0,0.3);"
       >
@@ -288,7 +270,7 @@
     <div
       role="button"
       tabindex="0"
-      onmouseenter={() => hover(sta[$lang])}
+      onmouseenter={() => hover($t('lev.cards.inpro.progressStatus'))}
       onmouseleave={() => hover('0')}
       class="border-2 rounded-2xl border-blue-500 dark:border-blue-400 hover:border-purple-500 dark:hover:border-purple-400 overflow-hidden transition-colors cursor-pointer"
       onclick={() => statusi()}
@@ -321,17 +303,17 @@
       >
         <span
           class="font-bold text-gray-800 dark:text-gray-200"
-          onmouseenter={() => hover(nooftitle[$lang])}
+          onmouseenter={() => hover($t('lev.cards.inpro.hoursCount'))}
           onmouseleave={() => hover('0')}
           role="contentinfo"
         >
-          {`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} ${hoursdonTitle[$lang]}`}
+          {`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} ${$t('lev.cards.inpro.hoursDone')}`}
         </span>
-        <span class="text-gray-600 dark:text-gray-400">{from[$lang]}</span>
+        <span class="text-gray-600 dark:text-gray-400">{$t('lev.cards.inpro.from')}</span>
         <span
           class="font-bold text-gray-800 dark:text-gray-200"
           role="contentinfo"
-          onmouseenter={() => hover(totalTitle[$lang])}
+          onmouseenter={() => hover($t('lev.cards.inpro.totalHours'))}
           onmouseleave={() => hover('0')}
         >
           {hourstotal}
@@ -370,7 +352,7 @@
     {#if missionDetails !== null && missionDetails !== 'null' && missionDetails !== 'undefined' && missionDetails.length > 0}
       <div
         class="text-sm text-gray-600 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-900/20 p-3 rounded-lg"
-        onmouseenter={() => hover(deta[$lang])}
+        onmouseenter={() => hover($t('lev.cards.inpro.missionDetails'))}
         onmouseleave={() => hover('0')}
       >
         <RichText outpot={missionDetails} editable={false} />
@@ -382,7 +364,7 @@
       <div
         class="text-sm text-gray-600 dark:text-gray-400 bg-yellow-50/50 dark:bg-yellow-900/20 p-3 rounded-lg border border-yellow-200 dark:border-yellow-700"
         role="contentinfo"
-        onmouseenter={() => hover(notes[$lang])}
+        onmouseenter={() => hover($t('lev.cards.inpro.notes'))}
         onmouseleave={() => hover('0')}
       >
         <RichText editable={false} outpot={hearotMeyuchadot} />
@@ -406,7 +388,7 @@
           onkeypress={() => (showSaveDialog = true)}
           onclick={() => (showSaveDialog = true)}
         >
-          ✏ {editButton[$lang]}
+          ✏ {$t('lev.cards.inpro.editTimer')}
         </button>
       {/if}
 

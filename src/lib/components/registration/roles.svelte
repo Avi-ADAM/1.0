@@ -23,6 +23,7 @@
   import { lang } from '$lib/stores/lang.js';
   import jroles from '$lib/data/tafkidim.json';
   import enjrole from '$lib/data/tafkidimEn.json';
+  import tr from '$lib/translations/tr.json';
   let roles1 = $state([]);
   let error1 = null;
   const baseUrl = import.meta.env.VITE_URL;
@@ -117,7 +118,7 @@
   });
 
   let selected = $state([]);
-  const placeholder = `${$lang == 'he' ? 'תפקידים מועדפים' : 'preferred roles'}`;
+  const placeholder = tr.reg.rolesPlaceholder[$lang];
 
   userName.subscribe((value) => {
     userName_value = value;
@@ -224,19 +225,14 @@
     he: 'https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg',
     en: 'https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg'
   };
-  let addn = $derived({ he: `הוספת "${ugug}"`, en: `Create "${ugug}"` });
-  const nom = {
-    he: 'לא קיים עדיין ברשימה, ניתן להוסיף בלחיצה על כפתור "הוספת תפקיד חדש" שלמטה',
-    en: 'Not on the list yet , add it with the "Add new roll" button bellow'
-  };
-  const what = {
-    he: 'יש לך תפקיד מועדף?',
-    en: 'Do you have a preferred role?'
-  };
-  const skipt = {
-    he: 'דילוג לסוף ההרשמה, ניתן יהיה להוסיף את הפרטים בכל עת מעמוד הפרופיל',
-    en: 'skip to end of registration, you can always add those details from your profile page'
-  };
+  let addn = $derived({
+    he: `${tr.selector.addPrefix.he} "${ugug}"`,
+    en: `${tr.selector.addPrefix.en} "${ugug}"`,
+    ar: `${tr.selector.addPrefix.ar} "${ugug}"`
+  });
+  const nom = tr.reg.notInList;
+  const what = tr.reg.rolesQuestion;
+  const skipt = tr.reg.skipToEnd;
 </script>
 
 <h1 class="midscreenText-2">

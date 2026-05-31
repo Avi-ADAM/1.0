@@ -1,5 +1,6 @@
 <script lang="ts">
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import { toast } from 'svelte-sonner';
   import { userStore } from '$lib/stores/levStores';
   import RichText from '$lib/celim/ui/richText.svelte';
@@ -62,7 +63,7 @@
           onChat({ forumId: newForumId, sheirutId: buble.id });
         } catch (err) {
           console.error(err);
-          toast.error(t.error[$lang]);
+          toast.error($t('lev.cards.saleCard.operationError'));
         } finally {
           isCreatingChat = false;
         }
@@ -70,101 +71,7 @@
     }
   }
 
-  const t = {
-    customer: { he: 'לקוח:', en: 'Customer:', ar: 'العميل:' },
-    product: { he: 'מוצר:', en: 'Product:', ar: 'المنتج:' },
-    price: { he: 'מחיר:', en: 'Price:', ar: 'السعر:' },
-    quantity: { he: 'כמות:', en: 'Quantity:', ar: 'الكمية:' },
-    total: { he: 'סה"כ:', en: 'Total:', ar: 'المجموع:' },
-    startDate: { he: 'התחלה:', en: 'Start:', ar: 'البداية:' },
-    endDate: { he: 'סיום:', en: 'End:', ar: 'النهاية:' },
-    confirmDelivery: {
-      he: 'אישור משלוח',
-      en: 'Confirm Delivery',
-      ar: 'تأكيد التسليم'
-    },
-    confirmMoney: {
-      he: 'קיבלתי את הכסף',
-      en: 'Money Received',
-      ar: 'استلمت المال'
-    },
-    chat: { he: 'צ׳אט', en: 'Chat', ar: 'محادثة' },
-    creatingChat: {
-      he: 'יוצר צ׳אט...',
-      en: 'Creating chat...',
-      ar: 'جاري إنشاء محادثة...'
-    },
-    submitting: { he: 'מעבד...', en: 'Processing...', ar: 'جاري المعالجة...' },
-    successDelivery: {
-      he: 'אישרת את המשלוח',
-      en: 'Delivery confirmed',
-      ar: 'تم تأكيد التسليم'
-    },
-    successMoney: {
-      he: 'אישרת קבלת הכסף',
-      en: 'Money receipt confirmed',
-      ar: 'تم تأكيد استلام المال'
-    },
-    error: {
-      he: 'שגיאה בביצוע הפעולה',
-      en: 'Action failed',
-      ar: 'فشل الإجراء'
-    },
-    deliveryVotes: {
-      he: 'אישורי מסירה',
-      en: 'Delivery Confirmations',
-      ar: 'تأكيدات التسليم'
-    },
-    statusLabels: {
-      customerGotIt: {
-        he: 'הלקוח קיבל',
-        en: 'Customer received',
-        ar: 'استلم العميل'
-      },
-      customerPaid: { he: 'הלקוח שילם', en: 'Customer paid', ar: 'دفع العميل' },
-      projectGotMoney: {
-        he: 'הכסף התקבל',
-        en: 'Money received',
-        ar: 'تم استلام المال'
-      },
-      delivered: { he: 'נמסר', en: 'Delivered', ar: 'تم التسليم' },
-      awaitingYourConfirm: {
-        he: 'ממתין לאישורך',
-        en: 'Awaiting your confirmation',
-        ar: 'في انتظار تأكيدك'
-      },
-      moneyRecipient: {
-        he: 'אתה אמור לקבל את הכסף',
-        en: 'You should receive the money',
-        ar: 'يجب أن تستلم المال'
-      }
-    },
-    moneyReceivers: {
-      he: 'מקבלי הכסף',
-      en: 'Money Recipients',
-      ar: 'مستلمو المال'
-    },
-    noReceiver: {
-      he: 'מלאו מקבל כסף',
-      en: 'Set a money receiver',
-      ar: 'حدد مستلم المال'
-    },
-    noReceiverDesc: {
-      he: 'כדי שהלקוח יוכל להעביר לכם כסף, הגש.י את עצמך כמקבל.ת',
-      en: 'So the customer can transfer money to you, add yourself as a recipient',
-      ar: 'حتى يتمكن العميل من تحويل الأموال إليك، أضف نفسك كمستلم'
-    },
-    addMyself: {
-      he: 'הוסף אותי כמקבל כסף',
-      en: 'Add me as money recipient',
-      ar: 'أضفني كمستلم'
-    },
-    removeMyself: {
-      he: 'הסר אותי מהרשימה',
-      en: 'Remove me from list',
-      ar: 'أزلني من القائمة'
-    }
-  };
+
 
   let isProcessing = $state(false);
   let isTogglingReceiver = $state(false);
@@ -207,11 +114,11 @@
         );
       }
       toast.success(
-        action === 'add' ? t.addMyself[$lang] : t.removeMyself[$lang]
+        action === 'add' ? $t('lev.cards.saleCard.addMeReceiver') : $t('lev.cards.saleCard.removeMeReceiver')
       );
     } catch (err) {
       console.error(err);
-      toast.error(t.error[$lang]);
+      toast.error($t('lev.cards.saleCard.operationError'));
     } finally {
       isTogglingReceiver = false;
     }
@@ -238,10 +145,10 @@
       const result = await response.json();
       if (!result.success) throw new Error(result.error?.message || 'Failed');
 
-      toast.success(t.successDelivery[$lang]);
+      toast.success($t('lev.cards.saleCard.deliveryConfirmed'));
     } catch (err) {
       console.error(err);
-      toast.error(t.error[$lang]);
+      toast.error($t('lev.cards.saleCard.operationError'));
     } finally {
       isProcessing = false;
     }
@@ -268,10 +175,10 @@
       const result = await response.json();
       if (!result.success) throw new Error(result.error?.message || 'Failed');
 
-      toast.success(t.successMoney[$lang]);
+      toast.success($t('lev.cards.saleCard.paymentConfirmed'));
     } catch (err) {
       console.error(err);
-      toast.error(t.error[$lang]);
+      toast.error($t('lev.cards.saleCard.operationError'));
     } finally {
       isProcessing = false;
     }
@@ -316,25 +223,25 @@
 
     if (buble.iGotIt) {
       items.push({
-        label: t.statusLabels.customerGotIt[$lang],
+        label: $t('lev.cards.saleCard.customerReceived'),
         color: 'green'
       });
     }
     if (buble.iTransferMoney) {
-      items.push({ label: t.statusLabels.customerPaid[$lang], color: 'blue' });
+      items.push({ label: $t('lev.cards.saleCard.customerPaid'), color: 'blue' });
     }
     if (buble.moneyTransfered) {
       items.push({
-        label: t.statusLabels.projectGotMoney[$lang],
+        label: $t('lev.cards.saleCard.moneyReceived'),
         color: 'green'
       });
     }
     if (buble.productExepted) {
-      items.push({ label: t.statusLabels.delivered[$lang], color: 'green' });
+      items.push({ label: $t('lev.cards.saleCard.delivered'), color: 'green' });
     }
     if (!buble.alreadyVoted && !buble.productExepted) {
       items.push({
-        label: t.statusLabels.awaitingYourConfirm[$lang],
+        label: $t('lev.cards.saleCard.awaitingApproval'),
         color: 'orange'
       });
     }
@@ -344,7 +251,7 @@
       !buble.moneyTransfered
     ) {
       items.push({
-        label: t.statusLabels.moneyRecipient[$lang],
+        label: $t('lev.cards.saleCard.youShouldReceive'),
         color: 'barbi'
       });
     }
@@ -416,7 +323,7 @@
       {/if}
       <div>
         <div class="text-[10px] text-green-600 uppercase font-semibold">
-          {t.customer[$lang]}
+          {$t('lev.cards.saleCard.customer')}
         </div>
         <div class="font-bold text-gray-800 dark:text-gray-200">
           {buble.customerName || 'Unknown'}
@@ -473,7 +380,7 @@
     <div class="grid grid-cols-2 gap-3 text-sm">
       <div class="bg-gray-50 dark:bg-gray-700/30 p-2 rounded-lg">
         <span class="text-gray-500 block text-[10px] uppercase"
-          >{t.price[$lang]}</span
+          >{$t('lev.cards.saleCard.price')}</span
         >
         <div class="flex items-center gap-2">
           <img
@@ -488,7 +395,7 @@
       </div>
       <div class="bg-gray-50 dark:bg-gray-700/30 p-2 rounded-lg">
         <span class="text-gray-500 block text-[10px] uppercase"
-          >{t.quantity[$lang]}</span
+          >{$t('lev.cards.saleCard.quantity')}</span
         >
         <span class="font-bold text-gray-800 dark:text-gray-100"
           >{buble.quant}</span
@@ -498,7 +405,7 @@
         class="col-span-2 bg-gradient-to-r from-green-500/5 to-teal-500/5 p-2 rounded-lg border border-green-500/10"
       >
         <span class="text-green-600 block text-[10px] uppercase font-bold"
-          >{t.total[$lang]}</span
+          >{$t('lev.cards.saleCard.total')}</span
         >
         <div class="flex items-center gap-2">
           <img
@@ -523,7 +430,7 @@
             class="w-5 h-5"
           />
           <div class="flex items-center gap-1">
-            <span class="font-semibold">{t.startDate[$lang]}</span>
+            <span class="font-semibold">{$t('lev.cards.saleCard.startDate')}</span>
             <span>{new Date(buble.startDate).toLocaleDateString($lang)}</span>
           </div>
         </div>
@@ -535,7 +442,7 @@
               class="w-5 h-5"
             />
             <div class="flex items-center gap-1">
-              <span class="font-semibold">{t.endDate[$lang]}</span>
+              <span class="font-semibold">{$t('lev.cards.saleCard.endDate')}</span>
               <span
                 >{new Date(buble.finnishDate).toLocaleDateString($lang)}</span
               >
@@ -560,24 +467,24 @@
         class:text-yellow-700={moneyReceivers.length > 0}
         class:dark:text-yellow-400={moneyReceivers.length > 0}
       >
-        {t.moneyReceivers[$lang]}
+        {$t('lev.cards.saleCard.moneyReceivers')}
       </div>
 
       {#if moneyReceivers.length === 0}
         <!-- Empty state: call to action -->
         <div class="bg-red-50 dark:bg-red-900/10 p-3">
           <p class="font-bold text-red-700 dark:text-red-300 text-sm">
-            {t.noReceiver[$lang]}
+            {$t('lev.cards.saleCard.addReceiver')}
           </p>
           <p class="text-xs text-red-600 dark:text-red-400 mt-1">
-            {t.noReceiverDesc[$lang]}
+            {$t('lev.cards.saleCard.addReceiverHint')}
           </p>
           <button
             class="mt-3 w-full py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-bold text-xs transition-all disabled:opacity-50"
             onclick={handleToggleReceiver}
             disabled={isTogglingReceiver}
           >
-            {isTogglingReceiver ? t.submitting[$lang] : t.addMyself[$lang]}
+            {isTogglingReceiver ? $t('lev.cards.saleCard.processing') : $t('lev.cards.saleCard.addMeReceiver')}
           </button>
         </div>
       {:else}
@@ -617,7 +524,7 @@
               onclick={handleToggleReceiver}
               disabled={isTogglingReceiver}
             >
-              {isTogglingReceiver ? t.submitting[$lang] : t.removeMyself[$lang]}
+              {isTogglingReceiver ? $t('lev.cards.saleCard.processing') : $t('lev.cards.saleCard.removeMeReceiver')}
             </button>
           {:else}
             <button
@@ -625,7 +532,7 @@
               onclick={handleToggleReceiver}
               disabled={isTogglingReceiver}
             >
-              {isTogglingReceiver ? t.submitting[$lang] : t.addMyself[$lang]}
+              {isTogglingReceiver ? $t('lev.cards.saleCard.processing') : $t('lev.cards.saleCard.addMeReceiver')}
             </button>
           {/if}
         </div>
@@ -655,7 +562,7 @@
   <!-- Vote Status Display -->
   <div class="px-4 pb-2">
     <div class="text-[10px] text-green-600 uppercase font-bold mb-1">
-      {t.deliveryVotes[$lang]}
+      {$t('lev.cards.saleCard.deliveryApprovals')}
     </div>
     <VoteStatusDisplay
       votes={weFinnishVotes}
@@ -689,9 +596,9 @@
         />
       </svg>
       {#if isCreatingChat}
-        {t.creatingChat[$lang]}
+        {$t('lev.cards.saleCard.creatingChat')}
       {:else}
-        {t.chat[$lang]}
+        {$t('lev.cards.saleCard.chat')}
       {/if}
     </button>
 
@@ -703,7 +610,7 @@
         disabled={isProcessing || buble.alreadyVoted}
       >
         {#if isProcessing}
-          {t.submitting[$lang]}
+          {$t('lev.cards.saleCard.processing')}
         {:else if buble.alreadyVoted}
           {buble.myDeliveryVote === true
             ? $lang === 'he'
@@ -713,7 +620,7 @@
               ? 'ממתין...'
               : 'Pending...'}
         {:else}
-          {t.confirmDelivery[$lang]}
+          {$t('lev.cards.saleCard.confirmDelivery')}
         {/if}
       </button>
     {/if}
@@ -726,9 +633,9 @@
         disabled={isProcessing}
       >
         {#if isProcessing}
-          {t.submitting[$lang]}
+          {$t('lev.cards.saleCard.processing')}
         {:else}
-          {t.confirmMoney[$lang]}
+          {$t('lev.cards.saleCard.confirmPayment')}
         {/if}
       </button>
     {/if}

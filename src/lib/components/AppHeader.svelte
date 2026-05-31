@@ -1,8 +1,10 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import { lang } from '$lib/stores/lang.js';
+  import tr from '$lib/translations/tr.json';
 
   const user = $derived($page.data.user || $page.data);
-  const userName = $derived(user?.username || user?.un || 'אורח');
+  const userName = $derived(user?.username || user?.un || tr.header.guest[$lang]);
   const profilePic = $derived(user?.profilePic);
   
   const initials = $derived(
@@ -21,12 +23,12 @@
     <img src="/deals logo.png" alt="Deals" class="logo-img" />
   </a>
   <div class="right">
-    <div class="badge">לקוח פרימיום</div>
-    <button class="notif" aria-label="התראות">
+    <div class="badge">{tr.header.premiumBadge[$lang]}</div>
+    <button class="notif" aria-label={tr.header.notifications[$lang]}>
       <span>🔔</span>
       <div class="notif-dot"></div>
     </button>
-    <button class="avatar" title={userName} aria-label="פרופיל">
+    <button class="avatar" title={userName} aria-label={tr.header.profile[$lang]}>
       {#if profilePic}
         <img src={profilePic} alt={userName} class="avatar-img" />
       {:else}

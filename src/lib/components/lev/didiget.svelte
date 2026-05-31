@@ -7,9 +7,8 @@
 
   let dialogOpen = $state(false);
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import Lowbtni from '$lib/celim/lowbtn.svelte';
-  const ishur = { he: 'אישור קבלת', en: 'approve of reciving' };
-  const me = { he: 'מאת', en: 'from' };
   //how to recive? discution or build in payments to add
   import { clickOutside } from './outsidclick.js';
   import { fly } from 'svelte/transition';
@@ -164,11 +163,6 @@
     });
   }
 
-  const suc = { he: 'בוצע בהצלחה', en: 'appruved sucssefully!' };
-  const er = {
-    he: 'אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל  ',
-    en: 'error: please try again, if the problem continue contact at baruch@1lev1.com'
-  };
 
   async function agree(alr) {
     console.log('agree called with alr:', alr, 'kind:', kind);
@@ -187,10 +181,10 @@
           kind: kind === 'send' ? 'send' : 'receive',
         });
         if (result.success) {
-          toast.success(suc[$lang]);
+          toast.success($t('lev.didiget.success'));
           coinLapach();
         } else {
-          toast.warning(er[$lang]);
+          toast.warning($t('lev.didiget.error'));
         }
       } catch (e) {
         error1 = e;
@@ -397,7 +391,7 @@ id: ${pendId}
           sentByMe: c.send?.data?.id === String(myid),
           seen: c.seen,
         }));
-        toast.success(`${fnnn[$lang]}`);
+        toast.success($t('lev.didiget.messageSent'));
         setTimeout(() => { isOpen = false; }, 15000);
       }
     } catch (e) {
@@ -486,7 +480,6 @@ id: ${pendId}
   };
   let mes = { he: ``, en: `` };
   let noo = { he: ``, en: `` };
-  const fnnn = { he: 'ההודעה נשלחה בהצלחה', en: 'messege send sucsessfully' };
 </script>
 
 <DialogOverlay class="overlay" {isOpen} onDismiss={close}>
@@ -613,7 +606,7 @@ id: ${pendId}
           >
             <img class="img" {src} alt="projectlogo" />
           </button>
-          <!----  <h1 class="{`normSml-${projectId}-vii`} pn" >{ishur[$lang]}</h1>-->
+          <!----  <h1 class="{`normSml-${projectId}-vii`} pn" >{$t('lev.didiget.approveOf')}</h1>-->
           <div class="flex flex-row align-middle justify-center">
             <div class="text-center">
               <img

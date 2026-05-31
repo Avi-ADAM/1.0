@@ -5,6 +5,7 @@
   import { SaleComponent } from '$lib/components/sales';
   import dayjs from 'dayjs';
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import { idPr } from '$lib/stores/idPr.js';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { fly } from 'svelte/transition';
@@ -187,63 +188,22 @@
     { year: 2019, bananas: 3840, cherries: 1920, dates: 960 },
     { year: 2020, bananas: 380, cherries: 920, dates: 1960 }
   ];
-  const om = { he: 'רק רגע בבקשה', en: 'one moment please' };
-  const cencel = { he: 'ביטול', en: 'cencel' };
-  const errmsg = { he: ' אירעה שגיאה', en: 'error' };
-  const trya = { he: 'לנסות שוב', en: 'try again' };
-  const erhe = { he: 'הכנסות ממתינות לחלוקה', en: 'awited spliting earnings' };
-  const our = { he: 'המוצרים שלנו', en: "our product's" };
-  const nm = { he: 'שם', en: 'name' };
-  const pric = { he: 'מחיר', en: 'price' };
-  const quanti = { he: 'כמות מצויה', en: 'available quantity' };
-  const kinde = { he: 'סוג', en: 'kind' };
-  const py = { he: 'ליחידה', en: 'per unit' };
-  const pm = { he: 'חודשי', en: 'monthly' };
-  const pye = { he: 'שנתי', en: 'yearly' };
-  const unl = { he: 'ללא הגבלה', en: 'unlimited' };
-  const res = { he: 'דיווח על מכירה', en: 'report sale' };
-  const cr = { he: ' יצירת מוצר חדש', en: 'create new product' };
-  const crCx = { he: 'מוצר מורכב', en: 'complex product' };
-  const gn = { he: 'שם המוצר', en: 'product name' };
-  const qu = { he: 'סכום', en: 'amount' };
-  const whoo = { he: 'הכסף ממתין אצל: ', en: 'who guard the money' };
-  const noteLabel = { he: 'הערה:', en: 'Note:' };
-  const tot = { he: 'סך הכל:', en: 'total:' };
-  const req = { he: 'בקשת חלוקה', en: 'request money spliting' };
-  const see = { he: 'צפיה בהצעת החלוקה', en: 'see existed sppliting offer' };
-  const sbp = { he: 'התפלגות המכירות לפי מוצר', en: 'sales by product' };
-  const sbd = { he: 'התפלגות המכירות לפי תאריך', en: 'sales by date' };
-  const awaitingSplit = { he: '(ממתינות לחלוקה)', en: '(awaiting split)' };
-  const tableView = { he: 'תצוגת טבלה', en: 'Table View' };
-  const downloadCsv = { he: 'הורדת CSV', en: 'Download CSV' };
-  const closeBtn = { he: 'סגור', en: 'Close' };
-  const salesTable = { he: 'טבלת מכירות', en: 'Sales Table' };
-  const giftName = { he: 'שם המוצר', en: 'Product Name' };
-  const amount = { he: 'סכום', en: 'Amount' };
-  const soldBy = { he: 'נמכר על ידי', en: 'Sold By' };
-  const dateLabel = { he: 'תאריך', en: 'Date' };
-  const statusLabel = { he: 'סטטוס', en: 'Status' };
-  const noteText = { he: 'הערה', en: 'Note' };
-  const splitStatus = { he: 'חולק', en: 'Split' };
-  const pendingStatus = { he: 'בהצבעה', en: 'Pending' };
-  const awaitingStatus = { he: 'ממתין', en: 'Awaiting' };
-
   function exportToCSV() {
     const headers = [
-      giftName[$lang],
-      amount[$lang],
-      soldBy[$lang],
-      dateLabel[$lang],
-      statusLabel[$lang],
-      noteText[$lang]
+      $t('project.hamatanot.productName'),
+      $t('project.hamatanot.amount'),
+      $t('project.hamatanot.reportSale'),
+      $t('project.hamatanot.salesByDate'),
+      $t('project.hamatanot.type'),
+      $t('project.hamatanot.note')
     ];
 
     const rows = salee.map((sale) => {
       const status = sale.attributes.splited
-        ? splitStatus[$lang]
+        ? ($lang === 'he' ? 'חולק' : $lang === 'ar' ? 'تم التقسيم' : 'Split')
         : sale.attributes.pending
-          ? pendingStatus[$lang]
-          : awaitingStatus[$lang];
+          ? ($lang === 'he' ? 'בהצבעה' : $lang === 'ar' ? 'في انتظار التصويت' : 'Pending')
+          : ($lang === 'he' ? 'ממתין' : $lang === 'ar' ? 'في الانتظار' : 'Awaiting');
 
       return [
         sale.attributes.matanot.data.attributes.name,
@@ -364,7 +324,7 @@
     <DialogContent class="content" aria-label="form">
       <div style="z-index: 400;" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
         <button class=" hover:bg-barbi text-mturk rounded-full" onclick={closer}
-          >{cencel[$lang]}</button
+          >{$t('project.hamatanot.cancel')}</button
         >
         {#if a == 0}
           <SaleComponent
@@ -384,7 +344,7 @@
           <New {projectId} onDone={done} />
         {:else if a == 2}
           <div class="sp bg-gold">
-            <h3 class="text-barbi">{om[$lang]}</h3>
+            <h3 class="text-barbi">{$t('project.hamatanot.loading')}</h3>
             <br />
             <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
             ></RingLoader>
@@ -393,11 +353,11 @@
           <h1
             class="text-center text-barbi text-bold underline decoration-mturk"
           >
-            {errmsg[$lang]}
+            {$t('project.hamatanot.error')}
           </h1>
           <button
             class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full"
-            onclick={() => (a = 0)}>{trya[$lang]}</button
+            onclick={() => (a = 0)}>{$t('project.hamatanot.tryAgain')}</button
           >
         {/if}
       </div></DialogContent
@@ -416,7 +376,7 @@
               <h1
                 class="md:text-center text-2xl md:text-2xl font-bold underline decoration-mturk text-center"
               >
-                {our[$lang]}
+                {$t('project.hamatanot.ourProducts')}
               </h1>
             </div>
             <div class="gifts-grid max-h-[calc(100vh-200px)] overflow-y-auto d">
@@ -430,14 +390,14 @@
                   </div>
                   <div class="card-body">
                     <p class="gift-price">
-                      <strong>{pric[$lang]}:</strong>
+                      <strong>{$t('project.hamatanot.price')}:</strong>
                       {data.attributes.price}
                     </p>
                     <p class="gift-quantity">
-                      <strong>{quanti[$lang]}:</strong>
+                      <strong>{$t('project.hamatanot.quantity')}:</strong>
                       {#if data.attributes.quant > 0 || data.attributes.quant === -1}
                         {#if data.attributes.kindOf == 'unlimited'}
-                          <span>{unl[$lang]}</span>
+                          <span>{$t('project.hamatanot.unlimited')}</span>
                         {:else}
                           {data.attributes.quant === -1
                             ? $lang === 'he'
@@ -448,15 +408,15 @@
                       {/if}
                     </p>
                     <p class="gift-kind">
-                      <strong>{kinde[$lang]}:</strong>
+                      <strong>{$t('project.hamatanot.type')}:</strong>
                       {#if data.attributes.kindOf == 'total'}
-                        {py[$lang]}
+                        {$t('project.hamatanot.perUnit')}
                       {:else if data.attributes.kindOf == 'monthly'}
-                        {pm[$lang]}
+                        {$t('project.hamatanot.monthly')}
                       {:else if data.attributes.kindOf == 'yearly'}
-                        {pye[$lang]}
+                        {$t('project.hamatanot.yearly')}
                       {:else if data.attributes.kindOf == 'unlimited'}
-                        {unl[$lang]}
+                        {$t('project.hamatanot.unlimited')}
                       {/if}
                     </p>
                   </div>
@@ -470,8 +430,8 @@
                     </div>
                     <button
                       class="report-sale-btn"
-                      title={res[$lang]}
-                      aria-label={res[$lang]}
+                      title={$t('project.hamatanot.reportSale')}
+                      aria-label={$t('project.hamatanot.reportSale')}
                       onclick={() =>
                         sell(
                           data.id,
@@ -524,13 +484,13 @@
       <div class="flex flex-wrap gap-2 justify-center">
         <button
           class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
-          onclick={addnew}>{cr[$lang]}</button
+          onclick={addnew}>{$t('project.hamatanot.createProduct')}</button
         >
         <a
           href="/moach/{$idPr}/sales/new"
           class="border border-gold hover:border-barbi bg-gold/10 hover:bg-gold/20 text-gold hover:text-barbi font-bold py-2 px-4 rounded-lg text-center"
         >
-          {crCx[$lang]}
+          {$t('project.hamatanot.complexProduct')}
         </a>
       </div>
     </div>
@@ -542,14 +502,14 @@
           <h1
             class="md:text-center text-2xl md:text-2xl font-bold underline decoration-mturk"
           >
-            {erhe[$lang]}
+            {$t('project.hamatanot.awaitingEarnings')}
           </h1>
           <button
             class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg transition-all duration-300"
             onclick={() => (showTableModal = true)}
-            aria-label={tableView[$lang]}
+            aria-label={$t('project.hamatanot.tableView')}
           >
-            📊 {tableView[$lang]}
+            📊 {$t('project.hamatanot.tableView')}
           </button>
         </div>
         <div class="flex d overflow-x-auto w-full">
@@ -579,7 +539,7 @@
               <div class="mb-3">
                 <h3
                   class="text-lg font-bold bg-gradient-to-r from-barbi via-mpink to-cyan-500 bg-clip-text text-transparent hover:from-gold hover:via-mpink hover:to-barbi transition-all duration-300 transform hover:scale-105"
-                  title={gn[$lang]}
+                  title={$t('project.hamatanot.productName')}
                 >
                   {data.attributes.matanot.data.attributes.name}
                 </h3>
@@ -591,7 +551,7 @@
               >
                 <p
                   class="text-xl font-semibold text-center bg-gradient-to-r from-cyan-500 to-barbi bg-clip-text text-transparent"
-                  title={qu[$lang]}
+                  title={$t('project.hamatanot.amount')}
                 >
                   ₪{data.attributes.in}
                 </p>
@@ -600,7 +560,7 @@
               <!-- User Info with Avatar -->
               <div
                 class="flex items-center justify-between space-x-3 mb-3"
-                title={whoo[$lang]}
+                title={$t('project.hamatanot.moneyGuardian')}
               >
                 <div class="flex items-center space-x-3">
                   <img
@@ -629,7 +589,7 @@
                     <small
                       class="text-barbi/70 font-semibold text-xs uppercase tracking-wider"
                     >
-                      {noteLabel[$lang]}
+                      {$t('project.hamatanot.note')}
                     </small>
                   </div>
                   <p
@@ -672,7 +632,7 @@
             {/if}
           {:else}
             <div class="border-t border-barbi/30 pt-2">
-              <h2>{tot[$lang]}</h2>
+              <h2>{$t('project.hamatanot.total')}</h2>
               <p class="font-bold">{allin}</p>
             </div>
           {/if}
@@ -682,7 +642,7 @@
           <button
             id="haluk"
             class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
-            onclick={ask}>{trili.length == 0 ? see[$lang] : req[$lang]}</button
+            onclick={ask}>{trili.length == 0 ? $t('project.hamatanot.viewSplitOffer') : $t('project.hamatanot.requestSplit')}</button
           >
         {:else}
           <button
@@ -706,7 +666,7 @@
     <div class="flex flex-col sm:flex-row-reverse justify-center">
       <div>
         <h1 class="text-center text-barbi text-bold underline decoration-mturk">
-          {sbp[$lang]}
+          {$t('project.hamatanot.salesByProduct')}
         </h1>
 
         <div class="sm:w-96 [width:95vw] [height:95vw] sm:h-96 m-4">
@@ -718,7 +678,7 @@
           <h1
             class="text-center text-barbi text-bold underline decoration-mturk"
           >
-            {sbd[$lang]}
+            {$t('project.hamatanot.salesByDate')}
           </h1>
 
           <div class="  sm:[width:calc(95vw-24rem)] w-4/5 h-96 m-2">
@@ -743,7 +703,7 @@
     >
       <DialogContent
         class=" table-modal-content"
-        aria-label={salesTable[$lang]}
+        aria-label={$t('project.hamatanot.salesTable')}
       >
         <div
           style="z-index: 800;"
@@ -751,21 +711,21 @@
           class="p-6 max-h-[90vh] overflow-y-auto"
         >
           <div class="flex justify-between items-center mb-4">
-            <h2 class="text-2xl font-bold text-barbi">{salesTable[$lang]}</h2>
+            <h2 class="text-2xl font-bold text-barbi">{$t('project.hamatanot.salesTable')}</h2>
             <div class="flex gap-2">
               <button
                 class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg transition-all duration-300"
                 onclick={exportToCSV}
-                aria-label={downloadCsv[$lang]}
+                aria-label={$t('project.hamatanot.downloadCsv')}
               >
-                📥 {downloadCsv[$lang]}
+                📥 {$t('project.hamatanot.downloadCsv')}
               </button>
               <button
                 class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg transition-all duration-300"
                 onclick={() => (showTableModal = false)}
-                aria-label={closeBtn[$lang]}
+                aria-label={$t('project.hamatanot.close')}
               >
-                ✕ {closeBtn[$lang]}
+                ✕ {$t('project.hamatanot.close')}
               </button>
             </div>
           </div>
@@ -775,12 +735,12 @@
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>{giftName[$lang]}</th>
-                  <th>{amount[$lang]}</th>
-                  <th>{soldBy[$lang]}</th>
-                  <th>{dateLabel[$lang]}</th>
-                  <th>{statusLabel[$lang]}</th>
-                  <th>{noteText[$lang]}</th>
+                  <th>{$t('project.hamatanot.productName')}</th>
+                  <th>{$t('project.hamatanot.amount')}</th>
+                  <th>{$t('project.hamatanot.reportSale')}</th>
+                  <th>{$t('project.hamatanot.salesByDate')}</th>
+                  <th>{$t('project.hamatanot.type')}</th>
+                  <th>{$t('project.hamatanot.note')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -818,15 +778,15 @@
                     <td>
                       {#if sale.attributes.splited}
                         <span class="status-badge split-badge"
-                          >✓ {splitStatus[$lang]}</span
+                          >✓ {$lang === 'he' ? 'חולק' : $lang === 'ar' ? 'تم التقسيم' : 'Split'}</span
                         >
                       {:else if sale.attributes.pending}
                         <span class="status-badge pending-badge"
-                          >⏳ {pendingStatus[$lang]}</span
+                          >⏳ {$lang === 'he' ? 'בהצבעה' : $lang === 'ar' ? 'في انتظار التصويت' : 'Pending'}</span
                         >
                       {:else}
                         <span class="status-badge awaiting-badge"
-                          >{awaitingStatus[$lang]}</span
+                          >{$lang === 'he' ? 'ממתין' : $lang === 'ar' ? 'في الانتظار' : 'Awaiting'}</span
                         >
                       {/if}
                     </td>
@@ -841,7 +801,7 @@
               </tbody>
               <tfoot>
                 <tr class="total-row">
-                  <td colspan="2" class="font-bold">{tot[$lang]}</td>
+                  <td colspan="2" class="font-bold">{$t('project.hamatanot.total')}</td>
                   <td class="font-bold">₪{totalSales}</td>
                   <td colspan="4"></td>
                 </tr>
