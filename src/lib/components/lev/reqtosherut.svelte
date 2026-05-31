@@ -67,12 +67,12 @@
     if (s == 'u') {
       ucli += 1;
       if (ucli >= 2) {
-        onUser?.(userId);
+        onUser?.({ id: userId });
       }
     } else if (s == 'p') {
       pcli += 1;
       if (pcli >= 2) {
-        onProj?.(projectId);
+        onProj?.({ id: projectId });
       }
     }
   }
@@ -143,300 +143,73 @@
     ser = xyz();
     const d = new Date();
     const tafkidimsa = role.data.map((c) => c.id);
-
-    const sdate =
-      sqedualed !== undefined && sqedualed != null
-        ? `start: "${sqedualed}"`
-        : ``;
-    const date =
-      deadline !== undefined && deadline != null
-        ? ` admaticedai: "${deadline}"`
-        : ``;
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    console.log(idL);
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
-    let newnew = false;
-    console.log(pid);
-    if (pid.includes(userId)) {
-      welcome = ``;
-      adduser2 = ``;
-      adduser = ``;
-      console.log(welcome, 'member');
-    } else {
-      newnew = true;
-      pid.push(userId);
-      pid = pid;
-      welcome = `createWelcomTop(
-    data: {users_permissions_user: "${userId}",
-          project: "${projectId}"
-                publishedAt: "${d.toISOString()}",
-        }
-) {data{id}}`;
-      adduser = `updateProject(
-  id: "${projectId}"
- data: {user_1s: ["${idL}","${userId}"]}
-  ){data{attributes {user_1s{data {id attributes{ email lang}}}}}}`;
-      adduser2 = `updateProject(
-  id: "${projectId}"
- data: {user_1s: [${pid}]}
-  ){data{attributes {user_1s{data {id}}}}}`;
-      console.log(welcome, 'not member');
-    }
     //add to pr users create missioninprogres, create welcom ballun;  first check for no of pr users and full consent ,(delete or save for refernce but put archive ) openM and asked
     if (noofpu === 1) {
       console.log('agree, ecsepted');
-
       try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation 
-                        { createMesimabetahalich(
-      data: {project: "${projectId}",
-             mission:  "${missId}",
-             hearotMeyuchadot: "${hearotMeyuchadot}",
-             name: "${openmissionName}",
-             descrip: "${missionDetails}",
-             hoursassinged: ${nhours},
-             perhour: ${valph}, 
-             iskvua:${iskvua},  
-             privatlinks: "${privatlinks}",
-             publicklinks: "${publicklinks}", 
-             users_permissions_user: "${userId}",
-              tafkidims: [${tafkidimsa}],
-                      publishedAt: "${d.toISOString()}",
-                      open_missions:[${openMid}],
-            ${date}
-            ${sdate}
-                  }
-  ) {data{attributes{project{data{id }}}}}
-
-updateOpenMission(
-  id: "${openMid}"
-  data: {archived: true}
-) {data{id attributes{archived}}}
-${welcome}
-${adduser}
- updateAsk(
-                 id: "${askId}" 
-                                data: { archived: true,
-                                    vots: [${userss}, 
-                                       {
-                                        what: true
-                                        users_permissions_user: "${idL}"
-
-                                      }
-                                    ]}
-                        ){data{id}}
-}
-`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
-
-        if (newnew == true) {
-          let emailt;
-          let ema = miDatan.data.updateProject.data.attributes.user_1s.data;
-          let la;
-          for (let i = 0; i < ema.length; i++) {
-            if (ema[i].id == userId) {
-              emailt = ema[i].attributes.email;
-              la = ema[i].attributes.lang;
-            }
-          }
-          let langi = $lang;
-          if (la == 'he' || la == 'en') {
-            langi = la;
-          }
-          console.log(langi);
-          let data = {
-            user: useraplyname,
-            projectName: projectName,
-            projectSrc: src2,
-            missionName: openmissionName,
-            email: emailt,
-            lang: langi,
-            kind: 'exeptedMission'
-          }; //username email projectname projectsrc lang openmissionName
-          fetch('/api/sma', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-          })
-            .then((response) => response)
-            .then((data) => {
-              console.log('Success:', data);
-            })
-            .catch((error) => {
-              console.error('Error:', error);
-            });
-        }
-        onAcsept?.({
-          ani: 'asked',
-          coinlapach: coinlapach
+        const result = await executeAction('finalizeAskAcceptance', {
+          variant: 'solo',
+          projectId,
+          missId,
+          openMid,
+          askId,
+          acceptedUserId: userId,
+          acceptedUserName: useraplyname,
+          openmissionName,
+          missionDetails,
+          nhours,
+          valph,
+          iskvua,
+          privatlinks,
+          publicklinks,
+          hearotMeyuchadot,
+          tafkidims: tafkidimsa,
+          sqedualed,
+          deadline,
+          existingVotes: users,
+          projectName,
+          projectSrc: src2,
         });
+        if (result.success) {
+          onAcsept?.({ ani: 'asked', coinlapach: coinlapach });
+        } else {
+          error1 = result.error;
+        }
       } catch (e) {
         error1 = e;
         console.log(error1);
       }
     } else if (noofpu === noofusersOk) {
       console.log('create new as above and add vote and archive asked');
-      //arcive all other asks
       try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation 
-                        { createMesimabetahalich(
-      data: {project: "${projectId}",
-             mission:  "${missId}",
-             hearotMeyuchadot: "${hearotMeyuchadot}",
-             name: "${openmissionName}",
-             descrip: "${missionDetails}",
-             hoursassinged: ${nhours},
-             perhour: ${valph},  
-              iskvua:${iskvua},   
-             privatlinks: "${privatlinks}",
-             publicklinks: "${publicklinks}", 
-             users_permissions_user: "${userId}",
-             tafkidims: [${tafkidimsa}],
-             publishedAt: "${d.toISOString()}",
-             open_missions:[${openMid}],
-            ${date}
-            ${sdate}
-                  }
-  ) {data{attributes{project{data{id }}}}}
-
-updateOpenMission(
-  id: "${openMid}"
-  data: {archived: true}
-) {data{id attributes{ archived asks{data{id}}}}}
-${welcome}
-${adduser2}
- updateAsk(
-            id: "${askId}"
-                                data: { 
-                                  archived: true,
-                                    vots: [${userss}, 
-                                       {
-                                        what: true
-                                        users_permissions_user: "${idL}"
-                                      }
-                                    ]}
-                        ){data{id}}
-}
-`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
-        //TODO: monter if iskvua, timegrama if dates
-        let chiluzh = miDatan.data.createMesimabetahalich.data.id;
-        let monti = ``;
-        if (iskvua == true) {
-          monti = `
-            createMonter(
-              data:{
-                mesimabetahalich: "${chiluzh}",
-                ani: "mesimabetahalich"
-                ${sqedualed != undefined && sqedualed != null ? `start: "${sqedualed > d ? sqedualed : d.toISOString()}"` : `start: "${d.toISOString()}"`}
-                ${deadline != undefined && deadline != null ? `finish: "${deadline}"` : ``}
-              }
-            )
-          `;
-        }
-
-        const otherasks =
-          miDatan.data.updateOpenMission.data.attributes.asks.data;
-        console.log(otherasks);
-        if (otherasks.length > 1) {
-          let nextquery = ``;
-          for (let i = 0; i < otherasks.length; i++) {
-            nextquery = `
-               ${i == 0 ? monti : ``}
-                updateAsk(
-                       id: "${otherasks[i].id}" 
-                                data: { archived: true
-                            }
-                        ){data{id}}`;
-            await fetch(linkg, {
-              method: 'POST',
-              headers: {
-                Authorization: bearer1,
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                query: `mutation { 
-                      ${nextquery}
-                        }`
-              })
-            })
-              .then((r) => r.json())
-              .then((data) => (miDatan = data));
-            console.log(miDatan);
-          }
-        }
-        if (newnew == true) {
-          let emailt;
-          let ema = miDatan.data.updateProject.data.attributes.user_1s.data;
-          let la;
-          for (let i = 0; i < ema.length; i++) {
-            if (ema[i].id == userId) {
-              emailt = ema[i].attributes.email;
-              la = ema[i].attributes.lang;
-            }
-          }
-          let langi = $lang;
-          if (la == 'he' || la == 'en') {
-            langi = la;
-          }
-          console.log(langi);
-          let data = {
-            user: useraplyname,
-            projectName: projectName,
-            projectSrc: src2,
-            missionName: openmissionName,
-            email: emailt,
-            lang: langi,
-            kind: 'exeptedMission'
-          }; //username email projectname projectsrc lang openmissionName
-          fetch('/api/sma', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-          })
-            .then((response) => response)
-            .then((data) => {
-              console.log('Success:', data);
-            })
-            .catch((error) => {
-              console.error('Error:', error);
-            });
-        }
-        onAcsept?.({
-          ani: 'asked',
-          coinlapach: coinlapach
+        const result = await executeAction('finalizeAskAcceptance', {
+          variant: 'allVoted',
+          projectId,
+          missId,
+          openMid,
+          askId,
+          acceptedUserId: userId,
+          acceptedUserName: useraplyname,
+          openmissionName,
+          missionDetails,
+          nhours,
+          valph,
+          iskvua,
+          privatlinks,
+          publicklinks,
+          hearotMeyuchadot,
+          tafkidims: tafkidimsa,
+          sqedualed,
+          deadline,
+          existingVotes: users,
+          projectName,
+          projectSrc: src2,
         });
+        if (result.success) {
+          onAcsept?.({ ani: 'asked', coinlapach: coinlapach });
+        } else {
+          error1 = result.error;
+        }
       } catch (e) {
         error1 = e;
         console.log(error1);
@@ -471,46 +244,25 @@ ${adduser2}
     noofusersNo += 1;
     noofusersWaiting -= 1;
     ser = xyz();
-    const declineda = declined.map((c) => c.id);
-    declineda.push(userId);
-    console.log('decline1');
+    const existingDeclinedIds = (declined || []).map((c) => String(c.id));
 
     // delete asked coin forever but keep asked on user ////matrix(1, 0, 0, 1, -61.718609, -47.72295)
     if (noofpu === 1) {
-      const cookieValueId = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('id='))
-        .split('=')[1];
-      idL = cookieValueId;
-      console.log(idL);
-      token = page.data.tok;
-      bearer1 = 'bearer' + ' ' + token;
       try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          //add already declined ids
-          body: JSON.stringify({
-            query: `mutation 
-                        { 
-updateOpenMission(
- id: "${openMid}"
-  data: {declined: [${declineda}]}
-) {data{id attributes{ declined {data{id}}}}}
-}
-`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
-        onDecline?.({
-          ani: 'asked',
-          coinlapach: coinlapach
+        const result = await executeAction('declineMissionRequest', {
+          openMissionId: String(openMid),
+          projectId: String(projectId),
+          declinedUserId: String(userId),
+          existingDeclinedIds
         });
+        if (result.success) {
+          onDecline?.({
+            ani: 'asked',
+            coinlapach: coinlapach
+          });
+        } else {
+          error1 = result.error;
+        }
       } catch (e) {
         error1 = e;
         console.log(error1);
