@@ -53,6 +53,15 @@
 
   let scrolli = $state(false);
 
+  // התקדמות גלילה (0..1) של פאנל התוכן — מניע שינוי עדין בסצנת ה‑3D
+  let scrollProgress = $state(0);
+
+  // גלילה חלקה לעוגן בתוך פאנל התוכן (#text)
+  function scrollToId(id) {
+    const el = document.getElementById(id);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   let loading = $state(false),
     loadinga = $state(false),
     w = $state(0),
@@ -143,6 +152,37 @@
   {image}
   url={pageurl[$lang]}
 />
+<!-- Sticky header: anchor nav + CTA -->
+<header
+  dir={$locale === 'he' || $locale === 'ar' ? 'rtl' : 'ltr'}
+  class="hidden sm:flex fixed top-0 inset-x-0 z-[600] items-center justify-between px-6 py-2 bg-white/40 backdrop-blur-md border-b border-white/40 shadow-sm"
+  style="font-family:'Sababa',sans-serif;"
+>
+  <img
+    src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"
+    alt="1lev1"
+    class="w-9 h-9 drop-shadow"
+    style="animation:none;"
+  />
+  <nav class="flex items-center gap-5 text-barbi font-bold">
+    <button class="hover:text-gold transition-colors" onclick={() => scrollToId('features')}>{$t('home.sections.navFeatures')}</button>
+    <button class="hover:text-gold transition-colors" onclick={() => scrollToId('how')}>{$t('home.sections.navHow')}</button>
+    <button class="hover:text-gold transition-colors" onclick={() => scrollToId('concierge')}>{$t('home.sections.navConcierge')}</button>
+    <button class="hover:text-gold transition-colors" onclick={() => scrollToId('who')}>{$t('home.sections.whoTitle')}</button>
+    <button class="hover:text-gold transition-colors" onclick={() => scrollToId('faq')}>{$t('home.sections.navFaq')}</button>
+  </nav>
+  <button
+    class="bg-barbi text-gold hover:bg-white hover:text-barbi font-bold px-4 py-1.5 rounded-xl shadow-md hover:scale-105 transition-all duration-300"
+    onclick={() => {
+      goto(
+        $locale == 'he' ? '/hascama' : $locale == 'ar' ? '/aitifaqia' : '/convention'
+      );
+      fi = true;
+    }}
+  >
+    {$t('home.sections.ctaTop')}
+  </button>
+</header>
 <div
   style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ; z-index: 699;"
 >
@@ -240,7 +280,10 @@
         <CircleProgresBar progress={$progress} />
       </div>
     {/if}
-    <div class="w-full h-full">
+    <div
+      class="w-full h-full transition-transform duration-300 ease-out"
+      style="transform: translateY({scrollProgress * -5}%) scale({1 + scrollProgress * 0.1});"
+    >
       <Canvas {size}>
         <ResizeHandler {size} />
         <Scene
@@ -248,6 +291,7 @@
           {size}
           hover={btna == true || btnb == true ? true : false}
           {scrolli}
+          {scrollProgress}
         />
       </Canvas>
     </div>
@@ -259,6 +303,9 @@
     class="relative d z-10 w-full h-screen overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-barbi scrollbar-track-transparent"
     onscroll={(e) => {
       scrolli = true;
+      const el = e.currentTarget;
+      const max = el.scrollHeight - el.clientHeight;
+      scrollProgress = max > 0 ? Math.min(1, Math.max(0, el.scrollTop / max)) : 0;
       if (window.scrollTimer) clearTimeout(window.scrollTimer);
       window.scrollTimer = setTimeout(() => (scrolli = false), 150);
     }}
@@ -514,6 +561,271 @@
             </button>
           </div>
         </div>
+      </div>
+
+      <!-- ===== גלילה ארוכה: בלוקים אינפורמטיביים וממירים ===== -->
+      <div
+        class="w-full max-w-xl flex flex-col gap-10 mt-12"
+        style="font-family:'Sababa',sans-serif;"
+      >
+        <!-- בלוק: הבעיה / הזדהות -->
+        <section class="text-center">
+          <h2 class="text-rose-700 font-bold text-2xl mb-4">
+            {$t('home.sections.problemTitle')}
+          </h2>
+          <div class="flex flex-col gap-3">
+            <p
+              class="bg-white/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-3 text-slate-900 shadow"
+            >
+              {$t('home.intro.q1')}
+            </p>
+            <p
+              class="bg-white/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-3 text-slate-900 shadow"
+            >
+              {$t('home.intro.q2')}
+            </p>
+          </div>
+        </section>
+
+        <!-- בלוק: יכולות הפלטפורמה -->
+        <section id="features" class="scroll-mt-16">
+          <h2 class="text-rose-700 font-bold text-2xl mb-1 text-center">
+            {$t('home.sections.featuresTitle')}
+          </h2>
+          <p class="text-center text-slate-700 text-sm mb-5">
+            {$t('home.sections.featuresSub')}
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {#each [['🗂️', 'projectMgmt'], ['🤝', 'negotiation'], ['🚀', 'onboarding'], ['📲', 'telegram'], ['🤖', 'aiBot'], ['🔍', 'transparency']] as [icon, key]}
+              <div
+                class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
+              >
+                <div class="text-2xl mb-1">{icon}</div>
+                <h3 class="text-rose-700 font-bold mb-1">
+                  {$t(`home.platform.${key}_t`)}
+                </h3>
+                <p class="text-slate-800 text-sm leading-relaxed">
+                  {$t(`home.platform.${key}_d`)}
+                </p>
+              </div>
+            {/each}
+          </div>
+        </section>
+
+        <!-- בלוק: איך זה עובד ב‑4 צעדים -->
+        <section id="how" class="scroll-mt-16">
+          <h2 class="text-rose-700 font-bold text-2xl mb-4 text-center">
+            {$t('home.sections.howTitle')}
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {#each ['s1', 's2', 's3', 's4'] as s, i}
+              <div
+                class="relative bg-gradient-to-br from-amber-100 via-amber-200 to-rose-100 border-2 border-gold rounded-lg p-4 shadow"
+              >
+                <div
+                  class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-barbi text-gold font-bold flex items-center justify-center shadow-md"
+                >
+                  {i + 1}
+                </div>
+                <h3 class="text-rose-700 font-bold mb-1">
+                  {$t(`home.maze.flow.${s}.title`)}
+                </h3>
+                <p class="text-slate-800 text-sm leading-relaxed">
+                  {$t(`home.maze.flow.${s}.desc`)}
+                </p>
+              </div>
+            {/each}
+          </div>
+        </section>
+
+        <!-- בלוק: הקונסיירז' (דו‑קהלי) -->
+        <section id="concierge" class="scroll-mt-16">
+          <p class="text-center text-barbi font-bold tracking-widest mb-1">
+            {$t('home.concierge.eyebrow')}
+          </p>
+          <h2 class="text-rose-700 font-bold text-2xl mb-2 text-center">
+            {$t('home.concierge.title')}
+          </h2>
+          <p class="text-center text-slate-800 mb-2">
+            {$t('home.concierge.subtitle')}
+          </p>
+          <p class="text-center text-rose-600 text-sm mb-5">
+            {$t('home.concierge.flow')}
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div
+              class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
+            >
+              <h3 class="text-rose-700 font-bold text-lg mb-2">
+                {$t('home.concierge.customerTitle')}
+              </h3>
+              <p class="text-slate-800 text-sm leading-relaxed mb-4 grow">
+                {$t('home.concierge.customerDesc')}
+              </p>
+              <button
+                class="bg-barbi hover:bg-white hover:text-barbi text-gold font-semibold px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:scale-105"
+                onclick={() => goto('/concierge/new')}
+              >
+                {$t('home.concierge.customerCta')}
+              </button>
+            </div>
+            <div
+              class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
+            >
+              <h3 class="text-rose-700 font-bold text-lg mb-2">
+                {$t('home.concierge.providerTitle')}
+              </h3>
+              <p class="text-slate-800 text-sm leading-relaxed mb-4 grow">
+                {$t('home.concierge.providerDesc')}
+              </p>
+              <button
+                class="bg-gold hover:bg-barbi hover:text-gold text-barbi font-semibold px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:scale-105"
+                onclick={() => goto('/concierge')}
+              >
+                {$t('home.concierge.providerCta')}
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- בלוק: למי זה מתאים -->
+        <section id="who" class="scroll-mt-16">
+          <h2 class="text-rose-700 font-bold text-2xl mb-1 text-center">
+            {$t('home.sections.whoTitle')}
+          </h2>
+          <p class="text-center text-slate-700 text-sm mb-5">
+            {$t('home.sections.whoSub')}
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {#each [['🧑‍🎨', 'whoFreelancer'], ['🏪', 'whoBusiness'], ['🌱', 'whoCreators']] as [icon, key]}
+              <div
+                class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col text-center"
+              >
+                <div class="text-3xl mb-1">{icon}</div>
+                <h3 class="text-rose-700 font-bold mb-1">
+                  {$t(`home.sections.${key}_t`)}
+                </h3>
+                <p class="text-slate-800 text-sm leading-relaxed">
+                  {$t(`home.sections.${key}_d`)}
+                </p>
+              </div>
+            {/each}
+          </div>
+        </section>
+
+        <!-- בלוק: הוכחה חברתית / תנועה עולמית -->
+        <section class="text-center">
+          <h2 class="text-rose-700 font-bold text-2xl mb-1">
+            {$t('home.sections.proofTitle')}
+          </h2>
+          <p class="text-slate-700 text-sm mb-4 max-w-md mx-auto">
+            {$t('home.sections.proofSub')}
+          </p>
+          <div class="flex justify-center items-stretch gap-3 flex-wrap">
+            <div class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]">
+              <div class="text-2xl font-bold text-white">{projectsCount}</div>
+              <div class="text-white/90 text-xs">{$t('home.sections.proofStatProjects')}</div>
+            </div>
+            <div class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]">
+              <div class="text-2xl font-bold text-white">{usersCount}</div>
+              <div class="text-white/90 text-xs">{$t('home.sections.proofStatMembers')}</div>
+            </div>
+            <div class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]">
+              <div class="text-2xl font-bold text-white">{membersCount}</div>
+              <div class="text-white/90 text-xs">{$t('home.sections.proofStatSigners')}</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- בלוק: מפת ההסכמה הגלובלית -->
+        <section class="text-center">
+          <h2 class="text-rose-700 font-bold text-2xl mb-1">
+            {$t('home.sections.mapTitle')}
+          </h2>
+          <p class="text-slate-700 text-sm mb-4 max-w-md mx-auto">
+            {$t('home.sections.mapSub')}
+          </p>
+          <a
+            href="/love"
+            data-sveltekit-prefetch
+            class="inline-block bg-barbi hover:bg-white hover:text-barbi text-gold font-semibold px-5 py-2 rounded-lg shadow-md hover:scale-105 transition-all duration-300"
+          >
+            🗺️ {$t('home.sections.mapCta')}
+          </a>
+        </section>
+
+        <!-- בלוק: מודל / תמחור -->
+        <section class="text-center">
+          <div class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-2xl px-5 py-5 shadow">
+            <h2 class="text-rose-700 font-bold text-2xl mb-1">
+              {$t('home.sections.modelTitle')}
+            </h2>
+            <p class="text-slate-800 leading-relaxed max-w-md mx-auto">
+              {$t('home.sections.modelSub')}
+            </p>
+          </div>
+        </section>
+
+        <!-- בלוק: שאלות נפוצות -->
+        <section id="faq" class="scroll-mt-16">
+          <h2 class="text-rose-700 font-bold text-2xl mb-4 text-center">
+            {$t('home.sections.faqTitle')}
+          </h2>
+          <div class="flex flex-col gap-2">
+            {#each ['1', '2', '3', '5', '6'] as q}
+              <details
+                class="bg-white/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-2 shadow"
+              >
+                <summary class="text-rose-700 font-semibold cursor-pointer py-1">
+                  {$t(`home.maze.faq.q${q}`)}
+                </summary>
+                <p class="text-slate-800 text-sm leading-relaxed pt-2">
+                  {$t(`home.maze.faq.a${q}`)}
+                </p>
+              </details>
+            {/each}
+          </div>
+        </section>
+
+        <!-- בלוק: קריאה לפעולה סופית -->
+        <section class="mb-8">
+          <div
+            class="bg-gradient-to-br from-gold via-barbi to-gold px-5 py-6 rounded-2xl border-2 border-gold shadow-xl text-center"
+          >
+            <h2 class="text-2xl font-bold text-white mb-2">
+              {$t('home.sections.ctaFinalTitle')}
+            </h2>
+            <p class="text-white/90 mb-4">
+              {$t('home.sections.ctaFinalSub')}
+            </p>
+            <div class="flex gap-3 justify-center flex-wrap">
+              <button
+                class="bg-white text-barbi font-bold px-5 py-2 rounded-xl shadow-lg hover:scale-105 transition-all duration-300"
+                onclick={() => {
+                  goto('/login');
+                  fi = true;
+                }}
+              >
+                {$t('home.cta.login')}
+              </button>
+              <button
+                class="bg-barbi text-gold font-bold px-5 py-2 rounded-xl shadow-lg hover:scale-105 transition-all duration-300"
+                onclick={() => {
+                  goto(
+                    $locale == 'he'
+                      ? '/hascama'
+                      : $locale == 'ar'
+                        ? '/aitifaqia'
+                        : '/convention'
+                  );
+                  fi = true;
+                }}
+              >
+                {$t('home.cta.register')}
+              </button>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   </div>
