@@ -340,10 +340,7 @@
     lockTimerForEdit(mId);
   }
 
-  let miDatan;
-  let token;
-  let bearer1;
-  let linkg = baseUrl + '/graphql';
+
 
   // this is a very imperfect way to have the dials rotate smoothly back to 0
   // set a transition on the minutes and seconds dial, but only when lapse is set to 0

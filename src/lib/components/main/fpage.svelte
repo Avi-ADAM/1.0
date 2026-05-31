@@ -207,9 +207,9 @@
     {#if $lang == 'he'}
       <a
         class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
-        title=" 1💗1 אודות "
-        data-sveltekit-prefetch
-        href="/about"
+        title=" ההסכמה אודות "
+        target="_blank"
+        href="https://agreement.1lev1.com"
       >
         {$t('home.nav.about')}
       </a>
@@ -223,8 +223,8 @@
     </a>
     <a
       class="text-barbi border-2 border-lturk font-bold hover:text-gold text-center bg-gold hover:bg-barbi px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
-      data-sveltekit-prefetch
-      href="/love"
+      target="_blank"
+      href="https://agreement.1lev1.com/love"
     >
       {$t('home.nav.agreementMap')}
     </a>

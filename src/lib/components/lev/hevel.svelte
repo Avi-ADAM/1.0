@@ -11,7 +11,6 @@ let fblink = $state(), twiterlink = $state(), discordlink = $state(), githublink
 let load = $state(false)
 let projects =$state([]);
 let uskill =$state([]);
-let idL;
 let srcU = $state("https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png");
 let uww = $state([]);
 let fmm = $state([]);
@@ -20,13 +19,7 @@ let val = $state([]);
 let mash = $state([])
 let error1 = null;
 
-     onMount(async () => {
-
-  const cookieValueId = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('id='))
-  .split('=')[1];
-  idL = cookieValueId;
+    onMount(async () => {
         try {
             const res = await sendToSer({ id: userId }, "52GetUserById", 0, 0, false, fetch);
             user = res.data.usersPermissionsUser.data.attributes;

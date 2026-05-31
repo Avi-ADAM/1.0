@@ -46,6 +46,7 @@
    * @property {string} [glowColor]
    * @property {Array} [user_1s]
    * @property {Array} [users]
+   * @property {number} [noofusers]
    * @property {number} [activeOrder]
    * @property {() => void} [onProj]
    */
@@ -60,9 +61,9 @@
     src2,
     missionBName,
     missionDetails,
-    noofusersNo,
-    noofusersOk,
-    noofusersWaiting,
+    noofusersNo = $bindable(),
+    noofusersOk = $bindable(),
+    noofusersWaiting = $bindable(),
     hearotMeyuchadot,
     mypos,
     valph,
@@ -81,7 +82,8 @@
 
     // מודרניזציה Props
     glowColor = 'gold', // צבע זהב כברירת מחדל לחלוקה
-    users = [],
+    users = $bindable([]),
+    noofusers,
     activeOrder = 0,
     onProj
   } = $props();
@@ -255,7 +257,9 @@
     {projectName}
     cardType={tr.headers.haluka[$lang]}
     cardTitle={missionBName}
-    memberCount={users?.length || noofusersOk + noofusersNo + noofusersWaiting}
+    memberCount={user_1s?.length ||
+      noofusers ||
+      noofusersOk + noofusersNo + noofusersWaiting}
     {glowColor}
     onProjectClick={handleProjectClick}
   />

@@ -6,18 +6,9 @@ import { lang } from '$lib/stores/lang.js'
 import { sendToSer } from '$lib/send/sendToSer.js';
 import RichText from '$lib/celim/ui/richText.svelte'
   let { missionId, onProject } = $props();
-let projectUsers =[];
-let idL;
-let srcP;
 let error1 = null;
 let projecto = [];
 async function xyd () {
-
-  const cookieValueId = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('id='))
-  .split('=')[1];
-  idL = cookieValueId;
     let datar;
         try {
             const res = await sendToSer({ id: missionId }, "51GetOpenMissionById", 0, 0, false, fetch);

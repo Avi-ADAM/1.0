@@ -118,20 +118,20 @@
     langUs.set(data.lang);
     doesLang.set(true);
 
-    // Check authentication
-    if (!page.data.tok) {
-      goto('/login');
+    // Check authentication (uid is provided by server if session is valid)
+    if (!page.data.uid) {
+      goto('/login?from=lev');
       return;
     }
 
     try {
-      // Initialize data using new architecture
-      await initializeLevData(page.data.uid, page.data.tok, data.lang);
+      // Initialize data using new architecture (token is now handled by server cookies)
+      await initializeLevData(page.data.uid, '', data.lang);
 
       // Setup socket listeners using new architecture
       unsubscribeSocket = setupSocketListeners(
         page.data.uid,
-        page.data.tok,
+        '',
         data.lang
       );
 
