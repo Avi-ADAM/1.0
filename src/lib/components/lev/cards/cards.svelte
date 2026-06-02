@@ -715,6 +715,7 @@
                       sqadualed={buble.sqadualed}
                       sqadualedf={buble.sqadualedf}
                       linkto={buble.linkto}
+                      location={buble.location}
                       pendId={buble.pendId}
                       users={buble.users}
                       nego_mashes={buble.nego_mashes || []}
@@ -769,6 +770,7 @@
                       mdate={buble.mdate}
                       mdates={buble.dates}
                       vallues={buble.vallues}
+                      location={buble.location}
                       pendId={buble.pendId}
                       isKavua={buble.isKavua}
                       diun={buble.diun}

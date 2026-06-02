@@ -4,6 +4,7 @@
   import UploadPic from '$lib/components/userPr/uploadPic.svelte';
   import MissionPickerList from './MissionPickerList.svelte';
   import ResourcePickerList from './ResourcePickerList.svelte';
+  import LocationPicker from '$lib/components/location/LocationPicker.svelte';
   import type {
     ComposeMode,
     PricingMode,
@@ -67,6 +68,38 @@
   let loading = $state(false);
   let success = $state(false);
   let error = $state(false);
+
+  let locationOpen = $state(false);
+  let locationScope = $state({
+    location_mode: 'unspecified' as 'online' | 'onsite' | 'hybrid' | 'unspecified',
+    isOnline: false,
+    lat: null as number | null,
+    lng: null as number | null,
+    radius: 15 as number | null,
+    location_hint: '' as string | null
+  });
+
+  function normalizeLocationNumber(v: unknown): number | null {
+    return typeof v === 'number' && Number.isFinite(v) ? v : null;
+  }
+  function hasLocationPoint(loc: typeof locationScope) {
+    return (
+      typeof loc?.lat === 'number' && Number.isFinite(loc.lat) &&
+      typeof loc?.lng === 'number' && Number.isFinite(loc.lng)
+    );
+  }
+  function hasLocationValue(loc: typeof locationScope) {
+    return loc?.location_mode !== 'unspecified' || hasLocationPoint(loc) || Boolean(loc?.location_hint?.trim());
+  }
+  function locationSummary(loc: typeof locationScope, tl: typeof t) {
+    if (!loc || !hasLocationValue(loc)) return tl.locationEmpty;
+    if (loc.location_mode === 'online') return tl.locationOnline;
+    if (hasLocationPoint(loc)) {
+      const hint = loc.location_hint?.trim() || tl.locationSelected;
+      return `${hint} - ${loc.radius || 15} km`;
+    }
+    return loc.location_hint?.trim() || tl.locationSelected;
+  }
 
   const isComplex = $derived(mode === 'complex');
   const pricingMode = $derived<PricingMode>(isComplex ? 'estimated' : 'fixed');
@@ -142,7 +175,13 @@
           openWarn:
             'יש פריטים ללא שיוך - יוצגו ללקוחות בתגית "מחפשים ספק" וייתכן עיכוב באספקה.',
           complexHint:
-            'התוספת של "מוצר מורכב" - מתכון של משימות ומשאבים. כל השאר זהה למוצר פשוט.'
+            'התוספת של "מוצר מורכב" - מתכון של משימות ומשאבים. כל השאר זהה למוצר פשוט.',
+          locationTitle: 'מיקום המוצר',
+          locationHelper: 'ציינו אם המוצר/שירות ניתן אונליין, פיזית, או שניהם.',
+          locationEmpty: 'הוסיפו מיקום (לא חובה)',
+          locationOnline: 'אונליין',
+          locationSelected: 'מיקום נבחר',
+          locationDone: 'סיים מיקום'
         }
       : {
           title: 'Create Product',
@@ -176,7 +215,13 @@
           openWarn:
             'Items without an assignee will be shown as "looking for provider"; delivery may be delayed.',
           complexHint:
-            'Complex products add a recipe of missions and resources. The base fields remain the same as a simple product.'
+            'Complex products add a recipe of missions and resources. The base fields remain the same as a simple product.',
+          locationTitle: 'Product location',
+          locationHelper: 'Specify if the product/service is online, onsite, or hybrid.',
+          locationEmpty: 'Add location (optional)',
+          locationOnline: 'Online',
+          locationSelected: 'Location set',
+          locationDone: 'Done'
         }
   );
 
@@ -255,6 +300,11 @@
         datef,
         oneForeProject,
         picId,
+        isOnline: locationScope.location_mode === 'online',
+        lat: normalizeLocationNumber(locationScope.lat),
+        lng: normalizeLocationNumber(locationScope.lng),
+        radius: normalizeLocationNumber(locationScope.radius),
+        location_hint: locationScope.location_hint?.trim() || null,
         recipeMissions: isComplex
           ? recipeMissions.map(toRecipeMissionPayload)
           : [],
@@ -413,6 +463,26 @@
     <span>{t.oneForeProject}</span>
   </label>
 
+  <!-- Location -->
+  <div class="field">
+    <button
+      type="button"
+      class="location-toggle"
+      class:active={locationOpen || hasLocationValue(locationScope)}
+      onclick={() => (locationOpen = !locationOpen)}
+    >
+      {locationOpen ? t.locationDone : locationSummary(locationScope, t)}
+    </button>
+    {#if locationOpen}
+      <LocationPicker
+        bind:value={locationScope}
+        label={t.locationTitle}
+        helper={t.locationHelper}
+        height="280px"
+      />
+    {/if}
+  </div>
+
   <!-- Simple total preview -->
   {#if !isComplex}
     <div class="summary">
@@ -511,6 +581,21 @@
 </div>
 
 <style>
+  .location-toggle {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-22, #2a2030);
+    color: var(--gold-l, #f1c47a);
+    border: 1px solid var(--border, #3b3540);
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: start;
+    font-size: 0.9rem;
+  }
+  .location-toggle.active {
+    border-color: var(--gold, #d8a64b);
+  }
+
   .compose-product {
     background: var(--bg, #1f1c24);
     color: var(--text, #f4ecd6);

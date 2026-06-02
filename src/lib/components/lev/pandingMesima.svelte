@@ -5,6 +5,7 @@
   import { fly } from 'svelte/transition';
   import { onMount } from 'svelte';
   import Nego from '../prPr/negoM.svelte';
+  import LocationView from '$lib/components/location/LocationView.svelte';
   import { goto } from '$app/navigation';
   import { idPr } from '../../stores/idPr.js';
   import Diun from './diun.svelte';
@@ -56,6 +57,7 @@
    * @property {any} [diun]
    * @property {any} [order]
    * @property {number} [ordern]
+   * @property {any} [location]
    * @property {boolean} [cards]
    * @property {(payload: { ani: string, coinlapach: any }) => void} [onCoinLapach]
    * @property {(payload: { id: any }) => void} [onProj]
@@ -111,6 +113,7 @@
     diun = [],
     order = diun.length,
     ordern = 0,
+    location = null,
     cards = false,
     onCoinLapach,
     onProj,
@@ -528,6 +531,7 @@
               {isKavua}
               {publicklinks}
               {privatlinks}
+              {location}
               {restime}
               {pendId}
               {users}
@@ -657,6 +661,11 @@
               >{noofhours * perhour}
             </span>
           </p>
+          {#if location}
+            <div style="width:90%;margin:6px auto 2px;">
+              <LocationView {location} dense />
+            </div>
+          {/if}
           <p class="p">
             <span
               onmouseenter={() => hover('סך ההצבעות בעד')}
@@ -818,6 +827,7 @@
                 {restime}
                 {sqadualed}
                 {dates}
+                {location}
                 {createdAt}
                 {descrip}
                 {mypos}
@@ -844,6 +854,7 @@
     {skills}
     {sqadualed}
     {dates}
+    {location}
     {timegramaDate}
     {tafkidims}
     {workways}

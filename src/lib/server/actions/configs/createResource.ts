@@ -80,6 +80,24 @@ async function ensureMashaabim(
   return String(createdId);
 }
 
+// ─── location helper ───────────────────────────────────────────────────────
+function buildLocationInput(
+  isOnline?: boolean,
+  lat?: number | null,
+  lng?: number | null,
+  radius?: number | null,
+  location_hint?: string | null
+): Record<string, unknown> | null {
+  if (lat == null && lng == null && !location_hint && isOnline === undefined) return null;
+  const loc: Record<string, unknown> = {};
+  if (lat != null) loc.lat = lat;
+  if (lng != null) loc.lng = lng;
+  if (radius != null) loc.radius = Math.round(radius);
+  if (location_hint) loc.location_hint = location_hint;
+  if (isOnline === true) loc.location_mode = 'online';
+  return Object.keys(loc).length > 0 ? loc : null;
+}
+
 // ─── handler ───────────────────────────────────────────────────────────────
 const createResourceHandler: ActionExecutionHandler = async (params, context) => {
   const {
@@ -99,8 +117,17 @@ const createResourceHandler: ActionExecutionHandler = async (params, context) =>
     isAssigned = false,
     isReceived = false,
     existingSpId,          // ID of an existing Sp record (personal resource)
-    restime                // response-time string used for Timegrama deadline
+    restime,               // response-time string used for Timegrama deadline
+    isOnline,
+    lat,
+    lng,
+    radius,
+    location_hint
   } = params;
+
+  if ((kindOf === 'monthly' || kindOf === 'yearly') && (!startDate || !endDate)) {
+    throw new Error('Start and end dates are required for monthly and yearly resources');
+  }
 
   const now = new Date().toISOString();
   const f = context.fetch as typeof fetch;
@@ -155,6 +182,9 @@ const createResourceHandler: ActionExecutionHandler = async (params, context) =>
   if (startDate)    resourceData.sqadualed  = startDate;
   if (endDate)      resourceData.sqadualedf = endDate;
 
+  const locationInput = buildLocationInput(isOnline, lat, lng, radius, location_hint);
+  if (locationInput) resourceData.location = locationInput;
+
   if (isPmash) {
     resourceData.users = [{
       what: true,
@@ -206,7 +236,8 @@ const createResourceHandler: ActionExecutionHandler = async (params, context) =>
           mashaabim:  ensuredMashaabimId,
           publishedAt: now,
           ...(startDate ? { sdate: startDate } : {}),
-          ...(endDate   ? { fdate: endDate } : {})
+          ...(endDate   ? { fdate: endDate } : {}),
+          ...(locationInput ? { location: locationInput } : {})
         }
       });
       spId = spData?.createSp?.data?.id ?? null;
@@ -302,7 +333,8 @@ const createResourceHandler: ActionExecutionHandler = async (params, context) =>
           mashaabim:  ensuredMashaabimId,
           publishedAt: now,
           ...(startDate ? { sdate: startDate } : {}),
-          ...(endDate   ? { fdate: endDate }   : {})
+          ...(endDate   ? { fdate: endDate }   : {}),
+          ...(locationInput ? { location: locationInput } : {})
         }
       });
       spId = spData?.createSp?.data?.id ?? null;
@@ -445,6 +477,31 @@ export const createResourceAction: ActionConfig = {
       type: 'string',
       required: false,
       description: 'End date'
+    },
+    isOnline: {
+      type: 'boolean',
+      required: false,
+      description: 'Whether the resource can be provided online'
+    },
+    lat: {
+      type: 'number',
+      required: false,
+      description: 'Resource latitude'
+    },
+    lng: {
+      type: 'number',
+      required: false,
+      description: 'Resource longitude'
+    },
+    radius: {
+      type: 'number',
+      required: false,
+      description: 'Resource service radius in km'
+    },
+    location_hint: {
+      type: 'string',
+      required: false,
+      description: 'Human-readable location hint'
     },
     isAssigned: {
       type: 'boolean',

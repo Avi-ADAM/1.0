@@ -13,8 +13,8 @@
   import { toast } from 'svelte-sonner';
   import Rich from '../conf/rich.svelte';
   import ActsNego from '../conf/actsNego.svelte';
-  import { crTask } from '$lib/func/moach/crtask.svelte';
-  import { page } from '$app/state';
+  import LocationNego from '../conf/locationNego.svelte';
+  import { submitNegoMission } from '$lib/client/actionClient';
   /**
    * @typedef {Object} Props
    * @property {any} [negopendmissions]
@@ -53,6 +53,7 @@
    * @property {boolean} [masaalr]
    * @property {any} restime
    * @property {any} [acts]
+   * @property {any} [location]
    * @property {Function} [onClose]
    * @property {Function} [onLoad]
    * @property {number} [isAsk]
@@ -96,6 +97,7 @@
     masaalr = false,
     restime,
     acts = [],
+    location = null,
     onClose,
     onLoad,
     isAsk = 0
@@ -104,23 +106,23 @@
   let datai = $state([]);
 
   $effect(() => {
+    const items = [
+      {
+        leb: `${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,
+        value: noofhours2 * perhour2
+      },
+      {
+        leb: `${tri?.nego?.original[$lang]},${noofhours * perhour}`,
+        value: noofhours * perhour
+      }
+    ];
     if (negopendmissions.length > 0) {
-      datai = [
-        {
-          leb: `${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,
-          value: noofhours2 * perhour2
-        },
-        {
-          leb: `${tri?.nego?.original[$lang]},${noofhours * perhour}`,
-          value: noofhours * perhour
-        }
-      ];
       for (let i = 0; i < negopendmissions.length; i++) {
         if (
           negopendmissions[i].attributes.perhour != null ||
           negopendmissions[i].attributes.noofhours != null
         ) {
-          datai.push({
+          items.push({
             leb: `${tri?.nego?.oldno[$lang]}-${i + 1}, ${(negopendmissions[i].attributes.noofhours ?? noofhours) * (negopendmissions[i].attributes.perhour ?? perhour)}`,
             value:
               (negopendmissions[i].attributes.noofhours ?? noofhours) *
@@ -128,33 +130,15 @@
           });
         }
       }
-    } else {
-      datai = [
-        {
-          leb: `${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,
-          value: noofhours2 * perhour2
-        },
-        {
-          leb: `${tri?.nego?.original[$lang]},${noofhours * perhour}`,
-          value: noofhours * perhour
-        }
-      ];
     }
+    datai = items;
   });
   console.log(negopendmissions);
   const tri = tr;
   let isKavua2 = $state();
   let newcontent = $state(true);
 
-  let miDatan = [];
   let error1;
-  let bearer1;
-  let token;
-  let idL;
-  let no = false;
-  let masa = false;
-  let data;
-  let isOpen;
   let placeholder4 = `בחירת תפקידים`;
   let roles = $state($role);
   let why = '';
@@ -184,112 +168,45 @@
   let acts2 = $state(
     acts?.data && Array.isArray(acts.data) ? [...acts.data] : []
   );
+  let location2 = $state(
+    location
+      ? { ...location }
+      : {
+          location_mode: 'unspecified',
+          isOnline: false,
+          lat: null,
+          lng: null,
+          radius: 15,
+          location_hint: ''
+        }
+  );
 
-  let rishon = 0;
-  function myMission() {
-    let checkBox = document.getElementById('tomeC');
-
-    let text = document.getElementById('doneC');
-    console.log(text);
-    if (text.style.display == 'none') {
-      text.style.display = '';
-    } else {
-      text.style.display = 'none';
+  function locationChanged() {
+    const a = location;
+    const b = location2;
+    if (a == null) {
+      return (
+        (b?.location_mode ?? 'unspecified') !== 'unspecified' ||
+        b?.lat != null ||
+        b?.lng != null ||
+        Boolean(b?.location_hint?.trim())
+      );
     }
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    rishon = idL;
+    return (
+      (a.location_mode ?? 'unspecified') !== (b?.location_mode ?? 'unspecified') ||
+      (a.lat ?? null) !== (b?.lat ?? null) ||
+      (a.lng ?? null) !== (b?.lng ?? null) ||
+      (a.radius ?? null) !== (b?.radius ?? null) ||
+      (a.location_hint ?? '') !== (b?.location_hint ?? '')
+    );
   }
-  let rishonves = 0;
-  function myMissionH() {
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    rishonves = idL;
-    /*let checkBox = document.getElementById("done");
-  // Get the output text
-  let text = document.getElementById("hoursC");
-  let text2 = document.getElementById("vallueperhourC");
-  let text3 = document.getElementById("vallueperhourN");
-  let text4 = document.getElementById("hoursD");
-  let text5 = document.getElementById("vallueperM");
-  // If the checkbox is checked, display the output text
-  if (text.style.display == "none"){
-    text.style.display = "";
-    text2.style.display = "";
-    text3.style.display = "none";
-    text4.style.display = "none";
-    text5.style.display = "none";
-  } else {
-    text.style.display = "none";
-    text2.style.display = "none";
-    text3.style.display = "";
-    text4.style.display = "";
-    text5.style.display = "";
-  }*/
-  }
+
 
   function arraysEqual(a1, a2) {
     return JSON.stringify(a1) == JSON.stringify(a2);
   }
   function close() {
     onClose?.();
-  }
-  let name4 = ``;
-  let descrip4 = ``;
-  let hearotMeyuchadot4 = ``;
-  let noofhours4 = ``;
-  let perhour4 = ``;
-  let skills4 = ``;
-  let roles4 = ``;
-  let ww4 = ``;
-  let rishon4 = ``;
-  let rishonves4 = ``;
-  let what4 = true;
-  function objToString(obj) {
-    if (!obj || !Array.isArray(obj)) return '';
-    let str = '';
-    for (let i = 0; i < obj.length; i++) {
-      str += '{';
-      for (const [p, val] of Object.entries(obj[i])) {
-        if (typeof val == 'string') {
-          str += `${p}:"${val}"\n`;
-        } else if (typeof val == 'number' || typeof val == 'boolean') {
-          str += `${p}:${val}\n`;
-        } else if (Array.isArray(val)) {
-          str += `${p}:[${val.map((c) => (c && typeof c === 'object' ? c.id : c)).join(',')}]\n`;
-        } else if (val === null) {
-          str += `${p}:null\n`;
-        }
-      }
-      str += '},';
-    }
-    return str;
-  }
-  function objToStringC(obj) {
-    if (!obj || !Array.isArray(obj)) return '';
-    let str = '';
-    for (let i = 0; i < obj.length; i++) {
-      str += '{';
-      for (const [p, val] of Object.entries(obj[i])) {
-        if (typeof val == 'string') {
-          str += `${p}:"${val}"\n`;
-        } else if (typeof val == 'number' || typeof val == 'boolean') {
-          str += `${p}:${val}\n`;
-        } else if (Array.isArray(val)) {
-          str += `${p}:[${val.map((c) => (c && typeof c === 'object' ? c.id : c)).join(',')}]\n`;
-        } else if (val === null) {
-          str += `${p}:null\n`;
-        }
-      }
-      str += '},';
-    }
-    return str;
   }
 
   function hasActsChanged() {
@@ -316,387 +233,144 @@
     });
   }
 
-  async function handleActsChanges() {
-    const acts2Array = Array.isArray(acts2) ? acts2 : [];
-    const actsArray = acts?.data && Array.isArray(acts.data) ? acts.data : [];
-
-    const newActsIds = [];
-    const originalActsIds = actsArray.map((act) => act.id);
-
-    try {
-      // Process all acts in acts2
-      for (const act of acts2Array) {
-        if (act.id && act.id.startsWith('temp_')) {
-          // This is a new task that was added in negotiation
-          console.log('Creating new task:', act.attributes.shem);
-          console.log('Dates from datetime-local:', {
-            dateS: act.attributes.dateS,
-            dateF: act.attributes.dateF
-          });
-
-          // Convert datetime-local format to ISO format for GraphQL
-          let dateS = null;
-          let dateF = null;
-
-          try {
-            if (act.attributes.dateS) {
-              // datetime-local gives us "YYYY-MM-DDTHH:mm" format, we need to add seconds and timezone
-              dateS = new Date(act.attributes.dateS + ':00.000Z').toISOString();
-            }
-            if (act.attributes.dateF) {
-              dateF = new Date(act.attributes.dateF + ':00.000Z').toISOString();
-            }
-          } catch (dateError) {
-            console.error('Error converting datetime-local dates:', dateError);
-            dateS = null;
-            dateF = null;
-          }
-
-          console.log('Converted to ISO dates:', { dateS, dateF });
-
-          const result = await crTask(
-            projectId, // pid
-            null, // mbId
-            null, // assignedId
-            isAsk === 0 ? pendId : null, // pendm
-            isAsk !== 0 ? pendId : null, // open_mission
-            dateS, // dateS
-            dateF, // dateF
-            null, // myIshur
-            act.attributes.shem, // shem
-            act.attributes.des || null, // des
-            act.attributes.link || null, // link
-            null // askId
-          );
-
-          console.log('crTask result:', result);
-
-          if (result && result.data && result.data.createAct) {
-            const newActId = result.data.createAct.data.id;
-            newActsIds.push(newActId);
-            console.log('Added new act ID:', newActId);
-          } else if (result && result !== 'error') {
-            console.warn('Unexpected crTask result structure:', result);
-          } else {
-            console.error('Failed to create task for:', act.attributes.shem);
-          }
-        } else if (act.id && !act.id.startsWith('temp_')) {
-          // This is an existing task
-          newActsIds.push(act.id);
-        }
-      }
-
-      return { newActsIds, originalActsIds };
-    } catch (error) {
-      console.error('Error handling acts changes:', error);
-      // Return original IDs if creation fails
-      return { newActsIds: originalActsIds, originalActsIds };
-    }
-  }
-  let userss;
   async function increment() {
     onLoad?.();
-    //TODO: update timegrama, add now pend that is changed to nego
-    let date4 = ``,
-      dates4 = ``,
-      iskvua4 = ``,
-      iskvua4nego = ``,
-      date4nego,
-      dates4nego,
-      namefornego,
-      descrip4nego,
-      hearotMeyuchadot4nego,
-      noofhours4nego,
-      perhour4nego,
-      skills4nego,
-      roles4nego,
-      ww4nego,
-      rishon4nego,
-      rishonves4nego;
-    let d = new Date();
-    const negoss = ``;
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
-    if (rishon !== 0) {
-      rishon4 = `rishon: "${rishon}"`;
-    } else {
-      rishon4 = ``;
+
+    // Detect what changed and build newValues / originalValues
+    const newValues = {};
+    const originalValues = {};
+    let hasChanges = false;
+
+    if (isKavua !== isKavua2) {
+      newValues.iskvua = isKavua2 ?? false;
+      originalValues.isMonth = isKavua ?? false;
+      hasChanges = true;
     }
-    /* if (rishonves !== 0){
-        rishonves4= `rishonves: "${rishonves}"`
-    } else {
-        rishonves4 = ``;
+    if (mdates !== mdates2) {
+      const momebtt = moment(mdates2, 'HH:mm DD/MM/YYYY ');
+      newValues.dates = mdates2 != null ? momebtt.toISOString() : null;
+      originalValues.dates = mdates ?? null;
+      hasChanges = true;
     }
-    ${rishon4nego}
-    ${rishonves4nego}
-     ${rishon4}
-    ${rishonves4}
-    ${rishon4}
-    ${rishonves4},
-    iskvua
-    */
-    if (isKavua === isKavua2) {
-      iskvua4 = ``;
-      iskvua4nego = ``;
-    } else {
-      iskvua4nego = ` isMonth: ${isKavua ?? false},`;
-      iskvua4 = ` iskvua: ${isKavua2 ?? false},`;
-      what4 = false;
+    if (mdate !== mdate2) {
+      const momebtt = moment(mdate2, 'HH:mm DD/MM/YYYY ');
+      newValues.sqadualed = mdate2 != null ? momebtt.toISOString() : null;
+      originalValues.date = mdate ?? null;
+      hasChanges = true;
     }
-    if (mdates === mdates2) {
-      dates4 = ``;
-      dates4nego = ``;
-    } else {
-      let momebtt = moment(mdates2, 'HH:mm DD/MM/YYYY ') || null;
-      dates4nego =
-        mdates != null && mdates != undefined ? ` dates: "${mdates}",` : ``;
-      dates4 =
-        mdates2 != null && mdates2 != undefined
-          ? ` dates: "${momebtt.toISOString()}",`
-          : ``;
-      what4 = false;
+    if (name1 !== name2) {
+      newValues.name = name2;
+      originalValues.name = name1;
+      hasChanges = true;
     }
-    if (mdate === mdate2) {
-      date4 = ``;
-      date4nego = ``;
-    } else {
-      let momebtt = moment(mdate2, 'HH:mm DD/MM/YYYY ') || null;
-      date4nego =
-        mdate != null && mdate != undefined ? ` date: "${mdate}",` : ``;
-      date4 =
-        mdate2 != null && mdate2 != undefined
-          ? ` sqadualed: "${momebtt.toISOString()}",`
-          : ``;
-      what4 = false;
+    if (descrip !== descrip2) {
+      newValues.descrip = descrip2;
+      originalValues.descrip = descrip;
+      hasChanges = true;
     }
-    if (name1 === name2) {
-      name4 = ``;
-      namefornego = ``;
-    } else {
-      name4 = `name: "${name2}",`;
-      namefornego = `name: "${name1}",`;
-      what4 = false;
+    if (hearotMeyuchadot !== hearotMeyuchadot2) {
+      newValues.hearotMeyuchadot = hearotMeyuchadot2;
+      originalValues.hearotMeyuchadot = hearotMeyuchadot;
+      hasChanges = true;
     }
-    if (descrip === descrip2) {
-      descrip4 = ``;
-      descrip4nego = ``;
-    } else {
-      descrip4 = `descrip: """${descrip2}""",`;
-      descrip4nego = `descrip: """${descrip}""",`;
-      what4 = false;
+    if (noofhours !== noofhours2) {
+      newValues.noofhours = noofhours2;
+      originalValues.noofhours = noofhours;
+      hasChanges = true;
     }
-    if (hearotMeyuchadot === hearotMeyuchadot2) {
-      hearotMeyuchadot4 = ``;
-      hearotMeyuchadot4nego = ``;
-    } else {
-      hearotMeyuchadot4 = `hearotMeyuchadot: """${hearotMeyuchadot2}""",`;
-      hearotMeyuchadot4nego = `hearotMeyuchadot: """${hearotMeyuchadot}""",`;
-      what4 = false;
+    if (perhour !== perhour2) {
+      newValues.perhour = perhour2;
+      originalValues.perhour = perhour;
+      hasChanges = true;
     }
-    if (noofhours === noofhours2) {
-      noofhours4 = ``;
-      noofhours4nego = ``;
-    } else {
-      noofhours4 = `noofhours: ${noofhours2},`;
-      noofhours4nego = `noofhours: ${noofhours},`;
-      what4 = false;
-    }
-    if (perhour === perhour2) {
-      perhour4 = ``;
-      perhour4nego = ``;
-    } else {
-      perhour4 = `perhour: ${perhour2},`;
-      perhour4nego = `perhour: ${perhour},`;
-      what4 = false;
-    }
+
     const skillsId = skills?.data ? skills.data.map((c) => c.id) : [];
     const skills2Id = skills3?.data ? skills3.data.map((c) => c.id) : [];
+    if (!arraysEqual(skillsId, skills2Id)) {
+      newValues.skillIds = skills2Id;
+      originalValues.skillIds = skillsId;
+      hasChanges = true;
+    }
     const roId = tafkidims?.data ? tafkidims.data.map((c) => c.id) : [];
     const ro2Id = tafkidims2?.data ? tafkidims2.data.map((c) => c.id) : [];
+    if (!arraysEqual(roId, ro2Id)) {
+      newValues.roleIds = ro2Id;
+      originalValues.roleIds = roId;
+      hasChanges = true;
+    }
     const wwId = workways?.data ? workways.data.map((c) => c.id) : [];
     const ww2Id = workways3?.data ? workways3.data.map((c) => c.id) : [];
-    if (arraysEqual(skillsId, skills2Id) === false) {
-      skills4 = ` skills: [${skills2Id}], `;
-      skills4nego = ` skills: [${skillsId}], `;
-      what4 = false;
-    } else {
-      skills4 = ``;
-      skills4nego = ``;
+    if (!arraysEqual(wwId, ww2Id)) {
+      newValues.workwayIds = ww2Id;
+      originalValues.workwayIds = wwId;
+      hasChanges = true;
     }
-    if (arraysEqual(roId, ro2Id) === false) {
-      roles4 = ` tafkidims: [${ro2Id}], `;
-      roles4nego = ` tafkidims: [${roId}], `;
-      what4 = false;
-    } else {
-      roles4 = ``;
-      roles4nego = ``;
+
+    if (locationChanged()) {
+      newValues.location = {
+        location_mode: location2?.location_mode ?? 'unspecified',
+        isOnline: location2?.location_mode === 'online',
+        lat: location2?.lat ?? null,
+        lng: location2?.lng ?? null,
+        radius: location2?.radius ?? null,
+        location_hint: location2?.location_hint ?? null
+      };
+      originalValues.location = location ?? null;
+      hasChanges = true;
     }
-    if (arraysEqual(wwId, ww2Id) === false) {
-      ww4 = ` work_ways: [${ww2Id}], `;
-      ww4nego = ` work_ways: [${wwId}], `;
-      what4 = false;
-    } else {
-      ww4 = ``;
-      ww4nego = ``;
-    }
-    // Handle acts before main mutation
+
     const actsChanged = hasActsChanged();
-    let newActsIds = [];
-    let originalActsIds = [];
+    if (actsChanged) hasChanges = true;
+
+    // Guard: skip if nothing changed and user already voted (masaalr + mypos)
+    if (!hasChanges && masaalr && mypos) return;
+
+    // Build acts data for server
+    const acts2Array = Array.isArray(acts2) ? acts2 : [];
+    const newActs = acts2Array
+      .filter((a) => a.id?.startsWith('temp_'))
+      .map((a) => ({
+        shem: a.attributes.shem,
+        des: a.attributes.des ?? null,
+        link: a.attributes.link ?? null,
+        dateS: a.attributes.dateS ? a.attributes.dateS + ':00.000Z' : null,
+        dateF: a.attributes.dateF ? a.attributes.dateF + ':00.000Z' : null,
+      }));
+    const existingActsIds = acts2Array
+      .filter((a) => a.id && !a.id.startsWith('temp_'))
+      .map((a) => a.id);
+    const snapshotActIds = (acts?.data ?? []).map((a) => a.id);
 
     try {
-      if (actsChanged) {
-        what4 = false;
-        // Create new acts and get their IDs
-        console.log('Acts changed, creating new tasks...');
-        const actsResult = await handleActsChanges();
-        newActsIds = actsResult.newActsIds;
-        originalActsIds = actsResult.originalActsIds;
-        console.log('New acts IDs:', newActsIds);
-        console.log('Original acts IDs:', originalActsIds);
-      } else {
-        // If no changes, use existing acts IDs
-        const actsArray =
-          acts?.data && Array.isArray(acts.data) ? acts.data : [];
-        originalActsIds = actsArray.map((act) => act.id);
-        newActsIds = [...originalActsIds];
-      }
-    } catch (error) {
-      console.error('Error handling acts before mutation:', error);
-      // Fallback to original acts if there's an error
-      const actsArray = acts?.data && Array.isArray(acts.data) ? acts.data : [];
-      originalActsIds = actsArray.map((act) => act.id);
-      newActsIds = [...originalActsIds];
-    }
-    let another = ``;
-    if (
-      (what4 == true && masaalr == true && mypos == false) ||
-      (what4 == true && masaalr == false) ||
-      what4 == false
-    ) {
-      if (what4 == false) {
-        another = `,{
-      what: true
-      users_permissions_user: "${idL}"
-      order: 4
-    }`;
-      }
-      if (masaalr == true) {
-        userss = objToStringC(users);
-      } else {
-        userss = objToString(users);
-      }
-      let fd = new Date(Date.now() + x);
-      try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          //${negoss} {rishons} {rishonveses}?
-          body: JSON.stringify({
-            query: `mutation { 
-             updateTimegrama(
-     id: ${timegramaId}
-             data:{
-      date: "${fd.toISOString()}",
-             }){data {id}}
-             createNegopendmission(
-              data:{
-                publishedAt: "${d.toISOString()}",
-                ${isAsk === 0 ? `pendm:${pendId}` : `open_mission:${pendId}`},
-                 users_permissions_user: "${idL}",
-                 isOriginal:${stepState == 2 ? true : false},
-    ${iskvua4nego}             
-    ${noofhours4nego}
-    ${hearotMeyuchadot4nego}
-    ${descrip4nego}
-    ${namefornego}
-    ${perhour4nego}
-    ${skills4nego}
-    ${roles4nego}
-    ${ww4nego}
-    ${date4nego}
-    ${dates4nego}
-    ${originalActsIds.length > 0 ? `acts: [${originalActsIds.join(',')}],` : ''}
-              }
-             ){data{id}}
-          ${isAsk === 0 ? 'updatePendm' : 'updateOpenMission'}(
-     id: ${pendId}
-      data:  { 
-            ${iskvua4}             
-           ${noofhours4}
-    ${hearotMeyuchadot4}
-    ${descrip4}
-    ${name4}
-    ${perhour4}
-    ${skills4}
-    ${roles4}
-    ${ww4}
-    ${date4}
-    ${dates4}
-    ${newActsIds.length > 0 ? `acts: [${newActsIds.join(',')}],` : ''}
-       ${
-         isAsk === 0
-           ? `users:[  ${userss} 
-     {
-      what: true
-      users_permissions_user: "${idL}"
-      order: ${ordern + 1}
-      zman:"${d.toISOString()}"
-      ide:${idL}
-    }
-  ], nego:[ 
-{
-    users_permissions_user: "${idL}"
-}
-  ]`
-           : ``
-       }
-      }
-  ){data {id}}
-  ${
-    isAsk === 0
-      ? ``
-      : `
-  updateAsk(
-  id:${isAsk}
-  data:{
-  vots:[  ${userss} 
-     {
-      what: true
-      users_permissions_user: "${idL}"
-      order: ${ordern + 1}
-      zman:"${d.toISOString()}"
-      ide:${idL}
-    }
-  ]
-  }){data{id}}`
-  }
-} `
-            // make coin desapire
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
+      const result = await submitNegoMission({
+        pendId: String(pendId),
+        projectId: String(projectId),
+        timegramaId: String(timegramaId),
+        isAsk: isAsk ?? 0,
+        restime,
+        isOriginal: stepState === 2,
+        ordern: ordern ?? 0,
+        newValues,
+        originalValues,
+        newActs,
+        existingActsIds,
+        snapshotActIds,
+        actsChanged,
+        users: users ?? [],
+      });
+
+      if (result.success) {
         toast.success(tr?.toasts.suc[$lang]);
         close();
-      } catch (e) {
-        error1 = e;
-        console.log(error1);
+      } else {
         toast.warning(tr?.toasts.er[$lang]);
       }
+    } catch (e) {
+      error1 = e;
+      console.log(error1);
+      toast.warning(tr?.toasts.er[$lang]);
     }
   }
-  let x;
-  let linkg = import.meta.env.VITE_URL + '/graphql';
   let dataibno = $state({
     skillName: [],
     roleDescription: [],
@@ -764,13 +438,6 @@
     );
     console.log('acts.data:', acts?.data);
     console.log('acts2 state:', acts2);
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
     const parseJSON = (resp) => (resp.json ? resp.json() : resp);
     const checkStatus = (resp) => {
       if (resp.status >= 200 && resp.status < 300) {
@@ -840,17 +507,6 @@
 
       console.log(error1);
     }
-    if (restime == 'feh') {
-      x = 48 * 60 * 60 * 1000;
-    } else if (restime == 'sth') {
-      x = 72 * 60 * 60 * 1000;
-    } else if (restime == 'nsh') {
-      x = 96 * 60 * 60 * 1000;
-    } else if (restime == 'sevend') {
-      x = 168 * 60 * 60 * 1000;
-    }
-    x = x;
-    console.log(new Date(Date.now() + x).toLocaleString(), restime);
   });
 </script>
 
@@ -938,6 +594,12 @@
       date={mdates}
       bind:dateb={mdates2}
       lebel={tri?.common.finishDate}
+    />
+
+    <LocationNego
+      {location}
+      bind:locationb={location2}
+      lebel={{ he: 'מיקום', en: 'Location' }}
     />
 
     <ActsNego {acts} bind:actsb={acts2} lebel={{ he: 'מטלות', en: 'Tasks' }} />

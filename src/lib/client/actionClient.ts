@@ -237,6 +237,35 @@ export interface EnsureStageForumParams {
   name?: string;
 }
 
+export interface SubmitNegoMissionParams {
+  pendId: string;
+  projectId: string;
+  timegramaId: string;
+  isAsk: number;
+  restime?: string;
+  isOriginal?: boolean;
+  ordern?: number;
+  newValues?: Record<string, any>;
+  originalValues?: Record<string, any>;
+  newActs?: Array<{ shem: string; des?: string | null; link?: string | null; dateS?: string | null; dateF?: string | null }>;
+  existingActsIds?: string[];
+  snapshotActIds?: string[];
+  actsChanged?: boolean;
+  users?: Array<{ what: boolean; users_permissions_user: string; order?: number; zman?: string; ide?: number }>;
+}
+
+export interface SubmitNegoMashParams {
+  pmashId: string;
+  projectId: string;
+  timegramaId?: string;
+  restime?: string;
+  isOriginal?: boolean;
+  ordern?: number;
+  newValues?: Record<string, any>;
+  originalValues?: Record<string, any>;
+  users?: Array<{ what: boolean; users_permissions_user: string; order?: number; zman?: string; ide?: number }>;
+}
+
 export type ActionKey =
   | 'createTask'
   | 'updateTask'
@@ -255,6 +284,8 @@ export type ActionKey =
   | 'ensureStageForum'
   | 'updateProjectDetails'
   | 'createResource'
+  | 'submitNegoMission'
+  | 'submitNegoMash'
   | 'getUserForums'
   | 'getForumThread'
   | 'createChatMessage'
@@ -314,7 +345,14 @@ export interface ActionParamsMap {
     isReceived?: boolean;
     existingSpId?: string;
     restime?: string;
+    isOnline?: boolean;
+    lat?: number | null;
+    lng?: number | null;
+    radius?: number | null;
+    location_hint?: string | null;
   };
+  submitNegoMission: SubmitNegoMissionParams;
+  submitNegoMash: SubmitNegoMashParams;
   getUserForums: Record<string, never>;
   getForumThread: {
     forumId: string;
@@ -740,6 +778,20 @@ export async function createTask(
   options: ExecuteActionOptions = {}
 ): Promise<ActionResponse> {
   return executeAction('createTask', params, options);
+}
+
+export async function submitNegoMission(
+  params: SubmitNegoMissionParams,
+  options: ExecuteActionOptions = {}
+): Promise<ActionResponse> {
+  return executeAction('submitNegoMission', params, options);
+}
+
+export async function submitNegoMash(
+  params: SubmitNegoMashParams,
+  options: ExecuteActionOptions = {}
+): Promise<ActionResponse> {
+  return executeAction('submitNegoMash', params, options);
 }
 
 

@@ -41,6 +41,23 @@ interface ChecklistItem {
   dateF?: string;
 }
 
+function buildLocationInput(
+  isOnline?: boolean,
+  lat?: number | null,
+  lng?: number | null,
+  radius?: number | null,
+  location_hint?: string | null
+): Record<string, unknown> | null {
+  if (lat == null && lng == null && !location_hint && isOnline === undefined) return null;
+  const loc: Record<string, unknown> = {};
+  if (lat != null) loc.lat = lat;
+  if (lng != null) loc.lng = lng;
+  if (radius != null) loc.radius = Math.round(radius);
+  if (location_hint) loc.location_hint = location_hint;
+  if (isOnline === true) loc.location_mode = 'online';
+  return Object.keys(loc).length > 0 ? loc : null;
+}
+
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const {
     projectId,
@@ -62,6 +79,11 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     assignedUserId,       // set → assigned to someone; null/absent → open
     checklist = [],
     processId,
+    isOnline,
+    lat,
+    lng,
+    radius,
+    location_hint,
   } = params;
 
   const { userId } = context;
@@ -104,8 +126,10 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     if (!missionId) throw new Error('Failed to create Mission entity');
   }
 
+  const locationInput = buildLocationInput(isOnline, lat, lng, radius, location_hint);
+
   // Common fields for OpenMission / Pendm
-  const commonFields = {
+  const commonFields: Record<string, unknown> = {
     projectId,
     missionId,
     name: missionName,
@@ -123,6 +147,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     privatlinks: privatlinks ?? null,
     hearotMeyuchadot: spnot ?? null,
     publishedAt: nowISO,
+    ...(locationInput ? { location: locationInput } : {}),
   };
 
   const initialVote = [

@@ -5,18 +5,14 @@
   import DateNego from '../conf/dateNego.svelte';
   import TotalBar from '../conf/barb.svelte';
   import KindOfnego from '$lib/components/conf/kindOfnego.svelte';
+  import LocationNego from '$lib/components/conf/locationNego.svelte';
   const tri = tr;
-  import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang';
   import { montsi, toIsoDateString } from '$lib/func/montsi.svelte';
   import { toast } from 'svelte-sonner';
   import Rich from '../conf/rich.svelte';
-  import { page } from '$app/state';
+  import { submitNegoMash } from '$lib/client/actionClient';
 
-  let bearer1;
-  let token;
-  let idL;
-  let miDatan = [];
   let error1;
   let clicked = false;
   /**
@@ -52,6 +48,7 @@
    * @property {any} timegramaId
    * @property {number} [ordern]
    * @property {boolean} [masaalr]
+   * @property {any} [location]
    */
 
   /** @type {Props} */
@@ -87,11 +84,11 @@
     timegramaId,
     ordern = 0,
     masaalr = false,
+    location = null,
     onClose,
     onLoad
   } = $props();
 
-  let userss;
   let descrip2 = $state(descrip);
   let name2 = $state(name1);
   let sqadualed2 = $state(sqadualed);
@@ -102,293 +99,146 @@
   let hm2 = $state(hm);
   let price2 = $state(price);
   let easy2 = $state(easy);
-  let rishon = 0;
   let kindOfb = $state(kindOf);
+  let location2 = $state(
+    location
+      ? { ...location }
+      : {
+          location_mode: 'unspecified',
+          isOnline: false,
+          lat: null,
+          lng: null,
+          radius: 15,
+          location_hint: ''
+        }
+  );
+
+  function locationChanged() {
+    const a = location;
+    const b = location2;
+    if (a == null) {
+      return (
+        (b?.location_mode ?? 'unspecified') !== 'unspecified' ||
+        b?.lat != null ||
+        b?.lng != null ||
+        Boolean(b?.location_hint?.trim())
+      );
+    }
+    return (
+      (a.location_mode ?? 'unspecified') !== (b?.location_mode ?? 'unspecified') ||
+      (a.lat ?? null) !== (b?.lat ?? null) ||
+      (a.lng ?? null) !== (b?.lng ?? null) ||
+      (a.radius ?? null) !== (b?.radius ?? null) ||
+      (a.location_hint ?? '') !== (b?.location_hint ?? '')
+    );
+  }
 
   function close() {
     onClose?.();
   }
-  let name4 = ``;
-  let descrip4 = ``;
-  let spnot4 = ``;
-  let hm4 = ``;
-  let price4 = ``;
-
-  let rishon4 = ``;
-  let rishonves4 = ``;
-  let what4 = true;
-  function objToString(obj) {
-    if (!obj || !Array.isArray(obj)) return '';
-    return obj
-      .map((item) => {
-        const props = Object.entries(item)
-          .filter(
-            ([key]) =>
-              key !== '__typename' &&
-              item[key] !== null &&
-              item[key] !== undefined
-          )
-          .map(([key, val]) => {
-            let formattedVal;
-            if (
-              key === 'users_permissions_user' &&
-              typeof val === 'object' &&
-              val !== null
-            ) {
-              formattedVal = `"${val.data.id}"`;
-            } else if (typeof val === 'string') {
-              formattedVal = `"${val.replace(/"/g, '\\"')}"`;
-            } else if (val === null) {
-              formattedVal = 'null';
-            } else {
-              formattedVal = val;
-            }
-            return `${key}:${formattedVal}`;
-          })
-          .join(',');
-        return `{${props}}`;
-      })
-      .join(',');
-  }
-  function objToStringC(obj) {
-    return objToString(obj);
-  }
-
   async function increment() {
     onLoad?.();
-    //TODO: update timegrama, add now pend that is changed to nego
-    let sqadualedf4 = ``,
-      kindOf4nego = ``,
-      kindOf4 = ``,
-      sqadualed4 = ``,
-      easy4 = ``,
-      easy4nego = ``,
-      sqadualedf4nego,
-      sqadualed4nego,
-      namefornego,
-      descrip4nego,
-      spnot4nego,
-      hm4nego,
-      price4nego,
-      rishon4nego,
-      rishonves4nego;
-
-    const idCookie = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='));
-    idL = idCookie?.split('=')[1];
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
 
     if (!pendId) {
       toast.error(tr?.toasts?.er?.[$lang] ?? 'Missing resource id');
       return;
     }
-    if (!idL) {
-      toast.error(tr?.toasts?.er?.[$lang] ?? 'Missing user id');
-      return;
+
+    // Detect what changed and build newValues (to apply) / originalValues (snapshot)
+    const newValues = {};
+    const originalValues = {};
+    let hasChanges = false;
+
+    if (sqadualed !== sqadualed2) {
+      newValues.sqadualed = toIsoDateString(sqadualed2) ?? null;
+      originalValues.sqadualed = sqadualed ?? null;
+      hasChanges = true;
+    }
+    if (sqadualedf !== sqadualedf2) {
+      newValues.sqadualedf = toIsoDateString(sqadualedf2) ?? null;
+      originalValues.sqadualedf = sqadualedf ?? null;
+      hasChanges = true;
+    }
+    if (name1 !== name2) {
+      newValues.name = name2;
+      originalValues.name = name1;
+      hasChanges = true;
+    }
+    if (descrip !== descrip2) {
+      newValues.descrip = descrip2;
+      originalValues.descrip = descrip;
+      hasChanges = true;
+    }
+    if (spnot !== spnot2) {
+      newValues.spnot = spnot2;
+      originalValues.spnot = spnot;
+      hasChanges = true;
+    }
+    if (linkto !== linkto2) {
+      newValues.linkto = linkto2;
+      originalValues.linkto = linkto;
+      hasChanges = true;
+    }
+    if (Number(easy) !== Number(easy2)) {
+      newValues.easy = easy2;
+      originalValues.easy = easy;
+      hasChanges = true;
+    }
+    if (Number(hm) !== Number(hm2)) {
+      newValues.hm = hm2;
+      originalValues.hm = hm;
+      hasChanges = true;
+    }
+    if (Number(price) !== Number(price2)) {
+      newValues.price = price2;
+      originalValues.price = price;
+      hasChanges = true;
+    }
+    if (kindOf !== kindOfb) {
+      newValues.kindOf = kindOfb;
+      originalValues.kindOf = kindOf;
+      hasChanges = true;
+    }
+    if (locationChanged()) {
+      newValues.location = {
+        location_mode: location2?.location_mode ?? 'unspecified',
+        lat: location2?.lat ?? null,
+        lng: location2?.lng ?? null,
+        radius: location2?.radius ?? null,
+        location_hint: location2?.location_hint ?? null
+      };
+      originalValues.location = location ?? null;
+      hasChanges = true;
     }
 
-    if (rishon !== 0) {
-      rishon4 = `rishon: "${rishon}"`;
-    } else {
-      rishon4 = ``;
-    }
+    // Guard: skip if nothing changed and the user has already voted yes
+    if (!hasChanges && masaalr && mypos) return;
 
-    if (sqadualed === sqadualed2) {
-      sqadualed4 = ``;
-      sqadualed4nego = ``;
-    } else {
-      const sqadualedIso = toIsoDateString(sqadualed2);
-      sqadualed4nego =
-        sqadualed !== undefined ? ` sqadualed: "${sqadualed}",` : ``;
-      sqadualed4 =
-        sqadualedIso != null ? ` sqadualed: "${sqadualedIso}",` : ``;
-      what4 = false;
-    }
-    if (sqadualedf === sqadualedf2) {
-      sqadualedf4 = ``;
-      sqadualedf4nego = ``;
-    } else {
-      const sqadualedfIso = toIsoDateString(sqadualedf2);
-      sqadualedf4nego =
-        sqadualedf !== undefined ? ` sqadualedf: "${sqadualedf}",` : ``;
-      sqadualedf4 =
-        sqadualedfIso != null ? ` sqadualedf: "${sqadualedfIso}"` : ``;
-      what4 = false;
-    }
-    if (name1 === name2) {
-      name4 = ``;
-      namefornego = ``;
-    } else {
-      name4 = `name: ${JSON.stringify(name2)},`;
-      namefornego = `name: ${JSON.stringify(name1)},`;
-      what4 = false;
-    }
-    if (descrip === descrip2) {
-      descrip4 = ``;
-      descrip4nego = ``;
-    } else {
-      descrip4 = `descrip: """${descrip2}""",`;
-      descrip4nego = `descrip: """${descrip}""",`;
-      what4 = false;
-    }
-    if (spnot === spnot2) {
-      spnot4 = ``;
-      spnot4nego = ``;
-    } else {
-      spnot4 = `spnot: ${JSON.stringify(spnot2)},`;
-      spnot4nego = `spnot: ${JSON.stringify(spnot)},`;
-      what4 = false;
-    }
-    if (easy === easy2) {
-      easy4 = ``;
-      easy4nego = ``;
-    } else {
-      easy4 = `easy: ${easy2},`;
-      easy4nego = `easy: ${easy},`;
-      what4 = false;
-    }
-    if (hm === hm2) {
-      hm4 = ``;
-      hm4nego = ``;
-    } else {
-      hm4 = `hm: ${hm2},`;
-      hm4nego = `hm: ${hm},`;
-      what4 = false;
-    }
-    if (price === price2) {
-      price4 = ``;
-      price4nego = ``;
-    } else {
-      price4 = `price: ${price2},`;
-      price4nego = `price: ${price},`;
-      what4 = false;
-    }
-    if (kindOf === kindOfb) {
-      kindOf4 = ``;
-      kindOf4nego = ``;
-    } else {
-      kindOf4 = `kindOf:${kindOfb},`;
-      kindOf4nego = `kindOf:${kindOf},`;
-      what4 = false;
-    }
+    try {
+      const result = await submitNegoMash({
+        pmashId: String(pendId),
+        projectId: String(projectId),
+        timegramaId: timegramaId != null ? String(timegramaId) : undefined,
+        restime,
+        isOriginal: stepState === 2,
+        ordern: ordern ?? 0,
+        newValues,
+        originalValues,
+        users: users ?? []
+      });
 
-    let fd = new Date(Date.now() + (x ?? 48 * 60 * 60 * 1000));
-    let d = new Date();
-    let another = ``;
-    if (
-      (what4 == true && masaalr == true && mypos == false) ||
-      (what4 == true && masaalr == false) ||
-      what4 == false
-    ) {
-      if (what4 == false) {
-        another = `,{
-      what: true
-      users_permissions_user: "${idL}"
-      order: 4
-      zman: "${d.toISOString()}"
-    }`;
-      }
-      if (masaalr == true) {
-        userss = objToStringC(users);
-      } else {
-        userss = objToString(users);
-      }
-
-      const timegramaMutation = timegramaId
-        ? `updateTimegrama(
-     id: ${timegramaId}
-             data:{
-      date: "${fd.toISOString()}",
-             }){data {id}}`
-        : '';
-
-      try {
-        const response = await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation { 
-             ${timegramaMutation}
-             createNegoMash(
-              data:{
-              users_permissions_user:"${idL}",
-                publishedAt: "${d.toISOString()}",
-                pmash:${pendId},
-                 isOriginal:${stepState == 2 ? true : false},
-                 ${kindOf4nego}
-    ${easy4nego}             
-    ${hm4nego}
-    ${spnot4nego}
-    ${descrip4nego}
-    ${namefornego}
-    ${price4nego}
-    ${sqadualedf4nego}
-    ${sqadualed4nego}
-              }
-             ){data{id}}
-            updatePmash(
-     id: ${pendId}
-      data:  { 
-            ${easy4}             
-           ${hm4}
-    ${spnot4}
-    ${kindOf4}
-    ${descrip4}
-    ${name4}
-    ${price4}
-    ${sqadualedf4}
-    ${sqadualed4}
-        users:[  ${userss}${userss ? ',' : ''}
-     {
-      what: true
-      users_permissions_user: "${idL}"
-      order: ${ordern + 1}
-      zman: "${d.toISOString()}"
-    }
-  ]
-      }
-  ){data {  id}}
-} `
-          })
-        });
-        const data = await response.json();
-        miDatan = data;
-        if (data?.errors?.length) {
-          console.error(data.errors);
-          toast.error(tr?.toasts?.er?.[$lang] ?? 'Error');
-          return;
-        }
+      if (result.success) {
         toast.success(tr?.toasts.suc[$lang]);
         close();
-      } catch (e) {
-        error1 = e;
-        console.log(error1);
+      } else {
         toast.error(tr?.toasts?.er?.[$lang] ?? 'Error');
       }
+    } catch (e) {
+      error1 = e;
+      console.log(error1);
+      toast.error(tr?.toasts?.er?.[$lang] ?? 'Error');
     }
   }
-  let x;
-  let linkg = import.meta.env.VITE_URL + '/graphql';
-  onMount(async () => {
-    console.log('mounted', $lang);
-    if (restime == 'feh') {
-      x = 48 * 60 * 60 * 1000;
-    } else if (restime == 'sth') {
-      x = 72 * 60 * 60 * 1000;
-    } else if (restime == 'nsh') {
-      x = 96 * 60 * 60 * 1000;
-    } else if (restime == 'sevend') {
-      x = 168 * 60 * 60 * 1000;
-    }
-    x = x;
-    console.log(new Date(Date.now() + x).toLocaleString(), restime);
-  });
-
   const effectiveHmNew = $derived(
     kindOfb === 'total' ? 1 : Number(hm2) || 0
   );
@@ -493,6 +343,12 @@
         lebel={tri?.common.finishDate}
       />
     {/if}
+
+    <LocationNego
+      {location}
+      bind:locationb={location2}
+      lebel={{ he: 'מיקום', en: 'Location' }}
+    />
 
     <!---<div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
     <div class="flex flex-row align-middle justify-center gap-x-2">

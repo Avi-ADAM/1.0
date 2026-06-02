@@ -68,6 +68,13 @@
   let loadingMap = $state(true);
   let locating = $state(false);
   let mapError = $state('');
+  let geocoding = $state(false);
+
+  // Tracks whether the user typed their own description. While false, picking a
+  // point auto-fills location_hint with a reverse-geocoded place name.
+  let hintEdited = $state(Boolean(value.location_hint?.trim()));
+  let geocodeController: AbortController | null = null;
+  let geocodeTimer: ReturnType<typeof setTimeout> | null = null;
 
   const hasPoint = $derived(
     typeof value.lat === 'number' &&
@@ -115,7 +122,7 @@
 
       marker.on('dragend', () => {
         const point = marker?.getLngLat();
-        if (point) setPoint(point.lat, point.lng, 'marker');
+        if (point) setPoint(point.lat, point.lng);
       });
 
       map.on('load', () => {
@@ -127,7 +134,7 @@
 
       map.on('click', (event) => {
         if (disabled) return;
-        setPoint(event.lngLat.lat, event.lngLat.lng, 'map');
+        setPoint(event.lngLat.lat, event.lngLat.lng);
       });
     } catch (error) {
       console.error('[LocationPicker] failed to initialize MapLibre', error);
@@ -136,6 +143,8 @@
     }
 
     return () => {
+      if (geocodeTimer) clearTimeout(geocodeTimer);
+      geocodeController?.abort();
       marker?.remove();
       map?.remove();
       marker = null;
@@ -161,15 +170,68 @@
     updateValue({ location_mode: mode });
   }
 
-  function setPoint(lat: number, lng: number, source: 'manual' | 'map' | 'marker' | 'browser') {
+  function setPoint(lat: number, lng: number) {
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+    const nextLat = roundCoord(lat);
+    const nextLng = roundCoord(lng);
     const nextMode = value.location_mode === 'online' ? 'hybrid' : value.location_mode || 'onsite';
     updateValue({
-      lat: roundCoord(lat),
-      lng: roundCoord(lng),
-      location_mode: nextMode === 'unspecified' ? 'onsite' : nextMode,
-      location_hint: value.location_hint || hintFromSource(source)
+      lat: nextLat,
+      lng: nextLng,
+      location_mode: nextMode === 'unspecified' ? 'onsite' : nextMode
     });
+    scheduleAutoHint(nextLat, nextLng);
+  }
+
+  // Debounced reverse-geocode so dragging the marker / typing coords doesn't
+  // hammer Nominatim (their policy asks for max ~1 req/sec).
+  function scheduleAutoHint(lat: number, lng: number) {
+    if (hintEdited) return;
+    if (geocodeTimer) clearTimeout(geocodeTimer);
+    geocoding = true;
+    geocodeTimer = setTimeout(() => autoFillHint(lat, lng), 600);
+  }
+
+  async function autoFillHint(lat: number, lng: number) {
+    if (hintEdited || typeof fetch === 'undefined') {
+      geocoding = false;
+      return;
+    }
+    geocodeController?.abort();
+    const controller = new AbortController();
+    geocodeController = controller;
+    try {
+      const url =
+        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=12&accept-language=he&lat=${lat}&lon=${lng}`;
+      const res = await fetch(url, { signal: controller.signal, headers: { Accept: 'application/json' } });
+      if (!res.ok) return;
+      const data = await res.json();
+      const label = formatPlace(data);
+      // Re-check hintEdited: the user may have typed while we were fetching.
+      if (label && !hintEdited) updateValue({ location_hint: label });
+    } catch (error) {
+      if ((error as Error)?.name !== 'AbortError') {
+        console.warn('[LocationPicker] reverse geocode failed', error);
+      }
+    } finally {
+      if (geocodeController === controller) {
+        geocodeController = null;
+        geocoding = false;
+      }
+    }
+  }
+
+  function formatPlace(data: any): string {
+    const a = data?.address ?? {};
+    const primary =
+      a.city || a.town || a.village || a.municipality || a.suburb || a.neighbourhood || a.county;
+    const secondary = a.state || a.country;
+    if (primary && secondary && primary !== secondary) return `${primary}, ${secondary}`;
+    if (primary) return primary;
+    if (typeof data?.display_name === 'string') {
+      return data.display_name.split(',').slice(0, 2).join(', ').trim();
+    }
+    return '';
   }
 
   function clearPoint() {
@@ -186,17 +248,19 @@
   }
 
   function updateHint(nextHint: string) {
+    // Once the user types, stop auto-filling. If they clear it, allow auto again.
+    hintEdited = Boolean(nextHint.trim());
     updateValue({ location_hint: nextHint });
   }
 
   function updateLat(lat: number | undefined) {
     if (typeof lat !== 'number' || !Number.isFinite(lat)) return;
-    setPoint(lat, Number(value.lng ?? DEFAULT_CENTER.lng), 'manual');
+    setPoint(lat, Number(value.lng ?? DEFAULT_CENTER.lng));
   }
 
   function updateLng(lng: number | undefined) {
     if (typeof lng !== 'number' || !Number.isFinite(lng)) return;
-    setPoint(Number(value.lat ?? DEFAULT_CENTER.lat), lng, 'manual');
+    setPoint(Number(value.lat ?? DEFAULT_CENTER.lat), lng);
   }
 
   async function useBrowserLocation() {
@@ -210,7 +274,7 @@
     navigator.geolocation.getCurrentPosition(
       (position) => {
         locating = false;
-        setPoint(position.coords.latitude, position.coords.longitude, 'browser');
+        setPoint(position.coords.latitude, position.coords.longitude);
       },
       (error) => {
         locating = false;
@@ -309,13 +373,6 @@
     return { type: 'FeatureCollection', features: [] };
   }
 
-  function hintFromSource(source: 'manual' | 'map' | 'marker' | 'browser') {
-    if (source === 'browser') return 'המיקום שלי';
-    if (source === 'map') return 'נקודה שנבחרה על המפה';
-    if (source === 'marker') return 'נקודה שעודכנה על המפה';
-    return '';
-  }
-
   function roundCoord(coord: number) {
     return Math.round(coord * 1_000_000) / 1_000_000;
   }
@@ -387,7 +444,7 @@
 
   <div class="control-grid">
     <label class="field field-wide">
-      <span>תיאור מיקום</span>
+      <span>תיאור מיקום{#if geocoding} · מאתר שם מקום…{/if}</span>
       <input
         disabled={disabled}
         placeholder="למשל: תל אביב והסביבה, חיפה, אונליין"

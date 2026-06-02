@@ -13,6 +13,7 @@
     glowColor?: string; // צבע זוהר (default: gold)
     onProjectClick?: () => void;
     actions?: Snippet; // Slot לכפתורים מותאמים אישית
+    voteSummary?: Snippet; // תצוגת מצביעים קומפקטית (מוצגת בהדר)
   }
 
   let {
@@ -23,8 +24,16 @@
     memberCount = 0,
     glowColor = 'gold',
     onProjectClick,
-    actions
+    actions,
+    voteSummary
   }: Props = $props();
+
+  // ניווט לפרויקט בלחיצה על הלוגו/שם הפרויקט (במקום כפתור נפרד)
+  function goToProject(e: Event) {
+    if (!onProjectClick) return;
+    e.stopPropagation();
+    onProjectClick();
+  }
 </script>
 
 <div
@@ -52,7 +61,7 @@
                     : 'radial-gradient(circle at center, var(--gold), transparent 70%)'}
   ></div>
 
-  <div class="relative flex items-center gap-3 z-10">
+  {#snippet identity()}
     <div class="relative">
       <AuthorityBadge
         {logoSrc}
@@ -61,7 +70,7 @@
         size={isMobileOrTablet() ? 80 : 120}
       />
     </div>
-    <div class="flex flex-col leading-tight">
+    <div class="flex flex-col leading-tight text-start">
       <div
         class="text-xl sm:text-2xl uppercase font-semibold text-barbi dark:text-barbi"
       >
@@ -76,25 +85,34 @@
         {cardTitle}
       </div>
     </div>
-  </div>
+  {/snippet}
 
-  <!-- Actions area: either custom slot or default project button -->
-  <div class="flex items-center gap-2 z-10 relative">
-    {#if actions}
-      {@render actions()}
-    {:else if onProjectClick}
-      <button
-        onclick={onProjectClick}
-        class="px-3 py-1 text-barbi hover:text-gold hover:bg-barbi bg-gold rounded-lg text-sm font-semibold transition-all shadow-sm hover:shadow-md"
-      >
-        {#if $lang === 'he'}
-          לצפיה בפרויקט
-        {:else}
-          View Project
-        {/if}
-      </button>
-    {/if}
-  </div>
+  {#if onProjectClick}
+    <button
+      type="button"
+      class="relative flex items-center gap-3 z-10 bg-transparent border-0 p-0 m-0 cursor-pointer hover:opacity-90 transition-opacity"
+      title={$lang === 'he' ? 'לצפיה בפרויקט' : 'View Project'}
+      onclick={goToProject}
+    >
+      {@render identity()}
+    </button>
+  {:else}
+    <div class="relative flex items-center gap-3 z-10">
+      {@render identity()}
+    </div>
+  {/if}
+
+  <!-- Actions area: תצוגת מצביעים קומפקטית ו/או כפתורים מותאמים -->
+  {#if voteSummary || actions}
+    <div class="flex items-center gap-3 z-10 relative flex-wrap justify-end">
+      {#if voteSummary}
+        {@render voteSummary()}
+      {/if}
+      {#if actions}
+        {@render actions()}
+      {/if}
+    </div>
+  {/if}
 </div>
 
 <style>

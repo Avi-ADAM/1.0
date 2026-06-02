@@ -16,6 +16,7 @@
   // רכיבים מודרניים חדשים
   import CardHeader from './CardHeader.svelte';
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
+  import LocationView from '$lib/components/location/LocationView.svelte';
   import { getProjectData } from '$lib/stores/projectStore';
 
   /**
@@ -83,6 +84,7 @@
     negotiationMode = false,
     negopendmissions = [],
     dates,
+    location = null,
     // פרופס מודרניים
     glowColor = 'blue',
     users = [],
@@ -175,7 +177,23 @@
     cardTitle={name}
     {glowColor}
     onProjectClick={handleProjectClick}
-  />
+  >
+    {#snippet voteSummary()}
+      <!-- במחשב: תצוגת מצביעים קומפקטית בהדר כדי לא לצמצם את אזור הגלילה -->
+      {#if !isMobileOrTablet() && user_1s && user_1s.length > 0}
+        <div
+          class="bg-white/70 dark:bg-gray-900/50 backdrop-blur-sm rounded-xl px-3 py-1.5 shadow-sm"
+        >
+          <VoteStatusDisplay
+            compact
+            votes={users || []}
+            members={user_1s}
+            {activeOrder}
+          />
+        </div>
+      {/if}
+    {/snippet}
+  </CardHeader>
 
   <!-- אזור תוכן נגלל -->
   <div
@@ -289,6 +307,11 @@
         </div>
       {/if}
 
+      <!-- מיקום -->
+      {#if location}
+        <LocationView {location} showMap mapHeight="190px" />
+      {/if}
+
       <!-- תיאור והערות (RichText) -->
       {#if descrip && descrip !== 'null'}
         <div class="text-gray-700 dark:text-gray-200">
@@ -396,15 +419,18 @@
         missionDetails={descrip}
         {hearotMeyuchadot}
         {acts}
+        {location}
       />
     </div>
   </div>
 
   <!-- תצוגת מצב הצבעה -->
+  {#if !(user_1s && user_1s.length > 0 && !isMobileOrTablet())}
   <div
     class="bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800"
   >
     {#if user_1s && user_1s.length > 0}
+      <!-- במובייל: הפאנל המלא נגלל יחד עם הכרטיס (במחשב מוצג בהדר) -->
       <div class="px-4 py-2">
         <VoteStatusDisplay
           votes={users || []}
@@ -462,6 +488,7 @@
       </div>
     {/if}
   </div>
+  {/if}
 
   <!-- Footer עם כפתורי פעולה -->
   <div

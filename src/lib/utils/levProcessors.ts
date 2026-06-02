@@ -39,6 +39,40 @@ export interface DisplayItem {
 }
 
 /**
+ * Card ordering priority bands (lower `pl` = shown earlier).
+ *
+ * The merged feed is sorted ascending by `pl` (see mergeAndSort / levDerived).
+ * Desired user-facing order:
+ *   1. In-progress missions with a RUNNING timer    (I'm working on it right now)
+ *   2. Votes / approvals awaiting MY action          (a decision is needed from me)
+ *   3. In-progress missions without a running timer
+ *   4. New mission / resource suggestions
+ *   5. Welcome / transfers / misc
+ *   6. Votes I already cast on the current version   (no longer actionable)
+ *
+ * Within a band a small modifier sub-sorts items (e.g. by votes already cast).
+ */
+export const PRIORITY_BAND = {
+  ACTIVE_TIMER: 0, // in-progress mission, timer running
+  VOTE_PENDING: 100, // vote/approval awaiting my action
+  IN_PROGRESS: 300, // in-progress mission, timer not running
+  SUGGESTION: 400, // new mission / resource suggestion
+  OTHER: 500, // welcome, transfers, anything else
+  VOTE_DONE: 700 // I already voted on the current version
+} as const;
+
+/**
+ * Priority for a vote-style card.
+ * Cards I haven't voted on yet sit in the VOTE_PENDING band; once I've voted on
+ * the current version they drop to the VOTE_DONE band so they stop competing
+ * with actionable items. `votesCast` nudges items with more existing votes
+ * slightly later within the band.
+ */
+function votePriority(already: boolean, votesCast = 0): number {
+  return (already ? PRIORITY_BAND.VOTE_DONE : PRIORITY_BAND.VOTE_PENDING) + votesCast;
+}
+
+/**
  * Helper function to get project data by ID
  */
 function getProjectById(projects: ProjectData[], projectId: string): ProjectData | undefined {
@@ -296,10 +330,7 @@ export function processPends(
     messege.reverse();
 
     // 4. Priority Calculation
-    let priority = 1 + users.length;
-    if (already) {
-      priority += 48;
-    }
+    const priority = votePriority(already, users.length);
 
     const { src2, ...projectInfoWithoutSrc2 } = projectInfo;
 
@@ -372,8 +403,9 @@ export function processMtaha(
     // Use projectHelpers to get project info
     const projectInfo = createProjectInfo(mission.projectId);
 
-    // Calculate priority - missions in progress have higher priority
-    const basePriority = mission.priority ?? 150;
+    // Priority is decided below once we know whether a timer is running:
+    // an actively-timed mission jumps to the very top, otherwise it sits in
+    // the in-progress band (after pending votes, before suggestions).
 
     // Timer Logic - Try to get from timers store first (for real-time updates)
     let totalMilliseconds = 0;
@@ -405,7 +437,7 @@ export function processMtaha(
       // Common display fields
       ani: 'mtaha',
       azmi: 'mesima',
-      pl: basePriority,
+      pl: isActive ? PRIORITY_BAND.ACTIVE_TIMER : PRIORITY_BAND.IN_PROGRESS,
       coinlapach: `mtaha-${mission.id}`,
       // Pass project info from helper
       ...projectInfo,
@@ -493,10 +525,7 @@ export function processFiapp(
     const noofusersWaiting = memberCount - users.length;
 
     // Priority calc
-    let basePriority = -2; // from ishursium
-    if (already) {
-      basePriority += 20; // 18
-    }
+    const basePriority = votePriority(already);
 
     // Prepare whatt link
     let whatt = null;
@@ -838,12 +867,7 @@ export function processAsked(
 
 
     // 6. Priority Calculation
-    // Base priority + modification if already voted (move effectively to "done" section pile if sort logic supports it)
-    let priority = ask.priority ?? 100;
-    if (already) {
-      priority += 48; // Shift down if already handled
-    }
-    // Add logic from createasked: pl: 1 + i + j (essentially index based, but we stick to fixed priorities)
+    const priority = votePriority(already);
 
     const rt = letters(omData.name || '');
 
@@ -973,7 +997,7 @@ export function processAskedResources(
 
     const noofusersWaiting = (projectInfo.noof || 0) - users.length;
 
-    let basePriority = res.priority || 7;
+    const basePriority = votePriority(already);
 
     // Letters styling
     const rt = letters(res.openName || '');
@@ -1062,8 +1086,8 @@ export function processSuggestions(
     const memberCount = project?.attributes.user_1s?.data?.length || suggestion.projectDetails?.membersCount || 0;
     const restime = project?.attributes.restime || suggestion.projectDetails?.restime;
 
-    // Suggestions have lower priority
-    const basePriority = suggestion.priority ?? 200;
+    // Suggestions sit below actionable votes but above already-voted items
+    const basePriority = PRIORITY_BAND.SUGGESTION;
 
     // UI Styling helpers
     const hst = checkHst(projectName || '');
@@ -1157,7 +1181,7 @@ export function processResourceSuggestions(
 
     const restime = getProjectRestime(projectId);
 
-    const basePriority = huca.priority ?? 6;
+    const basePriority = PRIORITY_BAND.SUGGESTION;
 
     return {
       ani: 'huca',
@@ -1407,10 +1431,7 @@ export function processPmashes(
     });
 
     // 4. Priority Calculation
-    let priority = 1 + users.length;
-    if (already) {
-      priority += 48; // Move down if already voted
-    }
+    const priority = votePriority(already, users.length);
 
     const { src2, ...projectInfoWithoutSrc2 } = projectInfo;
     const { nego_mashes: _rawNego, ...pmashRest } = pmash;
@@ -1436,6 +1457,7 @@ export function processPmashes(
       price: pmash.price,
       easy: pmash.easy,
       linkto: pmash.linkto,
+      location: pmash.location,
       sqadualed: pmash.sqadualed,
       sqadualedf: pmash.sqadualedf,
 
@@ -1547,8 +1569,8 @@ export function processWegets(
     const memberCount = projectInfo.noof || 0;
     const noofusersWaiting = memberCount - users.length;
 
-    // Priority calc from crMaap: pl: -1 + y.vots.length
-    const basePriority = -1 + users.length;
+    // Votes awaiting my action; drop to the done band once I've voted.
+    const basePriority = votePriority(already, users.length);
 
     return {
       // Pass through all other fields from raw data FIRST so they can be overridden
@@ -1664,11 +1686,8 @@ export function processHalukas(
     const memberCount = projectInfo.noof || 0;
     const noofusersWaiting = memberCount - users.length;
 
-    // 4. Priority Logic (rashbi: pl = 1 + vots.length; if already: pl += 25)
-    let basePriority = 1 + users.length;
-    if (already) {
-      basePriority += 25;
-    }
+    // 4. Priority Logic
+    const basePriority = votePriority(already, users.length);
 
     return {
       // Common display fields
@@ -1886,10 +1905,7 @@ export function processDecisions(
     const noofusersWaiting = memberCount - cv;
 
     // 3. Priority Logic
-    let basePriority = 1 + users.length; // hachla logic
-    if (already) {
-      basePriority += 48;
-    }
+    const basePriority = votePriority(already, users.length);
 
     // 4. Message Construction
     const messege: any[] = [];
@@ -1976,10 +1992,7 @@ export function processProductRequests(
   return sheirutpends.map(request => {
     const projectInfo = createProjectInfo(request.projectId);
 
-    // Priority: moderately high, similar to other pending items
-    // If we assume these need approval, they should be visible
-    const basePriority = 10;
-
+    // Priority is set in the return once we know whether I've already voted.
     const myid = request.myid;
     const users = request.vots || [];
     const user_1s = getProjectUsers(request.projectId) || [];
@@ -2043,7 +2056,7 @@ export function processProductRequests(
       // Common display fields
       ani: 'sheirutp',
       azmi: 'sheirut',
-      pl: basePriority,
+      pl: votePriority(already),
       coinlapach: `sheirutp-${request.id}`,
 
       // Project Info
@@ -2121,13 +2134,10 @@ export function processSales(
     // - Higher priority if money needs to be received and user is recipient
     // - Higher if delivery needs confirmation
     // - Lower if already fully processed
-    let basePriority = 15;
+    // Pending while I still owe a delivery vote; drops to the done band once I've voted.
+    let basePriority = votePriority(alreadyVoted);
     if (moneyTransferredToMe && !sale.moneyTransfered) {
-      basePriority = 5; // Urgent: money needs confirmation
-    } else if (!alreadyVoted && !sale.productExepted) {
-      basePriority = 10; // Need to confirm delivery
-    } else if (alreadyVoted) {
-      basePriority = 25; // Already voted
+      basePriority = PRIORITY_BAND.VOTE_PENDING; // money still needs confirmation
     }
 
     // Build status indicators
@@ -2185,15 +2195,12 @@ export function processPurchases(
     const projectInfo = createProjectInfo(purchase.projectId);
     const myid = purchase.myid;
     
-    // For purchases, priority logic might be different
-    let basePriority = 15;
-    if (!purchase.iGotIt) {
-      basePriority = 5; // Should confirm receipt
-    } else if (!purchase.iTransferMoney) {
-      basePriority = 10; // Should pay
-    } else if (purchase.iGotIt && purchase.iTransferMoney && !purchase.moneyTransfered) {
-      basePriority = 20; // Waiting for seller confirmation
-    }
+    // Pending while I still owe an action (receive / pay); once both are done
+    // it's just waiting on the seller, so drop it to the done band.
+    const awaitingSeller = purchase.iGotIt && purchase.iTransferMoney;
+    const basePriority = awaitingSeller
+      ? PRIORITY_BAND.VOTE_DONE
+      : PRIORITY_BAND.VOTE_PENDING;
 
     const status = {
       iGotIt: purchase.iGotIt,

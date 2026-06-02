@@ -64,6 +64,23 @@ function mapResourceKindOf(raw: string | undefined): string | null {
   }
 }
 
+function buildLocationInput(
+  isOnline?: boolean,
+  lat?: number | null,
+  lng?: number | null,
+  radius?: number | null,
+  location_hint?: string | null
+): Record<string, unknown> | null {
+  if (lat == null && lng == null && !location_hint && isOnline === undefined) return null;
+  const loc: Record<string, unknown> = {};
+  if (lat != null) loc.lat = lat;
+  if (lng != null) loc.lng = lng;
+  if (radius != null) loc.radius = Math.round(radius);
+  if (location_hint) loc.location_hint = location_hint;
+  if (isOnline === true) loc.location_mode = 'online';
+  return Object.keys(loc).length > 0 ? loc : null;
+}
+
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const {
     projectId,
@@ -81,6 +98,11 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     datef = null,
     oneForeProject = false,
     picId = null,
+    isOnline = undefined,
+    lat = null,
+    lng = null,
+    radius = null,
+    location_hint = null,
     recipeMissions = [],
     recipeResources = []
   } = params as {
@@ -99,12 +121,18 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     datef?: string | null;
     oneForeProject?: boolean;
     picId?: string | null;
+    isOnline?: boolean;
+    lat?: number | null;
+    lng?: number | null;
+    radius?: number | null;
+    location_hint?: string | null;
     recipeMissions?: RecipeMissionInput[];
     recipeResources?: RecipeResourceInput[];
   };
 
   const now = new Date().toISOString();
   const isComplex = pricingMode !== 'fixed';
+  const locationInput = buildLocationInput(isOnline, lat, lng, radius, location_hint);
 
   // Determine member count once (used to decide whether to open a matanotpend
   // flow — deferred for MVP).
@@ -183,6 +211,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   if (dates) createMatanotVars.startDate = new Date(dates).toISOString();
   if (datef) createMatanotVars.finnishDate = new Date(datef).toISOString();
   if (processId) createMatanotVars.process = processId;
+  if (locationInput) createMatanotVars.location = locationInput;
 
   const matanotRes = await strapi.execute(
     '136createMatanot',
@@ -353,6 +382,11 @@ export const createComplexMatanotConfig: ActionConfig = {
     datef: { type: 'string', required: false },
     oneForeProject: { type: 'boolean', required: false },
     picId: { type: 'string', required: false },
+    isOnline: { type: 'boolean', required: false },
+    lat: { type: 'number', required: false },
+    lng: { type: 'number', required: false },
+    radius: { type: 'number', required: false },
+    location_hint: { type: 'string', required: false },
     recipeMissions: { type: 'array', required: false },
     recipeResources: { type: 'array', required: false }
   },

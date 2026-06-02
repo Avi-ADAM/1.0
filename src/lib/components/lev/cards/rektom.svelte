@@ -189,6 +189,20 @@
     {glowColor}
     onProjectClick={handleProjectClick}
   >
+    {#snippet voteSummary()}
+      {#if !isMobileOrTablet() && user_1s && user_1s.length > 0}
+        <div
+          class="bg-white/70 dark:bg-gray-900/50 backdrop-blur-sm rounded-xl px-3 py-1.5 shadow-sm"
+        >
+          <VoteStatusDisplay
+            compact
+            votes={users || []}
+            members={user_1s}
+            {activeOrder}
+          />
+        </div>
+      {/if}
+    {/snippet}
     {#snippet actions()}
       {#if negotiationMode}
         <span class="text-sm bg-gold text-white px-2 py-1 rounded-full">
@@ -328,7 +342,7 @@
   </div>
 
   <!-- תצוגת סטטוס הצבעות מודרנית -->
-  {#if user_1s && user_1s.length > 0}
+  {#if user_1s && user_1s.length > 0 && isMobileOrTablet()}
     <div
       class="px-4 pb-4 {isScrolable.value
         ? 'bg-white dark:bg-slate-800'

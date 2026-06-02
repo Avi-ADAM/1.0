@@ -296,7 +296,25 @@
     cardTitle={buble.name}
     {glowColor}
     onProjectClick={handleProjectClick}
-  />
+  >
+    {#snippet voteSummary()}
+      {#if !isMobileOrTablet() && weFinnishMembers && weFinnishMembers.length > 0}
+        <div
+          class="bg-white/70 dark:bg-gray-900/50 backdrop-blur-sm rounded-xl px-3 py-1.5 shadow-sm"
+        >
+          <div class="text-[10px] text-green-600 uppercase font-bold mb-1">
+            {$t('lev.cards.saleCard.deliveryApprovals')}
+          </div>
+          <VoteStatusDisplay
+            compact
+            votes={weFinnishVotes}
+            members={weFinnishMembers}
+            activeOrder={0}
+          />
+        </div>
+      {/if}
+    {/snippet}
+  </CardHeader>
 
   <!-- Content -->
   <div
@@ -559,17 +577,19 @@
     {/if}
   </div>
 
-  <!-- Vote Status Display -->
-  <div class="px-4 pb-2">
-    <div class="text-[10px] text-green-600 uppercase font-bold mb-1">
-      {$t('lev.cards.saleCard.deliveryApprovals')}
+  <!-- Vote Status Display (במובייל בלבד; במחשב מוצג בהדר) -->
+  {#if isMobileOrTablet()}
+    <div class="px-4 pb-2">
+      <div class="text-[10px] text-green-600 uppercase font-bold mb-1">
+        {$t('lev.cards.saleCard.deliveryApprovals')}
+      </div>
+      <VoteStatusDisplay
+        votes={weFinnishVotes}
+        members={weFinnishMembers}
+        activeOrder={0}
+      />
     </div>
-    <VoteStatusDisplay
-      votes={weFinnishVotes}
-      members={weFinnishMembers}
-      activeOrder={0}
-    />
-  </div>
+  {/if}
 
   <!-- Actions -->
   <div

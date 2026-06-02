@@ -25,8 +25,23 @@
     missionDetails,
     hearotMeyuchadot,
     acts,
-    projectId
+    projectId,
+    location = null
   } = $props();
+
+  const locLabel = { he: 'מיקום', en: 'Location' };
+
+  function locationSummary(loc) {
+    if (!loc) return '—';
+    if (loc.location_mode === 'online') return $lang === 'he' ? 'אונליין' : 'Online';
+    const hasPoint = Number.isFinite(loc.lat) && Number.isFinite(loc.lng);
+    if (hasPoint) {
+      const hint = loc.location_hint?.trim();
+      const r = loc.radius || 15;
+      return `${hint ? hint + ' · ' : ''}${r} ${$lang === 'he' ? 'ק״מ' : 'km'}`;
+    }
+    return loc.location_hint?.trim() || '—';
+  }
 </script>
 
 {#if negopendmissions && negopendmissions.length > 0}
@@ -37,6 +52,7 @@
     <div class="space-y-3">
       {#each negopendmissions as nego}
         {@const attrs = nego.attributes}
+        {@const prevLoc = Array.isArray(attrs.location) ? attrs.location[0] : attrs.location}
         <div class="border-2 border-blue-300 rounded-lg p-3 bg-blue-50">
           <div class="text-sm md:text-base text-gray-600 mb-2">
             {tr.nego.proposedBy[$lang]}
@@ -85,6 +101,14 @@
                 oldValue={(attrs.noofhours || noofhours) *
                   (attrs.perhour || perhour)}
                 newValue={noofhours * perhour}
+              />
+            {/if}
+
+            {#if (prevLoc || location) && locationSummary(prevLoc) !== locationSummary(location)}
+              <ComparisonDisplay
+                label={locLabel[$lang]}
+                oldValue={locationSummary(prevLoc)}
+                newValue={locationSummary(location)}
               />
             {/if}
           </div>

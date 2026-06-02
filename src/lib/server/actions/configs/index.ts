@@ -72,6 +72,8 @@ import { getDecisionDetailsConfig } from './getDecisionDetails.js';
 import { getMissionForEditConfig } from './getMissionForEdit.js';
 import { createWorkWayConfig } from './createWorkWay.js';
 import { createMissionConfig } from './createMission.js';
+import { submitNegoMissionConfig } from './submitNegoMission.js';
+import { submitNegoMashConfig } from './submitNegoMash.js';
 
 
 /**
@@ -192,6 +194,12 @@ export function registerAllActions(): void {
   registerAction(getMissionForEditConfig);
   registerAction(createWorkWayConfig);
   registerAction(createMissionConfig);
+
+  // Negotiation submission (pendm / openMission nego flow)
+  registerAction(submitNegoMissionConfig);
+
+  // Negotiation submission (pmash / resource nego flow)
+  registerAction(submitNegoMashConfig);
 
   // Future actions will be registered here
   // registerAction(createTaskAction);

@@ -3657,6 +3657,13 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                     price
                     kindOf
                     spnot
+                    location {
+                      location_mode
+                      lat
+                      lng
+                      radius
+                      location_hint
+                    }
                     nego_mashes {
                       data {
                         id
@@ -3672,6 +3679,13 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           price
                           kindOf
                           spnot
+                          location {
+                            location_mode
+                            lat
+                            lng
+                            radius
+                            location_hint
+                          }
                           users_permissions_user {
                             data {
                               id
@@ -4302,6 +4316,13 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                     privatlinks
                     publicklinks
                     dates
+                    location {
+                      location_mode
+                      lat
+                      lng
+                      radius
+                      location_hint
+                    }
                     rishon {
                       data {
                         id
@@ -4333,6 +4354,13 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           date
                           dates
                           isMonth
+                          location {
+                            location_mode
+                            lat
+                            lng
+                            radius
+                            location_hint
+                          }
                           users_permissions_user {
                             data {
                               id
@@ -6200,6 +6228,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $estimatedPrice: Float,
     $status_of_voting: ENUM_MATANOT_STATUS_OF_VOTING,
     $process: ID,
+    $location: ComponentNewLocationInput,
     $publishedAt: DateTime
   ) {
     createMatanot(data: {
@@ -6218,6 +6247,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       estimatedPrice: $estimatedPrice,
       status_of_voting: $status_of_voting,
       process: $process,
+      location: $location,
       publishedAt: $publishedAt
     }) {
       data {
@@ -6762,6 +6792,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $privatlinks: String
     $hearotMeyuchadot: String
     $users: [ComponentProjectsPendmnegoInput]
+    $location: ComponentNewLocationInput
     $publishedAt: DateTime!
   ) {
     createPendm(data: {
@@ -6782,6 +6813,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       privatlinks: $privatlinks
       hearotMeyuchadot: $hearotMeyuchadot
       users: $users
+      location: $location
       publishedAt: $publishedAt
     }) {
       data { id }
@@ -6808,6 +6840,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $isRishon: Boolean
     $rishon: ID
     $archived: Boolean
+    $location: ComponentNewLocationInput
     $publishedAt: DateTime!
   ) {
     createOpenMission(data: {
@@ -6830,6 +6863,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       isRishon: $isRishon
       rishon: $rishon
       archived: $archived
+      location: $location
       publishedAt: $publishedAt
     }) {
       data { id }
@@ -6861,6 +6895,80 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         attributes { hervachti }
       }
     }
+  }`,
+
+  'negoCreateNegopendmission': `mutation NegoCreateNegopendmission(
+    $publishedAt: DateTime!, $userId: ID!,
+    $pendm: ID, $open_mission: ID,
+    $isOriginal: Boolean, $isMonth: Boolean,
+    $noofhours: Float, $perhour: Float,
+    $hearotMeyuchadot: String, $descrip: String, $name: String,
+    $skills: [ID], $tafkidims: [ID], $work_ways: [ID],
+    $sqadualed: DateTime, $dates: DateTime, $acts: [ID],
+    $location: [ComponentNewLocationInput]
+  ) {
+    createNegopendmission(data: {
+      publishedAt: $publishedAt
+      users_permissions_user: $userId
+      pendm: $pendm
+      open_mission: $open_mission
+      isOriginal: $isOriginal
+      isMonth: $isMonth
+      noofhours: $noofhours
+      perhour: $perhour
+      hearotMeyuchadot: $hearotMeyuchadot
+      descrip: $descrip
+      name: $name
+      skills: $skills
+      tafkidims: $tafkidims
+      work_ways: $work_ways
+      date: $sqadualed
+      dates: $dates
+      acts: $acts
+      location: $location
+    }) { data { id } }
+  }`,
+
+  'negoUpdatePendm': `mutation NegoUpdatePendm($id: ID!, $data: PendmInput!) {
+    updatePendm(id: $id, data: $data) { data { id } }
+  }`,
+
+  'negoUpdateOpenMission': `mutation NegoUpdateOpenMission($id: ID!, $data: OpenMissionInput!) {
+    updateOpenMission(id: $id, data: $data) { data { id } }
+  }`,
+
+  'negoUpdateAskVots': `mutation NegoUpdateAskVots($id: ID!, $vots: [ComponentProjectsVotsInput]) {
+    updateAsk(id: $id, data: { vots: $vots }) { data { id } }
+  }`,
+
+  'negoCreateNegoMash': `mutation NegoCreateNegoMash(
+    $publishedAt: DateTime!, $userId: ID!, $pmash: ID,
+    $isOriginal: Boolean, $name: String, $descrip: String, $spnot: String,
+    $easy: Float, $hm: Float, $price: Float, $kindOf: ENUM_NEGOMASH_KINDOF,
+    $sqadualed: DateTime, $sqadualedf: DateTime, $linkto: String,
+    $location: [ComponentNewLocationInput]
+  ) {
+    createNegoMash(data: {
+      publishedAt: $publishedAt
+      users_permissions_user: $userId
+      pmash: $pmash
+      isOriginal: $isOriginal
+      name: $name
+      descrip: $descrip
+      spnot: $spnot
+      easy: $easy
+      hm: $hm
+      price: $price
+      kindOf: $kindOf
+      sqadualed: $sqadualed
+      sqadualedf: $sqadualedf
+      linkto: $linkto
+      location: $location
+    }) { data { id } }
+  }`,
+
+  'negoUpdatePmash': `mutation NegoUpdatePmash($id: ID!, $data: PmashInput!) {
+    updatePmash(id: $id, data: $data) { data { id } }
   }`
 };
 

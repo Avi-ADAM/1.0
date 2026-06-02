@@ -159,7 +159,22 @@
     memberCount={noOfusers}
     {glowColor}
     onProjectClick={handleProjectClick}
-  />
+  >
+    {#snippet voteSummary()}
+      {#if !isMobileOrTablet() && user_1s && user_1s.length > 0}
+        <div
+          class="bg-white/70 dark:bg-gray-900/50 backdrop-blur-sm rounded-xl px-3 py-1.5 shadow-sm"
+        >
+          <VoteStatusDisplay
+            compact
+            votes={users || []}
+            members={user_1s}
+            {activeOrder}
+          />
+        </div>
+      {/if}
+    {/snippet}
+  </CardHeader>
 
   <!-- Content Area -->
   <div
@@ -316,7 +331,7 @@
   </div>
 
   <!-- Vote Status Display Details (if available) -->
-  {#if user_1s && user_1s.length > 0}
+  {#if user_1s && user_1s.length > 0 && isMobileOrTablet()}
     <div class="px-4 pb-4 bg-gray-200 dark:bg-slate-700 transition-all-300">
       <VoteStatusDisplay votes={users || []} members={user_1s} {activeOrder} />
     </div>

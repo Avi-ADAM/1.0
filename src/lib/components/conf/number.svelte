@@ -51,23 +51,19 @@ function checkAll(a,b){
 
 function updateDatai() {
   const oldValues = old ?? [];
+  const items = [
+    { leb: `${tr?.nego?.new[$lang]},${numberb}`, value: Number(numberb) },
+    { leb: `${tr?.nego?.original[$lang]},${number}`, value: Number(number) }
+  ];
   if (oldValues.length > 0) {
-    datai = [
-      { leb: `${tr?.nego?.new[$lang]},${numberb}`, value: Number(numberb) },
-      { leb: `${tr?.nego?.original[$lang]},${number}`, value: Number(number) }
-    ];
     for (let i = 0; i < oldValues.length; i++) {
       console.log(oldValues[i]);
       if (oldValues[i] != null) {
-        datai.push({ value: Number(oldValues[i]), leb: `${tr?.nego?.oldno[$lang]}-${i + 1},${oldValues[i]}` });
+        items.push({ value: Number(oldValues[i]), leb: `${tr?.nego?.oldno[$lang]}-${i + 1},${oldValues[i]}` });
       }
     }
-  } else {
-    datai = [
-      { leb: `${tr?.nego?.new[$lang]},${numberb}`, value: Number(numberb) },
-      { leb: `${tr?.nego?.original[$lang]},${number}`, value: Number(number) }
-    ];
   }
+  datai = items;
 }
 
 $effect.pre(() => {

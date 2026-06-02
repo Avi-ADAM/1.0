@@ -207,6 +207,20 @@
     cardTitle={buble.name}
     {glowColor}
   >
+    {#snippet voteSummary()}
+      {#if !isMobileOrTablet() && buble.user_1s && buble.user_1s.length > 0}
+        <div
+          class="bg-white/70 dark:bg-gray-900/50 backdrop-blur-sm rounded-xl px-3 py-1.5 shadow-sm"
+        >
+          <VoteStatusDisplay
+            compact
+            votes={buble.users || []}
+            members={buble.user_1s}
+            activeOrder={buble.orderon || 0}
+          />
+        </div>
+      {/if}
+    {/snippet}
     {#snippet actions()}
       <button
         onclick={(e) => { e.stopPropagation(); handleViewRequest(); }}
@@ -347,7 +361,7 @@
   </div>
 
   <!-- Vote Status Display -->
-  {#if buble.user_1s && buble.user_1s.length > 0}
+  {#if buble.user_1s && buble.user_1s.length > 0 && isMobileOrTablet()}
     <div class="px-4">
       <VoteStatusDisplay
         votes={buble.users || []}

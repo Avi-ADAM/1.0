@@ -337,7 +337,25 @@
     cardTitle={buble.name}
     glowColor="blue"
     onProjectClick={handleProjectClick}
-  />
+  >
+    {#snippet voteSummary()}
+      {#if !isMobileOrTablet() && buble.weFinnish && buble.weFinnish.length > 0}
+        <div
+          class="bg-white/70 dark:bg-gray-900/50 backdrop-blur-sm rounded-xl px-3 py-1.5 shadow-sm"
+        >
+          <div class="text-[10px] text-orange-600 uppercase font-bold mb-1">
+            {t.statusLabels.sellersClaimDelivered[$lang]}
+          </div>
+          <VoteStatusDisplay
+            compact
+            votes={weFinnishVotes}
+            members={weFinnishMembers}
+            activeOrder={0}
+          />
+        </div>
+      {/if}
+    {/snippet}
+  </CardHeader>
 
   <!-- Content -->
   <div
@@ -523,7 +541,7 @@
   </div>
 
   <!-- Seller delivery claims status -->
-  {#if buble.weFinnish && buble.weFinnish.length > 0}
+  {#if buble.weFinnish && buble.weFinnish.length > 0 && isMobileOrTablet()}
     <div class="px-4">
       <div class="text-[10px] text-orange-600 uppercase font-bold mb-1">
         {t.statusLabels.sellersClaimDelivered[$lang]}

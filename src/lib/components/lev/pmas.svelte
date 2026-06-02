@@ -7,6 +7,7 @@
   import { clickOutside } from './outsidclick.js';
   import { fly } from 'svelte/transition';
   import Nego from '../prPr/negoPend.svelte';
+  import LocationView from '$lib/components/location/LocationView.svelte';
   import { goto } from '$app/navigation';
   import { idPr } from '../../stores/idPr.js';
   import moment from 'moment';
@@ -57,6 +58,7 @@
    * @property {any} timegramaId
    * @property {any} restime
    * @property {any} [acts]
+   * @property {any} [location]
    * @property {boolean} [cards]
    * @property {() => void} [onModal]
    */
@@ -100,6 +102,7 @@
     timegramaId,
     restime,
     acts = [],
+    location = null,
     cards = false,
     onCoinLapach,
     onHover,
@@ -531,6 +534,7 @@ diunim = ` ${diu},`
             {sqadualed}
             {users}
             {acts}
+            {location}
             {restime}
           />
         {:else if diunm === true}
@@ -683,6 +687,11 @@ diunim = ` ${diu},`
                 >{easy > 0 ? easy * yers : price * yers}</span
               >
             </p>
+          {/if}
+          {#if location}
+            <div style="width:90%;margin:6px auto 2px;">
+              <LocationView {location} dense />
+            </div>
           {/if}
           <p class="p">
             <span
@@ -914,6 +923,7 @@ diunim = ` ${diu},`
                 {noofusersNo}
                 {nego_mashes}
                 {timeGramaDate}
+                {location}
                 onNego={claf}
                 {projectId}
                 {users}
@@ -954,6 +964,7 @@ diunim = ` ${diu},`
     onNego={claf}
     {nego_mashes}
     {timeGramaDate}
+    {location}
     {projectId}
     {users}
     activeOrder={order}

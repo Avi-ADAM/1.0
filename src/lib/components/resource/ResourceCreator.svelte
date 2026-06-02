@@ -8,6 +8,7 @@
   import Arrow from '$lib/celim/icons/arrow.svelte';
   import Button from '$lib/celim/ui/button.svelte';
   import NumberInput from '$lib/celim/ui/numberInput.svelte';
+  import LocationPicker from '$lib/components/location/LocationPicker.svelte';
   import moment from 'moment';
 
   /**
@@ -48,6 +49,16 @@
   let startDate = $state('');
   let endDate = $state('');
 
+  let locationOpen = $state(false);
+  let locationScope = $state({
+    location_mode: 'unspecified',
+    isOnline: false,
+    lat: null,
+    lng: null,
+    radius: 15,
+    location_hint: ''
+  });
+
   // --- Self-assignment (רלוונטי רק כשיש משתמש יחיד בפרויקט) ---
   let isSelfAssigned = $state(false);
   let isReceived = $state(false); // האם המשאב כבר התקבל?
@@ -71,6 +82,11 @@
   let showDates = $derived(kindOf === 'monthly' || kindOf === 'yearly');
   let showQuantity = $derived(kindOf === 'perUnit');
   let isSingleUser = $derived(userslength <= 1);
+  let hasValidDates = $derived(
+    !showDates ||
+      Boolean(startDate && endDate && endDate >= startDate)
+  );
+  let canSubmit = $derived(Boolean(name.trim()) && hasValidDates);
 
   // חישוב סה"כ בזמן אמת
   let totalPrice = $derived(
@@ -119,6 +135,27 @@
 
   let showForm = $state(true);
 
+  function normalizeLocationNumber(value) {
+    return typeof value === 'number' && Number.isFinite(value) ? value : null;
+  }
+
+  function hasLocationPoint(location) {
+    return (
+      typeof location?.lat === 'number' &&
+      Number.isFinite(location.lat) &&
+      typeof location?.lng === 'number' &&
+      Number.isFinite(location.lng)
+    );
+  }
+
+  function hasLocationValue(location) {
+    return (
+      location?.location_mode !== 'unspecified' ||
+      hasLocationPoint(location) ||
+      Boolean(location?.location_hint?.trim())
+    );
+  }
+
   const i18n = {
     he: {
       title: 'בקשת משאב חדש',
@@ -140,6 +177,7 @@
       loading: 'טוען משאבים...',
       success: 'דרישת המשאב פורסמה בהצלחה',
       error: 'שגיאה בפרסום דרישת המשאב',
+      datesRequired: 'יש לציין תאריך התחלה ותאריך סיום',
       totalPrice: 'סה"כ עלות משוערת',
       totalMax: 'סה"כ שווי בריקמה',
       summaryTitle: 'סיכום עלות',
@@ -159,7 +197,14 @@
         yearly: 'שנתי',
         perUnit: 'ליחידה',
         rent: 'השכרה'
-      }
+      },
+      locationTitle: 'מיקום',
+      locationHelper:
+        'בחרו האם המשאב ניתן אונליין, במקום או היברידי, ואת רדיוס השירות.',
+      locationEmpty: 'לא הוגדר מיקום',
+      locationSelected: 'מיקום נבחר',
+      locationOnline: 'אונליין',
+      locationDone: 'סיום'
     },
     en: {
       title: 'Request New Resource',
@@ -181,6 +226,7 @@
       loading: 'Loading resources...',
       success: 'Resource requirement published successfully',
       error: 'Error publishing resource requirement',
+      datesRequired: 'Start and end dates are required',
       totalPrice: 'Total Estimated Cost',
       totalMax: 'Total Maximum Value',
       summaryTitle: 'Cost Summary',
@@ -200,11 +246,28 @@
         yearly: 'Yearly',
         perUnit: 'Per unit',
         rent: 'Rent'
-      }
+      },
+      locationTitle: 'Location',
+      locationHelper:
+        'Choose whether this resource is online, on-site, or hybrid, and set the service radius.',
+      locationEmpty: 'No location set',
+      locationSelected: 'Location selected',
+      locationOnline: 'Online',
+      locationDone: 'Done'
     }
   };
 
   let t = $derived(i18n[$lang] || i18n.en);
+
+  function locationSummary(location) {
+    if (!location || !hasLocationValue(location)) return t.locationEmpty;
+    if (location.location_mode === 'online') return t.locationOnline;
+    if (hasLocationPoint(location)) {
+      const hint = location.location_hint?.trim() || t.locationSelected;
+      return `${hint} - ${location.radius || 15} km`;
+    }
+    return location.location_hint?.trim() || t.locationSelected;
+  }
 
   onMount(async () => {
     try {
@@ -340,6 +403,13 @@
   }
 
   async function handleSubmit() {
+    if (!canSubmit) {
+      if (showDates && !hasValidDates) {
+        toast.error(t.datesRequired);
+      }
+      return;
+    }
+
     isSubmitting = true;
     try {
       const selectedTemplate = findResourceTemplateByName(name);
@@ -365,7 +435,12 @@
         isAssigned: isSingleUser && isSelfAssigned,
         isReceived: isSingleUser && isSelfAssigned && isReceived,
         existingSpId: selectedSpId ?? undefined,
-        restime: restime || undefined
+        restime: restime || undefined,
+        isOnline: locationScope.location_mode === 'online',
+        lat: normalizeLocationNumber(locationScope.lat),
+        lng: normalizeLocationNumber(locationScope.lng),
+        radius: normalizeLocationNumber(locationScope.radius),
+        location_hint: locationScope.location_hint?.trim() || null
       });
 
       if (result.success) {
@@ -495,21 +570,25 @@
 
         {#if showDates}
           <div class="flex flex-col">
-            <label class="text-sm text-barbie mb-1">{t.startDate}</label>
+            <label class="text-sm text-barbie mb-1">{t.startDate} *</label>
             <input
               type="date"
               value={startDate}
               onchange={(event) => handleStartDateInput(event.currentTarget.value)}
+              required
               class="bg-pink-950/30 border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all"
+              class:!border-red-400={showDates && !startDate}
             />
           </div>
           <div class="flex flex-col">
-            <label class="text-sm text-barbie mb-1">{t.endDate}</label>
+            <label class="text-sm text-barbie mb-1">{t.endDate} *</label>
             <input
               type="date"
               bind:value={endDate}
               min={startDate || undefined}
+              required
               class="bg-pink-950/30 border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all"
+              class:!border-red-400={showDates && !endDate}
             />
           </div>
         {/if}
@@ -538,6 +617,29 @@
             bind:value={spnot}
             class="w-full bg-pink-950/30 border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all h-20 resize-none shadow-sm"
           ></textarea>
+        </div>
+
+        <div class="md:col-span-2 space-y-2">
+          <label class="text-sm text-barbie mb-1">{t.locationTitle}</label>
+          <button
+            type="button"
+            onclick={() => (locationOpen = !locationOpen)}
+            class="w-full px-4 py-3 text-sm font-medium text-white rounded-xl border border-gold/40 transition-colors flex items-center justify-center"
+            class:bg-pink-800={!locationOpen}
+            class:hover:bg-pink-700={!locationOpen}
+            class:bg-gold-700={locationOpen}
+            class:hover:bg-gold-600={locationOpen}
+          >
+            {locationOpen ? t.locationDone : locationSummary(locationScope)}
+          </button>
+          {#if locationOpen}
+            <LocationPicker
+              bind:value={locationScope}
+              label={t.locationTitle}
+              helper={t.locationHelper}
+              height="280px"
+            />
+          {/if}
         </div>
       </div>
 
@@ -684,7 +786,7 @@
       <div class="flex gap-4 pt-4">
         <Button
           onClick={handleSubmit}
-          disabled={isSubmitting || !name}
+          disabled={isSubmitting || !canSubmit}
           loading={isSubmitting}
           text={{ he: t.submit, en: t.submit }}
           class="flex-grow !py-4 text-lg font-bold !bg-gold-600 hover:!bg-gold !text-pink-950 shadow-md"

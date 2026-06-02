@@ -12,6 +12,7 @@
   // רכיבים מודרניים
   import CardHeader from './CardHeader.svelte';
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
+  import LocationView from '$lib/components/location/LocationView.svelte';
   import { getProjectData } from '$lib/stores/projectStore';
 
   /**
@@ -74,6 +75,7 @@
     allr = false,
     nego_mashes = [],
     timeGramaDate,
+    location = null,
     onHover,
     onAgree,
     onDecline,
@@ -183,7 +185,32 @@
         label: 'כמות'
       });
     }
+    const prevLoc = Array.isArray(previousOffer.location)
+      ? previousOffer.location[0]
+      : previousOffer.location;
+    const prevLocSummary = locationSummary(prevLoc);
+    const currLocSummary = locationSummary(location);
+    if ((prevLoc || location) && prevLocSummary !== currLocSummary) {
+      changes.push({
+        type: 'location',
+        old: prevLocSummary,
+        new: currLocSummary,
+        label: 'מיקום'
+      });
+    }
     return changes;
+  }
+
+  function locationSummary(loc) {
+    if (!loc) return '—';
+    if (loc.location_mode === 'online') return 'אונליין';
+    const hasPoint = Number.isFinite(loc.lat) && Number.isFinite(loc.lng);
+    if (hasPoint) {
+      const hint = loc.location_hint?.trim();
+      const r = loc.radius || 15;
+      return `${hint ? hint + ' · ' : ''}${r} ק״מ`;
+    }
+    return loc.location_hint?.trim() || '—';
   }
 
   const changes = getChanges();
@@ -249,7 +276,22 @@
     memberCount={noofusersOk + noofusersWaiting + noofusersNo}
     {glowColor}
     onProjectClick={onProj}
-  />
+  >
+    {#snippet voteSummary()}
+      {#if !isMobileOrTablet() && user_1s && user_1s.length > 0}
+        <div
+          class="bg-white/70 dark:bg-gray-900/50 backdrop-blur-sm rounded-xl px-3 py-1.5 shadow-sm"
+        >
+          <VoteStatusDisplay
+            compact
+            votes={users || []}
+            members={user_1s}
+            {activeOrder}
+          />
+        </div>
+      {/if}
+    {/snippet}
+  </CardHeader>
 
   <!-- אזור תוכן מרכזי נגלל -->
   <div
@@ -392,6 +434,10 @@
             {hearotMeyuchadot}
           </div>
         {/if}
+
+        {#if location}
+          <LocationView {location} showMap mapHeight="190px" />
+        {/if}
       </div>
     </div>
 
@@ -466,9 +512,11 @@
 
   <!-- סטטוס הצבעות -->
   {#if user_1s && user_1s.length > 0}
-    <div class="pt-2">
-      <VoteStatusDisplay votes={users || []} members={user_1s} {activeOrder} />
-    </div>
+    {#if isMobileOrTablet()}
+      <div class="pt-2">
+        <VoteStatusDisplay votes={users || []} members={user_1s} {activeOrder} />
+      </div>
+    {/if}
   {:else}
     <!-- תצוגת רזרבה במקרה ואין members -->
     <div class="flex items-center gap-4 text-sm font-medium pt-2 pb-2">

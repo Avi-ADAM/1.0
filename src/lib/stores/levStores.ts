@@ -47,6 +47,8 @@ export interface PendMissionData {
   }>;
   messages: any[];
   priority?: number;
+  /** Location component (location_mode, lat, lng, radius, location_hint) */
+  location?: any;
   [key: string]: any;
 }
 
@@ -158,6 +160,8 @@ export interface PendResourceData {
   projectId: string;
   resourceType: string;
   priority?: number;
+  /** Location component (location_mode, lat, lng, radius, location_hint) */
+  location?: any;
   [key: string]: any;
 }
 

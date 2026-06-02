@@ -150,7 +150,22 @@
         ? openmissionName
         : ''}
     {glowColor}
-  />
+  >
+    {#snippet voteSummary()}
+      {#if !isMobileOrTablet() && user_1s && user_1s.length > 0}
+        <div
+          class="bg-white/70 dark:bg-gray-900/50 backdrop-blur-sm rounded-xl px-3 py-1.5 shadow-sm"
+        >
+          <VoteStatusDisplay
+            compact
+            votes={users || []}
+            members={user_1s}
+            {activeOrder}
+          />
+        </div>
+      {/if}
+    {/snippet}
+  </CardHeader>
 
   <!-- Timer Bar -->
   <div
@@ -719,7 +734,7 @@
   </div>
 
   <!-- תצוגת משתמשים והצבעות (במידה והוזרק מה-DB המודרני) -->
-  {#if user_1s && user_1s.length > 0}
+  {#if user_1s && user_1s.length > 0 && isMobileOrTablet()}
     <div class="px-4 pb-3 bg-white dark:bg-slate-800">
       <VoteStatusDisplay votes={users || []} members={user_1s} {activeOrder} />
     </div>

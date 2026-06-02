@@ -13,10 +13,6 @@
   import { SendTo } from '$lib/send/sendTo.svelte';
   import Button from '$lib/celim/ui/button.svelte';
   import { attachEntityToProcess } from '$lib/client/actionClient';
-  import LocationPicker from '$lib/components/location/LocationPicker.svelte';
-
-  let locationOpenByRow = $state({});
-
   let token;
   let mash = [];
   let showResourceOptions = $state({}); // לשמירת מצב התצוגה של אפשרויות המשאבים לכל שורה
@@ -29,51 +25,6 @@
   const NEW_RESOURCE_TEXT = $derived($t('mission.totalNeeds.createResource'));
 
   const selfAssign = $derived($t('mission.totalNeeds.selfAssign'));
-
-  function defaultLocationScope() {
-    return {
-      location_mode: 'unspecified',
-      isOnline: false,
-      lat: null,
-      lng: null,
-      radius: 15,
-      location_hint: ''
-    };
-  }
-
-  function ensureLocationScope(data) {
-    if (!data.locationScope) {
-      data.locationScope = defaultLocationScope();
-    }
-    return data.locationScope;
-  }
-
-  function hasLocationPoint(location) {
-    return (
-      typeof location?.lat === 'number' &&
-      Number.isFinite(location.lat) &&
-      typeof location?.lng === 'number' &&
-      Number.isFinite(location.lng)
-    );
-  }
-
-  function hasLocationValue(location) {
-    return (
-      location?.location_mode !== 'unspecified' ||
-      hasLocationPoint(location) ||
-      Boolean(location?.location_hint?.trim())
-    );
-  }
-
-  function locationSummary(location) {
-    if (!location || !hasLocationValue(location)) return $t('mission.location.empty');
-    if (location.location_mode === 'online') return $t('mission.location.online');
-    if (hasLocationPoint(location)) {
-      const hint = location.location_hint?.trim() || $t('mission.location.selected');
-      return `${hint} - ${location.radius || 15} km`;
-    }
-    return location.location_hint?.trim() || $t('mission.location.selected');
-  }
 
   async function loadUserResources(resourceId) {
     const que1 = `query { 
@@ -266,7 +217,6 @@
     }
     for (let i = 0; i < meData.length; i++) {
       const data = meData[i];
-      const rowLocation = ensureLocationScope(data);
       let isAssigned = false;
       let isReceived = false;
       if (data.assignedTo && data.assignedTo.length > 0) {
@@ -612,7 +562,6 @@ vots: [${userss},
       if (meData[i].selectedResource === undefined) {
         meData[i].selectedResource = [];
       }
-      ensureLocationScope(meData[i]);
     }
   }
 
@@ -926,40 +875,6 @@ vots: [${userss},
                   <option value="perUnit">{$t('mission.totalNeeds.perUnit')}</option>
                   <option value="rent">{re[$lang]}</option>
                 </select>
-              </td>
-            {/each}
-          </tr>
-          <tr>
-            <th>{$t('mission.location.title')}</th>
-            {#each meData as data, i}
-              {@const locationScope = ensureLocationScope(data)}
-              <td>
-                <div class="space-y-2">
-                  <button
-                    class="w-full px-4 py-2 text-sm text-white rounded hover:bg-blue-600 relative flex items-center justify-center"
-                    class:bg-blue-500={!locationOpenByRow[i]}
-                    class:bg-green-500={locationOpenByRow[i]}
-                    class:hover:bg-green-600={locationOpenByRow[i]}
-                    onclick={() => {
-                      locationOpenByRow[i] = !locationOpenByRow[i];
-                      locationOpenByRow = locationOpenByRow;
-                    }}
-                  >
-                    <span>
-                      {locationOpenByRow[i]
-                        ? $t('mission.location.done')
-                        : locationSummary(locationScope)}
-                    </span>
-                  </button>
-                  {#if locationOpenByRow[i]}
-                    <LocationPicker
-                      bind:value={data.locationScope}
-                      label={$t('mission.location.title')}
-                      helper={$t('mission.location.helper')}
-                      height="280px"
-                    />
-                  {/if}
-                </div>
               </td>
             {/each}
           </tr>
