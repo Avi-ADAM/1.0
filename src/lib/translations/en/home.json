@@ -47,7 +47,8 @@
   "languages": {
     "en": "English",
     "he": "עברית",
-    "ar": "العربية"
+    "ar": "العربية",
+    "ru": "Русский"
   },
   "loading": {
     "title": "Loading a three-dimensional design element"
