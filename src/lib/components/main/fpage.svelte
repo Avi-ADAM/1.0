@@ -51,7 +51,9 @@
   let headlines = $derived([
     $t('home.hero.headline1'),
     $t('home.hero.headline2'),
-    $t('home.hero.headline3')
+    $t('home.hero.headline3'),
+    $t('home.hero.headline4'),
+    $t('home.hero.headline5')
   ]);
 
   let btna = $state(false);
@@ -406,7 +408,7 @@
           {$lang === 'he' ? 'sm:text-2xl text-xl' : 'sm:text-lg text-base'}"
         style="text-shadow:none;"
       >
-        <AnimatedHeadline wait={3000} fade={500} slide={300} y={1000} texts={headlines} />
+        <AnimatedHeadline wait={3000} fade={500} slide={300} y={0} texts={headlines} />
       </div>
 
       <!-- ===== מוביל: הבעיה / הכאב ===== -->
