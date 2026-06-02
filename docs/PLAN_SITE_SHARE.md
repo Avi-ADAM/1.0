@@ -84,30 +84,41 @@
 
 לא אחוז קשיח גלובלי, אלא **שורת־שירות (service line)** מוגדרת, שקופה וניתנת להתאמה.
 
+### 3.0 ✅ החלטת מוצר — בסיס לפי תפקיד (role-based)
+
+**הבסיס נקבע לפי הצד המשלם, לא אחיד:**
+
+| הצד | בסיס | פירוש |
+|---|---|---|
+| **ספק / מוכר** | `provider_earnings` | אחוז מ**הרווח שהספק הרוויח** בעסקה (לא מהמחיר ללקוח) |
+| **לקוח / קונה** | `transaction_value` | אחוז מ**ההוצאה של הלקוח** (הסכום ששילם) |
+
+> כלומר שני הצדדים תורמים לאתר, כל אחד על בסיס משלו: הספק נותן חלק מהרווח, הלקוח חלק
+> מההוצאה. ב‑`computeSiteShare` הבסיס נבחר אוטומטית לפי `payerRole`.
+
 ### 3.1 קונפיגורציה (על הרקמה הראשית / config)
 
 | שדה | סוג | תיאור |
 |---|---|---|
-| `siteShareBasis` | enum `['transaction_value','margin','provider_earnings']` | על מה מחושב החלק |
-| `siteShareSuggestedPct` | Decimal | אחוז ברירת המחדל המוצע (לכל basis) |
+| `siteSharePctProvider` | Decimal | אחוז מהרווח שמשלם **ספק** |
+| `siteSharePctCustomer` | Decimal | אחוז מההוצאה שמשלם **לקוח** |
 | `siteShareMin` / `siteShareMax` | Decimal nullable | רצפה/תקרה לסכום המוצע |
-| `siteShareModelByKind` | JSON | override פר‑סוג עסקה (A מול B, פר‑קטגוריה) |
+| `siteShareModelByKind` | JSON | override פר‑סוג עסקה / קטגוריה |
 
-> `siteShareSuggestedPct` הוא **מוצע** בלבד — המספר הסופי ש"לב" משלם נקבע ב‑§4 (אפשר פחות/יותר).
-> ערכי ברירת המחדל הסופיים הם **החלטה פתוחה** (ראה §9.1).
+> האחוזים הם **מוצעים** בלבד — המספר הסופי ש"לב" משלם נקבע ב‑§4 (אפשר פחות/יותר).
+> ערכי ברירת המחדל המספריים נשארים פרמטר קונפיג (לא hard-coded).
 
 ### 3.2 פונקציית החישוב המשותפת
 
 `src/lib/server/revenue/computeSiteShare.ts` — פונקציה **טהורה**, נקראת משני המסלולים (DRY):
 
 ```
-computeSiteShare({ basis, baseAmount, matbea, model, projectOverrides })
+computeSiteShare({ payerRole, baseAmount, matbea, config, projectOverrides })
   → { siteAmount, matbea, basis, suggestedPct, line: { he, en } }
 ```
 
-- `transaction_value`: `siteAmount = clamp(baseAmount × pct, min, max)`
-- `margin`: על בסיס `matanot.marginPct` / `estimatedPrice` (למוצרים `pricingMode!='fixed'`)
-- `provider_earnings`: אחוז מתוך מה שהספק מרוויח בפועל (לא מהמחיר ללקוח)
+- `payerRole='customer'` → basis `transaction_value`: `siteAmount = clamp(baseAmount × pctCustomer, min, max)` (`baseAmount` = הוצאת הלקוח)
+- `payerRole='provider'` → basis `provider_earnings`: `siteAmount = clamp(baseAmount × pctProvider, min, max)` (`baseAmount` = רווח הספק)
 
 הפלט `line` הוא תיאור מילולי להצגה ("שירות ניהול ושותפות של 1lev1 — מוצע: ₪Y"), כדי
 שהמשתמש יבין שזו **שורה בחבילה**, לא "מס".

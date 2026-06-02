@@ -7,6 +7,8 @@
   import { calcX } from '$lib/func/calcX.svelte';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { executeAction } from '$lib/client/actionClient.js';
+  import { buildSiteShareLines } from '$lib/revenue/buildSiteShareLines.js';
+  import { SITE_SHARE_FLAGS, SITE_SHARE_TREASURY_USER_ID } from '$lib/revenue/config.js';
   import ComparisonDisplay from '$lib/components/ui/ComparisonDisplay.svelte';
   import { toast } from 'svelte-sonner';
   import Button from '$lib/celim/ui/button.svelte';
@@ -416,6 +418,34 @@
             noten: ulist[c].noten > 0,
             nirsham: false // Add missing required field
           });
+        }
+      }
+
+      // Step 2.5: Site share — add the platform ("main rikma") as a recipient.
+      // Off by default (SITE_SHARE_FLAGS.manualSplit) and a no-op until a treasury
+      // user is configured, so this leaves the existing split untouched. See
+      // docs/PLAN_SITE_SHARE.md §6.1. In a manual split all members are providers,
+      // so the basis is the distributed profit (revach).
+      const siteLines = buildSiteShareLines({
+        enabled: SITE_SHARE_FLAGS.manualSplit,
+        payerRole: 'provider',
+        baseAmount: revach,
+        treasuryUserId: SITE_SHARE_TREASURY_USER_ID,
+        payerUserId: String(cookieValueId),
+        projectId: String($idPr),
+        matbea: '2'
+      });
+      if (siteLines) {
+        // proposedAmount is an R2 Haluka field — omit it until the schema lands.
+        const { proposedAmount, ...siteHalukaPayload } = siteLines.halukaData;
+        const siteHalukaRes = await executeAction('createHaluka', {
+          data: { ...siteHalukaPayload, publishedAt: d.toISOString() }
+        });
+        if (siteHalukaRes.success && siteHalukaRes.data?.createHaluka?.data?.id) {
+          halukaIds.push(siteHalukaRes.data.createHaluka.data.id);
+          hervachtiArray.push(siteLines.hervachtiEntry);
+        } else {
+          console.error('Failed to create site-share haluka:', siteHalukaRes.error);
         }
       }
 
