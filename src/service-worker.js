@@ -2,6 +2,7 @@
 
 //TODO: push nutifiction, english menifast
 import { build, files, version } from '$service-worker';
+import { signEventInSw, flushPending } from '$lib/crypto/swSign';
 
 // Create a unique cache name for this deployment
 const CACHE = `cache-${version}`;
@@ -85,6 +86,30 @@ self.addEventListener('notificationclick', function(event) {
           });*/
       })
   );
+});
+
+// Consent signing: a single-writer endpoint that signs an event with the
+// non-extractable private key kept in the freemates-crypto IDB. UI tabs pass
+// MessageChannel ports so the reply is delivered back to the originator.
+self.addEventListener('message', (ev) => {
+  const data = ev.data;
+  if (!data || data.type !== 'consent.sign') return;
+  const port = ev.ports && ev.ports[0];
+  ev.waitUntil((async () => {
+    try {
+      const res = await signEventInSw(data.payload);
+      if (port) port.postMessage(res);
+      if (res.ok && self.registration && self.registration.sync) {
+        try { await self.registration.sync.register('consent-sync'); } catch (e) { void e; }
+      }
+    } catch (e) {
+      if (port) port.postMessage({ ok: false, reason: 'sw_threw: ' + (e && e.message) });
+    }
+  })());
+});
+
+self.addEventListener('sync', (ev) => {
+  if (ev.tag === 'consent-sync') ev.waitUntil(flushPending());
 });
 
 self.addEventListener('fetch', (event) => {
