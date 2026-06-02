@@ -1,0 +1,22 @@
+{
+  "title": "Мои сделки",
+  "subtitle": "Отслеживайте все продукты и их состояние в режиме реального времени",
+  "my_purchases": "Мои покупки",
+  "my_sales": "Мои продажи",
+  "pending_requests": "Ожидающие запросы",
+  "active_purchases": "Активные покупки",
+  "active_sales": "Активные продажи",
+  "pending_requests_label": "Запросы на покупку, ожидающие одобрения",
+  "no_active_purchases": "У вас пока нет активных покупок",
+  "no_active_sales": "У вас пока нет активных продаж",
+  "no_pending_requests": "Нет ожидающих запросов",
+  "logo_alt": "Логотип сделок",
+  "quick_sales_center": "Центр продаж",
+  "quick_sales_center_hint": "Продавайте продукты из ваших проектов",
+  "quick_concierge": "Консьерж",
+  "quick_concierge_hint": "Запросы и пожелания для покупок",
+  "cta_start_selling": "Открыть центр продаж",
+  "cta_find_products": "Найти через консьержа",
+  "cta_sales_center_desc": "Перейдите в центр продаж, чтобы добавить новую продажу",
+  "cta_concierge_desc": "Опубликуйте пожелание и найдите то, что ищете"
+}

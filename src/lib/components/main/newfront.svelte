@@ -36,6 +36,13 @@
       locale.set('ar');
       document.cookie =
         `lang=${$lang}; expires=` + new Date(2027, 0, 1).toUTCString();
+    } else if (lan == 'ru') {
+      doesLang.set(true);
+      langUs.set('ru');
+      lang.set('ru');
+      locale.set('ru');
+      document.cookie =
+        `lang=${$lang}; expires=` + new Date(2027, 0, 1).toUTCString();
     }
     trans = false;
   }
@@ -71,7 +78,8 @@
   let pageurl = {
     ar: 'https://1lev1.com/ar',
     en: 'https://1lev1.com/en',
-    he: 'https://1lev1.com/he'
+    he: 'https://1lev1.com/he',
+    ru: 'https://1lev1.com/ru'
   };
   let size = $derived({
     width: w < 320 ? w : Math.min(w * 1.15, h * 1.5), // הגבל רוחב לפי יחס גובה
@@ -202,6 +210,14 @@
               title="Hebrew"
               class="text-barbi border border-lturk hover:text-gold bg-white text-center hover:bg-gray-50 px-2 py-0.5 rounded text-sm"
               >{$t('home.languages.he')}</button
+            >
+          {/if}
+          {#if $lang != 'ru'}
+            <button
+              onclick={() => change('ru')}
+              title="Russian"
+              class="text-barbi border border-lturk hover:text-gold bg-white text-center hover:bg-gray-50 px-2 py-0.5 rounded text-sm"
+              >{$t('home.languages.ru')}</button
             >
           {/if}
         </div>
