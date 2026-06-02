@@ -652,6 +652,13 @@ meta {
       doesLang.set(true);
       document.cookie =
         `lang=he; expires=` + new Date(2027, 0, 1).toUTCString();
+    } else if (la == 'ru') {
+      lang.set('ru');
+      locale.set('ru');
+      langUs.set('ru');
+      doesLang.set(true);
+      document.cookie =
+        `lang=ru; expires=` + new Date(2027, 0, 1).toUTCString();
     }
   }
 
@@ -785,6 +792,9 @@ meta {
         {/if}
         {#if $locale !== 'he'}
           <button onclick={() => change('he')} class="menu-btn">עברית</button>
+        {/if}
+        {#if $locale !== 'ru'}
+          <button onclick={() => change('ru')} class="menu-btn">Русский</button>
         {/if}
         <a href="/about" class="menu-btn">{$t('home.nav.about')}</a>
         <button onclick={info} class="menu-btn"

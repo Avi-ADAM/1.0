@@ -36,6 +36,13 @@
       locale.set('ar');
       document.cookie =
         `lang=${$lang}; expires=` + new Date(2027, 0, 1).toUTCString();
+    } else if (lan == 'ru') {
+      doesLang.set(true);
+      langUs.set('ru');
+      lang.set('ru');
+      locale.set('ru');
+      document.cookie =
+        `lang=${$lang}; expires=` + new Date(2027, 0, 1).toUTCString();
     }
     trans = false;
   }
@@ -83,7 +90,8 @@
   let pageurl = {
     ar: 'https://1lev1.com/ar',
     en: 'https://1lev1.com/en',
-    he: 'https://1lev1.com/he'
+    he: 'https://1lev1.com/he',
+    ru: 'https://1lev1.com/ru'
   };
   let size = $derived({
     width: w,
@@ -202,6 +210,16 @@
         class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
       >
         {$t('home.languages.he')}
+      </button>
+    {/if}
+    {#if $lang != 'ru'}
+      <button
+        type="button"
+        onclick={() => change('ru')}
+        title="change language to Russian"
+        class="text-barbi border-2 border-lturk font-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
+      >
+        {$t('home.languages.ru')}
       </button>
     {/if}
     {#if $lang == 'he'}
