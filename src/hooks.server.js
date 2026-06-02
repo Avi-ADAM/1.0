@@ -19,25 +19,29 @@ const myErrorHandler = ({ error, event }) => {
 const manifestLink = {
   he: "https://res.cloudinary.com/love1/raw/upload/v1749551626/manifest_with_new_routes_qktyc3.json?v=3",
   en: "https://res.cloudinary.com/love1/raw/upload/v1749552534/eng-mani-updated_xpcxdf.json?v=2",
-  ar: "https://res.cloudinary.com/love1/raw/upload/v1749552534/eng-mani-updated_xpcxdf.json?v=2"
+  ar: "https://res.cloudinary.com/love1/raw/upload/v1749552534/eng-mani-updated_xpcxdf.json?v=2",
+  ru: "https://res.cloudinary.com/love1/raw/upload/v1749552534/eng-mani-updated_xpcxdf.json?v=2"
 };
 
 const desc = {
   he: '1💗1 הסכמה עולמית על חירות | ליצור יחד בהסכמה. לכל 1 יש כישרונות ויכולות ייחודים, לכל 1 יש חלום. ביחד ניתן ליצור כל דבר, לשתף פעולה, לחלום, להעז, להצליח ולהרוויח בגדול.',
   en: '1💗1 WorldWide consensus for Security and Peace | collaboration platform, create together harmoniously | consensus based partnerships management platform | we can together',
-  ar: '1💗1 اتفاق عالمي للحرية والسلام، منصة تعاون، نخلق معًا بتناغم | نظام إدارة الشراكات القائم على التوافق، يمكننا معًا'
+  ar: '1💗1 اتفاق عالمي للحرية والسلام، منصة تعاون، نخلق معًا بتناغم | نظام إدارة الشراكات القائم على التوافق، يمكننا معًا',
+  ru: '1💗1 Всемирное согласие на свободу и безопасность | платформа сотрудничества, создавать вместе в согласии | система управления партнёрствами на основе консенсуса | вместе мы можем'
 };
 
 const title = {
   en: '1💗1 | Create together harmoniously | Worldwide Consensus for Freedom',
   he: 'הסכמה עולמית על חירות וביטחון | 1💗1️ ליצור ביחד בהסכמה | 1💗1',
-  ar: '1💗1 | نخلق معًا بتناغم | اتفاق عالمي للحرية'
+  ar: '1💗1 | نخلق معًا بتناغم | اتفاق عالمي للحرية',
+  ru: '1💗1 | Создавать вместе в согласии | Всемирное согласие на свободу'
 };
 
 const cl = {
   he: 'he-IL',
   en: 'en-gb',
-  ar: 'ar-EG'
+  ar: 'ar-EG',
+  ru: 'ru-RU'
 };
 
 let lang = 'he'; // Default language set to Hebrew
@@ -48,7 +52,7 @@ function getLanguage(event) {
   const coociLang = event.cookies.get('lang');
   const userAgent = event.request.headers.get('accept-language');
 
-  if (qlang && ['he', 'en', 'ar'].includes(qlang)) {
+  if (qlang && ['he', 'en', 'ar', 'ru'].includes(qlang)) {
     return qlang;
   } else if (event.url.pathname === '/en') {
     return 'en';
@@ -56,6 +60,8 @@ function getLanguage(event) {
     return 'ar';
   } else if (event.url.pathname === '/he') {
     return 'he';
+  } else if (event.url.pathname === '/ru') {
+    return 'ru';
   } else if (!coociLang) {
     return userAgent?.includes('he') ? 'he' : 'en';
   } else {
@@ -75,7 +81,7 @@ export async function handle({ event, resolve }) {
   event.locals.email = event.cookies.get('email') || false;
   console.log(lang, event.url.pathname);
   // Set language cookie based on URL path
-  if (event.url.pathname === '/en' || event.url.pathname === '/ar' || event.url.pathname === '/he') {
+  if (event.url.pathname === '/en' || event.url.pathname === '/ar' || event.url.pathname === '/he' || event.url.pathname === '/ru') {
     event.cookies.set('lang', lang, { path: '/' });
   }
 

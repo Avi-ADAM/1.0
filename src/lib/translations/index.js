@@ -6,6 +6,7 @@ export const config = {
         en: { lang },
         he: { lang },
         ar: { lang },
+        ru: { lang },
     },
     loaders: [
         {
@@ -242,6 +243,104 @@ export const config = {
             key: 'deals',
             routes: [/^(?:\/he|\/en|\/ar)?\/deals/],
             loader: async () => (await import('./ar/deals.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'onboard',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/onboard/],
+            loader: async () => (await import('./ru/onboard.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'tasks',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/myacts/],
+            loader: async () => (await import('./ru/tasks.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'bot',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/chat/],
+            loader: async () => (await import('./ru/bot.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'negotiation',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/negotiation/],
+            loader: async () => (await import('./ru/negotiation.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'guide',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/guid/],
+            loader: async () => (await import('./ru/guide.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'faq',
+            routes: [/^\/faq/],
+            loader: async () => (await import('./ru/faq.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'love',
+            routes: ['/love'],
+            loader: async () => (await import('./ru/love.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'bot',
+            loader: async () => (await import('./ru/bot.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'home',
+            loader: async () => (await import('./ru/home.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'nav',
+            loader: async () => (await import('./ru/nav.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'auth',
+            loader: async () => (await import('./ru/auth.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'lev',
+            loader: async () => (await import('./ru/lev.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'countries',
+            loader: async () => (await import('./ru/countries.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'deals',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/deals/],
+            loader: async () => (await import('./ru/deals.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'process',
+            loader: async () => (await import('./ru/process.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'timers',
+            loader: async () => (await import('./ru/timers.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'project',
+            loader: async () => (await import('./ru/project.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'mission',
+            loader: async () => (await import('./ru/mission.json')).default,
         },
         {
             locale: 'he',
