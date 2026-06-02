@@ -400,9 +400,10 @@
       </div>
 
       <div
-        class="sababa mt-2 mb-8 font-bold sm:text-2xl text-xl text-transparent
+        class="sababa mt-2 mb-8 font-bold text-transparent
           bg-clip-text bg-[length:auto_200%] animate-gradienty
-          bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
+          bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]
+          {$lang === 'he' ? 'sm:text-2xl text-xl' : 'sm:text-lg text-base'}"
         style="text-shadow:none;"
       >
         <AnimatedHeadline wait={3000} fade={500} slide={300} y={1000} texts={headlines} />
@@ -897,10 +898,14 @@
     font-family: 'Sababa', system-ui !important;
     text-shadow: none;
     color: inherit;
+    white-space: normal;
+    word-break: break-word;
+    display: inline-block;
+    max-width: 100%;
   }
   @media (max-width: 639px) {
     .sababa :global(span) {
-      font-size: 1.35rem;
+      font-size: 1.1rem;
       line-height: 1.45;
     }
   }
