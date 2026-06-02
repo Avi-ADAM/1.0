@@ -48,11 +48,11 @@
   }
 
   // Derived value for headlines array
-  let headlines = [
+  let headlines = $derived([
     $t('home.hero.headline1'),
     $t('home.hero.headline2'),
     $t('home.hero.headline3')
-  ];
+  ]);
 
   let btna = $state(false);
 
