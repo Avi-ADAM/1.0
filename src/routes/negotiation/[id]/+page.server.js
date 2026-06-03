@@ -28,7 +28,21 @@ export async function load({ params, fetch }) {
       if (result.data?.negotiation?.data) {
         const negotiationData = result.data.negotiation.data;
         const attrs = negotiationData.attributes;
-        
+
+        /** voters may be a JSON array (new schema) or a JSON string (legacy) */
+        const parseVoters = (v) => {
+          if (Array.isArray(v)) return v;
+          if (typeof v === 'string') try { return JSON.parse(v); } catch { return []; }
+          return [];
+        };
+
+        /** tags may be JSON array or JSON string */
+        const parseTags = (v) => {
+          if (Array.isArray(v)) return v;
+          if (typeof v === 'string') try { return JSON.parse(v); } catch { return []; }
+          return [];
+        };
+
         return {
           id: negotiationData.id,
           isNew: false,
@@ -43,18 +57,31 @@ export async function load({ params, fetch }) {
             createdByEmail: attrs.createdByEmail,
             createdAt: attrs.createdAt,
             updatedAt: attrs.updatedAt,
+            // New fields
+            visibility: attrs.visibility || 'private',
+            shareToken: attrs.shareToken || null,
+            isLocal: attrs.isLocal || false,
+            scaleMin: attrs.scaleMin ?? 0,
+            scaleMax: attrs.scaleMax ?? 100,
+            places: attrs.places?.data?.map(p => ({ id: p.id, name: p.attributes.name })) || [],
             positions: attrs.positions?.data?.map(pos => ({
               id: pos.id,
               heading: pos.attributes.heading,
               description: pos.attributes.description,
               author: pos.attributes.author,
               authorEmail: pos.attributes.authorEmail,
+              authorExternalId: pos.attributes.authorExternalId || null,
+              authorType: pos.attributes.authorType || null,
               votes: pos.attributes.votes || 0,
-              voters: JSON.parse(pos.attributes.voters || '[]'),
+              voters: parseVoters(pos.attributes.voters),
               location: pos.attributes.location || 50,
               intensity: pos.attributes.intensity || 5,
-              tags: JSON.parse(pos.attributes.tags || '[]'),
+              tags: parseTags(pos.attributes.tags),
               order: pos.attributes.order || 1,
+              isAnchor: pos.attributes.isAnchor || false,
+              pole: pos.attributes.pole || 'none',
+              kind: pos.attributes.kind || 'opinion',
+              relativePlacement: pos.attributes.relativePlacement || null,
               createdAt: pos.attributes.createdAt,
               hover: false
             })) || [],

@@ -15,6 +15,7 @@
   import ActsNego from '../conf/actsNego.svelte';
   import LocationNego from '../conf/locationNego.svelte';
   import { submitNegoMission } from '$lib/client/actionClient';
+  import { updatePendsStore } from '$lib/utils/levSocketHandler';
   /**
    * @typedef {Object} Props
    * @property {any} [negopendmissions]
@@ -360,6 +361,12 @@
       });
 
       if (result.success) {
+        // Pendm negotiation: update the card in place (changed fields + new
+        // vote round) so the user sees the new terms without a full refresh
+        // that would reset their scroll/swiper position.
+        if ((isAsk ?? 0) === 0 && result.data?.id) {
+          updatePendsStore(result.data);
+        }
         toast.success(tr?.toasts.suc[$lang]);
         close();
       } else {

@@ -223,15 +223,15 @@
     try {
       const result = await sendToSer(
         {
-          data: {
-            topic: currentTopic,
-            description: `${$t('negotiation.discussion_created_by')} ${userName}`,
-            status: 'active',
-            maxRounds,
-            currentRound: 1,
-            creator: page.data.uid || null,
-            createdByEmail: userEmail
-          }
+          topic: currentTopic,
+          description: `${$t('negotiation.discussion_created_by')} ${userName}`,
+          status: 'active',
+          maxRounds,
+          currentRound: 1,
+          createdBy: page.data.uid || null,
+          createdByEmail: userEmail,
+          visibility: 'private',
+          publishedAt: new Date().toISOString()
         },
         '40CreateNegotiation',
         0,
@@ -276,12 +276,18 @@
 
       const result = await sendToSer(
         {
-          data: {
-            ...newPoint,
-            negotiation: negotiationId,
-            voters: JSON.stringify([]),
-            aiMeta: JSON.stringify(aiAnalysis || {})
-          }
+          negotiationId,
+          heading,
+          description,
+          author: page.data.uid || null,
+          authorEmail: userEmail,
+          location: suggestedLocation ?? 50,
+          order: points.length + 1,
+          intensity: 5,
+          votes: 0,
+          voters: [],
+          aiMeta: aiAnalysis || {},
+          publishedAt: new Date().toISOString()
         },
         '41CreatePosition',
         0,
@@ -316,22 +322,28 @@
   async function supportPoint(pointId) {
     const point = points.find((p) => p.id === pointId);
     if (!point || point.voters.includes(userName)) return;
+    // Optimistic update
     point.voters = [...point.voters, userName];
     point.votes = (point.votes || 0) + 1;
     points = [...points];
     try {
-      await sendToSer(
-        {
-          id: pointId,
-          data: { voters: JSON.stringify(point.voters), votes: point.votes }
-        },
+      // Server handles idempotent voter tracking via the `support: true` flag
+      const res = await sendToSer(
+        { id: pointId, support: true },
         '42UpdatePosition',
         0,
         0,
         false,
         fetch
       );
+      if (res?.data?.alreadyVoted) {
+        // Server says already voted — roll back optimistic update
+        point.voters = point.voters.filter((s) => s !== userName);
+        point.votes--;
+        points = [...points];
+      }
     } catch {
+      // Roll back on error
       point.voters = point.voters.filter((s) => s !== userName);
       point.votes--;
       points = [...points];

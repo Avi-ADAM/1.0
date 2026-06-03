@@ -99,9 +99,36 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     data: entityData,
   }, context.jwt, context.fetch);
 
+  // Precise card update: a negotiation rewrites the resource terms and opens a
+  // new voting round, so send the changed scalar fields + the negotiator's vote
+  // (at the new order) for an in-place pmashes-store update. This avoids a full
+  // refresh that would reset the user's scroll/swiper position. The card face
+  // (name, totals, vote counts) updates immediately.
+  const patch: Record<string, any> = {};
+  if (nv.name       != null) patch.name       = nv.name;
+  if (nv.descrip    != null) patch.descrip    = nv.descrip;
+  if (nv.spnot      != null) patch.spnot      = nv.spnot;
+  if (nv.easy       != null) patch.easy       = nv.easy;
+  if (nv.hm         != null) patch.hm         = nv.hm;
+  if (nv.price      != null) patch.price      = nv.price;
+  if (nv.kindOf     != null) patch.resourceType = nv.kindOf;
+  if (nv.sqadualed  != null) patch.sqadualed  = nv.sqadualed;
+  if (nv.sqadualedf != null) patch.sqadualedf = nv.sqadualedf;
+  if (nv.linkto     != null) patch.linkto     = nv.linkto;
+  if (entityData.location != null) patch.location = entityData.location;
+
+  // Negotiator's vote in the Strapi-nested shape processPmashes/mergeVote expect.
+  const strapiVote: Record<string, any> = {
+    what: true,
+    users_permissions_user: { data: { id: String(userId) } },
+    order: (params.ordern ?? 0) + 1,
+    ide: parseInt(String(userId), 10),
+    zman: nowISO,
+  };
+
   return {
-    data: { success: true },
-    updateStrategy: { type: 'none' },
+    data: { id: String(params.pmashId), patch, newVote: strapiVote },
+    updateStrategy: { type: 'partialUpdate', config: { dataKeys: ['pmashes'] } },
   };
 };
 

@@ -353,12 +353,20 @@ export function updatePendsStore(data: Partial<PendMissionData> & { id: string }
       console.log('✏️ [levSocketHandler] Updating existing pend', { id: data.id });
 
       const newVote = (data as any).newVote;
-      if (newVote) {
-        // Append the vote (order-aware) so processPends re-derives the counts.
-        const merged = mergeVote((current[index] as any).users, newVote, true);
-        if (merged) {
-          current[index] = { ...current[index], users: merged } as PendMissionData;
+      const patch = (data as any).patch;
+      if (newVote || patch) {
+        // Targeted update: apply changed fields (negotiation) and/or append a
+        // vote (order-aware) so processPends re-derives the card. Avoids merging
+        // transient response fields (consensus/archived) into the store item.
+        let updated: any = current[index];
+        if (patch && typeof patch === 'object') {
+          updated = { ...updated, ...patch };
         }
+        if (newVote) {
+          const merged = mergeVote(updated.users, newVote, true);
+          if (merged) updated = { ...updated, users: merged };
+        }
+        current[index] = updated as PendMissionData;
       } else {
         current[index] = { ...current[index], ...data };
       }
@@ -545,11 +553,19 @@ export function updatePmashesStore(data: Partial<PendResourceData> & { id: strin
       console.log('✏️ [levSocketHandler] Updating existing pmash', { id: data.id });
 
       const newVote = (data as any).newVote;
-      if (newVote) {
-        const merged = mergeVote((current[index] as any).users, newVote, true);
-        if (merged) {
-          current[index] = { ...current[index], users: merged } as PendResourceData;
+      const patch = (data as any).patch;
+      if (newVote || patch) {
+        // Targeted update: apply changed fields (negotiation) and/or append a
+        // vote (order-aware), avoiding merge of transient response fields.
+        let updated: any = current[index];
+        if (patch && typeof patch === 'object') {
+          updated = { ...updated, ...patch };
         }
+        if (newVote) {
+          const merged = mergeVote(updated.users, newVote, true);
+          if (merged) updated = { ...updated, users: merged };
+        }
+        current[index] = updated as PendResourceData;
       } else {
         current[index] = { ...current[index], ...data };
       }

@@ -402,6 +402,50 @@ export const config = {
             key: 'mission',
             loader: async () => (await import('./ar/mission.json')).default,
         },
+        {
+            locale: 'he',
+            key: 'location',
+            loader: async () => (await import('./he/location.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'location',
+            loader: async () => (await import('./en/location.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'location',
+            loader: async () => (await import('./ar/location.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'location',
+            loader: async () => (await import('./ru/location.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'concierge',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/concierge/],
+            loader: async () => (await import('./he/concierge.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'concierge',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/concierge/],
+            loader: async () => (await import('./en/concierge.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'concierge',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/concierge/],
+            loader: async () => (await import('./ar/concierge.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'concierge',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/concierge/],
+            loader: async () => (await import('./ru/concierge.json')).default,
+        },
     ],
 };
 

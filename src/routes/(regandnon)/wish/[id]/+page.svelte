@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { showFoot } from '$lib/stores/showFoot.js';
   import { page } from '$app/stores';
+  import RichText from '$lib/celim/ui/richText.svelte';
 
   /** @type {{ data: { wish: any | null; proposalsCount: number; loadOk: boolean } }} */
   let { data } = $props();
@@ -126,7 +127,7 @@
 
 <svelte:head>
   <title>{wish.title} · משאלה 1💗1</title>
-  <meta name="description" content={wish.long.slice(0, 160)} />
+  <meta name="description" content={wish.long.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160)} />
 </svelte:head>
 
 <!-- ===================================================================
@@ -185,7 +186,9 @@
               <span class="muted hide-xs">מאת {wish.author} · {wish.project}</span>
             </div>
             <h1 class="hero-title">{wish.title}</h1>
-            <p class="hero-long">{wish.long}</p>
+            <div class="hero-long rich-wrap">
+              <RichText outpot={wish.long} editable={false} trans={true} sml={true} />
+            </div>
           </div>
         </div>
         <div class="hero-footer">
@@ -425,6 +428,9 @@
   .dim   { color:#52493e; font-size:11px; }
   .hero-title { margin:0; font-family:'Sababa','Heebo',sans-serif; font-size:clamp(22px,5vw,38px); font-weight:700; line-height:1.15; color:#ede5d8; }
   .hero-long  { margin:12px 0 0; font-family:'Bellefair',serif; font-size:clamp(14px,2vw,16px); line-height:1.65; color:#c8bba8; }
+  .rich-wrap :global(.editor-wrapper) { border:none !important; box-shadow:none !important; }
+  .rich-wrap :global(.tiptap-content) { min-height:0 !important; padding:0 !important; }
+  .rich-wrap :global(.custom-prose) { color:#c8bba8 !important; font-family:'Bellefair',serif !important; font-size:clamp(14px,2vw,16px) !important; line-height:1.65 !important; }
 
   .hero-footer { margin-top:20px; padding-top:16px; border-top:1px solid rgba(238,232,170,.14); display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
   .hero-metas  { display:flex; gap:14px; flex-wrap:wrap; }

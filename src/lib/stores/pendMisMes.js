@@ -2,6 +2,7 @@ import { SendTo } from '$lib/send/sendTo.svelte';
 import { io } from 'socket.io-client';
 import { get, writable } from 'svelte/store';
 import { socketClient } from '$lib/stores/socketClient';
+import { uPic } from '$lib/stores/uPic.js';
   const baseUrl = import.meta.env.VITE_URL
 
 const inFlightForumFetches = new Set();
@@ -81,8 +82,9 @@ export async function initialForum (all = false,ids = [],myId = 0){
       que = `{
        usersPermissionsUser (id:${myId}) {data{ attributes{
                             username
-                            projects_1s {data {id attributes{ 
-                              projectName 
+                            profilePic{data{attributes{url formats}}}
+                            projects_1s {data {id attributes{
+                              projectName
                               profilePic{data{attributes{url formats}}} 
                               forums{
                                 data{id attributes{
@@ -184,6 +186,12 @@ export async function initialForum (all = false,ids = [],myId = 0){
             console.log(res4.data,"res4")
             if(all == true){
               username.set(res4.data.usersPermissionsUser.data.attributes.username)
+
+              // הזרמת תמונת הפרופיל של המשתמש לכל האפליקציה (לדוגמה הדר הקונסיירז')
+              const myPic = res4.data.usersPermissionsUser.data.attributes.profilePic?.data?.attributes;
+              if (myPic) {
+                uPic.set(myPic.formats?.small?.url || myPic.formats?.thumbnail?.url || myPic.url);
+              }
 
               // חילוץ רשימת הפרויקטים
               const projects = res4.data.usersPermissionsUser.data.attributes.projects_1s.data.map(project => ({

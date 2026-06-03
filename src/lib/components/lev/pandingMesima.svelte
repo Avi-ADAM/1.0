@@ -6,7 +6,8 @@
   import { onMount } from 'svelte';
   import Nego from '../prPr/negoM.svelte';
   import LocationView from '$lib/components/location/LocationView.svelte';
-  import { goto } from '$app/navigation';
+  import { goto, invalidate } from '$app/navigation';
+  import { updatePendsStore } from '$lib/utils/levSocketHandler';
   import { idPr } from '../../stores/idPr.js';
   import Diun from './diun.svelte';
   import { RingLoader } from 'svelte-loading-spinners';
@@ -198,6 +199,17 @@
 
   let ser = $state(xyz());
 
+  // Recompute the progress ring whenever the vote counts change — these arrive
+  // as props re-derived from the pends store, so the ring tracks the store
+  // instead of relying on manual mutation that re-renders would overwrite.
+  $effect(() => {
+    // touch the reactive count props so the effect re-runs when they change
+    void noofusersOk;
+    void noofusersNo;
+    void noofusersWaiting;
+    ser = xyz();
+  });
+
   function coinLapach() {
     onCoinLapach?.({
       ani: 'pendmi',
@@ -205,23 +217,37 @@
     });
   }
 
+  // Build the current user's vote in the Strapi-nested shape that processPends
+  // (and the socket merge) expect, so an optimistic store update reads back
+  // identically to the server echo.
+  function buildMyVote(whatVal, whyText) {
+    const myId = String(page.data.id);
+    const vote = {
+      what: Boolean(whatVal),
+      users_permissions_user: { data: { id: myId } },
+      order: ordern ?? 0,
+      ide: parseInt(myId, 10),
+      zman: new Date().toISOString()
+    };
+    if (whyText) vote.why = whyText;
+    return vote;
+  }
+
+  // Apply a vote to the shared pends store immediately. mergeVote replaces the
+  // caller's prior vote at the same order, so this is safe to call twice
+  // (optimistic + authoritative echo) without double counting.
+  function applyMyVote(vote, id = pendId) {
+    updatePendsStore({ id: String(id), newVote: vote });
+  }
+
   let allr = $state(false);
   let forceRect = $state(false);
 
   async function agree(alr) {
-    // Optimistic UI update
-    if (alr == 'alr') {
-      allr = true;
-      already = true;
-      noofusersOk += 1;
-      noofusersNo -= 1;
-      ser = xyz();
-    } else {
-      already = true;
-      noofusersOk += 1;
-      noofusersWaiting -= 1;
-      ser = xyz();
-    }
+    // Immediate optimistic update to the shared store — this is the single
+    // source of truth, so the vote sticks through re-renders, the buttons hide,
+    // and the user can't vote twice while the request is in flight.
+    applyMyVote(buildMyVote(true));
 
     try {
       const result = await executeAction('voteOnPendm', {
@@ -229,12 +255,20 @@
         projectId: String(projectId),
         what: true,
       });
-      if (result.success && result.data?.consensus) {
+      if (!result.success) {
+        await invalidate(() => true); // roll back to server truth
+        return;
+      }
+      if (result.data?.consensus) {
         coinLapach();
+      } else if (result.data?.newVote) {
+        // Reconcile with the authoritative vote (correct order/zman from server).
+        applyMyVote(result.data.newVote, result.data.id ?? pendId);
       }
     } catch (e) {
       error1 = e;
       toast.warning($t('lev.pandingMesima.error'));
+      await invalidate(() => true); // roll back the optimistic vote
     }
   }
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
@@ -266,13 +300,10 @@
 
   function decline(alr) {
     if (alr == 'alr') {
-      // Changing vote from YES → NO immediately (no dialog needed)
+      // Changing vote from YES → NO immediately (no dialog needed). afterwhy()
+      // performs the optimistic store update + server call.
       allr = true;
       isOpen = false;
-      already = true;
-      noofusersNo += 1;
-      noofusersOk -= 1;
-      ser = xyz();
       afterwhy(); // fire without event (no why text)
     } else {
       // First-time NO vote: open dialog to enter reason
@@ -286,9 +317,8 @@
   async function afterwhy(event) {
     const whyText = event?.why ?? '';
     loading = true;
-    noofusersNo += 1;
-    noofusersWaiting -= 1;
-    ser = xyz();
+    // Immediate optimistic update to the shared store (see agree()).
+    applyMyVote(buildMyVote(false, whyText));
 
     try {
       const result = await executeAction('voteOnPendm', {
@@ -298,13 +328,26 @@
         ...(whyText ? { why: whyText } : {}),
       });
       loading = false;
-      if (result.success) {
+      if (!result.success) {
+        await invalidate(() => true); // roll back to server truth
+        return;
+      }
+      // Close the reason dialog now that the vote is recorded.
+      isOpen = false;
+      no = false;
+      if (result.data?.archived) {
+        // Full NO consensus archived the pend — server already triggered a
+        // full refresh; drop the bubble from this view too.
         coinLapach();
+      } else if (result.data?.newVote) {
+        // Reconcile with the authoritative vote.
+        applyMyVote(result.data.newVote, result.data.id ?? pendId);
       }
     } catch (e) {
       error1 = e;
       loading = false;
       toast.warning($t('lev.pandingMesima.error'));
+      await invalidate(() => true); // roll back the optimistic vote
     }
   }
   const close = () => {
@@ -327,8 +370,9 @@
     loading = false;
     no = false;
     masa = false;
-    //dispach or update  coin to negotiable state
-    coinLapach();
+    // The negotiated card is updated in place via the pends store (see negoM),
+    // so keep the bubble — don't remove it — and the user sees the new terms
+    // and reopened vote round without the view jumping back to the start.
   }
   let rect = false;
   async function react() {

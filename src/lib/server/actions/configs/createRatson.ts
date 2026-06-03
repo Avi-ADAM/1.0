@@ -47,6 +47,18 @@ const VALID_STATUS = new Set([
 
 const VALID_ACCESS = new Set(['personal', 'free_threshold', 'pay_to_access']);
 
+// Shared-purchase initiative kinds (PLAN_SHARED_PURCHASE §3.1). `solo` is the
+// classic single-organiser behaviour; any other value opens the group track.
+const VALID_JOIN_KIND = new Set([
+  'solo',
+  'group_trip',
+  'public_renovation',
+  'group_purchase',
+  'community_event',
+  'recurring_subscription',
+  'other'
+]);
+
 function buildProcessSubject(processId: string, name: string): string {
   return `RATSON::${processId}::${name.trim()}`;
 }
@@ -79,6 +91,10 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     isOnline = false,
     age_group = null,
     ai_meta = null,
+    joinKind = 'solo',
+    minJoiners = null,
+    maxJoiners = null,
+    joinDeadline = null,
     extracted_missions = [],
     extracted_resources = []
   } = params as {
@@ -108,6 +124,10 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     isOnline?: boolean;
     age_group?: string | null;
     ai_meta?: unknown;
+    joinKind?: string;
+    minJoiners?: number | null;
+    maxJoiners?: number | null;
+    joinDeadline?: string | null;
     extracted_missions?: ExtractedMissionInput[];
     extracted_resources?: ExtractedResourceInput[];
   };
@@ -119,6 +139,14 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const status = VALID_STATUS.has(status_ratson) ? status_ratson : 'open';
   const access = VALID_ACCESS.has(access_mode) ? access_mode : 'personal';
   const now = new Date().toISOString();
+
+  // ── Shared-purchase metadata (PLAN_SHARED_PURCHASE S0) ────────────────────
+  // A group initiative forces allowJoin=true and starts recruiting. `solo`
+  // stays untouched — no group fields are sent, so existing wishes behave
+  // exactly as before.
+  const kind = VALID_JOIN_KIND.has(joinKind) ? joinKind : 'solo';
+  const isGroup = kind !== 'solo';
+  const effectiveAllowJoin = isGroup ? true : allowJoin;
 
   const extractedMissionsClean = (extracted_missions || []).map((m) => ({
     name: String(m.name || '').trim(),
@@ -142,7 +170,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     startDate,
     finnishDate,
     fulfilled: false,
-    allowJoin,
+    allowJoin: effectiveAllowJoin,
     bounti,
     totalbounti: Number(totalbounti) || 0,
     vallues,
@@ -168,6 +196,16 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     extracted_resources: extractedResourcesClean
   };
   if (logoId) createVars.logo = logoId;
+
+  // Only send group fields for a non-solo initiative, so a plain wish never
+  // touches the shared-purchase columns.
+  if (isGroup) {
+    createVars.joinKind = kind;
+    createVars.share_status = 'recruiting';
+    if (typeof minJoiners === 'number' && minJoiners > 0) createVars.minJoiners = minJoiners;
+    if (typeof maxJoiners === 'number' && maxJoiners > 0) createVars.maxJoiners = maxJoiners;
+    if (joinDeadline) createVars.joinDeadline = joinDeadline;
+  }
 
   const ratsonRes = await strapi.execute('5crratson', createVars, context.jwt, context.fetch);
   const ratsonId: string | null = ratsonRes?.data?.createRatson?.data?.id ?? null;
@@ -232,6 +270,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     processId,
     status,
     accessMode: access,
+    joinKind: kind,
+    shareStatus: isGroup ? 'recruiting' : null,
     extractedMissionsCount: extractedMissionsClean.length,
     extractedResourcesCount: extractedResourcesClean.length
   };
@@ -269,6 +309,10 @@ export const createRatsonConfig: ActionConfig = {
     isOnline: { type: 'boolean', required: false },
     age_group: { type: 'string', required: false },
     ai_meta: { type: 'object', required: false },
+    joinKind: { type: 'string', required: false },
+    minJoiners: { type: 'number', required: false },
+    maxJoiners: { type: 'number', required: false },
+    joinDeadline: { type: 'string', required: false },
     extracted_missions: { type: 'array', required: false },
     extracted_resources: { type: 'array', required: false }
   },

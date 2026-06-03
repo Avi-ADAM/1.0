@@ -124,8 +124,8 @@ const qids_base = {
                                        $mashaabims:[ID],
                                        $link: String,
                                        $publishedAt: DateTime,
-                                       $status_ratson: Enum_Ratson_Status_Ratson,
-                                       $access_mode: Enum_Ratson_Access_Mode,
+                                       $status_ratson: ENUM_RATSON_STATUS_RATSON,
+                                       $access_mode: ENUM_RATSON_ACCESS_MODE,
                                        $categories: [ID],
                                        $sub_category: String,
                                        $language: String,
@@ -139,6 +139,11 @@ const qids_base = {
                                        $ai_meta: JSON,
                                        $chat_forum: ID,
                                        $process: ID,
+                                       $joinKind: ENUM_RATSON_JOINKIND,
+                                       $minJoiners: Int,
+                                       $maxJoiners: Int,
+                                       $joinDeadline: DateTime,
+                                       $share_status: ENUM_RATSON_SHARE_STATUS,
                                        $extracted_missions: [ComponentNewExtractedMissionsInput],
                                        $extracted_resources: [ComponentNewExtractedResourcesInput])
                         { createRatson(
@@ -173,6 +178,11 @@ const qids_base = {
              ai_meta: $ai_meta,
              chat_forum: $chat_forum,
              process: $process,
+             joinKind: $joinKind,
+             minJoiners: $minJoiners,
+             maxJoiners: $maxJoiners,
+             joinDeadline: $joinDeadline,
+             share_status: $share_status,
              extracted_missions: $extracted_missions,
              extracted_resources: $extracted_resources
                   }
@@ -6466,8 +6476,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $matanots: [ID],
     $matanots_offered: [ID],
     $users_permissions_users: [ID],
-    $status_ratson: Enum_Ratson_Status_Ratson,
-    $access_mode: Enum_Ratson_Access_Mode,
+    $status_ratson: ENUM_RATSON_STATUS_RATSON,
+    $access_mode: ENUM_RATSON_ACCESS_MODE,
     $sub_category: String,
     $language: String,
     $lat: Float,
@@ -6704,7 +6714,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     ratsons(
       filters: {
         fulfilled: { eq: false }
-        status_ratson: { in: [open, matching, negotiating] }
+        status_ratson: { in: ["open", "matching", "negotiating"] }
       }
       sort: ["createdAt:desc"]
       pagination: { limit: $limit }
@@ -8010,6 +8020,108 @@ export const qids = {
     }
   }
 }`,
+
+  // ── Concierge live enrichment (PLAN_CONCIERGE §6/§7) ──────────────────────
+  // Search the mission library by a skill/term — used to surface existing
+  // missions that already answer a freshly-typed wish.
+  '200findMissionsBySkill': `query FindMissionsBySkill($q: String) {
+    missions(
+      filters: { or: [ { missionName: { containsi: $q } }, { descrip: { containsi: $q } }, { skills: { skillName: { containsi: $q } } } ] }
+      pagination: { limit: 6 }
+    ) {
+      data {
+        id
+        attributes {
+          missionName
+          descrip
+          skills { data { id attributes { skillName } } }
+        }
+      }
+    }
+  }`,
+
+  // Find real platform members who hold a given skill — the heart of
+  // "check if there are people with these skills and suggest them".
+  '201findUsersBySkill': `query FindUsersBySkill($q: String) {
+    usersPermissionsUsers(
+      filters: { skills: { skillName: { containsi: $q } } }
+      pagination: { limit: 8 }
+    ) {
+      data {
+        id
+        attributes {
+          username
+          profilePic { data { attributes { url formats } } }
+          skills { data { id attributes { skillName } } }
+          projects_1s { data { id attributes { projectName } } }
+        }
+      }
+    }
+  }`,
+
+  // Find *available* resource instances (Sp = who holds a resource; mashaabim is
+  // the template). panui=true means free. Used to suggest real resources +
+  // their owners for a wish's extracted resources.
+  '202findAvailableSp': `query FindAvailableSp($q: String) {
+    sps(
+      filters: {
+        archived: { eq: false }
+        panui: { eq: true }
+        or: [
+          { name: { containsi: $q } }
+          { descrip: { containsi: $q } }
+          { mashaabim: { name: { containsi: $q } } }
+        ]
+      }
+      pagination: { limit: 6 }
+    ) {
+      data {
+        id
+        attributes {
+          name
+          descrip
+          price
+          panui
+          kindOf
+          mashaabim { data { id attributes { name } } }
+          users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          project { data { id attributes { projectName } } }
+        }
+      }
+    }
+  }`,
+
+  // Find existing *products* (matanot) a weave (project) already offers, by name.
+  // A wish's need may be fulfilled by a ready product — picking one routes into
+  // the built-in service-request flow (createSheirutpend). Active, non-archived only.
+  '203findMatanotByText': `query FindMatanotByText($q: String) {
+    matanots(
+      filters: {
+        archived: { eq: false }
+        status_of_voting: { eq: active }
+        or: [
+          { name: { containsi: $q } }
+          { desc: { containsi: $q } }
+        ]
+      }
+      pagination: { limit: 6 }
+    ) {
+      data {
+        id
+        attributes {
+          name
+          desc
+          sub_category
+          price
+          estimatedPrice
+          matbea { data { id attributes { name simbol } } }
+          projectcreates {
+            data { id attributes { projectName profilePic { data { attributes { url } } } } }
+          }
+        }
+      }
+    }
+  }`,
 
   ...qids_base,
   ...moachQids

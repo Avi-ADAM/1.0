@@ -12,6 +12,7 @@
   import { toast } from 'svelte-sonner';
   import Rich from '../conf/rich.svelte';
   import { submitNegoMash } from '$lib/client/actionClient';
+  import { updatePmashesStore } from '$lib/utils/levSocketHandler';
 
   let error1;
   let clicked = false;
@@ -228,6 +229,12 @@
       });
 
       if (result.success) {
+        // Update the card in place (changed fields + new vote round) so the
+        // user sees the new terms without a full refresh that would reset their
+        // scroll/swiper position.
+        if (result.data?.id) {
+          updatePmashesStore(result.data);
+        }
         toast.success(tr?.toasts.suc[$lang]);
         close();
       } else {

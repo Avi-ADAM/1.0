@@ -1,4 +1,6 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
+import { enrichWish, EMPTY_ENRICHMENT, type WishEnrichment } from '$lib/server/ai/enrichWish';
+import type { WishExtraction } from '$lib/server/ai/extractWish';
 import type { PageServerLoad } from './$types';
 
 function shortCode(id: string | number): string {
@@ -151,5 +153,34 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 
   const isOwner = wish ? wish.owners.some((o: any) => String(o.id) === String(uid)) : false;
 
-  return { wish, proposals, loadOk, uid, isOwner };
+  // ── Ground the breakdown in the live platform: real members who hold the
+  //    needed skills + currently-free resource instances (Sp). Best-effort —
+  //    a failure (Pinecone/embeddings/rate-limit) degrades to an empty panel
+  //    rather than blocking the page. Only run it for the owner reviewing an
+  //    open wish that still needs partners.
+  let enrichment: WishEnrichment = EMPTY_ENRICHMENT;
+  if (wish && (wish.extractedMissions.length > 0 || wish.extractedResources.length > 0)) {
+    try {
+      const aiSkills: string[] = Array.isArray(wish.aiMeta?.skills) ? wish.aiMeta.skills : [];
+      const extraction: WishExtraction = {
+        missions: wish.extractedMissions.map((m: any) => ({
+          name: m.name,
+          imp: m.importance === 'must' ? 'must' : 'nice'
+        })),
+        resources: wish.extractedResources.map((r: any) => ({
+          name: r.name,
+          imp: r.importance === 'must' ? 'must' : 'nice'
+        })),
+        skills: aiSkills.map((name: string) => ({ name })),
+        categories: [],
+        titleSuggestion: '',
+        hints: []
+      };
+      enrichment = await enrichWish(extraction, fetch);
+    } catch (e) {
+      console.warn('[concierge/:id] enrichment failed (non-fatal):', e);
+    }
+  }
+
+  return { wish, proposals, loadOk, uid, isOwner, enrichment };
 };

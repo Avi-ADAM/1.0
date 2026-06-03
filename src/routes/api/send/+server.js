@@ -1,13 +1,30 @@
-// TODO: Validation and server-side logic for GraphQL queries.
 // Secure endpoint that uses HttpOnly cookies for authentication.
+// Proxy to Strapi GraphQL — qids map names to safe, pre-vetted queries.
 const HTTP_ST_ENDPOINT = import.meta.env.VITE_URL
 const ep = HTTP_ST_ENDPOINT + "/graphql"
 import { qids } from './qids.js'
 import { validateAllQids, validateQuery } from './qidsValidator.js'
 import { json, error } from '@sveltejs/kit'
-const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER;
 
-// ─── Validate all qids on server startup (dev only) ───
+const VITE_ADMINMONTHER        = import.meta.env.VITE_ADMINMONTHER;
+const CONSENSUS_PUBLIC_TOKEN   = import.meta.env.VITE_CONSENSUS_PUBLIC_TOKEN;   // limited-scope API token for consensus
+const CONSENSUS_PROXY_SECRET   = import.meta.env.VITE_CONSENSUS_PROXY_SECRET;   // shared secret with consensus proxy
+
+// ── Consensus qid registry ─────────────────────────────────────────────────
+/** qids that belong to the consensus feature */
+const CONSENSUS_QIDS = new Set([
+  '39GetNegotiation', '40CreateNegotiation', '41CreatePosition', '42UpdatePosition',
+  'GetNegotiationByToken', 'ListLocalNegotiations',
+  'ListArguments', 'CreateArgument', 'UpdateArgument', 'ListPlaces'
+]);
+
+/** qids where server injects __identity → author fields before sending to Strapi */
+const IDENTITY_INJECT_QIDS = new Set(['41CreatePosition', 'CreateArgument']);
+
+/** qids where arg.support === true triggers server-side idempotent vote (read-then-write) */
+const VOTE_QIDS = new Set(['42UpdatePosition', 'UpdateArgument']);
+
+// ── Dev-time schema validation ─────────────────────────────────────────────
 const isDev = import.meta.env.DEV;
 if (isDev) {
 	console.log('\n🔍 [qids] Running schema validation...');
@@ -24,14 +41,16 @@ if (isDev) {
 export async function POST({ request, cookies }) {
 	const data = await request.json();
 
-	const query = data?.data?.queId ? qids[data.data.queId] : data?.data?.query;
+	// ── Resolve query string ─────────────────────────────────────────────────
+	const queId = data?.data?.queId;
+	const query = queId ? qids[queId] : data?.data?.query;
 
 	if (!query) {
 		throw error(400, 'queId or query is required');
 	}
 
-	// In dev mode, validate raw queries (not from qids) before executing
-	if (isDev && !data?.data?.queId && data?.data?.query) {
+	// In dev mode, validate raw queries before executing
+	if (isDev && !queId && data?.data?.query) {
 		const validation = validateQuery('raw-query', data.data.query);
 		if (!validation.valid) {
 			console.error('❌ [qids] Raw query validation failed:');
@@ -39,36 +58,145 @@ export async function POST({ request, cookies }) {
 		}
 	}
 
-	let isSer = data.isSer ?? false;
-	let idL = cookies.get('id');
-	let jw = isSer ? VITE_ADMINMONTHER : cookies.get('jwt');
+	// ── Auth flags ───────────────────────────────────────────────────────────
+	const isSer          = data.isSer ?? false;
+	const idL            = cookies.get('id');
+	const un             = cookies.get('un');   // username — used as voter-id for JWT path
+	const isConsensusQid = queId && CONSENSUS_QIDS.has(queId);
 
-	if (!jw && !isSer) {
-		throw error(401, 'Unauthorized: No token found');
+	// ── Security: validate consensus proxy secret for service calls ──────────
+	if (isSer && isConsensusQid) {
+		if (!CONSENSUS_PROXY_SECRET) {
+			throw error(500, 'Server misconfiguration: CONSENSUS_PROXY_SECRET not set');
+		}
+		const incoming = request.headers.get('x-consensus-secret');
+		if (incoming !== CONSENSUS_PROXY_SECRET) {
+			throw error(401, 'Unauthorized: Invalid consensus proxy secret');
+		}
 	}
 
+	// ── Token selection ──────────────────────────────────────────────────────
+	// Service calls to consensus qids use the limited-scope token; other service
+	// calls keep the admin token; JWT calls use the user's own token.
+	let jw;
+	if (isSer) {
+		jw = isConsensusQid ? CONSENSUS_PUBLIC_TOKEN : VITE_ADMINMONTHER;
+	} else {
+		jw = cookies.get('jwt');
+	}
+
+	if (!jw) {
+		if (!isSer) throw error(401, 'Unauthorized: No token found');
+		throw error(500, 'Server misconfiguration: service token not set');
+	}
+
+	// ── Extract __identity before building variables ─────────────────────────
+	const keyValueObject = data.data?.arg || {};
+	const identity       = keyValueObject.__identity ?? null;
+
+	// ── Build GraphQL variables (strip __identity and resolve idL) ───────────
 	let variablesObject = {};
-	let keyValueObject = data.data.arg || {};
-	for (let key in keyValueObject) {
-		if (keyValueObject[key] != null)
-			if (key === 'idL') {
-				variablesObject[key] = idL; // Use the local uid from 'idL' cookie for security
-			} else {
-				variablesObject[key] = keyValueObject[key];
-			}
+	for (const key in keyValueObject) {
+		if (keyValueObject[key] != null && key !== '__identity') {
+			variablesObject[key] = (key === 'idL') ? idL : keyValueObject[key];
+		}
 	}
 
-	let bearer1 = 'bearer' + ' ' + jw;
+	// ── Inject identity fields for author-creation qids ─────────────────────
+	// Server uses __identity as the authoritative source — never trust client-sent author fields.
+	if (isSer && identity && IDENTITY_INJECT_QIDS.has(queId)) {
+		if (identity.email)      variablesObject.authorEmail      = identity.email;
+		if (identity.externalId) variablesObject.authorExternalId = identity.externalId;
+		if (identity.type)       variablesObject.authorType       = identity.type;
+		if (identity.name)       variablesObject.authorName       = identity.name;
+	}
 
+	const bearer1 = 'bearer ' + jw;
+
+	// ── Server-side idempotent vote handler ──────────────────────────────────
+	// Handles both JWT path (username as voter-id) and service path (__identity.externalId).
+	if (keyValueObject.support === true && VOTE_QIDS.has(queId)) {
+		// Determine voter id
+		let voterId;
+		if (isSer && identity?.externalId) {
+			voterId = identity.externalId;
+		} else if (!isSer && un) {
+			voterId = un;
+		} else {
+			throw error(400, 'Missing voter identity for vote operation');
+		}
+
+		const entityId = variablesObject.id;
+		if (!entityId) throw error(400, 'Missing id for vote operation');
+
+		const isPosition = queId === '42UpdatePosition';
+		const entityType = isPosition ? 'position' : 'argument';
+
+		// Step 1 — Fetch current voters/votes
+		const fetchGql = `query GetVoters { ${entityType}(id: "${entityId}") { data { attributes { votes voters } } } }`;
+		let fetchData;
+		try {
+			const fetchRes = await fetch(ep, {
+				method: 'POST',
+				body: JSON.stringify({ query: fetchGql }),
+				headers: { 'Content-Type': 'application/json', Authorization: bearer1 }
+			});
+			fetchData = await fetchRes.json();
+		} catch (e) {
+			throw error(500, `Failed to fetch ${entityType} for vote: ${e.message}`);
+		}
+
+		const attrs = fetchData.data?.[entityType]?.data?.attributes;
+		if (!attrs) throw error(404, `${entityType} not found`);
+
+		// Step 2 — Idempotency check
+		const currentVoters = Array.isArray(attrs.voters) ? attrs.voters : [];
+		if (currentVoters.includes(voterId)) {
+			return json({ data: { alreadyVoted: true, votes: attrs.votes } });
+		}
+
+		// Step 3 — Write updated voters + votes
+		const newVoters = [...currentVoters, voterId];
+		const newVotes  = (attrs.votes || 0) + 1;
+
+		const updateMutation = isPosition
+			? `mutation VotePosition($id: ID!, $voters: JSON, $votes: Int) { updatePosition(id: $id, data: { voters: $voters, votes: $votes }) { data { id attributes { votes voters } } } }`
+			: `mutation VoteArgument($id: ID!, $voters: JSON, $votes: Int) { updateArgument(id: $id, data: { voters: $voters, votes: $votes }) { data { id attributes { votes voters } } } }`;
+
+		const controller2 = new AbortController();
+		const tid2 = setTimeout(() => controller2.abort(), 30000);
+		try {
+			const updateRes = await fetch(ep, {
+				method: 'POST',
+				body: JSON.stringify({ query: updateMutation, variables: { id: entityId, voters: newVoters, votes: newVotes } }),
+				headers: { 'Content-Type': 'application/json', Authorization: bearer1 },
+				signal: controller2.signal
+			});
+			clearTimeout(tid2);
+			const updateData = await updateRes.json();
+			return json(updateData);
+		} catch (e) {
+			clearTimeout(tid2);
+			if (e.name === 'AbortError') throw error(504, 'Vote update timed out');
+			throw error(500, e.message || 'Vote update failed');
+		}
+	}
+
+	// ── Enforce: service accounts cannot directly edit positions ─────────────
+	// (editing = UpdatePosition without support:true — only registered JWT users allowed)
+	if (isSer && queId === '42UpdatePosition' && keyValueObject.support !== true) {
+		throw error(403, 'Forbidden: Service accounts cannot edit positions directly');
+	}
+
+	// ── Standard GraphQL fetch ───────────────────────────────────────────────
 	const controller = new AbortController();
-	const timeout = 30000; // 30-second timeout
-	const timeoutId = setTimeout(() => controller.abort(), timeout);
+	const timeoutId  = setTimeout(() => controller.abort(), 30000);
 
 	try {
 		const res = await fetch(ep, {
 			method: 'POST',
 			credentials: 'include',
-			body: JSON.stringify({ query: query, variables: variablesObject || {} }),
+			body: JSON.stringify({ query, variables: variablesObject || {} }),
 			headers: {
 				'Content-Type': 'application/json',
 				Authorization: bearer1
@@ -77,54 +205,35 @@ export async function POST({ request, cookies }) {
 		});
 
 		clearTimeout(timeoutId);
-
 		const newd = await res.json();
 
-		if (newd.data) {
-			return json(newd);
-		}
+		if (newd.data) return json(newd);
 
 		if (newd.errors) {
 			console.error('GraphQL Errors from downstream:', JSON.stringify(newd.errors, null, 2));
-			// Check for authentication errors
 			const authError = newd.errors.find(err =>
 				err.message === 'Invalid token.' ||
 				err.extensions?.code === 'UNAUTHENTICATED' ||
 				err.message.includes('401') ||
 				err.message.includes('Unauthorized')
 			);
-
-			if (authError) {
-				throw error(401, authError.message);
-			}
-
-			// Handle other GraphQL errors by returning the full error object with a 500 status.
+			if (authError) throw error(401, authError.message);
 			return json(newd, { status: 500 });
 		}
 
-		// Fallback for unexpected response structure from the server.
 		console.error('Unexpected response structure:', newd);
-
-		// Strapi returns { data: null, error: { status: 401, ... } } for auth failures
 		if (newd.error?.status === 401 || newd.error?.name === 'UnauthorizedError') {
 			throw error(401, newd.error?.message || 'Unauthorized');
 		}
-
 		return json({ error: 'Unexpected response from server', details: newd }, { status: 500 });
 
 	} catch (e) {
-		clearTimeout(timeoutId); // Ensure timeout is cleared on other errors too
-		
+		clearTimeout(timeoutId);
 		if (e.name === 'AbortError') {
 			console.error('Fetch request timed out.');
 			throw error(504, 'Gateway Timeout: The server did not respond in time.');
 		}
-
-		// If SvelteKit's `error()` was thrown, it should be re-thrown.
-		if (e.status && e.body) {
-			throw e;
-		}
-
+		if (e.status && e.body) throw e;
 		console.error('Error:', e);
 		throw error(500, e.message || 'An internal server error occurred.');
 	}
@@ -141,4 +250,4 @@ export async function post({ request, cookies }) {
         // ... your code
     };
 }
-*/ 
+*/

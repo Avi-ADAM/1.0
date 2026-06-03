@@ -89,26 +89,20 @@
     </div>
     <div class="flex items-center justify-center">
       <button
-        onclick={() => addi()}
+        onclick={() => {
+          activeRoute = '/concierge';
+          goto('/concierge');
+        }}
         type="button"
-        class="inline-flex items-center justify-center w-10 h-10 font-medium bg-goldGrad bg-[length:200%_auto] animate-gradientx text-barbi rounded-full hover:animate-shine group focus:ring-4 focus:ring-blue-300 focus:outline-none dark:focus:ring-blue-800"
+        class="inline-flex items-center justify-center w-10 h-10 overflow-hidden rounded-full ring-2 ring-gold shadow-lg bg-goldGrad bg-[length:200%_auto] animate-gradientx hover:animate-shine group focus:ring-4 focus:ring-blue-300 focus:outline-none dark:focus:ring-blue-800"
       >
-        <svg
-          class="w-4 h-4 text-barbi"
+        <img
+          src="/logo-concierge.png"
+          alt=""
           aria-hidden="true"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 18 18"
-        >
-          <path
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="4"
-            d="M9 1v16M1 9h16"
-          />
-        </svg>
-        <span class="sr-only">New item</span>
+          class="w-full h-full object-cover"
+        />
+        <span class="sr-only">קונסיירז' · רצון חדש</span>
       </button>
     </div>
     <div

@@ -6,7 +6,7 @@
  * Server-authoritative logic:
  *  1. Fetches the current pendm from DB (votes + all OpenMission creation fields)
  *  2. Fetches project members to determine quorum
- *  3. Calculates `orderon` from DB (max negotiations + max vote order) — not trusted from client
+ *  3. Calculates `orderon` from DB (current round = highest existing vote order) — not trusted from client
  *  4. Adds / replaces the caller's vote at the current orderon
  *  5. On full YES consensus → creates OpenMission + archives pendm
  *     On full NO consensus → archives pendm
@@ -52,13 +52,19 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
   const totalMembers = memberIds.length;
 
   // 3. Calculate orderon server-side (not trusted from client)
+  //    orderon is the current negotiation round. Only a negotiation advances
+  //    the round — submitNegoMission casts the negotiator's vote at ordern+1,
+  //    so the highest vote order already reflects the latest negotiation.
+  //    A plain agree/decline vote must join the current round, never invent a
+  //    higher one. (Counting negopendmissions here would over-count when two
+  //    members negotiate the same round before refreshing — two snapshots but
+  //    only one new vote order — pushing orderon past every real vote so
+  //    consensus can never be reached.)
   const existingVotes: any[] = attrs.users ?? [];
-  const negoCount: number = attrs.negopendmissions?.data?.length ?? 0;
-  const maxVoteOrder: number = existingVotes.reduce(
+  const orderon: number = existingVotes.reduce(
     (max: number, v: any) => Math.max(max, v.order ?? 0),
     0,
   );
-  const orderon = Math.max(negoCount, maxVoteOrder);
 
   // 4. Build new votes array:
   //    - strip any existing vote by this user at orderon (handles vote changes)
