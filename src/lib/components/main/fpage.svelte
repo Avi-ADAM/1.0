@@ -1,6 +1,7 @@
 <script>
   import { locale, t } from '$lib/translations';
-  import { AnimatedHeadline } from 'svelte-animated-headline';
+  import { fly } from 'svelte/transition';
+  import { cubicIn, cubicOut } from 'svelte/easing';
   import { goto } from '$app/navigation';
   import Arrow from '$lib/celim/icons/arrow.svelte';
   import Lowding from '$lib/celim/lowding.svelte';
@@ -51,8 +52,21 @@
   let headlines = $derived([
     $t('home.hero.headline1'),
     $t('home.hero.headline2'),
-    $t('home.hero.headline3')
+    $t('home.hero.headline3'),
+    $t('home.hero.headline4'),
+    $t('home.hero.headline5')
   ]);
+
+  // כותרת מתחלפת: נסיעה אופקית לפי כיוון השפה, ללא reflow
+  let currentHeadline = $state(0);
+  let headlineDir = $derived($locale === 'he' || $locale === 'ar' ? 1 : -1);
+  $effect(() => {
+    if (headlines.length <= 1) return;
+    const id = setInterval(() => {
+      currentHeadline = (currentHeadline + 1) % headlines.length;
+    }, 3500);
+    return () => clearInterval(id);
+  });
 
   let btna = $state(false);
 
@@ -399,107 +413,140 @@
         </div>
       </div>
 
-      <div
-        class="sababa mt-2 mb-8 font-bold text-transparent
-          bg-clip-text bg-[length:auto_200%] animate-gradienty
-          bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]
-          {$lang === 'he' ? 'sm:text-2xl text-xl' : 'sm:text-lg text-base'}"
-        style="text-shadow:none;"
-      >
-        <AnimatedHeadline wait={3000} fade={500} slide={300} y={1000} texts={headlines} />
+      <div class="relative w-full min-h-[4rem] sm:min-h-[5rem] mt-2 mb-8 overflow-hidden">
+        {#key currentHeadline}
+          <div
+            class="absolute inset-0 flex items-center justify-center text-center font-bold text-transparent
+              bg-clip-text bg-[length:auto_200%] animate-gradienty
+              bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]
+              {$lang === 'he' ? 'sm:text-2xl text-xl' : 'sm:text-lg text-base'}"
+            style="text-shadow:none;"
+            in:fly={{ x: headlineDir * 60, duration: 450, easing: cubicOut }}
+            out:fly={{ x: headlineDir * -60, duration: 450, easing: cubicIn }}
+          >
+            {headlines[currentHeadline]}
+          </div>
+        {/key}
       </div>
 
-      <!-- Content Cards -->
-      <div class="w-full max-w-xl flex flex-col gap-6">
-        <div
-          class="bg-gradient-to-br from-amber-200 via-amber-300 to-rose-200 opacity-80 px-4 py-3 mt-2 rounded-lg border-2 border-gold shadow-xl backdrop-blur-sm"
+      <!-- ===== מוביל: הבעיה / הכאב ===== -->
+      <section
+        class="w-full max-w-xl mt-4 animate-fade-in-up"
+        style="font-family:'Sababa',sans-serif;"
+      >
+        <h2
+          class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center"
+          style="text-shadow:1px 1px 2px rgba(0,0,0,0.15);"
         >
-          <h2
-            class="text-rose-700 font-bold text-2xl sm:text-xl mb-2 text-center"
-            style="font-family: 'Sababa', sans-serif; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);"
-          >
-            {$t('home.fpage.whyDifferentTitle')}
-          </h2>
-          <p
-            class="text-slate-900 text-lg sm:text-base leading-relaxed text-center"
-            style="font-family: 'Sababa', sans-serif;"
-          >
-            {@html $t('home.fpage.whyDifferentDesc')}
-          </p>
-          <div class="mt-3 text-center">
-            <a
-              href={$locale === 'he'
-                ? '/hascama'
-                : $locale === 'ar'
-                  ? '/aitifaqia'
-                  : '/convention'}
-              class="inline-block bg-barbi hover:bg-white hover:text-barbi text-gold font-semibold text-lg sm:text-base px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
-              style="font-family: 'Sababa', sans-serif;"
+          {$t('home.sections.problemTitle')}
+        </h2>
+        <p class="text-center text-rose-500 text-base sm:text-sm mb-4">
+          {$t('home.sections.painLead')}
+        </p>
+        <div class="flex flex-col gap-2.5">
+          {#each ['pain1', 'pain2', 'pain3', 'pain4'] as p}
+            <div
+              class="flex items-start gap-3 bg-white/55 backdrop-blur-sm border border-rose-300/70 rounded-xl px-4 py-3 shadow-sm"
             >
-              {$t('home.fpage.discoverAgreement')}
-            </a>
-          </div>
+              <span
+                class="shrink-0 mt-0.5 w-6 h-6 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center text-sm font-bold"
+                >✕</span
+              >
+              <p class="text-slate-800 text-base sm:text-sm leading-relaxed text-start">
+                {$t(`home.sections.${p}`)}
+              </p>
+            </div>
+          {/each}
         </div>
-
-        <div
-          class="flex flex-col gap-2 items-center sm:text-md text-xs my-4 px-2"
+        <p
+          class="text-center text-rose-700 font-semibold italic text-lg sm:text-base mt-4"
         >
-          <Tile
-            bg={'roseGold'}
-            big={true}
-            sm={true}
-            reverse={true}
-            openi={true}
-            word={$t('home.features.livelihood')}
-          />
-          <Tile
-            bg={'roseGold'}
-            big={true}
-            sm={true}
-            reverse={true}
-            openi={true}
-            word={$t('home.features.sharedManagement')}
-          />
-          <Tile
-            bg={'roseGold'}
-            big={true}
-            sm={true}
-            reverse={true}
-            openi={true}
-            word={$t('home.features.transparency')}
-          />
-          <Tile
-            bg={'roseGold'}
-            big={true}
-            sm={true}
-            reverse={true}
-            openi={true}
-            word={$t('home.features.tools')}
-          />
-          <Tile
-            bg={'roseGold'}
-            big={true}
-            sm={true}
-            reverse={true}
-            openi={true}
-            word={$t('home.features.ownership')}
-          />
-          <Tile
-            bg={'roseGold'}
-            big={true}
-            sm={true}
-            reverse={true}
-            openi={true}
-            word={$t('home.features.formula')}
-          />
-          <Tile
-            bg={'roseGold'}
-            big={true}
-            sm={true}
-            word={$t('home.features.mission')}
-          />
+          {$t('home.sections.painCost')}
+        </p>
+        <div class="mt-5 text-center">
+          <p
+            class="inline-block bg-gradient-to-r from-gold via-barbi to-gold bg-[length:200%_auto] animate-gradientx text-white font-bold text-xl sm:text-lg px-6 py-3 rounded-2xl shadow-lg"
+          >
+            {$t('home.sections.painTurn')}
+          </p>
         </div>
+      </section>
 
+      <!-- ===== הדרך השלישית: שכיר / יזם בודד / ריקמה ===== -->
+      <section
+        class="w-full max-w-xl mt-10 animate-fade-in-up"
+        style="font-family:'Sababa',sans-serif;"
+      >
+        <h2
+          class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center"
+        >
+          {$t('home.sections.oldWayTitle')}
+        </h2>
+        <p class="text-center text-slate-700 text-base sm:text-sm mb-5">
+          {$t('home.sections.oldWaySub')}
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-stretch">
+          {#each [['colEmployee', false], ['colSolo', false], ['colRikma', true]] as [key, highlight]}
+            <div
+              class="relative flex flex-col rounded-2xl p-4 {highlight
+                ? 'bg-gradient-to-br from-amber-200 via-gold to-rose-200 border-2 border-gold shadow-xl ring-2 ring-gold/50'
+                : 'bg-slate-100/70 backdrop-blur-sm border border-slate-300 shadow-sm'}"
+            >
+              {#if highlight}
+                <span
+                  class="absolute -top-3 left-1/2 -translate-x-1/2 bg-barbi text-gold text-xs font-bold px-3 py-1 rounded-full shadow whitespace-nowrap"
+                  >{$t('home.sections.colRikma_badge')}</span
+                >
+              {/if}
+              <h3
+                class="font-bold text-lg sm:text-base mb-3 text-center {highlight
+                  ? 'text-rose-700 mt-1'
+                  : 'text-slate-500'}"
+              >
+                {$t(`home.sections.${key}_t`)}
+              </h3>
+              <ul class="flex flex-col gap-2">
+                {#each $t(`home.sections.${key}_d`).split('•') as item}
+                  <li
+                    class="flex items-start gap-2 text-sm text-start {highlight
+                      ? 'text-slate-900 font-medium'
+                      : 'text-slate-600'}"
+                  >
+                    <span
+                      class="shrink-0 {highlight
+                        ? 'text-emerald-600'
+                        : 'text-rose-400'}">{highlight ? '✓' : '✕'}</span
+                    >
+                    <span>{item.trim()}</span>
+                  </li>
+                {/each}
+              </ul>
+            </div>
+          {/each}
+        </div>
+      </section>
+
+      <!-- ===== גשר: שאלות הזדהות ===== -->
+      <section
+        class="w-full max-w-xl mt-10 animate-fade-in-up"
+        style="font-family:'Sababa',sans-serif;"
+      >
+        <div class="flex flex-col gap-3">
+          <p
+            class="bg-white/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-3 text-slate-900 text-lg sm:text-base shadow text-center"
+          >
+            {$t('home.intro.q1')}
+          </p>
+          <p
+            class="bg-white/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-3 text-slate-900 text-lg sm:text-base shadow text-center"
+          >
+            {$t('home.intro.q2')}
+          </p>
+        </div>
+      </section>
+
+      <!-- Content Cards: Stats + Mobile CTA -->
+      <div class="w-full max-w-xl flex flex-col gap-6 mt-10">
         <!-- Stats -->
         <div
           class="bg-gradient-to-br from-gold via-barbi to-gold opacity-80 px-4 py-3 mt-2 rounded-lg border-2 border-gold shadow-lg"
@@ -579,25 +626,6 @@
         class="w-full max-w-xl flex flex-col gap-10 mt-12"
         style="font-family:'Sababa',sans-serif;"
       >
-        <!-- בלוק: הבעיה / הזדהות -->
-        <section class="text-center">
-          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-4">
-            {$t('home.sections.problemTitle')}
-          </h2>
-          <div class="flex flex-col gap-3">
-            <p
-              class="bg-white/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-3 text-slate-900 text-lg sm:text-base shadow"
-            >
-              {$t('home.intro.q1')}
-            </p>
-            <p
-              class="bg-white/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-3 text-slate-900 text-lg sm:text-base shadow"
-            >
-              {$t('home.intro.q2')}
-            </p>
-          </div>
-        </section>
-
         <!-- בלוק: יכולות הפלטפורמה -->
         <section id="features" class="scroll-mt-16">
           <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center">
@@ -721,6 +749,102 @@
                 </p>
               </div>
             {/each}
+          </div>
+        </section>
+
+        <!-- בלוק: ערך הליבה — מה באמת מקבלים -->
+        <section class="scroll-mt-16">
+          <p
+            class="text-center text-slate-800 text-lg sm:text-base leading-relaxed mb-5 max-w-lg mx-auto"
+          >
+            {$t('home.features.welcome')}
+          </p>
+          <div class="flex flex-col gap-2 items-center sm:text-md text-xs px-2">
+            <Tile
+              bg={'roseGold'}
+              big={true}
+              sm={true}
+              reverse={true}
+              openi={true}
+              word={$t('home.features.livelihood')}
+            />
+            <Tile
+              bg={'roseGold'}
+              big={true}
+              sm={true}
+              reverse={true}
+              openi={true}
+              word={$t('home.features.sharedManagement')}
+            />
+            <Tile
+              bg={'roseGold'}
+              big={true}
+              sm={true}
+              reverse={true}
+              openi={true}
+              word={$t('home.features.transparency')}
+            />
+            <Tile
+              bg={'roseGold'}
+              big={true}
+              sm={true}
+              reverse={true}
+              openi={true}
+              word={$t('home.features.tools')}
+            />
+            <Tile
+              bg={'roseGold'}
+              big={true}
+              sm={true}
+              reverse={true}
+              openi={true}
+              word={$t('home.features.ownership')}
+            />
+            <Tile
+              bg={'roseGold'}
+              big={true}
+              sm={true}
+              reverse={true}
+              openi={true}
+              word={$t('home.features.formula')}
+            />
+            <Tile
+              bg={'roseGold'}
+              big={true}
+              sm={true}
+              word={$t('home.features.mission')}
+            />
+          </div>
+        </section>
+
+        <!-- בלוק: למה אנחנו שונים (תנועה עולמית) -->
+        <section class="text-center">
+          <div
+            class="bg-gradient-to-br from-amber-200 via-amber-300 to-rose-200 opacity-90 px-4 py-4 rounded-2xl border-2 border-gold shadow-xl backdrop-blur-sm"
+          >
+            <h2
+              class="text-rose-700 font-bold text-2xl sm:text-xl mb-2 text-center"
+              style="text-shadow: 1px 1px 2px rgba(0,0,0,0.3);"
+            >
+              {$t('home.fpage.whyDifferentTitle')}
+            </h2>
+            <p
+              class="text-slate-900 text-lg sm:text-base leading-relaxed text-center"
+            >
+              {@html $t('home.fpage.whyDifferentDesc')}
+            </p>
+            <div class="mt-3 text-center">
+              <a
+                href={$locale === 'he'
+                  ? '/hascama'
+                  : $locale === 'ar'
+                    ? '/aitifaqia'
+                    : '/convention'}
+                class="inline-block bg-barbi hover:bg-white hover:text-barbi text-gold font-semibold text-lg sm:text-base px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+              >
+                {$t('home.fpage.discoverAgreement')}
+              </a>
+            </div>
           </div>
         </section>
 
@@ -894,21 +1018,6 @@
 </div>
 
 <style>
-  .sababa :global(span) {
-    font-family: 'Sababa', system-ui !important;
-    text-shadow: none;
-    color: inherit;
-    white-space: normal;
-    word-break: break-word;
-    display: inline-block;
-    max-width: 100%;
-  }
-  @media (max-width: 639px) {
-    .sababa :global(span) {
-      font-size: 1.1rem;
-      line-height: 1.45;
-    }
-  }
   .flip {
     -moz-transform: scale(-1, 1);
     -webkit-transform: scale(-1, 1);
