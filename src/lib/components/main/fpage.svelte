@@ -1,6 +1,7 @@
 <script>
   import { locale, t } from '$lib/translations';
-  import { AnimatedHeadline } from 'svelte-animated-headline';
+  import { fly } from 'svelte/transition';
+  import { cubicIn, cubicOut } from 'svelte/easing';
   import { goto } from '$app/navigation';
   import Arrow from '$lib/celim/icons/arrow.svelte';
   import Lowding from '$lib/celim/lowding.svelte';
@@ -55,6 +56,17 @@
     $t('home.hero.headline4'),
     $t('home.hero.headline5')
   ]);
+
+  // כותרת מתחלפת: נסיעה אופקית לפי כיוון השפה, ללא reflow
+  let currentHeadline = $state(0);
+  let headlineDir = $derived($locale === 'he' || $locale === 'ar' ? 1 : -1);
+  $effect(() => {
+    if (headlines.length <= 1) return;
+    const id = setInterval(() => {
+      currentHeadline = (currentHeadline + 1) % headlines.length;
+    }, 3500);
+    return () => clearInterval(id);
+  });
 
   let btna = $state(false);
 
@@ -401,15 +413,20 @@
         </div>
       </div>
 
-      <div
-        class="sababa mt-2 mb-8 font-bold text-transparent
-          flex items-center justify-center text-center w-full min-h-[4rem] sm:min-h-[5rem]
-          bg-clip-text bg-[length:auto_200%] animate-gradienty
-          bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]
-          {$lang === 'he' ? 'sm:text-2xl text-xl' : 'sm:text-lg text-base'}"
-        style="text-shadow:none;"
-      >
-        <AnimatedHeadline wait={3000} fade={500} slide={300} y={0} texts={headlines} />
+      <div class="relative w-full min-h-[4rem] sm:min-h-[5rem] mt-2 mb-8 overflow-hidden">
+        {#key currentHeadline}
+          <div
+            class="absolute inset-0 flex items-center justify-center text-center font-bold text-transparent
+              bg-clip-text bg-[length:auto_200%] animate-gradienty
+              bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]
+              {$lang === 'he' ? 'sm:text-2xl text-xl' : 'sm:text-lg text-base'}"
+            style="text-shadow:none;"
+            in:fly={{ x: headlineDir * 60, duration: 450, easing: cubicOut }}
+            out:fly={{ x: headlineDir * -60, duration: 450, easing: cubicIn }}
+          >
+            {headlines[currentHeadline]}
+          </div>
+        {/key}
       </div>
 
       <!-- ===== מוביל: הבעיה / הכאב ===== -->
@@ -1001,21 +1018,6 @@
 </div>
 
 <style>
-  .sababa :global(span) {
-    font-family: 'Sababa', system-ui !important;
-    text-shadow: none;
-    color: inherit;
-    white-space: normal;
-    word-break: break-word;
-    display: inline-block;
-    max-width: 100%;
-  }
-  @media (max-width: 639px) {
-    .sababa :global(span) {
-      font-size: 1.1rem;
-      line-height: 1.45;
-    }
-  }
   .flip {
     -moz-transform: scale(-1, 1);
     -webkit-transform: scale(-1, 1);
