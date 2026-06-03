@@ -403,6 +403,7 @@
 
       <div
         class="sababa mt-2 mb-8 font-bold text-transparent
+          flex items-center justify-center text-center w-full min-h-[4rem] sm:min-h-[5rem]
           bg-clip-text bg-[length:auto_200%] animate-gradienty
           bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]
           {$lang === 'he' ? 'sm:text-2xl text-xl' : 'sm:text-lg text-base'}"
