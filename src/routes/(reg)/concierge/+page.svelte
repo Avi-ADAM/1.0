@@ -320,7 +320,7 @@
     {
       icon: '🌿',
       label:
-        $t('concierge.seed_seed_community_event') ||
+        $t('concierge.seed_community_event') ||
         $t('concierge.seed_community_event')
     },
     { icon: '✍', label: $t('concierge.seed_free_wish') }
