@@ -6545,8 +6545,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
 
   '101createRatsonProposal': `mutation CreateRatsonProposal(
     $ratson: ID!,
-    $kind: Enum_Ratsonproposal_Kind,
-    $status_proposal: Enum_Ratsonproposal_Status_Proposal,
+    $kind: ENUM_RATSONPROPOSAL_KIND,
+    $status_proposal: ENUM_RATSONPROPOSAL_STATUS_PROPOSAL,
     $matanot: ID,
     $project: ID,
     $proposer_users: [ID],
@@ -6583,8 +6583,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
 
   '102updateRatsonProposal': `mutation UpdateRatsonProposal(
     $id: ID!,
-    $kind: Enum_Ratsonproposal_Kind,
-    $status_proposal: Enum_Ratsonproposal_Status_Proposal,
+    $kind: ENUM_RATSONPROPOSAL_KIND,
+    $status_proposal: ENUM_RATSONPROPOSAL_STATUS_PROPOSAL,
     $matanot: ID,
     $project: ID,
     $proposer_users: [ID],
@@ -6655,7 +6655,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
 
   '108createRatsonMatchJob': `mutation CreateRatsonMatchJob(
     $ratson: ID!,
-    $mode: Enum_Ratsonmatchjob_Mode,
+    $mode: ENUM_RATSONMATCHJOB_MODE,
     $started_at: DateTime,
     $finished_at: DateTime,
     $proposals_created: Int,
