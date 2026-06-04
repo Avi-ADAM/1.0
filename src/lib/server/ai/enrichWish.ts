@@ -283,12 +283,12 @@ export async function enrichWish(
         name: a.name ?? '',
         desc: a.desc ?? null,
         price,
-        subCategory: a.sub_category ?? null,
+        subCategory: null,
         projectId: proj?.id ? String(proj.id) : null,
         projectName: proj?.attributes?.projectName ?? null,
         projectLogo: proj?.attributes?.profilePic?.data?.attributes?.url ?? null,
-        currencyName: a.matbea?.data?.attributes?.name ?? null,
-        currencySymbol: a.matbea?.data?.attributes?.simbol ?? null,
+        currencyName: a.currency?.data?.attributes?.name ?? null,
+        currencySymbol: a.currency?.data?.attributes?.simbol ?? null,
         matchedTerm: q
       });
     }

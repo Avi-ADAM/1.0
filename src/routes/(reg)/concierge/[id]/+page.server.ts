@@ -1,7 +1,16 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
+import { actionService } from '$lib/server/actions/index.js';
 import { enrichWish, EMPTY_ENRICHMENT, type WishEnrichment } from '$lib/server/ai/enrichWish';
 import type { WishExtraction } from '$lib/server/ai/extractWish';
 import type { PageServerLoad } from './$types';
+
+export type WishForumMessage = {
+  id: string;
+  from: string;
+  text: string;
+  sentByMe: boolean;
+  ts: string | null;
+};
 
 function shortCode(id: string | number): string {
   const s = String(id).padStart(6, '0');
@@ -153,6 +162,32 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 
   const isOwner = wish ? wish.owners.some((o: any) => String(o.id) === String(uid)) : false;
 
+  // ── Real wish-forum messages (replaces the old demo FORUM_MSGS). Best-effort:
+  //    getForumThread authorizes by participation, so a non-participant (e.g. a
+  //    provider not yet added to the wish chat) just gets an empty thread rather
+  //    than fabricated content. ──────────────────────────────────────────────
+  let forumMessages: WishForumMessage[] = [];
+  const tok = (locals as any)?.tok;
+  if (wish?.chatForumId && uid && tok) {
+    try {
+      const res = await actionService.executeAction(
+        'getForumThread',
+        { forumId: String(wish.chatForumId) },
+        { userId: String(uid), jwt: String(tok), lang: String((locals as any)?.lang || 'he'), fetch }
+      );
+      const msgs = res?.success ? res.data?.forum?.messages ?? [] : [];
+      forumMessages = msgs.map((m: any) => ({
+        id: String(m.id),
+        from: m.username || 'משתמשת',
+        text: m.message || '',
+        sentByMe: !!m.sentByMe,
+        ts: m.timestamp ?? null
+      }));
+    } catch (e) {
+      console.warn('[concierge/:id] forum thread load failed (non-fatal):', e);
+    }
+  }
+
   // ── Ground the breakdown in the live platform: real members who hold the
   //    needed skills + currently-free resource instances (Sp). Best-effort —
   //    a failure (Pinecone/embeddings/rate-limit) degrades to an empty panel
@@ -182,5 +217,5 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
     }
   }
 
-  return { wish, proposals, loadOk, uid, isOwner, enrichment };
+  return { wish, proposals, loadOk, uid, isOwner, enrichment, forumMessages };
 };

@@ -1,4 +1,5 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
+import { stripHtml } from '$lib/utils/stripHtml';
 import type { PageServerLoad } from './$types';
 
 function nameOf(user: any): string {
@@ -68,7 +69,7 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
           ratsonId: ratNode.id ? String(ratNode.id) : null,
           ratsonCode: ratNode.id ? shortCode(ratNode.id) : null,
           ratsonName: ra.name || '(ללא שם)',
-          ratsonLongDes: ra.longDes || ra.desc || '',
+          ratsonLongDes: stripHtml(ra.longDes || ra.desc || ''),
           ratsonStatus: ra.status_ratson || 'open',
           ratsonStart: ra.startDate ?? null,
           ratsonFinish: ra.finnishDate ?? null,

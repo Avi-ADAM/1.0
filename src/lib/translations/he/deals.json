@@ -18,5 +18,9 @@
   "cta_start_selling": "פתח מרכז מכירות",
   "cta_find_products": "חפש דרך קונסיירז׳",
   "cta_sales_center_desc": "עבור למרכז המכירות כדי להוסיף מכירה חדשה",
-  "cta_concierge_desc": "פרסם משאלה ומצא מה שאתה מחפש"
+  "cta_concierge_desc": "פרסם משאלה ומצא מה שאתה מחפש",
+  "incoming_wishes": "משאלות אלייך",
+  "incoming_wishes_label": "משאלות שבהן הוזמנת לתרום משימה או משאב",
+  "no_incoming_wishes": "אין כרגע משאלות שמבקשות ממך",
+  "incoming_wishes_hint": "כשמישהי תזמין אותך לתרום למשאלה — היא תופיע כאן"
 }

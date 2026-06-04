@@ -261,6 +261,65 @@ ratson_proposal.status='accepted' (סופי) + ratson.status_ratson='fulfilled' 
 
 ---
 
+## 5.2. איפה הנמען רואה "מבקשים ממך" (surfacing של requestSuggestion)
+
+> נכתב: 2026-06-04. אחרי בניית `requestSuggestion` (PLAN §5) — השלב הבא: לתת לנמען מקום לראות שמשאלה מבקשת ממנו משימה/משאב.
+
+`requestSuggestion` מייצר שני סוגי תוצרים. לכל אחד surface אחר:
+
+| מסלול | תוצר | איפה הנמען רואה את זה | סטטוס |
+|---|---|---|---|
+| **Track A** — מוצר (`kind='matanot'`) | `Sheirutpend` (בקשת שירות) | `/deals` → טאב **"בקשות ממתינות"** (`PendingRequestCard`, כולל pill "הגיע ממשאלה" דרך `sheirutpend.ratson_proposal`). **כבר עבד.** | ✅ |
+| **Track B** — אדם/משאב (`kind='person'/'resource'`) | `ratson_proposal` (status `suggested`, `proposer_users=[נמען]`) | עד עכשיו: רק התראת push ל-`/lev`. **המסך החדש:** `/deals` → טאב **"משאלות אלייך"**. | ✅ (חדש) |
+| **רמת ריקמה** (פרויקט מועמד) | `ratson_proposal` עם `project` (auto_generated מ-`matchRatson`) | `/moach/[projectId]/wishes` — **כבר היה קיים** (`107listRatsonsForProject`). זו ה"ריקמה" ששאלת עליה — מופעל. | ✅ (קיים) |
+
+### מה נבנה ב-surface הזה (Track B → /deals)
+- QID `111listMyWishInvitations` — `ratsonProposals` לפי `proposer_users.id == me` ו-`status_proposal ∈ {suggested, viewed}`.
+- `dealsQueries.ts`: `IncomingWishInvitation` + `fetchWishInvitationsForUser` (best-effort, מצורף ל-`fetchDealsForUser` ב-`Promise.all`).
+- `IncomingWishCard.svelte` + טאב "משאלות אלייך" ב-`deals/+page.svelte`. הכרטיס מקשר ל-`/concierge/[ratsonId]` (שם הנמען צופה ומגיב — `viewRatsonProposal`/accept/reject חיים שם).
+- תרגומים: `deals.json` ×4 + מפתחות `deals.*` ב-`tr.json`.
+
+### ⏭️ מה דילגנו ל-MVP: אובייקט במסך הלב (`/lev`)
+ההתראה של `requestSuggestion` מפנה ל-`/lev`, וה-surface ה"טבעי" הראשון הוא כרטיס במסך הלב (`finalSwiperArray`) — אבל הוספת **טיפוס אובייקט חדש ללב** נוגעת ב-~8 קבצים (extractor → loader → snapshot version bump → processor → derived → mergeAndSort → milon → UI card). לכן ל-MVP **דילגנו** והסתפקנו ב-surface של `/deals` (שם כבר יש pipeline טעינה צד-שרת פשוט).
+
+> כשנרצה להוסיף את זה (וכל אובייקט-לב עתידי): התיעוד המלא של ה-pipeline נמצא ב-[docs/HOWTO_ADD_LEV_OBJECT.md](./docs/HOWTO_ADD_LEV_OBJECT.md). זה ה"מתכון" שמקצר את הפעם הבאה. ה-`ani` המיועד לטיפוס הזה: `wishInvite`.
+
+---
+
+## 5.3. תגובת ספק להזמנה → מוצר מורכב (binding model)
+
+> נכתב: 2026-06-04. ההמשך הישיר של §5.2 — מה קורה כשספק שהוזמן לוחץ "צפה והגב" ובוחר לתרום בפועל. אומת מול `src/generated/STRAPI_SCHEMA_REFERENCE.md`.
+
+### העיקרון: ספק = יוצר pendm/pmash בריקמה שלו; המשאלה = מוצר מורכב שמרכיב את כולם; הלקוחה = קונה
+
+הקבלת היחסים (כל השדות **כבר קיימים ב‑Strapi** — אפס שינוי סכמה):
+
+| מה | היכן מוגדר |
+| --- | --- |
+| התרומה של הספק (משימה) | `pendm` בריקמת הספק (נוצר ע"י `mission.svelte`/`createMission` הקיים) → שורת BOM `matanot-recipe-mission.pendm` + `assignedMember`=ספק, `mode='createNew'` |
+| התרומה של הספק (משאב) | `pmash` בריקמת הספק (`ResourceCreator.svelte`/`createResource`) → `matanot-recipe-resource.pmash` + `assignedMember` |
+| המוצר המורכב | `matanot` (`pricingMode='estimated'/'quote'`, `process`) — ה‑aggregator |
+| משאלה ↔ מוצר | `ratson.derivedComplexMatanot` (oneToOne→matanot) + `ratson.process` |
+| התחייבות הספק | רכיב `ratson_willingness_entry` על ה‑proposal (`agree,item_idx,item_kind,willingHours/Amount,user`) |
+| הלקוחה כקונה | `sheirut` (נפתח מהמוצר המורכב; `sheirutpend` מפזר הסכמה לכל ריקמת ספק) |
+| מה נוצר/נצרך בזמן אמת | `sheirut-fulfillment` (`createdMissions`/`createdMaaps`) — מזין את `deals/[id]` |
+
+### שתי פאזות (החלטת בעלות — מאושר)
+
+1. **פאזת הרכבה (commitment):** **לא** יוצרים ריקמה — כבד ומזהם. המוצר המורכב הוא aggregator קל‑משקל המעוגן ל‑`ratson.process`; כל `pendm/pmash` חי בריקמה הקיימת של הספק. כל תרומה רק **מוסיפה שורת recipe** למוצר. (M8 stitching חוצה‑ריקמות.)
+2. **פאזת ייצור (אחרי שכולם התחייבו + הלקוחה אישרה):** אין מנוס — **יוצרים ריקמה ייעודית לכל השותפים**. **הלקוחה היא הלקוחה של הריקמה, לא חברה בה.** המוצר המורכב עובר/נקשר לריקמה הזו, ו‑`createSheirutFromPending` מפעיל את ה‑BOM.
+
+### סדר בנייה מוצע (אינקרמנטלי)
+
+- **S1 — accept modal נשלף (reusable):** `AcceptWishOffer.svelte` (props: `proposalId, ratsonId, item{kind,idx,name,hours/qty}`). בוחר ריקמה מארחת (מגשר על `projectId:null`) → מטמיע `mission.svelte`/`ResourceCreator.svelte` ממולא מ‑`extracted_*`. שמיש מ‑wish/lev/deals.
+- **S2 — action `acceptWishOffer`:** יוצר/מוצא את `ratson.derivedComplexMatanot` (lazy, מעוגן ל‑`ratson.process`), מוסיף שורת `matanot-recipe-mission/resource` עם ה‑pendm/pmash שנוצר, כותב `ratson_willingness_entry`, מעדכן `status_proposal`, מתריע ללקוחה.
+- **S3 — decline:** action קטן (status + התראה).
+- **S4 — materialize:** כשכל הצרכים מכוסים + הלקוחה מאשרת → יצירת ריקמת השותפים + `createSheirutFromPending` (M7 path קיים) + `sheirut-fulfillment` → `deals/[id]`.
+
+> פתוח: בחירת ה‑`item_kind`/idx מתוך `extracted_*`; mapping בין proposal יחיד (person/resource) לבין שורת ה‑recipe; תמחור (`willingAmount`/`ratePerHour`).
+
+---
+
 ## 6. אלגוריתם Matching (M3 → M6.5)
 
 ### 6.1 שלב Keyword (M3)

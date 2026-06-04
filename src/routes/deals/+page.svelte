@@ -3,6 +3,7 @@
   import StatsRow from '$lib/components/deals/StatsRow.svelte';
   import DealCard from '$lib/components/deals/DealCard.svelte';
   import PendingRequestCard from '$lib/components/deals/PendingRequestCard.svelte';
+  import IncomingWishCard from '$lib/components/deals/IncomingWishCard.svelte';
   import { t } from '$lib/translations';
   import {
     saleToDeal,
@@ -12,7 +13,7 @@
 
   let { data } = $props();
 
-  type TabKind = DealKind | 'pending';
+  type TabKind = DealKind | 'pending' | 'wishes';
   let tab = $state<TabKind>('purchase');
 
   const purchases = $derived(data.purchases ?? []);
@@ -20,10 +21,14 @@
   const pendingBuy = $derived(data.pendingBuy ?? []);
   const pendingSell = $derived(data.pendingSell ?? []);
   const pendingAll = $derived([...pendingBuy, ...pendingSell]);
+  const incomingWishes = $derived(data.incomingWishes ?? []);
+  const newWishCount = $derived(incomingWishes.filter((w) => w.status === 'suggested').length);
 
   const activeList = $derived(tab === 'purchase' ? purchases : tab === 'sale' ? sales : []);
   const deals = $derived(
-    tab !== 'pending' ? activeList.map((s) => saleToDeal(s, tab as DealKind)) : []
+    tab === 'purchase' || tab === 'sale'
+      ? activeList.map((s) => saleToDeal(s, tab as DealKind))
+      : []
   );
   const stats = $derived(salesToStats(activeList));
 </script>
@@ -95,9 +100,21 @@
         <span class="count">{pendingAll.length}</span>
       {/if}
     </button>
+    <button
+      class="tab"
+      class:active={tab === 'wishes'}
+      onclick={() => (tab = 'wishes')}
+    >
+      {$t('deals.incoming_wishes')}
+      {#if newWishCount > 0}
+        <span class="count warn">{newWishCount}</span>
+      {:else}
+        <span class="count">{incomingWishes.length}</span>
+      {/if}
+    </button>
   </div>
 
-  {#if tab !== 'pending'}
+  {#if tab === 'purchase' || tab === 'sale'}
     <StatsRow {stats} />
 
     <div class="section-label">
@@ -133,7 +150,7 @@
         {/each}
       </div>
     {/if}
-  {:else}
+  {:else if tab === 'pending'}
     <div class="section-label">{$t('deals.pending_requests_label')}</div>
 
     {#if pendingAll.length === 0}
@@ -151,6 +168,24 @@
         {/each}
         {#each pendingSell as req (req.id)}
           <PendingRequestCard {req} kind="sell" />
+        {/each}
+      </div>
+    {/if}
+  {:else}
+    <div class="section-label">{$t('deals.incoming_wishes_label')}</div>
+
+    {#if incomingWishes.length === 0}
+      <div class="empty">
+        <p class="empty-text">{$t('deals.no_incoming_wishes')}</p>
+        <p class="empty-sub">{$t('deals.incoming_wishes_hint')}</p>
+        <a href="/concierge" class="empty-cta empty-cta--pink">
+          🎩 {$t('deals.cta_find_products')}
+        </a>
+      </div>
+    {:else}
+      <div class="deals-grid">
+        {#each incomingWishes as wish (wish.proposalId)}
+          <IncomingWishCard {wish} weaves={data.weaves ?? []} />
         {/each}
       </div>
     {/if}

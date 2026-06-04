@@ -445,7 +445,9 @@
 
       if (result.success) {
         toast.success(t.success);
-        onCreated?.();
+        // Forward the created record so callers (e.g. AcceptWishOffer) can link
+        // it. Existing no-arg callers are unaffected.
+        onCreated?.(result.data);
       } else {
         toast.error(t.error + ': ' + result.error.message);
       }

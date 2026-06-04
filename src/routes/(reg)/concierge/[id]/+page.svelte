@@ -410,12 +410,19 @@
   const inviteResource = (r, label) => requestSuggestion(`r${r.id}`, { kind: 'resource', targetUserId: r.ownerId, projectId: null, totalPrice: r.price ?? 0, label });
   const requestProduct = (m, label) => requestSuggestion(`m${m.id}`, { kind: 'matanot',  matanotId: m.id, projectId: m.projectId, totalPrice: m.price ?? 0, label });
 
-  const FORUM_MSGS = [
-    { from: 'נועה גולן', role: 'ספא טבע',               time: 'לפני שעה', color: 'green', text: 'אישרתי. הפכנו את החלון של 10:00 לרשום שמה. שולחת לכם את כתובת הסוויטה.' },
-    { from: 'תמר ל.',    role: 'אמהות עוזרות',           time: 'לפני 45ד׳', color: 'green', text: 'מעולה. אהיה עם הילדים מ־8:30 עד 14:30. נעה, רוצה שאקנה לאמא שלך זר פרחים בדרך הביתה?' },
-    { from: 'יואב כ.',   role: 'Lift',                   time: 'לפני 22ד׳', color: 'blue',  text: 'אני בעיקרון פנוי. רק רוצה לוודא שעות מדויקות. נעה, אפשר 9:30 או 9:45?' },
-    { from: 'נעה ב.',    role: 'הלקוחה · בעלת המשאלה', time: 'לפני 8ד׳',  color: 'gold',  text: 'יואב, 9:30 מעולה. תמר, רעיון הפרחים מקסים — נעלה את זה לחלוקת ההוצאה.' },
-  ];
+  /* Real wish-forum messages (server-loaded from the wish chat_forum). */
+  const FORUM_VIEW = $derived(data?.forumMessages ?? []);
+
+  function forumRelTime(iso) {
+    if (!iso) return '';
+    const d = new Date(iso).getTime();
+    if (!d) return '';
+    const diff = (Date.now() - d) / 1000;
+    if (diff < 60) return 'הרגע';
+    if (diff < 3600) return `לפני ${Math.round(diff / 60)}ד׳`;
+    if (diff < 86400) return `לפני ${Math.round(diff / 3600)} שעות`;
+    return `לפני ${Math.round(diff / 86400)} ימים`;
+  }
 
   const ACTIVITY = [
     { color: 'gold',  time: 'עכשיו · 21:48', text: 'התכנית 75% מורכבת. נשארה שורה אחת פתוחה (ארוחה).' },
@@ -927,23 +934,32 @@
               </div>
             {/if}
           {:else}
-            <!-- Forum (design showcase — demo wish only) -->
+            <!-- Forum — real messages from the wish chat_forum -->
             <div class="panel">
               <h4>הפורום של המשאלה</h4>
-              <div style="display:flex;flex-direction:column;gap:10px">
-                {#each FORUM_MSGS as m (m.from + m.time)}
-                  <div style="display:flex;gap:10px;align-items:flex-start">
-                    <div class="disc disc-sm" style="border-color:{forumBorder(m.color)};color:{forumColor(m.color)}">{m.from.slice(0,2)}</div>
-                    <div style="flex:1">
-                      <div style="font-size:10px;color:#52493e;margin-bottom:2px">{m.from} · {m.role} · {m.time}</div>
-                      <div style="font-family:'Bellefair',serif;font-size:13px;color:#ede5d8;line-height:1.5">{m.text}</div>
+              {#if FORUM_VIEW.length === 0}
+                <div style="text-align:center;color:#52493e;font-size:13px;padding:18px 8px;font-family:'Bellefair',serif">
+                  עוד אין הודעות בפורום המשאלה.
+                </div>
+              {:else}
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  {#each FORUM_VIEW as m (m.id)}
+                    {@const color = m.sentByMe ? 'gold' : 'blue'}
+                    <div style="display:flex;gap:10px;align-items:flex-start">
+                      <div class="disc disc-sm" style="border-color:{forumBorder(color)};color:{forumColor(color)}">{(m.from || '··').slice(0,2)}</div>
+                      <div style="flex:1">
+                        <div style="font-size:10px;color:#52493e;margin-bottom:2px">{m.from} · {forumRelTime(m.ts)}</div>
+                        <div style="font-family:'Bellefair',serif;font-size:13px;color:#ede5d8;line-height:1.5">{m.text}</div>
+                      </div>
                     </div>
-                  </div>
-                {/each}
-              </div>
-              <button class="btn-ghost" style="width:100%;margin-top:12px;justify-content:center">
-                פתחי את כל השיחה (12 הודעות)
-              </button>
+                  {/each}
+                </div>
+              {/if}
+              {#if data?.wish?.chatForumId}
+                <a href={`/forum/${data.wish.chatForumId}`} class="btn-ghost" style="width:100%;margin-top:12px;justify-content:center;text-decoration:none">
+                  פתחי את כל השיחה
+                </a>
+              {/if}
             </div>
           {/if}
         </main>

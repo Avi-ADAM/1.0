@@ -777,7 +777,7 @@ const qids_base = {
         visibility: $visibility,
         shareToken: $shareToken,
         isLocal: $isLocal,
-        places: $placeIds,
+        cuntries: $placeIds,
         publishedAt: $publishedAt
       }) {
         data {
@@ -5991,6 +5991,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $mode: ENUM_MATANOTRECIPEMISSION_MODE,
     $notes: String,
     $partof: ID,
+    $assignedMember: ID,
     $publishedAt: DateTime
   ) {
     createMatanotRecipeMission(data: {
@@ -6003,6 +6004,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       mode: $mode,
       notes: $notes,
       partof: $partof,
+      assignedMember: $assignedMember,
       publishedAt: $publishedAt
     }) {
       data { id attributes { hoursPerUnit unitsPerProduct mode } }
@@ -6045,6 +6047,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $kindOf: ENUM_MATANOTRECIPERESOURCE_KINDOF,
     $mode: ENUM_MATANOTRECIPERESOURCE_MODE,
     $notes: String,
+    $assignedMember: ID,
     $publishedAt: DateTime
   ) {
     createMatanotRecipeResource(data: {
@@ -6056,6 +6059,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       kindOf: $kindOf,
       mode: $mode,
       notes: $notes,
+      assignedMember: $assignedMember,
       publishedAt: $publishedAt
     }) {
       data { id attributes { quantityPerUnit pricePerUnit mode } }
@@ -6095,7 +6099,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $quantity: Float!,
     $process: ID,
     $agreedPrice: Float,
-    $status: ENUM_SHEIRUTFULFILLMENT_STATUS,
+    $status_process: ENUM_SHEIRUTFULFILLMENT_STATUS_PROCESS,
     $publishedAt: DateTime
   ) {
     createSheirutFulfillment(data: {
@@ -6104,12 +6108,12 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       quantity: $quantity,
       process: $process,
       agreedPrice: $agreedPrice,
-      status: $status,
+      status_process: $status_process,
       publishedAt: $publishedAt
     }) {
       data {
         id
-        attributes { quantity agreedPrice status }
+        attributes { quantity agreedPrice status_process }
       }
     }
   }`,
@@ -6117,19 +6121,19 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
   '132updateSheirutFulfillment': `mutation UpdateSheirutFulfillment(
     $id: ID!,
     $agreedPrice: Float,
-    $status: ENUM_SHEIRUTFULFILLMENT_STATUS,
-    $createdMissions: [ID],
-    $createdMaaps: [ID],
-    $createdPmashes: [ID]
+    $status_process: ENUM_SHEIRUTFULFILLMENT_STATUS_PROCESS,
+    $createdMissions: ID,
+    $createdMaaps: ID,
+    $createdPmashes: ID
   ) {
     updateSheirutFulfillment(id: $id, data: {
       agreedPrice: $agreedPrice,
-      status: $status,
+      status_process: $status_process,
       createdMissions: $createdMissions,
       createdMaaps: $createdMaaps,
       createdPmashes: $createdPmashes
     }) {
-      data { id attributes { agreedPrice status } }
+      data { id attributes { agreedPrice status_process } }
     }
   }`,
 
@@ -6681,7 +6685,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     matanots(
       filters: {
         archived: { eq: false }
-        status_of_voting: { eq: active }
+        status_of_voting: { eq: "active" }
       }
       pagination: { limit: $limit }
     ) {
@@ -6689,7 +6693,6 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         id
         attributes {
           name
-          sub_category
           price
           estimatedPrice
           lat
@@ -6740,6 +6743,126 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           categories { data { id attributes { name } } }
         }
       }
+    }
+  }`,
+
+  /* ── Concierge: wish invitations addressed to me (PLAN_CONCIERGE §5) ──────────
+   * Personal surface for `requestSuggestion` Track B: a wisher invited *this*
+   * user to fill a need (proposer_users contains me). Track A (matanot service
+   * requests) already surface as Sheirutpends in /deals "pending"; this is the
+   * person/resource invitation that otherwise only lived as a /lev notification.
+   */
+  '111listMyWishInvitations': `query ListMyWishInvitations($uid: ID!, $limit: Int) {
+    ratsonProposals(
+      filters: {
+        proposer_users: { id: { eq: $uid } }
+        status_proposal: { in: ["suggested", "viewed"] }
+      }
+      sort: ["createdAt:desc"]
+      pagination: { limit: $limit }
+    ) {
+      data {
+        id
+        attributes {
+          status_proposal
+          kind
+          total_price
+          createdAt
+          forum { data { id } }
+          ratson {
+            data {
+              id
+              attributes {
+                name
+                desc
+                longDes
+                status_ratson
+                startDate
+                finnishDate
+                totalbounti
+                chat_forum { data { id } }
+                users_permissions_users {
+                  data {
+                    id
+                    attributes {
+                      username
+                      profilePic { data { attributes { url } } }
+                    }
+                  }
+                }
+                vallues { data { id attributes { valueName } } }
+                categories { data { id attributes { name } } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  /* ── Concierge: provider response → complex-matanot binding (PLAN_CONCIERGE §5.3) ──
+   * 139 creates the wish's aggregator product WITHOUT a project (neutral, anchored
+   * only to the wish's process) — the assembly-phase product per the two-phase model.
+   * 112 records the provider's commitment on the proposal (willingness + status).
+   */
+  '139createWishMatanot': `mutation CreateWishMatanot(
+    $name: String!,
+    $desc: JSON,
+    $pricingMode: ENUM_MATANOT_PRICINGMODE,
+    $estimatedPrice: Float,
+    $status_of_voting: ENUM_MATANOT_STATUS_OF_VOTING,
+    $process: ID,
+    $publishedAt: DateTime
+  ) {
+    createMatanot(data: {
+      name: $name,
+      desc: $desc,
+      pricingMode: $pricingMode,
+      estimatedPrice: $estimatedPrice,
+      price: $estimatedPrice,
+      status_of_voting: $status_of_voting,
+      process: $process,
+      publishedAt: $publishedAt
+    }) {
+      data { id attributes { name pricingMode status_of_voting } }
+    }
+  }`,
+
+  '141listMyWeavesDetailed': `query ListMyWeavesDetailed($uid: ID!) {
+    usersPermissionsUser(id: $uid) {
+      data {
+        attributes {
+          projects_1s {
+            data {
+              id
+              attributes {
+                projectName
+                restime
+                profilePic { data { attributes { url } } }
+                user_1s { data { id } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  '112commitWishWillingness': `mutation CommitWishWillingness(
+    $id: ID!,
+    $status_proposal: ENUM_RATSONPROPOSAL_STATUS_PROPOSAL,
+    $total_price: Float,
+    $ratson_willingness_entry: [ComponentNewWillingnessEntriesInput]
+  ) {
+    updateRatsonProposal(
+      id: $id,
+      data: {
+        status_proposal: $status_proposal,
+        total_price: $total_price,
+        ratson_willingness_entry: $ratson_willingness_entry
+      }
+    ) {
+      data { id attributes { status_proposal } }
     }
   }`,
 
@@ -8098,11 +8221,8 @@ export const qids = {
     matanots(
       filters: {
         archived: { eq: false }
-        status_of_voting: { eq: active }
-        or: [
-          { name: { containsi: $q } }
-          { desc: { containsi: $q } }
-        ]
+        status_of_voting: { eq: "active" }
+        name: { containsi: $q }
       }
       pagination: { limit: 6 }
     ) {
@@ -8111,10 +8231,9 @@ export const qids = {
         attributes {
           name
           desc
-          sub_category
           price
           estimatedPrice
-          matbea { data { id attributes { name simbol } } }
+          currency { data { id attributes { name simbol } } }
           projectcreates {
             data { id attributes { projectName profilePic { data { attributes { url } } } } }
           }

@@ -10,5 +10,9 @@
   "no_active_purchases": "ليس لديك مشتريات نشطة بعد",
   "no_active_sales": "ليس لديك مبيعات نشطة بعد",
   "no_pending_requests": "لا توجد طلبات معلقة",
-  "logo_alt": "شعار الصفقات"
+  "logo_alt": "شعار الصفقات",
+  "incoming_wishes": "أمنيات لك",
+  "incoming_wishes_label": "أمنيات دُعيت للمساهمة فيها بمهمة أو مورد",
+  "no_incoming_wishes": "لا توجد أمنيات تطلبك حاليًا",
+  "incoming_wishes_hint": "عندما يدعوك أحدهم إلى أمنية، ستظهر هنا"
 }

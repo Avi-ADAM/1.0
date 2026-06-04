@@ -51,6 +51,8 @@ import { acceptRatsonProposalConfig } from './acceptRatsonProposal.js';
 import { rejectRatsonProposalConfig } from './rejectRatsonProposal.js';
 import { updateRatsonExtractionConfig } from './updateRatsonExtraction.js';
 import { requestSuggestionConfig } from './requestSuggestion.js';
+import { acceptWishOfferConfig } from './acceptWishOffer.js';
+import { declineWishOfferConfig } from './declineWishOffer.js';
 import { finalizeAskAcceptanceConfig } from './finalizeAskAcceptance.js';
 import { finalizeJoinAcceptanceConfig } from './finalizeJoinAcceptance.js';
 import { updateWelcomeCardConfig } from './updateWelcomeCard.js';
@@ -190,6 +192,8 @@ export function registerAllActions(): void {
   registerAction(rejectRatsonProposalConfig);
   registerAction(updateRatsonExtractionConfig);
   registerAction(requestSuggestionConfig);
+  registerAction(acceptWishOfferConfig);
+  registerAction(declineWishOfferConfig);
 
   // Decision card display (read action — current vs. proposed values)
   registerAction(getDecisionDetailsConfig);
