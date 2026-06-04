@@ -4,6 +4,9 @@
   import { goto } from '$app/navigation';
   import { uPic } from '$lib/stores/uPic.js';
   import RichText from '$lib/celim/ui/richText.svelte';
+  import Mission from '$lib/components/prPr/mission.svelte';
+  import ResourceCreator from '$lib/components/resource/ResourceCreator.svelte';
+  import { toast } from 'svelte-sonner';
 
   /** @type {{ data: { wish: any | null; proposals: any[]; loadOk: boolean; uid?: string; isOwner: boolean; enrichment?: any } }} */
   let { data } = $props();
@@ -406,8 +409,109 @@
       inviteBusy = { ...inviteBusy, [sugKey]: false };
     }
   }
-  const invitePerson  = (p, label) => requestSuggestion(`p${p.id}`,  { kind: 'person',   targetUserId: p.id, projectId: null, label });
-  const inviteResource = (r, label) => requestSuggestion(`r${r.id}`, { kind: 'resource', targetUserId: r.ownerId, projectId: null, totalPrice: r.price ?? 0, label });
+  /* ── Customer authors the contract (PLAN_CONCIERGE §5.3) ───────────────────
+   * Inviting a person no longer fires a bare proposal — it opens the mission
+   * form in specMode so the wisher details the task (the offer). On submit we
+   * persist it weave-less via requestWishMission, which also creates the draft
+   * complex matanot + the unassigned BOM slot the provider later fills. */
+  let specForPerson = $state(/** @type {any} */ (null));
+
+  function invitePerson(p) {
+    if (!wishId) return;
+    const k = `p${p.id}`;
+    if (inviteBusy[k] || inviteDone[k]) return;
+    specForPerson = p;
+  }
+
+  async function submitPersonSpec(spec) {
+    const p = specForPerson;
+    if (!p || !wishId) return;
+    const sugKey = `p${p.id}`;
+    specForPerson = null;
+    inviteBusy = { ...inviteBusy, [sugKey]: true };
+    inviteError = '';
+    try {
+      const res = await fetch('/api/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actionKey: 'requestWishMission',
+          params: {
+            ratsonId: wishId,
+            targetUserId: p.id,
+            name: spec?.name || p.username || 'משימה',
+            hours: spec?.hours ?? null,
+            ratePerHour: spec?.ratePerHour ?? null,
+            descrip: spec?.descrip || '',
+            label: spec?.name || ''
+          }
+        })
+      });
+      const out = await res.json();
+      if (!out?.success) throw new Error(out?.error || 'הפנייה נכשלה');
+      inviteDone = { ...inviteDone, [sugKey]: 'ההצעה נשלחה' };
+      toast.success('הצעת המשימה נשלחה לספק');
+    } catch (err) {
+      console.error('[concierge/[id]] requestWishMission failed:', err);
+      inviteError = err instanceof Error ? err.message : 'אירעה שגיאה';
+      toast.error(inviteError);
+    } finally {
+      inviteBusy = { ...inviteBusy, [sugKey]: false };
+    }
+  }
+
+  /* ── Customer authors a resource offer (PLAN_CONCIERGE §5.3) — mirror of the
+   * person→mission path. Inviting a resource provider opens ResourceCreator in
+   * specMode so the wisher details the resource (the offer). On submit we persist
+   * it weave-less via requestWishResource, which also ensures the draft complex
+   * matanot + the unassigned BOM slot the provider later fills. */
+  let specForResource = $state(/** @type {any} */ (null));
+
+  function inviteResource(r, label) {
+    if (!wishId || !r?.ownerId) return;
+    const k = `r${r.id}`;
+    if (inviteBusy[k] || inviteDone[k]) return;
+    specForResource = { ...r, label };
+  }
+
+  async function submitResourceSpec(spec) {
+    const r = specForResource;
+    if (!r || !wishId) return;
+    const sugKey = `r${r.id}`;
+    specForResource = null;
+    inviteBusy = { ...inviteBusy, [sugKey]: true };
+    inviteError = '';
+    try {
+      const res = await fetch('/api/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actionKey: 'requestWishResource',
+          params: {
+            ratsonId: wishId,
+            targetUserId: r.ownerId,
+            name: spec?.name || r.name || 'משאב',
+            quantity: spec?.quantity ?? 1,
+            price: spec?.price ?? (r.price ?? null),
+            kindOf: spec?.kindOf || 'total',
+            descrip: spec?.descrip || '',
+            label: spec?.name || r.label || ''
+          }
+        })
+      });
+      const out = await res.json();
+      if (!out?.success) throw new Error(out?.error || 'הפנייה נכשלה');
+      inviteDone = { ...inviteDone, [sugKey]: 'ההצעה נשלחה' };
+      toast.success('הצעת המשאב נשלחה לספק');
+    } catch (err) {
+      console.error('[concierge/[id]] requestWishResource failed:', err);
+      inviteError = err instanceof Error ? err.message : 'אירעה שגיאה';
+      toast.error(inviteError);
+    } finally {
+      inviteBusy = { ...inviteBusy, [sugKey]: false };
+    }
+  }
+
   const requestProduct = (m, label) => requestSuggestion(`m${m.id}`, { kind: 'matanot',  matanotId: m.id, projectId: m.projectId, totalPrice: m.price ?? 0, label });
 
   /* Real wish-forum messages (server-loaded from the wish chat_forum). */
@@ -896,7 +1000,7 @@
                       {#if inviteDone[k]}
                         <span class="sbadge ready" style="padding:6px 10px;font-size:11px">✓ {inviteDone[k]}</span>
                       {:else if isOwner}
-                        <button class="btn-ghost" style="padding:6px 12px;font-size:12px" disabled={inviteBusy[k]} onclick={() => invitePerson(p, p.username || '')}>{inviteBusy[k] ? '⏳' : 'הזמיני'}</button>
+                        <button class="btn-ghost" style="padding:6px 12px;font-size:12px" disabled={inviteBusy[k]} onclick={() => invitePerson(p)}>{inviteBusy[k] ? '⏳' : 'הזמיני'}</button>
                       {:else}
                         <a href={personLink(p)} class="btn-ghost" style="padding:6px 12px;font-size:12px">פרופיל</a>
                       {/if}
@@ -1002,7 +1106,8 @@
                 {/each}
                 <!-- center gem -->
                 <g transform="translate({CX},{CY})">
-                  <circle r="28" fill="#0e0d0c" stroke="rgba(238,232,170,0.5)" stroke-width="1.5" />
+                  <circle r="28" fill="#0e0d0c" stroke="rgba(238,232,170,0.5)" stroke-width="1.5"
+                    style="filter:drop-shadow(0 0 10px rgba(238,232,170,0.45)) drop-shadow(0 0 22px rgba(238,232,170,0.2))" />
                   <g transform="rotate(45)">
                     <rect x="-10" y="-10" width="20" height="20" rx="2" fill="url(#gGold)" />
                   </g>
@@ -1096,6 +1201,43 @@
     </div><!-- /wrap -->
   </div><!-- /shell -->
 </div><!-- /cp -->
+
+{#if specForPerson}
+  <div class="spec-overlay" role="dialog" aria-modal="true">
+    <div class="spec-card">
+      <div class="spec-head">
+        <span>הצעת משימה ל־{specForPerson.username || 'ספק/ית'}</span>
+        <button class="spec-x" onclick={() => (specForPerson = null)} aria-label="סגירה">✕</button>
+      </div>
+      <p class="spec-hint">פרטי את המשימה שתרצי להציע — זו ההצעה שהספק יקבל ויאשר.</p>
+      <Mission
+        specMode={true}
+        id={0}
+        name={''}
+        missionTemplates={data.missionTemplates ?? []}
+        onSpec={submitPersonSpec}
+        onClose={() => (specForPerson = null)}
+      />
+    </div>
+  </div>
+{/if}
+
+{#if specForResource}
+  <div class="spec-overlay" role="dialog" aria-modal="true">
+    <div class="spec-card">
+      <div class="spec-head">
+        <span>הצעת משאב ל־{specForResource.ownerName || 'ספק/ית'}</span>
+        <button class="spec-x" onclick={() => (specForResource = null)} aria-label="סגירה">✕</button>
+      </div>
+      <p class="spec-hint">פרטי את המשאב שתרצי להציע — זו ההצעה שהספק יקבל ויאשר.</p>
+      <ResourceCreator
+        specMode={true}
+        onSpec={submitResourceSpec}
+        onCancel={() => (specForResource = null)}
+      />
+    </div>
+  </div>
+{/if}
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bellefair&family=Cinzel:wght@400;600;700&family=Heebo:wght@300;400;500;600;700;800&display=swap');
@@ -1343,8 +1485,8 @@
   @media(min-width:1080px) { .rail { position:sticky; top:76px; } }
 
   /* ── Harmony ring ── */
-  .harmony-wrap    { position:relative; display:flex; align-items:center; justify-content:center; }
-  .harmony-counter { position:absolute; bottom:-2px; left:0; right:0; text-align:center; }
+  .harmony-wrap    { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .harmony-counter { margin-top:14px; left:0; right:0; text-align:center; }
   .hc-lbl { font-family:'Cinzel',serif; font-size:10px; color:#9a8f80; letter-spacing:.22em; text-transform:uppercase; }
   .hc-num { font-family:'Sababa','Heebo',sans-serif; font-size:28px; color:#fde68a; line-height:1; margin-top:4px; }
 
@@ -1355,4 +1497,11 @@
 
   /* ── Consent row ── */
   .consent-row { display:flex; align-items:center; gap:10px; padding:10px 14px; background:rgba(2,255,187,.04); border:1px dashed rgba(2,255,187,.25); border-radius:12px; font-family:'Bellefair',serif; font-size:13px; color:#ede5d8; }
+
+  /* ── Spec (offer-author) modal ── */
+  .spec-overlay { position:fixed; inset:0; z-index:1200; background:rgba(0,0,0,.62); backdrop-filter:blur(4px); display:flex; align-items:flex-start; justify-content:center; padding:24px 12px; overflow:auto; }
+  .spec-card { width:min(760px,98vw); background:#14110d; border:1px solid #2a241c; border-radius:16px; padding:20px; }
+  .spec-head { display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:16px; font-weight:800; color:#f3ece0; margin-bottom:6px; }
+  .spec-x { background:transparent; border:none; color:#9a8f80; font-size:18px; cursor:pointer; }
+  .spec-hint { font-size:12.5px; color:#9a8f80; line-height:1.5; margin-bottom:12px; }
 </style>

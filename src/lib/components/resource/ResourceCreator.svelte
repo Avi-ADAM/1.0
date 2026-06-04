@@ -13,18 +13,23 @@
 
   /**
    * @typedef {Object} Props
-   * @property {string} projectId
+   * @property {string} [projectId]
    * @property {number} [userslength]   - מספר חברי הפרויקט (1 = משתמש יחיד)
    * @property {string} [restime]       - זמן תגובה לחישוב Timegrama (לדוגמה: "7d")
+   * @property {boolean} [specMode]     - מצב "ספק" (PLAN_CONCIERGE §5.3): הלקוחה מנסחת מפרט משאב
+   *                                      ולא יוצרת רשומה — handleSubmit מחזיר את המפרט ל-onSpec.
+   * @property {(spec: {name:string, descrip:string, price:number, quantity:number, kindOf:string, linkto:string, spnot:string}) => void} [onSpec]
    * @property {() => void} [onCreated]
    * @property {() => void} [onCancel]
    */
 
   /** @type {Props} */
   let {
-    projectId,
+    projectId = '',
     userslength = 1,
     restime = '',
+    specMode = false,
+    onSpec,
     onCreated,
     onCancel
   } = $props();
@@ -410,6 +415,22 @@
       return;
     }
 
+    // ── specMode (PLAN_CONCIERGE §5.3): the wisher authors a resource spec; we
+    //    don't persist a record here — the contract is created weave-less by the
+    //    requestWishResource action. Just hand the spec back to the caller. ──
+    if (specMode) {
+      onSpec?.({
+        name: name.trim(),
+        descrip: description || '',
+        price: Number(price) || 0,
+        quantity: showQuantity ? Number(hm) || 1 : 1,
+        kindOf,
+        linkto: linkto || '',
+        spnot: spnot || ''
+      });
+      return;
+    }
+
     isSubmitting = true;
     try {
       const selectedTemplate = findResourceTemplateByName(name);
@@ -462,7 +483,7 @@
 
 <div class="resource-creator space-y-6" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
   <header class="flex justify-between items-center mb-4">
-    <h2 class="text-2xl font-bold text-barbi">{t.title}</h2>
+    <h2 class="text-2xl font-bold text-barbi">{specMode ? ($lang === 'en' ? 'Resource offer' : 'הצעת משאב') : t.title}</h2>
     {#if onCancel}
       <button
         onclick={onCancel}
@@ -645,8 +666,8 @@
         </div>
       </div>
 
-      <!-- השמה לעצמי – מוצג רק כשיש משתמש יחיד בפרויקט -->
-      {#if isSingleUser}
+      <!-- השמה לעצמי – מוצג רק כשיש משתמש יחיד בפרויקט; מוסתר במצב מפרט (הצעה לספק) -->
+      {#if isSingleUser && !specMode}
         <div
           class="self-assign-box rounded-2xl border border-gold bg-pink-950/20 backdrop-blur-sm p-4 space-y-3"
         >
@@ -790,7 +811,7 @@
           onClick={handleSubmit}
           disabled={isSubmitting || !canSubmit}
           loading={isSubmitting}
-          text={{ he: t.submit, en: t.submit }}
+          text={specMode ? { he: 'שליחת הצעה לספק', en: 'Send offer to provider' } : { he: t.submit, en: t.submit }}
           class="flex-grow !py-4 text-lg font-bold !bg-gold-600 hover:!bg-gold !text-pink-950 shadow-md"
         />
         <Button

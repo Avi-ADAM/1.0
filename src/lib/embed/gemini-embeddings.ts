@@ -1,4 +1,10 @@
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API || '';
+// Read the key via SvelteKit's static-private env, NOT process.env — `.env`
+// values are not injected into process.env in the SvelteKit runtime, so the
+// raw process.env lookup resolved to '' and every embed call 403'd
+// ("unregistered caller"). See commit 137.3; reverting that broke matching.
+import { GEMINI_API_KEY as KEY_PRIORITY, GOOGLE_API as KEY_BACKUP } from '$env/static/private';
+
+const GEMINI_API_KEY = KEY_PRIORITY || KEY_BACKUP || '';
 
 const GEMINI_MODEL = 'gemini-embedding-2-preview';
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta';

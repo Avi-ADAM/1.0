@@ -288,7 +288,9 @@ ratson_proposal.status='accepted' (סופי) + ratson.status_ratson='fulfilled' 
 
 ## 5.3. תגובת ספק להזמנה → מוצר מורכב (binding model)
 
-> נכתב: 2026-06-04. ההמשך הישיר של §5.2 — מה קורה כשספק שהוזמן לוחץ "צפה והגב" ובוחר לתרום בפועל. אומת מול `src/generated/STRAPI_SCHEMA_REFERENCE.md`.
+> נכתב: 2026-06-04. ההמשך הישיר של §5.2. אומת מול `src/generated/STRAPI_SCHEMA_REFERENCE.md`.
+>
+> **⚠️ תיקון (אותו יום) — מי יוצר את המשימה:** הסעיף נכתב במקור כאילו **הספק** יוצר את המשימה (בחירת ריקמה + `mission.svelte` במודאל האישור). זו התנהגות שגויה. **המודל הנכון:** **הלקוח** מחבר את המשימה (= ההצעה/חוזה) בזמן ההזמנה — `mission.svelte` ב-`specMode` (פולט spec, מסתיר UI תלוי-פרויקט). פעולת `requestWishMission` יוצרת draft `derivedComplexMatanot` + `pendm` **חסר-ריקמה** (`137createPendmForRecipe` בלי `project` → `isglobal`) + שורת `matanot-recipe-mission` **לא-מוקצית** + proposal (מזהה השורה ב-`covered_missions[].extracted_mission_idx`). הספק רק **מאשר השמה**: `acceptWishOffer` מצומצמת ל-`assignedMember` בלבד (qid `143`/`144`) — **בלי בחירת ריקמה, בלי יצירה**. מודאל `AcceptWishOffer.svelte` = צפייה + [תמונה מלאה→/wish/id] + [אישור השמה] + [מו"מ — placeholder]. הריקמה נוצרת רק בסוף (phase 2, טרם מומש). הטבלה למטה משקפת את הישויות; ה"סדר בנייה" המקורי למטה הוחלף ע"י התיקון הזה.
 
 ### העיקרון: ספק = יוצר pendm/pmash בריקמה שלו; המשאלה = מוצר מורכב שמרכיב את כולם; הלקוחה = קונה
 

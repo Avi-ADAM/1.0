@@ -185,7 +185,7 @@
     {:else}
       <div class="deals-grid">
         {#each incomingWishes as wish (wish.proposalId)}
-          <IncomingWishCard {wish} weaves={data.weaves ?? []} />
+          <IncomingWishCard {wish} />
         {/each}
       </div>
     {/if}

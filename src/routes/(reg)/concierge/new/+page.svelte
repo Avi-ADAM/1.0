@@ -57,6 +57,10 @@
   let matchedResources = $state(
     /** @type {{id:string,name:string,template:string|null,price:number|null,ownerName:string|null,ownerAvatar:string|null,project:string|null}[]} */ ([])
   );
+  /** Full enrichment snapshot (people+resources+products+missions+skills) —
+   *  persisted into ai_meta so /concierge/[id] renders it without re-running
+   *  the Gemini/Pinecone analysis on every load. */
+  let matchedEnrichment = $state(/** @type {any} */ (null));
   let extracting = $state(false);
 
   /** Debounced AI extraction — fires 1.2s after user stops typing */
@@ -74,6 +78,7 @@
       matchedPeople = [];
       matchedMissions = [];
       matchedResources = [];
+      matchedEnrichment = null;
       return;
     }
     const timer = setTimeout(async () => {
@@ -94,6 +99,7 @@
           matchedPeople = data.matches?.people ?? [];
           matchedMissions = data.matches?.missions ?? [];
           matchedResources = data.matches?.resources ?? [];
+          matchedEnrichment = data.matches ?? null;
           // Auto-fill a title once Lev suggests one and the user hasn't typed it.
           if (!title.trim() && data.titleSuggestion) {
             title = data.titleSuggestion;
@@ -428,7 +434,19 @@
         skills: extractedSkills.map((s) => s.name),
         categories: extractedCategories,
         suggestedPeople: matchedPeople.map((p) => p.id),
-        matchedMissions: matchedMissions.map((m) => m.id)
+        matchedMissions: matchedMissions.map((m) => m.id),
+        // Full, renderable match snapshot — /concierge/[id] reads this straight
+        // from Strapi instead of re-running the analysis on every page load.
+        enrichment: matchedEnrichment
+          ? {
+              skills: matchedEnrichment.skills ?? [],
+              missions: matchedEnrichment.missions ?? [],
+              people: matchedEnrichment.people ?? [],
+              resources: matchedEnrichment.resources ?? [],
+              products: matchedEnrichment.products ?? [],
+              computedAt: new Date().toISOString()
+            }
+          : null
       };
 
       const createRes = await fetch('/api/action', {

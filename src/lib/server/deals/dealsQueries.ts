@@ -50,6 +50,9 @@ export interface IncomingWishInvitation {
   wisherPic?: string;
   /** Main wish forum — where the conversation with the wisher happens. */
   chatForumId?: string;
+  /** The authored slot the provider would fill (from the proposal's covered_*). */
+  slotHours?: number | null;
+  slotPrice?: number | null;
   values: string[];
   categories: string[];
 }
@@ -60,6 +63,8 @@ function mapWishInvitation(node: any): IncomingWishInvitation | null {
   if (!ratNode) return null;
   const ra = ratNode.attributes ?? {};
   const wisher = ra.users_permissions_users?.data?.[0];
+  const slotM = (pa.covered_missions ?? [])[0];
+  const slotR = (pa.covered_resources ?? [])[0];
 
   return {
     proposalId: String(node.id),
@@ -76,6 +81,13 @@ function mapWishInvitation(node: any): IncomingWishInvitation | null {
     wisherName: wisher?.attributes?.username || '',
     wisherPic: wisher?.attributes?.profilePic?.data?.attributes?.url || undefined,
     chatForumId: ra.chat_forum?.data?.id ? String(ra.chat_forum.data.id) : undefined,
+    slotHours: typeof slotM?.hours === 'number' ? slotM.hours : null,
+    slotPrice:
+      typeof slotM?.price === 'number'
+        ? slotM.price
+        : typeof slotR?.price === 'number'
+          ? slotR.price
+          : null,
     values: (ra.vallues?.data ?? []).map((v: any) => v.attributes?.valueName).filter(Boolean),
     categories: (ra.categories?.data ?? []).map((c: any) => c.attributes?.name).filter(Boolean)
   };

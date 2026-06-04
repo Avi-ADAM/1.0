@@ -51,6 +51,8 @@ import { acceptRatsonProposalConfig } from './acceptRatsonProposal.js';
 import { rejectRatsonProposalConfig } from './rejectRatsonProposal.js';
 import { updateRatsonExtractionConfig } from './updateRatsonExtraction.js';
 import { requestSuggestionConfig } from './requestSuggestion.js';
+import { requestWishMissionConfig } from './requestWishMission.js';
+import { requestWishResourceConfig } from './requestWishResource.js';
 import { acceptWishOfferConfig } from './acceptWishOffer.js';
 import { declineWishOfferConfig } from './declineWishOffer.js';
 import { finalizeAskAcceptanceConfig } from './finalizeAskAcceptance.js';
@@ -192,6 +194,8 @@ export function registerAllActions(): void {
   registerAction(rejectRatsonProposalConfig);
   registerAction(updateRatsonExtractionConfig);
   registerAction(requestSuggestionConfig);
+  registerAction(requestWishMissionConfig);
+  registerAction(requestWishResourceConfig);
   registerAction(acceptWishOfferConfig);
   registerAction(declineWishOfferConfig);
 

@@ -162,6 +162,17 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 
   const isOwner = wish ? wish.owners.some((o: any) => String(o.id) === String(uid)) : false;
 
+  // Mission templates for the owner's offer-authoring form (specMode autofill).
+  let missionTemplates: any[] = [];
+  if (isOwner) {
+    try {
+      const tplRes: any = await sendToSer({}, 'getMissionTemplates', 0, 0, false, fetch);
+      missionTemplates = tplRes?.data?.missions?.data ?? [];
+    } catch (e) {
+      console.warn('[concierge/:id] mission templates load failed (non-fatal):', e);
+    }
+  }
+
   // ── Real wish-forum messages (replaces the old demo FORUM_MSGS). Best-effort:
   //    getForumThread authorizes by participation, so a non-participant (e.g. a
   //    provider not yet added to the wish chat) just gets an empty thread rather
@@ -189,12 +200,32 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
   }
 
   // ── Ground the breakdown in the live platform: real members who hold the
-  //    needed skills + currently-free resource instances (Sp). Best-effort —
-  //    a failure (Pinecone/embeddings/rate-limit) degrades to an empty panel
-  //    rather than blocking the page. Only run it for the owner reviewing an
-  //    open wish that still needs partners.
+  //    needed skills + currently-free resource instances (Sp).
+  //
+  //    Prefer the snapshot persisted at creation (ai_meta.enrichment) — the
+  //    analysis already ran in /concierge/new, so we read it straight from
+  //    Strapi instead of re-hitting Gemini/Pinecone on every page load. Only
+  //    wishes created before this was stored fall back to a live recompute
+  //    (still best-effort: a failure degrades to an empty panel).
   let enrichment: WishEnrichment = EMPTY_ENRICHMENT;
-  if (wish && (wish.extractedMissions.length > 0 || wish.extractedResources.length > 0)) {
+  const savedEnrichment = wish?.aiMeta?.enrichment;
+  const hasSavedEnrichment =
+    savedEnrichment &&
+    typeof savedEnrichment === 'object' &&
+    ((savedEnrichment.people?.length ?? 0) > 0 ||
+      (savedEnrichment.resources?.length ?? 0) > 0 ||
+      (savedEnrichment.products?.length ?? 0) > 0 ||
+      (savedEnrichment.missions?.length ?? 0) > 0);
+
+  if (hasSavedEnrichment) {
+    enrichment = {
+      skills: savedEnrichment.skills ?? [],
+      missions: savedEnrichment.missions ?? [],
+      people: savedEnrichment.people ?? [],
+      resources: savedEnrichment.resources ?? [],
+      products: savedEnrichment.products ?? []
+    };
+  } else if (wish && (wish.extractedMissions.length > 0 || wish.extractedResources.length > 0)) {
     try {
       const aiSkills: string[] = Array.isArray(wish.aiMeta?.skills) ? wish.aiMeta.skills : [];
       const extraction: WishExtraction = {
@@ -217,5 +248,5 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
     }
   }
 
-  return { wish, proposals, loadOk, uid, isOwner, enrichment, forumMessages };
+  return { wish, proposals, loadOk, uid, isOwner, enrichment, forumMessages, missionTemplates };
 };

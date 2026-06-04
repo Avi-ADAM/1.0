@@ -3,20 +3,19 @@
   import { lang } from '$lib/stores/lang.js';
   import { invalidateAll } from '$app/navigation';
   import AcceptWishOffer from '$lib/components/concierge/AcceptWishOffer.svelte';
-  import type { IncomingWishInvitation, UserWeave } from '$lib/server/deals/dealsQueries';
+  import type { IncomingWishInvitation } from '$lib/server/deals/dealsQueries';
 
-  let { wish, weaves = [] }: { wish: IncomingWishInvitation; weaves?: UserWeave[] } = $props();
+  let { wish }: { wish: IncomingWishInvitation } = $props();
 
   let showOffer = $state(false);
 
-  // Map the invitation to the modal's "need". requestSuggestion stores
-  // person-invites as kind 'existing_project' and resource-invites as 'partial'.
+  // Map the invitation to the modal's ready offer. Person-invites are stored as
+  // kind 'existing_project', resource-invites as 'partial'.
   const offerItem = $derived({
     kind: (wish.kind === 'partial' ? 'resource' : 'mission') as 'mission' | 'resource',
-    idx: 0,
     name: wish.ratsonName || '',
-    hours: null as number | null,
-    quantity: null as number | null
+    hours: wish.slotHours ?? null,
+    price: wish.slotPrice ?? null
   });
 
   function openOffer() {
@@ -122,7 +121,6 @@
     proposalId={wish.proposalId}
     ratsonId={wish.ratsonId}
     item={offerItem}
-    {weaves}
     onClose={() => (showOffer = false)}
     {onDone}
   />

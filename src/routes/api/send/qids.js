@@ -6769,6 +6769,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           total_price
           createdAt
           forum { data { id } }
+          covered_missions { id extracted_mission_idx hours price }
+          covered_resources { id extracted_resource_idx quantity price }
           ratson {
             data {
               id
@@ -6845,6 +6847,18 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           }
         }
       }
+    }
+  }`,
+
+  '143assignRecipeMissionMember': `mutation AssignRecipeMissionMember($id: ID!, $assignedMember: ID) {
+    updateMatanotRecipeMission(id: $id, data: { assignedMember: $assignedMember }) {
+      data { id attributes { mode } }
+    }
+  }`,
+
+  '144assignRecipeResourceMember': `mutation AssignRecipeResourceMember($id: ID!, $assignedMember: ID) {
+    updateMatanotRecipeResource(id: $id, data: { assignedMember: $assignedMember }) {
+      data { id attributes { mode } }
     }
   }`,
 
