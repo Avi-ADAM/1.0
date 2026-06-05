@@ -2673,6 +2673,16 @@ export enum Enum_Openmashaabim_Kindof {
   Yearly = 'yearly'
 }
 
+export enum Enum_Openmashaabim_Source {
+  Concierge = 'concierge',
+  Project = 'project'
+}
+
+export enum Enum_Openmission_Source {
+  Concierge = 'concierge',
+  Project = 'project'
+}
+
 export enum Enum_Pmash_Kindof {
   Monthly = 'monthly',
   PerUnit = 'perUnit',
@@ -8584,7 +8594,9 @@ export type OpenMashaabim = {
   price?: Maybe<Scalars['Float']['output']>;
   project?: Maybe<ProjectEntityResponse>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
+  ratson?: Maybe<RatsonEntityResponse>;
   rikmashes?: Maybe<RikmashRelationResponseCollection>;
+  source?: Maybe<Enum_Openmashaabim_Source>;
   splited?: Maybe<Scalars['Boolean']['output']>;
   spnot?: Maybe<Scalars['String']['output']>;
   sps?: Maybe<SpRelationResponseCollection>;
@@ -8711,7 +8723,9 @@ export type OpenMashaabimFiltersInput = {
   price?: InputMaybe<FloatFilterInput>;
   project?: InputMaybe<ProjectFiltersInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
+  ratson?: InputMaybe<RatsonFiltersInput>;
   rikmashes?: InputMaybe<RikmashFiltersInput>;
+  source?: InputMaybe<StringFilterInput>;
   splited?: InputMaybe<BooleanFilterInput>;
   spnot?: InputMaybe<StringFilterInput>;
   sps?: InputMaybe<SpFiltersInput>;
@@ -8744,7 +8758,9 @@ export type OpenMashaabimInput = {
   price?: InputMaybe<Scalars['Float']['input']>;
   project?: InputMaybe<Scalars['ID']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  ratson?: InputMaybe<Scalars['ID']['input']>;
   rikmashes?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  source?: InputMaybe<Enum_Openmashaabim_Source>;
   splited?: InputMaybe<Scalars['Boolean']['input']>;
   spnot?: InputMaybe<Scalars['String']['input']>;
   sps?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -8791,9 +8807,11 @@ export type OpenMission = {
   project?: Maybe<ProjectEntityResponse>;
   publicklinks?: Maybe<Scalars['String']['output']>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
+  ratson?: Maybe<RatsonEntityResponse>;
   rishon?: Maybe<UsersPermissionsUserEntityResponse>;
   rishonves?: Maybe<UsersPermissionsUserRelationResponseCollection>;
   skills?: Maybe<SkillRelationResponseCollection>;
+  source?: Maybe<Enum_Openmission_Source>;
   sqadualed?: Maybe<Scalars['DateTime']['output']>;
   tafkidims?: Maybe<TafkidimRelationResponseCollection>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -8957,9 +8975,11 @@ export type OpenMissionFiltersInput = {
   project?: InputMaybe<ProjectFiltersInput>;
   publicklinks?: InputMaybe<StringFilterInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
+  ratson?: InputMaybe<RatsonFiltersInput>;
   rishon?: InputMaybe<UsersPermissionsUserFiltersInput>;
   rishonves?: InputMaybe<UsersPermissionsUserFiltersInput>;
   skills?: InputMaybe<SkillFiltersInput>;
+  source?: InputMaybe<StringFilterInput>;
   sqadualed?: InputMaybe<DateTimeFilterInput>;
   tafkidims?: InputMaybe<TafkidimFiltersInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
@@ -8998,9 +9018,11 @@ export type OpenMissionInput = {
   project?: InputMaybe<Scalars['ID']['input']>;
   publicklinks?: InputMaybe<Scalars['String']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  ratson?: InputMaybe<Scalars['ID']['input']>;
   rishon?: InputMaybe<Scalars['ID']['input']>;
   rishonves?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   skills?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  source?: InputMaybe<Enum_Openmission_Source>;
   sqadualed?: InputMaybe<Scalars['DateTime']['input']>;
   tafkidims?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   users?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -10062,6 +10084,7 @@ export type Project = {
   isMachzikim?: Maybe<Scalars['Boolean']['output']>;
   isMachzikimPublik?: Maybe<Scalars['Boolean']['output']>;
   isOt?: Maybe<Scalars['Boolean']['output']>;
+  isPlatform?: Maybe<Scalars['Boolean']['output']>;
   linkToWebsite?: Maybe<Scalars['String']['output']>;
   locale?: Maybe<Scalars['String']['output']>;
   localizations?: Maybe<ProjectRelationResponseCollection>;
@@ -10491,6 +10514,7 @@ export type ProjectFiltersInput = {
   isMachzikim?: InputMaybe<BooleanFilterInput>;
   isMachzikimPublik?: InputMaybe<BooleanFilterInput>;
   isOt?: InputMaybe<BooleanFilterInput>;
+  isPlatform?: InputMaybe<BooleanFilterInput>;
   linkToWebsite?: InputMaybe<StringFilterInput>;
   locale?: InputMaybe<StringFilterInput>;
   localizations?: InputMaybe<ProjectFiltersInput>;
@@ -10571,6 +10595,7 @@ export type ProjectInput = {
   isMachzikim?: InputMaybe<Scalars['Boolean']['input']>;
   isMachzikimPublik?: InputMaybe<Scalars['Boolean']['input']>;
   isOt?: InputMaybe<Scalars['Boolean']['input']>;
+  isPlatform?: InputMaybe<Scalars['Boolean']['input']>;
   linkToWebsite?: InputMaybe<Scalars['String']['input']>;
   location?: InputMaybe<ComponentNewLocationInput>;
   maaps?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -12149,6 +12174,8 @@ export type Ratson = {
   minJoiners?: Maybe<Scalars['Int']['output']>;
   missions?: Maybe<MissionRelationResponseCollection>;
   name?: Maybe<Scalars['String']['output']>;
+  open_mashaabims?: Maybe<OpenMashaabimRelationResponseCollection>;
+  open_missions?: Maybe<OpenMissionRelationResponseCollection>;
   partialConsensusFallback?: Maybe<Enum_Ratson_Partialconsensusfallback>;
   pics?: Maybe<UploadFileRelationResponseCollection>;
   pinecone_id?: Maybe<Scalars['String']['output']>;
@@ -12235,6 +12262,22 @@ export type RatsonMatanots_OfferedArgs = {
 
 export type RatsonMissionsArgs = {
   filters?: InputMaybe<MissionFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type RatsonOpen_MashaabimsArgs = {
+  filters?: InputMaybe<OpenMashaabimFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type RatsonOpen_MissionsArgs = {
+  filters?: InputMaybe<OpenMissionFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
   publicationState?: InputMaybe<PublicationState>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -12359,6 +12402,8 @@ export type RatsonFiltersInput = {
   missions?: InputMaybe<MissionFiltersInput>;
   name?: InputMaybe<StringFilterInput>;
   not?: InputMaybe<RatsonFiltersInput>;
+  open_mashaabims?: InputMaybe<OpenMashaabimFiltersInput>;
+  open_missions?: InputMaybe<OpenMissionFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<RatsonFiltersInput>>>;
   partialConsensusFallback?: InputMaybe<StringFilterInput>;
   pinecone_id?: InputMaybe<StringFilterInput>;
@@ -12418,6 +12463,8 @@ export type RatsonInput = {
   minJoiners?: InputMaybe<Scalars['Int']['input']>;
   missions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   name?: InputMaybe<Scalars['String']['input']>;
+  open_mashaabims?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  open_missions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   partialConsensusFallback?: InputMaybe<Enum_Ratson_Partialconsensusfallback>;
   pics?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   pinecone_id?: InputMaybe<Scalars['String']['input']>;

@@ -1089,8 +1089,15 @@ export function processSuggestions(
 
     // Use stored project data if available (member), otherwise use embedded details (non-member)
     const projectInfo = createProjectInfo(suggestion.projectId);
-    const projectName = project?.attributes.projectName || suggestion.projectDetails?.name || '';
-    const projectImageUrl = project?.attributes.profilePic?.data?.attributes?.url || suggestion.projectDetails?.src || '';
+    // Concierge-sourced suggestions (PLAN_CONCIERGE §5.2) belong to no weave —
+    // they carry a `ratson` link. Brand them as "קונסירג'" with the concierge logo.
+    const isConcierge = !!(suggestion.ratsonName || suggestion.source === 'concierge');
+    const projectName = isConcierge
+      ? 'קונסירג׳'
+      : (project?.attributes.projectName || suggestion.projectDetails?.name || '');
+    const projectImageUrl = isConcierge
+      ? '/logo-concierge.png'
+      : (project?.attributes.profilePic?.data?.attributes?.url || suggestion.projectDetails?.src || '');
     const memberCount = project?.attributes.user_1s?.data?.length || suggestion.projectDetails?.membersCount || 0;
     const restime = project?.attributes.restime || suggestion.projectDetails?.restime;
 

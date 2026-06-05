@@ -888,7 +888,7 @@
           >
             <div style="position:relative">
               <img
-                src="/botlogo.jpeg"
+                src="/botlogo.png"
                 style="width:36px;height:36px;border-radius:50%;border:2px solid rgba(116,191,255,.4)"
                 alt="Lev"
               />

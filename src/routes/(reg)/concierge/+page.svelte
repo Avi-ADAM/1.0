@@ -708,7 +708,7 @@
           <div class="panel lev-panel">
             <div class="lev-hdr">
               <div class="lev-av-wrap">
-                <img src="/botlogo.jpeg" alt="Lev" class="lev-av" />
+                <img src="/botlogo.png" alt="Lev" class="lev-av" />
                 <span class="lev-online"></span>
               </div>
               <div>

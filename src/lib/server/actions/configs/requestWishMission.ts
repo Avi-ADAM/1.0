@@ -24,7 +24,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     label = ''
   } = params as {
     ratsonId: string;
-    targetUserId: string;
+    targetUserId?: string | null;
     name: string;
     hours?: number | null;
     ratePerHour?: number | null;
@@ -33,8 +33,10 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   };
 
   if (!ratsonId) throw new Error('ratsonId is required');
-  if (!targetUserId) throw new Error('targetUserId is required');
   if (!name) throw new Error('mission name is required');
+  // targetUserId is optional: when present we send an invitation proposal to that
+  // provider; when absent the customer is just building out the plan — we create
+  // an unassigned BOM slot (for cost estimate / later assignment).
 
   const now = new Date().toISOString();
 
@@ -136,33 +138,39 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   // ── 4. Create the invitation proposal, linked to the slot ──────────────────
   // The slot reference rides in covered_missions[].extracted_mission_idx — the
   // recipe-mission id the provider will be assigned to on accept.
+  // Only when a target provider is given; otherwise the customer just added an
+  // unassigned slot to the plan (no invitation, no notification).
   const price =
     (typeof hours === 'number' ? hours : 0) * (typeof ratePerHour === 'number' ? ratePerHour : 0);
-  const propRes = await strapi.execute(
-    '101createRatsonProposal',
-    {
-      ratson: ratsonId,
-      kind: 'existing_project',
-      status_proposal: 'suggested',
-      proposer_users: [targetUserId],
-      total_price: price,
-      auto_generated: false,
-      covered_missions: [
-        {
-          extracted_mission_idx: recipeMissionId,
-          hours: typeof hours === 'number' ? hours : 0,
-          price
-        }
-      ],
-      publishedAt: now
-    },
-    context.jwt,
-    context.fetch
-  );
-  const proposalId = propRes?.data?.createRatsonProposal?.data?.id
-    ? String(propRes.data.createRatsonProposal.data.id)
-    : null;
-  if (!proposalId) throw new Error('Failed to create the invitation');
+
+  let proposalId: string | null = null;
+  if (targetUserId) {
+    const propRes = await strapi.execute(
+      '101createRatsonProposal',
+      {
+        ratson: ratsonId,
+        kind: 'existing_project',
+        status_proposal: 'suggested',
+        proposer_users: [targetUserId],
+        total_price: price,
+        auto_generated: false,
+        covered_missions: [
+          {
+            extracted_mission_idx: recipeMissionId,
+            hours: typeof hours === 'number' ? hours : 0,
+            price
+          }
+        ],
+        publishedAt: now
+      },
+      context.jwt,
+      context.fetch
+    );
+    proposalId = propRes?.data?.createRatsonProposal?.data?.id
+      ? String(propRes.data.createRatsonProposal.data.id)
+      : null;
+    if (!proposalId) throw new Error('Failed to create the invitation');
+  }
 
   return {
     data: {
@@ -171,9 +179,10 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       matanotId,
       pendmId,
       recipeMissionId,
-      proposalId
+      proposalId,
+      planOnly: !targetUserId
     },
-    recipientIds: [String(targetUserId)],
+    recipientIds: targetUserId ? [String(targetUserId)] : [],
     updateStrategy: { type: 'none' as const }
   };
 };
@@ -185,7 +194,7 @@ export const requestWishMissionConfig: ActionConfig = {
   graphqlOperation: handler,
   paramSchema: {
     ratsonId: { type: 'string', required: true },
-    targetUserId: { type: 'string', required: true },
+    targetUserId: { type: 'string', required: false },
     name: { type: 'string', required: true },
     hours: { type: 'number', required: false },
     ratePerHour: { type: 'number', required: false },

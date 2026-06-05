@@ -55,6 +55,8 @@ import { requestWishMissionConfig } from './requestWishMission.js';
 import { requestWishResourceConfig } from './requestWishResource.js';
 import { acceptWishOfferConfig } from './acceptWishOffer.js';
 import { declineWishOfferConfig } from './declineWishOffer.js';
+import { materializeWishConfig } from './materializeWish.js';
+import { publishWishNeedToCommunityConfig } from './publishWishNeedToCommunity.js';
 import { finalizeAskAcceptanceConfig } from './finalizeAskAcceptance.js';
 import { finalizeJoinAcceptanceConfig } from './finalizeJoinAcceptance.js';
 import { updateWelcomeCardConfig } from './updateWelcomeCard.js';
@@ -198,6 +200,8 @@ export function registerAllActions(): void {
   registerAction(requestWishResourceConfig);
   registerAction(acceptWishOfferConfig);
   registerAction(declineWishOfferConfig);
+  registerAction(materializeWishConfig);
+  registerAction(publishWishNeedToCommunityConfig);
 
   // Decision card display (read action — current vs. proposed values)
   registerAction(getDecisionDetailsConfig);

@@ -26,7 +26,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     label = ''
   } = params as {
     ratsonId: string;
-    targetUserId: string;
+    targetUserId?: string | null;
     name: string;
     quantity?: number | null;
     price?: number | null;
@@ -36,8 +36,10 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   };
 
   if (!ratsonId) throw new Error('ratsonId is required');
-  if (!targetUserId) throw new Error('targetUserId is required');
   if (!name) throw new Error('resource name is required');
+  // targetUserId is optional: with it we send an invitation to that provider;
+  // without it the customer is just defining a needed resource in the plan
+  // (unassigned BOM slot, for cost estimate / later assignment).
 
   const now = new Date().toISOString();
   const qty = typeof quantity === 'number' && quantity > 0 ? quantity : 1;
@@ -142,33 +144,36 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   // The slot reference rides in covered_resources[].extracted_resource_idx —
   // the recipe-resource id the provider will be assigned to on accept.
   const totalPrice = unitPrice * qty;
-  const propRes = await strapi.execute(
-    '101createRatsonProposal',
-    {
-      ratson: ratsonId,
-      // 'partial' = a resource/slice invite (vs 'existing_project' = person/mission).
-      // The deals IncomingWishCard keys its kind label + offerItem.kind off this.
-      kind: 'partial',
-      status_proposal: 'suggested',
-      proposer_users: [targetUserId],
-      total_price: totalPrice,
-      auto_generated: false,
-      covered_resources: [
-        {
-          extracted_resource_idx: recipeResourceId,
-          quantity: qty,
-          price: totalPrice
-        }
-      ],
-      publishedAt: now
-    },
-    context.jwt,
-    context.fetch
-  );
-  const proposalId = propRes?.data?.createRatsonProposal?.data?.id
-    ? String(propRes.data.createRatsonProposal.data.id)
-    : null;
-  if (!proposalId) throw new Error('Failed to create the invitation');
+  let proposalId: string | null = null;
+  if (targetUserId) {
+    const propRes = await strapi.execute(
+      '101createRatsonProposal',
+      {
+        ratson: ratsonId,
+        // 'partial' = a resource/slice invite (vs 'existing_project' = person/mission).
+        // The deals IncomingWishCard keys its kind label + offerItem.kind off this.
+        kind: 'partial',
+        status_proposal: 'suggested',
+        proposer_users: [targetUserId],
+        total_price: totalPrice,
+        auto_generated: false,
+        covered_resources: [
+          {
+            extracted_resource_idx: recipeResourceId,
+            quantity: qty,
+            price: totalPrice
+          }
+        ],
+        publishedAt: now
+      },
+      context.jwt,
+      context.fetch
+    );
+    proposalId = propRes?.data?.createRatsonProposal?.data?.id
+      ? String(propRes.data.createRatsonProposal.data.id)
+      : null;
+    if (!proposalId) throw new Error('Failed to create the invitation');
+  }
 
   return {
     data: {
@@ -177,9 +182,10 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       matanotId,
       pmashId,
       recipeResourceId,
-      proposalId
+      proposalId,
+      planOnly: !targetUserId
     },
-    recipientIds: [String(targetUserId)],
+    recipientIds: targetUserId ? [String(targetUserId)] : [],
     updateStrategy: { type: 'none' as const }
   };
 };
@@ -191,7 +197,7 @@ export const requestWishResourceConfig: ActionConfig = {
   graphqlOperation: handler,
   paramSchema: {
     ratsonId: { type: 'string', required: true },
-    targetUserId: { type: 'string', required: true },
+    targetUserId: { type: 'string', required: false },
     name: { type: 'string', required: true },
     quantity: { type: 'number', required: false },
     price: { type: 'number', required: false },

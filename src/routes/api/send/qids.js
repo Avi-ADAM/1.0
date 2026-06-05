@@ -1873,7 +1873,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                       ratePerHour
                       mode
                       notes
-                      pendm { data { id attributes { name descrip noofhours perhour mission { data { id } } } } }
+                      pendm { data { id attributes { name descrip noofhours perhour rishon { data { id } } mission { data { id } } } } }
                       mesimabetahalich { data { id attributes { name howmanyhoursalready hoursassinged } } }
                     }
                   }
@@ -4831,6 +4831,16 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         }
         noofhours
         perhour
+        source
+        ratson {
+          data {
+            id
+            attributes {
+              name
+              logo { data { attributes { url formats } } }
+            }
+          }
+        }
       }
     }
   }
@@ -6859,6 +6869,166 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
   '144assignRecipeResourceMember': `mutation AssignRecipeResourceMember($id: ID!, $assignedMember: ID) {
     updateMatanotRecipeResource(id: $id, data: { assignedMember: $assignedMember }) {
       data { id attributes { mode } }
+    }
+  }`,
+
+  /* ── Concierge: materialize phase (PLAN_CONCIERGE §5.3 phase 2 / M7) ────────
+   * 166 creates the dedicated partner weave (providers = members; the customer
+   * is the *client* of the resulting Sheirut, NOT a member). 167 hosts the
+   * composed product on that weave and activates it. 168 reads the BOM lines
+   * with their assignedMember so the action can verify readiness + collect the
+   * providers before producing the deal via the existing createSheirutFromPending.
+   */
+  '166crWishWeave': `mutation CrWishWeave($members: [ID], $projectName: String!, $descripFor: String, $publishedAt: DateTime, $isOt: Boolean) {
+    createProject(data: {
+      user_1s: $members,
+      projectName: $projectName,
+      descripFor: $descripFor,
+      isOt: $isOt,
+      publishedAt: $publishedAt
+    }) {
+      data { id attributes { projectName } }
+    }
+  }`,
+
+  '167hostWishMatanot': `mutation HostWishMatanot($id: ID!, $projectcreates: ID!, $publishedAt: DateTime) {
+    updateMatanot(id: $id, data: {
+      projectcreates: [$projectcreates],
+      status_of_voting: active,
+      publishedAt: $publishedAt
+    }) {
+      data { id attributes { status_of_voting } }
+    }
+  }`,
+
+  '168wishRecipeForMaterialize': `query WishRecipeForMaterialize($id: ID!) {
+    matanot(id: $id) {
+      data {
+        id
+        attributes {
+          name
+          pricingMode
+          estimatedPrice
+          matanot_recipe_missions {
+            data {
+              id
+              attributes {
+                hoursPerUnit
+                unitsPerProduct
+                ratePerHour
+                mode
+                notes
+                assignedMember { data { id } }
+                pendm { data { id attributes { name descrip } } }
+              }
+            }
+          }
+          matanot_recipe_resources {
+            data {
+              id
+              attributes {
+                quantityPerUnit
+                pricePerUnit
+                kindOf
+                mode
+                notes
+                assignedMember { data { id } }
+                pmash { data { id attributes { name descrip } } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  /* ── Concierge: publish a wish need to the community lev feed (PLAN_CONCIERGE
+   * §5.2). 169/170 create a project-LESS open-mission / open-mashaabim linked to
+   * the source wish (ratson) with source='concierge'. They surface to matching
+   * users through the existing skill/role → open_missions (and sp → open_mashaabims)
+   * suggestion matcher — no project required. 172 resolves skill names → ids so the
+   * published mission carries the matching dimensions. */
+  '169crWishOpenMission': `mutation CrWishOpenMission(
+    $name: String!,
+    $descrip: String,
+    $hearotMeyuchadot: String,
+    $noofhours: Float,
+    $perhour: Float,
+    $isMust: Boolean,
+    $ratson: ID,
+    $pendm: ID,
+    $mission: ID,
+    $skills: [ID],
+    $tafkidims: [ID],
+    $work_ways: [ID],
+    $source: ENUM_OPENMISSION_SOURCE,
+    $location: ComponentNewLocationInput,
+    $sqadualed: DateTime,
+    $publishedAt: DateTime
+  ) {
+    createOpenMission(data: {
+      name: $name,
+      descrip: $descrip,
+      hearotMeyuchadot: $hearotMeyuchadot,
+      noofhours: $noofhours,
+      perhour: $perhour,
+      isMust: $isMust,
+      archived: false,
+      ratson: $ratson,
+      pendm: $pendm,
+      mission: $mission,
+      skills: $skills,
+      tafkidims: $tafkidims,
+      work_ways: $work_ways,
+      source: $source,
+      location: $location,
+      sqadualed: $sqadualed,
+      publishedAt: $publishedAt
+    }) {
+      data { id attributes { name } }
+    }
+  }`,
+
+  '170crWishOpenMashaabim': `mutation CrWishOpenMashaabim(
+    $name: String!,
+    $descrip: String,
+    $spnot: String,
+    $price: Float,
+    $easy: Float,
+    $hm: Float,
+    $kindOf: ENUM_OPENMASHAABIM_KINDOF,
+    $isMust: Boolean,
+    $ratson: ID,
+    $pmash: ID,
+    $mashaabim: ID,
+    $source: ENUM_OPENMASHAABIM_SOURCE,
+    $location: ComponentNewLocationInput,
+    $publishedAt: DateTime
+  ) {
+    createOpenMashaabim(data: {
+      name: $name,
+      descrip: $descrip,
+      spnot: $spnot,
+      price: $price,
+      easy: $easy,
+      hm: $hm,
+      kindOf: $kindOf,
+      isMust: $isMust,
+      archived: false,
+      ratson: $ratson,
+      pmash: $pmash,
+      mashaabim: $mashaabim,
+      source: $source,
+      location: $location,
+      publishedAt: $publishedAt
+    }) {
+      data { id attributes { name } }
+    }
+  }`,
+
+  '172resolveSkillsByName': `query ResolveSkillsByName($names: [String]) {
+    skills(filters: { skillName: { in: $names } }, pagination: { limit: 50 }) {
+      data { id attributes { skillName } }
     }
   }`,
 

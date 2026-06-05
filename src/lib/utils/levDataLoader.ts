@@ -484,6 +484,12 @@ function updateSuggestionsWithDetails(missionsData: any[]) {
         dates: detail.attributes.dates || suggestion.dates,
         projectId: detail.attributes.project?.data?.id || suggestion.projectId,
 
+        // Concierge branding (PLAN_CONCIERGE §5.2): a project-less open-mission
+        // carries a `ratson` link → processSuggestions renders it as "קונסירג'".
+        source: detail.attributes.source ?? suggestion.source,
+        ratsonId: detail.attributes.ratson?.data?.id ?? suggestion.ratsonId,
+        ratsonName: detail.attributes.ratson?.data?.attributes?.name ?? suggestion.ratsonName,
+
         // Project details from the secondary fetch
         projectDetails: detail.attributes.project?.data?.attributes ? {
           name: detail.attributes.project.data.attributes.projectName,
