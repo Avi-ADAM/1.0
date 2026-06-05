@@ -1,8 +1,22 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import { Crosshair, Globe2, MapPin, MapPinned, RadioTower, RotateCcw } from '@lucide/svelte';
-  import type { GeoJSONSource, Map as MapLibreMap, Marker, StyleSpecification } from 'maplibre-gl';
+  import { get } from 'svelte/store';
+  import {
+    Crosshair,
+    Globe,
+    MapPin,
+    MapPinned,
+    RadioTower,
+    RotateCcw
+  } from '@lucide/svelte';
+  import type {
+    GeoJSONSource,
+    Map as MapLibreMap,
+    Marker,
+    StyleSpecification
+  } from 'maplibre-gl';
   import 'maplibre-gl/dist/maplibre-gl.css';
+  import { t, locale } from '$lib/translations';
 
   export type LocationMode = 'online' | 'onsite' | 'hybrid' | 'unspecified';
 
@@ -53,13 +67,19 @@
       radius: DEFAULT_RADIUS_KM,
       location_hint: ''
     }),
-    label = 'מיקום',
-    helper = 'בחרו נקודה, טווח שירות, או סמנו שהכל קורה אונליין.',
+    label = '',
+    helper = '',
     height = '360px',
     disabled = false,
     styleUrl = null,
     onChange
   }: Props = $props();
+
+  const modes = [
+    { id: 'online' as LocationMode, icon: Globe },
+    { id: 'onsite' as LocationMode, icon: MapPinned },
+    { id: 'hybrid' as LocationMode, icon: RadioTower }
+  ];
 
   let mapEl = $state<HTMLDivElement>();
   let map: MapLibreMap | null = null;
@@ -70,11 +90,11 @@
   let mapError = $state('');
   let geocoding = $state(false);
 
-  // Tracks whether the user typed their own description. While false, picking a
-  // point auto-fills location_hint with a reverse-geocoded place name.
   let hintEdited = $state(Boolean(value.location_hint?.trim()));
   let geocodeController: AbortController | null = null;
   let geocodeTimer: ReturnType<typeof setTimeout> | null = null;
+
+  const isRTL = $derived($locale === 'he' || $locale === 'ar');
 
   const hasPoint = $derived(
     typeof value.lat === 'number' &&
@@ -83,14 +103,16 @@
       Number.isFinite(value.lng)
   );
   const radiusKm = $derived(
-    typeof value.radius === 'number' && Number.isFinite(value.radius) && value.radius > 0
+    typeof value.radius === 'number' &&
+      Number.isFinite(value.radius) &&
+      value.radius > 0
       ? value.radius
       : DEFAULT_RADIUS_KM
   );
   const locationSummary = $derived.by(() => {
-    if (value.location_mode === 'online') return 'אונליין';
-    if (!hasPoint) return value.location_hint || 'עדיין לא נבחרה נקודה';
-    return `${value.lat?.toFixed(4)}, ${value.lng?.toFixed(4)} · ${radiusKm} ק״מ`;
+    if (value.location_mode === 'online') return $t('location.summary_online');
+    if (!hasPoint) return value.location_hint || $t('location.summary_no_point');
+    return `${value.lat?.toFixed(4)}, ${value.lng?.toFixed(4)} · ${radiusKm} ${$t('location.km')}`;
   });
 
   onMount(async () => {
@@ -112,8 +134,14 @@
         attributionControl: false
       });
 
-      map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-left');
-      map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
+      map.addControl(
+        new maplibregl.NavigationControl({ showCompass: false }),
+        'top-left'
+      );
+      map.addControl(
+        new maplibregl.AttributionControl({ compact: true }),
+        'bottom-left'
+      );
 
       marker = new maplibregl.Marker({
         color: '#ff4d9e',
@@ -139,7 +167,7 @@
     } catch (error) {
       console.error('[LocationPicker] failed to initialize MapLibre', error);
       loadingMap = false;
-      mapError = 'לא הצלחתי לטעון את המפה. עדיין אפשר למלא מיקום ידנית.';
+      mapError = get(t)('location.error_map_failed');
     }
 
     return () => {
@@ -153,7 +181,8 @@
   });
 
   function updateValue(patch: Partial<LocationValue>) {
-    const nextMode = patch.location_mode ?? value.location_mode ?? 'unspecified';
+    const nextMode =
+      patch.location_mode ?? value.location_mode ?? 'unspecified';
     const next: LocationValue = {
       ...value,
       ...patch,
@@ -174,7 +203,10 @@
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
     const nextLat = roundCoord(lat);
     const nextLng = roundCoord(lng);
-    const nextMode = value.location_mode === 'online' ? 'hybrid' : value.location_mode || 'onsite';
+    const nextMode =
+      value.location_mode === 'online'
+        ? 'hybrid'
+        : value.location_mode || 'onsite';
     updateValue({
       lat: nextLat,
       lng: nextLng,
@@ -201,13 +233,15 @@
     const controller = new AbortController();
     geocodeController = controller;
     try {
-      const url =
-        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=12&accept-language=he&lat=${lat}&lon=${lng}`;
-      const res = await fetch(url, { signal: controller.signal, headers: { Accept: 'application/json' } });
+      const lang = get(locale) || 'he';
+      const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=17&accept-language=${lang}&lat=${lat}&lon=${lng}`;
+      const res = await fetch(url, {
+        signal: controller.signal,
+        headers: { Accept: 'application/json' }
+      });
       if (!res.ok) return;
       const data = await res.json();
       const label = formatPlace(data);
-      // Re-check hintEdited: the user may have typed while we were fetching.
       if (label && !hintEdited) updateValue({ location_hint: label });
     } catch (error) {
       if ((error as Error)?.name !== 'AbortError') {
@@ -223,13 +257,19 @@
 
   function formatPlace(data: any): string {
     const a = data?.address ?? {};
-    const primary =
-      a.city || a.town || a.village || a.municipality || a.suburb || a.neighbourhood || a.county;
-    const secondary = a.state || a.country;
-    if (primary && secondary && primary !== secondary) return `${primary}, ${secondary}`;
-    if (primary) return primary;
+    const road = a.road || a.pedestrian || a.footway || a.path || a.cycleway;
+    const neighbourhood = a.neighbourhood || a.quarter || a.suburb || a.city_district;
+    const city = a.city || a.town || a.village || a.municipality || a.county;
+
+    const parts: string[] = [];
+    if (road) parts.push(road);
+    if (neighbourhood && neighbourhood !== city) parts.push(neighbourhood);
+    if (city) parts.push(city);
+
+    if (parts.length > 0) return parts.join(', ');
+
     if (typeof data?.display_name === 'string') {
-      return data.display_name.split(',').slice(0, 2).join(', ').trim();
+      return data.display_name.split(',').slice(0, 3).join(', ').trim();
     }
     return '';
   }
@@ -243,12 +283,14 @@
   }
 
   function updateRadius(nextRadius: number | undefined) {
-    const radius = typeof nextRadius === 'number' && Number.isFinite(nextRadius) ? nextRadius : DEFAULT_RADIUS_KM;
+    const radius =
+      typeof nextRadius === 'number' && Number.isFinite(nextRadius)
+        ? nextRadius
+        : DEFAULT_RADIUS_KM;
     updateValue({ radius: Math.max(1, Math.min(250, Math.round(radius))) });
   }
 
   function updateHint(nextHint: string) {
-    // Once the user types, stop auto-filling. If they clear it, allow auto again.
     hintEdited = Boolean(nextHint.trim());
     updateValue({ location_hint: nextHint });
   }
@@ -264,8 +306,12 @@
   }
 
   async function useBrowserLocation() {
-    if (disabled || typeof navigator === 'undefined' || !navigator.geolocation) {
-      mapError = 'הדפדפן לא מאפשר קבלת מיקום כרגע.';
+    if (
+      disabled ||
+      typeof navigator === 'undefined' ||
+      !navigator.geolocation
+    ) {
+      mapError = get(t)('location.error_no_geo');
       return;
     }
 
@@ -278,7 +324,7 @@
       },
       (error) => {
         locating = false;
-        mapError = error.message || 'לא הצלחנו לקבל מיקום מהדפדפן.';
+        mapError = error.message || get(t)('location.error_geo_failed');
       },
       { enableHighAccuracy: true, timeout: 9000, maximumAge: 60000 }
     );
@@ -330,16 +376,29 @@
     setRadiusData(circleFeature(lngLat, radiusKm));
 
     if (fly) {
-      map.easeTo({ center: lngLat, zoom: Math.max(map.getZoom(), 11), duration: 550 });
+      map.easeTo({
+        center: lngLat,
+        zoom: Math.max(map.getZoom(), 11),
+        duration: 550
+      });
     }
   }
 
   function setRadiusData(feature: GeoJSON.Feature<GeoJSON.Polygon> | null) {
-    const source = map?.getSource(CIRCLE_SOURCE_ID) as GeoJSONSource | undefined;
-    source?.setData(feature ? { type: 'FeatureCollection', features: [feature] } : emptyFeatureCollection());
+    const source = map?.getSource(CIRCLE_SOURCE_ID) as
+      | GeoJSONSource
+      | undefined;
+    source?.setData(
+      feature
+        ? { type: 'FeatureCollection', features: [feature] }
+        : emptyFeatureCollection()
+    );
   }
 
-  function circleFeature(center: [number, number], radius: number): GeoJSON.Feature<GeoJSON.Polygon> {
+  function circleFeature(
+    center: [number, number],
+    radius: number
+  ): GeoJSON.Feature<GeoJSON.Polygon> {
     const points: [number, number][] = [];
     const earthRadiusKm = 6371;
     const [lng, lat] = center;
@@ -384,25 +443,14 @@
   function toDeg(rad: number) {
     return (rad * 180) / Math.PI;
   }
-
-  const modes: Array<{
-    id: LocationMode;
-    title: string;
-    text: string;
-    icon: typeof Globe2;
-  }> = [
-    { id: 'online', title: 'אונליין', text: 'אין תלות במיקום', icon: Globe2 },
-    { id: 'onsite', title: 'פיזי', text: 'צריך להיות באזור', icon: MapPinned },
-    { id: 'hybrid', title: 'היברידי', text: 'קרבה עוזרת', icon: RadioTower }
-  ];
 </script>
 
-<section class="location-picker" aria-labelledby="location-picker-title">
+<section class="location-picker" dir={isRTL ? 'rtl' : 'ltr'} aria-labelledby="location-picker-title">
   <div class="location-head">
     <div>
-      <div class="eyebrow">Location scope</div>
-      <h3 id="location-picker-title">{label}</h3>
-      <p>{helper}</p>
+      <div class="eyebrow">{$t('location.eyebrow')}</div>
+      <h3 id="location-picker-title">{label || $t('location.helper')}</h3>
+      <p>{helper || $t('location.helper')}</p>
     </div>
     <div class="summary-pill" title={locationSummary}>
       <MapPin size={15} />
@@ -410,19 +458,19 @@
     </div>
   </div>
 
-  <div class="mode-grid" role="group" aria-label="סוג המיקום">
+  <div class="mode-grid" role="group" aria-label={$t('location.eyebrow')}>
     {#each modes as mode (mode.id)}
       <button
         type="button"
         class:active={value.location_mode === mode.id}
         class="mode-button"
-        disabled={disabled}
+        {disabled}
         onclick={() => setMode(mode.id)}
       >
         <svelte:component this={mode.icon} size={17} />
         <span>
-          <strong>{mode.title}</strong>
-          <small>{mode.text}</small>
+          <strong>{$t(`location.${mode.id}`)}</strong>
+          <small>{$t(`location.${mode.id}_sub`)}</small>
         </span>
       </button>
     {/each}
@@ -431,10 +479,12 @@
   <div class:muted-map={value.location_mode === 'online'} class="map-shell">
     <div bind:this={mapEl} class="map-canvas" style:height></div>
     {#if loadingMap}
-      <div class="map-state">טוען מפה...</div>
+      <div class="map-state">{$t('location.loading_map')}</div>
     {/if}
     {#if value.location_mode === 'online'}
-      <div class="map-state map-state-soft">המיקום לא ישפיע על ההתאמה במצב אונליין.</div>
+      <div class="map-state map-state-soft">
+        {$t('location.online_map_note')}
+      </div>
     {/if}
   </div>
 
@@ -444,17 +494,20 @@
 
   <div class="control-grid">
     <label class="field field-wide">
-      <span>תיאור מיקום{#if geocoding} · מאתר שם מקום…{/if}</span>
+      <span
+        >{$t('location.hint_label')}{#if geocoding}
+          {$t('location.geocoding_suffix')}{/if}</span
+      >
       <input
-        disabled={disabled}
-        placeholder="למשל: תל אביב והסביבה, חיפה, אונליין"
+        {disabled}
+        placeholder={$t('location.hint_placeholder')}
         value={value.location_hint ?? ''}
         oninput={(event) => updateHint(event.currentTarget.value)}
       />
     </label>
 
     <label class="field">
-      <span>קו רוחב</span>
+      <span>{$t('location.lat_label')}</span>
       <input
         disabled={disabled || value.location_mode === 'online'}
         type="number"
@@ -465,7 +518,7 @@
     </label>
 
     <label class="field">
-      <span>קו אורך</span>
+      <span>{$t('location.lng_label')}</span>
       <input
         disabled={disabled || value.location_mode === 'online'}
         type="number"
@@ -476,7 +529,7 @@
     </label>
 
     <label class="field radius-field">
-      <span>טווח שירות · {radiusKm} ק״מ</span>
+      <span>{$t('location.radius_label')} · {radiusKm} {$t('location.km')}</span>
       <input
         disabled={disabled || value.location_mode === 'online'}
         type="range"
@@ -490,13 +543,23 @@
   </div>
 
   <div class="actions-row">
-    <button type="button" class="ghost-button" disabled={disabled || locating} onclick={useBrowserLocation}>
+    <button
+      type="button"
+      class="ghost-button"
+      disabled={disabled || locating}
+      onclick={useBrowserLocation}
+    >
       <Crosshair size={16} />
-      <span>{locating ? 'מאתר...' : 'המיקום שלי'}</span>
+      <span>{locating ? $t('location.locating') : $t('location.my_location')}</span>
     </button>
-    <button type="button" class="ghost-button" disabled={disabled || !hasPoint} onclick={clearPoint}>
+    <button
+      type="button"
+      class="ghost-button"
+      disabled={disabled || !hasPoint}
+      onclick={clearPoint}
+    >
       <RotateCcw size={16} />
-      <span>ניקוי נקודה</span>
+      <span>{$t('location.clear_point')}</span>
     </button>
   </div>
 </section>
@@ -506,7 +569,11 @@
     border: 1px solid rgba(116, 191, 255, 0.22);
     border-radius: 18px;
     background:
-      linear-gradient(180deg, rgba(116, 191, 255, 0.07), rgba(116, 191, 255, 0.01)),
+      linear-gradient(
+        180deg,
+        rgba(116, 191, 255, 0.07),
+        rgba(116, 191, 255, 0.01)
+      ),
       #0e0d0c;
     padding: 16px;
     box-shadow: 0 20px 55px rgba(0, 0, 0, 0.28);
@@ -637,7 +704,11 @@
 
   .map-canvas {
     background:
-      linear-gradient(135deg, rgba(116, 191, 255, 0.12), rgba(2, 255, 187, 0.06)),
+      linear-gradient(
+        135deg,
+        rgba(116, 191, 255, 0.12),
+        rgba(2, 255, 187, 0.06)
+      ),
       #171512;
     min-height: 260px;
     width: 100%;
@@ -764,13 +835,32 @@
   }
 
   :global(.maplibregl-ctrl-group) {
-    background: rgba(14, 13, 12, 0.88);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: none;
+    background: rgba(14, 13, 12, 0.92) !important;
+    border: 1px solid rgba(212, 175, 55, 0.3) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  :global(.maplibregl-ctrl-group button) {
+    background-color: transparent !important;
+    width: 30px;
+    height: 30px;
   }
 
   :global(.maplibregl-ctrl-group button + button) {
-    border-top-color: rgba(255, 255, 255, 0.1);
+    border-top-color: rgba(212, 175, 55, 0.2) !important;
+  }
+
+  :global(.maplibregl-ctrl-group button:hover) {
+    background-color: rgba(212, 175, 55, 0.1) !important;
+  }
+
+  :global(.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon) {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' viewBox='0 0 29 29'%3E%3Cpath stroke='%23d4af37' stroke-width='2.5' stroke-linecap='round' d='M14.5 8.5v12M8.5 14.5h12'/%3E%3C/svg%3E") !important;
+  }
+
+  :global(.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon) {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='29' height='29' viewBox='0 0 29 29'%3E%3Cpath stroke='%23ff4d9e' stroke-width='2.5' stroke-linecap='round' d='M8.5 14.5h12'/%3E%3C/svg%3E") !important;
   }
 
   :global(.maplibregl-ctrl-attrib) {

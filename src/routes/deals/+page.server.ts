@@ -17,6 +17,8 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
       sales: result.sales,
       pendingBuy: result.pendingBuy,
       pendingSell: result.pendingSell,
+      incomingWishes: result.incomingWishes,
+      weaves: result.weaves,
       user: {
         username: result.username,
         profilePic: result.profilePic

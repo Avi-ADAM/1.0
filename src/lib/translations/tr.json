@@ -1087,6 +1087,66 @@
             "en": "Request Date",
             "ar": "تاريخ الطلب"
         },
+        "incomingWish": {
+            "he": "משאלה אלייך",
+            "en": "Wish for you",
+            "ar": "أمنية لك"
+        },
+        "inviteNew": {
+            "he": "חדשה",
+            "en": "New",
+            "ar": "جديدة"
+        },
+        "inviteViewed": {
+            "he": "נצפתה",
+            "en": "Viewed",
+            "ar": "تمت المشاهدة"
+        },
+        "aWisher": {
+            "he": "מבקשת",
+            "en": "A wisher",
+            "ar": "صاحب أمنية"
+        },
+        "invitedYou": {
+            "he": "הזמינה אותך לתרום למשאלה",
+            "en": "invited you to help with a wish",
+            "ar": "دعاك للمساهمة في أمنية"
+        },
+        "inviteKindPerson": {
+            "he": "מבקשים אותך",
+            "en": "You're invited",
+            "ar": "أنت مدعو"
+        },
+        "inviteKindResource": {
+            "he": "משאב נדרש",
+            "en": "Resource needed",
+            "ar": "مورد مطلوب"
+        },
+        "inviteBudget": {
+            "he": "תקציב",
+            "en": "Budget",
+            "ar": "الميزانية"
+        },
+        "byOffer": {
+            "he": "לפי הצעה",
+            "en": "By offer",
+            "ar": "حسب العرض"
+        },
+        "inviteWhen": {
+            "he": "מתי",
+            "en": "When",
+            "ar": "متى"
+        },
+        "flexible": {
+            "he": "גמיש",
+            "en": "Flexible",
+            "ar": "مرن"
+        },
+        "inviteRespond": {
+            "he": "צפה והשב",
+            "en": "View & respond",
+            "ar": "اعرض ورد"
+        },
         "statusInProgress": {
             "he": "בביצוע",
             "en": "In Progress",

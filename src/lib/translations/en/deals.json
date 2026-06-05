@@ -18,5 +18,9 @@
   "cta_start_selling": "Open Sales Center",
   "cta_find_products": "Search via Concierge",
   "cta_sales_center_desc": "Go to the Sales Center to add a new sale",
-  "cta_concierge_desc": "Post a wish and find what you're looking for"
+  "cta_concierge_desc": "Post a wish and find what you're looking for",
+  "incoming_wishes": "Wishes for you",
+  "incoming_wishes_label": "Wishes that invited you to contribute a task or resource",
+  "no_incoming_wishes": "No wishes are asking for you right now",
+  "incoming_wishes_hint": "When someone invites you to a wish, it will appear here"
 }

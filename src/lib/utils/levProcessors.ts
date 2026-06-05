@@ -131,8 +131,13 @@ export function processPends(
     const negos = pend.negopendmissions?.data || []; // Negotiations
 
     // 2. Logic: Already voted? Vote Counts?
-    const maxUserOrder = users.reduce((max, u) => Math.max(max, u.order || 0), 0);
-    const orderon = Math.max(negos.length || 0, maxUserOrder);
+    // orderon is the current negotiation round. Only a negotiation advances it
+    // (it casts a vote at ordern+1), so the highest vote order already reflects
+    // the latest round. Counting negopendmissions here would over-count when two
+    // members negotiate the same round before refreshing, pushing orderon past
+    // every real vote so consensus can never be reached. Must match the
+    // server-authoritative calc in voteOnPendm.ts.
+    const orderon = users.reduce((max, u) => Math.max(max, u.order || 0), 0);
 
     let already = false;
     let mypos = null;
@@ -664,10 +669,13 @@ export function processAsked(
     const missionId = omData.mission?.data?.id || ask.openMashaabimId;
 
     // 4. Voting Logic
-    // 4. Voting Logic
+    // orderon is the current negotiation round. Only a negotiation advances it
+    // (submitNegoMission casts a vote at ordern+1), so the highest vote order
+    // already reflects the latest round. Counting negopendmissions here would
+    // over-count when two members negotiate the same round before refreshing,
+    // pushing orderon past every real vote so consensus can never be reached.
     const allVotes = ask.vots || [];
-    const maxUserOrder = allVotes.reduce((max, v) => Math.max(max, v.order || 0), 0);
-    const orderon = Math.max(omData.negopendmissions?.data?.length || 0, maxUserOrder);
+    const orderon = allVotes.reduce((max, v) => Math.max(max, v.order || 0), 0);
 
     let noofusersOk = 0;
     let noofusersNo = 0;
@@ -1081,8 +1089,15 @@ export function processSuggestions(
 
     // Use stored project data if available (member), otherwise use embedded details (non-member)
     const projectInfo = createProjectInfo(suggestion.projectId);
-    const projectName = project?.attributes.projectName || suggestion.projectDetails?.name || '';
-    const projectImageUrl = project?.attributes.profilePic?.data?.attributes?.url || suggestion.projectDetails?.src || '';
+    // Concierge-sourced suggestions (PLAN_CONCIERGE §5.2) belong to no weave —
+    // they carry a `ratson` link. Brand them as "קונסירג'" with the concierge logo.
+    const isConcierge = !!(suggestion.ratsonName || suggestion.source === 'concierge');
+    const projectName = isConcierge
+      ? 'קונסירג׳'
+      : (project?.attributes.projectName || suggestion.projectDetails?.name || '');
+    const projectImageUrl = isConcierge
+      ? '/logo-concierge.png'
+      : (project?.attributes.profilePic?.data?.attributes?.url || suggestion.projectDetails?.src || '');
     const memberCount = project?.attributes.user_1s?.data?.length || suggestion.projectDetails?.membersCount || 0;
     const restime = project?.attributes.restime || suggestion.projectDetails?.restime;
 
@@ -1246,7 +1261,12 @@ export function processPmashes(
     const users = pmash.users || [];
     const diun = pmash.diun || [];
     const nego_mashes = pmash.nego_mashes?.data || [];
-    const orderon = nego_mashes.length || 0; // Current negotiation version
+    // Current round = highest existing vote order. Only a negotiation advances
+    // it (submitNegoMash casts a vote at ordern+1), so the votes already reflect
+    // the latest round. Counting nego_mashes here would over-count when two
+    // members negotiate the same round before refreshing, pushing orderon past
+    // every real vote so consensus can never be reached. Matches voteOnPmash.ts.
+    const orderon = users.reduce((max: number, v: any) => Math.max(max, v.order || 0), 0);
 
     // Extract user IDs who voted
     const uids: string[] = [];

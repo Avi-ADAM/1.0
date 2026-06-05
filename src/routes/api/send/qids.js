@@ -124,8 +124,8 @@ const qids_base = {
                                        $mashaabims:[ID],
                                        $link: String,
                                        $publishedAt: DateTime,
-                                       $status_ratson: Enum_Ratson_Status_Ratson,
-                                       $access_mode: Enum_Ratson_Access_Mode,
+                                       $status_ratson: ENUM_RATSON_STATUS_RATSON,
+                                       $access_mode: ENUM_RATSON_ACCESS_MODE,
                                        $categories: [ID],
                                        $sub_category: String,
                                        $language: String,
@@ -139,6 +139,11 @@ const qids_base = {
                                        $ai_meta: JSON,
                                        $chat_forum: ID,
                                        $process: ID,
+                                       $joinKind: ENUM_RATSON_JOINKIND,
+                                       $minJoiners: Int,
+                                       $maxJoiners: Int,
+                                       $joinDeadline: DateTime,
+                                       $share_status: ENUM_RATSON_SHARE_STATUS,
                                        $extracted_missions: [ComponentNewExtractedMissionsInput],
                                        $extracted_resources: [ComponentNewExtractedResourcesInput])
                         { createRatson(
@@ -173,6 +178,11 @@ const qids_base = {
              ai_meta: $ai_meta,
              chat_forum: $chat_forum,
              process: $process,
+             joinKind: $joinKind,
+             minJoiners: $minJoiners,
+             maxJoiners: $maxJoiners,
+             joinDeadline: $joinDeadline,
+             share_status: $share_status,
              extracted_missions: $extracted_missions,
              extracted_resources: $extracted_resources
                   }
@@ -767,7 +777,7 @@ const qids_base = {
         visibility: $visibility,
         shareToken: $shareToken,
         isLocal: $isLocal,
-        places: $placeIds,
+        cuntries: $placeIds,
         publishedAt: $publishedAt
       }) {
         data {
@@ -1863,7 +1873,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                       ratePerHour
                       mode
                       notes
-                      pendm { data { id attributes { name descrip noofhours perhour mission { data { id } } } } }
+                      pendm { data { id attributes { name descrip noofhours perhour rishon { data { id } } mission { data { id } } } } }
                       mesimabetahalich { data { id attributes { name howmanyhoursalready hoursassinged } } }
                     }
                   }
@@ -4821,6 +4831,16 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         }
         noofhours
         perhour
+        source
+        ratson {
+          data {
+            id
+            attributes {
+              name
+              logo { data { attributes { url formats } } }
+            }
+          }
+        }
       }
     }
   }
@@ -5981,6 +6001,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $mode: ENUM_MATANOTRECIPEMISSION_MODE,
     $notes: String,
     $partof: ID,
+    $assignedMember: ID,
     $publishedAt: DateTime
   ) {
     createMatanotRecipeMission(data: {
@@ -5993,6 +6014,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       mode: $mode,
       notes: $notes,
       partof: $partof,
+      assignedMember: $assignedMember,
       publishedAt: $publishedAt
     }) {
       data { id attributes { hoursPerUnit unitsPerProduct mode } }
@@ -6035,6 +6057,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $kindOf: ENUM_MATANOTRECIPERESOURCE_KINDOF,
     $mode: ENUM_MATANOTRECIPERESOURCE_MODE,
     $notes: String,
+    $assignedMember: ID,
     $publishedAt: DateTime
   ) {
     createMatanotRecipeResource(data: {
@@ -6046,6 +6069,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       kindOf: $kindOf,
       mode: $mode,
       notes: $notes,
+      assignedMember: $assignedMember,
       publishedAt: $publishedAt
     }) {
       data { id attributes { quantityPerUnit pricePerUnit mode } }
@@ -6085,7 +6109,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $quantity: Float!,
     $process: ID,
     $agreedPrice: Float,
-    $status: ENUM_SHEIRUTFULFILLMENT_STATUS,
+    $status_process: ENUM_SHEIRUTFULFILLMENT_STATUS_PROCESS,
     $publishedAt: DateTime
   ) {
     createSheirutFulfillment(data: {
@@ -6094,12 +6118,12 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       quantity: $quantity,
       process: $process,
       agreedPrice: $agreedPrice,
-      status: $status,
+      status_process: $status_process,
       publishedAt: $publishedAt
     }) {
       data {
         id
-        attributes { quantity agreedPrice status }
+        attributes { quantity agreedPrice status_process }
       }
     }
   }`,
@@ -6107,19 +6131,19 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
   '132updateSheirutFulfillment': `mutation UpdateSheirutFulfillment(
     $id: ID!,
     $agreedPrice: Float,
-    $status: ENUM_SHEIRUTFULFILLMENT_STATUS,
-    $createdMissions: [ID],
-    $createdMaaps: [ID],
-    $createdPmashes: [ID]
+    $status_process: ENUM_SHEIRUTFULFILLMENT_STATUS_PROCESS,
+    $createdMissions: ID,
+    $createdMaaps: ID,
+    $createdPmashes: ID
   ) {
     updateSheirutFulfillment(id: $id, data: {
       agreedPrice: $agreedPrice,
-      status: $status,
+      status_process: $status_process,
       createdMissions: $createdMissions,
       createdMaaps: $createdMaaps,
       createdPmashes: $createdPmashes
     }) {
-      data { id attributes { agreedPrice status } }
+      data { id attributes { agreedPrice status_process } }
     }
   }`,
 
@@ -6466,8 +6490,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $matanots: [ID],
     $matanots_offered: [ID],
     $users_permissions_users: [ID],
-    $status_ratson: Enum_Ratson_Status_Ratson,
-    $access_mode: Enum_Ratson_Access_Mode,
+    $status_ratson: ENUM_RATSON_STATUS_RATSON,
+    $access_mode: ENUM_RATSON_ACCESS_MODE,
     $sub_category: String,
     $language: String,
     $lat: Float,
@@ -6535,8 +6559,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
 
   '101createRatsonProposal': `mutation CreateRatsonProposal(
     $ratson: ID!,
-    $kind: Enum_Ratsonproposal_Kind,
-    $status_proposal: Enum_Ratsonproposal_Status_Proposal,
+    $kind: ENUM_RATSONPROPOSAL_KIND,
+    $status_proposal: ENUM_RATSONPROPOSAL_STATUS_PROPOSAL,
     $matanot: ID,
     $project: ID,
     $proposer_users: [ID],
@@ -6573,8 +6597,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
 
   '102updateRatsonProposal': `mutation UpdateRatsonProposal(
     $id: ID!,
-    $kind: Enum_Ratsonproposal_Kind,
-    $status_proposal: Enum_Ratsonproposal_Status_Proposal,
+    $kind: ENUM_RATSONPROPOSAL_KIND,
+    $status_proposal: ENUM_RATSONPROPOSAL_STATUS_PROPOSAL,
     $matanot: ID,
     $project: ID,
     $proposer_users: [ID],
@@ -6645,7 +6669,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
 
   '108createRatsonMatchJob': `mutation CreateRatsonMatchJob(
     $ratson: ID!,
-    $mode: Enum_Ratsonmatchjob_Mode,
+    $mode: ENUM_RATSONMATCHJOB_MODE,
     $started_at: DateTime,
     $finished_at: DateTime,
     $proposals_created: Int,
@@ -6671,7 +6695,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     matanots(
       filters: {
         archived: { eq: false }
-        status_of_voting: { eq: active }
+        status_of_voting: { eq: "active" }
       }
       pagination: { limit: $limit }
     ) {
@@ -6679,7 +6703,6 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         id
         attributes {
           name
-          sub_category
           price
           estimatedPrice
           lat
@@ -6704,7 +6727,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     ratsons(
       filters: {
         fulfilled: { eq: false }
-        status_ratson: { in: [open, matching, negotiating] }
+        status_ratson: { in: ["open", "matching", "negotiating"] }
       }
       sort: ["createdAt:desc"]
       pagination: { limit: $limit }
@@ -6730,6 +6753,300 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           categories { data { id attributes { name } } }
         }
       }
+    }
+  }`,
+
+  /* ── Concierge: wish invitations addressed to me (PLAN_CONCIERGE §5) ──────────
+   * Personal surface for `requestSuggestion` Track B: a wisher invited *this*
+   * user to fill a need (proposer_users contains me). Track A (matanot service
+   * requests) already surface as Sheirutpends in /deals "pending"; this is the
+   * person/resource invitation that otherwise only lived as a /lev notification.
+   */
+  '111listMyWishInvitations': `query ListMyWishInvitations($uid: ID!, $limit: Int) {
+    ratsonProposals(
+      filters: {
+        proposer_users: { id: { eq: $uid } }
+        status_proposal: { in: ["suggested", "viewed"] }
+      }
+      sort: ["createdAt:desc"]
+      pagination: { limit: $limit }
+    ) {
+      data {
+        id
+        attributes {
+          status_proposal
+          kind
+          total_price
+          createdAt
+          forum { data { id } }
+          covered_missions { id extracted_mission_idx hours price }
+          covered_resources { id extracted_resource_idx quantity price }
+          ratson {
+            data {
+              id
+              attributes {
+                name
+                desc
+                longDes
+                status_ratson
+                startDate
+                finnishDate
+                totalbounti
+                chat_forum { data { id } }
+                users_permissions_users {
+                  data {
+                    id
+                    attributes {
+                      username
+                      profilePic { data { attributes { url } } }
+                    }
+                  }
+                }
+                vallues { data { id attributes { valueName } } }
+                categories { data { id attributes { name } } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  /* ── Concierge: provider response → complex-matanot binding (PLAN_CONCIERGE §5.3) ──
+   * 139 creates the wish's aggregator product WITHOUT a project (neutral, anchored
+   * only to the wish's process) — the assembly-phase product per the two-phase model.
+   * 112 records the provider's commitment on the proposal (willingness + status).
+   */
+  '139createWishMatanot': `mutation CreateWishMatanot(
+    $name: String!,
+    $desc: JSON,
+    $pricingMode: ENUM_MATANOT_PRICINGMODE,
+    $estimatedPrice: Float,
+    $status_of_voting: ENUM_MATANOT_STATUS_OF_VOTING,
+    $process: ID,
+    $publishedAt: DateTime
+  ) {
+    createMatanot(data: {
+      name: $name,
+      desc: $desc,
+      pricingMode: $pricingMode,
+      estimatedPrice: $estimatedPrice,
+      price: $estimatedPrice,
+      status_of_voting: $status_of_voting,
+      process: $process,
+      publishedAt: $publishedAt
+    }) {
+      data { id attributes { name pricingMode status_of_voting } }
+    }
+  }`,
+
+  '141listMyWeavesDetailed': `query ListMyWeavesDetailed($uid: ID!) {
+    usersPermissionsUser(id: $uid) {
+      data {
+        attributes {
+          projects_1s {
+            data {
+              id
+              attributes {
+                projectName
+                restime
+                profilePic { data { attributes { url } } }
+                user_1s { data { id } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  '143assignRecipeMissionMember': `mutation AssignRecipeMissionMember($id: ID!, $assignedMember: ID) {
+    updateMatanotRecipeMission(id: $id, data: { assignedMember: $assignedMember }) {
+      data { id attributes { mode } }
+    }
+  }`,
+
+  '144assignRecipeResourceMember': `mutation AssignRecipeResourceMember($id: ID!, $assignedMember: ID) {
+    updateMatanotRecipeResource(id: $id, data: { assignedMember: $assignedMember }) {
+      data { id attributes { mode } }
+    }
+  }`,
+
+  /* ── Concierge: materialize phase (PLAN_CONCIERGE §5.3 phase 2 / M7) ────────
+   * 166 creates the dedicated partner weave (providers = members; the customer
+   * is the *client* of the resulting Sheirut, NOT a member). 167 hosts the
+   * composed product on that weave and activates it. 168 reads the BOM lines
+   * with their assignedMember so the action can verify readiness + collect the
+   * providers before producing the deal via the existing createSheirutFromPending.
+   */
+  '166crWishWeave': `mutation CrWishWeave($members: [ID], $projectName: String!, $descripFor: String, $publishedAt: DateTime, $isOt: Boolean) {
+    createProject(data: {
+      user_1s: $members,
+      projectName: $projectName,
+      descripFor: $descripFor,
+      isOt: $isOt,
+      publishedAt: $publishedAt
+    }) {
+      data { id attributes { projectName } }
+    }
+  }`,
+
+  '167hostWishMatanot': `mutation HostWishMatanot($id: ID!, $projectcreates: ID!, $publishedAt: DateTime) {
+    updateMatanot(id: $id, data: {
+      projectcreates: [$projectcreates],
+      status_of_voting: active,
+      publishedAt: $publishedAt
+    }) {
+      data { id attributes { status_of_voting } }
+    }
+  }`,
+
+  '168wishRecipeForMaterialize': `query WishRecipeForMaterialize($id: ID!) {
+    matanot(id: $id) {
+      data {
+        id
+        attributes {
+          name
+          pricingMode
+          estimatedPrice
+          matanot_recipe_missions {
+            data {
+              id
+              attributes {
+                hoursPerUnit
+                unitsPerProduct
+                ratePerHour
+                mode
+                notes
+                assignedMember { data { id } }
+                pendm { data { id attributes { name descrip } } }
+              }
+            }
+          }
+          matanot_recipe_resources {
+            data {
+              id
+              attributes {
+                quantityPerUnit
+                pricePerUnit
+                kindOf
+                mode
+                notes
+                assignedMember { data { id } }
+                pmash { data { id attributes { name descrip } } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  /* ── Concierge: publish a wish need to the community lev feed (PLAN_CONCIERGE
+   * §5.2). 169/170 create a project-LESS open-mission / open-mashaabim linked to
+   * the source wish (ratson) with source='concierge'. They surface to matching
+   * users through the existing skill/role → open_missions (and sp → open_mashaabims)
+   * suggestion matcher — no project required. 172 resolves skill names → ids so the
+   * published mission carries the matching dimensions. */
+  '169crWishOpenMission': `mutation CrWishOpenMission(
+    $name: String!,
+    $descrip: String,
+    $hearotMeyuchadot: String,
+    $noofhours: Float,
+    $perhour: Float,
+    $isMust: Boolean,
+    $ratson: ID,
+    $pendm: ID,
+    $mission: ID,
+    $skills: [ID],
+    $tafkidims: [ID],
+    $work_ways: [ID],
+    $source: ENUM_OPENMISSION_SOURCE,
+    $location: ComponentNewLocationInput,
+    $sqadualed: DateTime,
+    $publishedAt: DateTime
+  ) {
+    createOpenMission(data: {
+      name: $name,
+      descrip: $descrip,
+      hearotMeyuchadot: $hearotMeyuchadot,
+      noofhours: $noofhours,
+      perhour: $perhour,
+      isMust: $isMust,
+      archived: false,
+      ratson: $ratson,
+      pendm: $pendm,
+      mission: $mission,
+      skills: $skills,
+      tafkidims: $tafkidims,
+      work_ways: $work_ways,
+      source: $source,
+      location: $location,
+      sqadualed: $sqadualed,
+      publishedAt: $publishedAt
+    }) {
+      data { id attributes { name } }
+    }
+  }`,
+
+  '170crWishOpenMashaabim': `mutation CrWishOpenMashaabim(
+    $name: String!,
+    $descrip: String,
+    $spnot: String,
+    $price: Float,
+    $easy: Float,
+    $hm: Float,
+    $kindOf: ENUM_OPENMASHAABIM_KINDOF,
+    $isMust: Boolean,
+    $ratson: ID,
+    $pmash: ID,
+    $mashaabim: ID,
+    $source: ENUM_OPENMASHAABIM_SOURCE,
+    $location: ComponentNewLocationInput,
+    $publishedAt: DateTime
+  ) {
+    createOpenMashaabim(data: {
+      name: $name,
+      descrip: $descrip,
+      spnot: $spnot,
+      price: $price,
+      easy: $easy,
+      hm: $hm,
+      kindOf: $kindOf,
+      isMust: $isMust,
+      archived: false,
+      ratson: $ratson,
+      pmash: $pmash,
+      mashaabim: $mashaabim,
+      source: $source,
+      location: $location,
+      publishedAt: $publishedAt
+    }) {
+      data { id attributes { name } }
+    }
+  }`,
+
+  '172resolveSkillsByName': `query ResolveSkillsByName($names: [String]) {
+    skills(filters: { skillName: { in: $names } }, pagination: { limit: 50 }) {
+      data { id attributes { skillName } }
+    }
+  }`,
+
+  '112commitWishWillingness': `mutation CommitWishWillingness(
+    $id: ID!,
+    $status_proposal: ENUM_RATSONPROPOSAL_STATUS_PROPOSAL,
+    $total_price: Float,
+    $ratson_willingness_entry: [ComponentNewWillingnessEntriesInput]
+  ) {
+    updateRatsonProposal(
+      id: $id,
+      data: {
+        status_proposal: $status_proposal,
+        total_price: $total_price,
+        ratson_willingness_entry: $ratson_willingness_entry
+      }
+    ) {
+      data { id attributes { status_proposal } }
     }
   }`,
 
@@ -8010,6 +8327,104 @@ export const qids = {
     }
   }
 }`,
+
+  // ── Concierge live enrichment (PLAN_CONCIERGE §6/§7) ──────────────────────
+  // Search the mission library by a skill/term — used to surface existing
+  // missions that already answer a freshly-typed wish.
+  '200findMissionsBySkill': `query FindMissionsBySkill($q: String) {
+    missions(
+      filters: { or: [ { missionName: { containsi: $q } }, { descrip: { containsi: $q } }, { skills: { skillName: { containsi: $q } } } ] }
+      pagination: { limit: 6 }
+    ) {
+      data {
+        id
+        attributes {
+          missionName
+          descrip
+          skills { data { id attributes { skillName } } }
+        }
+      }
+    }
+  }`,
+
+  // Find real platform members who hold a given skill — the heart of
+  // "check if there are people with these skills and suggest them".
+  '201findUsersBySkill': `query FindUsersBySkill($q: String) {
+    usersPermissionsUsers(
+      filters: { skills: { skillName: { containsi: $q } } }
+      pagination: { limit: 8 }
+    ) {
+      data {
+        id
+        attributes {
+          username
+          profilePic { data { attributes { url formats } } }
+          skills { data { id attributes { skillName } } }
+          projects_1s { data { id attributes { projectName } } }
+        }
+      }
+    }
+  }`,
+
+  // Find *available* resource instances (Sp = who holds a resource; mashaabim is
+  // the template). panui=true means free. Used to suggest real resources +
+  // their owners for a wish's extracted resources.
+  '202findAvailableSp': `query FindAvailableSp($q: String) {
+    sps(
+      filters: {
+        archived: { eq: false }
+        panui: { eq: true }
+        or: [
+          { name: { containsi: $q } }
+          { descrip: { containsi: $q } }
+          { mashaabim: { name: { containsi: $q } } }
+        ]
+      }
+      pagination: { limit: 6 }
+    ) {
+      data {
+        id
+        attributes {
+          name
+          descrip
+          price
+          panui
+          kindOf
+          mashaabim { data { id attributes { name } } }
+          users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          project { data { id attributes { projectName } } }
+        }
+      }
+    }
+  }`,
+
+  // Find existing *products* (matanot) a weave (project) already offers, by name.
+  // A wish's need may be fulfilled by a ready product — picking one routes into
+  // the built-in service-request flow (createSheirutpend). Active, non-archived only.
+  '203findMatanotByText': `query FindMatanotByText($q: String) {
+    matanots(
+      filters: {
+        archived: { eq: false }
+        status_of_voting: { eq: "active" }
+        name: { containsi: $q }
+      }
+      pagination: { limit: 6 }
+    ) {
+      data {
+        id
+        attributes {
+          name
+          desc
+          price
+          estimatedPrice
+          currency { data { id attributes { name simbol } } }
+          projectcreates {
+            data { id attributes { projectName profilePic { data { attributes { url } } } } }
+          }
+        }
+      }
+    }
+  }`,
 
   ...qids_base,
   ...moachQids

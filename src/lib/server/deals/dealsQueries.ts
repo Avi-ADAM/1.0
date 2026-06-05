@@ -1,5 +1,6 @@
 import type { SaleData } from '$lib/stores/levStores';
 import { mapSaleData } from '$lib/utils/levDataExtractors';
+import { stripHtml } from '$lib/utils/stripHtml';
 import { qids } from '../../../routes/api/send/qids.js';
 
 export interface PendingRequestData {
@@ -24,6 +25,72 @@ export interface PendingRequestData {
   sourceRatsonName?: string;
   sourceProposalId?: string;
   sourceProposalKind?: string;
+}
+
+/**
+ * A wish (Ratson) in which the current user was personally invited to provide a
+ * task or resource — `requestSuggestion` Track B (PLAN_CONCIERGE §5). The wisher
+ * picked this member directly, so the proposal carries them in `proposer_users`
+ * rather than opening a Sheirutpend (which is what Track A / product requests do).
+ */
+export interface IncomingWishInvitation {
+  proposalId: string;
+  status: string;
+  /** 'existing_project' | 'partial' — roughly person vs. resource invitation. */
+  kind: string;
+  createdAt?: string;
+  ratsonId: string;
+  ratsonName: string;
+  ratsonDesc: string;
+  ratsonStatus: string;
+  startDate?: string;
+  finnishDate?: string;
+  totalBounti?: number | null;
+  wisherName: string;
+  wisherPic?: string;
+  /** Main wish forum — where the conversation with the wisher happens. */
+  chatForumId?: string;
+  /** The authored slot the provider would fill (from the proposal's covered_*). */
+  slotHours?: number | null;
+  slotPrice?: number | null;
+  values: string[];
+  categories: string[];
+}
+
+function mapWishInvitation(node: any): IncomingWishInvitation | null {
+  const pa = node?.attributes ?? {};
+  const ratNode = pa.ratson?.data;
+  if (!ratNode) return null;
+  const ra = ratNode.attributes ?? {};
+  const wisher = ra.users_permissions_users?.data?.[0];
+  const slotM = (pa.covered_missions ?? [])[0];
+  const slotR = (pa.covered_resources ?? [])[0];
+
+  return {
+    proposalId: String(node.id),
+    status: pa.status_proposal || 'suggested',
+    kind: pa.kind || 'partial',
+    createdAt: pa.createdAt || undefined,
+    ratsonId: String(ratNode.id),
+    ratsonName: ra.name || '',
+    ratsonDesc: stripHtml(ra.longDes || ra.desc || ''),
+    ratsonStatus: ra.status_ratson || 'open',
+    startDate: ra.startDate || undefined,
+    finnishDate: ra.finnishDate || undefined,
+    totalBounti: typeof ra.totalbounti === 'number' ? ra.totalbounti : null,
+    wisherName: wisher?.attributes?.username || '',
+    wisherPic: wisher?.attributes?.profilePic?.data?.attributes?.url || undefined,
+    chatForumId: ra.chat_forum?.data?.id ? String(ra.chat_forum.data.id) : undefined,
+    slotHours: typeof slotM?.hours === 'number' ? slotM.hours : null,
+    slotPrice:
+      typeof slotM?.price === 'number'
+        ? slotM.price
+        : typeof slotR?.price === 'number'
+          ? slotR.price
+          : null,
+    values: (ra.vallues?.data ?? []).map((v: any) => v.attributes?.valueName).filter(Boolean),
+    categories: (ra.categories?.data ?? []).map((c: any) => c.attributes?.name).filter(Boolean)
+  };
 }
 
 function mapSheirutpend(node: any, projectId?: string, projectName?: string): PendingRequestData {
@@ -89,14 +156,79 @@ function isActiveSheirut(attrs: any): boolean {
   return true;
 }
 
+/** A weave (project) the user belongs to — host options for a wish contribution. */
+export interface UserWeave {
+  id: string;
+  name: string;
+  src?: string;
+  memberCount: number;
+  restime?: string;
+  memberIds: string[];
+}
+
+export async function fetchUserWeaves(
+  fetchFn: typeof fetch,
+  jwt: string,
+  userId: string
+): Promise<UserWeave[]> {
+  const query = (qids as Record<string, string>)['141listMyWeavesDetailed'];
+  if (!query) return [];
+  try {
+    const data = await gql(fetchFn, jwt, query, { uid: userId });
+    const nodes = data?.usersPermissionsUser?.data?.attributes?.projects_1s?.data ?? [];
+    return nodes.map((p: any) => {
+      const a = p.attributes ?? {};
+      const members = a.user_1s?.data ?? [];
+      return {
+        id: String(p.id),
+        name: a.projectName || '',
+        src: a.profilePic?.data?.attributes?.url || undefined,
+        memberCount: members.length,
+        restime: a.restime || undefined,
+        memberIds: members.map((m: any) => String(m.id))
+      };
+    });
+  } catch (e) {
+    console.error('[deals] fetchUserWeaves failed (non-fatal):', e);
+    return [];
+  }
+}
+
 export interface DealsForUserResult {
   purchases: SaleData[];
   sales: SaleData[];
   pendingBuy: PendingRequestData[];
   pendingSell: PendingRequestData[];
+  incomingWishes: IncomingWishInvitation[];
+  weaves: UserWeave[];
   userId: string;
   username: string;
   profilePic?: string;
+}
+
+/**
+ * Wish invitations addressed to me — `requestSuggestion` Track B. Best-effort:
+ * a failure here (e.g. ratson-proposal not yet deployed) returns an empty list
+ * rather than breaking the whole deals page.
+ */
+export async function fetchWishInvitationsForUser(
+  fetchFn: typeof fetch,
+  jwt: string,
+  userId: string
+): Promise<IncomingWishInvitation[]> {
+  const query = (qids as Record<string, string>)['111listMyWishInvitations'];
+  if (!query) return [];
+
+  try {
+    const data = await gql(fetchFn, jwt, query, { uid: userId, limit: 60 });
+    const nodes = data?.ratsonProposals?.data ?? [];
+    return nodes
+      .map(mapWishInvitation)
+      .filter((x: IncomingWishInvitation | null): x is IncomingWishInvitation => x !== null);
+  } catch (e) {
+    console.error('[deals] fetchWishInvitationsForUser failed (non-fatal):', e);
+    return [];
+  }
 }
 
 export async function fetchDealsForUser(
@@ -107,10 +239,25 @@ export async function fetchDealsForUser(
   const query = (qids as Record<string, string>)['123dealsForUser'];
   if (!query) throw new Error('qid 123dealsForUser missing');
 
-  const data = await gql(fetchFn, jwt, query, { idL: userId });
+  // Fetch the user's deal data, their personal wish invitations, and their
+  // weaves (host options for contributing) together.
+  const [data, incomingWishes, weaves] = await Promise.all([
+    gql(fetchFn, jwt, query, { idL: userId }),
+    fetchWishInvitationsForUser(fetchFn, jwt, userId),
+    fetchUserWeaves(fetchFn, jwt, userId)
+  ]);
   const userData = data?.usersPermissionsUser?.data;
   if (!userData) {
-    return { purchases: [], sales: [], pendingBuy: [], pendingSell: [], userId, username: '' };
+    return {
+      purchases: [],
+      sales: [],
+      pendingBuy: [],
+      pendingSell: [],
+      incomingWishes,
+      weaves,
+      userId,
+      username: ''
+    };
   }
 
   const purchases: SaleData[] = [];
@@ -142,6 +289,8 @@ export async function fetchDealsForUser(
     sales,
     pendingBuy,
     pendingSell,
+    incomingWishes,
+    weaves,
     userId,
     username: userData.attributes?.username || '',
     profilePic: userData.attributes?.profilePic?.data?.attributes?.url || ''

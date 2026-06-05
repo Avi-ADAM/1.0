@@ -8,7 +8,8 @@
   import { fly } from 'svelte/transition';
   import Nego from '../prPr/negoPend.svelte';
   import LocationView from '$lib/components/location/LocationView.svelte';
-  import { goto } from '$app/navigation';
+  import { goto, invalidate } from '$app/navigation';
+  import { updatePmashesStore } from '$lib/utils/levSocketHandler';
   import { idPr } from '../../stores/idPr.js';
   import moment from 'moment';
   import { ProgressBar } from 'progressbar-svelte';
@@ -188,18 +189,34 @@
 
   let allr = $state(false);
 
+  // Build the current user's vote in the Strapi-nested shape that processPmash
+  // (and the socket merge) expect, so an optimistic store update reads back
+  // identically to the server echo.
+  function buildMyVote(whatVal, whyText) {
+    const myId = String(page.data.id);
+    const vote = {
+      what: Boolean(whatVal),
+      users_permissions_user: { data: { id: myId } },
+      order: ordern ?? 0,
+      ide: parseInt(myId, 10),
+      zman: new Date().toISOString()
+    };
+    if (whyText) vote.why = whyText;
+    return vote;
+  }
+
+  // Apply a vote to the shared pmashes store immediately. mergeVote replaces the
+  // caller's prior vote at the same order, so this is safe to call twice
+  // (optimistic + authoritative echo) without double counting.
+  function applyMyVote(vote, id = pendId) {
+    updatePmashesStore({ id: String(id), newVote: vote });
+  }
+
   async function agree(alr) {
-    // Optimistic UI update
-    if (alr == 'alr') {
-      allr = true;
-      already = true;
-      noofusersOk += 1;
-      noofusersNo -= 1;
-    } else {
-      already = true;
-      noofusersOk += 1;
-      noofusersWaiting -= 1;
-    }
+    // Immediate optimistic update to the shared store — single source of truth,
+    // so the vote sticks through re-renders, the buttons hide, and the user
+    // can't vote twice while the request is in flight.
+    applyMyVote(buildMyVote(true));
 
     try {
       const result = await executeAction('voteOnPmash', {
@@ -207,12 +224,20 @@
         projectId: String(projectId),
         what: true,
       });
-      if (result.success && result.data?.consensus) {
+      if (!result.success) {
+        await invalidate(() => true); // roll back to server truth
+        return;
+      }
+      if (result.data?.consensus) {
         coinLapach();
+      } else if (result.data?.newVote) {
+        // Reconcile with the authoritative vote (correct order/zman from server).
+        applyMyVote(result.data.newVote, result.data.id ?? pendId);
       }
     } catch (e) {
       error1 = e;
       toast.warning($t('lev.pmas.error'));
+      await invalidate(() => true); // roll back the optimistic vote
     }
   }
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
@@ -226,12 +251,10 @@
   }
   function decline(alr) {
     if (alr == 'alr') {
-      // Changing vote from YES → NO immediately
+      // Changing vote from YES → NO immediately. afterwhy() performs the
+      // optimistic store update + server call.
       allr = true;
       isOpen = false;
-      already = true;
-      noofusersNo += 1;
-      noofusersOk -= 1;
       afterwhy();
     } else {
       // First time NO: open dialog for reason
@@ -245,8 +268,8 @@
   async function afterwhy(event) {
     const whyText = event?.why ?? '';
     loading = true;
-    noofusersNo += 1;
-    noofusersWaiting -= 1;
+    // Immediate optimistic update to the shared store (see agree()).
+    applyMyVote(buildMyVote(false, whyText));
 
     try {
       const result = await executeAction('voteOnPmash', {
@@ -256,14 +279,26 @@
         ...(whyText ? { why: whyText } : {}),
       });
       loading = false;
+      if (!result.success) {
+        await invalidate(() => true); // roll back to server truth
+        return;
+      }
+      // Close the reason dialog now that the vote is recorded.
       isOpen = false;
-      if (result.success) {
+      no = false;
+      if (result.data?.archived) {
+        // Full NO consensus archived the pmash — server already triggered a
+        // full refresh; drop the bubble from this view too.
         coinLapach();
+      } else if (result.data?.newVote) {
+        // Reconcile with the authoritative vote.
+        applyMyVote(result.data.newVote, result.data.id ?? pendId);
       }
     } catch (e) {
       error1 = e;
       loading = false;
       toast.warning($t('lev.pmas.error'));
+      await invalidate(() => true); // roll back the optimistic vote
     }
   }
   const close = () => {
@@ -281,9 +316,9 @@
     isOpen = false;
     no = false;
     masa = false;
-    //dispach or update  coin to negotiable state
-    //TODO: maby better just upate from event end then start on lev
-    coinLapach();
+    // The negotiated card is updated in place via the pmashes store (see
+    // negoPend), so keep the bubble — don't remove it — and the user sees the
+    // new terms and reopened vote round without the view jumping to the start.
   }
   let ucli = $derived(0);
   let pcli = $state(0);
@@ -515,6 +550,7 @@ diunim = ` ${diu},`
           <Nego
             onLoad={() => (loading = true)}
             onClose={afternego}
+            {ordern}
             {descrip}
             {projectName}
             name1={name}

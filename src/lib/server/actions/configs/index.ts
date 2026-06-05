@@ -49,6 +49,14 @@ import { createRatsonConfig } from './createRatson.js';
 import { matchRatsonConfig } from './matchRatson.js';
 import { acceptRatsonProposalConfig } from './acceptRatsonProposal.js';
 import { rejectRatsonProposalConfig } from './rejectRatsonProposal.js';
+import { updateRatsonExtractionConfig } from './updateRatsonExtraction.js';
+import { requestSuggestionConfig } from './requestSuggestion.js';
+import { requestWishMissionConfig } from './requestWishMission.js';
+import { requestWishResourceConfig } from './requestWishResource.js';
+import { acceptWishOfferConfig } from './acceptWishOffer.js';
+import { declineWishOfferConfig } from './declineWishOffer.js';
+import { materializeWishConfig } from './materializeWish.js';
+import { publishWishNeedToCommunityConfig } from './publishWishNeedToCommunity.js';
 import { finalizeAskAcceptanceConfig } from './finalizeAskAcceptance.js';
 import { finalizeJoinAcceptanceConfig } from './finalizeJoinAcceptance.js';
 import { updateWelcomeCardConfig } from './updateWelcomeCard.js';
@@ -186,6 +194,14 @@ export function registerAllActions(): void {
   registerAction(matchRatsonConfig);
   registerAction(acceptRatsonProposalConfig);
   registerAction(rejectRatsonProposalConfig);
+  registerAction(updateRatsonExtractionConfig);
+  registerAction(requestSuggestionConfig);
+  registerAction(requestWishMissionConfig);
+  registerAction(requestWishResourceConfig);
+  registerAction(acceptWishOfferConfig);
+  registerAction(declineWishOfferConfig);
+  registerAction(materializeWishConfig);
+  registerAction(publishWishNeedToCommunityConfig);
 
   // Decision card display (read action — current vs. proposed values)
   registerAction(getDecisionDetailsConfig);

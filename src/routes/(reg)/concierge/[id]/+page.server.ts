@@ -1,5 +1,16 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
+import { actionService } from '$lib/server/actions/index.js';
+import { enrichWish, EMPTY_ENRICHMENT, type WishEnrichment } from '$lib/server/ai/enrichWish';
+import type { WishExtraction } from '$lib/server/ai/extractWish';
 import type { PageServerLoad } from './$types';
+
+export type WishForumMessage = {
+  id: string;
+  from: string;
+  text: string;
+  sentByMe: boolean;
+  ts: string | null;
+};
 
 function shortCode(id: string | number): string {
   const s = String(id).padStart(6, '0');
@@ -151,5 +162,91 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 
   const isOwner = wish ? wish.owners.some((o: any) => String(o.id) === String(uid)) : false;
 
-  return { wish, proposals, loadOk, uid, isOwner };
+  // Mission templates for the owner's offer-authoring form (specMode autofill).
+  let missionTemplates: any[] = [];
+  if (isOwner) {
+    try {
+      const tplRes: any = await sendToSer({}, 'getMissionTemplates', 0, 0, false, fetch);
+      missionTemplates = tplRes?.data?.missions?.data ?? [];
+    } catch (e) {
+      console.warn('[concierge/:id] mission templates load failed (non-fatal):', e);
+    }
+  }
+
+  // ── Real wish-forum messages (replaces the old demo FORUM_MSGS). Best-effort:
+  //    getForumThread authorizes by participation, so a non-participant (e.g. a
+  //    provider not yet added to the wish chat) just gets an empty thread rather
+  //    than fabricated content. ──────────────────────────────────────────────
+  let forumMessages: WishForumMessage[] = [];
+  const tok = (locals as any)?.tok;
+  if (wish?.chatForumId && uid && tok) {
+    try {
+      const res = await actionService.executeAction(
+        'getForumThread',
+        { forumId: String(wish.chatForumId) },
+        { userId: String(uid), jwt: String(tok), lang: String((locals as any)?.lang || 'he'), fetch }
+      );
+      const msgs = res?.success ? res.data?.forum?.messages ?? [] : [];
+      forumMessages = msgs.map((m: any) => ({
+        id: String(m.id),
+        from: m.username || 'משתמשת',
+        text: m.message || '',
+        sentByMe: !!m.sentByMe,
+        ts: m.timestamp ?? null
+      }));
+    } catch (e) {
+      console.warn('[concierge/:id] forum thread load failed (non-fatal):', e);
+    }
+  }
+
+  // ── Ground the breakdown in the live platform: real members who hold the
+  //    needed skills + currently-free resource instances (Sp).
+  //
+  //    Prefer the snapshot persisted at creation (ai_meta.enrichment) — the
+  //    analysis already ran in /concierge/new, so we read it straight from
+  //    Strapi instead of re-hitting Gemini/Pinecone on every page load. Only
+  //    wishes created before this was stored fall back to a live recompute
+  //    (still best-effort: a failure degrades to an empty panel).
+  let enrichment: WishEnrichment = EMPTY_ENRICHMENT;
+  const savedEnrichment = wish?.aiMeta?.enrichment;
+  const hasSavedEnrichment =
+    savedEnrichment &&
+    typeof savedEnrichment === 'object' &&
+    ((savedEnrichment.people?.length ?? 0) > 0 ||
+      (savedEnrichment.resources?.length ?? 0) > 0 ||
+      (savedEnrichment.products?.length ?? 0) > 0 ||
+      (savedEnrichment.missions?.length ?? 0) > 0);
+
+  if (hasSavedEnrichment) {
+    enrichment = {
+      skills: savedEnrichment.skills ?? [],
+      missions: savedEnrichment.missions ?? [],
+      people: savedEnrichment.people ?? [],
+      resources: savedEnrichment.resources ?? [],
+      products: savedEnrichment.products ?? []
+    };
+  } else if (wish && (wish.extractedMissions.length > 0 || wish.extractedResources.length > 0)) {
+    try {
+      const aiSkills: string[] = Array.isArray(wish.aiMeta?.skills) ? wish.aiMeta.skills : [];
+      const extraction: WishExtraction = {
+        missions: wish.extractedMissions.map((m: any) => ({
+          name: m.name,
+          imp: m.importance === 'must' ? 'must' : 'nice'
+        })),
+        resources: wish.extractedResources.map((r: any) => ({
+          name: r.name,
+          imp: r.importance === 'must' ? 'must' : 'nice'
+        })),
+        skills: aiSkills.map((name: string) => ({ name })),
+        categories: [],
+        titleSuggestion: '',
+        hints: []
+      };
+      enrichment = await enrichWish(extraction, fetch);
+    } catch (e) {
+      console.warn('[concierge/:id] enrichment failed (non-fatal):', e);
+    }
+  }
+
+  return { wish, proposals, loadOk, uid, isOwner, enrichment, forumMessages, missionTemplates };
 };

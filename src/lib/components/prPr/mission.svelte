@@ -55,7 +55,16 @@
     projectId,
     name = '',
     missionTemplates = [],
-    processContext = null
+    processContext = null,
+    /**
+     * Spec mode (PLAN_CONCIERGE §5.3): reuse this form to author a *weave-less*
+     * mission contract (e.g. a wisher offering a task to a provider). In this
+     * mode submit does NOT create a mission in a project — it emits the spec via
+     * `onSpec` and the caller persists it. Project-only UI (member assignment)
+     * is hidden.
+     */
+    specMode = false,
+    onSpec
   } = $props();
 
   const missionByLang = { he: heMission, en: enMission, ar: arMission };
@@ -94,7 +103,9 @@
   let roles1 = $state($role);
   let gloading = $state(false);
   onMount(async () => {
-    if (id !== 0) {
+    // specMode (or a missing/0 id) authors a NEW spec — never fetch an existing
+    // mission. Guards against id===undefined hitting getMissionForEdit('undefined').
+    if (id && id !== 0 && !specMode) {
       gloading = true;
       miData[0].missionName = name;
       miData = miData;
@@ -149,6 +160,10 @@
       (t) => t.attributes.missionName.trim() === value.trim()
     );
     if (!template) return;
+
+    // A template was recognised → transfer it into the form and lock the name
+    // field (the spec now comes from the template, not free text).
+    missionNameE = false;
 
     // Store the template's Mission ID so createMission sends existingMissionId
     // instead of trying to create a duplicate (which hits the unique constraint)
@@ -270,6 +285,23 @@
   async function increment() {
     loading = true;
     const element = miData[0];
+
+    // Spec mode — emit the authored contract instead of creating a mission in a
+    // project. The caller (e.g. concierge invite flow) persists it weave-less.
+    if (specMode) {
+      onSpec?.({
+        name: element.missionName,
+        descrip: element.descrip,
+        hours: Number(element.nhours) || 0,
+        ratePerHour: Number(element.valph) || 0,
+        skills: element.selectedSkills ?? [],
+        roles: element.selectedRoles ?? [],
+        workways: element.selectedWorkways ?? []
+      });
+      loading = false;
+      return;
+    }
+
     const skills = find_skill_id(element.selectedSkills);
     const work_ways = find_workway_id(element.selectedWorkways);
     const tafkidims = find_role_id(element.selectedRoles);
@@ -823,10 +855,18 @@
               </h2>
             {:else}
               <div class="flex flex-col">
+                <label
+                  for="mission-name-input"
+                  class="text-barbi font-bold text-sm mb-1 text-{$lang == 'en' ? 'left' : 'right'}"
+                >
+                  {$lang === 'en' ? 'Mission name' : 'שם המשימה'}
+                </label>
                 <input
+                  id="mission-name-input"
                   type="text"
                   bind:value={miData[0].missionName}
                   list="mission-name-options"
+                  placeholder={$lang === 'en' ? 'Type or pick a template…' : 'הקלידו או בחרו מתבנית…'}
                   class="bg-pink-950/30 border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all shadow-sm"
                 />
                 <datalist id="mission-name-options">
@@ -1346,7 +1386,7 @@
                   class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                   title={tri?.mission?.publicLinks[$lang]}><LinkIcon /></button
                 >{/if}
-              {#if !assignE}<button
+              {#if !assignE && !specMode}<button
                   title={tri?.mission?.assingTo[$lang] +
                     ' ' +
                     tri?.mission?.assingHelp[$lang]}

@@ -44,7 +44,10 @@
     loading = true;
 
     try {
-      const apiMessages = [...messageHistory, { text: currentInput, user: true }].map(m => ({
+      const apiMessages = [
+        ...messageHistory,
+        { text: currentInput, user: true }
+      ].map((m) => ({
         role: m.user ? 'user' : 'assistant',
         content: m.text
       }));
@@ -63,7 +66,7 @@
 
       const responseData = await response.json();
       const replyText = responseData.content || responseData.reply;
-      
+
       if (replyText) {
         chatMessages.addMessage({ text: replyText, user: false });
       }
@@ -96,177 +99,178 @@
 </script>
 
 {#if !isOnChatPage}
-<div
-  dir={$locale == 'he' || $locale == 'ar' ? 'rtl' : 'ltr'}
-  class="fixed bottom-12 {$locale == 'he' || $locale == 'ar'
-    ? 'left-4'
-    : 'right-4'} z-50"
->
-  <button
-    onclick={() => (visible = !visible)}
-    class="p-0 rounded-full shadow-lg {!visible ? 'floating-button' : ''}"
+  <div
+    dir={$locale == 'he' || $locale == 'ar' ? 'rtl' : 'ltr'}
+    class="fixed bottom-12 {$locale == 'he' || $locale == 'ar'
+      ? 'left-4'
+      : 'right-4'} z-50"
   >
-    <img
-      src="/botlogo.jpeg"
-      alt={$t('bot.title')}
-      class="sm:w-14 sm:h-14 h-4 w-4 rounded-full"
-    />
-  </button>
-  {#if visible}
-    <div
-      in:fly={{ y: 20, duration: 300 }}
-      out:fly={{ y: 20, duration: 300 }}
-      class="absolute sm:bottom-20 bottom-5 {$locale == 'he' || $locale == 'ar'
-        ? 'left-3'
-        : 'right-3'} sm:w-80 sm:h-96 h-[75vh] w-[75vw] bg-gold shadow-teal-500 rounded-xl shadow-2xl flex flex-col overflow-hidden"
+    <button
+      onclick={() => (visible = !visible)}
+      class="p-0 rounded-full shadow-lg {!visible ? 'floating-button' : ''}"
     >
+      <img
+        src="/botlogo.png"
+        alt={$t('bot.title')}
+        class="sm:w-14 sm:h-14 h-4 w-4 rounded-full"
+      />
+    </button>
+    {#if visible}
       <div
-        class="p-4 bg-liteGoldTobr shadow-lg flex justify-between items-center"
+        in:fly={{ y: 20, duration: 300 }}
+        out:fly={{ y: 20, duration: 300 }}
+        class="absolute sm:bottom-20 bottom-5 {$locale == 'he' ||
+        $locale == 'ar'
+          ? 'left-3'
+          : 'right-3'} sm:w-80 sm:h-96 h-[75vh] w-[75vw] bg-gold shadow-teal-500 rounded-xl shadow-2xl flex flex-col overflow-hidden"
       >
-        <h2 class="text-lg font-semibold text-bluesun drop-shadow-sm">
-          {user ? $t('bot.timerTitle') : $t('bot.welcomeTitle')}
-        </h2>
-        <div class="flex items-center gap-1">
-          <!-- Expand to full page button -->
-          <button
-            onclick={expandToFullPage}
-            class="text-bluesun hover:text-blue-600 bg-gold transition-colors duration-200 p-1 rounded-full hover:bg-white/20"
-            aria-label="Expand chat"
-            title={$locale === 'he' ? 'פתח צ׳אט מלא' : 'Open full chat'}
-          >
-            <svg
-              class="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
+        <div
+          class="p-4 bg-liteGoldTobr shadow-lg flex justify-between items-center"
+        >
+          <h2 class="text-lg font-semibold text-bluesun drop-shadow-sm">
+            {user ? $t('bot.timerTitle') : $t('bot.welcomeTitle')}
+          </h2>
+          <div class="flex items-center gap-1">
+            <!-- Expand to full page button -->
+            <button
+              onclick={expandToFullPage}
+              class="text-bluesun hover:text-blue-600 bg-gold transition-colors duration-200 p-1 rounded-full hover:bg-white/20"
+              aria-label="Expand chat"
+              title={$locale === 'he' ? 'פתח צ׳אט מלא' : 'Open full chat'}
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5"
-              ></path>
-            </svg>
-          </button>
-          <!-- Close button -->
-          <button
-            onclick={() => (visible = false)}
-            class="text-bluesun hover:text-red-600 bg-gold transition-colors duration-200 p-1 rounded-full hover:bg-white/20"
-            aria-label="Close bot"
-          >
-            <svg
-              class="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5"
+                ></path>
+              </svg>
+            </button>
+            <!-- Close button -->
+            <button
+              onclick={() => (visible = false)}
+              class="text-bluesun hover:text-red-600 bg-gold transition-colors duration-200 p-1 rounded-full hover:bg-white/20"
+              aria-label="Close bot"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              ></path>
-            </svg>
-          </button>
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </button>
+          </div>
         </div>
-      </div>
-      <div
-        bind:this={messagesContainer}
-        class="flex-1 d p-4 overflow-y-auto bg-gray-50 space-y-4"
-      >
-        {#if !user && messages.length === 0}
-          <div class="chat chat-start">
-            <div
-              class="chat-bubble bg-gradient-to-r from-gray-100 to-gray-50 text-gray-800 border border-gray-200 shadow-sm"
-            >
-              {$t('bot.initialMessage')}
+        <div
+          bind:this={messagesContainer}
+          class="flex-1 d p-4 overflow-y-auto bg-gray-50 space-y-4"
+        >
+          {#if !user && messages.length === 0}
+            <div class="chat chat-start">
+              <div
+                class="chat-bubble bg-gradient-to-r from-gray-100 to-gray-50 text-gray-800 border border-gray-200 shadow-sm"
+              >
+                {$t('bot.initialMessage')}
+              </div>
             </div>
-          </div>
-        {/if}
-        {#each messages as message, i (i)}
-          <div class="chat {message.user ? 'chat-end' : 'chat-start'}">
-            <div
-              style="white-space: pre-wrap;"
-              class="chat-bubble {message.user
-                ? 'bg-liteGoldTobr text-bluesun border border-liteGoldTobr shadow-md'
-                : 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-800 border border-gray-200 shadow-sm'}"
-            >
-              {message.text}
+          {/if}
+          {#each messages as message, i (i)}
+            <div class="chat {message.user ? 'chat-end' : 'chat-start'}">
+              <div
+                style="white-space: pre-wrap;"
+                class="chat-bubble {message.user
+                  ? 'bg-liteGoldTobr text-bluesun border border-liteGoldTobr shadow-md'
+                  : 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-800 border border-gray-200 shadow-sm'}"
+              >
+                {message.text}
+              </div>
             </div>
-          </div>
-        {/each}
-        {#if loading}
-          <div class="chat chat-start">
-            <div
-              class="chat-bubble bg-gradient-to-r from-gray-100 to-gray-50 text-gray-800 shadow-sm"
-            >
-              <Circle3 />
+          {/each}
+          {#if loading}
+            <div class="chat chat-start">
+              <div
+                class="chat-bubble bg-gradient-to-r from-gray-100 to-gray-50 text-gray-800 shadow-sm"
+              >
+                <Circle3 />
+              </div>
             </div>
-          </div>
-        {/if}
-      </div>
-      <div class="p-3 border-t bg-gradient-to-r from-amber-50 to-rose-50">
-        <div class="flex items-center gap-2">
-          <div class="flex-1 relative">
-            <textarea
-              bind:value={userInput}
-              onkeydown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                } else if (e.key === 'Enter' && e.shiftKey) {
-                  // Allow new line with Shift+Enter
-                }
-              }}
-              placeholder={user
-                ? $t('bot.timerPlaceholder')
-                : $t('bot.questionPlaceholder')}
-              rows="1"
-              class="w-full px-4 py-3 border-2 border-amber-200 rounded-{$locale !==
-                'he' && $locale !== 'ar'
-                ? 'r'
-                : 'l'}-2xl
+          {/if}
+        </div>
+        <div class="p-3 border-t bg-gradient-to-r from-amber-50 to-rose-50">
+          <div class="flex items-center gap-2">
+            <div class="flex-1 relative">
+              <textarea
+                bind:value={userInput}
+                onkeydown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  } else if (e.key === 'Enter' && e.shiftKey) {
+                    // Allow new line with Shift+Enter
+                  }
+                }}
+                placeholder={user
+                  ? $t('bot.timerPlaceholder')
+                  : $t('bot.questionPlaceholder')}
+                rows="1"
+                class="w-full px-4 py-3 border-2 border-amber-200 rounded-{$locale !==
+                  'he' && $locale !== 'ar'
+                  ? 'r'
+                  : 'l'}-2xl
                      focus:border-amber-300 focus:ring-2 focus:ring-rose-200 focus:outline-none
                      bg-gradient-to-r from-amber-50 to-rose-50
                      text-gray-800 placeholder-gray-500
                      resize-none overflow-hidden
                      transition-all duration-200 ease-in-out
                      shadow-sm hover:shadow-md"
-              style="min-height: 44px; max-height: 120px;"
-              oninput={autoResize}
-            ></textarea>
-          </div>
-          <button
-            onclick={handleSend}
-            disabled={loading}
-            class="bg-liteGoldTobr text-bluesun px-5 py-3
+                style="min-height: 44px; max-height: 120px;"
+                oninput={autoResize}
+              ></textarea>
+            </div>
+            <button
+              onclick={handleSend}
+              disabled={loading}
+              class="bg-liteGoldTobr text-bluesun px-5 py-3
                    rounded-{$locale == 'he' || $locale == 'ar' ? 'l' : 'r'}-2xl
                    hover:from-amber-500 hover:to-rose-500
                    disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed
                    transition-all duration-200 ease-in-out
                    shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95
                    font-medium min-w-[60px] h-[44px] flex items-center justify-center"
-          >
-            {#if loading}
-              <div
-                class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
-              ></div>
-            {:else}
-              {$t('bot.sendButton')}
-            {/if}
-          </button>
-        </div>
-        <div class="text-xs text-gray-500 mt-1 px-1">
-          {$locale === 'he'
-            ? 'Enter לשליחה • Shift+Enter לשורה חדשה'
-            : 'Enter to send • Shift+Enter for new line'}
+            >
+              {#if loading}
+                <div
+                  class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
+                ></div>
+              {:else}
+                {$t('bot.sendButton')}
+              {/if}
+            </button>
+          </div>
+          <div class="text-xs text-gray-500 mt-1 px-1">
+            {$locale === 'he'
+              ? 'Enter לשליחה • Shift+Enter לשורה חדשה'
+              : 'Enter to send • Shift+Enter for new line'}
+          </div>
         </div>
       </div>
-    </div>
-  {/if}
-</div>
+    {/if}
+  </div>
 {/if}
 
 <style>

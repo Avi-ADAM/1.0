@@ -60,7 +60,11 @@
       "Bash(awk 'NR>=2950 && NR<=3650' /c/Users/babay/Documents/GitHub/1.0main/src/routes/api/send/qids.js)",
       "Bash(awk 'NR>=2900 && NR<=3650' /c/Users/babay/Documents/GitHub/1.0main/src/routes/api/send/qids.js)",
       "Bash(awk 'NR<=3645' /c/Users/babay/Documents/GitHub/1.0main/src/routes/api/send/qids.js)",
-      "Bash(awk 'NR>=2738 && NR<=4500' /c/Users/babay/Documents/GitHub/1.0main/src/routes/api/send/qids.js)"
+      "Bash(awk 'NR>=2738 && NR<=4500' /c/Users/babay/Documents/GitHub/1.0main/src/routes/api/send/qids.js)",
+      "Bash(npx vitest *)",
+      "Bash(git stash *)",
+      "Bash(findstr /i \"gemini google\")",
+      "Bash(findstr /i \"gemini\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\deals\\request",

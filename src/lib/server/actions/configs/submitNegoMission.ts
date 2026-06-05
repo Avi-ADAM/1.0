@@ -145,19 +145,50 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       id: params.pendId,
       data: entityData,
     }, context.jwt, context.fetch);
-  } else {
-    // OpenMission path: update fields only
-    await strapi.execute('negoUpdateOpenMission', {
-      id: params.pendId,
-      data: entityData,
-    }, context.jwt, context.fetch);
 
-    // Update the Ask with the new vote
-    await strapi.execute('negoUpdateAskVots', {
-      id: String(params.isAsk),
-      vots: allUsers,
-    }, context.jwt, context.fetch);
+    // Precise card update: a negotiation rewrites the mission terms and opens a
+    // new voting round, so send the changed scalar fields + the negotiator's
+    // vote (at the new order) for an in-place pends-store update. This avoids a
+    // full refresh that would reset the user's scroll/swiper position. The
+    // relation/acts/negopendmission changes reconcile on the next load — the
+    // card face (name, totals, vote counts) updates immediately.
+    const patch: Record<string, any> = {};
+    if (nv.name             != null) patch.name             = nv.name;
+    if (nv.descrip          != null) patch.descrip          = nv.descrip;
+    if (nv.hearotMeyuchadot != null) patch.hearotMeyuchadot = nv.hearotMeyuchadot;
+    if (nv.noofhours        != null) patch.noofhours        = nv.noofhours;
+    if (nv.perhour          != null) patch.perhour          = nv.perhour;
+    if (nv.sqadualed        != null) patch.sqadualed        = nv.sqadualed;
+    if (nv.dates            != null) patch.dates            = nv.dates;
+    if (nv.iskvua           != null) patch.iskvua           = nv.iskvua;
+    if (entityData.location != null) patch.location         = entityData.location;
+
+    // Negotiator's vote in the Strapi-nested shape processPends/mergeVote expect.
+    const strapiVote: Record<string, any> = {
+      what: true,
+      users_permissions_user: { data: { id: String(userId) } },
+      order: (params.ordern ?? 0) + 1,
+      ide: parseInt(String(userId), 10),
+      zman: nowISO,
+    };
+
+    return {
+      data: { id: String(params.pendId), patch, newVote: strapiVote },
+      updateStrategy: { type: 'partialUpdate', config: { dataKeys: ['pends'] } },
+    };
   }
+
+  // OpenMission path: update fields only
+  await strapi.execute('negoUpdateOpenMission', {
+    id: params.pendId,
+    data: entityData,
+  }, context.jwt, context.fetch);
+
+  // Update the Ask with the new vote
+  await strapi.execute('negoUpdateAskVots', {
+    id: String(params.isAsk),
+    vots: allUsers,
+  }, context.jwt, context.fetch);
 
   return {
     data: { success: true },
