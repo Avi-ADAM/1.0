@@ -64,7 +64,14 @@
      * is hidden.
      */
     specMode = false,
-    onSpec
+    onSpec,
+    /**
+     * Optional prefill for specMode editing (PLAN_CONCIERGE plan editing):
+     * `{ name, descrip, hours, ratePerHour }`. When present, the form opens with
+     * these values so the wisher edits an existing plan item with all its
+     * details. Ignored outside specMode.
+     */
+    initialSpec = null
   } = $props();
 
   const missionByLang = { he: heMission, en: enMission, ar: arMission };
@@ -130,7 +137,16 @@
         gloading = false;
       }
     } else {
-      miData[0].missionName = name;
+      // specMode editing: hydrate the form with the existing plan item's details.
+      if (specMode && initialSpec) {
+        miData[0].missionName = initialSpec.name ?? name ?? '';
+        if (initialSpec.descrip != null) miData[0].descrip = initialSpec.descrip;
+        if (initialSpec.hours != null) miData[0].nhours = Number(initialSpec.hours) || 0;
+        if (initialSpec.ratePerHour != null)
+          miData[0].valph = Number(initialSpec.ratePerHour) || 0;
+      } else {
+        miData[0].missionName = name;
+      }
       miData = miData;
       gloading = false;
     }
