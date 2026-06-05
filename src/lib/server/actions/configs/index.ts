@@ -78,6 +78,7 @@ import { addHalukaChatEntryConfig } from './addHalukaChatEntry.js';
 import { voteOnDecisionConfig } from './voteOnDecision.js';
 import { getDecisionDetailsConfig } from './getDecisionDetails.js';
 import { getMissionForEditConfig } from './getMissionForEdit.js';
+import { getPlatformProjectConfig } from './getPlatformProject.js';
 import { createWorkWayConfig } from './createWorkWay.js';
 import { createMissionConfig } from './createMission.js';
 import { submitNegoMissionConfig } from './submitNegoMission.js';
@@ -205,6 +206,9 @@ export function registerAllActions(): void {
 
   // Decision card display (read action — current vs. proposed values)
   registerAction(getDecisionDetailsConfig);
+
+  // Site share — resolve the platform project (isPlatform=true) + treasury
+  registerAction(getPlatformProjectConfig);
 
   // Mission creation (all 4 branches) + supporting read/create actions
   registerAction(getMissionForEditConfig);

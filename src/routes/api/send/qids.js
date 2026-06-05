@@ -1421,6 +1421,18 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }`,
 
+  "205getPlatformProject": `query GetPlatformProject {
+    projects(filters: { isPlatform: { eq: true } }, pagination: { limit: 1 }) {
+      data {
+        id
+        attributes {
+          projectName
+          user_1s { data { id } }
+        }
+      }
+    }
+  }`,
+
   "67getMembersCount": `query GetMembersCount {
     chezins {
       meta {

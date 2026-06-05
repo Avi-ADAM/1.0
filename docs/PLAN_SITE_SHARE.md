@@ -60,23 +60,25 @@
 הרקמה הראשית היא **Project רגיל** — כך כל התשתית (hervachti ledger, halukas, פורומים,
 התראות) עובדת עליה ללא שינוי.
 
-### 2.1 סימון
+### 2.1 סימון — ✅ מיושם בסכמה
 
-- שדה חדש `api::project.project` → `isPlatform` Boolean (default false). בדיוק רקמה אחת מסומנת.
-- env `PLATFORM_PROJECT_ID` — fallback מהיר לזיהוי בלי query (מומלץ להחזיק את שניהם).
-- helper `src/lib/server/revenue/platformProject.ts` → `getPlatformProject()` (cache).
+- שדה `api::project.project` → **`isPlatform` Boolean — נוסף לסכמה ב‑main.** בדיוק רקמה אחת מסומנת `true`.
+- env `PLATFORM_PROJECT_ID` — override/קיצור אופציונלי לזיהוי בלי query.
+- helper `src/lib/server/revenue/platformProject.ts` → `resolvePlatformProject()`
+  (override סטטי, אחרת query על `isPlatform=true`). action קריאה `getPlatformProject`
+  (qid `205getPlatformProject`) חושף אותו ללקוח.
 
 ### 2.2 מי "מקבל" את הכסף ב‑Haluka
 
-`Haluka` היום הוא `user → user`. לאתר צריך נמען. שתי אפשרויות:
+`Haluka` הוא `user → user`, ולפלטפורמה אין משתמש‑אוצר ייעודי בסכמה. מכיוון ש‑`isPlatform`
+יושם על **Project**, נמען ה‑Haluka של האתר = **החבר הראשון של הרקמה הראשית** (`user_1s[0]`),
+נפתר בזמן ריצה דרך `getPlatformProject`. שדה `hervachti` של האתר משתמש ב‑אותו
+`users_permissions_user`, כך שההזרמה הקיימת ב‑`confirmHaluka.ts` מזכה אותו אוטומטית.
 
-- **(א) Treasury user** — משתמש־מערכת ייעודי שמשויך ל‑platform project. `Haluka.userrecive = treasuryUser`.
-  אפס שינוי סכמה, מתממש מיד. **מומלץ ל‑R0–R3.**
-- **(ב) הרחבת Haluka** — `recive_project` (manyToOne → project, nullable). חלוקה ישירה לרקמה
-  במקום ליחיד. נקי יותר סמנטית, דורש שינוי סכמה + טיפול ב‑`confirmHaluka`. **R4+.**
-
-ה‑`hervachti` entry של האתר ישתמש ב‑`users_permissions_user = treasuryUser` (אופציה א),
-כך שההזרמה הקיימת ב‑`confirmHaluka.ts` תזכה אוטומטית את יתרת ה‑treasury.
+- **override**: אפשר לקבע משתמש‑אוצר ספציפי דרך `PLATFORM_TREASURY_USER_ID` (env) או
+  `SITE_SHARE_TREASURY_USER_ID` (config).
+- **אינטרלוק בטיחות**: אם אין חבר ברקמה הראשית / אין override → `configured=false` → לא מוזרק כלום.
+- **(עתידי R4)** הרחבת `Haluka.recive_project` לחלוקה ישירה לרקמה במקום ליחיד.
 
 ---
 
