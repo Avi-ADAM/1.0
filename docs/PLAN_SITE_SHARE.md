@@ -25,6 +25,40 @@
 כפוי.** המשלם יכול לבקש הנחה (לשלם פחות) או להציע לשלם יותר, עם נימוק — ושני הכיוונים
 **מאושררים אוטומטית** מצד האתר. לא ממתינים להחלטה; הסיבה נשמרת לתיעוד והחלטות עתידיות.
 
+### עיקרון שלישי — האתר הוא **מוצר לא־מתכלה** שכל הצרכנים חולקים
+
+זו ההבנה שמאחדת את חלק־האתר עם שתי התכניות הקיימות:
+[PLAN_COMPLEX_PRODUCTS.md](../PLAN_COMPLEX_PRODUCTS.md) (BOM — מוצר = מתכון של משימות×שעות +
+משאבים) ו‑[PLAN_SHARED_PURCHASE.md](./PLAN_SHARED_PURCHASE.md) (מוצר אחד שנצרך יחד ע"י רבים).
+
+**1lev1 עצמה היא מוצר**, וכל הלקוחות יחד הם הצרכנים — בדיוק כמו רכישה משותפת אחת ענקית.
+אבל זה מוצר מיוחד: **הוא לא מתבלה משימוש.** כל צרכן נוסף שמצטרף לא מגדיל את עלות המוצר
+אלא בתוספת זניחה — מדובר במוצר "ללא הגבלה". המשימות שהושקעו בפיתוח ימשיכו לשרת אותנו גם
+בעתיד, ולכן אין כאן בלאי שצריך לכסות שוב ושוב.
+
+מההכרה הזו נגזר מודל תשלום עם **שלושה גבהים** שמוצגים ל"לב", ולא מספר יחיד:
+
+```
+        רצפה            הצעה                            תקרה (רף עליון)
+   (הנחה/לשלם פחות)   (מה שראוי לתת)            (ההשקעה בפיתוח ÷ כל הצרכנים)
+        │                 │                                    │
+   ─────┼─────────────────┼────────────────────────────────────┼────►  (אפשר גם לעבור)
+        ▼                 ▼                                    ▼
+   נימוק חובה        ברירת המחדל              תצוגתי בלבד — "ראו כמה הושקע כאן"
+                  (מחושב מהרווח/ההוצאה שלך)        לא ביקוש, רק כבוד להשקעה
+```
+
+- **התקרה** (§2.5) = **כל ההשקעה בפיתוח האתר חלקי כל הצרכנים**. ההשקעה נמדדת כ‑BOM של
+  המוצר הראשי (שעות פיתוח × תעריף + משאבים, בדיוק כמו מוצר מורכב). מכיוון שאין בלאי
+  והמכנה (מספר הצרכנים) רק גדל, **התקרה יורדת עם הזמן**. היא **תצוגתית בלבד**: נועדה
+  להראות "הושקעו פה הרבה כסף ומאמץ", **לא** סכום שאנחנו מבקשים. כמובן שמותר לעבור אותה.
+- **ההצעה** (§3) = מה שאנחנו חושבים שראוי לתת. את זה אנחנו **לא** גוזרים מההשקעה שלנו אלא
+  **מהרווח/ההוצאה שלך**: "עשית עסקה בשווי X, הרווחת Y — נשמח לתמורה כזו". זו ברירת המחדל.
+- **הרצפה** (§4) = הנחה / לשלם פחות, עם נימוק. גם היא מאושררת אוטומטית.
+
+> הקישור למוצר הוא העיקר: כבר קיים באתר מוצר כזה. נסמן אותו ב‑Strapi כ**מוצר הראשי**
+> (`Matanot.isMainProduct`, §2.5), וה‑BOM שלו הוא מקור ההשקעה לחישוב התקרה.
+
 ---
 
 ## 1. תמונת מצב — מה קיים, מה חסר
@@ -48,10 +82,12 @@
 
 ### חסר (זה מה שהתכנית מוסיפה)
 
-1. **אין "רקמה ראשית"** — אין Project שמייצג את האתר.
+1. **אין "רקמה ראשית"** — אין Project שמייצג את האתר. *(נסגר — `isPlatform` בסכמה)*
 2. **אין מושג חלק לאתר** — כל החלוקה היא peer‑to‑peer בלבד, 100% לחברי הפרויקט.
 3. **אין הזרקה אוטומטית** של שורת־האתר לתוך Tosplit (בשני המסלולים).
 4. **אין אלמנט "הצעת סכום אחר"** (הנחה / לשלם יותר + נימוק) ואין מנגנון אישרור אוטומטי.
+5. **אין "מוצר ראשי"** — אין Matanot מסומן שמ‑BOM שלו נגזרת ההשקעה (התקרה).
+6. **אין חישוב תקרה** (השקעה ÷ צרכנים) ואין הצגת הטווח רצפה→הצעה→תקרה ל"לב".
 
 ---
 
@@ -80,11 +116,66 @@
 - **אינטרלוק בטיחות**: אם אין חבר ברקמה הראשית / אין override → `configured=false` → לא מוזרק כלום.
 - **(עתידי R4)** הרחבת `Haluka.recive_project` לחלוקה ישירה לרקמה במקום ליחיד.
 
+### 2.5 המוצר הראשי וההשקעה (Platform-as-Product) — מקור התקרה
+
+הרקמה הראשית (§2.1) היא הצד שמקבל את הכסף; **המוצר הראשי** הוא הצד שמסביר *כמה הושקע*.
+לפי [PLAN_COMPLEX_PRODUCTS.md](../PLAN_COMPLEX_PRODUCTS.md), מוצר מורכב = BOM: סכום של
+(משימות × שעות × תעריף) + (משאבים × כמות × מחיר). **כבר קיים מוצר כזה** המייצג את האתר;
+נסמן אותו ובכך נחשוף את ההשקעה הכוללת ל‑UI.
+
+#### 2.5.1 סימון בסכמה
+
+- שדה `api::matanot.matanot` → **`isMainProduct` Boolean** (חדש). בדיוק מתנה אחת `true`,
+  ושייכת לרקמה הראשית (`project = isPlatform project`). אינטרלוק: אם אין מוצר ראשי →
+  אין תקרה, מציגים רק הצעה (§3). זהו degrade בטוח.
+- אופציונלי: `Matanot.investmentCache` (Decimal) — cache של ההשקעה הכוללת המחושבת מה‑BOM,
+  שמתעדכן ב‑hook (כמו `estimatedPrice` במוצר מורכב), כדי לא לחשב BOM מלא בכל בקשה.
+
+#### 2.5.2 חישוב ההשקעה (numerator)
+
+```
+investment = Σ(recipeMission.hoursPerUnit × ratePerHour × unitsPerProduct)
+           + Σ(recipeResource.quantityPerUnit × pricePerUnit)
+```
+
+זהו בדיוק `estimatedPrice` של המוצר הראשי לפי מודל ה‑BOM — סך כל שעות הפיתוח והמשאבים
+שהושקעו באתר. כל עוד תכנית המוצרים המורכבים לא יושמה במלואה, אפשר לזמן זאת משדה
+`investmentCache` יחיד שמוזן ידנית (seed) — ולשדרג ל‑BOM חי כשהמוצר הראשי יהפוך למוצר
+מורכב אמיתי.
+
+#### 2.5.3 חישוב התקרה (denominator) — "מוצר לא־מתכלה"
+
+```
+consumers     = מספר הצרכנים הייחודיים שעברו עסקה דרך האתר (lev-ים פעילים)
+ceilingPerLev = investment / max(consumers, 1)
+```
+
+- **המכנה** = כל הצרכנים יחד (מודל הרכישה המשותפת מ‑PLAN_SHARED_PURCHASE — האתר הוא
+  "רכישה משותפת" אחת ענקית). מקור הספירה: count על משתמשים פעילים / על Sheirut-ים שנסגרו.
+- מכיוון שהמוצר **לא מתבלה** (כל צרכן נוסף ≈ עלות אפסית), המכנה רק גדל ⇒ **התקרה יורדת
+  עם הזמן.** זה רצוי: ככל שיותר אנשים נהנים, הנטל הסמלי על כל אחד קטֵן.
+- **התקרה תצוגתית בלבד.** היא לא נכנסת ל‑Haluka כסכום ברירת־מחדל. היא מוצגת לצד ההצעה
+  כדי לתת פרספקטיבה ("הושקעו פה ₪N על פני M צרכנים → תקרה סמלית של ₪K"). מותר לעבור אותה.
+
+#### 2.5.4 פונקציה טהורה חדשה
+
+`src/lib/server/revenue/computePlatformCeiling.ts`:
+
+```
+computePlatformCeiling({ investment, consumers })
+  → { ceilingPerLev, investment, consumers, line: { he, en } }
+```
+
+נקראת לצד `computeSiteShare` (§3). הפלט `line` הוא הסבר תצוגתי, לא דרישה.
+
 ---
 
-## 3. מודל חישוב חלק האתר
+## 3. מודל חישוב חלק האתר — **ההצעה** (אמצע הטווח)
 
-לא אחוז קשיח גלובלי, אלא **שורת־שירות (service line)** מוגדרת, שקופה וניתנת להתאמה.
+`computeSiteShare` מחשבת את **ההצעה** — האמצע בין הרצפה (§4) לתקרה (§2.5). זה מה שאנחנו
+חושבים שראוי לתת, ובמכוון **לא** נגזר מההשקעה שלנו (זו התקרה) אלא **מהרווח/ההוצאה של
+המשלם.** לא אחוז קשיח גלובלי, אלא **שורת־שירות (service line)** מוגדרת, שקופה וניתנת
+להתאמה.
 
 ### 3.0 ✅ החלטת מוצר — בסיס לפי תפקיד (role-based)
 
@@ -125,18 +216,26 @@ computeSiteShare({ payerRole, baseAmount, matbea, config, projectOverrides })
 הפלט `line` הוא תיאור מילולי להצגה ("שירות ניהול ושותפות של 1lev1 — מוצע: ₪Y"), כדי
 שהמשתמש יבין שזו **שורה בחבילה**, לא "מס".
 
+> ב‑UI, ההצעה (`siteAmount`) מוצגת תמיד לצד התקרה התצוגתית מ‑`computePlatformCeiling`
+> (§2.5): "מוצע ₪Y · בפיתוח הושקעו ₪N על פני M צרכנים (תקרה סמלית ₪K)". כך ההצעה
+> ממוסגרת ביחס למוצר ולהשקעה — לא כמספר מנותק.
+
 ---
 
 ## 4. רכיב "הצעת סכום אחר" (Payer Adjustment)
 
-בכל מקום שבו מציגים ל"לב" כמה לשלם (כולל חלק האתר), נוסיף אלמנט תשלום עם שלוש אפשרויות:
+בכל מקום שבו מציגים ל"לב" כמה לשלם (כולל חלק האתר), נוסיף אלמנט תשלום שממקם את המשלם על
+הטווח רצפה→הצעה→תקרה (§0, עיקרון שלישי) עם שלוש אפשרויות:
 
 ```
 שירות 1lev1 — מוצע: ₪Y
+בפיתוח האתר הושקעו ₪N על פני M צרכנים → תקרה סמלית ₪K (אפשר גם לעבור)
   ( ) משלם כפי שמוצע
   ( ) אשמח להנחה — אשלם פחות   →  [ סכום ] [ סיבה (חובה) ]
   ( ) ארצה לשלם יותר          →  [ סכום ] [ סיבה (אופציונלי) ]
 ```
+
+> התקרה מוצגת כהקשר תצוגתי בלבד (§2.5) — לא חוסמת. "ארצה לשלם יותר" מותר גם מעבר לתקרה.
 
 ### 4.1 סכמה
 
@@ -199,9 +298,11 @@ computeSiteShare({ payerRole, baseAmount, matbea, config, projectOverrides })
 
 ## 7. שינויי סכמה (מרוכז)
 
-- `api::project.project`: `isPlatform` Boolean.
+- `api::project.project`: `isPlatform` Boolean. *(✅ קיים)*
+- `api::matanot.matanot`: `isMainProduct` Boolean (§2.5) + `investmentCache` Decimal אופציונלי.
 - `api::haluka.haluka`: `proposedAmount`, `adjustDirection`, `adjustReason`, `autoApproved` (+ `recive_project` ב‑R4).
 - treasury user — נתון seed, לא שינוי סכמה (אופציה א).
+- מקור מספר הצרכנים (denominator של התקרה) — count קיים על משתמשים/Sheirut, ללא שדה חדש.
 - config — שדות `siteShare*` על הרקמה הראשית או ב‑settings entity.
 
 ---
@@ -209,13 +310,15 @@ computeSiteShare({ payerRole, baseAmount, matbea, config, projectOverrides })
 ## 8. קבצים שייגעו (best estimate)
 
 ### חדשים — Server
-- `src/lib/server/revenue/computeSiteShare.ts` (חישוב טהור)
-- `src/lib/server/revenue/platformProject.ts` (`getPlatformProject`, treasury)
+- `src/lib/server/revenue/computeSiteShare.ts` (חישוב טהור — ההצעה) *(✅ קיים)*
+- `src/lib/server/revenue/computePlatformCeiling.ts` (חישוב טהור — התקרה, §2.5)
+- `src/lib/server/revenue/platformProject.ts` (`getPlatformProject`, treasury) *(✅ קיים)*
+- `src/lib/server/actions/configs/getMainProduct.ts` (read — מוצר ראשי + השקעה, §2.5)
 - `src/lib/server/actions/configs/adjustSiteShare.ts`
 - `src/lib/server/actions/configs/injectSiteShare.ts` (helper להזרקת hervachti+haluka)
 
 ### חדשים — Components
-- `src/lib/components/revenue/SiteShareLine.svelte`
+- `src/lib/components/revenue/SiteShareLine.svelte` (מציג הצעה + תקרה תצוגתית זה לצד זה)
 - `src/lib/components/revenue/SiteShareAdjust.svelte`
 
 ### עריכה
@@ -234,13 +337,15 @@ computeSiteShare({ payerRole, baseAmount, matbea, config, projectOverrides })
 
 | # | מטרה | תוצר | flag |
 |---|---|---|---|
-| R0 | רקמה ראשית (`isPlatform` + treasury + `PLATFORM_PROJECT_ID`) + `computeSiteShare` + config. בלי UI. | תשתית חישוב + ישות. | – |
-| R1 | הזרקה במסלול A (moach split): שורת hervachti + Haluka לאתר, auto‑confirm. | חלוקה ידנית כוללת חלק לאתר. | `siteShare.manualSplit=on` |
-| R2 | אלמנט "הצעת סכום אחר" (less/more + סיבה) + אישרור אוטומטי. | המשלם מתאים את חלק האתר; נרשם. | `siteShare.adjust=on` |
+| R0 | רקמה ראשית (`isPlatform` + treasury + `PLATFORM_PROJECT_ID`) + `computeSiteShare` + config. בלי UI. | תשתית חישוב + ישות. | – *(✅ מיושם)* |
+| R1 | הזרקה במסלול A (moach split): שורת hervachti + Haluka לאתר, auto‑confirm. | חלוקה ידנית כוללת חלק לאתר. | `siteShare.manualSplit=on` *(✅ מיושם)* |
+| R1.5 | מוצר ראשי (`isMainProduct`) + `computePlatformCeiling` + הצגת הטווח הצעה/תקרה ב‑`SiteShareLine`. | "ראו כמה הושקע" — תקרה תצוגתית לצד ההצעה. | `siteShare.ceiling=on` |
+| R2 | אלמנט "הצעת סכום אחר" (less/more + סיבה) + אישרור אוטומטי. | המשלם מתאים את חלק האתר על הטווח; נרשם. | `siteShare.adjust=on` |
 | R3 | הזרקה במסלול B (קונסיירז'/shared purchase). | התאמת קונסיירז' מזרימה חלק לאתר. | `siteShare.concierge=on` |
-| R4 | דוחות/audit, `Haluka.recive_project`, multi‑currency, override פר‑קטגוריה. | בשלות + שקיפות. | `siteShare.reports=on` |
+| R4 | דוחות/audit, `Haluka.recive_project`, BOM חי למוצר הראשי, multi‑currency, override פר‑קטגוריה. | בשלות + שקיפות. | `siteShare.reports=on` |
 
-> R0–R1 הם הליבה. ברירת מחדל של כל ה‑flags = off ⇒ אפס רגרסיה לחלוקה הקיימת.
+> R0–R1 הם הליבה (מיושמים). R1.5 מוסיף את מסגור־המוצר התצוגתי. ברירת מחדל של כל ה‑flags
+> = off ⇒ אפס רגרסיה לחלוקה הקיימת.
 
 ---
 
@@ -250,6 +355,7 @@ computeSiteShare({ payerRole, baseAmount, matbea, config, projectOverrides })
 
 1. המחשבון מחלק ₪1,000 בין 3 השותפים לפי תרומתם.
 2. `computeSiteShare({basis:'transaction_value', baseAmount:1000})` → מוצע ₪50 ("שירות ניהול 1lev1").
+2a. `computePlatformCeiling()` → בפיתוח הושקעו ₪900,000 על פני 6,000 צרכנים → תקרה סמלית ₪150. ה‑UI מציג: "מוצע ₪50 · תקרה ₪150 (אפשר גם לעבור)".
 3. `SiteShareAdjust` מוצג: השותף המשלם בוחר "ארצה לשלם יותר" → ₪70, סיבה: "תודה על המערכת".
 4. נוצר Tosplit עם 3 hervachti לשותפים + 1 hervachti לאתר (₪70), ו‑Haluka מתאימה (`proposedAmount=50`, `amount=70`, `adjustDirection='more'`, `autoApproved=true`, `confirmed=true`).
 5. כל השותפים מאשרים את ה‑Halukas שלהם; ה‑Haluka של האתר כבר מאושרת → לא חוסמת.
@@ -266,3 +372,10 @@ computeSiteShare({ payerRole, baseAmount, matbea, config, projectOverrides })
 5. **multi‑currency** — `matbea` קיים בכל הישויות; חישוב חוצה‑מטבעות (basis בפרויקט אחד, חלק אתר באחר) → R4.
 6. **תאימות אחורה** — flags off = החלוקה הקיימת לא משתנה. בדיקות רגרסיה ל‑`confirmHaluka`/`approveHaluka` לפני merge.
 7. **שורת־אתר על מכירות עבר** — לא רטרואקטיבי; חל רק על Tosplit חדשים אחרי הפעלת ה‑flag.
+8. **התקרה כ‑anchoring** (§2.5) — הצגת מספר השקעה גדול עלולה "לעגן" מעלה ולפעול כלחץ.
+   mitigation: ניסוח מפורש "תצוגתי, לא ביקוש", התקרה לעולם לא נכנסת כסכום ברירת־מחדל
+   ל‑Haluka, וההצעה (§3) נשארת ברירת המחדל היחידה.
+9. **מקור מספר הצרכנים** — איזה count מגדיר "צרכן" (משתמש רשום? עסקה שנסגרה?) משפיע ישירות
+   על התקרה. החלטת מוצר; ברירת מחדל מוצעת = משתמשים ייחודיים עם לפחות Sheirut אחד שנסגר.
+10. **השקעה לפני BOM חי** — עד שהמוצר הראשי יהפוך למוצר מורכב אמיתי, ההשקעה מגיעה מ‑seed
+    (`investmentCache`). זה קביל ל‑R1.5; ה‑BOM החי הוא R4.
