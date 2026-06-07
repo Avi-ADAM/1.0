@@ -8426,6 +8426,12 @@ export const qids = {
     }
   }`,
 
+  '204getAllMashaabims': `query GetAllMashaabims {
+    mashaabims(pagination: { limit: 500 }) {
+      data { id attributes { name } }
+    }
+  }`,
+
   ...qids_base,
   ...moachQids
 };

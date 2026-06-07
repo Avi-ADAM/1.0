@@ -1,37 +1,23 @@
 <script>
-    import { onMount } from 'svelte';
-  import { RingLoader
-} from 'svelte-loading-spinners'
+  import { onMount } from 'svelte';
+  import { RingLoader } from 'svelte-loading-spinners';
+  import { executeAction } from '$lib/client/actionClient';
 
-  let token; 
   /**
    * @typedef {Object} ClosePayload
-   * @property {any} id - The ID of the created resource.
-   * @property {string} name - The name of the created resource.
-   * @property {any} skob - The data object of the created resource.
+   * @property {any} id
+   * @property {string} name
+   * @property {any} skob
    */
-
   /**
    * @typedef {Object} RemovePayload
-   * @property {any} id - The ID of the resource to remove.
-   * @property {any[]} data - The updated meData array after removal.
+   * @property {any} id
+   * @property {any[]} data
    */
 
-  /**
-   * Callback function for when a resource is successfully created.
-   * @type {((payload: ClosePayload) => void) | undefined}
-   */
-  /**
-   * Callback function for when a resource is removed.
-   * @type {((payload: RemovePayload) => void) | undefined}
-   */
   let { onRemove, needr = [], meData = [], onClose } = $props();
-  let miDatan = [];
-    let error1 = null;
-async function upd (){
-            
-      
-}
+  let error1 = null;
+
 function vfor(){
   for (let i = 0; i < meData.length; i++) {
     const id = meData[i].id
@@ -49,72 +35,43 @@ $effect(() => {
               myMi ()  
               });
  let already = false;
- let idL;
-const baseUrl = import.meta.env.VITE_URL
 
-import { page } from '$app/state';
-async function han (){
-    console.log(meData)
-    let d = new Date
-    already = true;
-    // jwt is httpOnly now; read token from server-provided page data
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    token = page.data.tok;
-    let bearer1 = 'bearer' + ' ' + token;
- 
+async function han() {
+  already = true;
+
   for (const element of meData) {
-  const hm = (element.hm > 0) ? element.hm : 1;
-  const price = (element.price > 0) ? element.price : 0;
-  const easy = (element.easy > 0) ? element.easy : 0;
-  const sdate = (element.dates !== undefined) ? `sdate: "${new Date(element.dates).toISOString()}",` : ``;
-   const fdate = (element.datef !== undefined) ? `fdate: "${new Date(element.datef).toISOString()}" ,` : ``;
- let linkgra = baseUrl+'/graphql';
-    try {
-             await fetch(linkgra, {
-              method: 'POST',
-        headers: {
-            'Authorization': bearer1,
-            'Content-Type': 'application/json'
-                  },
-        body: 
-        JSON.stringify({query:
-          `mutation { createSp(
-      data: { 
-          name: "${element.name}",
-             descrip: "${element.descrip}",
-             kindOf: ${element.kindOf},
-             unit: ${hm},
-             spnot: "${element.spnot}",  
-             price: ${price},
-             myp: ${easy},   
-             linkto: "${element.linkto}",
-             users_permissions_user: "${idL}",
-             mashaabim: "${element.id}", 
-             publishedAt: "${d.toISOString()}",        
-             ${sdate} 
-             ${fdate}
-    }
-  )  {data{id attributes{ name}}}
-} `   
-} )})
-  .then(r => r.json())
-  .then(data => miDatan = data);
-         console.log(miDatan)
-             onClose?.({
-                 id: miDatan.data.createSp.data.id,
-                 name: miDatan.data.createSp.data.attributes.name,
-                 skob: miDatan.data.createSp.data
-             });
-        } catch (e) {
-            error1 = e
-        }
-        
-	}
+    const hm    = (element.hm    > 0) ? element.hm    : 1;
+    const price = (element.price > 0) ? element.price : 0;
+    const easy  = (element.easy  > 0) ? element.easy  : 0;
 
+    try {
+      const result = await executeAction('createResourceRequest', {
+        mashaabimId: element.id,
+        name:        element.name,
+        descrip:     element.descrip,
+        kindOf:      element.kindOf,
+        hm,
+        spnot:       element.spnot,
+        price,
+        myp:         easy,
+        linkto:      element.linkto,
+        sdate:       element.dates ? new Date(element.dates).toISOString() : undefined,
+        fdate:       element.datef ? new Date(element.datef).toISOString() : undefined
+      });
+
+      if (result.success && result.data) {
+        onClose?.({
+          id:   result.data.id,
+          name: result.data.attributes.name,
+          skob: result.data
+        });
+      } else {
+        error1 = result.error?.message || 'Create failed';
+      }
+    } catch (e) {
+      error1 = e;
+    }
+  }
 }
 function remove (id) {
   onRemove?.({

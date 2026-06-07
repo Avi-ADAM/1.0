@@ -333,22 +333,19 @@ console.log("skillslist",skillslist);
   }
 
   function addnewM(event) {
-    console.log(needr);
     const id = event.id;
-    const oldob = needr;
-    const old = oldob;
-    const newi = [id];
-    let array3 = old.concat(newi);
-    array3 = [...new Set([...old, ...newi])];
     const skob = event.skob;
-    const slectednew = meData;
-    slectednew.push(skob);
-    meData = slectednew;
+
+    // Add new mashaabim to catalog so find_id can resolve it
+    meData = [...meData, skob];
     allvn = meData.map((c) => c.attributes[valc]);
-    needr = array3;
-    const oldsel = data.selected2;
-    oldsel.push(event.name);
-    data.selected2 = oldsel;
+
+    // Add new name to selection
+    if (!data.selected2) data.selected2 = [];
+    data.selected2 = [...data.selected2, event.name];
+
+    needr = [...new Set([...needr, String(id)])];
+
     updi();
   }
 
@@ -458,20 +455,23 @@ console.log("skillslist",skillslist);
 
     const resp = filterByReference(meData, array3);
     const datana = resp;
+
+    // Snapshot the full list BEFORE onAdd can reset the parent binding
+    const listWithNew = [...data, skob];
+
     onAdd?.({
       data: datana,
       linkp: kish,
       valc: valc,
       a: datan
     });
-    data.push(skob);
-    data = data;
+
     console.log(id);
     masss = false;
     addSl = false;
     onClose?.({
       linkp: linkp,
-      list: data
+      list: listWithNew
     });
     onMassss?.({
       mass: false

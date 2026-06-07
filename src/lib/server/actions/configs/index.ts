@@ -82,6 +82,9 @@ import { createWorkWayConfig } from './createWorkWay.js';
 import { createMissionConfig } from './createMission.js';
 import { submitNegoMissionConfig } from './submitNegoMission.js';
 import { submitNegoMashConfig } from './submitNegoMash.js';
+import { updateResourceRequestConfig } from './updateResourceRequest.js';
+import { createResourceRequestConfig } from './createResourceRequest.js';
+import { createMashaabimConfig } from './createMashaabim.js';
 
 
 /**
@@ -216,6 +219,13 @@ export function registerAllActions(): void {
 
   // Negotiation submission (pmash / resource nego flow)
   registerAction(submitNegoMashConfig);
+
+  // User profile: create / update personal resource (Sp)
+  registerAction(createResourceRequestConfig);
+  registerAction(updateResourceRequestConfig);
+
+  // Mashaabim template creation (addNewNeed form)
+  registerAction(createMashaabimConfig);
 
   // Future actions will be registered here
   // registerAction(createTaskAction);

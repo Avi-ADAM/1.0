@@ -750,15 +750,27 @@
     isG = true;
     run();
   }
-  const title = { he: 'פרופיל והגדרות 1💗1', en: '1💗1 profile and settings', ar: '1💗1 الملف الشخصي والإعدادات' };
+  const title = {
+    he: 'פרופיל והגדרות 1💗1',
+    en: '1💗1 profile and settings',
+    ar: '1💗1 الملف الشخصي والإعدادات'
+  };
   const deletew = { he: 'מחיקה', en: 'delete', ar: 'حذف' };
-  const om = { he: 'רק רגע בבקשה', en: 'one moment please', ar: 'لحظة من فضلك' };
+  const om = {
+    he: 'רק רגע בבקשה',
+    en: 'one moment please',
+    ar: 'لحظة من فضلك'
+  };
   const message1 = {
     he: 'לחיצה על הכתר מובילה ללב 1💗1, שם נמצאות ההצעות, ההצבעות והפעולות השונות',
     en: 'click on the crown to move to the heart of 1💗1, there are offers, voting and various actions',
     ar: 'انقر على التاج للانتقال إلى قلب 1💗1، حيث توجد العروض والتصويت والإجراءات المختلفة'
   };
-  const levtitle = { he: 'ללב 1💗1', en: 'to the heart of 1💗1', ar: 'إلى قلب 1💗1' };
+  const levtitle = {
+    he: 'ללב 1💗1',
+    en: 'to the heart of 1💗1',
+    ar: 'إلى قلب 1💗1'
+  };
   const message2 = {
     he: 'רשימת הכישורים שלך, לחיצה על כפתור העריכה להוספת או הסרת כישורים',
     en: 'list of your skills, press the edit button below to add more skills or to remove some from your list',
@@ -800,13 +812,21 @@
     ar: 'قائمة مجموعاتك، FreeMates مجموعة تتعاون معاً، اضغط على اسم المجموعة للانتقال إلى عقلها، المصباح أدناه لإنشاء مجموعة جديدة'
   };
   const myfr = { he: 'הרקמות שלי', en: 'My FreeMates', ar: 'مجموعاتي' };
-  const crnfr = { he: 'יצירת ריקמה חדשה', en: 'create a new FreeMates', ar: 'إنشاء مجموعة جديدة' };
+  const crnfr = {
+    he: 'יצירת ריקמה חדשה',
+    en: 'create a new FreeMates',
+    ar: 'إنشاء مجموعة جديدة'
+  };
   const message10 = {
     he: 'כמה הרווחת עד כה (היהלום למטה במרכז), סכום הכסף הכולל שקיבלת מרקמות מופיע כאן',
     en: 'The Diamond down shows how much you earn from FreeMates so far',
     ar: 'الماسة أدناه تعرض مجموع أرباحك من المجموعات حتى الآن'
   };
-  const sofartit = { he: 'סך הכל הרווחתי', en: 'total earnings', ar: 'إجمالي الأرباح' };
+  const sofartit = {
+    he: 'סך הכל הרווחתי',
+    en: 'total earnings',
+    ar: 'إجمالي الأرباح'
+  };
   const editbas = {
     he: 'עריכת פרטים בסיסיים והגדרות',
     en: 'Edit Basic Information and Settings',
@@ -818,7 +838,7 @@
     ar: 'تعديل بياناتك والإعدادات، إضافة تنبيهات الجهاز، اختيار يوم إجازة وإلغاء الدليل'
   };
   const message12 = {
-    he: 'סרגל הניווט התחתון - מוח הרקמות, צ\'אט, יצירת פרויקט חדש, הלב ותפריט הפרופיל',
+    he: "סרגל הניווט התחתון - מוח הרקמות, צ'אט, יצירת פרויקט חדש, הלב ותפריט הפרופיל",
     en: 'Bottom navigation bar - Brain of FreeMates, Chat, Create new project, Heart, and Profile menu',
     ar: 'شريط التنقل السفلي - عقل المجموعات، المحادثة، إنشاء مشروع جديد، القلب، وقائمة الملف الشخصي'
   };
@@ -830,8 +850,16 @@
   const ww = { he: 'דרכי היצירה', en: 'ways of creation', ar: 'طرق الإبداع' };
   const plv = { he: 'בחירת ערכים', en: 'choose Vallues', ar: 'اختيار قيم' };
   const pls = { he: 'בחירת כישורים', en: 'choose skills', ar: 'اختيار مهارات' };
-  const plm = { he: 'בחירת משאבים', en: 'choose resources', ar: 'اختيار موارد' };
-  const plw = { he: 'בחירת דרכי יצירה', en: 'choose ways of creation', ar: 'اختيار طرق الإبداع' };
+  const plm = {
+    he: 'בחירת משאבים',
+    en: 'choose resources',
+    ar: 'اختيار موارد'
+  };
+  const plw = {
+    he: 'בחירת דרכי יצירה',
+    en: 'choose ways of creation',
+    ar: 'اختيار طرق الإبداع'
+  };
   const plt = { he: 'בחירת תפקידים', en: 'choose roles', ar: 'اختيار أدوار' };
   let width = $state(),
     height = $state();
@@ -1301,9 +1329,9 @@
             </div>
           </TourItem>
         </div>
-      <TourItem message={message12[$lang]}>
-        <div class="footer-tour-anchor" aria-hidden="true"></div>
-      </TourItem>
+        <TourItem message={message12[$lang]}>
+          <div class="footer-tour-anchor" aria-hidden="true"></div>
+        </TourItem>
       </div>
     </div>
   {:else if addP == true}
@@ -1351,7 +1379,7 @@
     left: 0;
     min-width: 99.9vw;
     min-height: 100vh;
-    z-index: 4;
+    z-index: 100;
     background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/4nd_w3gv33.svg);
     background-repeat: no-repeat;
     background-size: cover;

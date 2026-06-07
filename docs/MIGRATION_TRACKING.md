@@ -77,8 +77,8 @@
 | שינוי סיסמה | `userPr/editBasic.svelte` | 361–373 | `axios.post('/api/auth/change-password')` | `changePassword` | user (email אישור security) | `[ ]` |
 | עדכון guide status | `userPr/editBasic.svelte` | 450–465 | `fetch('/graphql', mutation updateUsersPermissionsUser)` | `toggleGuideStatus` | — | `[ ]` |
 | עדכון relations של משתמש | `userPr/edit.svelte` | 128–148 | `fetch('/graphql', mutation updateUsersPermissionsUser)` | `updateUserRelations` | user + פרויקטים קשורים | `[ ]` |
-| יצירת resource/need (sp) | `userPr/newsp.svelte` | 77–99 | `fetch('/graphql', mutation createSp)` | `createResourceRequest` | חברי פרויקט + matching users | `[ ]` |
-| עדכון resource/need (sp) | `userPr/editsp.svelte` | 62–84 | `fetch('/graphql', mutation updateSp)` | `updateResourceRequest` | חברי פרויקט | `[ ]` |
+| יצירת resource/need (sp) | `userPr/newsp.svelte` | 77–99 | `fetch('/graphql', mutation createSp)` | `createResourceRequest` | חברי פרויקט + matching users | `[x]` 2026-06-07 |
+| עדכון resource/need (sp) | `userPr/editsp.svelte` | 62–84 | `fetch('/graphql', mutation updateSp)` | `updateResourceRequest` | חברי פרויקט | `[x]` 2026-06-07 |
 
 ---
 
