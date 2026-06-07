@@ -62,7 +62,7 @@
 | לוג אירוע מערכת (system event log) | `prPr/mission.svelte` | 870–883 | `fetch('/api/ste', POST)` | `logSystemEvent` | admin/logs | `[ ]` |
 | יצירת matana (תמונה + GraphQL) | `prPr/newmatana.svelte` | 67–87 | `axios.post(/api/upload)` + `fetch('/graphql', mutation createMatana)` | `createMatana` | חברי פרויקט | `[ ]` |
 | יצירת mission | `prPr/mission.svelte` | 369 | `sendToSer(...)` | `createMission` | חברי פרויקט (real-time kanban) | `[ ]` |
-| עדכון סטטוס task | `prPr/tasks/chooseM.svelte` | 48 | `sendToSer(...)` | `updateTask` ← **קיים!** לבדוק אם מחובר | חברי פרויקט | `[ ]` |
+| עדכון סטטוס task | `prPr/tasks/chooseM.svelte` | 48 | `sendToSer(...)` | `updateTask` ← **קיים!** לבדוק אם מחובר | חברי פרויקט | `[x]` 2026-06-07 |
 | סימון act כ-done / set status | `prPr/tasks/Myacts.svelte` | 127–155 | `sendToSer(...)` × 2 | `markActDone` + `setActStatus` | מקצה + חברי פרויקט | `[ ]` |
 | פעולות הלוקה / tosplit | `prPr/whowhat.svelte` | 252–481 | `sendToSer(...)` (פעולות מרובות) | לפי סוג: `createHaluka` / `createTosplit` ← **קיימים!** | משתתפים + פרויקט | `[ ]` |
 

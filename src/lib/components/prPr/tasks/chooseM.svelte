@@ -4,7 +4,7 @@
   import Button from '$lib/celim/ui/button.svelte';
   import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
-  import { sendToSer } from '$lib/send/sendToSer.js';
+  import { executeAction } from '$lib/client/actionClient';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
 
   const moachStore = getMoachStore();
@@ -35,20 +35,16 @@
     const selectedMission = filtered.find((m) => m.attributes.name === selected);
     const selectedId = selectedMission?.id ?? null;
 
-    await sendToSer(
-      {
+    try {
+      const result = await executeAction('updateTask', {
         mesimabetahaliches: [selectedId],
         uid: [page.data.uid],
         isAssigned: true,
-        id: taskId
-      },
-      '31updateTask',
-      null,
-      null,
-      false,
-      fetch
-    ).then((data) => {
-      if (data.data != null) {
+        id: taskId,
+        projectId
+      });
+
+      if (result.success) {
         loading = false;
         success = true;
         moachStore.refreshBase(projectId, fetch);
@@ -57,10 +53,10 @@
         loading = false;
         error = true;
       }
-    }).catch(() => {
+    } catch {
       loading = false;
       error = true;
-    });
+    }
   }
 </script>
 
