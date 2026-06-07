@@ -8432,6 +8432,23 @@ export const qids = {
     }
   }`,
 
+  '205getMashaabimsByIds': `query GetMashaabimsByIds($ids: [ID]) {
+    mashaabims(filters: { id: { in: $ids } }) {
+      data { id attributes { name descrip kindOf price linkto } }
+    }
+  }`,
+
+  '206getSpForEdit': `query GetSpForEdit($spId: ID!) {
+    sp(id: $spId) {
+      data { id attributes {
+        name descrip kindOf unit spnot price myp linkto
+        users_permissions_user { data { id } }
+        sdate fdate
+      } }
+    }
+    me { id }
+  }`,
+
   ...qids_base,
   ...moachQids
 };

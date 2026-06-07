@@ -3,9 +3,14 @@
   import { showFoot } from '$lib/stores/showFoot.js';
   import { page } from '$app/stores';
   import RichText from '$lib/celim/ui/richText.svelte';
+  import { executeAction } from '$lib/client/actionClient';
+  import { toast } from 'svelte-sonner';
 
-  /** @type {{ data: { wish: any | null; proposalsCount: number; loadOk: boolean } }} */
+  /** @type {{ data: { wish: any | null; proposalsCount: number; myProposals: any[]; uid: string | null; isLoggedIn: boolean; loadOk: boolean } }} */
   let { data } = $props();
+
+  const isLoggedIn = $derived(!!data?.isLoggedIn);
+  const myProposals = $derived(data?.myProposals ?? []);
 
   onMount(() => showFoot.set(false));
   onDestroy(() => showFoot.set(true));
@@ -96,6 +101,7 @@
   const MISSIONS = $derived(
     data?.wish?.extractedMissions?.length
       ? data.wish.extractedMissions.map((m) => ({
+          id: m.id,
           name: m.name,
           hours: m.hoursEst ?? 0,
           imp: m.importance === 'must' ? 'must' : 'nice'
@@ -105,6 +111,7 @@
   const RESOURCES = $derived(
     data?.wish?.extractedResources?.length
       ? data.wish.extractedResources.map((r) => ({
+          id: r.id,
           name: r.name,
           qty: r.quantityEst ?? 1,
           imp: r.importance === 'must' ? 'must' : 'nice'
@@ -146,6 +153,57 @@
   }
 
   const wishId = $derived($page.params.id);
+
+  // ── Provider offer panel ────────────────────────────────────────────────────
+  let offerOpen = $state(false);
+  let offerSelected = $state(/** @type {Set<string>} */ (new Set()));
+  let offerResourceSelected = $state(/** @type {Set<string>} */ (new Set()));
+  let offerSubmitting = $state(false);
+  let offerDone = $state(false);
+
+  function toggleMission(id) {
+    const s = new Set(offerSelected);
+    s.has(id) ? s.delete(id) : s.add(id);
+    offerSelected = s;
+  }
+  function toggleResource(id) {
+    const s = new Set(offerResourceSelected);
+    s.has(id) ? s.delete(id) : s.add(id);
+    offerResourceSelected = s;
+  }
+
+  async function submitOffer() {
+    if (!offerSelected.size && !offerResourceSelected.size) return;
+    offerSubmitting = true;
+    try {
+      const res = await executeAction('offerWishHelp', {
+        ratsonId: String(wishId),
+        missionIds: [...offerSelected],
+        resourceIds: [...offerResourceSelected]
+      });
+      if (!res?.success) throw new Error(res?.error?.message || 'שגיאה');
+      offerDone = true;
+      toast.success('ההצעה נשלחה!');
+      offerOpen = false;
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'שגיאה בשליחה');
+    } finally {
+      offerSubmitting = false;
+    }
+  }
+
+  // A proposal is an "invitation" (from the wisher) if it has covered_missions
+  // or covered_resources; a self-offer has neither.
+  const myInvitations = $derived(
+    myProposals.filter(
+      (p) => p.coveredMissions?.length || p.coveredResources?.length
+    )
+  );
+  const mySelfOffers = $derived(
+    myProposals.filter(
+      (p) => !p.coveredMissions?.length && !p.coveredResources?.length
+    )
+  );
 </script>
 
 <svelte:head>
@@ -181,8 +239,13 @@
     </nav>
 
     <div class="hdr-right">
-      <a href="/login" class="btn-ghost btn-xs">התחברי</a>
-      <a href="/register" class="btn-ghost btn-xs hide-xs">הצטרפי</a>
+      {#if isLoggedIn}
+        <a href="/lev" class="btn-ghost btn-xs">הלב שלי</a>
+        <a href="/deals" class="btn-ghost btn-xs hide-xs">עסקאות</a>
+      {:else}
+        <a href="/login" class="btn-ghost btn-xs">התחברי</a>
+        <a href="/register" class="btn-ghost btn-xs hide-xs">הצטרפי</a>
+      {/if}
     </div>
   </header>
 
@@ -239,9 +302,17 @@
             {/each}
           </div>
           <div class="hero-cta-wrap">
-            <a href={`/login?next=/concierge/${wishId}`} class="btn-jewel"
-              >💗 אני יכולה לעזור</a
-            >
+            {#if isLoggedIn}
+              {#if offerDone}
+                <span class="badge-open" style="font-size:13px">✓ ההצעה שלך נשלחה לבעלת המשאלה</span>
+              {:else if myProposals.length}
+                <button class="btn-jewel" onclick={() => (offerOpen = true)}>📋 ההצעות שלי</button>
+              {:else}
+                <button class="btn-jewel" onclick={() => (offerOpen = true)}>💗 אני יכולה לעזור</button>
+              {/if}
+            {:else}
+              <a href={`/login?next=/wish/${wishId}`} class="btn-jewel">💗 אני יכולה לעזור</a>
+            {/if}
           </div>
         </div>
       </div>
@@ -343,13 +414,62 @@
             להציע בלי לחץ ובלי התחייבות. הסכמה תיווצר רק כש{wish.author} תאשר.
           </p>
           <div class="invite-cta">
-            <a href={`/login?next=/concierge/${wishId}`} class="btn-jewel"
-              >💗 אני יכולה לעזור</a
-            >
+            {#if isLoggedIn}
+              {#if offerDone}
+                <span class="badge-open" style="font-size:13px">✓ ההצעה שלך נשלחה</span>
+              {:else}
+                <button class="btn-jewel" onclick={() => (offerOpen = true)}>💗 אני יכולה לעזור</button>
+              {/if}
+            {:else}
+              <a href={`/login?next=/wish/${wishId}`} class="btn-jewel">💗 אני יכולה לעזור</a>
+            {/if}
             <a href="/concierge" class="btn-ghost">משאלות אחרות בקהילה</a>
           </div>
         </div>
       </div>
+
+      <!-- ── MY PROPOSALS (logged-in provider) ──────────────────────────── -->
+      {#if isLoggedIn && myProposals.length}
+        <div class="my-proposals anim anim-d3">
+          <div class="mp-hdr">
+            <span class="mp-icon">📋</span>
+            <h4 class="mp-title">ההצעות שלי לגבי משאלה זו</h4>
+          </div>
+          {#each myProposals as p (p.id)}
+            <div class="mp-card">
+              <div class="mp-row">
+                <span class="mp-kind">{p.kind === 'custom_offer' ? 'הצעה יוזמת' : 'הזמנה'}</span>
+                <span class="mp-status mp-status--{p.status}">{p.status}</span>
+              </div>
+              {#if p.coveredMissions?.length}
+                <div class="mp-items">
+                  {#each p.coveredMissions as cm (cm.id)}
+                    {@const mission = MISSIONS.find(
+                      (m) => String(m.id ?? '') === String(cm.extractedMissionIdx)
+                    ) ?? { name: cm.extractedMissionIdx }}
+                    <span class="mp-chip">✦ {mission.name}{cm.hours ? ` · ${cm.hours} שע׳` : ''}</span>
+                  {/each}
+                </div>
+              {/if}
+              {#if p.coveredResources?.length}
+                <div class="mp-items">
+                  {#each p.coveredResources as cr (cr.id)}
+                    {@const resource = RESOURCES.find(
+                      (r) => String(r.id ?? '') === String(cr.extractedResourceIdx)
+                    ) ?? { name: cr.extractedResourceIdx }}
+                    <span class="mp-chip">◐ {resource.name}{cr.quantity ? ` · ×${cr.quantity}` : ''}</span>
+                  {/each}
+                </div>
+              {/if}
+              {#if p.status === 'suggested' || p.status === 'viewed'}
+                <div class="mp-actions">
+                  <a href="/deals" class="btn-ghost btn-xs">לצפות ולאשר ב-Deals</a>
+                </div>
+              {/if}
+            </div>
+          {/each}
+        </div>
+      {/if}
 
       <!-- Privacy footer -->
       <div class="privacy-strip anim anim-d3">
@@ -367,6 +487,61 @@
   </div>
   <!-- /shell -->
 </div>
+
+<!-- ── OFFER HELP MODAL ──────────────────────────────────────────────────── -->
+{#if offerOpen}
+  <div class="ofr-overlay" role="dialog" aria-modal="true" dir="rtl">
+    <div class="ofr-card">
+      <button class="ofr-x" onclick={() => (offerOpen = false)} aria-label="סגירה">✕</button>
+      <div class="ofr-head">
+        <span class="ofr-gem"></span>
+        <h2 class="ofr-title">במה תוכלי לעזור?</h2>
+      </div>
+      <p class="ofr-intro">בחרי את המשימות והמשאבים שבהם תוכלי לסייע. בעלת המשאלה תקבל התראה ותוכל לשלוח לך פרטים נוספים.</p>
+
+      {#if MISSIONS.length}
+        <div class="ofr-section-lbl">✦ משימות</div>
+        <div class="ofr-chips">
+          {#each MISSIONS as m (m.name)}
+            <button
+              class="ofr-chip {offerSelected.has(String(m.id ?? m.name)) ? 'ofr-chip--sel' : ''}"
+              onclick={() => toggleMission(String(m.id ?? m.name))}
+              type="button"
+            >
+              {m.name}{m.hours ? ` · ${m.hours} שע׳` : ''}
+            </button>
+          {/each}
+        </div>
+      {/if}
+
+      {#if RESOURCES.length}
+        <div class="ofr-section-lbl" style="margin-top:12px">◐ משאבים</div>
+        <div class="ofr-chips">
+          {#each RESOURCES as r (r.name)}
+            <button
+              class="ofr-chip {offerResourceSelected.has(String(r.id ?? r.name)) ? 'ofr-chip--sel' : ''}"
+              onclick={() => toggleResource(String(r.id ?? r.name))}
+              type="button"
+            >
+              {r.name}{r.qty ? ` · ×${r.qty}` : ''}
+            </button>
+          {/each}
+        </div>
+      {/if}
+
+      <div class="ofr-actions" style="margin-top:20px">
+        <button class="ofr-btn ofr-btn--ghost" onclick={() => (offerOpen = false)}>ביטול</button>
+        <button
+          class="ofr-btn ofr-btn--primary"
+          onclick={submitOffer}
+          disabled={offerSubmitting || (!offerSelected.size && !offerResourceSelected.size)}
+        >
+          {offerSubmitting ? 'שולח…' : '💗 שלחי הצעה'}
+        </button>
+      </div>
+    </div>
+  </div>
+{/if}
 
 <!-- /cp -->
 
@@ -1151,4 +1326,169 @@
     color: #9a8f80;
     line-height: 1.55;
   }
+
+  /* ── My proposals panel ── */
+  .my-proposals {
+    margin-top: 18px;
+    padding: 18px;
+    border: 1px solid rgba(2, 255, 187, 0.2);
+    border-radius: 18px;
+    background: rgba(2, 255, 187, 0.03);
+  }
+  .mp-hdr {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .mp-icon { font-size: 16px; }
+  .mp-title {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: #02ffbb;
+    text-transform: uppercase;
+    margin: 0;
+  }
+  .mp-card {
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    margin-bottom: 8px;
+  }
+  .mp-card:last-child { margin-bottom: 0; }
+  .mp-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .mp-kind {
+    font-family: 'Bellefair', serif;
+    font-size: 12px;
+    color: #9a8f80;
+  }
+  .mp-status {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+  }
+  .mp-status--suggested, .mp-status--viewed {
+    background: rgba(238, 232, 170, 0.08);
+    color: #fde68a;
+    border: 1px solid rgba(238, 232, 170, 0.2);
+  }
+  .mp-status--accepted {
+    background: rgba(2, 255, 187, 0.08);
+    color: #02ffbb;
+    border: 1px solid rgba(2, 255, 187, 0.25);
+  }
+  .mp-status--rejected, .mp-status--expired {
+    background: rgba(255, 77, 158, 0.07);
+    color: #ff4d9e;
+    border: 1px solid rgba(255, 77, 158, 0.2);
+  }
+  .mp-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .mp-chip {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-family: 'Bellefair', serif;
+    font-size: 12px;
+    background: rgba(116, 191, 255, 0.08);
+    border: 1px solid rgba(116, 191, 255, 0.2);
+    color: #74bfff;
+  }
+  .mp-actions { margin-top: 6px; }
+
+  /* ── Offer modal ── */
+  .ofr-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .ofr-card {
+    position: relative;
+    width: min(520px, 96vw);
+    max-height: 88vh;
+    overflow: auto;
+    background: #14110d;
+    border: 1px solid rgba(238, 232, 170, 0.2);
+    border-radius: 18px;
+    padding: 26px 22px;
+  }
+  .ofr-x {
+    position: absolute;
+    inset-inline-end: 14px;
+    top: 12px;
+    background: transparent;
+    border: none;
+    color: #9a8f80;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  .ofr-head { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
+  .ofr-gem {
+    width: 9px; height: 9px; flex-shrink: 0;
+    background: linear-gradient(135deg, #ff4d9e, #c8155f);
+    transform: rotate(45deg);
+    box-shadow: 0 0 10px rgba(255, 77, 158, 0.6);
+  }
+  .ofr-title { font-size: 19px; font-weight: 800; color: #f3ece0; margin: 0; }
+  .ofr-intro { font-size: 13px; color: #9a8f80; line-height: 1.55; margin-bottom: 16px; }
+  .ofr-section-lbl {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.22em;
+    text-transform: uppercase; color: #9a8f80; margin-bottom: 8px;
+  }
+  .ofr-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .ofr-chip {
+    padding: 6px 13px;
+    border-radius: 999px;
+    font-family: 'Bellefair', serif;
+    font-size: 13px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ede5d8;
+    transition: all 0.15s;
+  }
+  .ofr-chip:hover { border-color: rgba(255, 77, 158, 0.4); color: #ff4d9e; }
+  .ofr-chip--sel {
+    background: rgba(255, 77, 158, 0.12);
+    border-color: rgba(255, 77, 158, 0.5);
+    color: #ff4d9e;
+  }
+  .ofr-actions { display: flex; gap: 10px; }
+  .ofr-btn {
+    flex: 1; padding: 12px; border-radius: 11px;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    text-align: center; border: 1px solid transparent;
+    font-family: 'Heebo', sans-serif;
+  }
+  .ofr-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .ofr-btn--ghost {
+    background: rgba(255,255,255,0.03);
+    border-color: rgba(255,255,255,0.08);
+    color: #9a8f80;
+  }
+  .ofr-btn--primary {
+    background: rgba(255, 77, 158, 0.14);
+    border-color: rgba(255, 77, 158, 0.4);
+    color: #ff6496;
+  }
+  .ofr-btn--primary:hover:not(:disabled) { background: rgba(255, 77, 158, 0.22); }
 </style>
