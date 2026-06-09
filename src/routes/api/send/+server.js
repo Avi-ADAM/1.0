@@ -5,8 +5,15 @@ const ep = HTTP_ST_ENDPOINT + "/graphql"
 import { qids } from './qids.js'
 import { validateAllQids, validateQuery } from './qidsValidator.js'
 import { json, error } from '@sveltejs/kit'
-// Server-only secrets — never exposed to the client bundle (no VITE_ prefix).
 import { ADMINMONTHER, CONSENSUS_PUBLIC_TOKEN, CONSENSUS_PROXY_SECRET } from '$env/static/private'
+
+function normalizeSecret(value) {
+	return String(value ?? '').replace(/\s+/g, '');
+}
+
+function getServiceToken(isConsensusQid) {
+	return normalizeSecret(isConsensusQid ? CONSENSUS_PUBLIC_TOKEN : ADMINMONTHER);
+}
 
 // ── Consensus qid registry ─────────────────────────────────────────────────
 /** qids that belong to the consensus feature */
@@ -64,11 +71,13 @@ export async function POST({ request, cookies }) {
 
 	// ── Security: validate consensus proxy secret for service calls ──────────
 	if (isSer && isConsensusQid) {
-		if (!CONSENSUS_PROXY_SECRET) {
+		const consensusProxySecret = normalizeSecret(CONSENSUS_PROXY_SECRET);
+
+		if (!consensusProxySecret) {
 			throw error(500, 'Server misconfiguration: CONSENSUS_PROXY_SECRET not set');
 		}
 		const incoming = request.headers.get('x-consensus-secret');
-		if (incoming !== CONSENSUS_PROXY_SECRET) {
+		if (incoming !== consensusProxySecret) {
 			throw error(401, 'Unauthorized: Invalid consensus proxy secret');
 		}
 	}
@@ -78,7 +87,7 @@ export async function POST({ request, cookies }) {
 	// calls keep the admin token; JWT calls use the user's own token.
 	let jw;
 	if (isSer) {
-		jw = isConsensusQid ? CONSENSUS_PUBLIC_TOKEN : ADMINMONTHER;
+		jw = getServiceToken(isConsensusQid);
 	} else {
 		jw = cookies.get('jwt');
 	}

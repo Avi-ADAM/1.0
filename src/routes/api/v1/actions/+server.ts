@@ -3,14 +3,13 @@ import type { RequestHandler } from './$types';
 import { verifyApiKey } from '$lib/server/apiKeys';
 import { actionService } from '$lib/server/actions/index.js';
 import type { ActionContext } from '$lib/server/actions/types.js';
-// Server-only secret — never exposed to the client bundle (no VITE_ prefix).
 import { ADMINMONTHER } from '$env/static/private';
 
 // Whitelist of actions allowed via API
 const ALLOWED_ACTIONS = ['createTask'];
 
 // Admin token for Strapi bypass (internal use)
-const ADMIN_TOKEN = ADMINMONTHER;
+const ADMIN_TOKEN = ADMINMONTHER.replace(/\s+/g, '');
 
 /**
  * POST /api/v1/actions

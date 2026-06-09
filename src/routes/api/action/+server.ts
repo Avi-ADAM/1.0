@@ -20,12 +20,11 @@ import { NotificationOrchestrator } from '$lib/server/notifications/Notification
 import type { ActionContext } from '$lib/server/actions/types.js';
 // Import action configurations to register them
 import '$lib/server/actions/configs/index.js';
-// Server-only secret — never exposed to the client bundle (no VITE_ prefix).
 import { ADMINMONTHER } from '$env/static/private';
 
 // Environment variables
 const STRAPI_ENDPOINT = import.meta.env.VITE_URL + '/graphql';
-const ADMIN_TOKEN = ADMINMONTHER;
+const ADMIN_TOKEN = ADMINMONTHER.replace(/\s+/g, '');
 
 // Initialize services (singleton pattern)
 let actionService: ActionService | null = null;
