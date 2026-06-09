@@ -29,7 +29,7 @@ export const createTaskTool = createTool({
 
     const userId = ctx.userId;
     const fetchInstance = ctx.fetchInstance;
-    const adminToken = process.env.VITE_ADMINMONTHER || '';
+    const adminToken = process.env.ADMINMONTHER || '';
 
     console.log(`[createTaskTool] Executing for user: ${userId}`, inputData);
 

@@ -87,6 +87,8 @@ import { createResourceRequestConfig } from './createResourceRequest.js';
 import { createMashaabimConfig } from './createMashaabim.js';
 import { updateUserRelationConfig } from './updateUserRelation.js';
 import { loadCatalogConfig } from './loadCatalog.js';
+import { toggleGuideStatusConfig } from './toggleGuideStatus.js';
+import { createMissionTemplateConfig } from './createMissionTemplate.js';
 import { offerWishHelpConfig } from './offerWishHelp.js';
 
 
@@ -234,6 +236,12 @@ export function registerAllActions(): void {
   // User profile relation update + catalog loader (edit.svelte)
   registerAction(updateUserRelationConfig);
   registerAction(loadCatalogConfig);
+
+  // Onboarding guide visibility toggle (editBasic.svelte)
+  registerAction(toggleGuideStatusConfig);
+
+  // Standalone mission catalog entry (addNewMission.svelte)
+  registerAction(createMissionTemplateConfig);
 
   // Future actions will be registered here
   // registerAction(createTaskAction);

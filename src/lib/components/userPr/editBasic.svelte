@@ -22,7 +22,7 @@
   } from '$lib/components/ui/card';
   import Separator from '$lib/celim/ui/separator.svelte';
   import ObjectChooser from '$lib/celim/ui/objectChooser.svelte';
-  import { page } from '$app/state';
+  import { executeAction } from '$lib/client/actionClient';
 
   // Props
   let {
@@ -428,36 +428,9 @@
     ).toUTCString()}; path=/`;
 
     try {
-      const token = page.data.tok;
-      if (!token) {
-        throw new Error('Authentication token not found');
-      }
-
-      const response = await fetch(`${import.meta.env.VITE_URL}/graphql`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `mutation { 
-						updateUsersPermissionsUser(
-							id: ${parseInt(uid)}, 
-							data: { profilManualAlready: ${!show} }
-						) { 
-							data { id } 
-						} 
-					}`
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update guide status');
-      }
-
-      const result = await response.json();
-      if (result.errors) {
-        throw new Error(result.errors[0]?.message || 'GraphQL error');
+      const result = await executeAction('toggleGuideStatus', { show });
+      if (!result.success) {
+        throw new Error(result.error?.message || 'Failed to update guide status');
       }
 
       toast.success(show ? t[$lang].guidResumed : t[$lang].guidStopped);

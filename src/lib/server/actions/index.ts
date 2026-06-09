@@ -57,7 +57,7 @@ import { ActionService } from './ActionService.js';
 import { NotificationOrchestrator } from '$lib/server/notifications/NotificationOrchestrator.js';
 
 const STRAPI_ENDPOINT = (process.env.VITE_URL || 'https://tovmeod.1lev1.com') + '/graphql';
-const ADMIN_TOKEN = process.env.VITE_ADMINMONTHER || '';
+const ADMIN_TOKEN = process.env.ADMINMONTHER || '';
 
 const strapiClient = new StrapiClient(STRAPI_ENDPOINT, ADMIN_TOKEN);
 const validator = new ValidationEngine();

@@ -5,10 +5,8 @@ const ep = HTTP_ST_ENDPOINT + "/graphql"
 import { qids } from './qids.js'
 import { validateAllQids, validateQuery } from './qidsValidator.js'
 import { json, error } from '@sveltejs/kit'
-
-const VITE_ADMINMONTHER        = import.meta.env.VITE_ADMINMONTHER;
-const CONSENSUS_PUBLIC_TOKEN   = import.meta.env.VITE_CONSENSUS_PUBLIC_TOKEN;   // limited-scope API token for consensus
-const CONSENSUS_PROXY_SECRET   = import.meta.env.VITE_CONSENSUS_PROXY_SECRET;   // shared secret with consensus proxy
+// Server-only secrets — never exposed to the client bundle (no VITE_ prefix).
+import { ADMINMONTHER, CONSENSUS_PUBLIC_TOKEN, CONSENSUS_PROXY_SECRET } from '$env/static/private'
 
 // ── Consensus qid registry ─────────────────────────────────────────────────
 /** qids that belong to the consensus feature */
@@ -80,7 +78,7 @@ export async function POST({ request, cookies }) {
 	// calls keep the admin token; JWT calls use the user's own token.
 	let jw;
 	if (isSer) {
-		jw = isConsensusQid ? CONSENSUS_PUBLIC_TOKEN : VITE_ADMINMONTHER;
+		jw = isConsensusQid ? CONSENSUS_PUBLIC_TOKEN : ADMINMONTHER;
 	} else {
 		jw = cookies.get('jwt');
 	}

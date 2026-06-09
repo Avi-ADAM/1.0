@@ -289,6 +289,8 @@ export type ActionKey =
   | 'getUserForums'
   | 'getForumThread'
   | 'createChatMessage'
+  | 'toggleGuideStatus'
+  | 'createMissionTemplate'
   ;
 
 
@@ -362,6 +364,15 @@ export interface ActionParamsMap {
     message: string;
     md?: Record<string, any>;
     username?: string;
+  };
+  toggleGuideStatus: {
+    show: boolean;
+  };
+  createMissionTemplate: {
+    missionName: string;
+    descrip?: string;
+    skillIds?: string[];
+    roleIds?: string[];
   };
 }
 

@@ -4,8 +4,8 @@
 
 import { objToString } from '$lib/func/objToString.svelte';
 import { SendTo } from '$lib/send/sendTo.svelte';
-
-const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER;
+// Server-only secret — never exposed to the client bundle (no VITE_ prefix).
+import { ADMINMONTHER } from '$env/static/private';
 
 function formatDate(date = new Date()) {
   const year = date.toLocaleString('default', { year: 'numeric' });
@@ -46,7 +46,7 @@ export async function GET() {
   }`;
 
   try {
-    const res = await SendTo(que, VITE_ADMINMONTHER);
+    const res = await SendTo(que, ADMINMONTHER);
     if (!res?.data) return new Response(JSON.stringify(suc));
 
     for (const element of res.data.mesimabetahaliches.data) {
@@ -61,7 +61,7 @@ export async function GET() {
       }`;
 
       try {
-        const resi = await SendTo(que2, VITE_ADMINMONTHER);
+        const resi = await SendTo(que2, ADMINMONTHER);
         if (!resi?.data?.mesimabetahalich?.data) continue;
 
         const at = resi.data.mesimabetahalich.data.attributes;
@@ -114,7 +114,7 @@ export async function GET() {
           }) { data { id } }
         }`;
 
-        const resis = await SendTo(mutation, VITE_ADMINMONTHER);
+        const resis = await SendTo(mutation, ADMINMONTHER);
         if (resis?.data) {
           console.log('monthly reset done for', id);
           suc.push(id);

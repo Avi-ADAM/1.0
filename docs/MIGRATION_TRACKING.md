@@ -75,7 +75,7 @@
 | יצירת API key | `userPr/editBasic.svelte` | 231–239 | `fetch('/api/api-keys', POST)` | `createApiKey` | user (email אישור) | `[ ]` |
 | מחיקת API key | `userPr/editBasic.svelte` | 266–268 | `fetch('/api/api-keys', DELETE)` | `deleteApiKey` | user | `[ ]` |
 | שינוי סיסמה | `userPr/editBasic.svelte` | 361–373 | `axios.post('/api/auth/change-password')` | `changePassword` | user (email אישור security) | `[ ]` |
-| עדכון guide status | `userPr/editBasic.svelte` | 450–465 | `fetch('/graphql', mutation updateUsersPermissionsUser)` | `toggleGuideStatus` | — | `[ ]` |
+| עדכון guide status | `userPr/editBasic.svelte` | 450–465 | `fetch('/graphql', mutation updateUsersPermissionsUser)` | `toggleGuideStatus` | — | `[x]` 2026-06-08 |
 | עדכון relations של משתמש | `userPr/edit.svelte` | 128–148 | `fetch('/graphql', mutation updateUsersPermissionsUser)` | `updateUserRelations` | user + פרויקטים קשורים | `[ ]` |
 | יצירת resource/need (sp) | `userPr/newsp.svelte` | 77–99 | `fetch('/graphql', mutation createSp)` | `createResourceRequest` | חברי פרויקט + matching users | `[x]` 2026-06-07 |
 | עדכון resource/need (sp) | `userPr/editsp.svelte` | 62–84 | `fetch('/graphql', mutation updateSp)` | `updateResourceRequest` | חברי פרויקט | `[x]` 2026-06-07 |
@@ -94,6 +94,7 @@
 | לוקליזציה ב-SkillSelector | `ui/SkillSelector.svelte` | multiple | `fetch('/api/ste', POST)` × 2 | ← לאחד עם `/api/ste` action | — | `[ ]` |
 | לוקליזציה ב-RoleSelector | `ui/RoleSelector.svelte` | multiple | `fetch('/api/ste', POST)` × 2 | ← לאחד עם `/api/ste` action | — | `[ ]` |
 | יצירת iwant logs | `addnew/newIwant.svelte` | multiple | `fetch('/api/ste', POST)` × 3 | `createIwantLog` | — | `[ ]` |
+| יצירת Mission template (קטלוג) + token | `addnew/addNewMission.svelte` | subm() | `fetch('/graphql', mutation createMission)` + `page.data.tok` bearer | `createMissionTemplate` (JWT, queId 21createMission) | — | `[x]` 2026-06-08 |
 
 ---
 

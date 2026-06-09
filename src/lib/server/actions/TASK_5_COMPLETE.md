@@ -60,7 +60,7 @@ Successfully implemented a comprehensive Strapi Client wrapper with all required
 // Create client
 const client = new StrapiClient(
   endpoint?: string,      // Default: process.env.VITE_URL
-  adminToken?: string,    // Default: process.env.VITE_ADMINMONTHER
+  adminToken?: string,    // Default: process.env.ADMINMONTHER
   retryConfig?: {         // Optional custom retry config
     maxRetries?: number,
     initialDelayMs?: number,

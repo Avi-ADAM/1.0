@@ -146,7 +146,7 @@ export class StrapiClient {
   ) {
     // Use provided values or fall back to environment variables or defaults
     this.endpoint = endpoint || process.env.VITE_URL || 'https://tovmeod.1lev1.com';
-    this.adminToken = adminToken || process.env.VITE_ADMINMONTHER || '';
+    this.adminToken = adminToken || process.env.ADMINMONTHER || '';
     this.retryConfig = { ...DEFAULT_RETRY_CONFIG, ...retryConfig };
     this.connectionPool = new ConnectionPool();
   }

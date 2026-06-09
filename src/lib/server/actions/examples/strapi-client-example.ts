@@ -222,7 +222,7 @@ async function environmentConfig() {
   // Production
   const prodClient = new StrapiClient(
     'https://api.1lev1.com',
-    process.env.VITE_ADMINMONTHER,
+    process.env.ADMINMONTHER,
     { maxRetries: 5, maxDelayMs: 10000 } // More resilient in production
   );
   

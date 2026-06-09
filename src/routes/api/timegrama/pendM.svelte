@@ -1,6 +1,7 @@
 <script module>
      import { SendTo } from '$lib/send/sendTo.svelte';
-const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER;
+     // Server-only secret — this module is imported only by timegrama/+server.js.
+     import { ADMINMONTHER } from '$env/static/private';
 //get by id
 //calculate votes
 //if no no create open mission 
@@ -14,7 +15,7 @@ export async function PendM(id,taid){
 }}} 
  }`;
     try {
-      let res = await SendTo(qu, VITE_ADMINMONTHER).then((res) => (res = res));
+      let res = await SendTo(qu, ADMINMONTHER).then((res) => (res = res));
       console.log(res);
       if (res.data != null) {
         console.log(res.data, 'pip');
@@ -28,7 +29,7 @@ export async function PendM(id,taid){
   }}}
                 }`
  try {
-      let res2 = await SendTo(qua, VITE_ADMINMONTHER).then((res2) => (res2 = res2));
+      let res2 = await SendTo(qua, ADMINMONTHER).then((res2) => (res2 = res2));
       console.log(res2);
       if (res2.data != null) {
         console.log(res2.data,"res2 data")
@@ -63,7 +64,7 @@ export async function PendM(id,taid){
  } `   
  console.log(qub)
      try {
-      let res3 = await SendTo(qub, VITE_ADMINMONTHER).then((res3) => (res3 = res3));
+      let res3 = await SendTo(qub, ADMINMONTHER).then((res3) => (res3 = res3));
       console.log(res3,"res3",id,taid)      
       if (res3.data != null) {
               console.log(res3.data,"res3 data")
@@ -79,7 +80,7 @@ export async function PendM(id,taid){
             }
               `
                try {
-      let res4 = await SendTo(que4, VITE_ADMINMONTHER).then((res4) => (res4 = res4));
+      let res4 = await SendTo(que4, ADMINMONTHER).then((res4) => (res4 = res4));
             if (res4.data != null) {
               console.log("succses",id," ",res4.data )
               return "sucsses" + id

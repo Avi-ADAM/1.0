@@ -185,10 +185,10 @@ private membershipCache = new Map<string, { isMember: boolean; expiresAt: number
 
 ## 🟢 נמוך — שיפורים עתידיים
 
-### 15. `VITE_ADMINMONTHER` — admin bypass token
+### 15. `VITE_ADMINMONTHER` — admin bypass token ✅ הושלם
 **בעיה:** token admin נמצא ב-VITE_ = חשוף ב-client build  
-**פתרון:** העבר ל-`PRIVATE_ADMINMONTHER` (SvelteKit private env)  
-**עדיפות:** 🟢 נמוך (אם לא בשימוש בclient side)  
+**פתרון שבוצע:** עבר ל-`ADMINMONTHER` (ללא prefix), נקרא ב-server דרך `$env/static/private`; ב-Node libs דרך `process.env.ADMINMONTHER`. אומת ב-build שהטוקן לא נמצא ב-client bundle (רק ב-`server/chunks/private.js`). אותו טיפול בוצע ל-`CONSENSUS_PUBLIC_TOKEN` ו-`CONSENSUS_PROXY_SECRET`.  
+**עדיפות:** 🟢 נמוך  
 **מאמץ:** קטן
 
 ### 16. Socket server — אין health monitoring
