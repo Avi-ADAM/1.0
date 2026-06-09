@@ -6,9 +6,20 @@ import { qids } from './qids.js'
 import { validateAllQids, validateQuery } from './qidsValidator.js'
 import { json, error } from '@sveltejs/kit'
 import { ADMINMONTHER, CONSENSUS_PUBLIC_TOKEN, CONSENSUS_PROXY_SECRET } from '$env/static/private'
+import { createHash } from 'node:crypto'
 
 function normalizeSecret(value) {
 	return String(value ?? '').replace(/\s+/g, '');
+}
+
+function fingerprintSecret(value) {
+	const normalized = normalizeSecret(value);
+
+	return {
+		present: normalized.length > 0,
+		length: normalized.length,
+		sha12: normalized ? createHash('sha256').update(normalized).digest('hex').slice(0, 12) : null
+	};
 }
 
 function getServiceToken(isConsensusQid) {
@@ -118,7 +129,7 @@ export async function POST({ request, cookies }) {
 		if (identity.name)       variablesObject.authorName       = identity.name;
 	}
 
-	const bearer1 = 'bearer ' + jw;
+	const bearer1 = 'Bearer ' + jw;
 
 	// ── Server-side idempotent vote handler ──────────────────────────────────
 	// Handles both JWT path (username as voter-id) and service path (__identity.externalId).
@@ -228,7 +239,14 @@ export async function POST({ request, cookies }) {
 			return json(newd, { status: 500 });
 		}
 
-		console.error('Unexpected response structure:', newd);
+		console.error('Unexpected response structure:', {
+			queId,
+			isSer,
+			isConsensusQid,
+			endpoint: ep,
+			serviceToken: isSer ? fingerprintSecret(jw) : { present: Boolean(jw) },
+			response: newd
+		});
 		if (newd.error?.status === 401 || newd.error?.name === 'UnauthorizedError') {
 			throw error(401, newd.error?.message || 'Unauthorized');
 		}
