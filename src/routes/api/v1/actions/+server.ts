@@ -9,7 +9,7 @@ import { ADMINMONTHER } from '$env/static/private';
 const ALLOWED_ACTIONS = ['createTask'];
 
 // Admin token for Strapi bypass (internal use)
-const ADMIN_TOKEN = ADMINMONTHER.replace(/\s+/g, '');
+const ADMIN_TOKEN = ADMINMONTHER.replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
 
 /**
  * POST /api/v1/actions
