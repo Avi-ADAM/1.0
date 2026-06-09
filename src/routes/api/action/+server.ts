@@ -24,7 +24,7 @@ import { ADMINMONTHER } from '$env/static/private';
 
 // Environment variables
 const STRAPI_ENDPOINT = import.meta.env.VITE_URL + '/graphql';
-const ADMIN_TOKEN = ADMINMONTHER.replace(/\s+/g, '');
+const ADMIN_TOKEN = ADMINMONTHER.replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
 
 // Initialize services (singleton pattern)
 let actionService: ActionService | null = null;

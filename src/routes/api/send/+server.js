@@ -8,8 +8,12 @@ import { json, error } from '@sveltejs/kit'
 import { ADMINMONTHER, CONSENSUS_PUBLIC_TOKEN, CONSENSUS_PROXY_SECRET } from '$env/static/private'
 import { createHash } from 'node:crypto'
 
-function normalizeSecret(value) {
-	return String(value ?? '').replace(/\s+/g, '');
+function normalizeSecret(value, name) {
+	let normalized = String(value ?? '').replace(/\s+/g, '');
+	if (name && normalized.startsWith(`${name}=`)) {
+		normalized = normalized.slice(name.length + 1);
+	}
+	return normalized;
 }
 
 function fingerprintSecret(value) {
@@ -23,7 +27,9 @@ function fingerprintSecret(value) {
 }
 
 function getServiceToken(isConsensusQid) {
-	return normalizeSecret(isConsensusQid ? CONSENSUS_PUBLIC_TOKEN : ADMINMONTHER);
+	return isConsensusQid
+		? normalizeSecret(CONSENSUS_PUBLIC_TOKEN, 'CONSENSUS_PUBLIC_TOKEN')
+		: normalizeSecret(ADMINMONTHER, 'ADMINMONTHER');
 }
 
 // ── Consensus qid registry ─────────────────────────────────────────────────
@@ -82,7 +88,7 @@ export async function POST({ request, cookies }) {
 
 	// ── Security: validate consensus proxy secret for service calls ──────────
 	if (isSer && isConsensusQid) {
-		const consensusProxySecret = normalizeSecret(CONSENSUS_PROXY_SECRET);
+		const consensusProxySecret = normalizeSecret(CONSENSUS_PROXY_SECRET, 'CONSENSUS_PROXY_SECRET');
 
 		if (!consensusProxySecret) {
 			throw error(500, 'Server misconfiguration: CONSENSUS_PROXY_SECRET not set');
