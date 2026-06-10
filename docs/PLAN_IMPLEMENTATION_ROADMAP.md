@@ -177,18 +177,30 @@
   (signed/pending/unsigned/unverified), עוטף את ה-eventId לאודיט.
 - 17 טסטים חדשים על ה-derivation, כולל poly-dispatch ו-skip-on-unknown.
 
-### צעד 6 — `proposal.counter` ו-`consensus.timeout` reducers
-- שני reducers עצמאיים על-בסיס PLAN_restime_in_signed_chain §3.
-- מקבלים `currentRound`/`roundStart` ל-`ProjectState`.
+### ✅ צעד 6 — `proposal.counter` + `consensus.timeout` reducers (קומיט 146.3)
+- `ProjectState.rounds: Map<SubjectKey, SubjectRound>` עם `current`/`start`/`closed?`.
+- 2 reducers + עדכון `tosplit.create` שיפתח round 0.
+- 11 טסטים שמכסים את כל מטריצת ה-race של PLAN_restime §5:
+  counter clears closed, stale timeout no-op, DAG-ancestry handles
+  ordering, subject isolation.
 
-### צעד 7 — `stateRoot` Merkle על `ProjectState`
-- `src/lib/consent/stateRoot.ts` — hash דטרמיניסטי על המבנה.
-- לא ב-events חדשים עדיין — שכבת ולידציה צד.
+### ✅ צעד 7 — `stateRoot` Merkle commitment (קומיט 146.4)
+- `src/lib/consent/stateRoot.ts` — `normalizeState`, `computeStateRoot`.
+- SHA-256 על canonical-JSON של ה-state. b64url.
+- `STATE_ROOT_VERSION = 1` קבוע — שינוי עתידי ישבור בקול.
+- 9 טסטים: commutativity, sensitivity (1ms שינוי = root אחר),
+  round state משתתף ב-root.
 
-### צעד 8 — Central Rikma C0
-- `User.platformRing` (`'inner' | 'outer' | null`).
-- migration script שמסמן הקיימים.
-- אין שינוי תפעולי.
+### ✅ צעד 8 — Central Rikma C0: `platformRing` projection (קומיט 146.5)
+- `src/lib/consent/platformRing.ts` — projection טהורה
+  `events → Map<userId, 'inner' | 'outer'>`.
+- Inner = יש לפחות `mission.approve` אחד שהם payee.
+- Outer = `project.join` בלי הסכמת משימה.
+- `mission.approve` auto-joins את ה-payee (אישור מבטא חברות).
+- 11 טסטים, כולל **התרחיש המדויק שתיארת**: 2 inner (avi+dana),
+  8 outer (committed-but-not-delivered).
+
+## כל הצעדים 1–8 הושלמו. סה"כ 130 / 130 טסטים עוברים.
 
 ---
 
