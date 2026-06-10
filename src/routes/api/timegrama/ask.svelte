@@ -1,6 +1,7 @@
 <script module>
   import { SendTo } from '$lib/send/sendTo.svelte';
-  const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER;
+  // Server-only secret — this module is imported only by timegrama/+server.js.
+  import { ADMINMONTHER } from '$env/static/private';
   export async function Ask(id, taid, fetch) {
     console.log(id, taid, 'ask compo started');
     let d = new Date();
@@ -10,7 +11,7 @@
 }}} 
  }`;
     try {
-      let res = await SendTo(qu, VITE_ADMINMONTHER).then((res) => (res = res));
+      let res = await SendTo(qu, ADMINMONTHER).then((res) => (res = res));
       console.log(res);
       if (res.data != null) {
         console.log(res.data, 'pip', res.data.ask.data.attributes.vots);
@@ -43,7 +44,7 @@
         }}} 
          }`;
             try {
-              let res2 = await SendTo(qua, VITE_ADMINMONTHER).then(
+              let res2 = await SendTo(qua, ADMINMONTHER).then(
                 (res2) => (res2 = res2)
               );
               console.log(res2, 'ask res2');
@@ -118,7 +119,7 @@ updateOpenMission(
 }
 `;
                 try {
-                  let res3 = await SendTo(qub, VITE_ADMINMONTHER).then(
+                  let res3 = await SendTo(qub, ADMINMONTHER).then(
                     (res3) => (res3 = res3)
                   );
                   console.log(res3, 'ask res3');
@@ -143,7 +144,7 @@ updateOpenMission(
             }
           `;
                       try {
-                        let res8 = await SendTo(monti, VITE_ADMINMONTHER).then(
+                        let res8 = await SendTo(monti, ADMINMONTHER).then(
                           (res8) => (res8 = res8)
                         );
                         console.log(res8, 'ask res8 ');
@@ -226,7 +227,7 @@ updateOpenMission(
                         try {
                           let res6 = await SendTo(
                             nextquery,
-                            VITE_ADMINMONTHER
+                            ADMINMONTHER
                           ).then((res6) => (res6 = res6));
                           console.log(res6, 'ask res 6');
                           if (res6.data != null) {
@@ -248,7 +249,7 @@ updateOpenMission(
             }
               `;
                     try {
-                      let res4 = await SendTo(que4, VITE_ADMINMONTHER).then(
+                      let res4 = await SendTo(que4, ADMINMONTHER).then(
                         (res4) => (res4 = res4)
                       );
                       console.log(res4, 'ask res4 ');
@@ -283,7 +284,7 @@ updateOpenMission(
             }
               `;
           try {
-            let res4 = await SendTo(que4, VITE_ADMINMONTHER).then(
+            let res4 = await SendTo(que4, ADMINMONTHER).then(
               (res4) => (res4 = res4)
             );
             console.log(res4, 'ask res4 ');

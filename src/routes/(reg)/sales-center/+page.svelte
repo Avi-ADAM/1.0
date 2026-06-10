@@ -1,25 +1,26 @@
 <script>
-  import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang.js';
-  import { salesService } from '$lib/services/salesService.js';
   import SaleComponent from '$lib/components/sales/SaleComponent.svelte';
   import { RingLoader } from 'svelte-loading-spinners';
   import { toast } from 'svelte-sonner';
-  import { page } from '$app/state';
+  import { invalidateAll } from '$app/navigation';
 
-  let loading = $state(true);
+  let { data } = $props();
+
+  let loading = $state(false);
   let error = $state(null);
-  let products = $state([]);
-  let filteredProducts = $state([]);
+  let products = $state([...data.products]);
+  let filteredProducts = $state([...data.products]);
   let searchTerm = $state('');
   let selectedProject = $state('all');
-  let projects = $state([]);
-  let userId = $state(null);
-  let token = $state(null);
-  let projectUsersCache = $state(new Map());
-  let activeSales = $state(new Map()); // Track active sale operations
-  let saleOperationId = $state(0); // Counter for unique operation IDs
-  let expandedCards = $state(new Set()); // Track expanded cards
+  let activeSales = $state(new Map());
+  let saleOperationId = $state(0);
+  let expandedCards = $state(new Set());
+
+  // Sync products from server after invalidateAll refresh
+  $effect(() => {
+    products = [...data.products];
+  });
 
   // Localization
   const texts = {
@@ -79,81 +80,6 @@
 
   let t = $derived(texts[$lang] || texts.he);
 
-  // Initialize authentication
-  onMount(async () => {
-    try {
-      // Get authentication data from cookies
-
-      const cookieValueId = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('id='))
-        ?.split('=')[1];
-
-      if (!cookieValueId) {
-        error = 'Authentication required';
-        loading = false;
-        return;
-      }
-
-      token = page.data.tok;
-      userId = cookieValueId;
-
-      await loadProducts();
-    } catch (e) {
-      console.error('Error initializing sales center:', e);
-      error = t.error;
-      loading = false;
-    }
-  });
-
-  async function loadProducts() {
-    try {
-      loading = true;
-      error = null;
-
-      const result = await salesService.getUserSellableProducts(userId, token, {
-        useCache: true,
-        cacheTTL: 15,
-        includeLoadingState: true
-      });
-
-      if (!result.success) {
-        throw new Error(result.error);
-      }
-
-      const { products: userProducts, projects: userProjects } = result.data;
-      products = userProducts;
-      projects = userProjects;
-
-      // Clear any stale active sales when reloading products
-      activeSales.clear();
-
-      // Show cache indicator if data is from cache
-      if (result.fromCache) {
-        toast.info(
-          $lang === 'he' ? 'נתונים נטענו מהמטמון' : 'Data loaded from cache'
-        );
-      }
-
-      filterProducts();
-    } catch (e) {
-      console.error('Error loading products:', e);
-      error = t.error;
-      toast.error(t.error);
-
-      // Show retry button for retryable errors
-      if (e.retryable) {
-        toast.error(
-          $lang === 'he'
-            ? 'שגיאה זמנית - נסה שוב'
-            : 'Temporary error - please retry'
-        );
-      }
-    } finally {
-      loading = false;
-    }
-  }
-
   function filterProducts() {
     let filtered = products;
 
@@ -178,9 +104,7 @@
 
   // Reactive filtering
   $effect(() => {
-    if (products.length > 0) {
-      filterProducts();
-    }
+    filterProducts();
   });
 
   function handleSaleStart(productId) {
@@ -297,13 +221,15 @@
   }
 
   async function refreshProductData() {
-    // Clear cache and reload products
-    salesService.clearAllCache();
-    await loadProducts();
-
-    toast.success(
-      $lang === 'he' ? 'נתוני המוצרים עודכנו' : 'Product data refreshed'
-    );
+    loading = true;
+    try {
+      await invalidateAll();
+      toast.success($lang === 'he' ? 'נתוני המוצרים עודכנו' : 'Product data refreshed');
+    } catch {
+      toast.error(t.error);
+    } finally {
+      loading = false;
+    }
   }
 
   function getProjectName(product) {
@@ -313,33 +239,7 @@
     );
   }
 
-  async function getProjectUsers(product) {
-    const projectId = product.attributes.projectcreates?.data?.[0]?.id;
-    if (!projectId) return [];
 
-    // Check cache first
-    if (projectUsersCache.has(projectId)) {
-      return projectUsersCache.get(projectId);
-    }
-
-    try {
-      const result = await salesService.getProjectProducts(projectId, token, {
-        useCache: true,
-        cacheTTL: 30
-      });
-
-      if (!result.success) {
-        throw new Error(result.error);
-      }
-
-      const users = result.data.project.users;
-      projectUsersCache.set(projectId, users);
-      return users;
-    } catch (error) {
-      console.error('Failed to fetch project users:', error);
-      return [];
-    }
-  }
 </script>
 
 <svelte:head>
@@ -379,7 +279,7 @@
         </div>
         <button
           class="bg-gold hover:bg-gold/80 text-grb font-bold px-6 py-2 rounded transition-colors"
-          onclick={loadProducts}
+          onclick={refreshProductData}
         >
           {$lang === 'he' ? 'לא להתייאש לנסות שוב' : 'Try Again'}
         </button>
@@ -416,7 +316,7 @@
               class="w-full p-3 rounded border border-white/30 bg-white/10 backdrop-blur-sm text-royal-blue glow-text focus:outline-none focus:ring-2 focus:ring-gold focus:border-gold"
             >
               <option value="all">{t.allProjects}</option>
-              {#each projects as project}
+              {#each data.projects as project}
                 <option value={project.id}>{project.name}</option>
               {/each}
             </select>
@@ -619,66 +519,46 @@
               {#if isCardExpanded(product.id)}
                 <div class="px-6 pb-6 border-t border-white/20 pt-4 bg-white/5">
                   {#if product.attributes.quant > 0 || product.attributes.quant === -1}
-                    {#await getProjectUsers(product)}
+                    {@const projectId = product.attributes.projectcreates?.data?.[0]?.id}
+                    {@const projectUsers = data.projectUsersMap?.[projectId] ?? []}
+                    {#if isSaleInProgress(product.id)}
                       <div class="text-center py-4">
-                        <div class="animate-pulse">
-                          <div
-                            class="h-4 bg-white/20 rounded w-3/4 mx-auto mb-2"
-                          ></div>
-                          <div class="h-8 bg-white/20 rounded"></div>
-                        </div>
-                      </div>
-                    {:then projectUsers}
-                      {#if isSaleInProgress(product.id)}
-                        <div class="text-center py-4">
-                          <div
-                            class="flex items-center justify-center space-x-2 {$lang ===
-                            'he'
-                              ? 'space-x-reverse'
-                              : ''}"
-                          >
-                            <div
-                              class="animate-spin rounded-full h-4 w-4 border-b-2 border-gold"
-                            ></div>
-                            <span
-                              class="text-royal-blue text-sm drop-shadow glow-text"
-                            >
-                              {t.processing}
-                            </span>
-                          </div>
-                        </div>
-                      {:else}
-                        <SaleComponent
-                          productId={product.id}
-                          productName={product.attributes.name}
-                          availableQuantity={product.attributes.quant}
-                          price={product.attributes.price}
-                          kindOf={product.attributes.kindOf}
-                          projectId={product.attributes.projectcreates
-                            ?.data?.[0]?.id || ''}
-                          {projectUsers}
-                          onStart={() => handleSaleStart(product.id)}
-                          onDone={(saleData, operationId) =>
-                            handleSaleSuccess(
-                              product.id,
-                              saleData,
-                              operationId
-                            )}
-                          onError={(error, operationId) =>
-                            handleSaleError(product.id, operationId, error)}
-                        />
-                      {/if}
-                    {:catch error}
-                      <div class="text-center py-4">
-                        <span
-                          class="text-red-400 text-sm drop-shadow glow-text"
+                        <div
+                          class="flex items-center justify-center space-x-2 {$lang ===
+                          'he'
+                            ? 'space-x-reverse'
+                            : ''}"
                         >
-                          {$lang === 'he'
-                            ? 'שגיאה בטעינת נתוני הפרויקט'
-                            : 'Error loading project data'}
-                        </span>
+                          <div
+                            class="animate-spin rounded-full h-4 w-4 border-b-2 border-gold"
+                          ></div>
+                          <span
+                            class="text-royal-blue text-sm drop-shadow glow-text"
+                          >
+                            {t.processing}
+                          </span>
+                        </div>
                       </div>
-                    {/await}
+                    {:else}
+                      <SaleComponent
+                        productId={product.id}
+                        productName={product.attributes.name}
+                        availableQuantity={product.attributes.quant}
+                        price={product.attributes.price}
+                        kindOf={product.attributes.kindOf}
+                        projectId={projectId || ''}
+                        {projectUsers}
+                        onStart={() => handleSaleStart(product.id)}
+                        onDone={(saleData, operationId) =>
+                          handleSaleSuccess(
+                            product.id,
+                            saleData,
+                            operationId
+                          )}
+                        onError={(error, operationId) =>
+                          handleSaleError(product.id, operationId, error)}
+                      />
+                    {/if}
                   {:else}
                     <div class="text-center py-4">
                       <span

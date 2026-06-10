@@ -129,7 +129,7 @@ async function example6_withOrchestrator(context: ActionContext) {
 
   const strapiClient = new StrapiClient(
     process.env.VITE_URL || 'https://api.1lev1.com',
-    process.env.VITE_ADMINMONTHER || ''
+    process.env.ADMINMONTHER || ''
   );
 
   const orchestrator = new NotificationOrchestrator(

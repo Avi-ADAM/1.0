@@ -55,8 +55,6 @@
   let ser = $state(xyz());
 
   let idL;
-  let bearer1;
-  let token;
 
   let ucli = $state(0);
 
@@ -300,61 +298,22 @@
     isOpen = true;
   }
   async function afreact(event) {
-    if (chat !== null) {
-      const diu = objToString(chat);
-    }
     let why = event.why;
-    console.log(why);
-    let d = new Date();
-    //  loading = true;
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
-    let dataa = {
-      data: {
-        chat: [
-          ...chat,
-          {
-            what: mypose,
-            users_permissions_user: idL,
-            why: why,
-            order: (order += 1),
-            zman: d.toISOString(),
-            ide: idL
-          }
-        ]
-      }
-    };
+    // Server appends the chat entry (fetch current → append → save) so the JWT
+    // stays in the HttpOnly cookie and never reaches the client.
     try {
-      await fetch(`${baseUrl}/api/asks/${askId}?populate=*`, {
-        method: 'PUT',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(dataa)
-      })
-        .then((r) => r.json())
-        .then((data) => (miDatan = data));
-      console.log(miDatan);
-      chat.push({
-        what: mypose,
-        users_permissions_user: idL,
-        why: why,
-        order: (order += 1),
-        zman: d.toISOString(),
-        ide: idL
+      const result = await executeAction('addAskChatEntry', {
+        askId: String(askId),
+        why: String(why),
+        what: mypose
       });
-      chat = chat;
-      clicked = false;
-      nowId.set(
-        miDatan.data.attributes.chat[miDatan.data.attributes.chat.length - 1].id
-      );
-      //   loading = false;
+      if (result.success) {
+        chat = result.data.chat ?? chat;
+        if (result.data.lastId) nowId.set(result.data.lastId);
+        clicked = false;
+      } else {
+        error1 = result.error;
+      }
     } catch (e) {
       error1 = e;
       console.log(error1);
@@ -374,7 +333,6 @@
   import { RingLoader } from 'svelte-loading-spinners';
   import Diun from './diun.svelte';
   import { nowId } from '$lib/stores/pendMisMes.js';
-  import { page } from '$app/state';
   /**
    * @typedef {Object} Props
    * @property {boolean} [low]

@@ -1,8 +1,8 @@
 <script>
 import Addnewskil from './addNewSkill.svelte';
            import { lang } from '$lib/stores/lang.js'
+import { executeAction } from '$lib/client/actionClient';
 const baseUrl = import.meta.env.VITE_URL
-import { page } from '$app/state'
 let addskil = false;
 import Addnewro from './addNewRole.svelte';
 let addro = false;
@@ -11,18 +11,17 @@ import { onMount } from 'svelte';
 //import ChoosRole from './choosRole.svelte';
 /**
  * @param {Object} props - Component properties
- * @param {( { id: any, name: any }) => void} [props.onNew] - Callback for when a new mission is created.
+ * @param {(payload: { id: any, name: any }) => void} [props.onNew] - Callback for when a new mission is created.
  */
 let { missionNewId = $bindable(), skills2 = $bindable([]), roles = $bindable([]), onNew } = $props();
 let error1 = null
-let token;
-let meData = [];
+let newName;
 function dis () {
   onNew?.({
     id: missionNewId,
     name: newName,
     } );
-};      
+};
 let selectedrole = $state([])
     
     onMount(async () => {
@@ -110,48 +109,26 @@ let missionName_value = $state();
      let loading = $state(true)
 
 async function subm() {
-    token  = page.data.tok; 
-    let bearer1 = 'bearer' + ' ' + token;
-tafkidimslist= find_role_id(selectedrole)
+  tafkidimslist = find_role_id(selectedrole);
   skillslist = find_skill_id(selected);
-  let d = new Date
-   let linkg =`${baseUrl}/graphql` ;
-              try {
-             await fetch(linkg, {
-              method: 'POST',
-       
-        headers: {
-            'Content-Type': 'application/json',
-               'Authorization': bearer1
-                  },
-        body: 
-        JSON.stringify({query: 
-          ` mutation { createMission(
-       data: {
-        missionName: "${missionName_value}",
-         skills: [${skillslist}],
-        tafkidims: [${tafkidimslist}],
-        descrip: "${desM}",
-        publishedAt: "${d.toISOString()}"       
+  try {
+    const result = await executeAction('createMissionTemplate', {
+      missionName: missionName_value,
+      descrip: desM,
+      skillIds: skillslist.map(String),
+      roleIds: tafkidimslist.map(String)
+    });
+    if (!result.success) {
+      console.log(result.error);
+      return;
     }
-  ){
-         data{
-              id attributes{missionName}
-          }
+    missionNewId = result.data.id;
+    newName = missionName_value;
+    dis();
+  } catch (e) {
+    console.log(e);
   }
- }`
-        })
- })
-  .then(r => r.json())
-  .then(data => meData = data);
-      console.log(meData)
-        missionNewId = meData.data.createMission.data.id;
-        newName = meData.data.createMission.data.attributes.missionName;
-          dis ();
-    } catch (e) {
-            console.log(e)
-        }
-    };
+};
     
 function addnew (event){ 
     const newOb = event.skob;

@@ -9,7 +9,8 @@ import { Ask } from './ask.svelte';
 //ask need to creater 0on first vote or on request if the requester is project member4
 //מעביר ראשון ראשון ברסק , אם מישהו ביקש מחכים למענה בעניינו ורק לאחר שיש כן 1 לפחות או לא 1 לפחות  ניתן לקבלו או לא 1 לפחות וניתן להציע לאנשים נוספים, בקשה של הקודם כאשר יש לא נשארת אך ניתן להוסיף עוד סקשות 
 import { SendTo } from '$lib/send/sendTo.svelte';
-const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER;
+// Server-only secret — never exposed to the client bundle (no VITE_ prefix).
+import { ADMINMONTHER } from '$env/static/private';
 async function x(id,kind,taid, fetch){
     console.log(id,kind,"13 server")
     if (kind == "ask"){
@@ -51,7 +52,7 @@ export async function GET({ fetch }) {
  }
     `; 
  try {
-   let res = await SendTo(qu, VITE_ADMINMONTHER).then((res) => (res = res));
+   let res = await SendTo(qu, ADMINMONTHER).then((res) => (res = res));
    console.log(res,"start 49")
    if (res.data != null) {
      console.log(res.data, 'pip');
@@ -61,7 +62,12 @@ export async function GET({ fetch }) {
        await Promise.all(all.map(async (element) =>{
         console.log(element, 'element line52');
         const dateof = new Date(element.attributes.date)
-        const myid = element.attributes[element.attributes.whatami].data.id;
+        const relation = element.attributes[element.attributes.whatami];
+        if (!relation || relation.data == null) {
+          console.warn(`timegrama ${element.id}: whatami="${element.attributes.whatami}" has no relation data, skipping`);
+          return;
+        }
+        const myid = relation.data.id;
         const tgid = element.id;
         console.log(dateof,myid, " line56");
         if (d >= dateof) {

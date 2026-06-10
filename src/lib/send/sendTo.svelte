@@ -1,5 +1,4 @@
 <script module>
-  import { page } from '$app/state';
   const HTTP_ST_ENDPOINT = import.meta.env.VITE_URL;
   export async function SendTo(dat, toc) {
     if (toc == null || toc == undefined || toc == true || toc == false) {

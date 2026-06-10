@@ -87,7 +87,16 @@ import { createResourceRequestConfig } from './createResourceRequest.js';
 import { createMashaabimConfig } from './createMashaabim.js';
 import { updateUserRelationConfig } from './updateUserRelation.js';
 import { loadCatalogConfig } from './loadCatalog.js';
+import { toggleGuideStatusConfig } from './toggleGuideStatus.js';
+import { createMissionTemplateConfig } from './createMissionTemplate.js';
 import { offerWishHelpConfig } from './offerWishHelp.js';
+import { addAskmChatEntryConfig } from './addAskmChatEntry.js';
+import { addAskChatEntryConfig } from './addAskChatEntry.js';
+import { createSaleConfig } from './createSale.js';
+import { updateUserProfilePicConfig } from './updateUserProfilePic.js';
+import { updateUserBasicConfig } from './updateUserBasic.js';
+import { archiveUserResourceConfig } from './archiveUserResource.js';
+import { createWeaveConfig } from './createWeave.js';
 
 
 /**
@@ -192,6 +201,12 @@ export function registerAllActions(): void {
   registerAction(confirmHalukaConfig);
   registerAction(addHalukaChatEntryConfig);
 
+  // Askm chat entry
+  registerAction(addAskmChatEntryConfig);
+
+  // Ask chat entry (reqtosherut.svelte)
+  registerAction(addAskChatEntryConfig);
+
   // Decision (project-level vote: logo change, etc.)
   registerAction(voteOnDecisionConfig);
 
@@ -234,6 +249,23 @@ export function registerAllActions(): void {
   // User profile relation update + catalog loader (edit.svelte)
   registerAction(updateUserRelationConfig);
   registerAction(loadCatalogConfig);
+
+  // Onboarding guide visibility toggle (editBasic.svelte)
+  registerAction(toggleGuideStatusConfig);
+
+  // Standalone mission catalog entry (addNewMission.svelte)
+  registerAction(createMissionTemplateConfig);
+
+  // Sale reporting (SaleComponent — shared by gift/[id] and sales-center)
+  registerAction(createSaleConfig);
+
+  // User profile (me page): picture, basic info, resource archive
+  registerAction(updateUserProfilePicConfig);
+  registerAction(updateUserBasicConfig);
+  registerAction(archiveUserResourceConfig);
+
+  // Weave creation (baci.svelte — "יצירת ריקמה", reusable project creation)
+  registerAction(createWeaveConfig);
 
   // Future actions will be registered here
   // registerAction(createTaskAction);

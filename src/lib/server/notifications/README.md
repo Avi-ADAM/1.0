@@ -47,7 +47,7 @@ import { StrapiClient } from '$lib/server/actions/StrapiClient';
 // Create instance
 const strapiClient = new StrapiClient(
   process.env.VITE_URL || '',
-  process.env.VITE_ADMINMONTHER || ''
+  process.env.ADMINMONTHER || ''
 );
 const orchestrator = new NotificationOrchestrator(strapiClient);
 

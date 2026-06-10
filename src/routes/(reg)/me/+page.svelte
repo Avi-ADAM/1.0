@@ -12,8 +12,10 @@
   import TourTip from '$lib/components/tour/tourMeEnd.svelte';
   import { lang, doesLang, langUs } from '$lib/stores/lang.js';
   import { locale } from '$lib/translations';
-  import { onMount, tick } from 'svelte';
-  import axios from 'axios';
+  import { onMount, onDestroy, tick } from 'svelte';
+  import { browser } from '$app/environment';
+  import { executeAction } from '$lib/client/actionClient';
+  import { hydrateUser } from '$lib/stores/userStore.js';
   import { draw } from 'svelte/transition';
   import Addnew from '$lib/components/addnew/baci.svelte';
   import { baciStore } from '$lib/stores/baciStore.js';
@@ -25,20 +27,22 @@
   //import Profile from '../../lib/components/userPr/new.svelte';
   //import { addS } from '../../lib/stores/addS.js';
   import { idPr } from '$lib/stores/idPr.js';
-  import { goto } from '$app/navigation';
+  import { goto, invalidateAll } from '$app/navigation';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { fly, scale } from 'svelte/transition';
+  let { data } = $props();
+
   let iwant = $state(false);
   let isOpen = $state(false);
   let isOpenM = $state(false);
-  let isG = $state(false);
+  let isG = $state(data.meData?.profilManualAlready ?? false);
   let current = $state('');
 
-  let url1 = `${baseUrl}/api/upload`;
+  // Upload goes through the server proxy (keeps JWT in the HttpOnly cookie)
+  let url1 = `/api/upload`;
   let updX = $state(0);
-  let token;
   let files;
-  let idLi;
+  let online = $state(browser ? navigator.onLine : true);
 
   let skil = [];
   let taf = [];
@@ -48,10 +52,7 @@
   let total = $state(0);
   let odata = [];
   let allvn;
-  let picLink = $state(
-    'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'
-  );
-  let idL;
+  let picLink = $state(data.picLink);
   let addSl = $state(false);
   let addSl1 = $state(false);
   let addSl2 = $state(false);
@@ -65,20 +66,12 @@
   let addP = $state(false);
   let st = $state(0);
   let stylef = $state('31px');
-  let meData = $state(start());
+  let meData = $state(data.meData);
   function isUCBrowser() {
     return /UCWEB|UCBrowser/i.test(navigator.userAgent);
   }
 
-  function sendP() {
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idLi = cookieValueId;
-    token = page.data.tok;
-    let bearer1 = 'bearer' + ' ' + token;
-    let link = `${baseUrl}/api/users/${idLi}`;
+  async function sendP() {
     // Check if FormData is empty
     let hasFiles = false;
     for (let pair of files.entries()) {
@@ -92,328 +85,98 @@
         en: 'Please select a file to upload'
       };
       toast.warning(msg[$lang]);
+      a = 0;
       return;
     }
 
-    axios
-      .post(url1, files, {
-        headers: {
-          Authorization: bearer1
-          // 'Content-Type': 'multipart/form-data' is automatically set by axios for FormData
-        }
-      })
-      .then(({ data }) => {
-        const imageId = data[0].id;
-        console.log(imageId);
-        sendpg(imageId);
-      })
-      .catch((error) => {
-        console.log('An error occurred:', error.response);
-        const msg = {
-          he: error.response?.data?.message || 'שגיאה בהעלאת קובץ',
-          en: error.response?.data?.message || 'Error uploading file'
-        };
-        toast.error(msg[$lang]);
-      });
-  }
-
-  async function sendpg(imageId) {
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idLi = cookieValueId;
-    token = page.data.tok;
-    let bearer1 = 'bearer' + ' ' + token;
-    let res;
-    let linkg = `${baseUrl}/graphql`;
     try {
-      await fetch(linkg, {
-        method: 'POST',
+      // 1) Upload the file through the server proxy (reads JWT from cookie)
+      const upRes = await fetch(url1, { method: 'POST', body: files });
+      if (!upRes.ok) throw new Error('upload failed');
+      const uploaded = await upRes.json();
+      const imageId = uploaded[0].id;
 
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `mutation { updateUsersPermissionsUser(
-    id:${idLi}
-      data: {profilePic: ${imageId} }
+      // 2) Link the uploaded media to the user via the unified action
+      const result = await executeAction('updateUserProfilePic', {
+        imageId: String(imageId)
+      });
 
-  ){
-      data {
-        attributes{
-        profilePic { data {
-               attributes{ url formats}}
-          }
+      if (!result.success) {
+        a = 0;
+        return; // executeAction already surfaced the error toast
       }
-  }
-}
-}
-`
-        })
-      })
-        .then((r) => r.json())
-        .then((data) => (res = data.data.updateUsersPermissionsUser.data));
-      console.log(res);
-      uPic.set(
-        res.attributes.profilePic.data.attributes.formats?.thumbnail?.url ||
-          res.attributes.profilePic.data.attributes.url
-      );
-      picLink = $uPic;
-      uPic.set(
-        res.attributes.profilePic.data.attributes.formats?.small?.url ||
-          res.attributes.profilePic.data.attributes.url
-      );
-      picLink = $uPic;
+
+      // Server reload (triggered by the action updateStrategy) refreshes
+      // picLink / uPic; just close the editor here.
       updX = 0;
       isOpenM = false;
       a = 0;
     } catch (e) {
       error1 = e;
+      console.log('An error occurred:', e);
+      const msg = {
+        he: 'שגיאה בהעלאת קובץ',
+        en: 'Error uploading file'
+      };
+      toast.error(msg[$lang]);
+      a = 0;
     }
   }
-  let meDataa = $state([]);
   let load = $state(false);
   function project(id) {
     load = true;
     idPr.set(id);
     goto('/moach');
   }
-  let mail = $state(),
-    lango;
-  let cards = $state(true);
-  async function start() {
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idL = cookieValueId;
-    token = page.data.tok;
-    let bearer1 = 'bearer' + ' ' + token;
-    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-    let linkgra = `${baseUrl}/graphql`;
-    try {
-      await fetch(linkgra, {
-        method: 'POST',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `query { usersPermissionsUser (id: ${idL}){
-    data {
-      id attributes{
-           frd
-            fblink twiterlink discordlink githublink
-            bio
-            preferCards
-            lang
-            machshirs{data{id attributes{jsoni}}}
-            email
-            noMail
-            username
-            hervachti
-            profilManualAlready
-            profilePic { data{ attributes{url formats} }}
-            projects_1s {data{ id attributes {projectName}} }
-            skills { data{ id attributes{ skillName ${$lang == 'he' ? 'localizations { data {attributes{skillName} }}' : ''}}}}
-            sps (filters: { archived: { ne: true } }) { data{id attributes{ name panui}}}
-            tafkidims { data { id attributes{ roleDescription  ${$lang == 'he' ? 'localizations {data {attributes{roleDescription } }}' : ''}}}}
-            vallues {data{ id attributes {valueName ${$lang == 'he' ? 'localizations{ data { attributes{ valueName } } }' : ''}}}}
-            work_ways {data{ id attributes{workWayName  ${$lang == 'he' ? 'localizations {data{attributes{workWayName}} }' : ''}}}}
-          }
-        }
-      }me { id }
- } `
-        })
-      })
-        .then((r) => r.json())
-        .then((data) => (meDataa = data));
-      if (meDataa.data != null) {
-        if (meDataa.data.me.id === idL && meDataa.data.me != null) {
-          if (
-            meDataa.data.usersPermissionsUser.data.attributes
-              .profilManualAlready != true
-          ) {
-            showSaveDialog = true; // Show dialog instead of running directly
-          }
-          console.log(meDataa.data.usersPermissionsUser.data.attributes);
-          meData = meDataa.data.usersPermissionsUser.data.attributes;
-          // Initialize selected2 for the data arrays themselves
-          if (
-            meData.skills &&
-            meData.skills.data &&
-            meData.skills.data.selected2 === undefined
-          ) {
-            meData.skills.data.selected2 = [];
-          }
-          if (
-            meData.tafkidims &&
-            meData.tafkidims.data &&
-            meData.tafkidims.data.selected2 === undefined
-          ) {
-            meData.tafkidims.data.selected2 = [];
-          }
-          if (
-            meData.sps &&
-            meData.sps.data &&
-            meData.sps.data.selected2 === undefined
-          ) {
-            meData.sps.data.selected2 = [];
-          }
-          if (
-            meData.vallues &&
-            meData.vallues.data &&
-            meData.vallues.data.selected2 === undefined
-          ) {
-            meData.vallues.data.selected2 = [];
-          }
-          if (
-            meData.work_ways &&
-            meData.work_ways.data &&
-            meData.work_ways.data.selected2 === undefined
-          ) {
-            meData.work_ways.data.selected2 = [];
-          }
-          isG =
-            meDataa.data.usersPermissionsUser.data.attributes
-              .profilManualAlready;
-          mail = meData.email;
-          liUN.set(meData.username);
-          lango = meData.lang || 'he';
-          if (lango == 'en' || lango == 'he') {
-            // Check if lang store is different from lango
-            if ($lang !== lango) {
-              // Sync all stores
-              lang.set(lango);
-              locale.set(lango);
-              langUs.set(lango);
-              doesLang.set(true);
-              // Add to cookies
-              document.cookie =
-                `lang=${lango}; expires=` + new Date(2027, 0, 1).toUTCString();
-              // Re-fetch data to include new lang data
-              await start();
-              return;
-            } else {
-              // Sync all stores
-              lang.set(lango);
-              locale.set(lango);
-              langUs.set(lango);
-              doesLang.set(true);
-              document.cookie =
-                `lang=${lango}; expires=` + new Date(2027, 0, 1).toUTCString();
-            }
-          }
-          if ($lang == 'he') {
-            for (let i = 0; i < meData.vallues.data.length; i++) {
-              if (
-                meData.vallues.data[i].attributes.localizations.data.length > 0
-              ) {
-                meData.vallues.data[i].attributes.valueName =
-                  meData.vallues.data[
-                    i
-                  ].attributes.localizations.data[0].attributes.valueName;
-              }
-            }
-          }
-          if ($lang == 'he') {
-            for (let i = 0; i < meData.skills.data.length; i++) {
-              if (
-                meData.skills.data[i].attributes.localizations.data.length > 0
-              ) {
-                meData.skills.data[i].attributes.skillName =
-                  meData.skills.data[
-                    i
-                  ].attributes.localizations.data[0].attributes.skillName;
-              }
-            }
-          }
-          meData = meData;
+  let mail = $state(data.meData?.email);
+  let lango = $state(data.meData?.lang || 'he');
+  let cards = $state(data.meData?.preferCards ?? true);
 
-          if ($lang == 'he') {
-            for (let i = 0; i < meData.tafkidims.data.length; i++) {
-              if (
-                meData.tafkidims.data[i].attributes.localizations.data.length >
-                0
-              ) {
-                meData.tafkidims.data[i].attributes.roleDescription =
-                  meData.tafkidims.data[
-                    i
-                  ].attributes.localizations.data[0].attributes.roleDescription;
-              }
-            }
-          }
-          meData = meData;
-          if ($lang == 'he') {
-            for (let i = 0; i < meData.work_ways.data.length; i++) {
-              if (
-                meData.work_ways.data[i].attributes.localizations.data.length >
-                0
-              ) {
-                meData.work_ways.data[i].attributes.workWayName =
-                  meData.work_ways.data[
-                    i
-                  ].attributes.localizations.data[0].attributes.workWayName;
-              }
-            }
-          }
-          cards = meData.preferCards ?? true;
-          //    roundText (meData.username);
-          /// pics = meData.profilePic.formats.small.url;
-
-          total = meData.hervachti ? meData.hervachti : 0;
-          fblink = meData.fblink;
-          twiterlink = meData.twiterlink;
-          discordlink = meData.discordlink;
-          githublink = meData.githublink;
-          noMail = meData.noMail;
-          if (meData.profilePic.data != null) {
-            uPic.set(
-              meData.profilePic.data.attributes.formats?.thumbnail?.url ||
-                meData.profilePic.data.attributes.url
-            );
-            picLink = $uPic;
-            uPic.set(
-              meData.profilePic.data.attributes.formats?.small?.url ||
-                meData.profilePic.data.attributes.url
-            );
-            picLink = $uPic;
-            let b = '/ar_1.0,c_thumb,g_face,w_0.6,z_0.7/r_max';
-            let output = [picLink.slice(0, 48), b, picLink.slice(48)].join('');
-            picLink = output;
-          } else {
-            picLink =
-              'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
-          }
-          localStorage.setItem('picLink', JSON.stringify(picLink));
-
-          total = meData.hervachti;
-          meData = meData;
-        } else {
-          goto('/login');
-        }
-      } else {
-        goto('/login');
-      }
-    } catch (e) {
-      error1 = e;
-      console.log(e);
-      if (e == 'TypeError: Failed to fetch') {
-        // setTimeout(start(), 10000);
-        const msg = {
-          he: 'נראה שיש בעיה בחיבור לאינטרנט, נא לנסות שוב',
-          en: 'seems llike we have a internet connection problem, please try again'
-        };
-        toast.warning(msg[$lang]);
-        //getcetch & show msg this from cetch bcz you have no net
-        // else no net page
-        //await net then again??
+  /**
+   * Sync local state from the server load. Re-runs whenever `data` changes —
+   * i.e. after invalidate('app:meProfile') triggered by one of our actions or
+   * by a socket notification from another device. This is what makes the
+   * profile reactive to updates.
+   */
+  $effect(() => {
+    if (!data.meData) return;
+    meData = data.meData;
+    picLink = data.picLink;
+    total = data.total;
+    mail = data.meData.email;
+    lango = data.meData.lang || 'he';
+    cards = data.meData.preferCards ?? true;
+    fblink = data.meData.fblink;
+    twiterlink = data.meData.twiterlink;
+    discordlink = data.meData.discordlink;
+    githublink = data.meData.githublink;
+    noMail = data.meData.noMail;
+    isG = data.meData.profilManualAlready;
+    // Hydrate the app-wide user cache so other pages don't re-fetch.
+    hydrateUser(data.meData);
+    if (browser) {
+      liUN.set(data.meData.username);
+      uPic.set(data.avatarSmall);
+      if (data.avatarSmall) {
+        localStorage.setItem('picLink', JSON.stringify(data.picLink));
       }
     }
-    return meData;
-  }
+  });
+
+  // Keep the language stores in sync with the user's saved preference.
+  $effect(() => {
+    const lng = data.meData?.lang;
+    if (browser && (lng === 'he' || lng === 'en')) {
+      if ($lang !== lng) {
+        lang.set(lng);
+        locale.set(lng);
+        langUs.set(lng);
+        doesLang.set(true);
+        document.cookie =
+          `lang=${lng}; expires=` + new Date(2027, 0, 1).toUTCString();
+      }
+    }
+  });
   function reverseString(str) {
     return str.split('').reverse().join('');
   }
@@ -458,46 +221,23 @@
     githublink = $state(),
     noMail = $state();
   async function sendD() {
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idLi = cookieValueId;
-    token = page.data.tok;
-    let bearer1 = 'bearer' + ' ' + token;
-    let link = `${baseUrl}/api/users/${idLi}`;
-    axios
-      .put(
-        link,
-        {
-          username: userName_value,
-          bio: biog,
-          frd: frd,
-          lang: lango,
-          fblink: fblink,
-          twiterlink: twiterlink,
-          discordlink: discordlink,
-          githublink: githublink,
-          preferCards: cards,
-          noMail: noMail
-        },
-        {
-          headers: {
-            Authorization: bearer1
-          }
-        }
-      )
-      .then((response) => {
-        meData = response.data;
-        isOpenM = false;
-        isOpen = false;
-        a = 0;
-        start();
-        //  updpic.set(0);
-      })
-      .catch((error) => {
-        console.log('An error occurred:', error.response);
-      });
+    const result = await executeAction('updateUserBasic', {
+      username: userName_value,
+      bio: biog,
+      frd: frd,
+      lang: lango,
+      fblink: fblink,
+      twiterlink: twiterlink,
+      discordlink: discordlink,
+      githublink: githublink,
+      preferCards: cards,
+      noMail: noMail
+    });
+    isOpenM = false;
+    isOpen = false;
+    a = 0;
+    // On success the action's updateStrategy reloads the profile (app:meProfile),
+    // so the synced $effect refreshes meData. executeAction already toasts errors.
   }
 
   function callbackFunction(event) {
@@ -678,46 +418,23 @@
         ? `המשאב ${nj} ימחק האם להמשיך?`
         : `the resource ${nj} will be deleted, do you want to continue?`;
   }
-  let miDa = [];
   async function han() {
     a = 2;
-    console.log(spid);
-
-    token = page.data.tok;
-    let bearer1 = 'bearer' + ' ' + token;
-    let linkgra = `${baseUrl}/graphql`;
-    try {
-      await fetch(linkgra, {
-        method: 'POST',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `mutation { updateSp(
-   id: ${spid}
-      data: {
-        archived: true
-      }
-  ) {data {id }}
- } `
-        })
-      })
-        .then((r) => r.json())
-        .then((data) => (miDa = data));
-      console.log(miDa);
-      const tor = miDa.data.updateSp.data.id;
+    const result = await executeAction('archiveUserResource', {
+      spId: String(spid)
+    });
+    if (result.success) {
+      // Optimistic local removal for snappy UX; the action's updateStrategy
+      // also reloads the profile to reconcile.
       const oldob = meData.sps.data;
       const x = oldob.map((c) => c.id);
-      const indexy = x.indexOf(tor);
-      oldob.splice(indexy, 1);
+      const indexy = x.indexOf(result.data?.id ?? spid);
+      if (indexy > -1) oldob.splice(indexy, 1);
       meData.sps.data = oldob;
       meData = meData;
-      a = 0;
-      isOpen = false;
-    } catch (e) {
-      error1 = e;
     }
+    a = 0;
+    isOpen = false;
   }
   //
   $effect(async () => {
@@ -750,6 +467,28 @@
     isG = true;
     run();
   }
+
+  // --- Connectivity ----------------------------------------------------------
+  // Profile refresh on socket events is centralized in +layout.svelte (single
+  // listener → patches userStore + invalidates 'app:meProfile'), so this page
+  // doesn't open its own socket listener. Here we only track connectivity.
+  onMount(() => {
+    const goOnline = () => {
+      online = true;
+      invalidateAll(); // refetch fresh data once connectivity returns
+    };
+    const goOffline = () => {
+      online = false;
+    };
+    window.addEventListener('online', goOnline);
+    window.addEventListener('offline', goOffline);
+
+    onDestroy(() => {
+      window.removeEventListener('online', goOnline);
+      window.removeEventListener('offline', goOffline);
+    });
+  });
+
   const title = {
     he: 'פרופיל והגדרות 1💗1',
     en: '1💗1 profile and settings',
@@ -863,7 +602,7 @@
   const plt = { he: 'בחירת תפקידים', en: 'choose roles', ar: 'اختيار أدوار' };
   let width = $state(),
     height = $state();
-  let showSaveDialog = $state(false);
+  let showSaveDialog = $state(data.showGuide);
   const dialogHeader = {
     he: 'הצגת מדריך משתמש',
     en: 'Show User Guide',
@@ -889,11 +628,34 @@
 <svelte:head>
   <title>{title[$lang]}</title>
 </svelte:head>
-{#await meData}
+{#if (!online || data.loadError) && meData}
+  <div class="stale-banner" dir="rtl">
+    {$lang === 'he'
+      ? 'אין חיבור — מוצג מידע שמור'
+      : 'No connection — showing saved data'}
+  </div>
+{/if}
+{#if data.loadError && !meData}
+  <div class="body grid items-center justify-center text-center" dir="rtl">
+    <div>
+      <p class="text-barbi">
+        {$lang === 'he'
+          ? 'נראה שיש בעיה בחיבור, נא לנסות שוב'
+          : 'Seems there is a connection problem, please try again'}
+      </p>
+      <button
+        onclick={() => invalidateAll()}
+        class="bg-gradient-to-br from-barbi to-mpink text-gold font-bold py-2 px-4 rounded-full mt-2"
+      >
+        {$lang === 'he' ? 'נסה שוב' : 'Retry'}
+      </button>
+    </div>
+  </div>
+{:else if !meData}
   <div class="body button-gold grid items-center justify-center">
     <Lowding height="30vh" />
   </div>
-{:then meData}
+{:else}
   <Dialog
     bind:showSaveDialog
     {dialogHeader}
@@ -902,70 +664,17 @@
     {clearButton}
     onSaveTimer={async () => {
       showSaveDialog = false;
-
-      // Update server to mark guide as not viewed (so it can show again)
-      try {
-        if (page.data.tok) {
-          const bearer1 = 'bearer' + ' ' + page.data.tok;
-          await fetch(`${baseUrl}/graphql`, {
-            method: 'POST',
-            headers: {
-              Authorization: bearer1,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              query: `mutation { 
-                updateUsersPermissionsUser(
-                  id: ${parseInt(idL)}, 
-                  data: { profilManualAlready: false }
-                ) { 
-                  data { id } 
-                } 
-              }`
-            })
-          });
-
-          // Set cookie to show guide
-          document.cookie = `guidMe=again; expires=${new Date(2027, 0, 1).toUTCString()}; path=/`;
-        }
-      } catch (e) {
-        console.error('Failed to update guide status:', e);
-      }
-
+      // Resume guide → profilManualAlready=false
+      await executeAction('toggleGuideStatus', { show: true });
+      document.cookie = `guidMe=again; expires=${new Date(2027, 0, 1).toUTCString()}; path=/`;
       run();
     }}
     onClearTimer={async () => {
       showSaveDialog = false;
       isG = true; // Mark as viewed without showing
-
-      // Update server to mark guide as viewed
-      try {
-        if (page.data.tok) {
-          const bearer1 = 'bearer' + ' ' + page.data.tok;
-          await fetch(`${baseUrl}/graphql`, {
-            method: 'POST',
-            headers: {
-              Authorization: bearer1,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              query: `mutation { 
-                updateUsersPermissionsUser(
-                  id: ${parseInt(idL)}, 
-                  data: { profilManualAlready: true }
-                ) { 
-                  data { id } 
-                } 
-              }`
-            })
-          });
-
-          // Also set cookie to remember choice
-          document.cookie = `guidMe=done; expires=${new Date(2027, 0, 1).toUTCString()}; path=/`;
-        }
-      } catch (e) {
-        console.error('Failed to update guide status:', e);
-      }
+      // Stop guide → profilManualAlready=true
+      await executeAction('toggleGuideStatus', { show: false });
+      document.cookie = `guidMe=done; expires=${new Date(2027, 0, 1).toUTCString()}; path=/`;
     }}
   />
   <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer}>
@@ -993,7 +702,7 @@
               onGuidMeChange={(value) => (isG = !value)}
               checked={cards}
               lango={$lang}
-              uid={meDataa.data.me.id}
+              uid={data.uid}
               {fblink}
               {twiterlink}
               {noMail}
@@ -1345,9 +1054,23 @@
     <Addnew userName_value={meData.username} />
   {/if}
   <!-- המשימות שסיימתי-->
-{/await}
+{/if}
 
 <style>
+  .stale-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 800;
+    text-align: center;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.85rem;
+    background: var(--gold, #d4af37);
+    color: #3b2f00;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+
   .center-upload {
     position: fixed;
     top: 50%;

@@ -52,6 +52,10 @@ export async function load({ locals, params, fetch }) {
     console.log('existingRequests', existingRequests);
   }
 
+  // Extract project users and membership from already-loaded product data
+  const projectUsers = alld?.projectcreates?.data?.[0]?.attributes?.user_1s?.data ?? [];
+  const isMember = uid ? projectUsers.some((u) => String(u.id) === String(uid)) : false;
+
   return {
     uid,
     lang,
@@ -59,7 +63,9 @@ export async function load({ locals, params, fetch }) {
     tok: tok == false ? false : true,
     archived,
     alld,
-    existingRequests
+    existingRequests,
+    projectUsers,
+    isMember
   };
 }
 

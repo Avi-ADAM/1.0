@@ -39,8 +39,10 @@
       isAuthed = true;
       initialForum(true, [], data.uid);
       console.log(data.uid, $forum);
-      initialWebS(data.tok, data.uid);
-      initialWebSP(data.tok, data.uid);
+      // data.tok is now just a boolean login flag; the socket authenticates from
+      // the HttpOnly cookie, so no token is passed (these fns ignore arg 1).
+      initialWebS(null, data.uid);
+      initialWebSP(null, data.uid);
     } else {
       // jwt is httpOnly now; rely on server-provided token or 'when' cookie for auth flag
       const cookieT = document.cookie

@@ -5,10 +5,32 @@ const ep = HTTP_ST_ENDPOINT + "/graphql"
 import { qids } from './qids.js'
 import { validateAllQids, validateQuery } from './qidsValidator.js'
 import { json, error } from '@sveltejs/kit'
+import { ADMINMONTHER, CONSENSUS_PUBLIC_TOKEN, CONSENSUS_PROXY_SECRET } from '$env/static/private'
+import { createHash } from 'node:crypto'
 
-const VITE_ADMINMONTHER        = import.meta.env.VITE_ADMINMONTHER;
-const CONSENSUS_PUBLIC_TOKEN   = import.meta.env.VITE_CONSENSUS_PUBLIC_TOKEN;   // limited-scope API token for consensus
-const CONSENSUS_PROXY_SECRET   = import.meta.env.VITE_CONSENSUS_PROXY_SECRET;   // shared secret with consensus proxy
+function normalizeSecret(value, name) {
+	let normalized = String(value ?? '').replace(/\s+/g, '');
+	if (name && normalized.startsWith(`${name}=`)) {
+		normalized = normalized.slice(name.length + 1);
+	}
+	return normalized;
+}
+
+function fingerprintSecret(value) {
+	const normalized = normalizeSecret(value);
+
+	return {
+		present: normalized.length > 0,
+		length: normalized.length,
+		sha12: normalized ? createHash('sha256').update(normalized).digest('hex').slice(0, 12) : null
+	};
+}
+
+function getServiceToken(isConsensusQid) {
+	return isConsensusQid
+		? normalizeSecret(CONSENSUS_PUBLIC_TOKEN, 'CONSENSUS_PUBLIC_TOKEN')
+		: normalizeSecret(ADMINMONTHER, 'ADMINMONTHER');
+}
 
 // ── Consensus qid registry ─────────────────────────────────────────────────
 /** qids that belong to the consensus feature */
@@ -66,11 +88,13 @@ export async function POST({ request, cookies }) {
 
 	// ── Security: validate consensus proxy secret for service calls ──────────
 	if (isSer && isConsensusQid) {
-		if (!CONSENSUS_PROXY_SECRET) {
+		const consensusProxySecret = normalizeSecret(CONSENSUS_PROXY_SECRET, 'CONSENSUS_PROXY_SECRET');
+
+		if (!consensusProxySecret) {
 			throw error(500, 'Server misconfiguration: CONSENSUS_PROXY_SECRET not set');
 		}
 		const incoming = request.headers.get('x-consensus-secret');
-		if (incoming !== CONSENSUS_PROXY_SECRET) {
+		if (incoming !== consensusProxySecret) {
 			throw error(401, 'Unauthorized: Invalid consensus proxy secret');
 		}
 	}
@@ -80,7 +104,7 @@ export async function POST({ request, cookies }) {
 	// calls keep the admin token; JWT calls use the user's own token.
 	let jw;
 	if (isSer) {
-		jw = isConsensusQid ? CONSENSUS_PUBLIC_TOKEN : VITE_ADMINMONTHER;
+		jw = getServiceToken(isConsensusQid);
 	} else {
 		jw = cookies.get('jwt');
 	}
@@ -111,7 +135,7 @@ export async function POST({ request, cookies }) {
 		if (identity.name)       variablesObject.authorName       = identity.name;
 	}
 
-	const bearer1 = 'bearer ' + jw;
+	const bearer1 = 'Bearer ' + jw;
 
 	// ── Server-side idempotent vote handler ──────────────────────────────────
 	// Handles both JWT path (username as voter-id) and service path (__identity.externalId).
@@ -221,7 +245,14 @@ export async function POST({ request, cookies }) {
 			return json(newd, { status: 500 });
 		}
 
-		console.error('Unexpected response structure:', newd);
+		console.error('Unexpected response structure:', {
+			queId,
+			isSer,
+			isConsensusQid,
+			endpoint: ep,
+			serviceToken: isSer ? fingerprintSecret(jw) : { present: Boolean(jw) },
+			response: newd
+		});
 		if (newd.error?.status === 401 || newd.error?.name === 'UnauthorizedError') {
 			throw error(401, newd.error?.message || 'Unauthorized');
 		}
