@@ -487,4 +487,30 @@ export const addVoteConfig: ActionConfig = {
   },
 
   // updateStrategy מוגדר דינמית ב-handler בהתבסס על type
+
+  // Phase 1 shadow signing (PLAN_action_migration_vs_p2p §6.3, Phase 1 of
+  // PLAN_user_sovereign_consent). Only the tosplit branch ratifies a group
+  // decision today — pendm/pmash already track their own consensus separately
+  // and will get their own consentSpec as they migrate to weighted-unanimous.
+  consentSpec: {
+    action: (params: Record<string, unknown>) => {
+      const type = params.type as string | undefined;
+      if (type === 'tosplit')     return 'tosplit.vote';
+      if (type === 'pend')        return 'pendm.vote';
+      if (type === 'sheirutpend') return 'sheirutpend.vote';
+      if (type === 'ask')         return 'ask.vote';
+      if (type === 'decision')    return 'decision.vote';
+      if (type === 'weFinnish')   return 'mission.approve.vote';
+      return null;
+    },
+    subjectType: (params: Record<string, unknown>) => String(params.type ?? 'unknown'),
+    subjectIdParam: 'id',
+    requireConsensus: true,
+    restimeFrom: 'project',
+    predicateFromParams: (params) => ({
+      what: params.what ?? true,
+      why: params.why,
+      order: params.order ?? 0
+    })
+  }
 };

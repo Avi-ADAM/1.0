@@ -1,5 +1,24 @@
 // Canonical shape of a signed consent event.
 // Every meaningful mutation in the project becomes one of these.
+//
+// Phase 0 used a minimal shape (v: 1, id, actor, device, action, subject,
+// predicate, parents, ts, nonce, sig). Phase 1.5 adds OPTIONAL fields for
+// state commitments (PLAN_rikma_as_state_machine) and quorum proofs
+// (PLAN_restime_in_signed_chain). They MUST stay optional so Phase 0 events
+// remain valid forever; verification logic treats their absence as
+// "this event predates the commitment scheme".
+
+import type { QuorumProof } from './quorum';
+
+export type Delta =
+  | { kind: 'hervachti.add';  member: string; amount: string; code: string }
+  | { kind: 'hervachti.move'; from: string; to: string; amount: string; code: string }
+  | { kind: 'member.add';     member: string }
+  | { kind: 'member.remove';  member: string }
+  | { kind: 'share.bump';     member: string; oldBps: number; newBps: number }
+  | { kind: 'value.set';      path: string; before: unknown; after: unknown }
+  | { kind: 'consensus.reach'; subject: string; decision: 'approve' | 'reject' }
+  | { kind: 'round.advance';  subject: string; from: number; to: number; reason: 'counter' | 'merge' };
 
 export type ConsentEvent = {
   v: 1;
@@ -13,6 +32,12 @@ export type ConsentEvent = {
   ts: number;
   nonce: string;
   sig: string;
+
+  // Phase 1.5 — state commitment + consensus witness.
+  parentStateRoots?: string[];   // b64 hash(es) of parent ProjectState(s)
+  stateRoot?: string;            // b64 hash of ProjectState after this event
+  delta?: Delta[];               // declared changes; verifier checks against state
+  quorum?: QuorumProof;          // for events that ratify a group decision
 };
 
 export type DeviceCert = {
@@ -40,7 +65,14 @@ export const ACTIONS = {
   projectCreate:   'project.create',
   projectJoin:     'project.join',
   projectLeave:    'project.leave',
+  projectAmend:    'project.amend',
   missionComplete: 'mission.complete',
+  missionApprove:  'mission.approve',
+  missionApproveVote: 'mission.approve.vote',
+  proposalCounter: 'proposal.counter',
+  consensusTimeout: 'consensus.timeout',
+  memberAway:      'member.away',
+  timeTick:        'time.tick',
   deviceCert:      'device.cert',
   deviceRevoke:    'device.revoke'
 } as const;

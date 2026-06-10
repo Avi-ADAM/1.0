@@ -14,6 +14,7 @@ import { showFoot } from '$lib/stores/showFoot.js';
   import { initialWebSP } from '$lib/stores/pgishot.js';
   import Mobile from '$lib/components/front/mobile.svelte';
   import MobileFooter from '$lib/components/footer/mobileFooter.svelte';
+  import { bootstrapConsentIdentity } from '$lib/consent/bootstrap.svelte';
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -64,6 +65,10 @@ onMount(async () => {
       // the HttpOnly cookie, so no token is passed (these fns ignore arg 1).
       initialWebS(null, data.uid);
       initialWebSP(null, data.uid);
+      // Phase 1 of PLAN_user_sovereign_consent: idempotent identity bootstrap.
+      // Fire-and-forget. Failures (browser unsupported, mirror unreachable)
+      // surface in the UI via consentStatus; they never block the layout.
+      if (data.uid) bootstrapConsentIdentity(data.uid).catch(() => { /* noop */ });
     }
 });
 function reg (){

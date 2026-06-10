@@ -11,11 +11,32 @@ export type TosplitView = {
   approved: boolean;
 };
 
+/**
+ * Per-subject round tracking (PLAN_restime_in_signed_chain §3).
+ *   - `current`  = the active round (0 for initial proposal)
+ *   - `start`    = ts of the event that opened this round (proposal.create or
+ *                  the most recent proposal.counter)
+ *   - `closed`   = populated when a consensus.timeout for THIS round was
+ *                  successfully ingested. Cleared by a subsequent counter
+ *                  (counter reopens the conversation).
+ */
+export type SubjectRound = {
+  current: number;
+  start: number;
+  closed?: {
+    round: number;
+    reachedAt: number;
+    decision: 'approve' | 'reject';
+  };
+};
+
 export type ProjectState = {
   projectId: string | null;
   members: Set<string>;
   balances: Map<string, number>;
   tosplits: Map<string, TosplitView>;
+  /** Keyed by `${subject.type}:${subject.id}` */
+  rounds: Map<string, SubjectRound>;
   asOf: number;
 };
 
@@ -25,8 +46,13 @@ export function emptyState(projectId: string | null = null): ProjectState {
     members: new Set(),
     balances: new Map(),
     tosplits: new Map(),
+    rounds: new Map(),
     asOf: 0
   };
+}
+
+export function subjectKey(type: string, id: string): string {
+  return `${type}:${id}`;
 }
 
 // Topological sort: parents before children. Ties broken by ts then id.
