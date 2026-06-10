@@ -5,13 +5,22 @@
 // verify it in O(|evidence|) without re-running the full projection.
 //
 // Rules supported:
-//   - unanimous       : every member of the eligible set voted yes
+//   - unanimous       : every member of the eligible set voted yes (head count)
 //   - majority        : > half of the eligible set voted yes
 //   - k-of-n          : at least k yes votes (k specified in rule.params)
 //   - agreers-only    : at least 1 yes vote, no nos (used by Ratson §3.0)
 //   - timeout         : deadline passed AND no counter-proposal exists
 //                       (full validation lives in PLAN_restime_in_signed_chain;
 //                        the proof here only carries the receipts)
+//   - weighted-unanimous-positive
+//                     : every member with weight > 0 voted yes; zero-weight
+//                       members ignored. **Default for rikmas under D-13/D-14**:
+//                       weight = Σ FinnishedMission.total + Σ Rikmash.total
+//                       (in agorot). Members who committed to a mission but
+//                       haven't completed any have zero weight → cannot block.
+//   - weighted-threshold
+//                     : Σ weight(yes voters) × 10000 ≥ thresholdBps × Σ weight(all)
+//                       For 2/3 use thresholdBps=6667; for 50%+1 use 5001.
 
 import type { ConsentEvent } from './event';
 
@@ -20,7 +29,9 @@ export type QuorumRule =
   | { kind: 'majority' }
   | { kind: 'k-of-n'; k: number }
   | { kind: 'agreers-only' }
-  | { kind: 'timeout'; expectedEnd: number; clockTolerance: number };
+  | { kind: 'timeout'; expectedEnd: number; clockTolerance: number }
+  | { kind: 'weighted-unanimous-positive' }
+  | { kind: 'weighted-threshold'; thresholdBps: number };
 
 export type QuorumProof = {
   rule: QuorumRule;
@@ -35,6 +46,13 @@ export type QuorumContext = {
   events: Map<string, ConsentEvent>;  // events the verifier can resolve
   voteAction: string;                 // e.g. 'tosplit.vote', 'mission.approve.vote'
   yesPredicate?: (ev: ConsentEvent) => boolean;  // default: predicate.what === true
+
+  /**
+   * Per-member voting weight in agorot (D-13). Required for `weighted-*` rules.
+   * Members not present in the map are treated as zero-weight (committed but
+   * not delivered — cannot block per the user's clarification).
+   */
+  memberWeights?: Map<string, bigint>;
 };
 
 export type QuorumResult =
@@ -128,6 +146,53 @@ export function verifyQuorum(proof: QuorumProof, ctx: QuorumContext): QuorumResu
       }
       const { yesActors, reason } = collectVotes(proof, ctx);
       if (reason) return { ok: false, reason };
+      return { ok: true, agreers: [...yesActors], reachingActor: proof.reachingActor };
+    }
+
+    case 'weighted-unanimous-positive': {
+      if (!ctx.memberWeights) return { ok: false, reason: 'missing_weights' };
+      const { yesActors, noActors, reason } = collectVotes(proof, ctx);
+      if (reason) return { ok: false, reason };
+
+      // Any "no" from a positive-weight member breaks unanimity.
+      for (const noVoter of noActors) {
+        const w = ctx.memberWeights.get(noVoter) ?? 0n;
+        if (w > 0n) return { ok: false, reason: 'positive_no_vote:' + noVoter };
+      }
+
+      // Every positive-weight eligible member must have a "yes" on record.
+      const missing: string[] = [];
+      for (const member of ctx.eligibleMembers) {
+        const w = ctx.memberWeights.get(member) ?? 0n;
+        if (w > 0n && !yesActors.has(member)) missing.push(member);
+      }
+      if (missing.length > 0) {
+        return { ok: false, reason: 'positive_missing_vote:' + missing.join(',') };
+      }
+      return { ok: true, agreers: [...yesActors], reachingActor: proof.reachingActor };
+    }
+
+    case 'weighted-threshold': {
+      if (!ctx.memberWeights) return { ok: false, reason: 'missing_weights' };
+      const { yesActors, reason } = collectVotes(proof, ctx);
+      if (reason) return { ok: false, reason };
+
+      let yesWeight = 0n;
+      for (const a of yesActors) yesWeight += ctx.memberWeights.get(a) ?? 0n;
+
+      let totalWeight = 0n;
+      for (const m of ctx.eligibleMembers) totalWeight += ctx.memberWeights.get(m) ?? 0n;
+
+      if (totalWeight === 0n) {
+        return { ok: false, reason: 'zero_total_weight' };
+      }
+      // yesWeight * 10000 >= thresholdBps * totalWeight
+      // (all integer math — avoids float drift in BPS)
+      const lhs = yesWeight * 10_000n;
+      const rhs = BigInt(proof.rule.thresholdBps) * totalWeight;
+      if (lhs < rhs) {
+        return { ok: false, reason: `below_threshold:${lhs}/${rhs}` };
+      }
       return { ok: true, agreers: [...yesActors], reachingActor: proof.reachingActor };
     }
 

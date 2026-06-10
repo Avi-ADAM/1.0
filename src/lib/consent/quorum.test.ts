@@ -194,6 +194,141 @@ describe('verifyQuorum: timeout', () => {
   });
 });
 
+describe('verifyQuorum: weighted-unanimous-positive (the user\'s central rikma case)', () => {
+  it('passes when both contributors vote yes; 8 zero-weight members ignored', () => {
+    const evs = [
+      ev({ id: 'v1', actor: 'avi',  ts: 1 }),
+      ev({ id: 'v2', actor: 'dana', ts: 2 })
+    ];
+    const members = ['avi', 'dana', ...Array.from({ length: 8 }, (_, i) => `pending-${i}`)];
+    const weights = new Map<string, bigint>([
+      ['avi', 60000n],
+      ['dana', 40000n]
+      // 8 pending members: weight 0 (committed but not delivered)
+    ]);
+    const res = verifyQuorum(
+      { rule: { kind: 'weighted-unanimous-positive' }, evidence: ['v1', 'v2'] },
+      { ...ctxFor(evs, members), memberWeights: weights }
+    );
+    expect(res.ok).toBe(true);
+    if (res.ok) expect(res.agreers.sort()).toEqual(['avi', 'dana']);
+  });
+
+  it('blocks when one contributor votes no', () => {
+    const evs = [
+      ev({ id: 'v1', actor: 'avi',  ts: 1 }),
+      ev({ id: 'v2', actor: 'dana', what: false, ts: 2 })
+    ];
+    const members = ['avi', 'dana', 'pending'];
+    const weights = new Map<string, bigint>([['avi', 60000n], ['dana', 40000n]]);
+    const res = verifyQuorum(
+      { rule: { kind: 'weighted-unanimous-positive' }, evidence: ['v1', 'v2'] },
+      { ...ctxFor(evs, members), memberWeights: weights }
+    );
+    expect(res.ok).toBe(false);
+    if (!res.ok) expect(res.reason).toContain('positive_no_vote:dana');
+  });
+
+  it('zero-weight member CANNOT block via no vote', () => {
+    // Critical case: a "committed but not delivered" user shouldn't be able
+    // to vote no and block the decision.
+    const evs = [
+      ev({ id: 'v1', actor: 'avi',  ts: 1 }),
+      ev({ id: 'v2', actor: 'dana', ts: 2 }),
+      ev({ id: 'v3', actor: 'pending', what: false, ts: 3 })  // tries to block
+    ];
+    const members = ['avi', 'dana', 'pending'];
+    const weights = new Map<string, bigint>([['avi', 60000n], ['dana', 40000n]]);
+    const res = verifyQuorum(
+      { rule: { kind: 'weighted-unanimous-positive' }, evidence: ['v1', 'v2', 'v3'] },
+      { ...ctxFor(evs, members), memberWeights: weights }
+    );
+    expect(res.ok).toBe(true);
+  });
+
+  it('blocks when a positive-weight contributor did not vote at all', () => {
+    const evs = [ev({ id: 'v1', actor: 'avi', ts: 1 })];
+    const members = ['avi', 'dana'];
+    const weights = new Map<string, bigint>([['avi', 60000n], ['dana', 40000n]]);
+    const res = verifyQuorum(
+      { rule: { kind: 'weighted-unanimous-positive' }, evidence: ['v1'] },
+      { ...ctxFor(evs, members), memberWeights: weights }
+    );
+    expect(res.ok).toBe(false);
+    if (!res.ok) expect(res.reason).toContain('positive_missing_vote:dana');
+  });
+
+  it('rejects when memberWeights is missing', () => {
+    const evs = [ev({ id: 'v1', actor: 'avi', ts: 1 })];
+    const res = verifyQuorum(
+      { rule: { kind: 'weighted-unanimous-positive' }, evidence: ['v1'] },
+      ctxFor(evs, ['avi'])
+    );
+    expect(res.ok).toBe(false);
+    if (!res.ok) expect(res.reason).toBe('missing_weights');
+  });
+});
+
+describe('verifyQuorum: weighted-threshold', () => {
+  it('passes when yes weight ≥ 2/3 of total (6667 bps)', () => {
+    const evs = [
+      ev({ id: 'v1', actor: 'avi', ts: 1 }),   // weight 70%
+      // dana doesn't vote                        weight 30%
+    ];
+    const members = ['avi', 'dana'];
+    const weights = new Map<string, bigint>([['avi', 7000n], ['dana', 3000n]]);
+    const res = verifyQuorum(
+      { rule: { kind: 'weighted-threshold', thresholdBps: 6667 }, evidence: ['v1'] },
+      { ...ctxFor(evs, members), memberWeights: weights }
+    );
+    expect(res.ok).toBe(true);
+  });
+
+  it('fails below 2/3 threshold', () => {
+    const evs = [ev({ id: 'v1', actor: 'avi', ts: 1 })];  // weight 60%
+    const members = ['avi', 'dana'];
+    const weights = new Map<string, bigint>([['avi', 6000n], ['dana', 4000n]]);
+    const res = verifyQuorum(
+      { rule: { kind: 'weighted-threshold', thresholdBps: 6667 }, evidence: ['v1'] },
+      { ...ctxFor(evs, members), memberWeights: weights }
+    );
+    expect(res.ok).toBe(false);
+  });
+
+  it('uses integer math — no float drift at boundary', () => {
+    // Threshold exactly: 2/3 of 30000 = 20000. Yes weight = 20000. Should pass.
+    const evs = [ev({ id: 'v1', actor: 'avi', ts: 1 })];
+    const members = ['avi', 'dana', 'eden'];
+    const weights = new Map<string, bigint>([
+      ['avi', 20000n], ['dana', 5000n], ['eden', 5000n]
+    ]);
+    // 20000 * 10000 = 200000000; 6667 * 30000 = 200010000 → just below; should fail
+    const fail = verifyQuorum(
+      { rule: { kind: 'weighted-threshold', thresholdBps: 6667 }, evidence: ['v1'] },
+      { ...ctxFor(evs, members), memberWeights: weights }
+    );
+    expect(fail.ok).toBe(false);
+
+    // Drop threshold to exact 2/3 = 6666.666... → 6666 should pass
+    const pass = verifyQuorum(
+      { rule: { kind: 'weighted-threshold', thresholdBps: 6666 }, evidence: ['v1'] },
+      { ...ctxFor(evs, members), memberWeights: weights }
+    );
+    expect(pass.ok).toBe(true);
+  });
+
+  it('zero total weight → reject (no one has delivered yet)', () => {
+    const members = ['committed-1', 'committed-2'];
+    const weights = new Map<string, bigint>();  // all zero
+    const res = verifyQuorum(
+      { rule: { kind: 'weighted-threshold', thresholdBps: 5001 }, evidence: [] },
+      { ...ctxFor([], members), memberWeights: weights }
+    );
+    expect(res.ok).toBe(false);
+    if (!res.ok) expect(res.reason).toBe('zero_total_weight');
+  });
+});
+
 describe('verifyQuorum: error paths', () => {
   it('reports missing evidence', () => {
     const res = verifyQuorum(

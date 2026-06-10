@@ -38,8 +38,11 @@
 | D-10 | ה-`paramSchema` של action חדש מותאם 1-ל-1 ל-`predicate` של אירוע חתום | API | migration #4 §6.1 |
 | D-11 | Strapi נשאר mirror; הוא לא הסמכות | סנכרון | consent #1 §0 |
 | D-12 | **כל ערך כספי = `bigint` של אגורות** (×100). לא Decimal/float | מודל מספרים | state-machine #7 §8.5 |
+| D-13 | **משקל חבר לקונסנזוס = `Σ FinnishedMission.total + Σ Rikmash.total`** של אותו משתמש, ב-bigint של אגורות. בדיוק מה ש-`hachcal.svelte` מחשב היום (`fmiData[].total + rikmashes[].total`) | קונסנזוס משוקלל | central_rikma #6, מבוסס Q-A של המשתמש |
+| D-14 | **כלל ברירת מחדל ל-rikmas = `weighted-unanimous-positive`**: כל חבר עם משקל > 0 חייב לאשר; חברי-0 (שאושרו אך לא ביצעו עדיין) **לא יכולים לחסום**, אבל גם לא מוכרחים להצביע | קונסנזוס משוקלל | מבוסס Q-B של המשתמש |
+| D-15 | **לרקמה המרכזית בהווה** (2 תורמים מתוך 10 שאושרו) — D-14 חל אוטומטית: 2 התורמים = ה-quorum האפקטיבי. 8 שאושרו אך לא ביצעו = חברים, ללא משקל הצבעה | יישום מיידי | central_rikma #6 §3 |
 
-החלטה D-08 נעולה ע"י המשתמש בהודעה הזו ומשפיעה על כל מה שלהלן.
+החלטות D-08, D-13, D-14, D-15 נעולות ע"י המשתמש בהודעות בסשן זה ומשפיעות על כל מה שלהלן.
 
 ---
 
@@ -48,11 +51,12 @@
 הסדר = חשיבות. הראשונות חוסמות פאזה כבר עכשיו; האחרונות נדחות.
 
 ### חוסמות מיידי
-- **O-A: מהי "משימה מאושרת" ברקמה המרכזית?** = PR שמוזג? Issue שנסגר?
-  שעות שדווחו? משהו חדש? **חוסם C0–C2** (central_rikma §8).
-  המלצה: "פעולה שהושלמה ב-mission הקיים + אישור קוורום פנימי שני".
-- **O-B: גודל הקוורום הפנימי הראשוני** ברקמה המרכזית. 1? 2? majority?
-  המלצה: 2-of-N כל זמן ש-N≤4; ⌈N/2⌉ אחרי. **חוסם C0**.
+- ~~**O-A: מהי "משימה מאושרת" ברקמה המרכזית?**~~ **✅ נסגר ע"י המשתמש**:
+  בדיוק כמו כל רקמה — `FinnishedMission` (`noofhours × perhour = total`)
+  ו-`Rikmash` (משאב שהושלם, `total`). ראה D-13.
+- ~~**O-B: גודל הקוורום הפנימי**~~ **✅ נסגר ע"י המשתמש**: כמו כל רקמה,
+  עם הסתייגות שמי שאושר אך לא ביצע משימה (משקל 0) **לא יכול לחסום**.
+  מומש כ-`weighted-unanimous-positive` (D-14).
 - **O-C: ניסוח החוקה** (constitutionHash) — חוסם C2 בלבד. לא קוד.
 
 ### חוסמות בעוד שלב-שניים
@@ -140,15 +144,50 @@
 
 ---
 
-## 6. מה אני בונה היום (בקומיט הזה)
+## 6. מה כבר נבנה (Phase 1.5 foundations + הרחבת קונסנזוס משוקלל)
 
-צעדים 1, 2, 3, 4 — התשתית הצולבת שכל השאר נשען עליה. הם:
-- חסרי תלות זה בזה
-- ניתנים לבנייה ובדיקה עצמאית
-- backward-compatible (לא שובר את Phase 0)
-- פותחים את צעדים 5–8
+צעדים 1–4 בקומיט הראשון (146):
+- `src/lib/crypto/money.ts` + טסטים — bigint של אגורות, distribute הוגן
+- `src/lib/consent/quorum.ts` + טסטים — verifier ל-5 כללים
+- `ConsentEvent` הורחב עם 4 שדות אופציונליים
+- `ActionConfig.consentSpec` — שער ל-shadow signing
 
-צעדים 5–8 דורשים החלטות מוצריות (O-A, O-B), ויעלו אחרי שיוסכמו.
+הרחבה (קומיט 146.1, אחרי הבהרת המשתמש על Q-A/Q-B):
+- `src/lib/consent/memberWeight.ts` — חישוב משקל מ-FinnishedMission+Rikmash totals
+- `quorum.ts` הורחב עם 2 כללים: `weighted-unanimous-positive`, `weighted-threshold`
+- 12 טסטים חדשים שמייצגים את התרחיש של הרקמה המרכזית (2 תורמים מתוך 10)
+- D-13, D-14, D-15 — החלטות נעולות לקונסנזוס משוקלל
+
+**סה"כ 82 טסטים עוברים**, TS נקי בקבצים החדשים, backward-compat מלא.
+
+## 7. השלב הבא (צעדים 5–8, ניתנים להתחלה — כל ההחלטות החוסמות סגורות)
+
+### צעד 5 — חיבור `consentSpec` ל-`addVote` (ענף tosplit) + ConsentBadge
+- הרחבת `src/lib/server/actions/configs/addVote.ts` עם `consentSpec` ראשון:
+  ```ts
+  consentSpec: {
+    action: 'tosplit.vote',
+    subjectType: 'tosplit',
+    subjectIdParam: 'tosplitId',
+    requireConsensus: true,
+    restimeFrom: 'project'
+  }
+  ```
+- `/api/action` יזהה את ה-spec ויקרא ל-shadow signing flow.
+- `src/lib/components/consent/ConsentBadge.svelte` — ירוק/אפור ב-split page.
+
+### צעד 6 — `proposal.counter` ו-`consensus.timeout` reducers
+- שני reducers עצמאיים על-בסיס PLAN_restime_in_signed_chain §3.
+- מקבלים `currentRound`/`roundStart` ל-`ProjectState`.
+
+### צעד 7 — `stateRoot` Merkle על `ProjectState`
+- `src/lib/consent/stateRoot.ts` — hash דטרמיניסטי על המבנה.
+- לא ב-events חדשים עדיין — שכבת ולידציה צד.
+
+### צעד 8 — Central Rikma C0
+- `User.platformRing` (`'inner' | 'outer' | null`).
+- migration script שמסמן הקיימים.
+- אין שינוי תפעולי.
 
 ---
 
