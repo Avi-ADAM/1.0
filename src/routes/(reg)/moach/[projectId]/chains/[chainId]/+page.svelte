@@ -9,8 +9,6 @@
   import { toast } from 'svelte-sonner';
   import { sendToSer } from '$lib/send/sendToSer.js';
 
-  const baseUrl = import.meta.env.VITE_URL;
-
   // ---------------------------------------------------------------------------
   // Route param
   // ---------------------------------------------------------------------------
@@ -144,78 +142,17 @@
     loading   = true;
     loadError = null;
 
-    const token = page.data.tok;
-    if (!token) { loading = false; return; }
-
-    const bearer = `bearer ${token}`;
-
-    const currentLang = $lang;
-    const locFrag = currentLang === 'he' ? 'localizations{data {attributes{ roleDescription }} }' : '';
-
     try {
-      const res = await fetch(`${baseUrl}/graphql`, {
-        method: 'POST',
-        headers: { Authorization: bearer, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: `{
-            project(id: "${projectId}") { data { attributes {
-              acts { data { id attributes {
-                shem hashivut naasa myIshur valiIshur status dateS dateF
-                pendm { data { id } }
-                open_mission { data { id } }
-                mesimabetahaliches { data { id } }
-                my { data { id attributes { username profilePic { data { attributes { url } } } } } }
-                vali { data { id } }
-              }}}
-              mesimabetahaliches(filters: { finnished: { eq: false } }) { data {
-                id attributes {
-                  name status iskvua createdAt
-                  open_missions { data { id } }
-                  forums { data { id } }
-                  finiapruvals { data { id attributes { missname archived } } }
-                  users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
-                  acts { data { id attributes { shem dateS naasa myIshur valiIshur status } } }
-                }
-              }}
-              open_missions(filters: { archived: { eq: false } }) { data {
-                id attributes {
-                  name descrip noofhours perhour sqadualed createdAt
-                  pendm { data { id } }
-                  asks { data { id attributes { username } } }
-                  tafkidims { data { id attributes { roleDescription ${locFrag} } } }
-                }
-              }}
-              pendms(filters: { archived: { eq: false } }) { data {
-                id attributes {
-                  name dates createdAt archived
-                  mission { data { id } }
-                  tafkidims { data { id attributes { roleDescription ${locFrag} } } }
-                }
-              }}
-              finnished_missions { data {
-                id attributes {
-                  missionName start finish total
-                  mesimabetahalich { data { id } }
-                }
-              }}
-              open_mashaabims(filters: { archived: { eq: false } }) { data {
-                id attributes {
-                  name kindOf hm descrip price easy spnot sqadualed sqadualedf
-                  pmash { data { id attributes { name } } }
-                  askms { data { id attributes { name } } }
-                  maap { data { id attributes { name archived } } }
-                  rikmashes { data { id attributes { name kindOf total hm price } } }
-                }
-              }}
-              rikmashes { data {
-                id attributes { name kindOf total hm price }
-              }}
-            }}}
-          `
-        })
-      });
-
-      const json = await res.json();
+      // Routed through the secure proxy (qid) so the JWT stays in the HttpOnly
+      // cookie. `withLoc` mirrors the original he-only localization fragment.
+      const json = await sendToSer(
+        { pid: projectId, withLoc: $lang === 'he' },
+        'chainDetailProjectData',
+        0,
+        0,
+        false,
+        fetch
+      );
       const attrs = json?.data?.project?.data?.attributes;
       if (!attrs) { loadError = 'no_data'; loading = false; return; }
 

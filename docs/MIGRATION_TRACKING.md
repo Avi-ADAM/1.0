@@ -49,6 +49,8 @@
 | הוספת תגובה להעברת כסף | `lev/didiget.svelte` | afreact() | `fetch('/graphql')` inline mutation chatre (broken objToString) | `addHalukaChatEntry` (server fetches current chatre, appends, saves back) | חברי פרויקט (socket) | `[x]` 2026-05-22 |
 | הצבעה על החלטת פרויקט — שינוי לוגו (kind=pic) + consensus | `lev/decisionMaking.svelte` | agree() kind!='sheirutpends' | `fetch('/graphql')` × broken (template literal discarded + que() as tagged template) — consensus never fired | `voteOnDecision` (server-authoritative: DB fetch, dedup, consensus → archiveDecision + updateProject.profilePic + markTimegrama) | חברי פרויקט (socket) | `[x]` 2026-05-22 |
 | הצבעה על sheirutpend מ-decisionMaking | `lev/decisionMaking.svelte` | agree() kind='sheirutpends' | `addVote(type:'decision')` בטעות לכל ה-kinds | `addVote(type:'sheirutpend')` — ה-action הנכון הקיים (handles consensus → createSheirut) | חברי פרויקט (socket) | `[x]` 2026-05-22 |
+| הוספת תגובה לצ'אט Askm | `lev/reqtom.svelte` | afreact() | `PUT /api/askms/{id}` + `page.data.tok` | `addAskmChatEntry` (server GET→append→PUT, no token on client) | — | `[x]` 2026-06-10 |
+| הוספת תגובה לצ'אט Askm | `lev/mashsuggest.svelte` | afreact() | `PUT /api/askms/{id}` + `page.data.tok` | `addAskmChatEntry` | — | `[x]` 2026-06-10 |
 
 ---
 
@@ -231,6 +233,7 @@
 | `confirmHaluka` | `configs/confirmHaluka.ts` | אישור Haluka ע"י שולח (senderconf) או מקבל (confirmed + spCheck + hervachti distribution) |
 | `addHalukaChatEntry` | `configs/addHalukaChatEntry.ts` | הוספת entry לchatre של Haluka (שרת מביא מה-DB ומוסיף) |
 | `voteOnDecision` | `configs/voteOnDecision.ts` | הצבעה על החלטת פרויקט — server-authoritative (DB fetch, dedup, consensus → archiveDecision + updateProject.profilePic (pic) + markTimegrama) |
+| `addAskmChatEntry` | `configs/addAskmChatEntry.ts` | הוספת entry לchat של Askm (שרת מביא מה-DB, מוסיף, שומר — ללא token בלקוח) |
 
 ---
 

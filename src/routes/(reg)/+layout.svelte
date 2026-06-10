@@ -42,7 +42,6 @@ console.log('Message received. ', payload);
 // isAuthed is derived synchronously from server data so there is no
 // flash of the login wall after a successful login redirect.
 let isAuthed = $state(!!data.tok);
-let token;
 onMount(async () => {
     // Check session expiry via the 'when' cookie
     const cookieRe = document.cookie
@@ -61,8 +60,10 @@ onMount(async () => {
       console.log('authed');
       initialForum(true, [], data.uid);
       console.log(data.uid, $forum);
-      initialWebS(data.tok, data.uid);
-      initialWebSP(data.tok, data.uid);
+      // data.tok is now just a boolean login flag; the socket authenticates from
+      // the HttpOnly cookie, so no token is passed (these fns ignore arg 1).
+      initialWebS(null, data.uid);
+      initialWebSP(null, data.uid);
     }
 });
 function reg (){

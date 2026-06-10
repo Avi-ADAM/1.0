@@ -24,6 +24,7 @@ onMessage(messaging, (payload) => {
   import ThemeToggle from '$lib/celim/main/ThemeToggle.svelte';
   import { Bot } from '$lib/components/bot';
   import { socketClient } from '$lib/stores/socketClient';
+  import { patchUser } from '$lib/stores/userStore.js';
   import { toast } from 'svelte-sonner';
   import { addMes } from '$lib/stores/pendMisMes.js';
   import { forumStore } from '$lib/stores/forumStore';
@@ -129,6 +130,14 @@ onMessage(messaging, (payload) => {
           notification.actionResult || notification.data?.actionResult || {};
         const actionParams =
           notification.actionParams || notification.data?.actionParams || {};
+
+        // Profile changes (pic / basic info) made on any of the user's
+        // devices: patch the shared userStore so every open page reflects it
+        // instantly. socketClient already invalidates 'app:meProfile' for a
+        // full refresh of the /me page itself.
+        if (meta.type === 'profile' && notification.data?.attributes) {
+          patchUser(notification.data.attributes);
+        }
 
         if (
           (meta.type === 'askMessage' || meta.type === 'meetingMessage') &&

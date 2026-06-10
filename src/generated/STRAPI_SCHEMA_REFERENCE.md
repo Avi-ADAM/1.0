@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-06-04
+> Last updated: 2026-06-09
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -23,7 +23,7 @@ import type { StrapiEntity, StrapiCollection, StrapiMedia } from '$lib/types/str
 
 ---
 
-## 🏗️ Content Type Entities (104)
+## 🏗️ Content Type Entities (107)
 
 These are the main content types in the Strapi backend.
 
@@ -80,6 +80,25 @@ These are the main content types in the Strapi backend.
 | `name` | `Maybe<Scalars['String']['output']>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `users_permissions_user` | `Maybe<UsersPermissionsUserEntityResponse>` |
+
+### Argument
+| Field | Type |
+|-------|------|
+| `arguments` | `Maybe<ArgumentRelationResponseCollection>` |
+| `authorEmail` | `Maybe<Scalars['String']['output']>` |
+| `authorExternalId` | `Maybe<Scalars['String']['output']>` |
+| `authorName` | `Maybe<Scalars['String']['output']>` |
+| `authorType` | `Maybe<Enum_Argument_Authortype>` |
+| `body` | `Maybe<Scalars['String']['output']>` |
+| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `negotiation` | `Maybe<NegotiationEntityResponse>` |
+| `parent` | `Maybe<ArgumentEntityResponse>` |
+| `position` | `Maybe<PositionEntityResponse>` |
+| `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `stance` | `Maybe<Enum_Argument_Stance>` |
+| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `voters` | `Maybe<Scalars['JSON']['output']>` |
+| `votes` | `Maybe<Scalars['Int']['output']>` |
 
 ### Ask
 | Field | Type |
@@ -171,6 +190,22 @@ These are the main content types in the Strapi backend.
 | `shekelsPerHoure` | `Maybe<Scalars['Float']['output']>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `users_permissions_user` | `Maybe<UsersPermissionsUserEntityResponse>` |
+
+### Clause
+| Field | Type |
+|-------|------|
+| `authorExternalId` | `Maybe<Scalars['String']['output']>` |
+| `authorType` | `Maybe<Enum_Clause_Authortype>` |
+| `body` | `Maybe<Scalars['String']['output']>` |
+| `confirmedByAuthor` | `Maybe<Scalars['Boolean']['output']>` |
+| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `issue` | `Maybe<IssueEntityResponse>` |
+| `negotiation` | `Maybe<NegotiationEntityResponse>` |
+| `origin` | `Maybe<Enum_Clause_Origin>` |
+| `position` | `Maybe<PositionEntityResponse>` |
+| `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `stanceValue` | `Maybe<Scalars['Float']['output']>` |
+| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 
 ### ContentReleasesRelease
 | Field | Type |
@@ -469,6 +504,18 @@ These are the main content types in the Strapi backend.
 | `code` | `Maybe<Scalars['String']['output']>` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `name` | `Maybe<Scalars['String']['output']>` |
+| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
+
+### Issue
+| Field | Type |
+|-------|------|
+| `clauses` | `Maybe<ClauseRelationResponseCollection>` |
+| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `negotiation` | `Maybe<NegotiationEntityResponse>` |
+| `order` | `Maybe<Scalars['Int']['output']>` |
+| `origin` | `Maybe<Enum_Issue_Origin>` |
+| `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `title` | `Maybe<Scalars['String']['output']>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 
 ### Maap
@@ -818,6 +865,7 @@ These are the main content types in the Strapi backend.
 | `createActLocalization` | `Maybe<ActEntityResponse>` |
 | `createActt` | `Maybe<ActtEntityResponse>` |
 | `createApiKey` | `Maybe<ApiKeyEntityResponse>` |
+| `createArgument` | `Maybe<ArgumentEntityResponse>` |
 | `createAsk` | `Maybe<AskEntityResponse>` |
 | `createAskm` | `Maybe<AskmEntityResponse>` |
 | `createAskwant` | `Maybe<AskwantEntityResponse>` |
@@ -826,6 +874,7 @@ These are the main content types in the Strapi backend.
 | `createCategoryLocalization` | `Maybe<CategoryEntityResponse>` |
 | `createChezin` | `Maybe<ChezinEntityResponse>` |
 | `createChezinLocalization` | `Maybe<ChezinEntityResponse>` |
+| `createClause` | `Maybe<ClauseEntityResponse>` |
 | `createContentReleasesRelease` | `Maybe<ContentReleasesReleaseEntityResponse>` |
 | `createContentReleasesReleaseAction` | `Maybe<ContentReleasesReleaseActionEntityResponse>` |
 | `createConventionText` | `Maybe<ConventionTextEntityResponse>` |
@@ -850,6 +899,7 @@ These are the main content types in the Strapi backend.
 | `createHalukaLocalization` | `Maybe<HalukaEntityResponse>` |
 | `createHatzaa` | `Maybe<HatzaaEntityResponse>` |
 | `createHazbaah` | `Maybe<HazbaahEntityResponse>` |
+| `createIssue` | `Maybe<IssueEntityResponse>` |
 | `createMaap` | `Maybe<MaapEntityResponse>` |
 | `createMaapLocalization` | `Maybe<MaapEntityResponse>` |
 | `createMachshir` | `Maybe<MachshirEntityResponse>` |
@@ -938,12 +988,14 @@ These are the main content types in the Strapi backend.
 | `deleteAct` | `Maybe<ActEntityResponse>` |
 | `deleteActt` | `Maybe<ActtEntityResponse>` |
 | `deleteApiKey` | `Maybe<ApiKeyEntityResponse>` |
+| `deleteArgument` | `Maybe<ArgumentEntityResponse>` |
 | `deleteAsk` | `Maybe<AskEntityResponse>` |
 | `deleteAskm` | `Maybe<AskmEntityResponse>` |
 | `deleteAskwant` | `Maybe<AskwantEntityResponse>` |
 | `deleteBakasha` | `Maybe<BakashaEntityResponse>` |
 | `deleteCategory` | `Maybe<CategoryEntityResponse>` |
 | `deleteChezin` | `Maybe<ChezinEntityResponse>` |
+| `deleteClause` | `Maybe<ClauseEntityResponse>` |
 | `deleteContentReleasesRelease` | `Maybe<ContentReleasesReleaseEntityResponse>` |
 | `deleteContentReleasesReleaseAction` | `Maybe<ContentReleasesReleaseActionEntityResponse>` |
 | `deleteConventionText` | `Maybe<ConventionTextEntityResponse>` |
@@ -962,6 +1014,7 @@ These are the main content types in the Strapi backend.
 | `deleteHaluka` | `Maybe<HalukaEntityResponse>` |
 | `deleteHatzaa` | `Maybe<HatzaaEntityResponse>` |
 | `deleteHazbaah` | `Maybe<HazbaahEntityResponse>` |
+| `deleteIssue` | `Maybe<IssueEntityResponse>` |
 | `deleteMaap` | `Maybe<MaapEntityResponse>` |
 | `deleteMachshir` | `Maybe<MachshirEntityResponse>` |
 | `deleteMashaabim` | `Maybe<MashaabimEntityResponse>` |
@@ -1035,12 +1088,14 @@ These are the main content types in the Strapi backend.
 | `updateAct` | `Maybe<ActEntityResponse>` |
 | `updateActt` | `Maybe<ActtEntityResponse>` |
 | `updateApiKey` | `Maybe<ApiKeyEntityResponse>` |
+| `updateArgument` | `Maybe<ArgumentEntityResponse>` |
 | `updateAsk` | `Maybe<AskEntityResponse>` |
 | `updateAskm` | `Maybe<AskmEntityResponse>` |
 | `updateAskwant` | `Maybe<AskwantEntityResponse>` |
 | `updateBakasha` | `Maybe<BakashaEntityResponse>` |
 | `updateCategory` | `Maybe<CategoryEntityResponse>` |
 | `updateChezin` | `Maybe<ChezinEntityResponse>` |
+| `updateClause` | `Maybe<ClauseEntityResponse>` |
 | `updateContentReleasesRelease` | `Maybe<ContentReleasesReleaseEntityResponse>` |
 | `updateContentReleasesReleaseAction` | `Maybe<ContentReleasesReleaseActionEntityResponse>` |
 | `updateConventionText` | `Maybe<ConventionTextEntityResponse>` |
@@ -1060,6 +1115,7 @@ These are the main content types in the Strapi backend.
 | `updateHaluka` | `Maybe<HalukaEntityResponse>` |
 | `updateHatzaa` | `Maybe<HatzaaEntityResponse>` |
 | `updateHazbaah` | `Maybe<HazbaahEntityResponse>` |
+| `updateIssue` | `Maybe<IssueEntityResponse>` |
 | `updateMaap` | `Maybe<MaapEntityResponse>` |
 | `updateMachshir` | `Maybe<MachshirEntityResponse>` |
 | `updateMashaabim` | `Maybe<MashaabimEntityResponse>` |
@@ -1206,6 +1262,8 @@ These are the main content types in the Strapi backend.
 ### Negotiation
 | Field | Type |
 |-------|------|
+| `arguments` | `Maybe<ArgumentRelationResponseCollection>` |
+| `clauses` | `Maybe<ClauseRelationResponseCollection>` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `createdByEmail` | `Maybe<Scalars['String']['output']>` |
 | `creator` | `Maybe<UsersPermissionsUserEntityResponse>` |
@@ -1213,6 +1271,7 @@ These are the main content types in the Strapi backend.
 | `currentRound` | `Maybe<Scalars['Int']['output']>` |
 | `description` | `Maybe<Scalars['String']['output']>` |
 | `isLocal` | `Maybe<Scalars['Boolean']['output']>` |
+| `issues` | `Maybe<IssueRelationResponseCollection>` |
 | `maxRounds` | `Maybe<Scalars['Int']['output']>` |
 | `ownerExternalId` | `Maybe<Scalars['String']['output']>` |
 | `participants` | `Maybe<UsersPermissionsUserRelationResponseCollection>` |
@@ -1483,10 +1542,12 @@ These are the main content types in the Strapi backend.
 | Field | Type |
 |-------|------|
 | `aiMeta` | `Maybe<Scalars['String']['output']>` |
+| `arguments` | `Maybe<ArgumentRelationResponseCollection>` |
 | `author` | `Maybe<UsersPermissionsUserEntityResponse>` |
 | `authorEmail` | `Maybe<Scalars['String']['output']>` |
 | `authorExternalId` | `Maybe<Scalars['String']['output']>` |
 | `authorType` | `Maybe<Enum_Position_Authortype>` |
+| `clauses` | `Maybe<ClauseRelationResponseCollection>` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `description` | `Maybe<Scalars['String']['output']>` |
 | `heading` | `Maybe<Scalars['String']['output']>` |
@@ -1499,6 +1560,7 @@ These are the main content types in the Strapi backend.
 | `pole` | `Maybe<Enum_Position_Pole>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `relativePlacement` | `Maybe<Scalars['JSON']['output']>` |
+| `selfPlacement` | `Maybe<Scalars['Int']['output']>` |
 | `tags` | `Maybe<FiltertagRelationResponseCollection>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `voters` | `Maybe<UsersPermissionsUserRelationResponseCollection>` |
@@ -1615,6 +1677,8 @@ These are the main content types in the Strapi backend.
 | `actts` | `Maybe<ActtEntityResponseCollection>` |
 | `apiKey` | `Maybe<ApiKeyEntityResponse>` |
 | `apiKeys` | `Maybe<ApiKeyEntityResponseCollection>` |
+| `argument` | `Maybe<ArgumentEntityResponse>` |
+| `arguments` | `Maybe<ArgumentEntityResponseCollection>` |
 | `ask` | `Maybe<AskEntityResponse>` |
 | `askm` | `Maybe<AskmEntityResponse>` |
 | `askms` | `Maybe<AskmEntityResponseCollection>` |
@@ -1627,6 +1691,8 @@ These are the main content types in the Strapi backend.
 | `category` | `Maybe<CategoryEntityResponse>` |
 | `chezin` | `Maybe<ChezinEntityResponse>` |
 | `chezins` | `Maybe<ChezinEntityResponseCollection>` |
+| `clause` | `Maybe<ClauseEntityResponse>` |
+| `clauses` | `Maybe<ClauseEntityResponseCollection>` |
 | `contentReleasesRelease` | `Maybe<ContentReleasesReleaseEntityResponse>` |
 | `contentReleasesReleaseAction` | `Maybe<ContentReleasesReleaseActionEntityResponse>` |
 | `contentReleasesReleaseActions` | `Maybe<ContentReleasesReleaseActionEntityResponseCollection>` |
@@ -1665,6 +1731,8 @@ These are the main content types in the Strapi backend.
 | `hazbaahs` | `Maybe<HazbaahEntityResponseCollection>` |
 | `i18NLocale` | `Maybe<I18NLocaleEntityResponse>` |
 | `i18NLocales` | `Maybe<I18NLocaleEntityResponseCollection>` |
+| `issue` | `Maybe<IssueEntityResponse>` |
+| `issues` | `Maybe<IssueEntityResponseCollection>` |
 | `maap` | `Maybe<MaapEntityResponse>` |
 | `maaps` | `Maybe<MaapEntityResponseCollection>` |
 | `machshir` | `Maybe<MachshirEntityResponse>` |
@@ -3533,7 +3601,7 @@ These are Strapi components (reusable field groups).
 
 ---
 
-## 📝 Input Types (102)
+## 📝 Input Types (105)
 
 Used for creating/updating content.
 
@@ -3582,6 +3650,23 @@ Used for creating/updating content.
 | `key_prefix` | `InputMaybe<Scalars['String']['input']>` |
 | `name` | `InputMaybe<Scalars['String']['input']>` |
 | `users_permissions_user` | `InputMaybe<Scalars['ID']['input']>` |
+
+### ArgumentInput
+| Field | Type |
+|-------|------|
+| `arguments` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `authorEmail` | `InputMaybe<Scalars['String']['input']>` |
+| `authorExternalId` | `InputMaybe<Scalars['String']['input']>` |
+| `authorName` | `InputMaybe<Scalars['String']['input']>` |
+| `authorType` | `InputMaybe<Enum_Argument_Authortype>` |
+| `body` | `InputMaybe<Scalars['String']['input']>` |
+| `negotiation` | `InputMaybe<Scalars['ID']['input']>` |
+| `parent` | `InputMaybe<Scalars['ID']['input']>` |
+| `position` | `InputMaybe<Scalars['ID']['input']>` |
+| `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `stance` | `InputMaybe<Enum_Argument_Stance>` |
+| `voters` | `InputMaybe<Scalars['JSON']['input']>` |
+| `votes` | `InputMaybe<Scalars['Int']['input']>` |
 
 ### AskInput
 | Field | Type |
@@ -3683,6 +3768,20 @@ Used for creating/updating content.
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `shekelsPerHoure` | `InputMaybe<Scalars['Float']['input']>` |
 | `users_permissions_user` | `InputMaybe<Scalars['ID']['input']>` |
+
+### ClauseInput
+| Field | Type |
+|-------|------|
+| `authorExternalId` | `InputMaybe<Scalars['String']['input']>` |
+| `authorType` | `InputMaybe<Enum_Clause_Authortype>` |
+| `body` | `InputMaybe<Scalars['String']['input']>` |
+| `confirmedByAuthor` | `InputMaybe<Scalars['Boolean']['input']>` |
+| `issue` | `InputMaybe<Scalars['ID']['input']>` |
+| `negotiation` | `InputMaybe<Scalars['ID']['input']>` |
+| `origin` | `InputMaybe<Enum_Clause_Origin>` |
+| `position` | `InputMaybe<Scalars['ID']['input']>` |
+| `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `stanceValue` | `InputMaybe<Scalars['Float']['input']>` |
 
 ### ContentReleasesReleaseActionInput
 | Field | Type |
@@ -4062,6 +4161,16 @@ Used for creating/updating content.
 | `null` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `or` | `InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>` |
 | `startsWith` | `InputMaybe<Scalars['Int']['input']>` |
+
+### IssueInput
+| Field | Type |
+|-------|------|
+| `clauses` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `negotiation` | `InputMaybe<Scalars['ID']['input']>` |
+| `order` | `InputMaybe<Scalars['Int']['input']>` |
+| `origin` | `InputMaybe<Enum_Issue_Origin>` |
+| `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `title` | `InputMaybe<Scalars['String']['input']>` |
 
 ### JsonFilterInput
 | Field | Type |
@@ -4491,12 +4600,15 @@ Used for creating/updating content.
 ### NegotiationInput
 | Field | Type |
 |-------|------|
+| `arguments` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `clauses` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `createdByEmail` | `InputMaybe<Scalars['String']['input']>` |
 | `creator` | `InputMaybe<Scalars['ID']['input']>` |
 | `cuntries` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `currentRound` | `InputMaybe<Scalars['Int']['input']>` |
 | `description` | `InputMaybe<Scalars['String']['input']>` |
 | `isLocal` | `InputMaybe<Scalars['Boolean']['input']>` |
+| `issues` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `maxRounds` | `InputMaybe<Scalars['Int']['input']>` |
 | `ownerExternalId` | `InputMaybe<Scalars['String']['input']>` |
 | `participants` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -4728,10 +4840,12 @@ Used for creating/updating content.
 | Field | Type |
 |-------|------|
 | `aiMeta` | `InputMaybe<Scalars['String']['input']>` |
+| `arguments` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `author` | `InputMaybe<Scalars['ID']['input']>` |
 | `authorEmail` | `InputMaybe<Scalars['String']['input']>` |
 | `authorExternalId` | `InputMaybe<Scalars['String']['input']>` |
 | `authorType` | `InputMaybe<Enum_Position_Authortype>` |
+| `clauses` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `description` | `InputMaybe<Scalars['String']['input']>` |
 | `heading` | `InputMaybe<Scalars['String']['input']>` |
 | `intensity` | `InputMaybe<Scalars['Int']['input']>` |
@@ -4743,6 +4857,7 @@ Used for creating/updating content.
 | `pole` | `InputMaybe<Enum_Position_Pole>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `relativePlacement` | `InputMaybe<Scalars['JSON']['input']>` |
+| `selfPlacement` | `InputMaybe<Scalars['Int']['input']>` |
 | `tags` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `voters` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `votes` | `InputMaybe<Scalars['Int']['input']>` |
@@ -5563,12 +5678,12 @@ Used for creating/updating content.
 
 ---
 
-## 🔍 Filter Input Types (91)
+## 🔍 Filter Input Types (94)
 
 Used for querying/filtering content. Each content type has a corresponding filter input.
 
 <details>
-<summary>Click to expand all 91 filter types</summary>
+<summary>Click to expand all 94 filter types</summary>
 
 #### ActFiltersInput
 Fields: `and`, `createdAt`, `dateF`, `dateS`, `des`, `forums`, `hashivut`, `id`, `isAssigned`, `link`, `locale`, `localizations`, `mesimabetahaliches`, `my`, `myIshur`, `naasa`, `negopendmissions`, `not`, `open_mission`, `or`, `partofs`, `pendm`, `project`, `publishedAt`, `shem`, `status`, `tafkidims`, `taskdis`, `timegrama`, `timers`, `updatedAt`, `userAndIshur`, `vali`, `valiIshur`
@@ -5578,6 +5693,9 @@ Fields: `and`, `createdAt`, `id`, `link`, `name`, `not`, `or`, `publishedAt`, `t
 
 #### ApiKeyFiltersInput
 Fields: `and`, `createdAt`, `id`, `key_hash`, `key_prefix`, `name`, `not`, `or`, `updatedAt`, `users_permissions_user`
+
+#### ArgumentFiltersInput
+Fields: `and`, `arguments`, `authorEmail`, `authorExternalId`, `authorName`, `authorType`, `body`, `createdAt`, `id`, `negotiation`, `not`, `or`, `parent`, `position`, `publishedAt`, `stance`, `updatedAt`, `voters`, `votes`
 
 #### AskFiltersInput
 Fields: `and`, `archived`, `chat`, `createdAt`, `forums`, `id`, `not`, `open_mission`, `or`, `partofs`, `project`, `publishedAt`, `timegrama`, `updatedAt`, `users_permissions_user`, `vots`
@@ -5596,6 +5714,9 @@ Fields: `and`, `createdAt`, `id`, `locale`, `localizations`, `matanots`, `name`,
 
 #### ChezinFiltersInput
 Fields: `and`, `countries`, `createdAt`, `deffinitions`, `email`, `fullAgreement`, `id`, `locale`, `localizations`, `myQuotes`, `name`, `noOpHours`, `not`, `or`, `phoneNumber`, `publishedAt`, `shekelsPerHoure`, `updatedAt`, `users_permissions_user`
+
+#### ClauseFiltersInput
+Fields: `and`, `authorExternalId`, `authorType`, `body`, `confirmedByAuthor`, `createdAt`, `id`, `issue`, `negotiation`, `not`, `or`, `origin`, `position`, `publishedAt`, `stanceValue`, `updatedAt`
 
 #### ContentReleasesReleaseActionFiltersInput
 Fields: `and`, `contentType`, `createdAt`, `id`, `locale`, `not`, `or`, `release`, `type`, `updatedAt`
@@ -5654,6 +5775,9 @@ Fields: `and`, `approved`, `createdAt`, `id`, `not`, `or`, `publishedAt`, `updat
 #### I18NLocaleFiltersInput
 Fields: `and`, `code`, `createdAt`, `id`, `name`, `not`, `or`, `updatedAt`
 
+#### IssueFiltersInput
+Fields: `and`, `clauses`, `createdAt`, `id`, `negotiation`, `not`, `or`, `order`, `origin`, `publishedAt`, `title`, `updatedAt`
+
 #### MaapFiltersInput
 Fields: `and`, `archived`, `createdAt`, `cycleEnd`, `cycleIndex`, `cycleStart`, `id`, `isAcceptanceMaap`, `isSelfProposal`, `locale`, `localizations`, `mashabetahalich`, `name`, `not`, `open_mashaabim`, `or`, `partofs`, `pmash`, `project`, `publishedAt`, `quantityDelivered`, `rikmash`, `sheirut_fulfillments`, `sp`, `timegrama`, `unit`, `updatedAt`, `vots`
 
@@ -5706,7 +5830,7 @@ Fields: `and`, `createdAt`, `descrip`, `easy`, `hm`, `id`, `isOriginal`, `kindOf
 Fields: `acts`, `and`, `createdAt`, `date`, `dates`, `descrip`, `filds`, `hearotMeyuchadot`, `howMany`, `id`, `isMonth`, `isOriginal`, `isRishon`, `location`, `name`, `noofhours`, `not`, `open_mission`, `or`, `pendm`, `perhour`, `publishedAt`, `skills`, `tafkidims`, `total`, `updatedAt`, `users_permissions_user`, `vots`, `work_ways`
 
 #### NegotiationFiltersInput
-Fields: `and`, `createdAt`, `createdByEmail`, `creator`, `cuntries`, `currentRound`, `description`, `id`, `isLocal`, `maxRounds`, `not`, `or`, `ownerExternalId`, `participants`, `positions`, `publishedAt`, `scaleMax`, `scaleMin`, `shareToken`, `status`, `topic`, `updatedAt`, `visibility`
+Fields: `and`, `arguments`, `clauses`, `createdAt`, `createdByEmail`, `creator`, `cuntries`, `currentRound`, `description`, `id`, `isLocal`, `issues`, `maxRounds`, `not`, `or`, `ownerExternalId`, `participants`, `positions`, `publishedAt`, `scaleMax`, `scaleMin`, `shareToken`, `status`, `topic`, `updatedAt`, `visibility`
 
 #### OpenMashaabimFiltersInput
 Fields: `and`, `archived`, `askms`, `createdAt`, `declinedsps`, `descrip`, `easy`, `haamadapruvs`, `haamadas`, `hm`, `howMeny`, `id`, `isMust`, `isYesod`, `kindOf`, `linkto`, `locale`, `localizations`, `location`, `maap`, `mashaabim`, `name`, `not`, `or`, `partofs`, `pmash`, `price`, `project`, `publishedAt`, `ratson`, `rikmashes`, `source`, `splited`, `spnot`, `sps`, `sqadualed`, `sqadualedf`, `updatedAt`, `users`
@@ -5733,7 +5857,7 @@ Fields: `and`, `approved`, `archived`, `createdAt`, `id`, `not`, `or`, `pgisha`,
 Fields: `and`, `archived`, `askm`, `createdAt`, `descrip`, `diun`, `easy`, `hm`, `id`, `isMaap`, `isMust`, `isSelfProposal`, `isYesod`, `kindOf`, `linkto`, `location`, `maap`, `mashaabim`, `mashabetahaliches`, `matanot_recipe_resources`, `name`, `nego_mashes`, `negom`, `not`, `open_mashaabim`, `or`, `partofs`, `price`, `project`, `publishedAt`, `selfProposalUser`, `sheirut_fulfillments`, `spnot`, `sqadualed`, `sqadualedf`, `timegrama`, `updatedAt`, `users`
 
 #### PositionFiltersInput
-Fields: `aiMeta`, `and`, `author`, `authorEmail`, `authorExternalId`, `authorType`, `createdAt`, `description`, `heading`, `id`, `intensity`, `isAnchor`, `kind`, `location`, `negotiation`, `not`, `or`, `order`, `pole`, `publishedAt`, `relativePlacement`, `tags`, `updatedAt`, `voters`, `votes`
+Fields: `aiMeta`, `and`, `arguments`, `author`, `authorEmail`, `authorExternalId`, `authorType`, `clauses`, `createdAt`, `description`, `heading`, `id`, `intensity`, `isAnchor`, `kind`, `location`, `negotiation`, `not`, `or`, `order`, `pole`, `publishedAt`, `relativePlacement`, `selfPlacement`, `tags`, `updatedAt`, `voters`, `votes`
 
 #### ProjectFiltersInput
 Fields: `acts`, `addHoursManualy`, `and`, `askms`, `asks`, `askwants`, `city`, `countries`, `createdAt`, `deals`, `decisions`, `deffinitions`, `descripFor`, `discordlink`, `drivelink`, `fblink`, `finiapruvals`, `finnishedM72HForDecline`, `finnishedMAllApruve`, `finnished_missions`, `forums`, `githublink`, `haamadapruvs`, `haamadas`, `halukas`, `id`, `isMachzikim`, `isMachzikimPublik`, `isOt`, `isPlatform`, `linkToWebsite`, `locale`, `localizations`, `location`, `maaps`, `machshirs`, `mashaabims`, `mashabetahaliches`, `matanotofs`, `mesimabetahaliches`, `missions`, `newMeMissionOuto72ho`, `newOpenMissionAllApruve`, `newOpenMotoAfter72hoursWithnono`, `newmeOpenAllapruve`, `not`, `open_mashaabims`, `open_missions`, `or`, `pendms`, `pmashes`, `projectName`, `publicDescription`, `publishedAt`, `ratson_proposals`, `restime`, `rikmashes`, `sales`, `sheirutpends`, `sheiruts`, `sps`, `tafkidims`, `timeToP`, `timerOnlyTOrAlsoManuallyF`, `timers`, `tosplits`, `totalinyearone`, `totalinyearsec`, `totalmaxyearone`, `totalmaxyearsec`, `totalminyearone`, `totalminyearsec`, `twiterlink`, `updatedAt`, `user_1s`, `usersOfP`, `vallues`, `watsapplink`, `welcom_tops`, `work_ways`, `zohars`
@@ -5847,12 +5971,12 @@ Fields: `allSubmited`, `and`, `createdAt`, `done`, `id`, `mesimabetahalich`, `no
 
 ---
 
-## 📦 Entity Response Types (355)
+## 📦 Entity Response Types (367)
 
 Wrapper types for GraphQL responses.
 
 <details>
-<summary>Click to expand all 355 response types</summary>
+<summary>Click to expand all 367 response types</summary>
 
 - **ActEntity**: `attributes: Maybe<Act>`, `id: Maybe<Scalars['ID']['output']>`
 - **ActEntityResponse**: `data: Maybe<ActEntity>`
@@ -5865,6 +5989,10 @@ Wrapper types for GraphQL responses.
 - **ApiKeyEntityResponse**: `data: Maybe<ApiKeyEntity>`
 - **ApiKeyEntityResponseCollection**: `data: Array<ApiKeyEntity>`, `meta: ResponseCollectionMeta`
 - **ApiKeyRelationResponseCollection**: `data: Array<ApiKeyEntity>`
+- **ArgumentEntity**: `attributes: Maybe<Argument>`, `id: Maybe<Scalars['ID']['output']>`
+- **ArgumentEntityResponse**: `data: Maybe<ArgumentEntity>`
+- **ArgumentEntityResponseCollection**: `data: Array<ArgumentEntity>`, `meta: ResponseCollectionMeta`
+- **ArgumentRelationResponseCollection**: `data: Array<ArgumentEntity>`
 - **AskEntity**: `attributes: Maybe<Ask>`, `id: Maybe<Scalars['ID']['output']>`
 - **AskEntityResponse**: `data: Maybe<AskEntity>`
 - **AskEntityResponseCollection**: `data: Array<AskEntity>`, `meta: ResponseCollectionMeta`
@@ -5889,6 +6017,10 @@ Wrapper types for GraphQL responses.
 - **ChezinEntityResponse**: `data: Maybe<ChezinEntity>`
 - **ChezinEntityResponseCollection**: `data: Array<ChezinEntity>`, `meta: ResponseCollectionMeta`
 - **ChezinRelationResponseCollection**: `data: Array<ChezinEntity>`
+- **ClauseEntity**: `attributes: Maybe<Clause>`, `id: Maybe<Scalars['ID']['output']>`
+- **ClauseEntityResponse**: `data: Maybe<ClauseEntity>`
+- **ClauseEntityResponseCollection**: `data: Array<ClauseEntity>`, `meta: ResponseCollectionMeta`
+- **ClauseRelationResponseCollection**: `data: Array<ClauseEntity>`
 - **ContentReleasesReleaseActionEntity**: `attributes: Maybe<ContentReleasesReleaseAction>`, `id: Maybe<Scalars['ID']['output']>`
 - **ContentReleasesReleaseActionEntityResponse**: `data: Maybe<ContentReleasesReleaseActionEntity>`
 - **ContentReleasesReleaseActionEntityResponseCollection**: `data: Array<ContentReleasesReleaseActionEntity>`, `meta: ResponseCollectionMeta`
@@ -5962,6 +6094,10 @@ Wrapper types for GraphQL responses.
 - **I18NLocaleEntity**: `attributes: Maybe<I18NLocale>`, `id: Maybe<Scalars['ID']['output']>`
 - **I18NLocaleEntityResponse**: `data: Maybe<I18NLocaleEntity>`
 - **I18NLocaleEntityResponseCollection**: `data: Array<I18NLocaleEntity>`, `meta: ResponseCollectionMeta`
+- **IssueEntity**: `attributes: Maybe<Issue>`, `id: Maybe<Scalars['ID']['output']>`
+- **IssueEntityResponse**: `data: Maybe<IssueEntity>`
+- **IssueEntityResponseCollection**: `data: Array<IssueEntity>`, `meta: ResponseCollectionMeta`
+- **IssueRelationResponseCollection**: `data: Array<IssueEntity>`
 - **MaapEntity**: `attributes: Maybe<Maap>`, `id: Maybe<Scalars['ID']['output']>`
 - **MaapEntityResponse**: `data: Maybe<MaapEntity>`
 - **MaapEntityResponseCollection**: `data: Array<MaapEntity>`, `meta: ResponseCollectionMeta`
@@ -6213,12 +6349,16 @@ Wrapper types for GraphQL responses.
 
 ---
 
-## 🔢 Enum Types (61)
+## 🔢 Enum Types (66)
 
 <details>
-<summary>Click to expand all 61 enum types</summary>
+<summary>Click to expand all 66 enum types</summary>
 
 - **Enum_Act_Hashivut**: 
+- **Enum_Argument_Authortype**: 
+- **Enum_Argument_Stance**: 
+- **Enum_Clause_Authortype**: 
+- **Enum_Clause_Origin**: 
 - **Enum_Componentdesisionnegom_Kindof**: 
 - **Enum_Componentnewextractedmissions_Importance**: 
 - **Enum_Componentnewextractedresources_Importance**: 
@@ -6229,6 +6369,7 @@ Wrapper types for GraphQL responses.
 - **Enum_Contentreleasesreleaseaction_Type**: 
 - **Enum_Decision_Kind**: 
 - **Enum_Forum_Spec**: 
+- **Enum_Issue_Origin**: 
 - **Enum_Maap_Unit**: 
 - **Enum_Mashaabim_Kindof**: 
 - **Enum_Mashabetahalich_Kindof**: 
@@ -6294,7 +6435,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 16661 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 17071 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

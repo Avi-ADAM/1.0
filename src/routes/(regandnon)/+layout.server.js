@@ -7,7 +7,10 @@ export function load({ locals, url }) {
     console.log(from)
     return {
         userAgent,
-        tok,
+        // SECURITY: expose only a boolean login flag — never the raw JWT. The
+        // token stays in the HttpOnly cookie; consumers use `tok` as a login
+        // flag and the socket authenticates from the cookie.
+        tok: !!tok,
         from,
         un,
         uid

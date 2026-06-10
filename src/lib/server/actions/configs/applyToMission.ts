@@ -1,7 +1,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 
 const applyToMissionHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
-  const { openMissionId, projectId, existingAskedIds = [] } = params;
+  const { openMissionId, projectId } = params;
 
   const now = new Date();
   const nowISO = now.toISOString();
@@ -16,6 +16,16 @@ const applyToMissionHandler: ActionExecutionHandler = async (params, context, { 
   const projectAttrs = projectRes?.data?.project?.data?.attributes;
   const memberIds: string[] = (projectAttrs?.user_1s?.data || []).map((m: any) => String(m.id));
   const restime: string = projectAttrs?.restime ?? '';
+
+  // Fetch existing asked IDs server-side so clients don't need to send them
+  const askedsRes = await strapi.execute(
+    '80usersPermissionsUserWithAskeds',
+    { id: context.userId },
+    context.jwt,
+    context.fetch
+  );
+  const existingAskedIds: string[] =
+    askedsRes?.data?.usersPermissionsUser?.data?.attributes?.askeds?.data?.map((a: any) => String(a.id)) ?? [];
 
   // ── SOLO CASE: single-member project where that member is the applicant ──
   // Creating an Ask with an initial self-vote would leave it permanently stuck
@@ -235,7 +245,6 @@ export const applyToMissionConfig: ActionConfig = {
   paramSchema: {
     openMissionId: { type: 'string', required: true },
     projectId: { type: 'string', required: true },
-    existingAskedIds: { type: 'array', required: false },
   },
 
   authRules: [{ type: 'jwt' }],

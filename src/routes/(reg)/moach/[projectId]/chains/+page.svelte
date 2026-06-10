@@ -9,7 +9,6 @@
   import { lang } from '$lib/stores/lang.js';
 
   const moachStore = getMoachStore();
-  const baseUrl = import.meta.env.VITE_URL;
 
   let projectId = $derived(page.params.projectId);
   let projectData = $derived(moachStore.state.projects[projectId]);
@@ -90,40 +89,17 @@
 
     chainExtraLoading = true;
     try {
-      const parts = [];
-      if (neededOmIds.length > 0) {
-        parts.push(`
-          extraOm: open_missions(filters:{id:{in:[${neededOmIds.map((id) => `"${id}"`).join(',')}]}}) {
-            data { id attributes { name noofhours perhour sqadualed privatlinks publicklinks
-              rishon{data{id}} mission{data{id}} acts{data{id attributes{shem dateS}}} createdAt
-              asks {data{ id attributes { archived
-                users_permissions_user {data{ id attributes{ username profilePic {data{attributes{ url }}}}}}
-                forums {data{ id }}
-              }}}
-            }}
-          }
-        `);
-      }
-      if (neededPmIds.length > 0) {
-        parts.push(`
-          extraPendm: pendms(filters:{id:{in:[${neededPmIds.map((id) => `"${id}"`).join(',')}]}}) {
-            data { id attributes { name createdAt dates noofhours perhour mission{data{id}}
-              users { what why id users_permissions_user { data { id attributes { username } } } }
-            }}
-          }
-        `);
-      }
-
-      const token = page.data?.tok || '';
-      const res = await fetch(baseUrl + '/graphql', {
-        method: 'POST',
-        headers: {
-          Authorization: 'bearer ' + token,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ query: `query { project(id: "${projectId}") { data { attributes { ${parts.join('\n')} } } } }` })
-      });
-      const json = await res.json();
+      // Routed through the secure proxy (qid) so the JWT stays in the HttpOnly
+      // cookie. Empty id arrays return empty sets — harmless when only one of the
+      // two is needed (the early-return above already covers the both-empty case).
+      const json = await sendToSer(
+        { pid: projectId, omIds: neededOmIds, pmIds: neededPmIds },
+        'chainExtraData',
+        0,
+        0,
+        false,
+        fetch
+      );
       const projAttrs = json?.data?.project?.data?.attributes;
 
       const newOmi = projAttrs?.extraOm?.data ?? [];

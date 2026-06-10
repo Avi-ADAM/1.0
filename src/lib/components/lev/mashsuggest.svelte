@@ -225,61 +225,18 @@
   let miDatan = [];
   async function afreact(event) {
     let why = event.why;
-    console.log(why);
-    let d = new Date();
-    //  loading = true;
-   
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    let idL = cookieValueId;
-    let token = page.data.tok;
-    let bearer1 = 'bearer' + ' ' + token;
-    let dataa = {
-      data: {
-        chat: [
-          ...chat,
-          {
-            what: true,
-            users_permissions_user: idL,
-            why: why,
-            order: (order += 1),
-            zman: d.toISOString(),
-            ide: idL
-          }
-        ]
-      }
-    };
     try {
-      await fetch(`${baseUrl}/api/askms/${askId}?populate=*`, {
-        method: 'PUT',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(dataa)
-      })
-        .then((r) => r.json())
-        .then((data) => (miDatan = data));
-      console.log(miDatan);
-      chat.push({
-        what: true,
-        users_permissions_user: idL,
-        why: why,
-        order: (order += 1),
-        zman: d.toISOString(),
-        ide: idL
+      const result = await executeAction('addAskmChatEntry', {
+        askId: String(askId),
+        why: String(why),
       });
-      chat = chat;
-      clicked = false;
-      nowId.set(
-        miDatan.data.attributes.chat[miDatan.data.attributes.chat.length - 1].id
-      );
-      //   loading = false;
+      if (result.success) {
+        chat = result.data.chat ?? chat;
+        if (result.data.lastId) nowId.set(result.data.lastId);
+        clicked = false;
+      }
     } catch (e) {
-      let error1 = e;
-      console.log(error1);
+      console.log(e);
     }
   }
 </script>

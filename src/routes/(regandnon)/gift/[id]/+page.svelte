@@ -7,9 +7,6 @@
   import { RingLoader } from 'svelte-loading-spinners';
   import { goto } from '$app/navigation';
   import SaleComponent from '$lib/components/sales/SaleComponent.svelte';
-  import { projectMembershipService } from '$lib/services/projectMembershipService.js';
-  import { salesService } from '$lib/services/salesService.js';
-  import { getCurrentUserId } from '$lib/utils/authUtils.js';
   import { toast } from 'svelte-sonner';
   import NumberInput from '$lib/celim/ui/numberInput.svelte';
   import MatanotPublicView from '$lib/components/products/MatanotPublicView.svelte';
@@ -21,10 +18,6 @@
 
   // State
   let showSaleInterface = $state(false);
-  let isMember = $state(false);
-  let membershipType = $state('none');
-  let projectUsers = $state([]);
-  let isLoadingMembership = $state(false);
   let currentQuantity = $state(data.alld?.quant || 0);
 
   // Form state
@@ -110,11 +103,11 @@
   }
 
   async function handleBuyNow(e) {
-    e?.preventDefault(); // Prevent default form submission
+    e?.preventDefault();
 
     try {
       isSubmitting = true;
-      const userId = getCurrentUserId();
+      const userId = data.uid;
       if (!userId) {
         login();
         return;
@@ -182,47 +175,6 @@
     toast.error(error || t.saleError[$lang]);
   }
 
-  async function checkProjectMembership() {
-    if (!data.tok || !data.alld?.projectcreates?.data?.[0]?.id) return;
-
-    const userId = getCurrentUserId();
-    const projectId = data.alld.projectcreates.data[0].id;
-
-    if (!userId || !projectId) return;
-
-    isLoadingMembership = true;
-    try {
-      const membershipResult =
-        await projectMembershipService.checkProjectMembership(
-          userId,
-          projectId,
-          { includeProjectInfo: true }
-        );
-
-      if (membershipResult.success) {
-        isMember = membershipResult.isMember;
-        membershipType = membershipResult.membershipType;
-
-        if (isMember) {
-          const token = page.data.tok;
-          if (token) {
-            const projectResult = await salesService.getProjectProducts(
-              projectId,
-              token
-            );
-            if (projectResult.success) {
-              projectUsers = projectResult.data.project.users;
-            }
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error checking project membership:', error);
-    } finally {
-      isLoadingMembership = false;
-    }
-  }
-
   function login(e) {
     e?.preventDefault?.();
     goto(`/login?from=gift/${data.mId}`);
@@ -259,7 +211,6 @@
     if (data.alld?.quant !== undefined) {
       currentQuantity = data.alld.quant;
     }
-    checkProjectMembership();
   });
 
   $effect(() => {
@@ -365,7 +316,7 @@
               </h2>
               <div class="scale-90 origin-top-right rtl:origin-top-left">
                 <ShareButtons
-                  slug={'gift/' + page.data.mId}
+                  slug={'gift/' + data.mId}
                   title={data.alld.title ? data.alld.title[$lang] : null}
                   desc={t.gift[$lang]}
                   hashtags={['1💗1', 'consensus']}
@@ -469,7 +420,7 @@
 
           <!-- Actions Area -->
           <div class="mt-auto">
-            {#if page.data.tok}
+            {#if data.tok}
               {#if hasPendingRequest}
                 <a
                   href={firstPendingId ? `/deals/request/${firstPendingId}` : '/deals'}
@@ -512,7 +463,7 @@
               </div>
 
               <!-- Admin/Member Section -->
-              {#if isMember && !isLoadingMembership}
+              {#if data.isMember}
                 <div
                   class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700"
                 >
@@ -545,7 +496,7 @@
                         price={data.alld.price || 0}
                         kindOf={data.alld.kindOf || 'total'}
                         projectId={data.alld.projectcreates.data[0].id}
-                        {projectUsers}
+                        projectUsers={data.projectUsers}
                         onDone={handleSaleSuccess}
                         onError={handleSaleError}
                       />

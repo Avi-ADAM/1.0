@@ -1,7 +1,5 @@
 <script>
-  import { mi } from '$lib/components/prPr/mi.js';
   import { idPr } from '../../stores/idPr.js';
-  import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
   import Checkbox from '$lib/celim/ui/input/checkbox.svelte';
   import TextInput from '$lib/celim/ui/input/textInput.svelte';
@@ -9,8 +7,7 @@
   import RichText from '$lib/celim/ui/richText.svelte';
   import Button from '$lib/celim/ui/button.svelte';
   import UploadPic from '../userPr/uploadPic.svelte';
-  import axios from 'axios';
-  import { page } from '$app/state';
+  import { executeAction } from '$lib/client/actionClient';
   let oneForeProject = $state(false);
   let description = $state('');
   let loading = $state(false);
@@ -21,95 +18,52 @@
   let quant = $state(1);
   let kindOf = $state('total');
   let name = $state('');
-  let bearer1;
-  let token;
   let error1;
-  let miDatan = [];
-  let linkg = import.meta.env.VITE_URL + '/graphql';
 
   let croppedImage = $state(null);
-  const baseUrl = import.meta.env.VITE_URL;
-
-  let url1 = baseUrl + '/api/upload';
 
 
   async function add() {
     loading = true;
-    console.log(description);
-    let imageId = null;
     quant = quant > 0 ? quant : 1;
     price = price > 0 ? price : 0;
-
-    let d = new Date();
     already = true;
 
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
     try {
+      let picId = null;
       if (croppedImage) {
         try {
-          const response = await axios.post(url1, croppedImage, {
-            headers: {
-              Authorization: bearer1
-            }
-          });
-          imageId = response.data[0].id;
-          console.log('imageId', imageId);
-        } catch (error) {
-          console.log('צריך לתקן:', error.response);
+          const uploadRes = await fetch('/api/upload', { method: 'POST', body: croppedImage });
+          const uploadData = await uploadRes.json();
+          picId = uploadData?.[0]?.id != null ? String(uploadData[0].id) : null;
+        } catch (e) {
+          console.log('upload failed:', e);
         }
       }
-      // GraphQL mutation without image
-      console.log(dates, datef);
-      const sdate = new Date(dates) || null;
-      const fdate = new Date(datef) || null;
-      const response = await fetch(linkg, {
-        method: 'POST',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `mutation {
-              createMatanot(
-                data: {
-                ${imageId ? `pic: "${imageId}",` : ``}
-                  projectcreates: "${$idPr}"
-                  name: """${name}"""
-                  price: ${price}
-                  quant: ${unlimitedM ? -1 : quant}
-                  desc: """${description}"""	
-                  publishedAt: "${d.toISOString()}"
-                  kindOf: ${kindOf}
-                 ${sdate !== null ? `	 startDate: "${sdate.toISOString()}" ` : ``}	
-                 ${fdate !== null ? `	finnishDate: "${fdate.toISOString()}" ` : ``}
-                  oneForeProject: ${oneForeProject}
-                }
-              ) {
-                data {
-                  id
-                  attributes {
-                    name
-                    price
-                    quant
-                    kindOf
-                  }
-                }
-              }
-            }`
-        })
+
+      const result = await executeAction('createComplexMatanot', {
+        projectId: String($idPr),
+        name,
+        desc: description,
+        pricingMode: 'fixed',
+        fixedPrice: price,
+        quant,
+        unlimitedM,
+        kindOf,
+        dates: dates ?? null,
+        datef: datef ?? null,
+        oneForeProject,
+        picId
       });
 
-      const result = await response.json();
-      miDatan = result;
-
-      console.log(miDatan);
-      loading = false;
-      success = true;
-      error = false;
-      onDone({
-        matana: miDatan.data.createMatanot.data
-      });
+      if (result.success) {
+        loading = false;
+        success = true;
+        error = false;
+        onDone({ matana: result.data?.matanot ?? result.data });
+      } else {
+        throw new Error(result.error?.message ?? 'Failed to create matanot');
+      }
     } catch (e) {
       error1 = e;
       console.log(error1);

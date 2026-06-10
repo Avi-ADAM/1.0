@@ -3,7 +3,6 @@
 </script>
 
 <script>
-  import NewIwant from '$lib/components/addnew/newIwant.svelte';
   import { fly } from 'svelte/transition';
   import { lang } from '$lib/stores/lang.js';
   import { forum, isChatOpen, nowChatId } from '$lib/stores/pendMisMes.js';
@@ -160,16 +159,14 @@
                 <div
                   class="mx-auto h-[85vh] d overflow-auto flex flex-col z-[1001]"
                 >
-                  {#if newMeeting == false}
-                    <NewIwant {idL} userName_value={username} />
-                  {:else}
-                    <CreateNewMeeting
-                      onClose={() => {
-                        newMeeting = false;
-                        dialogOpen = false;
-                      }}
-                    />
-                  {/if}
+                  <!-- Wish creation moved to the /concierge flow; this drawer
+                       now only hosts the new-meeting form. -->
+                  <CreateNewMeeting
+                    onClose={() => {
+                      newMeeting = false;
+                      dialogOpen = false;
+                    }}
+                  />
                 </div>
               </div>
             </div>
