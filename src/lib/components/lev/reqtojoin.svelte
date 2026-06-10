@@ -367,13 +367,11 @@
     ser = xyz();
 
     if (noofpu === 1) {
-      const existingDeclinedIds = (Array.isArray(declined) ? declined : []).map((c) => String(c.id));
       try {
         const result = await executeAction('declineMissionRequest', {
           openMissionId: String(openMid),
           projectId: String(projectId),
           declinedUserId: String(userId),
-          existingDeclinedIds,
         });
         if (result.success) {
           onDecline?.({ ani: 'asked', coinlapach });

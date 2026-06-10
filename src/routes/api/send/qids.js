@@ -2725,8 +2725,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       data { id }
     }
   }`,
-  '130updateOpenMissionDeclined': `mutation UpdateOpenMissionDeclined($id: ID!, $declinedIds: [ID]) {
-    updateOpenMission(id: $id, data: { declined: $declinedIds }) {
+  '130updateOpenMissionDeclined': `mutation UpdateOpenMissionDeclined($id: ID!, $declinedId: ID) {
+    updateOpenMission(id: $id, data: { declined: $declinedId }) {
       data { id }
     }
   }`,
