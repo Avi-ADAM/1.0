@@ -38,7 +38,7 @@ async function publishPubkey(identity: IdentityRecord) {
 }
 
 export type PublishResult =
-  | { ok: true; event: ConsentEvent }
+  | { ok: true; event: ConsentEvent; reason?: undefined }
   | { ok: false; reason: string; event: ConsentEvent };
 
 export async function signAndPublish(

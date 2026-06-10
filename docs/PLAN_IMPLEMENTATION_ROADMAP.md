@@ -160,21 +160,22 @@
 
 **סה"כ 82 טסטים עוברים**, TS נקי בקבצים החדשים, backward-compat מלא.
 
-## 7. השלב הבא (צעדים 5–8, ניתנים להתחלה — כל ההחלטות החוסמות סגורות)
+## 7. השלב הבא
 
-### צעד 5 — חיבור `consentSpec` ל-`addVote` (ענף tosplit) + ConsentBadge
-- הרחבת `src/lib/server/actions/configs/addVote.ts` עם `consentSpec` ראשון:
-  ```ts
-  consentSpec: {
-    action: 'tosplit.vote',
-    subjectType: 'tosplit',
-    subjectIdParam: 'tosplitId',
-    requireConsensus: true,
-    restimeFrom: 'project'
-  }
-  ```
-- `/api/action` יזהה את ה-spec ויקרא ל-shadow signing flow.
-- `src/lib/components/consent/ConsentBadge.svelte` — ירוק/אפור ב-split page.
+### ✅ צעד 5 — `consentSpec` ל-`addVote` + ConsentBadge (קומיט 146.2)
+- `ConsentSpec.action`/`subjectType` הורחבו לתמוך בפונקציה (poly-action dispatch).
+- `addVote` קיבל `consentSpec` שמנתב 6 ענפים:
+  - `type='tosplit'` → `tosplit.vote`
+  - `type='pend'` → `pendm.vote`
+  - `type='sheirutpend'` → `sheirutpend.vote`
+  - `type='ask'` → `ask.vote`
+  - `type='decision'` → `decision.vote`
+  - `type='weFinnish'` → `mission.approve.vote`
+- `src/lib/client/shadowSign.ts` — orchestrator עם `deriveConsentEventFromAction`
+  (טהור) ו-`signActionShadow` (browser-only, lazy-imports `signAndPublish`).
+- `src/lib/components/consent/ConsentBadge.svelte` — Svelte 5 runes, 4 מצבים
+  (signed/pending/unsigned/unverified), עוטף את ה-eventId לאודיט.
+- 17 טסטים חדשים על ה-derivation, כולל poly-dispatch ו-skip-on-unknown.
 
 ### צעד 6 — `proposal.counter` ו-`consensus.timeout` reducers
 - שני reducers עצמאיים על-בסיס PLAN_restime_in_signed_chain §3.

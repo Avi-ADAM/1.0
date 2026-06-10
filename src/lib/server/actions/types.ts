@@ -51,16 +51,18 @@ export interface ActionConfig {
  * Declarative mapping from an action invocation to a ConsentEvent. Lets
  * existing actions emit shadow-signed events without touching call sites.
  *
- * The spec is intentionally minimal: action name + which param holds the
- * subject id + a pure projection from params to event.predicate. Complex
- * actions (multi-stage flows) can provide a function instead.
+ * For poly-actions that branch on a param value (e.g. addVote with
+ * type=tosplit|pend|sheirutpend|...), `action` and `subjectType` can be
+ * functions that derive the right value from params. They can also return
+ * `null` to indicate "no consent event for this invocation" — used when only
+ * some branches of a poly-action ratify a group decision.
  */
 export interface ConsentSpec {
-  /** Dotted action name (e.g., 'tosplit.vote', 'mission.approve') */
-  action: string;
+  /** Dotted action name (e.g., 'tosplit.vote'). String or per-invocation deriver. */
+  action: string | ((params: Record<string, unknown>) => string | null);
 
-  /** Type tag for ConsentEvent.subject.type (e.g., 'tosplit', 'haluka') */
-  subjectType: string;
+  /** Type tag for ConsentEvent.subject.type. String or per-invocation deriver. */
+  subjectType: string | ((params: Record<string, unknown>) => string);
 
   /** Name of the action param that holds the subject id */
   subjectIdParam: string;
@@ -83,8 +85,9 @@ export interface ConsentSpec {
 
   /**
    * Pure mapping from action params to event.predicate. If omitted, the
-   * predicate is `{ ...params, [subjectIdParam]: undefined }` — the subject
-   * id is moved to ConsentEvent.subject.id and not duplicated in predicate.
+   * predicate is `{ ...params, [subjectIdParam]: undefined, userId: undefined }`
+   * — the subject id moves to ConsentEvent.subject.id and userId is bound at
+   * sign time from the session, not from the payload.
    */
   predicateFromParams?: (params: Record<string, unknown>) => Record<string, unknown>;
 
