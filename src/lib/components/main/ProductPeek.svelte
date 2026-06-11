@@ -56,6 +56,9 @@
 
   function pointerDown(e) {
     if (flyDir !== 0 || negoMode || cardIdx >= levCards.length) return;
+    // A press that starts on a button is a click, not a drag — capturing the
+    // pointer here would steal the click from the button.
+    if (e.target.closest('button')) return;
     dragging = true;
     startX = e.clientX;
     e.currentTarget.setPointerCapture?.(e.pointerId);
