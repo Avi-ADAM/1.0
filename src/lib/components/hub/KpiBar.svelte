@@ -20,12 +20,13 @@
     sales: tr.hub.sales[$lang]
   });
 
+  // All KPI actions live as cards on the Lev screen until dedicated pages ship.
   const chips = $derived([
-    { icon: '🗳', count: votes,           label: labels.votes,       href: '/kind/vote',       red: false,        pulse: urgent > 0 },
-    { icon: '⏰', count: urgent,          label: labels.urgent,      href: '/kind/vote',       red: urgent > 0,   pulse: urgent > 0 },
-    { icon: '💼', count: suggestions,     label: labels.suggestions, href: '/kind/suggestion', red: false,        pulse: false },
-    { icon: '🛒', count: activePurchases, label: labels.purchases,   href: '/kind/sale',       red: false,        pulse: false },
-    { icon: '💰', count: activeSales,     label: labels.sales,       href: '/kind/sale',       red: false,        pulse: false }
+    { icon: '🗳', count: votes,           label: labels.votes,       href: '/lev', red: false,        pulse: urgent > 0 },
+    { icon: '⏰', count: urgent,          label: labels.urgent,      href: '/lev', red: urgent > 0,   pulse: urgent > 0 },
+    { icon: '💼', count: suggestions,     label: labels.suggestions, href: '/lev', red: false,        pulse: false },
+    { icon: '🛒', count: activePurchases, label: labels.purchases,   href: '/lev', red: false,        pulse: false },
+    { icon: '💰', count: activeSales,     label: labels.sales,       href: '/lev', red: false,        pulse: false }
   ]);
 </script>
 

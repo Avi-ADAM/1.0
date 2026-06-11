@@ -14,16 +14,16 @@
   const t = {
     he: {
       shortcuts: 'קיצורי דרך',
-      missions: 'משימות בתהליך',
-      rikma: 'ריקמות',
-      inbound: 'כניסות',
+      lev: 'הלב — אישורים והצבעות',
+      moach: 'מוח — ניהול הריקמה',
+      me: 'הפרופיל שלי',
       feed: 'פעילות אחרונה'
     },
     en: {
       shortcuts: 'Shortcuts',
-      missions: 'Active missions',
-      rikma: 'Connections',
-      inbound: 'Inbound',
+      lev: 'The Heart — approvals & votes',
+      moach: 'Brain — manage your partnership',
+      me: 'My profile',
       feed: 'Recent activity'
     }
   };
@@ -31,9 +31,9 @@
   let labels = $derived(t[$lang as keyof typeof t] ?? t.he);
 
   const shortcuts = $derived([
-    { icon: '🧩', label: labels.missions,  href: '/kind/mission',    badge: 0 },
-    { icon: '🤝', label: labels.rikma,     href: '/kind/rikma',      badge: 0 },
-    { icon: '📨', label: labels.inbound,   href: '/kind/suggestion', badge: 0 }
+    { icon: '💗', label: labels.lev,   href: '/lev',   badge: 0 },
+    { icon: '🧠', label: labels.moach, href: '/moach', badge: 0 },
+    { icon: '👤', label: labels.me,    href: '/me',    badge: 0 }
   ]);
 </script>
 
@@ -70,7 +70,7 @@
       {:else}
         <!-- Urgent vote alert -->
         {#if summary.kpi.urgent > 0}
-          <UrgentVotePill count={summary.kpi.urgent} />
+          <UrgentVotePill count={summary.kpi.urgent} href="/lev" />
         {/if}
 
         <!-- Custom purchase CTA -->

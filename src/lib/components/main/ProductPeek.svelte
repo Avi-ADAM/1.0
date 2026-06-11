@@ -3,13 +3,83 @@
   import { goto } from '$app/navigation';
   import { fade } from 'svelte/transition';
 
-  let active = $state('hub');
+  let active = $state('lev');
 
   const tabs = $derived([
+    { id: 'lev', icon: '💗', label: $t('home.peek.lev.tab') },
     { id: 'hub', icon: '🏠', label: $t('home.peek.tabs.hub') },
     { id: 'mission', icon: '⏱️', label: $t('home.peek.tabs.mission') },
     { id: 'vote', icon: '🗳️', label: $t('home.peek.tabs.vote') }
   ]);
+
+  // --- Lev swipeable demo cards ---
+  const levCards = $derived([
+    {
+      emoji: '🧩',
+      glow: 'rgba(238,232,170,0.9)',
+      type: $t('home.peek.lev.cards.c1.type'),
+      project: $t('home.peek.lev.cards.c1.project'),
+      title: $t('home.peek.lev.cards.c1.title'),
+      by: $t('home.peek.lev.cards.c1.by')
+    },
+    {
+      emoji: '🤝',
+      glow: 'rgba(74,222,128,0.8)',
+      type: $t('home.peek.lev.cards.c2.type'),
+      project: $t('home.peek.lev.cards.c2.project'),
+      title: $t('home.peek.lev.cards.c2.title'),
+      by: $t('home.peek.lev.cards.c2.by')
+    },
+    {
+      emoji: '💰',
+      glow: 'rgba(255,0,146,0.6)',
+      type: $t('home.peek.lev.cards.c3.type'),
+      project: $t('home.peek.lev.cards.c3.project'),
+      title: $t('home.peek.lev.cards.c3.title'),
+      by: $t('home.peek.lev.cards.c3.by')
+    }
+  ]);
+
+  let cardIdx = $state(0);
+  let dx = $state(0);
+  let dragging = $state(false);
+  let flyDir = $state(0); // 0 = idle, 1 = flying right (approve), -1 = flying left (reject)
+  let startX = 0;
+
+  function pointerDown(e) {
+    if (flyDir !== 0 || cardIdx >= levCards.length) return;
+    dragging = true;
+    startX = e.clientX;
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  }
+
+  function pointerMove(e) {
+    if (dragging && flyDir === 0) dx = e.clientX - startX;
+  }
+
+  function pointerUp() {
+    if (!dragging) return;
+    dragging = false;
+    if (dx > 70) decide(true);
+    else if (dx < -70) decide(false);
+    else dx = 0;
+  }
+
+  function decide(approve) {
+    if (flyDir !== 0 || cardIdx >= levCards.length) return;
+    flyDir = approve ? 1 : -1;
+    setTimeout(() => {
+      cardIdx += 1;
+      dx = 0;
+      flyDir = 0;
+    }, 350);
+  }
+
+  function restartCards() {
+    cardIdx = 0;
+    dx = 0;
+    flyDir = 0;
+  }
 
   const kpis = $derived([
     { icon: '🗳', count: 2, label: $t('home.peek.hub.votes') },
@@ -74,7 +144,114 @@
 
   {#key active}
     <div class="min-h-[330px] p-3 sm:p-4" in:fade={{ duration: 250 }}>
-      {#if active === 'hub'}
+      {#if active === 'lev'}
+        <p class="text-xs font-semibold text-white/40 uppercase tracking-wider mb-1">
+          {$t('home.peek.lev.header')}
+        </p>
+        <p class="text-center text-gold/90 text-sm mb-3">{$t('home.peek.lev.hint')}</p>
+
+        {#if cardIdx < levCards.length}
+          <div class="relative h-[250px] select-none" style="perspective: 800px;">
+            <!-- next card peeking from behind -->
+            {#if cardIdx + 1 < levCards.length}
+              <div
+                class="absolute inset-x-3 top-2 bottom-0 rounded-2xl bg-white/80 border border-slate-200 scale-95 translate-y-2"
+              ></div>
+            {/if}
+
+            <!-- top card: draggable -->
+            <div
+              class="absolute inset-0 rounded-2xl bg-white shadow-2xl overflow-hidden flex flex-col cursor-grab active:cursor-grabbing"
+              style="touch-action: pan-y; transform: translateX({flyDir !== 0
+                ? flyDir * 140
+                : 0}%) translateX({flyDir === 0 ? dx : 0}px) rotate({(flyDir !== 0
+                ? flyDir * 18
+                : dx / 14)}deg); transition: {dragging
+                ? 'none'
+                : 'transform 0.35s ease'}; opacity: {flyDir !== 0 ? 0.4 : 1};"
+              onpointerdown={pointerDown}
+              onpointermove={pointerMove}
+              onpointerup={pointerUp}
+              onpointercancel={pointerUp}
+              role="group"
+              aria-label={levCards[cardIdx].title}
+            >
+              <!-- gold header with glow, like the real card -->
+              <div
+                class="relative flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-200 border-b border-amber-300 overflow-hidden"
+              >
+                <div
+                  class="absolute inset-0 opacity-30 blur-2xl pointer-events-none"
+                  style="background: radial-gradient(circle at center, {levCards[cardIdx]
+                    .glow}, transparent 70%);"
+                ></div>
+                <span class="text-xl relative">{levCards[cardIdx].emoji}</span>
+                <span class="relative flex-1 min-w-0">
+                  <span class="block text-sm font-bold text-slate-800 truncate"
+                    >{levCards[cardIdx].project}</span
+                  >
+                  <span class="block text-[11px] text-amber-700 font-semibold"
+                    >{levCards[cardIdx].type}</span
+                  >
+                </span>
+              </div>
+
+              <div class="flex-1 flex flex-col justify-center px-4 py-3 text-center">
+                <p class="text-slate-800 font-bold text-base leading-snug">
+                  {levCards[cardIdx].title}
+                </p>
+                <p class="text-slate-500 text-xs mt-2">{levCards[cardIdx].by}</p>
+              </div>
+
+              <div class="flex border-t border-slate-100">
+                <button
+                  type="button"
+                  class="flex-1 py-3 text-red-500 font-bold text-sm hover:bg-red-50 transition-colors"
+                  onclick={() => decide(false)}
+                  >✕ {$t('home.peek.lev.reject')}</button
+                >
+                <div class="w-px bg-slate-100"></div>
+                <button
+                  type="button"
+                  class="flex-1 py-3 text-green-600 font-bold text-sm hover:bg-green-50 transition-colors"
+                  onclick={() => decide(true)}
+                  >✓ {$t('home.peek.lev.approve')}</button
+                >
+              </div>
+
+              <!-- drag feedback stamps -->
+              {#if dx > 30 || flyDir === 1}
+                <span
+                  class="absolute top-10 start-3 rotate-[-12deg] border-4 border-green-500 text-green-600 font-black text-lg px-2 py-0.5 rounded-lg bg-white/80"
+                  >✓ {$t('home.peek.lev.approved')}</span
+                >
+              {:else if dx < -30 || flyDir === -1}
+                <span
+                  class="absolute top-10 end-3 rotate-[12deg] border-4 border-red-400 text-red-500 font-black text-lg px-2 py-0.5 rounded-lg bg-white/80"
+                  >✕ {$t('home.peek.lev.rejected')}</span
+                >
+              {/if}
+            </div>
+          </div>
+          <p class="text-center text-white/40 text-xs mt-2">
+            {cardIdx + 1} / {levCards.length}
+          </p>
+        {:else}
+          <div
+            class="h-[250px] flex flex-col items-center justify-center text-center gap-2"
+            in:fade={{ duration: 300 }}
+          >
+            <span class="text-5xl">💗</span>
+            <p class="text-white font-bold text-lg">{$t('home.peek.lev.done')}</p>
+            <p class="text-white/60 text-sm max-w-xs">{$t('home.peek.lev.doneSub')}</p>
+            <button
+              type="button"
+              class="mt-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white/80 text-sm font-semibold hover:bg-white/20 transition-colors"
+              onclick={restartCards}>{$t('home.peek.lev.restart')}</button
+            >
+          </div>
+        {/if}
+      {:else if active === 'hub'}
         <!-- KPI chips like the real hub -->
         <div class="flex flex-wrap gap-2 pb-3 border-b border-white/10">
           {#each kpis as kpi (kpi.label)}
