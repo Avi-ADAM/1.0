@@ -36,6 +36,9 @@ const handler: ActionExecutionHandler = async (_params, context, { strapi }) => 
       configured: Boolean(treasuryUserId),
       projectId: String(node.id),
       treasuryUserId,
+      // Identity for the proposal card's 1💗1 row (logo + name + public link).
+      projectName: node.attributes?.projectName ?? '',
+      logoUrl: node.attributes?.profilePic?.data?.attributes?.url ?? '',
     },
     updateStrategy: { type: 'none' },
   };

@@ -1427,8 +1427,24 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         id
         attributes {
           projectName
+          profilePic { data { attributes { url } } }
           user_1s { data { id } }
         }
+      }
+    }
+  }`,
+
+  "206createPlatformSale": `mutation CreatePlatformSale($project: ID!, $userId: ID!, $amount: Float!, $publishedAt: DateTime!, $note: String) {
+    createSale(data: {
+      project: $project
+      users_permissions_user: $userId
+      in: $amount
+      publishedAt: $publishedAt
+      note: $note
+    }) {
+      data {
+        id
+        attributes { in note }
       }
     }
   }`,
@@ -3534,6 +3550,30 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           id
                           attributes {
                             hervachti
+                          }
+                        }
+                      }
+                    }
+                    siteShareHalukas {
+                      data {
+                        id
+                        attributes {
+                          amount
+                          confirmed
+                          senderconf
+                          proposedAmount
+                          adjustDirection
+                          adjustReason
+                          usersend { data { id } }
+                          userrecive { data { id } }
+                          recive_project {
+                            data {
+                              id
+                              attributes {
+                                projectName
+                                profilePic { data { attributes { url } } }
+                              }
+                            }
                           }
                         }
                       }

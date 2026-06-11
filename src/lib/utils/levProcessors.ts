@@ -1729,6 +1729,10 @@ export function processHalukas(
       uids: uids,
       halukot: haluka.halukot,
       hervach: haluka.hervach,
+      // Platform (1💗1) service-share line for this proposal, if present
+      // (SITE_SHARE_TRANSFER_SPEC.md §7). undefined when the cross-rikma schema
+      // isn't live — the card then shows no platform row.
+      siteShare: haluka.siteShare,
 
       // Status
       already,

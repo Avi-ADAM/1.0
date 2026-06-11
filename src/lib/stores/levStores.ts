@@ -175,11 +175,29 @@ export interface ResourceRequestData {
 }
 
 /** Profit distribution request data */
+/** Platform (1💗1) service-share line attached to a proposal, summed from the
+ *  tosplit's `siteShareHalukas` (SITE_SHARE_TRANSFER_SPEC.md §7). Present only
+ *  when the cross-rikma fields are live; `undefined` otherwise. */
+export interface HalukaSiteShare {
+  /** Total amount routed to the platform for this proposal. */
+  amount: number;
+  /** All linked transfers confirmed by both sides. */
+  confirmed: boolean;
+  /** The giver(s) have marked the money as sent. */
+  senderconf: boolean;
+  /** Original suggestion before any adjustment (reports). */
+  proposedAmount?: number;
+  /** 'as_is' | 'less' | 'more'. */
+  adjustDirection?: string;
+  adjustReason?: string | null;
+}
+
 export interface HalukaData {
   id: string;
   projectId: string;
   amount: number;
   priority?: number;
+  siteShare?: HalukaSiteShare;
   [key: string]: any;
 }
 

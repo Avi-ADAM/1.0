@@ -538,6 +538,7 @@
                       onProj={proj}
                       onCoinLapach={delo}
                       hervach={buble.hervach}
+                      siteShare={buble.siteShare}
                       onUser={user}
                       {low}
                       cards="true"

@@ -18,6 +18,7 @@ import type {
   PendResourceData,
   ResourceRequestData,
   HalukaData,
+  HalukaSiteShare,
   WelcomeData,
   TransferData,
   DecisionData,
@@ -610,6 +611,56 @@ export function extractWegets(userData: any): ResourceRequestData[] {
  * 
  * **Validates: Requirements 1.1, 1.4**
  */
+/**
+ * Sum a tosplit's site-share transfer halukas into a single display line.
+ * Defensive: returns `undefined` when there are none (or the field is absent
+ * because the cross-rikma schema isn't live yet). Status flags are aggregated
+ * conservatively — `confirmed`/`senderconf` are true only when ALL transfers are.
+ */
+function extractSiteShare(nodes: any): HalukaSiteShare | undefined {
+  if (!Array.isArray(nodes) || nodes.length === 0) {
+    return undefined;
+  }
+
+  let amount = 0;
+  let proposed = 0;
+  let hasProposed = false;
+  let allConfirmed = true;
+  let allSent = true;
+  let adjustDirection: string | undefined;
+  let adjustReason: string | null | undefined;
+
+  for (const node of nodes) {
+    const a = node?.attributes;
+    if (!a) continue;
+    amount += a.amount || 0;
+    if (typeof a.proposedAmount === 'number') {
+      proposed += a.proposedAmount;
+      hasProposed = true;
+    }
+    if (a.confirmed !== true) allConfirmed = false;
+    if (a.senderconf !== true) allSent = false;
+    // Carry the adjustment from the first transfer that has one (one proposal,
+    // one direction in practice).
+    if (adjustDirection === undefined && a.adjustDirection) {
+      adjustDirection = a.adjustDirection;
+      adjustReason = a.adjustReason ?? null;
+    }
+  }
+
+  if (amount <= 0) {
+    return undefined;
+  }
+
+  return {
+    amount,
+    confirmed: allConfirmed,
+    senderconf: allSent,
+    ...(hasProposed ? { proposedAmount: proposed } : {}),
+    ...(adjustDirection ? { adjustDirection, adjustReason } : {})
+  };
+}
+
 export function extractHalukas(userData: any): HalukaData[] {
   const halukas: HalukaData[] = [];
 
@@ -632,6 +683,13 @@ export function extractHalukas(userData: any): HalukaData[] {
 
       const attrs = tosplit.attributes;
 
+      // Site share (1💗1) — the platform service-share transfer(s) deducted from
+      // this proposal, summed for display. These are NOT in `halukas` (they don't
+      // gate the partners' confirmation, see SITE_SHARE_TRANSFER_SPEC.md §0.2/§7);
+      // they surface via the separate `siteShareHalukas` relation. Defensive: the
+      // field only exists once the cross-rikma schema is live, otherwise undefined.
+      const siteShare = extractSiteShare(attrs.siteShareHalukas?.data);
+
       halukas.push({
         id: tosplit.id,
         projectId: project.id,
@@ -645,6 +703,7 @@ export function extractHalukas(userData: any): HalukaData[] {
         halukot: attrs.halukas?.data || [],
         hervach: attrs.hervachti || [],
         pendId: tosplit.id,
+        ...(siteShare ? { siteShare } : {}),
 
         // Additional metadata that might be useful
         createdAt: attrs.createdAt

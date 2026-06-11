@@ -8,6 +8,7 @@
   import { isMobileOrTablet } from '$lib/utilities/device';
   import { toggleScrollable, isScrolable } from './isScrolable.svelte.js';
   import { getProjectData } from '$lib/stores/projectStore.js';
+  import { platformStore } from '$lib/stores/platformStore';
 
   // רכיבים מודרניים חדשים
   import CardHeader from './CardHeader.svelte';
@@ -40,6 +41,7 @@
    * @property {() => void} [onTochat]
    * @property {any} [halukot]
    * @property {any} [hervach]
+   * @property {any} [siteShare]
    * @property {any} [projectId]
    *
    * // Props חדשים למודרניזציה
@@ -78,6 +80,7 @@
     onTochat,
     halukot = [],
     hervach = [],
+    siteShare = null,
     projectId,
 
     // מודרניזציה Props
@@ -91,6 +94,37 @@
     return getProjectData(projectId, 'us') || [];
   });
   let ulist = $state([]);
+
+  // Platform (1💗1) service-share row. Renders only when this proposal actually
+  // carries a site share AND the main-rikma identity resolved (logo/name/link).
+  // Both views (table + mobile) read these; the platform is a RECEIVER of the
+  // share, mirroring prPr/whowhat.svelte. See SITE_SHARE_TRANSFER_SPEC.md §7.
+  let showSiteShare = $derived(
+    !!siteShare && (siteShare.amount || 0) > 0 && $platformStore.configured
+  );
+  let siteShareAmount = $derived(siteShare ? siteShare.amount || 0 : 0);
+  let platformName = $derived($platformStore.projectName || '1💗1');
+  let platformLogo = $derived($platformStore.logoUrl || '');
+  let platformLink = $derived(
+    $platformStore.projectId ? `/project/${$platformStore.projectId}` : null
+  );
+  // Physical-transfer status of the share (both-sides confirm + chat, like a
+  // SheirutHalukaCard): pending → sent → confirmed.
+  let siteShareStatus = $derived(
+    !siteShare
+      ? ''
+      : siteShare.confirmed
+        ? $lang === 'he'
+          ? 'שולם'
+          : 'Paid'
+        : siteShare.senderconf
+          ? $lang === 'he'
+            ? 'נשלח'
+            : 'Sent'
+          : $lang === 'he'
+            ? 'ממתין'
+            : 'Pending'
+  );
 
   function processSplitDetails() {
     if (!hervach) {
@@ -287,7 +321,7 @@
   >
     <!-- תצוגת סטטוס הצבעה מודרנית או חלופית -->
 
-    {#if ulist.length > 0}
+    {#if ulist.length > 0 || showSiteShare}
       <div class="w-full overflow-x-auto pb-4">
         <!-- Mobile View -->
         <div class="block md:hidden space-y-3">
@@ -365,6 +399,56 @@
               {/if}
             </div>
           {/each}
+
+          {#if showSiteShare}
+            <!-- 1💗1 platform service-share (mobile) -->
+            <div
+              class="bg-gradient-to-br from-amber-50 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/20 rounded-xl p-3 border border-amber-300 dark:border-amber-700 shadow-sm"
+            >
+              <div class="flex items-center gap-2 mb-2">
+                {#if platformLogo}
+                  <img
+                    src={platformLogo}
+                    alt={platformName}
+                    class="w-7 h-7 rounded-full object-cover border border-amber-300"
+                  />
+                {/if}
+                {#if platformLink}
+                  <a
+                    href={platformLink}
+                    class="font-bold text-amber-700 dark:text-amber-300 text-base hover:underline"
+                    >💗 {platformName}</a
+                  >
+                {:else}
+                  <span class="font-bold text-amber-700 dark:text-amber-300 text-base"
+                    >💗 {platformName}</span
+                  >
+                {/if}
+              </div>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div
+                  class="bg-white dark:bg-gray-800 border border-amber-200 dark:border-amber-700 rounded-lg p-2"
+                >
+                  <div class="text-gray-500 dark:text-gray-400">
+                    {$lang === 'he' ? 'חלק האתר:' : 'Site share:'}
+                  </div>
+                  <div class="font-semibold text-amber-700 dark:text-amber-300">
+                    {siteShareAmount.toFixed(2)}
+                  </div>
+                </div>
+                <div
+                  class="bg-white dark:bg-gray-800 border border-amber-200 dark:border-amber-700 rounded-lg p-2"
+                >
+                  <div class="text-gray-500 dark:text-gray-400">
+                    {$lang === 'he' ? 'סטטוס:' : 'Status:'}
+                  </div>
+                  <div class="font-semibold text-amber-700 dark:text-amber-300">
+                    {siteShareStatus}
+                  </div>
+                </div>
+              </div>
+            </div>
+          {/if}
         </div>
 
         <!-- Desktop View -->
@@ -440,6 +524,47 @@
                   </td>
                 </tr>
               {/each}
+
+              {#if showSiteShare}
+                <!-- 1💗1 platform service-share row -->
+                <tr
+                  class="bg-gradient-to-br from-amber-50 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/20"
+                >
+                  <td
+                    class="p-3 font-bold text-amber-700 dark:text-amber-300 border-r border-amber-200 dark:border-amber-700"
+                  >
+                    <div class="flex items-center justify-center gap-2">
+                      {#if platformLogo}
+                        <img
+                          src={platformLogo}
+                          alt={platformName}
+                          class="w-6 h-6 rounded-full object-cover border border-amber-300"
+                        />
+                      {/if}
+                      {#if platformLink}
+                        <a href={platformLink} class="hover:underline"
+                          >💗 {platformName}</a
+                        >
+                      {:else}
+                        <span>💗 {platformName}</span>
+                      {/if}
+                    </div>
+                  </td>
+                  <td class="p-3 font-mono text-amber-700 dark:text-amber-300"
+                    >{siteShareAmount.toFixed(2)}</td
+                  >
+                  <td class="p-3 font-mono text-gray-400 dark:text-gray-500">-</td>
+                  <td class="p-3 font-mono text-gray-400 dark:text-gray-500">-</td>
+                  <td
+                    class="p-3 font-mono font-bold text-amber-700 dark:text-amber-300"
+                    >{siteShareAmount.toFixed(2)}</td
+                  >
+                  <td
+                    class="p-3 text-xs border-l border-amber-200 dark:border-amber-700 text-amber-700 dark:text-amber-300 font-semibold"
+                    >{siteShareStatus}</td
+                  >
+                </tr>
+              {/if}
             </tbody>
           </table>
         </div>

@@ -7,12 +7,8 @@
   import { calcX } from '$lib/func/calcX.svelte';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { executeAction } from '$lib/client/actionClient.js';
-  import { buildSiteShareLines } from '$lib/revenue/buildSiteShareLines.js';
-  import {
-    SITE_SHARE_FLAGS,
-    SITE_SHARE_TREASURY_USER_ID,
-    SITE_SHARE_PLATFORM_PROJECT_ID
-  } from '$lib/revenue/config.js';
+  import { computeSiteShare } from '$lib/revenue/computeSiteShare.js';
+  import { SITE_SHARE_FLAGS, DEFAULT_SITE_SHARE_CONFIG } from '$lib/revenue/config.js';
   import ComparisonDisplay from '$lib/components/ui/ComparisonDisplay.svelte';
   import { toast } from 'svelte-sonner';
   import Button from '$lib/celim/ui/button.svelte';
@@ -61,6 +57,9 @@
     return (100 * partialValue) / totalValue;
   }
   let ulist = $state([]);
+  // Display preference: card grid (default) or the legacy spreadsheet table.
+  // Both render the same ulist + platform site-share, just different layouts.
+  let viewMode = $state('cards'); // 'cards' | 'table'
   const baseUrl = import.meta.env.VITE_URL;
 
   let linkg = baseUrl + '/graphql';
@@ -110,6 +109,10 @@
       for (let i = 0; i < ulist.length; i++) {
         if (ulist[i].le && ulist[i].noten > 0) {
           for (let j = 0; j < ulist[i].le.length; j++) {
+            // Platform (site-share) transfers are tracked separately and are NOT
+            // part of the tosplit's halukas, so they must be excluded here —
+            // otherwise the count never matches and "split changed" fires falsely.
+            if (ulist[i].le[j].platform === true) continue;
             currentTransfers.push({
               from: ulist[i].uid,
               to: ulist[i].le[j].leid,
@@ -363,11 +366,26 @@
   }
 
   async function ask() {
+    // A discount ("pay less") must carry a reason (PLAN §4).
+    if (
+      SITE_SHARE_FLAGS.manualSplit &&
+      platformInfo?.configured &&
+      siteShareDirection === 'less' &&
+      !siteShareReason.trim()
+    ) {
+      toast.error(
+        $lang === 'he'
+          ? 'נא לציין סיבה להנחה בחלק האתר'
+          : 'Please give a reason for the site-share discount'
+      );
+      return;
+    }
+
     isLoading = true;
     isSuccess = false;
     isError = false;
     already = true;
-    
+
     let d = new Date();
     const cookieValueId = document.cookie
       .split('; ')
@@ -383,11 +401,17 @@
     }
 
     try {
-      // Step 1: Create all halukot using the new action system
+      // Step 1: Create all halukot using the new action system.
+      // Platform (1💗1) transfers are split out: they are the cross-rikma money
+      // movement and are tracked separately (both sides confirm + chat), so they
+      // must NOT be added to the tosplit's halukas — otherwise the platform
+      // member's confirmation would gate the partners' split completion.
       let halukaIds = [];
+      let platformHalukaIds = [];
       for (let i = 0; i < ulist.length; i++) {
         if (ulist[i].noten > 0) {
           for (let x = 0; x < ulist[i].le.length; x++) {
+            const isPlatform = ulist[i].le[x].platform === true;
             const halukaData = {
               project: $idPr,
               usersend: String(ulist[i].uid),
@@ -398,10 +422,32 @@
               publishedAt: d.toISOString()
             };
 
+            // Cross-rikma tagging for the platform transfer — only when the
+            // Strapi fields are live (SITE_SHARE_TRANSFER_SPEC.md §1/§7). Gated so
+            // a build whose HalukaInput lacks these fields is unaffected. The
+            // tosplit link (source_tosplit) is set from the tosplit side below via
+            // `siteShareHalukas`, so it isn't needed here. publishedAt’s qid passes
+            // `data` straight through HalukaInput, so new keys flow automatically.
+            if (isPlatform && SITE_SHARE_FLAGS.crossRikmaFields && platformInfo?.configured) {
+              Object.assign(halukaData, {
+                isSiteShare: true,
+                recive_project: String(platformInfo.projectId),
+                proposedAmount: siteShareProposed,
+                adjustDirection: siteShareDirection,
+                adjustReason: siteShareReason || null,
+                autoApproved: true
+              });
+            }
+
             const result = await executeAction('createHaluka', { data: halukaData });
-            
-            if (result.success && result.data?.createHaluka?.data?.id) {
-              halukaIds.push(result.data.createHaluka.data.id);
+            const newHalukaId = result?.data?.createHaluka?.data?.id;
+
+            if (result.success && newHalukaId) {
+              if (isPlatform) {
+                platformHalukaIds.push(newHalukaId);
+              } else {
+                halukaIds.push(newHalukaId);
+              }
             } else {
               console.error('Failed to create haluka:', result.error);
             }
@@ -425,47 +471,33 @@
         }
       }
 
-      // Step 2.5: Site share — add the platform ("main rikma") as a recipient.
-      // Off by default (SITE_SHARE_FLAGS.manualSplit). When on, the treasury
-      // recipient is resolved from the platform project (isPlatform=true) unless
-      // a static override is set, and the platform never charges its own split.
-      // In a manual split all members are providers, so the basis is the
-      // distributed profit (revach). See docs/PLAN_SITE_SHARE.md §2, §6.1.
-      if (SITE_SHARE_FLAGS.manualSplit) {
-        let treasuryUserId = SITE_SHARE_TREASURY_USER_ID;
-        let platformProjectId = SITE_SHARE_PLATFORM_PROJECT_ID;
-        if (!treasuryUserId) {
-          const pp = await executeAction('getPlatformProject', {});
-          if (pp.success && pp.data?.configured) {
-            treasuryUserId = String(pp.data.treasuryUserId);
-            platformProjectId = String(pp.data.projectId);
-          }
-        }
-        const isPlatformOwnSplit =
-          platformProjectId && String($idPr) === String(platformProjectId);
-        const siteLines = isPlatformOwnSplit
-          ? null
-          : buildSiteShareLines({
-              enabled: true,
-              payerRole: 'provider',
-              baseAmount: revach,
-              treasuryUserId,
-              payerUserId: String(cookieValueId),
-              projectId: String($idPr),
-              matbea: '2'
-            });
-        if (siteLines) {
-          // proposedAmount is an R2 Haluka field — omit it until the schema lands.
-          const { proposedAmount, ...siteHalukaPayload } = siteLines.halukaData;
-          const siteHalukaRes = await executeAction('createHaluka', {
-            data: { ...siteHalukaPayload, publishedAt: d.toISOString() }
-          });
-          if (siteHalukaRes.success && siteHalukaRes.data?.createHaluka?.data?.id) {
-            halukaIds.push(siteHalukaRes.data.createHaluka.data.id);
-            hervachtiArray.push(siteLines.hervachtiEntry);
-          } else {
-            console.error('Failed to create site-share haluka:', siteHalukaRes.error);
-          }
+      // Step 2.5: Site share — TWO records, one per side (dual-project documentation):
+      //  (a) income Sale in the MAIN rikma (accounting: the platform earned this by
+      //      providing its service), and
+      //  (b) the cross-rikma transfer Haluka(s) created above in THIS project
+      //      (physical money movement, tracked with both-sides confirm + chat).
+      // The Sale references the transfer halukas so an archive can link the two
+      // sides. The adjustment (less/more) is auto-approved (PLAN §5); reason kept.
+      // See docs/PLAN_SITE_SHARE.md §6.1 and src/generated/SITE_SHARE_TRANSFER_SPEC.md.
+      console.log('[SiteShare] submit — platformInfo:', JSON.stringify(platformInfo),
+                  '| direction:', siteShareDirection, '| final:', siteShareFinal,
+                  '| transferHalukas:', JSON.stringify(platformHalukaIds));
+      if (SITE_SHARE_FLAGS.manualSplit && platformInfo?.configured && siteShareFinal > 0) {
+        const saleRes = await executeAction('createPlatformSale', {
+          projectId: platformInfo.projectId,
+          memberId: platformInfo.memberId,
+          amount: siteShareFinal,
+          publishedAt: d.toISOString(),
+          // Adjustment is auto-approved (PLAN §5); reason kept for the record.
+          adjustDirection: siteShareDirection,
+          adjustReason: siteShareReason || null,
+          proposedAmount: siteShareProposed,
+          sourceProjectId: String($idPr),
+          transferHalukaIds: platformHalukaIds
+        });
+        console.log('[SiteShare] createPlatformSale →', JSON.stringify(saleRes?.data));
+        if (!saleRes?.success) {
+          console.error('[SiteShare] Failed to create platform sale:', saleRes?.error);
         }
       }
 
@@ -485,7 +517,14 @@
         ],
         halukas: halukaIds,
         hervachti: hervachtiArray,
-        ...(salesIds.length > 0 && { sales: salesIds })
+        ...(salesIds.length > 0 && { sales: salesIds }),
+        // Link the platform transfer(s) to this proposal WITHOUT joining the
+        // gating `halukas` set (SITE_SHARE_TRANSFER_SPEC.md §7.1). Sets each
+        // transfer's `source_tosplit` via the inverse. Gated like the tagging
+        // above; `data` passes straight through TosplitInput.
+        ...(SITE_SHARE_FLAGS.crossRikmaFields && platformHalukaIds.length > 0
+          ? { siteShareHalukas: platformHalukaIds }
+          : {})
       };
 
       const tosplitResult = await executeAction('createTosplit', { data: tosplitData });
@@ -535,7 +574,16 @@
       toast.success($lang === 'he' ? 'החלוקה נוצרה בהצלחה!' : 'Split created successfully!');
       isLoading = false;
       isSuccess = true;
-      
+
+      // Immediately reflect the new state: switch to the "proposal pending" view so
+      // the create button + site-share box disappear and the creator's vote shows.
+      // Without this the form stays put and a second click would duplicate the split.
+      hatzaa = true;
+      already = true;
+      noofok = 1; // the creator's own "what:true" vote
+      noofno = 0;
+      noofw = Math.max(0, ulist.length - 1);
+
     } catch (e) {
       error1 = e;
       console.error('Error creating tosplit:', error1);
@@ -562,6 +610,87 @@
   let isError = $state(false);
   let availableForNewSplit = $state(0); // Count of truly available sales (not pending)
 
+  // Site share — display-time preview of the platform's service line.
+  // siteShareProposed is what the system suggests; the payer may keep it, pay
+  // less (reason required) or more (reason optional). Both directions are
+  // auto-approved (PLAN §4/§5). platformInfo is reused by ask() so we don't
+  // resolve the platform project twice.
+  let siteShareProposed = $state(0);
+  let platformInfo = $state(null); // { projectId, memberId, configured }
+  let siteShareDirection = $state('as_is'); // 'as_is' | 'less' | 'more'
+  let siteShareCustom = $state(0); // the payer's chosen amount when adjusting
+  let siteShareReason = $state('');
+  // The giver→platform transfers the matching produced (for display under the table).
+  let platformTransfers = $state([]);
+
+  // The final amount that will actually be recorded.
+  let siteShareFinal = $derived(
+    siteShareDirection === 'as_is'
+      ? siteShareProposed
+      : Number(siteShareCustom) > 0
+        ? Number(siteShareCustom)
+        : siteShareProposed
+  );
+
+  // True when the platform takes a real share of THIS split. Kept as a function
+  // (not $derived) so distribute() can call it imperatively while recomputing.
+  // NOTE: this is NOT gated on view-mode (trili). When viewing an existing
+  // proposal we reconstruct the stored site-share (see onMount) so the recompute
+  // reproduces it — otherwise the partners' amounts and the missing platform card
+  // would register as a false "split changed".
+  function platformActive() {
+    return (
+      SITE_SHARE_FLAGS.manualSplit &&
+      Boolean(platformInfo?.configured) &&
+      siteShareFinal > 0
+    );
+  }
+
+  // Reactive twin of platformActive() for the template (card visibility). Shown in
+  // both create AND view modes so the proposal always displays the site share.
+  let showPlatformCol = $derived(
+    SITE_SHARE_FLAGS.manualSplit &&
+      Boolean(platformInfo?.configured) &&
+      siteShareFinal > 0
+  );
+
+  function pickDirection(dir) {
+    siteShareDirection = dir;
+    if (dir !== 'as_is' && !(Number(siteShareCustom) > 0)) {
+      siteShareCustom = siteShareProposed; // seed the input from the suggestion
+    }
+    if (dir === 'as_is') siteShareReason = '';
+    distribute(); // the platform's share changed → re-split the remainder
+  }
+
+  // Re-split when the payer edits the custom amount (less/more).
+  function onSiteShareAmount() {
+    distribute();
+  }
+
+  async function resolveSiteShare() {
+    if (!SITE_SHARE_FLAGS.manualSplit) return;
+    const pp = await executeAction('getPlatformProject', {});
+    console.log('[SiteShare] getPlatformProject →', JSON.stringify(pp?.data));
+    if (!pp.success || !pp.data?.configured) return;
+
+    const projectId = pp.data.projectId;
+    const memberId = pp.data.treasuryUserId; // first platform member
+    const isPlatformOwnSplit = projectId && String($idPr) === String(projectId);
+    if (isPlatformOwnSplit || !memberId) return;
+
+    platformInfo = { projectId, memberId, configured: true };
+
+    const { siteAmount } = computeSiteShare({
+      payerRole: 'provider',
+      baseAmount: revach,
+      matbea: '2',
+      config: DEFAULT_SITE_SHARE_CONFIG
+    });
+    siteShareProposed = siteAmount;
+    console.log('[SiteShare] preview siteAmount:', siteAmount);
+  }
+
   onMount(async () => {
     // Filter sales: include pending sales OR unsplited sales (exclude only fully splited)
     // This ensures pending sales appear in the table
@@ -578,12 +707,39 @@
 
     cal();
 
-    pre();
+    // Build the per-user base (totals, percentages) once.
+    buildBase();
+
+    // Resolve the platform's service line BEFORE distributing, so partners split
+    // the NET base (revach − site share) and the deducted amount is routed to the
+    // platform as a real transfer. Shows in the proposal table, not only on submit.
+    await resolveSiteShare();
+
+    // View mode: an existing proposal already has the site-share baked into its
+    // stored hervachti (the partners split the NET base). Reconstruct that exact
+    // amount so distribute() reproduces the same split + platform transfers —
+    // otherwise the recompute (which would re-derive a fresh suggestion) drifts
+    // from what was stored and the UI falsely flags "split changed".
     if (trili.length > 0) {
       already = true;
       hatzaa = true;
       currentTosplit = trili[0];
-      const vots = trili[0].attributes.vots;
+      if (platformInfo?.configured) {
+        const stored = currentTosplit.attributes.hervachti || [];
+        const sumStored = stored.reduce((s, h) => s + (h.amount || 0), 0);
+        const inferred = revach - sumStored; // = the site-share that was deducted
+        // Pin the proposal to the stored amount: covers as-is AND adjusted
+        // (less/more) splits, and 0 for old splits that predate site-share.
+        siteShareProposed = inferred > 0.01 ? inferred : 0;
+        siteShareDirection = 'as_is';
+      }
+    }
+
+    // Now split the remainder among partners + route the site share to the platform.
+    distribute();
+
+    if (trili.length > 0) {
+      const vots = currentTosplit.attributes.vots;
       for (let i = 0; i < vots.length; i++) {
         if (vots[i].what == true) {
           noofok += 1;
@@ -622,7 +778,10 @@
       }
     }
   }
-  function pre() {
+  // buildBase: compute each user's totals + percentage-of-rikma once. The actual
+  // per-user split amounts and transfers are computed in distribute(), which can
+  // re-run whenever the platform's share changes (so partners split the remainder).
+  function buildBase() {
     // Calculate totals for each user
     for (let i = 0; i < users.length; i++) {
       for (let j = 0; j < fmiData.length; j++) {
@@ -703,73 +862,99 @@
         d: pmcounter,
         o: 'visible',
         c: `url(#img${counter})`,
-        imid: `img${counter}`
+        imid: `img${counter}`,
+        // Safe defaults so the template can render before distribute() runs
+        // (resolveSiteShare awaits in between → a render happens with x undefined).
+        x: 0,
+        meca: 0,
+        noten: 0,
+        cama: 0,
+        le: [],
+        kibal: false,
+        latet: 0
       });
       
       pmcounter -= userPercentage;
     }
-    
-    // Calculate meca/noten for each user
+  }
+
+  // distribute: split the (possibly net) base among partners and match givers to
+  // receivers. The platform (1💗1) is added as an extra RECEIVER — kept out of
+  // `ulist` so the voting/hervachti machinery for project members is untouched —
+  // so the site share is routed to it as an ordinary giver→platform Haluka.
+  // Re-runnable: called on mount and whenever the payer adjusts the site share.
+  function distribute() {
+    const active = platformActive();
+    // Partners split what's left AFTER the platform takes its share.
+    const netBase = Math.max(0, revach - (active ? siteShareFinal : 0));
+
+    // Per-user fair share on the net base → surplus (noten) / deficit (meca).
     for (let i = 0; i < ulist.length; i++) {
-      ulist[i].x = (ulist[i].p / 100) * revach;
-      if (ulist[i].ihave - ulist[i].x < 0) {
-        ulist[i].meca = ulist[i].x - ulist[i].ihave;
+      ulist[i].x = revach > 0 ? (ulist[i].p / 100) * netBase : 0;
+      const surplus = ulist[i].ihave - ulist[i].x;
+      if (surplus < -0.000001) {
+        ulist[i].meca = -surplus;
         ulist[i].noten = 0;
-        ulist[i].cama = 0;
-      } else if (ulist[i].ihave - ulist[i].x > 0) {
-        ulist[i].noten = ulist[i].ihave - ulist[i].x;
+      } else if (surplus > 0.000001) {
+        ulist[i].noten = surplus;
         ulist[i].meca = 0;
       } else {
         ulist[i].meca = 0;
         ulist[i].noten = 0;
-        ulist[i].cama = 0;
       }
-    }
-    // Reset transfer arrays
-    for (let i = 0; i < ulist.length; i++) {
+      ulist[i].cama = 0;
       ulist[i].le = [];
       ulist[i].kibal = false;
       ulist[i].latet = ulist[i].noten;
     }
 
-    // Sort by amount needed (meca) in descending order for better distribution
-    ulist.sort(({ meca: a }, { meca: b }) => b - a);
+    // Receivers: each partner's deficit + the platform's site share (idx = -1).
+    // We match on copies of the "need" so ulist[i].meca stays the full deficit
+    // for display, and ulist column order never changes between recomputes.
+    const recv = ulist
+      .map((u, idx) => ({ idx, need: u.meca, platform: false }))
+      .concat(active ? [{ idx: -1, need: siteShareFinal, platform: true }] : [])
+      .filter((r) => r.need > 0.01)
+      .sort((a, b) => b.need - a.need);
 
-    // Store original meca values for display
-    const originalMeca = ulist.map(u => u.meca);
-    
-    // Calculate transfers using a more flexible approach
-    for (let giver = 0; giver < ulist.length; giver++) {
-      if (ulist[giver].noten <= 0) continue; // Skip if nothing to give
+    const givers = ulist
+      .map((u, idx) => ({ idx, give: u.noten }))
+      .filter((g) => g.give > 0.01)
+      .sort((a, b) => b.give - a.give);
 
-      let remainingToGive = ulist[giver].noten;
+    platformTransfers = [];
+    for (const g of givers) {
+      let remaining = g.give;
+      for (const r of recv) {
+        if (remaining <= 0.01 || r.need <= 0.01) continue;
+        if (!r.platform && g.idx === r.idx) continue; // can't transfer to self
+        const amount = Math.min(remaining, r.need);
+        if (amount <= 0.01) continue;
 
-      for (let receiver = 0; receiver < ulist.length; receiver++) {
-        if (ulist[receiver].meca <= 0 || remainingToGive <= 0) continue; // Skip if nothing needed or nothing left to give
-        if (giver === receiver) continue; // Can't transfer to self
-
-        // Calculate how much to transfer
-        let transferAmount = Math.min(remainingToGive, ulist[receiver].meca);
-
-        if (transferAmount > 0.01) {
-          // Only transfer if meaningful amount
-          // Add to giver's transfer list
-          ulist[giver].le.push({
-            le: ulist[receiver].username,
-            leid: ulist[receiver].uid,
-            cama: transferAmount
+        if (r.platform) {
+          // Cross-rikma transfer: this partner funds part of the site share.
+          ulist[g.idx].le.push({
+            le: '1💗1',
+            leid: platformInfo?.memberId,
+            cama: amount,
+            platform: true
           });
-
-          // Update remaining amounts
-          remainingToGive -= transferAmount;
-          ulist[receiver].meca -= transferAmount;
+          platformTransfers.push({
+            fromId: ulist[g.idx].uid,
+            fromName: ulist[g.idx].username,
+            amount
+          });
+        } else {
+          ulist[g.idx].le.push({
+            le: ulist[r.idx].username,
+            leid: ulist[r.idx].uid,
+            cama: amount
+          });
         }
+
+        remaining -= amount;
+        r.need -= amount;
       }
-    }
-    
-    // Restore original meca values for display
-    for (let i = 0; i < ulist.length; i++) {
-      ulist[i].meca = originalMeca[i];
     }
 
     // Debug log to see the results
@@ -782,7 +967,9 @@
         needsToGive: u.noten.toFixed(2),
         needsToReceive: u.meca.toFixed(2),
         transfers: u.le
-      }))
+      })),
+      '| platform share:',
+      active ? siteShareFinal.toFixed(2) : 0
     );
 
     ulist = ulist;
@@ -796,94 +983,262 @@
 
 <div class="dd md:items-center">
   <div class="body items-center">
-    <table dir="rtl">
-      <caption class="sm:text-right md:text-center text-right">
-        <h1 class="md:text-center text-2xl md:text-2xl font-bold">
-          {$t('mission.whowhat.calculationTable')}
-        </h1>
-      </caption>
-      <tbody>
-        <tr class="gg">
-          <th class="gg"></th>
-          {#each ulist as data, i}
-            <td class="gg" style="font-size: 3rem">
-              {i + 1}
-            </td>
-          {/each}
-        </tr>
-        <tr class="ggr">
-          <th class="ggr">{$t('mission.whowhat.name')}</th>
-          {#each ulist as data, i}
-            <td class="ggr">{data.username}</td>
-          {/each}
-        </tr>
-        <tr>
-          <th>{$t('mission.whowhat.profitShare')}</th>
-          {#each ulist as data, i}
-            <td>
-              {#if revach > 0}
-                {data.x.toFixed(2)}
-              {:else}
-                0
-              {/if}
-            </td>
-          {/each}
-        </tr><tr>
-          <th>{$t('mission.whowhat.myAmount')}</th>
-          {#each ulist as data, i}
-            <td>
-              {#if data.ihave > 0}
-                {data.ihave.toFixed(2)}
-              {:else}
-                0
-              {/if}
-            </td>
-          {/each}
-        </tr><tr>
-          <th>{$t('mission.whowhat.amountToGive')}</th>
-          {#each ulist as data, i}
-            <td>
-              {#if revach > 0 && data.ihave - data.x > 0}
-                {data.noten.toFixed(2)}
-              {:else}
-                0
-              {/if}
-            </td>
-          {/each}
-        </tr>
-        <tr>
-          <th>{$t('mission.whowhat.giveTo')}</th>
-          {#each ulist as data, i}
-            <td>
-              {#if data.le}
-                {#each data.le as ee, i}
-                  {` ${ee.le} :  ${ee.cama.toFixed(2)} `}
-                  <br />
-                {/each}
-              {/if}
-            </td>
-          {/each}
-        </tr>
-        <tr>
-          <th>{$t('mission.whowhat.amountToReceive')}</th>
-          {#each ulist as data, i}
-            <td>
-              {#if revach > 0 && data.ihave - data.x < 0}
-                {data.meca.toFixed(2)}
-              {:else}
-                0
-              {/if}
-            </td>
-          {/each}
-        </tr><tr>
-          <th>{$t('mission.whowhat.percentageInRikma')}</th>
-          {#each ulist as data, i}
-            <td>{data.p.toFixed(2)}</td>
-          {/each}
-        </tr>
-      </tbody>
-    </table>
+    <h1 class="calc-title">{$t('mission.whowhat.calculationTable')}</h1>
+
+    <div class="view-toggle" dir="rtl" role="tablist">
+      <button
+        type="button"
+        class="vt-btn"
+        class:active={viewMode === 'cards'}
+        aria-pressed={viewMode === 'cards'}
+        onclick={() => (viewMode = 'cards')}
+      >
+        {$lang === 'he' ? 'כרטיסים' : 'Cards'}
+      </button>
+      <button
+        type="button"
+        class="vt-btn"
+        class:active={viewMode === 'table'}
+        aria-pressed={viewMode === 'table'}
+        onclick={() => (viewMode = 'table')}
+      >
+        {$lang === 'he' ? 'טבלה' : 'Table'}
+      </button>
+    </div>
+
+    {#if viewMode === 'cards'}
+    <div class="calc-grid" dir="rtl">
+      {#each ulist as data}
+        <div class="pcard">
+          <div class="pcard-head">
+            {#if data.src}
+              <img class="pcard-av" src={data.src} alt={data.username} />
+            {:else}
+              <div class="pcard-av pcard-av-ph">{(data.username || '?').charAt(0)}</div>
+            {/if}
+            <div class="pcard-id">
+              <span class="pcard-name">{data.username}</span>
+              <span class="pcard-pct">{data.p.toFixed(1)}% {$t('mission.whowhat.percentageInRikma')}</span>
+            </div>
+          </div>
+
+          <div class="pcard-rows">
+            <div class="prow">
+              <span>{$t('mission.whowhat.profitShare')}</span>
+              <b>{revach > 0 ? data.x.toFixed(2) : '0'}</b>
+            </div>
+            <div class="prow">
+              <span>{$t('mission.whowhat.myAmount')}</span>
+              <b>{(data.ihave || 0).toFixed(2)}</b>
+            </div>
+            {#if revach > 0 && data.noten > 0.01}
+              <div class="prow give">
+                <span>{$t('mission.whowhat.amountToGive')}</span>
+                <b>{data.noten.toFixed(2)}</b>
+              </div>
+            {:else if revach > 0 && data.meca > 0.01}
+              <div class="prow get">
+                <span>{$t('mission.whowhat.amountToReceive')}</span>
+                <b>{data.meca.toFixed(2)}</b>
+              </div>
+            {:else}
+              <div class="prow even">
+                <span>{$lang === 'he' ? 'מאוזן' : 'Balanced'}</span>
+                <b>✓</b>
+              </div>
+            {/if}
+          </div>
+
+          {#if data.le && data.le.length > 0}
+            <div class="pcard-transfers">
+              <span class="pt-head">{$t('mission.whowhat.giveTo')}</span>
+              {#each data.le as ee}
+                <span class="pt-chip" class:platform={ee.platform}>{ee.le} · {ee.cama.toFixed(2)}</span>
+              {/each}
+            </div>
+          {/if}
+        </div>
+      {/each}
+
+      {#if showPlatformCol}
+        <div class="pcard platform-card">
+          <div class="pcard-head">
+            <div class="pcard-av pcard-av-plat">💗</div>
+            <div class="pcard-id">
+              <span class="pcard-name">1💗1</span>
+              <span class="pcard-pct">
+                {revach > 0 ? ((siteShareFinal / revach) * 100).toFixed(1) : '0'}% · {$lang === 'he' ? 'שירות ניהול ושותפות' : 'management & partnership'}
+              </span>
+            </div>
+          </div>
+
+          <div class="pcard-rows">
+            <div class="prow get">
+              <span>{$lang === 'he' ? 'חלק האתר' : 'Site share'}</span>
+              <b>{siteShareFinal.toFixed(2)}</b>
+            </div>
+          </div>
+
+          {#if platformTransfers.length > 0}
+            <div class="pcard-transfers">
+              <span class="pt-head">{$lang === 'he' ? 'ממומן ע"י' : 'Funded by'}</span>
+              {#each platformTransfers as tr}
+                <span class="pt-chip platform">{tr.fromName} · {tr.amount.toFixed(2)}</span>
+              {/each}
+            </div>
+          {/if}
+        </div>
+      {/if}
+    </div>
+    {/if}
+
+    {#if viewMode === 'table'}
+    <div class="table-wrap">
+      <table dir="rtl">
+        <tbody>
+          <tr class="gg">
+            <th class="gg"></th>
+            {#each ulist as data, i}
+              <td class="gg" style="font-size: 3rem">{i + 1}</td>
+            {/each}
+            {#if showPlatformCol}<td class="gg" style="font-size: 2rem">💗</td>{/if}
+          </tr>
+          <tr class="ggr">
+            <th class="ggr">{$t('mission.whowhat.name')}</th>
+            {#each ulist as data}
+              <td class="ggr">{data.username}</td>
+            {/each}
+            {#if showPlatformCol}<td class="ggr">1💗1</td>{/if}
+          </tr>
+          <tr>
+            <th>{$t('mission.whowhat.profitShare')}</th>
+            {#each ulist as data}
+              <td>{revach > 0 ? data.x.toFixed(2) : '0'}</td>
+            {/each}
+            {#if showPlatformCol}<td class="plat-cell">{siteShareFinal.toFixed(2)}</td>{/if}
+          </tr>
+          <tr>
+            <th>{$t('mission.whowhat.myAmount')}</th>
+            {#each ulist as data}
+              <td>{(data.ihave || 0).toFixed(2)}</td>
+            {/each}
+            {#if showPlatformCol}<td class="plat-cell">—</td>{/if}
+          </tr>
+          <tr>
+            <th>{$t('mission.whowhat.amountToGive')}</th>
+            {#each ulist as data}
+              <td>{revach > 0 && data.noten > 0.01 ? data.noten.toFixed(2) : '0'}</td>
+            {/each}
+            {#if showPlatformCol}<td class="plat-cell">—</td>{/if}
+          </tr>
+          <tr>
+            <th>{$t('mission.whowhat.giveTo')}</th>
+            {#each ulist as data}
+              <td>
+                {#if data.le}
+                  {#each data.le as ee}
+                    {` ${ee.le} :  ${ee.cama.toFixed(2)} `}<br />
+                  {/each}
+                {/if}
+              </td>
+            {/each}
+            {#if showPlatformCol}<td class="plat-cell">—</td>{/if}
+          </tr>
+          <tr>
+            <th>{$t('mission.whowhat.amountToReceive')}</th>
+            {#each ulist as data}
+              <td>{revach > 0 && data.meca > 0.01 ? data.meca.toFixed(2) : '0'}</td>
+            {/each}
+            {#if showPlatformCol}<td class="plat-cell">{siteShareFinal.toFixed(2)}</td>{/if}
+          </tr>
+          <tr>
+            <th>{$t('mission.whowhat.percentageInRikma')}</th>
+            {#each ulist as data}
+              <td>{data.p.toFixed(2)}</td>
+            {/each}
+            {#if showPlatformCol}<td class="plat-cell">{revach > 0 ? ((siteShareFinal / revach) * 100).toFixed(2) : '0'}</td>{/if}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    {/if}
 <br>
+    {#if siteShareProposed > 0 && !hatzaa}
+      <div class="site-share" dir="rtl">
+        <div class="ss-head">
+          <span class="ss-title">
+            {$lang === 'he'
+              ? 'שירות הניהול והשותפות של 1💗1'
+              : '1💗1 management & partnership service'}
+          </span>
+          <span class="ss-amount">{siteShareFinal.toFixed(2)}</span>
+        </div>
+        <p class="ss-sub">
+          {$lang === 'he'
+            ? `1💗1 נכנסת לחלוקה כשותפה נותנת־שירות. הסכום הזה יורד מהרווח שמתחלק בין השותפים (נשאר לחלוקה: ${(revach - siteShareFinal).toFixed(2)} מתוך ${revach.toFixed(2)}). מוצע: ${siteShareProposed.toFixed(2)} — אפשר לתת יותר או לבקש הנחה, וזה מאושר מיד.`
+            : `1💗1 joins the split as a service-providing partner. This amount is deducted from the profit shared between partners (left to split: ${(revach - siteShareFinal).toFixed(2)} of ${revach.toFixed(2)}). Suggested: ${siteShareProposed.toFixed(2)} — you may give more or ask for less; approved instantly.`}
+        </p>
+
+        <div class="ss-options">
+          <label class="ss-opt">
+            <input
+              type="radio"
+              name="siteShareDir"
+              checked={siteShareDirection === 'as_is'}
+              onchange={() => pickDirection('as_is')}
+            />
+            <span>{$lang === 'he' ? `משלם כפי שמוצע (${siteShareProposed.toFixed(2)})` : `Pay as suggested (${siteShareProposed.toFixed(2)})`}</span>
+          </label>
+
+          <label class="ss-opt">
+            <input
+              type="radio"
+              name="siteShareDir"
+              checked={siteShareDirection === 'more'}
+              onchange={() => pickDirection('more')}
+            />
+            <span>{$lang === 'he' ? 'ארצה לתת יותר' : "I'd like to give more"}</span>
+          </label>
+
+          <label class="ss-opt">
+            <input
+              type="radio"
+              name="siteShareDir"
+              checked={siteShareDirection === 'less'}
+              onchange={() => pickDirection('less')}
+            />
+            <span>{$lang === 'he' ? 'אשמח להנחה — אשלם פחות' : "I'd like a discount — pay less"}</span>
+          </label>
+        </div>
+
+        {#if siteShareDirection !== 'as_is'}
+          <div class="ss-adjust">
+            <label class="ss-field">
+              <span>{$lang === 'he' ? 'סכום' : 'Amount'}</span>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                bind:value={siteShareCustom}
+                oninput={onSiteShareAmount}
+              />
+            </label>
+            <label class="ss-field ss-reason">
+              <span>
+                {siteShareDirection === 'less'
+                  ? ($lang === 'he' ? 'סיבה (חובה)' : 'Reason (required)')
+                  : ($lang === 'he' ? 'סיבה (אופציונלי)' : 'Reason (optional)')}
+              </span>
+              <input
+                type="text"
+                bind:value={siteShareReason}
+                placeholder={$lang === 'he' ? 'מה הסיבה?' : 'Why?'}
+              />
+            </label>
+          </div>
+        {/if}
+      </div>
+    {/if}
     {#if availableForNewSplit > 0 && revach > 0 && !hatzaa}
       <Button
         text={{ he: $t('mission.whowhat.confirmSplit'), en: $t('mission.whowhat.confirmSplit'), ar: $t('mission.whowhat.confirmSplit') }}
@@ -945,44 +1300,6 @@
 </div>
 
 <style>
-  .gg {
-    position: sticky;
-    top: 1px;
-    background-color: #6b0f1a;
-    background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
-
-    border-width: 4px;
-    border-color: rgb(103, 232, 249);
-    border-radius: 4%;
-    opacity: 1;
-    color: rgb(132, 241, 223);
-  }
-  .ggd {
-    position: sticky;
-    bottom: 1px;
-    background-color: #6b0f1a;
-    background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
-
-    border-width: 4px;
-    border-color: rgb(103, 232, 249);
-    border-radius: 4%;
-    opacity: 1;
-    color: rgb(132, 241, 223);
-  }
-  .ggr {
-    position: sticky;
-    top: 77px;
-    background-color: #6b0f1a;
-    background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
-
-    opacity: 1;
-    color: rgb(132, 241, 223);
-  }
-  .ggr:hover,
-  .gg:hover,
-  .ggd:hover {
-    background: var(--barbi-pink);
-  }
   .dd {
     display: flex;
     align-items: center;
@@ -990,39 +1307,296 @@
     flex-direction: column;
   }
   .body {
-    overflow-x: auto;
-    overflow-y: auto;
+    width: 100%;
     max-width: 100vw;
     padding-left: 0.5em;
     padding-right: 0.5em;
   }
 
-  table,
-  th,
-  td {
+  /* ── Calculation: responsive participant cards (replaces the legacy table) ── */
+  .calc-title {
+    text-align: center;
+    font-weight: 800;
+    font-size: 1.5rem;
+    margin: 0.5rem 0 1.1rem;
+    color: var(--barbi-pink);
+  }
+  /* ── View switcher (cards / table) ── */
+  .view-toggle {
+    display: flex;
+    width: fit-content;
+    gap: 0;
+    margin: 0 auto 1rem;
+    padding: 0.2rem;
+    border: 2px solid rgb(103, 232, 249);
+    border-radius: 999px;
+    background: #eafcff;
+  }
+  .vt-btn {
+    border: none;
+    background: transparent;
+    color: #6b0f1a;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.35rem 1.1rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .vt-btn.active {
+    background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
+    color: rgb(132, 241, 223);
+  }
+
+  /* ── Legacy spreadsheet table view ── */
+  .table-wrap {
+    width: 100%;
+    overflow-x: auto;
+  }
+  .table-wrap table,
+  .table-wrap th,
+  .table-wrap td {
     border-collapse: collapse;
     border-width: 4px;
     border-color: rgb(103, 232, 249);
     border-radius: 4%;
   }
-  table {
+  .table-wrap table {
     text-align: center;
     color: var(--barbi-pink);
     margin: 0 auto;
   }
-  th {
+  .table-wrap th {
+    background-color: #6b0f1a;
+    background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
+    color: rgb(132, 241, 223);
+    padding: 0.3rem 0.6rem;
+  }
+  .table-wrap td {
+    background-color: #5efaf2;
+    background-image: linear-gradient(8deg, #5efaf2 0%, #eee 74%);
+    padding: 0.3rem 0.6rem;
+  }
+  .table-wrap th:hover {
+    background: var(--barbi-pink);
+  }
+  .table-wrap td:hover {
+    background: rgb(132, 241, 223);
+  }
+  .table-wrap .gg,
+  .table-wrap .ggr {
     background-color: #6b0f1a;
     background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
     color: rgb(132, 241, 223);
   }
-  td {
-    background-color: #5efaf2;
-    background-image: linear-gradient(8deg, #5efaf2 0%, #eee 74%);
+  .table-wrap td.plat-cell {
+    background-image: linear-gradient(8deg, #ffe9a8 0%, #fff7e0 74%);
+    color: #6b0f1a;
+    font-weight: 800;
   }
-  th:hover {
-    background: var(--barbi-pink);
+
+  .calc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 0.85rem;
+    width: 100%;
+    max-width: 60rem;
+    margin: 0 auto;
   }
-  td:hover {
-    background: rgb(132, 241, 223);
+  .pcard {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 0.9rem;
+    border-radius: 1rem;
+    border: 2px solid rgb(103, 232, 249);
+    background-image: linear-gradient(160deg, #ffffff 0%, #eafcff 100%);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  }
+  .pcard-head {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-width: 0;
+  }
+  .pcard-av {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgb(103, 232, 249);
+    flex-shrink: 0;
+  }
+  .pcard-av-ph,
+  .pcard-av-plat {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: #6b0f1a;
+    background: #b3f5ec;
+  }
+  .pcard-av-plat {
+    font-size: 1.4rem;
+    background: #ffe9a8;
+    border-color: var(--barbi-pink);
+  }
+  .pcard-id {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .pcard-name {
+    font-weight: 800;
+    color: #6b0f1a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pcard-pct {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--barbi-pink);
+  }
+  .pcard-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .prow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    padding: 0.32rem 0.55rem;
+    border-radius: 0.5rem;
+    background: rgba(0, 0, 0, 0.035);
+    color: #444;
+  }
+  .prow b {
+    font-weight: 800;
+    color: #6b0f1a;
+  }
+  .prow.give {
+    background: rgba(255, 0, 146, 0.1);
+  }
+  .prow.give,
+  .prow.give b {
+    color: #b3006b;
+  }
+  .prow.get {
+    background: rgba(2, 200, 150, 0.16);
+  }
+  .prow.get,
+  .prow.get b {
+    color: #067a5b;
+  }
+  .prow.even {
+    opacity: 0.6;
+  }
+  .pcard-transfers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    align-items: center;
+    padding-top: 0.5rem;
+    border-top: 1px dashed rgba(0, 0, 0, 0.12);
+  }
+  .pt-head {
+    width: 100%;
+    font-size: 0.7rem;
+    font-weight: 700;
+    opacity: 0.65;
+  }
+  .pt-chip {
+    font-size: 0.75rem;
+    background: #fff;
+    border: 1px solid rgb(103, 232, 249);
+    border-radius: 999px;
+    padding: 0.12rem 0.55rem;
+    white-space: nowrap;
+  }
+  .pt-chip.platform {
+    border-color: var(--barbi-pink);
+    background: #fff7e0;
+    color: #6b0f1a;
+    font-weight: 700;
+  }
+  .platform-card {
+    background-image: linear-gradient(160deg, #fff7e0 0%, #ffe9a8 100%);
+    border-color: var(--barbi-pink);
+    box-shadow: 0 6px 18px rgba(255, 0, 146, 0.18);
+  }
+
+  /* Site-share service line + payer adjustment */
+  .site-share {
+    max-width: 32rem;
+    margin: 1rem auto;
+    padding: 1rem 1.25rem;
+    border: 2px solid var(--barbi-pink);
+    border-radius: 0.75rem;
+    background-image: linear-gradient(315deg, #fff7e0 0%, #ffe9a8 100%);
+    color: #6b0f1a;
+    text-align: right;
+  }
+  .ss-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+  .ss-title {
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+  .ss-amount {
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--barbi-pink);
+    white-space: nowrap;
+  }
+  .ss-sub {
+    margin: 0.4rem 0 0.8rem;
+    font-size: 0.85rem;
+    opacity: 0.85;
+    line-height: 1.4;
+  }
+  .ss-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .ss-opt {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+  .ss-opt input {
+    accent-color: var(--barbi-pink);
+  }
+  .ss-adjust {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+  .ss-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .ss-field.ss-reason {
+    flex: 1 1 12rem;
+  }
+  .ss-field input {
+    padding: 0.4rem 0.5rem;
+    border: 1px solid var(--barbi-pink);
+    border-radius: 0.4rem;
+    background: #fff;
+    color: #6b0f1a;
   }
 </style>

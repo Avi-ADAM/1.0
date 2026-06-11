@@ -13,20 +13,28 @@ import type { SiteShareConfig } from './types.js';
 /** Feature flags per injection path (PLAN §9). */
 export const SITE_SHARE_FLAGS = {
   /** R1 — inject the site share into the manual moach revenue split. */
-  manualSplit: false,
+  manualSplit: true,
   /** R3 — inject the site share into the concierge → sale path. */
-  concierge: false
+  concierge: false,
+  /**
+   * R4 — cross-rikma Strapi fields (isSiteShare, recive_project, source_tosplit,
+   * adjustment fields) per src/generated/SITE_SHARE_TRANSFER_SPEC.md §1/§7.
+   * While OFF: createHaluka sends no new fields, the lev query omits
+   * `siteShareHalukas`, and the proposal card shows no 1💗1 row — zero regression
+   * on a Strapi that lacks the fields. Flip ON once the backend ships them.
+   * ON since 1.0b shipped the haluka/tosplit cross-rikma fields (2026-06).
+   */
+  crossRikmaFields: true
 } as const;
 
-/**
- * The platform's treasury user id (the recipient of the site-share Haluka).
- * Empty string disables injection even when a flag is on — a deliberate
- * safety interlock until a real treasury user is provisioned (PLAN §2.2 option A).
- */
-export const SITE_SHARE_TREASURY_USER_ID = '';
+/** The platform / "main rikma" project id (PLAN §2.1). Optional override — when empty,
+ * the project is resolved at runtime via the isPlatform flag. */
+export const SITE_SHARE_PLATFORM_PROJECT_ID = '1';
 
-/** The platform / "main rikma" project id (PLAN §2.1). */
-export const SITE_SHARE_PLATFORM_PROJECT_ID = '';
+/** Optional override to pin a specific treasury recipient user (PLAN §2.2). When
+ * empty, the recipient is the platform project's first member (`user_1s[0]`),
+ * resolved at runtime. Kept for the env-override path in `platformProject.ts`. */
+export const SITE_SHARE_TREASURY_USER_ID = '';
 
 /**
  * Suggested percentages. Placeholder defaults — the exact numbers are a config
