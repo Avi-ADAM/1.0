@@ -333,7 +333,7 @@
       "by": "Proposed by Daniel · 'Studio Or' partnership",
       "consensus": "Consent: 3 of 4 have voted",
       "yes": "Agree",
-      "no": "Object",
+      "no": "Negotiate",
       "hint": "Decisions pass only by consent — every member has a voice"
     },
     "note": "This is sample data for illustration — the real system is waiting for you inside.",
@@ -341,34 +341,43 @@
     "lev": {
       "tab": "Heart cards",
       "header": "The Heart — actions awaiting your consent",
-      "hint": "Swipe right to approve, left to decline — try it 👇",
+      "hint": "Swipe right to approve, left to negotiate — try it 👇",
       "approve": "Approve",
-      "reject": "Decline",
+      "reject": "Negotiate",
       "approved": "Approved!",
-      "rejected": "Declined",
+      "rejected": "To negotiation",
       "done": "That's it! You just ran a partnership in 20 seconds 💗",
-      "doneSub": "This is how every decision passes — by everyone's consent, card by card.",
+      "doneSub": "There is no rejection in 1💗1 — only consent or negotiation, card by card, until everyone is at peace with the decision.",
       "restart": "Again ↺",
       "cards": {
         "c1": {
           "type": "Mission approval",
           "project": "'Studio Or' partnership",
-          "title": "Add mission: 'Packaging design' — 4 hours",
-          "by": "Proposed by Sivan"
+          "title": "Add mission: 'Packaging design'",
+          "by": "Proposed by Sivan",
+          "t1": "hours",
+          "t2": "ILS/hour"
         },
         "c2": {
           "type": "Join request",
           "project": "'Community Garden' partnership",
           "title": "Yoav the carpenter asks to join",
-          "by": "3 of 4 already approved"
+          "by": "3 of 4 already approved",
+          "t1": "hours/week"
         },
         "c3": {
-          "type": "Profit split",
+          "type": "Client price quote",
           "project": "'Studio Or' partnership",
-          "title": "Approve split: 1,840 ILS by logged hours",
-          "by": "Auto-calculated by the formula"
+          "title": "Portfolio website for a new client — quote",
+          "by": "Proposed by Daniel",
+          "t1": "ILS price"
         }
-      }
+      },
+      "negoTitle": "Counter-offer",
+      "negoOrig": "Proposed:",
+      "negoSend": "Send counter-offer 🤝",
+      "negoBack": "Back",
+      "negoSent": "Sent to negotiation!"
     }
   }
 }
