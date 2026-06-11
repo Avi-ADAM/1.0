@@ -1565,7 +1565,7 @@ Track these metrics during migration:
 ```bash
 # Strapi Configuration
 VITE_URL=https://api.1lev1.com
-VITE_ADMINMONTHER=<admin-jwt-token>
+ADMINMONTHER=<admin-jwt-token>
 
 # Socket.IO Server
 SOCKET_SERVER_URL=http://localhost:3001

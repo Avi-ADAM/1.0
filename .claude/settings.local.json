@@ -64,7 +64,11 @@
       "Bash(npx vitest *)",
       "Bash(git stash *)",
       "Bash(findstr /i \"gemini google\")",
-      "Bash(findstr /i \"gemini\")"
+      "Bash(findstr /i \"gemini\")",
+      "Bash(node_modules/.bin/tsc --noEmit --skipLibCheck --moduleResolution bundler --module esnext --target esnext --types \"\" src/lib/server/actions/configs/toggleGuideStatus.ts)",
+      "Bash(node_modules/.bin/tsc --noEmit --skipLibCheck --moduleResolution bundler --module esnext --target esnext src/lib/server/actions/configs/toggleGuideStatus.ts)",
+      "Bash(stat -c '%y %n' package-lock.json yarn.lock)",
+      "Bash(ls node_modules/.package-lock.json)"
     ],
     "additionalDirectories": [
       "c:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\deals\\request",

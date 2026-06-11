@@ -6,8 +6,7 @@
   import MultiSelect from 'svelte-multiselect';
   import NumberInput from '$lib/celim/ui/numberInput.svelte';
   import { toast } from 'svelte-sonner';
-  import { SendTo } from '$lib/send/sendTo.svelte';
-  import { page } from '$app/state';
+  import { executeAction } from '$lib/client/actionClient';
   import tr from '$lib/translations/tr.json';
 
   /**
@@ -58,9 +57,6 @@
   let datesE = $state(false);
   let currentOperationId = $state(null);
 
-  const baseUrl = import.meta.env.VITE_URL;
-  let linkg = baseUrl + '/graphql';
-
   function find_user_id(user_name_arr) {
     let id = 0;
     for (let i = 0; i < projectUsers.length; i++) {
@@ -108,115 +104,53 @@
       toast.error(noSelected[$lang]);
       return;
     }
-    
-    // Start the sale operation and get operation ID
+
+    if (kindOf === 'monthly' || kindOf === 'yearly') {
+      if (dates === null) {
+        datesE = true;
+        toast.warning(datesEmessage[$lang]);
+        return;
+      }
+      datesE = false;
+    }
+
     currentOperationId = onStart ? onStart() : null;
     already = true;
 
-    let quanter = ``;
-    if (hm > 0 && availableQuantity !== -1) {
-      const quantnew = availableQuantity - hm;
-      quanter = `updateMatanot( id: ${productId}
-      data:  {quant: ${quantnew} } ){
-        data {id attributes{ quant}}
-      }`;
-    }
-
-    let d = new Date();
-  
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    
-    const token = page.data.tok;
-    const bearer1 = 'bearer' + ' ' + token;
-
     try {
-      const sdate = new Date(dates) || null;
-      const fdate = new Date(datef) || null;
+      const saleDate = dayjs($store?.selected).toISOString();
+      const userId = String(find_user_id(selected));
 
-      let saleDate = dayjs($store?.selected);
-      let saleData = {
-        project: `${projectId}`,
-        matanot: `${productId}`,
-        users_permissions_user: `${find_user_id(selected)}`,
-        in: total,
-        unit: hm,
-        date: saleDate.toISOString(),
-        publishedAt: d.toISOString(),
+      const actionParams = {
+        productId: String(productId),
+        projectId: String(projectId),
+        userId,
+        total,
+        quantity: hm,
+        saleDate,
+        availableQuantity,
+        kindOf,
+        note: note.trim() || undefined
       };
 
-      // Add note if provided
-      if (note.trim()) {
-        saleData.note = note.trim();
-      }
-
       if (kindOf === 'monthly' || kindOf === 'yearly') {
-        if (dates !== null) {
-          datesE = false;
-          saleData.startDate = sdate.toISOString();
-        } else {
-          datesE = true;
-          toast.warning(datesEmessage[$lang]);
-          return;
-        }
-        if (datef !== null) {
-          saleData.finishDate = fdate.toISOString();
-        }
+        actionParams.startDate = new Date(dates).toISOString();
+        if (datef !== null) actionParams.finishDate = new Date(datef).toISOString();
       }
 
-      const response = await fetch(linkg, {
-        method: 'POST',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          query: `mutation 
-                        { createSale(
-      data: ${JSON.stringify(saleData).replace(/"([^(")"]+)":/g, '$1:')}
-    ) {data{ id attributes{ in date matanot {data{id attributes{ name }}} users_permissions_user {data{ id attributes{ username}}}}}}
-  ${quanter}
-}`,
-        }),
-      });
+      const result = await executeAction('createSale', actionParams);
 
-      const miDatan = await response.json();
+      if (!result.success) {
+        throw new Error(result.error?.message ?? 'Sale failed');
+      }
 
       if (hm > 0) {
-        // יצירת monter רק אם אין תאריך סיום מוגדר (מכירה מתמשכת)
-        if ((kindOf === 'monthly' || kindOf === 'yearly') && datef === null) {
-          let chiluzh = miDatan.data.createSale.data.id;
-          let monti = `mutation{
-            createMonter(
-              data:{
-                sale: "${chiluzh}",
-                ani: "sale",
-                start: "${sdate.toISOString()}"
-              }
-            ){data{id}}
-            }`;
-          await SendTo(monti)
-            .then(() => console.log('Ongoing monthly sale created'))
-            .catch(() => console.log('Ongoing monthly sale creation error'));
-        }
-        
-        // בדיקה אם יש עדכון כמות לפני הגישה לנתונים
-        const saleResult = {
-          id: miDatan.data.createSale.data.id,
-          in: miDatan.data.createSale.data.attributes.in,
-          un: undefined, // Will be set if quantity was updated
-          matana: miDatan.data.createSale.data,
-        };
-        
-        // הוספת נתוני עדכון הכמות רק אם הם קיימים (לא unlimited)
-        if (miDatan.data.updateMatanot) {
-          saleResult.id = miDatan.data.updateMatanot.data.id;
-          saleResult.un = miDatan.data.updateMatanot.data.attributes.quant;
-          onDone?.(saleResult, currentOperationId);
+        if (result.data?.newQuantity !== undefined) {
+          onDone?.(
+            { id: result.data.saleId, in: result.data.saleIn, un: result.data.newQuantity, matana: result.data.matana },
+            currentOperationId
+          );
         } else {
-          // במקרה של unlimited, אין עדכון כמות אבל המכירה הצליחה
           onDoners?.();
         }
       } else {
@@ -227,7 +161,6 @@
       const errorMessage = e.message || tr.sales.saleError[$lang];
       onError?.(errorMessage, currentOperationId);
     } finally {
-      // Reset the operation state
       currentOperationId = null;
       already = false;
     }

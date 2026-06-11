@@ -1,4 +1,5 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
+import { redirect } from '@sveltejs/kit';
 import { actionService } from '$lib/server/actions/index.js';
 import { enrichWish, EMPTY_ENRICHMENT, type WishEnrichment } from '$lib/server/ai/enrichWish';
 import type { WishExtraction } from '$lib/server/ai/extractWish';
@@ -161,6 +162,11 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
   }
 
   const isOwner = wish ? wish.owners.some((o: any) => String(o.id) === String(uid)) : false;
+
+  // Non-owners land on the public provider view.
+  if (wish && !isOwner) {
+    throw redirect(302, `/wish/${params.id}`);
+  }
 
   // Mission templates for the owner's offer-authoring form (specMode autofill).
   let missionTemplates: any[] = [];

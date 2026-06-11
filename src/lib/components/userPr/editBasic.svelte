@@ -22,7 +22,8 @@
   } from '$lib/components/ui/card';
   import Separator from '$lib/celim/ui/separator.svelte';
   import ObjectChooser from '$lib/celim/ui/objectChooser.svelte';
-  import { page } from '$app/state';
+  import { executeAction } from '$lib/client/actionClient';
+  import ConsentStatusBadge from '$lib/components/consent/ConsentStatusBadge.svelte';
 
   // Props
   let {
@@ -116,7 +117,10 @@
       newKeySuccess: 'המפתח נוצר בהצלחה',
       saveKeyWarning: 'שמור אותו עכשיו - הוא לא יוצג שוב.',
       cancel: 'ביטול',
-      create: 'צור'
+      create: 'צור',
+      identityTitle: 'הזהות הקריפטוגרפית שלך',
+      identityDesc: 'מפתח חתימה אישי שנשמר רק בדפדפן שלך. השרת לא מחזיק עותק — אפילו אנחנו לא יכולים לזייף פעולות בשמך.',
+      identityManage: 'פרטים נוספים'
     },
     en: {
       head: 'Edit Profile',
@@ -167,7 +171,10 @@
       newKeySuccess: 'Key created successfully',
       saveKeyWarning: 'Save it now - it will not be shown again.',
       cancel: 'Cancel',
-      create: 'Create'
+      create: 'Create',
+      identityTitle: 'Your cryptographic identity',
+      identityDesc: 'A personal signing key that lives only in your browser. The server never holds a copy — even we cannot forge actions on your behalf.',
+      identityManage: 'Details'
     }
   };
 
@@ -428,36 +435,9 @@
     ).toUTCString()}; path=/`;
 
     try {
-      const token = page.data.tok;
-      if (!token) {
-        throw new Error('Authentication token not found');
-      }
-
-      const response = await fetch(`${import.meta.env.VITE_URL}/graphql`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `mutation { 
-						updateUsersPermissionsUser(
-							id: ${parseInt(uid)}, 
-							data: { profilManualAlready: ${!show} }
-						) { 
-							data { id } 
-						} 
-					}`
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update guide status');
-      }
-
-      const result = await response.json();
-      if (result.errors) {
-        throw new Error(result.errors[0]?.message || 'GraphQL error');
+      const result = await executeAction('toggleGuideStatus', { show });
+      if (!result.success) {
+        throw new Error(result.error?.message || 'Failed to update guide status');
       }
 
       toast.success(show ? t[$lang].guidResumed : t[$lang].guidStopped);
@@ -579,6 +559,24 @@
             loading={pressed}
           />
         {/if}
+      </CardContent>
+    </Card>
+
+    <!-- Cryptographic Identity -->
+    <Card>
+      <CardHeader>
+        <CardTitle>{t[$lang].identityTitle}</CardTitle>
+        <CardDescription>{t[$lang].identityDesc}</CardDescription>
+      </CardHeader>
+      <CardContent class="flex items-center justify-between gap-3 flex-wrap">
+        <ConsentStatusBadge expanded lang={$lang === 'en' ? 'en' : 'he'} />
+        <a
+          href="/me/identity"
+          data-sveltekit-prefetch
+          class="text-sm text-gold hover:underline"
+        >
+          {t[$lang].identityManage} →
+        </a>
       </CardContent>
     </Card>
 

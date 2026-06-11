@@ -1,61 +1,41 @@
 <script>
-  import {page} from '$app/state'
- let idNewNeed;
-const baseUrl = import.meta.env.VITE_URL
+  import { executeAction } from '$lib/client/actionClient';
+  import { lang } from '$lib/stores/lang.js';
 
-           import { lang } from '$lib/stores/lang.js'
+  let clicked = $state(false);
+  let needName = $state();
+  let desN = $state('');
+  let price = $state(0);
+  let valued = $state();
+  let linkto = $state('');
 
- let clicked = $state(false)
-let token;
-let needName = $state();
-let  desN = $state("");
-let price = $state(0);
-let valued = $state();
-let linkto = $state("");
-let meData = [];
-
-async function subm() {
-  clicked = true
-    token  = page.data.tok; 
-    let bearer1 = 'bearer' + ' ' + token;
-    let d = new Date
+  async function subm() {
+    clicked = true;
     try {
-           const res = await fetch(`${baseUrl}/graphql`, {
-              method: "POST",
-              headers: {
-                   'Authorization': bearer1,
-                 'Content-Type': 'application/json'
-              },  body: JSON.stringify({
-                        query: `mutation { createMashaabim(
-       data: {
-         name: "${needName}",
-        price: ${price},
-        descrip: "${desN}",
-        kindOf: ${valued},
-        publishedAt: "${d.toISOString()}",
-        linkto: "${linkto}"
-        }
-    
-  ){
-  data { id attributes{ name}}
-}
-}
-              `})
-})
-             .then(r => r.json())
-  .then(data => meData = data);
-        console.log(meData)
-    onNewn?.({
-  id: meData.data.createMashaabim.data.id,
-  skob: meData.data.createMashaabim.data,
-  name: meData.data.createMashaabim.data.attributes.name,
-       })
-addnee = false
-                  }
-      catch(error) {
-        console.log('צריך לתקן:', error.response);
-                };
-    };
+      const result = await executeAction('createMashaabim', {
+        name: needName,
+        price,
+        descrip: desN,
+        kindOf: valued,
+        linkto
+      });
+      if (result.success) {
+        const entry = result.data;
+        onNewn?.({
+          id: entry.id,
+          skob: entry,
+          name: entry.attributes.name
+        });
+        addnee = false;
+      } else {
+        console.log('Error creating mashaabim:', result.error);
+        clicked = false;
+      }
+    } catch (error) {
+      console.log('צריך לתקן:', error);
+      clicked = false;
+    }
+  }
   /**
    * @typedef {Object} Props
    * @property {boolean} [onmo] - cando choose

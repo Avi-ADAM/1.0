@@ -34,6 +34,69 @@ export interface ActionConfig {
 
   /** Update strategy for client-side updates (optional) */
   updateStrategy?: UpdateStrategy;
+
+  /**
+   * Consent-event mapping for actions that ratify a group decision
+   * (PLAN_action_migration_vs_p2p §6.3).
+   *
+   * When present, /api/action mirrors the action into a signed ConsentEvent
+   * (Phase 1 shadow signing). The action's params map 1:1 to the event's
+   * predicate (PLAN_action_migration_vs_p2p D-10). Absent ⇒ legacy mutation
+   * only, no shadow event.
+   */
+  consentSpec?: ConsentSpec;
+}
+
+/**
+ * Declarative mapping from an action invocation to a ConsentEvent. Lets
+ * existing actions emit shadow-signed events without touching call sites.
+ *
+ * For poly-actions that branch on a param value (e.g. addVote with
+ * type=tosplit|pend|sheirutpend|...), `action` and `subjectType` can be
+ * functions that derive the right value from params. They can also return
+ * `null` to indicate "no consent event for this invocation" — used when only
+ * some branches of a poly-action ratify a group decision.
+ */
+export interface ConsentSpec {
+  /** Dotted action name (e.g., 'tosplit.vote'). String or per-invocation deriver. */
+  action: string | ((params: Record<string, unknown>) => string | null);
+
+  /** Type tag for ConsentEvent.subject.type. String or per-invocation deriver. */
+  subjectType: string | ((params: Record<string, unknown>) => string);
+
+  /** Name of the action param that holds the subject id */
+  subjectIdParam: string;
+
+  /**
+   * Whether this event ratifies a group decision (needs QuorumProof).
+   * Maps to PLAN_rikma_as_state_machine §8.2 — informs the verifier whether
+   * to expect a `quorum` field.
+   */
+  requireConsensus?: boolean;
+
+  /**
+   * Restime resolution mode (PLAN_restime_in_signed_chain §10).
+   *   - 'project'  → look up the parent project's restimeMs
+   *   - 'ratson'   → look up the parent ratson's restimeMs
+   *   - 'custom'   → predicateFromParams must include `restimeMs`
+   *   - undefined  → no restime applies (immediate decision)
+   */
+  restimeFrom?: 'project' | 'ratson' | 'custom';
+
+  /**
+   * Pure mapping from action params to event.predicate. If omitted, the
+   * predicate is `{ ...params, [subjectIdParam]: undefined, userId: undefined }`
+   * — the subject id moves to ConsentEvent.subject.id and userId is bound at
+   * sign time from the session, not from the payload.
+   */
+  predicateFromParams?: (params: Record<string, unknown>) => Record<string, unknown>;
+
+  /**
+   * Optional: which existing event ids this one descends from. Default: an
+   * empty array (caller assembles the DAG). For votes, typically the
+   * proposal-creation event.
+   */
+  parentsFromParams?: (params: Record<string, unknown>) => string[];
 }
 
 /**

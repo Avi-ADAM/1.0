@@ -13,6 +13,45 @@
 
 ---
 
+## 0. ⚠️ פרצות קריטיות בפרוקסי — לתקן לפני הכל (נמצאו 2026-06-10)
+
+> שתי הפרצות האלה חשופות **כבר עכשיו** בפרודקשן, עוד לפני נעילת הרשת.
+> נעילת Strapi ל-localhost **לא** סוגרת אותן — הפרוקסי עצמו ציבורי.
+
+### 0.1 דגל `isSer` נשלט על-ידי הלקוח ומעניק טוקן אדמין
+
+הלקוח שולח `isSer` ב-body, והשרת מצמיד טוקן service/אדמין בלי לאמת שהקריאה
+באמת הגיעה מצד שרת:
+
+| קובץ | שורה | הבעיה |
+|------|------|--------|
+| `src/routes/api/send/+server.js` | ~84, ~106 | `isSer = data.isSer ?? false` → `getServiceToken()`. בדיקת `x-consensus-secret` קיימת **רק** ל-qids של קונסנזוס; לכל qid אחר `isSer:true` מקבל את `ADMINMONTHER` בלי שום סוד. |
+| `src/routes/api/action/+server.ts` | ~63-85 | `isSer === true` → `jwt = ADMIN_TOKEN` **וגם** `userId = params.userId` — כל דפדפן אנונימי יכול להריץ כל action בשם כל משתמש. |
+
+**תיקון נדרש:**
+- [ ] `api/action`: להסיר את מסלול ה-`isSer` מה-body. קריאות פנימיות (Telegram bot
+  וכו') יאומתו עם secret header ייעודי (כדוגמת `CONSENSUS_PROXY_SECRET`), או
+  יקראו ל-`ActionService` ישירות בצד שרת בלי לעבור ב-HTTP.
+- [ ] `api/send`: להרחיב את בדיקת ה-secret לכל קריאת `isSer` (לא רק קונסנזוס),
+  או לזהות service-calls אך ורק לפי header ולא לפי ה-body.
+- [ ] לעדכן callers פנימיים שמשתמשים ב-`isSer:true` (למשל
+  `src/lib/func/send/timeGrama.svelte` → `archiveTimeGrama(..., isSer)`) —
+  לוודא שהם רצים בצד שרת בלבד או עוברים למסלול המאומת.
+
+### 0.2 raw-query bypass ב-`api/send` (עוקף את ה-whitelist)
+
+`api/send/+server.js:68` — אם הלקוח לא שולח `queId`, השרת מריץ
+`data.data.query` שרירותי. ה-validation רץ רק ב-dev וגם אז רק מדפיס שגיאה.
+בשילוב עם 0.1 → GraphQL שרירותי עם טוקן אדמין מכל דפדפן.
+
+**תיקון נדרש:**
+- [ ] בפרודקשן: לדחות query גולמי לחלוטין (`throw error(400)` אם אין `queId`).
+  ב-dev אפשר להשאיר עם warning.
+- [ ] grep מאמת: אף caller בקוד לא שולח `query` גולמי ל-`/api/send`
+  (ואם כן — להוסיף את ה-query ל-`qids.js`).
+
+---
+
 ## 1. תמונת מצב — מה כבר קיים
 
 | נתיב | תפקיד | אימות | סטטוס |
@@ -32,37 +71,50 @@
 קומפוננטות קוראות אותו ופונות **ישירות מהדפדפן** ל-`VITE_URL/graphql`. ברגע
 שננעל את Strapi מבחוץ — כל אלה ייפלו, ובינתיים הטוקן דולף.
 
-### 2.1 נקודות החשיפה (צד שרת → לקוח) — סך הכל 4
+### 2.1 נקודות החשיפה (צד שרת → לקוח) — סך הכל 4 — **כולן נסגרו ✅ (אומת 2026-06-10)**
 
-| קובץ | שורה | מחזיר ללקוח | תיקון נדרש |
+| קובץ | שורה | מחזיר ללקוח | סטטוס |
 |------|------|--------------|------------|
-| `src/routes/+layout.server.js` | 21 | `jwt: tok` (טוקן אמיתי, גלובלי) | להסיר לגמרי |
-| `src/routes/(reg)/+layout.server.js` | — | `tok: locals.tok` (טוקן אמיתי) | להחליף ב-flag בוליאני |
-| `src/routes/(regandnon)/+layout.server.js` | — | `tok: locals.tok` (טוקן אמיתי) | להחליף ב-flag בוליאני |
-| `src/routes/(reg)/sales-center/+page.server.js` | 4 | `tok: locals.tok` (טוקן אמיתי) | להחליף ב-flag בוליאני |
+| `src/routes/+layout.server.js` | 21 | `jwt: tok` (טוקן אמיתי, גלובלי) | ✅ הוחלף ב-`loggedIn: !!tok` |
+| `src/routes/(reg)/+layout.server.js` | — | `tok: locals.tok` (טוקן אמיתי) | ✅ הוחלף ב-`tok: !!tok` |
+| `src/routes/(regandnon)/+layout.server.js` | — | `tok: locals.tok` (טוקן אמיתי) | ✅ הוחלף ב-`tok: !!tok` |
+| `src/routes/(reg)/sales-center/+page.server.js` | 4 | `tok: locals.tok` (טוקן אמיתי) | ✅ מחזיר flag בוליאני |
+
+**צרכני `page.data.tok`/`.jwt` שנותרו (grep 2026-06-10):**
+- `src/routes/(regandnon)/availiableResorce/[id]/+page.svelte` — משתמש רק
+  כ-flag בוליאני (`!= false`) — **תקין, לא לגעת**.
+- `src/routes/test-lev-socket/+page.svelte:30` — `jwt = page.data.tok` — דף
+  בדיקה; מקבל היום בוליאני ולא טוקן. ⏳ לעדכן/למחוק את הדף לפני פרודקשן.
+- `src/lib/legacy/moach/OLD_monolith.svelte` — legacy, לא בשימוש.
 
 > **בטוחים — לא לגעת:** מקומות שמחזירים `tok: tok == false ? false : true`
 > (כבר בוליאני). שימושי `jwt: String(locals.tok)` בתוך `actionService.executeAction`
 > (למשל `(reg)/forum/+layout.server.ts`) ובתוך helper של `gql()`
 > (`deals/request/[id]/+page.server.ts`) — אלה רצים **בצד שרת בלבד** ולא נחשפים ללקוח.
 
-### 2.2 צרכני הטוקן (לקוח) שיש להגר — ~39 קומפוננטות
+### 2.2 צרכני הטוקן (לקוח) שיש להגר — ~39 קומפוננטות — **הושלם ברובו ✅**
 
-קוראות `page.data.tok` / `page.data.jwt` כ-bearer ופונות ישירות ל-Strapi:
+הרשימה ההיסטורית (לתיעוד): `lev/*`, `addnew/*`, `userPr/*`, `prPr/*`,
+`sales/SaleComponent`, `registration/newppp`, routes שונים. נכון ל-2026-06-10
+ה-grep `page\.data\.tok|page\.data\.jwt` נקי פרט לחריגים שב-2.1.
 
-- **`src/lib/components/lev/`**: `rikma`, `hevel`, `mesima`, `weget`, `reqtosherut`,
-  `mashsuggest`, `projectSuggestornew`, `halukaask`, `pmas`, `reqtom`,
-  `missionInProgress`, `didiget`, `decisionMaking`
-- **`src/lib/components/addnew/`**: `newIwant`, `addNewNeed`, `addNewMission`, `baci`
-- **`src/lib/components/userPr/`**: `newsp`, `edit`, `editsp`, `editBasic`
-- **`src/lib/components/prPr/`**: `totalNeeds`, `negoPend`, `newmatana`
-- **`src/lib/components/sales/`**: `SaleComponent`
-- **`src/lib/components/registration/`**: `newppp`
-- **routes**: `(reg)/newlev/+page.svelte` (מעביר `page.data.tok` ל-`initializeLevData`),
-  `(reg)/me`, `(reg)/oldlev`, `(reg)/sales-center`, `(regandnon)/...` ועוד
+### 2.2.1 פניות `/graphql` ישירות **ללא טוקן** שנותרו — יישברו בנעילה! (grep 2026-06-10)
 
-> רשימה מלאה מדויקת:
-> `grep -rln "page\.data\.tok\|page\.data\.jwt" src --include=*.svelte`
+קומפוננטות שפונות מהדפדפן ל-`VITE_URL/graphql` בלי bearer (queries ציבוריים /
+אנונימיים). אין כאן דליפת טוקן, אבל ברגע ש-Strapi יינעל ל-localhost — **כולן
+יישברו**. חובה להגר ל-`sendToSer`/qids לפני שלב 3:
+
+- **`src/lib/components/ui/`**: `ValueSelector`, `SkillSelector`, `RoleSelector`
+- **`src/lib/components/registration/`**: `roles`, `vallues`, `workways`, `password`
+- **`src/lib/components/addnew/`**: `addNewMission`, `addNewSkill`
+- **`src/lib/components/prPr/`**: `negoM`, `choosMission`, `whowhat`
+- **`src/lib/components/lev/`**: `reqtosherut`
+- **`src/lib/components/main/`**: `amana`, `amanaen`, `amanar`
+- **routes**: `hascama/+page.svelte`
+- ~~`src/lib/legacy/moach/OLD_monolith.svelte`~~ (legacy — לא מגרים)
+
+> grep מאמת (צריך להגיע ל-0, למעט legacy):
+> `grep -rln "graphql" src --include=*.svelte | xargs grep -ln "VITE_URL\|baseUrl"`
 
 ### 2.3 פניות REST ישירות (לא GraphQL) שגם תלויות בטוקן
 
@@ -199,18 +251,37 @@ Whitelist של פעולות מותרות; כל השאר → 404. פעולות ש
 
 ## 4. שלב 2 — הקשחת הפרוקסי עצמו
 
-- **לסגור את ה-raw-query bypass** ב-`api/send/+server.js:27`: כיום אם הלקוח לא
-  שולח `queId`, השרת מריץ `data.query` שרירותי — זה מאיין את ה-whitelist.
-  בפרודקשן לדחות query גולמי ולהתיר רק `qids`.
+- **לסגור את ה-raw-query bypass** — הועבר לסעיף 0.2 (קריטי, לתקן מיד).
+- **לסגור את פרצת ה-`isSer`** — סעיף 0.1 (קריטי, לתקן מיד).
 - Rate limiting + הגבלת גודל body על נתיבי הפרוקסי.
 - CORS מצומצם.
 - לוודא ש-`/api/action` עם authorization לכל action הוא הסטנדרט לכתיבה.
 
-## 5. שלב 3 — נעילת רשת ל-Strapi
+## 5. שלב 3 — נעילת רשת ל-Strapi (העברת SvelteKit ל-VPS)
 
-- Strapi מאזין על `127.0.0.1` בלבד (או firewall שחוסם 1337 מבחוץ).
-- Nginx מקדימה; SvelteKit מדבר עם Strapi דרך localhost.
-- לוודא ש-`VITE_URL` בצד שרת מצביע ל-localhost ולא נדרש ללקוח לאחר שלב 1.
+ההחלטה: שרת ה-SvelteKit (node adapter) ירוץ **על אותו VPS** של Strapi.
+Strapi נחסם מבחוץ ומדבר רק עם SvelteKit דרך loopback.
+
+- Strapi מאזין על `127.0.0.1` בלבד (`HOST=127.0.0.1` ב-config) **וגם**
+  firewall (ufw/iptables) שחוסם 1337 מבחוץ — הגנה כפולה.
+- Nginx מקדימה את SvelteKit (TLS, gzip); SvelteKit → Strapi דרך
+  `http://127.0.0.1:1337`.
+- **⚠️ מלכודת `VITE_URL`:** זהו משתנה **build-time שנכנס גם ל-bundle של
+  הלקוח** (prefix `VITE_`). אם נציב בו `127.0.0.1` לפני שכל הקומפוננטות
+  ב-2.2.1 הוגרו — הן יקבלו כתובת localhost ויישברו אצל המשתמש. הסדר המחייב:
+  קודם 2.2.1 = 0, ואז לעבור בצד שרת למשתנה **פרטי** חדש (למשל `STRAPI_URL`
+  ב-`$env/static/private`) שמצביע ל-localhost, ולהפסיק את השימוש ב-`VITE_URL`
+  בקבצי השרת (`api/send`, `api/action`, `api/upload`, server loads).
+- **מדיה (uploads):** אם הלקוח טוען תמונות ישירות מ-Strapi
+  (`VITE_URL/uploads/...`) — להגדיר ב-Nginx location ציבורי read-only של
+  `/uploads` שמפנה ל-`127.0.0.1:1337`, או להגיש דרך SvelteKit. לאמת לפני
+  הנעילה אילו URLים של מדיה חיים בפרודקשן.
+- **פאנל האדמין של Strapi (`/admin`):** ייחסם גם הוא. גישה דרך SSH tunnel
+  (`ssh -L 1337:127.0.0.1:1337`) או location ב-Nginx עם allowlist של IP /
+  basic-auth.
+- **שירותים חיצוניים:** לוודא שאין מי שפונה ל-Strapi ישירות מבחוץ —
+  Telegram bot, cron jobs, webhooks, שרת sockets. כל אחד כזה צריך לעבור
+  ללקריאה דרך localhost (אם הוא על אותו VPS) או דרך הפרוקסי המאומת.
 
 ## 6. שלב 4 — אימות סופי וניקוי
 
@@ -226,3 +297,18 @@ Whitelist של פעולות מותרות; כל השאר → 404. פעולות ש
   מיטיגציה: לבצע 3.3 **אחרון**, אחרי ש-grep הצרכנים = 0.
 - כל שלב הוא commit נפרד וניתן ל-revert; אין שינוי סכמה ב-Strapi.
 - מומלץ flag/בדיקה בסביבת staging לפני נעילת הרשת (שלב 3).
+
+---
+
+## 8. סדר עבודה מעודכן (2026-06-10)
+
+1. - [ ] **סעיף 0.1** — סגירת פרצת ה-`isSer` (אדמין טוקן מהדפדפן) — **מיידי**
+2. - [ ] **סעיף 0.2** — חסימת raw-query בפרודקשן — **מיידי**
+3. - [ ] **סעיף 2.2.1** — הגירת ~17 הקומפוננטות האנונימיות ל-`sendToSer`/qids
+4. - [ ] השלמת שאריות שלב 1: register proxy, uploads, `test-lev-socket`,
+       sidequest ה-chat (3.6)
+5. - [ ] guardrails (3.4) + grep = 0
+6. - [ ] שלב 2 — rate limiting, body size, CORS
+7. - [ ] שלב 3 — מעבר ל-`STRAPI_URL` פרטי, פריסת SvelteKit על ה-VPS,
+       נעילת Strapi ל-`127.0.0.1` + firewall, nginx ל-`/uploads` ו-`/admin`
+8. - [ ] שלב 4 — אימות סופי, ניקוי, תיעוד

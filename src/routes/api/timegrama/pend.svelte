@@ -1,7 +1,8 @@
 <script module>
   import { sanitizeUserInput } from '$lib/func/uti/sanitizeUserInput.svelte';
      import { SendTo } from '$lib/send/sendTo.svelte';
-  const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER;
+  // Server-only secret — this module is imported only by timegrama/+server.js.
+  import { ADMINMONTHER } from '$env/static/private';
 //get by id
 //calculate votes
 //if no no create open mission 
@@ -15,7 +16,7 @@ export async function Pend(id,taid){
   }}} 
     }`;
     try {
-      let res = await SendTo(qu, VITE_ADMINMONTHER).then((res) => (res = res));
+      let res = await SendTo(qu, ADMINMONTHER).then((res) => (res = res));
       console.log(res,"pend first res", id);
       if (res.data != null) {
         console.log(res.data,"pend first res data");
@@ -35,7 +36,7 @@ export async function Pend(id,taid){
                 }`
                 console.log("we go second pend", id)
  try {
-      let res2 = await SendTo(qua, VITE_ADMINMONTHER).then((res2) => (res2 = res2));
+      let res2 = await SendTo(qua, ADMINMONTHER).then((res2) => (res2 = res2));
       console.log(res2,"pend  res2");
       if (res2.data != null) {
         console.log(res2.data,"pend  res2 data");
@@ -77,7 +78,7 @@ export async function Pend(id,taid){
  } `   
  console.log(qub,"queri2")
      try {
-      let res3 = await SendTo(qub, VITE_ADMINMONTHER).then((res3) => (res3 = res3));
+      let res3 = await SendTo(qub, ADMINMONTHER).then((res3) => (res3 = res3));
       console.log(res3,"pend res3 ",res?.errors?.locations)     
       if (res3.data != null) {
               console.log(res3.data,"pend res3 data ,pend line 83 ")
@@ -93,7 +94,7 @@ export async function Pend(id,taid){
             }
               `
                try {
-      let res4 = await SendTo(que4, VITE_ADMINMONTHER).then((res4) => (res4 = res4));
+      let res4 = await SendTo(que4, ADMINMONTHER).then((res4) => (res4 = res4));
       console.log(res4,"pend res4 ")      
       if (res4.data != null) {
               console.log(res4.data,"pend res4 ")      

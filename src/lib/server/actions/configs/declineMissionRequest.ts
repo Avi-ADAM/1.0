@@ -1,12 +1,11 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 
 const declineMissionRequestHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
-  const { openMissionId, existingDeclinedIds = [], declinedUserId } = params;
+  const { openMissionId, declinedUserId } = params;
 
-  const declinedIds = [...existingDeclinedIds.map(String), String(declinedUserId)];
   await strapi.execute(
     '130updateOpenMissionDeclined',
-    { id: openMissionId, declinedIds },
+    { id: openMissionId, declinedId: String(declinedUserId) },
     context.jwt,
     context.fetch
   );
@@ -26,7 +25,6 @@ export const declineMissionRequestConfig: ActionConfig = {
     openMissionId: { type: 'string', required: true },
     projectId: { type: 'string', required: true },
     declinedUserId: { type: 'string', required: true },
-    existingDeclinedIds: { type: 'array', required: false },
   },
 
   authRules: [

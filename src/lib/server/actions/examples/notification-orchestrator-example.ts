@@ -12,7 +12,7 @@ import type { NotificationConfig, ActionContext } from '../types';
 // Example 1: Create NotificationOrchestrator instance
 const strapiClient = new StrapiClient(
   process.env.VITE_URL || 'https://api.1lev1.com/graphql',
-  process.env.VITE_ADMINMONTHER || ''
+  process.env.ADMINMONTHER || ''
 );
 
 const notificationOrchestrator = new NotificationOrchestrator(strapiClient);

@@ -49,6 +49,8 @@
 | הוספת תגובה להעברת כסף | `lev/didiget.svelte` | afreact() | `fetch('/graphql')` inline mutation chatre (broken objToString) | `addHalukaChatEntry` (server fetches current chatre, appends, saves back) | חברי פרויקט (socket) | `[x]` 2026-05-22 |
 | הצבעה על החלטת פרויקט — שינוי לוגו (kind=pic) + consensus | `lev/decisionMaking.svelte` | agree() kind!='sheirutpends' | `fetch('/graphql')` × broken (template literal discarded + que() as tagged template) — consensus never fired | `voteOnDecision` (server-authoritative: DB fetch, dedup, consensus → archiveDecision + updateProject.profilePic + markTimegrama) | חברי פרויקט (socket) | `[x]` 2026-05-22 |
 | הצבעה על sheirutpend מ-decisionMaking | `lev/decisionMaking.svelte` | agree() kind='sheirutpends' | `addVote(type:'decision')` בטעות לכל ה-kinds | `addVote(type:'sheirutpend')` — ה-action הנכון הקיים (handles consensus → createSheirut) | חברי פרויקט (socket) | `[x]` 2026-05-22 |
+| הוספת תגובה לצ'אט Askm | `lev/reqtom.svelte` | afreact() | `PUT /api/askms/{id}` + `page.data.tok` | `addAskmChatEntry` (server GET→append→PUT, no token on client) | — | `[x]` 2026-06-10 |
+| הוספת תגובה לצ'אט Askm | `lev/mashsuggest.svelte` | afreact() | `PUT /api/askms/{id}` + `page.data.tok` | `addAskmChatEntry` | — | `[x]` 2026-06-10 |
 
 ---
 
@@ -62,7 +64,7 @@
 | לוג אירוע מערכת (system event log) | `prPr/mission.svelte` | 870–883 | `fetch('/api/ste', POST)` | `logSystemEvent` | admin/logs | `[ ]` |
 | יצירת matana (תמונה + GraphQL) | `prPr/newmatana.svelte` | 67–87 | `axios.post(/api/upload)` + `fetch('/graphql', mutation createMatana)` | `createMatana` | חברי פרויקט | `[ ]` |
 | יצירת mission | `prPr/mission.svelte` | 369 | `sendToSer(...)` | `createMission` | חברי פרויקט (real-time kanban) | `[ ]` |
-| עדכון סטטוס task | `prPr/tasks/chooseM.svelte` | 48 | `sendToSer(...)` | `updateTask` ← **קיים!** לבדוק אם מחובר | חברי פרויקט | `[ ]` |
+| עדכון סטטוס task | `prPr/tasks/chooseM.svelte` | 48 | `sendToSer(...)` | `updateTask` ← **קיים!** לבדוק אם מחובר | חברי פרויקט | `[x]` 2026-06-07 |
 | סימון act כ-done / set status | `prPr/tasks/Myacts.svelte` | 127–155 | `sendToSer(...)` × 2 | `markActDone` + `setActStatus` | מקצה + חברי פרויקט | `[ ]` |
 | פעולות הלוקה / tosplit | `prPr/whowhat.svelte` | 252–481 | `sendToSer(...)` (פעולות מרובות) | לפי סוג: `createHaluka` / `createTosplit` ← **קיימים!** | משתתפים + פרויקט | `[ ]` |
 
@@ -75,10 +77,10 @@
 | יצירת API key | `userPr/editBasic.svelte` | 231–239 | `fetch('/api/api-keys', POST)` | `createApiKey` | user (email אישור) | `[ ]` |
 | מחיקת API key | `userPr/editBasic.svelte` | 266–268 | `fetch('/api/api-keys', DELETE)` | `deleteApiKey` | user | `[ ]` |
 | שינוי סיסמה | `userPr/editBasic.svelte` | 361–373 | `axios.post('/api/auth/change-password')` | `changePassword` | user (email אישור security) | `[ ]` |
-| עדכון guide status | `userPr/editBasic.svelte` | 450–465 | `fetch('/graphql', mutation updateUsersPermissionsUser)` | `toggleGuideStatus` | — | `[ ]` |
+| עדכון guide status | `userPr/editBasic.svelte` | 450–465 | `fetch('/graphql', mutation updateUsersPermissionsUser)` | `toggleGuideStatus` | — | `[x]` 2026-06-08 |
 | עדכון relations של משתמש | `userPr/edit.svelte` | 128–148 | `fetch('/graphql', mutation updateUsersPermissionsUser)` | `updateUserRelations` | user + פרויקטים קשורים | `[ ]` |
-| יצירת resource/need (sp) | `userPr/newsp.svelte` | 77–99 | `fetch('/graphql', mutation createSp)` | `createResourceRequest` | חברי פרויקט + matching users | `[ ]` |
-| עדכון resource/need (sp) | `userPr/editsp.svelte` | 62–84 | `fetch('/graphql', mutation updateSp)` | `updateResourceRequest` | חברי פרויקט | `[ ]` |
+| יצירת resource/need (sp) | `userPr/newsp.svelte` | 77–99 | `fetch('/graphql', mutation createSp)` | `createResourceRequest` | חברי פרויקט + matching users | `[x]` 2026-06-07 |
+| עדכון resource/need (sp) | `userPr/editsp.svelte` | 62–84 | `fetch('/graphql', mutation updateSp)` | `updateResourceRequest` | חברי פרויקט | `[x]` 2026-06-07 |
 
 ---
 
@@ -94,6 +96,7 @@
 | לוקליזציה ב-SkillSelector | `ui/SkillSelector.svelte` | multiple | `fetch('/api/ste', POST)` × 2 | ← לאחד עם `/api/ste` action | — | `[ ]` |
 | לוקליזציה ב-RoleSelector | `ui/RoleSelector.svelte` | multiple | `fetch('/api/ste', POST)` × 2 | ← לאחד עם `/api/ste` action | — | `[ ]` |
 | יצירת iwant logs | `addnew/newIwant.svelte` | multiple | `fetch('/api/ste', POST)` × 3 | `createIwantLog` | — | `[ ]` |
+| יצירת Mission template (קטלוג) + token | `addnew/addNewMission.svelte` | subm() | `fetch('/graphql', mutation createMission)` + `page.data.tok` bearer | `createMissionTemplate` (JWT, queId 21createMission) | — | `[x]` 2026-06-08 |
 
 ---
 
@@ -230,6 +233,7 @@
 | `confirmHaluka` | `configs/confirmHaluka.ts` | אישור Haluka ע"י שולח (senderconf) או מקבל (confirmed + spCheck + hervachti distribution) |
 | `addHalukaChatEntry` | `configs/addHalukaChatEntry.ts` | הוספת entry לchatre של Haluka (שרת מביא מה-DB ומוסיף) |
 | `voteOnDecision` | `configs/voteOnDecision.ts` | הצבעה על החלטת פרויקט — server-authoritative (DB fetch, dedup, consensus → archiveDecision + updateProject.profilePic (pic) + markTimegrama) |
+| `addAskmChatEntry` | `configs/addAskmChatEntry.ts` | הוספת entry לchat של Askm (שרת מביא מה-DB, מוסיף, שומר — ללא token בלקוח) |
 
 ---
 

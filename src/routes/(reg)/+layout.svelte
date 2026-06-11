@@ -14,6 +14,7 @@ import { showFoot } from '$lib/stores/showFoot.js';
   import { initialWebSP } from '$lib/stores/pgishot.js';
   import Mobile from '$lib/components/front/mobile.svelte';
   import MobileFooter from '$lib/components/footer/mobileFooter.svelte';
+  import { bootstrapConsentIdentity } from '$lib/consent/bootstrap.svelte';
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -42,7 +43,6 @@ console.log('Message received. ', payload);
 // isAuthed is derived synchronously from server data so there is no
 // flash of the login wall after a successful login redirect.
 let isAuthed = $state(!!data.tok);
-let token;
 onMount(async () => {
     // Check session expiry via the 'when' cookie
     const cookieRe = document.cookie
@@ -61,8 +61,14 @@ onMount(async () => {
       console.log('authed');
       initialForum(true, [], data.uid);
       console.log(data.uid, $forum);
-      initialWebS(data.tok, data.uid);
-      initialWebSP(data.tok, data.uid);
+      // data.tok is now just a boolean login flag; the socket authenticates from
+      // the HttpOnly cookie, so no token is passed (these fns ignore arg 1).
+      initialWebS(null, data.uid);
+      initialWebSP(null, data.uid);
+      // Phase 1 of PLAN_user_sovereign_consent: idempotent identity bootstrap.
+      // Fire-and-forget. Failures (browser unsupported, mirror unreachable)
+      // surface in the UI via consentStatus; they never block the layout.
+      if (data.uid) bootstrapConsentIdentity(data.uid).catch(() => { /* noop */ });
     }
 });
 function reg (){

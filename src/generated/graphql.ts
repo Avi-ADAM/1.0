@@ -316,6 +316,93 @@ export type ApiKeyRelationResponseCollection = {
   data: Array<ApiKeyEntity>;
 };
 
+export type Argument = {
+  __typename?: 'Argument';
+  arguments?: Maybe<ArgumentRelationResponseCollection>;
+  authorEmail?: Maybe<Scalars['String']['output']>;
+  authorExternalId?: Maybe<Scalars['String']['output']>;
+  authorName?: Maybe<Scalars['String']['output']>;
+  authorType?: Maybe<Enum_Argument_Authortype>;
+  body?: Maybe<Scalars['String']['output']>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  negotiation?: Maybe<NegotiationEntityResponse>;
+  parent?: Maybe<ArgumentEntityResponse>;
+  position?: Maybe<PositionEntityResponse>;
+  publishedAt?: Maybe<Scalars['DateTime']['output']>;
+  stance?: Maybe<Enum_Argument_Stance>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  voters?: Maybe<Scalars['JSON']['output']>;
+  votes?: Maybe<Scalars['Int']['output']>;
+};
+
+
+export type ArgumentArgumentsArgs = {
+  filters?: InputMaybe<ArgumentFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+export type ArgumentEntity = {
+  __typename?: 'ArgumentEntity';
+  attributes?: Maybe<Argument>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type ArgumentEntityResponse = {
+  __typename?: 'ArgumentEntityResponse';
+  data?: Maybe<ArgumentEntity>;
+};
+
+export type ArgumentEntityResponseCollection = {
+  __typename?: 'ArgumentEntityResponseCollection';
+  data: Array<ArgumentEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type ArgumentFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<ArgumentFiltersInput>>>;
+  arguments?: InputMaybe<ArgumentFiltersInput>;
+  authorEmail?: InputMaybe<StringFilterInput>;
+  authorExternalId?: InputMaybe<StringFilterInput>;
+  authorName?: InputMaybe<StringFilterInput>;
+  authorType?: InputMaybe<StringFilterInput>;
+  body?: InputMaybe<StringFilterInput>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  id?: InputMaybe<IdFilterInput>;
+  negotiation?: InputMaybe<NegotiationFiltersInput>;
+  not?: InputMaybe<ArgumentFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ArgumentFiltersInput>>>;
+  parent?: InputMaybe<ArgumentFiltersInput>;
+  position?: InputMaybe<PositionFiltersInput>;
+  publishedAt?: InputMaybe<DateTimeFilterInput>;
+  stance?: InputMaybe<StringFilterInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+  voters?: InputMaybe<JsonFilterInput>;
+  votes?: InputMaybe<IntFilterInput>;
+};
+
+export type ArgumentInput = {
+  arguments?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  authorEmail?: InputMaybe<Scalars['String']['input']>;
+  authorExternalId?: InputMaybe<Scalars['String']['input']>;
+  authorName?: InputMaybe<Scalars['String']['input']>;
+  authorType?: InputMaybe<Enum_Argument_Authortype>;
+  body?: InputMaybe<Scalars['String']['input']>;
+  negotiation?: InputMaybe<Scalars['ID']['input']>;
+  parent?: InputMaybe<Scalars['ID']['input']>;
+  position?: InputMaybe<Scalars['ID']['input']>;
+  publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  stance?: InputMaybe<Enum_Argument_Stance>;
+  voters?: InputMaybe<Scalars['JSON']['input']>;
+  votes?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ArgumentRelationResponseCollection = {
+  __typename?: 'ArgumentRelationResponseCollection';
+  data: Array<ArgumentEntity>;
+};
+
 export type Ask = {
   __typename?: 'Ask';
   archived?: Maybe<Scalars['Boolean']['output']>;
@@ -859,6 +946,76 @@ export type ChezinInput = {
 export type ChezinRelationResponseCollection = {
   __typename?: 'ChezinRelationResponseCollection';
   data: Array<ChezinEntity>;
+};
+
+export type Clause = {
+  __typename?: 'Clause';
+  authorExternalId?: Maybe<Scalars['String']['output']>;
+  authorType?: Maybe<Enum_Clause_Authortype>;
+  body?: Maybe<Scalars['String']['output']>;
+  confirmedByAuthor?: Maybe<Scalars['Boolean']['output']>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  issue?: Maybe<IssueEntityResponse>;
+  negotiation?: Maybe<NegotiationEntityResponse>;
+  origin?: Maybe<Enum_Clause_Origin>;
+  position?: Maybe<PositionEntityResponse>;
+  publishedAt?: Maybe<Scalars['DateTime']['output']>;
+  stanceValue?: Maybe<Scalars['Float']['output']>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+export type ClauseEntity = {
+  __typename?: 'ClauseEntity';
+  attributes?: Maybe<Clause>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type ClauseEntityResponse = {
+  __typename?: 'ClauseEntityResponse';
+  data?: Maybe<ClauseEntity>;
+};
+
+export type ClauseEntityResponseCollection = {
+  __typename?: 'ClauseEntityResponseCollection';
+  data: Array<ClauseEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type ClauseFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<ClauseFiltersInput>>>;
+  authorExternalId?: InputMaybe<StringFilterInput>;
+  authorType?: InputMaybe<StringFilterInput>;
+  body?: InputMaybe<StringFilterInput>;
+  confirmedByAuthor?: InputMaybe<BooleanFilterInput>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  id?: InputMaybe<IdFilterInput>;
+  issue?: InputMaybe<IssueFiltersInput>;
+  negotiation?: InputMaybe<NegotiationFiltersInput>;
+  not?: InputMaybe<ClauseFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ClauseFiltersInput>>>;
+  origin?: InputMaybe<StringFilterInput>;
+  position?: InputMaybe<PositionFiltersInput>;
+  publishedAt?: InputMaybe<DateTimeFilterInput>;
+  stanceValue?: InputMaybe<FloatFilterInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+};
+
+export type ClauseInput = {
+  authorExternalId?: InputMaybe<Scalars['String']['input']>;
+  authorType?: InputMaybe<Enum_Clause_Authortype>;
+  body?: InputMaybe<Scalars['String']['input']>;
+  confirmedByAuthor?: InputMaybe<Scalars['Boolean']['input']>;
+  issue?: InputMaybe<Scalars['ID']['input']>;
+  negotiation?: InputMaybe<Scalars['ID']['input']>;
+  origin?: InputMaybe<Enum_Clause_Origin>;
+  position?: InputMaybe<Scalars['ID']['input']>;
+  publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  stanceValue?: InputMaybe<Scalars['Float']['input']>;
+};
+
+export type ClauseRelationResponseCollection = {
+  __typename?: 'ClauseRelationResponseCollection';
+  data: Array<ClauseEntity>;
 };
 
 export type ComponentDesisionEditPend = {
@@ -2465,6 +2622,28 @@ export enum Enum_Act_Hashivut {
   Yellow = 'yellow'
 }
 
+export enum Enum_Argument_Authortype {
+  Charter = 'charter',
+  Guest = 'guest',
+  Registered = 'registered'
+}
+
+export enum Enum_Argument_Stance {
+  Con = 'con',
+  Pro = 'pro'
+}
+
+export enum Enum_Clause_Authortype {
+  Charter = 'charter',
+  Guest = 'guest',
+  Registered = 'registered'
+}
+
+export enum Enum_Clause_Origin {
+  Ai = 'ai',
+  Human = 'human'
+}
+
 export enum Enum_Componentdesisionnegom_Kindof {
   Monthly = 'monthly',
   PerUnit = 'perUnit',
@@ -2537,6 +2716,11 @@ export enum Enum_Forum_Spec {
   General = 'general',
   Spesifica = 'spesifica',
   Spesificm = 'spesificm'
+}
+
+export enum Enum_Issue_Origin {
+  Ai = 'ai',
+  Human = 'human'
 }
 
 export enum Enum_Maap_Unit {
@@ -3474,7 +3658,7 @@ export type ForumRelationResponseCollection = {
   data: Array<ForumEntity>;
 };
 
-export type GenericMorph = Act | Actt | ApiKey | Ask | Askm | Askwant | Bakasha | Category | Chezin | ComponentDesisionEditPend | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ContentReleasesRelease | ContentReleasesReleaseAction | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | Mesimabetahalich | Message | Mission | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | OpenMashaabim | OpenMission | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pmash | Position | Project | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | Richtext | Rikmash | Sale | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Sidur | Skill | Solution | Sp | Tafkidim | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
+export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ContentReleasesRelease | ContentReleasesReleaseAction | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | Mesimabetahalich | Message | Mission | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | OpenMashaabim | OpenMission | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pmash | Position | Project | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | Richtext | Rikmash | Sale | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Sidur | Skill | Solution | Sp | Tafkidim | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
 
 export type Haamada = {
   __typename?: 'Haamada';
@@ -3931,6 +4115,72 @@ export type IntFilterInput = {
   null?: InputMaybe<Scalars['Boolean']['input']>;
   or?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
   startsWith?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type Issue = {
+  __typename?: 'Issue';
+  clauses?: Maybe<ClauseRelationResponseCollection>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  negotiation?: Maybe<NegotiationEntityResponse>;
+  order?: Maybe<Scalars['Int']['output']>;
+  origin?: Maybe<Enum_Issue_Origin>;
+  publishedAt?: Maybe<Scalars['DateTime']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+
+export type IssueClausesArgs = {
+  filters?: InputMaybe<ClauseFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+export type IssueEntity = {
+  __typename?: 'IssueEntity';
+  attributes?: Maybe<Issue>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type IssueEntityResponse = {
+  __typename?: 'IssueEntityResponse';
+  data?: Maybe<IssueEntity>;
+};
+
+export type IssueEntityResponseCollection = {
+  __typename?: 'IssueEntityResponseCollection';
+  data: Array<IssueEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type IssueFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<IssueFiltersInput>>>;
+  clauses?: InputMaybe<ClauseFiltersInput>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  id?: InputMaybe<IdFilterInput>;
+  negotiation?: InputMaybe<NegotiationFiltersInput>;
+  not?: InputMaybe<IssueFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<IssueFiltersInput>>>;
+  order?: InputMaybe<IntFilterInput>;
+  origin?: InputMaybe<StringFilterInput>;
+  publishedAt?: InputMaybe<DateTimeFilterInput>;
+  title?: InputMaybe<StringFilterInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+};
+
+export type IssueInput = {
+  clauses?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  negotiation?: InputMaybe<Scalars['ID']['input']>;
+  order?: InputMaybe<Scalars['Int']['input']>;
+  origin?: InputMaybe<Enum_Issue_Origin>;
+  publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type IssueRelationResponseCollection = {
+  __typename?: 'IssueRelationResponseCollection';
+  data: Array<IssueEntity>;
 };
 
 export type JsonFilterInput = {
@@ -5915,6 +6165,7 @@ export type Mutation = {
   createActLocalization?: Maybe<ActEntityResponse>;
   createActt?: Maybe<ActtEntityResponse>;
   createApiKey?: Maybe<ApiKeyEntityResponse>;
+  createArgument?: Maybe<ArgumentEntityResponse>;
   createAsk?: Maybe<AskEntityResponse>;
   createAskm?: Maybe<AskmEntityResponse>;
   createAskwant?: Maybe<AskwantEntityResponse>;
@@ -5923,6 +6174,7 @@ export type Mutation = {
   createCategoryLocalization?: Maybe<CategoryEntityResponse>;
   createChezin?: Maybe<ChezinEntityResponse>;
   createChezinLocalization?: Maybe<ChezinEntityResponse>;
+  createClause?: Maybe<ClauseEntityResponse>;
   createContentReleasesRelease?: Maybe<ContentReleasesReleaseEntityResponse>;
   createContentReleasesReleaseAction?: Maybe<ContentReleasesReleaseActionEntityResponse>;
   createConventionText?: Maybe<ConventionTextEntityResponse>;
@@ -5947,6 +6199,7 @@ export type Mutation = {
   createHalukaLocalization?: Maybe<HalukaEntityResponse>;
   createHatzaa?: Maybe<HatzaaEntityResponse>;
   createHazbaah?: Maybe<HazbaahEntityResponse>;
+  createIssue?: Maybe<IssueEntityResponse>;
   createMaap?: Maybe<MaapEntityResponse>;
   createMaapLocalization?: Maybe<MaapEntityResponse>;
   createMachshir?: Maybe<MachshirEntityResponse>;
@@ -6037,12 +6290,14 @@ export type Mutation = {
   deleteAct?: Maybe<ActEntityResponse>;
   deleteActt?: Maybe<ActtEntityResponse>;
   deleteApiKey?: Maybe<ApiKeyEntityResponse>;
+  deleteArgument?: Maybe<ArgumentEntityResponse>;
   deleteAsk?: Maybe<AskEntityResponse>;
   deleteAskm?: Maybe<AskmEntityResponse>;
   deleteAskwant?: Maybe<AskwantEntityResponse>;
   deleteBakasha?: Maybe<BakashaEntityResponse>;
   deleteCategory?: Maybe<CategoryEntityResponse>;
   deleteChezin?: Maybe<ChezinEntityResponse>;
+  deleteClause?: Maybe<ClauseEntityResponse>;
   deleteContentReleasesRelease?: Maybe<ContentReleasesReleaseEntityResponse>;
   deleteContentReleasesReleaseAction?: Maybe<ContentReleasesReleaseActionEntityResponse>;
   deleteConventionText?: Maybe<ConventionTextEntityResponse>;
@@ -6061,6 +6316,7 @@ export type Mutation = {
   deleteHaluka?: Maybe<HalukaEntityResponse>;
   deleteHatzaa?: Maybe<HatzaaEntityResponse>;
   deleteHazbaah?: Maybe<HazbaahEntityResponse>;
+  deleteIssue?: Maybe<IssueEntityResponse>;
   deleteMaap?: Maybe<MaapEntityResponse>;
   deleteMachshir?: Maybe<MachshirEntityResponse>;
   deleteMashaabim?: Maybe<MashaabimEntityResponse>;
@@ -6140,12 +6396,14 @@ export type Mutation = {
   updateAct?: Maybe<ActEntityResponse>;
   updateActt?: Maybe<ActtEntityResponse>;
   updateApiKey?: Maybe<ApiKeyEntityResponse>;
+  updateArgument?: Maybe<ArgumentEntityResponse>;
   updateAsk?: Maybe<AskEntityResponse>;
   updateAskm?: Maybe<AskmEntityResponse>;
   updateAskwant?: Maybe<AskwantEntityResponse>;
   updateBakasha?: Maybe<BakashaEntityResponse>;
   updateCategory?: Maybe<CategoryEntityResponse>;
   updateChezin?: Maybe<ChezinEntityResponse>;
+  updateClause?: Maybe<ClauseEntityResponse>;
   updateContentReleasesRelease?: Maybe<ContentReleasesReleaseEntityResponse>;
   updateContentReleasesReleaseAction?: Maybe<ContentReleasesReleaseActionEntityResponse>;
   updateConventionText?: Maybe<ConventionTextEntityResponse>;
@@ -6165,6 +6423,7 @@ export type Mutation = {
   updateHaluka?: Maybe<HalukaEntityResponse>;
   updateHatzaa?: Maybe<HatzaaEntityResponse>;
   updateHazbaah?: Maybe<HazbaahEntityResponse>;
+  updateIssue?: Maybe<IssueEntityResponse>;
   updateMaap?: Maybe<MaapEntityResponse>;
   updateMachshir?: Maybe<MachshirEntityResponse>;
   updateMashaabim?: Maybe<MashaabimEntityResponse>;
@@ -6264,6 +6523,11 @@ export type MutationCreateApiKeyArgs = {
 };
 
 
+export type MutationCreateArgumentArgs = {
+  data: ArgumentInput;
+};
+
+
 export type MutationCreateAskArgs = {
   data: AskInput;
 };
@@ -6307,6 +6571,11 @@ export type MutationCreateChezinLocalizationArgs = {
   data?: InputMaybe<ChezinInput>;
   id?: InputMaybe<Scalars['ID']['input']>;
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
+};
+
+
+export type MutationCreateClauseArgs = {
+  data: ClauseInput;
 };
 
 
@@ -6445,6 +6714,11 @@ export type MutationCreateHatzaaArgs = {
 
 export type MutationCreateHazbaahArgs = {
   data: HazbaahInput;
+};
+
+
+export type MutationCreateIssueArgs = {
+  data: IssueInput;
 };
 
 
@@ -6957,6 +7231,11 @@ export type MutationDeleteApiKeyArgs = {
 };
 
 
+export type MutationDeleteArgumentArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteAskArgs = {
   id: Scalars['ID']['input'];
 };
@@ -6986,6 +7265,11 @@ export type MutationDeleteCategoryArgs = {
 export type MutationDeleteChezinArgs = {
   id: Scalars['ID']['input'];
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
+};
+
+
+export type MutationDeleteClauseArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -7081,6 +7365,11 @@ export type MutationDeleteHatzaaArgs = {
 
 
 export type MutationDeleteHazbaahArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteIssueArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -7481,6 +7770,12 @@ export type MutationUpdateApiKeyArgs = {
 };
 
 
+export type MutationUpdateArgumentArgs = {
+  data: ArgumentInput;
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationUpdateAskArgs = {
   data: AskInput;
   id: Scalars['ID']['input'];
@@ -7516,6 +7811,12 @@ export type MutationUpdateChezinArgs = {
   data: ChezinInput;
   id: Scalars['ID']['input'];
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
+};
+
+
+export type MutationUpdateClauseArgs = {
+  data: ClauseInput;
+  id: Scalars['ID']['input'];
 };
 
 
@@ -7635,6 +7936,12 @@ export type MutationUpdateHatzaaArgs = {
 
 export type MutationUpdateHazbaahArgs = {
   data: HazbaahInput;
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateIssueArgs = {
+  data: IssueInput;
   id: Scalars['ID']['input'];
 };
 
@@ -8455,6 +8762,8 @@ export type NegopendmissionRelationResponseCollection = {
 
 export type Negotiation = {
   __typename?: 'Negotiation';
+  arguments?: Maybe<ArgumentRelationResponseCollection>;
+  clauses?: Maybe<ClauseRelationResponseCollection>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   createdByEmail?: Maybe<Scalars['String']['output']>;
   creator?: Maybe<UsersPermissionsUserEntityResponse>;
@@ -8462,6 +8771,7 @@ export type Negotiation = {
   currentRound?: Maybe<Scalars['Int']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   isLocal?: Maybe<Scalars['Boolean']['output']>;
+  issues?: Maybe<IssueRelationResponseCollection>;
   maxRounds?: Maybe<Scalars['Int']['output']>;
   ownerExternalId?: Maybe<Scalars['String']['output']>;
   participants?: Maybe<UsersPermissionsUserRelationResponseCollection>;
@@ -8477,8 +8787,32 @@ export type Negotiation = {
 };
 
 
+export type NegotiationArgumentsArgs = {
+  filters?: InputMaybe<ArgumentFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type NegotiationClausesArgs = {
+  filters?: InputMaybe<ClauseFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
 export type NegotiationCuntriesArgs = {
   filters?: InputMaybe<CuntryFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type NegotiationIssuesArgs = {
+  filters?: InputMaybe<IssueFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
   publicationState?: InputMaybe<PublicationState>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -8518,6 +8852,8 @@ export type NegotiationEntityResponseCollection = {
 
 export type NegotiationFiltersInput = {
   and?: InputMaybe<Array<InputMaybe<NegotiationFiltersInput>>>;
+  arguments?: InputMaybe<ArgumentFiltersInput>;
+  clauses?: InputMaybe<ClauseFiltersInput>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
   createdByEmail?: InputMaybe<StringFilterInput>;
   creator?: InputMaybe<UsersPermissionsUserFiltersInput>;
@@ -8526,6 +8862,7 @@ export type NegotiationFiltersInput = {
   description?: InputMaybe<StringFilterInput>;
   id?: InputMaybe<IdFilterInput>;
   isLocal?: InputMaybe<BooleanFilterInput>;
+  issues?: InputMaybe<IssueFiltersInput>;
   maxRounds?: InputMaybe<IntFilterInput>;
   not?: InputMaybe<NegotiationFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<NegotiationFiltersInput>>>;
@@ -8543,12 +8880,15 @@ export type NegotiationFiltersInput = {
 };
 
 export type NegotiationInput = {
+  arguments?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  clauses?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   createdByEmail?: InputMaybe<Scalars['String']['input']>;
   creator?: InputMaybe<Scalars['ID']['input']>;
   cuntries?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   currentRound?: InputMaybe<Scalars['Int']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   isLocal?: InputMaybe<Scalars['Boolean']['input']>;
+  issues?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   maxRounds?: InputMaybe<Scalars['Int']['input']>;
   ownerExternalId?: InputMaybe<Scalars['String']['input']>;
   participants?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -9946,10 +10286,12 @@ export type PmashRelationResponseCollection = {
 export type Position = {
   __typename?: 'Position';
   aiMeta?: Maybe<Scalars['String']['output']>;
+  arguments?: Maybe<ArgumentRelationResponseCollection>;
   author?: Maybe<UsersPermissionsUserEntityResponse>;
   authorEmail?: Maybe<Scalars['String']['output']>;
   authorExternalId?: Maybe<Scalars['String']['output']>;
   authorType?: Maybe<Enum_Position_Authortype>;
+  clauses?: Maybe<ClauseRelationResponseCollection>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   heading?: Maybe<Scalars['String']['output']>;
@@ -9962,10 +10304,27 @@ export type Position = {
   pole?: Maybe<Enum_Position_Pole>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   relativePlacement?: Maybe<Scalars['JSON']['output']>;
+  selfPlacement?: Maybe<Scalars['Int']['output']>;
   tags?: Maybe<FiltertagRelationResponseCollection>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   voters?: Maybe<UsersPermissionsUserRelationResponseCollection>;
   votes?: Maybe<Scalars['Int']['output']>;
+};
+
+
+export type PositionArgumentsArgs = {
+  filters?: InputMaybe<ArgumentFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type PositionClausesArgs = {
+  filters?: InputMaybe<ClauseFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
 
@@ -10003,10 +10362,12 @@ export type PositionEntityResponseCollection = {
 export type PositionFiltersInput = {
   aiMeta?: InputMaybe<StringFilterInput>;
   and?: InputMaybe<Array<InputMaybe<PositionFiltersInput>>>;
+  arguments?: InputMaybe<ArgumentFiltersInput>;
   author?: InputMaybe<UsersPermissionsUserFiltersInput>;
   authorEmail?: InputMaybe<StringFilterInput>;
   authorExternalId?: InputMaybe<StringFilterInput>;
   authorType?: InputMaybe<StringFilterInput>;
+  clauses?: InputMaybe<ClauseFiltersInput>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
   description?: InputMaybe<StringFilterInput>;
   heading?: InputMaybe<StringFilterInput>;
@@ -10022,6 +10383,7 @@ export type PositionFiltersInput = {
   pole?: InputMaybe<StringFilterInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   relativePlacement?: InputMaybe<JsonFilterInput>;
+  selfPlacement?: InputMaybe<IntFilterInput>;
   tags?: InputMaybe<FiltertagFiltersInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
   voters?: InputMaybe<UsersPermissionsUserFiltersInput>;
@@ -10030,10 +10392,12 @@ export type PositionFiltersInput = {
 
 export type PositionInput = {
   aiMeta?: InputMaybe<Scalars['String']['input']>;
+  arguments?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   author?: InputMaybe<Scalars['ID']['input']>;
   authorEmail?: InputMaybe<Scalars['String']['input']>;
   authorExternalId?: InputMaybe<Scalars['String']['input']>;
   authorType?: InputMaybe<Enum_Position_Authortype>;
+  clauses?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   description?: InputMaybe<Scalars['String']['input']>;
   heading?: InputMaybe<Scalars['String']['input']>;
   intensity?: InputMaybe<Scalars['Int']['input']>;
@@ -10045,6 +10409,7 @@ export type PositionInput = {
   pole?: InputMaybe<Enum_Position_Pole>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   relativePlacement?: InputMaybe<Scalars['JSON']['input']>;
+  selfPlacement?: InputMaybe<Scalars['Int']['input']>;
   tags?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   voters?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   votes?: InputMaybe<Scalars['Int']['input']>;
@@ -10738,6 +11103,8 @@ export type Query = {
   actts?: Maybe<ActtEntityResponseCollection>;
   apiKey?: Maybe<ApiKeyEntityResponse>;
   apiKeys?: Maybe<ApiKeyEntityResponseCollection>;
+  argument?: Maybe<ArgumentEntityResponse>;
+  arguments?: Maybe<ArgumentEntityResponseCollection>;
   ask?: Maybe<AskEntityResponse>;
   askm?: Maybe<AskmEntityResponse>;
   askms?: Maybe<AskmEntityResponseCollection>;
@@ -10750,6 +11117,8 @@ export type Query = {
   category?: Maybe<CategoryEntityResponse>;
   chezin?: Maybe<ChezinEntityResponse>;
   chezins?: Maybe<ChezinEntityResponseCollection>;
+  clause?: Maybe<ClauseEntityResponse>;
+  clauses?: Maybe<ClauseEntityResponseCollection>;
   contentReleasesRelease?: Maybe<ContentReleasesReleaseEntityResponse>;
   contentReleasesReleaseAction?: Maybe<ContentReleasesReleaseActionEntityResponse>;
   contentReleasesReleaseActions?: Maybe<ContentReleasesReleaseActionEntityResponseCollection>;
@@ -10788,6 +11157,8 @@ export type Query = {
   hazbaahs?: Maybe<HazbaahEntityResponseCollection>;
   i18NLocale?: Maybe<I18NLocaleEntityResponse>;
   i18NLocales?: Maybe<I18NLocaleEntityResponseCollection>;
+  issue?: Maybe<IssueEntityResponse>;
+  issues?: Maybe<IssueEntityResponseCollection>;
   maap?: Maybe<MaapEntityResponse>;
   maaps?: Maybe<MaapEntityResponseCollection>;
   machshir?: Maybe<MachshirEntityResponse>;
@@ -10957,6 +11328,19 @@ export type QueryApiKeysArgs = {
 };
 
 
+export type QueryArgumentArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryArgumentsArgs = {
+  filters?: InputMaybe<ArgumentFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
 export type QueryAskArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
 };
@@ -11032,6 +11416,19 @@ export type QueryChezinArgs = {
 export type QueryChezinsArgs = {
   filters?: InputMaybe<ChezinFiltersInput>;
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type QueryClauseArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryClausesArgs = {
+  filters?: InputMaybe<ClauseFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
   publicationState?: InputMaybe<PublicationState>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -11289,6 +11686,19 @@ export type QueryI18NLocaleArgs = {
 export type QueryI18NLocalesArgs = {
   filters?: InputMaybe<I18NLocaleFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type QueryIssueArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryIssuesArgs = {
+  filters?: InputMaybe<IssueFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 

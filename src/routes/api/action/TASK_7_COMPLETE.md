@@ -148,7 +148,7 @@ Cookie: id=user123; jwt=token; lang=he
 
 ### Environment Variables Used
 - `VITE_URL` - Strapi endpoint URL
-- `VITE_ADMINMONTHER` - Admin JWT token
+- `ADMINMONTHER` - Admin JWT token (server-only, read via `$env/static/private`)
 
 ### Cookie Dependencies
 - `id` - User ID (required)

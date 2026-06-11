@@ -11,7 +11,8 @@ import type { ActionConfig } from '$lib/server/actions/types.js';
 
 // Mock environment variables
 vi.stubEnv('VITE_URL', 'http://localhost:1337');
-vi.stubEnv('VITE_ADMINMONTHER', 'test-admin-token');
+// ADMINMONTHER is now a server-only secret read via $env/static/private (no VITE_ prefix).
+vi.mock('$env/static/private', () => ({ ADMINMONTHER: 'test-admin-token' }));
 
 describe('Action API Endpoint - Core Functionality', () => {
   beforeEach(async () => {

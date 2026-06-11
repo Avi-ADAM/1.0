@@ -1,57 +1,24 @@
 <script>
-    import MultiSelect from 'svelte-multiselect';
-    import { onMount } from 'svelte';
-    import Addnewnee from '../addnew/addNewNeed.svelte';
-    const baseUrl = import.meta.env.VITE_URL
-    import { lang } from '$lib/stores/lang';
-    import { t } from '$lib/translations';
-   //// import { sneed } from '../../stores/sneed.js';
-  //  import { total } from '../../stores/total.js';
-    //let  userName_value;
-    let token; 
-  //  let error = null
-    let addnee = $state(false);  
-  let isLow = $state(true)
-import { page } from '$app/state';
-onMount(async () => {
-    // jwt is httpOnly now; read token from server-provided page data
-    token = page.data.tok;
-    let bearer1 = 'bearer' + ' ' + token;
-        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-        const checkStatus = (resp) => {
-        if (resp.status >= 200 && resp.status < 300) {
-          return resp;
-        }
-        return parseJSON(resp).then((resp) => {
-          throw resp;
-        });
-      };
-      let linkg =baseUrl+"/graphql" ;
-        try {
-             await fetch(linkg, {
-              method: 'POST',
-       
-        headers: {
-            'Authorization': bearer1,
-            'Content-Type': 'application/json'
-                  },
-        body: 
-        JSON.stringify({query: 
-          `{  mashaabims {data{id attributes{
-                           name
-                            } }}}`
-        })
- })
-  .then(r => r.json())
-  .then(data => needss = data.data.mashaabims.data);
-   console.log(needss)
-   onStr?.()
-    isLow = false
+  import MultiSelect from 'svelte-multiselect';
+  import { onMount } from 'svelte';
+  import Addnewnee from '../addnew/addNewNeed.svelte';
+  import { sendToSer } from '$lib/send/sendToSer.js';
+  import { lang } from '$lib/stores/lang';
+  import { t } from '$lib/translations';
+
+  let addnee = $state(false);
+  let isLow = $state(true);
+
+  onMount(async () => {
+    try {
+      const result = await sendToSer({}, '204getAllMashaabims', 0, 0, false, fetch);
+      needss = result.data?.mashaabims?.data ?? [];
+      onStr?.();
+      isLow = false;
     } catch (e) {
-            console.log(e)
-           
-        }
-    });
+      console.log(e);
+    }
+  });
 
 
     function find_need_id(need_name_arr){

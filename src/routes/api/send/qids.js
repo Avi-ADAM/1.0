@@ -1180,7 +1180,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
               id
               attributes {
                 projectName
-                user_1s { data { id } }
+                user_1s { data { id attributes { username } } }
                 restime
                 timeToP
                 profilePic { data { attributes { url } } }
@@ -2737,8 +2737,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       data { id }
     }
   }`,
-  '130updateOpenMissionDeclined': `mutation UpdateOpenMissionDeclined($id: ID!, $declinedIds: [ID]) {
-    updateOpenMission(id: $id, data: { declined: $declinedIds }) {
+  '130updateOpenMissionDeclined': `mutation UpdateOpenMissionDeclined($id: ID!, $declinedId: ID) {
+    updateOpenMission(id: $id, data: { declined: $declinedId }) {
       data { id }
     }
   }`,
@@ -6954,6 +6954,55 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }`,
 
+  /* ── Weave creation (baci.svelte "יצירת ריקמה") ────────────────────────────
+   * Reusable project-creation flow moved server-side so the JWT stays in the
+   * HttpOnly cookie. `baciFormData` feeds the create form (vallue options +
+   * existing project names for the uniqueness check). `crVallue` mints any
+   * vallue the user typed that doesn't exist yet. `crWeaveFull` creates the
+   * project itself with all the form fields (creator = sole member). */
+  'baciFormData': `query BaciFormData {
+    vallues(sort: "valueName:asc") {
+      data { id attributes { valueName localizations { data { attributes { valueName } } } } }
+    }
+    projects { data { attributes { projectName } } }
+  }`,
+
+  'crVallue': `mutation CrVallue($valueName: String!, $publishedAt: DateTime) {
+    createVallue(data: { valueName: $valueName, publishedAt: $publishedAt }) {
+      data { id attributes { valueName } }
+    }
+  }`,
+
+  'crWeaveFull': `mutation CrWeaveFull(
+    $members: [ID],
+    $projectName: String!,
+    $publicDescription: String,
+    $descripFor: String,
+    $linkToWebsite: String,
+    $vallues: [ID],
+    $restime: ENUM_PROJECT_RESTIME,
+    $timeToP: ENUM_PROJECT_TIMETOP,
+    $profilePic: ID,
+    $isOt: Boolean,
+    $publishedAt: DateTime
+  ) {
+    createProject(data: {
+      user_1s: $members,
+      projectName: $projectName,
+      publicDescription: $publicDescription,
+      descripFor: $descripFor,
+      linkToWebsite: $linkToWebsite,
+      vallues: $vallues,
+      restime: $restime,
+      timeToP: $timeToP,
+      profilePic: $profilePic,
+      isOt: $isOt,
+      publishedAt: $publishedAt
+    }) {
+      data { id attributes { projectName } }
+    }
+  }`,
+
   /* ── Concierge: publish a wish need to the community lev feed (PLAN_CONCIERGE
    * §5.2). 169/170 create a project-LESS open-mission / open-mashaabim linked to
    * the source wish (ratson) with source='concierge'. They surface to matching
@@ -7347,6 +7396,97 @@ export const moachQids = {
     }
     me { id }
   }`,
+  /* Chain view "extra" lookups (moach/[projectId]/chains): open_missions /
+   * pendms referenced by BOM lines but not in the main missions payload. Filter
+   * by the specific ids the client computed. Routed through /api/send so the JWT
+   * stays in the HttpOnly cookie (was a direct client /graphql bearer call). */
+  'chainExtraData': `query ChainExtraData($pid: ID!, $omIds: [ID], $pmIds: [ID]) {
+    project(id: $pid) {
+      data {
+        attributes {
+          extraOm: open_missions(filters: { id: { in: $omIds } }) {
+            data { id attributes { name noofhours perhour sqadualed privatlinks publicklinks
+              rishon { data { id } } mission { data { id } } acts { data { id attributes { shem dateS } } } createdAt
+              asks { data { id attributes { archived
+                users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+                forums { data { id } }
+              } } }
+            } }
+          }
+          extraPendm: pendms(filters: { id: { in: $pmIds } }) {
+            data { id attributes { name createdAt dates noofhours perhour mission { data { id } }
+              users { what why id users_permissions_user { data { id attributes { username } } } }
+            } }
+          }
+        }
+      }
+    }
+  }`,
+
+  /* Single-chain detail page (moach/[projectId]/chains/[chainId]): the full
+   * active-work snapshot used to reconstruct the requested chain. `$withLoc`
+   * mirrors the original lang-conditional roleDescription localization (he only).
+   * Routed through /api/send so the JWT stays server-side (was a direct bearer). */
+  'chainDetailProjectData': `query ChainDetailProjectData($pid: ID!, $withLoc: Boolean!) {
+    project(id: $pid) {
+      data {
+        attributes {
+          acts { data { id attributes {
+            shem hashivut naasa myIshur valiIshur status dateS dateF
+            pendm { data { id } }
+            open_mission { data { id } }
+            mesimabetahaliches { data { id } }
+            my { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            vali { data { id } }
+          } } }
+          mesimabetahaliches(filters: { finnished: { eq: false } }) { data {
+            id attributes {
+              name status iskvua createdAt
+              open_missions { data { id } }
+              forums { data { id } }
+              finiapruvals { data { id attributes { missname archived } } }
+              users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+              acts { data { id attributes { shem dateS naasa myIshur valiIshur status } } }
+            }
+          } }
+          open_missions(filters: { archived: { eq: false } }) { data {
+            id attributes {
+              name descrip noofhours perhour sqadualed createdAt
+              pendm { data { id } }
+              asks { data { id attributes { username } } }
+              tafkidims { data { id attributes { roleDescription localizations @include(if: $withLoc) { data { attributes { roleDescription } } } } } }
+            }
+          } }
+          pendms(filters: { archived: { eq: false } }) { data {
+            id attributes {
+              name dates createdAt archived
+              mission { data { id } }
+              tafkidims { data { id attributes { roleDescription localizations @include(if: $withLoc) { data { attributes { roleDescription } } } } } }
+            }
+          } }
+          finnished_missions { data {
+            id attributes {
+              missionName start finish total
+              mesimabetahalich { data { id } }
+            }
+          } }
+          open_mashaabims(filters: { archived: { eq: false } }) { data {
+            id attributes {
+              name kindOf hm descrip price easy spnot sqadualed sqadualedf
+              pmash { data { id attributes { name } } }
+              askms { data { id attributes { name } } }
+              maap { data { id attributes { name archived } } }
+              rikmashes { data { id attributes { name kindOf total hm price } } }
+            }
+          } }
+          rikmashes { data {
+            id attributes { name kindOf total hm price }
+          } }
+        }
+      }
+    }
+  }`,
+
   'getProjectMissions': `query GetProjectMissions($pid: ID!) {
     project(id: $pid) {
       data {
@@ -8433,6 +8573,164 @@ export const qids = {
           projectcreates {
             data { id attributes { projectName profilePic { data { attributes { url } } } } }
           }
+        }
+      }
+    }
+  }`,
+
+  '204getAllMashaabims': `query GetAllMashaabims {
+    mashaabims(pagination: { limit: 500 }) {
+      data { id attributes { name } }
+    }
+  }`,
+
+  '205getMashaabimsByIds': `query GetMashaabimsByIds($ids: [ID]) {
+    mashaabims(filters: { id: { in: $ids } }) {
+      data { id attributes { name descrip kindOf price linkto } }
+    }
+  }`,
+
+  '206getSpForEdit': `query GetSpForEdit($spId: ID!) {
+    sp(id: $spId) {
+      data { id attributes {
+        name descrip kindOf unit spnot price myp linkto
+        users_permissions_user { data { id } }
+        sdate fdate
+      } }
+    }
+    me { id }
+  }`,
+
+  // ── Sale actions ──────────────────────────────────────────────────────────
+
+  'createSaleRecord': `mutation CreateSaleRecord(
+    $project: ID!,
+    $matanot: ID!,
+    $users_permissions_user: ID!,
+    $in: Float!,
+    $unit: Float!,
+    $date: DateTime!,
+    $publishedAt: DateTime!,
+    $startDate: DateTime,
+    $finishDate: DateTime,
+    $note: String
+  ) {
+    createSale(data: {
+      project: $project,
+      matanot: $matanot,
+      users_permissions_user: $users_permissions_user,
+      in: $in,
+      unit: $unit,
+      date: $date,
+      publishedAt: $publishedAt,
+      startDate: $startDate,
+      finishDate: $finishDate,
+      note: $note
+    }) {
+      data {
+        id
+        attributes {
+          in
+          date
+          matanot { data { id attributes { name } } }
+          users_permissions_user { data { id attributes { username } } }
+        }
+      }
+    }
+  }`,
+
+  'updateMatanotQuant': `mutation UpdateMatanotQuant($id: ID!, $quant: Float!) {
+    updateMatanot(id: $id, data: { quant: $quant }) {
+      data {
+        id
+        attributes { quant }
+      }
+    }
+  }`,
+
+  'createMonterForSale': `mutation CreateMonterForSale($saleId: ID!, $start: DateTime!) {
+    createMonter(data: {
+      sale: $saleId,
+      ani: "sale",
+      start: $start
+    }) {
+      data { id }
+    }
+  }`,
+
+  'saleCenterUserProducts': `query SaleCenterUserProducts($uid: ID!) {
+    usersPermissionsUser(id: $uid) {
+      data {
+        id
+        attributes {
+          projects_1s {
+            data {
+              id
+              attributes {
+                projectName
+                profilePic {
+                  data {
+                    attributes {
+                      url
+                      formats
+                    }
+                  }
+                }
+                user_1s {
+                  data {
+                    id
+                    attributes {
+                      username
+                    }
+                  }
+                }
+                matanotofs(filters: { or: [{ quant: { gt: 0 } }, { quant: { eq: -1 } }] }) {
+                  data {
+                    id
+                    attributes {
+                      name
+                      price
+                      quant
+                      kindOf
+                      startDate
+                      finnishDate
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  'meProfile': `query MeProfile($uid: ID!) {
+    usersPermissionsUser(id: $uid) {
+      data {
+        id
+        attributes {
+          frd
+          fblink
+          twiterlink
+          discordlink
+          githublink
+          bio
+          preferCards
+          lang
+          machshirs { data { id attributes { jsoni } } }
+          email
+          noMail
+          username
+          hervachti
+          profilManualAlready
+          profilePic { data { attributes { url formats } } }
+          projects_1s { data { id attributes { projectName } } }
+          skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
+          sps(filters: { archived: { ne: true } }) { data { id attributes { name panui } } }
+          tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+          vallues { data { id attributes { valueName localizations { data { attributes { valueName } } } } } }
+          work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
         }
       }
     }

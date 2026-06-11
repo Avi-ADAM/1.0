@@ -25,59 +25,24 @@
   import Button from '$lib/celim/ui/button.svelte';
 
   import { slide, fly } from 'svelte/transition';
-  const baseUrl = import.meta.env.VITE_URL;
+  import { executeAction } from '$lib/client/actionClient';
+  import { sendToSer } from '$lib/send/sendToSer.js';
 
-  let newskillslist, idLi, name;
+  let newskillslist;
 
-  let token;
   //for the options of multiselect
   let allvn = $state([]);
   let listt = [];
   let error1 = null;
   async function get() {
-    const cookieValueId = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    idLi = cookieValueId;
-    token = page.data.tok;
-    let bearer1 = 'bearer' + ' ' + token;
-    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-    const checkStatus = (resp) => {
-      if (resp.status >= 200 && resp.status < 300) {
-        return resp;
-      }
-      return parseJSON(resp).then((resp) => {
-        throw resp;
-      });
-    };
-
     try {
-      let more = ``;
-      if ($lang == 'he') {
-        more = `localizations{ data {attributes{ ${valc} }}}`;
-      }
-      const res = await fetch(baseUrl + '/graphql', {
-        method: 'POST',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `query {
-  ${linkp} {data{ id attributes {${valc} ${more}}}}
-}
-              `
-        })
-      })
-        .then(checkStatus)
-        .then(parseJSON);
-      meData = res.data[linkp].data;
-      if ($lang == 'he') {
-        for (var i = 0; i < meData.length; i++) {
-          if (meData[i].attributes.localizations.data.length > 0) {
-            meData[i].attributes[valc] =
-              meData[i].attributes.localizations.data[0].attributes[valc];
+      const result = await executeAction('loadCatalog', { linkp, lang: $lang });
+      if (!result.success) { console.log('loadCatalog error:', result.error); return; }
+      meData = result.data;
+      if ($lang !== 'en') {
+        for (let i = 0; i < meData.length; i++) {
+          if (meData[i].attributes.localizations?.data?.length > 0) {
+            meData[i].attributes[valc] = meData[i].attributes.localizations.data[0].attributes[valc];
           }
         }
       }
@@ -93,7 +58,6 @@
   skillsNew.subscribe((newwork) => {
     newskillslist = newwork;
   });
-  let uid;
   /*
 function deleteitem (skillId){
   console.log(skillId);
@@ -103,80 +67,26 @@ if (index > -1) {
   };
 console.log("skillslist",skillslist);
 };    */
-  let miData = [];
   let g = $state(false);
   let needr = $state([]);
 
   async function increment() {
     g = true;
-    let more = ``;
-    if ($lang == 'he') {
-      more = `localizations { data{attributes{ ${valc} }}}`;
-    }
     if (datan !== 'mash') {
-      let list = data.map((c) => `"${c.id}"`);
-
-      const cookieValueId = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('id='))
-        .split('=')[1];
-      uid = cookieValueId;
-      token = page.data.tok;
-      let bearer1 = 'bearer' + ' ' + token;
-      let link = baseUrl + '/graphql';
+      const ids = data.map((c) => String(c.id));
       try {
-        await fetch(link, {
-          method: 'POST',
-
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation { updateUsersPermissionsUser(
-    id:${uid}
-      data: { ${kish}: [${list}] }
-
-  ){
-      data {
-        attributes{
-          ${kish}{ data {
-              id attributes{ ${valc} ${more}}}
-          }
-      }
-  }
-}
-}
-`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miData = data.data));
-        console.log(
-          miData,
-          miData.updateUsersPermissionsUser.data.attributes[kish]
-        );
-        if ($lang == 'he') {
-          for (
-            var i = 0;
-            i <
-            miData.updateUsersPermissionsUser.data.attributes[kish].data.length;
-            i++
-          ) {
-            const t =
-              miData.updateUsersPermissionsUser.data.attributes[kish].data;
-            if (t[i].attributes.localizations.data.length > 0) {
-              t[i].attributes[valc] =
-                t[i].attributes.localizations.data[0].attributes[valc];
+        const result = await executeAction('updateUserRelation', { kish, ids });
+        if (!result.success) { error1 = result.error; g = false; return; }
+        let updatedList = result.data.attributes[kish].data;
+        if ($lang !== 'en') {
+          for (let i = 0; i < updatedList.length; i++) {
+            if (updatedList[i].attributes.localizations?.data?.length > 0) {
+              updatedList[i].attributes[valc] = updatedList[i].attributes.localizations.data[0].attributes[valc];
             }
           }
         }
-        miData = miData;
         addSl = false;
-        onClose?.({
-          linkp: linkp,
-          list: miData.updateUsersPermissionsUser.data.attributes[kish].data
-        });
+        onClose?.({ linkp, list: updatedList });
         g = false;
       } catch (e) {
         error1 = e;
@@ -187,7 +97,6 @@ console.log("skillslist",skillslist);
   }
 
   import { RingLoader } from 'svelte-loading-spinners';
-  import { page } from '$app/state';
   let yy = $state(0);
   $effect(() => {
     console.log(yy, 'yy');
@@ -333,22 +242,19 @@ console.log("skillslist",skillslist);
   }
 
   function addnewM(event) {
-    console.log(needr);
     const id = event.id;
-    const oldob = needr;
-    const old = oldob;
-    const newi = [id];
-    let array3 = old.concat(newi);
-    array3 = [...new Set([...old, ...newi])];
     const skob = event.skob;
-    const slectednew = meData;
-    slectednew.push(skob);
-    meData = slectednew;
+
+    // Add new mashaabim to catalog so find_id can resolve it
+    meData = [...meData, skob];
     allvn = meData.map((c) => c.attributes[valc]);
-    needr = array3;
-    const oldsel = data.selected2;
-    oldsel.push(event.name);
-    data.selected2 = oldsel;
+
+    // Add new name to selection
+    if (!data.selected2) data.selected2 = [];
+    data.selected2 = [...data.selected2, event.name];
+
+    needr = [...new Set([...needr, String(id)])];
+
     updi();
   }
 
@@ -384,42 +290,12 @@ console.log("skillslist",skillslist);
     meDatamm = [];
   }
   async function updi() {
-    let res = [];
-
-    token = page.data.tok;
-    let bearer1 = 'bearer' + ' ' + token;
-    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-    const checkStatus = (resp) => {
-      if (resp.status >= 200 && resp.status < 300) {
-        return resp;
-      }
-      return parseJSON(resp).then((resp) => {
-        throw resp;
-      });
-    };
-    let linkg = baseUrl + '/graphql';
     try {
-      await fetch(linkg, {
-        method: 'POST',
-
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `{  mashaabims (filters:{id: {in:[${needr}]}}){data{ id attributes{
-          name descrip kindOf  price linkto
-        } }}}`
-        })
-      })
-        .then((r) => r.json())
-        .then((data) => (res = data));
-      meDatamm = res.data.mashaabims.data;
+      const result = await sendToSer({ ids: needr }, '205getMashaabimsByIds', 0, 0, false, fetch);
+      meDatamm = result.data?.mashaabims?.data ?? [];
       g = false;
       masss = true;
-      onMassss?.({
-        mass: true
-      });
+      onMassss?.({ mass: true });
     } catch (e) {
       console.log(e);
     }
@@ -458,20 +334,23 @@ console.log("skillslist",skillslist);
 
     const resp = filterByReference(meData, array3);
     const datana = resp;
+
+    // Snapshot the full list BEFORE onAdd can reset the parent binding
+    const listWithNew = [...data, skob];
+
     onAdd?.({
       data: datana,
       linkp: kish,
       valc: valc,
       a: datan
     });
-    data.push(skob);
-    data = data;
+
     console.log(id);
     masss = false;
     addSl = false;
     onClose?.({
       linkp: linkp,
-      list: data
+      list: listWithNew
     });
     onMassss?.({
       mass: false
@@ -510,60 +389,17 @@ console.log("skillslist",skillslist);
   async function edit(id) {
     g = true;
     console.log(id);
-
-    token = page.data.tok;
-    let bearer1 = 'bearer' + ' ' + token;
-    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-    const checkStatus = (resp) => {
-      if (resp.status >= 200 && resp.status < 300) {
-        return resp;
-      }
-      return parseJSON(resp).then((resp) => {
-        throw resp;
-      });
-    };
-
     try {
-      const res = await fetch(baseUrl + '/graphql', {
-        method: 'POST',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `query {
-  sp (id: "${id}") {data{
-     id  attributes{
-     name
-       descrip
-             kindOf
-             unit
-             spnot
-             price
-             myp
-             linkto
-             users_permissions_user {data{id}}
-             sdate
-             fdate
-     }}}
-     me {id}
-}
-              `
-        })
-      })
-        .then(checkStatus)
-        .then(parseJSON);
-      xd = res.data.sp.data;
-      console.log(res);
-      if ((xd.attributes.users_permissions_user.data.id = res.data.me.id)) {
-        //
+      const result = await sendToSer({ spId: id }, '206getSpForEdit', 0, 0, false, fetch);
+      xd = result.data?.sp?.data;
+      const meId = result.data?.me?.id;
+      console.log(result);
+      if ((xd.attributes.users_permissions_user.data.id = meId)) {
         console.log(xd);
         ed = true;
         g = false;
         masss = true;
-        onMassss?.({
-          mass: true
-        });
+        onMassss?.({ mass: true });
       }
     } catch (e) {
       error1 = e;

@@ -272,8 +272,14 @@
                 : ''),
           rawName: item.name,
           detail: item.notes || '',
+          notes: item.notes || '',
           kind: kindHe,
           isResource,
+          // Source position in the extracted_* array (per kind) — lets the
+          // edit/delete handlers map a row back to its component to persist.
+          idx,
+          quantityEst: item.quantityEst ?? null,
+          kindOf: item.kindOf ?? null,
           linked:
             (isResource ? item.linkedMashaabims : item.linkedMissions) ?? [],
           imp: item.importance === 'must' ? 'must' : 'nice',
@@ -846,6 +852,202 @@
     }
   }
 
+  /* ── Full per-row plan editing (remove / edit a need) ──────────────────────
+   * Both rebuild the wish's extracted_* arrays and persist via
+   * updateRatsonExtraction — the same source buildPlanRows renders. The need's
+   * `idx` maps the row back to its component in the correct kind's array. */
+  function currentExtractionPayload() {
+    return {
+      missions: (data?.wish?.extractedMissions ?? []).map((m) => ({
+        name: m.name,
+        hoursEst: m.hoursEst ?? null,
+        importance: m.importance === 'must' ? 'must' : 'nice',
+        notes: m.notes || ''
+      })),
+      resources: (data?.wish?.extractedResources ?? []).map((r) => ({
+        name: r.name,
+        quantityEst: r.quantityEst ?? null,
+        kindOf: r.kindOf ?? null,
+        importance: r.importance === 'must' ? 'must' : 'nice',
+        notes: r.notes || ''
+      }))
+    };
+  }
+
+  async function persistExtraction(missions, resources, okMsg) {
+    const res = await fetch('/api/action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        actionKey: 'updateRatsonExtraction',
+        params: {
+          ratsonId: wishId,
+          extracted_missions: missions,
+          extracted_resources: resources
+        }
+      })
+    });
+    const out = await res.json();
+    if (!out?.success) throw new Error(out?.error || 'השמירה נכשלה');
+    if (okMsg) toast.success(okMsg);
+    window.location.reload();
+  }
+
+  let rowBusy = $state(/** @type {Record<string, boolean>} */ ({}));
+
+  async function deleteNeed(row) {
+    if (!wishId || !isOwner) return;
+    const hasAccepted = row.providers?.some((p) => p.status === 'accepted');
+    const warn = hasAccepted
+      ? 'לשורה זו כבר משויך ספק שאישר. ההסרה לא תבטל את ההצעה הקיימת. להסיר בכל זאת?'
+      : `להסיר את "${row.need.rawName}" מהתכנית?`;
+    if (!confirm(warn)) return;
+    const key = `del-${row.need.isResource ? 'r' : 'm'}-${row.need.idx}`;
+    if (rowBusy[key]) return;
+    rowBusy = { ...rowBusy, [key]: true };
+    try {
+      const { missions, resources } = currentExtractionPayload();
+      if (row.need.isResource) resources.splice(row.need.idx, 1);
+      else missions.splice(row.need.idx, 1);
+      await persistExtraction(missions, resources, 'הוסר מהתכנית');
+    } catch (err) {
+      console.error('[concierge/[id]] deleteNeed failed:', err);
+      toast.error(err instanceof Error ? err.message : 'אירעה שגיאה');
+      rowBusy = { ...rowBusy, [key]: false };
+    }
+  }
+
+  /** @type {{ isResource:boolean, idx:number, initialSpec:any } | null} */
+  let editTarget = $state(null);
+
+  function editNeed(row) {
+    if (!wishId || !isOwner) return;
+    editTarget = {
+      isResource: row.need.isResource,
+      idx: row.need.idx,
+      initialSpec: row.need.isResource
+        ? {
+            name: row.need.rawName,
+            descrip: row.need.notes || '',
+            price: row.need.bestPrice ?? null,
+            quantity: row.need.quantityEst ?? 1,
+            kindOf: row.need.kindOf || 'total'
+          }
+        : {
+            name: row.need.rawName,
+            descrip: row.need.notes || '',
+            hours: row.need.hours ?? null
+          }
+    };
+  }
+
+  async function submitEditNeed(spec) {
+    const t = editTarget;
+    editTarget = null;
+    if (!t || !wishId) return;
+    try {
+      const { missions, resources } = currentExtractionPayload();
+      if (t.isResource) {
+        if (resources[t.idx]) {
+          resources[t.idx] = {
+            ...resources[t.idx],
+            name: spec?.name || resources[t.idx].name,
+            quantityEst: spec?.quantity ?? resources[t.idx].quantityEst ?? null,
+            kindOf: spec?.kindOf || resources[t.idx].kindOf || null,
+            notes: spec?.descrip ?? resources[t.idx].notes ?? ''
+          };
+        }
+      } else if (missions[t.idx]) {
+        missions[t.idx] = {
+          ...missions[t.idx],
+          name: spec?.name || missions[t.idx].name,
+          hoursEst: spec?.hours ?? missions[t.idx].hoursEst ?? null,
+          notes: spec?.descrip ?? missions[t.idx].notes ?? ''
+        };
+      }
+      await persistExtraction(missions, resources, 'התכנית עודכנה');
+    } catch (err) {
+      console.error('[concierge/[id]] submitEditNeed failed:', err);
+      toast.error(err instanceof Error ? err.message : 'אירעה שגיאה');
+    }
+  }
+
+  /* ── Invite all matched suggestions at once (author one offer → send to each) ──
+   * Reuses the same per-need suggestions rendered when a row has no provider. */
+  /** @type {{ isResource:boolean, targets:any[], needName:string } | null} */
+  let inviteAllTarget = $state(null);
+  let inviteAllBusy = $state(false);
+
+  function inviteAll(row) {
+    if (!wishId || !isOwner) return;
+    if (row.need.isResource) {
+      const targets = resourcesForNeed(row.need)
+        .filter((r) => r.ownerId)
+        .map((r) => ({ userId: r.ownerId, label: r.name, price: r.price ?? null }));
+      if (!targets.length) return;
+      inviteAllTarget = { isResource: true, targets, needName: row.need.rawName };
+    } else {
+      const targets = peopleForNeed(row.need)
+        .filter((p) => p.id)
+        .map((p) => ({ userId: p.id, label: p.username || 'ספק/ית' }));
+      if (!targets.length) return;
+      inviteAllTarget = { isResource: false, targets, needName: row.need.rawName };
+    }
+  }
+
+  async function submitInviteAll(spec) {
+    const t = inviteAllTarget;
+    inviteAllTarget = null;
+    if (!t || !wishId || inviteAllBusy) return;
+    inviteAllBusy = true;
+    try {
+      const results = await Promise.allSettled(
+        t.targets.map((tg) =>
+          fetch('/api/action', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              actionKey: t.isResource
+                ? 'requestWishResource'
+                : 'requestWishMission',
+              params: t.isResource
+                ? {
+                    ratsonId: wishId,
+                    targetUserId: tg.userId,
+                    name: spec?.name || t.needName || 'משאב',
+                    quantity: spec?.quantity ?? 1,
+                    price: spec?.price ?? tg.price ?? null,
+                    kindOf: spec?.kindOf || 'total',
+                    descrip: spec?.descrip || '',
+                    label: spec?.name || t.needName || ''
+                  }
+                : {
+                    ratsonId: wishId,
+                    targetUserId: tg.userId,
+                    name: spec?.name || t.needName || 'משימה',
+                    hours: spec?.hours ?? null,
+                    ratePerHour: spec?.ratePerHour ?? null,
+                    descrip: spec?.descrip || '',
+                    label: spec?.name || t.needName || ''
+                  }
+            })
+          }).then((r) => r.json())
+        )
+      );
+      const ok = results.filter(
+        (r) => r.status === 'fulfilled' && r.value?.success
+      ).length;
+      if (ok > 0)
+        toast.success(`ההצעה נשלחה ל־${ok} מתוך ${t.targets.length} ספקים`);
+      else toast.error('שליחת ההצעות נכשלה');
+      window.location.reload();
+    } catch (err) {
+      console.error('[concierge/[id]] submitInviteAll failed:', err);
+      toast.error(err instanceof Error ? err.message : 'אירעה שגיאה');
+      inviteAllBusy = false;
+    }
+  }
+
   /* ── Publish a need to the community lev feed (PLAN_CONCIERGE §5.2) ──
    * Reuses open-mission/open-mashaabim → surfaces as a sugestmi/sugestma card
    * branded "קונסירג'". For missions we pass the wish's matched skill names so
@@ -875,6 +1077,10 @@
             name: row.need.rawName,
             descrip: row.need.detail || '',
             hours: row.need.isResource ? null : (row.need.hours ?? null),
+            // Resource dimensions so the open-mashaabim carries price/quantity.
+            price: row.need.isResource ? (row.need.bestPrice ?? null) : null,
+            quantity: row.need.isResource ? (row.need.quantityEst ?? null) : null,
+            kindOf: row.need.isResource ? (row.need.kindOf ?? 'total') : 'total',
             isMust: row.need.imp === 'must',
             skillNames: row.need.isResource ? [] : skillNames
           }
@@ -1425,22 +1631,37 @@
                       style="font-size:12px;color:#fde68a"
                       >₪{row.need.bestPrice}</span
                     >{/if}
-                  {#if isOwner && HAS_REAL && !row.need.isResource}
-                    {#if publishDone[row.need.title]}
-                      <span style="font-size:11px;color:#02ffbb"
-                        >✓ פורסם לקהילה</span
-                      >
-                    {:else}
+                  {#if isOwner && HAS_REAL}
+                    <span class="need-tools">
                       <button
                         class="btn-ghost"
                         style="padding:4px 10px;font-size:11px"
-                        disabled={publishBusy[row.need.title]}
-                        onclick={() => publishNeed(row)}
-                        >{publishBusy[row.need.title]
-                          ? '⏳'
-                          : '📣 פרסמי לקהילה'}</button
+                        onclick={() => editNeed(row)}>✎ ערכי</button
                       >
-                    {/if}
+                      <button
+                        class="btn-ghost need-del"
+                        style="padding:4px 10px;font-size:11px"
+                        disabled={rowBusy[
+                          `del-${row.need.isResource ? 'r' : 'm'}-${row.need.idx}`
+                        ]}
+                        onclick={() => deleteNeed(row)}>✕ הסר</button
+                      >
+                      {#if publishDone[row.need.title]}
+                        <span style="font-size:11px;color:#02ffbb"
+                          >✓ פורסם לקהילה</span
+                        >
+                      {:else}
+                        <button
+                          class="btn-ghost"
+                          style="padding:4px 10px;font-size:11px"
+                          disabled={publishBusy[row.need.title]}
+                          onclick={() => publishNeed(row)}
+                          >{publishBusy[row.need.title]
+                            ? '⏳'
+                            : '📣 פרסמי לקהילה'}</button
+                        >
+                      {/if}
+                    </span>
                   {/if}
                 </div>
               </div>
@@ -1450,8 +1671,22 @@
                   {@const sugR = HAS_REAL ? resourcesForNeed(row.need) : []}
                   {@const sugM = HAS_REAL ? productsForNeed(row.need) : []}
                   {#if sugP.length || sugR.length || sugM.length}
+                    {@const invitable = row.need.isResource
+                      ? sugR.filter((r) => r.ownerId).length
+                      : sugP.filter((p) => p.id).length}
                     <div class="sug-wrap">
-                      <div class="sug-lbl">✶ אולי מתאימים — שלחי פנייה</div>
+                      <div class="sug-lbl-row">
+                        <div class="sug-lbl">✶ אולי מתאימים — שלחי פנייה</div>
+                        {#if isOwner && invitable > 1}
+                          <button
+                            class="btn-jewel"
+                            style="padding:5px 12px;font-size:11px"
+                            disabled={inviteAllBusy}
+                            onclick={() => inviteAll(row)}
+                            >הזמיני את כולם · {invitable}</button
+                          >
+                        {/if}
+                      </div>
                       {#each sugM as m (m.id)}
                         {@const k = `m${m.id}`}
                         <div class="scard">
@@ -2270,6 +2505,76 @@
         onSpec={submitAddResource}
         onCancel={() => (addResourceOpen = false)}
       />
+    </div>
+  </div>
+{/if}
+
+{#if editTarget}
+  <div class="spec-overlay" role="dialog" aria-modal="true">
+    <div class="spec-card">
+      <div class="spec-head">
+        <span>{editTarget.isResource ? 'עריכת משאב' : 'עריכת משימה'}</span>
+        <button
+          class="spec-x"
+          onclick={() => (editTarget = null)}
+          aria-label="סגירה">✕</button
+        >
+      </div>
+      <p class="spec-hint">ערכי את כל פרטי הצורך — השינוי יישמר בתכנית.</p>
+      {#if editTarget.isResource}
+        <ResourceCreator
+          specMode={true}
+          initialSpec={editTarget.initialSpec}
+          onSpec={submitEditNeed}
+          onCancel={() => (editTarget = null)}
+        />
+      {:else}
+        <Mission
+          specMode={true}
+          id={0}
+          name={editTarget.initialSpec?.name ?? ''}
+          initialSpec={editTarget.initialSpec}
+          missionTemplates={data.missionTemplates ?? []}
+          onSpec={submitEditNeed}
+          onClose={() => (editTarget = null)}
+        />
+      {/if}
+    </div>
+  </div>
+{/if}
+
+{#if inviteAllTarget}
+  <div class="spec-overlay" role="dialog" aria-modal="true">
+    <div class="spec-card">
+      <div class="spec-head">
+        <span>הזמנת כל המתאימים · {inviteAllTarget.targets.length}</span>
+        <button
+          class="spec-x"
+          onclick={() => (inviteAllTarget = null)}
+          aria-label="סגירה">✕</button
+        >
+      </div>
+      <p class="spec-hint">
+        נסחי הצעה אחת — היא תישלח לכל {inviteAllTarget.targets.length} הספקים שמתאימים
+        לצורך.
+      </p>
+      {#if inviteAllTarget.isResource}
+        <ResourceCreator
+          specMode={true}
+          initialSpec={{ name: inviteAllTarget.needName }}
+          onSpec={submitInviteAll}
+          onCancel={() => (inviteAllTarget = null)}
+        />
+      {:else}
+        <Mission
+          specMode={true}
+          id={0}
+          name={inviteAllTarget.needName ?? ''}
+          missionTemplates={data.missionTemplates ?? []}
+          onSpec={submitInviteAll}
+          onClose={() => (inviteAllTarget = null)}
+        />
+      {/if}
     </div>
   </div>
 {/if}
@@ -3124,6 +3429,25 @@
     gap: 14px;
     margin-top: auto;
     padding-top: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .need-tools {
+    display: inline-flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-inline-start: auto;
+  }
+  .need-del:hover:not(:disabled) {
+    color: #ff4d9e;
+    border-color: rgba(255, 77, 158, 0.4);
+  }
+  .sug-lbl-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 4px;
   }
 
   /* ── Provider cards ── */

@@ -7,213 +7,52 @@
   import { lang } from '$lib/stores/lang.js';
   import { RingLoader } from 'svelte-loading-spinners';
   import { goto } from '$app/navigation';
+  import { executeAction } from '$lib/client/actionClient';
 
   //TODO: get asked from server then show you alr .., find a way to get title
   let error1 = null;
   /**
    * @typedef {Object} Props
-   * @property {any} [askedarr]
    * @property {boolean} [alr]
    * @property {any} data
    */
 
   /** @type {Props} */
-  let { askedarr = $bindable([]), alr = $bindable(false), data } = $props();
+  let { alr = $bindable(false), data } = $props();
 
   let success = $state(false);
   function project(x) {
     goto('/project/' + x);
   }
-  import { sendToSer } from '$lib/send/sendToSer.js';
 
   async function ask() {
     alr = true;
     const inD = data.alld;
-    if (!inD || !inD.attributes.project || !inD.attributes.project.data) {
+    if (!inD?.attributes?.project?.data) {
       toast.error('שגיאה בטעינת נתוני הפרויקט');
+      alr = false;
       return;
     }
 
-    const uId = data.uid;
-    if (!uId) {
-      toast.error('נא להתחבר מחדש למערכת');
-      return;
-    }
-
-    const projectUserIds =
-      inD.attributes.project.data.attributes.user_1s.data.map((t) => t.id);
-
-    // If only one user in project and it's me - create mesimabetahalich directly
-    if (projectUserIds.length === 1 && projectUserIds.includes(uId)) {
-      const token = page.data.tok;
-
-      if (!token) {
-        toast.error('נא להתחבר מחדש למערכת');
-        return;
-      }
-
-      try {
-        const { createMesimabetahalich, afterMesimabetahalikhCreation } =
-          await import('$lib/utils/createMesimabetahalich.js');
-
-        const result = await createMesimabetahalich({
-          projectId: inD.attributes.project.data.id,
-          missId: inD.attributes.mission?.data?.id || data.mId,
-          openMid: data.mId,
-          userId: uId,
-          currentUserId: uId,
-          openmissionName: inD.attributes.name,
-          missionDetails: inD.attributes.descrip || '',
-          nhours: inD.attributes.noofhours,
-          valph: inD.attributes.perhour,
-          iskvua: inD.attributes.iskvua || false,
-          hearotMeyuchadot: inD.attributes.hearotMeyuchadot || '',
-          privatlinks: inD.attributes.privatlinks || '',
-          publicklinks: inD.attributes.publicklinks || '',
-          tafkidims: inD.attributes.tafkidims.data,
-          deadline: inD.attributes.dates,
-          sqedualed: inD.attributes.sqadualed,
-          projectUserIds: projectUserIds,
-          sendToSer
-        });
-
-        if (result?.data?.createMesimabetahalich) {
-          await afterMesimabetahalikhCreation({
-            miDatan: result,
-            isNewUser: false,
-            iskvua: inD.attributes.iskvua || false,
-            sqedualed: inD.attributes.sqadualed,
-            deadline: inD.attributes.dates,
-            userId: uId,
-            currentUserId: uId,
-            useraplyname: data.username || '',
-            projectName: inD.attributes.project.data.attributes.projectName,
-            src2:
-              inD.attributes.project.data.attributes.profilePic.data?.attributes
-                .url || '',
-            openmissionName: inD.attributes.name,
-            lang: $lang,
-            sendToSer,
-            projectUserData: null
-          });
-
-          success = true;
-          setTimeout(() => {
-            success = false;
-          }, 15000);
-          toast.success('המשימה נוצרה בהצלחה!');
-          return;
-        } else {
-          toast.error('שגיאה ביצירת המשימה');
-          return;
-        }
-      } catch (error) {
-        console.error('שגיאה ביצירת משימה:', error);
-        toast.error('אירעה שגיאה ביצירת המשימה');
-        return;
-      }
-    }
-
-    const d1 = await sendToSer(
-      { id: uId },
-      '80usersPermissionsUserWithAskeds',
-      0,
-      0,
-      false,
-      fetch
-    );
-
-    // Accessing deep property safely
-    const r = d1?.data?.usersPermissionsUser?.data?.attributes?.askeds?.data;
-    if (r && r.length > 0) {
-      const p = r.map((c) => c.id);
-      askedarr = p;
-    }
-
-    let myvote = [];
     try {
-      let pid = inD.attributes.project.data.attributes.user_1s.data.map(
-        (t) => t.id
-      );
-      if (pid.includes(uId)) {
-        let d = new Date();
-        myvote = [
-          {
-            what: true,
-            users_permissions_user: uId,
-            ide: parseInt(uId),
-            zman: d.toISOString()
-          }
-        ];
+      const result = await executeAction('applyToMission', {
+        openMissionId: String(data.mId),
+        projectId: String(inD.attributes.project.data.id)
+      });
+
+      if (!result.success) {
+        toast.error(result.error?.message ?? 'שגיאה בשליחת הבקשה');
+        alr = false;
+        return;
       }
+
+      success = true;
+      setTimeout(() => { success = false; }, 15000);
+      toast.success(`${fnnn[$lang]}`);
     } catch (error) {
-      console.error('שגיאה בעיבוד הבקשה:', error);
-      toast.error('אירעה שגיאה בעיבוד הבקשה');
-      return;
-    }
-
-    const as = [...askedarr];
-    as.push(`${data.mId}`);
-
-    // First, update the user's askeds list
-    await sendToSer(
-      {
-        userId: uId,
-        askedsList: as
-      },
-      '81updateAskeds',
-      0,
-      0,
-      false,
-      fetch
-    );
-
-    // Then, create the Ask
-    const d2 = await sendToSer(
-      {
-        userId: uId,
-        openMissionId: data.mId,
-        projectId: inD.attributes.project.data.id,
-        publishedAt: new Date().toISOString(),
-        vote: myvote
-      },
-      '81.5createAsk',
-      0,
-      0,
-      false,
-      fetch
-    );
-
-    const r2 = d2.data;
-    console.log(r2);
-    if (r2 != null && r2.createAsk) {
-      let restime = inD.attributes.project.data.attributes.restime;
-      let x = calcX(restime);
-      let fd = new Date(Date.now() + x);
-      let hiluzId = r2.createAsk.data.id;
-
-      const d3 = await sendToSer(
-        {
-          date: fd.toISOString(),
-          whatami: 'ask',
-          askId: hiluzId
-        },
-        '82createTimegramaForAsk',
-        0,
-        0,
-        false,
-        fetch
-      );
-
-      const r3 = d3.data;
-      console.log(r3);
-      if (r3 != null) {
-        success = true;
-        setTimeout(function () {
-          success = false;
-        }, 15000);
-        toast.success(`${fnnn[$lang]}`);
-      }
+      console.error('שגיאה:', error);
+      toast.error('אירעה שגיאה');
+      alr = false;
     }
   }
 
@@ -285,12 +124,11 @@
     en: 'some information is available only for registersd users'
   };
   import { Head } from 'svead';
-  import { calcX } from '$lib/func/calcX.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
 
   let title = 'This is Svead a Svelte Head Component';
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`;
-  let description = page.data.alld?.attributes?.descrip || om[$lang];
+  let description = data.alld?.attributes?.descrip || om[$lang];
   let url = page.url.toString();
   //TODO: header nav menu
 </script>
@@ -550,7 +388,7 @@
                 </div>
                 <div class="">
                   <Share
-                    slug={'availableMission/' + page.data.mId}
+                    slug={'availableMission/' + data.mId}
                     title={data.alld.title[$lang]}
                     desc="a new mission"
                     hashtags={['1💗1', 'consensus']}
@@ -636,7 +474,7 @@
                   {/each}
                 </div>
               {/if}
-              {#if page.data.tok != false}
+              {#if data.tok != false}
                 <div class="flex justify-center">
                   {#if alr == false && !data.alld.attributes.users.data
                       .map((c) => c.id)
@@ -691,7 +529,7 @@
     {:else}
       <div class="text-center pt-14">
         <h1 class="text-barbi sm:text-xl my-5">{mand[$lang]}</h1>
-        {#if page.data.tok != false}
+        {#if data.tok != false}
           <a
             href="/lev"
             class="text-lturk hover:text-barbi hover:border-barbi border border-gold rounded-xl px-4 py-2 sm:text-xl"
@@ -719,7 +557,7 @@
   {:else}
     <div class="text-center pt-14">
       <h3 class="text-barbi sm:text-xl my-5">error | שגיאה</h3>
-      {#if page.data.tok != false}
+      {#if data.tok != false}
         <a
           href="/lev"
           class="text-lturk hover:text-barbi hover:border-barbi border border-gold rounded-xl px-4 py-2 sm:text-xl"

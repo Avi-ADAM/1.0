@@ -2,10 +2,9 @@
     import { lang } from '$lib/stores/lang.js'
     import { Confetti } from "svelte-confetti"
    import { quintOut } from "svelte/easing";
-    import {addslashes} from '$lib/func/uti/string.js'
     import { idPr } from '../../stores/idPr.js';
     import { baciStore, resetBaciStore } from '$lib/stores/baciStore.js';
-    import axios from 'axios';
+    import { executeAction } from '$lib/client/actionClient';
     import { goto } from '$app/navigation';
     import AddnewVal from './addnewval.svelte';
     import MultiSelect from 'svelte-multiselect';
@@ -14,132 +13,108 @@
      import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly, scale } from 'svelte/transition';
       import Chooser from '$lib/celim/ui/chooser.svelte'
-      const baseUrl = import.meta.env.VITE_URL
 
 let loading = $state(false);
 let isOpen = $state(false);
 let a = $state(0);
 let success = $state(false)
     let before = $state(false);
-    let url1 = baseUrl+"/api/upload";
-    let resP;
-    let token; 
-   let idL;
+    let url1 = "/api/upload";
 let run = [];
 let files;
   let shgi = $state(false);
     let nam;
-async function sendP () {
-  if($baciStore.projectName_value.length < 1){
-    naex = {"he": "שם הריקמה חייב להיות ארוך יותר", "en": "please choose name for the FreeMate"}
-    shgi = true 
-  }else{
-    if (run.includes($baciStore.projectName_value)){
-   naex = {"he":"השם כבר קיים נא לבחור שם אחר" , "en":"name already exists please try another name"}
-  shgi = true; 
-} else{
-  loading = true;
-
-  const cookieValueId = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('id='))
-  .split('=')[1];
-  
-  idL = cookieValueId;
-    token  = page.data.jwt;
-    let bearer1 = 'bearer' + ' ' + token;
-//let fd = new FormData();
-if (files) {
-  //  fd.append('files', files[0]);
-  axios
- .post( url1, files  ,{
-                headers: {
-                    Authorization: bearer1,
-                },
-            })
-            .then(({ data }) => {
-                 $baciStore.imageId = data[0].id;
-                 sendPP()
-            })
-            .catch(error => {
-    console.log('צריך לתקן:', error.response);
-        loading = false;
-            });
-          } else {
-            sendPP()
-          }
+async function sendP() {
+  if ($baciStore.projectName_value.length < 1) {
+    naex = { he: 'שם הריקמה חייב להיות ארוך יותר', en: 'please choose name for the FreeMate' };
+    shgi = true;
+    return;
   }
-}
-async function sendPP(){
-  await newnew()
-    .then()
-   let d = new Date;
-   
-  const cookieValueId = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('id='))
-  .split('=')[1];
-  
-  idL = cookieValueId;
-    token  = page.data.jwt; 
-    let bearer1 = 'bearer' + ' ' + token;
+  if (run.includes($baciStore.projectName_value)) {
+    naex = { he: 'השם כבר קיים נא לבחור שם אחר', en: 'name already exists please try another name' };
+    shgi = true;
+    return;
+  }
+  loading = true;
+  // Upload the cover image (if any) through the server proxy, which reads the
+  // JWT from the HttpOnly cookie — the token never touches the client.
+  if (files) {
     try {
-           const res = await fetch(baseUrl+"/graphql", {
-              method: "POST",
-              headers: {
-                   'Authorization': bearer1,
-                 'Content-Type': 'application/json'
-              },  body: JSON.stringify({
-                        query: `mutation { createProject(
-       data: {
-         user_1s: ${idL},
-        projectName: "${$baciStore.projectName_value}",
-        publishedAt: "${d.toISOString()}",
-        publicDescription: """${addslashes($baciStore.desP)}""",
-        linkToWebsite: """${addslashes($baciStore.linkP)}""",
-        descripFor: """${addslashes($baciStore.desPl)}""",
-        vallues:[${find_value_id($baciStore.selected)}],
-        restime: ${$baciStore.restime},
-        timeToP:${$baciStore.timeToP},
-         profilePic: ${$baciStore.imageId},
-         isOt:${$baciStore.ont}
-        }  
-  ){
-  data { id attributes{ projectName}}
+      const upRes = await fetch(url1, { method: 'POST', body: files });
+      if (!upRes.ok) throw new Error('upload failed');
+      const uploaded = await upRes.json();
+      $baciStore.imageId = uploaded[0].id;
+    } catch (error) {
+      console.log('צריך לתקן:', error);
+      loading = false;
+      return;
+    }
+  }
+  await sendPP();
 }
-}
-              `})
-})
-             .then(r => r.json())
-  .then(data => resP = data);
-        console.log(resP)
-         success = true
-         idPr.set(resP.data.createProject.data.id);
-        before = true;
-            loading = false;
-    let data = {"name": userName_value, "action": "יצר ריקמה חדשה בשם:", "det": `${$baciStore.projectName_value} והתיאור: ${$baciStore.desP}` }
-   fetch("/api/ste", {
-  method: 'POST', // or 'PUT'
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(data),
-})
-  .then((response) => response)
-  .then((data) => {
-    console.log('Success:', data);
-       resetBaciStore();
-       goto("/moach", );
-  })
-  .catch((error) => {
-    console.error('Error:', error);
-  
-  })
-                  }
-      catch(error) {
-        console.log('צריך לתקן:', error);
-                }
-              }
+
+async function sendPP() {
+  // Resolve the selected vallues: known ones → ids (client already loaded the
+  // list); unknown ones → names the server will mint. Project creation + vallue
+  // minting happen server-side via the unified action, so no JWT on the client.
+  const knownNames = vallues.map((c) => c.attributes.valueName);
+  const vallueIds = [];
+  const newVallueNames = [];
+  for (const sel of $baciStore.selected) {
+    const idx = knownNames.indexOf(sel);
+    if (idx >= 0) {
+      vallueIds.push(String(vallues[idx].id));
+    } else {
+      newVallueNames.push(sel);
+    }
+  }
+
+  try {
+    const result = await executeAction('createWeave', {
+      projectName: $baciStore.projectName_value,
+      publicDescription: $baciStore.desP,
+      descripFor: $baciStore.desPl,
+      linkToWebsite: $baciStore.linkP,
+      restime: $baciStore.restime,
+      timeToP: $baciStore.timeToP,
+      imageId: $baciStore.imageId ? String($baciStore.imageId) : undefined,
+      isOt: $baciStore.ont,
+      vallueIds,
+      newVallueNames
+    });
+
+    if (!result.success) {
+      loading = false;
+      return; // executeAction already surfaced the error toast
+    }
+
+    success = true;
+    idPr.set(result.data.projectId);
+    before = true;
+    loading = false;
+
+    // Site-activity feed entry (same-origin internal endpoint, no token).
+    const data = {
+      name: userName_value,
+      action: 'יצר ריקמה חדשה בשם:',
+      det: `${$baciStore.projectName_value} והתיאור: ${$baciStore.desP}`
+    };
+    fetch('/api/ste', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    })
+      .then(() => {
+        resetBaciStore();
+        goto('/moach');
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+  } catch (error) {
+    console.log('צריך לתקן:', error);
+    loading = false;
+  }
 }
 
 let vallues = $state([]);
@@ -147,43 +122,27 @@ let vallues = $state([]);
     let addval = false;
     
     onMount(async () => {
-     
-    token  = page.data.jwt; 
-    let bearer1 = 'bearer' + ' ' + token;
-        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-        const checkStatus = (resp) => {
-        if (resp.status >= 200 && resp.status < 300) {
-          return resp;
-        }
-        return parseJSON(resp).then((resp) => {
-          throw resp;
-        });
-      };
+        // Read vallue options + existing project names through the secure proxy,
+        // which injects the JWT from the HttpOnly cookie (no token on the client).
         try {
-           const res = await fetch(baseUrl+"/graphql", {
-              method: "POST",
-              headers: {
-                   'Authorization': bearer1,
-                 'Content-Type': 'application/json'
-              },  body: JSON.stringify({
-                        query: `query {
-  vallues  (sort: "valueName:asc") {data{ id attributes{  valueName ${$lang == 'he' ? 'localizations{data{attributes{ valueName}} }' : ""}}}}
-  projects{data{attributes{  projectName}}}
-}
-              `})
-            }).then(checkStatus)
-          .then(parseJSON);
-            vallues = res.data.vallues.data;
+           const res = await fetch('/api/send', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ data: { queId: 'baciFormData' } })
+            });
+            const json = await res.json();
+            if (!res.ok || !json?.data) throw json;
+            vallues = json.data.vallues.data;
             if ($lang == "he" ){
               for (var i = 0; i < vallues.length; i++){
                 if (vallues[i].attributes.localizations.data.length > 0){
                 vallues[i].attributes.valueName = vallues[i].attributes.localizations.data[0].attributes.valueName
                 }
               }
-            }          
+            }
             vallues = vallues
                         newcontent = false
-            const runi = res.data.projects.data;
+            const runi = json.data.projects.data;
            run = runi.map(c => c.attributes.projectName)
         } catch (e) {
             error1 = e
@@ -191,23 +150,11 @@ let vallues = $state([]);
     });
 
 let suc = $state(false);
-    function find_value_id(value_name_arr){
-     var  arr = [];
-      for (let j = 0; j< value_name_arr.length; j++ ){
-      for (let i = 0; i< vallues.length; i++){
-        if(vallues[i].attributes.valueName === value_name_arr[j]){
-          arr.push(vallues[i].id);
-        }
-      }
-      }
-      return arr;
-     };
-
 
         const placeholder = `${$lang == "he" ? "ערכים ומטרות" : "vallues and goals"}`;
 
- function project (id) {
-         idPr.set(resP.data.createProject.data.id);
+ function project () {
+    // idPr was already set to the new weave id in sendPP().
     goto("/moach");
   };
   import { RingLoader
@@ -215,7 +162,6 @@ let suc = $state(false);
   import RichText from '$lib/celim/ui/richText.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device.js';
   import MobileModal from '$lib/celim/ui/mobileModal.svelte';
-  import { page } from '$app/state';
   let { userName_value } = $props();
  const closer = () => {
     isOpen = false;
@@ -232,70 +178,6 @@ let suc = $state(false);
     a = 1
 }
 
-
-  async function newnew (){
-    let meData = []
-  for (let i = 0; i<$baciStore.selected.length ;i++){
-    if (!vallues.map(c => c.attributes.valueName).includes($baciStore.selected[i])){
-      //create new and update vallues
-        console.log($baciStore.selected,vallues)
-  let link =baseUrl+"/graphql" ;
-  let d = new Date
-        try {
-             await fetch(link, {
-              method: 'POST',
-       
-        headers: {
-            'Content-Type': 'application/json'
-                  },
-        body: 
-        JSON.stringify({query: 
-           `mutation  createVallue {
-  createVallue(data: {  valueName: "${$baciStore.selected[i]}",
-        publishedAt: "${d.toISOString()}"}) {
-    data {
-      id
-      attributes {
-        valueName
-      } 
-
-       }
-    }
-}`   
-        })
-})
-  .then(r => r.json())
-  .then(data => meData = data);
-const newOb = meData.data.createVallue.data;
-    const newValues = vallues ;
-    newValues.push(newOb);
-       
-    vallues = newValues;
-    let data = {"name": userName_value, "action": "create ערך חדש בשם:", "det": `${$baciStore.selected[i]}`}
-   fetch("/api/ste", {
-  method: 'POST', // or 'PUT'
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(data),
-})
-  .then((response) => response)
-  .then((data) => {
-    console.log('Success:', data);
-
-  })
-  .catch((error) => {
-    console.error('Error:', error);
-  
-  })
-                  }
-      catch(error) {
-        console.log('צריך לתקן:', error.response);
-        error = error1 
-        console.log(error1)
-                };}
-              }
-            }
 
   function handleFocusIn(event) {
     if (isMobileOrTablet) {

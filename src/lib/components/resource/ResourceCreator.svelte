@@ -31,7 +31,14 @@
     specMode = false,
     onSpec,
     onCreated,
-    onCancel
+    onCancel,
+    /**
+     * Optional prefill for specMode editing (PLAN_CONCIERGE plan editing):
+     * `{ name, descrip, price, quantity, kindOf }`. When present, the form opens
+     * with these values so the wisher edits an existing plan item with all its
+     * details. Ignored outside specMode.
+     */
+    initialSpec = null
   } = $props();
 
   let mashaabimTemplates = $state([]);
@@ -275,6 +282,14 @@
   }
 
   onMount(async () => {
+    // specMode editing: hydrate the form with the existing plan item's details.
+    if (specMode && initialSpec) {
+      if (initialSpec.name != null) name = initialSpec.name;
+      if (initialSpec.descrip != null) description = initialSpec.descrip;
+      if (initialSpec.price != null) price = Number(initialSpec.price) || 0;
+      if (initialSpec.kindOf) kindOf = initialSpec.kindOf;
+      if (initialSpec.quantity != null) hm = Number(initialSpec.quantity) || 1;
+    }
     try {
       const result = await sendToSer({}, 'getMashaabims', 0, 0, false, fetch);
       if (result && result.data && result.data.mashaabims) {

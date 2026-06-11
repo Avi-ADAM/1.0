@@ -18,6 +18,10 @@ export const load = async ({ url, locals }) => {
     uid,
     un,
     id: uid,  // Alias for socket client
-    jwt: tok  // DEPRECATED: Use /api/socket-auth endpoint instead. Kept for backward compatibility.
+    // SECURITY: never send the raw JWT to the client. The token lives only in the
+    // HttpOnly cookie; the socket authenticates from that cookie (withCredentials)
+    // and all reads/mutations go through /api/send + /api/action which read it
+    // server-side. Expose only a boolean login flag.
+    loggedIn: !!tok
   };
 }
