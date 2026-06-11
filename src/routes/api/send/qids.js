@@ -2095,6 +2095,23 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         id
         attributes {
           name
+          quantityDelivered
+          cycleIndex
+          cycleStart
+          cycleEnd
+          mashabetahalich {
+            data {
+              id
+              attributes {
+                name
+                pricePerUnit
+                kindOf
+                quantityDelivered
+                users_permissions_user { data { id } }
+                rikmash { data { id } }
+              }
+            }
+          }
           vots {
             id
             what
@@ -3600,6 +3617,24 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                   attributes {
                     createdAt
                     name
+                    quantityDelivered
+                    cycleIndex
+                    cycleStart
+                    cycleEnd
+                    mashabetahalich {
+                      data {
+                        id
+                        attributes {
+                          name
+                          pricePerUnit
+                          kindOf
+                          start
+                          end
+                          status_mashab
+                          users_permissions_user { data { id } }
+                        }
+                      }
+                    }
                     sp {
                       data {
                         id
@@ -7339,6 +7374,84 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
 };
 
 export const moachQids = {
+  // ─── Monthly recurring resources (mashabetahalich cyclic engine) ──────────
+  // A "mashabetahalich" with recurring=true is a recurring expense (server rent,
+  // apartment, stall…). Each month /api/monthi opens a cycle (a Maap with
+  // cycleIndex/cycleStart/cycleEnd) that surfaces on the lev screen; once the
+  // responsible user confirms the amount and the project approves it, the spend
+  // is archived as a delivery line on the resource's Rikmash.
+  'mrCreateMashabetahalich': `mutation MrCreateMashabetahalich($data: MashabetahalichInput!) {
+    createMashabetahalich(data: $data) { data { id attributes { name } } }
+  }`,
+  'mrUpdateMashabetahalich': `mutation MrUpdateMashabetahalich($id: ID!, $data: MashabetahalichInput!) {
+    updateMashabetahalich(id: $id, data: $data) { data { id attributes { status_mashab finnished } } }
+  }`,
+  'mrGetMashabetahalich': `query MrGetMashabetahalich($id: ID!) {
+    mashabetahalich(id: $id) {
+      data { id attributes {
+        name descrip pricePerUnit start end cycleSize kindOf recurring status_mashab
+        finnished quantityDelivered
+        project { data { id attributes { user_1s { data { id } } } } }
+        users_permissions_user { data { id attributes { username email lang noMail } } }
+        maaps { data { id attributes { cycleIndex cycleStart cycleEnd archived } } }
+        rikmash { data { id } }
+      } }
+    }
+  }`,
+  // Used by /api/monthi: every active, non-finished recurring resource.
+  'mrGetRecurringForMonthi': `query MrGetRecurringForMonthi {
+    mashabetahaliches(
+      filters: { recurring: { eq: true }, status_mashab: { eq: "active" }, finnished: { eq: false } }
+      pagination: { limit: 300 }
+    ) {
+      data { id attributes {
+        name pricePerUnit start end cycleSize kindOf
+        project { data { id attributes { projectName user_1s { data { id } } } } }
+        users_permissions_user { data { id attributes { username email lang noMail } } }
+        maaps(pagination: { limit: 500 }) { data { id attributes { cycleIndex cycleStart cycleEnd archived } } }
+        rikmash { data { id } }
+      } }
+    }
+  }`,
+  'mrCreateCycleMaap': `mutation MrCreateCycleMaap($data: MaapInput!) {
+    createMaap(data: $data) { data { id attributes { cycleIndex } } }
+  }`,
+  'mrGetRikmashForDelivery': `query MrGetRikmashForDelivery($id: ID!) {
+    rikmash(id: $id) {
+      data { id attributes {
+        total cyclesCount firstDeliveryAt lastDeliveryAt
+        deliveries { id cycleIndex deliveredAt quantity note maap { data { id } } }
+      } }
+    }
+  }`,
+  'mrCreateRikmash': `mutation MrCreateRikmash($data: RikmashInput!) {
+    createRikmash(data: $data) { data { id } }
+  }`,
+  'mrUpdateRikmash': `mutation MrUpdateRikmash($id: ID!, $data: RikmashInput!) {
+    updateRikmash(id: $id, data: $data) { data { id } }
+  }`,
+  'mrLinkRikmashToMashabetahalich': `mutation MrLinkRikmash($id: ID!, $rikmash: ID!) {
+    updateMashabetahalich(id: $id, data: { rikmash: $rikmash }) { data { id } }
+  }`,
+  // Resolve a DRAFT recurring engine created at proposal time, so askm approval
+  // can activate it. Matched by project + name (robust to the pmash→om linkage).
+  'mrGetDraftMashForProject': `query MrGetDraftMashForProject($pid: ID!, $name: String!) {
+    mashabetahaliches(
+      filters: {
+        project: { id: { eq: $pid } }
+        recurring: { eq: true }
+        status_mashab: { eq: "draft" }
+        name: { eq: $name }
+      }
+      pagination: { limit: 1 }
+    ) {
+      data { id attributes { pricePerUnit kindOf start end cycleSize } }
+    }
+  }`,
+  'mrUpdateCycleMaap': `mutation MrUpdateCycleMaap($id: ID!, $data: MaapInput!) {
+    updateMaap(id: $id, data: $data) { data { id } }
+  }`,
+
   'getProjectBaseInfo': `query GetProjectBaseInfo($pid: ID!) {
     project(id: $pid) {
       data {

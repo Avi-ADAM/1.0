@@ -97,6 +97,7 @@ import { updateUserProfilePicConfig } from './updateUserProfilePic.js';
 import { updateUserBasicConfig } from './updateUserBasic.js';
 import { archiveUserResourceConfig } from './archiveUserResource.js';
 import { createWeaveConfig } from './createWeave.js';
+import { markResourceDoneConfig } from './markResourceDone.js';
 
 
 /**
@@ -266,6 +267,9 @@ export function registerAllActions(): void {
 
   // Weave creation (baci.svelte — "יצירת ריקמה", reusable project creation)
   registerAction(createWeaveConfig);
+
+  // Recurring monthly resources: close a mashabetahalich engine (mark done)
+  registerAction(markResourceDoneConfig);
 
   // Future actions will be registered here
   // registerAction(createTaskAction);

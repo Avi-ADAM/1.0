@@ -102,12 +102,26 @@
     sqadualed,
     sqadualedf,
     cards = false,
+    // Recurring monthly resource cycle (mashabetahalich engine)
+    isRecurringCycle = false,
+    mashabetahalichId,
+    cycleIndex,
+    quantityDelivered = 0,
+    pricePerUnit = 0,
+    responsibleUserId,
+    myid,
     onUser,
     onProj,
     onAcsept,
     onHover,
     onModal
   } = $props();
+
+  // The signed-in user is the one responsible for entering this month's spend.
+  let isResponsible = $derived(
+    isRecurringCycle && String(myid ?? '') === String(responsibleUserId ?? '')
+  );
+  let amountInput = $state(0);
   let resP = [];
   let lang;
   import { Swiper, SwiperSlide } from 'swiper/svelte';
@@ -221,6 +235,15 @@
   });
 
   async function agree() {
+    // Recurring monthly cycle → confirm/edit this month's amount first.
+    if (isRecurringCycle) {
+      amountInput = Number(quantityDelivered || pricePerUnit || 0);
+      spend = true;
+      no = false;
+      masa = false;
+      isOpen = true;
+      return;
+    }
     // Optimistic UI update
     already = true;
     noofusersOk += 1;
@@ -233,6 +256,47 @@
         what: true,
       });
       if (result.success && result.data?.consensus) {
+        onAcsept?.({ ani: 'finim', coinlapach });
+      }
+    } catch (e) {
+      error1 = e;
+      console.log(error1);
+    }
+  }
+
+  // Confirm the monthly spend (counts as a YES vote). The responsible user can
+  // edit the amount; other members simply approve the proposed amount.
+  async function confirmRecurring() {
+    isOpen = false;
+    already = true;
+    noofusersOk += 1;
+    noofusersWaiting -= 1;
+    ser = xyz();
+    try {
+      const result = await executeAction('voteOnMaap', {
+        askId: String(askId),
+        projectId: String(projectId),
+        what: true,
+        ...(isResponsible ? { amount: Number(amountInput) || 0 } : {}),
+      });
+      if (result.success && result.data?.consensus) {
+        onAcsept?.({ ani: 'finim', coinlapach });
+      }
+    } catch (e) {
+      error1 = e;
+      console.log(error1);
+    }
+  }
+
+  // Close the recurring resource entirely (stops future monthly cycles).
+  async function markDone() {
+    isOpen = false;
+    try {
+      const result = await executeAction('markResourceDone', {
+        mashabetahalichId: String(mashabetahalichId),
+        projectId: String(projectId),
+      });
+      if (result.success) {
         onAcsept?.({ ani: 'finim', coinlapach });
       }
     } catch (e) {
@@ -277,10 +341,12 @@
   let whyy = $state(' ');
   let no = $state();
   let masa = $state();
+  let spend = $state(false);
   function close() {
     isOpen = false;
     no = false;
     masa = false;
+    spend = false;
   }
 
   let hovered = $state(false);
@@ -332,7 +398,36 @@
             />
           </svg></button
         >
-        {#if no === true}
+        {#if spend === true}
+          <h1 style="font-size:1.5em;">
+            {isResponsible ? 'כמה הוצאת החודש?' : 'אישור ההוצאה החודשית'}
+          </h1>
+          {#if cycleIndex}
+            <p class="text-barbi" style="font-size:0.9em;">מחזור #{cycleIndex}</p>
+          {/if}
+          {#if isResponsible}
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              bind:value={amountInput}
+              placeholder="הסכום שהוצא בפועל החודש"
+            />
+          {:else}
+            <p class="p" style="font-size:1.2em; color:var(--gold)">{quantityDelivered} ₪</p>
+          {/if}
+          <br />
+          <button class="add" onclick={confirmRecurring}>אישור ההוצאה</button>
+          {#if mashabetahalichId}
+            <br />
+            <button
+              class="add"
+              style="background-color:var(--barbi-pink); color:var(--gold); margin-top:8px;"
+              onclick={markDone}
+              title="סיום המשאב החודשי — לא ייפתחו עוד חיובים חודשיים"
+            >סיום המשאב (Done)</button>
+          {/if}
+        {:else if no === true}
           <h1 style="font-size:2em;">יש לנמק</h1>
           <input
             minlength="26"
@@ -571,7 +666,18 @@
           >
             {spnot}
           </h2>
-          {#if kindOf === 'perUnit'}
+          {#if isRecurringCycle}
+            <p class="p cd">
+              <span
+                onmouseenter={() => hover('הוצאה חודשית — לחצו על הלב לעדכון ואישור')}
+                onmouseleave={() => hover('0')}
+                style="color:var(--gold)">🔁 {quantityDelivered || pricePerUnit} ₪</span
+              >
+              {#if cycleIndex}
+                <span style="color: aqua; font-size:0.8em;"> · #{cycleIndex}</span>
+              {/if}
+            </p>
+          {:else if kindOf === 'perUnit'}
             <p dir="ltr" class="p cd">
               <span
                 onmouseenter={() => hover(' שווי ליחידה')}

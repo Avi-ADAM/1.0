@@ -808,6 +808,13 @@
                       projectName={buble.projectName}
                       useraplyname={buble.username}
                       userId={buble.uid}
+                      myid={buble.myid}
+                      isRecurringCycle={buble.isRecurringCycle}
+                      mashabetahalichId={buble.mashabetahalichId}
+                      cycleIndex={buble.cycleIndex}
+                      quantityDelivered={buble.quantityDelivered}
+                      pricePerUnit={buble.pricePerUnit}
+                      responsibleUserId={buble.responsibleUserId}
                       spid={buble.spid}
                       src={buble.src}
                       price={buble.price}

@@ -124,6 +124,7 @@ export class EmailService {
         HalukaApproved: () => import('$lib/components/mail/HalukaApproved.svelte'),
         ComeVoteJoin: () => import('$lib/components/mail/comeVoteJoin.svelte'),
         MissionAccepted: () => import('$lib/components/mail/mail.svelte'),
+        MonthlyResourceActive: () => import('$lib/components/mail/monthlyResourceActive.svelte'),
       };
 
       const loader = templates[templateName];

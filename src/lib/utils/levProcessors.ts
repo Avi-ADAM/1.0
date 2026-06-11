@@ -1643,7 +1643,17 @@ export function processWegets(
       noofusersNo,
       whyno,
       whyes,
-      noofusersWaiting
+      noofusersWaiting,
+
+      // Recurring monthly resource cycle fields
+      isRecurringCycle: weget.isRecurringCycle === true,
+      mashabetahalichId: weget.mashabetahalichId,
+      cycleIndex: weget.cycleIndex,
+      cycleStart: weget.cycleStart,
+      cycleEnd: weget.cycleEnd,
+      quantityDelivered: weget.quantityDelivered,
+      pricePerUnit: weget.pricePerUnit,
+      responsibleUserId: weget.responsibleUserId
     };
   });
 }

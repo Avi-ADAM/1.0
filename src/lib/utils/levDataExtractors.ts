@@ -565,35 +565,51 @@ export function extractWegets(userData: any): ResourceRequestData[] {
           continue;
         }
 
+        // Recurring monthly resource cycle? (Maap linked to a mashabetahalich engine)
+        const mashab = maap.attributes.mashabetahalich?.data;
+        const mashabAttrs = mashab?.attributes;
+        const isRecurringCycle = Boolean(mashab?.id);
+
         wegets.push({
           id: maap.id,
           projectId: project.id,
           requestType: 'maap',
           priority: 6,
           // Additional fields
-          name: maap.attributes.name || '',
+          name: maap.attributes.name || mashabAttrs?.name || '',
           createdAt: maap.attributes.createdAt,
           vots: maap.attributes.vots || [],
           spId: maap.attributes.sp?.data?.id,
           spData: maap.attributes.sp?.data?.attributes,
-          spName: maap.attributes.sp?.data?.attributes?.name,
+          spName: maap.attributes.sp?.data?.attributes?.name || mashabAttrs?.name,
           openMashaabimId: maap.attributes.open_mashaabim?.data?.id,
           openMashaabimData: maap.attributes.open_mashaabim?.data?.attributes,
           users: maap.attributes.vots || [],
           src: maap.attributes.project?.data?.attributes?.profilePic?.data?.attributes?.url || 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png',
           // Extract fields from open_mashaabim
           easy: maap.attributes.open_mashaabim?.data?.attributes?.easy,
-          price: maap.attributes.open_mashaabim?.data?.attributes?.price,
+          price: maap.attributes.open_mashaabim?.data?.attributes?.price ?? mashabAttrs?.pricePerUnit,
           sqadualed: maap.attributes.open_mashaabim?.data?.attributes?.sqadualed,
           sqadualedf: maap.attributes.open_mashaabim?.data?.attributes?.sqadualedf,
           spnot: maap.attributes.open_mashaabim?.data?.attributes?.spnot,
-          kindOf: maap.attributes.open_mashaabim?.data?.attributes?.kindOf,
+          kindOf: maap.attributes.open_mashaabim?.data?.attributes?.kindOf ?? mashabAttrs?.kindOf,
           unit: maap.attributes.sp?.data?.attributes?.unit,
-          openName: maap.attributes.open_mashaabim?.data?.attributes?.name,
-          userId: maap.attributes.sp?.data?.attributes?.users_permissions_user?.data?.id,
+          openName: maap.attributes.open_mashaabim?.data?.attributes?.name || mashabAttrs?.name,
+          userId:
+            maap.attributes.sp?.data?.attributes?.users_permissions_user?.data?.id ||
+            mashabAttrs?.users_permissions_user?.data?.id,
           username: maap.attributes.sp?.data?.attributes?.users_permissions_user?.data?.attributes?.username,
           myp: maap.attributes.sp?.data?.attributes?.myp,
-          myid: userData.id
+          myid: userData.id,
+          // Recurring cycle fields (only present on recurring cycle Maaps)
+          isRecurringCycle,
+          mashabetahalichId: mashab?.id,
+          cycleIndex: maap.attributes.cycleIndex,
+          cycleStart: maap.attributes.cycleStart,
+          cycleEnd: maap.attributes.cycleEnd,
+          quantityDelivered: maap.attributes.quantityDelivered,
+          pricePerUnit: mashabAttrs?.pricePerUnit,
+          responsibleUserId: mashabAttrs?.users_permissions_user?.data?.id
         });
       }
     }

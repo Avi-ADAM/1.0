@@ -297,6 +297,7 @@ export type ActionKey =
   | 'addAskmChatEntry'
   | 'addAskChatEntry'
   | 'createWeave'
+  | 'markResourceDone'
   ;
 
 
@@ -351,6 +352,7 @@ export interface ActionParamsMap {
     endDate?: string;
     isAssigned?: boolean;
     isReceived?: boolean;
+    recurring?: boolean;
     existingSpId?: string;
     restime?: string;
     isOnline?: boolean;
