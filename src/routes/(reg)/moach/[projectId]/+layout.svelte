@@ -15,11 +15,32 @@
   import TaskModal from '$lib/components/prPr/tasks/taskModal.svelte';
   import { untrack } from 'svelte';
   import { socketClient } from '$lib/stores/socketClient';
+  import { TourItem, run } from 'svelte-tour';
+  import Dialog from '$lib/celim/ui/dialog.svelte';
 
   let { children, data } = $props();
   const moachStore = setMoachStore();
   let socketUnsubscribe;
   let projectId = $derived(page.params.projectId);
+
+  let showGuideDialog = $state(false);
+
+  const guideDialogHeader = {
+    he: 'מדריך למוח הריקמה',
+    en: 'Project Brain Guide',
+    ar: 'دليل عقل المجموعة'
+  };
+  const guideDialogText = {
+    he: 'האם ברצונך לראות מדריך קצר שיסביר מה ניתן לעשות במוח הריקמה?\n(ניתן לפתוח מחדש בלחיצה על סימן ה-? בכותרת)',
+    en: 'Would you like a quick tour of what you can do in the project brain?\n(You can reopen it via the ? button in the header)',
+    ar: 'هل تريد جولة سريعة لعقل المشروع?\n(يمكنك إعادة فتحه من خلال زر ? في الرأس)'
+  };
+  const guideYes = { he: 'אשמח', en: 'Yes', ar: 'نعم' };
+  const guideNo = { he: 'לא תודה', en: 'No thanks', ar: 'لا شكراً' };
+
+  function startGuide() {
+    run();
+  }
   let projectBase = $derived(data.projectBase);
   let currentPath = $derived(page.url.pathname);
 
@@ -38,6 +59,11 @@
     }
   });
   onMount(() => {
+    const guideKey = `moachGuide_${projectId}`;
+    if (!localStorage.getItem(guideKey)) {
+      showGuideDialog = true;
+    }
+
     // Socket integration for real-time invalidation
     socketClient.connect(data.uid);
     socketUnsubscribe = socketClient.onNotification((notification) => {
@@ -76,6 +102,56 @@
   onDestroy(() => {
     if (socketUnsubscribe) socketUnsubscribe();
   });
+  const tourMessages = {
+    he: {
+      badge: 'ריקמה היא קבוצת שיתוף פעולה — כל אחד תורם את הכישורים שלו ומרוויח לפי תרומתו',
+      members: 'חברי הריקמה — עיגול ירוק פועם = חבר שעובד עכשיו לטובת הפרויקט. לחיצה על תמונה עוברת לפרופיל',
+      tabsIntro: 'הטאבים הם מרכז הניהול של הריקמה — כל טאב מציג היבט אחר של הפרויקט',
+      create: '📋 יצירה: יוצרים משימות ומבקשים משאבים (כסף, ציוד, מידע) — הן עבור חברי הפרויקט הקיימים, והן כדי לאתר שותפים ושותפות חדשים שיבצעו את המשימה או יספקו את המשאב. אפשר גם לבנות תהליכים מורכבים משלבים',
+      progress: '🔄 בתהליך: רשימת כל המשימות הפעילות — מי עובד על מה ובאיזה שלב',
+      acts: '✅ פעולות ומטלות: ניהול המשימות הקטנות — מה נגמר, מה בדרך',
+      timers: '⏱️ טיימרים: כאן רואים מתי כל חבר פרויקט היה פעיל לטובת הפרויקט ומה עשה. כשחבר מפעיל טיימר מופיע עיגול ירוק מסביב לתמונה שלו למעלה',
+      wishes: '💌 משאלות נכנסות: לידים חמים מלקוחות הקונסיירז\' שהפרויקט שלכם מתאים לתת להם שירות או מוצר — הזדמנויות עסקיות מוכנות',
+      sales: '🛒 מכירות ומוצרים: יצירת מוצרים פשוטים ומורכבים, מעקב אחרי מכירות והכנסות הריקמה',
+      split: '💰 חלוקה: מחשבון חלוקת ההכנסות — כל אחד מקבל לפי מה שתרם',
+      votes: '🗳️ הצבעות: קבלת החלטות דמוקרטית — כל חבר ריקמה יכול להציע ולהצביע',
+      gantt: '📊 גאנט וקאנבן: ניהול ויזואלי של הפרויקט ולוח זמנים',
+      helpBtn: 'הצגת מדריך מחדש'
+    },
+    en: {
+      badge: 'FreeMates is a collaboration group — everyone contributes their skills and earns according to their contribution',
+      members: 'FreeMates members — a pulsing green ring means a member is currently working on the project. Click a photo to visit their profile',
+      tabsIntro: 'The tabs are the management hub of the FreeMates — each tab shows a different aspect of the project',
+      create: '📋 Create: add missions and request resources (money, gear, info) — both for existing project members and to attract new partners who will carry out the mission or provide the resource. You can also build multi-step complex processes',
+      progress: '🔄 Progress: list of all active missions — who is working on what and at which stage',
+      acts: '✅ Acts & Tasks: manage small tasks — what is done, what is on the way',
+      timers: '⏱️ Timers: see when each member was active for the project and what they worked on. When a member starts a timer, a green ring appears around their avatar above',
+      wishes: '💌 Incoming Wishes: warm leads from concierge customers that your project is a match for — ready business opportunities',
+      sales: '🛒 Sales & Products: create simple and complex products, track sales and revenue',
+      split: '💰 Split: revenue-split calculator — everyone gets paid according to their contribution',
+      votes: '🗳️ Votes: democratic decision-making — every member can propose and vote',
+      gantt: '📊 Gantt & Kanban: visual project management and timeline',
+      helpBtn: 'Show guide again'
+    },
+    ar: {
+      badge: 'FreeMates مجموعة تعاون — كل شخص يساهم بمهاراته ويكسب وفقاً لمساهمته',
+      members: 'أعضاء المجموعة — حلقة خضراء نابضة = عضو يعمل الآن. انقر على صورة للذهاب إلى ملفهم الشخصي',
+      tabsIntro: 'التبويبات هي مركز إدارة المجموعة — كل تبويب يعرض جانباً مختلفاً من المشروع',
+      create: '📋 إنشاء: أنشئ مهام واطلب موارد — للأعضاء الحاليين أو لاستقطاب شركاء جدد ينجزون المهمة أو يوفرون المورد. يمكنك أيضاً بناء عمليات متعددة المراحل',
+      progress: '🔄 قيد التنفيذ: قائمة بجميع المهام النشطة',
+      acts: '✅ الأعمال والمهام: إدارة المهام الصغيرة',
+      timers: '⏱️ المؤقتات: شاهد متى كان كل عضو نشطاً وماذا عمل. عند تشغيل مؤقت تظهر حلقة خضراء حول صورته',
+      wishes: '💌 الرغبات الواردة: عملاء محتملون من الكونسيرج يناسبهم مشروعكم — فرص عمل جاهزة',
+      sales: '🛒 المبيعات والمنتجات: إنشاء منتجات بسيطة ومعقدة وتتبع الإيرادات',
+      split: '💰 التقسيم: حاسبة توزيع الإيرادات',
+      votes: '🗳️ التصويتات: اتخاذ القرارات ديمقراطياً',
+      gantt: '📊 جانت وكانبان: إدارة المشروع بصرياً',
+      helpBtn: 'عرض الدليل مجدداً'
+    }
+  };
+
+  let tour = $derived(tourMessages[$lang] || tourMessages.he);
+
   const i18n = {
     he: {
       back: 'חזרה לרשימה',
@@ -182,6 +258,22 @@
 </script>
 
 {#if projectBase}
+  <Dialog
+    bind:showSaveDialog={showGuideDialog}
+    dialogHeader={guideDialogHeader}
+    innerText={guideDialogText}
+    innerDialogButton={guideYes}
+    clearButton={guideNo}
+    onSaveTimer={() => {
+      showGuideDialog = false;
+      localStorage.setItem(`moachGuide_${projectId}`, 'done');
+      startGuide();
+    }}
+    onClearTimer={() => {
+      showGuideDialog = false;
+      localStorage.setItem(`moachGuide_${projectId}`, 'done');
+    }}
+  />
   <div
     class="moach-layout min-h-screen text-barbi text-center overflow-y-auto scroll-smooth"
   >
@@ -206,12 +298,21 @@
             <span class="text-sm font-medium hidden sm:inline">{t.back}</span>
           </button>
 
-          <AuthorityBadge
-            logoSrc={projectBase.profilePic?.data?.attributes?.url}
-            projectName={projectBase.projectName}
-            memberCount={projectBase.user_1s?.data?.length || 0}
-            size={200}
-          />
+          <TourItem message={tour.badge}>
+            <AuthorityBadge
+              logoSrc={projectBase.profilePic?.data?.attributes?.url}
+              projectName={projectBase.projectName}
+              memberCount={projectBase.user_1s?.data?.length || 0}
+              size={200}
+            />
+          </TourItem>
+
+          <!-- Help button - top right -->
+          <button
+            class="absolute right-0 sm:right-4 top-0 flex items-center justify-center w-8 h-8 rounded-full border border-gold text-gold hover:bg-gold hover:text-barbi transition-colors font-bold text-sm"
+            onclick={() => { localStorage.removeItem(`moachGuide_${projectId}`); startGuide(); }}
+            title={tour.helpBtn}
+          >?</button>
         </div>
 
         <div class="flex flex-row items-center justify-center gap-2">
@@ -333,6 +434,7 @@
         </div>
 
         <!-- Member Avatars with Timer Indicators -->
+        <TourItem message={tour.members}>
         <div
           class="flex items-center justify-center py-2"
           dir={$lang === 'he' ? 'rtl' : 'ltr'}
@@ -375,6 +477,21 @@
               </button>
             {/each}
           </div>
+        </div>
+        </TourItem>
+
+        <!-- Tour anchors — invisible spans that drive next/next over the nav -->
+        <div class="tour-anchors-row" aria-hidden="true">
+          <TourItem message={tour.tabsIntro}><span class="tour-anchor"></span></TourItem>
+          <TourItem message={tour.create}><span class="tour-anchor"></span></TourItem>
+          <TourItem message={tour.progress}><span class="tour-anchor"></span></TourItem>
+          <TourItem message={tour.acts}><span class="tour-anchor"></span></TourItem>
+          <TourItem message={tour.timers}><span class="tour-anchor"></span></TourItem>
+          <TourItem message={tour.wishes}><span class="tour-anchor"></span></TourItem>
+          <TourItem message={tour.sales}><span class="tour-anchor"></span></TourItem>
+          <TourItem message={tour.split}><span class="tour-anchor"></span></TourItem>
+          <TourItem message={tour.votes}><span class="tour-anchor"></span></TourItem>
+          <TourItem message={tour.gantt}><span class="tour-anchor"></span></TourItem>
         </div>
 
         <!-- Navigation Tabs -->
@@ -438,5 +555,20 @@
   .moach-layout :global(.sv) {
     width: 24px;
     height: 24px;
+  }
+
+  .tour-anchors-row {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    height: 0;
+    overflow: visible;
+  }
+
+  .tour-anchor {
+    display: inline-block;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
   }
 </style>
