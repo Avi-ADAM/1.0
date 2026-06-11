@@ -101,7 +101,8 @@
     "colSolo_d": "All the risk on you•Loneliness•Heavy management load•No safety net",
     "colRikma_t": "At 1💗1 — a Rikma",
     "colRikma_badge": "The third way",
-    "colRikma_d": "Real ownership in %•Full freedom•Decisions by consensus•Partners who complete you•Lifetime profit"
+    "colRikma_d": "Real ownership in %•Full freedom•Decisions by consensus•Partners who complete you•Lifetime profit",
+    "navDemo": "Live demo"
   },
   "platform": {
     "projectMgmt_t": "Your whole project at a glance",
@@ -296,5 +297,87 @@
     "tabRoles": "Roles",
     "tabStyle": "Style",
     "tabPassword": "Password"
+  },
+  "peek": {
+    "title": "A live peek inside",
+    "sub": "This is what the platform looks like from the inside — before you sign up.",
+    "badge": "Demo",
+    "tabs": {
+      "hub": "My hub",
+      "mission": "Mission & timer",
+      "vote": "Vote & consent"
+    },
+    "hub": {
+      "votes": "votes",
+      "urgent": "urgent",
+      "suggestions": "offers",
+      "shortcuts": "Shortcuts",
+      "missions": "Active missions",
+      "rikma": "Partnerships",
+      "inbound": "Inbound",
+      "feedTitle": "Recent activity",
+      "feed1": "Sivan proposed a new profit split in 'Studio Or'",
+      "feed2": "Mission 'Logo design' approved — 2.5 hours added",
+      "feed3": "The 'Community Garden' partnership is looking for a carpenter"
+    },
+    "mission": {
+      "header": "Mission in progress",
+      "name": "Logo design · 'Studio Or' partnership",
+      "timerLabel": "Timer running",
+      "hours": "Hours logged on this mission: 6.5",
+      "equity": "Every hour is transparently recorded and becomes a share of the partnership's profits"
+    },
+    "vote": {
+      "header": "Proposal up for vote",
+      "proposal": "Approve a 1,200 ILS budget for photography gear",
+      "by": "Proposed by Daniel · 'Studio Or' partnership",
+      "consensus": "Consent: 3 of 4 have voted",
+      "yes": "Agree",
+      "no": "Negotiate",
+      "hint": "Decisions pass only by consent — every member has a voice"
+    },
+    "note": "This is sample data for illustration — the real system is waiting for you inside.",
+    "cta": "Want one of your own? Agree & sign up",
+    "lev": {
+      "tab": "Heart cards",
+      "header": "The Heart — actions awaiting your consent",
+      "hint": "Swipe right to approve, left to negotiate — try it 👇",
+      "approve": "Approve",
+      "reject": "Negotiate",
+      "approved": "Approved!",
+      "rejected": "To negotiation",
+      "done": "That's it! You just ran a partnership in 20 seconds 💗",
+      "doneSub": "There is no rejection in 1💗1 — only consent or negotiation, card by card, until everyone is at peace with the decision.",
+      "restart": "Again ↺",
+      "cards": {
+        "c1": {
+          "type": "Mission approval",
+          "project": "'Studio Or' partnership",
+          "title": "Add mission: 'Packaging design'",
+          "by": "Proposed by Sivan",
+          "t1": "hours",
+          "t2": "ILS/hour"
+        },
+        "c2": {
+          "type": "Join request",
+          "project": "'Community Garden' partnership",
+          "title": "Yoav the carpenter asks to join",
+          "by": "3 of 4 already approved",
+          "t1": "hours/week"
+        },
+        "c3": {
+          "type": "Client price quote",
+          "project": "'Studio Or' partnership",
+          "title": "Portfolio website for a new client — quote",
+          "by": "Proposed by Daniel",
+          "t1": "ILS price"
+        }
+      },
+      "negoTitle": "Counter-offer",
+      "negoOrig": "Proposed:",
+      "negoSend": "Send counter-offer 🤝",
+      "negoBack": "Back",
+      "negoSent": "Sent to negotiation!"
+    }
   }
 }
