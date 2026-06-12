@@ -7335,6 +7335,89 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
 
   'negoUpdatePmash': `mutation NegoUpdatePmash($id: ID!, $data: PmashInput!) {
     updatePmash(id: $id, data: $data) { data { id } }
+  }`,
+
+  // ─── Open-resource (openMashaabim) candidate negotiation ───
+  // A candidate proposes parallel terms on an open resource. Each candidate has
+  // their own Askm; the proposed terms live as NegoMash rounds bound to that
+  // Askm — the shared OpenMashaabim is never overwritten.
+
+  // Create a NegoMash round. Works for both the internal pmash flow and the
+  // external candidate flow (open_mashaabim + askm), with round bookkeeping.
+  'negoCreateNegoMashRound': `mutation NegoCreateNegoMashRound(
+    $publishedAt: DateTime!, $userId: ID!,
+    $pmash: ID, $open_mashaabim: ID, $askm: ID,
+    $ordern: Int, $proposedBy: ENUM_NEGOMASH_PROPOSEDBY, $status: ENUM_NEGOMASH_STATUS,
+    $isOriginal: Boolean, $name: String, $descrip: String, $spnot: String,
+    $easy: Float, $hm: Float, $price: Float, $kindOf: ENUM_NEGOMASH_KINDOF,
+    $sqadualed: DateTime, $sqadualedf: DateTime, $linkto: String,
+    $location: [ComponentNewLocationInput]
+  ) {
+    createNegoMash(data: {
+      publishedAt: $publishedAt
+      users_permissions_user: $userId
+      pmash: $pmash
+      open_mashaabim: $open_mashaabim
+      askm: $askm
+      ordern: $ordern
+      proposedBy: $proposedBy
+      status: $status
+      isOriginal: $isOriginal
+      name: $name
+      descrip: $descrip
+      spnot: $spnot
+      easy: $easy
+      hm: $hm
+      price: $price
+      kindOf: $kindOf
+      sqadualed: $sqadualed
+      sqadualedf: $sqadualedf
+      linkto: $linkto
+      location: $location
+    }) { data { id } }
+  }`,
+
+  // Create an Askm already in negotiating state (candidate parallel proposal).
+  'createAskmWithNego': `mutation CreateAskmWithNego(
+    $publishedAt: DateTime!, $openMashaabimId: ID!, $projectId: ID!, $spId: ID!, $userId: ID!,
+    $vots: [ComponentProjectsVotsInput],
+    $negotiationStatus: ENUM_ASKM_NEGOTIATIONSTATUS, $turn: ENUM_ASKM_TURN, $currentRound: Int
+  ) {
+    createAskm(data: {
+      publishedAt: $publishedAt
+      open_mashaabim: $openMashaabimId
+      project: $projectId
+      sp: $spId
+      users_permissions_user: $userId
+      vots: $vots
+      negotiationStatus: $negotiationStatus
+      turn: $turn
+      currentRound: $currentRound
+    }) { data { id } }
+  }`,
+
+  // Advance an Askm negotiation (new vote round / counter / turn flip).
+  'updateAskmNegoState': `mutation UpdateAskmNegoState(
+    $id: ID!, $vots: [ComponentProjectsVotsInput],
+    $turn: ENUM_ASKM_TURN, $currentRound: Int, $negotiationStatus: ENUM_ASKM_NEGOTIATIONSTATUS
+  ) {
+    updateAskm(id: $id, data: {
+      vots: $vots
+      turn: $turn
+      currentRound: $currentRound
+      negotiationStatus: $negotiationStatus
+    }) { data { id } }
+  }`,
+
+  // Read an Askm's negotiation rounds (latest first) for the card / materialization.
+  'getAskmNegoRounds': `query GetAskmNegoRounds($id: ID!) {
+    askm(id: $id) { data { id attributes {
+      currentRound turn negotiationStatus
+      nego_mashes(sort: "ordern:desc") { data { id attributes {
+        ordern proposedBy status name descrip spnot
+        easy hm price kindOf sqadualed sqadualedf linkto
+      } } }
+    } } }
   }`
 };
 
