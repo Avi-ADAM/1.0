@@ -685,7 +685,7 @@ const qids_base = {
             isLocal
             scaleMin
             scaleMax
-            places {
+            cuntries {
               data {
                 id
                 attributes { name }
@@ -718,10 +718,10 @@ const qids_base = {
                   authorExternalId
                   authorType
                   votes
-                  voters
+                  voters { data { id } }
                   location
                   intensity
-                  tags
+                  tags { data { id } }
                   order
                   isAnchor
                   pole
@@ -902,7 +902,7 @@ const qids_base = {
             isLocal
             scaleMin
             scaleMax
-            places { data { id attributes { name } } }
+            cuntries { data { id attributes { name } } }
             creator { data { attributes { username email } } }
             positions {
               data {
@@ -915,7 +915,7 @@ const qids_base = {
                   authorExternalId
                   authorType
                   votes
-                  voters
+                  voters { data { id } }
                   location
                   intensity
                   order
@@ -937,7 +937,7 @@ const qids_base = {
   'ListLocalNegotiations': `
     query ListLocalNegotiations($placeId: ID!) {
       negotiations(filters: {
-        places: { id: { eq: $placeId } },
+        cuntries: { id: { eq: $placeId } },
         visibility: { in: ["local", "unlisted"] }
       }) {
         data {
