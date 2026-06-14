@@ -8,6 +8,7 @@
   import Tile from '$lib/celim/tile.svelte';
   import { Canvas } from '@threlte/core';
   import Scene from '$lib/components/main/1lev1.svelte';
+  import ProductPeek from '$lib/components/main/ProductPeek.svelte';
   import ResizeHandler from '$lib/components/ResizeHandler.svelte';
   import { useProgress } from '@threlte/extras';
   import CircleProgresBar from '$lib/celim/ui/circleProgresBar.svelte';
@@ -276,6 +277,7 @@
     style="animation:none;"
   />
   <nav class="flex flex-1 items-center justify-center gap-4 min-w-0 text-barbi font-bold text-sm lg:text-base">
+    <button type="button" class="hover:text-gold transition-colors whitespace-nowrap" onclick={() => scrollToId('demo')}>{$t('home.sections.navDemo')}</button>
     <button type="button" class="hover:text-gold transition-colors whitespace-nowrap" onclick={() => scrollToId('features')}>{$t('home.sections.navFeatures')}</button>
     <button type="button" class="hover:text-gold transition-colors whitespace-nowrap" onclick={() => scrollToId('how')}>{$t('home.sections.navHow')}</button>
     <button type="button" class="hover:text-gold transition-colors whitespace-nowrap" onclick={() => scrollToId('concierge')}>{$t('home.sections.navConcierge')}</button>
@@ -524,6 +526,15 @@
             </div>
           {/each}
         </div>
+      </section>
+
+      <!-- ===== הצצה חיה למערכת (דמו לפני הרשמה) ===== -->
+      <section
+        id="demo"
+        class="w-full max-w-xl mt-10 scroll-mt-16 animate-fade-in-up"
+        style="font-family:'Sababa',sans-serif;"
+      >
+        <ProductPeek />
       </section>
 
       <!-- ===== גשר: שאלות הזדהות ===== -->

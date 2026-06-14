@@ -6,6 +6,7 @@
   import CustomPurchaseCta from '$lib/components/hub/CustomPurchaseCta.svelte';
   import ActionFeed from '$lib/components/hub/ActionFeed.svelte';
   import HubSkeleton from '$lib/components/hub/HubSkeleton.svelte';
+  import FirstSteps from '$lib/components/hub/FirstSteps.svelte';
 
   /** @type {{ data: import('./$types').PageData }} */
   let { data } = $props();
@@ -13,16 +14,16 @@
   const t = {
     he: {
       shortcuts: 'קיצורי דרך',
-      missions: 'משימות בתהליך',
-      rikma: 'ריקמות',
-      inbound: 'כניסות',
+      lev: 'הלב — אישורים והצבעות',
+      moach: 'מוח — ניהול הריקמה',
+      me: 'הפרופיל שלי',
       feed: 'פעילות אחרונה'
     },
     en: {
       shortcuts: 'Shortcuts',
-      missions: 'Active missions',
-      rikma: 'Connections',
-      inbound: 'Inbound',
+      lev: 'The Heart — approvals & votes',
+      moach: 'Brain — manage your partnership',
+      me: 'My profile',
       feed: 'Recent activity'
     }
   };
@@ -30,9 +31,9 @@
   let labels = $derived(t[$lang as keyof typeof t] ?? t.he);
 
   const shortcuts = $derived([
-    { icon: '🧩', label: labels.missions,  href: '/kind/mission',    badge: 0 },
-    { icon: '🤝', label: labels.rikma,     href: '/kind/rikma',      badge: 0 },
-    { icon: '📨', label: labels.inbound,   href: '/kind/suggestion', badge: 0 }
+    { icon: '💗', label: labels.lev,   href: '/lev',   badge: 0 },
+    { icon: '🧠', label: labels.moach, href: '/moach', badge: 0 },
+    { icon: '👤', label: labels.me,    href: '/me',    badge: 0 }
   ]);
 </script>
 
@@ -43,6 +44,13 @@
 {#await data.streamed.summary}
   <HubSkeleton />
 {:then summary}
+  {@const isNewUser =
+    summary.kpi.votes +
+      summary.kpi.urgent +
+      summary.kpi.suggestions +
+      summary.kpi.activePurchases +
+      summary.kpi.activeSales ===
+      0 && summary.topFive.length === 0}
   <div dir="rtl" class="min-h-screen bg-bluesun text-white font-rubik">
 
     <!-- Sticky KPI bar -->
@@ -56,13 +64,18 @@
 
     <div class="max-w-lg mx-auto px-4 pt-4 pb-24 space-y-4">
 
-      <!-- Urgent vote alert -->
-      {#if summary.kpi.urgent > 0}
-        <UrgentVotePill count={summary.kpi.urgent} />
-      {/if}
+      {#if isNewUser}
+        <!-- First steps for a freshly registered user (no activity yet) -->
+        <FirstSteps username={summary.username} />
+      {:else}
+        <!-- Urgent vote alert -->
+        {#if summary.kpi.urgent > 0}
+          <UrgentVotePill count={summary.kpi.urgent} href="/lev" />
+        {/if}
 
-      <!-- Custom purchase CTA -->
-      <CustomPurchaseCta />
+        <!-- Custom purchase CTA -->
+        <CustomPurchaseCta />
+      {/if}
 
       <!-- Kind shortcuts -->
       <section>
