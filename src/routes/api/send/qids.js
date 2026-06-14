@@ -753,7 +753,7 @@ const qids_base = {
     mutation CreateNegotiation(
       $topic: String!,
       $description: String,
-      $status: String,
+      $status: ENUM_NEGOTIATION_STATUS,
       $maxRounds: Int,
       $currentRound: Int,
       $createdBy: ID,
