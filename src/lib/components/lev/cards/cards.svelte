@@ -17,6 +17,9 @@
   import ProductRequestCard from './ProductRequestCard.svelte';
   import SaleCard from './SaleCard.svelte';
   import CustomerSaleCard from './CustomerSaleCard.svelte';
+  import SiteSharePayCard from './SiteSharePayCard.svelte';
+  import SiteShareIncomeCard from './SiteShareIncomeCard.svelte';
+  import SiteShareAutoApprovedCard from './SiteShareAutoApprovedCard.svelte';
   //import { fly } from 'svelte/transition';
   import { onMount } from 'svelte';
   import Header from './../../header/header.svelte';
@@ -538,6 +541,7 @@
                       onProj={proj}
                       onCoinLapach={delo}
                       hervach={buble.hervach}
+                      siteShare={buble.siteShare}
                       onUser={user}
                       {low}
                       cards="true"
@@ -571,6 +575,17 @@
                       onProj={proj}
                     /></SwiperSlide
                   >
+                {:else if buble.ani === 'sale' && buble.isSiteShareIncome && milon.sales == true}
+                  <SwiperSlide
+                    class="{isMobileOrTablet()
+                      ? 'swipr-slidemobile'
+                      : 'swiper-slidec'} "
+                    ><SiteShareIncomeCard
+                      {buble}
+                      isFirst={currentIndex === i}
+                      onProj={proj}
+                    /></SwiperSlide
+                  >
                 {:else if buble.ani === 'sale' && milon.sales == true}
                   <SwiperSlide
                     class="{isMobileOrTablet()
@@ -593,6 +608,28 @@
                       isFirst={currentIndex === i}
                       onProj={proj}
                       {onChat}
+                    /></SwiperSlide
+                  >
+                {:else if buble.ani === 'sitesharepay'}
+                  <SwiperSlide
+                    class="{isMobileOrTablet()
+                      ? 'swipr-slidemobile'
+                      : 'swiper-slidec'} "
+                    ><SiteSharePayCard
+                      {buble}
+                      isFirst={currentIndex === i}
+                      onProj={proj}
+                    /></SwiperSlide
+                  >
+                {:else if buble.ani === 'sitesharedecide'}
+                  <SwiperSlide
+                    class="{isMobileOrTablet()
+                      ? 'swipr-slidemobile'
+                      : 'swiper-slidec'} "
+                    ><SiteShareAutoApprovedCard
+                      {buble}
+                      isFirst={currentIndex === i}
+                      onProj={proj}
                     /></SwiperSlide
                   >
                 {:else if buble.ani === 'vidu' && milon.vidu == true}

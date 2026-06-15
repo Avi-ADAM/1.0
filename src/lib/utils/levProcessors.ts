@@ -14,7 +14,9 @@ import type {
   DecisionData,
   ProjectData,
   ProductRequestData,
-  SaleData
+  SaleData,
+  SiteSharePayableData,
+  OpenSiteShareDecisionData
 } from '$lib/stores/levStores';
 // @ts-ignore
 import { createProjectInfo, createUserInfo, getProjectMembers, getProjectUsers, getProjectRestime } from '$lib/utils/projectHelpers.js';
@@ -1729,6 +1731,10 @@ export function processHalukas(
       uids: uids,
       halukot: haluka.halukot,
       hervach: haluka.hervach,
+      // Platform (1💗1) service-share line for this proposal, if present
+      // (SITE_SHARE_TRANSFER_SPEC.md §7). undefined when the cross-rikma schema
+      // isn't live — the card then shows no platform row.
+      siteShare: haluka.siteShare,
 
       // Status
       already,
@@ -2258,6 +2264,90 @@ export function processPurchases(
  * @param arrays - Variable number of display item arrays to merge
  * @returns Single sorted array of all display items
  */
+/**
+ * Process committed-but-unpaid site-share contributions into display items.
+ *
+ * Each payable becomes a card prompting the member to pick a volunteer receiver
+ * and send the transfer. These need the member's action, so they sit in the
+ * VOTE_PENDING band (just after votes awaiting me). The card uses the GIVING
+ * rikma's branding (rikmaName/rikmaLogo) since that's where the obligation arose.
+ *
+ * Pure function; does not modify input.
+ */
+export function processSiteSharePayables(
+  payables: SiteSharePayableData[],
+  projects: ProjectData[]
+): DisplayItem[] {
+  if (!payables || !Array.isArray(payables)) {
+    return [];
+  }
+
+  return payables.map(p => {
+    const projectInfo = createProjectInfo(p.projectId);
+
+    return {
+      // Common display fields
+      ani: 'sitesharepay',
+      azmi: 'sitesharepay',
+      pl: PRIORITY_BAND.VOTE_PENDING + 20,
+      coinlapach: `sitesharepay-${p.contributionId}`,
+      // Project info (falls back to the payload's rikma branding)
+      ...projectInfo,
+      projectId: p.projectId,
+      projectName: p.rikmaName || projectInfo.projectName || '',
+      src: p.rikmaLogo || projectInfo.src2 || '',
+
+      // Pass through all payable fields (contributionId, amount, volunteers, …)
+      ...p
+    };
+  });
+}
+
+/**
+ * Open (pending) site-share decisions whose split is NO LONGER shown as a haluka
+ * card (it auto-approved by time). Each surfaces as a dedicated swiper card that
+ * explains the already-approved split and asks the member to ratify their giving.
+ *
+ * `activeHalukaTosplitIds` is the set of tosplit ids currently rendered as haluka
+ * cards (their gate-2 decision row already covers the member). We EXCLUDE any
+ * decision whose tosplit is in that set, so the member never sees the same
+ * decision twice — only the orphaned ones get this card.
+ *
+ * Pure function; does not modify input.
+ */
+export function processOpenSiteShareDecisions(
+  decisions: OpenSiteShareDecisionData[],
+  projects: ProjectData[],
+  activeHalukaTosplitIds: Set<string> = new Set()
+): DisplayItem[] {
+  if (!decisions || !Array.isArray(decisions)) {
+    return [];
+  }
+
+  return decisions
+    .filter(d => !activeHalukaTosplitIds.has(String(d.tosplitId)))
+    .map(d => {
+      const projectInfo = createProjectInfo(d.projectId);
+
+      return {
+        // Common display fields
+        ani: 'sitesharedecide',
+        azmi: 'sitesharedecide',
+        // Just after votes awaiting me, alongside the payables band.
+        pl: PRIORITY_BAND.VOTE_PENDING + 21,
+        coinlapach: `sitesharedecide-${d.contributionId}`,
+        // Project info (falls back to the decision's rikma branding)
+        ...projectInfo,
+        projectId: d.projectId,
+        projectName: d.projectName || projectInfo.projectName || '',
+        src: d.projectLogo || projectInfo.src2 || '',
+
+        // Pass through decision fields (contributionId, tosplitId, amounts, …)
+        ...d
+      };
+    });
+}
+
 export function mergeAndSort(...arrays: DisplayItem[][]): DisplayItem[] {
   // Flatten all arrays into one
   const merged = arrays.flat();
