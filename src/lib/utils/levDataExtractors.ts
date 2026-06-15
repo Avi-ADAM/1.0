@@ -1297,6 +1297,37 @@ export function mapSaleData(sheirut: any, projectId: string, userData: any, mode
       }
     : iTransferedToFromSheirut;
 
+  // Site-share income: the platform rikma receives one transfer Haluka per
+  // contributing member (giver → chosen volunteer). Surface them ALL so each
+  // pair confirms the money moved via SheirutHalukaCard (vs. a normal sale,
+  // which only ever has a single haluka above).
+  const transferHalukas = (attrs.halukas?.data || []).map((h: any) => {
+    const ha = h.attributes || {};
+    const send = ha.usersend?.data;
+    const recv = ha.userrecive?.data;
+    return {
+      id: String(h.id),
+      amount: ha.amount ?? null,
+      senderconf: ha.senderconf || false,
+      confirmed: ha.confirmed || false,
+      forumId: ha.forum?.data?.id ? String(ha.forum.data.id) : null,
+      sender: send
+        ? {
+            id: String(send.id),
+            username: send.attributes?.username || '',
+            profilePic: send.attributes?.profilePic?.data?.attributes?.url
+          }
+        : null,
+      receiver: recv
+        ? {
+            id: String(recv.id),
+            username: recv.attributes?.username || '',
+            profilePic: recv.attributes?.profilePic?.data?.attributes?.url
+          }
+        : null
+    };
+  });
+
   // Extract weFinnish votes
   const weFinnish = attrs.weFinnish?.data?.map((v: any) => ({
     id: v.id,
@@ -1358,6 +1389,7 @@ export function mapSaleData(sheirut: any, projectId: string, userData: any, mode
     iTransferMoney: !!halukaId || attrs.iTransferMoney || false,
     moneyTransfered: attrs.moneyTransfered || false,
     productExepted: attrs.productExepted || false,
+    isSiteShareIncome: attrs.isSiteShareIncome || false,
 
     // Money handling
     iCanGetMonay,
@@ -1369,6 +1401,7 @@ export function mapSaleData(sheirut: any, projectId: string, userData: any, mode
     halukaForumId,
     senderconf,
     halukaConfirmed,
+    transferHalukas,
 
     // Delivery confirmation voting
     weFinnish,

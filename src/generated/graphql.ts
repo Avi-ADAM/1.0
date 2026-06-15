@@ -2718,6 +2718,12 @@ export enum Enum_Forum_Spec {
   Spesificm = 'spesificm'
 }
 
+export enum Enum_Haluka_Adjustdirection {
+  AsIs = 'as_is',
+  Less = 'less',
+  More = 'more'
+}
+
 export enum Enum_Issue_Origin {
   Ai = 'ai',
   Human = 'human'
@@ -3015,6 +3021,18 @@ export enum Enum_Sheirutfulfillment_Status_Process {
   Completed = 'completed',
   Delivered = 'delivered',
   Pending = 'pending'
+}
+
+export enum Enum_Sitesharecontribution_Des_Status {
+  Decided = 'decided',
+  Pending = 'pending',
+  Skipped = 'skipped'
+}
+
+export enum Enum_Sitesharecontribution_Direction {
+  AsIs = 'as_is',
+  Less = 'less',
+  More = 'more'
 }
 
 export enum Enum_Sp_Kindof {
@@ -3658,7 +3676,7 @@ export type ForumRelationResponseCollection = {
   data: Array<ForumEntity>;
 };
 
-export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ContentReleasesRelease | ContentReleasesReleaseAction | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | Mesimabetahalich | Message | Mission | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | OpenMashaabim | OpenMission | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pmash | Position | Project | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | Richtext | Rikmash | Sale | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Sidur | Skill | Solution | Sp | Tafkidim | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
+export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ContentReleasesRelease | ContentReleasesReleaseAction | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | Mesimabetahalich | Message | Mission | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | OpenMashaabim | OpenMission | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pmash | Position | Project | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | Richtext | Rikmash | Sale | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Sidur | SiteShareContribution | Skill | Solution | Sp | Tafkidim | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
 
 export type Haamada = {
   __typename?: 'Haamada';
@@ -3810,19 +3828,27 @@ export type HaamadapruvRelationResponseCollection = {
 
 export type Haluka = {
   __typename?: 'Haluka';
+  adjustDirection?: Maybe<Enum_Haluka_Adjustdirection>;
+  adjustReason?: Maybe<Scalars['String']['output']>;
   amount?: Maybe<Scalars['Float']['output']>;
+  autoApproved?: Maybe<Scalars['Boolean']['output']>;
   chatre?: Maybe<Array<Maybe<ComponentProjectsChatre>>>;
   confirmed: Scalars['Boolean']['output'];
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   forum?: Maybe<ForumEntityResponse>;
+  isSiteShare?: Maybe<Scalars['Boolean']['output']>;
   locale?: Maybe<Scalars['String']['output']>;
   localizations?: Maybe<HalukaRelationResponseCollection>;
   matbea?: Maybe<MatbeaEntityResponse>;
   project?: Maybe<ProjectEntityResponse>;
+  proposedAmount?: Maybe<Scalars['Float']['output']>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   ratson_share?: Maybe<RatsonShareEntityResponse>;
+  recive_project?: Maybe<ProjectEntityResponse>;
   senderconf?: Maybe<Scalars['Boolean']['output']>;
   sheirut?: Maybe<SheirutEntityResponse>;
+  site_share_contribution?: Maybe<SiteShareContributionEntityResponse>;
+  source_tosplit?: Maybe<TosplitEntityResponse>;
   tosplit?: Maybe<TosplitEntityResponse>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   userrecive?: Maybe<UsersPermissionsUserEntityResponse>;
@@ -3864,23 +3890,31 @@ export type HalukaEntityResponseCollection = {
 };
 
 export type HalukaFiltersInput = {
+  adjustDirection?: InputMaybe<StringFilterInput>;
+  adjustReason?: InputMaybe<StringFilterInput>;
   amount?: InputMaybe<FloatFilterInput>;
   and?: InputMaybe<Array<InputMaybe<HalukaFiltersInput>>>;
+  autoApproved?: InputMaybe<BooleanFilterInput>;
   chatre?: InputMaybe<ComponentProjectsChatreFiltersInput>;
   confirmed?: InputMaybe<BooleanFilterInput>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
   forum?: InputMaybe<ForumFiltersInput>;
   id?: InputMaybe<IdFilterInput>;
+  isSiteShare?: InputMaybe<BooleanFilterInput>;
   locale?: InputMaybe<StringFilterInput>;
   localizations?: InputMaybe<HalukaFiltersInput>;
   matbea?: InputMaybe<MatbeaFiltersInput>;
   not?: InputMaybe<HalukaFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<HalukaFiltersInput>>>;
   project?: InputMaybe<ProjectFiltersInput>;
+  proposedAmount?: InputMaybe<FloatFilterInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   ratson_share?: InputMaybe<RatsonShareFiltersInput>;
+  recive_project?: InputMaybe<ProjectFiltersInput>;
   senderconf?: InputMaybe<BooleanFilterInput>;
   sheirut?: InputMaybe<SheirutFiltersInput>;
+  site_share_contribution?: InputMaybe<SiteShareContributionFiltersInput>;
+  source_tosplit?: InputMaybe<TosplitFiltersInput>;
   tosplit?: InputMaybe<TosplitFiltersInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
   userrecive?: InputMaybe<UsersPermissionsUserFiltersInput>;
@@ -3890,16 +3924,24 @@ export type HalukaFiltersInput = {
 };
 
 export type HalukaInput = {
+  adjustDirection?: InputMaybe<Enum_Haluka_Adjustdirection>;
+  adjustReason?: InputMaybe<Scalars['String']['input']>;
   amount?: InputMaybe<Scalars['Float']['input']>;
+  autoApproved?: InputMaybe<Scalars['Boolean']['input']>;
   chatre?: InputMaybe<Array<InputMaybe<ComponentProjectsChatreInput>>>;
   confirmed?: InputMaybe<Scalars['Boolean']['input']>;
   forum?: InputMaybe<Scalars['ID']['input']>;
+  isSiteShare?: InputMaybe<Scalars['Boolean']['input']>;
   matbea?: InputMaybe<Scalars['ID']['input']>;
   project?: InputMaybe<Scalars['ID']['input']>;
+  proposedAmount?: InputMaybe<Scalars['Float']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   ratson_share?: InputMaybe<Scalars['ID']['input']>;
+  recive_project?: InputMaybe<Scalars['ID']['input']>;
   senderconf?: InputMaybe<Scalars['Boolean']['input']>;
   sheirut?: InputMaybe<Scalars['ID']['input']>;
+  site_share_contribution?: InputMaybe<Scalars['ID']['input']>;
+  source_tosplit?: InputMaybe<Scalars['ID']['input']>;
   tosplit?: InputMaybe<Scalars['ID']['input']>;
   userrecive?: InputMaybe<Scalars['ID']['input']>;
   usersend?: InputMaybe<Scalars['ID']['input']>;
@@ -6255,6 +6297,7 @@ export type Mutation = {
   createSheirutpend?: Maybe<SheirutpendEntityResponse>;
   createSheirutpendLocalization?: Maybe<SheirutpendEntityResponse>;
   createSidur?: Maybe<SidurEntityResponse>;
+  createSiteShareContribution?: Maybe<SiteShareContributionEntityResponse>;
   createSkill?: Maybe<SkillEntityResponse>;
   createSkillLocalization?: Maybe<SkillEntityResponse>;
   createSolution?: Maybe<SolutionEntityResponse>;
@@ -6359,6 +6402,7 @@ export type Mutation = {
   deleteSheirutnego?: Maybe<SheirutnegoEntityResponse>;
   deleteSheirutpend?: Maybe<SheirutpendEntityResponse>;
   deleteSidur?: Maybe<SidurEntityResponse>;
+  deleteSiteShareContribution?: Maybe<SiteShareContributionEntityResponse>;
   deleteSkill?: Maybe<SkillEntityResponse>;
   deleteSolution?: Maybe<SolutionEntityResponse>;
   deleteSp?: Maybe<SpEntityResponse>;
@@ -6466,6 +6510,7 @@ export type Mutation = {
   updateSheirutnego?: Maybe<SheirutnegoEntityResponse>;
   updateSheirutpend?: Maybe<SheirutpendEntityResponse>;
   updateSidur?: Maybe<SidurEntityResponse>;
+  updateSiteShareContribution?: Maybe<SiteShareContributionEntityResponse>;
   updateSkill?: Maybe<SkillEntityResponse>;
   updateSolution?: Maybe<SolutionEntityResponse>;
   updateSp?: Maybe<SpEntityResponse>;
@@ -7036,6 +7081,11 @@ export type MutationCreateSidurArgs = {
 };
 
 
+export type MutationCreateSiteShareContributionArgs = {
+  data: SiteShareContributionInput;
+};
+
+
 export type MutationCreateSkillArgs = {
   data: SkillInput;
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
@@ -7593,6 +7643,11 @@ export type MutationDeleteSheirutpendArgs = {
 
 
 export type MutationDeleteSidurArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteSiteShareContributionArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -8207,6 +8262,12 @@ export type MutationUpdateSheirutpendArgs = {
 
 export type MutationUpdateSidurArgs = {
   data: SidurInput;
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateSiteShareContributionArgs = {
+  data: SiteShareContributionInput;
   id: Scalars['ID']['input'];
 };
 
@@ -10446,6 +10507,7 @@ export type Project = {
   haamadapruvs?: Maybe<HaamadapruvRelationResponseCollection>;
   haamadas?: Maybe<HaamadaRelationResponseCollection>;
   halukas?: Maybe<HalukaRelationResponseCollection>;
+  halukas_recive?: Maybe<HalukaRelationResponseCollection>;
   isMachzikim?: Maybe<Scalars['Boolean']['output']>;
   isMachzikimPublik?: Maybe<Scalars['Boolean']['output']>;
   isOt?: Maybe<Scalars['Boolean']['output']>;
@@ -10478,8 +10540,11 @@ export type Project = {
   restime?: Maybe<Enum_Project_Restime>;
   rikmashes?: Maybe<RikmashRelationResponseCollection>;
   sales?: Maybe<SaleRelationResponseCollection>;
+  sales_source?: Maybe<SaleRelationResponseCollection>;
   sheirutpends?: Maybe<SheirutpendRelationResponseCollection>;
   sheiruts?: Maybe<SheirutRelationResponseCollection>;
+  sheiruts_sourced?: Maybe<SheirutRelationResponseCollection>;
+  site_share_contributions?: Maybe<SiteShareContributionRelationResponseCollection>;
   sps?: Maybe<SpRelationResponseCollection>;
   tafkidims?: Maybe<TafkidimRelationResponseCollection>;
   timeToP?: Maybe<Enum_Project_Timetop>;
@@ -10615,6 +10680,14 @@ export type ProjectHalukasArgs = {
 };
 
 
+export type ProjectHalukas_ReciveArgs = {
+  filters?: InputMaybe<HalukaFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
 export type ProjectLocalizationsArgs = {
   filters?: InputMaybe<ProjectFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
@@ -10742,6 +10815,14 @@ export type ProjectSalesArgs = {
 };
 
 
+export type ProjectSales_SourceArgs = {
+  filters?: InputMaybe<SaleFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
 export type ProjectSheirutpendsArgs = {
   filters?: InputMaybe<SheirutpendFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
@@ -10752,6 +10833,21 @@ export type ProjectSheirutpendsArgs = {
 export type ProjectSheirutsArgs = {
   filters?: InputMaybe<SheirutFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type ProjectSheiruts_SourcedArgs = {
+  filters?: InputMaybe<SheirutFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type ProjectSite_Share_ContributionsArgs = {
+  filters?: InputMaybe<SiteShareContributionFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
@@ -10875,6 +10971,7 @@ export type ProjectFiltersInput = {
   haamadapruvs?: InputMaybe<HaamadapruvFiltersInput>;
   haamadas?: InputMaybe<HaamadaFiltersInput>;
   halukas?: InputMaybe<HalukaFiltersInput>;
+  halukas_recive?: InputMaybe<HalukaFiltersInput>;
   id?: InputMaybe<IdFilterInput>;
   isMachzikim?: InputMaybe<BooleanFilterInput>;
   isMachzikimPublik?: InputMaybe<BooleanFilterInput>;
@@ -10908,8 +11005,11 @@ export type ProjectFiltersInput = {
   restime?: InputMaybe<StringFilterInput>;
   rikmashes?: InputMaybe<RikmashFiltersInput>;
   sales?: InputMaybe<SaleFiltersInput>;
+  sales_source?: InputMaybe<SaleFiltersInput>;
   sheirutpends?: InputMaybe<SheirutpendFiltersInput>;
   sheiruts?: InputMaybe<SheirutFiltersInput>;
+  sheiruts_sourced?: InputMaybe<SheirutFiltersInput>;
+  site_share_contributions?: InputMaybe<SiteShareContributionFiltersInput>;
   sps?: InputMaybe<SpFiltersInput>;
   tafkidims?: InputMaybe<TafkidimFiltersInput>;
   timeToP?: InputMaybe<StringFilterInput>;
@@ -10957,6 +11057,7 @@ export type ProjectInput = {
   haamadapruvs?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   haamadas?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   halukas?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  halukas_recive?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   isMachzikim?: InputMaybe<Scalars['Boolean']['input']>;
   isMachzikimPublik?: InputMaybe<Scalars['Boolean']['input']>;
   isOt?: InputMaybe<Scalars['Boolean']['input']>;
@@ -10987,8 +11088,11 @@ export type ProjectInput = {
   restime?: InputMaybe<Enum_Project_Restime>;
   rikmashes?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   sales?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  sales_source?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   sheirutpends?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   sheiruts?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  sheiruts_sourced?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  site_share_contributions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   sps?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   tafkidims?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   timeToP?: InputMaybe<Enum_Project_Timetop>;
@@ -11244,6 +11348,8 @@ export type Query = {
   sheiruts?: Maybe<SheirutEntityResponseCollection>;
   sidur?: Maybe<SidurEntityResponse>;
   sidurs?: Maybe<SidurEntityResponseCollection>;
+  siteShareContribution?: Maybe<SiteShareContributionEntityResponse>;
+  siteShareContributions?: Maybe<SiteShareContributionEntityResponseCollection>;
   skill?: Maybe<SkillEntityResponse>;
   skills?: Maybe<SkillEntityResponseCollection>;
   solution?: Maybe<SolutionEntityResponse>;
@@ -12263,6 +12369,19 @@ export type QuerySidurArgs = {
 
 export type QuerySidursArgs = {
   filters?: InputMaybe<SidurFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type QuerySiteShareContributionArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QuerySiteShareContributionsArgs = {
+  filters?: InputMaybe<SiteShareContributionFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
   publicationState?: InputMaybe<PublicationState>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -13408,6 +13527,7 @@ export type Sale = {
   finishDate?: Maybe<Scalars['DateTime']['output']>;
   in?: Maybe<Scalars['Float']['output']>;
   isMonterActive?: Maybe<Scalars['Boolean']['output']>;
+  isSiteShareIncome?: Maybe<Scalars['Boolean']['output']>;
   matanot?: Maybe<MatanotEntityResponse>;
   monters?: Maybe<MonterRelationResponseCollection>;
   note?: Maybe<Scalars['String']['output']>;
@@ -13415,6 +13535,7 @@ export type Sale = {
   project?: Maybe<ProjectEntityResponse>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   sheiruts?: Maybe<SheirutRelationResponseCollection>;
+  source_project?: Maybe<ProjectEntityResponse>;
   splited: Scalars['Boolean']['output'];
   startDate?: Maybe<Scalars['DateTime']['output']>;
   tosplits?: Maybe<TosplitRelationResponseCollection>;
@@ -13470,6 +13591,7 @@ export type SaleFiltersInput = {
   id?: InputMaybe<IdFilterInput>;
   in?: InputMaybe<FloatFilterInput>;
   isMonterActive?: InputMaybe<BooleanFilterInput>;
+  isSiteShareIncome?: InputMaybe<BooleanFilterInput>;
   matanot?: InputMaybe<MatanotFiltersInput>;
   monters?: InputMaybe<MonterFiltersInput>;
   not?: InputMaybe<SaleFiltersInput>;
@@ -13479,6 +13601,7 @@ export type SaleFiltersInput = {
   project?: InputMaybe<ProjectFiltersInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   sheiruts?: InputMaybe<SheirutFiltersInput>;
+  source_project?: InputMaybe<ProjectFiltersInput>;
   splited?: InputMaybe<BooleanFilterInput>;
   startDate?: InputMaybe<DateTimeFilterInput>;
   tosplits?: InputMaybe<TosplitFiltersInput>;
@@ -13492,6 +13615,7 @@ export type SaleInput = {
   finishDate?: InputMaybe<Scalars['DateTime']['input']>;
   in?: InputMaybe<Scalars['Float']['input']>;
   isMonterActive?: InputMaybe<Scalars['Boolean']['input']>;
+  isSiteShareIncome?: InputMaybe<Scalars['Boolean']['input']>;
   matanot?: InputMaybe<Scalars['ID']['input']>;
   monters?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   note?: InputMaybe<Scalars['String']['input']>;
@@ -13499,6 +13623,7 @@ export type SaleInput = {
   project?: InputMaybe<Scalars['ID']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   sheiruts?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  source_project?: InputMaybe<Scalars['ID']['input']>;
   splited?: InputMaybe<Scalars['Boolean']['input']>;
   startDate?: InputMaybe<Scalars['DateTime']['input']>;
   tosplits?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -13581,6 +13706,7 @@ export type Sheirut = {
   iTransferedTo?: Maybe<UsersPermissionsUserRelationResponseCollection>;
   isApruved?: Maybe<Scalars['Boolean']['output']>;
   isItOnlyOneInProject?: Maybe<Scalars['Boolean']['output']>;
+  isSiteShareIncome?: Maybe<Scalars['Boolean']['output']>;
   locale?: Maybe<Scalars['String']['output']>;
   localizations?: Maybe<SheirutRelationResponseCollection>;
   matanot?: Maybe<MatanotEntityResponse>;
@@ -13595,7 +13721,10 @@ export type Sheirut = {
   sales?: Maybe<SaleRelationResponseCollection>;
   sheirut_fulfillments?: Maybe<SheirutFulfillmentRelationResponseCollection>;
   sheirutpend?: Maybe<SheirutpendEntityResponse>;
+  site_share_contributions?: Maybe<SiteShareContributionRelationResponseCollection>;
+  source_project?: Maybe<ProjectEntityResponse>;
   source_proposals?: Maybe<RatsonRelationResponseCollection>;
+  source_tosplit?: Maybe<TosplitEntityResponse>;
   startDate?: Maybe<Scalars['DateTime']['output']>;
   total?: Maybe<Scalars['Float']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -13687,6 +13816,14 @@ export type SheirutSheirut_FulfillmentsArgs = {
 };
 
 
+export type SheirutSite_Share_ContributionsArgs = {
+  filters?: InputMaybe<SiteShareContributionFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
 export type SheirutSource_ProposalsArgs = {
   filters?: InputMaybe<RatsonFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
@@ -13751,6 +13888,7 @@ export type SheirutFiltersInput = {
   id?: InputMaybe<IdFilterInput>;
   isApruved?: InputMaybe<BooleanFilterInput>;
   isItOnlyOneInProject?: InputMaybe<BooleanFilterInput>;
+  isSiteShareIncome?: InputMaybe<BooleanFilterInput>;
   locale?: InputMaybe<StringFilterInput>;
   localizations?: InputMaybe<SheirutFiltersInput>;
   matanot?: InputMaybe<MatanotFiltersInput>;
@@ -13767,7 +13905,10 @@ export type SheirutFiltersInput = {
   sales?: InputMaybe<SaleFiltersInput>;
   sheirut_fulfillments?: InputMaybe<SheirutFulfillmentFiltersInput>;
   sheirutpend?: InputMaybe<SheirutpendFiltersInput>;
+  site_share_contributions?: InputMaybe<SiteShareContributionFiltersInput>;
+  source_project?: InputMaybe<ProjectFiltersInput>;
   source_proposals?: InputMaybe<RatsonFiltersInput>;
+  source_tosplit?: InputMaybe<TosplitFiltersInput>;
   startDate?: InputMaybe<DateTimeFilterInput>;
   total?: InputMaybe<FloatFilterInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
@@ -13892,6 +14033,7 @@ export type SheirutInput = {
   iTransferedTo?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   isApruved?: InputMaybe<Scalars['Boolean']['input']>;
   isItOnlyOneInProject?: InputMaybe<Scalars['Boolean']['input']>;
+  isSiteShareIncome?: InputMaybe<Scalars['Boolean']['input']>;
   matanot?: InputMaybe<Scalars['ID']['input']>;
   moneyTransfered?: InputMaybe<Scalars['Boolean']['input']>;
   monters?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -13904,7 +14046,10 @@ export type SheirutInput = {
   sales?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   sheirut_fulfillments?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   sheirutpend?: InputMaybe<Scalars['ID']['input']>;
+  site_share_contributions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  source_project?: InputMaybe<Scalars['ID']['input']>;
   source_proposals?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  source_tosplit?: InputMaybe<Scalars['ID']['input']>;
   startDate?: InputMaybe<Scalars['DateTime']['input']>;
   total?: InputMaybe<Scalars['Float']['input']>;
   users_permissions_users?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -14162,6 +14307,88 @@ export type SidurFiltersInput = {
 export type SidurInput = {
   lemi?: InputMaybe<Scalars['String']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type SiteShareContribution = {
+  __typename?: 'SiteShareContribution';
+  amount?: Maybe<Scalars['Float']['output']>;
+  basisAmount?: Maybe<Scalars['Float']['output']>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  des_status?: Maybe<Enum_Sitesharecontribution_Des_Status>;
+  direction?: Maybe<Enum_Sitesharecontribution_Direction>;
+  haluka?: Maybe<HalukaEntityResponse>;
+  matbea?: Maybe<MatbeaEntityResponse>;
+  project?: Maybe<ProjectEntityResponse>;
+  proposedAmount?: Maybe<Scalars['Float']['output']>;
+  publishedAt?: Maybe<Scalars['DateTime']['output']>;
+  reason?: Maybe<Scalars['String']['output']>;
+  recive_project?: Maybe<ProjectEntityResponse>;
+  sheirut?: Maybe<SheirutEntityResponse>;
+  tosplit?: Maybe<TosplitEntityResponse>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  users_permissions_user?: Maybe<UsersPermissionsUserEntityResponse>;
+};
+
+export type SiteShareContributionEntity = {
+  __typename?: 'SiteShareContributionEntity';
+  attributes?: Maybe<SiteShareContribution>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type SiteShareContributionEntityResponse = {
+  __typename?: 'SiteShareContributionEntityResponse';
+  data?: Maybe<SiteShareContributionEntity>;
+};
+
+export type SiteShareContributionEntityResponseCollection = {
+  __typename?: 'SiteShareContributionEntityResponseCollection';
+  data: Array<SiteShareContributionEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type SiteShareContributionFiltersInput = {
+  amount?: InputMaybe<FloatFilterInput>;
+  and?: InputMaybe<Array<InputMaybe<SiteShareContributionFiltersInput>>>;
+  basisAmount?: InputMaybe<FloatFilterInput>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  des_status?: InputMaybe<StringFilterInput>;
+  direction?: InputMaybe<StringFilterInput>;
+  haluka?: InputMaybe<HalukaFiltersInput>;
+  id?: InputMaybe<IdFilterInput>;
+  matbea?: InputMaybe<MatbeaFiltersInput>;
+  not?: InputMaybe<SiteShareContributionFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<SiteShareContributionFiltersInput>>>;
+  project?: InputMaybe<ProjectFiltersInput>;
+  proposedAmount?: InputMaybe<FloatFilterInput>;
+  publishedAt?: InputMaybe<DateTimeFilterInput>;
+  reason?: InputMaybe<StringFilterInput>;
+  recive_project?: InputMaybe<ProjectFiltersInput>;
+  sheirut?: InputMaybe<SheirutFiltersInput>;
+  tosplit?: InputMaybe<TosplitFiltersInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+  users_permissions_user?: InputMaybe<UsersPermissionsUserFiltersInput>;
+};
+
+export type SiteShareContributionInput = {
+  amount?: InputMaybe<Scalars['Float']['input']>;
+  basisAmount?: InputMaybe<Scalars['Float']['input']>;
+  des_status?: InputMaybe<Enum_Sitesharecontribution_Des_Status>;
+  direction?: InputMaybe<Enum_Sitesharecontribution_Direction>;
+  haluka?: InputMaybe<Scalars['ID']['input']>;
+  matbea?: InputMaybe<Scalars['ID']['input']>;
+  project?: InputMaybe<Scalars['ID']['input']>;
+  proposedAmount?: InputMaybe<Scalars['Float']['input']>;
+  publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  reason?: InputMaybe<Scalars['String']['input']>;
+  recive_project?: InputMaybe<Scalars['ID']['input']>;
+  sheirut?: InputMaybe<Scalars['ID']['input']>;
+  tosplit?: InputMaybe<Scalars['ID']['input']>;
+  users_permissions_user?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type SiteShareContributionRelationResponseCollection = {
+  __typename?: 'SiteShareContributionRelationResponseCollection';
+  data: Array<SiteShareContributionEntity>;
 };
 
 export type Skill = {
@@ -15028,6 +15255,9 @@ export type Tosplit = {
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   ratson_proposal?: Maybe<RatsonProposalEntityResponse>;
   sales?: Maybe<SaleRelationResponseCollection>;
+  sheiruts?: Maybe<SheirutRelationResponseCollection>;
+  siteShareHalukas?: Maybe<HalukaRelationResponseCollection>;
+  site_share_contributions?: Maybe<SiteShareContributionRelationResponseCollection>;
   split_origin?: Maybe<Enum_Tosplit_Split_Origin>;
   timegrama?: Maybe<TimegramaEntityResponse>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -15061,6 +15291,29 @@ export type TosplitLocalizationsArgs = {
 
 export type TosplitSalesArgs = {
   filters?: InputMaybe<SaleFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type TosplitSheirutsArgs = {
+  filters?: InputMaybe<SheirutFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type TosplitSiteShareHalukasArgs = {
+  filters?: InputMaybe<HalukaFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type TosplitSite_Share_ContributionsArgs = {
+  filters?: InputMaybe<SiteShareContributionFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
   publicationState?: InputMaybe<PublicationState>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -15107,6 +15360,9 @@ export type TosplitFiltersInput = {
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   ratson_proposal?: InputMaybe<RatsonProposalFiltersInput>;
   sales?: InputMaybe<SaleFiltersInput>;
+  sheiruts?: InputMaybe<SheirutFiltersInput>;
+  siteShareHalukas?: InputMaybe<HalukaFiltersInput>;
+  site_share_contributions?: InputMaybe<SiteShareContributionFiltersInput>;
   split_origin?: InputMaybe<StringFilterInput>;
   timegrama?: InputMaybe<TimegramaFiltersInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
@@ -15124,6 +15380,9 @@ export type TosplitInput = {
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   ratson_proposal?: InputMaybe<Scalars['ID']['input']>;
   sales?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  sheiruts?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  siteShareHalukas?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  site_share_contributions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   split_origin?: InputMaybe<Enum_Tosplit_Split_Origin>;
   timegrama?: InputMaybe<Scalars['ID']['input']>;
   vots?: InputMaybe<Array<InputMaybe<ComponentProjectsVotsInput>>>;
@@ -15579,6 +15838,7 @@ export type UsersPermissionsUser = {
   negotiations?: Maybe<NegotiationRelationResponseCollection>;
   negotiationsIparticipante?: Maybe<NegotiationRelationResponseCollection>;
   noMail?: Maybe<Scalars['Boolean']['output']>;
+  noMoachGuide?: Maybe<Scalars['Boolean']['output']>;
   noOfHoursProject1?: Maybe<Scalars['Float']['output']>;
   onboarding_status?: Maybe<Enum_Userspermissionsuser_Onboarding_Status>;
   onboarding_track?: Maybe<Enum_Userspermissionsuser_Onboarding_Track>;
@@ -15611,6 +15871,7 @@ export type UsersPermissionsUser = {
   sheiruts?: Maybe<SheirutRelationResponseCollection>;
   sheiruts_iCanGetMonay?: Maybe<SheirutRelationResponseCollection>;
   shekelsPerHoureProject1?: Maybe<Scalars['Float']['output']>;
+  site_share_contributions?: Maybe<SiteShareContributionRelationResponseCollection>;
   skills?: Maybe<SkillRelationResponseCollection>;
   socketId?: Maybe<Scalars['String']['output']>;
   sphmin?: Maybe<Scalars['Float']['output']>;
@@ -16070,6 +16331,14 @@ export type UsersPermissionsUserSheiruts_ICanGetMonayArgs = {
 };
 
 
+export type UsersPermissionsUserSite_Share_ContributionsArgs = {
+  filters?: InputMaybe<SiteShareContributionFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
 export type UsersPermissionsUserSkillsArgs = {
   filters?: InputMaybe<SkillFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
@@ -16231,6 +16500,7 @@ export type UsersPermissionsUserFiltersInput = {
   negotiations?: InputMaybe<NegotiationFiltersInput>;
   negotiationsIparticipante?: InputMaybe<NegotiationFiltersInput>;
   noMail?: InputMaybe<BooleanFilterInput>;
+  noMoachGuide?: InputMaybe<BooleanFilterInput>;
   noOfHoursProject1?: InputMaybe<FloatFilterInput>;
   not?: InputMaybe<UsersPermissionsUserFiltersInput>;
   onboarding_status?: InputMaybe<StringFilterInput>;
@@ -16266,6 +16536,7 @@ export type UsersPermissionsUserFiltersInput = {
   sheiruts?: InputMaybe<SheirutFiltersInput>;
   sheiruts_iCanGetMonay?: InputMaybe<SheirutFiltersInput>;
   shekelsPerHoureProject1?: InputMaybe<FloatFilterInput>;
+  site_share_contributions?: InputMaybe<SiteShareContributionFiltersInput>;
   skills?: InputMaybe<SkillFiltersInput>;
   socketId?: InputMaybe<StringFilterInput>;
   sphmin?: InputMaybe<FloatFilterInput>;
@@ -16352,6 +16623,7 @@ export type UsersPermissionsUserInput = {
   negotiations?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   negotiationsIparticipante?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   noMail?: InputMaybe<Scalars['Boolean']['input']>;
+  noMoachGuide?: InputMaybe<Scalars['Boolean']['input']>;
   noOfHoursProject1?: InputMaybe<Scalars['Float']['input']>;
   onboarding_status?: InputMaybe<Enum_Userspermissionsuser_Onboarding_Status>;
   onboarding_track?: InputMaybe<Enum_Userspermissionsuser_Onboarding_Track>;
@@ -16386,6 +16658,7 @@ export type UsersPermissionsUserInput = {
   sheiruts?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   sheiruts_iCanGetMonay?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   shekelsPerHoureProject1?: InputMaybe<Scalars['Float']['input']>;
+  site_share_contributions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   skills?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   socketId?: InputMaybe<Scalars['String']['input']>;
   sphmin?: InputMaybe<Scalars['Float']['input']>;

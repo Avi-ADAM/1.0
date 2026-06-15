@@ -12,6 +12,7 @@
   import ComparisonDisplay from '$lib/components/ui/ComparisonDisplay.svelte';
   import { toast } from 'svelte-sonner';
   import Button from '$lib/celim/ui/button.svelte';
+  import SiteShareDecision from '$lib/components/revenue/SiteShareDecision.svelte';
   /**
    * @typedef {Object} Props
    * @property {any} [fmiData]
@@ -192,12 +193,21 @@
       }
     }
 
-    // Check for new sales
+    // Check for new sales. A sale that is already in voting (`pending`) or already
+    // linked to THIS tosplit is part of the active proposal — NOT a new addition.
+    // Only a sale that is neither splited, nor pending, nor linked to any tosplit
+    // counts as genuinely new. (Without the `pending` guard a sale that lost its
+    // tosplit link during an update reappears here as a phantom "new sale".)
     const existingSalesIds = currentTosplit.attributes.sales?.data?.map(s => s.id) || [];
-    const currentUnsplitedIds = unsplitedSales.map(s => s.id);
-    
-    const newSales = currentUnsplitedIds.filter(id => !existingSalesIds.includes(id));
-    
+    const newSales = salee
+      .filter(s =>
+        !s.attributes.splited &&
+        !s.attributes.pending &&
+        !existingSalesIds.includes(s.id) &&
+        (!s.attributes.tosplits?.data || s.attributes.tosplits.data.length === 0)
+      )
+      .map(s => s.id);
+
     if (newSales.length > 0) {
       hasChanges = true;
       const newSalesText = $lang === 'he' ? 'מכירות חדשות נוספו' : 'new sales added';
@@ -216,6 +226,21 @@
   }
 
   async function updateTosplit() {
+    // A discount ("pay less") must carry a reason (PLAN §4) — same rule as ask().
+    if (
+      SITE_SHARE_FLAGS.manualSplit &&
+      platformInfo?.configured &&
+      siteShareDirection === 'less' &&
+      !siteShareReason.trim()
+    ) {
+      toast.error(
+        $lang === 'he'
+          ? 'נא לציין סיבה להנחה בחלק האתר'
+          : 'Please give a reason for the site-share discount'
+      );
+      return;
+    }
+
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
@@ -227,11 +252,16 @@
     try {
       const existingHalukas = currentTosplit.attributes.halukas.data;
 
-      // Build current transfers list
+      // Build current transfers list. Platform (site-share) transfers are tracked
+      // separately and must NOT enter the tosplit's gating `halukas` set (otherwise
+      // the platform member's confirmation would gate the partners, and the count
+      // mismatch with checkSplitChanges() — which also excludes them — falsely
+      // fires "split changed"). Mirrors ask(): platform legs stay out here.
       const currentTransfers = [];
       for (let i = 0; i < ulist.length; i++) {
         if (ulist[i].noten > 0 && ulist[i].le) {
           for (let x = 0; x < ulist[i].le.length; x++) {
+            if (ulist[i].le[x].platform === true) continue;
             currentTransfers.push({
               from: ulist[i].uid,
               to: ulist[i].le[x].leid,
@@ -324,16 +354,116 @@
         }
       }
 
-      // Get all unsplited sales IDs
-      const salesIds = unsplitedSales.map(sale => sale.id);
+      // ── Site share (1💗1) on the UPDATE path ──────────────────────────────────
+      // Mirror ask(): the platform's service line is a real giver→platform Haluka,
+      // but it is NOT part of the gating `halukas` set — it's linked through the
+      // tosplit's `siteShareHalukas` (SET semantics, like `sales`). We reconcile the
+      // existing platform transfers against the freshly-computed ones so editing a
+      // proposal keeps the cross-rikma transfer accurate (update amount, add new,
+      // drop stale-unconfirmed) without proliferating duplicates.
+      let platformHalukaIds = [];
+      const existingPlatform = currentTosplit.attributes.siteShareHalukas?.data || [];
+      const siteShareActive =
+        SITE_SHARE_FLAGS.crossRikmaFields && platformInfo?.configured;
+      if (siteShareActive) {
+        // Current platform transfers from the recomputed split.
+        const platformNow = [];
+        for (let i = 0; i < ulist.length; i++) {
+          if (ulist[i].noten > 0 && ulist[i].le) {
+            for (let x = 0; x < ulist[i].le.length; x++) {
+              if (ulist[i].le[x].platform === true) {
+                platformNow.push({
+                  from: String(ulist[i].uid),
+                  to: String(ulist[i].le[x].leid),
+                  amount: parseFloat(ulist[i].le[x].cama.toFixed(2))
+                });
+              }
+            }
+          }
+        }
 
-      // Update the tosplit with new halukas, hervachti, and sales
+        const remaining = [...platformNow];
+        for (const ex of existingPlatform) {
+          const exFrom = String(ex.attributes.usersend?.data?.id ?? '');
+          const exTo = String(ex.attributes.userrecive?.data?.id ?? '');
+          const idx = remaining.findIndex((t) => t.from === exFrom && t.to === exTo);
+          if (idx !== -1) {
+            const m = remaining[idx];
+            if (
+              !ex.attributes.confirmed &&
+              Math.abs((ex.attributes.amount || 0) - m.amount) > 0.01
+            ) {
+              await sendToSer(
+                { id: ex.id, amount: m.amount },
+                '70updateHaluka',
+                null,
+                null,
+                false,
+                fetch
+              );
+            }
+            platformHalukaIds.push(ex.id);
+            remaining.splice(idx, 1);
+          } else if (ex.attributes.confirmed) {
+            // Keep confirmed transfers even if the recompute no longer produces them.
+            platformHalukaIds.push(ex.id);
+          }
+          // Unmatched & unconfirmed → omitted from platformHalukaIds → unlinked by
+          // the siteShareHalukas SET below (its source_tosplit is cleared).
+        }
+
+        // Brand-new platform transfers — tagged like ask(). The tosplit-side SET
+        // links them (source_tosplit), so it isn't passed here.
+        for (const t of remaining) {
+          const halukaData = {
+            project: $idPr,
+            usersend: t.from,
+            userrecive: t.to,
+            amount: t.amount,
+            matbea: '2',
+            confirmed: false,
+            publishedAt: d.toISOString(),
+            isSiteShare: true,
+            recive_project: String(platformInfo.projectId),
+            proposedAmount: siteShareProposed,
+            adjustDirection: siteShareDirection,
+            adjustReason: siteShareReason || null,
+            autoApproved: true
+          };
+          const res = await sendToSer(
+            { data: halukaData },
+            '69createHaluka',
+            null,
+            null,
+            false,
+            fetch
+          );
+          const id = res?.data?.createHaluka?.data?.id;
+          if (id) platformHalukaIds.push(id);
+        }
+      }
+
+      // `68updateTosplit` writes `sales` as a SET (replace), and tosplit↔sale is
+      // manyToMany — so we must re-send the sales ALREADY linked to this tosplit
+      // together with the newly-unsplited ones, or the update would silently drop
+      // the originals and they'd resurface as phantom "new sales" on refresh.
+      const existingSaleIds = currentTosplit.attributes.sales?.data?.map(s => s.id) || [];
+      const salesIds = [...new Set([...existingSaleIds, ...unsplitedSales.map(sale => sale.id)])];
+
+      // Update the tosplit with new halukas, hervachti, sales and the site-share
+      // transfer links. Passthrough `data: TosplitInput!` (same proven shape as
+      // createTosplit) so siteShareHalukas flows even though the local generated
+      // schema is stale. siteShareHalukas is always sent (the sole caller) so its
+      // SET semantics link/unlink platform transfers cleanly without wiping.
       await sendToSer(
         {
           id: currentTosplit.id,
-          halukas: updatedHalukaIds,
-          hervachti: hervachtiArray,
-          sales: salesIds
+          data: {
+            halukas: updatedHalukaIds,
+            hervachti: hervachtiArray,
+            sales: salesIds,
+            ...(siteShareActive ? { siteShareHalukas: platformHalukaIds } : {})
+          }
         },
         '68updateTosplit',
         null,
@@ -355,6 +485,45 @@
           null,
           false,
           fetch
+        );
+      }
+
+      // Income Sale in the MAIN rikma (the platform earned this by providing its
+      // service) — mirrors ask() step 2.5. We create it ONLY when site-share is
+      // newly introduced in THIS edit (the proposal had none before): the original
+      // ask() already recorded one, and we don't track its id, so re-creating on
+      // every edit would duplicate the income. If a pre-existing site-share amount
+      // changed, the income Sale stays at its original figure (documented gap —
+      // closing it needs a stored Sale↔tosplit link; see SITE_SHARE_TRANSFER_SPEC).
+      if (
+        SITE_SHARE_FLAGS.manualSplit &&
+        platformInfo?.configured &&
+        siteShareFinal > 0 &&
+        existingPlatform.length === 0 &&
+        platformHalukaIds.length > 0
+      ) {
+        const saleRes = await executeAction('createPlatformSale', {
+          projectId: platformInfo.projectId,
+          memberId: platformInfo.memberId,
+          amount: siteShareFinal,
+          publishedAt: d.toISOString(),
+          adjustDirection: siteShareDirection,
+          adjustReason: siteShareReason || null,
+          proposedAmount: siteShareProposed,
+          sourceProjectId: String($idPr),
+          transferHalukaIds: platformHalukaIds
+        });
+        if (!saleRes?.success) {
+          console.error('[SiteShare] update: failed to create platform sale:', saleRes?.error);
+        }
+      } else if (
+        SITE_SHARE_FLAGS.manualSplit &&
+        platformInfo?.configured &&
+        existingPlatform.length > 0
+      ) {
+        console.warn(
+          '[SiteShare] update: existing site-share income Sale not adjusted',
+          '(no stored Sale↔tosplit link). Transfer halukas were reconciled.'
         );
       }
 
@@ -542,6 +711,59 @@
       const tosplitId = tosplitResult.data.createTosplit.data.id;
       console.log('Tosplit created successfully:', tosplitId);
 
+      // Gate 3 seeding (PLAN_SITE_SHARE_PER_MEMBER §1/§3): create a `pending`
+      // decision for EVERY member with a share, so the "open decisions" reminder
+      // has a queryable source of truth. Idempotent server-side; the creator's
+      // gate-1 choice below upserts their seeded row to decided/skipped.
+      if (platformProjectId) {
+        const ssMembers = ulist
+          .filter((u) => Number(u.x) > 0 && u.uid)
+          .map((u) => ({
+            userId: String(u.uid),
+            basisAmount: Number(u.x),
+            proposedAmount: computeSiteShare({
+              payerRole: 'provider',
+              baseAmount: Number(u.x),
+              matbea: '2',
+              config: DEFAULT_SITE_SHARE_CONFIG
+            }).siteAmount
+          }));
+        if (ssMembers.length > 0) {
+          const seedRes = await executeAction('seedSiteShareDecisions', {
+            tosplitId: String(tosplitId),
+            projectId: String($idPr),
+            recive_project: String(platformProjectId),
+            members: ssMembers
+          });
+          if (!seedRes?.success) {
+            console.error('[SiteShare] seeding failed:', seedRes?.error);
+          }
+        }
+      }
+
+      // Gate 1 (PLAN_SITE_SHARE_PER_MEMBER §2): persist the creator's PERSONAL
+      // site-share decision now that the tosplit exists. Identity is taken from
+      // the session server-side; we pass only the choice + the basis it was
+      // computed from. No transfer Haluka yet — that's the receiving side (M4).
+      if (platformProjectId && creatorSSDecision) {
+        const basis =
+          ulist.find((u) => String(u.uid) === String(cookieValueId))?.x ?? 0;
+        const ssRes = await executeAction('decideSiteShare', {
+          tosplitId: String(tosplitId),
+          projectId: String($idPr),
+          recive_project: String(platformProjectId),
+          decision: creatorSSDecision.decision,
+          amount: creatorSSDecision.amount,
+          direction: creatorSSDecision.direction,
+          reason: creatorSSDecision.reason,
+          proposedAmount: creatorProposed,
+          basisAmount: basis
+        });
+        if (!ssRes?.success) {
+          console.error('[SiteShare] creator decision failed:', ssRes?.error);
+        }
+      }
+
       // Step 5: Update each sale to mark as pending (waiting for votes)
       for (let saleId of salesIds) {
         await sendToSer(
@@ -632,6 +854,17 @@
         : siteShareProposed
   );
 
+  // ── M1 decouple (per-member migration) ───────────────────────────────────────
+  // The COLLECTIVE site-share — the platform as a synthetic receiver INSIDE
+  // distribute(), funded mechanically by deducting `netBase = revach − siteShare`
+  // and matching givers to it — is decoupled. With this OFF, distribute() is a
+  // pure 100% peer split on the FULL revach, and every collective branch below
+  // (platformActive, the ask()/update reconcile, createPlatformSale, the UI box)
+  // goes inert because `platformInfo` is never configured (see resolveSiteShare).
+  // The per-member personal layer (M2, PLAN_SITE_SHARE_PER_MEMBER §0/§2) replaces
+  // it and lives OUTSIDE distribute(). Flip to true to restore the old model.
+  const COLLECTIVE_SITE_SHARE = false;
+
   // True when the platform takes a real share of THIS split. Kept as a function
   // (not $derived) so distribute() can call it imperatively while recomputing.
   // NOTE: this is NOT gated on view-mode (trili). When viewing an existing
@@ -640,6 +873,7 @@
   // would register as a false "split changed".
   function platformActive() {
     return (
+      COLLECTIVE_SITE_SHARE &&
       SITE_SHARE_FLAGS.manualSplit &&
       Boolean(platformInfo?.configured) &&
       siteShareFinal > 0
@@ -649,10 +883,64 @@
   // Reactive twin of platformActive() for the template (card visibility). Shown in
   // both create AND view modes so the proposal always displays the site share.
   let showPlatformCol = $derived(
-    SITE_SHARE_FLAGS.manualSplit &&
+    COLLECTIVE_SITE_SHARE &&
+      SITE_SHARE_FLAGS.manualSplit &&
       Boolean(platformInfo?.configured) &&
       siteShareFinal > 0
   );
+
+  // ── M2: per-member personal site-share (gate 1 — creator decides their OWN) ──
+  // Independent of COLLECTIVE_SITE_SHARE: the personal layer always resolves the
+  // platform project (for recive_project) and offers THIS creator a contribution
+  // out of their own share. The choice is captured here and persisted right after
+  // the tosplit is created in ask() (decideSiteShare needs the new tosplit id).
+  let myId = $state(null); // current user (creator), from the id cookie
+  let platformProjectId = $state(null); // the platform rikma (recive_project)
+  let creatorSSDecision = $state(null); // { decision, amount, direction, reason }
+
+  // The creator's own fair share — the basis computeSiteShare runs on.
+  let creatorShare = $derived(
+    myId != null ? (ulist.find((u) => String(u.uid) === String(myId))?.x ?? 0) : 0
+  );
+  let creatorProposed = $derived(
+    creatorShare > 0
+      ? computeSiteShare({
+          payerRole: 'provider',
+          baseAmount: creatorShare,
+          matbea: '2',
+          config: DEFAULT_SITE_SHARE_CONFIG
+        }).siteAmount
+      : 0
+  );
+  // Prompt the creator only while creating a NEW split, when a platform exists and
+  // they actually earned a share to give from.
+  let showCreatorSiteShare = $derived(
+    !hatzaa && !already && platformProjectId != null && creatorShare > 0
+  );
+
+  function readIdCookie() {
+    if (typeof document === 'undefined') return null;
+    return (
+      document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('id='))
+        ?.split('=')[1] ?? null
+    );
+  }
+
+  // Resolve the platform project for the PERSONAL layer (recive_project only — the
+  // receiver/volunteer is chosen later, M4). NOT gated on COLLECTIVE_SITE_SHARE.
+  async function resolvePersonalSiteShare() {
+    const pp = await executeAction('getPlatformProject', {});
+    if (!pp.success || !pp.data?.configured) return;
+    const pid = pp.data.projectId;
+    if (!pid || String($idPr) === String(pid)) return; // the platform's own split
+    platformProjectId = String(pid);
+  }
+
+  function onCreatorDecide(payload) {
+    creatorSSDecision = payload; // captured; persisted after tosplit creation (ask)
+  }
 
   function pickDirection(dir) {
     siteShareDirection = dir;
@@ -669,6 +957,9 @@
   }
 
   async function resolveSiteShare() {
+    // M1: collective site-share decoupled — leave platformInfo unconfigured so
+    // distribute() runs as a pure 100% peer split (PLAN_SITE_SHARE_PER_MEMBER §0).
+    if (!COLLECTIVE_SITE_SHARE) return;
     if (!SITE_SHARE_FLAGS.manualSplit) return;
     const pp = await executeAction('getPlatformProject', {});
     console.log('[SiteShare] getPlatformProject →', JSON.stringify(pp?.data));
@@ -714,6 +1005,12 @@
     // the NET base (revach − site share) and the deducted amount is routed to the
     // platform as a real transfer. Shows in the proposal table, not only on submit.
     await resolveSiteShare();
+
+    // M2 per-member layer: identify the creator + resolve the platform project so
+    // the personal contribution prompt (gate 1) can render. Independent of the
+    // collective switch above.
+    myId = readIdCookie();
+    await resolvePersonalSiteShare();
 
     // View mode: an existing proposal already has the site-share baked into its
     // stored hervachti (the partners split the NET base). Reconstruct that exact
@@ -1239,6 +1536,32 @@
         {/if}
       </div>
     {/if}
+    {#if showCreatorSiteShare}
+      <div class="creator-ss" dir="rtl">
+        {#key myId}
+          <SiteShareDecision
+            proposed={creatorProposed}
+            basis={creatorShare}
+            initial={null}
+            busy={isLoading}
+            onDecide={onCreatorDecide}
+          />
+        {/key}
+        {#if creatorSSDecision}
+          <p class="creator-ss-note">
+            {#if $lang === 'he'}
+              {creatorSSDecision.decision === 'skipped'
+                ? 'בחרת לא לתת הפעם — יירשם עם יצירת החלוקה.'
+                : `הנתינה שלך (${Number(creatorSSDecision.amount).toFixed(2)}) תירשם עם יצירת החלוקה.`}
+            {:else}
+              {creatorSSDecision.decision === 'skipped'
+                ? 'You chose not to give — saved when the split is created.'
+                : `Your contribution (${Number(creatorSSDecision.amount).toFixed(2)}) will be saved when the split is created.`}
+            {/if}
+          </p>
+        {/if}
+      </div>
+    {/if}
     {#if availableForNewSplit > 0 && revach > 0 && !hatzaa}
       <Button
         text={{ he: $t('mission.whowhat.confirmSplit'), en: $t('mission.whowhat.confirmSplit'), ar: $t('mission.whowhat.confirmSplit') }}
@@ -1530,6 +1853,18 @@
   }
 
   /* Site-share service line + payer adjustment */
+  .creator-ss {
+    max-width: 32rem;
+    margin: 1rem auto;
+  }
+  .creator-ss-note {
+    margin: 0.5rem 0 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: right;
+    color: var(--gold, #c9a227);
+  }
+
   .site-share {
     max-width: 32rem;
     margin: 1rem auto;

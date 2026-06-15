@@ -9,6 +9,11 @@
   import { toggleScrollable, isScrolable } from './isScrolable.svelte.js';
   import { getProjectData } from '$lib/stores/projectStore.js';
   import { platformStore } from '$lib/stores/platformStore';
+  import { onMount } from 'svelte';
+  import { computeSiteShare } from '$lib/revenue/computeSiteShare.js';
+  import { DEFAULT_SITE_SHARE_CONFIG } from '$lib/revenue/config.js';
+  import { executeAction } from '$lib/client/actionClient';
+  import SiteShareDecision from '$lib/components/revenue/SiteShareDecision.svelte';
 
   // רכיבים מודרניים חדשים
   import CardHeader from './CardHeader.svelte';
@@ -43,6 +48,7 @@
    * @property {any} [hervach]
    * @property {any} [siteShare]
    * @property {any} [projectId]
+   * @property {any} [tosplitId]
    *
    * // Props חדשים למודרניזציה
    * @property {string} [glowColor]
@@ -82,6 +88,7 @@
     hervach = [],
     siteShare = null,
     projectId,
+    tosplitId = null,
 
     // מודרניזציה Props
     glowColor = 'gold', // צבע זהב כברירת מחדל לחלוקה
@@ -93,7 +100,72 @@
   let user_1s = $derived.by(() => {
     return getProjectData(projectId, 'us') || [];
   });
-  let ulist = $state([]);
+  // Build the per-member table from TWO sources, each for what it actually carries:
+  //  • hervachti → each member's fair profit share ("מגיע", `amount`) + role flags.
+  //    The `amount` here is the proportional share, NOT a transfer — so it can't
+  //    tell us who actually paid whom how much.
+  //  • halukot (the real halukas) → the actual transfers (usersend→userrecive→amount),
+  //    mirroring exactly what the send screen (whowhat) computed and stored.
+  // "בפועל" = fair share + what they gave away − what they received. This matches
+  // the send-screen display because both read from the same stored transfers.
+  // (The query must fetch halukas{ usersend userrecive amount } — see 83levMainUserQuery.)
+  let ulist = $derived.by(() => {
+    if (!hervach || hervach.length === 0) return [];
+
+    const rows = new Map(); // uid → row
+
+    for (const item of hervach) {
+      const user =
+        item?.users_permissions_user?.data || item?.users_permissions_user;
+      if (!user) continue;
+      const uid = String(user.id ?? user);
+      const username =
+        user.attributes?.username ||
+        user.username ||
+        getProjectData(projectId, 'un', uid) ||
+        'Unknown';
+      rows.set(uid, {
+        uid,
+        username,
+        x: item?.amount || 0, // מגיע — fair profit share
+        ihave: 0,
+        noten: 0, // total given (from halukot)
+        meca: 0, // total received (from halukot)
+        le: [],
+        isMekabel: !!item?.mekabel,
+        isNoten: !!item?.noten
+      });
+    }
+
+    // Apply the real transfers — the only place the actual paid amounts live.
+    const transfers = Array.isArray(halukot) ? halukot : [];
+    for (const h of transfers) {
+      const a = h?.attributes || h || {};
+      const fromId = String(a.usersend?.data?.id ?? a.usersend?.id ?? '');
+      const toId = String(a.userrecive?.data?.id ?? a.userrecive?.id ?? '');
+      const amount = a.amount || 0;
+      if (amount <= 0.001) continue;
+
+      const giver = rows.get(fromId);
+      const receiver = rows.get(toId);
+      if (giver) {
+        giver.noten += amount;
+        giver.le.push({
+          le: receiver?.username || getProjectData(projectId, 'un', toId) || '—',
+          leid: toId,
+          cama: amount
+        });
+      }
+      if (receiver) receiver.meca += amount;
+    }
+
+    // "בפועל" = fair share + what they gave away − what they received.
+    for (const u of rows.values()) {
+      u.ihave = u.x + u.noten - u.meca;
+    }
+
+    return Array.from(rows.values());
+  });
 
   // Platform (1💗1) service-share row. Renders only when this proposal actually
   // carries a site share AND the main-rikma identity resolved (logo/name/link).
@@ -126,113 +198,123 @@
             : 'Pending'
   );
 
-  function processSplitDetails() {
-    if (!hervach) {
-      console.log('Missing hervach data:', { hervach });
-      return;
-    }
+  // ── M2.4: per-member personal site-share (gate 2 — the approving member
+  // decides their OWN contribution out of their own share). The tosplit already
+  // exists here, so we call decideSiteShare directly with its id. Independent of
+  // the collective `siteShare` row above (PLAN_SITE_SHARE_PER_MEMBER §2).
+  let myId = $state(null); // current member, from the id cookie
+  let initialDecision = $state(null); // existing record loaded for prefill / echo of last save
+  let ssBusy = $state(false);
+  let aggregate = $state(null); // { sum, decidedCount } across all members (§6)
 
-    if (hervach.length === 0) {
-      console.log('Empty hervach array');
-      return;
-    }
+  // N = members who owe a decision (earned a share in this split).
+  let ssMemberCount = $derived(ulist.filter((u) => Number(u.x) > 0).length);
+  // Running "members gave ₪X · Y/N decided" — only meaningful once loaded.
+  let showAggregate = $derived(
+    aggregate != null && String(projectId) !== String(platformProjectId) && ssMemberCount > 0
+  );
 
-    console.log('Processing split details from hervach:', {
-      hervachLength: hervach.length,
-      hervach
-    });
+  // This member's fair share ("מגיע") — the basis computeSiteShare runs on.
+  let myShare = $derived(
+    myId != null ? (ulist.find((u) => String(u.uid) === String(myId))?.x ?? 0) : 0
+  );
+  let myProposed = $derived(
+    myShare > 0
+      ? computeSiteShare({
+          payerRole: 'provider',
+          baseAmount: myShare,
+          matbea: '2',
+          config: DEFAULT_SITE_SHARE_CONFIG
+        }).siteAmount
+      : 0
+  );
+  // recive_project — the platform rikma. Resolved from the store (already loaded
+  // for the collective row); the volunteer receiver is chosen later (M4).
+  let platformProjectId = $derived(
+    $platformStore.configured && $platformStore.projectId
+      ? String($platformStore.projectId)
+      : null
+  );
+  // Offer the decision only when: this is a real tosplit, a platform exists, this
+  // rikma isn't the platform itself, and the member earned a share to give from.
+  let showMySiteShare = $derived(
+    !!tosplitId &&
+      platformProjectId != null &&
+      String(projectId) !== String(platformProjectId) &&
+      myShare > 0
+  );
 
-    let tempUlist = [];
-    let givers = [];
-    let receivers = [];
-
-    let totalAmount = 0;
-    for (let i = 0; i < hervach.length; i++) {
-      totalAmount += hervach[i]?.amount || 0;
-    }
-
-    for (let i = 0; i < hervach.length; i++) {
-      let item = hervach[i];
-      let user =
-        item?.users_permissions_user?.data || item?.users_permissions_user;
-      let amount = item?.amount || 0;
-      let isMekabel = item?.mekabel || false;
-      let isNoten = item?.noten || false;
-
-      console.log(`Hervach ${i}:`, { item, user, amount, isMekabel, isNoten });
-
-      if (user) {
-        let userId = user.id || user;
-        let username =
-          user.attributes?.username ||
-          user.username ||
-          getProjectData(projectId, 'un', userId) ||
-          'Unknown';
-
-        let userObj = {
-          uid: userId,
-          username: username,
-          x: amount,
-          p: 0,
-          ihave: isNoten ? totalAmount : 0,
-          meca: isMekabel ? amount : 0,
-          noten: 0,
-          le: [],
-          isMekabel: isMekabel,
-          isNoten: isNoten
-        };
-
-        tempUlist.push(userObj);
-
-        if (isNoten) {
-          givers.push(userObj);
-        }
-        if (isMekabel) {
-          receivers.push(userObj);
-        }
-      }
-    }
-
-    console.log('After hervach processing:', { tempUlist, givers, receivers });
-
-    for (let giver of givers) {
-      let totalGiving = 0;
-
-      for (let receiver of receivers) {
-        if (receiver.meca <= 0) continue;
-
-        let transferAmount = receiver.x;
-
-        if (transferAmount > 0.01) {
-          giver.le.push({
-            le: receiver.username,
-            leid: receiver.uid,
-            cama: transferAmount
-          });
-
-          totalGiving += transferAmount;
-
-          console.log(
-            `Transfer calculated: ${giver.username} -> ${receiver.username}: ${transferAmount}`
-          );
-        }
-      }
-      giver.noten = totalGiving;
-    }
-
-    for (let user of tempUlist) {
-      if (user.isMekabel) {
-        user.meca = user.x;
-      }
-    }
-
-    console.log('Final ulist with transfers:', tempUlist);
-    ulist = tempUlist;
+  function readIdCookie() {
+    if (typeof document === 'undefined') return null;
+    return (
+      document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('id='))
+        ?.split('=')[1] ?? null
+    );
   }
 
-  $effect(() => {
-    processSplitDetails();
+  async function loadAggregate() {
+    if (!tosplitId) return;
+    try {
+      const res = await executeAction('getSiteShareAggregate', {
+        tosplitId: String(tosplitId)
+      });
+      if (res?.success) aggregate = res.data;
+    } catch (e) {
+      console.error('[SiteShare] load aggregate failed:', e);
+    }
+  }
+
+  onMount(async () => {
+    myId = readIdCookie();
+    if (!tosplitId) return;
+    // Prefill from any existing decision so re-opening shows the prior choice,
+    // and load the running aggregate for the "members gave ₪X" line.
+    try {
+      const res = await executeAction('getSiteShareDecision', {
+        tosplitId: String(tosplitId)
+      });
+      if (res?.success && res.data?.found) initialDecision = res.data.decision;
+    } catch (e) {
+      console.error('[SiteShare] load decision failed:', e);
+    }
+    await loadAggregate();
   });
+
+  async function onMyDecide(payload) {
+    if (ssBusy) return;
+    ssBusy = true;
+    try {
+      const res = await executeAction('decideSiteShare', {
+        tosplitId: String(tosplitId),
+        projectId: String(projectId),
+        recive_project: platformProjectId ? String(platformProjectId) : undefined,
+        decision: payload.decision,
+        amount: payload.amount,
+        direction: payload.direction,
+        reason: payload.reason,
+        proposedAmount: myProposed,
+        basisAmount: myShare
+      });
+      if (res?.success) {
+        // Reflect the saved state so the card shows "settled" on next render.
+        initialDecision = {
+          des_status: payload.decision,
+          amount: payload.amount,
+          direction: payload.direction,
+          reason: payload.reason
+        };
+        await loadAggregate(); // my decision changed the running total
+      } else {
+        console.error('[SiteShare] member decision failed:', res?.error);
+      }
+    } catch (e) {
+      console.error('[SiteShare] member decision error:', e);
+    } finally {
+      ssBusy = false;
+    }
+  }
 
   function hover(x) {
     onHover?.({ x: x });
@@ -568,6 +650,38 @@
             </tbody>
           </table>
         </div>
+      </div>
+    {/if}
+
+    {#if showAggregate}
+      <!-- §6 running aggregate: members' contributions to 1💗1 so far. -->
+      <div
+        class="mt-2 flex items-center justify-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 px-3 py-2 text-xs font-semibold text-amber-700 dark:text-amber-300"
+      >
+        {#if $lang === 'he'}
+          <span>חברי הרקמה נתנו עד כה {aggregate.sum.toFixed(2)} ל‑1💗1</span>
+          <span class="opacity-70">·</span>
+          <span>{aggregate.decidedCount}/{ssMemberCount} החליטו</span>
+        {:else}
+          <span>Members gave {aggregate.sum.toFixed(2)} to 1💗1 so far</span>
+          <span class="opacity-70">·</span>
+          <span>{aggregate.decidedCount}/{ssMemberCount} decided</span>
+        {/if}
+      </div>
+    {/if}
+
+    {#if showMySiteShare}
+      <!-- Gate 2: the approving member's PERSONAL site-share decision. -->
+      <div class="mt-2">
+        {#key myId}
+          <SiteShareDecision
+            proposed={myProposed}
+            basis={myShare}
+            initial={initialDecision}
+            busy={ssBusy}
+            onDecide={onMyDecide}
+          />
+        {/key}
       </div>
     {/if}
   </div>

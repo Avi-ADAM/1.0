@@ -291,6 +291,13 @@ export type ActionKey =
   | 'createChatMessage'
   | 'getPlatformProject'
   | 'createPlatformSale'
+  | 'decideSiteShare'
+  | 'getSiteShareDecision'
+  | 'getSiteShareAggregate'
+  | 'getOpenSiteShareDecisions'
+  | 'seedSiteShareDecisions'
+  | 'createSiteShareTransfer'
+  | 'getSiteSharePayables'
   ;
 
 

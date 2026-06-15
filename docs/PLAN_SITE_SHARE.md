@@ -3,6 +3,10 @@
 > תכנית בלבד — בלי קוד. בנוי על התשתית הקיימת של Tosplit/Haluka/Hervachti, ומשלים את
 > [PLAN_CONCIERGE.md](../PLAN_CONCIERGE.md) ו‑[PLAN_SHARED_PURCHASE.md](./PLAN_SHARED_PURCHASE.md).
 > נכתב: 2026-06-02
+>
+> **⚠️ עדכון מודל (2026-06-15):** §3–§6 (חלק‑אתר קולקטיבי, מנוכה מהקופה) **הוחלפו** במודל
+> **אישי פר‑חבר** ב‑[PLAN_SITE_SHARE_PER_MEMBER.md](./PLAN_SITE_SHARE_PER_MEMBER.md). שאר
+> הסעיפים (§2 רקמה ראשית, §2.5 מוצר/תקרה, §3.2 computeSiteShare, §11 סיכונים) בתוקף.
 
 ---
 

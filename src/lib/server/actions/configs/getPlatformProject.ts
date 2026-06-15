@@ -30,7 +30,7 @@ const handler: ActionExecutionHandler = async (_params, context, { strapi }) => 
 
   const members = node.attributes?.user_1s?.data ?? [];
   const treasuryUserId = members.length > 0 ? String(members[0].id) : null;
-
+  console.log('[getPlatformProject] treasuryUserId', treasuryUserId, node.id);
   return {
     data: {
       configured: Boolean(treasuryUserId),

@@ -291,6 +291,19 @@ export interface SaleData {
   senderconf?: boolean;
   halukaConfirmed?: boolean;
 
+  // Site-share income (platform rikma is the receiver): one transfer Haluka per
+  // contributing member (giver → chosen volunteer), each confirmed both-sides.
+  isSiteShareIncome?: boolean;
+  transferHalukas?: {
+    id: string;
+    amount?: number | null;
+    senderconf: boolean;
+    confirmed: boolean;
+    forumId?: string | null;
+    sender?: { id: string; username: string; profilePic?: string } | null;
+    receiver?: { id: string; username: string; profilePic?: string } | null;
+  }[];
+
   // Additional fields
   matanots?: any[];
   equaliSplited?: boolean;
@@ -335,6 +348,39 @@ export interface ProductRequestData {
   timegramaId?: string;
   timegramaDate?: string;
 
+  [key: string]: any;
+}
+
+/** A committed-but-unpaid site-share contribution this member still owes to the
+ *  platform (1💗1). Surfaced as a swiper card so the member can pick a volunteer
+ *  receiver and send the transfer (PLAN_SITE_SHARE_PER_MEMBER §5, M4). */
+export interface SiteSharePayableData {
+  contributionId: string;
+  amount: number;
+  projectId: string;        // the giving rikma (where the member is a member)
+  reciveProjectId?: string; // the platform rikma receiving the income
+  sheirutId?: string;
+  volunteers: { id: string; username: string; profilePic?: string }[];
+  rikmaName?: string;
+  rikmaLogo?: string;
+  [key: string]: any;
+}
+
+/**
+ * An OPEN (pending) site-share decision whose split is no longer shown as a
+ * haluka card (e.g. the split auto-approved by time). Surfaced as a dedicated
+ * swiper card that explains the already-approved split and asks the member to
+ * ratify their personal giving. Replaces the old top-of-page reminder banner.
+ */
+export interface OpenSiteShareDecisionData {
+  contributionId: string;
+  tosplitId: string;
+  projectId: string;          // the giving rikma
+  reciveProjectId?: string;   // the platform rikma
+  projectName?: string;
+  projectLogo?: string;
+  proposedAmount: number;
+  basisAmount: number;
   [key: string]: any;
 }
 
@@ -414,6 +460,12 @@ export const salesStore: Writable<SaleData[]> = writable([]);
 
 /** My purchases (sheiruts where I am the customer) */
 export const purchasesStore: Writable<SaleData[]> = writable([]);
+
+/** Committed-but-unpaid site-share contributions I still owe the platform */
+export const siteSharePayablesStore: Writable<SiteSharePayableData[]> = writable([]);
+
+/** Open (pending) site-share decisions whose split already auto-approved */
+export const openSiteShareDecisionsStore: Writable<OpenSiteShareDecisionData[]> = writable([]);
 
 // ========== UI State Stores ==========
 
