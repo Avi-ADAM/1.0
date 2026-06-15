@@ -2,7 +2,6 @@
   import { userName } from '../../stores/store.js';
   import { show } from '../registration/store-show.js';
   import  Hello  from '../registration/hello.svelte'
-  import  Password from '../registration/password.svelte'
    import { goto, prefetch } from '$app/navigation';
 
   import {
@@ -84,11 +83,6 @@ function add (event){
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}"> 
    <Scree onProgres={add}/> 
    </div>  -->
-  {:else if show_value == 5}
-    <div class="midscreen"
- transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}"> 
-   <Password onProgres={add}/> 
-   </div>  
   {:else if show_value == 6}
   <div class="midscreen"
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}">

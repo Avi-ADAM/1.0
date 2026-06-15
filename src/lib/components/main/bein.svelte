@@ -363,7 +363,7 @@
         >
           <Workways onProgres={add} />
         </div>
-      {:else if show_value === 5}
+      {:else if show_value === 5 && mode !== 'onboarding'}
         <div
           class="step-wrap"
           dir={$lang === 'en' ? 'ltr' : 'rtl'}
