@@ -110,7 +110,7 @@
     </div>
 
     <div class="actions">
-      <a href="/me" class="btn btn-skip">{$t('onboard.actions.skip')}</a>
+      <a href="/hub" class="btn btn-skip">{$t('onboard.actions.skip')}</a>
       <button class="btn btn-barbi" onclick={go} disabled={going}>
         {#if going}<span class="spin">⟳</span>
           {$t('onboard.actions.going')}{:else}{$t(

@@ -107,14 +107,15 @@
       badge: 'ריקמה היא קבוצת שיתוף פעולה — כל אחד תורם את הכישורים שלו ומרוויח לפי תרומתו',
       members: 'חברי הריקמה — עיגול ירוק פועם = חבר שעובד עכשיו לטובת הפרויקט. לחיצה על תמונה עוברת לפרופיל',
       tabsIntro: 'הטאבים הם מרכז הניהול של הריקמה — כל טאב מציג היבט אחר של הפרויקט',
-      create: '📋 יצירה: יוצרים משימות ומבקשים משאבים (כסף, ציוד, מידע) — הן עבור חברי הפרויקט הקיימים, והן כדי לאתר שותפים ושותפות חדשים שיבצעו את המשימה או יספקו את המשאב. אפשר גם לבנות תהליכים מורכבים משלבים',
+      create: '📋 יצירה: יוצרים משימות ומבקשים משאבים (כסף, ציוד, מידע) — הן עבור חברי הפרויקט הקיימים, והן כדי לאתר שותפים ושותפות חדשים. כל משימה או משאב שתפרסמו מקבלים לינק שיתוף לדף ייחודי ויפיפה — מותאם לרשתות חברתיות ולגיוס שותפים',
       progress: '🔄 בתהליך: רשימת כל המשימות הפעילות — מי עובד על מה ובאיזה שלב',
       acts: '✅ פעולות ומטלות: ניהול המשימות הקטנות — מה נגמר, מה בדרך',
       timers: '⏱️ טיימרים: כאן רואים מתי כל חבר פרויקט היה פעיל לטובת הפרויקט ומה עשה. כשחבר מפעיל טיימר מופיע עיגול ירוק מסביב לתמונה שלו למעלה',
       wishes: '💌 משאלות נכנסות: לידים חמים מלקוחות הקונסיירז\' שהפרויקט שלכם מתאים לתת להם שירות או מוצר — הזדמנויות עסקיות מוכנות',
-      sales: '🛒 מכירות ומוצרים: יצירת מוצרים פשוטים ומורכבים, מעקב אחרי מכירות והכנסות הריקמה',
+      sales: '🛒 מכירות ומוצרים: מוצר פשוט = מחיר קבוע. מוצר מורכב = מחיר שמתגבש תוך כדי תהליך הקניה — לפי משימות, משאבים והחלטות שמתקבלות יחד עם הלקוח. כל מוצר מקבל דף יפיפה מותאם לשיתוף ולקבלת לקוחות',
       split: '💰 חלוקה: מחשבון חלוקת ההכנסות — כל אחד מקבל לפי מה שתרם',
-      votes: '🗳️ הצבעות: קבלת החלטות דמוקרטית — כל חבר ריקמה יכול להציע ולהצביע',
+      votes: '🗳️ הצבעות: קבלת החלטות מתוך קונצנזוס — משא ומתן בכלים ייחודיים עד שכולם שמחים עם התוצאה. לא הצבעת רוב אלא הסכמה אמיתית של כל חברי הריקמה',
+      chains: '🔗 שרשראות: כל משימה ומשאב לאורך כל חייהם — מהצעת הפתיחה דרך ההצבעה ועד לארכיון. שקיפות מלאה והבנה עמוקה של כל תהליך בפרויקט',
       gantt: '📊 גאנט וקאנבן: ניהול ויזואלי של הפרויקט ולוח זמנים',
       helpBtn: 'הצגת מדריך מחדש'
     },
@@ -122,14 +123,15 @@
       badge: 'FreeMates is a collaboration group — everyone contributes their skills and earns according to their contribution',
       members: 'FreeMates members — a pulsing green ring means a member is currently working on the project. Click a photo to visit their profile',
       tabsIntro: 'The tabs are the management hub of the FreeMates — each tab shows a different aspect of the project',
-      create: '📋 Create: add missions and request resources (money, gear, info) — both for existing project members and to attract new partners who will carry out the mission or provide the resource. You can also build multi-step complex processes',
+      create: '📋 Create: add missions and request resources (money, gear, info) — for existing members or to find new partners. Every published mission or resource gets a unique shareable link with a beautiful page optimized for social networks and partner recruitment',
       progress: '🔄 Progress: list of all active missions — who is working on what and at which stage',
       acts: '✅ Acts & Tasks: manage small tasks — what is done, what is on the way',
       timers: '⏱️ Timers: see when each member was active for the project and what they worked on. When a member starts a timer, a green ring appears around their avatar above',
       wishes: '💌 Incoming Wishes: warm leads from concierge customers that your project is a match for — ready business opportunities',
-      sales: '🛒 Sales & Products: create simple and complex products, track sales and revenue',
+      sales: '🛒 Sales & Products: Simple product = fixed price. Complex product = price shaped by missions, resources and decisions made together during the purchase process. Every product gets a beautiful shareable page optimized for social media and attracting customers',
       split: '💰 Split: revenue-split calculator — everyone gets paid according to their contribution',
-      votes: '🗳️ Votes: democratic decision-making — every member can propose and vote',
+      votes: '🗳️ Votes: decisions made through consensus — unique negotiation tools until everyone is genuinely happy with the outcome. Not majority vote, but real agreement from all FreeMates members',
+      chains: '🔗 Chains: every mission and resource across its entire lifecycle — from the opening proposal through voting all the way to the archive. Full transparency and deep understanding of every project process',
       gantt: '📊 Gantt & Kanban: visual project management and timeline',
       helpBtn: 'Show guide again'
     },
@@ -137,14 +139,15 @@
       badge: 'FreeMates مجموعة تعاون — كل شخص يساهم بمهاراته ويكسب وفقاً لمساهمته',
       members: 'أعضاء المجموعة — حلقة خضراء نابضة = عضو يعمل الآن. انقر على صورة للذهاب إلى ملفهم الشخصي',
       tabsIntro: 'التبويبات هي مركز إدارة المجموعة — كل تبويب يعرض جانباً مختلفاً من المشروع',
-      create: '📋 إنشاء: أنشئ مهام واطلب موارد — للأعضاء الحاليين أو لاستقطاب شركاء جدد ينجزون المهمة أو يوفرون المورد. يمكنك أيضاً بناء عمليات متعددة المراحل',
+      create: '📋 إنشاء: أنشئ مهام واطلب موارد — للأعضاء الحاليين أو لاستقطاب شركاء جدد. كل مهمة أو مورد تنشره يحصل على رابط مشاركة لصفحة فريدة وجميلة مناسبة للشبكات الاجتماعية',
       progress: '🔄 قيد التنفيذ: قائمة بجميع المهام النشطة',
       acts: '✅ الأعمال والمهام: إدارة المهام الصغيرة',
       timers: '⏱️ المؤقتات: شاهد متى كان كل عضو نشطاً وماذا عمل. عند تشغيل مؤقت تظهر حلقة خضراء حول صورته',
       wishes: '💌 الرغبات الواردة: عملاء محتملون من الكونسيرج يناسبهم مشروعكم — فرص عمل جاهزة',
-      sales: '🛒 المبيعات والمنتجات: إنشاء منتجات بسيطة ومعقدة وتتبع الإيرادات',
+      sales: '🛒 المبيعات والمنتجات: منتج بسيط = سعر ثابت. منتج معقد = سعر يتشكل خلال عملية الشراء بناءً على المهام والموارد والقرارات المشتركة. كل منتج يحصل على صفحة جميلة للمشاركة',
       split: '💰 التقسيم: حاسبة توزيع الإيرادات',
-      votes: '🗳️ التصويتات: اتخاذ القرارات ديمقراطياً',
+      votes: '🗳️ التصويتات: قرارات من خلال إجماع — تفاوض بأدوات فريدة حتى يكون الجميع سعداء بالنتيجة. ليس تصويت أغلبية بل اتفاق حقيقي',
+      chains: '🔗 السلاسل: كل مهمة ومورد عبر دورة حياتهم الكاملة — من الاقتراح الأولي مروراً بالتصويت وحتى الأرشيف. شفافية كاملة وفهم عميق لكل عملية',
       gantt: '📊 جانت وكانبان: إدارة المشروع بصرياً',
       helpBtn: 'عرض الدليل مجدداً'
     }
@@ -491,6 +494,7 @@
           <TourItem message={tour.sales}><span class="tour-anchor"></span></TourItem>
           <TourItem message={tour.split}><span class="tour-anchor"></span></TourItem>
           <TourItem message={tour.votes}><span class="tour-anchor"></span></TourItem>
+          <TourItem message={tour.chains}><span class="tour-anchor"></span></TourItem>
           <TourItem message={tour.gantt}><span class="tour-anchor"></span></TourItem>
         </div>
 
