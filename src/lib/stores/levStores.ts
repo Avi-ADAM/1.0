@@ -363,6 +363,14 @@ export interface SiteSharePayableData {
   volunteers: { id: string; username: string; profilePic?: string }[];
   rikmaName?: string;
   rikmaLogo?: string;
+  // Transfer state — set once createSiteShareTransfer has run. When `halukaId`
+  // is present the card switches from "pick a receiver & send" to the
+  // both-sides confirmation flow (chat + "I sent", like the regular transfer).
+  halukaId?: string | null;
+  transferSenderconf?: boolean;
+  transferConfirmed?: boolean;
+  transferForumId?: string | null;
+  receiver?: { id: string; username: string; profilePic?: string } | null;
   [key: string]: any;
 }
 

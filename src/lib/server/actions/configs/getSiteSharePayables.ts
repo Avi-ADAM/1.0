@@ -29,7 +29,16 @@ const handler: ActionExecutionHandler = async (_params, context, { strapi }) => 
     const a = row.attributes ?? {};
     const amount = Number(a.amount) || 0;
     if (amount <= 0) continue; // 0/skip never owes a transfer
-    if (a.haluka?.data?.id) continue; // already transferred
+
+    // A transfer Haluka may already exist. If it's fully settled (both sides
+    // confirmed) the money is done — drop it. If it exists but isn't settled,
+    // KEEP it so the giver can still coordinate via chat and confirm "I sent",
+    // exactly like the regular money-transfer card.
+    const haluka = a.haluka?.data ?? null;
+    const ha = haluka?.attributes ?? null;
+    const transferSenderconf = !!ha?.senderconf;
+    const transferConfirmed = !!ha?.confirmed;
+    if (haluka?.id && transferSenderconf && transferConfirmed) continue; // settled
 
     const sheirut = a.sheirut?.data ?? null;
     const volunteers = (sheirut?.attributes?.iCanGetMonay?.data ?? []).map((u: any) => ({
@@ -40,6 +49,16 @@ const handler: ActionExecutionHandler = async (_params, context, { strapi }) => 
 
     const sourceRikma = a.tosplit?.data?.attributes?.project?.data ?? null;
 
+    // The chosen receiver (from the created transfer Haluka, if any).
+    const recNode = ha?.userrecive?.data ?? null;
+    const receiver = recNode
+      ? {
+          id: String(recNode.id),
+          username: recNode.attributes?.username ?? '',
+          profilePic: recNode.attributes?.profilePic?.data?.attributes?.url ?? null,
+        }
+      : null;
+
     payables.push({
       contributionId: String(row.id),
       amount,
@@ -49,6 +68,14 @@ const handler: ActionExecutionHandler = async (_params, context, { strapi }) => 
       volunteers,
       rikmaName: sourceRikma?.attributes?.projectName ?? '',
       rikmaLogo: sourceRikma?.attributes?.profilePic?.data?.attributes?.url ?? null,
+      // Transfer state — present once createSiteShareTransfer has run. When set,
+      // the card switches from "pick a receiver & send" to the both-sides
+      // confirmation flow (SheirutHalukaCard).
+      halukaId: haluka?.id ? String(haluka.id) : null,
+      transferSenderconf,
+      transferConfirmed,
+      transferForumId: ha?.forum?.data?.id ? String(ha.forum.data.id) : null,
+      receiver,
     });
   }
 
