@@ -56,7 +56,11 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     };
   }
 
-  if (!receiverId || String(receiverId) === userId) {
+  // A receiver is required, but it MAY be the sender themselves: if the giver is
+  // also a member of the platform (1💗1) rikma there's nothing wrong with them
+  // "receiving" their own site-share — it's recorded like a sale (the money sits
+  // with the receiver) and the platform rikma settles it internally afterwards.
+  if (!receiverId) {
     return { data: { success: false, error: 'invalid_receiver' }, updateStrategy: { type: 'none' } };
   }
 

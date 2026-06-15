@@ -21,7 +21,9 @@
     senderconf = $bindable(false),
     confirmed = $bindable(false),
     myId,
-    projectId
+    projectId,
+    onEnsureHaluka = null,
+    oncomplete = null
   }: {
     halukaId: string;
     senderId: string;
@@ -36,7 +38,28 @@
     confirmed?: boolean;
     myId: string;
     projectId: string;
+    /**
+     * Optional lazy-creation hook. When `halukaId` is empty the Haluka doesn't
+     * exist yet — the FIRST action (open chat / confirm sent) calls this to
+     * materialise it and returns its id. Callers that already have a Haluka pass
+     * a real `halukaId` and leave this null, so the path never triggers for them.
+     */
+    onEnsureHaluka?: (() => Promise<string | null>) | null;
+    /** Fired once a confirmation makes BOTH sides confirmed (transfer done). */
+    oncomplete?: (() => void) | null;
   } = $props();
+
+  // Resolve the working Haluka id, creating it on demand the first time a
+  // participant acts. Returns null if creation failed (the caller toasts).
+  let ensuredId: string | null = $state(null);
+  async function resolveHalukaId(): Promise<string | null> {
+    if (halukaId) return String(halukaId);
+    if (ensuredId) return ensuredId;
+    if (!onEnsureHaluka) return null;
+    const id = await onEnsureHaluka();
+    if (id) ensuredId = String(id);
+    return ensuredId;
+  }
 
   const isSender = $derived(String(myId) === String(senderId));
   const isReceiver = $derived(String(myId) === String(receiverId));
@@ -67,18 +90,21 @@
     if (isProcessing || senderconf) return;
     isProcessing = true;
     try {
+      const hid = await resolveHalukaId();
+      if (!hid) throw new Error('no_haluka');
       const res = await fetch('/api/action', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           actionKey: 'confirmSheirutHaluka',
-          params: { halukaId: String(halukaId), role: 'sender' }
+          params: { halukaId: hid, role: 'sender' }
         })
       });
       const result = await res.json();
       if (!result.success) throw new Error(result.error?.message || 'Failed');
       senderconf = true;
       toast.success(t.senderConfirmed[$lang]);
+      if (confirmed) oncomplete?.();
     } catch (err) {
       console.error(err);
       toast.error(t.error[$lang]);
@@ -91,18 +117,21 @@
     if (isProcessing || confirmed) return;
     isProcessing = true;
     try {
+      const hid = await resolveHalukaId();
+      if (!hid) throw new Error('no_haluka');
       const res = await fetch('/api/action', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           actionKey: 'confirmSheirutHaluka',
-          params: { halukaId: String(halukaId), role: 'receiver' }
+          params: { halukaId: hid, role: 'receiver' }
         })
       });
       const result = await res.json();
       if (!result.success) throw new Error(result.error?.message || 'Failed');
       confirmed = true;
       toast.success(t.receiverConfirmed[$lang]);
+      if (senderconf) oncomplete?.();
     } catch (err) {
       console.error(err);
       toast.error(t.error[$lang]);
@@ -119,12 +148,14 @@
     if (!chatForumId) {
       isOpeningChat = true;
       try {
+        const hid = await resolveHalukaId();
+        if (!hid) throw new Error('no_haluka');
         const res = await fetch('/api/action', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             actionKey: 'ensureHalukaForum',
-            params: { halukaId: String(halukaId), projectId: String(projectId) }
+            params: { halukaId: hid, projectId: String(projectId) }
           })
         });
         const result = await res.json();
@@ -144,7 +175,7 @@
     const md = {
       pid: Number(projectId),
       mbId: 0,
-      halukId: Number(halukaId),
+      halukId: Number(ensuredId ?? halukaId),
       senderId,
       receiverId,
       participants: [senderId, receiverId],
