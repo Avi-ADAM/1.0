@@ -91,6 +91,7 @@
     projectId,
     onProj
   } = $props();
+  console.log(recurring, recurringNoEnd, pricePerUnit, '1');
   let user_1s = $derived.by(() => {
     return getProjectData(projectId, 'us') || [];
   });
@@ -341,12 +342,18 @@
             onmouseleave={() => hover('0')}
             class="text-barbi dark:text-pink-400 font-bold"
           >
-            {(pricePerUnit > 0 ? pricePerUnit : easy > 0 ? easy : price).toLocaleString()}
+            {(pricePerUnit > 0
+              ? pricePerUnit
+              : easy > 0
+                ? easy
+                : price
+            ).toLocaleString()}
             ₪ {kindOf === 'yearly' ? 'לשנה' : 'לחודש'}
           </span>
           <span class="text-gray-400">·</span>
           <span
-            onmouseenter={() => hover('בכל חודש ייפתח חיוב לאישור ההוצאה בפועל')}
+            onmouseenter={() =>
+              hover('בכל חודש ייפתח חיוב לאישור ההוצאה בפועל')}
             onmouseleave={() => hover('0')}
             class="font-black text-gray-900 dark:text-white"
           >
@@ -538,7 +545,11 @@
   {#if user_1s && user_1s.length > 0}
     {#if isMobileOrTablet()}
       <div class="pt-2">
-        <VoteStatusDisplay votes={users || []} members={user_1s} {activeOrder} />
+        <VoteStatusDisplay
+          votes={users || []}
+          members={user_1s}
+          {activeOrder}
+        />
       </div>
     {/if}
   {:else}

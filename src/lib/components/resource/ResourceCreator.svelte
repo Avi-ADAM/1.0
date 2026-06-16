@@ -645,7 +645,8 @@
               >
                 <span
                   class="w-5 h-5 rounded-full bg-white transition-transform"
-                  class:translate-x-5={isRecurring}
+                  class:translate-x-5={isRecurring && $lang !== 'he'}
+                  class:-translate-x-5={isRecurring && $lang === 'he'}
                 ></span>
               </span>
             </button>

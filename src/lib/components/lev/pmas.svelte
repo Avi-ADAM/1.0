@@ -225,7 +225,7 @@
       const result = await executeAction('voteOnPmash', {
         pmashId: String(pendId),
         projectId: String(projectId),
-        what: true,
+        what: true
       });
       if (!result.success) {
         await invalidate(() => true); // roll back to server truth
@@ -279,7 +279,7 @@
         pmashId: String(pendId),
         projectId: String(projectId),
         what: false,
-        ...(whyText ? { why: whyText } : {}),
+        ...(whyText ? { why: whyText } : {})
       });
       loading = false;
       if (!result.success) {
@@ -364,7 +364,7 @@
         entityId: String(pendId),
         projectId: String(projectId),
         what: mypos,
-        why,
+        why
       });
       if (result.success) {
         const newDiunId = result.data?.newDiunId;
@@ -664,21 +664,34 @@ diunim = ` ${diu},`
                 <span
                   onmouseenter={() => hover('עלות חודשית משוערת')}
                   onmouseleave={() => hover('0')}
-                  style="color:var(--gold)">{pricePerUnit > 0 ? pricePerUnit : easy > 0 ? easy : price}</span
+                  style="color:var(--gold)"
+                  >{pricePerUnit > 0
+                    ? pricePerUnit
+                    : easy > 0
+                      ? easy
+                      : price}</span
                 >
-                <span style="color: aqua">₪ {kindOf === 'yearly' ? 'לשנה' : 'לחודש'}</span>
+                <span style="color: aqua"
+                  >₪ {kindOf === 'yearly' ? 'לשנה' : 'לחודש'}</span
+                >
               </p>
               <p class="recur-note">
                 {#if recurringNoEnd}
                   ♾️ ללא תאריך סיום — עד שיסומן כהושלם
                 {:else}
-                  עד {sqadualedf ? new Date(sqadualedf).toLocaleDateString('he-IL') : ''}
+                  עד {sqadualedf
+                    ? new Date(sqadualedf).toLocaleDateString('he-IL')
+                    : ''}
                 {/if}
               </p>
-              <p class="recur-badge"
-                onmouseenter={() => hover('בכל חודש ייפתח חיוב לאישור ההוצאה בפועל')}
+              <p
+                class="recur-badge"
+                onmouseenter={() =>
+                  hover('בכל חודש ייפתח חיוב לאישור ההוצאה בפועל')}
                 onmouseleave={() => hover('0')}
-              >🔁 משאב חוזר · אישרור חודשי</p>
+              >
+                🔁 משאב חוזר · אישרור חודשי
+              </p>
             </div>
           {:else if kindOf === 'perUnit'}
             <p class="p">
@@ -1029,6 +1042,9 @@ diunim = ` ${diu},`
     {nego_mashes}
     {timeGramaDate}
     {location}
+    {recurring}
+    {recurringNoEnd}
+    {pricePerUnit}
     {projectId}
     {users}
     activeOrder={order}
