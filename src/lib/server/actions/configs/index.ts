@@ -87,6 +87,8 @@ import { getOpenSiteShareDecisionsConfig } from './getOpenSiteShareDecisions.js'
 import { seedSiteShareDecisionsConfig } from './seedSiteShareDecisions.js';
 import { createSiteShareTransferConfig } from './createSiteShareTransfer.js';
 import { getSiteSharePayablesConfig } from './getSiteSharePayables.js';
+import { getSiteShareArchiveConfig } from './getSiteShareArchive.js';
+import { getRikmaSplitsArchiveConfig } from './getRikmaSplitsArchive.js';
 import { createWorkWayConfig } from './createWorkWay.js';
 import { createMissionConfig } from './createMission.js';
 import { submitNegoMissionConfig } from './submitNegoMission.js';
@@ -254,6 +256,10 @@ export function registerAllActions(): void {
   registerAction(createSiteShareTransferConfig);
   // Site share (per-member) — M4: a member's committed-but-unpaid contributions
   registerAction(getSiteSharePayablesConfig);
+  // Site share (per-member) — M5: standing archive for the split screen (both sides)
+  registerAction(getSiteShareArchiveConfig);
+  // M5: comprehensive distribution archive — all tosplits + per-member all-time totals
+  registerAction(getRikmaSplitsArchiveConfig);
 
   // Mission creation (all 4 branches) + supporting read/create actions
   registerAction(getMissionForEditConfig);

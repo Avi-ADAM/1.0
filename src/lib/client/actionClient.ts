@@ -298,6 +298,8 @@ export type ActionKey =
   | 'seedSiteShareDecisions'
   | 'createSiteShareTransfer'
   | 'getSiteSharePayables'
+  | 'getSiteShareArchive'
+  | 'getRikmaSplitsArchive'
   ;
 
 
