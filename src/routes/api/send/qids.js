@@ -3744,6 +3744,18 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                         id
                       }
                     }
+                    mashabetahaliches(filters: { recurring: { eq: true } }) {
+                      data {
+                        id
+                        attributes {
+                          recurring
+                          pricePerUnit
+                          start
+                          end
+                          status_mashab
+                        }
+                      }
+                    }
                     timegrama {
                       data {
                         id

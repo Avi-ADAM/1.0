@@ -1481,6 +1481,11 @@ export function processPmashes(
       sqadualed: pmash.sqadualed,
       sqadualedf: pmash.sqadualedf,
 
+      // Recurring expense flags (open-ended monthly/yearly cost, approved monthly)
+      recurring: pmash.recurring === true,
+      recurringNoEnd: pmash.recurringNoEnd === true,
+      pricePerUnit: pmash.pricePerUnit,
+
       // Timegrama
       timegramaId: pmash.timegramaId,
       timeGramaDate: pmash.timegramaDate,

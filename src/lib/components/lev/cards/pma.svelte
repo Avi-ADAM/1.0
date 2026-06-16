@@ -71,6 +71,9 @@
     monts,
     yers,
     hm,
+    recurring = false,
+    recurringNoEnd = false,
+    pricePerUnit = 0,
     already = $bindable(),
     allr = false,
     nego_mashes = [],
@@ -271,7 +274,11 @@
   <CardHeader
     logoSrc={src}
     {projectName}
-    cardType={hasUpdatedOffer ? 'הצעה מתוקנת' : 'אישור משאב'}
+    cardType={hasUpdatedOffer
+      ? 'הצעה מתוקנת'
+      : recurring
+        ? '🔁 משאב חוזר · אישרור חודשי'
+        : 'אישור משאב'}
     cardTitle={name}
     memberCount={noofusersOk + noofusersWaiting + noofusersNo}
     {glowColor}
@@ -328,7 +335,24 @@
           alt="howmuch"
         />
 
-        {#if kindOf === 'perUnit'}
+        {#if recurring}
+          <span
+            onmouseenter={() => hover('עלות חודשית משוערת')}
+            onmouseleave={() => hover('0')}
+            class="text-barbi dark:text-pink-400 font-bold"
+          >
+            {(pricePerUnit > 0 ? pricePerUnit : easy > 0 ? easy : price).toLocaleString()}
+            ₪ {kindOf === 'yearly' ? 'לשנה' : 'לחודש'}
+          </span>
+          <span class="text-gray-400">·</span>
+          <span
+            onmouseenter={() => hover('בכל חודש ייפתח חיוב לאישור ההוצאה בפועל')}
+            onmouseleave={() => hover('0')}
+            class="font-black text-gray-900 dark:text-white"
+          >
+            {recurringNoEnd ? '♾️ ללא תאריך סיום' : 'משאב חוזר'}
+          </span>
+        {:else if kindOf === 'perUnit'}
           <span
             onmouseenter={() => hover('שווי ליחידה')}
             onmouseleave={() => hover('0')}

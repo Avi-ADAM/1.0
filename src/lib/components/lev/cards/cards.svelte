@@ -714,6 +714,9 @@
                       easy={buble.easy}
                       sqadualed={buble.sqadualed}
                       sqadualedf={buble.sqadualedf}
+                      recurring={buble.recurring}
+                      recurringNoEnd={buble.recurringNoEnd}
+                      pricePerUnit={buble.pricePerUnit}
                       linkto={buble.linkto}
                       location={buble.location}
                       pendId={buble.pendId}

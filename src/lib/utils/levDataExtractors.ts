@@ -509,6 +509,11 @@ export function extractPmashes(userData: any): PendResourceData[] {
         continue;
       }
 
+      // Recurring expense? (a draft mashabetahalich engine is linked to the pmash)
+      const engine = pmash.attributes.mashabetahaliches?.data?.[0]?.attributes;
+      const isRecurring = Boolean(engine?.recurring);
+      const recurringEnd = engine?.end ?? pmash.attributes.sqadualedf ?? null;
+
       pmashes.push({
         id: pmash.id,
         projectId: project.id,
@@ -532,7 +537,11 @@ export function extractPmashes(userData: any): PendResourceData[] {
         mashaabimId: pmash.attributes.mashaabim?.data?.id,
         timegramaId: pmash.attributes.timegrama?.data?.id,
         timegramaDate: pmash.attributes.timegrama?.data?.attributes?.date,
-        nego_mashes: pmash.attributes.nego_mashes || { data: [] }
+        nego_mashes: pmash.attributes.nego_mashes || { data: [] },
+        // Recurring expense flags
+        recurring: isRecurring,
+        recurringNoEnd: isRecurring && !recurringEnd,
+        pricePerUnit: engine?.pricePerUnit ?? pmash.attributes.easy ?? pmash.attributes.price ?? 0
       });
     }
   }

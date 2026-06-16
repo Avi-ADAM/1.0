@@ -93,6 +93,9 @@
     easy,
     sqadualed,
     sqadualedf,
+    recurring = false,
+    recurringNoEnd = false,
+    pricePerUnit = 0,
     pendId,
     users,
     linkto,
@@ -655,7 +658,29 @@ diunim = ` ${diu},`
           >
             {name}
           </h1>
-          {#if kindOf === 'perUnit'}
+          {#if recurring}
+            <div class="recur" dir="rtl">
+              <p class="p">
+                <span
+                  onmouseenter={() => hover('עלות חודשית משוערת')}
+                  onmouseleave={() => hover('0')}
+                  style="color:var(--gold)">{pricePerUnit > 0 ? pricePerUnit : easy > 0 ? easy : price}</span
+                >
+                <span style="color: aqua">₪ {kindOf === 'yearly' ? 'לשנה' : 'לחודש'}</span>
+              </p>
+              <p class="recur-note">
+                {#if recurringNoEnd}
+                  ♾️ ללא תאריך סיום — עד שיסומן כהושלם
+                {:else}
+                  עד {sqadualedf ? new Date(sqadualedf).toLocaleDateString('he-IL') : ''}
+                {/if}
+              </p>
+              <p class="recur-badge"
+                onmouseenter={() => hover('בכל חודש ייפתח חיוב לאישור ההוצאה בפועל')}
+                onmouseleave={() => hover('0')}
+              >🔁 משאב חוזר · אישרור חודשי</p>
+            </div>
+          {:else if kindOf === 'perUnit'}
             <p class="p">
               <span
                 onmouseenter={() => hover(' שווי ליחידה')}
@@ -944,6 +969,9 @@ diunim = ` ${diu},`
                 {hm}
                 {monts}
                 {yers}
+                {recurring}
+                {recurringNoEnd}
+                {pricePerUnit}
                 {easy}
                 {price}
                 {hearotMeyuchadot}
