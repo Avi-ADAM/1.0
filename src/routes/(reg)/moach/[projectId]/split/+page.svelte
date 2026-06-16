@@ -7,6 +7,7 @@
   import Lowding from '$lib/celim/lowding.svelte';
   import { lang } from '$lib/stores/lang.js';
   import Fini from '$lib/components/prPr/fini.svelte';
+  import SplitsArchive from '$lib/components/prPr/SplitsArchive.svelte';
 
   const moachStore = getMoachStore();
 
@@ -76,5 +77,6 @@
         users={base?.user_1s?.data || []}
       />
     </section>
+    <SplitsArchive {projectId} />
   {/if}
 </div>

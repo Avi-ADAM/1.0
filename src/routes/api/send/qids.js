@@ -1760,6 +1760,106 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }`,
 
+  // M5 archive (giving side): every DECIDED contribution this rikma's members made
+  // (project = the giving rikma) — committed `amount` + the transfer Haluka's settle
+  // state — so the split-screen archive can show "what we gave to 1💗1", per member,
+  // all-time. des_status quoted (StringFilterInput, per the backend gotcha).
+  "216getSiteShareContributionsByGivingProject": `query GetSiteShareContributionsByGivingProject($project: ID!) {
+    siteShareContributions(
+      filters: { and: [
+        { project: { id: { eq: $project } } },
+        { des_status: { eq: "decided" } }
+      ] },
+      pagination: { limit: 500 }
+    ) {
+      data {
+        id
+        attributes {
+          amount
+          users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          haluka { data { id attributes {
+            senderconf
+            confirmed
+            amount
+            userrecive { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          } } }
+        }
+      }
+    }
+  }`,
+
+  // M5 archive (receiving side): every DECIDED contribution whose recive_project is
+  // the platform — for the main-rikma split screen: total in, who received how much
+  // (grouped by the transfer Haluka's userrecive), and a per-source-rikma breakdown
+  // (grouped by the giving `project`).
+  "217getSiteShareContributionsByReciveProject": `query GetSiteShareContributionsByReciveProject($recive: ID!) {
+    siteShareContributions(
+      filters: { and: [
+        { recive_project: { id: { eq: $recive } } },
+        { des_status: { eq: "decided" } }
+      ] },
+      pagination: { limit: 500 }
+    ) {
+      data {
+        id
+        attributes {
+          amount
+          project { data { id attributes { projectName profilePic { data { attributes { url } } } } } }
+          users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          haluka { data { id attributes {
+            senderconf
+            confirmed
+            amount
+            userrecive { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          } } }
+        }
+      }
+    }
+  }`,
+
+  // M5 archive (all splits): every tosplit the rikma has had (finished + open),
+  // newest first, with each member's fair-share allocation (`hervachti.amount` =
+  // "מגיע") + the transfer halukas. Feeds the comprehensive distribution archive:
+  // per-split "who got how much" + per-member all-time totals + grand total.
+  "218getRikmaSplitsArchive": `query GetRikmaSplitsArchive($project: ID!) {
+    project(id: $project) {
+      data {
+        id
+        attributes {
+          tosplits(pagination: { limit: 500 }, sort: ["createdAt:desc"]) {
+            data {
+              id
+              attributes {
+                name
+                prectentage
+                finished
+                createdAt
+                hervachti {
+                  amount
+                  noten
+                  mekabel
+                  users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+                }
+                halukas {
+                  data {
+                    id
+                    attributes {
+                      amount
+                      confirmed
+                      senderconf
+                      usersend { data { id attributes { username profilePic { data { attributes { url } } } } } }
+                      userrecive { data { id attributes { username profilePic { data { attributes { url } } } } } }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
   "67getMembersCount": `query GetMembersCount {
     chezins {
       meta {
