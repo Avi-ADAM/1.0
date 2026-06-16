@@ -7457,7 +7457,10 @@ export const moachQids = {
       }
       pagination: { limit: 1 }
     ) {
-      data { id attributes { pricePerUnit kindOf start end cycleSize } }
+      data { id attributes {
+        pricePerUnit kindOf start end cycleSize
+        pmash { data { id attributes { easy price sqadualed sqadualedf kindOf } } }
+      } }
     }
   }`,
   'mrUpdateCycleMaap': `mutation MrUpdateCycleMaap($id: ID!, $data: MaapInput!) {

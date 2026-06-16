@@ -566,6 +566,9 @@ diunim = ` ${diu},`
             {noofusers}
             {price}
             {easy}
+            {recurring}
+            {recurringNoEnd}
+            {pricePerUnit}
             {linkto}
             {pendId}
             {mshaabId}

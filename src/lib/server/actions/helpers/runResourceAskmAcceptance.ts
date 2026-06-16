@@ -81,13 +81,33 @@ export async function activateRecurringEngine(
   if (!draft) return;
 
   const attrs = draft.attributes ?? {};
-  const unit: 'month' | 'year' = attrs.kindOf === 'yearly' ? 'year' : 'month';
-  const pricePerUnit = attrs.pricePerUnit ?? 0;
+  // Prefer the final negotiated terms carried on the linked Pmash (members may
+  // have negotiated the monthly cost / period before approval) over the draft's
+  // initial values.
+  const pm = attrs.pmash?.data?.attributes ?? {};
+  const kindOfFinal = pm.kindOf ?? attrs.kindOf;
+  const unit: 'month' | 'year' = kindOfFinal === 'yearly' ? 'year' : 'month';
+  const negEasy = Number(pm.easy) || 0;
+  const negPrice = Number(pm.price) || 0;
+  const pricePerUnit =
+    negEasy > 0 ? negEasy : negPrice > 0 ? negPrice : attrs.pricePerUnit ?? 0;
+  const start = pm.sqadualed ?? attrs.start ?? null;
+  const end = pm.sqadualedf ?? attrs.end ?? null;
   const now = new Date();
 
   await strapi.execute(
     'mrUpdateMashabetahalich',
-    { id: draft.id, data: { status_mashab: 'active', users_permissions_user: acceptedUserId } },
+    {
+      id: draft.id,
+      data: {
+        status_mashab: 'active',
+        users_permissions_user: acceptedUserId,
+        pricePerUnit,
+        kindOf: kindOfFinal,
+        ...(start ? { start } : {}),
+        ...(end ? { end } : {}),
+      },
+    },
     context.jwt,
     context.fetch
   );

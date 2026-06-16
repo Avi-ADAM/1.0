@@ -86,6 +86,9 @@
     ordern = 0,
     masaalr = false,
     location = null,
+    recurring = false,
+    recurringNoEnd = false,
+    pricePerUnit = 0,
     onClose,
     onLoad
   } = $props();
@@ -253,11 +256,14 @@
     kindOf === 'total' ? 1 : Number(hm) || 0
   );
 
+  // For a recurring expense the negotiated price IS the per-cycle (monthly /
+  // yearly) cost, so we never multiply by the number of months — each cycle is
+  // approved separately. Fixed-term resources keep multiplying over the period.
   const montsiNew = $derived(
-    Number(montsi(kindOfb, sqadualed2, sqadualedf2)) || 1
+    recurring ? 1 : Number(montsi(kindOfb, sqadualed2, sqadualedf2)) || 1
   );
   const montsiOrig = $derived(
-    Number(montsi(kindOf, sqadualed, sqadualedf)) || 1
+    recurring ? 1 : Number(montsi(kindOf, sqadualed, sqadualedf)) || 1
   );
 
   const totalNew = $derived(
@@ -314,6 +320,15 @@
     {tri?.nego?.headmash[$lang]}
     {name1}
   </h1>
+  {#if recurring}
+    <div
+      class="mx-2 my-2 rounded-lg border border-gold/60 bg-gold/10 p-2 text-sm text-center"
+    >
+      🔁 {$lang === 'en'
+        ? 'Recurring resource — the value below is the per-cycle (monthly) cost. Every cycle is approved separately. You may leave the end date empty for an open-ended expense.'
+        : 'משאב חוזר — הסכום למטה הוא העלות לכל מחזור (חודשי). כל מחזור עובר אישור בנפרד. ניתן להשאיר תאריך סיום ריק להוצאה ללא הגבלת זמן.'}
+    </div>
+  {/if}
   <div class="flex flex-col align-middle justify-center">
     <Text text={name1} bind:textb={name2} lebel={tri?.common?.name} />
     <Rich
@@ -378,7 +393,13 @@
   <div
     class="border border-gold border-opacity-80 rounded m-2 flex flex-col align-middle justify-center gap-x-2"
   >
-    <h2 class="underline decoration-mturk">{tri?.mash.tota[$lang]}</h2>
+    <h2 class="underline decoration-mturk">
+      {#if recurring}
+        {$lang === 'en' ? 'Estimated cost per cycle' : 'עלות משוערת למחזור'}
+      {:else}
+        {tri?.mash.tota[$lang]}
+      {/if}
+    </h2>
     {#if valuesChanged}
       <div class="flex flex-col gap-2">
         <div>

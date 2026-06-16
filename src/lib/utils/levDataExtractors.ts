@@ -538,10 +538,16 @@ export function extractPmashes(userData: any): PendResourceData[] {
         timegramaId: pmash.attributes.timegrama?.data?.id,
         timegramaDate: pmash.attributes.timegrama?.data?.attributes?.date,
         nego_mashes: pmash.attributes.nego_mashes || { data: [] },
-        // Recurring expense flags
+        // Recurring expense flags. pricePerUnit reflects the LIVE (possibly
+        // negotiated) monthly cost — the pmash's easy/price take precedence over
+        // the engine's initial pricePerUnit so negotiation shows immediately.
         recurring: isRecurring,
         recurringNoEnd: isRecurring && !recurringEnd,
-        pricePerUnit: engine?.pricePerUnit ?? pmash.attributes.easy ?? pmash.attributes.price ?? 0
+        pricePerUnit:
+          pmash.attributes.easy ||
+          pmash.attributes.price ||
+          engine?.pricePerUnit ||
+          0
       });
     }
   }
