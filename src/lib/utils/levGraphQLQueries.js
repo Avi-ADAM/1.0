@@ -103,6 +103,46 @@ export async function fetchOpenMissions(baseUrl, token, keysSorted, lang) {
 }
 
 /**
+ * Fetch a single quantum slice of lev data.
+ *
+ * Uses the mini-userData envelope pattern: every slice query returns
+ * usersPermissionsUser → projects_1s(filters:{id:{in:$pids}}) → one collection.
+ * The existing extractors run unchanged on the response.
+ *
+ * @param {string} qid - Static query id registered in qids.js (e.g. '87levSliceSheirutp')
+ * @param {string|number} idL - The user ID
+ * @param {Array<string|number>|null} pids - Project IDs to filter to, or null for all projects
+ * @param {string} lang - Language code
+ * @returns {Promise<any>} Raw GraphQL response
+ */
+export async function fetchLevSlice(qid, idL, pids, lang) {
+  try {
+    const response = await fetch('/api/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        data: {
+          queId: qid,
+          arg: { idL, pids: pids ?? null, lang }
+        }
+      })
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        goto('/login?from=lev');
+      }
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error(`Error in fetchLevSlice (${qid}):`, error);
+    throw error;
+  }
+}
+
+/**
  * Fetch specific mission data for the /myacts page
  * 
  * @param {string | number} idL - The user ID

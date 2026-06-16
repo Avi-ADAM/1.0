@@ -20,13 +20,15 @@
     sales: tr.hub.sales[$lang]
   });
 
-  // All KPI actions live as cards on the Lev screen until dedicated pages ship.
+  // KPI chips link to /lev with a ?focus= deep-link so the lev page can load
+  // just the relevant quantum slice first and show cards before the full query
+  // completes.  Types without a slice query yet fall back to the full load.
   const chips = $derived([
-    { icon: '🗳', count: votes,           label: labels.votes,       href: '/lev', red: false,        pulse: urgent > 0 },
-    { icon: '⏰', count: urgent,          label: labels.urgent,      href: '/lev', red: urgent > 0,   pulse: urgent > 0 },
-    { icon: '💼', count: suggestions,     label: labels.suggestions, href: '/lev', red: false,        pulse: false },
-    { icon: '🛒', count: activePurchases, label: labels.purchases,   href: '/lev', red: false,        pulse: false },
-    { icon: '💰', count: activeSales,     label: labels.sales,       href: '/lev', red: false,        pulse: false }
+    { icon: '🗳', count: votes,           label: labels.votes,       href: '/lev',                   red: false,        pulse: urgent > 0 },
+    { icon: '⏰', count: urgent,          label: labels.urgent,      href: '/lev',                   red: urgent > 0,   pulse: urgent > 0 },
+    { icon: '💼', count: suggestions,     label: labels.suggestions, href: '/lev?focus=mtaha',       red: false,        pulse: false },
+    { icon: '🛒', count: activePurchases, label: labels.purchases,   href: '/lev?focus=buy',         red: false,        pulse: false },
+    { icon: '💰', count: activeSales,     label: labels.sales,       href: '/lev?focus=sheirutp',   red: false,        pulse: false }
   ]);
 </script>
 

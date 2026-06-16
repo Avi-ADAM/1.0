@@ -35,6 +35,8 @@ import {
   loadSnapshot,
   clearSnapshot,
   getSnapshotVersion,
+  dataMode,
+  loadedScopes,
   type SnapshotData,
   type UserData
 } from '$lib/stores/levStores';
@@ -163,6 +165,9 @@ export async function initializeLevData(
     console.log('💾 [levDataLoader] Saving new snapshot');
     saveCurrentSnapshot();
 
+    // Mark stores as fully loaded — safe to snapshot now
+    dataMode.set('full');
+
     console.log('✅ [levDataLoader] Initialization complete');
   } catch (error) {
     console.error('❌ [levDataLoader] Failed to fetch fresh data:', error);
@@ -230,6 +235,10 @@ export function restoreFromSnapshot(snapshot: SnapshotData): void {
     sheirutpStore.set(snapshot.data.sheirutp || []);
     salesStore.set(snapshot.data.sales || []);
     purchasesStore.set(snapshot.data.purchases || []);
+
+    // A restored snapshot represents a full dataset — safe to snapshot again later
+    dataMode.set('full');
+    loadedScopes.set({});
 
     console.log('✅ [levDataLoader] All stores restored from snapshot');
   } catch (error) {
@@ -387,6 +396,13 @@ export function populateStores(data: any, userId: string): void {
  * **Validates: Requirements 4.3, 4.4**
  */
 export function saveCurrentSnapshot(): void {
+  // Guard: never snapshot a partial session — a snapshot saved from a slice-only
+  // load would make returning /lev visitors see incomplete data as "everything".
+  if (get(dataMode) !== 'full') {
+    console.log('⏭️ [levDataLoader] Skipping snapshot — dataMode is not full');
+    return;
+  }
+
   console.log('💾 [levDataLoader] Saving current snapshot');
 
   try {
@@ -455,8 +471,10 @@ export function clearAllData(): void {
   sheirutpStore.set([]);
   salesStore.set([]);
 
-  // Clear snapshot
+  // Clear snapshot and reset loading state
   clearSnapshot();
+  dataMode.set('none');
+  loadedScopes.set({});
 
   console.log('✅ [levDataLoader] All data cleared');
 }

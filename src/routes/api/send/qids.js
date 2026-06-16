@@ -8468,6 +8468,127 @@ export const qids = {
   }
 }`,
 
+  // ── Lev quantum (incremental) slice queries ───────────────────────────────
+  // Each query returns the same mini-userData envelope as query 83, restricted
+  // to one collection and optionally to a subset of projects ($pids).
+  // Passing $pids: null (or omitting it) returns data for ALL projects.
+  // The existing extractors in levDataExtractors.ts run unchanged on the result.
+
+  '87levSliceSheirutp': `query LevSliceSheirutp($idL: ID!, $pids: [ID]) {
+  usersPermissionsUser(id: $idL) {
+    data {
+      id
+      attributes {
+        projects_1s(filters: { id: { in: $pids } }) {
+          data {
+            id
+            attributes {
+              projectName
+              restime
+              user_1s {
+                data {
+                  id
+                }
+              }
+              profilePic {
+                data {
+                  attributes {
+                    url
+                    formats
+                  }
+                }
+              }
+              sheirutpends(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    sheirut {
+                      data {
+                        id
+                        attributes {
+                          name
+                          descrip
+                          equaliSplited
+                          oneTime
+                        }
+                      }
+                    }
+                    startDate
+                    finnishDate
+                    price
+                    quant
+                    total
+                    users_permissions_user {
+                      data {
+                        id
+                        attributes {
+                          username
+                          profilePic {
+                            data {
+                              attributes {
+                                url
+                                formats
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    matanots {
+                      data {
+                        id
+                        attributes {
+                          name
+                          desc
+                          price
+                          quant
+                          kindOf
+                          pic {
+                            data {
+                              attributes {
+                                url
+                                formats
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    createdAt
+                    votes {
+                      data {
+                        id
+                        attributes {
+                          what
+                          order
+                          why
+                          users_permissions_user {
+                            data {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                    timegrama {
+                      data {
+                        id
+                        attributes {
+                          date
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`,
+
   // ── Concierge live enrichment (PLAN_CONCIERGE §6/§7) ──────────────────────
   // Search the mission library by a skill/term — used to surface existing
   // missions that already answer a freshly-typed wish.

@@ -397,6 +397,22 @@ export const salesStore: Writable<SaleData[]> = writable([]);
 /** My purchases (sheiruts where I am the customer) */
 export const purchasesStore: Writable<SaleData[]> = writable([]);
 
+// ========== Loading Mode ==========
+
+/**
+ * Tracks what data is currently in the stores.
+ * 'none'    — stores are empty (cold start, no snapshot)
+ * 'partial' — one or more quantum slices loaded, but not the full query 83
+ * 'full'    — full initializeLevData cycle completed (snapshot-safe)
+ */
+export const dataMode: Writable<'none' | 'partial' | 'full'> = writable('none');
+
+/**
+ * Per-type record of which project IDs have been covered by a slice load.
+ * typeKey → string[] of project IDs.  Merged (never replaced) by loadLevSlice.
+ */
+export const loadedScopes: Writable<Record<string, string[]>> = writable({});
+
 // ========== UI State Stores ==========
 
 /** Current view mode: true = cards, false = coins */
