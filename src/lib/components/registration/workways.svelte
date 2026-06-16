@@ -4,12 +4,10 @@
   import { show } from './store-show.js';
   import { workways1 } from './workways1.js';
   import { onMount } from 'svelte';
-  import { page } from '$app/state';
-
   import jwork from '$lib/data/workways.json';
   import enjwork from '$lib/data/workwaysEn.json';
   import { lang } from '$lib/stores/lang.js';
-  import Skip from '$lib/celim/icons/skip.svelte';
+
   let { onProgres } = $props();
   let newcontent = $state(true);
   let workways2 = $state([]);
@@ -24,23 +22,14 @@
     }
     const parseJSON = (resp) => (resp.json ? resp.json() : resp);
     const checkStatus = (resp) => {
-      if (resp.status >= 200 && resp.status < 300) {
-        return resp;
-      }
-      return parseJSON(resp).then((resp) => {
-        throw resp;
-      });
-    };
-    const headers = {
-      'Content-Type': 'application/json'
+      if (resp.status >= 200 && resp.status < 300) return resp;
+      return parseJSON(resp).then((resp) => { throw resp; });
     };
 
     try {
       const res = await fetch(baseUrl + '/graphql', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: `query {
   workWays(sort: "workWayName") {data{ id attributes{workWayName  ${$lang == 'he' ? 'localizations {data{attributes{workWayName}} }' : ''}}
@@ -55,13 +44,10 @@
         for (var i = 0; i < freshWorkways.length; i++) {
           if (freshWorkways[i].attributes.localizations.data.length > 0) {
             freshWorkways[i].attributes.workWayName =
-              freshWorkways[
-                i
-              ].attributes.localizations.data[0].attributes.workWayName;
+              freshWorkways[i].attributes.localizations.data[0].attributes.workWayName;
           }
         }
       }
-      // Deduplicate by workWayName to prevent each_key_duplicate in MultiSelect
       const seenW = new Set();
       freshWorkways = freshWorkways.filter((w) => {
         const name = w.attributes?.workWayName;
@@ -71,7 +57,6 @@
       });
       workways2 = freshWorkways;
 
-      // טעינת דרכי העבודה שנבחרו בעבר
       const currentWorkways = $workways1;
       if (currentWorkways && currentWorkways.length > 0) {
         const workwayNames = currentWorkways
@@ -84,7 +69,6 @@
       }
 
       newcontent = false;
-      console.log(workways2);
     } catch (e) {
       error1 = e;
     }
@@ -105,63 +89,40 @@
   import tr from '$lib/translations/tr.json';
 
   let selected = $state([]);
-
   const placeholder = tr.reg.workwaysPlaceholder[$lang];
 
   let userName_value = $state();
   let show_value = 0;
 
-  userName.subscribe((value) => {
-    userName_value = value;
-  });
-
-  show.subscribe((newValue) => {
-    show_value = newValue;
-  });
+  userName.subscribe((value) => { userName_value = value; });
+  show.subscribe((newValue) => { show_value = newValue; });
 
   function increment() {
-    show.update((n) => n + 1);
-    onProgres?.({
-      tx: 0,
-      txx: 8
-    });
     newnew();
+    show.update((n) => n + 1);
+    onProgres?.({ tx: 0, txx: 8 });
   }
   function toend() {
     newnew();
     show.set(5);
-    onProgres?.({
-      tx: 0,
-      txx: 8
-    });
+    onProgres?.({ tx: 0, txx: 8 });
   }
   function back() {
-    show.update((n) => n - 1);
-    onProgres?.({
-      tx: 0,
-      txx: 16
-    });
     newnew();
+    show.update((n) => n - 1);
+    onProgres?.({ tx: 0, txx: 16 });
   }
 
-  //add new option and update store
   let meData = $state();
   async function newnew() {
-    console.log(selected, workways2);
     for (let i = 0; i < selected.length; i++) {
-      if (
-        !workways2.map((c) => c.attributes.workWayName).includes(selected[i])
-      ) {
-        //create new and update workways2
+      if (!workways2.map((c) => c.attributes.workWayName).includes(selected[i])) {
         let d = new Date();
         let link = baseUrl + '/graphql';
         try {
           await fetch(link, {
             method: 'POST',
-
-            headers: {
-              'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               query: `mutation  createWorkWay {
   createWorkWay(data: {  workWayName: "${selected[i]}",
@@ -171,8 +132,7 @@
       id
       attributes {
         workWayName ${$lang == 'he' ? 'localizations { data {attributes{workWayName} }}' : ''}
-      } 
-
+      }
        }
     }
 }`
@@ -183,10 +143,8 @@
           const newOb = meData.data.createWorkWay.data;
           const newValues = workways2;
           newValues.push(newOb);
-
           workways2 = newValues;
           const newN = meData.data.createWorkWay.data.attributes.workWayName;
-
           let userName_value = $userName;
           let datau = {
             name: userName_value,
@@ -194,162 +152,155 @@
             det: newN
           };
           fetch('/api/ste', {
-            method: 'POST', // or 'PUT'
-            headers: {
-              'Content-Type': 'application/json'
-            },
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(datau)
-          })
-            .then((response) => response)
-            .then((data) => {
-              console.log('Success:', data, datau);
-            })
-            .catch((error) => {
-              console.error('Error:', error);
-            });
+          }).catch((error) => { console.error('Error:', error); });
         } catch (error) {
           console.log('צריך לתקן:', error.response);
           error = error1;
-          console.log(error1);
         }
       }
     }
-
     workways1.set(find_workway_id(selected));
   }
-  let searchText = $state(``);
 
-  const srca = {
-    he: 'https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg',
-    en: 'https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg'
-  };
-  const srcb = {
-    he: 'https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg',
-    en: 'https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg'
-  };
+  let searchText = $state('');
   let addn = $derived({
     he: `הוספת "${searchText}"`,
     en: `Create "${searchText}"`
   });
+
   const ws = {
     he: 'מה הם העדפות היצירה שלך?',
-    en: 'How do you preffer to Create?'
-  };
-  const skipt = {
-    he: 'דילוג לסוף ההרשמה, ניתן יהיה להוסיף את הפרטים בכל עת מעמוד הפרופיל',
-    en: 'skip to end of registration, you can always add those details from your profile page'
+    en: 'How do you prefer to Create?'
   };
 </script>
 
-<h1 class="midscreenText-2">
-  {userName_value}
-  <br />
-  {ws[$lang]}
-</h1>
-<div dir={$lang == 'en' ? 'ltr' : 'rtl'} class="input-2">
-  <MultiSelect
-    --sms-width="var(--multiselect-width)"
-    outerDivClass="!bg-gold !text-barbi"
-    inputClass="!bg-gold !text-barbi"
-    liSelectedClass="!bg-barbi !text-gold"
-    createOptionMsg={addn[$lang]}
-    allowUserOptions={'append'}
-    loading={newcontent}
-    bind:searchText
-    bind:selected
-    {placeholder}
-    options={[...new Set(workways2.map((c) => c.attributes.workWayName).filter(Boolean))]}
-  />
+<div class="step-inner" dir={$lang == 'en' ? 'ltr' : 'rtl'}>
+  <h2 class="step-title">{userName_value}&nbsp;{ws[$lang]}</h2>
+  <div class="multi-wrap">
+    <MultiSelect
+      --sms-width="100%"
+      outerDivClass="!bg-gold !text-barbi"
+      inputClass="!bg-gold !text-barbi"
+      liSelectedClass="!bg-barbi !text-gold"
+      createOptionMsg={addn[$lang]}
+      allowUserOptions={'append'}
+      loading={newcontent}
+      bind:searchText
+      bind:selected
+      {placeholder}
+      options={[...new Set(workways2.map((c) => c.attributes.workWayName).filter(Boolean))]}
+    />
+  </div>
+  <div class="nav-row">
+    <button class="btn-nav btn-back" onclick={back} disabled={show_value <= 1}>
+      {$lang === 'en' ? '← Back' : 'חזרה →'}
+    </button>
+    <button class="btn-nav btn-skip" onclick={toend}>
+      {$lang === 'en' ? 'Skip' : 'דלג'}
+    </button>
+    <button class="btn-nav btn-next" onclick={increment}>
+      {$lang === 'en' ? 'Next →' : '← הבא'}
+    </button>
+  </div>
 </div>
 
-<button class="button-in-1-2" onclick={back}>
-  <img alt="go" style="height:15vh;" src={srca[$lang]} />
-</button>
-<button
-  class="button-end bg-sturk p-1 rounded-full"
-  onclick={toend}
-  title={skipt[$lang]}
->
-  <Skip />
-</button>
-<button class="button-2" onclick={increment}>
-  <img alt="go" style="height:15vh;" src={srcb[$lang]} />
-</button>
-
 <style>
-  .midscreenText-2 {
-    transition: all 1s ease-in;
-    grid-column: 1 /5;
-    grid-row: 1/ 2;
-    align-self: center;
-    justify-self: center;
-    font-size: 1.8rem;
-    line-height: normal;
-    text-shadow: 1px 1px purple;
-    color: var(--barbi-pink);
-    margin-top: 12vh;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639592274/line1_r0jmn5.png);
-    background-size: 18rem 6rem;
-    height: 6rem;
-    width: 18rem;
-    text-align: center;
-    padding: 0.65rem 1rem 0rem 1rem;
-
-    -webkit-text-size-adjust: 100%;
-  }
-  @media (max-width: 500px) {
-    .midscreenText-2 {
-      background-size: 12rem 4rem;
-      height: 4rem;
-      width: 12rem;
-      font-size: 0.75rem;
-      margin-top: 14vh;
-    }
-    .input-2 {
-      grid-column: 2/4;
-      grid-row: 2/3;
-      display: flex;
-      justify-content: center;
-      align-self: center;
-      justify-self: center;
-      --multiselect-width: 30vw;
-    }
-    /* Keep the gold back/skip/next arrows reachable when the multiselect
-       grows past the viewport on small screens. */
-    .button-in-1-2,
-    .button-2,
-    .button-end {
-      position: sticky;
-      bottom: 8px;
-      z-index: 5;
-    }
-  }
-
-  .button-in-1-2 {
-    grid-column: 1/2;
-    grid-row: 7 / 8;
-    align-self: center;
-    justify-self: center;
-  }
-  .button-2 {
-    grid-column: 4/5;
-    grid-row: 7 / 8;
-    align-self: center;
-    justify-self: center;
-  }
-  .button-end {
-    grid-column: 2/4;
-    grid-row: 7 / 8;
-    align-self: center;
-    justify-self: center;
-  }
-  .input-2 {
-    grid-column: 2/4;
-    grid-row: 2/3;
+  .step-inner {
     display: flex;
-    justify-content: center;
-    align-self: center;
-    justify-self: center;
-    --multiselect-width: auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    width: 100%;
+  }
+
+  .step-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #c8860a;
+    text-align: center;
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  .multi-wrap {
+    width: 100%;
+    position: relative;
+    z-index: 50;
+  }
+
+  .nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding-top: 4px;
+  }
+
+  .btn-nav {
+    font-family: 'Heebo', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.18s;
+    border-radius: 99px;
+    white-space: nowrap;
+  }
+
+  .btn-back {
+    padding: 8px 16px;
+    background: rgba(255, 248, 220, 0.7);
+    border: 1.5px solid rgba(218, 165, 32, 0.38);
+    color: #7a5e00;
+    font-size: 0.8rem;
+  }
+  .btn-back:not(:disabled):hover {
+    background: rgba(255, 215, 0, 0.15);
+    border-color: rgba(218, 165, 32, 0.65);
+  }
+  .btn-back:disabled {
+    opacity: 0.32;
+    cursor: default;
+  }
+
+  .btn-next {
+    padding: 9px 20px;
+    background: linear-gradient(135deg, #daa520, #e91e8c);
+    border: none;
+    color: #fff;
+    font-size: 0.85rem;
+    box-shadow: 0 3px 12px rgba(218, 165, 32, 0.3);
+  }
+  .btn-next:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 18px rgba(218, 165, 32, 0.42);
+  }
+
+  .btn-skip {
+    padding: 7px 12px;
+    background: transparent;
+    border: 1.5px dashed rgba(218, 165, 32, 0.42);
+    color: #9a6b10;
+    font-size: 0.72rem;
+  }
+  .btn-skip:hover {
+    border-style: solid;
+    background: rgba(255, 215, 0, 0.08);
+  }
+
+  :global(.multi-wrap .options) {
+    top: 100% !important;
+    bottom: auto !important;
+    margin-top: 5px !important;
+    margin-bottom: 0 !important;
+    max-height: 40vh !important;
+    overflow-y: auto !important;
+    z-index: 9999 !important;
+    background: var(--gold) !important;
+    border: 2px solid var(--barbi-pink) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18) !important;
   }
 </style>

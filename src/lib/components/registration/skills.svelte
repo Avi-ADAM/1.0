@@ -2,13 +2,10 @@
   import SkillSelector from '$lib/components/ui/SkillSelector.svelte';
   import { userName } from '../../stores/store.js';
   import { lang } from '$lib/stores/lang.js';
-  import { page } from '$app/state';
-
   import { show } from './store-show.js';
   import { skills1 } from './skills1.js';
   import { onMount } from 'svelte';
   import { skil } from '$lib/components/prPr/mi.js';
-  import Skip from '$lib/celim/icons/skip.svelte';
 
   let { onProgres } = $props();
 
@@ -16,21 +13,9 @@
   let userName_value = $state();
   let show_value = 0;
 
-  // Subscribe to stores
-  userName.subscribe((value) => {
-    userName_value = value;
-  });
+  userName.subscribe((value) => { userName_value = value; });
+  show.subscribe((newValue) => { show_value = newValue; });
 
-  show.subscribe((newValue) => {
-    show_value = newValue;
-  });
-
-  // Seed `selected` from $skills1 (IDs) reactively. We can't use a one-shot
-  // onMount here because SkillSelector lazily refreshes $skil (via the _fresh
-  // guard), so when arriving from /onboard/provider/review the brand-new skill
-  // IDs may not be in $skil yet at mount time. Watching $skil lets the names
-  // fill in as soon as the fresh fetch lands. Once we've mapped every ID we
-  // stop seeding so user edits in MultiSelect aren't overwritten.
   let seedComplete = $state(false);
   $effect(() => {
     if (seedComplete) return;
@@ -52,7 +37,6 @@
     if (mapped.length === ids.length) seedComplete = true;
   });
 
-  // Map strings back to IDs and save before navigating
   function find_skill_id(skill_name_arr) {
     var arr = [];
     for (let j = 0; j < skill_name_arr.length; j++) {
@@ -60,10 +44,8 @@
         let name = $skil[i].attributes?.skillName || '';
         let heName = name;
         if ($skil[i].attributes?.localizations?.data?.length > 0) {
-          heName =
-            $skil[i].attributes.localizations.data[0].attributes.skillName;
+          heName = $skil[i].attributes.localizations.data[0].attributes.skillName;
         }
-
         if (name === skill_name_arr[j] || heName === skill_name_arr[j]) {
           arr.push($skil[i].id);
           break;
@@ -74,8 +56,6 @@
   }
 
   function saveToStore() {
-    // SkillSelector automatically creates new items on the server
-    // and adds them to $skil, so we just need to find their IDs here.
     const skillIds = find_skill_id(selected);
     skills1.set(skillIds);
   }
@@ -85,13 +65,11 @@
     show.update((n) => n + 1);
     onProgres?.({ tx: 0, txx: 16 });
   }
-
   function toend() {
     saveToStore();
     show.set(5);
     onProgres?.({ tx: 0, txx: 4 });
   }
-
   function back() {
     saveToStore();
     show.update((n) => n - 1);
@@ -99,141 +77,107 @@
   }
 
   import tr from '$lib/translations/tr.json';
-
-  // Assets and text
-  const srca = {
-    he: 'https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg',
-    en: 'https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg'
-  };
-  const srcb = {
-    he: 'https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg',
-    en: 'https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg'
-  };
   const ws = tr.reg.skillsQuestion;
-  const skipt = tr.reg.skipToEnd;
 </script>
 
-<h1 class="midscreenText-2">
-  {userName_value}
-  <br />
-  {ws[$lang]}
-</h1>
-
-<div dir={$lang == 'en' ? 'ltr' : 'rtl'} class="input-2">
-  <!-- Integration of the new SkillSelector -->
-  <div style="width: var(--multiselect-width, 80vw); max-width: 600px;">
+<div class="step-inner" dir={$lang == 'en' ? 'ltr' : 'rtl'}>
+  <h2 class="step-title">{userName_value}&nbsp;{ws[$lang]}</h2>
+  <div class="multi-wrap">
     <SkillSelector bind:selectedSkills={selected} color="--gold" />
+  </div>
+  <div class="nav-row">
+    <button class="btn-nav btn-back" onclick={back} disabled={show_value <= 1}>
+      {$lang === 'en' ? '← Back' : 'חזרה →'}
+    </button>
+    <button class="btn-nav btn-skip" onclick={toend}>
+      {$lang === 'en' ? 'Skip' : 'דלג'}
+    </button>
+    <button class="btn-nav btn-next" onclick={increment}>
+      {$lang === 'en' ? 'Next →' : '← הבא'}
+    </button>
   </div>
 </div>
 
-<button class="button-in-1-2" onclick={back}>
-  <img alt="go" style="height:15vh;" src={srca[$lang]} />
-</button>
-
-<button
-  class="button-end bg-sturk p-1 rounded-full"
-  onclick={toend}
-  title={skipt[$lang]}
->
-  <Skip />
-</button>
-
-<button class="button-2" onclick={increment}>
-  <img alt="go" style="height:15vh;" src={srcb[$lang]} />
-</button>
-
 <style>
-  .midscreenText-2 {
-    transition: all 1s ease-in;
-    grid-column: 1 /5;
-    grid-row: 1/ 2;
-    align-self: center;
-    justify-self: center;
-    font-size: 1.8rem;
-    line-height: normal;
-    text-shadow: 1px 1px purple;
-    color: var(--barbi-pink);
-    margin-top: 12vh;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639592274/line1_r0jmn5.png);
-    background-size: 18rem 6rem;
-    height: 6rem;
-    width: 18rem;
-    text-align: center;
-    padding-top: 0.65rem;
-    -webkit-text-size-adjust: 100%;
-  }
-  @media (min-width: 501px) {
-    :global([data-svelte-dialog-overlay].content) {
-      z-index: 700;
-      width: 50vw;
-    }
-  }
-  @media (max-width: 500px) {
-    :global([data-svelte-dialog-overlay].content) {
-      z-index: 700;
-      width: 80vw;
-    }
-    .midscreenText-2 {
-      background-size: 12rem 4rem;
-      height: 4rem;
-      width: 12rem;
-      font-size: 0.75rem;
-      margin-top: 14vh;
-    }
-    .input-2 {
-      grid-column: 2/4;
-      grid-row: 2/3;
-      align-self: center;
-      justify-self: center;
-      display: flex;
-      justify-content: center;
-      --multiselect-width: 80vw;
-    }
-    /* Keep the gold back/skip/next arrows reachable when the multiselect
-       grows past the viewport — otherwise a user with many selected chips
-       has no visible way to advance. */
-    .button-in-1-2,
-    .button-2,
-    .button-end {
-      position: sticky;
-      bottom: 8px;
-      z-index: 5;
-    }
-  }
-  .input-2-2 {
-    grid-column: 1/5;
-    grid-row: 5/6;
-    text-align: center;
-    margin: 0 auto;
-  }
-  .button-in-1-2 {
-    grid-column: 1/2;
-    grid-row: 8/9;
-    align-self: center;
-    justify-self: center;
-  }
-  .button-2 {
-    grid-column: 4/5;
-    grid-row: 8/9;
-    align-self: center;
-    justify-self: center;
-  }
-  .button-end {
-    grid-column: 2/4;
-    grid-row: 8/9;
-    align-self: center;
-    justify-self: center;
+  .step-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    width: 100%;
   }
 
-  .input-2 {
-    grid-column: 2/4;
-    grid-row: 2/3;
+  .step-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #c8860a;
     text-align: center;
-    margin-top: -4vh;
-    align-self: center;
-    justify-self: center;
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  .multi-wrap {
+    width: 100%;
+    position: relative;
+    z-index: 50;
+  }
+
+  .nav-row {
     display: flex;
-    justify-content: center;
-    --multiselect-width: 25vw;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding-top: 4px;
+  }
+
+  .btn-nav {
+    font-family: 'Heebo', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.18s;
+    border-radius: 99px;
+    white-space: nowrap;
+  }
+
+  .btn-back {
+    padding: 8px 16px;
+    background: rgba(255, 248, 220, 0.7);
+    border: 1.5px solid rgba(218, 165, 32, 0.38);
+    color: #7a5e00;
+    font-size: 0.8rem;
+  }
+  .btn-back:not(:disabled):hover {
+    background: rgba(255, 215, 0, 0.15);
+    border-color: rgba(218, 165, 32, 0.65);
+  }
+  .btn-back:disabled {
+    opacity: 0.32;
+    cursor: default;
+  }
+
+  .btn-next {
+    padding: 9px 20px;
+    background: linear-gradient(135deg, #daa520, #e91e8c);
+    border: none;
+    color: #fff;
+    font-size: 0.85rem;
+    box-shadow: 0 3px 12px rgba(218, 165, 32, 0.3);
+  }
+  .btn-next:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 18px rgba(218, 165, 32, 0.42);
+  }
+
+  .btn-skip {
+    padding: 7px 12px;
+    background: transparent;
+    border: 1.5px dashed rgba(218, 165, 32, 0.42);
+    color: #9a6b10;
+    font-size: 0.72rem;
+  }
+  .btn-skip:hover {
+    border-style: solid;
+    background: rgba(255, 215, 0, 0.08);
   }
 </style>
