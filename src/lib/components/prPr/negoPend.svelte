@@ -99,7 +99,7 @@
   let sqadualed2 = $state(sqadualed);
   let sqadualedf2 = $state(sqadualedf);
 
-  let spnot2 = spnot;
+  let spnot2 = $state(spnot);
   let linkto2 = $state(linkto);
   let hm2 = $state(hm);
   let price2 = $state(price);
@@ -349,7 +349,11 @@
       bind:textb={descrip2}
       lebel={tri?.common?.description}
     />
-    <!--<Text text={spnot} bind:textb={spnot2} lebel={tri?.mission?.specialNotes}/>-->
+    <Text
+      text={spnot}
+      bind:textb={spnot2}
+      lebel={{ he: 'הערות מיוחדות', en: 'Special notes' }}
+    />
     <Text text={linkto} bind:textb={linkto2} lebel={tri?.mash?.linkto} />
     <KindOfnego {kindOf} bind:kindOfb lebel={tri?.mash.kindof} />
 
@@ -392,8 +396,8 @@
         {#if recurring2}
           <p class="text-xs text-center text-barbi/80">
             {$lang === 'en'
-              ? 'Approved each cycle; leave the end date empty for open-ended.'
-              : 'מאושר בכל מחזור; השאירו תאריך סיום ריק למצב ללא הגבלה.'}
+              ? 'Approved each cycle; clear the end date for an open-ended expense.'
+              : 'מאושר בכל מחזור; ניתן להסיר תאריך סיום למצב ללא הגבלה.'}
           </p>
           <NumberField
             number={cycleSize}
@@ -402,6 +406,16 @@
               ? `Every N ${kindOfb === 'yearly' ? 'years' : 'months'}`
               : `כל כמה ${kindOfb === 'yearly' ? 'שנים' : 'חודשים'}`}
           />
+          <button
+            type="button"
+            onclick={() => (sqadualedf2 = null)}
+            disabled={sqadualedf2 == null || sqadualedf2 === ''}
+            class="mx-auto text-sm border border-gold/50 rounded-full px-3 py-1 hover:bg-gold/20 disabled:opacity-40"
+          >
+            {sqadualedf2 == null || sqadualedf2 === ''
+              ? $lang === 'en' ? '∞ Open-ended (no end date)' : '∞ ללא תאריך סיום'
+              : $lang === 'en' ? 'Remove end date' : 'הסרת תאריך סיום'}
+          </button>
         {/if}
       </div>
     {/if}
