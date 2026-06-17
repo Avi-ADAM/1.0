@@ -3702,6 +3702,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                     price
                     kindOf
                     spnot
+                    recurring
+                    cycleSize
                     location {
                       location_mode
                       lat
@@ -3742,18 +3744,6 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                     mashaabim {
                       data {
                         id
-                      }
-                    }
-                    mashabetahaliches(filters: { recurring: { eq: true } }) {
-                      data {
-                        id
-                        attributes {
-                          recurring
-                          pricePerUnit
-                          start
-                          end
-                          status_mashab
-                        }
                       }
                     }
                     timegrama {
@@ -7359,7 +7349,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $isOriginal: Boolean, $name: String, $descrip: String, $spnot: String,
     $easy: Float, $hm: Float, $price: Float, $kindOf: ENUM_NEGOMASH_KINDOF,
     $sqadualed: DateTime, $sqadualedf: DateTime, $linkto: String,
-    $location: [ComponentNewLocationInput]
+    $location: [ComponentNewLocationInput], $recurring: Boolean, $cycleSize: Int
   ) {
     createNegoMash(data: {
       publishedAt: $publishedAt
@@ -7377,6 +7367,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       sqadualedf: $sqadualedf
       linkto: $linkto
       location: $location
+      recurring: $recurring
+      cycleSize: $cycleSize
     }) { data { id } }
   }`,
 
@@ -7445,21 +7437,23 @@ export const moachQids = {
   'mrLinkRikmashToMashabetahalich': `mutation MrLinkRikmash($id: ID!, $rikmash: ID!) {
     updateMashabetahalich(id: $id, data: { rikmash: $rikmash }) { data { id } }
   }`,
-  // Resolve a DRAFT recurring engine created at proposal time, so askm approval
-  // can activate it. Matched by project + name (robust to the pmash→om linkage).
-  'mrGetDraftMashForProject': `query MrGetDraftMashForProject($pid: ID!, $name: String!) {
-    mashabetahaliches(
+  // Resolve the approved recurring Pmash's final (possibly negotiated) terms so
+  // askm approval can spin up the mashabetahalich engine. Matched by project +
+  // name; only returns when the final pmash is still flagged recurring, so a
+  // member negotiating recurring → false cleanly results in no engine.
+  'mrGetPmashRecurringTerms': `query MrGetPmashRecurringTerms($pid: ID!, $name: String!) {
+    pmashes(
       filters: {
         project: { id: { eq: $pid } }
-        recurring: { eq: true }
-        status_mashab: { eq: "draft" }
         name: { eq: $name }
+        recurring: { eq: true }
       }
+      sort: ["createdAt:desc"]
       pagination: { limit: 1 }
     ) {
       data { id attributes {
-        pricePerUnit kindOf start end cycleSize
-        pmash { data { id attributes { easy price sqadualed sqadualedf kindOf } } }
+        recurring cycleSize easy price kindOf sqadualed sqadualedf
+        mashaabim { data { id } }
       } }
     }
   }`,

@@ -145,6 +145,7 @@ const createResourceHandler: ActionExecutionHandler = async (params, context) =>
     isAssigned = false,
     isReceived = false,
     recurring = false,     // monthly/yearly recurring expense (server rent, apartment…)
+    cycleSize = 1,         // recurrence period in units of kindOf (e.g. every N months)
     existingSpId,          // ID of an existing Sp record (personal resource)
     restime,               // response-time string used for Timegrama deadline
     isOnline,
@@ -227,6 +228,13 @@ const createResourceHandler: ActionExecutionHandler = async (params, context) =>
       order: 0,
       zman:  now
     }];
+    // Recurring expense flag lives on the Pmash so members can negotiate it.
+    // The mashabetahalich engine itself is created on askm approval from the
+    // final (possibly negotiated) Pmash terms — see runResourceAskmAcceptance.
+    if (recurring && (kindOf === 'monthly' || kindOf === 'yearly')) {
+      resourceData.recurring = true;
+      resourceData.cycleSize = cycleSize ?? 1;
+    }
     if (isAssigned) {
       resourceData.isSelfProposal   = true;
       resourceData.selfProposalUser = userId;
@@ -255,27 +263,8 @@ const createResourceHandler: ActionExecutionHandler = async (params, context) =>
   const cycleUnit: 'month' | 'year' = kindOf === 'yearly' ? 'year' : 'month';
   const pricePerUnit = (easy && easy > 0 ? easy : price) || 0;
 
-  if (isRecurring && isPmash) {
-    // Multi-member: a DRAFT engine carried on the Pmash. finalizeAskmAcceptance
-    // activates it (status → active + assigns the responsible user) once approved.
-    await createMashabetahalichRecord(f, jwt, {
-      name,
-      descrip: description,
-      project: projectId,
-      mashaabim: ensuredMashaabimId,
-      pmash: createdId,
-      kindOf,
-      unit: cycleUnit,
-      status_mashab: 'draft',
-      recurring: true,
-      start: startDate || now,
-      ...(endDate ? { end: endDate } : {}),
-      cycleSize: 1,
-      pricePerUnit,
-      finnished: false,
-      publishedAt: now
-    });
-  }
+  // Multi-member recurring resources carry `recurring`/`cycleSize` on the Pmash
+  // (set above) and the engine is created on approval — nothing more to do here.
 
   if (isRecurring && !isPmash) {
     // Single-member: activate immediately, responsible user = creator. Reuse or
@@ -656,6 +645,11 @@ export const createResourceAction: ActionConfig = {
       type: 'boolean',
       required: false,
       description: 'Recurring monthly/yearly expense (server rent, apartment, stall). Creates a mashabetahalich engine driven by /api/monthi'
+    },
+    cycleSize: {
+      type: 'number',
+      required: false,
+      description: 'Recurrence period in units of kindOf (default 1 = every month/year)'
     },
     existingSpId: {
       type: 'string',

@@ -353,6 +353,7 @@ export interface ActionParamsMap {
     isAssigned?: boolean;
     isReceived?: boolean;
     recurring?: boolean;
+    cycleSize?: number;
     existingSpId?: string;
     restime?: string;
     isOnline?: boolean;

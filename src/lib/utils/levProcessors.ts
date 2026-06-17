@@ -1484,6 +1484,7 @@ export function processPmashes(
       // Recurring expense flags (open-ended monthly/yearly cost, approved monthly)
       recurring: pmash.recurring === true,
       recurringNoEnd: pmash.recurringNoEnd === true,
+      cycleSize: pmash.cycleSize ?? 1,
       pricePerUnit: pmash.pricePerUnit,
 
       // Timegrama

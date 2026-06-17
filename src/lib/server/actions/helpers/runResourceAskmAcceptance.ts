@@ -57,11 +57,12 @@ function currentCycleBounds(unit: 'month' | 'year', ref = new Date()) {
 }
 
 /**
- * If a DRAFT recurring engine was created for this resource at proposal time
- * (createResource, multi-member branch), activate it on approval: status →
- * active, assign the responsible user, and turn the freshly-created acceptance
- * Maap into cycle #1 (links it to the engine + sets the cycle window/amount).
- * No-op for non-recurring resources.
+ * When the approved resource is a recurring expense (the final, possibly
+ * negotiated, Pmash is still flagged recurring), spin up the mashabetahalich
+ * engine on approval: create it active, assign the responsible user, configure
+ * it from the Pmash's final terms, and turn the freshly-created acceptance Maap
+ * into cycle #1. No-op for non-recurring resources (incl. those negotiated from
+ * recurring → false, since the query filters recurring: true).
  */
 export async function activateRecurringEngine(
   strapi: StrapiExecutor,
@@ -72,65 +73,68 @@ export async function activateRecurringEngine(
   if (!resourceName) return;
 
   const res: any = await strapi.execute(
-    'mrGetDraftMashForProject',
+    'mrGetPmashRecurringTerms',
     { pid: projectId, name: resourceName },
     context.jwt,
     context.fetch
   );
-  const draft = res?.data?.mashabetahaliches?.data?.[0];
-  if (!draft) return;
+  const pmash = res?.data?.pmashes?.data?.[0];
+  if (!pmash) return; // not recurring (or negotiated off) → nothing to do
 
-  const attrs = draft.attributes ?? {};
-  // Prefer the final negotiated terms carried on the linked Pmash (members may
-  // have negotiated the monthly cost / period before approval) over the draft's
-  // initial values.
-  const pm = attrs.pmash?.data?.attributes ?? {};
-  const kindOfFinal = pm.kindOf ?? attrs.kindOf;
-  const unit: 'month' | 'year' = kindOfFinal === 'yearly' ? 'year' : 'month';
+  const pm = pmash.attributes ?? {};
+  const kindOf = pm.kindOf === 'yearly' ? 'yearly' : 'monthly';
+  const unit: 'month' | 'year' = kindOf === 'yearly' ? 'year' : 'month';
   const negEasy = Number(pm.easy) || 0;
   const negPrice = Number(pm.price) || 0;
-  const pricePerUnit =
-    negEasy > 0 ? negEasy : negPrice > 0 ? negPrice : attrs.pricePerUnit ?? 0;
-  const start = pm.sqadualed ?? attrs.start ?? null;
-  const end = pm.sqadualedf ?? attrs.end ?? null;
+  const pricePerUnit = negEasy > 0 ? negEasy : negPrice;
+  const cycleSize = Number(pm.cycleSize) || 1;
+  const mashaabimId = pm.mashaabim?.data?.id;
   const now = new Date();
 
-  await strapi.execute(
-    'mrUpdateMashabetahalich',
+  const createRes: any = await strapi.execute(
+    'mrCreateMashabetahalich',
     {
-      id: draft.id,
       data: {
-        status_mashab: 'active',
+        name: resourceName,
+        project: projectId,
         users_permissions_user: acceptedUserId,
+        pmash: pmash.id,
+        ...(mashaabimId ? { mashaabim: mashaabimId } : {}),
+        kindOf,
+        unit,
+        status_mashab: 'active',
+        recurring: true,
+        cycleSize,
         pricePerUnit,
-        kindOf: kindOfFinal,
-        ...(start ? { start } : {}),
-        ...(end ? { end } : {}),
+        ...(pm.sqadualed ? { start: pm.sqadualed } : { start: now.toISOString() }),
+        ...(pm.sqadualedf ? { end: pm.sqadualedf } : {}),
+        finnished: false,
+        publishedAt: now.toISOString(),
       },
     },
     context.jwt,
     context.fetch
   );
+  const mashId = createRes?.data?.createMashabetahalich?.data?.id;
+  if (!mashId || !maapId) return;
 
-  if (maapId) {
-    const { cycleStart, cycleEnd } = currentCycleBounds(unit);
-    await strapi.execute(
-      'mrUpdateCycleMaap',
-      {
-        id: maapId,
-        data: {
-          mashabetahalich: draft.id,
-          cycleIndex: 1,
-          cycleStart,
-          cycleEnd,
-          quantityDelivered: pricePerUnit,
-          publishedAt: now.toISOString(),
-        },
+  const { cycleStart, cycleEnd } = currentCycleBounds(unit);
+  await strapi.execute(
+    'mrUpdateCycleMaap',
+    {
+      id: maapId,
+      data: {
+        mashabetahalich: mashId,
+        cycleIndex: 1,
+        cycleStart,
+        cycleEnd,
+        quantityDelivered: pricePerUnit,
+        publishedAt: now.toISOString(),
       },
-      context.jwt,
-      context.fetch
-    );
-  }
+    },
+    context.jwt,
+    context.fetch
+  );
 }
 
 export async function runResourceAskmAcceptance(

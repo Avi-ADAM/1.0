@@ -96,6 +96,7 @@
     recurring = false,
     recurringNoEnd = false,
     pricePerUnit = 0,
+    cycleSize = 1,
     pendId,
     users,
     linkto,
@@ -569,6 +570,7 @@ diunim = ` ${diu},`
             {recurring}
             {recurringNoEnd}
             {pricePerUnit}
+            {cycleSize}
             {linkto}
             {pendId}
             {mshaabId}

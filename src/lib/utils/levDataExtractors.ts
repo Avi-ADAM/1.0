@@ -509,10 +509,9 @@ export function extractPmashes(userData: any): PendResourceData[] {
         continue;
       }
 
-      // Recurring expense? (a draft mashabetahalich engine is linked to the pmash)
-      const engine = pmash.attributes.mashabetahaliches?.data?.[0]?.attributes;
-      const isRecurring = Boolean(engine?.recurring);
-      const recurringEnd = engine?.end ?? pmash.attributes.sqadualedf ?? null;
+      // Recurring expense? The flag lives on the Pmash so it stays negotiable.
+      const isRecurring = Boolean(pmash.attributes.recurring);
+      const recurringEnd = pmash.attributes.sqadualedf ?? null;
 
       pmashes.push({
         id: pmash.id,
@@ -538,16 +537,12 @@ export function extractPmashes(userData: any): PendResourceData[] {
         timegramaId: pmash.attributes.timegrama?.data?.id,
         timegramaDate: pmash.attributes.timegrama?.data?.attributes?.date,
         nego_mashes: pmash.attributes.nego_mashes || { data: [] },
-        // Recurring expense flags. pricePerUnit reflects the LIVE (possibly
-        // negotiated) monthly cost — the pmash's easy/price take precedence over
-        // the engine's initial pricePerUnit so negotiation shows immediately.
+        // Recurring expense flags. pricePerUnit is the LIVE (possibly negotiated)
+        // per-cycle cost taken straight from the pmash's easy/price.
         recurring: isRecurring,
         recurringNoEnd: isRecurring && !recurringEnd,
-        pricePerUnit:
-          pmash.attributes.easy ||
-          pmash.attributes.price ||
-          engine?.pricePerUnit ||
-          0
+        cycleSize: pmash.attributes.cycleSize ?? 1,
+        pricePerUnit: pmash.attributes.easy || pmash.attributes.price || 0
       });
     }
   }

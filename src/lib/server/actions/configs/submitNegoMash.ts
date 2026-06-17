@@ -44,6 +44,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     sqadualed: orig.sqadualed ?? null,
     sqadualedf: orig.sqadualedf ?? null,
     linkto: orig.linkto ?? null,
+    recurring: orig.recurring ?? null,
+    cycleSize: orig.cycleSize ?? null,
     location: (() => {
       const loc = normalizeLocationInput(orig.location);
       return loc ? [loc] : null;
@@ -86,6 +88,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   if (nv.sqadualed  != null) entityData.sqadualed  = nv.sqadualed;
   if (nv.sqadualedf != null) entityData.sqadualedf = nv.sqadualedf;
   if (nv.linkto     != null) entityData.linkto     = nv.linkto;
+  if (nv.recurring  != null) entityData.recurring  = nv.recurring;
+  if (nv.cycleSize  != null) entityData.cycleSize  = nv.cycleSize;
 
   if (nv.location != null) {
     const loc = normalizeLocationInput(nv.location);
@@ -115,6 +119,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   if (nv.sqadualed  != null) patch.sqadualed  = nv.sqadualed;
   if (nv.sqadualedf != null) patch.sqadualedf = nv.sqadualedf;
   if (nv.linkto     != null) patch.linkto     = nv.linkto;
+  if (nv.recurring  != null) patch.recurring  = nv.recurring;
+  if (nv.cycleSize  != null) patch.cycleSize  = nv.cycleSize;
   if (entityData.location != null) patch.location = entityData.location;
 
   // Negotiator's vote in the Strapi-nested shape processPmashes/mergeVote expect.
@@ -144,7 +150,7 @@ export const submitNegoMashConfig: ActionConfig = {
     restime:        { type: 'string',  required: false, description: 'Project restime: feh|sth|nsh|sevend' },
     isOriginal:     { type: 'boolean', required: false, description: 'True if this is the first negotiation (stepState === 2)' },
     ordern:         { type: 'number',  required: false, description: 'Current order index (new vote gets ordern+1)' },
-    newValues:      { type: 'object',  required: false, description: 'Changed field values to apply (name, descrip, spnot, easy, hm, price, kindOf, sqadualed, sqadualedf, linkto, location)' },
+    newValues:      { type: 'object',  required: false, description: 'Changed field values to apply (name, descrip, spnot, easy, hm, price, kindOf, sqadualed, sqadualedf, linkto, location, recurring, cycleSize)' },
     originalValues: { type: 'object',  required: false, description: 'Original values before the change (for the snapshot)' },
     users:          { type: 'array',   required: false, description: 'Existing users/votes array on the pmash' },
   },

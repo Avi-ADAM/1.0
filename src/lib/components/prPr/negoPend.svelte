@@ -89,6 +89,7 @@
     recurring = false,
     recurringNoEnd = false,
     pricePerUnit = 0,
+    cycleSize = 1,
     onClose,
     onLoad
   } = $props();
@@ -104,6 +105,8 @@
   let price2 = $state(price);
   let easy2 = $state(easy);
   let kindOfb = $state(kindOf);
+  let recurring2 = $state(Boolean(recurring));
+  let cycleSize2 = $state(Number(cycleSize) || 1);
   let location2 = $state(
     location
       ? { ...location }
@@ -203,6 +206,16 @@
       originalValues.kindOf = kindOf;
       hasChanges = true;
     }
+    if (Boolean(recurring) !== Boolean(recurring2)) {
+      newValues.recurring = recurring2;
+      originalValues.recurring = recurring;
+      hasChanges = true;
+    }
+    if (recurring2 && Number(cycleSize) !== Number(cycleSize2)) {
+      newValues.cycleSize = Number(cycleSize2) || 1;
+      originalValues.cycleSize = cycleSize;
+      hasChanges = true;
+    }
     if (locationChanged()) {
       newValues.location = {
         location_mode: location2?.location_mode ?? 'unspecified',
@@ -260,7 +273,7 @@
   // yearly) cost, so we never multiply by the number of months — each cycle is
   // approved separately. Fixed-term resources keep multiplying over the period.
   const montsiNew = $derived(
-    recurring ? 1 : Number(montsi(kindOfb, sqadualed2, sqadualedf2)) || 1
+    recurring2 ? 1 : Number(montsi(kindOfb, sqadualed2, sqadualedf2)) || 1
   );
   const montsiOrig = $derived(
     recurring ? 1 : Number(montsi(kindOf, sqadualed, sqadualedf)) || 1
@@ -320,7 +333,7 @@
     {tri?.nego?.headmash[$lang]}
     {name1}
   </h1>
-  {#if recurring}
+  {#if recurring || recurring2}
     <div
       class="mx-2 my-2 rounded-lg border border-gold/60 bg-gold/10 p-2 text-sm text-center"
     >
@@ -366,6 +379,33 @@
       />
     {/if}
 
+    {#if kindOfb === 'monthly' || kindOfb === 'yearly'}
+      <div
+        class="border border-gold border-opacity-40 rounded m-2 p-2 flex flex-col gap-2"
+      >
+        <label class="flex flex-row items-center justify-center gap-x-2">
+          <span class="underline decoration-mturk"
+            >{$lang === 'en' ? 'Recurring expense' : 'הוצאה חוזרת'}</span
+          >
+          <input type="checkbox" bind:checked={recurring2} />
+        </label>
+        {#if recurring2}
+          <p class="text-xs text-center text-barbi/80">
+            {$lang === 'en'
+              ? 'Approved each cycle; leave the end date empty for open-ended.'
+              : 'מאושר בכל מחזור; השאירו תאריך סיום ריק למצב ללא הגבלה.'}
+          </p>
+          <NumberField
+            number={cycleSize}
+            bind:numberb={cycleSize2}
+            lebel={$lang === 'en'
+              ? `Every N ${kindOfb === 'yearly' ? 'years' : 'months'}`
+              : `כל כמה ${kindOfb === 'yearly' ? 'שנים' : 'חודשים'}`}
+          />
+        {/if}
+      </div>
+    {/if}
+
     <LocationNego
       {location}
       bind:locationb={location2}
@@ -394,7 +434,7 @@
     class="border border-gold border-opacity-80 rounded m-2 flex flex-col align-middle justify-center gap-x-2"
   >
     <h2 class="underline decoration-mturk">
-      {#if recurring}
+      {#if recurring2}
         {$lang === 'en' ? 'Estimated cost per cycle' : 'עלות משוערת למחזור'}
       {:else}
         {tri?.mash.tota[$lang]}
