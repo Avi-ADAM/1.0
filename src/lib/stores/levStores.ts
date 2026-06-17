@@ -102,6 +102,10 @@ export interface AskedResourceData {
   kindOf?: string;
   spid?: string;
   deadline?: string;
+  sqadualedf?: string;
+  /** Recurring expense terms (per-cycle cost, monthly/yearly approval). */
+  recurring?: boolean;
+  cycleSize?: number;
   openName?: string;
   omid?: string;
   askId?: string;

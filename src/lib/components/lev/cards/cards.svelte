@@ -1071,6 +1071,10 @@
                       hearotMeyuchadot={buble.spnot}
                       price={buble.price}
                       deadline={buble.deadline}
+                      sqadualedf={buble.sqadualedf}
+                      kindOf={buble.kindOf}
+                      recurring={buble.recurring}
+                      cycleSize={buble.cycleSize}
                       missId={buble.missId}
                       id={buble.id}
                       openMid={buble.omid}

@@ -3351,6 +3351,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                     hm
                     name
                     easy
+                    recurring
+                    cycleSize
                   }
                 }
               }
@@ -4413,6 +4415,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           hm
                           name
                           easy
+                          recurring
+                          cycleSize
                         }
                       }
                     }
@@ -4429,6 +4433,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           kindOf
                           sqadualed
                           sqadualedf
+                          recurring
+                          cycleSize
                         }
                       }
                     }

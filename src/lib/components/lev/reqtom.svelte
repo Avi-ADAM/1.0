@@ -22,6 +22,10 @@
    * @property {boolean} [isVisible]
    * @property {any} coinlapach
    * @property {any} deadline
+   * @property {any} [sqadualedf]
+   * @property {any} [kindOf]
+   * @property {boolean} [recurring]
+   * @property {number} [cycleSize]
    * @property {any} projectName
    * @property {any} openmissionName
    * @property {any} myp
@@ -82,6 +86,10 @@
     isVisible = false,
     coinlapach,
     deadline,
+    sqadualedf,
+    kindOf,
+    recurring = false,
+    cycleSize = 1,
     projectName,
     openmissionName,
     myp,
@@ -453,8 +461,11 @@
               noofusers={noofpu}
               pendId={id}
               linkto={''}
-              sqadualed={null}
-              sqadualedf={deadline}
+              sqadualed={deadline}
+              {sqadualedf}
+              {kindOf}
+              {recurring}
+              {cycleSize}
               {users}
               ordern={orderon}
               restime={getProjectData(projectId, 'restime')}
@@ -725,11 +736,11 @@
               {new Date(deadline).toLocaleDateString('he-IL')}
             </p>{/if}
           <p
-            onmouseenter={() => hover('שווי')}
+            onmouseenter={() => hover(recurring ? 'משאב חוזר · שווי למחזור' : 'שווי')}
             onmouseleave={() => hover('0')}
             class="hslink bc"
           >
-            {price}
+            {#if recurring}🔁 {/if}{price}
           </p>
           <p class="hslink cd">
             <span
@@ -826,6 +837,10 @@
                 {src}
                 {low}
                 {deadline}
+                {sqadualedf}
+                {kindOf}
+                {recurring}
+                {cycleSize}
                 {easy}
                 {myp}
                 {price}
@@ -866,6 +881,10 @@
     {src}
     {low}
     {deadline}
+    {sqadualedf}
+    {kindOf}
+    {recurring}
+    {cycleSize}
     {easy}
     {myp}
     {price}

@@ -1140,6 +1140,11 @@ export function extractAskedResources(userData: any): AskedResourceData[] {
         hm:        pmashAttrs.hm        || openMashaabimAttrs.hm        || '',
         kindOf:    pmashAttrs.kindOf    || openMashaabimAttrs.kindOf    || '',
         sqadualed: pmashAttrs.sqadualed || openMashaabimAttrs.sqadualed || '',
+        // End date + recurring terms. Prefer the (possibly negotiated) pmash; the
+        // pmash is the live source of truth that the recurring engine reads from.
+        sqadualedf: pmashAttrs.sqadualedf || openMashaabimAttrs.sqadualedf || '',
+        recurring:  pmashAttrs.recurring ?? openMashaabimAttrs.recurring ?? false,
+        cycleSize:  pmashAttrs.cycleSize ?? openMashaabimAttrs.cycleSize ?? 1,
       };
 
       // Profile pic: prefer the askm's own users_permissions_user, fall back to sp owner
@@ -1172,6 +1177,9 @@ export function extractAskedResources(userData: any): AskedResourceData[] {
         kindOf: omData.kindOf,
         spid: askAttributes.sp?.data?.id,
         deadline: omData.sqadualed,
+        sqadualedf: omData.sqadualedf,
+        recurring: omData.recurring === true,
+        cycleSize: omData.cycleSize ?? 1,
         openName: omData.name,
         omid: askAttributes.open_mashaabim?.data?.id,
         pmashId: askAttributes.pmash?.data?.id,
