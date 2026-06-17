@@ -184,6 +184,11 @@
       noofusersOk += 1;
       noofusersWaiting -= 1;
       ser = xyz();
+      // Snapshot the votes BEFORE the optimistic append: the server always
+      // appends the current user's vote itself (addVote tosplit / approveHaluka),
+      // so the list we hand it must not already contain this user — otherwise
+      // the "בעד" vote is written twice.
+      const priorVotes = Array.isArray(users) ? [...users] : [];
       appendOptimisticVote({ what: true });
 
       const cookieValueId = document.cookie
@@ -209,7 +214,7 @@
           const result = await executeAction('approveHaluka', {
             tosplitId: pendId,
             userId: idL,
-            users,
+            users: priorVotes,
             halukot,
             sales: sales || [],
             hervachUpdates,
@@ -237,7 +242,7 @@
             type: 'tosplit',
             id: pendId,
             projectId,
-            existingComponentData: users
+            existingComponentData: priorVotes
           });
           if (!result.success) {
             throw new Error(result.error?.message || 'Failed to add vote');
@@ -281,13 +286,16 @@
       noofusersNo += 1;
       noofusersWaiting -= 1;
       ser = xyz();
+      // Snapshot before the optimistic append — the server appends this user's
+      // vote itself, so don't hand it a list that already includes them.
+      const priorVotes = Array.isArray(users) ? [...users] : [];
       appendOptimisticVote({ what: false, why });
       try {
         const result = await executeAction('addVote', {
           type: 'tosplit',
           id: pendId,
           projectId,
-          existingComponentData: users,
+          existingComponentData: priorVotes,
           what: false,
           why
         });
@@ -784,6 +792,9 @@
                 {noofusers}
                 activeOrder={order}
                 {projectId}
+                tosplitId={pendId}
+                {halukot}
+                {hervach}
               />
             </div>
           </Drawer.Content>
@@ -810,6 +821,7 @@
     activeOrder={order}
     {halukot}
     {hervach}
+    tosplitId={pendId}
   />
 {/if}
 

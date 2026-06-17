@@ -18,6 +18,7 @@ import type {
   PendResourceData,
   ResourceRequestData,
   HalukaData,
+  HalukaSiteShare,
   WelcomeData,
   TransferData,
   DecisionData,
@@ -636,6 +637,56 @@ export function extractWegets(userData: any): ResourceRequestData[] {
  * 
  * **Validates: Requirements 1.1, 1.4**
  */
+/**
+ * Sum a tosplit's site-share transfer halukas into a single display line.
+ * Defensive: returns `undefined` when there are none (or the field is absent
+ * because the cross-rikma schema isn't live yet). Status flags are aggregated
+ * conservatively — `confirmed`/`senderconf` are true only when ALL transfers are.
+ */
+function extractSiteShare(nodes: any): HalukaSiteShare | undefined {
+  if (!Array.isArray(nodes) || nodes.length === 0) {
+    return undefined;
+  }
+
+  let amount = 0;
+  let proposed = 0;
+  let hasProposed = false;
+  let allConfirmed = true;
+  let allSent = true;
+  let adjustDirection: string | undefined;
+  let adjustReason: string | null | undefined;
+
+  for (const node of nodes) {
+    const a = node?.attributes;
+    if (!a) continue;
+    amount += a.amount || 0;
+    if (typeof a.proposedAmount === 'number') {
+      proposed += a.proposedAmount;
+      hasProposed = true;
+    }
+    if (a.confirmed !== true) allConfirmed = false;
+    if (a.senderconf !== true) allSent = false;
+    // Carry the adjustment from the first transfer that has one (one proposal,
+    // one direction in practice).
+    if (adjustDirection === undefined && a.adjustDirection) {
+      adjustDirection = a.adjustDirection;
+      adjustReason = a.adjustReason ?? null;
+    }
+  }
+
+  if (amount <= 0) {
+    return undefined;
+  }
+
+  return {
+    amount,
+    confirmed: allConfirmed,
+    senderconf: allSent,
+    ...(hasProposed ? { proposedAmount: proposed } : {}),
+    ...(adjustDirection ? { adjustDirection, adjustReason } : {})
+  };
+}
+
 export function extractHalukas(userData: any): HalukaData[] {
   const halukas: HalukaData[] = [];
 
@@ -658,6 +709,13 @@ export function extractHalukas(userData: any): HalukaData[] {
 
       const attrs = tosplit.attributes;
 
+      // Site share (1💗1) — the platform service-share transfer(s) deducted from
+      // this proposal, summed for display. These are NOT in `halukas` (they don't
+      // gate the partners' confirmation, see SITE_SHARE_TRANSFER_SPEC.md §0.2/§7);
+      // they surface via the separate `siteShareHalukas` relation. Defensive: the
+      // field only exists once the cross-rikma schema is live, otherwise undefined.
+      const siteShare = extractSiteShare(attrs.siteShareHalukas?.data);
+
       halukas.push({
         id: tosplit.id,
         projectId: project.id,
@@ -671,6 +729,7 @@ export function extractHalukas(userData: any): HalukaData[] {
         halukot: attrs.halukas?.data || [],
         hervach: attrs.hervachti || [],
         pendId: tosplit.id,
+        ...(siteShare ? { siteShare } : {}),
 
         // Additional metadata that might be useful
         createdAt: attrs.createdAt
@@ -1264,6 +1323,37 @@ export function mapSaleData(sheirut: any, projectId: string, userData: any, mode
       }
     : iTransferedToFromSheirut;
 
+  // Site-share income: the platform rikma receives one transfer Haluka per
+  // contributing member (giver → chosen volunteer). Surface them ALL so each
+  // pair confirms the money moved via SheirutHalukaCard (vs. a normal sale,
+  // which only ever has a single haluka above).
+  const transferHalukas = (attrs.halukas?.data || []).map((h: any) => {
+    const ha = h.attributes || {};
+    const send = ha.usersend?.data;
+    const recv = ha.userrecive?.data;
+    return {
+      id: String(h.id),
+      amount: ha.amount ?? null,
+      senderconf: ha.senderconf || false,
+      confirmed: ha.confirmed || false,
+      forumId: ha.forum?.data?.id ? String(ha.forum.data.id) : null,
+      sender: send
+        ? {
+            id: String(send.id),
+            username: send.attributes?.username || '',
+            profilePic: send.attributes?.profilePic?.data?.attributes?.url
+          }
+        : null,
+      receiver: recv
+        ? {
+            id: String(recv.id),
+            username: recv.attributes?.username || '',
+            profilePic: recv.attributes?.profilePic?.data?.attributes?.url
+          }
+        : null
+    };
+  });
+
   // Extract weFinnish votes
   const weFinnish = attrs.weFinnish?.data?.map((v: any) => ({
     id: v.id,
@@ -1325,6 +1415,7 @@ export function mapSaleData(sheirut: any, projectId: string, userData: any, mode
     iTransferMoney: !!halukaId || attrs.iTransferMoney || false,
     moneyTransfered: attrs.moneyTransfered || false,
     productExepted: attrs.productExepted || false,
+    isSiteShareIncome: attrs.isSiteShareIncome || false,
 
     // Money handling
     iCanGetMonay,
@@ -1336,6 +1427,7 @@ export function mapSaleData(sheirut: any, projectId: string, userData: any, mode
     halukaForumId,
     senderconf,
     halukaConfirmed,
+    transferHalukas,
 
     // Delivery confirmation voting
     weFinnish,

@@ -1,6 +1,4 @@
 <script>
-  import { page } from '$app/state';
-
   import MultiSelect from 'svelte-multiselect';
   import { userName } from '../../stores/store.js';
   import { show } from './store-show.js';
@@ -12,14 +10,13 @@
    * @property {number} [show_value]
    * @property {(payload: {tx: number, txx: number}) => void} [onProgres]
    */
-  /**
-   * @type {Props}
-   */
+  /** @type {Props} */
   let {
     userName_value = $bindable(),
     show_value = $bindable(0),
     onProgres
   } = $props();
+
   import { lang } from '$lib/stores/lang.js';
   import jroles from '$lib/data/tafkidim.json';
   import enjrole from '$lib/data/tafkidimEn.json';
@@ -28,7 +25,6 @@
   let error1 = null;
   const baseUrl = import.meta.env.VITE_URL;
 
-  let addrole = 0;
   function find_role_id(role_name_arr) {
     var arr = [];
     for (let j = 0; j < role_name_arr.length; j++) {
@@ -50,23 +46,14 @@
     }
     const parseJSON = (resp) => (resp.json ? resp.json() : resp);
     const checkStatus = (resp) => {
-      if (resp.status >= 200 && resp.status < 300) {
-        return resp;
-      }
-      return parseJSON(resp).then((resp) => {
-        throw resp;
-      });
-    };
-    const headers = {
-      'Content-Type': 'application/json'
+      if (resp.status >= 200 && resp.status < 300) return resp;
+      return parseJSON(resp).then((resp) => { throw resp; });
     };
 
     try {
       const res = await fetch(baseUrl + '/graphql', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: `query {
   tafkidims(sort: "roleDescription") { data { id attributes{ roleDescription  ${$lang == 'he' ? 'localizations {data {attributes{roleDescription } }}' : ''}}
@@ -83,13 +70,10 @@
         for (var i = 0; i < freshRoles.length; i++) {
           if (freshRoles[i].attributes.localizations.data.length > 0) {
             freshRoles[i].attributes.roleDescription =
-              freshRoles[
-                i
-              ].attributes.localizations.data[0].attributes.roleDescription;
+              freshRoles[i].attributes.localizations.data[0].attributes.roleDescription;
           }
         }
       }
-      // Deduplicate by roleDescription to prevent each_key_duplicate in MultiSelect
       const seenR = new Set();
       freshRoles = freshRoles.filter((r) => {
         const name = r.attributes?.roleDescription;
@@ -99,7 +83,6 @@
       });
       roles1 = freshRoles;
 
-      // טעינת התפקידים שנבחרו בעבר
       const currentRoles = $roles2;
       if (currentRoles && currentRoles.length > 0) {
         const roleNames = currentRoles
@@ -120,13 +103,8 @@
   let selected = $state([]);
   const placeholder = tr.reg.rolesPlaceholder[$lang];
 
-  userName.subscribe((value) => {
-    userName_value = value;
-  });
-
-  show.subscribe((newValue) => {
-    show_value = newValue;
-  });
+  userName.subscribe((value) => { userName_value = value; });
+  show.subscribe((newValue) => { show_value = newValue; });
 
   function increment() {
     newnew();
@@ -143,25 +121,17 @@
     show.update((n) => n - 1);
     onProgres?.({ tx: 0, txx: 20 });
   }
-  import Skip from '$lib/celim/icons/skip.svelte';
 
   let meData = $state();
   async function newnew() {
     for (let i = 0; i < selected.length; i++) {
-      if (
-        !roles1.map((c) => c.attributes.roleDescription).includes(selected[i])
-      ) {
-        //create new and update roles
-        console.log(selected, roles1);
+      if (!roles1.map((c) => c.attributes.roleDescription).includes(selected[i])) {
         let link = baseUrl + '/graphql';
         let d = new Date();
         try {
           await fetch(link, {
             method: 'POST',
-
-            headers: {
-              'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               query: `mutation  createTafkidim {
   createTafkidim(data: {  roleDescription: "${selected[i]}",
@@ -171,7 +141,6 @@
       attributes {
         roleDescription
       }
-
        }
     }
 }`
@@ -182,7 +151,6 @@
           const newOb = meData.data.createTafkidim.data;
           const newValues = roles1;
           newValues.push(newOb);
-
           roles1 = newValues;
           let userName_value = $userName;
           let data = {
@@ -191,180 +159,152 @@
             det: `${selected[i]}`
           };
           fetch('/api/ste', {
-            method: 'POST', // or 'PUT'
-            headers: {
-              'Content-Type': 'application/json'
-            },
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
-          })
-            .then((response) => response)
-            .then((data) => {
-              console.log('Success:', data);
-            })
-            .catch((error) => {
-              console.error('Error:', error);
-            });
+          }).catch((error) => { console.error('Error:', error); });
         } catch (error) {
           console.log('צריך לתקן:', error.response);
           error = error1;
-          console.log(error1);
         }
       }
     }
     roles2.set(find_role_id(selected));
-    console.log($roles2);
   }
 
-  let ugug = $state(``);
-
-  const srca = {
-    he: 'https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg',
-    en: 'https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg'
-  };
-  const srcb = {
-    he: 'https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg',
-    en: 'https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg'
-  };
+  let ugug = $state('');
   let addn = $derived({
     he: `${tr.selector.addPrefix.he} "${ugug}"`,
     en: `${tr.selector.addPrefix.en} "${ugug}"`,
     ar: `${tr.selector.addPrefix.ar} "${ugug}"`
   });
-  const nom = tr.reg.notInList;
   const what = tr.reg.rolesQuestion;
-  const skipt = tr.reg.skipToEnd;
 </script>
 
-<h1 class="midscreenText-2">
-  {userName_value}
-  <br />
-  {what[$lang]}
-</h1>
-<div dir={$lang == 'en' ? 'ltr' : 'rtl'} class="input-2">
-  <MultiSelect
-    --sms-width="var(--multiselect-width)"
-    outerDivClass="!bg-gold !text-barbi"
-    inputClass="!bg-gold !text-barbi"
-    liSelectedClass="!bg-barbi !text-gold"
-    --sms-max-width={'60vw'}
-    createOptionMsg={addn[$lang]}
-    allowUserOptions={'append'}
-    loading={newcontent}
-    bind:searchText={ugug}
-    bind:selected
-    {placeholder}
-    options={[...new Set(roles1.map((c) => c.attributes.roleDescription).filter(Boolean))]}
-  />
+<div class="step-inner" dir={$lang == 'en' ? 'ltr' : 'rtl'}>
+  <h2 class="step-title">{userName_value}&nbsp;{what[$lang]}</h2>
+  <div class="multi-wrap">
+    <MultiSelect
+      --sms-width="100%"
+      outerDivClass="!bg-gold !text-barbi"
+      inputClass="!bg-gold !text-barbi"
+      liSelectedClass="!bg-barbi !text-gold"
+      createOptionMsg={addn[$lang]}
+      allowUserOptions={'append'}
+      loading={newcontent}
+      bind:searchText={ugug}
+      bind:selected
+      {placeholder}
+      options={[...new Set(roles1.map((c) => c.attributes.roleDescription).filter(Boolean))]}
+    />
+  </div>
+  <div class="nav-row">
+    <button class="btn-nav btn-back" onclick={back} disabled={show_value <= 1}>
+      {$lang === 'en' ? '← Back' : 'חזרה →'}
+    </button>
+    <button class="btn-nav btn-skip" onclick={toend}>
+      {$lang === 'en' ? 'Skip' : 'דלג'}
+    </button>
+    <button class="btn-nav btn-next" onclick={increment}>
+      {$lang === 'en' ? 'Next →' : '← הבא'}
+    </button>
+  </div>
 </div>
-<button class="button-in-1-2" onclick={back}>
-  <img alt="go" style="height:15vh;" src={srca[$lang]} />
-</button>
-<button
-  class="button-end bg-sturk hover:bg-mturk p-1 rounded-full"
-  onclick={toend}
-  title={skipt[$lang]}
->
-  <Skip />
-</button>
-<button class="button-2" onclick={increment}>
-  <img alt="go" style="height:15vh;" src={srcb[$lang]} />
-</button>
 
 <style>
-  :global([data-svelte-dialog-content].content) {
-    background-color: #000000;
-    background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
-
-    width: 80vw;
-  }
-  @media (min-width: 501px) {
-    :global([data-svelte-dialog-content].content) {
-      background-color: #000000;
-      background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
-
-      width: 78vw;
-    }
-  }
-
-  .midscreenText-2 {
-    transition: all 1s ease-in;
-    grid-column: 1 /5;
-    grid-row: 1/ 2;
-    align-self: center;
-    justify-self: center;
-    font-size: 2rem;
-    line-height: normal;
-    text-shadow: 1px 1px purple;
-    color: var(--barbi-pink);
-    margin-top: 12vh;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639592274/line1_r0jmn5.png);
-    background-size: 18rem 6rem;
-    height: 6rem;
-    width: 18rem;
-    text-align: center;
-    padding: 0.65rem;
-    -webkit-text-size-adjust: 100%;
-  }
-  @media (max-width: 500px) {
-    .midscreenText-2 {
-      font-size: 0.75rem;
-      background-size: 12rem 4rem;
-      height: 4rem;
-      width: 12rem;
-      margin-top: 14vh;
-    }
-    .input-2 {
-      grid-column: 2/4;
-      grid-row: 2/3;
-      margin-top: 0;
-      display: flex;
-      justify-content: center;
-      align-self: center;
-      justify-self: center;
-      --multiselect-width: 30vw;
-    }
-    /* Keep the gold back/skip/next arrows reachable when the multiselect
-       grows past the viewport on small screens. */
-    .button-in-1-2,
-    .button-2,
-    .button-end {
-      position: sticky;
-      bottom: 8px;
-      z-index: 5;
-    }
-  }
-
-  .button-in-1-2 {
-    grid-column: 1/2;
-    grid-row: 7 / 8;
-    align-self: center;
-    justify-self: center;
-  }
-  .button-2 {
-    grid-column: 4/5;
-    grid-row: 7 / 8;
-    align-self: center;
-    justify-self: center;
-  }
-  .button-end {
-    grid-column: 2/4;
-    grid-row: 7 / 8;
-    align-self: center;
-    justify-self: center;
-  }
-  .input-2 {
-    grid-column: 2/4;
-    grid-row: 2/3;
-    margin-top: -8vh;
+  .step-inner {
     display: flex;
-    justify-content: center;
-    align-self: center;
-    justify-self: center;
-    --multiselect-width: auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    width: 100%;
   }
-  .input-2-2 {
-    grid-column: 1/5;
-    grid-row: 5/6;
+
+  .step-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #c8860a;
     text-align: center;
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  .multi-wrap {
+    width: 100%;
+    position: relative;
+    z-index: 50;
+  }
+
+  .nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding-top: 4px;
+  }
+
+  .btn-nav {
+    font-family: 'Heebo', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.18s;
+    border-radius: 99px;
+    white-space: nowrap;
+  }
+
+  .btn-back {
+    padding: 8px 16px;
+    background: rgba(255, 248, 220, 0.7);
+    border: 1.5px solid rgba(218, 165, 32, 0.38);
+    color: #7a5e00;
+    font-size: 0.8rem;
+  }
+  .btn-back:not(:disabled):hover {
+    background: rgba(255, 215, 0, 0.15);
+    border-color: rgba(218, 165, 32, 0.65);
+  }
+  .btn-back:disabled {
+    opacity: 0.32;
+    cursor: default;
+  }
+
+  .btn-next {
+    padding: 9px 20px;
+    background: linear-gradient(135deg, #daa520, #e91e8c);
+    border: none;
+    color: #fff;
+    font-size: 0.85rem;
+    box-shadow: 0 3px 12px rgba(218, 165, 32, 0.3);
+  }
+  .btn-next:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 18px rgba(218, 165, 32, 0.42);
+  }
+
+  .btn-skip {
+    padding: 7px 12px;
+    background: transparent;
+    border: 1.5px dashed rgba(218, 165, 32, 0.42);
+    color: #9a6b10;
+    font-size: 0.72rem;
+  }
+  .btn-skip:hover {
+    border-style: solid;
+    background: rgba(255, 215, 0, 0.08);
+  }
+
+  :global(.multi-wrap .options) {
+    top: 100% !important;
+    bottom: auto !important;
+    margin-top: 5px !important;
+    margin-bottom: 0 !important;
+    max-height: 40vh !important;
+    overflow-y: auto !important;
+    z-index: 9999 !important;
+    background: var(--gold) !important;
+    border: 2px solid var(--barbi-pink) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18) !important;
   }
 </style>
