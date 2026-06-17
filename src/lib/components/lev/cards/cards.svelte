@@ -1145,6 +1145,9 @@
                       declineddarra={buble.declineddarra}
                       deadLine={buble.sqadualed}
                       sqadualedf={buble.sqadualedf}
+                      kindOf={buble.kindOf}
+                      recurring={buble.recurring}
+                      cycleSize={buble.cycleSize}
                       oid={buble.oid}
                       id={buble.id}
                       price={buble.price}

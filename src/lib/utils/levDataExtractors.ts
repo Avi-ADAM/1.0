@@ -1055,8 +1055,18 @@ export function extractResourceSuggestions(userData: any): ResourceSuggestionDat
           kindOf: omAttrs.kindOf,
           spnot: omAttrs.spnot,
           descrip: omAttrs.descrip,
-          sqedualed: omAttrs.sqedualed,
-          sqedualedf: omAttrs.sqedualedf,
+          // Strapi field is `sqadualed`/`sqadualedf` (start/end). Expose under the
+          // `sqadualed*` keys the cards read; keep the legacy `sqedualed*` keys
+          // populated from the same source for any older consumers.
+          sqadualed: omAttrs.sqadualed,
+          sqadualedf: omAttrs.sqadualedf,
+          sqedualed: omAttrs.sqadualed,
+          sqedualedf: omAttrs.sqadualedf,
+
+          // Recurring expense terms (open-ended monthly/yearly cost, approved
+          // each cycle). Copied onto the OpenMashaabim at pmash approval.
+          recurring: omAttrs.recurring === true,
+          cycleSize: omAttrs.cycleSize ?? 1,
 
           myp: myp,
           oid: spId,

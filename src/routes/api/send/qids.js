@@ -2430,7 +2430,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       data {
         id
         attributes {
-          name descrip spnot kindOf hm price easy linkto sqadualed sqadualedf
+          name descrip spnot kindOf hm price easy linkto sqadualed sqadualedf recurring cycleSize
           mashaabim { data { id } }
           timegrama { data { id } }
           users {
@@ -3423,6 +3423,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           descrip
                           spnot
                           kindOf
+                          recurring
+                          cycleSize
                           users {
                             data {
                               id
