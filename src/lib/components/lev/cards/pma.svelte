@@ -78,6 +78,7 @@
     recurring = false,
     recurringNoEnd = false,
     pricePerUnit = 0,
+    cycleSize = 1,
     already = $bindable(),
     allr = false,
     nego_mashes = [],
@@ -206,7 +207,44 @@
         label: 'מיקום'
       });
     }
+    // Recurring expense toggled (one-time ↔ recurring). recurring is a boolean,
+    // so it can't go through the truthy guards above — compare explicitly, and
+    // only when the snapshot actually carried a recurring value.
+    if (
+      previousOffer.recurring != null &&
+      Boolean(previousOffer.recurring) !== Boolean(recurring)
+    ) {
+      changes.push({
+        type: 'recurring',
+        old: previousOffer.recurring ? 'משאב חוזר' : 'חד פעמי',
+        new: recurring ? 'משאב חוזר' : 'חד פעמי',
+        label: 'סוג חיוב'
+      });
+    }
+    // Billing frequency (every N months/years) changed — only meaningful while
+    // the resource is recurring.
+    if (
+      recurring &&
+      previousOffer.cycleSize &&
+      Number(previousOffer.cycleSize) !== Number(cycleSize)
+    ) {
+      changes.push({
+        type: 'cycleSize',
+        old: cycleLabel(previousOffer.cycleSize),
+        new: cycleLabel(cycleSize),
+        label: 'תדירות'
+      });
+    }
     return changes;
+  }
+
+  // Human label for a billing frequency: "כל חודש" / "כל 3 חודשים" (or years
+  // when the resource is yearly).
+  function cycleLabel(n) {
+    const num = Number(n) || 1;
+    const single = kindOf === 'yearly' ? 'שנה' : 'חודש';
+    const plural = kindOf === 'yearly' ? 'שנים' : 'חודשים';
+    return num === 1 ? `כל ${single}` : `כל ${num} ${plural}`;
   }
 
   function locationSummary(loc) {

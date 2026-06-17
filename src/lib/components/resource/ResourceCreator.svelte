@@ -63,6 +63,9 @@
   // Recurring monthly/yearly expense (server rent, apartment, stall…). When on,
   // the resource becomes a mashabetahalich engine driven by /api/monthi.
   let isRecurring = $state(false);
+  // How often the cycle repeats: every N units (months for monthly, years for
+  // yearly). Defaults to every 1.
+  let cycleSize = $state(1);
 
   let locationOpen = $state(false);
   let locationScope = $state({
@@ -206,6 +209,11 @@
       recurring: 'הוצאה חוזרת חודשית',
       recurringHint: 'תשלום קבוע שחוזר כל חודש (שרת, שכירות, דוכן). בכל חודש תתבקשו לאשר את הסכום שהוצא, וזה ייכנס לארכיון לאחר אישור הריקמה.',
       recurringEndOptional: 'תאריך סיום (לא חובה — עד לסימון כהושלם)',
+      cycleSize: 'תדירות החיוב',
+      cycleSizeHintMonthly: 'כל כמה חודשים נפתח חיוב לאישור (1 = כל חודש)',
+      cycleSizeHintYearly: 'כל כמה שנים נפתח חיוב לאישור (1 = כל שנה)',
+      cycleUnitMonthly: 'חודשים',
+      cycleUnitYearly: 'שנים',
       totalPrice: 'סה"כ עלות משוערת',
       totalMax: 'סה"כ שווי בריקמה',
       summaryTitle: 'סיכום עלות',
@@ -258,6 +266,11 @@
       recurring: 'Recurring monthly expense',
       recurringHint: 'A fixed payment that repeats every month (server, rent, stall). Each month you will be asked to confirm the amount spent, and it is archived after the weave approves it.',
       recurringEndOptional: 'End date (optional — until marked done)',
+      cycleSize: 'Billing frequency',
+      cycleSizeHintMonthly: 'Open a confirmation every N months (1 = every month)',
+      cycleSizeHintYearly: 'Open a confirmation every N years (1 = every year)',
+      cycleUnitMonthly: 'months',
+      cycleUnitYearly: 'years',
       totalPrice: 'Total Estimated Cost',
       totalMax: 'Total Maximum Value',
       summaryTitle: 'Cost Summary',
@@ -477,6 +490,10 @@
         easy: maxInvestment || price,
         kindOf,
         recurring: isRecurring && (kindOf === 'monthly' || kindOf === 'yearly'),
+        cycleSize:
+          isRecurring && (kindOf === 'monthly' || kindOf === 'yearly')
+            ? Math.max(1, Number(cycleSize) || 1)
+            : undefined,
         hm: showQuantity ? hm : 1,
         linkto,
         spnot,
@@ -650,6 +667,32 @@
                 ></span>
               </span>
             </button>
+
+            {#if isRecurring}
+              <div
+                class="mt-3 flex flex-col rounded-xl border border-gold/40 bg-pink-950/10 p-3 animate-in fade-in duration-300"
+              >
+                <label class="text-sm text-barbie mb-1 font-medium"
+                  >{t.cycleSize}</label
+                >
+                <p class="text-xs text-barbie/80 mb-2">
+                  {kindOf === 'yearly'
+                    ? t.cycleSizeHintYearly
+                    : t.cycleSizeHintMonthly}
+                </p>
+                <div class="flex items-center gap-3">
+                  <NumberInput
+                    value={cycleSize}
+                    onValueChange={(v) => (cycleSize = Math.max(1, Number(v) || 1))}
+                  />
+                  <span class="text-sm text-barbie/90 whitespace-nowrap">
+                    {kindOf === 'yearly'
+                      ? t.cycleUnitYearly
+                      : t.cycleUnitMonthly}
+                  </span>
+                </div>
+              </div>
+            {/if}
           </div>
         {/if}
 

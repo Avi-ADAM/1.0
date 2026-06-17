@@ -990,6 +990,7 @@ diunim = ` ${diu},`
                 {recurring}
                 {recurringNoEnd}
                 {pricePerUnit}
+                {cycleSize}
                 {sqadualed}
                 {sqadualedf}
                 {easy}
@@ -1011,7 +1012,7 @@ diunim = ` ${diu},`
                 onNego={claf}
                 {projectId}
                 {users}
-                activeOrder={order}
+                activeOrder={ordern}
                 {onProj}
               />
             </div>
@@ -1052,11 +1053,12 @@ diunim = ` ${diu},`
     {recurring}
     {recurringNoEnd}
     {pricePerUnit}
+    {cycleSize}
     {sqadualed}
     {sqadualedf}
     {projectId}
     {users}
-    activeOrder={order}
+    activeOrder={ordern}
     {onProj}
   />
 {/if}

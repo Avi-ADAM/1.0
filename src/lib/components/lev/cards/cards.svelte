@@ -717,6 +717,7 @@
                       recurring={buble.recurring}
                       recurringNoEnd={buble.recurringNoEnd}
                       pricePerUnit={buble.pricePerUnit}
+                      cycleSize={buble.cycleSize}
                       linkto={buble.linkto}
                       location={buble.location}
                       pendId={buble.pendId}

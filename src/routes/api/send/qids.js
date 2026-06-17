@@ -3726,6 +3726,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           price
                           kindOf
                           spnot
+                          recurring
+                          cycleSize
                           location {
                             location_mode
                             lat
