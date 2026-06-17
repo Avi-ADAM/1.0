@@ -93,6 +93,13 @@
       "inTotal": "المجموع",
       "oneMonth": "شهر واحد"
     },
+    "resourcePeriod": {
+      "monthly": "شهري",
+      "yearly": "سنوي",
+      "recurring": "مورد متكرر",
+      "noEndDate": "بدون تاريخ انتهاء",
+      "months": "أشهر"
+    },
     "inpro": {
       "missionInProgress": "مهمة قيد التنفيذ",
       "progressStatus": "حالة تقدم تنفيذ المهمة",

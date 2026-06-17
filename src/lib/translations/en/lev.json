@@ -93,6 +93,13 @@
       "inTotal": "In total",
       "oneMonth": "One month"
     },
+    "resourcePeriod": {
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "recurring": "Recurring resource",
+      "noEndDate": "No end date",
+      "months": "months"
+    },
     "inpro": {
       "missionInProgress": "Mission in progress",
       "progressStatus": "Status of mission progress",

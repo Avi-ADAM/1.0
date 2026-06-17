@@ -990,6 +990,8 @@ diunim = ` ${diu},`
                 {recurring}
                 {recurringNoEnd}
                 {pricePerUnit}
+                {sqadualed}
+                {sqadualedf}
                 {easy}
                 {price}
                 {hearotMeyuchadot}
@@ -1050,6 +1052,8 @@ diunim = ` ${diu},`
     {recurring}
     {recurringNoEnd}
     {pricePerUnit}
+    {sqadualed}
+    {sqadualedf}
     {projectId}
     {users}
     activeOrder={order}
