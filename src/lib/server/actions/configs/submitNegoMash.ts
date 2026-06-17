@@ -48,7 +48,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     cycleSize: orig.cycleSize ?? null,
     location: (() => {
       const loc = normalizeLocationInput(orig.location);
-      return loc ? [loc] : null;
+      return loc ? [loc] : [];
     })(),
   }, context.jwt, context.fetch);
 
