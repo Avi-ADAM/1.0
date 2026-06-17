@@ -2532,6 +2532,23 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         id
         attributes {
           name
+          quantityDelivered
+          cycleIndex
+          cycleStart
+          cycleEnd
+          mashabetahalich {
+            data {
+              id
+              attributes {
+                name
+                pricePerUnit
+                kindOf
+                quantityDelivered
+                users_permissions_user { data { id } }
+                rikmash { data { id } }
+              }
+            }
+          }
           vots {
             id
             what
@@ -4077,6 +4094,24 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                   attributes {
                     createdAt
                     name
+                    quantityDelivered
+                    cycleIndex
+                    cycleStart
+                    cycleEnd
+                    mashabetahalich {
+                      data {
+                        id
+                        attributes {
+                          name
+                          pricePerUnit
+                          kindOf
+                          start
+                          end
+                          status_mashab
+                          users_permissions_user { data { id } }
+                        }
+                      }
+                    }
                     sp {
                       data {
                         id
@@ -4144,6 +4179,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                     price
                     kindOf
                     spnot
+                    recurring
+                    cycleSize
                     location {
                       location_mode
                       lat
@@ -4166,6 +4203,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           price
                           kindOf
                           spnot
+                          recurring
+                          cycleSize
                           location {
                             location_mode
                             lat
@@ -7789,7 +7828,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $isOriginal: Boolean, $name: String, $descrip: String, $spnot: String,
     $easy: Float, $hm: Float, $price: Float, $kindOf: ENUM_NEGOMASH_KINDOF,
     $sqadualed: DateTime, $sqadualedf: DateTime, $linkto: String,
-    $location: [ComponentNewLocationInput]
+    $location: [ComponentNewLocationInput], $recurring: Boolean, $cycleSize: Int
   ) {
     createNegoMash(data: {
       publishedAt: $publishedAt
@@ -7807,6 +7846,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       sqadualedf: $sqadualedf
       linkto: $linkto
       location: $location
+      recurring: $recurring
+      cycleSize: $cycleSize
     }) { data { id } }
   }`,
 
@@ -7816,6 +7857,89 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
 };
 
 export const moachQids = {
+  // ─── Monthly recurring resources (mashabetahalich cyclic engine) ──────────
+  // A "mashabetahalich" with recurring=true is a recurring expense (server rent,
+  // apartment, stall…). Each month /api/monthi opens a cycle (a Maap with
+  // cycleIndex/cycleStart/cycleEnd) that surfaces on the lev screen; once the
+  // responsible user confirms the amount and the project approves it, the spend
+  // is archived as a delivery line on the resource's Rikmash.
+  'mrCreateMashabetahalich': `mutation MrCreateMashabetahalich($data: MashabetahalichInput!) {
+    createMashabetahalich(data: $data) { data { id attributes { name } } }
+  }`,
+  'mrUpdateMashabetahalich': `mutation MrUpdateMashabetahalich($id: ID!, $data: MashabetahalichInput!) {
+    updateMashabetahalich(id: $id, data: $data) { data { id attributes { status_mashab finnished } } }
+  }`,
+  'mrGetMashabetahalich': `query MrGetMashabetahalich($id: ID!) {
+    mashabetahalich(id: $id) {
+      data { id attributes {
+        name descrip pricePerUnit start end cycleSize kindOf recurring status_mashab
+        finnished quantityDelivered
+        project { data { id attributes { user_1s { data { id } } } } }
+        users_permissions_user { data { id attributes { username email lang noMail } } }
+        maaps { data { id attributes { cycleIndex cycleStart cycleEnd archived } } }
+        rikmash { data { id } }
+      } }
+    }
+  }`,
+  // Used by /api/monthi: every active, non-finished recurring resource.
+  'mrGetRecurringForMonthi': `query MrGetRecurringForMonthi {
+    mashabetahaliches(
+      filters: { recurring: { eq: true }, status_mashab: { eq: "active" }, finnished: { eq: false } }
+      pagination: { limit: 300 }
+    ) {
+      data { id attributes {
+        name pricePerUnit start end cycleSize kindOf
+        project { data { id attributes { projectName user_1s { data { id } } } } }
+        users_permissions_user { data { id attributes { username email lang noMail } } }
+        maaps(pagination: { limit: 500 }) { data { id attributes { cycleIndex cycleStart cycleEnd archived } } }
+        rikmash { data { id } }
+      } }
+    }
+  }`,
+  'mrCreateCycleMaap': `mutation MrCreateCycleMaap($data: MaapInput!) {
+    createMaap(data: $data) { data { id attributes { cycleIndex } } }
+  }`,
+  'mrGetRikmashForDelivery': `query MrGetRikmashForDelivery($id: ID!) {
+    rikmash(id: $id) {
+      data { id attributes {
+        total cyclesCount firstDeliveryAt lastDeliveryAt
+        deliveries { id cycleIndex deliveredAt quantity note maap { data { id } } }
+      } }
+    }
+  }`,
+  'mrCreateRikmash': `mutation MrCreateRikmash($data: RikmashInput!) {
+    createRikmash(data: $data) { data { id } }
+  }`,
+  'mrUpdateRikmash': `mutation MrUpdateRikmash($id: ID!, $data: RikmashInput!) {
+    updateRikmash(id: $id, data: $data) { data { id } }
+  }`,
+  'mrLinkRikmashToMashabetahalich': `mutation MrLinkRikmash($id: ID!, $rikmash: ID!) {
+    updateMashabetahalich(id: $id, data: { rikmash: $rikmash }) { data { id } }
+  }`,
+  // Resolve the approved recurring Pmash's final (possibly negotiated) terms so
+  // askm approval can spin up the mashabetahalich engine. Matched by project +
+  // name; only returns when the final pmash is still flagged recurring, so a
+  // member negotiating recurring → false cleanly results in no engine.
+  'mrGetPmashRecurringTerms': `query MrGetPmashRecurringTerms($pid: ID!, $name: String!) {
+    pmashes(
+      filters: {
+        project: { id: { eq: $pid } }
+        name: { eq: $name }
+        recurring: { eq: true }
+      }
+      sort: ["createdAt:desc"]
+      pagination: { limit: 1 }
+    ) {
+      data { id attributes {
+        recurring cycleSize easy price kindOf sqadualed sqadualedf
+        mashaabim { data { id } }
+      } }
+    }
+  }`,
+  'mrUpdateCycleMaap': `mutation MrUpdateCycleMaap($id: ID!, $data: MaapInput!) {
+    updateMaap(id: $id, data: $data) { data { id } }
+  }`,
+
   'getProjectBaseInfo': `query GetProjectBaseInfo($pid: ID!) {
     project(id: $pid) {
       data {

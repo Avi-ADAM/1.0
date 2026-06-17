@@ -8562,6 +8562,7 @@ export type NegoInput = {
 export type NegoMash = {
   __typename?: 'NegoMash';
   createdAt?: Maybe<Scalars['DateTime']['output']>;
+  cycleSize?: Maybe<Scalars['Int']['output']>;
   descrip?: Maybe<Scalars['String']['output']>;
   easy?: Maybe<Scalars['Float']['output']>;
   hm?: Maybe<Scalars['Float']['output']>;
@@ -8573,6 +8574,7 @@ export type NegoMash = {
   pmash?: Maybe<PmashEntityResponse>;
   price?: Maybe<Scalars['Float']['output']>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
+  recurring?: Maybe<Scalars['Boolean']['output']>;
   spnot?: Maybe<Scalars['String']['output']>;
   sqadualed?: Maybe<Scalars['DateTime']['output']>;
   sqadualedf?: Maybe<Scalars['DateTime']['output']>;
@@ -8615,6 +8617,7 @@ export type NegoMashEntityResponseCollection = {
 export type NegoMashFiltersInput = {
   and?: InputMaybe<Array<InputMaybe<NegoMashFiltersInput>>>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
+  cycleSize?: InputMaybe<IntFilterInput>;
   descrip?: InputMaybe<StringFilterInput>;
   easy?: InputMaybe<FloatFilterInput>;
   hm?: InputMaybe<FloatFilterInput>;
@@ -8629,6 +8632,7 @@ export type NegoMashFiltersInput = {
   pmash?: InputMaybe<PmashFiltersInput>;
   price?: InputMaybe<FloatFilterInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
+  recurring?: InputMaybe<BooleanFilterInput>;
   spnot?: InputMaybe<StringFilterInput>;
   sqadualed?: InputMaybe<DateTimeFilterInput>;
   sqadualedf?: InputMaybe<DateTimeFilterInput>;
@@ -8638,6 +8642,7 @@ export type NegoMashFiltersInput = {
 };
 
 export type NegoMashInput = {
+  cycleSize?: InputMaybe<Scalars['Int']['input']>;
   descrip?: InputMaybe<Scalars['String']['input']>;
   easy?: InputMaybe<Scalars['Float']['input']>;
   hm?: InputMaybe<Scalars['Float']['input']>;
@@ -8649,6 +8654,7 @@ export type NegoMashInput = {
   pmash?: InputMaybe<Scalars['ID']['input']>;
   price?: InputMaybe<Scalars['Float']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  recurring?: InputMaybe<Scalars['Boolean']['input']>;
   spnot?: InputMaybe<Scalars['String']['input']>;
   sqadualed?: InputMaybe<Scalars['DateTime']['input']>;
   sqadualedf?: InputMaybe<Scalars['DateTime']['input']>;
@@ -10153,6 +10159,7 @@ export type Pmash = {
   archived: Scalars['Boolean']['output'];
   askm?: Maybe<AskmEntityResponse>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
+  cycleSize?: Maybe<Scalars['Int']['output']>;
   descrip?: Maybe<Scalars['String']['output']>;
   diun?: Maybe<Array<Maybe<ComponentProjectsVots>>>;
   easy?: Maybe<Scalars['Float']['output']>;
@@ -10176,6 +10183,7 @@ export type Pmash = {
   price?: Maybe<Scalars['Float']['output']>;
   project?: Maybe<ProjectEntityResponse>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
+  recurring?: Maybe<Scalars['Boolean']['output']>;
   selfProposalUser?: Maybe<UsersPermissionsUserEntityResponse>;
   sheirut_fulfillments?: Maybe<SheirutFulfillmentRelationResponseCollection>;
   spnot?: Maybe<Scalars['String']['output']>;
@@ -10268,6 +10276,7 @@ export type PmashFiltersInput = {
   archived?: InputMaybe<BooleanFilterInput>;
   askm?: InputMaybe<AskmFiltersInput>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
+  cycleSize?: InputMaybe<IntFilterInput>;
   descrip?: InputMaybe<StringFilterInput>;
   diun?: InputMaybe<ComponentProjectsVotsFiltersInput>;
   easy?: InputMaybe<FloatFilterInput>;
@@ -10294,6 +10303,7 @@ export type PmashFiltersInput = {
   price?: InputMaybe<FloatFilterInput>;
   project?: InputMaybe<ProjectFiltersInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
+  recurring?: InputMaybe<BooleanFilterInput>;
   selfProposalUser?: InputMaybe<UsersPermissionsUserFiltersInput>;
   sheirut_fulfillments?: InputMaybe<SheirutFulfillmentFiltersInput>;
   spnot?: InputMaybe<StringFilterInput>;
@@ -10307,6 +10317,7 @@ export type PmashFiltersInput = {
 export type PmashInput = {
   archived?: InputMaybe<Scalars['Boolean']['input']>;
   askm?: InputMaybe<Scalars['ID']['input']>;
+  cycleSize?: InputMaybe<Scalars['Int']['input']>;
   descrip?: InputMaybe<Scalars['String']['input']>;
   diun?: InputMaybe<Array<InputMaybe<ComponentProjectsVotsInput>>>;
   easy?: InputMaybe<Scalars['Float']['input']>;
@@ -10330,6 +10341,7 @@ export type PmashInput = {
   price?: InputMaybe<Scalars['Float']['input']>;
   project?: InputMaybe<Scalars['ID']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  recurring?: InputMaybe<Scalars['Boolean']['input']>;
   selfProposalUser?: InputMaybe<Scalars['ID']['input']>;
   sheirut_fulfillments?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   spnot?: InputMaybe<Scalars['String']['input']>;

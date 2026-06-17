@@ -300,6 +300,15 @@ export type ActionKey =
   | 'getSiteSharePayables'
   | 'getSiteShareArchive'
   | 'getRikmaSplitsArchive'
+  | 'toggleGuideStatus'
+  | 'createMissionTemplate'
+  | 'updateUserProfilePic'
+  | 'updateUserBasic'
+  | 'archiveUserResource'
+  | 'addAskmChatEntry'
+  | 'addAskChatEntry'
+  | 'createWeave'
+  | 'markResourceDone'
   ;
 
 
@@ -354,6 +363,8 @@ export interface ActionParamsMap {
     endDate?: string;
     isAssigned?: boolean;
     isReceived?: boolean;
+    recurring?: boolean;
+    cycleSize?: number;
     existingSpId?: string;
     restime?: string;
     isOnline?: boolean;

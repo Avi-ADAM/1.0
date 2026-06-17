@@ -14,6 +14,68 @@ function formatDate(date = new Date()) {
   return [year, month, day].join('-');
 }
 
+// Bounds of the cycle (month or year) that contains `ref`.
+function cycleBounds(unit, ref = new Date()) {
+  if (unit === 'year') {
+    return {
+      cycleStart: new Date(ref.getFullYear(), 0, 1),
+      cycleEnd: new Date(ref.getFullYear(), 11, 31, 23, 59, 59)
+    };
+  }
+  return {
+    cycleStart: new Date(ref.getFullYear(), ref.getMonth(), 1),
+    cycleEnd: new Date(ref.getFullYear(), ref.getMonth() + 1, 0, 23, 59, 59)
+  };
+}
+
+// Does an existing (non-archived) cycle already cover the given window?
+function hasOpenCycleFor(maaps, cycleStart) {
+  const y = cycleStart.getFullYear();
+  const m = cycleStart.getMonth();
+  return (maaps || []).some((mp) => {
+    const a = mp.attributes ?? mp;
+    if (a.archived) return false;
+    if (!a.cycleStart) return false;
+    const d = new Date(a.cycleStart);
+    return d.getFullYear() === y && d.getMonth() === m;
+  });
+}
+
+// Render the activation email and post it to the existing sendMail endpoint.
+async function sendActivationEmail(fetchFn, user, payload) {
+  if (!user?.email || user?.noMail === true) return;
+  try {
+    const { render } = await import('svelty-email');
+    const mod = await import('$lib/components/mail/monthlyResourceActive.svelte');
+    const lang = ['he', 'en', 'ar'].includes(user.lang) ? user.lang : 'he';
+    const previewText =
+      lang === 'en'
+        ? `Log this month's expense for ${payload.resourceName}`
+        : `עדכון ההוצאה החודשית עבור ${payload.resourceName}`;
+    const emailHtml = await render(mod.default, {
+      username: user.username || '',
+      resourceName: payload.resourceName,
+      projectName: payload.projectName,
+      plannedAmount: payload.plannedAmount,
+      monthLabel: payload.monthLabel,
+      lang,
+      previewText
+    });
+    await fetchFn('/api/sendMail', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: user.email,
+        emailHtml,
+        previewText,
+        emailText: previewText
+      })
+    });
+  } catch (e) {
+    console.error('monthi: failed to send activation email', e);
+  }
+}
+
 // Hours from timer segments that fall within the given year+month
 function hoursInMonth(timers, year, month) {
   if (!timers || !Array.isArray(timers)) return 0;
@@ -33,7 +95,7 @@ function hoursInMonth(timers, year, month) {
 
 let suc = [];
 
-export async function GET() {
+export async function GET({ fetch }) {
   console.log('monthi api called');
   suc = [];
 
@@ -129,5 +191,103 @@ export async function GET() {
     console.error('monthi top-level error', e);
   }
 
-  return new Response(JSON.stringify(suc));
+  // ── Recurring resources (mashabetahalich): open this month's cycle ─────────
+  const sucRes = await runRecurringResources(fetch);
+
+  return new Response(JSON.stringify({ missions: suc, resources: sucRes }));
+}
+
+// For every active recurring resource, open a Maap cycle for the current month
+// (unless one already exists or the resource ended), and email the responsible
+// user to confirm the amount spent. Past-end resources are closed.
+async function runRecurringResources(fetchFn) {
+  const opened = [];
+
+  const listQue = `query MrGetRecurringForMonthi {
+    mashabetahaliches(
+      filters: { recurring: { eq: true }, status_mashab: { eq: "active" }, finnished: { eq: false } }
+      pagination: { limit: 300 }
+    ) {
+      data { id attributes {
+        name pricePerUnit start end cycleSize kindOf
+        project { data { id attributes { projectName } } }
+        users_permissions_user { data { id attributes { username email lang noMail } } }
+        maaps(pagination: { limit: 500 }) { data { id attributes { cycleIndex cycleStart cycleEnd archived } } }
+      } }
+    }
+  }`;
+
+  let list;
+  try {
+    list = await SendTo(listQue, ADMINMONTHER);
+  } catch (e) {
+    console.error('monthi: failed to list recurring resources', e);
+    return opened;
+  }
+  const engines = list?.data?.mashabetahaliches?.data ?? [];
+  const now = new Date();
+
+  for (const eng of engines) {
+    const id = eng.id;
+    const a = eng.attributes ?? {};
+    try {
+      const unit = a.kindOf === 'yearly' ? 'year' : 'month';
+      const start = a.start ? new Date(a.start) : null;
+      const end = a.end ? new Date(a.end) : null;
+
+      if (start && now < start) continue; // not started yet
+
+      if (end && now > end) {
+        // Past the end date — close the engine so no further cycles open.
+        const closeMut = `mutation { updateMashabetahalich(id: "${id}", data: { status_mashab: "closed", finnished: true }) { data { id } } }`;
+        await SendTo(closeMut, ADMINMONTHER);
+        continue;
+      }
+
+      const { cycleStart, cycleEnd } = cycleBounds(unit, now);
+      const maaps = a.maaps?.data ?? [];
+      if (hasOpenCycleFor(maaps, cycleStart)) continue; // already opened this period
+
+      const nextIndex =
+        maaps.reduce((mx, mp) => Math.max(mx, mp.attributes?.cycleIndex ?? 0), 0) + 1;
+      const projectId = a.project?.data?.id;
+      const planned = a.pricePerUnit ?? 0;
+      const name = (a.name ?? 'משאב').replace(/"/g, '\\"');
+
+      const createMut = `mutation {
+        createMaap(data: {
+          project: "${projectId}",
+          name: "${name}",
+          mashabetahalich: "${id}",
+          cycleIndex: ${nextIndex},
+          cycleStart: "${cycleStart.toISOString()}",
+          cycleEnd: "${cycleEnd.toISOString()}",
+          quantityDelivered: ${planned},
+          publishedAt: "${now.toISOString()}"
+        }) { data { id } }
+      }`;
+      const created = await SendTo(createMut, ADMINMONTHER);
+      if (!created?.data?.createMaap?.data?.id) {
+        console.error('monthi: failed to open cycle for resource', id, created);
+        continue;
+      }
+
+      // Email the responsible user to confirm this month's spend.
+      const user = a.users_permissions_user?.data?.attributes;
+      const monthLabel = `${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+      await sendActivationEmail(fetchFn, user, {
+        resourceName: a.name ?? '',
+        projectName: a.project?.data?.attributes?.projectName ?? '',
+        plannedAmount: planned,
+        monthLabel
+      });
+
+      console.log('monthi: opened cycle', nextIndex, 'for resource', id);
+      opened.push(id);
+    } catch (e) {
+      console.error('monthi: error processing recurring resource', id, e);
+    }
+  }
+
+  return opened;
 }

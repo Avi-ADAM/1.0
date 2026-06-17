@@ -33,6 +33,8 @@
    * @property {any} price
    * @property {any} monts
    * @property {any} yers
+   * @property {any} [sqadualed]
+   * @property {any} [sqadualedf]
    * @property {any} hm
    * @property {boolean} [already]
    * @property {boolean} [allr]
@@ -70,7 +72,13 @@
     price,
     monts,
     yers,
+    sqadualed = null,
+    sqadualedf = null,
     hm,
+    recurring = false,
+    recurringNoEnd = false,
+    pricePerUnit = 0,
+    cycleSize = 1,
     already = $bindable(),
     allr = false,
     nego_mashes = [],
@@ -88,6 +96,7 @@
     projectId,
     onProj
   } = $props();
+  console.log(recurring, recurringNoEnd, pricePerUnit, '1');
   let user_1s = $derived.by(() => {
     return getProjectData(projectId, 'us') || [];
   });
@@ -198,7 +207,44 @@
         label: 'מיקום'
       });
     }
+    // Recurring expense toggled (one-time ↔ recurring). recurring is a boolean,
+    // so it can't go through the truthy guards above — compare explicitly, and
+    // only when the snapshot actually carried a recurring value.
+    if (
+      previousOffer.recurring != null &&
+      Boolean(previousOffer.recurring) !== Boolean(recurring)
+    ) {
+      changes.push({
+        type: 'recurring',
+        old: previousOffer.recurring ? 'משאב חוזר' : 'חד פעמי',
+        new: recurring ? 'משאב חוזר' : 'חד פעמי',
+        label: 'סוג חיוב'
+      });
+    }
+    // Billing frequency (every N months/years) changed — only meaningful while
+    // the resource is recurring.
+    if (
+      recurring &&
+      previousOffer.cycleSize &&
+      Number(previousOffer.cycleSize) !== Number(cycleSize)
+    ) {
+      changes.push({
+        type: 'cycleSize',
+        old: cycleLabel(previousOffer.cycleSize),
+        new: cycleLabel(cycleSize),
+        label: 'תדירות'
+      });
+    }
     return changes;
+  }
+
+  // Human label for a billing frequency: "כל חודש" / "כל 3 חודשים" (or years
+  // when the resource is yearly).
+  function cycleLabel(n) {
+    const num = Number(n) || 1;
+    const single = kindOf === 'yearly' ? 'שנה' : 'חודש';
+    const plural = kindOf === 'yearly' ? 'שנים' : 'חודשים';
+    return num === 1 ? `כל ${single}` : `כל ${num} ${plural}`;
   }
 
   function locationSummary(loc) {
@@ -214,6 +260,52 @@
   }
 
   const changes = getChanges();
+
+  function isValidDate(d) {
+    if (d == null || d === 'undefined' || d === 'null' || d === '') return false;
+    return !Number.isNaN(new Date(d).getTime());
+  }
+
+  function formatResourceDate(d) {
+    const locale = $lang === 'he' ? 'he-IL' : $lang;
+    return new Date(d).toLocaleDateString(locale);
+  }
+
+  let hasStartDate = $derived(isValidDate(sqadualed));
+  let hasEndDate = $derived(isValidDate(sqadualedf));
+  let hasDateRange = $derived(hasStartDate && hasEndDate);
+  let isYearlyResource = $derived(kindOf === 'yearly');
+  let unitPrice = $derived(
+    pricePerUnit > 0 ? pricePerUnit : easy > 0 ? easy : price
+  );
+
+  let periodCount = $derived.by(() => {
+    if (!hasDateRange) return 0;
+    const start = new Date(sqadualed).getTime();
+    const end = new Date(sqadualedf).getTime();
+    if (end <= start) return 0;
+    const diff = end - start;
+    if (isYearlyResource) {
+      return diff / (1000 * 60 * 60 * 24 * 365.25);
+    }
+    return diff / ((1000 * 60 * 60 * 24 * 365.25) / 12);
+  });
+
+  let dateRangeTotal = $derived.by(() => {
+    if (!hasDateRange || periodCount <= 0) return null;
+    if (recurring || kindOf === 'monthly' || kindOf === 'yearly') {
+      return unitPrice * periodCount;
+    }
+    return null;
+  });
+
+  let showResourcePeriod = $derived(
+    hasStartDate ||
+      hasEndDate ||
+      recurring ||
+      kindOf === 'monthly' ||
+      kindOf === 'yearly'
+  );
 
   function stripHtml(html) {
     if (!html) return '';
@@ -271,7 +363,11 @@
   <CardHeader
     logoSrc={src}
     {projectName}
-    cardType={hasUpdatedOffer ? 'הצעה מתוקנת' : 'אישור משאב'}
+    cardType={hasUpdatedOffer
+      ? 'הצעה מתוקנת'
+      : recurring
+        ? '🔁 משאב חוזר · אישרור חודשי'
+        : 'אישור משאב'}
     cardTitle={name}
     memberCount={noofusersOk + noofusersWaiting + noofusersNo}
     {glowColor}
@@ -328,7 +424,30 @@
           alt="howmuch"
         />
 
-        {#if kindOf === 'perUnit'}
+        {#if recurring}
+          <span
+            onmouseenter={() => hover('עלות חודשית משוערת')}
+            onmouseleave={() => hover('0')}
+            class="text-barbi dark:text-pink-400 font-bold"
+          >
+            {(pricePerUnit > 0
+              ? pricePerUnit
+              : easy > 0
+                ? easy
+                : price
+            ).toLocaleString()}
+            ₪ {kindOf === 'yearly' ? 'לשנה' : 'לחודש'}
+          </span>
+          <span class="text-gray-400">·</span>
+          <span
+            onmouseenter={() =>
+              hover('בכל חודש ייפתח חיוב לאישור ההוצאה בפועל')}
+            onmouseleave={() => hover('0')}
+            class="font-black text-gray-900 dark:text-white"
+          >
+            {recurringNoEnd ? '♾️ ללא תאריך סיום' : 'משאב חוזר'}
+          </span>
+        {:else if kindOf === 'perUnit'}
           <span
             onmouseenter={() => hover('שווי ליחידה')}
             onmouseleave={() => hover('0')}
@@ -416,6 +535,106 @@
           </span>
         {/if}
       </div>
+
+      {#if showResourcePeriod}
+        <div
+          class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 space-y-2"
+        >
+          {#if recurring || kindOf === 'monthly' || kindOf === 'yearly'}
+            <div
+              class="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 flex-wrap"
+            >
+              <span
+                class="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+              >
+                {isYearlyResource
+                  ? $t('lev.cards.resourcePeriod.yearly')
+                  : $t('lev.cards.resourcePeriod.monthly')}
+              </span>
+              {#if recurring}
+                <span class="text-gray-500 dark:text-gray-400 text-xs"
+                  >🔁 {$t('lev.cards.resourcePeriod.recurring')}</span
+                >
+              {/if}
+            </div>
+          {/if}
+
+          {#if hasStartDate || hasEndDate || (recurring && recurringNoEnd)}
+            <div
+              class="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300"
+            >
+              <svg
+                class="w-4 h-4 text-blue-500 shrink-0 mt-0.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                ><path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                ></path></svg
+              >
+              <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+                {#if hasStartDate}
+                  <span
+                    onmouseenter={() => hover($t('lev.cards.saleCard.startDate'))}
+                    onmouseleave={() => hover('0')}
+                  >
+                    <span class="text-gray-400 dark:text-gray-500"
+                      >{$t('lev.cards.saleCard.startDate')}</span
+                    >
+                    {formatResourceDate(sqadualed)}
+                  </span>
+                {/if}
+                {#if hasEndDate}
+                  {#if hasStartDate}<span class="text-gray-400">–</span>{/if}
+                  <span
+                    onmouseenter={() => hover($t('lev.cards.saleCard.endDate'))}
+                    onmouseleave={() => hover('0')}
+                  >
+                    <span class="text-gray-400 dark:text-gray-500"
+                      >{$t('lev.cards.saleCard.endDate')}</span
+                    >
+                    {formatResourceDate(sqadualedf)}
+                  </span>
+                {:else if recurring && recurringNoEnd}
+                  {#if hasStartDate}<span class="text-gray-400">–</span>{/if}
+                  <span
+                    onmouseenter={() =>
+                      hover($t('lev.cards.resourcePeriod.noEndDate'))}
+                    onmouseleave={() => hover('0')}
+                  >
+                    ♾️ {$t('lev.cards.resourcePeriod.noEndDate')}
+                  </span>
+                {/if}
+              </div>
+            </div>
+          {/if}
+
+          {#if dateRangeTotal != null}
+            <div
+              class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-bold text-gray-900 dark:text-white"
+            >
+              <span
+                class="text-gray-500 dark:text-gray-400 font-medium"
+                onmouseenter={() => hover($t('lev.cards.voteCard.inTotal'))}
+                onmouseleave={() => hover('0')}
+              >
+                {$t('lev.cards.voteCard.inTotal')}:
+              </span>
+              <span>{Math.round(dateRangeTotal).toLocaleString()} ₪</span>
+              <span class="text-gray-400 font-normal text-xs">
+                ({unitPrice.toLocaleString()} × {periodCount.toFixed(1)}
+                {isYearlyResource
+                  ? $t('lev.cards.voteCard.years')
+                  : $t('lev.cards.resourcePeriod.months')})
+              </span>
+            </div>
+          {/if}
+        </div>
+      {/if}
 
       <!-- תיאור והערות -->
       <div class="mt-4 space-y-3">
@@ -514,7 +733,11 @@
   {#if user_1s && user_1s.length > 0}
     {#if isMobileOrTablet()}
       <div class="pt-2">
-        <VoteStatusDisplay votes={users || []} members={user_1s} {activeOrder} />
+        <VoteStatusDisplay
+          votes={users || []}
+          members={user_1s}
+          {activeOrder}
+        />
       </div>
     {/if}
   {:else}

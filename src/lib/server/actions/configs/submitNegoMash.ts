@@ -44,9 +44,11 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     sqadualed: orig.sqadualed ?? null,
     sqadualedf: orig.sqadualedf ?? null,
     linkto: orig.linkto ?? null,
+    recurring: orig.recurring ?? null,
+    cycleSize: orig.cycleSize ?? null,
     location: (() => {
       const loc = normalizeLocationInput(orig.location);
-      return loc ? [loc] : null;
+      return loc ? [loc] : [];
     })(),
   }, context.jwt, context.fetch);
 
@@ -72,24 +74,25 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
 
   const allUsers = [...existingUsers, newVote];
 
-  // 4. Build the pmash update data (only changed fields)
-  const nv = params.newValues ?? {};
+  // 4. Build the pmash update data. Apply every field the negotiator actually
+  //    changed — including clears to null/empty (e.g. removing the end date to
+  //    make a recurring expense open-ended). The negotiation form only adds a
+  //    key to newValues when it changed, so key-presence == "changed".
+  const nv: Record<string, any> = params.newValues ?? {};
   const entityData: Record<string, any> = {};
 
-  if (nv.name       != null) entityData.name       = nv.name;
-  if (nv.descrip    != null) entityData.descrip    = nv.descrip;
-  if (nv.spnot      != null) entityData.spnot      = nv.spnot;
-  if (nv.easy       != null) entityData.easy       = nv.easy;
-  if (nv.hm         != null) entityData.hm         = nv.hm;
-  if (nv.price      != null) entityData.price      = nv.price;
-  if (nv.kindOf     != null) entityData.kindOf     = nv.kindOf;
-  if (nv.sqadualed  != null) entityData.sqadualed  = nv.sqadualed;
-  if (nv.sqadualedf != null) entityData.sqadualedf = nv.sqadualedf;
-  if (nv.linkto     != null) entityData.linkto     = nv.linkto;
+  const SCALAR_FIELDS = [
+    'name', 'descrip', 'spnot', 'easy', 'hm', 'price', 'kindOf',
+    'sqadualed', 'sqadualedf', 'linkto', 'recurring', 'cycleSize',
+  ];
+  for (const key of SCALAR_FIELDS) {
+    if (key in nv) entityData[key] = nv[key];
+  }
 
-  if (nv.location != null) {
-    const loc = normalizeLocationInput(nv.location);
-    if (loc) entityData.location = loc;
+  if ('location' in nv) {
+    // normalizeLocationInput returns null for an empty location → applying null
+    // clears the component, so the location can be removed in a negotiation too.
+    entityData.location = normalizeLocationInput(nv.location);
   }
 
   entityData.users = allUsers;
@@ -105,17 +108,13 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   // refresh that would reset the user's scroll/swiper position. The card face
   // (name, totals, vote counts) updates immediately.
   const patch: Record<string, any> = {};
-  if (nv.name       != null) patch.name       = nv.name;
-  if (nv.descrip    != null) patch.descrip    = nv.descrip;
-  if (nv.spnot      != null) patch.spnot      = nv.spnot;
-  if (nv.easy       != null) patch.easy       = nv.easy;
-  if (nv.hm         != null) patch.hm         = nv.hm;
-  if (nv.price      != null) patch.price      = nv.price;
-  if (nv.kindOf     != null) patch.resourceType = nv.kindOf;
-  if (nv.sqadualed  != null) patch.sqadualed  = nv.sqadualed;
-  if (nv.sqadualedf != null) patch.sqadualedf = nv.sqadualedf;
-  if (nv.linkto     != null) patch.linkto     = nv.linkto;
-  if (entityData.location != null) patch.location = entityData.location;
+  for (const key of SCALAR_FIELDS) {
+    if (!(key in nv)) continue;
+    // The pmashes store keys resource kind as `resourceType`.
+    if (key === 'kindOf') patch.resourceType = nv.kindOf;
+    else patch[key] = nv[key];
+  }
+  if ('location' in nv) patch.location = entityData.location;
 
   // Negotiator's vote in the Strapi-nested shape processPmashes/mergeVote expect.
   const strapiVote: Record<string, any> = {
@@ -144,7 +143,7 @@ export const submitNegoMashConfig: ActionConfig = {
     restime:        { type: 'string',  required: false, description: 'Project restime: feh|sth|nsh|sevend' },
     isOriginal:     { type: 'boolean', required: false, description: 'True if this is the first negotiation (stepState === 2)' },
     ordern:         { type: 'number',  required: false, description: 'Current order index (new vote gets ordern+1)' },
-    newValues:      { type: 'object',  required: false, description: 'Changed field values to apply (name, descrip, spnot, easy, hm, price, kindOf, sqadualed, sqadualedf, linkto, location)' },
+    newValues:      { type: 'object',  required: false, description: 'Changed field values to apply (name, descrip, spnot, easy, hm, price, kindOf, sqadualed, sqadualedf, linkto, location, recurring, cycleSize)' },
     originalValues: { type: 'object',  required: false, description: 'Original values before the change (for the snapshot)' },
     users:          { type: 'array',   required: false, description: 'Existing users/votes array on the pmash' },
   },

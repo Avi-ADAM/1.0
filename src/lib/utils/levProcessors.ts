@@ -1483,6 +1483,12 @@ export function processPmashes(
       sqadualed: pmash.sqadualed,
       sqadualedf: pmash.sqadualedf,
 
+      // Recurring expense flags (open-ended monthly/yearly cost, approved monthly)
+      recurring: pmash.recurring === true,
+      recurringNoEnd: pmash.recurringNoEnd === true,
+      cycleSize: pmash.cycleSize ?? 1,
+      pricePerUnit: pmash.pricePerUnit,
+
       // Timegrama
       timegramaId: pmash.timegramaId,
       timeGramaDate: pmash.timegramaDate,
@@ -1645,7 +1651,17 @@ export function processWegets(
       noofusersNo,
       whyno,
       whyes,
-      noofusersWaiting
+      noofusersWaiting,
+
+      // Recurring monthly resource cycle fields
+      isRecurringCycle: weget.isRecurringCycle === true,
+      mashabetahalichId: weget.mashabetahalichId,
+      cycleIndex: weget.cycleIndex,
+      cycleStart: weget.cycleStart,
+      cycleEnd: weget.cycleEnd,
+      quantityDelivered: weget.quantityDelivered,
+      pricePerUnit: weget.pricePerUnit,
+      responsibleUserId: weget.responsibleUserId
     };
   });
 }

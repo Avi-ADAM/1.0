@@ -751,6 +751,10 @@
                       easy={buble.easy}
                       sqadualed={buble.sqadualed}
                       sqadualedf={buble.sqadualedf}
+                      recurring={buble.recurring}
+                      recurringNoEnd={buble.recurringNoEnd}
+                      pricePerUnit={buble.pricePerUnit}
+                      cycleSize={buble.cycleSize}
                       linkto={buble.linkto}
                       location={buble.location}
                       pendId={buble.pendId}
@@ -845,6 +849,13 @@
                       projectName={buble.projectName}
                       useraplyname={buble.username}
                       userId={buble.uid}
+                      myid={buble.myid}
+                      isRecurringCycle={buble.isRecurringCycle}
+                      mashabetahalichId={buble.mashabetahalichId}
+                      cycleIndex={buble.cycleIndex}
+                      quantityDelivered={buble.quantityDelivered}
+                      pricePerUnit={buble.pricePerUnit}
+                      responsibleUserId={buble.responsibleUserId}
                       spid={buble.spid}
                       src={buble.src}
                       price={buble.price}

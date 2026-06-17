@@ -3,7 +3,10 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
-import { runResourceAskmAcceptance } from '../helpers/runResourceAskmAcceptance.js';
+import {
+  runResourceAskmAcceptance,
+  activateRecurringEngine,
+} from '../helpers/runResourceAskmAcceptance.js';
 
 const finalizeAskmAcceptanceHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const {
@@ -80,7 +83,7 @@ const finalizeAskmAcceptanceHandler: ActionExecutionHandler = async (params, con
     });
   } else {
     // isSelfProposal + pmash — OM/Maap path differs; keep inline until migrated
-    await strapi.execute(
+    const maapRes: any = await strapi.execute(
       '141createMaap',
       {
         data: {
@@ -93,6 +96,14 @@ const finalizeAskmAcceptanceHandler: ActionExecutionHandler = async (params, con
       context.jwt,
       context.fetch
     );
+
+    // Recurring expense? Activate the draft engine and make this Maap cycle #1.
+    await activateRecurringEngine(strapi, context, {
+      projectId: String(projectId),
+      resourceName: String(missionName ?? ''),
+      acceptedUserId: String(acceptedUserId),
+      maapId: maapRes?.data?.createMaap?.data?.id,
+    });
 
     const existingVots = (existingVotes as any[]).map((v: any) => ({
       what: v.what ?? true,

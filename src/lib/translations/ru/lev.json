@@ -93,6 +93,13 @@
       "inTotal": "Всего",
       "oneMonth": "Один месяц"
     },
+    "resourcePeriod": {
+      "monthly": "Ежемесячно",
+      "yearly": "Ежегодно",
+      "recurring": "Повторяющийся ресурс",
+      "noEndDate": "Без даты окончания",
+      "months": "месяцев"
+    },
     "inpro": {
       "missionInProgress": "Задача в процессе выполнения",
       "progressStatus": "Статус прогресса выполнения задачи",

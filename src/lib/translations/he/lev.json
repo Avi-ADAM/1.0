@@ -93,6 +93,13 @@
       "inTotal": "סך הכל",
       "oneMonth": "חודש אחד"
     },
+    "resourcePeriod": {
+      "monthly": "חודשי",
+      "yearly": "שנתי",
+      "recurring": "משאב חוזר",
+      "noEndDate": "ללא תאריך סיום",
+      "months": "חודשים"
+    },
     "inpro": {
       "missionInProgress": "משימה בתהליך ביצוע",
       "progressStatus": "סטטוס התקדמות ביצוע המשימה",

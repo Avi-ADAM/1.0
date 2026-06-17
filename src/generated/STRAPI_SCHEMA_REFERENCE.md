@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-06-15
+> Last updated: 2026-06-17
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -1223,6 +1223,7 @@ These are the main content types in the Strapi backend.
 | Field | Type |
 |-------|------|
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `cycleSize` | `Maybe<Scalars['Int']['output']>` |
 | `descrip` | `Maybe<Scalars['String']['output']>` |
 | `easy` | `Maybe<Scalars['Float']['output']>` |
 | `hm` | `Maybe<Scalars['Float']['output']>` |
@@ -1234,6 +1235,7 @@ These are the main content types in the Strapi backend.
 | `pmash` | `Maybe<PmashEntityResponse>` |
 | `price` | `Maybe<Scalars['Float']['output']>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `recurring` | `Maybe<Scalars['Boolean']['output']>` |
 | `spnot` | `Maybe<Scalars['String']['output']>` |
 | `sqadualed` | `Maybe<Scalars['DateTime']['output']>` |
 | `sqadualedf` | `Maybe<Scalars['DateTime']['output']>` |
@@ -1517,6 +1519,7 @@ These are the main content types in the Strapi backend.
 | `archived` | `Scalars['Boolean']['output']` |
 | `askm` | `Maybe<AskmEntityResponse>` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `cycleSize` | `Maybe<Scalars['Int']['output']>` |
 | `descrip` | `Maybe<Scalars['String']['output']>` |
 | `diun` | `Maybe<Array<Maybe<ComponentProjectsVots>>>` |
 | `easy` | `Maybe<Scalars['Float']['output']>` |
@@ -1540,6 +1543,7 @@ These are the main content types in the Strapi backend.
 | `price` | `Maybe<Scalars['Float']['output']>` |
 | `project` | `Maybe<ProjectEntityResponse>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `recurring` | `Maybe<Scalars['Boolean']['output']>` |
 | `selfProposalUser` | `Maybe<UsersPermissionsUserEntityResponse>` |
 | `sheirut_fulfillments` | `Maybe<SheirutFulfillmentRelationResponseCollection>` |
 | `spnot` | `Maybe<Scalars['String']['output']>` |
@@ -4609,6 +4613,7 @@ Used for creating/updating content.
 ### NegoMashInput
 | Field | Type |
 |-------|------|
+| `cycleSize` | `InputMaybe<Scalars['Int']['input']>` |
 | `descrip` | `InputMaybe<Scalars['String']['input']>` |
 | `easy` | `InputMaybe<Scalars['Float']['input']>` |
 | `hm` | `InputMaybe<Scalars['Float']['input']>` |
@@ -4620,6 +4625,7 @@ Used for creating/updating content.
 | `pmash` | `InputMaybe<Scalars['ID']['input']>` |
 | `price` | `InputMaybe<Scalars['Float']['input']>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `recurring` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `spnot` | `InputMaybe<Scalars['String']['input']>` |
 | `sqadualed` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `sqadualedf` | `InputMaybe<Scalars['DateTime']['input']>` |
@@ -4861,6 +4867,7 @@ Used for creating/updating content.
 |-------|------|
 | `archived` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `askm` | `InputMaybe<Scalars['ID']['input']>` |
+| `cycleSize` | `InputMaybe<Scalars['Int']['input']>` |
 | `descrip` | `InputMaybe<Scalars['String']['input']>` |
 | `diun` | `InputMaybe<Array<InputMaybe<ComponentProjectsVotsInput>>>` |
 | `easy` | `InputMaybe<Scalars['Float']['input']>` |
@@ -4884,6 +4891,7 @@ Used for creating/updating content.
 | `price` | `InputMaybe<Scalars['Float']['input']>` |
 | `project` | `InputMaybe<Scalars['ID']['input']>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `recurring` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `selfProposalUser` | `InputMaybe<Scalars['ID']['input']>` |
 | `sheirut_fulfillments` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `spnot` | `InputMaybe<Scalars['String']['input']>` |
@@ -5913,7 +5921,7 @@ Fields: `and`, `ani`, `archived`, `createdAt`, `done`, `finish`, `id`, `mesimabe
 Fields: `acceptedAt`, `and`, `createdAt`, `des`, `fixprice`, `id`, `kindOf`, `location`, `mashaabims`, `matanot`, `matanotpend`, `missions`, `name`, `not`, `or`, `price`, `proposedHours`, `proposedPrice`, `proposedQuantity`, `publishedAt`, `quant`, `ratson_proposal`, `recipeMission`, `recipeResource`, `rejectedAt`, `updatedAt`, `votes`
 
 #### NegoMashFiltersInput
-Fields: `and`, `createdAt`, `descrip`, `easy`, `hm`, `id`, `isOriginal`, `kindOf`, `linkto`, `location`, `name`, `not`, `or`, `pmash`, `price`, `publishedAt`, `spnot`, `sqadualed`, `sqadualedf`, `updatedAt`, `users`, `users_permissions_user`
+Fields: `and`, `createdAt`, `cycleSize`, `descrip`, `easy`, `hm`, `id`, `isOriginal`, `kindOf`, `linkto`, `location`, `name`, `not`, `or`, `pmash`, `price`, `publishedAt`, `recurring`, `spnot`, `sqadualed`, `sqadualedf`, `updatedAt`, `users`, `users_permissions_user`
 
 #### NegopendmissionFiltersInput
 Fields: `acts`, `and`, `createdAt`, `date`, `dates`, `descrip`, `filds`, `hearotMeyuchadot`, `howMany`, `id`, `isMonth`, `isOriginal`, `isRishon`, `location`, `name`, `noofhours`, `not`, `open_mission`, `or`, `pendm`, `perhour`, `publishedAt`, `skills`, `tafkidims`, `total`, `updatedAt`, `users_permissions_user`, `vots`, `work_ways`
@@ -5943,7 +5951,7 @@ Fields: `and`, `available`, `createdAt`, `id`, `not`, `or`, `pgishas`, `publishe
 Fields: `and`, `approved`, `archived`, `createdAt`, `id`, `not`, `or`, `pgisha`, `updatedAt`, `users_permissions_user`
 
 #### PmashFiltersInput
-Fields: `and`, `archived`, `askm`, `createdAt`, `descrip`, `diun`, `easy`, `hm`, `id`, `isMaap`, `isMust`, `isSelfProposal`, `isYesod`, `kindOf`, `linkto`, `location`, `maap`, `mashaabim`, `mashabetahaliches`, `matanot_recipe_resources`, `name`, `nego_mashes`, `negom`, `not`, `open_mashaabim`, `or`, `partofs`, `price`, `project`, `publishedAt`, `selfProposalUser`, `sheirut_fulfillments`, `spnot`, `sqadualed`, `sqadualedf`, `timegrama`, `updatedAt`, `users`
+Fields: `and`, `archived`, `askm`, `createdAt`, `cycleSize`, `descrip`, `diun`, `easy`, `hm`, `id`, `isMaap`, `isMust`, `isSelfProposal`, `isYesod`, `kindOf`, `linkto`, `location`, `maap`, `mashaabim`, `mashabetahaliches`, `matanot_recipe_resources`, `name`, `nego_mashes`, `negom`, `not`, `open_mashaabim`, `or`, `partofs`, `price`, `project`, `publishedAt`, `recurring`, `selfProposalUser`, `sheirut_fulfillments`, `spnot`, `sqadualed`, `sqadualedf`, `timegrama`, `updatedAt`, `users`
 
 #### PositionFiltersInput
 Fields: `aiMeta`, `and`, `arguments`, `author`, `authorEmail`, `authorExternalId`, `authorType`, `clauses`, `createdAt`, `description`, `heading`, `id`, `intensity`, `isAnchor`, `kind`, `location`, `negotiation`, `not`, `or`, `order`, `pole`, `publishedAt`, `relativePlacement`, `selfPlacement`, `tags`, `updatedAt`, `voters`, `votes`
@@ -6534,7 +6542,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 17344 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 17356 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/
