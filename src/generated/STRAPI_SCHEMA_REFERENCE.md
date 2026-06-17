@@ -1304,6 +1304,7 @@ These are the main content types in the Strapi backend.
 | `archived` | `Maybe<Scalars['Boolean']['output']>` |
 | `askms` | `Maybe<AskmRelationResponseCollection>` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `cycleSize` | `Maybe<Scalars['Int']['output']>` |
 | `declinedsps` | `Maybe<SpRelationResponseCollection>` |
 | `descrip` | `Maybe<Scalars['String']['output']>` |
 | `easy` | `Maybe<Scalars['Float']['output']>` |
@@ -1327,6 +1328,7 @@ These are the main content types in the Strapi backend.
 | `project` | `Maybe<ProjectEntityResponse>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `ratson` | `Maybe<RatsonEntityResponse>` |
+| `recurring` | `Maybe<Scalars['Boolean']['output']>` |
 | `rikmashes` | `Maybe<RikmashRelationResponseCollection>` |
 | `source` | `Maybe<Enum_Openmashaabim_Source>` |
 | `splited` | `Maybe<Scalars['Boolean']['output']>` |
@@ -4688,6 +4690,7 @@ Used for creating/updating content.
 |-------|------|
 | `archived` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `askms` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `cycleSize` | `InputMaybe<Scalars['Int']['input']>` |
 | `declinedsps` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `descrip` | `InputMaybe<Scalars['String']['input']>` |
 | `easy` | `InputMaybe<Scalars['Float']['input']>` |
@@ -4709,6 +4712,7 @@ Used for creating/updating content.
 | `project` | `InputMaybe<Scalars['ID']['input']>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `ratson` | `InputMaybe<Scalars['ID']['input']>` |
+| `recurring` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `rikmashes` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `source` | `InputMaybe<Enum_Openmashaabim_Source>` |
 | `splited` | `InputMaybe<Scalars['Boolean']['input']>` |
@@ -5930,7 +5934,7 @@ Fields: `acts`, `and`, `createdAt`, `date`, `dates`, `descrip`, `filds`, `hearot
 Fields: `and`, `arguments`, `clauses`, `createdAt`, `createdByEmail`, `creator`, `cuntries`, `currentRound`, `description`, `id`, `isLocal`, `issues`, `maxRounds`, `not`, `or`, `ownerExternalId`, `participants`, `positions`, `publishedAt`, `scaleMax`, `scaleMin`, `shareToken`, `status`, `topic`, `updatedAt`, `visibility`
 
 #### OpenMashaabimFiltersInput
-Fields: `and`, `archived`, `askms`, `createdAt`, `declinedsps`, `descrip`, `easy`, `haamadapruvs`, `haamadas`, `hm`, `howMeny`, `id`, `isMust`, `isYesod`, `kindOf`, `linkto`, `locale`, `localizations`, `location`, `maap`, `mashaabim`, `name`, `not`, `or`, `partofs`, `pmash`, `price`, `project`, `publishedAt`, `ratson`, `rikmashes`, `source`, `splited`, `spnot`, `sps`, `sqadualed`, `sqadualedf`, `updatedAt`, `users`
+Fields: `and`, `archived`, `askms`, `createdAt`, `cycleSize`, `declinedsps`, `descrip`, `easy`, `haamadapruvs`, `haamadas`, `hm`, `howMeny`, `id`, `isMust`, `isYesod`, `kindOf`, `linkto`, `locale`, `localizations`, `location`, `maap`, `mashaabim`, `name`, `not`, `or`, `partofs`, `pmash`, `price`, `project`, `publishedAt`, `ratson`, `recurring`, `rikmashes`, `source`, `splited`, `spnot`, `sps`, `sqadualed`, `sqadualedf`, `updatedAt`, `users`
 
 #### OpenMissionFiltersInput
 Fields: `acts`, `and`, `archived`, `asks`, `createdAt`, `dates`, `declined`, `descrip`, `hatzaas`, `hearotMeyuchadot`, `howMeny`, `id`, `isMust`, `isRishon`, `isYesod`, `isglobal`, `iskvua`, `isshift`, `locale`, `localizations`, `location`, `mesimabetahaliches`, `mission`, `name`, `negopendmissions`, `noofhours`, `not`, `or`, `partofs`, `pendm`, `perhour`, `privatlinks`, `project`, `publicklinks`, `publishedAt`, `ratson`, `rishon`, `rishonves`, `skills`, `source`, `sqadualed`, `tafkidims`, `updatedAt`, `users`, `usersNotRelevant`, `vallues`, `work_ways`
@@ -6542,7 +6546,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 17356 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 17362 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

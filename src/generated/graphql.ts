@@ -8979,6 +8979,7 @@ export type OpenMashaabim = {
   archived?: Maybe<Scalars['Boolean']['output']>;
   askms?: Maybe<AskmRelationResponseCollection>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
+  cycleSize?: Maybe<Scalars['Int']['output']>;
   declinedsps?: Maybe<SpRelationResponseCollection>;
   descrip?: Maybe<Scalars['String']['output']>;
   easy?: Maybe<Scalars['Float']['output']>;
@@ -9002,6 +9003,7 @@ export type OpenMashaabim = {
   project?: Maybe<ProjectEntityResponse>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   ratson?: Maybe<RatsonEntityResponse>;
+  recurring?: Maybe<Scalars['Boolean']['output']>;
   rikmashes?: Maybe<RikmashRelationResponseCollection>;
   source?: Maybe<Enum_Openmashaabim_Source>;
   splited?: Maybe<Scalars['Boolean']['output']>;
@@ -9105,6 +9107,7 @@ export type OpenMashaabimFiltersInput = {
   archived?: InputMaybe<BooleanFilterInput>;
   askms?: InputMaybe<AskmFiltersInput>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
+  cycleSize?: InputMaybe<IntFilterInput>;
   declinedsps?: InputMaybe<SpFiltersInput>;
   descrip?: InputMaybe<StringFilterInput>;
   easy?: InputMaybe<FloatFilterInput>;
@@ -9131,6 +9134,7 @@ export type OpenMashaabimFiltersInput = {
   project?: InputMaybe<ProjectFiltersInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   ratson?: InputMaybe<RatsonFiltersInput>;
+  recurring?: InputMaybe<BooleanFilterInput>;
   rikmashes?: InputMaybe<RikmashFiltersInput>;
   source?: InputMaybe<StringFilterInput>;
   splited?: InputMaybe<BooleanFilterInput>;
@@ -9145,6 +9149,7 @@ export type OpenMashaabimFiltersInput = {
 export type OpenMashaabimInput = {
   archived?: InputMaybe<Scalars['Boolean']['input']>;
   askms?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  cycleSize?: InputMaybe<Scalars['Int']['input']>;
   declinedsps?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   descrip?: InputMaybe<Scalars['String']['input']>;
   easy?: InputMaybe<Scalars['Float']['input']>;
@@ -9166,6 +9171,7 @@ export type OpenMashaabimInput = {
   project?: InputMaybe<Scalars['ID']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   ratson?: InputMaybe<Scalars['ID']['input']>;
+  recurring?: InputMaybe<Scalars['Boolean']['input']>;
   rikmashes?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   source?: InputMaybe<Enum_Openmashaabim_Source>;
   splited?: InputMaybe<Scalars['Boolean']['input']>;
