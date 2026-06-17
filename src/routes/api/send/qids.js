@@ -1372,6 +1372,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           descrip
           spnot
           kindOf
+          recurring
+          cycleSize
           sqadualedf
           sqadualed
           linkto
