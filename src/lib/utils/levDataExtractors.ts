@@ -623,7 +623,12 @@ export function extractWegets(userData: any): ResourceRequestData[] {
           // null quantityDelivered ⇒ still planned-only; members can't approve.
           cycleReported: maap.attributes.quantityDelivered != null,
           pricePerUnit: mashabAttrs?.pricePerUnit,
-          responsibleUserId: mashabAttrs?.users_permissions_user?.data?.id
+          responsibleUserId: mashabAttrs?.users_permissions_user?.data?.id,
+          // Deadline clock for the cycle: when it elapses (and not done) clients
+          // auto-approve the reported amount; a counter-offer resets the date.
+          timegramaId: maap.attributes.timegrama?.data?.id,
+          timegramaDate: maap.attributes.timegrama?.data?.attributes?.date,
+          timegramaDone: maap.attributes.timegrama?.data?.attributes?.done
         });
       }
     }

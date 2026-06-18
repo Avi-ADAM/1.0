@@ -857,6 +857,10 @@
                       quantityDelivered={buble.quantityDelivered}
                       pricePerUnit={buble.pricePerUnit}
                       responsibleUserId={buble.responsibleUserId}
+                      orderon={buble.orderon}
+                      timegramaId={buble.timegramaId}
+                      timegramaDate={buble.timegramaDate}
+                      timegramaDone={buble.timegramaDone}
                       spid={buble.spid}
                       src={buble.src}
                       price={buble.price}

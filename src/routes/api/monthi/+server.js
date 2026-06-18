@@ -14,6 +14,13 @@ function formatDate(date = new Date()) {
   return [year, month, day].join('-');
 }
 
+// Project governance window (restime) → milliseconds. Mirrors actionUtils.
+const RESTIME_HOURS = { feh: 48, sth: 72, nsh: 96, sevend: 168 };
+function calcDeadline(restime, ref = new Date()) {
+  const hours = RESTIME_HOURS[restime] ?? 48;
+  return new Date(ref.getTime() + hours * 3600000);
+}
+
 // Bounds of the cycle (month or year) that contains `ref`.
 function cycleBounds(unit, ref = new Date()) {
   if (unit === 'year') {
@@ -210,7 +217,7 @@ async function runRecurringResources(fetchFn) {
     ) {
       data { id attributes {
         name pricePerUnit start end cycleSize kindOf
-        project { data { id attributes { projectName } } }
+        project { data { id attributes { projectName restime } } }
         users_permissions_user { data { id attributes { username email lang noMail } } }
         maaps(pagination: { limit: 500 }) { data { id attributes { cycleIndex cycleStart cycleEnd archived } } }
       } }
@@ -270,9 +277,29 @@ async function runRecurringResources(fetchFn) {
         }) { data { id } }
       }`;
       const created = await SendTo(createMut, ADMINMONTHER);
-      if (!created?.data?.createMaap?.data?.id) {
+      const newMaapId = created?.data?.createMaap?.data?.id;
+      if (!newMaapId) {
         console.error('monthi: failed to open cycle for resource', id, created);
         continue;
+      }
+
+      // Attach a Timegrama (deadline) so the cycle auto-approves once the window
+      // elapses (clients cast the YES) — and a counter-offer can reset the clock.
+      try {
+        const deadline = calcDeadline(a.project?.data?.attributes?.restime, now);
+        const tgMut = `mutation {
+          createTimegrama(data: { date: "${deadline.toISOString()}", done: false, whatami: "maap", maap: "${newMaapId}" }) { data { id } }
+        }`;
+        const tg = await SendTo(tgMut, ADMINMONTHER);
+        const tgId = tg?.data?.createTimegrama?.data?.id;
+        if (tgId) {
+          await SendTo(
+            `mutation { updateMaap(id: "${newMaapId}", data: { timegrama: "${tgId}" }) { data { id } } }`,
+            ADMINMONTHER
+          );
+        }
+      } catch (e) {
+        console.error('monthi: failed to attach timegrama for cycle', newMaapId, e);
       }
 
       // Email the responsible user to confirm this month's spend.

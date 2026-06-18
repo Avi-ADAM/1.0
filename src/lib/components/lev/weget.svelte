@@ -112,6 +112,11 @@
     pricePerUnit = 0,
     responsibleUserId,
     myid,
+    // Current voting round + deadline clock (recurring cycles)
+    orderon = 0,
+    timegramaId,
+    timegramaDate,
+    timegramaDone = false,
     onUser,
     onProj,
     onAcsept,
@@ -129,6 +134,23 @@
     isRecurringCycle && !isResponsible && !cycleReported
   );
   let amountInput = $state(0);
+  // Counter-offer (negotiation) on a recurring cycle.
+  let nego = $state(false);
+  let negoAmount = $state(0);
+  let negoReason = $state('');
+  // True once the cycle's deadline has elapsed without being settled — a member's
+  // client then auto-approves the reported amount (checked once on mount below).
+  function isTimerExpired() {
+    return (
+      isRecurringCycle &&
+      cycleReported &&
+      !already &&
+      !isResponsible &&
+      !!timegramaDate &&
+      !timegramaDone &&
+      new Date(timegramaDate).getTime() < Date.now()
+    );
+  }
   let resP = [];
   let lang;
   import { Swiper, SwiperSlide } from 'swiper/svelte';
@@ -239,6 +261,8 @@
     var b = moment(sqadualed);
     yers = a.diff(b, 'years', true).toFixed(2);
     monts = a.diff(b, 'months', true).toFixed(2);
+    // Auto-approve the reported amount if this cycle's deadline already elapsed.
+    if (isTimerExpired()) autoApprove();
   });
 
   async function agree() {
@@ -305,6 +329,59 @@
     confirmRecurring();
   }
 
+  // Counter-offer: instead of a hard decline, a member proposes a different
+  // monthly amount with a reason. Opens the negotiation dialog.
+  function counter() {
+    negoAmount = Number(quantityDelivered || pricePerUnit || 0);
+    negoReason = '';
+    spend = false;
+    no = false;
+    masa = false;
+    nego = true;
+    isOpen = true;
+  }
+
+  // Submit the counter-offer: rewrites the amount, snapshots the old one, opens a
+  // new voting round, resets the timer and posts the reason to chat (server-side).
+  async function submitCounter() {
+    if (!negoReason.trim()) return;
+    isOpen = false;
+    nego = false;
+    try {
+      await executeAction('submitNegoMaap', {
+        askId: String(askId),
+        projectId: String(projectId),
+        newAmount: Number(negoAmount) || 0,
+        reason: negoReason.trim()
+      });
+    } catch (e) {
+      error1 = e;
+      console.log(error1);
+    }
+  }
+
+  // Auto-approve the reported amount once the deadline has elapsed (member side).
+  async function autoApprove() {
+    if (already) return;
+    already = true;
+    noofusersOk += 1;
+    noofusersWaiting -= 1;
+    ser = xyz();
+    try {
+      const result = await executeAction('voteOnMaap', {
+        askId: String(askId),
+        projectId: String(projectId),
+        what: true
+      });
+      if (result.success && result.data?.consensus) {
+        onAcsept?.({ ani: 'finim', coinlapach });
+      }
+    } catch (e) {
+      error1 = e;
+      console.log(error1);
+    }
+  }
+
   // Close the recurring resource entirely (stops future monthly cycles).
   async function markDone() {
     isOpen = false;
@@ -364,6 +441,7 @@
     no = false;
     masa = false;
     spend = false;
+    nego = false;
   }
 
   let hovered = $state(false);
@@ -458,6 +536,35 @@
           <br />
           <button class="add" disabled={whyy.length < 26} onclick={decline}
             >אישור</button
+          >
+        {:else if nego === true}
+          <h1 style="font-size:1.5em;">הצעת סכום אחר</h1>
+          <p class="text-barbi" style="font-size:0.95em; text-align:center;">
+            {missionBName}{#if cycleIndex} · מחזור #{cycleIndex}{/if}
+          </p>
+          <p style="font-size:0.85em; color:#9aa0a6; text-align:center; margin:2px 0;">
+            הסכום שדווח: {quantityDelivered} ₪
+          </p>
+          <label style="display:flex; align-items:center; gap:6px; margin:6px 0;">
+            הסכום המוצע:
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              bind:value={negoAmount}
+              placeholder="הסכום שאתה מציע"
+            />
+            ₪
+          </label>
+          <input
+            minlength="3"
+            type="text"
+            bind:value={negoReason}
+            placeholder="מדוע להזיז את הסכום? (יתפרסם בצ'אט)"
+          />
+          <br />
+          <button class="add" disabled={!negoReason.trim()} onclick={submitCounter}
+            >שליחת ההצעה</button
           >
         {:else if masa === true}
           <input
@@ -809,10 +916,13 @@
                 ></button
               >
               <!--   <button on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button>-->
+              <!-- Objection / counter-offer. Hidden for the responsible owner on a
+                   recurring cycle — they set the amount via the heart (report). -->
+              {#if !(isRecurringCycle && isResponsible)}
               <button
-                onmouseenter={() => hover('התנגדות')}
+                onmouseenter={() => hover(isRecurringCycle ? 'הצעת סכום אחר' : 'התנגדות')}
                 onmouseleave={() => hover('0')}
-                onclick={open}
+                onclick={isRecurringCycle ? counter : open}
                 style="margin: 0;"
                 class="btn gb"
                 name="decline"
@@ -827,6 +937,7 @@
                   /></svg
                 ></button
               >
+              {/if}
             {/if}
           {:else if low == true}
             <Lowbtn />
@@ -853,6 +964,7 @@
                 onAgree={agree}
                 onReport={reportFromCard}
                 onDecline={open}
+                onNego={counter}
                 onHover={hoverc}
                 {low}
                 {agprice}
@@ -891,6 +1003,7 @@
     onAgree={agree}
     onReport={reportFromCard}
     onDecline={open}
+    onNego={counter}
     onHover={hoverc}
     {isVisible}
     {low}

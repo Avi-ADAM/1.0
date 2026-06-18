@@ -93,6 +93,7 @@ import { createWorkWayConfig } from './createWorkWay.js';
 import { createMissionConfig } from './createMission.js';
 import { submitNegoMissionConfig } from './submitNegoMission.js';
 import { submitNegoMashConfig } from './submitNegoMash.js';
+import { submitNegoMaapConfig } from './submitNegoMaap.js';
 import { updateResourceRequestConfig } from './updateResourceRequest.js';
 import { createResourceRequestConfig } from './createResourceRequest.js';
 import { createMashaabimConfig } from './createMashaabim.js';
@@ -272,6 +273,7 @@ export function registerAllActions(): void {
 
   // Negotiation submission (pmash / resource nego flow)
   registerAction(submitNegoMashConfig);
+  registerAction(submitNegoMaapConfig);
 
   // User profile: create / update personal resource (Sp)
   registerAction(createResourceRequestConfig);

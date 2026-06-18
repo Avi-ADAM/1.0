@@ -138,6 +138,38 @@ export async function activateRecurringEngine(
     context.jwt,
     context.fetch
   );
+
+  // Attach a Timegrama (deadline) to cycle #1 so it auto-approves once the
+  // governance window elapses, and a counter-offer can reset the clock.
+  try {
+    const restimeRes: any = await strapi.execute(
+      'mrGetProjectRestime',
+      { pid: projectId },
+      context.jwt,
+      context.fetch
+    );
+    const restime: string =
+      restimeRes?.data?.project?.data?.attributes?.restime ?? 'feh';
+    const RESTIME_HOURS: Record<string, number> = { feh: 48, sth: 72, nsh: 96, sevend: 168 };
+    const deadline = new Date(now.getTime() + (RESTIME_HOURS[restime] ?? 48) * 3600000);
+    const tgRes: any = await strapi.execute(
+      'mrCreateCycleTimegrama',
+      { date: deadline.toISOString(), maapId },
+      context.jwt,
+      context.fetch
+    );
+    const tgId = tgRes?.data?.createTimegrama?.data?.id;
+    if (tgId) {
+      await strapi.execute(
+        'mrLinkMaapTimegrama',
+        { id: maapId, timegrama: tgId },
+        context.jwt,
+        context.fetch
+      );
+    }
+  } catch (e) {
+    console.error('activateRecurringEngine: failed to attach timegrama', e);
+  }
 }
 
 export async function runResourceAskmAcceptance(

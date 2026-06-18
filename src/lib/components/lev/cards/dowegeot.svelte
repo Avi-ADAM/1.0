@@ -423,17 +423,10 @@
           ⏳ {he('ניתן לאשר רק לאחר שהאחראי ידווח את ההוצאה החודשית', 'You can approve only after the responsible member reports this month\'s spend')}
         </p>
       {:else if already === false && allr === false}
-        <button
-          class="flex-1 py-2 flex justify-center items-center bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 font-bold rounded-xl transition-all"
-          onclick={() => decline('f')}
-          onmouseenter={() => hover({ he: 'התנגדות', en: 'objection' })}
-          onmouseleave={() => hover('0')}
-        >
-          <No />
-        </button>
         {#if isRecurringCycle && isResponsible}
+          <!-- The responsible owner reports the actual spend (counts as YES). -->
           <button
-            class="flex-2 py-2 px-4 flex justify-center items-center gap-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
+            class="flex-1 py-2 px-4 flex justify-center items-center gap-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
             onclick={report}
             onmouseenter={() => hover({ he: 'דיווח ואישור ההוצאה', en: 'report & approve' })}
             onmouseleave={() => hover('0')}
@@ -442,6 +435,16 @@
             <Lev />
           </button>
         {:else}
+          <!-- Objection: a hard decline for one-off maaps, a counter-offer
+               (propose a different amount + reason) for recurring cycles. -->
+          <button
+            class="flex-1 py-2 flex justify-center items-center gap-2 bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 font-bold rounded-xl transition-all"
+            onclick={isRecurringCycle ? () => nego('f') : () => decline('f')}
+            onmouseenter={() => hover(isRecurringCycle ? { he: 'הצעת סכום אחר', en: 'counter-offer' } : { he: 'התנגדות', en: 'objection' })}
+            onmouseleave={() => hover('0')}
+          >
+            {#if isRecurringCycle}{he('הצעת סכום אחר', 'Counter-offer')}{:else}<No />{/if}
+          </button>
           <button
             class="flex-2 py-2 px-4 flex justify-center items-center gap-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
             onclick={() => agree('f')}
