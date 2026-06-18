@@ -619,6 +619,9 @@ export function extractWegets(userData: any): ResourceRequestData[] {
           cycleStart: maap.attributes.cycleStart,
           cycleEnd: maap.attributes.cycleEnd,
           quantityDelivered: maap.attributes.quantityDelivered,
+          // Has the responsible user reported this month's actual spend yet?
+          // null quantityDelivered ⇒ still planned-only; members can't approve.
+          cycleReported: maap.attributes.quantityDelivered != null,
           pricePerUnit: mashabAttrs?.pricePerUnit,
           responsibleUserId: mashabAttrs?.users_permissions_user?.data?.id
         });

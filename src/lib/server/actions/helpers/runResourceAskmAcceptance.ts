@@ -119,6 +119,10 @@ export async function activateRecurringEngine(
   if (!mashId || !maapId) return;
 
   const { cycleStart, cycleEnd } = currentCycleBounds(unit);
+  // Turn the acceptance Maap into cycle #1. Leave quantityDelivered unset (null):
+  // the responsible user must still report the actual spend for this first month
+  // before the rest of the project can approve it. pricePerUnit (on the engine)
+  // is the planned preview only.
   await strapi.execute(
     'mrUpdateCycleMaap',
     {
@@ -128,7 +132,6 @@ export async function activateRecurringEngine(
         cycleIndex: 1,
         cycleStart,
         cycleEnd,
-        quantityDelivered: pricePerUnit,
         publishedAt: now.toISOString(),
       },
     },

@@ -104,6 +104,8 @@
     cards = false,
     // Recurring monthly resource cycle (mashabetahalich engine)
     isRecurringCycle = false,
+    // Has the responsible user reported this month's actual spend yet?
+    cycleReported = false,
     mashabetahalichId,
     cycleIndex,
     quantityDelivered = 0,
@@ -120,6 +122,11 @@
   // The signed-in user is the one responsible for entering this month's spend.
   let isResponsible = $derived(
     isRecurringCycle && String(myid ?? '') === String(responsibleUserId ?? '')
+  );
+  // A member (not the responsible user) can only approve a recurring cycle once
+  // the responsible user has reported the actual amount. Until then it's "pending".
+  let awaitingReport = $derived(
+    isRecurringCycle && !isResponsible && !cycleReported
   );
   let amountInput = $state(0);
   let resP = [];
@@ -235,6 +242,9 @@
   });
 
   async function agree() {
+    // Members can't approve a recurring cycle before the responsible user
+    // reports the actual amount.
+    if (awaitingReport) return;
     // Recurring monthly cycle → confirm/edit this month's amount first.
     if (isRecurringCycle) {
       amountInput = Number(quantityDelivered || pricePerUnit || 0);
@@ -668,11 +678,24 @@
           </h2>
           {#if isRecurringCycle}
             <p class="p cd">
-              <span
-                onmouseenter={() => hover('הוצאה חודשית — לחצו על הלב לעדכון ואישור')}
-                onmouseleave={() => hover('0')}
-                style="color:var(--gold)">🔁 {quantityDelivered || pricePerUnit} ₪</span
-              >
+              {#if cycleReported}
+                <span
+                  onmouseenter={() => hover('ההוצאה שדווחה החודש — לחצו על הלב לאישור')}
+                  onmouseleave={() => hover('0')}
+                  style="color:var(--gold)">🔁 {quantityDelivered} ₪</span
+                >
+              {:else}
+                <span
+                  onmouseenter={() =>
+                    hover(
+                      isResponsible
+                        ? 'טרם דיווחת את ההוצאה החודש — לחצו על הלב לדיווח'
+                        : 'ממתין לדיווח ההוצאה ע"י האחראי'
+                    )}
+                  onmouseleave={() => hover('0')}
+                  style="color:#9aa0a6;">🔁 ~{pricePerUnit} ₪ {isResponsible ? '(מתוכנן)' : '(טרם דווח)'}</span
+                >
+              {/if}
               {#if cycleIndex}
                 <span style="color: aqua; font-size:0.8em;"> · #{cycleIndex}</span>
               {/if}
@@ -747,9 +770,18 @@
             </p>
           {/if}
           {#if low == false}
-            {#if !already}
+            {#if awaitingReport}
+              <p
+                class="cd"
+                style="grid-column:1/3; grid-row:4/5; margin:0; font-size:8px; line-height:1.1; color:#9aa0a6; text-align:center;"
+                onmouseenter={() => hover('ניתן לאשר רק אחרי שהאחראי ידווח את ההוצאה החודשית')}
+                onmouseleave={() => hover('0')}
+              >
+                ⏳ ממתין לדיווח האחראי
+              </p>
+            {:else if !already}
               <button
-                onmouseenter={() => hover('אישור')}
+                onmouseenter={() => hover(isResponsible ? 'דיווח ואישור ההוצאה' : 'אישור')}
                 onmouseleave={() => hover('0')}
                 onclick={agree}
                 style="margin: 0;"
@@ -829,6 +861,13 @@
                 {monts}
                 {hm}
                 {spnot}
+                {isRecurringCycle}
+                {cycleReported}
+                {cycleIndex}
+                {quantityDelivered}
+                {pricePerUnit}
+                {isResponsible}
+                {awaitingReport}
               />
             </div>
           </Drawer.Content>
@@ -860,6 +899,13 @@
     {users}
     {hm}
     {spnot}
+    {isRecurringCycle}
+    {cycleReported}
+    {cycleIndex}
+    {quantityDelivered}
+    {pricePerUnit}
+    {isResponsible}
+    {awaitingReport}
   />
 {/if}
 

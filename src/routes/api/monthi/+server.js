@@ -254,6 +254,10 @@ async function runRecurringResources(fetchFn) {
       const planned = a.pricePerUnit ?? 0;
       const name = (a.name ?? 'משאב').replace(/"/g, '\\"');
 
+      // Open the cycle WITHOUT quantityDelivered — it stays null until the
+      // responsible user reports the month's actual spend. The planned amount
+      // lives on the engine (pricePerUnit) and is shown only as a preview.
+      // Members can approve the cycle only once it's been reported.
       const createMut = `mutation {
         createMaap(data: {
           project: "${projectId}",
@@ -262,7 +266,6 @@ async function runRecurringResources(fetchFn) {
           cycleIndex: ${nextIndex},
           cycleStart: "${cycleStart.toISOString()}",
           cycleEnd: "${cycleEnd.toISOString()}",
-          quantityDelivered: ${planned},
           publishedAt: "${now.toISOString()}"
         }) { data { id } }
       }`;

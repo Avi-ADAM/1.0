@@ -853,6 +853,7 @@
                       isRecurringCycle={buble.isRecurringCycle}
                       mashabetahalichId={buble.mashabetahalichId}
                       cycleIndex={buble.cycleIndex}
+                      cycleReported={buble.cycleReported}
                       quantityDelivered={buble.quantityDelivered}
                       pricePerUnit={buble.pricePerUnit}
                       responsibleUserId={buble.responsibleUserId}

@@ -43,6 +43,13 @@
    * @property {number} [activeOrder]
    * @property {Function} [onProj]
    * @property {number} [noOfusers]
+   * @property {boolean} [isRecurringCycle]
+   * @property {boolean} [cycleReported]
+   * @property {any} [cycleIndex]
+   * @property {number} [quantityDelivered]
+   * @property {number} [pricePerUnit]
+   * @property {boolean} [isResponsible]
+   * @property {boolean} [awaitingReport]
    */
 
   /** @type {Props} */
@@ -76,7 +83,15 @@
     projectId,
     activeOrder = 0,
     onProj,
-    noOfusers = 0
+    noOfusers = 0,
+    // Recurring monthly resource cycle (mashabetahalich engine)
+    isRecurringCycle = false,
+    cycleReported = false,
+    cycleIndex,
+    quantityDelivered = 0,
+    pricePerUnit = 0,
+    isResponsible = false,
+    awaitingReport = false
   } = $props();
   let user_1s = $derived.by(() => {
     return getProjectData(projectId, 'us') || [];
@@ -84,6 +99,8 @@
   function hover(x) {
     onHover?.({ x: x });
   }
+  /** Inline bilingual helper for the recurring-cycle strings. */
+  const he = (h, e) => ($lang === 'he' ? h : e);
   function agree(alr) {
     already = true;
     onAgree?.({ alr: alr, y: 'a' });
@@ -208,7 +225,27 @@
           src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg"
           alt="howmuch"
         />
-        {#if kindOf === 'perUnit'}
+        {#if isRecurringCycle}
+          <p class="flex flex-col">
+            <span class="font-bold text-base">
+              🔁 {he('הוצאה חודשית חוזרת', 'Recurring monthly expense')}
+              {#if cycleIndex}<span style="color:var(--barbi-pink)"> · {he('מחזור', 'cycle')} #{cycleIndex}</span>{/if}
+            </span>
+            {#if cycleReported}
+              <span style="color:var(--barbi-pink)" class="font-bold">
+                {quantityDelivered.toLocaleString('en-US', { maximumFractionDigits: 2 })} ₪
+                <span class="text-xs font-normal text-gray-500">{he('דווח החודש', 'reported this month')}</span>
+              </span>
+            {:else}
+              <span style="color:#9aa0a6;">
+                ~{pricePerUnit.toLocaleString('en-US', { maximumFractionDigits: 2 })} ₪
+                {isResponsible
+                  ? he('(מתוכנן — נא לדווח את ההוצאה בפועל)', '(planned — please report the actual spend)')
+                  : he('(טרם דווח ע"י האחראי)', '(not yet reported by the responsible member)')}
+              </span>
+            {/if}
+          </p>
+        {:else if kindOf === 'perUnit'}
           <p>
             <span
               onmouseenter={() =>
@@ -342,7 +379,11 @@
     class="p-4 bg-gray-50 dark:bg-gray-900/50 flex gap-3 border-t border-gray-100 dark:border-gray-700"
   >
     {#if low == false}
-      {#if already === false && allr === false}
+      {#if awaitingReport}
+        <p class="flex-1 text-center text-sm text-gray-500 dark:text-gray-400 py-2">
+          ⏳ {he('ניתן לאשר רק לאחר שהאחראי ידווח את ההוצאה החודשית', 'You can approve only after the responsible member reports this month\'s spend')}
+        </p>
+      {:else if already === false && allr === false}
         <button
           class="flex-1 py-2 flex justify-center items-center bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 font-bold rounded-xl transition-all"
           onclick={() => decline('f')}
@@ -354,7 +395,7 @@
         <button
           class="flex-2 py-2 flex justify-center items-center bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
           onclick={() => agree('f')}
-          onmouseenter={() => hover({ he: 'אישור', en: 'appruve' })}
+          onmouseenter={() => hover({ he: isRecurringCycle && isResponsible ? 'דיווח ואישור' : 'אישור', en: isRecurringCycle && isResponsible ? 'report & approve' : 'appruve' })}
           onmouseleave={() => hover('0')}
         >
           <Lev />

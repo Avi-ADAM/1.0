@@ -80,6 +80,20 @@ async function handleCycleMaapVote(
   const kindOf = mashAttrs.kindOf ?? 'monthly';
   const hasAmount = amount != null && !Number.isNaN(amount);
 
+  // Two-card model: the responsible user reports the actual monthly spend, and
+  // only then can the rest of the project approve that specific month.
+  // `quantityDelivered == null` ⇒ not reported yet (the engine's pricePerUnit is
+  // a planned preview only). Reject any non-responsible vote until it's reported.
+  const meId = String(context.userId);
+  const isResponsible = meId === responsibleId;
+  const alreadyReported = attrs.quantityDelivered != null;
+  if (!isResponsible && !alreadyReported) {
+    return {
+      data: { askId, consensus: false, awaitingReport: true },
+      updateStrategy: { type: 'none' },
+    };
+  }
+
   // Resolve the spend amount: explicit > already-stored > planned price.
   const spend: number = hasAmount
     ? (amount as number)
@@ -111,7 +125,9 @@ async function handleCycleMaapVote(
 
   if (!consensus) {
     const data: Record<string, any> = { vots: allVots };
-    if (hasAmount) data.quantityDelivered = spend;
+    // Mark the cycle as reported once the responsible user weighs in (with an
+    // explicit amount, or the planned default), which opens approval to members.
+    if (hasAmount || isResponsible) data.quantityDelivered = spend;
     await strapi.execute('mrUpdateCycleMaap', { id: askId, data }, context.jwt, context.fetch);
     return {
       data: { askId, consensus: false },
