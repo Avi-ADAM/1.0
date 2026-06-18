@@ -298,6 +298,13 @@
     }
   }
 
+  // Inline report from the detail card: the responsible owner types the amount
+  // there and submits directly (no dialog). Counts as their report + YES vote.
+  function reportFromCard(e) {
+    amountInput = Number(e?.amount) || 0;
+    confirmRecurring();
+  }
+
   // Close the recurring resource entirely (stops future monthly cycles).
   async function markDone() {
     isOpen = false;
@@ -841,6 +848,7 @@
             <div class="swiper-slidec mx-auto">
               <Cards
                 onAgree={agree}
+                onReport={reportFromCard}
                 onDecline={open}
                 onHover={hoverc}
                 {low}
@@ -878,6 +886,7 @@
 {:else}
   <Cards
     onAgree={agree}
+    onReport={reportFromCard}
     onDecline={open}
     onHover={hoverc}
     {isVisible}
