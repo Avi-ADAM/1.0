@@ -419,9 +419,9 @@
           <h1 style="font-size:1.5em;">
             {isResponsible ? 'כמה הוצאת החודש?' : 'אישור ההוצאה החודשית'}
           </h1>
-          {#if cycleIndex}
-            <p class="text-barbi" style="font-size:0.9em;">מחזור #{cycleIndex}</p>
-          {/if}
+          <p class="text-barbi" style="font-size:0.95em; text-align:center;">
+            {missionBName}{#if cycleIndex} · מחזור #{cycleIndex}{/if}
+          </p>
           {#if isResponsible}
             <input
               type="number"
@@ -431,7 +431,10 @@
               placeholder="הסכום שהוצא בפועל החודש"
             />
           {:else}
-            <p class="p" style="font-size:1.2em; color:var(--gold)">{quantityDelivered} ₪</p>
+            <p style="font-size:0.9em; color:#9aa0a6; text-align:center; margin:4px 0;">
+              {useraplyname} דיווח/ה על הוצאה של:
+            </p>
+            <p class="p" style="font-size:1.6em; font-weight:bold; color:var(--gold)">{quantityDelivered} ₪</p>
           {/if}
           <br />
           <button class="add" onclick={confirmRecurring}>אישור ההוצאה</button>

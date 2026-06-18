@@ -264,10 +264,19 @@
                 </span>
               </label>
             {:else if cycleReported}
-              <span style="color:var(--barbi-pink)" class="font-bold">
-                {quantityDelivered.toLocaleString('en-US', { maximumFractionDigits: 2 })} ₪
-                <span class="text-xs font-normal text-gray-500">{he('דווח החודש', 'reported this month')}</span>
-              </span>
+              <!-- Members approve the spend the responsible owner reported. -->
+              <div class="flex flex-col gap-0.5">
+                <span class="text-sm text-gray-700 dark:text-gray-300">
+                  {he('לאישור — ההוצאה החודשית שדיווח', 'To approve — the monthly expense reported by')}
+                  <span class="font-bold">{useraplyname}</span>:
+                </span>
+                <span style="color:var(--barbi-pink)" class="font-extrabold text-2xl">
+                  {quantityDelivered.toLocaleString('en-US', { maximumFractionDigits: 2 })} ₪
+                </span>
+                <span class="text-xs text-gray-500">
+                  {he('עבור', 'for')} {missionBName}{#if cycleIndex} · {he('מחזור', 'cycle')} #{cycleIndex}{/if}
+                </span>
+              </div>
             {:else}
               <span style="color:#9aa0a6;">
                 ~{pricePerUnit.toLocaleString('en-US', { maximumFractionDigits: 2 })} ₪
@@ -434,11 +443,12 @@
           </button>
         {:else}
           <button
-            class="flex-2 py-2 flex justify-center items-center bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
+            class="flex-2 py-2 px-4 flex justify-center items-center gap-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
             onclick={() => agree('f')}
-            onmouseenter={() => hover({ he: 'אישור', en: 'appruve' })}
+            onmouseenter={() => hover({ he: isRecurringCycle ? 'אישור ההוצאה החודשית' : 'אישור', en: isRecurringCycle ? 'approve monthly expense' : 'appruve' })}
             onmouseleave={() => hover('0')}
           >
+            {#if isRecurringCycle}{he('אישור ההוצאה', 'Approve expense')}{/if}
             <Lev />
           </button>
         {/if}
