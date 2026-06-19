@@ -1,4 +1,5 @@
-<script lang="ts">
+﻿<script lang="ts">
+  import { isRtl } from '$lib/translations';
   import { updateTimer, calculateTotalHours } from '$lib/func/timers.js';
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang';
@@ -144,7 +145,7 @@
   );
 </script>
 
-<div class="tec-card" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
+<div class="tec-card" dir={$isRtl ? 'rtl' : 'ltr'}>
   <div class="tec-header">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>

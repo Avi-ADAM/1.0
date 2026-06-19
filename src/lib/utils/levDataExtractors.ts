@@ -18,6 +18,7 @@ import type {
   PendResourceData,
   ResourceRequestData,
   HalukaData,
+  HalukaSiteShare,
   WelcomeData,
   TransferData,
   DecisionData,
@@ -509,6 +510,10 @@ export function extractPmashes(userData: any): PendResourceData[] {
         continue;
       }
 
+      // Recurring expense? The flag lives on the Pmash so it stays negotiable.
+      const isRecurring = Boolean(pmash.attributes.recurring);
+      const recurringEnd = pmash.attributes.sqadualedf ?? null;
+
       pmashes.push({
         id: pmash.id,
         projectId: project.id,
@@ -532,7 +537,13 @@ export function extractPmashes(userData: any): PendResourceData[] {
         mashaabimId: pmash.attributes.mashaabim?.data?.id,
         timegramaId: pmash.attributes.timegrama?.data?.id,
         timegramaDate: pmash.attributes.timegrama?.data?.attributes?.date,
-        nego_mashes: pmash.attributes.nego_mashes || { data: [] }
+        nego_mashes: pmash.attributes.nego_mashes || { data: [] },
+        // Recurring expense flags. pricePerUnit is the LIVE (possibly negotiated)
+        // per-cycle cost taken straight from the pmash's easy/price.
+        recurring: isRecurring,
+        recurringNoEnd: isRecurring && !recurringEnd,
+        cycleSize: pmash.attributes.cycleSize ?? 1,
+        pricePerUnit: pmash.attributes.easy || pmash.attributes.price || 0
       });
     }
   }
@@ -565,35 +576,59 @@ export function extractWegets(userData: any): ResourceRequestData[] {
           continue;
         }
 
+        // Recurring monthly resource cycle? (Maap linked to a mashabetahalich engine)
+        const mashab = maap.attributes.mashabetahalich?.data;
+        const mashabAttrs = mashab?.attributes;
+        const isRecurringCycle = Boolean(mashab?.id);
+
         wegets.push({
           id: maap.id,
           projectId: project.id,
           requestType: 'maap',
           priority: 6,
           // Additional fields
-          name: maap.attributes.name || '',
+          name: maap.attributes.name || mashabAttrs?.name || '',
           createdAt: maap.attributes.createdAt,
           vots: maap.attributes.vots || [],
           spId: maap.attributes.sp?.data?.id,
           spData: maap.attributes.sp?.data?.attributes,
-          spName: maap.attributes.sp?.data?.attributes?.name,
+          spName: maap.attributes.sp?.data?.attributes?.name || mashabAttrs?.name,
           openMashaabimId: maap.attributes.open_mashaabim?.data?.id,
           openMashaabimData: maap.attributes.open_mashaabim?.data?.attributes,
           users: maap.attributes.vots || [],
           src: maap.attributes.project?.data?.attributes?.profilePic?.data?.attributes?.url || 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png',
           // Extract fields from open_mashaabim
           easy: maap.attributes.open_mashaabim?.data?.attributes?.easy,
-          price: maap.attributes.open_mashaabim?.data?.attributes?.price,
+          price: maap.attributes.open_mashaabim?.data?.attributes?.price ?? mashabAttrs?.pricePerUnit,
           sqadualed: maap.attributes.open_mashaabim?.data?.attributes?.sqadualed,
           sqadualedf: maap.attributes.open_mashaabim?.data?.attributes?.sqadualedf,
           spnot: maap.attributes.open_mashaabim?.data?.attributes?.spnot,
-          kindOf: maap.attributes.open_mashaabim?.data?.attributes?.kindOf,
+          kindOf: maap.attributes.open_mashaabim?.data?.attributes?.kindOf ?? mashabAttrs?.kindOf,
           unit: maap.attributes.sp?.data?.attributes?.unit,
-          openName: maap.attributes.open_mashaabim?.data?.attributes?.name,
-          userId: maap.attributes.sp?.data?.attributes?.users_permissions_user?.data?.id,
+          openName: maap.attributes.open_mashaabim?.data?.attributes?.name || mashabAttrs?.name,
+          userId:
+            maap.attributes.sp?.data?.attributes?.users_permissions_user?.data?.id ||
+            mashabAttrs?.users_permissions_user?.data?.id,
           username: maap.attributes.sp?.data?.attributes?.users_permissions_user?.data?.attributes?.username,
           myp: maap.attributes.sp?.data?.attributes?.myp,
-          myid: userData.id
+          myid: userData.id,
+          // Recurring cycle fields (only present on recurring cycle Maaps)
+          isRecurringCycle,
+          mashabetahalichId: mashab?.id,
+          cycleIndex: maap.attributes.cycleIndex,
+          cycleStart: maap.attributes.cycleStart,
+          cycleEnd: maap.attributes.cycleEnd,
+          quantityDelivered: maap.attributes.quantityDelivered,
+          // Has the responsible user reported this month's actual spend yet?
+          // null quantityDelivered ⇒ still planned-only; members can't approve.
+          cycleReported: maap.attributes.quantityDelivered != null,
+          pricePerUnit: mashabAttrs?.pricePerUnit,
+          responsibleUserId: mashabAttrs?.users_permissions_user?.data?.id,
+          // Deadline clock for the cycle: when it elapses (and not done) clients
+          // auto-approve the reported amount; a counter-offer resets the date.
+          timegramaId: maap.attributes.timegrama?.data?.id,
+          timegramaDate: maap.attributes.timegrama?.data?.attributes?.date,
+          timegramaDone: maap.attributes.timegrama?.data?.attributes?.done
         });
       }
     }
@@ -610,6 +645,56 @@ export function extractWegets(userData: any): ResourceRequestData[] {
  * 
  * **Validates: Requirements 1.1, 1.4**
  */
+/**
+ * Sum a tosplit's site-share transfer halukas into a single display line.
+ * Defensive: returns `undefined` when there are none (or the field is absent
+ * because the cross-rikma schema isn't live yet). Status flags are aggregated
+ * conservatively — `confirmed`/`senderconf` are true only when ALL transfers are.
+ */
+function extractSiteShare(nodes: any): HalukaSiteShare | undefined {
+  if (!Array.isArray(nodes) || nodes.length === 0) {
+    return undefined;
+  }
+
+  let amount = 0;
+  let proposed = 0;
+  let hasProposed = false;
+  let allConfirmed = true;
+  let allSent = true;
+  let adjustDirection: string | undefined;
+  let adjustReason: string | null | undefined;
+
+  for (const node of nodes) {
+    const a = node?.attributes;
+    if (!a) continue;
+    amount += a.amount || 0;
+    if (typeof a.proposedAmount === 'number') {
+      proposed += a.proposedAmount;
+      hasProposed = true;
+    }
+    if (a.confirmed !== true) allConfirmed = false;
+    if (a.senderconf !== true) allSent = false;
+    // Carry the adjustment from the first transfer that has one (one proposal,
+    // one direction in practice).
+    if (adjustDirection === undefined && a.adjustDirection) {
+      adjustDirection = a.adjustDirection;
+      adjustReason = a.adjustReason ?? null;
+    }
+  }
+
+  if (amount <= 0) {
+    return undefined;
+  }
+
+  return {
+    amount,
+    confirmed: allConfirmed,
+    senderconf: allSent,
+    ...(hasProposed ? { proposedAmount: proposed } : {}),
+    ...(adjustDirection ? { adjustDirection, adjustReason } : {})
+  };
+}
+
 export function extractHalukas(userData: any): HalukaData[] {
   const halukas: HalukaData[] = [];
 
@@ -632,6 +717,13 @@ export function extractHalukas(userData: any): HalukaData[] {
 
       const attrs = tosplit.attributes;
 
+      // Site share (1💗1) — the platform service-share transfer(s) deducted from
+      // this proposal, summed for display. These are NOT in `halukas` (they don't
+      // gate the partners' confirmation, see SITE_SHARE_TRANSFER_SPEC.md §0.2/§7);
+      // they surface via the separate `siteShareHalukas` relation. Defensive: the
+      // field only exists once the cross-rikma schema is live, otherwise undefined.
+      const siteShare = extractSiteShare(attrs.siteShareHalukas?.data);
+
       halukas.push({
         id: tosplit.id,
         projectId: project.id,
@@ -645,6 +737,7 @@ export function extractHalukas(userData: any): HalukaData[] {
         halukot: attrs.halukas?.data || [],
         hervach: attrs.hervachti || [],
         pendId: tosplit.id,
+        ...(siteShare ? { siteShare } : {}),
 
         // Additional metadata that might be useful
         createdAt: attrs.createdAt
@@ -970,8 +1063,18 @@ export function extractResourceSuggestions(userData: any): ResourceSuggestionDat
           kindOf: omAttrs.kindOf,
           spnot: omAttrs.spnot,
           descrip: omAttrs.descrip,
-          sqedualed: omAttrs.sqedualed,
-          sqedualedf: omAttrs.sqedualedf,
+          // Strapi field is `sqadualed`/`sqadualedf` (start/end). Expose under the
+          // `sqadualed*` keys the cards read; keep the legacy `sqedualed*` keys
+          // populated from the same source for any older consumers.
+          sqadualed: omAttrs.sqadualed,
+          sqadualedf: omAttrs.sqadualedf,
+          sqedualed: omAttrs.sqadualed,
+          sqedualedf: omAttrs.sqadualedf,
+
+          // Recurring expense terms (open-ended monthly/yearly cost, approved
+          // each cycle). Copied onto the OpenMashaabim at pmash approval.
+          recurring: omAttrs.recurring === true,
+          cycleSize: omAttrs.cycleSize ?? 1,
 
           myp: myp,
           oid: spId,
@@ -1045,6 +1148,11 @@ export function extractAskedResources(userData: any): AskedResourceData[] {
         hm:        pmashAttrs.hm        || openMashaabimAttrs.hm        || '',
         kindOf:    pmashAttrs.kindOf    || openMashaabimAttrs.kindOf    || '',
         sqadualed: pmashAttrs.sqadualed || openMashaabimAttrs.sqadualed || '',
+        // End date + recurring terms. Prefer the (possibly negotiated) pmash; the
+        // pmash is the live source of truth that the recurring engine reads from.
+        sqadualedf: pmashAttrs.sqadualedf || openMashaabimAttrs.sqadualedf || '',
+        recurring:  pmashAttrs.recurring ?? openMashaabimAttrs.recurring ?? false,
+        cycleSize:  pmashAttrs.cycleSize ?? openMashaabimAttrs.cycleSize ?? 1,
       };
 
       // Profile pic: prefer the askm's own users_permissions_user, fall back to sp owner
@@ -1077,6 +1185,9 @@ export function extractAskedResources(userData: any): AskedResourceData[] {
         kindOf: omData.kindOf,
         spid: askAttributes.sp?.data?.id,
         deadline: omData.sqadualed,
+        sqadualedf: omData.sqadualedf,
+        recurring: omData.recurring === true,
+        cycleSize: omData.cycleSize ?? 1,
         openName: omData.name,
         omid: askAttributes.open_mashaabim?.data?.id,
         pmashId: askAttributes.pmash?.data?.id,
@@ -1238,6 +1349,37 @@ export function mapSaleData(sheirut: any, projectId: string, userData: any, mode
       }
     : iTransferedToFromSheirut;
 
+  // Site-share income: the platform rikma receives one transfer Haluka per
+  // contributing member (giver → chosen volunteer). Surface them ALL so each
+  // pair confirms the money moved via SheirutHalukaCard (vs. a normal sale,
+  // which only ever has a single haluka above).
+  const transferHalukas = (attrs.halukas?.data || []).map((h: any) => {
+    const ha = h.attributes || {};
+    const send = ha.usersend?.data;
+    const recv = ha.userrecive?.data;
+    return {
+      id: String(h.id),
+      amount: ha.amount ?? null,
+      senderconf: ha.senderconf || false,
+      confirmed: ha.confirmed || false,
+      forumId: ha.forum?.data?.id ? String(ha.forum.data.id) : null,
+      sender: send
+        ? {
+            id: String(send.id),
+            username: send.attributes?.username || '',
+            profilePic: send.attributes?.profilePic?.data?.attributes?.url
+          }
+        : null,
+      receiver: recv
+        ? {
+            id: String(recv.id),
+            username: recv.attributes?.username || '',
+            profilePic: recv.attributes?.profilePic?.data?.attributes?.url
+          }
+        : null
+    };
+  });
+
   // Extract weFinnish votes
   const weFinnish = attrs.weFinnish?.data?.map((v: any) => ({
     id: v.id,
@@ -1299,6 +1441,7 @@ export function mapSaleData(sheirut: any, projectId: string, userData: any, mode
     iTransferMoney: !!halukaId || attrs.iTransferMoney || false,
     moneyTransfered: attrs.moneyTransfered || false,
     productExepted: attrs.productExepted || false,
+    isSiteShareIncome: attrs.isSiteShareIncome || false,
 
     // Money handling
     iCanGetMonay,
@@ -1310,6 +1453,7 @@ export function mapSaleData(sheirut: any, projectId: string, userData: any, mode
     halukaForumId,
     senderconf,
     halukaConfirmed,
+    transferHalukas,
 
     // Delivery confirmation voting
     weFinnish,

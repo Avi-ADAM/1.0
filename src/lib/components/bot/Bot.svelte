@@ -1,6 +1,6 @@
-<script>
+﻿<script>
   import { fly } from 'svelte/transition';
-  import { t, locale } from '$lib/translations';
+  import { t, locale, isRtl} from '$lib/translations';
   import { goto } from '$app/navigation';
   import { idPr } from '$lib/stores/idPr';
   import { Circle3 } from 'svelte-loading-spinners';
@@ -100,7 +100,7 @@
 
 {#if !isOnChatPage}
   <div
-    dir={$locale == 'he' || $locale == 'ar' ? 'rtl' : 'ltr'}
+    dir={$isRtl ? 'rtl' : 'ltr'}
     class="fixed bottom-12 {$locale == 'he' || $locale == 'ar'
       ? 'left-4'
       : 'right-4'} z-50"

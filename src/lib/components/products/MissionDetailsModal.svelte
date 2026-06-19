@@ -1,4 +1,5 @@
-<script lang="ts">
+﻿<script lang="ts">
+  import { isRtl } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import { fade, fly } from 'svelte/transition';
   import SkillSelector from '$lib/components/ui/SkillSelector.svelte';
@@ -113,7 +114,7 @@
         <button class="x" type="button" aria-label="close" onclick={onClose}>×</button>
       </header>
 
-      <div class="body" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
+      <div class="body" dir={$isRtl ? 'rtl' : 'ltr'}>
         <label class="field">
           <span>{t.desc}</span>
           <textarea

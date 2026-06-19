@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
 import Addnewskil from './addNewSkill.svelte';
            import { lang } from '$lib/stores/lang.js'
 import { executeAction } from '$lib/client/actionClient';
@@ -197,7 +198,7 @@ selectedrole = newSele;
      
      <Addnewskil onAddnewskill={addnew} nobr={false} color={"--barbi-pink"} />
 
-     <div dir="{$lang == "en" ? "ltr" : "rtl"}">
+     <div dir="{$isRtl ? 'rtl' : 'ltr'}">
   <lebel for="choos">{adds[$lang]}</lebel>
 <MultiSelect
 id="choos"

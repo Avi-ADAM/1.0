@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
   import { sendToSer } from '$lib/send/sendToSer.js';
@@ -147,7 +148,7 @@
 
   let t = $derived(i18n[$lang] || i18n.en);
   /** @type {'rtl' | 'ltr'} */
-  let dir = $derived($lang === 'he' || $lang === 'ar' ? 'rtl' : 'ltr');
+  let dir = $derived($isRtl ? 'rtl' : 'ltr');
 
   onMount(async () => {
     try {

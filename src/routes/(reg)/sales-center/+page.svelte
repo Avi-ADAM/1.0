@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import SaleComponent from '$lib/components/sales/SaleComponent.svelte';
   import { RingLoader } from 'svelte-loading-spinners';
@@ -248,7 +249,7 @@
 
 <div
   class="min-h-screen bg-gradient-to-br from-gra to-grb p-4"
-  dir={$lang === 'he' ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
 >
   <div class="max-w-7xl mx-auto">
     <!-- Header -->
@@ -366,19 +367,19 @@
         </div>
       {:else}
         <div
-          dir={$lang === 'he' ? 'rtl' : 'ltr'}
+          dir={$isRtl ? 'rtl' : 'ltr'}
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10"
         >
           {#each filteredProducts as product (product.id)}
             <div
               class="bg-white/10 backdrop-blur-md rounded-lg shadow-lg border border-white/20 hover:shadow-xl hover:bg-white/15 transition-all duration-300 overflow-hidden"
-              dir={$lang === 'he' ? 'rtl' : 'ltr'}
+              dir={$isRtl ? 'rtl' : 'ltr'}
             >
               <!-- Product Header -->
-              <div class="p-6 pb-4" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
+              <div class="p-6 pb-4" dir={$isRtl ? 'rtl' : 'ltr'}>
                 <div
                   class="flex flex-row justify-between items-start mb-4"
-                  dir={$lang === 'he' ? 'rtl' : 'ltr'}
+                  dir={$isRtl ? 'rtl' : 'ltr'}
                 >
                   <div
                     class="flex-1 min-w-0 {$lang === 'he'
@@ -396,7 +397,7 @@
                   </div>
 
                   <!-- Action Buttons -->
-                  <div class="flex gap-2" dir={$lang === 'he' ? 'rtl' : ''}>
+                  <div class="flex gap-2" dir={$isRtl ? 'rtl' : ''}>
                     <button
                       onclick={() =>
                         shareProduct(product.id, product.attributes.name)}

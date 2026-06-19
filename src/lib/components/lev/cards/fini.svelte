@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import Chaticon from '../../../celim/chaticon.svelte';
   import tr from '$lib/translations/tr.json';
   import { lang } from '$lib/stores/lang.js';
@@ -112,7 +113,7 @@
   onkeypress={(e) => {
     e.key === 'Enter' && toggleScrollable();
   }}
-  dir={$lang == 'he' ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   style="overflow-y:auto"
   class="d {isMobileOrTablet()
     ? 'w-full h-full'

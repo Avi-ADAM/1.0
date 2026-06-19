@@ -1,4 +1,4 @@
-<script>
+﻿<script>
   import { idPr } from '$lib/stores/idPr.js';
   import moment from 'moment';
   import { onMount } from 'svelte';
@@ -34,7 +34,7 @@
   import SveltyPicker from 'svelty-picker';
 
   import { lang } from '$lib/stores/lang.js';
-  import { t } from '$lib/translations';
+  import { t, isRtl} from '$lib/translations';
   import Button from '$lib/celim/ui/button.svelte';
   import { page } from '$app/state';
   /**
@@ -208,7 +208,7 @@
   <h1 class="text-barbi">
     {isEdit == false ? $t('mission.crtask.heading') : $t('mission.crtask.editHeading')}
   </h1>
-  <div dir={$lang == 'en' ? 'ltr' : 'rtl'} class="textinput">
+  <div dir={$isRtl ? 'rtl' : 'ltr'} class="textinput">
     <input name="des" bind:value={name} type="text" class="input" required />
     <label
       style:right={$lang == 'he' ? '0' : 'none'}
@@ -235,7 +235,7 @@
     format=" hh:ii dd/mm/yyyy"
     bind:value={adMatai}
   ></SveltyPicker>
-  <div dir={$lang == 'en' ? 'ltr' : 'rtl'} class="textinput">
+  <div dir={$isRtl ? 'rtl' : 'ltr'} class="textinput">
     <input name="des" bind:value={link} type="text" class="input" required />
     <label
       style:right={$lang == 'he' ? '0' : 'none'}
@@ -245,7 +245,7 @@
     >
     <span class="line"></span>
   </div>
-  <div dir={$lang == 'en' ? 'ltr' : 'rtl'} class="textinput">
+  <div dir={$isRtl ? 'rtl' : 'ltr'} class="textinput">
     <textarea name="es" bind:value={teur} type="text" class="input d" required
     ></textarea>
     <label

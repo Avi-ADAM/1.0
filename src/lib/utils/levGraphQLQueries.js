@@ -21,7 +21,7 @@ import { goto } from '$app/navigation';
  */
 export async function fetchMainUserData(baseUrl, token, idL, lang) {
   console.log('fetchMainUserData (secure) called with:', { idL, lang });
-  
+
   try {
     const response = await fetch('/api/send', {
       method: 'POST',
@@ -35,24 +35,25 @@ export async function fetchMainUserData(baseUrl, token, idL, lang) {
         }
       })
     });
-    
+
     console.log('API response status:', response.status, response.statusText);
     if (!response.ok) {
       if (response.status === 401) {
         goto('/login?from=lev');
       }
-      
+
       try {
         const errorData = await response.json();
         console.error('GraphQL Error Detail:', JSON.stringify(errorData, null, 2));
       } catch (e) {
         console.error('Could not parse error response body');
       }
-      
+
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const result = await response.json();
+    console.log('my result', result);
     return result;
   } catch (error) {
     console.error('Error in fetchMainUserData:', error);

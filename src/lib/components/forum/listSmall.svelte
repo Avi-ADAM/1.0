@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import {isToday }from '$lib/func/uti/isToday.svelte';
    import {lang} from '$lib/stores/lang'
   import { isChatLoading, nowChatId } from '$lib/stores/pendMisMes';
@@ -30,7 +31,7 @@
             <div class="py-3 px-5 d overflow-y-auto h-[420px] ">
                 
                 <!-- Chat list -->
-                <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="divide-y divide-gray-200">
+                <div dir="{$isRtl ? 'rtl' : 'ltr'}" class="divide-y divide-gray-200">
                   {#if $isChatLoading}
                   <div class="w-full h-full flex justify-center align-middle items-center">
                   <Rainbow />

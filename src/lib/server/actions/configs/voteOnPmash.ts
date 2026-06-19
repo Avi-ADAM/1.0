@@ -114,6 +114,13 @@ const voteOnPmashHandler: ActionExecutionHandler = async (params, context, { str
       ? `sqadualedf: "${new Date(attrs.sqadualedf).toISOString()}",`
       : '';
 
+    // Carry the recurring-expense terms onto the OpenMashaabim so the resource
+    // suggestion card (sugestma) can show "recurring / monthly approval" and the
+    // estimated total. Only emitted when the pmash is recurring.
+    const recurringFrag = attrs.recurring
+      ? `recurring: true, cycleSize: ${parseInt(String(attrs.cycleSize ?? 1), 10) || 1},`
+      : '';
+
     const strapiUrl = process.env.VITE_URL ?? 'https://tovmeod.1lev1.com';
     const graphqlUrl = `${strapiUrl}/graphql`;
     const headers = {
@@ -157,6 +164,7 @@ const voteOnPmashHandler: ActionExecutionHandler = async (params, context, { str
         mashaabim: "${mshaabId}",
         ${sqadualedFrag}
         ${sqadualefFrag}
+        ${recurringFrag}
       }) { data { attributes { project { data { id } } } } }
 
       updatePmash(id: "${pmashId}", data: {

@@ -2,6 +2,7 @@
   import { userName } from '../../stores/store.js';
   import { show } from './store-show.js';
   import { lang } from '$lib/stores/lang.js';
+  import { isRtl } from '$lib/translations';
 
   import { fly } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
@@ -81,15 +82,15 @@
 </script>
 
 <div class="midscreenText-2">
-  <h1 class="a1" dir={dira[$lang]}>
+  <h1 class="a1" dir={$isRtl ? 'rtl' : 'ltr'}>
     {sh[$lang]}
     {$userName}
   </h1>
-  <h1 class="a2" dir={dira[$lang]}>
+  <h1 class="a2" dir={$isRtl ? 'rtl' : 'ltr'}>
     {sh2[$lang]}
     {sh3[$lang]}{idx}{sh1[$lang]}
   </h1>
-  <h1 class="a3" dir={dira[$lang]}>
+  <h1 class="a3" dir={$isRtl ? 'rtl' : 'ltr'}>
     {sh4[$lang]}
     {sh5[$lang]}
     1💗1

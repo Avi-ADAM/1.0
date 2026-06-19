@@ -1,4 +1,5 @@
-<script lang="ts">
+﻿<script lang="ts">
+  import { isRtl } from '$lib/translations';
   import { lang } from '$lib/stores/lang';
   import { fly } from 'svelte/transition';
   import { toast } from 'svelte-sonner';
@@ -308,7 +309,7 @@
 
 <div
   class="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 text-white"
-  dir={$lang === 'he' ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
 >
   {#if !data.meeting}
     <!-- Meeting Not Found -->

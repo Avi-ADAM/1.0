@@ -1,4 +1,5 @@
 <script>
+  import { isRtl } from '$lib/translations';
   let isonly = $state(false);
   import RichText from '$lib/celim/ui/richText.svelte';
   import { onMount } from 'svelte';
@@ -46,7 +47,7 @@
 
   <!-- Table Container -->
   <div class="overflow-x-auto bg-white rounded-xl shadow-lg border border-gray-200">
-    <table dir={$lang == 'en' ? "ltr" : "rtl"} class="w-full min-w-full">
+    <table dir={$isRtl ? 'rtl' : 'ltr'} class="w-full min-w-full">
       <!-- Task Numbers Row (if not single task) -->
       {#if isonly == false}
         <thead>

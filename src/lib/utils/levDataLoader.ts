@@ -59,6 +59,7 @@ import {
   extractPurchases
 } from './levDataExtractors';
 import { fetchMainUserData, fetchOpenMissions } from './levGraphQLQueries';
+import { resolvePlatformIdentity } from '$lib/stores/platformStore';
 
 
 /**
@@ -94,6 +95,11 @@ export async function initializeLevData(
   lang: string
 ): Promise<void> {
   console.log('🚀 [levDataLoader] Initializing lev data', { userId, lang });
+
+  // Resolve the platform (1💗1) identity once for the proposal card's site-share
+  // row — logo/name/public link. Fire-and-forget: never blocks the feed and the
+  // card degrades to no platform row if it fails.
+  resolvePlatformIdentity();
 
   // Step 1: Try to load from snapshot first
   const snapshot = loadSnapshot();

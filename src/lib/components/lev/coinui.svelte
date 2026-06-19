@@ -106,7 +106,8 @@
     arr1 = oldob;
     onStart?.({
       cards: false,
-      ani: event.ani
+      ani: event.ani,
+      coinlapach: event.coinlapach
     });
   }
 

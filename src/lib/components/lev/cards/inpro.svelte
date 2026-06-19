@@ -1,7 +1,7 @@
-<script>
+﻿<script>
   import { formatTime } from './../utils.js';
   import { lang } from '$lib/stores/lang.js';
-  import { t } from '$lib/translations';
+  import { t, isRtl} from '$lib/translations';
   import {
     nowChatId,
     isChatOpen,
@@ -181,7 +181,7 @@
   onkeypress={(e) => {
     e.key === 'Enter' && toggleScrollable();
   }}
-  dir={$lang == 'he' ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   style="overflow-y:auto"
   class="{isMobileOrTablet()
     ? 'w-full h-full'
@@ -374,7 +374,7 @@
 
   <!-- Actions Footer -->
   <div
-    class="p-4 bg-gray-50 dark:bg-gray-900/50 flex flex-col gap-3 border-t border-gray-100 dark:border-gray-700"
+    class="px-3 py-2 bg-gray-50 dark:bg-gray-900/50 flex flex-wrap gap-2 border-t border-gray-100 dark:border-gray-700"
   >
     {#if low == false}
       <!-- Edit Timer Button -->
@@ -382,7 +382,7 @@
         <button
           onmouseenter={() => hover('לחיצה לעריכת הטיימר')}
           onmouseleave={() => hover('0')}
-          class="py-2 px-4 bg-white dark:bg-gray-800 border-2 border-yellow-500 dark:border-yellow-400 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 font-bold rounded-xl transition-all"
+          class="flex-1 py-1.5 px-3 bg-white dark:bg-gray-800 border-2 border-yellow-500 dark:border-yellow-400 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 font-bold rounded-xl transition-all flex items-center justify-center gap-1.5"
           tabindex="0"
           role="button"
           onkeypress={() => (showSaveDialog = true)}
@@ -392,74 +392,72 @@
         </button>
       {/if}
 
-      <div class="flex gap-3">
-        <!-- Done Button -->
-        {#if already === false}
-          <button
-            onmouseenter={() => hover('לחיצה לסיום המשימה')}
-            onmouseleave={() => hover('0')}
-            onclick={done}
-            class="flex-1 py-2 px-4 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
-            name="done"
+      <!-- Done Button -->
+      {#if already === false}
+        <button
+          onmouseenter={() => hover('לחיצה לסיום המשימה')}
+          onmouseleave={() => hover('0')}
+          onclick={done}
+          class="flex-1 py-1.5 px-3 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5"
+          name="done"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-4 h-4"
+            viewBox="0 0 24 24"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="w-5 h-5"
-              viewBox="0 0 24 24"
-            >
-              <path
-                fill="currentColor"
-                d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z"
-              />
-            </svg>
-            <span>{$lang === 'he' ? 'סיום משימה' : 'Complete Task'}</span>
-          </button>
-        {/if}
+            <path
+              fill="currentColor"
+              d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z"
+            />
+          </svg>
+          <span>{$lang === 'he' ? 'סיום משימה' : 'Complete Task'}</span>
+        </button>
+      {/if}
 
-        <!-- Timer Button -->
-        {#if show === true}
-          <button
-            onmouseenter={() =>
-              hover(`${running ? 'עצירת הטיימר' : 'הפעלת טיימר'}`)}
-            onmouseleave={() => hover('0')}
-            onclick={running ? azor : start}
-            class="flex-1 py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
-            name="start timer"
+      <!-- Timer Button -->
+      {#if show === true}
+        <button
+          onmouseenter={() =>
+            hover(`${running ? 'עצירת הטיימר' : 'הפעלת טיימר'}`)}
+          onmouseleave={() => hover('0')}
+          onclick={running ? azor : start}
+          class="flex-1 py-1.5 px-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5"
+          name="start timer"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-4 h-4"
+            viewBox="0 0 24 24"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="w-5 h-5"
-              viewBox="0 0 24 24"
-            >
-              <path
-                fill="currentColor"
-                d="M6,2H18V8H18V8L14,12L18,16V16H18V22H6V16H6V16L10,12L6,8V8H6V2M16,16.5L12,12.5L8,16.5V20H16V16.5M12,11.5L16,7.5V4H8V7.5L12,11.5M10,6H14V6.75L12,8.75L10,6.75V6Z"
-              />
-            </svg>
-            <span
-              >{running
-                ? $lang === 'he'
-                  ? 'הפסקה'
-                  : 'Stop'
-                : $lang === 'he'
-                  ? 'התחלה'
-                  : 'Start'}</span
-            >
-          </button>
-        {/if}
-      </div>
+            <path
+              fill="currentColor"
+              d="M6,2H18V8H18V8L14,12L18,16V16H18V22H6V16H6V16L10,12L6,8V8H6V2M16,16.5L12,12.5L8,16.5V20H16V16.5M12,11.5L16,7.5V4H8V7.5L12,11.5M10,6H14V6.75L12,8.75L10,6.75V6Z"
+            />
+          </svg>
+          <span
+            >{running
+              ? $lang === 'he'
+                ? 'הפסקה'
+                : 'Stop'
+              : $lang === 'he'
+                ? 'התחלה'
+                : 'Start'}</span
+          >
+        </button>
+      {/if}
 
       <!-- Link Button -->
       {#if link && link != 'undefined'}
         <a
           onmouseenter={() => hover(linkDescription)}
           onmouseleave={() => hover('0')}
-          class="py-2 px-4 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+          class="flex-1 py-1.5 px-3 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5"
           href={link}
         >
           <svg
-            width="20"
-            height="20"
+            width="18"
+            height="18"
             xmlns="http://www.w3.org/2000/svg"
             fill="currentColor"
             fill-rule="evenodd"

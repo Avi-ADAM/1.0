@@ -2,8 +2,8 @@
   import { userName } from '../../stores/store.js';
   import { show } from '../registration/store-show.js';
   import  Hello  from '../registration/hello.svelte'
-  import  Password from '../registration/password.svelte'
    import { goto, prefetch } from '$app/navigation';
+  import { locale, isRtl } from '$lib/translations';
 
   import {
     scale,
@@ -84,21 +84,19 @@ function add (event){
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}"> 
    <Scree onProgres={add}/> 
    </div>  -->
-  {:else if show_value == 5}
-    <div class="midscreen"
- transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}"> 
-   <Password onProgres={add}/> 
-   </div>  
   {:else if show_value == 6}
   <div class="midscreen"
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}">
-    <div dir="rtl" class="midscreenText-3"><h1>
-תודה
+    <div dir={$isRtl ? 'rtl' : 'ltr'} class="midscreenText-3"><h1>
+{$locale === 'ar' ? 'شكراً' : $locale === 'ru' ? 'Спасибо' : $locale === 'en' ? 'Thank you' : 'תודה'}
 <br>
 {userName_value}
 <br>
-ולהתראות בקרוב</h1>
-    <button class="text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-2 rounded-full" onclick={()=>goto('/me',)}>לחיצה למעבר לעמוד הפרופיל</button>
+{$locale === 'ar' ? 'وإلى اللقاء قريباً' : $locale === 'ru' ? 'До скорой встречи' : $locale === 'en' ? 'See you soon' : 'ולהתראות בקרוב'}
+</h1>
+    <button class="text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-2 rounded-full" onclick={()=>goto('/me',)}>
+      {$locale === 'ar' ? 'الانتقال إلى صفحة الملف الشخصي' : $locale === 'ru' ? 'Перейти на страницу профиля' : $locale === 'en' ? 'Go to profile page' : 'לחיצה למעבר לעמוד הפרופיל'}
+    </button>
   </div>
   </div>
 {/if}

@@ -2,7 +2,7 @@
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
-  import { sendToSer } from '$lib/send/sendToSer.js';
+  import { loadProjectProcesses } from '$lib/utils/processes';
   import ProcessBoard from '$lib/components/process/ProcessBoard.svelte';
   import { onMount } from 'svelte';
   import Lowding from '$lib/celim/lowding.svelte';
@@ -16,8 +16,9 @@
 
   onMount(async () => {
     try {
-      const res = await sendToSer({ pid: projectId }, 'getProjectProcesses', null, null, false, fetch);
-      processes = res?.data?.project?.data?.attributes?.processes?.data || [];
+      processes = await loadProjectProcesses(projectId, fetch);
+    } catch (e) {
+      console.error(e);
     } finally {
       loading = false;
     }

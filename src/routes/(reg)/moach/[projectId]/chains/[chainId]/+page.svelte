@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
   import { idPr } from '$lib/stores/idPr.js';
@@ -190,7 +191,7 @@
   <title>{chainName} — {t.processPage}</title>
 </svelte:head>
 
-<div class="pp" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
+<div class="pp" dir={$isRtl ? 'rtl' : 'ltr'}>
 
   <!-- ── Back navigation ──────────────────────────────────────────────────── -->
   <div class="pp-nav">

@@ -180,6 +180,9 @@
    * @property {any} kindOf
    * @property {any} deadLine
    * @property {any} sqedualedf
+   * @property {any} [sqadualedf] - end date (recurring expense window end)
+   * @property {boolean} [recurring] - recurring monthly/yearly expense
+   * @property {number} [cycleSize] - every N months/years
    * @property {any} projectName
    * @property {any} mashName
    * @property {any} descrip
@@ -215,6 +218,9 @@
     kindOf,
     deadLine,
     sqedualedf,
+    sqadualedf,
+    recurring = false,
+    cycleSize = 1,
     projectName,
     mashName,
     descrip,
@@ -387,6 +393,14 @@ role="button"
             >
               {mashName}
             </h1>
+            {#if recurring}
+              <span
+                onmouseenter={() => hover('משאב חוזר · אישרור כל מחזור')}
+                onmouseleave={() => hover('0')}
+                class="ltn"
+                style="color: var(--gold);">🔁 חוזר</span
+              >
+            {/if}
             <h3
               onmouseenter={() => hover('שווי')}
               onmouseleave={() => hover('0')}
@@ -506,8 +520,12 @@ role="button"
     {easy}
     {myp}
     {already}
-    {deadLine} 
+    {deadLine}
     {sqedualedf}
+    {sqadualedf}
+    {kindOf}
+    {recurring}
+    {cycleSize}
     {price}
     {total}
     {descrip}
@@ -534,8 +552,12 @@ role="button"
     {easy}
     {myp}
     {already}
-    {deadLine} 
+    {deadLine}
     {sqedualedf}
+    {sqadualedf}
+    {kindOf}
+    {recurring}
+    {cycleSize}
     {price}
     {total}
     {descrip}

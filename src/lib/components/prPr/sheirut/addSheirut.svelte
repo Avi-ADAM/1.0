@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import Close from '$lib/celim/close.svelte';
   import SucssesConf from '$lib/celim/sucssesConf.svelte';
   import Chooser from '$lib/celim/ui/chooser.svelte';
@@ -144,14 +145,14 @@ let pendque = `mutation {
             onclick={()=>open = false}><Close/>
         </button>
         <h1 class="text-barbi">{heading[$lang]}</h1>
-        <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
+        <div dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
               <input name="des" bind:value={name}  
              type='text' class='input'required >
               <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="des" class='label'>{namede[$lang]}</label>
               <span class='line'></span>
         </div>
 
-        <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
+        <div dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
               <textarea name="es"  bind:value={descrip}    
              type='text' class='input d' required ></textarea>
               <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="es" class='label'>{desde[$lang]}</label>

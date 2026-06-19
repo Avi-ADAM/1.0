@@ -1,5 +1,6 @@
-
+﻿
 <script>
+  import { isRtl } from '$lib/translations';
                import { lang } from '$lib/stores/lang.js'
                import { liUN } from '$lib/stores/liUN.js';
 
@@ -112,7 +113,7 @@ const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
   onB?.();
 };
     </script>
-    <div style="--the:{`var(${color})`};" dir="{$lang == "en" ? "ltr" : "rtl"}">
+    <div style="--the:{`var(${color})`};" dir="{$isRtl ? 'rtl' : 'ltr'}">
       
     {#if addW == false}
     <button style="--the:{color};"
@@ -128,11 +129,11 @@ const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
       <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
     </svg></button> 
       
-    <div dir="{$lang == "en" ? "ltr" : "rtl"}">
+    <div dir="{$isRtl ? 'rtl' : 'ltr'}">
         <h1 style="font-size: 1rem; line-height: normal; color: var(--barbi-pink);">{adds[$lang]}</h1>    
     </div>
 
-<div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
+<div dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
   <input         bind:value={Name_value}
  type='text' class='input' required>
   <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="name" class='label'>{valn[$lang]}</label>

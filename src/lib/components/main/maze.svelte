@@ -1,5 +1,5 @@
-<script>
-  import { t } from '$lib/translations';
+﻿<script>
+  import { t, isRtl} from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import { fly, fade } from 'svelte/transition';
 
@@ -40,7 +40,7 @@
   ];
 </script>
 
-<div class="maze-wrapper" dir={$lang === 'en' ? 'ltr' : 'rtl'}>
+<div class="maze-wrapper" dir={$isRtl ? 'rtl' : 'ltr'}>
   <!-- Header -->
   <div class="maze-header">
     <div class="header-icon">💗</div>

@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
     import { lang } from "$lib/stores/lang";
   /**
    * @typedef {Object} Props
@@ -12,7 +13,7 @@
   /** @type {Props} */
   let { text = $bindable(""), lebel = {"en":"Name", "he":"שם"}, color = "gold", type = "text", autocomplete = "off" } = $props();
     </script>
-     <div dir={$lang == 'en' ? 'ltr' : 'rtl'} class="textinput">
+     <div dir={$isRtl ? 'rtl' : 'ltr'} class="textinput">
         <input
           name="name"
           bind:value={text}

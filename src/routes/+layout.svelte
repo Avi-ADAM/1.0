@@ -1,4 +1,4 @@
-<script>
+﻿<script>
   /* const app = firebase()
   import { getMessaging, onMessage } from "firebase/messaging";
 
@@ -17,7 +17,7 @@ onMessage(messaging, (payload) => {
   import { confettiStore } from '$lib/stores/confettiStore';
   import { theme, themeConfig } from '$lib/stores/theme';
   import { onMount } from 'svelte';
-  import { locale } from '$lib/translations';
+  import { locale, isRtl} from '$lib/translations';
   import { goto } from '$app/navigation';
   import { navigating } from '$app/state';
   import { browser } from '$app/environment';
@@ -202,7 +202,7 @@ onMessage(messaging, (payload) => {
   {@render children?.()}
   <Toaster
     toastOptions={{
-      style: `dir: ${$locale == 'en' ? 'ltr' : 'rtl'}; text-align: ${$locale == 'en' ? 'left' : 'right'}; `
+      style: `dir: ${$isRtl ? 'rtl' : 'ltr'}; text-align: ${$isRtl ? 'right' : 'left'}; `
     }}
     richColors
     closeButton

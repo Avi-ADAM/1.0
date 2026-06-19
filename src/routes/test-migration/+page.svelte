@@ -1,4 +1,5 @@
-<script lang="ts">
+﻿<script lang="ts">
+  import { isRtl } from '$lib/translations';
   /**
    * Migration Demo Page
    * 
@@ -155,7 +156,7 @@
   <title>Action System Migration Demo</title>
 </svelte:head>
 
-<div class="migration-demo" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
+<div class="migration-demo" dir={$isRtl ? 'rtl' : 'ltr'}>
   <header>
     <h1>🚀 Action System Migration Demo</h1>
     <p>Compare the old sendToSer system with the new unified action system</p>

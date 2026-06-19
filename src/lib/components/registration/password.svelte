@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import { createBubbler, preventDefault } from 'svelte/legacy';
 
   const bubble = createBubbler();
@@ -361,7 +362,7 @@
 			</li>-->
     </ul>
     {#if already === false}
-      <div dir={$lang == 'en' ? 'ltr' : 'rtl'} class="but">
+      <div dir={$isRtl ? 'rtl' : 'ltr'} class="but">
         <button type="button" class="button-2" onclick={back}>
           <img alt="go" class="img-4" src={srca[$lang]} />
         </button>
