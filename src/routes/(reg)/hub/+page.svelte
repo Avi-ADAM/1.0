@@ -1,6 +1,7 @@
 <script lang="ts">
   import { lang } from '$lib/stores/lang.js';
   import KpiBar from '$lib/components/hub/KpiBar.svelte';
+  import HubHeader from '$lib/components/hub/HubHeader.svelte';
   import UrgentVotePill from '$lib/components/hub/UrgentVotePill.svelte';
   import KindShortcut from '$lib/components/hub/KindShortcut.svelte';
   import CustomPurchaseCta from '$lib/components/hub/CustomPurchaseCta.svelte';
@@ -12,23 +13,14 @@
   let { data } = $props();
 
   const t = {
-    he: {
-      shortcuts: 'קיצורי דרך',
-      lev: 'הלב — אישורים והצבעות',
-      moach: 'מוח — ניהול הריקמה',
-      me: 'הפרופיל שלי',
-      feed: 'פעילות אחרונה'
-    },
-    en: {
-      shortcuts: 'Shortcuts',
-      lev: 'The Heart — approvals & votes',
-      moach: 'Brain — manage your partnership',
-      me: 'My profile',
-      feed: 'Recent activity'
-    }
+    he: { shortcuts: 'קיצורי דרך', lev: 'הלב', moach: 'מוח', me: 'הפרופיל שלי', feed: 'פעילות אחרונה' },
+    en: { shortcuts: 'Shortcuts', lev: 'The Heart', moach: 'Brain', me: 'My profile', feed: 'Recent activity' },
+    ar: { shortcuts: 'اختصارات', lev: 'القلب', moach: 'العقل', me: 'ملفي', feed: 'النشاط الأخير' },
+    ru: { shortcuts: 'Ярлыки', lev: 'Сердце', moach: 'Мозг', me: 'Мой профиль', feed: 'Недавняя активность' }
   };
 
   let labels = $derived(t[$lang as keyof typeof t] ?? t.he);
+  let dir = $derived(($lang === 'he' || $lang === 'ar' ? 'rtl' : 'ltr') as 'rtl' | 'ltr');
 
   const shortcuts = $derived([
     { icon: '💗', label: labels.lev,   href: '/lev',   badge: 0 },
@@ -41,64 +33,115 @@
   <title>Hub</title>
 </svelte:head>
 
-{#await data.streamed.summary}
-  <HubSkeleton />
-{:then summary}
-  {@const isNewUser =
-    summary.kpi.votes +
-      summary.kpi.urgent +
-      summary.kpi.suggestions +
-      summary.kpi.activePurchases +
-      summary.kpi.activeSales ===
-      0 && summary.topFive.length === 0}
-  <div dir="rtl" class="min-h-screen bg-bluesun text-white font-rubik">
+<div {dir} class="hub-shell relative min-h-[100dvh] bg-bluesun text-white font-rubik overflow-hidden">
+  <!-- Atmospheric gold glow anchored to the header -->
+  <div class="glow pointer-events-none absolute inset-x-0 top-0 h-72" aria-hidden="true"></div>
 
-    <!-- Sticky KPI bar -->
-    <KpiBar
-      votes={summary.kpi.votes}
-      urgent={summary.kpi.urgent}
-      suggestions={summary.kpi.suggestions}
-      activePurchases={summary.kpi.activePurchases}
-      activeSales={summary.kpi.activeSales}
-    />
+  <main
+    class="relative mx-auto w-full max-w-md px-4 space-y-5
+           pt-[calc(env(safe-area-inset-top)+1.5rem)]
+           pb-[calc(env(safe-area-inset-bottom)+6rem)]"
+  >
+    {#await data.streamed.summary}
+      <HubSkeleton />
+    {:then summary}
+      {@const isNewUser =
+        summary.kpi.votes +
+          summary.kpi.urgent +
+          summary.kpi.suggestions +
+          summary.kpi.activePurchases +
+          summary.kpi.activeSales ===
+          0 && summary.topFive.length === 0}
 
-    <div class="max-w-lg mx-auto px-4 pt-4 pb-24 space-y-4">
+      <HubHeader username={summary.username} profilePic={summary.profilePic} />
 
       {#if isNewUser}
-        <!-- First steps for a freshly registered user (no activity yet) -->
-        <FirstSteps username={summary.username} />
+        <div class="stagger" style="--i:1">
+          <FirstSteps username={summary.username} />
+        </div>
       {:else}
-        <!-- Urgent vote alert -->
         {#if summary.kpi.urgent > 0}
-          <UrgentVotePill count={summary.kpi.urgent} href="/lev" />
+          <div class="stagger" style="--i:1">
+            <UrgentVotePill count={summary.kpi.urgent} href="/lev" />
+          </div>
         {/if}
 
-        <!-- Custom purchase CTA -->
-        <CustomPurchaseCta />
-      {/if}
-
-      <!-- Kind shortcuts -->
-      <section>
-        <h2 class="text-xs font-semibold text-white/40 uppercase tracking-wider mb-2 px-1">
-          {labels.shortcuts}
-        </h2>
-        <div class="flex gap-3 flex-wrap">
-          {#each shortcuts as s (s.href)}
-            <KindShortcut icon={s.icon} label={s.label} href={s.href} badge={s.badge} />
-          {/each}
+        <div class="stagger" style="--i:2">
+          <KpiBar
+            votes={summary.kpi.votes}
+            urgent={summary.kpi.urgent}
+            suggestions={summary.kpi.suggestions}
+            activePurchases={summary.kpi.activePurchases}
+            activeSales={summary.kpi.activeSales}
+          />
         </div>
-      </section>
 
-      <!-- Action feed -->
-      <section>
-        <h2 class="text-xs font-semibold text-white/40 uppercase tracking-wider mb-2 px-1">
-          {labels.feed}
-        </h2>
-        <ActionFeed items={summary.topFive} />
-      </section>
+        <div class="stagger" style="--i:3">
+          <CustomPurchaseCta />
+        </div>
 
-    </div>
-  </div>
-{:catch err}
-  <p class="text-red-400 text-center p-8" dir="rtl">שגיאה בטעינת הדף: {err.message}</p>
-{/await}
+        <section class="stagger" style="--i:4">
+          <h2 class="section-title">{labels.shortcuts}</h2>
+          <div class="flex gap-3">
+            {#each shortcuts as s (s.href)}
+              <KindShortcut icon={s.icon} label={s.label} href={s.href} badge={s.badge} />
+            {/each}
+          </div>
+        </section>
+
+        {#if summary.topFive.length > 0}
+          <section class="stagger" style="--i:5">
+            <h2 class="section-title">{labels.feed}</h2>
+            <ActionFeed items={summary.topFive} />
+          </section>
+        {/if}
+      {/if}
+    {:catch err}
+      <p class="text-red-400 text-center p-8">שגיאה בטעינת הדף: {err.message}</p>
+    {/await}
+  </main>
+</div>
+
+<style>
+  /* Soft radial gold haze behind the greeting — gives the dark canvas depth */
+  .glow {
+    background: radial-gradient(
+      120% 80% at 50% 0%,
+      rgba(179, 135, 40, 0.22) 0%,
+      rgba(179, 135, 40, 0.06) 38%,
+      transparent 70%
+    );
+  }
+
+  .section-title {
+    margin: 0 0 0.5rem;
+    padding-inline: 0.25rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  /* Staggered entrance — each section eases up in sequence on load */
+  .stagger {
+    animation: rise 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--i, 0) * 70ms);
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stagger {
+      animation: none;
+    }
+  }
+</style>

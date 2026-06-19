@@ -9,21 +9,49 @@
 
   let { count, href = '/kind/vote' }: Props = $props();
 
-  let labels = $derived({ msg: tr.hub.urgentVoteMsg[$lang], btn: tr.hub.handleBtn[$lang] });
+  const L = (key: keyof typeof tr.hub) =>
+    (tr.hub[key] as Record<string, string>)[$lang] ?? (tr.hub[key] as Record<string, string>).en;
+
+  let labels = $derived({ msg: L('urgentVoteMsg'), btn: L('handleBtn') });
 </script>
 
 {#if count > 0}
   <a
     {href}
-    dir="rtl"
-    class="w-full flex items-center gap-2 px-4 py-3 rounded-xl no-underline
-           bg-red-500/15 border border-red-400/40 text-right
-           hover:bg-red-500/25 transition-colors"
+    class="urgent relative flex items-center gap-3 px-4 py-3.5 rounded-2xl no-underline overflow-hidden
+           bg-gradient-to-r from-red-500/20 to-red-500/5 border border-red-400/40"
   >
-    <span class="text-2xl animate-pulse">🚨</span>
-    <span class="flex-1 text-red-300 font-medium text-sm">
-      {count} {labels.msg}
+    <span class="text-2xl shrink-0 animate-pulse">🚨</span>
+    <span class="flex-1 min-w-0">
+      <span class="block text-sm font-semibold text-red-200 leading-tight">
+        {count} {labels.msg}
+      </span>
     </span>
-    <span class="text-xs text-red-400 underline">{labels.btn} →</span>
+    <span
+      class="shrink-0 text-xs font-bold text-red-100 bg-red-500/40 border border-red-300/30
+             rounded-full px-3 py-1.5 whitespace-nowrap"
+    >{labels.btn}</span>
   </a>
 {/if}
+
+<style>
+  /* Slow breathing glow to draw the eye without being obnoxious */
+  .urgent::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.35);
+    animation: breathe 2.4s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes breathe {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(248, 113, 113, 0);
+    }
+    50% {
+      box-shadow: 0 0 18px 1px rgba(248, 113, 113, 0.25);
+    }
+  }
+</style>
