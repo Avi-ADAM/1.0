@@ -92,7 +92,16 @@
     pricePerUnit = 0,
     cycleSize = 1,
     onClose,
-    onLoad
+    onLoad,
+    /**
+     * Optional custom submit handler. When provided, the component hands the
+     * computed diff to the parent instead of calling submitNegoMash itself.
+     * Used by the open-resource candidate flow (proposeOnOpenMashaabim), where
+     * there is no pmash to negotiate on — the terms become a parallel proposal
+     * on the candidate's Askm. Receives { newValues, originalValues, hasChanges }.
+     * @type {((d: { newValues: any, originalValues: any, hasChanges: boolean }) => Promise<void>) | null}
+     */
+    onSubmit = null
   } = $props();
 
   let descrip2 = $state(descrip);
@@ -147,7 +156,7 @@
   async function increment() {
     onLoad?.();
 
-    if (!pendId) {
+    if (!onSubmit && !pendId) {
       toast.error(tr?.toasts?.er?.[$lang] ?? 'Missing resource id');
       return;
     }
@@ -231,6 +240,20 @@
 
     // Guard: skip if nothing changed and the user has already voted yes
     if (!hasChanges && masaalr && mypos) return;
+
+    // Candidate / parallel-proposal flow: hand the diff to the parent.
+    if (onSubmit) {
+      try {
+        await onSubmit({ newValues, originalValues, hasChanges });
+        toast.success(tr?.toasts.suc[$lang]);
+        close();
+      } catch (e) {
+        error1 = e;
+        console.log(error1);
+        toast.error(tr?.toasts?.er?.[$lang] ?? 'Error');
+      }
+      return;
+    }
 
     try {
       const result = await submitNegoMash({

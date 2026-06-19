@@ -266,6 +266,15 @@ export interface SubmitNegoMashParams {
   users?: Array<{ what: boolean; users_permissions_user: string; order?: number; zman?: string; ide?: number }>;
 }
 
+export interface ProposeOnOpenMashaabimParams {
+  openMashaabimId: string;
+  projectId: string;
+  spId: string;
+  missionName?: string;
+  newValues?: Record<string, any>;
+  originalValues?: Record<string, any>;
+}
+
 export type ActionKey =
   | 'createTask'
   | 'updateTask'
@@ -287,6 +296,7 @@ export type ActionKey =
   | 'submitNegoMission'
   | 'submitNegoMash'
   | 'submitNegoMaap'
+  | 'proposeOnOpenMashaabim'
   | 'getUserForums'
   | 'getForumThread'
   | 'createChatMessage'
@@ -382,6 +392,7 @@ export interface ActionParamsMap {
     newAmount: number;
     reason?: string;
   };
+  proposeOnOpenMashaabim: ProposeOnOpenMashaabimParams;
   getUserForums: Record<string, never>;
   getForumThread: {
     forumId: string;
