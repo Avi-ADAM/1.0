@@ -72,7 +72,7 @@ export const LEV_SLICES: Record<string, LevSliceDef> = {
   },
 
   pends: {
-    qid: null, // TODO: add 87levSlicePends query
+    qid: '87levSlicePends',
     extract: extractPends,
     store: pendsStore,
     anis: ['pends'],
@@ -80,7 +80,7 @@ export const LEV_SLICES: Record<string, LevSliceDef> = {
   },
 
   fiapp: {
-    qid: null, // TODO: add 87levSliceFiapp query
+    qid: '87levSliceFiapp',
     extract: extractFiapp,
     store: fiappStore,
     anis: ['fiapp'],
@@ -128,7 +128,7 @@ export const LEV_SLICES: Record<string, LevSliceDef> = {
   },
 
   decisions: {
-    qid: null, // TODO: add 87levSliceDecisions query
+    qid: '87levSliceDecisions',
     extract: extractDecisions,
     store: decisionsStore,
     anis: ['hachla'],
@@ -136,7 +136,7 @@ export const LEV_SLICES: Record<string, LevSliceDef> = {
   },
 
   sales: {
-    qid: null, // TODO: add 87levSliceSales query
+    qid: '87levSliceSales',
     extract: extractSales,
     store: salesStore,
     anis: ['sale'],
