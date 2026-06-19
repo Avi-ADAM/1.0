@@ -197,11 +197,15 @@ Whitelist של פעולות מותרות; כל השאר → 404. פעולות ש
   (או `tok: locals.tok != false`), כלומר flag בלבד.
 - לעדכן כל `if (page.data.tok)` שמשמש כבדיקת התחברות שיעבוד מול ה-flag הבוליאני.
 
-### 3.4 שמירה (guardrail) שלא תחזור הדליפה
+### 3.4 שמירה (guardrail) שלא תחזור הדליפה — **בוצע ✅ (2026-06-19)**
 
-- בדיקת CI / grep שנכשלת אם מופיע `page.data.jwt`/`page.data.tok` בהקשר של
-  `fetch(... /graphql ...)`, או אם server-load מחזיר `locals.tok` כטוקן.
-- לוודא ש-`grep -rn "VITE_URL.*graphql" src --include=*.svelte` מחזיר 0 בקוד לקוח.
+- `scripts/check-proxy-security.mjs` + `npm run check:proxy`: נכשל אם קומפוננטת
+  לקוח חדשה (`.svelte`) קוראת ל-`/graphql` ישירות (דרך `VITE_URL`/`baseUrl`).
+  עובד בשיטת ratchet — יש BASELINE של 33 העבריינים הידועים; להסיר קובץ מה-BASELINE
+  עם כל מיגרציה, והסקריפט גם נכשל אם קובץ ב-BASELINE כבר נוקה (כדי לשמור על הרשימה
+  כנה ומתכווצת).
+- ⏳ לחבר ל-CI workflow (כרגע אין `.github/workflows`) — להריץ `check:proxy` +
+  `validate:qids` ב-PR.
 
 ### 3.5 צ'קליסט שלב 1
 
