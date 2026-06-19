@@ -138,6 +138,10 @@
   let nego = $state(false);
   let negoAmount = $state(0);
   let negoReason = $state('');
+  // After the proposer submits a counter-offer the lev stores aren't refetched
+  // (lev data is client-side), so we optimistically override the shown amount.
+  let amountOverride = $state(/** @type {number | null} */ (null));
+  let shownAmount = $derived(amountOverride ?? quantityDelivered);
   // True once the cycle's deadline has elapsed without being settled — a member's
   // client then auto-approves the reported amount (checked once on mount below).
   function isTimerExpired() {
@@ -347,6 +351,14 @@
     if (!negoReason.trim()) return;
     isOpen = false;
     nego = false;
+    // Optimistic: the card adopts the proposed amount and a fresh voting round
+    // in which only the proposer's YES counts — everyone else must re-approve.
+    amountOverride = Number(negoAmount) || 0;
+    already = true;
+    noofusersOk = 1;
+    noofusersNo = 0;
+    noofusersWaiting = Math.max((noofpu || 0) - 1, 0);
+    ser = xyz();
     try {
       await executeAction('submitNegoMaap', {
         askId: String(askId),
@@ -512,7 +524,7 @@
             <p style="font-size:0.9em; color:#9aa0a6; text-align:center; margin:4px 0;">
               {useraplyname} דיווח/ה על הוצאה של:
             </p>
-            <p class="p" style="font-size:1.6em; font-weight:bold; color:var(--gold)">{quantityDelivered} ₪</p>
+            <p class="p" style="font-size:1.6em; font-weight:bold; color:var(--gold)">{shownAmount} ₪</p>
           {/if}
           <br />
           <button class="add" onclick={confirmRecurring}>אישור ההוצאה</button>
@@ -799,7 +811,7 @@
                 <span
                   onmouseenter={() => hover('ההוצאה שדווחה החודש — לחצו על הלב לאישור')}
                   onmouseleave={() => hover('0')}
-                  style="color:var(--gold)">🔁 {quantityDelivered} ₪</span
+                  style="color:var(--gold)">🔁 {shownAmount} ₪</span
                 >
               {:else}
                 <span
@@ -987,7 +999,7 @@
                 {isRecurringCycle}
                 {cycleReported}
                 {cycleIndex}
-                {quantityDelivered}
+                quantityDelivered={shownAmount}
                 {pricePerUnit}
                 {isResponsible}
                 {awaitingReport}
@@ -1027,7 +1039,7 @@
     {isRecurringCycle}
     {cycleReported}
     {cycleIndex}
-    {quantityDelivered}
+    quantityDelivered={shownAmount}
     {pricePerUnit}
     {isResponsible}
     {awaitingReport}

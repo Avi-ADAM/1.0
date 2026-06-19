@@ -72,7 +72,10 @@
       "Bash(git merge *)",
       "Bash(awk 'NR>=3300 && NR<=3760 && /^  .[0-9]+[a-zA-Z]+.: .query|^  .[0-9]+[a-zA-Z]+.: .mutation/ {print NR\": \"$0}' src/routes/api/send/qids.js)",
       "Bash(awk -F: '$1<3745')",
-      "PowerShell(Select-String *)"
+      "PowerShell(Select-String *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\deals\\request",
