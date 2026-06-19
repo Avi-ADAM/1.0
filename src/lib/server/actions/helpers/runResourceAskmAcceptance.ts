@@ -42,17 +42,34 @@ function normalizeVotes(existingVotes: unknown[]) {
   }));
 }
 
-/** Month bounds for the cycle containing `ref`. */
-function currentCycleBounds(unit: 'month' | 'year', ref = new Date()) {
+/**
+ * The cycle window [start,end] containing `ref`, anchored to `anchor` and
+ * stepping by `size` units (cycleSize). Mirrors /api/monthi's cycleWindow so
+ * cycle #1's window aligns with the windows monthi opens for later cycles.
+ */
+function currentCycleBounds(
+  unit: 'month' | 'year',
+  anchor: Date,
+  size = 1,
+  ref = new Date()
+) {
+  const step = Math.max(1, Number(size) || 1);
   if (unit === 'year') {
+    const since = ref.getFullYear() - anchor.getFullYear();
+    const idx = Math.max(0, Math.floor(since / step));
+    const y = anchor.getFullYear() + idx * step;
     return {
-      cycleStart: new Date(ref.getFullYear(), 0, 1).toISOString(),
-      cycleEnd: new Date(ref.getFullYear(), 11, 31, 23, 59, 59).toISOString(),
+      cycleStart: new Date(y, 0, 1).toISOString(),
+      cycleEnd: new Date(y + step - 1, 11, 31, 23, 59, 59).toISOString(),
     };
   }
+  const since =
+    (ref.getFullYear() - anchor.getFullYear()) * 12 + (ref.getMonth() - anchor.getMonth());
+  const idx = Math.max(0, Math.floor(since / step));
+  const m = anchor.getMonth() + idx * step;
   return {
-    cycleStart: new Date(ref.getFullYear(), ref.getMonth(), 1).toISOString(),
-    cycleEnd: new Date(ref.getFullYear(), ref.getMonth() + 1, 0, 23, 59, 59).toISOString(),
+    cycleStart: new Date(anchor.getFullYear(), m, 1).toISOString(),
+    cycleEnd: new Date(anchor.getFullYear(), m + step, 0, 23, 59, 59).toISOString(),
   };
 }
 
@@ -118,7 +135,8 @@ export async function activateRecurringEngine(
   const mashId = createRes?.data?.createMashabetahalich?.data?.id;
   if (!mashId || !maapId) return;
 
-  const { cycleStart, cycleEnd } = currentCycleBounds(unit);
+  const startAnchor = pm.sqadualed ? new Date(pm.sqadualed) : now;
+  const { cycleStart, cycleEnd } = currentCycleBounds(unit, startAnchor, cycleSize, now);
   // Turn the acceptance Maap into cycle #1. Leave quantityDelivered unset (null):
   // the responsible user must still report the actual spend for this first month
   // before the rest of the project can approve it. pricePerUnit (on the engine)

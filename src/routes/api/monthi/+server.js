@@ -21,27 +21,41 @@ function calcDeadline(restime, ref = new Date()) {
   return new Date(ref.getTime() + hours * 3600000);
 }
 
-// Bounds of the cycle (month or year) that contains `ref`.
-function cycleBounds(unit, ref = new Date()) {
+// The cycle window [start,end] containing `ref`, anchored to the engine `start`
+// and stepping by `size` units. cycleSize lets a resource run e.g. bi-monthly:
+// one cycle every `size` months instead of every month (size=1 ⇒ monthly/yearly
+// as before). The window is anchored to `anchor` so cycles stay aligned to the
+// resource's start date across runs.
+function cycleWindow(unit, anchor, size, ref = new Date()) {
+  const step = Math.max(1, Number(size) || 1);
   if (unit === 'year') {
+    const since = ref.getFullYear() - anchor.getFullYear();
+    const idx = Math.max(0, Math.floor(since / step));
+    const y = anchor.getFullYear() + idx * step;
     return {
-      cycleStart: new Date(ref.getFullYear(), 0, 1),
-      cycleEnd: new Date(ref.getFullYear(), 11, 31, 23, 59, 59)
+      cycleStart: new Date(y, 0, 1),
+      cycleEnd: new Date(y + step - 1, 11, 31, 23, 59, 59)
     };
   }
+  const since =
+    (ref.getFullYear() - anchor.getFullYear()) * 12 + (ref.getMonth() - anchor.getMonth());
+  const idx = Math.max(0, Math.floor(since / step));
+  const m = anchor.getMonth() + idx * step;
   return {
-    cycleStart: new Date(ref.getFullYear(), ref.getMonth(), 1),
-    cycleEnd: new Date(ref.getFullYear(), ref.getMonth() + 1, 0, 23, 59, 59)
+    cycleStart: new Date(anchor.getFullYear(), m, 1),
+    cycleEnd: new Date(anchor.getFullYear(), m + step, 0, 23, 59, 59)
   };
 }
 
-// Does an existing (non-archived) cycle already cover the given window?
+// Does a cycle already exist for this window? Includes archived cycles: with a
+// multi-month cycleSize the same window spans several monthi runs, and once its
+// cycle is settled (archived) we must NOT open a duplicate for the same window.
+// Distinct windows have distinct start months, so the next window still opens.
 function hasOpenCycleFor(maaps, cycleStart) {
   const y = cycleStart.getFullYear();
   const m = cycleStart.getMonth();
   return (maaps || []).some((mp) => {
     const a = mp.attributes ?? mp;
-    if (a.archived) return false;
     if (!a.cycleStart) return false;
     const d = new Date(a.cycleStart);
     return d.getFullYear() === y && d.getMonth() === m;
@@ -251,9 +265,12 @@ async function runRecurringResources(fetchFn) {
         continue;
       }
 
-      const { cycleStart, cycleEnd } = cycleBounds(unit, now);
+      // Anchor cycle windows to the resource start so cycleSize spacing (e.g.
+      // bi-monthly) stays aligned; fall back to now when no start is set.
+      const anchor = start ?? now;
+      const { cycleStart, cycleEnd } = cycleWindow(unit, anchor, a.cycleSize, now);
       const maaps = a.maaps?.data ?? [];
-      if (hasOpenCycleFor(maaps, cycleStart)) continue; // already opened this period
+      if (hasOpenCycleFor(maaps, cycleStart)) continue; // already opened this window
 
       const nextIndex =
         maaps.reduce((mx, mp) => Math.max(mx, mp.attributes?.cycleIndex ?? 0), 0) + 1;
