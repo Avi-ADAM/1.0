@@ -1,7 +1,6 @@
 ﻿<!-- src/lib/components/prPr/kanban/KanbanBoard.svelte -->
 <script lang="ts">
-  import { lang } from '$lib/stores/lang.js';
-  import { t, isRtl} from '$lib/translations';
+  import { t, isRtl } from '$lib/translations';
 
   interface RawItem {
     id: string;
@@ -248,8 +247,6 @@
       finishedMissions.length
   );
   let totalActs = $derived(acts.length);
-  let isRtl = $derived($lang === 'he');
-
   let dragging: { item: CardItem; fromColId: string } | null = $state(null);
   let dragOverColId: string | null = $state(null);
 
@@ -375,7 +372,7 @@
     const trackRect = trackEl.getBoundingClientRect();
     const tolerance = 12;
 
-    if (isRtl) {
+    if ($isRtl) {
       // In RTL, "back" (right-to-left scroll) means items are to the right of the track
       // "forward" (left-to-right scroll) means items are to the left of the track
       canScrollBack = columns.some(
@@ -405,7 +402,7 @@
 
     let target: HTMLDivElement | undefined;
 
-    if (isRtl) {
+    if ($isRtl) {
       if (direction === 'forward') {
         // Forward in RTL means scrolling to the left (next column)
         target = columns.find(
@@ -436,11 +433,9 @@
       }
     }
 
-    target?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'nearest',
-      inline: isRtl ? 'end' : 'start'
-    });
+    if (!target) return;
+    const colRect = target.getBoundingClientRect();
+    trackEl.scrollBy({ left: colRect.left - trackRect.left, behavior: 'smooth' });
   }
 
   $effect(() => {
