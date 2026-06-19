@@ -3,6 +3,7 @@
   import ListOfTiles from "$lib/components/grid/listOfTiles.svelte";
     import { Grid , PrelineTheme,PlainTableCssTheme ,CardsPlusTheme ,PagingData, GridFooter} from "@mediakular/gridcraft";
     import { lang } from "$lib/stores/lang";
+  import { isRtl } from '$lib/translations';
   import GoButton from "$lib/components/grid/GoButton.svelte";
   import RichText from "$lib/celim/ui/richText.svelte";
   import NameAndPname from "$lib/components/grid/nameAndPname.svelte";
@@ -185,7 +186,7 @@ let columns = $state([
         }
     </script>
 <Head title={title[$lang]} description={description[$lang]} {image} {url} />
-<div class="w-full px-2 text-center bg-gold text-barbi" dir={$lang == "he" ? 'rtl':'ltr'}>
+<div class="w-full px-2 text-center bg-gold text-barbi" dir={$isRtl ? 'rtl' : 'ltr'}>
 <h2 class="flex justify-center items-center">{intitle[$lang]}{#if isLoading || isLoadingMore}
     <RingLoader size={30}/>
      {/if}</h2>

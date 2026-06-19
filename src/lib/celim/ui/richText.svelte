@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import { lang } from '$lib/stores/lang';
   import { onMount, onDestroy } from 'svelte';
   import List from '$lib/celim/icons/list.svelte';
@@ -285,7 +286,7 @@
 </script>
 
 <div
-  dir={$lang == 'he' ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   class="editor-wrapper rounded-lg transition-all duration-300 {minw
     ? 'max-w-[50vw]'
     : ''} {trans ? 'bg-transparent' : 'bg-gold/10'}"

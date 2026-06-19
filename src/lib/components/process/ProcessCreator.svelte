@@ -1,7 +1,7 @@
-<script>
+﻿<script>
   import { createProcess } from '$lib/client/actionClient';
   import { lang } from '$lib/stores/lang.js';
-  import { t } from '$lib/translations';
+  import { t, isRtl} from '$lib/translations';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { Button } from '$lib/components/ui/button';
 
@@ -52,7 +52,7 @@
 
 <div
   class="rounded-lg border border-gold bg-white/80 p-4 text-start shadow-sm"
-  dir={$lang === 'he' ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
 >
   <div class="mb-4">
     <h3 class="text-lg font-semibold text-barbi">{$t('process.creator.title')}</h3>

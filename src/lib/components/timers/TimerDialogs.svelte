@@ -1,9 +1,9 @@
-<script lang="ts">
+﻿<script lang="ts">
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { fly, slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
   import { lang } from '$lib/stores/lang';
-  import { t } from '$lib/translations';
+  import { t, isRtl} from '$lib/translations';
   import { toast } from 'svelte-sonner';
   import { formatTime } from '$lib/func/uti/formatTime';
   import {
@@ -400,7 +400,7 @@
           <path d="M18 6L6 18M6 6l12 12" />
         </svg>
       </button>
-      <div class="dialog-content mt-4" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
+      <div class="dialog-content mt-4" dir={$isRtl ? 'rtl' : 'ltr'}>
         <h2 class="dialog-title">{$t('timers.manageTime')}</h2>
 
         {#if timer?.attributes?.activeTimer?.data?.attributes?.timers?.length}
@@ -575,7 +575,7 @@
           <path d="M18 6L6 18M6 6l12 12" />
         </svg>
       </button>
-      <div class="dialog-content mt-4" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
+      <div class="dialog-content mt-4" dir={$isRtl ? 'rtl' : 'ltr'}>
         <h2 class="dialog-title">
           {dialogEdit == true ? $t('timers.editTimer') : $t('timers.saveTimer')}
         </h2>
@@ -619,7 +619,7 @@
           <path d="M18 6L6 18M6 6l12 12" />
         </svg>
       </button>
-      <div class="dialog-content mt-4" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
+      <div class="dialog-content mt-4" dir={$isRtl ? 'rtl' : 'ltr'}>
         <h2 class="dialog-title">{$t('timers.saveTimer')}</h2>
         {#if filteredTasks.length}
           <h3>{$t('timers.chooseTasks')}</h3>

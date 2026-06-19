@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import Daterange from './../../celim/ui/daterange.svelte';
   import Crtask from '$lib/components/prPr/tasks/crtask.svelte';
   import Plus from '$lib/celim/plus.svelte';
@@ -665,7 +666,7 @@
       {#if dialog == 1}
         <div
           style="z-index: 400; overflow-x: auto;"
-          dir={$lang == 'he' ? 'rtl' : 'ltr'}
+          dir={$isRtl ? 'rtl' : 'ltr'}
           class="d"
         >
           <button
@@ -674,7 +675,7 @@
             ><Close />
           </button>
           <table
-            dir={$lang == 'he' ? 'rtl' : 'ltr'}
+            dir={$isRtl ? 'rtl' : 'ltr'}
             class="d"
             style="overflow-x: auto; font-size: 95%;"
           >
@@ -720,7 +721,7 @@
                 <th class="ddd">{mf.numShifts}</th>
                 {#each days as day, i}
                   <td>
-                    <div dir={$lang == 'he' ? 'rtl' : 'ltr'} class="textinput">
+                    <div dir={$isRtl ? 'rtl' : 'ltr'} class="textinput">
                       <input
                         type="number"
                         id={`shif${i}`}
@@ -778,7 +779,7 @@
                     {#if day.shifts[t] != undefined}
                       <td style="font-size: 3rem">
                         <div
-                          dir={$lang == 'he' ? 'rtl' : 'ltr'}
+                          dir={$isRtl ? 'rtl' : 'ltr'}
                           class="textinput"
                         >
                           <input
@@ -829,7 +830,7 @@
         />
       {:else if dialog === 3}
         <div
-          dir={$lang != 'he' ? 'ltr' : 'rtl'}
+          dir={$isRtl ? 'rtl' : 'ltr'}
           style="  overflow-x: auto; background: linear-gradient(to right, #25c481, #25b7c4);background: -webkit-linear-gradient(left, #25c481, #25b7c4); "
         >
           <ExpandTask
@@ -846,7 +847,7 @@
 
 <div
   bind:clientWidth={wid}
-  dir={$lang == 'he' ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   style="overflow-y:auto"
   class=" d sm:pt-4 w-full"
 >
@@ -934,7 +935,7 @@
               <Daterange
                 onEdit={() => (dateE = true)}
                 onEditStop={() => (dateE = false)}
-                dir={$lang == 'he' ? 'rtl' : 'ltr'}
+                dir={$isRtl ? 'rtl' : 'ltr'}
                 bind:start={miData[0].date}
                 bind:finnish={miData[0].dates}
               />

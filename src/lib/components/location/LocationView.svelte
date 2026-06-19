@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import { onDestroy, tick } from 'svelte';
   import { lang } from '$lib/stores/lang.js';
   import { Globe2, MapPin, MapPinned, RadioTower, ChevronDown } from '@lucide/svelte';
@@ -175,7 +176,7 @@
 </script>
 
 {#if !(isEmpty && hideWhenEmpty)}
-  <div class="loc-view" class:dense dir={$lang === 'he' ? 'rtl' : 'ltr'}>
+  <div class="loc-view" class:dense dir={$isRtl ? 'rtl' : 'ltr'}>
     <div class="loc-row">
       <span class="loc-badge" class:online={isOnline}>
         <ModeIcon size={dense ? 13 : 15} />

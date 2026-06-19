@@ -1,6 +1,6 @@
-<script>
+﻿<script>
   import { lang } from '$lib/stores/lang.js';
-  import { t } from '$lib/translations';
+  import { t, isRtl} from '$lib/translations';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte';
@@ -150,7 +150,7 @@
   onkeypress={(e) => {
     e.key === 'Enter' && toggleScrollable();
   }}
-  dir={$lang == 'he' ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   style="overflow-y:auto"
   class="{isMobileOrTablet()
     ? 'w-full h-full'

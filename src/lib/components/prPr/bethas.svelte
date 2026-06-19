@@ -1,6 +1,6 @@
-<script>
+﻿<script>
   import { lang } from '$lib/stores/lang.js';
-  import { t } from '$lib/translations';
+  import { t, isRtl} from '$lib/translations';
   import Crtask from '$lib/components/prPr/tasks/crtask.svelte';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import Plus from '$lib/celim/plus.svelte';
@@ -222,7 +222,7 @@
     </DialogContent>
   </div>
 </DialogOverlay>
-<section dir={$lang == 'he' ? 'rtl' : 'ltr'} bind:clientWidth={w}>
+<section dir={$isRtl ? 'rtl' : 'ltr'} bind:clientWidth={w}>
   <h1>{$t('mission.bethas.heading')}</h1>
   <button onclick={() => (isOpen = true)}><Plus /></button>
   <div>

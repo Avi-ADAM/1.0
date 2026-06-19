@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import { onMount } from 'svelte';
   import MultiSelect from 'svelte-multiselect';
   import { lang } from '$lib/stores/lang.js';
@@ -533,7 +534,7 @@
   }
 </script>
 
-<div class="resource-creator space-y-6" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
+<div class="resource-creator space-y-6" dir={$isRtl ? 'rtl' : 'ltr'}>
   <header class="flex justify-between items-center mb-4">
     <h2 class="text-2xl font-bold text-barbi">{specMode ? ($lang === 'en' ? 'Resource offer' : 'הצעת משאב') : t.title}</h2>
     {#if onCancel}

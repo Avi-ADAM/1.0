@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang';
 
@@ -91,7 +92,7 @@
   };
 
   const labels = $derived(i18n[$lang] ?? i18n['he']);
-  const dir = $derived($lang === 'ar' || $lang === 'he' ? 'rtl' : 'ltr');
+  const dir = $derived($lang === 'ar' || $isRtl ? 'rtl' : 'ltr');
 </script>
 
 <div class="archive-wrap" class:visible {dir}>

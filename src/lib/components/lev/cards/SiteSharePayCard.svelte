@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { t, isRtl } from '$lib/translations';
   /**
    * SiteSharePayCard — the swiper-card form of a single committed-but-unpaid
    * site-share contribution (PLAN_SITE_SHARE_PER_MEMBER §5, M4).
@@ -18,7 +19,7 @@
    * 0/skip never reaches here — the loader only emits `decided & amount>0`
    * contributions whose transfer (if any) is not yet settled.
    */
-  import { lang } from '$lib/stores/lang.js';
+
   import { executeAction } from '$lib/client/actionClient';
   import { userStore, siteSharePayablesStore } from '$lib/stores/levStores';
   import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
@@ -29,7 +30,6 @@
 
   let { buble, isFirst = false, onProj } = $props();
 
-  const isHe = $derived($lang === 'he');
 
   let busy = $state(false);
   // null = "use the default" (first volunteer); set on radio change.
@@ -56,7 +56,7 @@
   // server-side (confirmSheirutHaluka). Here we just retire the card from the
   // feed so it isn't shown as outstanding anymore.
   function handleComplete() {
-    toast.success(isHe ? 'ההעברה הושלמה 💗' : 'Transfer complete 💗');
+    toast.success($t('lev.revenue.siteSharePayCard.done'));
     siteSharePayablesStore.update((list) =>
       list.filter((p) => p.contributionId !== buble.contributionId)
     );
@@ -68,21 +68,12 @@
     }
   }
 
-  // Map a handler error code to a human message.
   function transferErrorMessage(code) {
     switch (code) {
-      case 'invalid_receiver':
-        return isHe ? 'יש לבחור מקבל/ת' : 'Pick a receiver first';
-      case 'no_transfer_for_zero_or_skip':
-        return isHe
-          ? 'אין העברה לחלוקה שדולגה או באפס'
-          : 'No transfer for a skipped or zero split';
-      case 'not_contribution_owner':
-        return isHe
-          ? 'רק בעל/ת ההתחייבות יכול/ה לבצע את ההעברה'
-          : 'Only the contribution owner can transfer';
-      default:
-        return isHe ? 'פתיחת ההעברה נכשלה' : 'Could not open the transfer';
+      case 'invalid_receiver': return $t('lev.revenue.siteSharePayCard.errInvalidReceiver');
+      case 'no_transfer_for_zero_or_skip': return $t('lev.revenue.siteSharePayCard.errZeroSkip');
+      case 'not_contribution_owner': return $t('lev.revenue.siteSharePayCard.errNotOwner');
+      default: return $t('lev.revenue.siteSharePayCard.errOpen');
     }
   }
 
@@ -125,7 +116,7 @@
       return null;
     } catch (e) {
       console.error('[SiteShare] open transfer error:', e);
-      toast.error(isHe ? 'שגיאה בפתיחת ההעברה' : 'Error opening the transfer');
+      toast.error($t('lev.revenue.siteSharePayCard.errNet'));
       return null;
     } finally {
       busy = false;
@@ -140,12 +131,12 @@
   onkeypress={(e) => {
     e.key === 'Enter' && toggleScrollable();
   }}
-  dir={isHe ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   style="overflow-y:auto"
   class="{isMobileOrTablet()
     ? 'w-full h-full'
     : ' w-[90%] h-[90%]'}  lg:w-[90%] {isFirst
-    ? isHe
+    ? $isRtl
       ? 'boxleft'
       : 'boxright'
     : ''} flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isScrolable.value
@@ -157,7 +148,7 @@
   <CardHeader
     logoSrc={buble.rikmaLogo || buble.src}
     projectName={buble.rikmaName || buble.projectName}
-    cardType={isHe ? 'נתינה ל‑1💗1' : 'GIVE TO 1💗1'}
+    cardType={$t('lev.revenue.siteSharePayCard.cardType')}
     cardTitle={`${Number(buble.amount).toFixed(2)} ₪`}
     glowColor="gold"
     onProjectClick={handleProjectClick}
@@ -169,19 +160,13 @@
       ? 'bg-white dark:bg-slate-800'
       : 'bg-gray-200 dark:bg-slate-700'} transition-all-300 p-4 flex-1 overflow-y-auto flex flex-col gap-4"
   >
-    <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-      {isHe
-        ? 'התחייבת לתת ל‑1💗1 מהחלוקה הזו. תאם/י בצ׳אט ואשר/י כששלחת את הכסף. ההעברה תושלם כשגם המקבל/ת יאשר/תאשר קבלה.'
-        : 'You committed to give 1💗1 from this split. Coordinate in chat and confirm once you sent the money. It completes when the receiver confirms too.'}
-    </p>
+    <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{$t('lev.revenue.siteSharePayCard.body')}</p>
 
     {#if !buble.volunteers || buble.volunteers.length === 0}
       <div
         class="rounded-xl border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 p-4 text-sm text-amber-800 dark:text-amber-200"
       >
-        {isHe
-          ? 'אין עדיין מי שהתנדב/ה לקבל ב‑1💗1. ההעברה תיפתח כשמתנדב/ת ייקבע/תיקבע.'
-          : 'No 1💗1 member has volunteered to receive yet. The transfer opens once someone does.'}
+        {$t('lev.revenue.siteSharePayCard.noVol')}
       </div>
     {:else}
       <!-- Receiver picker — only until the transfer is locked in. -->
@@ -190,7 +175,7 @@
           <div
             class="text-[11px] uppercase font-bold text-gold mb-2 dark:text-[var(--gold-l)]"
           >
-            {isHe ? 'בחר/י מקבל/ת' : 'Pick a receiver'}
+            {$t('lev.revenue.siteSharePayCard.pickReceiver')}
           </div>
           <div class="flex flex-wrap gap-2">
             {#each buble.volunteers as v (v.id)}

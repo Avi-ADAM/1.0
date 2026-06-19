@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import MultiSelect from 'svelte-multiselect';
   import { userName } from '../../stores/store.js';
   import { show } from './store-show.js';
@@ -203,7 +204,7 @@
   };
 </script>
 
-<div class="step-inner" dir={$lang == 'en' ? 'ltr' : 'rtl'}>
+<div class="step-inner" dir={$isRtl ? 'rtl' : 'ltr'}>
   <h2 class="step-title">{userName_value}&nbsp;{what[$lang]}</h2>
   <p class="step-desc">{info[$lang]}</p>
   <div class="multi-wrap">

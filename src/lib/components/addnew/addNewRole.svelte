@@ -1,5 +1,6 @@
-
+﻿
 <script>
+  import { isRtl } from '$lib/translations';
 import { onMount } from 'svelte';
 import { lang } from '$lib/stores/lang.js'
     import { liUN } from '$lib/stores/liUN.js';
@@ -211,7 +212,7 @@ function dispatchb () {
 
 </script>
 
-<div class="p-4" style="--the:{`var(${color})`};" dir="{$lang == "en" ? "ltr" : "rtl"}">
+<div class="p-4" style="--the:{`var(${color})`};" dir="{$isRtl ? 'rtl' : 'ltr'}">
 {#if addR == false}
 <button 
 class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-0.5 px-4 rounded-full"
@@ -228,7 +229,7 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded-full"
   
 
     <h1 class="font-bold text-gold" style="font-size: 1rem; line-height: normal; color: var({color}); ">{addn[$lang]}</h1>    
-<div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
+<div dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
   <input  bind:value={roleName_value}
  type='text' class='input' required>
   <label  style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="name" class='label'>{valn[$lang]}</label>
@@ -236,14 +237,14 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded-full"
 </div>
 {#if shgi == true}<small class="text-red-600">{errmsg[$lang]}</small>{/if}
 
-   <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
+   <div dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
   <input bind:value={desR}  
  type='text' class='input' required>
   <label  style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="des" class='label'>{des[$lang]}</label>
   <span class='line'></span>
 </div>
 <br>
-   <div dir="{$lang == "en" ? "ltr" : "rtl"}">
+   <div dir="{$isRtl ? 'rtl' : 'ltr'}">
       <MultiSelect
         outerDivClass="!bg-gold !text-barbi"
         inputClass="!bg-gold !text-barbi"

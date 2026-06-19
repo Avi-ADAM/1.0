@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import { onMount } from 'svelte';
   import { Calendar } from '@fullcalendar/core';
   import dayGridPlugin from '@fullcalendar/daygrid';
@@ -173,7 +174,7 @@
         right: 'dayGridMonth,timeGridWeek,timeGridDay'
       },
       locale: $lang === 'he' ? 'he' : 'en',
-      direction: $lang === 'he' ? 'rtl' : 'ltr',
+      direction: $isRtl ? 'rtl' : 'ltr',
       height: 'auto',
       events: events,
       eventClick: handleEventClick,
@@ -290,14 +291,14 @@
       const events = createCalendarEvents(timers);
       calendar.setOption('events', events);
       calendar.setOption('locale', $lang === 'he' ? 'he' : 'en');
-      calendar.setOption('direction', $lang === 'he' ? 'rtl' : 'ltr');
+      calendar.setOption('direction', $isRtl ? 'rtl' : 'ltr');
     }
   });
 </script>
 
 <!-- הקומפוננטה עם הנתונים -->
-<div class="project-timers-calendar bg-white rounded-lg shadow-lg pt-4 px-1 sm:p-6" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
-  <div class="flex justify-between items-center mb-6" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
+<div class="project-timers-calendar bg-white rounded-lg shadow-lg pt-4 px-1 sm:p-6" dir={$isRtl ? 'rtl' : 'ltr'}>
+  <div class="flex justify-between items-center mb-6" dir={$isRtl ? 'rtl' : 'ltr'}>
     <h2 class="text-2xl font-bold text-gray-800">{currentTexts.projectTimers}</h2>
     <div class="flex gap-4 text-sm">
       <div class="flex items-center gap-2">
@@ -447,7 +448,7 @@
 <!-- מודאל פרטי טיימר -->
 {#if showTimerModal && selectedTimerData}
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onkeypress={(e) => e.key === 'Escape' && closeModal()} onclick={closeModal}>
-    <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto" onclick={(e) => e.stopPropagation()} dir={$lang === 'he' ? 'rtl' : 'ltr'} >
+    <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto" onclick={(e) => e.stopPropagation()} dir={$isRtl ? 'rtl' : 'ltr'} >
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-xl font-semibold">
           {selectedTimerData.mesimabetahalich?.name || currentTexts.noTaskName}

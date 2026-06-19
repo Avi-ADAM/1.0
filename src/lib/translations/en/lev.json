@@ -179,5 +179,90 @@
     "toHeadquarters": "to the FreeMates headquarters",
     "welcome": "welcome to new FreeMates",
     "heartOf": "the heart of 1💗1"
+  },
+  "revenue": {
+    "siteShareDecision": {
+      "title": "Your contribution to 1💗1",
+      "sub": "Out of what you earned ({basis} {currency}) — 1💗1's management & partnership service. Suggested: {proposed} {currency}. Give as suggested, more, or less — it's your personal contribution and doesn't change the other partners' shares.",
+      "skipped": "You chose not to give this time. You can change it.",
+      "gave": "You gave {amount} {currency}. You can update it.",
+      "asIs": "As suggested ({proposed})",
+      "more": "I'd like to give more",
+      "less": "Give less",
+      "amount": "Amount",
+      "reasonReq": "Reason (required)",
+      "reasonOpt": "Reason (optional)",
+      "placeholder": "Why?",
+      "confirm": "Confirm contribution",
+      "skip": "Not this time"
+    },
+    "openSiteShareReminder": {
+      "title": "Open contribution decisions",
+      "sub": "You still have a personal 1💗1 contribution to decide on the splits below. Give, or choose not to this time.",
+      "rikma": "Rikma"
+    },
+    "siteSharePayCard": {
+      "cardType": "GIVE TO 1💗1",
+      "done": "Transfer complete 💗",
+      "pickReceiver": "Pick a receiver",
+      "errOpen": "Could not open the transfer",
+      "errNet": "Error opening the transfer",
+      "errInvalidReceiver": "Pick a receiver first",
+      "errZeroSkip": "No transfer for a skipped or zero split",
+      "errNotOwner": "Only the contribution owner can transfer",
+      "body": "You committed to give 1💗1 from this split. Coordinate in chat and confirm once you sent the money. It completes when the receiver confirms too.",
+      "noVol": "No 1💗1 member has volunteered to receive yet. The transfer opens once someone does."
+    },
+    "siteShareAutoApprovedCard": {
+      "cardType": "CONFIRM 1💗1 GIVING",
+      "saved": "Saved 💗",
+      "errSave": "Save failed",
+      "errNet": "Save error",
+      "autoNotice": "This split already auto-approved and closed. You did not block it — all that is left is to confirm your personal giving to 1💗1.",
+      "body": "Choose how much to give 1💗1 from your personal share of this split, or skip this time. It doesn't affect what the partners split."
+    },
+    "siteShareIncomeCard": {
+      "cardType": "SITE SHARE INCOME",
+      "body": "This is site-share income from a rikma's members. There's no product or delivery step — just make sure someone volunteers to receive, and that giver and receiver confirm the money moved.",
+      "totalIncome": "Total income",
+      "you": "You",
+      "transfers": "Member transfers",
+      "complete": "complete",
+      "noTransfers": "No member transfers yet. They appear here once a giving member picks a receiver and sends."
+    }
+  },
+  "taskModal": {
+    "progress": "Progress",
+    "createdBy": "Created by",
+    "unknown": "Unknown",
+    "assignedTo": "Assigned to",
+    "accepted": "Accepted",
+    "awaitingAccept": "Awaiting acceptance",
+    "openForRoles": "Open for roles:",
+    "openUnassigned": "Open – unassigned",
+    "start": "Start:",
+    "due": "Due:",
+    "description": "Description",
+    "assigneeAccepted": "Assignee accepted the task",
+    "yes": "Yes",
+    "pending": "Pending",
+    "markedDone": "Assignee marked as done",
+    "creatorValidated": "Creator validated completion",
+    "stage0": "Created",
+    "stage1": "Assigned",
+    "stage2": "Accepted",
+    "stage3": "In Progress",
+    "stage4": "Done",
+    "stage5": "Validated",
+    "badge0": "Open",
+    "badge1": "Awaiting Assignment",
+    "badge2": "Pending Acceptance",
+    "badge3": "In Progress",
+    "badge4": "Pending Validation",
+    "badge5": "Completed",
+    "urgency_white": "Normal",
+    "urgency_green": "Low",
+    "urgency_yellow": "Medium",
+    "urgency_red": "Urgent"
   }
 }

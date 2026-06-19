@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
 import MultiSelect from 'svelte-multiselect';
 import { missionNew } from '../../stores/missionNew';
   import { onMount } from 'svelte';
@@ -73,7 +74,7 @@ const adds = {"he":"בחירת תפקידים נדרשים","en": "Add needed ro
 </script>
 
 
-<div dir="{$lang == "en" ? "ltr" : "rtl"}">
+<div dir="{$isRtl ? 'rtl' : 'ltr'}">
   <lebel for="choos">{adds[$lang]}</lebel>
 <MultiSelect
 id="choos"

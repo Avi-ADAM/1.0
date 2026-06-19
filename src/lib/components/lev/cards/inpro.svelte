@@ -1,7 +1,7 @@
-<script>
+﻿<script>
   import { formatTime } from './../utils.js';
   import { lang } from '$lib/stores/lang.js';
-  import { t } from '$lib/translations';
+  import { t, isRtl} from '$lib/translations';
   import {
     nowChatId,
     isChatOpen,
@@ -181,7 +181,7 @@
   onkeypress={(e) => {
     e.key === 'Enter' && toggleScrollable();
   }}
-  dir={$lang == 'he' ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   style="overflow-y:auto"
   class="{isMobileOrTablet()
     ? 'w-full h-full'

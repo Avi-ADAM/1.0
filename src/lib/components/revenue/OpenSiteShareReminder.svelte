@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { t, isRtl } from '$lib/translations';
   /**
    * OpenSiteShareReminder — gate 3 (PLAN_SITE_SHARE_PER_MEMBER §3).
    *
@@ -13,7 +14,6 @@
    * are no open decisions.
    */
   import { onMount } from 'svelte';
-  import { lang } from '$lib/stores/lang.js';
   import { executeAction } from '$lib/client/actionClient';
   import SiteShareDecision from './SiteShareDecision.svelte';
 
@@ -22,7 +22,6 @@
   let collapsed = $state(false);
   let busyId = $state(null); // contributionId currently being saved
 
-  const isHe = $derived($lang === 'he');
 
   async function load() {
     try {
@@ -67,21 +66,17 @@
 </script>
 
 {#if loaded && decisions.length > 0}
-  <div class="ossr" dir={isHe ? 'rtl' : 'ltr'}>
+  <div class="ossr" dir={$isRtl ? 'rtl' : 'ltr'}>
     <button class="ossr-head" type="button" onclick={() => (collapsed = !collapsed)}>
       <span class="ossr-title">
-        💗 {isHe ? 'החלטות נתינה פתוחות' : 'Open contribution decisions'}
+        💗 {$t('lev.revenue.openSiteShareReminder.title')}
         <span class="ossr-count">{decisions.length}</span>
       </span>
       <span class="ossr-chev" class:open={!collapsed} aria-hidden="true">▾</span>
     </button>
 
     {#if !collapsed}
-      <p class="ossr-sub">
-        {isHe
-          ? 'נותר לך להחליט על הנתינה האישית שלך ל‑1💗1 בחלוקות הבאות. אפשר לתת או לבחור לא הפעם.'
-          : "You still have a personal 1💗1 contribution to decide on the splits below. Give, or choose not to this time."}
-      </p>
+      <p class="ossr-sub">{$t('lev.revenue.openSiteShareReminder.sub')}</p>
       <div class="ossr-list">
         {#each decisions as item (item.contributionId)}
           <div class="ossr-item">
@@ -89,7 +84,7 @@
               {#if item.projectLogo}
                 <img src={item.projectLogo} alt={item.projectName} class="ossr-logo" />
               {/if}
-              <span class="ossr-rikma">{item.projectName || (isHe ? 'רקמה' : 'Rikma')}</span>
+              <span class="ossr-rikma">{item.projectName || $t('lev.revenue.openSiteShareReminder.rikma')}</span>
             </div>
             <SiteShareDecision
               proposed={item.proposedAmount}

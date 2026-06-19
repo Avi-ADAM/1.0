@@ -1,4 +1,5 @@
-<script lang="ts">
+﻿<script lang="ts">
+  import { t, isRtl } from '$lib/translations';
   /**
    * SiteShareAutoApprovedCard — the swiper-card form of an OPEN (pending)
    * site-share decision whose split has ALREADY auto-approved (by time) and is
@@ -10,7 +11,6 @@
    * component used in every other gate. On decide the contribution closes and the
    * card removes itself from `openSiteShareDecisionsStore`.
    */
-  import { lang } from '$lib/stores/lang.js';
   import { executeAction } from '$lib/client/actionClient';
   import { openSiteShareDecisionsStore } from '$lib/stores/levStores';
   import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
@@ -21,7 +21,6 @@
 
   let { buble, isFirst = false, onProj } = $props();
 
-  const isHe = $derived($lang === 'he');
 
   let busy = $state(false);
 
@@ -49,18 +48,18 @@
         basisAmount: buble.basisAmount
       });
       if (res?.success) {
-        toast.success(isHe ? 'נרשם 💗' : 'Saved 💗');
+        toast.success($t('lev.revenue.siteShareAutoApprovedCard.saved'));
         // Decision closed — drop this card from the feed.
         openSiteShareDecisionsStore.update((list) =>
           list.filter((d) => d.contributionId !== buble.contributionId)
         );
       } else {
         console.error('[SiteShare] decide (auto-approved) failed:', res?.error);
-        toast.error(isHe ? 'השמירה נכשלה' : 'Save failed');
+        toast.error($t('lev.revenue.siteShareAutoApprovedCard.errSave'));
       }
     } catch (e) {
       console.error('[SiteShare] decide (auto-approved) error:', e);
-      toast.error(isHe ? 'שגיאה בשמירה' : 'Save error');
+      toast.error($t('lev.revenue.siteShareAutoApprovedCard.errNet'));
     } finally {
       busy = false;
     }
@@ -74,12 +73,12 @@
   onkeypress={(e) => {
     e.key === 'Enter' && toggleScrollable();
   }}
-  dir={isHe ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   style="overflow-y:auto"
   class="{isMobileOrTablet()
     ? 'w-full h-full'
     : ' w-[90%] h-[90%]'}  lg:w-[90%] {isFirst
-    ? isHe
+    ? $isRtl
       ? 'boxleft'
       : 'boxright'
     : ''} flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isScrolable.value
@@ -91,7 +90,7 @@
   <CardHeader
     logoSrc={buble.projectLogo || buble.src}
     projectName={buble.projectName}
-    cardType={isHe ? 'אשרור נתינה ל‑1💗1' : 'CONFIRM 1💗1 GIVING'}
+    cardType={$t('lev.revenue.siteShareAutoApprovedCard.cardType')}
     cardTitle={`${Number(buble.proposedAmount || 0).toFixed(2)} ₪`}
     glowColor="gold"
     onProjectClick={handleProjectClick}
@@ -108,18 +107,10 @@
       class="rounded-xl border border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20 p-3 flex items-start gap-2"
     >
       <span class="text-green-600 dark:text-green-400 text-lg leading-none">✓</span>
-      <p class="text-sm text-green-800 dark:text-green-200 leading-relaxed">
-        {isHe
-          ? 'החלוקה הזו כבר אושרה אוטומטית והסתיימה. לא חסמת אותה — נותר רק לאשרר את הנתינה האישית שלך ל‑1💗1.'
-          : 'This split already auto-approved and closed. You did not block it — all that is left is to confirm your personal giving to 1💗1.'}
-      </p>
+      <p class="text-sm text-green-800 dark:text-green-200 leading-relaxed">{$t('lev.revenue.siteShareAutoApprovedCard.autoNotice')}</p>
     </div>
 
-    <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-      {isHe
-        ? 'בחר/י כמה לתת ל‑1💗1 מהחלק האישי שלך בחלוקה הזו, או דלג/י הפעם. זה לא משפיע על מה שהשותפים חילקו.'
-        : "Choose how much to give 1💗1 from your personal share of this split, or skip this time. It doesn't affect what the partners split."}
-    </p>
+    <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{$t('lev.revenue.siteShareAutoApprovedCard.body')}</p>
 
     <!-- Shared decision UI (same as every other gate) -->
     <SiteShareDecision

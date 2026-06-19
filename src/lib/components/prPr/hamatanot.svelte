@@ -1,11 +1,11 @@
-<script>
+﻿<script>
   //טבלת מתנות כפתור מכירה מקפיץ תפריט של איפה הכסף יושב
   import Col from './column/main.svelte';
   import New from './newmatana.svelte';
   import { SaleComponent } from '$lib/components/sales';
   import dayjs from 'dayjs';
   import { lang } from '$lib/stores/lang.js';
-  import { t } from '$lib/translations';
+  import { t, isRtl} from '$lib/translations';
   import { idPr } from '$lib/stores/idPr.js';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { fly } from 'svelte/transition';
@@ -322,7 +322,7 @@
     transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}
   >
     <DialogContent class="content" aria-label="form">
-      <div style="z-index: 400;" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
+      <div style="z-index: 400;" dir={$isRtl ? 'rtl' : 'ltr'}>
         <button class=" hover:bg-barbi text-mturk rounded-full" onclick={closer}
           >{$t('project.hamatanot.cancel')}</button
         >
@@ -707,7 +707,7 @@
       >
         <div
           style="z-index: 800;"
-          dir={$lang == 'he' ? 'rtl' : 'ltr'}
+          dir={$isRtl ? 'rtl' : 'ltr'}
           class="p-6 max-h-[90vh] overflow-y-auto"
         >
           <div class="flex justify-between items-center mb-4">

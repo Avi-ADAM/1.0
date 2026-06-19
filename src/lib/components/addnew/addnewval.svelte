@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
            import { lang } from '$lib/stores/lang.js'
                import { liUN } from '$lib/stores/liUN.js';
 const baseUrl = import.meta.env.VITE_URL
@@ -126,14 +127,14 @@ class=" hover:bg-barbi text-gold hover:text-lturk font-bold  rounded-full text-c
 <div >
  <h1 class="font-bold" style="font-size: 1rem; line-height: normal; color: var(--barbi-pink); ">{addn[$lang]}</h1>    
 </div>
-<div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
+<div dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
   <input  bind:value={name_value} type='text' class='input' required>
   <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="name" class='label'>{valn[$lang]}</label>
   <span class='line'></span>
 </div>
 {#if shgi == true}<small class="text-red-600">{errmsg[$lang]}</small>{/if}
 <br />
-<div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
+<div dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
   <input type='text' class='input' bind:value={desV} required>
   <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="descrip" class='label'>{des[$lang]}</label>
   <span class='line'></span>

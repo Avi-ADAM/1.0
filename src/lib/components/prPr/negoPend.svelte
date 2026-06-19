@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import tr from '$lib/translations/tr.json';
   import Text from '../conf/text.svelte';
   import NumberField from '../conf/number.svelte';
@@ -328,7 +329,7 @@
   ]);
 </script>
 
-<div class="text-barbi" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
+<div class="text-barbi" dir={$isRtl ? 'rtl' : 'ltr'}>
   <h1 class="md:text-center text-2xl md:text-2xl font-bold underline">
     {tri?.nego?.headmash[$lang]}
     {name1}

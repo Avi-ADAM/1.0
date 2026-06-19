@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
     import { page } from '$app/state';
   import MobileModal from '$lib/celim/ui/mobileModal.svelte';
   import MultiSelect from 'svelte-multiselect';
@@ -179,7 +180,7 @@ function closeMobileModal() {
 
 </script>
 
-<div dir="{$lang == 'he' ? 'rtl' : 'ltr'}" >
+<div dir="{$isRtl ? 'rtl' : 'ltr'}" >
   {#if children}{@render children()}{:else}
 <h2 class="text-barbi font-bold">{head[$lang]}</h2>
   {/if}

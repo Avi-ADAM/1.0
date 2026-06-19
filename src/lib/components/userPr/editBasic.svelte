@@ -1,4 +1,5 @@
-<script lang="ts">
+﻿<script lang="ts">
+  import { isRtl } from '$lib/translations';
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { lang } from '$lib/stores/lang.js';
@@ -453,7 +454,7 @@
   }
 </script>
 
-<div dir={$lang === 'he' ? 'rtl' : 'ltr'}>
+<div dir={$isRtl ? 'rtl' : 'ltr'}>
   <h1 class="text-2xl font-bold text-center mb-6 text-gold">{t[$lang].head}</h1>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-5">

@@ -1,6 +1,5 @@
-<script>
-  import { lang } from '$lib/stores/lang';
-  import { t } from '$lib/translations';
+﻿<script>
+  import { t, locale, isRtl } from '$lib/translations';
 
   /**
    * @typedef {Object} Props
@@ -16,11 +15,8 @@
 
   function fmtDate(d) {
     if (!d) return null;
-    return new Date(d).toLocaleDateString($lang === 'he' ? 'he-IL' : 'en-GB', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    });
+    const lc = { he: 'he-IL', ar: 'ar-SA', ru: 'ru-RU', en: 'en-GB' }[$locale] ?? 'en-GB';
+    return new Date(d).toLocaleDateString(lc, { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
   function closeOnBg(e) {
@@ -60,72 +56,25 @@
     return 0;
   });
 
-  const STAGES = [
-    { he: 'נוצרה', en: 'Created' },
-    { he: 'הוקצתה', en: 'Assigned' },
-    { he: 'אושרה ע"י מבצע', en: 'Accepted' },
-    { he: 'בביצוע', en: 'In Progress' },
-    { he: 'סומנה כבוצע', en: 'Done' },
-    { he: 'אושרה סופית', en: 'Validated' }
+  const BADGE_CLS = [
+    'bg-sky-100 text-sky-700 border-sky-300',
+    'bg-violet-100 text-violet-700 border-violet-300',
+    'bg-amber-100 text-amber-700 border-amber-300',
+    'bg-blue-100 text-blue-700 border-blue-300',
+    'bg-orange-100 text-orange-700 border-orange-300',
+    'bg-emerald-100 text-emerald-700 border-emerald-300'
   ];
 
-  // badge per stage
-  const BADGE = [
-    { he: 'פתוחה', en: 'Open', cls: 'bg-sky-100 text-sky-700 border-sky-300' },
-    {
-      he: 'ממתינה להשמה',
-      en: 'Awaiting Assignment',
-      cls: 'bg-violet-100 text-violet-700 border-violet-300'
-    },
-    {
-      he: 'ממתינה לאישור מבצע',
-      en: 'Pending Acceptance',
-      cls: 'bg-amber-100 text-amber-700 border-amber-300'
-    },
-    {
-      he: 'בביצוע',
-      en: 'In Progress',
-      cls: 'bg-blue-100 text-blue-700 border-blue-300'
-    },
-    {
-      he: 'ממתינה לאישור יוצר',
-      en: 'Pending Validation',
-      cls: 'bg-orange-100 text-orange-700 border-orange-300'
-    },
-    {
-      he: 'הושלמה',
-      en: 'Completed',
-      cls: 'bg-emerald-100 text-emerald-700 border-emerald-300'
-    }
-  ];
-
-  const URGENCY = {
-    white: {
-      he: 'רגיל',
-      en: 'Normal',
-      cls: 'bg-slate-50 text-slate-600 border-slate-200'
-    },
-    green: {
-      he: 'נמוך',
-      en: 'Low',
-      cls: 'bg-emerald-50 text-emerald-600 border-emerald-200'
-    },
-    yellow: {
-      he: 'בינוני',
-      en: 'Medium',
-      cls: 'bg-amber-50 text-amber-600 border-amber-200'
-    },
-    red: {
-      he: 'דחוף',
-      en: 'Urgent',
-      cls: 'bg-rose-50 text-rose-600 border-rose-200'
-    }
+  const URGENCY_CLS = {
+    white:  'bg-slate-50 text-slate-600 border-slate-200',
+    green:  'bg-emerald-50 text-emerald-600 border-emerald-200',
+    yellow: 'bg-amber-50 text-amber-600 border-amber-200',
+    red:    'bg-rose-50 text-rose-600 border-rose-200'
   };
 
   const ICONS = ['📋', '🎯', '🤝', '⚙️', '🏁', '✅'];
 
-  const isHe = $derived($lang === 'he');
-  const dir = $derived(isHe ? 'rtl' : 'ltr');
+  const dir = $derived($isRtl ? 'rtl' : 'ltr');
 
   const progress = $derived(act?.status ?? 0);
 
@@ -138,7 +87,7 @@
 </script>
 
 {#if open && act}
-  {@const uCfg = URGENCY[act.hashivut] || URGENCY.white}
+  {@const urgencyKey = act.hashivut && URGENCY_CLS[act.hashivut] ? act.hashivut : 'white'}
   <!-- backdrop -->
   <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
   <div
@@ -173,18 +122,18 @@
           {#if stage() >= 0}
             <span
               class="text-xs font-semibold px-2.5 py-1 rounded-full border
-                         {BADGE[stage()].cls}"
+                         {BADGE_CLS[stage()]}"
             >
-              {BADGE[stage()][isHe ? 'he' : 'en']}
+              {$t('lev.taskModal.badge' + stage())}
             </span>
           {/if}
           <!-- urgency badge -->
 
           <span
             class="text-[10px] font-bold px-2 py-1 rounded-full border shadow-sm
-                   {uCfg.cls}"
+                   {URGENCY_CLS[urgencyKey]}"
           >
-            {uCfg[isHe ? 'he' : 'en']}
+            {$t('lev.taskModal.urgency_' + urgencyKey)}
           </span>
           <!-- close -->
           <button
@@ -216,7 +165,7 @@
         <!-- lifecycle timeline -->
         <div class="overflow-x-auto">
           <ol class="flex items-start justify-center gap-0 min-w-max" {dir}>
-            {#each STAGES as s, i}
+            {#each { length: 6 } as _, i}
               {@const done = i < stage()}
               {@const current = i === stage()}
               <li class="flex flex-col items-center" style="width:80px">
@@ -225,7 +174,7 @@
                   <div
                     class="flex-1 h-0.5 {i === 0
                       ? 'invisible'
-                      : (isHe ? i < stage() : i <= stage())
+                      : ($isRtl ? i < stage() : i <= stage())
                         ? 'bg-amber-400'
                         : 'bg-zinc-200 dark:bg-zinc-700'}"
                   ></div>
@@ -257,9 +206,9 @@
                     {/if}
                   </div>
                   <div
-                    class="flex-1 h-0.5 {i === STAGES.length - 1
+                    class="flex-1 h-0.5 {i === 5
                       ? 'invisible'
-                      : (isHe ? i <= stage() - 1 : i < stage())
+                      : ($isRtl ? i <= stage() - 1 : i < stage())
                         ? 'bg-amber-400'
                         : 'bg-zinc-200 dark:bg-zinc-700'}"
                   ></div>
@@ -272,7 +221,7 @@
                       ? 'text-zinc-800 dark:text-zinc-100 font-bold'
                       : 'text-zinc-400 dark:text-zinc-500'}"
                 >
-                  {s[isHe ? 'he' : 'en']}
+                  {$t('lev.taskModal.stage' + i)}
                 </span>
               </li>
             {/each}
@@ -285,7 +234,7 @@
             <div
               class="flex justify-between text-xs text-zinc-500 dark:text-zinc-400"
             >
-              <span>{isHe ? 'התקדמות' : 'Progress'}</span>
+              <span>{$t('lev.taskModal.progress')}</span>
               <span
                 class="font-mono font-semibold text-zinc-700 dark:text-zinc-300"
                 >{progress}%</span
@@ -311,7 +260,7 @@
             <p
               class="text-xs font-semibold uppercase tracking-wider text-zinc-400"
             >
-              {isHe ? 'יצר את המטלה' : 'Created by'}
+              {$t('lev.taskModal.createdBy')}
             </p>
             {#if creator}
               <div class="flex items-center gap-3">
@@ -330,7 +279,7 @@
               <p class="text-sm text-zinc-500">#{creatorId}</p>
             {:else}
               <p class="text-sm text-zinc-400 italic">
-                {isHe ? 'לא ידוע' : 'Unknown'}
+                {$t('lev.taskModal.unknown')}
               </p>
             {/if}
           </div>
@@ -342,7 +291,7 @@
             <p
               class="text-xs font-semibold uppercase tracking-wider text-zinc-400"
             >
-              {isHe ? 'מבצע המטלה' : 'Assigned to'}
+              {$t('lev.taskModal.assignedTo')}
             </p>
 
             {#if assignee}
@@ -374,7 +323,7 @@
                           clip-rule="evenodd"
                         />
                       </svg>
-                      {isHe ? 'קיבל/ה את המטלה' : 'Accepted'}
+                      {$t('lev.taskModal.accepted')}
                     </span>
                   {:else}
                     <span
@@ -393,7 +342,7 @@
                           d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                         />
                       </svg>
-                      {isHe ? 'ממתין לאישור מבצע' : 'Awaiting acceptance'}
+                      {$t('lev.taskModal.awaitingAccept')}
                     </span>
                   {/if}
                 </div>
@@ -401,7 +350,7 @@
             {:else if hasRole && roles.length > 0}
               <div class="space-y-1.5">
                 <p class="text-xs text-zinc-500 dark:text-zinc-400">
-                  {isHe ? 'פתוחה לתפקידים:' : 'Open for roles:'}
+                  {$t('lev.taskModal.openForRoles')}
                 </p>
                 <div class="flex flex-wrap gap-1.5">
                   {#each roles as role}
@@ -431,7 +380,7 @@
                   />
                 </svg>
                 <span class="text-sm font-medium">
-                  {isHe ? 'פתוחה להתנדבות' : 'Open – unassigned'}
+                  {$t('lev.taskModal.openUnassigned')}
                 </span>
               </div>
             {/if}
@@ -458,7 +407,7 @@
                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                   />
                 </svg>
-                <span class="text-zinc-400">{isHe ? 'התחלה:' : 'Start:'}</span>
+                <span class="text-zinc-400">{$t('lev.taskModal.start')}</span>
                 <span class="font-medium">{fmtDate(act.dateS)}</span>
               </div>
             {/if}
@@ -479,7 +428,7 @@
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                <span class="text-zinc-400">{isHe ? 'יעד:' : 'Due:'}</span>
+                <span class="text-zinc-400">{$t('lev.taskModal.due')}</span>
                 <span class="font-medium">{fmtDate(act.dateF)}</span>
               </div>
             {/if}
@@ -492,7 +441,7 @@
             <p
               class="text-xs font-semibold uppercase tracking-wider text-zinc-400"
             >
-              {isHe ? 'תיאור' : 'Description'}
+              {$t('lev.taskModal.description')}
             </p>
             <div
               class="prose prose-sm dark:prose-invert max-w-none
@@ -513,7 +462,7 @@
           <!-- row: assignee approved -->
           <div class="flex items-center justify-between px-4 py-3">
             <span class="text-sm text-zinc-600 dark:text-zinc-300">
-              {isHe ? 'מבצע קיבל את המטלה' : 'Assignee accepted the task'}
+              {$t('lev.taskModal.assigneeAccepted')}
             </span>
             {#if act.myIshur}
               <span
@@ -530,7 +479,7 @@
                     clip-rule="evenodd"
                   />
                 </svg>
-                {isHe ? 'כן' : 'Yes'}
+                {$t('lev.taskModal.yes')}
               </span>
             {:else}
               <span
@@ -549,7 +498,7 @@
                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                {isHe ? 'ממתין' : 'Pending'}
+                {$t('lev.taskModal.pending')}
               </span>
             {/if}
           </div>
@@ -557,7 +506,7 @@
           <!-- row: marked as done -->
           <div class="flex items-center justify-between px-4 py-3">
             <span class="text-sm text-zinc-600 dark:text-zinc-300">
-              {isHe ? 'מבצע סימן כבוצע' : 'Assignee marked as done'}
+              {$t('lev.taskModal.markedDone')}
             </span>
             {#if act.naasa}
               <span
@@ -574,7 +523,7 @@
                     clip-rule="evenodd"
                   />
                 </svg>
-                {isHe ? 'כן' : 'Yes'}
+                {$t('lev.taskModal.yes')}
               </span>
             {:else}
               <span
@@ -588,7 +537,7 @@
           <!-- row: creator validated -->
           <div class="flex items-center justify-between px-4 py-3">
             <span class="text-sm text-zinc-600 dark:text-zinc-300">
-              {isHe ? 'יוצר אישר שבוצע' : 'Creator validated completion'}
+              {$t('lev.taskModal.creatorValidated')}
             </span>
             {#if act.valiIshur}
               <span
@@ -605,7 +554,7 @@
                     clip-rule="evenodd"
                   />
                 </svg>
-                {isHe ? 'כן' : 'Yes'}
+                {$t('lev.taskModal.yes')}
               </span>
             {:else if act.naasa}
               <span
@@ -624,7 +573,7 @@
                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                {isHe ? 'ממתין' : 'Pending'}
+                {$t('lev.taskModal.pending')}
               </span>
             {:else}
               <span

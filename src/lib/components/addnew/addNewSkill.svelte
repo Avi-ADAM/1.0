@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import Addnewro from './addNewRoleToSkill.svelte';
   import MultiSelect from 'svelte-multiselect';
   import { onMount } from 'svelte';
@@ -302,7 +303,7 @@
 <div
   class="p-4"
   style="--the:{`var(${color})`};"
-  dir={$lang === 'en' ? 'ltr' : 'rtl'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
 >
   {#if addS === false}
     <button
@@ -331,7 +332,7 @@
       </h1>
 
       <!-- שם כישור + בדיקת כפילות -->
-      <div dir={$lang === 'en' ? 'ltr' : 'rtl'} class="textinput">
+      <div dir={$isRtl ? 'rtl' : 'ltr'} class="textinput">
         <input
           bind:value={skillName_value}
           oninput={onSkillNameInput}
@@ -380,7 +381,7 @@
       {/if}
 
       <!-- תיאור -->
-      <div dir={$lang === 'en' ? 'ltr' : 'rtl'} class="textinput">
+      <div dir={$isRtl ? 'rtl' : 'ltr'} class="textinput">
         <input bind:value={desS} type="text" class="input" required />
         <label
           style:right={$lang === 'he' ? '0' : 'none'}
@@ -394,7 +395,7 @@
       <br />
 
       <!-- MultiSelect תפקידים -->
-      <div dir={$lang === 'en' ? 'ltr' : 'rtl'}>
+      <div dir={$isRtl ? 'rtl' : 'ltr'}>
         <MultiSelect
           outerDivClass="!bg-gold !text-barbi"
           inputClass="!bg-gold !text-barbi"

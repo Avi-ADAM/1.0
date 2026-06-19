@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { lang } from '$lib/stores/lang.js';
+  import { locale } from '$lib/translations';
 
   interface Props {
     username?: string;
@@ -7,7 +7,7 @@
 
   let { username = '' }: Props = $props();
 
-  const t = {
+  const tr = {
     he: {
       hello: 'ברוכים הבאים',
       sub: 'ההרשמה הושלמה 🎉 עדיין אין כאן פעילות — ככה מתחילים בשלושה צעדים:',
@@ -61,10 +61,64 @@
           cta: 'Make a request'
         }
       ]
+    },
+    ar: {
+      hello: 'مرحباً بك',
+      sub: 'أنت هنا 🎉 لا يوجد شيء بعد — إليك كيفية البدء في ثلاث خطوات:',
+      steps: [
+        {
+          icon: '🚀',
+          title: 'بناء ملفك الشخصي أو إطلاق شراكة',
+          desc: 'نحو 4 دقائق — حمّل سيرتك الذاتية أو موقعك الحالي وسيملأ الذكاء الاصطناعي البقية',
+          href: '/onboard',
+          cta: 'ابدأ'
+        },
+        {
+          icon: '🤖',
+          title: 'تعرف على Lev — المساعد الذكي',
+          desc: 'يتنقل ويفتح المهام ويجيب على أي سؤال حول النظام',
+          href: '/lev',
+          cta: 'تحدث إلى Lev'
+        },
+        {
+          icon: '✨',
+          title: 'أخبرنا بما تريد إنشاؤه',
+          desc: 'يقوم الكونسيرج بتفكيك طلبك وربطك بالشركاء المناسبين',
+          href: '/concierge',
+          cta: 'قدم طلبًا'
+        }
+      ]
+    },
+    ru: {
+      hello: 'Добро пожаловать',
+      sub: 'Вы здесь 🎉 Пока ничего нет — вот как начать за три шага:',
+      steps: [
+        {
+          icon: '🚀',
+          title: 'Создайте профиль или запустите партнёрство',
+          desc: 'Около 4 минут — загрузите резюме или сайт, и ИИ заполнит всё за вас',
+          href: '/onboard',
+          cta: 'Начать'
+        },
+        {
+          icon: '🤖',
+          title: 'Познакомьтесь с Lev — умным помощником',
+          desc: 'Навигирует, открывает задания и отвечает на любой вопрос о системе',
+          href: '/lev',
+          cta: 'Поговорить с Lev'
+        },
+        {
+          icon: '✨',
+          title: 'Расскажите, что хотите создать',
+          desc: 'Консьерж разбивает ваш запрос и находит подходящих партнёров',
+          href: '/concierge',
+          cta: 'Подать запрос'
+        }
+      ]
     }
   };
 
-  let labels = $derived(t[$lang as keyof typeof t] ?? t.he);
+  let labels = $derived(tr[$locale as keyof typeof tr] ?? tr.en);
 </script>
 
 <section

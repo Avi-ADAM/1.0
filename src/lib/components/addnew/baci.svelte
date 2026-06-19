@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
     import { lang } from '$lib/stores/lang.js'
     import { Confetti } from "svelte-confetti"
    import { quintOut } from "svelte/easing";
@@ -248,11 +249,11 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
 
   {#if before == false}
 
-<div transition:scale={{ delay: 250, duration: 300, easing: quintOut }} dir="{$lang == "en" ? "ltr" : "rtl"}" class="jho {isMobileOrTablet ? "pb-12" : ""} flex flex-col items-center text-center justify-center">
+<div transition:scale={{ delay: 250, duration: 300, easing: quintOut }} dir="{$isRtl ? 'rtl' : 'ltr'}" class="jho {isMobileOrTablet ? "pb-12" : ""} flex flex-col items-center text-center justify-center">
   <h1 class="text-gold">{crn[$lang]}</h1>
 <br>
 
-        <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
+        <div dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
   <input name="des" bind:value={$baciStore.projectName_value}
  type='text' class='input'required >
   <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="des" class='label'>{frn[$lang]}</label>
@@ -260,7 +261,7 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
 </div>
 {#if shgi == true}<small class="text-red-600 bg-slate-50">{naex[$lang]}</small>{/if}
 <!----
-    <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
+    <div dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
   <textarea name="es"  bind:value={desP}    
  type='text' class='input d' required ></textarea>
   <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="es" class='label'>{teure[$lang]}</label>
@@ -272,7 +273,7 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
 <RichText bind:outpot={$baciStore.desP}/>
 </div>
 <!----
-   <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
+   <div dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
   <textarea name="s"  bind:value={$baciStore.desPl}
  type='text' class='input d' required></textarea>
   <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="s" class='label'>{prte[$lang]}</label>
@@ -283,7 +284,7 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
 
 <RichText bind:outpot={$baciStore.desPl}/>
 </div>
- <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
+ <div dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
   <input name="de"    bind:value={$baciStore.linkP}
  type='text' class='input' required>
   <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="de" class='label'>{wel[$lang]}</label>
@@ -339,7 +340,7 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
   </MobileModal>
 {/if}
   <br>
- <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="mb-3 xl:w-96 m-2">
+ <div dir="{$isRtl ? 'rtl' : 'ltr'}" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-gold">{hre[$lang]}</h2>
     <select class:round={$lang == "he"} class:rounden={$lang == "en"} bind:value={$baciStore.restime} class=" form-select appearance-none
       block
@@ -363,7 +364,7 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
 </select>
 <small style="color: turquoise;">{hrex[$lang]}</small>
 </div>
-<div dir="{$lang == "en" ? "ltr" : "rtl"}" class="mb-3 xl:w-96 m-2">
+<div dir="{$isRtl ? 'rtl' : 'ltr'}" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-gold">{timeto[$lang]}</h2>
     <select class:round={$lang == "he"} class:rounden={$lang == "en"} bind:value={$baciStore.timeToP} class=" form-select appearance-none
       block

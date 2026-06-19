@@ -1,6 +1,6 @@
-<script lang="ts">
+﻿<script lang="ts">
   import { lang } from '$lib/stores/lang.js';
-  import { t } from '$lib/translations';
+  import { t, isRtl} from '$lib/translations';
   import { toast } from 'svelte-sonner';
   import { userStore } from '$lib/stores/levStores';
   import RichText from '$lib/celim/ui/richText.svelte';
@@ -267,7 +267,7 @@
   onkeypress={(e) => {
     e.key === 'Enter' && toggleScrollable();
   }}
-  dir={$lang == 'he' ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   style="overflow-y:auto"
   class="{isMobileOrTablet()
     ? 'w-full h-full'

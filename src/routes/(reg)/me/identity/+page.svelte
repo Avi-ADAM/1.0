@@ -1,4 +1,5 @@
-<script lang="ts">
+﻿<script lang="ts">
+  import { isRtl } from '$lib/translations';
   /**
    * /me/identity — your cryptographic identity at a glance.
    *
@@ -74,7 +75,7 @@
   <title>{t('title')} · 1lev1</title>
 </svelte:head>
 
-<main class="mx-auto max-w-2xl p-4 md:p-8 text-zinc-800 dark:text-zinc-100" dir={$lang === 'en' ? 'ltr' : 'rtl'}>
+<main class="mx-auto max-w-2xl p-4 md:p-8 text-zinc-800 dark:text-zinc-100" dir={$isRtl ? 'rtl' : 'ltr'}>
   <a href="/me" class="text-sm text-zinc-500 hover:underline">← {t('backToMe')}</a>
 
   <h1 class="text-2xl font-bold mt-4 mb-2">{t('title')}</h1>

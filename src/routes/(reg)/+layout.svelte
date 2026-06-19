@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
 
 import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
@@ -100,7 +101,7 @@ const logi = {"he": "להתחברות", "en": "To Login", "ar": "لتسجيل ا
   <Foot un={data.un} idL={data.uid}/>
   <Tour TourTip={TourTip}></Tour>
   <Toaster toastOptions={{
-		style: `dir: ${$lang == "en" ? "ltr" : "rtl"}; text-align: ${$lang == "en" ? "left" : "right"}; `,
+		style: `dir: ${$isRtl ? 'rtl' : 'ltr'}; text-align: ${$isRtl ? 'right' : 'left'}; `,
   }} richColors  closeButton position="top-center" />
     </main>
  {/if}

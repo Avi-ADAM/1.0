@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import { goto } from '$app/navigation';
   import { fly, scale } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
@@ -33,7 +34,7 @@
   }
 </script>
 
-<div class="fork-wrap" dir={$lang === 'en' ? 'ltr' : 'rtl'}>
+<div class="fork-wrap" dir={$isRtl ? 'rtl' : 'ltr'}>
   <!-- title plaque -->
   <div class="plaque" in:fly={{ y: -16, duration: 500, delay: 100, easing: quintOut }}>
     <span class="plaque-title">

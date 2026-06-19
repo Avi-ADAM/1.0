@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import { page } from '$app/state';
   import Lowding from '$lib/celim/lowding.svelte';
   import { lang } from '$lib/stores/lang.js';
@@ -317,7 +318,7 @@
 
 {#if arr1.length > 0}
       <div
-        dir={$lang == 'he' ? 'rtl' : 'ltr'}
+        dir={$isRtl ? 'rtl' : 'ltr'}
         bind:clientWidth={h}
         class="body box-border h-screen"
       >
@@ -518,7 +519,7 @@
               class="mySwiperc {!isMobileOrTablet()
                 ? 'swiperc'
                 : 'swipermobile'}"
-              dir={$lang == 'he' ? 'rtl' : 'ltr'}
+              dir={$isRtl ? 'rtl' : 'ltr'}
               navigation={isMobileOrTablet()
                 ? false
                 : {

@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import { page, navigating } from '$app/state';
   import { goto } from '$app/navigation';
   import { lang } from '$lib/stores/lang.js';
@@ -440,7 +441,7 @@
         <TourItem message={tour.members}>
         <div
           class="flex items-center justify-center py-2"
-          dir={$lang === 'he' ? 'rtl' : 'ltr'}
+          dir={$isRtl ? 'rtl' : 'ltr'}
         >
           <div class="flex -space-x-2">
             {#each projectBase.user_1s?.data || [] as user}
@@ -501,7 +502,7 @@
         <!-- Navigation Tabs -->
         <nav
           class="flex justify-center flex-wrap gap-1 py-4"
-          dir={$lang === 'he' ? 'rtl' : 'ltr'}
+          dir={$isRtl ? 'rtl' : 'ltr'}
         >
           {#each tabs as tab}
             <a

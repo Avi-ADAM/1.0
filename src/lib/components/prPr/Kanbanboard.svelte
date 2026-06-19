@@ -1,7 +1,7 @@
-<!-- src/lib/components/prPr/kanban/KanbanBoard.svelte -->
+﻿<!-- src/lib/components/prPr/kanban/KanbanBoard.svelte -->
 <script lang="ts">
   import { lang } from '$lib/stores/lang.js';
-  import { t } from '$lib/translations';
+  import { t, isRtl} from '$lib/translations';
 
   interface RawItem {
     id: string;
@@ -523,7 +523,7 @@
   </div>
 {/if}
 
-<div class="kanban-root w-full" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
+<div class="kanban-root w-full" dir={$isRtl ? 'rtl' : 'ltr'}>
   <!-- Stats / legend bar -->
   <div
     class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mb-4 px-2 text-xs"
