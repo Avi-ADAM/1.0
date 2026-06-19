@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import { username } from '$lib/stores/pendMisMes';
   import { page } from '$app/state';
   /**
@@ -100,7 +101,7 @@
 </script>
 
 <div
-  dir={$lang == 'he' || $lang == 'ar' ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   class="flex flex-col p-4 min-h-[85vh] h-fit"
 >
   <div class="text-center gap-2 flex flex-row justify-center items-center">

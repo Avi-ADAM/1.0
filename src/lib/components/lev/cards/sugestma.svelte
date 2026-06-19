@@ -1,12 +1,13 @@
-<script>
+﻿<script>
   import { lang } from '$lib/stores/lang.js';
-  import { t } from '$lib/translations';
+  import { t, isRtl} from '$lib/translations';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
+  import moment from 'moment';
 
   // רכיבים מודרניים חדשים
   import CardHeader from './CardHeader.svelte';
@@ -26,6 +27,9 @@
    * @property {any} spnot
    * @property {any} deadLine
    * @property {any} sqadualedf
+   * @property {any} [kindOf]
+   * @property {boolean} [recurring] - recurring monthly/yearly expense
+   * @property {number} [cycleSize] - every N months/years
    * @property {boolean} [already]
    *
    * <!-- Props חדשים עבור הסגנון המודרני -->
@@ -57,6 +61,9 @@
     spnot,
     deadLine,
     sqadualedf,
+    kindOf,
+    recurring = false,
+    cycleSize = 1,
     already = $bindable(false),
 
     // Props מודרניים (ברירת מחדל ירוק עבור dowegeot לפי המסמך)
@@ -104,6 +111,42 @@
     he: 'הצעה לשיתוף משאב בריקמה',
     en: 'Suggestion for sharing a resource with FreeMates'
   };
+  const recurHead = {
+    he: '🔁 משאב חוזר · אישרור כל מחזור',
+    en: '🔁 Recurring resource · approved each cycle'
+  };
+
+  // Per-cycle amount for a recurring expense (value-for-calc, falling back to price).
+  let perCycle = $derived(Number(easy) > 0 ? Number(easy) : Number(price) || 0);
+  // Number of cycles between start (deadLine) and end (sqadualedf). null when
+  // open-ended (no end date) → total can't be computed.
+  let cycleCount = $derived(
+    (() => {
+      if (!recurring || !deadLine || !sqadualedf) return null;
+      const unit = kindOf === 'yearly' ? 'years' : 'months';
+      const n = moment(sqadualedf).diff(moment(deadLine), unit, true);
+      return n > 0 ? n : null;
+    })()
+  );
+  // Estimated total investment over the whole window.
+  let recurTotal = $derived(
+    cycleCount != null ? Math.round(perCycle * cycleCount) : null
+  );
+  let unitWord = $derived(
+    kindOf === 'yearly'
+      ? { per: 'לשנה', many: 'שנים', one: 'שנה' }
+      : { per: 'לחודש', many: 'חודשים', one: 'חודש' }
+  );
+  let cycleCountLabel = $derived(
+    cycleCount != null
+      ? (() => {
+          const rounded = Math.round(cycleCount * 10) / 10;
+          return rounded === 1
+            ? unitWord.one
+            : `${rounded} ${unitWord.many}`;
+        })()
+      : ''
+  );
 </script>
 
 <!-- Container מודרני עם אפקטי Glow -->
@@ -114,7 +157,7 @@
   onkeypress={(e) => {
     e.key === 'Enter' && toggleScrollable();
   }}
-  dir={$lang == 'he' ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   class="{isMobileOrTablet()
     ? 'w-full h-full'
     : 'w-[90%] h-[90%]'} lg:w-[90%] {isVisible
@@ -138,7 +181,7 @@
   <CardHeader
     logoSrc={src}
     {projectName}
-    cardType={head[$lang]}
+    cardType={recurring ? recurHead[$lang] : head[$lang]}
     cardTitle={mashName}
     {glowColor}
     onProjectClick={handleProjectClick}
@@ -152,6 +195,50 @@
   >
     <!-- שווי והצעות -->
     <div class="flex flex-col space-y-4">
+      {#if recurring}
+        <!-- באנר משאב חוזר: עלות למחזור + תדירות + סך השקעה משוער / ללא סיום -->
+        <div
+          class="flex flex-col gap-1.5 p-3 rounded-xl border border-blue-200 dark:border-blue-800/50 bg-blue-50 dark:bg-blue-900/20"
+        >
+          <div class="flex items-center flex-wrap gap-2">
+            <span class="text-lg">🔁</span>
+            <span
+              onmouseenter={() => hover('עלות משוערת למחזור')}
+              onmouseleave={() => hover('0')}
+              class="font-bold text-barbi text-base sm:text-lg"
+            >
+              {perCycle.toLocaleString()} ₪ {unitWord.per}
+            </span>
+            {#if cycleSize > 1}
+              <span class="text-sm text-gray-600 dark:text-gray-300">
+                · כל {cycleSize} {unitWord.many}
+              </span>
+            {/if}
+          </div>
+          {#if recurTotal != null}
+            <div
+              onmouseenter={() => hover('סך השקעה משוער לכל התקופה')}
+              onmouseleave={() => hover('0')}
+              class="text-sm text-gray-700 dark:text-gray-200"
+            >
+              סך השקעה משוער:
+              <span class="font-black text-gray-900 dark:text-white"
+                >{recurTotal.toLocaleString()} ₪</span
+              >
+              <span class="text-gray-500 dark:text-gray-400"
+                >({perCycle.toLocaleString()} × {cycleCountLabel})</span
+              >
+            </div>
+          {:else}
+            <div class="text-sm font-semibold text-gray-800 dark:text-gray-100">
+              ♾️ ללא תאריך סיום — עד לסימון כהושלם
+            </div>
+          {/if}
+          <div class="text-xs text-gray-500 dark:text-gray-400">
+            בכל מחזור ייפתח חיוב לאישור ההוצאה בפועל מול הריקמה
+          </div>
+        </div>
+      {/if}
       <div
         class="flex items-center flex-wrap gap-2 text-sm sm:text-lg text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-900/50 p-3 rounded-xl w-fit"
       >

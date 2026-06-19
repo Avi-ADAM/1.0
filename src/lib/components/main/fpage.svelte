@@ -1,5 +1,5 @@
-<script>
-  import { locale, t } from '$lib/translations';
+﻿<script>
+  import { locale, t, isRtl} from '$lib/translations';
   import { fly } from 'svelte/transition';
   import { cubicIn, cubicOut } from 'svelte/easing';
   import { goto } from '$app/navigation';
@@ -266,7 +266,7 @@
 
 <!-- Sticky header: anchor nav + שפות/קישורים + CTA (מחשב) -->
 <header
-  dir={$locale === 'he' || $locale === 'ar' ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   class="hidden sm:flex fixed top-0 inset-x-0 z-[600] items-center gap-4 px-6 py-2 bg-white/40 backdrop-blur-md border-b border-white/40 shadow-sm"
   style="font-family:'Sababa',sans-serif;"
 >
@@ -313,7 +313,7 @@
 </div>
 
 <div
-  dir={$locale === 'he' || $locale === 'ar' ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   class="relative h-screen w-screen overflow-hidden bg-[length:200%_auto] animate-gradientx bg-gradient-to-br from-[#e0e7ff] via-[#f3e8ff] to-[#e0e7ff]"
 >
   <!-- 3D Scene Background -->

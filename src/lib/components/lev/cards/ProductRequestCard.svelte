@@ -1,4 +1,5 @@
-<script lang="ts">
+﻿<script lang="ts">
+  import { isRtl } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import { toast } from 'svelte-sonner';
   import { userStore } from '$lib/stores/levStores';
@@ -174,7 +175,7 @@
   onkeypress={(e) => {
     e.key === 'Enter' && toggleScrollable();
   }}
-  dir={$lang == 'he' ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   style="overflow-y:auto"
   class="{isMobileOrTablet()
     ? 'w-full h-full'

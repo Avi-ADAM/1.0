@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { locale, isRtl } from '$lib/translations';
   /**
    * SplitsArchive — M5 comprehensive distribution archive (PLAN_SITE_SHARE_PER_MEMBER §6).
    *
@@ -84,7 +85,7 @@
     }
   };
   let t = $derived(i18n[$lang] || i18n.en);
-  let isHe = $derived($lang === 'he');
+  let isHe = $derived($locale === 'he');
 
   const fmt = (n) => `₪${(Number(n) || 0).toLocaleString()}`;
   const fmtDate = (s) => {
@@ -129,7 +130,7 @@
 {:else}
   {#if hasSplits}
     <!-- All-time per-member summary -->
-    <section class="bg-white p-6 rounded-xl shadow-sm" dir={isHe ? 'rtl' : 'ltr'}>
+    <section class="bg-white p-6 rounded-xl shadow-sm" dir={$isRtl ? 'rtl' : 'ltr'}>
       <h2 class="text-xl font-bold text-primary mb-3">{t.summary}</h2>
       <div class="sa-total">
         <span class="sa-total-label">{t.totalDistributed}</span>
@@ -155,7 +156,7 @@
     </section>
 
     <!-- Per-split list -->
-    <section class="bg-white p-6 rounded-xl shadow-sm" dir={isHe ? 'rtl' : 'ltr'}>
+    <section class="bg-white p-6 rounded-xl shadow-sm" dir={$isRtl ? 'rtl' : 'ltr'}>
       <h2 class="text-xl font-bold text-primary mb-3">{t.allSplits}</h2>
       <div class="space-y-2">
         {#each splits as s (s.id)}

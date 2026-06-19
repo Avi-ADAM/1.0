@@ -1,4 +1,5 @@
-<script lang="ts">
+﻿<script lang="ts">
+  import { isRtl } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import RichText from '$lib/celim/ui/richText.svelte';
 
@@ -125,7 +126,7 @@
   }
 </script>
 
-<div class="matanot-view" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
+<div class="matanot-view" dir={$isRtl ? 'rtl' : 'ltr'}>
   {#if matanot.pic?.data?.attributes?.url}
     <img class="cover" src={matanot.pic.data.attributes.url} alt={matanot.name ?? ''} />
   {/if}

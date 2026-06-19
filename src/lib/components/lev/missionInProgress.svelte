@@ -1,11 +1,11 @@
-<script>
+﻿<script>
   import TimerDialogs from '../timers/TimerDialogs.svelte';
   import { Drawer } from 'vaul-svelte';
   import { nutifi } from '$lib/func/nutifi.svelte';
   import { toast } from 'svelte-sonner';
   import RangeSlider from 'svelte-range-slider-pips';
   import { lang } from '$lib/stores/lang.js';
-  import { locale, t } from '$lib/translations';
+  import { locale, t, isRtl} from '$lib/translations';
   import { fly, scale } from 'svelte/transition';
   import { clickOutside } from './outsidclick.js';
   import { formatTime } from './utils.js';
@@ -703,7 +703,7 @@
   <div transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}>
     <DialogContent aria-label="form" class="content">
       <div
-        dir={$locale === 'he' || $locale === 'ar' ? 'rtl' : 'ltr'}
+        dir={$isRtl ? 'rtl' : 'ltr'}
         class="p-6 space-y-4"
       >
         <button

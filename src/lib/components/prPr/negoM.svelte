@@ -1,8 +1,8 @@
-<script>
+﻿<script>
   import { role, ww, skil } from '$lib/components/prPr/mi.js';
   import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang';
-  import { t } from '$lib/translations';
+  import { t, isRtl} from '$lib/translations';
   import tr from '$lib/translations/tr.json';
   import Text from '../conf/text.svelte';
   import Elements from '../conf/elements.svelte';
@@ -517,7 +517,7 @@
   });
 </script>
 
-<div class="text-barbi" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
+<div class="text-barbi" dir={$isRtl ? 'rtl' : 'ltr'}>
   <h1 class="md:text-center text-2xl md:text-2xl font-bold underline">
     {tri?.nego?.head[$lang]}
     {name1}

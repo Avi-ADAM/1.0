@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { Toaster } from 'svelte-sonner';
@@ -61,7 +62,7 @@
     <Foot un={data?.un} idL={data?.uid} />
     <Toaster
       toastOptions={{
-        style: `dir: ${$lang == 'en' ? 'ltr' : 'rtl'}; text-align: ${$lang == 'en' ? 'left' : 'right'}; `
+        style: `dir: ${$isRtl ? 'rtl' : 'ltr'}; text-align: ${$isRtl ? 'right' : 'left'}; `
       }}
       richColors
       closeButton

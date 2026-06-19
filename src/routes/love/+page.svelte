@@ -1,7 +1,7 @@
-<script>
+﻿<script>
   import { RingLoader } from 'svelte-loading-spinners';
   import { lang } from '$lib/stores/lang.js';
-  import { t } from '$lib/translations';
+  import { t, isRtl} from '$lib/translations';
 
   import { LayerCake, Svg, Html } from 'layercake';
   import { feature } from 'topojson-client';
@@ -137,7 +137,7 @@
                       }}
                       <div
                         class="tooltip-content"
-                        dir={$lang === 'he' ? 'rtl' : 'ltr'}
+                        dir={$isRtl ? 'rtl' : 'ltr'}
                       >
                         <div class="tooltip-header">
                           {$t('countries.' + tooltipData.name, {
@@ -197,7 +197,7 @@
     </div>
 
     <!-- Stats Section -->
-    <div class="stats-section" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
+    <div class="stats-section" dir={$isRtl ? 'rtl' : 'ltr'}>
       <div class="stat-card">
         <div class="stat-value">{addCommas(noof)}</div>
         <div class="stat-label">{$t('love.stats.total')}</div>

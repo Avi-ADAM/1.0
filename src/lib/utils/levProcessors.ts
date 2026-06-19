@@ -1565,26 +1565,32 @@ export function processWegets(
     let whyes: string[] = [];
     let what: boolean[] = [];
 
-    // Process votes - first pass to collect uids and what array
-    for (const u of users) {
+    // Vote rounds: a counter-offer (submitNegoMaap) casts the proposer's vote at
+    // order+1, so the highest order is the current round. Regular maaps have no
+    // negotiation, so every vote stays at order 0 and this collapses to "all
+    // votes" — identical to the old behaviour.
+    const orderon = users.reduce((max: number, u: any) => Math.max(max, u.order || 0), 0);
+    const votesThisRound = users.filter((u: any) => (u.order || 0) === orderon);
+
+    // Process votes - first pass to collect uids and what array (current round)
+    for (const u of votesThisRound) {
       if (u.users_permissions_user?.data?.id) {
         uids.push(u.users_permissions_user.data.id);
       }
       what.push(u.what);
     }
 
-    // Check if I voted
+    // Check if I voted in the current round
     if (myid && uids.includes(myid)) {
       already = true;
-      // Find my position
-      const myVote = users.find((u: any) => u.users_permissions_user?.data?.id === myid);
+      const myVote = votesThisRound.find((u: any) => u.users_permissions_user?.data?.id === myid);
       if (myVote) {
         mypos = myVote.what;
       }
     }
 
-    // Count votes
-    for (const u of users) {
+    // Count votes (current round only)
+    for (const u of votesThisRound) {
       if (u.what === true) {
         noofusersOk++;
         if (u.why) whyes.push(u.why);
@@ -1595,7 +1601,7 @@ export function processWegets(
     }
 
     const memberCount = projectInfo.noof || 0;
-    const noofusersWaiting = memberCount - users.length;
+    const noofusersWaiting = memberCount - votesThisRound.length;
 
     // Votes awaiting my action; drop to the done band once I've voted.
     const basePriority = votePriority(already, users.length);
@@ -1653,6 +1659,9 @@ export function processWegets(
       whyes,
       noofusersWaiting,
 
+      // Current voting round (advanced by a counter-offer)
+      orderon,
+
       // Recurring monthly resource cycle fields
       isRecurringCycle: weget.isRecurringCycle === true,
       mashabetahalichId: weget.mashabetahalichId,
@@ -1661,7 +1670,10 @@ export function processWegets(
       cycleEnd: weget.cycleEnd,
       quantityDelivered: weget.quantityDelivered,
       pricePerUnit: weget.pricePerUnit,
-      responsibleUserId: weget.responsibleUserId
+      responsibleUserId: weget.responsibleUserId,
+      timegramaId: weget.timegramaId,
+      timegramaDate: weget.timegramaDate,
+      timegramaDone: weget.timegramaDone
     };
   });
 }

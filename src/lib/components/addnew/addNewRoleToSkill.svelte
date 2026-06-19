@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
            import { lang } from '$lib/stores/lang.js'
     import { liUN } from '$lib/stores/liUN.js';
   const baseUrl = import.meta.env.VITE_URL
@@ -95,7 +96,7 @@ const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
         <h1 style="font-size: 1rem; line-height: normal; color: var(--barbi-pink); ">{addn[$lang]}</h1>    
     
    
-<div style="--the:{`var(${color})`};" dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
+<div style="--the:{`var(${color})`};" dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
   <input    bind:value={roleName_value}
  type='text' class='input' required>
   <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="name" class='label'>{valn[$lang]}</label>
@@ -103,7 +104,7 @@ const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
 </div>
 {#if shgi == true}<small class="text-red-600">{errmsg[$lang]}</small>{/if}
 
-           <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
+           <div dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
   <input bind:value={desS}  
  type='text' class='input' required>
   <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="des" class='label'>{des[$lang]}</label>
@@ -111,7 +112,7 @@ const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
 </div>
           
           
-          <div dir="{$lang == "en" ? "ltr" : "rtl"}" >
+          <div dir="{$isRtl ? 'rtl' : 'ltr'}" >
 
           <button onclick={add}
           title="{btnTitles[$lang]}"

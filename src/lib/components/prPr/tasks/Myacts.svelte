@@ -1,14 +1,14 @@
-<script>
+﻿<script>
   import { toast } from 'svelte-sonner';
   import { sendToSer } from '$lib/send/sendToSer'; // adjust path
-  import { t } from '$lib/translations';
+  import { t, isRtl} from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   // ─── Props ───────────────────────────────────────────────────────────────────
   let {
     mesimot = [] // mesimabetahaliches.data[]
   } = $props();
 
-  const dir = $derived($lang === 'ar' || $lang === 'he' ? 'rtl' : 'ltr');
+  const dir = $derived($lang === 'ar' || $isRtl ? 'rtl' : 'ltr');
 
   // ─── Flatten acts from all mesimot ───────────────────────────────────────────
   const allActs = $derived(

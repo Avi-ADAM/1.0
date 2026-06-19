@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   /**
    * SiteShareIncomeCard — the platform-rikma RECEIVING side of a site-share
    * contribution (PLAN_SITE_SHARE_PER_MEMBER §10.2; SITE_SHARE_TRANSFER_SPEC §5).
@@ -15,8 +15,7 @@
    * When a transfer is confirmed both-sides the money is recorded as held by the
    * receiver (haluka.confirmed) — the basis for internal income distribution.
    */
-  import { lang } from '$lib/stores/lang.js';
-  import { t } from '$lib/translations';
+  import { t, isRtl } from '$lib/translations';
   import { toast } from 'svelte-sonner';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
@@ -26,7 +25,6 @@
 
   let { buble, isFirst = false, onProj } = $props();
 
-  const isHe = $derived($lang === 'he');
 
   function handleProjectClick() {
     if (onProj && buble.projectId) {
@@ -102,12 +100,12 @@
   onkeypress={(e) => {
     e.key === 'Enter' && toggleScrollable();
   }}
-  dir={isHe ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   style="overflow-y:auto"
   class="{isMobileOrTablet()
     ? 'w-full h-full'
     : ' w-[90%] h-[90%]'}  lg:w-[90%] {isFirst
-    ? isHe
+    ? $isRtl
       ? 'boxleft'
       : 'boxright'
     : ''} flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isScrolable.value
@@ -119,7 +117,7 @@
   <CardHeader
     logoSrc={buble.projectSrc}
     projectName={buble.projectName}
-    cardType={isHe ? 'הכנסת חלק האתר' : 'SITE SHARE INCOME'}
+    cardType={$t('lev.revenue.siteShareIncomeCard.cardType')}
     cardTitle={buble.name}
     glowColor="gold"
     onProjectClick={handleProjectClick}
@@ -131,11 +129,7 @@
       ? 'bg-white dark:bg-slate-800'
       : 'bg-gray-200 dark:bg-slate-700'} transition-all-300 p-4 flex-1 overflow-y-auto flex flex-col gap-4"
   >
-    <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-      {isHe
-        ? 'זוהי הכנסת חלק האתר מחברי רקמה שהשתמשו בשירות. אין כאן מוצר או אישור משלוח — רק לוודא שמישהו מתנדב לקבל את הכסף, ושהנותן והמקבל אישרו שהכסף עבר.'
-        : "This is site-share income from a rikma's members. There's no product or delivery step — just make sure someone volunteers to receive, and that giver and receiver confirm the money moved."}
-    </p>
+    <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{$t('lev.revenue.siteShareIncomeCard.body')}</p>
 
     <!-- Description -->
     {#if buble.descrip}
@@ -151,7 +145,7 @@
       class="bg-gradient-to-r from-amber-500/5 to-yellow-500/5 p-3 rounded-lg border border-amber-500/20"
     >
       <span class="text-amber-700 dark:text-amber-300 block text-[10px] uppercase font-bold">
-        {isHe ? 'סך ההכנסה' : 'Total income'}
+        {$t('lev.revenue.siteShareIncomeCard.totalIncome')}
       </span>
       <div class="flex items-center gap-2">
         <img
@@ -227,7 +221,7 @@
               {#if String(u.id) === String(buble.myid)}
                 <span
                   class="mr-auto text-[9px] bg-yellow-200 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 px-2 py-0.5 rounded-full font-bold"
-                  >{isHe ? 'אתה' : 'You'}</span
+                  >{$t('lev.revenue.siteShareIncomeCard.you')}</span
                 >
               {/if}
             </div>
@@ -270,9 +264,9 @@
         <div
           class="flex items-center justify-between text-[11px] uppercase font-bold text-amber-700 dark:text-[var(--gold-l,#e6d27a)]"
         >
-          <span>{isHe ? 'העברות מהחברים' : 'Member transfers'}</span>
+          <span>{$t('lev.revenue.siteShareIncomeCard.transfers')}</span>
           <span class="text-gray-500 dark:text-gray-400 normal-case font-semibold">
-            {settledCount}/{transfers.length} {isHe ? 'הושלמו' : 'complete'}
+            {settledCount}/{transfers.length} {$t('lev.revenue.siteShareIncomeCard.complete')}
           </span>
         </div>
         {#each transfers as h (h.id)}
@@ -297,9 +291,7 @@
       <div
         class="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/20 p-3 text-sm text-gray-600 dark:text-gray-400"
       >
-        {isHe
-          ? 'עדיין לא נשלחו העברות מהחברים. ההעברות יופיעו כאן ברגע שחבר נותן בוחר מקבל ושולח.'
-          : 'No member transfers yet. They appear here once a giving member picks a receiver and sends.'}
+        {$t('lev.revenue.siteShareIncomeCard.noTransfers')}
       </div>
     {/if}
   </div>

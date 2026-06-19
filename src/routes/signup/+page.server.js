@@ -2,6 +2,13 @@ import { redirect, fail } from '@sveltejs/kit';
 
 const baseUrl = import.meta.env.VITE_URL;
 
+export async function load({ cookies }) {
+  const fpval = cookies.get('fpval');
+  if (!fpval) {
+    throw redirect(302, '/hascama');
+  }
+}
+
 export const actions = {
   default: async ({ request, cookies }) => {
     const data = await request.formData();

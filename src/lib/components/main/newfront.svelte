@@ -1,5 +1,5 @@
-<script>
-  import { locale, t } from '$lib/translations';
+﻿<script>
+  import { locale, t, isRtl} from '$lib/translations';
   import { AnimatedHeadline } from 'svelte-animated-headline';
   import { goto } from '$app/navigation';
   import Arrow from '$lib/celim/icons/arrow.svelte';
@@ -441,7 +441,7 @@
   {/if}
 </div>
 <div
-  dir={$lang === 'he' || $lang == 'ar' ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   class="flex flex-col md:flex-row w-full min-h-screen bg-gradient-to-br from-[#fdfbf7] to-[#fff0f5] overflow-x-hidden"
 >
   <div
@@ -489,7 +489,7 @@
     </div>
     <div
       class="overflow-auto d"
-      dir={$lang !== 'en' ? 'ltr' : 'rtl'}
+      dir={$isRtl ? 'rtl' : 'ltr'}
       onscroll={() => {
         scrolli = true;
         setTimeout(() => (scrolli = false), 1500);
@@ -536,7 +536,7 @@
         </p>
       </div>
 
-      <div dir={$lang == 'en' ? 'ltr' : 'rtl'}>
+      <div dir={$isRtl ? 'rtl' : 'ltr'}>
         <Tile
           bg={'neww'}
           big={true}

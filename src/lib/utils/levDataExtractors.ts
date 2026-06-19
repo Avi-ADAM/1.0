@@ -619,8 +619,16 @@ export function extractWegets(userData: any): ResourceRequestData[] {
           cycleStart: maap.attributes.cycleStart,
           cycleEnd: maap.attributes.cycleEnd,
           quantityDelivered: maap.attributes.quantityDelivered,
+          // Has the responsible user reported this month's actual spend yet?
+          // null quantityDelivered ⇒ still planned-only; members can't approve.
+          cycleReported: maap.attributes.quantityDelivered != null,
           pricePerUnit: mashabAttrs?.pricePerUnit,
-          responsibleUserId: mashabAttrs?.users_permissions_user?.data?.id
+          responsibleUserId: mashabAttrs?.users_permissions_user?.data?.id,
+          // Deadline clock for the cycle: when it elapses (and not done) clients
+          // auto-approve the reported amount; a counter-offer resets the date.
+          timegramaId: maap.attributes.timegrama?.data?.id,
+          timegramaDate: maap.attributes.timegrama?.data?.attributes?.date,
+          timegramaDone: maap.attributes.timegrama?.data?.attributes?.done
         });
       }
     }
@@ -1055,8 +1063,18 @@ export function extractResourceSuggestions(userData: any): ResourceSuggestionDat
           kindOf: omAttrs.kindOf,
           spnot: omAttrs.spnot,
           descrip: omAttrs.descrip,
-          sqedualed: omAttrs.sqedualed,
-          sqedualedf: omAttrs.sqedualedf,
+          // Strapi field is `sqadualed`/`sqadualedf` (start/end). Expose under the
+          // `sqadualed*` keys the cards read; keep the legacy `sqedualed*` keys
+          // populated from the same source for any older consumers.
+          sqadualed: omAttrs.sqadualed,
+          sqadualedf: omAttrs.sqadualedf,
+          sqedualed: omAttrs.sqadualed,
+          sqedualedf: omAttrs.sqadualedf,
+
+          // Recurring expense terms (open-ended monthly/yearly cost, approved
+          // each cycle). Copied onto the OpenMashaabim at pmash approval.
+          recurring: omAttrs.recurring === true,
+          cycleSize: omAttrs.cycleSize ?? 1,
 
           myp: myp,
           oid: spId,
@@ -1130,6 +1148,11 @@ export function extractAskedResources(userData: any): AskedResourceData[] {
         hm:        pmashAttrs.hm        || openMashaabimAttrs.hm        || '',
         kindOf:    pmashAttrs.kindOf    || openMashaabimAttrs.kindOf    || '',
         sqadualed: pmashAttrs.sqadualed || openMashaabimAttrs.sqadualed || '',
+        // End date + recurring terms. Prefer the (possibly negotiated) pmash; the
+        // pmash is the live source of truth that the recurring engine reads from.
+        sqadualedf: pmashAttrs.sqadualedf || openMashaabimAttrs.sqadualedf || '',
+        recurring:  pmashAttrs.recurring ?? openMashaabimAttrs.recurring ?? false,
+        cycleSize:  pmashAttrs.cycleSize ?? openMashaabimAttrs.cycleSize ?? 1,
       };
 
       // Profile pic: prefer the askm's own users_permissions_user, fall back to sp owner
@@ -1162,6 +1185,9 @@ export function extractAskedResources(userData: any): AskedResourceData[] {
         kindOf: omData.kindOf,
         spid: askAttributes.sp?.data?.id,
         deadline: omData.sqadualed,
+        sqadualedf: omData.sqadualedf,
+        recurring: omData.recurring === true,
+        cycleSize: omData.cycleSize ?? 1,
         openName: omData.name,
         omid: askAttributes.open_mashaabim?.data?.id,
         pmashId: askAttributes.pmash?.data?.id,

@@ -80,6 +80,20 @@ async function handleCycleMaapVote(
   const kindOf = mashAttrs.kindOf ?? 'monthly';
   const hasAmount = amount != null && !Number.isNaN(amount);
 
+  // Two-card model: the responsible user reports the actual monthly spend, and
+  // only then can the rest of the project approve that specific month.
+  // `quantityDelivered == null` ⇒ not reported yet (the engine's pricePerUnit is
+  // a planned preview only). Reject any non-responsible vote until it's reported.
+  const meId = String(context.userId);
+  const isResponsible = meId === responsibleId;
+  const alreadyReported = attrs.quantityDelivered != null;
+  if (!isResponsible && !alreadyReported) {
+    return {
+      data: { askId, consensus: false, awaitingReport: true },
+      updateStrategy: { type: 'none' },
+    };
+  }
+
   // Resolve the spend amount: explicit > already-stored > planned price.
   const spend: number = hasAmount
     ? (amount as number)
@@ -91,27 +105,53 @@ async function handleCycleMaapVote(
   const memberIds: string[] = members.map((m: any) => String(m.id));
   const totalMembers = memberIds.length;
 
-  // Build vots (dedup current user)
+  // Vote rounds: a counter-offer (submitNegoMaap) casts the negotiator's vote at
+  // order+1, so the highest order is the current round. Consensus is judged only
+  // on votes at that round — a counter-offer forces everyone to re-approve.
   const existingVots: any[] = attrs.vots ?? [];
+  const orderon: number = existingVots.reduce(
+    (mx: number, v: any) => Math.max(mx, v.order ?? 0),
+    0,
+  );
   const strUserId = String(context.userId);
+  // Keep votes from prior rounds + this round's votes by other users.
   const previousVotes = existingVots
     .filter((v: any) => {
-      const uid = v.users_permissions_user?.data?.id ?? v.users_permissions_user;
-      return String(uid) !== strUserId;
+      const uid =
+        v.users_permissions_user?.data?.id ??
+        v.users_permissions_user?.id ??
+        v.users_permissions_user;
+      return !(String(uid) === strUserId && (v.order ?? 0) === orderon);
     })
-    .map(normalizeVote);
-  const newVote: Record<string, any> = { what: Boolean(what), users_permissions_user: strUserId };
+    .map((v: any) => {
+      const row = normalizeVote(v);
+      row.order = v.order ?? 0;
+      return row;
+    });
+  const newVote: Record<string, any> = {
+    what: Boolean(what),
+    users_permissions_user: strUserId,
+    order: orderon,
+    ide: parseInt(strUserId, 10),
+    zman: now.toISOString(),
+  };
   if (why) newVote.why = why;
   const allVots = [...previousVotes, newVote];
 
   const yesCount = allVots.filter(
-    (v) => v.what === true && memberIds.includes(String(v.users_permissions_user)),
+    (v) =>
+      v.what === true &&
+      (v.order ?? 0) === orderon &&
+      memberIds.includes(String(v.users_permissions_user)),
   ).length;
   const consensus = what === true && totalMembers > 0 && yesCount >= totalMembers;
+  const timegramaId: string | null = attrs.timegrama?.data?.id ?? null;
 
   if (!consensus) {
     const data: Record<string, any> = { vots: allVots };
-    if (hasAmount) data.quantityDelivered = spend;
+    // Mark the cycle as reported once the responsible user weighs in (with an
+    // explicit amount, or the planned default), which opens approval to members.
+    if (hasAmount || isResponsible) data.quantityDelivered = spend;
     await strapi.execute('mrUpdateCycleMaap', { id: askId, data }, context.jwt, context.fetch);
     return {
       data: { askId, consensus: false },
@@ -183,6 +223,11 @@ async function handleCycleMaapVote(
     id: mashId,
     data: { quantityDelivered: (mashAttrs.quantityDelivered ?? 0) + spend },
   }, context.jwt, context.fetch);
+
+  // Stop the deadline clock — the cycle is settled.
+  if (timegramaId) {
+    await strapi.execute('mrSetTimegramaDone', { id: timegramaId, done: true }, context.jwt, context.fetch);
+  }
 
   return { data: { askId, rikmashId, consensus: true }, updateStrategy: { type: 'fullRefresh' } };
 }

@@ -286,6 +286,7 @@ export type ActionKey =
   | 'createResource'
   | 'submitNegoMission'
   | 'submitNegoMash'
+  | 'submitNegoMaap'
   | 'getUserForums'
   | 'getForumThread'
   | 'createChatMessage'
@@ -375,6 +376,12 @@ export interface ActionParamsMap {
   };
   submitNegoMission: SubmitNegoMissionParams;
   submitNegoMash: SubmitNegoMashParams;
+  submitNegoMaap: {
+    askId: string;
+    projectId: string;
+    newAmount: number;
+    reason?: string;
+  };
   getUserForums: Record<string, never>;
   getForumThread: {
     forumId: string;

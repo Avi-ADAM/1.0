@@ -1,4 +1,5 @@
-<script lang="ts">
+﻿<script lang="ts">
+  import { isRtl } from '$lib/translations';
   import tr from '$lib/translations/tr.json';
   import { lang } from '$lib/stores/lang.js';
   import { invalidateAll } from '$app/navigation';
@@ -53,7 +54,7 @@
 
 <div
   class="card"
-  dir={$lang === 'en' ? 'ltr' : 'rtl'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   role="button"
   tabindex="0"
   onclick={openOffer}

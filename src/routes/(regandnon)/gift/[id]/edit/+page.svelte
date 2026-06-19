@@ -1,4 +1,5 @@
-<script lang="ts">
+﻿<script lang="ts">
+  import { isRtl } from '$lib/translations';
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
   import { lang } from '$lib/stores/lang.js';
@@ -34,7 +35,7 @@
   }
 </script>
 
-<div class="container mx-auto px-4 py-6 max-w-4xl" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
+<div class="container mx-auto px-4 py-6 max-w-4xl" dir={$isRtl ? 'rtl' : 'ltr'}>
   {#if projectId}
     <ComposeProduct
       {projectId}

@@ -1,5 +1,5 @@
-<script>
-  import { t, locale } from '$lib/translations';
+﻿<script>
+  import { t, locale, isRtl} from '$lib/translations';
 
   const questionCount = 13;
   const questionKeys = Array.from({ length: questionCount }, (_, i) => i + 1);
@@ -13,7 +13,7 @@
   <meta property="og:type" content="website" />
 </svelte:head>
 
-<div class="faq-container" dir={$locale === 'en' ? 'ltr' : 'rtl'}>
+<div class="faq-container" dir={$isRtl ? 'rtl' : 'ltr'}>
   <h1>{$t('faq.title')}</h1>
 
   <div class="faq-list">

@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { locale, isRtl } from '$lib/translations';
   /**
    * SiteShareArchive — M5 (PLAN_SITE_SHARE_PER_MEMBER §6).
    *
@@ -67,7 +68,7 @@
     }
   };
   let t = $derived(i18n[$lang] || i18n.en);
-  let isHe = $derived($lang === 'he');
+  let isHe = $derived($locale === 'he');
 
   let isPlatform = $derived(!!data?.isPlatformView);
   let hasData = $derived(
@@ -97,7 +98,7 @@
 {#if loading}
   <div class="flex justify-center p-8"><Lowding /></div>
 {:else if hasData}
-  <div dir={isHe ? 'rtl' : 'ltr'} class="space-y-6">
+  <div dir={$isRtl ? 'rtl' : 'ltr'} class="space-y-6">
     <h2 class="text-xl font-bold text-primary">
       {isPlatform ? t.titleIn : t.titleOut}
     </h2>

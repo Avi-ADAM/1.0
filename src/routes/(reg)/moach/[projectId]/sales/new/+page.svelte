@@ -1,4 +1,5 @@
-<script lang="ts">
+﻿<script lang="ts">
+  import { isRtl } from '$lib/translations';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
@@ -35,7 +36,7 @@
   </title>
 </svelte:head>
 
-<div class="page" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
+<div class="page" dir={$isRtl ? 'rtl' : 'ltr'}>
   <div class="head">
     <button class="back" type="button" onclick={backToSales}>{t.back}</button>
     <div class="titles">

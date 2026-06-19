@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { t, locale, isRtl } from '$lib/translations';
   /**
    * SiteShareDecision — the single shared decision UI for the per-member site
    * share (PLAN_SITE_SHARE_PER_MEMBER §2/§3). The SAME component renders in all
@@ -10,7 +11,6 @@
    * it does NOT reduce what the other partners split (that decoupling is M1).
    */
   import { untrack } from 'svelte';
-  import { lang } from '$lib/stores/lang.js';
 
   let {
     /** computeSiteShare suggestion on the member's personal share. */
@@ -36,7 +36,7 @@
   let custom = $state(untrack(() => (initial?.amount > 0 ? initial.amount : 0)));
   let reason = $state(untrack(() => initial?.reason ?? ''));
 
-  const isHe = $derived($lang === 'he');
+
   // 0 is a valid contribution. In adjust mode we honour an explicit 0 (no silent
   // fallback to `proposed`); only a blank/NaN field falls back.
   let finalAmount = $derived(
@@ -72,77 +72,58 @@
   }
 </script>
 
-<div class="ssd" class:compact dir="rtl">
+<div class="ssd" class:compact dir={$isRtl ? 'rtl' : 'ltr'}>
   <div class="ssd-head">
-    <span class="ssd-title">
-      {isHe ? 'הנתינה שלך ל‑1💗1' : 'Your contribution to 1💗1'}
-    </span>
+    <span class="ssd-title">{$t('lev.revenue.siteShareDecision.title')}</span>
     <span class="ssd-amount">{Number(finalAmount).toFixed(2)} {currency}</span>
   </div>
 
   <p class="ssd-sub">
-    {#if isHe}
-      מהחלק שהרווחת ({Number(basis).toFixed(2)} {currency}) — שירות הניהול והשותפות של
-      1💗1. מוצע: {Number(proposed).toFixed(2)} {currency}. אפשר לתת כמוצע, יותר, או פחות —
-      וזו נתינה אישית שלך בלבד, היא לא משנה את חלקם של שאר השותפים.
-    {:else}
-      Out of what you earned ({Number(basis).toFixed(2)} {currency}) — 1💗1's management &
-      partnership service. Suggested: {Number(proposed).toFixed(2)} {currency}. Give as
-      suggested, more, or less — it's your personal contribution and doesn't change the
-      other partners' shares.
-    {/if}
+    {$t('lev.revenue.siteShareDecision.sub', { basis: Number(basis).toFixed(2), proposed: Number(proposed).toFixed(2), currency })}
   </p>
 
   {#if settled}
     <p class="ssd-settled">
-      {#if initial?.des_status === 'skipped'}
-        {isHe ? 'בחרת לא לתת הפעם. אפשר לשנות.' : 'You chose not to give this time. You can change it.'}
-      {:else}
-        {isHe
-          ? `נתת ${Number(initial?.amount || 0).toFixed(2)} ${currency}. אפשר לעדכן.`
-          : `You gave ${Number(initial?.amount || 0).toFixed(2)} ${currency}. You can update it.`}
-      {/if}
+      {initial?.des_status === 'skipped'
+        ? $t('lev.revenue.siteShareDecision.skipped')
+        : $t('lev.revenue.siteShareDecision.gave', { amount: Number(initial?.amount || 0).toFixed(2), currency })}
     </p>
   {/if}
 
   <div class="ssd-options">
     <label class="ssd-opt">
       <input type="radio" name="ssdDir" checked={direction === 'as_is'} onchange={() => pick('as_is')} disabled={busy} />
-      <span>{isHe ? `כמוצע (${Number(proposed).toFixed(2)})` : `As suggested (${Number(proposed).toFixed(2)})`}</span>
+      <span>{$t('lev.revenue.siteShareDecision.asIs', { proposed: Number(proposed).toFixed(2) })}</span>
     </label>
     <label class="ssd-opt">
       <input type="radio" name="ssdDir" checked={direction === 'more'} onchange={() => pick('more')} disabled={busy} />
-      <span>{isHe ? 'ארצה לתת יותר' : "I'd like to give more"}</span>
+      <span>{$t('lev.revenue.siteShareDecision.more')}</span>
     </label>
     <label class="ssd-opt">
       <input type="radio" name="ssdDir" checked={direction === 'less'} onchange={() => pick('less')} disabled={busy} />
-      <span>{isHe ? 'אתן פחות' : 'Give less'}</span>
+      <span>{$t('lev.revenue.siteShareDecision.less')}</span>
     </label>
   </div>
 
   {#if direction !== 'as_is'}
     <div class="ssd-adjust">
       <label class="ssd-field">
-        <span>{isHe ? 'סכום' : 'Amount'}</span>
+        <span>{$t('lev.revenue.siteShareDecision.amount')}</span>
         <input type="number" min="0" step="0.01" bind:value={custom} disabled={busy} />
       </label>
       <label class="ssd-field ssd-reason">
-        <span>
-          {direction === 'less'
-            ? (isHe ? 'סיבה (חובה)' : 'Reason (required)')
-            : (isHe ? 'סיבה (אופציונלי)' : 'Reason (optional)')}
-        </span>
-        <input type="text" bind:value={reason} placeholder={isHe ? 'מה הסיבה?' : 'Why?'} disabled={busy} />
+        <span>{direction === 'less' ? $t('lev.revenue.siteShareDecision.reasonReq') : $t('lev.revenue.siteShareDecision.reasonOpt')}</span>
+        <input type="text" bind:value={reason} placeholder={$t('lev.revenue.siteShareDecision.placeholder')} disabled={busy} />
       </label>
     </div>
   {/if}
 
   <div class="ssd-actions">
     <button type="button" class="ssd-confirm" onclick={confirm} disabled={busy || needsReason || finalAmount < 0}>
-      {isHe ? 'אישור הנתינה' : 'Confirm contribution'}
+      {$t('lev.revenue.siteShareDecision.confirm')}
     </button>
     <button type="button" class="ssd-skip" onclick={skip} disabled={busy}>
-      {isHe ? 'לא הפעם' : 'Not this time'}
+      {$t('lev.revenue.siteShareDecision.skip')}
     </button>
   </div>
 </div>

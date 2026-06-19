@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import { page } from '$app/state';
   import Lowding from '$lib/celim/lowding.svelte';
   import { lang } from '$lib/stores/lang.js';
@@ -317,7 +318,7 @@
 
 {#if arr1.length > 0}
       <div
-        dir={$lang == 'he' ? 'rtl' : 'ltr'}
+        dir={$isRtl ? 'rtl' : 'ltr'}
         bind:clientWidth={h}
         class="body box-border h-screen"
       >
@@ -518,7 +519,7 @@
               class="mySwiperc {!isMobileOrTablet()
                 ? 'swiperc'
                 : 'swipermobile'}"
-              dir={$lang == 'he' ? 'rtl' : 'ltr'}
+              dir={$isRtl ? 'rtl' : 'ltr'}
               navigation={isMobileOrTablet()
                 ? false
                 : {
@@ -853,9 +854,14 @@
                       isRecurringCycle={buble.isRecurringCycle}
                       mashabetahalichId={buble.mashabetahalichId}
                       cycleIndex={buble.cycleIndex}
+                      cycleReported={buble.cycleReported}
                       quantityDelivered={buble.quantityDelivered}
                       pricePerUnit={buble.pricePerUnit}
                       responsibleUserId={buble.responsibleUserId}
+                      orderon={buble.orderon}
+                      timegramaId={buble.timegramaId}
+                      timegramaDate={buble.timegramaDate}
+                      timegramaDone={buble.timegramaDone}
                       spid={buble.spid}
                       src={buble.src}
                       price={buble.price}
@@ -1071,6 +1077,10 @@
                       hearotMeyuchadot={buble.spnot}
                       price={buble.price}
                       deadline={buble.deadline}
+                      sqadualedf={buble.sqadualedf}
+                      kindOf={buble.kindOf}
+                      recurring={buble.recurring}
+                      cycleSize={buble.cycleSize}
                       missId={buble.missId}
                       id={buble.id}
                       openMid={buble.omid}
@@ -1145,6 +1155,9 @@
                       declineddarra={buble.declineddarra}
                       deadLine={buble.sqadualed}
                       sqadualedf={buble.sqadualedf}
+                      kindOf={buble.kindOf}
+                      recurring={buble.recurring}
+                      cycleSize={buble.cycleSize}
                       oid={buble.oid}
                       id={buble.id}
                       price={buble.price}

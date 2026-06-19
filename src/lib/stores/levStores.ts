@@ -102,6 +102,10 @@ export interface AskedResourceData {
   kindOf?: string;
   spid?: string;
   deadline?: string;
+  sqadualedf?: string;
+  /** Recurring expense terms (per-cycle cost, monthly/yearly approval). */
+  recurring?: boolean;
+  cycleSize?: number;
   openName?: string;
   omid?: string;
   askId?: string;
@@ -125,6 +129,12 @@ export interface ResourceSuggestionData {
   descrip?: string;
   sqedualed?: string;
   sqedualedf?: string;
+  sqadualed?: string; // start date (correct Strapi field name)
+  sqadualedf?: string; // end date (correct Strapi field name)
+
+  // Recurring expense terms (open-ended monthly/yearly cost, monthly approval)
+  recurring?: boolean;
+  cycleSize?: number;
 
   // Derived/Related
   myp?: number; // from user SP

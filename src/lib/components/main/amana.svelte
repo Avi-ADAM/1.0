@@ -1,9 +1,9 @@
-<script>
+﻿<script>
   import { liUN } from '$lib/stores/liUN.js';
   import { Canvas } from '@threlte/core';
   import Scene from './globu.svelte';
   import { doesLang, langUs, lang } from '$lib/stores/lang.js';
-  import { locale, t } from '$lib/translations';
+  import { locale, t, isRtl} from '$lib/translations';
   import { goto } from '$app/navigation';
   import Maze from './maze.svelte';
   import MultiSelect from 'svelte-multiselect';
@@ -712,7 +712,7 @@ meta {
         <Close />
       </button>
 
-      <div class="premium-modal-content" dir={$locale === 'en' ? 'ltr' : 'rtl'}>
+      <div class="premium-modal-content" dir={$isRtl ? 'rtl' : 'ltr'}>
         {#if isMazeOpen}
           <div class="maze-scroll-area">
             <Maze />
@@ -754,7 +754,7 @@ meta {
 {/if}
 
 <!-- Main Container -->
-<div class="page-container" dir={$locale === 'en' ? 'ltr' : 'rtl'}>
+<div class="page-container" dir={$isRtl ? 'rtl' : 'ltr'}>
   <!-- Background Elements -->
   <div class="bg-gradient"></div>
   <div class="bg-orbs">

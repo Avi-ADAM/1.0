@@ -1,4 +1,5 @@
-<script lang="ts">
+﻿<script lang="ts">
+  import { isRtl } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import Button from '$lib/celim/ui/button.svelte';
   import UploadPic from '$lib/components/userPr/uploadPic.svelte';
@@ -340,7 +341,7 @@
   }
 </script>
 
-<div class="compose-product" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
+<div class="compose-product" dir={$isRtl ? 'rtl' : 'ltr'}>
   <div class="mode-tabs" role="tablist">
     <button
       type="button"

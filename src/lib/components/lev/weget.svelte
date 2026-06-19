@@ -104,12 +104,19 @@
     cards = false,
     // Recurring monthly resource cycle (mashabetahalich engine)
     isRecurringCycle = false,
+    // Has the responsible user reported this month's actual spend yet?
+    cycleReported = false,
     mashabetahalichId,
     cycleIndex,
     quantityDelivered = 0,
     pricePerUnit = 0,
     responsibleUserId,
     myid,
+    // Current voting round + deadline clock (recurring cycles)
+    orderon = 0,
+    timegramaId,
+    timegramaDate,
+    timegramaDone = false,
     onUser,
     onProj,
     onAcsept,
@@ -121,7 +128,33 @@
   let isResponsible = $derived(
     isRecurringCycle && String(myid ?? '') === String(responsibleUserId ?? '')
   );
+  // A member (not the responsible user) can only approve a recurring cycle once
+  // the responsible user has reported the actual amount. Until then it's "pending".
+  let awaitingReport = $derived(
+    isRecurringCycle && !isResponsible && !cycleReported
+  );
   let amountInput = $state(0);
+  // Counter-offer (negotiation) on a recurring cycle.
+  let nego = $state(false);
+  let negoAmount = $state(0);
+  let negoReason = $state('');
+  // After the proposer submits a counter-offer the lev stores aren't refetched
+  // (lev data is client-side), so we optimistically override the shown amount.
+  let amountOverride = $state(/** @type {number | null} */ (null));
+  let shownAmount = $derived(amountOverride ?? quantityDelivered);
+  // True once the cycle's deadline has elapsed without being settled — a member's
+  // client then auto-approves the reported amount (checked once on mount below).
+  function isTimerExpired() {
+    return (
+      isRecurringCycle &&
+      cycleReported &&
+      !already &&
+      !isResponsible &&
+      !!timegramaDate &&
+      !timegramaDone &&
+      new Date(timegramaDate).getTime() < Date.now()
+    );
+  }
   let resP = [];
   let lang;
   import { Swiper, SwiperSlide } from 'swiper/svelte';
@@ -232,9 +265,14 @@
     var b = moment(sqadualed);
     yers = a.diff(b, 'years', true).toFixed(2);
     monts = a.diff(b, 'months', true).toFixed(2);
+    // Auto-approve the reported amount if this cycle's deadline already elapsed.
+    if (isTimerExpired()) autoApprove();
   });
 
   async function agree() {
+    // Members can't approve a recurring cycle before the responsible user
+    // reports the actual amount.
+    if (awaitingReport) return;
     // Recurring monthly cycle → confirm/edit this month's amount first.
     if (isRecurringCycle) {
       amountInput = Number(quantityDelivered || pricePerUnit || 0);
@@ -278,6 +316,74 @@
         projectId: String(projectId),
         what: true,
         ...(isResponsible ? { amount: Number(amountInput) || 0 } : {}),
+      });
+      if (result.success && result.data?.consensus) {
+        onAcsept?.({ ani: 'finim', coinlapach });
+      }
+    } catch (e) {
+      error1 = e;
+      console.log(error1);
+    }
+  }
+
+  // Inline report from the detail card: the responsible owner types the amount
+  // there and submits directly (no dialog). Counts as their report + YES vote.
+  function reportFromCard(e) {
+    amountInput = Number(e?.amount) || 0;
+    confirmRecurring();
+  }
+
+  // Counter-offer: instead of a hard decline, a member proposes a different
+  // monthly amount with a reason. Opens the negotiation dialog.
+  function counter() {
+    negoAmount = Number(quantityDelivered || pricePerUnit || 0);
+    negoReason = '';
+    spend = false;
+    no = false;
+    masa = false;
+    nego = true;
+    isOpen = true;
+  }
+
+  // Submit the counter-offer: rewrites the amount, snapshots the old one, opens a
+  // new voting round, resets the timer and posts the reason to chat (server-side).
+  async function submitCounter() {
+    if (!negoReason.trim()) return;
+    isOpen = false;
+    nego = false;
+    // Optimistic: the card adopts the proposed amount and a fresh voting round
+    // in which only the proposer's YES counts — everyone else must re-approve.
+    amountOverride = Number(negoAmount) || 0;
+    already = true;
+    noofusersOk = 1;
+    noofusersNo = 0;
+    noofusersWaiting = Math.max((noofpu || 0) - 1, 0);
+    ser = xyz();
+    try {
+      await executeAction('submitNegoMaap', {
+        askId: String(askId),
+        projectId: String(projectId),
+        newAmount: Number(negoAmount) || 0,
+        reason: negoReason.trim()
+      });
+    } catch (e) {
+      error1 = e;
+      console.log(error1);
+    }
+  }
+
+  // Auto-approve the reported amount once the deadline has elapsed (member side).
+  async function autoApprove() {
+    if (already) return;
+    already = true;
+    noofusersOk += 1;
+    noofusersWaiting -= 1;
+    ser = xyz();
+    try {
+      const result = await executeAction('voteOnMaap', {
+        askId: String(askId),
+        projectId: String(projectId),
+        what: true
       });
       if (result.success && result.data?.consensus) {
         onAcsept?.({ ani: 'finim', coinlapach });
@@ -347,6 +453,7 @@
     no = false;
     masa = false;
     spend = false;
+    nego = false;
   }
 
   let hovered = $state(false);
@@ -402,9 +509,9 @@
           <h1 style="font-size:1.5em;">
             {isResponsible ? 'כמה הוצאת החודש?' : 'אישור ההוצאה החודשית'}
           </h1>
-          {#if cycleIndex}
-            <p class="text-barbi" style="font-size:0.9em;">מחזור #{cycleIndex}</p>
-          {/if}
+          <p class="text-barbi" style="font-size:0.95em; text-align:center;">
+            {missionBName}{#if cycleIndex} · מחזור #{cycleIndex}{/if}
+          </p>
           {#if isResponsible}
             <input
               type="number"
@@ -414,7 +521,10 @@
               placeholder="הסכום שהוצא בפועל החודש"
             />
           {:else}
-            <p class="p" style="font-size:1.2em; color:var(--gold)">{quantityDelivered} ₪</p>
+            <p style="font-size:0.9em; color:#9aa0a6; text-align:center; margin:4px 0;">
+              {useraplyname} דיווח/ה על הוצאה של:
+            </p>
+            <p class="p" style="font-size:1.6em; font-weight:bold; color:var(--gold)">{shownAmount} ₪</p>
           {/if}
           <br />
           <button class="add" onclick={confirmRecurring}>אישור ההוצאה</button>
@@ -438,6 +548,35 @@
           <br />
           <button class="add" disabled={whyy.length < 26} onclick={decline}
             >אישור</button
+          >
+        {:else if nego === true}
+          <h1 style="font-size:1.5em;">הצעת סכום אחר</h1>
+          <p class="text-barbi" style="font-size:0.95em; text-align:center;">
+            {missionBName}{#if cycleIndex} · מחזור #{cycleIndex}{/if}
+          </p>
+          <p style="font-size:0.85em; color:#9aa0a6; text-align:center; margin:2px 0;">
+            הסכום שדווח: {quantityDelivered} ₪
+          </p>
+          <label style="display:flex; align-items:center; gap:6px; margin:6px 0;">
+            הסכום המוצע:
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              bind:value={negoAmount}
+              placeholder="הסכום שאתה מציע"
+            />
+            ₪
+          </label>
+          <input
+            minlength="3"
+            type="text"
+            bind:value={negoReason}
+            placeholder="מדוע להזיז את הסכום? (יתפרסם בצ'אט)"
+          />
+          <br />
+          <button class="add" disabled={!negoReason.trim()} onclick={submitCounter}
+            >שליחת ההצעה</button
           >
         {:else if masa === true}
           <input
@@ -668,11 +807,24 @@
           </h2>
           {#if isRecurringCycle}
             <p class="p cd">
-              <span
-                onmouseenter={() => hover('הוצאה חודשית — לחצו על הלב לעדכון ואישור')}
-                onmouseleave={() => hover('0')}
-                style="color:var(--gold)">🔁 {quantityDelivered || pricePerUnit} ₪</span
-              >
+              {#if cycleReported}
+                <span
+                  onmouseenter={() => hover('ההוצאה שדווחה החודש — לחצו על הלב לאישור')}
+                  onmouseleave={() => hover('0')}
+                  style="color:var(--gold)">🔁 {shownAmount} ₪</span
+                >
+              {:else}
+                <span
+                  onmouseenter={() =>
+                    hover(
+                      isResponsible
+                        ? 'טרם דיווחת את ההוצאה החודש — לחצו על הלב לדיווח'
+                        : 'ממתין לדיווח ההוצאה ע"י האחראי'
+                    )}
+                  onmouseleave={() => hover('0')}
+                  style="color:#9aa0a6;">🔁 ~{pricePerUnit} ₪ {isResponsible ? '(מתוכנן)' : '(טרם דווח)'}</span
+                >
+              {/if}
               {#if cycleIndex}
                 <span style="color: aqua; font-size:0.8em;"> · #{cycleIndex}</span>
               {/if}
@@ -747,9 +899,18 @@
             </p>
           {/if}
           {#if low == false}
-            {#if !already}
+            {#if awaitingReport}
+              <p
+                class="cd"
+                style="grid-column:1/3; grid-row:4/5; margin:0; font-size:8px; line-height:1.1; color:#9aa0a6; text-align:center;"
+                onmouseenter={() => hover('ניתן לאשר רק אחרי שהאחראי ידווח את ההוצאה החודשית')}
+                onmouseleave={() => hover('0')}
+              >
+                ⏳ ממתין לדיווח האחראי
+              </p>
+            {:else if !already}
               <button
-                onmouseenter={() => hover('אישור')}
+                onmouseenter={() => hover(isResponsible ? 'דיווח ואישור ההוצאה' : 'אישור')}
                 onmouseleave={() => hover('0')}
                 onclick={agree}
                 style="margin: 0;"
@@ -767,10 +928,13 @@
                 ></button
               >
               <!--   <button on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button>-->
+              <!-- Objection / counter-offer. Hidden for the responsible owner on a
+                   recurring cycle — they set the amount via the heart (report). -->
+              {#if !(isRecurringCycle && isResponsible)}
               <button
-                onmouseenter={() => hover('התנגדות')}
+                onmouseenter={() => hover(isRecurringCycle ? 'הצעת סכום אחר' : 'התנגדות')}
                 onmouseleave={() => hover('0')}
-                onclick={open}
+                onclick={isRecurringCycle ? counter : open}
                 style="margin: 0;"
                 class="btn gb"
                 name="decline"
@@ -785,6 +949,7 @@
                   /></svg
                 ></button
               >
+              {/if}
             {/if}
           {:else if low == true}
             <Lowbtn />
@@ -809,7 +974,9 @@
             <div class="swiper-slidec mx-auto">
               <Cards
                 onAgree={agree}
+                onReport={reportFromCard}
                 onDecline={open}
+                onNego={counter}
                 onHover={hoverc}
                 {low}
                 {agprice}
@@ -829,6 +996,13 @@
                 {monts}
                 {hm}
                 {spnot}
+                {isRecurringCycle}
+                {cycleReported}
+                {cycleIndex}
+                quantityDelivered={shownAmount}
+                {pricePerUnit}
+                {isResponsible}
+                {awaitingReport}
               />
             </div>
           </Drawer.Content>
@@ -839,7 +1013,9 @@
 {:else}
   <Cards
     onAgree={agree}
+    onReport={reportFromCard}
     onDecline={open}
+    onNego={counter}
     onHover={hoverc}
     {isVisible}
     {low}
@@ -860,6 +1036,13 @@
     {users}
     {hm}
     {spnot}
+    {isRecurringCycle}
+    {cycleReported}
+    {cycleIndex}
+    quantityDelivered={shownAmount}
+    {pricePerUnit}
+    {isResponsible}
+    {awaitingReport}
   />
 {/if}
 

@@ -1,4 +1,4 @@
-<script>
+﻿<script>
   import { userName } from '../../stores/store.js';
   import { show } from '../registration/store-show.js';
   import { goto } from '$app/navigation';
@@ -15,7 +15,7 @@
   import { workways1 } from '../registration/workways1.js';
   import { valluss } from '../registration/valluss.js';
   import { get } from 'svelte/store';
-  import { locale, t } from '$lib/translations';
+  import { locale, t, isRtl} from '$lib/translations';
 
   let show_value = $state(0);
   show.subscribe((newValue) => {
@@ -104,7 +104,7 @@
 </svelte:head>
 
 <div
-  dir={$lang === 'en' ? 'ltr' : 'rtl'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   class="page-shell"
   bind:clientWidth={w}
   in:scale={{
@@ -127,7 +127,7 @@
   {#if (mode === 'onboarding' && show_value >= 1 && show_value <= 4) || (mode === 'registration' && show_value >= 1 && show_value <= 5)}
     <div
       class="journey-strip"
-      dir={$lang === 'en' ? 'ltr' : 'rtl'}
+      dir={$isRtl ? 'rtl' : 'ltr'}
       in:fly={{ y: 30, duration: 700, easing: quintOut }}
     >
       <!-- START: Flag -->
@@ -243,7 +243,7 @@
   <!-- ══════════════════════════════════════════
        GLASS CARD
   ═══════════════════════════════════════════ -->
-  <div dir={$lang === 'en' ? 'ltr' : 'rtl'} class="glass-stage">
+  <div dir={$isRtl ? 'rtl' : 'ltr'} class="glass-stage">
     <!-- Shimmer edge -->
     <div class="card-shim"></div>
 
@@ -251,7 +251,7 @@
     {#if (mode === 'onboarding' && show_value >= 1 && show_value <= 4) || (mode === 'registration' && show_value >= 1 && show_value <= 5)}
       <nav
         class="tabs-bar"
-        dir={$lang === 'en' ? 'ltr' : 'rtl'}
+        dir={$isRtl ? 'rtl' : 'ltr'}
         in:fly={{ y: -8, duration: 450 }}
       >
         {#each tabDefs as tab}
@@ -282,7 +282,7 @@
       {#if show_value === 1}
         <div
           class="step-wrap"
-          dir={$lang === 'en' ? 'ltr' : 'rtl'}
+          dir={$isRtl ? 'rtl' : 'ltr'}
           in:fly={{
             x: 50,
             duration: 900,
@@ -297,7 +297,7 @@
       {:else if show_value === 2}
         <div
           class="step-wrap"
-          dir={$lang === 'en' ? 'ltr' : 'rtl'}
+          dir={$isRtl ? 'rtl' : 'ltr'}
           in:fly={{
             x: 50,
             duration: 900,
@@ -312,7 +312,7 @@
       {:else if show_value === 3}
         <div
           class="step-wrap"
-          dir={$lang === 'en' ? 'ltr' : 'rtl'}
+          dir={$isRtl ? 'rtl' : 'ltr'}
           in:fly={{
             x: 50,
             duration: 900,
@@ -327,7 +327,7 @@
       {:else if show_value === 4}
         <div
           class="step-wrap"
-          dir={$lang === 'en' ? 'ltr' : 'rtl'}
+          dir={$isRtl ? 'rtl' : 'ltr'}
           in:fly={{
             x: 50,
             duration: 900,

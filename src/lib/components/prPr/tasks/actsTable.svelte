@@ -1,4 +1,4 @@
-<script>
+﻿<script>
   import Dates from '$lib/components/grid/dates.svelte';
   import ListOfTiles from '$lib/components/grid/listOfTiles.svelte';
   import {
@@ -8,7 +8,7 @@
     PagingData
   } from '@mediakular/gridcraft';
   import { lang } from '$lib/stores/lang';
-  import { t } from '$lib/translations';
+  import { t, isRtl} from '$lib/translations';
   import RichText from '$lib/celim/ui/richText.svelte';
   import NameAndPname from '$lib/components/grid/nameAndPname.svelte';
   import NameField from '$lib/components/grid/nameField.svelte';
@@ -370,7 +370,7 @@
 
 <div
   class="w-full px-2 text-center bg-gold dark:bg-barbi dark:text-gold text-barbi"
-  dir={$lang == 'he' ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
 >
   <div class="flex items-center gap-2">
     <div class="flex flex-row flex-1 overflow-x-auto d min-w-0">

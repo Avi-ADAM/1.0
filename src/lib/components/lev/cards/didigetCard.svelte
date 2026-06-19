@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import { toggleScrollable, isScrolable } from './isScrolable.svelte.js';
@@ -196,7 +197,7 @@
   onkeypress={(e) => {
     e.key === 'Enter' && toggleScrollable();
   }}
-  dir={$lang == 'he' ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   style="overflow-y:auto"
   class="d {isMobileOrTablet()
     ? 'w-full h-full'
@@ -240,7 +241,7 @@
 
   <!-- Content Area -->
   <div
-    dir={$lang == 'en' ? 'ltr' : 'rtl'}
+    dir={$isRtl ? 'rtl' : 'ltr'}
     class="{isScrolable.value
       ? 'bg-white dark:bg-slate-800'
       : 'bg-gray-50 dark:bg-slate-700'} transition-all duration-300 p-4 flex-1 overflow-y-auto space-y-6"

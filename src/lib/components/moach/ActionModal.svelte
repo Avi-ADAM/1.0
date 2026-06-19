@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { lang } from '$lib/stores/lang.js';
   import Lowding from '$lib/celim/lowding.svelte';
@@ -39,7 +40,7 @@
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer}>
   <div
     class="flex items-center justify-center min-h-screen p-4"
-    dir={$lang == 'he' ? 'rtl' : 'ltr'}
+    dir={$isRtl ? 'rtl' : 'ltr'}
   >
     <DialogContent
       class="bg-barbi border-4 border-gold rounded-3xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl"

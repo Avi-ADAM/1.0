@@ -1,4 +1,4 @@
-<script>
+﻿<script>
   import { BarLoader } from 'svelte-loading-spinners';
   import ChatMessage from '../../celim/messeges.svelte';
   import TodayDivider from '../../celim/todaydevider.svelte';
@@ -16,7 +16,7 @@
   import { slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
   import { lang } from '$lib/stores/lang.js';
-  import { t } from '$lib/translations';
+  import { t, isRtl} from '$lib/translations';
   import { onMount } from 'svelte';
   let why = $state('');
   /**
@@ -143,7 +143,7 @@
 </script>
 
 <div
-  dir={$lang === 'en' ? 'ltr' : 'rtl'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   class="flex flex-col {dont == false
     ? 'dont h-[75vh] sm:h-[80vh]'
     : 'shadow-lg shadow-fuchsia-400/20 h-full'} max-h-[calc(100vh-100px)] bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-xl overflow-hidden"
@@ -210,7 +210,7 @@
 
   <!-- Input Area -->
   <div
-    dir={$lang === 'en' ? 'ltr' : 'rtl'}
+    dir={$isRtl ? 'rtl' : 'ltr'}
     class:pb-8={rect == false && no == false}
     class="px-4 py-3 bg-gradient-to-r from-gray-800/40 to-gray-800/60 backdrop-blur-md {loading ==
     true
@@ -226,7 +226,7 @@
 
     {#if rect == true || no == true}
       <div class="relative flex items-end gap-2 sm:gap-3">
-        <div dir={$lang === 'en' ? 'ltr' : 'rtl'} class="textinput flex-1">
+        <div dir={$isRtl ? 'rtl' : 'ltr'} class="textinput flex-1">
           <textarea
             name="s"
             bind:value={why}

@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import SkillSelector from '$lib/components/ui/SkillSelector.svelte';
   import { userName } from '../../stores/store.js';
   import { lang } from '$lib/stores/lang.js';
@@ -80,7 +81,7 @@
   const ws = tr.reg.skillsQuestion;
 </script>
 
-<div class="step-inner" dir={$lang == 'en' ? 'ltr' : 'rtl'}>
+<div class="step-inner" dir={$isRtl ? 'rtl' : 'ltr'}>
   <h2 class="step-title">{userName_value}&nbsp;{ws[$lang]}</h2>
   <div class="multi-wrap">
     <SkillSelector bind:selectedSkills={selected} color="--gold" />

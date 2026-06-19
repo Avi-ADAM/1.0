@@ -1372,6 +1372,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           descrip
           spnot
           kindOf
+          recurring
+          cycleSize
           sqadualedf
           sqadualed
           linkto
@@ -2430,7 +2432,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       data {
         id
         attributes {
-          name descrip spnot kindOf hm price easy linkto sqadualed sqadualedf
+          name descrip spnot kindOf hm price easy linkto sqadualed sqadualedf recurring cycleSize
           mashaabim { data { id } }
           timegrama { data { id } }
           users {
@@ -2546,13 +2548,17 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                 quantityDelivered
                 users_permissions_user { data { id } }
                 rikmash { data { id } }
+                project { data { id } }
+                forums(pagination: { limit: 1 }) { data { id } }
               }
             }
           }
+          timegrama { data { id attributes { date done } } }
           vots {
             id
             what
             why
+            order
             users_permissions_user { data { id } }
           }
           sp {
@@ -3349,6 +3355,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                     hm
                     name
                     easy
+                    recurring
+                    cycleSize
                   }
                 }
               }
@@ -3423,6 +3431,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           descrip
                           spnot
                           kindOf
+                          recurring
+                          cycleSize
                           users {
                             data {
                               id
@@ -4112,6 +4122,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                         }
                       }
                     }
+                    timegrama { data { id attributes { date done } } }
                     sp {
                       data {
                         id
@@ -4155,6 +4166,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                       what
                       why
                       id
+                      order
                       users_permissions_user {
                         data {
                           id
@@ -4409,6 +4421,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           hm
                           name
                           easy
+                          recurring
+                          cycleSize
                         }
                       }
                     }
@@ -4425,6 +4439,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           kindOf
                           sqadualed
                           sqadualedf
+                          recurring
+                          cycleSize
                         }
                       }
                     }
@@ -7938,6 +7954,47 @@ export const moachQids = {
   }`,
   'mrUpdateCycleMaap': `mutation MrUpdateCycleMaap($id: ID!, $data: MaapInput!) {
     updateMaap(id: $id, data: $data) { data { id } }
+  }`,
+  // Each monthly cycle Maap gets its own Timegrama (deadline). When it elapses the
+  // clients auto-approve the reported amount; a counter-offer resets the date.
+  'mrCreateCycleTimegrama': `mutation MrCreateCycleTimegrama($date: DateTime!, $maapId: ID!) {
+    createTimegrama(data: { date: $date, done: false, whatami: "maap", maap: $maapId }) {
+      data { id }
+    }
+  }`,
+  'mrLinkMaapTimegrama': `mutation MrLinkMaapTimegrama($id: ID!, $timegrama: ID!) {
+    updateMaap(id: $id, data: { timegrama: $timegrama }) { data { id } }
+  }`,
+  // Snapshot of a counter-offer on a recurring cycle: old amount + proposed amount
+  // + who/why/cycle in des(JSON). Requires a `maap` relation on the Nego collection.
+  'mrCreateNego': `mutation MrCreateNego($maapId: ID!, $price: Float, $proposedPrice: Float, $des: JSON, $publishedAt: DateTime) {
+    createNego(data: { maap: $maapId, price: $price, proposedPrice: $proposedPrice, des: $des, publishedAt: $publishedAt }) {
+      data { id }
+    }
+  }`,
+  // The engine's chat forum (for posting counter-offer reasons). May not exist yet.
+  'mrGetMashabForum': `query MrGetMashabForum($id: ID!) {
+    mashabetahalich(id: $id) {
+      data { id attributes {
+        name
+        project { data { id } }
+        forums(pagination: { limit: 1 }) { data { id } }
+      } }
+    }
+  }`,
+  'mrCreateForumMashab': `mutation MrCreateForumMashab($pid: ID, $mashabId: ID, $da: DateTime) {
+    createForum(data: { project: $pid, mashabetahalich: $mashabId, publishedAt: $da }) {
+      data { id }
+    }
+  }`,
+  'mrGetProjectRestime': `query MrGetProjectRestime($pid: ID!) {
+    project(id: $pid) { data { id attributes { restime } } }
+  }`,
+  'mrSetTimegramaDone': `mutation MrSetTimegramaDone($id: ID!, $done: Boolean!) {
+    updateTimegrama(id: $id, data: { done: $done }) { data { id } }
+  }`,
+  'mrResetTimegrama': `mutation MrResetTimegrama($id: ID!, $date: DateTime!) {
+    updateTimegrama(id: $id, data: { date: $date, done: false }) { data { id } }
   }`,
 
   'getProjectBaseInfo': `query GetProjectBaseInfo($pid: ID!) {
