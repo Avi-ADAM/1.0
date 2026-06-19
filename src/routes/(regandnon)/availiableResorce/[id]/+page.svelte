@@ -227,6 +227,11 @@
     const monts = { "he":"חודשים", "en": "month's" }
     const years = { "he":"שנים", "en":"year's" }
     const total = { "he":"בסך הכל", "en":"total" }
+    const recurH = { "he":"משאב חוזר · אישרור כל מחזור", "en":"recurring resource · approved each cycle" }
+    const everyH = { "he":"כל", "en":"every" }
+    const noEndH = { "he":"ללא תאריך סיום", "en":"no end date" }
+    const perM = { "he":"לחודש", "en":"per month" }
+    const perY = { "he":"לשנה", "en":"per year" }
     const nomash = { "he":"לא יצרת משאב מתאים נא ליצור עם הכפתור ליד", "en":"no resorce matching create one with the button" }
     const plh = { "he": "בחירת משאב", "en":"choose resorce" }
     const nom = { "he":"לא נמצא משאב מתאים, ניתן ליצור את המשאב המבוקש עם הכפתור הסמוך", "en":"no matching resorce, you can create new same as the requested with the button on the side" }
@@ -274,6 +279,17 @@
                             <div class="flex flex-row justify-between">
                                 <div class="px-2">
                                     <h2 class="text-barbi font-bold text-xl lg:text-4xl underline">{data.alld.name}</h2>
+                                    {#if data.alld.recurring}
+                                        <div class="inline-flex flex-wrap items-center gap-2 my-2 px-3 py-1.5 rounded-xl bg-blue-900/40 border border-gold/40">
+                                            <span class="text-gold font-bold text-sm lg:text-xl">🔁 {recurH[$lang]}</span>
+                                            {#if Number(data.alld.cycleSize) > 1}
+                                                <span class="text-gray-100 text-xs lg:text-lg">· {everyH[$lang]} {data.alld.cycleSize} {data.alld.kindOf == "yearly" ? years[$lang] : monts[$lang]}</span>
+                                            {/if}
+                                            {#if !data.alld.sqadualedf}
+                                                <span class="text-gray-100 text-xs lg:text-lg">· ♾️ {noEndH[$lang]}</span>
+                                            {/if}
+                                        </div>
+                                    {/if}
                                     {#if data.alld.descrip !== null && data.alld.descrip !== 'null' && data.alld.descrip !== 'undefined' && data.alld.descrip !== undefined}
                                         <p class="cd d max-h-16 text-gray-100 text-lg lg-text-2xl overflow-y-auto">{data.alld.descrip}</p>
                                     {/if}
@@ -297,20 +313,23 @@
                                             {#if data.alld.price != data.alld.easy}
                                                 <span> ↔️ {data.alld.easy}</span>
                                             {/if}
+                                            {#if data.alld.recurring}
+                                                <span class="text-gold"> ₪ {data.alld.kindOf == "yearly" ? perY[$lang] : perM[$lang]}</span>
+                                            {/if}
                                         </span>
                                         {#if data.alld.kindOf != "total" && data.alld.hm > 1}
                                             <span> ✖️ {data.alld.hm} {units[$lang]}</span>
                                         {/if}
-                                        {#if data.alld.kindOf == "monthly" || data.alld.kindOf == "years" || data.alld.kindOf == "rent"}
-                                            <span> ✖️ {montsi(data.alld.kindOf,data.alld.sqadualed,data.alld.sqadualedf,true)} 
+                                        {#if (data.alld.kindOf == "monthly" || data.alld.kindOf == "years" || data.alld.kindOf == "yearly" || data.alld.kindOf == "rent") && !(data.alld.recurring && !data.alld.sqadualedf)}
+                                            <span> ✖️ {montsi(data.alld.kindOf,data.alld.sqadualed,data.alld.sqadualedf,true)}
                                                 {#if data.alld.kindOf == "monthly" || data.alld.kindOf == "rent"}
                                                     <span>{monts[$lang]}</span>
-                                                {:else if data.alld.kindOf == "years"}
+                                                {:else if data.alld.kindOf == "years" || data.alld.kindOf == "yearly"}
                                                     <span>{years[$lang]}</span>
                                                 {/if}
                                             </span>
                                         {/if}
-                                        {#if data.alld.kindOf != "total"}
+                                        {#if data.alld.kindOf != "total" && !(data.alld.recurring && !data.alld.sqadualedf)}
                                             <span>  =  {data.alld.price * data.alld.hm * montsi(data.alld.kindOf, data.alld.sqadualed, data.alld.sqadualedf,true)}
                                                 {#if data.alld.price != data.alld.easy}
                                                     <span> ↔️ {data.alld.easy * data.alld.hm * montsi(data.alld.kindOf, data.alld.sqadualed, data.alld.sqadualedf,true)}</span>

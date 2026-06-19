@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import { Head } from 'svead';
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
@@ -242,7 +243,7 @@
 
 {#if data.alld}
   <div
-    dir={$lang === 'he' ? 'rtl' : 'ltr'}
+    dir={$isRtl ? 'rtl' : 'ltr'}
     class="container mx-auto px-4 py-6 max-w-4xl pb-24"
   >
     <!-- Main Card -->
@@ -380,7 +381,7 @@
               </div>
               <div
                 class="mb-6 flex gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm dark:border-amber-700/40 dark:bg-amber-900/20"
-                dir={$lang === 'ar' ? 'rtl' : $lang === 'he' ? 'rtl' : 'ltr'}
+                dir={$isRtl ? 'rtl' : 'ltr'}
               >
                 <span class="mt-0.5 shrink-0 text-amber-500">ℹ️</span>
                 <div class="text-amber-800 dark:text-amber-300">

@@ -1,4 +1,5 @@
-<script lang="ts">
+﻿<script lang="ts">
+  import { isRtl } from '$lib/translations';
   import { page } from '$app/state';
   import { afterNavigate, invalidate } from '$app/navigation';
   import { onDestroy, onMount } from 'svelte';
@@ -169,7 +170,7 @@
 </svelte:head>
 
 <div
-  dir={$lang === 'en' ? 'ltr' : 'rtl'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   class="relative h-screen overflow-hidden bg-[radial-gradient(circle_at_top,theme(colors.slate.700),theme(colors.slate.900)_44%,#140116)] text-white"
 >
   <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.08),transparent_32%,rgba(236,72,153,0.12))]"></div>

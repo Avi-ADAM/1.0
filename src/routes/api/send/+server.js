@@ -37,11 +37,12 @@ function getServiceToken(isConsensusQid) {
 const CONSENSUS_QIDS = new Set([
   '39GetNegotiation', '40CreateNegotiation', '41CreatePosition', '42UpdatePosition',
   'GetNegotiationByToken', 'ListLocalNegotiations',
-  'ListArguments', 'CreateArgument', 'UpdateArgument', 'ListPlaces'
+  'ListArguments', 'CreateArgument', 'UpdateArgument', 'ListPlaces',
+  'ListIssues', 'ListClauses', 'CreateIssue', 'CreateClause', 'UpdateClause'
 ]);
 
 /** qids where server injects __identity → author fields before sending to Strapi */
-const IDENTITY_INJECT_QIDS = new Set(['41CreatePosition', 'CreateArgument']);
+const IDENTITY_INJECT_QIDS = new Set(['41CreatePosition', 'CreateArgument', 'CreateClause']);
 
 /** qids where arg.support === true triggers server-side idempotent vote (read-then-write) */
 const VOTE_QIDS = new Set(['42UpdatePosition', 'UpdateArgument']);
@@ -210,6 +211,37 @@ export async function POST({ request, cookies }) {
 	// (editing = UpdatePosition without support:true — only registered JWT users allowed)
 	if (isSer && queId === '42UpdatePosition' && keyValueObject.support !== true) {
 		throw error(403, 'Forbidden: Service accounts cannot edit positions directly');
+	}
+
+	// ── Enforce: UpdateClause ownership rules ────────────────────────────────
+	// body/issueId: JWT (registered owner) only — block service path entirely.
+	// stanceValue/confirmedByAuthor: service path allowed, but only for the clause author.
+	if (queId === 'UpdateClause') {
+		if (isSer && (keyValueObject.body != null || keyValueObject.issueId != null)) {
+			throw error(403, 'Forbidden: Service accounts cannot edit clause body or issueId');
+		}
+		if (isSer) {
+			const clauseId = variablesObject.id;
+			if (!clauseId) throw error(400, 'Missing id for UpdateClause');
+			const ownerExternalId = identity?.externalId;
+			if (!ownerExternalId) throw error(403, 'Forbidden: Missing __identity.externalId for UpdateClause');
+
+			let fetchData;
+			try {
+				const fetchRes = await fetch(ep, {
+					method: 'POST',
+					body: JSON.stringify({ query: `query { clause(id: "${clauseId}") { data { attributes { authorExternalId } } } }` }),
+					headers: { 'Content-Type': 'application/json', Authorization: bearer1 }
+				});
+				fetchData = await fetchRes.json();
+			} catch (e) {
+				throw error(500, `Failed to fetch clause for ownership check: ${e.message}`);
+			}
+			const clauseAuthor = fetchData.data?.clause?.data?.attributes?.authorExternalId;
+			if (clauseAuthor !== ownerExternalId) {
+				throw error(403, 'Forbidden: Not the clause author');
+			}
+		}
 	}
 
 	// ── Standard GraphQL fetch ───────────────────────────────────────────────

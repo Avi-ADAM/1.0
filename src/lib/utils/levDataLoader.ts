@@ -61,6 +61,7 @@ import {
   extractPurchases
 } from './levDataExtractors';
 import { fetchMainUserData, fetchOpenMissions } from './levGraphQLQueries';
+import { resolvePlatformIdentity } from '$lib/stores/platformStore';
 
 
 /**
@@ -96,6 +97,11 @@ export async function initializeLevData(
   lang: string
 ): Promise<void> {
   console.log('🚀 [levDataLoader] Initializing lev data', { userId, lang });
+
+  // Resolve the platform (1💗1) identity once for the proposal card's site-share
+  // row — logo/name/public link. Fire-and-forget: never blocks the feed and the
+  // card degrades to no platform row if it fails.
+  resolvePlatformIdentity();
 
   // Step 1: Try to load from snapshot first
   const snapshot = loadSnapshot();
@@ -161,12 +167,13 @@ export async function initializeLevData(
     }
 
 
+    // Mark stores as fully loaded — must be set BEFORE saveCurrentSnapshot,
+    // whose guard refuses to persist anything other than a full dataset.
+    dataMode.set('full');
+
     // Step 4: Save new snapshot
     console.log('💾 [levDataLoader] Saving new snapshot');
     saveCurrentSnapshot();
-
-    // Mark stores as fully loaded — safe to snapshot now
-    dataMode.set('full');
 
     console.log('✅ [levDataLoader] Initialization complete');
   } catch (error) {

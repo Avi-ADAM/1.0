@@ -23,7 +23,7 @@ export async function PendM(id,taid){
                 //cr openm
                 let qua = `{
   pmash (id:${id}) {data{ id attributes{
-   isYesod isMust name spnot kindOf linkto price descrip easy hm sqadualed sqadualedf
+   isYesod isMust name spnot kindOf linkto price descrip easy hm sqadualed sqadualedf recurring cycleSize
         project{data{id}}
                             mashaabim {data{ id}}
   }}}
@@ -36,6 +36,9 @@ export async function PendM(id,taid){
         let d = new Date()
          const date = (res2.data.pmash.data.attributes.sqadualed !== undefined && res2.data.pmash.data.attributes.sqadualed !== "undefined" && res2.data.pmash.data.attributes.sqadualed !== null) ? `sqadualed: "${res2.data.pmash.data.attributes.sqadualed}",` : ``;
         const dates = (res2.data.pmash.data.attributes.sqadualedf !== undefined && res2.data.pmash.data.attributes.sqadualedf !== "undefined" && res2.data.pmash.data.attributes.sqadualedf !== null) ? `sqadualedf: "${res2.data.pmash.data.attributes.sqadualedf}",` : ``;
+        // Carry recurring-expense terms onto the auto-created OpenMashaabim so the
+        // suggestion / available-resource views can flag it as recurring.
+        const recur = (res2.data.pmash.data.attributes.recurring === true) ? `recurring: true, cycleSize: ${parseInt(res2.data.pmash.data.attributes.cycleSize ?? 1, 10) || 1},` : ``;
                 let qub = `mutation { createOpenMashaabim(
       data: {project: "${res2.data.pmash.data.attributes.project.data.id}",
              spnot: """${res2.data.pmash.data.attributes.spnot}""",
@@ -51,8 +54,9 @@ export async function PendM(id,taid){
              isYesod:${res2.data.pmash.data.attributes.isYesod || false},
              isMust:${res2.data.pmash.data.attributes.isMust || false},
              mashaabim: "${res2.data.pmash.data.attributes.mashaabim.data.id}"
-             ${date} 
+             ${date}
              ${dates}
+             ${recur}
             }
   ) {data{attributes {project{data{ id} }}}}
   updatePmash(

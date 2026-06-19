@@ -78,10 +78,23 @@ import { addHalukaChatEntryConfig } from './addHalukaChatEntry.js';
 import { voteOnDecisionConfig } from './voteOnDecision.js';
 import { getDecisionDetailsConfig } from './getDecisionDetails.js';
 import { getMissionForEditConfig } from './getMissionForEdit.js';
+import { getPlatformProjectConfig } from './getPlatformProject.js';
+import { createPlatformSaleConfig } from './createPlatformSale.js';
+import { decideSiteShareConfig } from './decideSiteShare.js';
+import { getSiteShareDecisionConfig } from './getSiteShareDecision.js';
+import { getSiteShareAggregateConfig } from './getSiteShareAggregate.js';
+import { getOpenSiteShareDecisionsConfig } from './getOpenSiteShareDecisions.js';
+import { seedSiteShareDecisionsConfig } from './seedSiteShareDecisions.js';
+import { createSiteShareTransferConfig } from './createSiteShareTransfer.js';
+import { getSiteSharePayablesConfig } from './getSiteSharePayables.js';
+import { getSiteShareArchiveConfig } from './getSiteShareArchive.js';
+import { getRikmaSplitsArchiveConfig } from './getRikmaSplitsArchive.js';
 import { createWorkWayConfig } from './createWorkWay.js';
 import { createMissionConfig } from './createMission.js';
 import { submitNegoMissionConfig } from './submitNegoMission.js';
 import { submitNegoMashConfig } from './submitNegoMash.js';
+import { submitNegoMaapConfig } from './submitNegoMaap.js';
+import { proposeOnOpenMashaabimConfig } from './proposeOnOpenMashaabim.js';
 import { updateResourceRequestConfig } from './updateResourceRequest.js';
 import { createResourceRequestConfig } from './createResourceRequest.js';
 import { createMashaabimConfig } from './createMashaabim.js';
@@ -97,6 +110,7 @@ import { updateUserProfilePicConfig } from './updateUserProfilePic.js';
 import { updateUserBasicConfig } from './updateUserBasic.js';
 import { archiveUserResourceConfig } from './archiveUserResource.js';
 import { createWeaveConfig } from './createWeave.js';
+import { markResourceDoneConfig } from './markResourceDone.js';
 
 
 /**
@@ -228,6 +242,28 @@ export function registerAllActions(): void {
   // Decision card display (read action — current vs. proposed values)
   registerAction(getDecisionDetailsConfig);
 
+  // Site share — resolve the platform project and create income Sale
+  registerAction(getPlatformProjectConfig);
+  registerAction(createPlatformSaleConfig);
+  // Site share (per-member) — record a member's decided/skipped contribution
+  registerAction(decideSiteShareConfig);
+  // Site share (per-member) — load a member's existing decision (prefill)
+  registerAction(getSiteShareDecisionConfig);
+  // Site share (per-member) — split-card aggregate (running sum + how many decided)
+  registerAction(getSiteShareAggregateConfig);
+  // Site share (per-member) — gate 3 reminder: a member's open (pending) decisions
+  registerAction(getOpenSiteShareDecisionsConfig);
+  // Site share (per-member) — seed pending decisions for a new tosplit's members
+  registerAction(seedSiteShareDecisionsConfig);
+  // Site share (per-member) — M4 receiving side: create the member→volunteer transfer
+  registerAction(createSiteShareTransferConfig);
+  // Site share (per-member) — M4: a member's committed-but-unpaid contributions
+  registerAction(getSiteSharePayablesConfig);
+  // Site share (per-member) — M5: standing archive for the split screen (both sides)
+  registerAction(getSiteShareArchiveConfig);
+  // M5: comprehensive distribution archive — all tosplits + per-member all-time totals
+  registerAction(getRikmaSplitsArchiveConfig);
+
   // Mission creation (all 4 branches) + supporting read/create actions
   registerAction(getMissionForEditConfig);
   registerAction(createWorkWayConfig);
@@ -238,6 +274,8 @@ export function registerAllActions(): void {
 
   // Negotiation submission (pmash / resource nego flow)
   registerAction(submitNegoMashConfig);
+  registerAction(submitNegoMaapConfig);
+  registerAction(proposeOnOpenMashaabimConfig);
 
   // User profile: create / update personal resource (Sp)
   registerAction(createResourceRequestConfig);
@@ -266,6 +304,9 @@ export function registerAllActions(): void {
 
   // Weave creation (baci.svelte — "יצירת ריקמה", reusable project creation)
   registerAction(createWeaveConfig);
+
+  // Recurring monthly resources: close a mashabetahalich engine (mark done)
+  registerAction(markResourceDoneConfig);
 
   // Future actions will be registered here
   // registerAction(createTaskAction);

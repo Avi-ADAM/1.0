@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import CreateNewMeeting from '$lib/components/addnew/createNewMeeting.svelte';
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang';
@@ -436,7 +437,7 @@
 
 <div
   class="min-h-screen pb-16 bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 text-white p-6"
-  dir={$lang === 'he' ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
 >
   <header
     class="text-center mb-8 relative overflow-hidden p-8 rounded-3xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-2xl"
@@ -849,7 +850,7 @@
     <div
       class="relative bg-gradient-to-br from-gray-900 via-purple-900/90 to-gray-900 rounded-3xl p-8 max-w-md w-full border border-white/20 shadow-2xl"
       transition:scale={{ duration: 300, start: 0.9 }}
-      dir={$lang === 'he' ? 'rtl' : 'ltr'}
+      dir={$isRtl ? 'rtl' : 'ltr'}
     >
       <!-- Close Button -->
       <button

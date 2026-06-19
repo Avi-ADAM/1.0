@@ -1,4 +1,5 @@
 import i18n from 'sveltekit-i18n';
+import { derived } from 'svelte/store';
 import lang from './lang.json';
 
 export const config = {
@@ -450,5 +451,7 @@ export const config = {
 };
 
 export const { t, loading, locales, locale, loadTranslations } = new i18n(config);
+
+export const isRtl = derived(locale, ($locale) => $locale === 'he' || $locale === 'ar');
 
 loading.subscribe(($loading) => $loading && console.log('Loading translations...'));

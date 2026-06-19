@@ -1,4 +1,5 @@
-<script lang="ts">
+﻿<script lang="ts">
+  import { isRtl } from '$lib/translations';
   /**
    * AcceptWishOffer — PLAN_CONCIERGE §5.3
    *
@@ -79,7 +80,7 @@
     }
   } as const;
   const t = $derived($lang === 'en' ? T.en : T.he);
-  const dir = $derived($lang === 'en' ? 'ltr' : 'rtl');
+  const dir = $derived($isRtl ? 'rtl' : 'ltr');
   const wishHref = $derived(`/wish/${ratsonId}`);
 
   async function approve() {

@@ -50,8 +50,190 @@ function computeTotal(kindOf: string, agprice: number, hm: number, sqadualed?: s
   return agprice;
 }
 
+/**
+ * Vote on a recurring monthly cycle Maap.
+ *
+ * Each month /api/monthi opens a cycle Maap (linked to a mashabetahalich engine)
+ * pre-filled with the planned amount. The responsible user confirms / edits the
+ * real amount (passed as `amount`), which counts as their YES vote. On full
+ * project consensus the spend is appended as a delivery line on the engine's
+ * Rikmash (created on the first cycle) and the cycle Maap is archived.
+ */
+async function handleCycleMaapVote(
+  strapi: any,
+  context: any,
+  args: {
+    askId: string;
+    projectId: string;
+    what: boolean;
+    why?: string;
+    amount?: number;
+    attrs: any;
+    mashab: any;
+    now: Date;
+  },
+) {
+  const { askId, projectId, what, why, amount, attrs, mashab, now } = args;
+  const mashId = String(mashab.id);
+  const mashAttrs = mashab.attributes ?? {};
+  const responsibleId = String(mashAttrs.users_permissions_user?.data?.id ?? '');
+  const kindOf = mashAttrs.kindOf ?? 'monthly';
+  const hasAmount = amount != null && !Number.isNaN(amount);
+
+  // Two-card model: the responsible user reports the actual monthly spend, and
+  // only then can the rest of the project approve that specific month.
+  // `quantityDelivered == null` ⇒ not reported yet (the engine's pricePerUnit is
+  // a planned preview only). Reject any non-responsible vote until it's reported.
+  const meId = String(context.userId);
+  const isResponsible = meId === responsibleId;
+  const alreadyReported = attrs.quantityDelivered != null;
+  if (!isResponsible && !alreadyReported) {
+    return {
+      data: { askId, consensus: false, awaitingReport: true },
+      updateStrategy: { type: 'none' },
+    };
+  }
+
+  // Resolve the spend amount: explicit > already-stored > planned price.
+  const spend: number = hasAmount
+    ? (amount as number)
+    : attrs.quantityDelivered ?? mashAttrs.pricePerUnit ?? 0;
+
+  // Members & quorum
+  const projectRes = await strapi.execute('3projectJSONQue', { pid: projectId }, context.jwt, context.fetch);
+  const members = projectRes?.data?.project?.data?.attributes?.user_1s?.data ?? [];
+  const memberIds: string[] = members.map((m: any) => String(m.id));
+  const totalMembers = memberIds.length;
+
+  // Vote rounds: a counter-offer (submitNegoMaap) casts the negotiator's vote at
+  // order+1, so the highest order is the current round. Consensus is judged only
+  // on votes at that round — a counter-offer forces everyone to re-approve.
+  const existingVots: any[] = attrs.vots ?? [];
+  const orderon: number = existingVots.reduce(
+    (mx: number, v: any) => Math.max(mx, v.order ?? 0),
+    0,
+  );
+  const strUserId = String(context.userId);
+  // Keep votes from prior rounds + this round's votes by other users.
+  const previousVotes = existingVots
+    .filter((v: any) => {
+      const uid =
+        v.users_permissions_user?.data?.id ??
+        v.users_permissions_user?.id ??
+        v.users_permissions_user;
+      return !(String(uid) === strUserId && (v.order ?? 0) === orderon);
+    })
+    .map((v: any) => {
+      const row = normalizeVote(v);
+      row.order = v.order ?? 0;
+      return row;
+    });
+  const newVote: Record<string, any> = {
+    what: Boolean(what),
+    users_permissions_user: strUserId,
+    order: orderon,
+    ide: parseInt(strUserId, 10),
+    zman: now.toISOString(),
+  };
+  if (why) newVote.why = why;
+  const allVots = [...previousVotes, newVote];
+
+  const yesCount = allVots.filter(
+    (v) =>
+      v.what === true &&
+      (v.order ?? 0) === orderon &&
+      memberIds.includes(String(v.users_permissions_user)),
+  ).length;
+  const consensus = what === true && totalMembers > 0 && yesCount >= totalMembers;
+  const timegramaId: string | null = attrs.timegrama?.data?.id ?? null;
+
+  if (!consensus) {
+    const data: Record<string, any> = { vots: allVots };
+    // Mark the cycle as reported once the responsible user weighs in (with an
+    // explicit amount, or the planned default), which opens approval to members.
+    if (hasAmount || isResponsible) data.quantityDelivered = spend;
+    await strapi.execute('mrUpdateCycleMaap', { id: askId, data }, context.jwt, context.fetch);
+    return {
+      data: { askId, consensus: false },
+      updateStrategy: { type: 'partialUpdate', config: { dataKeys: ['wegets'] } },
+    };
+  }
+
+  // ── Consensus: archive the month's spend as a delivery on the Rikmash ──────
+  const cycleIndex = attrs.cycleIndex ?? 1;
+  let rikmashId: string | null = mashAttrs.rikmash?.data?.id ?? null;
+
+  if (rikmashId) {
+    const rRes = await strapi.execute('mrGetRikmashForDelivery', { id: rikmashId }, context.jwt, context.fetch);
+    const rAttrs = rRes?.data?.rikmash?.data?.attributes ?? {};
+    const existingDeliveries = (rAttrs.deliveries ?? []).map((d: any) => ({
+      id: d.id,
+      cycleIndex: d.cycleIndex,
+      deliveredAt: d.deliveredAt,
+      quantity: d.quantity,
+      ...(d.note ? { note: d.note } : {}),
+      ...(d.maap?.data?.id ? { maap: d.maap.data.id } : {}),
+    }));
+    const deliveries = [
+      ...existingDeliveries,
+      { cycleIndex, deliveredAt: now.toISOString(), quantity: spend, maap: askId, confirmedBy: strUserId },
+    ];
+    await strapi.execute('mrUpdateRikmash', {
+      id: rikmashId,
+      data: {
+        deliveries,
+        total: (rAttrs.total ?? 0) + spend,
+        cyclesCount: (rAttrs.cyclesCount ?? 0) + 1,
+        lastDeliveryAt: now.toISOString(),
+      },
+    }, context.jwt, context.fetch);
+  } else {
+    const created = await strapi.execute('mrCreateRikmash', {
+      data: {
+        name: mashAttrs.name ?? attrs.name ?? 'משאב',
+        project: projectId,
+        mashabetahalich: mashId,
+        kindOf,
+        ...(responsibleId ? { users_permissions_user: responsibleId } : {}),
+        total: spend,
+        agprice: mashAttrs.pricePerUnit ?? spend,
+        cyclesCount: 1,
+        firstDeliveryAt: now.toISOString(),
+        lastDeliveryAt: now.toISOString(),
+        deliveries: [
+          { cycleIndex, deliveredAt: now.toISOString(), quantity: spend, maap: askId, confirmedBy: strUserId },
+        ],
+        maaps: [askId],
+        publishedAt: now.toISOString(),
+      },
+    }, context.jwt, context.fetch);
+    rikmashId = created?.data?.createRikmash?.data?.id ?? null;
+    if (rikmashId) {
+      await strapi.execute('mrLinkRikmashToMashabetahalich', { id: mashId, rikmash: rikmashId }, context.jwt, context.fetch);
+    }
+  }
+
+  // Archive the cycle Maap + accumulate the engine's running total.
+  await strapi.execute('mrUpdateCycleMaap', {
+    id: askId,
+    data: { archived: true, vots: allVots, quantityDelivered: spend, ...(rikmashId ? { rikmash: rikmashId } : {}) },
+  }, context.jwt, context.fetch);
+
+  await strapi.execute('mrUpdateMashabetahalich', {
+    id: mashId,
+    data: { quantityDelivered: (mashAttrs.quantityDelivered ?? 0) + spend },
+  }, context.jwt, context.fetch);
+
+  // Stop the deadline clock — the cycle is settled.
+  if (timegramaId) {
+    await strapi.execute('mrSetTimegramaDone', { id: timegramaId, done: true }, context.jwt, context.fetch);
+  }
+
+  return { data: { askId, rikmashId, consensus: true }, updateStrategy: { type: 'fullRefresh' } };
+}
+
 const voteOnMaapHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
-  const { askId, projectId, what, why } = params;
+  const { askId, projectId, what, why, amount } = params;
 
   const now = new Date();
 
@@ -60,6 +242,22 @@ const voteOnMaapHandler: ActionExecutionHandler = async (params, context, { stra
   const maapData = maapRes?.data?.maap?.data;
   if (!maapData) throw new Error(`Maap ${askId} not found`);
   const attrs = maapData.attributes;
+
+  // ── Recurring cycle Maap: a monthly spend awaiting confirmation. Archive the
+  //    confirmed amount as a delivery line on the engine's Rikmash. ──────────
+  const mashab = attrs.mashabetahalich?.data;
+  if (mashab) {
+    return handleCycleMaapVote(strapi, context, {
+      askId: String(askId),
+      projectId: String(projectId),
+      what: Boolean(what),
+      why,
+      amount: amount != null ? Number(amount) : undefined,
+      attrs,
+      mashab,
+      now,
+    });
+  }
 
   const sp = attrs.sp?.data;
   const om = attrs.open_mashaabim?.data;
@@ -236,6 +434,7 @@ export const voteOnMaapConfig: ActionConfig = {
     projectId: { type: 'string', required: true, description: 'Project ID' },
     what: { type: 'boolean', required: true, description: 'true = agree, false = decline' },
     why: { type: 'string', required: false, description: 'Optional decline reason' },
+    amount: { type: 'number', required: false, description: 'For recurring cycle Maaps: the confirmed amount spent this month' },
   },
 
   authRules: [

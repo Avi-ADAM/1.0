@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import tr from '$lib/translations/tr.json';
   import Text from '../conf/text.svelte';
   import NumberField from '../conf/number.svelte';
@@ -86,8 +87,21 @@
     ordern = 0,
     masaalr = false,
     location = null,
+    recurring = false,
+    recurringNoEnd = false,
+    pricePerUnit = 0,
+    cycleSize = 1,
     onClose,
-    onLoad
+    onLoad,
+    /**
+     * Optional custom submit handler. When provided, the component hands the
+     * computed diff to the parent instead of calling submitNegoMash itself.
+     * Used by the open-resource candidate flow (proposeOnOpenMashaabim), where
+     * there is no pmash to negotiate on — the terms become a parallel proposal
+     * on the candidate's Askm. Receives { newValues, originalValues, hasChanges }.
+     * @type {((d: { newValues: any, originalValues: any, hasChanges: boolean }) => Promise<void>) | null}
+     */
+    onSubmit = null
   } = $props();
 
   let descrip2 = $state(descrip);
@@ -95,12 +109,14 @@
   let sqadualed2 = $state(sqadualed);
   let sqadualedf2 = $state(sqadualedf);
 
-  let spnot2 = spnot;
+  let spnot2 = $state(spnot);
   let linkto2 = $state(linkto);
   let hm2 = $state(hm);
   let price2 = $state(price);
   let easy2 = $state(easy);
   let kindOfb = $state(kindOf);
+  let recurring2 = $state(Boolean(recurring));
+  let cycleSize2 = $state(Number(cycleSize) || 1);
   let location2 = $state(
     location
       ? { ...location }
@@ -140,7 +156,7 @@
   async function increment() {
     onLoad?.();
 
-    if (!pendId) {
+    if (!onSubmit && !pendId) {
       toast.error(tr?.toasts?.er?.[$lang] ?? 'Missing resource id');
       return;
     }
@@ -200,6 +216,16 @@
       originalValues.kindOf = kindOf;
       hasChanges = true;
     }
+    if (Boolean(recurring) !== Boolean(recurring2)) {
+      newValues.recurring = recurring2;
+      originalValues.recurring = recurring;
+      hasChanges = true;
+    }
+    if (recurring2 && Number(cycleSize) !== Number(cycleSize2)) {
+      newValues.cycleSize = Number(cycleSize2) || 1;
+      originalValues.cycleSize = cycleSize;
+      hasChanges = true;
+    }
     if (locationChanged()) {
       newValues.location = {
         location_mode: location2?.location_mode ?? 'unspecified',
@@ -214,6 +240,20 @@
 
     // Guard: skip if nothing changed and the user has already voted yes
     if (!hasChanges && masaalr && mypos) return;
+
+    // Candidate / parallel-proposal flow: hand the diff to the parent.
+    if (onSubmit) {
+      try {
+        await onSubmit({ newValues, originalValues, hasChanges });
+        toast.success(tr?.toasts.suc[$lang]);
+        close();
+      } catch (e) {
+        error1 = e;
+        console.log(error1);
+        toast.error(tr?.toasts?.er?.[$lang] ?? 'Error');
+      }
+      return;
+    }
 
     try {
       const result = await submitNegoMash({
@@ -253,11 +293,14 @@
     kindOf === 'total' ? 1 : Number(hm) || 0
   );
 
+  // For a recurring expense the negotiated price IS the per-cycle (monthly /
+  // yearly) cost, so we never multiply by the number of months — each cycle is
+  // approved separately. Fixed-term resources keep multiplying over the period.
   const montsiNew = $derived(
-    Number(montsi(kindOfb, sqadualed2, sqadualedf2)) || 1
+    recurring2 ? 1 : Number(montsi(kindOfb, sqadualed2, sqadualedf2)) || 1
   );
   const montsiOrig = $derived(
-    Number(montsi(kindOf, sqadualed, sqadualedf)) || 1
+    recurring ? 1 : Number(montsi(kindOf, sqadualed, sqadualedf)) || 1
   );
 
   const totalNew = $derived(
@@ -309,11 +352,20 @@
   ]);
 </script>
 
-<div class="text-barbi" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
+<div class="text-barbi" dir={$isRtl ? 'rtl' : 'ltr'}>
   <h1 class="md:text-center text-2xl md:text-2xl font-bold underline">
     {tri?.nego?.headmash[$lang]}
     {name1}
   </h1>
+  {#if recurring || recurring2}
+    <div
+      class="mx-2 my-2 rounded-lg border border-gold/60 bg-gold/10 p-2 text-sm text-center"
+    >
+      🔁 {$lang === 'en'
+        ? 'Recurring resource — the value below is the per-cycle (monthly) cost. Every cycle is approved separately. You may leave the end date empty for an open-ended expense.'
+        : 'משאב חוזר — הסכום למטה הוא העלות לכל מחזור (חודשי). כל מחזור עובר אישור בנפרד. ניתן להשאיר תאריך סיום ריק להוצאה ללא הגבלת זמן.'}
+    </div>
+  {/if}
   <div class="flex flex-col align-middle justify-center">
     <Text text={name1} bind:textb={name2} lebel={tri?.common?.name} />
     <Rich
@@ -321,7 +373,11 @@
       bind:textb={descrip2}
       lebel={tri?.common?.description}
     />
-    <!--<Text text={spnot} bind:textb={spnot2} lebel={tri?.mission?.specialNotes}/>-->
+    <Text
+      text={spnot}
+      bind:textb={spnot2}
+      lebel={{ he: 'הערות מיוחדות', en: 'Special notes' }}
+    />
     <Text text={linkto} bind:textb={linkto2} lebel={tri?.mash?.linkto} />
     <KindOfnego {kindOf} bind:kindOfb lebel={tri?.mash.kindof} />
 
@@ -351,6 +407,43 @@
       />
     {/if}
 
+    {#if kindOfb === 'monthly' || kindOfb === 'yearly'}
+      <div
+        class="border border-gold border-opacity-40 rounded m-2 p-2 flex flex-col gap-2"
+      >
+        <label class="flex flex-row items-center justify-center gap-x-2">
+          <span class="underline decoration-mturk"
+            >{$lang === 'en' ? 'Recurring expense' : 'הוצאה חוזרת'}</span
+          >
+          <input type="checkbox" bind:checked={recurring2} />
+        </label>
+        {#if recurring2}
+          <p class="text-xs text-center text-barbi/80">
+            {$lang === 'en'
+              ? 'Approved each cycle; clear the end date for an open-ended expense.'
+              : 'מאושר בכל מחזור; ניתן להסיר תאריך סיום למצב ללא הגבלה.'}
+          </p>
+          <NumberField
+            number={cycleSize}
+            bind:numberb={cycleSize2}
+            lebel={$lang === 'en'
+              ? `Every N ${kindOfb === 'yearly' ? 'years' : 'months'}`
+              : `כל כמה ${kindOfb === 'yearly' ? 'שנים' : 'חודשים'}`}
+          />
+          <button
+            type="button"
+            onclick={() => (sqadualedf2 = null)}
+            disabled={sqadualedf2 == null || sqadualedf2 === ''}
+            class="mx-auto text-sm border border-gold/50 rounded-full px-3 py-1 hover:bg-gold/20 disabled:opacity-40"
+          >
+            {sqadualedf2 == null || sqadualedf2 === ''
+              ? $lang === 'en' ? '∞ Open-ended (no end date)' : '∞ ללא תאריך סיום'
+              : $lang === 'en' ? 'Remove end date' : 'הסרת תאריך סיום'}
+          </button>
+        {/if}
+      </div>
+    {/if}
+
     <LocationNego
       {location}
       bind:locationb={location2}
@@ -378,7 +471,13 @@
   <div
     class="border border-gold border-opacity-80 rounded m-2 flex flex-col align-middle justify-center gap-x-2"
   >
-    <h2 class="underline decoration-mturk">{tri?.mash.tota[$lang]}</h2>
+    <h2 class="underline decoration-mturk">
+      {#if recurring2}
+        {$lang === 'en' ? 'Estimated cost per cycle' : 'עלות משוערת למחזור'}
+      {:else}
+        {tri?.mash.tota[$lang]}
+      {/if}
+    </h2>
     {#if valuesChanged}
       <div class="flex flex-col gap-2">
         <div>

@@ -67,8 +67,34 @@
     }
   }
 
+  // Open the negotiation dialog so the candidate can offer parallel (counter) terms.
   function nego(oid) {
-    console.log('nego', oid);
+    masa = true;
+    isOpen = true;
+  }
+
+  // Candidate's parallel proposal — stored as a NegoMash round on a new Askm,
+  // never overwriting the shared OpenMashaabim (see proposeOnOpenMashaabim).
+  async function handleNegoSubmit({ newValues }) {
+    const result = await executeAction('proposeOnOpenMashaabim', {
+      openMashaabimId: String(id),
+      projectId: String(projectId),
+      spId: String(oid),
+      missionName: mashName != null ? String(mashName) : undefined,
+      newValues
+    });
+    if (!result.success) {
+      throw new Error(result.error || 'proposeOnOpenMashaabim failed');
+    }
+  }
+
+  // Called by Nego after a successful submit (or on cancel): close + drop the card.
+  function afternego() {
+    masa = false;
+    isOpen = false;
+    loading = false;
+    already = true;
+    less();
   }
 
   async function decline(oid) {
@@ -125,6 +151,7 @@
     onHover?.({ id: u });
   }
   import Cards from './cards/sugestma.svelte';
+  import Nego from '../prPr/negoPend.svelte';
   import { executeAction } from '$lib/client/actionClient';
   import { SendTo } from '$lib/send/sendTo.svelte';
   import { DialogContent, DialogOverlay } from 'svelte-accessible-dialog';
@@ -153,6 +180,9 @@
    * @property {any} kindOf
    * @property {any} deadLine
    * @property {any} sqedualedf
+   * @property {any} [sqadualedf] - end date (recurring expense window end)
+   * @property {boolean} [recurring] - recurring monthly/yearly expense
+   * @property {number} [cycleSize] - every N months/years
    * @property {any} projectName
    * @property {any} mashName
    * @property {any} descrip
@@ -188,6 +218,9 @@
     kindOf,
     deadLine,
     sqedualedf,
+    sqadualedf,
+    recurring = false,
+    cycleSize = 1,
     projectName,
     mashName,
     descrip,
@@ -217,10 +250,13 @@
   } = $props();
   let isOpen = $state(false),
     diunm = $state(false),
-    loading = false;
+    masa = $state(false),
+    loading = $state(false);
   const close = () => {
     isOpen = false;
     diunm = false;
+    masa = false;
+    loading = false;
   };
   let miDatan = [];
   async function afreact(event) {
@@ -259,32 +295,31 @@
         >
         {#if loading === true}
           <RingLoader size="260" color="#ff00ae" unit="px" duration="2s" />
-          <!--   
-{:else if masa === true}
-
-<Nego
-      onLoad={()=>loading = true}
-        onClose={afternego}
-  descrip ={descrip}
-  projectName ={projectName}
-  name1 ={name}
-  spnot = {hearotMeyuchadot}
-  kindOf ={kindOf}
-  hm = {hm}
-  {timegramaId}
-  projectId = {projectId}
-  total ={total}
-  noofusers={noofusers}
-  price={price}
-  easy = {easy}
-  linkto = {linkto}
-  pendId ={pendId}
-  mshaabId={mshaabId}
-  sqadualedf={sqadualedf}
-  sqadualed={sqadualed}
-  users={users}
-{restime}
-/>-->
+        {:else if masa === true}
+          <Nego
+            onLoad={() => (loading = true)}
+            onClose={afternego}
+            onSubmit={handleNegoSubmit}
+            masaalr={false}
+            descrip={descrip}
+            projectName={projectName}
+            name1={mashName}
+            spnot={spnot}
+            kindOf={kindOf}
+            hm={0}
+            projectId={projectId}
+            total={total}
+            noofusers={1}
+            price={price}
+            easy={easy}
+            linkto={''}
+            pendId={null}
+            sqadualedf={sqedualedf}
+            sqadualed={null}
+            users={[]}
+            ordern={0}
+            {restime}
+          />
         {:else if diunm === true}
           <Diun
             onRect={afreact}
@@ -358,6 +393,14 @@ role="button"
             >
               {mashName}
             </h1>
+            {#if recurring}
+              <span
+                onmouseenter={() => hover('משאב חוזר · אישרור כל מחזור')}
+                onmouseleave={() => hover('0')}
+                class="ltn"
+                style="color: var(--gold);">🔁 חוזר</span
+              >
+            {/if}
             <h3
               onmouseenter={() => hover('שווי')}
               onmouseleave={() => hover('0')}
@@ -469,6 +512,7 @@ role="button"
   <Cards
     onAgree={() => agree(oid)}
     onDecline={() => decline(oid)}
+    onNego={() => nego(oid)}
     onHover={hoverc}
     onTochat={tochat}
     {low}
@@ -476,8 +520,12 @@ role="button"
     {easy}
     {myp}
     {already}
-    {deadLine} 
+    {deadLine}
     {sqedualedf}
+    {sqadualedf}
+    {kindOf}
+    {recurring}
+    {cycleSize}
     {price}
     {total}
     {descrip}
@@ -495,6 +543,7 @@ role="button"
   <Cards
     onAgree={() => agree(oid)}
     onDecline={() => decline(oid)}
+    onNego={() => nego(oid)}
     onHover={hoverc}
     onTochat={tochat}
     {isVisible}
@@ -503,8 +552,12 @@ role="button"
     {easy}
     {myp}
     {already}
-    {deadLine} 
+    {deadLine}
     {sqedualedf}
+    {sqadualedf}
+    {kindOf}
+    {recurring}
+    {cycleSize}
     {price}
     {total}
     {descrip}

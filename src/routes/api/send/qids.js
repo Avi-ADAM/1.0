@@ -685,7 +685,7 @@ const qids_base = {
             isLocal
             scaleMin
             scaleMax
-            places {
+            cuntries {
               data {
                 id
                 attributes { name }
@@ -718,15 +718,16 @@ const qids_base = {
                   authorExternalId
                   authorType
                   votes
-                  voters
+                  voters { data { id } }
                   location
                   intensity
-                  tags
+                  tags { data { id } }
                   order
                   isAnchor
                   pole
                   kind
                   relativePlacement
+                  selfPlacement
                 }
               }
             }
@@ -753,7 +754,7 @@ const qids_base = {
     mutation CreateNegotiation(
       $topic: String!,
       $description: String,
-      $status: String,
+      $status: ENUM_NEGOTIATION_STATUS,
       $maxRounds: Int,
       $currentRound: Int,
       $createdBy: ID,
@@ -859,15 +860,18 @@ const qids_base = {
     }
   `,
 
-  // Editing only (heading / description / location by registered owner via JWT).
+  // Editing only (heading / description / location / selfPlacement by registered owner via JWT).
   // Voting (support: true) is intercepted by +server.js and handled server-side
   // with idempotent read-then-write logic — the qid string is never sent to Strapi.
+  // selfPlacement: author's manual self-placement on 0..100 axis (AI hint, not displayed location).
+  // location: derived value computed by consensus from clauses, written back via this qid.
   '42UpdatePosition': `
-    mutation UpdatePosition($id: ID!, $heading: String, $description: String, $location: Int) {
+    mutation UpdatePosition($id: ID!, $heading: String, $description: String, $location: Int, $selfPlacement: Int) {
       updatePosition(id: $id, data: {
         heading: $heading,
         description: $description,
-        location: $location
+        location: $location,
+        selfPlacement: $selfPlacement
       }) {
         data {
           id
@@ -875,6 +879,7 @@ const qids_base = {
             heading
             description
             location
+            selfPlacement
             votes
             voters
           }
@@ -902,7 +907,7 @@ const qids_base = {
             isLocal
             scaleMin
             scaleMax
-            places { data { id attributes { name } } }
+            cuntries { data { id attributes { name } } }
             creator { data { attributes { username email } } }
             positions {
               data {
@@ -915,7 +920,7 @@ const qids_base = {
                   authorExternalId
                   authorType
                   votes
-                  voters
+                  voters { data { id } }
                   location
                   intensity
                   order
@@ -937,7 +942,7 @@ const qids_base = {
   'ListLocalNegotiations': `
     query ListLocalNegotiations($placeId: ID!) {
       negotiations(filters: {
-        places: { id: { eq: $placeId } },
+        cuntries: { id: { eq: $placeId } },
         visibility: { in: ["local", "unlisted"] }
       }) {
         data {
@@ -1029,6 +1034,132 @@ const qids_base = {
         data {
           id
           attributes { votes voters body }
+        }
+      }
+    }
+  `,
+
+  // ── Issue / Clause qids (spec 2.0) ────────────────────────────────────────
+
+  // arg: { negotiationId }
+  'ListIssues': `
+    query ListIssues($negotiationId: ID!) {
+      issues(
+        filters: { negotiation: { id: { eq: $negotiationId } } }
+        sort: ["order:asc"]
+      ) {
+        data {
+          id
+          attributes {
+            title
+            order
+            origin
+          }
+        }
+      }
+    }
+  `,
+
+  // arg: { negotiationId }
+  // Returns all clauses for a negotiation. Filter by positionId client-side if needed.
+  'ListClauses': `
+    query ListClauses($negotiationId: ID!) {
+      clauses(
+        filters: { negotiation: { id: { eq: $negotiationId } } }
+      ) {
+        data {
+          id
+          attributes {
+            body
+            stanceValue
+            origin
+            confirmedByAuthor
+            position { data { id } }
+            issue { data { id attributes { title } } }
+          }
+        }
+      }
+    }
+  `,
+
+  // arg: { negotiationId, title, order, origin, publishedAt }
+  // origin: "ai" (AI-identified) | "human" (user-added manually)
+  'CreateIssue': `
+    mutation CreateIssue(
+      $negotiationId: ID!,
+      $title: String!,
+      $order: Int,
+      $origin: ENUM_ISSUE_ORIGIN,
+      $publishedAt: DateTime
+    ) {
+      createIssue(data: {
+        negotiation: $negotiationId,
+        title: $title,
+        order: $order,
+        origin: $origin,
+        publishedAt: $publishedAt
+      }) {
+        data { id }
+      }
+    }
+  `,
+
+  // arg: { negotiationId, positionId, issueId?, body, stanceValue, origin,
+  //        publishedAt, __identity (server injects authorExternalId/authorType) }
+  'CreateClause': `
+    mutation CreateClause(
+      $negotiationId: ID!,
+      $positionId: ID!,
+      $issueId: ID,
+      $body: String!,
+      $stanceValue: Int,
+      $origin: ENUM_CLAUSE_ORIGIN,
+      $authorExternalId: String,
+      $authorType: ENUM_CLAUSE_AUTHORTYPE,
+      $publishedAt: DateTime
+    ) {
+      createClause(data: {
+        negotiation: $negotiationId,
+        position: $positionId,
+        issue: $issueId,
+        body: $body,
+        stanceValue: $stanceValue,
+        origin: $origin,
+        authorExternalId: $authorExternalId,
+        authorType: $authorType,
+        confirmedByAuthor: false,
+        publishedAt: $publishedAt
+      }) {
+        data { id }
+      }
+    }
+  `,
+
+  // arg: { id, body?, stanceValue?, issueId?, confirmedByAuthor?, __identity }
+  // body/issueId: JWT-only (registered owner). stanceValue/confirmedByAuthor: author via service path.
+  // Server enforces ownership for service-path calls (pre-fetch check).
+  'UpdateClause': `
+    mutation UpdateClause(
+      $id: ID!,
+      $body: String,
+      $stanceValue: Int,
+      $issueId: ID,
+      $confirmedByAuthor: Boolean
+    ) {
+      updateClause(id: $id, data: {
+        body: $body,
+        stanceValue: $stanceValue,
+        issue: $issueId,
+        confirmedByAuthor: $confirmedByAuthor
+      }) {
+        data {
+          id
+          attributes {
+            body
+            stanceValue
+            confirmedByAuthor
+            issue { data { id } }
+          }
         }
       }
     }
@@ -1241,6 +1372,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           descrip
           spnot
           kindOf
+          recurring
+          cycleSize
           sqadualedf
           sqadualed
           linkto
@@ -1421,6 +1554,314 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }`,
 
+  "205getPlatformProject": `query GetPlatformProject {
+    projects(filters: { isPlatform: { eq: true } }, pagination: { limit: 1 }) {
+      data {
+        id
+        attributes {
+          projectName
+          profilePic { data { attributes { url } } }
+          user_1s { data { id } }
+        }
+      }
+    }
+  }`,
+
+  "206createPlatformSale": `mutation CreatePlatformSale($project: ID!, $userId: ID!, $amount: Float!, $publishedAt: DateTime!, $note: String, $product: ID) {
+    createSale(data: {
+      project: $project
+      users_permissions_user: $userId
+      matanot: $product
+      in: $amount
+      publishedAt: $publishedAt
+      note: $note
+    }) {
+      data {
+        id
+        attributes { in note }
+      }
+    }
+  }`,
+
+  // ── Site share — per-member contribution (PLAN_SITE_SHARE_PER_MEMBER §1) ──────
+  // The decision record (one per member+tosplit). des_status: pending|decided|skipped.
+  // Passthrough SiteShareContributionInput! so all fields flow regardless of the
+  // local generated schema. The personal transfer Haluka is created later (M4,
+  // receiving side) and linked back via `haluka`.
+  "207createSiteShareContribution": `mutation CreateSiteShareContribution($data: SiteShareContributionInput!) {
+    createSiteShareContribution(data: $data) {
+      data {
+        id
+        attributes { des_status amount direction }
+      }
+    }
+  }`,
+
+  "208updateSiteShareContribution": `mutation UpdateSiteShareContribution($id: ID!, $data: SiteShareContributionInput!) {
+    updateSiteShareContribution(id: $id, data: $data) {
+      data {
+        id
+        attributes { des_status amount direction }
+      }
+    }
+  }`,
+
+  // Upsert guard + aggregate source: the existing decision for this member+tosplit.
+  "209getSiteShareContributionByUserTosplit": `query GetSiteShareContributionByUserTosplit($user: ID!, $tosplit: ID!) {
+    siteShareContributions(
+      filters: { and: [
+        { users_permissions_user: { id: { eq: $user } } },
+        { tosplit: { id: { eq: $tosplit } } }
+      ] },
+      pagination: { limit: 1 }
+    ) {
+      data {
+        id
+        attributes { des_status amount direction proposedAmount basisAmount reason }
+      }
+    }
+  }`,
+
+  // Aggregate (§6): every member's decision for one tosplit — feeds the split
+  // card's "members gave ₪X · Y/N decided" line.
+  "210getSiteShareContributionsByTosplit": `query GetSiteShareContributionsByTosplit($tosplit: ID!) {
+    siteShareContributions(
+      filters: { tosplit: { id: { eq: $tosplit } } },
+      pagination: { limit: 200 }
+    ) {
+      data {
+        id
+        attributes {
+          des_status
+          amount
+          users_permissions_user { data { id } }
+        }
+      }
+    }
+  }`,
+
+  // Reminder (gate 3, §3): every OPEN (pending) decision for one member, with
+  // enough context to render the decision card inline (rikma name + basis).
+  "211getOpenSiteShareDecisions": `query GetOpenSiteShareDecisions($user: ID!) {
+    siteShareContributions(
+      filters: { and: [
+        { users_permissions_user: { id: { eq: $user } } },
+        { des_status: { eq: "pending" } }
+      ] },
+      pagination: { limit: 100 }
+    ) {
+      data {
+        id
+        attributes {
+          des_status
+          proposedAmount
+          basisAmount
+          recive_project { data { id } }
+          tosplit { data { id } }
+          project {
+            data {
+              id
+              attributes {
+                projectName
+                profilePic { data { attributes { url } } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  // M4 receiving side: the platform-income Sheirut for one source split (one per
+  // source_tosplit — the aggregation key). Returns its running total + volunteers.
+  "212getSiteShareIncomeSheirutByTosplit": `query GetSiteShareIncomeSheirutByTosplit($tosplit: ID!) {
+    sheiruts(
+      filters: { and: [
+        { source_tosplit: { id: { eq: $tosplit } } },
+        { isSiteShareIncome: { eq: true } }
+      ] },
+      pagination: { limit: 1 }
+    ) {
+      data {
+        id
+        attributes {
+          total
+          price
+          iCanGetMonay { data { id attributes { username } } }
+        }
+      }
+    }
+  }`,
+
+  // M4: generic Sheirut update (passthrough) — used to bump the income Sheirut's
+  // running total/price and link members as it accumulates.
+  "213updateSheirut": `mutation UpdateSheirut($id: ID!, $data: SheirutInput!) {
+    updateSheirut(id: $id, data: $data) {
+      data { id }
+    }
+  }`,
+
+  // M4: one site-share contribution by id — identity + state for the transfer flow
+  // (createSiteShareTransfer enforces decided & amount>0, idempotent on `haluka`).
+  "214getSiteShareContributionById": `query GetSiteShareContributionById($id: ID!) {
+    siteShareContribution(id: $id) {
+      data {
+        id
+        attributes {
+          des_status
+          amount
+          users_permissions_user { data { id } }
+          tosplit { data { id } }
+          project { data { id } }
+          recive_project { data { id } }
+          matbea { data { id } }
+          sheirut { data { id } }
+          haluka { data { id } }
+        }
+      }
+    }
+  }`,
+
+  // M4: this member's payable site-share contributions — decided & amount>0, with
+  // the income Sheirut + its volunteers, so the reminder can offer "pay now". The
+  // action drops any that already have a transfer Haluka (0/skip never lands here).
+  "215getSiteSharePayables": `query GetSiteSharePayables($user: ID!) {
+    siteShareContributions(
+      filters: { and: [
+        { users_permissions_user: { id: { eq: $user } } },
+        { des_status: { eq: "decided" } }
+      ] },
+      pagination: { limit: 100 }
+    ) {
+      data {
+        id
+        attributes {
+          amount
+          project { data { id } }
+          recive_project { data { id } }
+          haluka { data { id attributes {
+            senderconf
+            confirmed
+            amount
+            forum { data { id } }
+            userrecive { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          } } }
+          tosplit {
+            data { id attributes {
+              project { data { id attributes { projectName profilePic { data { attributes { url } } } } } }
+            } }
+          }
+          sheirut {
+            data { id attributes {
+              total
+              iCanGetMonay { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            } }
+          }
+        }
+      }
+    }
+  }`,
+
+  // M5 archive (giving side): every DECIDED contribution this rikma's members made
+  // (project = the giving rikma) — committed `amount` + the transfer Haluka's settle
+  // state — so the split-screen archive can show "what we gave to 1💗1", per member,
+  // all-time. des_status quoted (StringFilterInput, per the backend gotcha).
+  "216getSiteShareContributionsByGivingProject": `query GetSiteShareContributionsByGivingProject($project: ID!) {
+    siteShareContributions(
+      filters: { and: [
+        { project: { id: { eq: $project } } },
+        { des_status: { eq: "decided" } }
+      ] },
+      pagination: { limit: 500 }
+    ) {
+      data {
+        id
+        attributes {
+          amount
+          users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          haluka { data { id attributes {
+            senderconf
+            confirmed
+            amount
+            userrecive { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          } } }
+        }
+      }
+    }
+  }`,
+
+  // M5 archive (receiving side): every DECIDED contribution whose recive_project is
+  // the platform — for the main-rikma split screen: total in, who received how much
+  // (grouped by the transfer Haluka's userrecive), and a per-source-rikma breakdown
+  // (grouped by the giving `project`).
+  "217getSiteShareContributionsByReciveProject": `query GetSiteShareContributionsByReciveProject($recive: ID!) {
+    siteShareContributions(
+      filters: { and: [
+        { recive_project: { id: { eq: $recive } } },
+        { des_status: { eq: "decided" } }
+      ] },
+      pagination: { limit: 500 }
+    ) {
+      data {
+        id
+        attributes {
+          amount
+          project { data { id attributes { projectName profilePic { data { attributes { url } } } } } }
+          users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          haluka { data { id attributes {
+            senderconf
+            confirmed
+            amount
+            userrecive { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          } } }
+        }
+      }
+    }
+  }`,
+
+  // M5 archive (all splits): every tosplit the rikma has had (finished + open),
+  // newest first, with each member's fair-share allocation (`hervachti.amount` =
+  // "מגיע") + the transfer halukas. Feeds the comprehensive distribution archive:
+  // per-split "who got how much" + per-member all-time totals + grand total.
+  "218getRikmaSplitsArchive": `query GetRikmaSplitsArchive($project: ID!) {
+    project(id: $project) {
+      data {
+        id
+        attributes {
+          tosplits(pagination: { limit: 500 }, sort: ["createdAt:desc"]) {
+            data {
+              id
+              attributes {
+                name
+                prectentage
+                finished
+                createdAt
+                hervachti {
+                  amount
+                  noten
+                  mekabel
+                  users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+                }
+                halukas {
+                  data {
+                    id
+                    attributes {
+                      amount
+                      confirmed
+                      senderconf
+                      usersend { data { id attributes { username profilePic { data { attributes { url } } } } } }
+                      userrecive { data { id attributes { username profilePic { data { attributes { url } } } } } }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
   "67getMembersCount": `query GetMembersCount {
     chezins {
       meta {
@@ -1431,14 +1872,10 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }`,
 
-  "68updateTosplit": `mutation UpdateTosplit($id: ID!, $halukas: [ID], $hervachti: [ComponentProjectsHervachtiInput], $sales: [ID]) {
+  "68updateTosplit": `mutation UpdateTosplit($id: ID!, $data: TosplitInput!) {
     updateTosplit(
       id: $id,
-      data: {
-        halukas: $halukas,
-        hervachti: $hervachti,
-        sales: $sales
-      }
+      data: $data
     ) {
       data {
         id
@@ -1590,6 +2027,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           forum { data { id } }
           amount
           ushar
+          isSiteShare
+          recive_project { data { id } }
         }
       }
     }
@@ -1993,7 +2432,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       data {
         id
         attributes {
-          name descrip spnot kindOf hm price easy linkto sqadualed sqadualedf
+          name descrip spnot kindOf hm price easy linkto sqadualed sqadualedf recurring cycleSize
           mashaabim { data { id } }
           timegrama { data { id } }
           users {
@@ -2095,10 +2534,31 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         id
         attributes {
           name
+          quantityDelivered
+          cycleIndex
+          cycleStart
+          cycleEnd
+          mashabetahalich {
+            data {
+              id
+              attributes {
+                name
+                pricePerUnit
+                kindOf
+                quantityDelivered
+                users_permissions_user { data { id } }
+                rikmash { data { id } }
+                project { data { id } }
+                forums(pagination: { limit: 1 }) { data { id } }
+              }
+            }
+          }
+          timegrama { data { id attributes { date done } } }
           vots {
             id
             what
             why
+            order
             users_permissions_user { data { id } }
           }
           sp {
@@ -2895,6 +3355,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                     hm
                     name
                     easy
+                    recurring
+                    cycleSize
                   }
                 }
               }
@@ -2969,6 +3431,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           descrip
                           spnot
                           kindOf
+                          recurring
+                          cycleSize
                           users {
                             data {
                               id
@@ -3234,6 +3698,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                     iGotMoney { iGotMoney users_permissions_user { data { id } } }
                     moneyTransfered
                     productExepted
+                    isSiteShareIncome
                     weFinnish {
                       data {
                         id
@@ -3356,8 +3821,17 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           senderconf
                           confirmed
                           amount
+                          isSiteShare
                           forum { data { id } }
-                          usersend { data { id } }
+                          usersend {
+                            data {
+                              id
+                              attributes {
+                                username
+                                profilePic { data { attributes { url formats } } }
+                              }
+                            }
+                          }
                           userrecive {
                             data {
                               id
@@ -3501,6 +3975,12 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                     halukas {
                       data {
                         id
+                        attributes {
+                          amount
+                          confirmed
+                          usersend { data { id } }
+                          userrecive { data { id } }
+                        }
                       }
                     }
                     vots {
@@ -3522,6 +4002,30 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           id
                           attributes {
                             hervachti
+                          }
+                        }
+                      }
+                    }
+                    siteShareHalukas {
+                      data {
+                        id
+                        attributes {
+                          amount
+                          confirmed
+                          senderconf
+                          proposedAmount
+                          adjustDirection
+                          adjustReason
+                          usersend { data { id } }
+                          userrecive { data { id } }
+                          recive_project {
+                            data {
+                              id
+                              attributes {
+                                projectName
+                                profilePic { data { attributes { url } } }
+                              }
+                            }
                           }
                         }
                       }
@@ -3600,6 +4104,25 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                   attributes {
                     createdAt
                     name
+                    quantityDelivered
+                    cycleIndex
+                    cycleStart
+                    cycleEnd
+                    mashabetahalich {
+                      data {
+                        id
+                        attributes {
+                          name
+                          pricePerUnit
+                          kindOf
+                          start
+                          end
+                          status_mashab
+                          users_permissions_user { data { id } }
+                        }
+                      }
+                    }
+                    timegrama { data { id attributes { date done } } }
                     sp {
                       data {
                         id
@@ -3643,6 +4166,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                       what
                       why
                       id
+                      order
                       users_permissions_user {
                         data {
                           id
@@ -3667,6 +4191,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                     price
                     kindOf
                     spnot
+                    recurring
+                    cycleSize
                     location {
                       location_mode
                       lat
@@ -3689,6 +4215,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           price
                           kindOf
                           spnot
+                          recurring
+                          cycleSize
                           location {
                             location_mode
                             lat
@@ -3893,6 +4421,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           hm
                           name
                           easy
+                          recurring
+                          cycleSize
                         }
                       }
                     }
@@ -3909,6 +4439,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           kindOf
                           sqadualed
                           sqadualedf
+                          recurring
+                          cycleSize
                         }
                       }
                     }
@@ -7312,7 +7844,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $isOriginal: Boolean, $name: String, $descrip: String, $spnot: String,
     $easy: Float, $hm: Float, $price: Float, $kindOf: ENUM_NEGOMASH_KINDOF,
     $sqadualed: DateTime, $sqadualedf: DateTime, $linkto: String,
-    $location: [ComponentNewLocationInput]
+    $location: [ComponentNewLocationInput], $recurring: Boolean, $cycleSize: Int
   ) {
     createNegoMash(data: {
       publishedAt: $publishedAt
@@ -7330,15 +7862,224 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       sqadualedf: $sqadualedf
       linkto: $linkto
       location: $location
+      recurring: $recurring
+      cycleSize: $cycleSize
     }) { data { id } }
   }`,
 
   'negoUpdatePmash': `mutation NegoUpdatePmash($id: ID!, $data: PmashInput!) {
     updatePmash(id: $id, data: $data) { data { id } }
+  }`,
+
+  // ─── Open-resource (openMashaabim) candidate negotiation ───
+  // A candidate proposes parallel terms on an open resource. Each candidate has
+  // their own Askm; the proposed terms live as NegoMash rounds bound to that
+  // Askm — the shared OpenMashaabim is never overwritten.
+
+  // Create a NegoMash round. Works for both the internal pmash flow and the
+  // external candidate flow (open_mashaabim + askm), with round bookkeeping.
+  'negoCreateNegoMashRound': `mutation NegoCreateNegoMashRound(
+    $publishedAt: DateTime!, $userId: ID!,
+    $pmash: ID, $open_mashaabim: ID, $askm: ID,
+    $ordern: Int, $proposedBy: ENUM_NEGOMASH_PROPOSEDBY, $status: ENUM_NEGOMASH_STATUS,
+    $isOriginal: Boolean, $name: String, $descrip: String, $spnot: String,
+    $easy: Float, $hm: Float, $price: Float, $kindOf: ENUM_NEGOMASH_KINDOF,
+    $sqadualed: DateTime, $sqadualedf: DateTime, $linkto: String,
+    $location: [ComponentNewLocationInput]
+  ) {
+    createNegoMash(data: {
+      publishedAt: $publishedAt
+      users_permissions_user: $userId
+      pmash: $pmash
+      open_mashaabim: $open_mashaabim
+      askm: $askm
+      ordern: $ordern
+      proposedBy: $proposedBy
+      status: $status
+      isOriginal: $isOriginal
+      name: $name
+      descrip: $descrip
+      spnot: $spnot
+      easy: $easy
+      hm: $hm
+      price: $price
+      kindOf: $kindOf
+      sqadualed: $sqadualed
+      sqadualedf: $sqadualedf
+      linkto: $linkto
+      location: $location
+    }) { data { id } }
+  }`,
+
+  // Create an Askm already in negotiating state (candidate parallel proposal).
+  'createAskmWithNego': `mutation CreateAskmWithNego(
+    $publishedAt: DateTime!, $openMashaabimId: ID!, $projectId: ID!, $spId: ID!, $userId: ID!,
+    $vots: [ComponentProjectsVotsInput],
+    $negotiationStatus: ENUM_ASKM_NEGOTIATIONSTATUS, $turn: ENUM_ASKM_TURN, $currentRound: Int
+  ) {
+    createAskm(data: {
+      publishedAt: $publishedAt
+      open_mashaabim: $openMashaabimId
+      project: $projectId
+      sp: $spId
+      users_permissions_user: $userId
+      vots: $vots
+      negotiationStatus: $negotiationStatus
+      turn: $turn
+      currentRound: $currentRound
+    }) { data { id } }
+  }`,
+
+  // Advance an Askm negotiation (new vote round / counter / turn flip).
+  'updateAskmNegoState': `mutation UpdateAskmNegoState(
+    $id: ID!, $vots: [ComponentProjectsVotsInput],
+    $turn: ENUM_ASKM_TURN, $currentRound: Int, $negotiationStatus: ENUM_ASKM_NEGOTIATIONSTATUS
+  ) {
+    updateAskm(id: $id, data: {
+      vots: $vots
+      turn: $turn
+      currentRound: $currentRound
+      negotiationStatus: $negotiationStatus
+    }) { data { id } }
+  }`,
+
+  // Read an Askm's negotiation rounds (latest first) for the card / materialization.
+  'getAskmNegoRounds': `query GetAskmNegoRounds($id: ID!) {
+    askm(id: $id) { data { id attributes {
+      currentRound turn negotiationStatus
+      nego_mashes(sort: "ordern:desc") { data { id attributes {
+        ordern proposedBy status name descrip spnot
+        easy hm price kindOf sqadualed sqadualedf linkto
+      } } }
+    } } }
   }`
 };
 
 export const moachQids = {
+  // ─── Monthly recurring resources (mashabetahalich cyclic engine) ──────────
+  // A "mashabetahalich" with recurring=true is a recurring expense (server rent,
+  // apartment, stall…). Each month /api/monthi opens a cycle (a Maap with
+  // cycleIndex/cycleStart/cycleEnd) that surfaces on the lev screen; once the
+  // responsible user confirms the amount and the project approves it, the spend
+  // is archived as a delivery line on the resource's Rikmash.
+  'mrCreateMashabetahalich': `mutation MrCreateMashabetahalich($data: MashabetahalichInput!) {
+    createMashabetahalich(data: $data) { data { id attributes { name } } }
+  }`,
+  'mrUpdateMashabetahalich': `mutation MrUpdateMashabetahalich($id: ID!, $data: MashabetahalichInput!) {
+    updateMashabetahalich(id: $id, data: $data) { data { id attributes { status_mashab finnished } } }
+  }`,
+  'mrGetMashabetahalich': `query MrGetMashabetahalich($id: ID!) {
+    mashabetahalich(id: $id) {
+      data { id attributes {
+        name descrip pricePerUnit start end cycleSize kindOf recurring status_mashab
+        finnished quantityDelivered
+        project { data { id attributes { user_1s { data { id } } } } }
+        users_permissions_user { data { id attributes { username email lang noMail } } }
+        maaps { data { id attributes { cycleIndex cycleStart cycleEnd archived } } }
+        rikmash { data { id } }
+      } }
+    }
+  }`,
+  // Used by /api/monthi: every active, non-finished recurring resource.
+  'mrGetRecurringForMonthi': `query MrGetRecurringForMonthi {
+    mashabetahaliches(
+      filters: { recurring: { eq: true }, status_mashab: { eq: "active" }, finnished: { eq: false } }
+      pagination: { limit: 300 }
+    ) {
+      data { id attributes {
+        name pricePerUnit start end cycleSize kindOf
+        project { data { id attributes { projectName user_1s { data { id } } } } }
+        users_permissions_user { data { id attributes { username email lang noMail } } }
+        maaps(pagination: { limit: 500 }) { data { id attributes { cycleIndex cycleStart cycleEnd archived } } }
+        rikmash { data { id } }
+      } }
+    }
+  }`,
+  'mrCreateCycleMaap': `mutation MrCreateCycleMaap($data: MaapInput!) {
+    createMaap(data: $data) { data { id attributes { cycleIndex } } }
+  }`,
+  'mrGetRikmashForDelivery': `query MrGetRikmashForDelivery($id: ID!) {
+    rikmash(id: $id) {
+      data { id attributes {
+        total cyclesCount firstDeliveryAt lastDeliveryAt
+        deliveries { id cycleIndex deliveredAt quantity note maap { data { id } } }
+      } }
+    }
+  }`,
+  'mrCreateRikmash': `mutation MrCreateRikmash($data: RikmashInput!) {
+    createRikmash(data: $data) { data { id } }
+  }`,
+  'mrUpdateRikmash': `mutation MrUpdateRikmash($id: ID!, $data: RikmashInput!) {
+    updateRikmash(id: $id, data: $data) { data { id } }
+  }`,
+  'mrLinkRikmashToMashabetahalich': `mutation MrLinkRikmash($id: ID!, $rikmash: ID!) {
+    updateMashabetahalich(id: $id, data: { rikmash: $rikmash }) { data { id } }
+  }`,
+  // Resolve the approved recurring Pmash's final (possibly negotiated) terms so
+  // askm approval can spin up the mashabetahalich engine. Matched by project +
+  // name; only returns when the final pmash is still flagged recurring, so a
+  // member negotiating recurring → false cleanly results in no engine.
+  'mrGetPmashRecurringTerms': `query MrGetPmashRecurringTerms($pid: ID!, $name: String!) {
+    pmashes(
+      filters: {
+        project: { id: { eq: $pid } }
+        name: { eq: $name }
+        recurring: { eq: true }
+      }
+      sort: ["createdAt:desc"]
+      pagination: { limit: 1 }
+    ) {
+      data { id attributes {
+        recurring cycleSize easy price kindOf sqadualed sqadualedf
+        mashaabim { data { id } }
+      } }
+    }
+  }`,
+  'mrUpdateCycleMaap': `mutation MrUpdateCycleMaap($id: ID!, $data: MaapInput!) {
+    updateMaap(id: $id, data: $data) { data { id } }
+  }`,
+  // Each monthly cycle Maap gets its own Timegrama (deadline). When it elapses the
+  // clients auto-approve the reported amount; a counter-offer resets the date.
+  'mrCreateCycleTimegrama': `mutation MrCreateCycleTimegrama($date: DateTime!, $maapId: ID!) {
+    createTimegrama(data: { date: $date, done: false, whatami: "maap", maap: $maapId }) {
+      data { id }
+    }
+  }`,
+  'mrLinkMaapTimegrama': `mutation MrLinkMaapTimegrama($id: ID!, $timegrama: ID!) {
+    updateMaap(id: $id, data: { timegrama: $timegrama }) { data { id } }
+  }`,
+  // Snapshot of a counter-offer on a recurring cycle: old amount + proposed amount
+  // + who/why/cycle in des(JSON). Requires a `maap` relation on the Nego collection.
+  'mrCreateNego': `mutation MrCreateNego($maapId: ID!, $price: Float, $proposedPrice: Float, $des: JSON, $publishedAt: DateTime) {
+    createNego(data: { maap: $maapId, price: $price, proposedPrice: $proposedPrice, des: $des, publishedAt: $publishedAt }) {
+      data { id }
+    }
+  }`,
+  // The engine's chat forum (for posting counter-offer reasons). May not exist yet.
+  'mrGetMashabForum': `query MrGetMashabForum($id: ID!) {
+    mashabetahalich(id: $id) {
+      data { id attributes {
+        name
+        project { data { id } }
+        forums(pagination: { limit: 1 }) { data { id } }
+      } }
+    }
+  }`,
+  'mrCreateForumMashab': `mutation MrCreateForumMashab($pid: ID, $mashabId: ID, $da: DateTime) {
+    createForum(data: { project: $pid, mashabetahalich: $mashabId, publishedAt: $da }) {
+      data { id }
+    }
+  }`,
+  'mrGetProjectRestime': `query MrGetProjectRestime($pid: ID!) {
+    project(id: $pid) { data { id attributes { restime } } }
+  }`,
+  'mrSetTimegramaDone': `mutation MrSetTimegramaDone($id: ID!, $done: Boolean!) {
+    updateTimegrama(id: $id, data: { done: $done }) { data { id } }
+  }`,
+  'mrResetTimegrama': `mutation MrResetTimegrama($id: ID!, $date: DateTime!) {
+    updateTimegrama(id: $id, data: { date: $date, done: false }) { data { id } }
+  }`,
+
   'getProjectBaseInfo': `query GetProjectBaseInfo($pid: ID!) {
     project(id: $pid) {
       data {
@@ -7581,6 +8322,8 @@ export const moachQids = {
                 name prectentage halukas { data { id attributes { confirmed userrecive { data { id } } amount usersend { data { id } } } } }
                 hervachti { users_permissions_user { data { id attributes { hervachti } } } noten mekabel amount }
                 vots { what users_permissions_user { data { id } } }
+                sales { data { id } }
+                siteShareHalukas { data { id attributes { amount confirmed usersend { data { id } } userrecive { data { id } } } } }
               }
             }
           }

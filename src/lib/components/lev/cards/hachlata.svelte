@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import { toggleScrollable, isScrolable } from './isScrolable.svelte.js';
   import tr from '$lib/translations/tr.json';
   import { onMount } from 'svelte';
@@ -119,7 +120,7 @@
   onkeypress={(e) => {
     e.key === 'Enter' && toggleScrollable();
   }}
-  dir={$lang == 'he' ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   style="overflow-y:auto"
   class="d {isMobileOrTablet()
     ? 'w-full h-full'

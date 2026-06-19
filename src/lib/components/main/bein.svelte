@@ -1,9 +1,7 @@
-<script>
+﻿<script>
   import { userName } from '../../stores/store.js';
   import { show } from '../registration/store-show.js';
   import { goto } from '$app/navigation';
-  import Hello from '../registration/hello.svelte';
-  import Password from '../registration/password.svelte';
   import { lang } from '$lib/stores/lang.js';
   import { scale, fly } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
@@ -17,15 +15,15 @@
   import { workways1 } from '../registration/workways1.js';
   import { valluss } from '../registration/valluss.js';
   import { get } from 'svelte/store';
-  import { locale, t } from '$lib/translations';
+  import { locale, t, isRtl} from '$lib/translations';
 
   let show_value = $state(0);
   show.subscribe((newValue) => {
     show_value = newValue;
   });
 
-  /** @type {{ idx?: number, mode?: "registration" | "onboarding" }} */
-  let { idx = 1, mode = 'registration' } = $props();
+  /** @type {{ mode?: "registration" | "onboarding" }} */
+  let { mode = 'onboarding' } = $props();
 
   // Onboarding mode skips the Password step. We persist the wizard's stores to
   // the user profile when step 4 → 5 completes, then redirect to /onboard/done.
@@ -96,14 +94,9 @@
     }
   }
 
-  let title = $derived($t('home.bein.title'));
-  let tu = $derived($t('home.bein.confirmEmail'));
-  let see = $derived($t('home.bein.seeSoon'));
-  const buttn = $derived($t('home.bein.contactMessage'));
 </script>
 
 <svelte:head>
-  <title>{title}</title>
   <link
     href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Heebo:wght@300;400;600;700&display=swap"
     rel="stylesheet"
@@ -111,7 +104,7 @@
 </svelte:head>
 
 <div
-  dir={$lang === 'en' ? 'ltr' : 'rtl'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   class="page-shell"
   bind:clientWidth={w}
   in:scale={{
@@ -134,7 +127,7 @@
   {#if (mode === 'onboarding' && show_value >= 1 && show_value <= 4) || (mode === 'registration' && show_value >= 1 && show_value <= 5)}
     <div
       class="journey-strip"
-      dir={$lang === 'en' ? 'ltr' : 'rtl'}
+      dir={$isRtl ? 'rtl' : 'ltr'}
       in:fly={{ y: 30, duration: 700, easing: quintOut }}
     >
       <!-- START: Flag -->
@@ -250,7 +243,7 @@
   <!-- ══════════════════════════════════════════
        GLASS CARD
   ═══════════════════════════════════════════ -->
-  <div dir={$lang === 'en' ? 'ltr' : 'rtl'} class="glass-stage">
+  <div dir={$isRtl ? 'rtl' : 'ltr'} class="glass-stage">
     <!-- Shimmer edge -->
     <div class="card-shim"></div>
 
@@ -258,7 +251,7 @@
     {#if (mode === 'onboarding' && show_value >= 1 && show_value <= 4) || (mode === 'registration' && show_value >= 1 && show_value <= 5)}
       <nav
         class="tabs-bar"
-        dir={$lang === 'en' ? 'ltr' : 'rtl'}
+        dir={$isRtl ? 'rtl' : 'ltr'}
         in:fly={{ y: -8, duration: 450 }}
       >
         {#each tabDefs as tab}
@@ -286,27 +279,10 @@
 
     <!-- STEP CONTENT -->
     <div class="steps-area">
-      {#if show_value === 0 && mode !== 'onboarding'}
-        <!-- Step 0 (Hello/greeting) is registration-only.
-             In onboarding mode the manual/+page.svelte onMount guards
-             against show < 1, so this branch is never reached. -->
+      {#if show_value === 1}
         <div
           class="step-wrap"
-          in:fly={{
-            x: 50,
-            duration: 900,
-            delay: 100,
-            opacity: 0,
-            easing: quintOut
-          }}
-          out:fly={{ x: -50, duration: 600, opacity: 0, easing: quintOut }}
-        >
-          <Hello {idx} onProgres={add} />
-        </div>
-      {:else if show_value === 1}
-        <div
-          class="step-wrap"
-          dir={$lang === 'en' ? 'ltr' : 'rtl'}
+          dir={$isRtl ? 'rtl' : 'ltr'}
           in:fly={{
             x: 50,
             duration: 900,
@@ -321,7 +297,7 @@
       {:else if show_value === 2}
         <div
           class="step-wrap"
-          dir={$lang === 'en' ? 'ltr' : 'rtl'}
+          dir={$isRtl ? 'rtl' : 'ltr'}
           in:fly={{
             x: 50,
             duration: 900,
@@ -336,7 +312,7 @@
       {:else if show_value === 3}
         <div
           class="step-wrap"
-          dir={$lang === 'en' ? 'ltr' : 'rtl'}
+          dir={$isRtl ? 'rtl' : 'ltr'}
           in:fly={{
             x: 50,
             duration: 900,
@@ -351,7 +327,7 @@
       {:else if show_value === 4}
         <div
           class="step-wrap"
-          dir={$lang === 'en' ? 'ltr' : 'rtl'}
+          dir={$isRtl ? 'rtl' : 'ltr'}
           in:fly={{
             x: 50,
             duration: 900,
@@ -362,43 +338,6 @@
           out:fly={{ x: -50, duration: 600, opacity: 0, easing: quintOut }}
         >
           <Workways onProgres={add} />
-        </div>
-      {:else if show_value === 5}
-        <div
-          class="step-wrap"
-          dir={$lang === 'en' ? 'ltr' : 'rtl'}
-          in:fly={{
-            x: 50,
-            duration: 900,
-            delay: 100,
-            opacity: 0,
-            easing: quintOut
-          }}
-          out:fly={{ x: -50, duration: 600, opacity: 0, easing: quintOut }}
-        >
-          <Password onProgres={add} />
-        </div>
-      {:else if show_value === 6}
-        <div
-          class="step-wrap success-wrap"
-          in:fly={{
-            x: 50,
-            duration: 900,
-            delay: 100,
-            opacity: 0,
-            easing: quintOut
-          }}
-          out:fly={{ x: -50, duration: 600, opacity: 0, easing: quintOut }}
-        >
-          <div class="success-card" dir={$lang === 'en' ? 'ltr' : 'rtl'}>
-            <div class="success-heart">💗</div>
-            <h1 class="success-title">{tu}</h1>
-            <p class="success-name">{$userName}</p>
-            <p class="success-sub">{see}</p>
-            <a href="mailto:baruch@1lev1.com" class="contact-link"
-              >{buttn}</a
-            >
-          </div>
         </div>
       {/if}
     </div>
@@ -764,16 +703,11 @@
   /* ── Step wrapper ── */
   .step-wrap {
     width: 100%;
-    display: grid;
-    grid-template-columns: auto auto auto auto;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 4px 14px;
-    min-height: 370px;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639592319/love_nnzswg.svg);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: contain;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px 16px 16px;
+    min-height: 280px;
   }
 
   .steps-area {
@@ -784,80 +718,6 @@
 
   .steps-area > :global(.step-wrap) {
     grid-area: 1 / 1;
-  }
-
-  /* ── Success ── */
-  .success-wrap {
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-  }
-  .success-card {
-    text-align: center;
-    padding: 32px 24px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(12px);
-    border-radius: 24px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-    max-width: 90%;
-  }
-  .success-heart {
-    font-size: 3.5rem;
-    animation: hb 1.4s ease-in-out infinite;
-  }
-  @keyframes hb {
-    0%,
-    100% {
-      transform: scale(1);
-    }
-    30% {
-      transform: scale(1.15);
-    }
-    60% {
-      transform: scale(1.06);
-    }
-  }
-  .success-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #c8860a;
-    line-height: 1.3;
-  }
-  .success-name {
-    font-size: 1.2rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #daa520, #e91e8c);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .success-sub {
-    font-size: 0.9rem;
-    color: #8b6914;
-    font-style: italic;
-  }
-  .contact-link {
-    margin-top: 12px;
-    padding: 10px 24px;
-    border-radius: 99px;
-    background: linear-gradient(135deg, #daa520, #e91e8c);
-    color: #fff;
-    font-size: 0.82rem;
-    font-weight: 700;
-    text-decoration: none;
-    box-shadow: 0 4px 16px rgba(218, 165, 32, 0.32);
-    transition:
-      transform 0.2s,
-      box-shadow 0.2s;
-  }
-  .contact-link:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(218, 165, 32, 0.48);
   }
 
   /* ── Responsive ── */

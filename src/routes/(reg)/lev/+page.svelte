@@ -30,6 +30,8 @@
   import Coinsui from '$lib/components/lev/newcoinui.svelte';
   import Cardsui from '$lib/components/lev/cards/cards.svelte';
   import Tooltip from '$lib/celim/tooltip.svelte';
+  import { siteSharePayablesStore, openSiteShareDecisionsStore } from '$lib/stores/levStores';
+  import { executeAction } from '$lib/client/actionClient';
 
   // Dialog components
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
@@ -118,6 +120,32 @@
     isCardsView.set(event.cards);
   }
 
+  // M4 receiving side: load committed-but-unpaid site-share contributions so they
+  // surface as cards in the swiper (replaces the old top-of-page banner).
+  async function loadSiteSharePayables() {
+    try {
+      const res = await executeAction('getSiteSharePayables', {});
+      if (res?.success) {
+        siteSharePayablesStore.set(res.data?.payables ?? []);
+      }
+    } catch (e) {
+      console.error('[SiteShare] load payables failed:', e);
+    }
+  }
+
+  // Gate 3 (§3): open (pending) decisions whose split already auto-approved.
+  // The pipeline only surfaces a card for those NOT shown as a haluka card.
+  async function loadOpenSiteShareDecisions() {
+    try {
+      const res = await executeAction('getOpenSiteShareDecisions', {});
+      if (res?.success) {
+        openSiteShareDecisionsStore.set(res.data?.decisions ?? []);
+      }
+    } catch (e) {
+      console.error('[SiteShare] load open decisions failed:', e);
+    }
+  }
+
   function handleCoinLapach(event) {
     // Remove item from display optimistically
     displayItems = displayItems.filter(
@@ -189,6 +217,10 @@
 
       // Setup socket listeners using new architecture
       unsubscribeSocket = setupSocketListeners(page.data.uid, '', data.lang);
+
+      // Load site-share payables + open decisions into the swiper (non-blocking)
+      loadSiteSharePayables();
+      loadOpenSiteShareDecisions();
 
       loading = false;
       console.log('✅ LEV PAGE INITIALIZED SUCCESSFULLY');

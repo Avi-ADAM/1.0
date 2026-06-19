@@ -14,7 +14,9 @@ import type {
   DecisionData,
   ProjectData,
   ProductRequestData,
-  SaleData
+  SaleData,
+  SiteSharePayableData,
+  OpenSiteShareDecisionData
 } from '$lib/stores/levStores';
 // @ts-ignore
 import { createProjectInfo, createUserInfo, getProjectMembers, getProjectUsers, getProjectRestime } from '$lib/utils/projectHelpers.js';
@@ -1481,6 +1483,12 @@ export function processPmashes(
       sqadualed: pmash.sqadualed,
       sqadualedf: pmash.sqadualedf,
 
+      // Recurring expense flags (open-ended monthly/yearly cost, approved monthly)
+      recurring: pmash.recurring === true,
+      recurringNoEnd: pmash.recurringNoEnd === true,
+      cycleSize: pmash.cycleSize ?? 1,
+      pricePerUnit: pmash.pricePerUnit,
+
       // Timegrama
       timegramaId: pmash.timegramaId,
       timeGramaDate: pmash.timegramaDate,
@@ -1557,26 +1565,32 @@ export function processWegets(
     let whyes: string[] = [];
     let what: boolean[] = [];
 
-    // Process votes - first pass to collect uids and what array
-    for (const u of users) {
+    // Vote rounds: a counter-offer (submitNegoMaap) casts the proposer's vote at
+    // order+1, so the highest order is the current round. Regular maaps have no
+    // negotiation, so every vote stays at order 0 and this collapses to "all
+    // votes" — identical to the old behaviour.
+    const orderon = users.reduce((max: number, u: any) => Math.max(max, u.order || 0), 0);
+    const votesThisRound = users.filter((u: any) => (u.order || 0) === orderon);
+
+    // Process votes - first pass to collect uids and what array (current round)
+    for (const u of votesThisRound) {
       if (u.users_permissions_user?.data?.id) {
         uids.push(u.users_permissions_user.data.id);
       }
       what.push(u.what);
     }
 
-    // Check if I voted
+    // Check if I voted in the current round
     if (myid && uids.includes(myid)) {
       already = true;
-      // Find my position
-      const myVote = users.find((u: any) => u.users_permissions_user?.data?.id === myid);
+      const myVote = votesThisRound.find((u: any) => u.users_permissions_user?.data?.id === myid);
       if (myVote) {
         mypos = myVote.what;
       }
     }
 
-    // Count votes
-    for (const u of users) {
+    // Count votes (current round only)
+    for (const u of votesThisRound) {
       if (u.what === true) {
         noofusersOk++;
         if (u.why) whyes.push(u.why);
@@ -1587,7 +1601,7 @@ export function processWegets(
     }
 
     const memberCount = projectInfo.noof || 0;
-    const noofusersWaiting = memberCount - users.length;
+    const noofusersWaiting = memberCount - votesThisRound.length;
 
     // Votes awaiting my action; drop to the done band once I've voted.
     const basePriority = votePriority(already, users.length);
@@ -1643,7 +1657,23 @@ export function processWegets(
       noofusersNo,
       whyno,
       whyes,
-      noofusersWaiting
+      noofusersWaiting,
+
+      // Current voting round (advanced by a counter-offer)
+      orderon,
+
+      // Recurring monthly resource cycle fields
+      isRecurringCycle: weget.isRecurringCycle === true,
+      mashabetahalichId: weget.mashabetahalichId,
+      cycleIndex: weget.cycleIndex,
+      cycleStart: weget.cycleStart,
+      cycleEnd: weget.cycleEnd,
+      quantityDelivered: weget.quantityDelivered,
+      pricePerUnit: weget.pricePerUnit,
+      responsibleUserId: weget.responsibleUserId,
+      timegramaId: weget.timegramaId,
+      timegramaDate: weget.timegramaDate,
+      timegramaDone: weget.timegramaDone
     };
   });
 }
@@ -1729,6 +1759,10 @@ export function processHalukas(
       uids: uids,
       halukot: haluka.halukot,
       hervach: haluka.hervach,
+      // Platform (1💗1) service-share line for this proposal, if present
+      // (SITE_SHARE_TRANSFER_SPEC.md §7). undefined when the cross-rikma schema
+      // isn't live — the card then shows no platform row.
+      siteShare: haluka.siteShare,
 
       // Status
       already,
@@ -2258,6 +2292,90 @@ export function processPurchases(
  * @param arrays - Variable number of display item arrays to merge
  * @returns Single sorted array of all display items
  */
+/**
+ * Process committed-but-unpaid site-share contributions into display items.
+ *
+ * Each payable becomes a card prompting the member to pick a volunteer receiver
+ * and send the transfer. These need the member's action, so they sit in the
+ * VOTE_PENDING band (just after votes awaiting me). The card uses the GIVING
+ * rikma's branding (rikmaName/rikmaLogo) since that's where the obligation arose.
+ *
+ * Pure function; does not modify input.
+ */
+export function processSiteSharePayables(
+  payables: SiteSharePayableData[],
+  projects: ProjectData[]
+): DisplayItem[] {
+  if (!payables || !Array.isArray(payables)) {
+    return [];
+  }
+
+  return payables.map(p => {
+    const projectInfo = createProjectInfo(p.projectId);
+
+    return {
+      // Common display fields
+      ani: 'sitesharepay',
+      azmi: 'sitesharepay',
+      pl: PRIORITY_BAND.VOTE_PENDING + 20,
+      coinlapach: `sitesharepay-${p.contributionId}`,
+      // Project info (falls back to the payload's rikma branding)
+      ...projectInfo,
+      projectId: p.projectId,
+      projectName: p.rikmaName || projectInfo.projectName || '',
+      src: p.rikmaLogo || projectInfo.src2 || '',
+
+      // Pass through all payable fields (contributionId, amount, volunteers, …)
+      ...p
+    };
+  });
+}
+
+/**
+ * Open (pending) site-share decisions whose split is NO LONGER shown as a haluka
+ * card (it auto-approved by time). Each surfaces as a dedicated swiper card that
+ * explains the already-approved split and asks the member to ratify their giving.
+ *
+ * `activeHalukaTosplitIds` is the set of tosplit ids currently rendered as haluka
+ * cards (their gate-2 decision row already covers the member). We EXCLUDE any
+ * decision whose tosplit is in that set, so the member never sees the same
+ * decision twice — only the orphaned ones get this card.
+ *
+ * Pure function; does not modify input.
+ */
+export function processOpenSiteShareDecisions(
+  decisions: OpenSiteShareDecisionData[],
+  projects: ProjectData[],
+  activeHalukaTosplitIds: Set<string> = new Set()
+): DisplayItem[] {
+  if (!decisions || !Array.isArray(decisions)) {
+    return [];
+  }
+
+  return decisions
+    .filter(d => !activeHalukaTosplitIds.has(String(d.tosplitId)))
+    .map(d => {
+      const projectInfo = createProjectInfo(d.projectId);
+
+      return {
+        // Common display fields
+        ani: 'sitesharedecide',
+        azmi: 'sitesharedecide',
+        // Just after votes awaiting me, alongside the payables band.
+        pl: PRIORITY_BAND.VOTE_PENDING + 21,
+        coinlapach: `sitesharedecide-${d.contributionId}`,
+        // Project info (falls back to the decision's rikma branding)
+        ...projectInfo,
+        projectId: d.projectId,
+        projectName: d.projectName || projectInfo.projectName || '',
+        src: d.projectLogo || projectInfo.src2 || '',
+
+        // Pass through decision fields (contributionId, tosplitId, amounts, …)
+        ...d
+      };
+    });
+}
+
 export function mergeAndSort(...arrays: DisplayItem[][]): DisplayItem[] {
   // Flatten all arrays into one
   const merged = arrays.flat();

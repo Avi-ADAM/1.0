@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import MultiSelect from 'svelte-multiselect';
   import { valluesStore } from '$lib/components/prPr/mi.js';
   import { lang } from '$lib/stores/lang.js';
@@ -258,7 +259,7 @@
 
 <div
   class="value-selector-container max-w-full text-right sm:text-right"
-  dir={$lang === 'en' ? 'ltr' : 'rtl'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   style="--the:var({color});"
 >
   <MultiSelect

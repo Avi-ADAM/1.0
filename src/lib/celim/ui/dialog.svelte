@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
     //jsdoc format docomentation
     /**
      * @file dialog.svelte
@@ -79,7 +80,7 @@
       aria-label="timer-options"
       class="timer-dialog"
     >
-      <div class="dialog-content" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
+      <div class="dialog-content" dir={$isRtl ? 'rtl' : 'ltr'}>
         <h2 class="dialog-title">{dialogHeader[$lang]}</h2>
         <p class="dialog-message">
           {innerText[$lang]}

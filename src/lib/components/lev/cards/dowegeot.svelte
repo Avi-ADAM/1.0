@@ -1,6 +1,6 @@
-<script>
+﻿<script>
   import { lang } from '$lib/stores/lang.js';
-  import { t } from '$lib/translations';
+  import { t, isRtl} from '$lib/translations';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte';
@@ -36,6 +36,7 @@
    * @property {(payload: { alr: any, y: string }) => void} [onAgree]
    * @property {(payload: { alr: any, y: string }) => void} [onDecline]
    * @property {(payload: { alr: any, y: string }) => void} [onNego]
+   * @property {(payload: { amount: number }) => void} [onReport]
    * @property {() => void} [onTochat]
    * @property {string} [glowColor]
    * @property {Array} [user_1s]
@@ -43,6 +44,13 @@
    * @property {number} [activeOrder]
    * @property {Function} [onProj]
    * @property {number} [noOfusers]
+   * @property {boolean} [isRecurringCycle]
+   * @property {boolean} [cycleReported]
+   * @property {any} [cycleIndex]
+   * @property {number} [quantityDelivered]
+   * @property {number} [pricePerUnit]
+   * @property {boolean} [isResponsible]
+   * @property {boolean} [awaitingReport]
    */
 
   /** @type {Props} */
@@ -69,6 +77,7 @@
     onAgree,
     onDecline,
     onNego,
+    onReport,
     onTochat,
     // Modern Props
     glowColor = 'teal',
@@ -76,13 +85,33 @@
     projectId,
     activeOrder = 0,
     onProj,
-    noOfusers = 0
+    noOfusers = 0,
+    // Recurring monthly resource cycle (mashabetahalich engine)
+    isRecurringCycle = false,
+    cycleReported = false,
+    cycleIndex,
+    quantityDelivered = 0,
+    pricePerUnit = 0,
+    isResponsible = false,
+    awaitingReport = false
   } = $props();
   let user_1s = $derived.by(() => {
     return getProjectData(projectId, 'us') || [];
   });
   function hover(x) {
     onHover?.({ x: x });
+  }
+  /** Inline bilingual helper for the recurring-cycle strings. */
+  const he = (h, e) => ($lang === 'he' ? h : e);
+  // The responsible owner types this month's actual spend right on the card.
+  // `reportInput` is null until the owner edits it; until then we show the
+  // reported/planned default, so no $effect-seeding is needed.
+  let reportInput = $state(/** @type {number | null} */ (null));
+  const plannedDefault = $derived(Number(quantityDelivered || pricePerUnit || 0));
+  const effectiveAmount = $derived(reportInput ?? plannedDefault);
+  function report() {
+    already = true;
+    onReport?.({ amount: Number(effectiveAmount) || 0 });
   }
   function agree(alr) {
     already = true;
@@ -121,7 +150,7 @@
   onkeypress={(e) => {
     e.key === 'Enter' && toggleScrollable();
   }}
-  dir={$lang == 'he' ? 'rtl' : 'ltr'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   style="overflow-y:auto"
   class="{isMobileOrTablet()
     ? 'w-full h-full'
@@ -208,7 +237,54 @@
           src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg"
           alt="howmuch"
         />
-        {#if kindOf === 'perUnit'}
+        {#if isRecurringCycle}
+          <div class="flex flex-col gap-2 w-full">
+            <span class="font-bold text-base">
+              🔁 {he('הוצאה חודשית חוזרת', 'Recurring monthly expense')}
+              {#if cycleIndex}<span style="color:var(--barbi-pink)"> · {he('מחזור', 'cycle')} #{cycleIndex}</span>{/if}
+            </span>
+            {#if isResponsible}
+              <!-- The owner reports the actual spend right here. -->
+              <label class="flex flex-col gap-1 text-sm text-gray-700 dark:text-gray-300">
+                {he('כמה הוצאת החודש?', 'How much did you spend this month?')}
+                <span class="flex items-center gap-2">
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={effectiveAmount}
+                    oninput={(e) => (reportInput = Number(e.currentTarget.value))}
+                    class="w-32 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-2 py-1 text-base text-gray-900 dark:text-gray-100"
+                    placeholder={`~${pricePerUnit}`}
+                  />
+                  <span class="font-bold">₪</span>
+                </span>
+                <span class="text-xs text-gray-500">
+                  {he('מתוכנן', 'planned')}: ~{pricePerUnit.toLocaleString('en-US', { maximumFractionDigits: 2 })} ₪
+                </span>
+              </label>
+            {:else if cycleReported}
+              <!-- Members approve the spend the responsible owner reported. -->
+              <div class="flex flex-col gap-0.5">
+                <span class="text-sm text-gray-700 dark:text-gray-300">
+                  {he('לאישור — ההוצאה החודשית שדיווח', 'To approve — the monthly expense reported by')}
+                  <span class="font-bold">{useraplyname}</span>:
+                </span>
+                <span style="color:var(--barbi-pink)" class="font-extrabold text-2xl">
+                  {quantityDelivered.toLocaleString('en-US', { maximumFractionDigits: 2 })} ₪
+                </span>
+                <span class="text-xs text-gray-500">
+                  {he('עבור', 'for')} {missionBName}{#if cycleIndex} · {he('מחזור', 'cycle')} #{cycleIndex}{/if}
+                </span>
+              </div>
+            {:else}
+              <span style="color:#9aa0a6;">
+                ~{pricePerUnit.toLocaleString('en-US', { maximumFractionDigits: 2 })} ₪
+                {he('(טרם דווח ע"י האחראי)', '(not yet reported by the responsible member)')}
+              </span>
+            {/if}
+          </div>
+        {:else if kindOf === 'perUnit'}
           <p>
             <span
               onmouseenter={() =>
@@ -342,23 +418,43 @@
     class="p-4 bg-gray-50 dark:bg-gray-900/50 flex gap-3 border-t border-gray-100 dark:border-gray-700"
   >
     {#if low == false}
-      {#if already === false && allr === false}
-        <button
-          class="flex-1 py-2 flex justify-center items-center bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 font-bold rounded-xl transition-all"
-          onclick={() => decline('f')}
-          onmouseenter={() => hover({ he: 'התנגדות', en: 'objection' })}
-          onmouseleave={() => hover('0')}
-        >
-          <No />
-        </button>
-        <button
-          class="flex-2 py-2 flex justify-center items-center bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
-          onclick={() => agree('f')}
-          onmouseenter={() => hover({ he: 'אישור', en: 'appruve' })}
-          onmouseleave={() => hover('0')}
-        >
-          <Lev />
-        </button>
+      {#if awaitingReport}
+        <p class="flex-1 text-center text-sm text-gray-500 dark:text-gray-400 py-2">
+          ⏳ {he('ניתן לאשר רק לאחר שהאחראי ידווח את ההוצאה החודשית', 'You can approve only after the responsible member reports this month\'s spend')}
+        </p>
+      {:else if already === false && allr === false}
+        {#if isRecurringCycle && isResponsible}
+          <!-- The responsible owner reports the actual spend (counts as YES). -->
+          <button
+            class="flex-1 py-2 px-4 flex justify-center items-center gap-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
+            onclick={report}
+            onmouseenter={() => hover({ he: 'דיווח ואישור ההוצאה', en: 'report & approve' })}
+            onmouseleave={() => hover('0')}
+          >
+            {he('דיווח ואישור', 'Report & approve')}
+            <Lev />
+          </button>
+        {:else}
+          <!-- Objection: a hard decline for one-off maaps, a counter-offer
+               (propose a different amount + reason) for recurring cycles. -->
+          <button
+            class="flex-1 py-2 flex justify-center items-center gap-2 bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 font-bold rounded-xl transition-all"
+            onclick={isRecurringCycle ? () => nego('f') : () => decline('f')}
+            onmouseenter={() => hover(isRecurringCycle ? { he: 'הצעת סכום אחר', en: 'counter-offer' } : { he: 'התנגדות', en: 'objection' })}
+            onmouseleave={() => hover('0')}
+          >
+            {#if isRecurringCycle}{he('הצעת סכום אחר', 'Counter-offer')}{:else}<No />{/if}
+          </button>
+          <button
+            class="flex-2 py-2 px-4 flex justify-center items-center gap-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
+            onclick={() => agree('f')}
+            onmouseenter={() => hover({ he: isRecurringCycle ? 'אישור ההוצאה החודשית' : 'אישור', en: isRecurringCycle ? 'approve monthly expense' : 'appruve' })}
+            onmouseleave={() => hover('0')}
+          >
+            {#if isRecurringCycle}{he('אישור ההוצאה', 'Approve expense')}{/if}
+            <Lev />
+          </button>
+        {/if}
       {/if}
     {:else if low == true}
       <Lowbtn isCart="true" />

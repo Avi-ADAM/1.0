@@ -15,6 +15,8 @@ import {
   sheirutpStore,
   salesStore,
   purchasesStore,
+  siteSharePayablesStore,
+  openSiteShareDecisionsStore,
   askedResourcesStore,
   decisionsStore,
   projectsStore,
@@ -39,6 +41,8 @@ import {
   processProductRequests,
   processSales,
   processPurchases,
+  processSiteSharePayables,
+  processOpenSiteShareDecisions,
   mergeAndSort,
   type DisplayItem
 } from '$lib/utils/levProcessors';
@@ -251,6 +255,30 @@ export const processedPurchases: Readable<DisplayItem[]> = derived(
   ([$purchases, $projects]) => processPurchases($purchases, $projects)
 );
 
+/**
+ * Derived store for processed site-share payables (committed-but-unpaid
+ * contributions the member still owes the platform).
+ */
+export const processedSiteSharePayables: Readable<DisplayItem[]> = derived(
+  [siteSharePayablesStore, projectsStore],
+  ([$payables, $projects]) => processSiteSharePayables($payables, $projects)
+);
+
+/**
+ * Open (pending) site-share decisions whose split has no active haluka card.
+ * Depends on `processedHalukas` so the card auto-hides the moment that split's
+ * haluka card (gate 2) is present — the member then decides there instead.
+ */
+export const processedOpenSiteShareDecisions: Readable<DisplayItem[]> = derived(
+  [openSiteShareDecisionsStore, projectsStore, processedHalukas],
+  ([$decisions, $projects, $halukas]) => {
+    const activeTosplitIds = new Set(
+      $halukas.map((h) => String(h.pendId)).filter(Boolean)
+    );
+    return processOpenSiteShareDecisions($decisions, $projects, activeTosplitIds);
+  }
+);
+
 // ========== Final Merged Array ==========
 
 /**
@@ -295,6 +323,8 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
     processedSheirutp,
     processedSales,
     processedPurchases,
+    processedSiteSharePayables,
+    processedOpenSiteShareDecisions,
     milon,
     projectFilter
   ],
@@ -315,6 +345,8 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
     $sheirutp,
     $sales,
     $purchases,
+    $siteSharePayables,
+    $openSiteShareDecisions,
     $milon,
     $projectFilter
   ]) => {
@@ -335,7 +367,9 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
       $decisions,
       $sheirutp,
       $sales,
-      $purchases
+      $purchases,
+      $siteSharePayables,
+      $openSiteShareDecisions
     );
 
     // Step 2: Apply milon filtering (visibility settings)
@@ -374,6 +408,10 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
           return $milon.sales;
         case 'buy':
           return $milon.purchases;
+        case 'sitesharepay':
+          return true; // Always show: an outstanding payment owed by the member
+        case 'sitesharedecide':
+          return true; // Always show: an open giving decision on an auto-approved split
         case 'hachla':
           return $milon.hachla;
         default:

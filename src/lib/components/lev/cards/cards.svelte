@@ -1,4 +1,5 @@
-<script>
+﻿<script>
+  import { isRtl } from '$lib/translations';
   import { page } from '$app/state';
   import Lowding from '$lib/celim/lowding.svelte';
   import { lang } from '$lib/stores/lang.js';
@@ -17,6 +18,9 @@
   import ProductRequestCard from './ProductRequestCard.svelte';
   import SaleCard from './SaleCard.svelte';
   import CustomerSaleCard from './CustomerSaleCard.svelte';
+  import SiteSharePayCard from './SiteSharePayCard.svelte';
+  import SiteShareIncomeCard from './SiteShareIncomeCard.svelte';
+  import SiteShareAutoApprovedCard from './SiteShareAutoApprovedCard.svelte';
   //import { fly } from 'svelte/transition';
   import { onMount } from 'svelte';
   import Header from './../../header/header.svelte';
@@ -314,7 +318,7 @@
 
 {#if arr1.length > 0}
       <div
-        dir={$lang == 'he' ? 'rtl' : 'ltr'}
+        dir={$isRtl ? 'rtl' : 'ltr'}
         bind:clientWidth={h}
         class="body box-border h-screen"
       >
@@ -515,7 +519,7 @@
               class="mySwiperc {!isMobileOrTablet()
                 ? 'swiperc'
                 : 'swipermobile'}"
-              dir={$lang == 'he' ? 'rtl' : 'ltr'}
+              dir={$isRtl ? 'rtl' : 'ltr'}
               navigation={isMobileOrTablet()
                 ? false
                 : {
@@ -538,6 +542,7 @@
                       onProj={proj}
                       onCoinLapach={delo}
                       hervach={buble.hervach}
+                      siteShare={buble.siteShare}
                       onUser={user}
                       {low}
                       cards="true"
@@ -571,6 +576,17 @@
                       onProj={proj}
                     /></SwiperSlide
                   >
+                {:else if buble.ani === 'sale' && buble.isSiteShareIncome && milon.sales == true}
+                  <SwiperSlide
+                    class="{isMobileOrTablet()
+                      ? 'swipr-slidemobile'
+                      : 'swiper-slidec'} "
+                    ><SiteShareIncomeCard
+                      {buble}
+                      isFirst={currentIndex === i}
+                      onProj={proj}
+                    /></SwiperSlide
+                  >
                 {:else if buble.ani === 'sale' && milon.sales == true}
                   <SwiperSlide
                     class="{isMobileOrTablet()
@@ -593,6 +609,28 @@
                       isFirst={currentIndex === i}
                       onProj={proj}
                       {onChat}
+                    /></SwiperSlide
+                  >
+                {:else if buble.ani === 'sitesharepay'}
+                  <SwiperSlide
+                    class="{isMobileOrTablet()
+                      ? 'swipr-slidemobile'
+                      : 'swiper-slidec'} "
+                    ><SiteSharePayCard
+                      {buble}
+                      isFirst={currentIndex === i}
+                      onProj={proj}
+                    /></SwiperSlide
+                  >
+                {:else if buble.ani === 'sitesharedecide'}
+                  <SwiperSlide
+                    class="{isMobileOrTablet()
+                      ? 'swipr-slidemobile'
+                      : 'swiper-slidec'} "
+                    ><SiteShareAutoApprovedCard
+                      {buble}
+                      isFirst={currentIndex === i}
+                      onProj={proj}
                     /></SwiperSlide
                   >
                 {:else if buble.ani === 'vidu' && milon.vidu == true}
@@ -714,6 +752,10 @@
                       easy={buble.easy}
                       sqadualed={buble.sqadualed}
                       sqadualedf={buble.sqadualedf}
+                      recurring={buble.recurring}
+                      recurringNoEnd={buble.recurringNoEnd}
+                      pricePerUnit={buble.pricePerUnit}
+                      cycleSize={buble.cycleSize}
                       linkto={buble.linkto}
                       location={buble.location}
                       pendId={buble.pendId}
@@ -808,6 +850,18 @@
                       projectName={buble.projectName}
                       useraplyname={buble.username}
                       userId={buble.uid}
+                      myid={buble.myid}
+                      isRecurringCycle={buble.isRecurringCycle}
+                      mashabetahalichId={buble.mashabetahalichId}
+                      cycleIndex={buble.cycleIndex}
+                      cycleReported={buble.cycleReported}
+                      quantityDelivered={buble.quantityDelivered}
+                      pricePerUnit={buble.pricePerUnit}
+                      responsibleUserId={buble.responsibleUserId}
+                      orderon={buble.orderon}
+                      timegramaId={buble.timegramaId}
+                      timegramaDate={buble.timegramaDate}
+                      timegramaDone={buble.timegramaDone}
                       spid={buble.spid}
                       src={buble.src}
                       price={buble.price}
@@ -1023,6 +1077,10 @@
                       hearotMeyuchadot={buble.spnot}
                       price={buble.price}
                       deadline={buble.deadline}
+                      sqadualedf={buble.sqadualedf}
+                      kindOf={buble.kindOf}
+                      recurring={buble.recurring}
+                      cycleSize={buble.cycleSize}
                       missId={buble.missId}
                       id={buble.id}
                       openMid={buble.omid}
@@ -1097,6 +1155,9 @@
                       declineddarra={buble.declineddarra}
                       deadLine={buble.sqadualed}
                       sqadualedf={buble.sqadualedf}
+                      kindOf={buble.kindOf}
+                      recurring={buble.recurring}
+                      cycleSize={buble.cycleSize}
                       oid={buble.oid}
                       id={buble.id}
                       price={buble.price}

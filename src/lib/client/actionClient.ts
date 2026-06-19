@@ -266,6 +266,15 @@ export interface SubmitNegoMashParams {
   users?: Array<{ what: boolean; users_permissions_user: string; order?: number; zman?: string; ide?: number }>;
 }
 
+export interface ProposeOnOpenMashaabimParams {
+  openMashaabimId: string;
+  projectId: string;
+  spId: string;
+  missionName?: string;
+  newValues?: Record<string, any>;
+  originalValues?: Record<string, any>;
+}
+
 export type ActionKey =
   | 'createTask'
   | 'updateTask'
@@ -286,9 +295,22 @@ export type ActionKey =
   | 'createResource'
   | 'submitNegoMission'
   | 'submitNegoMash'
+  | 'submitNegoMaap'
+  | 'proposeOnOpenMashaabim'
   | 'getUserForums'
   | 'getForumThread'
   | 'createChatMessage'
+  | 'getPlatformProject'
+  | 'createPlatformSale'
+  | 'decideSiteShare'
+  | 'getSiteShareDecision'
+  | 'getSiteShareAggregate'
+  | 'getOpenSiteShareDecisions'
+  | 'seedSiteShareDecisions'
+  | 'createSiteShareTransfer'
+  | 'getSiteSharePayables'
+  | 'getSiteShareArchive'
+  | 'getRikmaSplitsArchive'
   | 'toggleGuideStatus'
   | 'createMissionTemplate'
   | 'updateUserProfilePic'
@@ -297,6 +319,7 @@ export type ActionKey =
   | 'addAskmChatEntry'
   | 'addAskChatEntry'
   | 'createWeave'
+  | 'markResourceDone'
   ;
 
 
@@ -351,6 +374,8 @@ export interface ActionParamsMap {
     endDate?: string;
     isAssigned?: boolean;
     isReceived?: boolean;
+    recurring?: boolean;
+    cycleSize?: number;
     existingSpId?: string;
     restime?: string;
     isOnline?: boolean;
@@ -361,6 +386,13 @@ export interface ActionParamsMap {
   };
   submitNegoMission: SubmitNegoMissionParams;
   submitNegoMash: SubmitNegoMashParams;
+  submitNegoMaap: {
+    askId: string;
+    projectId: string;
+    newAmount: number;
+    reason?: string;
+  };
+  proposeOnOpenMashaabim: ProposeOnOpenMashaabimParams;
   getUserForums: Record<string, never>;
   getForumThread: {
     forumId: string;
@@ -370,54 +402,6 @@ export interface ActionParamsMap {
     message: string;
     md?: Record<string, any>;
     username?: string;
-  };
-  toggleGuideStatus: {
-    show: boolean;
-  };
-  createMissionTemplate: {
-    missionName: string;
-    descrip?: string;
-    skillIds?: string[];
-    roleIds?: string[];
-  };
-  updateUserProfilePic: {
-    imageId: string;
-  };
-  updateUserBasic: {
-    username?: string;
-    bio?: string;
-    frd?: string;
-    lang?: string;
-    fblink?: string;
-    twiterlink?: string;
-    discordlink?: string;
-    githublink?: string;
-    preferCards?: boolean;
-    noMail?: boolean;
-  };
-  archiveUserResource: {
-    spId: string;
-  };
-  addAskmChatEntry: {
-    askId: string;
-    why: string;
-  };
-  addAskChatEntry: {
-    askId: string;
-    why: string;
-    what?: boolean;
-  };
-  createWeave: {
-    projectName: string;
-    publicDescription?: string;
-    descripFor?: string;
-    linkToWebsite?: string;
-    restime?: string;
-    timeToP?: string;
-    imageId?: string;
-    isOt?: boolean;
-    vallueIds?: string[];
-    newVallueNames?: string[];
   };
 }
 

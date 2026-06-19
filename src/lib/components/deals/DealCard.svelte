@@ -1,4 +1,5 @@
-<script lang="ts">
+﻿<script lang="ts">
+  import { isRtl } from '$lib/translations';
   import { goto } from '$app/navigation';
   import tr from '$lib/translations/tr.json';
   import { lang } from '$lib/stores/lang.js';
@@ -25,7 +26,7 @@
 <div
   class="card"
   class:faded={deal.status === 'done'}
-  dir={$lang === 'en' ? 'ltr' : 'rtl'}
+  dir={$isRtl ? 'rtl' : 'ltr'}
   role="button"
   tabindex="0"
   onclick={navigate}
