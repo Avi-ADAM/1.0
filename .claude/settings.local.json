@@ -75,7 +75,8 @@
       "PowerShell(Select-String *)",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(awk '/export type NegoInput = \\\\{/,/\\\\};/' src/generated/graphql.ts)"
     ],
     "additionalDirectories": [
       "c:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\deals\\request",
