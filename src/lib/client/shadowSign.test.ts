@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { deriveConsentEventFromAction } from './shadowSign';
+import { deriveConsentEventFromAction, shadowSignFromCookie } from './shadowSign';
 import type { ConsentSpec } from '$lib/server/actions/types';
 
 const tosplitVoteSpec: ConsentSpec = {
@@ -138,6 +138,37 @@ describe('deriveConsentEventFromAction — pure mapping', () => {
   });
 });
 
+describe('addVoteConsentSpec — imported from shared specs module', () => {
+  it('routes the 6 vote branches identically to the duplicated inline spec', async () => {
+    // This regression test exists to catch silent drift if someone edits the
+    // shared spec but forgets to update tests, or vice versa.
+    const { addVoteConsentSpec } = await import('$lib/consent/specs/addVote');
+    const branches: Array<[string, string]> = [
+      ['tosplit',     'tosplit.vote'],
+      ['pend',        'pendm.vote'],
+      ['sheirutpend', 'sheirutpend.vote'],
+      ['ask',         'ask.vote'],
+      ['decision',    'decision.vote'],
+      ['weFinnish',   'mission.approve.vote']
+    ];
+    for (const [type, expected] of branches) {
+      const ev = deriveConsentEventFromAction(addVoteConsentSpec, {
+        type, id: 'x', what: true, projectId: 'p'
+      });
+      expect(ev!.action).toBe(expected);
+      expect(ev!.subject).toEqual({ type, id: 'x' });
+    }
+  });
+
+  it('returns null for an unrecognised vote type (shadow-skip)', async () => {
+    const { addVoteConsentSpec } = await import('$lib/consent/specs/addVote');
+    const ev = deriveConsentEventFromAction(addVoteConsentSpec, {
+      type: 'tournament', id: 'x', projectId: 'p'
+    });
+    expect(ev).toBeNull();
+  });
+});
+
 describe('deriveConsentEventFromAction — addVote poly-action dispatch', () => {
   it('routes type=tosplit → tosplit.vote', () => {
     const ev = deriveConsentEventFromAction(addVoteSpec, {
@@ -188,5 +219,37 @@ describe('deriveConsentEventFromAction — addVote poly-action dispatch', () => 
       type: 'tosplit', id: 'ts-1', what: true, projectId: 'p-1'
     });
     expect(ev!.predicate?.order).toBe(0);
+  });
+});
+
+describe('shadowSignFromCookie — convenience for call sites', () => {
+  // The test environment doesn't expose `browser` from $app/environment as
+  // true, so the helper returns the SSR branch. This guarantees a callable
+  // function that never throws even when called outside a browser context —
+  // which is exactly the contract: callers can fire it after their action
+  // without worrying about environment.
+  it('returns a non-throwing result outside the browser', async () => {
+    const spec: ConsentSpec = {
+      action: 'tosplit.vote',
+      subjectType: 'tosplit',
+      subjectIdParam: 'id'
+    };
+    const res = await shadowSignFromCookie(spec, { id: 'x' });
+    expect(res.ok).toBe(false);
+    if (!res.ok) {
+      // either 'not_browser' (SSR) or 'no_cookie_id' is acceptable —
+      // the contract is just "never throws, always resolves".
+      expect(['not_browser', 'no_cookie_id']).toContain(res.reason);
+    }
+  });
+
+  it('never throws even when the spec misroutes the params', async () => {
+    const spec: ConsentSpec = {
+      action: 'tosplit.vote',
+      subjectType: 'tosplit',
+      subjectIdParam: 'missingParam'  // params won't have this
+    };
+    const res = await shadowSignFromCookie(spec, { other: 'x' });
+    expect(res.ok).toBe(false);
   });
 });

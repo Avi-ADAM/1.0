@@ -328,14 +328,17 @@
       }
     } else {
       try {
-        const result = await executeAction('addVote', {
+        const voteParams = {
           type: 'ask',
           id: askId,
           projectId: projectId,
           existingComponentData: users
-        });
+        };
+        const result = await executeAction('addVote', voteParams);
         if (result.success) {
           onAcsept?.({ ani: 'asked', coinlapach: coinlapach });
+          // Phase 1 shadow signing — best-effort.
+          shadowSignFromCookie(addVoteConsentSpec, voteParams);
         } else {
           error1 = result.error;
         }
@@ -502,6 +505,8 @@
     initialForum
   } from '$lib/stores/pendMisMes.js';
   import { executeAction } from '$lib/client/actionClient';
+  import { shadowSignFromCookie } from '$lib/client/shadowSign';
+  import { addVoteConsentSpec } from '$lib/consent/specs/addVote';
   import NegoM from '../prPr/negoM.svelte';
   import { getProjectData } from '$lib/stores/projectStore.js';
   import { page } from '$app/state';

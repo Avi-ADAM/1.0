@@ -1,6 +1,8 @@
 <script>
   import { ProgressBar } from 'progressbar-svelte';
   import { executeAction } from '$lib/client/actionClient';
+  import { shadowSignFromCookie } from '$lib/client/shadowSign';
+  import { addVoteConsentSpec } from '$lib/consent/specs/addVote';
   import { goto } from '$app/navigation';
   import dayjs from 'dayjs';
   import { lang } from '$lib/stores/lang.js';
@@ -216,14 +218,17 @@
     } else {
       // 3+ members: just record the vote via action (handles notifications + socket)
       try {
-        const result = await executeAction('addVote', {
+        const voteParams = {
           type: 'ask',
           id: askId,
           projectId: projectId,
           existingComponentData: users
-        });
+        };
+        const result = await executeAction('addVote', voteParams);
         if (result.success) {
           onAcsept?.({ ani: 'asked', coinlapach: coinlapach });
+          // Phase 1 shadow signing — best-effort.
+          shadowSignFromCookie(addVoteConsentSpec, voteParams);
         } else {
           error1 = result.error;
         }

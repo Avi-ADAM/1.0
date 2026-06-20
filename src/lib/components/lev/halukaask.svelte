@@ -238,15 +238,22 @@
       } else {
         // Not all users approved yet — add partial vote
         try {
-          const result = await executeAction('addVote', {
+          const voteParams = {
             type: 'tosplit',
             id: pendId,
             projectId,
-            existingComponentData: priorVotes
-          });
+            existingComponentData: priorVotes,
+            what: true,
+            order: 0
+          };
+          const result = await executeAction('addVote', voteParams);
           if (!result.success) {
             throw new Error(result.error?.message || 'Failed to add vote');
           }
+          // Phase 1 shadow signing — fire-and-forget. The legacy mutation
+          // succeeded; signing the parallel ConsentEvent is best-effort and
+          // never blocks the UI on failure.
+          shadowSignFromCookie(addVoteConsentSpec, voteParams);
         } catch (e) {
           error1 = e;
           console.log(error1);
@@ -255,6 +262,8 @@
     }
   }
   import { executeAction } from '$lib/client/actionClient';
+  import { shadowSignFromCookie } from '$lib/client/shadowSign';
+  import { addVoteConsentSpec } from '$lib/consent/specs/addVote';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   async function nego(alr) {
     already = true;
@@ -291,17 +300,21 @@
       const priorVotes = Array.isArray(users) ? [...users] : [];
       appendOptimisticVote({ what: false, why });
       try {
-        const result = await executeAction('addVote', {
+        const voteParams = {
           type: 'tosplit',
           id: pendId,
           projectId,
           existingComponentData: priorVotes,
           what: false,
-          why
-        });
+          why,
+          order: 0
+        };
+        const result = await executeAction('addVote', voteParams);
         if (result.success) {
           miDatan = result.data;
           coinLapach();
+          // Phase 1 shadow signing — best-effort, no UI dependency.
+          shadowSignFromCookie(addVoteConsentSpec, voteParams);
         } else {
           error1 = result.error;
         }

@@ -70,8 +70,31 @@ export function deriveConsentEventFromAction(
 }
 
 export type ShadowSignResult =
-  | { ok: true; event: ConsentEvent }
+  | { ok: true; event: ConsentEvent; reason?: undefined }
   | { ok: false; reason: string };
+
+/**
+ * Convenience wrapper for the common case: read the user id from the `id`
+ * cookie, sign in the background, swallow any failure. Most action call
+ * sites just want this one-liner after their executeAction succeeded.
+ *
+ * Returns a Promise that always resolves (never rejects). On success it
+ * carries the signed event; on failure, the reason.
+ */
+export function shadowSignFromCookie(
+  spec: ConsentSpec,
+  params: Record<string, unknown>
+): Promise<ShadowSignResult> {
+  if (!browser) return Promise.resolve({ ok: false, reason: 'not_browser' });
+  const cookieValueId = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('id='))
+    ?.split('=')[1];
+  if (!cookieValueId) return Promise.resolve({ ok: false, reason: 'no_cookie_id' });
+  return signActionShadow(String(cookieValueId), spec, params).catch(
+    (e: unknown) => ({ ok: false, reason: 'threw:' + (e as Error).message })
+  );
+}
 
 /**
  * Sign and ship a shadow ConsentEvent for the given action.

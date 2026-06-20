@@ -1,6 +1,8 @@
 <script>
   import { Drawer } from 'vaul-svelte';
   import { executeAction } from '$lib/client/actionClient';
+  import { shadowSignFromCookie } from '$lib/client/shadowSign';
+  import { addVoteConsentSpec } from '$lib/consent/specs/addVote';
   import { ProgressBar } from 'progressbar-svelte';
   import { goto } from '$app/navigation';
   import { lang } from '$lib/stores/lang.js';
@@ -249,13 +251,16 @@
     try {
       if (kind === 'sheirutpends') {
         // Use existing sheirutpend vote action — handles consensus → createSheirut internally
-        const result = await executeAction('addVote', {
+        const voteParams = {
           type: 'sheirutpend',
           id: String(askId),
           projectId: String(projectId),
-        });
+        };
+        const result = await executeAction('addVote', voteParams);
         if (result.success) {
           onAcsept?.({ ani: 'askedma', coinlapach });
+          // Phase 1 shadow signing — best-effort.
+          shadowSignFromCookie(addVoteConsentSpec, voteParams);
         } else {
           error1 = result.error;
         }
