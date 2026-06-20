@@ -231,6 +231,46 @@
       "noTransfers": "No member transfers yet. They appear here once a giving member picks a receiver and sends."
     }
   },
+  "fiappru": {
+    "whyHeading": "Please explain why",
+    "taskNotCompleted": "Why wasn't the task completed?",
+    "offerRejected": "Please explain why you are rejecting this offer",
+    "addHours": "Add hours"
+  },
+  "weget": {
+    "howMuchSpentThisMonth": "How much did you spend this month?",
+    "approveMonthlyExpense": "Approve monthly expense",
+    "cycleLabel": "Cycle",
+    "reportedExpenseOf": "reported an expense of:",
+    "actualAmountPlaceholder": "Actual amount spent this month",
+    "confirmExpense": "Confirm expense",
+    "doneResourceTitle": "End monthly resource — no more monthly charges will be opened",
+    "doneResource": "Done (End resource)",
+    "mustExplain": "Please explain",
+    "missingForApproval": "What is missing to confirm that the resource was received?",
+    "proposeOtherAmount": "Propose a different amount",
+    "reportedAmount": "Reported amount:",
+    "proposedAmount": "Proposed amount:",
+    "amountYouPropose": "Amount you propose",
+    "whyMoveAmount": "Why change the amount? (will be posted in chat)",
+    "submitProposal": "Submit proposal",
+    "explainProposal": "Please explain the proposal",
+    "addHours": "Add hours"
+  },
+  "levchat": {
+    "messagePlaceholder": "Write your message..."
+  },
+  "halukaask": {
+    "offerRejected": "Please explain why you are rejecting this offer",
+    "yourResponse": "Your response",
+    "yourResponseLabel": "Your response",
+    "canRespond": "You may respond and explain why",
+    "decline": "decline",
+    "approve": "approve",
+    "theOffer": "the offer",
+    "referToPrevious": "Please refer to the previous response and address the claims made",
+    "previousResponse": "Previous response"
+  },
   "taskModal": {
     "progress": "Progress",
     "createdBy": "Created by",
