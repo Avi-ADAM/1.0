@@ -9193,6 +9193,742 @@ export const qids = {
   }
 }`,
 
+  // ── Lev quantum (incremental) slice queries ───────────────────────────────
+  // Each query returns the same mini-userData envelope as query 83, restricted
+  // to one collection and optionally to a subset of projects ($pids).
+  // Passing $pids: null (or omitting it) returns data for ALL projects.
+  // The existing extractors in levDataExtractors.ts run unchanged on the result.
+
+  '87levSliceSheirutp': `query LevSliceSheirutp($idL: ID!, $pids: [ID]) {
+  usersPermissionsUser(id: $idL) {
+    data {
+      id
+      attributes {
+        projects_1s(filters: { id: { in: $pids } }) {
+          data {
+            id
+            attributes {
+              projectName
+              restime
+              user_1s {
+                data {
+                  id
+                }
+              }
+              profilePic {
+                data {
+                  attributes {
+                    url
+                    formats
+                  }
+                }
+              }
+              sheirutpends(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    sheirut {
+                      data {
+                        id
+                        attributes {
+                          name
+                          descrip
+                          equaliSplited
+                          oneTime
+                        }
+                      }
+                    }
+                    startDate
+                    finnishDate
+                    price
+                    quant
+                    total
+                    users_permissions_user {
+                      data {
+                        id
+                        attributes {
+                          username
+                          profilePic {
+                            data {
+                              attributes {
+                                url
+                                formats
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    matanots {
+                      data {
+                        id
+                        attributes {
+                          name
+                          desc
+                          price
+                          quant
+                          kindOf
+                          pic {
+                            data {
+                              attributes {
+                                url
+                                formats
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    createdAt
+                    votes {
+                      data {
+                        id
+                        attributes {
+                          what
+                          order
+                          why
+                          users_permissions_user {
+                            data {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                    timegrama {
+                      data {
+                        id
+                        attributes {
+                          date
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`,
+
+  '87levSliceSales': `query LevSliceSales($idL: ID!, $pids: [ID]) {
+  usersPermissionsUser(id: $idL) {
+    data {
+      id
+      attributes {
+        projects_1s(filters: { id: { in: $pids } }) {
+          data {
+            id
+            attributes {
+              projectName
+              restime
+              user_1s {
+                data {
+                  id
+                }
+              }
+              profilePic {
+                data {
+                  attributes {
+                    url
+                    formats
+                  }
+                }
+              }
+              sheiruts {
+                data {
+                  id
+                  attributes {
+                    name
+                    descrip
+                    equaliSplited
+                    oneTime
+                    archived
+                    isApruved
+                    isItOnlyOneInProject
+                    price
+                    quant
+                    startDate
+                    finnishDate
+                    total
+                    iGotIt
+                    iTransferMoney
+                    iGotMoney { iGotMoney users_permissions_user { data { id } } }
+                    moneyTransfered
+                    productExepted
+                    isSiteShareIncome
+                    weFinnish {
+                      data {
+                        id
+                        attributes {
+                          what
+                          order
+                          why
+                          users_permissions_user {
+                            data {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                    iCanGetMonay {
+                      data {
+                        id
+                        attributes {
+                          username
+                          profilePic {
+                            data {
+                              attributes {
+                                url
+                                formats
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    iTransferedTo {
+                      data {
+                        id
+                        attributes {
+                          username
+                          profilePic {
+                            data {
+                              attributes {
+                                url
+                                formats
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    users_permissions_users {
+                      data {
+                        id
+                        attributes {
+                          username
+                          profilePic {
+                            data {
+                              attributes {
+                                url
+                                formats
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    matanot {
+                      data {
+                        id
+                        attributes {
+                          name
+                          desc
+                          price
+                          quant
+                          kindOf
+                          pic {
+                            data {
+                              attributes {
+                                url
+                                formats
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    forums {
+                      data {
+                        id
+                        attributes {
+                          messages(pagination: { limit: 50 }) {
+                            data {
+                              id
+                              attributes {
+                                content
+                                createdAt
+                                users_permissions_user {
+                                  data {
+                                    id
+                                    attributes {
+                                      username
+                                      profilePic {
+                                        data {
+                                          attributes {
+                                            url
+                                            formats
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    halukas(filters: { ushar: { eq: true } }) {
+                      data {
+                        id
+                        attributes {
+                          senderconf
+                          confirmed
+                          amount
+                          isSiteShare
+                          forum { data { id } }
+                          usersend {
+                            data {
+                              id
+                              attributes {
+                                username
+                                profilePic { data { attributes { url formats } } }
+                              }
+                            }
+                          }
+                          userrecive {
+                            data {
+                              id
+                              attributes {
+                                username
+                                profilePic { data { attributes { url formats } } }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`,
+
+  '87levSliceFiapp': `query LevSliceFiapp($idL: ID!, $pids: [ID]) {
+  usersPermissionsUser(id: $idL) {
+    data {
+      id
+      attributes {
+        projects_1s(filters: { id: { in: $pids } }) {
+          data {
+            id
+            attributes {
+              projectName
+              restime
+              user_1s {
+                data {
+                  id
+                }
+              }
+              profilePic {
+                data {
+                  attributes {
+                    url
+                    formats
+                  }
+                }
+              }
+              finiapruvals(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    timegrama {
+                      data {
+                        id
+                        attributes {
+                          date
+                        }
+                      }
+                    }
+                    missname
+                    noofhours
+                    why
+                    what {
+                      data {
+                        id
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                    mesimabetahalich {
+                      data {
+                        id
+                        attributes {
+                          perhour
+                          hearotMeyuchadot
+                          descrip
+                          mission {
+                            data {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                    vots {
+                      what
+                      why
+                      id
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                    project {
+                      data {
+                        id
+                      }
+                    }
+                    users_permissions_user {
+                      data {
+                        id
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`,
+
+  '87levSliceDecisions': `query LevSliceDecisions($idL: ID!, $pids: [ID]) {
+  usersPermissionsUser(id: $idL) {
+    data {
+      id
+      attributes {
+        projects_1s(filters: { id: { in: $pids } }) {
+          data {
+            id
+            attributes {
+              projectName
+              restime
+              user_1s {
+                data {
+                  id
+                }
+              }
+              profilePic {
+                data {
+                  attributes {
+                    url
+                    formats
+                  }
+                }
+              }
+              decisions(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    kind
+                    createdAt
+                    timegrama {
+                      data {
+                        id
+                        attributes {
+                          date
+                        }
+                      }
+                    }
+                    newpic {
+                      data {
+                        id
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                    vots {
+                      what
+                      why
+                      id
+                      order
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`,
+
+  '87levSlicePends': `query LevSlicePends($idL: ID!, $pids: [ID]) {
+  usersPermissionsUser(id: $idL) {
+    data {
+      id
+      attributes {
+        projects_1s(filters: { id: { in: $pids } }) {
+          data {
+            id
+            attributes {
+              projectName
+              restime
+              user_1s {
+                data {
+                  id
+                }
+              }
+              profilePic {
+                data {
+                  attributes {
+                    url
+                    formats
+                  }
+                }
+              }
+              pendms(filters: { archived: { eq: false }, matanot_recipe_missions: { id: { null: true } } }) {
+                data {
+                  id
+                  attributes {
+                    name
+                    createdAt
+                    iskvua
+                    hearotMeyuchadot
+                    descrip
+                    noofhours
+                    perhour
+                    sqadualed
+                    privatlinks
+                    publicklinks
+                    dates
+                    location {
+                      location_mode
+                      lat
+                      lng
+                      radius
+                      location_hint
+                    }
+                    rishon {
+                      data {
+                        id
+                      }
+                    }
+                    acts {
+                      data {
+                        id
+                        attributes {
+                          shem
+                          link
+                          des
+                          dateF
+                          dateS
+                        }
+                      }
+                    }
+                    negopendmissions {
+                      data {
+                        id
+                        attributes {
+                          name
+                          hearotMeyuchadot
+                          descrip
+                          createdAt
+                          noofhours
+                          perhour
+                          isOriginal
+                          date
+                          dates
+                          isMonth
+                          location {
+                            location_mode
+                            lat
+                            lng
+                            radius
+                            location_hint
+                          }
+                          users_permissions_user {
+                            data {
+                              id
+                              attributes {
+                                username
+                              }
+                            }
+                          }
+                          skills {
+                            data {
+                              id
+                              attributes {
+                                skillName
+                                localizations {
+                                  data {
+                                    attributes {
+                                      skillName
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                          tafkidims {
+                            data {
+                              id
+                              attributes {
+                                roleDescription
+                                localizations {
+                                  data {
+                                    attributes {
+                                      roleDescription
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                          work_ways {
+                            data {
+                              id
+                              attributes {
+                                workWayName
+                                localizations {
+                                  data {
+                                    attributes {
+                                      workWayName
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                          acts {
+                            data {
+                              id
+                              attributes {
+                                shem
+                                link
+                                des
+                                dateF
+                                dateS
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    skills {
+                      data {
+                        id
+                        attributes {
+                          skillName
+                          localizations {
+                            data {
+                              attributes {
+                                skillName
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    tafkidims {
+                      data {
+                        id
+                        attributes {
+                          roleDescription
+                          localizations {
+                            data {
+                              attributes {
+                                roleDescription
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    work_ways {
+                      data {
+                        id
+                        attributes {
+                          workWayName
+                          localizations {
+                            data {
+                              attributes {
+                                workWayName
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    mission {
+                      data {
+                        id
+                      }
+                    }
+                    vallues {
+                      data {
+                        id
+                      }
+                    }
+                    timegrama {
+                      data {
+                        id
+                        attributes {
+                          date
+                        }
+                      }
+                    }
+                    diun {
+                      what
+                      why
+                      id
+                      zman
+                      order
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                    users {
+                      what
+                      order
+                      why
+                      zman
+                      id
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`,
+
   // ── Concierge live enrichment (PLAN_CONCIERGE §6/§7) ──────────────────────
   // Search the mission library by a skill/term — used to surface existing
   // missions that already answer a freshly-typed wish.
