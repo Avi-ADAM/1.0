@@ -76,7 +76,10 @@
       "Bash(git add *)",
       "Bash(git commit *)",
       "Bash(git push *)",
-      "Bash(awk '/export type NegoInput = \\\\{/,/\\\\};/' src/generated/graphql.ts)"
+      "Bash(awk '/export type NegoInput = \\\\{/,/\\\\};/' src/generated/graphql.ts)",
+      "Bash(awk '/^### Ask$/{f=1} f{print NR\": \"$0} /^### Askm$/{exit}' src/generated/STRAPI_SCHEMA_REFERENCE.md)",
+      "Bash(awk '/^### NegoMashInput$/{x=1} x{print} /^### NegopendmissionInput$/{exit}' src/generated/STRAPI_SCHEMA_REFERENCE.md)",
+      "Bash(echo \"exit:$?\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\deals\\request",

@@ -51,10 +51,11 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const memberIds: string[] = (projectAttrs?.user_1s?.data || []).map((m: any) => String(m.id));
   const restime: string = projectAttrs?.restime ?? '';
 
-  // 2. Create the Askm in "negotiating" state with the candidate's round-0 vote.
-  //    turn = project: the rights-holders are the ones who now respond.
+  // 2. Create the Askm with the candidate's round-0 vote. Askm carries no scalar
+  //    negotiation-state fields — the round/turn/status are derived from its
+  //    NegoMash rounds — so a plain createAskm is enough.
   const askmRes = await strapi.execute(
-    'createAskmWithNego',
+    '125createAskm',
     {
       publishedAt: nowISO,
       openMashaabimId,
@@ -62,9 +63,6 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       spId,
       userId: requesterId,
       vots: [buildRequesterVote(requesterId, now)],
-      negotiationStatus: 'negotiating',
-      turn: 'project',
-      currentRound: 0,
     },
     context.jwt,
     context.fetch

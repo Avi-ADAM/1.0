@@ -7911,45 +7911,20 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }) { data { id } }
   }`,
 
-  // Create an Askm already in negotiating state (candidate parallel proposal).
-  'createAskmWithNego': `mutation CreateAskmWithNego(
-    $publishedAt: DateTime!, $openMashaabimId: ID!, $projectId: ID!, $spId: ID!, $userId: ID!,
-    $vots: [ComponentProjectsVotsInput],
-    $negotiationStatus: ENUM_ASKM_NEGOTIATIONSTATUS, $turn: ENUM_ASKM_TURN, $currentRound: Int
-  ) {
-    createAskm(data: {
-      publishedAt: $publishedAt
-      open_mashaabim: $openMashaabimId
-      project: $projectId
-      sp: $spId
-      users_permissions_user: $userId
-      vots: $vots
-      negotiationStatus: $negotiationStatus
-      turn: $turn
-      currentRound: $currentRound
-    }) { data { id } }
-  }`,
-
-  // Advance an Askm negotiation (new vote round / counter / turn flip).
-  'updateAskmNegoState': `mutation UpdateAskmNegoState(
-    $id: ID!, $vots: [ComponentProjectsVotsInput],
-    $turn: ENUM_ASKM_TURN, $currentRound: Int, $negotiationStatus: ENUM_ASKM_NEGOTIATIONSTATUS
-  ) {
-    updateAskm(id: $id, data: {
-      vots: $vots
-      turn: $turn
-      currentRound: $currentRound
-      negotiationStatus: $negotiationStatus
-    }) { data { id } }
-  }`,
+  // Note: Askm has no scalar negotiation-state fields. The state (current round,
+  // whose turn, status) is DERIVED from its NegoMash rounds. So creating an Askm
+  // for a candidate proposal is a plain createAskm (reuse '125createAskm'), and
+  // adding a vote/round reuses '133addVoteToAskm'.
 
   // Read an Askm's negotiation rounds (latest first) for the card / materialization.
   'getAskmNegoRounds': `query GetAskmNegoRounds($id: ID!) {
     askm(id: $id) { data { id attributes {
-      currentRound turn negotiationStatus
+      archived
+      vots { what order users_permissions_user { data { id } } }
       nego_mashes(sort: "ordern:desc") { data { id attributes {
         ordern proposedBy status name descrip spnot
         easy hm price kindOf sqadualed sqadualedf linkto
+        users_permissions_user { data { id } }
       } } }
     } } }
   }`
