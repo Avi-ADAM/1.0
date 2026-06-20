@@ -231,6 +231,46 @@
       "noTransfers": "لا توجد تحويلات من الأعضاء بعد. تظهر هنا بمجرد أن يختار عضو معطٍ مستلمًا ويرسل."
     }
   },
+  "fiappru": {
+    "whyHeading": "يرجى التعليل",
+    "taskNotCompleted": "لماذا لم تكتمل المهمة؟",
+    "offerRejected": "يرجى تعليل سبب رفض العرض",
+    "addHours": "أضف ساعات"
+  },
+  "weget": {
+    "howMuchSpentThisMonth": "كم أنفقت هذا الشهر؟",
+    "approveMonthlyExpense": "تأكيد المصروف الشهري",
+    "cycleLabel": "دورة",
+    "reportedExpenseOf": "أبلغ عن مصروف بقيمة:",
+    "actualAmountPlaceholder": "المبلغ الفعلي المنفق هذا الشهر",
+    "confirmExpense": "تأكيد المصروف",
+    "doneResourceTitle": "إنهاء المورد الشهري — لن تُفتح مزيد من الرسوم الشهرية",
+    "doneResource": "إنهاء المورد",
+    "mustExplain": "يرجى التعليل",
+    "missingForApproval": "ما الذي ينقص لتأكيد استلام المورد؟",
+    "proposeOtherAmount": "اقتراح مبلغ آخر",
+    "reportedAmount": "المبلغ المُبلَّغ عنه:",
+    "proposedAmount": "المبلغ المقترح:",
+    "amountYouPropose": "المبلغ الذي تقترحه",
+    "whyMoveAmount": "لماذا تغيير المبلغ؟ (سيُنشر في المحادثة)",
+    "submitProposal": "إرسال الاقتراح",
+    "explainProposal": "يرجى تعليل الاقتراح",
+    "addHours": "أضف ساعات"
+  },
+  "levchat": {
+    "messagePlaceholder": "اكتب رسالتك..."
+  },
+  "halukaask": {
+    "offerRejected": "يرجى تعليل سبب رفض العرض",
+    "yourResponse": "ردك",
+    "yourResponseLabel": "ردك",
+    "canRespond": "يمكنك الرد والتعليل",
+    "decline": "رفض",
+    "approve": "موافقة",
+    "theOffer": "العرض",
+    "referToPrevious": "يرجى الرجوع إلى الرد السابق والرد على الادعاءات المطروحة",
+    "previousResponse": "الرد السابق"
+  },
   "taskModal": {
     "progress": "التقدم",
     "createdBy": "تم الإنشاء بواسطة",
