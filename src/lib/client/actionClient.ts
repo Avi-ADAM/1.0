@@ -275,6 +275,15 @@ export interface ProposeOnOpenMashaabimParams {
   originalValues?: Record<string, any>;
 }
 
+export interface CounterOnAskmParams {
+  askmId: string;
+  openMashaabimId?: string;
+  projectId: string;
+  ordern?: number;
+  newValues?: Record<string, any>;
+  users?: Array<{ what: boolean; users_permissions_user: any; order?: number; zman?: string; ide?: number }>;
+}
+
 export type ActionKey =
   | 'createTask'
   | 'updateTask'
@@ -297,6 +306,7 @@ export type ActionKey =
   | 'submitNegoMash'
   | 'submitNegoMaap'
   | 'proposeOnOpenMashaabim'
+  | 'counterOnAskm'
   | 'getUserForums'
   | 'getForumThread'
   | 'createChatMessage'
@@ -393,6 +403,7 @@ export interface ActionParamsMap {
     reason?: string;
   };
   proposeOnOpenMashaabim: ProposeOnOpenMashaabimParams;
+  counterOnAskm: CounterOnAskmParams;
   getUserForums: Record<string, never>;
   getForumThread: {
     forumId: string;

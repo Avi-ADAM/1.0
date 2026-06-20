@@ -95,6 +95,7 @@ import { submitNegoMissionConfig } from './submitNegoMission.js';
 import { submitNegoMashConfig } from './submitNegoMash.js';
 import { submitNegoMaapConfig } from './submitNegoMaap.js';
 import { proposeOnOpenMashaabimConfig } from './proposeOnOpenMashaabim.js';
+import { counterOnAskmConfig } from './counterOnAskm.js';
 import { updateResourceRequestConfig } from './updateResourceRequest.js';
 import { createResourceRequestConfig } from './createResourceRequest.js';
 import { createMashaabimConfig } from './createMashaabim.js';
@@ -276,6 +277,7 @@ export function registerAllActions(): void {
   registerAction(submitNegoMashConfig);
   registerAction(submitNegoMaapConfig);
   registerAction(proposeOnOpenMashaabimConfig);
+  registerAction(counterOnAskmConfig);
 
   // User profile: create / update personal resource (Sp)
   registerAction(createResourceRequestConfig);

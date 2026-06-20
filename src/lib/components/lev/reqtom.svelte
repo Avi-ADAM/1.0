@@ -162,6 +162,24 @@
     onAcsept?.({ ani: 'askedma', coinlapach });
   }
 
+  // Rights-holder intermediate proposal on a candidate's Askm. Stored as a
+  // NegoMash round (proposedBy=project) on the Askm — never overwriting the
+  // shared OpenMashaabim. For self-proposals (isRishon) the internal pmash flow
+  // is used instead, so onSubmit is only wired for the external-candidate case.
+  async function handleCounter({ newValues }) {
+    const result = await executeAction('counterOnAskm', {
+      askmId: String(askId ?? id),
+      openMashaabimId: openMid != null ? String(openMid) : undefined,
+      projectId: String(projectId),
+      ordern: orderon ?? 0,
+      newValues,
+      users
+    });
+    if (!result.success) {
+      throw new Error(result.error || 'counterOnAskm failed');
+    }
+  }
+
   import { executeAction } from '$lib/client/actionClient';
   import Nego from '../prPr/negoPend.svelte';
   import { getProjectData } from '$lib/stores/projectStore.js';
@@ -448,6 +466,7 @@
               masaalr={false}
               onLoad={() => (negotiationLoading = true)}
               onClose={afternego}
+              onSubmit={isRishon ? null : handleCounter}
               descrip={missionDetails}
               {projectName}
               name1={openmissionName}
@@ -830,7 +849,7 @@
                 onTochat={tochat}
                 onAgree={() => agree()}
                 onDecline={() => decline()}
-                onNego={isRishon ? toggleNegotiationMode : () => decline()}
+                onNego={toggleNegotiationMode}
                 onHover={hoverc}
                 {already}
                 {projectName}
@@ -871,7 +890,7 @@
     onTochat={tochat}
     onAgree={() => agree()}
     onDecline={() => decline()}
-    onNego={isRishon ? toggleNegotiationMode : () => decline()}
+    onNego={toggleNegotiationMode}
     onHover={hoverc}
     {isVisible}
     {already}
