@@ -7927,6 +7927,13 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         users_permissions_user { data { id } }
       } } }
     } } }
+  }`,
+
+  // At acceptance, flow the winning candidate's negotiated terms onto the
+  // open resource (which is archived for this candidate right after), so the
+  // existing downstream materialization picks up the agreed values.
+  'applyRoundToOpenMashaabim': `mutation ApplyRoundToOpenMashaabim($id: ID!, $data: OpenMashaabimInput!) {
+    updateOpenMashaabim(id: $id, data: $data) { data { id } }
   }`
 };
 
