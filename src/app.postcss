@@ -1,5 +1,6 @@
 /* Write your global styles here, in PostCSS syntax */
 @import '@fontsource/fira-mono';
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -67,7 +68,7 @@
     format('truetype');
 }
 @font-face {
-  font-family: 'Rubik';
+  font-family: 'RubikMicrobe';
   src: url('https://res.cloudinary.com/love1/raw/upload/v1649971094/RubikMicrobe-Regular_jx6vb8.ttf')
     format('truetype');
 }
@@ -349,7 +350,7 @@ textarea::-webkit-resizer {
 :root {
   font-family:
     'Bellefair',
-    'Rubik',
+    'RubikMicrobe',
     Arial,
     -apple-system,
     BlinkMacSystemFont,
@@ -361,7 +362,7 @@ textarea::-webkit-resizer {
     'Open Sans',
     'Helvetica Neue',
     sans-serif;
-  --bal: 'Bellefair', 'Rubik';
+  --bal: 'Bellefair', 'RubikMicrobe';
   --font-mono: 'Fira Mono', monospace;
   --pure-white: #ffffff;
   --primary-color: #b9c6d2;
@@ -486,15 +487,10 @@ span {
   counter-reset: muffins;
 }
 .tiptap ul {
-  margin: 0px 40px;
-  padding: 0 0 0 40px;
-}
-/*   //     list-style-image: linear-gradient(to left bottom, red, blue);
-
-*/
-.tiptap ul {
+  margin: 0;
+  padding: 0 0 0 28px;
   list-style-image: url('https://res.cloudinary.com/love1/image/upload/v1701972931/list_agpi7e.svg');
-  display: list-item;
+  display: block;
 }
 .tiptap a {
   color: var(--lturk);
@@ -504,6 +500,8 @@ span {
 }
 .tiptap h3 {
   font-size: 1rem;
+  font-family: 'Rubik', sans-serif;
+  font-weight: 400;
 }
 .tiptap p {
   font-size: 0.8rem;
