@@ -1,0 +1,25 @@
+{
+  "name": "onelove-promo",
+  "version": "1.0.0",
+  "description": "1💗1 (1lev1.com) promotional video — built with Remotion",
+  "private": true,
+  "scripts": {
+    "dev": "remotion studio",
+    "render": "remotion render Promo-Landscape out/promo-landscape.mp4",
+    "render:vertical": "remotion render Promo-Vertical out/promo-vertical.mp4",
+    "render:square": "remotion render Promo-Square out/promo-square.mp4",
+    "upgrade": "remotion upgrade"
+  },
+  "dependencies": {
+    "@remotion/google-fonts": "4.0.380",
+    "@remotion/transitions": "4.0.380",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "remotion": "4.0.380"
+  },
+  "devDependencies": {
+    "@remotion/cli": "4.0.380",
+    "@types/react": "19.0.0",
+    "typescript": "5.5.4"
+  }
+}
