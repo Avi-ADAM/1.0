@@ -1,10 +1,9 @@
 /**
- * Action Configuration: Rights-holder counter (intermediate proposal) on an Askm.
+ * Action Configuration: Rights-holder counter (intermediate proposal) on an Ask.
  *
- * The mirror of proposeOnOpenMashaabim, from the project side. A rights-holder,
- * instead of plain approve/decline, offers intermediate terms. This is stored as
- * a new NegoMash round (proposedBy=project) bound to the candidate's Askm, plus
- * the proposer's vote at the new round. The shared OpenMashaabim is untouched.
+ * The mission-side mirror of counterOnAskm. A rights-holder offers intermediate
+ * terms instead of a plain approve/decline. Stored as a new Negopendmission round
+ * (proposedBy=project) bound to the candidate's Ask. The shared OpenMission is untouched.
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
@@ -19,43 +18,43 @@ interface UserVote {
 }
 
 const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
-  const { askmId, openMashaabimId, projectId } = params;
+  const { askId, openMissionId, projectId } = params;
   const newValues = (params.newValues ?? {}) as Record<string, any>;
   const now = new Date();
   const nowISO = now.toISOString();
   const userId = String(context.userId);
   const nextOrder = (Number(params.ordern) || 0) + 1;
 
-  // 1. The project's counter terms as a new NegoMash round on the candidate's Askm.
+  // 1. The project's counter terms as a new Negopendmission round on the candidate's Ask.
   const loc = normalizeLocationInput(newValues.location);
   await strapi.execute(
-    'negoCreateNegoMashRound',
+    'negoCreateNegopendmissionRound',
     {
       publishedAt: nowISO,
       userId,
-      open_mashaabim: openMashaabimId != null ? String(openMashaabimId) : null,
-      askm: String(askmId),
+      open_mission: openMissionId != null ? String(openMissionId) : null,
+      ask: String(askId),
       ordern: nextOrder,
       proposedBy: 'project',
       status: 'proposed',
       isOriginal: false,
-      name: newValues.name ?? null,
+      noofhours: newValues.noofhours ?? null,
+      perhour: newValues.perhour ?? null,
+      hearotMeyuchadot: newValues.hearotMeyuchadot ?? null,
       descrip: newValues.descrip ?? null,
-      spnot: newValues.spnot ?? null,
-      easy: newValues.easy ?? null,
-      hm: newValues.hm ?? null,
-      price: newValues.price ?? null,
-      kindOf: newValues.kindOf ?? null,
+      name: newValues.name ?? null,
+      skills: newValues.skillIds ?? null,
+      tafkidims: newValues.roleIds ?? null,
+      work_ways: newValues.workwayIds ?? null,
       sqadualed: newValues.sqadualed ?? null,
-      sqadualedf: newValues.sqadualedf ?? null,
-      linkto: newValues.linkto ?? null,
+      dates: newValues.dates ?? null,
       location: loc ? [loc] : [],
     },
     context.jwt,
     context.fetch
   );
 
-  // 2. Record the proposer's vote at the new round (133 replaces the whole array).
+  // 2. Record the proposer's vote at the new round (replaces the whole vots array).
   const existing = ((params.users ?? []) as UserVote[]).map((u) => {
     const upu = extractRelationId(u.users_permissions_user);
     return {
@@ -74,35 +73,35 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     ide: parseInt(userId, 10),
   };
   await strapi.execute(
-    '133addVoteToAskm',
-    { id: String(askmId), vots: [...existing, newVote] },
+    'negoUpdateAskVots',
+    { id: String(askId), vots: [...existing, newVote] },
     context.jwt,
     context.fetch
   );
 
   return {
-    data: { askmId, ordern: nextOrder },
+    data: { askId, ordern: nextOrder },
     updateStrategy: { type: 'none' },
   };
 };
 
-export const counterOnAskmConfig: ActionConfig = {
-  key: 'counterOnAskm',
+export const counterOnAskConfig: ActionConfig = {
+  key: 'counterOnAsk',
   description:
-    "Rights-holder counter-proposal on a candidate's Askm. Adds a NegoMash round (proposedBy=project) plus the proposer's vote at the new round, without touching the shared OpenMashaabim.",
+    "Rights-holder counter-proposal on a candidate's Ask. Adds a Negopendmission round (proposedBy=project) plus the proposer's vote at the new round, without touching the shared OpenMission.",
   graphqlOperation: handler,
 
   paramSchema: {
-    askmId: { type: 'string', required: true, description: 'Askm being negotiated' },
-    openMashaabimId: { type: 'string', required: false, description: 'Open resource the Askm targets' },
+    askId: { type: 'string', required: true, description: 'Ask being negotiated' },
+    openMissionId: { type: 'string', required: false, description: 'Open mission the Ask targets' },
     projectId: { type: 'string', required: true, description: 'Project (rikma) ID — auth' },
     ordern: { type: 'number', required: false, description: 'Current max round (new round = ordern+1)' },
     newValues: {
       type: 'object',
       required: false,
-      description: 'Counter terms: name, descrip, spnot, easy, hm, price, kindOf, sqadualed, sqadualedf, linkto, location',
+      description: 'Counter terms: name, descrip, hearotMeyuchadot, noofhours, perhour, skillIds, roleIds, workwayIds, sqadualed, dates, location',
     },
-    users: { type: 'array', required: false, description: 'Existing Askm vots array' },
+    users: { type: 'array', required: false, description: 'Existing Ask vots array' },
   },
 
   authRules: [
@@ -117,8 +116,8 @@ export const counterOnAskmConfig: ActionConfig = {
   notification: {
     recipients: { type: 'projectMembers', config: { projectIdParam: 'projectId', excludeSender: true } },
     templates: {
-      title: { he: 'הצעת ביניים למשאב', en: 'Intermediate proposal for a resource' },
-      body: { he: 'הוגשה הצעת ביניים על משאב בריקמה', en: 'An intermediate proposal was submitted for a resource' },
+      title: { he: 'הצעת ביניים למשימה', en: 'Intermediate proposal for a mission' },
+      body: { he: 'הוגשה הצעת ביניים על משימה בריקמה', en: 'An intermediate proposal was submitted for a mission' },
     },
     channels: ['socket'],
     metadata: { type: 'base', url: 'lev' },

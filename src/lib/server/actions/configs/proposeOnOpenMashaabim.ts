@@ -94,7 +94,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       sqadualed: newValues.sqadualed ?? null,
       sqadualedf: newValues.sqadualedf ?? null,
       linkto: newValues.linkto ?? null,
-      location: loc ? [loc] : null,
+      location: loc ? [loc] : [],
     },
     context.jwt,
     context.fetch

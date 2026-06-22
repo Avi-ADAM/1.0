@@ -284,6 +284,22 @@ export interface CounterOnAskmParams {
   users?: Array<{ what: boolean; users_permissions_user: any; order?: number; zman?: string; ide?: number }>;
 }
 
+export interface ProposeOnOpenMissionParams {
+  openMissionId: string;
+  projectId: string;
+  newValues?: Record<string, any>;
+  originalValues?: Record<string, any>;
+}
+
+export interface CounterOnAskParams {
+  askId: string;
+  openMissionId?: string;
+  projectId: string;
+  ordern?: number;
+  newValues?: Record<string, any>;
+  users?: Array<{ what: boolean; users_permissions_user: any; order?: number; zman?: string; ide?: number }>;
+}
+
 export type ActionKey =
   | 'createTask'
   | 'updateTask'
@@ -307,6 +323,8 @@ export type ActionKey =
   | 'submitNegoMaap'
   | 'proposeOnOpenMashaabim'
   | 'counterOnAskm'
+  | 'proposeOnOpenMission'
+  | 'counterOnAsk'
   | 'getUserForums'
   | 'getForumThread'
   | 'createChatMessage'
@@ -404,6 +422,8 @@ export interface ActionParamsMap {
   };
   proposeOnOpenMashaabim: ProposeOnOpenMashaabimParams;
   counterOnAskm: CounterOnAskmParams;
+  proposeOnOpenMission: ProposeOnOpenMissionParams;
+  counterOnAsk: CounterOnAskParams;
   getUserForums: Record<string, never>;
   getForumThread: {
     forumId: string;

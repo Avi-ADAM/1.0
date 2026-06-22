@@ -362,6 +362,18 @@
           <span class="whitespace-nowrap">{$t('lev.cards.decline')}</span>
         </button>
 
+        <!-- כפתור הצעה מקבילה -->
+        {#if onNego}
+          <button
+            class="flex-1 py-3 bg-white dark:bg-gray-800 border-2 border-yellow-500 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 font-bold rounded-xl flex justify-center items-center gap-2 transition-all hover:scale-105"
+            onmouseenter={() => hover({ he: 'הצעה מקבילה', en: 'counter proposal' })}
+            onmouseleave={() => hover('0')}
+            onclick={() => nego(null)}
+          >
+            <span class="whitespace-nowrap">{$t('lev.cards.nego')}</span>
+          </button>
+        {/if}
+
         <!-- כפתור הסכמה -->
         <button
           class="flex-2 py-3 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg flex justify-center items-center gap-2 transform hover:-translate-y-1 transition-all"

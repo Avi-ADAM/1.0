@@ -263,7 +263,20 @@ export async function POST({ request, cookies }) {
 		clearTimeout(timeoutId);
 		const newd = await res.json();
 
-		if (newd.data) return json(newd);
+		if (newd.data) {
+			// §5 bridge spec: never hand a private (bridge) discussion to the
+			// service path (guest/charter). Registered users read it through the
+			// JWT path, where Strapi enforces visibility. GetNegotiationByToken is
+			// link-based and ListLocalNegotiations already excludes private — so
+			// only the read-by-id qid needs guarding here.
+			if (isSer && queId === '39GetNegotiation') {
+				const vis = newd.data?.negotiation?.data?.attributes?.visibility;
+				if (vis === 'private') {
+					return json({ data: { negotiation: { data: null } } });
+				}
+			}
+			return json(newd);
+		}
 
 		if (newd.errors) {
 			console.error('GraphQL Errors from downstream:', JSON.stringify(newd.errors, null, 2));

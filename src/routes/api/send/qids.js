@@ -685,6 +685,9 @@ const qids_base = {
             isLocal
             scaleMin
             scaleMax
+            sourceType
+            sourceId
+            sourceMeta
             cuntries {
               data {
                 id
@@ -718,10 +721,10 @@ const qids_base = {
                   authorExternalId
                   authorType
                   votes
-                  voters { data { id } }
+                  voters
                   location
                   intensity
-                  tags { data { id } }
+                  tags
                   order
                   isAnchor
                   pole
@@ -748,7 +751,9 @@ const qids_base = {
 
   // arg: { topic, description, maxRounds, status, currentRound, createdBy,
   //        createdByEmail, ownerExternalId, visibility, shareToken, isLocal,
-  //        placeIds, publishedAt }
+  //        placeIds, sourceType, sourceId, sourceMeta, publishedAt }
+  // sourceType/sourceId/sourceMeta tie a bridge discussion to a main-app object
+  // (pmash / mission negotiation card) — see consensus1lev1 main-repo-bridge-spec.
   // Registered users only (no service token).
   '40CreateNegotiation': `
     mutation CreateNegotiation(
@@ -764,6 +769,9 @@ const qids_base = {
       $shareToken: String,
       $isLocal: Boolean,
       $placeIds: [ID],
+      $sourceType: String,
+      $sourceId: String,
+      $sourceMeta: JSON,
       $publishedAt: DateTime
     ) {
       createNegotiation(data: {
@@ -779,6 +787,9 @@ const qids_base = {
         shareToken: $shareToken,
         isLocal: $isLocal,
         cuntries: $placeIds,
+        sourceType: $sourceType,
+        sourceId: $sourceId,
+        sourceMeta: $sourceMeta,
         publishedAt: $publishedAt
       }) {
         data {
@@ -806,7 +817,7 @@ const qids_base = {
       $authorEmail: String,
       $authorExternalId: String,
       $authorType: ENUM_POSITION_AUTHORTYPE,
-      $location: Int,
+      $location: Float,
       $order: Int,
       $intensity: Int,
       $votes: Int,
@@ -866,7 +877,7 @@ const qids_base = {
   // selfPlacement: author's manual self-placement on 0..100 axis (AI hint, not displayed location).
   // location: derived value computed by consensus from clauses, written back via this qid.
   '42UpdatePosition': `
-    mutation UpdatePosition($id: ID!, $heading: String, $description: String, $location: Int, $selfPlacement: Int) {
+    mutation UpdatePosition($id: ID!, $heading: String, $description: String, $location: Float, $selfPlacement: Int) {
       updatePosition(id: $id, data: {
         heading: $heading,
         description: $description,
@@ -907,6 +918,9 @@ const qids_base = {
             isLocal
             scaleMin
             scaleMax
+            sourceType
+            sourceId
+            sourceMeta
             cuntries { data { id attributes { name } } }
             creator { data { attributes { username email } } }
             positions {
@@ -920,7 +934,66 @@ const qids_base = {
                   authorExternalId
                   authorType
                   votes
-                  voters { data { id } }
+                  voters
+                  location
+                  intensity
+                  order
+                  isAnchor
+                  pole
+                  kind
+                  relativePlacement
+                }
+              }
+            }
+            participants { data { id attributes { username email } } }
+          }
+        }
+      }
+    }
+  `,
+
+  // arg: { sourceType, sourceId }  — find the bridge discussion for a main-app
+  // object (a pmash / mission negotiation card). Registered users only: this qid
+  // is intentionally NOT added to CONSENSUS_QIDS, so it runs on the caller's own
+  // JWT and Strapi enforces access (no guest/charter service path). Returns the
+  // most recent match (limit 1). See consensus1lev1 main-repo-bridge-spec §2.3.
+  'GetNegotiationBySource': `
+    query GetNegotiationBySource($sourceType: String!, $sourceId: String!) {
+      negotiations(
+        filters: { sourceType: { eq: $sourceType }, sourceId: { eq: $sourceId } }
+        sort: ["createdAt:desc"]
+        pagination: { limit: 1 }
+      ) {
+        data {
+          id
+          attributes {
+            topic
+            description
+            status
+            maxRounds
+            currentRound
+            visibility
+            shareToken
+            isLocal
+            scaleMin
+            scaleMax
+            sourceType
+            sourceId
+            sourceMeta
+            cuntries { data { id attributes { name } } }
+            creator { data { attributes { username email } } }
+            positions {
+              data {
+                id
+                attributes {
+                  heading
+                  description
+                  aiMeta
+                  authorEmail
+                  authorExternalId
+                  authorType
+                  votes
+                  voters
                   location
                   intensity
                   order
@@ -4565,7 +4638,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                               id
                             }
                           }
-                          negopendmissions {
+                          negopendmissions(sort: "ordern:desc") {
                             data {
                               id
                               attributes {
@@ -4573,6 +4646,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                                 hearotMeyuchadot
                                 descrip
                                 createdAt
+                                ordern
+                                proposedBy
                                 noofhours
                                 perhour
                                 isOriginal
@@ -4882,7 +4957,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                         }
                       }
                     }
-                    negopendmissions {
+                    negopendmissions(sort: "ordern:desc") {
                       data {
                         id
                         attributes {
@@ -4890,6 +4965,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           hearotMeyuchadot
                           descrip
                           createdAt
+                          ordern
+                          proposedBy
                           noofhours
                           perhour
                           isOriginal
@@ -7934,6 +8011,70 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
   // existing downstream materialization picks up the agreed values.
   'applyRoundToOpenMashaabim': `mutation ApplyRoundToOpenMashaabim($id: ID!, $data: OpenMashaabimInput!) {
     updateOpenMashaabim(id: $id, data: $data) { data { id } }
+  }`,
+
+  // ─── Open-mission (openMission) candidate negotiation ───
+  // Mirrors the openMashaabim flow: each candidate has their own Ask; proposed
+  // terms live as Negopendmission rounds bound to that Ask. The shared
+  // OpenMission stays untouched as the rikma baseline for comparison.
+
+  // Create a Negopendmission round. Works for both the internal pendm flow and
+  // the external candidate/counter flow (open_mission + ask), with round bookkeeping.
+  'negoCreateNegopendmissionRound': `mutation NegoCreateNegopendmissionRound(
+    $publishedAt: DateTime!, $userId: ID!,
+    $pendm: ID, $open_mission: ID, $ask: ID,
+    $ordern: Int, $proposedBy: ENUM_NEGOPENDMISSION_PROPOSEDBY, $status: ENUM_NEGOPENDMISSION_STATUS,
+    $isOriginal: Boolean,
+    $noofhours: Float, $perhour: Float,
+    $hearotMeyuchadot: String, $descrip: String, $name: String,
+    $skills: [ID], $tafkidims: [ID], $work_ways: [ID],
+    $sqadualed: DateTime, $dates: DateTime,
+    $location: [ComponentNewLocationInput]
+  ) {
+    createNegopendmission(data: {
+      publishedAt: $publishedAt
+      users_permissions_user: $userId
+      pendm: $pendm
+      open_mission: $open_mission
+      ask: $ask
+      ordern: $ordern
+      proposedBy: $proposedBy
+      status: $status
+      isOriginal: $isOriginal
+      noofhours: $noofhours
+      perhour: $perhour
+      hearotMeyuchadot: $hearotMeyuchadot
+      descrip: $descrip
+      name: $name
+      skills: $skills
+      tafkidims: $tafkidims
+      work_ways: $work_ways
+      date: $sqadualed
+      dates: $dates
+      location: $location
+    }) { data { id } }
+  }`,
+
+  // Read an Ask's negotiation rounds (latest first) for the card / finalization.
+  'getAskNegoRounds': `query GetAskNegoRounds($id: ID!) {
+    ask(id: $id) { data { id attributes {
+      archived
+      vots { what order users_permissions_user { data { id } } }
+      negopendmissions(sort: "ordern:desc") { data { id attributes {
+        ordern proposedBy status name descrip hearotMeyuchadot
+        noofhours perhour date dates
+        skills { data { id } }
+        tafkidims { data { id } }
+        work_ways { data { id } }
+        users_permissions_user { data { id } }
+      } } }
+    } } }
+  }`,
+
+  // At acceptance, flow the winning candidate's negotiated terms onto the
+  // open mission (archived right after), so the Mesimabetahalich uses the agreed values.
+  'applyRoundToOpenMission': `mutation ApplyRoundToOpenMission($id: ID!, $data: OpenMissionInput!) {
+    updateOpenMission(id: $id, data: $data) { data { id } }
   }`
 };
 
@@ -9742,7 +9883,7 @@ export const qids = {
                         }
                       }
                     }
-                    negopendmissions {
+                    negopendmissions(sort: "ordern:desc") {
                       data {
                         id
                         attributes {
@@ -9750,6 +9891,8 @@ export const qids = {
                           hearotMeyuchadot
                           descrip
                           createdAt
+                          ordern
+                          proposedBy
                           noofhours
                           perhour
                           isOriginal

@@ -291,7 +291,7 @@ export const requestSuggestionConfig: ActionConfig = {
         ar: 'طلب جديد من أمنية'
       },
       body: {
-        he: 'מישהי פנתה אלייך דרך משאלה בקונסיירז׳. כנסי ל־Lev כדי להגיב.',
+        he: 'נשלחה פנייה אליך דרך משאלה בקונסיירז׳. יש להיכנס ל־Lev כדי להגיב.',
         en: 'Someone reached out to you through a concierge wish. Open Lev to respond.',
         ar: 'تواصل معك أحدهم عبر أمنية. افتح Lev للرد.'
       }

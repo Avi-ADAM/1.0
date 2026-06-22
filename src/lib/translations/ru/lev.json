@@ -20,6 +20,7 @@
   "cards": {
     "approve": "Хочу",
     "decline": "Не подходит",
+    "nego": "Встречное предложение",
     "requesterDetails": "Данные заявителя",
     "confirmApprove": "Утвердить",
     "confirmDecline": "Возразить",

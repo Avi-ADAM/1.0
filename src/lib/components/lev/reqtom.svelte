@@ -467,6 +467,7 @@
               onLoad={() => (negotiationLoading = true)}
               onClose={afternego}
               onSubmit={isRishon ? null : handleCounter}
+              candidateRound={!isRishon ? (negopendmissions?.find(r => r.attributes?.proposedBy === 'candidate')?.attributes ?? null) : null}
               descrip={missionDetails}
               {projectName}
               name1={openmissionName}

@@ -14,6 +14,8 @@
    * @property {string} [hearotMeyuchadot] - Original special notes
    * @property {Object} [acts] - Original acts/tasks
    * @property {string} [projectId] - Project ID for user data lookup
+   * @property {any} [location] - Original location object
+   * @property {boolean} [isCandidateFlow] - When true the nego rounds are candidate proposals; swap old/new direction
    */
 
   /** @type {Props} */
@@ -26,7 +28,8 @@
     hearotMeyuchadot,
     acts,
     projectId,
-    location = null
+    location = null,
+    isCandidateFlow = false
   } = $props();
 
   const locLabel = { he: 'מיקום', en: 'Location' };
@@ -47,24 +50,42 @@
 {#if negopendmissions && negopendmissions.length > 0}
   <div class="mt-6">
     <div class="mb-2 font-bold text-barbi text-xl lg:text-2xl">
-      {tr.nego.history[$lang]}
+      {isCandidateFlow ? tr.nego.candidateHistory[$lang] : tr.nego.history[$lang]}
     </div>
     <div class="space-y-3">
-      {#each negopendmissions as nego}
-        {@const attrs = nego.attributes}
+      {#each negopendmissions as negoItem}
+        {@const attrs = negoItem.attributes}
+        {@const byCandidate = attrs.proposedBy === 'candidate'}
         {@const prevLoc = Array.isArray(attrs.location) ? attrs.location[0] : attrs.location}
-        <div class="border-2 border-blue-300 rounded-lg p-3 bg-blue-50">
-          <div class="text-sm md:text-base text-gray-600 mb-2">
-            {tr.nego.proposedBy[$lang]}
-            <span class="font-semibold">
-              {getProjectData(
-                projectId,
-                'un',
-                attrs.users_permissions_user?.data?.id
-              ) ||
-                attrs.users_permissions_user?.data?.attributes.username ||
-                'Unknown'}
-            </span>
+        {@const roundLabel = isCandidateFlow
+          ? (byCandidate ? tr.nego.candidateRound[$lang] : tr.nego.projectRound[$lang])
+          : tr.nego.proposedBy[$lang]}
+        {@const old_hours = isCandidateFlow ? noofhours : (attrs.noofhours ?? noofhours)}
+        {@const new_hours = isCandidateFlow ? (attrs.noofhours ?? noofhours) : noofhours}
+        {@const old_perhour = isCandidateFlow ? perhour : (attrs.perhour ?? perhour)}
+        {@const new_perhour = isCandidateFlow ? (attrs.perhour ?? perhour) : perhour}
+        {@const old_name = isCandidateFlow ? openmissionName : attrs.name}
+        {@const new_name = isCandidateFlow ? attrs.name : openmissionName}
+        {@const old_loc = isCandidateFlow ? locationSummary(location) : locationSummary(prevLoc)}
+        {@const new_loc = isCandidateFlow ? locationSummary(prevLoc) : locationSummary(location)}
+        <div class="border-2 {isCandidateFlow && byCandidate ? 'border-barbi/50 bg-barbi/5' : isCandidateFlow ? 'border-gold/50 bg-gold/5' : 'border-blue-300 bg-blue-50'} rounded-lg p-3">
+          <div class="text-sm md:text-base text-gray-600 mb-2 flex flex-wrap items-center gap-2">
+            {#if isCandidateFlow}
+              <span class="font-bold px-2 py-0.5 rounded-full text-xs {byCandidate ? 'bg-barbi/20 text-barbi' : 'bg-gold/20 text-yellow-700'}">
+                {roundLabel}
+              </span>
+            {:else}
+              {roundLabel}
+              <span class="font-semibold">
+                {getProjectData(
+                  projectId,
+                  'un',
+                  attrs.users_permissions_user?.data?.id
+                ) ||
+                  attrs.users_permissions_user?.data?.attributes.username ||
+                  'Unknown'}
+              </span>
+            {/if}
             <span class="text-xs md:text-sm ml-2">
               {new Date(attrs.createdAt).toLocaleDateString($lang)}
             </span>
@@ -74,41 +95,40 @@
             {#if attrs.name && attrs.name !== openmissionName}
               <ComparisonDisplay
                 label={tr.common.nameLabel[$lang]}
-                oldValue={attrs.name}
-                newValue={openmissionName}
+                oldValue={old_name}
+                newValue={new_name}
               />
             {/if}
 
             {#if attrs.noofhours && attrs.noofhours !== noofhours}
               <ComparisonDisplay
                 label={tr.common.hoursLabel[$lang]}
-                oldValue={attrs.noofhours}
-                newValue={noofhours}
+                oldValue={old_hours}
+                newValue={new_hours}
               />
             {/if}
 
             {#if attrs.perhour && attrs.perhour !== perhour}
               <ComparisonDisplay
                 label={tr.common.perhourLabel[$lang]}
-                oldValue={attrs.perhour}
-                newValue={perhour}
+                oldValue={old_perhour}
+                newValue={new_perhour}
               />
             {/if}
 
             {#if (attrs.perhour && attrs.perhour !== perhour) || (attrs.noofhours && attrs.noofhours !== noofhours)}
               <ComparisonDisplay
                 label={tr.common.totalLabel[$lang]}
-                oldValue={(attrs.noofhours || noofhours) *
-                  (attrs.perhour || perhour)}
-                newValue={noofhours * perhour}
+                oldValue={String(old_hours * old_perhour)}
+                newValue={String(new_hours * new_perhour)}
               />
             {/if}
 
             {#if (prevLoc || location) && locationSummary(prevLoc) !== locationSummary(location)}
               <ComparisonDisplay
                 label={locLabel[$lang]}
-                oldValue={locationSummary(prevLoc)}
-                newValue={locationSummary(location)}
+                oldValue={old_loc}
+                newValue={new_loc}
               />
             {/if}
           </div>

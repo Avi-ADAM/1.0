@@ -278,65 +278,51 @@
 </script>
 
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
-  <div transition:fly={{ y: 450, opacity: 0.5, duration: 2000 }}>
-    <DialogContent class="chat" aria-label="form">
-      <div dir="rtl" class="grid items-center justify-center aling-center">
-        <button
-          onclick={close}
-          style="margin: 0 auto;"
-          class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-          title={$t('lev.mashsuggest.cancel')}
-          ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-            <path
-              fill="currentColor"
-              d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
-            />
-          </svg></button
-        >
-        {#if loading === true}
-          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s" />
-        {:else if masa === true}
-          <Nego
-            onLoad={() => (loading = true)}
-            onClose={afternego}
-            onSubmit={handleNegoSubmit}
-            masaalr={false}
-            descrip={descrip}
-            projectName={projectName}
-            name1={mashName}
-            spnot={spnot}
-            kindOf={kindOf}
-            hm={0}
-            projectId={projectId}
-            total={total}
-            noofusers={1}
-            price={price}
-            easy={easy}
-            linkto={''}
-            pendId={null}
-            sqadualedf={sqedualedf}
-            sqadualed={null}
-            users={[]}
-            ordern={0}
-            {restime}
-          />
-        {:else if diunm === true}
-          <Diun
-            onRect={afreact}
-            smalldes={projectName + '-' + mashName}
-            nameChatPartner={`${$t('lev.mashsuggest.chatOnJoining')}
-                              ${projectName} `}
-            mypos={true}
-            rect={true}
-            {clicked}
-            pendId={askId}
-            profilePicChatPartner={src.length > 0
-              ? src
-              : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
-            ani="iaskedMa"
-          />
-        {/if}
-      </div>
+  <div transition:fly={{ y: 40, opacity: 0, duration: 250 }}>
+    <DialogContent class="nego-modal" aria-label="form">
+      <button class="nego-modal-close" onclick={close} aria-label="סגירה">✕</button>
+      {#if loading === true}
+        <RingLoader size="200" color="#ff00ae" unit="px" duration="2s" />
+      {:else if masa === true}
+        <Nego
+          onLoad={() => (loading = true)}
+          onClose={afternego}
+          onSubmit={handleNegoSubmit}
+          masaalr={false}
+          descrip={descrip}
+          projectName={projectName}
+          name1={mashName}
+          spnot={spnot}
+          kindOf={kindOf}
+          hm={0}
+          projectId={projectId}
+          total={total}
+          noofusers={1}
+          price={price}
+          easy={easy}
+          linkto={''}
+          pendId={null}
+          sqadualedf={sqedualedf}
+          sqadualed={null}
+          users={[]}
+          ordern={0}
+          {restime}
+        />
+      {:else if diunm === true}
+        <Diun
+          onRect={afreact}
+          smalldes={projectName + '-' + mashName}
+          nameChatPartner={`${$t('lev.mashsuggest.chatOnJoining')} ${projectName}`}
+          mypos={true}
+          rect={true}
+          {clicked}
+          pendId={askId}
+          profilePicChatPartner={src.length > 0
+            ? src
+            : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
+          ani="iaskedMa"
+        />
+      {/if}
     </DialogContent>
   </div>
 </DialogOverlay>
@@ -732,5 +718,44 @@ role="button"
       height: 195px;
       width: 195px;
     }
+  }
+
+  :global([data-svelte-dialog-overlay].overlay) {
+    z-index: 9000;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  :global([data-svelte-dialog-content].nego-modal) {
+    position: relative;
+    background: #12121e;
+    border: 1px solid rgba(255, 0, 174, 0.35);
+    border-radius: 1.25rem;
+    width: min(700px, 96vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 2.5rem 1.5rem 2rem;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+    z-index: 9001;
+  }
+  .nego-modal-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    font-size: 1.25rem;
+    color: var(--barbi-pink);
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    z-index: 1;
+    padding: 0.25rem 0.5rem;
+    border-radius: 50%;
+    transition: background 0.15s;
+  }
+  .nego-modal-close:hover {
+    background: rgba(255, 0, 174, 0.15);
   }
 </style>

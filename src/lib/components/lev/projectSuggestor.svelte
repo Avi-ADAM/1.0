@@ -119,8 +119,31 @@
     }
   }
 
-  function nego(oid) {
-    console.log('nego', oid);
+  let negoOpen = $state(false);
+  let negoLoading = $state(false);
+
+  function nego(openMissionId) {
+    negoOpen = true;
+    isOpen = true;
+  }
+
+  async function handleNegoSubmit({ newValues, originalValues }) {
+    const result = await executeAction('proposeOnOpenMission', {
+      openMissionId: String(oid),
+      projectId: String(projectId),
+      newValues,
+      originalValues,
+    });
+    if (!result.success) throw new Error(result.error || 'proposeOnOpenMission failed');
+    already = true;
+    askedarr.push(String(oid));
+    less(oid);
+  }
+
+  function afterNego() {
+    negoOpen = false;
+    negoLoading = false;
+    isOpen = false;
   }
 
   async function decline(oid) {
@@ -244,6 +267,7 @@
   import { DialogContent, DialogOverlay } from 'svelte-accessible-dialog';
   import Diun from './diun.svelte';
   import { RingLoader } from 'svelte-loading-spinners';
+  import NegoM from '../prPr/negoM.svelte';
   const ttal = { he: 'נכנס כבר כסף', en: 'already has income' };
   const ttwe = { he: 'צפי רווח: שבוע', en: 'exp income: one week ' };
   const ttmo = { he: 'צפי רווח: חודש', en: 'exp income: one month ' };
@@ -259,6 +283,8 @@
   const close = () => {
     isOpen = false;
     diunm = false;
+    negoOpen = false;
+    negoLoading = false;
   };
 
   let clicked = $state(false);
@@ -365,57 +391,52 @@
 </script>
 
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
-  <div transition:fly={{ y: 450, opacity: 0.5, duration: 2000 }}>
-    <DialogContent class="chat d" aria-label="form">
-      <div dir="rtl" class="grid items-center justify-center aling-center d">
-        {#if loading === true}
-          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
-          ></RingLoader>
-          <!--   
-{:else if masa === true}
-
-<Nego
-      onLoad={()=>loading = true}
-        onClose={afternego}
-  descrip ={descrip}
-  projectName ={projectName}
-  name1 ={name}
-  spnot = {hearotMeyuchadot}
-  kindOf ={kindOf}
-  hm = {hm}
-  {timegramaId}
-  projectId = {projectId}
-  total ={total}
-  noofusers={noOfusers}
-  price={price}
-  easy = {easy}
-  linkto = {linkto}
-  pendId ={pendId}
-  mshaabId={mshaabId}
-  sqadualedf={sqadualedf}
-  sqadualed={sqadualed}
-  users={users}
-{restime}
-/>-->
-        {:else if diunm === true}
-          <Diun
-            onRect={afreact}
-            smalldes={projectName + '-' + missionName}
-            nameChatPartner={`${chatdes2[$lang]} 
-  ${projectName}`}
-            mypos={true}
-            rect={true}
-            {clicked}
-            pendId={forumId ? forumId : oid}
-            profilePicChatPartner={src.length > 0
-              ? src
-              : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
-            ani={forumId ? 'new-forum' : 'iaskedMi'}
-            messages={forumId ? $forumStore[forumId]?.messages || [] : []}
-            isLoading={forumId ? $forumStore[forumId]?.loading || false : false}
-          />
-        {/if}
-      </div>
+  <div transition:fly={{ y: 40, opacity: 0, duration: 250 }}>
+    <DialogContent class="nego-modal" aria-label="form">
+      <button class="nego-modal-close" onclick={close} aria-label="סגירה">✕</button>
+      {#if loading === true}
+        <RingLoader size="200" color="#ff00ae" unit="px" duration="2s" />
+      {:else if negoOpen === true}
+        <NegoM
+          onLoad={() => (negoLoading = true)}
+          onClose={afterNego}
+          onSubmit={handleNegoSubmit}
+          descrip={missionDetails}
+          {projectName}
+          name1={missionName}
+          {hearotMeyuchadot}
+          noofhours={noOfHours}
+          {perhour}
+          {projectId}
+          total={noOfHours * perhour}
+          noofusers={noOfusers}
+          pendId={String(oid)}
+          {skills}
+          tafkidims={role}
+          {workways}
+          mdate={deadLine}
+          mdates={deadLinefi}
+          isKavua={false}
+          users={[]}
+          isAsk={1}
+        />
+      {:else if diunm === true}
+        <Diun
+          onRect={afreact}
+          smalldes={projectName + '-' + missionName}
+          nameChatPartner={`${chatdes2[$lang]} ${projectName}`}
+          mypos={true}
+          rect={true}
+          {clicked}
+          pendId={forumId ? forumId : oid}
+          profilePicChatPartner={src.length > 0
+            ? src
+            : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
+          ani={forumId ? 'new-forum' : 'iaskedMi'}
+          messages={forumId ? $forumStore[forumId]?.messages || [] : []}
+          isLoading={forumId ? $forumStore[forumId]?.loading || false : false}
+        />
+      {/if}
     </DialogContent>
   </div>
 </DialogOverlay>
@@ -2831,6 +2852,7 @@
               onProject={project}
               onAgree={() => agree(oid)}
               onDecline={() => decline(oid)}
+              onNego={() => nego(oid)}
               onHover={hoverc}
               onTochat={tochat}
               {acts}
@@ -2866,6 +2888,7 @@
     onProject={project}
     onAgree={() => agree(oid)}
     onDecline={() => decline(oid)}
+    onNego={() => nego(oid)}
     onHover={hoverc}
     onTochat={tochat}
     {isVisible}
@@ -3072,5 +3095,44 @@
       height: 195px;
       width: 195px;
     }
+  }
+
+  :global([data-svelte-dialog-overlay].overlay) {
+    z-index: 9000;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  :global([data-svelte-dialog-content].nego-modal) {
+    position: relative;
+    background: #12121e;
+    border: 1px solid rgba(255, 0, 174, 0.35);
+    border-radius: 1.25rem;
+    width: min(700px, 96vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 2.5rem 1.5rem 2rem;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+    z-index: 9001;
+  }
+  .nego-modal-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    font-size: 1.25rem;
+    color: var(--barbi-pink);
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    z-index: 1;
+    padding: 0.25rem 0.5rem;
+    border-radius: 50%;
+    transition: background 0.15s;
+  }
+  .nego-modal-close:hover {
+    background: rgba(255, 0, 174, 0.15);
   }
 </style>

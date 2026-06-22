@@ -3,7 +3,7 @@
 מסמך מעקב למימוש מו"מ על תנאי שותפות בהצעות הפתוחות של הריקמה, במקביל למו"מ
 הפנימי הקיים (pendm / pmash).
 
-עודכן לאחרונה: 2026-06-21 · ענף: `claude/hopeful-pascal-6fd137`
+עודכן לאחרונה: 2026-06-21 · ענף: `main`
 
 ---
 
@@ -146,10 +146,10 @@
 
 - [x] סכמת Strapi (rounds + relations)
 - [x] משאבים: proposeOnOpenMashaabim + counterOnAskm + מימוש + UI
-- [ ] משימות: תיקון submitNegoMission (לא לדרוס) → סבב מקושר ל-Ask
-- [ ] משימות: proposeOnOpenMission + counterOnAsk + שאילתות
-- [ ] משימות: מימוש ב-ask.svelte/finalizeAskAcceptance מתנאי הסבב
-- [ ] משימות: UI (projectSuggestor + sugestmi + reqtojoin/reqtosherut)
+- [x] משימות: תיקון submitNegoMission (לא לדרוס) → סבב מקושר ל-Ask
+- [x] משימות: proposeOnOpenMission + counterOnAsk + שאילתות (negoCreateNegopendmissionRound / getAskNegoRounds / applyRoundToOpenMission)
+- [x] משימות: מימוש ב-finalizeAskAcceptance מתנאי הסבב (best-effort, כמו runResourceAskmAcceptance)
+- [x] משימות: UI (projectSuggestor + sugestmi + reqtojoin + negoM.onSubmit)
 - [ ] טעינת nego_mashes/negopendmissions לכרטיסי בעל-הזכות
 - [ ] helper חישוב סבב/תור בצד הלקוח
 - [ ] תיקון pendId ל-isRishon ב-reqtom

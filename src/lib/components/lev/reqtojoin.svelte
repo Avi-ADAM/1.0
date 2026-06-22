@@ -279,7 +279,7 @@
           existingMemberIds: existingMemberIdsBefore,
           existingVotes: users,
           projectName,
-          projectSrc: src2,
+          projectSrc: src2
         });
         if (result.success) {
           onAcsept?.({ ani: 'asked', coinlapach: coinlapach });
@@ -315,7 +315,7 @@
           existingMemberIds: existingMemberIdsBefore,
           existingVotes: users,
           projectName,
-          projectSrc: src2,
+          projectSrc: src2
         });
         if (result.success) {
           onAcsept?.({ ani: 'asked', coinlapach: coinlapach });
@@ -354,10 +354,25 @@
   function toggleNegotiationMode() {
     negotiationMode = !negotiationMode;
     if (negotiationMode) {
-      already = true; // Set to true when entering negotiation mode
+      already = true;
       masa = true;
       isOpen = true;
     }
+  }
+
+  // Rights-holder intermediate proposal on a candidate's Ask. Stored as a
+  // Negopendmission round (proposedBy=project) — never overwriting the shared
+  // OpenMission. For self-proposals (isRishon) the internal pendm flow is used.
+  async function handleCounter({ newValues, originalValues }) {
+    const result = await executeAction('counterOnAsk', {
+      askId: String(askId),
+      openMissionId: openMid != null ? String(openMid) : undefined,
+      projectId: String(projectId),
+      ordern: orderon ?? 0,
+      newValues,
+      users
+    });
+    if (!result.success) throw new Error(result.error || 'counterOnAsk failed');
   }
 
   async function decline() {
@@ -371,7 +386,7 @@
         const result = await executeAction('declineMissionRequest', {
           openMissionId: String(openMid),
           projectId: String(projectId),
-          declinedUserId: String(userId),
+          declinedUserId: String(userId)
         });
         if (result.success) {
           onDecline?.({ ani: 'asked', coinlapach });
@@ -539,6 +554,7 @@
       coinlapach
     });
   }
+
 </script>
 
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
@@ -554,6 +570,12 @@
               masaalr={false}
               onLoad={() => (negotiationLoading = true)}
               onClose={afternego}
+              onSubmit={isRishon ? null : handleCounter}
+              candidateRound={!isRishon
+                ? (negopendmissions?.find(
+                    (r) => r.attributes?.proposedBy === 'candidate'
+                  )?.attributes ?? null)
+                : null}
               {timegramaId}
               {negopendmissions}
               descrip={missionDetails}
@@ -568,7 +590,7 @@
               noofusers={noofpu}
               missionId={missId}
               {skills}
-              isAsk={askId}
+              isAsk={isRishon ? 0 : (askId ?? 1)}
               tafkidims={role}
               {workways}
               mdate={sqedualed}
@@ -577,7 +599,7 @@
               {publicklinks}
               {privatlinks}
               restime={getProjectData(projectId, 'restime')}
-              pendId={openMid}
+              pendId={isRishon ? openMid : null}
               {users}
               {acts}
             />
@@ -904,7 +926,7 @@
             <div class="swiper-slidec mx-auto">
               <Card
                 onAgree={() => agree()}
-                onNego={isRishon ? toggleNegotiationMode : () => decline()}
+                onNego={toggleNegotiationMode}
                 onHover={() => hoverc()}
                 onChat={tochat}
                 {low}
@@ -947,7 +969,7 @@
 {:else}
   <Card
     onAgree={() => agree()}
-    onNego={isRishon ? toggleNegotiationMode : () => decline()}
+    onNego={toggleNegotiationMode}
     onHover={hoverc}
     onChat={tochat}
     {isVisible}

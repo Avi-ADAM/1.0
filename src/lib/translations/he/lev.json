@@ -20,6 +20,7 @@
   "cards": {
     "approve": "אני רוצה",
     "decline": "לא מתאים",
+    "nego": "התאמה אישית",
     "requesterDetails": "פרטי המבקש",
     "confirmApprove": "אישור",
     "confirmDecline": "התנגדות",

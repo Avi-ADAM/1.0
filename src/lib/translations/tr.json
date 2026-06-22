@@ -499,6 +499,21 @@
             "en": "suggest changes for the mission",
             "ar": "اقتراح تغييرات للمهمة"
         },
+        "headMissionCandidate": {
+            "he": "הגשת הצעה מקבילה למשימה",
+            "en": "Submit parallel proposal for mission",
+            "ar": "تقديم اقتراح موازٍ للمهمة"
+        },
+        "headMashCandidate": {
+            "he": "הגשת הצעה מקבילה למשאב",
+            "en": "Submit parallel proposal for resource",
+            "ar": "تقديم اقتراح موازٍ للمورد"
+        },
+        "submitProposal": {
+            "he": "שלח הצעה",
+            "en": "Send proposal",
+            "ar": "إرسال الاقتراح"
+        },
         "sugestion": {
             "he": "ההצעה שלך",
             "en": "your sugestion",
@@ -573,6 +588,26 @@
             "he": "היסטוריית משא ומתן",
             "en": "Negotiation History",
             "ar": "سجل التفاوض"
+        },
+        "candidateHistory": {
+            "he": "הצעות המועמד",
+            "en": "Candidate Proposals",
+            "ar": "مقترحات المرشح"
+        },
+        "candidateRound": {
+            "he": "הצעת מועמד",
+            "en": "Candidate's proposal",
+            "ar": "اقتراح المرشح"
+        },
+        "projectRound": {
+            "he": "הצעת ביניים מהריקמה",
+            "en": "Project's counter",
+            "ar": "عرض مضاد من المشروع"
+        },
+        "rikmaReq": {
+            "he": "דרישת הריקמה",
+            "en": "Project requirement",
+            "ar": "متطلب المشروع"
         },
         "proposedBy": {
             "he": "הוצע על ידי:",
@@ -1088,7 +1123,7 @@
             "ar": "تاريخ الطلب"
         },
         "incomingWish": {
-            "he": "משאלה אלייך",
+            "he": "משאלה אליך",
             "en": "Wish for you",
             "ar": "أمنية لك"
         },
@@ -1103,12 +1138,12 @@
             "ar": "تمت المشاهدة"
         },
         "aWisher": {
-            "he": "מבקשת",
+            "he": "מבקש/ת",
             "en": "A wisher",
             "ar": "صاحب أمنية"
         },
         "invitedYou": {
-            "he": "הזמינה אותך לתרום למשאלה",
+            "he": "הזמינ/ה אותך לתרום למשאלה",
             "en": "invited you to help with a wish",
             "ar": "دعاك للمساهمة في أمنية"
         },

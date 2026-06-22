@@ -79,7 +79,12 @@
       "Bash(awk '/export type NegoInput = \\\\{/,/\\\\};/' src/generated/graphql.ts)",
       "Bash(awk '/^### Ask$/{f=1} f{print NR\": \"$0} /^### Askm$/{exit}' src/generated/STRAPI_SCHEMA_REFERENCE.md)",
       "Bash(awk '/^### NegoMashInput$/{x=1} x{print} /^### NegopendmissionInput$/{exit}' src/generated/STRAPI_SCHEMA_REFERENCE.md)",
-      "Bash(echo \"exit:$?\")"
+      "Bash(echo \"exit:$?\")",
+      "PowerShell(npx svelte-check --tsconfig ./jsconfig.json --threshold error 2>&1)",
+      "Bash(Get-Item \"C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0\\\\src\\\\lib\\\\server\\\\actions\\\\configs\\\\proposeOnOpenMission.ts\")",
+      "Bash(Select-Object Name, Length)",
+      "Bash(Get-Item \"C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0\\\\src\\\\lib\\\\server\\\\actions\\\\configs\\\\counterOnAsk.ts\")",
+      "Bash(awk -F: '{if \\($2+0 < 4641\\) prev=$0; else if \\(!found\\) {print prev; print $0; found=1}}')"
     ],
     "additionalDirectories": [
       "c:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\deals\\request",
