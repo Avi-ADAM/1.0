@@ -2,6 +2,7 @@ import React from 'react';
 import {Composition} from 'remotion';
 import {loadFont} from '@remotion/google-fonts/Rubik';
 import {Promo, SCENES, TRANSITION} from './Promo';
+import {Promo2, SCENES2, TRANSITION2} from './Promo2';
 
 // Load only the weights we use, and include the Hebrew subset so the RTL copy renders.
 loadFont('normal', {
@@ -9,12 +10,15 @@ loadFont('normal', {
   subsets: ['hebrew', 'latin'],
 });
 
-// TransitionSeries total = sum(scenes) - sum(transitions).
-const DURATION = SCENES.reduce((a, b) => a + b, 0) - (SCENES.length - 1) * TRANSITION;
+// TransitionSeries total = sum(scenes) - sum(transitions between them).
+const DURATION  = SCENES.reduce((a, b)  => a + b, 0) - (SCENES.length  - 1) * TRANSITION;
+const DURATION2 = SCENES2.reduce((a, b) => a + b, 0) - (SCENES2.length - 1) * TRANSITION2;
 
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      {/* ─── PROMO 1: Brand intro ─── */}
+
       {/* Landscape — for the website hero / YouTube */}
       <Composition
         id="Promo-Landscape"
@@ -40,6 +44,38 @@ export const RemotionRoot: React.FC = () => {
         id="Promo-Square"
         component={Promo}
         durationInFrames={DURATION}
+        fps={30}
+        width={1080}
+        height={1080}
+      />
+
+      {/* ─── PROMO 2: Process walkthrough ─── */}
+
+      {/* Landscape — YouTube / website explainer */}
+      <Composition
+        id="Promo2-Landscape"
+        component={Promo2}
+        durationInFrames={DURATION2}
+        fps={30}
+        width={1920}
+        height={1080}
+      />
+
+      {/* Vertical — Reels / Stories */}
+      <Composition
+        id="Promo2-Vertical"
+        component={Promo2}
+        durationInFrames={DURATION2}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+
+      {/* Square — feed post */}
+      <Composition
+        id="Promo2-Square"
+        component={Promo2}
+        durationInFrames={DURATION2}
         fps={30}
         width={1080}
         height={1080}

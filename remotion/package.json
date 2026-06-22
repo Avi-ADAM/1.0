@@ -8,6 +8,9 @@
     "render": "remotion render Promo-Landscape out/promo-landscape.mp4",
     "render:vertical": "remotion render Promo-Vertical out/promo-vertical.mp4",
     "render:square": "remotion render Promo-Square out/promo-square.mp4",
+    "render2": "remotion render Promo2-Landscape out/promo2-landscape.mp4",
+    "render2:vertical": "remotion render Promo2-Vertical out/promo2-vertical.mp4",
+    "render2:square": "remotion render Promo2-Square out/promo2-square.mp4",
     "upgrade": "remotion upgrade"
   },
   "dependencies": {
