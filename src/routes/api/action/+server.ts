@@ -21,6 +21,7 @@ import type { ActionContext } from '$lib/server/actions/types.js';
 // Import action configurations to register them
 import '$lib/server/actions/configs/index.js';
 import { ADMINMONTHER } from '$env/static/private';
+import { isInternalRequest } from '$lib/server/internalSecret.js';
 
 // Environment variables
 const STRAPI_ENDPOINT = import.meta.env.VITE_URL + '/graphql';
@@ -76,8 +77,13 @@ export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
     let jwt = cookies.get('jwt');
     const lang = cookies.get('lang') || 'he';
 
-    // Server-Side Bypass Logic (e.g. from Telegram Bot)
-    if (isSer === true) {
+    // Server-Side Bypass Logic (e.g. from Telegram Bot).
+    // `isSer` grants the admin token and lets the caller act as any userId, so
+    // it is honoured only when the request carries the internal secret
+    // (injected by handleFetch for genuine server-side calls). A client that
+    // sets isSer:true in the body without the secret is treated as a normal
+    // authenticated user and falls through to the cookie JWT below.
+    if (isSer === true && isInternalRequest(request)) {
       jwt = ADMIN_TOKEN;
       // If request is from server, use userId from params if available, otherwise fallback to cookie (likely undefined)
       if (params?.userId) {
