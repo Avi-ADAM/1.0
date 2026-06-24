@@ -40,15 +40,17 @@ const PHONE_RE = /(?:\+?\d[\s-]?){7,}/;
 const REPEAT_RE = /(.)\1{4,}/; // same char 5+ times → "aaaaaa"
 
 /**
- * Screen a free-text label. Pure function — no I/O.
+ * Screen a free-text string. Pure function — no I/O. `checkLength` is on for
+ * short labels; turn it off for longer free-text like descriptions.
  */
-export function screenLabel(label: string): ScreenResult {
+export function screenLabel(label: string, opts: { checkLength?: boolean } = {}): ScreenResult {
+	const { checkLength = true } = opts;
 	const reasons: string[] = [];
 	const text = (label ?? '').trim();
 	const lower = text.toLowerCase();
 
 	if (!text) reasons.push('empty');
-	if (text.length > 60) reasons.push('too_long');
+	if (checkLength && text.length > 60) reasons.push('too_long');
 	if (URL_RE.test(text)) reasons.push('link');
 	if (EMAIL_RE.test(text)) reasons.push('contact');
 	if (PHONE_RE.test(text)) reasons.push('contact');
@@ -86,7 +88,8 @@ export async function archiveEntry(kind: VocabKind, id: string, fetchFn: typeof 
 const OWNER_LABELS: Record<VocabKind, string> = {
 	skills: 'כישור',
 	vallues: 'ערך',
-	roles: 'תפקיד'
+	roles: 'תפקיד',
+	workways: 'דרך יצירה'
 };
 
 /**
@@ -143,9 +146,12 @@ export interface ModerationOutcome {
  */
 export async function moderateVocabItem(
 	fetchFn: typeof fetch,
-	args: { kind: VocabKind; id: string; label: string; createdBy?: string }
+	args: { kind: VocabKind; id: string; label: string; createdBy?: string; extraText?: string }
 ): Promise<ModerationOutcome> {
-	const screen = screenLabel(args.label);
+	const labelScreen = screenLabel(args.label);
+	const descScreen = args.extraText ? screenLabel(args.extraText, { checkLength: false }) : { flagged: false, reasons: [] };
+	const reasons = [...new Set([...labelScreen.reasons, ...descScreen.reasons])];
+	const screen = { flagged: reasons.length > 0, reasons };
 	if (!screen.flagged) return { flagged: false, archived: false, reasons: [] };
 
 	let archived = false;

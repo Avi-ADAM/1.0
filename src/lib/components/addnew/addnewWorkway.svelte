@@ -32,74 +32,42 @@
       onB
     } = $props();
 
-        function dispatchww (meData) {
-          console.log(meData);
+        function dispatchww (item) {
       onAddww?.({
-        id: meData.data.createWorkWay.data.id,
+        id: item.id,
         mid: mid,
-        skob: meData.data.createWorkWay.data,
-        name: meData.data.createWorkWay.data.attributes.workwayName,
+        skob: item,
+        name: item.attributes?.workWayName ?? item.attributes?.workwayName,
         } );
     };
-    const baseUrl = import.meta.env.VITE_URL
 
    async function addww () {
-    let d = new Date
        shgi = false;
 if (rn.includes(Name_value)){
   shgi = true;
 } else {
-let link =baseUrl+"/graphql" ;
         try {
-             await fetch(link, {
+             const res = await fetch('/api/vocab/create', {
               method: 'POST',
-       
-        headers: {
-            'Content-Type': 'application/json'
-                  },
-        body: 
-        JSON.stringify({query: 
-           `mutation { createWorkWay(
-       data: {workWayName: "${Name_value}" 
-              publishedAt: "${d.toISOString()}",
-      }
-  
-  ){
-          data{
-              id attributes{ workWayName ${$lang == 'he' ? 'localizations { data {attributes{workWayName} }}' : ""}
-          }}
-  }
-}`   
-        })
-})
-  .then(r => r.json())
-  .then(data => meData = data);
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                kind: 'workways',
+                label: Name_value,
+                lang: $lang,
+                createdBy: $liUN || 'user'
+              })
+            }).then((r) => r.json());
 
-            dispatchww (meData, id);
+            if (!res?.success || !res.item) { console.log('create failed', res); return; }
+            if (res.moderation?.flagged) { addW = false; return; }
+
+            dispatchww({ id: res.item.id, attributes: res.item.attributes });
             addW = false;
-          let userName_value = liUN.get()
-         let data = {"name": userName_value, "action": "create דרך יצירה חדשה בשם:", "det": `${Name_value}`}
-   fetch("/api/ste", {
-  method: 'POST', // or 'PUT'
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(data),
-})
-  .then((response) => response)
-  .then((data) => {
-    console.log('Success:', data);
-
-  })
-  .catch((error) => {
-    console.error('Error:', error);
-  
-  })
           }
       catch(error) {
         console.log('צריך לתקן:', error);
                 };}
-    };    
+    };
     
 
        const cencel = {"he":"ביטול","en": "cencel"}

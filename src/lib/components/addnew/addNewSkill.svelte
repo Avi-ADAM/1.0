@@ -3,13 +3,9 @@
   import Addnewro from './addNewRoleToSkill.svelte';
   import MultiSelect from 'svelte-multiselect';
   import { onMount } from 'svelte';
-  import { sanitizeUserInput } from '$lib/func/uti/sanitizeUserInput.svelte';
   import { lang } from '$lib/stores/lang.js';
   import { liUN } from '$lib/stores/liUN.js';
-  import {
-    checkDuplicate,
-    validateAndCreateVocabItem
-  } from '$lib/embed/vocab-creation';
+  import { checkDuplicate } from '$lib/embed/vocab-creation';
 
   // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -33,7 +29,6 @@
   let tafkidimslist = [];
   let skillName_value = $state('');
   let desS = $state('');
-  let meData;
   let error1 = null;
   let addro = $state(false);
 
@@ -75,44 +70,18 @@
     }
   };
 
-  // ─── onMount: טעינת תפקידים ───────────────────────────────────────────────────
-
-  const baseUrl = import.meta.env.VITE_URL;
+  // ─── onMount: טעינת תפקידים (דרך הפרוקסי) ────────────────────────────────────
 
   onMount(async () => {
-    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-    const checkStatus = (resp) => {
-      if (resp.status >= 200 && resp.status < 300) return resp;
-      return parseJSON(resp).then((r) => {
-        throw r;
-      });
-    };
-
     try {
-      const res = await fetch(baseUrl + '/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: `query {
-            tafkidims { data { id attributes {
-              roleDescription
-              ${$lang === 'he' ? 'localizations { data { attributes { roleDescription } } }' : ''}
-            }}}
-          }`
-        })
-      })
-        .then(checkStatus)
-        .then(parseJSON);
-
-      roles1 = res.data.tafkidims.data;
+      const res = await fetch(`/api/vocab/list?kind=roles&lang=${$lang}`).then((r) => r.json());
+      roles1 = res?.data ?? [];
 
       if ($lang === 'he') {
         for (let i = 0; i < roles1.length; i++) {
           if (roles1[i].attributes.localizations?.data?.length > 0) {
             roles1[i].attributes.roleDescription =
-              roles1[
-                i
-              ].attributes.localizations.data[0].attributes.roleDescription;
+              roles1[i].attributes.localizations.data[0].attributes.roleDescription;
           }
         }
       }
@@ -166,8 +135,8 @@
     return arr;
   }
 
-  function dispatchskillid(meData, id) {
-    onAddnewskill?.({ id, mid, skob: meData.data.createSkill.data });
+  function dispatchskillid(skob, id) {
+    onAddnewskill?.({ id, mid, skob });
   }
 
   function dispatchb() {
@@ -187,7 +156,7 @@
     addro = event.addro;
   }
 
-  // ─── יצירת כישור — עם validateAndCreateVocabItem ─────────────────────────────
+  // ─── יצירת כישור — דרך הפרוקסי המאוחד /api/vocab/create ──────────────────────
 
   async function addNewSkill() {
     saveError = '';
@@ -205,85 +174,54 @@
     saving = true;
     tafkidimslist = find_role_id(selected);
 
-    const result = await validateAndCreateVocabItem(
-      skillName_value.trim(),
-      'skills',
+    try {
+      // Single server-side path: create → moderate → vector + translate.
+      const res = await fetch('/api/vocab/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          kind: 'skills',
+          label: skillName_value.trim(),
+          lang: $lang,
+          createdBy: $liUN || 'user',
+          description: desS,
+          relations: { tafkidims: tafkidimslist }
+        })
+      }).then((r) => r.json());
 
-      // strapiCreateFn — יוצר ב-Strapi + מפעיל תרגום אוטומטי
-      async (label) => {
-        const d = new Date();
+      saving = false;
 
-        // 1. צור את הכישור ב-Strapi
-        const gqlRes = await fetch(baseUrl + '/graphql', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            query: `mutation {
-              createSkill(data: {
-                skillName: "${sanitizeUserInput(label)}",
-                descrip: "${sanitizeUserInput(desS)}",
-                tafkidims: [${tafkidimslist}],
-                publishedAt: "${d.toISOString()}"
-              }) {
-                data {
-                  id
-                  attributes {
-                    skillName
-                    ${$lang === 'he' ? 'localizations { data { attributes { skillName } } }' : ''}
-                  }
-                }
-              }
-            }`
-          })
-        }).then((r) => r.json());
-
-        meData = gqlRes;
-        id = meData.data.createSkill.data.id;
-
-        // 2. הפעל תרגום אוטומטי (הפונקציה הקיימת שלך)
-        fetch('/api/auto-localize/strapi4', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contentType: 'skills',
-            entryId: id,
-            sourceLocale: $lang
-          })
-        }).catch((e) => console.warn('תרגום אוטומטי נכשל:', e));
-        // fire-and-forget — לא מחכים, לא חוסמים
-
-        // 3. לוג פעולה
-        fetch('/api/ste', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: $liUN,
-            action: 'יצר כישור חדש בשם:',
-            det: `${label} והתיאור: ${desS} והתפקידים: ${tafkidimslist.join(', ')}`
-          })
-        }).catch((e) => console.warn('לוג נכשל:', e));
-
-        // החזר בפורמט שמצפה לו validateAndCreateVocabItem
-        return { id: String(id), label, translations: {} };
+      if (!res?.success || !res.item) {
+        saveError = $lang === 'he' ? 'יצירה נכשלה' : 'Create failed';
+        return;
       }
-    );
 
-    saving = false;
+      // Flagged → archived for owner review.
+      if (res.moderation?.flagged) {
+        saveError = $lang === 'he' ? 'נשלח לבדיקת מנהל' : 'Submitted for review';
+        return;
+      }
 
-    if (result.success) {
-      dispatchskillid(meData, id);
+      // Fire auto-translation (background) for clean items.
+      if (res.translate) {
+        fetch('/api/translations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(res.translate)
+        }).catch((e) => console.warn('תרגום אוטומטי נכשל:', e));
+      }
+
+      id = res.item.id;
+      dispatchskillid({ id: res.item.id, attributes: res.item.attributes }, id);
       addS = false;
       skillName_value = '';
       desS = '';
       selected = [];
       dupMatch = null;
       dupStatus = 'idle';
-    } else if (result.reason === 'duplicate') {
-      // כפילות שנתפסה ברגע השמירה (race condition נדיר)
-      dupMatch = result.match;
-      dupStatus = result.match.similarity >= 0.92 ? 'found' : 'similar';
-    } else {
-      saveError = result.message;
+    } catch (e) {
+      saving = false;
+      saveError = e instanceof Error ? e.message : String(e);
     }
   }
 

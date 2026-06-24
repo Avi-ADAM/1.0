@@ -25,14 +25,6 @@ const SRC = join(ROOT, 'src');
 // Files known to still call Strapi /graphql directly from the client.
 // Shrink this list as components are migrated; never add to it.
 const BASELINE = new Set([
-	'src/lib/components/addnew/addNewMission.svelte',
-	'src/lib/components/addnew/addNewRole.svelte',
-	'src/lib/components/addnew/addNewRoleToSkill.svelte',
-	'src/lib/components/addnew/addNewSkill.svelte',
-	'src/lib/components/addnew/addNewSkillToRole.svelte',
-	'src/lib/components/addnew/addnewWorkway.svelte',
-	'src/lib/components/addnew/addnewval.svelte',
-	'src/lib/components/addnew/choosRole.svelte',
 	'src/lib/components/lev/reqtosherut.svelte',
 	'src/lib/components/main/amana.svelte',
 	'src/lib/components/main/amanaen.svelte',

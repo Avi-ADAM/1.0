@@ -52,9 +52,33 @@ Props: `selected` (bindable, מערך מחרוזות), `placeholder`, `color`, `
 
 המודרציה רצה **inline** בכל יצירה (`/api/vocab/create`), כך שלא ניתן לעקוף אותה.
 
-## מה נותר לאימוץ מלא
+## טפסי יצירה (addnew/*) — הוגרו ✅
 
-- להחליף שימושים ישירים ב-`addnew/*` (addNewSkill, addnewval, addNewRole …)
-  שעדיין יוצרים דרך GraphQL ישיר — להפנותם ל-`VocabSelector`/`/api/vocab/create`.
-- workways: להוסיף `kind: 'work_ways'` ל-`vocabKinds` ולהגר את `addnewWorkway`.
+הטפסים העשירים (שם + תיאור + relations) ממשיכים לקיים את ה-UX שלהם, אבל
+**צינור היצירה אוחד** — כולם קוראים ל-`/api/vocab/create` (במקום GraphQL ישיר),
+כך שמודרציה/תרגום/וקטור/הודעה-לבעלים קורים במקום אחד ולא ניתנים לעקיפה:
+
+| קובץ | kind | extra |
+|------|------|-------|
+| `addNewSkill` | skills | descrip + relation `tafkidims` |
+| `addNewSkillToRole` | skills | descrip |
+| `addNewRole` | roles | descrip + relation `skills` |
+| `addNewRoleToSkill` | roles | descrip |
+| `addnewval` | vallues | descrip |
+| `addnewWorkway` | workways | — |
+
+קריאות הרשימה (`addNewSkill`/`addNewRole`/`choosRole`/`addNewMission`) הוגרו
+ל-`/api/vocab/list`. `addNewMission` כבר יוצר משימה דרך
+`executeAction('createMissionTemplate')` — רק הקריאה הוגרה.
+
+**הרחבת `/api/vocab/create`:** מקבל כעת `description` ו-`relations` אופציונליים.
+שמות השדות/relations מגיעים מ-`vocabKinds` (whitelist) והערכים עוברים כ-GraphQL
+variables — אין הזרקה.
+
+**תיקון אגב:** `liUN.get()` (שלא קיים על writable ו-היה זורק) הוחלף ב-`$liUN`.
+
+## מה נותר
+
+- workways: `kind: 'workways'` קיים וצינור היצירה עובד; `/api/vocab/list`
+  ל-workways לא מחווט עדיין (לאמת את שם ה-collection הרבים לפני הפעלה).
 - (אופציונלי) כפתורי Approve/Archive אינטראקטיביים בהודעת הטלגרם של הבעלים.

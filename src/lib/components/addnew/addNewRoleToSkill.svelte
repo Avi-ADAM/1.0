@@ -2,7 +2,6 @@
   import { isRtl } from '$lib/translations';
            import { lang } from '$lib/stores/lang.js'
     import { liUN } from '$lib/stores/liUN.js';
-  const baseUrl = import.meta.env.VITE_URL
 
   /**
    * @typedef {Object} Props
@@ -20,63 +19,37 @@
       if (rn.includes(roleName_value)){
   shgi = true;
 } else {
-  let d = new Date
-      let link = baseUrl+"/graphql" ;
         try {
-             await fetch(link, {
+             const res = await fetch('/api/vocab/create', {
               method: 'POST',
-       
-        headers: {
-            'Content-Type': 'application/json'
-                  },
-        body: 
-        JSON.stringify({query: 
-           `mutation  createTafkidim {
-  createTafkidim (data: {  roleDescription: "${roleName_value}",
-          descrip: "${desS}",
-                publishedAt: "${d.toISOString()}"
-}) {
-    data {
-      id
-      attributes {
-        roleDescription
-      } 
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                kind: 'roles',
+                label: roleName_value,
+                lang: $lang,
+                createdBy: $liUN || 'user',
+                description: desS
+              })
+            }).then((r) => r.json());
 
-       }
-    }
-}`   
-        })
-})
-  .then(r => r.json())
-  .then(data => meData = data);
-         finnish (meData.data.createTafkidim.data.id,meData.data.createTafkidim.data);
-          let userName_value = liUN.get()
-         let data = {"name": userName_value, "action": "יצר תפקיד חדש בשם:", "det": `${roleName_value} והתיאור: ${desS}` }
-   fetch("/api/ste", {
-  method: 'POST', // or 'PUT'
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(data),
-})
-  .then((response) => response)
-  .then((data) => {
-    console.log('Success:', data);
+            if (!res?.success || !res.item) { console.log('create failed', res); return; }
+            if (res.moderation?.flagged) return;
 
-  })
+            if (res.translate) {
+              fetch('/api/translations', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(res.translate)
+              }).catch((e) => console.warn('תרגום נכשל:', e));
+            }
 
-  .catch((error) => {
-    console.error('Error:', error);
-  
-  })
+            meData = { id: res.item.id, attributes: res.item.attributes };
+            finnish(res.item.id, meData);
               }
       catch(error) {
-        let error1;
-        console.log('צריך לתקן:', error.response);
-        error = error1 
-        console.log(error1)
+        console.log('צריך לתקן:', error);
                 };}
-    };     
+    };
        function finnish (id , sec) {
   onFinnish?.({ // Svelte 5: Replaced dispatch with callback prop
     id: id,

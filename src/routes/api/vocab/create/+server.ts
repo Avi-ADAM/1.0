@@ -40,6 +40,9 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
 	const { kind, lang } = body;
 	const label = sanitize(body?.label);
 	const createdBy = body?.createdBy ? String(body.createdBy) : undefined;
+	const description =
+		typeof body?.description === 'string' ? body.description.replace(/\s+/g, ' ').trim().slice(0, 500) : '';
+	const relations = body?.relations && typeof body.relations === 'object' ? body.relations : {};
 
 	if (!isVocabKind(kind)) throw error(400, 'Invalid or missing kind');
 	if (!label) throw error(400, 'Missing label');
@@ -48,9 +51,29 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
 	const meta = VOCAB_KINDS[kind];
 	const now = new Date().toISOString();
 
-	// 1 — create (parametrized; nameField/mutation come from our own config)
-	const createQuery = `mutation CreateVocab($name: String!, $now: DateTime!) {
-		${meta.createMutation}(data: { ${meta.nameField}: $name, publishedAt: $now }) {
+	// 1 — create. Field/mutation/relation names come from our own config (never
+	// from the client); all values are passed as GraphQL variables.
+	const varDecls = ['$name: String!', '$now: DateTime!'];
+	const dataFields = [`${meta.nameField}: $name`, 'publishedAt: $now'];
+	const variables: Record<string, unknown> = { name: label, now };
+
+	if (meta.descriptionField && description) {
+		varDecls.push('$description: String');
+		dataFields.push(`${meta.descriptionField}: $description`);
+		variables.description = description;
+	}
+
+	for (const field of meta.relationFields ?? []) {
+		const ids = relations[field];
+		if (Array.isArray(ids) && ids.length) {
+			varDecls.push(`$rel_${field}: [ID]`);
+			dataFields.push(`${field}: $rel_${field}`);
+			variables[`rel_${field}`] = ids.map(String);
+		}
+	}
+
+	const createQuery = `mutation CreateVocab(${varDecls.join(', ')}) {
+		${meta.createMutation}(data: { ${dataFields.join(', ')} }) {
 			data {
 				id
 				attributes {
@@ -66,7 +89,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
 		const res = await fetch(STRAPI_GRAPHQL, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken()}` },
-			body: JSON.stringify({ query: createQuery, variables: { name: label, now } })
+			body: JSON.stringify({ query: createQuery, variables })
 		});
 		const j = await res.json();
 		if (j.errors) {
@@ -84,7 +107,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
 	const id = String(created.id);
 
 	// 2 — moderate (archives + alerts owner if flagged); never throws
-	const moderation = await moderateVocabItem(fetch, { kind, id, label, createdBy });
+	const moderation = await moderateVocabItem(fetch, { kind, id, label, createdBy, extraText: description });
 
 	// 3 — clean items only: index for semantic dup-detection + ping owner channel
 	if (!moderation.flagged) {
