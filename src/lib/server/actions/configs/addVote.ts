@@ -7,6 +7,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types';
 import { createSheirutFromPendingConfig } from './createSheirutFromPending';
+import { ensureCandidacyTimegrama } from '../../nego/timegrama';
 
 /**
  * Custom handler לבניית קומפוננטות ועדכון
@@ -65,6 +66,11 @@ const addVoteHandler: ActionExecutionHandler = async (params, context, util) => 
     if (!result || result.errors) {
       throw new Error(`AddVoteToAsk failed: ${JSON.stringify(result?.errors || 'Unknown error')}`);
     }
+
+    // A rikma member has now engaged with this candidacy → start the auto-approval
+    // clock if it isn't already running (external-candidate timegrama is deferred
+    // to here; Path A/B1). No-op-safe; never blocks the vote.
+    await ensureCandidacyTimegrama(strapi, context, { side: 'ask', id });
 
     const strapiVote = {
       what: true,

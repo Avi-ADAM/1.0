@@ -20,6 +20,12 @@
    * @property {boolean} [specMode]     - מצב "ספק" (PLAN_CONCIERGE §5.3): הלקוחה מנסחת מפרט משאב
    *                                      ולא יוצרת רשומה — handleSubmit מחזיר את המפרט ל-onSpec.
    * @property {(spec: {name:string, descrip:string, price:number, quantity:number, kindOf:string, linkto:string, spnot:string}) => void} [onSpec]
+   * @property {boolean} [publishMode]  - מצב "פרסום לקהילה" (קונסיירז'): הטופס המלא נפתח אך
+   *                                      ה-handleSubmit אינו יוצר רשומת משאב בפרויקט אלא מחזיר
+   *                                      את כל הפרטים ל-onPublish (כולל mashaabimId שזוהה לפי שם),
+   *                                      כדי שהקורא יפרסם openMashaabim. תאימות לאחור: פעיל רק
+   *                                      כשמוזרק onPublish/publishMode.
+   * @property {(payload: {name:string, descrip:string, price:number, easy:number, kindOf:string, quantity:number, recurring:boolean, cycleSize:number|null, linkto:string, spnot:string, mashaabimId:string|null, startDate:string|null, endDate:string|null, isOnline:boolean, lat:number|null, lng:number|null, radius:number|null, location_hint:string|null}) => void} [onPublish]
    * @property {() => void} [onCreated]
    * @property {() => void} [onCancel]
    */
@@ -31,6 +37,8 @@
     restime = '',
     specMode = false,
     onSpec,
+    publishMode = false,
+    onPublish,
     onCreated,
     onCancel,
     /**
@@ -195,6 +203,9 @@
       price: 'שווי / מחיר',
       maxInvestment: 'שווי לחישוב בפרויקט',
       maxInvestmentHint: 'הצעת ערך גבוה יותר שמכיל את הסיכון',
+      minValue: 'שווי מינימום',
+      maxValue: 'שווי מקסימום',
+      maxValueHint: 'הערך המקסימלי שתהיו מוכנים לשלם / לקבל עבור המשאב',
       kindOf: 'סוג שווי',
       quantity: 'כמות',
       link: 'לינק לפרטים / רכישה',
@@ -252,6 +263,9 @@
       price: 'Value / Price',
       maxInvestment: 'Maximum Investment Value',
       maxInvestmentHint: 'Suggested higher value to cover risk',
+      minValue: 'Minimum value',
+      maxValue: 'Maximum value',
+      maxValueHint: 'The maximum value you would pay / accept for the resource',
       kindOf: 'Value Type',
       quantity: 'Quantity',
       link: 'Link to details / purchase',
@@ -315,8 +329,8 @@
   }
 
   onMount(async () => {
-    // specMode editing: hydrate the form with the existing plan item's details.
-    if (specMode && initialSpec) {
+    // specMode / publishMode: hydrate the form with the incoming item's details.
+    if ((specMode || publishMode) && initialSpec) {
       if (initialSpec.name != null) name = initialSpec.name;
       if (initialSpec.descrip != null) description = initialSpec.descrip;
       if (initialSpec.price != null) price = Number(initialSpec.price) || 0;
@@ -479,6 +493,40 @@
       return;
     }
 
+    // ── publishMode (Concierge community publish): full form, but instead of
+    //    persisting a project resource we hand the complete payload back to the
+    //    caller — including the resolved mashaabim template id (so the published
+    //    open-mashaabim is matchable to providers who hold this resource) and the
+    //    rich dimensions (easy, dates, recurring, location). No record created. ──
+    if (publishMode) {
+      const selectedTemplate = findResourceTemplateByName(name);
+      onPublish?.({
+        name: name.trim(),
+        descrip: description || '',
+        price: Number(price) || 0,
+        easy: Number(maxInvestment) || Number(price) || 0,
+        kindOf,
+        quantity: showQuantity ? Number(hm) || 1 : 1,
+        recurring: isRecurring && (kindOf === 'monthly' || kindOf === 'yearly'),
+        cycleSize:
+          isRecurring && (kindOf === 'monthly' || kindOf === 'yearly')
+            ? Math.max(1, Number(cycleSize) || 1)
+            : null,
+        linkto: linkto || '',
+        spnot: spnot || '',
+        mashaabimId: selectedTemplate?.id ?? null,
+        startDate:
+          showDates && startDate ? new Date(startDate).toISOString() : null,
+        endDate: showDates && endDate ? new Date(endDate).toISOString() : null,
+        isOnline: locationScope.location_mode === 'online',
+        lat: normalizeLocationNumber(locationScope.lat),
+        lng: normalizeLocationNumber(locationScope.lng),
+        radius: normalizeLocationNumber(locationScope.radius),
+        location_hint: locationScope.location_hint?.trim() || null
+      });
+      return;
+    }
+
     isSubmitting = true;
     try {
       const selectedTemplate = findResourceTemplateByName(name);
@@ -536,7 +584,7 @@
 
 <div class="resource-creator space-y-6" dir={$isRtl ? 'rtl' : 'ltr'}>
   <header class="flex justify-between items-center mb-4">
-    <h2 class="text-2xl font-bold text-barbi">{specMode ? ($lang === 'en' ? 'Resource offer' : 'הצעת משאב') : t.title}</h2>
+    <h2 class="text-2xl font-bold text-barbi">{specMode ? ($lang === 'en' ? 'Resource offer' : 'הצעת משאב') : publishMode ? ($lang === 'en' ? 'Publish to community' : 'פרסום משאב לקהילה') : t.title}</h2>
     {#if onCancel}
       <button
         onclick={onCancel}
@@ -621,14 +669,18 @@
         </div>
 
         <div class="flex flex-col">
-          <label class="text-sm text-barbie mb-1 font-medium">{t.price}</label>
+          <label class="text-sm text-barbie mb-1 font-medium"
+            >{publishMode ? t.minValue : t.price}</label
+          >
           <NumberInput value={price} onValueChange={handlePriceInput} />
         </div>
         <div class="flex flex-col">
           <label class="text-sm text-barbie mb-1 font-medium"
-            >{t.maxInvestment}</label
+            >{publishMode ? t.maxValue : t.maxInvestment}</label
           >
-          <p class="text-xs text-barbie/80 mb-1">{t.maxInvestmentHint}</p>
+          <p class="text-xs text-barbie/80 mb-1">
+            {publishMode ? t.maxValueHint : t.maxInvestmentHint}
+          </p>
           <NumberInput
             value={maxInvestment}
             onValueChange={handleMaxInvestmentInput}
@@ -774,8 +826,8 @@
         </div>
       </div>
 
-      <!-- השמה לעצמי – מוצג רק כשיש משתמש יחיד בפרויקט; מוסתר במצב מפרט (הצעה לספק) -->
-      {#if isSingleUser && !specMode}
+      <!-- השמה לעצמי – מוצג רק כשיש משתמש יחיד בפרויקט; מוסתר במצב מפרט (הצעה לספק) ובמצב פרסום לקהילה -->
+      {#if isSingleUser && !specMode && !publishMode}
         <div
           class="self-assign-box rounded-2xl border border-gold bg-pink-950/20 backdrop-blur-sm p-4 space-y-3"
         >
@@ -919,7 +971,7 @@
           onClick={handleSubmit}
           disabled={isSubmitting || !canSubmit}
           loading={isSubmitting}
-          text={specMode ? { he: 'שליחת הצעה לספק', en: 'Send offer to provider' } : { he: t.submit, en: t.submit }}
+          text={specMode ? { he: 'שליחת הצעה לספק', en: 'Send offer to provider' } : publishMode ? { he: 'פרסום לקהילה 📣', en: 'Publish to community 📣' } : { he: t.submit, en: t.submit }}
           class="flex-grow !py-4 text-lg font-bold !bg-gold-600 hover:!bg-gold !text-pink-950 shadow-md"
         />
         <Button

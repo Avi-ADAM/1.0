@@ -3,6 +3,7 @@
   import { ProgressBar } from 'progressbar-svelte';
   import { goto } from '$app/navigation';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
+  import { t } from '$lib/translations';
   import { clickOutside } from './outsidclick.js';
   import { fly } from 'svelte/transition';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
@@ -488,6 +489,7 @@
     onHover?.({ id: u });
   }
   import Cards from './cards/dowegeot.svelte';
+  import TimetToTimegrama from './cards/timetToTimegrama.svelte';
 </script>
 
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
@@ -497,7 +499,7 @@
         <button
           onclick={close}
           class=" hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-          title="ביטול"
+          title={$t('lev.missionInProgress.cancel')}
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
             <path
               fill="currentColor"
@@ -507,10 +509,10 @@
         >
         {#if spend === true}
           <h1 style="font-size:1.5em;">
-            {isResponsible ? 'כמה הוצאת החודש?' : 'אישור ההוצאה החודשית'}
+            {isResponsible ? $t('lev.weget.howMuchSpentThisMonth') : $t('lev.weget.approveMonthlyExpense')}
           </h1>
           <p class="text-barbi" style="font-size:0.95em; text-align:center;">
-            {missionBName}{#if cycleIndex} · מחזור #{cycleIndex}{/if}
+            {missionBName}{#if cycleIndex} · {$t('lev.weget.cycleLabel')} #{cycleIndex}{/if}
           </p>
           {#if isResponsible}
             <input
@@ -518,53 +520,53 @@
               min="0"
               step="0.01"
               bind:value={amountInput}
-              placeholder="הסכום שהוצא בפועל החודש"
+              placeholder={$t('lev.weget.actualAmountPlaceholder')}
             />
           {:else}
             <p style="font-size:0.9em; color:#9aa0a6; text-align:center; margin:4px 0;">
-              {useraplyname} דיווח/ה על הוצאה של:
+              {useraplyname} {$t('lev.weget.reportedExpenseOf')}
             </p>
             <p class="p" style="font-size:1.6em; font-weight:bold; color:var(--gold)">{shownAmount} ₪</p>
           {/if}
           <br />
-          <button class="add" onclick={confirmRecurring}>אישור ההוצאה</button>
+          <button class="add" onclick={confirmRecurring}>{$t('lev.weget.confirmExpense')}</button>
           {#if mashabetahalichId}
             <br />
             <button
               class="add"
               style="background-color:var(--barbi-pink); color:var(--gold); margin-top:8px;"
               onclick={markDone}
-              title="סיום המשאב החודשי — לא ייפתחו עוד חיובים חודשיים"
-            >סיום המשאב (Done)</button>
+              title={$t('lev.weget.doneResourceTitle')}
+            >{$t('lev.weget.doneResource')}</button>
           {/if}
         {:else if no === true}
-          <h1 style="font-size:2em;">יש לנמק</h1>
+          <h1 style="font-size:2em;">{$t('lev.weget.mustExplain')}</h1>
           <input
             minlength="26"
             type="text"
             bind:value={whyy}
-            placeholder="מה חסר בכדי שניתן יהיה לאשר שהמשאב התקבל"
+            placeholder={$t('lev.weget.missingForApproval')}
           />
           <br />
           <button class="add" disabled={whyy.length < 26} onclick={decline}
-            >אישור</button
+            >{$t('lev.cards.confirmApprove')}</button
           >
         {:else if nego === true}
-          <h1 style="font-size:1.5em;">הצעת סכום אחר</h1>
+          <h1 style="font-size:1.5em;">{$t('lev.weget.proposeOtherAmount')}</h1>
           <p class="text-barbi" style="font-size:0.95em; text-align:center;">
-            {missionBName}{#if cycleIndex} · מחזור #{cycleIndex}{/if}
+            {missionBName}{#if cycleIndex} · {$t('lev.weget.cycleLabel')} #{cycleIndex}{/if}
           </p>
           <p style="font-size:0.85em; color:#9aa0a6; text-align:center; margin:2px 0;">
-            הסכום שדווח: {quantityDelivered} ₪
+            {$t('lev.weget.reportedAmount')} {quantityDelivered} ₪
           </p>
           <label style="display:flex; align-items:center; gap:6px; margin:6px 0;">
-            הסכום המוצע:
+            {$t('lev.weget.proposedAmount')}
             <input
               type="number"
               min="0"
               step="0.01"
               bind:value={negoAmount}
-              placeholder="הסכום שאתה מציע"
+              placeholder={$t('lev.weget.amountYouPropose')}
             />
             ₪
           </label>
@@ -572,20 +574,20 @@
             minlength="3"
             type="text"
             bind:value={negoReason}
-            placeholder="מדוע להזיז את הסכום? (יתפרסם בצ'אט)"
+            placeholder={$t('lev.weget.whyMoveAmount')}
           />
           <br />
           <button class="add" disabled={!negoReason.trim()} onclick={submitCounter}
-            >שליחת ההצעה</button
+            >{$t('lev.weget.submitProposal')}</button
           >
         {:else if masa === true}
           <input
             minlength="26"
             type="text"
             bind:value={whyy}
-            placeholder="יש לנמק  ההצעה  על "
+            placeholder={$t('lev.weget.explainProposal')}
           />
-          <input type="number" placeholder="add moree hours" />
+          <input type="number" placeholder={$t('lev.weget.addHours')} />
         {/if}
       </div>
     </DialogContent>
@@ -608,6 +610,9 @@
     class="hover:scale-290 duration-1000 ease-in"
     transition:fly|local={{ y: 250, opacity: 0.9, duration: 2000 }}
   >
+    {#if timegramaDate && !timegramaDone}
+      <TimetToTimegrama {timegramaDate} />
+    {/if}
     <Swiper
       dir="rtl"
       on:swiper={setSwiperRef}

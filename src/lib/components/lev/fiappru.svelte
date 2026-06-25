@@ -7,6 +7,7 @@
   import { goto } from '$app/navigation';
   import { idPr } from './../../stores/idPr.js';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
+  import { t } from '$lib/translations';
   let dialogOpen = $state(false);
   let resP = [];
   let lang;
@@ -336,7 +337,7 @@
         <button
           onclick={close}
           class=" hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-          title="ביטול"
+          title={$t('lev.missionInProgress.cancel')}
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
             <path
               fill="currentColor"
@@ -345,25 +346,25 @@
           </svg></button
         >
         {#if no === true}
-          <h1 style="font-size:2em;">יש לנמק מדוע</h1>
+          <h1 style="font-size:2em;">{$t('lev.fiappru.whyHeading')}</h1>
           <input
             minlength="26"
             type="text"
             bind:value={whyy}
-            placeholder=" מדוע המשימה לא הושלמה"
+            placeholder={$t('lev.fiappru.taskNotCompleted')}
           />
           <br />
           <button class="add" disabled={whyy.length < 26} onclick={decline}
-            >אישור</button
+            >{$t('lev.cards.confirmApprove')}</button
           >
         {:else if masa === true}
           <input
             minlength="26"
             type="text"
             bind:value={whyy}
-            placeholder="יש לנמק מדוע ההצעה נדחית על ידך"
+            placeholder={$t('lev.fiappru.offerRejected')}
           />
-          <input type="number" placeholder="add moree hours" />
+          <input type="number" placeholder={$t('lev.fiappru.addHours')} />
         {/if}
       </div>
     </DialogContent>

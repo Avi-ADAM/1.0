@@ -16,6 +16,8 @@
   import LocationNego from '../conf/locationNego.svelte';
   import { submitNegoMission } from '$lib/client/actionClient';
   import { updatePendsStore } from '$lib/utils/levSocketHandler';
+  import { toIsoDateString } from '$lib/func/montsi.svelte';
+  import { openNegoBridge, readNegoBridgeReturn } from '$lib/func/negoBridge.js';
   /**
    * @typedef {Object} Props
    * @property {any} [negopendmissions]
@@ -101,7 +103,21 @@
     location = null,
     onClose,
     onLoad,
-    isAsk = 0
+    isAsk = 0,
+    /**
+     * Optional: when provided, hands the diff to the parent instead of calling
+     * submitNegoMission. Used by the open-mission candidate/counter flow where
+     * the terms become a parallel Negopendmission round. Receives { newValues, originalValues }.
+     * @type {((d: { newValues: any, originalValues: any }) => Promise<void>) | null}
+     */
+    onSubmit = null,
+    /**
+     * The latest candidate-side negotiation round attributes (proposedBy=candidate).
+     * Shown alongside fields as a reference when counter-proposing on a candidate's
+     * open-mission application so members know what they are responding to.
+     * @type {any | null}
+     */
+    candidateRound = null
   } = $props();
   $inspect(acts);
   let datai = $state([]);
@@ -208,6 +224,46 @@
   }
   function close() {
     onClose?.();
+  }
+
+  // ── Consensus bridge ──────────────────────────────────────────────────────
+  // Open a structured mediation discussion in the consensus app, seeded with the
+  // mission's negotiable terms (original vs. current proposal). See negoBridge.js.
+  function openBridge() {
+    openNegoBridge({
+      sourceType: 'mission',
+      sourceId: pendId,
+      title: name1,
+      projectName,
+      fields: [
+        { key: 'name', label: 'שם', kind: 'text', original: name1 ?? null, proposed: name2 ?? null },
+        { key: 'descrip', label: 'תיאור', kind: 'text', original: descrip ?? null, proposed: descrip2 ?? null },
+        { key: 'noofhours', label: 'כמות שעות', kind: 'number', original: noofhours || 0, proposed: noofhours2 || 0 },
+        { key: 'perhour', label: 'שווי לשעה', kind: 'number', original: perhour || 0, proposed: perhour2 || 0 },
+        { key: 'startDate', label: 'תאריך התחלה', kind: 'date', original: toIsoDateString(mdate) ?? null, proposed: toIsoDateString(mdate2) ?? null },
+        { key: 'finishDate', label: 'תאריך סיום', kind: 'date', original: toIsoDateString(mdates) ?? null, proposed: toIsoDateString(mdates2) ?? null }
+      ]
+    });
+  }
+
+  // Prefill from a returned bridge agreement. Dates come back as ISO strings;
+  // convert them to the picker's display format so submit (which re-parses with
+  // 'HH:mm DD/MM/YYYY') round-trips correctly.
+  function applyBridgeReturn() {
+    const v = readNegoBridgeReturn(pendId);
+    if (!v) return;
+    if (v.name != null) name2 = String(v.name);
+    if (v.descrip != null) descrip2 = String(v.descrip);
+    if (v.noofhours != null) noofhours2 = +v.noofhours;
+    if (v.perhour != null) perhour2 = +v.perhour;
+    if (v.startDate != null) {
+      const m = moment(v.startDate);
+      if (m.isValid()) mdate2 = m.format('HH:mm DD/MM/YYYY');
+    }
+    if (v.finishDate != null) {
+      const m = moment(v.finishDate);
+      if (m.isValid()) mdates2 = m.format('HH:mm DD/MM/YYYY');
+    }
   }
 
   function hasActsChanged() {
@@ -326,6 +382,20 @@
     // Guard: skip if nothing changed and user already voted (masaalr + mypos)
     if (!hasChanges && masaalr && mypos) return;
 
+    // Parent-handled flow (open-mission candidate/counter): hand the diff to the parent.
+    if (onSubmit) {
+      try {
+        await onSubmit({ newValues, originalValues });
+        toast.success(tr?.toasts.suc[$lang]);
+        close();
+      } catch (e) {
+        error1 = e;
+        console.log(error1);
+        toast.warning(tr?.toasts.er[$lang]);
+      }
+      return;
+    }
+
     // Build acts data for server
     const acts2Array = Array.isArray(acts2) ? acts2 : [];
     const newActs = acts2Array
@@ -428,6 +498,7 @@
     dataibno = dataibno;
   }
   onMount(async () => {
+    applyBridgeReturn();
     isKavua2 = isKavua;
     skills3 = JSON.parse(JSON.stringify(skills));
     tafkidims2 = JSON.parse(JSON.stringify(tafkidims));
@@ -519,7 +590,7 @@
 
 <div class="text-barbi" dir={$isRtl ? 'rtl' : 'ltr'}>
   <h1 class="md:text-center text-2xl md:text-2xl font-bold underline">
-    {tri?.nego?.head[$lang]}
+    {onSubmit ? tri?.nego?.headMissionCandidate[$lang] : tri?.nego?.head[$lang]}:
     {name1}
   </h1>
   <div class="flex flex-col align-middle justify-center">
@@ -577,6 +648,31 @@
       bind:textb={privatlinks2}
       lebel={tri?.mission?.linkToMission}
     />
+    {#if onSubmit && candidateRound}
+      {@const candTot = (candidateRound.noofhours ?? noofhours) * (candidateRound.perhour ?? perhour)}
+      <div class="mx-2 my-2 rounded-lg border border-barbi/50 bg-barbi/5 p-3 text-sm space-y-1">
+        <p class="font-bold text-barbi text-base">
+          💡 {$lang === 'he' ? 'הצעת המועמד (לעיון):' : 'Candidate proposal (for reference):'}
+        </p>
+        <div class="flex flex-wrap gap-x-4 gap-y-1 text-barbi/80">
+          {#if candidateRound.noofhours != null}
+            <span>{$lang === 'he' ? 'שעות:' : 'Hours:'} <strong>{candidateRound.noofhours}</strong></span>
+          {/if}
+          {#if candidateRound.perhour != null}
+            <span>{$lang === 'he' ? 'לשעה:' : 'Per hour:'} <strong>{candidateRound.perhour}</strong></span>
+          {/if}
+          {#if candTot > 0}
+            <span class="font-bold">{$lang === 'he' ? 'סה"כ:' : 'Total:'} <strong>{candTot.toLocaleString()}</strong></span>
+          {/if}
+          {#if candidateRound.mdate}
+            <span>{$lang === 'he' ? 'התחלה:' : 'Start:'} <strong>{new Date(candidateRound.mdate).toLocaleDateString($lang)}</strong></span>
+          {/if}
+          {#if candidateRound.mdates}
+            <span>{$lang === 'he' ? 'סיום:' : 'End:'} <strong>{new Date(candidateRound.mdates).toLocaleDateString($lang)}</strong></span>
+          {/if}
+        </div>
+      </div>
+    {/if}
     <Number
       old={negopendmissions.map((c) => c?.attributes?.noofhours)}
       number={noofhours}
@@ -590,18 +686,30 @@
             ? true
             : null}
     />
+    {#if onSubmit && candidateRound?.noofhours != null && candidateRound.noofhours !== noofhours}
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} <strong>{candidateRound.noofhours}</strong></p>
+    {/if}
     <Number
       old={negopendmissions.map((c) => c?.attributes?.perhour)}
       number={perhour}
       bind:numberb={perhour2}
       lebel={tri?.mission?.hourlyVallue[$lang]}
     />
+    {#if onSubmit && candidateRound?.perhour != null && candidateRound.perhour !== perhour}
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} <strong>{candidateRound.perhour}</strong></p>
+    {/if}
     <DateNego date={mdate} bind:dateb={mdate2} lebel={tri?.common.startDate} />
+    {#if onSubmit && candidateRound?.mdate}
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} {new Date(candidateRound.mdate).toLocaleDateString($lang)}</p>
+    {/if}
     <DateNego
       date={mdates}
       bind:dateb={mdates2}
       lebel={tri?.common.finishDate}
     />
+    {#if onSubmit && candidateRound?.mdates}
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} {new Date(candidateRound.mdates).toLocaleDateString($lang)}</p>
+    {/if}
 
     <LocationNego
       {location}
@@ -742,13 +850,20 @@
                                     </td>
                                 </tr>
                                 </table>-->
-  <div class="w-fit mx-auto">
+  <div class="w-fit mx-auto flex flex-col items-center gap-y-2">
     <button
       onclick={increment}
       class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
       type="submit"
-      name="addm">{tri?.common.puttovote[$lang]}</button
+      name="addm">{onSubmit ? tri?.nego?.submitProposal[$lang] : tri?.common.puttovote[$lang]}</button
     >
+    <button
+      onclick={openBridge}
+      type="button"
+      class="mx-auto text-sm border border-gold/50 text-gold hover:bg-gold/20 rounded-full px-4 py-1"
+    >
+      {$lang === 'en' ? '🤝 Open a deeper discussion' : '🤝 דיון מעמיק'}
+    </button>
   </div>
 </div>
 

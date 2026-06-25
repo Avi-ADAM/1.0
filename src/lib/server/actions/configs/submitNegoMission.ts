@@ -178,10 +178,30 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     };
   }
 
-  // OpenMission path: update fields only
-  await strapi.execute('negoUpdateOpenMission', {
-    id: params.pendId,
-    data: entityData,
+  // OpenMission path: create a negotiation round instead of overwriting the
+  // shared resource. Multiple candidates negotiate in parallel; the OpenMission
+  // stays clean as the rikma baseline.
+  const roundLoc = nv.location != null ? normalizeLocationInput(nv.location) : null;
+  await strapi.execute('negoCreateNegopendmissionRound', {
+    publishedAt: nowISO,
+    userId,
+    open_mission: String(params.pendId),
+    ask: String(params.isAsk),
+    ordern: (params.ordern ?? 0) + 1,
+    proposedBy: 'candidate',
+    status: 'proposed',
+    isOriginal: false,
+    noofhours: nv.noofhours ?? null,
+    perhour: nv.perhour ?? null,
+    hearotMeyuchadot: nv.hearotMeyuchadot ?? null,
+    descrip: nv.descrip ?? null,
+    name: nv.name ?? null,
+    skills: nv.skillIds ?? null,
+    tafkidims: nv.roleIds ?? null,
+    work_ways: nv.workwayIds ?? null,
+    sqadualed: nv.sqadualed ?? null,
+    dates: nv.dates ?? null,
+    location: roundLoc ? [roundLoc] : null,
   }, context.jwt, context.fetch);
 
   // Update the Ask with the new vote

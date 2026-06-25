@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hub — mobile redesign preview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bellefair&family=Rubik:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { rubik: ['Rubik', 'sans-serif'], litt: ['Bellefair', 'serif'] },
+            colors: { bluesun: '#2c384a', accent: '#B38728', gold: '#FCF6BA', greeni: '#2effa8' },
+            backgroundImage: {
+              goldTobr:
+                'linear-gradient(to bottom right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771c, #FBF5B7, #B38728, #FCF6BA, #BF953F)'
+            }
+          }
+        }
+      };
+    </script>
+    <style>
+      body { background: #11161d; }
+      .phone { width: 390px; }
+      .glow {
+        background: radial-gradient(120% 80% at 50% 0%, rgba(179,135,40,0.22) 0%, rgba(179,135,40,0.06) 38%, transparent 70%);
+      }
+      .section-title {
+        margin: 0 0 .5rem; padding-inline: .25rem; font-size: .7rem; font-weight: 600;
+        letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,.4);
+      }
+      .stagger { animation: rise .55s cubic-bezier(.16,1,.3,1) both; }
+      @keyframes rise { from { opacity:0; transform: translateY(10px);} to {opacity:1; transform: translateY(0);} }
+      .urgent::before {
+        content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+        animation: breathe 2.4s ease-in-out infinite;
+      }
+      @keyframes breathe { 0%,100%{box-shadow:0 0 0 0 rgba(248,113,113,0);} 50%{box-shadow:0 0 18px 1px rgba(248,113,113,.25);} }
+    </style>
+  </head>
+  <body class="min-h-screen flex items-start justify-center gap-8 py-8 font-rubik flex-wrap">
+    <!-- ACTIVE USER STATE -->
+    <div class="phone rounded-[2rem] overflow-hidden shadow-2xl border border-white/10">
+      <div class="relative min-h-[780px] bg-bluesun text-white overflow-hidden">
+        <div class="glow pointer-events-none absolute inset-x-0 top-0 h-72"></div>
+        <main class="relative mx-auto w-full max-w-md px-4 space-y-5 pt-6 pb-24">
+          <!-- header -->
+          <header class="flex items-center gap-3.5 stagger">
+            <div class="relative shrink-0">
+              <span class="absolute -inset-0.5 rounded-full bg-goldTobr opacity-70 blur-[2px]"></span>
+              <span class="relative flex items-center justify-center w-14 h-14 rounded-full bg-bluesun ring-2 ring-bluesun text-gold font-litt text-2xl">א</span>
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="text-xs font-medium uppercase tracking-[0.18em] text-gold/70 truncate">יום שישי, 19 ביוני</p>
+              <h1 class="font-litt text-2xl leading-tight text-white truncate">בוקר טוב, אבי</h1>
+            </div>
+          </header>
+
+          <!-- urgent -->
+          <a href="#" class="urgent relative flex items-center gap-3 px-4 py-3.5 rounded-2xl no-underline overflow-hidden bg-gradient-to-r from-red-500/20 to-red-500/5 border border-red-400/40 stagger">
+            <span class="text-2xl shrink-0 animate-pulse">🚨</span>
+            <span class="flex-1 min-w-0"><span class="block text-sm font-semibold text-red-200 leading-tight">1 הצבעה דחופה מסתיימת בקרוב!</span></span>
+            <span class="shrink-0 text-xs font-bold text-red-100 bg-red-500/40 border border-red-300/30 rounded-full px-3 py-1.5 whitespace-nowrap">לטיפול</span>
+          </a>
+
+          <!-- hero votes + tiles -->
+          <div class="space-y-3 stagger">
+            <a href="#" class="block no-underline rounded-3xl p-5 border border-gold/30 bg-gradient-to-br from-gold/15 via-white/5 to-transparent">
+              <div class="flex items-center gap-4">
+                <span class="text-3xl shrink-0">🗳️</span>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-baseline gap-2">
+                    <span class="font-litt text-5xl leading-none text-gold tabular-nums">3</span>
+                    <span class="text-sm font-medium text-white/70">הצבעות</span>
+                  </div>
+                  <p class="text-sm text-white/55 mt-1">ממתינות להצבעה שלך</p>
+                </div>
+                <span class="text-gold/60 text-xl shrink-0">‹</span>
+              </div>
+            </a>
+            <div class="grid grid-cols-3 gap-3">
+              <a href="#" class="flex flex-col items-center justify-center gap-1 rounded-2xl py-3.5 px-2 no-underline bg-white/5 border border-white/10">
+                <span class="text-xl leading-none">💼</span><span class="font-litt text-2xl leading-none text-white">5</span><span class="text-[11px] text-white/55 text-center leading-tight">הצעות</span>
+              </a>
+              <a href="#" class="flex flex-col items-center justify-center gap-1 rounded-2xl py-3.5 px-2 no-underline bg-white/5 border border-white/10">
+                <span class="text-xl leading-none">🛒</span><span class="font-litt text-2xl leading-none text-white">2</span><span class="text-[11px] text-white/55 text-center leading-tight">קניות</span>
+              </a>
+              <a href="#" class="flex flex-col items-center justify-center gap-1 rounded-2xl py-3.5 px-2 no-underline bg-white/5 border border-white/10">
+                <span class="text-xl leading-none">💰</span><span class="font-litt text-2xl leading-none text-white">1</span><span class="text-[11px] text-white/55 text-center leading-tight">מכירות</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- gold CTA -->
+          <a href="#" class="relative flex items-center gap-3 px-4 py-4 rounded-2xl no-underline overflow-hidden bg-goldTobr shadow-[0_8px_24px_-8px_rgba(179,135,40,0.6)] stagger">
+            <span class="relative text-2xl shrink-0">✨</span>
+            <span class="relative flex-1 min-w-0">
+              <span class="block text-sm font-bold text-amber-950 leading-tight">צור קנייה מותאמת אישית</span>
+              <span class="block text-xs text-amber-900/70 mt-0.5 truncate">תאר מה אתה צריך ומצא שותפים</span>
+            </span>
+            <span class="relative shrink-0 text-xs font-bold text-amber-950 bg-white/40 rounded-full px-3 py-1.5 whitespace-nowrap">התחל</span>
+          </a>
+
+          <!-- shortcuts -->
+          <section class="stagger">
+            <h2 class="section-title">קיצורי דרך</h2>
+            <div class="flex gap-3">
+              <a href="#" class="flex flex-1 flex-col items-center gap-2 px-3 py-4 rounded-2xl no-underline bg-white/5 border border-white/10"><span class="text-2xl leading-none">💗</span><span class="text-xs font-medium text-white/75 text-center leading-tight">הלב</span></a>
+              <a href="#" class="flex flex-1 flex-col items-center gap-2 px-3 py-4 rounded-2xl no-underline bg-white/5 border border-white/10"><span class="text-2xl leading-none">🧠</span><span class="text-xs font-medium text-white/75 text-center leading-tight">מוח</span></a>
+              <a href="#" class="flex flex-1 flex-col items-center gap-2 px-3 py-4 rounded-2xl no-underline bg-white/5 border border-white/10"><span class="text-2xl leading-none">👤</span><span class="text-xs font-medium text-white/75 text-center leading-tight">הפרופיל שלי</span></a>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <!-- CAUGHT-UP STATE -->
+    <div class="phone rounded-[2rem] overflow-hidden shadow-2xl border border-white/10">
+      <div class="relative min-h-[780px] bg-bluesun text-white overflow-hidden">
+        <div class="glow pointer-events-none absolute inset-x-0 top-0 h-72"></div>
+        <main class="relative mx-auto w-full max-w-md px-4 space-y-5 pt-6 pb-24">
+          <header class="flex items-center gap-3.5">
+            <div class="relative shrink-0">
+              <span class="absolute -inset-0.5 rounded-full bg-goldTobr opacity-70 blur-[2px]"></span>
+              <span class="relative flex items-center justify-center w-14 h-14 rounded-full bg-bluesun ring-2 ring-bluesun text-gold font-litt text-2xl">מ</span>
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="text-xs font-medium uppercase tracking-[0.18em] text-gold/70 truncate">יום שישי, 19 ביוני</p>
+              <h1 class="font-litt text-2xl leading-tight text-white truncate">ערב טוב, מאיה</h1>
+            </div>
+          </header>
+          <div class="space-y-3">
+            <a href="#" class="block no-underline rounded-3xl p-5 border border-greeni/25 bg-gradient-to-br from-greeni/10 via-white/5 to-transparent">
+              <div class="flex items-center gap-4">
+                <span class="text-3xl shrink-0">✓</span>
+                <div class="flex-1 min-w-0">
+                  <p class="font-litt text-2xl leading-tight text-greeni">הכל מעודכן</p>
+                  <p class="text-sm text-white/45 mt-0.5">0 הצבעות</p>
+                </div>
+              </div>
+            </a>
+            <div class="grid grid-cols-3 gap-3">
+              <a href="#" class="flex flex-col items-center justify-center gap-1 rounded-2xl py-3.5 px-2 no-underline bg-white/5 border border-white/10"><span class="text-xl leading-none">💼</span><span class="font-litt text-2xl leading-none text-white">1</span><span class="text-[11px] text-white/55 text-center leading-tight">הצעות</span></a>
+              <a href="#" class="flex flex-col items-center justify-center gap-1 rounded-2xl py-3.5 px-2 no-underline bg-white/5 border border-white/10"><span class="text-xl leading-none">🛒</span><span class="font-litt text-2xl leading-none text-white">0</span><span class="text-[11px] text-white/55 text-center leading-tight">קניות</span></a>
+              <a href="#" class="flex flex-col items-center justify-center gap-1 rounded-2xl py-3.5 px-2 no-underline bg-white/5 border border-white/10"><span class="text-xl leading-none">💰</span><span class="font-litt text-2xl leading-none text-white">0</span><span class="text-[11px] text-white/55 text-center leading-tight">מכירות</span></a>
+            </div>
+          </div>
+          <a href="#" class="relative flex items-center gap-3 px-4 py-4 rounded-2xl no-underline overflow-hidden bg-goldTobr shadow-[0_8px_24px_-8px_rgba(179,135,40,0.6)]">
+            <span class="relative text-2xl shrink-0">✨</span>
+            <span class="relative flex-1 min-w-0"><span class="block text-sm font-bold text-amber-950 leading-tight">צור קנייה מותאמת אישית</span><span class="block text-xs text-amber-900/70 mt-0.5 truncate">תאר מה אתה צריך ומצא שותפים</span></span>
+            <span class="relative shrink-0 text-xs font-bold text-amber-950 bg-white/40 rounded-full px-3 py-1.5 whitespace-nowrap">התחל</span>
+          </a>
+          <section>
+            <h2 class="section-title">קיצורי דרך</h2>
+            <div class="flex gap-3">
+              <a href="#" class="flex flex-1 flex-col items-center gap-2 px-3 py-4 rounded-2xl no-underline bg-white/5 border border-white/10"><span class="text-2xl leading-none">💗</span><span class="text-xs font-medium text-white/75 text-center leading-tight">הלב</span></a>
+              <a href="#" class="flex flex-1 flex-col items-center gap-2 px-3 py-4 rounded-2xl no-underline bg-white/5 border border-white/10"><span class="text-2xl leading-none">🧠</span><span class="text-xs font-medium text-white/75 text-center leading-tight">מוח</span></a>
+              <a href="#" class="flex flex-1 flex-col items-center gap-2 px-3 py-4 rounded-2xl no-underline bg-white/5 border border-white/10"><span class="text-2xl leading-none">👤</span><span class="text-xs font-medium text-white/75 text-center leading-tight">הפרופיל שלי</span></a>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

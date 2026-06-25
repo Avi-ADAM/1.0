@@ -23,6 +23,8 @@
 	 * @property {string} [name]
 	 * @property {string} [lang]
 	 * @property {string} [restime]
+	 * @property {string|number} [pid] - project id, for the deep link
+	 * @property {string|number} [eid] - pendm/pmash entity id, for the deep link
 	 */
 
 	/** @type {Props} */
@@ -35,8 +37,21 @@
 		rishon = "",
 		name = "",
 		lang = "he",
-		restime = "feh"
+		restime = "feh",
+		pid = "",
+		eid = ""
 	} = $props();
+
+	// Deep link straight to the focused vote page when we know the project + entity.
+	// finiappmi (mission-completion approval) has no such page → fall back to /lev.
+	const routeKind = kind === 'pendmash'
+		? 'pmash'
+		: (kind === 'pend' || kind === 'pendAsk')
+			? 'pendm'
+			: null;
+	const voteHref = pid && eid && routeKind
+		? `https://1lev1.com/moach/${pid}/votes/${routeKind}/${eid}`
+		: 'https://1lev1.com/lev';
     const houhe = {"feh":"עומדים יומיים","sth":"עומדים שלושה ימים","nsh":"עומדים ארבעה ימים","sevend":"עומד שבוע אחד"}
     const houen = {"feh":"48 hours","sth":"72 hours","nsh":"96 hours","sevend":"one week"}
     const hoza = {"pendAsk":"הוצעה משימה חדשה בשם","pend":"הוצעה משימה חדשה בשם","pendmash":"הוצע משאב חדש בשם","finiappmi":"הסתיימה בהצלחה המשימה"}
@@ -161,7 +176,7 @@
 				{instruction[lang]}
 			</Text>
 			<Section style={{ padding: '16px 0 20px' }}>
-				<Button pY={19} style={button} href="https://1lev1.com/lev">{tovo[lang]}</Button>
+				<Button pY={19} style={button} href={voteHref}>{tovo[lang]}</Button>
 			</Section>		
 			<Hr style={hr} />
 			<Text style={footer}>{slogen[lang]}</Text>

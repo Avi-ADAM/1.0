@@ -1031,6 +1031,7 @@
                       declined={buble.decid}
                       timegramaId={buble.timegramaId}
                       timegramaDate={buble.timegramaDate}
+                      timegramaDone={buble.timegramaDone}
                       negopendmissions={buble.negopendmissions || []}
                       orderon={buble.orderon || 0}
                       forumId={buble.forumId}
@@ -1089,6 +1090,9 @@
                       declined={buble.decid}
                       spid={buble.spid}
                       timegramaId={buble.timegramaId}
+                      timegramaDate={buble.timegramaDate}
+                      timegramaDone={buble.timegramaDone}
+                      pmashId={buble.pmashId}
                       isRishon={buble.isSelfProposal === true}
                       pendingMainVote={buble.pendingMainVote === true}
                       negopendmissions={buble.negopendmissions || []}
@@ -1114,6 +1118,10 @@
                       restime={buble.restime}
                       chat={buble.chat ?? null}
                       askId={buble.askId ?? null}
+                      myRoundProposedBy={buble.myRoundProposedBy ?? null}
+                      myOrdern={buble.myOrdern ?? 0}
+                      myAskUsers={buble.myAskUsers ?? []}
+                      myRound={buble.myRound ?? null}
                       alreadyi={buble.alreadyi}
                       {askedarr}
                       {declineddarr}
@@ -1160,6 +1168,11 @@
                       cycleSize={buble.cycleSize}
                       oid={buble.oid}
                       id={buble.id}
+                      askId={buble.myAskId ?? buble.askId ?? 1}
+                      myRoundProposedBy={buble.myRoundProposedBy ?? null}
+                      myOrdern={buble.myOrdern ?? 0}
+                      myAskUsers={buble.myAskUsers ?? []}
+                      myRound={buble.myRound ?? null}
                       price={buble.price}
                       myp={buble.myp}
                       already={buble.already}

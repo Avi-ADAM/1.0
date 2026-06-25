@@ -50,6 +50,7 @@ import {
   type ProductRequestData
 } from '$lib/stores/levStores';
 import { initializeLevData } from './levDataLoader';
+import { loadLevSlice } from './levSliceLoader';
 
 /**
  * Setup socket listeners for the Lev page
@@ -100,6 +101,14 @@ export function setupSocketListeners(
         await handlePartialUpdate(updateStrategy.config?.dataKeys, data, userId, token, lang);
         break;
 
+      case 'refetchScope':
+        console.log('🔁 [levSocketHandler] Refetch-scope triggered', {
+          dataKeys: updateStrategy.config?.dataKeys,
+          projectId: updateStrategy.config?.projectId
+        });
+        await handleRefetchScope(updateStrategy.config, userId, lang);
+        break;
+
       case 'optimistic':
         console.log('⚡ [levSocketHandler] Optimistic update - already applied');
         // UI already updated optimistically, no action needed
@@ -122,10 +131,54 @@ export function setupSocketListeners(
 }
 
 /**
+ * Handle refetch-scope: re-fetch one or more quantum slices and upsert them.
+ *
+ * config = { dataKeys: string[], projectId?: string }
+ * For each key found in the registry with a qid, calls loadLevSlice.
+ * Unknown keys (no qid) fall back to a full refresh so no update is ever lost.
+ */
+async function handleRefetchScope(
+  config: { dataKeys?: string[]; projectId?: string } | undefined,
+  userId: string,
+  lang: string
+): Promise<void> {
+  const { LEV_SLICES } = await import('./levSliceRegistry');
+  const keys = config?.dataKeys ?? [];
+  const pids = config?.projectId ? [config.projectId] : null;
+
+  let needsFullRefresh = false;
+
+  for (const key of keys) {
+    const def = LEV_SLICES[key];
+    if (!def) {
+      console.warn(`[levSocketHandler] refetchScope: unknown key "${key}" — will full-refresh`);
+      needsFullRefresh = true;
+      continue;
+    }
+    if (!def.qid) {
+      console.warn(`[levSocketHandler] refetchScope: no qid for "${key}" — will full-refresh`);
+      needsFullRefresh = true;
+      continue;
+    }
+    try {
+      await loadLevSlice(key, userId, pids, lang);
+    } catch (err) {
+      console.error(`[levSocketHandler] refetchScope: failed for "${key}"`, err);
+      needsFullRefresh = true;
+    }
+  }
+
+  if (needsFullRefresh) {
+    console.log('[levSocketHandler] refetchScope falling back to full refresh');
+    await handleFullRefresh(userId, '', lang);
+  }
+}
+
+/**
  * Handle full refresh of all data
- * 
+ *
  * This triggers a complete re-fetch of all Lev page data from the server.
- * 
+ *
  * @param userId - Current user ID
  * @param token - JWT authentication token
  * @param lang - Current language
@@ -291,8 +344,9 @@ async function handlePartialUpdate(
           if (data && data.id) {
             updateSheirutpStore(data);
           } else {
-            console.log('🔄 [levSocketHandler] No data for sheirutpends update, performing full refresh');
-            await handleFullRefresh(userId, token, lang);
+            // No item payload — refetch the slice for this type (much cheaper than full refresh)
+            console.log('🔁 [levSocketHandler] No data for sheirutpends — refetching slice');
+            await handleRefetchScope({ dataKeys: ['sheirutpends'] }, userId, lang);
           }
           break;
 

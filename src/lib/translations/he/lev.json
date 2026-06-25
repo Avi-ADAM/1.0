@@ -20,6 +20,9 @@
   "cards": {
     "approve": "אני רוצה",
     "decline": "לא מתאים",
+    "nego": "התאמה אישית",
+    "acceptCounter": "אישור",
+    "proposeOther": "הצעה אחרת",
     "requesterDetails": "פרטי המבקש",
     "confirmApprove": "אישור",
     "confirmDecline": "התנגדות",
@@ -230,6 +233,46 @@
       "complete": "הושלמו",
       "noTransfers": "עדיין לא נשלחו העברות מהחברים. ההעברות יופיעו כאן ברגע שחבר נותן בוחר מקבל ושולח."
     }
+  },
+  "fiappru": {
+    "whyHeading": "יש לנמק מדוע",
+    "taskNotCompleted": "מדוע המשימה לא הושלמה",
+    "offerRejected": "יש לנמק מדוע ההצעה נדחית על ידך",
+    "addHours": "הוסף שעות"
+  },
+  "weget": {
+    "howMuchSpentThisMonth": "כמה הוצאת החודש?",
+    "approveMonthlyExpense": "אישור ההוצאה החודשית",
+    "cycleLabel": "מחזור",
+    "reportedExpenseOf": "דיווח/ה על הוצאה של:",
+    "actualAmountPlaceholder": "הסכום שהוצא בפועל החודש",
+    "confirmExpense": "אישור ההוצאה",
+    "doneResourceTitle": "סיום המשאב החודשי — לא ייפתחו עוד חיובים חודשיים",
+    "doneResource": "סיום המשאב",
+    "mustExplain": "יש לנמק",
+    "missingForApproval": "מה חסר בכדי שניתן יהיה לאשר שהמשאב התקבל",
+    "proposeOtherAmount": "הצעת סכום אחר",
+    "reportedAmount": "הסכום שדווח:",
+    "proposedAmount": "הסכום המוצע:",
+    "amountYouPropose": "הסכום שאתה מציע",
+    "whyMoveAmount": "מדוע להזיז את הסכום? (יתפרסם בצ'אט)",
+    "submitProposal": "שליחת ההצעה",
+    "explainProposal": "יש לנמק את ההצעה",
+    "addHours": "הוסף שעות"
+  },
+  "levchat": {
+    "messagePlaceholder": "כתוב הודעה..."
+  },
+  "halukaask": {
+    "offerRejected": "יש לנמק מדוע ההצעה נדחית על ידך",
+    "yourResponse": "התשובה שלך",
+    "yourResponseLabel": "התגובה שלך",
+    "canRespond": "ניתן להגיב ולנמק מדוע",
+    "decline": "לדחות",
+    "approve": "לאשר",
+    "theOffer": "את ההצעה",
+    "referToPrevious": "נא להתייחס לתגובה הקודמת ולהשיב על הטענות שעלו בה",
+    "previousResponse": "התגובה הקודמת"
   },
   "taskModal": {
     "progress": "התקדמות",

@@ -13,6 +13,7 @@
   import { DialogContent, DialogOverlay } from 'svelte-accessible-dialog';
   import { RingLoader } from 'svelte-loading-spinners';
   import Diun from './diun.svelte';
+  import TimetToTimegrama from './cards/timetToTimegrama.svelte';
   const baseUrl = import.meta.env.VITE_URL;
   let clicked = $state(false);
   /**
@@ -22,6 +23,10 @@
    * @property {boolean} [isVisible]
    * @property {any} coinlapach
    * @property {any} deadline
+   * @property {any} [timegramaId]
+   * @property {any} [timegramaDate]
+   * @property {boolean} [timegramaDone]
+   * @property {any} [pmashId]
    * @property {any} [sqadualedf]
    * @property {any} [kindOf]
    * @property {boolean} [recurring]
@@ -132,6 +137,8 @@
     order = $bindable(0),
     // שדות חדשים למשא ומתן
     timegramaId,
+    timegramaDate = null,     // מועד פקיעת ה-timegrama → שעון עצר לאישור אוטומטי
+    timegramaDone = false,    // אם ה-timegrama כבר נסגר/בוטל → לא מציגים שעון
     isRishon = false,         // = isSelfProposal: חבר פרויקט שיצר ישירות → כותרת מיוחדת + מו"מ
     pmashId = undefined,      // pmash relation id — present on isSelfProposal Askms
     pendingMainVote = false,  // = הצבעה כפולה: גם על הצורך וגם שהחבר נותן אותו
@@ -160,6 +167,25 @@
     masa = false;
     negotiationMode = false;
     onAcsept?.({ ani: 'askedma', coinlapach });
+  }
+
+  // Rights-holder intermediate proposal on a candidate's Askm. Stored as a
+  // NegoMash round (proposedBy=project) on the Askm — never overwriting the
+  // shared OpenMashaabim. For self-proposals (isRishon) the internal pmash flow
+  // is used instead, so onSubmit is only wired for the external-candidate case.
+  async function handleCounter({ newValues }) {
+    const result = await executeAction('counterOnAskm', {
+      askmId: String(askId ?? id),
+      openMashaabimId: openMid != null ? String(openMid) : undefined,
+      projectId: String(projectId),
+      ordern: orderon ?? 0,
+      candidateUserId: userId != null ? String(userId) : undefined,
+      newValues,
+      users
+    });
+    if (!result.success) {
+      throw new Error(result.error || 'counterOnAskm failed');
+    }
   }
 
   import { executeAction } from '$lib/client/actionClient';
@@ -448,6 +474,8 @@
               masaalr={false}
               onLoad={() => (negotiationLoading = true)}
               onClose={afternego}
+              onSubmit={isRishon ? null : handleCounter}
+              candidateRound={!isRishon ? (negopendmissions?.find(r => r.attributes?.proposedBy === 'candidate')?.attributes ?? null) : null}
               descrip={missionDetails}
               {projectName}
               name1={openmissionName}
@@ -459,7 +487,7 @@
               {projectId}
               total={myp || price}
               noofusers={noofpu}
-              pendId={id}
+              pendId={isRishon ? (pmashId ?? id) : id}
               linkto={''}
               sqadualed={deadline}
               {sqadualedf}
@@ -529,6 +557,9 @@
     class="hover:scale-290 duration-1000 ease-in"
     transition:fly|local={{ y: 250, opacity: 0.9, duration: 2000 }}
   >
+    {#if timegramaDate && !timegramaDone}
+      <TimetToTimegrama {timegramaDate} />
+    {/if}
     <Swiper
       dir="rtl"
       on:swiper={setSwiperRef}
@@ -830,7 +861,7 @@
                 onTochat={tochat}
                 onAgree={() => agree()}
                 onDecline={() => decline()}
-                onNego={isRishon ? toggleNegotiationMode : () => decline()}
+                onNego={toggleNegotiationMode}
                 onHover={hoverc}
                 {already}
                 {projectName}
@@ -871,7 +902,7 @@
     onTochat={tochat}
     onAgree={() => agree()}
     onDecline={() => decline()}
-    onNego={isRishon ? toggleNegotiationMode : () => decline()}
+    onNego={toggleNegotiationMode}
     onHover={hoverc}
     {isVisible}
     {already}

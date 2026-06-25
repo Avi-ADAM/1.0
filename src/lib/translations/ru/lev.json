@@ -20,6 +20,9 @@
   "cards": {
     "approve": "Хочу",
     "decline": "Не подходит",
+    "nego": "Встречное предложение",
+    "acceptCounter": "Принять",
+    "proposeOther": "Другое предложение",
     "requesterDetails": "Данные заявителя",
     "confirmApprove": "Утвердить",
     "confirmDecline": "Возразить",
@@ -230,6 +233,46 @@
       "complete": "завершено",
       "noTransfers": "Переводов от участников пока нет. Они появятся здесь, когда дающий участник выберет получателя и отправит."
     }
+  },
+  "fiappru": {
+    "whyHeading": "Пожалуйста, объясните причину",
+    "taskNotCompleted": "Почему задача не была выполнена?",
+    "offerRejected": "Пожалуйста, объясните причину отклонения предложения",
+    "addHours": "Добавить часы"
+  },
+  "weget": {
+    "howMuchSpentThisMonth": "Сколько вы потратили в этом месяце?",
+    "approveMonthlyExpense": "Подтвердить ежемесячные расходы",
+    "cycleLabel": "Цикл",
+    "reportedExpenseOf": "сообщил(-а) о расходах:",
+    "actualAmountPlaceholder": "Фактическая сумма расходов за месяц",
+    "confirmExpense": "Подтвердить расходы",
+    "doneResourceTitle": "Завершить ежемесячный ресурс — больше не будет ежемесячных платежей",
+    "doneResource": "Завершить ресурс",
+    "mustExplain": "Пожалуйста, объясните",
+    "missingForApproval": "Что не хватает для подтверждения получения ресурса?",
+    "proposeOtherAmount": "Предложить другую сумму",
+    "reportedAmount": "Сообщённая сумма:",
+    "proposedAmount": "Предлагаемая сумма:",
+    "amountYouPropose": "Ваша предлагаемая сумма",
+    "whyMoveAmount": "Почему вы меняете сумму? (будет опубликовано в чате)",
+    "submitProposal": "Отправить предложение",
+    "explainProposal": "Пожалуйста, объясните предложение",
+    "addHours": "Добавить часы"
+  },
+  "levchat": {
+    "messagePlaceholder": "Написать сообщение..."
+  },
+  "halukaask": {
+    "offerRejected": "Пожалуйста, объясните причину отклонения предложения",
+    "yourResponse": "Ваш ответ",
+    "yourResponseLabel": "Ваш ответ",
+    "canRespond": "Вы можете ответить и объяснить причину",
+    "decline": "отклонить",
+    "approve": "одобрить",
+    "theOffer": "предложение",
+    "referToPrevious": "Пожалуйста, обратитесь к предыдущему ответу и ответьте на высказанные аргументы",
+    "previousResponse": "Предыдущий ответ"
   },
   "taskModal": {
     "progress": "Прогресс",

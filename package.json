@@ -15,7 +15,8 @@
     "codegen": "graphql-codegen --config codegen.ts",
     "types:extract": "node scripts/extract-graphql-types.mjs",
     "types:update": "npm run codegen && npm run types:extract",
-    "validate:qids": "node scripts/validate-qids.mjs"
+    "validate:qids": "node scripts/validate-qids.mjs",
+    "check:proxy": "node scripts/check-proxy-security.mjs"
   },
   "engines": {
     "node": "22.x"

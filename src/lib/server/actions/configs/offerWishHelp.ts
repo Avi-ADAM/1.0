@@ -120,7 +120,7 @@ export const offerWishHelpConfig: ActionConfig = {
         ar: 'عرض مساعدة جديد لأمنيتك'
       },
       body: {
-        he: 'מישהי הציעה לעזור במשאלה שלך. כנסי ל־Concierge כדי לראות.',
+        he: 'נשלחה הצעת עזרה חדשה למשאלה שלך. יש להיכנס ל־Concierge כדי לראות.',
         en: 'Someone offered to help with your wish. Open Concierge to review.',
         ar: 'قدّم أحدهم عرضًا للمساعدة في أمنيتك. افتح Concierge للمراجعة.'
       }

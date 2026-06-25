@@ -1103,8 +1103,13 @@ export function processSuggestions(
     const memberCount = project?.attributes.user_1s?.data?.length || suggestion.projectDetails?.membersCount || 0;
     const restime = project?.attributes.restime || suggestion.projectDetails?.restime;
 
-    // Suggestions sit below actionable votes but above already-voted items
-    const basePriority = PRIORITY_BAND.SUGGESTION;
+    // Suggestions sit below actionable votes but above already-voted items —
+    // unless the rikma countered the candidate's application (Path B2), in which
+    // case it's actionable for the candidate and jumps to the VOTE_PENDING band.
+    const awaitingMyResponse = suggestion.myRoundProposedBy === 'project';
+    const basePriority = awaitingMyResponse
+      ? PRIORITY_BAND.VOTE_PENDING
+      : PRIORITY_BAND.SUGGESTION;
 
     // UI Styling helpers
     const hst = checkHst(projectName || '');
@@ -1198,7 +1203,12 @@ export function processResourceSuggestions(
 
     const restime = getProjectRestime(projectId);
 
-    const basePriority = PRIORITY_BAND.SUGGESTION;
+    // A rikma counter on the candidate's own application (Path B2) is actionable
+    // for the candidate → jumps from the suggestion band to VOTE_PENDING.
+    const awaitingMyResponse = huca.myRoundProposedBy === 'project';
+    const basePriority = awaitingMyResponse
+      ? PRIORITY_BAND.VOTE_PENDING
+      : PRIORITY_BAND.SUGGESTION;
 
     return {
       ani: 'huca',

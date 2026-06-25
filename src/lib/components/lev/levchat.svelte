@@ -1,6 +1,7 @@
 <script>
 	import ChatMessage from '../../celim/messeges.svelte';
 	import TodayDivider from '../../celim/todaydevider.svelte';
+	import { t } from '$lib/translations';
 	
 
 	let nameMe='Me';
@@ -128,7 +129,7 @@ let todayMessages =[
                </svg>
             </button>
          </span>
-         <input type="text" placeholder="Write your message!" class="w-full focus:outline-none focus:placeholder-gray-400 text-gray-600 placeholder-gray-600 pl-12 bg-gray-200 rounded-md py-3">
+         <input type="text" placeholder={$t('lev.levchat.messagePlaceholder')} class="w-full focus:outline-none focus:placeholder-gray-400 text-gray-600 placeholder-gray-600 pl-12 bg-gray-200 rounded-md py-3">
          <div class="absolute right-0 items-center inset-y-0 hidden sm:flex">
             <button type="button" class="inline-flex items-center justify-center rounded-full h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6 text-gray-600">

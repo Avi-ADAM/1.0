@@ -2,24 +2,34 @@
   import { lang } from '$lib/stores/lang.js';
   import tr from '$lib/translations/tr.json';
 
+  const L = (key: keyof typeof tr.hub) =>
+    (tr.hub[key] as Record<string, string>)[$lang] ?? (tr.hub[key] as Record<string, string>).en;
+
   let labels = $derived({
-    text: tr.hub.customPurchaseText[$lang],
-    sub: tr.hub.customPurchaseSub[$lang],
-    btn: tr.hub.startBtn[$lang]
+    text: L('customPurchaseText'),
+    sub: L('customPurchaseSub'),
+    btn: L('startBtn')
   });
 </script>
 
 <a
   href="/concierge/new"
-  dir="rtl"
-  class="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-right no-underline
-         bg-goldTobr border border-accent/40 shadow-sm
-         hover:opacity-90 hover:scale-[1.01] transition-all active:scale-[0.99]"
+  class="group relative flex items-center gap-3 px-4 py-4 rounded-2xl no-underline overflow-hidden
+         bg-goldTobr shadow-[0_8px_24px_-8px_rgba(179,135,40,0.6)]
+         transition-transform active:scale-[0.98]"
 >
-  <span class="text-2xl">✨</span>
-  <span class="flex-1">
-    <span class="block text-sm font-semibold text-amber-900">{labels.text}</span>
-    <span class="block text-xs text-amber-800/70 mt-0.5">{labels.sub}</span>
+  <!-- moving sheen on the gold -->
+  <span
+    class="pointer-events-none absolute inset-0 -translate-x-full group-active:translate-x-full
+           bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700"
+  ></span>
+
+  <span class="relative text-2xl shrink-0">✨</span>
+  <span class="relative flex-1 min-w-0">
+    <span class="block text-sm font-bold text-amber-950 leading-tight">{labels.text}</span>
+    <span class="block text-xs text-amber-900/70 mt-0.5 truncate">{labels.sub}</span>
   </span>
-  <span class="text-amber-800 font-bold text-sm">{labels.btn} ←</span>
+  <span
+    class="relative shrink-0 text-xs font-bold text-amber-950 bg-white/40 rounded-full px-3 py-1.5 whitespace-nowrap"
+  >{labels.btn}</span>
 </a>

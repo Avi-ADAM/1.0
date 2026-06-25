@@ -490,7 +490,7 @@ id: ${pendId}
           onclick={close}
           style="margin: 0 auto;"
           class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-          title="ביטול"
+          title={$t('lev.missionInProgress.cancel')}
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
             <path
               fill="currentColor"
@@ -503,9 +503,9 @@ id: ${pendId}
             minlength="26"
             type="text"
             bind:value={why}
-            placeholder="יש לנמק מדוע ההצעה נדחית על ידך"
+            placeholder={$t('lev.halukaask.offerRejected')}
           />
-          <button onclick={afterwhy}>אישור</button>
+          <button onclick={afterwhy}>{$t('lev.cards.confirmApprove')}</button>
         {:else if rect === true}
           <Diun
             onRect={afreact}

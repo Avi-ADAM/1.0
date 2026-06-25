@@ -11,9 +11,11 @@
 
   // New architecture imports
   import { finalSwiperArray } from '$lib/stores/levDerived';
-  import { isCardsView } from '$lib/stores/levStores';
+  import { isCardsView, projectFilter } from '$lib/stores/levStores';
   import { initializeLevData } from '$lib/utils/levDataLoader';
   import { setupSocketListeners } from '$lib/utils/levSocketHandler';
+  import { loadLevSlice } from '$lib/utils/levSliceLoader';
+  import { sliceKeysForAni, runnableSliceKeys } from '$lib/utils/levSliceRegistry';
   import {
     nowChatId,
     isChatOpen
@@ -168,9 +170,44 @@
       return;
     }
 
+    // Read deep-link params set by hub chips
+    const focusAni = page.url.searchParams.get('focus');
+    const focusProject = page.url.searchParams.get('project');
+
     try {
-      // Initialize data using new architecture (token is now handled by server cookies)
-      await initializeLevData(page.data.uid, '', data.lang);
+      if (focusAni) {
+        // Quantum (fast) path: load only the requested slice, then kick off the
+        // full query 83 in the background so the page becomes complete quietly.
+        if (focusProject) {
+          projectFilter.set(focusProject);
+        }
+
+        const sliceKeys = sliceKeysForAni(focusAni).filter((k) =>
+          runnableSliceKeys().includes(k)
+        );
+
+        if (sliceKeys.length > 0) {
+          // Load slice(s) first — shows cards immediately with one small request
+          await Promise.all(
+            sliceKeys.map((key) =>
+              loadLevSlice(key, page.data.uid, focusProject ? [focusProject] : null, data.lang)
+            )
+          );
+
+          loading = false; // show cards right away
+
+          // Full load in background — stores will update reactively when done
+          initializeLevData(page.data.uid, '', data.lang).catch((e) => {
+            console.warn('[lev] Background full load failed:', e.message);
+          });
+        } else {
+          // Focus type not yet sliceable — fall through to full load
+          await initializeLevData(page.data.uid, '', data.lang);
+        }
+      } else {
+        // Normal path: full load
+        await initializeLevData(page.data.uid, '', data.lang);
+      }
 
       // Fetch timers to populate timers store (needed for missionInProgress)
       await fetchTimers(page.data.uid, fetch);

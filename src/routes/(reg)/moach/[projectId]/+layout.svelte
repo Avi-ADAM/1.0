@@ -1,4 +1,4 @@
-﻿<script>
+<script>
   import { isRtl } from '$lib/translations';
   import { page, navigating } from '$app/state';
   import { goto } from '$app/navigation';
@@ -18,11 +18,30 @@
   import { socketClient } from '$lib/stores/socketClient';
   import { TourItem, run } from 'svelte-tour';
   import Dialog from '$lib/celim/ui/dialog.svelte';
+  import { sendToSer } from '$lib/send/sendToSer.js';
 
   let { children, data } = $props();
   const moachStore = setMoachStore();
   let socketUnsubscribe;
   let projectId = $derived(page.params.projectId);
+
+  // Count of open items awaiting a vote — drives the badge on the "votes" tab.
+  // Count-only query (pagination meta), loaded after mount and refreshed on
+  // vote socket events, so it never blocks the moach base load.
+  let voteCount = $state(0);
+  async function loadVoteCount() {
+    if (!projectId) return;
+    try {
+      const res = await sendToSer({ pid: projectId }, 'getOpenVoteCounts', null, null, false, fetch);
+      const a = res?.data?.project?.data?.attributes;
+      voteCount =
+        (a?.pmashes?.data?.length ?? 0) +
+        (a?.pendms?.data?.length ?? 0) +
+        (a?.tosplits?.data?.length ?? 0);
+    } catch (e) {
+      console.error('[MoachLayout] vote count failed', e);
+    }
+  }
 
   let showGuideDialog = $state(false);
 
@@ -65,6 +84,8 @@
       showGuideDialog = true;
     }
 
+    loadVoteCount();
+
     // Socket integration for real-time invalidation
     socketClient.connect(data.uid);
     socketUnsubscribe = socketClient.onNotification((notification) => {
@@ -90,6 +111,7 @@
         moachStore.invalidate(projectId, 'base');
         moachStore.invalidate(projectId, 'missions');
         moachStore.invalidate(projectId, 'financials');
+        loadVoteCount();
       } else if (type) {
         moachStore.invalidate(projectId, type);
       } else {
@@ -444,7 +466,7 @@
           dir={$isRtl ? 'rtl' : 'ltr'}
         >
           <div class="flex -space-x-2">
-            {#each projectBase.user_1s?.data || [] as user}
+            {#each projectBase.user_1s?.data || [] as user (user.id)}
               {@const projectTimerData = $projectTimersStore[projectId]?.data}
               {@const timers = projectTimerData?.timers?.data || []}
               {@const hasActiveTimer = timers.some(
@@ -504,10 +526,10 @@
           class="flex justify-center flex-wrap gap-1 py-4"
           dir={$isRtl ? 'rtl' : 'ltr'}
         >
-          {#each tabs as tab}
+          {#each tabs as tab (tab.id)}
             <a
               href="/moach/{projectId}/{tab.id}"
-              class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold px-4 py-2 drop-shadow-lg shadow-gold transition-all
+              class="relative hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold px-4 py-2 drop-shadow-lg shadow-gold transition-all
               {isActive(tab.id)
                 ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-blue-800 font-bold'
                 : 'bg-gradient-to-r from-gra via-grb  to-gre text-purple-700 font-bold'}
@@ -515,6 +537,14 @@
               style={!isActive(tab.id) ? 'text-shadow:1px 1px #fff;' : ''}
             >
               {t[tab.label]}
+              {#if tab.id === 'votes' && voteCount > 0}
+                <span
+                  class="absolute -top-2 -right-2 min-w-5 h-5 px-1 flex items-center justify-center rounded-full bg-barbi text-gold text-xs font-bold ring-2 ring-white shadow-lg animate-pulse"
+                  title={t.votes}
+                >
+                  {voteCount}
+                </span>
+              {/if}
             </a>
           {/each}
         </nav>

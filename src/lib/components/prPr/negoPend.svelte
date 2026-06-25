@@ -14,6 +14,8 @@
   import Rich from '../conf/rich.svelte';
   import { submitNegoMash } from '$lib/client/actionClient';
   import { updatePmashesStore } from '$lib/utils/levSocketHandler';
+  import { onMount } from 'svelte';
+  import { openNegoBridge, readNegoBridgeReturn } from '$lib/func/negoBridge.js';
 
   let error1;
   let clicked = false;
@@ -101,7 +103,14 @@
      * on the candidate's Askm. Receives { newValues, originalValues, hasChanges }.
      * @type {((d: { newValues: any, originalValues: any, hasChanges: boolean }) => Promise<void>) | null}
      */
-    onSubmit = null
+    onSubmit = null,
+    /**
+     * The latest candidate-side negotiation round attributes (proposedBy=candidate).
+     * When provided alongside onSubmit, shown as a reference beside each field so
+     * the project member knows what they are counter-proposing against.
+     * @type {any | null}
+     */
+    candidateRound = null
   } = $props();
 
   let descrip2 = $state(descrip);
@@ -153,6 +162,43 @@
   function close() {
     onClose?.();
   }
+
+  // ── Consensus bridge ──────────────────────────────────────────────────────
+  // Open a structured mediation discussion in the consensus app, seeded with
+  // every negotiable term (original vs. current proposal). Unchanged terms are
+  // sent too — the consensus side marks them agreed. See negoBridge.js.
+  function openBridge() {
+    openNegoBridge({
+      sourceType: 'pmash',
+      sourceId: pendId,
+      title: name1,
+      projectName,
+      fields: [
+        { key: 'name', label: 'שם', kind: 'text', original: name1 ?? null, proposed: name2 ?? null },
+        { key: 'descrip', label: 'תיאור', kind: 'text', original: descrip ?? null, proposed: descrip2 ?? null },
+        { key: 'price', label: 'שווי', kind: 'number', original: Number(price) || 0, proposed: Number(price2) || 0 },
+        { key: 'easy', label: 'שווי לב', kind: 'number', original: Number(easy) || 0, proposed: Number(easy2) || 0 },
+        { key: 'hm', label: 'כמות', kind: 'number', original: Number(hm) || 0, proposed: Number(hm2) || 0 },
+        { key: 'sqadualed', label: 'תאריך התחלה', kind: 'date', original: toIsoDateString(sqadualed) ?? null, proposed: toIsoDateString(sqadualed2) ?? null },
+        { key: 'sqadualedf', label: 'תאריך סיום', kind: 'date', original: toIsoDateString(sqadualedf) ?? null, proposed: toIsoDateString(sqadualedf2) ?? null }
+      ]
+    });
+  }
+
+  // On return from the bridge, prefill the editable fields with the agreed
+  // values. The user still submits + votes as usual.
+  onMount(() => {
+    const v = readNegoBridgeReturn(pendId);
+    if (!v) return;
+    if (v.price != null) price2 = Number(v.price);
+    if (v.easy != null) easy2 = Number(v.easy);
+    if (v.hm != null) hm2 = Number(v.hm);
+    if (v.name != null) name2 = String(v.name);
+    if (v.descrip != null) descrip2 = String(v.descrip);
+    if (v.sqadualed != null) sqadualed2 = v.sqadualed;
+    if (v.sqadualedf != null) sqadualedf2 = v.sqadualedf;
+  });
+
   async function increment() {
     onLoad?.();
 
@@ -354,9 +400,40 @@
 
 <div class="text-barbi" dir={$isRtl ? 'rtl' : 'ltr'}>
   <h1 class="md:text-center text-2xl md:text-2xl font-bold underline">
-    {tri?.nego?.headmash[$lang]}
+    {onSubmit ? tri?.nego?.headMashCandidate[$lang] : tri?.nego?.headmash[$lang]}:
     {name1}
   </h1>
+
+  <!-- Candidate proposal context — shown only in counter-proposal flow -->
+  {#if onSubmit && candidateRound}
+    {@const candTotal = (candidateRound.hm ?? hm) * (candidateRound.easy ?? candidateRound.price ?? easy ?? price)}
+    <div class="mx-2 my-2 rounded-lg border border-barbi/50 bg-barbi/8 p-3 text-sm space-y-1">
+      <p class="font-bold text-barbi text-base">
+        💡 {$lang === 'he' ? 'הצעת המועמד (לעיון):' : 'Candidate proposal (for reference):'}
+      </p>
+      <div class="flex flex-wrap gap-x-4 gap-y-1 text-barbi/80">
+        {#if candidateRound.hm != null}
+          <span>{$lang === 'he' ? 'כמות:' : 'Qty:'} <strong>{candidateRound.hm}</strong></span>
+        {/if}
+        {#if candidateRound.price != null}
+          <span>{$lang === 'he' ? 'מחיר:' : 'Price:'} <strong>{candidateRound.price}</strong></span>
+        {/if}
+        {#if candidateRound.easy != null}
+          <span>{$lang === 'he' ? 'שווי לב:' : 'Lev value:'} <strong>{candidateRound.easy}</strong></span>
+        {/if}
+        {#if candTotal > 0}
+          <span class="font-bold">{$lang === 'he' ? 'סה"כ:' : 'Total:'} <strong>{candTotal.toLocaleString()}</strong></span>
+        {/if}
+        {#if candidateRound.sqadualed}
+          <span>{$lang === 'he' ? 'התחלה:' : 'Start:'} <strong>{new Date(candidateRound.sqadualed).toLocaleDateString($lang)}</strong></span>
+        {/if}
+        {#if candidateRound.sqadualedf}
+          <span>{$lang === 'he' ? 'סיום:' : 'End:'} <strong>{new Date(candidateRound.sqadualedf).toLocaleDateString($lang)}</strong></span>
+        {/if}
+      </div>
+    </div>
+  {/if}
+
   {#if recurring || recurring2}
     <div
       class="mx-2 my-2 rounded-lg border border-gold/60 bg-gold/10 p-2 text-sm text-center"
@@ -368,6 +445,9 @@
   {/if}
   <div class="flex flex-col align-middle justify-center">
     <Text text={name1} bind:textb={name2} lebel={tri?.common?.name} />
+    {#if onSubmit && candidateRound?.name && candidateRound.name !== name1}
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד:' : 'Candidate:'} {candidateRound.name}</p>
+    {/if}
     <Rich
       text={descrip}
       bind:textb={descrip2}
@@ -383,28 +463,43 @@
 
     {#if !(kindOf == 'total' && kindOfb == 'total')}
       <NumberField number={hm} bind:numberb={hm2} lebel={tri?.mash?.noof[$lang]} />
+      {#if onSubmit && candidateRound?.hm != null && candidateRound.hm !== hm}
+        <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} <strong>{candidateRound.hm}</strong></p>
+      {/if}
     {/if}
     <NumberField
       number={price}
       bind:numberb={price2}
       lebel={tri?.mash?.shovi[$lang]}
     />
+    {#if onSubmit && candidateRound?.price != null && candidateRound.price !== price}
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} <strong>{candidateRound.price}</strong></p>
+    {/if}
     <NumberField
       number={easy}
       bind:numberb={easy2}
       lebel={tri?.mash?.shovile[$lang]}
     />
+    {#if onSubmit && candidateRound?.easy != null && candidateRound.easy !== easy}
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} <strong>{candidateRound.easy}</strong></p>
+    {/if}
     {#if kindOf == 'yearly' || kindOfb == 'yearly' || kindOfb == 'monthly' || kindOf == 'monthly' || kindOf == 'rent' || kindOfb == 'rent'}
       <DateNego
         date={sqadualed}
         bind:dateb={sqadualed2}
         lebel={tri?.common.startDate}
       />
+      {#if onSubmit && candidateRound?.sqadualed}
+        <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} {new Date(candidateRound.sqadualed).toLocaleDateString($lang)}</p>
+      {/if}
       <DateNego
         date={sqadualedf}
         bind:dateb={sqadualedf2}
         lebel={tri?.common.finishDate}
       />
+      {#if onSubmit && candidateRound?.sqadualedf}
+        <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} {new Date(candidateRound.sqadualedf).toLocaleDateString($lang)}</p>
+      {/if}
     {/if}
 
     {#if kindOfb === 'monthly' || kindOfb === 'yearly'}
@@ -520,12 +615,19 @@
     {/if}
   </div>
 
-  <div class="w-fit mx-auto">
+  <div class="w-fit mx-auto flex flex-col items-center gap-y-2">
     <button
       onclick={increment}
       class="mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
       type="submit"
-      name="addm">{tri?.common.puttovote[$lang]}</button
+      name="addm">{onSubmit ? tri?.nego?.submitProposal[$lang] : tri?.common.puttovote[$lang]}</button
     >
+    <button
+      onclick={openBridge}
+      type="button"
+      class="mx-auto text-sm border border-gold/50 text-gold hover:bg-gold/20 rounded-full px-4 py-1"
+    >
+      {$lang === 'en' ? '🤝 Open a deeper discussion' : '🤝 דיון מעמיק'}
+    </button>
   </div>
 </div>

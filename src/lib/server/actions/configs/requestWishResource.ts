@@ -218,7 +218,7 @@ export const requestWishResourceConfig: ActionConfig = {
         ar: 'عرض مورد من أمنية'
       },
       body: {
-        he: 'מישהי הכינה עבורך הצעת משאב מוכנה. כנסי ל־Deals כדי לאשר את ההשמה.',
+        he: 'נשלחה אליך הצעת משאב. יש להיכנס ל־Deals כדי לאשר את ההשמה.',
         en: 'Someone prepared a ready resource offer for you. Open Deals to approve your placement.',
         ar: 'أعدّ أحدهم عرض مورد جاهزًا لك. افتح Deals للموافقة.'
       }
