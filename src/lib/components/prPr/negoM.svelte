@@ -1,11 +1,14 @@
 ﻿<script>
   import { role, ww, skil } from '$lib/components/prPr/mi.js';
   import { onMount } from 'svelte';
+  import { get } from 'svelte/store';
   import { lang } from '$lib/stores/lang';
   import { t, isRtl} from '$lib/translations';
   import tr from '$lib/translations/tr.json';
   import Text from '../conf/text.svelte';
-  import Elements from '../conf/elements.svelte';
+  import SkillSelector from '../ui/SkillSelector.svelte';
+  import RoleSelector from '../ui/RoleSelector.svelte';
+  import WorkwaySelector from '../ui/WorkwaySelector.svelte';
   import Number from '../conf/number.svelte';
   import DateNego from '../conf/dateNego.svelte';
   import Barb from '../conf/barb.svelte';
@@ -153,23 +156,10 @@
   console.log(negopendmissions);
   const tri = tr;
   let isKavua2 = $state();
-  let newcontent = $state(true);
 
   let error1;
-  let placeholder4 = `בחירת תפקידים`;
-  let roles = $state($role);
-  let why = '';
-  let skills2 = $state($skil);
-  let placeholder1 = `בחירת כישורים`;
-  let addS = false;
   let descrip2 = $state(descrip);
   let name2 = $state(name1);
-  let selected2 = [];
-  let selected3 = [];
-  let selected1 = [];
-  let workways2 = $state($ww);
-  let placeholder = `סוג משימה`;
-  const plww = { he: `סוג משימה`, en: `mission kind` };
   let mdate2 = $state(mdate);
   let mdates2 = $state(mdates);
 
@@ -179,9 +169,13 @@
   let perhour2 = $state(perhour);
   let myM;
   let done;
-  let skills3 = $state({ data: [] });
-  let tafkidims2 = $state({ data: [] });
-  let workways3 = $state({ data: [] });
+
+  // Unified vocab selection — name arrays bound to the VocabSelector wrappers.
+  // Seeded (in onMount) from the mission's current relations and resolved back
+  // to ids at submit time, the same flow used in userPr/edit.svelte.
+  let selectedSkills = $state([]);
+  let selectedRoles = $state([]);
+  let selectedWorkways = $state([]);
   let acts2 = $state(
     acts?.data && Array.isArray(acts.data) ? [...acts.data] : []
   );
@@ -222,6 +216,52 @@
   function arraysEqual(a1, a2) {
     return JSON.stringify(a1) == JSON.stringify(a2);
   }
+
+  /** Localized display name for a catalog/relation entry (he localization first). */
+  function vname(item, nameField) {
+    let name = item?.attributes?.[nameField] || '';
+    if ($lang === 'he' && item?.attributes?.localizations?.data?.length > 0) {
+      name = item.attributes.localizations.data[0].attributes[nameField];
+    }
+    return name;
+  }
+
+  // Seed selected names from the mission's current relations, preferring the
+  // catalog entry (which always carries localizations) so the labels match the
+  // dropdown options — otherwise re-picking a Hebrew item wouldn't resolve.
+  function seedNames(items, catalog, nameField) {
+    return (items ?? [])
+      .map((it) => {
+        const hit = catalog.find((c) => String(c.id) === String(it.id));
+        return vname(hit ?? it, nameField);
+      })
+      .filter(Boolean);
+  }
+
+  // Resolve display names back to catalog ids (matches master name OR he
+  // localization) — the inverse of the seeding above. Includes the original
+  // relation objects in the source so existing items never drop while a newly
+  // created one is still propagating into the store.
+  function findIds(names, catalog, originals, nameField) {
+    const source = [...catalog, ...(originals ?? [])];
+    const ids = [];
+    for (const searchName of names) {
+      for (const item of source) {
+        if (!item.attributes) continue;
+        const name = item.attributes[nameField];
+        let heName = name;
+        if (item.attributes.localizations?.data?.length > 0) {
+          heName = item.attributes.localizations.data[0].attributes[nameField];
+        }
+        if (name === searchName || heName === searchName) {
+          ids.push(String(item.id));
+          break;
+        }
+      }
+    }
+    return ids;
+  }
+
   function close() {
     onClose?.();
   }
@@ -341,22 +381,22 @@
       hasChanges = true;
     }
 
-    const skillsId = skills?.data ? skills.data.map((c) => c.id) : [];
-    const skills2Id = skills3?.data ? skills3.data.map((c) => c.id) : [];
+    const skillsId = (skills?.data ?? []).map((c) => String(c.id));
+    const skills2Id = findIds(selectedSkills, $skil, skills?.data, 'skillName');
     if (!arraysEqual(skillsId, skills2Id)) {
       newValues.skillIds = skills2Id;
       originalValues.skillIds = skillsId;
       hasChanges = true;
     }
-    const roId = tafkidims?.data ? tafkidims.data.map((c) => c.id) : [];
-    const ro2Id = tafkidims2?.data ? tafkidims2.data.map((c) => c.id) : [];
+    const roId = (tafkidims?.data ?? []).map((c) => String(c.id));
+    const ro2Id = findIds(selectedRoles, $role, tafkidims?.data, 'roleDescription');
     if (!arraysEqual(roId, ro2Id)) {
       newValues.roleIds = ro2Id;
       originalValues.roleIds = roId;
       hasChanges = true;
     }
-    const wwId = workways?.data ? workways.data.map((c) => c.id) : [];
-    const ww2Id = workways3?.data ? workways3.data.map((c) => c.id) : [];
+    const wwId = (workways?.data ?? []).map((c) => String(c.id));
+    const ww2Id = findIds(selectedWorkways, $ww, workways?.data, 'workWayName');
     if (!arraysEqual(wwId, ww2Id)) {
       newValues.workwayIds = ww2Id;
       originalValues.workwayIds = wwId;
@@ -448,143 +488,16 @@
       toast.warning(tr?.toasts.er[$lang]);
     }
   }
-  let dataibno = $state({
-    skillName: [],
-    roleDescription: [],
-    workWayName: []
-  });
-  function addnew(event) {
-    const newOb = event.skob;
-    const valc = event.valc;
-    const dataibn = event.dataibn;
-    const newN = event.skob.attributes[valc];
-    dataibno[valc] = dataibn;
-    const newValues =
-      valc == 'skillName'
-        ? $skil
-        : valc == 'roleDescription'
-          ? $role
-          : valc == 'workWayName'
-            ? $ww
-            : [];
-    newValues.push(newOb);
-    if (valc == 'skillName') {
-      skills2 = newValues;
-      skil.set(skills2);
-    } else if (valc == 'roleDescription') {
-      roles = newValues;
-      role.set(roles);
-    } else if (valc == 'workWayName') {
-      workways2 = newValues;
-      ww.set(workways2);
-    }
-    const newSele =
-      valc == 'skillName'
-        ? skills3.data
-        : valc == 'roleDescription'
-          ? tafkidims2.data
-          : valc == 'workWayName'
-            ? workways3.data
-            : [];
-    newSele.push(newOb);
-    if (valc == 'skillName') {
-      skills3.data = newSele;
-    } else if (valc == 'roleDescription') {
-      tafkidims2.data = newSele;
-    } else if (valc == 'workWayName') {
-      workways3.data = newSele;
-    }
-    dataibno[valc].push(newN);
-    dataibno = dataibno;
-  }
-  onMount(async () => {
+  onMount(() => {
     applyBridgeReturn();
     isKavua2 = isKavua;
-    skills3 = JSON.parse(JSON.stringify(skills));
-    tafkidims2 = JSON.parse(JSON.stringify(tafkidims));
-    workways3 = JSON.parse(JSON.stringify(workways));
-    console.log('negoM mounted', $lang);
-    console.log(
-      'acts prop received:',
-      acts,
-      'type:',
-      typeof acts,
-      'has data:',
-      !!acts?.data,
-      'data isArray:',
-      Array.isArray(acts?.data)
-    );
-    console.log('acts.data:', acts?.data);
-    console.log('acts2 state:', acts2);
-    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-    const checkStatus = (resp) => {
-      if (resp.status >= 200 && resp.status < 300) {
-        return resp;
-      }
-      return parseJSON(resp).then((resp) => {
-        throw resp;
-      });
-    };
-    try {
-      const res = await fetch(import.meta.env.VITE_URL + '/graphql', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `query {
-    skills {data{ id attributes{ skillName ${$lang == 'he' ? 'localizations{data {attributes{ skillName}} }' : ''} }}}
-     tafkidims {data{ id attributes{ roleDescription ${$lang == 'he' ? 'localizations{data {attributes{ roleDescription}} }' : ''}}}}
-     workWays {data{ id attributes{ workWayName ${$lang == 'he' ? 'localizations{data {attributes{ workWayName}} }' : ''} } }}
- }
-              `
-        })
-      })
-        .then(checkStatus)
-        .then(parseJSON);
-      skills2 = res.data.skills.data;
-      if ($lang == 'he') {
-        for (let i = 0; i < skills2.length; i++) {
-          if (skills2[i].attributes.localizations.data.length > 0) {
-            skills2[i].attributes.skillName =
-              skills2[i].attributes.localizations.data[0].attributes.skillName;
-          }
-        }
-      }
-      skills2 = skills2;
-      roles = res.data.tafkidims.data;
-      if ($lang == 'he') {
-        for (let i = 0; i < roles.length; i++) {
-          if (roles[i].attributes.localizations.data.length > 0) {
-            roles[i].attributes.roleDescription =
-              roles[
-                i
-              ].attributes.localizations.data[0].attributes.roleDescription;
-          }
-        }
-      }
-      roles = roles;
-      workways2 = res.data.workWays.data;
-      if ($lang == 'he') {
-        for (let i = 0; i < workways2.length; i++) {
-          if (workways2[i].attributes.localizations.data.length > 0) {
-            workways2[i].attributes.workWayName =
-              workways2[
-                i
-              ].attributes.localizations.data[0].attributes.workWayName;
-          }
-        }
-      }
-      workways2 = workways2;
-      skil.set(skills2);
-      ww.set(workways2);
-      role.set(roles);
-      newcontent = false;
-    } catch (e) {
-      error1 = e;
-
-      console.log(error1);
-    }
+    // Seed the selectors from the mission's current relations. The shared vocab
+    // stores (mi.js) are seeded synchronously from static JSON at import, so the
+    // localized labels are available here; the VocabSelector refreshes the
+    // catalog through the proxy on its own mount.
+    selectedSkills = seedNames(skills?.data, get(skil), 'skillName');
+    selectedRoles = seedNames(tafkidims?.data, get(role), 'roleDescription');
+    selectedWorkways = seedNames(workways?.data, get(ww), 'workWayName');
   });
 </script>
 
@@ -606,42 +519,36 @@
       bind:textb={descrip2}
       lebel={tri?.common?.description}
     />
-    <Elements
-      dataibn={dataibno.skillName}
-      {newcontent}
-      placeholder={tri?.mission?.addNewSkills}
-      datai={skills.data}
-      alld={skills2}
-      bind:dataib={skills3.data}
-      lebel={tri?.mission?.requireSkills}
-      onAddnew={addnew}
-      valc="skillName"
-      bgi="gold"
-    />
-    <Elements
-      {newcontent}
-      placeholder={tri?.mission?.addNewRoles}
-      datai={tafkidims.data}
-      alld={roles}
-      bind:dataib={tafkidims2.data}
-      lebel={tri?.mission?.requiredRoles}
-      dataibn={dataibno.roleDescription}
-      onAddnew={addnew}
-      valc="roleDescription"
-      bgi="gold"
-    />
-    <Elements
-      {newcontent}
-      placeholder={tri?.mission?.addNewWw}
-      datai={workways.data}
-      alld={workways2}
-      bind:dataib={workways3.data}
-      lebel={tri?.mission?.requiredWW}
-      dataibn={dataibno.workWayName}
-      onAddnew={addnew}
-      valc="workWayName"
-      bgi="gold"
-    />
+    <div class="m-2">
+      <h3 class="text-center text-sm text-barbi underline decoration-mturk">
+        {tri?.mission?.requireSkills?.[$lang]}
+      </h3>
+      <SkillSelector
+        bind:selectedSkills
+        placeholder={tri?.mission?.addNewSkills?.[$lang]}
+        autoCreate={true}
+      />
+    </div>
+    <div class="m-2">
+      <h3 class="text-center text-sm text-barbi underline decoration-mturk">
+        {tri?.mission?.requiredRoles?.[$lang]}
+      </h3>
+      <RoleSelector
+        bind:selectedRoles
+        placeholder={tri?.mission?.addNewRoles?.[$lang]}
+        autoCreate={true}
+      />
+    </div>
+    <div class="m-2">
+      <h3 class="text-center text-sm text-barbi underline decoration-mturk">
+        {tri?.mission?.requiredWW?.[$lang]}
+      </h3>
+      <WorkwaySelector
+        bind:selectedWorkways
+        placeholder={tri?.mission?.addNewww?.[$lang]}
+        autoCreate={true}
+      />
+    </div>
     <!----<Text long={true} text={hearotMeyuchadot} bind:textb={hearotMeyuchadot2} lebel={tri?.mission?.specialNotes}/>
             --><Text
       text={privatlinks}

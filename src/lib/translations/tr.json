@@ -739,6 +739,11 @@
             "en": "Search or select roles",
             "ar": "ابحث أو اختر أدواراً"
         },
+        "searchWorkways": {
+            "he": "חיפוש או בחירת דרכי יצירה",
+            "en": "Search or select ways of creation",
+            "ar": "ابحث أو اختر طرق العمل"
+        },
         "identicalValue": {
             "he": "ערך זהה כבר קיים במערכת:",
             "en": "An identical value already exists:",
@@ -754,6 +759,11 @@
             "en": "An identical role already exists:",
             "ar": "دور مطابق موجود بالفعل:"
         },
+        "identicalWorkway": {
+            "he": "דרך יצירה זהה כבר קיימת במערכת:",
+            "en": "An identical way of creation already exists:",
+            "ar": "طريقة عمل مطابقة موجودة بالفعل:"
+        },
         "similarValue": {
             "he": "דומה מאוד לערך קיים:",
             "en": "Very similar to an existing value:",
@@ -768,6 +778,11 @@
             "he": "דומה מאוד לתפקיד קיים:",
             "en": "Very similar to an existing role:",
             "ar": "مشابه جداً لدور موجود:"
+        },
+        "similarWorkway": {
+            "he": "דומה מאוד לדרך יצירה קיימת:",
+            "en": "Very similar to an existing way of creation:",
+            "ar": "مشابه جداً لطريقة عمل موجودة:"
         },
         "addPrefix": {
             "he": "הוספת",

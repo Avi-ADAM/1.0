@@ -69,6 +69,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
 
   // 3. Create negopendmission snapshot (stores original values before this negotiation)
   const orig = params.originalValues ?? {};
+  const origLoc = normalizeLocationInput(orig.location);
   await strapi.execute('negoCreateNegopendmission', {
     publishedAt: nowISO,
     userId,
@@ -87,10 +88,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     sqadualed: orig.date ?? null,
     dates: orig.dates ?? null,
     acts: snapshotActIds.length > 0 ? snapshotActIds : null,
-    location: (() => {
-      const loc = normalizeLocationInput(orig.location);
-      return loc ? [loc] : null;
-    })(),
+    // Omit `location` entirely when absent: the field is a repeatable component
+    // ([ComponentNewLocationInput]) and Strapi rejects an explicit `null`.
+    ...(origLoc ? { location: [origLoc] } : {}),
   }, context.jwt, context.fetch);
 
   // 4. Build updated users array (existing + new vote from current user)
@@ -201,7 +201,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     work_ways: nv.workwayIds ?? null,
     sqadualed: nv.sqadualed ?? null,
     dates: nv.dates ?? null,
-    location: roundLoc ? [roundLoc] : null,
+    // Omit when absent — repeatable component rejects explicit `null` (see snapshot above).
+    ...(roundLoc ? { location: [roundLoc] } : {}),
   }, context.jwt, context.fetch);
 
   // Update the Ask with the new vote

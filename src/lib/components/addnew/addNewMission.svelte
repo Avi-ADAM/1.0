@@ -3,7 +3,6 @@
 import Addnewskil from './addNewSkill.svelte';
            import { lang } from '$lib/stores/lang.js'
 import { executeAction } from '$lib/client/actionClient';
-const baseUrl = import.meta.env.VITE_URL
 let addskil = false;
 import Addnewro from './addNewRole.svelte';
 let addro = false;
@@ -26,45 +25,26 @@ function dis () {
 let selectedrole = $state([])
     
     onMount(async () => {
-        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-        const checkStatus = (resp) => {
-        if (resp.status >= 200 && resp.status < 300) {
-          return resp;
-        }
-        return parseJSON(resp).then((resp) => {
-          throw resp;
-        });
-      };
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-    
         try {
-            const res = await fetch(`${baseUrl}/graphql`, {
-              method: "POST",
-              headers: {
-                 'Content-Type': 'application/json'
-              },body: JSON.stringify({
-                        query: `query {
-  skills {data{ id attributes{ skillName ${$lang == 'he' ? 'localizations{data{attributes{ skillName }}}' : ""}}}}
-    tafkidims {data{ id attributes{ roleDescription ${$lang == 'he' ? 'localizations{data{attributes{ roleDescription }}}' : ""}}}}
-}
-              `})
-            }).then(checkStatus)
-          .then(parseJSON);
-            skills2 = res.data.skills.data;
+            // Read skills + roles through the proxy (no direct Strapi access).
+            const [sk, ro] = await Promise.all([
+              fetch(`/api/vocab/list?kind=skills&lang=${$lang}`).then((r) => r.json()),
+              fetch(`/api/vocab/list?kind=roles&lang=${$lang}`).then((r) => r.json())
+            ]);
+
+            skills2 = sk?.data ?? [];
              if ($lang == "he" ){
               for (let i = 0; i < skills2.length; i++){
-                if (skills2[i].attributes.localizations.data.length > 0){
+                if (skills2[i].attributes.localizations?.data?.length > 0){
                 skills2[i].attributes.skillName = skills2[i].attributes.localizations.data[0].attributes.skillName
                 }
               }
             }
             skills2 = skills2
-             roles = res.data.tafkidims.data
+             roles = ro?.data ?? []
                        if ($lang == "he" ){
               for (let i = 0; i < roles.length; i++){
-                if (roles[i].attributes.localizations.data.length > 0){
+                if (roles[i].attributes.localizations?.data?.length > 0){
                 roles[i].attributes.roleDescription = roles[i].attributes.localizations.data[0].attributes.roleDescription
                 }
               }
@@ -74,7 +54,7 @@ let selectedrole = $state([])
         } catch (e) {
             error1 = e
         }
-        
+
     });
 let missionName_value = $state();
     let selected = $state([]);  

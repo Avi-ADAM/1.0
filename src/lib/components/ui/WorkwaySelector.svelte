@@ -1,10 +1,10 @@
 <script>
-  // Back-compat wrapper around the unified VocabSelector. Keeps the original
-  // `selectedSkills` prop so existing call sites need no changes.
+  // Back-compat wrapper around the unified VocabSelector. Keeps a dedicated
+  // `selectedWorkways` prop so call sites read clearly.
   import VocabSelector from './VocabSelector.svelte';
 
   let {
-    selectedSkills = $bindable([]),
+    selectedWorkways = $bindable([]),
     placeholder = undefined,
     color = '--gold',
     autoCreate = true,
@@ -14,8 +14,8 @@
 </script>
 
 <VocabSelector
-  kind="skills"
-  bind:selected={selectedSkills}
+  kind="workways"
+  bind:selected={selectedWorkways}
   {placeholder}
   {color}
   {autoCreate}

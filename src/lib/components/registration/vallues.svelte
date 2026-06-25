@@ -1,13 +1,11 @@
-﻿<script>
+<script>
   import { isRtl } from '$lib/translations';
-  import MultiSelect from 'svelte-multiselect';
+  import ValueSelector from '$lib/components/ui/ValueSelector.svelte';
   import { userName } from '../../stores/store.js';
+  import { lang } from '$lib/stores/lang.js';
   import { show } from './store-show.js';
   import { valluss } from './valluss.js';
-  import { onMount } from 'svelte';
-  import { lang } from '$lib/stores/lang.js';
-  import jvals from '$lib/data/vallues.json';
-  import enjvals from '$lib/data/valluesEn.json';
+  import { valluesStore } from '$lib/components/prPr/mi.js';
   /**
    * @typedef {Object} Props
    * @property {string} [userName_value]
@@ -21,21 +19,29 @@
     onProgres
   } = $props();
 
-  let vallues = $state([]);
-  let error1 = null;
-  let newcontent = $state(false);
+  let selected = $state([]);
 
+  userName.subscribe((value) => { userName_value = value; });
+  show.subscribe((newValue) => { show_value = newValue; });
+
+  // Seed `selected` from the stored ids (existing profile + AI-confirmed) once
+  // the shared catalog has loaded, mapping each id to its current-language name
+  // — same pattern as the skills step. ValueSelector (VocabSelector) owns the
+  // catalog, creation, moderation, translation and duplicate detection.
   let seedComplete = $state(false);
   $effect(() => {
     if (seedComplete) return;
     const ids = $valluss;
-    if (!ids || ids.length === 0) return;
-    if (!vallues || vallues.length === 0) return;
+    if (!ids || ids.length === 0 || !$valluesStore || $valluesStore.length === 0) return;
     const mapped = ids
       .map((vallueId) => {
-        const v = vallues.find((item) => item.id == vallueId);
+        const v = $valluesStore.find((item) => item.id == vallueId);
         if (!v) return null;
-        return v.attributes?.valueName || null;
+        let name = v.attributes?.valueName || '';
+        if ($lang === 'he' && v.attributes?.localizations?.data?.length > 0) {
+          name = v.attributes.localizations.data[0].attributes.valueName;
+        }
+        return name;
       })
       .filter(Boolean);
     if (mapped.length === 0) return;
@@ -43,156 +49,43 @@
     if (mapped.length === ids.length) seedComplete = true;
   });
 
-  onMount(async () => {
-    if ($lang == 'he') {
-      vallues = jvals;
-    } else if ($lang == 'en') {
-      vallues = enjvals;
-    }
-    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-    const checkStatus = (resp) => {
-      if (resp.status >= 200 && resp.status < 300) return resp;
-      return parseJSON(resp).then((resp) => { throw resp; });
-    };
-
-    try {
-      const res = await fetch(baseUrl + '/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: `query {
-  vallues (sort: "valueName:asc", pagination: { limit: 1000 }){
-    data{
-      id
-      attributes {valueName ${$lang == 'he' ? 'localizations{ data { attributes{ valueName } } }' : ''}}
-}
-}
-}
-              `
-        })
-      })
-        .then(checkStatus)
-        .then(parseJSON);
-      let freshVallues = res.data.vallues.data;
-      if ($lang == 'he') {
-        for (var i = 0; i < freshVallues.length; i++) {
-          if (freshVallues[i].attributes.localizations?.data?.length > 0) {
-            freshVallues[i].attributes.valueName =
-              freshVallues[i].attributes.localizations.data[0].attributes.valueName;
-          }
-        }
-      }
-      const seen = new Set();
-      freshVallues = freshVallues.filter((v) => {
-        const name = v.attributes?.valueName;
-        if (!name || seen.has(name)) return false;
-        seen.add(name);
-        return true;
-      });
-      vallues = freshVallues;
-    } catch (e) {
-      error1 = e;
-    }
-  });
-
   function find_value_id(value_name_arr) {
     var arr = [];
     for (let j = 0; j < value_name_arr.length; j++) {
-      for (let i = 0; i < vallues.length; i++) {
-        if (vallues[i].attributes.valueName === value_name_arr[j]) {
-          arr.push(vallues[i].id);
+      for (let i = 0; i < $valluesStore.length; i++) {
+        let name = $valluesStore[i].attributes?.valueName || '';
+        let heName = name;
+        if ($valluesStore[i].attributes?.localizations?.data?.length > 0) {
+          heName = $valluesStore[i].attributes.localizations.data[0].attributes.valueName;
+        }
+        if (name === value_name_arr[j] || heName === value_name_arr[j]) {
+          arr.push($valluesStore[i].id);
+          break;
         }
       }
     }
     return arr;
   }
 
-  import tr from '$lib/translations/tr.json';
-
-  let selected = $state([]);
-  const placeholder = tr.reg.valuesPlaceholder[$lang];
-
-  userName.subscribe((value) => { userName_value = value; });
-  show.subscribe((newValue) => { show_value = newValue; });
+  function saveToStore() {
+    valluss.set(find_value_id(selected));
+  }
 
   function increment() {
-    newnew();
+    saveToStore();
     show.update((n) => n + 1);
     onProgres?.({ tx: 0, txx: 20 });
   }
   function toend() {
-    newnew();
+    saveToStore();
     show.set(5);
     onProgres?.({ tx: 0, txx: 4 });
   }
   function back() {
-    newnew();
+    saveToStore();
     show.update((n) => n - 1);
     onProgres?.({ tx: 600, txx: 20 });
   }
-
-  const baseUrl = import.meta.env.VITE_URL;
-
-  let meData = [];
-  async function newnew() {
-    for (let i = 0; i < selected.length; i++) {
-      if (!vallues.map((c) => c.attributes.valueName).includes(selected[i])) {
-        let link = baseUrl + '/graphql';
-        let d = new Date();
-        try {
-          await fetch(link, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              query: `mutation  createVallue {
-  createVallue(data: {  valueName: "${selected[i]}",
-        publishedAt: "${d.toISOString()}"}) {
-    data {
-      id
-      attributes {
-        valueName
-      }
-       }
-    }
-}`
-            })
-          })
-            .then((r) => r.json())
-            .then((data) => (meData = data));
-          const newOb = meData?.data?.createVallue?.data;
-          if (!newOb) {
-            console.warn('[vallues] createVallue returned no data', meData?.errors);
-            continue;
-          }
-          const alreadyExists = vallues.some(
-            (v) => v.id == newOb.id || v.attributes?.valueName === newOb.attributes?.valueName
-          );
-          if (alreadyExists) continue;
-          const newValues = vallues;
-          newValues.push(newOb);
-          vallues = newValues;
-          let userName_value = $userName;
-          let data = {
-            name: userName_value,
-            action: 'create ערך חדש בשם:',
-            det: `${selected[i]}`
-          };
-          fetch('/api/ste', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-          }).catch((error) => { console.error('Error:', error); });
-        } catch (error) {
-          console.log('צריך לתקן:', error.response);
-          error = error1;
-        }
-      }
-    }
-    valluss.set(find_value_id(selected));
-  }
-
-  let ugug = $state('');
-  let addn = $derived({ he: `הוספת "${ugug}"`, en: `Create "${ugug}"` });
 
   const what = {
     he: 'אלו ערכים ומטרות ברצונך לקדם?',
@@ -208,20 +101,7 @@
   <h2 class="step-title">{userName_value}&nbsp;{what[$lang]}</h2>
   <p class="step-desc">{info[$lang]}</p>
   <div class="multi-wrap">
-    <MultiSelect
-      liSelectedStyle="z-index: 1000;"
-      --sms-width="100%"
-      outerDivClass="!bg-gold !text-barbi"
-      inputClass="!bg-gold !text-barbi"
-      liSelectedClass="!bg-barbi !text-gold"
-      createOptionMsg={addn[$lang]}
-      allowUserOptions={'append'}
-      loading={newcontent}
-      bind:searchText={ugug}
-      bind:selected
-      {placeholder}
-      options={[...new Set(vallues.map((c) => c.attributes.valueName).filter(Boolean))]}
-    />
+    <ValueSelector bind:selectedValues={selected} color="--gold" />
   </div>
   <div class="nav-row">
     <button class="btn-nav btn-back" onclick={back} disabled={show_value <= 1}>

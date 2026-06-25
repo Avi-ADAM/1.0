@@ -116,7 +116,6 @@
   ]);
 
   let error1 = null;
-  let roles1 = $state($role);
   let gloading = $state(false);
   onMount(async () => {
     // specMode (or a missing/0 id) authors a NEW spec — never fetch an existing
@@ -258,14 +257,27 @@
     }
   }
 
+  // Resolve a catalog entry's name in the current language — mirrors
+  // VocabSelector.entryName so the labels SkillSelector emits (including
+  // semantic suggestions that live in the DB store but not in the statically
+  // bundled snapshot) map back to ids reliably instead of being silently
+  // dropped. Used for skills, which go through VocabSelector.
+  function catName(c, field) {
+    let name = c.attributes?.[field] || '';
+    if ($lang === 'he' && c.attributes?.localizations?.data?.length > 0) {
+      name = c.attributes.localizations.data[0].attributes[field];
+    }
+    return name;
+  }
+
+  // Roles use a raw MultiSelect whose options are the master `roleDescription`,
+  // so match on that — but against the live store (not the stale `roles1`
+  // snapshot) so refreshed entries still resolve.
   function find_role_id(role_name_arr) {
-    let arr = [];
-    for (let j = 0; j < role_name_arr.length; j++) {
-      for (let i = 0; i < roles1.length; i++) {
-        if (roles1[i].attributes.roleDescription === role_name_arr[j]) {
-          arr.push(roles1[i].id);
-        }
-      }
+    const arr = [];
+    for (const nm of role_name_arr) {
+      const hit = $role.find((c) => c.attributes.roleDescription === nm);
+      if (hit) arr.push(hit.id);
     }
     return arr;
   }
@@ -297,16 +309,14 @@
   let selected3;
 
   function find_skill_id(skill_name_arr) {
-    let arr = [];
-    for (let j = 0; j < skill_name_arr.length; j++) {
-      for (let i = 0; i < skills2.length; i++) {
-        if (skills2[i].attributes.skillName === skill_name_arr[j]) {
-          arr.push(skills2[i].id);
-        }
-      }
+    const arr = [];
+    for (const nm of skill_name_arr) {
+      const hit = $skil.find((c) => catName(c, 'skillName') === nm);
+      if (hit) arr.push(hit.id);
     }
     return arr;
   }
+
   async function increment() {
     loading = true;
     const element = miData[0];

@@ -1,176 +1,84 @@
 ﻿<script>
   import { isRtl } from '$lib/translations';
-  import MultiSelect from 'svelte-multiselect';
+  import WorkwaySelector from '$lib/components/ui/WorkwaySelector.svelte';
   import { userName } from '../../stores/store.js';
   import { show } from './store-show.js';
   import { workways1 } from './workways1.js';
-  import { onMount } from 'svelte';
-  import jwork from '$lib/data/workways.json';
-  import enjwork from '$lib/data/workwaysEn.json';
+  import { ww } from '$lib/components/prPr/mi.js';
   import { lang } from '$lib/stores/lang.js';
 
   let { onProgres } = $props();
-  let newcontent = $state(true);
-  let workways2 = $state([]);
-  let error1 = null;
-  const baseUrl = import.meta.env.VITE_URL;
 
-  onMount(async () => {
-    if ($lang == 'he') {
-      workways2 = jwork;
-    } else if ($lang == 'en') {
-      workways2 = enjwork;
-    }
-    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-    const checkStatus = (resp) => {
-      if (resp.status >= 200 && resp.status < 300) return resp;
-      return parseJSON(resp).then((resp) => { throw resp; });
-    };
+  let selected = $state([]);
 
-    try {
-      const res = await fetch(baseUrl + '/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: `query {
-  workWays(sort: "workWayName") {data{ id attributes{workWayName  ${$lang == 'he' ? 'localizations {data{attributes{workWayName}} }' : ''}}
-}}}
-              `
-        })
-      })
-        .then(checkStatus)
-        .then(parseJSON);
-      let freshWorkways = res.data.workWays.data;
-      if ($lang == 'he') {
-        for (var i = 0; i < freshWorkways.length; i++) {
-          if (freshWorkways[i].attributes.localizations.data.length > 0) {
-            freshWorkways[i].attributes.workWayName =
-              freshWorkways[i].attributes.localizations.data[0].attributes.workWayName;
-          }
+  let userName_value = $state();
+  let show_value = $state(0);
+
+  userName.subscribe((value) => { userName_value = value; });
+  show.subscribe((newValue) => { show_value = newValue; });
+
+  // Seed `selected` from the stored ids once the shared catalog has loaded,
+  // mapping each id to its current-language name — same pattern as the other
+  // steps. WorkwaySelector (VocabSelector) owns the catalog, creation,
+  // moderation and duplicate detection.
+  let seedComplete = $state(false);
+  $effect(() => {
+    if (seedComplete) return;
+    const ids = $workways1;
+    if (!ids || ids.length === 0 || !$ww || $ww.length === 0) return;
+    const mapped = ids
+      .map((workwayId) => {
+        const w = $ww.find((item) => item.id == workwayId);
+        if (!w) return null;
+        let name = w.attributes?.workWayName || '';
+        if ($lang === 'he' && w.attributes?.localizations?.data?.length > 0) {
+          name = w.attributes.localizations.data[0].attributes.workWayName;
         }
-      }
-      const seenW = new Set();
-      freshWorkways = freshWorkways.filter((w) => {
-        const name = w.attributes?.workWayName;
-        if (!name || seenW.has(name)) return false;
-        seenW.add(name);
-        return true;
-      });
-      workways2 = freshWorkways;
-
-      const currentWorkways = $workways1;
-      if (currentWorkways && currentWorkways.length > 0) {
-        const workwayNames = currentWorkways
-          .map((workwayId) => {
-            const workway = workways2.find((w) => w.id == workwayId);
-            return workway ? workway.attributes.workWayName : null;
-          })
-          .filter(Boolean);
-        selected = workwayNames;
-      }
-
-      newcontent = false;
-    } catch (e) {
-      error1 = e;
-    }
+        return name;
+      })
+      .filter(Boolean);
+    if (mapped.length === 0) return;
+    selected = [...new Set(mapped)];
+    if (mapped.length === ids.length) seedComplete = true;
   });
 
   function find_workway_id(workway_arr) {
     var arr = [];
     for (let j = 0; j < workway_arr.length; j++) {
-      for (let i = 0; i < workways2.length; i++) {
-        if (workways2[i].attributes.workWayName === workway_arr[j]) {
-          arr.push(workways2[i].id);
+      for (let i = 0; i < $ww.length; i++) {
+        let name = $ww[i].attributes?.workWayName || '';
+        let heName = name;
+        if ($ww[i].attributes?.localizations?.data?.length > 0) {
+          heName = $ww[i].attributes.localizations.data[0].attributes.workWayName;
+        }
+        if (name === workway_arr[j] || heName === workway_arr[j]) {
+          arr.push($ww[i].id);
+          break;
         }
       }
     }
     return arr;
   }
 
-  import tr from '$lib/translations/tr.json';
-
-  let selected = $state([]);
-  const placeholder = tr.reg.workwaysPlaceholder[$lang];
-
-  let userName_value = $state();
-  let show_value = 0;
-
-  userName.subscribe((value) => { userName_value = value; });
-  show.subscribe((newValue) => { show_value = newValue; });
+  function saveToStore() {
+    workways1.set(find_workway_id(selected));
+  }
 
   function increment() {
-    newnew();
+    saveToStore();
     show.update((n) => n + 1);
     onProgres?.({ tx: 0, txx: 8 });
   }
   function toend() {
-    newnew();
+    saveToStore();
     show.set(5);
     onProgres?.({ tx: 0, txx: 8 });
   }
   function back() {
-    newnew();
+    saveToStore();
     show.update((n) => n - 1);
     onProgres?.({ tx: 0, txx: 16 });
   }
-
-  let meData = $state();
-  async function newnew() {
-    for (let i = 0; i < selected.length; i++) {
-      if (!workways2.map((c) => c.attributes.workWayName).includes(selected[i])) {
-        let d = new Date();
-        let link = baseUrl + '/graphql';
-        try {
-          await fetch(link, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              query: `mutation  createWorkWay {
-  createWorkWay(data: {  workWayName: "${selected[i]}",
-        publishedAt: "${d.toISOString()}"
-           }) {
-    data {
-      id
-      attributes {
-        workWayName ${$lang == 'he' ? 'localizations { data {attributes{workWayName} }}' : ''}
-      }
-       }
-    }
-}`
-            })
-          })
-            .then((r) => r.json())
-            .then((data) => (meData = data));
-          const newOb = meData.data.createWorkWay.data;
-          const newValues = workways2;
-          newValues.push(newOb);
-          workways2 = newValues;
-          const newN = meData.data.createWorkWay.data.attributes.workWayName;
-          let userName_value = $userName;
-          let datau = {
-            name: userName_value,
-            action: 'create דרך יצירה חדשה בשם:',
-            det: newN
-          };
-          fetch('/api/ste', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(datau)
-          }).catch((error) => { console.error('Error:', error); });
-        } catch (error) {
-          console.log('צריך לתקן:', error.response);
-          error = error1;
-        }
-      }
-    }
-    workways1.set(find_workway_id(selected));
-  }
-
-  let searchText = $state('');
-  let addn = $derived({
-    he: `הוספת "${searchText}"`,
-    en: `Create "${searchText}"`
-  });
 
   const ws = {
     he: 'מה הם העדפות היצירה שלך?',
@@ -181,19 +89,7 @@
 <div class="step-inner" dir={$isRtl ? 'rtl' : 'ltr'}>
   <h2 class="step-title">{userName_value}&nbsp;{ws[$lang]}</h2>
   <div class="multi-wrap">
-    <MultiSelect
-      --sms-width="100%"
-      outerDivClass="!bg-gold !text-barbi"
-      inputClass="!bg-gold !text-barbi"
-      liSelectedClass="!bg-barbi !text-gold"
-      createOptionMsg={addn[$lang]}
-      allowUserOptions={'append'}
-      loading={newcontent}
-      bind:searchText
-      bind:selected
-      {placeholder}
-      options={[...new Set(workways2.map((c) => c.attributes.workWayName).filter(Boolean))]}
-    />
+    <WorkwaySelector bind:selectedWorkways={selected} color="--gold" />
   </div>
   <div class="nav-row">
     <button class="btn-nav btn-back" onclick={back} disabled={show_value <= 1}>
