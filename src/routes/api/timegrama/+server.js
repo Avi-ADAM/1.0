@@ -6,6 +6,7 @@ import { PendM } from './pendM.svelte';
 
 import {finiapp} from './finiapp.svelte'
 import { Ask } from './ask.svelte';
+import { Askm } from './askm.svelte';
 //ask need to creater 0on first vote or on request if the requester is project member4
 //מעביר ראשון ראשון ברסק , אם מישהו ביקש מחכים למענה בעניינו ורק לאחר שיש כן 1 לפחות או לא 1 לפחות  ניתן לקבלו או לא 1 לפחות וניתן להציע לאנשים נוספים, בקשה של הקודם כאשר יש לא נשארת אך ניתן להוסיף עוד סקשות 
 import { SendTo } from '$lib/send/sendTo.svelte';
@@ -17,6 +18,8 @@ async function x(id,kind,taid, fetch){
               console.log('here');
       await Ask(id,taid, fetch)
      // console.log("here")
+    } else if (kind == "askm"){
+      await Askm(id, taid)
     } else if (kind == 'pendm') {
               await Pend(id,taid);
 

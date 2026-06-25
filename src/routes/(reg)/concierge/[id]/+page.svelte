@@ -8,7 +8,7 @@
   import ResourceCreator from '$lib/components/resource/ResourceCreator.svelte';
   import { toast } from 'svelte-sonner';
 
-  /** @type {{ data: { wish: any | null; proposals: any[]; loadOk: boolean; uid?: string; isOwner: boolean; enrichment?: any } }} */
+  /** @type {{ data: { wish: any | null; proposals: any[]; loadOk: boolean; uid?: string; isOwner: boolean; enrichment?: any; forumMessages?: any[]; missionTemplates?: any[] } }} */
   let { data } = $props();
 
   onMount(() => showFoot.set(false));
@@ -1061,9 +1061,37 @@
       .filter(Boolean)
   );
 
-  async function publishNeed(row) {
+  /* Resource publish opens the official resource-request form (ResourceCreator
+   * in publishMode) so the wisher supplies the full spec — most importantly the
+   * matched mashaabim template (→ the open-mashaabim becomes matchable to the
+   * providers who actually hold this resource), plus max value, dates, recurring
+   * and location. Missions still publish directly (skill-matched open mission). */
+  /** @type {any} */
+  let publishResourceTarget = $state(null);
+  /** @type {any} */
+  let publishMissionTarget = $state(null);
+
+  /* Both kinds open the official form first (ResourceCreator / Mission in their
+   * publish modes) so the wisher supplies the full spec before it goes out to
+   * the community — for resources that means the matched mashaabim template,
+   * max value, dates & location; for missions the skills/roles/hours that drive
+   * the open-mission matcher. */
+  function publishNeed(row) {
     const key = row.need.title;
     if (!wishId || publishBusy[key] || publishDone[key]) return;
+    if (row.need.isResource) {
+      publishResourceTarget = row;
+    } else {
+      publishMissionTarget = row;
+    }
+  }
+
+  async function submitPublishMission(spec) {
+    const row = publishMissionTarget;
+    publishMissionTarget = null;
+    if (!row || !wishId) return;
+    const key = row.need.title;
+    if (publishBusy[key] || publishDone[key]) return;
     publishBusy = { ...publishBusy, [key]: true };
     try {
       const res = await fetch('/api/action', {
@@ -1073,16 +1101,16 @@
           actionKey: 'publishWishNeedToCommunity',
           params: {
             ratsonId: wishId,
-            kind: row.need.isResource ? 'resource' : 'mission',
-            name: row.need.rawName,
-            descrip: row.need.detail || '',
-            hours: row.need.isResource ? null : (row.need.hours ?? null),
-            // Resource dimensions so the open-mashaabim carries price/quantity.
-            price: row.need.isResource ? (row.need.bestPrice ?? null) : null,
-            quantity: row.need.isResource ? (row.need.quantityEst ?? null) : null,
-            kindOf: row.need.isResource ? (row.need.kindOf ?? 'total') : 'total',
+            kind: 'mission',
+            name: spec?.name || row.need.rawName,
+            descrip: spec?.descrip || '',
+            hours: spec?.hours ?? row.need.hours ?? null,
+            perhour: spec?.ratePerHour ?? null,
             isMust: row.need.imp === 'must',
-            skillNames: row.need.isResource ? [] : skillNames
+            skillNames:
+              Array.isArray(spec?.skills) && spec.skills.length
+                ? spec.skills
+                : skillNames
           }
         })
       });
@@ -1091,7 +1119,56 @@
       publishDone = { ...publishDone, [key]: true };
       toast.success('הצורך פורסם לקהילה — יופיע בלב של מי שמתאים 📣');
     } catch (err) {
-      console.error('[concierge/[id]] publishNeed failed:', err);
+      console.error('[concierge/[id]] submitPublishMission failed:', err);
+      toast.error(err instanceof Error ? err.message : 'אירעה שגיאה');
+    } finally {
+      publishBusy = { ...publishBusy, [key]: false };
+    }
+  }
+
+  async function submitPublishResource(payload) {
+    const row = publishResourceTarget;
+    publishResourceTarget = null;
+    if (!row || !wishId) return;
+    const key = row.need.title;
+    if (publishBusy[key] || publishDone[key]) return;
+    publishBusy = { ...publishBusy, [key]: true };
+    try {
+      const res = await fetch('/api/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actionKey: 'publishWishNeedToCommunity',
+          params: {
+            ratsonId: wishId,
+            kind: 'resource',
+            name: payload.name,
+            descrip: payload.descrip || '',
+            price: payload.price ?? null,
+            easy: payload.easy ?? null,
+            quantity: payload.quantity ?? null,
+            kindOf: payload.kindOf ?? 'total',
+            recurring: payload.recurring ?? false,
+            linkto: payload.linkto || '',
+            spnot: payload.spnot || '',
+            mashaabimTemplateId: payload.mashaabimId ?? null,
+            startDate: payload.startDate ?? null,
+            endDate: payload.endDate ?? null,
+            isMust: row.need.imp === 'must',
+            isOnline: payload.isOnline ?? false,
+            lat: payload.lat ?? null,
+            lng: payload.lng ?? null,
+            radius: payload.radius ?? null,
+            location_hint: payload.location_hint ?? null
+          }
+        })
+      });
+      const out = await res.json();
+      if (!out?.success) throw new Error(out?.error || 'הפרסום נכשל');
+      publishDone = { ...publishDone, [key]: true };
+      toast.success('המשאב פורסם לקהילה — נציע אותו למי שמחזיק אותו 📣');
+    } catch (err) {
+      console.error('[concierge/[id]] submitPublishResource failed:', err);
       toast.error(err instanceof Error ? err.message : 'אירעה שגיאה');
     } finally {
       publishBusy = { ...publishBusy, [key]: false };
@@ -1658,7 +1735,7 @@
                           onclick={() => publishNeed(row)}
                           >{publishBusy[row.need.title]
                             ? '⏳'
-                            : '📣 פרסמי לקהילה'}</button
+                            : '📣 פרסום לקהילה'}</button
                         >
                       {/if}
                     </span>
@@ -2504,6 +2581,75 @@
         specMode={true}
         onSpec={submitAddResource}
         onCancel={() => (addResourceOpen = false)}
+      />
+    </div>
+  </div>
+{/if}
+
+{#if publishResourceTarget}
+  <div class="spec-overlay" role="dialog" aria-modal="true">
+    <div class="spec-card">
+      <div class="spec-head">
+        <span>פרסום משאב לקהילה 📣</span>
+        <button
+          class="spec-x"
+          onclick={() => (publishResourceTarget = null)}
+          aria-label="סגירה">✕</button
+        >
+      </div>
+      <p class="spec-hint">
+        מלאי את פרטי המשאב — בחירה מהרשימה מקשרת אותו למשאב מוכר כך שנציע אותו
+        אוטומטית למי שמחזיק אותו. השווי, הטווח, התאריכים והמיקום ייכנסו להצעה.
+      </p>
+      <ResourceCreator
+        publishMode={true}
+        initialSpec={{
+          name: publishResourceTarget.need.rawName,
+          descrip:
+            publishResourceTarget.need.notes ||
+            publishResourceTarget.need.detail ||
+            '',
+          price: publishResourceTarget.need.bestPrice ?? null,
+          quantity: publishResourceTarget.need.quantityEst ?? 1,
+          kindOf: publishResourceTarget.need.kindOf || 'total'
+        }}
+        onPublish={submitPublishResource}
+        onCancel={() => (publishResourceTarget = null)}
+      />
+    </div>
+  </div>
+{/if}
+
+{#if publishMissionTarget}
+  <div class="spec-overlay" role="dialog" aria-modal="true">
+    <div class="spec-card">
+      <div class="spec-head">
+        <span>פרסום משימה לקהילה 📣</span>
+        <button
+          class="spec-x"
+          onclick={() => (publishMissionTarget = null)}
+          aria-label="סגירה">✕</button
+        >
+      </div>
+      <p class="spec-hint">
+        מלאי את פרטי המשימה — הכישורים, התפקיד והשעות יקבעו למי נציע אותה
+        אוטומטית מהלב.
+      </p>
+      <Mission
+        publishMode={true}
+        id={0}
+        name={publishMissionTarget.need.rawName}
+        missionTemplates={data.missionTemplates ?? []}
+        initialSpec={{
+          name: publishMissionTarget.need.rawName,
+          descrip:
+            publishMissionTarget.need.notes ||
+            publishMissionTarget.need.detail ||
+            '',
+          hours: publishMissionTarget.need.hours ?? null
+        }}
+        onPublish={submitPublishMission}
+        onClose={() => (publishMissionTarget = null)}
       />
     </div>
   </div>

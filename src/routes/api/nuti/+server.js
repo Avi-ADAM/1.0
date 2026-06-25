@@ -14,7 +14,8 @@ async function sendMail(
   email,
   username,
   lang,
-  rishon){
+  rishon,
+  eid){
     const previewText = {
       "he": `הצבעה על ${kind == "finiappmi"? "אישור סיום המשימה":"ההצעה"} של ${un} בריקמה ${pn}`,
       "en":`Vote for ${un}'s ${kind == "finiappmi"?"mission complition appruval":"suggestion"} on the freeMates ${pn}`
@@ -40,7 +41,9 @@ async function sendMail(
       rishon: rishon,
       name: name,
       lang: lang,
-      restime: restime ?? 'feh'
+      restime: restime ?? 'feh',
+      pid: pid,
+      eid: eid
     }
   );
   const emailHtml = emailHtmlObj.html || "";
@@ -112,6 +115,9 @@ export async function POST({ request }) {
   const name = data.name;
   const pu = data.pu;
   const restime = data.restime;
+  // Entity id of the created pendm/pmash, for the deep link in the email.
+  // Accept a few likely names; falls back to /lev in the template when absent.
+  const eid = data.eid ?? data.pendId ?? data.pmashId ?? data.id ?? '';
  
   const rishon = data.rishon ?? getUnById(pu, data.rishon);
   const un = getUnById(pu, uid);
@@ -134,7 +140,8 @@ export async function POST({ request }) {
          eEmail,
          eUsername,
          eLang != null ? eLang : 'he',
-         rishon
+         rishon,
+         eid
        );
      }
   }))

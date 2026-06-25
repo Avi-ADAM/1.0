@@ -67,6 +67,14 @@
     specMode = false,
     onSpec,
     /**
+     * Publish mode (Concierge community publish): like specMode the full form is
+     * shown but submit does NOT create a project mission — it emits the authored
+     * spec via `onPublish` so the caller publishes a weave-less open-mission to
+     * the community. Backward-compatible: active only when publishMode is set.
+     */
+    publishMode = false,
+    onPublish,
+    /**
      * Optional prefill for specMode editing (PLAN_CONCIERGE plan editing):
      * `{ name, descrip, hours, ratePerHour }`. When present, the form opens with
      * these values so the wisher edits an existing plan item with all its
@@ -113,7 +121,7 @@
   onMount(async () => {
     // specMode (or a missing/0 id) authors a NEW spec — never fetch an existing
     // mission. Guards against id===undefined hitting getMissionForEdit('undefined').
-    if (id && id !== 0 && !specMode) {
+    if (id && id !== 0 && !specMode && !publishMode) {
       gloading = true;
       miData[0].missionName = name;
       miData = miData;
@@ -138,8 +146,8 @@
         gloading = false;
       }
     } else {
-      // specMode editing: hydrate the form with the existing plan item's details.
-      if (specMode && initialSpec) {
+      // specMode / publishMode editing: hydrate the form with the item's details.
+      if ((specMode || publishMode) && initialSpec) {
         miData[0].missionName = initialSpec.name ?? name ?? '';
         if (initialSpec.descrip != null) miData[0].descrip = initialSpec.descrip;
         if (initialSpec.hours != null) miData[0].nhours = Number(initialSpec.hours) || 0;
@@ -303,10 +311,11 @@
     loading = true;
     const element = miData[0];
 
-    // Spec mode — emit the authored contract instead of creating a mission in a
-    // project. The caller (e.g. concierge invite flow) persists it weave-less.
-    if (specMode) {
-      onSpec?.({
+    // Spec / publish mode — emit the authored contract instead of creating a
+    // mission in a project. specMode caller persists it weave-less; publishMode
+    // caller publishes it as a community open-mission.
+    if (specMode || publishMode) {
+      const spec = {
         name: element.missionName,
         descrip: element.descrip,
         hours: Number(element.nhours) || 0,
@@ -314,7 +323,9 @@
         skills: element.selectedSkills ?? [],
         roles: element.selectedRoles ?? [],
         workways: element.selectedWorkways ?? []
-      });
+      };
+      if (publishMode) onPublish?.(spec);
+      else onSpec?.(spec);
       loading = false;
       return;
     }
@@ -1403,7 +1414,7 @@
                   class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                   title={tri?.mission?.publicLinks[$lang]}><LinkIcon /></button
                 >{/if}
-              {#if !assignE && !specMode}<button
+              {#if !assignE && !specMode && !publishMode}<button
                   title={tri?.mission?.assingTo[$lang] +
                     ' ' +
                     tri?.mission?.assingHelp[$lang]}
@@ -1424,9 +1435,26 @@
                   title={mf.isShift}><ShiftsIcon /></button
                 >{/if}
             </div>
-            <div class="align-self-end justify-items-end">
+            <div
+              class="flex flex-row flex-wrap items-center justify-end gap-3"
+            >
+              {#if specMode || publishMode}
+                <button
+                  type="button"
+                  onclick={() => onClose?.()}
+                  class="rounded-xl border border-gold/60 px-4 py-2 text-sm text-barbi hover:bg-pink-950/30 transition-all"
+                >
+                  {$lang === 'en' ? 'Cancel' : $lang === 'ar' ? 'إلغاء' : 'ביטול'}
+                </button>
+              {/if}
               <Button
-                text={{ he: mf.publish, en: mf.publish, ar: mf.publish }}
+                text={publishMode
+                  ? {
+                      he: 'פרסום לקהילה 📣',
+                      en: 'Publish to community 📣',
+                      ar: 'النشر للمجتمع 📣'
+                    }
+                  : { he: mf.publish, en: mf.publish, ar: mf.publish }}
                 onClick={increment}
                 {loading}
                 {success}

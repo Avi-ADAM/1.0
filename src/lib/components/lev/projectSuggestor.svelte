@@ -48,6 +48,10 @@
    * @property {boolean} [cards] - Cards flag
    * @property {any} [chat] - Chat data
    * @property {any} askId - Ask ID
+   * @property {string|null} [myRoundProposedBy] - latest round author on my application ('project' = rikma countered)
+   * @property {number} [myOrdern] - latest round order on my application
+   * @property {any[]} [myAskUsers] - my application's vots (for accept/counter)
+   * @property {any} [myRound] - latest round terms on my application (my own counter-offer)
    * @property {any} order - Order data
    */
   /** @type {ComponentProps} */
@@ -89,6 +93,11 @@
     chat = [],
     askId,
     forumId, // Add forumId to props
+    // Path B2 — the rikma's latest response on the candidate's own application.
+    myRoundProposedBy = null, // 'project' → rikma countered, awaiting candidate
+    myOrdern = 0,
+    myAskUsers = [],
+    myRound = null, // latest round terms on my application (my own counter-offer)
     order = {},
     onModal
   } = $props();
@@ -127,17 +136,50 @@
     isOpen = true;
   }
 
+  // Nego dialog submit. Two cases:
+  //  - rikma already countered my application (B2) → candidateCounterOnAsk (new
+  //    candidate round on my existing Ask, cancels the clock),
+  //  - otherwise → proposeOnOpenMission (the action checks membership server-side
+  //    and routes: member → Path D / project round; non-member → Path B / candidate).
   async function handleNegoSubmit({ newValues, originalValues }) {
-    const result = await executeAction('proposeOnOpenMission', {
-      openMissionId: String(oid),
-      projectId: String(projectId),
-      newValues,
-      originalValues,
-    });
-    if (!result.success) throw new Error(result.error || 'proposeOnOpenMission failed');
+    let action, params;
+    if (myRoundProposedBy === 'project') {
+      action = 'candidateCounterOnAsk';
+      params = {
+        askId: String(askId),
+        openMissionId: String(oid),
+        projectId: String(projectId),
+        ordern: myOrdern ?? 0,
+        newValues,
+        users: myAskUsers ?? [],
+      };
+    } else {
+      action = 'proposeOnOpenMission';
+      params = { openMissionId: String(oid), projectId: String(projectId), newValues, originalValues };
+    }
+    const result = await executeAction(action, params);
+    if (!result.success) throw new Error(result.error || `${action} failed`);
     already = true;
     askedarr.push(String(oid));
     less(oid);
+  }
+
+  // B2 — candidate accepts the rikma's counter: records the taker's favorable vote
+  // at the latest round and (re)starts the auto-approval clock.
+  async function acceptCounter() {
+    already = true;
+    try {
+      const result = await executeAction('acceptCounterOnAsk', {
+        askId: String(askId),
+        projectId: String(projectId),
+        ordern: myOrdern ?? 0,
+        users: myAskUsers ?? [],
+      });
+      if (result.success) less(oid);
+      else error1 = result.error;
+    } catch (e) {
+      error1 = e;
+    }
   }
 
   function afterNego() {
@@ -2853,6 +2895,9 @@
               onAgree={() => agree(oid)}
               onDecline={() => decline(oid)}
               onNego={() => nego(oid)}
+              onAccept={() => acceptCounter()}
+              {myRoundProposedBy}
+              {myRound}
               onHover={hoverc}
               onTochat={tochat}
               {acts}
@@ -2889,6 +2934,9 @@
     onAgree={() => agree(oid)}
     onDecline={() => decline(oid)}
     onNego={() => nego(oid)}
+    onAccept={() => acceptCounter()}
+    {myRoundProposedBy}
+    {myRound}
     onHover={hoverc}
     onTochat={tochat}
     {isVisible}

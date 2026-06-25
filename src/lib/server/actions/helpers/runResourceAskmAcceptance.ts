@@ -266,7 +266,25 @@ export async function runResourceAskmAcceptance(
   );
   const maapId = maapRes?.data?.createMaap?.data?.id;
 
-  await strapi.execute('131archiveOpenMashaabim', { id: openMashaabimId }, jwt, fetchFn);
+  const archiveRes: any = await strapi.execute(
+    '131archiveOpenMashaabim',
+    { id: openMashaabimId },
+    jwt,
+    fetchFn
+  );
+
+  // Archive the other (losing) candidates' askms on this open resource so their
+  // offers can no longer be voted on. Mirrors the mission-side sibling-archive.
+  const siblingAskms: any[] =
+    archiveRes?.data?.updateOpenMashaabim?.data?.attributes?.askms?.data ?? [];
+  for (const sib of siblingAskms) {
+    if (String(sib.id) === String(askmId)) continue;
+    try {
+      await strapi.execute('131bArchiveAskm', { id: String(sib.id) }, jwt, fetchFn);
+    } catch (e) {
+      console.error('runResourceAskmAcceptance: failed to archive sibling askm', sib.id, e);
+    }
+  }
 
   // Recurring expense? Activate the draft engine and make this Maap cycle #1.
   await activateRecurringEngine(strapi, context, {

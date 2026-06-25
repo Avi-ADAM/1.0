@@ -27,6 +27,7 @@ import { rejectSheirutpendConfig } from './rejectSheirutpend.js';
 import { addVoteConfig } from './addVote.js';
 import { ensureSheirutForumConfig } from './ensureSheirutForum.js';
 import { ensureSheirutpendForumConfig } from './ensureSheirutpendForum.js';
+import { ensureVoteForumConfig } from './ensureVoteForum.js';
 import { createProcessConfig } from './createProcess.js';
 import { attachEntityToProcessConfig } from './attachEntityToProcess.js';
 import { ensureProcessForumConfig } from './ensureProcessForum.js';
@@ -98,6 +99,12 @@ import { proposeOnOpenMashaabimConfig } from './proposeOnOpenMashaabim.js';
 import { counterOnAskmConfig } from './counterOnAskm.js';
 import { proposeOnOpenMissionConfig } from './proposeOnOpenMission.js';
 import { counterOnAskConfig } from './counterOnAsk.js';
+import { acceptCounterOnAskmConfig } from './acceptCounterOnAskm.js';
+import { acceptCounterOnAskConfig } from './acceptCounterOnAsk.js';
+import { candidateCounterOnAskmConfig } from './candidateCounterOnAskm.js';
+import { candidateCounterOnAskConfig } from './candidateCounterOnAsk.js';
+import { customizeOpenMashaabimConfig } from './customizeOpenMashaabim.js';
+import { customizeOpenMissionConfig } from './customizeOpenMission.js';
 import { updateResourceRequestConfig } from './updateResourceRequest.js';
 import { createResourceRequestConfig } from './createResourceRequest.js';
 import { createMashaabimConfig } from './createMashaabim.js';
@@ -154,6 +161,7 @@ export function registerAllActions(): void {
   // Sheirut forum helpers
   registerAction(ensureSheirutForumConfig);
   registerAction(ensureSheirutpendForumConfig);
+  registerAction(ensureVoteForumConfig);
   registerAction(createProcessConfig);
   registerAction(attachEntityToProcessConfig);
   registerAction(ensureProcessForumConfig);
@@ -282,6 +290,12 @@ export function registerAllActions(): void {
   registerAction(counterOnAskmConfig);
   registerAction(proposeOnOpenMissionConfig);
   registerAction(counterOnAskConfig);
+  registerAction(acceptCounterOnAskmConfig);
+  registerAction(acceptCounterOnAskConfig);
+  registerAction(candidateCounterOnAskmConfig);
+  registerAction(candidateCounterOnAskConfig);
+  registerAction(customizeOpenMashaabimConfig);
+  registerAction(customizeOpenMissionConfig);
 
   // User profile: create / update personal resource (Sp)
   registerAction(createResourceRequestConfig);

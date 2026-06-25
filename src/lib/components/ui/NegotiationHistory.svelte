@@ -2,6 +2,7 @@
   import { lang } from '$lib/stores/lang.js';
   import ComparisonDisplay from './ComparisonDisplay.svelte';
   import { getProjectData } from '$lib/stores/projectStore';
+  import RichText from '$lib/celim/ui/richText.svelte';
   import tr from '$lib/translations/tr.json';
 
   /**
@@ -86,9 +87,11 @@
                   'Unknown'}
               </span>
             {/if}
-            <span class="text-xs md:text-sm ml-2">
-              {new Date(attrs.createdAt).toLocaleDateString($lang)}
-            </span>
+            {#if attrs.createdAt && !isNaN(new Date(attrs.createdAt).getTime())}
+              <span class="text-xs md:text-sm ml-2">
+                {new Date(attrs.createdAt).toLocaleDateString($lang)}
+              </span>
+            {/if}
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -134,24 +137,34 @@
           </div>
 
           {#if attrs.descrip && attrs.descrip !== missionDetails}
-            <div class="mt-3 text-sm md:text-base">
-              <span class="font-medium text-blue-700 text-base md:text-lg"
+            <div class="mt-3 text-sm md:text-base rounded-lg bg-white/70 dark:bg-gray-900/40 p-3">
+              <span
+                class="font-medium text-blue-700 dark:text-blue-300 text-base md:text-lg"
                 >{tr.nego.updatedDescription[$lang]}</span
               >
-              <p class="text-gray-700 mt-2 text-sm md:text-base">
-                {attrs.descrip}
-              </p>
+              <div
+                class="text-gray-800 dark:text-gray-100 mt-2 text-sm md:text-base leading-relaxed"
+              >
+                <RichText outpot={attrs.descrip} editable={false} trans={true} />
+              </div>
             </div>
           {/if}
 
           {#if attrs.hearotMeyuchadot && attrs.hearotMeyuchadot !== hearotMeyuchadot}
-            <div class="mt-3 text-sm md:text-base">
-              <span class="font-medium text-blue-700 text-base md:text-lg"
+            <div class="mt-3 text-sm md:text-base rounded-lg bg-white/70 dark:bg-gray-900/40 p-3">
+              <span
+                class="font-medium text-blue-700 dark:text-blue-300 text-base md:text-lg"
                 >{tr.nego.updatedNotes[$lang]}</span
               >
-              <p class="text-gray-700 mt-2 text-sm md:text-base">
-                {attrs.hearotMeyuchadot}
-              </p>
+              <div
+                class="text-gray-800 dark:text-gray-100 mt-2 text-sm md:text-base leading-relaxed"
+              >
+                <RichText
+                  outpot={attrs.hearotMeyuchadot}
+                  editable={false}
+                  trans={true}
+                />
+              </div>
             </div>
           {/if}
 

@@ -13,6 +13,7 @@
   import { DialogContent, DialogOverlay } from 'svelte-accessible-dialog';
   import { RingLoader } from 'svelte-loading-spinners';
   import Diun from './diun.svelte';
+  import TimetToTimegrama from './cards/timetToTimegrama.svelte';
   const baseUrl = import.meta.env.VITE_URL;
   let clicked = $state(false);
   /**
@@ -22,6 +23,10 @@
    * @property {boolean} [isVisible]
    * @property {any} coinlapach
    * @property {any} deadline
+   * @property {any} [timegramaId]
+   * @property {any} [timegramaDate]
+   * @property {boolean} [timegramaDone]
+   * @property {any} [pmashId]
    * @property {any} [sqadualedf]
    * @property {any} [kindOf]
    * @property {boolean} [recurring]
@@ -132,6 +137,8 @@
     order = $bindable(0),
     // שדות חדשים למשא ומתן
     timegramaId,
+    timegramaDate = null,     // מועד פקיעת ה-timegrama → שעון עצר לאישור אוטומטי
+    timegramaDone = false,    // אם ה-timegrama כבר נסגר/בוטל → לא מציגים שעון
     isRishon = false,         // = isSelfProposal: חבר פרויקט שיצר ישירות → כותרת מיוחדת + מו"מ
     pmashId = undefined,      // pmash relation id — present on isSelfProposal Askms
     pendingMainVote = false,  // = הצבעה כפולה: גם על הצורך וגם שהחבר נותן אותו
@@ -172,6 +179,7 @@
       openMashaabimId: openMid != null ? String(openMid) : undefined,
       projectId: String(projectId),
       ordern: orderon ?? 0,
+      candidateUserId: userId != null ? String(userId) : undefined,
       newValues,
       users
     });
@@ -479,7 +487,7 @@
               {projectId}
               total={myp || price}
               noofusers={noofpu}
-              pendId={id}
+              pendId={isRishon ? (pmashId ?? id) : id}
               linkto={''}
               sqadualed={deadline}
               {sqadualedf}
@@ -549,6 +557,9 @@
     class="hover:scale-290 duration-1000 ease-in"
     transition:fly|local={{ y: 250, opacity: 0.9, duration: 2000 }}
   >
+    {#if timegramaDate && !timegramaDone}
+      <TimetToTimegrama {timegramaDate} />
+    {/if}
     <Swiper
       dir="rtl"
       on:swiper={setSwiperRef}

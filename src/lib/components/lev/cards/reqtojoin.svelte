@@ -241,14 +241,24 @@
       {#if !isRishon && negopendmissions.length > 0}
         {@const latestRound = negopendmissions[0]?.attributes}
         {@const byCandidate = latestRound?.proposedBy === 'candidate'}
+        {@const roundDate = latestRound?.createdAt
+          ? new Date(latestRound.createdAt)
+          : null}
+        {@const descChanged =
+          latestRound?.descrip && latestRound.descrip !== missionDetails}
+        {@const notesChanged =
+          latestRound?.hearotMeyuchadot &&
+          latestRound.hearotMeyuchadot !== hearotMeyuchadot}
         <div class="rounded-xl border-2 p-3 space-y-2 {byCandidate ? 'border-barbi bg-barbi/5' : 'border-gold bg-gold/5'}">
           <div class="font-bold text-sm flex items-center gap-2 {byCandidate ? 'text-barbi' : 'text-yellow-700 dark:text-yellow-400'}">
             <span class="px-2 py-0.5 rounded-full text-xs {byCandidate ? 'bg-barbi/20' : 'bg-gold/30'}">
               {byCandidate ? tr.nego.candidateRound[$lang] : tr.nego.projectRound[$lang]}
             </span>
-            <span class="text-xs font-normal text-gray-500 dark:text-gray-400">
-              {new Date(latestRound?.createdAt).toLocaleDateString($lang)}
-            </span>
+            {#if roundDate && !isNaN(roundDate.getTime())}
+              <span class="text-xs font-normal text-gray-500 dark:text-gray-400">
+                {roundDate.toLocaleDateString($lang)}
+              </span>
+            {/if}
           </div>
           {#if latestRound?.noofhours || latestRound?.perhour}
             <div class="flex flex-wrap items-center gap-2 text-sm font-bold text-gray-800 dark:text-gray-100">
@@ -270,6 +280,26 @@
               <span class="font-medium">{tr.common.nameLabel[$lang]}:</span>
               <span class="text-gray-400 line-through ml-1">{openmissionName}</span>
               → <span class="font-semibold">{latestRound.name}</span>
+            </div>
+          {/if}
+          {#if descChanged}
+            <div class="rounded-lg bg-white/70 dark:bg-gray-900/40 p-2">
+              <div class="font-semibold text-xs mb-1 {byCandidate ? 'text-barbi' : 'text-yellow-700 dark:text-yellow-400'}">
+                {tr.nego.updatedDescription[$lang]}
+              </div>
+              <div class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed">
+                <RichText outpot={latestRound.descrip} editable={false} trans={true} />
+              </div>
+            </div>
+          {/if}
+          {#if notesChanged}
+            <div class="rounded-lg bg-white/70 dark:bg-gray-900/40 p-2">
+              <div class="font-semibold text-xs mb-1 {byCandidate ? 'text-barbi' : 'text-yellow-700 dark:text-yellow-400'}">
+                {tr.nego.updatedNotes[$lang]}
+              </div>
+              <div class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed">
+                <RichText outpot={latestRound.hearotMeyuchadot} editable={false} trans={true} />
+              </div>
             </div>
           {/if}
         </div>

@@ -21,6 +21,8 @@
     "approve": "I want",
     "decline": "Not for me",
     "nego": "Customize",
+    "acceptCounter": "Accept",
+    "proposeOther": "Another proposal",
     "requesterDetails": "Requester Details",
     "confirmApprove": "Approve",
     "confirmDecline": "Decline",

@@ -16,7 +16,8 @@ export type ForumKind =
   | 'ask'
   | 'sheirut'
   | 'haluka'
-  | 'meeting';
+  | 'meeting'
+  | 'wish';
 
 export interface ForumMessageView {
   id: string;
@@ -95,7 +96,16 @@ function uniqueIds(ids: Array<string | null | undefined>): string[] {
   );
 }
 
+function ratsonOwners(attrs: any): string[] {
+  return entityArray(attrs?.ratson?.data?.attributes?.users_permissions_users).map((user) =>
+    String(user.id)
+  );
+}
+
 function forumKind(attrs: any): ForumKind {
+  // A wish's chat_forum links back via `ratson` and has none of the
+  // project/ask/sheirut relations the other kinds key off.
+  if (attrs?.ratson?.data) return 'wish';
   if (attrs?.haluka?.data) return 'haluka';
   if (attrs?.pgisha?.data) return 'meeting';
   if (entityArray(attrs?.asks).length > 0) return 'ask';
@@ -107,6 +117,9 @@ function forumKind(attrs: any): ForumKind {
 
 function forumTitle(kind: ForumKind, attrs: any, projectName: string): string {
   const subject = String(attrs?.subject || '').trim();
+  if (kind === 'wish') {
+    return attrs?.ratson?.data?.attributes?.name || subject || 'Wish chat';
+  }
   if (kind === 'haluka') {
     const haluka = attrs?.haluka?.data?.attributes;
     const sender = haluka?.usersend?.data?.attributes?.username;
@@ -134,6 +147,7 @@ function forumTitle(kind: ForumKind, attrs: any, projectName: string): string {
 }
 
 function forumSubtitle(kind: ForumKind, attrs: any, projectName: string): string {
+  if (kind === 'wish') return attrs?.ratson?.data?.attributes?.name || projectName;
   if (kind === 'haluka') {
     const amount = attrs?.haluka?.data?.attributes?.amount;
     return amount ? `${projectName} · ${amount}` : projectName;
@@ -207,6 +221,10 @@ export function participantIdsForForum(entity: any): string[] {
   const attrs = entity?.attributes || {};
   const kind = forumKind(attrs);
   const project = firstProject(attrs);
+
+  if (kind === 'wish') {
+    return uniqueIds(ratsonOwners(attrs));
+  }
 
   if (kind === 'haluka') {
     const haluka = attrs.haluka?.data?.attributes || {};

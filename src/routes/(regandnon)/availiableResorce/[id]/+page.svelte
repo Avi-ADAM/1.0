@@ -4,9 +4,14 @@
     import Share from '$lib/components/share/shareButtons/index.svelte';
     import { page } from '$app/state';
     import { lang } from '$lib/stores/lang.js';
+    import { t } from '$lib/translations';
     import { RingLoader } from 'svelte-loading-spinners';
     import { goto } from '$app/navigation';
     import { SendTo } from '$lib/send/sendTo.svelte';
+    import { executeAction } from '$lib/client/actionClient';
+    import Nego from '$lib/components/prPr/negoPend.svelte';
+    import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
+    import { fly } from 'svelte/transition';
     import RangeSlider from "svelte-range-slider-pips";
     import { Head } from 'svead';
     import { calcX } from '$lib/func/calcX.svelte';
@@ -93,48 +98,60 @@
         ask(id)
     }
 
-    async function ask(spId) {
-        alrr = true;
-        const inD = data.alld;
-        let d = new Date();       
-        const cookieValueId = document.cookie
+    // Same SP resolution as afterChoose, but opens the custom-terms (nego) flow.
+    function afterChooseNego (){
+        let id = find_skill_id(selected,mash,"name")
+        openNego(id)
+    }
+
+    function getUid() {
+        return document.cookie
             .split('; ')
             .find((row) => row.startsWith('id='))
             .split('=')[1];
-        const uId = cookieValueId;
-        
-        if(spId == 0){
-            const easy = (easyy > 0) ? easyy : 0;
-            const sdate = (inD.sqadualed !== undefined) ? `sdate: "${new Date(inD.sqadualed).toISOString()}",` : ``;
-            const fdate = (inD.sqadualedf !== undefined) ? `fdate: "${new Date(inD.sqadualedf).toISOString()}" ,` : ``;
-            let que0 =  `mutation { createSp(
-                data: { 
-                    name: "${inD.name}",
-                    descrip: "${inD.descrip}",
-                    kindOf: ${inD.kindOf},
-                    unit: ${inD.hm},
-                    spnot: "${inD.spnot}",  
-                    price: ${inD.price},
-                    myp: ${easy},   
-                    linkto: "${inD.linkto}",
-                    users_permissions_user: "${uId}",
-                    mashaabim: "${inD.mashaabim.data.id}", 
-                    publishedAt: "${d.toISOString()}",        
-                    ${sdate} 
-                    ${fdate}
-                }
-            )  {data{id }}
-            } ` 
-            const d0 = await SendTo(que0).then();
-            const r0 = d0.data.createSp.data.id;
-            if (r0) {
-                create(r0)
+    }
+
+    // Resolve the SP to invest: an existing one (spId != 0) or a freshly created
+    // resource of the requested type (spId == 0). Returns the real SP id.
+    async function ensureSpId(spId) {
+        if (spId != 0) return spId;
+        const inD = data.alld;
+        let d = new Date();
+        const uId = getUid();
+        const easy = (easyy > 0) ? easyy : 0;
+        const sdate = (inD.sqadualed !== undefined) ? `sdate: "${new Date(inD.sqadualed).toISOString()}",` : ``;
+        const fdate = (inD.sqadualedf !== undefined) ? `fdate: "${new Date(inD.sqadualedf).toISOString()}" ,` : ``;
+        let que0 =  `mutation { createSp(
+            data: {
+                name: "${inD.name}",
+                descrip: "${inD.descrip}",
+                kindOf: ${inD.kindOf},
+                unit: ${inD.hm},
+                spnot: "${inD.spnot}",
+                price: ${inD.price},
+                myp: ${easy},
+                linkto: "${inD.linkto}",
+                users_permissions_user: "${uId}",
+                mashaabim: "${inD.mashaabim.data.id}",
+                publishedAt: "${d.toISOString()}",
+                ${sdate}
+                ${fdate}
             }
-        } else {
-            create(spId)
-        }
-        
+        )  {data{id }}
+        } `
+        const d0 = await SendTo(que0).then();
+        return d0.data.createSp.data.id;
+    }
+
+    async function ask(spId) {
+        alrr = true;
+        const real = await ensureSpId(spId);
+        if (real) create(real);
+
         async function create(spIdd){
+            const inD = data.alld;
+            let d = new Date();
+            const uId = getUid();
             let myvote = ``;
             let pid = inD.project.data.attributes.user_1s.data.map((t) => t.id);
             if (pid.includes(uId)) {
@@ -207,6 +224,47 @@
         }
     }
 
+    // Propose custom terms (Path B/D). After resolving the SP (existing or new),
+    // open the Nego dialog and submit via proposeOnOpenMashaabim — the server
+    // checks membership and routes (member → Path D; non-member → Path B).
+    let negoOpen = $state(false);
+    let negoLoading = $state(false);
+    let negoSpId = $state(null);
+    const closeNego = () => { negoOpen = false; negoLoading = false; };
+
+    async function openNego(spId) {
+        alrr = true;
+        const real = await ensureSpId(spId);
+        if (real) { negoSpId = String(real); negoOpen = true; }
+        else alrr = false;
+    }
+
+    async function negoSubmit({ newValues }) {
+        const inD = data.alld;
+        try {
+            const result = await executeAction('proposeOnOpenMashaabim', {
+                openMashaabimId: String(data.mId),
+                projectId: String(inD.project.data.id),
+                spId: String(negoSpId),
+                missionName: inD.name != null ? String(inD.name) : undefined,
+                newValues
+            });
+            if (!result.success) {
+                toast.error(result.error?.message ?? 'שגיאה בשליחת ההצעה');
+                negoLoading = false;
+                return;
+            }
+            closeNego();
+            success = true;
+            setTimeout(() => { success = false; }, 15000);
+            toast.success(`${fnnn[$lang]}`);
+        } catch (e) {
+            console.error(e);
+            toast.error('אירעה שגיאה');
+            negoLoading = false;
+        }
+    }
+
     const fnnn = { "he": 'הבקשה נשלחה בהצלחה', "en": 'request has sent sucsesfully' };
     const headi = { "he": 'הצעה לשיתוף משאב', "en": 'oportunity for sharing resource' };
     const om = { "he": 'משאב נדרש', "en": 'needed resorce' };
@@ -253,7 +311,43 @@
 {:then a} 
     {#if data != null}
         <SucssesConf {success} />
-        
+
+        <DialogOverlay isOpen={negoOpen} onDismiss={closeNego} class="overlay">
+            <div transition:fly={{ y: 40, opacity: 0, duration: 250 }}>
+                <DialogContent class="nego" aria-label="form">
+                    <button onclick={closeNego} style="margin: 0 auto;" class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full" aria-label="סגירה">✕</button>
+                    {#if negoLoading}
+                        <RingLoader size="200" color="#ff00ae" unit="px" duration="2s" />
+                    {:else if negoOpen && data.alld}
+                        <Nego
+                            onLoad={() => (negoLoading = true)}
+                            onClose={closeNego}
+                            onSubmit={negoSubmit}
+                            masaalr={false}
+                            descrip={data.alld.descrip}
+                            projectName={data.alld.project.data.attributes.projectName}
+                            name1={data.alld.name}
+                            spnot={data.alld.spnot}
+                            kindOf={data.alld.kindOf}
+                            hm={data.alld.hm || 0}
+                            projectId={String(data.alld.project.data.id)}
+                            total={data.alld.price || 0}
+                            noofusers={data.alld.project.data.attributes.user_1s?.data?.length || 1}
+                            price={data.alld.price || 0}
+                            easy={data.alld.easy || 0}
+                            linkto={''}
+                            pendId={null}
+                            sqadualedf={data.alld.sqadualedf}
+                            sqadualed={data.alld.sqadualed}
+                            users={[]}
+                            ordern={0}
+                            restime={data.alld.project.data.attributes.restime}
+                        />
+                    {/if}
+                </DialogContent>
+            </div>
+        </DialogOverlay>
+
         {#if data.alld?.archived != true && data.alld != null}
             <Head title={page.data?.alld?.title[$lang] ?? headi[$lang]} {description} {image} {url} />
             <div bind:clientWidth={wid} dir="rtl" style="overflow-y:auto" class="d mb-4 sm:pt-4 w-full lg:w-1/2 mx-auto">
@@ -368,6 +462,7 @@
                                                     <RangeSlider float={true} onstop={(e) => { console.log(e) }} bind:values={easyy} min=0 max={Number(data.alld.easy) ?? Number(data.alld.price)} />
                                                 </div>
                                                 <button onclick={()=>ask(0)} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full">{okk[$lang]}</button>
+                                                <button onclick={()=>openNego(0)} class="border border-gold rounded-full text-gold hover:text-barbi hover:border-barbi font-bold py-2 px-4 m-4">{$t('lev.cards.proposeOther')}</button>
                                             {/if}
                                             
                                             {#if tochoose != true && alrr == false}
@@ -383,7 +478,8 @@
                                                     </div>
                                                 {/if}
                                                 {#if selected.length>0}
-                                                    <button onclick={afterChoose} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full">{ok[$lang]}</button> 
+                                                    <button onclick={afterChoose} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full">{ok[$lang]}</button>
+                                                    <button onclick={afterChooseNego} class="border border-gold rounded-full text-gold hover:text-barbi hover:border-barbi font-bold py-2 px-4 m-4">{$t('lev.cards.proposeOther')}</button>
                                                 {/if}
                                             {/if}
                                         </div>

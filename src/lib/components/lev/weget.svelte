@@ -489,6 +489,7 @@
     onHover?.({ id: u });
   }
   import Cards from './cards/dowegeot.svelte';
+  import TimetToTimegrama from './cards/timetToTimegrama.svelte';
 </script>
 
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
@@ -609,6 +610,9 @@
     class="hover:scale-290 duration-1000 ease-in"
     transition:fly|local={{ y: 250, opacity: 0.9, duration: 2000 }}
   >
+    {#if timegramaDate && !timegramaDone}
+      <TimetToTimegrama {timegramaDate} />
+    {/if}
     <Swiper
       dir="rtl"
       on:swiper={setSwiperRef}

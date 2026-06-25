@@ -2,7 +2,8 @@ import { sendToSer } from '$lib/send/sendToSer.js';
 import { redirect } from '@sveltejs/kit';
 import { actionService } from '$lib/server/actions/index.js';
 import { enrichWish, EMPTY_ENRICHMENT, type WishEnrichment } from '$lib/server/ai/enrichWish';
-import type { WishExtraction } from '$lib/server/ai/extractWish';
+import { extractWish, type WishExtraction } from '$lib/server/ai/extractWish';
+import { GEMINI_API_KEY } from '$env/static/private';
 import type { PageServerLoad } from './$types';
 
 export type WishForumMessage = {
@@ -31,6 +32,7 @@ function initials(name: string): string {
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
   const uid = (locals as any)?.uid;
+  const tok = (locals as any)?.tok;
 
   let wish: any = null;
   let proposals: any[] = [];
@@ -168,6 +170,82 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
     throw redirect(302, `/wish/${params.id}`);
   }
 
+  // ── Auto-extract on load ──────────────────────────────────────────────────
+  //    A wish that loaded without a structured breakdown (created outside
+  //    /concierge/new, or where the live extraction never ran) would otherwise
+  //    fall through to the client's design-mock. Run the same Gemini extraction
+  //    here, persist it, and continue with real data so the page never shows
+  //    demo content for a real wish. Owner-only (we're past the non-owner
+  //    redirect) and best-effort — a failure just leaves the panel empty.
+  if (
+    isOwner &&
+    wish &&
+    wish.extractedMissions.length === 0 &&
+    wish.extractedResources.length === 0
+  ) {
+    const wishText = String(wish.longDes || wish.desc || '').trim();
+    if (wishText.length >= 20) {
+      try {
+        const extraction = await extractWish(wishText, GEMINI_API_KEY);
+        if (extraction.missions.length > 0 || extraction.resources.length > 0) {
+          // Reflect immediately in the shapes the page renders this load.
+          wish.extractedMissions = extraction.missions.map((m) => ({
+            id: null,
+            name: m.name,
+            hoursEst: null,
+            importance: m.imp === 'must' ? 'must' : 'nice',
+            notes: '',
+            linkedMissions: []
+          }));
+          wish.extractedResources = extraction.resources.map((r) => ({
+            id: null,
+            name: r.name,
+            kindOf: null,
+            quantityEst: null,
+            importance: r.imp === 'must' ? 'must' : 'nice',
+            notes: '',
+            linkedMashaabims: []
+          }));
+          // Carry inferred skills so the enrichment below can match people.
+          wish.aiMeta = {
+            ...(wish.aiMeta || {}),
+            skills: extraction.skills.map((s) => s.name)
+          };
+
+          // Persist so the next load is instant and the breakdown is editable.
+          if (uid && tok) {
+            try {
+              await actionService.executeAction(
+                'updateRatsonExtraction',
+                {
+                  ratsonId: String(wish.id),
+                  extracted_missions: wish.extractedMissions.map((m: any) => ({
+                    name: m.name,
+                    importance: m.importance
+                  })),
+                  extracted_resources: wish.extractedResources.map((r: any) => ({
+                    name: r.name,
+                    importance: r.importance
+                  }))
+                },
+                {
+                  userId: String(uid),
+                  jwt: String(tok),
+                  lang: String((locals as any)?.lang || 'he'),
+                  fetch
+                }
+              );
+            } catch (e) {
+              console.warn('[concierge/:id] auto-extract persist failed (non-fatal):', e);
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('[concierge/:id] auto-extract failed (non-fatal):', e);
+      }
+    }
+  }
+
   // Mission templates for the owner's offer-authoring form (specMode autofill).
   let missionTemplates: any[] = [];
   if (isOwner) {
@@ -184,7 +262,6 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
   //    provider not yet added to the wish chat) just gets an empty thread rather
   //    than fabricated content. ──────────────────────────────────────────────
   let forumMessages: WishForumMessage[] = [];
-  const tok = (locals as any)?.tok;
   if (wish?.chatForumId && uid && tok) {
     try {
       const res = await actionService.executeAction(

@@ -49,6 +49,41 @@ const qids_base = {
       data { id }
     }
   }`,
+  // ── Pendm / Pmash chat forum (realtime discussion) ─────────────────────────
+  'getPendmChatForum': `query GetPendmChatForum($id: ID!) {
+    pendm(id: $id) {
+      data {
+        id
+        attributes {
+          name
+          project { data { id } }
+          forums(pagination: { limit: 1 }) { data { id } }
+        }
+      }
+    }
+  }`,
+  'getPmashChatForum': `query GetPmashChatForum($id: ID!) {
+    pmash(id: $id) {
+      data {
+        id
+        attributes {
+          name
+          project { data { id } }
+          forums(pagination: { limit: 1 }) { data { id } }
+        }
+      }
+    }
+  }`,
+  'linkForumToPendm': `mutation LinkForumToPendm($id: ID!, $forumId: ID!) {
+    updatePendm(id: $id, data: { forums: [$forumId] }) {
+      data { id }
+    }
+  }`,
+  'linkForumToPmash': `mutation LinkForumToPmash($id: ID!, $forumId: ID!) {
+    updatePmash(id: $id, data: { forums: [$forumId] }) {
+      data { id }
+    }
+  }`,
   '2cGetMoneyReceivers': `query GetMoneyReceivers($id: ID!) {
     sheirut(id: $id) {
       data {
@@ -3265,6 +3300,11 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
   }`,
   '131archiveOpenMashaabim': `mutation ArchiveOpenMashaabim($id: ID!) {
     updateOpenMashaabim(id: $id, data: { archived: true }) {
+      data { id attributes { askms { data { id } } } }
+    }
+  }`,
+  '131bArchiveAskm': `mutation ArchiveAskm($id: ID!) {
+    updateAskm(id: $id, data: { archived: true }) {
       data { id }
     }
   }`,
@@ -3308,6 +3348,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
               vots {
                 what
                 zman
+                order
+                id
                 users_permissions_user {
                   data {
                     id
@@ -3319,6 +3361,25 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                   id
                   attributes {
                     date
+                    done
+                  }
+                }
+              }
+              negopendmissions(sort: "ordern:desc") {
+                data {
+                  id
+                  attributes {
+                    ordern
+                    proposedBy
+                    status
+                    name
+                    descrip
+                    hearotMeyuchadot
+                    noofhours
+                    perhour
+                    date
+                    dates
+                    createdAt
                   }
                 }
               }
@@ -3398,6 +3459,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                 what
                 why
                 zman
+                order
                 id
                 users_permissions_user {
                   data {
@@ -3410,6 +3472,28 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                   id
                   attributes {
                     date
+                    done
+                  }
+                }
+              }
+              nego_mashes(sort: "ordern:desc") {
+                data {
+                  id
+                  attributes {
+                    ordern
+                    proposedBy
+                    status
+                    name
+                    descrip
+                    spnot
+                    easy
+                    hm
+                    price
+                    kindOf
+                    sqadualed
+                    sqadualedf
+                    linkto
+                    createdAt
                   }
                 }
               }
@@ -4447,6 +4531,27 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                         id
                         attributes {
                           date
+                          done
+                        }
+                      }
+                    }
+                    nego_mashes(sort: "ordern:desc") {
+                      data {
+                        id
+                        attributes {
+                          ordern
+                          proposedBy
+                          status
+                          name
+                          descrip
+                          spnot
+                          easy
+                          hm
+                          price
+                          kindOf
+                          sqadualed
+                          sqadualedf
+                          linkto
                         }
                       }
                     }
@@ -4569,6 +4674,25 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                         id
                         attributes {
                           date
+                          done
+                        }
+                      }
+                    }
+                    negopendmissions(sort: "ordern:desc") {
+                      data {
+                        id
+                        attributes {
+                          ordern
+                          proposedBy
+                          status
+                          name
+                          descrip
+                          hearotMeyuchadot
+                          noofhours
+                          perhour
+                          date
+                          dates
+                          createdAt
                         }
                       }
                     }
@@ -7660,7 +7784,11 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $pmash: ID,
     $mashaabim: ID,
     $source: ENUM_OPENMASHAABIM_SOURCE,
+    $linkto: String,
+    $recurring: Boolean,
     $location: ComponentNewLocationInput,
+    $sqadualed: DateTime,
+    $sqadualedf: DateTime,
     $publishedAt: DateTime
   ) {
     createOpenMashaabim(data: {
@@ -7677,7 +7805,11 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       pmash: $pmash,
       mashaabim: $mashaabim,
       source: $source,
+      linkto: $linkto,
+      recurring: $recurring,
       location: $location,
+      sqadualed: $sqadualed,
+      sqadualedf: $sqadualedf,
       publishedAt: $publishedAt
     }) {
       data { id attributes { name } }
@@ -8075,6 +8207,49 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
   // open mission (archived right after), so the Mesimabetahalich uses the agreed values.
   'applyRoundToOpenMission': `mutation ApplyRoundToOpenMission($id: ID!, $data: OpenMissionInput!) {
     updateOpenMission(id: $id, data: $data) { data { id } }
+  }`,
+
+  // ─── Cron finalizers (timegrama auto-approval) ───
+  // Everything the askm finalizer needs to run the bilateral gate (rounds +
+  // vots + members + taker) and then materialize (open_mashaabim + sp + name +
+  // sibling askms to archive).
+  'getAskmForFinalize': `query GetAskmForFinalize($id: ID!) {
+    askm(id: $id) { data { id attributes {
+      archived
+      vots { what order users_permissions_user { data { id } } }
+      users_permissions_user { data { id } }
+      sp { data { id } }
+      project { data { id attributes { restime user_1s { data { id } } } } }
+      open_mashaabim { data { id attributes { name askms { data { id } } } } }
+      nego_mashes(sort: "ordern:desc") { data { id attributes { ordern proposedBy } } }
+    } } }
+  }`,
+
+  // Archive a sibling Askm (a losing candidate) once another is accepted.
+  'archiveAskmSimple': `mutation ArchiveAskmSimple($id: ID!) {
+    updateAskm(id: $id, data: { archived: true }) { data { id } }
+  }`,
+
+  // ─── Candidacy timegrama lifecycle (ensure / reset) ───
+  // The deadline timegrama for an Ask/Askm is created when a rikma member first
+  // engages (favorable vote or counter), and reset when a counter opens a fresh
+  // response window. These let the nego helper find an active one before deciding
+  // whether to create or reset.
+  'getActiveTimegramaForAsk': `query GetActiveTimegramaForAsk($id: ID!) {
+    timegramas(filters: { ask: { id: { eq: $id } }, done: { ne: true } }, sort: "id:desc", pagination: { limit: 1 }) {
+      data { id }
+    }
+  }`,
+  'getActiveTimegramaForAskm': `query GetActiveTimegramaForAskm($id: ID!) {
+    timegramas(filters: { askm: { id: { eq: $id } }, done: { ne: true } }, sort: "id:desc", pagination: { limit: 1 }) {
+      data { id }
+    }
+  }`,
+  'getAskProjectRestime': `query GetAskProjectRestime($id: ID!) {
+    ask(id: $id) { data { id attributes { project { data { id attributes { restime } } } } } }
+  }`,
+  'getAskmProjectRestime': `query GetAskmProjectRestime($id: ID!) {
+    askm(id: $id) { data { id attributes { project { data { id attributes { restime } } } } } }
   }`
 };
 
@@ -8530,6 +8705,81 @@ export const moachQids = {
       }
     }
   }`,
+  // Cheap count-only query for the "votes" tab badge in the moach nav. Uses
+  // pagination meta so no rows are fetched — safe to call on layout mount and
+  // on each vote socket event without affecting the moach base load.
+  'getOpenVoteCounts': `query GetOpenVoteCounts($pid: ID!) {
+    project(id: $pid) {
+      data {
+        attributes {
+          pmashes(filters: { archived: { eq: false } }) { meta { pagination { total } } }
+          pendms(filters: { archived: { eq: false } }) { meta { pagination { total } } }
+          tosplits(filters: { finished: { eq: false } }) { meta { pagination { total } } }
+        }
+      }
+    }
+  }`,
+  // Single-entity queries for the focused in-moach vote pages
+  // (moach/[projectId]/votes/[kind]/[id]). Field selections mirror the lev
+  // page's pendm/pmash selections exactly so the shared extractors/processors
+  // consume them unchanged. project{id} is included for the cross-project guard.
+  'getPendmForVote': `query GetPendmForVote($eid: ID!) {
+    pendm(id: $eid) {
+      data {
+        id
+        attributes {
+          project { data { id } }
+          name createdAt iskvua hearotMeyuchadot descrip noofhours perhour sqadualed privatlinks publicklinks dates
+          location { location_mode lat lng radius location_hint }
+          rishon { data { id } }
+          mission { data { id } }
+          vallues { data { id } }
+          timegrama { data { id attributes { date } } }
+          acts { data { id attributes { shem link des dateF dateS } } }
+          skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
+          tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+          work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
+          negopendmissions(sort: "ordern:desc") {
+            data { id attributes {
+              name hearotMeyuchadot descrip createdAt ordern proposedBy noofhours perhour isOriginal date dates isMonth
+              location { location_mode lat lng radius location_hint }
+              users_permissions_user { data { id attributes { username } } }
+              skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
+              tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+              work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
+              acts { data { id attributes { shem link des dateF dateS } } }
+            } }
+          }
+          diun { what why order id zman users_permissions_user { data { id } } }
+          users { what why order id users_permissions_user { data { id } } }
+        }
+      }
+    }
+  }`,
+  'getPmashForVote': `query GetPmashForVote($eid: ID!) {
+    pmash(id: $eid) {
+      data {
+        id
+        attributes {
+          project { data { id } }
+          hm sqadualedf sqadualed linkto createdAt name descrip easy price kindOf spnot recurring cycleSize
+          location { location_mode lat lng radius location_hint }
+          nego_mashes {
+            data { id attributes {
+              hm sqadualedf sqadualed linkto createdAt name descrip easy price kindOf spnot recurring cycleSize
+              location { location_mode lat lng radius location_hint }
+              users_permissions_user { data { id } }
+            } }
+          }
+          mashaabim { data { id } }
+          timegrama { data { id attributes { date } } }
+          diun { what why order id zman users_permissions_user { data { id } } }
+          users { what order why id users_permissions_user { data { id } } }
+        }
+      }
+    }
+  }`,
+
   'getMissionInProgress': `query GetMissionInProgress($id: ID!) {
     mesimabetahalich(id: $id) {
       data {
@@ -8683,6 +8933,17 @@ export const moachQids = {
         }
       }
       project { data { ...ForumProjectCore } }
+      ratson {
+        data {
+          id
+          attributes {
+            name
+            users_permissions_users {
+              data { id attributes { username profilePic { data { attributes { url formats } } } } }
+            }
+          }
+        }
+      }
       haluka {
         data {
           id
@@ -8812,6 +9073,17 @@ export const moachQids = {
         }
       }
       project { data { ...ForumProjectSummaryCore } }
+      ratson {
+        data {
+          id
+          attributes {
+            name
+            users_permissions_users {
+              data { id attributes { username profilePic { data { attributes { url formats } } } } }
+            }
+          }
+        }
+      }
       haluka {
         data {
           id

@@ -1,23 +1,24 @@
 /**
- * Action Configuration: Candidate proposes parallel terms on an open mission.
+ * Action Configuration: take / propose terms on an open mission.
  *
  * Unlike the internal pendm negotiation (submitNegoMission) — between rights-holders —
  * an open mission can attract several candidates at once. Each candidate gets their own
  * Ask, and their proposed terms are stored as a Negopendmission round bound to that Ask.
  * The OpenMission stays untouched as the rikma's baseline for comparison.
+ *
+ * Membership is checked SERVER-SIDE and decides the path (so correctness never
+ * depends on the client — e.g. public offer pages where the store isn't loaded):
+ *   - rikma member → Path D: round proposedBy='project' + the clock starts now,
+ *   - non-member   → Path B: round proposedBy='candidate' + clock deferred (it
+ *     starts when a member first votes/counters).
+ * `proposeOnOpenMission` and `customizeOpenMission` share this handler.
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { normalizeLocationInput } from './actionUtils.js';
+import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
 
-const resMs: Record<string, number> = {
-  feh: 48 * 3_600_000,
-  sth: 72 * 3_600_000,
-  nsh: 96 * 3_600_000,
-  sevend: 168 * 3_600_000,
-};
-
-const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
+export const openMissionProposalHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { openMissionId, projectId } = params;
   const newValues = (params.newValues ?? {}) as Record<string, any>;
 
@@ -25,7 +26,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const nowISO = now.toISOString();
   const requesterId = String(context.userId);
 
-  // 1. Project members + restime (for deadline + notifications).
+  // 1. Members — the server-side source of truth for the path decision.
   const projectRes = await strapi.execute(
     '128getProjectMembersAndRestime',
     { pid: projectId },
@@ -34,7 +35,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   );
   const projectAttrs = (projectRes as any)?.data?.project?.data?.attributes;
   const memberIds: string[] = (projectAttrs?.user_1s?.data || []).map((m: any) => String(m.id));
-  const restime: string = projectAttrs?.restime ?? '';
+  const isMember = memberIds.includes(requesterId);
+  const proposedBy = isMember ? 'project' : 'candidate';
 
   // 2. Fetch existing asked IDs so user.askeds stays consistent.
   const askedsRes = await strapi.execute(
@@ -74,7 +76,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       open_mission: openMissionId,
       ask: askId,
       ordern: 0,
-      proposedBy: 'candidate',
+      proposedBy,
       status: 'proposed',
       isOriginal: false,
       noofhours: newValues.noofhours ?? null,
@@ -102,16 +104,10 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     context.fetch
   );
 
-  // 6. Deadline timegrama (same windows as applyToMission).
-  const offsetMs = resMs[restime] ?? 0;
-  if (offsetMs > 0) {
-    const deadline = new Date(now.getTime() + offsetMs);
-    await strapi.execute(
-      '82createTimegramaForAsk',
-      { date: deadline.toISOString(), whatami: 'ask', askId },
-      context.jwt,
-      context.fetch
-    );
+  // 6. Member (Path D) → start the auto-approval clock now (member engaged).
+  //    Non-member (Path B) → defer; the clock starts when a member votes/counters.
+  if (isMember) {
+    await ensureCandidacyTimegrama(strapi, context, { side: 'ask', id: String(askId) });
   }
 
   const recipientIds = Array.from(new Set([...memberIds, requesterId].filter(Boolean)));
@@ -126,8 +122,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
 export const proposeOnOpenMissionConfig: ActionConfig = {
   key: 'proposeOnOpenMission',
   description:
-    "Candidate proposes parallel terms on an open mission. Creates an Ask plus a Negopendmission round holding the proposed terms — without overwriting the shared OpenMission. The rights-holders then vote or counter.",
-  graphqlOperation: handler,
+    'Take/propose terms on an open mission. Server checks membership: member → project round (Path D, clock now); non-member → candidate round (Path B, clock deferred). OpenMission is never overwritten.',
+  graphqlOperation: openMissionProposalHandler,
 
   paramSchema: {
     openMissionId: { type: 'string', required: true, description: 'ID of the open mission' },

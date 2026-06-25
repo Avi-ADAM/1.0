@@ -9,6 +9,7 @@
   import No from '$lib/celim/no.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device';
+  import tr from '$lib/translations/tr.json';
 
   // ייבוא רכיבים מודרניים חדשים
   import CardHeader from './CardHeader.svelte';
@@ -50,6 +51,9 @@
     onAgree,
     onDecline,
     onNego,
+    onAccept,
+    myRoundProposedBy = null, // 'project' → rikma countered my application (B2)
+    myRound = null, // latest round terms on my application (my own / rikma counter)
     onProject,
     onTochat,
     noOfusers,
@@ -147,6 +151,100 @@
       : 'bg-gray-50 dark:bg-slate-700/50'} 
     transition-all duration-300 p-5 flex-1 overflow-y-auto space-y-6 text-gray-800 dark:text-gray-100"
   >
+    <!-- ההצעה שלי — מוצגת כשהגשתי התאמה אישית (סבב מו"מ על המועמדות שלי) -->
+    {#if myRound}
+      {@const byCandidate = myRound.proposedBy !== 'project'}
+      {@const roundDate = myRound.createdAt ? new Date(myRound.createdAt) : null}
+      {@const descChanged = myRound.descrip && myRound.descrip !== missionDetails}
+      {@const notesChanged =
+        myRound.hearotMeyuchadot && myRound.hearotMeyuchadot !== hearotMeyuchadot}
+      {@const hoursChanged =
+        (myRound.noofhours != null && myRound.noofhours !== noOfHours) ||
+        (myRound.perhour != null && myRound.perhour !== perhour)}
+      <div
+        class="rounded-xl border-2 p-3 space-y-2 {byCandidate
+          ? 'border-barbi bg-barbi/5'
+          : 'border-gold bg-gold/5'}"
+      >
+        <div
+          class="font-bold text-sm flex items-center gap-2 {byCandidate
+            ? 'text-barbi'
+            : 'text-yellow-700 dark:text-yellow-400'}"
+        >
+          <span
+            class="px-2 py-0.5 rounded-full text-xs {byCandidate
+              ? 'bg-barbi/20'
+              : 'bg-gold/30'}"
+          >
+            {byCandidate ? tr.nego.candidateRound[$lang] : tr.nego.projectRound[$lang]}
+          </span>
+          {#if roundDate && !isNaN(roundDate.getTime())}
+            <span class="text-xs font-normal text-gray-500 dark:text-gray-400">
+              {roundDate.toLocaleDateString($lang)}
+            </span>
+          {/if}
+        </div>
+        {#if myRound.noofhours != null || myRound.perhour != null}
+          <div
+            class="flex flex-wrap items-center gap-2 text-sm font-bold text-gray-800 dark:text-gray-100"
+          >
+            <img
+              style="width:1.5rem;"
+              src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg"
+              alt=""
+            />
+            <span
+              class={byCandidate ? 'text-barbi' : 'text-yellow-700 dark:text-yellow-400'}
+            >
+              {(myRound.noofhours ?? noOfHours).toLocaleString()} {hourss[$lang]}
+              × {(myRound.perhour ?? perhour).toLocaleString()}
+              = {((myRound.noofhours ?? noOfHours) * (myRound.perhour ?? perhour)).toLocaleString()}
+            </span>
+            {#if hoursChanged}
+              <span class="text-xs text-gray-500 dark:text-gray-400">
+                ({tr.nego.rikmaReq[$lang]}: {noOfHours} × {perhour} = {noOfHours * perhour})
+              </span>
+            {/if}
+          </div>
+        {/if}
+        {#if myRound.name && myRound.name !== missionName}
+          <div class="text-xs text-gray-600 dark:text-gray-300">
+            <span class="font-medium">{tr.common.nameLabel[$lang]}:</span>
+            <span class="text-gray-400 line-through mx-1">{missionName}</span>
+            → <span class="font-semibold">{myRound.name}</span>
+          </div>
+        {/if}
+        {#if descChanged}
+          <div class="rounded-lg bg-white/70 dark:bg-gray-900/40 p-2">
+            <div
+              class="font-semibold text-xs mb-1 {byCandidate
+                ? 'text-barbi'
+                : 'text-yellow-700 dark:text-yellow-400'}"
+            >
+              {tr.nego.updatedDescription[$lang]}
+            </div>
+            <div class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed">
+              <RichText outpot={myRound.descrip} editable={false} trans={true} />
+            </div>
+          </div>
+        {/if}
+        {#if notesChanged}
+          <div class="rounded-lg bg-white/70 dark:bg-gray-900/40 p-2">
+            <div
+              class="font-semibold text-xs mb-1 {byCandidate
+                ? 'text-barbi'
+                : 'text-yellow-700 dark:text-yellow-400'}"
+            >
+              {tr.nego.updatedNotes[$lang]}
+            </div>
+            <div class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed">
+              <RichText outpot={myRound.hearotMeyuchadot} editable={false} trans={true} />
+            </div>
+          </div>
+        {/if}
+      </div>
+    {/if}
+
     <!-- תאריכים -->
     {#if sqadualed || sqadualedf}
       <div
@@ -350,7 +448,27 @@
     class="p-4 bg-gray-50 dark:bg-gray-900/80 flex gap-3 border-t border-gray-100 dark:border-gray-800"
   >
     {#if low == false}
-      {#if already === false && allr === false && alreadyi == false}
+      {#if myRoundProposedBy === 'project'}
+        <!-- B2: הריקמה הציעה הצעה נגדית — לאשר או להעלות סבב נגדי -->
+        <button
+          class="flex-2 py-3 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg flex justify-center items-center gap-2 transform hover:-translate-y-1 transition-all"
+          style="flex: 2;"
+          onmouseenter={() => hover($t('lev.cards.acceptCounter'))}
+          onmouseleave={() => hover('0')}
+          onclick={() => onAccept?.()}
+        >
+          <div class="w-8 h-8 text-white"><Lev /></div>
+          <span class="whitespace-nowrap">{$t('lev.cards.acceptCounter')}</span>
+        </button>
+        <button
+          class="flex-1 py-3 bg-white dark:bg-gray-800 border-2 border-yellow-500 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 font-bold rounded-xl flex justify-center items-center gap-2 transition-all hover:scale-105"
+          onmouseenter={() => hover($t('lev.cards.proposeOther'))}
+          onmouseleave={() => hover('0')}
+          onclick={() => nego(null)}
+        >
+          <span class="whitespace-nowrap">{$t('lev.cards.proposeOther')}</span>
+        </button>
+      {:else if already === false && allr === false && alreadyi == false}
         <!-- כפתור דחייה -->
         <button
           class="flex-1 py-3 bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold rounded-xl flex justify-center items-center gap-2 transition-all hover:scale-105"

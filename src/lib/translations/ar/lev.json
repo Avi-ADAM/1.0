@@ -21,6 +21,8 @@
     "approve": "أريد",
     "decline": "غير مناسب",
     "nego": "تخصيص",
+    "acceptCounter": "موافقة",
+    "proposeOther": "اقتراح آخر",
     "requesterDetails": "تفاصيل مقدم الطلب",
     "confirmApprove": "تأكيد",
     "confirmDecline": "معارضة",

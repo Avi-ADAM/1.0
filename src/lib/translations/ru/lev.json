@@ -21,6 +21,8 @@
     "approve": "Хочу",
     "decline": "Не подходит",
     "nego": "Встречное предложение",
+    "acceptCounter": "Принять",
+    "proposeOther": "Другое предложение",
     "requesterDetails": "Данные заявителя",
     "confirmApprove": "Утвердить",
     "confirmDecline": "Возразить",

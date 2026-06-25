@@ -73,18 +73,52 @@
     isOpen = true;
   }
 
-  // Candidate's parallel proposal — stored as a NegoMash round on a new Askm,
-  // never overwriting the shared OpenMashaabim (see proposeOnOpenMashaabim).
+  // Nego dialog submit. Two cases:
+  //  - rikma already countered my application (B2) → candidateCounterOnAskm,
+  //  - otherwise → proposeOnOpenMashaabim (the action checks membership server-side
+  //    and routes: member → Path D / project round; non-member → Path B / candidate).
   async function handleNegoSubmit({ newValues }) {
-    const result = await executeAction('proposeOnOpenMashaabim', {
-      openMashaabimId: String(id),
-      projectId: String(projectId),
-      spId: String(oid),
-      missionName: mashName != null ? String(mashName) : undefined,
-      newValues
-    });
+    let action, params;
+    if (myRoundProposedBy === 'project') {
+      action = 'candidateCounterOnAskm';
+      params = {
+        askmId: String(askId),
+        openMashaabimId: String(id),
+        projectId: String(projectId),
+        ordern: myOrdern ?? 0,
+        newValues,
+        users: myAskUsers ?? []
+      };
+    } else {
+      action = 'proposeOnOpenMashaabim';
+      params = {
+        openMashaabimId: String(id),
+        projectId: String(projectId),
+        spId: String(oid),
+        missionName: mashName != null ? String(mashName) : undefined,
+        newValues
+      };
+    }
+    const result = await executeAction(action, params);
     if (!result.success) {
-      throw new Error(result.error || 'proposeOnOpenMashaabim failed');
+      throw new Error(result.error || `${action} failed`);
+    }
+  }
+
+  // B2 — candidate accepts the rikma's counter on a resource.
+  async function acceptCounter() {
+    already = true;
+    try {
+      const result = await executeAction('acceptCounterOnAskm', {
+        askmId: String(askId),
+        projectId: String(projectId),
+        ordern: myOrdern ?? 0,
+        users: myAskUsers ?? []
+      });
+      if (result.success) less();
+      else error1 = result.error;
+    } catch (e) {
+      error1 = e;
     }
   }
 
@@ -205,6 +239,10 @@
    * @property {any} [chat]
    * @property {number} [order]
    * @property {number} [askId]
+   * @property {string|null} [myRoundProposedBy]
+   * @property {number} [myOrdern]
+   * @property {any[]} [myAskUsers]
+   * @property {any} [myRound]
    */
 
   /** @type {Props} */
@@ -243,6 +281,11 @@
     chat = $bindable([]),
     order = $bindable(0),
     askId = 1,
+    // Path B2 — the rikma's latest response on the candidate's own application.
+    myRoundProposedBy = null, // 'project' → rikma countered, awaiting candidate
+    myOrdern = 0,
+    myAskUsers = [],
+    myRound = null, // latest round terms on my application (my own counter-offer)
     onLess,
     onProj,
     onHover,
@@ -499,6 +542,9 @@ role="button"
     onAgree={() => agree(oid)}
     onDecline={() => decline(oid)}
     onNego={() => nego(oid)}
+    onAccept={() => acceptCounter()}
+    {myRoundProposedBy}
+    {myRound}
     onHover={hoverc}
     onTochat={tochat}
     {low}
@@ -530,6 +576,9 @@ role="button"
     onAgree={() => agree(oid)}
     onDecline={() => decline(oid)}
     onNego={() => nego(oid)}
+    onAccept={() => acceptCounter()}
+    {myRoundProposedBy}
+    {myRound}
     onHover={hoverc}
     onTochat={tochat}
     {isVisible}

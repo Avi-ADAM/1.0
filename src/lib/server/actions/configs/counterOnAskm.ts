@@ -9,6 +9,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { normalizeLocationInput, extractRelationId } from './actionUtils.js';
+import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
 
 interface UserVote {
   what: boolean;
@@ -80,8 +81,27 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     context.fetch
   );
 
+  // A project counter (Path B2) opens a fresh window for the candidate to accept
+  // or counter back. Create the timegrama if none is active, else reset its date.
+  // The bilateral gate keeps it from finalizing until the candidate agrees.
+  await ensureCandidacyTimegrama(strapi, context, { side: 'askm', id: String(askmId), reset: true });
+
+  // Notify the rikma members AND the candidate (the ask owner) that a counter
+  // awaits a response — so it surfaces for the candidate, not only members.
+  const projectRes: any = await strapi
+    .execute('128getProjectMembersAndRestime', { pid: projectId }, context.jwt, context.fetch)
+    .catch(() => null);
+  const memberIds: string[] = (projectRes?.data?.project?.data?.attributes?.user_1s?.data || []).map(
+    (m: any) => String(m.id)
+  );
+  const candId = params.candidateUserId != null ? String(params.candidateUserId) : null;
+  const recipientIds = Array.from(
+    new Set([...memberIds, candId].filter((u) => u && u !== userId))
+  );
+
   return {
     data: { askmId, ordern: nextOrder },
+    recipientIds,
     updateStrategy: { type: 'none' },
   };
 };
@@ -97,6 +117,7 @@ export const counterOnAskmConfig: ActionConfig = {
     openMashaabimId: { type: 'string', required: false, description: 'Open resource the Askm targets' },
     projectId: { type: 'string', required: true, description: 'Project (rikma) ID — auth' },
     ordern: { type: 'number', required: false, description: 'Current max round (new round = ordern+1)' },
+    candidateUserId: { type: 'string', required: false, description: 'Ask owner (candidate) — notified of the counter' },
     newValues: {
       type: 'object',
       required: false,
@@ -115,7 +136,7 @@ export const counterOnAskmConfig: ActionConfig = {
   ],
 
   notification: {
-    recipients: { type: 'projectMembers', config: { projectIdParam: 'projectId', excludeSender: true } },
+    recipients: { type: 'specificUsers', config: { userIdsParam: 'recipientIds' } },
     templates: {
       title: { he: 'הצעת ביניים למשאב', en: 'Intermediate proposal for a resource' },
       body: { he: 'הוגשה הצעת ביניים על משאב בריקמה', en: 'An intermediate proposal was submitted for a resource' },

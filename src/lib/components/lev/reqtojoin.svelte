@@ -58,6 +58,8 @@
    * @property {number} [order]
    * @property {any} sqedualed
    * @property {any} timegramaId
+   * @property {any} [timegramaDate]
+   * @property {boolean} [timegramaDone]
    * @property {boolean} [cards]
    * @property {any} [onUser]
    * @property {any} [onProj]
@@ -123,6 +125,8 @@
     orderon = 0,
     sqedualed,
     timegramaId,
+    timegramaDate = null,
+    timegramaDone = false,
     cards = false,
     isRishon = false,
     workways = [],
@@ -369,6 +373,7 @@
       openMissionId: openMid != null ? String(openMid) : undefined,
       projectId: String(projectId),
       ordern: orderon ?? 0,
+      candidateUserId: userId != null ? String(userId) : undefined,
       newValues,
       users
     });
@@ -510,6 +515,7 @@
   import { RingLoader } from 'svelte-loading-spinners';
   import { forumStore } from '$lib/stores/forumStore';
   import Diun from './diun.svelte';
+  import TimetToTimegrama from './cards/timetToTimegrama.svelte';
   import {
     nowId,
     addMes,
@@ -650,6 +656,9 @@
     role="button"
     transition:fly|local={{ y: 250, opacity: 0.9, duration: 2000 }}
   >
+    {#if timegramaDate && !timegramaDone}
+      <TimetToTimegrama {timegramaDate} />
+    {/if}
     <Swiper
       dir="rtl"
       on:swiper={setSwiperRef}
