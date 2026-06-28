@@ -105,19 +105,25 @@
 `sales/SaleComponent`, `registration/newppp`, routes שונים. נכון ל-2026-06-10
 ה-grep `page\.data\.tok|page\.data\.jwt` נקי פרט לחריגים שב-2.1.
 
-### 2.2.1 פניות `/graphql` ישירות **ללא טוקן** שנותרו — יישברו בנעילה! (grep 2026-06-10)
+### 2.2.1 פניות `/graphql` ישירות **ללא טוקן** שנותרו — יישברו בנעילה! (אומת 2026-06-28)
 
 קומפוננטות שפונות מהדפדפן ל-`VITE_URL/graphql` בלי bearer (queries ציבוריים /
 אנונימיים). אין כאן דליפת טוקן, אבל ברגע ש-Strapi יינעל ל-localhost — **כולן
 יישברו**. חובה להגר ל-`sendToSer`/qids לפני שלב 3:
 
+**קוד מת — לא להגר, למחוק:**
+- ~~`src/lib/components/registration/password.svelte`~~ — **קוד מת** (2026-06-28): אף import. ההרשמה עברה לכלל ל-onboarding. למחוק.
+- ~~`src/lib/components/lev/reqtosherut.svelte`~~ — **קוד מת** (2026-06-28): אף import. הלוגיקה הוגרה ל-action `finalizeAskAcceptance`. chat reply הוא לא רק sidequest — הקובץ כולו יתום. למחוק.
+- ~~`src/lib/components/main/amann.svelte`~~ — **קוד מת** (2026-06-28): אף import. למחוק.
+
+**חיים — חובה להגר (אומת 2026-06-28):**
 - **`src/lib/components/ui/`**: `ValueSelector`, `SkillSelector`, `RoleSelector`
-- **`src/lib/components/registration/`**: `roles`, `vallues`, `workways`, `password`
+- **`src/lib/components/registration/`**: `roles`, `vallues`, `workways`
 - **`src/lib/components/addnew/`**: `addNewMission`, `addNewSkill`
 - **`src/lib/components/prPr/`**: `negoM`, `choosMission`, `whowhat`
-- **`src/lib/components/lev/`**: `reqtosherut`
-- **`src/lib/components/main/`**: `amana`, `amanaen`, `amanar`
-- **routes**: `hascama/+page.svelte`
+- **`src/lib/components/main/`**: `amana`, `amanaen`, `amanar` + תלויות שלהם (`tikunolam`, `tikunar`, `tikuneng`, `tranarb`, `translatehe`, `translateeng`)
+- **routes**: `hascama/+page.svelte`, `convention/+page.svelte`, `aitifaqia/+page.svelte`
+  > שלוש הרוטים הללו **חיים** — מקושרים מ-`fpage.svelte`, `newfront.svelte`, `ProductPeek.svelte`; `signup` מפנה ל-`/hascama`.
 - ~~`src/lib/legacy/moach/OLD_monolith.svelte`~~ (legacy — לא מגרים)
 
 > grep מאמת (צריך להגיע ל-0, למעט legacy):
@@ -126,9 +132,18 @@
 ### 2.3 פניות REST ישירות (לא GraphQL) שגם תלויות בטוקן
 
 - `userPr/editBasic.svelte:362` → `VITE_URL/api/auth/change-password`
-- login / `auth/local` / password-reset (`registration/password.svelte`,
-  `login/passwordReset`, `login/passChange`, `signup/check-email`)
-- העלאות שעדיין פונות ישירות במקום דרך `/api/upload`
+- login / `auth/local` / password-reset (`login/passwordReset`, `login/passChange`, `signup/check-email`)
+- ~~`registration/password.svelte`~~ → **קוד מת**, לא רלוונטי
+
+### 2.4 ארכיטקטורת פריסה ומדיה (אומת 2026-06-28)
+
+**ארכיטקטורה:** Frontend (Vercel) → SvelteKit API (Linux VPS) → Strapi (127.0.0.1 על אותו VPS).
+
+**מדיה / uploads:** הפרויקט משתמש ב-**Cloudinary** ולא ב-Strapi local uploads.
+- קבצים עולים דרך Cloudinary CDN — כתובות ה-URL הן `res.cloudinary.com/...`, לא `VITE_URL/uploads/...`.
+- **אין** צורך ב-Nginx location ציבורי ל-`/uploads` של Strapi.
+- `/api/upload` בשרת SvelteKit — לבדוק האם הוא מתווך ל-Cloudinary דרך Strapi, ואם כן האם הסשן נשמר תקין. הפרוקסי הזה כבר קיים ותקין.
+- **לא נדרשת** עבודה נוספת בנושא מדיה לצורך נעילת Strapi.
 
 ---
 
@@ -209,25 +224,30 @@ Whitelist של פעולות מותרות; כל השאר → 404. פעולות ש
 
 ### 3.5 צ'קליסט שלב 1
 
-- [ ] מיפוי סופי של כל צרכני `page.data.tok`/`.jwt` (פקודת ה-grep למעלה)
-- [ ] הגירת `lev/*` (13 קבצים) לפרוקסי — לתאם עם `MIGRATION_TRACKING.md`
+- [x] מיפוי סופי של כל צרכני `page.data.tok`/`.jwt` (אומת 2026-06-28)
+- [ ] **מחיקת קוד מת** (אומת 2026-06-28 — אף import):
+  - [ ] `src/lib/components/lev/reqtosherut.svelte` — כולו קוד מת, למחוק
+  - [ ] `src/lib/components/registration/password.svelte` — כולו קוד מת, למחוק
+  - [ ] `src/lib/components/main/amann.svelte` — כולו קוד מת, למחוק
+- [ ] הגירת `lev/*` לפרוקסי — לתאם עם `MIGRATION_TRACKING.md`
   - [x] `welcomTo.svelte` → `updateWelcomeCard` action (2026-05-25)
-  - [x] `hevel.svelte` → `sendToSer('52GetUserById')` (2026-05-25, גם תוקן באג גישה ל-`usersPermissionsUser`)
+  - [x] `hevel.svelte` → `sendToSer('52GetUserById')` (2026-05-25)
   - [x] `mesima.svelte` → `sendToSer('51GetOpenMissionById')` (2026-05-25)
   - [x] `rikma.svelte` → `sendToSer('49GetProjectById')` (2026-05-25)
-  - [x] `mashsuggest.svelte` `decline(oid)` → `declineSpForMashaabim` action חדש (2026-05-25)
-  - [x] `halukaask.svelte` `agree` hervachti loop → קופל לתוך `approveHaluka` עם `hervachUpdates` (2026-05-25; qid חדש `167getUserHervachti`, server קורא current balance ומחיל delta)
-  - [x] `halukaask.svelte` `afterwhy()` (decline עם why) → הורחב `addVote` עם `what`/`why` אופציונליים לסניף ה-`tosplit` (2026-05-25). הקובץ עכשיו נקי לחלוטין מ-`page.data.tok`/`/graphql`/`bearer`.
-  - [x] `reqtosherut.svelte` `decline()` `if (noofpu===1)` → `declineMissionRequest` קיים (2026-05-25; הערה: ה-action ה"נכון" היה `declineMissionRequest` ולא `declineOpenMission` — האחרון מעדכן `user.declined`, ה-mutation המקורית עדכנה `openMission.declined`)
-  - [~] `projectSuggestornew.svelte` `less`/`decline` (#11, #12) — **קובץ לא בשימוש; מדלגים**
-  - [ ] `mashsuggest`/`reqtom`/`reqtosherut` chat replies — **חסום sidequest** (ראה 3.6)
-- [ ] הגירת `addnew/*` (4)
-- [ ] הגירת `userPr/*` (4) — כולל `editBasic` change-password ל-auth proxy
-- [ ] הגירת `prPr/*` (3)
+  - [x] `mashsuggest.svelte` `decline(oid)` → `declineSpForMashaabim` action (2026-05-25)
+  - [x] `halukaask.svelte` → `approveHaluka` + `addVote` (2026-05-25)
+  - [~] `reqtosherut.svelte` — **קוד מת, למחוק** (ראה למעלה)
+  - [~] `projectSuggestornew.svelte` — לא בשימוש; מדלגים
+  - [ ] `mashsuggest`/`reqtom` chat replies — **sidequest** (ראה 3.6)
+- [ ] הגירת `main/*` (amana/amanaen/amanar + tikunolam/tikunar/tikuneng/tranarb/translatehe/translateeng) + routes (hascama/convention/aitifaqia) לפרוקסי
+- [ ] הגירת `addnew/*` (addNewMission, addNewSkill)
+- [ ] הגירת `ui/*` (ValueSelector, SkillSelector, RoleSelector)
+- [ ] הגירת `registration/*` (roles, vallues, workways) — password.svelte קוד מת
+- [ ] הגירת `userPr/*` — כולל `editBasic` change-password ל-auth proxy
+- [ ] הגירת `prPr/*` (negoM, choosMission, whowhat)
 - [ ] הגירת `sales/SaleComponent`, `registration/newppp`
 - [ ] הגירת routes שמשתמשים בטוקן (`newlev` הושלם ✅ 2026-05-29, `me`, `oldlev`, ...)
-- [x] יצירת `/api/auth` proxy (2026-05-24) + העברת change-password/forgot/reset/send-email-confirmation; register נדחה
-- [ ] העברת כל ה-uploads ל-`/api/upload`
+- [x] יצירת `/api/auth` proxy (2026-05-24) + change-password/forgot/reset/send-email-confirmation
 - [ ] היפוך 4 נקודות החשיפה ל-flag בוליאני (3.3)
 - [ ] הוספת guardrail (3.4) ו-grep מאמת = 0
 - [ ] בדיקת רגרסיה ידנית בדפדפן: login, lev, העלאת קובץ, שינוי סיסמה
@@ -250,7 +270,7 @@ Whitelist של פעולות מותרות; כל השאר → 404. פעולות ש
 |------|---------|-----------|---------|
 | `mashsuggest.svelte` | `replyToMash` (~255-303) | `PUT /api/askms/${askId}` עם append ל-`chat[]` | forum על askm + `createMessage` |
 | `reqtom.svelte` | chat reply (~420-475) | `PUT /api/askms/${askId}` עם append ל-`chat[]` | forum על askm + `createMessage` |
-| `reqtosherut.svelte` | chat reply (~325-370) | `PUT /api/asks/${askId}` עם append ל-`chat[]` | forum על ask + `createMessage` |
+| ~~`reqtosherut.svelte`~~ | ~~chat reply~~ | **קוד מת — הקובץ כולו יימחק** (אין importers) | לא רלוונטי |
 
 **יתרון:** ה-actions ליצירת פורום (`2forumCr`, `2forumCrBasic`) ולהוספת הודעה
 (`1chatsend`) כבר קיימים ומאומתים — רק צריך לחבר.
@@ -283,10 +303,7 @@ Strapi נחסם מבחוץ ומדבר רק עם SvelteKit דרך loopback.
   קודם 2.2.1 = 0, ואז לעבור בצד שרת למשתנה **פרטי** חדש (למשל `STRAPI_URL`
   ב-`$env/static/private`) שמצביע ל-localhost, ולהפסיק את השימוש ב-`VITE_URL`
   בקבצי השרת (`api/send`, `api/action`, `api/upload`, server loads).
-- **מדיה (uploads):** אם הלקוח טוען תמונות ישירות מ-Strapi
-  (`VITE_URL/uploads/...`) — להגדיר ב-Nginx location ציבורי read-only של
-  `/uploads` שמפנה ל-`127.0.0.1:1337`, או להגיש דרך SvelteKit. לאמת לפני
-  הנעילה אילו URLים של מדיה חיים בפרודקשן.
+- **מדיה (uploads):** הפרויקט משתמש ב-Cloudinary — אין קבצי מדיה מקומיים ב-Strapi. כתובות התמונות הן `res.cloudinary.com/...` ולא פנימיות. **אין צורך ב-location ציבורי ל-`/uploads`.**
 - **פאנל האדמין של Strapi (`/admin`):** ייחסם גם הוא. גישה דרך SSH tunnel
   (`ssh -L 1337:127.0.0.1:1337`) או location ב-Nginx עם allowlist של IP /
   basic-auth.
@@ -311,15 +328,17 @@ Strapi נחסם מבחוץ ומדבר רק עם SvelteKit דרך loopback.
 
 ---
 
-## 8. סדר עבודה מעודכן (2026-06-10)
+## 8. סדר עבודה מעודכן (2026-06-28)
 
-1. - [ ] **סעיף 0.1** — סגירת פרצת ה-`isSer` (אדמין טוקן מהדפדפן) — **מיידי**
-2. - [ ] **סעיף 0.2** — חסימת raw-query בפרודקשן — **מיידי**
-3. - [ ] **סעיף 2.2.1** — הגירת ~17 הקומפוננטות האנונימיות ל-`sendToSer`/qids
-4. - [ ] השלמת שאריות שלב 1: register proxy, uploads, `test-lev-socket`,
-       sidequest ה-chat (3.6)
-5. - [ ] guardrails (3.4) + grep = 0
-6. - [ ] שלב 2 — rate limiting, body size, CORS
-7. - [ ] שלב 3 — מעבר ל-`STRAPI_URL` פרטי, פריסת SvelteKit על ה-VPS,
-       נעילת Strapi ל-`127.0.0.1` + firewall, nginx ל-`/uploads` ו-`/admin`
-8. - [ ] שלב 4 — אימות סופי, ניקוי, תיעוד
+**ארכיטקטורה:** Frontend על Vercel → SvelteKit API על Linux VPS → Strapi על 127.0.0.1. Cloudinary לקבצים — אין Strapi local uploads.
+
+1. - [x] **סעיף 0.1** — סגירת פרצת ה-`isSer` ✅ (2026-06-19)
+2. - [x] **סעיף 0.2** — חסימת raw-query בפרודקשן ✅ (2026-06-19)
+3. - [ ] **מחיקת קוד מת** — `reqtosherut.svelte`, `password.svelte`, `amann.svelte`
+4. - [ ] **`VITE_URL` → `STRAPI_URL`** (פרטי, `$env/static/private`) ב-`api/send`, `api/action`, `api/upload` — **חובה לפני שינוי הכתובת ב-VPS**
+5. - [ ] **סעיף 2.2.1** — הגירת הקומפוננטות החיות האנונימיות (amana/tikun/convention/hascama, ui selectors, registration, addnew, prPr)
+6. - [ ] השלמת שאריות שלב 1: `test-lev-socket`, sidequest ה-chat (3.6)
+7. - [ ] guardrails (3.4) + grep = 0
+8. - [ ] שלב 2 — rate limiting, body size, CORS
+9. - [ ] שלב 3 — פריסת SvelteKit על ה-VPS, נעילת Strapi ל-`127.0.0.1` + firewall (ufw), Nginx ל-`/admin` + TLS; **ללא** צורך ב-location מיוחד ל-`/uploads` (Cloudinary)
+10. - [ ] שלב 4 — אימות סופי, ניקוי, תיעוד

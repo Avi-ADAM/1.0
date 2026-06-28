@@ -49,14 +49,14 @@ const NODE_URL = import.meta.env.VITE_NURL
  * 
  * @throws {Error} If the fetch request fails or the server returns an error
  */
-export async function sendToSer(arg = {}, queId = "", me = 0, project = 0, isSer = false, fetch) {
+export async function sendToSer(arg = {}, queId = "", me = 0, project = 0, isSer = false, fetch, options = {}) {
   /** @type {{ isSer: boolean; data: { arg: Record<string, any>; queId: string } }} */
   let datau = { isSer: isSer, data: { arg, queId } }
   console.log("Sending to server:", isSer);
-  
+
   /** @type {any} */
   let da = []
-  
+
   await fetch("/api/send", {
     method: 'POST',
     headers: {
@@ -66,7 +66,7 @@ export async function sendToSer(arg = {}, queId = "", me = 0, project = 0, isSer
   })
     .then(async (res) => {
       if (res.status === 401) {
-        if (typeof window !== 'undefined') {
+        if (!options.silent && typeof window !== 'undefined') {
           console.warn('Unauthorized (401), redirecting to login...');
           window.location.href = '/login';
         }

@@ -92,7 +92,6 @@
     trans = $state(false);
 
   import { Head } from 'svead';
-  import { sendToSer } from '$lib/send/sendToSer.js';
   import { onMount } from 'svelte';
 
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`;
@@ -113,52 +112,17 @@
     height: h
   });
 
-  // פונקציה לטעינת נתוני הסטטיסטיקות
   async function loadStats() {
     try {
-      const projectsResult = await sendToSer(
-        {},
-        '66getProjectsCount',
-        0,
-        0,
-        true,
-        fetch
-      );
-
-      const membersResult = await sendToSer(
-        {},
-        '67getMembersCount',
-        0,
-        0,
-        true,
-        fetch
-      );
-      const usersResult = await sendToSer(
-        {},
-        '89getUsersCount',
-        0,
-        0,
-        true,
-        fetch
-      );
-
-      if (projectsResult?.data?.projects?.meta?.pagination?.total) {
-        projectsCount = projectsResult.data.projects.meta.pagination.total;
-      }
-
-      if (membersResult?.data?.chezins?.meta?.pagination?.total) {
-        membersCount = membersResult.data.chezins.meta.pagination.total;
-      }
-
-      if (usersResult?.data?.usersPermissionsUsers?.meta?.pagination?.total) {
-        usersCount =
-          usersResult.data.usersPermissionsUsers.meta.pagination.total;
-      }
-      // TODO: עדכן משתנה agreementCount כשהשאילתה תהיה מוכנה
-
+      const res = await fetch('/api/stat');
+      if (!res.ok) throw new Error('stat fetch failed');
+      const data = await res.json();
+      projectsCount = data.projects ?? 0;
+      membersCount  = data.members  ?? 0;
+      usersCount    = data.users    ?? 0;
       statsLoaded = true;
-    } catch (error) {
-      console.error('Error loading stats:', error);
+    } catch (e) {
+      console.error('Error loading stats:', e);
       statsLoaded = true;
     }
   }
