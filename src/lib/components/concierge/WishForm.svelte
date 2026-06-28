@@ -779,19 +779,23 @@
       >
     </nav>
     <div class="hdr-right">
-      <button class="notif-btn" aria-label="התראות"
-        >🔔<span class="notif-pip"></span></button
-      >
-      <button
-        class="av-btn"
-        onclick={(e) => (anon ? navGuard(e, '/me', 'הפרופיל שלי') : goto('/me'))}
-      >
-        {#if $uPic}
-          <img src={$uPic} alt="פרופיל" class="av-img" />
-        {:else}
-          {getUserInitials(data.un)}
-        {/if}
-      </button>
+      {#if anon}
+        <button
+          class="hdr-register"
+          onclick={() => gotoRegister('/concierge/new')}>הרשמה</button
+        >
+      {:else}
+        <button class="notif-btn" aria-label="התראות"
+          >🔔<span class="notif-pip"></span></button
+        >
+        <button class="av-btn" onclick={() => goto('/me')}>
+          {#if $uPic}
+            <img src={$uPic} alt="פרופיל" class="av-img" />
+          {:else}
+            {getUserInitials(data.un)}
+          {/if}
+        </button>
+      {/if}
     </div>
   </header>
 
@@ -824,7 +828,10 @@
             {#if i < STEPS.length - 1}<span class="step-sep"></span>{/if}
           {/each}
         </div>
-        <a href="/concierge" class="btn-ghost btn-xs"
+        <a
+          href="/concierge"
+          class="btn-ghost btn-xs"
+          onclick={(e) => navGuard(e, '/concierge', 'רשימת המשאלות שלי')}
           >⟵ חזרה לרשימת המשאלות שלי</a
         >
       </div>
@@ -1844,6 +1851,23 @@
     align-items: center;
     gap: 8px;
     flex-shrink: 0;
+  }
+  .hdr-register {
+    padding: 8px 18px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Sababa', 'Heebo', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: #fde68a;
+    background: linear-gradient(135deg, #c8155f, #ff4d9e);
+    box-shadow: 0 6px 20px rgba(200, 21, 95, 0.4);
+    white-space: nowrap;
+    transition: transform 0.2s;
+  }
+  .hdr-register:hover {
+    transform: translateY(-1px);
   }
   .notif-btn {
     position: relative;
