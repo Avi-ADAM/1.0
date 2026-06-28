@@ -1,5 +1,5 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import Chaticon from '../../../celim/chaticon.svelte';
   import tr from '$lib/translations/tr.json';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
@@ -187,16 +187,10 @@
     !siteShare
       ? ''
       : siteShare.confirmed
-        ? $lang === 'he'
-          ? 'שולם'
-          : 'Paid'
+        ? $t('lev.haluka.table.paid')
         : siteShare.senderconf
-          ? $lang === 'he'
-            ? 'נשלח'
-            : 'Sent'
-          : $lang === 'he'
-            ? 'ממתין'
-            : 'Pending'
+          ? $t('lev.haluka.table.sent')
+          : $t('lev.haluka.table.pending')
   );
 
   // ── M2.4: per-member personal site-share (gate 2 — the approving member
@@ -421,7 +415,7 @@
                 <div
                   class="bg-white dark:bg-gray-800 border dark:border-gray-600 rounded-lg p-2"
                 >
-                  <div class="text-gray-500 dark:text-gray-400">מגיע:</div>
+                  <div class="text-gray-500 dark:text-gray-400">{$t('lev.haluka.table.due')}:</div>
                   <div class="font-semibold text-barbi dark:text-pink-400">
                     {user.x.toFixed(2)}
                   </div>
@@ -429,7 +423,7 @@
                 <div
                   class="bg-white dark:bg-gray-800 border dark:border-gray-600 rounded-lg p-2"
                 >
-                  <div class="text-gray-500 dark:text-gray-400">בפועל:</div>
+                  <div class="text-gray-500 dark:text-gray-400">{$t('lev.haluka.table.actual')}:</div>
                   <div class="font-semibold text-green-600 dark:text-green-400">
                     {user.ihave.toFixed(2)}
                   </div>
@@ -438,7 +432,7 @@
                   <div
                     class="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/50 rounded-lg p-2"
                   >
-                    <div class="text-gray-500 dark:text-gray-400">נותן:</div>
+                    <div class="text-gray-500 dark:text-gray-400">{$t('lev.haluka.table.giving')}:</div>
                     <div class="font-semibold text-red-600 dark:text-red-400">
                       {user.noten.toFixed(2)}
                     </div>
@@ -448,7 +442,7 @@
                   <div
                     class="bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800/50 rounded-lg p-2"
                   >
-                    <div class="text-gray-500 dark:text-gray-400">מקבל:</div>
+                    <div class="text-gray-500 dark:text-gray-400">{$t('lev.haluka.table.receiving')}:</div>
                     <div
                       class="font-semibold text-green-600 dark:text-green-400"
                     >
@@ -462,7 +456,7 @@
                   class="mt-3 pt-2 border-t border-gray-200 dark:border-gray-700"
                 >
                   <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                    העברות:
+                    {$t('lev.haluka.table.transfers')}:
                   </div>
                   <div class="space-y-1.5">
                     {#each user.le as transfer}
@@ -513,7 +507,7 @@
                   class="bg-white dark:bg-gray-800 border border-amber-200 dark:border-amber-700 rounded-lg p-2"
                 >
                   <div class="text-gray-500 dark:text-gray-400">
-                    {$lang === 'he' ? 'חלק האתר:' : 'Site share:'}
+                    {$t('lev.haluka.table.siteShare')}:
                   </div>
                   <div class="font-semibold text-amber-700 dark:text-amber-300">
                     {siteShareAmount.toFixed(2)}
@@ -523,7 +517,7 @@
                   class="bg-white dark:bg-gray-800 border border-amber-200 dark:border-amber-700 rounded-lg p-2"
                 >
                   <div class="text-gray-500 dark:text-gray-400">
-                    {$lang === 'he' ? 'סטטוס:' : 'Status:'}
+                    {$t('lev.haluka.table.status')}:
                   </div>
                   <div class="font-semibold text-amber-700 dark:text-amber-300">
                     {siteShareStatus}
@@ -541,12 +535,12 @@
           <table class="w-full text-center border-collapse text-sm">
             <thead>
               <tr class="bg-gradient-to-br from-barbi to-mpink text-gold">
-                <th class="p-3 font-semibold">שם</th>
-                <th class="p-3 font-semibold">מגיע</th>
-                <th class="p-3 font-semibold">בפועל</th>
-                <th class="p-3 font-semibold">נותן</th>
-                <th class="p-3 font-semibold">מקבל</th>
-                <th class="p-3 font-semibold">העברות</th>
+                <th class="p-3 font-semibold">{$t('lev.haluka.table.name')}</th>
+                <th class="p-3 font-semibold">{$t('lev.haluka.table.due')}</th>
+                <th class="p-3 font-semibold">{$t('lev.haluka.table.actual')}</th>
+                <th class="p-3 font-semibold">{$t('lev.haluka.table.giving')}</th>
+                <th class="p-3 font-semibold">{$t('lev.haluka.table.receiving')}</th>
+                <th class="p-3 font-semibold">{$t('lev.haluka.table.transfers')}</th>
               </tr>
             </thead>
             <tbody
@@ -659,15 +653,9 @@
       <div
         class="mt-2 flex items-center justify-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 px-3 py-2 text-xs font-semibold text-amber-700 dark:text-amber-300"
       >
-        {#if $lang === 'he'}
-          <span>חברי הרקמה נתנו עד כה {aggregate.sum.toFixed(2)} ל‑1💗1</span>
-          <span class="opacity-70">·</span>
-          <span>{aggregate.decidedCount}/{ssMemberCount} החליטו</span>
-        {:else}
-          <span>Members gave {aggregate.sum.toFixed(2)} to 1💗1 so far</span>
-          <span class="opacity-70">·</span>
-          <span>{aggregate.decidedCount}/{ssMemberCount} decided</span>
-        {/if}
+        <span>{$t('lev.haluka.table.membersGave')} {aggregate.sum.toFixed(2)} {$t('lev.haluka.table.to1lev1')}</span>
+        <span class="opacity-70">·</span>
+        <span>{aggregate.decidedCount}/{ssMemberCount} {$t('lev.haluka.table.decided')}</span>
       </div>
     {/if}
 

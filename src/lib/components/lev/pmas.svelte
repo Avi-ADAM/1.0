@@ -19,6 +19,7 @@
   import { t } from '$lib/translations';
   import Cards from './cards/pma.svelte';
   import { nowId } from '$lib/stores/pendMisMes';
+  import { forumStore } from '$lib/stores/forumStore';
   import { toast } from 'svelte-sonner';
   /**
    * @typedef {Object} Props
@@ -128,12 +129,65 @@
   let why = '';
   let isOpen = $state(false);
   let loading = $state(false);
-  function tochat() {
+  // Realtime chat forum for this resource vote (replaces the old `diun` store).
+  let forumId = $state(null);
+  let chatm = $state(false);
+
+  async function tochat() {
     no = false;
     masa = false;
-    diunm = true;
+    diunm = false;
     loading = false;
+    chatm = true;
     isOpen = true;
+    if (!forumId) {
+      try {
+        const result = await executeAction('ensureVoteForum', {
+          entityType: 'pmash',
+          entityId: String(pendId),
+          projectId: String(projectId)
+        });
+        if (result.success) forumId = result.data?.forumId ?? null;
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    if (forumId) forumStore.initForum(String(forumId), page.data.id);
+  }
+
+  // Persist a chat message to the forum. The Diun component has already added an
+  // optimistic (pending) bubble via forumStore; here we save it and reconcile
+  // with the real message id. Other participants receive it over the socket.
+  async function sendForumMessage(event) {
+    const message = event?.why?.trim();
+    if (!message || !forumId) return;
+    try {
+      const result = await executeAction('createChatMessage', {
+        forumId: String(forumId),
+        message
+      });
+      if (result.success && result.data) {
+        let picLink =
+          'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
+        try {
+          if (typeof localStorage !== 'undefined' && localStorage.getItem('picLink')) {
+            picLink = JSON.parse(localStorage.getItem('picLink'));
+          }
+        } catch (e) {}
+        forumStore.addMessage(String(forumId), {
+          id: result.data.messageId,
+          message,
+          username: page.data.un || 'You',
+          pic: picLink,
+          timestamp: new Date().toISOString(),
+          sentByMe: true,
+          pending: false
+        });
+      }
+    } catch (e) {
+      console.log(e);
+      toast.warning($t('lev.pmas.error'));
+    }
   }
 
   function percentage(partialValue, totalValue) {
@@ -314,6 +368,7 @@
     masa = false;
     allr = false;
     rect = false;
+    chatm = false;
   };
 
   function afternego(event) {
@@ -580,6 +635,22 @@ diunim = ` ${diu},`
             {acts}
             {location}
             {restime}
+          />
+        {:else if chatm === true}
+          <Diun
+            onRect={sendForumMessage}
+            bind:clicked
+            rect={true}
+            rikmaName={projectName}
+            smalldes={name}
+            nameChatPartner={`הצבעה על ${name}`}
+            nameMe={page.data.un || 'Me'}
+            {mypos}
+            pendId={forumId}
+            profilePicChatPartner={src}
+            ani={forumId ? 'new-forum' : 'pmashes'}
+            messages={forumId ? $forumStore[forumId]?.messages || [] : []}
+            isLoading={forumId ? $forumStore[forumId]?.loading || false : false}
           />
         {:else if diunm === true}
           <Diun

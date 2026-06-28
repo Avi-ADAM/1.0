@@ -82,7 +82,22 @@
       "showResourceInvestment": "הצגת הצעות להשקעת משאבים ברקמות בלבד",
       "showResourceVotes": "הצגת הצבעות על בקשת משאבים לרקמות בלבד",
       "showJoinAndInvest": "הצגת בקשות להצטרפות ולהשקעת משאבים ברקמות בלבד",
-      "showMyPurchases": "הצגת הקניות שלי בלבד"
+      "showMyPurchases": "הצגת הקניות שלי בלבד",
+      "items": {
+        "fiap": "אשרורי סיום ({{count}})",
+        "sugg": "הצעות למשימות ({{count}})",
+        "pend": "משימות בתהליך אישור ({{count}})",
+        "asks": "אישורי השמה למשימות ({{count}})",
+        "betaha": "משימות בביצוע ({{count}})",
+        "desi": "החלטות כלליות ({{count}})",
+        "ppmash": "משאבים בתהליך אישור ({{count}})",
+        "pmashs": "הצעות לשיתוף משאבים ({{count}})",
+        "pmaap": "אשרור קבלת משאבים ({{count}})",
+        "askmap": "אשרור השמה למשאבים ({{count}})",
+        "hachla": "אשרורים כלליים ({{count}})",
+        "sheirutp": "בקשות שירות ({{count}})",
+        "purchases": "קניות שלי ({{count}})"
+      }
     },
     "voteCard": {
       "neged": "נדרש בירור",
@@ -142,7 +157,23 @@
   },
   "haluka": {
     "successMessage": "החלוקה אושרה בהצלחה! 🎉",
-    "errorMessage": "שגיאה באישור החלוקה. נסה שוב."
+    "errorMessage": "שגיאה באישור החלוקה. נסה שוב.",
+    "table": {
+      "name": "שם",
+      "due": "מגיע",
+      "actual": "בפועל",
+      "giving": "נותן",
+      "receiving": "מקבל",
+      "transfers": "העברות",
+      "siteShare": "חלק האתר",
+      "status": "סטטוס",
+      "paid": "שולם",
+      "sent": "נשלח",
+      "pending": "ממתין",
+      "membersGave": "חברי הרקמה נתנו עד כה",
+      "decided": "החליטו",
+      "to1lev1": "ל‑1💗1"
+    }
   },
   "reqtom": {
     "voteTitle": "הצבעה על בקשה לשיתוף משאב והצטרפות לרקמה",

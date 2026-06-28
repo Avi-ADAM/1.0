@@ -2792,23 +2792,24 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
   }`,
 
   // ── Decision (project vote) ────────────────────────────────────────────────
-  '159getDecisionForVote': `query GetDecisionForVote($id: ID!) {
-    decision(id: $id) {
+  '159getDecisionForVote': `query GetDecisionForVote($eid: ID!) {
+    decision(id: $eid) {
       data {
         id
         attributes {
           kind
           archived
-          newpic { data { id } }
-          timegrama { data { id } }
+          projects { data { id } }
+          newpic { data { id attributes { url } } }
+          timegrama { data { id attributes { date } } }
           newname
           newpubdes
           newprides
           newFlink
           newWlink
           timtoM
-          valluesadd { data { id } }
-          valluesles { data { id } }
+          valluesadd { data { id attributes { valueName } } }
+          valluesles { data { id attributes { valueName } } }
           vots {
             id
             what
@@ -8690,6 +8691,9 @@ export const moachQids = {
           tosplits(filters: { finished: { eq: false } }) {
             data { id attributes { name vots { what why users_permissions_user { data { id attributes { username } } } } } }
           }
+          decisions(filters: { archived: { eq: false } }) {
+            data { id attributes { kind newname vots { what users_permissions_user { data { id } } } } }
+          }
           open_missions(filters: { archived: { eq: false } }) {
             data {
               id
@@ -8698,6 +8702,18 @@ export const moachQids = {
                 asks(filters: { archived: { eq: false } }) {
                   data { id attributes { vots { what why users_permissions_user { data { id attributes { username } } } } } }
                 }
+              }
+            }
+          }
+          askms(filters: { archived: { eq: false } }) {
+            data {
+              id
+              attributes {
+                vots { what why users_permissions_user { data { id } } }
+                pmash { data { attributes { name } } }
+                open_mashaabim { data { attributes { name } } }
+                users_permissions_user { data { id attributes { username } } }
+                sp { data { attributes { users_permissions_user { data { attributes { username } } } } } }
               }
             }
           }
@@ -8715,6 +8731,11 @@ export const moachQids = {
           pmashes(filters: { archived: { eq: false } }) { data { id } }
           pendms(filters: { archived: { eq: false } }) { data { id } }
           tosplits(filters: { finished: { eq: false } }) { data { id } }
+          decisions(filters: { archived: { eq: false } }) { data { id } }
+          askms(filters: { archived: { eq: false } }) { data { id } }
+          open_missions(filters: { archived: { eq: false } }) {
+            data { id attributes { asks(filters: { archived: { eq: false } }) { data { id } } } }
+          }
         }
       }
     }
@@ -8775,6 +8796,132 @@ export const moachQids = {
           timegrama { data { id attributes { date } } }
           diun { what why order id zman users_permissions_user { data { id } } }
           users { what order why id users_permissions_user { data { id } } }
+        }
+      }
+    }
+  }`,
+  // Join request (candidate → open_mission). Field selection mirrors the lev
+  // `asks` block so extractAsked/processAsked consume it unchanged. Renders via
+  // Reqtojoin. project{id} is for the cross-project guard.
+  'getAskForVote': `query GetAskForVote($eid: ID!) {
+    ask(id: $eid) {
+      data {
+        id
+        attributes {
+          project { data { id } }
+          vots { what why zman order id users_permissions_user { data { id } } }
+          timegrama { data { id attributes { date done } } }
+          negopendmissions(sort: "ordern:desc") {
+            data { id attributes { ordern proposedBy status name descrip hearotMeyuchadot noofhours perhour date dates createdAt } }
+          }
+          createdAt
+          chat { why id ide what zman users_permissions_user { data { id } } }
+          forums { data { id attributes { messages(pagination: { limit: 100 }) { data { id attributes { content createdAt users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } } } } } } }
+          open_mission {
+            data { id attributes {
+              acts { data { id attributes { shem link des dateF dateS } } }
+              mission { data { id } }
+              negopendmissions(sort: "ordern:desc") {
+                data { id attributes {
+                  name hearotMeyuchadot descrip createdAt ordern proposedBy noofhours perhour isOriginal date dates isMonth
+                  users_permissions_user { data { id attributes { username } } }
+                  skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
+                  tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+                  work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
+                  acts { data { id attributes { shem link des dateF dateS } } }
+                } }
+              }
+              declined { data { id } }
+              iskvua isRishon sqadualed dates publicklinks
+              skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
+              work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
+              tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+              noofhours perhour privatlinks descrip hearotMeyuchadot name
+            } }
+          }
+          users_permissions_user {
+            data { id attributes {
+              username
+              skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
+              work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
+              tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+              email
+              profilePic { data { attributes { url formats } } }
+            } }
+          }
+        }
+      }
+    }
+  }`,
+  // Resource join request (candidate/self → open_mashaabim/pmash). Mirrors the
+  // lev `askms` block so extractAskedResources/processAskedResources consume it
+  // unchanged. Renders via Reqtom. project{id} added for the cross-project guard.
+  'getAskmForVote': `query GetAskmForVote($eid: ID!) {
+    askm(id: $eid) {
+      data {
+        id
+        attributes {
+          project { data { id } }
+          isSelfProposal
+          pendingMainVote
+          vots { what zman why id users_permissions_user { data { id } } }
+          timegrama { data { id attributes { date done } } }
+          nego_mashes(sort: "ordern:desc") {
+            data { id attributes { ordern proposedBy status name descrip spnot easy hm price kindOf sqadualed sqadualedf linkto } }
+          }
+          createdAt
+          chat { why ide what zman id users_permissions_user { data { id } } }
+          users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+          open_mashaabim { data { id attributes { price descrip spnot kindOf sqadualedf sqadualed linkto createdAt hm name easy recurring cycleSize } } }
+          pmash { data { id attributes { name descrip spnot price easy hm kindOf sqadualed sqadualedf recurring cycleSize } } }
+          sp { data { id attributes { name descrip price myp spnot users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } } } } }
+        }
+      }
+    }
+  }`,
+
+  // Tosplit (haluka) vote page — single focused split. Fields mirror what
+  // extractHalukas + processHalukas need; project{id} is for the cross-project guard.
+  'getTosplitForVote': `query GetTosplitForVote($eid: ID!) {
+    tosplit(id: $eid) {
+      data {
+        id
+        attributes {
+          project { data { id } }
+          name
+          createdAt
+          vots { what why ide order users_permissions_user { data { id } } }
+          hervachti {
+            users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            amount
+            mekabel
+            noten
+          }
+          halukas {
+            data {
+              id
+              attributes {
+                amount
+                senderconf
+                confirmed
+                usersend { data { id attributes { username } } }
+                userrecive { data { id attributes { username } } }
+              }
+            }
+          }
+          siteShareHalukas {
+            data {
+              id
+              attributes {
+                amount
+                proposedAmount
+                senderconf
+                confirmed
+                adjustDirection
+                adjustReason
+              }
+            }
+          }
         }
       }
     }

@@ -93,7 +93,9 @@
       "Bash(npm run *)",
       "Bash(openssl s_client -servername tovmeod.1lev1.com -connect tovmeod.1lev1.com:443)",
       "Bash(openssl x509 *)",
-      "Bash(ssh *)"
+      "Bash(ssh *)",
+      "Bash(git show *)",
+      "Bash(ls src/lib/stores/forumStore.js)"
     ],
     "additionalDirectories": [
       "c:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\deals\\request",

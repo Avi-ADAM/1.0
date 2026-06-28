@@ -34,10 +34,18 @@
     try {
       const res = await sendToSer({ pid: projectId }, 'getOpenVoteCounts', null, null, false, fetch);
       const a = res?.data?.project?.data?.attributes;
+      // asks are nested per open_mission → sum across them.
+      const askCount = (a?.open_missions?.data ?? []).reduce(
+        (s, m) => s + (m?.attributes?.asks?.data?.length ?? 0),
+        0
+      );
       voteCount =
         (a?.pmashes?.data?.length ?? 0) +
         (a?.pendms?.data?.length ?? 0) +
-        (a?.tosplits?.data?.length ?? 0);
+        (a?.tosplits?.data?.length ?? 0) +
+        (a?.decisions?.data?.length ?? 0) +
+        (a?.askms?.data?.length ?? 0) +
+        askCount;
     } catch (e) {
       console.error('[MoachLayout] vote count failed', e);
     }
