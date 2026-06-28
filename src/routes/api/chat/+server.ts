@@ -60,6 +60,13 @@ export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
     if (!userId) {
       // ── Unregistered user → direct agent ──
       console.log('🔓 Unregistered user detected, using nonreg-bot');
+      global.botContext = {
+        fetchInstance: fetch,
+        userId: 'anonymous',
+        isInternalBot: false,
+        currentPath,
+        lang,
+      };
       const nonregAgent = createUnregisteredBotAgent(GEMINI_API_KEY, lang);
 
       const agentMessages = [];
@@ -120,6 +127,7 @@ export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
       if (components.length > 0) response.components = components;
 
       console.log('📤 Nonreg bot response: reply=', result.text?.slice(0, 80));
+      if (global.botContext) delete (global as any).botContext;
       return json(response, { headers: corsHeaders });
     }
 
@@ -128,7 +136,8 @@ export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
       fetchInstance: fetch,
       userId: userId?.toString() || 'anonymous',
       isInternalBot: true, // JWT-authenticated session
-      currentPath
+      currentPath,
+      lang,
     };
 
     console.log('🚀 Executing Mastra workflow for rich chat');

@@ -5,6 +5,7 @@ import { getSitePagesTool } from '../tools/siteNavigationTool';
 import { delegateToAgentTool } from '../tools/delegateToAgentTool';
 import { getPageContextTool } from '../tools/pageContextTool';
 import { createProjectTool } from '../tools/createProjectTool';
+import { reportIssueTool } from '../tools/reportIssueTool';
 import { SITE_CONTEXT } from '../../lib/bot/context.js';
 
 export function createGeneralHelpAgent(apiKey: string, language: string = 'he') {
@@ -37,6 +38,7 @@ ${SITE_CONTEXT}
 - getPageContextTool: לקבלת מידע ספציפי על העמוד הנוכחי שהמשתמש נמצא בו, כולל פעולות אפשריות ותיאור העמוד
 - createProjectTool: ליצירת פרויקטים חדשים באמצעות קישור יצירת פרויקט מוגדר
 - delegateToAgentTool: להעברת בקשות לסוכנים מתמחים (טיימר או ניווט) כאשר המשתמש זקוק לפונקציונליות ספציפית
+- reportIssueTool: לדיווח על תקלות, הצעת פיצ'רים, פנייה לצוות האתר או פנייה לשותפות
 
 אתה יכול לעזור עם:
 - הסברים על איך להשתמש בטיימרים ובלוח השנה
@@ -47,11 +49,13 @@ ${SITE_CONTEXT}
 - שאלות כלליות על הפונקציונליות והחזון של האתר
 - הדרכה בסיסית לשימוש בפלטפורמה
 - הסברים ספציפיים על העמוד הנוכחי באמצעות הכלי getPageContextTool
+- דיווח על תקלות, הצעת פיצ'רים, פנייה לשותפות ויצירת קשר עם הצוות
 
 כאשר המשתמש מבקש לבצע פעולות ספציפיות, השתמש בכלי delegateToAgentTool:
 - לפעולות טיימר (הפעלה, עצירה, יצירת טיימרים חדשים) - השתמש עם agentType: 'timer'
 - לפעולות ניווט (מעבר לעמודים ספציפיים) - השתמש עם agentType: 'navigation'
 - כאשר המשתמש רוצה ליצור פרויקט או ריקמה חדשה, השתמש ב-createProjectTool כדי לספק קישור ליצירת הפרויקט
+- כאשר המשתמש רוצה לדווח על תקלה, להציע פיצ'ר, לפנות לצוות או לבצע פנייה לשותפות - השתמש ב-reportIssueTool
 
 הערה חשובה: פעולות טיימר זמינות רק למשתמשים רשומים. אם המשתמש לא רשום ומבקש פעולת טיימר, הכלי יחזיר הודעת שגיאה מתאימה.
 
@@ -71,6 +75,7 @@ Your tools:
 - getPageContextTool: To get specific information about the current page the user is on, including possible actions and page description
 - delegateToAgentTool: To delegate requests to specialized agents (timer or navigation) when the user needs specific functionality
 - createProjectTool: To create new projects by generating a project creation URL
+- reportIssueTool: To report bugs, suggest features, submit partnership inquiries, or contact the site team
 
 You can help with:
 - Explanations on how to use timers and calendar
@@ -81,11 +86,13 @@ You can help with:
 - General questions about functionality and the site's vision
 - Basic guidance for using the platform
 - Specific explanations about the current page using the getPageContextTool
+- Reporting bugs, suggesting features, partnership inquiries, and contacting the team
 
 When the user requests specific actions:
 - For timer operations (start, stop, create new timers) - use delegateToAgentTool with agentType: 'timer'
 - For navigation operations (go to specific pages) - use delegateToAgentTool with agentType: 'navigation'
 - When the user wants to create a new project or tissue, use createProjectTool to provide a link to create the project
+- When the user reports a bug, suggests a feature, inquires about a partnership, or wants to contact the team - use reportIssueTool
 
 Important note: Timer operations are only available to registered users. If the user is not registered and requests timer operations, the tool will return an appropriate error message.
 
@@ -104,7 +111,8 @@ Always be helpful and friendly, and provide comprehensive answers based on the a
 			getSitePagesTool,
 			delegateToAgentTool,
 			getPageContextTool,
-			createProjectTool
+			createProjectTool,
+			reportIssueTool,
 		}
 	});
 }

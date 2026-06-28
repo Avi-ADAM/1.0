@@ -41,6 +41,8 @@ export interface McpContext {
   intent?: any;
   /** Optional: current page path the user is on */
   currentPath?: string;
+  /** Optional: user language (he/en/ar/ru) */
+  lang?: string;
 }
 
 // Node.js global augmentation so TypeScript is happy

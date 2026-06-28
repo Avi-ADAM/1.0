@@ -2,7 +2,7 @@
   "title": "Bot",
   "timerTitle": "Help & actions Bot",
   "welcomeTitle": "Welcome to 1💗1",
-  "initialMessage": "Ask me anything about the site!",
+  "initialMessage": "Ask me anything about the site! I can also help you report bugs, suggest features, submit a partnership inquiry, or contact the team.",
   "errorMessage": "Sorry, something went wrong.",
   "timerPlaceholder": "Start or stop a timer...",
   "questionPlaceholder": "Ask a question...",
@@ -54,5 +54,12 @@
   "chatQuickSuggestionsTitle": "Quick Suggestions",
   "chatInputPlaceholder": "Ask a question, request info, suggest an action...",
   "chatSendAriaLabel": "Send",
-  "chatFooterHint": "Mastra AI · Smart Agent · Enter to send"
+  "chatFooterHint": "Mastra AI · Smart Agent · Enter to send",
+  "sugGuestReportBug": "Report a bug",
+  "sugGuestSuggestFeature": "Suggest a feature",
+  "sugGuestContactTeam": "Contact the team",
+  "sugUserReportBug": "Report a bug",
+  "reportSuccessMsg": "Your report was sent successfully! The team will get back to you soon.",
+  "reportErrorMsg": "Failed to send report. Please try again.",
+  "reportTypePrompt": "What type of report? (bug / feature / partnership / contact)"
 }

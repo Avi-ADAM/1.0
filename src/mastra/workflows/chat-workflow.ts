@@ -10,7 +10,7 @@ import {
 } from '../lib/agent-response';
 
 interface IntentResult {
-  type: 'timer' | 'navigation' | 'general';
+  type: 'timer' | 'navigation' | 'general' | 'report';
   confidence: number;
   details: {
     action?: string;
@@ -73,7 +73,7 @@ const analyzeIntent = createStep({
     fetchInstance: z.any().optional(),
     currentPath: z.string().optional(),
     intent: z.object({
-      type: z.enum(['timer', 'navigation', 'general']),
+      type: z.enum(['timer', 'navigation', 'general', 'report']),
       confidence: z.number(),
       details: intentDetailsSchema
     })
@@ -196,7 +196,7 @@ const routeToAgent = createStep({
     fetchInstance: z.any().optional(),
     currentPath: z.string().optional(),
     intent: z.object({
-      type: z.enum(['timer', 'navigation', 'general']),
+      type: z.enum(['timer', 'navigation', 'general', 'report']),
       confidence: z.number(),
       details: intentDetailsSchema
     })
@@ -205,7 +205,7 @@ const routeToAgent = createStep({
     agentResult: z.any(),
     agentType: z.string(),
     intent: z.object({
-      type: z.enum(['timer', 'navigation', 'general']),
+      type: z.enum(['timer', 'navigation', 'general', 'report']),
       confidence: z.number(),
       details: intentDetailsSchema
     })
@@ -251,6 +251,12 @@ const routeToAgent = createStep({
       case 'navigation':
         // Navigation is available for all users, but some pages require authentication
         agent = createNavigationAgent(apiKey, language, userId);
+        break;
+
+      case 'report':
+        // Report/contact — handled by the general help agent which has reportIssueTool
+        agent = createGeneralHelpAgent(apiKey, language);
+        agentType = 'report';
         break;
 
       default:
@@ -352,7 +358,7 @@ const processResponse = createStep({
     agentResult: z.any(),
     agentType: z.string(),
     intent: z.object({
-      type: z.enum(['timer', 'navigation', 'general']),
+      type: z.enum(['timer', 'navigation', 'general', 'report']),
       confidence: z.number(),
       details: intentDetailsSchema
     })

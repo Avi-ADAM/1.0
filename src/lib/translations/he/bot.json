@@ -2,7 +2,7 @@
   "title": "בוט",
   "timerTitle": "בוט לעזרה ופעולות באתר",
   "welcomeTitle": "ברוכים הבאים ל-1💗1",
-  "initialMessage": "שאלו אותי כל דבר על האתר!",
+  "initialMessage": "שאלו אותי כל דבר על האתר! בנוסף, אני יכול לעזור לכם לדווח על תקלות, להציע פיצ'רים, לשלוח פנייה לשותפות או ליצור קשר עם הצוות.",
   "errorMessage": "מצטערים, משהו השתבש.",
   "timerPlaceholder": "התחלת או הפסקת טיימר או ניווט לדף אחר באתר...",
   "questionPlaceholder": "שאלת שאלה...",
@@ -54,5 +54,12 @@
   "chatQuickSuggestionsTitle": "הצעות מהירות",
   "chatInputPlaceholder": "שאלת שאלה, בקשת מידע, הצעת פעולה...",
   "chatSendAriaLabel": "שליחה",
-  "chatFooterHint": "Mastra AI · סוכן חכם · Enter לשליחה"
+  "chatFooterHint": "Mastra AI · סוכן חכם · Enter לשליחה",
+  "sugGuestReportBug": "דיווח על תקלה",
+  "sugGuestSuggestFeature": "הצעת פיצ'ר חדש",
+  "sugGuestContactTeam": "פנייה לצוות",
+  "sugUserReportBug": "דיווח על תקלה",
+  "reportSuccessMsg": "הפנייה נשלחה בהצלחה! הצוות יחזור אליך בהקדם.",
+  "reportErrorMsg": "אירעה שגיאה בשליחת הפנייה. נסה שנית.",
+  "reportTypePrompt": "מה סוג הפנייה? (תקלה / פיצ'ר / שותפות / יצירת קשר)"
 }

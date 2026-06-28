@@ -84,6 +84,16 @@
     el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
+  // ביקוש‑תחילה: הלקוחה כותבת משאלה ב‑/wish/new הציבורי (ללא login),
+  // ורק הספק — שחייב חשבון כדי להציע — מופנה להרשמה (לא לקיר ה‑login).
+  // `from` שומר את היעד כדי שנוכל להחזיר אותו אליו אחרי ההרשמה.
+  function gotoRegister(from) {
+    const reg =
+      $locale == 'he' ? '/hascama' : $locale == 'ar' ? '/aitifaqia' : '/convention';
+    goto(from ? `${reg}?from=${encodeURIComponent(from)}` : reg);
+    fi = true;
+  }
+
   let loading = $state(false),
     loadinga = $state(false),
     w = $state(0),
@@ -678,7 +688,7 @@
               </p>
               <button
                 class="bg-barbi hover:bg-white hover:text-barbi text-gold font-semibold text-lg sm:text-base px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:scale-105"
-                onclick={() => goto('/concierge/new')}
+                onclick={() => goto('/wish/new')}
               >
                 {$t('home.concierge.customerCta')}
               </button>
@@ -694,7 +704,7 @@
               </p>
               <button
                 class="bg-gold hover:bg-barbi hover:text-gold text-barbi font-semibold text-lg sm:text-base px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:scale-105"
-                onclick={() => goto('/concierge')}
+                onclick={() => gotoRegister('/concierge')}
               >
                 {$t('home.concierge.providerCta')}
               </button>

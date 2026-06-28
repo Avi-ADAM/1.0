@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-06-25
+> Last updated: 2026-06-28
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -23,7 +23,7 @@ import type { StrapiEntity, StrapiCollection, StrapiMedia } from '$lib/types/str
 
 ---
 
-## 🏗️ Content Type Entities (108)
+## 🏗️ Content Type Entities (109)
 
 These are the main content types in the Strapi backend.
 
@@ -975,6 +975,7 @@ These are the main content types in the Strapi backend.
 | `createSheirutpend` | `Maybe<SheirutpendEntityResponse>` |
 | `createSheirutpendLocalization` | `Maybe<SheirutpendEntityResponse>` |
 | `createSidur` | `Maybe<SidurEntityResponse>` |
+| `createSiteReport` | `Maybe<SiteReportEntityResponse>` |
 | `createSiteShareContribution` | `Maybe<SiteShareContributionEntityResponse>` |
 | `createSkill` | `Maybe<SkillEntityResponse>` |
 | `createSkillLocalization` | `Maybe<SkillEntityResponse>` |
@@ -1078,6 +1079,7 @@ These are the main content types in the Strapi backend.
 | `deleteSheirutnego` | `Maybe<SheirutnegoEntityResponse>` |
 | `deleteSheirutpend` | `Maybe<SheirutpendEntityResponse>` |
 | `deleteSidur` | `Maybe<SidurEntityResponse>` |
+| `deleteSiteReport` | `Maybe<SiteReportEntityResponse>` |
 | `deleteSiteShareContribution` | `Maybe<SiteShareContributionEntityResponse>` |
 | `deleteSkill` | `Maybe<SkillEntityResponse>` |
 | `deleteSolution` | `Maybe<SolutionEntityResponse>` |
@@ -1180,6 +1182,7 @@ These are the main content types in the Strapi backend.
 | `updateSheirutnego` | `Maybe<SheirutnegoEntityResponse>` |
 | `updateSheirutpend` | `Maybe<SheirutpendEntityResponse>` |
 | `updateSidur` | `Maybe<SidurEntityResponse>` |
+| `updateSiteReport` | `Maybe<SiteReportEntityResponse>` |
 | `updateSiteShareContribution` | `Maybe<SiteShareContributionEntityResponse>` |
 | `updateSkill` | `Maybe<SkillEntityResponse>` |
 | `updateSolution` | `Maybe<SolutionEntityResponse>` |
@@ -1867,6 +1870,8 @@ These are the main content types in the Strapi backend.
 | `sheiruts` | `Maybe<SheirutEntityResponseCollection>` |
 | `sidur` | `Maybe<SidurEntityResponse>` |
 | `sidurs` | `Maybe<SidurEntityResponseCollection>` |
+| `siteReport` | `Maybe<SiteReportEntityResponse>` |
+| `siteReports` | `Maybe<SiteReportEntityResponseCollection>` |
 | `siteShareContribution` | `Maybe<SiteShareContributionEntityResponse>` |
 | `siteShareContributions` | `Maybe<SiteShareContributionEntityResponseCollection>` |
 | `skill` | `Maybe<SkillEntityResponse>` |
@@ -2223,6 +2228,21 @@ These are the main content types in the Strapi backend.
 | `lemi` | `Maybe<Scalars['String']['output']>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
+
+### SiteReport
+| Field | Type |
+|-------|------|
+| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `description` | `Maybe<Scalars['String']['output']>` |
+| `lang` | `Maybe<Scalars['String']['output']>` |
+| `page` | `Maybe<Scalars['String']['output']>` |
+| `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `status` | `Maybe<Enum_Sitereport_Status>` |
+| `type` | `Maybe<Enum_Sitereport_Type>` |
+| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `userEmail` | `Maybe<Scalars['String']['output']>` |
+| `userId` | `Maybe<Scalars['String']['output']>` |
+| `userName` | `Maybe<Scalars['String']['output']>` |
 
 ### SiteShareContribution
 | Field | Type |
@@ -3682,7 +3702,7 @@ These are Strapi components (reusable field groups).
 
 ---
 
-## 📝 Input Types (106)
+## 📝 Input Types (107)
 
 Used for creating/updating content.
 
@@ -5359,6 +5379,19 @@ Used for creating/updating content.
 | `lemi` | `InputMaybe<Scalars['String']['input']>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 
+### SiteReportInput
+| Field | Type |
+|-------|------|
+| `description` | `InputMaybe<Scalars['String']['input']>` |
+| `lang` | `InputMaybe<Scalars['String']['input']>` |
+| `page` | `InputMaybe<Scalars['String']['input']>` |
+| `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `status` | `InputMaybe<Enum_Sitereport_Status>` |
+| `type` | `InputMaybe<Enum_Sitereport_Type>` |
+| `userEmail` | `InputMaybe<Scalars['String']['input']>` |
+| `userId` | `InputMaybe<Scalars['String']['input']>` |
+| `userName` | `InputMaybe<Scalars['String']['input']>` |
+
 ### SiteShareContributionInput
 | Field | Type |
 |-------|------|
@@ -5833,12 +5866,12 @@ Used for creating/updating content.
 
 ---
 
-## 🔍 Filter Input Types (95)
+## 🔍 Filter Input Types (96)
 
 Used for querying/filtering content. Each content type has a corresponding filter input.
 
 <details>
-<summary>Click to expand all 95 filter types</summary>
+<summary>Click to expand all 96 filter types</summary>
 
 #### ActFiltersInput
 Fields: `and`, `createdAt`, `dateF`, `dateS`, `des`, `forums`, `hashivut`, `id`, `isAssigned`, `link`, `locale`, `localizations`, `mesimabetahaliches`, `my`, `myIshur`, `naasa`, `negopendmissions`, `not`, `open_mission`, `or`, `partofs`, `pendm`, `project`, `publishedAt`, `shem`, `status`, `tafkidims`, `taskdis`, `timegrama`, `timers`, `updatedAt`, `userAndIshur`, `vali`, `valiIshur`
@@ -6059,6 +6092,9 @@ Fields: `and`, `appruved`, `archived`, `createdAt`, `finnishDate`, `forum`, `id`
 #### SidurFiltersInput
 Fields: `and`, `createdAt`, `id`, `lemi`, `not`, `or`, `publishedAt`, `updatedAt`
 
+#### SiteReportFiltersInput
+Fields: `and`, `createdAt`, `description`, `id`, `lang`, `not`, `or`, `page`, `publishedAt`, `status`, `type`, `updatedAt`, `userEmail`, `userId`, `userName`
+
 #### SiteShareContributionFiltersInput
 Fields: `amount`, `and`, `basisAmount`, `createdAt`, `des_status`, `direction`, `haluka`, `id`, `matbea`, `not`, `or`, `project`, `proposedAmount`, `publishedAt`, `reason`, `recive_project`, `sheirut`, `tosplit`, `updatedAt`, `users_permissions_user`
 
@@ -6129,12 +6165,12 @@ Fields: `allSubmited`, `and`, `createdAt`, `done`, `id`, `mesimabetahalich`, `no
 
 ---
 
-## 📦 Entity Response Types (371)
+## 📦 Entity Response Types (374)
 
 Wrapper types for GraphQL responses.
 
 <details>
-<summary>Click to expand all 371 response types</summary>
+<summary>Click to expand all 374 response types</summary>
 
 - **ActEntity**: `attributes: Maybe<Act>`, `id: Maybe<Scalars['ID']['output']>`
 - **ActEntityResponse**: `data: Maybe<ActEntity>`
@@ -6421,6 +6457,9 @@ Wrapper types for GraphQL responses.
 - **SidurEntity**: `attributes: Maybe<Sidur>`, `id: Maybe<Scalars['ID']['output']>`
 - **SidurEntityResponse**: `data: Maybe<SidurEntity>`
 - **SidurEntityResponseCollection**: `data: Array<SidurEntity>`, `meta: ResponseCollectionMeta`
+- **SiteReportEntity**: `attributes: Maybe<SiteReport>`, `id: Maybe<Scalars['ID']['output']>`
+- **SiteReportEntityResponse**: `data: Maybe<SiteReportEntity>`
+- **SiteReportEntityResponseCollection**: `data: Array<SiteReportEntity>`, `meta: ResponseCollectionMeta`
 - **SiteShareContributionEntity**: `attributes: Maybe<SiteShareContribution>`, `id: Maybe<Scalars['ID']['output']>`
 - **SiteShareContributionEntityResponse**: `data: Maybe<SiteShareContributionEntity>`
 - **SiteShareContributionEntityResponseCollection**: `data: Array<SiteShareContributionEntity>`, `meta: ResponseCollectionMeta`
@@ -6511,10 +6550,10 @@ Wrapper types for GraphQL responses.
 
 ---
 
-## 🔢 Enum Types (73)
+## 🔢 Enum Types (75)
 
 <details>
-<summary>Click to expand all 73 enum types</summary>
+<summary>Click to expand all 75 enum types</summary>
 
 - **Enum_Act_Hashivut**: 
 - **Enum_Argument_Authortype**: 
@@ -6578,6 +6617,8 @@ Wrapper types for GraphQL responses.
 - **Enum_Ratson_Willingnessmodel**: 
 - **Enum_Rikmash_Kindof**: 
 - **Enum_Sheirutfulfillment_Status_Process**: 
+- **Enum_Sitereport_Status**: 
+- **Enum_Sitereport_Type**: 
 - **Enum_Sitesharecontribution_Des_Status**: 
 - **Enum_Sitesharecontribution_Direction**: 
 - **Enum_Sp_Kindof**: 
@@ -6604,7 +6645,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 17518 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 17627 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

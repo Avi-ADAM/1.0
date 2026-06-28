@@ -26,10 +26,10 @@ const systemPrompt =
 
 החזר תמיד JSON בפורמט הבא:
 {
-  "type": "timer|navigation|general",
+  "type": "timer|navigation|general|report",
   "confidence": 0.0-1.0,
   "details": {
-    "action": "start|stop|pause|resume|create|delete|navigate|help|confirm|deny",
+    "action": "start|stop|pause|resume|create|delete|navigate|help|confirm|deny|bug|feature|partnership|contact",
     "target": "timer_name|page_name|null",
     "context": "additional_context"
   }
@@ -39,6 +39,7 @@ const systemPrompt =
 - timer: כל דבר הקשור לטיימרים (התחלה, עצירה, יצירה, מחיקה, אישור פעולות טיימר)
 - navigation: ניווט באתר (מעבר לדפים, חיפוש) - לא כולל יצירת תוכן חדש
 - general: עזרה כללית, שאלות, הסברים, ופעולות יצירה כמו יצירת פרויקטים חדשים
+- report: דיווח על תקלה/באג, הצעת פיצ'ר חדש, פנייה לשותפות, יצירת קשר עם צוות האתר
 
 **טיפול באישורים והכחשות:**
 - אם המשתמש אומר "כן", "תודה", "בסדר", "אישור" וכו' - בדוק את ההקשר הקודם
@@ -57,6 +58,10 @@ const systemPrompt =
 הודעה ללא הקשר: "תעביר אותי לדף הפרויקטים" -> {"type": "navigation", "confidence": 0.9, "details": {"action": "navigate", "target": "projects", "context": null}}
 הודעה ללא הקשר: "איך אני יוצר טיימר חדש?" -> {"type": "general", "confidence": 0.8, "details": {"action": "help", "target": null, "context": "timer_creation"}}
 הודעה ללא הקשר: "צור פרויקט חדש בשם 'אתר אינטרנט'" -> {"type": "general", "confidence": 0.9, "details": {"action": "create", "target": "project", "context": "create_new_project"}}
+הודעה ללא הקשר: "יש לי תקלה בדף ההצבעות" -> {"type": "report", "confidence": 0.95, "details": {"action": "bug", "target": null, "context": "bug_report"}}
+הודעה ללא הקשר: "אני רוצה להציע פיצ'ר חדש" -> {"type": "report", "confidence": 0.9, "details": {"action": "feature", "target": null, "context": "feature_request"}}
+הודעה ללא הקשר: "אני מעוניין בשותפות עם האתר" -> {"type": "report", "confidence": 0.9, "details": {"action": "partnership", "target": null, "context": "partnership_inquiry"}}
+הודעה ללא הקשר: "אני רוצה לפנות לצוות" -> {"type": "report", "confidence": 0.85, "details": {"action": "contact", "target": null, "context": "contact_team"}}
 
 **דוגמה לבקשת טיימר:**
 "הפעלת טיימר עבור בניית אתר מדהים ביופיו" -> {"type": "timer", "confidence": 0.95, "details": {"action": "start", "target": "בניית אתר מדהים ביופיו", "context": "start_timer_for_mission"}}
@@ -77,10 +82,10 @@ You are an intent analysis agent. Your task is to analyze the user's message and
 
 Always return JSON in this format:
 {
-  "type": "timer|navigation|general",
+  "type": "timer|navigation|general|report",
   "confidence": 0.0-1.0,
   "details": {
-    "action": "start|stop|pause|resume|create|delete|navigate|help|confirm|deny",
+    "action": "start|stop|pause|resume|create|delete|navigate|help|confirm|deny|bug|feature|partnership|contact",
     "target": "timer_name|page_name|null",
     "context": "additional_context"
   }
@@ -90,6 +95,7 @@ Intent types:
 - timer: Anything related to timers (start, stop, create, delete, confirming timer actions)
 - navigation: Site navigation (go to pages, search) - does not include creating new content
 - general: General help, questions, explanations, and creation actions like creating new projects
+- report: Reporting a bug/issue, suggesting a feature, partnership inquiry, or contacting the site team
 
 **Handling confirmations and denials:**
 - If user says "yes", "thanks", "ok", "confirm", etc. - check previous context
@@ -108,6 +114,10 @@ No context: "stop the timer" -> {"type": "timer", "confidence": 0.9, "details": 
 No context: "take me to projects page" -> {"type": "navigation", "confidence": 0.9, "details": {"action": "navigate", "target": "projects", "context": null}}
 No context: "how do I create a new timer?" -> {"type": "general", "confidence": 0.8, "details": {"action": "help", "target": null, "context": "timer_creation"}}
 No context: "create a new project called 'website'" -> {"type": "general", "confidence": 0.9, "details": {"action": "create", "target": "project", "context": "create_new_project"}}
+No context: "there's a bug on the voting page" -> {"type": "report", "confidence": 0.95, "details": {"action": "bug", "target": null, "context": "bug_report"}}
+No context: "I want to suggest a new feature" -> {"type": "report", "confidence": 0.9, "details": {"action": "feature", "target": null, "context": "feature_request"}}
+No context: "I'm interested in a partnership" -> {"type": "report", "confidence": 0.9, "details": {"action": "partnership", "target": null, "context": "partnership_inquiry"}}
+No context: "I want to contact the team" -> {"type": "report", "confidence": 0.85, "details": {"action": "contact", "target": null, "context": "contact_team"}}
 
 **Timer request example:**
 "start timer for building amazing website" -> {"type": "timer", "confidence": 0.95, "details": {"action": "start", "target": "building amazing website", "context": "start_timer_for_mission"}}

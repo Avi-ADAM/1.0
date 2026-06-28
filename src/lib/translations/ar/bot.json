@@ -2,7 +2,7 @@
   "title": "بوت",
   "timerTitle": "بوت المساعدة والعمليات في الموقع",
   "welcomeTitle": "مرحباً بكم في 1💗1",
-  "initialMessage": "اسألوني أي شيء عن الموقع!",
+  "initialMessage": "اسألوني أي شيء عن الموقع! يمكنني أيضاً مساعدتك في الإبلاغ عن الأخطاء، اقتراح ميزات، إرسال استفسار شراكة أو التواصل مع الفريق.",
   "errorMessage": "عذراً، حدث خطأ ما.",
   "timerPlaceholder": "ابدأ أو أوقف المؤقت أو انتقل إلى صفحة أخرى في الموقع...",
   "questionPlaceholder": "اطرح سؤالاً...",
@@ -54,5 +54,12 @@
   "chatQuickSuggestionsTitle": "اقتراحات سريعة",
   "chatInputPlaceholder": "اطرح سؤالاً، اطلب معلومات، اقترح إجراء...",
   "chatSendAriaLabel": "إرسال",
-  "chatFooterHint": "Mastra AI · وكيل ذكي · Enter للإرسال"
+  "chatFooterHint": "Mastra AI · وكيل ذكي · Enter للإرسال",
+  "sugGuestReportBug": "الإبلاغ عن خطأ",
+  "sugGuestSuggestFeature": "اقتراح ميزة",
+  "sugGuestContactTeam": "التواصل مع الفريق",
+  "sugUserReportBug": "الإبلاغ عن خطأ",
+  "reportSuccessMsg": "تم إرسال طلبك بنجاح! سيتواصل معك الفريق قريباً.",
+  "reportErrorMsg": "فشل إرسال الطلب. يرجى المحاولة مرة أخرى.",
+  "reportTypePrompt": "ما نوع الطلب؟ (خطأ / ميزة / شراكة / تواصل)"
 }

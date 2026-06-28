@@ -3077,6 +3077,19 @@ export enum Enum_Sheirutfulfillment_Status_Process {
   Pending = 'pending'
 }
 
+export enum Enum_Sitereport_Status {
+  InReview = 'in_review',
+  New = 'new',
+  Resolved = 'resolved'
+}
+
+export enum Enum_Sitereport_Type {
+  Bug = 'bug',
+  Contact = 'contact',
+  Feature = 'feature',
+  Partnership = 'partnership'
+}
+
 export enum Enum_Sitesharecontribution_Des_Status {
   Decided = 'decided',
   Pending = 'pending',
@@ -3772,7 +3785,7 @@ export type ForumRelationResponseCollection = {
   data: Array<ForumEntity>;
 };
 
-export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ContentReleasesRelease | ContentReleasesReleaseAction | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | Mesimabetahalich | Message | Mission | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | OpenMashaabim | OpenMission | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pmash | Position | Project | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | Richtext | Rikmash | Sale | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Sidur | SiteShareContribution | Skill | Solution | Sp | Tafkidim | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
+export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ContentReleasesRelease | ContentReleasesReleaseAction | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | Mesimabetahalich | Message | Mission | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | OpenMashaabim | OpenMission | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pmash | Position | Project | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | Richtext | Rikmash | Sale | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Sidur | SiteReport | SiteShareContribution | Skill | Solution | Sp | Tafkidim | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
 
 export type Haamada = {
   __typename?: 'Haamada';
@@ -6407,6 +6420,7 @@ export type Mutation = {
   createSheirutpend?: Maybe<SheirutpendEntityResponse>;
   createSheirutpendLocalization?: Maybe<SheirutpendEntityResponse>;
   createSidur?: Maybe<SidurEntityResponse>;
+  createSiteReport?: Maybe<SiteReportEntityResponse>;
   createSiteShareContribution?: Maybe<SiteShareContributionEntityResponse>;
   createSkill?: Maybe<SkillEntityResponse>;
   createSkillLocalization?: Maybe<SkillEntityResponse>;
@@ -6512,6 +6526,7 @@ export type Mutation = {
   deleteSheirutnego?: Maybe<SheirutnegoEntityResponse>;
   deleteSheirutpend?: Maybe<SheirutpendEntityResponse>;
   deleteSidur?: Maybe<SidurEntityResponse>;
+  deleteSiteReport?: Maybe<SiteReportEntityResponse>;
   deleteSiteShareContribution?: Maybe<SiteShareContributionEntityResponse>;
   deleteSkill?: Maybe<SkillEntityResponse>;
   deleteSolution?: Maybe<SolutionEntityResponse>;
@@ -6620,6 +6635,7 @@ export type Mutation = {
   updateSheirutnego?: Maybe<SheirutnegoEntityResponse>;
   updateSheirutpend?: Maybe<SheirutpendEntityResponse>;
   updateSidur?: Maybe<SidurEntityResponse>;
+  updateSiteReport?: Maybe<SiteReportEntityResponse>;
   updateSiteShareContribution?: Maybe<SiteShareContributionEntityResponse>;
   updateSkill?: Maybe<SkillEntityResponse>;
   updateSolution?: Maybe<SolutionEntityResponse>;
@@ -7191,6 +7207,11 @@ export type MutationCreateSidurArgs = {
 };
 
 
+export type MutationCreateSiteReportArgs = {
+  data: SiteReportInput;
+};
+
+
 export type MutationCreateSiteShareContributionArgs = {
   data: SiteShareContributionInput;
 };
@@ -7753,6 +7774,11 @@ export type MutationDeleteSheirutpendArgs = {
 
 
 export type MutationDeleteSidurArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteSiteReportArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -8372,6 +8398,12 @@ export type MutationUpdateSheirutpendArgs = {
 
 export type MutationUpdateSidurArgs = {
   data: SidurInput;
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateSiteReportArgs = {
+  data: SiteReportInput;
   id: Scalars['ID']['input'];
 };
 
@@ -11533,6 +11565,8 @@ export type Query = {
   sheiruts?: Maybe<SheirutEntityResponseCollection>;
   sidur?: Maybe<SidurEntityResponse>;
   sidurs?: Maybe<SidurEntityResponseCollection>;
+  siteReport?: Maybe<SiteReportEntityResponse>;
+  siteReports?: Maybe<SiteReportEntityResponseCollection>;
   siteShareContribution?: Maybe<SiteShareContributionEntityResponse>;
   siteShareContributions?: Maybe<SiteShareContributionEntityResponseCollection>;
   skill?: Maybe<SkillEntityResponse>;
@@ -12554,6 +12588,19 @@ export type QuerySidurArgs = {
 
 export type QuerySidursArgs = {
   filters?: InputMaybe<SidurFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type QuerySiteReportArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QuerySiteReportsArgs = {
+  filters?: InputMaybe<SiteReportFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
   publicationState?: InputMaybe<PublicationState>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -14492,6 +14539,68 @@ export type SidurFiltersInput = {
 export type SidurInput = {
   lemi?: InputMaybe<Scalars['String']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type SiteReport = {
+  __typename?: 'SiteReport';
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  lang?: Maybe<Scalars['String']['output']>;
+  page?: Maybe<Scalars['String']['output']>;
+  publishedAt?: Maybe<Scalars['DateTime']['output']>;
+  status?: Maybe<Enum_Sitereport_Status>;
+  type?: Maybe<Enum_Sitereport_Type>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  userEmail?: Maybe<Scalars['String']['output']>;
+  userId?: Maybe<Scalars['String']['output']>;
+  userName?: Maybe<Scalars['String']['output']>;
+};
+
+export type SiteReportEntity = {
+  __typename?: 'SiteReportEntity';
+  attributes?: Maybe<SiteReport>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type SiteReportEntityResponse = {
+  __typename?: 'SiteReportEntityResponse';
+  data?: Maybe<SiteReportEntity>;
+};
+
+export type SiteReportEntityResponseCollection = {
+  __typename?: 'SiteReportEntityResponseCollection';
+  data: Array<SiteReportEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type SiteReportFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<SiteReportFiltersInput>>>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  description?: InputMaybe<StringFilterInput>;
+  id?: InputMaybe<IdFilterInput>;
+  lang?: InputMaybe<StringFilterInput>;
+  not?: InputMaybe<SiteReportFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<SiteReportFiltersInput>>>;
+  page?: InputMaybe<StringFilterInput>;
+  publishedAt?: InputMaybe<DateTimeFilterInput>;
+  status?: InputMaybe<StringFilterInput>;
+  type?: InputMaybe<StringFilterInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+  userEmail?: InputMaybe<StringFilterInput>;
+  userId?: InputMaybe<StringFilterInput>;
+  userName?: InputMaybe<StringFilterInput>;
+};
+
+export type SiteReportInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  lang?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['String']['input']>;
+  publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  status?: InputMaybe<Enum_Sitereport_Status>;
+  type?: InputMaybe<Enum_Sitereport_Type>;
+  userEmail?: InputMaybe<Scalars['String']['input']>;
+  userId?: InputMaybe<Scalars['String']['input']>;
+  userName?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type SiteShareContribution = {
