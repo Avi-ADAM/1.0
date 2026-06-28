@@ -8,17 +8,25 @@ import type { PageServerLoad } from './$types';
 // no heavy lev-page payload.
 const QID: Record<string, string> = {
   pmash: 'getPmashForVote',
-  pendm: 'getPendmForVote'
+  pendm: 'getPendmForVote',
+  ask: 'getAskForVote',
+  askm: 'getAskmForVote',
+  tosplit: 'getTosplitForVote',
+  decision: '159getDecisionForVote'
 };
 const ROOT: Record<string, string> = {
   pmash: 'pmash',
-  pendm: 'pendm'
+  pendm: 'pendm',
+  ask: 'ask',
+  askm: 'askm',
+  tosplit: 'tosplit',
+  decision: 'decision'
 };
 
 export const load: PageServerLoad = async ({ params, fetch }) => {
   const { projectId, kind, id } = params as {
     projectId: string;
-    kind: 'pmash' | 'pendm';
+    kind: 'pmash' | 'pendm' | 'ask' | 'askm' | 'tosplit' | 'decision';
     id: string;
   };
 
@@ -27,12 +35,12 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
 
   if (!entity) throw error(404, 'Vote not found');
 
-  // Cross-project guard: the entity must belong to the project in the URL.
-  // Membership in that project is already enforced by the moach [projectId]
-  // +layout.server.ts, so we only need to prevent viewing a vote from another
-  // project by guessing its id.
+  // Cross-project guard: when the entity has a project relation set, it must
+  // match the URL. Older entities (created before the project field was added)
+  // have null project — skip the check for those; moach layout auth already
+  // confirmed the user is a member of projectId.
   const entityProjectId = entity.attributes?.project?.data?.id;
-  if (String(entityProjectId) !== String(projectId)) {
+  if (entityProjectId && String(entityProjectId) !== String(projectId)) {
     throw error(404, 'Vote not found');
   }
 

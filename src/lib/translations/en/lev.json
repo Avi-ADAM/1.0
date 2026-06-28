@@ -82,7 +82,22 @@
       "showResourceInvestment": "Show only suggested investments of resources in FreeMates",
       "showResourceVotes": "Show only votes on new resource for FreeMates",
       "showJoinAndInvest": "Show only requests to join and invest resources on FreeMates",
-      "showMyPurchases": "Show only my purchases"
+      "showMyPurchases": "Show only my purchases",
+      "items": {
+        "fiap": "Mission Completion Approvals ({{count}})",
+        "sugg": "Mission Proposals ({{count}})",
+        "pend": "Missions Pending Approval ({{count}})",
+        "asks": "Mission Assignment Approvals ({{count}})",
+        "betaha": "Missions in Progress ({{count}})",
+        "desi": "General Decisions ({{count}})",
+        "ppmash": "Resources Pending Approval ({{count}})",
+        "pmashs": "Resource Sharing Proposals ({{count}})",
+        "pmaap": "Resource Reception Approvals ({{count}})",
+        "askmap": "Resource Assignment Approvals ({{count}})",
+        "hachla": "General Approvals ({{count}})",
+        "sheirutp": "Service Requests ({{count}})",
+        "purchases": "My Purchases ({{count}})"
+      }
     },
     "voteCard": {
       "neged": "Negotiation needed",
@@ -142,7 +157,23 @@
   },
   "haluka": {
     "successMessage": "Division approved successfully! 🎉",
-    "errorMessage": "Error approving division. Please try again."
+    "errorMessage": "Error approving division. Please try again.",
+    "table": {
+      "name": "Name",
+      "due": "Due",
+      "actual": "Actual",
+      "giving": "Giving",
+      "receiving": "Receiving",
+      "transfers": "Transfers",
+      "siteShare": "Site share",
+      "status": "Status",
+      "paid": "Paid",
+      "sent": "Sent",
+      "pending": "Pending",
+      "membersGave": "Members gave so far",
+      "decided": "decided",
+      "to1lev1": "to 1💗1"
+    }
   },
   "reqtom": {
     "voteTitle": "vote on request to join the FreeMates and share a resorce ",

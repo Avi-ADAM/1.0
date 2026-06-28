@@ -103,7 +103,7 @@
           } else {
             forumStore.addMessage(pendId, {
               id: 'temp-' + Date.now(),
-              message: why,
+              message: why.trim(),
               username: nameMe,
               pic: picLink,
               timestamp: d.toISOString(),

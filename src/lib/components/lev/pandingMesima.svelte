@@ -127,6 +127,9 @@
   let why = '';
   let isOpen = $state(false);
   let loading = $state(false);
+  // Realtime chat forum for this mission vote (replaces the old `diun` store).
+  let forumId = $state(null);
+  let chatm = $state(false);
   $inspect(acts);
   onMount(() => {
     skills =
@@ -273,13 +276,62 @@
   }
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
 
-  function tochat() {
+  async function tochat() {
     no = false;
     masa = false;
     diunm = true;
     loading = false;
     forceRect = true;
+    chatm = true;
     isOpen = true;
+    if (!forumId) {
+      try {
+        const result = await executeAction('ensureVoteForum', {
+          entityType: 'pendm',
+          entityId: String(pendId),
+          projectId: String(projectId)
+        });
+        if (result.success) forumId = result.data?.forumId ?? null;
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    if (forumId) forumStore.initForum(String(forumId), page.data.id);
+  }
+
+  // Persist a chat message to the forum. The Diun component has already added an
+  // optimistic (pending) bubble via forumStore; here we save it and reconcile
+  // with the real message id. Other participants receive it over the socket.
+  async function sendForumMessage(event) {
+    const message = event?.why?.trim();
+    if (!message || !forumId) return;
+    try {
+      const result = await executeAction('createChatMessage', {
+        forumId: String(forumId),
+        message
+      });
+      if (result.success && result.data) {
+        let picLink =
+          'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
+        try {
+          if (typeof localStorage !== 'undefined' && localStorage.getItem('picLink')) {
+            picLink = JSON.parse(localStorage.getItem('picLink'));
+          }
+        } catch (e) {}
+        forumStore.addMessage(String(forumId), {
+          id: result.data.messageId,
+          message,
+          username: page.data.un || 'You',
+          pic: picLink,
+          timestamp: new Date().toISOString(),
+          sentByMe: true,
+          pending: false
+        });
+      }
+    } catch (e) {
+      console.log(e);
+      toast.warning($t('lev.pandingMesima.error'));
+    }
   }
   let masaalr = $state(false);
   async function nego(alr) {
@@ -363,6 +415,7 @@
     masa = false;
     allr = false;
     forceRect = false;
+    chatm = false;
   };
 
   function afternego(event) {
@@ -507,6 +560,7 @@
   import { lang } from '$lib/stores/lang';
   import { t } from '$lib/translations';
   import { nowId } from '$lib/stores/pendMisMes';
+  import { forumStore } from '$lib/stores/forumStore';
   import { toast } from 'svelte-sonner';
   import { Drawer } from 'vaul-svelte';
   import { page } from '$app/state';
@@ -581,6 +635,38 @@
               {users}
             />
           {/if}
+        </div>
+      </DialogContent>
+    {:else if chatm === true}
+      <DialogContent aria-label="form" class="chat d">
+        <div dir="rtl" class="grid items-center justify-center text-center">
+          <button
+            style="margin: 0 auto;"
+            onclick={close}
+            class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+            title="ביטול"
+            ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+              />
+            </svg></button
+          >
+          <Diun
+            onRect={sendForumMessage}
+            bind:clicked
+            rect={true}
+            rikmaName={projectName}
+            smalldes={name}
+            nameChatPartner={`הצבעה על ${name}`}
+            nameMe={page.data.un || 'Me'}
+            {mypos}
+            pendId={forumId}
+            profilePicChatPartner={src}
+            ani={forumId ? 'new-forum' : 'pendM'}
+            messages={forumId ? $forumStore[forumId]?.messages || [] : []}
+            isLoading={forumId ? $forumStore[forumId]?.loading || false : false}
+          />
         </div>
       </DialogContent>
     {:else}

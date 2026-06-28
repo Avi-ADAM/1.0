@@ -1,43 +1,17 @@
 <script>
   import Tile from '$lib/celim/tile.svelte';
-  import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
   import { onMount } from 'svelte';
 
   let fir = $t('lev.cards.filter.heartDesc');
   let u = $t('lev.cards.filter.heartDesc');
 
-  let sugg = 'sugg';
-  let pend = 'pend';
-  let asks = 'asks';
-  let welc = 'welc';
-  let betaha = 'betaha';
-  let desi = 'desi';
-  let fiap = 'fiap';
-  let ppmash = 'ppmash';
-  let pmashs = 'pmashs';
-  let pmaap = 'pmaap';
-  let askmap = 'askmap';
-  let sheirutp = 'sheirutp';
-  let purchases = 'purchases';
-  let hachla = 'hachla';
   let selectedProjectName = $state(null);
-  // נאחסן את כל המצבים באובייקט אחד
   let states = $state({
-    sugg,
-    pend,
-    asks,
-    welc,
-    betaha,
-    desi,
-    fiap,
-    ppmash,
-    pmashs,
-    pmaap,
-    askmap,
-    sheirutp,
-    purchases,
-    hachla
+    sugg: 'sugg', pend: 'pend', asks: 'asks', welc: 'welc',
+    betaha: 'betaha', desi: 'desi', fiap: 'fiap', ppmash: 'ppmash',
+    pmashs: 'pmashs', pmaap: 'pmaap', askmap: 'askmap',
+    sheirutp: 'sheirutp', purchases: 'purchases', hachla: 'hachla'
   });
   onMount(async () => {
     if (filterKind === 'projects') {
@@ -54,21 +28,17 @@
         'red',
         'gray'
       ];
-      milon = [];
+      const items = [];
       for (let i = 0; i < allIds.length; i++) {
-        milon.push({
+        items.push({
           id: allIds[i].projectId,
           name: allIds[i].projectName,
           val: true,
           color: colors[i % colors.length],
-          word: {
-            he: `${allIds[i].projectName} - (${allIds[i].count})`,
-            en: `${allIds[i].projectName} - (${allIds[i].count})`
-          }
+          word: `${allIds[i].projectName} - (${allIds[i].count})`
         });
       }
-      milon = milon;
-      console.log(milon, 'milon');
+      milonProjects = items;
     }
   });
   function showonly(value, id = null) {
@@ -203,123 +173,23 @@
     }
     onHover?.({ id: u });
   }
-  $effect(() => {
-    console.log('milon', milon);
-  });
-  //{name:"welc",val:true,color:"gray"},
-  let milon = $state([
-    {
-      name: 'fiap',
-      val: true,
-      color: 'blue',
-      word: {
-        he: `אשרורי סיום (${fia})`,
-        en: `Mission Completion Approvals (${fia})`
-      }
-    },
-    {
-      name: 'sugg',
-      val: true,
-      color: 'green',
-      word: { he: `הצעות למשימות (${sug})`, en: `Mission Proposals (${sug})` }
-    },
-    {
-      name: 'pend',
-      val: true,
-      color: 'yellow',
-      word: {
-        he: `משימות בתהליך אישור (${pen})`,
-        en: `Missions Pending Approval (${pen})`
-      }
-    },
-    {
-      name: 'asks',
-      val: true,
-      color: 'indigo',
-      word: {
-        he: `אישורי השמה למשימות (${ask})`,
-        en: `Mission Assignment Approvals (${ask})`
-      }
-    },
-    {
-      name: 'betaha',
-      val: true,
-      color: 'purple',
-      word: {
-        he: `משימות בביצוע (${beta})`,
-        en: `Missions in Progress (${beta})`
-      }
-    },
-    {
-      name: 'desi',
-      val: true,
-      color: 'pink',
-      word: { he: `החלטות כלליות (${des})`, en: `General Decisions (${des})` }
-    },
-    {
-      name: 'ppmash',
-      val: true,
-      color: 'gold',
-      word: {
-        he: `משאבים בתהליך אישור (${pmash})`,
-        en: `Resources Pending Approval (${pmash})`
-      }
-    },
-    {
-      name: 'pmashs',
-      val: true,
-      color: 'neww',
-      word: {
-        he: `הצעות לשיתוף משאבים (${mashs})`,
-        en: `Resource Sharing Proposals (${mashs})`
-      }
-    },
-    {
-      name: 'pmaap',
-      val: true,
-      color: 'wow',
-      word: {
-        he: `אשרור קבלת משאבים (${maap})`,
-        en: `Resource Reception Approvals (${maap})`
-      }
-    },
-    {
-      name: 'askmap',
-      val: true,
-      color: 'red',
-      word: {
-        he: `אשרור השמה למשאבים (${askma})`,
-        en: `Resource Assignment Approvals (${askma})`
-      }
-    },
-    {
-      name: 'hachla',
-      val: true,
-      color: 'gray',
-      word: {
-        he: `אשרורים כלליים (${hachlot})`,
-        en: `General Approvals (${hachlot})`
-      }
-    },
-    {
-      name: 'sheirutp',
-      val: true,
-      color: 'gray',
-      word: {
-        he: `בקשות שירות (${sheirutps})`,
-        en: `Service Requests (${sheirutps})`
-      }
-    },
-    {
-      name: 'purchases',
-      val: true,
-      color: 'blue',
-      word: {
-        he: `קניות שלי (${purchasesn})`,
-        en: `My Purchases (${purchasesn})`
-      }
-    }
+  let milonProjects = $state([]);
+  let milonItems = $derived([
+    { name: 'fiap',     val: true, color: 'blue',   word: $t('lev.cards.filter.items.fiap',    { count: fia }) },
+    { name: 'sugg',     val: true, color: 'green',  word: $t('lev.cards.filter.items.sugg',    { count: sug }) },
+    { name: 'pend',     val: true, color: 'yellow', word: $t('lev.cards.filter.items.pend',    { count: pen }) },
+    { name: 'asks',     val: true, color: 'indigo', word: $t('lev.cards.filter.items.asks',    { count: ask }) },
+    { name: 'betaha',   val: true, color: 'purple', word: $t('lev.cards.filter.items.betaha',  { count: beta }) },
+    { name: 'desi',     val: true, color: 'pink',   word: $t('lev.cards.filter.items.desi',    { count: des }) },
+    { name: 'ppmash',   val: true, color: 'gold',   word: $t('lev.cards.filter.items.ppmash',  { count: pmash }) },
+    { name: 'pmashs',   val: true, color: 'neww',   word: $t('lev.cards.filter.items.pmashs',  { count: mashs }) },
+    { name: 'pmaap',    val: true, color: 'wow',    word: $t('lev.cards.filter.items.pmaap',   { count: maap }) },
+    { name: 'askmap',   val: true, color: 'red',    word: $t('lev.cards.filter.items.askmap',  { count: askma }) },
+    { name: 'hachla',   val: true, color: 'gray',   word: $t('lev.cards.filter.items.hachla',  { count: hachlot }) },
+    { name: 'sheirutp', val: true, color: 'gray',   word: $t('lev.cards.filter.items.sheirutp',{ count: sheirutps }) },
+    { name: 'purchases',val: true, color: 'blue',   word: $t('lev.cards.filter.items.purchases',{ count: purchasesn }) }
   ]);
+  let milon = $derived(filterKind === 'projects' ? milonProjects : milonItems);
 </script>
 
 <div
@@ -336,7 +206,7 @@
       <button onclick={() => showonly?.(key.name)}>
         <Tile
           bg={key.color}
-          word={key.word[$lang]}
+          word={key.word}
           openi={states[key.name] === 'true'}
           closei={states[key.name] !== 'true'}
         />
@@ -347,7 +217,7 @@
       <button onclick={() => showonly?.(key.name, key.id)}>
         <Tile
           bg={key.color}
-          word={key.word[$lang]}
+          word={key.word}
           openi={selectedProjectName === null ||
             selectedProjectName === key.name}
           closei={selectedProjectName !== null &&
