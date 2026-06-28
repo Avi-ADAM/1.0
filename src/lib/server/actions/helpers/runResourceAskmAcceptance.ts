@@ -212,6 +212,44 @@ export async function runResourceAskmAcceptance(
   const fetchFn = context.fetch;
   const newnew = !existingMemberIds.map(String).includes(String(acceptedUserId));
 
+  // If the candidate negotiated parallel terms, flow the latest proposed round
+  // onto the (about-to-be-archived) open resource so the Maap + downstream
+  // materialization use the agreed values rather than the rikma baseline.
+  // Best-effort: a plain "agree" (no rounds) keeps the baseline terms.
+  try {
+    const roundsRes: any = await strapi.execute(
+      'getAskmNegoRounds',
+      { id: String(askmId) },
+      jwt,
+      fetchFn
+    );
+    const rounds = roundsRes?.data?.askm?.data?.attributes?.nego_mashes?.data ?? [];
+    const latest = rounds[0]?.attributes; // sorted ordern:desc → [0] is the latest round
+    if (latest) {
+      const data: Record<string, any> = {};
+      if (latest.name != null) data.name = latest.name;
+      if (latest.descrip != null) data.descrip = latest.descrip;
+      if (latest.spnot != null) data.spnot = latest.spnot;
+      if (latest.easy != null) data.easy = latest.easy;
+      if (latest.hm != null) data.hm = latest.hm;
+      if (latest.price != null) data.price = latest.price;
+      if (latest.kindOf != null) data.kindOf = latest.kindOf;
+      if (latest.sqadualed != null) data.sqadualed = latest.sqadualed;
+      if (latest.sqadualedf != null) data.sqadualedf = latest.sqadualedf;
+      if (latest.linkto != null) data.linkto = latest.linkto;
+      if (Object.keys(data).length > 0) {
+        await strapi.execute(
+          'applyRoundToOpenMashaabim',
+          { id: String(openMashaabimId), data },
+          jwt,
+          fetchFn
+        );
+      }
+    }
+  } catch {
+    /* negotiated terms are best-effort; baseline materialization still works */
+  }
+
   const maapRes: any = await strapi.execute(
     '141createMaap',
     {
@@ -228,7 +266,25 @@ export async function runResourceAskmAcceptance(
   );
   const maapId = maapRes?.data?.createMaap?.data?.id;
 
-  await strapi.execute('131archiveOpenMashaabim', { id: openMashaabimId }, jwt, fetchFn);
+  const archiveRes: any = await strapi.execute(
+    '131archiveOpenMashaabim',
+    { id: openMashaabimId },
+    jwt,
+    fetchFn
+  );
+
+  // Archive the other (losing) candidates' askms on this open resource so their
+  // offers can no longer be voted on. Mirrors the mission-side sibling-archive.
+  const siblingAskms: any[] =
+    archiveRes?.data?.updateOpenMashaabim?.data?.attributes?.askms?.data ?? [];
+  for (const sib of siblingAskms) {
+    if (String(sib.id) === String(askmId)) continue;
+    try {
+      await strapi.execute('131bArchiveAskm', { id: String(sib.id) }, jwt, fetchFn);
+    } catch (e) {
+      console.error('runResourceAskmAcceptance: failed to archive sibling askm', sib.id, e);
+    }
+  }
 
   // Recurring expense? Activate the draft engine and make this Maap cycle #1.
   await activateRecurringEngine(strapi, context, {

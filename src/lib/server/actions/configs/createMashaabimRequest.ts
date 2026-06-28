@@ -110,22 +110,27 @@ const createMashaabimRequestHandler: ActionExecutionHandler = async (params, con
     };
   }
 
-  // Step 4: deadline Timegrama (pending approval path only)
-  const resMs: Record<string, number> = {
-    feh: 48 * 3_600_000,
-    sth: 72 * 3_600_000,
-    nsh: 96 * 3_600_000,
-    sevend: 168 * 3_600_000,
-  };
-  const offsetMs = resMs[restime] ?? 0;
-  if (offsetMs > 0) {
-    const deadline = new Date(now.getTime() + offsetMs);
-    await strapi.execute(
-      '127createTimegramaForAskm',
-      { date: deadline.toISOString(), askmId },
-      context.jwt,
-      context.fetch
-    );
+  // Step 4: deadline Timegrama — only when the requester is a rikma member
+  // (Path C: their favorable vote already exists, so the clock can run). For an
+  // external candidate (Path A) it's deferred until a member first votes
+  // (finalizeAskmAcceptance partial creates it on the first vote).
+  if (isProjectMember) {
+    const resMs: Record<string, number> = {
+      feh: 48 * 3_600_000,
+      sth: 72 * 3_600_000,
+      nsh: 96 * 3_600_000,
+      sevend: 168 * 3_600_000,
+    };
+    const offsetMs = resMs[restime] ?? 0;
+    if (offsetMs > 0) {
+      const deadline = new Date(now.getTime() + offsetMs);
+      await strapi.execute(
+        '127createTimegramaForAskm',
+        { date: deadline.toISOString(), askmId },
+        context.jwt,
+        context.fetch
+      );
+    }
   }
 
   const recipientIds = Array.from(new Set([...memberIds, requesterId].filter(Boolean)));

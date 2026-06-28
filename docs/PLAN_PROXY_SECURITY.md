@@ -28,15 +28,20 @@
 | `src/routes/api/send/+server.js` | ~84, ~106 | `isSer = data.isSer ?? false` → `getServiceToken()`. בדיקת `x-consensus-secret` קיימת **רק** ל-qids של קונסנזוס; לכל qid אחר `isSer:true` מקבל את `ADMINMONTHER` בלי שום סוד. |
 | `src/routes/api/action/+server.ts` | ~63-85 | `isSer === true` → `jwt = ADMIN_TOKEN` **וגם** `userId = params.userId` — כל דפדפן אנונימי יכול להריץ כל action בשם כל משתמש. |
 
-**תיקון נדרש:**
-- [ ] `api/action`: להסיר את מסלול ה-`isSer` מה-body. קריאות פנימיות (Telegram bot
-  וכו') יאומתו עם secret header ייעודי (כדוגמת `CONSENSUS_PROXY_SECRET`), או
-  יקראו ל-`ActionService` ישירות בצד שרת בלי לעבור ב-HTTP.
-- [ ] `api/send`: להרחיב את בדיקת ה-secret לכל קריאת `isSer` (לא רק קונסנזוס),
-  או לזהות service-calls אך ורק לפי header ולא לפי ה-body.
-- [ ] לעדכן callers פנימיים שמשתמשים ב-`isSer:true` (למשל
-  `src/lib/func/send/timeGrama.svelte` → `archiveTimeGrama(..., isSer)`) —
-  לוודא שהם רצים בצד שרת בלבד או עוברים למסלול המאומת.
+**בוצע ✅ (2026-06-19):**
+- [x] נוסף `src/lib/server/internalSecret.js` — סוד פנימי נגזר מ-`ADMINMONTHER`
+  (sha256), אף פעם לא נחשף ללקוח. fail-closed אם `ADMINMONTHER` חסר.
+- [x] `hooks.server.js` → `handleFetch` מזריק header `x-internal-secret` לכל
+  קריאת `fetch` צד-שרת ל-`/api/*` (origin זהה). fetch מהדפדפן לא עובר ב-hook
+  הזה, לכן לקוח לא יכול לזייף.
+- [x] `api/send`: `isSer = (data.isSer === true) && isInternalRequest(request)`.
+  אם הלקוח שולח `isSer:true` בלי הסוד → מטופל כמשתמש רגיל (JWT מ-cookie).
+- [x] `api/action`: מסלול ה-bypass (`jwt = ADMIN_TOKEN` + `params.userId`)
+  מותנה כעת ב-`isSer === true && isInternalRequest(request)`.
+- [x] callers פנימיים (`+page.server.js`, `newTelegram`, mastra tools) עוברים
+  ב-`event.fetch` → מקבלים את ה-header אוטומטית, אין צורך לשנות כל caller.
+  `timeGrama.svelte` `archiveTimeGrama` מקבל `isSer` כפרמטר (ברירת מחדל false)
+  ואף לקוח לא מעביר `true` — אומת ב-grep.
 
 ### 0.2 raw-query bypass ב-`api/send` (עוקף את ה-whitelist)
 
@@ -44,11 +49,13 @@
 `data.data.query` שרירותי. ה-validation רץ רק ב-dev וגם אז רק מדפיס שגיאה.
 בשילוב עם 0.1 → GraphQL שרירותי עם טוקן אדמין מכל דפדפן.
 
-**תיקון נדרש:**
-- [ ] בפרודקשן: לדחות query גולמי לחלוטין (`throw error(400)` אם אין `queId`).
-  ב-dev אפשר להשאיר עם warning.
-- [ ] grep מאמת: אף caller בקוד לא שולח `query` גולמי ל-`/api/send`
-  (ואם כן — להוסיף את ה-query ל-`qids.js`).
+**בוצע ✅ (2026-06-19):**
+- [x] בפרודקשן: אם אין `queId` → `throw error(403)`; raw query מותר ב-dev בלבד.
+  `queId` לא מוכר → `throw error(400)` (קודם נפל בשקט ל-`if (!query)`).
+- [x] אומת ב-grep: כל ה-callers (`sendToSer`/`sendToSerTyped`/קריאות ישירות
+  ב-`baci.svelte`, `enrichWish.ts`) שולחים `queId`. הקובץ
+  `metrics/examples/migration-metrics-example.ts` שולח פורמט `qid`/`variables`
+  שלא תאם ממילא — דוגמה מתה, לא נתיב פעיל.
 
 ---
 
@@ -190,11 +197,15 @@ Whitelist של פעולות מותרות; כל השאר → 404. פעולות ש
   (או `tok: locals.tok != false`), כלומר flag בלבד.
 - לעדכן כל `if (page.data.tok)` שמשמש כבדיקת התחברות שיעבוד מול ה-flag הבוליאני.
 
-### 3.4 שמירה (guardrail) שלא תחזור הדליפה
+### 3.4 שמירה (guardrail) שלא תחזור הדליפה — **בוצע ✅ (2026-06-19)**
 
-- בדיקת CI / grep שנכשלת אם מופיע `page.data.jwt`/`page.data.tok` בהקשר של
-  `fetch(... /graphql ...)`, או אם server-load מחזיר `locals.tok` כטוקן.
-- לוודא ש-`grep -rn "VITE_URL.*graphql" src --include=*.svelte` מחזיר 0 בקוד לקוח.
+- `scripts/check-proxy-security.mjs` + `npm run check:proxy`: נכשל אם קומפוננטת
+  לקוח חדשה (`.svelte`) קוראת ל-`/graphql` ישירות (דרך `VITE_URL`/`baseUrl`).
+  עובד בשיטת ratchet — יש BASELINE של 33 העבריינים הידועים; להסיר קובץ מה-BASELINE
+  עם כל מיגרציה, והסקריפט גם נכשל אם קובץ ב-BASELINE כבר נוקה (כדי לשמור על הרשימה
+  כנה ומתכווצת).
+- ⏳ לחבר ל-CI workflow (כרגע אין `.github/workflows`) — להריץ `check:proxy` +
+  `validate:qids` ב-PR.
 
 ### 3.5 צ'קליסט שלב 1
 

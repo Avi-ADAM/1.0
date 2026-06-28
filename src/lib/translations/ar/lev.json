@@ -20,6 +20,9 @@
   "cards": {
     "approve": "أريد",
     "decline": "غير مناسب",
+    "nego": "تخصيص",
+    "acceptCounter": "موافقة",
+    "proposeOther": "اقتراح آخر",
     "requesterDetails": "تفاصيل مقدم الطلب",
     "confirmApprove": "تأكيد",
     "confirmDecline": "معارضة",
@@ -79,7 +82,22 @@
       "showResourceInvestment": "عرض مقترحات استثمار الموارد في المجموعات فقط",
       "showResourceVotes": "عرض التصويتات على طلبات الموارد للمجموعات فقط",
       "showJoinAndInvest": "عرض طلبات الانضمام واستثمار الموارد في المجموعات فقط",
-      "showMyPurchases": "عرض مشترياتي فقط"
+      "showMyPurchases": "عرض مشترياتي فقط",
+      "items": {
+        "fiap": "موافقات إتمام المهام ({{count}})",
+        "sugg": "مقترحات المهام ({{count}})",
+        "pend": "مهام في انتظار الموافقة ({{count}})",
+        "asks": "موافقات تعيين المهام ({{count}})",
+        "betaha": "مهام قيد التنفيذ ({{count}})",
+        "desi": "قرارات عامة ({{count}})",
+        "ppmash": "موارد في انتظار الموافقة ({{count}})",
+        "pmashs": "مقترحات مشاركة الموارد ({{count}})",
+        "pmaap": "موافقات استلام الموارد ({{count}})",
+        "askmap": "موافقات تعيين الموارد ({{count}})",
+        "hachla": "موافقات عامة ({{count}})",
+        "sheirutp": "طلبات الخدمة ({{count}})",
+        "purchases": "مشترياتي ({{count}})"
+      }
     },
     "voteCard": {
       "neged": "يلزم توضيح",
@@ -139,7 +157,23 @@
   },
   "haluka": {
     "successMessage": "تمت الموافقة على التوزيع بنجاح! 🎉",
-    "errorMessage": "خطأ في الموافقة على التوزيع. يرجى المحاولة مرة أخرى."
+    "errorMessage": "خطأ في الموافقة على التوزيع. يرجى المحاولة مرة أخرى.",
+    "table": {
+      "name": "الاسم",
+      "due": "المستحق",
+      "actual": "الفعلي",
+      "giving": "يعطي",
+      "receiving": "يستلم",
+      "transfers": "التحويلات",
+      "siteShare": "حصة الموقع",
+      "status": "الحالة",
+      "paid": "مدفوع",
+      "sent": "أُرسل",
+      "pending": "قيد الانتظار",
+      "membersGave": "أعضاء الشبكة أعطوا حتى الآن",
+      "decided": "قرروا",
+      "to1lev1": "لـ 1💗1"
+    }
   },
   "reqtom": {
     "voteTitle": "التصويت على طلب الانضمام إلى الشبكة ومشاركة مورد",
@@ -230,6 +264,46 @@
       "complete": "مكتملة",
       "noTransfers": "لا توجد تحويلات من الأعضاء بعد. تظهر هنا بمجرد أن يختار عضو معطٍ مستلمًا ويرسل."
     }
+  },
+  "fiappru": {
+    "whyHeading": "يرجى التعليل",
+    "taskNotCompleted": "لماذا لم تكتمل المهمة؟",
+    "offerRejected": "يرجى تعليل سبب رفض العرض",
+    "addHours": "أضف ساعات"
+  },
+  "weget": {
+    "howMuchSpentThisMonth": "كم أنفقت هذا الشهر؟",
+    "approveMonthlyExpense": "تأكيد المصروف الشهري",
+    "cycleLabel": "دورة",
+    "reportedExpenseOf": "أبلغ عن مصروف بقيمة:",
+    "actualAmountPlaceholder": "المبلغ الفعلي المنفق هذا الشهر",
+    "confirmExpense": "تأكيد المصروف",
+    "doneResourceTitle": "إنهاء المورد الشهري — لن تُفتح مزيد من الرسوم الشهرية",
+    "doneResource": "إنهاء المورد",
+    "mustExplain": "يرجى التعليل",
+    "missingForApproval": "ما الذي ينقص لتأكيد استلام المورد؟",
+    "proposeOtherAmount": "اقتراح مبلغ آخر",
+    "reportedAmount": "المبلغ المُبلَّغ عنه:",
+    "proposedAmount": "المبلغ المقترح:",
+    "amountYouPropose": "المبلغ الذي تقترحه",
+    "whyMoveAmount": "لماذا تغيير المبلغ؟ (سيُنشر في المحادثة)",
+    "submitProposal": "إرسال الاقتراح",
+    "explainProposal": "يرجى تعليل الاقتراح",
+    "addHours": "أضف ساعات"
+  },
+  "levchat": {
+    "messagePlaceholder": "اكتب رسالتك..."
+  },
+  "halukaask": {
+    "offerRejected": "يرجى تعليل سبب رفض العرض",
+    "yourResponse": "ردك",
+    "yourResponseLabel": "ردك",
+    "canRespond": "يمكنك الرد والتعليل",
+    "decline": "رفض",
+    "approve": "موافقة",
+    "theOffer": "العرض",
+    "referToPrevious": "يرجى الرجوع إلى الرد السابق والرد على الادعاءات المطروحة",
+    "previousResponse": "الرد السابق"
   },
   "taskModal": {
     "progress": "التقدم",

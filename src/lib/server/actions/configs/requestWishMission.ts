@@ -214,7 +214,7 @@ export const requestWishMissionConfig: ActionConfig = {
         ar: 'عرض مهمة من أمنية'
       },
       body: {
-        he: 'מישהי הכינה עבורך הצעת משימה מוכנה. כנסי ל־Deals כדי לאשר את ההשמה.',
+        he: 'נשלחה אליך הצעת משימה. יש להיכנס ל־Deals כדי לאשר את ההשמה.',
         en: 'Someone prepared a ready task offer for you. Open Deals to approve your placement.',
         ar: 'أعدّ أحدهم عرض مهمة جاهزًا لك. افتح Deals للموافقة.'
       }

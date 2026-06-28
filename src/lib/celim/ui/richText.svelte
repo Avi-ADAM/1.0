@@ -7,7 +7,7 @@
   import TextAlign from '@tiptap/extension-text-align';
   import Link from '@tiptap/extension-link';
   import Highlight from '@tiptap/extension-highlight';
-  import FloatingMenu from '@tiptap/extension-floating-menu';
+  import { BubbleMenu } from '@tiptap/extension-bubble-menu';
   import StarterKit from '@tiptap/starter-kit';
   import Underline from '@tiptap/extension-underline';
   import LinkIcon from '../icons/linkIcon.svelte';
@@ -40,6 +40,7 @@
   let element = $state();
   let editor = $state();
   let menu = $state();
+  let bubbleMenuEl = $state();
   let editorHtml = '';
 
   let activeStates = $state({
@@ -218,8 +219,12 @@
           defaultAlignment: $lang == 'he' ? 'right' : 'left'
         }),
         Underline,
-        FloatingMenu.configure({
-          element: menu
+        BubbleMenu.configure({
+          element: bubbleMenuEl,
+          shouldShow: ({ editor: ed }) => {
+            const { from, to } = ed.state.selection;
+            return from !== to;
+          }
         })
       ],
       onTransaction: () => {
@@ -445,6 +450,46 @@
     </div>
   {/if}
 
+  <!-- Bubble Menu (on text selection) -->
+  <div bind:this={bubbleMenuEl} class="bubble-menu">
+    <button
+      onclick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+      class:active={activeStates.heading1}
+      class="bubble-btn"
+    >
+      H1
+    </button>
+    <button
+      onclick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+      class:active={activeStates.heading3}
+      class="bubble-btn"
+    >
+      H3
+    </button>
+    <button
+      onclick={() => editor.chain().focus().setParagraph().run()}
+      class:active={activeStates.paragraph}
+      class="bubble-btn"
+    >
+      P
+    </button>
+    <div class="bubble-sep"></div>
+    <button
+      onclick={() => editor.chain().focus().toggleBold().run()}
+      class:active={activeStates.bold}
+      class="bubble-btn"
+    >
+      <strong>B</strong>
+    </button>
+    <button
+      onclick={() => editor.chain().focus().toggleItalic().run()}
+      class:active={activeStates.italic}
+      class="bubble-btn"
+    >
+      <em>I</em>
+    </button>
+  </div>
+
   <!-- Editor Content -->
   <div
     class="tiptap-content text-barbi min-h-[150px] outline-none {sml
@@ -614,6 +659,48 @@
     box-shadow: 0 2px 4px rgba(224, 33, 138, 0.3);
     border-radius: 0.375rem;
     border: 1px solid var(--barbi-pink);
+  }
+
+  /* Bubble Menu */
+  .bubble-menu {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    background: white;
+    border: 1px solid var(--gold);
+    border-radius: 0.5rem;
+    padding: 3px 6px;
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.12),
+      0 1px 3px rgba(212, 175, 55, 0.2);
+  }
+  .bubble-btn {
+    background: transparent;
+    color: #555;
+    border: none;
+    border-radius: 4px;
+    padding: 3px 7px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    line-height: 1.4;
+  }
+  .bubble-btn:hover {
+    background: rgba(212, 175, 55, 0.15);
+    color: var(--barbi-pink);
+  }
+  .bubble-btn.active {
+    background: var(--barbi-pink) !important;
+    color: white !important;
+    border-color: transparent !important;
+    box-shadow: none;
+  }
+  .bubble-sep {
+    width: 1px;
+    height: 18px;
+    background: rgba(212, 175, 55, 0.4);
+    margin: 0 3px;
   }
 
   /* Prose Overrides */

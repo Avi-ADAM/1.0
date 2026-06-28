@@ -10,6 +10,7 @@
   import { t, locale } from '$lib/translations';
   import { skil } from '$lib/components/prPr/mi.js';
   import { get } from 'svelte/store';
+  import { page } from '$app/state';
 
   /**
    * @typedef {{
@@ -137,6 +138,18 @@
         );
       }
     }
+    // Fold in the user's EXISTING profile items so the save (which REPLACES each
+    // relation) preserves what they already had — the AI flow only ever adds.
+    const existing = page.data?.existingIds ?? {};
+    for (const cat of /** @type {const} */ (['skills', 'roles', 'methods', 'vallues'])) {
+      const present = new Set(
+        out[cat].map((x) => x.existingId).filter(Boolean).map(String)
+      );
+      for (const id of existing[cat] ?? []) {
+        if (!present.has(String(id))) out[cat].push({ name: '', existingId: String(id) });
+      }
+    }
+
     const sps = data.proposed_sps ?? [];
     const resources = sps
       .map((sp, i) => ({ ...sp, _i: i }))

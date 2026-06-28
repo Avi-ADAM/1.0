@@ -15,8 +15,8 @@
   import SkillSelector from '../ui/SkillSelector.svelte';
   import ValueSelector from '../ui/ValueSelector.svelte';
   import RoleSelector from '../ui/RoleSelector.svelte';
-  import { skil, role ,valluesStore} from '$lib/components/prPr/mi.js';
-  import Addneww from '../addnew/addnewWorkway.svelte';
+  import WorkwaySelector from '../ui/WorkwaySelector.svelte';
+  import { skil, role, valluesStore, ww } from '$lib/components/prPr/mi.js';
   import Addnewv from '../addnew/addnewval.svelte';
   import Addnewr from '../addnew/addNewRole.svelte';
   import Addnewn from '../addnew/addNewNeed.svelte';
@@ -86,6 +86,7 @@ console.log("skillslist",skillslist);
           }
         }
         addSl = false;
+        yy = 0;
         onClose?.({ linkp, list: updatedList });
         g = false;
       } catch (e) {
@@ -104,11 +105,25 @@ console.log("skillslist",skillslist);
   function find_id(arra) {
     var arr = [];
     const baseSource =
-      datan === 'skil' ? $skil : datan === 'val' ? $valluesStore : datan === 'taf' ? $role : meData;
+      datan === 'skil'
+        ? $skil
+        : datan === 'val'
+          ? $valluesStore
+          : datan === 'taf'
+            ? $role
+            : datan === 'work'
+              ? $ww
+              : meData;
     // Combine with current data to ensure we don't lose items already in sync
     const sourceData = [...baseSource, ...data];
     const nameField =
-      datan === 'skil' ? 'skillName' : datan === 'val' ? 'valueName' : valc;
+      datan === 'skil'
+        ? 'skillName'
+        : datan === 'val'
+          ? 'valueName'
+          : datan === 'work'
+            ? 'workWayName'
+            : valc;
 
     for (let j = 0; j < arra.length; j++) {
       const searchName = arra[j];
@@ -119,9 +134,10 @@ console.log("skillslist",skillslist);
         let name = sourceData[i].attributes[nameField];
         let heName = name;
 
-        // Check localizations if available (for skills and values)
+        // Check localizations if available (selector-backed catalogs carry he
+        // localizations, and the selectors emit the localized name in Hebrew)
         if (
-          (datan === 'skil' || datan === 'val') &&
+          (datan === 'skil' || datan === 'val' || datan === 'taf' || datan === 'work') &&
           sourceData[i].attributes.localizations?.data?.length > 0
         ) {
           heName =
@@ -163,6 +179,22 @@ console.log("skillslist",skillslist);
     });
     return res;
   };
+
+  // Resolved catalog objects keep the DEFAULT-locale name in their name field
+  // (Hebrew lives only in `localizations`). When displaying in Hebrew we must
+  // surface the localized name in the display field too — otherwise the tiles
+  // and the re-seeded dropdown labels show English, and the English label then
+  // makes find_id resolve a re-picked Hebrew item to the same id (collapsing
+  // the list). Shallow-copy so the shared store is never mutated.
+  function localizeObjects(objs, nameField) {
+    if ($lang !== 'he') return objs;
+    return objs.map((o) => {
+      const loc = o?.attributes?.localizations?.data?.[0]?.attributes?.[nameField];
+      return loc
+        ? { ...o, attributes: { ...o.attributes, [nameField]: loc } }
+        : o;
+    });
+  }
 
   function handleAdd() {
     console.log(data);
@@ -225,6 +257,14 @@ console.log("skillslist",skillslist);
 
   function open() {
     //if there is no already , but to check changes
+    // Reset per-session edit state. `yy` drives the save button AND the
+    // close/cancel path, and this component instance is reused across edit
+    // sessions (only its view toggles). A stale `yy` from a previous *saved*
+    // session makes the editor think there are unsaved changes and, on close,
+    // send a stale/empty list — which wiped the whole relation. Always start
+    // each session at yy=0 with listt snapshotting the current items.
+    yy = 0;
+    listt = data;
     get();
     onOpen?.({
       linkp: linkp
@@ -232,12 +272,14 @@ console.log("skillslist",skillslist);
   }
 
   function bitul() {
-    if (yy == 0) {
-      listt = data;
-    }
+    // Close the inline editor preserving whatever is currently selected. Adds
+    // and removes are already applied live to the parent during editing, so
+    // "close" keeps the current list. Never fall back to a stale/empty `listt`
+    // snapshot (that emptied the relation when yy was left non-zero).
+    const list = Array.isArray(data) ? data : listt;
     onClose?.({
       linkp: linkp,
-      list: listt
+      list
     });
   }
 
@@ -487,9 +529,13 @@ console.log("skillslist",skillslist);
       (data.selected2 === undefined ||
         (data.length > 0 && data.selected2.length === 0))
     ) {
-      if ((datan === 'skil' || datan === 'taf') && data.length > 0) {
+      if ((datan === 'skil' || datan === 'taf' || datan === 'work') && data.length > 0) {
         data.selected2 = data.map(
-          (d) => d.attributes[valc] || d.attributes.skillName || d.attributes.roleDescription
+          (d) =>
+            d.attributes[valc] ||
+            d.attributes.skillName ||
+            d.attributes.roleDescription ||
+            d.attributes.workWayName
         );
       } else if (datan === 'val' && data.length > 0) {
         data.selected2 = data.map(
@@ -517,7 +563,10 @@ console.log("skillslist",skillslist);
             [...$valluesStore, ...data].map((item) => [String(item.id), item])
           ).values()
         );
-        const objects = filterByReference(deduplicatedSource, ids);
+        const objects = localizeObjects(
+          filterByReference(deduplicatedSource, ids),
+          valc
+        );
         onAdd?.({
           data: objects,
           linkp: kish,
@@ -555,7 +604,10 @@ console.log("skillslist",skillslist);
             [...$skil, ...data].map((item) => [String(item.id), item])
           ).values()
         );
-        const objects = filterByReference(deduplicatedSource, ids);
+        const objects = localizeObjects(
+          filterByReference(deduplicatedSource, ids),
+          valc
+        );
         onAdd?.({
           data: objects,
           linkp: kish,
@@ -582,7 +634,40 @@ console.log("skillslist",skillslist);
             [...$role, ...data].map((item) => [String(item.id), item])
           ).values()
         );
-        const objects = filterByReference(deduplicatedSource, ids);
+        const objects = localizeObjects(
+          filterByReference(deduplicatedSource, ids),
+          valc
+        );
+        onAdd?.({
+          data: objects,
+          linkp: kish,
+          valc: valc,
+          a: datan
+        });
+      }
+    }
+  });
+
+  $effect(() => {
+    if (datan === 'work' && data.selected2 && $ww) {
+      const labels = data.selected2;
+      const ids = find_id(labels);
+
+      if (ids.length < labels.length) return;
+
+      const existingIds = data.map((d) => String(d.id)).sort();
+      const targetIds = [...new Set(ids.map((id) => String(id)))].sort();
+
+      if (JSON.stringify(existingIds) !== JSON.stringify(targetIds)) {
+        const deduplicatedSource = Array.from(
+          new Map(
+            [...$ww, ...data].map((item) => [String(item.id), item])
+          ).values()
+        );
+        const objects = localizeObjects(
+          filterByReference(deduplicatedSource, ids),
+          valc
+        );
         onAdd?.({
           data: objects,
           linkp: kish,
@@ -738,7 +823,7 @@ console.log("skillslist",skillslist);
                     >
                   {/if}
                 </Tile>
-              {:else if datan !== 'skil' && datan !== 'taf' && datan !== 'val'}
+              {:else if datan !== 'skil' && datan !== 'taf' && datan !== 'val' && datan !== 'work'}
                 <div
                   class="text-center text-sm text-lturk md:text-xl"
                   title={less[$lang]}
@@ -776,7 +861,7 @@ console.log("skillslist",skillslist);
         {/if}
       {/if}
       <br />
-      {#if datan != 'skil' && datan != 'val' && datan != 'taf'}
+      {#if datan != 'skil' && datan != 'val' && datan != 'taf' && datan != 'work'}
         <div>
           <h3 class="text-center text-sm text-barbi">
             {adbf[$lang]}{Valname}{adaf[$lang]}
@@ -835,10 +920,20 @@ console.log("skillslist",skillslist);
           {placeholder}
           autoCreate={true}
         />
+      {:else if datan == 'work'}
+        <WorkwaySelector
+          bind:selectedWorkways={data.selected2}
+          onadd={() => {
+            yy = 1;
+          }}
+          onremove={() => {
+            yy = 2;
+          }}
+          {placeholder}
+          autoCreate={true}
+        />
       {:else if datan == 'mash'}
         <Addnewn rr={13} onNewn={addnewM} bind:addW />
-      {:else if datan == 'work'}
-        <Addneww rn={allvn} onAddww={addnew} bind:addW />
       {/if}
     </div>
     <br />

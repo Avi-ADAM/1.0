@@ -5,9 +5,13 @@
   import Share from '$lib/components/share/shareButtons/index.svelte';
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import { RingLoader } from 'svelte-loading-spinners';
   import { goto } from '$app/navigation';
   import { executeAction } from '$lib/client/actionClient';
+  import NegoM from '$lib/components/prPr/negoM.svelte';
+  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
+  import { fly } from 'svelte/transition';
 
   //TODO: get asked from server then show you alr .., find a way to get title
   let error1 = null;
@@ -53,6 +57,45 @@
       console.error('שגיאה:', error);
       toast.error('אירעה שגיאה');
       alr = false;
+    }
+  }
+
+  // Propose custom terms (Path B/D). The server checks membership and routes:
+  // a rikma member → Path D (project round); a non-member → Path B (candidate round).
+  let negoOpen = $state(false);
+  let negoLoading = $state(false);
+  const closeNego = () => {
+    negoOpen = false;
+    negoLoading = false;
+  };
+  async function negoSubmit({ newValues, originalValues }) {
+    const inD = data.alld;
+    if (!inD?.attributes?.project?.data) {
+      toast.error('שגיאה בטעינת נתוני הפרויקט');
+      negoLoading = false;
+      return;
+    }
+    try {
+      const result = await executeAction('proposeOnOpenMission', {
+        openMissionId: String(data.mId),
+        projectId: String(inD.attributes.project.data.id),
+        newValues,
+        originalValues
+      });
+      if (!result.success) {
+        toast.error(result.error?.message ?? 'שגיאה בשליחת ההצעה');
+        negoLoading = false;
+        return;
+      }
+      closeNego();
+      alr = true;
+      success = true;
+      setTimeout(() => { success = false; }, 15000);
+      toast.success(`${fnnn[$lang]}`);
+    } catch (error) {
+      console.error('שגיאה:', error);
+      toast.error('אירעה שגיאה');
+      negoLoading = false;
     }
   }
 
@@ -475,7 +518,7 @@
                 </div>
               {/if}
               {#if data.tok != false}
-                <div class="flex justify-center">
+                <div class="flex flex-wrap gap-3 justify-center items-center">
                   {#if alr == false && !data.alld.attributes.users.data
                       .map((c) => c.id)
                       .includes(data.uid)}
@@ -488,6 +531,11 @@
                       class=" mx-auto mt-7 text-3xl px-4 py-3 hover:text-black hover:font-bold text-barbi"
                       >{iwantto[$lang]}</button
                     >
+                    <button
+                      onclick={() => (negoOpen = true)}
+                      class="mt-7 text-xl px-4 py-3 border border-gold rounded-full text-gold hover:text-barbi hover:border-barbi"
+                      >{$t('lev.cards.proposeOther')}</button
+                    >
                   {:else if data.alld.attributes.users.data
                     .map((c) => c.id)
                     .includes(data.uid)}
@@ -496,6 +544,48 @@
                     </h3>
                   {/if}
                 </div>
+
+                <DialogOverlay isOpen={negoOpen} onDismiss={closeNego} class="overlay">
+                  <div transition:fly={{ y: 40, opacity: 0, duration: 250 }}>
+                    <DialogContent class="nego" aria-label="form">
+                      <button
+                        onclick={closeNego}
+                        style="margin: 0 auto;"
+                        class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+                        aria-label="סגירה">✕</button
+                      >
+                      {#if negoLoading}
+                        <RingLoader size="200" color="#ff00ae" unit="px" duration="2s" />
+                      {:else if negoOpen}
+                        <NegoM
+                          onLoad={() => (negoLoading = true)}
+                          onClose={closeNego}
+                          onSubmit={negoSubmit}
+                          descrip={data.alld.attributes.descrip}
+                          projectName={data.alld.attributes.project.data.attributes.projectName}
+                          name1={data.alld.attributes.name}
+                          hearotMeyuchadot={data.alld.attributes.hearotMeyuchadot}
+                          noofhours={data.alld.attributes.noofhours}
+                          perhour={data.alld.attributes.perhour}
+                          projectId={String(data.alld.attributes.project.data.id)}
+                          total={(data.alld.attributes.noofhours || 0) *
+                            (data.alld.attributes.perhour || 0)}
+                          noofusers={data.alld.attributes.project.data.attributes.user_1s?.data
+                            ?.length || 0}
+                          pendId={String(data.mId)}
+                          skills={data.alld.attributes.skills?.data || []}
+                          tafkidims={data.alld.attributes.tafkidims?.data || []}
+                          workways={data.alld.attributes.work_ways?.data || []}
+                          mdate={data.alld.attributes.sqadualed}
+                          mdates={data.alld.attributes.dates}
+                          isKavua={data.alld.attributes.iskvua === true}
+                          users={[]}
+                          isAsk={1}
+                        />
+                      {/if}
+                    </DialogContent>
+                  </div>
+                </DialogOverlay>
               {:else}
                 <div class="flex justify-center">
                   <div

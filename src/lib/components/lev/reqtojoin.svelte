@@ -58,6 +58,8 @@
    * @property {number} [order]
    * @property {any} sqedualed
    * @property {any} timegramaId
+   * @property {any} [timegramaDate]
+   * @property {boolean} [timegramaDone]
    * @property {boolean} [cards]
    * @property {any} [onUser]
    * @property {any} [onProj]
@@ -123,6 +125,8 @@
     orderon = 0,
     sqedualed,
     timegramaId,
+    timegramaDate = null,
+    timegramaDone = false,
     cards = false,
     isRishon = false,
     workways = [],
@@ -279,7 +283,7 @@
           existingMemberIds: existingMemberIdsBefore,
           existingVotes: users,
           projectName,
-          projectSrc: src2,
+          projectSrc: src2
         });
         if (result.success) {
           onAcsept?.({ ani: 'asked', coinlapach: coinlapach });
@@ -315,7 +319,7 @@
           existingMemberIds: existingMemberIdsBefore,
           existingVotes: users,
           projectName,
-          projectSrc: src2,
+          projectSrc: src2
         });
         if (result.success) {
           onAcsept?.({ ani: 'asked', coinlapach: coinlapach });
@@ -357,10 +361,26 @@
   function toggleNegotiationMode() {
     negotiationMode = !negotiationMode;
     if (negotiationMode) {
-      already = true; // Set to true when entering negotiation mode
+      already = true;
       masa = true;
       isOpen = true;
     }
+  }
+
+  // Rights-holder intermediate proposal on a candidate's Ask. Stored as a
+  // Negopendmission round (proposedBy=project) — never overwriting the shared
+  // OpenMission. For self-proposals (isRishon) the internal pendm flow is used.
+  async function handleCounter({ newValues, originalValues }) {
+    const result = await executeAction('counterOnAsk', {
+      askId: String(askId),
+      openMissionId: openMid != null ? String(openMid) : undefined,
+      projectId: String(projectId),
+      ordern: orderon ?? 0,
+      candidateUserId: userId != null ? String(userId) : undefined,
+      newValues,
+      users
+    });
+    if (!result.success) throw new Error(result.error || 'counterOnAsk failed');
   }
 
   async function decline() {
@@ -374,7 +394,7 @@
         const result = await executeAction('declineMissionRequest', {
           openMissionId: String(openMid),
           projectId: String(projectId),
-          declinedUserId: String(userId),
+          declinedUserId: String(userId)
         });
         if (result.success) {
           onDecline?.({ ani: 'asked', coinlapach });
@@ -498,6 +518,7 @@
   import { RingLoader } from 'svelte-loading-spinners';
   import { forumStore } from '$lib/stores/forumStore';
   import Diun from './diun.svelte';
+  import TimetToTimegrama from './cards/timetToTimegrama.svelte';
   import {
     nowId,
     addMes,
@@ -544,6 +565,7 @@
       coinlapach
     });
   }
+
 </script>
 
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
@@ -559,6 +581,12 @@
               masaalr={false}
               onLoad={() => (negotiationLoading = true)}
               onClose={afternego}
+              onSubmit={isRishon ? null : handleCounter}
+              candidateRound={!isRishon
+                ? (negopendmissions?.find(
+                    (r) => r.attributes?.proposedBy === 'candidate'
+                  )?.attributes ?? null)
+                : null}
               {timegramaId}
               {negopendmissions}
               descrip={missionDetails}
@@ -573,7 +601,7 @@
               noofusers={noofpu}
               missionId={missId}
               {skills}
-              isAsk={askId}
+              isAsk={isRishon ? 0 : (askId ?? 1)}
               tafkidims={role}
               {workways}
               mdate={sqedualed}
@@ -582,7 +610,7 @@
               {publicklinks}
               {privatlinks}
               restime={getProjectData(projectId, 'restime')}
-              pendId={openMid}
+              pendId={isRishon ? openMid : null}
               {users}
               {acts}
             />
@@ -633,6 +661,9 @@
     role="button"
     transition:fly|local={{ y: 250, opacity: 0.9, duration: 2000 }}
   >
+    {#if timegramaDate && !timegramaDone}
+      <TimetToTimegrama {timegramaDate} />
+    {/if}
     <Swiper
       dir="rtl"
       on:swiper={setSwiperRef}
@@ -909,7 +940,7 @@
             <div class="swiper-slidec mx-auto">
               <Card
                 onAgree={() => agree()}
-                onNego={isRishon ? toggleNegotiationMode : () => decline()}
+                onNego={toggleNegotiationMode}
                 onHover={() => hoverc()}
                 onChat={tochat}
                 {low}
@@ -952,7 +983,7 @@
 {:else}
   <Card
     onAgree={() => agree()}
-    onNego={isRishon ? toggleNegotiationMode : () => decline()}
+    onNego={toggleNegotiationMode}
     onHover={hoverc}
     onChat={tochat}
     {isVisible}

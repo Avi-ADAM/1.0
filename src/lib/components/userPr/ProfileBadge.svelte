@@ -123,14 +123,16 @@
   /* === הגדרות לטאבלט ומחשב === */
   @media (min-width: 768px) {
     .badge-container {
-      /* במחשב אנחנו מבטלים את הגבלת ה-33% ועוברים לשליטה לפי גובה (85vh) שעבדה לך מושלם */
-      width: auto;
-      max-width: none;
-      height: 76vh;
+      /* במחשב אנחנו משתמשים בשילוב של height: 76vh ו-max-width: 33vw כדי לתמוך במסכים לאורך */
+      width: 100%;
+      max-width: 33vw;
+      height: auto;
+      max-height: 76vh;
+      aspect-ratio: 5 / 7;
     }
 
     svg {
-      width: auto;
+      width: 100%;
       height: 100%;
     }
   }

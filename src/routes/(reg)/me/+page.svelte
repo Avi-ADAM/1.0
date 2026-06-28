@@ -370,7 +370,27 @@
       event.list.selected2 = [];
     }
 
-    if (a == 'tafkidims') {
+    // Safety net against accidental data loss: genuine removals are applied
+    // live via remove()/onRemove during editing, so by the time the editor
+    // closes an *empty* list against a still-populated relation means a bug
+    // upstream (e.g. a stale snapshot). Keep the existing items instead of
+    // clearing them. A real "remove all" leaves the relation already empty
+    // here, so this guard never blocks legitimate clears.
+    const incoming = Array.isArray(event.list) ? event.list : [];
+    const existingMap = {
+      tafkidims: meData.tafkidims?.data,
+      skills: meData.skills?.data,
+      vallues: meData.vallues?.data,
+      mashaabims: meData.sps?.data,
+      workWays: meData.work_ways?.data
+    };
+    const existing = existingMap[a] ?? [];
+
+    if (incoming.length === 0 && existing.length > 0) {
+      console.warn(
+        `[me/close] ignored empty list for "${a}" — kept ${existing.length} existing item(s) to avoid wiping the relation`
+      );
+    } else if (a == 'tafkidims') {
       meData.tafkidims.data = event.list;
     } else if (a == 'skills') {
       meData.skills.data = event.list;

@@ -15,7 +15,8 @@
     "codegen": "graphql-codegen --config codegen.ts",
     "types:extract": "node scripts/extract-graphql-types.mjs",
     "types:update": "npm run codegen && npm run types:extract",
-    "validate:qids": "node scripts/validate-qids.mjs"
+    "validate:qids": "node scripts/validate-qids.mjs",
+    "check:proxy": "node scripts/check-proxy-security.mjs"
   },
   "engines": {
     "node": "22.x"
@@ -91,6 +92,7 @@
     "@svelte-plugins/datepicker": "^1.0.9",
     "@tailwindcss/vite": "^4.1.11",
     "@tiptap/core": "^2.6.6",
+    "@tiptap/extension-bubble-menu": "^2.27.2",
     "@tiptap/extension-floating-menu": "^2.6.6",
     "@tiptap/extension-highlight": "^2.9.1",
     "@tiptap/extension-link": "^2.6.6",

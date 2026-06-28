@@ -2,15 +2,12 @@
   import { isRtl } from '$lib/translations';
            import { lang } from '$lib/stores/lang.js'
                import { liUN } from '$lib/stores/liUN.js';
-const baseUrl = import.meta.env.VITE_URL
 
- let vallues = [];
-// דף של השראה כפתור להוסיף את ההשראה שלך, כפתור לתיקונים  
+// דף של השראה כפתור להוסיף את ההשראה שלך, כפתור לתיקונים
     let name_value = $state();
     let desV = $state();
 
     let error1 = null;
-let meData;
     let shgi = $state(false);
 
 async function addNewVall() {
@@ -18,66 +15,43 @@ async function addNewVall() {
 if (rn.includes(name_value)){
   shgi = true;
 } else {
-  let link =baseUrl+"/graphql" ;
-  let d = new Date
         try {
-             await fetch(link, {
+             const res = await fetch('/api/vocab/create', {
               method: 'POST',
-       
-        headers: {
-            'Content-Type': 'application/json'
-                  },
-        body: 
-        JSON.stringify({query: 
-           `mutation  createVallue {
-  createVallue(data: {  valueName: "${name_value}",
-          descrip: "${desV}",
-        publishedAt: "${d.toISOString()}"}) {
-    data {
-      id
-      attributes {
-        valueName ${$lang == 'he' ? 'localizations { data {attributes{valueName} }}' : ""}
-      } 
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                kind: 'vallues',
+                label: name_value,
+                lang: $lang,
+                createdBy: $liUN || 'user',
+                description: desV
+              })
+            }).then((r) => r.json());
 
-       }
-    }
-}`   
-        })
-})
-  .then(r => r.json())
-  .then(data => meData = data);
-   dispatchvall (meData);
-    let userName_value = $liUN
-     let data = {"name": userName_value, "action": "create ערך חדש בשם:", "det": `${name_value} והתיאור: ${desV} `}
-   fetch("/api/ste", {
-  method: 'POST', 
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(data),
-})
-  .then((response) => response)
-  .then((data) => {
-    console.log('Success:', data);
+            if (!res?.success || !res.item) { error1 = 'create failed'; return; }
+            if (res.moderation?.flagged) { addS = false; return; }
 
-  })
-  .catch((error) => {
-    console.error('Error:', error);
-  
-  })
+            if (res.translate) {
+              fetch('/api/translations', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(res.translate)
+              }).catch((e) => console.warn('תרגום נכשל:', e));
+            }
+
+            dispatchvall({ id: res.item.id, attributes: res.item.attributes });
                   }
       catch(error) {
-        console.log('צריך לתקן:', error.response);
-        error = error1 
-        console.log(error1)
+        console.log('צריך לתקן:', error);
+        error1 = error
                 };}
-    };    
+    };
 
- 
-function dispatchvall (meData) {
+
+function dispatchvall (item) {
   onAddnew?.({
-    id: meData.data.createVallue.data.id,
-    skob: meData.data.createVallue.data
+    id: item.id,
+    skob: item
     } );
     addS = false
 };

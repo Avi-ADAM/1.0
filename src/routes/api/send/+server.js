@@ -7,6 +7,7 @@ import { validateAllQids, validateQuery } from './qidsValidator.js'
 import { json, error } from '@sveltejs/kit'
 import { ADMINMONTHER, CONSENSUS_PUBLIC_TOKEN, CONSENSUS_PROXY_SECRET } from '$env/static/private'
 import { createHash } from 'node:crypto'
+import { isInternalRequest } from '$lib/server/internalSecret.js'
 
 function normalizeSecret(value, name) {
 	let normalized = String(value ?? '').replace(/\s+/g, '');
@@ -65,16 +66,18 @@ export async function POST({ request, cookies }) {
 	const data = await request.json();
 
 	// ── Resolve query string ─────────────────────────────────────────────────
+	// Only whitelisted qids are allowed. Raw client-supplied GraphQL would
+	// bypass the whitelist entirely, so it is permitted in dev only.
 	const queId = data?.data?.queId;
-	const query = queId ? qids[queId] : data?.data?.query;
-
-	if (!query) {
-		throw error(400, 'queId or query is required');
-	}
-
-	// In dev mode, validate raw queries before executing
-	if (isDev && !queId && data?.data?.query) {
-		const validation = validateQuery('raw-query', data.data.query);
+	let query;
+	if (queId) {
+		query = qids[queId];
+		if (!query) throw error(400, `Unknown queId: ${queId}`);
+	} else {
+		if (!isDev) throw error(403, 'Raw GraphQL queries are not allowed; use a queId');
+		query = data?.data?.query;
+		if (!query) throw error(400, 'queId or query is required');
+		const validation = validateQuery('raw-query', query);
 		if (!validation.valid) {
 			console.error('❌ [qids] Raw query validation failed:');
 			validation.errors.forEach(e => console.error(`   ${e}`));
@@ -82,7 +85,10 @@ export async function POST({ request, cookies }) {
 	}
 
 	// ── Auth flags ───────────────────────────────────────────────────────────
-	const isSer          = data.isSer ?? false;
+	// `isSer` grants the service/admin token, so it is honoured only when the
+	// request carries the internal secret (injected by handleFetch for genuine
+	// server-side calls). A client cannot forge it.
+	const isSer          = (data.isSer === true) && isInternalRequest(request);
 	const idL            = cookies.get('id');
 	const un             = cookies.get('un');   // username — used as voter-id for JWT path
 	const isConsensusQid = queId && CONSENSUS_QIDS.has(queId);
@@ -263,7 +269,20 @@ export async function POST({ request, cookies }) {
 		clearTimeout(timeoutId);
 		const newd = await res.json();
 
-		if (newd.data) return json(newd);
+		if (newd.data) {
+			// §5 bridge spec: never hand a private (bridge) discussion to the
+			// service path (guest/charter). Registered users read it through the
+			// JWT path, where Strapi enforces visibility. GetNegotiationByToken is
+			// link-based and ListLocalNegotiations already excludes private — so
+			// only the read-by-id qid needs guarding here.
+			if (isSer && queId === '39GetNegotiation') {
+				const vis = newd.data?.negotiation?.data?.attributes?.visibility;
+				if (vis === 'private') {
+					return json({ data: { negotiation: { data: null } } });
+				}
+			}
+			return json(newd);
+		}
 
 		if (newd.errors) {
 			console.error('GraphQL Errors from downstream:', JSON.stringify(newd.errors, null, 2));

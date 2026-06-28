@@ -1,10 +1,12 @@
-﻿<script>
+<script>
   import { isRtl } from '$lib/translations';
-  import MultiSelect from 'svelte-multiselect';
+  import RoleSelector from '$lib/components/ui/RoleSelector.svelte';
   import { userName } from '../../stores/store.js';
+  import { lang } from '$lib/stores/lang.js';
   import { show } from './store-show.js';
   import { roles2 } from './roles2.js';
-  import { onMount } from 'svelte';
+  import { role } from '$lib/components/prPr/mi.js';
+  import tr from '$lib/translations/tr.json';
   /**
    * @typedef {Object} Props
    * @property {string} [userName_value]
@@ -18,186 +20,81 @@
     onProgres
   } = $props();
 
-  import { lang } from '$lib/stores/lang.js';
-  import jroles from '$lib/data/tafkidim.json';
-  import enjrole from '$lib/data/tafkidimEn.json';
-  import tr from '$lib/translations/tr.json';
-  let roles1 = $state([]);
-  let error1 = null;
-  const baseUrl = import.meta.env.VITE_URL;
+  let selected = $state([]);
+
+  userName.subscribe((value) => { userName_value = value; });
+  show.subscribe((newValue) => { show_value = newValue; });
+
+  // Seed `selected` from the stored ids (existing profile + AI-confirmed) once
+  // the shared catalog has loaded, mapping each id to its current-language name
+  // — same pattern as the skills step. RoleSelector (VocabSelector) owns the
+  // catalog, creation, moderation, translation and duplicate detection.
+  let seedComplete = $state(false);
+  $effect(() => {
+    if (seedComplete) return;
+    const ids = $roles2;
+    if (!ids || ids.length === 0 || !$role || $role.length === 0) return;
+    const mapped = ids
+      .map((roleId) => {
+        const r = $role.find((item) => item.id == roleId);
+        if (!r) return null;
+        let name = r.attributes?.roleDescription || '';
+        if ($lang === 'he' && r.attributes?.localizations?.data?.length > 0) {
+          name = r.attributes.localizations.data[0].attributes.roleDescription;
+        }
+        return name;
+      })
+      .filter(Boolean);
+    if (mapped.length === 0) return;
+    selected = mapped;
+    if (mapped.length === ids.length) seedComplete = true;
+  });
 
   function find_role_id(role_name_arr) {
     var arr = [];
     for (let j = 0; j < role_name_arr.length; j++) {
-      for (let i = 0; i < roles1.length; i++) {
-        if (roles1[i].attributes.roleDescription === role_name_arr[j]) {
-          arr.push(roles1[i].id);
+      for (let i = 0; i < $role.length; i++) {
+        let name = $role[i].attributes?.roleDescription || '';
+        let heName = name;
+        if ($role[i].attributes?.localizations?.data?.length > 0) {
+          heName = $role[i].attributes.localizations.data[0].attributes.roleDescription;
+        }
+        if (name === role_name_arr[j] || heName === role_name_arr[j]) {
+          arr.push($role[i].id);
+          break;
         }
       }
     }
     return arr;
   }
-  let newcontent = $state(true);
 
-  onMount(async () => {
-    if ($lang == 'he') {
-      roles1 = jroles;
-    } else if ($lang == 'en') {
-      roles1 = enjrole;
-    }
-    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-    const checkStatus = (resp) => {
-      if (resp.status >= 200 && resp.status < 300) return resp;
-      return parseJSON(resp).then((resp) => { throw resp; });
-    };
-
-    try {
-      const res = await fetch(baseUrl + '/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: `query {
-  tafkidims(sort: "roleDescription") { data { id attributes{ roleDescription  ${$lang == 'he' ? 'localizations {data {attributes{roleDescription } }}' : ''}}
-}
-}
-}
-              `
-        })
-      })
-        .then(checkStatus)
-        .then(parseJSON);
-      let freshRoles = res.data.tafkidims.data;
-      if ($lang == 'he') {
-        for (var i = 0; i < freshRoles.length; i++) {
-          if (freshRoles[i].attributes.localizations.data.length > 0) {
-            freshRoles[i].attributes.roleDescription =
-              freshRoles[i].attributes.localizations.data[0].attributes.roleDescription;
-          }
-        }
-      }
-      const seenR = new Set();
-      freshRoles = freshRoles.filter((r) => {
-        const name = r.attributes?.roleDescription;
-        if (!name || seenR.has(name)) return false;
-        seenR.add(name);
-        return true;
-      });
-      roles1 = freshRoles;
-
-      const currentRoles = $roles2;
-      if (currentRoles && currentRoles.length > 0) {
-        const roleNames = currentRoles
-          .map((roleId) => {
-            const role = roles1.find((r) => r.id == roleId);
-            return role ? role.attributes.roleDescription : null;
-          })
-          .filter(Boolean);
-        selected = roleNames;
-      }
-
-      newcontent = false;
-    } catch (e) {
-      error1 = e;
-    }
-  });
-
-  let selected = $state([]);
-  const placeholder = tr.reg.rolesPlaceholder[$lang];
-
-  userName.subscribe((value) => { userName_value = value; });
-  show.subscribe((newValue) => { show_value = newValue; });
+  function saveToStore() {
+    roles2.set(find_role_id(selected));
+  }
 
   function increment() {
-    newnew();
+    saveToStore();
     show.update((n) => n + 1);
     onProgres?.({ tx: 0, txx: 11 });
   }
   function toend() {
-    newnew();
+    saveToStore();
     show.set(5);
     onProgres?.({ tx: 0, txx: 4 });
   }
   function back() {
-    newnew();
+    saveToStore();
     show.update((n) => n - 1);
     onProgres?.({ tx: 0, txx: 20 });
   }
 
-  let meData = $state();
-  async function newnew() {
-    for (let i = 0; i < selected.length; i++) {
-      if (!roles1.map((c) => c.attributes.roleDescription).includes(selected[i])) {
-        let link = baseUrl + '/graphql';
-        let d = new Date();
-        try {
-          await fetch(link, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              query: `mutation  createTafkidim {
-  createTafkidim(data: {  roleDescription: "${selected[i]}",
-        publishedAt: "${d.toISOString()}"}) {
-    data {
-      id
-      attributes {
-        roleDescription
-      }
-       }
-    }
-}`
-            })
-          })
-            .then((r) => r.json())
-            .then((data) => (meData = data));
-          const newOb = meData.data.createTafkidim.data;
-          const newValues = roles1;
-          newValues.push(newOb);
-          roles1 = newValues;
-          let userName_value = $userName;
-          let data = {
-            name: userName_value,
-            action: 'create תפקיד חדש בשם:',
-            det: `${selected[i]}`
-          };
-          fetch('/api/ste', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-          }).catch((error) => { console.error('Error:', error); });
-        } catch (error) {
-          console.log('צריך לתקן:', error.response);
-          error = error1;
-        }
-      }
-    }
-    roles2.set(find_role_id(selected));
-  }
-
-  let ugug = $state('');
-  let addn = $derived({
-    he: `${tr.selector.addPrefix.he} "${ugug}"`,
-    en: `${tr.selector.addPrefix.en} "${ugug}"`,
-    ar: `${tr.selector.addPrefix.ar} "${ugug}"`
-  });
   const what = tr.reg.rolesQuestion;
 </script>
 
 <div class="step-inner" dir={$isRtl ? 'rtl' : 'ltr'}>
   <h2 class="step-title">{userName_value}&nbsp;{what[$lang]}</h2>
   <div class="multi-wrap">
-    <MultiSelect
-      --sms-width="100%"
-      outerDivClass="!bg-gold !text-barbi"
-      inputClass="!bg-gold !text-barbi"
-      liSelectedClass="!bg-barbi !text-gold"
-      createOptionMsg={addn[$lang]}
-      allowUserOptions={'append'}
-      loading={newcontent}
-      bind:searchText={ugug}
-      bind:selected
-      {placeholder}
-      options={[...new Set(roles1.map((c) => c.attributes.roleDescription).filter(Boolean))]}
-    />
+    <RoleSelector bind:selectedRoles={selected} color="--gold" />
   </div>
   <div class="nav-row">
     <button class="btn-nav btn-back" onclick={back} disabled={show_value <= 1}>

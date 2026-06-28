@@ -23,39 +23,15 @@ let roleName_value = $state();
 let desR = $state();
 let error1 = null;
 let shgi = $state(false);
-const baseUrl = import.meta.env.VITE_URL
 
 
 onMount(async () => {
-        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-        const checkStatus = (resp) => {
-        if (resp.status >= 200 && resp.status < 300) {
-          return resp;
-        }
-        return parseJSON(resp).then((resp) => {
-          throw resp;
-        });
-      };
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-    
         try {
-            const res = await fetch(baseUrl+"/graphql", {
-              method: "POST",
-              headers: {
-                 'Content-Type': 'application/json'
-              },body: JSON.stringify({
-                        query: `query {
-  skills { data{ id attributes{ skillName ${$lang == 'he' ? 'localizations { data {attributes{skillName} }}' : ""}}
-}
-} }`})
-            }).then(checkStatus)
-          .then(parseJSON);
-            skills2 = res.data.skills.data
+            const res = await fetch(`/api/vocab/list?kind=skills&lang=${$lang}`).then((r) => r.json());
+            skills2 = res?.data ?? []
             if ($lang == "he" ){
               for (var i = 0; i < skills2.length; i++){
-                if (skills2[i].attributes.localizations.data.length > 0){
+                if (skills2[i].attributes.localizations?.data?.length > 0){
                 skills2[i].attributes.skillName = skills2[i].attributes.localizations.data[0].attributes.skillName
                 }
               }
@@ -81,68 +57,42 @@ if (rn.includes(roleName_value)){
   shgi = true;
   console.log("shgia")
 } else {
-  let d = new Date
 skillslist = find_skill_id(selected);
-   let link = baseUrl+"/graphql" ;
         try {
-             await fetch(link, {
+             const res = await fetch('/api/vocab/create', {
               method: 'POST',
-       
-        headers: {
-            'Content-Type': 'application/json'
-                  },
-        body: 
-        JSON.stringify({query: 
-           `mutation  createTafkidim {
-  createTafkidim(data: {  roleDescription: "${roleName_value}",
-          descrip: "${desR}",
-          skills: [${skillslist}],
-          publishedAt: "${d.toISOString()}"
-        }
-          ) {
-    data {
-      id
-      attributes {
-        roleDescription ${$lang == 'he' ? 'localizations { data {attributes{roleDescription} }}' : ""}
-      } 
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                kind: 'roles',
+                label: roleName_value,
+                lang: $lang,
+                createdBy: $liUN || 'user',
+                description: desR,
+                relations: { skills: skillslist }
+              })
+            }).then((r) => r.json());
 
-       }
-    }
-}`   
-        })
-})
-  .then(r => r.json())
-  .then(data => meData = data);
-      //  skillIdStore.set(meData.id);
-        id = meData.data.createTafkidim.data.id;
-  //  skillslist.push(idro);
-        dispatchrole?.(meData.data.createTafkidim.data, id);
-        addR = false;
-        let userName_value = $liUN
-         let data = {"name": userName_value, "action": "יצר תפקיד חדש בשם:", "det": `${roleName_value} והתיאור: ${desR} והכישורים: ${selected.join(" , ")}` }
-   fetch("/api/ste", {
-  method: 'POST', // or 'PUT'
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(data),
-})
-  .then((response) => response)
-  .then((data) => {
-    console.log('Success:', data);
+            if (!res?.success || !res.item) { error1 = 'create failed'; return; }
+            if (res.moderation?.flagged) { addR = false; return; }
 
-  })
-  .catch((error) => {
-    console.error('Error:', error);
-  
-  })
+            if (res.translate) {
+              fetch('/api/translations', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(res.translate)
+              }).catch((e) => console.warn('תרגום נכשל:', e));
+            }
+
+            id = res.item.id;
+            dispatchrole?.({ id: res.item.id, attributes: res.item.attributes }, id);
+            addR = false;
              }
       catch(error) {
-        console.log('צריך לתקן:', error.response);
-        error = error1 
+        console.log('צריך לתקן:', error);
+        error1 = error
         console.log(error1)
                 };}
-    };     
+    };
 
 
 

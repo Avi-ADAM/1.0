@@ -275,6 +275,79 @@ export interface ProposeOnOpenMashaabimParams {
   originalValues?: Record<string, any>;
 }
 
+export interface CounterOnAskmParams {
+  askmId: string;
+  openMashaabimId?: string;
+  projectId: string;
+  ordern?: number;
+  candidateUserId?: string;
+  newValues?: Record<string, any>;
+  users?: Array<{ what: boolean; users_permissions_user: any; order?: number; zman?: string; ide?: number }>;
+}
+
+export interface ProposeOnOpenMissionParams {
+  openMissionId: string;
+  projectId: string;
+  newValues?: Record<string, any>;
+  originalValues?: Record<string, any>;
+}
+
+export interface CounterOnAskParams {
+  askId: string;
+  openMissionId?: string;
+  projectId: string;
+  ordern?: number;
+  candidateUserId?: string;
+  newValues?: Record<string, any>;
+  users?: Array<{ what: boolean; users_permissions_user: any; order?: number; zman?: string; ide?: number }>;
+}
+
+export interface AcceptCounterOnAskmParams {
+  askmId: string;
+  projectId: string;
+  ordern?: number;
+  users?: Array<{ what: boolean; users_permissions_user: any; order?: number; zman?: string; ide?: number }>;
+}
+
+export interface AcceptCounterOnAskParams {
+  askId: string;
+  projectId: string;
+  ordern?: number;
+  users?: Array<{ what: boolean; users_permissions_user: any; order?: number; zman?: string; ide?: number }>;
+}
+
+export interface CandidateCounterOnAskmParams {
+  askmId: string;
+  openMashaabimId?: string;
+  projectId: string;
+  ordern?: number;
+  newValues?: Record<string, any>;
+  users?: Array<{ what: boolean; users_permissions_user: any; order?: number; zman?: string; ide?: number }>;
+}
+
+export interface CandidateCounterOnAskParams {
+  askId: string;
+  openMissionId?: string;
+  projectId: string;
+  ordern?: number;
+  newValues?: Record<string, any>;
+  users?: Array<{ what: boolean; users_permissions_user: any; order?: number; zman?: string; ide?: number }>;
+}
+
+export interface CustomizeOpenMashaabimParams {
+  openMashaabimId: string;
+  projectId: string;
+  spId: string;
+  missionName?: string;
+  newValues?: Record<string, any>;
+}
+
+export interface CustomizeOpenMissionParams {
+  openMissionId: string;
+  projectId: string;
+  newValues?: Record<string, any>;
+}
+
 export type ActionKey =
   | 'createTask'
   | 'updateTask'
@@ -297,9 +370,19 @@ export type ActionKey =
   | 'submitNegoMash'
   | 'submitNegoMaap'
   | 'proposeOnOpenMashaabim'
+  | 'counterOnAskm'
+  | 'proposeOnOpenMission'
+  | 'counterOnAsk'
+  | 'acceptCounterOnAskm'
+  | 'acceptCounterOnAsk'
+  | 'candidateCounterOnAskm'
+  | 'candidateCounterOnAsk'
+  | 'customizeOpenMashaabim'
+  | 'customizeOpenMission'
   | 'getUserForums'
   | 'getForumThread'
   | 'createChatMessage'
+  | 'ensureVoteForum'
   | 'getPlatformProject'
   | 'createPlatformSale'
   | 'decideSiteShare'
@@ -320,6 +403,8 @@ export type ActionKey =
   | 'addAskChatEntry'
   | 'createWeave'
   | 'markResourceDone'
+  | 'finalizeJoinAcceptance'
+  | 'finalizeAskmAcceptance'
   ;
 
 
@@ -393,6 +478,15 @@ export interface ActionParamsMap {
     reason?: string;
   };
   proposeOnOpenMashaabim: ProposeOnOpenMashaabimParams;
+  counterOnAskm: CounterOnAskmParams;
+  proposeOnOpenMission: ProposeOnOpenMissionParams;
+  counterOnAsk: CounterOnAskParams;
+  acceptCounterOnAskm: AcceptCounterOnAskmParams;
+  acceptCounterOnAsk: AcceptCounterOnAskParams;
+  candidateCounterOnAskm: CandidateCounterOnAskmParams;
+  candidateCounterOnAsk: CandidateCounterOnAskParams;
+  customizeOpenMashaabim: CustomizeOpenMashaabimParams;
+  customizeOpenMission: CustomizeOpenMissionParams;
   getUserForums: Record<string, never>;
   getForumThread: {
     forumId: string;
@@ -402,6 +496,12 @@ export interface ActionParamsMap {
     message: string;
     md?: Record<string, any>;
     username?: string;
+  };
+  ensureVoteForum: {
+    entityType: 'pendm' | 'pmash';
+    entityId: string;
+    projectId?: string;
+    forumId?: string;
   };
 }
 

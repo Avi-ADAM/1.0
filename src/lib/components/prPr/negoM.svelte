@@ -1,11 +1,14 @@
 ﻿<script>
   import { role, ww, skil } from '$lib/components/prPr/mi.js';
   import { onMount } from 'svelte';
+  import { get } from 'svelte/store';
   import { lang } from '$lib/stores/lang';
   import { t, isRtl} from '$lib/translations';
   import tr from '$lib/translations/tr.json';
   import Text from '../conf/text.svelte';
-  import Elements from '../conf/elements.svelte';
+  import SkillSelector from '../ui/SkillSelector.svelte';
+  import RoleSelector from '../ui/RoleSelector.svelte';
+  import WorkwaySelector from '../ui/WorkwaySelector.svelte';
   import Number from '../conf/number.svelte';
   import DateNego from '../conf/dateNego.svelte';
   import Barb from '../conf/barb.svelte';
@@ -16,6 +19,8 @@
   import LocationNego from '../conf/locationNego.svelte';
   import { submitNegoMission } from '$lib/client/actionClient';
   import { updatePendsStore } from '$lib/utils/levSocketHandler';
+  import { toIsoDateString } from '$lib/func/montsi.svelte';
+  import { openNegoBridge, readNegoBridgeReturn } from '$lib/func/negoBridge.js';
   /**
    * @typedef {Object} Props
    * @property {any} [negopendmissions]
@@ -101,7 +106,21 @@
     location = null,
     onClose,
     onLoad,
-    isAsk = 0
+    isAsk = 0,
+    /**
+     * Optional: when provided, hands the diff to the parent instead of calling
+     * submitNegoMission. Used by the open-mission candidate/counter flow where
+     * the terms become a parallel Negopendmission round. Receives { newValues, originalValues }.
+     * @type {((d: { newValues: any, originalValues: any }) => Promise<void>) | null}
+     */
+    onSubmit = null,
+    /**
+     * The latest candidate-side negotiation round attributes (proposedBy=candidate).
+     * Shown alongside fields as a reference when counter-proposing on a candidate's
+     * open-mission application so members know what they are responding to.
+     * @type {any | null}
+     */
+    candidateRound = null
   } = $props();
   $inspect(acts);
   let datai = $state([]);
@@ -137,23 +156,10 @@
   console.log(negopendmissions);
   const tri = tr;
   let isKavua2 = $state();
-  let newcontent = $state(true);
 
   let error1;
-  let placeholder4 = `בחירת תפקידים`;
-  let roles = $state($role);
-  let why = '';
-  let skills2 = $state($skil);
-  let placeholder1 = `בחירת כישורים`;
-  let addS = false;
   let descrip2 = $state(descrip);
   let name2 = $state(name1);
-  let selected2 = [];
-  let selected3 = [];
-  let selected1 = [];
-  let workways2 = $state($ww);
-  let placeholder = `סוג משימה`;
-  const plww = { he: `סוג משימה`, en: `mission kind` };
   let mdate2 = $state(mdate);
   let mdates2 = $state(mdates);
 
@@ -163,9 +169,13 @@
   let perhour2 = $state(perhour);
   let myM;
   let done;
-  let skills3 = $state({ data: [] });
-  let tafkidims2 = $state({ data: [] });
-  let workways3 = $state({ data: [] });
+
+  // Unified vocab selection — name arrays bound to the VocabSelector wrappers.
+  // Seeded (in onMount) from the mission's current relations and resolved back
+  // to ids at submit time, the same flow used in userPr/edit.svelte.
+  let selectedSkills = $state([]);
+  let selectedRoles = $state([]);
+  let selectedWorkways = $state([]);
   let acts2 = $state(
     acts?.data && Array.isArray(acts.data) ? [...acts.data] : []
   );
@@ -206,8 +216,94 @@
   function arraysEqual(a1, a2) {
     return JSON.stringify(a1) == JSON.stringify(a2);
   }
+
+  /** Localized display name for a catalog/relation entry (he localization first). */
+  function vname(item, nameField) {
+    let name = item?.attributes?.[nameField] || '';
+    if ($lang === 'he' && item?.attributes?.localizations?.data?.length > 0) {
+      name = item.attributes.localizations.data[0].attributes[nameField];
+    }
+    return name;
+  }
+
+  // Seed selected names from the mission's current relations, preferring the
+  // catalog entry (which always carries localizations) so the labels match the
+  // dropdown options — otherwise re-picking a Hebrew item wouldn't resolve.
+  function seedNames(items, catalog, nameField) {
+    return (items ?? [])
+      .map((it) => {
+        const hit = catalog.find((c) => String(c.id) === String(it.id));
+        return vname(hit ?? it, nameField);
+      })
+      .filter(Boolean);
+  }
+
+  // Resolve display names back to catalog ids (matches master name OR he
+  // localization) — the inverse of the seeding above. Includes the original
+  // relation objects in the source so existing items never drop while a newly
+  // created one is still propagating into the store.
+  function findIds(names, catalog, originals, nameField) {
+    const source = [...catalog, ...(originals ?? [])];
+    const ids = [];
+    for (const searchName of names) {
+      for (const item of source) {
+        if (!item.attributes) continue;
+        const name = item.attributes[nameField];
+        let heName = name;
+        if (item.attributes.localizations?.data?.length > 0) {
+          heName = item.attributes.localizations.data[0].attributes[nameField];
+        }
+        if (name === searchName || heName === searchName) {
+          ids.push(String(item.id));
+          break;
+        }
+      }
+    }
+    return ids;
+  }
+
   function close() {
     onClose?.();
+  }
+
+  // ── Consensus bridge ──────────────────────────────────────────────────────
+  // Open a structured mediation discussion in the consensus app, seeded with the
+  // mission's negotiable terms (original vs. current proposal). See negoBridge.js.
+  function openBridge() {
+    openNegoBridge({
+      sourceType: 'mission',
+      sourceId: pendId,
+      title: name1,
+      projectName,
+      fields: [
+        { key: 'name', label: 'שם', kind: 'text', original: name1 ?? null, proposed: name2 ?? null },
+        { key: 'descrip', label: 'תיאור', kind: 'text', original: descrip ?? null, proposed: descrip2 ?? null },
+        { key: 'noofhours', label: 'כמות שעות', kind: 'number', original: noofhours || 0, proposed: noofhours2 || 0 },
+        { key: 'perhour', label: 'שווי לשעה', kind: 'number', original: perhour || 0, proposed: perhour2 || 0 },
+        { key: 'startDate', label: 'תאריך התחלה', kind: 'date', original: toIsoDateString(mdate) ?? null, proposed: toIsoDateString(mdate2) ?? null },
+        { key: 'finishDate', label: 'תאריך סיום', kind: 'date', original: toIsoDateString(mdates) ?? null, proposed: toIsoDateString(mdates2) ?? null }
+      ]
+    });
+  }
+
+  // Prefill from a returned bridge agreement. Dates come back as ISO strings;
+  // convert them to the picker's display format so submit (which re-parses with
+  // 'HH:mm DD/MM/YYYY') round-trips correctly.
+  function applyBridgeReturn() {
+    const v = readNegoBridgeReturn(pendId);
+    if (!v) return;
+    if (v.name != null) name2 = String(v.name);
+    if (v.descrip != null) descrip2 = String(v.descrip);
+    if (v.noofhours != null) noofhours2 = +v.noofhours;
+    if (v.perhour != null) perhour2 = +v.perhour;
+    if (v.startDate != null) {
+      const m = moment(v.startDate);
+      if (m.isValid()) mdate2 = m.format('HH:mm DD/MM/YYYY');
+    }
+    if (v.finishDate != null) {
+      const m = moment(v.finishDate);
+      if (m.isValid()) mdates2 = m.format('HH:mm DD/MM/YYYY');
+    }
   }
 
   function hasActsChanged() {
@@ -285,22 +381,22 @@
       hasChanges = true;
     }
 
-    const skillsId = skills?.data ? skills.data.map((c) => c.id) : [];
-    const skills2Id = skills3?.data ? skills3.data.map((c) => c.id) : [];
+    const skillsId = (skills?.data ?? []).map((c) => String(c.id));
+    const skills2Id = findIds(selectedSkills, $skil, skills?.data, 'skillName');
     if (!arraysEqual(skillsId, skills2Id)) {
       newValues.skillIds = skills2Id;
       originalValues.skillIds = skillsId;
       hasChanges = true;
     }
-    const roId = tafkidims?.data ? tafkidims.data.map((c) => c.id) : [];
-    const ro2Id = tafkidims2?.data ? tafkidims2.data.map((c) => c.id) : [];
+    const roId = (tafkidims?.data ?? []).map((c) => String(c.id));
+    const ro2Id = findIds(selectedRoles, $role, tafkidims?.data, 'roleDescription');
     if (!arraysEqual(roId, ro2Id)) {
       newValues.roleIds = ro2Id;
       originalValues.roleIds = roId;
       hasChanges = true;
     }
-    const wwId = workways?.data ? workways.data.map((c) => c.id) : [];
-    const ww2Id = workways3?.data ? workways3.data.map((c) => c.id) : [];
+    const wwId = (workways?.data ?? []).map((c) => String(c.id));
+    const ww2Id = findIds(selectedWorkways, $ww, workways?.data, 'workWayName');
     if (!arraysEqual(wwId, ww2Id)) {
       newValues.workwayIds = ww2Id;
       originalValues.workwayIds = wwId;
@@ -325,6 +421,20 @@
 
     // Guard: skip if nothing changed and user already voted (masaalr + mypos)
     if (!hasChanges && masaalr && mypos) return;
+
+    // Parent-handled flow (open-mission candidate/counter): hand the diff to the parent.
+    if (onSubmit) {
+      try {
+        await onSubmit({ newValues, originalValues });
+        toast.success(tr?.toasts.suc[$lang]);
+        close();
+      } catch (e) {
+        error1 = e;
+        console.log(error1);
+        toast.warning(tr?.toasts.er[$lang]);
+      }
+      return;
+    }
 
     // Build acts data for server
     const acts2Array = Array.isArray(acts2) ? acts2 : [];
@@ -378,148 +488,22 @@
       toast.warning(tr?.toasts.er[$lang]);
     }
   }
-  let dataibno = $state({
-    skillName: [],
-    roleDescription: [],
-    workWayName: []
-  });
-  function addnew(event) {
-    const newOb = event.skob;
-    const valc = event.valc;
-    const dataibn = event.dataibn;
-    const newN = event.skob.attributes[valc];
-    dataibno[valc] = dataibn;
-    const newValues =
-      valc == 'skillName'
-        ? $skil
-        : valc == 'roleDescription'
-          ? $role
-          : valc == 'workWayName'
-            ? $ww
-            : [];
-    newValues.push(newOb);
-    if (valc == 'skillName') {
-      skills2 = newValues;
-      skil.set(skills2);
-    } else if (valc == 'roleDescription') {
-      roles = newValues;
-      role.set(roles);
-    } else if (valc == 'workWayName') {
-      workways2 = newValues;
-      ww.set(workways2);
-    }
-    const newSele =
-      valc == 'skillName'
-        ? skills3.data
-        : valc == 'roleDescription'
-          ? tafkidims2.data
-          : valc == 'workWayName'
-            ? workways3.data
-            : [];
-    newSele.push(newOb);
-    if (valc == 'skillName') {
-      skills3.data = newSele;
-    } else if (valc == 'roleDescription') {
-      tafkidims2.data = newSele;
-    } else if (valc == 'workWayName') {
-      workways3.data = newSele;
-    }
-    dataibno[valc].push(newN);
-    dataibno = dataibno;
-  }
-  onMount(async () => {
+  onMount(() => {
+    applyBridgeReturn();
     isKavua2 = isKavua;
-    skills3 = JSON.parse(JSON.stringify(skills));
-    tafkidims2 = JSON.parse(JSON.stringify(tafkidims));
-    workways3 = JSON.parse(JSON.stringify(workways));
-    console.log('negoM mounted', $lang);
-    console.log(
-      'acts prop received:',
-      acts,
-      'type:',
-      typeof acts,
-      'has data:',
-      !!acts?.data,
-      'data isArray:',
-      Array.isArray(acts?.data)
-    );
-    console.log('acts.data:', acts?.data);
-    console.log('acts2 state:', acts2);
-    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-    const checkStatus = (resp) => {
-      if (resp.status >= 200 && resp.status < 300) {
-        return resp;
-      }
-      return parseJSON(resp).then((resp) => {
-        throw resp;
-      });
-    };
-    try {
-      const res = await fetch(import.meta.env.VITE_URL + '/graphql', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `query {
-    skills {data{ id attributes{ skillName ${$lang == 'he' ? 'localizations{data {attributes{ skillName}} }' : ''} }}}
-     tafkidims {data{ id attributes{ roleDescription ${$lang == 'he' ? 'localizations{data {attributes{ roleDescription}} }' : ''}}}}
-     workWays {data{ id attributes{ workWayName ${$lang == 'he' ? 'localizations{data {attributes{ workWayName}} }' : ''} } }}
- }
-              `
-        })
-      })
-        .then(checkStatus)
-        .then(parseJSON);
-      skills2 = res.data.skills.data;
-      if ($lang == 'he') {
-        for (let i = 0; i < skills2.length; i++) {
-          if (skills2[i].attributes.localizations.data.length > 0) {
-            skills2[i].attributes.skillName =
-              skills2[i].attributes.localizations.data[0].attributes.skillName;
-          }
-        }
-      }
-      skills2 = skills2;
-      roles = res.data.tafkidims.data;
-      if ($lang == 'he') {
-        for (let i = 0; i < roles.length; i++) {
-          if (roles[i].attributes.localizations.data.length > 0) {
-            roles[i].attributes.roleDescription =
-              roles[
-                i
-              ].attributes.localizations.data[0].attributes.roleDescription;
-          }
-        }
-      }
-      roles = roles;
-      workways2 = res.data.workWays.data;
-      if ($lang == 'he') {
-        for (let i = 0; i < workways2.length; i++) {
-          if (workways2[i].attributes.localizations.data.length > 0) {
-            workways2[i].attributes.workWayName =
-              workways2[
-                i
-              ].attributes.localizations.data[0].attributes.workWayName;
-          }
-        }
-      }
-      workways2 = workways2;
-      skil.set(skills2);
-      ww.set(workways2);
-      role.set(roles);
-      newcontent = false;
-    } catch (e) {
-      error1 = e;
-
-      console.log(error1);
-    }
+    // Seed the selectors from the mission's current relations. The shared vocab
+    // stores (mi.js) are seeded synchronously from static JSON at import, so the
+    // localized labels are available here; the VocabSelector refreshes the
+    // catalog through the proxy on its own mount.
+    selectedSkills = seedNames(skills?.data, get(skil), 'skillName');
+    selectedRoles = seedNames(tafkidims?.data, get(role), 'roleDescription');
+    selectedWorkways = seedNames(workways?.data, get(ww), 'workWayName');
   });
 </script>
 
 <div class="text-barbi" dir={$isRtl ? 'rtl' : 'ltr'}>
   <h1 class="md:text-center text-2xl md:text-2xl font-bold underline">
-    {tri?.nego?.head[$lang]}
+    {onSubmit ? tri?.nego?.headMissionCandidate[$lang] : tri?.nego?.head[$lang]}:
     {name1}
   </h1>
   <div class="flex flex-col align-middle justify-center">
@@ -535,48 +519,67 @@
       bind:textb={descrip2}
       lebel={tri?.common?.description}
     />
-    <Elements
-      dataibn={dataibno.skillName}
-      {newcontent}
-      placeholder={tri?.mission?.addNewSkills}
-      datai={skills.data}
-      alld={skills2}
-      bind:dataib={skills3.data}
-      lebel={tri?.mission?.requireSkills}
-      onAddnew={addnew}
-      valc="skillName"
-      bgi="gold"
-    />
-    <Elements
-      {newcontent}
-      placeholder={tri?.mission?.addNewRoles}
-      datai={tafkidims.data}
-      alld={roles}
-      bind:dataib={tafkidims2.data}
-      lebel={tri?.mission?.requiredRoles}
-      dataibn={dataibno.roleDescription}
-      onAddnew={addnew}
-      valc="roleDescription"
-      bgi="gold"
-    />
-    <Elements
-      {newcontent}
-      placeholder={tri?.mission?.addNewWw}
-      datai={workways.data}
-      alld={workways2}
-      bind:dataib={workways3.data}
-      lebel={tri?.mission?.requiredWW}
-      dataibn={dataibno.workWayName}
-      onAddnew={addnew}
-      valc="workWayName"
-      bgi="gold"
-    />
+    <div class="m-2">
+      <h3 class="text-center text-sm text-barbi underline decoration-mturk">
+        {tri?.mission?.requireSkills?.[$lang]}
+      </h3>
+      <SkillSelector
+        bind:selectedSkills
+        placeholder={tri?.mission?.addNewSkills?.[$lang]}
+        autoCreate={true}
+      />
+    </div>
+    <div class="m-2">
+      <h3 class="text-center text-sm text-barbi underline decoration-mturk">
+        {tri?.mission?.requiredRoles?.[$lang]}
+      </h3>
+      <RoleSelector
+        bind:selectedRoles
+        placeholder={tri?.mission?.addNewRoles?.[$lang]}
+        autoCreate={true}
+      />
+    </div>
+    <div class="m-2">
+      <h3 class="text-center text-sm text-barbi underline decoration-mturk">
+        {tri?.mission?.requiredWW?.[$lang]}
+      </h3>
+      <WorkwaySelector
+        bind:selectedWorkways
+        placeholder={tri?.mission?.addNewww?.[$lang]}
+        autoCreate={true}
+      />
+    </div>
     <!----<Text long={true} text={hearotMeyuchadot} bind:textb={hearotMeyuchadot2} lebel={tri?.mission?.specialNotes}/>
             --><Text
       text={privatlinks}
       bind:textb={privatlinks2}
       lebel={tri?.mission?.linkToMission}
     />
+    {#if onSubmit && candidateRound}
+      {@const candTot = (candidateRound.noofhours ?? noofhours) * (candidateRound.perhour ?? perhour)}
+      <div class="mx-2 my-2 rounded-lg border border-barbi/50 bg-barbi/5 p-3 text-sm space-y-1">
+        <p class="font-bold text-barbi text-base">
+          💡 {$lang === 'he' ? 'הצעת המועמד (לעיון):' : 'Candidate proposal (for reference):'}
+        </p>
+        <div class="flex flex-wrap gap-x-4 gap-y-1 text-barbi/80">
+          {#if candidateRound.noofhours != null}
+            <span>{$lang === 'he' ? 'שעות:' : 'Hours:'} <strong>{candidateRound.noofhours}</strong></span>
+          {/if}
+          {#if candidateRound.perhour != null}
+            <span>{$lang === 'he' ? 'לשעה:' : 'Per hour:'} <strong>{candidateRound.perhour}</strong></span>
+          {/if}
+          {#if candTot > 0}
+            <span class="font-bold">{$lang === 'he' ? 'סה"כ:' : 'Total:'} <strong>{candTot.toLocaleString()}</strong></span>
+          {/if}
+          {#if candidateRound.mdate}
+            <span>{$lang === 'he' ? 'התחלה:' : 'Start:'} <strong>{new Date(candidateRound.mdate).toLocaleDateString($lang)}</strong></span>
+          {/if}
+          {#if candidateRound.mdates}
+            <span>{$lang === 'he' ? 'סיום:' : 'End:'} <strong>{new Date(candidateRound.mdates).toLocaleDateString($lang)}</strong></span>
+          {/if}
+        </div>
+      </div>
+    {/if}
     <Number
       old={negopendmissions.map((c) => c?.attributes?.noofhours)}
       number={noofhours}
@@ -590,18 +593,30 @@
             ? true
             : null}
     />
+    {#if onSubmit && candidateRound?.noofhours != null && candidateRound.noofhours !== noofhours}
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} <strong>{candidateRound.noofhours}</strong></p>
+    {/if}
     <Number
       old={negopendmissions.map((c) => c?.attributes?.perhour)}
       number={perhour}
       bind:numberb={perhour2}
       lebel={tri?.mission?.hourlyVallue[$lang]}
     />
+    {#if onSubmit && candidateRound?.perhour != null && candidateRound.perhour !== perhour}
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} <strong>{candidateRound.perhour}</strong></p>
+    {/if}
     <DateNego date={mdate} bind:dateb={mdate2} lebel={tri?.common.startDate} />
+    {#if onSubmit && candidateRound?.mdate}
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} {new Date(candidateRound.mdate).toLocaleDateString($lang)}</p>
+    {/if}
     <DateNego
       date={mdates}
       bind:dateb={mdates2}
       lebel={tri?.common.finishDate}
     />
+    {#if onSubmit && candidateRound?.mdates}
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} {new Date(candidateRound.mdates).toLocaleDateString($lang)}</p>
+    {/if}
 
     <LocationNego
       {location}
@@ -742,13 +757,20 @@
                                     </td>
                                 </tr>
                                 </table>-->
-  <div class="w-fit mx-auto">
+  <div class="w-fit mx-auto flex flex-col items-center gap-y-2">
     <button
       onclick={increment}
       class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
       type="submit"
-      name="addm">{tri?.common.puttovote[$lang]}</button
+      name="addm">{onSubmit ? tri?.nego?.submitProposal[$lang] : tri?.common.puttovote[$lang]}</button
     >
+    <button
+      onclick={openBridge}
+      type="button"
+      class="mx-auto text-sm border border-gold/50 text-gold hover:bg-gold/20 rounded-full px-4 py-1"
+    >
+      {$lang === 'en' ? '🤝 Open a deeper discussion' : '🤝 דיון מעמיק'}
+    </button>
   </div>
 </div>
 

@@ -446,7 +446,7 @@
           onclick={close}
           style="margin: 0 auto;"
           class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-          title="ביטול"
+          title={$t('lev.missionInProgress.cancel')}
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
             <path
               fill="currentColor"
@@ -459,34 +459,34 @@
             minlength="26"
             type="text"
             bind:value={why}
-            placeholder="יש לנמק מדוע ההצעה נדחית על ידך"
+            placeholder={$t('lev.halukaask.offerRejected')}
           />
-          <button onclick={afterwhy}>אישור</button>
+          <button onclick={afterwhy}>{$t('lev.cards.confirmApprove')}</button>
         {:else if rect === true}
           <div class="text-center">
             <h1>
-              ניתן להגיב ולנמק מדוע
-              {mypos === false ? 'לדחות' : ' לאשר '}
-              את ההצעה
+              {$t('lev.halukaask.canRespond')}
+              {mypos === false ? $t('lev.halukaask.decline') : $t('lev.halukaask.approve')}
+              {$t('lev.halukaask.theOffer')}
               <br />
-              נא להתייחס לתגובה הקודמת ולהשיב על הטענות שעלו בה
+              {$t('lev.halukaask.referToPrevious')}
             </h1>
-            <small style="color: red;">התגובה הקודמת</small>
+            <small style="color: red;">{$t('lev.halukaask.previousResponse')}</small>
             {#if whyno.length > 0}<h4
                 style="color:var(--barbi-pink); font-size: 13px;"
               >
                 {whyno.join(' ~ ')}
               </h4>{/if}
             <br />
-            <lebel for="yu">התגובה שלך</lebel>
+            <lebel for="yu">{$t('lev.halukaask.yourResponseLabel')}</lebel>
             <input
               id="yu"
               minlength="26"
               type="text"
               bind:value={why}
-              placeholder="התשובה שלך"
+              placeholder={$t('lev.halukaask.yourResponse')}
             />
-            <button onclick={afreact}>אישור</button>
+            <button onclick={afreact}>{$t('lev.cards.confirmApprove')}</button>
           </div>
         {:else if masa === true}
           <h2 class="bg-gold text-barbi text-center">

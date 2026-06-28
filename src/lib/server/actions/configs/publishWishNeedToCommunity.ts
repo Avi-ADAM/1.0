@@ -40,14 +40,27 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     hours = null,
     perhour = null,
     price = null,
+    easy = null,
     quantity = null,
     kindOf = 'total',
+    recurring = false,
+    linkto = '',
+    spnot = '',
+    startDate = null,
+    endDate = null,
     isMust = false,
     skillNames = [],
     pendmId = null,
     pmashId = null,
     missionTemplateId = null,
-    mashaabimTemplateId = null
+    mashaabimTemplateId = null,
+    // Optional location override (when the wisher sets a location in the
+    // resource form); otherwise we fall back to the wish's own location below.
+    isOnline = null,
+    lat = null,
+    lng = null,
+    radius = null,
+    location_hint = null
   } = params as {
     ratsonId: string;
     kind: 'mission' | 'resource';
@@ -56,14 +69,25 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     hours?: number | null;
     perhour?: number | null;
     price?: number | null;
+    easy?: number | null;
     quantity?: number | null;
     kindOf?: string;
+    recurring?: boolean;
+    linkto?: string;
+    spnot?: string;
+    startDate?: string | null;
+    endDate?: string | null;
     isMust?: boolean;
     skillNames?: string[];
     pendmId?: string | null;
     pmashId?: string | null;
     missionTemplateId?: string | null;
     mashaabimTemplateId?: string | null;
+    isOnline?: boolean | null;
+    lat?: number | null;
+    lng?: number | null;
+    radius?: number | null;
+    location_hint?: string | null;
   };
 
   if (!ratsonId) throw new Error('ratsonId is required');
@@ -87,13 +111,28 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const isOwner = owners.some((o: any) => String(o.id) === String(context.userId));
   if (!isOwner) throw new Error('Only the wish owner may publish a need to the community');
 
-  // Build a location component from the wish's flat fields.
+  // Build a location component. Prefer an explicit override coming from the
+  // resource form; otherwise fall back to the wish's own flat location fields.
+  const hasLocOverride =
+    isOnline != null ||
+    lat != null ||
+    lng != null ||
+    radius != null ||
+    (typeof location_hint === 'string' && location_hint.trim() !== '');
   const loc: Record<string, unknown> = {};
-  if (ratAttrs.lat != null) loc.lat = ratAttrs.lat;
-  if (ratAttrs.lng != null) loc.lng = ratAttrs.lng;
-  if (ratAttrs.radius != null) loc.radius = Math.round(Number(ratAttrs.radius));
-  if (ratAttrs.location_hint) loc.location_hint = ratAttrs.location_hint;
-  if (ratAttrs.isOnline) loc.location_mode = 'online';
+  if (hasLocOverride) {
+    if (lat != null) loc.lat = lat;
+    if (lng != null) loc.lng = lng;
+    if (radius != null) loc.radius = Math.round(Number(radius));
+    if (location_hint) loc.location_hint = location_hint;
+    if (isOnline) loc.location_mode = 'online';
+  } else {
+    if (ratAttrs.lat != null) loc.lat = ratAttrs.lat;
+    if (ratAttrs.lng != null) loc.lng = ratAttrs.lng;
+    if (ratAttrs.radius != null) loc.radius = Math.round(Number(ratAttrs.radius));
+    if (ratAttrs.location_hint) loc.location_hint = ratAttrs.location_hint;
+    if (ratAttrs.isOnline) loc.location_mode = 'online';
+  }
   const location = Object.keys(loc).length ? loc : null;
 
   // ── Mission ────────────────────────────────────────────────────────────────
@@ -130,8 +169,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
         skills: skillIds,
         tafkidims: [],
         work_ways: [],
-        // source intentionally omitted — branding keys off the `ratson` relation;
-        // set your ENUM_OPENMISSION_SOURCE value here once finalised.
+        // Branded as Concierge by the `source` enum (and the `ratson` relation).
+        source: 'concierge',
         location,
         sqadualed: ratAttrs.startDate || null,
         publishedAt: now
@@ -158,16 +197,28 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     {
       name,
       descrip: descrip || '',
-      spnot: '',
+      spnot: spnot || '',
       price: typeof price === 'number' ? price : 0,
-      easy: typeof price === 'number' ? price : 0,
+      // `easy` is the project-side max/risk value; fall back to price when absent.
+      easy:
+        typeof easy === 'number' && easy > 0
+          ? easy
+          : typeof price === 'number'
+            ? price
+            : 0,
       hm: typeof quantity === 'number' && quantity > 0 ? quantity : 1,
       kindOf: mapKindOf(kindOf),
       isMust: !!isMust,
       ratson: ratsonId,
       pmash: pmashId || null,
       mashaabim: mashaabimTemplateId || null,
+      // Branded as Concierge by the `source` enum (and the `ratson` relation).
+      source: 'concierge',
+      linkto: linkto || '',
+      recurring: !!recurring,
       location,
+      sqadualed: startDate || null,
+      sqadualedf: endDate || null,
       publishedAt: now
     },
     context.jwt,
@@ -220,14 +271,25 @@ export const publishWishNeedToCommunityConfig: ActionConfig = {
     hours: { type: 'number', required: false },
     perhour: { type: 'number', required: false },
     price: { type: 'number', required: false },
+    easy: { type: 'number', required: false },
     quantity: { type: 'number', required: false },
     kindOf: { type: 'string', required: false },
+    recurring: { type: 'boolean', required: false },
+    linkto: { type: 'string', required: false },
+    spnot: { type: 'string', required: false },
+    startDate: { type: 'string', required: false },
+    endDate: { type: 'string', required: false },
     isMust: { type: 'boolean', required: false },
     skillNames: { type: 'array', required: false },
     pendmId: { type: 'string', required: false },
     pmashId: { type: 'string', required: false },
     missionTemplateId: { type: 'string', required: false },
-    mashaabimTemplateId: { type: 'string', required: false }
+    mashaabimTemplateId: { type: 'string', required: false },
+    isOnline: { type: 'boolean', required: false },
+    lat: { type: 'number', required: false },
+    lng: { type: 'number', required: false },
+    radius: { type: 'number', required: false },
+    location_hint: { type: 'string', required: false }
   },
   authRules: [{ type: 'jwt', errorMessage: 'Must be logged in to publish a need' }],
   updateStrategy: { type: 'none' }

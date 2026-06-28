@@ -69,6 +69,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
 
   // 3. Create negopendmission snapshot (stores original values before this negotiation)
   const orig = params.originalValues ?? {};
+  const origLoc = normalizeLocationInput(orig.location);
   await strapi.execute('negoCreateNegopendmission', {
     publishedAt: nowISO,
     userId,
@@ -87,10 +88,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     sqadualed: orig.date ?? null,
     dates: orig.dates ?? null,
     acts: snapshotActIds.length > 0 ? snapshotActIds : null,
-    location: (() => {
-      const loc = normalizeLocationInput(orig.location);
-      return loc ? [loc] : null;
-    })(),
+    // Omit `location` entirely when absent: the field is a repeatable component
+    // ([ComponentNewLocationInput]) and Strapi rejects an explicit `null`.
+    ...(origLoc ? { location: [origLoc] } : {}),
   }, context.jwt, context.fetch);
 
   // 4. Build updated users array (existing + new vote from current user)
@@ -178,10 +178,31 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     };
   }
 
-  // OpenMission path: update fields only
-  await strapi.execute('negoUpdateOpenMission', {
-    id: params.pendId,
-    data: entityData,
+  // OpenMission path: create a negotiation round instead of overwriting the
+  // shared resource. Multiple candidates negotiate in parallel; the OpenMission
+  // stays clean as the rikma baseline.
+  const roundLoc = nv.location != null ? normalizeLocationInput(nv.location) : null;
+  await strapi.execute('negoCreateNegopendmissionRound', {
+    publishedAt: nowISO,
+    userId,
+    open_mission: String(params.pendId),
+    ask: String(params.isAsk),
+    ordern: (params.ordern ?? 0) + 1,
+    proposedBy: 'candidate',
+    status: 'proposed',
+    isOriginal: false,
+    noofhours: nv.noofhours ?? null,
+    perhour: nv.perhour ?? null,
+    hearotMeyuchadot: nv.hearotMeyuchadot ?? null,
+    descrip: nv.descrip ?? null,
+    name: nv.name ?? null,
+    skills: nv.skillIds ?? null,
+    tafkidims: nv.roleIds ?? null,
+    work_ways: nv.workwayIds ?? null,
+    sqadualed: nv.sqadualed ?? null,
+    dates: nv.dates ?? null,
+    // Omit when absent — repeatable component rejects explicit `null` (see snapshot above).
+    ...(roundLoc ? { location: [roundLoc] } : {}),
   }, context.jwt, context.fetch);
 
   // Update the Ask with the new vote

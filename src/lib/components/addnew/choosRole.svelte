@@ -4,7 +4,6 @@ import MultiSelect from 'svelte-multiselect';
 import { missionNew } from '../../stores/missionNew';
   import { onMount } from 'svelte';
              import { lang } from '$lib/stores/lang.js'
-const baseUrl = import.meta.env.VITE_URL
 
 function inc() {
      missionNew.set(find_role_id(selected));
@@ -26,34 +25,12 @@ function inc() {
 
 
   onMount(async () => {
-const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-      const checkStatus = (resp) => {
-      if (resp.status >= 200 && resp.status < 300) {
-        return resp;
-      }
-      return parseJSON(resp).then((resp) => {
-        throw resp;
-      });
-    };
-    const headers = {
-      'Content-Type': 'application/json',
-    };
       try {
-          const res = await fetch(baseUrl+"/graphql", {
-              method: "POST",
-              headers: {
-                 'Content-Type': 'application/json'
-              },body: JSON.stringify({
-                        query: `query {
-  tafkidims {data{ id attributes{ roleDescription ${$lang == 'he' ? 'localizations{data{attributes{ roleDescription }}}' : ""}}}}
-}
-              `})
-            }).then(checkStatus)
-          .then(parseJSON);
-            roles1 = res.data.tafkidims.data
+          const res = await fetch(`/api/vocab/list?kind=roles&lang=${$lang}`).then((r) => r.json());
+            roles1 = res?.data ?? []
                        if ($lang == "he" ){
               for (var i = 0; i < roles1.length; i++){
-                if (roles1[i].attributes.localizations.data.length > 0){
+                if (roles1[i].attributes.localizations?.data?.length > 0){
                 roles1[i].attributes.roleDescription = roles1[i].attributes.localizations.data[0].attributes.roleDescription
                 }
               }

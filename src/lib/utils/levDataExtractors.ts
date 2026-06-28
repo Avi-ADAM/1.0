@@ -235,6 +235,14 @@ export function extractAsked(userData: any): AskData[] {
         chat: ask.attributes.chat || [],
         timegramaId: ask.attributes.timegrama?.data?.id,
         timegramaDate: ask.attributes.timegrama?.data?.attributes?.date,
+        timegramaDone: ask.attributes.timegrama?.data?.attributes?.done,
+        // Negotiation rounds (latest first) + current max round, for the card's
+        // Nego dialog (whose turn / latest proposed terms).
+        negopendmissions: ask.attributes.negopendmissions?.data || [],
+        orderon: (ask.attributes.negopendmissions?.data || []).reduce(
+          (m: number, r: any) => Math.max(m, Number(r.attributes?.ordern ?? 0)),
+          0
+        ),
         openMissionId: ask.attributes.open_mission?.data?.id,
         openMissionData: ask.attributes.open_mission?.data?.attributes,
         userAttributes: ask.attributes.users_permissions_user?.data?.attributes,
@@ -424,6 +432,17 @@ export function extractSuggestions(userData: any): SuggestionData[] {
       score: score,
       alreadyAsked: isAlreadyAsked,
       askId: askData?.id,
+      // Candidate's own pending application + the rikma's latest response, so the
+      // suggestion card can offer accept / counter-back (Path B2). myRoundProposedBy
+      // === 'project' means the rikma countered and it's the candidate's turn.
+      myAskId: askData?.id,
+      myAskUsers: askData?.attributes?.vots || [],
+      myRoundProposedBy: askData?.attributes?.negopendmissions?.data?.[0]?.attributes?.proposedBy ?? null,
+      myOrdern: askData?.attributes?.negopendmissions?.data?.[0]?.attributes?.ordern ?? 0,
+      // Full latest round (terms the candidate / rikma actually proposed), so the
+      // suggestion card can show the candidate their own counter-offer rather than
+      // only the rikma's baseline mission terms.
+      myRound: askData?.attributes?.negopendmissions?.data?.[0]?.attributes ?? null,
       chat: askData?.attributes?.chat,
       forumId: (askData?.attributes?.forums?.data && askData.attributes.forums.data.length > 0) ? askData.attributes.forums.data[0].id : null,
 
@@ -988,6 +1007,14 @@ export function extractResourceSuggestions(userData: any): ResourceSuggestionDat
 
   const sps = userData.attributes.sps.data;
 
+  // Lookup the candidate's own pending Askm per open resource, so a suggestion the
+  // candidate already applied to can surface the rikma's latest response (Path B2).
+  const myAskmByOm = new Map<string, any>();
+  for (const askm of (userData.attributes.askms?.data || [])) {
+    const omId = askm?.attributes?.open_mashaabim?.data?.id;
+    if (omId) myAskmByOm.set(String(omId), askm);
+  }
+
   for (const sp of sps) {
     if (!sp?.attributes?.mashaabim?.data?.attributes?.open_mashaabims?.data) {
       continue;
@@ -1085,6 +1112,19 @@ export function extractResourceSuggestions(userData: any): ResourceSuggestionDat
           // Additional fields
           ani: 'huca', // Identifiers for processor/UI
           azmi: 'hazaa',
+
+          // Candidate's own pending application + rikma's latest response (Path B2).
+          myAskId: myAskmByOm.get(String(om.id))?.id,
+          myAskUsers: myAskmByOm.get(String(om.id))?.attributes?.vots || [],
+          myRoundProposedBy:
+            myAskmByOm.get(String(om.id))?.attributes?.nego_mashes?.data?.[0]?.attributes?.proposedBy ?? null,
+          myOrdern:
+            myAskmByOm.get(String(om.id))?.attributes?.nego_mashes?.data?.[0]?.attributes?.ordern ?? 0,
+          // Full latest round (terms the candidate / rikma actually proposed), so the
+          // resource suggestion card can show the candidate their own counter-offer
+          // rather than only the rikma's baseline resource terms.
+          myRound:
+            myAskmByOm.get(String(om.id))?.attributes?.nego_mashes?.data?.[0]?.attributes ?? null,
 
           // Pass raw attrs if needed
           openMashaabimId: om.id,
@@ -1212,6 +1252,14 @@ export function extractAskedResources(userData: any): AskedResourceData[] {
         vots: askAttributes.vots || [],
         timegramaId: askAttributes.timegrama?.data?.id,
         timegramaDate: askAttributes.timegrama?.data?.attributes?.date,
+        timegramaDone: askAttributes.timegrama?.data?.attributes?.done,
+        // Resource negotiation rounds (NegoMash, latest first) + current max round.
+        // Exposed under `negopendmissions`/`orderon` to match reqtom's generic prop names.
+        negopendmissions: askAttributes.nego_mashes?.data || [],
+        orderon: (askAttributes.nego_mashes?.data || []).reduce(
+          (m: number, r: any) => Math.max(m, Number(r.attributes?.ordern ?? 0)),
+          0
+        ),
         spData: askAttributes.sp?.data?.attributes,
         openMashaabimData: askAttributes.open_mashaabim?.data?.attributes,
         userAttributes: userAttrs

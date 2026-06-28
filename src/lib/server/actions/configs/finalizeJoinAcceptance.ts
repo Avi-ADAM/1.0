@@ -53,10 +53,48 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
 
   const votesStr = formatVotesForInline(existingVotes);
 
-  const dateFragment = deadline ? `admaticedai: "${deadline}"` : '';
-  const sdateFragment = sqedualed ? `start: "${sqedualed}"` : '';
-  const tafkidimsStr = Array.isArray(tafkidims) ? tafkidims.join(',') : '';
-  const otherAsksFragment = variant === 'allVoted' ? 'asks { data { id } } acts { data { id } }' : 'acts { data { id } }';
+  // Apply the latest negotiated round's terms (if any) to the materialized
+  // Mesimabetahalich. When a candidate proposed custom terms and the member
+  // approves ("אישור"), the agreed (round) terms must win over the OpenMission
+  // baseline that the client passes in. Resolved server-side so client props
+  // can't make the materialization wrong.
+  let fName = openmissionName;
+  let fDescrip = missionDetails;
+  let fHearot = hearotMeyuchadot;
+  let fHours = nhours;
+  let fPer = valph;
+  let fTafkidims = Array.isArray(tafkidims) ? tafkidims.slice() : [];
+  let fStart = sqedualed;
+  let fDates = deadline;
+  try {
+    const roundsRes = await strapi.execute(
+      'getAskNegoRounds',
+      { id: askId },
+      context.jwt,
+      context.fetch
+    );
+    const latest =
+      roundsRes?.data?.ask?.data?.attributes?.negopendmissions?.data?.[0]?.attributes ?? null;
+    if (latest) {
+      if (latest.name != null) fName = latest.name;
+      if (latest.descrip != null) fDescrip = latest.descrip;
+      if (latest.hearotMeyuchadot != null) fHearot = latest.hearotMeyuchadot;
+      if (latest.noofhours != null) fHours = latest.noofhours;
+      if (latest.perhour != null) fPer = latest.perhour;
+      if (latest.tafkidims?.data?.length > 0) fTafkidims = latest.tafkidims.data.map((c: any) => c.id);
+      if (latest.date != null) fStart = latest.date;
+      if (latest.dates != null) fDates = latest.dates;
+    }
+  } catch (e) {
+    console.error('[finalizeJoinAcceptance] nego rounds fetch failed:', e);
+  }
+
+  const dateFragment = fDates ? `admaticedai: "${fDates}"` : '';
+  const sdateFragment = fStart ? `start: "${fStart}"` : '';
+  const tafkidimsStr = Array.isArray(fTafkidims) ? fTafkidims.join(',') : '';
+  // Always pull sibling asks so other candidates' offers get archived on
+  // acceptance — in BOTH the solo and allVoted variants.
+  const otherAsksFragment = 'asks { data { id } } acts { data { id } }';
 
   const welcomeFragment = newnew
     ? `createWelcomTop(data: {
@@ -87,11 +125,11 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
     createMesimabetahalich(data: {
       project: "${projectId}",
       mission: "${missId}",
-      hearotMeyuchadot: "${hearotMeyuchadot}",
-      name: "${openmissionName}",
-      descrip: "${missionDetails}",
-      hoursassinged: ${nhours},
-      perhour: ${valph},
+      hearotMeyuchadot: """${fHearot}""",
+      name: """${fName}""",
+      descrip: """${fDescrip}""",
+      hoursassinged: ${fHours},
+      perhour: ${fPer},
       iskvua: ${iskvua},
       privatlinks: "${privatlinks}",
       publicklinks: "${publicklinks}",
@@ -155,58 +193,41 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
     }
   }
 
-  // allVoted: archive other asks + optional createMonter
-  if (variant === 'allVoted') {
-    const otherAsks: any[] = openMissionAttrs.asks?.data || [];
-    const startDate = sqedualed
-      ? (new Date(sqedualed) > d ? sqedualed : now)
-      : now;
-
-    const monterFragment = iskvua && chiluzh
-      ? `createMonter(data: {
-          mesimabetahalich: "${chiluzh}",
-          ani: "mesimabetahalich"
-          start: "${startDate}"
-          ${deadline ? `finish: "${deadline}"` : ''}
-        }) { data { id } }`
-      : '';
-
-    if (otherAsks.length > 1) {
-      for (let i = 0; i < otherAsks.length; i++) {
-        const archiveQuery = `mutation {
-          ${i === 0 ? monterFragment : ''}
-          updateAsk(id: "${otherAsks[i].id}", data: { archived: true }) { data { id } }
-        }`;
-        await context.fetch(graphqlUrl, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ query: archiveQuery }),
-        });
-      }
-    } else if (monterFragment) {
-      await context.fetch(graphqlUrl, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ query: `mutation { ${monterFragment} }` }),
-      });
-    }
-  } else if (variant === 'solo' && iskvua && chiluzh) {
-    // Solo + iskvua: still need Monter
-    const startDate = sqedualed
-      ? (new Date(sqedualed) > d ? sqedualed : now)
-      : now;
-    const monterQuery = `mutation {
-      createMonter(data: {
+  // Archive the other (losing) candidates' asks on this OpenMission, and spin
+  // up a Monter for recurring missions. Runs for BOTH variants — a single-member
+  // (solo) project still needs sibling candidate asks archived so they can no
+  // longer be voted on.
+  const otherAsks: any[] = openMissionAttrs.asks?.data || [];
+  const siblingAsks = otherAsks.filter((a) => String(a.id) !== String(askId));
+  const startDate = fStart
+    ? (new Date(fStart) > d ? fStart : now)
+    : now;
+  const monterFragment = iskvua && chiluzh
+    ? `createMonter(data: {
         mesimabetahalich: "${chiluzh}",
         ani: "mesimabetahalich"
         start: "${startDate}"
-        ${deadline ? `finish: "${deadline}"` : ''}
-      }) { data { id } }
-    }`;
+        ${fDates ? `finish: "${fDates}"` : ''}
+      }) { data { id } }`
+    : '';
+
+  if (siblingAsks.length > 0) {
+    for (let i = 0; i < siblingAsks.length; i++) {
+      const archiveQuery = `mutation {
+        ${i === 0 ? monterFragment : ''}
+        updateAsk(id: "${siblingAsks[i].id}", data: { archived: true }) { data { id } }
+      }`;
+      await context.fetch(graphqlUrl, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ query: archiveQuery }),
+      });
+    }
+  } else if (monterFragment) {
     await context.fetch(graphqlUrl, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ query: monterQuery }),
+      body: JSON.stringify({ query: `mutation { ${monterFragment} }` }),
     });
   }
 
@@ -260,7 +281,7 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
           }],
           {
             title: { he: 'התקבלת למשימה', en: 'You were accepted to a mission' },
-            body: { he: `משימה: ${openmissionName}`, en: `Mission: ${openmissionName}` },
+            body: { he: `משימה: ${fName}`, en: `Mission: ${fName}` },
           },
           'MissionAccepted',
           context,
@@ -268,7 +289,7 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
             user: acceptedUserName || attrs.username || '',
             projectName,
             projectSrc,
-            missionName: openmissionName,
+            missionName: fName,
           }
         );
       }

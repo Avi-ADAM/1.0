@@ -20,6 +20,9 @@
   "cards": {
     "approve": "I want",
     "decline": "Not for me",
+    "nego": "Customize",
+    "acceptCounter": "Accept",
+    "proposeOther": "Another proposal",
     "requesterDetails": "Requester Details",
     "confirmApprove": "Approve",
     "confirmDecline": "Decline",
@@ -79,7 +82,22 @@
       "showResourceInvestment": "Show only suggested investments of resources in FreeMates",
       "showResourceVotes": "Show only votes on new resource for FreeMates",
       "showJoinAndInvest": "Show only requests to join and invest resources on FreeMates",
-      "showMyPurchases": "Show only my purchases"
+      "showMyPurchases": "Show only my purchases",
+      "items": {
+        "fiap": "Mission Completion Approvals ({{count}})",
+        "sugg": "Mission Proposals ({{count}})",
+        "pend": "Missions Pending Approval ({{count}})",
+        "asks": "Mission Assignment Approvals ({{count}})",
+        "betaha": "Missions in Progress ({{count}})",
+        "desi": "General Decisions ({{count}})",
+        "ppmash": "Resources Pending Approval ({{count}})",
+        "pmashs": "Resource Sharing Proposals ({{count}})",
+        "pmaap": "Resource Reception Approvals ({{count}})",
+        "askmap": "Resource Assignment Approvals ({{count}})",
+        "hachla": "General Approvals ({{count}})",
+        "sheirutp": "Service Requests ({{count}})",
+        "purchases": "My Purchases ({{count}})"
+      }
     },
     "voteCard": {
       "neged": "Negotiation needed",
@@ -139,7 +157,23 @@
   },
   "haluka": {
     "successMessage": "Division approved successfully! 🎉",
-    "errorMessage": "Error approving division. Please try again."
+    "errorMessage": "Error approving division. Please try again.",
+    "table": {
+      "name": "Name",
+      "due": "Due",
+      "actual": "Actual",
+      "giving": "Giving",
+      "receiving": "Receiving",
+      "transfers": "Transfers",
+      "siteShare": "Site share",
+      "status": "Status",
+      "paid": "Paid",
+      "sent": "Sent",
+      "pending": "Pending",
+      "membersGave": "Members gave so far",
+      "decided": "decided",
+      "to1lev1": "to 1💗1"
+    }
   },
   "reqtom": {
     "voteTitle": "vote on request to join the FreeMates and share a resorce ",
@@ -230,6 +264,46 @@
       "complete": "complete",
       "noTransfers": "No member transfers yet. They appear here once a giving member picks a receiver and sends."
     }
+  },
+  "fiappru": {
+    "whyHeading": "Please explain why",
+    "taskNotCompleted": "Why wasn't the task completed?",
+    "offerRejected": "Please explain why you are rejecting this offer",
+    "addHours": "Add hours"
+  },
+  "weget": {
+    "howMuchSpentThisMonth": "How much did you spend this month?",
+    "approveMonthlyExpense": "Approve monthly expense",
+    "cycleLabel": "Cycle",
+    "reportedExpenseOf": "reported an expense of:",
+    "actualAmountPlaceholder": "Actual amount spent this month",
+    "confirmExpense": "Confirm expense",
+    "doneResourceTitle": "End monthly resource — no more monthly charges will be opened",
+    "doneResource": "Done (End resource)",
+    "mustExplain": "Please explain",
+    "missingForApproval": "What is missing to confirm that the resource was received?",
+    "proposeOtherAmount": "Propose a different amount",
+    "reportedAmount": "Reported amount:",
+    "proposedAmount": "Proposed amount:",
+    "amountYouPropose": "Amount you propose",
+    "whyMoveAmount": "Why change the amount? (will be posted in chat)",
+    "submitProposal": "Submit proposal",
+    "explainProposal": "Please explain the proposal",
+    "addHours": "Add hours"
+  },
+  "levchat": {
+    "messagePlaceholder": "Write your message..."
+  },
+  "halukaask": {
+    "offerRejected": "Please explain why you are rejecting this offer",
+    "yourResponse": "Your response",
+    "yourResponseLabel": "Your response",
+    "canRespond": "You may respond and explain why",
+    "decline": "decline",
+    "approve": "approve",
+    "theOffer": "the offer",
+    "referToPrevious": "Please refer to the previous response and address the claims made",
+    "previousResponse": "Previous response"
   },
   "taskModal": {
     "progress": "Progress",

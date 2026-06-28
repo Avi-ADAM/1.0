@@ -213,22 +213,27 @@ const applyToMissionHandler: ActionExecutionHandler = async (params, context, { 
   const askId = askRes?.data?.createAsk?.data?.id;
   if (!askId) throw new Error('Failed to create Ask');
 
-  // Create Timegrama deadline
-  const resMs: Record<string, number> = {
-    feh: 48 * 3_600_000,
-    sth: 72 * 3_600_000,
-    nsh: 96 * 3_600_000,
-    sevend: 168 * 3_600_000,
-  };
-  const offsetMs = resMs[restime] ?? 0;
-  if (offsetMs > 0) {
-    const deadline = new Date(now.getTime() + offsetMs);
-    await strapi.execute(
-      '82createTimegramaForAsk',
-      { date: deadline.toISOString(), whatami: 'ask', askId },
-      context.jwt,
-      context.fetch
-    );
+  // Create Timegrama deadline ONLY when the applicant is a rikma member (Path C:
+  // their own favorable vote already exists, so the auto-approval clock can run).
+  // For an external candidate (Path A) the timegrama is deferred until a member
+  // first engages — created then by addVote (the ask vote path).
+  if (memberIds.includes(String(context.userId))) {
+    const resMs: Record<string, number> = {
+      feh: 48 * 3_600_000,
+      sth: 72 * 3_600_000,
+      nsh: 96 * 3_600_000,
+      sevend: 168 * 3_600_000,
+    };
+    const offsetMs = resMs[restime] ?? 0;
+    if (offsetMs > 0) {
+      const deadline = new Date(now.getTime() + offsetMs);
+      await strapi.execute(
+        '82createTimegramaForAsk',
+        { date: deadline.toISOString(), whatami: 'ask', askId },
+        context.jwt,
+        context.fetch
+      );
+    }
   }
 
   return {

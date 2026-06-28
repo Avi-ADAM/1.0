@@ -29,17 +29,34 @@
       // ignore — fall back to the default greeting
     }
 
-    // Seed the wizard's stores from the saved selection so Bein loads the
-    // user's AI-confirmed items pre-selected (instead of an empty wizard).
+    // Seed the wizard's stores so Bein loads pre-selected items instead of an
+    // empty wizard. Two sources are merged:
+    //  • the user's EXISTING profile vocab (loaded server-side in +page.server.js)
+    //    — so existing users editing their profile, or skipping the AI steps
+    //    straight to here, see what they already have.
+    //  • the AI-confirmed ids from the cv/describe flow (onboard.cvSavedIds).
+    // Ids are de-duplicated (as strings) so an item kept by both sources appears
+    // once, and the persisted set is the union (never wiping existing items).
     try {
+      const existing = page?.data?.existingIds ?? {};
+
+      let saved = {};
       const raw = sessionStorage.getItem('onboard.cvSavedIds');
-      if (raw) {
-        const ids = JSON.parse(raw);
-        if (Array.isArray(ids.skills) && ids.skills.length) skills1.set(ids.skills);
-        if (Array.isArray(ids.roles) && ids.roles.length) roles2.set(ids.roles);
-        if (Array.isArray(ids.methods) && ids.methods.length) workways1.set(ids.methods);
-        if (Array.isArray(ids.vallues) && ids.vallues.length) valluss.set(ids.vallues);
-      }
+      if (raw) saved = JSON.parse(raw) || {};
+
+      const merge = (a, b) => [
+        ...new Set([...(Array.isArray(a) ? a : []), ...(Array.isArray(b) ? b : [])].map(String))
+      ];
+
+      const skills = merge(existing.skills, saved.skills);
+      const roles = merge(existing.roles, saved.roles);
+      const methods = merge(existing.methods, saved.methods);
+      const vallues = merge(existing.vallues, saved.vallues);
+
+      if (skills.length) skills1.set(skills);
+      if (roles.length) roles2.set(roles);
+      if (methods.length) workways1.set(methods);
+      if (vallues.length) valluss.set(vallues);
     } catch {
       // ignore — Bein will simply start empty
     }

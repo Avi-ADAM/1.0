@@ -2,7 +2,6 @@
   import { isRtl } from '$lib/translations';
            import { lang } from '$lib/stores/lang.js'
     import { liUN } from '$lib/stores/liUN.js';
-const baseUrl = import.meta.env.VITE_URL
 
 let skillName_value = $state();
     let desS = $state();
@@ -13,63 +12,37 @@ async function addNewSkill () {
 if (rn.includes(skillName_value)){
   shgi = true;
 } else {
-  let d = new Date;
-   let link =baseUrl+"/graphql" ;
         try {
-             await fetch(link, {
+             const res = await fetch('/api/vocab/create', {
               method: 'POST',
-       
-        headers: {
-            'Content-Type': 'application/json'
-                  },
-        body: 
-        JSON.stringify({query: 
-           `mutation   {
-  createSkill(data: {  skillName: "${skillName_value}",
-          descrip: "${desS}",
-                publishedAt: "${d.toISOString()}"
-        }
-          ) {
-    data {
-      id
-      attributes {
-        skillName
-      } 
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                kind: 'skills',
+                label: skillName_value,
+                lang: $lang,
+                createdBy: $liUN || 'user',
+                description: desS
+              })
+            }).then((r) => r.json());
 
-       }
-    }
-}`   
-        })
-})
-  .then(r => r.json())
-  .then(data => meData = data);
-     const id = meData.data.createSkill.data.id;
-    finnish (id,meData.data.createSkill.data);
-      console.log("some")
-          let userName_value = liUN.get()
+            if (!res?.success || !res.item) { console.log('create failed', res); return; }
+            if (res.moderation?.flagged) return;
 
-         let data = {"name": userName_value, "action": "יצר כישור חדש בשם:", "det": `${skillName_value} והתיאור: ${desS} `}
-   fetch("/api/ste", {
-  method: 'POST', // or 'PUT'
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(data),
-})
-  .then((response) => response)
-  .then((data) => {
-    console.log('Success:', data);
+            if (res.translate) {
+              fetch('/api/translations', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(res.translate)
+              }).catch((e) => console.warn('תרגום נכשל:', e));
+            }
 
-  })
-  .catch((error) => {
-    console.error('Error:', error);
-  
-  })
+            meData = { id: res.item.id, attributes: res.item.attributes };
+            finnish(res.item.id, meData);
               }
       catch(error) {
         console.log('צריך לתקן:', error)
                 };}
-    };   
+    };
 
 
 function finnish (id,sec) {

@@ -1,6 +1,26 @@
 
 // hooks.server.(js|ts)
 //import * as Sentry from '@sentry/sveltekit';
+import { getInternalSecret, INTERNAL_HEADER } from '$lib/server/internalSecret.js';
+
+/**
+ * Inject the internal proxy secret on same-origin /api/* requests made with the
+ * server-side fetch. Browser fetches never reach this hook, so the header
+ * cannot be forged by a client. This is what lets /api/send and /api/action
+ * trust a request's `isSer` flag.
+ * @type {import('@sveltejs/kit').HandleFetch}
+ */
+export async function handleFetch({ event, request, fetch }) {
+	try {
+		const url = new URL(request.url);
+		if (url.origin === event.url.origin && url.pathname.startsWith('/api/')) {
+			request.headers.set(INTERNAL_HEADER, getInternalSecret());
+		}
+	} catch (e) {
+		console.error('handleFetch: failed to attach internal secret', e);
+	}
+	return fetch(request);
+}
 
 /*Sentry.init({
   dsn: 'https://880ab60c73ec06407ad3339ce31714a0@o4503949749321728.ingest.sentry.io/4506774069641216',

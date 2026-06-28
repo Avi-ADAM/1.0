@@ -49,6 +49,41 @@ const qids_base = {
       data { id }
     }
   }`,
+  // ── Pendm / Pmash chat forum (realtime discussion) ─────────────────────────
+  'getPendmChatForum': `query GetPendmChatForum($id: ID!) {
+    pendm(id: $id) {
+      data {
+        id
+        attributes {
+          name
+          project { data { id } }
+          forums(pagination: { limit: 1 }) { data { id } }
+        }
+      }
+    }
+  }`,
+  'getPmashChatForum': `query GetPmashChatForum($id: ID!) {
+    pmash(id: $id) {
+      data {
+        id
+        attributes {
+          name
+          project { data { id } }
+          forums(pagination: { limit: 1 }) { data { id } }
+        }
+      }
+    }
+  }`,
+  'linkForumToPendm': `mutation LinkForumToPendm($id: ID!, $forumId: ID!) {
+    updatePendm(id: $id, data: { forums: [$forumId] }) {
+      data { id }
+    }
+  }`,
+  'linkForumToPmash': `mutation LinkForumToPmash($id: ID!, $forumId: ID!) {
+    updatePmash(id: $id, data: { forums: [$forumId] }) {
+      data { id }
+    }
+  }`,
   '2cGetMoneyReceivers': `query GetMoneyReceivers($id: ID!) {
     sheirut(id: $id) {
       data {
@@ -685,6 +720,9 @@ const qids_base = {
             isLocal
             scaleMin
             scaleMax
+            sourceType
+            sourceId
+            sourceMeta
             cuntries {
               data {
                 id
@@ -718,10 +756,10 @@ const qids_base = {
                   authorExternalId
                   authorType
                   votes
-                  voters { data { id } }
+                  voters
                   location
                   intensity
-                  tags { data { id } }
+                  tags
                   order
                   isAnchor
                   pole
@@ -748,7 +786,9 @@ const qids_base = {
 
   // arg: { topic, description, maxRounds, status, currentRound, createdBy,
   //        createdByEmail, ownerExternalId, visibility, shareToken, isLocal,
-  //        placeIds, publishedAt }
+  //        placeIds, sourceType, sourceId, sourceMeta, publishedAt }
+  // sourceType/sourceId/sourceMeta tie a bridge discussion to a main-app object
+  // (pmash / mission negotiation card) — see consensus1lev1 main-repo-bridge-spec.
   // Registered users only (no service token).
   '40CreateNegotiation': `
     mutation CreateNegotiation(
@@ -764,6 +804,9 @@ const qids_base = {
       $shareToken: String,
       $isLocal: Boolean,
       $placeIds: [ID],
+      $sourceType: String,
+      $sourceId: String,
+      $sourceMeta: JSON,
       $publishedAt: DateTime
     ) {
       createNegotiation(data: {
@@ -779,6 +822,9 @@ const qids_base = {
         shareToken: $shareToken,
         isLocal: $isLocal,
         cuntries: $placeIds,
+        sourceType: $sourceType,
+        sourceId: $sourceId,
+        sourceMeta: $sourceMeta,
         publishedAt: $publishedAt
       }) {
         data {
@@ -806,7 +852,7 @@ const qids_base = {
       $authorEmail: String,
       $authorExternalId: String,
       $authorType: ENUM_POSITION_AUTHORTYPE,
-      $location: Int,
+      $location: Float,
       $order: Int,
       $intensity: Int,
       $votes: Int,
@@ -866,7 +912,7 @@ const qids_base = {
   // selfPlacement: author's manual self-placement on 0..100 axis (AI hint, not displayed location).
   // location: derived value computed by consensus from clauses, written back via this qid.
   '42UpdatePosition': `
-    mutation UpdatePosition($id: ID!, $heading: String, $description: String, $location: Int, $selfPlacement: Int) {
+    mutation UpdatePosition($id: ID!, $heading: String, $description: String, $location: Float, $selfPlacement: Int) {
       updatePosition(id: $id, data: {
         heading: $heading,
         description: $description,
@@ -907,6 +953,9 @@ const qids_base = {
             isLocal
             scaleMin
             scaleMax
+            sourceType
+            sourceId
+            sourceMeta
             cuntries { data { id attributes { name } } }
             creator { data { attributes { username email } } }
             positions {
@@ -920,7 +969,66 @@ const qids_base = {
                   authorExternalId
                   authorType
                   votes
-                  voters { data { id } }
+                  voters
+                  location
+                  intensity
+                  order
+                  isAnchor
+                  pole
+                  kind
+                  relativePlacement
+                }
+              }
+            }
+            participants { data { id attributes { username email } } }
+          }
+        }
+      }
+    }
+  `,
+
+  // arg: { sourceType, sourceId }  — find the bridge discussion for a main-app
+  // object (a pmash / mission negotiation card). Registered users only: this qid
+  // is intentionally NOT added to CONSENSUS_QIDS, so it runs on the caller's own
+  // JWT and Strapi enforces access (no guest/charter service path). Returns the
+  // most recent match (limit 1). See consensus1lev1 main-repo-bridge-spec §2.3.
+  'GetNegotiationBySource': `
+    query GetNegotiationBySource($sourceType: String!, $sourceId: String!) {
+      negotiations(
+        filters: { sourceType: { eq: $sourceType }, sourceId: { eq: $sourceId } }
+        sort: ["createdAt:desc"]
+        pagination: { limit: 1 }
+      ) {
+        data {
+          id
+          attributes {
+            topic
+            description
+            status
+            maxRounds
+            currentRound
+            visibility
+            shareToken
+            isLocal
+            scaleMin
+            scaleMax
+            sourceType
+            sourceId
+            sourceMeta
+            cuntries { data { id attributes { name } } }
+            creator { data { attributes { username email } } }
+            positions {
+              data {
+                id
+                attributes {
+                  heading
+                  description
+                  aiMeta
+                  authorEmail
+                  authorExternalId
+                  authorType
+                  votes
+                  voters
                   location
                   intensity
                   order
@@ -2684,23 +2792,24 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
   }`,
 
   // ── Decision (project vote) ────────────────────────────────────────────────
-  '159getDecisionForVote': `query GetDecisionForVote($id: ID!) {
-    decision(id: $id) {
+  '159getDecisionForVote': `query GetDecisionForVote($eid: ID!) {
+    decision(id: $eid) {
       data {
         id
         attributes {
           kind
           archived
-          newpic { data { id } }
-          timegrama { data { id } }
+          projects { data { id } }
+          newpic { data { id attributes { url } } }
+          timegrama { data { id attributes { date } } }
           newname
           newpubdes
           newprides
           newFlink
           newWlink
           timtoM
-          valluesadd { data { id } }
-          valluesles { data { id } }
+          valluesadd { data { id attributes { valueName } } }
+          valluesles { data { id attributes { valueName } } }
           vots {
             id
             what
@@ -3192,6 +3301,11 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
   }`,
   '131archiveOpenMashaabim': `mutation ArchiveOpenMashaabim($id: ID!) {
     updateOpenMashaabim(id: $id, data: { archived: true }) {
+      data { id attributes { askms { data { id } } } }
+    }
+  }`,
+  '131bArchiveAskm': `mutation ArchiveAskm($id: ID!) {
+    updateAskm(id: $id, data: { archived: true }) {
       data { id }
     }
   }`,
@@ -3235,6 +3349,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
               vots {
                 what
                 zman
+                order
+                id
                 users_permissions_user {
                   data {
                     id
@@ -3246,6 +3362,25 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                   id
                   attributes {
                     date
+                    done
+                  }
+                }
+              }
+              negopendmissions(sort: "ordern:desc") {
+                data {
+                  id
+                  attributes {
+                    ordern
+                    proposedBy
+                    status
+                    name
+                    descrip
+                    hearotMeyuchadot
+                    noofhours
+                    perhour
+                    date
+                    dates
+                    createdAt
                   }
                 }
               }
@@ -3325,6 +3460,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                 what
                 why
                 zman
+                order
                 id
                 users_permissions_user {
                   data {
@@ -3337,6 +3473,28 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                   id
                   attributes {
                     date
+                    done
+                  }
+                }
+              }
+              nego_mashes(sort: "ordern:desc") {
+                data {
+                  id
+                  attributes {
+                    ordern
+                    proposedBy
+                    status
+                    name
+                    descrip
+                    spnot
+                    easy
+                    hm
+                    price
+                    kindOf
+                    sqadualed
+                    sqadualedf
+                    linkto
+                    createdAt
                   }
                 }
               }
@@ -4374,6 +4532,27 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                         id
                         attributes {
                           date
+                          done
+                        }
+                      }
+                    }
+                    nego_mashes(sort: "ordern:desc") {
+                      data {
+                        id
+                        attributes {
+                          ordern
+                          proposedBy
+                          status
+                          name
+                          descrip
+                          spnot
+                          easy
+                          hm
+                          price
+                          kindOf
+                          sqadualed
+                          sqadualedf
+                          linkto
                         }
                       }
                     }
@@ -4496,6 +4675,25 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                         id
                         attributes {
                           date
+                          done
+                        }
+                      }
+                    }
+                    negopendmissions(sort: "ordern:desc") {
+                      data {
+                        id
+                        attributes {
+                          ordern
+                          proposedBy
+                          status
+                          name
+                          descrip
+                          hearotMeyuchadot
+                          noofhours
+                          perhour
+                          date
+                          dates
+                          createdAt
                         }
                       }
                     }
@@ -4565,7 +4763,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                               id
                             }
                           }
-                          negopendmissions {
+                          negopendmissions(sort: "ordern:desc") {
                             data {
                               id
                               attributes {
@@ -4573,6 +4771,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                                 hearotMeyuchadot
                                 descrip
                                 createdAt
+                                ordern
+                                proposedBy
                                 noofhours
                                 perhour
                                 isOriginal
@@ -4882,7 +5082,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                         }
                       }
                     }
-                    negopendmissions {
+                    negopendmissions(sort: "ordern:desc") {
                       data {
                         id
                         attributes {
@@ -4890,6 +5090,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           hearotMeyuchadot
                           descrip
                           createdAt
+                          ordern
+                          proposedBy
                           noofhours
                           perhour
                           isOriginal
@@ -7583,7 +7785,11 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $pmash: ID,
     $mashaabim: ID,
     $source: ENUM_OPENMASHAABIM_SOURCE,
+    $linkto: String,
+    $recurring: Boolean,
     $location: ComponentNewLocationInput,
+    $sqadualed: DateTime,
+    $sqadualedf: DateTime,
     $publishedAt: DateTime
   ) {
     createOpenMashaabim(data: {
@@ -7600,7 +7806,11 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       pmash: $pmash,
       mashaabim: $mashaabim,
       source: $source,
+      linkto: $linkto,
+      recurring: $recurring,
       location: $location,
+      sqadualed: $sqadualed,
+      sqadualedf: $sqadualedf,
       publishedAt: $publishedAt
     }) {
       data { id attributes { name } }
@@ -7911,47 +8121,136 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }) { data { id } }
   }`,
 
-  // Create an Askm already in negotiating state (candidate parallel proposal).
-  'createAskmWithNego': `mutation CreateAskmWithNego(
-    $publishedAt: DateTime!, $openMashaabimId: ID!, $projectId: ID!, $spId: ID!, $userId: ID!,
-    $vots: [ComponentProjectsVotsInput],
-    $negotiationStatus: ENUM_ASKM_NEGOTIATIONSTATUS, $turn: ENUM_ASKM_TURN, $currentRound: Int
-  ) {
-    createAskm(data: {
-      publishedAt: $publishedAt
-      open_mashaabim: $openMashaabimId
-      project: $projectId
-      sp: $spId
-      users_permissions_user: $userId
-      vots: $vots
-      negotiationStatus: $negotiationStatus
-      turn: $turn
-      currentRound: $currentRound
-    }) { data { id } }
-  }`,
-
-  // Advance an Askm negotiation (new vote round / counter / turn flip).
-  'updateAskmNegoState': `mutation UpdateAskmNegoState(
-    $id: ID!, $vots: [ComponentProjectsVotsInput],
-    $turn: ENUM_ASKM_TURN, $currentRound: Int, $negotiationStatus: ENUM_ASKM_NEGOTIATIONSTATUS
-  ) {
-    updateAskm(id: $id, data: {
-      vots: $vots
-      turn: $turn
-      currentRound: $currentRound
-      negotiationStatus: $negotiationStatus
-    }) { data { id } }
-  }`,
+  // Note: Askm has no scalar negotiation-state fields. The state (current round,
+  // whose turn, status) is DERIVED from its NegoMash rounds. So creating an Askm
+  // for a candidate proposal is a plain createAskm (reuse '125createAskm'), and
+  // adding a vote/round reuses '133addVoteToAskm'.
 
   // Read an Askm's negotiation rounds (latest first) for the card / materialization.
   'getAskmNegoRounds': `query GetAskmNegoRounds($id: ID!) {
     askm(id: $id) { data { id attributes {
-      currentRound turn negotiationStatus
+      archived
+      vots { what order users_permissions_user { data { id } } }
       nego_mashes(sort: "ordern:desc") { data { id attributes {
         ordern proposedBy status name descrip spnot
         easy hm price kindOf sqadualed sqadualedf linkto
+        users_permissions_user { data { id } }
       } } }
     } } }
+  }`,
+
+  // At acceptance, flow the winning candidate's negotiated terms onto the
+  // open resource (which is archived for this candidate right after), so the
+  // existing downstream materialization picks up the agreed values.
+  'applyRoundToOpenMashaabim': `mutation ApplyRoundToOpenMashaabim($id: ID!, $data: OpenMashaabimInput!) {
+    updateOpenMashaabim(id: $id, data: $data) { data { id } }
+  }`,
+
+  // ─── Open-mission (openMission) candidate negotiation ───
+  // Mirrors the openMashaabim flow: each candidate has their own Ask; proposed
+  // terms live as Negopendmission rounds bound to that Ask. The shared
+  // OpenMission stays untouched as the rikma baseline for comparison.
+
+  // Create a Negopendmission round. Works for both the internal pendm flow and
+  // the external candidate/counter flow (open_mission + ask), with round bookkeeping.
+  'negoCreateNegopendmissionRound': `mutation NegoCreateNegopendmissionRound(
+    $publishedAt: DateTime!, $userId: ID!,
+    $pendm: ID, $open_mission: ID, $ask: ID,
+    $ordern: Int, $proposedBy: ENUM_NEGOPENDMISSION_PROPOSEDBY, $status: ENUM_NEGOPENDMISSION_STATUS,
+    $isOriginal: Boolean,
+    $noofhours: Float, $perhour: Float,
+    $hearotMeyuchadot: String, $descrip: String, $name: String,
+    $skills: [ID], $tafkidims: [ID], $work_ways: [ID],
+    $sqadualed: DateTime, $dates: DateTime,
+    $location: [ComponentNewLocationInput]
+  ) {
+    createNegopendmission(data: {
+      publishedAt: $publishedAt
+      users_permissions_user: $userId
+      pendm: $pendm
+      open_mission: $open_mission
+      ask: $ask
+      ordern: $ordern
+      proposedBy: $proposedBy
+      status: $status
+      isOriginal: $isOriginal
+      noofhours: $noofhours
+      perhour: $perhour
+      hearotMeyuchadot: $hearotMeyuchadot
+      descrip: $descrip
+      name: $name
+      skills: $skills
+      tafkidims: $tafkidims
+      work_ways: $work_ways
+      date: $sqadualed
+      dates: $dates
+      location: $location
+    }) { data { id } }
+  }`,
+
+  // Read an Ask's negotiation rounds (latest first) for the card / finalization.
+  'getAskNegoRounds': `query GetAskNegoRounds($id: ID!) {
+    ask(id: $id) { data { id attributes {
+      archived
+      vots { what order users_permissions_user { data { id } } }
+      negopendmissions(sort: "ordern:desc") { data { id attributes {
+        ordern proposedBy status name descrip hearotMeyuchadot
+        noofhours perhour date dates
+        skills { data { id } }
+        tafkidims { data { id } }
+        work_ways { data { id } }
+        users_permissions_user { data { id } }
+      } } }
+    } } }
+  }`,
+
+  // At acceptance, flow the winning candidate's negotiated terms onto the
+  // open mission (archived right after), so the Mesimabetahalich uses the agreed values.
+  'applyRoundToOpenMission': `mutation ApplyRoundToOpenMission($id: ID!, $data: OpenMissionInput!) {
+    updateOpenMission(id: $id, data: $data) { data { id } }
+  }`,
+
+  // ─── Cron finalizers (timegrama auto-approval) ───
+  // Everything the askm finalizer needs to run the bilateral gate (rounds +
+  // vots + members + taker) and then materialize (open_mashaabim + sp + name +
+  // sibling askms to archive).
+  'getAskmForFinalize': `query GetAskmForFinalize($id: ID!) {
+    askm(id: $id) { data { id attributes {
+      archived
+      vots { what order users_permissions_user { data { id } } }
+      users_permissions_user { data { id } }
+      sp { data { id } }
+      project { data { id attributes { restime user_1s { data { id } } } } }
+      open_mashaabim { data { id attributes { name askms { data { id } } } } }
+      nego_mashes(sort: "ordern:desc") { data { id attributes { ordern proposedBy } } }
+    } } }
+  }`,
+
+  // Archive a sibling Askm (a losing candidate) once another is accepted.
+  'archiveAskmSimple': `mutation ArchiveAskmSimple($id: ID!) {
+    updateAskm(id: $id, data: { archived: true }) { data { id } }
+  }`,
+
+  // ─── Candidacy timegrama lifecycle (ensure / reset) ───
+  // The deadline timegrama for an Ask/Askm is created when a rikma member first
+  // engages (favorable vote or counter), and reset when a counter opens a fresh
+  // response window. These let the nego helper find an active one before deciding
+  // whether to create or reset.
+  'getActiveTimegramaForAsk': `query GetActiveTimegramaForAsk($id: ID!) {
+    timegramas(filters: { ask: { id: { eq: $id } }, done: { ne: true } }, sort: "id:desc", pagination: { limit: 1 }) {
+      data { id }
+    }
+  }`,
+  'getActiveTimegramaForAskm': `query GetActiveTimegramaForAskm($id: ID!) {
+    timegramas(filters: { askm: { id: { eq: $id } }, done: { ne: true } }, sort: "id:desc", pagination: { limit: 1 }) {
+      data { id }
+    }
+  }`,
+  'getAskProjectRestime': `query GetAskProjectRestime($id: ID!) {
+    ask(id: $id) { data { id attributes { project { data { id attributes { restime } } } } } }
+  }`,
+  'getAskmProjectRestime': `query GetAskmProjectRestime($id: ID!) {
+    askm(id: $id) { data { id attributes { project { data { id attributes { restime } } } } } }
   }`
 };
 
@@ -8392,6 +8691,9 @@ export const moachQids = {
           tosplits(filters: { finished: { eq: false } }) {
             data { id attributes { name vots { what why users_permissions_user { data { id attributes { username } } } } } }
           }
+          decisions(filters: { archived: { eq: false } }) {
+            data { id attributes { kind newname vots { what users_permissions_user { data { id } } } } }
+          }
           open_missions(filters: { archived: { eq: false } }) {
             data {
               id
@@ -8403,10 +8705,228 @@ export const moachQids = {
               }
             }
           }
+          askms(filters: { archived: { eq: false } }) {
+            data {
+              id
+              attributes {
+                vots { what why users_permissions_user { data { id } } }
+                pmash { data { attributes { name } } }
+                open_mashaabim { data { attributes { name } } }
+                users_permissions_user { data { id attributes { username } } }
+                sp { data { attributes { users_permissions_user { data { attributes { username } } } } } }
+              }
+            }
+          }
         }
       }
     }
   }`,
+  // Cheap count-only query for the "votes" tab badge in the moach nav. Uses
+  // pagination meta so no rows are fetched — safe to call on layout mount and
+  // on each vote socket event without affecting the moach base load.
+  'getOpenVoteCounts': `query GetOpenVoteCounts($pid: ID!) {
+    project(id: $pid) {
+      data {
+        attributes {
+          pmashes(filters: { archived: { eq: false } }) { data { id } }
+          pendms(filters: { archived: { eq: false } }) { data { id } }
+          tosplits(filters: { finished: { eq: false } }) { data { id } }
+          decisions(filters: { archived: { eq: false } }) { data { id } }
+          askms(filters: { archived: { eq: false } }) { data { id } }
+          open_missions(filters: { archived: { eq: false } }) {
+            data { id attributes { asks(filters: { archived: { eq: false } }) { data { id } } } }
+          }
+        }
+      }
+    }
+  }`,
+  // Single-entity queries for the focused in-moach vote pages
+  // (moach/[projectId]/votes/[kind]/[id]). Field selections mirror the lev
+  // page's pendm/pmash selections exactly so the shared extractors/processors
+  // consume them unchanged. project{id} is included for the cross-project guard.
+  'getPendmForVote': `query GetPendmForVote($eid: ID!) {
+    pendm(id: $eid) {
+      data {
+        id
+        attributes {
+          project { data { id } }
+          name createdAt iskvua hearotMeyuchadot descrip noofhours perhour sqadualed privatlinks publicklinks dates
+          location { location_mode lat lng radius location_hint }
+          rishon { data { id } }
+          mission { data { id } }
+          vallues { data { id } }
+          timegrama { data { id attributes { date } } }
+          acts { data { id attributes { shem link des dateF dateS } } }
+          skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
+          tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+          work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
+          negopendmissions(sort: "ordern:desc") {
+            data { id attributes {
+              name hearotMeyuchadot descrip createdAt ordern proposedBy noofhours perhour isOriginal date dates isMonth
+              location { location_mode lat lng radius location_hint }
+              users_permissions_user { data { id attributes { username } } }
+              skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
+              tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+              work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
+              acts { data { id attributes { shem link des dateF dateS } } }
+            } }
+          }
+          diun { what why order id zman users_permissions_user { data { id } } }
+          users { what why order id users_permissions_user { data { id } } }
+        }
+      }
+    }
+  }`,
+  'getPmashForVote': `query GetPmashForVote($eid: ID!) {
+    pmash(id: $eid) {
+      data {
+        id
+        attributes {
+          project { data { id } }
+          hm sqadualedf sqadualed linkto createdAt name descrip easy price kindOf spnot recurring cycleSize
+          location { location_mode lat lng radius location_hint }
+          nego_mashes {
+            data { id attributes {
+              hm sqadualedf sqadualed linkto createdAt name descrip easy price kindOf spnot recurring cycleSize
+              location { location_mode lat lng radius location_hint }
+              users_permissions_user { data { id } }
+            } }
+          }
+          mashaabim { data { id } }
+          timegrama { data { id attributes { date } } }
+          diun { what why order id zman users_permissions_user { data { id } } }
+          users { what order why id users_permissions_user { data { id } } }
+        }
+      }
+    }
+  }`,
+  // Join request (candidate → open_mission). Field selection mirrors the lev
+  // `asks` block so extractAsked/processAsked consume it unchanged. Renders via
+  // Reqtojoin. project{id} is for the cross-project guard.
+  'getAskForVote': `query GetAskForVote($eid: ID!) {
+    ask(id: $eid) {
+      data {
+        id
+        attributes {
+          project { data { id } }
+          vots { what why zman order id users_permissions_user { data { id } } }
+          timegrama { data { id attributes { date done } } }
+          negopendmissions(sort: "ordern:desc") {
+            data { id attributes { ordern proposedBy status name descrip hearotMeyuchadot noofhours perhour date dates createdAt } }
+          }
+          createdAt
+          chat { why id ide what zman users_permissions_user { data { id } } }
+          forums { data { id attributes { messages(pagination: { limit: 100 }) { data { id attributes { content createdAt users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } } } } } } }
+          open_mission {
+            data { id attributes {
+              acts { data { id attributes { shem link des dateF dateS } } }
+              mission { data { id } }
+              negopendmissions(sort: "ordern:desc") {
+                data { id attributes {
+                  name hearotMeyuchadot descrip createdAt ordern proposedBy noofhours perhour isOriginal date dates isMonth
+                  users_permissions_user { data { id attributes { username } } }
+                  skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
+                  tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+                  work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
+                  acts { data { id attributes { shem link des dateF dateS } } }
+                } }
+              }
+              declined { data { id } }
+              iskvua isRishon sqadualed dates publicklinks
+              skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
+              work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
+              tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+              noofhours perhour privatlinks descrip hearotMeyuchadot name
+            } }
+          }
+          users_permissions_user {
+            data { id attributes {
+              username
+              skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
+              work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
+              tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+              email
+              profilePic { data { attributes { url formats } } }
+            } }
+          }
+        }
+      }
+    }
+  }`,
+  // Resource join request (candidate/self → open_mashaabim/pmash). Mirrors the
+  // lev `askms` block so extractAskedResources/processAskedResources consume it
+  // unchanged. Renders via Reqtom. project{id} added for the cross-project guard.
+  'getAskmForVote': `query GetAskmForVote($eid: ID!) {
+    askm(id: $eid) {
+      data {
+        id
+        attributes {
+          project { data { id } }
+          isSelfProposal
+          pendingMainVote
+          vots { what zman why id users_permissions_user { data { id } } }
+          timegrama { data { id attributes { date done } } }
+          nego_mashes(sort: "ordern:desc") {
+            data { id attributes { ordern proposedBy status name descrip spnot easy hm price kindOf sqadualed sqadualedf linkto } }
+          }
+          createdAt
+          chat { why ide what zman id users_permissions_user { data { id } } }
+          users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } }
+          open_mashaabim { data { id attributes { price descrip spnot kindOf sqadualedf sqadualed linkto createdAt hm name easy recurring cycleSize } } }
+          pmash { data { id attributes { name descrip spnot price easy hm kindOf sqadualed sqadualedf recurring cycleSize } } }
+          sp { data { id attributes { name descrip price myp spnot users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } } } } }
+        }
+      }
+    }
+  }`,
+
+  // Tosplit (haluka) vote page — single focused split. Fields mirror what
+  // extractHalukas + processHalukas need; project{id} is for the cross-project guard.
+  'getTosplitForVote': `query GetTosplitForVote($eid: ID!) {
+    tosplit(id: $eid) {
+      data {
+        id
+        attributes {
+          project { data { id } }
+          name
+          createdAt
+          vots { what why ide order users_permissions_user { data { id } } }
+          hervachti {
+            users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            amount
+            mekabel
+            noten
+          }
+          halukas {
+            data {
+              id
+              attributes {
+                amount
+                senderconf
+                confirmed
+                usersend { data { id attributes { username } } }
+                userrecive { data { id attributes { username } } }
+              }
+            }
+          }
+          siteShareHalukas {
+            data {
+              id
+              attributes {
+                amount
+                proposedAmount
+                senderconf
+                confirmed
+                adjustDirection
+                adjustReason
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
   'getMissionInProgress': `query GetMissionInProgress($id: ID!) {
     mesimabetahalich(id: $id) {
       data {
@@ -8560,6 +9080,17 @@ export const moachQids = {
         }
       }
       project { data { ...ForumProjectCore } }
+      ratson {
+        data {
+          id
+          attributes {
+            name
+            users_permissions_users {
+              data { id attributes { username profilePic { data { attributes { url formats } } } } }
+            }
+          }
+        }
+      }
       haluka {
         data {
           id
@@ -8689,6 +9220,17 @@ export const moachQids = {
         }
       }
       project { data { ...ForumProjectSummaryCore } }
+      ratson {
+        data {
+          id
+          attributes {
+            name
+            users_permissions_users {
+              data { id attributes { username profilePic { data { attributes { url formats } } } } }
+            }
+          }
+        }
+      }
       haluka {
         data {
           id
@@ -9200,6 +9742,744 @@ export const qids = {
                   attributes {
                     moneyTransfered
                     productExepted
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`,
+
+  // ── Lev quantum (incremental) slice queries ───────────────────────────────
+  // Each query returns the same mini-userData envelope as query 83, restricted
+  // to one collection and optionally to a subset of projects ($pids).
+  // Passing $pids: null (or omitting it) returns data for ALL projects.
+  // The existing extractors in levDataExtractors.ts run unchanged on the result.
+
+  '87levSliceSheirutp': `query LevSliceSheirutp($idL: ID!, $pids: [ID]) {
+  usersPermissionsUser(id: $idL) {
+    data {
+      id
+      attributes {
+        projects_1s(filters: { id: { in: $pids } }) {
+          data {
+            id
+            attributes {
+              projectName
+              restime
+              user_1s {
+                data {
+                  id
+                }
+              }
+              profilePic {
+                data {
+                  attributes {
+                    url
+                    formats
+                  }
+                }
+              }
+              sheirutpends(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    sheirut {
+                      data {
+                        id
+                        attributes {
+                          name
+                          descrip
+                          equaliSplited
+                          oneTime
+                        }
+                      }
+                    }
+                    startDate
+                    finnishDate
+                    price
+                    quant
+                    total
+                    users_permissions_user {
+                      data {
+                        id
+                        attributes {
+                          username
+                          profilePic {
+                            data {
+                              attributes {
+                                url
+                                formats
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    matanots {
+                      data {
+                        id
+                        attributes {
+                          name
+                          desc
+                          price
+                          quant
+                          kindOf
+                          pic {
+                            data {
+                              attributes {
+                                url
+                                formats
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    createdAt
+                    votes {
+                      data {
+                        id
+                        attributes {
+                          what
+                          order
+                          why
+                          users_permissions_user {
+                            data {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                    timegrama {
+                      data {
+                        id
+                        attributes {
+                          date
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`,
+
+  '87levSliceSales': `query LevSliceSales($idL: ID!, $pids: [ID]) {
+  usersPermissionsUser(id: $idL) {
+    data {
+      id
+      attributes {
+        projects_1s(filters: { id: { in: $pids } }) {
+          data {
+            id
+            attributes {
+              projectName
+              restime
+              user_1s {
+                data {
+                  id
+                }
+              }
+              profilePic {
+                data {
+                  attributes {
+                    url
+                    formats
+                  }
+                }
+              }
+              sheiruts {
+                data {
+                  id
+                  attributes {
+                    name
+                    descrip
+                    equaliSplited
+                    oneTime
+                    archived
+                    isApruved
+                    isItOnlyOneInProject
+                    price
+                    quant
+                    startDate
+                    finnishDate
+                    total
+                    iGotIt
+                    iTransferMoney
+                    iGotMoney { iGotMoney users_permissions_user { data { id } } }
+                    moneyTransfered
+                    productExepted
+                    isSiteShareIncome
+                    weFinnish {
+                      data {
+                        id
+                        attributes {
+                          what
+                          order
+                          why
+                          users_permissions_user {
+                            data {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                    iCanGetMonay {
+                      data {
+                        id
+                        attributes {
+                          username
+                          profilePic {
+                            data {
+                              attributes {
+                                url
+                                formats
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    iTransferedTo {
+                      data {
+                        id
+                        attributes {
+                          username
+                          profilePic {
+                            data {
+                              attributes {
+                                url
+                                formats
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    users_permissions_users {
+                      data {
+                        id
+                        attributes {
+                          username
+                          profilePic {
+                            data {
+                              attributes {
+                                url
+                                formats
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    matanot {
+                      data {
+                        id
+                        attributes {
+                          name
+                          desc
+                          price
+                          quant
+                          kindOf
+                          pic {
+                            data {
+                              attributes {
+                                url
+                                formats
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    forums {
+                      data {
+                        id
+                        attributes {
+                          messages(pagination: { limit: 50 }) {
+                            data {
+                              id
+                              attributes {
+                                content
+                                createdAt
+                                users_permissions_user {
+                                  data {
+                                    id
+                                    attributes {
+                                      username
+                                      profilePic {
+                                        data {
+                                          attributes {
+                                            url
+                                            formats
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    halukas(filters: { ushar: { eq: true } }) {
+                      data {
+                        id
+                        attributes {
+                          senderconf
+                          confirmed
+                          amount
+                          isSiteShare
+                          forum { data { id } }
+                          usersend {
+                            data {
+                              id
+                              attributes {
+                                username
+                                profilePic { data { attributes { url formats } } }
+                              }
+                            }
+                          }
+                          userrecive {
+                            data {
+                              id
+                              attributes {
+                                username
+                                profilePic { data { attributes { url formats } } }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`,
+
+  '87levSliceFiapp': `query LevSliceFiapp($idL: ID!, $pids: [ID]) {
+  usersPermissionsUser(id: $idL) {
+    data {
+      id
+      attributes {
+        projects_1s(filters: { id: { in: $pids } }) {
+          data {
+            id
+            attributes {
+              projectName
+              restime
+              user_1s {
+                data {
+                  id
+                }
+              }
+              profilePic {
+                data {
+                  attributes {
+                    url
+                    formats
+                  }
+                }
+              }
+              finiapruvals(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    timegrama {
+                      data {
+                        id
+                        attributes {
+                          date
+                        }
+                      }
+                    }
+                    missname
+                    noofhours
+                    why
+                    what {
+                      data {
+                        id
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                    mesimabetahalich {
+                      data {
+                        id
+                        attributes {
+                          perhour
+                          hearotMeyuchadot
+                          descrip
+                          mission {
+                            data {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                    vots {
+                      what
+                      why
+                      id
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                    project {
+                      data {
+                        id
+                      }
+                    }
+                    users_permissions_user {
+                      data {
+                        id
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`,
+
+  '87levSliceDecisions': `query LevSliceDecisions($idL: ID!, $pids: [ID]) {
+  usersPermissionsUser(id: $idL) {
+    data {
+      id
+      attributes {
+        projects_1s(filters: { id: { in: $pids } }) {
+          data {
+            id
+            attributes {
+              projectName
+              restime
+              user_1s {
+                data {
+                  id
+                }
+              }
+              profilePic {
+                data {
+                  attributes {
+                    url
+                    formats
+                  }
+                }
+              }
+              decisions(filters: { archived: { eq: false } }) {
+                data {
+                  id
+                  attributes {
+                    kind
+                    createdAt
+                    timegrama {
+                      data {
+                        id
+                        attributes {
+                          date
+                        }
+                      }
+                    }
+                    newpic {
+                      data {
+                        id
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                    vots {
+                      what
+                      why
+                      id
+                      order
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`,
+
+  '87levSlicePends': `query LevSlicePends($idL: ID!, $pids: [ID]) {
+  usersPermissionsUser(id: $idL) {
+    data {
+      id
+      attributes {
+        projects_1s(filters: { id: { in: $pids } }) {
+          data {
+            id
+            attributes {
+              projectName
+              restime
+              user_1s {
+                data {
+                  id
+                }
+              }
+              profilePic {
+                data {
+                  attributes {
+                    url
+                    formats
+                  }
+                }
+              }
+              pendms(filters: { archived: { eq: false }, matanot_recipe_missions: { id: { null: true } } }) {
+                data {
+                  id
+                  attributes {
+                    name
+                    createdAt
+                    iskvua
+                    hearotMeyuchadot
+                    descrip
+                    noofhours
+                    perhour
+                    sqadualed
+                    privatlinks
+                    publicklinks
+                    dates
+                    location {
+                      location_mode
+                      lat
+                      lng
+                      radius
+                      location_hint
+                    }
+                    rishon {
+                      data {
+                        id
+                      }
+                    }
+                    acts {
+                      data {
+                        id
+                        attributes {
+                          shem
+                          link
+                          des
+                          dateF
+                          dateS
+                        }
+                      }
+                    }
+                    negopendmissions(sort: "ordern:desc") {
+                      data {
+                        id
+                        attributes {
+                          name
+                          hearotMeyuchadot
+                          descrip
+                          createdAt
+                          ordern
+                          proposedBy
+                          noofhours
+                          perhour
+                          isOriginal
+                          date
+                          dates
+                          isMonth
+                          location {
+                            location_mode
+                            lat
+                            lng
+                            radius
+                            location_hint
+                          }
+                          users_permissions_user {
+                            data {
+                              id
+                              attributes {
+                                username
+                              }
+                            }
+                          }
+                          skills {
+                            data {
+                              id
+                              attributes {
+                                skillName
+                                localizations {
+                                  data {
+                                    attributes {
+                                      skillName
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                          tafkidims {
+                            data {
+                              id
+                              attributes {
+                                roleDescription
+                                localizations {
+                                  data {
+                                    attributes {
+                                      roleDescription
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                          work_ways {
+                            data {
+                              id
+                              attributes {
+                                workWayName
+                                localizations {
+                                  data {
+                                    attributes {
+                                      workWayName
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                          acts {
+                            data {
+                              id
+                              attributes {
+                                shem
+                                link
+                                des
+                                dateF
+                                dateS
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    skills {
+                      data {
+                        id
+                        attributes {
+                          skillName
+                          localizations {
+                            data {
+                              attributes {
+                                skillName
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    tafkidims {
+                      data {
+                        id
+                        attributes {
+                          roleDescription
+                          localizations {
+                            data {
+                              attributes {
+                                roleDescription
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    work_ways {
+                      data {
+                        id
+                        attributes {
+                          workWayName
+                          localizations {
+                            data {
+                              attributes {
+                                workWayName
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    mission {
+                      data {
+                        id
+                      }
+                    }
+                    vallues {
+                      data {
+                        id
+                      }
+                    }
+                    timegrama {
+                      data {
+                        id
+                        attributes {
+                          date
+                        }
+                      }
+                    }
+                    diun {
+                      what
+                      why
+                      id
+                      zman
+                      order
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
+                    users {
+                      what
+                      order
+                      why
+                      zman
+                      id
+                      users_permissions_user {
+                        data {
+                          id
+                        }
+                      }
+                    }
                   }
                 }
               }

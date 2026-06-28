@@ -7,6 +7,7 @@ import {
   runResourceAskmAcceptance,
   activateRecurringEngine,
 } from '../helpers/runResourceAskmAcceptance.js';
+import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
 
 const finalizeAskmAcceptanceHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const {
@@ -36,31 +37,11 @@ const finalizeAskmAcceptanceHandler: ActionExecutionHandler = async (params, con
 
     await strapi.execute('133addVoteToAskm', { id: askmId, vots: allVots }, context.jwt, context.fetch);
 
-    if (isFirstVote) {
-      const projectRes = await strapi.execute(
-        '128getProjectMembersAndRestime',
-        { pid: projectId },
-        context.jwt,
-        context.fetch
-      );
-      const restime: string = projectRes?.data?.project?.data?.attributes?.restime ?? '';
-      const resMs: Record<string, number> = {
-        feh: 48 * 3_600_000,
-        sth: 72 * 3_600_000,
-        nsh: 96 * 3_600_000,
-        sevend: 168 * 3_600_000,
-      };
-      const offsetMs = resMs[restime] ?? 0;
-      if (offsetMs > 0) {
-        const deadline = new Date(now.getTime() + offsetMs);
-        await strapi.execute(
-          '127createTimegramaForAskm',
-          { date: deadline.toISOString(), askmId },
-          context.jwt,
-          context.fetch
-        );
-      }
-    }
+    // A rikma member has engaged → ensure the auto-approval clock is running
+    // (deferred from the external candidate's proposal; also recreates one that a
+    // candidate-counter cancelled). isFirstVote retained for back-compat callers.
+    void isFirstVote;
+    await ensureCandidacyTimegrama(strapi, context, { side: 'askm', id: String(askmId) });
 
     return { data: { askmId }, updateStrategy: { type: 'none' } };
   }

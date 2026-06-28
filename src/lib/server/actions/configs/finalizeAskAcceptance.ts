@@ -47,11 +47,46 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
   const d = new Date();
   const now = d.toISOString();
 
+  // Apply the latest negotiated round (if any) to the Mesimabetahalich params.
+  // Best-effort: if the query fails or there are no rounds, baseline params are kept.
+  let finalName = openmissionName;
+  let finalMissionDetails = missionDetails;
+  let finalNhours = nhours;
+  let finalValph = valph;
+  let finalHearotMeyuchadot = hearotMeyuchadot;
+  let finalTafkidims = Array.isArray(tafkidims) ? [...tafkidims] : [];
+  let finalSqedualed = sqedualed;
+  let finalDeadline = deadline;
+
+  try {
+    const roundsRes: any = await strapi.execute(
+      'getAskNegoRounds',
+      { id: String(askId) },
+      context.jwt,
+      context.fetch
+    );
+    const rounds = roundsRes?.data?.ask?.data?.attributes?.negopendmissions?.data ?? [];
+    const latest = rounds[0]?.attributes; // ordern:desc → [0] is the latest round
+    if (latest) {
+      if (latest.name != null) finalName = latest.name;
+      if (latest.descrip != null) finalMissionDetails = latest.descrip;
+      if (latest.noofhours != null) finalNhours = latest.noofhours;
+      if (latest.perhour != null) finalValph = latest.perhour;
+      if (latest.hearotMeyuchadot != null) finalHearotMeyuchadot = latest.hearotMeyuchadot;
+      if (latest.tafkidims?.data?.length > 0)
+        finalTafkidims = latest.tafkidims.data.map((t: any) => String(t.id));
+      if (latest.date != null) finalSqedualed = latest.date;
+      if (latest.dates != null) finalDeadline = latest.dates;
+    }
+  } catch {
+    /* negotiated terms are best-effort; baseline params still work */
+  }
+
   const votesStr = formatVotesForInline(existingVotes);
 
-  const dateFragment = deadline ? `admaticedai: "${deadline}"` : '';
-  const sdateFragment = sqedualed ? `start: "${sqedualed}"` : '';
-  const tafkidimsStr = Array.isArray(tafkidims) ? tafkidims.join(',') : '';
+  const dateFragment = finalDeadline ? `admaticedai: "${finalDeadline}"` : '';
+  const sdateFragment = finalSqedualed ? `start: "${finalSqedualed}"` : '';
+  const tafkidimsStr = finalTafkidims.join(',');
   const otherAsksFragment = variant === 'allVoted' ? 'asks { data { id } }' : '';
 
   const strapiUrl = process.env.VITE_URL || 'https://tovmeod.1lev1.com';
@@ -65,11 +100,11 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
     createMesimabetahalich(data: {
       project: "${projectId}",
       mission: "${missId}",
-      hearotMeyuchadot: "${hearotMeyuchadot}",
-      name: "${openmissionName}",
-      descrip: "${missionDetails}",
-      hoursassinged: ${nhours},
-      perhour: ${valph},
+      hearotMeyuchadot: "${finalHearotMeyuchadot}",
+      name: "${finalName}",
+      descrip: "${finalMissionDetails}",
+      hoursassinged: ${finalNhours},
+      perhour: ${finalValph},
       iskvua: ${iskvua},
       privatlinks: "${privatlinks}",
       publicklinks: "${publicklinks}",
