@@ -192,7 +192,7 @@ onMessage(messaging, (payload) => {
   });
 </script>
 
-{#if navigating.delta}
+{#if navigating.to}
   <div class="nav-progress-track">
     <div class="nav-progress-bar"></div>
   </div>
