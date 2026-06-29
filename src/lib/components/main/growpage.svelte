@@ -5,6 +5,7 @@
   import { goto } from '$app/navigation';
   import { Head } from 'svead';
   import { onMount } from 'svelte';
+  import { lang, langUs, doesLang } from '$lib/stores/lang';
 
   const regPath = $derived(
     $locale === 'he'
@@ -77,7 +78,88 @@
   }
 
   onMount(loadStats);
+
+  let trans = $state(false);
+
+  function change(lan) {
+    doesLang.set(true);
+    langUs.set(lan);
+    lang.set(lan);
+    locale.set(lan);
+    document.cookie = `lang=${lan}; expires=` + new Date(2027, 0, 1).toUTCString();
+    trans = false;
+  }
 </script>
+
+{#snippet utilityNav(compact = false)}
+  {#if trans === false}
+    <button type="button" onclick={() => (trans = !trans)}>
+      <img
+        class="shadow-xl rounded {compact ? 'w-7 h-7' : ''}"
+        alt="translat-icon"
+        src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"
+      />
+    </button>
+  {:else}
+    <button
+      type="button"
+      onclick={() => (trans = !trans)}
+      class="text-emerald-700 hover:text-amber-600 p-0.5"
+    >
+      <svg class="w-6 h-6" viewBox="0 0 24 24">
+        <path
+          fill="currentColor"
+          d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+        />
+      </svg>
+    </button>
+    {#if $lang != 'en'}
+      <button
+        type="button"
+        onclick={() => change('en')}
+        title="change language to English"
+        class="text-emerald-900 border-2 border-emerald-300 font-bold hover:text-amber-50 bg-amber-200 text-center hover:bg-emerald-700 px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
+      >
+        {$t('home.languages.en')}
+      </button>
+    {/if}
+    {#if $lang != 'ar'}
+      <button
+        type="button"
+        onclick={() => change('ar')}
+        title="change language to Arabic"
+        class="text-emerald-900 border-2 border-emerald-300 font-bold hover:text-amber-50 bg-amber-200 text-center hover:bg-emerald-700 px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
+      >
+        {$t('home.languages.ar')}
+      </button>
+    {/if}
+    {#if $lang != 'he'}
+      <button
+        type="button"
+        onclick={() => change('he')}
+        title="change language to Hebrew"
+        class="text-emerald-900 border-2 border-emerald-300 font-bold hover:text-amber-50 bg-amber-200 text-center hover:bg-emerald-700 px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
+      >
+        {$t('home.languages.he')}
+      </button>
+    {/if}
+    {#if $lang != 'ru'}
+      <button
+        type="button"
+        onclick={() => change('ru')}
+        title="change language to Russian"
+        class="text-emerald-900 border-2 border-emerald-300 font-bold hover:text-amber-50 bg-amber-200 text-center hover:bg-emerald-700 px-1.5 py-0.5 rounded text-base sm:text-sm whitespace-nowrap"
+      >
+        {$t('home.languages.ru')}
+      </button>
+    {/if}
+  {/if}
+{/snippet}
+
+<!-- Mobile lang selector (floating) -->
+<div class="md:hidden fixed top-16 left-2 z-[699] flex flex-col gap-1">
+  {@render utilityNav()}
+</div>
 
 <Head
   title={$t('grow.meta.title')}
@@ -95,14 +177,14 @@
   <header
     class="sticky top-0 z-50 flex items-center gap-3 px-4 sm:px-8 py-3 bg-[#f4faf1]/90 backdrop-blur-md border-b border-emerald-200/50 shadow-sm"
   >
-    <img
-      src={image}
-      alt="1lev1"
-      class="w-10 h-10 shrink-0 drop-shadow transition-transform hover:rotate-6 duration-300"
-    />
-    <span class="font-bold text-emerald-800 text-xl tracking-tight select-none"
-      >1💗1</span
-    >
+    <a href="/" class="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity">
+      <img
+        src={image}
+        alt="1lev1"
+        class="w-10 h-10 drop-shadow transition-transform hover:rotate-6 duration-300"
+      />
+      <span class="font-bold text-emerald-800 text-xl tracking-tight select-none">1💗1</span>
+    </a>
     <nav
       class="hidden md:flex flex-1 items-center justify-center gap-6 text-emerald-800 font-semibold text-sm lg:text-base"
     >
@@ -133,6 +215,14 @@
       >
     </nav>
     <div class="flex-1 md:flex-none"></div>
+    <!-- Desktop lang selector -->
+    <div
+      class="hidden md:flex items-center gap-2"
+      class:flex-row={trans}
+      class:flex-wrap={trans}
+    >
+      {@render utilityNav(true)}
+    </div>
     <button
       type="button"
       class="shrink-0 bg-emerald-700 text-amber-50 hover:bg-emerald-800 font-bold px-5 py-2 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 whitespace-nowrap text-sm"

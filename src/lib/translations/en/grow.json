@@ -1,107 +1,107 @@
 {
   "meta": {
     "title": "1💗1 · Grow Together — a living from the land, without going it alone",
-    "description": "An ecological livelihood that starts from community, not from risk. Land, seedlings, hands and time — everyone brings what they have and love, and together you grow a harmonious, circular living. Start from the customers and build the business around the need."
+    "description": "An ecological livelihood that starts from the community and reduces risk. Land, seedlings, hands and time — each person contributes their unique part, and together they create a harmonious, circular livelihood based on real demand."
   },
   "hero": {
-    "eyebrow": "◈ Ecological work · Tending the land · Community ◈",
+    "eyebrow": "◈ Ecological doing · Connection to the land · Creative community ◈",
     "h1": "A living from the land — without doing it alone",
     "h2": "An ecological profession starts from community, not from risk",
     "h3": "Everyone brings what they have and love — together a livelihood grows",
     "h4": "From the eater back to the soil — one whole, harmonious circle",
     "h5": "Start from the customers. The business is built around the need",
-    "sub": "You don't need land, capital, or to start alone. Each person brings a piece — soil, seedlings, hands, time or customers — and the system fairly records who gave what, and shares the harvest.",
+    "sub": "No initial capital, land purchase or going it alone is required. Everyone brings their share — land, seedlings, working hands, time or a desire to consume — and 1💗1's cooperative model coordinates everything transparently and shares the fruits fairly.",
     "ctaPrimary": "Let's grow together ✿",
-    "ctaSecondary": "I want a local veggie box 🥬"
+    "ctaSecondary": "I want to order a local veggie box 🥬"
   },
   "nav": {
     "barriers": "The barriers",
-    "weave": "How it's woven",
+    "weave": "The weave: a living partnership",
     "demand": "Start from the customer",
     "how": "How to start",
     "who": "Who it's for",
-    "join": "Join"
+    "join": "Join the circle"
   },
   "problem": {
-    "title": "Starting a growing business alone — nearly impossible",
-    "lead": "The dream is simple: work the land, grow real food, earn a dignified living. It's the barriers that stop you.",
-    "b1": "You have no land — and those who do are afraid to hand it to strangers.",
-    "b2": "No capital for seedlings, tools and a greenhouse before you've earned a cent.",
-    "b3": "No guaranteed customers — and half the produce rots or goes to waste.",
-    "b4": "Alone from dawn to dusk, no day of rest and no one to relieve you.",
-    "cost": "So the dream stays a dream, and the land stays fallow.",
-    "turn": "At 1💗1 every barrier becomes someone else's role ✿"
+    "title": "The difficulty of founding an agricultural venture alone",
+    "lead": "The dream sounds simple and pure: to work the land, grow healthy food and earn a dignified living. But in reality, the challenges on the ground are almost impassable for individuals.",
+    "b1": "Lack of available land — and a natural fear among landowners of renting it out long-term.",
+    "b2": "High setup costs for equipment, seedlings and infrastructure before the first product is sold.",
+    "b3": "Marketing instability — without guaranteed customers upfront, a significant portion of the yield may go to waste.",
+    "b4": "Burnout and loneliness — hard physical work around the clock, without the ability to take rest days or backup.",
+    "cost": "This is how the dream fades, and the fertile land remains desolate.",
+    "turn": "At 1💗1 we turn every barrier into an opportunity for another partner in the circle ✿"
   },
   "weave": {
-    "title": "A weave: everyone brings a thread, a whole cloth emerges",
-    "sub": "Not a partnership where everyone does everything. Each person joins with what they have and love — and the system remembers every hour and resource, so the split stays fair.",
-    "r1_t": "🌍 The landholder",
-    "r1_d": "Provides the plot, knows they'll profit from it, and is involved in every decision. The land works — instead of lying fallow.",
-    "r2_t": "🌱 The seedling grower",
-    "r2_d": "Enjoys growing seedlings in quantity, and is happy to contribute them as an investment — and to be involved in how things grow.",
-    "r3_t": "🧑‍🌾 The grower on the ground",
-    "r3_d": "Comes from morning to evening for the love of it. It's not a 'job', it's a passion — and it's counted as hours put into the system.",
-    "r4_t": "🤝 The relief hand",
-    "r4_d": "When the grower wants a day of rest, someone steps in. No one is chained to the land alone, 365 days a year.",
-    "r5_t": "⚖️ The system",
-    "r5_d": "Everyone puts in hours and resources — and the system records who gave what, sharing the harvest and the money by real contribution.",
-    "note": "No single 'owner' and 'employees'. A network of givers — each with a transparent, measurable share."
+    "title": "The weave — a living partnership inspired by nature",
+    "sub": "In 1💗1, a partnership is called a 'weave' — inspired by living tissue in a living body. Each cell in the weave has full independence, a unique role and freedom of action, and together they create a whole, pulsing, functioning organism that enables shared flourishing without giving up personal freedom.",
+    "r1_t": "🌍 The soil cell and anchor of the venture",
+    "r1_d": "Provides available land for the venture, participates in decision-making and enjoys a fair return. The land comes back to life instead of lying fallow.",
+    "r2_t": "🌱 The germination and knowledge cell",
+    "r2_d": "Prepares and nurtures quality seedlings as part of the initial investment in the weave, and professionally accompanies the growing process.",
+    "r3_t": "🧑‍🌾 The doing and nurturing cell",
+    "r3_d": "Comes to practical work in the field out of passion and connection to the land. Working hours and energy are transparently translated into ownership in the weave.",
+    "r4_t": "🛡️ The backup and resilience cell",
+    "r4_d": "Ensures continuity and stability. When rest or vacation is needed, other partners support and fill in, so the land and weave continue to flourish.",
+    "r5_t": "⚖️ The nervous system: synchronization and fairness",
+    "r5_d": "1💗1's technological interface functions like a quiet nervous system: it coordinates, documents each cell's contribution, and distributes profits by full consensus.",
+    "note": "There is no pyramidal structure of 'employers' and 'employees' here. There is an equal weave — each cell has freedom and independence, and everyone complements one another in harmony."
   },
   "demand": {
-    "title": "Start from the customer — not from the risk",
-    "sub": "Instead of growing and hoping someone buys, start from people who already want. The risk of 'no customers and produce in the bin' simply disappears.",
-    "p1": "People in a given area ask for a weekly veggie box — that's the demand.",
-    "p2": "Around them, the beginning grower organizes with the landholder, the seedling grower and the carers.",
-    "p3": "You grow exactly what was ordered, in the quantity ordered — minimum waste, maximum freshness.",
-    "basket": "🥬 A weekly veggie box, local and fresh — built around the people who actually want it."
+    "title": "Start from the community — reduce the risk",
+    "sub": "Instead of growing and hoping someone buys, we flip the equation and base everything on pre-defined demand.",
+    "p1": "Local residents express interest and pre-order a regular seasonal vegetable box.",
+    "p2": "Around this demand, landowners, growers and carers in the same area organize together.",
+    "p3": "We grow exactly what was ordered and in the required quantity — no surplus, no waste and maximum freshness.",
+    "basket": "🥬 A weekly, local and rich vegetable box — built especially for the people waiting for it."
   },
   "paths": {
-    "title": "Two ways — whichever fits you",
-    "simple_t": "Simple sales",
-    "simple_d": "Grow, sell, and the system simply splits the money among everyone who contributed — hours, land, seedlings. No accounting headaches.",
-    "economy_t": "A full economy around the customer",
-    "economy_d": "A personal concierge: the customer says what they want, and a group forms around the need — a weekly box, a subscription, complementary products. A living local economy.",
-    "note": "Start small with simple sales, and grow into a full economy — at your own pace."
+    "title": "Two growth paths — your choice",
+    "simple_t": "Direct income sharing",
+    "simple_d": "Grow, sell, and income is automatically and simply divided among all partners according to their investment ratio and hours.",
+    "economy_t": "A complete local economy",
+    "economy_d": "Building a comprehensive subscription system around the community's needs: weekly boxes, complementary products and broad community integration.",
+    "note": "You can start simply with basic sales, and expand to a full local economy at the pace that's right for you."
   },
   "how": {
-    "title": "How to start — 4 steps",
-    "s1_t": "Join and say what you have",
-    "s1_d": "Land? Seedlings? Time and hands? Or are you a customer who wants a local box? Every starting point is good.",
-    "s2_t": "Get woven into a group",
-    "s2_d": "The system connects you — landholder, grower, carer and customers — by area, need and what each person loves to do.",
-    "s3_t": "Agree, transparently",
-    "s3_d": "Who gives what, who gets what, and how it's split. All visible, measurable, and approved by everyone before you begin.",
-    "s4_t": "Grow — and share the harvest",
-    "s4_d": "The land works, the box reaches the customer, and every hour and resource translates into a fair share of fruit and money."
+    "title": "Four simple steps to get started",
+    "s1_t": "Join and present your resources",
+    "s1_d": "Available land? Growing ability? Free time and working hands? Or perhaps a wish to support as consumers? Every contribution is an excellent starting point.",
+    "s2_t": "Connecting and forming the circle",
+    "s2_d": "We connect complementary partners in the same geographic area to create a harmonious and balanced working group.",
+    "s3_t": "Agreement and full transparency",
+    "s3_d": "We define and approve digitally and clearly in advance the division of roles, investments and how profits are shared.",
+    "s4_t": "Grow and share in abundance",
+    "s4_d": "The garden sets off, the produce reaches consumers, and income is shared according to the model agreed upon transparently."
   },
   "who": {
-    "title": "Who it's for",
-    "sub": "For anyone with a piece to give — and anyone who wants to eat better.",
-    "w1_t": "Landholders",
-    "w1_d": "With a free plot that could work and yield — through involvement, not surrender.",
-    "w2_t": "Gardening & farming lovers",
-    "w2_d": "Who love the soil and want that love to become a livelihood too.",
-    "w3_t": "Beginning farmers",
-    "w3_d": "Who want to start without huge capital and without the risk of going it alone.",
-    "w4_t": "Communities & kibbutzim",
-    "w4_d": "Looking to thicken a local, circular, shared economy around the land.",
+    "title": "Who is this for?",
+    "sub": "For anyone who wants to take part in real ecological and social change, and for anyone who wants to consume clean, quality food.",
+    "w1_t": "Landowners and open spaces",
+    "w1_d": "Who want to see their land yielding and returning life, through social involvement and partnership.",
+    "w2_t": "Earth and gardening lovers",
+    "w2_d": "People who want to turn their passion into practical, rewarding agricultural work without capital.",
+    "w3_t": "Farmers at the beginning of their journey",
+    "w3_d": "Who want to gain practical experience, build community and reduce the startup and marketing risks involved in starting alone.",
+    "w4_t": "Settlements and local communities",
+    "w4_d": "Who aspire to strengthen their economic and social resilience through cooperative, connecting local agriculture.",
     "w5_t": "Conscious consumers",
-    "w5_d": "Who want a fresh, local veggie box — and to know the hands that grew it."
+    "w5_d": "People who want fresh, local vegetables directly from the field, and to get to know the partners who grew them."
   },
   "values": {
-    "title": "Harmony, circularity, and a real connection",
-    "v1_t": "🔄 Circularity",
-    "v1_d": "From seed to plate and back to the soil. No waste, no needless middlemen — a closed loop between giver and eater.",
-    "v2_t": "🤲 Harmony",
-    "v2_d": "Everyone does what they love and are good at. Livelihood is born from joy, not from burnout.",
-    "v3_t": "🔍 Transparency",
-    "v3_d": "Every hour, every seedling and every coin — recorded and visible. Trust is built on fair measurement, not promises."
+    "title": "The values that drive us",
+    "v1_t": "Circularity and cycles",
+    "v1_d": "From seed to plate and back to the soil. We minimize the intermediary gaps and food waste to the minimum possible.",
+    "v2_t": "Personal harmony",
+    "v2_d": "Each partner focuses on what they do best and love. The work is done from connection and fulfilment, not from burnout.",
+    "v3_t": "Trust and transparency",
+    "v3_d": "Clear and accessible documentation of every hour, resource and fruit enables building long-term relationships based on true partnership."
   },
   "cta": {
-    "title": "The land is waiting. The community is ready.",
-    "sub": "Whether you have a plot, hands, seedlings — or just a hunger for real food — there's a place for you in the circle.",
+    "title": "The land is ready, the community is waiting",
+    "sub": "Whether you have land to offer, working hands, professional knowledge — or simply a desire to eat healthy local food — there's a place for you in our circle.",
     "register": "Let's grow together ✿",
     "wish": "I want a local box 🥬",
-    "login": "I already have an account"
+    "login": "Login to existing account"
   }
 }
