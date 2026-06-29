@@ -37,6 +37,7 @@
     projectUsers = [],
     each = $bindable(price || 0),
     kindUlimit = false,
+    defaultHolder = '',
     onStart,
     onDone,
     onDoners,
@@ -44,7 +45,7 @@
   } = $props();
 
   let store = $state();
-  let selected = $state([]);
+  let selected = $state(defaultHolder ? [defaultHolder] : []);
   let total = $state(0);
   let hm = $state(1);
   let note = $state('');

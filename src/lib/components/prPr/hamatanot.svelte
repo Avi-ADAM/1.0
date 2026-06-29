@@ -4,6 +4,9 @@
   import New from './newmatana.svelte';
   import { SaleComponent } from '$lib/components/sales';
   import dayjs from 'dayjs';
+  import 'dayjs/locale/he.js';
+  import 'dayjs/locale/ar.js';
+  import 'dayjs/locale/ru.js';
   import { lang } from '$lib/stores/lang.js';
   import { t, isRtl} from '$lib/translations';
   import { idPr } from '$lib/stores/idPr.js';
@@ -31,6 +34,55 @@
 
   /** @type {Array<Record<string, string | number>>} */
   let arrt = $state([]);
+
+  /** @typedef {'daily' | 'monthly' | 'yearly'} ChartPeriod */
+
+  /** @type {ChartPeriod} */
+  let chartPeriod = $state('daily');
+
+  /** @type {number} */
+  let selectedChartYear = $state(dayjs().year());
+
+  /**
+   * @param {Record<string, Record<string, number | string>>} grouped
+   * @param {(key: string) => string} formatLabel
+   * @param {(a: { date: string | number }, b: { date: string | number }) => number} [sortFn]
+   * @returns {Array<Record<string, string | number>>}
+   */
+  function buildStackedChartData(grouped, formatLabel, sortFn) {
+    const rows = Object.entries(grouped).map(([key, value]) => ({
+      date: key,
+      ...value
+    }));
+    if (rows.length === 0) return [];
+
+    const keys = rows.reduce((acc, curr) => {
+      Object.keys(curr).forEach((key) => {
+        if (key !== 'date') acc.add(key);
+      });
+      return acc;
+    }, /** @type {Set<string>} */ (new Set()));
+
+    const output = rows.map((item) =>
+      [...keys].reduce(
+        (acc, key) => {
+          acc[key] = item[key] ?? 0;
+          return acc;
+        },
+        /** @type {Record<string, string | number>} */ ({ date: item.date })
+      )
+    );
+
+    output.sort(
+      sortFn ??
+        ((a, b) => new Date(String(a.date)).getTime() - new Date(String(b.date)).getTime())
+    );
+
+    return output.map((obj) => ({
+      ...obj,
+      date: formatLabel(String(obj.date))
+    }));
+  }
 
   /** @type {string | undefined} */
   let kindOf = $state();
@@ -188,6 +240,70 @@
     { year: 2019, bananas: 3840, cherries: 1920, dates: 960 },
     { year: 2020, bananas: 380, cherries: 920, dates: 1960 }
   ];
+
+  const availableYears = $derived(
+    [...new Set(salee.map((s) => dayjs(s.attributes.date).year()))].sort(
+      (a, b) => b - a
+    )
+  );
+
+  const monthlyGrouped = $derived.by(() => {
+    /** @type {Record<string, Record<string, number>>} */
+    const grouped = {};
+    for (let m = 1; m <= 12; m++) {
+      const monthKey = `${selectedChartYear}-${String(m).padStart(2, '0')}`;
+      grouped[monthKey] = { total: 0 };
+    }
+    for (const sale of salee) {
+      const d = dayjs(sale.attributes.date);
+      if (d.year() !== selectedChartYear) continue;
+      const monthKey = d.format('YYYY-MM');
+      grouped[monthKey].total += sale.attributes.in;
+    }
+    return grouped;
+  });
+
+  const yearlyGrouped = $derived.by(() => {
+    /** @type {Record<string, Record<string, number>>} */
+    const grouped = {};
+    for (const sale of salee) {
+      const yearKey = dayjs(sale.attributes.date).format('YYYY');
+      if (!grouped[yearKey]) grouped[yearKey] = { total: 0 };
+      grouped[yearKey].total += sale.attributes.in;
+    }
+    return grouped;
+  });
+
+  const arrtMonth = $derived.by(() => {
+    void $lang;
+    return buildStackedChartData(monthlyGrouped, (key) =>
+      dayjs(`${key}-01`).format('MMM')
+    );
+  });
+
+  const arrtYear = $derived(
+    buildStackedChartData(
+      yearlyGrouped,
+      (key) => key,
+      (a, b) => Number(a.date) - Number(b.date)
+    )
+  );
+
+  const activeChartData = $derived(
+    chartPeriod === 'daily'
+      ? arrt
+      : chartPeriod === 'monthly'
+        ? arrtMonth
+        : arrtYear
+  );
+
+  const hasActiveChartData = $derived(
+    chartPeriod === 'daily'
+      ? arrt.length > 0
+      : chartPeriod === 'monthly'
+        ? arrtMonth.some((row) => Number(row.total) > 0)
+        : arrtYear.length > 0
+  );
   function exportToCSV() {
     const headers = [
       $t('project.hamatanot.productName'),
@@ -236,6 +352,17 @@
       $lang === 'he' ? 'הקובץ הורד בהצלחה' : 'File downloaded successfully'
     );
   }
+
+  $effect(() => {
+    dayjs.locale($lang);
+  });
+
+  $effect(() => {
+    if (availableYears.length > 0 && !availableYears.includes(selectedChartYear)) {
+      selectedChartYear = availableYears[0];
+    }
+  });
+
   $effect(() => {
     // Show all sales in graphs
     fermatana = salee.reduce((acc, sale) => {
@@ -678,11 +805,72 @@
           <h1
             class="text-center text-barbi text-bold underline decoration-mturk"
           >
-            {$t('project.hamatanot.salesByDate')}
+            {#if chartPeriod === 'daily'}
+              {$t('project.hamatanot.salesByDate')}
+            {:else if chartPeriod === 'monthly'}
+              {$t('project.hamatanot.salesByMonth')}
+            {:else}
+              {$t('project.hamatanot.salesByYear')}
+            {/if}
           </h1>
 
-          <div class="  sm:[width:calc(95vw-24rem)] w-4/5 h-96 m-2">
-            <Col data={arrt} />
+          <div class="flex flex-wrap items-center justify-center gap-2 m-2">
+            <button
+              type="button"
+              class="px-3 py-1 rounded-full text-sm font-semibold border transition-colors {chartPeriod ===
+              'daily'
+                ? 'border-barbi bg-barbi text-white'
+                : 'border-barbi/40 text-barbi hover:border-barbi'}"
+              onclick={() => (chartPeriod = 'daily')}
+            >
+              {$t('project.hamatanot.chartPeriodDaily')}
+            </button>
+            <button
+              type="button"
+              class="px-3 py-1 rounded-full text-sm font-semibold border transition-colors {chartPeriod ===
+              'monthly'
+                ? 'border-barbi bg-barbi text-white'
+                : 'border-barbi/40 text-barbi hover:border-barbi'}"
+              onclick={() => (chartPeriod = 'monthly')}
+            >
+              {$t('project.hamatanot.chartPeriodMonthly')}
+            </button>
+            <button
+              type="button"
+              class="px-3 py-1 rounded-full text-sm font-semibold border transition-colors {chartPeriod ===
+              'yearly'
+                ? 'border-barbi bg-barbi text-white'
+                : 'border-barbi/40 text-barbi hover:border-barbi'}"
+              onclick={() => (chartPeriod = 'yearly')}
+            >
+              {$t('project.hamatanot.chartPeriodYearly')}
+            </button>
+
+            {#if chartPeriod === 'monthly' && availableYears.length > 0}
+              <label class="flex items-center gap-2 text-sm text-barbi">
+                <span>{$t('project.hamatanot.selectYear')}:</span>
+                <select
+                  class="rounded border border-barbi/40 bg-white px-2 py-1 text-barbi"
+                  value={selectedChartYear}
+                  onchange={(e) =>
+                    (selectedChartYear = Number(e.currentTarget.value))}
+                >
+                  {#each availableYears as year (year)}
+                    <option value={year}>{year}</option>
+                  {/each}
+                </select>
+              </label>
+            {/if}
+          </div>
+
+          <div class="sm:[width:calc(95vw-24rem)] w-4/5 h-96 m-2 pb-8 overflow-visible pr-4">
+            {#if hasActiveChartData}
+              <Col data={activeChartData} />
+            {:else}
+              <p class="flex h-full items-center justify-center text-barbi/70">
+                {$t('project.hamatanot.noSalesInPeriod')}
+              </p>
+            {/if}
           </div>
         </div>
       </div>

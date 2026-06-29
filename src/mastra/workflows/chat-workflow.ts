@@ -4,13 +4,14 @@ import { createIntentAgent } from '../agents/intent-agent';
 import { createTimerAgent } from '../agents/timer-agent';
 import { createNavigationAgent } from '../agents/navigation-agent';
 import { createGeneralHelpAgent } from '../agents/help-agent';
+import { createSaleAgent } from '../agents/sale-agent';
 import {
   DEFAULT_AGENT_MAX_STEPS,
   getAgentReply
 } from '../lib/agent-response';
 
 interface IntentResult {
-  type: 'timer' | 'navigation' | 'general' | 'report';
+  type: 'timer' | 'navigation' | 'general' | 'report' | 'sale';
   confidence: number;
   details: {
     action?: string;
@@ -73,7 +74,7 @@ const analyzeIntent = createStep({
     fetchInstance: z.any().optional(),
     currentPath: z.string().optional(),
     intent: z.object({
-      type: z.enum(['timer', 'navigation', 'general', 'report']),
+      type: z.enum(['timer', 'navigation', 'general', 'report', 'sale']),
       confidence: z.number(),
       details: intentDetailsSchema
     })
@@ -161,6 +162,16 @@ const analyzeIntent = createStep({
             context: 'fallback_parsing'
           }
         });
+      } else if (messageText.includes('מכירה') || messageText.includes('מכרתי') || messageText.includes('sale')) {
+        intent = normalizeIntent({
+          type: 'sale' as const,
+          confidence: 0.7,
+          details: {
+            action: 'create',
+            target: null,
+            context: 'fallback_parsing'
+          }
+        });
       } else {
         intent = normalizeIntent({
           type: 'general' as const,
@@ -196,7 +207,7 @@ const routeToAgent = createStep({
     fetchInstance: z.any().optional(),
     currentPath: z.string().optional(),
     intent: z.object({
-      type: z.enum(['timer', 'navigation', 'general', 'report']),
+      type: z.enum(['timer', 'navigation', 'general', 'report', 'sale']),
       confidence: z.number(),
       details: intentDetailsSchema
     })
@@ -205,7 +216,7 @@ const routeToAgent = createStep({
     agentResult: z.any(),
     agentType: z.string(),
     intent: z.object({
-      type: z.enum(['timer', 'navigation', 'general', 'report']),
+      type: z.enum(['timer', 'navigation', 'general', 'report', 'sale']),
       confidence: z.number(),
       details: intentDetailsSchema
     })
@@ -257,6 +268,16 @@ const routeToAgent = createStep({
         // Report/contact — handled by the general help agent which has reportIssueTool
         agent = createGeneralHelpAgent(apiKey, language);
         agentType = 'report';
+        break;
+
+      case 'sale':
+        if (!userId) {
+          agent = createGeneralHelpAgent(apiKey, language);
+          agentType = 'general';
+        } else {
+          agent = createSaleAgent(apiKey, language, userId);
+          agentType = 'sale';
+        }
         break;
 
       default:
@@ -358,7 +379,7 @@ const processResponse = createStep({
     agentResult: z.any(),
     agentType: z.string(),
     intent: z.object({
-      type: z.enum(['timer', 'navigation', 'general', 'report']),
+      type: z.enum(['timer', 'navigation', 'general', 'report', 'sale']),
       confidence: z.number(),
       details: intentDetailsSchema
     })
@@ -459,6 +480,19 @@ const processResponse = createStep({
             if (intent?.type === 'timer' && intent?.details?.action === 'start') {
               response.reply = 'מצאתי כמה משימות מתאימות. בחר מהרשימה את המשימה שתרצה להפעיל עבורה טיימר.';
             }
+          }
+
+          // Handle sale product list
+          if (name === 'saleActionTool' && output?.success && output?.products?.length > 0) {
+            console.log('🛍️ Generating product_list component for UI');
+            if (!response.components) response.components = [];
+            response.components.push({
+              type: 'product_list',
+              props: {
+                products: output.products,
+                userId: output.userId
+              }
+            });
           }
 
           if (

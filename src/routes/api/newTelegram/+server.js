@@ -78,6 +78,9 @@ const translations = {
         saleDatePrompt: 'שלח/י תאריך בפורמט DD/MM/YYYY\nלדוגמה: 29/06/2026\nאו: "היום" / "אתמול"',
         saleQuantityPrompt: 'שלח/י כמות (מספר שלם חיובי):',
         salePricePrompt: 'שלח/י מחיר ליחידה (₪):',
+        saleNotePrompt: '📋 שלח/י הערה (טקסט חופשי, עד 500 תווים):\nלביטול שלח/י "-"',
+        saleStartDatePrompt: '📅 שלח/י תאריך התחלה בפורמט DD/MM/YYYY:',
+        saleFinishDatePrompt: '📅 שלח/י תאריך סיום בפורמט DD/MM/YYYY\nלמנוי פתוח (ללא תאריך סיום) שלח/י "-"',
         saleCreated: '✅ המכירה נרשמה בהצלחה!',
         saleCancelled: 'המכירה בוטלה.',
         saleError: '❌ שגיאה ברישום המכירה. נסה/י שוב.',
@@ -145,6 +148,9 @@ const translations = {
         saleDatePrompt: 'Send date in format DD/MM/YYYY\nExample: 29/06/2026\nOr: "today" / "yesterday"',
         saleQuantityPrompt: 'Send quantity (positive integer):',
         salePricePrompt: 'Send price per unit (₪):',
+        saleNotePrompt: '📋 Send a note (free text, up to 500 chars):\nTo clear send "-"',
+        saleStartDatePrompt: '📅 Send start date in format DD/MM/YYYY:',
+        saleFinishDatePrompt: '📅 Send end date in format DD/MM/YYYY\nFor open-ended subscription send "-"',
         saleCreated: '✅ Sale recorded successfully!',
         saleCancelled: 'Sale cancelled.',
         saleError: '❌ Error recording sale. Please try again.',
@@ -179,7 +185,8 @@ const pendingEdits = new Map();
 const pendingSale = new Map();
 // key: userId string
 // value: { productId, productName, price, quant, kindOf, projectId, projectName, projectUsers,
-//          quantity, each, saleDate, holderId, holderName, pendingField: null|'quantity'|'each'|'date', messageId }
+//          quantity, each, saleDate, startDate, finishDate, note, holderId, holderName,
+//          pendingField: null|'quantity'|'each'|'date'|'startDate'|'finishDate'|'note', messageId }
 
 // --- Helper functions for interval editing ---
 
@@ -314,33 +321,82 @@ function parseSaleDate(text) {
 }
 
 function calcSaleTotal(sale) {
+    if ((sale.kindOf === 'monthly' || sale.kindOf === 'yearly') && sale.startDate && sale.finishDate) {
+        const a = new Date(sale.startDate);
+        const b = new Date(sale.finishDate);
+        const days = Math.ceil((b - a) / (1000 * 60 * 60 * 24));
+        if (days > 0) {
+            const divisor = sale.kindOf === 'monthly' ? 30 : 365;
+            return Number(((days / divisor) * sale.each * sale.quantity).toFixed(2));
+        }
+    }
     return Number((sale.quantity * sale.each).toFixed(2));
 }
 
 function formatSaleCard(sale, lang) {
-    const date = new Date(sale.saleDate);
-    const dateStr = date.toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const fmt = (iso) => new Date(iso).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US', { day: '2-digit', month: '2-digit', year: 'numeric' });
     const total = calcSaleTotal(sale);
+    const isSubscription = sale.kindOf === 'monthly' || sale.kindOf === 'yearly';
+
     if (lang === 'he') {
-        return `📦 *${sale.productName}*\n🏢 ${sale.projectName}\n\n📊 כמות: *${sale.quantity}*\n💰 מחיר ליחידה: *${sale.each} ₪*\n💵 סה"כ: *${total} ₪*\n📅 תאריך: *${dateStr}*\n👤 מחזיק כסף: *${sale.holderName}*`;
+        const kindLabel = sale.kindOf === 'monthly' ? ' (חודשי)' : sale.kindOf === 'yearly' ? ' (שנתי)' : '';
+        let card = `📦 *${sale.productName}*${kindLabel}\n🏢 ${sale.projectName}\n\n`;
+        if (sale.kindOf !== 'total' && sale.kindOf !== 'unlimited') {
+            card += `📊 כמות: *${sale.quantity}*\n`;
+        }
+        card += `💰 מחיר ליחידה: *${sale.each} ₪*\n`;
+        if (isSubscription && sale.startDate) {
+            card += `📅 מ: *${fmt(sale.startDate)}*`;
+            card += sale.finishDate ? ` עד: *${fmt(sale.finishDate)}*\n` : ` (פתוח)\n`;
+        }
+        card += `💵 סה"כ: *${total} ₪*\n`;
+        card += `🗓️ תאריך מכירה: *${fmt(sale.saleDate)}*\n`;
+        card += `👤 מחזיק כסף: *${sale.holderName}*`;
+        if (sale.note) card += `\n📋 הערה: _${sale.note}_`;
+        return card;
     }
-    return `📦 *${sale.productName}*\n🏢 ${sale.projectName}\n\n📊 Qty: *${sale.quantity}*\n💰 Per unit: *${sale.each} ₪*\n💵 Total: *${total} ₪*\n📅 Date: *${dateStr}*\n👤 Money holder: *${sale.holderName}*`;
+
+    const kindLabel = sale.kindOf === 'monthly' ? ' (monthly)' : sale.kindOf === 'yearly' ? ' (yearly)' : '';
+    let card = `📦 *${sale.productName}*${kindLabel}\n🏢 ${sale.projectName}\n\n`;
+    if (sale.kindOf !== 'total' && sale.kindOf !== 'unlimited') {
+        card += `📊 Qty: *${sale.quantity}*\n`;
+    }
+    card += `💰 Per unit: *${sale.each} ₪*\n`;
+    if (isSubscription && sale.startDate) {
+        card += `📅 From: *${fmt(sale.startDate)}*`;
+        card += sale.finishDate ? ` to: *${fmt(sale.finishDate)}*\n` : ` (open)\n`;
+    }
+    card += `💵 Total: *${total} ₪*\n`;
+    card += `🗓️ Sale date: *${fmt(sale.saleDate)}*\n`;
+    card += `👤 Money holder: *${sale.holderName}*`;
+    if (sale.note) card += `\n📋 Note: _${sale.note}_`;
+    return card;
 }
 
 function buildSaleCardKeyboard(sale, uid, lang) {
-    const isTotal = sale.kindOf === 'total';
+    const isTotal = sale.kindOf === 'total' || sale.kindOf === 'unlimited';
+    const isSubscription = sale.kindOf === 'monthly' || sale.kindOf === 'yearly';
     const buttons = [];
     if (!isTotal) {
         buttons.push([
-            Markup.button.callback(lang === 'he' ? '📝 שנה כמות' : '📝 Qty', `saleFld-quantity-${uid}`),
-            Markup.button.callback(lang === 'he' ? '💰 שנה מחיר' : '💰 Price', `saleFld-each-${uid}`)
+            Markup.button.callback(lang === 'he' ? '📊 כמות' : '📊 Qty', `saleFld-quantity-${uid}`),
+            Markup.button.callback(lang === 'he' ? '💰 מחיר' : '💰 Price', `saleFld-each-${uid}`)
         ]);
     } else {
-        buttons.push([Markup.button.callback(lang === 'he' ? '💰 שנה מחיר' : '💰 Price', `saleFld-each-${uid}`)]);
+        buttons.push([Markup.button.callback(lang === 'he' ? '💰 מחיר' : '💰 Price', `saleFld-each-${uid}`)]);
+    }
+    if (isSubscription) {
+        buttons.push([
+            Markup.button.callback(lang === 'he' ? '📅 תחילה' : '📅 Start', `saleFld-startDate-${uid}`),
+            Markup.button.callback(lang === 'he' ? '📅 סיום' : '📅 End', `saleFld-finishDate-${uid}`)
+        ]);
     }
     buttons.push([
-        Markup.button.callback(lang === 'he' ? '📅 שנה תאריך' : '📅 Date', `saleFld-date-${uid}`),
-        Markup.button.callback(lang === 'he' ? '👤 שנה מחזיק' : '👤 Holder', `saleHolder-${uid}`)
+        Markup.button.callback(lang === 'he' ? '🗓️ תאריך' : '🗓️ Date', `saleFld-date-${uid}`),
+        Markup.button.callback(lang === 'he' ? '👤 מחזיק' : '👤 Holder', `saleHolder-${uid}`)
+    ]);
+    buttons.push([
+        Markup.button.callback(lang === 'he' ? '📋 הערה' : '📋 Note', `saleFld-note-${uid}`)
     ]);
     buttons.push([Markup.button.callback(lang === 'he' ? '✅ שלח מכירה' : '✅ Send Sale', `saleSend-${uid}`)]);
     buttons.push([Markup.button.callback(lang === 'he' ? '❌ ביטול' : '❌ Cancel', `saleCancel-${uid}`)]);
@@ -1108,6 +1164,9 @@ bot.action(/^saleProd-(\d+)-(\d+)$/, async (ctx) => {
             quantity: 1,
             each: product.price,
             saleDate: new Date().toISOString(),
+            startDate: null,
+            finishDate: null,
+            note: '',
             holderId,
             holderName,
             pendingField: null,
@@ -1178,8 +1237,8 @@ bot.action(/^saleHolderSel-(\d+)-(\d+)$/, async (ctx) => {
     await ctx.answerCbQuery();
 });
 
-// Set pending field (quantity / each / date) → prompt text input
-bot.action(/^saleFld-(quantity|each|date)-(\d+)$/, async (ctx) => {
+// Set pending field (quantity / each / date / note / startDate / finishDate) → prompt text input
+bot.action(/^saleFld-(quantity|each|date|note|startDate|finishDate)-(\d+)$/, async (ctx) => {
     const field = ctx.match[1];
     const userId = ctx.match[2];
     const userInfo = ctx.state.userInfo;
@@ -1195,7 +1254,13 @@ bot.action(/^saleFld-(quantity|each|date)-(\d+)$/, async (ctx) => {
         ? getText('saleQuantityPrompt', lang)
         : field === 'each'
             ? getText('salePricePrompt', lang)
-            : getText('saleDatePrompt', lang);
+            : field === 'note'
+                ? getText('saleNotePrompt', lang)
+                : field === 'startDate'
+                    ? getText('saleStartDatePrompt', lang)
+                    : field === 'finishDate'
+                        ? getText('saleFinishDatePrompt', lang)
+                        : getText('saleDatePrompt', lang);
 
     ctx.reply(prompt, Markup.inlineKeyboard([
         [Markup.button.callback(getText('cancelEdit', lang), `saleCancelFld-${userId}`)]
@@ -1259,10 +1324,11 @@ bot.action(/^saleSend-(\d+)$/, async (ctx) => {
             date: sale.saleDate,
             publishedAt: now
         };
-        // For monthly/yearly use saleDate as startDate (open-ended)
         if (sale.kindOf === 'monthly' || sale.kindOf === 'yearly') {
-            vars.startDate = sale.saleDate;
+            vars.startDate = sale.startDate ?? sale.saleDate;
+            if (sale.finishDate) vars.finishDate = sale.finishDate;
         }
+        if (sale.note?.trim()) vars.note = sale.note.trim();
 
         const res = await sendToSer(vars, 'createSaleRecord', 0, 0, true, fetch);
         if (!res?.data?.createSale?.data?.id) throw new Error('Sale creation failed');
@@ -1280,7 +1346,7 @@ bot.action(/^saleSend-(\d+)$/, async (ctx) => {
         // Create open-ended Monter for monthly/yearly without finish date
         if ((sale.kindOf === 'monthly' || sale.kindOf === 'yearly') && !vars.finishDate) {
             await sendToSer(
-                { saleId, start: sale.saleDate },
+                { saleId, start: vars.startDate },
                 'createMonterForSale', 0, 0, true, fetch
             ).catch(e => console.warn('[saleSend] monter creation failed:', e));
         }
@@ -1397,6 +1463,28 @@ bot.on('text', async (ctx) => {
                     return;
                 }
                 sale.saleDate = iso;
+            } else if (field === 'note') {
+                const trimmed = userText.trim();
+                sale.note = (trimmed === '-' || trimmed.toLowerCase() === 'none') ? '' : trimmed.slice(0, 500);
+            } else if (field === 'startDate') {
+                const iso = parseSaleDate(userText);
+                if (!iso) {
+                    await ctx.reply(getText('invalidSaleDate', lang));
+                    return;
+                }
+                sale.startDate = iso;
+            } else if (field === 'finishDate') {
+                const trimmed = userText.trim();
+                if (trimmed === '-' || trimmed.toLowerCase() === 'none' || trimmed === 'אין') {
+                    sale.finishDate = null;
+                } else {
+                    const iso = parseSaleDate(trimmed);
+                    if (!iso) {
+                        await ctx.reply(getText('invalidSaleDate', lang));
+                        return;
+                    }
+                    sale.finishDate = iso;
+                }
             }
 
             sale.pendingField = null;

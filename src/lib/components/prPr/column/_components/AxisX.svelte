@@ -98,8 +98,8 @@
 
 <style>
   .tick {
-    font-size: 0.725em;
-    font-weight: 200;
+    font-size: 0.8em;
+    font-weight: 500;
   }
 
   line,
@@ -109,7 +109,7 @@
   }
 
   .tick text {
-    fill: #666;
+    fill: var(--barbi-pink, #b91372);
   }
 
   .tick .tick-mark,

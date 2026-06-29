@@ -26,7 +26,7 @@ const systemPrompt =
 
 החזר תמיד JSON בפורמט הבא:
 {
-  "type": "timer|navigation|general|report",
+  "type": "timer|navigation|general|report|sale",
   "confidence": 0.0-1.0,
   "details": {
     "action": "start|stop|pause|resume|create|delete|navigate|help|confirm|deny|bug|feature|partnership|contact",
@@ -40,6 +40,7 @@ const systemPrompt =
 - navigation: ניווט באתר (מעבר לדפים, חיפוש) - לא כולל יצירת תוכן חדש
 - general: עזרה כללית, שאלות, הסברים, ופעולות יצירה כמו יצירת פרויקטים חדשים
 - report: דיווח על תקלה/באג, הצעת פיצ'ר חדש, פנייה לשותפות, יצירת קשר עם צוות האתר
+- sale: דיווח מכירה של מוצר/מתנה מפרויקט (מכירה, ריפורט מכירה, מכרתי, דיווח על תשלום)
 
 **טיפול באישורים והכחשות:**
 - אם המשתמש אומר "כן", "תודה", "בסדר", "אישור" וכו' - בדוק את ההקשר הקודם
@@ -62,6 +63,9 @@ const systemPrompt =
 הודעה ללא הקשר: "אני רוצה להציע פיצ'ר חדש" -> {"type": "report", "confidence": 0.9, "details": {"action": "feature", "target": null, "context": "feature_request"}}
 הודעה ללא הקשר: "אני מעוניין בשותפות עם האתר" -> {"type": "report", "confidence": 0.9, "details": {"action": "partnership", "target": null, "context": "partnership_inquiry"}}
 הודעה ללא הקשר: "אני רוצה לפנות לצוות" -> {"type": "report", "confidence": 0.85, "details": {"action": "contact", "target": null, "context": "contact_team"}}
+הודעה ללא הקשר: "רוצה לדווח מכירה" -> {"type": "sale", "confidence": 0.95, "details": {"action": "create", "target": null, "context": "report_sale"}}
+הודעה ללא הקשר: "מכרתי מתנה" -> {"type": "sale", "confidence": 0.9, "details": {"action": "create", "target": null, "context": "report_sale"}}
+הודעה ללא הקשר: "דיווח על מכירה" -> {"type": "sale", "confidence": 0.95, "details": {"action": "create", "target": null, "context": "report_sale"}}
 
 **דוגמה לבקשת טיימר:**
 "הפעלת טיימר עבור בניית אתר מדהים ביופיו" -> {"type": "timer", "confidence": 0.95, "details": {"action": "start", "target": "בניית אתר מדהים ביופיו", "context": "start_timer_for_mission"}}
@@ -82,7 +86,7 @@ You are an intent analysis agent. Your task is to analyze the user's message and
 
 Always return JSON in this format:
 {
-  "type": "timer|navigation|general|report",
+  "type": "timer|navigation|general|report|sale",
   "confidence": 0.0-1.0,
   "details": {
     "action": "start|stop|pause|resume|create|delete|navigate|help|confirm|deny|bug|feature|partnership|contact",
@@ -96,6 +100,7 @@ Intent types:
 - navigation: Site navigation (go to pages, search) - does not include creating new content
 - general: General help, questions, explanations, and creation actions like creating new projects
 - report: Reporting a bug/issue, suggesting a feature, partnership inquiry, or contacting the site team
+- sale: Reporting a sale of a product/gift from a project (sold something, report sale, sold a package)
 
 **Handling confirmations and denials:**
 - If user says "yes", "thanks", "ok", "confirm", etc. - check previous context
@@ -118,6 +123,8 @@ No context: "there's a bug on the voting page" -> {"type": "report", "confidence
 No context: "I want to suggest a new feature" -> {"type": "report", "confidence": 0.9, "details": {"action": "feature", "target": null, "context": "feature_request"}}
 No context: "I'm interested in a partnership" -> {"type": "report", "confidence": 0.9, "details": {"action": "partnership", "target": null, "context": "partnership_inquiry"}}
 No context: "I want to contact the team" -> {"type": "report", "confidence": 0.85, "details": {"action": "contact", "target": null, "context": "contact_team"}}
+No context: "I want to report a sale" -> {"type": "sale", "confidence": 0.95, "details": {"action": "create", "target": null, "context": "report_sale"}}
+No context: "I sold a package" -> {"type": "sale", "confidence": 0.9, "details": {"action": "create", "target": null, "context": "report_sale"}}
 
 **Timer request example:**
 "start timer for building amazing website" -> {"type": "timer", "confidence": 0.95, "details": {"action": "start", "target": "building amazing website", "context": "start_timer_for_mission"}}

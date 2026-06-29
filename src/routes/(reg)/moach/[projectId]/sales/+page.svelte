@@ -34,7 +34,7 @@
   <title>{page.data.projectBase?.projectName ? `${page.data.projectBase.projectName} · ` : ''}{$lang === 'he' ? 'מכירות' : $lang === 'ar' ? 'مبيعات' : 'Sales'} · 1lev1</title>
 </svelte:head>
 
-<div class="sales-page p-4">
+<div class="sales-page px-0 py-4">
   {#if loading && !financials}
     <div class="flex justify-center p-12">
       <Lowding />

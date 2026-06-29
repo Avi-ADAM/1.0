@@ -4,6 +4,7 @@
   import PartnershipGrid from './components/PartnershipGrid.svelte';
   import MissionList from './components/MissionList.svelte';
   import TimerEditCard from './components/TimerEditCard.svelte';
+  import ProductList from './components/ProductList.svelte';
 
   let {
     message,
@@ -75,6 +76,8 @@
           <MissionList {...comp.props} {onAction} />
         {:else if comp.type === 'timer_edit'}
           <TimerEditCard {...comp.props} />
+        {:else if comp.type === 'product_list'}
+          <ProductList {...comp.props} />
         {/if}
       {/each}
     {/if}

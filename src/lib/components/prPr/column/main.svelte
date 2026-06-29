@@ -21,19 +21,26 @@
   const yKey = [0, 1];
   const zKey = 'key';
 
-  const seriesNames = Object.keys(data[0]).filter(d => d !== xKey);
+  const seriesNames = $derived(
+    data.length > 0 ? Object.keys(data[0]).filter((d) => d !== xKey) : []
+  );
   const seriesColors = ["rgb(244, 114, 182)","rgb(34, 211, 238)","rgb(251, 207, 232)","rgb(103, 232, 249)", '#00e047', '#7ceb68', '#b7f486', '#ecfda5'];
 
-  data.forEach(d => {
-    seriesNames.forEach(name => {
-      d[name] = +d[name];
-    });
-  });
+  const normalizedData = $derived(
+    data.map((d) => {
+      const row = { ...d };
+      seriesNames.forEach((name) => {
+        row[name] = +row[name];
+      });
+      return row;
+    })
+  );
 
-  const stackData = stack()
-    .keys(seriesNames);
-
-  const series = stackData(data);
+  const series = $derived(
+    data.length > 0
+      ? stack().keys(seriesNames)(normalizedData)
+      : []
+  );
 
   const formatTickY = d => {
     if (d === 0 || !isFinite(d) || isNaN(d)) return '0';
@@ -55,13 +62,14 @@
 </style>
 
 <div class="chart-container">
+  {#if data.length > 0}
   <LayerCake
-       padding={{ top: 0, right: 20, bottom: 20, left: 20 }}
+       padding={{ top: 0, right: 20, bottom: 28, left: 20 }}
        x={d => d.data[xKey]}
        y={yKey}
        z={zKey}
-       xScale={scaleBand().paddingInner([0.02]).round(true)}
-       xDomain={uniques(data, xKey)}
+       xScale={scaleBand().paddingInner([0.05]).paddingOuter([0.1]).round(false)}
+       xDomain={uniques(normalizedData, xKey)}
       zScale={scaleOrdinal()}
       zDomain={seriesNames}
       zRange={seriesColors}
@@ -80,5 +88,5 @@
       <ColumnStacked/>
     </Svg>
   </LayerCake>
-
+  {/if}
 </div>
