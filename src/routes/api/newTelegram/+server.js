@@ -71,7 +71,20 @@ const translations = {
         endBeforeStart: '❌ שעת הסיום חייבת להיות אחרי שעת ההתחלה',
         noIntervals: 'אין קטעי זמן מוגמרים לעריכה.',
         backToIntervals: '<< חזרה לרשימת קטעים',
-        cancelEdit: '❌ ביטול עריכה'
+        cancelEdit: '❌ ביטול עריכה',
+        reportSaleBtn: '🛍️ דיווח מכירה',
+        chooseProduct: 'בחר/י מוצר למכירה:',
+        noProducts: 'לא נמצאו מוצרים זמינים.',
+        saleDatePrompt: 'שלח/י תאריך בפורמט DD/MM/YYYY\nלדוגמה: 29/06/2026\nאו: "היום" / "אתמול"',
+        saleQuantityPrompt: 'שלח/י כמות (מספר שלם חיובי):',
+        salePricePrompt: 'שלח/י מחיר ליחידה (₪):',
+        saleCreated: '✅ המכירה נרשמה בהצלחה!',
+        saleCancelled: 'המכירה בוטלה.',
+        saleError: '❌ שגיאה ברישום המכירה. נסה/י שוב.',
+        invalidSaleQty: '❌ כמות לא תקינה. הכנס/י מספר שלם חיובי.',
+        invalidSalePrice: '❌ מחיר לא תקין. הכנס/י מספר חיובי.',
+        invalidSaleDate: '❌ תאריך לא תקין. השתמש/י בפורמט: DD/MM/YYYY',
+        chooseHolder: '👤 בחר/י מי יחזיק את הכסף:'
     },
     en: {
         welcome: 'Welcome to 1💗1',
@@ -125,7 +138,20 @@ const translations = {
         endBeforeStart: '❌ End time must be after start time',
         noIntervals: 'No completed intervals to edit.',
         backToIntervals: '<< Back to intervals list',
-        cancelEdit: '❌ Cancel edit'
+        cancelEdit: '❌ Cancel edit',
+        reportSaleBtn: '🛍️ Report Sale',
+        chooseProduct: 'Choose a product to sell:',
+        noProducts: 'No available products found.',
+        saleDatePrompt: 'Send date in format DD/MM/YYYY\nExample: 29/06/2026\nOr: "today" / "yesterday"',
+        saleQuantityPrompt: 'Send quantity (positive integer):',
+        salePricePrompt: 'Send price per unit (₪):',
+        saleCreated: '✅ Sale recorded successfully!',
+        saleCancelled: 'Sale cancelled.',
+        saleError: '❌ Error recording sale. Please try again.',
+        invalidSaleQty: '❌ Invalid quantity. Please enter a positive integer.',
+        invalidSalePrice: '❌ Invalid price. Please enter a positive number.',
+        invalidSaleDate: '❌ Invalid date. Use format: DD/MM/YYYY',
+        chooseHolder: '👤 Choose who holds the money:'
     } // Add other EN translations if needed
 };
 
@@ -148,6 +174,12 @@ let appIds = [];
 // State for tracking pending datetime edits per user
 const pendingEdits = new Map();
 // key: userId string, value: { missionId, timerId, projectId, index, field, intervals, totalHours }
+
+// State for tracking in-progress sale per user
+const pendingSale = new Map();
+// key: userId string
+// value: { productId, productName, price, quant, kindOf, projectId, projectName, projectUsers,
+//          quantity, each, saleDate, holderId, holderName, pendingField: null|'quantity'|'each'|'date', messageId }
 
 // --- Helper functions for interval editing ---
 
@@ -236,6 +268,83 @@ async function getUserMissions(uid, fetchInstance, onlyStartable = false, onlySt
         console.error(`getUserMissions Error for user ${uid}:`, error);
         return [];
     }
+}
+
+// Fetch all sellable products for a user across their projects
+async function getUserProducts(uid, fetchInstance) {
+    try {
+        const res = await sendToSer({ uid }, 'saleCenterUserProducts', 0, 0, true, fetchInstance);
+        const projectsData = res?.data?.usersPermissionsUser?.data?.attributes?.projects_1s?.data ?? [];
+        const products = [];
+        for (const project of projectsData) {
+            const projectUsers = project.attributes.user_1s?.data ?? [];
+            for (const product of project.attributes.matanotofs?.data ?? []) {
+                products.push({
+                    id: product.id,
+                    name: product.attributes.name,
+                    price: product.attributes.price ?? 0,
+                    quant: product.attributes.quant,
+                    kindOf: product.attributes.kindOf ?? 'total',
+                    projectId: project.id,
+                    projectName: project.attributes.projectName,
+                    projectUsers // [{ id, attributes: { username } }]
+                });
+            }
+        }
+        return products;
+    } catch (error) {
+        console.error('getUserProducts error:', error);
+        return [];
+    }
+}
+
+function parseSaleDate(text) {
+    const lower = text.trim().toLowerCase();
+    if (lower === 'היום' || lower === 'today') return new Date().toISOString();
+    if (lower === 'אתמול' || lower === 'yesterday') {
+        const d = new Date(); d.setDate(d.getDate() - 1); return d.toISOString();
+    }
+    const match = text.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+    if (!match) return null;
+    let [, day, month, year] = match;
+    if (year.length === 2) year = '20' + year;
+    const d = new Date(`${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T12:00:00`);
+    if (isNaN(d.getTime())) return null;
+    return d.toISOString();
+}
+
+function calcSaleTotal(sale) {
+    return Number((sale.quantity * sale.each).toFixed(2));
+}
+
+function formatSaleCard(sale, lang) {
+    const date = new Date(sale.saleDate);
+    const dateStr = date.toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const total = calcSaleTotal(sale);
+    if (lang === 'he') {
+        return `📦 *${sale.productName}*\n🏢 ${sale.projectName}\n\n📊 כמות: *${sale.quantity}*\n💰 מחיר ליחידה: *${sale.each} ₪*\n💵 סה"כ: *${total} ₪*\n📅 תאריך: *${dateStr}*\n👤 מחזיק כסף: *${sale.holderName}*`;
+    }
+    return `📦 *${sale.productName}*\n🏢 ${sale.projectName}\n\n📊 Qty: *${sale.quantity}*\n💰 Per unit: *${sale.each} ₪*\n💵 Total: *${total} ₪*\n📅 Date: *${dateStr}*\n👤 Money holder: *${sale.holderName}*`;
+}
+
+function buildSaleCardKeyboard(sale, uid, lang) {
+    const isTotal = sale.kindOf === 'total';
+    const buttons = [];
+    if (!isTotal) {
+        buttons.push([
+            Markup.button.callback(lang === 'he' ? '📝 שנה כמות' : '📝 Qty', `saleFld-quantity-${uid}`),
+            Markup.button.callback(lang === 'he' ? '💰 שנה מחיר' : '💰 Price', `saleFld-each-${uid}`)
+        ]);
+    } else {
+        buttons.push([Markup.button.callback(lang === 'he' ? '💰 שנה מחיר' : '💰 Price', `saleFld-each-${uid}`)]);
+    }
+    buttons.push([
+        Markup.button.callback(lang === 'he' ? '📅 שנה תאריך' : '📅 Date', `saleFld-date-${uid}`),
+        Markup.button.callback(lang === 'he' ? '👤 שנה מחזיק' : '👤 Holder', `saleHolder-${uid}`)
+    ]);
+    buttons.push([Markup.button.callback(lang === 'he' ? '✅ שלח מכירה' : '✅ Send Sale', `saleSend-${uid}`)]);
+    buttons.push([Markup.button.callback(lang === 'he' ? '❌ ביטול' : '❌ Cancel', `saleCancel-${uid}`)]);
+    return Markup.inlineKeyboard(buttons).resize();
 }
 
 // פונקציה חדשה למציאת משימות רלוונטיות
@@ -406,7 +515,8 @@ bot.start(async (ctx) => {
             Markup.inlineKeyboard([
                 [Markup.button.url(getText('login', lang), 'https://1lev1.com/login')],
                 [Markup.button.callback(getText('startTimerBtn', lang), `timerStart-${userInfo.uid}`)],
-                [Markup.button.callback(getText('stopTimerBtn', lang), `timerStop-${userInfo.uid}`)]
+                [Markup.button.callback(getText('stopTimerBtn', lang), `timerStop-${userInfo.uid}`)],
+                [Markup.button.callback(getText('reportSaleBtn', lang), `reportSale-${userInfo.uid}`)]
             ]).resize()
         );
     } else {
@@ -934,6 +1044,269 @@ bot.action(/^cancelEdit-(\d+)$/, async (ctx) => {
     await ctx.editMessageText(lang === 'he' ? 'העריכה בוטלה.' : 'Edit cancelled.').catch(() => {});
 });
 
+// ─── Sale Action Handlers ──────────────────────────────────────────────────
+
+// Step 1: Show product list
+bot.action(/^reportSale-(\d+)$/, async (ctx) => {
+    const userId = ctx.match[1];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    const fetch = ctx.update.fetch;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    try {
+        const products = await getUserProducts(userId, fetch);
+        if (products.length === 0) {
+            await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+            ctx.reply(getText('noProducts', lang));
+        } else {
+            const buttons = products.map(p => [
+                Markup.button.callback(`${p.name} | ${p.projectName}`, `saleProd-${p.id}-${userId}`)
+            ]);
+            await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+            ctx.reply(getText('chooseProduct', lang), Markup.inlineKeyboard(buttons).resize());
+        }
+    } catch (error) {
+        console.error('reportSale error:', error);
+        ctx.reply(getText('aiActionFailed', lang));
+    }
+    await ctx.answerCbQuery();
+});
+
+// Step 2: Product selected → create pending sale with defaults, show card
+bot.action(/^saleProd-(\d+)-(\d+)$/, async (ctx) => {
+    const productId = ctx.match[1];
+    const userId = ctx.match[2];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    const fetch = ctx.update.fetch;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    try {
+        const products = await getUserProducts(userId, fetch);
+        const product = products.find(p => p.id == productId);
+        if (!product) {
+            await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+            ctx.reply(getText('missionNotFound', lang));
+            return ctx.answerCbQuery();
+        }
+
+        // Default holder = the reporting user themselves
+        const selfUser = product.projectUsers.find(u => u.id == userInfo.uid);
+        const holderId = selfUser?.id ?? product.projectUsers[0]?.id ?? String(userInfo.uid);
+        const holderName = selfUser?.attributes?.username ?? product.projectUsers[0]?.attributes?.username ?? userInfo.username;
+
+        const sale = {
+            productId: product.id,
+            productName: product.name,
+            price: product.price,
+            quant: product.quant,
+            kindOf: product.kindOf,
+            projectId: product.projectId,
+            projectName: product.projectName,
+            projectUsers: product.projectUsers,
+            quantity: 1,
+            each: product.price,
+            saleDate: new Date().toISOString(),
+            holderId,
+            holderName,
+            pendingField: null,
+            messageId: null
+        };
+        pendingSale.set(userId.toString(), sale);
+
+        await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+        const msg = await ctx.reply(formatSaleCard(sale, lang), {
+            parse_mode: 'Markdown',
+            ...buildSaleCardKeyboard(sale, userId, lang)
+        });
+        sale.messageId = msg.message_id;
+    } catch (error) {
+        console.error('saleProd error:', error);
+        ctx.reply(getText('aiActionFailed', lang));
+    }
+    await ctx.answerCbQuery();
+});
+
+// Change holder: show project users
+bot.action(/^saleHolder-(\d+)$/, async (ctx) => {
+    const userId = ctx.match[1];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    const sale = pendingSale.get(userId.toString());
+    if (!sale) { ctx.reply(getText('generalError', lang)); return ctx.answerCbQuery(); }
+
+    const buttons = sale.projectUsers.map(u => [
+        Markup.button.callback(
+            `${u.attributes.username}${u.id == sale.holderId ? ' ✓' : ''}`,
+            `saleHolderSel-${u.id}-${userId}`
+        )
+    ]);
+    buttons.push([Markup.button.callback(getText('backToStart', lang), `saleBack-${userId}`)]);
+
+    await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+    ctx.reply(getText('chooseHolder', lang), Markup.inlineKeyboard(buttons).resize());
+    await ctx.answerCbQuery();
+});
+
+// Holder selected
+bot.action(/^saleHolderSel-(\d+)-(\d+)$/, async (ctx) => {
+    const holderId = ctx.match[1];
+    const userId = ctx.match[2];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    const sale = pendingSale.get(userId.toString());
+    if (!sale) { ctx.reply(getText('generalError', lang)); return ctx.answerCbQuery(); }
+
+    const holder = sale.projectUsers.find(u => u.id == holderId);
+    if (!holder) { ctx.reply(getText('generalError', lang)); return ctx.answerCbQuery(); }
+
+    sale.holderId = holder.id;
+    sale.holderName = holder.attributes.username;
+    sale.pendingField = null;
+
+    await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+    const msg = await ctx.reply(formatSaleCard(sale, lang), {
+        parse_mode: 'Markdown',
+        ...buildSaleCardKeyboard(sale, userId, lang)
+    });
+    sale.messageId = msg.message_id;
+    await ctx.answerCbQuery();
+});
+
+// Set pending field (quantity / each / date) → prompt text input
+bot.action(/^saleFld-(quantity|each|date)-(\d+)$/, async (ctx) => {
+    const field = ctx.match[1];
+    const userId = ctx.match[2];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    const sale = pendingSale.get(userId.toString());
+    if (!sale) { ctx.reply(getText('generalError', lang)); return ctx.answerCbQuery(); }
+
+    sale.pendingField = field;
+
+    const prompt = field === 'quantity'
+        ? getText('saleQuantityPrompt', lang)
+        : field === 'each'
+            ? getText('salePricePrompt', lang)
+            : getText('saleDatePrompt', lang);
+
+    ctx.reply(prompt, Markup.inlineKeyboard([
+        [Markup.button.callback(getText('cancelEdit', lang), `saleCancelFld-${userId}`)]
+    ]).resize());
+    await ctx.answerCbQuery();
+});
+
+// Cancel field input
+bot.action(/^saleCancelFld-(\d+)$/, async (ctx) => {
+    const userId = ctx.match[1];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    const sale = pendingSale.get(userId.toString());
+    if (sale) sale.pendingField = null;
+    await ctx.answerCbQuery(lang === 'he' ? 'בוטל' : 'Cancelled');
+    await ctx.editMessageText(lang === 'he' ? 'ההקלדה בוטלה.' : 'Input cancelled.').catch(() => {});
+});
+
+// Back to sale card (from holder list)
+bot.action(/^saleBack-(\d+)$/, async (ctx) => {
+    const userId = ctx.match[1];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    const sale = pendingSale.get(userId.toString());
+    if (!sale) { ctx.reply(getText('generalError', lang)); return ctx.answerCbQuery(); }
+
+    sale.pendingField = null;
+    await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+    const msg = await ctx.reply(formatSaleCard(sale, lang), {
+        parse_mode: 'Markdown',
+        ...buildSaleCardKeyboard(sale, userId, lang)
+    });
+    sale.messageId = msg.message_id;
+    await ctx.answerCbQuery();
+});
+
+// Send sale
+bot.action(/^saleSend-(\d+)$/, async (ctx) => {
+    const userId = ctx.match[1];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    const fetch = ctx.update.fetch;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    const sale = pendingSale.get(userId.toString());
+    if (!sale) { ctx.reply(getText('generalError', lang)); return ctx.answerCbQuery(); }
+
+    try {
+        const total = calcSaleTotal(sale);
+        const now = new Date().toISOString();
+        const vars = {
+            project: sale.projectId,
+            matanot: sale.productId,
+            users_permissions_user: sale.holderId,
+            in: total,
+            unit: sale.quantity,
+            date: sale.saleDate,
+            publishedAt: now
+        };
+        // For monthly/yearly use saleDate as startDate (open-ended)
+        if (sale.kindOf === 'monthly' || sale.kindOf === 'yearly') {
+            vars.startDate = sale.saleDate;
+        }
+
+        const res = await sendToSer(vars, 'createSaleRecord', 0, 0, true, fetch);
+        if (!res?.data?.createSale?.data?.id) throw new Error('Sale creation failed');
+
+        const saleId = res.data.createSale.data.id;
+
+        // Decrement quantity if not unlimited
+        if (sale.quant !== -1 && sale.quantity > 0) {
+            await sendToSer(
+                { id: sale.productId, quant: sale.quant - sale.quantity },
+                'updateMatanotQuant', 0, 0, true, fetch
+            ).catch(e => console.warn('[saleSend] quant update failed:', e));
+        }
+
+        // Create open-ended Monter for monthly/yearly without finish date
+        if ((sale.kindOf === 'monthly' || sale.kindOf === 'yearly') && !vars.finishDate) {
+            await sendToSer(
+                { saleId, start: sale.saleDate },
+                'createMonterForSale', 0, 0, true, fetch
+            ).catch(e => console.warn('[saleSend] monter creation failed:', e));
+        }
+
+        pendingSale.delete(userId.toString());
+        await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+        ctx.reply(getText('saleCreated', lang));
+    } catch (error) {
+        console.error('saleSend error:', error);
+        ctx.reply(getText('saleError', lang));
+    }
+    await ctx.answerCbQuery();
+});
+
+// Cancel sale
+bot.action(/^saleCancel-(\d+)$/, async (ctx) => {
+    const userId = ctx.match[1];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    pendingSale.delete(userId.toString());
+    await ctx.answerCbQuery(lang === 'he' ? 'בוטל' : 'Cancelled');
+    await ctx.editMessageText(getText('saleCancelled', lang)).catch(() => {});
+});
+
 // --- Text Message Handler (Using global fetch for helpers) ---
 bot.on('text', async (ctx) => {
     const userText = ctx.message.text;
@@ -994,6 +1367,44 @@ bot.on('text', async (ctx) => {
                 pendingEdits.delete(uid);
                 await ctx.reply(getText('aiActionFailed', lang));
             }
+            return;
+        }
+
+        // Handle pending sale field input
+        if (pendingSale.has(uid) && pendingSale.get(uid).pendingField) {
+            const sale = pendingSale.get(uid);
+            const field = sale.pendingField;
+
+            if (field === 'quantity') {
+                const qty = parseInt(userText.trim(), 10);
+                const maxQty = sale.quant === -1 ? Infinity : sale.quant;
+                if (!Number.isInteger(qty) || qty <= 0 || qty > maxQty) {
+                    await ctx.reply(getText('invalidSaleQty', lang));
+                    return;
+                }
+                sale.quantity = qty;
+            } else if (field === 'each') {
+                const price = parseFloat(userText.trim().replace(',', '.'));
+                if (isNaN(price) || price < 0) {
+                    await ctx.reply(getText('invalidSalePrice', lang));
+                    return;
+                }
+                sale.each = price;
+            } else if (field === 'date') {
+                const iso = parseSaleDate(userText);
+                if (!iso) {
+                    await ctx.reply(getText('invalidSaleDate', lang));
+                    return;
+                }
+                sale.saleDate = iso;
+            }
+
+            sale.pendingField = null;
+            const msg = await ctx.reply(formatSaleCard(sale, lang), {
+                parse_mode: 'Markdown',
+                ...buildSaleCardKeyboard(sale, uid, lang)
+            });
+            sale.messageId = msg.message_id;
             return;
         }
 
