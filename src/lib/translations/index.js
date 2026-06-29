@@ -142,6 +142,11 @@ export const config = {
         },
         {
             locale: 'en',
+            key: 'grow',
+            loader: async () => (await import('./en/grow.json')).default,
+        },
+        {
+            locale: 'en',
             key: 'nav',
             loader: async () => (await import('./en/nav.json')).default,
         },
@@ -175,6 +180,11 @@ export const config = {
             locale: 'he',
             key: 'home',
             loader: async () => (await import('./he/home.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'grow',
+            loader: async () => (await import('./he/grow.json')).default,
         },
         {
             locale: 'he',
@@ -218,6 +228,11 @@ export const config = {
             locale: 'ar',
             key: 'home',
             loader: async () => (await import('./ar/home.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'grow',
+            loader: async () => (await import('./ar/grow.json')).default,
         },
         {
             locale: 'ar',
@@ -296,6 +311,11 @@ export const config = {
             locale: 'ru',
             key: 'home',
             loader: async () => (await import('./ru/home.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'grow',
+            loader: async () => (await import('./ru/grow.json')).default,
         },
         {
             locale: 'ru',
