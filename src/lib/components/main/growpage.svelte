@@ -711,6 +711,35 @@
       </div>
     </section>
 
+    <!-- ===== Hebrew Video (only shown in Hebrew) ===== -->
+    {#if $locale === 'he'}
+      <section class="scroll-mt-24">
+        <div class="text-center mb-8">
+          <h2 class="text-emerald-900 font-extrabold text-3xl sm:text-4xl mb-3">
+            רוצים להבין איך זה עובד?
+          </h2>
+          <p class="text-emerald-900/70 text-lg max-w-2xl mx-auto">
+            צפו בסרטון שלנו ותגלו איך 1lev1 יכולה לשנות את הדרך שבה אתם מממשים את החלומות שלכם
+          </p>
+        </div>
+        <div class="max-w-3xl mx-auto">
+          <div
+            class="relative w-full rounded-3xl overflow-hidden shadow-2xl border border-emerald-200"
+            style="padding-bottom: 56.25%;"
+          >
+            <iframe
+              class="absolute inset-0 w-full h-full"
+              src="https://www.youtube.com/embed/Ma17YV2Aem0"
+              title="1lev1 - הסרטון שלנו"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+            ></iframe>
+          </div>
+        </div>
+      </section>
+    {/if}
+
     <!-- ===== Who it's for (למי זה מתאים) ===== -->
     <section id="who" class="scroll-mt-24">
       <div class="text-center mb-12">
