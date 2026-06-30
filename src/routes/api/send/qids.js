@@ -1515,6 +1515,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         attributes {
           sqadualed
           archived
+          source
+          ratson { data { id } }
           acts { data { id attributes { shem des dateF dateS link } } }
           users { data { id } }
           mission { data { id } }
@@ -7166,6 +7168,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           matbea { data { id attributes { name simbol } } }
           forum { data { id } }
           negos { data { id } }
+          open_mission { data { id } }
           covered_missions { id extracted_mission_idx hours price }
           covered_resources { id extracted_resource_idx quantity price }
         }
@@ -7305,6 +7308,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $auto_generated: Boolean,
     $covered_missions: [ComponentNewCoveredMissionsInput],
     $covered_resources: [ComponentNewCoveredResourcesInput],
+    $open_mission: ID,
     $publishedAt: DateTime
   ) {
     createRatsonProposal(
@@ -7322,6 +7326,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         auto_generated: $auto_generated,
         covered_missions: $covered_missions,
         covered_resources: $covered_resources,
+        open_mission: $open_mission,
         publishedAt: $publishedAt
       }
     ) {

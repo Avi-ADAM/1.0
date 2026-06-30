@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-06-28
+> Last updated: 2026-06-30
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -1357,6 +1357,7 @@ These are the main content types in the Strapi backend.
 | `project` | `Maybe<ProjectEntityResponse>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `ratson` | `Maybe<RatsonEntityResponse>` |
+| `ratson_proposal` | `Maybe<RatsonProposalEntityResponse>` |
 | `recurring` | `Maybe<Scalars['Boolean']['output']>` |
 | `rikmashes` | `Maybe<RikmashRelationResponseCollection>` |
 | `source` | `Maybe<Enum_Openmashaabim_Source>` |
@@ -1403,6 +1404,7 @@ These are the main content types in the Strapi backend.
 | `publicklinks` | `Maybe<Scalars['String']['output']>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `ratson` | `Maybe<RatsonEntityResponse>` |
+| `ratson_proposals` | `Maybe<RatsonProposalRelationResponseCollection>` |
 | `rishon` | `Maybe<UsersPermissionsUserEntityResponse>` |
 | `rishonves` | `Maybe<UsersPermissionsUserRelationResponseCollection>` |
 | `skills` | `Maybe<SkillRelationResponseCollection>` |
@@ -2008,6 +2010,8 @@ These are the main content types in the Strapi backend.
 | `matbea` | `Maybe<MatbeaEntityResponse>` |
 | `match_score` | `Maybe<Scalars['Float']['output']>` |
 | `negos` | `Maybe<NegoRelationResponseCollection>` |
+| `open_mashaabims` | `Maybe<OpenMashaabimRelationResponseCollection>` |
+| `open_mission` | `Maybe<OpenMissionEntityResponse>` |
 | `project` | `Maybe<ProjectEntityResponse>` |
 | `proposer_users` | `Maybe<UsersPermissionsUserRelationResponseCollection>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
@@ -4785,6 +4789,7 @@ Used for creating/updating content.
 | `project` | `InputMaybe<Scalars['ID']['input']>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `ratson` | `InputMaybe<Scalars['ID']['input']>` |
+| `ratson_proposal` | `InputMaybe<Scalars['ID']['input']>` |
 | `recurring` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `rikmashes` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `source` | `InputMaybe<Enum_Openmashaabim_Source>` |
@@ -4827,6 +4832,7 @@ Used for creating/updating content.
 | `publicklinks` | `InputMaybe<Scalars['String']['input']>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `ratson` | `InputMaybe<Scalars['ID']['input']>` |
+| `ratson_proposals` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `rishon` | `InputMaybe<Scalars['ID']['input']>` |
 | `rishonves` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `skills` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -5190,6 +5196,8 @@ Used for creating/updating content.
 | `matbea` | `InputMaybe<Scalars['ID']['input']>` |
 | `match_score` | `InputMaybe<Scalars['Float']['input']>` |
 | `negos` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `open_mashaabims` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `open_mission` | `InputMaybe<Scalars['ID']['input']>` |
 | `project` | `InputMaybe<Scalars['ID']['input']>` |
 | `proposer_users` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
@@ -6021,10 +6029,10 @@ Fields: `acts`, `and`, `ask`, `createdAt`, `date`, `dates`, `descrip`, `filds`, 
 Fields: `and`, `arguments`, `clauses`, `createdAt`, `createdByEmail`, `creator`, `cuntries`, `currentRound`, `description`, `id`, `isLocal`, `issues`, `maxRounds`, `not`, `or`, `ownerExternalId`, `participants`, `positions`, `publishedAt`, `scaleMax`, `scaleMin`, `shareToken`, `sourceId`, `sourceMeta`, `sourceType`, `status`, `topic`, `updatedAt`, `visibility`
 
 #### OpenMashaabimFiltersInput
-Fields: `and`, `archived`, `askms`, `createdAt`, `cycleSize`, `declinedsps`, `descrip`, `easy`, `haamadapruvs`, `haamadas`, `hm`, `howMeny`, `id`, `isMust`, `isYesod`, `kindOf`, `linkto`, `locale`, `localizations`, `location`, `maap`, `mashaabim`, `name`, `nego_mashes`, `not`, `or`, `partofs`, `pmash`, `price`, `project`, `publishedAt`, `ratson`, `recurring`, `rikmashes`, `source`, `splited`, `spnot`, `sps`, `sqadualed`, `sqadualedf`, `updatedAt`, `users`
+Fields: `and`, `archived`, `askms`, `createdAt`, `cycleSize`, `declinedsps`, `descrip`, `easy`, `haamadapruvs`, `haamadas`, `hm`, `howMeny`, `id`, `isMust`, `isYesod`, `kindOf`, `linkto`, `locale`, `localizations`, `location`, `maap`, `mashaabim`, `name`, `nego_mashes`, `not`, `or`, `partofs`, `pmash`, `price`, `project`, `publishedAt`, `ratson`, `ratson_proposal`, `recurring`, `rikmashes`, `source`, `splited`, `spnot`, `sps`, `sqadualed`, `sqadualedf`, `updatedAt`, `users`
 
 #### OpenMissionFiltersInput
-Fields: `acts`, `and`, `archived`, `asks`, `createdAt`, `dates`, `declined`, `descrip`, `hatzaas`, `hearotMeyuchadot`, `howMeny`, `id`, `isMust`, `isRishon`, `isYesod`, `isglobal`, `iskvua`, `isshift`, `locale`, `localizations`, `location`, `mesimabetahaliches`, `mission`, `name`, `negopendmissions`, `noofhours`, `not`, `or`, `partofs`, `pendm`, `perhour`, `privatlinks`, `project`, `publicklinks`, `publishedAt`, `ratson`, `rishon`, `rishonves`, `skills`, `source`, `sqadualed`, `tafkidims`, `updatedAt`, `users`, `usersNotRelevant`, `vallues`, `work_ways`
+Fields: `acts`, `and`, `archived`, `asks`, `createdAt`, `dates`, `declined`, `descrip`, `hatzaas`, `hearotMeyuchadot`, `howMeny`, `id`, `isMust`, `isRishon`, `isYesod`, `isglobal`, `iskvua`, `isshift`, `locale`, `localizations`, `location`, `mesimabetahaliches`, `mission`, `name`, `negopendmissions`, `noofhours`, `not`, `or`, `partofs`, `pendm`, `perhour`, `privatlinks`, `project`, `publicklinks`, `publishedAt`, `ratson`, `ratson_proposals`, `rishon`, `rishonves`, `skills`, `source`, `sqadualed`, `tafkidims`, `updatedAt`, `users`, `usersNotRelevant`, `vallues`, `work_ways`
 
 #### PartofFiltersInput
 Fields: `acts`, `and`, `askms`, `asks`, `createdAt`, `default`, `finiapruvals`, `forums`, `id`, `maaps`, `mashabetahaliches`, `matanot`, `matanot_recipe_missions`, `matanots`, `mesimabetahaliches`, `not`, `open_mashaabims`, `open_missions`, `or`, `pendms`, `pmashes`, `ratson`, `sheirut_fulfillments`, `updatedAt`
@@ -6060,7 +6068,7 @@ Fields: `access_mode`, `age_group`, `ai_meta`, `allowJoin`, `and`, `bounti`, `ca
 Fields: `and`, `createdAt`, `error`, `finished_at`, `id`, `mode`, `not`, `or`, `proposals_created`, `publishedAt`, `ratson`, `started_at`, `updatedAt`
 
 #### RatsonProposalFiltersInput
-Fields: `and`, `auto_generated`, `covered_missions`, `covered_resources`, `createdAt`, `final_breakdown`, `forum`, `id`, `kind`, `matanot`, `matbea`, `match_score`, `negos`, `not`, `or`, `project`, `proposer_users`, `publishedAt`, `ratson`, `ratson_willingness_entry`, `sheirutpends`, `status_proposal`, `tosplits`, `total_price`, `updatedAt`, `votes`
+Fields: `and`, `auto_generated`, `covered_missions`, `covered_resources`, `createdAt`, `final_breakdown`, `forum`, `id`, `kind`, `matanot`, `matbea`, `match_score`, `negos`, `not`, `open_mashaabims`, `open_mission`, `or`, `project`, `proposer_users`, `publishedAt`, `ratson`, `ratson_willingness_entry`, `sheirutpends`, `status_proposal`, `tosplits`, `total_price`, `updatedAt`, `votes`
 
 #### RatsonShareFiltersInput
 Fields: `and`, `createdAt`, `halukas`, `id`, `joinedAt`, `leftAt`, `matbea`, `maxContribution`, `not`, `notificationsOn`, `or`, `publishedAt`, `ratson`, `role`, `status_share`, `updatedAt`, `users_permissions_user`
@@ -6645,7 +6653,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 17627 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 17655 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

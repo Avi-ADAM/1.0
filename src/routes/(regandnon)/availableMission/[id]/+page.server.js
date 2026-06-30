@@ -59,10 +59,17 @@ async function awaitapi(mId, lang, tok, fetch) {
     if (node) {
       const langd = langAdjast(node, lang);
       const alld = { ...langd };
-      alld.title = {
-        he: `1💗1 | הצעה למשימה "${alld.attributes.name}" בריקמה: ${alld.attributes.project.data.attributes.projectName}`,
-        en: `1💗1 | come see this mission "${alld.attributes.name}" on freeMates:"${alld.attributes.project.data.attributes.projectName}"`
-      };
+      const projectName = alld.attributes.project?.data?.attributes?.projectName;
+      const isConcierge = alld.attributes.source === 'concierge' || !alld.attributes.project?.data;
+      alld.title = isConcierge
+        ? {
+            he: `1💗1 | הצעה למשימה ממשאלה: "${alld.attributes.name}"`,
+            en: `1💗1 | Wish mission: "${alld.attributes.name}"`
+          }
+        : {
+            he: `1💗1 | הצעה למשימה "${alld.attributes.name}" בריקמה: ${projectName}`,
+            en: `1💗1 | come see this mission "${alld.attributes.name}" on freeMates:"${projectName}"`
+          };
       return alld;
     }
     return null;

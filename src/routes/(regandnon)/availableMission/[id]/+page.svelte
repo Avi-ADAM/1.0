@@ -32,6 +32,31 @@
   async function ask() {
     alr = true;
     const inD = data.alld;
+    const isConcierge = inD?.attributes?.source === 'concierge' || !inD?.attributes?.project?.data;
+
+    if (isConcierge) {
+      // Concierge open mission — no project. Apply as volunteer via ratsonProposal.
+      try {
+        const result = await executeAction('applyToMission', {
+          openMissionId: String(data.mId)
+          // projectId intentionally omitted — server detects concierge path
+        });
+        if (!result.success) {
+          toast.error(result.error?.message ?? 'שגיאה בשליחת הבקשה');
+          alr = false;
+          return;
+        }
+        success = true;
+        setTimeout(() => { success = false; }, 15000);
+        toast.success($t('lev.cards.wishApplied') || fnnn[$lang]);
+      } catch (error) {
+        console.error('שגיאה:', error);
+        toast.error('אירעה שגיאה');
+        alr = false;
+      }
+      return;
+    }
+
     if (!inD?.attributes?.project?.data) {
       toast.error('שגיאה בטעינת נתוני הפרויקט');
       alr = false;
@@ -71,7 +96,8 @@
   async function negoSubmit({ newValues, originalValues }) {
     const inD = data.alld;
     if (!inD?.attributes?.project?.data) {
-      toast.error('שגיאה בטעינת נתוני הפרויקט');
+      // Concierge missions don't support nego yet
+      toast.error('מו"מ אינו זמין עבור משימות קונסיירז\'');
       negoLoading = false;
       return;
     }
@@ -206,12 +232,20 @@
         >
           <div class="relative flex items-center space-x-1">
             <div class="relative">
+              {#if data.alld.attributes.project?.data?.attributes?.profilePic?.data?.attributes?.url}
               <img
                 src={data.alld.attributes.project.data.attributes.profilePic
                   .data?.attributes.url}
                 alt=""
                 class="w-10 sm:w-16 h-10 sm:h-16 rounded-full"
               />
+              {:else}
+              <img
+                src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"
+                alt=""
+                class="w-10 sm:w-16 h-10 sm:h-16 rounded-full"
+              />
+              {/if}
             </div>
             <div class="flex flex-col leading-tight">
               <div class="sm:text-sm text-md mt-1 flex items-center">
@@ -221,17 +255,24 @@
                 >
               </div>
               <span class="pn ml-1 text-lg sm:text-xl lg:text-2xl text-grey-200"
-                >{data.alld.attributes.project.data.attributes
-                  .projectName}</span
+                >{data.alld.attributes.project?.data?.attributes?.projectName ?? '🌟 קונסיירז\''}</span
               >
             </div>
           </div>
           <div>
+            {#if data.alld.attributes.project?.data}
             <button
               onclick={() => project(data.alld.attributes.project.data.id)}
               class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4"
               >{seePr[$lang]}</button
             >
+            {:else if data.alld.attributes.ratson?.data?.id}
+            <a
+              href="/concierge/{data.alld.attributes.ratson.data.id}"
+              class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4"
+              >{'he' === $lang ? 'לצפיה במשאלה' : 'See the wish'}</a
+            >
+            {/if}
           </div>
         </div>
         <div
@@ -556,7 +597,7 @@
                       >
                       {#if negoLoading}
                         <RingLoader size="200" color="#ff00ae" unit="px" duration="2s" />
-                      {:else if negoOpen}
+                      {:else if negoOpen && data.alld.attributes.project?.data}
                         <NegoM
                           onLoad={() => (negoLoading = true)}
                           onClose={closeNego}
@@ -582,6 +623,8 @@
                           users={[]}
                           isAsk={1}
                         />
+                      {:else if negoOpen}
+                        <p class="text-barbi text-center p-4">מו"מ אינו זמין עבור משימות קונסיירז'</p>
                       {/if}
                     </DialogContent>
                   </div>

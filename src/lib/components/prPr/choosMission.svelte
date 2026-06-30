@@ -23,7 +23,7 @@
  */
 
 /** @type {Props} */
- let { mission1 = [], children, pn, pl, restime, projectUsers, alit, onClose, selected = $bindable([]), processContext = null } = $props();
+ let { mission1 = [], children, pn, pl, restime, projectUsers, alit, onClose, selected = $bindable([]), processContext = null, name: initialName = '', initialDescrip = '' } = $props();
  const baseUrl = import.meta.env.VITE_URL
 
  let newcontent = $state(true);
@@ -139,10 +139,12 @@ const head = {"he":"הוספת משימות הנדרשות לתפקוד הריק
 let id = $state(0)
 let ugug = $state(``);
 let addn = $derived({"he":`יצירת משימה חדשה: "${ugug}"`,"en": `Create new mission: "${ugug}"`});
-let name = $state("")
+// When a prefill name arrives via URL param, start with the mission form directly open
+let name = $state('')
+$effect(() => { if (initialName && !name) name = initialName; })
+let before = $state(false);
 
- function add(){
-  if (selected.length > 0) {
+  function add(){
     findT();
     if (!mission1.map(c => c.attributes.missionName).includes(selected[0])){
       name = selected[0]
@@ -153,10 +155,8 @@ let name = $state("")
     }
     before = false;
   }
-}
 
-let before = $state(false);
- const mn = {
+  const mn = {
   "he": "שם המשימה",
   "en": "mission name"
 }
@@ -223,6 +223,8 @@ function closeMobileModal() {
         projectId={$idPr}
         {processContext}
         missionTemplates={mission1}
-        onClose={onClose}/>
+        onClose={onClose}
+        initialSpec={initialDescrip ? { name, descrip: initialDescrip } : null}
+        />
         {/if}
  </div>

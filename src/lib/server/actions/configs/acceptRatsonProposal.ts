@@ -24,10 +24,12 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { requestWishMissionConfig } from './requestWishMission.js';
 
 const ACCEPTABLE_FROM_STATUSES = new Set(['suggested', 'viewed']);
 
-const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
+const handler: ActionExecutionHandler = async (params, context, util) => {
+  const { strapi } = util;
   const { proposalId, note } = params as { proposalId: string; note?: string };
   if (!proposalId) throw new Error('proposalId is required');
 
@@ -60,13 +62,6 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const projectId = pa.project?.data?.id ?? null;
   const totalPrice = typeof pa.total_price === 'number' ? pa.total_price : 0;
 
-  if (!matanotId) {
-    throw new Error('Proposal has no matanot — cannot open Sheirutpend (custom_offer flow handled separately in M7)');
-  }
-  if (!projectId) {
-    throw new Error('Proposal has no proposer project — cannot open Sheirutpend');
-  }
-
   const ratsonAttrs = ratRes?.data?.ratson?.data?.attributes ?? {};
   const owners = ratsonAttrs.users_permissions_users?.data ?? [];
   const ratsonStart = ratsonAttrs.startDate ?? null;
@@ -83,6 +78,167 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   }
 
   const now = new Date().toISOString();
+  const chatForumId = ratsonAttrs.chat_forum?.data?.id ?? null;
+
+  // ── COMMUNITY-VOLUNTEER CASE (PLAN_CONCIERGE M7) ─────────────────────────
+  // A volunteer who applied to a community-published open mission (applyToMission
+  // concierge path) has no proposer project/matanot — accepting can't open a
+  // Sheirutpend. Instead the owner's accept *materialises the BOM slot for this
+  // need and binds the volunteer to it*: we author the mission slot on the wish's
+  // draft product (reusing requestWishMission), assign the volunteer, mark the
+  // proposal accepted, and archive the open mission. The wish then completes via
+  // the normal materializeWish flow once all slots are filled.
+  const openMissionId = pa.open_mission?.data?.id ? String(pa.open_mission.data.id) : null;
+  if (!matanotId && !projectId && openMissionId) {
+    const volunteerId = (pa.proposer_users?.data ?? [])[0]?.id
+      ? String(pa.proposer_users.data[0].id)
+      : null;
+    if (!volunteerId) throw new Error('Volunteer proposal has no proposer to assign');
+
+    const coveredMission = (pa.covered_missions ?? [])[0] ?? {};
+    const hours = typeof coveredMission.hours === 'number' ? coveredMission.hours : null;
+    const price = typeof coveredMission.price === 'number' ? coveredMission.price : totalPrice;
+
+    // Read the open mission for the authoritative name/rate of the published need.
+    const omRes = await strapi.execute(
+      '51GetOpenMissionById',
+      { id: openMissionId },
+      context.jwt,
+      context.fetch
+    );
+    const omAttrs = omRes?.data?.openMission?.data?.attributes ?? {};
+    const missionName = String(omAttrs.name || 'משימה');
+    const ratePerHour =
+      typeof omAttrs.perhour === 'number' && omAttrs.perhour > 0
+        ? omAttrs.perhour
+        : hours && price
+          ? price / hours
+          : null;
+
+    // 1. Author the unassigned BOM slot on the wish's draft product (no target →
+    //    planOnly). Reuses requestWishMission so slot/product/recipe stay identical
+    //    to the invite flow.
+    const slotOut = await (requestWishMissionConfig.graphqlOperation as ActionExecutionHandler)(
+      {
+        ratsonId: String(ratsonId),
+        name: missionName,
+        hours: hours ?? omAttrs.noofhours ?? null,
+        ratePerHour,
+        descrip: omAttrs.descrip || '',
+        label: missionName
+      },
+      context,
+      util
+    );
+    const recipeMissionId = (slotOut as any)?.data?.recipeMissionId
+      ? String((slotOut as any).data.recipeMissionId)
+      : null;
+    if (!recipeMissionId) throw new Error('Failed to author the BOM slot for the volunteer');
+
+    // 2. Bind the volunteer to the slot (assignedMember → materializeWish picks it up).
+    await strapi.execute(
+      '143assignRecipeMissionMember',
+      { id: recipeMissionId, assignedMember: volunteerId },
+      context.jwt,
+      context.fetch
+    );
+
+    // 3. Mark the proposal accepted. Leave covered_missions as the need's array
+    //    index so it keeps rendering under the right plan row (now as 'accepted').
+    await strapi.execute(
+      '102updateRatsonProposal',
+      { id: proposalId, status_proposal: 'accepted' },
+      context.jwt,
+      context.fetch
+    );
+
+    // 4. Archive the open mission so it leaves the community feed.
+    try {
+      await strapi.execute(
+        '73archiveOpenMission',
+        { openMid: openMissionId },
+        context.jwt,
+        context.fetch
+      );
+    } catch (err) {
+      console.warn('[acceptRatsonProposal] archiving open mission failed (non-fatal):', err);
+    }
+
+    // 5. Seed the wish chat documenting the acceptance.
+    if (chatForumId) {
+      try {
+        await strapi.execute(
+          '1chatsend',
+          {
+            fid: chatForumId,
+            fidn: parseInt(String(chatForumId), 10),
+            idL: context.userId,
+            da: now,
+            mes: note
+              ? `בחרתי מתנדב/ת למשימה "${missionName}". ${note}`
+              : `בחרתי מתנדב/ת למשימה "${missionName}".`
+          },
+          context.jwt,
+          context.fetch
+        );
+      } catch (err) {
+        console.warn('[acceptRatsonProposal] chat seed message failed:', err);
+      }
+    }
+
+    // Notify the chosen volunteer (socket + push). The action-level config targets
+    // projectMembers and yields nobody here, so dispatch explicitly. Fire & forget.
+    if (util.notifier) {
+      util.notifier
+        .notify(
+          {
+            recipients: { type: 'specificUsers', config: { userIdsParam: 'recipientIds' } },
+            templates: {
+              title: {
+                he: 'נבחרת למשימה מתוך משאלה 💗',
+                en: 'You were chosen for a wish task 💗',
+                ar: 'تم اختيارك لمهمة من أمنية 💗'
+              },
+              body: {
+                he: `נבחרת לבצע את "${missionName}". נמשיך משם להשלמת הדיל.`,
+                en: `You were chosen to do "${missionName}". The deal continues from here.`,
+                ar: `تم اختيارك لتنفيذ "${missionName}".`
+              }
+            },
+            channels: ['socket', 'push'],
+            metadata: { priority: 'high', type: 'ratsonProposal', url: `/concierge/${ratsonId}` }
+          },
+          params,
+          { recipientIds: [volunteerId], data: { proposalId, ratsonId } },
+          context
+        )
+        .catch((e: unknown) =>
+          console.warn('[acceptRatsonProposal] volunteer notification failed (non-fatal):', e)
+        );
+    }
+
+    return {
+      data: {
+        success: true,
+        proposalId: String(proposalId),
+        ratsonId: String(ratsonId),
+        recipeMissionId,
+        volunteerId,
+        openMissionId,
+        statusProposal: 'accepted',
+        concierge: true
+      },
+      recipientIds: [volunteerId],
+      updateStrategy: { type: 'none' as const }
+    };
+  }
+
+  if (!matanotId) {
+    throw new Error('Proposal has no matanot — cannot open Sheirutpend (custom_offer flow handled separately in M7)');
+  }
+  if (!projectId) {
+    throw new Error('Proposal has no proposer project — cannot open Sheirutpend');
+  }
 
   // ── 2. Flip status to 'accepted' (wisher side of the gate) ──────────────
   await strapi.execute(
@@ -147,7 +303,6 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   }
 
   // ── 6. (Optional) seed a chat message documenting the acceptance ────────
-  const chatForumId = ratsonAttrs.chat_forum?.data?.id ?? null;
   if (chatForumId) {
     try {
       await strapi.execute(

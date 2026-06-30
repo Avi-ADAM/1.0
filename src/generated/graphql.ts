@@ -9185,6 +9185,7 @@ export type OpenMashaabim = {
   project?: Maybe<ProjectEntityResponse>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   ratson?: Maybe<RatsonEntityResponse>;
+  ratson_proposal?: Maybe<RatsonProposalEntityResponse>;
   recurring?: Maybe<Scalars['Boolean']['output']>;
   rikmashes?: Maybe<RikmashRelationResponseCollection>;
   source?: Maybe<Enum_Openmashaabim_Source>;
@@ -9325,6 +9326,7 @@ export type OpenMashaabimFiltersInput = {
   project?: InputMaybe<ProjectFiltersInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   ratson?: InputMaybe<RatsonFiltersInput>;
+  ratson_proposal?: InputMaybe<RatsonProposalFiltersInput>;
   recurring?: InputMaybe<BooleanFilterInput>;
   rikmashes?: InputMaybe<RikmashFiltersInput>;
   source?: InputMaybe<StringFilterInput>;
@@ -9363,6 +9365,7 @@ export type OpenMashaabimInput = {
   project?: InputMaybe<Scalars['ID']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   ratson?: InputMaybe<Scalars['ID']['input']>;
+  ratson_proposal?: InputMaybe<Scalars['ID']['input']>;
   recurring?: InputMaybe<Scalars['Boolean']['input']>;
   rikmashes?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   source?: InputMaybe<Enum_Openmashaabim_Source>;
@@ -9413,6 +9416,7 @@ export type OpenMission = {
   publicklinks?: Maybe<Scalars['String']['output']>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   ratson?: Maybe<RatsonEntityResponse>;
+  ratson_proposals?: Maybe<RatsonProposalRelationResponseCollection>;
   rishon?: Maybe<UsersPermissionsUserEntityResponse>;
   rishonves?: Maybe<UsersPermissionsUserRelationResponseCollection>;
   skills?: Maybe<SkillRelationResponseCollection>;
@@ -9478,6 +9482,14 @@ export type OpenMissionNegopendmissionsArgs = {
 export type OpenMissionPartofsArgs = {
   filters?: InputMaybe<PartofFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type OpenMissionRatson_ProposalsArgs = {
+  filters?: InputMaybe<RatsonProposalFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
@@ -9581,6 +9593,7 @@ export type OpenMissionFiltersInput = {
   publicklinks?: InputMaybe<StringFilterInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   ratson?: InputMaybe<RatsonFiltersInput>;
+  ratson_proposals?: InputMaybe<RatsonProposalFiltersInput>;
   rishon?: InputMaybe<UsersPermissionsUserFiltersInput>;
   rishonves?: InputMaybe<UsersPermissionsUserFiltersInput>;
   skills?: InputMaybe<SkillFiltersInput>;
@@ -9624,6 +9637,7 @@ export type OpenMissionInput = {
   publicklinks?: InputMaybe<Scalars['String']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   ratson?: InputMaybe<Scalars['ID']['input']>;
+  ratson_proposals?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   rishon?: InputMaybe<Scalars['ID']['input']>;
   rishonves?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   skills?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -13321,6 +13335,8 @@ export type RatsonProposal = {
   matbea?: Maybe<MatbeaEntityResponse>;
   match_score?: Maybe<Scalars['Float']['output']>;
   negos?: Maybe<NegoRelationResponseCollection>;
+  open_mashaabims?: Maybe<OpenMashaabimRelationResponseCollection>;
+  open_mission?: Maybe<OpenMissionEntityResponse>;
   project?: Maybe<ProjectEntityResponse>;
   proposer_users?: Maybe<UsersPermissionsUserRelationResponseCollection>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -13351,6 +13367,14 @@ export type RatsonProposalCovered_ResourcesArgs = {
 
 export type RatsonProposalNegosArgs = {
   filters?: InputMaybe<NegoFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type RatsonProposalOpen_MashaabimsArgs = {
+  filters?: InputMaybe<OpenMashaabimFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
   publicationState?: InputMaybe<PublicationState>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -13424,6 +13448,8 @@ export type RatsonProposalFiltersInput = {
   match_score?: InputMaybe<FloatFilterInput>;
   negos?: InputMaybe<NegoFiltersInput>;
   not?: InputMaybe<RatsonProposalFiltersInput>;
+  open_mashaabims?: InputMaybe<OpenMashaabimFiltersInput>;
+  open_mission?: InputMaybe<OpenMissionFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<RatsonProposalFiltersInput>>>;
   project?: InputMaybe<ProjectFiltersInput>;
   proposer_users?: InputMaybe<UsersPermissionsUserFiltersInput>;
@@ -13449,6 +13475,8 @@ export type RatsonProposalInput = {
   matbea?: InputMaybe<Scalars['ID']['input']>;
   match_score?: InputMaybe<Scalars['Float']['input']>;
   negos?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  open_mashaabims?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  open_mission?: InputMaybe<Scalars['ID']['input']>;
   project?: InputMaybe<Scalars['ID']['input']>;
   proposer_users?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;

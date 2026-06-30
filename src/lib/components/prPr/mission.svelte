@@ -27,6 +27,123 @@
   import Expand from '$lib/celim/icons/expand.svelte';
   import { executeAction } from '$lib/client/actionClient';
   import Button from '$lib/celim/ui/button.svelte';
+  // AI suggest / improve / translate
+  let aiSuggesting = $state(false);
+  let aiSuggestResult = $state(null);  // { extraction, matchResults, similarMissions }
+  let aiImproving = $state(false);
+  let aiTranslating = $state(false);
+  let aiTranslations = $state(null); // { he, en, ar }
+  let aiDescUndo = $state('');       // snapshot before improve (for undo)
+
+  async function handleAiSuggest() {
+    const name = miData[0].missionName?.trim();
+    if (!name) { toast.warning($lang === 'en' ? 'Please enter a mission name first' : 'יש להזין שם משימה תחילה'); return; }
+    aiSuggesting = true;
+    aiSuggestResult = null;
+    try {
+      const res = await fetch('/api/mission/suggest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, descrip: miData[0].descrip ?? '', lang: $lang }),
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error('suggest failed');
+      aiSuggestResult = data;
+    } catch (e) {
+      toast.error($lang === 'en' ? 'AI suggestion failed. Please try again.' : 'הצעת AI נכשלה, נסו שוב.');
+    } finally {
+      aiSuggesting = false;
+    }
+  }
+
+  function applyAiSuggestions() {
+    if (!aiSuggestResult) return;
+    const { extraction, matchResults } = aiSuggestResult;
+
+    // Merge skills — only add names not already selected
+    const addSkills = [
+      ...(matchResults?.skills?.matched ?? []).map(r => r.existingLabel ?? r.input),
+      ...(matchResults?.skills?.suggestions ?? []).map(r => r.existingLabel ?? r.input),
+      ...(matchResults?.skills?.newItems ?? []).map(r => r.input),
+    ].filter(n => n && !miData[0].selectedSkills.includes(n));
+    miData[0].selectedSkills = [...miData[0].selectedSkills, ...addSkills];
+
+    // Merge roles
+    const addRoles = extraction.roles.filter(n => n && !miData[0].selectedRoles.includes(n));
+    miData[0].selectedRoles = [...miData[0].selectedRoles, ...addRoles];
+
+    // Merge workways
+    const addWw = extraction.workways.filter(n => n && !miData[0].selectedWorkways.includes(n));
+    miData[0].selectedWorkways = [...miData[0].selectedWorkways, ...addWw];
+
+    // Improve descrip if empty
+    if ((!miData[0].descrip || miData[0].descrip === '<p></p>' || miData[0].descrip === '<p><br></p>') && extraction.improvedDescrip) {
+      miData[0].descrip = extraction.improvedDescrip;
+    }
+
+    miData = miData;
+    aiSuggestResult = null;
+    toast.success($lang === 'en' ? 'AI suggestions applied!' : 'הצעות AI הוחלו!');
+  }
+
+  async function handleAiImprove() {
+    const text = miData[0].descrip;
+    if (!text || text === '<p></p>' || text === '<p><br></p>') {
+      toast.warning($lang === 'en' ? 'Please write a description first' : 'יש לכתוב תיאור תחילה');
+      return;
+    }
+    aiImproving = true;
+    aiDescUndo = text;
+    try {
+      const res = await fetch('/api/mission/describe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, mode: 'improve', lang: $lang }),
+      });
+      const data = await res.json();
+      if (!data.ok || !data.improved) throw new Error('improve failed');
+      miData[0].descrip = data.improved;
+      miData = miData;
+      toast.success($lang === 'en' ? 'Description improved!' : 'התיאור שופר!');
+    } catch (e) {
+      aiDescUndo = '';
+      toast.error($lang === 'en' ? 'AI improve failed. Please try again.' : 'שיפור AI נכשל, נסו שוב.');
+    } finally {
+      aiImproving = false;
+    }
+  }
+
+  function undoAiImprove() {
+    if (aiDescUndo) {
+      miData[0].descrip = aiDescUndo;
+      miData = miData;
+      aiDescUndo = '';
+    }
+  }
+
+  async function handleAiTranslate() {
+    const text = miData[0].descrip;
+    if (!text || text === '<p></p>' || text === '<p><br></p>') {
+      toast.warning($lang === 'en' ? 'Please write a description first' : 'יש לכתוב תיאור תחילה');
+      return;
+    }
+    aiTranslating = true;
+    aiTranslations = null;
+    try {
+      const res = await fetch('/api/mission/describe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, mode: 'translate', lang: $lang }),
+      });
+      const data = await res.json();
+      if (!data.ok || !data.translations) throw new Error('translate failed');
+      aiTranslations = data.translations;
+    } catch (e) {
+      toast.error($lang === 'en' ? 'Translation failed. Please try again.' : 'תרגום נכשל, נסו שוב.');
+    } finally {
+      aiTranslating = false;
+    }
+  }
   import Tile from '$lib/celim/tile.svelte';
   import TextInput from '$lib/celim/ui/input/textInput.svelte';
   import EditIcon from '$lib/celim/icons/editIcon.svelte';
@@ -912,8 +1029,63 @@
                     <option value={template.attributes.missionName}></option>
                   {/each}
                 </datalist>
+                <!-- AI Suggest button -->
+                <button
+                  type="button"
+                  onclick={handleAiSuggest}
+                  disabled={aiSuggesting}
+                  class="mt-2 flex items-center gap-1 px-3 py-1.5 rounded-full border border-gold/60 text-xs text-barbi hover:bg-gold/20 transition-all disabled:opacity-50"
+                  title={$lang === 'en' ? 'Suggest skills, roles & description with AI' : 'הצע כישורים, תפקידים ותיאור עם AI'}
+                >
+                  {#if aiSuggesting}
+                    <span class="animate-spin inline-block w-3 h-3 border border-barbi rounded-full border-t-transparent"></span>
+                  {:else}
+                    ✨
+                  {/if}
+                  {$lang === 'en' ? 'Suggest with AI' : $lang === 'ar' ? 'اقتراح بالذكاء الاصطناعي' : 'הצע עם AI'}
+                </button>
               </div>
               <button onclick={() => (missionNameE = false)}><Done /></button>
+
+              <!-- AI Suggestion result panel -->
+              {#if aiSuggestResult}
+                <div class="mt-3 p-3 rounded-xl border border-gold/40 bg-pink-950/30 text-sm text-barbi space-y-2">
+                  <p class="font-bold text-gold">
+                    {$lang === 'en' ? '✨ AI Suggestions — click to apply:' : '✨ הצעות AI — לחצו להחלה:'}
+                  </p>
+                  {#if aiSuggestResult.extraction.skills.length > 0}
+                    <p><span class="text-mturk">{$lang === 'en' ? 'Skills:' : 'כישורים:'}</span> {aiSuggestResult.extraction.skills.join(', ')}</p>
+                  {/if}
+                  {#if aiSuggestResult.extraction.roles.length > 0}
+                    <p><span class="text-mturk">{$lang === 'en' ? 'Roles:' : 'תפקידים:'}</span> {aiSuggestResult.extraction.roles.join(', ')}</p>
+                  {/if}
+                  {#if aiSuggestResult.extraction.workways.length > 0}
+                    <p><span class="text-mturk">{$lang === 'en' ? 'Work modes:' : 'דרכי עבודה:'}</span> {aiSuggestResult.extraction.workways.join(', ')}</p>
+                  {/if}
+                  {#if aiSuggestResult.similarMissions?.length > 0}
+                    <p class="text-xs text-barbi/60">
+                      {$lang === 'en' ? '📚 Similar templates found:' : '📚 תבניות דומות נמצאו:'}
+                      {aiSuggestResult.similarMissions.map(m => m.missionName).join(', ')}
+                    </p>
+                  {/if}
+                  <div class="flex gap-2 pt-1">
+                    <button
+                      type="button"
+                      onclick={applyAiSuggestions}
+                      class="px-3 py-1 rounded-full bg-gold text-barbi text-xs font-bold hover:bg-mturk transition-all"
+                    >
+                      {$lang === 'en' ? '✅ Apply all' : '✅ החל הכל'}
+                    </button>
+                    <button
+                      type="button"
+                      onclick={() => (aiSuggestResult = null)}
+                      class="px-3 py-1 rounded-full border border-gold/60 text-barbi text-xs hover:bg-pink-950/30 transition-all"
+                    >
+                      {$lang === 'en' ? 'Dismiss' : 'סגור'}
+                    </button>
+                  </div>
+                </div>
+              {/if}
             {/if}
             {#if gloading == false}
               <h3
@@ -928,6 +1100,57 @@
               </h3>
               {#if descripE}
                 <RichText bind:outpot={miData[0].descrip} />
+                <!-- AI description actions -->
+                <div class="flex flex-wrap gap-2 mt-2">
+                  <button
+                    type="button"
+                    onclick={handleAiImprove}
+                    disabled={aiImproving}
+                    class="flex items-center gap-1 px-3 py-1.5 rounded-full border border-gold/60 text-xs text-barbi hover:bg-gold/20 transition-all disabled:opacity-50"
+                  >
+                    {#if aiImproving}<span class="animate-spin inline-block w-3 h-3 border border-barbi rounded-full border-t-transparent"></span>{:else}🪄{/if}
+                    {$lang === 'en' ? 'Improve with AI' : $lang === 'ar' ? 'تحسين بالذكاء' : 'שפר עם AI'}
+                  </button>
+                  {#if aiDescUndo}
+                    <button
+                      type="button"
+                      onclick={undoAiImprove}
+                      class="flex items-center gap-1 px-3 py-1.5 rounded-full border border-gold/40 text-xs text-barbi hover:bg-pink-950/30 transition-all"
+                    >
+                      ↩️ {$lang === 'en' ? 'Undo' : 'בטל שיפור'}
+                    </button>
+                  {/if}
+                  <button
+                    type="button"
+                    onclick={handleAiTranslate}
+                    disabled={aiTranslating}
+                    class="flex items-center gap-1 px-3 py-1.5 rounded-full border border-gold/60 text-xs text-barbi hover:bg-gold/20 transition-all disabled:opacity-50"
+                  >
+                    {#if aiTranslating}<span class="animate-spin inline-block w-3 h-3 border border-barbi rounded-full border-t-transparent"></span>{:else}🌍{/if}
+                    {$lang === 'en' ? 'Translate' : $lang === 'ar' ? 'ترجم' : 'תרגם'}
+                  </button>
+                </div>
+                <!-- Translation preview -->
+                {#if aiTranslations}
+                  <div class="mt-2 p-3 rounded-xl border border-gold/40 bg-pink-950/30 text-xs text-barbi space-y-2">
+                    <p class="font-bold text-gold">{$lang === 'en' ? '🌍 Translation preview:' : '🌍 תצוגה מקדימה של תרגום:'}</p>
+                    {#if aiTranslations.he && $lang !== 'he'}
+                      <p><span class="text-mturk">עברית:</span> {aiTranslations.he.replace(/<[^>]+>/g,'').slice(0,120)}…</p>
+                    {/if}
+                    {#if aiTranslations.en && $lang !== 'en'}
+                      <p><span class="text-mturk">English:</span> {aiTranslations.en.replace(/<[^>]+>/g,'').slice(0,120)}…</p>
+                    {/if}
+                    {#if aiTranslations.ar && $lang !== 'ar'}
+                      <p><span class="text-mturk">العربية:</span> {aiTranslations.ar.replace(/<[^>]+>/g,'').slice(0,120)}…</p>
+                    {/if}
+                    <p class="text-barbi/50 text-xs">{$lang === 'en' ? 'Translations will be auto-saved after publishing.' : 'התרגומים יישמרו אוטומטית לאחר הפרסום.'}</p>
+                    <button
+                      type="button"
+                      onclick={() => (aiTranslations = null)}
+                      class="px-2 py-1 rounded-full border border-gold/40 text-xs hover:bg-pink-950/30"
+                    >{$lang === 'en' ? 'Close' : 'סגור'}</button>
+                  </div>
+                {/if}
               {:else if miData[0].descrip}
                 <RichText
                   outpot={miData[0].descrip}

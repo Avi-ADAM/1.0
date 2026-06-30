@@ -112,11 +112,17 @@
   async function agree(oid) {
     already = true;
     try {
-      const result = await executeAction('applyToMission', {
+      /** @type {Record<string, unknown>} */
+      const actionParams = {
         openMissionId: String(oid),
-        projectId: String(projectId),
         existingAskedIds: askedarr.map(String),
-      });
+      };
+      // Only pass projectId when it exists — concierge open missions have no project
+      // and the action detects that case via the missing projectId.
+      if (projectId) {
+        actionParams.projectId = String(projectId);
+      }
+      const result = await executeAction('applyToMission', actionParams);
       if (result.success) {
         askedarr.push(`${oid}`);
         less(oid);

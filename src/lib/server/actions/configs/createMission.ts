@@ -128,6 +128,19 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
 
   const locationInput = buildLocationInput(isOnline, lat, lng, radius, location_hint);
 
+  // 2b. Fire-and-forget: create Strapi localizations for newly created Mission entries
+  if (!existingMissionId && missionId) {
+    const sourceLocale = (context as any).lang ?? 'he';
+    // Use the request-scoped fetch so the request carries auth cookies
+    (context.fetch('/api/translations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contentType: 'missions', entryId: Number(missionId), sourceLocale }),
+    }).catch((e: unknown) => {
+      console.warn('[createMission] localization trigger failed:', e);
+    })) as Promise<void>;
+  }
+
   // Common fields for OpenMission / Pendm
   const commonFields: Record<string, unknown> = {
     projectId,

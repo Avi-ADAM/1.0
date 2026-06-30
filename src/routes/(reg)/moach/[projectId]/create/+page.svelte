@@ -1,6 +1,7 @@
 <script>
   import { page } from '$app/state';
   import { untrack } from 'svelte';
+  import { tick } from 'svelte';
   import { lang } from '$lib/stores/lang.js';
   import Hand from '$lib/components/prPr/hand.svelte';
   import Handd from '$lib/components/prPr/handd.svelte';
@@ -24,6 +25,23 @@
   let openMA = $state(false);
   let hovered = $state(false);
   let hoveredd = $state(false);
+
+  // Prefill state for action=createmission URL param
+  let prefillMissionName = $state('');
+  let prefillMissionDescrip = $state('');
+
+  // Consumer for ?action=createmission — mirrors the createproject consumer in me/+page.svelte
+  $effect(async () => {
+    if (page.url.searchParams.has('action')) {
+      await tick();
+      if (page.url.searchParams.get('action') === 'createmission') {
+        const params = page.url.searchParams;
+        prefillMissionName    = params.get('name') ?? '';
+        prefillMissionDescrip = params.get('descrip') ?? '';
+        addM = true;
+      }
+    }
+  });
 
   let projectBase = $derived(data.projectBase);
   // projectMissionsData = full project.attributes from getProjectMissions query
@@ -264,7 +282,7 @@
               </svg>
             </button>
           </div>
-          <ChoosMission mission1={missionTemplates} {pn} {pl} {restime} {projectUsers} {alit} onClose={closeM} />
+          <ChoosMission mission1={missionTemplates} {pn} {pl} {restime} {projectUsers} {alit} onClose={closeM} name={prefillMissionName} initialDescrip={prefillMissionDescrip} />
         </div>
       {/if}
 
