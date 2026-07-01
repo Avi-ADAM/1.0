@@ -21,6 +21,7 @@
   import SiteSharePayCard from './SiteSharePayCard.svelte';
   import SiteShareIncomeCard from './SiteShareIncomeCard.svelte';
   import SiteShareAutoApprovedCard from './SiteShareAutoApprovedCard.svelte';
+  import WishOfferCard from './WishOfferCard.svelte';
   //import { fly } from 'svelte/transition';
   import { onMount } from 'svelte';
   import Header from './../../header/header.svelte';
@@ -608,6 +609,18 @@
                       {buble}
                       isFirst={currentIndex === i}
                       onProj={proj}
+                      {onChat}
+                    /></SwiperSlide
+                  >
+                {:else if buble.ani === 'wishoffer'}
+                  <SwiperSlide
+                    class="{isMobileOrTablet()
+                      ? 'swipr-slidemobile'
+                      : 'swiper-slidec'} "
+                    ><WishOfferCard
+                      {buble}
+                      isFirst={currentIndex === i}
+                      onUser={user}
                       {onChat}
                     /></SwiperSlide
                   >

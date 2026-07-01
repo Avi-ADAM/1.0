@@ -9164,6 +9164,7 @@ export type OpenMashaabim = {
   declinedsps?: Maybe<SpRelationResponseCollection>;
   descrip?: Maybe<Scalars['String']['output']>;
   easy?: Maybe<Scalars['Float']['output']>;
+  extractedKey?: Maybe<Scalars['String']['output']>;
   haamadapruvs?: Maybe<HaamadapruvRelationResponseCollection>;
   haamadas?: Maybe<HaamadaRelationResponseCollection>;
   hm?: Maybe<Scalars['Float']['output']>;
@@ -9302,6 +9303,7 @@ export type OpenMashaabimFiltersInput = {
   declinedsps?: InputMaybe<SpFiltersInput>;
   descrip?: InputMaybe<StringFilterInput>;
   easy?: InputMaybe<FloatFilterInput>;
+  extractedKey?: InputMaybe<StringFilterInput>;
   haamadapruvs?: InputMaybe<HaamadapruvFiltersInput>;
   haamadas?: InputMaybe<HaamadaFiltersInput>;
   hm?: InputMaybe<FloatFilterInput>;
@@ -9346,6 +9348,7 @@ export type OpenMashaabimInput = {
   declinedsps?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   descrip?: InputMaybe<Scalars['String']['input']>;
   easy?: InputMaybe<Scalars['Float']['input']>;
+  extractedKey?: InputMaybe<Scalars['String']['input']>;
   haamadapruvs?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   haamadas?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   hm?: InputMaybe<Scalars['Float']['input']>;
@@ -9391,6 +9394,7 @@ export type OpenMission = {
   dates?: Maybe<Scalars['DateTime']['output']>;
   declined?: Maybe<UsersPermissionsUserEntityResponse>;
   descrip?: Maybe<Scalars['String']['output']>;
+  extractedKey?: Maybe<Scalars['String']['output']>;
   hatzaas?: Maybe<HatzaaRelationResponseCollection>;
   hearotMeyuchadot?: Maybe<Scalars['String']['output']>;
   howMeny?: Maybe<Scalars['Long']['output']>;
@@ -9565,6 +9569,7 @@ export type OpenMissionFiltersInput = {
   dates?: InputMaybe<DateTimeFilterInput>;
   declined?: InputMaybe<UsersPermissionsUserFiltersInput>;
   descrip?: InputMaybe<StringFilterInput>;
+  extractedKey?: InputMaybe<StringFilterInput>;
   hatzaas?: InputMaybe<HatzaaFiltersInput>;
   hearotMeyuchadot?: InputMaybe<StringFilterInput>;
   howMeny?: InputMaybe<LongFilterInput>;
@@ -9614,6 +9619,7 @@ export type OpenMissionInput = {
   dates?: InputMaybe<Scalars['DateTime']['input']>;
   declined?: InputMaybe<Scalars['ID']['input']>;
   descrip?: InputMaybe<Scalars['String']['input']>;
+  extractedKey?: InputMaybe<Scalars['String']['input']>;
   hatzaas?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   hearotMeyuchadot?: InputMaybe<Scalars['String']['input']>;
   howMeny?: InputMaybe<Scalars['Long']['input']>;

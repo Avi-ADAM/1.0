@@ -31,6 +31,7 @@ import {
   sheirutpStore,
   salesStore,
   purchasesStore,
+  wishOffersStore,
   saveSnapshot,
   loadSnapshot,
   clearSnapshot,
@@ -58,7 +59,8 @@ import {
   extractDecisions,
   extractProductRequests,
   extractSales,
-  extractPurchases
+  extractPurchases,
+  extractWishOffers
 } from './levDataExtractors';
 import { fetchMainUserData, fetchOpenMissions } from './levGraphQLQueries';
 import { resolvePlatformIdentity } from '$lib/stores/platformStore';
@@ -242,6 +244,7 @@ export function restoreFromSnapshot(snapshot: SnapshotData): void {
     sheirutpStore.set(snapshot.data.sheirutp || []);
     salesStore.set(snapshot.data.sales || []);
     purchasesStore.set(snapshot.data.purchases || []);
+    wishOffersStore.set(snapshot.data.wishOffers || []);
 
     // A restored snapshot represents a full dataset — safe to snapshot again later
     dataMode.set('full');
@@ -381,6 +384,11 @@ export function populateStores(data: any, userId: string): void {
     purchasesStore.set(purchaseData);
     console.log(`✅ [levDataLoader] Purchases set (${purchaseData.length} items)`);
 
+    // Extract and set wish offers (community volunteer offers on my wishes)
+    const wishOffers = extractWishOffers(userData);
+    wishOffersStore.set(wishOffers);
+    console.log(`✅ [levDataLoader] Wish offers set (${wishOffers.length} items)`);
+
     console.log('✅ [levDataLoader] All stores populated successfully');
   } catch (error) {
     console.error('❌ [levDataLoader] Error populating stores:', error);
@@ -434,7 +442,8 @@ export function saveCurrentSnapshot(): void {
         resourceSuggestions: get(resourceSuggestionsStore),
         sheirutp: get(sheirutpStore),
         sales: get(salesStore),
-        purchases: get(purchasesStore)
+        purchases: get(purchasesStore),
+        wishOffers: get(wishOffersStore)
       }
     };
 
@@ -477,6 +486,8 @@ export function clearAllData(): void {
   decisionsStore.set([]);
   sheirutpStore.set([]);
   salesStore.set([]);
+  purchasesStore.set([]);
+  wishOffersStore.set([]);
 
   // Clear snapshot and reset loading state
   clearSnapshot();

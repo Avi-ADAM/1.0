@@ -361,6 +361,41 @@ export interface ProductRequestData {
   [key: string]: any;
 }
 
+/** A community volunteer's pending proposal on a wish I own (concierge).
+ *  A member responded positively to an openMission I published from my wish
+ *  (applyToMission → kind 'custom_offer', status 'suggested', open_mission set).
+ *  Surfaced as an ask-like lev card so I can accept (acceptRatsonProposal) or
+ *  reject (rejectRatsonProposal) the volunteer. See PLAN_MISSION_AI / concierge. */
+export interface WishOfferData {
+  id: string;              // ratson_proposal id
+  projectId: string;       // '' — concierge wishes are project-less
+  priority?: number;
+
+  // The wish (ratson) this offer is for
+  ratsonId: string;
+  ratsonName: string;
+  ratsonDesc?: string;
+  ratsonLogo?: string;
+
+  // The volunteer who offered
+  volunteerId: string;
+  volunteerName: string;
+  volunteerSrc?: string;
+
+  // What was offered (the published openMission / matched need)
+  missionName: string;
+  hours?: number | null;
+  price?: number | null;
+  coveredIdx?: string | null;
+
+  // Coordination chat forum (owner ↔ volunteer), lazily created on first open
+  forumId?: string | null;
+
+  createdAt?: string;
+  myid?: string;
+  [key: string]: any;
+}
+
 /** A committed-but-unpaid site-share contribution this member still owes to the
  *  platform (1💗1). Surfaced as a swiper card so the member can pick a volunteer
  *  receiver and send the transfer (PLAN_SITE_SHARE_PER_MEMBER §5, M4). */
@@ -479,6 +514,9 @@ export const salesStore: Writable<SaleData[]> = writable([]);
 /** My purchases (sheiruts where I am the customer) */
 export const purchasesStore: Writable<SaleData[]> = writable([]);
 
+/** Community volunteer offers on wishes I own (concierge) — pending my accept/reject */
+export const wishOffersStore: Writable<WishOfferData[]> = writable([]);
+
 // ========== Loading Mode ==========
 
 /**
@@ -531,7 +569,7 @@ export const projectFilter: Writable<string | null> = writable(null);
 // ========== Snapshot Helpers ==========
 
 /** Current version of the snapshot data structure */
-const SNAPSHOT_VERSION = 4;
+const SNAPSHOT_VERSION = 5;
 
 /** Snapshot data structure for localStorage */
 export interface SnapshotData {
@@ -556,6 +594,7 @@ export interface SnapshotData {
     sheirutp: ProductRequestData[];
     sales: SaleData[];
     purchases: SaleData[];
+    wishOffers: WishOfferData[];
   };
 }
 

@@ -1537,6 +1537,15 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
+  // Best-effort read of the stable extracted-need key persisted on a concierge
+  // open mission at publish time. Kept separate from 51GetOpenMissionById so that
+  // — until the `extractedKey` field is live in Strapi — selecting it can fail in
+  // isolation (caught by the caller) without breaking the main open-mission load.
+  'getOpenMissionExtractedKey': `query GetOpenMissionExtractedKey($id: ID!) {
+    openMission(id: $id) {
+      data { id attributes { extractedKey } }
+    }
+  }`,
   '52GetUserById': `query GetUserById($id: ID!) {
     usersPermissionsUser(id: $id) {
       data {
@@ -3327,6 +3336,46 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       id
       attributes {
         haskama
+        ratsons {
+          data {
+            id
+            attributes {
+              name
+              desc
+              logo { data { attributes { url formats } } }
+              extracted_missions { id name }
+              extracted_resources { id name }
+              ratson_proposals {
+                data {
+                  id
+                  attributes {
+                    kind
+                    status_proposal
+                    total_price
+                    createdAt
+                    proposer_users {
+                      data {
+                        id
+                        attributes {
+                          username
+                          profilePic { data { attributes { url formats } } }
+                        }
+                      }
+                    }
+                    open_mission {
+                      data {
+                        id
+                        attributes { name noofhours perhour }
+                      }
+                    }
+                    forum { data { id } }
+                    covered_missions { id extracted_mission_idx hours price }
+                  }
+                }
+              }
+            }
+          }
+        }
         asks(filters: { archived: { eq: false } }) {
           data {
             id
@@ -9096,6 +9145,27 @@ export const moachQids = {
           }
         }
       }
+      ratson_proposal {
+        data {
+          id
+          attributes {
+            ratson {
+              data {
+                id
+                attributes {
+                  name
+                  users_permissions_users {
+                    data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                  }
+                }
+              }
+            }
+            proposer_users {
+              data { id attributes { username profilePic { data { attributes { url formats } } } } }
+            }
+          }
+        }
+      }
       haluka {
         data {
           id
@@ -9231,6 +9301,27 @@ export const moachQids = {
           attributes {
             name
             users_permissions_users {
+              data { id attributes { username profilePic { data { attributes { url formats } } } } }
+            }
+          }
+        }
+      }
+      ratson_proposal {
+        data {
+          id
+          attributes {
+            ratson {
+              data {
+                id
+                attributes {
+                  name
+                  users_permissions_users {
+                    data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                  }
+                }
+              }
+            }
+            proposer_users {
               data { id attributes { username profilePic { data { attributes { url formats } } } } }
             }
           }
@@ -9409,6 +9500,29 @@ export const moachQids = {
               }
             }
           }
+          ratson_proposals {
+            data {
+              id
+              attributes {
+                forum { data { ...ForumListCore } }
+              }
+            }
+          }
+          ratsons {
+            data {
+              id
+              attributes {
+                ratson_proposals {
+                  data {
+                    id
+                    attributes {
+                      forum { data { ...ForumListCore } }
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -9436,6 +9550,27 @@ export const moachQids = {
         }
       }
       project { data { ...ForumListProjectCore } }
+      ratson_proposal {
+        data {
+          id
+          attributes {
+            ratson {
+              data {
+                id
+                attributes {
+                  name
+                  users_permissions_users {
+                    data { id attributes { username profilePic { data { attributes { url formats } } } } }
+                  }
+                }
+              }
+            }
+            proposer_users {
+              data { id attributes { username profilePic { data { attributes { url formats } } } } }
+            }
+          }
+        }
+      }
       haluka {
         data {
           id

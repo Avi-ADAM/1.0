@@ -44,22 +44,42 @@ const applyToMissionHandler: ActionExecutionHandler = async (params, context, { 
       String(o.id)
     );
 
-    // Resolve which extracted mission this open mission was published from. The
-    // published open mission carries the need's name (publishWishNeedToCommunity),
-    // and the /concierge/[id] page matches proposals to plan rows by the need's
-    // array index — so we match by name and use that index. If the name no longer
-    // matches (e.g. the owner renamed the need), we still create the offer; it just
-    // won't auto-attach to a row.
+    // Resolve which extracted need this open mission was published from. Prefer
+    // the STABLE extracted-component id persisted on the open mission at publish
+    // time (`extractedKey`) — robust against the owner later renaming/reordering
+    // needs. The /concierge/[id] matcher accepts either the array index OR the
+    // component id as `extracted_mission_idx`. Best-effort read: the field may not
+    // be live in Strapi yet, so we fall back to matching by name → array index.
+    let extractedKey: string | null = null;
+    try {
+      const kRes = await strapi.execute(
+        'getOpenMissionExtractedKey',
+        { id: openMissionId },
+        context.jwt,
+        context.fetch
+      );
+      const raw = kRes?.data?.openMission?.data?.attributes?.extractedKey;
+      extractedKey = raw != null && String(raw) !== '' ? String(raw) : null;
+    } catch (e) {
+      console.warn('[applyToMission] extractedKey read failed (field may not be live yet):', e);
+    }
+
     const extractedMissions: any[] = ratAttrs.extracted_missions ?? [];
     const omName = String(omAttrs.name ?? '').trim();
     const matchedIdx = omName
       ? extractedMissions.findIndex((m: any) => String(m?.name ?? '').trim() === omName)
       : -1;
 
+    // Value written into covered_missions: the stable component id when we have
+    // it, otherwise the matched array index (legacy/name-match path). If neither
+    // resolves we still create the offer; it just won't auto-attach to a row.
+    const coveredIdxValue =
+      extractedKey != null ? extractedKey : matchedIdx >= 0 ? String(matchedIdx) : null;
+
     const price = (omAttrs.noofhours ?? 0) * (omAttrs.perhour ?? 0);
     const coveredMissions =
-      matchedIdx >= 0
-        ? [{ extracted_mission_idx: String(matchedIdx), hours: omAttrs.noofhours ?? null, price }]
+      coveredIdxValue != null
+        ? [{ extracted_mission_idx: coveredIdxValue, hours: omAttrs.noofhours ?? null, price }]
         : [];
 
     // Create the volunteer offer. `open_mission` is what marks this as a

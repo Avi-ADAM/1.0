@@ -16,7 +16,8 @@ import type {
   ProductRequestData,
   SaleData,
   SiteSharePayableData,
-  OpenSiteShareDecisionData
+  OpenSiteShareDecisionData,
+  WishOfferData
 } from '$lib/stores/levStores';
 // @ts-ignore
 import { createProjectInfo, createUserInfo, getProjectMembers, getProjectUsers, getProjectRestime } from '$lib/utils/projectHelpers.js';
@@ -2384,6 +2385,36 @@ export function processOpenSiteShareDecisions(
         ...d
       };
     });
+}
+
+/**
+ * Process community volunteer offers on wishes I own (concierge) into display
+ * items. Each is an ask-like card awaiting my accept/reject, so it sits in the
+ * VOTE_PENDING band. These wishes are project-less, so project info is empty —
+ * the card renders the wish + volunteer + offered need directly off the item.
+ */
+export function processWishOffers(
+  offers: WishOfferData[],
+  _projects: ProjectData[]
+): DisplayItem[] {
+  if (!offers || !Array.isArray(offers)) {
+    return [];
+  }
+
+  return offers.map((offer) => ({
+    // Common display fields
+    ani: 'wishoffer',
+    azmi: 'wishoffer',
+    pl: PRIORITY_BAND.VOTE_PENDING,
+    coinlapach: `wishoffer-${offer.id}`,
+
+    projectId: offer.projectId || '',
+    projectName: offer.ratsonName || '',
+    src: offer.ratsonLogo || offer.volunteerSrc || '',
+
+    // Pass through all wish-offer fields (ratsonId, volunteer, missionName, …)
+    ...offer
+  }));
 }
 
 export function mergeAndSort(...arrays: DisplayItem[][]): DisplayItem[] {

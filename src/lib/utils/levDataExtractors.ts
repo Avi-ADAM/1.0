@@ -24,7 +24,8 @@ import type {
   DecisionData,
   ResourceSuggestionData,
   ProductRequestData,
-  SaleData
+  SaleData,
+  WishOfferData
 } from '$lib/stores/levStores';
 import { calculateScore } from './suggestionMatchers';
 
@@ -1579,4 +1580,105 @@ export function extractPurchases(userData: any): SaleData[] {
   }
 
   return purchases;
+}
+
+/**
+ * Extract community volunteer offers on wishes the user OWNS (concierge).
+ *
+ * Walks the user's owned ratsons → ratson_proposals and surfaces the ones that
+ * are a pending community volunteer offer: status `suggested` AND linked to an
+ * `open_mission` (the published need). These are created by applyToMission when
+ * a member responds positively to a need the wisher published to the community.
+ * The wisher accepts/rejects them from the lev feed.
+ *
+ * Pure + defensive — returns [] on missing data, never throws.
+ *
+ * @param userData - Raw GraphQL response data (usersPermissionsUser.data)
+ * @returns Array of wish-offer data
+ */
+export function extractWishOffers(userData: any): WishOfferData[] {
+  const offers: WishOfferData[] = [];
+
+  const ratsons = userData?.attributes?.ratsons?.data;
+  if (!Array.isArray(ratsons)) {
+    return offers;
+  }
+
+  for (const ratson of ratsons) {
+    const rAttrs = ratson?.attributes;
+    if (!ratson?.id || !rAttrs) continue;
+
+    const ratsonName = rAttrs.name || '';
+    const ratsonDesc = rAttrs.desc || '';
+    const ratsonLogo = rAttrs.logo?.data?.attributes?.url;
+    const extractedMissions = Array.isArray(rAttrs.extracted_missions)
+      ? rAttrs.extracted_missions
+      : [];
+
+    const proposals = rAttrs.ratson_proposals?.data;
+    if (!Array.isArray(proposals)) continue;
+
+    for (const proposal of proposals) {
+      const pAttrs = proposal?.attributes;
+      if (!proposal?.id || !pAttrs) continue;
+
+      // Only pending community-volunteer offers: still suggested + has an
+      // open_mission link (distinguishes them from project/matanot proposals).
+      const openMission = pAttrs.open_mission?.data;
+      if (pAttrs.status_proposal !== 'suggested' || !openMission?.id) continue;
+
+      const omAttrs = openMission.attributes || {};
+      const volunteer = pAttrs.proposer_users?.data?.[0];
+
+      // Resolve the offered need's display name: prefer the matched extracted
+      // mission (via covered_missions idx), fall back to the openMission name.
+      // `extracted_mission_idx` is either the stable extracted-component id
+      // (rename-proof, written at publish) or — for older offers — the array
+      // index. Resolve by id first, then fall back to index, then openMission name.
+      const covered = Array.isArray(pAttrs.covered_missions) ? pAttrs.covered_missions[0] : null;
+      const coveredIdx = covered?.extracted_mission_idx ?? null;
+      let missionName = omAttrs.name || '';
+      if (coveredIdx != null) {
+        const byId = extractedMissions.find((m: any) => String(m?.id) === String(coveredIdx));
+        const idx = Number(coveredIdx);
+        const byIdx = !Number.isNaN(idx) ? extractedMissions[idx] : null;
+        const match = byId || byIdx;
+        if (match?.name) {
+          missionName = match.name;
+        }
+      }
+
+      offers.push({
+        id: proposal.id,
+        projectId: '', // concierge wishes are project-less
+        priority: 2,
+
+        ratsonId: ratson.id,
+        ratsonName,
+        ratsonDesc,
+        ratsonLogo,
+
+        volunteerId: volunteer?.id || '',
+        volunteerName: volunteer?.attributes?.username || '',
+        volunteerSrc: volunteer?.attributes?.profilePic?.data?.attributes?.url,
+
+        missionName,
+        hours: covered?.hours ?? omAttrs.noofhours ?? null,
+        price: covered?.price ?? pAttrs.total_price ?? omAttrs.perhour ?? null,
+        coveredIdx,
+
+        // Coordination chat forum, if one has already been opened
+        forumId: pAttrs.forum?.data?.id ?? null,
+
+        createdAt: pAttrs.createdAt,
+        myid: userData.id,
+
+        // Processor metadata
+        ani: 'wishoffer',
+        azmi: 'wishoffer'
+      });
+    }
+  }
+
+  return offers;
 }

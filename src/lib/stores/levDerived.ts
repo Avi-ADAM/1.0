@@ -15,6 +15,7 @@ import {
   sheirutpStore,
   salesStore,
   purchasesStore,
+  wishOffersStore,
   siteSharePayablesStore,
   openSiteShareDecisionsStore,
   askedResourcesStore,
@@ -41,6 +42,7 @@ import {
   processProductRequests,
   processSales,
   processPurchases,
+  processWishOffers,
   processSiteSharePayables,
   processOpenSiteShareDecisions,
   mergeAndSort,
@@ -256,6 +258,15 @@ export const processedPurchases: Readable<DisplayItem[]> = derived(
 );
 
 /**
+ * Derived store for processed wish offers (community volunteer offers on wishes
+ * I own — concierge). Recomputes when wishOffersStore changes.
+ */
+export const processedWishOffers: Readable<DisplayItem[]> = derived(
+  [wishOffersStore, projectsStore],
+  ([$wishOffers, $projects]) => processWishOffers($wishOffers, $projects)
+);
+
+/**
  * Derived store for processed site-share payables (committed-but-unpaid
  * contributions the member still owes the platform).
  */
@@ -323,6 +334,7 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
     processedSheirutp,
     processedSales,
     processedPurchases,
+    processedWishOffers,
     processedSiteSharePayables,
     processedOpenSiteShareDecisions,
     milon,
@@ -345,6 +357,7 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
     $sheirutp,
     $sales,
     $purchases,
+    $wishOffers,
     $siteSharePayables,
     $openSiteShareDecisions,
     $milon,
@@ -368,6 +381,7 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
       $sheirutp,
       $sales,
       $purchases,
+      $wishOffers,
       $siteSharePayables,
       $openSiteShareDecisions
     );
@@ -408,6 +422,8 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
           return $milon.sales;
         case 'buy':
           return $milon.purchases;
+        case 'wishoffer':
+          return true; // Always show: a volunteer offer on my wish awaits my accept/reject
         case 'sitesharepay':
           return true; // Always show: an outstanding payment owed by the member
         case 'sitesharedecide':

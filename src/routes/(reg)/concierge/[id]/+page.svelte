@@ -278,6 +278,9 @@
           // Source position in the extracted_* array (per kind) — lets the
           // edit/delete handlers map a row back to its component to persist.
           idx,
+          // Stable extracted-component id — the rename-proof key we persist on
+          // the published open mission so a volunteer's proposal binds by id.
+          componentId: item.id ?? null,
           quantityEst: item.quantityEst ?? null,
           kindOf: item.kindOf ?? null,
           linked:
@@ -1107,6 +1110,7 @@
             hours: spec?.hours ?? row.need.hours ?? null,
             perhour: spec?.ratePerHour ?? null,
             isMust: row.need.imp === 'must',
+            extractedKey: row.need.componentId != null ? String(row.need.componentId) : null,
             skillNames:
               Array.isArray(spec?.skills) && spec.skills.length
                 ? spec.skills
@@ -1144,6 +1148,7 @@
             kind: 'resource',
             name: payload.name,
             descrip: payload.descrip || '',
+            extractedKey: row.need.componentId != null ? String(row.need.componentId) : null,
             price: payload.price ?? null,
             easy: payload.easy ?? null,
             quantity: payload.quantity ?? null,

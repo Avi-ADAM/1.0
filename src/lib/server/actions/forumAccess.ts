@@ -17,7 +17,8 @@ export type ForumKind =
   | 'sheirut'
   | 'haluka'
   | 'meeting'
-  | 'wish';
+  | 'wish'
+  | 'wishoffer';
 
 export interface ForumMessageView {
   id: string;
@@ -102,7 +103,23 @@ function ratsonOwners(attrs: any): string[] {
   );
 }
 
+// A wishoffer forum coordinates the wish owner and the community volunteer before
+// the owner accepts the proposal. It links back via `ratson_proposal`, whose
+// `ratson` carries the owners and whose `proposer_users` carry the volunteer(s).
+function ratsonProposalParticipants(attrs: any): string[] {
+  const proposal = attrs?.ratson_proposal?.data?.attributes;
+  if (!proposal) return [];
+  const owners = entityArray(proposal?.ratson?.data?.attributes?.users_permissions_users).map(
+    (user) => String(user.id)
+  );
+  const proposers = entityArray(proposal?.proposer_users).map((user) => String(user.id));
+  return [...owners, ...proposers];
+}
+
 function forumKind(attrs: any): ForumKind {
+  // A community-volunteer coordination chat links back via `ratson_proposal`
+  // (checked before `ratson` since a proposal forum has no direct ratson link).
+  if (attrs?.ratson_proposal?.data) return 'wishoffer';
   // A wish's chat_forum links back via `ratson` and has none of the
   // project/ask/sheirut relations the other kinds key off.
   if (attrs?.ratson?.data) return 'wish';
@@ -117,6 +134,13 @@ function forumKind(attrs: any): ForumKind {
 
 function forumTitle(kind: ForumKind, attrs: any, projectName: string): string {
   const subject = String(attrs?.subject || '').trim();
+  if (kind === 'wishoffer') {
+    return (
+      attrs?.ratson_proposal?.data?.attributes?.ratson?.data?.attributes?.name ||
+      subject ||
+      'Wish offer chat'
+    );
+  }
   if (kind === 'wish') {
     return attrs?.ratson?.data?.attributes?.name || subject || 'Wish chat';
   }
@@ -147,6 +171,8 @@ function forumTitle(kind: ForumKind, attrs: any, projectName: string): string {
 }
 
 function forumSubtitle(kind: ForumKind, attrs: any, projectName: string): string {
+  if (kind === 'wishoffer')
+    return attrs?.ratson_proposal?.data?.attributes?.ratson?.data?.attributes?.name || projectName;
   if (kind === 'wish') return attrs?.ratson?.data?.attributes?.name || projectName;
   if (kind === 'haluka') {
     const amount = attrs?.haluka?.data?.attributes?.amount;
@@ -221,6 +247,10 @@ export function participantIdsForForum(entity: any): string[] {
   const attrs = entity?.attributes || {};
   const kind = forumKind(attrs);
   const project = firstProject(attrs);
+
+  if (kind === 'wishoffer') {
+    return uniqueIds(ratsonProposalParticipants(attrs));
+  }
 
   if (kind === 'wish') {
     return uniqueIds(ratsonOwners(attrs));
@@ -336,6 +366,20 @@ export function collectForumEntitiesFromUserSources(data: any): any[] {
 
   entityArray(attrs.sheiruts).forEach((sheirut) => {
     entityArray(sheirut?.attributes?.forums).forEach((forum) => forums.push(forum));
+  });
+
+  // Wishoffer coordination chats — reachable as the volunteer (proposer side)…
+  entityArray(attrs.ratson_proposals).forEach((proposal) => {
+    const forum = proposal?.attributes?.forum?.data;
+    if (forum) forums.push(forum);
+  });
+
+  // …and as the wish owner (ratsons → ratson_proposals → forum).
+  entityArray(attrs.ratsons).forEach((ratson) => {
+    entityArray(ratson?.attributes?.ratson_proposals).forEach((proposal) => {
+      const forum = proposal?.attributes?.forum?.data;
+      if (forum) forums.push(forum);
+    });
   });
 
   return forums;

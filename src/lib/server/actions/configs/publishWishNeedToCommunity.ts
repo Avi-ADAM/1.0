@@ -49,6 +49,10 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     startDate = null,
     endDate = null,
     isMust = false,
+    // Stable id of the extracted need (extracted_missions/_resources component id)
+    // this row was published from. Persisted onto the open mission so a community
+    // volunteer's proposal binds to the exact need regardless of later renames.
+    extractedKey = null,
     skillNames = [],
     pendmId = null,
     pmashId = null,
@@ -78,6 +82,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     startDate?: string | null;
     endDate?: string | null;
     isMust?: boolean;
+    extractedKey?: string | null;
     skillNames?: string[];
     pendmId?: string | null;
     pmashId?: string | null;
@@ -183,6 +188,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       : null;
     if (!openMissionId) throw new Error('Failed to publish the mission to the community');
 
+    await persistExtractedKey(strapi, context, 'mission', openMissionId, extractedKey);
     await seedChat(strapi, context, ratAttrs, name);
 
     return {
@@ -229,6 +235,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     : null;
   if (!openMashaabimId) throw new Error('Failed to publish the resource to the community');
 
+  await persistExtractedKey(strapi, context, 'resource', openMashaabimId, extractedKey);
   await seedChat(strapi, context, ratAttrs, name);
 
   return {
@@ -236,6 +243,37 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     updateStrategy: { type: 'none' as const }
   };
 };
+
+/**
+ * Persist the stable extracted-need id onto the freshly published open mission /
+ * mashaabim, so a community volunteer's proposal binds to the exact need by id
+ * (not by name). Best-effort: the `extractedKey` field may not be live in Strapi
+ * yet — a failure here must never fail the publish (applyToMission falls back to
+ * matching by name in that window). Reuses the generic update mutations.
+ */
+async function persistExtractedKey(
+  strapi: any,
+  context: any,
+  kind: 'mission' | 'resource',
+  id: string,
+  extractedKey: string | null
+) {
+  if (extractedKey == null || String(extractedKey) === '') return;
+  const qid = kind === 'mission' ? 'negoUpdateOpenMission' : 'applyRoundToOpenMashaabim';
+  try {
+    await strapi.execute(
+      qid,
+      { id, data: { extractedKey: String(extractedKey) } },
+      context.jwt,
+      context.fetch
+    );
+  } catch (e) {
+    console.warn(
+      '[publishWishNeedToCommunity] extractedKey persist failed (field may not be live yet):',
+      e
+    );
+  }
+}
 
 async function seedChat(strapi: any, context: any, ratAttrs: any, name: string) {
   const chatForumId = ratAttrs.chat_forum?.data?.id ?? null;
@@ -280,6 +318,7 @@ export const publishWishNeedToCommunityConfig: ActionConfig = {
     startDate: { type: 'string', required: false },
     endDate: { type: 'string', required: false },
     isMust: { type: 'boolean', required: false },
+    extractedKey: { type: 'string', required: false },
     skillNames: { type: 'array', required: false },
     pendmId: { type: 'string', required: false },
     pmashId: { type: 'string', required: false },

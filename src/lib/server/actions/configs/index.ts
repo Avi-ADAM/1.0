@@ -27,6 +27,7 @@ import { rejectSheirutpendConfig } from './rejectSheirutpend.js';
 import { addVoteConfig } from './addVote.js';
 import { ensureSheirutForumConfig } from './ensureSheirutForum.js';
 import { ensureSheirutpendForumConfig } from './ensureSheirutpendForum.js';
+import { ensureRatsonProposalForumConfig } from './ensureRatsonProposalForum.js';
 import { ensureVoteForumConfig } from './ensureVoteForum.js';
 import { createProcessConfig } from './createProcess.js';
 import { attachEntityToProcessConfig } from './attachEntityToProcess.js';
@@ -161,6 +162,7 @@ export function registerAllActions(): void {
   // Sheirut forum helpers
   registerAction(ensureSheirutForumConfig);
   registerAction(ensureSheirutpendForumConfig);
+  registerAction(ensureRatsonProposalForumConfig);
   registerAction(ensureVoteForumConfig);
   registerAction(createProcessConfig);
   registerAction(attachEntityToProcessConfig);
@@ -357,6 +359,7 @@ export {
   addVoteConfig,
   ensureSheirutForumConfig,
   ensureSheirutpendForumConfig,
+  ensureRatsonProposalForumConfig,
   closeFiniapruvalConfig,
   updateProjectDetailsConfig,
   createProcessConfig,

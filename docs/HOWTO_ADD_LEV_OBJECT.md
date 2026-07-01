@@ -125,6 +125,45 @@ import from `levStores`.
   derived store on every dependency change. Do fetches/AI in a server load or a
   separate enrichment pass (see `updateSuggestionsWithDetails`), not here.
 
+## Card visual conventions (keep every card uniform)
+
+New cards must look like the rest of the deck, not like a bespoke panel. Learned
+while building `WishOfferCard`:
+
+- **Gold header via `CardHeader.svelte`.** Every card opens with the shared gold
+  `CardHeader` (`bg-colorfulGrad`), never a hand-rolled badge/toper. Pass
+  `logoSrc`, `projectName`, `cardType` (the small kicker), `cardTitle` (the big
+  line) and `glowColor` (`'gold'` is the default look). This gives the logo,
+  authority badge, project name, and the type/title stack for free.
+- **Container shell.** Wrap in the standard
+  `bg-white dark:bg-gray-800 rounded-2xl overflow-hidden` flex-column with a
+  `shadow-glow border-glow` when `isFirst`, else `shadow-lg border`. Footer
+  actions sit in a `p-4 bg-gray-50 dark:bg-gray-900/80 border-t` row; the primary
+  button is `flex-2` `from-barbi to-mpink`.
+- **Concierge branding.** For project-less (concierge / `ratson`) objects, brand
+  the header with logo `'/logo-concierge.png'` and name `'קונסירג׳'` — the same
+  convention `processSuggestions`/`sugestmi` use (`isConcierge` →
+  projectName/projectImageUrl). Don't invent a per-card logo.
+- **Logo click → navigate.** Wire `CardHeader`'s `onProjectClick`. For a normal
+  project card that's `onProj({ id: projectId })`; for a concierge/wish object
+  route to the relevant page (owner → `/concierge/{ratsonId}`, proposer →
+  `/wish/{ratsonId}`).
+- **Users open in a modal, never a page.** Don't link `href="/user/{id}"`. Call
+  the `onUser` callback (`onUser?.({ id })`) — `cards.svelte`'s `user()` bubbles
+  it to `/lev/+page.svelte` which opens the user modal. Pass `onUser={user}` when
+  you add the card branch.
+- **Coordination chat via a `forum`.** If two parties need to talk before a
+  decision, reuse the forum infra rather than a custom thread: (1) the entity
+  needs a `forum` relation (+ reverse on `Forum`); (2) an `ensure<X>Forum` action
+  lazily creates a **project-less** forum (`2forumCrBasic` with `pid: null`) and
+  links it; (3) teach `forumAccess.ts` a new `ForumKind` — `forumKind`,
+  `forumTitle`/`forumSubtitle`, `participantIdsForForum` (who may read/write),
+  and `collectForumEntitiesFromUserSources` (how each side discovers it); (4) add
+  the relation block to the shared forum fragments (`103getForumThreadById`,
+  `105getForumSummaryById`, `104getUserForumSources`→`ForumListCore`). The card's
+  chat button then calls the ensure action and forwards `onChat({ forumId })`.
+  See `ensureRatsonProposalForum` + the `'wishoffer'` kind for the full pattern.
+
 ## Reference: a complete existing type to copy
 
 Product requests (`sheirutpend`) are the closest analogue to a concierge object
@@ -133,3 +172,9 @@ and touch every step — use it as a template:
 - `extractProductRequests` — `levDataExtractors.ts`
 - `processProductRequests` (ani `sheirutp`) — `levProcessors.ts`
 - `processedSheirutp` + milon `case 'sheirutp'` — `levDerived.ts`
+
+For a **concierge / project-less** object that also follows the card conventions
+above (gold header, concierge branding, user modal, coordination forum), copy the
+`wishoffer` type instead: `WishOfferData`/`wishOffersStore`, `extractWishOffers`,
+`processWishOffers`, `processedWishOffers`, `WishOfferCard.svelte`, and the
+`ensureRatsonProposalForum` action + `'wishoffer'` forum kind.
