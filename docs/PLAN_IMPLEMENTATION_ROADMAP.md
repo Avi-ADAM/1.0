@@ -17,7 +17,7 @@
 | 4 | [PLAN_action_migration_vs_p2p](./PLAN_action_migration_vs_p2p.md) | תכנון + רה-תיעדוף | המיגרציה כתפר ל-P2P |
 | 5 | [PLAN_SITE_SHARE](./PLAN_SITE_SHARE.md) | R0/R1 ✅ shipped; R1.5–R4 → | האתר כשותף |
 | 6 | [PLAN_central_rikma_definition](./PLAN_central_rikma_definition.md) | תכנון; **החלטת מודל ✅** (§3 כאן) | הרקמה כקואופ אמיתי |
-| 7 | [PLAN_rikma_as_state_machine](./PLAN_rikma_as_state_machine.md) | תכנון; חלק מ-Phase 1.5 | שווי מתמטית מאומת |
+| 7 | [PLAN_rikma_as_state_machine](./PLAN_rikma_as_state_machine.md) | §7 ✅ (צעד 9): אימות commitments + persistence; אכיפה strict → Phase 3 | שווי מתמטית מאומת |
 | 8 | [PLAN_restime_in_signed_chain](./PLAN_restime_in_signed_chain.md) | תכנון | שתיקה חתומה |
 
 ---
@@ -200,7 +200,31 @@
 - 11 טסטים, כולל **התרחיש המדויק שתיארת**: 2 inner (avi+dana),
   8 outer (committed-but-not-delivered).
 
-## כל הצעדים 1–8 הושלמו. סה"כ 130 / 130 טסטים עוברים.
+### ✅ צעד 9 — מיגרציית מכונת-המצב: אימות commitments + persistence (branch rikma-state-machine-migration)
+משלים את PLAN_rikma_as_state_machine §7 — שכבת האימות שהופכת את השדות
+האופציונליים מ-146 לאכיפים:
+- `src/lib/consent/deltaCheck.ts` — Delta validators: soundness (כל delta
+  מוצהר חייב להיות אמת) + completeness (שינויי balances/חברות בלי הצהרה = דחייה).
+- `src/lib/consent/policy.ts` — טבלת §8.2: אילו actions דורשים QuorumProof
+  (mission.approve, project.join/leave, project.amend, snapshot.commit).
+  יציאה עצמית (project.leave על עצמך) ריבונית — בלי קוורום.
+- `src/lib/consent/commitment.ts` — המאמת: replay של ancestor closure →
+  בדיקת `parentStateRoots` / `stateRoot` / `delta` / `quorum`. שני מצבים:
+  `available` (ברירת מחדל עד Phase 3 — שקר מוכח נדחה, לא-ניתן-לאימות = אזהרה)
+  ו-`strict` (אכיפה מלאה).
+- מחובר ל-`ingestEvent` (client) ול-`verifyConsentEvent` (server) — אירוע
+  עם stateRoot שלא מתחשב מחדש נדחה בדיוק כמו חתימה שגויה.
+- `mission.approve` reducer — הדוגמה מ-§6 רצה end-to-end: זיכוי hervachti
+  ב-bigint אגורות (D-12; `balances` הוסב number → bigint), payee הופך חבר.
+- `snapshot.commit` + `snapshot.vote` (§5.1) — checkpoints קוורומליים.
+  ה-snapshots מחוץ ל-state root (attestation על state ≠ state; מניעת
+  self-reference). ה-root המוצהר ב-predicate מאומת בחישוב-מחדש ב-ingest.
+- **Persistence (D-11)**: ה-store השרתי הפך ל-write-through cache מעל Strapi —
+  קולקציות חדשות `consent-event` (append-only, בלי update/delete routes)
+  ו-`user-key` (revocation בלבד, בלי מחיקה) ברפו 1.0b. Strapi לא זמין →
+  degradation שקט ל-memory-only; המראה לעולם לא חוסמת ingest.
+
+## כל הצעדים 1–9 הושלמו. סה"כ 154 / 154 טסטים עוברים.
 
 ---
 

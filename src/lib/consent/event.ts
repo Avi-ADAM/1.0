@@ -73,6 +73,8 @@ export const ACTIONS = {
   consensusTimeout: 'consensus.timeout',
   memberAway:      'member.away',
   timeTick:        'time.tick',
+  snapshotCommit:  'snapshot.commit',
+  snapshotVote:    'snapshot.vote',
   deviceCert:      'device.cert',
   deviceRevoke:    'device.revoke'
 } as const;
