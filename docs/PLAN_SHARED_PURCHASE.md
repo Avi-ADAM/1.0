@@ -1,363 +1,387 @@
-# Shared Purchase / Consensus Buying — Plan
+# Shared Purchase — קנייה משותפת ואיגוד ביקושים — Plan v2
 
 > מסמך עצמאי. **לא לערוך** את `PLAN_CONCIERGE.md` / `PLAN_COMPLEX_PRODUCTS.md`.
-> הנחה: סכמת הקונסיירז' (ratson-proposal, extracted_missions/resources, status_ratson, chat_forum, process) **כבר קיימת ב-Strapi** (יושמה במחשב אחר, עדיין לא בפרודקשן). הסכמות החדשות כאן מוסיפות שכבת "קנייה משותפת" מעליה.
+> **v2 (2026-07-01)** — שכתוב של v1. השינוי המרכזי: v1 בנה הכל סביב מודל אחד — "משאלה של יוזם אחד שאחרים מצטרפים אליה ומחליטים יחד" — ומשם נבעו כל מנגנוני הקונצנזוס, ההצבעות וה-willingness. v2 מוסיף את המסלול שהיה חסר: **איגוד ביקושים (Demand Aggregation)** — צרכנים עצמאיים שהמערכת מאגדת בלי שיצטרכו לוותר, להתפשר או להחליט שום דבר יחד — וממקם את מסלול-הקונצנזוס של v1 כמסלול משני לשימושים שבאמת דורשים החלטה משותפת.
+> הנחה: סכמת הקונסיירז' (ratson-proposal, extracted_missions/resources, status_ratson, chat_forum, process, `matchRatson`, Pinecone) **קיימת ועובדת** (ראה סטטוס ב-`PLAN_CONCIERGE.md` §★).
 
 ---
 
-## 1. Context
+## 1. שלוש צורות של "קנייה משותפת" — ולמה חייבים להפריד ביניהן
 
-המודל הקיים: משתמש בודד פותח Ratson, ספק קונה/מספק, הקבוצה משלמת דרך Sheirutpend עם הצבעת קונצנזוס יחידנית (סטראפי-side: `Sheirutpend.votes`, חישוב ב-`addVote.ts`).
-המודל שאנחנו מוסיפים: **משאלה היא יוזמה משותפת**. כמה אנשים מצטרפים, מקבלים החלטות יחד, ומשלמים יחד — לטיול קבוצתי, שיפוץ ציבורי, אירוע קהילתי, רכישה משותפת. ה-`allowJoin` הקיים ב-Ratson מקבל סוף-סוף משמעות.
+הבעיה העסקית: יש שירותים שקיימים **רק** בנפח. ספק ירקות מקומי לא יפתח משק בשביל סל שבועי אחד — אבל 10 סלים באותו אזור זה עסק. נהג מיניבוס לא ייסע בשביל נוסע אחד — אבל 10 נוסעים במחיר-למושב זה משתלם לכולם. מוצר דיגיטלי (קורס, כלי, מנוי) לא תלוי אזור בכלל — הסף שלו גלובלי.
 
-מטרות:
+הבעיה האנושית: ברגע שמחברים אנשים זרים לקבוצת-קנייה ומבקשים מהם **להחליט יחד**, מקבלים ויתורים, מריבות, ונטישה. לכן ההבחנה הקריטית היא לא "כמה אנשים" אלא **כמה החלטות משותפות** המוצר דורש:
 
-1. לחשוף `allowJoin` בטופס, להוסיף סוג-יוזמה (`joinKind`), שדות גיוס (min/max joiners, תאריך-סגירה).
-2. לתת לעובר-אורח להצטרף ל-Ratson פתוח (UI ציבורי + action `joinRatson`).
-3. לאפשר לקבוצה לקבל החלטות _פר-פריט_ ב-BOM שה-`extracted_*` / `ratson-proposal` ייצר.
-4. כשאין קונצנזוס מלא — להפעיל fallback מוגדר-מראש (skip / agreers-only / willingness-pricing) במקום לחסום.
-5. להציע משאלות פתוחות למשתמשים לפי גיאוגרפיה ותחומי עניין (lat/lng/radius + vallues, דרך Pinecone הקיים).
-6. לתרגם הסכמה לתשלום: כשהקבוצה מתחייבת → Sheirutpend פר-פריט → Tosplit/Haluka מחלקים כל פריט בין המסכימים לפי המודל.
+| | **A — יוזמה משותפת** | **B — מאגד ביקושים** | **C — הצעה מותנית-סף** |
+| --- | --- | --- | --- |
+| מי מתחיל | אדם אחד פותח משאלה ומזמין שותפים | אף אחד — המערכת מזהה משאלות דומות ומאגדת | **ספק** מפרסם "אני אפתח את זה אם N יחתמו" |
+| דוגמה | שיפוץ גינה שכונתית; אירוע שמתכננים יחד | סל ירקות שבועי; הסעה קבועה לעיר; מנוי SaaS | טיול מאורגן במיניבוס (מינ' 10); סדנה (מינ' 8) |
+| החלטות קבוצתיות | **כן** — תכולה, מחיר, מי משלם מה | **אפס** — כל אחד חותם על עסקה אישית | **אפס** — take it or leave it, פר-אדם |
+| כסף | משותף (Tosplit/Haluka) | **אישי** — N עסקאות נפרדות שמופעלות יחד | אישי — מחיר-למושב |
+| מנגנון הסכמה | הצבעות, קונצנזוס, willingness (v1) | אין. חתימה אישית = ההסכמה כולה | אין. חתימה אישית |
+| אזוריות | לפי המשאלה | פיזי=מקומי, דיגיטלי=גלובלי | לפי הגדרת הספק |
+| פוטנציאל מריבה | גבוה — מנוהל במפורש | **אפס by design** | אפס |
 
-המרכיב הקריטי: הסכמה מתפצלת ל-3 רמות — (א) הסכמה על-עצם-הפריט, (ב) הסכמה על-מחיר, (ג) הסכמה מי משלם. רוב התשתית קיימת — חסר חיבור והגדרה.
+**התובנה המרכזית של v2**: רוב מקרי-השימוש שחשבנו שהם A הם בעצם B או C. סל ירקות, הסעות, מנויים, סדנאות, טיולים סטנדרטיים — אף אחד מהם לא צריך שהקבוצה תחליט שום דבר. הקבוצה קיימת **רק כדי להגיע לסף הכדאיות**, וזה תפקיד של המערכת, לא של האנשים. מסלול A נשאר נחוץ — אבל רק למה שבאמת משותף (תכנון אירוע, שיפוץ ציבורי), והוא לא חוסם את B/C, שפשוטים ממנו בסדר גודל (לא נוגעים ב-`addVote.ts` בכלל).
 
----
-
-## 2. תשתית קיימת לשימוש חוזר (לא להמציא מחדש)
-
-| צורך                           | שכבה קיימת                                                  | קובץ                                                                                                        |
-| ------------------------------ | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| תאחסון משתתפים                 | `Ratson.users_permissions_users` (relation)                 | סכמה line 1772                                                                                              |
-| Toggle "פתוח להצטרפות"         | `Ratson.allowJoin` (Boolean)                                | סכמה line 1742 — שדה קיים, לא בטופס                                                                         |
-| מטא-משאלה (כתובת/רדיוס/תחומים) | `Ratson.lat/lng/radius/vallues/categories/sub_category`     | קיים                                                                                                        |
-| גזירת פריטים מהמשאלה           | `Ratson.extracted_missions/extracted_resources` (קונסיירז') | יושם                                                                                                        |
-| Object ההצעה                   | `ratson-proposal` (קונסיירז' §2.2)                          | יושם                                                                                                        |
-| ההצבעה עצמה                    | `Vote` relation + `addVote.ts`                              | `src/lib/server/actions/configs/addVote.ts:181-250`                                                         |
-| העברה לתשלום                   | `createSheirutpend` → `createSheirutFromPending`            | `actions/configs/createSheirutpend.ts`, `createSheirutFromPending.ts`                                       |
-| **פיצול תשלום**                | `Tosplit` + `Haluka` + `vots`/`prectentage`                 | סכמה line 2110/418; actions: `createHaluka`, `createSheirutHaluka`, `confirmSheirutHaluka`, `approveHaluka` |
-| התאמה וקטורית                  | Pinecone wired (Gemini 3072d, 5 namespaces)                 | `src/lib/embed/pinecone.ts`, `embed/matcher.ts`                                                             |
-| גיאו (סכמה בלבד)               | `User.lat/lng/radius`                                       | סכמה line ~5303 — לוגיקה ל-haversine **חסרה**                                                               |
-| מנגנון התראות                  | `NotificationOrchestrator` (email/push/telegram/socket)     | `src/lib/server/notifications/NotificationOrchestrator.ts`                                                  |
-| פרוסס + פורומים                | `createProcess`, `attachEntityToProcess`                    | `actions/configs/createProcess.ts`, `attachEntityToProcess.ts`                                              |
-| Acts כהמלצות למשתמש            | `Act` entity + `User.acts`                                  | סכמה                                                                                                        |
-
-**שינוי חיוני אחד בקיים**: כלל הקונצנזוס ב-`addVote.ts:228` הוא **קשיח לאחדפיות** (`positiveMemberVotes.length >= totalMembers`). חייב להפוך לקונפיגורבילי לפני שניתן לבנות קבוצת-קנייה.
+אותו מוצר יכול לחיות בשני מסלולים: "טיול לגליל" כ-C (הספק קבע מסלול ומחיר, חותמים או לא) לעומת "בואו נתכנן טיול יחד" כ-A. **ברירת המחדל של המערכת: המסלול נטול-המריבות.** A נבחר רק במפורש.
 
 ---
 
-## 3. הוספות סכמה ל-Strapi
+## 2. עקרונות אל-מריבה (חוקי היסוד של מסלולי B/C)
 
-### 3.1 הרחבת `api::ratson.ratson` — שדות חדשים
+אלה לא המלצות UX — אלה אילוצים אדריכליים. כל פיצ'ר עתידי במסלול B/C חייב לעבור אותם:
 
-| שדה                        | סוג                                                                                                                  | תיאור                                                                                |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `joinKind`                 | enum `['solo','group_trip','public_renovation','group_purchase','community_event','recurring_subscription','other']` | אופי היוזמה. `solo` = ההתנהגות של היום (אחד מארגן). שאר הערכים מפעילים מסלול shared. |
-| `minJoiners`               | Integer (default 1)                                                                                                  | סף מינימום משתתפים לפעולה                                                            |
-| `maxJoiners`               | Integer (nullable)                                                                                                   | תקרה אופציונלית                                                                      |
-| `joinDeadline`             | DateTime                                                                                                             | אחרי תאריך זה אי-אפשר להצטרף; אם `currentJoiners < minJoiners` — הריצה נכשלת/מוחזר   |
-| `consensusRule`            | enum `['unanimous','agreers_only']` (default `agreers_only`)                                                         | כלל ההצבעה ברירת מחדל לכל החלטות בתוך ה-Ratson                                       |
-| `partialConsensusFallback` | enum `['skip','agreers_only','willingness_pricing']` (default `skip`)                                                | מה לעשות עם פריט שלא עבר את הסף                                                      |
-| `willingnessModel`         | enum `['proportional_cap','pareto_sum','vickrey_light','manual_split']` (default `proportional_cap`)                 | רלוונטי רק כש-fallback = `willingness_pricing`; ראה §6                               |
-| `share_status`             | enum `['recruiting','locked','executing','completed','cancelled','expired']`                                         | מצב הקבוצה (אורתוגונלי ל-`status_ratson` שמתאר את המשאלה)                            |
-| `lockedAt`                 | DateTime                                                                                                             | מתי הקבוצה ננעלה ועברה ל-execution                                                   |
+1. **ריבונות אישית** — המשאלה של כל צרכן נשארת שלו. הצטרפות למאגד לא ממזגת משאלות, לא משנה אותן ולא מחייבת כלום. עזיבה לפני חתימה — חופשית ושקטה.
+2. **אפס החלטות קבוצתיות** — הסטנדרטיזציה קורית אצל הספק (הוא מגדיר את המוצר), ההתאמה האישית קורית בשוליים (כל חבר בוחר אופציות אישיות: גודל סל, נקודת איסוף, תוספות). אין שום שאלה שמופנית ל"קבוצה".
+3. **אין כסף משותף** — כל חתימה יוצרת עסקה אישית (Sheirutpend אישי מול הספק). אין קופה, אין חלוקה, אין Tosplit/Haluka במסלולים האלה. סכסוך תשלום/איכות הוא בין צרכן יחיד לספק — לעולם לא בין צרכן לצרכן.
+4. **הפעלה אטומית** — אף עסקה לא נכנסת לתוקף עד שההצעה הגיעה לסף שלה בתוך המועד. הגיעה — כולן מופעלות יחד; לא הגיעה — כולן פוקעות בשקט ואף אחד לא חייב כלום. אין מצב שבו מישהו "נתקע" משלם על קבוצה שהתפרקה.
+5. **תחרות במקום הצבעה** — אם שני ספקים מציעים לאותו מאגד, הקבוצה **לא מצביעה** איזה לבחור. כל הצעה חיה בנפרד, כל חבר חותם על מה שמתאים לו, וההצעה שמגיעה לסף שלה מופעלת (יכולות גם שתיים). השוק מכריע, לא אסיפה.
+6. **אנונימיות עד חתימה** — חברי מאגד רואים מספרים מצטברים ("11 משקי בית, תקציב מצטבר ~1,650₪/שבוע"), לא זהויות. אין לחץ חברתי, אין "למה הוא הצטרף והיא לא". זהות נחשפת לספק רק אחרי חתימה, ולחברים אחרים — רק אם המשתמש בחר (`visibility` פר-חבר).
+7. **הצטרפות ≠ התחייבות; חתימה = התחייבות** — שתי רמות בלבד. עניין (רך, הפיך, אנונימי) → חתימה על הצעה קונקרטית (מחייבת, עם פרטים מלאים: מחיר, מועד, תנאי ביטול). שום שלב-ביניים עמום.
+8. **פקיעה שקטה כברירת מחדל** — מאגד שלא הבשיל לא "נכשל" בפומבי ולא מייצר אשמה. הוא ממשיך לצבור עניין, או פוקע בלי רעש.
 
-**אילוצים**: כאשר `joinKind != 'solo'` ⇒ `allowJoin=true` חובה.
-
-### 3.2 ישות חדשה: `api::ratson-share.ratson-share`
-
-רשומה אחת פר-משתתף בקבוצה (יותר חזקה מ-relation `users_permissions_users` הקיים — נדרשת כדי לאחסן role, contribution, joinTime, willing-cap).
-
-| שדה                   | סוג                                                 |
-| --------------------- | --------------------------------------------------- |
-| `ratson`              | manyToOne → ratson                                  |
-| `user`                | manyToOne → users_permissions_user                  |
-| `role`                | enum `['initiator','joiner','observer']`            |
-| `maxContribution`     | Decimal nullable (תקרה גלובלית; אם null = ללא תקרה) |
-| `currency`            | relation → matbea                                   |
-| `joinedAt` / `leftAt` | DateTime                                            |
-| `status_share`        | enum `['active','left','completed']`                |
-| `notificationsOn`     | Boolean default true                                |
-
-> ה-relation הישן `Ratson.users_permissions_users` נשאר בשימוש כקיצור-קריאה (mirror של active members) ומתעדכן אטומית בהוספת/הסרת share.
-
-### 3.3 הרחבת `api::ratson-proposal.ratson-proposal` (יושם בקונסיירז')
-
-תוספות שדות לתמיכה בהחלטה קבוצתית פר-הצעה:
-
-| שדה                   | סוג                                                               | תיאור                                                                                           |
-| --------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `votes`               | oneToMany ← Vote (reverse, על-ידי הוספת `ratson_proposal` ל-Vote) | רשומות הצבעה                                                                                    |
-| `willingness_entries` | Component repeatable (`ratson_willingness_entry`, §3.4)           | התחייבויות פר-משתמש פר-פריט                                                                     |
-| `final_breakdown`     | JSON nullable                                                     | פלט של `evaluateRatsonConsensus`: אילו פריטים נכנסו, מי משלם כמה, מה היה ה-fallback שנעשה בפועל |
-| `tosplit`             | manyToOne → tosplit nullable                                      | קישור ל-Tosplit שנוצר אוטומטית עם נעילה                                                         |
-
-### 3.4 רכיב חדש: `ratson_willingness_entry` (component, repeatable)
-
-נאחסן רשומת willingness אחת פר-(משתמש × פריט ב-proposal):
-
-| שדה             | סוג                                                                                    |
-| --------------- | -------------------------------------------------------------------------------------- |
-| `user`          | relation → users_permissions_user                                                      |
-| `item_kind`     | enum `['proposal','covered_mission','covered_resource']`                               |
-| `item_idx`      | Integer (אינדקס ל-`covered_missions[i]` / `covered_resources[j]`; `-1` עבור הצעה כולה) |
-| `agree`         | Boolean (האם בכלל רוצה את הפריט)                                                       |
-| `willingAmount` | Decimal (כמה מוכן לשלם)                                                                |
-| `willingHours`  | Decimal nullable (אם הפריט הוא covered_mission — שעות שמוכן לתרום במקום כסף)           |
-| `submittedAt`   | DateTime                                                                               |
-| `note`          | String nullable                                                                        |
-
-### 3.5 הרחבת `api::vote.vote` (קיים)
-
-הוספת שני קישורים אופציונליים — מאפשרת לסקייל-בחזרה לקיים בלי ישות חדשה:
-
-- `ratson` manyToOne → ratson (nullable)
-- `ratson_proposal` manyToOne → ratson-proposal (nullable)
-- `item_kind` enum (כמו 3.4) — מאפשר וויט פר-פריט במקום פר-הצעה
-- `item_idx` Integer nullable
-
-> ה-Vote הקיים כבר מקושר ל-sheirutpend, matanotpend, decision, sheirut — הוספת ratson + ratson_proposal עקבית עם הדפוס.
-
-### 3.6 הרחבת `api::tosplit.tosplit` ו-`api::haluka.haluka`
-
-- `Tosplit.ratson_proposal` manyToOne → ratson-proposal (nullable) — קישור פיצול ל-proposal.
-- `Tosplit.split_origin` enum `['manual','willingness_proportional','willingness_pareto','willingness_vickrey','equal']` — מתעד מאיזה מודל המספרים נגזרו.
-- `Haluka.ratson_share` manyToOne → ratson-share (nullable) — קישור החלק של אדם ספציפי בקבוצה.
-
-> אין צורך ב-entity חדש ל-"שכבת הפיצול הקבוצתית" — Tosplit + Haluka **כבר** מתממשים את זה (עם vots, prectentage, finished, sales). רק הוספנו שני קישורים לקונטקסט.
+> **למה זה מחסל את המריבות**: כל מריבה בקבוצת-קנייה נובעת מאחד משלושה — תכולה משותפת, כסף משותף, או בחירה משותפת. עקרונות 2, 3, 5 מוציאים את שלושתם מהמשוואה מבנית. מה שנשאר לכל משתתף זו החלטה צרכנית רגילה: "העסקה האישית הזאת שווה לי או לא".
 
 ---
 
-## 4. שינוי בליבת ההצבעה (קריטי)
+## 3. תשתית קיימת לשימוש חוזר (עודכן מול הקוד)
 
-קובץ: `src/lib/server/actions/configs/addVote.ts:181-250`.
+| צורך | שכבה קיימת | הערה |
+| --- | --- | --- |
+| המשאלה האישית | `Ratson` על כל שדותיו — כולל **`frequency`** (מחזוריות! סל שבועי), **`isOnline`** (דיגיטלי/גלובלי), `lat/lng/radius`, `categories`, `vallues`, `ai_meta`, `pinecone_id` | הכל קיים; `frequency`+`isOnline` הופכים לשדות מפתח באיגוד |
+| פירוק מובנה של המשאלה | קונסיירז': `extracted_missions/resources` + חילוץ חי בכתיבה | קיים — זה מה שמאפשר לזהות ש"ירקות אורגניים כל שבוע" ≈ "סל ירקות שבועי" |
+| דמיון סמנטי | Pinecone (Gemini 3072d) + `matchRatson` (keyword/vector) | קיים — האיגוד הוא `matchRatson` בין משאלות-למשאלות במקום משאלה-לספקים |
+| הצעת ספק | `ratson-proposal` + surfacing ב-`/moach/[projectId]/wishes`, `/deals` | קיים למשאלה בודדת; מורחב למאגד (§6) |
+| הסכמה→עסקה | `createSheirutpend` → `approveSheirutpend` → `createSheirutFromPending` | קיים — מקבל מצב "מותנה-סף" (§7) |
+| התראות | `NotificationOrchestrator` (email/push/telegram/socket) | קיים |
+| שדות גיוס | `joinKind`/`minJoiners`/`maxJoiners`/`joinDeadline` על Ratson | **כבר במיגרציה** (ראה PLAN_CONCIERGE ★) — משמשים את מסלול A ואת C |
+| פיצול כסף קבוצתי | `Tosplit`/`Haluka` | רלוונטי **רק למסלול A** |
+| הצבעות | `Vote` + `addVote.ts` | רלוונטי **רק למסלול A** — מסלולי B/C לא נוגעים בו |
+| גיאו | `User.lat/lng/radius`, `Ratson.lat/lng/radius` — לוגיקת haversine **חסרה** | §10 |
 
-היום סף הקונצנזוס קשיח: `positiveMemberVotes.length >= totalMembers` (line ~228). יש להחליף בפונקציה משותפת חדשה:
+---
+
+## 4. מסלול B — המאגד (Demand Pool): סכמה
+
+### 4.1 ישות חדשה: `api::maagad.maagad` (מאגד ביקוש)
+
+אשכול של משאלות דומות שהמערכת (או אדם) פתחה. המאגד **לא מחליף** את המשאלות — הוא שכבת-על שמצביעה עליהן.
+
+| שדה | סוג | תיאור |
+| --- | --- | --- |
+| `name` | String | תיאור קנוני של הביקוש ("סל ירקות אורגני שבועי — עמק יזרעאל") |
+| `canonical_desc` | Text | ניסוח מאוחד שה-AI מפיק מהמשאלות החברות — מה שספק רואה |
+| `scope` | enum `['local','regional','global']` | `global` נגזר אוטומטית כשרוב המשאלות `isOnline` |
+| `lat` / `lng` / `radius` | Decimal | centroid + רדיוס-כיסוי של החברים (ריק כש-`global`) |
+| `frequency` | enum כמו ב-Ratson (`one_time`,`weekly`,`monthly`…) | מחזוריות הביקוש |
+| `categories` / `vallues` | relations (כמו Ratson) | ל-matching ספקים |
+| `pinecone_id` | String | embedding של `canonical_desc` — לאיגוד המשכי ולהתאמת ספקים |
+| `status_maagad` | enum `['forming','visible','offered','activating','active','dormant','closed']` | ראה מחזור-חיים §7.4 |
+| `origin` | enum `['system_cluster','user_opened','supplier_offer']` | מי יצר — אשכול אוטומטי / משתמש שפתח מאגד במקום משאלה / ספק (מסלול C) |
+| `viability_hint` | Integer nullable | הערכת "כמה צריך כדי שיהיה כדאי" — heuristic/AI, לתצוגת progress לפני שיש הצעה אמיתית |
+| `chat_forum` | oneToOne → chat | פורום שאלות-לספק (לא פורום החלטות! ראה §12) |
+| `process` | oneToOne → partof | עוגן process, כמו Ratson |
+
+### 4.2 ישות חדשה: `api::maagad-member.maagad-member`
+
+חברות של צרכן במאגד. נפרד מ-`ratson-share` של מסלול A — כי הסמנטיקה הפוכה (אין תרומה לקופה, אין role).
+
+| שדה | סוג | תיאור |
+| --- | --- | --- |
+| `maagad` | manyToOne → maagad | |
+| `user` | manyToOne → users_permissions_user | |
+| `ratson` | manyToOne → ratson nullable | המשאלה המקורית שבגללה אוגד; nullable כי אפשר להצטרף למאגד גם בלי משאלה קודמת (כפתור "גם אני") |
+| `status_member` | enum `['suggested','interested','signed','active','left','expired']` | `suggested` = המערכת הציעה לו, טרם הגיב |
+| `signed_offer` | manyToOne → maagad-offer nullable | על איזו הצעה חתם |
+| `sheirutpend` | manyToOne → sheirutpend nullable | העסקה האישית שנוצרה בחתימה |
+| `options` | JSON | בחירות אישיות מתוך `maagad-offer.options` (גודל סל, נקודת איסוף…) |
+| `visibility` | enum `['anonymous','first_name','full']` default `anonymous` | מה חברים אחרים רואים |
+| `joinedAt` / `signedAt` / `leftAt` | DateTime | |
+
+### 4.3 ישות חדשה: `api::maagad-offer.maagad-offer`
+
+הצעת ספק למאגד. **סטנדרטית ואטומית**: מחיר-ליחידה, סף, מועד. זה החוזה שכל חבר חותם עליו אישית.
+
+| שדה | סוג | תיאור |
+| --- | --- | --- |
+| `maagad` | manyToOne → maagad | |
+| `proposer_user` / `proposer_project` | relations (כמו ratson-proposal) | |
+| `title` / `description` | String / Text | מה בדיוק מקבלים |
+| `unit_price` | Decimal + `currency` → matbea | מחיר לצרכן (לסל, למושב, למנוי) |
+| `price_tiers` | JSON nullable | מדרגות: `[{min:10, price:100},{min:20, price:80}]` — המחיר יורד ככל שנחתמים יותר; **החיוב לפי המדרגה שהושגה בפועל בהפעלה** (כולם מרוויחים מהצטרפות של עוד אנשים — תמריץ חיובי במקום מריבה) |
+| `min_participants` | Integer | הסף. מתחתיו — אין עסקה |
+| `max_participants` | Integer nullable | קיבולת |
+| `sign_deadline` | DateTime | עד מתי אוספים חתימות |
+| `options` | JSON | אופציות אישיות שהספק מגדיר: `[{key:'size', choices:['S','M','L'], priceDelta:[0,15,30]}, {key:'pickup', choices:[…]}]` |
+| `recurrence` | enum + `cycle_terms` JSON | להצעה מחזורית: מה קורה כל מחזור, תנאי יציאה (§7.5) |
+| `cancellation_terms` | Text | תנאי ביטול — חלק מהחוזה שחותמים עליו |
+| `status_offer` | enum `['open','quorum_reached','activated','expired','withdrawn']` | |
+| `signed_count` | Integer (denormalized) | לתצוגת progress מהירה |
+
+> **אין** שדה "הצבעת קבוצה על ההצעה". כמה הצעות `open` יכולות לחיות במקביל על אותו מאגד (עקרון 5).
+
+### 4.4 הרחבות מינימליות לישויות קיימות
+
+- `Sheirutpend.maagad_offer` manyToOne → maagad-offer (nullable) + `Sheirutpend.conditional` Boolean default false — עסקה מותנית-סף לא ניתנת ל-`createSheirutFromPending` עד שההצעה `activated` (guard בשרת). **אפס השפעה על זרימות קיימות** — השדות nullable/false.
+- `Ratson.maagad` manyToOne → maagad (nullable) — למשאלה שאוגדה; המשאלה נשארת חיה ועצמאית.
+- `Ratson.aggregation_opt_out` Boolean default false — משתמש שלא רוצה שהמשאלה שלו תאוגד.
+
+---
+
+## 5. אלגוריתם האיגוד — איך המערכת מזהה ש-10 אנשים רוצים אותו דבר
+
+Job מתוזמן (+ טריגר אחרי כל `createRatson`/עדכון): `clusterRatsons`.
+
+1. **מועמדות**: משאלות `status_ratson='open'`, לא `fulfilled`, לא `aggregation_opt_out`, שלא חברות כבר במאגד פעיל.
+2. **דמיון סמנטי**: לכל משאלה — `pinecone.query` על namespace המשאלות (embedding כבר קיים מהקונסיירז'). סף התחלתי cosine ≥ 0.82 (לכייל עם דאטה אמיתי).
+3. **תאימות קשיחה** (חובה, לא score):
+   - **Scope**: אם המשאלה פיזית (`isOnline=false`) — חיתוך גיאוגרפי: `withinRadius` הדדי (או מרחק ≤ min(radius_i, radius_j)); אם דיגיטלית — מדלגים על גיאו לגמרי, מסננים רק שפה/מטבע.
+   - **Frequency**: `weekly` לא מתאגד עם `one_time` (סל שבועי ≠ קנייה חד-פעמית של ירקות).
+   - **קטגוריה**: לפחות קטגוריה משותפת אחת או sub_category זהה.
+4. **גיבוש**: אשכול בגודל ≥ K (התחלה: K=3) → יצירת `maagad` עם `canonical_desc` שה-LLM מנסח מתוך המשאלות (בלי לחשוף פרטים אישיים), centroid גיאוגרפי, `viability_hint`.
+5. **הזמנה, לא צירוף**: כל בעל-משאלה מקבל `maagad-member` בסטטוס `suggested` + התראה: *"יש עוד 6 אנשים באזורך שמחפשים סל ירקות שבועי. יחד — לספק מקומי שווה לפתוח את זה. מצטרף/ת?"*. **אף אחד לא מצורף אוטומטית** — עקרון 1.
+6. **איגוד המשכי**: משאלה חדשה שדומה למאגד קיים (`pinecone_id` של המאגד) → הצעת הצטרפות ישירה במקום אשכול חדש. מאגדים דומים מדי → הצעת merge (פעולת אדמין/אוטומטית, החברים רק מקבלים עדכון — אין להם מה להחליט, החברות שלהם נשמרת כמו שהיא).
+
+בנוסף — **פתיחה ידנית**: משתמש יכול לפתוח מאגד ישירות ("אני מחפש עוד אנשים לסל ירקות") — `origin='user_opened'`. זה *לא* הופך אותו למנהל ולא נותן לו סמכויות על אחרים; הוא סתם החבר הראשון. אין תפקיד "יוזם" במסלול B — עוד מקור-מריבות שנחסך.
+
+---
+
+## 6. חיבור לנותני השירות — הצד השני של השוק
+
+המאגד שווה משהו רק אם ספק רואה אותו. שלושה ערוצים:
+
+### 6.1 Surfacing לספקים קיימים
+
+- **`/moach/[projectId]/demand`** (חדש, ליד `/wishes` הקיים): מאגדים `visible` שמתאימים לפרויקט — לפי `matchRatson` logic קיים אבל ברמת המאגד (categories/vallues/vector) + חיתוך גיאו בין אזור-השירות של הפרויקט ל-centroid+radius של המאגד (מאגד `global` עובר לכל ספק דיגיטלי מתאים). התצוגה: *"12 משקי בית ברדיוס 15 ק"מ ממך מחפשים סל ירקות שבועי, תקציב מצטבר ~1,800₪/שבוע"* — מספרים מצטברים, אפס זהויות (עקרון 6).
+- **התראה יזומה**: מאגד חדש/גדל שחוצה את `viability_hint` → push לספקים המתאימים ביותר (top-N לפי score). זו ההזדמנות העסקית מוגשת אליהם.
+
+### 6.2 Surfacing לספקים *פוטנציאליים* (גיוס!)
+
+זה ההבדל בין "עוד פיצ'ר" ל"מנוע צמיחה": ביקוש מצטבר גלוי הוא כלי גיוס ספקים. עמוד ציבורי **`/demand`** (browse, ללא הרשמה) של מאגדים `visible` לפי אזור/קטגוריה — *"באזורך מחכים: 12 סלי ירקות, 8 חוגי ילדים, 15 מנויי חדר-כושר"*. CTA: "אתה יכול לספק את זה? הירשם והצע". שיתוף החוצה (share links) — חברי מאגד יכולים להפיץ כדי למשוך ספק.
+
+### 6.3 ההצעה
+
+`createMaagadOffer` — ספק מגיש הצעה (§4.3). ולידציה: מחובר לפרויקט/פרופיל, שדות חובה מלאים, `min_participants ≥ 2`. ההצעה נשלחת לכל החברים (`interested`+`suggested`) כהתראה + מופיעה בעמוד המאגד. שאלות הבהרה — ב-`chat_forum` של המאגד (שאלות צרכן↔ספק, גלוי לכולם; **לא** ערוץ החלטות).
+
+**מו"מ במסלול B הוא עדכון-הצעה, לא דיון**: ספק שרואה שההצעה לא מתקדמת יכול לפרסם גרסה מתוקנת (מחיר/תנאים). חתימות קיימות על הגרסה הישנה נשארות בתוקף אם החדשה זהה-או-טובה-יותר לכולם (מחיר ≤, תנאים ⊇), אחרת נדרש אישור-מחדש בלחיצה. אין מו"מ קבוצתי.
+
+---
+
+## 7. חתימה, סף והפעלה אטומית
+
+### 7.1 חתימה — `signMaagadOffer`
+
+חבר חותם על הצעה: בוחר `options` אישיות, רואה מחיר סופי (unit_price + deltas; אם יש `price_tiers` — רואה טווח: "80–100₪ תלוי כמה נחתום"), מאשר `cancellation_terms`.
+בשרת: `maagad-member.status='signed'` + `signed_offer` + יצירת **Sheirutpend אישי** `conditional=true` מול הספק, עם פירוט העסקה. עדכון `signed_count`.
+
+### 7.2 הגעה לסף — הפעלה אטומית
+
+כש-`signed_count ≥ min_participants` (בתוך `sign_deadline`):
+
+1. `status_offer='quorum_reached'` + התראה לספק: **הספק מאשר סופית** (confirm) — הוא הצד שהתחייבותו תלויה בנפח, מגיע לו לראות את המספר הסופי. חלון אישור מוגדר (48h ברירת מחדל). אפשר גם auto-confirm אם סימן זאת מראש בהצעה.
+2. עם אישור: `activateMaagadOffer` — לולאה על כל החתומים: `Sheirutpend.conditional=false` → המסלול הקיים (`approveSheirutpend`/`createSheirutFromPending`) רץ פר-עסקה. אם יש `price_tiers` — המחיר ננעל לפי המדרגה שהושגה, לכולם.
+3. `status_offer='activated'`, `status_maagad='active'`, members→`active`. התראת "יצאנו לדרך" לכולם.
+4. חתומים על הצעות *אחרות* של אותו מאגד שלא הופעלו — נשארים חתומים עד ה-deadline של אותה הצעה (ייתכנו שתי הצעות פעילות; צרכן שחתם על שתיהן — מקבל את שתיהן, זו הייתה בחירתו האישית. ה-UI מזהיר בחתימה כפולה).
+
+### 7.3 אי-הגעה לסף — פקיעה שקטה
+
+`sign_deadline` עבר ו-`signed_count < min`: `status_offer='expired'`, כל ה-Sheirutpend המותנים → archived, members חוזרים ל-`interested`. התראה רכה אחת ("ההצעה לא הבשילה הפעם; המאגד ממשיך לצבור חברים"). לספק — סיכום + אופציה להציע שוב בתנאים אחרים. **אף אחד לא חויב, אף אחד לא אשם** (עקרון 8).
+
+מקרי ביניים: ספק רשאי להפעיל גם מתחת ל-min (זכותו, המחיר לפי ההצעה — לא מעלים מחיר על החתומים בדיעבד); חתום שמבטל לפני הפעלה → `signed_count--`, ואם ירד מתחת לסף אחרי שכבר `quorum_reached` — חלון backfill קצר (waitlist: `interested` שקיבלו "התפנה מקום") לפני שהספק מחליט.
+
+### 7.4 מחזור חיי המאגד
 
 ```
-src/lib/server/consensus/evaluateConsensus.ts  (חדש)
-  evaluateConsensus({
-    voters: User[],          // קבוצת המצביעים הזכאית (project members או ratson-shares)
-    votes: Vote[],
-    rule: 'unanimous'|'agreers_only'
-  }) → { reached: boolean, agreers: User[], dissenters: User[], abstainers: User[] }
+forming (נוצר, מגייס עניין)
+  → visible (≥K חברים interested — נחשף לספקים; לפני כן לא שווה להציג)
+  → offered (יש הצעה אחת לפחות open)
+  → activating (הצעה הגיעה לסף, ממתין לאישור ספק)
+  → active (הצעה הופעלה — עסקאות רצות)
+  → dormant (אין הצעות חיות ואין תנועה X ימים — לא מוצג לספקים, חברים נשארים)
+  → closed (ידני/ניקוי)
 ```
 
-`addVote.ts` עובר לקרוא ל-`evaluateConsensus` עם הכלל המתאים לפי הישות שעליה מצביעים (sheirutpend ⇒ project rule הקיים; ratson_proposal ⇒ `ratson.consensusRule`).
+`active` לא סוגר את המאגד: לסל שבועי, המאגד ממשיך לגייס (waitlist למחזור הבא / להגדלת קיבולת הספק).
 
-**תאימות אחורה**: דיפולט = `unanimous` (ההתנהגות הקיימת). הזרימה של sheirutpend עם project יחיד ממשיכה לעבוד בלי שינוי.
+### 7.5 מחזוריות — סל הירקות לאורך זמן
 
----
+הצעה עם `recurrence != one_time` מפעילה עסקאות מתמשכות:
 
-## 5. Action Configs חדשים
-
-תחת `src/lib/server/actions/configs/`:
-
-1. **`joinRatson.ts`** — מוסיף משתמש ל-Ratson פתוח: יצירת `ratson-share`, עדכון `Ratson.users_permissions_users`, attach ל-`chat_forum`, התראת מנהל ה-Ratson. בדיקות: `allowJoin=true`, `share_status='recruiting'`, `currentJoiners < maxJoiners`, `now < joinDeadline`, לא קיים share אקטיבי לאותו user.
-2. **`leaveRatson.ts`** — `status_share='left'`, leftAt. אם היוזם עוזב → או העברת בעלות לחבר ותיק או `share_status='cancelled'`.
-3. **`lockRatson.ts`** — סוגר הצטרפויות. בדיקה: `currentJoiners >= minJoiners`. `share_status='locked'`, `lockedAt=now`. מפעיל matching אוטומטי (קונסיירז' `matchRatson`).
-4. **`recordWillingness.ts`** — append/upsert ל-`ratson_proposal.willingness_entries` (לפי user × item). לוגית רץ פר-פריט; קליינט יכול לשלוח batch.
-5. **`voteOnRatsonProposal.ts`** — wrapper דק על `addVote` הקיים, עם `ratson_proposal=id` ו-`item_kind/item_idx` אופציונליים. אחרי כל הצבעה, אם כל המצביעים בקבוצה השלימו → trigger אוטומטי ל-`evaluateRatsonConsensus`.
-6. **`evaluateRatsonConsensus.ts`** — הליבה. לפעולה אחת:
-   - לכל פריט ב-proposal (proposal-level + כל covered_mission + כל covered_resource): קורא `evaluateConsensus` עם הכלל מ-Ratson.
-   - לפי תוצאה ו-`partialConsensusFallback`: מסמן את הפריט כ-`included`/`excluded`/`willingness_priced`.
-   - אם `willingness_priced` — מחשב פיצול לפי `willingnessModel` (ראה §6).
-   - שומר את התוצאה ב-`ratson_proposal.final_breakdown` (JSON).
-   - **לא יוצר Sheirutpend עדיין** — מציג אותה לקבוצה לאישור סופי (avoid surprise).
-7. **`confirmRatsonExecution.ts`** — אחרי שהקבוצה רואה את ה-final_breakdown ומאשרת:
-   - יוצר Sheirutpend (קריאה ל-`createSheirutpend` הקיים) פר-פריט כלול, עם `users_permissions_users` = רק המסכימים/משתתפים בפריט.
-   - יוצר Tosplit + Haluka פר-Sheirutpend על-בסיס `final_breakdown`; ממלא `prectentage` או `amount` לכל Haluka.
-   - מקשר את כולם ל-`ratson_proposal.tosplit`.
-   - `ratson.share_status='executing'`.
-   - התראות לכל המשתתפים.
-8. **`suggestRatsonsToUser.ts`** — מריץ matching של משאלות פתוחות (`access_mode='public'`, `allowJoin=true`, `share_status='recruiting'`) למשתמש: keyword (vallues/categories) + geo (haversine פר-`User.lat/lng/radius` × `Ratson.lat/lng/radius`) + vector (Pinecone — מבוסס `pinecone_id` של ה-Ratson). יוצר `Act` רשומות עם המלצות. job מתוזמן + on-demand.
-9. **`cancelRatson.ts` / `expireRatson.ts`** — סגירה. אם כבר התחיל execution — מצריך הצבעת קונצנזוס לסגירה.
-
-### QIDs חדשים בקובץ `src/routes/api/send/qids.js`
-
-(לקבוע מספרים שלא מתנגשים עם 100-109 של קונסיירז'; הצעה: 130-145)
-
-- `130joinRatson`, `131leaveRatson`, `132lockRatson`
-- `133createRatsonShare`, `134updateRatsonShare`, `135queryRatsonShares`
-- `136recordWillingness`, `137queryWillingnessForProposal`
-- `138createRatsonVote`, `139queryRatsonVotes`
-- `140updateRatsonProposalBreakdown`
-- `141createTosplitFromRatson`, `142createHalukasFromBreakdown`
-- `143listOpenJoinableRatsons`, `144listMyRatsonShares`
-- `145createActForRatsonSuggestion`
+- ההפעלה יוצרת התקשרות-מסגרת פר-חבר; כל מחזור (שבוע) = fulfillment תחת אותו Sheirut (לא Sheirutpend חדש כל שבוע — להשתמש במנגנון `sheirut-fulfillment` הקיים מ-PLAN_COMPLEX_PRODUCTS).
+- **יציאה ממנוי**: לפי `cycle_terms` שנחתמו (למשל הודעה של שבועיים). יוצא → הספק מקבל עדכון + waitlist backfill אוטומטי.
+- **שחיקה מתחת לסף**: אם מספר הפעילים יורד מתחת ל-`min_participants` — לא מפרקים אוטומטית: התראה לספק + פתיחת גיוס מחודש (`visible` שוב) + חלון X מחזורים. הספק מחליט אם להמשיך, להעלות מחיר לפי tiers שהוגדרו מראש (רק אם הוגדרו — אין שינוי חד-צדדי), או לסיים לפי התנאים.
 
 ---
 
-## 6. מודלי Willingness Pricing (לבחירה פר-Ratson)
+## 8. מסלול C — הצעה מותנית-סף יזומת-ספק
 
-כש-`partialConsensusFallback='willingness_pricing'` והפריט לא קיבל קונצנזוס לגבי מחיר:
+ה"מיניבוס": הספק לא מחכה שביקוש יתאגד — הוא מפרסם הצעה, והמערכת מגייסת לה חתומים.
 
-### 6.1 `proportional_cap` (ברירת מחדל מוצעת)
+- `createMaagadOffer` עם `origin='supplier_offer'`: נוצר `maagad` עטיפה (scope/גיאו/קטגוריות לפי ההצעה) + ההצעה עצמה. זה בדיוק אותו מנגנון של §6–7 — **אין קוד חדש מלבד נקודת-כניסה**.
+- הפצה: (א) התאמה למשאלות פתוחות קיימות — `matchRatson` הפוך, המשאלות שמתאימות מקבלות את ההצעה כהצעת-הצטרפות; (ב) פיד ההמלצות בלב (`suggestToUser` §11); (ג) עמוד ציבורי `/demand/[id]` עם progress bar ("7/10 נרשמו — נשארו 4 ימים") — ניתן לשיתוף החוצה, מכניס משתמשים חדשים למערכת.
+- כל השאר זהה: חתימה אישית, סף, deadline, הפעלה אטומית, פקיעה שקטה.
 
-תנאי-קנייה: `Σ willingAmount ≥ itemPrice`.
-חישוב Haluka: `share_i = (willingAmount_i / Σ willingAmount) × itemPrice` — כל אחד משלם פחות או שווה למה שהיה מוכן, סכום = מחיר בדיוק.
-יתרון: אף אחד לא משלם יותר מההצעה שלו, סכום מדויק. מודל פשוט להסבר.
-
-### 6.2 `pareto_sum`
-
-תנאי-קנייה: `Σ willingAmount ≥ itemPrice`.
-חישוב Haluka: כל אחד משלם **בדיוק** את `willingAmount_i`. עודף (`Σ - itemPrice`) מצטבר ל-bounti של ה-Ratson או למצטבר פרויקטלי.
-יתרון: דווח-אמת מתוגמל (giving more = paying more), טוב לקהילות גיוס.
-
-### 6.3 `vickrey_light`
-
-תנאי-קנייה: `count(willingAmount_i ≥ minSharePrice) ≥ minPayersForItem`, כאשר `minSharePrice = itemPrice / minPayersForItem`.
-חישוב Haluka: כולם משלמים את המחיר השני-הנמוך מבין המסכימים (מנגנון "shaving" של Vickrey).
-יתרון: מאוד אטרקטיבי לפרויקטים — מעודד דיווח אמת. **חיסרון: מורכב להסבר**.
-
-### 6.4 `manual_split`
-
-ה-creator מקבל את ה-breakdown עם `willingAmount_i` כהמלצה, ועורך ידנית לפני `confirmRatsonExecution`. שמרני, בטוח, מתאים לתחילת הדרך.
-
-> בכל המודלים: אם תנאי-הקנייה נכשל → הפריט נופל לפעולה הבאה לפי `partialConsensusFallback` (skip או agreers_only). `evaluateRatsonConsensus` מתעד את ה-fallback chain ב-`final_breakdown.fallback_trace[]`.
+> זה גם המסלול הטבעי לספק שראה מאגד אבל רוצה להציע משהו קצת אחר ממה שהתבקש — הוא פשוט פותח הצעה נפרדת והשוק מכריע.
 
 ---
 
-## 7. UI חדש
+## 9. מסלול A — יוזמה משותפת (v1, מתומצת ומותנית)
 
-### 7.1 הרחבת `src/lib/components/addnew/newIwant.svelte` (טופס משאלה)
+נשאר בתוקף למקרים שהם באמת שיתופיים — קבוצה שמעצבת יחד תכולה (שיפוץ ציבורי, אירוע קהילתי, טיול שמתכננים ביחד). עיקרי v1 שנשמרים, בסדר עדיפות מופחת:
 
-חשיפת `allowJoin` כ-Switch בולט. כש-`true` נפתח אקורדיון "קבוצה":
+- **`ratson-share`** (§3.2 של v1) — חברות עם role/contribution — כבסיס להצטרפות ליוזמה.
+- **רפקטור `addVote.ts` → `evaluateConsensus`** משותף עם כלל קונפיגורבילי (`unanimous`/`agreers_only`; דיפולט `unanimous` = אפס רגרסיה). זה השינוי היחיד בליבה קיימת, והוא נדרש **רק** למסלול A.
+- **החלטות פר-פריט** על `ratson-proposal` (votes עם `item_kind`/`item_idx`) + **fallback** לפריט בלי קונצנזוס: `skip` / `agreers_only` / `willingness_pricing`.
+- **מודלי willingness** — `proportional_cap` (דיפולט; אף אחד לא משלם יותר משהצהיר, הסכום מתכנס למחיר), `manual_split`; `pareto_sum`/`vickrey_light` נדחים ל-opt-in מתקדם מאוחר.
+- **ביצוע**: `final_breakdown` מוצג לאישור סופי → Sheirutpend פר-פריט + `Tosplit`/`Haluka` לפי ה-breakdown.
 
-- `joinKind` (chooser)
-- `minJoiners` / `maxJoiners`
-- `joinDeadline`
-- `consensusRule` (chooser, ברירת מחדל `majority`) + `consensusThreshold` (slider, רק אם `threshold`)
-- `partialConsensusFallback` (chooser) + `willingnessModel` (chooser, רק אם `willingness_pricing`)
-- preview של דוגמת ה-Haluka שתיווצר (תיאור מילולי)
+**שינויים מ-v1 לאור עקרונות §2:**
 
-> שיקול UX: הפרמטרים האלה מציפים. ברירת מחדל "Smart" — `consensusRule='majority'`, `partialConsensusFallback='agreers_only'` — מסתירה הכל ב"advanced".
-
-### 7.2 רכיבי `src/lib/components/concierge/` חדשים (משלימים את §4 של PLAN_CONCIERGE)
-
-- **`JoinersPanel.svelte`** — רשימת `ratson-share`, סטטוס recruiting/locked, כפתורי join/leave.
-- **`ProposalGroupReview.svelte`** — תצוגה פר-פריט של הצעה עם:
-  - מצב הצבעה (X/Y הצביעו, מי מסכים, מי לא)
-  - שדות `willingAmount`/`willingHours` עבור המשתמש הנוכחי (אם רלוונטי)
-  - תצוגה צפויה של ה-breakdown עם פעולת "calculate preview" ←‏ `evaluateRatsonConsensus` בלי commit
-- **`FinalBreakdownView.svelte`** — תצוגת `final_breakdown` עם פירוט פר-משתמש (כמה אני משלם, על מה, לפי איזה fallback). כפתור confirm/cancel.
-- **`SharePaymentCard.svelte`** — בכרטיסי `lev/cards/`, מציג את חלקי ה-Haluka הפעילים של המשתמש כתוצאה מ-Ratson share.
-
-### 7.3 דף ציבורי `src/routes/(regandnon)/wish/[id]/+page.svelte` (קיים מקונסיירז')
-
-תוספת: אם `allowJoin && share_status='recruiting'` — כפתור "Join" (CTA ראשי).
-
-### 7.4 פיד הצעות בעמוד הבית/`lev`
-
-רכיב חדש `src/lib/components/lev/SuggestedWishes.svelte` — מציג Acts מסוג `'ratson_suggestion'` ע"י `suggestRatsonsToUser` (geo + interests).
+1. **A הוא opt-in מפורש** — הטופס מציע קודם "לחפש/לפתוח מאגד" (B); "יוזמה משותפת עם החלטות קבוצתיות" היא בחירה מודעת עם הסבר על המחויבות.
+2. **כלל-הכרעה נבחר מראש וגלוי למצטרפים** — מי שמצטרף יודע בדיוק איך מחליטים לפני שנכנס. אין שינוי כללים באמצע (נעילת `consensusRule` אחרי המצטרף הראשון).
+3. **מבנה מריבה-ממוזערת גם כאן**: ברירת המחדל `agreers_only` — מי שלא רוצה פריט פשוט לא משתתף בו ולא משלם עליו (mini-מאגד פר-פריט), במקום לחסום את כולם. `unanimous` שמור למקרים שבאמת דורשים את כולם.
+4. QIDs ופירוט מלא: v1 §3–§7 נשארים הרפרנס הטכני למסלול הזה (היסטוריית git של המסמך), מיושמים רק אחרי Track P (ראה §13).
 
 ---
 
-## 8. Geo Matching — תוספת חסרה
+## 10. גיאו ו-Scope
 
-תחת `src/lib/server/geo/`:
+תחת `src/lib/server/geo/` (כמו v1): `haversine.ts`, `withinRadius.ts`. שימושים: איגוד (§5.3), התאמת ספק↔מאגד (§6.1), פיד המלצות. Prefilter מלבני דרך Strapi (`lat_gte/lte`) → haversine מדויק ב-Node. מספיק עד עשרות-אלפי רשומות; PostGIS בעתיד אם צריך.
 
-- `haversine.ts` — חישוב מרחק קלאסי.
-- `withinRadius.ts` — `(userLat, userLng, userRadius, ratsonLat, ratsonLng, ratsonRadius) → boolean | distance`.
-- אינטגרציה ב-`suggestRatsonsToUser.ts` ובכל קוואיירי שמסנן רשימת Ratsons ציבוריים (rectangular bounding-box prefilter דרך Strapi `lat_gte/lte`, ואז haversine מדויק ב-Node).
-
-> אם בעתיד נצטרך scale, ניתן לעבור ל-PostGIS plugin של Strapi. כרגע — bounding box + filter ב-Node מספיק עד עשרות אלפי Ratsons.
+**כלל ה-scope**: `isOnline=true` (מוצר דיגיטלי/מרחוק) ⇒ הגיאו לא משתתף בכלל — לא באיגוד ולא בהתאמת ספקים; מסננים רק שפה ומטבע. מאגד יכול להיות מעורב-scope רק אם השירות ניתן מרחוק לכולם. שירות פיזי בלי מיקום על המשאלה → prompt להשלמת מיקום לפני איגוד.
 
 ---
 
-## 9. Milestones
+## 11. Actions + QIDs
 
-| #    | מטרה                                                                                                                                        | תוצר                                                | flag                                 |
-| ---- | ------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------ |
-| S0   | חשיפת `allowJoin` + `joinKind` בטופס. שמירה לאחור — joinKind='solo' מתנהג בדיוק כמו היום.                                                   | יוצר משאלה "פתוחה לקבוצה" עם metadata.              | –                                    |
-| S1   | `ratson-share` + `joinRatson`/`leaveRatson`. UI: `JoinersPanel` + כפתור Join בעמוד public wish.                                             | זרים יכולים להצטרף; chat_forum משותף.               | `sharedPurchase.join=on`             |
-| S2   | רפקטור `addVote.ts` ל-`evaluateConsensus` משותף עם 5 חוקים. retrofit ל-sheirutpend (unanimous נשאר ברירת מחדל ⇒ אפס רגרסיה).                | סף הצבעה הפך קונפיגורבילי.                          | `consensus.configurable=on`          |
-| S3   | `voteOnRatsonProposal` + `recordWillingness` + `evaluateRatsonConsensus`. fallback רק ב-`skip` ו-`agreers_only`. UI: `ProposalGroupReview`. | קבוצה מצביעה על הצעה פר-פריט; פריטים נכנסים/יוצאים. | `sharedPurchase.partialConsensus=on` |
-| S4   | `confirmRatsonExecution` יוצר Sheirutpend פר-פריט + Tosplit + Haluka equal-split (לפני willingness).                                        | תשלום בפועל לכל פריט מוסכם, חלוקה שווה.             | `sharedPurchase.execute=on`          |
-| S5   | `willingnessModel='proportional_cap'` ו-`manual_split`. UI: `FinalBreakdownView`.                                                           | חלוקה לא-שווה לפי willing.                          | `sharedPurchase.willingness=on`      |
-| S5.5 | `pareto_sum` + `vickrey_light` (לבחירה ב-Ratson).                                                                                           | מודלים מתקדמים.                                     | `sharedPurchase.advancedPricing=on`  |
-| S6   | geo utils + `suggestRatsonsToUser` + `SuggestedWishes` ב-lev. Acts notifications.                                                           | משתמש מקבל המלצות לפי גיאו+תחומים.                  | `sharedPurchase.suggest=on`          |
-| S7   | Pinecone matching למשאלות פתוחות (לא רק keyword). שילוב ב-`suggestRatsonsToUser`.                                                           | המלצות איכותיות גם בלי tagging.                     | `sharedPurchase.vectorSuggest=on`    |
-| S8   | אינטגרציה ל-`/deals`: deal יחיד מציג את כל Sheirutpend-ים שנוצרו מאותו Ratson כ-sub-deals.                                                  | תצוגה מאוחדת.                                       | `sharedPurchase.dealsView=on`        |
+תחת `src/lib/server/actions/configs/` (כולם דרך `/api/action` — זמינים גם ל-agent):
 
-S0–S2 הם החובה. S3–S5 הם הליבה. S5.5+ הם hardening ו-AI.
+| Action | תמצית |
+| --- | --- |
+| `clusterRatsons` | job האיגוד (§5) — cron + טריגר אחרי createRatson |
+| `openMaagad` | פתיחה ידנית ע"י משתמש (§5) או עטיפה למסלול C |
+| `joinMaagad` / `leaveMaagad` | הצטרפות/עזיבה רכה (`interested`) — בלי התחייבות |
+| `createMaagadOffer` | הצעת ספק (§6.3) / הצעה יזומה (§8) |
+| `reviseMaagadOffer` | גרסה מתוקנת + לוגיקת שימור-חתימות (§6.3) |
+| `signMaagadOffer` / `unsignMaagadOffer` | חתימה/ביטול-לפני-הפעלה (§7.1, §7.3) |
+| `confirmMaagadQuorum` / `activateMaagadOffer` | אישור ספק + הפעלה אטומית (§7.2) |
+| `expireMaagadOffers` | cron פקיעות (§7.3) + dormancy של מאגדים |
+| `suggestMaagadimToUser` | פיד המלצות: מאגדים והצעות-סף מתאימים למשתמש (גיאו+תחומים+vector) → `Act` records |
+| `suggestMaagadimToSupplier` | ההתאמה ההפוכה (§6.1) → התראות לספקים |
 
----
-
-## 10. סיכונים ופתוחים
-
-1. **התפוצצות פרמטרים בטופס** — 6 שדות חדשים עלולים להבריח משתמשים. פתרון: ברירת מחדל "Smart" + accordion "Advanced".
-2. **משחקי דיווח-אמת** — `proportional_cap` מעודד דיווח-חסר ("אגיד שאני מוכן לפחות, אחרים ימלאו"). `pareto_sum` הפוך — מעודד שכבת-לחץ חברתית. `vickrey_light` הכי הוגן תאורטית, הכי מורכב להסבר. **הצעה**: התחל מ-`proportional_cap` כברירת מחדל, השאר את האחרים כ-opt-in מתקדם.
-3. **תאימות אחורה ל-`addVote.ts`** — שינוי הליבה רגיש. mitigation: כיסוי בדיקות מקסימלי לפני merge; דיפולט `unanimous` שומר על ההתנהגות הקיימת.
-4. **התראות-יתר ל-joiners** — כל הצבעה/willingness/comment פוטנציאלית מספאם. throttling ב-NotificationOrchestrator פר-Ratson + העדפת `notificationsOn` ב-share.
-5. **פרטיות willingness** — הסכומים שכל אחד מוכן לשלם הם מידע רגיש. שדה ב-Ratson `willingnessVisibility` enum `['private','aggregate_only','full']` (default `aggregate_only`) — שולט מה רואה כל joiner.
-6. **מקרי-קצה ב-Haluka** — עיגול שגרום ל-Σ הלוקות ≠ itemPrice. החלטה: יש לטפל ב-`confirmRatsonExecution` ע"י "תיקון יתרת אגורות" אצל היוזם או divisor mod.
-7. **שחקנים זדוניים / spam-join** — אדם מצטרף ל-100 Ratsons ומפיל את הסף לעולם. mitigation: `User.reputation` + cap מירבי לכניסות פעילות בו-זמנית + הסרה אוטומטית אם אינו מצביע X פעמים.
-8. **השפעה על `Sheirutpend` הקיים** — לא משנים את הסכמה שלו; רק יוצרים יותר Sheirutpend-ים פר-Ratson. צריך לוודא שהרכיבים הקיימים שמציגים Sheirut "אחד" (SaleCard, CustomerSaleCard) מתמודדים עם רשימה.
+QIDs: **180–199** (בפועל תפוסים עד ~172, כולל כפילויות 166/167 — לוודא מול `qids.js` לפני קיבוע): 180crMaagad, 181crMaagadMember, 182updateMaagadMember, 183crMaagadOffer, 184updateMaagadOffer, 185queryMaagadFull, 186listMaagadimForUser, 187listMaagadimForSupplier, 188listPublicDemand, 189crConditionalSheirutpend, 190activateConditionalPends, 191queryMaagadMembers, 192–199 רזרבה (כולל מסלול A בהמשך).
 
 ---
 
-## 11. קבצים שייגעו (best estimate)
+## 12. UI
+
+### צרכן
+
+- **בטופס המשאלה (`newIwant.svelte`) — כלום.** זה העיקרון: המשתמש כותב משאלה רגילה; האיגוד קורה מאחורי הקלעים. תוספת יחידה: checkbox צנוע "אפשר לצרף אותי לביקוש קבוצתי" (default on; כותב ל-`aggregation_opt_out`).
+- **`MaagadInviteCard`** (lev + push): *"יש עוד 6 כמוך…"* — הצטרפות בלחיצה. (אובייקט-לב חדש — לפי `docs/HOWTO_ADD_LEV_OBJECT.md`; `ani:'maagadInvite'`.)
+- **`/maagad/[id]`** — עמוד המאגד: מספרים מצטברים (progress לעבר `viability_hint`), ההצעות הפתוחות, כפתור הצטרפות/חתימה, chat שאלות-לספק. בלי רשימת שמות (עקרון 6).
+- **`OfferSignSheet`** — sheet חתימה: options אישיות, מחיר סופי/טווח tiers, תנאי ביטול, אישור.
+- **`/deals`** — עסקה מותנית מוצגת עם badge "ממתין לסף — 7/10" עד ההפעלה; אחרי — deal רגיל.
+
+### ספק
+
+- **`/moach/[projectId]/demand`** — מאגדים מתאימים + כפתור "הצע"; טופס `MaagadOfferForm` (מחיר, tiers, min/max, deadline, options, recurrence, ביטול).
+- **progress ההצעה** — כמה חתמו, זמן שנותר, אישור-סף.
+
+### ציבורי
+
+- **`/demand`** + **`/demand/[id]`** — browse ביקוש מצטבר + עמוד הצעה עם progress bar, ניתן לשיתוף (SEO/גיוס — §6.2).
+
+---
+
+## 13. Milestones
+
+**Track P (מאגדים — B/C) קודם**: לא נוגע ב-addVote, לא דורש Tosplit/Haluka, ומכסה את רוב מקרי-השימוש. **Track G (יוזמה משותפת — A) אחריו**.
+
+| # | מטרה | תוצר נבדק | flag |
+| --- | --- | --- | --- |
+| P0 | סכמה: `maagad`/`maagad-member`/`maagad-offer` + הרחבות Sheirutpend/Ratson (§4.4). geo utils (§10). | Strapi rebuild + types. | – |
+| P1 | `clusterRatsons` + `openMaagad`/`joinMaagad`/`leaveMaagad` + `MaagadInviteCard` + `/maagad/[id]` (קריאה+הצטרפות). | 3 משאלות דומות → מאגד → הזמנות → הצטרפות. | `maagad.cluster=on` |
+| P2 | Surfacing ספקים: `/moach/.../demand` + `suggestMaagadimToSupplier` + `createMaagadOffer` + `MaagadOfferForm`. | ספק רואה ביקוש ומגיש הצעה. | `maagad.supply=on` |
+| P3 | חתימה והפעלה: `signMaagadOffer` + Sheirutpend מותנה + `confirmMaagadQuorum`/`activateMaagadOffer` + `expireMaagadOffers` + תצוגת `/deals`. | flow מלא: סף הושג → N עסקאות חיות; סף לא הושג → פקיעה נקייה. | `maagad.execute=on` |
+| P4 | מסלול C: הצעה יזומת-ספק + `/demand` ציבורי + progress bar + share. | "מיניבוס 10 מקומות" מקצה לקצה כולל נרשמים מבחוץ. | `maagad.supplierOffer=on` |
+| P5 | מחזוריות (§7.5): מסגרת + fulfillment פר-מחזור + יציאה/backfill/שחיקה. | סל ירקות רץ 4 שבועות עם עוזב אחד ומצטרף אחד. | `maagad.recurring=on` |
+| P6 | ליטוש שוק: `price_tiers`, `reviseMaagadOffer`, waitlist, הצעות מתחרות, `suggestMaagadimToUser` מלא (vector). | — | `maagad.market=on` |
+| G1 | `ratson-share` + join/leave ליוזמה + חשיפת `joinKind` בטופס (opt-in מפורש, §9.1). | — | `shared.join=on` |
+| G2 | רפקטור `evaluateConsensus` (דיפולט unanimous, אפס רגרסיה). | — | `consensus.configurable=on` |
+| G3 | הצבעה פר-פריט + fallback `skip`/`agreers_only` + UI review. | — | `shared.partialConsensus=on` |
+| G4 | ביצוע: Sheirutpend פר-פריט + Tosplit/Haluka + `final_breakdown`. | — | `shared.execute=on` |
+| G5 | willingness: `proportional_cap` + `manual_split` (המתקדמים — backlog). | — | `shared.willingness=on` |
+
+---
+
+## 14. סיכונים ופתוחים
+
+1. **איגוד-יתר / איגוד-שווא** — cosine גבוה בין משאלות שונות מהותית ("סל ירקות" ~ "ירקות לגינה"). Mitigation: תאימות קשיחה (§5.3) חובה, סף גבוה, וההזמנה תמיד opt-in — איגוד שגוי עולה התראה מיותרת אחת, לא עסקה שגויה. לכייל את הסף על דאטה אמיתי לפני הרחבה.
+2. **מסה קריטית (קר משני הצדדים)** — אין מאגדים בלי משאלות, אין הצעות בלי מאגדים. Mitigation: מסלול C (ספק יכול להתחיל לבד), `/demand` הציבורי כערוץ גיוס, ו-`viability_hint` שמציג progress גם בלי הצעה.
+3. **אמינות חתימה** — חותמים ולא משלמים בהפעלה. Mitigation שלב 1: reputation + חסימת חותמים סדרתיים-נוטשים; שלב 2 (פתוח): שריון אמצעי תשלום בחתימה (tokenization) — דורש החלטת תשתית תשלומים נפרדת.
+4. **ספק נוטש אחרי סף** — הקבוצה הבשילה והספק נעלם. Mitigation: חלון-אישור קצוב (§7.2) עם פקיעה אוטומטית + פגיעת reputation; החתומים חוזרים ל-`interested` והמאגד נשאר חי לספק הבא.
+5. **פרטיות** — גם מספרים מצטברים יכולים לזהות באזור דליל ("3 משקי בית ביישוב X"). Mitigation: עיגול גיאוגרפי של centroid, הצגת טווחים ("5–10") מתחת לסף חשיפה, ו-`visibility` פר-חבר.
+6. **כפל-מנגנונים B/A** — משתמשים יתבלבלו בין מאגד ליוזמה. Mitigation: שפה עקבית ("מצטרפים לביקוש" vs "שותפים ליוזמה"), ומסלול A מוסתר עד G1.
+7. **חיוב מחזורי ושחיקה** (§7.5) — הנקודה החוזית העדינה ביותר; `cycle_terms` חייבים להיות מוצגים בחתימה, לא באותיות קטנות. פתוח: תבניות תנאים סטנדרטיות מוכנות-מראש שספק בוחר מהן (פחות ניסוחים חופשיים = פחות סכסוכים).
+8. **עומס התראות** — clustering שרץ הרבה מייצר הזמנות חוזרות. Mitigation: התראת-הזמנה אחת פר מאגד×משתמש; digest שבועי לכל השאר; throttling ב-NotificationOrchestrator.
+9. **גבול B↔A מטושטש בשטח** — קבוצה במסלול B תנסה "רק לשנות משהו קטן ביחד" בצ'אט. ה-chat_forum של מאגד הוא ערוץ שאלות-לספק בלבד; בקשות שינוי מוצר → הספק מוציא `reviseMaagadOffer`. לתעד את זה גם ב-UI (microcopy).
+
+---
+
+## 15. קבצים שייגעו (best estimate, Track P)
 
 ### חדשים — Server
 
-- `src/lib/server/actions/configs/joinRatson.ts`
-- `src/lib/server/actions/configs/leaveRatson.ts`
-- `src/lib/server/actions/configs/lockRatson.ts`
-- `src/lib/server/actions/configs/recordWillingness.ts`
-- `src/lib/server/actions/configs/voteOnRatsonProposal.ts`
-- `src/lib/server/actions/configs/evaluateRatsonConsensus.ts`
-- `src/lib/server/actions/configs/confirmRatsonExecution.ts`
-- `src/lib/server/actions/configs/suggestRatsonsToUser.ts`
-- `src/lib/server/actions/configs/cancelRatson.ts`
-- `src/lib/server/consensus/evaluateConsensus.ts` (משותף)
-- `src/lib/server/consensus/willingnessModels.ts` (4 מודלי תמחור)
+- `src/lib/server/actions/configs/clusterRatsons.ts`
+- `src/lib/server/actions/configs/openMaagad.ts` / `joinMaagad.ts` / `leaveMaagad.ts`
+- `src/lib/server/actions/configs/createMaagadOffer.ts` / `reviseMaagadOffer.ts`
+- `src/lib/server/actions/configs/signMaagadOffer.ts` / `unsignMaagadOffer.ts`
+- `src/lib/server/actions/configs/confirmMaagadQuorum.ts` / `activateMaagadOffer.ts` / `expireMaagadOffers.ts`
+- `src/lib/server/actions/configs/suggestMaagadimToUser.ts` / `suggestMaagadimToSupplier.ts`
+- `src/lib/server/maagad/clustering.ts` (לוגיקת האיגוד — טהורה וניתנת לבדיקה)
 - `src/lib/server/geo/haversine.ts`, `withinRadius.ts`
-- `src/lib/services/sharedPurchaseService.ts` (browser fetch helpers)
+- `src/lib/services/maagadService.ts` (browser fetch helpers)
 
 ### חדשים — Routes
 
-- `src/routes/(reg)/concierge/[id]/share/+page.svelte` (משלים את הקיים)
+- `src/routes/(regandnon)/demand/+page.svelte` + `/demand/[id]/+page.svelte` (ציבורי)
+- `src/routes/(reg)/maagad/[id]/+page.svelte`
+- `src/routes/(reg)/moach/[projectId]/demand/+page.svelte`
 
 ### חדשים — Components
 
-- `src/lib/components/concierge/JoinersPanel.svelte`
-- `src/lib/components/concierge/ProposalGroupReview.svelte`
-- `src/lib/components/concierge/FinalBreakdownView.svelte`
-- `src/lib/components/concierge/WillingnessInput.svelte`
-- `src/lib/components/lev/SuggestedWishes.svelte`
-- `src/lib/components/lev/cards/SharePaymentCard.svelte`
+- `src/lib/components/maagad/MaagadCard.svelte`, `MaagadDetail.svelte`, `MaagadProgress.svelte`
+- `src/lib/components/maagad/MaagadOfferCard.svelte`, `MaagadOfferForm.svelte`, `OfferSignSheet.svelte`
+- `src/lib/components/lev/cards/MaagadInviteCard.svelte` (+ pipeline לפי HOWTO_ADD_LEV_OBJECT)
 
 ### עריכה
 
-- `src/lib/components/addnew/newIwant.svelte` — אקורדיון "קבוצה" עם 6 שדות חדשים.
-- `src/routes/(regandnon)/wish/[id]/+page.svelte` — כפתור Join + JoinersPanel.
-- `src/lib/server/actions/configs/addVote.ts` — קריאה ל-`evaluateConsensus` החדש (שמירה אחורה לכלל `unanimous`).
-- `src/routes/api/send/qids.js` — QIDs 130–145.
+- `src/lib/components/addnew/newIwant.svelte` — checkbox opt-out בלבד (Track P; אקורדיון-הקבוצה של v1 נדחה ל-G1).
+- `src/routes/api/send/qids.js` — QIDs 180–191.
 - `src/lib/server/actions/configs/index.ts` — registration.
-- `src/lib/components/lev/cards/SaleCard.svelte`, `CustomerSaleCard.svelte` — תמיכה ב-Sheirutpend מרובים פר-Ratson.
-- `src/lib/translations/he.ts` / `en.ts`.
-- `src/lib/types/index.ts` — `RatsonShare`, `WillingnessEntry`, `FinalBreakdown`.
+- `src/lib/components/deals/*` — badge "ממתין לסף" ל-Sheirutpend מותנה.
+- `src/lib/translations/*` — strings.
+- `src/lib/types/index.ts` — `Maagad`, `MaagadMember`, `MaagadOffer`.
 
 ---
 
-## 12. Verification (end-to-end)
+## 16. Verification (end-to-end)
 
-לכל milestone, סדר בדיקה:
+**יחידה**: Vitest ל-`clustering.ts` (scope/frequency/geo gates, ספי דמיון — עם seed vectors), למכונת-המצבים של offer (open→quorum→activated / expired, ביטול לפני/אחרי סף, backfill), ולחישוב tiers.
 
-**יחידה**: Vitest לכל action חדש; snapshot tests ל-`evaluateConsensus` ו-`willingnessModels` עם seed scenarios (3-people unanimous-yes, 3-people 2-yes-1-no עם כל 4 fallback × 4 willingness model = 16 מצבים).
+**אינטגרציה — תרחיש "סל ירקות" (P1–P3)**:
 
-**אינטגרציה**:
+1. 4 משתמשי דמה באותו אזור + 1 רחוק + 1 `isOnline`; כולם יוצרים משאלות "ירקות שבועיים" בניסוחים שונים.
+2. `clusterRatsons` → מאגד אחד עם 4 (הרחוק והדיגיטלי בחוץ). כל ה-4 קיבלו `suggested`.
+3. 3 מצטרפים (`interested`), אחד מתעלם. מאגד → `visible`.
+4. ספק דמה רואה אותו ב-`/moach/.../demand`, מגיש הצעה: 90₪/סל, min 3, deadline +7d, options גודל.
+5. 3 חותמים (אחד עם option L) → נוצרו 3 Sheirutpend מותנים; `quorum_reached`; ספק מאשר → 3 עסקאות חיות ב-`/deals`, מחירים נכונים כולל delta.
+6. תרחיש-מראה: הצעה שנייה min 5 → פוקעת ב-deadline → pends נארכבו, members חזרו `interested`, אפס עסקאות.
 
-1. הרצת dev server + Strapi מקומי.
-2. יוצר 3 משתמשי דמה.
-3. משתמש A יוצר Ratson עם `joinKind='group_trip'`, `consensusRule='majority'`, `partialConsensusFallback='willingness_pricing'`, `willingnessModel='proportional_cap'`.
-4. משתמשים B, C מצטרפים (`joinRatson`).
-5. ratson-proposal עם 3 פריטים נוצר (יושם בקונסיירז' — אם לא, mock פרופוזל ידני דרך הסטראפי-admin).
-6. A מצביע yes על כל הפריטים, B yes על 2, C yes על 1 ועל הפריט השלישי שולח `willingAmount=20` למרות `agree=false`.
-7. הפעלת `evaluateRatsonConsensus` — לבדוק `final_breakdown`: שני פריטים עברו majority (כולם משלמים שווה), פריט שלישי נפל ל-willingness_pricing (A+B משלמים לפי willing, C לא משלם).
-8. `confirmRatsonExecution` — בודק שנוצרו 3 Sheirutpend + 3 Tosplit + 5 Halukas (2+2+1).
-9. בדיקת ה-`/deals` שמציג deal מאוחד.
+**תרחיש "מיניבוס" (P4)**: ספק פותח הצעת-סף (min 10) בלי מאגד קיים → 6 נרשמים מהמלצות + 4 דרך לינק ציבורי → הפעלה. וגם: 8 בלבד → הספק בוחר להפעיל מתחת לסף → עובד במחיר המקורי.
 
-**MCP/Agent**: לאחר S4 מוודאים שכל ה-actions זמינים דרך `/api/v1/actions` ושאפשר להריץ flow מלא מתוך chat-agent עם prompts פשוטים.
+**רגרסיה**: כל זרימות Sheirutpend הקיימות (ללא `maagad_offer`) עוברות ללא שינוי — להריץ טסטים של createSheirutpend/approveSheirutpend/createSheirutFromPending לפני merge של P3. Track P לא נוגע ב-`addVote.ts` — אפס סיכון שם עד G2.
 
-**רגרסיה**: כל Sheirutpend קיים עם project יחיד ממשיך לעבור consensus כרגיל (unanimity על project members) — לפני merge של S2, להריץ את כל הטסטים של addVote ו-createSheirutFromPending.
+**MCP/Agent**: אחרי P3 — flow מלא דרך `/api/v1/actions` בצ'אט: "תמצא לי עוד אנשים שרוצים סל ירקות" → join → sign.
