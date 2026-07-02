@@ -222,7 +222,8 @@
     margin: 0;
     padding: 0.75rem 0.9rem;
     background: #fffdf6;
-    border: 1px solid #efe3c0;
+    border: 1px solid #d9bd6f;
+    box-shadow: inset 0 1px 3px rgba(179, 135, 40, 0.1);
     border-radius: 0.9rem;
     display: flex;
     flex-direction: column;

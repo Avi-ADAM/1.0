@@ -74,11 +74,12 @@
     background: radial-gradient(circle, #ff0092 0%, transparent 65%);
   }
   .glow-gold {
-    width: 38vmax;
-    height: 38vmax;
+    width: 42vmax;
+    height: 42vmax;
     bottom: -12vmax;
     inset-inline-end: -10vmax;
-    background: radial-gradient(circle, #d4af37 0%, transparent 65%);
+    background: radial-gradient(circle, #d4af37 0%, transparent 68%);
+    opacity: 0.75;
     animation-delay: -7s;
   }
   @keyframes drift {
@@ -94,7 +95,7 @@
   .card-frame {
     width: 100%;
     max-width: 26rem;
-    padding: 1.5px;
+    padding: 2.5px;
     border-radius: 1.9rem;
     background: linear-gradient(
       135deg,
@@ -102,12 +103,26 @@
       #fcf6ba,
       #b38728,
       #fbf5b7,
-      #aa771c
+      #aa771c,
+      #fbf5b7,
+      #b38728
     );
+    background-size: 300% 300%;
+    animation:
+      card-in 650ms cubic-bezier(0.22, 1, 0.36, 1) both,
+      frame-glint 9s ease-in-out infinite;
     box-shadow:
-      0 24px 60px -18px rgba(255, 0, 146, 0.35),
-      0 8px 28px -12px rgba(90, 60, 0, 0.25);
-    animation: card-in 650ms cubic-bezier(0.22, 1, 0.36, 1) both;
+      0 24px 60px -18px rgba(255, 0, 146, 0.3),
+      0 10px 34px -12px rgba(179, 135, 40, 0.45);
+  }
+  @keyframes frame-glint {
+    0%,
+    100% {
+      background-position: 0% 0%;
+    }
+    50% {
+      background-position: 100% 100%;
+    }
   }
   @keyframes card-in {
     from {
@@ -121,15 +136,32 @@
   }
 
   .auth-card {
-    background: rgba(255, 255, 255, 0.9);
+    position: relative;
+    background: linear-gradient(
+      165deg,
+      rgba(255, 253, 244, 0.94) 0%,
+      rgba(255, 255, 255, 0.9) 45%,
+      rgba(255, 246, 221, 0.92) 100%
+    );
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
-    border-radius: calc(1.9rem - 1.5px);
+    border-radius: calc(1.9rem - 2.5px);
     padding: 2.25rem 1.75rem 2rem;
     text-align: center;
   }
 
+  /* inner gold hairline — classic double-frame */
+  .auth-card::before {
+    content: '';
+    position: absolute;
+    inset: 7px;
+    border: 1px solid rgba(191, 149, 63, 0.35);
+    border-radius: calc(1.9rem - 9px);
+    pointer-events: none;
+  }
+
   .brand {
+    position: relative;
     display: inline-flex;
     align-items: baseline;
     gap: 0.15em;
@@ -140,6 +172,22 @@
     color: var(--barbi-pink, #ff0092);
     text-decoration: none;
     letter-spacing: 0.04em;
+  }
+  .brand-one {
+    background: linear-gradient(
+      110deg,
+      #8a6414,
+      #bf953f 20%,
+      #fcf6ba 40%,
+      #b38728 60%,
+      #fbf5b7 80%,
+      #8a6414
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 4.5s linear infinite;
   }
   .brand-heart {
     font-size: 0.8em;
@@ -162,8 +210,8 @@
   }
 
   .gold-divider {
-    height: 2px;
-    width: 5.5rem;
+    height: 2.5px;
+    width: 7rem;
     margin: 0.9rem auto 0;
     border-radius: 999px;
     background: linear-gradient(
@@ -250,8 +298,9 @@
     width: 100%;
     min-height: 48px;
     border-radius: 0.9rem;
-    border: 1px solid #dfc98a;
+    border: 1px solid #cfa94e;
     background: #fffdf6;
+    box-shadow: inset 0 1px 3px rgba(179, 135, 40, 0.12);
     color: #3d0a2a;
     font-size: 0.95rem;
     padding-inline-start: 2.7rem;
@@ -276,7 +325,7 @@
     position: absolute;
     inset-inline-start: 0.85rem;
     display: flex;
-    color: #c9a24b;
+    color: #b38728;
     pointer-events: none;
   }
 
@@ -342,7 +391,8 @@
     border-radius: 999px;
     background: linear-gradient(120deg, #ff0092, #d8006f 55%, #ff0092);
     background-size: 200% auto;
-    color: #fff6d8;
+    border: 1.5px solid rgba(252, 246, 186, 0.85);
+    color: #ffeebc;
     font-family: inherit;
     font-size: 1.02rem;
     font-weight: 700;
@@ -350,7 +400,9 @@
     cursor:
       url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg),
       pointer;
-    box-shadow: 0 10px 24px -10px rgba(255, 0, 146, 0.65);
+    box-shadow:
+      0 10px 24px -10px rgba(255, 0, 146, 0.65),
+      0 3px 12px -3px rgba(191, 149, 63, 0.5);
     transition:
       background-position 400ms ease,
       transform 180ms ease,
@@ -359,7 +411,9 @@
   .auth-card :global(.auth-submit:hover:not(:disabled)) {
     background-position: 100% center;
     transform: translateY(-2px);
-    box-shadow: 0 14px 30px -10px rgba(255, 0, 146, 0.7);
+    box-shadow:
+      0 14px 30px -10px rgba(255, 0, 146, 0.7),
+      0 4px 16px -3px rgba(191, 149, 63, 0.6);
   }
   .auth-card :global(.auth-submit:focus-visible) {
     outline: 3px solid #b38728;
@@ -375,8 +429,8 @@
     width: 1.15rem;
     height: 1.15rem;
     border-radius: 50%;
-    border: 2.5px solid rgba(255, 246, 216, 0.4);
-    border-top-color: #fff6d8;
+    border: 2.5px solid rgba(255, 238, 188, 0.4);
+    border-top-color: #ffeebc;
     animation: spin 800ms linear infinite;
   }
   @keyframes spin {
@@ -390,15 +444,15 @@
     align-items: center;
     gap: 0.75rem;
     margin: 0.4rem 0;
-    color: #b99a9f;
+    color: #9a7a2e;
     font-size: 0.78rem;
   }
   .auth-card :global(.auth-divider::before),
   .auth-card :global(.auth-divider::after) {
     content: '';
     flex: 1;
-    height: 1px;
-    background: linear-gradient(to right, transparent, #dfc98a, transparent);
+    height: 1.5px;
+    background: linear-gradient(to right, transparent, #cfa94e, transparent);
   }
 
   .auth-card :global(.auth-secondary) {
@@ -408,8 +462,12 @@
     width: 100%;
     min-height: 46px;
     border-radius: 999px;
-    border: 1.5px solid #dfc98a;
-    background: transparent;
+    border: 1.5px solid #cfa94e;
+    background: linear-gradient(
+      165deg,
+      rgba(252, 246, 186, 0.35),
+      rgba(191, 149, 63, 0.12)
+    );
     color: #5c1440;
     font-family: inherit;
     font-size: 0.92rem;
@@ -445,8 +503,9 @@
     width: 4rem;
     height: 4rem;
     border-radius: 50%;
-    background: radial-gradient(circle at 30% 25%, #fff0f8, #ffd6ee);
-    border: 1.5px solid rgba(255, 0, 146, 0.35);
+    background: radial-gradient(circle at 30% 25%, #fff8e1, #ffe9c4);
+    border: 2px solid #cfa94e;
+    box-shadow: 0 4px 14px -4px rgba(179, 135, 40, 0.55);
     font-size: 1.8rem;
   }
 
