@@ -156,6 +156,14 @@
     "error": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל "
   },
   "haluka": {
+    "bridge": {
+      "openDiscussion": "🤝 דיון מעמיק",
+      "openDiscussionHint": "פתיחת דיון גישור מובנה בקונצנזוס על החלוקה",
+      "resolved": "הדיון בקונצנזוס הגיע להכרעה",
+      "resolvedShare": "חלק מוסכם",
+      "toDiscussion": "לדיון המלא ←",
+      "voteStillNeeded": "ההכרעה מנחה את ההצבעה — האישור הסופי נשאר כאן בכרטיס."
+    },
     "successMessage": "החלוקה אושרה בהצלחה! 🎉",
     "errorMessage": "שגיאה באישור החלוקה. נסה שוב.",
     "table": {

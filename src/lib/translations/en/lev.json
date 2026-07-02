@@ -156,6 +156,14 @@
     "error": "error: please try again, if the problem continue contact at baruch@1lev1.com"
   },
   "haluka": {
+    "bridge": {
+      "openDiscussion": "🤝 Deep discussion",
+      "openDiscussionHint": "Open a structured mediation discussion about this split",
+      "resolved": "The consensus discussion reached a decision",
+      "resolvedShare": "Agreed share",
+      "toDiscussion": "Open full discussion ←",
+      "voteStillNeeded": "The decision guides the vote — final approval stays here on the card."
+    },
     "successMessage": "Division approved successfully! 🎉",
     "errorMessage": "Error approving division. Please try again.",
     "table": {
