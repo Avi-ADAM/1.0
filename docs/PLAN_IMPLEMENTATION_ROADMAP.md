@@ -19,6 +19,7 @@
 | 6 | [PLAN_central_rikma_definition](./PLAN_central_rikma_definition.md) | תכנון; **החלטת מודל ✅** (§3 כאן) | הרקמה כקואופ אמיתי |
 | 7 | [PLAN_rikma_as_state_machine](./PLAN_rikma_as_state_machine.md) | §7 ✅ (צעד 9): אימות commitments + persistence; אכיפה strict → Phase 3 | שווי מתמטית מאומת |
 | 8 | [PLAN_restime_in_signed_chain](./PLAN_restime_in_signed_chain.md) | תכנון | שתיקה חתומה |
+| 9 | [PLAN_MONEY_RAILS](./PLAN_MONEY_RAILS.md) | תכנון; ראש-גשר: מרכז המכירות + מאגד | כסף אמיתי: escrow-by-proof, בלי בלוקצ'יין |
 
 ---
 
