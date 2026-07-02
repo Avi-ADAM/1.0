@@ -13,7 +13,7 @@ async function bootstrapIdentity(userId: string, label = 'test') {
   )) as CryptoKeyPair;
   const spki = await crypto.subtle.exportKey('spki', kp.publicKey);
   const devicePubB64 = b64urlEncode(spki);
-  consentStore.putKey({
+  await consentStore.putKey({
     userId,
     devicePubB64,
     algo,
@@ -62,11 +62,11 @@ describe('end-to-end consent flow (server-side store)', () => {
     const v = await verifyConsentEvent(ev);
     expect(v.ok).toBe(true);
 
-    consentStore.putEvent(ev);
-    const got = consentStore.getEvent(ev.id);
+    await consentStore.putEvent(ev);
+    const got = await consentStore.getEvent(ev.id);
     expect(got?.id).toBe(ev.id);
 
-    const list = consentStore.eventsForSubject('tosplit', 'ts-XYZ');
+    const list = await consentStore.eventsForSubject('tosplit', 'ts-XYZ');
     expect(list.length).toBe(1);
   });
 
@@ -119,9 +119,45 @@ describe('end-to-end consent flow (server-side store)', () => {
     for (const ev of [createEv, voteA, voteB]) {
       const v = await verifyConsentEvent(ev);
       expect(v.ok, `event ${ev.action} should verify`).toBe(true);
-      consentStore.putEvent(ev);
+      await consentStore.putEvent(ev);
     }
-    const list = consentStore.eventsForSubject('tosplit', 'ts-1');
+    const list = await consentStore.eventsForSubject('tosplit', 'ts-1');
     expect(list.length).toBe(3);
+  });
+
+  it('rejects a signed event whose stateRoot commitment is false', async () => {
+    const id = await bootstrapIdentity('user-A');
+    const createEv = await buildEvent(id, {
+      actor: 'user-A',
+      action: 'tosplit.create',
+      subject: { type: 'tosplit', id: 'ts-2' }
+    });
+    expect((await verifyConsentEvent(createEv)).ok).toBe(true);
+    await consentStore.putEvent(createEv);
+
+    // Properly signed, but commits to a root that doesn't recompute — the
+    // Phase 1.5 layer must reject it even though the signature is valid.
+    const body = {
+      v: 1 as const,
+      actor: 'user-A',
+      device: id.devicePubB64,
+      action: 'tosplit.vote',
+      subject: { type: 'tosplit' as const, id: 'ts-2' },
+      predicate: { what: true },
+      parents: [createEv.id],
+      ts: Date.now(),
+      nonce: b64urlEncode(crypto.getRandomValues(new Uint8Array(16))),
+      stateRoot: 'forged-root-that-cannot-recompute'
+    };
+    const { sig, id: evId } = await signCanonical(
+      body as unknown as import('$lib/crypto/canonical').JsonValue,
+      id.kp.privateKey,
+      id.algo
+    );
+    const forged = { ...body, sig, id: evId } as unknown as ConsentEvent;
+
+    const v = await verifyConsentEvent(forged);
+    expect(v.ok).toBe(false);
+    if (!v.ok) expect(v.reason).toBe('commitment:state_root_mismatch');
   });
 });

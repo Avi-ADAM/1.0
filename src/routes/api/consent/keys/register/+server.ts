@@ -39,6 +39,6 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     cert: cert as StoredPubKey['cert'],
     addedAt: Date.now()
   };
-  consentStore.putKey(stored);
+  await consentStore.putKey(stored);
   return json({ ok: true });
 };

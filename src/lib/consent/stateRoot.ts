@@ -29,6 +29,11 @@ export const STATE_ROOT_VERSION = 1;
  *   - bigint       → base-10 string (matches Money.serialize)
  *   - undefined    → omitted (matches canonicalize's drop rule)
  *
+ * `state.snapshots` is deliberately NOT part of the root: a snapshot is an
+ * attestation ABOUT a state root; folding it into the root would make every
+ * attestation change the thing it attests (self-reference). Verifiers compare
+ * snapshot marks against independently recomputed roots instead.
+ *
  * Any structural change to ProjectState requires updating this function AND
  * bumping STATE_ROOT_VERSION.
  */
@@ -40,7 +45,7 @@ export function normalizeState(state: ProjectState): JsonValue {
     members: [...state.members].sort(),
     balances: [...state.balances.entries()]
       .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
-      .map(([k, v]) => [k, v] as JsonValue),
+      .map(([k, v]) => [k, v.toString()] as JsonValue),
     tosplits: [...state.tosplits.entries()]
       .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
       .map(([k, v]) => [k, normalizeTosplit(v)] as JsonValue),

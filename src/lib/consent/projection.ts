@@ -30,13 +30,34 @@ export type SubjectRound = {
   };
 };
 
+/**
+ * A quorum-attested checkpoint (PLAN_rikma_as_state_machine §5.1). Records
+ * that a `snapshot.commit` event vouched for `stateRoot` as the state after
+ * event `upTo`. Snapshots are attestations ABOUT state — they are deliberately
+ * excluded from the committed state root (see stateRoot.ts), otherwise a
+ * snapshot would change the very root it attests.
+ */
+export type SnapshotMark = {
+  eventId: string;     // the snapshot.commit event
+  upTo: string;        // last event covered by the attested root
+  stateRoot: string;   // the attested root
+  ts: number;
+  by: string;          // signer (typically quorum.reachingActor)
+};
+
 export type ProjectState = {
   projectId: string | null;
   members: Set<string>;
-  balances: Map<string, number>;
+  /**
+   * hervachti per member, in bigint agorot (D-12). Single-currency per rikma
+   * for now; multi-currency requires a keyed structure AND a
+   * STATE_ROOT_VERSION bump.
+   */
+  balances: Map<string, bigint>;
   tosplits: Map<string, TosplitView>;
   /** Keyed by `${subject.type}:${subject.id}` */
   rounds: Map<string, SubjectRound>;
+  snapshots: SnapshotMark[];
   asOf: number;
 };
 
@@ -47,6 +68,7 @@ export function emptyState(projectId: string | null = null): ProjectState {
     balances: new Map(),
     tosplits: new Map(),
     rounds: new Map(),
+    snapshots: [],
     asOf: 0
   };
 }

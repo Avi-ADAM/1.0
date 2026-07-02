@@ -4,7 +4,7 @@ import { consentStore } from '$lib/server/consent/store';
 
 export const GET: RequestHandler = async ({ params, cookies }) => {
   if (!cookies.get('jwt')) throw error(401, 'Unauthorized');
-  const keys = consentStore.getKeysForUser(params.userId!);
+  const keys = await consentStore.getKeysForUser(params.userId!);
   // Strip the cert payload — not all callers need it. Pub key bytes are public.
   return json({
     ok: true,

@@ -15,7 +15,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
   const v = await verifyConsentEvent(ev as ConsentEvent);
   if (!v.ok) throw error(400, `verify failed: ${v.reason}`);
 
-  const added = consentStore.putEvent(ev as ConsentEvent);
+  const added = await consentStore.putEvent(ev as ConsentEvent);
   return json({ ok: true, deduped: !added, id: (ev as ConsentEvent).id });
 };
 
@@ -26,6 +26,6 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
   const subjectId = url.searchParams.get('subjectId');
   if (!subjectType || !subjectId) throw error(400, 'subjectType and subjectId required');
 
-  const events = consentStore.eventsForSubject(subjectType, subjectId);
+  const events = await consentStore.eventsForSubject(subjectType, subjectId);
   return json({ ok: true, events });
 };
