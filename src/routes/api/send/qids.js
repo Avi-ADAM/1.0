@@ -9727,11 +9727,14 @@ export const qids = {
           data {
             id
             attributes {
+              projectName
               # Mission applications – members vote via pendms.users (ordered)
               pendms(filters: { archived: { eq: false } }) {
                 data {
                   id
                   attributes {
+                    name
+                    createdAt
                     timegrama {
                       data {
                         attributes {
@@ -9761,6 +9764,8 @@ export const qids = {
                 data {
                   id
                   attributes {
+                    missname
+                    createdAt
                     timegrama {
                       data {
                         attributes {
@@ -9784,6 +9789,35 @@ export const qids = {
                 data {
                   id
                   attributes {
+                    createdAt
+                    timegrama {
+                      data {
+                        attributes {
+                          date
+                        }
+                      }
+                    }
+                    open_mashaabim {
+                      data {
+                        attributes {
+                          name
+                        }
+                      }
+                    }
+                    pmash {
+                      data {
+                        attributes {
+                          name
+                        }
+                      }
+                    }
+                    sp {
+                      data {
+                        attributes {
+                          name
+                        }
+                      }
+                    }
                     vots {
                       what
                       users_permissions_user {
@@ -9800,6 +9834,22 @@ export const qids = {
                 data {
                   id
                   attributes {
+                    name
+                    createdAt
+                    timegrama {
+                      data {
+                        attributes {
+                          date
+                        }
+                      }
+                    }
+                    mashabetahalich {
+                      data {
+                        attributes {
+                          name
+                        }
+                      }
+                    }
                     vots {
                       what
                       users_permissions_user {
@@ -9816,6 +9866,15 @@ export const qids = {
                 data {
                   id
                   attributes {
+                    kind
+                    createdAt
+                    timegrama {
+                      data {
+                        attributes {
+                          date
+                        }
+                      }
+                    }
                     vots {
                       what
                       users_permissions_user {
@@ -9832,6 +9891,8 @@ export const qids = {
                 data {
                   id
                   attributes {
+                    name
+                    createdAt
                     vots {
                       what
                       order
@@ -9849,6 +9910,14 @@ export const qids = {
                 data {
                   id
                   attributes {
+                    createdAt
+                    sheirut {
+                      data {
+                        attributes {
+                          name
+                        }
+                      }
+                    }
                     timegrama {
                       data {
                         attributes {
@@ -9913,6 +9982,22 @@ export const qids = {
               user_1s {
                 data {
                   id
+                  attributes {
+                    username
+                    haskamaz
+                    haskamac
+                    email
+                    noMail
+                    haskama
+                    profilePic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
                 }
               }
               profilePic {
@@ -10028,6 +10113,22 @@ export const qids = {
               user_1s {
                 data {
                   id
+                  attributes {
+                    username
+                    haskamaz
+                    haskamac
+                    email
+                    noMail
+                    haskama
+                    profilePic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
                 }
               }
               profilePic {
@@ -10230,6 +10331,22 @@ export const qids = {
               user_1s {
                 data {
                   id
+                  attributes {
+                    username
+                    haskamaz
+                    haskamac
+                    email
+                    noMail
+                    haskama
+                    profilePic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
                 }
               }
               profilePic {
@@ -10324,6 +10441,22 @@ export const qids = {
               user_1s {
                 data {
                   id
+                  attributes {
+                    username
+                    haskamaz
+                    haskamac
+                    email
+                    noMail
+                    haskama
+                    profilePic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
                 }
               }
               profilePic {
@@ -10393,6 +10526,22 @@ export const qids = {
               user_1s {
                 data {
                   id
+                  attributes {
+                    username
+                    haskamaz
+                    haskamac
+                    email
+                    noMail
+                    haskama
+                    profilePic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
                 }
               }
               profilePic {
@@ -10645,6 +10794,22 @@ export const qids = {
               user_1s {
                 data {
                   id
+                  attributes {
+                    username
+                    haskamaz
+                    haskamac
+                    email
+                    noMail
+                    haskama
+                    profilePic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
                 }
               }
               profilePic {
@@ -10755,6 +10920,22 @@ export const qids = {
               user_1s {
                 data {
                   id
+                  attributes {
+                    username
+                    haskamaz
+                    haskamac
+                    email
+                    noMail
+                    haskama
+                    profilePic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
                 }
               }
               profilePic {
@@ -10931,6 +11112,22 @@ export const qids = {
               user_1s {
                 data {
                   id
+                  attributes {
+                    username
+                    haskamaz
+                    haskamac
+                    email
+                    noMail
+                    haskama
+                    profilePic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
                 }
               }
               profilePic {
@@ -11038,6 +11235,22 @@ export const qids = {
               user_1s {
                 data {
                   id
+                  attributes {
+                    username
+                    haskamaz
+                    haskamac
+                    email
+                    noMail
+                    haskama
+                    profilePic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
                 }
               }
               profilePic {
