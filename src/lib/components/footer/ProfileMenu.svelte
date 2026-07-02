@@ -53,12 +53,12 @@
 </script>
 
 <div
-  class="relative inline-flex flex-col items-center justify-center h-full px-5 rounded-e-full"
+  class="relative inline-flex flex-col items-center justify-center h-full px-2 rounded-e-full"
 >
   <button
     onclick={toggleMenu}
     type="button"
-    class="inline-flex flex-col items-center justify-center text-barbi h-full hover:bg-gray-50 dark:hover:bg-gray-800 group"
+    class="inline-flex flex-col items-center justify-center gap-0.5 text-barbi h-full w-full hover:bg-gray-50 dark:hover:bg-gray-800 group"
   >
     <svg
       class="w-6 h-6 transition-transform duration-200 {showMenu
@@ -76,6 +76,9 @@
         d="M19 9l-7 7-7-7"
       ></path>
     </svg>
+    <span class="text-[9px] leading-none text-gray-500 dark:text-gray-300">
+      {translations[$lang]?.profile || translations.en.profile}
+    </span>
     <span class="sr-only">
       {translations[$lang]?.profileMenu || translations.en.profileMenu}
     </span>
