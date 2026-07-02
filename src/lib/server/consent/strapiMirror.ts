@@ -5,7 +5,12 @@
 // degrades the mirror to memory-only, it never blocks ingest. Rows carry the
 // full signed event / key as a JSON payload plus flat columns for querying.
 //
-// Backend collections (repo 1.0b): api/consent-event, api/user-key.
+// Backend: Strapi v4 (repo 1.0b, branch shabab) — collections
+// api::consent-event.consent-event and api::user-key.user-key. v4 REST
+// conventions apply: `/api` prefix, `{ data: {...} }` request wrapping,
+// `filters[field][$eq]` query params, `{ data: [{ id, attributes }] }`
+// responses. `pagination[limit]=-1` resolves to the configured maxLimit
+// (9999 in config/api.js) — plenty until snapshots (§5.1) cap replay anyway.
 
 import { env } from '$env/dynamic/private';
 import type { ConsentEvent } from '$lib/consent/event';
@@ -33,7 +38,7 @@ async function req(path: string, init?: RequestInit): Promise<unknown> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 5000);
   try {
-    const res = await fetch(`${BASE}${path}`, {
+    const res = await fetch(`${BASE}/api${path}`, {
       ...init,
       headers: {
         'Content-Type': 'application/json',
@@ -49,12 +54,22 @@ async function req(path: string, init?: RequestInit): Promise<unknown> {
   }
 }
 
+// v4 rows come back as { id, attributes: {...} }; tolerate a flat row too
+// (populated deeply / transformer plugins).
+function rowPayload(row: unknown): unknown {
+  const r = row as { attributes?: { payload?: unknown }; payload?: unknown } | undefined;
+  return r?.attributes?.payload ?? r?.payload;
+}
+
+function responseRows(json: unknown): unknown[] {
+  const data = (json as { data?: unknown } | undefined)?.data;
+  return Array.isArray(data) ? data : [];
+}
+
 // ── events ───────────────────────────────────────────────────────────────────
 
-type EventRow = { payload?: unknown };
-
 function rowToEvent(row: unknown): ConsentEvent | undefined {
-  const payload = (row as EventRow)?.payload;
+  const payload = rowPayload(row);
   return payload && typeof payload === 'object' ? (payload as ConsentEvent) : undefined;
 }
 
@@ -64,14 +79,16 @@ export async function mirrorSaveEvent(ev: ConsentEvent): Promise<void> {
     await req('/consent-events', {
       method: 'POST',
       body: JSON.stringify({
-        eventId: ev.id,
-        actor: ev.actor,
-        action: ev.action,
-        subjectType: ev.subject.type,
-        subjectId: ev.subject.id,
-        ts: ev.ts,
-        stateRoot: ev.stateRoot ?? null,
-        payload: ev
+        data: {
+          eventId: ev.id,
+          actor: ev.actor,
+          action: ev.action,
+          subjectType: ev.subject.type,
+          subjectId: ev.subject.id,
+          ts: String(ev.ts),
+          stateRoot: ev.stateRoot ?? null,
+          payload: ev
+        }
       })
     });
   } catch (e) {
@@ -84,8 +101,10 @@ export async function mirrorSaveEvent(ev: ConsentEvent): Promise<void> {
 export async function mirrorLoadEvent(id: string): Promise<ConsentEvent | undefined> {
   if (!mirrorEnabled()) return undefined;
   try {
-    const rows = (await req(`/consent-events?eventId=${encodeURIComponent(id)}&_limit=1`)) as unknown[];
-    return Array.isArray(rows) ? rowToEvent(rows[0]) : undefined;
+    const json = await req(
+      `/consent-events?filters[eventId][$eq]=${encodeURIComponent(id)}&pagination[limit]=1`
+    );
+    return rowToEvent(responseRows(json)[0]);
   } catch (e) {
     warnOnce('loadEvent', e);
     return undefined;
@@ -98,12 +117,13 @@ export async function mirrorEventsForSubject(
 ): Promise<ConsentEvent[]> {
   if (!mirrorEnabled()) return [];
   try {
-    const rows = (await req(
-      `/consent-events?subjectType=${encodeURIComponent(subjectType)}` +
-      `&subjectId=${encodeURIComponent(subjectId)}&_limit=-1`
-    )) as unknown[];
-    if (!Array.isArray(rows)) return [];
-    return rows.map(rowToEvent).filter((e): e is ConsentEvent => e !== undefined);
+    const json = await req(
+      `/consent-events?filters[subjectType][$eq]=${encodeURIComponent(subjectType)}` +
+      `&filters[subjectId][$eq]=${encodeURIComponent(subjectId)}&pagination[limit]=-1`
+    );
+    return responseRows(json)
+      .map(rowToEvent)
+      .filter((e): e is ConsentEvent => e !== undefined);
   } catch (e) {
     warnOnce('eventsForSubject', e);
     return [];
@@ -112,10 +132,8 @@ export async function mirrorEventsForSubject(
 
 // ── keys ─────────────────────────────────────────────────────────────────────
 
-type KeyRow = { payload?: unknown };
-
 function rowToKey(row: unknown): StoredPubKey | undefined {
-  const payload = (row as KeyRow)?.payload;
+  const payload = rowPayload(row);
   return payload && typeof payload === 'object' ? (payload as StoredPubKey) : undefined;
 }
 
@@ -125,13 +143,15 @@ export async function mirrorSaveKey(k: StoredPubKey): Promise<void> {
     await req('/user-keys', {
       method: 'POST',
       body: JSON.stringify({
-        userId: k.userId,
-        devicePubB64: k.devicePubB64,
-        algo: k.algo,
-        label: k.label,
-        revokedAt: k.revokedAt ?? null,
-        addedAt: k.addedAt,
-        payload: k
+        data: {
+          userId: k.userId,
+          devicePubB64: k.devicePubB64,
+          algo: k.algo,
+          label: k.label,
+          revokedAt: k.revokedAt !== undefined ? String(k.revokedAt) : null,
+          addedAt: String(k.addedAt),
+          payload: k
+        }
       })
     });
   } catch (e) {
@@ -145,11 +165,11 @@ export async function mirrorLoadKey(
 ): Promise<StoredPubKey | undefined> {
   if (!mirrorEnabled()) return undefined;
   try {
-    const rows = (await req(
-      `/user-keys?userId=${encodeURIComponent(userId)}` +
-      `&devicePubB64=${encodeURIComponent(devicePubB64)}&_limit=1`
-    )) as unknown[];
-    return Array.isArray(rows) ? rowToKey(rows[0]) : undefined;
+    const json = await req(
+      `/user-keys?filters[userId][$eq]=${encodeURIComponent(userId)}` +
+      `&filters[devicePubB64][$eq]=${encodeURIComponent(devicePubB64)}&pagination[limit]=1`
+    );
+    return rowToKey(responseRows(json)[0]);
   } catch (e) {
     warnOnce('loadKey', e);
     return undefined;
@@ -159,11 +179,12 @@ export async function mirrorLoadKey(
 export async function mirrorKeysForUser(userId: string): Promise<StoredPubKey[]> {
   if (!mirrorEnabled()) return [];
   try {
-    const rows = (await req(
-      `/user-keys?userId=${encodeURIComponent(userId)}&_limit=-1`
-    )) as unknown[];
-    if (!Array.isArray(rows)) return [];
-    return rows.map(rowToKey).filter((k): k is StoredPubKey => k !== undefined);
+    const json = await req(
+      `/user-keys?filters[userId][$eq]=${encodeURIComponent(userId)}&pagination[limit]=-1`
+    );
+    return responseRows(json)
+      .map(rowToKey)
+      .filter((k): k is StoredPubKey => k !== undefined);
   } catch (e) {
     warnOnce('keysForUser', e);
     return [];
