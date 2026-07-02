@@ -1,265 +1,261 @@
 <script>
-	import { preventDefault } from 'svelte/legacy';
+  import axios from 'axios';
+  import { goto } from '$app/navigation';
+  import { page } from '$app/state';
+  import { fade } from 'svelte/transition';
+  import { t } from '$lib/translations';
 
-	import axios from 'axios';
-    import { goto} from '$app/navigation';
- 	import { page } from '$app/state'
-    const email = page.url.searchParams.get('code')
-	import { lang } from '$lib/stores/lang.js'
+  const code = page.url.searchParams.get('code');
 
-let passwordx;
-let errorl = $state(null);
-let before = $state(true);
+  let password = $state('');
+  let showPassword = $state(false);
+  let submitting = $state(false);
+  let done = $state(false);
+  let errorMsg = $state(null);
 
+  // The first three requirements are shown to the user and gate the submit
+  // button; the symbol check only feeds the 4th strength bar as a bonus.
+  let validations = $derived([
+    password.length >= 8,
+    /[A-Z]/.test(password),
+    /[0-9]/.test(password),
+    /[$&+,:;=?@#]/.test(password)
+  ]);
+  let strength = $derived(validations.filter(Boolean).length);
+  let canSubmit = $derived(
+    validations[0] && validations[1] && validations[2]
+  );
 
-function shaneh () {
-  console.log("1")
-          passwordx = passwordx.trim();
-  console.log("2")
-
-  // Request API.
-axios
-  .post('/api/auth/reset-password', {
-    code: email,
-    password: passwordx,
-    passwordConfirmation: passwordx,
-  })
-  .then(response => {
-    // Handle success.
-                    goto("/login", )
-    before = false;
-  })
-  .catch(error => {
-    // Handle error.
-    console.log('An error occurred:', error.response);
-  errorl = error.response.data ;
-  })};
-
-	let strength = $state(0);
-	let validations = $state([]);
-	let showPassword = $state(false);
-	function validatePassword(e) {
-        passwordx = e.target.value
-		const password = e.target.value;
-		validations = [
-			password.length > 5,
-			password.search(/[A-Z]/) > -1,
-			password.search(/[0-9]/) > -1,
-			password.search(/[$&+,:;=?@#]/) > -1,
-		];
-		strength = validations.reduce((acc, cur) => acc + cur, 0);
-
-	}
-	function getV (e){
-    passwordx = e.target.value
-	}
-	const crnp = {"he":"יצירת סיסמה חדשה","en":"create new password"}
-    const val1 = {"he":"על הססמה להכיל לפחות 8 אותיות","en": "be at least 8 characters"}
-  const val2 = {"he":"ולפחות אות אחת גדולה באנגלית","en": "must contain a capital letter"}
-  const val3 = {"he":"ולפחות מספר אחד","en": "must contain a number"}
-  const arr2 = {"he":"הסיסמה שונתה בהצלחה","en": "the password has been changed"}
-
+  function onSubmit(event) {
+    event.preventDefault();
+    if (!canSubmit || submitting) return;
+    submitting = true;
+    errorMsg = null;
+    const trimmed = password.trim();
+    axios
+      .post('/api/auth/reset-password', {
+        code,
+        password: trimmed,
+        passwordConfirmation: trimmed
+      })
+      .then(() => {
+        done = true;
+        setTimeout(() => goto('/login'), 3000);
+      })
+      .catch((error) => {
+        console.error('reset-password failed:', error?.response || error);
+        errorMsg = error?.response?.data?.message || $t('auth.change.error');
+      })
+      .finally(() => {
+        submitting = false;
+      });
+  }
 </script>
 
 <svelte:head>
-  <title>{$lang === 'he' ? 'שינוי סיסמה' : $lang === 'ar' ? 'تغيير كلمة المرور' : 'Change Password'} · 1lev1</title>
+  <title>{$t('auth.change.title')}</title>
 </svelte:head>
 
-{#if before}
-<div>
-        <div>
-            {#if errorl}
-                        <h1
-                        style="color:var(--barbi-pink); font-size:13px; font-weight:bold background-color: white; opacity: 0.7;"
-                        >{errorl} </h1>
-       {/if}
+{#if !done}
+  <h1 class="auth-heading">{$t('auth.change.heading')}</h1>
+  <p class="auth-sub">{$t('auth.change.subtitle')}</p>
+
+  {#if errorMsg}
+    <div class="auth-alert" role="alert" in:fade>{errorMsg}</div>
+  {/if}
+
+  <form class="auth-form" onsubmit={onSubmit}>
+    <div class="auth-field">
+      <label class="auth-label" for="new-password"
+        >{$t('auth.change.passwordLabel')}</label
+      >
+      <div class="auth-input-wrap">
+        <span class="auth-input-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <rect
+              x="4.5"
+              y="10"
+              width="15"
+              height="10"
+              rx="2"
+              stroke="currentColor"
+              stroke-width="1.7"
+            />
+            <path
+              d="M8 10V7a4 4 0 0 1 8 0v3"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"
+            />
+          </svg>
+        </span>
+        <input
+          class="auth-input"
+          id="new-password"
+          name="password"
+          type={showPassword ? 'text' : 'password'}
+          bind:value={password}
+          placeholder={$t('auth.change.passwordPlaceholder')}
+          autocomplete="new-password"
+          aria-describedby="password-reqs"
+          dir="ltr"
+        />
+        <button
+          type="button"
+          class="auth-toggle"
+          onclick={() => (showPassword = !showPassword)}
+          aria-label={showPassword
+            ? $t('auth.login.hidePassword')
+            : $t('auth.login.showPassword')}
+          title={showPassword
+            ? $t('auth.login.hidePassword')
+            : $t('auth.login.showPassword')}
+        >
+          {#if showPassword}
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M2.99902 3L20.999 21M9.8433 9.91364C9.32066 10.4536 8.99902 11.1892 8.99902 12C8.99902 13.6569 10.3422 15 11.999 15C12.8215 15 13.5667 14.669 14.1086 14.133M6.49902 6.64715C4.59972 7.90034 3.15305 9.78394 2.45703 12C3.73128 16.0571 7.52159 19 11.9992 19C13.9881 19 15.8414 18.4194 17.3988 17.4184M10.999 5.04939C11.328 5.01673 11.6617 5 11.9992 5C16.4769 5 20.2672 7.94291 21.5414 12C21.2607 12.894 20.8577 13.7338 20.3522 14.5"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          {:else}
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M2.45703 12C3.73128 7.94291 7.52159 5 11.9992 5C16.4769 5 20.2672 7.94291 21.5414 12C20.2672 16.0571 16.4769 19 11.9992 19C7.52159 19 3.73128 16.0571 2.45703 12Z"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M11.9992 15C13.6561 15 14.9992 13.6569 14.9992 12C14.9992 10.3431 13.6561 9 11.9992 9C10.3424 9 8.99924 10.3431 8.99924 12C8.99924 13.6569 10.3424 15 11.9992 15Z"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          {/if}
+        </button>
+      </div>
     </div>
 
-
-
-
-<main>
-	<form onsubmit={preventDefault(shaneh)}>
-
-
-		<div class="field">
-			<input
-				autocomplete="new-password"
-   				type={showPassword ? "text" : "password"}
-				name="password"
-				class="input"
-				placeholder={crnp[$lang]}
-				oninput={validatePassword}
-				onblur={getV}
-			/>
-			<span
-				class="toggle-password"
-				onmouseenter={() => (showPassword = true)}
-				onmouseleave={() => (showPassword = false)}
-			>
-				{showPassword ? "🔒" : "👁"}
-			</span>
-		</div>
-
-
-		<div class="strength">
-			<span class="bar bar-1" class:bar-show={strength > 0}></span>
-			<span class="bar bar-2" class:bar-show={strength > 1}></span>
-			<span class="bar bar-3" class:bar-show={strength > 2}></span>
-			<span class="bar bar-4" class:bar-show={strength > 3}></span>
-		</div>
-
-		<ul dir="rtl">
-			<li>
-				{validations[0] ? "🏆" : "❌"} {val1[$lang]}
-			</li>
-			<li>
-				{validations[1] ? "🏆" : "❌"} {val2[$lang]}
-			</li>
-			<li>{validations[2] ? "🏆" : "❌"} {val3[$lang]}</li>
-			<!--<li>
-				{validations[3] ? "🏆" : "❌"}  ולפחות סמל אחד מאלו($&+,:;=?@#) must contain one symbol ($&+,:;=?@#)
-			</li>-->
-		</ul>
-
-		<button onclick={shaneh} disabled={strength < 4}>{crnp[$lang]}</button>
-	</form>
-</main>
-
-
+    <div class="strength" aria-hidden="true">
+      <span class="bar" class:on={strength > 0}></span>
+      <span class="bar" class:on={strength > 1}></span>
+      <span class="bar" class:on={strength > 2}></span>
+      <span class="bar" class:on={strength > 3}></span>
     </div>
-    {:else }
-<h1 class="text-center text-barbi">{arr2[$lang]}</h1>
 
-    {/if}
+    <ul class="reqs" id="password-reqs">
+      <li class:ok={validations[0]}>
+        <span class="req-mark" aria-hidden="true"
+          >{validations[0] ? '✓' : '•'}</span
+        >
+        {$t('auth.change.req1')}
+      </li>
+      <li class:ok={validations[1]}>
+        <span class="req-mark" aria-hidden="true"
+          >{validations[1] ? '✓' : '•'}</span
+        >
+        {$t('auth.change.req2')}
+      </li>
+      <li class:ok={validations[2]}>
+        <span class="req-mark" aria-hidden="true"
+          >{validations[2] ? '✓' : '•'}</span
+        >
+        {$t('auth.change.req3')}
+      </li>
+    </ul>
+
+    <button type="submit" class="auth-submit" disabled={!canSubmit || submitting}>
+      {#if submitting}
+        <span class="auth-spinner" aria-hidden="true"></span>
+        {$t('auth.change.submitting')}
+      {:else}
+        {$t('auth.change.submit')}
+      {/if}
+    </button>
+  </form>
+{:else}
+  <div class="auth-success" role="status">
+    <span class="auth-success-icon" aria-hidden="true">💗</span>
+    <h1 class="auth-heading" style="margin-top: 0.2rem;">
+      {$t('auth.change.successTitle')}
+    </h1>
+    <p class="auth-sub">{$t('auth.change.successBody')}</p>
+    <a class="auth-secondary" href="/login">{$t('auth.change.goToLogin')}</a>
+  </div>
+{/if}
+
 <style>
+  .strength {
+    display: flex;
+    gap: 6px;
+    margin-top: -0.2rem;
+  }
+  .bar {
+    flex: 1;
+    height: 6px;
+    border-radius: 999px;
+    background: #f0e3ea;
+    transition: background-color 350ms ease;
+  }
+  .bar.on:nth-child(1) {
+    background: #ff7ab8;
+  }
+  .bar.on:nth-child(2) {
+    background: #ff4da3;
+  }
+  .bar.on:nth-child(3) {
+    background: var(--barbi-pink, #ff0092);
+  }
+  .bar.on:nth-child(4) {
+    background: #b38728;
+  }
 
-	.field {
-		width: 80%;
-		position: relative;
-		border-bottom: 2px dashed var(--text-color);
-		margin: 1rem auto ;
-	}
-	.label {
-		color: var(--text-color);
-		font-size: 1.2rem;
-	}
-	.input {
-		outline: none;
-		border: none;
-		overflow: hidden;
-		margin: 0;
-		width: 50%;
-		margin: 0 auto;
-		padding: 0.25rem 0;
-		background-color: white;
-		color: white;
-		font-size: 1.2em;
-		font-weight: bold;
-		transition: border 500ms;
-	}
-	.input:valid {
-		color: yellowgreen;
-	}
-	.input:invalid {
-		color: orangered;
-	}
-	/*border animation*/
-	.field::after {
-		content: "";
-		position: relative;
-		display: block;
-		height: 4px;
-		width: 100%;
-		background: yellowgreen;
-		transform: scaleX(0);
-		transform-origin: 0%;
-		transition: transform 500ms ease;
-		top: 2px;
-	}
-	.field:focus-within {
-		border-color: transparent;
-	}
-	.field:focus-within::after {
-		transform: scaleX(1);
-		opacity: 1;
-	}
-	/*label animation*/
-	.label {
-		z-index: -1;
-		position: absolute;
-		transform: translateY(-2rem);
-		transform-origin: 0%;
-		transition: transform 400ms;
-	}
-	.field:focus-within .label,
-	.input:not(:placeholder-shown) + .label {
-		transform: scale(0.8) translateY(-5rem);
-		opacity: 1;
-	}
-	/*strength meter*/
-	.strength {
-		display: flex;
-		height: 20px;
-		width: 80%;
-		margin: 0 auto;
-	}
-	.bar {
-		margin-right: 5px;
-		height: 100%;
-		width: 25%;
-		transition: box-shadow 500ms;
-		box-shadow: inset 0px 20px #1f1f1f;
-	}
-	.bar-show {
-		box-shadow: none;
-	}
-	.bar-1 {
-		background: linear-gradient(to right, red, orangered);
-	}
-	.bar-2 {
-		background: linear-gradient(to right, orangered, yellow);
-	}
-	.bar-3 {
-		background: linear-gradient(to right, yellow, yellowgreen);
-	}
-	.bar-4 {
-		background: linear-gradient(to right, yellowgreen, green);
-	}
-	.bar:last-child {
-		margin-right: 0;
-	}
-	ul {
-		list-style: none;
-		margin: 10px 26%;
-		padding: 0;
-		font-size: 0.7rem;
-		text-align: center;
-		background-color: var(--barbi-pink);
-		color: var(--gold);
-		opacity: 0.8;
-	}
-	/* Buttons */
-	button {
-		margin-top: 2rem;
-		padding: 5px 20px 10px 20px;
-		font-weight: bold;
-		border: 2px solid rgb(250, 0, 187);
-		color: rgb(153, 255, 0);
-		background: transparent;
-		transition: all 1000ms;
-    margin-left: 1rem;
-    margin-right: auto;
-	}
-	button:disabled {
-		border-color: var(--gold);
-		color: var(--gold);
-	}
-	.toggle-password {
-		position: absolute;
-		cursor: help;
-		font-size: 0.8rem;
-		right: 0.25rem;
-		bottom: 0.5rem;
-	}
+  .reqs {
+    list-style: none;
+    margin: 0;
+    padding: 0.75rem 0.9rem;
+    background: #fffdf6;
+    border: 1px solid #efe3c0;
+    border-radius: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.82rem;
+    color: #8a5a75;
+    text-align: start;
+  }
+  .reqs li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 250ms ease;
+  }
+  .reqs li.ok {
+    color: #1c8a4d;
+  }
+  .req-mark {
+    display: inline-grid;
+    place-items: center;
+    width: 1.15rem;
+    height: 1.15rem;
+    border-radius: 50%;
+    background: #f0e3ea;
+    color: #b99a9f;
+    font-size: 0.7rem;
+    font-weight: 700;
+    transition:
+      background-color 250ms ease,
+      color 250ms ease;
+  }
+  li.ok .req-mark {
+    background: #d8f3e3;
+    color: #1c8a4d;
+  }
 </style>
