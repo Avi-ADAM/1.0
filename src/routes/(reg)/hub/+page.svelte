@@ -62,7 +62,7 @@
       {:else}
         {#if summary.kpi.urgent > 0}
           <div class="stagger" style="--i:1">
-            <UrgentVotePill count={summary.kpi.urgent} href="/lev" />
+            <UrgentVotePill count={summary.kpi.urgent} href="/lev?focus=votes" />
           </div>
         {/if}
 

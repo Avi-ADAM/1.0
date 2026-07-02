@@ -64,10 +64,19 @@ export async function loadLevSlice(
     ? pids.map(String)
     : (userData.attributes?.projects_1s?.data ?? []).map((p: any) => String(p.id));
 
-  def.store.update((curr: any[]) => [
-    ...curr.filter((item: any) => !coveredPids.includes(String(item.projectId))),
-    ...fresh
-  ]);
+  if (!pids && def.source === 'user') {
+    // User-scoped slice with no project filter = the full collection for this
+    // user, possibly spanning projects the user is not a member of (e.g.
+    // purchases). A projectId-based upsert can't express that scope — replace
+    // the store wholesale instead (coveredPids would be empty/partial and the
+    // merge would duplicate items).
+    def.store.set(fresh);
+  } else {
+    def.store.update((curr: any[]) => [
+      ...curr.filter((item: any) => !coveredPids.includes(String(item.projectId))),
+      ...fresh
+    ]);
+  }
 
   // Mark scope as loaded (upgrade 'none' → 'partial', keep 'full' as-is)
   dataMode.update((mode) => (mode === 'full' ? 'full' : 'partial'));
