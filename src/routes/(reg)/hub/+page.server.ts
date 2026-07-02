@@ -9,9 +9,27 @@ export interface HubKpi {
   activeSales: number;
 }
 
+/**
+ * One vote-awaiting item, ready for the hub ActionFeed. `type` is the lev
+ * `ani` value of the item's card type, so the client can deep-link into the
+ * matching quantum slice (`/lev?focus=<type>&project=<projectId>`).
+ * `title` may be empty (e.g. decisions have no name) — the client falls back
+ * to a localized type label.
+ */
+export interface HubFeedItem {
+  id: string;
+  type: string;
+  title: string;
+  projectId: string;
+  projectName: string;
+  urgent: boolean;
+  deadline: string | null;
+  createdAt: string | null;
+}
+
 export interface HubSummary {
   kpi: HubKpi;
-  topFive: any[];
+  topFive: HubFeedItem[];
   username: string;
   profilePic?: string;
 }
@@ -59,18 +77,37 @@ function processHubSummary(raw: any, uid: string): HubSummary {
   const attrs = userData.attributes;
   let votes = 0;
   let urgent = 0;
+  const feed: HubFeedItem[] = [];
 
   for (const project of attrs.projects_1s?.data ?? []) {
     const pa = project.attributes;
+    const projectId = String(project.id);
+    const projectName = pa.projectName ?? '';
+
+    // Register one vote-awaiting item: bump the KPIs and add a feed candidate.
+    const noteVote = (type: string, item: any, title: string) => {
+      votes++;
+      const deadline = item.attributes?.timegrama?.data?.attributes?.date ?? null;
+      const isU = isUrgent(deadline);
+      if (isU) urgent++;
+      feed.push({
+        id: String(item.id),
+        type,
+        title,
+        projectId,
+        projectName,
+        urgent: isU,
+        deadline,
+        createdAt: item.attributes?.createdAt ?? null
+      });
+    };
 
     // pendms – ordered (negopendmissions count matters for orderon)
     for (const pend of pa.pendms?.data ?? []) {
       const a = pend.attributes;
       const negoCount = a.negopendmissions?.data?.length ?? 0;
-      const vots = a.users ?? [];
-      if (needsOrderedVote(vots, negoCount, uid)) {
-        votes++;
-        if (isUrgent(a.timegrama?.data?.attributes?.date)) urgent++;
+      if (needsOrderedVote(a.users ?? [], negoCount, uid)) {
+        noteVote('pends', pend, a.name ?? '');
       }
     }
 
@@ -78,29 +115,43 @@ function processHubSummary(raw: any, uid: string): HubSummary {
     for (const fin of pa.finiapruvals?.data ?? []) {
       const a = fin.attributes;
       if (needsSimpleVote(a.vots ?? [], uid)) {
-        votes++;
-        if (isUrgent(a.timegrama?.data?.attributes?.date)) urgent++;
+        noteVote('fiapp', fin, a.missname ?? '');
       }
     }
 
     // askms – simple (no order)
     for (const askm of pa.askms?.data ?? []) {
-      if (needsSimpleVote(askm.attributes.vots ?? [], uid)) votes++;
+      const a = askm.attributes;
+      if (needsSimpleVote(a.vots ?? [], uid)) {
+        const title =
+          a.open_mashaabim?.data?.attributes?.name ??
+          a.pmash?.data?.attributes?.name ??
+          a.sp?.data?.attributes?.name ??
+          '';
+        noteVote('askedm', askm, title);
+      }
     }
 
     // maaps – simple (no order)
     for (const maap of pa.maaps?.data ?? []) {
-      if (needsSimpleVote(maap.attributes.vots ?? [], uid)) votes++;
+      const a = maap.attributes;
+      if (needsSimpleVote(a.vots ?? [], uid)) {
+        noteVote('wegets', maap, a.name || (a.mashabetahalich?.data?.attributes?.name ?? ''));
+      }
     }
 
-    // decisions – simple (any vote counts)
+    // decisions – simple (any vote counts); no name field → client shows a type label
     for (const dec of pa.decisions?.data ?? []) {
-      if (needsSimpleVote(dec.attributes.vots ?? [], uid)) votes++;
+      if (needsSimpleVote(dec.attributes.vots ?? [], uid)) {
+        noteVote('hachla', dec, '');
+      }
     }
 
     // tosplits – ordered
     for (const ts of pa.tosplits?.data ?? []) {
-      if (needsOrderedVote(ts.attributes.vots ?? [], 0, uid)) votes++;
+      if (needsOrderedVote(ts.attributes.vots ?? [], 0, uid)) {
+        noteVote('haluk', ts, ts.attributes.name ?? '');
+      }
     }
 
     // sheirutpends – ordered, relational votes (Vote entity)
@@ -112,11 +163,21 @@ function processHubSummary(raw: any, uid: string): HubSummary {
         users_permissions_user: v.attributes?.users_permissions_user
       }));
       if (needsOrderedVote(normalizedVots, 0, uid)) {
-        votes++;
-        if (isUrgent(a.timegrama?.data?.attributes?.date)) urgent++;
+        noteVote('sheirutp', sp, a.sheirut?.data?.attributes?.name ?? '');
       }
     }
   }
+
+  // Most pressing first: urgent, then nearest deadline, then longest-waiting.
+  feed.sort((a, b) => {
+    if (a.urgent !== b.urgent) return a.urgent ? -1 : 1;
+    const ad = a.deadline ? new Date(a.deadline).getTime() : Infinity;
+    const bd = b.deadline ? new Date(b.deadline).getTime() : Infinity;
+    if (ad !== bd) return ad - bd;
+    const ac = a.createdAt ? new Date(a.createdAt).getTime() : Infinity;
+    const bc = b.createdAt ? new Date(b.createdAt).getTime() : Infinity;
+    return ac - bc;
+  });
 
   // Active purchases (user as buyer – sheiruts directly on user)
   const activePurchases = (attrs.sheiruts?.data ?? []).filter((s: any) => {
@@ -138,7 +199,7 @@ function processHubSummary(raw: any, uid: string): HubSummary {
 
   return {
     kpi: { votes, urgent, suggestions, activePurchases, activeSales },
-    topFive: [],
+    topFive: feed.slice(0, 5),
     username: attrs.username ?? '',
     profilePic: attrs.profilePic?.data?.attributes?.url
   };
