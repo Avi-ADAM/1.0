@@ -9913,6 +9913,22 @@ export const qids = {
               user_1s {
                 data {
                   id
+                  attributes {
+                    username
+                    haskamaz
+                    haskamac
+                    email
+                    noMail
+                    haskama
+                    profilePic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
                 }
               }
               profilePic {
@@ -10028,6 +10044,22 @@ export const qids = {
               user_1s {
                 data {
                   id
+                  attributes {
+                    username
+                    haskamaz
+                    haskamac
+                    email
+                    noMail
+                    haskama
+                    profilePic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
                 }
               }
               profilePic {
@@ -10230,6 +10262,22 @@ export const qids = {
               user_1s {
                 data {
                   id
+                  attributes {
+                    username
+                    haskamaz
+                    haskamac
+                    email
+                    noMail
+                    haskama
+                    profilePic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
                 }
               }
               profilePic {
@@ -10324,6 +10372,22 @@ export const qids = {
               user_1s {
                 data {
                   id
+                  attributes {
+                    username
+                    haskamaz
+                    haskamac
+                    email
+                    noMail
+                    haskama
+                    profilePic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
                 }
               }
               profilePic {
@@ -10393,6 +10457,22 @@ export const qids = {
               user_1s {
                 data {
                   id
+                  attributes {
+                    username
+                    haskamaz
+                    haskamac
+                    email
+                    noMail
+                    haskama
+                    profilePic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
                 }
               }
               profilePic {
@@ -10645,6 +10725,22 @@ export const qids = {
               user_1s {
                 data {
                   id
+                  attributes {
+                    username
+                    haskamaz
+                    haskamac
+                    email
+                    noMail
+                    haskama
+                    profilePic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
                 }
               }
               profilePic {
@@ -10755,6 +10851,22 @@ export const qids = {
               user_1s {
                 data {
                   id
+                  attributes {
+                    username
+                    haskamaz
+                    haskamac
+                    email
+                    noMail
+                    haskama
+                    profilePic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
                 }
               }
               profilePic {
@@ -10931,6 +11043,22 @@ export const qids = {
               user_1s {
                 data {
                   id
+                  attributes {
+                    username
+                    haskamaz
+                    haskamac
+                    email
+                    noMail
+                    haskama
+                    profilePic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
                 }
               }
               profilePic {
@@ -11038,6 +11166,22 @@ export const qids = {
               user_1s {
                 data {
                   id
+                  attributes {
+                    username
+                    haskamaz
+                    haskamac
+                    email
+                    noMail
+                    haskama
+                    profilePic {
+                      data {
+                        attributes {
+                          url
+                          formats
+                        }
+                      }
+                    }
+                  }
                 }
               }
               profilePic {
