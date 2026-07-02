@@ -438,7 +438,8 @@
 <style>
   .focus-chip {
     position: fixed;
-    top: 0.5rem;
+    /* Below the cards/coins switch, which owns top:1rem center (z-[1000]) */
+    top: 4.5rem;
     left: 50%;
     transform: translateX(-50%);
     z-index: 40;
