@@ -2,6 +2,7 @@ import { webcrypto } from 'node:crypto';
 import { algoParams } from '$lib/crypto/algorithm';
 import { verifySignedObject, type PubKeyResolver } from '$lib/crypto/verify';
 import type { ConsentEvent } from '$lib/consent/event';
+import { hasCommitments, verifyCommitments } from '$lib/consent/commitment';
 import { consentStore } from './store';
 import { b64urlDecode } from '$lib/crypto/b64';
 
@@ -14,7 +15,7 @@ if (!globalThis.crypto) {
 }
 
 export const resolveFromStore: PubKeyResolver = async (actor, devicePubB64) => {
-  const stored = consentStore.getKey(actor, devicePubB64);
+  const stored = await consentStore.getKey(actor, devicePubB64);
   if (!stored) return null;
   if (stored.revokedAt) return null;
 
@@ -29,5 +30,17 @@ export const resolveFromStore: PubKeyResolver = async (actor, devicePubB64) => {
 };
 
 export async function verifyConsentEvent(ev: ConsentEvent) {
-  return verifySignedObject(ev, resolveFromStore);
+  const sig = await verifySignedObject(ev, resolveFromStore);
+  if (!sig.ok) return sig;
+
+  // Phase 1.5 — state commitments (PLAN_rikma_as_state_machine §7). Runs in
+  // 'available' mode until Phase 3 enforcement: a provably false stateRoot /
+  // delta / quorum is rejected; unverifiable claims pass with warnings.
+  if (hasCommitments(ev)) {
+    const c = await verifyCommitments(ev, {
+      getEvent: (id) => consentStore.getEvent(id)
+    });
+    if (!c.ok) return { ok: false as const, reason: `commitment:${c.reason}` };
+  }
+  return sig;
 }
