@@ -1,0 +1,46 @@
+# SvelteKit API instance — runs on the Linux VPS next to Strapi.
+# Deployed by deploy-api.ps1 (the image is built locally and shipped with
+# docker save/load, so there is no `build:` section here on purpose).
+#
+# Expected layout on the server (default: /opt/1lev1/api):
+#   docker-compose.api.yml   <- this file (pushed by the script)
+#   .env                     <- runtime env, lives ONLY on the server:
+#                               STRAPI_URL=http://strapi:1337   (shared docker network)
+#                               ORIGIN=https://api.1lev1.com
+#                               ADMINMONTHER=..., cookies secrets, etc.
+#
+# Strapi stays bound to 127.0.0.1 / the internal docker network — only this
+# service and Nginx (TLS -> 127.0.0.1:3000) are reachable from outside.
+# See docs/PLAN_PROXY_SECURITY.md stage 3 and docs/DEPLOY_API_DOCKER.md.
+
+services:
+  sveltekit-api:
+    image: 1lev1/sveltekit-api:latest
+    container_name: sveltekit-api
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      # adapter-node needs ORIGIN for correct CSRF/origin checks behind Nginx
+      - ORIGIN=${ORIGIN:-https://api.1lev1.com}
+      - BODY_SIZE_LIMIT=${BODY_SIZE_LIMIT:-50M}
+    ports:
+      # loopback only — Nginx terminates TLS and proxies to 127.0.0.1:3000
+      - "127.0.0.1:3000:3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      - app-network
+
+networks:
+  # Same external network the socket-server joins; put the Strapi container on
+  # it too so STRAPI_URL=http://strapi:1337 resolves.
+  # Create once on the server: docker network create app_app-network
+  app-network:
+    external: true
+    name: app_app-network

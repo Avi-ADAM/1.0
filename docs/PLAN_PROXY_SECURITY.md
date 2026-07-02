@@ -341,4 +341,5 @@ Strapi נחסם מבחוץ ומדבר רק עם SvelteKit דרך loopback.
 7. - [ ] guardrails (3.4) + grep = 0
 8. - [ ] שלב 2 — rate limiting, body size, CORS
 9. - [ ] שלב 3 — פריסת SvelteKit על ה-VPS, נעילת Strapi ל-`127.0.0.1` + firewall (ufw), Nginx ל-`/admin` + TLS; **ללא** צורך ב-location מיוחד ל-`/uploads` (Cloudinary)
+   - [x] קבצי docker + סקריפט פריסה לאינסטנס ה-API נוצרו (2026-07-02): `Dockerfile`, `.dockerignore`, `docker-compose.api.yml`, `deploy-api.ps1`, `/api/health` — ראה `docs/DEPLOY_API_DOCKER.md`
 10. - [ ] שלב 4 — אימות סופי, ניקוי, תיעוד
