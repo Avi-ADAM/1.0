@@ -44,9 +44,10 @@
 </script>
 
 <div class="space-y-3">
-  <!-- Hero: votes waiting (the primary daily action) -->
+  <!-- Hero: votes waiting (the primary daily action) — quantum-loads only the
+       vote-relevant slices instead of the full lev query -->
   <a
-    href="/lev"
+    href="/lev?focus=votes"
     class="hero block no-underline rounded-3xl p-5 border transition-all active:scale-[0.985]
            {votes > 0
              ? 'border-gold/30 bg-gradient-to-br from-gold/15 via-white/5 to-transparent'

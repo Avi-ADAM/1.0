@@ -15,7 +15,9 @@
   import { initializeLevData } from '$lib/utils/levDataLoader';
   import { setupSocketListeners } from '$lib/utils/levSocketHandler';
   import { loadLevSlice } from '$lib/utils/levSliceLoader';
-  import { sliceKeysForAni, runnableSliceKeys } from '$lib/utils/levSliceRegistry';
+  import { sliceKeysForFocus, runnableSliceKeys } from '$lib/utils/levSliceRegistry';
+  import { dataMode } from '$lib/stores/levStores';
+  import { get } from 'svelte/store';
   import {
     nowChatId,
     isChatOpen
@@ -175,14 +177,16 @@
     const focusProject = page.url.searchParams.get('project');
 
     try {
-      if (focusAni) {
-        // Quantum (fast) path: load only the requested slice, then kick off the
-        // full query 83 in the background so the page becomes complete quietly.
+      if (focusAni && get(dataMode) !== 'full') {
+        // Quantum (fast) path: load only the requested slice(s), then kick off
+        // the full query 83 in the background so the page becomes complete
+        // quietly. Skipped when full data is already in memory (client-side
+        // nav back from hub) — nothing to speed up.
         if (focusProject) {
           projectFilter.set(focusProject);
         }
 
-        const sliceKeys = sliceKeysForAni(focusAni).filter((k) =>
+        const sliceKeys = sliceKeysForFocus(focusAni).filter((k) =>
           runnableSliceKeys().includes(k)
         );
 

@@ -254,6 +254,13 @@ Phase-1 approach (cheapest, ships value immediately): **deep-link into lev**
 with a focus param — `href="/lev?focus=sheirutp&project=Y"`. In
 `src/routes/(reg)/lev/+page.svelte`:
 
+> **Focus groups:** `?focus=` also accepts a *virtual group* name that expands
+> to several slice types (see `LEV_FOCUS_GROUPS` in `levSliceRegistry.ts`).
+> The hub "votes waiting" hero and the urgent pill use `?focus=votes`, which
+> expands to the seven vote-bearing types the hub KPI counts
+> (pends, fiapp, askedResources, wegets, decisions, halukas, sheirutpends).
+> Comma-separated ani values (`?focus=sale,buy`) work too.
+
 - On mount, read `focus` / `project` from `page.url.searchParams`.
 - If `focus` is present and `dataMode !== 'full'`: skip `initializeLevData`,
   call `loadLevSlice` for the registry entries whose `anis` include the focus

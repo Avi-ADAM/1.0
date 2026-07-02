@@ -96,7 +96,7 @@ export const LEV_SLICES: Record<string, LevSliceDef> = {
   },
 
   wegets: {
-    qid: null, // TODO: add 87levSliceWegets query
+    qid: '87levSliceWegets',
     extract: extractWegets,
     store: wegetsStore,
     anis: ['wegets'],
@@ -104,7 +104,7 @@ export const LEV_SLICES: Record<string, LevSliceDef> = {
   },
 
   halukas: {
-    qid: null, // TODO: add 87levSliceHalukas query
+    qid: '87levSliceHalukas',
     extract: extractHalukas,
     store: halukasStore,
     anis: ['haluk'],
@@ -143,10 +143,19 @@ export const LEV_SLICES: Record<string, LevSliceDef> = {
     source: 'project'
   },
 
+  // askms hang off projects_1s (extractAskedResources walks projects_1s[].askms)
+  askedResources: {
+    qid: '87levSliceAskedResources',
+    extract: extractAskedResources,
+    store: askedResourcesStore,
+    anis: ['askedm'],
+    source: 'project'
+  },
+
   // ── user-scoped types ────────────────────────────────────────────────────
 
   mtaha: {
-    qid: null, // TODO: add 87levSliceMtaha query (user-scoped)
+    qid: '87levSliceMtaha',
     extract: extractMtaha,
     store: mtahaStore,
     anis: ['mtaha'],
@@ -161,16 +170,8 @@ export const LEV_SLICES: Record<string, LevSliceDef> = {
     source: 'user'
   },
 
-  askedResources: {
-    qid: null, // TODO: add 87levSliceAskedResources query (user-scoped)
-    extract: extractAskedResources,
-    store: askedResourcesStore,
-    anis: ['askedm'],
-    source: 'user'
-  },
-
   purchases: {
-    qid: null, // TODO: add 87levSlicePurchases query (user-scoped)
+    qid: '87levSlicePurchases',
     extract: extractPurchases,
     store: purchasesStore,
     anis: ['buy'],
@@ -184,6 +185,16 @@ export const LEV_SLICES: Record<string, LevSliceDef> = {
 };
 
 /**
+ * Virtual focus groups: a single ?focus= value that expands to several slice
+ * types. `votes` mirrors the hub KPI "votes waiting" count, which sums the
+ * open-vote items across these collections (see hub/+page.server.ts):
+ * pendms, finiapruvals, askms, maaps, decisions, tosplits, sheirutpends.
+ */
+export const LEV_FOCUS_GROUPS: Record<string, string[]> = {
+  votes: ['pends', 'fiapp', 'askedResources', 'wegets', 'decisions', 'halukas', 'sheirutpends']
+};
+
+/**
  * Find all slice keys whose anis array contains the given ani value.
  * Used to translate a ?focus= param into slice keys.
  */
@@ -191,6 +202,20 @@ export function sliceKeysForAni(ani: string): string[] {
   return Object.entries(LEV_SLICES)
     .filter(([, def]) => def.anis.includes(ani))
     .map(([key]) => key);
+}
+
+/**
+ * Translate a ?focus= param into slice keys: either a virtual group name
+ * (e.g. 'votes') or one/more comma-separated ani values.
+ */
+export function sliceKeysForFocus(focus: string): string[] {
+  if (LEV_FOCUS_GROUPS[focus]) {
+    return LEV_FOCUS_GROUPS[focus];
+  }
+  const keys = focus
+    .split(',')
+    .flatMap((ani) => sliceKeysForAni(ani.trim()));
+  return Array.from(new Set(keys));
 }
 
 /**
