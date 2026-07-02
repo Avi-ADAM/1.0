@@ -121,7 +121,7 @@ const voteOnPmashHandler: ActionExecutionHandler = async (params, context, { str
       ? `recurring: true, cycleSize: ${parseInt(String(attrs.cycleSize ?? 1), 10) || 1},`
       : '';
 
-    const strapiUrl = process.env.VITE_URL ?? 'https://tovmeod.1lev1.com';
+    const strapiUrl = import.meta.env.VITE_URL ?? 'https://tovmeod.1lev1.com';
     const graphqlUrl = `${strapiUrl}/graphql`;
     const headers = {
       Authorization: `bearer ${context.jwt}`,

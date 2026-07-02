@@ -51,8 +51,17 @@
   let omiData = $derived(projectMissionsData?.open_missions?.data ?? []);
   /** @type {any[]} */
   let missionTemplates = $derived(data.missionTemplates ?? []);
+  const getImageUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) return url;
+    const base = import.meta.env.VITE_URL || '';
+    const cleanBase = base.endsWith('/') ? base.slice(0, -1) : base;
+    const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+    return `${cleanBase}${cleanUrl}`;
+  };
+
   let pn = $derived(projectBase?.projectName ?? '');
-  let pl = $derived(projectBase?.profilePic?.data?.attributes?.url ?? '');
+  let pl = $derived(getImageUrl(projectBase?.profilePic?.data?.attributes?.url));
   let projectUsers = $derived(projectBase?.user_1s?.data ?? []);
   let restime = $derived(projectBase?.restime);
   /** @type {string[]} */

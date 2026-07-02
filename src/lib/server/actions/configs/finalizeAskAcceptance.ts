@@ -89,7 +89,7 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
   const tafkidimsStr = finalTafkidims.join(',');
   const otherAsksFragment = variant === 'allVoted' ? 'asks { data { id } }' : '';
 
-  const strapiUrl = process.env.VITE_URL || 'https://tovmeod.1lev1.com';
+  const strapiUrl = import.meta.env.VITE_URL || 'https://tovmeod.1lev1.com';
   const graphqlUrl = `${strapiUrl}/graphql`;
   const headers = {
     Authorization: `bearer ${context.jwt}`,

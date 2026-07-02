@@ -3,6 +3,13 @@
 		"svelte": {
 			"type": "http",
 			"url": "https://mcp.svelte.dev/mcp"
+		},
+		"1lev1-mcp": {
+			"type": "http",
+			"url": "https://rend.1lev1.com/api/mcp",
+			"headers": {
+				"Authorization": "Bearer 1lev1_1_705f6f493fd35c121569e0abbbc85c347a1692290b620cf3"
+			}
 		}
 	}
 }

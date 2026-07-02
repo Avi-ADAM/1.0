@@ -25,6 +25,17 @@
   let socketUnsubscribe;
   let projectId = $derived(page.params.projectId);
 
+  function getImageUrl(url) {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+      return url;
+    }
+    const base = import.meta.env.VITE_URL || '';
+    const cleanBase = base.endsWith('/') ? base.slice(0, -1) : base;
+    const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+    return `${cleanBase}${cleanUrl}`;
+  }
+
   // Count of open items awaiting a vote — drives the badge on the "votes" tab.
   // Count-only query (pagination meta), loaded after mount and refreshed on
   // vote socket events, so it never blocks the moach base load.
@@ -334,7 +345,7 @@
 
           <TourItem message={tour.badge}>
             <AuthorityBadge
-              logoSrc={projectBase.profilePic?.data?.attributes?.url}
+              logoSrc={getImageUrl(projectBase.profilePic?.data?.attributes?.url)}
               projectName={projectBase.projectName}
               memberCount={projectBase.user_1s?.data?.length || 0}
               size={200}
@@ -494,7 +505,7 @@
                   class="inline-block h-10 w-10 rounded-full ring-2 transition-all duration-300 {hasActiveTimer
                     ? 'ring-green-400 ring-4 shadow-lg shadow-green-400/50'
                     : 'ring-gold'}"
-                  src={user.attributes.profilePic?.data?.attributes?.url ||
+                  src={getImageUrl(user.attributes.profilePic?.data?.attributes?.url) ||
                     'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
                   alt={user.attributes.username}
                 />

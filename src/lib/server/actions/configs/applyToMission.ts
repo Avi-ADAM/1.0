@@ -217,7 +217,7 @@ const applyToMissionHandler: ActionExecutionHandler = async (params, context, { 
 
     // 2. Atomic mutation: createMesimabetahalich + updateOpenMission (archive)
     //    (same pattern as finalizeJoinAcceptance main mutation, minus Ask/member parts)
-    const strapiUrl = process.env.VITE_URL || 'https://tovmeod.1lev1.com';
+    const strapiUrl = import.meta.env.VITE_URL || 'https://tovmeod.1lev1.com';
     const graphqlUrl = `${strapiUrl}/graphql`;
     const headers = {
       Authorization: `bearer ${context.jwt}`,

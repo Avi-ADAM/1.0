@@ -25,6 +25,17 @@
     goto(`/moach/${id}`);
     idPr.set(id);
   }
+
+  function getImageUrl(url: string | null) {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+      return url;
+    }
+    const base = import.meta.env.VITE_URL || '';
+    const cleanBase = base.endsWith('/') ? base.slice(0, -1) : base;
+    const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+    return `${cleanBase}${cleanUrl}`;
+  }
 </script>
 
 <svelte:head>
@@ -56,7 +67,7 @@
               class="w-6 h-6 rounded-full overflow-hidden ring-2 ring-gold/30 group-hover:ring-gold transition-all duration-300 flex-shrink-0"
             >
               <img
-                src={project.profilePic}
+                src={getImageUrl(project.profilePic)}
                 alt={`${project.projectName} logo`}
                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
               />

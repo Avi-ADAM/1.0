@@ -124,7 +124,7 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
     const sqadualedFrag = attrs.sqadualed ? `sqadualed: "${attrs.sqadualed}"` : '';
     const datesFrag = attrs.dates ? `dates: "${attrs.dates}"` : '';
 
-    const strapiUrl = process.env.VITE_URL ?? 'https://tovmeod.1lev1.com';
+    const strapiUrl = import.meta.env.VITE_URL ?? 'https://tovmeod.1lev1.com';
     const graphqlUrl = `${strapiUrl}/graphql`;
     const headers = {
       Authorization: `bearer ${context.jwt}`,

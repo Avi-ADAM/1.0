@@ -29,7 +29,7 @@ const voteOnDecisionHandler: ActionExecutionHandler = async (params, context, { 
   // 1. Fetch Decision with current vots
   const decisionRes = await strapi.execute(
     '159getDecisionForVote',
-    { id: decisionId },
+    { eid: decisionId },
     context.jwt,
     context.fetch,
   );

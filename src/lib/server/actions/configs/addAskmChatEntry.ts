@@ -2,7 +2,7 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 
 const addAskmChatEntryHandler: ActionExecutionHandler = async (params, context) => {
   const { askId, why } = params;
-  const strapiUrl = process.env.VITE_URL || 'https://tovmeod.1lev1.com';
+  const strapiUrl = import.meta.env.VITE_URL || 'https://tovmeod.1lev1.com';
 
   // 1. Fetch current askm chat
   const getRes = await context.fetch(

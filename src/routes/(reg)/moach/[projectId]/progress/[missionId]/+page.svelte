@@ -1,4 +1,5 @@
 <script>
+  import { page } from '$app/state';
   const moachStore = getMoachStore();
   import { lang } from '$lib/stores/lang.js';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
@@ -6,6 +7,15 @@
   import { onMount } from 'svelte';
   import Lowding from '$lib/celim/lowding.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
+
+  const getImageUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) return url;
+    const base = import.meta.env.VITE_URL || '';
+    const cleanBase = base.endsWith('/') ? base.slice(0, -1) : base;
+    const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+    return `${cleanBase}${cleanUrl}`;
+  };
 
   let projectId = $derived(page.params.projectId);
   let missionId = $derived(page.params.missionId);
@@ -95,7 +105,7 @@
           <div class="flex items-center gap-3">
             <img
               class="w-10 h-10 rounded-full"
-              src={mission.attributes.users_permissions_user?.data?.attributes?.profilePic?.data?.attributes?.url || 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
+              src={getImageUrl(mission.attributes.users_permissions_user?.data?.attributes?.profilePic?.data?.attributes?.url) || 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
               alt=""
             />
             <span class="font-medium">{mission.attributes.users_permissions_user?.data?.attributes?.username}</span>
