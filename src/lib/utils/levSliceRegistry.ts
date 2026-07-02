@@ -219,6 +219,22 @@ export function sliceKeysForFocus(focus: string): string[] {
 }
 
 /**
+ * Translate a ?focus= param into the ani values it covers — used by the lev
+ * page to filter the rendered cards (not just the data loading) so the user
+ * sees only the focused type(s) even after the background full load lands.
+ */
+export function anisForFocus(focus: string): string[] {
+  const groupKeys = LEV_FOCUS_GROUPS[focus];
+  if (groupKeys) {
+    return Array.from(new Set(groupKeys.flatMap((k) => LEV_SLICES[k]?.anis ?? [])));
+  }
+  return focus
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+/**
  * Return only the slice keys that have a qid registered (ready to use).
  */
 export function runnableSliceKeys(): string[] {

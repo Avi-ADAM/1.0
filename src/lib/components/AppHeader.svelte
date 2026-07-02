@@ -16,12 +16,26 @@
       .slice(0, 2)
       .toUpperCase() || '??'
   );
+
+  // Way back home: the deals screens sit outside the (reg) layout, so the
+  // header carries its own links to the app's main screens.
+  const navLabels: Record<string, Record<string, string>> = {
+    hub: { he: 'מרכז', en: 'Hub', ar: 'المركز' },
+    lev: { he: 'הלב', en: 'Heart', ar: 'القلب' },
+    moach: { he: 'רקמות', en: 'Rikmot', ar: 'ركموت' }
+  };
+  const nl = (key: string) => navLabels[key][$lang] ?? navLabels[key].he;
 </script>
 
 <header class="header">
   <a href="/deals" class="logo">
     <img src="/deals logo.png" alt="Deals" class="logo-img" />
   </a>
+  <nav class="main-nav">
+    <a href="/hub" class="nav-link"><span class="nav-icon">🏠</span><span class="nav-word">{nl('hub')}</span></a>
+    <a href="/lev" class="nav-link"><span class="nav-icon">💗</span><span class="nav-word">{nl('lev')}</span></a>
+    <a href="/moach" class="nav-link"><span class="nav-icon">🧠</span><span class="nav-word">{nl('moach')}</span></a>
+  </nav>
   <div class="right">
     <div class="badge">{tr.header.premiumBadge[$lang]}</div>
     <button class="notif" aria-label={tr.header.notifications[$lang]}>
@@ -76,6 +90,34 @@
     display: flex;
     align-items: center;
     gap: 12px;
+  }
+
+  .main-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--s2);
+    color: var(--gold-l);
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .nav-link:hover {
+    border-color: var(--border-g);
+    transform: translateY(-1px);
+  }
+  .nav-icon {
+    font-size: 13px;
+    line-height: 1;
   }
 
   .badge {
@@ -152,6 +194,13 @@
     }
     .badge {
       display: none;
+    }
+    /* Narrow screens: keep the way-back links, drop the words */
+    .nav-word {
+      display: none;
+    }
+    .nav-link {
+      padding: 4px 8px;
     }
   }
 </style>
