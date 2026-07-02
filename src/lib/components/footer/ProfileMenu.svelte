@@ -6,6 +6,7 @@
 
   const translations = {
     he: {
+      more: 'עוד',
       profile: 'פרופיל',
       timers: 'טיימרים',
       calendar: 'לוח שנה',
@@ -15,6 +16,7 @@
       myActs: 'המטלות שלי'
     },
     en: {
+      more: 'More',
       profile: 'Profile',
       timers: 'Timers',
       calendar: 'Calendar',
@@ -24,6 +26,7 @@
       myActs: 'My Tasks'
     },
     ar: {
+      more: 'المزيد',
       profile: 'الملف الشخصي',
       timers: 'المؤقتات',
       calendar: 'التقويم',
@@ -77,7 +80,7 @@
       ></path>
     </svg>
     <span class="text-[9px] leading-none text-gray-500 dark:text-gray-300">
-      {translations[$lang]?.profile || translations.en.profile}
+      {translations[$lang]?.more || translations.en.more}
     </span>
     <span class="sr-only">
       {translations[$lang]?.profileMenu || translations.en.profileMenu}

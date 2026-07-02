@@ -15,7 +15,11 @@
   import { initializeLevData } from '$lib/utils/levDataLoader';
   import { setupSocketListeners } from '$lib/utils/levSocketHandler';
   import { loadLevSlice } from '$lib/utils/levSliceLoader';
-  import { sliceKeysForFocus, runnableSliceKeys } from '$lib/utils/levSliceRegistry';
+  import {
+    sliceKeysForFocus,
+    anisForFocus,
+    runnableSliceKeys
+  } from '$lib/utils/levSliceRegistry';
   import { dataMode } from '$lib/stores/levStores';
   import { get } from 'svelte/store';
   import {
@@ -58,11 +62,26 @@
   // Subscribe to view mode
   let cards = $state(true);
 
+  // Focused view (?focus= deep-link from hub): show only these ani values.
+  // Kept as a view-level filter so the background full load can complete the
+  // stores without flooding the screen with every card type.
+  let focusFilter = $state(null);
+
   // Reactive subscriptions
   $effect(() => {
-    displayItems = $finalSwiperArray;
+    displayItems = focusFilter
+      ? $finalSwiperArray.filter((i) => focusFilter.has(i.ani))
+      : $finalSwiperArray;
     cards = $isCardsView;
   });
+
+  const focusChipText = { he: 'תצוגה ממוקדת', en: 'Focused view' };
+  const showAllText = { he: 'הצג הכל', en: 'Show all' };
+
+  function clearFocus() {
+    focusFilter = null;
+    projectFilter.set(null);
+  }
 
   // Dialog state
   let isOpen = $state(false);
@@ -176,16 +195,24 @@
     const focusAni = page.url.searchParams.get('focus');
     const focusProject = page.url.searchParams.get('project');
 
+    // Apply the focused view regardless of how the data gets loaded — the
+    // whole point of the deep-link is seeing only the requested cards.
+    if (focusAni) {
+      const anis = anisForFocus(focusAni);
+      if (anis.length > 0) {
+        focusFilter = new Set(anis);
+      }
+      if (focusProject) {
+        projectFilter.set(focusProject);
+      }
+    }
+
     try {
       if (focusAni && get(dataMode) !== 'full') {
         // Quantum (fast) path: load only the requested slice(s), then kick off
         // the full query 83 in the background so the page becomes complete
         // quietly. Skipped when full data is already in memory (client-side
         // nav back from hub) — nothing to speed up.
-        if (focusProject) {
-          projectFilter.set(focusProject);
-        }
-
         const sliceKeys = sliceKeysForFocus(focusAni).filter((k) =>
           runnableSliceKeys().includes(k)
         );
@@ -314,6 +341,16 @@
     </div>
   </DialogOverlay>
 
+  <!-- Focused-view chip: visible while a ?focus= deep-link filter is active -->
+  {#if focusFilter}
+    <div class="focus-chip" dir="auto">
+      <span>{focusChipText[$lang] ?? focusChipText.he}</span>
+      <button type="button" onclick={clearFocus}>
+        {showAllText[$lang] ?? showAllText.he}
+      </button>
+    </div>
+  {/if}
+
   <!-- Main Content -->
   <Tooltip title={u} ispic={true}>
     {#if cards}
@@ -399,6 +436,34 @@
 {/if}
 
 <style>
+  .focus-chip {
+    position: fixed;
+    top: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.9rem;
+    border-radius: 9999px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(179, 135, 40, 0.6);
+    color: #fff;
+    font-size: 0.75rem;
+    backdrop-filter: blur(6px);
+  }
+  .focus-chip button {
+    border: none;
+    border-radius: 9999px;
+    padding: 0.15rem 0.6rem;
+    background: rgba(179, 135, 40, 0.85);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
   .loading-container {
     display: flex;
     justify-content: center;
