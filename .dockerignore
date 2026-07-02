@@ -1,0 +1,37 @@
+# deps / build artifacts (rebuilt inside the image)
+node_modules
+build
+.svelte-kit
+.vercel
+.output
+
+# secrets — the .env is passed to the build as a BuildKit secret, never in the context
+.env
+.env.*
+
+# unrelated sub-projects (deployed separately)
+android
+remotion
+socket-server
+
+# dev / test noise
+.git
+.github
+.kiro
+.embed-cache
+test-results
+dev_output.log
+*.log
+onboard_final_check.png
+verify_flows.spec.js
+verify_flows_v2.py
+verify_onboard_v2.js
+test-socket-integration.bat
+test-socket-integration.sh
+test.ps1
+deploy-api.ps1
+
+# docs
+docs
+readmes
+*.md
