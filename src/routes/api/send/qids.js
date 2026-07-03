@@ -11870,6 +11870,29 @@ export const qids = {
     }
   }`,
 
+  // Open, un-pooled wishes eligible for auto-aggregation (clusterRatsons).
+  // Uses ratson.maagad / aggregation_opt_out — only available once the 1.0b
+  // schema deploys, so the caller guards this query.
+  '233listOpenRatsonsForClustering': `query ListOpenRatsonsForClustering {
+    ratsons(
+      filters: {
+        and: [
+          { status_ratson: { in: ["open", "matching"] } }
+          { aggregation_opt_out: { ne: true } }
+          { maagad: { id: { null: true } } }
+        ]
+      }
+      pagination: { limit: 200 }
+      sort: "createdAt:desc"
+    ) {
+      data { id attributes {
+        name isOnline lat lng radius frequency language
+        categories { data { id } }
+        users_permissions_users { data { id } }
+      } }
+    }
+  }`,
+
   // ── Sale actions ──────────────────────────────────────────────────────────
 
   'createSaleRecord': `mutation CreateSaleRecord(

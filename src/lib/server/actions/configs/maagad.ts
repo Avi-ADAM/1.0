@@ -26,6 +26,7 @@ import {
   type OfferState,
   type OfferStatus
 } from '../../maagad/offerStateMachine.js';
+import { clusterWishes, type ClusterWish } from '../../maagad/clustering.js';
 
 const VISIBILITIES = new Set(['anonymous', 'first_name', 'full']);
 const RECURRENCES = new Set(['one_time', 'weekly', 'biweekly', 'monthly']);
@@ -622,6 +623,114 @@ const expireMaagadOffersHandler: ActionExecutionHandler = async (_params, contex
   return { data: { expiredCount: expired.length, expiredOfferIds: expired } };
 };
 
+// ── clusterRatsons (§5 — auto-aggregation job) ──────────────────────────────
+// Queries open, un-pooled wishes, runs the pure clustering (geo/frequency/
+// category gates + similarity), and materialises a maagad per cluster with its
+// members in `suggested` status (an invitation, never an auto-join — §5.5).
+// Batch/cron entry point; safe to re-run (pooled wishes are filtered out by the
+// `maagad: null` query).
+
+const clusterRatsonsHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
+  const simThreshold = params?.simThreshold;
+  const minClusterSize = params?.minClusterSize;
+
+  const res = await strapi.execute(
+    '233listOpenRatsonsForClustering',
+    {},
+    context.jwt,
+    context.fetch
+  );
+  const rows = res?.data?.ratsons?.data ?? [];
+
+  // Keep the owner ids alongside the pure ClusterWish so we can invite them.
+  const ownersById = new Map<string, string[]>();
+  const wishes: ClusterWish[] = rows.map((r: any) => {
+    const a = r.attributes ?? {};
+    ownersById.set(
+      String(r.id),
+      (a.users_permissions_users?.data ?? []).map((u: any) => String(u.id))
+    );
+    return {
+      id: String(r.id),
+      name: a.name ?? '',
+      isOnline: !!a.isOnline,
+      lat: a.lat ?? null,
+      lng: a.lng ?? null,
+      radius: a.radius != null ? Number(a.radius) : null,
+      frequency: a.frequency ?? null,
+      language: a.language ?? null,
+      categoryIds: (a.categories?.data ?? []).map((c: any) => String(c.id))
+    };
+  });
+
+  const clusters = clusterWishes(wishes, {
+    ...(typeof simThreshold === 'number' ? { simThreshold } : {}),
+    ...(typeof minClusterSize === 'number' ? { minClusterSize } : {})
+  });
+
+  const created: Array<{ maagadId: string; size: number }> = [];
+
+  for (const cluster of clusters) {
+    const seed = cluster.members[0];
+    const createdMaagad = await strapi.execute(
+      '224crMaagad',
+      {
+        name: seed.name || 'ביקוש קבוצתי',
+        // The plan calls for an LLM-written unified description; the seed name
+        // is the initial stand-in until that is wired.
+        canonical_desc: seed.name || null,
+        scope: cluster.online ? 'global' : 'local',
+        lat: cluster.lat,
+        lng: cluster.lng,
+        radius: cluster.radiusKm != null ? Math.round(cluster.radiusKm) : null,
+        frequency: cluster.frequency,
+        status_maagad: 'forming',
+        origin: 'system_cluster',
+        // Simple heuristic until real viability estimation lands.
+        viability_hint: Math.max(cluster.members.length * 2, 5),
+        ratsons: cluster.members.map((m) => m.id),
+        publishedAt: nowIso()
+      },
+      context.jwt,
+      context.fetch
+    );
+    const maagadId = createdMaagad?.data?.createMaagad?.data?.id;
+    if (!maagadId) continue;
+
+    // Invite every wish owner as `suggested` — no auto-join (§5.5, §2.1).
+    const invitedUserIds = new Set<string>();
+    for (const m of cluster.members) {
+      for (const uid of ownersById.get(m.id) ?? []) {
+        if (invitedUserIds.has(uid)) continue;
+        invitedUserIds.add(uid);
+        await strapi.execute(
+          '225crMaagadMember',
+          {
+            maagad: maagadId,
+            user: uid,
+            ratson: m.id,
+            status_member: 'suggested',
+            visibility: 'anonymous',
+            joinedAt: nowIso(),
+            publishedAt: nowIso()
+          },
+          context.jwt,
+          context.fetch
+        );
+      }
+    }
+    created.push({ maagadId, size: cluster.members.length });
+  }
+
+  return {
+    data: {
+      scanned: wishes.length,
+      clustersCreated: created.length,
+      pools: created
+    }
+  };
+};
+
 // ── Configs ─────────────────────────────────────────────────────────────────
 
 const jwtRule = { type: 'jwt' as const, errorMessage: 'you must be logged in' };
@@ -751,6 +860,16 @@ export const maagadActions: ActionConfig[] = [
     description: 'Batch: expire offers past their deadline; signers revert to interested (cron)',
     graphqlOperation: expireMaagadOffersHandler,
     paramSchema: {},
+    authRules: [jwtRule]
+  },
+  {
+    key: 'clusterRatsons',
+    description: 'Auto-aggregation job: cluster open wishes into demand pools with suggested members',
+    graphqlOperation: clusterRatsonsHandler,
+    paramSchema: {
+      simThreshold: { type: 'number', required: false, description: 'Override similarity threshold (0-1)' },
+      minClusterSize: { type: 'number', required: false, description: 'Override minimum cluster size (default 3)' }
+    },
     authRules: [jwtRule]
   }
 ];

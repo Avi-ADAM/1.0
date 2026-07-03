@@ -92,7 +92,7 @@ src/routes/api/send/qids.js                     ← 207–210 (ראה §5)
 | `222mapOpenMashaabims` | משאבים מבוקשים, אותו מבנה |
 | `223mapMaagadim` | מאגדים forming/visible/offered + ההצעות הפתוחות שלהם (guarded — §3) |
 
-**פעולות מאגד (M2):** `224crMaagad`, `225crMaagadMember`, `226updateMaagadMember`, `227crMaagadOffer`, `228updateMaagadOffer`, `229queryMaagadFull`, `230updateMaagad`, `231queryMyMaagadMember`, `232listExpiredOpenOffers`.
+**פעולות מאגד (M2):** `224crMaagad`, `225crMaagadMember`, `226updateMaagadMember`, `227crMaagadOffer`, `228updateMaagadOffer`, `229queryMaagadFull`, `230updateMaagad`, `231queryMyMaagadMember`, `232listExpiredOpenOffers`, `233listOpenRatsonsForClustering`.
 
 ## 6. אבני דרך
 
@@ -100,7 +100,7 @@ src/routes/api/send/qids.js                     ← 207–210 (ראה §5)
 | --- | --- | --- | --- |
 | M0 | מסמך זה + spec סכמה + קבצי v3 ב-1.0b | – | סשן זה |
 | M1 | `/demand` ציבורי: מפה + שתי עדשות + שכבות ratson/open-mission/open-mashaabim מהסכמה הקיימת + רשימת-צד + deep-links | M0 | סשן זה |
-| M2 | `/maagad/[id]` (צפייה/הצטרפות/עזיבה/חתימה/ביטול-חתימה, פרטיות בשרת) + actions: `openMaagad`/`joinMaagad`/`leaveMaagad`/`createMaagadOffer`/`signMaagadOffer`/`unsignMaagadOffer`/`confirmMaagadQuorum`/`expireMaagadOffers` (QIDs 224–232) + מכונת-מצבים טהורה `offerStateMachine.ts` (22 טסטים) + `MaagadOfferForm` + חיבור מהמפה | סכמה בפרודקשן (הענף מוכן) | **סשן זה** — חסר רק: Sheirutpend מותנה + הרצת pipeline העסקה פר-חבר בהפעלה; `clusterRatsons` (איגוד אוטומטי) |
+| M2 | `/maagad/[id]` (צפייה/הצטרפות/עזיבה/חתימה/ביטול-חתימה, פרטיות בשרת) + actions: `openMaagad`/`joinMaagad`/`leaveMaagad`/`createMaagadOffer`/`signMaagadOffer`/`unsignMaagadOffer`/`confirmMaagadQuorum`/`expireMaagadOffers`/`clusterRatsons` (QIDs 224–233) + מכונות טהורות `offerStateMachine.ts` (22) + `clustering.ts` (11) + `MaagadOfferForm` + חיבור מהמפה | סכמה בפרודקשן (הענף מוכן) | **סשן זה** — חסר רק: Sheirutpend מותנה + הרצת pipeline העסקה פר-חבר בהפעלה; שדרוג `similarity()` ל-Pinecone |
 | M3 | עדשת-ספק פעילה בהקשר פרויקט: `/moach/[projectId]/demand` משתמש באותו `DiscoveryMap` עם pre-filter גיאו של הפרויקט; חיבור ההפעלה ל-Sheirutpend מותנה (`activateMaagadOffer` → deal pipeline) | M2 + P2 של PLAN_SHARED_PURCHASE | הבא |
 | M4 | הצעות-סף (Track C) על המפה עם progress חי (socket) + heat-layer ביקוש כשצפיפות גבוהה | P4 | עתידי |
 
