@@ -11659,11 +11659,11 @@ export const qids = {
   }`,
 
   // ── Discovery map (PLAN_DISCOVERY_MAP §5) ────────────────────────────────
-  // Public queries feeding /demand. 207–209 run against the live schema;
-  // 210 targets the maagad collections (SPEC_SHARED_PURCHASE_MAP in 1.0b) and
-  // is called behind a guard until they exist in production.
+  // Public queries feeding /demand. 220–222 run against the live schema;
+  // 223mapMaagadim targets the maagad collections (SPEC_SHARED_PURCHASE_MAP in
+  // 1.0b) and is called behind a guard until they exist in production.
 
-  '207mapJoinableRatsons': `query MapJoinableRatsons {
+  '220mapJoinableRatsons': `query MapJoinableRatsons {
     ratsons(
       filters: {
         and: [
@@ -11684,7 +11684,7 @@ export const qids = {
     }
   }`,
 
-  '208mapOpenMissions': `query MapOpenMissions {
+  '221mapOpenMissions': `query MapOpenMissions {
     openMissions(
       filters: { archived: { eq: false } }
       pagination: { limit: 250 }
@@ -11700,7 +11700,7 @@ export const qids = {
     }
   }`,
 
-  '209mapOpenMashaabims': `query MapOpenMashaabims {
+  '222mapOpenMashaabims': `query MapOpenMashaabims {
     openMashaabims(
       filters: { archived: { eq: false } }
       pagination: { limit: 250 }
@@ -11715,7 +11715,7 @@ export const qids = {
     }
   }`,
 
-  '210mapMaagadim': `query MapMaagadim {
+  '223mapMaagadim': `query MapMaagadim {
     maagads(
       filters: { status_maagad: { in: ["forming", "visible", "offered"] } }
       pagination: { limit: 250 }
@@ -11732,7 +11732,7 @@ export const qids = {
 
   // ── Maagad actions (PLAN_SHARED_PURCHASE Track B/C, PLAN_DISCOVERY_MAP M2) ─
 
-  '211crMaagad': `mutation CrMaagad(
+  '224crMaagad': `mutation CrMaagad(
     $name: String, $canonical_desc: String, $scope: ENUM_MAAGAD_SCOPE,
     $lat: Float, $lng: Float, $radius: Long, $frequency: String,
     $status_maagad: ENUM_MAAGAD_STATUS_MAAGAD, $origin: ENUM_MAAGAD_ORIGIN,
@@ -11748,7 +11748,7 @@ export const qids = {
     }
   }`,
 
-  '212crMaagadMember': `mutation CrMaagadMember(
+  '225crMaagadMember': `mutation CrMaagadMember(
     $maagad: ID!, $user: ID!, $ratson: ID,
     $status_member: ENUM_MAAGADMEMBER_STATUS_MEMBER,
     $visibility: ENUM_MAAGADMEMBER_VISIBILITY,
@@ -11763,7 +11763,7 @@ export const qids = {
     }
   }`,
 
-  '213updateMaagadMember': `mutation UpdateMaagadMember(
+  '226updateMaagadMember': `mutation UpdateMaagadMember(
     $id: ID!, $status_member: ENUM_MAAGADMEMBER_STATUS_MEMBER,
     $signed_offer: ID, $options: JSON,
     $visibility: ENUM_MAAGADMEMBER_VISIBILITY,
@@ -11778,7 +11778,7 @@ export const qids = {
     }
   }`,
 
-  '214crMaagadOffer': `mutation CrMaagadOffer(
+  '227crMaagadOffer': `mutation CrMaagadOffer(
     $maagad: ID!, $proposer_user: ID, $proposer_project: ID,
     $title: String, $description: String,
     $unit_price: Float, $currency: ID, $price_tiers: JSON,
@@ -11801,7 +11801,7 @@ export const qids = {
     }
   }`,
 
-  '215updateMaagadOffer': `mutation UpdateMaagadOffer(
+  '228updateMaagadOffer': `mutation UpdateMaagadOffer(
     $id: ID!, $signed_count: Int, $status_offer: ENUM_MAAGADOFFER_STATUS_OFFER
   ) {
     updateMaagadOffer(id: $id, data: {
@@ -11811,7 +11811,7 @@ export const qids = {
     }
   }`,
 
-  '216queryMaagadFull': `query QueryMaagadFull($id: ID!) {
+  '229queryMaagadFull': `query QueryMaagadFull($id: ID!) {
     maagad(id: $id) {
       data { id attributes {
         name canonical_desc scope lat lng radius frequency
@@ -11820,6 +11820,7 @@ export const qids = {
         vallues { data { id attributes { valueName } } }
         members { data { id attributes {
           status_member visibility joinedAt
+          signed_offer { data { id } }
           user { data { id attributes { username profilePic { data { attributes { url } } } } } }
         } } }
         offers { data { id attributes {
@@ -11834,7 +11835,7 @@ export const qids = {
     }
   }`,
 
-  '217updateMaagad': `mutation UpdateMaagad(
+  '230updateMaagad': `mutation UpdateMaagad(
     $id: ID!, $status_maagad: ENUM_MAAGAD_STATUS_MAAGAD,
     $lat: Float, $lng: Float, $radius: Long, $viability_hint: Int
   ) {
@@ -11846,7 +11847,21 @@ export const qids = {
     }
   }`,
 
-  '218queryMyMaagadMember': `query QueryMyMaagadMember($maagadId: ID!, $userId: ID!) {
+  '232listExpiredOpenOffers': `query ListExpiredOpenOffers($now: DateTime!) {
+    maagadOffers(
+      filters: { status_offer: { eq: "open" }, sign_deadline: { lt: $now } }
+      pagination: { limit: 100 }
+    ) {
+      data { id attributes {
+        title sign_deadline signed_count min_participants
+        maagad { data { id attributes { status_maagad } } }
+        proposer_user { data { id } }
+        signed_members { data { id attributes { user { data { id } } } } }
+      } }
+    }
+  }`,
+
+  '231queryMyMaagadMember': `query QueryMyMaagadMember($maagadId: ID!, $userId: ID!) {
     maagadMembers(
       filters: { maagad: { id: { eq: $maagadId } }, user: { id: { eq: $userId } } }
       pagination: { limit: 1 }

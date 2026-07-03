@@ -16,13 +16,13 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 
   const res: any = await sendToSer(
     { id: params.id },
-    '216queryMaagadFull',
+    '229queryMaagadFull',
     0,
     0,
     false,
     fetch
   ).catch((e: any) => {
-    console.error('[maagad/:id] 216queryMaagadFull failed', e);
+    console.error('[maagad/:id] 229queryMaagadFull failed', e);
     return null;
   });
 

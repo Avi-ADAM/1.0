@@ -81,14 +81,18 @@ src/routes/api/send/qids.js                     ← 207–210 (ראה §5)
 
 **אופן המסירה**: קבצי v4 מלאים (`src/api/maagad*` + הרחבות `ratson`/`sheirutpend`) על ענף העבודה שמבוסס `shabab` ב-1.0b. אחרי מיזוג ודיפלוי: הענקת הרשאות (Public: find/findOne על maagad+maagad-offer) והרצת codegen בפרונט — פירוט ב-`docs/SPEC_SHARED_PURCHASE_MAP.md`.
 
-## 5. QIDs (פנויים מ-207; 180–199 מהתוכנית המקורית כבר נחצו ע"י 200–206)
+## 5. QIDs (בלוק 220+ — 180–219 כבר תפוסים ע"י התכניות הקודמות ו-site-share)
+
+**מפה (§2):**
 
 | QID | תוכן |
 | --- | --- |
-| `207mapJoinableRatsons` | משאלות-להצטרפות לפי הסינון של §2 + lat notNull, עד 250 |
-| `208mapOpenMissions` | משימות פתוחות + location + project(location, projectName) + skills + ratson(id) |
-| `209mapOpenMashaabims` | משאבים מבוקשים, אותו מבנה |
-| `210mapMaagadim` | מאגדים forming/visible/offered + ההצעות הפתוחות שלהם (guarded — §3) |
+| `220mapJoinableRatsons` | משאלות-להצטרפות לפי הסינון של §2 + lat notNull, עד 250 |
+| `221mapOpenMissions` | משימות פתוחות + location + project(location, projectName) + skills + ratson(id) |
+| `222mapOpenMashaabims` | משאבים מבוקשים, אותו מבנה |
+| `223mapMaagadim` | מאגדים forming/visible/offered + ההצעות הפתוחות שלהם (guarded — §3) |
+
+**פעולות מאגד (M2):** `224crMaagad`, `225crMaagadMember`, `226updateMaagadMember`, `227crMaagadOffer`, `228updateMaagadOffer`, `229queryMaagadFull`, `230updateMaagad`, `231queryMyMaagadMember`, `232listExpiredOpenOffers`.
 
 ## 6. אבני דרך
 
@@ -96,8 +100,8 @@ src/routes/api/send/qids.js                     ← 207–210 (ראה §5)
 | --- | --- | --- | --- |
 | M0 | מסמך זה + spec סכמה + קבצי v3 ב-1.0b | – | סשן זה |
 | M1 | `/demand` ציבורי: מפה + שתי עדשות + שכבות ratson/open-mission/open-mashaabim מהסכמה הקיימת + רשימת-צד + deep-links | M0 | סשן זה |
-| M2 | `/maagad/[id]` (צפייה/הצטרפות/עזיבה/חתימה/ביטול-חתימה, פרטיות בשרת) + actions: `openMaagad`/`joinMaagad`/`leaveMaagad`/`createMaagadOffer`/`signMaagadOffer`/`unsignMaagadOffer` (QIDs 211–218) + `MaagadOfferForm` + חיבור מהמפה | סכמה בפרודקשן (הענף מוכן) | **סשן זה** — חסר: Sheirutpend מותנה בחתימה, אישור-ספק/הפעלה אטומית, `clusterRatsons`, cron פקיעות |
-| M3 | עדשת-ספק פעילה בהקשר פרויקט: `/moach/[projectId]/demand` משתמש באותו `DiscoveryMap` עם pre-filter גיאו של הפרויקט; `confirmMaagadQuorum`/`activateMaagadOffer` | M2 + P2 של PLAN_SHARED_PURCHASE | הבא |
+| M2 | `/maagad/[id]` (צפייה/הצטרפות/עזיבה/חתימה/ביטול-חתימה, פרטיות בשרת) + actions: `openMaagad`/`joinMaagad`/`leaveMaagad`/`createMaagadOffer`/`signMaagadOffer`/`unsignMaagadOffer`/`confirmMaagadQuorum`/`expireMaagadOffers` (QIDs 224–232) + מכונת-מצבים טהורה `offerStateMachine.ts` (22 טסטים) + `MaagadOfferForm` + חיבור מהמפה | סכמה בפרודקשן (הענף מוכן) | **סשן זה** — חסר רק: Sheirutpend מותנה + הרצת pipeline העסקה פר-חבר בהפעלה; `clusterRatsons` (איגוד אוטומטי) |
+| M3 | עדשת-ספק פעילה בהקשר פרויקט: `/moach/[projectId]/demand` משתמש באותו `DiscoveryMap` עם pre-filter גיאו של הפרויקט; חיבור ההפעלה ל-Sheirutpend מותנה (`activateMaagadOffer` → deal pipeline) | M2 + P2 של PLAN_SHARED_PURCHASE | הבא |
 | M4 | הצעות-סף (Track C) על המפה עם progress חי (socket) + heat-layer ביקוש כשצפיפות גבוהה | P4 | עתידי |
 
 ## 7. אימות

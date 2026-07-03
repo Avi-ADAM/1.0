@@ -9,13 +9,23 @@
  *   - the pool opener gets no special role: `openMaagad` just makes them the
  *     first member.
  *
- * Deferred to P3 (documented in PLAN_DISCOVERY_MAP): creating the conditional
- * Sheirutpend on sign, supplier quorum confirmation and atomic activation.
- * Signing here records the commitment on the membership + offer counters so
- * the flow is fully testable end-to-end without touching deal flows.
+ * Offer lifecycle (open → quorum_reached → activated / expired) is decided by
+ * the pure state machine in `../../maagad/offerStateMachine.ts`; the handlers
+ * here only wire those decisions to Strapi.
+ *
+ * Deferred to a later milestone (documented in PLAN_DISCOVERY_MAP): creating
+ * the conditional Sheirutpend on activation and running the existing deal
+ * pipeline per member. Activation here transitions the offer + members to
+ * `active`, which is the observable outcome the plan's §7.2 scenario checks.
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import {
+  canConfirm,
+  shouldExpire,
+  type OfferState,
+  type OfferStatus
+} from '../../maagad/offerStateMachine.js';
 
 const VISIBILITIES = new Set(['anonymous', 'first_name', 'full']);
 const RECURRENCES = new Set(['one_time', 'weekly', 'biweekly', 'monthly']);
@@ -30,7 +40,7 @@ function nowIso(): string {
 
 async function fetchMaagad(strapi: any, context: any, maagadId: string) {
   const res = await strapi.execute(
-    '216queryMaagadFull',
+    '229queryMaagadFull',
     { id: maagadId },
     context.jwt,
     context.fetch
@@ -42,7 +52,7 @@ async function fetchMaagad(strapi: any, context: any, maagadId: string) {
 
 async function fetchMyMember(strapi: any, context: any, maagadId: string) {
   const res = await strapi.execute(
-    '218queryMyMaagadMember',
+    '231queryMyMaagadMember',
     { maagadId, userId: context.userId },
     context.jwt,
     context.fetch
@@ -69,7 +79,7 @@ async function maybePromoteToVisible(
     newCount >= VISIBLE_THRESHOLD
   ) {
     await strapi.execute(
-      '217updateMaagad',
+      '230updateMaagad',
       { id: maagadId, status_maagad: 'visible' },
       context.jwt,
       context.fetch
@@ -100,7 +110,7 @@ const openMaagadHandler: ActionExecutionHandler = async (params, context, { stra
   const vis = VISIBILITIES.has(visibility) ? visibility : 'anonymous';
 
   const created = await strapi.execute(
-    '211crMaagad',
+    '224crMaagad',
     {
       name: String(name).trim(),
       canonical_desc: canonicalDesc,
@@ -122,7 +132,7 @@ const openMaagadHandler: ActionExecutionHandler = async (params, context, { stra
 
   // The opener is just the first member — no role, no authority (§5).
   await strapi.execute(
-    '212crMaagadMember',
+    '225crMaagadMember',
     {
       maagad: maagadId,
       user: context.userId,
@@ -165,7 +175,7 @@ const joinMaagadHandler: ActionExecutionHandler = async (params, context, { stra
       return { data: { maagadId, memberId: existing.id, already: true } };
     }
     await strapi.execute(
-      '213updateMaagadMember',
+      '226updateMaagadMember',
       { id: existing.id, status_member: 'interested', visibility: vis },
       context.jwt,
       context.fetch
@@ -173,7 +183,7 @@ const joinMaagadHandler: ActionExecutionHandler = async (params, context, { stra
     memberId = existing.id;
   } else {
     const created = await strapi.execute(
-      '212crMaagadMember',
+      '225crMaagadMember',
       {
         maagad: maagadId,
         user: context.userId,
@@ -216,7 +226,7 @@ const leaveMaagadHandler: ActionExecutionHandler = async (params, context, { str
   if (st === 'left') return { data: { maagadId, left: true } };
 
   await strapi.execute(
-    '213updateMaagadMember',
+    '226updateMaagadMember',
     { id: existing.id, status_member: 'left', leftAt: nowIso() },
     context.jwt,
     context.fetch
@@ -274,7 +284,7 @@ const createMaagadOfferHandler: ActionExecutionHandler = async (params, context,
       throw new Error('a local/regional supplier offer needs lat/lng');
     }
     const created = await strapi.execute(
-      '211crMaagad',
+      '224crMaagad',
       {
         name: String(newMaagad.name).trim(),
         canonical_desc: newMaagad.canonicalDesc ?? null,
@@ -295,7 +305,7 @@ const createMaagadOfferHandler: ActionExecutionHandler = async (params, context,
   }
 
   const offerRes = await strapi.execute(
-    '214crMaagadOffer',
+    '227crMaagadOffer',
     {
       maagad: targetMaagadId,
       proposer_user: context.userId,
@@ -323,7 +333,7 @@ const createMaagadOfferHandler: ActionExecutionHandler = async (params, context,
   // Pool now carries a live offer.
   if (maagadNode && ['forming', 'visible', 'dormant'].includes(maagadNode.attributes?.status_maagad)) {
     await strapi.execute(
-      '217updateMaagad',
+      '230updateMaagad',
       { id: targetMaagadId, status_maagad: 'offered' },
       context.jwt,
       context.fetch
@@ -385,7 +395,7 @@ const signMaagadOfferHandler: ActionExecutionHandler = async (params, context, {
   }
   if (!member) {
     const created = await strapi.execute(
-      '212crMaagadMember',
+      '225crMaagadMember',
       {
         maagad: maagadId,
         user: context.userId,
@@ -401,7 +411,7 @@ const signMaagadOfferHandler: ActionExecutionHandler = async (params, context, {
   }
 
   await strapi.execute(
-    '213updateMaagadMember',
+    '226updateMaagadMember',
     {
       id: member.id,
       status_member: 'signed',
@@ -416,7 +426,7 @@ const signMaagadOfferHandler: ActionExecutionHandler = async (params, context, {
   const newCount = currentCount + 1;
   const quorum = newCount >= Number(oa.min_participants || Infinity);
   await strapi.execute(
-    '215updateMaagadOffer',
+    '228updateMaagadOffer',
     {
       id: offerId,
       signed_count: newCount,
@@ -464,7 +474,7 @@ const unsignMaagadOfferHandler: ActionExecutionHandler = async (params, context,
   }
 
   await strapi.execute(
-    '213updateMaagadMember',
+    '226updateMaagadMember',
     { id: member.id, status_member: 'interested', signed_offer: null, signedAt: null },
     context.jwt,
     context.fetch
@@ -474,7 +484,7 @@ const unsignMaagadOfferHandler: ActionExecutionHandler = async (params, context,
   const droppedBelowMin =
     oa.status_offer === 'quorum_reached' && newCount < Number(oa.min_participants || 0);
   await strapi.execute(
-    '215updateMaagadOffer',
+    '228updateMaagadOffer',
     {
       id: offerId,
       signed_count: newCount,
@@ -485,6 +495,131 @@ const unsignMaagadOfferHandler: ActionExecutionHandler = async (params, context,
   );
 
   return { data: { maagadId, offerId, unsigned: true, signedCount: newCount } };
+};
+
+// ── confirmMaagadQuorum + activateMaagadOffer (§7.2) ────────────────────────
+// The supplier confirms the final number, then the offer + its signed members
+// flip to active. (The conditional Sheirutpend + deal pipeline per member are a
+// later milestone — see the file header.)
+
+function offerStateFrom(oa: any): OfferState {
+  return {
+    status: (oa.status_offer as OfferStatus) ?? 'open',
+    signedCount: Number(oa.signed_count) || 0,
+    minParticipants: Number(oa.min_participants) || 0,
+    maxParticipants: oa.max_participants != null ? Number(oa.max_participants) : null,
+    signDeadline: oa.sign_deadline ?? null
+  };
+}
+
+async function activateOffer(
+  strapi: any,
+  context: any,
+  maagadId: string,
+  offerId: string,
+  maagadNode: any
+) {
+  await strapi.execute(
+    '228updateMaagadOffer',
+    { id: offerId, status_offer: 'activated' },
+    context.jwt,
+    context.fetch
+  );
+  await strapi.execute(
+    '230updateMaagad',
+    { id: maagadId, status_maagad: 'active' },
+    context.jwt,
+    context.fetch
+  );
+  // Every member who signed *this* offer becomes active.
+  const signedMembers = (maagadNode.attributes?.members?.data ?? []).filter(
+    (m: any) => String(m?.attributes?.signed_offer?.data?.id) === String(offerId)
+  );
+  const activatedUserIds: string[] = [];
+  for (const m of signedMembers) {
+    await strapi.execute(
+      '226updateMaagadMember',
+      { id: m.id, status_member: 'active' },
+      context.jwt,
+      context.fetch
+    );
+    const uid = m?.attributes?.user?.data?.id;
+    if (uid) activatedUserIds.push(String(uid));
+  }
+  return activatedUserIds;
+}
+
+const confirmMaagadQuorumHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
+  const { maagadId, offerId } = params as Record<string, any>;
+  if (!maagadId) throw new Error('maagadId is required');
+  if (!offerId) throw new Error('offerId is required');
+
+  const maagadNode = await fetchMaagad(strapi, context, maagadId);
+  const offer = (maagadNode.attributes?.offers?.data ?? []).find(
+    (o: any) => String(o.id) === String(offerId)
+  );
+  if (!offer) throw new Error(`Offer ${offerId} not found on maagad ${maagadId}`);
+  const oa = offer.attributes ?? {};
+
+  // Only the offering supplier may confirm (§7.2).
+  const proposerId = oa.proposer_user?.data?.id;
+  if (proposerId && String(proposerId) !== String(context.userId)) {
+    throw new Error('only the offering supplier may confirm the quorum');
+  }
+
+  const check = canConfirm(offerStateFrom(oa));
+  if (!check.ok) throw new Error(check.reason);
+
+  const activatedUserIds = await activateOffer(strapi, context, maagadId, offerId, maagadNode);
+
+  return {
+    data: { maagadId, offerId, activated: true, activatedCount: activatedUserIds.length },
+    notifyUserIds: activatedUserIds
+  };
+};
+
+// ── expireMaagadOffers (§7.3 — cron / batch) ────────────────────────────────
+// Pass-through-able as an /api/action call from a scheduled endpoint. Sweeps
+// open/quorum_reached offers past their deadline → expired; members who signed
+// only that offer fall back to interested. Silent expiry (§2.8) — one soft
+// notice to the signers, nothing public.
+
+const expireMaagadOffersHandler: ActionExecutionHandler = async (_params, context, { strapi }) => {
+  const now = new Date().toISOString();
+  const res = await strapi.execute(
+    '232listExpiredOpenOffers',
+    { now },
+    context.jwt,
+    context.fetch
+  );
+  const offers = res?.data?.maagadOffers?.data ?? [];
+  const expired: string[] = [];
+  const nowMs = Date.now();
+
+  for (const offer of offers) {
+    const oa = offer.attributes ?? {};
+    if (!shouldExpire(offerStateFrom(oa), nowMs)) continue;
+
+    await strapi.execute(
+      '228updateMaagadOffer',
+      { id: offer.id, status_offer: 'expired' },
+      context.jwt,
+      context.fetch
+    );
+    // Signers of this offer revert to interested (their conditional deal, once
+    // it exists, is archived by the same milestone that creates it).
+    for (const sm of oa.signed_members?.data ?? []) {
+      await strapi.execute(
+        '226updateMaagadMember',
+        { id: sm.id, status_member: 'interested', signed_offer: null, signedAt: null },
+        context.jwt,
+        context.fetch
+      );
+    }
+    expired.push(String(offer.id));
+  }
+
+  return { data: { expiredCount: expired.length, expiredOfferIds: expired } };
 };
 
 // ── Configs ─────────────────────────────────────────────────────────────────
@@ -590,6 +725,32 @@ export const maagadActions: ActionConfig[] = [
       maagadId: { type: 'string', required: true, description: 'The pool' },
       offerId: { type: 'string', required: true, description: 'The offer to unsign' }
     },
+    authRules: [jwtRule]
+  },
+  {
+    key: 'confirmMaagadQuorum',
+    description: 'Supplier confirms the quorum and activates the offer (members → active)',
+    graphqlOperation: confirmMaagadQuorumHandler,
+    paramSchema: {
+      maagadId: { type: 'string', required: true, description: 'The pool' },
+      offerId: { type: 'string', required: true, description: 'The offer to activate' }
+    },
+    authRules: [jwtRule],
+    notification: {
+      recipients: { type: 'specificUsers', config: { userIdsParam: 'notifyUserIds', excludeSender: true } },
+      templates: {
+        title: { he: 'יצאנו לדרך!', en: "We're a go!", ar: 'انطلقنا!' },
+        body: { he: 'ההצעה שחתמת עליה הופעלה — העסקה שלך יוצאת לפועל', en: 'The offer you signed is activated — your deal is going ahead', ar: 'العرض الذي وقّعت عليه مُفعّل — صفقتك تمضي قُدُمًا' }
+      },
+      channels: ['socket', 'push'],
+      metadata: { type: 'maagad', url: 'maagad' }
+    }
+  },
+  {
+    key: 'expireMaagadOffers',
+    description: 'Batch: expire offers past their deadline; signers revert to interested (cron)',
+    graphqlOperation: expireMaagadOffersHandler,
+    paramSchema: {},
     authRules: [jwtRule]
   }
 ];

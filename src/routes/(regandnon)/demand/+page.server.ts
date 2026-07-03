@@ -14,14 +14,14 @@ function nodesOf(result: PromiseSettledResult<any>, key: string): any[] {
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
   // Four independent public reads; each degrades to an empty layer on its own.
-  // 210 (maagadim) is *expected* to fail until the collections from
+  // 223mapMaagadim is *expected* to fail until the collections from
   // 1.0b/docs/SPEC_SHARED_PURCHASE_MAP.md exist in production.
   const [wishesRes, missionsRes, resourcesRes, maagadimRes] =
     await Promise.allSettled([
-      sendToSer({}, '207mapJoinableRatsons', 0, 0, false, fetch),
-      sendToSer({}, '208mapOpenMissions', 0, 0, false, fetch),
-      sendToSer({}, '209mapOpenMashaabims', 0, 0, false, fetch),
-      sendToSer({}, '210mapMaagadim', 0, 0, false, fetch)
+      sendToSer({}, '220mapJoinableRatsons', 0, 0, false, fetch),
+      sendToSer({}, '221mapOpenMissions', 0, 0, false, fetch),
+      sendToSer({}, '222mapOpenMashaabims', 0, 0, false, fetch),
+      sendToSer({}, '223mapMaagadim', 0, 0, false, fetch)
     ]);
 
   const wishes = nodesOf(wishesRes, 'ratsons')
