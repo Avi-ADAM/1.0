@@ -18,7 +18,7 @@
 | `open-mission.ratson` + `source` | ✅ | מזהה צרכים שמקורם בקונסיירז' (`publishWishNeedToCommunity`) |
 | `maagad` / `maagad-member` / `maagad-offer` | ❌ לא קיימים | P0 של PLAN_SHARED_PURCHASE — נוצר בסשן זה (ראה §4) |
 | גיאו-utils (`haversine`, `withinRadius`) | ❌ | נוצר בסשן זה |
-| **פער ריפו 1.0b** | ⚠️ | הריפו הוא Strapi **v3.6.8** (עדכון אחרון 6/2022) בעוד הפרודקשן הוא Strapi v4 עם 109 טייפים (כולל `ratson` שאינו בריפו). לכן שינויי סכמה נמסרים כ-**spec v4** (`docs/SPEC_SHARED_PURCHASE_MAP.md` ב-1.0b) ליישום ב-Content-Type Builder, בנוסף לקבצי v3 תואמי-ריפו. |
+| **ענף המקור ב-1.0b** | ✅ `shabab` | ענף `master` הוא Strapi v3 מ-2022; המקור החי הוא ענף **`shabab`** (Strapi 4.20.0). קבצי הסכמה החדשים נוצרו בפורמט v4 מעל `shabab`; ראה `docs/SPEC_SHARED_PURCHASE_MAP.md` שם לצעדים ידניים אחרי דיפלוי (הרשאות + codegen). |
 
 ---
 
@@ -79,7 +79,7 @@ src/routes/api/send/qids.js                     ← 207–210 (ראה §5)
 
 **אין צורך בשדות מיקום חדשים** — בניגוד להנחת PLAN_LOCATION_MAPS §3, `ComponentNewLocation` כבר קיים על כל הישויות הרלוונטיות בפרודקשן.
 
-**אופן המסירה** (בגלל פער-הריפו, §0): ב-1.0b נכנסים (א) `docs/SPEC_SHARED_PURCHASE_MAP.md` — מפרט v4 מלא ליישום ב-Content-Type Builder / קבצי schema.json של הפרודקשן; (ב) קבצי v3 תואמי-ריפו (`api/maagad*`) כדי שהריפו יישאר עקבי עם עצמו.
+**אופן המסירה**: קבצי v4 מלאים (`src/api/maagad*` + הרחבות `ratson`/`sheirutpend`) על ענף העבודה שמבוסס `shabab` ב-1.0b. אחרי מיזוג ודיפלוי: הענקת הרשאות (Public: find/findOne על maagad+maagad-offer) והרצת codegen בפרונט — פירוט ב-`docs/SPEC_SHARED_PURCHASE_MAP.md`.
 
 ## 5. QIDs (פנויים מ-207; 180–199 מהתוכנית המקורית כבר נחצו ע"י 200–206)
 
@@ -96,8 +96,8 @@ src/routes/api/send/qids.js                     ← 207–210 (ראה §5)
 | --- | --- | --- | --- |
 | M0 | מסמך זה + spec סכמה + קבצי v3 ב-1.0b | – | סשן זה |
 | M1 | `/demand` ציבורי: מפה + שתי עדשות + שכבות ratson/open-mission/open-mashaabim מהסכמה הקיימת + רשימת-צד + deep-links | M0 | סשן זה |
-| M2 | שכבת מאגדים חיה (אחרי יישום הסכמה בפרודקשן) + `/maagad/[id]` + `joinMaagad` מהמפה | סכמה בפרודקשן | הבא |
-| M3 | עדשת-ספק פעילה: כפתור "הצע" מהפופאפ → `MaagadOfferForm` / הצעת-משימה; `/moach/[projectId]/demand` משתמש באותו `DiscoveryMap` עם pre-filter גיאו של הפרויקט | M2 + P2 של PLAN_SHARED_PURCHASE | הבא |
+| M2 | `/maagad/[id]` (צפייה/הצטרפות/עזיבה/חתימה/ביטול-חתימה, פרטיות בשרת) + actions: `openMaagad`/`joinMaagad`/`leaveMaagad`/`createMaagadOffer`/`signMaagadOffer`/`unsignMaagadOffer` (QIDs 211–218) + `MaagadOfferForm` + חיבור מהמפה | סכמה בפרודקשן (הענף מוכן) | **סשן זה** — חסר: Sheirutpend מותנה בחתימה, אישור-ספק/הפעלה אטומית, `clusterRatsons`, cron פקיעות |
+| M3 | עדשת-ספק פעילה בהקשר פרויקט: `/moach/[projectId]/demand` משתמש באותו `DiscoveryMap` עם pre-filter גיאו של הפרויקט; `confirmMaagadQuorum`/`activateMaagadOffer` | M2 + P2 של PLAN_SHARED_PURCHASE | הבא |
 | M4 | הצעות-סף (Track C) על המפה עם progress חי (socket) + heat-layer ביקוש כשצפיפות גבוהה | P4 | עתידי |
 
 ## 7. אימות

@@ -11730,6 +11730,131 @@ export const qids = {
     }
   }`,
 
+  // ── Maagad actions (PLAN_SHARED_PURCHASE Track B/C, PLAN_DISCOVERY_MAP M2) ─
+
+  '211crMaagad': `mutation CrMaagad(
+    $name: String, $canonical_desc: String, $scope: ENUM_MAAGAD_SCOPE,
+    $lat: Float, $lng: Float, $radius: Long, $frequency: String,
+    $status_maagad: ENUM_MAAGAD_STATUS_MAAGAD, $origin: ENUM_MAAGAD_ORIGIN,
+    $viability_hint: Int, $ratsons: [ID], $publishedAt: DateTime
+  ) {
+    createMaagad(data: {
+      name: $name, canonical_desc: $canonical_desc, scope: $scope,
+      lat: $lat, lng: $lng, radius: $radius, frequency: $frequency,
+      status_maagad: $status_maagad, origin: $origin,
+      viability_hint: $viability_hint, ratsons: $ratsons, publishedAt: $publishedAt
+    }) {
+      data { id attributes { name status_maagad origin scope } }
+    }
+  }`,
+
+  '212crMaagadMember': `mutation CrMaagadMember(
+    $maagad: ID!, $user: ID!, $ratson: ID,
+    $status_member: ENUM_MAAGADMEMBER_STATUS_MEMBER,
+    $visibility: ENUM_MAAGADMEMBER_VISIBILITY,
+    $joinedAt: DateTime, $publishedAt: DateTime
+  ) {
+    createMaagadMember(data: {
+      maagad: $maagad, user: $user, ratson: $ratson,
+      status_member: $status_member, visibility: $visibility,
+      joinedAt: $joinedAt, publishedAt: $publishedAt
+    }) {
+      data { id attributes { status_member visibility } }
+    }
+  }`,
+
+  '213updateMaagadMember': `mutation UpdateMaagadMember(
+    $id: ID!, $status_member: ENUM_MAAGADMEMBER_STATUS_MEMBER,
+    $signed_offer: ID, $options: JSON,
+    $visibility: ENUM_MAAGADMEMBER_VISIBILITY,
+    $signedAt: DateTime, $leftAt: DateTime
+  ) {
+    updateMaagadMember(id: $id, data: {
+      status_member: $status_member, signed_offer: $signed_offer,
+      options: $options, visibility: $visibility,
+      signedAt: $signedAt, leftAt: $leftAt
+    }) {
+      data { id attributes { status_member } }
+    }
+  }`,
+
+  '214crMaagadOffer': `mutation CrMaagadOffer(
+    $maagad: ID!, $proposer_user: ID, $proposer_project: ID,
+    $title: String, $description: String,
+    $unit_price: Float, $currency: ID, $price_tiers: JSON,
+    $min_participants: Int, $max_participants: Int,
+    $sign_deadline: DateTime, $options: JSON,
+    $recurrence: ENUM_MAAGADOFFER_RECURRENCE, $cycle_terms: JSON,
+    $cancellation_terms: String, $publishedAt: DateTime
+  ) {
+    createMaagadOffer(data: {
+      maagad: $maagad, proposer_user: $proposer_user, proposer_project: $proposer_project,
+      title: $title, description: $description,
+      unit_price: $unit_price, currency: $currency, price_tiers: $price_tiers,
+      min_participants: $min_participants, max_participants: $max_participants,
+      sign_deadline: $sign_deadline, options: $options,
+      recurrence: $recurrence, cycle_terms: $cycle_terms,
+      cancellation_terms: $cancellation_terms, status_offer: open,
+      signed_count: 0, publishedAt: $publishedAt
+    }) {
+      data { id attributes { title status_offer min_participants sign_deadline } }
+    }
+  }`,
+
+  '215updateMaagadOffer': `mutation UpdateMaagadOffer(
+    $id: ID!, $signed_count: Int, $status_offer: ENUM_MAAGADOFFER_STATUS_OFFER
+  ) {
+    updateMaagadOffer(id: $id, data: {
+      signed_count: $signed_count, status_offer: $status_offer
+    }) {
+      data { id attributes { signed_count status_offer } }
+    }
+  }`,
+
+  '216queryMaagadFull': `query QueryMaagadFull($id: ID!) {
+    maagad(id: $id) {
+      data { id attributes {
+        name canonical_desc scope lat lng radius frequency
+        status_maagad origin viability_hint createdAt
+        categories { data { id attributes { name } } }
+        vallues { data { id attributes { valueName } } }
+        members { data { id attributes {
+          status_member visibility joinedAt
+          user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+        } } }
+        offers { data { id attributes {
+          title description unit_price price_tiers
+          min_participants max_participants sign_deadline options
+          recurrence cycle_terms cancellation_terms status_offer signed_count
+          currency { data { id attributes { name } } }
+          proposer_user { data { id attributes { username } } }
+          proposer_project { data { id attributes { projectName profilePic { data { attributes { url } } } } } }
+        } } }
+      } }
+    }
+  }`,
+
+  '217updateMaagad': `mutation UpdateMaagad(
+    $id: ID!, $status_maagad: ENUM_MAAGAD_STATUS_MAAGAD,
+    $lat: Float, $lng: Float, $radius: Long, $viability_hint: Int
+  ) {
+    updateMaagad(id: $id, data: {
+      status_maagad: $status_maagad, lat: $lat, lng: $lng,
+      radius: $radius, viability_hint: $viability_hint
+    }) {
+      data { id attributes { status_maagad } }
+    }
+  }`,
+
+  '218queryMyMaagadMember': `query QueryMyMaagadMember($maagadId: ID!, $userId: ID!) {
+    maagadMembers(
+      filters: { maagad: { id: { eq: $maagadId } }, user: { id: { eq: $userId } } }
+      pagination: { limit: 1 }
+    ) {
+      data { id attributes { status_member visibility options signed_offer { data { id } } } }
+    }
+  }`,
+
   // ── Sale actions ──────────────────────────────────────────────────────────
 
   'createSaleRecord': `mutation CreateSaleRecord(

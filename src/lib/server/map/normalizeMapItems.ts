@@ -175,7 +175,7 @@ export function normalizeMaagadim(nodes: StrapiNode[]): [MapItem[], MapItem[]] {
       id: String(node.id),
       kind: 'maagad',
       title: a.name || '',
-      href: null, // `/maagad/[id]` lands in M2
+      href: `/maagad/${node.id}`,
       meta: {
         desc: a.canonical_desc ?? null,
         status: a.status_maagad ?? null,
@@ -193,7 +193,8 @@ export function normalizeMaagadim(nodes: StrapiNode[]): [MapItem[], MapItem[]] {
         id: `${node.id}-${o.id}`,
         kind: 'offer',
         title: oa.title || a.name || '',
-        href: null, // `/demand/[id]` lands in M4
+        // The offer lives on its pool page until a dedicated share page (M4).
+        href: `/maagad/${node.id}`,
         meta: {
           unitPrice: num(oa.unit_price),
           signed: num(oa.signed_count) ?? 0,

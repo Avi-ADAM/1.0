@@ -37,6 +37,7 @@ import { closeFiniapruvalConfig } from './closeFiniapruval.js';
 import { updateProjectDetailsConfig } from './updateProjectDetails.js';
 import { completeMissionConfig } from './completeMission.js';
 import { chatActions } from './chat.js';
+import { maagadActions } from './maagad.js';
 
 import { createTaskAction } from './createTask.js';
 import { createResourceAction } from './createResource.js';
@@ -176,6 +177,7 @@ export function registerAllActions(): void {
 
   // Chat actions
   chatActions.forEach(registerAction);
+  maagadActions.forEach(registerAction);
   forumReadActions.forEach(registerAction);
 
   // Sheirut money receiver
@@ -368,6 +370,7 @@ export {
   ensureStageForumConfig,
   completeMissionConfig,
   chatActions,
+  maagadActions,
   forumReadActions,
   createComplexMatanotConfig,
   approveMatanotConfig,

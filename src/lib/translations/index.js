@@ -446,25 +446,25 @@ export const config = {
         {
             locale: 'he',
             key: 'demand',
-            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/demand/],
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/(demand|maagad)/],
             loader: async () => (await import('./he/demand.json')).default,
         },
         {
             locale: 'en',
             key: 'demand',
-            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/demand/],
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/(demand|maagad)/],
             loader: async () => (await import('./en/demand.json')).default,
         },
         {
             locale: 'ar',
             key: 'demand',
-            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/demand/],
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/(demand|maagad)/],
             loader: async () => (await import('./ar/demand.json')).default,
         },
         {
             locale: 'ru',
             key: 'demand',
-            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/demand/],
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/(demand|maagad)/],
             loader: async () => (await import('./ru/demand.json')).default,
         },
         {
