@@ -1,5 +1,5 @@
 ﻿<script>
-  import { locale, t, isRtl} from '$lib/translations';
+  import { locale, t, isRtl } from '$lib/translations';
   import { fly } from 'svelte/transition';
   import { cubicIn, cubicOut } from 'svelte/easing';
   import { goto } from '$app/navigation';
@@ -75,7 +75,7 @@
   let btnb = $state(false);
 
   // מודל וידאו (עברית בלבד כרגע): הסרטון נטען ומתחיל לנגן אוטומטית עם הפתיחה
-  const VIDEO_HOW_IT_WORKS = 'FqzccJ4lqTc'; // איך 1💗1 עובדת (הפתרון)
+  const VIDEO_HOW_IT_WORKS = 'l0d1yv6Qtz4'; //'FqzccJ4lqTc'; // איך 1💗1 עובדת (הפתרון)
   const VIDEO_THIRD_WAY = 'FcyaiAIqeA4'; // הבעיה והדרך השלישית
   let videoOpen = $state(false);
   let videoId = $state('');
@@ -102,7 +102,11 @@
   // `from` שומר את היעד כדי שנוכל להחזיר אותו אליו אחרי ההרשמה.
   function gotoRegister(from) {
     const reg =
-      $locale == 'he' ? '/hascama' : $locale == 'ar' ? '/aitifaqia' : '/convention';
+      $locale == 'he'
+        ? '/hascama'
+        : $locale == 'ar'
+          ? '/aitifaqia'
+          : '/convention';
     goto(from ? `${reg}?from=${encodeURIComponent(from)}` : reg);
     fi = true;
   }
@@ -141,8 +145,8 @@
       if (!res.ok) throw new Error('stat fetch failed');
       const data = await res.json();
       projectsCount = data.projects ?? 0;
-      membersCount  = data.members  ?? 0;
-      usersCount    = data.users    ?? 0;
+      membersCount = data.members ?? 0;
+      usersCount = data.users ?? 0;
       statsLoaded = true;
     } catch (e) {
       console.error('Error loading stats:', e);
@@ -263,13 +267,41 @@
     class="w-9 h-9 shrink-0 drop-shadow"
     style="animation:none;"
   />
-  <nav class="flex flex-1 items-center justify-center gap-4 min-w-0 text-barbi font-bold text-sm lg:text-base">
-    <button type="button" class="hover:text-gold transition-colors whitespace-nowrap" onclick={() => scrollToId('demo')}>{$t('home.sections.navDemo')}</button>
-    <button type="button" class="hover:text-gold transition-colors whitespace-nowrap" onclick={() => scrollToId('features')}>{$t('home.sections.navFeatures')}</button>
-    <button type="button" class="hover:text-gold transition-colors whitespace-nowrap" onclick={() => scrollToId('how')}>{$t('home.sections.navHow')}</button>
-    <button type="button" class="hover:text-gold transition-colors whitespace-nowrap" onclick={() => scrollToId('concierge')}>{$t('home.sections.navConcierge')}</button>
-    <button type="button" class="hover:text-gold transition-colors whitespace-nowrap" onclick={() => scrollToId('who')}>{$t('home.sections.whoTitle')}</button>
-    <button type="button" class="hover:text-gold transition-colors whitespace-nowrap" onclick={() => scrollToId('faq')}>{$t('home.sections.navFaq')}</button>
+  <nav
+    class="flex flex-1 items-center justify-center gap-4 min-w-0 text-barbi font-bold text-sm lg:text-base"
+  >
+    <button
+      type="button"
+      class="hover:text-gold transition-colors whitespace-nowrap"
+      onclick={() => scrollToId('demo')}>{$t('home.sections.navDemo')}</button
+    >
+    <button
+      type="button"
+      class="hover:text-gold transition-colors whitespace-nowrap"
+      onclick={() => scrollToId('features')}
+      >{$t('home.sections.navFeatures')}</button
+    >
+    <button
+      type="button"
+      class="hover:text-gold transition-colors whitespace-nowrap"
+      onclick={() => scrollToId('how')}>{$t('home.sections.navHow')}</button
+    >
+    <button
+      type="button"
+      class="hover:text-gold transition-colors whitespace-nowrap"
+      onclick={() => scrollToId('concierge')}
+      >{$t('home.sections.navConcierge')}</button
+    >
+    <button
+      type="button"
+      class="hover:text-gold transition-colors whitespace-nowrap"
+      onclick={() => scrollToId('who')}>{$t('home.sections.whoTitle')}</button
+    >
+    <button
+      type="button"
+      class="hover:text-gold transition-colors whitespace-nowrap"
+      onclick={() => scrollToId('faq')}>{$t('home.sections.navFaq')}</button
+    >
   </nav>
   <div
     class="flex shrink-0 items-center gap-2"
@@ -283,7 +315,11 @@
     class="shrink-0 bg-barbi text-gold hover:bg-white hover:text-barbi font-bold px-4 py-1.5 rounded-xl shadow-md hover:scale-105 transition-all duration-300 whitespace-nowrap"
     onclick={() => {
       goto(
-        $locale == 'he' ? '/hascama' : $locale == 'ar' ? '/aitifaqia' : '/convention'
+        $locale == 'he'
+          ? '/hascama'
+          : $locale == 'ar'
+            ? '/aitifaqia'
+            : '/convention'
       );
       fi = true;
     }}
@@ -293,9 +329,7 @@
 </header>
 
 <!-- תפריט שפה/קישורים צף — מובייל בלבד -->
-<div
-  class="sm:hidden absolute left-[1%] top-[1%] z-[699] flex flex-col"
->
+<div class="sm:hidden absolute left-[1%] top-[1%] z-[699] flex flex-col">
   {@render utilityNav()}
 </div>
 
@@ -326,7 +360,8 @@
     {/if}
     <div
       class="w-full h-full transition-transform duration-300 ease-out"
-      style="transform: translateY({scrollProgress * -5}%) scale({1 + scrollProgress * 0.1});"
+      style="transform: translateY({scrollProgress * -5}%) scale({1 +
+        scrollProgress * 0.1});"
     >
       <Canvas {size}>
         <ResizeHandler {size} />
@@ -349,7 +384,8 @@
       scrolli = true;
       const el = e.currentTarget;
       const max = el.scrollHeight - el.clientHeight;
-      scrollProgress = max > 0 ? Math.min(1, Math.max(0, el.scrollTop / max)) : 0;
+      scrollProgress =
+        max > 0 ? Math.min(1, Math.max(0, el.scrollTop / max)) : 0;
       if (window.scrollTimer) clearTimeout(window.scrollTimer);
       window.scrollTimer = setTimeout(() => (scrolli = false), 150);
     }}
@@ -402,7 +438,9 @@
         </div>
       </div>
 
-      <div class="relative w-full min-h-[4rem] sm:min-h-[5rem] mt-2 mb-8 overflow-hidden">
+      <div
+        class="relative w-full min-h-[4rem] sm:min-h-[5rem] mt-2 mb-8 overflow-hidden"
+      >
         {#key currentHeadline}
           <div
             class="absolute inset-0 flex items-center justify-center text-center font-bold text-transparent
@@ -441,7 +479,9 @@
                 class="shrink-0 mt-0.5 w-6 h-6 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center text-sm font-bold"
                 >✕</span
               >
-              <p class="text-slate-800 text-base sm:text-sm leading-relaxed text-start">
+              <p
+                class="text-slate-800 text-base sm:text-sm leading-relaxed text-start"
+              >
                 {$t(`home.sections.${p}`)}
               </p>
             </div>
@@ -463,7 +503,11 @@
           <div class="mt-5 text-center">
             <button
               type="button"
-              onclick={() => openVideo(VIDEO_HOW_IT_WORKS, $t('home.videos.howItWorksLabel'))}
+              onclick={() =>
+                openVideo(
+                  VIDEO_HOW_IT_WORKS,
+                  $t('home.videos.howItWorksLabel')
+                )}
               class="inline-flex items-center gap-2 bg-barbi hover:bg-white hover:text-barbi text-gold font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
             >
               <span class="text-2xl leading-none">▶</span>
@@ -529,7 +573,8 @@
           <div class="mt-6 text-center">
             <button
               type="button"
-              onclick={() => openVideo(VIDEO_THIRD_WAY, $t('home.videos.thirdWayLabel'))}
+              onclick={() =>
+                openVideo(VIDEO_THIRD_WAY, $t('home.videos.thirdWayLabel'))}
               class="inline-flex items-center gap-2 bg-gold hover:bg-barbi hover:text-gold text-barbi font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300 border-2 border-gold"
             >
               <span class="text-2xl leading-none">▶</span>
@@ -600,7 +645,9 @@
                 <div class="text-gold text-2xl">•</div>
                 <div class="bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
                   <div class="text-2xl font-bold text-gold">{membersCount}</div>
-                  <div class="text-white text-sm">{$t('home.fpage.agreedOnAgreement')}</div>
+                  <div class="text-white text-sm">
+                    {$t('home.fpage.agreedOnAgreement')}
+                  </div>
                 </div>
               </div>
             </div>
@@ -650,7 +697,9 @@
       >
         <!-- בלוק: יכולות הפלטפורמה -->
         <section id="features" class="scroll-mt-16">
-          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center">
+          <h2
+            class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center"
+          >
             {$t('home.sections.featuresTitle')}
           </h2>
           <p class="text-center text-slate-700 text-base sm:text-sm mb-5">
@@ -675,7 +724,9 @@
 
         <!-- בלוק: איך זה עובד ב‑4 צעדים -->
         <section id="how" class="scroll-mt-16">
-          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-4 text-center">
+          <h2
+            class="text-rose-700 font-bold text-3xl sm:text-2xl mb-4 text-center"
+          >
             {$t('home.sections.howTitle')}
           </h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -701,10 +752,14 @@
 
         <!-- בלוק: הקונסיירז' (דו‑קהלי) -->
         <section id="concierge" class="scroll-mt-16">
-          <p class="text-center text-barbi font-bold text-base sm:text-sm tracking-widest mb-1">
+          <p
+            class="text-center text-barbi font-bold text-base sm:text-sm tracking-widest mb-1"
+          >
             {$t('home.concierge.eyebrow')}
           </p>
-          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-2 text-center">
+          <h2
+            class="text-rose-700 font-bold text-3xl sm:text-2xl mb-2 text-center"
+          >
             {$t('home.concierge.title')}
           </h2>
           <p class="text-center text-slate-800 text-lg sm:text-base mb-2">
@@ -720,7 +775,9 @@
               <h3 class="text-rose-700 font-bold text-xl sm:text-lg mb-2">
                 {$t('home.concierge.customerTitle')}
               </h3>
-              <p class="text-slate-800 text-base sm:text-sm leading-relaxed mb-4 grow">
+              <p
+                class="text-slate-800 text-base sm:text-sm leading-relaxed mb-4 grow"
+              >
                 {$t('home.concierge.customerDesc')}
               </p>
               <button
@@ -736,7 +793,9 @@
               <h3 class="text-rose-700 font-bold text-xl sm:text-lg mb-2">
                 {$t('home.concierge.providerTitle')}
               </h3>
-              <p class="text-slate-800 text-base sm:text-sm leading-relaxed mb-4 grow">
+              <p
+                class="text-slate-800 text-base sm:text-sm leading-relaxed mb-4 grow"
+              >
                 {$t('home.concierge.providerDesc')}
               </p>
               <button
@@ -751,7 +810,9 @@
 
         <!-- בלוק: למי זה מתאים -->
         <section id="who" class="scroll-mt-16">
-          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center">
+          <h2
+            class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center"
+          >
             {$t('home.sections.whoTitle')}
           </h2>
           <p class="text-center text-slate-700 text-base sm:text-sm mb-5">
@@ -879,17 +940,29 @@
             {$t('home.sections.proofSub')}
           </p>
           <div class="flex justify-center items-stretch gap-3 flex-wrap">
-            <div class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]">
+            <div
+              class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]"
+            >
               <div class="text-2xl font-bold text-white">{projectsCount}</div>
-              <div class="text-white/90 text-sm sm:text-xs">{$t('home.sections.proofStatProjects')}</div>
+              <div class="text-white/90 text-sm sm:text-xs">
+                {$t('home.sections.proofStatProjects')}
+              </div>
             </div>
-            <div class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]">
+            <div
+              class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]"
+            >
               <div class="text-2xl font-bold text-white">{usersCount}</div>
-              <div class="text-white/90 text-sm sm:text-xs">{$t('home.sections.proofStatMembers')}</div>
+              <div class="text-white/90 text-sm sm:text-xs">
+                {$t('home.sections.proofStatMembers')}
+              </div>
             </div>
-            <div class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]">
+            <div
+              class="bg-gradient-to-br from-gold via-barbi to-gold rounded-lg px-4 py-3 shadow min-w-[110px]"
+            >
               <div class="text-2xl font-bold text-white">{membersCount}</div>
-              <div class="text-white/90 text-sm sm:text-xs">{$t('home.sections.proofStatSigners')}</div>
+              <div class="text-white/90 text-sm sm:text-xs">
+                {$t('home.sections.proofStatSigners')}
+              </div>
             </div>
           </div>
         </section>
@@ -913,11 +986,15 @@
 
         <!-- בלוק: מודל / תמחור -->
         <section class="text-center">
-          <div class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-2xl px-5 py-5 shadow">
+          <div
+            class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-2xl px-5 py-5 shadow"
+          >
             <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1">
               {$t('home.sections.modelTitle')}
             </h2>
-            <p class="text-slate-800 text-lg sm:text-base leading-relaxed max-w-md mx-auto">
+            <p
+              class="text-slate-800 text-lg sm:text-base leading-relaxed max-w-md mx-auto"
+            >
               {$t('home.sections.modelSub')}
             </p>
           </div>
@@ -925,7 +1002,9 @@
 
         <!-- בלוק: שאלות נפוצות -->
         <section id="faq" class="scroll-mt-16">
-          <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-4 text-center">
+          <h2
+            class="text-rose-700 font-bold text-3xl sm:text-2xl mb-4 text-center"
+          >
             {$t('home.sections.faqTitle')}
           </h2>
           <div class="flex flex-col gap-2">
@@ -933,10 +1012,14 @@
               <details
                 class="bg-white/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-2 shadow"
               >
-                <summary class="text-rose-700 font-semibold text-lg sm:text-base cursor-pointer py-1">
+                <summary
+                  class="text-rose-700 font-semibold text-lg sm:text-base cursor-pointer py-1"
+                >
                   {$t(`home.maze.faq.q${q}`)}
                 </summary>
-                <p class="text-slate-800 text-base sm:text-sm leading-relaxed pt-2">
+                <p
+                  class="text-slate-800 text-base sm:text-sm leading-relaxed pt-2"
+                >
                   {$t(`home.maze.faq.a${q}`)}
                 </p>
               </details>
@@ -951,35 +1034,65 @@
             class="group relative flex flex-col sm:flex-row items-center gap-5 w-full overflow-hidden rounded-3xl border-2 border-emerald-300/60 bg-gradient-to-br from-[#f4faf1] via-[#e8f5e3] to-[#f0f4e3] px-6 py-6 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
           >
             <!-- רקע דקורטיבי -->
-            <div class="pointer-events-none absolute -top-12 -end-12 w-48 h-48 rounded-full bg-emerald-200/30 blur-2xl"></div>
-            <div class="pointer-events-none absolute -bottom-10 -start-10 w-36 h-36 rounded-full bg-amber-200/20 blur-2xl"></div>
+            <div
+              class="pointer-events-none absolute -top-12 -end-12 w-48 h-48 rounded-full bg-emerald-200/30 blur-2xl"
+            ></div>
+            <div
+              class="pointer-events-none absolute -bottom-10 -start-10 w-36 h-36 rounded-full bg-amber-200/20 blur-2xl"
+            ></div>
 
             <!-- אמוג׳י / אייקון -->
-            <div class="relative shrink-0 w-16 h-16 rounded-2xl bg-emerald-100 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+            <div
+              class="relative shrink-0 w-16 h-16 rounded-2xl bg-emerald-100 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300"
+            >
               <span class="text-3xl">🌱</span>
             </div>
 
             <!-- טקסט -->
-            <div class="relative flex flex-col gap-1.5 text-center sm:text-start flex-1 min-w-0">
-              <div class="inline-flex items-center gap-1.5 justify-center sm:justify-start">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-emerald-700 font-semibold text-xs tracking-wide uppercase">
+            <div
+              class="relative flex flex-col gap-1.5 text-center sm:text-start flex-1 min-w-0"
+            >
+              <div
+                class="inline-flex items-center gap-1.5 justify-center sm:justify-start"
+              >
+                <span
+                  class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"
+                ></span>
+                <span
+                  class="text-emerald-700 font-semibold text-xs tracking-wide uppercase"
+                >
                   {$t('home.grow.eyebrow')}
                 </span>
               </div>
-              <p class="text-emerald-900 font-bold text-xl sm:text-lg leading-snug">
+              <p
+                class="text-emerald-900 font-bold text-xl sm:text-lg leading-snug"
+              >
                 {$t('home.grow.title')}
               </p>
-              <p class="text-emerald-800/80 text-base sm:text-sm leading-relaxed">
+              <p
+                class="text-emerald-800/80 text-base sm:text-sm leading-relaxed"
+              >
                 {$t('home.grow.desc')}
               </p>
             </div>
 
             <!-- חץ / CTA -->
-            <div class="relative shrink-0 flex items-center gap-2 bg-emerald-700 text-amber-50 font-bold px-5 py-2.5 rounded-xl shadow group-hover:bg-emerald-800 group-hover:scale-105 transition-all duration-300 whitespace-nowrap text-base sm:text-sm">
+            <div
+              class="relative shrink-0 flex items-center gap-2 bg-emerald-700 text-amber-50 font-bold px-5 py-2.5 rounded-xl shadow group-hover:bg-emerald-800 group-hover:scale-105 transition-all duration-300 whitespace-nowrap text-base sm:text-sm"
+            >
               {$t('home.grow.cta')}
-              <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d={$isRtl ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7'} />
+              <svg
+                class="w-4 h-4 group-hover:translate-x-0.5 transition-transform"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d={$isRtl ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7'}
+                />
               </svg>
             </div>
           </a>
