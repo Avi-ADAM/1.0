@@ -214,6 +214,7 @@
       processes: 'תהליכים',
       votes: 'הצבעות',
       wishes: 'משאלות נכנסות',
+      demand: 'מפת ביקוש',
       editPic: 'עריכת תמונה',
       upload: 'העלאה',
       editDetails: 'עריכת פרטים',
@@ -236,6 +237,7 @@
       processes: 'Processes',
       votes: 'Votes',
       wishes: 'Incoming wishes',
+      demand: 'Demand map',
       editPic: 'Edit Picture',
       upload: 'Upload',
       editDetails: 'Edit Details',
@@ -258,6 +260,7 @@
       processes: 'العمليات',
       votes: 'التصويتات',
       wishes: 'الرغبات الواردة',
+      demand: 'خريطة الطلب',
       editPic: 'تعدיל الصورة',
       upload: 'تحميل',
       editDetails: 'تعدיל التفاصيل',
@@ -288,6 +291,7 @@
     { id: 'split', label: 'split' },
     { id: 'sales', label: 'sales' },
     { id: 'wishes', label: 'wishes' },
+    { id: 'demand', label: 'demand' },
     { id: 'votes', label: 'votes' },
     { id: 'shifts', label: 'shifts' }
   ];
