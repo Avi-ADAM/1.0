@@ -68,5 +68,10 @@
   "rec_biweekly": "Biweekly",
   "rec_monthly": "Monthly",
   "submit_offer": "Publish offer",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "supplier_title": "Demand discovery for suppliers",
+  "supplier_subtitle": "Group demand and wishes waiting for a supplier near",
+  "supplier_no_location": "This rikma has no location yet — showing all demand. Set a location to rank by proximity.",
+  "supplier_empty": "No matching demand right now. Check back later or widen the area.",
+  "km": "km"
 }

@@ -11893,6 +11893,17 @@ export const qids = {
     }
   }`,
 
+  // Project service-area context for /moach/[projectId]/demand (supplier lens).
+  '234getProjectLocation': `query GetProjectLocation($pid: ID!) {
+    project(id: $pid) {
+      data { id attributes {
+        projectName
+        location { lat lng radius location_hint location_mode }
+        vallues { data { id attributes { valueName } } }
+      } }
+    }
+  }`,
+
   // ── Sale actions ──────────────────────────────────────────────────────────
 
   'createSaleRecord': `mutation CreateSaleRecord(
