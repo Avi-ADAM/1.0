@@ -9,6 +9,7 @@
   import { Canvas } from '@threlte/core';
   import Scene from '$lib/components/main/1lev1.svelte';
   import ProductPeek from '$lib/components/main/ProductPeek.svelte';
+  import VideoModal from '$lib/components/main/VideoModal.svelte';
   import ResizeHandler from '$lib/components/ResizeHandler.svelte';
   import { useProgress } from '@threlte/extras';
   import CircleProgresBar from '$lib/celim/ui/circleProgresBar.svelte';
@@ -72,6 +73,18 @@
   let btna = $state(false);
 
   let btnb = $state(false);
+
+  // מודל וידאו (עברית בלבד כרגע): הסרטון נטען ומתחיל לנגן אוטומטית עם הפתיחה
+  const VIDEO_HOW_IT_WORKS = 'FqzccJ4lqTc'; // איך 1💗1 עובדת (הפתרון)
+  const VIDEO_THIRD_WAY = 'FcyaiAIqeA4'; // הבעיה והדרך השלישית
+  let videoOpen = $state(false);
+  let videoId = $state('');
+  let videoTitle = $state('');
+  function openVideo(id, title) {
+    videoId = id;
+    videoTitle = title;
+    videoOpen = true;
+  }
 
   let scrolli = $state(false);
 
@@ -446,6 +459,18 @@
             {$t('home.sections.painTurn')}
           </p>
         </div>
+        {#if $lang === 'he'}
+          <div class="mt-5 text-center">
+            <button
+              type="button"
+              onclick={() => openVideo(VIDEO_HOW_IT_WORKS, $t('home.videos.howItWorksLabel'))}
+              class="inline-flex items-center gap-2 bg-barbi hover:bg-white hover:text-barbi text-gold font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
+            >
+              <span class="text-2xl leading-none">▶</span>
+              {$t('home.videos.howItWorksCta')}
+            </button>
+          </div>
+        {/if}
       </section>
 
       <!-- ===== הדרך השלישית: שכיר / יזם בודד / ריקמה ===== -->
@@ -500,6 +525,18 @@
             </div>
           {/each}
         </div>
+        {#if $lang === 'he'}
+          <div class="mt-6 text-center">
+            <button
+              type="button"
+              onclick={() => openVideo(VIDEO_THIRD_WAY, $t('home.videos.thirdWayLabel'))}
+              class="inline-flex items-center gap-2 bg-gold hover:bg-barbi hover:text-gold text-barbi font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300 border-2 border-gold"
+            >
+              <span class="text-2xl leading-none">▶</span>
+              {$t('home.videos.thirdWayCta')}
+            </button>
+          </div>
+        {/if}
       </section>
 
       <!-- ===== הצצה חיה למערכת (דמו לפני הרשמה) ===== -->
@@ -1042,6 +1079,14 @@
     </button>
   </div>
 </div>
+
+<!-- מודל וידאו (עברית בלבד כרגע) — נטען ומתחיל לנגן אוטומטית עם הפתיחה -->
+<VideoModal
+  bind:open={videoOpen}
+  {videoId}
+  title={videoTitle}
+  closeLabel={$t('home.videos.close')}
+/>
 
 <style>
   .flip {
