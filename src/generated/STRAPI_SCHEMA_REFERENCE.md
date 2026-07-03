@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-06-30
+> Last updated: 2026-07-03
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -23,7 +23,7 @@ import type { StrapiEntity, StrapiCollection, StrapiMedia } from '$lib/types/str
 
 ---
 
-## 🏗️ Content Type Entities (109)
+## 🏗️ Content Type Entities (114)
 
 These are the main content types in the Strapi backend.
 
@@ -209,6 +209,20 @@ These are the main content types in the Strapi backend.
 | `position` | `Maybe<PositionEntityResponse>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `stanceValue` | `Maybe<Scalars['Float']['output']>` |
+| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
+
+### ConsentEvent
+| Field | Type |
+|-------|------|
+| `action` | `Scalars['String']['output']` |
+| `actor` | `Scalars['String']['output']` |
+| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `eventId` | `Scalars['String']['output']` |
+| `payload` | `Scalars['JSON']['output']` |
+| `stateRoot` | `Maybe<Scalars['String']['output']>` |
+| `subjectId` | `Maybe<Scalars['String']['output']>` |
+| `subjectType` | `Maybe<Scalars['String']['output']>` |
+| `ts` | `Maybe<Scalars['Long']['output']>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 
 ### ContentReleasesRelease
@@ -534,6 +548,74 @@ These are the main content types in the Strapi backend.
 | `origin` | `Maybe<Enum_Issue_Origin>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `title` | `Maybe<Scalars['String']['output']>` |
+| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
+
+### Maagad
+| Field | Type |
+|-------|------|
+| `canonical_desc` | `Maybe<Scalars['String']['output']>` |
+| `categories` | `Maybe<CategoryRelationResponseCollection>` |
+| `chat_forum` | `Maybe<ForumEntityResponse>` |
+| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `frequency` | `Maybe<Scalars['String']['output']>` |
+| `lat` | `Maybe<Scalars['Float']['output']>` |
+| `lng` | `Maybe<Scalars['Float']['output']>` |
+| `members` | `Maybe<MaagadMemberRelationResponseCollection>` |
+| `name` | `Maybe<Scalars['String']['output']>` |
+| `offers` | `Maybe<MaagadOfferRelationResponseCollection>` |
+| `origin` | `Maybe<Enum_Maagad_Origin>` |
+| `pinecone_id` | `Maybe<Scalars['String']['output']>` |
+| `process` | `Maybe<PartofEntityResponse>` |
+| `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `radius` | `Maybe<Scalars['Long']['output']>` |
+| `ratsons` | `Maybe<RatsonRelationResponseCollection>` |
+| `scope` | `Maybe<Enum_Maagad_Scope>` |
+| `status_maagad` | `Maybe<Enum_Maagad_Status_Maagad>` |
+| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `vallues` | `Maybe<VallueRelationResponseCollection>` |
+| `viability_hint` | `Maybe<Scalars['Int']['output']>` |
+
+### MaagadMember
+| Field | Type |
+|-------|------|
+| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `joinedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `leftAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `maagad` | `Maybe<MaagadEntityResponse>` |
+| `options` | `Maybe<Scalars['JSON']['output']>` |
+| `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `ratson` | `Maybe<RatsonEntityResponse>` |
+| `sheirutpend` | `Maybe<SheirutpendEntityResponse>` |
+| `signedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `signed_offer` | `Maybe<MaagadOfferEntityResponse>` |
+| `status_member` | `Maybe<Enum_Maagadmember_Status_Member>` |
+| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `user` | `Maybe<UsersPermissionsUserEntityResponse>` |
+| `visibility` | `Maybe<Enum_Maagadmember_Visibility>` |
+
+### MaagadOffer
+| Field | Type |
+|-------|------|
+| `cancellation_terms` | `Maybe<Scalars['String']['output']>` |
+| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `currency` | `Maybe<MatbeaEntityResponse>` |
+| `cycle_terms` | `Maybe<Scalars['JSON']['output']>` |
+| `description` | `Maybe<Scalars['String']['output']>` |
+| `maagad` | `Maybe<MaagadEntityResponse>` |
+| `max_participants` | `Maybe<Scalars['Int']['output']>` |
+| `min_participants` | `Maybe<Scalars['Int']['output']>` |
+| `options` | `Maybe<Scalars['JSON']['output']>` |
+| `price_tiers` | `Maybe<Scalars['JSON']['output']>` |
+| `proposer_project` | `Maybe<ProjectEntityResponse>` |
+| `proposer_user` | `Maybe<UsersPermissionsUserEntityResponse>` |
+| `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `recurrence` | `Maybe<Enum_Maagadoffer_Recurrence>` |
+| `sign_deadline` | `Maybe<Scalars['DateTime']['output']>` |
+| `signed_count` | `Maybe<Scalars['Int']['output']>` |
+| `signed_members` | `Maybe<MaagadMemberRelationResponseCollection>` |
+| `status_offer` | `Maybe<Enum_Maagadoffer_Status_Offer>` |
+| `title` | `Maybe<Scalars['String']['output']>` |
+| `unit_price` | `Maybe<Scalars['Float']['output']>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 
 ### Maap
@@ -895,6 +977,7 @@ These are the main content types in the Strapi backend.
 | `createChezin` | `Maybe<ChezinEntityResponse>` |
 | `createChezinLocalization` | `Maybe<ChezinEntityResponse>` |
 | `createClause` | `Maybe<ClauseEntityResponse>` |
+| `createConsentEvent` | `Maybe<ConsentEventEntityResponse>` |
 | `createContentReleasesRelease` | `Maybe<ContentReleasesReleaseEntityResponse>` |
 | `createContentReleasesReleaseAction` | `Maybe<ContentReleasesReleaseActionEntityResponse>` |
 | `createConventionText` | `Maybe<ConventionTextEntityResponse>` |
@@ -920,6 +1003,9 @@ These are the main content types in the Strapi backend.
 | `createHatzaa` | `Maybe<HatzaaEntityResponse>` |
 | `createHazbaah` | `Maybe<HazbaahEntityResponse>` |
 | `createIssue` | `Maybe<IssueEntityResponse>` |
+| `createMaagad` | `Maybe<MaagadEntityResponse>` |
+| `createMaagadMember` | `Maybe<MaagadMemberEntityResponse>` |
+| `createMaagadOffer` | `Maybe<MaagadOfferEntityResponse>` |
 | `createMaap` | `Maybe<MaapEntityResponse>` |
 | `createMaapLocalization` | `Maybe<MaapEntityResponse>` |
 | `createMachshir` | `Maybe<MachshirEntityResponse>` |
@@ -994,6 +1080,7 @@ These are the main content types in the Strapi backend.
 | `createTranslate` | `Maybe<TranslateEntityResponse>` |
 | `createUploadFile` | `Maybe<UploadFileEntityResponse>` |
 | `createUploadFolder` | `Maybe<UploadFolderEntityResponse>` |
+| `createUserKey` | `Maybe<UserKeyEntityResponse>` |
 | `createUsersPermissionsRole` | `Maybe<UsersPermissionsCreateRolePayload>` |
 | `createUsersPermissionsUser` | `UsersPermissionsUserEntityResponse` |
 | `createVallue` | `Maybe<VallueEntityResponse>` |
@@ -1018,6 +1105,7 @@ These are the main content types in the Strapi backend.
 | `deleteCategory` | `Maybe<CategoryEntityResponse>` |
 | `deleteChezin` | `Maybe<ChezinEntityResponse>` |
 | `deleteClause` | `Maybe<ClauseEntityResponse>` |
+| `deleteConsentEvent` | `Maybe<ConsentEventEntityResponse>` |
 | `deleteContentReleasesRelease` | `Maybe<ContentReleasesReleaseEntityResponse>` |
 | `deleteContentReleasesReleaseAction` | `Maybe<ContentReleasesReleaseActionEntityResponse>` |
 | `deleteConventionText` | `Maybe<ConventionTextEntityResponse>` |
@@ -1037,6 +1125,9 @@ These are the main content types in the Strapi backend.
 | `deleteHatzaa` | `Maybe<HatzaaEntityResponse>` |
 | `deleteHazbaah` | `Maybe<HazbaahEntityResponse>` |
 | `deleteIssue` | `Maybe<IssueEntityResponse>` |
+| `deleteMaagad` | `Maybe<MaagadEntityResponse>` |
+| `deleteMaagadMember` | `Maybe<MaagadMemberEntityResponse>` |
+| `deleteMaagadOffer` | `Maybe<MaagadOfferEntityResponse>` |
 | `deleteMaap` | `Maybe<MaapEntityResponse>` |
 | `deleteMachshir` | `Maybe<MachshirEntityResponse>` |
 | `deleteMashaabim` | `Maybe<MashaabimEntityResponse>` |
@@ -1092,6 +1183,7 @@ These are the main content types in the Strapi backend.
 | `deleteTranslate` | `Maybe<TranslateEntityResponse>` |
 | `deleteUploadFile` | `Maybe<UploadFileEntityResponse>` |
 | `deleteUploadFolder` | `Maybe<UploadFolderEntityResponse>` |
+| `deleteUserKey` | `Maybe<UserKeyEntityResponse>` |
 | `deleteUsersPermissionsRole` | `Maybe<UsersPermissionsDeleteRolePayload>` |
 | `deleteUsersPermissionsUser` | `UsersPermissionsUserEntityResponse` |
 | `deleteVallue` | `Maybe<VallueEntityResponse>` |
@@ -1120,6 +1212,7 @@ These are the main content types in the Strapi backend.
 | `updateCategory` | `Maybe<CategoryEntityResponse>` |
 | `updateChezin` | `Maybe<ChezinEntityResponse>` |
 | `updateClause` | `Maybe<ClauseEntityResponse>` |
+| `updateConsentEvent` | `Maybe<ConsentEventEntityResponse>` |
 | `updateContentReleasesRelease` | `Maybe<ContentReleasesReleaseEntityResponse>` |
 | `updateContentReleasesReleaseAction` | `Maybe<ContentReleasesReleaseActionEntityResponse>` |
 | `updateConventionText` | `Maybe<ConventionTextEntityResponse>` |
@@ -1140,6 +1233,9 @@ These are the main content types in the Strapi backend.
 | `updateHatzaa` | `Maybe<HatzaaEntityResponse>` |
 | `updateHazbaah` | `Maybe<HazbaahEntityResponse>` |
 | `updateIssue` | `Maybe<IssueEntityResponse>` |
+| `updateMaagad` | `Maybe<MaagadEntityResponse>` |
+| `updateMaagadMember` | `Maybe<MaagadMemberEntityResponse>` |
+| `updateMaagadOffer` | `Maybe<MaagadOfferEntityResponse>` |
 | `updateMaap` | `Maybe<MaapEntityResponse>` |
 | `updateMachshir` | `Maybe<MachshirEntityResponse>` |
 | `updateMashaabim` | `Maybe<MashaabimEntityResponse>` |
@@ -1195,6 +1291,7 @@ These are the main content types in the Strapi backend.
 | `updateTranslate` | `Maybe<TranslateEntityResponse>` |
 | `updateUploadFile` | `Maybe<UploadFileEntityResponse>` |
 | `updateUploadFolder` | `Maybe<UploadFolderEntityResponse>` |
+| `updateUserKey` | `Maybe<UserKeyEntityResponse>` |
 | `updateUsersPermissionsRole` | `Maybe<UsersPermissionsUpdateRolePayload>` |
 | `updateUsersPermissionsUser` | `UsersPermissionsUserEntityResponse` |
 | `updateVallue` | `Maybe<VallueEntityResponse>` |
@@ -1749,6 +1846,8 @@ These are the main content types in the Strapi backend.
 | `chezins` | `Maybe<ChezinEntityResponseCollection>` |
 | `clause` | `Maybe<ClauseEntityResponse>` |
 | `clauses` | `Maybe<ClauseEntityResponseCollection>` |
+| `consentEvent` | `Maybe<ConsentEventEntityResponse>` |
+| `consentEvents` | `Maybe<ConsentEventEntityResponseCollection>` |
 | `contentReleasesRelease` | `Maybe<ContentReleasesReleaseEntityResponse>` |
 | `contentReleasesReleaseAction` | `Maybe<ContentReleasesReleaseActionEntityResponse>` |
 | `contentReleasesReleaseActions` | `Maybe<ContentReleasesReleaseActionEntityResponseCollection>` |
@@ -1789,6 +1888,12 @@ These are the main content types in the Strapi backend.
 | `i18NLocales` | `Maybe<I18NLocaleEntityResponseCollection>` |
 | `issue` | `Maybe<IssueEntityResponse>` |
 | `issues` | `Maybe<IssueEntityResponseCollection>` |
+| `maagad` | `Maybe<MaagadEntityResponse>` |
+| `maagadMember` | `Maybe<MaagadMemberEntityResponse>` |
+| `maagadMembers` | `Maybe<MaagadMemberEntityResponseCollection>` |
+| `maagadOffer` | `Maybe<MaagadOfferEntityResponse>` |
+| `maagadOffers` | `Maybe<MaagadOfferEntityResponseCollection>` |
+| `maagads` | `Maybe<MaagadEntityResponseCollection>` |
 | `maap` | `Maybe<MaapEntityResponse>` |
 | `maaps` | `Maybe<MaapEntityResponseCollection>` |
 | `machshir` | `Maybe<MachshirEntityResponse>` |
@@ -1900,6 +2005,8 @@ These are the main content types in the Strapi backend.
 | `uploadFiles` | `Maybe<UploadFileEntityResponseCollection>` |
 | `uploadFolder` | `Maybe<UploadFolderEntityResponse>` |
 | `uploadFolders` | `Maybe<UploadFolderEntityResponseCollection>` |
+| `userKey` | `Maybe<UserKeyEntityResponse>` |
+| `userKeys` | `Maybe<UserKeyEntityResponseCollection>` |
 | `usersPermissionsRole` | `Maybe<UsersPermissionsRoleEntityResponse>` |
 | `usersPermissionsRoles` | `Maybe<UsersPermissionsRoleEntityResponseCollection>` |
 | `usersPermissionsUser` | `Maybe<UsersPermissionsUserEntityResponse>` |
@@ -1925,6 +2032,7 @@ These are the main content types in the Strapi backend.
 |-------|------|
 | `access_mode` | `Maybe<Enum_Ratson_Access_Mode>` |
 | `age_group` | `Maybe<Scalars['String']['output']>` |
+| `aggregation_opt_out` | `Maybe<Scalars['Boolean']['output']>` |
 | `ai_meta` | `Maybe<Scalars['JSON']['output']>` |
 | `allowJoin` | `Maybe<Scalars['Boolean']['output']>` |
 | `bounti` | `Maybe<Scalars['Boolean']['output']>` |
@@ -1955,6 +2063,7 @@ These are the main content types in the Strapi backend.
 | `lockedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `logo` | `Maybe<UploadFileEntityResponse>` |
 | `longDes` | `Maybe<Scalars['String']['output']>` |
+| `maagad` | `Maybe<MaagadEntityResponse>` |
 | `mashaabims` | `Maybe<MashaabimRelationResponseCollection>` |
 | `matanots` | `Maybe<MatanotRelationResponseCollection>` |
 | `matanots_offered` | `Maybe<MatanotRelationResponseCollection>` |
@@ -2207,11 +2316,13 @@ These are the main content types in the Strapi backend.
 |-------|------|
 | `appruved` | `Maybe<Scalars['Boolean']['output']>` |
 | `archived` | `Maybe<Scalars['Boolean']['output']>` |
+| `conditional` | `Maybe<Scalars['Boolean']['output']>` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `finnishDate` | `Maybe<Scalars['DateTime']['output']>` |
 | `forum` | `Maybe<ForumEntityResponse>` |
 | `locale` | `Maybe<Scalars['String']['output']>` |
 | `localizations` | `Maybe<SheirutpendRelationResponseCollection>` |
+| `maagad_offer` | `Maybe<MaagadOfferEntityResponse>` |
 | `matanots` | `Maybe<MatanotRelationResponseCollection>` |
 | `price` | `Maybe<Scalars['Float']['output']>` |
 | `project` | `Maybe<ProjectEntityResponse>` |
@@ -2493,6 +2604,19 @@ These are the main content types in the Strapi backend.
 | `path` | `Scalars['String']['output']` |
 | `pathId` | `Scalars['Int']['output']` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
+
+### UserKey
+| Field | Type |
+|-------|------|
+| `addedAt` | `Maybe<Scalars['Long']['output']>` |
+| `algo` | `Scalars['String']['output']` |
+| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `devicePubB64` | `Scalars['String']['output']` |
+| `label` | `Maybe<Scalars['String']['output']>` |
+| `payload` | `Scalars['JSON']['output']` |
+| `revokedAt` | `Maybe<Scalars['Long']['output']>` |
+| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `userId` | `Scalars['String']['output']` |
 
 ### UsersPermissionsCreateRolePayload
 | Field | Type |
@@ -3708,7 +3832,7 @@ These are Strapi components (reusable field groups).
 
 ---
 
-## 📝 Input Types (107)
+## 📝 Input Types (112)
 
 Used for creating/updating content.
 
@@ -3893,6 +4017,18 @@ Used for creating/updating content.
 | `position` | `InputMaybe<Scalars['ID']['input']>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `stanceValue` | `InputMaybe<Scalars['Float']['input']>` |
+
+### ConsentEventInput
+| Field | Type |
+|-------|------|
+| `action` | `InputMaybe<Scalars['String']['input']>` |
+| `actor` | `InputMaybe<Scalars['String']['input']>` |
+| `eventId` | `InputMaybe<Scalars['String']['input']>` |
+| `payload` | `InputMaybe<Scalars['JSON']['input']>` |
+| `stateRoot` | `InputMaybe<Scalars['String']['input']>` |
+| `subjectId` | `InputMaybe<Scalars['String']['input']>` |
+| `subjectType` | `InputMaybe<Scalars['String']['input']>` |
+| `ts` | `InputMaybe<Scalars['Long']['input']>` |
 
 ### ContentReleasesReleaseActionInput
 | Field | Type |
@@ -4348,6 +4484,68 @@ Used for creating/updating content.
 | `null` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `or` | `InputMaybe<Array<InputMaybe<Scalars['Long']['input']>>>` |
 | `startsWith` | `InputMaybe<Scalars['Long']['input']>` |
+
+### MaagadInput
+| Field | Type |
+|-------|------|
+| `canonical_desc` | `InputMaybe<Scalars['String']['input']>` |
+| `categories` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `chat_forum` | `InputMaybe<Scalars['ID']['input']>` |
+| `frequency` | `InputMaybe<Scalars['String']['input']>` |
+| `lat` | `InputMaybe<Scalars['Float']['input']>` |
+| `lng` | `InputMaybe<Scalars['Float']['input']>` |
+| `members` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `name` | `InputMaybe<Scalars['String']['input']>` |
+| `offers` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `origin` | `InputMaybe<Enum_Maagad_Origin>` |
+| `pinecone_id` | `InputMaybe<Scalars['String']['input']>` |
+| `process` | `InputMaybe<Scalars['ID']['input']>` |
+| `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `radius` | `InputMaybe<Scalars['Long']['input']>` |
+| `ratsons` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `scope` | `InputMaybe<Enum_Maagad_Scope>` |
+| `status_maagad` | `InputMaybe<Enum_Maagad_Status_Maagad>` |
+| `vallues` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `viability_hint` | `InputMaybe<Scalars['Int']['input']>` |
+
+### MaagadMemberInput
+| Field | Type |
+|-------|------|
+| `joinedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `leftAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `maagad` | `InputMaybe<Scalars['ID']['input']>` |
+| `options` | `InputMaybe<Scalars['JSON']['input']>` |
+| `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `ratson` | `InputMaybe<Scalars['ID']['input']>` |
+| `sheirutpend` | `InputMaybe<Scalars['ID']['input']>` |
+| `signedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `signed_offer` | `InputMaybe<Scalars['ID']['input']>` |
+| `status_member` | `InputMaybe<Enum_Maagadmember_Status_Member>` |
+| `user` | `InputMaybe<Scalars['ID']['input']>` |
+| `visibility` | `InputMaybe<Enum_Maagadmember_Visibility>` |
+
+### MaagadOfferInput
+| Field | Type |
+|-------|------|
+| `cancellation_terms` | `InputMaybe<Scalars['String']['input']>` |
+| `currency` | `InputMaybe<Scalars['ID']['input']>` |
+| `cycle_terms` | `InputMaybe<Scalars['JSON']['input']>` |
+| `description` | `InputMaybe<Scalars['String']['input']>` |
+| `maagad` | `InputMaybe<Scalars['ID']['input']>` |
+| `max_participants` | `InputMaybe<Scalars['Int']['input']>` |
+| `min_participants` | `InputMaybe<Scalars['Int']['input']>` |
+| `options` | `InputMaybe<Scalars['JSON']['input']>` |
+| `price_tiers` | `InputMaybe<Scalars['JSON']['input']>` |
+| `proposer_project` | `InputMaybe<Scalars['ID']['input']>` |
+| `proposer_user` | `InputMaybe<Scalars['ID']['input']>` |
+| `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `recurrence` | `InputMaybe<Enum_Maagadoffer_Recurrence>` |
+| `sign_deadline` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `signed_count` | `InputMaybe<Scalars['Int']['input']>` |
+| `signed_members` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `status_offer` | `InputMaybe<Enum_Maagadoffer_Status_Offer>` |
+| `title` | `InputMaybe<Scalars['String']['input']>` |
+| `unit_price` | `InputMaybe<Scalars['Float']['input']>` |
 
 ### MaapInput
 | Field | Type |
@@ -5120,6 +5318,7 @@ Used for creating/updating content.
 |-------|------|
 | `access_mode` | `InputMaybe<Enum_Ratson_Access_Mode>` |
 | `age_group` | `InputMaybe<Scalars['String']['input']>` |
+| `aggregation_opt_out` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `ai_meta` | `InputMaybe<Scalars['JSON']['input']>` |
 | `allowJoin` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `bounti` | `InputMaybe<Scalars['Boolean']['input']>` |
@@ -5147,6 +5346,7 @@ Used for creating/updating content.
 | `lockedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `logo` | `InputMaybe<Scalars['ID']['input']>` |
 | `longDes` | `InputMaybe<Scalars['String']['input']>` |
+| `maagad` | `InputMaybe<Scalars['ID']['input']>` |
 | `mashaabims` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `matanots` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `matanots_offered` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -5369,8 +5569,10 @@ Used for creating/updating content.
 |-------|------|
 | `appruved` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `archived` | `InputMaybe<Scalars['Boolean']['input']>` |
+| `conditional` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `finnishDate` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `forum` | `InputMaybe<Scalars['ID']['input']>` |
+| `maagad_offer` | `InputMaybe<Scalars['ID']['input']>` |
 | `matanots` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `price` | `InputMaybe<Scalars['Float']['input']>` |
 | `project` | `InputMaybe<Scalars['ID']['input']>` |
@@ -5639,6 +5841,17 @@ Used for creating/updating content.
 | `path` | `InputMaybe<Scalars['String']['input']>` |
 | `pathId` | `InputMaybe<Scalars['Int']['input']>` |
 
+### UserKeyInput
+| Field | Type |
+|-------|------|
+| `addedAt` | `InputMaybe<Scalars['Long']['input']>` |
+| `algo` | `InputMaybe<Scalars['String']['input']>` |
+| `devicePubB64` | `InputMaybe<Scalars['String']['input']>` |
+| `label` | `InputMaybe<Scalars['String']['input']>` |
+| `payload` | `InputMaybe<Scalars['JSON']['input']>` |
+| `revokedAt` | `InputMaybe<Scalars['Long']['input']>` |
+| `userId` | `InputMaybe<Scalars['String']['input']>` |
+
 ### UsersPermissionsLoginInput
 | Field | Type |
 |-------|------|
@@ -5878,12 +6091,12 @@ Used for creating/updating content.
 
 ---
 
-## 🔍 Filter Input Types (96)
+## 🔍 Filter Input Types (101)
 
 Used for querying/filtering content. Each content type has a corresponding filter input.
 
 <details>
-<summary>Click to expand all 96 filter types</summary>
+<summary>Click to expand all 101 filter types</summary>
 
 #### ActFiltersInput
 Fields: `and`, `createdAt`, `dateF`, `dateS`, `des`, `forums`, `hashivut`, `id`, `isAssigned`, `link`, `locale`, `localizations`, `mesimabetahaliches`, `my`, `myIshur`, `naasa`, `negopendmissions`, `not`, `open_mission`, `or`, `partofs`, `pendm`, `project`, `publishedAt`, `shem`, `status`, `tafkidims`, `taskdis`, `timegrama`, `timers`, `updatedAt`, `userAndIshur`, `vali`, `valiIshur`
@@ -5917,6 +6130,9 @@ Fields: `and`, `countries`, `createdAt`, `deffinitions`, `email`, `fullAgreement
 
 #### ClauseFiltersInput
 Fields: `and`, `authorExternalId`, `authorType`, `body`, `confirmedByAuthor`, `createdAt`, `id`, `issue`, `negotiation`, `not`, `or`, `origin`, `position`, `publishedAt`, `stanceValue`, `updatedAt`
+
+#### ConsentEventFiltersInput
+Fields: `action`, `actor`, `and`, `createdAt`, `eventId`, `id`, `not`, `or`, `payload`, `stateRoot`, `subjectId`, `subjectType`, `ts`, `updatedAt`
 
 #### ContentReleasesReleaseActionFiltersInput
 Fields: `and`, `contentType`, `createdAt`, `id`, `locale`, `not`, `or`, `release`, `type`, `updatedAt`
@@ -5977,6 +6193,15 @@ Fields: `and`, `code`, `createdAt`, `id`, `name`, `not`, `or`, `updatedAt`
 
 #### IssueFiltersInput
 Fields: `and`, `clauses`, `createdAt`, `id`, `negotiation`, `not`, `or`, `order`, `origin`, `publishedAt`, `title`, `updatedAt`
+
+#### MaagadFiltersInput
+Fields: `and`, `canonical_desc`, `categories`, `chat_forum`, `createdAt`, `frequency`, `id`, `lat`, `lng`, `members`, `name`, `not`, `offers`, `or`, `origin`, `pinecone_id`, `process`, `publishedAt`, `radius`, `ratsons`, `scope`, `status_maagad`, `updatedAt`, `vallues`, `viability_hint`
+
+#### MaagadMemberFiltersInput
+Fields: `and`, `createdAt`, `id`, `joinedAt`, `leftAt`, `maagad`, `not`, `options`, `or`, `publishedAt`, `ratson`, `sheirutpend`, `signedAt`, `signed_offer`, `status_member`, `updatedAt`, `user`, `visibility`
+
+#### MaagadOfferFiltersInput
+Fields: `and`, `cancellation_terms`, `createdAt`, `currency`, `cycle_terms`, `description`, `id`, `maagad`, `max_participants`, `min_participants`, `not`, `options`, `or`, `price_tiers`, `proposer_project`, `proposer_user`, `publishedAt`, `recurrence`, `sign_deadline`, `signed_count`, `signed_members`, `status_offer`, `title`, `unit_price`, `updatedAt`
 
 #### MaapFiltersInput
 Fields: `and`, `archived`, `createdAt`, `cycleEnd`, `cycleIndex`, `cycleStart`, `forum`, `id`, `isAcceptanceMaap`, `isSelfProposal`, `locale`, `localizations`, `mashabetahalich`, `name`, `negos`, `not`, `open_mashaabim`, `or`, `partofs`, `pmash`, `project`, `publishedAt`, `quantityDelivered`, `rikmash`, `sheirut_fulfillments`, `sp`, `timegrama`, `unit`, `updatedAt`, `vots`
@@ -6066,7 +6291,7 @@ Fields: `acts`, `addHoursManualy`, `and`, `askms`, `asks`, `askwants`, `city`, `
 Fields: `ai_meta`, `and`, `archived`, `avg_rating`, `bio_raw`, `createdAt`, `display_name`, `id`, `lat`, `lng`, `location`, `not`, `or`, `owner_id`, `owner_type`, `pinecone_id`, `publishedAt`, `radius_km`, `updatedAt`
 
 #### RatsonFiltersInput
-Fields: `access_mode`, `age_group`, `ai_meta`, `allowJoin`, `and`, `bounti`, `categories`, `chat_forum`, `consensusRule`, `createdAt`, `derivedComplexMatanot`, `desc`, `extracted_missions`, `extracted_resources`, `finnishDate`, `frequency`, `fulfilled`, `fulfillment_score`, `id`, `isOnline`, `joinDeadline`, `joinKind`, `language`, `last_matched_at`, `lat`, `link`, `lng`, `locale`, `localizations`, `location`, `location_hint`, `lockedAt`, `longDes`, `mashaabims`, `matanots`, `matanots_offered`, `maxJoiners`, `minJoiners`, `missions`, `name`, `not`, `open_mashaabims`, `open_missions`, `or`, `partialConsensusFallback`, `pinecone_id`, `process`, `publishedAt`, `radius`, `ratson_match_jobs`, `ratson_proposals`, `ratson_shares`, `share_status`, `sheiruts`, `startDate`, `status_ratson`, `sub_category`, `totalbounti`, `updatedAt`, `users_permissions_users`, `vallues`, `votes`, `willingnessModel`
+Fields: `access_mode`, `age_group`, `aggregation_opt_out`, `ai_meta`, `allowJoin`, `and`, `bounti`, `categories`, `chat_forum`, `consensusRule`, `createdAt`, `derivedComplexMatanot`, `desc`, `extracted_missions`, `extracted_resources`, `finnishDate`, `frequency`, `fulfilled`, `fulfillment_score`, `id`, `isOnline`, `joinDeadline`, `joinKind`, `language`, `last_matched_at`, `lat`, `link`, `lng`, `locale`, `localizations`, `location`, `location_hint`, `lockedAt`, `longDes`, `maagad`, `mashaabims`, `matanots`, `matanots_offered`, `maxJoiners`, `minJoiners`, `missions`, `name`, `not`, `open_mashaabims`, `open_missions`, `or`, `partialConsensusFallback`, `pinecone_id`, `process`, `publishedAt`, `radius`, `ratson_match_jobs`, `ratson_proposals`, `ratson_shares`, `share_status`, `sheiruts`, `startDate`, `status_ratson`, `sub_category`, `totalbounti`, `updatedAt`, `users_permissions_users`, `vallues`, `votes`, `willingnessModel`
 
 #### RatsonMatchJobFiltersInput
 Fields: `and`, `createdAt`, `error`, `finished_at`, `id`, `mode`, `not`, `or`, `proposals_created`, `publishedAt`, `ratson`, `started_at`, `updatedAt`
@@ -6099,7 +6324,7 @@ Fields: `agreedPrice`, `and`, `cmdm`, `consumedMissionHours`, `consumedOpenMU`, 
 Fields: `and`, `createdAt`, `finnishDate`, `id`, `isOriginal`, `not`, `or`, `price`, `publishedAt`, `quant`, `sheirutpend`, `startDate`, `updatedAt`, `users_permissions_user`, `vots`
 
 #### SheirutpendFiltersInput
-Fields: `and`, `appruved`, `archived`, `createdAt`, `finnishDate`, `forum`, `id`, `locale`, `localizations`, `matanots`, `not`, `or`, `price`, `project`, `quant`, `ratson_proposal`, `sheirut`, `sheirutnegos`, `startDate`, `timegrama`, `total`, `updatedAt`, `users_permissions_user`, `votes`, `vots`
+Fields: `and`, `appruved`, `archived`, `conditional`, `createdAt`, `finnishDate`, `forum`, `id`, `locale`, `localizations`, `maagad_offer`, `matanots`, `not`, `or`, `price`, `project`, `quant`, `ratson_proposal`, `sheirut`, `sheirutnegos`, `startDate`, `timegrama`, `total`, `updatedAt`, `users_permissions_user`, `votes`, `vots`
 
 #### SidurFiltersInput
 Fields: `and`, `createdAt`, `id`, `lemi`, `not`, `or`, `publishedAt`, `updatedAt`
@@ -6143,6 +6368,9 @@ Fields: `alternativeText`, `and`, `caption`, `createdAt`, `ext`, `folder`, `fold
 #### UploadFolderFiltersInput
 Fields: `and`, `children`, `createdAt`, `files`, `id`, `name`, `not`, `or`, `parent`, `path`, `pathId`, `updatedAt`
 
+#### UserKeyFiltersInput
+Fields: `addedAt`, `algo`, `and`, `createdAt`, `devicePubB64`, `id`, `label`, `not`, `or`, `payload`, `revokedAt`, `updatedAt`, `userId`
+
 #### UsersPermissionsPermissionFiltersInput
 Fields: `action`, `and`, `createdAt`, `id`, `not`, `or`, `role`, `updatedAt`
 
@@ -6177,12 +6405,12 @@ Fields: `allSubmited`, `and`, `createdAt`, `done`, `id`, `mesimabetahalich`, `no
 
 ---
 
-## 📦 Entity Response Types (374)
+## 📦 Entity Response Types (391)
 
 Wrapper types for GraphQL responses.
 
 <details>
-<summary>Click to expand all 374 response types</summary>
+<summary>Click to expand all 391 response types</summary>
 
 - **ActEntity**: `attributes: Maybe<Act>`, `id: Maybe<Scalars['ID']['output']>`
 - **ActEntityResponse**: `data: Maybe<ActEntity>`
@@ -6227,6 +6455,9 @@ Wrapper types for GraphQL responses.
 - **ClauseEntityResponse**: `data: Maybe<ClauseEntity>`
 - **ClauseEntityResponseCollection**: `data: Array<ClauseEntity>`, `meta: ResponseCollectionMeta`
 - **ClauseRelationResponseCollection**: `data: Array<ClauseEntity>`
+- **ConsentEventEntity**: `attributes: Maybe<ConsentEvent>`, `id: Maybe<Scalars['ID']['output']>`
+- **ConsentEventEntityResponse**: `data: Maybe<ConsentEventEntity>`
+- **ConsentEventEntityResponseCollection**: `data: Array<ConsentEventEntity>`, `meta: ResponseCollectionMeta`
 - **ContentReleasesReleaseActionEntity**: `attributes: Maybe<ContentReleasesReleaseAction>`, `id: Maybe<Scalars['ID']['output']>`
 - **ContentReleasesReleaseActionEntityResponse**: `data: Maybe<ContentReleasesReleaseActionEntity>`
 - **ContentReleasesReleaseActionEntityResponseCollection**: `data: Array<ContentReleasesReleaseActionEntity>`, `meta: ResponseCollectionMeta`
@@ -6304,6 +6535,17 @@ Wrapper types for GraphQL responses.
 - **IssueEntityResponse**: `data: Maybe<IssueEntity>`
 - **IssueEntityResponseCollection**: `data: Array<IssueEntity>`, `meta: ResponseCollectionMeta`
 - **IssueRelationResponseCollection**: `data: Array<IssueEntity>`
+- **MaagadEntity**: `attributes: Maybe<Maagad>`, `id: Maybe<Scalars['ID']['output']>`
+- **MaagadEntityResponse**: `data: Maybe<MaagadEntity>`
+- **MaagadEntityResponseCollection**: `data: Array<MaagadEntity>`, `meta: ResponseCollectionMeta`
+- **MaagadMemberEntity**: `attributes: Maybe<MaagadMember>`, `id: Maybe<Scalars['ID']['output']>`
+- **MaagadMemberEntityResponse**: `data: Maybe<MaagadMemberEntity>`
+- **MaagadMemberEntityResponseCollection**: `data: Array<MaagadMemberEntity>`, `meta: ResponseCollectionMeta`
+- **MaagadMemberRelationResponseCollection**: `data: Array<MaagadMemberEntity>`
+- **MaagadOfferEntity**: `attributes: Maybe<MaagadOffer>`, `id: Maybe<Scalars['ID']['output']>`
+- **MaagadOfferEntityResponse**: `data: Maybe<MaagadOfferEntity>`
+- **MaagadOfferEntityResponseCollection**: `data: Array<MaagadOfferEntity>`, `meta: ResponseCollectionMeta`
+- **MaagadOfferRelationResponseCollection**: `data: Array<MaagadOfferEntity>`
 - **MaapEntity**: `attributes: Maybe<Maap>`, `id: Maybe<Scalars['ID']['output']>`
 - **MaapEntityResponse**: `data: Maybe<MaapEntity>`
 - **MaapEntityResponseCollection**: `data: Array<MaapEntity>`, `meta: ResponseCollectionMeta`
@@ -6519,6 +6761,9 @@ Wrapper types for GraphQL responses.
 - **UploadFolderEntityResponse**: `data: Maybe<UploadFolderEntity>`
 - **UploadFolderEntityResponseCollection**: `data: Array<UploadFolderEntity>`, `meta: ResponseCollectionMeta`
 - **UploadFolderRelationResponseCollection**: `data: Array<UploadFolderEntity>`
+- **UserKeyEntity**: `attributes: Maybe<UserKey>`, `id: Maybe<Scalars['ID']['output']>`
+- **UserKeyEntityResponse**: `data: Maybe<UserKeyEntity>`
+- **UserKeyEntityResponseCollection**: `data: Array<UserKeyEntity>`, `meta: ResponseCollectionMeta`
 - **UsersPermissionsPermissionEntity**: `attributes: Maybe<UsersPermissionsPermission>`, `id: Maybe<Scalars['ID']['output']>`
 - **UsersPermissionsPermissionRelationResponseCollection**: `data: Array<UsersPermissionsPermissionEntity>`
 - **UsersPermissionsRoleEntity**: `attributes: Maybe<UsersPermissionsRole>`, `id: Maybe<Scalars['ID']['output']>`
@@ -6562,10 +6807,10 @@ Wrapper types for GraphQL responses.
 
 ---
 
-## 🔢 Enum Types (75)
+## 🔢 Enum Types (82)
 
 <details>
-<summary>Click to expand all 75 enum types</summary>
+<summary>Click to expand all 82 enum types</summary>
 
 - **Enum_Act_Hashivut**: 
 - **Enum_Argument_Authortype**: 
@@ -6584,6 +6829,13 @@ Wrapper types for GraphQL responses.
 - **Enum_Forum_Spec**: 
 - **Enum_Haluka_Adjustdirection**: 
 - **Enum_Issue_Origin**: 
+- **Enum_Maagadmember_Status_Member**: 
+- **Enum_Maagadmember_Visibility**: 
+- **Enum_Maagadoffer_Recurrence**: 
+- **Enum_Maagadoffer_Status_Offer**: 
+- **Enum_Maagad_Origin**: 
+- **Enum_Maagad_Scope**: 
+- **Enum_Maagad_Status_Maagad**: 
 - **Enum_Maap_Unit**: 
 - **Enum_Mashaabim_Kindof**: 
 - **Enum_Mashabetahalich_Kindof**: 
@@ -6657,7 +6909,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 17661 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 18321 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

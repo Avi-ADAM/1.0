@@ -330,6 +330,7 @@
   }
   .lens-switch button.active {
     background: white;
+    color: #2b2740;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
   }
   .layer-chips {
@@ -344,6 +345,7 @@
     gap: 0.4rem;
     border: 1px solid rgba(120, 120, 160, 0.25);
     background: white;
+    color: #2b2740;
     border-radius: 9999px;
     padding: 0.3rem 0.75rem;
     font-size: 0.85rem;
@@ -383,6 +385,7 @@
     inset-inline-start: 0.75rem;
     max-width: min(20rem, calc(100% - 1.5rem));
     background: white;
+    color: #2b2740;
     border-radius: 0.9rem;
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
     padding: 0.85rem;
@@ -463,7 +466,7 @@
     padding: 0.5rem 0.7rem;
     cursor: pointer;
     text-decoration: none;
-    color: inherit;
+    color: #2b2740;
   }
   .row.static {
     cursor: default;

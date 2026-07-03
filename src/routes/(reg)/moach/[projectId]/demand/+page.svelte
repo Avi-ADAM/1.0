@@ -136,8 +136,9 @@
   .warn {
     margin-top: 0.5rem;
     font-size: 0.85rem;
-    background: rgba(245, 158, 11, 0.12);
-    color: #b45309;
+    background: rgba(245, 158, 11, 0.18);
+    color: #fcd34d;
+    border: 1px solid rgba(245, 158, 11, 0.4);
     border-radius: 0.6rem;
     padding: 0.5rem 0.75rem;
   }
@@ -161,6 +162,7 @@
     inset-inline-start: 0.75rem;
     max-width: min(20rem, calc(100% - 1.5rem));
     background: white;
+    color: #2b2740;
     border-radius: 0.9rem;
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
     padding: 0.85rem;
@@ -204,6 +206,7 @@
     flex: 1;
     border: 1px solid rgba(120, 120, 160, 0.25);
     background: white;
+    color: #2b2740;
     border-radius: 0.7rem;
     padding: 0.45rem;
     cursor: pointer;
@@ -211,8 +214,9 @@
     font-weight: 600;
   }
   .tabs button.active {
-    background: rgba(139, 92, 246, 0.12);
-    border-color: rgba(139, 92, 246, 0.4);
+    background: #ede9fe;
+    border-color: rgba(139, 92, 246, 0.6);
+    color: #4c1d95;
   }
   .count {
     opacity: 0.55;
@@ -232,6 +236,7 @@
     text-align: start;
     border: 1px solid rgba(120, 120, 160, 0.18);
     background: white;
+    color: #2b2740;
     border-radius: 0.7rem;
     padding: 0.55rem 0.7rem;
     cursor: pointer;

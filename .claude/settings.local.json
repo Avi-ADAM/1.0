@@ -98,7 +98,9 @@
       "Bash(ls src/lib/stores/forumStore.js)",
       "Bash(ls scripts/)",
       "Bash(ls .github/)",
-      "Bash(echo \"EXIT:$?\")"
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(ls src/routes/\\\\\\(reg\\\\\\)/moach/*.svelte)",
+      "Bash(ls src/routes/\\\\\\(reg\\\\\\)/*.svelte)"
     ],
     "additionalDirectories": [
       "c:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\deals\\request",
