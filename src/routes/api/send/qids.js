@@ -11658,6 +11658,78 @@ export const qids = {
     me { id }
   }`,
 
+  // ── Discovery map (PLAN_DISCOVERY_MAP §5) ────────────────────────────────
+  // Public queries feeding /demand. 207–209 run against the live schema;
+  // 210 targets the maagad collections (SPEC_SHARED_PURCHASE_MAP in 1.0b) and
+  // is called behind a guard until they exist in production.
+
+  '207mapJoinableRatsons': `query MapJoinableRatsons {
+    ratsons(
+      filters: {
+        and: [
+          { status_ratson: { in: ["open", "matching"] } }
+          { access_mode: { ne: "personal" } }
+          { or: [{ allowJoin: { eq: true } }, { joinKind: { notIn: ["solo"] } }] }
+        ]
+      }
+      pagination: { limit: 250 }
+      sort: "createdAt:desc"
+    ) {
+      data { id attributes {
+        name status_ratson access_mode isOnline lat lng radius location_hint
+        allowJoin joinKind minJoiners maxJoiners joinDeadline frequency
+        categories { data { id attributes { name } } }
+        ratson_shares { data { id } }
+      } }
+    }
+  }`,
+
+  '208mapOpenMissions': `query MapOpenMissions {
+    openMissions(
+      filters: { archived: { eq: false } }
+      pagination: { limit: 250 }
+      sort: "createdAt:desc"
+    ) {
+      data { id attributes {
+        name descrip noofhours perhour isglobal dates source
+        location { lat lng radius location_hint location_mode }
+        project { data { id attributes { projectName location { lat lng radius location_hint location_mode } } } }
+        skills { data { id attributes { skillName } } }
+        ratson { data { id attributes { lat lng radius isOnline } } }
+      } }
+    }
+  }`,
+
+  '209mapOpenMashaabims': `query MapOpenMashaabims {
+    openMashaabims(
+      filters: { archived: { eq: false } }
+      pagination: { limit: 250 }
+      sort: "createdAt:desc"
+    ) {
+      data { id attributes {
+        name descrip kindOf source
+        location { lat lng radius location_hint location_mode }
+        project { data { id attributes { projectName location { lat lng radius location_hint location_mode } } } }
+        ratson { data { id attributes { lat lng radius isOnline } } }
+      } }
+    }
+  }`,
+
+  '210mapMaagadim': `query MapMaagadim {
+    maagads(
+      filters: { status_maagad: { in: ["forming", "visible", "offered"] } }
+      pagination: { limit: 250 }
+    ) {
+      data { id attributes {
+        name canonical_desc scope lat lng radius frequency status_maagad viability_hint
+        members(filters: { status_member: { in: ["interested", "signed", "active"] } }) { data { id } }
+        offers(filters: { status_offer: { eq: "open" } }) {
+          data { id attributes { title unit_price min_participants max_participants signed_count sign_deadline status_offer } }
+        }
+      } }
+    }
+  }`,
+
   // ── Sale actions ──────────────────────────────────────────────────────────
 
   'createSaleRecord': `mutation CreateSaleRecord(
