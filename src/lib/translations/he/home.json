@@ -385,5 +385,12 @@
       "negoBack": "חזרה",
       "negoSent": "נשלח למו\"מ!"
     }
+  },
+  "videos": {
+    "howItWorksCta": "ראו איך אחד לב אחד עובדת",
+    "howItWorksLabel": "סרטון: איך 1💗1 עובדת",
+    "thirdWayCta": "צפו בסרטון: הדרך השלישית — למה זה נצרך",
+    "thirdWayLabel": "סרטון: הדרך השלישית",
+    "close": "סגירה"
   }
 }
