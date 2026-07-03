@@ -69,9 +69,10 @@
 </script>
 
 {#if footMode === 'mini'}
-  <!-- Minimized: a small pill offering the two expand directions -->
+  <!-- Minimized: a small pill offering the two expand directions, centered so it
+       doesn't collide with the chat bot bubble docked at the end corner -->
   <div
-    class="fixed z-50 bottom-2 end-2 flex items-center gap-1 p-1 bg-white border border-gray-200 rounded-full shadow-lg dark:bg-gray-700 dark:border-gray-600"
+    class="fixed z-50 bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1 p-1 bg-white border border-gray-200 rounded-full shadow-lg dark:bg-gray-700 dark:border-gray-600"
   >
     <button
       type="button"
@@ -99,7 +100,7 @@
 {:else}
   <div
     class={vertical
-      ? 'fixed z-50 bottom-2 end-2 w-20 bg-white border border-gray-200 rounded-3xl shadow-lg dark:bg-gray-700 dark:border-gray-600'
+      ? 'fixed z-50 bottom-2 start-2 w-20 bg-white border border-gray-200 rounded-3xl shadow-lg dark:bg-gray-700 dark:border-gray-600'
       : ' fixed z-50 w-full h-14 max-w-lg -translate-x-1/2 bg-white border border-gray-200 rounded-full bottom-0 left-1/2 dark:bg-gray-700 dark:border-gray-600'}
   >
     {#if navigating && navigating.to}

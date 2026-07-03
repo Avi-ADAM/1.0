@@ -97,7 +97,8 @@
       "Bash(git show *)",
       "Bash(ls src/lib/stores/forumStore.js)",
       "Bash(ls scripts/)",
-      "Bash(ls .github/)"
+      "Bash(ls .github/)",
+      "Bash(echo \"EXIT:$?\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\deals\\request",
