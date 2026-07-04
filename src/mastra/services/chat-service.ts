@@ -6,6 +6,7 @@ import {
   DEFAULT_AGENT_MAX_STEPS,
   getAgentReply
 } from '../lib/agent-response';
+import { setMcpContext, clearMcpContext } from '../../lib/server/mcpContext.js';
 
 interface ChatInput {
   message: string;
@@ -121,14 +122,14 @@ export class ChatService {
     let agent: any;
     let agentType = intent.type;
 
-    // Set global context for tools
+    // Set per-request context for tools
     if (userId && fetchInstance) {
-      global.botContext = {
+      setMcpContext({
         fetchInstance: fetchInstance,
         userId: userId,
         intent: intent,
         currentMessage: message
-      };
+      });
     }
 
     switch (intent.type) {
@@ -233,10 +234,8 @@ export class ChatService {
       }
     }
 
-    // Clean up global context
-    if (global.botContext) {
-      delete global.botContext;
-    }
+    // Clean up per-request context
+    clearMcpContext();
 
     return response;
   }

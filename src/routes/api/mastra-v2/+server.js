@@ -4,6 +4,7 @@ import { GEMINI_API_KEY } from '$env/static/private';
 import { mastra } from '../../../mastra';
 import { createUnregisteredBotAgent } from '../../../mastra/agents/nonreg-bot.js';
 import { DEFAULT_AGENT_MAX_STEPS } from '../../../mastra/lib/agent-response.js';
+import { setMcpContext } from '$lib/server/mcpContext';
 
 export async function POST({ request, fetch }) {
   const { payload, user } = await request.json();
@@ -91,11 +92,11 @@ export async function POST({ request, fetch }) {
     }
 
     console.log('🚀 Starting chat workflow for registered user');
-    global.botContext = {
+    setMcpContext({
       fetchInstance: fetch,
       userId: user.id.toString(),
       currentPath: currentPath
-    };
+    });
     // Execute the workflow
     const run = await mastra.getWorkflow('chatWorkflow').createRunAsync();
 

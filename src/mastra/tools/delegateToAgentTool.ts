@@ -2,6 +2,7 @@ import { createTool } from '@mastra/core/tools'
 import { z } from 'zod';
 import { createTimerAgent } from '../agents/timer-agent';
 import { createNavigationAgent } from '../agents/navigation-agent';
+import { getMcpContext } from '../../lib/server/mcpContext.js';
 
 export const delegateToAgentTool = createTool({
   id: 'delegateToAgentTool',
@@ -27,8 +28,8 @@ export const delegateToAgentTool = createTool({
         userMessage
       );
 
-      // Get the global context that was set in the workflow
-      const botContext = (global as any).botContext;
+      // Get the per-request context that was set in the workflow
+      const botContext = getMcpContext();
       if (!botContext) {
         return {
           success: false,

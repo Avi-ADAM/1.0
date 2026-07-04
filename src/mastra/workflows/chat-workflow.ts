@@ -9,6 +9,7 @@ import {
   DEFAULT_AGENT_MAX_STEPS,
   getAgentReply
 } from '../lib/agent-response';
+import { setMcpContext, clearMcpContext } from '../../lib/server/mcpContext.js';
 
 interface IntentResult {
   type: 'timer' | 'navigation' | 'general' | 'report' | 'sale';
@@ -235,15 +236,15 @@ const routeToAgent = createStep({
     console.log('🚀 Routing to agent for intent:', intent.type);
     console.log('🌐 Language for agent:', language);
 
-    // Set global context for tools to access
-    global.botContext = {
+    // Set per-request context for tools to access
+    setMcpContext({
       fetchInstance: fetchInstance,
       userId: userId,
       isInternalBot: true, // JWT-authenticated — ownership checks are relaxed
       fullHistory: history,
       currentMessage: message,
       intent
-    };
+    });
 
     let agent: any;
     let agentType = intent.type;
@@ -359,10 +360,8 @@ const routeToAgent = createStep({
       result.response?.messages?.filter((m: any) => m.role === 'tool')
         ?.length || 0
     );
-    // Clean up global context
-    if (global.botContext) {
-      delete global.botContext;
-    }
+    // Clean up per-request context
+    clearMcpContext();
 
     return {
       agentResult: result,

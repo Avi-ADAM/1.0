@@ -2,6 +2,7 @@
 import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 import { sendToSer } from '../../lib/send/sendToSer.js';
+import { getMcpContext } from '../../lib/server/mcpContext.js';
 
 // ── helpers ──────────────────────────────────────────────
 
@@ -120,7 +121,7 @@ export const getWorkedHoursTool = createTool({
   }),
   execute: async (inputData) => {
     const { period, startDate, endDate } = inputData;
-    const globalContext = (global as any).botContext || {};
+    const globalContext = getMcpContext() || ({} as any);
     const userId = globalContext.userId;
     const fetchInstance = globalContext.fetchInstance;
     const isServerRequest = !globalContext.isInternalBot;

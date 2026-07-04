@@ -2,6 +2,7 @@ import { createTool } from '@mastra/core/tools'
 import { z } from 'zod';
 import { sendToSer } from '../../lib/send/sendToSer';
 import { fuzzyMissionMatch, sortMissionsByRelevance } from '../../lib/utils/fuzzyMatch.js';
+import { getMcpContext } from '../../lib/server/mcpContext.js';
 
 async function findUserMissions(userId: string, fetch: any, isServerRequest = false, missionName?: string) {
   try {
@@ -47,7 +48,7 @@ export const findMissionTool = createTool({
   }),
   execute: async (inputData, context) => {
     const { missionName } = inputData;
-    const globalContext = global.botContext || {};
+    const globalContext = getMcpContext() || ({} as any);
     const userId = globalContext.userId;
     const fetchInstance = globalContext.fetchInstance;
     const isServerRequest = !globalContext.isInternalBot;

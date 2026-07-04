@@ -4,6 +4,7 @@ import { createEnhancedBotAgent } from '../../../mastra/agents/reg-bot.ts';
 import { createUnregisteredBotAgent } from '../../../mastra/agents/nonreg-bot.ts';
 import { DEFAULT_AGENT_MAX_STEPS } from '../../../mastra/lib/agent-response.ts';
 import { GEMINI_API_KEY } from '$env/static/private';
+import { setMcpContext, clearMcpContext } from '$lib/server/mcpContext';
 
 export async function POST({ request, fetch, cookies }) {
   const { action, payload, user } = await request.json();
@@ -65,11 +66,11 @@ export async function POST({ request, fetch, cookies }) {
       content: payload.text
     });
 
-    // Set global context for tools to access
-    global.botContext = {
+    // Set per-request context for tools to access
+    setMcpContext({
       fetchInstance: fetch,
       userId: user.id
-    };
+    });
 
     // Execute the agent with access to tools
     const result = await registeredAgent.generate(messages, {
@@ -121,9 +122,7 @@ export async function POST({ request, fetch, cookies }) {
       { status: 500 }
     );
   } finally {
-    // Clean up global context to prevent memory leaks
-    if (global.botContext) {
-      delete global.botContext;
-    }
+    // Clean up per-request context
+    clearMcpContext();
   }
 }
