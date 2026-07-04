@@ -6541,6 +6541,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
               id
               attributes {
                 price quant total startDate finnishDate createdAt
+                conditional
+                maagad_offer { data { id attributes { title status_offer } } }
                 forum { data { id } }
                 ratson_proposal {
                   data {
@@ -6647,6 +6649,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                     id
                     attributes {
                       price quant total startDate finnishDate createdAt
+                      conditional
+                      maagad_offer { data { id attributes { title status_offer } } }
                       forum { data { id } }
                       ratson_proposal {
                         data {
@@ -11767,14 +11771,35 @@ export const qids = {
     $id: ID!, $status_member: ENUM_MAAGADMEMBER_STATUS_MEMBER,
     $signed_offer: ID, $options: JSON,
     $visibility: ENUM_MAAGADMEMBER_VISIBILITY,
+    $sheirutpend: ID,
     $signedAt: DateTime, $leftAt: DateTime
   ) {
     updateMaagadMember(id: $id, data: {
       status_member: $status_member, signed_offer: $signed_offer,
-      options: $options, visibility: $visibility,
+      options: $options, visibility: $visibility, sheirutpend: $sheirutpend,
       signedAt: $signedAt, leftAt: $leftAt
     }) {
       data { id attributes { status_member } }
+    }
+  }`,
+
+  // Atomic-activation deal (PLAN_SHARED_PURCHASE §7.2): a per-member Sheirutpend
+  // on the supplier's rikma, tagged with the maagad_offer. conditional=false =
+  // live deal (created only at activation, so no orphan pends on unsign/expire).
+  '235crMaagadSheirutpend': `mutation CrMaagadSheirutpend(
+    $project: ID!, $userId: ID!, $maagadOffer: ID!,
+    $price: Float, $quant: Float, $total: Float, $publishedAt: DateTime
+  ) {
+    createSheirutpend(data: {
+      project: $project,
+      users_permissions_user: $userId,
+      maagad_offer: $maagadOffer,
+      conditional: false,
+      appruved: false,
+      price: $price, quant: $quant, total: $total,
+      publishedAt: $publishedAt
+    }) {
+      data { id attributes { price total conditional } }
     }
   }`,
 

@@ -13,15 +13,17 @@
  * the pure state machine in `../../maagad/offerStateMachine.ts`; the handlers
  * here only wire those decisions to Strapi.
  *
- * Deferred to a later milestone (documented in PLAN_DISCOVERY_MAP): creating
- * the conditional Sheirutpend on activation and running the existing deal
- * pipeline per member. Activation here transitions the offer + members to
- * `active`, which is the observable outcome the plan's §7.2 scenario checks.
+ * Activation (§7.2) is atomic: confirming quorum flips the offer + signed
+ * members to active AND mints a live per-member Sheirutpend on the supplier's
+ * rikma (the offer's proposer_project), priced at the tier the reached count
+ * unlocked. Deals are created only at activation, so unsigning/expiring before
+ * then leaves no orphan pends. Recurring fulfilment (§7.5) is still future.
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import {
   canConfirm,
+  resolveTierPrice,
   shouldExpire,
   type OfferState,
   type OfferStatus
@@ -520,6 +522,26 @@ async function activateOffer(
   offerId: string,
   maagadNode: any
 ) {
+  const offer = (maagadNode.attributes?.offers?.data ?? []).find(
+    (o: any) => String(o.id) === String(offerId)
+  );
+  const oa = offer?.attributes ?? {};
+  const proposerProjectId = oa.proposer_project?.data?.id
+    ? String(oa.proposer_project.data.id)
+    : null;
+
+  // Members who signed *this* offer.
+  const signedMembers = (maagadNode.attributes?.members?.data ?? []).filter(
+    (m: any) => String(m?.attributes?.signed_offer?.data?.id) === String(offerId)
+  );
+
+  // Final price: the tier the reached count unlocked, for everyone (§4.3).
+  const finalPrice = resolveTierPrice(
+    Number(oa.unit_price) || 0,
+    Array.isArray(oa.price_tiers) ? oa.price_tiers : null,
+    signedMembers.length
+  );
+
   await strapi.execute(
     '228updateMaagadOffer',
     { id: offerId, status_offer: 'activated' },
@@ -532,22 +554,54 @@ async function activateOffer(
     context.jwt,
     context.fetch
   );
-  // Every member who signed *this* offer becomes active.
-  const signedMembers = (maagadNode.attributes?.members?.data ?? []).filter(
-    (m: any) => String(m?.attributes?.signed_offer?.data?.id) === String(offerId)
-  );
+
   const activatedUserIds: string[] = [];
+  let dealsCreated = 0;
+  const nowStr = nowIso();
   for (const m of signedMembers) {
+    const uid = m?.attributes?.user?.data?.id;
+
+    // Atomic activation (§7.2): a live per-member deal on the supplier's rikma.
+    // Requires the offer to carry a proposer_project; a solo supplier without a
+    // rikma still activates (members go active) but no Sheirutpend is minted —
+    // surfaced via dealsCreated so the caller can flag it.
+    let sheirutpendId: string | null = null;
+    if (proposerProjectId && uid) {
+      try {
+        const pendRes = await strapi.execute(
+          '235crMaagadSheirutpend',
+          {
+            project: proposerProjectId,
+            userId: String(uid),
+            maagadOffer: offerId,
+            price: finalPrice,
+            quant: 1,
+            total: finalPrice,
+            publishedAt: nowStr
+          },
+          context.jwt,
+          context.fetch
+        );
+        sheirutpendId = pendRes?.data?.createSheirutpend?.data?.id ?? null;
+        if (sheirutpendId) dealsCreated++;
+      } catch (e) {
+        console.error('[activateOffer] failed to create Sheirutpend for member', m.id, e);
+      }
+    }
+
     await strapi.execute(
       '226updateMaagadMember',
-      { id: m.id, status_member: 'active' },
+      {
+        id: m.id,
+        status_member: 'active',
+        ...(sheirutpendId ? { sheirutpend: sheirutpendId } : {})
+      },
       context.jwt,
       context.fetch
     );
-    const uid = m?.attributes?.user?.data?.id;
     if (uid) activatedUserIds.push(String(uid));
   }
-  return activatedUserIds;
+  return { activatedUserIds, dealsCreated, finalPrice };
 }
 
 const confirmMaagadQuorumHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
@@ -571,10 +625,23 @@ const confirmMaagadQuorumHandler: ActionExecutionHandler = async (params, contex
   const check = canConfirm(offerStateFrom(oa));
   if (!check.ok) throw new Error(check.reason);
 
-  const activatedUserIds = await activateOffer(strapi, context, maagadId, offerId, maagadNode);
+  const { activatedUserIds, dealsCreated, finalPrice } = await activateOffer(
+    strapi,
+    context,
+    maagadId,
+    offerId,
+    maagadNode
+  );
 
   return {
-    data: { maagadId, offerId, activated: true, activatedCount: activatedUserIds.length },
+    data: {
+      maagadId,
+      offerId,
+      activated: true,
+      activatedCount: activatedUserIds.length,
+      dealsCreated,
+      finalPrice
+    },
     notifyUserIds: activatedUserIds
   };
 };

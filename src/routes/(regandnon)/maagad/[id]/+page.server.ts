@@ -14,12 +14,15 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
   const uid = (locals as any)?.uid ?? null;
 
+  // Public page: anonymous visitors read via the service token (no Strapi
+  // Public-role permission needed); logged-in users use their own JWT. `uid`
+  // still comes from the cookie either way, so `my` membership resolves.
   const res: any = await sendToSer(
     { id: params.id },
     '229queryMaagadFull',
     0,
     0,
-    false,
+    !uid,
     fetch
   ).catch((e: any) => {
     console.error('[maagad/:id] 229queryMaagadFull failed', e);

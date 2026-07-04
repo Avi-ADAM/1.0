@@ -101,10 +101,13 @@ function mapSheirutpend(node: any, projectId?: string, projectName?: string): Pe
   const user = attrs.users_permissions_user?.data;
   const rp = attrs.ratson_proposal?.data;
   const rpRatson = rp?.attributes?.ratson?.data;
+  // Maagad-origin deals (PLAN_SHARED_PURCHASE §7.2) have no matanot — fall back
+  // to the offer's title so the deal isn't nameless in /deals.
+  const maagadOffer = attrs.maagad_offer?.data;
 
   return {
     id: String(node.id),
-    productName: mAttrs.name || '',
+    productName: mAttrs.name || maagadOffer?.attributes?.title || '',
     productId: matanot?.id ? String(matanot.id) : undefined,
     productKindOf: mAttrs.kindOf || undefined,
     productPic: mAttrs.pic?.data?.attributes?.url || undefined,

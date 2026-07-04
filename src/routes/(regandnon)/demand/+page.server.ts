@@ -13,15 +13,21 @@ function nodesOf(result: PromiseSettledResult<any>, key: string): any[] {
 }
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
+  // Public page: anonymous visitors have no JWT cookie, so — like the other
+  // (regandnon) pages (e.g. availableMission) — anonymous reads go through the
+  // service token (isSer = !isReg). This uses the internal-secret-authenticated
+  // proxy, so these vetted read-only qids never depend on Strapi *Public* role
+  // permissions. Logged-in users read with their own JWT (find permission).
+  const isReg = !!(locals as any)?.uid;
+  const svc = !isReg;
+
   // Four independent public reads; each degrades to an empty layer on its own.
-  // 223mapMaagadim is *expected* to fail until the collections from
-  // 1.0b/docs/SPEC_SHARED_PURCHASE_MAP.md exist in production.
   const [wishesRes, missionsRes, resourcesRes, maagadimRes] =
     await Promise.allSettled([
-      sendToSer({}, '220mapJoinableRatsons', 0, 0, false, fetch),
-      sendToSer({}, '221mapOpenMissions', 0, 0, false, fetch),
-      sendToSer({}, '222mapOpenMashaabims', 0, 0, false, fetch),
-      sendToSer({}, '223mapMaagadim', 0, 0, false, fetch)
+      sendToSer({}, '220mapJoinableRatsons', 0, 0, svc, fetch),
+      sendToSer({}, '221mapOpenMissions', 0, 0, svc, fetch),
+      sendToSer({}, '222mapOpenMashaabims', 0, 0, svc, fetch),
+      sendToSer({}, '223mapMaagadim', 0, 0, svc, fetch)
     ]);
 
   const wishes = nodesOf(wishesRes, 'ratsons')
