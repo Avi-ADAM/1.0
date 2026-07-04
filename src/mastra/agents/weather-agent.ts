@@ -4,7 +4,8 @@ import { Memory } from '@mastra/memory';
 import { LibSQLStore } from '@mastra/libsql';
 import { weatherTool } from '../tools/weather-tool';
 const google = createGoogleGenerativeAI({
-  apiKey: import.meta.env?.VITE_GOOGLE_API || process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY,
+  // Prefer server-only vars; VITE_GOOGLE_API kept last as a legacy fallback (it is a secret and should not use the public VITE_ prefix).
+  apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY || import.meta.env?.VITE_GOOGLE_API,
 });
 
 export const weatherAgent = new Agent({

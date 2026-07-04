@@ -1,6 +1,8 @@
 const baseUrl = import.meta.env.VITE_URL;
 let url = baseUrl+'/api/cuntries/5';
-let hook = import.meta.env.VITE_HOOK;
+// Deploy webhook is a secret — prefer the server-only var. The VITE_ fallback
+// keeps the existing deployment working until the env is renamed (see docs).
+let hook = process.env.DEPLOY_HOOK || import.meta.env.VITE_HOOK;
 let t = false;
 async function awaitapi() {
   const res = await fetch(url);
@@ -20,8 +22,10 @@ export async function GET(req) {
      יאללה לתקן 
      `;
       // %0A is url encoded '\n' which is used for new line.
-      const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
-      const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID;
+      // Telegram bot token is a secret — must not carry the public VITE_ prefix.
+      // Falls back to the old VITE_ names until the deploy env is renamed (see docs).
+      const Token = process.env.TELEGRAM_BOT_TOKEN || import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
+      const chatId = process.env.TELEGRAM_CHAT_ID || import.meta.env.VITE_TELEGRAM_CHAT_ID;
       const url = `https://api.telegram.org/bot${Token}/sendMessage?chat_id=${chatId}&text=${botMessage}`;
       const rest = await fetch(url);
       let sec = false;
