@@ -1,6 +1,7 @@
 import { MCPServer } from '@mastra/mcp';
 import { mastra } from '../../../../mastra'; // Our global instance
 import { verifyApiKey } from '$lib/server/apiKeys';
+import { setMcpContext } from '$lib/server/mcpContext';
 import { toReqRes, toFetchResponse } from 'fetch-to-node';
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
@@ -23,11 +24,11 @@ async function handleMcpRequest(request: Request, apiKey: string, url: URL, svel
         throw error(401, 'Unauthorized: Invalid API Key');
     }
 
-    // Set global context for tools (like timerActionTool) which rely on it to identify who is performing the action
-    global.botContext = {
+    // Set per-request context for tools (like timerActionTool) which rely on it to identify who is performing the action
+    setMcpContext({
         userId: user.id.toString(),
         fetchInstance: svelteFetch
-    };
+    });
     console.log(`[MCP] Request from authenticated user: ${user.id} via apiKey endpoint at ${url.pathname}`);
 
     // Extract valid agents handling missing description fields properly (needed by MCPServer logic)

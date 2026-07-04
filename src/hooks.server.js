@@ -88,6 +88,20 @@ function getLanguage(event) {
     return coociLang;
   }
 }
+// Baseline security headers applied to every response. A full Content-Security-Policy
+// is intentionally NOT set here — it needs a dedicated, tested pass to whitelist all
+// external origins (Cloudinary, MapLibre, Google, Telegram, fonts, socket, etc.).
+function applySecurityHeaders(response, isSecure) {
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-Frame-Options', 'SAMEORIGIN');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('Permissions-Policy', 'geolocation=(self), microphone=(), camera=()');
+  if (isSecure) {
+    response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
+  return response;
+}
+
 /** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }) {
   lang = getLanguage(event);
@@ -99,7 +113,7 @@ export async function handle({ event, resolve }) {
   event.locals.uid = event.cookies.get('id') || false;
   event.locals.un = event.cookies.get('un') || false;
   event.locals.email = event.cookies.get('email') || false;
-  console.log(lang, event.url.pathname);
+  const isSecure = event.url.protocol === 'https:';
   // Set language cookie based on URL path
   if (event.url.pathname === '/en' || event.url.pathname === '/ar' || event.url.pathname === '/he' || event.url.pathname === '/ru') {
     event.cookies.set('lang', lang, { path: '/' });
@@ -151,10 +165,10 @@ export async function handle({ event, resolve }) {
       headers: { Location: '/' }
     });
   } else if (event.url.pathname.startsWith('/api')) {
-    return await resolve(event);
+    return applySecurityHeaders(await resolve(event), isSecure);
   }
 
-  return await resolve(event, {
+  const response = await resolve(event, {
     transformPageChunk: ({ html }) =>
       html
         .replace('%lang%', lang)
@@ -166,6 +180,7 @@ export async function handle({ event, resolve }) {
         .replace('%cl%', cl[lang])
         .replace('%manifest%', manifestLink[lang])
   });
+  return applySecurityHeaders(response, isSecure);
 }
 
 // Uncomment if using Sentry

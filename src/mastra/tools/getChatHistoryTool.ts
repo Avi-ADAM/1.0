@@ -1,5 +1,6 @@
 import { createTool } from '@mastra/core/tools'
 import { z } from 'zod';
+import { getMcpContext } from '../../lib/server/mcpContext.js';
 
 export const getChatHistoryTool = createTool({
   id: 'getChatHistoryTool',
@@ -19,8 +20,8 @@ export const getChatHistoryTool = createTool({
   execute: async (inputData) => {
     const { limit = 20, searchTerm } = context;
     
-    // Get the full history from global context if available
-    const fullHistory = global.botContext?.fullHistory || [];
+    // Get the full history from the per-request context if available
+    const fullHistory = getMcpContext()?.fullHistory || [];
     
     let filteredHistory = fullHistory;
     

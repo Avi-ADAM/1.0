@@ -45,18 +45,30 @@ export interface McpContext {
   lang?: string;
 }
 
-// Node.js global augmentation so TypeScript is happy
-declare global {
-  // eslint-disable-next-line no-var
-  var botContext: McpContext | undefined;
-}
+import { AsyncLocalStorage } from 'node:async_hooks';
+
+/**
+ * Per-request context store.
+ *
+ * Previously the context lived on `global.botContext`, a single mutable
+ * object shared by every concurrent request — so two users hitting the bot
+ * at the same time could clobber each other's identity/fetch instance. We now
+ * keep it in an AsyncLocalStorage, which gives each request its own isolated
+ * store that automatically propagates through the async call chain (agents,
+ * workflows, tools) without leaking across requests.
+ */
+const contextStore = new AsyncLocalStorage<McpContext>();
 
 /**
  * Set the MCP context for the current request.
- * Called once per request in the MCP server handler or chat workflow.
+ * Called once per request in the MCP server handler, chat route or workflow.
+ *
+ * Uses `enterWith` so it stays a drop-in replacement for the old
+ * "assign at the top of the handler" pattern: the store is bound to the
+ * current async context and every asynchronous operation that follows it.
  */
 export function setMcpContext(ctx: McpContext): void {
-  global.botContext = ctx;
+  contextStore.enterWith(ctx);
 }
 
 /**
@@ -64,7 +76,17 @@ export function setMcpContext(ctx: McpContext): void {
  * Returns null when called outside an authenticated request.
  */
 export function getMcpContext(): McpContext | null {
-  return global.botContext ?? null;
+  return contextStore.getStore() ?? null;
+}
+
+/**
+ * Clear the context for the current async execution.
+ * With per-request isolation this is optional (the next request gets a fresh
+ * store), but the previous code cleared the global explicitly, so we keep an
+ * equivalent to preserve behaviour.
+ */
+export function clearMcpContext(): void {
+  contextStore.enterWith(undefined as unknown as McpContext);
 }
 
 /**

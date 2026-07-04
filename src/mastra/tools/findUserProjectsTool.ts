@@ -1,6 +1,7 @@
 import { createTool } from '@mastra/core/tools'
 import { z } from 'zod';
 import { sendToSer } from '../../lib/send/sendToSer';
+import { getMcpContext } from '../../lib/server/mcpContext.js';
 
 async function findUserProjects(userId: number, fetch: any, isServerRequest = false) {
   try {
@@ -43,7 +44,7 @@ export const findUserProjectsTool = createTool({
   execute: async (inputData, context) => {
     try {
       const { userId, query } = inputData;
-      const globalContext = global.botContext || {};
+      const globalContext = getMcpContext() || ({} as any);
       const fetchInstance = globalContext.fetchInstance;
       const isServerRequest = !globalContext.isInternalBot;
       

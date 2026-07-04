@@ -19,3 +19,10 @@ cert.crt
 cert.key
 /brain
 .claude/worktrees/
+
+# Build/runtime artifacts & caches (should not be committed)
+.embed-cache/
+dev_output.log
+*.log
+test-results/
+vite.config.js.timestamp-*.mjs

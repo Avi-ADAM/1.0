@@ -34,6 +34,15 @@ function warnOnce(what: string, e: unknown) {
   console.warn(`[consent/strapiMirror] ${what} failed — running memory-only:`, e);
 }
 
+// Carries the HTTP status so callers can branch on it (e.g. a 400 unique-key
+// conflict on create → upsert instead of fail) without string-matching messages.
+class ReqError extends Error {
+  constructor(readonly status: number, readonly body: string, message: string) {
+    super(message);
+    this.name = 'ReqError';
+  }
+}
+
 async function req(path: string, init?: RequestInit): Promise<unknown> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 5000);
@@ -47,11 +56,25 @@ async function req(path: string, init?: RequestInit): Promise<unknown> {
       },
       signal: controller.signal
     });
-    if (!res.ok) throw new Error(`${init?.method ?? 'GET'} ${path} → ${res.status}`);
+    if (!res.ok) {
+      // Strapi v4 puts the real reason (ValidationError, unique-constraint,
+      // "Invalid key <name>") in the JSON body — surface it, or a 400 is opaque.
+      const detail = await res.text().catch(() => '');
+      throw new ReqError(
+        res.status,
+        detail,
+        `${init?.method ?? 'GET'} ${path} → ${res.status}${detail ? ` — ${detail.slice(0, 500)}` : ''}`
+      );
+    }
     return await res.json();
   } finally {
     clearTimeout(timer);
   }
+}
+
+/** True when a create failed only because the row already exists (unique key). */
+function isUniqueConflict(e: unknown): boolean {
+  return e instanceof ReqError && e.status === 400 && /must be unique/i.test(e.body);
 }
 
 // v4 rows come back as { id, attributes: {...} }; tolerate a flat row too
@@ -137,25 +160,49 @@ function rowToKey(row: unknown): StoredPubKey | undefined {
   return payload && typeof payload === 'object' ? (payload as StoredPubKey) : undefined;
 }
 
+function rowId(row: unknown): string | number | undefined {
+  return (row as { id?: string | number } | undefined)?.id;
+}
+
+// devicePubB64 is unique — v4 has no upsert, so a re-registered device 400s on
+// create. Look up the existing row's id so we can PUT the current payload over
+// it (keeps a later revocation / label change flowing to the mirror).
+async function findKeyId(devicePubB64: string): Promise<string | number | undefined> {
+  const json = await req(
+    `/user-keys?filters[devicePubB64][$eq]=${encodeURIComponent(devicePubB64)}` +
+    `&pagination[limit]=1`
+  );
+  return rowId(responseRows(json)[0]);
+}
+
 export async function mirrorSaveKey(k: StoredPubKey): Promise<void> {
   if (!mirrorEnabled()) return;
+  const data = {
+    userId: k.userId,
+    devicePubB64: k.devicePubB64,
+    algo: k.algo,
+    label: k.label,
+    revokedAt: k.revokedAt !== undefined ? String(k.revokedAt) : null,
+    addedAt: String(k.addedAt),
+    payload: k
+  };
   try {
-    await req('/user-keys', {
-      method: 'POST',
-      body: JSON.stringify({
-        data: {
-          userId: k.userId,
-          devicePubB64: k.devicePubB64,
-          algo: k.algo,
-          label: k.label,
-          revokedAt: k.revokedAt !== undefined ? String(k.revokedAt) : null,
-          addedAt: String(k.addedAt),
-          payload: k
-        }
-      })
-    });
+    await req('/user-keys', { method: 'POST', body: JSON.stringify({ data }) });
   } catch (e) {
-    warnOnce('saveKey', e);
+    // Not a duplicate → genuinely degraded mirror; warn and stay memory-only.
+    if (!isUniqueConflict(e)) {
+      warnOnce('saveKey', e);
+      return;
+    }
+    // Duplicate → the row exists; update it in place so putKey stays idempotent.
+    try {
+      const id = await findKeyId(k.devicePubB64);
+      if (id !== undefined) {
+        await req(`/user-keys/${id}`, { method: 'PUT', body: JSON.stringify({ data }) });
+      }
+    } catch (e2) {
+      warnOnce('saveKey', e2);
+    }
   }
 }
 

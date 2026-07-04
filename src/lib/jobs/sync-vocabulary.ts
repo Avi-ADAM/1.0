@@ -107,8 +107,6 @@ type RawVallue = {
 const LOC = (field: string) => `localizations { data { attributes { ${field} } } }`;
 
 async function gql<T>(query: string): Promise<T> {
-    console.log('GraphQL query:', query);
-    console.log('STRAPI_TOKEN:', STRAPI_TOKEN );
     const res = await fetch(`${STRAPI_URL}/graphql`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${STRAPI_TOKEN}` },

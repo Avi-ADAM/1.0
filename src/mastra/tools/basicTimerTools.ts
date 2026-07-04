@@ -2,6 +2,7 @@ import { createTool } from '@mastra/core/tools'
 import { z } from 'zod';
 import { sendToSer } from '../../lib/send/sendToSer.js';
 import { startTimer, stopTimer } from '../../lib/func/timers.js';
+import { getMcpContext } from '../../lib/server/mcpContext.js';
 
 // Basic Start Timer Tool
 export const startTimerTool = createTool({
@@ -18,7 +19,7 @@ export const startTimerTool = createTool({
   }),
   execute: async (inputData, context) => {
     const { missionId } = inputData;
-    const globalContext = global.botContext || {};
+    const globalContext = getMcpContext() || ({} as any);
     const userId = globalContext.userId;
     const fetchInstance = globalContext.fetchInstance;
     const isServerRequest = !globalContext.isInternalBot;
@@ -77,7 +78,7 @@ export const stopTimerTool = createTool({
   }),
   execute: async (inputData, context) => {
     const { missionId } = inputData;
-    const globalContext = global.botContext || {};
+    const globalContext = getMcpContext() || ({} as any);
     const fetchInstance = globalContext.fetchInstance;
     const isServerRequest = !globalContext.isInternalBot;
     

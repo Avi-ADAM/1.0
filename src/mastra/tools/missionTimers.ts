@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { sendToSer } from '../../lib/send/sendToSer.js';
 import { startTimer, stopTimer } from '../../lib/func/timers.js';
 import { fuzzyMissionMatch, sortMissionsByRelevance } from '../../lib/utils/fuzzyMatch.js';
+import { getMcpContext, setMcpContext } from '../../lib/server/mcpContext.js';
 
 // Enhanced schema definitions
 const MissionDetailSchema = z.object({
@@ -58,7 +59,7 @@ export const getMissionDetailsTool = createTool({
   }),
   execute: async (inputData, context) => {
     const { missionId } = inputData;
-    const globalContext = global.botContext || {};
+    const globalContext = getMcpContext() || ({} as any);
     const fetchInstance = globalContext.fetchInstance;
     const isServerRequest = !globalContext.isInternalBot;
     
@@ -124,7 +125,7 @@ export const listUserMissionsTool = createTool({
   }),
   execute: async (inputData, context) => {
     const { filter, projectId, projectName, missionName, limit } = inputData;
-    const globalContext = global.botContext || {};
+    const globalContext = getMcpContext() || ({} as any);
     const userId = globalContext.userId;
     const fetchInstance = globalContext.fetchInstance;
     const isServerRequest = !globalContext.isInternalBot;
@@ -227,7 +228,8 @@ export const listUserMissionsTool = createTool({
         totalCount,
         missions: formattedMissions
       };
-      global.botContext = globalContext;
+      // Persist the disambiguation hint back onto the per-request context.
+      setMcpContext(globalContext);
 
       return { missions: formattedMissions, totalCount, success: true };
     } catch (error) {
@@ -273,7 +275,7 @@ export const getMissionStatsTool = createTool({
   }),
   execute: async (inputData, context) => {
     const { projectId } = inputData;
-    const globalContext = global.botContext || {};
+    const globalContext = getMcpContext() || ({} as any);
     const userId = globalContext.userId;
     const fetchInstance = globalContext.fetchInstance;
     const isServerRequest = !globalContext.isInternalBot;
@@ -364,7 +366,7 @@ export const getActiveTimersTool = createTool({
   }),
   execute: async (inputData, context) => {
     const { includeDetails } = inputData;
-    const globalContext = global.botContext || {};
+    const globalContext = getMcpContext() || ({} as any);
     const userId = globalContext.userId;
     const fetchInstance = globalContext.fetchInstance;
     const isServerRequest = !globalContext.isInternalBot;
@@ -425,7 +427,7 @@ export const getTimerHistoryTool = createTool({
   }),
   execute: async (inputData, context) => {
     const { missionId, projectId, days, limit } = inputData;
-    const globalContext = global.botContext || {};
+    const globalContext = getMcpContext() || ({} as any);
     const userId = globalContext.userId;
     const fetchInstance = globalContext.fetchInstance;
     const isServerRequest = !globalContext.isInternalBot;
@@ -498,7 +500,7 @@ export const startTimerWithNotesTool = createTool({
   }),
   execute: async (inputData, context) => {
     const { missionId, notes, taskId } = inputData;
-    const globalContext = global.botContext || {};
+    const globalContext = getMcpContext() || ({} as any);
     const userId = globalContext.userId;
     const fetchInstance = globalContext.fetchInstance;
     const isServerRequest = !globalContext.isInternalBot;
@@ -565,7 +567,7 @@ export const stopTimerWithSummaryTool = createTool({
   }),
   execute: async (inputData, context) => {
     const { missionId, summary, completedTasks } = inputData;
-    const globalContext = global.botContext || {};
+    const globalContext = getMcpContext() || ({} as any);
     const fetchInstance = globalContext.fetchInstance;
     const isServerRequest = !globalContext.isInternalBot;
     

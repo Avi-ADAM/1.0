@@ -127,7 +127,6 @@ export async function verifyApiKey(rawKey: string) {
     })
   });
 
-  console.log(`[API Keys] Using Strapi Token starting with: ${STRAPI_TOKEN.slice(0, 4)}...`);
   console.log(`[API Keys] GraphQL request status: ${res.status}`);
   
   if (!res.ok) {

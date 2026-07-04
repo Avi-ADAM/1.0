@@ -12,7 +12,6 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
   const jwt  = cookies.get('jwt');
   const userIdStr = cookies.get('id');
   if (!jwt || !userIdStr) throw error(401, 'Unauthorized');
-    console.log(jwt, userIdStr);
   const userId = parseInt(userIdStr, 10);
   if (isNaN(userId)) throw error(400, 'Invalid user ID');
 
