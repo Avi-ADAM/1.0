@@ -294,6 +294,12 @@
     gap: 8px;
     margin-bottom: 24px;
     border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar {
+    display: none;
   }
   .tab {
     background: transparent;
@@ -307,6 +313,8 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-shrink: 0;
+    white-space: nowrap;
     transition: color 0.2s;
     font-family: 'Heebo', sans-serif;
   }
@@ -319,7 +327,7 @@
   .tab.active::after {
     content: '';
     position: absolute;
-    bottom: -1px;
+    bottom: 0;
     left: 0;
     right: 0;
     height: 2px;
