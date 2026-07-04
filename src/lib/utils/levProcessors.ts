@@ -2018,7 +2018,31 @@ export function processDecisions(
     };
 
     // Specific mapping based on Type
-    if (decision.kind === 'sheirutpends') {
+    if (decision.kind === 'saleClaim') {
+      // Bilateral consensus: exactly two participants (reporter + holder).
+      // Counts reflect signatures on the *standing* round, not rikma-wide votes.
+      const sc = (decision as any).saleClaim;
+      const standingOrder = sc?.standingOrder ?? 1;
+      const signedIds = new Set(
+        (users as any[])
+          .filter((u) => Number(u.order) === standingOrder && u.what === true)
+          .map((u) => String(u?.users_permissions_user?.data?.id ?? u?.ide ?? ''))
+      );
+      const ok = signedIds.size;
+      return {
+        ...commonFields,
+        ...decision,
+        pendId: decision.id,
+        restime: getProjectRestime(decision.projectId),
+        created_at: decision.createdAt,
+        noof: 2,
+        noofusersOk: ok,
+        noofusersNo: 0,
+        noofusersWaiting: Math.max(0, 2 - ok),
+        // The extractor already gated this to "my turn", so I can act now.
+        already: false
+      };
+    } else if (decision.kind === 'sheirutpends') {
       return {
         ...commonFields,
         ...decision, // includes spdata

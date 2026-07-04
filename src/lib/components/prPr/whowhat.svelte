@@ -201,6 +201,10 @@
     const existingSalesIds = currentTosplit.attributes.sales?.data?.map(s => s.id) || [];
     const newSales = salee
       .filter(s =>
+        // Only *effective* sales enter a tosplit. A sale whose holder hasn't
+        // consented yet (holderStatus:'open') is not counted in any balance
+        // until it matures (PLAN_sale_holder_consent). null/self/confirmed pass.
+        s.attributes.holderStatus !== 'open' &&
         !s.attributes.splited &&
         !s.attributes.pending &&
         !existingSalesIds.includes(s.id) &&
@@ -985,14 +989,18 @@
   onMount(async () => {
     // Filter sales: include pending sales OR unsplited sales (exclude only fully splited)
     // This ensures pending sales appear in the table
-    unsplitedSales = salee.filter(sale => 
+    // Exclude sales still awaiting holder consent (holderStatus:'open') — they
+    // are not counted in any balance until they mature (PLAN_sale_holder_consent).
+    unsplitedSales = salee.filter(sale =>
+      sale.attributes.holderStatus !== 'open' &&
       !sale.attributes.splited &&
       (!sale.attributes.tosplits?.data || sale.attributes.tosplits.data.length === 0)
     );
 
-    // Count truly available sales (not pending, not splited)
-    availableForNewSplit = salee.filter(sale => 
-      !sale.attributes.splited && 
+    // Count truly available sales (not open/pending, not splited)
+    availableForNewSplit = salee.filter(sale =>
+      sale.attributes.holderStatus !== 'open' &&
+      !sale.attributes.splited &&
       !sale.attributes.pending
     ).length;
 

@@ -7,6 +7,8 @@
   import NumberInput from '$lib/celim/ui/numberInput.svelte';
   import { toast } from 'svelte-sonner';
   import { executeAction } from '$lib/client/actionClient';
+  import { shadowSignFromCookie } from '$lib/client/shadowSign';
+  import { createSaleConsentSpec } from '$lib/consent/specs/createSale';
   import tr from '$lib/translations/tr.json';
 
   /**
@@ -143,6 +145,28 @@
 
       if (!result.success) {
         throw new Error(result.error?.message ?? 'Sale failed');
+      }
+
+      const holderStatus = result.data?.holderStatus;
+      const decisionId = result.data?.decisionId;
+
+      // Phase 1 shadow signing — best-effort, non-blocking. The signed
+      // sale.record event mirrors the reporter's attestation of the full claim.
+      shadowSignFromCookie(createSaleConsentSpec, {
+        ...actionParams,
+        saleId: result.data?.saleId,
+        decisionId,
+        holderStatus
+      });
+
+      // Money-held-by-someone-else → the report is a claim awaiting consent.
+      if (holderStatus === 'open') {
+        const holderName = selected?.[0] ?? '';
+        toast.info(
+          $lang === 'en'
+            ? `Report sent — awaiting ${holderName}'s consent. It will auto-approve after the rikma's response time if there is no reply.`
+            : `הדיווח נשלח — ממתין להסכמת ${holderName}. יאושר אוטומטית בתום זמן התגובה של הריקמה אם לא תגיע תגובה.`
+        );
       }
 
       if (hm > 0) {

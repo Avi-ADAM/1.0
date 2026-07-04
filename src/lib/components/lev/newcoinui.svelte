@@ -887,6 +887,7 @@
               stylef={buble.stylef}
               st={buble.st}
               spid={buble.spid}
+              saleClaim={buble.saleClaim}
               {low}
             />
           </div>

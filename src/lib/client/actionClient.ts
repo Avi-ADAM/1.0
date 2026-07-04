@@ -405,6 +405,9 @@ export type ActionKey =
   | 'markResourceDone'
   | 'finalizeJoinAcceptance'
   | 'finalizeAskmAcceptance'
+  | 'createSale'
+  | 'voteOnDecision'
+  | 'counterSaleClaim'
   ;
 
 

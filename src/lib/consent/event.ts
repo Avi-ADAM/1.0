@@ -71,6 +71,7 @@ export const ACTIONS = {
   missionApproveVote: 'mission.approve.vote',
   proposalCounter: 'proposal.counter',
   consensusTimeout: 'consensus.timeout',
+  saleRecord:       'sale.record',
   memberAway:      'member.away',
   timeTick:        'time.tick',
   snapshotCommit:  'snapshot.commit',

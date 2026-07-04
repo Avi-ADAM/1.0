@@ -118,6 +118,7 @@ import { offerWishHelpConfig } from './offerWishHelp.js';
 import { addAskmChatEntryConfig } from './addAskmChatEntry.js';
 import { addAskChatEntryConfig } from './addAskChatEntry.js';
 import { createSaleConfig } from './createSale.js';
+import { counterSaleClaimConfig } from './counterSaleClaim.js';
 import { updateUserProfilePicConfig } from './updateUserProfilePic.js';
 import { updateUserBasicConfig } from './updateUserBasic.js';
 import { archiveUserResourceConfig } from './archiveUserResource.js';
@@ -320,6 +321,8 @@ export function registerAllActions(): void {
 
   // Sale reporting (SaleComponent — shared by gift/[id] and sales-center)
   registerAction(createSaleConfig);
+  // Bilateral holder-consent negotiation on a saleClaim Decision
+  registerAction(counterSaleClaimConfig);
 
   // User profile (me page): picture, basic info, resource archive
   registerAction(updateUserProfilePicConfig);

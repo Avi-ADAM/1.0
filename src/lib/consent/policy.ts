@@ -59,6 +59,12 @@ const QUORUM_POLICY: Partial<Record<ActionName, QuorumRequirement>> = {
   // haluka flow migrates to explicit consensus events (Phase 4 wave).
   'haluka.approve':    NOT_REQUIRED,
 
+  // A sale report is the reporter's sovereign attestation that opens a
+  // bilateral holder-consent conversation (PLAN_sale_holder_consent). It is
+  // NOT a rikma-wide decision — consensus is between exactly two people
+  // (reporter + holder), so no group QuorumProof applies.
+  'sale.record':       NOT_REQUIRED,
+
   'member.away':       NOT_REQUIRED,
   'time.tick':         NOT_REQUIRED,
   'device.cert':       NOT_REQUIRED,
