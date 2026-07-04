@@ -101,8 +101,9 @@ src/routes/api/send/qids.js                     ← 207–210 (ראה §5)
 | M0 | מסמך זה + spec סכמה + קבצי v3 ב-1.0b | – | סשן זה |
 | M1 | `/demand` ציבורי: מפה + שתי עדשות + שכבות ratson/open-mission/open-mashaabim מהסכמה הקיימת + רשימת-צד + deep-links | M0 | סשן זה |
 | M2 | `/maagad/[id]` (צפייה/הצטרפות/עזיבה/חתימה/ביטול-חתימה, פרטיות בשרת) + actions: `openMaagad`/`joinMaagad`/`leaveMaagad`/`createMaagadOffer`/`signMaagadOffer`/`unsignMaagadOffer`/`confirmMaagadQuorum`/`expireMaagadOffers`/`clusterRatsons` (QIDs 224–233) + מכונות טהורות `offerStateMachine.ts` (22) + `clustering.ts` (11) + `MaagadOfferForm` + חיבור מהמפה | סכמה בפרודקשן (הענף מוכן) | **סשן זה** — חסר רק: Sheirutpend מותנה + הרצת pipeline העסקה פר-חבר בהפעלה; שדרוג `similarity()` ל-Pinecone |
-| M3 | ✅ עדשת-ספק בהקשר פרויקט: `/moach/[projectId]/demand` (אותו `DiscoveryMap`, מרוכז על מיקום הפרויקט, ביקוש ממוין לפי מרחק, CTA "הצע" → `/maagad/[id]`; QID `234getProjectLocation`). **חסר:** חיבור ההפעלה ל-Sheirutpend מותנה (`activateMaagadOffer` → deal pipeline) — נשאר ל-M4 | M2 | **סשן זה** |
-| M4 | הצעות-סף (Track C) על המפה עם progress חי (socket) + heat-layer ביקוש כשצפיפות גבוהה | P4 | עתידי |
+| M3 | ✅ עדשת-ספק בהקשר פרויקט: `/moach/[projectId]/demand` (אותו `DiscoveryMap`, מרוכז על מיקום הפרויקט, ביקוש ממוין לפי מרחק, CTA "הצע" → `/maagad/[id]`; QID `234getProjectLocation`). | M2 | סשן קודם |
+| M4 | ✅ **הפעלה אטומית → עסקאות אמת**: `confirmMaagadQuorum` יוצר `Sheirutpend` חי פר-חבר-חתום על ריקמת הספק (`proposer_project`), במחיר ה-tier שהושג (`resolveTierPrice`), מקושר ל-`maagad_offer` ול-`maagad-member.sheirutpend`. העסקאות צפות ב-`/deals` (fallback לשם ההצעה כשאין מוצר). QIDs `235crMaagadSheirutpend` + הרחבת `226`/`123dealsForUser`. יצירה-בהפעלה בלבד → אין pends יתומים בביטול/פקיעה. | M2 | **סשן זה** |
+| M5 | הצעות-סף (Track C) עם progress חי (socket) + heat-layer; **מחזוריות (§7.5)**: `sheirut-fulfillment` פר-מחזור; שדרוג `similarity()` ל-Pinecone; badge "ממתין לסף" ב-`/deals` לפני הפעלה | P4/P5 | עתידי |
 
 ## 7. אימות
 
