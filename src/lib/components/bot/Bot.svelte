@@ -101,7 +101,7 @@
 {#if !isOnChatPage}
   <div
     dir={$isRtl ? 'rtl' : 'ltr'}
-    class="fixed bottom-12 {$locale == 'he' || $locale == 'ar'
+    class="fixed bottom-20 sm:bottom-12 {$locale == 'he' || $locale == 'ar'
       ? 'left-4'
       : 'right-4'} z-50"
   >
@@ -112,7 +112,7 @@
       <img
         src="/botlogo.png"
         alt={$t('bot.title')}
-        class="sm:w-14 sm:h-14 h-4 w-4 rounded-full"
+        class="sm:w-14 sm:h-14 h-12 w-12 rounded-full"
       />
     </button>
     {#if visible}
