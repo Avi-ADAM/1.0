@@ -236,6 +236,15 @@
     }
     return 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
   }
+  // A sale can reference a gift (matanot) that was deleted or not populated,
+  // leaving matanot.data === null. Guard the whole chain so the component never
+  // crashes on render/hydration; fall back to a generic label.
+  function getMatanaName(sale) {
+    return (
+      sale?.attributes?.matanot?.data?.attributes?.name ??
+      ($lang === 'he' ? 'מוצר לא ידוע' : 'Unknown product')
+    );
+  }
   let arrc = [
     { year: 2019, bananas: 3840, cherries: 1920, dates: 960 },
     { year: 2020, bananas: 380, cherries: 920, dates: 1960 }
@@ -322,7 +331,7 @@
           : ($lang === 'he' ? 'ממתין' : $lang === 'ar' ? 'في الانتظار' : 'Awaiting');
 
       return [
-        sale.attributes.matanot.data.attributes.name,
+        getMatanaName(sale),
         sale.attributes.in,
         sale.attributes.users_permissions_user.data.attributes.username,
         dayjs(sale.attributes.date).format('DD/MM/YYYY HH:mm'),
@@ -366,7 +375,7 @@
   $effect(() => {
     // Show all sales in graphs
     fermatana = salee.reduce((acc, sale) => {
-      const matanaName = sale.attributes.matanot.data.attributes.name;
+      const matanaName = getMatanaName(sale);
       const saleIn = sale.attributes.in;
       acc[matanaName] = (acc[matanaName] || 0) + saleIn;
       return acc;
@@ -377,7 +386,7 @@
     const newFerdate = {};
     for (const sale of salee) {
       const dateKey = dayjs(sale.attributes.date).format('YYYY-MM-DD');
-      const matanaName = sale.attributes.matanot.data.attributes.name;
+      const matanaName = getMatanaName(sale);
       const saleIn = sale.attributes.in;
 
       if (!newFerdate[dateKey]) {
@@ -668,7 +677,7 @@
                   class="text-lg font-bold bg-gradient-to-r from-barbi via-mpink to-cyan-500 bg-clip-text text-transparent hover:from-gold hover:via-mpink hover:to-barbi transition-all duration-300 transform hover:scale-105"
                   title={$t('project.hamatanot.productName')}
                 >
-                  {data.attributes.matanot.data.attributes.name}
+                  {getMatanaName(data)}
                 </h3>
               </div>
 
@@ -941,9 +950,7 @@
                         : ''}
                   >
                     <td>{index + 1}</td>
-                    <td class="font-semibold"
-                      >{sale.attributes.matanot.data.attributes.name}</td
-                    >
+                    <td class="font-semibold">{getMatanaName(sale)}</td>
                     <td class="font-bold">₪{sale.attributes.in}</td>
                     <td>
                       <div class="flex items-center gap-2">
