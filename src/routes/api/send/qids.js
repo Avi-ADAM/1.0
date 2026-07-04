@@ -8715,7 +8715,7 @@ export const moachQids = {
             data {
               id
               attributes {
-                in date pending splited holderStatus note tosplits { data { id } }
+                in date pending splited holderStatus confirmedBy note tosplits { data { id } }
                 matanot { data { id attributes { name } } }
                 users_permissions_user { data { id attributes { username } } }
               }
@@ -12174,6 +12174,25 @@ export const qids = {
                       kindOf
                       startDate
                       finnishDate
+                    }
+                  }
+                }
+                decisions(filters: { kind: { eq: "saleClaim" }, archived: { eq: false } }) {
+                  data {
+                    id
+                    attributes {
+                      negom { id }
+                      vots { what order users_permissions_user { data { id } } }
+                      sale {
+                        data {
+                          id
+                          attributes {
+                            reporter { data { id } }
+                            users_permissions_user { data { id attributes { username } } }
+                            matanot { data { attributes { name } } }
+                          }
+                        }
+                      }
                     }
                   }
                 }

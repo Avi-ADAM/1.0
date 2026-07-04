@@ -8,6 +8,8 @@ import { proposalCounter } from './proposalCounter';
 import { consensusTimeout } from './consensusTimeout';
 import { missionApprove } from './missionApprove';
 import { snapshotCommit } from './snapshotCommit';
+import { saleRecord } from './saleRecord';
+import { decisionVote } from './decisionVote';
 
 export type Reducer = (state: ProjectState, ev: ConsentEvent) => ProjectState;
 
@@ -19,5 +21,7 @@ export const reducers: Record<string, Reducer> = {
   'proposal.counter':  proposalCounter,
   'consensus.timeout': consensusTimeout,
   'mission.approve':   missionApprove,
-  'snapshot.commit':   snapshotCommit
+  'snapshot.commit':   snapshotCommit,
+  'sale.record':       saleRecord,
+  'decision.vote':     decisionVote
 };

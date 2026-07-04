@@ -72,6 +72,10 @@ export const ACTIONS = {
   proposalCounter: 'proposal.counter',
   consensusTimeout: 'consensus.timeout',
   saleRecord:       'sale.record',
+  // Already emitted by addVoteConsentSpec (type:'decision') — added to the
+  // enum here so ActionName covers it (was previously reached only via an
+  // unsafe `as ActionName` cast at the shadow-sign call site).
+  decisionVote:     'decision.vote',
   memberAway:      'member.away',
   timeTick:        'time.tick',
   snapshotCommit:  'snapshot.commit',

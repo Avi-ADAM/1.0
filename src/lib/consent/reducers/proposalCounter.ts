@@ -1,5 +1,5 @@
 import type { ConsentEvent } from '../event';
-import type { ProjectState, SubjectRound } from '../projection';
+import type { ProjectState, SubjectRound, SaleClaimView } from '../projection';
 import { subjectKey } from '../projection';
 
 /**
@@ -31,5 +31,22 @@ export function proposalCounter(state: ProjectState, ev: ConsentEvent): ProjectS
   };
   const rounds = new Map(state.rounds);
   rounds.set(key, next);
-  return { ...state, rounds };
+
+  // PLAN_sale_holder_consent — if this counter targets a tracked bilateral
+  // saleClaim, bump its standing round too and reset signers: proposing a
+  // precision round IS the proposer's own agreement to it. No-op for every
+  // other subject kind (they don't have a saleClaims entry).
+  let saleClaims = state.saleClaims;
+  const claim = saleClaims.get(ev.subject.id);
+  if (claim && !claim.closed) {
+    const bumped: SaleClaimView = {
+      ...claim,
+      standingOrder: claim.standingOrder + 1,
+      signers: new Set([ev.actor])
+    };
+    saleClaims = new Map(saleClaims);
+    saleClaims.set(ev.subject.id, bumped);
+  }
+
+  return { ...state, rounds, saleClaims };
 }
