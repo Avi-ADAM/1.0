@@ -5,8 +5,22 @@ import fs from 'fs'
 import path from 'path';
 //import {defineConfig} from 'vite';
 import devtoolsJson from 'vite-plugin-devtools-json';
+
+// Set by `tauri android dev` so the device's WebView can reach the dev server over LAN
+const tauriDevHost = process.env.TAURI_DEV_HOST;
+
 /** @type {import('vite').UserConfig} */
 const config = {
+  ...(tauriDevHost
+    ? {
+        server: {
+          host: tauriDevHost,
+          port: 5173,
+          strictPort: true,
+          hmr: { protocol: 'ws', host: tauriDevHost, port: 5183 }
+        }
+      }
+    : {}),
   resolve: {
     alias: {
       '$generated': path.resolve('./src/generated')
