@@ -327,7 +327,53 @@ const qids_base = {
     }
   }
  }
-`, "18createNewMeeting": `mutation CreateNewMeeting( $outpot: String, $name: String,$publishedAt:DateTime) {
+`,
+
+  // ── Meeting participant selection (privacy-preserving) ─────────────────────
+  // Co-members: the users the current user shares at least one project with.
+  // Used to populate the "add participants" dropdown so it never exposes the
+  // whole user base — only people you already collaborate with.
+  '170getMyCoMembers': `query GetMyCoMembers($uid: ID!) {
+  usersPermissionsUser(id: $uid) {
+    data {
+      id
+      attributes {
+        username
+        projects_1s {
+          data {
+            id
+            attributes {
+              projectName
+              user_1s {
+                data {
+                  id
+                  attributes { username }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`,
+
+  // Exact lookup used when inviting someone who is NOT a co-member: the inviter
+  // must know the person's full username or email. Matches are exact (eq), so
+  // this can't be used to enumerate/guess users. Returns minimal fields only.
+  '171findUserByExact': `query FindUserByExact($q: String!) {
+  usersPermissionsUsers(
+    filters: { or: [ { username: { eq: $q } }, { email: { eq: $q } } ] }
+    pagination: { limit: 1 }
+  ) {
+    data {
+      id
+      attributes { username }
+    }
+  }
+}`,
+
+  "18createNewMeeting": `mutation CreateNewMeeting( $outpot: String, $name: String,$publishedAt:DateTime) {
   createPgisha(data: 
     {name: $name, desc: $outpot,publishedAt:$publishedAt})
      {data{id}}
