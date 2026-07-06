@@ -15,6 +15,8 @@
   import { DEFAULT_SITE_SHARE_CONFIG } from '$lib/revenue/config.js';
   import { executeAction } from '$lib/client/actionClient';
   import SiteShareDecision from '$lib/components/revenue/SiteShareDecision.svelte';
+  import { fetchBridgeResolution } from '$lib/func/negoBridge.js';
+  import { openHalukaDiscussion } from '$lib/func/halukaBridge.js';
 
   // רכיבים מודרניים חדשים
   import CardHeader from './CardHeader.svelte';
@@ -239,6 +241,50 @@
       myShare > 0
   );
 
+  // ── Consensus bridge (deep discussion + signed decision) ─────────────────
+  // A haluka dispute is "who gets how much": per member the fair share ("מגיע")
+  // vs. the outcome of the proposed transfers ("בפועל"). Each member becomes a
+  // negotiable number term, so the consensus tools (issues, arguments, middle
+  // formula) run on the real disagreement. When the discussion signs a
+  // resolution, it is persisted on the Negotiation and shown here to EVERY
+  // member — the decision guides the vote, the card's vote stays the formal
+  // approval channel.
+  let bridgeInfo = $state(null); // { discussionUrl, resolution } once signed
+
+  // Agreed per-member shares from the signed resolution, joined to usernames.
+  let bridgeRows = $derived.by(() => {
+    const values = bridgeInfo?.resolution?.values;
+    if (!values) return [];
+    return Object.entries(values)
+      .filter(([key]) => key.startsWith('m:'))
+      .map(([key, value]) => {
+        const uid = key.slice(2);
+        const member = ulist.find((u) => String(u.uid) === uid);
+        return {
+          uid,
+          username:
+            member?.username || getProjectData(projectId, 'un', uid) || uid,
+          value: Number(value)
+        };
+      })
+      .filter((row) => Number.isFinite(row.value));
+  });
+
+  function openHalukaBridge(event) {
+    event.stopPropagation(); // the whole card toggles scroll on click
+    openHalukaDiscussion({
+      tosplitId,
+      title: missionBName || projectName,
+      projectName,
+      rows: ulist.map((u) => ({
+        uid: u.uid,
+        username: u.username,
+        fair: u.x,
+        actual: u.ihave
+      }))
+    });
+  }
+
   function readIdCookie() {
     if (typeof document === 'undefined') return null;
     return (
@@ -264,6 +310,10 @@
   onMount(async () => {
     myId = readIdCookie();
     if (!tosplitId) return;
+    // Signed bridge decision, if the split went through a consensus discussion.
+    fetchBridgeResolution('tosplit', tosplitId).then((found) => {
+      bridgeInfo = found;
+    });
     // Prefill from any existing decision so re-opening shows the prior choice,
     // and load the running aggregate for the "members gave ₪X" line.
     try {
@@ -397,6 +447,61 @@
       : 'bg-gray-50 dark:bg-slate-700/50'} transition-all-300 p-4 flex-1 overflow-y-auto d space-y-4"
   >
     <!-- תצוגת סטטוס הצבעה מודרנית או חלופית -->
+
+    {#if bridgeInfo?.resolution}
+      <!-- The decision signed in the consensus discussion — visible to every
+           member; the vote below stays the formal approval. -->
+      <div
+        class="rounded-xl border border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20 p-3 space-y-2"
+      >
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <p class="text-sm font-bold text-emerald-700 dark:text-emerald-300">
+            🤝 {$t('lev.haluka.bridge.resolved')}: {bridgeInfo.resolution.heading}
+          </p>
+          <a
+            href={bridgeInfo.discussionUrl}
+            target="_blank"
+            rel="noopener"
+            onclick={(e) => e.stopPropagation()}
+            class="text-xs font-semibold text-emerald-700 dark:text-emerald-300 underline"
+          >
+            {$t('lev.haluka.bridge.toDiscussion')}
+          </a>
+        </div>
+        {#if bridgeRows.length > 0}
+          <div class="flex flex-wrap gap-1.5">
+            {#each bridgeRows as row (row.uid)}
+              <span
+                class="rounded-lg bg-white dark:bg-gray-800 border border-emerald-200 dark:border-emerald-800 px-2 py-1 text-xs"
+              >
+                <span class="font-semibold text-barbi dark:text-pink-400"
+                  >{row.username}</span
+                >
+                <span class="text-gray-500 dark:text-gray-400">
+                  · {$t('lev.haluka.bridge.resolvedShare')}:
+                </span>
+                <span class="font-bold text-emerald-700 dark:text-emerald-300"
+                  >{row.value.toFixed(2)}</span
+                >
+              </span>
+            {/each}
+          </div>
+        {/if}
+        <p class="text-[11px] text-gray-500 dark:text-gray-400">
+          {$t('lev.haluka.bridge.voteStillNeeded')}
+        </p>
+      </div>
+    {:else if tosplitId && ulist.length > 0}
+      <div class="flex justify-end">
+        <button
+          onclick={openHalukaBridge}
+          title={$t('lev.haluka.bridge.openDiscussionHint')}
+          class="inline-flex items-center gap-1 rounded-lg border-2 border-yellow-500 px-3 py-1.5 text-xs font-bold text-yellow-600 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/30 transition-all"
+        >
+          {$t('lev.haluka.bridge.openDiscussion')}
+        </button>
+      </div>
+    {/if}
 
     {#if ulist.length > 0 || showSiteShare}
       <div class="w-full overflow-x-auto pb-4">

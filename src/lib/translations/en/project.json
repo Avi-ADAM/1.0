@@ -89,7 +89,18 @@
     "tableView": "Table View",
     "downloadCsv": "Download CSV",
     "close": "Close",
-    "salesTable": "Sales Table"
+    "salesTable": "Sales Table",
+    "siteShare": {
+      "label": "Site Share",
+      "body": "Income from a rikma where 1lev1 joined as a service-providing partner (management, splitting, tracking).",
+      "paid": "Actually paid",
+      "proposed": "Original suggestion",
+      "less": "Reduced by payer",
+      "more": "Increased by payer",
+      "reason": "Reason",
+      "fromRikma": "From rikma",
+      "transfers": "Transfers"
+    }
   },
   "newmatana": {
     "unlimited": "unlimited",

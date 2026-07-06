@@ -7,7 +7,10 @@
 //
 // See consensus1lev1/docs/main-repo-bridge-spec.md (§3, §4).
 
-const CONSENSUS_BRIDGE_URL = 'https://consensus.1lev1.com/negotiation/bridge';
+import { sendToSer } from '$lib/send/sendToSer.js';
+
+const CONSENSUS_APP_URL = 'https://consensus.1lev1.com';
+const CONSENSUS_BRIDGE_URL = `${CONSENSUS_APP_URL}/negotiation/bridge`;
 
 /**
  * base64url-encode a JSON-serializable object (URL-safe, no padding).
@@ -86,4 +89,67 @@ export function readNegoBridgeReturn(sourceId) {
     return agreed.values;
   }
   return null;
+}
+
+/**
+ * @typedef {Object} BridgeResolution
+ * @property {1} v
+ * @property {string} sourceType
+ * @property {string} sourceId
+ * @property {string} positionId  the position the decision was derived from
+ * @property {string} heading     title of the chosen position
+ * @property {string} summary     its description — human summary of the agreement
+ * @property {Record<string, string|number>} values  key → agreed value
+ * @property {Array<{key: string, label: string, kind: string, value: any, body: string|null, stance: number|null}>} terms
+ * @property {string} decidedAt   ISO timestamp
+ */
+
+/**
+ * The durable half of the way back: fetch the decision that was SIGNED in the
+ * consensus discussion and persisted on the Negotiation record. Unlike the
+ * `negoBridge` URL param (which only reaches whoever clicked the link), this is
+ * visible to every member who opens the source card. Returns null when there is
+ * no discussion, no signed decision yet, or the request fails (e.g. the
+ * `resolution` field is not in Strapi yet) — callers just skip the banner.
+ *
+ * @param {string} sourceType e.g. 'pmash' | 'mission' | 'tosplit'
+ * @param {string|number} sourceId
+ * @param {typeof globalThis.fetch} [fetchFn]
+ * @returns {Promise<{ negotiationId: string, topic: string, status: string,
+ *   discussionUrl: string, resolution: BridgeResolution } | null>}
+ */
+export async function fetchBridgeResolution(sourceType, sourceId, fetchFn = globalThis.fetch) {
+  try {
+    const res = await sendToSer(
+      { sourceType, sourceId: String(sourceId) },
+      'GetNegotiationResolutionBySource',
+      0,
+      0,
+      false,
+      fetchFn,
+      { silent: true }
+    );
+    const node = res?.data?.negotiations?.data?.[0];
+    if (!node) return null;
+    const a = node.attributes ?? {};
+    let resolution = a.resolution;
+    if (typeof resolution === 'string') {
+      try {
+        resolution = JSON.parse(resolution);
+      } catch {
+        return null;
+      }
+    }
+    if (resolution?.v !== 1 || !resolution.values) return null;
+    if (String(resolution.sourceId) !== String(sourceId)) return null;
+    return {
+      negotiationId: String(node.id),
+      topic: a.topic ?? '',
+      status: a.status ?? '',
+      discussionUrl: `${CONSENSUS_APP_URL}/negotiation/${node.id}`,
+      resolution
+    };
+  } catch {
+    return null;
+  }
 }

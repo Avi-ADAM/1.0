@@ -9535,6 +9535,7 @@ export type Negotiation = {
   participants?: Maybe<UsersPermissionsUserRelationResponseCollection>;
   positions?: Maybe<PositionRelationResponseCollection>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
+  resolution?: Maybe<Scalars['JSON']['output']>;
   scaleMax?: Maybe<Scalars['Int']['output']>;
   scaleMin?: Maybe<Scalars['Int']['output']>;
   shareToken?: Maybe<Scalars['String']['output']>;
@@ -9631,6 +9632,7 @@ export type NegotiationFiltersInput = {
   participants?: InputMaybe<UsersPermissionsUserFiltersInput>;
   positions?: InputMaybe<PositionFiltersInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
+  resolution?: InputMaybe<JsonFilterInput>;
   scaleMax?: InputMaybe<IntFilterInput>;
   scaleMin?: InputMaybe<IntFilterInput>;
   shareToken?: InputMaybe<StringFilterInput>;
@@ -9658,6 +9660,7 @@ export type NegotiationInput = {
   participants?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   positions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  resolution?: InputMaybe<Scalars['JSON']['input']>;
   scaleMax?: InputMaybe<Scalars['Int']['input']>;
   scaleMin?: InputMaybe<Scalars['Int']['input']>;
   shareToken?: InputMaybe<Scalars['String']['input']>;

@@ -340,7 +340,7 @@
     </div>
 
     <!-- רשימת מטלות -->
-    {#if acts?.length > 0}
+    {#if (acts?.data ?? acts)?.length > 0}
       <div
         class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-xl p-4 shadow-sm"
       >
@@ -348,7 +348,7 @@
           {cardT.acts[$lang]}
         </h4>
         <ul class="space-y-2">
-          {#each acts as datai}
+          {#each (acts?.data ?? acts ?? []) as datai}
             <li
               class="flex items-center gap-3 py-2 border-b border-gray-100 dark:border-slate-700 last:border-0"
             >
@@ -356,7 +356,7 @@
               <span
                 class="text-base md:text-lg font-medium text-gray-800 dark:text-gray-200"
               >
-                {datai.attributes.shem}
+                {datai?.attributes?.shem ?? datai}
               </span>
             </li>
           {/each}
@@ -366,54 +366,54 @@
 
     <!-- תגיות: כישורים, תפקיד, דרכי עבודה -->
     <div class="space-y-4">
-      {#if skills?.length > 0}
+      {#if (skills?.data ?? skills)?.length > 0}
         <div>
           <h4 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2">
             {cardT.skneed[$lang]}
           </h4>
           <div class="flex flex-wrap gap-2">
-            {#each skills as skill}
+            {#each (skills?.data ?? skills ?? []) as skill}
               <Tile
                 sm={true}
                 big={true}
                 bg="green"
-                word={skill.attributes.skillName}
+                word={skill?.attributes?.skillName ?? skill}
               />
             {/each}
           </div>
         </div>
       {/if}
 
-      {#if role?.length > 0}
+      {#if (role?.data ?? role)?.length > 0}
         <div>
           <h4 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2">
             {cardT.rneed[$lang]}
           </h4>
           <div class="flex flex-wrap gap-2">
-            {#each role as rol}
+            {#each (role?.data ?? role ?? []) as rol}
               <Tile
                 sm={true}
                 big={true}
                 bg="pink"
-                word={rol.attributes.roleDescription}
+                word={rol?.attributes?.roleDescription ?? rol}
               />
             {/each}
           </div>
         </div>
       {/if}
 
-      {#if workways?.length > 0}
+      {#if (workways?.data ?? workways)?.length > 0}
         <div>
           <h4 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2">
             {cardT.wwneed[$lang]}
           </h4>
           <div class="flex flex-wrap gap-2">
-            {#each workways as wo}
+            {#each (workways?.data ?? workways ?? []) as wo}
               <Tile
                 sm={true}
                 big={true}
                 bg="yellow"
-                word={wo.attributes.workWayName}
+                word={wo?.attributes?.workWayName ?? wo}
               />
             {/each}
           </div>

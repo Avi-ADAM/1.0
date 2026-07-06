@@ -1046,6 +1046,52 @@ const qids_base = {
     }
   `,
 
+  // arg: { id, resolution, status } — "sign" the bridge decision: persist the
+  // agreed outcome on the Negotiation itself so every member sees it from the
+  // source card (haluka / negoPend / …), not only whoever clicked the return
+  // link. Registered users only: intentionally NOT in CONSENSUS_QIDS, so it
+  // runs on the caller's own JWT and Strapi enforces access (requires the
+  // authenticated role to have `update` on Negotiation). Requires the new
+  // `resolution` (JSON) field on Negotiation — see consensus1lev1
+  // main-repo-return-spec.md.
+  '43SetNegotiationResolution': `
+    mutation SetNegotiationResolution($id: ID!, $resolution: JSON, $status: ENUM_NEGOTIATION_STATUS) {
+      updateNegotiation(id: $id, data: { resolution: $resolution, status: $status }) {
+        data {
+          id
+          attributes {
+            resolution
+            status
+          }
+        }
+      }
+    }
+  `,
+
+  // arg: { sourceType, sourceId } — read back the signed decision for a bridged
+  // main-app object. Same lookup key and access rules as GetNegotiationBySource
+  // (registered only, most recent match). Kept separate from the existing read
+  // qids so they keep working until the `resolution` field exists in Strapi.
+  'GetNegotiationResolutionBySource': `
+    query GetNegotiationResolutionBySource($sourceType: String!, $sourceId: String!) {
+      negotiations(
+        filters: { sourceType: { eq: $sourceType }, sourceId: { eq: $sourceId } }
+        sort: ["createdAt:desc"]
+        pagination: { limit: 1 }
+      ) {
+        data {
+          id
+          attributes {
+            topic
+            status
+            shareToken
+            resolution
+          }
+        }
+      }
+    }
+  `,
+
   // arg: { placeId }
   'ListLocalNegotiations': `
     query ListLocalNegotiations($placeId: ID!) {
@@ -1692,6 +1738,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       users_permissions_user: $userId
       matanot: $product
       in: $amount
+      date: $publishedAt
       publishedAt: $publishedAt
       note: $note
     }) {

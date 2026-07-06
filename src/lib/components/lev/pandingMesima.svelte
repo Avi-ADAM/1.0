@@ -132,30 +132,36 @@
   let chatm = $state(false);
   $inspect(acts);
   onMount(() => {
+    // Unwrap Strapi collection objects ({ data: [...] }) to plain arrays before localizing
+    const skillsArr = Array.isArray(skills) ? skills : (skills?.data ?? []);
+    const tafkidimsArr = Array.isArray(tafkidims) ? tafkidims : (tafkidims?.data ?? []);
+    const workwaysArr = Array.isArray(workways) ? workways : (workways?.data ?? []);
+
+    // oneLangAdj localizes the items; keep result as { data: [...] } for downstream components
     skills =
       oneLangAdj(
         {
-          data: skills
+          data: skillsArr
         },
         $lang,
         'skillName'
-      ).data || [];
+      );
     tafkidims =
       oneLangAdj(
         {
-          data: tafkidims
+          data: tafkidimsArr
         },
         $lang,
         'roleDescription'
-      ).data || [];
+      );
     workways =
       oneLangAdj(
         {
-          data: workways
+          data: workwaysArr
         },
         $lang,
         'workWayName'
-      ).data || [];
+      );
   });
 
   function percentage(partialValue, totalValue) {
