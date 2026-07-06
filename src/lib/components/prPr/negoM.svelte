@@ -20,7 +20,7 @@
   import { submitNegoMission } from '$lib/client/actionClient';
   import { updatePendsStore } from '$lib/utils/levSocketHandler';
   import { toIsoDateString } from '$lib/func/montsi.svelte';
-  import { openNegoBridge, readNegoBridgeReturn } from '$lib/func/negoBridge.js';
+  import { fetchBridgeResolution, openNegoBridge, readNegoBridgeReturn } from '$lib/func/negoBridge.js';
   /**
    * @typedef {Object} Props
    * @property {any} [negopendmissions]
@@ -289,9 +289,7 @@
   // Prefill from a returned bridge agreement. Dates come back as ISO strings;
   // convert them to the picker's display format so submit (which re-parses with
   // 'HH:mm DD/MM/YYYY') round-trips correctly.
-  function applyBridgeReturn() {
-    const v = readNegoBridgeReturn(pendId);
-    if (!v) return;
+  function applyBridgeValues(v) {
     if (v.name != null) name2 = String(v.name);
     if (v.descrip != null) descrip2 = String(v.descrip);
     if (v.noofhours != null) noofhours2 = +v.noofhours;
@@ -304,6 +302,22 @@
       const m = moment(v.finishDate);
       if (m.isValid()) mdates2 = m.format('HH:mm DD/MM/YYYY');
     }
+  }
+
+  // The way back from the bridge, two channels with the same shape:
+  //  1. `negoBridge` URL param — instant, but only for whoever clicked the link.
+  //  2. The resolution signed in the discussion and persisted on the server —
+  //     visible to every member who opens the card.
+  // Either way the values only prefill the editable side; the user still
+  // submits and the proposal passes the regular vote round.
+  async function applyBridgeReturn() {
+    const fromUrl = readNegoBridgeReturn(pendId);
+    if (fromUrl) {
+      applyBridgeValues(fromUrl);
+      return;
+    }
+    const found = await fetchBridgeResolution('mission', pendId);
+    if (found?.resolution?.values) applyBridgeValues(found.resolution.values);
   }
 
   function hasActsChanged() {

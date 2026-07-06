@@ -15,7 +15,7 @@
   import { submitNegoMash } from '$lib/client/actionClient';
   import { updatePmashesStore } from '$lib/utils/levSocketHandler';
   import { onMount } from 'svelte';
-  import { openNegoBridge, readNegoBridgeReturn } from '$lib/func/negoBridge.js';
+  import { fetchBridgeResolution, openNegoBridge, readNegoBridgeReturn } from '$lib/func/negoBridge.js';
 
   let error1;
   let clicked = false;
@@ -187,9 +187,7 @@
 
   // On return from the bridge, prefill the editable fields with the agreed
   // values. The user still submits + votes as usual.
-  onMount(() => {
-    const v = readNegoBridgeReturn(pendId);
-    if (!v) return;
+  function applyBridgeValues(v) {
     if (v.price != null) price2 = Number(v.price);
     if (v.easy != null) easy2 = Number(v.easy);
     if (v.hm != null) hm2 = Number(v.hm);
@@ -197,6 +195,19 @@
     if (v.descrip != null) descrip2 = String(v.descrip);
     if (v.sqadualed != null) sqadualed2 = v.sqadualed;
     if (v.sqadualedf != null) sqadualedf2 = v.sqadualedf;
+  }
+
+  // Two return channels, same shape: the `negoBridge` URL param (instant, only
+  // for whoever clicked the link) and the resolution signed in the discussion
+  // and persisted on the server (visible to every member opening the card).
+  onMount(async () => {
+    const fromUrl = readNegoBridgeReturn(pendId);
+    if (fromUrl) {
+      applyBridgeValues(fromUrl);
+      return;
+    }
+    const found = await fetchBridgeResolution('pmash', pendId);
+    if (found?.resolution?.values) applyBridgeValues(found.resolution.values);
   });
 
   async function increment() {

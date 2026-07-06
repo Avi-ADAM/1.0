@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-07-03
+> Last updated: 2026-07-06
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -1412,6 +1412,7 @@ These are the main content types in the Strapi backend.
 | `participants` | `Maybe<UsersPermissionsUserRelationResponseCollection>` |
 | `positions` | `Maybe<PositionRelationResponseCollection>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `resolution` | `Maybe<Scalars['JSON']['output']>` |
 | `scaleMax` | `Maybe<Scalars['Int']['output']>` |
 | `scaleMin` | `Maybe<Scalars['Int']['output']>` |
 | `shareToken` | `Maybe<Scalars['String']['output']>` |
@@ -4951,6 +4952,7 @@ Used for creating/updating content.
 | `participants` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `positions` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `resolution` | `InputMaybe<Scalars['JSON']['input']>` |
 | `scaleMax` | `InputMaybe<Scalars['Int']['input']>` |
 | `scaleMin` | `InputMaybe<Scalars['Int']['input']>` |
 | `shareToken` | `InputMaybe<Scalars['String']['input']>` |
@@ -6255,7 +6257,7 @@ Fields: `and`, `askm`, `createdAt`, `cycleSize`, `descrip`, `easy`, `hm`, `id`, 
 Fields: `acts`, `and`, `ask`, `createdAt`, `date`, `dates`, `descrip`, `filds`, `hearotMeyuchadot`, `howMany`, `id`, `isMonth`, `isOriginal`, `isRishon`, `location`, `name`, `noofhours`, `not`, `open_mission`, `or`, `ordern`, `pendm`, `perhour`, `proposedBy`, `publishedAt`, `skills`, `status`, `tafkidims`, `total`, `updatedAt`, `users_permissions_user`, `vots`, `work_ways`
 
 #### NegotiationFiltersInput
-Fields: `and`, `arguments`, `clauses`, `createdAt`, `createdByEmail`, `creator`, `cuntries`, `currentRound`, `description`, `id`, `isLocal`, `issues`, `maxRounds`, `not`, `or`, `ownerExternalId`, `participants`, `positions`, `publishedAt`, `scaleMax`, `scaleMin`, `shareToken`, `sourceId`, `sourceMeta`, `sourceType`, `status`, `topic`, `updatedAt`, `visibility`
+Fields: `and`, `arguments`, `clauses`, `createdAt`, `createdByEmail`, `creator`, `cuntries`, `currentRound`, `description`, `id`, `isLocal`, `issues`, `maxRounds`, `not`, `or`, `ownerExternalId`, `participants`, `positions`, `publishedAt`, `resolution`, `scaleMax`, `scaleMin`, `shareToken`, `sourceId`, `sourceMeta`, `sourceType`, `status`, `topic`, `updatedAt`, `visibility`
 
 #### OpenMashaabimFiltersInput
 Fields: `and`, `archived`, `askms`, `createdAt`, `cycleSize`, `declinedsps`, `descrip`, `easy`, `extractedKey`, `haamadapruvs`, `haamadas`, `hm`, `howMeny`, `id`, `isMust`, `isYesod`, `kindOf`, `linkto`, `locale`, `localizations`, `location`, `maap`, `mashaabim`, `name`, `nego_mashes`, `not`, `or`, `partofs`, `pmash`, `price`, `project`, `publishedAt`, `ratson`, `ratson_proposal`, `recurring`, `rikmashes`, `source`, `splited`, `spnot`, `sps`, `sqadualed`, `sqadualedf`, `updatedAt`, `users`
@@ -6909,7 +6911,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 18321 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 18324 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

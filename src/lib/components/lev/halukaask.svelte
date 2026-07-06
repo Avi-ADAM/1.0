@@ -1,5 +1,6 @@
 <script>
   import { clickOutside } from './outsidclick.js';
+  import { halukaMemberRows, openHalukaDiscussion } from '$lib/func/halukaBridge.js';
   import { fly } from 'svelte/transition';
   import { Drawer } from 'vaul-svelte';
   import { goto } from '$app/navigation';
@@ -273,6 +274,20 @@
     isOpen = true;
     console.log(no);
   }
+
+  // Open the consensus mediation discussion for this split (one number term
+  // per member: fair share vs. actual outcome) and close the dialog — the
+  // signed decision returns to the haluka card via fetchBridgeResolution.
+  function openMasaDiscussion() {
+    openHalukaDiscussion({
+      tosplitId: pendId,
+      title: name,
+      projectName,
+      rows: halukaMemberRows(hervach, halukot)
+    });
+    isOpen = false;
+    masa = false;
+  }
   function decline(alr) {
     if (alr == 'alr') {
       alert('soon');
@@ -489,31 +504,24 @@
             <button onclick={afreact}>{$t('lev.cards.confirmApprove')}</button>
           </div>
         {:else if masa === true}
-          <h2 class="bg-gold text-barbi text-center">
-            .יבנה במהרה בימינו אמן בנתיים יש להגיב לא ולנמק ואז ליצור משאב חדש
-            עם המאפיינים הרצויים
-          </h2>
-          <!--
-<Nego
-        on:close={afternego}
-  descrip ={descrip}
-  projectName ={projectName}
-  name1 ={name}
-  hearotMeyuchadot = {hearotMeyuchadot}
-  kindOf ={kindOf}
-  hm = {hm}
-  projectId = {projectId}
-  total ={total}
-  noofusers={noofusers}
-  price={price}
-  easy = {easy}
-  linkto = {linkto}
-  pendId ={pendId}
-  mshaabId={mshaabId}
-  sqadualedf={sqadualedf}
-  sqadualed={sqadualed}
-  users={users}
-/>-->
+          <!-- Negotiating a split = a structured mediation discussion in the
+               consensus app. The signed decision is persisted and comes back to
+               the haluka card for every member; the vote there stays the formal
+               approval channel. -->
+          <div class="text-center p-2">
+            <h2 class="text-barbi font-bold">
+              {$t('lev.haluka.bridge.openDiscussionHint')}
+            </h2>
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+              {$t('lev.haluka.bridge.voteStillNeeded')}
+            </p>
+            <button
+              onclick={openMasaDiscussion}
+              class="mt-3 px-4 py-2 rounded-xl bg-gold text-barbi font-bold hover:scale-105 transition-transform"
+            >
+              {$t('lev.haluka.bridge.openDiscussion')}
+            </button>
+          </div>
         {/if}
       </div>
     </DialogContent>
