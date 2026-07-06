@@ -1,4 +1,7 @@
 <script>
+  import { onMount } from 'svelte';
+  import { isWebkitTextPathBidiBug, toVisualRtl } from '$lib/utils/rtlTextPath.js';
+
   let {
     logoSrc = '',
     projectName = '',
@@ -8,8 +11,16 @@
     darkGoldColor = '#B8860B',
     pinkGlow = true
   } = $props();
-  
-  const isRTL = $derived(/[\u0590-\u05FF]/.test(projectName));
+
+  const isRTL = $derived(/[\u0590-\u05FF\u0600-\u06FF]/.test(projectName));
+
+  // WebKit (Safari / all iOS browsers) ignores bidi on <textPath>, rendering
+  // RTL names reversed. Detect it after mount and reorder the text ourselves.
+  let webkitBidiBug = $state(false);
+  onMount(() => {
+    webkitBidiBug = isWebkitTextPathBidiBug();
+  });
+  const needsManualRtl = $derived(isRTL && webkitBidiBug);
   
   const baseFontSize = $derived(Math.max(14, Math.min(34, Math.sqrt(size) * 2.2)));
   const logoSize = $derived(size * 0.58); 
@@ -62,6 +73,12 @@
       animate: true
     };
   });
+
+  // On WebKit, feed the text in visual order and render it LTR; everywhere else
+  // keep the logical string and let the browser's bidi engine reorder it.
+  const displayText = $derived(
+    needsManualRtl ? toVisualRtl(finalState.text) : finalState.text
+  );
 </script>
 
 <div 
@@ -95,24 +112,24 @@
         <path id="circle-path" d="M 100, 178 a 78,78 0 1,1 0,-156 a 78,78 0 1,1 0,156" />
       </defs>
       
-      <text 
-        class="curved-text" 
-        class:rtl={isRTL}
+      <text
+        class="curved-text"
+        class:rtl={isRTL && !needsManualRtl}
         class:animate-spin-slow={finalState.animate}
-        dominant-baseline="middle" 
-        style="transform-origin: center;" 
+        dominant-baseline="middle"
+        style="transform-origin: center;"
       >
-        <!-- 
+        <!--
            תיקון קריטי: startOffset="50%"
            מכיוון שהמסלול מתחיל למטה (0%), ה-50% זה בדיוק למעלה (שעה 12).
            זה נותן לטקסט מקום להימתח לשני הצדדים בלי להיחתך.
         -->
-        <textPath 
-          href="#circle-path" 
-          startOffset="50%" 
+        <textPath
+          href="#circle-path"
+          startOffset="50%"
           text-anchor="middle"
         >
-          {finalState.text}
+          {displayText}
         </textPath>
       </text>
     </svg>

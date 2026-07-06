@@ -1,4 +1,11 @@
 <script>
+  import { onMount } from 'svelte';
+  import {
+    hasRtl,
+    isWebkitTextPathBidiBug,
+    toVisualRtl
+  } from '$lib/utils/rtlTextPath.js';
+
   let {
     username,
     avatarUrl,
@@ -7,6 +14,18 @@
     diamondContent,
     wreathSvgUrl = 'https://res.cloudinary.com/love1/image/upload/v1640438986/goldenP_bz4wu5.svg'
   } = $props();
+
+  // WebKit (Safari / all iOS browsers) ignores bidi on <textPath>, so RTL
+  // usernames render reversed. Detect it after mount and reorder the text
+  // ourselves; other browsers keep the logical string.
+  let webkitBidiBug = $state(false);
+  onMount(() => {
+    webkitBidiBug = isWebkitTextPathBidiBug();
+  });
+  const needsManualRtl = $derived(webkitBidiBug && hasRtl(username));
+  const displayName = $derived(
+    needsManualRtl ? toVisualRtl(username) : username
+  );
 </script>
 
 <div class="badge-container">
@@ -42,14 +61,14 @@
 
     <!-- טקסט -->
     <text
-      direction="rtl"
+      direction={needsManualRtl ? 'ltr' : 'rtl'}
       fill="#ff00ae"
       font-size="30"
       font-weight="bold"
       style="text-shadow: 1px 1px 2px rgba(63, 56, 18, 0.8);"
     >
       <textPath href="#text-arc" startOffset="50%" text-anchor="middle">
-        {username}
+        {displayName}
       </textPath>
     </text>
 
