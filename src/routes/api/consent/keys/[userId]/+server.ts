@@ -14,6 +14,7 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
       algo: k.algo,
       pubSpkiB64: k.pubSpkiB64,
       label: k.label,
+      kemPubSpkiB64: k.kemPubSpkiB64 ?? null,
       revokedAt: k.revokedAt ?? null,
       addedAt: k.addedAt
     }))

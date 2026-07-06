@@ -18,9 +18,9 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
   if (!body || body.userId !== userId) {
     throw error(403, 'userId in body must match session');
   }
-  const { devicePubB64, algo, pubSpkiB64, label, cert } = body as {
+  const { devicePubB64, algo, pubSpkiB64, label, cert, kemPubSpkiB64 } = body as {
     devicePubB64?: unknown; algo?: unknown; pubSpkiB64?: unknown;
-    label?: unknown; cert?: unknown;
+    label?: unknown; cert?: unknown; kemPubSpkiB64?: unknown;
   };
   if (typeof devicePubB64 !== 'string' ||
       (algo !== 'Ed25519' && algo !== 'ECDSA-P256') ||
@@ -37,6 +37,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     pubSpkiB64,
     label,
     cert: cert as StoredPubKey['cert'],
+    kemPubSpkiB64: typeof kemPubSpkiB64 === 'string' ? kemPubSpkiB64 : undefined,
     addedAt: Date.now()
   };
   await consentStore.putKey(stored);

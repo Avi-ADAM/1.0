@@ -1,6 +1,7 @@
 import { browser } from '$app/environment';
 import { b64urlEncode } from '$lib/crypto/b64';
 import { ensureIdentity, type IdentityRecord } from '$lib/crypto/identity';
+import { ensureKemKeypair } from '$lib/space/e2e/kem';
 import { idbAdd } from '$lib/crypto/keystore';
 import type { ConsentEvent } from './event';
 import { buildAndSignEvent, type SignableEvent } from './signEvent';
@@ -19,6 +20,9 @@ async function publishPubkey(identity: IdentityRecord) {
   if (!browser) return;
   try {
     const pubSpkiB64 = b64urlEncode(identity.pubSpki);
+    const kemPubSpkiB64 = await ensureKemKeypair()
+      .then((k) => k.kemPubSpkiB64)
+      .catch(() => undefined);
     const res = await fetch('/api/consent/keys/register', {
       method: 'POST',
       credentials: 'include',
@@ -28,6 +32,7 @@ async function publishPubkey(identity: IdentityRecord) {
         devicePubB64: identity.devicePubB64,
         algo: identity.algo,
         pubSpkiB64,
+        kemPubSpkiB64,
         label: navigator.userAgent.slice(0, 40)
       })
     });

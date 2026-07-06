@@ -3,13 +3,15 @@
 // module only speaks the wire format.
 
 import type { ConsentEvent } from '$lib/consent/event';
+import type { SealedEnvelope } from './e2e/seal';
 
 export type RelayPullResponse = {
   ok: boolean;
   epoch: string;
   latestSeq: number;
   heads: string[];
-  events: Array<{ seq: number; event: ConsentEvent }>;
+  // one seq stream, two kinds: plaintext events and sealed envelopes
+  events: Array<{ seq: number; event?: ConsentEvent; sealed?: SealedEnvelope }>;
 };
 
 export type RelayHeadsResponse = {
@@ -62,5 +64,16 @@ export function pushEvents(
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ events })
+  });
+}
+
+export function pushSealed(
+  spaceId: string,
+  sealed: SealedEnvelope[]
+): Promise<RelayResult<RelayPushResponse>> {
+  return call(`/api/relay/${encodeURIComponent(spaceId)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sealed })
   });
 }

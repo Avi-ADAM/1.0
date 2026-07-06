@@ -76,7 +76,14 @@ export const ACTIONS = {
   snapshotCommit:  'snapshot.commit',
   snapshotVote:    'snapshot.vote',
   deviceCert:      'device.cert',
-  deviceRevoke:    'device.revoke'
+  deviceRevoke:    'device.revoke',
+  // S3a — group-key distribution. The rotate event is PLAINTEXT by design:
+  // you cannot encrypt the key-distribution message with the key it
+  // distributes. Its predicate carries the epoch number and the epoch key
+  // wrapped to every member device (see $lib/space/e2e/epoch.ts). It has NO
+  // reducer on purpose: epochs are transport-layer state, not ProjectState —
+  // adding it to the projection would change stateRoot semantics.
+  epochRotate:     'epoch.rotate'
 } as const;
 
 export type ActionName = typeof ACTIONS[keyof typeof ACTIONS];

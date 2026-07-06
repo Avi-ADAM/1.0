@@ -8,9 +8,11 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import { isConsentEventShape, type ConsentEvent } from '$lib/consent/event';
+import { isSealedEnvelopeShape } from '$lib/space/e2e/seal';
 import { isValidSpaceId } from '$lib/space/protocol';
-import { verifyConsentEvent } from '$lib/server/consent/verifyServerSide';
-import { relayAppend, relayRead, logEpoch } from '$lib/server/relay/log';
+import { verifyConsentEvent, resolveFromStore } from '$lib/server/consent/verifyServerSide';
+import { verifySignedObject } from '$lib/crypto/verify';
+import { relayAppend, relayAppendSealed, relayRead, logEpoch } from '$lib/server/relay/log';
 
 const MAX_BATCH = 200;
 
@@ -21,9 +23,10 @@ export const POST: RequestHandler = async ({ request, params, cookies }) => {
   if (!isValidSpaceId(spaceId)) throw error(400, 'bad spaceId');
 
   const body = await request.json().catch(() => null);
-  const events = body?.events;
-  if (!Array.isArray(events) || events.length === 0) throw error(400, 'events[] required');
-  if (events.length > MAX_BATCH) throw error(413, `max ${MAX_BATCH} events per push`);
+  const events = Array.isArray(body?.events) ? body.events : [];
+  const sealed = Array.isArray(body?.sealed) ? body.sealed : [];
+  if (events.length + sealed.length === 0) throw error(400, 'events[] or sealed[] required');
+  if (events.length + sealed.length > MAX_BATCH) throw error(413, `max ${MAX_BATCH} items per push`);
 
   const results: Array<
     { id: string; ok: true; seq: number; deduped: boolean } | { id: string | null; ok: false; reason: string }
@@ -46,6 +49,30 @@ export const POST: RequestHandler = async ({ request, params, cookies }) => {
       continue;
     }
     results.push({ id: ev.id, ok: true, seq: appended.seq, deduped: appended.deduped });
+  }
+
+  // Sealed path (S3a): the relay verifies ONLY the outer device signature —
+  // anti-spam, not authority. It cannot and does not look inside.
+  for (const raw of sealed) {
+    if (!isSealedEnvelopeShape(raw)) {
+      results.push({ id: (raw as { id?: string })?.id ?? null, ok: false, reason: 'bad_shape' });
+      continue;
+    }
+    if (raw.spaceId !== spaceId) {
+      results.push({ id: raw.id, ok: false, reason: 'spaceId_mismatch' });
+      continue;
+    }
+    const v = await verifySignedObject(raw, resolveFromStore);
+    if (!v.ok) {
+      results.push({ id: raw.id, ok: false, reason: `verify:${v.reason}` });
+      continue;
+    }
+    const appended = await relayAppendSealed(spaceId, raw);
+    if (!appended.ok) {
+      results.push({ id: raw.id, ok: false, reason: appended.reason });
+      continue;
+    }
+    results.push({ id: raw.id, ok: true, seq: appended.seq, deduped: appended.deduped });
   }
 
   const state = relayRead(spaceId, Number.MAX_SAFE_INTEGER);

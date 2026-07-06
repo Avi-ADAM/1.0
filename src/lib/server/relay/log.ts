@@ -14,10 +14,18 @@
 
 import { randomBytes } from 'node:crypto';
 import type { ConsentEvent } from '$lib/consent/event';
+import type { SealedEnvelope } from '$lib/space/e2e/seal';
 import { computeHeads } from '$lib/space/protocol';
 import { consentStore } from '$lib/server/consent/store';
 
-export type RelayEnvelope = { seq: number; event: ConsentEvent };
+// A log entry is either a plaintext signed event (S2) or a sealed envelope
+// (S3a) — one seq stream per space covers both, so a single client cursor
+// stays valid as a space transitions to E2E.
+export type RelayEnvelope = {
+  seq: number;
+  event?: ConsentEvent;
+  sealed?: SealedEnvelope;
+};
 
 export type RelayAppendResult =
   | { ok: true; seq: number; deduped: boolean; reason?: undefined }
@@ -76,6 +84,32 @@ export async function relayAppend(
   return { ok: true, seq, deduped: false };
 }
 
+/**
+ * Sealed path (S3a): the relay stores ciphertext it cannot read. No
+ * consentStore write-through — the mirror has nowhere meaningful to put an
+ * opaque blob yet (HANDOFF task: a `sealed-envelope` Strapi collection).
+ * Until then durability of sealed history = the member replicas themselves,
+ * which is the end-state anyway; the relay is a mailbox, not an archive.
+ */
+export async function relayAppendSealed(
+  spaceId: string,
+  sealed: SealedEnvelope
+): Promise<RelayAppendResult> {
+  const log = getLog(spaceId);
+
+  const existing = log.byId.get(sealed.id);
+  if (existing !== undefined) return { ok: true, seq: existing, deduped: true };
+
+  if (log.envelopes.length >= MAX_EVENTS_PER_SPACE) {
+    return { ok: false, reason: 'space_full' };
+  }
+
+  const seq = log.nextSeq++;
+  log.envelopes.push({ seq, sealed });
+  log.byId.set(sealed.id, seq);
+  return { ok: true, seq, deduped: false };
+}
+
 export function relayRead(spaceId: string, since = 0): RelayReadResult {
   const log = logs.get(spaceId);
   if (!log) return { epoch: logEpoch, latestSeq: 0, heads: [], envelopes: [] };
@@ -85,15 +119,26 @@ export function relayRead(spaceId: string, since = 0): RelayReadResult {
   return {
     epoch: logEpoch,
     latestSeq: log.nextSeq - 1,
-    heads: computeHeads(log.envelopes.map((e) => e.event)),
+    heads: plaintextHeads(log),
     envelopes
   };
 }
 
-/** Heads only — the O(1)-when-idle sync check. */
+/**
+ * Heads only — the O(1)-when-idle sync check. Computed over PLAINTEXT
+ * events only: the relay cannot see inside sealed envelopes, so for an E2E
+ * space this reflects just the key-distribution layer and clients must rely
+ * on the seq cursor (which covers both kinds) for "am I behind".
+ */
 export function relayHeads(spaceId: string): string[] {
   const log = logs.get(spaceId);
-  return log ? computeHeads(log.envelopes.map((e) => e.event)) : [];
+  return log ? plaintextHeads(log) : [];
+}
+
+function plaintextHeads(log: SpaceLog): string[] {
+  const events: ConsentEvent[] = [];
+  for (const e of log.envelopes) if (e.event) events.push(e.event);
+  return computeHeads(events);
 }
 
 /** Test hook. */

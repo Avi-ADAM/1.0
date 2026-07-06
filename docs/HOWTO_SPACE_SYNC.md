@@ -91,11 +91,33 @@ npx vitest --run src/lib/space src/lib/server/relay
 פעולה בטאב אחד מופיעה בשני תוך ≤20 שניות (interval ברירת המחדל), וב-devtools →
 IndexedDB → `freemates-crypto` רואים את `spaceIndex`/`spaceCursors` מתמלאים.
 
-## מה הלאה (לפי הסולם)
+## הצפנה קבוצתית (S3a) — relay עיוור
 
-1. **S2b** — הרחבת reducers (~25 ישויות קטגוריה א') ומעבר דפי UI לקריאה
-   מ-projection מקומי; Strapi יורד ל-cache.
-2. **Socket wake-up** — במקום polling, ערוץ `consent:event` הקיים יעיר
-   `pollAndSyncIfBehind()` (החיבור מוכן — זו קריאה אחת).
-3. **S3a** — epoch-keys והצפנת ה-payload; ה-relay מפסיק להבין מה עובר בו.
-   נקודת החיבור: העטיפה ב-`relayClient` — הפרוטוקול לא משתנה.
+השכבה ממומשת ב-`src/lib/space/e2e/` (kem/epoch/seal). Space הופך ל-E2E
+ברגע שיש בו אירוע `epoch.rotate`; מאותו רגע `publish()` רגיל נחסם
+(מלבד rotate עצמו) והנתונים עוברים רק כ-ciphertext:
+
+```js
+import { fetchKemRecipients } from '$lib/space/peerKeys';
+
+// התנעת הצפנה ל-Space (epoch 0) — עוטף את המפתח לכל מכשירי החברים
+const { recipients, missing } = await fetchKemRecipients(memberUserIds);
+await replica.rotateEpoch(userId, recipients, 'genesis');
+
+// מכאן והלאה:
+await replica.publishSealed(userId, {
+  action: 'tosplit.vote',
+  subject: { type: 'tosplit', id },
+  predicate: { what: true }
+});
+```
+
+הסרת חבר = `rotateEpoch(userId, recipientsWithoutThem, 'member.remove')`.
+המוסר ממשיך לקרוא את העבר (היה שם) אך לא את העתיד. ה-relay רואה רק
+מעטפות חתומות — יש טסט שמאמת שאף byte קריא לא יושב אצלו
+(`src/lib/server/relay/sealedRelay.test.ts`).
+
+## מה הלאה
+
+ההמשך המלא, כולל תור משימות מפורט, אינווריאנטים שאסור לשבור ומלכודות
+סביבה — ב-[HANDOFF_DISTRIBUTED_DB.md](./HANDOFF_DISTRIBUTED_DB.md).
