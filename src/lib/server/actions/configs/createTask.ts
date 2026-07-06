@@ -99,12 +99,26 @@ const createTaskHandler: ActionExecutionHandler = async (params, context, { stra
   });
 
   const result = await response.json();
-  
+
   if (result.errors) {
     throw new Error(result.errors[0].message);
   }
 
-  return result.data.createAct.data;
+  const createdAct = result.data.createAct.data;
+
+  // If the task is assigned to a specific person who is NOT the creator,
+  // that person is the direct recipient (notified on every channel).
+  // Otherwise `notifyUserIds` stays empty and the notification rule falls
+  // back to the project members.
+  const notifyUserIds =
+    isAssigned && assignedUserId && String(assignedUserId) !== String(context.userId)
+      ? [String(assignedUserId)]
+      : [];
+
+  return {
+    ...createdAct,
+    notifyUserIds
+  };
 };
 
 export const createTaskAction: ActionConfig = {
@@ -185,24 +199,32 @@ export const createTaskAction: ActionConfig = {
   ],
   
   notification: {
+    // When the task is assigned to a specific person other than the creator,
+    // `notifyUserIds` (returned by the handler) targets that person directly.
+    // When it's empty (self-assigned, role-assigned or unassigned) the rule
+    // falls back to notifying the project members.
     recipients: {
-      type: 'projectMembers',
+      type: 'specificUsers',
       config: {
+        userIdsParam: 'notifyUserIds',
         projectIdParam: 'projectId',
         excludeSender: true
       }
     },
     templates: {
       title: {
-        he: 'מטלה חדשה נוצרה',
-        en: 'New Task Created'
+        he: 'מטלה חדשה: {{name}}',
+        en: 'New task: {{name}}'
       },
       body: {
-        he: 'מטלה חדשה בשם "{{name}}" נוספה לפרויקט',
-        en: 'A new task "{{name}}" was added to the project'
+        he: 'נוספה מטלה חדשה עבורך: "{{name}}"',
+        en: 'A new task was added for you: "{{name}}"'
       }
     },
-    channels: ['socket', 'push'],
+    // All channels — each is delivered only where the recipient has it set up
+    // (linked Telegram, email, push subscription), so the assignee is reached
+    // everywhere available.
+    channels: ['socket', 'push', 'email', 'telegram'],
     metadata: {
       priority: 'normal',
       url: '/lev?project={{projectId}}'
