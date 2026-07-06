@@ -12,7 +12,7 @@
   // New architecture imports
   import { finalSwiperArray } from '$lib/stores/levDerived';
   import { isCardsView, projectFilter } from '$lib/stores/levStores';
-  import { initializeLevData } from '$lib/utils/levDataLoader';
+  import { initializeLevData, hasValidSnapshot } from '$lib/utils/levDataLoader';
   import { setupSocketListeners } from '$lib/utils/levSocketHandler';
   import { loadLevSlice } from '$lib/utils/levSliceLoader';
   import {
@@ -77,6 +77,7 @@
 
   const focusChipText = { he: 'תצוגה ממוקדת', en: 'Focused view' };
   const showAllText = { he: 'הצג הכל', en: 'Show all' };
+  const stillLoadingText = { he: 'טוען את שאר הנתונים…', en: 'Loading the rest…' };
 
   function clearFocus() {
     focusFilter = null;
@@ -207,6 +208,27 @@
       }
     }
 
+    // Side channels that don't depend on the lev dataset — start them right
+    // away instead of after the (potentially long) data load. The timers store
+    // and socket upserts populate reactively whenever they arrive.
+    fetchTimers(page.data.uid, fetch).catch((e) =>
+      console.warn('[lev] fetchTimers failed:', e?.message)
+    );
+    timerCleanup = initialWebSocketForTimer(page.data.uid, fetch);
+    unsubscribeSocket = setupSocketListeners(page.data.uid, '', data.lang);
+    loadSiteSharePayables();
+    loadOpenSiteShareDecisions();
+
+    // Errors of a background refresh must not blank an already-rendered page —
+    // only an expired session needs action.
+    const handleBackgroundError = (e) => {
+      console.warn('[lev] Background full load failed:', e?.message);
+      if (e instanceof Error && e.message.includes('Authentication failed')) {
+        toast.error('Your session has expired. Please log in again.');
+        goto('/login?from=lev');
+      }
+    };
+
     try {
       if (focusAni && get(dataMode) !== 'full') {
         // Quantum (fast) path: load only the requested slice(s), then kick off
@@ -228,30 +250,47 @@
           loading = false; // show cards right away
 
           // Full load in background — stores will update reactively when done
-          initializeLevData(page.data.uid, '', data.lang).catch((e) => {
-            console.warn('[lev] Background full load failed:', e.message);
-          });
+          initializeLevData(page.data.uid, '', data.lang).catch(handleBackgroundError);
         } else {
           // Focus type not yet sliceable — fall through to full load
           await initializeLevData(page.data.uid, '', data.lang);
         }
+      } else if (get(dataMode) === 'full' || hasValidSnapshot()) {
+        // Warm path: full data already in memory (client-side nav back) or a
+        // valid localStorage snapshot exists. initializeLevData restores the
+        // snapshot synchronously before its network fetch, so the page can
+        // render immediately and the fresh query 83 streams in behind it.
+        const refresh = initializeLevData(page.data.uid, '', data.lang);
+        loading = false;
+        refresh.catch(handleBackgroundError);
       } else {
-        // Normal path: full load
-        await initializeLevData(page.data.uid, '', data.lang);
+        // Cold path (no snapshot, no focus): progressive first paint. Load the
+        // small vote-urgent slices first — the first one to land paints the
+        // page — then run the full query 83 in the background. Same pattern as
+        // the hub deep-link path, just with the 'votes' group and no filter.
+        const sliceKeys = sliceKeysForFocus('votes').filter((k) =>
+          runnableSliceKeys().includes(k)
+        );
+
+        let anySliceLoaded = false;
+        if (sliceKeys.length > 0) {
+          await Promise.allSettled(
+            sliceKeys.map((key) =>
+              loadLevSlice(key, page.data.uid, null, data.lang).then(() => {
+                anySliceLoaded = true;
+                loading = false; // first slice to arrive paints the page
+              })
+            )
+          );
+        }
+
+        if (anySliceLoaded) {
+          initializeLevData(page.data.uid, '', data.lang).catch(handleBackgroundError);
+        } else {
+          // No runnable slices or all of them failed — original blocking load
+          await initializeLevData(page.data.uid, '', data.lang);
+        }
       }
-
-      // Fetch timers to populate timers store (needed for missionInProgress)
-      await fetchTimers(page.data.uid, fetch);
-
-      // Initialize WebSocket for timer updates (uses the new socketClient-based approach)
-      timerCleanup = initialWebSocketForTimer(page.data.uid, fetch);
-
-      // Setup socket listeners using new architecture
-      unsubscribeSocket = setupSocketListeners(page.data.uid, '', data.lang);
-
-      // Load site-share payables + open decisions into the swiper (non-blocking)
-      loadSiteSharePayables();
-      loadOpenSiteShareDecisions();
 
       loading = false;
       console.log('✅ LEV PAGE INITIALIZED SUCCESSFULLY');
@@ -348,6 +387,13 @@
       <button type="button" onclick={clearFocus}>
         {showAllText[$lang] ?? showAllText.he}
       </button>
+    </div>
+  {:else if $dataMode !== 'full'}
+    <!-- Progressive load in progress: urgent cards are on screen, the full
+         dataset is still streaming in behind them -->
+    <div class="focus-chip" dir="auto" role="status">
+      <span class="loading-dot"></span>
+      <span>{stillLoadingText[$lang] ?? stillLoadingText.he}</span>
     </div>
   {/if}
 
@@ -454,6 +500,26 @@
     font-size: 0.75rem;
     backdrop-filter: blur(6px);
   }
+  .loading-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: #ff00ae;
+    animation: loading-dot-pulse 1.2s ease-in-out infinite;
+  }
+
+  @keyframes loading-dot-pulse {
+    0%,
+    100% {
+      opacity: 0.35;
+      transform: scale(0.8);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+  }
+
   .focus-chip button {
     border: none;
     border-radius: 9999px;
