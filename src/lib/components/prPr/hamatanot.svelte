@@ -20,6 +20,38 @@
   import Close from '$lib/celim/close.svelte';
   import ShareButtons from '$lib/components/share/shareButtons/index.svelte';
   import { toast } from 'svelte-sonner';
+  import SiteShareSaleNote from './SiteShareSaleNote.svelte';
+  import { isSiteShareNote, parseSiteShareNote } from '$lib/revenue/parseSiteShareNote';
+
+  // Site-share income Sales created before the mutation set a `date` have a null
+  // date, which dayjs renders as "Invalid Date". Fall back to a dash so the
+  // table/CSV stay readable.
+  function formatSaleDate(date) {
+    const d = dayjs(date);
+    return d.isValid() ? d.format('DD/MM/YYYY HH:mm') : '—';
+  }
+
+  // One-line, human-readable summary of a site-share note for dense contexts
+  // (table cells, CSV export) where the full card would be too large.
+  function siteShareSummary(note) {
+    const p = parseSiteShareNote(note);
+    if (!p) return note || '';
+    const parts = [$t('project.hamatanot.siteShare.label')];
+    if (p.fromProjectId)
+      parts.push(`${$t('project.hamatanot.siteShare.fromRikma')} #${p.fromProjectId}`);
+    if (p.paid !== null)
+      parts.push(`${$t('project.hamatanot.siteShare.paid')} ₪${p.paid}`);
+    if (p.adjustDirection) {
+      const dir =
+        p.adjustDirection === 'less'
+          ? $t('project.hamatanot.siteShare.less')
+          : $t('project.hamatanot.siteShare.more');
+      const proposed = p.proposed !== null ? ` (₪${p.proposed})` : '';
+      const reason = p.reason ? ` — ${p.reason}` : '';
+      parts.push(`${dir}${proposed}${reason}`);
+    }
+    return parts.join(' · ');
+  }
 
   /** @type {Record<string, number>} */
   let fermatana = $state({});
@@ -240,10 +272,14 @@
   // leaving matanot.data === null. Guard the whole chain so the component never
   // crashes on render/hydration; fall back to a generic label.
   function getMatanaName(sale) {
-    return (
-      sale?.attributes?.matanot?.data?.attributes?.name ??
-      ($lang === 'he' ? 'מוצר לא ידוע' : 'Unknown product')
-    );
+    const linked = sale?.attributes?.matanot?.data?.attributes?.name;
+    if (linked) return linked;
+    // Site-share income Sales carry no product; label them by their nature
+    // instead of the generic "unknown product" fallback.
+    if (isSiteShareNote(sale?.attributes?.note)) {
+      return $t('project.hamatanot.siteShare.label');
+    }
+    return $lang === 'he' ? 'מוצר לא ידוע' : 'Unknown product';
   }
   let arrc = [
     { year: 2019, bananas: 3840, cherries: 1920, dates: 960 },
@@ -334,9 +370,11 @@
         getMatanaName(sale),
         sale.attributes.in,
         sale.attributes.users_permissions_user.data.attributes.username,
-        dayjs(sale.attributes.date).format('DD/MM/YYYY HH:mm'),
+        formatSaleDate(sale.attributes.date),
         status,
-        sale.attributes.note || ''
+        isSiteShareNote(sale.attributes.note)
+          ? siteShareSummary(sale.attributes.note)
+          : sale.attributes.note || ''
       ];
     });
 
@@ -716,7 +754,11 @@
               </div>
 
               <!-- Note Section with Modern Card Design -->
-              {#if data.attributes.note}
+              {#if isSiteShareNote(data.attributes.note)}
+                <div class="mt-4">
+                  <SiteShareSaleNote note={data.attributes.note} />
+                </div>
+              {:else if data.attributes.note}
                 <div
                   class="mt-4 p-3 bg-gradient-to-br from-barbi/5 to-gold/5 rounded-xl border-l-4 border-gold/30 backdrop-blur-sm"
                 >
@@ -965,11 +1007,7 @@
                           .username}
                       </div>
                     </td>
-                    <td
-                      >{dayjs(sale.attributes.date).format(
-                        'DD/MM/YYYY HH:mm'
-                      )}</td
-                    >
+                    <td>{formatSaleDate(sale.attributes.date)}</td>
                     <td>
                       {#if sale.attributes.splited}
                         <span class="status-badge split-badge"
@@ -987,9 +1025,15 @@
                     </td>
                     <td
                       class="max-w-xs truncate"
-                      title={sale.attributes.note || ''}
+                      title={isSiteShareNote(sale.attributes.note)
+                        ? siteShareSummary(sale.attributes.note)
+                        : sale.attributes.note || ''}
                     >
-                      {sale.attributes.note || '-'}
+                      {#if isSiteShareNote(sale.attributes.note)}
+                        {siteShareSummary(sale.attributes.note)}
+                      {:else}
+                        {sale.attributes.note || '-'}
+                      {/if}
                     </td>
                   </tr>
                 {/each}

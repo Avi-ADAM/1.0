@@ -1738,6 +1738,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       users_permissions_user: $userId
       matanot: $product
       in: $amount
+      date: $publishedAt
       publishedAt: $publishedAt
       note: $note
     }) {
