@@ -45,6 +45,56 @@ export type SnapshotMark = {
   by: string;          // signer (typically quorum.reachingActor)
 };
 
+/**
+ * A reported sale, projected from `sale.record` (PLAN_sale_holder_consent).
+ * Keyed by the Sale's id (ev.subject.id on the sale.record event).
+ *
+ *   - status 'self'      → sovereign self-report, final immediately.
+ *   - status 'open'      → claim about someone else's holding, awaiting
+ *                          bilateral consensus on `decisionId` (see
+ *                          ProjectState.saleClaims).
+ *   - status 'confirmed' → the saleClaim matured (mutual vote or timeout);
+ *                          `version` holds the values that were agreed.
+ */
+export type SaleView = {
+  id: string;
+  reporterId: string;
+  holderId: string;
+  status: 'self' | 'open' | 'confirmed';
+  decisionId?: string;
+  confirmedBy?: 'vote' | 'timeout';
+  version: {
+    total?: number;
+    quantity?: number;
+    kindOf?: string;
+    saleDate?: string;
+    startDate?: string;
+    finishDate?: string;
+  };
+};
+
+/**
+ * Bilateral consensus tracker for a `saleClaim` Decision — exactly two
+ * parties (reporter + holder), unlike the rikma-wide quorum other Decision
+ * kinds use. Keyed by the Decision's id.
+ *
+ *   - `standingOrder` is the round currently on the table (1 = the original
+ *     claim; bumped by `proposal.counter`).
+ *   - `signers` holds who has signed the standing round; proposing a counter
+ *     counts as the proposer's own signature on the new round.
+ *   - `closed` is set once both parties signed the same round (vote) or a
+ *     `consensus.timeout` matured it (timeout).
+ */
+export type SaleClaimView = {
+  decisionId: string;
+  saleId: string;
+  holderId: string;
+  reporterId: string;
+  standingOrder: number;
+  signers: Set<string>;
+  closed?: { decidedAt: number; by: 'vote' | 'timeout' };
+};
+
 export type ProjectState = {
   projectId: string | null;
   members: Set<string>;
@@ -58,6 +108,10 @@ export type ProjectState = {
   /** Keyed by `${subject.type}:${subject.id}` */
   rounds: Map<string, SubjectRound>;
   snapshots: SnapshotMark[];
+  /** Keyed by Sale id (PLAN_sale_holder_consent). */
+  sales: Map<string, SaleView>;
+  /** Keyed by Decision id — only entries for kind:'saleClaim'. */
+  saleClaims: Map<string, SaleClaimView>;
   asOf: number;
 };
 
@@ -69,6 +123,8 @@ export function emptyState(projectId: string | null = null): ProjectState {
     tosplits: new Map(),
     rounds: new Map(),
     snapshots: [],
+    sales: new Map(),
+    saleClaims: new Map(),
     asOf: 0
   };
 }

@@ -3,6 +3,8 @@
   import { executeAction } from '$lib/client/actionClient';
   import { shadowSignFromCookie } from '$lib/client/shadowSign';
   import { addVoteConsentSpec } from '$lib/consent/specs/addVote';
+  import { proposalCounterConsentSpec } from '$lib/consent/specs/counterSaleClaim';
+  import { toast } from 'svelte-sonner';
   import { ProgressBar } from 'progressbar-svelte';
   import { goto } from '$app/navigation';
   import { lang } from '$lib/stores/lang.js';
@@ -49,6 +51,7 @@
    * @property {any} timegramaDate
    * @property {any} restime
    * @property {any} timegramaId
+   * @property {any} [saleClaim] - Bilateral saleClaim payload (holder/reporter, standing round, negom)
    * @property {boolean} [cards]
    * @property {number} [tx]
    * @property {boolean} [modal]
@@ -98,6 +101,7 @@
     timegramaId,
     cards = false,
     tx = 200,
+    saleClaim = null,
     modal = $bindable(false),
     onModal,
     onHover,
@@ -117,6 +121,15 @@
         he: `הצבעה על שינוי הלוגו`,
         en: 'vote on Logo change'
       };
+    } else if (kind === 'saleClaim') {
+      const pn = saleClaim?.productName ? ` (${saleClaim.productName})` : '';
+      openmissionName = {
+        he: `הסכמה על מכירה${pn}`,
+        en: `sale consent${pn}`
+      };
+      // Prefill the negotiation form with the version currently on the table.
+      nqty = saleClaim?.standing?.hm ?? saleClaim?.current?.unit ?? 1;
+      nprice = saleClaim?.standing?.price ?? 0;
     } else if (kind === 'sheirutpends') {
       openmissionName = {
         he: 'הצבעה על יצירת שירות חדש',
@@ -274,6 +287,15 @@
           ...(timegramaId != null ? { timegramaId: String(timegramaId) } : {}),
         });
         if (result.success) {
+          // Phase 1 shadow signing for the standing-round agreement.
+          if (kind === 'saleClaim') {
+            shadowSignFromCookie(addVoteConsentSpec, {
+              type: 'decision',
+              id: String(askId),
+              what: true,
+              order: saleClaim?.standingOrder ?? 1
+            });
+          }
           if (result.data?.consensus) {
             onAcsept?.({ ani: 'askedma', coinlapach });
           }
@@ -285,6 +307,64 @@
     } catch (e) {
       error1 = e;
       console.log(error1);
+    }
+  }
+
+  // ── saleClaim negotiation (counter / precision round) ─────────────────────
+  let negoModal = $state(false);
+  let nqty = $state(1);
+  let nprice = $state(0);
+  let nnote = $state('');
+  let negoBusy = $state(false);
+
+  function openNego() {
+    nqty = saleClaim?.standing?.hm ?? saleClaim?.current?.unit ?? 1;
+    nprice = saleClaim?.standing?.price ?? 0;
+    nnote = '';
+    negoModal = true;
+  }
+
+  async function sendNego() {
+    if (negoBusy) return;
+    negoBusy = true;
+    const newValues = {
+      hm: Number(nqty),
+      price: Number(nprice),
+      kindOf: saleClaim?.standing?.kindOf ?? null,
+      sqadualed: saleClaim?.standing?.sqadualed ?? null,
+      sqadualedf: saleClaim?.standing?.sqadualedf ?? null,
+      descrip: nnote?.trim() || null
+    };
+    try {
+      const result = await executeAction('counterSaleClaim', {
+        decisionId: String(askId),
+        projectId: String(projectId),
+        newValues,
+        why: nnote?.trim() || undefined
+      });
+      if (result.success) {
+        // Shadow-sign the proposal.counter with the resulting round number.
+        shadowSignFromCookie(proposalCounterConsentSpec, {
+          decisionId: String(askId),
+          order: result.data?.order,
+          newValues,
+          why: nnote?.trim() || undefined
+        });
+        already = true;
+        negoModal = false;
+        toast.success(
+          $lang === 'en' ? 'Refinement sent — the ball is in their court.' : 'הדיוק נשלח — הכדור אצל הצד השני.'
+        );
+        onAcsept?.({ ani: 'askedma', coinlapach });
+      } else {
+        error1 = result.error;
+        toast.error($lang === 'en' ? 'Could not send refinement' : 'שליחת הדיוק נכשלה');
+      }
+    } catch (e) {
+      error1 = e;
+      toast.error($lang === 'en' ? 'Could not send refinement' : 'שליחת הדיוק נכשלה');
+    } finally {
+      negoBusy = false;
     }
   }
   async function decline() {
@@ -1185,25 +1265,48 @@
                   ></button
                 >
                 <!-- <button3 on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button3>-->
-                <button
-                  onmouseenter={() => hover({ he: 'דחיה', en: 'reject' })}
-                  onmouseleave={() => hover('0')}
-                  onclick={decline}
-                  class="btn gb"
-                  name="decline"
-                  aria-label="reject"
-                  ><svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                    version="1.1"
-                    class="btin"
-                    viewBox="0 0 24 24"
-                    ><path
-                      fill="currentColor"
-                      d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
-                    /></svg
-                  ></button
-                >
+                {#if kind === 'saleClaim'}
+                  <!-- No absolute "no": a saleClaim is refined via negotiation
+                       (scales icon), never rejected. -->
+                  <button
+                    onmouseenter={() => hover({ he: 'משא-ומתן / דיוק', en: 'negotiate / refine' })}
+                    onmouseleave={() => hover('0')}
+                    onclick={openNego}
+                    class="btn gb"
+                    name="negotiate"
+                    aria-label="negotiate"
+                    ><svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      version="1.1"
+                      class="btin"
+                      viewBox="0 0 24 24"
+                      ><path
+                        fill="currentColor"
+                        d="M12,3A1,1 0 0,1 13,4V4.29L18.21,6.16L18.5,6.05A1,1 0 0,1 19.76,6.68L21.83,12.2C21.94,12.5 21.9,12.85 21.7,13.11C20.94,14.12 19.55,14.5 18.5,14.5C17.45,14.5 16.06,14.12 15.3,13.11C15.1,12.85 15.06,12.5 15.17,12.2L17,7.31L13,5.87V18H16A1,1 0 0,1 17,19A1,1 0 0,1 16,20H8A1,1 0 0,1 7,19A1,1 0 0,1 8,18H11V5.87L7,7.31L8.83,12.2C8.94,12.5 8.9,12.85 8.7,13.11C7.94,14.12 6.55,14.5 5.5,14.5C4.45,14.5 3.06,14.12 2.3,13.11C2.1,12.85 2.06,12.5 2.17,12.2L4.24,6.68A1,1 0 0,1 5.5,6.05L5.79,6.16L11,4.29V4A1,1 0 0,1 12,3M18.5,8.4L17.31,11.5H19.69L18.5,8.4M5.5,8.4L4.31,11.5H6.69L5.5,8.4Z"
+                      /></svg
+                    ></button
+                  >
+                {:else}
+                  <button
+                    onmouseenter={() => hover({ he: 'דחיה', en: 'reject' })}
+                    onmouseleave={() => hover('0')}
+                    onclick={decline}
+                    class="btn gb"
+                    name="decline"
+                    aria-label="reject"
+                    ><svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      xmlns:xlink="http://www.w3.org/1999/xlink"
+                      version="1.1"
+                      class="btin"
+                      viewBox="0 0 24 24"
+                      ><path
+                        fill="currentColor"
+                        d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
+                      /></svg
+                    ></button
+                  >
+                {/if}
               {/if}
             {:else if low == true}
               <Lowbtn />
@@ -1289,7 +1392,154 @@
   />
 {/if}
 
+{#if negoModal}
+  <div
+    class="nego-overlay"
+    role="button"
+    tabindex="0"
+    onclick={(e) => {
+      if (e.target === e.currentTarget) negoModal = false;
+    }}
+    onkeydown={(e) => {
+      if (e.key === 'Escape') negoModal = false;
+    }}
+  >
+    <div class="nego-card" dir={$lang === 'en' ? 'ltr' : 'rtl'}>
+      <h3 class="nego-title">
+        {$lang === 'en' ? 'Refine the sale claim' : 'דיוק דיווח המכירה'}
+      </h3>
+      <p class="nego-sub">
+        {$lang === 'en'
+          ? 'Propose the version you can sign. Silence for the response window means the standing version is auto-approved.'
+          : 'הציעו את הגרסה שאתם חתומים עליה. שתיקה עד תום זמן התגובה = הגרסה שעל השולחן מאושרת אוטומטית.'}
+      </p>
+
+      <label class="nego-label">
+        {$lang === 'en' ? 'Quantity' : 'כמות'}
+        <span class="nego-ref"
+          >{$lang === 'en' ? 'on table:' : 'על השולחן:'} {saleClaim?.standing?.hm ?? '—'}</span
+        >
+        <input class="nego-input" type="number" min="0" step="any" bind:value={nqty} />
+      </label>
+
+      <label class="nego-label">
+        {$lang === 'en' ? 'Price per unit' : 'מחיר ליחידה'}
+        <span class="nego-ref"
+          >{$lang === 'en' ? 'on table:' : 'על השולחן:'} {saleClaim?.standing?.price ?? '—'}</span
+        >
+        <input class="nego-input" type="number" min="0" step="any" bind:value={nprice} />
+      </label>
+
+      <label class="nego-label">
+        {$lang === 'en' ? 'Note (optional)' : 'הערה (רשות)'}
+        <textarea class="nego-input" rows="2" maxlength="300" bind:value={nnote}></textarea>
+      </label>
+
+      <p class="nego-total">
+        {$lang === 'en' ? 'Total' : 'סה"כ'}: {(Number(nqty) || 0) * (Number(nprice) || 0)}₪
+      </p>
+
+      <div class="nego-actions">
+        <button class="nego-btn nego-cancel" onclick={() => (negoModal = false)}>
+          {$lang === 'en' ? 'Cancel' : 'ביטול'}
+        </button>
+        <button class="nego-btn nego-send" onclick={sendNego} disabled={negoBusy}>
+          {negoBusy
+            ? $lang === 'en'
+              ? 'Sending…'
+              : 'שולח…'
+            : $lang === 'en'
+              ? 'Send refinement'
+              : 'שליחת דיוק'}
+        </button>
+      </div>
+    </div>
+  </div>
+{/if}
+
 <style>
+  .nego-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .nego-card {
+    background: #1f1f1f;
+    border: 1px solid var(--barbi-pink, #ff0092);
+    border-radius: 16px;
+    padding: 20px;
+    width: 100%;
+    max-width: 360px;
+    color: var(--gold, #eee8aa);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  }
+  .nego-title {
+    margin: 0 0 6px;
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--barbi-pink, #ff0092);
+    text-align: center;
+  }
+  .nego-sub {
+    margin: 0 0 14px;
+    font-size: 12px;
+    opacity: 0.8;
+    text-align: center;
+  }
+  .nego-label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+  .nego-ref {
+    font-size: 11px;
+    opacity: 0.6;
+  }
+  .nego-input {
+    background: #333;
+    border: 1px solid var(--barbi-pink, #ff0092);
+    border-radius: 8px;
+    padding: 8px;
+    color: var(--gold, #eee8aa);
+    width: 100%;
+  }
+  .nego-total {
+    text-align: center;
+    font-weight: bold;
+    margin: 8px 0 14px;
+  }
+  .nego-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  .nego-btn {
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid var(--barbi-pink, #ff0092);
+  }
+  .nego-cancel {
+    background: transparent;
+    color: var(--gold, #eee8aa);
+  }
+  .nego-send {
+    background: var(--barbi-pink, #ff0092);
+    color: var(--gold, #eee8aa);
+  }
+  .nego-send:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
   .swiper-slidec {
     display: flex;
     align-items: center;

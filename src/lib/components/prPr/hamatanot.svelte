@@ -281,6 +281,36 @@
     }
     return $lang === 'he' ? 'מוצר לא ידוע' : 'Unknown product';
   }
+
+  // Holder-consent status chip (PLAN_sale_holder_consent). holderStatus is
+  // null for legacy sales predating this feature — shown as unverified but
+  // still counted (grandfathered), matching the sovereignty-plan precedent.
+  function saleHolderLabel(sale) {
+    const hs = sale?.attributes?.holderStatus;
+    const holderName =
+      sale?.attributes?.users_permissions_user?.data?.attributes?.username ?? '';
+    if (hs === 'self') {
+      return { cls: 'chip-self', text: { he: 'מאומת (עצמי)', en: 'verified (self)' }[$lang] ?? 'verified (self)' };
+    }
+    if (hs === 'open') {
+      return {
+        cls: 'chip-open',
+        text:
+          ($lang === 'he' ? `בהסכמה מול ${holderName}` : `awaiting ${holderName}'s consent`)
+      };
+    }
+    if (hs === 'confirmed') {
+      const byTimeout = sale?.attributes?.confirmedBy === 'timeout';
+      return {
+        cls: 'chip-confirmed',
+        text: byTimeout
+          ? ($lang === 'he' ? 'אושר בשתיקה' : 'auto-approved')
+          : ($lang === 'he' ? 'אושר' : 'confirmed')
+      };
+    }
+    // null = legacy, predates this feature
+    return { cls: 'chip-legacy', text: $lang === 'he' ? 'לא מאומת (legacy)' : 'unverified (legacy)' };
+  }
   let arrc = [
     { year: 2019, bananas: 3840, cherries: 1920, dates: 960 },
     { year: 2020, bananas: 380, cherries: 920, dates: 1960 }
@@ -709,6 +739,12 @@
                   ⏳ {$lang === 'he' ? 'בהצבעה' : 'Pending'}
                 </div>
               {/if}
+              <!-- Holder-consent status chip -->
+              <div
+                class="holder-chip {saleHolderLabel(data).cls} text-xs px-2 py-0.5 rounded-full self-start mb-2"
+              >
+                {saleHolderLabel(data).text}
+              </div>
               <!-- Gift Name with Modern Styling -->
               <div class="mb-3">
                 <h3
@@ -980,6 +1016,7 @@
                   <th>{$t('project.hamatanot.salesByDate')}</th>
                   <th>{$t('project.hamatanot.type')}</th>
                   <th>{$t('project.hamatanot.note')}</th>
+                  <th>{$lang === 'he' ? 'סטטוס' : 'Status'}</th>
                 </tr>
               </thead>
               <tbody>
@@ -1034,6 +1071,11 @@
                       {:else}
                         {sale.attributes.note || '-'}
                       {/if}
+                    </td>
+                    <td>
+                      <span class="holder-chip {saleHolderLabel(sale).cls} status-badge"
+                        >{saleHolderLabel(sale).text}</span
+                      >
                     </td>
                   </tr>
                 {/each}
@@ -1284,6 +1326,29 @@
   .awaiting-badge {
     background-color: #fef3c7;
     color: #92400e;
+  }
+
+  /* Holder-consent status chip (PLAN_sale_holder_consent) */
+  .holder-chip {
+    display: inline-block;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .chip-self {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+  .chip-open {
+    background-color: #dbeafe;
+    color: #1e40af;
+  }
+  .chip-confirmed {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+  .chip-legacy {
+    background-color: #f3f4f6;
+    color: #6b7280;
   }
 
   .sales-table tfoot .total-row {

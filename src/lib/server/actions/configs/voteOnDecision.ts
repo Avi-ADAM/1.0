@@ -20,11 +20,154 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import {
+  fetchSaleClaim,
+  standingOrder,
+  standingSaleVersion,
+  bothPartiesSigned,
+  normalizeVots,
+  type SaleClaim
+} from './saleClaimShared.js';
 
-const voteOnDecisionHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
+/**
+ * saleClaim agree() branch (PLAN_sale_holder_consent — phase 2).
+ *
+ * A saleClaim Decision is bilateral: the only valid voters are the reporter
+ * and the claimed holder. A YES vote signs the *standing* round (highest
+ * negom round, or round 1 = the original claim). When BOTH parties have signed
+ * the same standing round, the version matures onto the Sale:
+ *   - values applied (unit/in/dates from the round's negom, or original for r1)
+ *   - inventory delta reconciled if the quantity changed
+ *   - holderStatus:'confirmed', confirmedBy:'vote'
+ *   - Decision archived, timegrama done, both parties notified.
+ */
+async function handleSaleClaimVote(
+  params: Record<string, any>,
+  context: any,
+  strapi: any,
+  notifier: any,
+) {
+  const { decisionId } = params;
+  const now = new Date();
+  const userId = String(context.userId);
+
+  const claim: SaleClaim = await fetchSaleClaim(strapi, context, decisionId);
+  if (!claim) throw new Error(`saleClaim Decision ${decisionId} not found`);
+  if (claim.archived) throw new Error('This sale claim is already resolved');
+
+  // Only the two parties may vote (unlike ordinary rikma-wide decisions).
+  if (userId !== claim.holderId && userId !== claim.reporterId) {
+    throw new Error('Only the reporter or the claimed holder may vote on a sale claim');
+  }
+
+  const order = standingOrder(claim); // the round currently on the table
+  const alreadySigned = claim.vots.some(
+    (v) => String(v.userId) === userId && Number(v.order) === order && v.what,
+  );
+  if (alreadySigned) {
+    throw new Error('You already agreed to the current version — waiting for the other side');
+  }
+
+  // Append this YES vote to the standing round.
+  const newVote = {
+    what: true,
+    users_permissions_user: userId,
+    ide: parseInt(userId, 10),
+    zman: now.toISOString(),
+    order,
+  };
+  const allVots = [...normalizeVots(claim.vots), newVote];
+
+  if (!bothPartiesSigned(allVots, order, claim.holderId, claim.reporterId)) {
+    // Not yet mutual — persist the vote and wait.
+    await strapi.execute('121addVoteToDecision', { decisionId, vots: allVots }, context.jwt, context.fetch);
+    return {
+      data: { id: decisionId, consensus: false, kind: 'saleClaim' },
+      updateStrategy: { type: 'partialUpdate', config: { dataKeys: ['decisions'] } },
+    };
+  }
+
+  // ── MUTUAL CONSENSUS on the standing round → mature the version ───────────
+  const version = standingSaleVersion(claim, order);
+
+  // Reconcile inventory if the agreed quantity differs from what was reserved.
+  if (version.unit != null && claim.matanotQuant != null && claim.matanotId) {
+    const oldUnit = Number(claim.saleUnit ?? 0);
+    const newUnit = Number(version.unit);
+    if (newUnit !== oldUnit && Number(claim.matanotQuant) !== -1) {
+      const adjustedQuant = Number(claim.matanotQuant) + (oldUnit - newUnit);
+      try {
+        await strapi.execute('updateMatanotQuant', { id: claim.matanotId, quant: adjustedQuant }, context.jwt, context.fetch);
+      } catch (err) {
+        console.warn('[saleClaim] inventory delta failed:', err);
+      }
+    }
+  }
+
+  // Apply the agreed version + stamp the holder outcome onto the Sale.
+  await strapi.execute(
+    'applySaleVersion',
+    {
+      id: claim.saleId,
+      in: version.in,
+      unit: version.unit,
+      date: version.date ?? undefined,
+      startDate: version.startDate ?? undefined,
+      finishDate: version.finishDate ?? undefined,
+      holderStatus: 'confirmed',
+      confirmedBy: 'vote',
+      holderDecidedAt: now.toISOString(),
+    },
+    context.jwt,
+    context.fetch,
+  );
+
+  // Archive the Decision and mark the timegrama done.
+  await strapi.execute('160archiveDecision', { id: decisionId, vots: allVots }, context.jwt, context.fetch);
+  if (claim.timegramaId) {
+    await strapi.execute('35updateTimeGrama', { id: String(claim.timegramaId), done: true }, context.jwt, context.fetch);
+  }
+
+  // Notify both parties that the sale is confirmed.
+  if (notifier) {
+    try {
+      await notifier.notify(
+        {
+          recipients: { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
+          templates: {
+            title: { he: 'המכירה אושרה', en: 'Sale confirmed' },
+            body: {
+              he: `הדיווח על מחזיק-הכסף אושר בהסכמת שני הצדדים${order > 1 ? ' (בגרסה המעודכנת)' : ''}.`,
+              en: `The money-holder report was confirmed by both parties${order > 1 ? ' (updated version)' : ''}.`,
+            },
+          },
+          channels: ['socket', 'push'],
+          metadata: { type: 'saleClaimConfirmed', url: 'lev', priority: 'normal' },
+        },
+        { recipients: [claim.holderId, claim.reporterId], projectId: params.projectId, decisionId },
+        { data: { id: decisionId } },
+        context,
+      );
+    } catch (err) {
+      console.warn('[saleClaim] confirm notification failed:', err);
+    }
+  }
+
+  return {
+    data: { decisionId, consensus: true, kind: 'saleClaim', confirmedBy: 'vote' },
+    updateStrategy: { type: 'fullRefresh' },
+  };
+}
+
+const voteOnDecisionHandler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const { decisionId, projectId, kind, newpicid, timegramaId } = params;
   const { userId } = context;
   const now = new Date();
+
+  // Bilateral sale-holder consent rides a distinct branch (two parties only).
+  if (kind === 'saleClaim') {
+    return handleSaleClaimVote(params, context, strapi, notifier);
+  }
 
   // 1. Fetch Decision with current vots
   const decisionRes = await strapi.execute(

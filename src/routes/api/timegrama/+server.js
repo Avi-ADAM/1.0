@@ -7,6 +7,7 @@ import { PendM } from './pendM.svelte';
 import {finiapp} from './finiapp.svelte'
 import { Ask } from './ask.svelte';
 import { Askm } from './askm.svelte';
+import { Decision } from './decision.svelte';
 //ask need to creater 0on first vote or on request if the requester is project member4
 //מעביר ראשון ראשון ברסק , אם מישהו ביקש מחכים למענה בעניינו ורק לאחר שיש כן 1 לפחות או לא 1 לפחות  ניתן לקבלו או לא 1 לפחות וניתן להציע לאנשים נוספים, בקשה של הקודם כאשר יש לא נשארת אך ניתן להוסיף עוד סקשות 
 import { SendTo } from '$lib/send/sendTo.svelte';
@@ -27,8 +28,11 @@ async function x(id,kind,taid, fetch){
       await PendM(id,taid)
     }else if(kind == "finiapruval"){
       await finiapp(id,taid)
+    }else if(kind == "decision"){
+      // saleClaim silence-as-consent maturation (PLAN_sale_holder_consent)
+      await Decision(id,taid)
     }
-    
+
 }
 export async function GET({ fetch }) {
     let d = new Date();

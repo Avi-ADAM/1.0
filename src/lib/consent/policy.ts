@@ -40,9 +40,12 @@ const QUORUM_POLICY: Partial<Record<ActionName, QuorumRequirement>> = {
   'snapshot.commit':   { required: true, voteAction: 'snapshot.vote' },
 
   // Votes are themselves evidence; requiring quorum on them would recurse.
+  // decision.vote covers both rikma-wide Decision kinds (pic, ...) and the
+  // bilateral saleClaim kind — neither ratifies via a group QuorumProof.
   'tosplit.vote':          NOT_REQUIRED,
   'mission.approve.vote':  NOT_REQUIRED,
   'snapshot.vote':         NOT_REQUIRED,
+  'decision.vote':         NOT_REQUIRED,
 
   // Carries its own rule (kind: 'timeout') when a proof is attached; absence
   // of a counter-proposal is checked at ingest (PLAN_restime §5), not here.
@@ -58,6 +61,12 @@ const QUORUM_POLICY: Partial<Record<ActionName, QuorumRequirement>> = {
   // haluka.approve is a vote-like ratification kept quorum-free until the
   // haluka flow migrates to explicit consensus events (Phase 4 wave).
   'haluka.approve':    NOT_REQUIRED,
+
+  // A sale report is the reporter's sovereign attestation that opens a
+  // bilateral holder-consent conversation (PLAN_sale_holder_consent). It is
+  // NOT a rikma-wide decision — consensus is between exactly two people
+  // (reporter + holder), so no group QuorumProof applies.
+  'sale.record':       NOT_REQUIRED,
 
   'member.away':       NOT_REQUIRED,
   'time.tick':         NOT_REQUIRED,

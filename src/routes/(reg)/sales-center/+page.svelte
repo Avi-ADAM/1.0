@@ -8,6 +8,12 @@
 
   let { data } = $props();
 
+  // PLAN_sale_holder_consent — my open sale reports still awaiting the
+  // claimed holder's consent (or my turn to respond after a counter).
+  let openSaleClaims = $derived(data.openSaleClaims ?? []);
+  let myTurnClaims = $derived(openSaleClaims.filter((c) => c.myTurn));
+  let waitingClaims = $derived(openSaleClaims.filter((c) => !c.myTurn));
+
   let loading = $state(false);
   let error = $state(null);
   let products = $state([...data.products]);
@@ -263,6 +269,25 @@
         {t.subtitle}
       </p>
     </div>
+
+    {#if openSaleClaims.length > 0}
+      <div class="claims-banner mb-6">
+        {#if myTurnClaims.length > 0}
+          <p class="claims-line claims-turn">
+            {$lang === 'he'
+              ? `יש לך ${myTurnClaims.length} דיווח${myTurnClaims.length > 1 ? 'ים' : ''} שממתין${myTurnClaims.length > 1 ? 'ים' : ''} לתגובתך בעמוד הלב`
+              : `You have ${myTurnClaims.length} sale report${myTurnClaims.length > 1 ? 's' : ''} awaiting your response on the heart page`}
+          </p>
+        {/if}
+        {#if waitingClaims.length > 0}
+          <p class="claims-line claims-waiting">
+            {$lang === 'he'
+              ? `${waitingClaims.length} דיווח${waitingClaims.length > 1 ? 'ים' : ''} ממתין${waitingClaims.length > 1 ? 'ים' : ''} להסכמת מחזיק הכסף`
+              : `${waitingClaims.length} sale report${waitingClaims.length > 1 ? 's' : ''} awaiting the holder's consent`}
+          </p>
+        {/if}
+      </div>
+    {/if}
 
     {#if loading}
       <div class="flex flex-col items-center justify-center py-20">
@@ -580,6 +605,32 @@
 </div>
 
 <style>
+  /* PLAN_sale_holder_consent — open claims banner */
+  .claims-banner {
+    max-width: 48rem;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .claims-line {
+    text-align: center;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .claims-turn {
+    background-color: rgba(255, 0, 146, 0.15);
+    color: var(--barbi-pink, #ff0092);
+    border: 1px solid var(--barbi-pink, #ff0092);
+  }
+  .claims-waiting {
+    background-color: rgba(59, 130, 246, 0.12);
+    color: #1e40af;
+    border: 1px solid rgba(59, 130, 246, 0.4);
+  }
+
   /* Custom styles for the sales center */
   .textinput {
     position: relative;

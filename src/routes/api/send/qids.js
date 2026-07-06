@@ -4220,6 +4220,29 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                         }
                       }
                     }
+                    negom {
+                      id
+                      hm
+                      price
+                      kindOf
+                      sqadualed
+                    }
+                    sale {
+                      data {
+                        id
+                        attributes {
+                          in
+                          unit
+                          date
+                          startDate
+                          finishDate
+                          holderStatus
+                          reporter { data { id } }
+                          users_permissions_user { data { id attributes { username } } }
+                          matanot { data { id attributes { name quant } } }
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -8735,7 +8758,7 @@ export const moachQids = {
             data {
               id
               attributes {
-                in date pending splited note tosplits { data { id } }
+                in date pending splited holderStatus confirmedBy note tosplits { data { id } }
                 matanot { data { id attributes { name } } }
                 users_permissions_user { data { id attributes { username } } }
               }
@@ -11988,7 +12011,9 @@ export const qids = {
     $publishedAt: DateTime!,
     $startDate: DateTime,
     $finishDate: DateTime,
-    $note: String
+    $note: String,
+    $reporter: ID,
+    $holderStatus: ENUM_SALE_HOLDERSTATUS
   ) {
     createSale(data: {
       project: $project,
@@ -12000,7 +12025,9 @@ export const qids = {
       publishedAt: $publishedAt,
       startDate: $startDate,
       finishDate: $finishDate,
-      note: $note
+      note: $note,
+      reporter: $reporter,
+      holderStatus: $holderStatus
     }) {
       data {
         id
@@ -12030,6 +12057,127 @@ export const qids = {
       start: $start
     }) {
       data { id }
+    }
+  }`,
+
+  // ── Sale holder consent (PLAN_sale_holder_consent) ────────────────────────
+  // Project restime + member ids, used to validate the claimed holder is a
+  // rikma member and to schedule the silence-as-consent timegrama.
+  'saleClaimProjectInfo': `query SaleClaimProjectInfo($pid: ID!) {
+    project(id: $pid) {
+      data {
+        id
+        attributes {
+          projectName
+          restime
+          user_1s { data { id } }
+        }
+      }
+    }
+  }`,
+
+  // A saleClaim Decision — a bilateral (reporter+holder) holder-consent claim
+  // riding the existing Decision model. `sale` links it back to the report.
+  'createSaleClaimDecision': `mutation CreateSaleClaimDecision(
+    $projectIds: [ID],
+    $sale: ID,
+    $decisionName: String,
+    $publishedAt: DateTime,
+    $vots: [ComponentProjectsVotsInput]
+  ) {
+    createDecision(data: {
+      projects: $projectIds,
+      sale: $sale,
+      kind: saleClaim,
+      decisionName: $decisionName,
+      publishedAt: $publishedAt,
+      vots: $vots
+    }) {
+      data { id }
+    }
+  }`,
+
+  // Link the created Decision back onto the Sale, and (re)set holderStatus.
+  'updateSaleHolderLink': `mutation UpdateSaleHolderLink(
+    $id: ID!,
+    $decision: ID,
+    $holderStatus: ENUM_SALE_HOLDERSTATUS
+  ) {
+    updateSale(id: $id, data: { decision: $decision, holderStatus: $holderStatus }) {
+      data { id attributes { holderStatus } }
+    }
+  }`,
+
+  // Full saleClaim Decision, with the linked Sale (holder + reporter), the
+  // precision rounds (negom) and the standing timegrama — everything the
+  // consensus/negotiation logic needs.
+  'getSaleClaimDecision': `query GetSaleClaimDecision($eid: ID!) {
+    decision(id: $eid) {
+      data {
+        id
+        attributes {
+          kind
+          archived
+          decisionName
+          vots { what id order zman users_permissions_user { data { id } } }
+          negom { id hm price kindOf sqadualed }
+          timegrama { data { id attributes { date done } } }
+          sale {
+            data {
+              id
+              attributes {
+                in
+                unit
+                date
+                startDate
+                finishDate
+                holderStatus
+                reporter { data { id } }
+                users_permissions_user { data { id } }
+                matanot { data { id attributes { quant name } } }
+                project { data { id attributes { restime } } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  // Append a precision round (counter): sets the full negom array + vots.
+  'updateSaleClaimNego': `mutation UpdateSaleClaimNego(
+    $id: ID!,
+    $negom: [ComponentProjectsNegomInput],
+    $vots: [ComponentProjectsVotsInput]
+  ) {
+    updateDecision(id: $id, data: { negom: $negom, vots: $vots }) {
+      data { id }
+    }
+  }`,
+
+  // Apply an agreed/matured version onto the Sale and stamp the holder outcome.
+  'applySaleVersion': `mutation ApplySaleVersion(
+    $id: ID!,
+    $in: Float,
+    $unit: Float,
+    $date: DateTime,
+    $startDate: DateTime,
+    $finishDate: DateTime,
+    $holderStatus: ENUM_SALE_HOLDERSTATUS,
+    $confirmedBy: ENUM_SALE_CONFIRMEDBY,
+    $holderDecidedAt: DateTime
+  ) {
+    updateSale(id: $id, data: {
+      in: $in,
+      unit: $unit,
+      date: $date,
+      startDate: $startDate,
+      finishDate: $finishDate,
+      holderStatus: $holderStatus,
+      confirmedBy: $confirmedBy,
+      holderDecidedAt: $holderDecidedAt
+    }) {
+      data { id attributes { holderStatus confirmedBy } }
     }
   }`,
 
@@ -12069,6 +12217,25 @@ export const qids = {
                       kindOf
                       startDate
                       finnishDate
+                    }
+                  }
+                }
+                decisions(filters: { kind: { eq: "saleClaim" }, archived: { eq: false } }) {
+                  data {
+                    id
+                    attributes {
+                      negom { id }
+                      vots { what order users_permissions_user { data { id } } }
+                      sale {
+                        data {
+                          id
+                          attributes {
+                            reporter { data { id } }
+                            users_permissions_user { data { id attributes { username } } }
+                            matanot { data { attributes { name } } }
+                          }
+                        }
+                      }
                     }
                   }
                 }

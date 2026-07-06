@@ -940,17 +940,100 @@ export function extractDecisions(userData: any): DecisionData[] {
       for (const decision of project.attributes.decisions.data) {
         if (!decision?.id || !decision?.attributes) continue;
 
+        const kind = decision.attributes.kind || '';
+        const vots = decision.attributes.vots || [];
+
+        // Bilateral sale-holder consent (PLAN_sale_holder_consent). Only two
+        // parties (reporter + holder), and it belongs on *my* heart only when
+        // it is my turn to respond (I'm a party and haven't signed the standing
+        // round yet).
+        if (kind === 'saleClaim') {
+          const sale = decision.attributes.sale?.data;
+          if (!sale) continue; // malformed claim — nothing to consent to
+          const holderId = String(sale.attributes?.users_permissions_user?.data?.id ?? '');
+          const reporterId = String(sale.attributes?.reporter?.data?.id ?? '');
+          const myid = String(userData.id);
+          const isParty = myid === holderId || myid === reporterId;
+          if (!isParty) continue;
+
+          const negom = decision.attributes.negom || [];
+          const standingOrder = negom.length + 1;
+          const iSignedStanding = vots.some(
+            (v: any) =>
+              String(v.users_permissions_user?.data?.id ?? v.ide ?? '') === myid &&
+              Number(v.order) === standingOrder &&
+              v.what
+          );
+          if (iSignedStanding) continue; // waiting on the other side, not my move
+
+          const lastNegom = negom.length > 0 ? negom[negom.length - 1] : null;
+          decisions.push({
+            id: decision.id,
+            projectId: project.id,
+            decision: 'saleClaim',
+            priority: 10,
+            myid,
+            kind: 'saleClaim',
+            createdAt: decision.attributes.createdAt,
+            vots,
+            users: vots,
+            timegramaId: decision.attributes.timegrama?.data?.id,
+            timegramaDate: decision.attributes.timegrama?.data?.attributes?.date,
+            // saleClaim-specific payload for the card + negotiation drawer.
+            saleClaim: {
+              saleId: String(sale.id),
+              holderId,
+              reporterId,
+              iAmHolder: myid === holderId,
+              iAmReporter: myid === reporterId,
+              standingOrder,
+              negom,
+              holderName: sale.attributes?.users_permissions_user?.data?.attributes?.username ?? '',
+              productName: sale.attributes?.matanot?.data?.attributes?.name ?? '',
+              current: {
+                unit: sale.attributes?.unit,
+                in: sale.attributes?.in,
+                startDate: sale.attributes?.startDate,
+                finishDate: sale.attributes?.finishDate
+              },
+              // The version currently on the table (last negom round, or the
+              // original sale values for round 1).
+              standing: lastNegom
+                ? {
+                    hm: lastNegom.hm,
+                    price: lastNegom.price,
+                    kindOf: lastNegom.kindOf,
+                    sqadualed: lastNegom.sqadualed,
+                    sqadualedf: lastNegom.sqadualedf,
+                    descrip: lastNegom.descrip
+                  }
+                : {
+                    hm: sale.attributes?.unit,
+                    price:
+                      sale.attributes?.unit && Number(sale.attributes.unit) !== 0
+                        ? Number(sale.attributes.in) / Number(sale.attributes.unit)
+                        : sale.attributes?.in,
+                    kindOf: null,
+                    sqadualed: sale.attributes?.startDate,
+                    sqadualedf: sale.attributes?.finishDate,
+                    descrip: null
+                  }
+            }
+          } as any);
+          continue;
+        }
+
         decisions.push({
           id: decision.id,
           projectId: project.id,
-          decision: decision.attributes.kind || '',
+          decision: kind,
           priority: 10,
           myid: userData.id,
           // Additional fields
-          kind: decision.attributes.kind || '',
+          kind,
           createdAt: decision.attributes.createdAt,
-          vots: decision.attributes.vots || [],
-          users: decision.attributes.vots || [], // normalize for processor
+          vots,
+          users: vots, // normalize for processor
           timegramaId: decision.attributes.timegrama?.data?.id,
           timegramaDate: decision.attributes.timegrama?.data?.attributes?.date,
           newpic: decision.attributes.newpic?.data?.attributes?.url, // Matches hachla logic extracting url
