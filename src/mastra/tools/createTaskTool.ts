@@ -11,7 +11,8 @@ export const createTaskTool = createTool({
     name: z.string().describe('Short name/title of the task'),
     description: z.string().optional().describe('Detailed description of the task'),
     link: z.string().optional().describe('Optional URL related to the task'),
-    assignedUserId: z.string().optional().describe('ID of the user to assign this task to. If not provided, it remains unassigned or assigned to a role.'),
+    assignedUserId: z.string().optional().describe('ID of the person (project member) to assign this task to. Use getProjectMembersTool to resolve a name to an ID. Mutually exclusive with tafkidims.'),
+    tafkidims: z.array(z.string()).optional().describe('IDs of the roles (tafkidim) to assign this task to, when it is assigned to a role rather than a specific person. Use getProjectMembersTool to resolve a role name to an ID. Mutually exclusive with assignedUserId.'),
     missionId: z.string().optional().describe('ID of the specific mission (mesimabetahaliches) this task belongs to'),
     hashivut: z.enum(['white', 'green', 'yellow', 'red']).default('white').describe('Urgency level of the task'),
     dateS: z.string().optional().describe('Start date (ISO format)'),
@@ -31,12 +32,21 @@ export const createTaskTool = createTool({
     const fetchInstance = ctx.fetchInstance;
     const adminToken = process.env.ADMINMONTHER || '';
 
-    console.log(`[createTaskTool] Executing for user: ${userId}`, inputData);
+    // A task is assigned to a specific person only when assignedUserId is given.
+    // When roles (tafkidims) are provided instead, the underlying action stores
+    // them as a role assignment (isAssigned = false).
+    const hasRoles = Array.isArray(inputData.tafkidims) && inputData.tafkidims.length > 0;
+    const actionParams = {
+      ...inputData,
+      isAssigned: inputData.assignedUserId ? true : !hasRoles
+    };
+
+    console.log(`[createTaskTool] Executing for user: ${userId}`, actionParams);
 
     try {
       const result = await actionService.executeAction(
         'createTask',
-        inputData,
+        actionParams,
         {
           userId,
           jwt: adminToken, // Use admin token to perform action on behalf of user

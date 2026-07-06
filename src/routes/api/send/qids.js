@@ -3326,6 +3326,20 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
+  // People (members) and roles (tafkidim) of a project — used to resolve a task
+  // assignee ("for a person or a role") by name when creating an Act via chat/MCP/Telegram.
+  'getProjectPeopleAndRoles': `query GetProjectPeopleAndRoles($pid: ID!) {
+    project(id: $pid) {
+      data {
+        id
+        attributes {
+          projectName
+          user_1s { data { id attributes { username } } }
+          tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+        }
+      }
+    }
+  }`,
   '125createAskm': `mutation CreateAskm($publishedAt: DateTime!, $openMashaabimId: ID!, $projectId: ID!, $spId: ID!, $userId: ID!, $vots: [ComponentProjectsVotsInput], $archived: Boolean) {
     createAskm(data: {
       publishedAt: $publishedAt,

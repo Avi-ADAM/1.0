@@ -3,6 +3,7 @@ import { Telegraf, Markup } from 'telegraf';
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { startTimer, stopTimer, saveTimer, updateTimer } from '$lib/func/timers.js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { actionService } from '$lib/server/actions/index.js';
 // createServer is likely not needed when using SvelteKit endpoint for webhook
 // import { createServer } from 'https';
 
@@ -87,7 +88,22 @@ const translations = {
         invalidSaleQty: '❌ כמות לא תקינה. הכנס/י מספר שלם חיובי.',
         invalidSalePrice: '❌ מחיר לא תקין. הכנס/י מספר חיובי.',
         invalidSaleDate: '❌ תאריך לא תקין. השתמש/י בפורמט: DD/MM/YYYY',
-        chooseHolder: '👤 בחר/י מי יחזיק את הכסף:'
+        chooseHolder: '👤 בחר/י מי יחזיק את הכסף:',
+        newTaskBtn: '📝 מטלה חדשה',
+        chooseTaskProject: '📂 בחר/י פרויקט למטלה:',
+        noProjectsForTask: 'לא נמצאו פרויקטים שאת/ה חבר/ה בהם.',
+        chooseAssigneeType: '👥 למי לשייך את המטלה?',
+        assignToPersonBtn: '👤 לאדם',
+        assignToRoleBtn: '🎗️ לתפקיד',
+        assignToNoneBtn: '📋 ללא שיוך',
+        chooseTaskPerson: '👤 בחר/י אדם:',
+        chooseTaskRole: '🎗️ בחר/י תפקיד:',
+        noPeopleInProject: 'לא נמצאו חברים בפרויקט זה.',
+        noRolesInProject: 'לא נמצאו תפקידים בפרויקט זה.',
+        taskNamePrompt: '✍️ שלח/י את שם המטלה (טקסט חופשי):',
+        taskCreated: '✅ המטלה "{{name}}" נוצרה בהצלחה!',
+        taskError: '❌ שגיאה ביצירת המטלה. נסה/י שוב.',
+        taskCancelled: 'יצירת המטלה בוטלה.'
     },
     en: {
         welcome: 'Welcome to 1💗1',
@@ -157,11 +173,26 @@ const translations = {
         invalidSaleQty: '❌ Invalid quantity. Please enter a positive integer.',
         invalidSalePrice: '❌ Invalid price. Please enter a positive number.',
         invalidSaleDate: '❌ Invalid date. Use format: DD/MM/YYYY',
-        chooseHolder: '👤 Choose who holds the money:'
+        chooseHolder: '👤 Choose who holds the money:',
+        newTaskBtn: '📝 New Task',
+        chooseTaskProject: '📂 Choose a project for the task:',
+        noProjectsForTask: 'No projects found that you are a member of.',
+        chooseAssigneeType: '👥 Who should the task be assigned to?',
+        assignToPersonBtn: '👤 A person',
+        assignToRoleBtn: '🎗️ A role',
+        assignToNoneBtn: '📋 Unassigned',
+        chooseTaskPerson: '👤 Choose a person:',
+        chooseTaskRole: '🎗️ Choose a role:',
+        noPeopleInProject: 'No members found in this project.',
+        noRolesInProject: 'No roles found in this project.',
+        taskNamePrompt: '✍️ Send the task name (free text):',
+        taskCreated: '✅ Task "{{name}}" created successfully!',
+        taskError: '❌ Error creating the task. Please try again.',
+        taskCancelled: 'Task creation cancelled.'
     } // Add other EN translations if needed
 };
 
-import { TELEGRAM_BOT_TOKEN_NEW, GEMINI_API_KEY } from '$env/static/private';
+import { TELEGRAM_BOT_TOKEN_NEW, GEMINI_API_KEY, ADMINMONTHER } from '$env/static/private';
 
 // --- הגדרות ומשתנים גלובליים ---
 const Token = TELEGRAM_BOT_TOKEN_NEW;
@@ -180,6 +211,12 @@ let appIds = [];
 // State for tracking pending datetime edits per user
 const pendingEdits = new Map();
 // key: userId string, value: { missionId, timerId, projectId, index, field, intervals, totalHours }
+
+// State for tracking in-progress task creation per user
+const pendingTask = new Map();
+// key: userId string
+// value: { projectId, projectName, assignedUserId, assigneeName,
+//          tafkidId, roleName, pendingField: null|'name' }
 
 // State for tracking in-progress sale per user
 const pendingSale = new Map();
@@ -302,6 +339,41 @@ async function getUserProducts(uid, fetchInstance) {
     } catch (error) {
         console.error('getUserProducts error:', error);
         return [];
+    }
+}
+
+// Fetch the projects a user is a member of (for task creation)
+async function getUserProjectsForTask(uid, fetchInstance) {
+    try {
+        const res = await sendToSer({ uid }, '64getUserProjectList', uid, 0, true, fetchInstance);
+        const projects = res?.data?.usersPermissionsUser?.data?.attributes?.projects_1s?.data ?? [];
+        return projects.map(p => ({ id: p.id, name: p.attributes.projectName }));
+    } catch (error) {
+        console.error('getUserProjectsForTask error:', error);
+        return [];
+    }
+}
+
+// Fetch a project's people (members) and roles (tafkidim) for task assignment
+async function getProjectPeopleAndRoles(projectId, fetchInstance) {
+    try {
+        const res = await sendToSer({ pid: projectId }, 'getProjectPeopleAndRoles', 0, 0, true, fetchInstance);
+        const attrs = res?.data?.project?.data?.attributes;
+        const people = (attrs?.user_1s?.data ?? []).map(u => ({
+            id: u.id,
+            username: u.attributes?.username ?? `#${u.id}`
+        }));
+        const roles = (attrs?.tafkidims?.data ?? []).map(r => ({
+            id: r.id,
+            roleDescription:
+                r.attributes?.localizations?.data?.[0]?.attributes?.roleDescription ||
+                r.attributes?.roleDescription ||
+                `#${r.id}`
+        }));
+        return { projectName: attrs?.projectName ?? '', people, roles };
+    } catch (error) {
+        console.error('getProjectPeopleAndRoles error:', error);
+        return { projectName: '', people: [], roles: [] };
     }
 }
 
@@ -572,7 +644,8 @@ bot.start(async (ctx) => {
                 [Markup.button.url(getText('login', lang), 'https://1lev1.com/login')],
                 [Markup.button.callback(getText('startTimerBtn', lang), `timerStart-${userInfo.uid}`)],
                 [Markup.button.callback(getText('stopTimerBtn', lang), `timerStop-${userInfo.uid}`)],
-                [Markup.button.callback(getText('reportSaleBtn', lang), `reportSale-${userInfo.uid}`)]
+                [Markup.button.callback(getText('reportSaleBtn', lang), `reportSale-${userInfo.uid}`)],
+                [Markup.button.callback(getText('newTaskBtn', lang), `newTask-${userInfo.uid}`)]
             ]).resize()
         );
     } else {
@@ -1373,6 +1446,236 @@ bot.action(/^saleCancel-(\d+)$/, async (ctx) => {
     await ctx.editMessageText(getText('saleCancelled', lang)).catch(() => {});
 });
 
+// ─── Task (Act) Creation Handlers ──────────────────────────────────────────
+
+// Persist the assembled task via the Unified Action System (fires notifications).
+async function finalizeTask(ctx, uid, lang, fetch) {
+    const task = pendingTask.get(uid);
+    if (!task || !task.projectId || !task.name) {
+        ctx.reply(getText('generalError', lang));
+        return;
+    }
+    try {
+        const params = {
+            projectId: task.projectId,
+            name: task.name,
+            // A person assignment takes precedence; otherwise a role assignment;
+            // otherwise the task stays unassigned at the project level.
+            isAssigned: task.assignedUserId ? true : !task.tafkidId
+        };
+        if (task.assignedUserId) params.assignedUserId = task.assignedUserId;
+        if (task.tafkidId) params.tafkidims = [task.tafkidId];
+
+        const result = await actionService.executeAction('createTask', params, {
+            userId: String(uid),
+            jwt: ADMINMONTHER,
+            lang,
+            fetch
+        });
+
+        if (result?.success) {
+            pendingTask.delete(uid);
+            ctx.reply(getText('taskCreated', lang, { name: task.name }));
+        } else {
+            console.error('finalizeTask action error:', result?.error);
+            ctx.reply(getText('taskError', lang));
+        }
+    } catch (error) {
+        console.error('finalizeTask error:', error);
+        ctx.reply(getText('taskError', lang));
+    }
+}
+
+// Step 1: choose a project
+bot.action(/^newTask-(\d+)$/, async (ctx) => {
+    const userId = ctx.match[1];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    const fetch = ctx.update.fetch;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    try {
+        const projects = await getUserProjectsForTask(userId, fetch);
+        await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+        if (projects.length === 0) {
+            ctx.reply(getText('noProjectsForTask', lang));
+        } else {
+            const buttons = projects.map(p => [
+                Markup.button.callback(p.name, `taskProj-${p.id}-${userId}`)
+            ]);
+            buttons.push([Markup.button.callback(getText('cancelEdit', lang), `taskCancel-${userId}`)]);
+            ctx.reply(getText('chooseTaskProject', lang), Markup.inlineKeyboard(buttons).resize());
+        }
+    } catch (error) {
+        console.error('newTask error:', error);
+        ctx.reply(getText('aiActionFailed', lang));
+    }
+    await ctx.answerCbQuery();
+});
+
+// Step 2: project chosen → choose assignee type
+bot.action(/^taskProj-(\d+)-(\d+)$/, async (ctx) => {
+    const projectId = ctx.match[1];
+    const userId = ctx.match[2];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    pendingTask.set(userId.toString(), {
+        projectId,
+        projectName: '',
+        assignedUserId: null,
+        assigneeName: null,
+        tafkidId: null,
+        roleName: null,
+        name: null,
+        pendingField: null
+    });
+
+    await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+    ctx.reply(getText('chooseAssigneeType', lang), Markup.inlineKeyboard([
+        [Markup.button.callback(getText('assignToPersonBtn', lang), `taskAsPerson-${userId}`)],
+        [Markup.button.callback(getText('assignToRoleBtn', lang), `taskAsRole-${userId}`)],
+        [Markup.button.callback(getText('assignToNoneBtn', lang), `taskAsNone-${userId}`)],
+        [Markup.button.callback(getText('cancelEdit', lang), `taskCancel-${userId}`)]
+    ]).resize());
+    await ctx.answerCbQuery();
+});
+
+// Step 3a: assign to a person → list members
+bot.action(/^taskAsPerson-(\d+)$/, async (ctx) => {
+    const userId = ctx.match[1];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    const fetch = ctx.update.fetch;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    const task = pendingTask.get(userId.toString());
+    if (!task) { ctx.reply(getText('generalError', lang)); return ctx.answerCbQuery(); }
+
+    const { people } = await getProjectPeopleAndRoles(task.projectId, fetch);
+    await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+    if (people.length === 0) {
+        ctx.reply(getText('noPeopleInProject', lang));
+    } else {
+        const buttons = people.map(p => [
+            Markup.button.callback(p.username, `taskPerson-${p.id}-${userId}`)
+        ]);
+        buttons.push([Markup.button.callback(getText('cancelEdit', lang), `taskCancel-${userId}`)]);
+        ctx.reply(getText('chooseTaskPerson', lang), Markup.inlineKeyboard(buttons).resize());
+    }
+    await ctx.answerCbQuery();
+});
+
+// Step 3b: assign to a role → list roles
+bot.action(/^taskAsRole-(\d+)$/, async (ctx) => {
+    const userId = ctx.match[1];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    const fetch = ctx.update.fetch;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    const task = pendingTask.get(userId.toString());
+    if (!task) { ctx.reply(getText('generalError', lang)); return ctx.answerCbQuery(); }
+
+    const { roles } = await getProjectPeopleAndRoles(task.projectId, fetch);
+    await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+    if (roles.length === 0) {
+        ctx.reply(getText('noRolesInProject', lang));
+    } else {
+        const buttons = roles.map(r => [
+            Markup.button.callback(r.roleDescription, `taskRole-${r.id}-${userId}`)
+        ]);
+        buttons.push([Markup.button.callback(getText('cancelEdit', lang), `taskCancel-${userId}`)]);
+        ctx.reply(getText('chooseTaskRole', lang), Markup.inlineKeyboard(buttons).resize());
+    }
+    await ctx.answerCbQuery();
+});
+
+// Step 3c: unassigned → prompt for task name
+bot.action(/^taskAsNone-(\d+)$/, async (ctx) => {
+    const userId = ctx.match[1];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    const task = pendingTask.get(userId.toString());
+    if (!task) { ctx.reply(getText('generalError', lang)); return ctx.answerCbQuery(); }
+
+    task.assignedUserId = null;
+    task.tafkidId = null;
+    task.pendingField = 'name';
+    await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+    ctx.reply(getText('taskNamePrompt', lang), Markup.inlineKeyboard([
+        [Markup.button.callback(getText('cancelEdit', lang), `taskCancel-${userId}`)]
+    ]).resize());
+    await ctx.answerCbQuery();
+});
+
+// Person selected → prompt for task name
+bot.action(/^taskPerson-(\d+)-(\d+)$/, async (ctx) => {
+    const personId = ctx.match[1];
+    const userId = ctx.match[2];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    const fetch = ctx.update.fetch;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    const task = pendingTask.get(userId.toString());
+    if (!task) { ctx.reply(getText('generalError', lang)); return ctx.answerCbQuery(); }
+
+    const { people } = await getProjectPeopleAndRoles(task.projectId, fetch);
+    const person = people.find(p => p.id == personId);
+    task.assignedUserId = personId;
+    task.assigneeName = person?.username ?? null;
+    task.tafkidId = null;
+    task.pendingField = 'name';
+
+    await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+    ctx.reply(getText('taskNamePrompt', lang), Markup.inlineKeyboard([
+        [Markup.button.callback(getText('cancelEdit', lang), `taskCancel-${userId}`)]
+    ]).resize());
+    await ctx.answerCbQuery();
+});
+
+// Role selected → prompt for task name
+bot.action(/^taskRole-(\d+)-(\d+)$/, async (ctx) => {
+    const roleId = ctx.match[1];
+    const userId = ctx.match[2];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    const fetch = ctx.update.fetch;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    const task = pendingTask.get(userId.toString());
+    if (!task) { ctx.reply(getText('generalError', lang)); return ctx.answerCbQuery(); }
+
+    const { roles } = await getProjectPeopleAndRoles(task.projectId, fetch);
+    const role = roles.find(r => r.id == roleId);
+    task.tafkidId = roleId;
+    task.roleName = role?.roleDescription ?? null;
+    task.assignedUserId = null;
+    task.pendingField = 'name';
+
+    await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+    ctx.reply(getText('taskNamePrompt', lang), Markup.inlineKeyboard([
+        [Markup.button.callback(getText('cancelEdit', lang), `taskCancel-${userId}`)]
+    ]).resize());
+    await ctx.answerCbQuery();
+});
+
+// Cancel task creation
+bot.action(/^taskCancel-(\d+)$/, async (ctx) => {
+    const userId = ctx.match[1];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    pendingTask.delete(userId.toString());
+    await ctx.answerCbQuery(lang === 'he' ? 'בוטל' : 'Cancelled');
+    await ctx.editMessageText(getText('taskCancelled', lang)).catch(() => {});
+});
+
 // --- Text Message Handler (Using global fetch for helpers) ---
 bot.on('text', async (ctx) => {
     const userText = ctx.message.text;
@@ -1493,6 +1796,26 @@ bot.on('text', async (ctx) => {
                 ...buildSaleCardKeyboard(sale, uid, lang)
             });
             sale.messageId = msg.message_id;
+            return;
+        }
+
+        // Handle pending task name input → create the task
+        if (pendingTask.has(uid) && pendingTask.get(uid).pendingField === 'name') {
+            const cancelWords = ['ביטול', 'בטל', 'cancel', 'stop', 'quit'];
+            if (cancelWords.includes(userText.trim().toLowerCase())) {
+                pendingTask.delete(uid);
+                await ctx.reply(getText('taskCancelled', lang));
+                return;
+            }
+            const name = userText.trim();
+            if (!name) {
+                await ctx.reply(getText('taskNamePrompt', lang));
+                return;
+            }
+            const task = pendingTask.get(uid);
+            task.name = name.slice(0, 200);
+            task.pendingField = null;
+            await finalizeTask(ctx, uid, lang, fetch);
             return;
         }
 
