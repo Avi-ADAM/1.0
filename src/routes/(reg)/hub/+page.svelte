@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+  import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
   import KpiBar from '$lib/components/hub/KpiBar.svelte';
   import HubHeader from '$lib/components/hub/HubHeader.svelte';
@@ -63,6 +65,34 @@
     { icon: '🧠', label: labels.moach, href: '/moach', badge: 0 },
     { icon: '👤', label: labels.me,    href: '/me',    badge: 0 }
   ]);
+
+  onMount(() => {
+    // Warm the lev stores while the user reads the hub — /lev is the main
+    // destination from here and its full query takes a long time cold.
+    // Deferred to idle time so it never competes with the hub's own streamed
+    // load, and dynamically imported so the lev data pipeline stays out of
+    // the hub bundle. initializeLevData dedupes against the lev page's own
+    // load, so navigating mid-prefetch never doubles query 83.
+    const schedule = (cb: () => void) =>
+      typeof window.requestIdleCallback === 'function'
+        ? window.requestIdleCallback(cb, { timeout: 4000 })
+        : window.setTimeout(cb, 1500);
+
+    schedule(async () => {
+      if (!page.data.uid) return;
+      try {
+        const [{ initializeLevData }, { dataMode }, { get }] = await Promise.all([
+          import('$lib/utils/levDataLoader'),
+          import('$lib/stores/levStores'),
+          import('svelte/store')
+        ]);
+        if (get(dataMode) === 'full') return; // already warm from an earlier visit
+        await initializeLevData(page.data.uid, '', page.data.lang ?? 'he');
+      } catch (e) {
+        console.warn('[hub] lev prefetch failed:', e?.message);
+      }
+    });
+  });
 </script>
 
 <svelte:head>

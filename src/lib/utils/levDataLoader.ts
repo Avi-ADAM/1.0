@@ -65,6 +65,10 @@ import {
 import { fetchMainUserData, fetchOpenMissions } from './levGraphQLQueries';
 import { resolvePlatformIdentity } from '$lib/stores/platformStore';
 
+// Single in-flight full load, keyed by user id — lets concurrent callers
+// (hub prefetch, lev page, focus-path background refresh) share one query 83.
+let inFlightLoad: { key: string; promise: Promise<void> } | null = null;
+
 
 /**
  * Initialize lev data from snapshot or fetch fresh data from server
@@ -93,7 +97,29 @@ import { resolvePlatformIdentity } from '$lib/stores/platformStore';
  * }
  * ```
  */
-export async function initializeLevData(
+export function initializeLevData(
+  userId: string,
+  token: string,
+  lang: string
+): Promise<void> {
+  // Dedupe concurrent full loads (e.g. the hub prefetch racing the lev page's
+  // own load): query 83 is expensive — share the in-flight promise instead of
+  // firing it twice against the backend.
+  if (inFlightLoad && inFlightLoad.key === String(userId)) {
+    console.log('⏳ [levDataLoader] Full load already in flight, reusing it');
+    return inFlightLoad.promise;
+  }
+
+  const promise = doInitializeLevData(userId, token, lang).finally(() => {
+    if (inFlightLoad?.promise === promise) {
+      inFlightLoad = null;
+    }
+  });
+  inFlightLoad = { key: String(userId), promise };
+  return promise;
+}
+
+async function doInitializeLevData(
   userId: string,
   token: string,
   lang: string
