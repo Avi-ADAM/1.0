@@ -13,6 +13,20 @@ if (process.env.ADAPTER === 'vercel') {
       })
     }
   };
+} else if (process.env.ADAPTER === 'mobile') {
+  // Tauri (Android/desktop) build: pure SPA, no SvelteKit server at runtime.
+  // All /api/* traffic must go to the remote server (VITE_URL) — see $lib/platform.
+  config = {
+    kit: {
+      adapter: staticAdapter({
+        pages: 'build',
+        assets: 'build',
+        fallback: 'index.html',
+        precompress: false,
+        strict: false
+      })
+    }
+  };
 } else if (process.env.ADAPTER === 'static') {
   config = {
     kit: {
