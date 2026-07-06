@@ -7,6 +7,48 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 
+/**
+ * Resolve the users who should be notified when a task is assigned to a role.
+ * Returns the holders of the given roles (tafkidim) that are also members of
+ * this project, so a role assignment notifies only the relevant role holders
+ * rather than every project member.
+ */
+async function resolveRoleHoldersInProject(
+  strapi: any,
+  context: any,
+  roleIds: string[],
+  projectId: string
+): Promise<string[]> {
+  try {
+    const [rolesRes, projRes] = await Promise.all([
+      strapi.execute('getRolesHolders', { ids: roleIds }, context.jwt, context.fetch),
+      strapi.execute('128getProjectMembersAndRestime', { pid: String(projectId) }, context.jwt, context.fetch)
+    ]);
+
+    const holderIds = new Set<string>();
+    for (const role of rolesRes?.data?.tafkidims?.data ?? []) {
+      for (const u of role?.attributes?.users_permissions_users?.data ?? []) {
+        if (u?.id != null) holderIds.add(String(u.id));
+      }
+    }
+
+    const memberIds = new Set<string>(
+      (projRes?.data?.project?.data?.attributes?.user_1s?.data ?? [])
+        .map((u: any) => String(u.id))
+    );
+
+    // Prefer role holders that are members of THIS project. If project
+    // membership couldn't be resolved, fall back to the raw role holders.
+    const scoped = [...holderIds].filter((id) => memberIds.has(id));
+    if (scoped.length > 0) return scoped;
+    if (memberIds.size === 0) return [...holderIds];
+    return [];
+  } catch (error) {
+    console.error('[createTask] resolveRoleHoldersInProject error:', error);
+    return [];
+  }
+}
+
 const createTaskHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const {
     projectId,
@@ -106,14 +148,22 @@ const createTaskHandler: ActionExecutionHandler = async (params, context, { stra
 
   const createdAct = result.data.createAct.data;
 
-  // If the task is assigned to a specific person who is NOT the creator,
-  // that person is the direct recipient (notified on every channel).
-  // Otherwise `notifyUserIds` stays empty and the notification rule falls
-  // back to the project members.
-  const notifyUserIds =
-    isAssigned && assignedUserId && String(assignedUserId) !== String(context.userId)
-      ? [String(assignedUserId)]
-      : [];
+  // Determine the direct recipients (notified on every channel):
+  //  - assigned to a specific person other than the creator → that person.
+  //  - assigned to a role → the holders of that role within this project.
+  //  - otherwise → empty, so the notification rule falls back to project members.
+  let notifyUserIds: string[] = [];
+  if (isAssigned && assignedUserId && String(assignedUserId) !== String(context.userId)) {
+    notifyUserIds = [String(assignedUserId)];
+  } else if (Array.isArray(tafkidims) && tafkidims.length > 0) {
+    const holders = await resolveRoleHoldersInProject(
+      strapi,
+      context,
+      tafkidims.map((id: any) => String(id)),
+      String(projectId)
+    );
+    notifyUserIds = holders.filter((id) => String(id) !== String(context.userId));
+  }
 
   return {
     ...createdAct,
