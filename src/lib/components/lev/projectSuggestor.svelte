@@ -2783,8 +2783,8 @@
             onmouseleave={() => hover('0')}
           >
             {#if skills}
-              {#each skills as skill}
-                <Tile bg="green" word={skill.attributes.skillName} />
+              {#each (skills?.data ?? skills ?? []) as skill}
+                <Tile bg="green" word={skill?.attributes?.skillName ?? skill} />
               {/each}
             {/if}
           </div>

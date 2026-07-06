@@ -147,35 +147,40 @@ export async function initializeLevData(
     // Step 3: Update all stores with fresh data
     populateStores(freshData, userId);
 
-    // Step 3.5: Fetch detailed data for top suggestions (optimization)
-    const suggestions = get(suggestionsStore);
-    if (suggestions.length > 0) {
-      console.log(`🌐 [levDataLoader] Fetching details for ${suggestions.length} suggestions`);
-      const topIds = suggestions.slice(0, 50).map(s => s.id); // Optimized to fetch top 50
-
-      try {
-        const detailsData = await fetchOpenMissions(
-          topIds,
-          lang
-        );
-
-        if (detailsData?.data?.openMissions?.data) {
-          updateSuggestionsWithDetails(detailsData.data.openMissions.data);
-          console.log('✅ [levDataLoader] Suggestions enriched with details');
-        }
-      } catch (err) {
-        console.warn('⚠️ [levDataLoader] Failed to fetch suggestion details', err);
-      }
-    }
-
-
     // Mark stores as fully loaded — must be set BEFORE saveCurrentSnapshot,
     // whose guard refuses to persist anything other than a full dataset.
     dataMode.set('full');
 
-    // Step 4: Save new snapshot
-    console.log('💾 [levDataLoader] Saving new snapshot');
-    saveCurrentSnapshot();
+    // Step 3.5 + 4 run in the background: suggestion enrichment (query 84) is
+    // a second server round-trip and must not delay first render — the cards
+    // update reactively when it lands. The snapshot is saved after enrichment
+    // so the persisted copy carries the enriched suggestions.
+    void (async () => {
+      const suggestions = get(suggestionsStore);
+      if (suggestions.length > 0) {
+        console.log(`🌐 [levDataLoader] Fetching details for ${suggestions.length} suggestions`);
+        const topIds = suggestions.slice(0, 50).map(s => s.id); // Optimized to fetch top 50
+
+        try {
+          const detailsData = await fetchOpenMissions(
+            import.meta.env.VITE_URL,
+            token,
+            topIds,
+            lang
+          );
+
+          if (detailsData?.data?.openMissions?.data) {
+            updateSuggestionsWithDetails(detailsData.data.openMissions.data);
+            console.log('✅ [levDataLoader] Suggestions enriched with details');
+          }
+        } catch (err) {
+          console.warn('⚠️ [levDataLoader] Failed to fetch suggestion details', err);
+        }
+      }
+
+      console.log('💾 [levDataLoader] Saving new snapshot');
+      saveCurrentSnapshot();
+    })();
 
     console.log('✅ [levDataLoader] Initialization complete');
   } catch (error) {
@@ -197,6 +202,22 @@ export async function initializeLevData(
 
     // No snapshot and fetch failed - this is a critical error
     throw error;
+  }
+}
+
+/**
+ * Check whether a restorable snapshot exists in localStorage.
+ *
+ * Lets the page decide synchronously (before kicking off the network load)
+ * whether it can render immediately from cached data — initializeLevData
+ * performs the actual restore.
+ */
+export function hasValidSnapshot(): boolean {
+  try {
+    const snapshot = loadSnapshot();
+    return !!snapshot && snapshot.version === getSnapshotVersion();
+  } catch {
+    return false;
   }
 }
 
