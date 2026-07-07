@@ -3343,6 +3343,32 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
+  // Users who hold the given roles (tafkidim) — used to notify only the role
+  // holders (intersected with project members) when a task is assigned to a role.
+  'getRolesHolders': `query GetRolesHolders($ids: [ID]) {
+    tafkidims(filters: { id: { in: $ids } }) {
+      data {
+        id
+        attributes {
+          users_permissions_users { data { id } }
+        }
+      }
+    }
+  }`,
+  // People (members) and roles (tafkidim) of a project — used to resolve a task
+  // assignee ("for a person or a role") by name when creating an Act via chat/MCP/Telegram.
+  'getProjectPeopleAndRoles': `query GetProjectPeopleAndRoles($pid: ID!) {
+    project(id: $pid) {
+      data {
+        id
+        attributes {
+          projectName
+          user_1s { data { id attributes { username } } }
+          tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+        }
+      }
+    }
+  }`,
   '125createAskm': `mutation CreateAskm($publishedAt: DateTime!, $openMashaabimId: ID!, $projectId: ID!, $spId: ID!, $userId: ID!, $vots: [ComponentProjectsVotsInput], $archived: Boolean) {
     createAskm(data: {
       publishedAt: $publishedAt,

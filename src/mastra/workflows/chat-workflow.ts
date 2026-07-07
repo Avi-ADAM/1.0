@@ -5,6 +5,7 @@ import { createTimerAgent } from '../agents/timer-agent';
 import { createNavigationAgent } from '../agents/navigation-agent';
 import { createGeneralHelpAgent } from '../agents/help-agent';
 import { createSaleAgent } from '../agents/sale-agent';
+import { createTaskAgent } from '../agents/task-agent';
 import {
   DEFAULT_AGENT_MAX_STEPS,
   getAgentReply
@@ -12,7 +13,7 @@ import {
 import { setMcpContext, clearMcpContext } from '../../lib/server/mcpContext.js';
 
 interface IntentResult {
-  type: 'timer' | 'navigation' | 'general' | 'report' | 'sale';
+  type: 'timer' | 'navigation' | 'general' | 'report' | 'sale' | 'task';
   confidence: number;
   details: {
     action?: string;
@@ -29,6 +30,7 @@ interface ChatOutput {
   timerAction?: any;
   dataUpdate?: any;
   projectCreation?: any;
+  taskCreation?: any;
   rawAgentMessages?: any[];
   components?: {
     type: 'voting' | 'summary' | 'proposal' | 'mission_list' | string;
@@ -75,7 +77,7 @@ const analyzeIntent = createStep({
     fetchInstance: z.any().optional(),
     currentPath: z.string().optional(),
     intent: z.object({
-      type: z.enum(['timer', 'navigation', 'general', 'report', 'sale']),
+      type: z.enum(['timer', 'navigation', 'general', 'report', 'sale', 'task']),
       confidence: z.number(),
       details: intentDetailsSchema
     })
@@ -208,7 +210,7 @@ const routeToAgent = createStep({
     fetchInstance: z.any().optional(),
     currentPath: z.string().optional(),
     intent: z.object({
-      type: z.enum(['timer', 'navigation', 'general', 'report', 'sale']),
+      type: z.enum(['timer', 'navigation', 'general', 'report', 'sale', 'task']),
       confidence: z.number(),
       details: intentDetailsSchema
     })
@@ -217,7 +219,7 @@ const routeToAgent = createStep({
     agentResult: z.any(),
     agentType: z.string(),
     intent: z.object({
-      type: z.enum(['timer', 'navigation', 'general', 'report', 'sale']),
+      type: z.enum(['timer', 'navigation', 'general', 'report', 'sale', 'task']),
       confidence: z.number(),
       details: intentDetailsSchema
     })
@@ -278,6 +280,17 @@ const routeToAgent = createStep({
         } else {
           agent = createSaleAgent(apiKey, language, userId);
           agentType = 'sale';
+        }
+        break;
+
+      case 'task':
+        if (!userId) {
+          // Creating tasks requires a registered, project-member user.
+          agent = createGeneralHelpAgent(apiKey, language);
+          agentType = 'general';
+        } else {
+          agent = createTaskAgent(apiKey, language, userId);
+          agentType = 'task';
         }
         break;
 
@@ -378,7 +391,7 @@ const processResponse = createStep({
     agentResult: z.any(),
     agentType: z.string(),
     intent: z.object({
-      type: z.enum(['timer', 'navigation', 'general', 'report', 'sale']),
+      type: z.enum(['timer', 'navigation', 'general', 'report', 'sale', 'task']),
       confidence: z.number(),
       details: intentDetailsSchema
     })
@@ -391,6 +404,7 @@ const processResponse = createStep({
     timerAction: z.any().optional(),
     dataUpdate: z.any().optional(),
     projectCreation: z.any().optional(),
+    taskCreation: z.any().optional(),
     rawAgentMessages: z.array(z.any()).optional(),
     components: z.array(z.any()).optional()
   }),
@@ -450,6 +464,11 @@ const processResponse = createStep({
             if (output.navigation) {
               response.navigation = output.navigation;
             }
+          }
+
+          // Handle new task (Act) creation
+          if (name === 'createTaskTool' && output?.success) {
+            response.taskCreation = output;
           }
 
           // Handle mission list representation (interactive buttons)
@@ -551,6 +570,7 @@ const chatWorkflow = createWorkflow({
     timerAction: z.any().optional(),
     dataUpdate: z.any().optional(),
     projectCreation: z.any().optional(),
+    taskCreation: z.any().optional(),
     components: z.array(z.any()).optional()
   })
 })

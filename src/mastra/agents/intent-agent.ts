@@ -26,7 +26,7 @@ const systemPrompt =
 
 החזר תמיד JSON בפורמט הבא:
 {
-  "type": "timer|navigation|general|report|sale",
+  "type": "timer|navigation|general|report|sale|task",
   "confidence": 0.0-1.0,
   "details": {
     "action": "start|stop|pause|resume|create|delete|navigate|help|confirm|deny|bug|feature|partnership|contact",
@@ -41,6 +41,7 @@ const systemPrompt =
 - general: עזרה כללית, שאלות, הסברים, ופעולות יצירה כמו יצירת פרויקטים חדשים
 - report: דיווח על תקלה/באג, הצעת פיצ'ר חדש, פנייה לשותפות, יצירת קשר עם צוות האתר
 - sale: דיווח מכירה של מוצר/מתנה מפרויקט (מכירה, ריפורט מכירה, מכרתי, דיווח על תשלום)
+- task: יצירת מטלה (Act) בתוך פרויקט, למשל "צור מטלה", "פתח מטלה חדשה בפרויקט X", "תוסיף מטלה לדנה", "מטלה עבור תפקיד העיצוב". שים לב: מטלה שונה מטיימר וממשימה בתהליך — זו יצירת פריט עבודה חדש עבור אדם או תפקיד.
 
 **טיפול באישורים והכחשות:**
 - אם המשתמש אומר "כן", "תודה", "בסדר", "אישור" וכו' - בדוק את ההקשר הקודם
@@ -66,6 +67,9 @@ const systemPrompt =
 הודעה ללא הקשר: "רוצה לדווח מכירה" -> {"type": "sale", "confidence": 0.95, "details": {"action": "create", "target": null, "context": "report_sale"}}
 הודעה ללא הקשר: "מכרתי מתנה" -> {"type": "sale", "confidence": 0.9, "details": {"action": "create", "target": null, "context": "report_sale"}}
 הודעה ללא הקשר: "דיווח על מכירה" -> {"type": "sale", "confidence": 0.95, "details": {"action": "create", "target": null, "context": "report_sale"}}
+הודעה ללא הקשר: "צור מטלה לבדוק את העיצוב בפרויקט האתר" -> {"type": "task", "confidence": 0.95, "details": {"action": "create", "target": "לבדוק את העיצוב", "context": "create_task"}}
+הודעה ללא הקשר: "תוסיף מטלה לדנה בפרויקט השיווק" -> {"type": "task", "confidence": 0.9, "details": {"action": "create", "target": null, "context": "create_task"}}
+הודעה ללא הקשר: "פתח מטלה עבור תפקיד המפתחים" -> {"type": "task", "confidence": 0.9, "details": {"action": "create", "target": null, "context": "create_task"}}
 
 **דוגמה לבקשת טיימר:**
 "הפעלת טיימר עבור בניית אתר מדהים ביופיו" -> {"type": "timer", "confidence": 0.95, "details": {"action": "start", "target": "בניית אתר מדהים ביופיו", "context": "start_timer_for_mission"}}
@@ -86,7 +90,7 @@ You are an intent analysis agent. Your task is to analyze the user's message and
 
 Always return JSON in this format:
 {
-  "type": "timer|navigation|general|report|sale",
+  "type": "timer|navigation|general|report|sale|task",
   "confidence": 0.0-1.0,
   "details": {
     "action": "start|stop|pause|resume|create|delete|navigate|help|confirm|deny|bug|feature|partnership|contact",
@@ -101,6 +105,7 @@ Intent types:
 - general: General help, questions, explanations, and creation actions like creating new projects
 - report: Reporting a bug/issue, suggesting a feature, partnership inquiry, or contacting the site team
 - sale: Reporting a sale of a product/gift from a project (sold something, report sale, sold a package)
+- task: Creating a task (Act) inside a project, e.g. "create a task", "add a task in project X", "add a task for Dana", "open a task for the design role". Note: a task is distinct from a timer or an in-progress mission — it is a new work item for a person or a role.
 
 **Handling confirmations and denials:**
 - If user says "yes", "thanks", "ok", "confirm", etc. - check previous context
@@ -125,6 +130,9 @@ No context: "I'm interested in a partnership" -> {"type": "report", "confidence"
 No context: "I want to contact the team" -> {"type": "report", "confidence": 0.85, "details": {"action": "contact", "target": null, "context": "contact_team"}}
 No context: "I want to report a sale" -> {"type": "sale", "confidence": 0.95, "details": {"action": "create", "target": null, "context": "report_sale"}}
 No context: "I sold a package" -> {"type": "sale", "confidence": 0.9, "details": {"action": "create", "target": null, "context": "report_sale"}}
+No context: "create a task to review the design in the website project" -> {"type": "task", "confidence": 0.95, "details": {"action": "create", "target": "review the design", "context": "create_task"}}
+No context: "add a task for Dana in the marketing project" -> {"type": "task", "confidence": 0.9, "details": {"action": "create", "target": null, "context": "create_task"}}
+No context: "open a task for the developers role" -> {"type": "task", "confidence": 0.9, "details": {"action": "create", "target": null, "context": "create_task"}}
 
 **Timer request example:**
 "start timer for building amazing website" -> {"type": "timer", "confidence": 0.95, "details": {"action": "start", "target": "building amazing website", "context": "start_timer_for_mission"}}
