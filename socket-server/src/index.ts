@@ -142,6 +142,24 @@ io.on('connection', (socket) => {
   }
   
   /**
+   * Space sync wake-up subscriptions (HANDOFF_DISTRIBUTED_DB T1).
+   * A replica subscribes to its spaceId; the relay pokes /space-changed after
+   * accepting new envelopes and everyone in the room gets a metadata-only
+   * 'space:changed' — no content ever flows through here.
+   */
+  socket.on('space:subscribe', (data: { spaceId?: unknown }) => {
+    const spaceId = typeof data?.spaceId === 'string' ? data.spaceId : null;
+    if (!spaceId || spaceId.length > 200) return;
+    socket.join(`space:${spaceId}`);
+  });
+
+  socket.on('space:unsubscribe', (data: { spaceId?: unknown }) => {
+    const spaceId = typeof data?.spaceId === 'string' ? data.spaceId : null;
+    if (!spaceId || spaceId.length > 200) return;
+    socket.leave(`space:${spaceId}`);
+  });
+
+  /**
    * Disconnect handler
    */
   socket.on('disconnect', (reason) => {
@@ -278,6 +296,37 @@ httpServer.on('request', async (req, res) => {
     return;
   }
   
+  // Space-changed wake-up (HANDOFF_DISTRIBUTED_DB T1) — called by the relay
+  // after accepting new envelopes. Metadata only: the body carries a spaceId,
+  // never event content.
+  if (req.method === 'POST' && req.url === '/space-changed') {
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body) as { spaceId?: unknown };
+        const spaceId = typeof data?.spaceId === 'string' ? data.spaceId : null;
+        if (!spaceId || spaceId.length > 200) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'spaceId (string) is required' }));
+          return;
+        }
+        io.to(`space:${spaceId}`).emit('space:changed', { spaceId });
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true }));
+      } catch (error) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          error: 'Invalid request',
+          message: error instanceof Error ? error.message : 'Unknown error'
+        }));
+      }
+    });
+    return;
+  }
+
   // 404 for unknown routes
   res.writeHead(404, { 'Content-Type': 'application/json' });
   res.end(JSON.stringify({ error: 'Not found' }));
