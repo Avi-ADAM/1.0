@@ -169,7 +169,11 @@
     });
   }
 
-  function chat() {}
+  function chat(payload) {
+    // Forward a card's chat request (e.g. saleClaim → { forumId }) to the page,
+    // which opens the shared chat drawer.
+    onChat?.(payload);
+  }
 
   function cards() {
     onCards?.({
@@ -239,6 +243,7 @@
     onHover,
     onCards,
     onProj,
+    onChat,
     adder = [],
     arr1 = $bindable([]),
     askedarr = [],

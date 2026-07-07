@@ -314,41 +314,38 @@
   let negoModal = $state(false);
   let nqty = $state(1);
   let nprice = $state(0);
-  let nnote = $state('');
   let negoBusy = $state(false);
 
   function openNego() {
     nqty = saleClaim?.standing?.hm ?? saleClaim?.current?.unit ?? 1;
     nprice = saleClaim?.standing?.price ?? 0;
-    nnote = '';
     negoModal = true;
   }
 
   async function sendNego() {
     if (negoBusy) return;
     negoBusy = true;
+    // projects.negom is numbers-only — a counter refines quantity/price/dates.
+    // Any explanation belongs in the decision chat, not a persisted note.
     const newValues = {
       hm: Number(nqty),
       price: Number(nprice),
       kindOf: saleClaim?.standing?.kindOf ?? null,
       sqadualed: saleClaim?.standing?.sqadualed ?? null,
-      sqadualedf: saleClaim?.standing?.sqadualedf ?? null,
-      descrip: nnote?.trim() || null
+      sqadualedf: saleClaim?.standing?.sqadualedf ?? null
     };
     try {
       const result = await executeAction('counterSaleClaim', {
         decisionId: String(askId),
         projectId: String(projectId),
-        newValues,
-        why: nnote?.trim() || undefined
+        newValues
       });
       if (result.success) {
         // Shadow-sign the proposal.counter with the resulting round number.
         shadowSignFromCookie(proposalCounterConsentSpec, {
           decisionId: String(askId),
           order: result.data?.order,
-          newValues,
-          why: nnote?.trim() || undefined
+          newValues
         });
         already = true;
         negoModal = false;
@@ -377,6 +374,29 @@
   let hovered = $state(false);
   function tochat() {
     onChat?.();
+  }
+
+  // saleClaim chat: ensure a forum exists on the Decision (bilateral discussion,
+  // the "clarify" path — never a veto) and hand its id up to the lev-page chat
+  // drawer, exactly like pendm/pmash vote cards.
+  let saleClaimForumId = $state(null);
+  async function openSaleClaimChat() {
+    let fid = saleClaimForumId;
+    if (!fid) {
+      try {
+        const r = await executeAction('ensureVoteForum', {
+          entityType: 'decision',
+          entityId: String(askId),
+          projectId: String(projectId)
+        });
+        if (r.success) fid = r.data?.forumId ?? null;
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    saleClaimForumId = fid;
+    if (fid) onChat?.({ forumId: String(fid) });
+    else onChat?.();
   }
   let w = $state(0);
 
@@ -1334,6 +1354,8 @@
               <Card
                 onAgree={() => agree()}
                 onDecline={() => decline()}
+                onNegotiate={openNego}
+                onChat={openSaleClaimChat}
                 onHover={hoverc}
                 isVisible={false}
                 {already}
@@ -1343,6 +1365,7 @@
                 {low}
                 {kind}
                 {spdata}
+                {saleClaim}
                 {timegramaDate}
                 {restime}
                 {deadline}
@@ -1367,6 +1390,8 @@
   <Card
     onAgree={() => agree()}
     onDecline={() => decline()}
+    onNegotiate={openNego}
+    onChat={openSaleClaimChat}
     onHover={hoverc}
     {already}
     {projectName}
@@ -1379,6 +1404,7 @@
     {projectId}
     {onProj}
     {spdata}
+    {saleClaim}
     {timegramaDate}
     {restime}
     {deadline}
@@ -1428,11 +1454,6 @@
           >{$lang === 'en' ? 'on table:' : 'על השולחן:'} {saleClaim?.standing?.price ?? '—'}</span
         >
         <input class="nego-input" type="number" min="0" step="any" bind:value={nprice} />
-      </label>
-
-      <label class="nego-label">
-        {$lang === 'en' ? 'Note (optional)' : 'הערה (רשות)'}
-        <textarea class="nego-input" rows="2" maxlength="300" bind:value={nnote}></textarea>
       </label>
 
       <p class="nego-total">

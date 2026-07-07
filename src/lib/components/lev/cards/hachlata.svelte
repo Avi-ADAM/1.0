@@ -64,10 +64,14 @@
     onHover,
     onAgree,
     onDecline,
+    onNegotiate,
+    onChat,
     projectId,
     users = [],
     activeOrder = 0,
     onProj,
+    /** @type {any} bilateral saleClaim payload (reporter/holder, standing round, negom) */
+    saleClaim = null,
     /** @type {string} current value of the project field being changed */
     currentValue = '',
     /** @type {string} proposed new value */
@@ -76,6 +80,39 @@
   let user_1s = $derived.by(() => {
     return getProjectData(projectId, 'us') || [];
   });
+
+  // saleClaim is bilateral: only the reporter + claimed holder are participants,
+  // and the standing round (not order 0) is the "active" version. Restrict the
+  // avatars/counts to those two so the reporter's original claim reads as an
+  // approval of the standing round rather than an "old version" vote.
+  let displayMembers = $derived.by(() => {
+    if (kind !== 'saleClaim' || !saleClaim) return user_1s;
+    const ids = new Set(
+      [String(saleClaim.reporterId ?? ''), String(saleClaim.holderId ?? '')].filter(Boolean)
+    );
+    return (user_1s || []).filter((m) => ids.has(String(m.id)));
+  });
+  let effectiveActiveOrder = $derived(
+    kind === 'saleClaim' ? (saleClaim?.standingOrder ?? 1) : activeOrder
+  );
+
+  // Prefer the standing round; fall back to the sale's own values (current) so
+  // the numbers still render even if only `current` arrived.
+  let saleClaimQty = $derived(Number(saleClaim?.standing?.hm ?? saleClaim?.current?.unit ?? 0));
+  let saleClaimPrice = $derived(
+    Number(
+      saleClaim?.standing?.price ??
+        (saleClaim?.current?.unit && Number(saleClaim.current.unit) !== 0
+          ? Number(saleClaim.current.in) / Number(saleClaim.current.unit)
+          : saleClaim?.current?.in) ??
+        0
+    )
+  );
+  let saleClaimTotal = $derived(
+    saleClaim?.standing?.hm != null && saleClaim?.standing?.price != null
+      ? Number(saleClaim.standing.hm) * Number(saleClaim.standing.price)
+      : Number(saleClaim?.current?.in ?? saleClaimQty * saleClaimPrice)
+  );
   let zman = $state();
 
   onMount(() => {
@@ -107,6 +144,14 @@
   function decline(alr) {
     already = true;
     onDecline?.({ alr: alr });
+  }
+  function negotiate() {
+    // No absolute "no" for a saleClaim — refine via negotiation instead.
+    onNegotiate?.();
+  }
+  function chat() {
+    // Clarify/deep-discuss with the other party via the decision's forum.
+    onChat?.();
   }
   function linke(t) {
     console.log(t);
@@ -153,15 +198,15 @@
     {glowColor}
   >
     {#snippet voteSummary()}
-      {#if !isMobileOrTablet() && user_1s && user_1s.length > 0}
+      {#if !isMobileOrTablet() && displayMembers && displayMembers.length > 0}
         <div
           class="bg-white/70 dark:bg-gray-900/50 backdrop-blur-sm rounded-xl px-3 py-1.5 shadow-sm"
         >
           <VoteStatusDisplay
             compact
             votes={users || []}
-            members={user_1s}
-            {activeOrder}
+            members={displayMembers}
+            activeOrder={effectiveActiveOrder}
           />
         </div>
       {/if}
@@ -214,6 +259,56 @@
               ? equaliSplitedTr[$lang]
               : equaliSplitedFl[$lang]}
           </h5>
+        </div>
+      </div>
+    {:else if kind === 'saleClaim'}
+      <!-- Bilateral sale-holder consent: show the version currently on the
+           table (last negom round, or the original claim for round 1). -->
+      <div
+        class="space-y-3 bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700"
+      >
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+            {$lang === 'he' ? 'הכסף אצל' : 'Money held by'}
+          </span>
+          <span class="text-sm font-bold text-gray-800 dark:text-gray-100">
+            {saleClaim?.holderName || '—'}
+          </span>
+        </div>
+        {#if saleClaim?.productName}
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+              {$lang === 'he' ? 'מוצר' : 'Product'}
+            </span>
+            <span class="text-sm text-gray-800 dark:text-gray-100">{saleClaim.productName}</span>
+          </div>
+        {/if}
+
+        <div class="flex flex-col gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+          <span class="text-xs font-semibold text-barbi dark:text-mpink uppercase tracking-wide flex items-center gap-1">
+            <span>🧾</span>
+            {(saleClaim?.standingOrder ?? 1) > 1
+              ? $lang === 'he'
+                ? `הגרסה שעל השולחן (סבב ${saleClaim?.standingOrder})`
+                : `On the table (round ${saleClaim?.standingOrder})`
+              : $lang === 'he'
+                ? 'הדיווח'
+                : 'The claim'}
+          </span>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="bg-white dark:bg-gray-800 rounded-lg py-2 border border-gray-200 dark:border-gray-600">
+              <div class="text-[10px] text-gray-500 dark:text-gray-400">{$lang === 'he' ? 'כמות' : 'Qty'}</div>
+              <div class="font-bold text-gray-800 dark:text-gray-100">{saleClaimQty}</div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-lg py-2 border border-gray-200 dark:border-gray-600">
+              <div class="text-[10px] text-gray-500 dark:text-gray-400">{$lang === 'he' ? 'מחיר ליח׳' : 'Unit price'}</div>
+              <div class="font-bold text-gray-800 dark:text-gray-100">{saleClaimPrice}₪</div>
+            </div>
+            <div class="bg-barbi/5 dark:bg-mpink/10 rounded-lg py-2 border border-barbi/30 dark:border-mpink/30">
+              <div class="text-[10px] text-gray-500 dark:text-gray-400">{$lang === 'he' ? 'סה״כ' : 'Total'}</div>
+              <div class="font-extrabold text-barbi dark:text-mpink">{saleClaimTotal}₪</div>
+            </div>
+          </div>
         </div>
       </div>
     {:else if kind !== 'sheirutpends' && kind !== 'pic' && (currentValue || newValue)}
@@ -735,9 +830,13 @@
   </div>
 
   <!-- תצוגת משתמשים והצבעות (במידה והוזרק מה-DB המודרני) -->
-  {#if user_1s && user_1s.length > 0 && isMobileOrTablet()}
+  {#if displayMembers && displayMembers.length > 0 && isMobileOrTablet()}
     <div class="px-4 pb-3 bg-white dark:bg-slate-800">
-      <VoteStatusDisplay votes={users || []} members={user_1s} {activeOrder} />
+      <VoteStatusDisplay
+        votes={users || []}
+        members={displayMembers}
+        activeOrder={effectiveActiveOrder}
+      />
     </div>
   {/if}
   <!-- Actions Footer -->
@@ -746,14 +845,45 @@
   >
     {#if low == false}
       {#if already === false}
-        <button
-          class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold rounded-xl transition-all flex justify-center items-center"
-          onmouseenter={() => hover('התנגדות')}
-          onmouseleave={() => hover('0')}
-          onclick={() => decline('f')}
-        >
-          <No />
-        </button>
+        {#if kind === 'saleClaim'}
+          <!-- Clarify / deep-discuss with the other party (opens the decision forum). -->
+          <button
+            class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/40 font-bold rounded-xl transition-all flex justify-center items-center"
+            onmouseenter={() => hover($lang === 'he' ? 'צ׳אט / בירור' : 'chat / clarify')}
+            onmouseleave={() => hover('0')}
+            onclick={chat}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M12,3C6.5,3 2,6.58 2,11C2,13.13 3.04,15.06 4.74,16.5C4.59,17.92 4.06,19.19 3.28,20.28C3.13,20.5 3.06,20.75 3.14,21C3.23,21.28 3.5,21.44 3.79,21.44C6.05,21.44 7.84,20.5 9.17,19.24C10.06,19.5 11,19.66 12,19.66C17.5,19.66 22,16.08 22,11.66C22,7.24 17.5,3 12,3Z"
+              />
+            </svg>
+          </button>
+          <!-- No absolute "no": a saleClaim is refined via negotiation, never rejected. -->
+          <button
+            class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 font-bold rounded-xl transition-all flex justify-center items-center gap-2"
+            onmouseenter={() => hover($lang === 'he' ? 'משא-ומתן / דיוק' : 'negotiate / refine')}
+            onmouseleave={() => hover('0')}
+            onclick={negotiate}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M12,3A1,1 0 0,1 13,4V4.29L18.21,6.16L18.5,6.05A1,1 0 0,1 19.76,6.68L21.83,12.2C21.94,12.5 21.9,12.85 21.7,13.11C20.94,14.12 19.55,14.5 18.5,14.5C17.45,14.5 16.06,14.12 15.3,13.11C15.1,12.85 15.06,12.5 15.17,12.2L17,7.31L13,5.87V18H16A1,1 0 0,1 17,19A1,1 0 0,1 16,20H8A1,1 0 0,1 7,19A1,1 0 0,1 8,18H11V5.87L7,7.31L8.83,12.2C8.94,12.5 8.9,12.85 8.7,13.11C7.94,14.12 6.55,14.5 5.5,14.5C4.45,14.5 3.06,14.12 2.3,13.11C2.1,12.85 2.06,12.5 2.17,12.2L4.24,6.68A1,1 0 0,1 5.5,6.05L5.79,6.16L11,4.29V4A1,1 0 0,1 12,3M18.5,8.4L17.31,11.5H19.69L18.5,8.4M5.5,8.4L4.31,11.5H6.69L5.5,8.4Z"
+              />
+            </svg>
+          </button>
+        {:else}
+          <button
+            class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold rounded-xl transition-all flex justify-center items-center"
+            onmouseenter={() => hover('התנגדות')}
+            onmouseleave={() => hover('0')}
+            onclick={() => decline('f')}
+          >
+            <No />
+          </button>
+        {/if}
 
         <button
           class="flex-2 py-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex justify-center items-center"

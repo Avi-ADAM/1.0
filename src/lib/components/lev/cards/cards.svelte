@@ -318,641 +318,639 @@
 </script>
 
 {#if arr1.length > 0}
+  <div
+    dir={$isRtl ? 'rtl' : 'ltr'}
+    bind:clientWidth={h}
+    class="body box-border h-screen"
+  >
+    {#if !isMobileOrTablet()}
+      <img
+        onmouseenter={() => hoverc(nexttitle[$lang])}
+        onmouseleave={() => hoverc('0')}
+        class={$lang == 'he' ? 'perv' : '	next'}
+        src={srcb[$lang]}
+        alt={$lang == 'he' ? 'חזרה' : '	next'}
+      />
+      <img
+        onmouseenter={() => hoverc(pretitle[$lang])}
+        onmouseleave={() => hoverc('0')}
+        class={$lang == 'he' ? 'next' : 'perv'}
+        class:hidden={currentIndex == 0}
+        src={srca[$lang]}
+        alt={$lang == 'he' ? 'הבא' : '	next'}
+      />
       <div
-        dir={$isRtl ? 'rtl' : 'ltr'}
-        bind:clientWidth={h}
-        class="body box-border h-screen"
+        dir="ltr"
+        role="contentinfo"
+        onmouseenter={() => hoverc('שינוי התצוגה מקלפים למטבעות')}
+        onmouseleave={() => hoverc('0')}
+        style:visibility={low == true ? 'hidden' : 'visible'}
+        class="bg z-[1000] p-1 bg-white/70 backdrop-blur-md rounded-full shadow-md"
       >
-        {#if !isMobileOrTablet()}
-          <img
-            onmouseenter={() => hoverc(nexttitle[$lang])}
-            onmouseleave={() => hoverc('0')}
-            class={$lang == 'he' ? 'perv' : '	next'}
-            src={srcb[$lang]}
-            alt={$lang == 'he' ? 'חזרה' : '	next'}
-          />
-          <img
-            onmouseenter={() => hoverc(pretitle[$lang])}
-            onmouseleave={() => hoverc('0')}
-            class={$lang == 'he' ? 'next' : 'perv'}
-            class:hidden={currentIndex == 0}
-            src={srca[$lang]}
-            alt={$lang == 'he' ? 'הבא' : '	next'}
-          />
-          <div
-            dir="ltr"
-            role="contentinfo"
-            onmouseenter={() => hoverc('שינוי התצוגה מקלפים למטבעות')}
-            onmouseleave={() => hoverc('0')}
-            style:visibility={low == true ? 'hidden' : 'visible'}
-            class="bg z-[1000] p-1 bg-white/70 backdrop-blur-md rounded-full shadow-md"
-          >
-            <Switch
-              bind:value={cards}
-              onChange={() => change()}
-              design="multi"
-              options={[true, false]}
+        <Switch
+          bind:value={cards}
+          onChange={() => change()}
+          design="multi"
+          options={[true, false]}
+        />
+      </div>
+      <!-- Left Filter (Card Type) -->
+      <div
+        dir="ltr"
+        role="contentinfo"
+        onmouseenter={() => hoverc(filterT[$lang])}
+        onmouseleave={() => hoverc('0')}
+        style:visibility={low == true ? 'hidden' : 'visible'}
+        class="z-[1000] top-4 absolute left-4 flex flex-row items-start justify-start"
+      >
+        <button
+          class="w-12 h-12 flex items-center justify-center bg-white/90 backdrop-blur-md hover:bg-gold/80 rounded-full border-1 border-barbi shadow-lg transition-all duration-300"
+          onclick={() => (filter ? showall() : (filter = true))}
+        >
+          <FilterIcon filterType="cardType" isX={filter} /></button
+        >
+        {#if filter}
+          <div class="mt-2 ml-2">
+            <Filter
+              onShowonly={showonly}
+              {sug}
+              {pen}
+              {ask}
+              {wel}
+              {beta}
+              {des}
+              {fia}
+              {pmash}
+              {mashs}
+              {maap}
+              {askma}
+              {hachlot}
+              {saless}
+              {sheirutps}
+              filterKind="kind"
             />
           </div>
-          <!-- Left Filter (Card Type) -->
+        {/if}
+      </div>
+
+      <!-- Right Filter (Projects) -->
+      <div
+        dir="ltr"
+        role="contentinfo"
+        onmouseenter={() => hoverc(filterT[$lang])}
+        onmouseleave={() => hoverc('0')}
+        style:visibility={low == true ? 'hidden' : 'visible'}
+        class="z-[1000] top-4 absolute right-4 flex flex-row-reverse items-start justify-start"
+      >
+        {#if uniqueProjects.length >= 2}
+          <button
+            class="w-12 h-12 flex items-center justify-center bg-white/90 backdrop-blur-md hover:bg-gold/80 rounded-full border-1 border-barbi shadow-lg transition-all duration-300"
+            onclick={() => (filter2 ? showall() : (filter2 = true))}
+          >
+            <FilterIcon isX={filter2} /></button
+          >
+          {#if filter2}
+            <div class="mt-2 mr-2">
+              <Filter
+                allIds={uniqueProjects}
+                filterKind="projects"
+                onShowonly={showonly}
+              />
+            </div>
+          {/if}
+        {/if}
+      </div>
+    {:else if !low}
+      <div
+        class="fixed z-50 max-w-[95%] h-8 sm:max-w-lg -translate-x-1/2 bg-white border border-gray-200 rounded-full bottom-12 left-1/2 dark:bg-gray-700 dark:border-gray-600"
+      >
+        <div
+          class=" h-full max-w-lg flex space-x-2 flex-row mx-auto justify-center align-middle items-center"
+        >
+          {#if !filter}
+            <div
+              dir="ltr"
+              role="contentinfo"
+              onmouseenter={() => hoverc('שינוי התצוגה מקלפים למטבעות')}
+              onmouseleave={() => hoverc('0')}
+              style:visibility={low == true ? 'hidden' : 'visible'}
+              class="px-4 z-[1000]"
+            >
+              <Switch
+                bind:value={cards}
+                onChange={() => change()}
+                design="multi"
+                options={[true, false]}
+              />
+            </div>
+          {/if}
           <div
             dir="ltr"
             role="contentinfo"
             onmouseenter={() => hoverc(filterT[$lang])}
             onmouseleave={() => hoverc('0')}
             style:visibility={low == true ? 'hidden' : 'visible'}
-            class="z-[1000] top-4 absolute left-4 flex flex-row items-start justify-start"
+            class="z-[1000] px-4 flex flex-row items-center justify-center"
           >
             <button
-              class="w-12 h-12 flex items-center justify-center bg-white/90 backdrop-blur-md hover:bg-gold/80 rounded-full border-1 border-barbi shadow-lg transition-all duration-300"
+              class="w-10 h-10 flex items-center justify-center bg-white/90 backdrop-blur-md rounded-full border-1 border-barbi shadow-lg"
               onclick={() => (filter ? showall() : (filter = true))}
             >
-              <FilterIcon filterType="cardType" isX={filter} /></button
+              <FilterIcon isX={filter} filterType="cardType" /></button
             >
             {#if filter}
-              <div class="mt-2 ml-2">
-                <Filter
-                  onShowonly={showonly}
-                  {sug}
-                  {pen}
-                  {ask}
-                  {wel}
-                  {beta}
-                  {des}
-                  {fia}
-                  {pmash}
-                  {mashs}
-                  {maap}
-                  {askma}
-                  {hachlot}
-                  {saless}
-                  {sheirutps}
-                  filterKind="kind"
-                />
-              </div>
+              <Filter
+                onShowonly={showonly}
+                {sug}
+                {pen}
+                {ask}
+                {wel}
+                {beta}
+                {des}
+                {fia}
+                {pmash}
+                {mashs}
+                {maap}
+                {askma}
+                {hachlot}
+                {saless}
+                {sheirutps}
+                {purchasesn}
+                filterKind="kind"
+              />
             {/if}
-          </div>
-
-          <!-- Right Filter (Projects) -->
-          <div
-            dir="ltr"
-            role="contentinfo"
-            onmouseenter={() => hoverc(filterT[$lang])}
-            onmouseleave={() => hoverc('0')}
-            style:visibility={low == true ? 'hidden' : 'visible'}
-            class="z-[1000] top-4 absolute right-4 flex flex-row-reverse items-start justify-start"
-          >
-            {#if uniqueProjects.length >= 2}
-              <button
-                class="w-12 h-12 flex items-center justify-center bg-white/90 backdrop-blur-md hover:bg-gold/80 rounded-full border-1 border-barbi shadow-lg transition-all duration-300"
-                onclick={() => (filter2 ? showall() : (filter2 = true))}
-              >
-                <FilterIcon isX={filter2} /></button
-              >
-              {#if filter2}
-                <div class="mt-2 mr-2">
-                  <Filter
-                    allIds={uniqueProjects}
-                    filterKind="projects"
-                    onShowonly={showonly}
-                  />
-                </div>
-              {/if}
-            {/if}
-          </div>
-        {:else if !low}
-          <div
-            class="fixed z-50 max-w-[95%] h-8 sm:max-w-lg -translate-x-1/2 bg-white border border-gray-200 rounded-full bottom-12 left-1/2 dark:bg-gray-700 dark:border-gray-600"
-          >
-            <div
-              class=" h-full max-w-lg flex space-x-2 flex-row mx-auto justify-center align-middle items-center"
+            <button
+              class="w-10 h-10 flex items-center justify-center bg-white/90 backdrop-blur-md hover:bg-gold/80 rounded-full border-1 border-barbi shadow-lg"
+              onclick={() => (filter2 ? showall() : (filter2 = true))}
             >
-              {#if !filter}
-                <div
-                  dir="ltr"
-                  role="contentinfo"
-                  onmouseenter={() => hoverc('שינוי התצוגה מקלפים למטבעות')}
-                  onmouseleave={() => hoverc('0')}
-                  style:visibility={low == true ? 'hidden' : 'visible'}
-                  class="px-4 z-[1000]"
-                >
-                  <Switch
-                    bind:value={cards}
-                    onChange={() => change()}
-                    design="multi"
-                    options={[true, false]}
-                  />
-                </div>
-              {/if}
-              <div
-                dir="ltr"
-                role="contentinfo"
-                onmouseenter={() => hoverc(filterT[$lang])}
-                onmouseleave={() => hoverc('0')}
-                style:visibility={low == true ? 'hidden' : 'visible'}
-                class="z-[1000] px-4 flex flex-row items-center justify-center"
-              >
-                <button
-                  class="w-10 h-10 flex items-center justify-center bg-white/90 backdrop-blur-md rounded-full border-1 border-barbi shadow-lg"
-                  onclick={() => (filter ? showall() : (filter = true))}
-                >
-                  <FilterIcon isX={filter} filterType="cardType" /></button
-                >
-                {#if filter}
-                  <Filter
-                    onShowonly={showonly}
-                    {sug}
-                    {pen}
-                    {ask}
-                    {wel}
-                    {beta}
-                    {des}
-                    {fia}
-                    {pmash}
-                    {mashs}
-                    {maap}
-                    {askma}
-                    {hachlot}
-                    {saless}
-                    {sheirutps}
-                    {purchasesn}
-                    filterKind="kind"
-                  />
-                {/if}
-                <button
-                  class="w-10 h-10 flex items-center justify-center bg-white/90 backdrop-blur-md hover:bg-gold/80 rounded-full border-1 border-barbi shadow-lg"
-                  onclick={() => (filter2 ? showall() : (filter2 = true))}
-                >
-                  <FilterIcon isX={filter2} /></button
-                >
-                {#if filter2}
-                  <Filter
-                    allIds={uniqueProjects}
-                    filterKind="projects"
-                    onShowonly={showonly}
-                  />
-                {/if}
-              </div>
-            </div>
+              <FilterIcon isX={filter2} /></button
+            >
+            {#if filter2}
+              <Filter
+                allIds={uniqueProjects}
+                filterKind="projects"
+                onShowonly={showonly}
+              />
+            {/if}
           </div>
-        {/if}
+        </div>
+      </div>
+    {/if}
 
-        <div
-          role="contentinfo"
-          class="swi"
-          onmouseenter={() => hoverede()}
-          onmouseleave={() => hoverede()}
-        >
-          {#key swiperKey}
-            <Swiper
-              releaseOnEdges={true}
-              direction={!isMobileOrTablet() ? 'horizontal' : 'vertical'}
-              slidesPerView={isMobileOrTablet() ? 1 : 'auto'}
-              spaceBetween={isMobileOrTablet() ? 0 : null}
-              on:swiper={(e) => handleSwiper(e)}
-              keyboard={{
-                enabled: true
+    <div
+      role="contentinfo"
+      class="swi"
+      onmouseenter={() => hoverede()}
+      onmouseleave={() => hoverede()}
+    >
+      {#key swiperKey}
+        <Swiper
+          releaseOnEdges={true}
+          direction={!isMobileOrTablet() ? 'horizontal' : 'vertical'}
+          slidesPerView={isMobileOrTablet() ? 1 : 'auto'}
+          spaceBetween={isMobileOrTablet() ? 0 : null}
+          on:swiper={(e) => handleSwiper(e)}
+          keyboard={{
+            enabled: true
+          }}
+          mousewheel={true}
+          effect={'slide'}
+          grabCursor={true}
+          modules={[Manipulation, Mousewheel, Keyboard, Navigation]}
+          class="mySwiperc {!isMobileOrTablet() ? 'swiperc' : 'swipermobile'}"
+          dir={$isRtl ? 'rtl' : 'ltr'}
+          navigation={isMobileOrTablet()
+            ? false
+            : {
+                nextEl: $lang == 'he' ? '.perv' : '.next',
+                prevEl: $lang == 'he' ? '.next' : '.perv'
               }}
-              mousewheel={true}
-              effect={'slide'}
-              grabCursor={true}
-              modules={[Manipulation, Mousewheel, Keyboard, Navigation]}
-              class="mySwiperc {!isMobileOrTablet()
-                ? 'swiperc'
-                : 'swipermobile'}"
-              dir={$isRtl ? 'rtl' : 'ltr'}
-              navigation={isMobileOrTablet()
-                ? false
-                : {
-                    nextEl: $lang == 'he' ? '.perv' : '.next',
-                    prevEl: $lang == 'he' ? '.next' : '.perv'
-                  }}
-            >
-              {#each filteredArr as buble, i}
-                {#if buble.ani === 'haluk' && milon.desi == true}
-                  <SwiperSlide
-                    class="{isMobileOrTablet()
-                      ? 'swipr-slidemobile'
-                      : 'swiper-slidec'} "
-                    ><Hal
-                      isVisible={currentIndex === i}
-                      user_1s={buble.user_1s}
-                      halukot={buble.halukot}
-                      forumId={buble.forumId}
-                      onHover={hover}
-                      onProj={proj}
-                      onCoinLapach={delo}
-                      hervach={buble.hervach}
-                      siteShare={buble.siteShare}
-                      onUser={user}
-                      {low}
-                      cards="true"
-                      coinlapach={buble.coinlapach}
-                      myid={buble.myid}
-                      pendId={buble.pendId}
-                      mypos={buble.mypos}
-                      projectName={buble.projectName}
-                      name={buble.name}
-                      src={buble.src}
-                      projectId={buble.projectId}
-                      bind:noofusersOk={buble.noofusersOk}
-                      bind:noofusersNo={buble.noofusersNo}
-                      bind:noofusersWaiting={buble.noofusersWaiting}
-                      noofusers={buble.noofusers}
-                      bind:already={buble.already}
-                      created_at={buble.created_at}
-                      bind:users={buble.users}
-                      diun={buble.diun}
-                      order={buble.order}
-                    /></SwiperSlide
-                  >
-                {:else if buble.ani === 'sheirutp' && milon.sheirutp == true}
-                  <SwiperSlide
-                    class="{isMobileOrTablet()
-                      ? 'swipr-slidemobile'
-                      : 'swiper-slidec'} "
-                    ><ProductRequestCard
-                      {buble}
-                      isFirst={currentIndex === i}
-                      onProj={proj}
-                    /></SwiperSlide
-                  >
-                {:else if buble.ani === 'sale' && buble.isSiteShareIncome && milon.sales == true}
-                  <SwiperSlide
-                    class="{isMobileOrTablet()
-                      ? 'swipr-slidemobile'
-                      : 'swiper-slidec'} "
-                    ><SiteShareIncomeCard
-                      {buble}
-                      isFirst={currentIndex === i}
-                      onProj={proj}
-                    /></SwiperSlide
-                  >
-                {:else if buble.ani === 'sale' && milon.sales == true}
-                  <SwiperSlide
-                    class="{isMobileOrTablet()
-                      ? 'swipr-slidemobile'
-                      : 'swiper-slidec'} "
-                    ><SaleCard
-                      {buble}
-                      isFirst={currentIndex === i}
-                      onProj={proj}
-                      {onChat}
-                    /></SwiperSlide
-                  >
-                {:else if buble.ani === 'buy' && milon.sales == true}
-                  <SwiperSlide
-                    class="{isMobileOrTablet()
-                      ? 'swipr-slidemobile'
-                      : 'swiper-slidec'} "
-                    ><CustomerSaleCard
-                      {buble}
-                      isFirst={currentIndex === i}
-                      onProj={proj}
-                      {onChat}
-                    /></SwiperSlide
-                  >
-                {:else if buble.ani === 'wishoffer'}
-                  <SwiperSlide
-                    class="{isMobileOrTablet()
-                      ? 'swipr-slidemobile'
-                      : 'swiper-slidec'} "
-                    ><WishOfferCard
-                      {buble}
-                      isFirst={currentIndex === i}
-                      onUser={user}
-                      {onChat}
-                    /></SwiperSlide
-                  >
-                {:else if buble.ani === 'sitesharepay'}
-                  <SwiperSlide
-                    class="{isMobileOrTablet()
-                      ? 'swipr-slidemobile'
-                      : 'swiper-slidec'} "
-                    ><SiteSharePayCard
-                      {buble}
-                      isFirst={currentIndex === i}
-                      onProj={proj}
-                    /></SwiperSlide
-                  >
-                {:else if buble.ani === 'sitesharedecide'}
-                  <SwiperSlide
-                    class="{isMobileOrTablet()
-                      ? 'swipr-slidemobile'
-                      : 'swiper-slidec'} "
-                    ><SiteShareAutoApprovedCard
-                      {buble}
-                      isFirst={currentIndex === i}
-                      onProj={proj}
-                    /></SwiperSlide
-                  >
-                {:else if buble.ani === 'vidu' && milon.vidu == true}
-                  <SwiperSlide
-                    class="{isMobileOrTablet()
-                      ? 'swipr-slidemobile'
-                      : 'swiper-slidec'} "
-                    ><Vid
-                      isVisible={currentIndex === i}
-                      onHover={hover}
-                      onProj={proj}
-                      onCoinLapach={delo}
-                      onUser={user}
-                      {low}
-                      cards="true"
-                      send={buble.send}
-                      recive={buble.recive}
-                      coinlapach={buble.coinlapach}
-                      myid={buble.myid}
-                      pendId={buble.pendId}
-                      projectName={buble.projectName}
-                      src={buble.src}
-                      projectId={buble.projectId}
-                      sendpropic={buble.sendpropic}
-                      sendname={buble.sendname}
-                      respropic={buble.respropic}
-                      resname={buble.resname}
-                      kind={buble.kind}
-                      amount={buble.amount}
-                      sendcon={buble.senderconf}
-                      confirmed={buble.confirmed}
-                      already={buble.already}
-                      shear={buble.shear}
-                      hervachti={buble.hervachti}
-                      created_at={buble.created_at}
-                      messege={buble.messege}
-                      order={buble.order}
-                      forumId={buble.forumId}
-                    /></SwiperSlide
-                  >
-                {:else if buble.ani === 'mtaha' && milon.betaha == true}
-                  <SwiperSlide
-                    class="{isMobileOrTablet()
-                      ? 'swipr-slidemobile'
-                      : 'swiper-slidec'} "
-                    ><MissionInProgress
-                      onProj={proj}
-                      cards="true"
-                      onUser={user}
-                      onHover={hover}
-                      {low}
-                      forumId={buble.forumId}
-                      restime={buble.restime}
-                      isVisible={currentIndex === i}
-                      pu={buble.pu}
-                      hearotMeyuchadot={buble.hearotMeyuchadot}
-                      tasks={buble.acts.data}
-                      status={buble.status}
-                      tx={buble.tx}
-                      iskvua={buble.iskvua}
-                      coinlapach={buble.coinlapach}
-                      usernames={buble.usernames}
-                      noofpu={buble.noof}
-                      oldzman={buble.timer}
-                      stname={buble.stname}
-                      mId={buble.id}
-                      missId={buble.missionId}
-                      missionName={buble.name}
-                      projectId={buble.projectId}
-                      projectName={buble.projectName}
-                      missionDetails={buble.descrip}
-                      src={buble.src}
-                      link={buble.privatlinks}
-                      dueDateOrCountToDedline={buble.admaticedai}
-                      startDate={buble.dates}
-                      hoursdon={buble.howmanyhoursalready}
-                      hourstotal={buble.hoursassinged}
-                      perhour={buble.perhour}
-                      onDone={delo}
-                    /></SwiperSlide
-                  >
-                {:else if buble.ani === 'pmashes' && milon.ppmash == true}
-                  <SwiperSlide
-                    class={isMobileOrTablet()
-                      ? 'swipr-slidemobile'
-                      : 'swiper-slidec'}
-                    ><PendingMa
-                      onHover={hover}
-                      onProj={proj}
-                      onUser={user}
-                      cards="true"
-                      isVisible={currentIndex === i}
-                      {low}
-                      coinlapach={buble.coinlapach}
-                      onCoinLapach={delo}
-                      restime={buble.restime}
-                      ordern={buble.orderon}
-                      timegramaId={buble.timegramaId}
-                      messege={buble.messege}
-                      mysrc={buble.mysrc}
-                      mypos={buble.mypos}
-                      diun={buble.diun}
-                      descrip={buble.descrip}
-                      projectName={buble.projectName}
-                      name={buble.name}
-                      hearotMeyuchadot={buble.hearotMeyuchadot}
-                      kindOf={buble.kindOf}
-                      src={buble.src}
-                      noofusersWaiting={buble.noofusersWaiting}
-                      projectId={buble.projectId}
-                      noofusersOk={buble.noofusersOk}
-                      created_at={buble.created_at}
-                      noofusersNo={buble.noofusersNo}
-                      already={buble.already}
-                      noofusers={buble.noofusers}
-                      mshaabId={buble.mshaabId}
-                      hm={buble.hm}
-                      price={buble.price}
-                      easy={buble.easy}
-                      sqadualed={buble.sqadualed}
-                      sqadualedf={buble.sqadualedf}
-                      recurring={buble.recurring}
-                      recurringNoEnd={buble.recurringNoEnd}
-                      pricePerUnit={buble.pricePerUnit}
-                      cycleSize={buble.cycleSize}
-                      linkto={buble.linkto}
-                      location={buble.location}
-                      pendId={buble.pendId}
-                      users={buble.users}
-                      nego_mashes={buble.nego_mashes || []}
-                      timeGramaDate={buble.timeGramaDate}
-                    /></SwiperSlide
-                  >
-                {:else if buble.ani === 'pends' && milon.pend == true}
-                  <SwiperSlide
-                    class={isMobileOrTablet()
-                      ? 'swipr-slidemobile'
-                      : 'swiper-slidec'}
-                    ><PendingM
-                      onHover={hover}
-                      onProj={proj}
-                      onUser={user}
-                      onCoinLapach={delo}
-                      timegramaId={buble.timegramaId}
-                      {low}
-                      negopendmissions={buble.negopendmissions}
-                      isVisible={currentIndex === i}
-                      createdAt={buble.createdAt}
-                      restime={buble.restime}
-                      timegramaDate={buble.timegramaDate}
-                      publicklinks={buble.publicklinks}
-                      privatlinks={buble.privatlinks}
-                      dates={buble.dates}
-                      ordern={buble.orderon}
-                      coinlapach={buble.coinlapach}
-                      messege={buble.messege}
-                      mysrc={buble.mysrc}
-                      mypos={buble.mypos}
-                      descrip={buble.descrip}
-                      projectName={buble.projectName}
-                      name={buble.name}
-                      hearotMeyuchadot={buble.hearotMeyuchadot}
-                      noofhours={buble.noofhours}
-                      src={buble.src}
-                      noofusersWaiting={buble.noofusersWaiting}
-                      projectId={buble.projectId}
-                      uids={buble.uids}
-                      what={buble.what}
-                      noofusersOk={buble.noofusersOk}
-                      total={buble.noofhours * buble.perhour}
-                      perhour={buble.perhour}
-                      noofusersNo={buble.noofusersNo}
-                      already={buble.already}
-                      noofusers={buble.noofusers}
-                      missionId={buble.missionId}
-                      skills={buble.skills}
-                      tafkidims={buble.tafkidims}
-                      workways={buble.workways}
-                      mdate={buble.mdate}
-                      mdates={buble.dates}
-                      vallues={buble.vallues}
-                      location={buble.location}
-                      pendId={buble.pendId}
-                      isKavua={buble.isKavua}
-                      diun={buble.diun}
-                      acts={buble.acts}
-                      users={buble.users}
-                      sqadualed={buble.sqadualed}
-                      cards="true"
-                    /></SwiperSlide
-                  >
-                {:else if buble.ani === 'wegets' && milon.pmaap == true}
-                  <SwiperSlide
-                    class={isMobileOrTablet()
-                      ? 'swipr-slidemobile'
-                      : 'swiper-slidec'}
-                    ><Weget
-                      onAcsept={delo}
-                      cards="true"
-                      onDecline={delo}
-                      onHover={hover}
-                      onProj={proj}
-                      onUser={user}
-                      {low}
-                      isVisible={currentIndex === i}
-                      coinlapach={buble.coinlapach}
-                      mId={buble.mId}
-                      noofusersWaiting={buble.noofusersWaiting}
-                      uids={buble.uids}
-                      kindOf={buble.kindOf}
-                      noofusersOk={buble.noofusersOk}
-                      noofusersNo={buble.noofusersNo}
-                      already={buble.already}
-                      users={buble.users}
-                      askId={buble.askId}
-                      myp={buble.myp}
-                      projectName={buble.projectName}
-                      useraplyname={buble.username}
-                      userId={buble.uid}
-                      myid={buble.myid}
-                      isRecurringCycle={buble.isRecurringCycle}
-                      mashabetahalichId={buble.mashabetahalichId}
-                      cycleIndex={buble.cycleIndex}
-                      cycleReported={buble.cycleReported}
-                      quantityDelivered={buble.quantityDelivered}
-                      pricePerUnit={buble.pricePerUnit}
-                      responsibleUserId={buble.responsibleUserId}
-                      orderon={buble.orderon}
-                      timegramaId={buble.timegramaId}
-                      timegramaDate={buble.timegramaDate}
-                      timegramaDone={buble.timegramaDone}
-                      spid={buble.spid}
-                      src={buble.src}
-                      price={buble.price}
-                      hm={buble.hm}
-                      src2={buble.src2}
-                      why={buble.why}
-                      whatt={buble.whatt}
-                      missionBName={buble.openName}
-                      name={buble.name}
-                      projectId={buble.projectId}
-                      noofpu={buble.noof}
-                      sqadualedf={buble.sqadualedf}
-                      sqadualed={buble.sqadualed}
-                      spnot={buble.spnot}
-                      easy={buble.easy}
-                      nhours={buble.nhours}
-                      deadline={buble.deadline}
-                      missId={buble.missId}
-                      id={buble.id}
-                      openMid={buble.omid}
-                      stylef={buble.stylef}
-                      st={buble.st}
-                      declined={buble.decid}
-                    /></SwiperSlide
-                  >
-                {:else if buble.ani === 'fiapp' && milon.fiap == true}
-                  <SwiperSlide
-                    class={isMobileOrTablet()
-                      ? 'swipr-slidemobile'
-                      : 'swiper-slidec'}
-                    ><Fiappru
-                      onAcsept={delo}
-                      onDecline={delo}
-                      onHover={hover}
-                      onProj={proj}
-                      onUser={user}
-                      cards="true"
-                      {low}
-                      timegramaId={buble.timegramaId}
-                      timegramaDate={buble.timegramaDate}
-                      isVisible={currentIndex === i}
-                      coinlapach={buble.coinlapach}
-                      mId={buble.mId}
-                      noofusersWaiting={buble.noofusersWaiting}
-                      uids={buble.uids}
-                      what={buble.what}
-                      noofusersOk={buble.noofusersOk}
-                      noofusersNo={buble.noofusersNo}
-                      already={buble.already}
-                      users={buble.users}
-                      askId={buble.askId}
-                      projectName={buble.projectName}
-                      useraplyname={buble.username}
-                      userId={buble.uid}
-                      missionDetails={buble.descrip}
-                      src={buble.src}
-                      src2={buble.src2}
-                      why={buble.why}
-                      whatt={buble.whatt}
-                      whattid={buble.whattid}
-                      missionBName={buble.openName}
-                      name={buble.name}
-                      projectId={buble.projectId}
-                      noofpu={buble.noof}
-                      publicklinks={buble.publicklinks}
-                      privatlinks={buble.privatlinks}
-                      hearotMeyuchadot={buble.hearotMeyuchadot}
-                      valph={buble.perhour}
-                      nhours={buble.nhours}
-                      deadline={buble.deadline}
-                      missId={buble.missId}
-                      id={buble.id}
-                      openMid={buble.omid}
-                      stylef={buble.stylef}
-                      st={buble.st}
-                      declined={buble.decid}
-                    /></SwiperSlide
-                  ><!--
+        >
+          {#each filteredArr as buble, i}
+            {#if buble.ani === 'haluk' && milon.desi == true}
+              <SwiperSlide
+                class="{isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'} "
+                ><Hal
+                  isVisible={currentIndex === i}
+                  user_1s={buble.user_1s}
+                  halukot={buble.halukot}
+                  forumId={buble.forumId}
+                  onHover={hover}
+                  onProj={proj}
+                  onCoinLapach={delo}
+                  hervach={buble.hervach}
+                  siteShare={buble.siteShare}
+                  onUser={user}
+                  {low}
+                  cards="true"
+                  coinlapach={buble.coinlapach}
+                  myid={buble.myid}
+                  pendId={buble.pendId}
+                  mypos={buble.mypos}
+                  projectName={buble.projectName}
+                  name={buble.name}
+                  src={buble.src}
+                  projectId={buble.projectId}
+                  bind:noofusersOk={buble.noofusersOk}
+                  bind:noofusersNo={buble.noofusersNo}
+                  bind:noofusersWaiting={buble.noofusersWaiting}
+                  noofusers={buble.noofusers}
+                  bind:already={buble.already}
+                  created_at={buble.created_at}
+                  bind:users={buble.users}
+                  diun={buble.diun}
+                  order={buble.order}
+                /></SwiperSlide
+              >
+            {:else if buble.ani === 'sheirutp' && milon.sheirutp == true}
+              <SwiperSlide
+                class="{isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'} "
+                ><ProductRequestCard
+                  {buble}
+                  isFirst={currentIndex === i}
+                  onProj={proj}
+                /></SwiperSlide
+              >
+            {:else if buble.ani === 'sale' && buble.isSiteShareIncome && milon.sales == true}
+              <SwiperSlide
+                class="{isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'} "
+                ><SiteShareIncomeCard
+                  {buble}
+                  isFirst={currentIndex === i}
+                  onProj={proj}
+                /></SwiperSlide
+              >
+            {:else if buble.ani === 'sale' && milon.sales == true}
+              <SwiperSlide
+                class="{isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'} "
+                ><SaleCard
+                  {buble}
+                  isFirst={currentIndex === i}
+                  onProj={proj}
+                  {onChat}
+                /></SwiperSlide
+              >
+            {:else if buble.ani === 'buy' && milon.sales == true}
+              <SwiperSlide
+                class="{isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'} "
+                ><CustomerSaleCard
+                  {buble}
+                  isFirst={currentIndex === i}
+                  onProj={proj}
+                  {onChat}
+                /></SwiperSlide
+              >
+            {:else if buble.ani === 'wishoffer'}
+              <SwiperSlide
+                class="{isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'} "
+                ><WishOfferCard
+                  {buble}
+                  isFirst={currentIndex === i}
+                  onUser={user}
+                  {onChat}
+                /></SwiperSlide
+              >
+            {:else if buble.ani === 'sitesharepay'}
+              <SwiperSlide
+                class="{isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'} "
+                ><SiteSharePayCard
+                  {buble}
+                  isFirst={currentIndex === i}
+                  onProj={proj}
+                /></SwiperSlide
+              >
+            {:else if buble.ani === 'sitesharedecide'}
+              <SwiperSlide
+                class="{isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'} "
+                ><SiteShareAutoApprovedCard
+                  {buble}
+                  isFirst={currentIndex === i}
+                  onProj={proj}
+                /></SwiperSlide
+              >
+            {:else if buble.ani === 'vidu' && milon.vidu == true}
+              <SwiperSlide
+                class="{isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'} "
+                ><Vid
+                  isVisible={currentIndex === i}
+                  onHover={hover}
+                  onProj={proj}
+                  onCoinLapach={delo}
+                  onUser={user}
+                  {low}
+                  cards="true"
+                  send={buble.send}
+                  recive={buble.recive}
+                  coinlapach={buble.coinlapach}
+                  myid={buble.myid}
+                  pendId={buble.pendId}
+                  projectName={buble.projectName}
+                  src={buble.src}
+                  projectId={buble.projectId}
+                  sendpropic={buble.sendpropic}
+                  sendname={buble.sendname}
+                  respropic={buble.respropic}
+                  resname={buble.resname}
+                  kind={buble.kind}
+                  amount={buble.amount}
+                  sendcon={buble.senderconf}
+                  confirmed={buble.confirmed}
+                  already={buble.already}
+                  shear={buble.shear}
+                  hervachti={buble.hervachti}
+                  created_at={buble.created_at}
+                  messege={buble.messege}
+                  order={buble.order}
+                  forumId={buble.forumId}
+                /></SwiperSlide
+              >
+            {:else if buble.ani === 'mtaha' && milon.betaha == true}
+              <SwiperSlide
+                class="{isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'} "
+                ><MissionInProgress
+                  onProj={proj}
+                  cards="true"
+                  onUser={user}
+                  onHover={hover}
+                  {low}
+                  forumId={buble.forumId}
+                  restime={buble.restime}
+                  isVisible={currentIndex === i}
+                  pu={buble.pu}
+                  hearotMeyuchadot={buble.hearotMeyuchadot}
+                  tasks={buble.acts.data}
+                  status={buble.status}
+                  tx={buble.tx}
+                  iskvua={buble.iskvua}
+                  coinlapach={buble.coinlapach}
+                  usernames={buble.usernames}
+                  noofpu={buble.noof}
+                  oldzman={buble.timer}
+                  stname={buble.stname}
+                  mId={buble.id}
+                  missId={buble.missionId}
+                  missionName={buble.name}
+                  projectId={buble.projectId}
+                  projectName={buble.projectName}
+                  missionDetails={buble.descrip}
+                  src={buble.src}
+                  link={buble.privatlinks}
+                  dueDateOrCountToDedline={buble.admaticedai}
+                  startDate={buble.dates}
+                  hoursdon={buble.howmanyhoursalready}
+                  hourstotal={buble.hoursassinged}
+                  perhour={buble.perhour}
+                  onDone={delo}
+                /></SwiperSlide
+              >
+            {:else if buble.ani === 'pmashes' && milon.ppmash == true}
+              <SwiperSlide
+                class={isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'}
+                ><PendingMa
+                  onHover={hover}
+                  onProj={proj}
+                  onUser={user}
+                  cards="true"
+                  isVisible={currentIndex === i}
+                  {low}
+                  coinlapach={buble.coinlapach}
+                  onCoinLapach={delo}
+                  restime={buble.restime}
+                  ordern={buble.orderon}
+                  timegramaId={buble.timegramaId}
+                  messege={buble.messege}
+                  mysrc={buble.mysrc}
+                  mypos={buble.mypos}
+                  diun={buble.diun}
+                  descrip={buble.descrip}
+                  projectName={buble.projectName}
+                  name={buble.name}
+                  hearotMeyuchadot={buble.hearotMeyuchadot}
+                  kindOf={buble.kindOf}
+                  src={buble.src}
+                  noofusersWaiting={buble.noofusersWaiting}
+                  projectId={buble.projectId}
+                  noofusersOk={buble.noofusersOk}
+                  created_at={buble.created_at}
+                  noofusersNo={buble.noofusersNo}
+                  already={buble.already}
+                  noofusers={buble.noofusers}
+                  mshaabId={buble.mshaabId}
+                  hm={buble.hm}
+                  price={buble.price}
+                  easy={buble.easy}
+                  sqadualed={buble.sqadualed}
+                  sqadualedf={buble.sqadualedf}
+                  recurring={buble.recurring}
+                  recurringNoEnd={buble.recurringNoEnd}
+                  pricePerUnit={buble.pricePerUnit}
+                  cycleSize={buble.cycleSize}
+                  linkto={buble.linkto}
+                  location={buble.location}
+                  pendId={buble.pendId}
+                  users={buble.users}
+                  nego_mashes={buble.nego_mashes || []}
+                  timeGramaDate={buble.timeGramaDate}
+                /></SwiperSlide
+              >
+            {:else if buble.ani === 'pends' && milon.pend == true}
+              <SwiperSlide
+                class={isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'}
+                ><PendingM
+                  onHover={hover}
+                  onProj={proj}
+                  onUser={user}
+                  onCoinLapach={delo}
+                  timegramaId={buble.timegramaId}
+                  {low}
+                  negopendmissions={buble.negopendmissions}
+                  isVisible={currentIndex === i}
+                  createdAt={buble.createdAt}
+                  restime={buble.restime}
+                  timegramaDate={buble.timegramaDate}
+                  publicklinks={buble.publicklinks}
+                  privatlinks={buble.privatlinks}
+                  dates={buble.dates}
+                  ordern={buble.orderon}
+                  coinlapach={buble.coinlapach}
+                  messege={buble.messege}
+                  mysrc={buble.mysrc}
+                  mypos={buble.mypos}
+                  descrip={buble.descrip}
+                  projectName={buble.projectName}
+                  name={buble.name}
+                  hearotMeyuchadot={buble.hearotMeyuchadot}
+                  noofhours={buble.noofhours}
+                  src={buble.src}
+                  noofusersWaiting={buble.noofusersWaiting}
+                  projectId={buble.projectId}
+                  uids={buble.uids}
+                  what={buble.what}
+                  noofusersOk={buble.noofusersOk}
+                  total={buble.noofhours * buble.perhour}
+                  perhour={buble.perhour}
+                  noofusersNo={buble.noofusersNo}
+                  already={buble.already}
+                  noofusers={buble.noofusers}
+                  missionId={buble.missionId}
+                  skills={buble.skills}
+                  tafkidims={buble.tafkidims}
+                  workways={buble.workways}
+                  mdate={buble.mdate}
+                  mdates={buble.dates}
+                  vallues={buble.vallues}
+                  location={buble.location}
+                  pendId={buble.pendId}
+                  isKavua={buble.isKavua}
+                  diun={buble.diun}
+                  acts={buble.acts}
+                  users={buble.users}
+                  sqadualed={buble.sqadualed}
+                  cards="true"
+                /></SwiperSlide
+              >
+            {:else if buble.ani === 'wegets' && milon.pmaap == true}
+              <SwiperSlide
+                class={isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'}
+                ><Weget
+                  onAcsept={delo}
+                  cards="true"
+                  onDecline={delo}
+                  onHover={hover}
+                  onProj={proj}
+                  onUser={user}
+                  {low}
+                  isVisible={currentIndex === i}
+                  coinlapach={buble.coinlapach}
+                  mId={buble.mId}
+                  noofusersWaiting={buble.noofusersWaiting}
+                  uids={buble.uids}
+                  kindOf={buble.kindOf}
+                  noofusersOk={buble.noofusersOk}
+                  noofusersNo={buble.noofusersNo}
+                  already={buble.already}
+                  users={buble.users}
+                  askId={buble.askId}
+                  myp={buble.myp}
+                  projectName={buble.projectName}
+                  useraplyname={buble.username}
+                  userId={buble.uid}
+                  myid={buble.myid}
+                  isRecurringCycle={buble.isRecurringCycle}
+                  mashabetahalichId={buble.mashabetahalichId}
+                  cycleIndex={buble.cycleIndex}
+                  cycleReported={buble.cycleReported}
+                  quantityDelivered={buble.quantityDelivered}
+                  pricePerUnit={buble.pricePerUnit}
+                  responsibleUserId={buble.responsibleUserId}
+                  orderon={buble.orderon}
+                  timegramaId={buble.timegramaId}
+                  timegramaDate={buble.timegramaDate}
+                  timegramaDone={buble.timegramaDone}
+                  spid={buble.spid}
+                  src={buble.src}
+                  price={buble.price}
+                  hm={buble.hm}
+                  src2={buble.src2}
+                  why={buble.why}
+                  whatt={buble.whatt}
+                  missionBName={buble.openName}
+                  name={buble.name}
+                  projectId={buble.projectId}
+                  noofpu={buble.noof}
+                  sqadualedf={buble.sqadualedf}
+                  sqadualed={buble.sqadualed}
+                  spnot={buble.spnot}
+                  easy={buble.easy}
+                  nhours={buble.nhours}
+                  deadline={buble.deadline}
+                  missId={buble.missId}
+                  id={buble.id}
+                  openMid={buble.omid}
+                  stylef={buble.stylef}
+                  st={buble.st}
+                  declined={buble.decid}
+                /></SwiperSlide
+              >
+            {:else if buble.ani === 'fiapp' && milon.fiap == true}
+              <SwiperSlide
+                class={isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'}
+                ><Fiappru
+                  onAcsept={delo}
+                  onDecline={delo}
+                  onHover={hover}
+                  onProj={proj}
+                  onUser={user}
+                  cards="true"
+                  {low}
+                  timegramaId={buble.timegramaId}
+                  timegramaDate={buble.timegramaDate}
+                  isVisible={currentIndex === i}
+                  coinlapach={buble.coinlapach}
+                  mId={buble.mId}
+                  noofusersWaiting={buble.noofusersWaiting}
+                  uids={buble.uids}
+                  what={buble.what}
+                  noofusersOk={buble.noofusersOk}
+                  noofusersNo={buble.noofusersNo}
+                  already={buble.already}
+                  users={buble.users}
+                  askId={buble.askId}
+                  projectName={buble.projectName}
+                  useraplyname={buble.username}
+                  userId={buble.uid}
+                  missionDetails={buble.descrip}
+                  src={buble.src}
+                  src2={buble.src2}
+                  why={buble.why}
+                  whatt={buble.whatt}
+                  whattid={buble.whattid}
+                  missionBName={buble.openName}
+                  name={buble.name}
+                  projectId={buble.projectId}
+                  noofpu={buble.noof}
+                  publicklinks={buble.publicklinks}
+                  privatlinks={buble.privatlinks}
+                  hearotMeyuchadot={buble.hearotMeyuchadot}
+                  valph={buble.perhour}
+                  nhours={buble.nhours}
+                  deadline={buble.deadline}
+                  missId={buble.missId}
+                  id={buble.id}
+                  openMid={buble.omid}
+                  stylef={buble.stylef}
+                  st={buble.st}
+                  declined={buble.decid}
+                /></SwiperSlide
+              ><!--
 {:else if buble.ani === "walcomen" && milon.welc == true}
    <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"><Welcomt 
     id={buble.id}
@@ -964,327 +962,324 @@
        /></SwiperSlide>
 
    -->
-                {:else if buble.ani === 'walcomen' && milon.welc == true}
-                  <SwiperSlide
-                    class={isMobileOrTablet()
-                      ? 'swipr-slidemobile'
-                      : 'swiper-slidec'}
-                    ><Welcomt
-                      welcomId={buble.welcomeId}
-                      id={buble.id}
-                      src={buble.src}
-                      onHover={hover}
-                      coinlapach={buble.coinlapach}
-                      onCoinLapach={delo}
-                      username={buble.username}
-                      projectName={buble.projectName}
-                      projectId={buble.projectId}
-                      partnershipDetails={buble.details}
-                      pd={buble.pd}
-                    /></SwiperSlide
-                  >
-                {:else if buble.ani === 'askedcoin' && milon.asks == true}
-                  <SwiperSlide
-                    class={isMobileOrTablet()
-                      ? 'swipr-slidemobile'
-                      : 'swiper-slidec'}
-                    ><Reqtojoin
-                      onAcsept={delo}
-                      onHover={hover}
-                      onProj={proj}
-                      onUser={user}
-                      onDecline={delo}
-                      cards="true"
-                      isVisible={currentIndex === i}
-                      iskvua={buble.iskvua}
-                      email={buble.email}
-                      role={buble.role}
-                      workways={buble.workways}
-                      userSkills={buble.userSkills}
-                      userRole={buble.userRole}
-                      userWorkway={buble.userWorkway}
-                      skills={buble.skills}
-                      coinlapach={buble.coinlapach}
-                      {low}
-                      pid={buble.pid}
-                      chat={buble.chat}
-                      noofusersWaiting={buble.noofusersWaiting}
-                      uids={buble.uids}
-                      what={buble.what}
-                      noofusersOk={buble.noofusersOk}
-                      noofusersNo={buble.noofusersNo}
-                      already={buble.already}
-                      users={buble.users}
-                      askId={buble.askId}
-                      projectName={buble.projectName}
-                      useraplyname={buble.username}
-                      userId={buble.uid}
-                      missionDetails={buble.missionDetails}
-                      src={buble.src}
-                      src2={buble.src2}
-                      openmissionName={buble.openName}
-                      name={buble.name}
-                      projectId={buble.projectId}
-                      noofpu={buble.noof}
-                      publicklinks={buble.publicklinks}
-                      privatlinks={buble.privatlinks}
-                      hearotMeyuchadot={buble.hearotMeyuchadot}
-                      valph={buble.perhour}
-                      nhours={buble.nhours}
-                      deadline={buble.deadline}
-                      sqedualed={buble.sqedualed}
-                      missId={buble.missId}
-                      id={buble.id}
-                      acts={buble.acts}
-                      openMid={buble.omid}
-                      stylef={buble.stylef}
-                      st={buble.st}
-                      isRishon={buble?.openMissionData?.isRishon ||
-                        buble.isRishon}
-                      declined={buble.decid}
-                      timegramaId={buble.timegramaId}
-                      timegramaDate={buble.timegramaDate}
-                      timegramaDone={buble.timegramaDone}
-                      negopendmissions={buble.negopendmissions || []}
-                      orderon={buble.orderon || 0}
-                      forumId={buble.forumId}
-                    /></SwiperSlide
-                  >
-                {:else if buble.ani === 'askedm' && milon.askmap == true}
-                  <SwiperSlide
-                    class={isMobileOrTablet()
-                      ? 'swipr-slidemobile'
-                      : 'swiper-slidec'}
-                    ><Reqtom
-                      onAcsept={delo}
-                      onDecline={delo}
-                      onHover={hover}
-                      onProj={proj}
-                      cards="true"
-                      onUser={user}
-                      onChat={chat}
-                      isVisible={currentIndex === i}
-                      {low}
-                      pid={buble.pid}
-                      coinlapach={buble.coinlapach}
-                      noofusersWaiting={buble.noofusersWaiting}
-                      uids={buble.uids}
-                      what={buble.what}
-                      noofusersOk={buble.noofusersOk}
-                      noofusersNo={buble.noofusersNo}
-                      already={buble.already}
-                      users={buble.users}
-                      askId={buble.askId}
-                      projectName={buble.projectName}
-                      useraplyname={buble.username}
-                      userId={buble.uid}
-                      missionDetails={buble.descrip}
-                      src={buble.src}
-                      src2={buble.src2}
-                      openmissionName={buble.openName}
-                      name={buble.name}
-                      projectId={buble.projectId}
-                      noofpu={buble.noof}
-                      myp={buble.myp}
-                      easy={buble.easy}
-                      spnot={buble.spnot}
-                      hearotMeyuchadot={buble.spnot}
-                      price={buble.price}
-                      deadline={buble.deadline}
-                      sqadualedf={buble.sqadualedf}
-                      kindOf={buble.kindOf}
-                      recurring={buble.recurring}
-                      cycleSize={buble.cycleSize}
-                      missId={buble.missId}
-                      id={buble.id}
-                      openMid={buble.omid}
-                      stylef={buble.stylef}
-                      st={buble.st}
-                      declined={buble.decid}
-                      spid={buble.spid}
-                      timegramaId={buble.timegramaId}
-                      timegramaDate={buble.timegramaDate}
-                      timegramaDone={buble.timegramaDone}
-                      pmashId={buble.pmashId}
-                      isRishon={buble.isSelfProposal === true}
-                      pendingMainVote={buble.pendingMainVote === true}
-                      negopendmissions={buble.negopendmissions || []}
-                      orderon={buble.orderon || 0}
-                    /></SwiperSlide
-                  >
-                {:else if buble.ani === 'meData' && milon.sugg == true}
-                  <SwiperSlide
-                    class={isMobileOrTablet()
-                      ? 'swipr-slidemobile'
-                      : 'swiper-slidec'}
-                    ><ProjectSuggestor
-                      onLess={delo}
-                      onHover={hover}
-                      onProj={proj}
-                      onUser={user}
-                      isVisible={currentIndex === i}
-                      coinlapach={buble.coinlapach}
-                      {low}
-                      pid={buble.pid}
-                      noOfusers={buble.noOfusers}
-                      acts={buble.acts}
-                      restime={buble.restime}
-                      chat={buble.chat ?? null}
-                      askId={buble.askId ?? null}
-                      myRoundProposedBy={buble.myRoundProposedBy ?? null}
-                      myOrdern={buble.myOrdern ?? 0}
-                      myAskUsers={buble.myAskUsers ?? []}
-                      myRound={buble.myRound ?? null}
-                      alreadyi={buble.alreadyi}
-                      {askedarr}
-                      {declineddarr}
-                      deadLine={buble.sqadualed}
-                      forumId={buble.forumId}
-                      oid={buble.id}
-                      projectName={buble.projectName}
-                      role={buble.tafkidims}
-                      skills={buble.skills}
-                      missionDetails={buble.descrip}
-                      hearotMeyuchadot={buble.hearotMeyuchadot}
-                      src={buble.src}
-                      missionName={buble.name}
-                      projectId={buble.projectId}
-                      workways={buble.work_ways}
-                      noOfHours={buble.noofhours}
-                      perhour={buble.perhour}
-                      total={buble.noofhours * buble.perhour}
-                      cards="true"
-                    /></SwiperSlide
-                  >
-                {:else if buble.ani === 'huca' && milon.pmashs == true}
-                  <SwiperSlide
-                    class={isMobileOrTablet()
-                      ? 'swipr-slidemobile'
-                      : 'swiper-slidec'}
-                    ><Mashsug
-                      onLess={delo}
-                      cards="true"
-                      onHover={hover}
-                      onProj={proj}
-                      onUser={user}
-                      messege={buble.messege}
-                      {i}
-                      isVisible={currentIndex === i}
-                      coinlapach={buble.coinlapach}
-                      {low}
-                      {askedarr}
-                      declineddarra={buble.declineddarra}
-                      deadLine={buble.sqadualed}
-                      sqadualedf={buble.sqadualedf}
-                      kindOf={buble.kindOf}
-                      recurring={buble.recurring}
-                      cycleSize={buble.cycleSize}
-                      oid={buble.oid}
-                      id={buble.id}
-                      askId={buble.myAskId ?? buble.askId ?? 1}
-                      myRoundProposedBy={buble.myRoundProposedBy ?? null}
-                      myOrdern={buble.myOrdern ?? 0}
-                      myAskUsers={buble.myAskUsers ?? []}
-                      myRound={buble.myRound ?? null}
-                      price={buble.price}
-                      myp={buble.myp}
-                      already={buble.already}
-                      restime={buble.restime}
-                      projectName={buble.projectName}
-                      missionDetails={buble.descrip}
-                      notes={buble.hearotMeyuchadot}
-                      src={buble.srcb}
-                      mashName={buble.mashname}
-                      projectId={buble.projectId}
-                      descrip={buble.descrip}
-                      spnot={buble.spnot}
-                      easy={buble.easy}
-                    /></SwiperSlide
-                  >
-                {:else if buble.ani === 'hachla' && milon.hachla == true}
-                  <SwiperSlide
-                    class={isMobileOrTablet()
-                      ? 'swipr-slidemobile'
-                      : 'swiper-slidec'}
-                    ><DecisionMaking
-                      onAcsept={delo}
-                      onDecline={delo}
-                      onHover={hover}
-                      onProj={proj}
-                      cards="true"
-                      onChat={chat}
-                      timegramaDate={buble.timegramaDate}
-                      timegramaId={buble.timegramaId}
-                      restime={buble.restime}
-                      noofpu={buble.noofpu ?? buble.noof}
-                      newpicid={buble?.newpicid}
-                      coinlapach={buble.coinlapach}
-                      created_at={buble.created_at}
-                      spdata={buble.spdata}
-                      isVisible={currentIndex === i}
-                      kind={buble.kind}
-                      messege={buble.messege}
-                      myid={buble.myid}
-                      noofusersWaiting={buble.noofusersWaiting}
-                      uids={buble.uids}
-                      what={buble.mypos}
-                      noofusersOk={buble.noofusersOk}
-                      noofusersNo={buble.noofusersNo}
-                      already={buble.already}
-                      users={buble.users}
-                      askId={buble.pendId}
-                      projectName={buble.projectName}
-                      projectId={buble.projectId}
-                      userId={buble.uid}
-                      src={buble.src}
-                      src2={buble?.newpic}
-                      stylef={buble.stylef}
-                      st={buble.st}
-                      spid={buble.spid}
-                      {low}
-                    /></SwiperSlide
-                  >
-                {/if}
-              {/each}
+            {:else if buble.ani === 'walcomen' && milon.welc == true}
               <SwiperSlide
                 class={isMobileOrTablet()
                   ? 'swipr-slidemobile'
                   : 'swiper-slidec'}
+                ><Welcomt
+                  welcomId={buble.welcomeId}
+                  id={buble.id}
+                  src={buble.src}
+                  onHover={hover}
+                  coinlapach={buble.coinlapach}
+                  onCoinLapach={delo}
+                  username={buble.username}
+                  projectName={buble.projectName}
+                  projectId={buble.projectId}
+                  partnershipDetails={buble.details}
+                  pd={buble.pd}
+                /></SwiperSlide
               >
-                <div
-                  class="flex flex-col items-center justify-center h-full w-full"
-                >
-                  <h2 class="text-2xl font-bold mb-4">
-                    {$lang === 'he' ? 'התעדכנת בהכל' : 'End of the line'}
-                  </h2>
-                  <Button
-                    onClick={() => swiperRef?.slideTo(0)}
-                    text={{ he: 'חזרה להתחלה', en: 'Back to Start' }}
-                  />
-                </div>
-              </SwiperSlide>
-              <!--- <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 1</SwiperSlide><SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 2</SwiperSlide
+            {:else if buble.ani === 'askedcoin' && milon.asks == true}
+              <SwiperSlide
+                class={isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'}
+                ><Reqtojoin
+                  onAcsept={delo}
+                  onHover={hover}
+                  onProj={proj}
+                  onUser={user}
+                  onDecline={delo}
+                  cards="true"
+                  isVisible={currentIndex === i}
+                  iskvua={buble.iskvua}
+                  email={buble.email}
+                  role={buble.role}
+                  workways={buble.workways}
+                  userSkills={buble.userSkills}
+                  userRole={buble.userRole}
+                  userWorkway={buble.userWorkway}
+                  skills={buble.skills}
+                  coinlapach={buble.coinlapach}
+                  {low}
+                  pid={buble.pid}
+                  chat={buble.chat}
+                  noofusersWaiting={buble.noofusersWaiting}
+                  uids={buble.uids}
+                  what={buble.what}
+                  noofusersOk={buble.noofusersOk}
+                  noofusersNo={buble.noofusersNo}
+                  already={buble.already}
+                  users={buble.users}
+                  askId={buble.askId}
+                  projectName={buble.projectName}
+                  useraplyname={buble.username}
+                  userId={buble.uid}
+                  missionDetails={buble.missionDetails}
+                  src={buble.src}
+                  src2={buble.src2}
+                  openmissionName={buble.openName}
+                  name={buble.name}
+                  projectId={buble.projectId}
+                  noofpu={buble.noof}
+                  publicklinks={buble.publicklinks}
+                  privatlinks={buble.privatlinks}
+                  hearotMeyuchadot={buble.hearotMeyuchadot}
+                  valph={buble.perhour}
+                  nhours={buble.nhours}
+                  deadline={buble.deadline}
+                  sqedualed={buble.sqedualed}
+                  missId={buble.missId}
+                  id={buble.id}
+                  acts={buble.acts}
+                  openMid={buble.omid}
+                  stylef={buble.stylef}
+                  st={buble.st}
+                  isRishon={buble?.openMissionData?.isRishon || buble.isRishon}
+                  declined={buble.decid}
+                  timegramaId={buble.timegramaId}
+                  timegramaDate={buble.timegramaDate}
+                  timegramaDone={buble.timegramaDone}
+                  negopendmissions={buble.negopendmissions || []}
+                  orderon={buble.orderon || 0}
+                  forumId={buble.forumId}
+                /></SwiperSlide
+              >
+            {:else if buble.ani === 'askedm' && milon.askmap == true}
+              <SwiperSlide
+                class={isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'}
+                ><Reqtom
+                  onAcsept={delo}
+                  onDecline={delo}
+                  onHover={hover}
+                  onProj={proj}
+                  cards="true"
+                  onUser={user}
+                  onChat={chat}
+                  isVisible={currentIndex === i}
+                  {low}
+                  pid={buble.pid}
+                  coinlapach={buble.coinlapach}
+                  noofusersWaiting={buble.noofusersWaiting}
+                  uids={buble.uids}
+                  what={buble.what}
+                  noofusersOk={buble.noofusersOk}
+                  noofusersNo={buble.noofusersNo}
+                  already={buble.already}
+                  users={buble.users}
+                  askId={buble.askId}
+                  projectName={buble.projectName}
+                  useraplyname={buble.username}
+                  userId={buble.uid}
+                  missionDetails={buble.descrip}
+                  src={buble.src}
+                  src2={buble.src2}
+                  openmissionName={buble.openName}
+                  name={buble.name}
+                  projectId={buble.projectId}
+                  noofpu={buble.noof}
+                  myp={buble.myp}
+                  easy={buble.easy}
+                  spnot={buble.spnot}
+                  hearotMeyuchadot={buble.spnot}
+                  price={buble.price}
+                  deadline={buble.deadline}
+                  sqadualedf={buble.sqadualedf}
+                  kindOf={buble.kindOf}
+                  recurring={buble.recurring}
+                  cycleSize={buble.cycleSize}
+                  missId={buble.missId}
+                  id={buble.id}
+                  openMid={buble.omid}
+                  stylef={buble.stylef}
+                  st={buble.st}
+                  declined={buble.decid}
+                  spid={buble.spid}
+                  timegramaId={buble.timegramaId}
+                  timegramaDate={buble.timegramaDate}
+                  timegramaDone={buble.timegramaDone}
+                  pmashId={buble.pmashId}
+                  isRishon={buble.isSelfProposal === true}
+                  pendingMainVote={buble.pendingMainVote === true}
+                  negopendmissions={buble.negopendmissions || []}
+                  orderon={buble.orderon || 0}
+                /></SwiperSlide
+              >
+            {:else if buble.ani === 'meData' && milon.sugg == true}
+              <SwiperSlide
+                class={isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'}
+                ><ProjectSuggestor
+                  onLess={delo}
+                  onHover={hover}
+                  onProj={proj}
+                  onUser={user}
+                  isVisible={currentIndex === i}
+                  coinlapach={buble.coinlapach}
+                  {low}
+                  pid={buble.pid}
+                  noOfusers={buble.noOfusers}
+                  acts={buble.acts}
+                  restime={buble.restime}
+                  chat={buble.chat ?? null}
+                  askId={buble.askId ?? null}
+                  myRoundProposedBy={buble.myRoundProposedBy ?? null}
+                  myOrdern={buble.myOrdern ?? 0}
+                  myAskUsers={buble.myAskUsers ?? []}
+                  myRound={buble.myRound ?? null}
+                  alreadyi={buble.alreadyi}
+                  {askedarr}
+                  {declineddarr}
+                  deadLine={buble.sqadualed}
+                  forumId={buble.forumId}
+                  oid={buble.id}
+                  projectName={buble.projectName}
+                  role={buble.tafkidims}
+                  skills={buble.skills}
+                  missionDetails={buble.descrip}
+                  hearotMeyuchadot={buble.hearotMeyuchadot}
+                  src={buble.src}
+                  missionName={buble.name}
+                  projectId={buble.projectId}
+                  workways={buble.work_ways}
+                  noOfHours={buble.noofhours}
+                  perhour={buble.perhour}
+                  total={buble.noofhours * buble.perhour}
+                  cards="true"
+                /></SwiperSlide
+              >
+            {:else if buble.ani === 'huca' && milon.pmashs == true}
+              <SwiperSlide
+                class={isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'}
+                ><Mashsug
+                  onLess={delo}
+                  cards="true"
+                  onHover={hover}
+                  onProj={proj}
+                  onUser={user}
+                  messege={buble.messege}
+                  {i}
+                  isVisible={currentIndex === i}
+                  coinlapach={buble.coinlapach}
+                  {low}
+                  {askedarr}
+                  declineddarra={buble.declineddarra}
+                  deadLine={buble.sqadualed}
+                  sqadualedf={buble.sqadualedf}
+                  kindOf={buble.kindOf}
+                  recurring={buble.recurring}
+                  cycleSize={buble.cycleSize}
+                  oid={buble.oid}
+                  id={buble.id}
+                  askId={buble.myAskId ?? buble.askId ?? 1}
+                  myRoundProposedBy={buble.myRoundProposedBy ?? null}
+                  myOrdern={buble.myOrdern ?? 0}
+                  myAskUsers={buble.myAskUsers ?? []}
+                  myRound={buble.myRound ?? null}
+                  price={buble.price}
+                  myp={buble.myp}
+                  already={buble.already}
+                  restime={buble.restime}
+                  projectName={buble.projectName}
+                  missionDetails={buble.descrip}
+                  notes={buble.hearotMeyuchadot}
+                  src={buble.srcb}
+                  mashName={buble.mashname}
+                  projectId={buble.projectId}
+                  descrip={buble.descrip}
+                  spnot={buble.spnot}
+                  easy={buble.easy}
+                /></SwiperSlide
+              >
+            {:else if buble.ani === 'hachla' && milon.hachla == true}
+              <SwiperSlide
+                class={isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'}
+                ><DecisionMaking
+                  onAcsept={delo}
+                  onDecline={delo}
+                  onHover={hover}
+                  onProj={proj}
+                  cards="true"
+                  onChat={chat}
+                  timegramaDate={buble.timegramaDate}
+                  timegramaId={buble.timegramaId}
+                  restime={buble.restime}
+                  noofpu={buble.noofpu ?? buble.noof}
+                  newpicid={buble?.newpicid}
+                  coinlapach={buble.coinlapach}
+                  created_at={buble.created_at}
+                  spdata={buble.spdata}
+                  isVisible={currentIndex === i}
+                  kind={buble.kind}
+                  messege={buble.messege}
+                  myid={buble.myid}
+                  noofusersWaiting={buble.noofusersWaiting}
+                  uids={buble.uids}
+                  what={buble.mypos}
+                  noofusersOk={buble.noofusersOk}
+                  noofusersNo={buble.noofusersNo}
+                  already={buble.already}
+                  users={buble.users}
+                  askId={buble.pendId}
+                  projectName={buble.projectName}
+                  projectId={buble.projectId}
+                  userId={buble.uid}
+                  src={buble.src}
+                  src2={buble?.newpic}
+                  stylef={buble.stylef}
+                  st={buble.st}
+                  spid={buble.spid}
+                  saleClaim={buble.saleClaim}
+                  {low}
+                /></SwiperSlide
+              >
+            {/if}
+          {/each}
+          <SwiperSlide
+            class={isMobileOrTablet() ? 'swipr-slidemobile' : 'swiper-slidec'}
+          >
+            <div
+              class="flex flex-col items-center justify-center h-full w-full"
+            >
+              <h2 class="text-2xl font-bold mb-4">
+                {$lang === 'he' ? 'התעדכנת בהכל' : 'End of the line'}
+              </h2>
+              <Button
+                onClick={() => swiperRef?.slideTo(0)}
+                text={{ he: 'חזרה להתחלה', en: 'Back to Start' }}
+              />
+            </div>
+          </SwiperSlide>
+          <!--- <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 1</SwiperSlide><SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 2</SwiperSlide
   ><SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 3</SwiperSlide><SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 4</SwiperSlide
   ><SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 5</SwiperSlide><SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 6</SwiperSlide
   ><SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 7</SwiperSlide><SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 8</SwiperSlide
   ><SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 9</SwiperSlide>-->
-            </Swiper>
-          {/key}
-        </div>
-      </div>
-    {:else if low == true}
-      <div class="body grid items-center justify-center">
-        <Lowding height="50vh" />
-      </div>
-    {:else}
-      <div class="body flex flex-col items-center justify-center">
-        <h1 class="text-2xl font-bold text-barbi text-center">
-          {noThings[$lang]}
-        </h1>
-        <Button onClick={() => goto('/me')} text={toProfile} />
-      </div>
-    {/if}
-
+        </Swiper>
+      {/key}
+    </div>
+  </div>
+{:else if low == true}
+  <div class="body grid items-center justify-center">
+    <Lowding height="50vh" />
+  </div>
+{:else}
+  <div class="body flex flex-col items-center justify-center">
+    <h1 class="text-2xl font-bold text-barbi text-center">
+      {noThings[$lang]}
+    </h1>
+    <Button onClick={() => goto('/me')} text={toProfile} />
+  </div>
+{/if}
 
 <style>
   .body {

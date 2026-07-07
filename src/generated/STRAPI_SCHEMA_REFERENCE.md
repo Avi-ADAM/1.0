@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-07-06
+> Last updated: 2026-07-07
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -23,7 +23,7 @@ import type { StrapiEntity, StrapiCollection, StrapiMedia } from '$lib/types/str
 
 ---
 
-## 🏗️ Content Type Entities (114)
+## 🏗️ Content Type Entities (115)
 
 These are the main content types in the Strapi backend.
 
@@ -310,6 +310,7 @@ These are the main content types in the Strapi backend.
 | `moreHours` | `Maybe<MesimabetahalichEntityResponse>` |
 | `negodes` | `Maybe<Array<Maybe<ComponentProjectsNegodes>>>` |
 | `negom` | `Maybe<Array<Maybe<ComponentProjectsNegom>>>` |
+| `negos` | `Maybe<NegoRelationResponseCollection>` |
 | `newFlink` | `Maybe<Scalars['String']['output']>` |
 | `newHours` | `Maybe<Scalars['Int']['output']>` |
 | `newWlink` | `Maybe<Scalars['String']['output']>` |
@@ -1055,6 +1056,7 @@ These are the main content types in the Strapi backend.
 | `createRichtextLocalization` | `Maybe<RichtextEntityResponse>` |
 | `createRikmash` | `Maybe<RikmashEntityResponse>` |
 | `createSale` | `Maybe<SaleEntityResponse>` |
+| `createSealedEnvelope` | `Maybe<SealedEnvelopeEntityResponse>` |
 | `createSeeder` | `Maybe<SeederEntityResponse>` |
 | `createSheirut` | `Maybe<SheirutEntityResponse>` |
 | `createSheirutFulfillment` | `Maybe<SheirutFulfillmentEntityResponse>` |
@@ -1166,6 +1168,7 @@ These are the main content types in the Strapi backend.
 | `deleteRichtext` | `Maybe<RichtextEntityResponse>` |
 | `deleteRikmash` | `Maybe<RikmashEntityResponse>` |
 | `deleteSale` | `Maybe<SaleEntityResponse>` |
+| `deleteSealedEnvelope` | `Maybe<SealedEnvelopeEntityResponse>` |
 | `deleteSeeder` | `Maybe<SeederEntityResponse>` |
 | `deleteSheirut` | `Maybe<SheirutEntityResponse>` |
 | `deleteSheirutFulfillment` | `Maybe<SheirutFulfillmentEntityResponse>` |
@@ -1274,6 +1277,7 @@ These are the main content types in the Strapi backend.
 | `updateRichtext` | `Maybe<RichtextEntityResponse>` |
 | `updateRikmash` | `Maybe<RikmashEntityResponse>` |
 | `updateSale` | `Maybe<SaleEntityResponse>` |
+| `updateSealedEnvelope` | `Maybe<SealedEnvelopeEntityResponse>` |
 | `updateSeeder` | `Maybe<SeederEntityResponse>` |
 | `updateSheirut` | `Maybe<SheirutEntityResponse>` |
 | `updateSheirutFulfillment` | `Maybe<SheirutFulfillmentEntityResponse>` |
@@ -1311,6 +1315,7 @@ These are the main content types in the Strapi backend.
 |-------|------|
 | `acceptedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `decision` | `Maybe<DecisionEntityResponse>` |
 | `des` | `Maybe<Scalars['JSON']['output']>` |
 | `fixprice` | `Maybe<Scalars['Boolean']['output']>` |
 | `kindOf` | `Maybe<Enum_Nego_Kindof>` |
@@ -1970,6 +1975,8 @@ These are the main content types in the Strapi backend.
 | `rikmashes` | `Maybe<RikmashEntityResponseCollection>` |
 | `sale` | `Maybe<SaleEntityResponse>` |
 | `sales` | `Maybe<SaleEntityResponseCollection>` |
+| `sealedEnvelope` | `Maybe<SealedEnvelopeEntityResponse>` |
+| `sealedEnvelopes` | `Maybe<SealedEnvelopeEntityResponseCollection>` |
 | `seeder` | `Maybe<SeederEntityResponse>` |
 | `seeders` | `Maybe<SeederEntityResponseCollection>` |
 | `sheirut` | `Maybe<SheirutEntityResponse>` |
@@ -2229,6 +2236,16 @@ These are the main content types in the Strapi backend.
 | `unit` | `Maybe<Scalars['Float']['output']>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `users_permissions_user` | `Maybe<UsersPermissionsUserEntityResponse>` |
+
+### SealedEnvelope
+| Field | Type |
+|-------|------|
+| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `envelopeId` | `Scalars['String']['output']` |
+| `payload` | `Scalars['JSON']['output']` |
+| `spaceId` | `Scalars['String']['output']` |
+| `ts` | `Maybe<Scalars['Long']['output']>` |
+| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 
 ### Seeder
 | Field | Type |
@@ -3706,6 +3723,7 @@ These are Strapi components (reusable field groups).
 | `hm` | `Maybe<Scalars['Float']['output']>` |
 | `id` | `Scalars['ID']['output']` |
 | `kindOf` | `Maybe<Enum_Componentprojectsnegom_Kindof>` |
+| `notes` | `Maybe<Scalars['String']['output']>` |
 | `price` | `Maybe<Scalars['Float']['output']>` |
 | `sqadualed` | `Maybe<Scalars['DateTime']['output']>` |
 | `sqadualedf` | `Maybe<Scalars['DateTime']['output']>` |
@@ -3718,6 +3736,7 @@ These are Strapi components (reusable field groups).
 | `hm` | `InputMaybe<FloatFilterInput>` |
 | `kindOf` | `InputMaybe<StringFilterInput>` |
 | `not` | `InputMaybe<ComponentProjectsNegomFiltersInput>` |
+| `notes` | `InputMaybe<StringFilterInput>` |
 | `or` | `InputMaybe<Array<InputMaybe<ComponentProjectsNegomFiltersInput>>>` |
 | `price` | `InputMaybe<FloatFilterInput>` |
 | `sqadualed` | `InputMaybe<DateTimeFilterInput>` |
@@ -3730,6 +3749,7 @@ These are Strapi components (reusable field groups).
 | `hm` | `InputMaybe<Scalars['Float']['input']>` |
 | `id` | `InputMaybe<Scalars['ID']['input']>` |
 | `kindOf` | `InputMaybe<Enum_Componentprojectsnegom_Kindof>` |
+| `notes` | `InputMaybe<Scalars['String']['input']>` |
 | `price` | `InputMaybe<Scalars['Float']['input']>` |
 | `sqadualed` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `sqadualedf` | `InputMaybe<Scalars['DateTime']['input']>` |
@@ -3876,7 +3896,7 @@ These are Strapi components (reusable field groups).
 
 ---
 
-## 📝 Input Types (112)
+## 📝 Input Types (113)
 
 Used for creating/updating content.
 
@@ -4193,6 +4213,7 @@ Used for creating/updating content.
 | `moreHours` | `InputMaybe<Scalars['ID']['input']>` |
 | `negodes` | `InputMaybe<Array<InputMaybe<ComponentProjectsNegodesInput>>>` |
 | `negom` | `InputMaybe<Array<InputMaybe<ComponentProjectsNegomInput>>>` |
+| `negos` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `newFlink` | `InputMaybe<Scalars['String']['input']>` |
 | `newHours` | `InputMaybe<Scalars['Int']['input']>` |
 | `newWlink` | `InputMaybe<Scalars['String']['input']>` |
@@ -4900,6 +4921,7 @@ Used for creating/updating content.
 | Field | Type |
 |-------|------|
 | `acceptedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `decision` | `InputMaybe<Scalars['ID']['input']>` |
 | `des` | `InputMaybe<Scalars['JSON']['input']>` |
 | `fixprice` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `kindOf` | `InputMaybe<Enum_Nego_Kindof>` |
@@ -5537,6 +5559,14 @@ Used for creating/updating content.
 | `unit` | `InputMaybe<Scalars['Float']['input']>` |
 | `users_permissions_user` | `InputMaybe<Scalars['ID']['input']>` |
 
+### SealedEnvelopeInput
+| Field | Type |
+|-------|------|
+| `envelopeId` | `InputMaybe<Scalars['String']['input']>` |
+| `payload` | `InputMaybe<Scalars['JSON']['input']>` |
+| `spaceId` | `InputMaybe<Scalars['String']['input']>` |
+| `ts` | `InputMaybe<Scalars['Long']['input']>` |
+
 ### SeederInput
 | Field | Type |
 |-------|------|
@@ -6144,12 +6174,12 @@ Used for creating/updating content.
 
 ---
 
-## 🔍 Filter Input Types (101)
+## 🔍 Filter Input Types (102)
 
 Used for querying/filtering content. Each content type has a corresponding filter input.
 
 <details>
-<summary>Click to expand all 101 filter types</summary>
+<summary>Click to expand all 102 filter types</summary>
 
 #### ActFiltersInput
 Fields: `and`, `createdAt`, `dateF`, `dateS`, `des`, `forums`, `hashivut`, `id`, `isAssigned`, `link`, `locale`, `localizations`, `mesimabetahaliches`, `my`, `myIshur`, `naasa`, `negopendmissions`, `not`, `open_mission`, `or`, `partofs`, `pendm`, `project`, `publishedAt`, `shem`, `status`, `tafkidims`, `taskdis`, `timegrama`, `timers`, `updatedAt`, `userAndIshur`, `vali`, `valiIshur`
@@ -6206,7 +6236,7 @@ Fields: `and`, `createdAt`, `desc`, `head`, `id`, `not`, `or`, `publishedAt`, `s
 Fields: `and`, `costumers`, `createdAt`, `id`, `not`, `or`, `publishedAt`, `salers`, `updatedAt`
 
 #### DecisionFiltersInput
-Fields: `and`, `archived`, `createdAt`, `decisionName`, `discord`, `drive`, `forums`, `github`, `id`, `kind`, `matanot`, `moreHours`, `negodes`, `negom`, `newFlink`, `newHours`, `newWlink`, `newname`, `newprides`, `newpubdes`, `not`, `or`, `projects`, `publishedAt`, `sale`, `timegrama`, `timtoM`, `twitter`, `updatedAt`, `valluesadd`, `valluesles`, `votes`, `vots`, `whatsapp`
+Fields: `and`, `archived`, `createdAt`, `decisionName`, `discord`, `drive`, `forums`, `github`, `id`, `kind`, `matanot`, `moreHours`, `negodes`, `negom`, `negos`, `newFlink`, `newHours`, `newWlink`, `newname`, `newprides`, `newpubdes`, `not`, `or`, `projects`, `publishedAt`, `sale`, `timegrama`, `timtoM`, `twitter`, `updatedAt`, `valluesadd`, `valluesles`, `votes`, `vots`, `whatsapp`
 
 #### DeffinitionFiltersInput
 Fields: `and`, `countries`, `createdAt`, `deffinitionName`, `free_people`, `id`, `locale`, `localizations`, `not`, `or`, `projects`, `publishedAt`, `updatedAt`
@@ -6299,7 +6329,7 @@ Fields: `and`, `createdAt`, `id`, `name`, `not`, `or`, `publishedAt`, `sps`, `up
 Fields: `and`, `ani`, `archived`, `createdAt`, `done`, `finish`, `id`, `mesimabetahalich`, `not`, `or`, `sale`, `sheirut`, `start`, `updatedAt`, `want`
 
 #### NegoFiltersInput
-Fields: `acceptedAt`, `and`, `createdAt`, `des`, `fixprice`, `id`, `kindOf`, `location`, `maap`, `mashaabims`, `matanot`, `matanotpend`, `missions`, `name`, `not`, `or`, `price`, `proposedHours`, `proposedPrice`, `proposedQuantity`, `publishedAt`, `quant`, `ratson_proposal`, `recipeMission`, `recipeResource`, `rejectedAt`, `updatedAt`, `votes`
+Fields: `acceptedAt`, `and`, `createdAt`, `decision`, `des`, `fixprice`, `id`, `kindOf`, `location`, `maap`, `mashaabims`, `matanot`, `matanotpend`, `missions`, `name`, `not`, `or`, `price`, `proposedHours`, `proposedPrice`, `proposedQuantity`, `publishedAt`, `quant`, `ratson_proposal`, `recipeMission`, `recipeResource`, `rejectedAt`, `updatedAt`, `votes`
 
 #### NegoMashFiltersInput
 Fields: `and`, `askm`, `createdAt`, `cycleSize`, `descrip`, `easy`, `hm`, `id`, `isOriginal`, `kindOf`, `linkto`, `location`, `name`, `not`, `open_mashaabim`, `or`, `ordern`, `pmash`, `price`, `proposedBy`, `publishedAt`, `recurring`, `spnot`, `sqadualed`, `sqadualedf`, `status`, `updatedAt`, `users`, `users_permissions_user`
@@ -6363,6 +6393,9 @@ Fields: `agprice`, `and`, `createdAt`, `cyclesCount`, `deliveries`, `firstDelive
 
 #### SaleFiltersInput
 Fields: `and`, `confirmedBy`, `createdAt`, `date`, `decision`, `finishDate`, `holderDecidedAt`, `holderStatus`, `id`, `in`, `isMonterActive`, `isSiteShareIncome`, `matanot`, `monters`, `not`, `note`, `or`, `pending`, `project`, `publishedAt`, `reporter`, `sheiruts`, `source_project`, `splited`, `startDate`, `tosplits`, `unit`, `updatedAt`, `users_permissions_user`
+
+#### SealedEnvelopeFiltersInput
+Fields: `and`, `createdAt`, `envelopeId`, `id`, `not`, `or`, `payload`, `spaceId`, `ts`, `updatedAt`
 
 #### SeederFiltersInput
 Fields: `and`, `createdAt`, `finnish`, `id`, `mesimabetahalich`, `not`, `or`, `publishedAt`, `start`, `updatedAt`
@@ -6458,12 +6491,12 @@ Fields: `allSubmited`, `and`, `createdAt`, `done`, `id`, `mesimabetahalich`, `no
 
 ---
 
-## 📦 Entity Response Types (391)
+## 📦 Entity Response Types (394)
 
 Wrapper types for GraphQL responses.
 
 <details>
-<summary>Click to expand all 391 response types</summary>
+<summary>Click to expand all 394 response types</summary>
 
 - **ActEntity**: `attributes: Maybe<Act>`, `id: Maybe<Scalars['ID']['output']>`
 - **ActEntityResponse**: `data: Maybe<ActEntity>`
@@ -6741,6 +6774,9 @@ Wrapper types for GraphQL responses.
 - **SaleEntityResponse**: `data: Maybe<SaleEntity>`
 - **SaleEntityResponseCollection**: `data: Array<SaleEntity>`, `meta: ResponseCollectionMeta`
 - **SaleRelationResponseCollection**: `data: Array<SaleEntity>`
+- **SealedEnvelopeEntity**: `attributes: Maybe<SealedEnvelope>`, `id: Maybe<Scalars['ID']['output']>`
+- **SealedEnvelopeEntityResponse**: `data: Maybe<SealedEnvelopeEntity>`
+- **SealedEnvelopeEntityResponseCollection**: `data: Array<SealedEnvelopeEntity>`, `meta: ResponseCollectionMeta`
 - **SeederEntity**: `attributes: Maybe<Seeder>`, `id: Maybe<Scalars['ID']['output']>`
 - **SeederEntityResponse**: `data: Maybe<SeederEntity>`
 - **SeederEntityResponseCollection**: `data: Array<SeederEntity>`, `meta: ResponseCollectionMeta`
@@ -6965,7 +7001,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 18416 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 18513 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

@@ -351,6 +351,8 @@ export interface CustomizeOpenMissionParams {
 export type ActionKey =
   | 'createTask'
   | 'updateTask'
+  | 'createMission'
+  | 'completeMission'
   | 'createHaluka'
   | 'createTosplit'
   | 'approveHaluka'
@@ -582,6 +584,18 @@ export async function executeAction<K extends ActionKey>(
     }
 
     console.log(`[ActionClient] Action succeeded:`, result.data);
+
+    // S2b shadow-sign (HANDOFF T4 step 6) — fire-and-forget parallel
+    // ConsentEvent for actions registered in the shadow registry. Never
+    // blocks or fails the action; addVote/createSale keep their existing
+    // per-call-site signing and are NOT in the registry.
+    if (browser) {
+      import('./shadowSignRegistry')
+        .then(({ shadowSignForAction }) =>
+          shadowSignForAction(actionKey, params as Record<string, unknown>, result.data)
+        )
+        .catch(() => {});
+    }
 
     // Execute update strategy if not skipped
     if (!options.skipUpdateStrategy && result.updateStrategy) {

@@ -16,9 +16,12 @@
  */
 
 import type { ActionConfig } from '../types';
+import { createHalukaConsentSpec } from '$lib/consent/specs/s2b';
 
 export const createHalukaConfig: ActionConfig = {
   key: 'createHaluka',
+  // S2b shadow event (haluka.create) — signed client-side via shadowSignRegistry.
+  consentSpec: createHalukaConsentSpec,
   
   description: 'Create a new haluka (distribution transfer) from one user to another',
   

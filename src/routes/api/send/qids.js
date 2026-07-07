@@ -84,6 +84,23 @@ const qids_base = {
       data { id }
     }
   }`,
+  'getDecisionChatForum': `query GetDecisionChatForum($id: ID!) {
+    decision(id: $id) {
+      data {
+        id
+        attributes {
+          decisionName
+          projects(pagination: { limit: 1 }) { data { id } }
+          forums(pagination: { limit: 1 }) { data { id } }
+        }
+      }
+    }
+  }`,
+  'linkForumToDecision': `mutation LinkForumToDecision($id: ID!, $forumId: ID!) {
+    updateDecision(id: $id, data: { forums: [$forumId] }) {
+      data { id }
+    }
+  }`,
   '2cGetMoneyReceivers': `query GetMoneyReceivers($id: ID!) {
     sheirut(id: $id) {
       data {
@@ -4226,6 +4243,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                       price
                       kindOf
                       sqadualed
+                      sqadualedf
                     }
                     sale {
                       data {
@@ -8868,6 +8886,17 @@ export const moachQids = {
       }
     }
   }`,
+  // Cheap count-only query for the "opportunities" group badge in the moach
+  // nav — id + status only, counted client-side with the same active statuses
+  // (suggested/viewed) the wishes page uses.
+  'getOpenWishCounts': `query GetOpenWishCounts($projectId: ID!, $limit: Int) {
+    ratsonProposals(
+      filters: { project: { id: { eq: $projectId } } }
+      pagination: { limit: $limit }
+    ) {
+      data { id attributes { status_proposal } }
+    }
+  }`,
   // Single-entity queries for the focused in-moach vote pages
   // (moach/[projectId]/votes/[kind]/[id]). Field selections mirror the lev
   // page's pendm/pmash selections exactly so the shared extractors/processors
@@ -12120,7 +12149,7 @@ export const qids = {
           archived
           decisionName
           vots { what id order zman users_permissions_user { data { id } } }
-          negom { id hm price kindOf sqadualed }
+          negom { id hm price kindOf sqadualed sqadualedf }
           timegrama { data { id attributes { date done } } }
           sale {
             data {

@@ -1004,8 +1004,7 @@ export function extractDecisions(userData: any): DecisionData[] {
                     price: lastNegom.price,
                     kindOf: lastNegom.kindOf,
                     sqadualed: lastNegom.sqadualed,
-                    sqadualedf: lastNegom.sqadualedf,
-                    descrip: lastNegom.descrip
+                    sqadualedf: lastNegom.sqadualedf
                   }
                 : {
                     hm: sale.attributes?.unit,
@@ -1015,8 +1014,7 @@ export function extractDecisions(userData: any): DecisionData[] {
                         : sale.attributes?.in,
                     kindOf: null,
                     sqadualed: sale.attributes?.startDate,
-                    sqadualedf: sale.attributes?.finishDate,
-                    descrip: null
+                    sqadualedf: sale.attributes?.finishDate
                   }
             }
           } as any);

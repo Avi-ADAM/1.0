@@ -25,7 +25,13 @@ export type StoredPubKey = {
   pubSpkiB64: string;          // base64url-encoded SPKI bytes
   label: string;
   cert?: DeviceCert;           // null for self-cert / TOFU first device
+  /** S3a: the device's ECDH P-256 public key (b64url SPKI) for receiving
+   *  wrapped epoch keys. Absent on devices that predate the E2E layer. */
+  kemPubSpkiB64?: string;
   revokedAt?: number;
+  /** T7 — 'manual' = user revoked one device; 'reset' = chain reset revoked
+   *  everything (cancellable during the cooldown, see devicePolicy.ts). */
+  revokedReason?: 'manual' | 'reset';
   addedAt: number;
 };
 

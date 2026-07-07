@@ -95,6 +95,123 @@ export type SaleClaimView = {
   closed?: { decidedAt: number; by: 'vote' | 'timeout' };
 };
 
+/**
+ * A mission and its lifecycle, projected from mission.* events (S2b, T4).
+ * pendm / negopendmission / mesimabetahalich / finnishedMission / finiapruval
+ * are NOT separate entities here — they are states of this one view
+ * (PLAN_serverless_p2p_data §2).
+ *
+ *   pend → (unanimous pendm.vote) → inProgress → (mission.complete) →
+ *   completed → (mission.approve) → approved
+ *
+ * `stageIds` holds the legacy Strapi stage-entity ids (pendm id, ask id,
+ * mesimabetahalich id…) so stage-vote events whose subject is the stage
+ * entity can find their mission.
+ */
+export type MissionView = {
+  id: string;
+  createdBy: string;
+  createdAt: number;
+  name?: string;
+  assignee?: string;
+  hours?: number;
+  perhour?: number;
+  stageIds: string[];
+  state: 'pend' | 'proposed' | 'inProgress' | 'completed' | 'approved';
+  completion?: {
+    by: string;
+    ts: number;
+    hoursDone?: number;
+    /** Deletable free text (HANDOFF T4 deletion policy) — blanked by payload.redact. */
+    why?: string;
+    redacted?: boolean;
+  };
+  approval?: { by: string; ts: number };
+};
+
+/** A haluka (distribution transfer), projected from haluka.* events. */
+export type HalukaView = {
+  id: string;
+  from: string;
+  to: string;
+  tosplitId?: string;
+  amount?: number;
+  code?: string;
+  status: 'pending' | 'approved' | 'confirmed';
+};
+
+/**
+ * A Decision entity (generic — any `kind`). The bilateral saleClaim kind
+ * keeps its dedicated `saleClaims` tracker; this view is the generic record
+ * (kind, creator) that decision.create plants for every kind.
+ */
+export type DecisionView = {
+  id: string;
+  createdBy: string;
+  createdAt: number;
+  kind?: string;
+  /** Optional pointer to the entity the decision is about. */
+  ref?: string;
+};
+
+/**
+ * Generic per-subject vote tally for staged consent subjects
+ * (pend / sheirutpend / ask / decision / weFinnish…). Keyed by subjectKey.
+ * Unanimity over current members follows the tosplitVote rule.
+ */
+export type StageVotesView = {
+  subjectType: string;
+  subjectId: string;
+  votes: Map<string, { what: boolean; ts: number; eventId: string; order: number }>;
+  approved: boolean;
+};
+
+/** Work-timer accumulator per mission/stage subject, from time.tick events. */
+export type TimerView = {
+  id: string;
+  totalMs: number;
+  runningSince?: number;
+  runningBy?: string;
+};
+
+export type MessageView = {
+  id: string;
+  by: string;
+  ts: number;
+  /** Deletable free text (HANDOFF T4 deletion policy) — blanked by payload.redact. */
+  body?: string;
+  /** S3 upgrade path: content-addressed payload reference (sha256). */
+  bodyRef?: string;
+  redacted?: boolean;
+};
+
+/**
+ * A forum and its messages. `createdBy`/`createdAt` are set by forum.create;
+ * a message.post for an unknown forum plants an implicit stub (legacy forums
+ * predate the chain and never got a create event).
+ */
+export type ForumView = {
+  id: string;
+  createdBy?: string;
+  createdAt?: number;
+  kind?: string;
+  /** Ordered by (ts, id) — deterministic regardless of arrival order. */
+  messages: MessageView[];
+};
+
+/** A meeting (pgisha), from pgisha.create / pgisha.approve. */
+export type MeetingView = {
+  id: string;
+  createdBy: string;
+  createdAt: number;
+  date?: string;
+  name?: string;
+  approvals: Set<string>;
+};
+
+/** member.away marks — actor's own declaration of temporary absence. */
+export type AwayMark = { since: number; until?: number };
+
 export type ProjectState = {
   projectId: string | null;
   members: Set<string>;
@@ -112,6 +229,25 @@ export type ProjectState = {
   sales: Map<string, SaleView>;
   /** Keyed by Decision id — only entries for kind:'saleClaim'. */
   saleClaims: Map<string, SaleClaimView>;
+  // ---- S2b (HANDOFF T4) — category-A entity maps ----
+  /** Keyed by Mission id. */
+  missions: Map<string, MissionView>;
+  /** Keyed by Haluka id. */
+  halukas: Map<string, HalukaView>;
+  /** Keyed by Decision id — generic record for every kind. */
+  decisions: Map<string, DecisionView>;
+  /** Keyed by subjectKey — generic staged-consent vote tallies. */
+  stageVotes: Map<string, StageVotesView>;
+  /** Keyed by subject id (mission / mesimabetahalich). */
+  timers: Map<string, TimerView>;
+  /** Keyed by Forum id. */
+  forums: Map<string, ForumView>;
+  /** Keyed by Meeting (pgisha) id. */
+  meetings: Map<string, MeetingView>;
+  /** Keyed by userId — member.away declarations. */
+  away: Map<string, AwayMark>;
+  /** Keyed by settings path — project.amend value.set entries. */
+  settings: Map<string, unknown>;
   asOf: number;
 };
 
@@ -125,6 +261,15 @@ export function emptyState(projectId: string | null = null): ProjectState {
     snapshots: [],
     sales: new Map(),
     saleClaims: new Map(),
+    missions: new Map(),
+    halukas: new Map(),
+    decisions: new Map(),
+    stageVotes: new Map(),
+    timers: new Map(),
+    forums: new Map(),
+    meetings: new Map(),
+    away: new Map(),
+    settings: new Map(),
     asOf: 0
   };
 }

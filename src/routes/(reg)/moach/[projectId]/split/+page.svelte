@@ -8,6 +8,7 @@
   import { lang } from '$lib/stores/lang.js';
   import Fini from '$lib/components/prPr/fini.svelte';
   import SplitsArchive from '$lib/components/prPr/SplitsArchive.svelte';
+  import SpaceProjectionShadow from '$lib/components/consent/SpaceProjectionShadow.svelte';
 
   const moachStore = getMoachStore();
 
@@ -61,6 +62,11 @@
       <Lowding />
     </div>
   {:else if financials}
+    <!-- T2 (HANDOFF_DISTRIBUTED_DB): local projection beside the GraphQL data,
+         shadow-only — renders nothing unless SPACE_SYNC_ENABLED. -->
+    {#key projectId}
+      <SpaceProjectionShadow {projectId} users={base?.user_1s?.data || []} />
+    {/key}
     <section class="bg-white p-6 rounded-xl shadow-sm">
       <h2 class="text-xl font-bold mb-4 text-primary">{t.status}</h2>
       <Fini

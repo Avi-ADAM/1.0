@@ -16,9 +16,28 @@
 
 import { canonicalize, type JsonValue } from '$lib/crypto/canonical';
 import { b64urlEncode } from '$lib/crypto/b64';
-import type { ProjectState, SubjectRound, TosplitView } from './projection';
+import type {
+  ProjectState,
+  SubjectRound,
+  TosplitView,
+  SaleView,
+  SaleClaimView,
+  MissionView,
+  HalukaView,
+  DecisionView,
+  StageVotesView,
+  TimerView,
+  ForumView,
+  MeetingView,
+  AwayMark
+} from './projection';
 
-export const STATE_ROOT_VERSION = 1;
+// v2 — S2b (HANDOFF T4): the one centralized bump for the category-A
+// expansion. Adds sales/saleClaims (present in ProjectState since
+// PLAN_sale_holder_consent, deliberately left out of v1 pending this bump)
+// and the new entity maps (missions, halukas, decisions, stageVotes, timers,
+// forums, meetings, away, settings).
+export const STATE_ROOT_VERSION = 2;
 
 /**
  * Pure: ProjectState → deterministic JSON value (sorted, no Sets/Maps/bigint).
@@ -51,8 +70,25 @@ export function normalizeState(state: ProjectState): JsonValue {
       .map(([k, v]) => [k, normalizeTosplit(v)] as JsonValue),
     rounds: [...state.rounds.entries()]
       .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
-      .map(([k, v]) => [k, normalizeRound(v)] as JsonValue)
+      .map(([k, v]) => [k, normalizeRound(v)] as JsonValue),
+    sales: sortedEntries(state.sales, normalizeSale),
+    saleClaims: sortedEntries(state.saleClaims, normalizeSaleClaim),
+    missions: sortedEntries(state.missions, normalizeMission),
+    halukas: sortedEntries(state.halukas, normalizeHaluka),
+    decisions: sortedEntries(state.decisions, normalizeDecision),
+    stageVotes: sortedEntries(state.stageVotes, normalizeStageVotes),
+    timers: sortedEntries(state.timers, normalizeTimer),
+    forums: sortedEntries(state.forums, normalizeForum),
+    meetings: sortedEntries(state.meetings, normalizeMeeting),
+    away: sortedEntries(state.away, normalizeAway),
+    settings: sortedEntries(state.settings, (v) => (v ?? null) as JsonValue)
   } as unknown as JsonValue;
+}
+
+function sortedEntries<V>(map: Map<string, V>, norm: (v: V) => JsonValue): JsonValue {
+  return [...map.entries()]
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+    .map(([k, v]) => [k, norm(v)] as JsonValue) as unknown as JsonValue;
 }
 
 function normalizeTosplit(t: TosplitView): JsonValue {
@@ -81,6 +117,124 @@ function normalizeRound(r: SubjectRound): JsonValue {
     } as JsonValue;
   }
   return out as JsonValue;
+}
+
+// ---- S2b (v2) normalizers. undefined fields are dropped by canonicalize's
+// drop rule (same convention as the v1 normalizers above). ----
+
+function normalizeSale(s: SaleView): JsonValue {
+  return {
+    id: s.id,
+    reporterId: s.reporterId,
+    holderId: s.holderId,
+    status: s.status,
+    decisionId: s.decisionId,
+    confirmedBy: s.confirmedBy,
+    version: s.version
+  } as unknown as JsonValue;
+}
+
+function normalizeSaleClaim(c: SaleClaimView): JsonValue {
+  return {
+    decisionId: c.decisionId,
+    saleId: c.saleId,
+    holderId: c.holderId,
+    reporterId: c.reporterId,
+    standingOrder: c.standingOrder,
+    signers: [...c.signers].sort(),
+    closed: c.closed
+  } as unknown as JsonValue;
+}
+
+function normalizeMission(m: MissionView): JsonValue {
+  return {
+    id: m.id,
+    createdBy: m.createdBy,
+    createdAt: m.createdAt,
+    name: m.name,
+    assignee: m.assignee,
+    hours: m.hours,
+    perhour: m.perhour,
+    stageIds: [...m.stageIds].sort(),
+    state: m.state,
+    completion: m.completion,
+    approval: m.approval
+  } as unknown as JsonValue;
+}
+
+function normalizeHaluka(h: HalukaView): JsonValue {
+  return {
+    id: h.id,
+    from: h.from,
+    to: h.to,
+    tosplitId: h.tosplitId,
+    amount: h.amount,
+    code: h.code,
+    status: h.status
+  } as unknown as JsonValue;
+}
+
+function normalizeDecision(d: DecisionView): JsonValue {
+  return {
+    id: d.id,
+    createdBy: d.createdBy,
+    createdAt: d.createdAt,
+    kind: d.kind,
+    ref: d.ref
+  } as unknown as JsonValue;
+}
+
+function normalizeStageVotes(s: StageVotesView): JsonValue {
+  return {
+    subjectType: s.subjectType,
+    subjectId: s.subjectId,
+    approved: s.approved,
+    votes: [...s.votes.entries()]
+      .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+      .map(([k, v]) => [k, { what: v.what, ts: v.ts, eventId: v.eventId, order: v.order }])
+  } as unknown as JsonValue;
+}
+
+function normalizeTimer(t: TimerView): JsonValue {
+  return {
+    id: t.id,
+    totalMs: t.totalMs,
+    runningSince: t.runningSince,
+    runningBy: t.runningBy
+  } as unknown as JsonValue;
+}
+
+function normalizeForum(f: ForumView): JsonValue {
+  return {
+    id: f.id,
+    createdBy: f.createdBy,
+    createdAt: f.createdAt,
+    kind: f.kind,
+    // Already kept sorted by (ts, id) by the messagePost reducer.
+    messages: f.messages.map((m) => ({
+      id: m.id,
+      by: m.by,
+      ts: m.ts,
+      body: m.body,
+      bodyRef: m.bodyRef,
+      redacted: m.redacted
+    }))
+  } as unknown as JsonValue;
+}
+
+function normalizeMeeting(m: MeetingView): JsonValue {
+  return {
+    id: m.id,
+    createdBy: m.createdBy,
+    createdAt: m.createdAt,
+    date: m.date,
+    name: m.name,
+    approvals: [...m.approvals].sort()
+  } as unknown as JsonValue;
+}
+
+function normalizeAway(a: AwayMark): JsonValue {
+  return { since: a.since, until: a.until } as unknown as JsonValue;
 }
 
 /**

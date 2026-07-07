@@ -1,14 +1,16 @@
 import type { ConsentEvent } from '../event';
 import type { ProjectState, SaleClaimView, SaleView } from '../projection';
+import { recordStageVote } from './stageVote';
 
 /**
  * decision.vote — agreement on the standing round of a Decision.
  *
- * This event name is shared by every Decision kind (pic, pubdes, ... and now
- * saleClaim), but this reducer only has an effect when the subject is a
- * TRACKED saleClaim (i.e. `state.saleClaims` already has an entry for it,
- * planted by the `sale.record` reducer). For every other kind it's a no-op —
- * those kinds aren't part of this projection yet.
+ * This event name is shared by every Decision kind (pic, pubdes, ... and
+ * saleClaim). Since S2b (T4):
+ *   - a TRACKED saleClaim (entry in `state.saleClaims`, planted by the
+ *     sale.record reducer) keeps the bilateral maturation logic below;
+ *   - every OTHER kind is tallied generically into `stageVotes` — rikma-wide
+ *     unanimity, same rule as tosplit.vote.
  *
  * A saleClaim's consensus rule is bilateral (reporter + holder), unlike the
  * rikma-wide quorum other kinds use: the round matures the instant BOTH
@@ -19,7 +21,7 @@ import type { ProjectState, SaleClaimView, SaleView } from '../projection';
 export function decisionVote(state: ProjectState, ev: ConsentEvent): ProjectState {
   const decisionId = ev.subject.id;
   const claim = state.saleClaims.get(decisionId);
-  if (!claim) return state; // not a tracked saleClaim — out of scope here
+  if (!claim) return recordStageVote(state, ev); // generic kind — tally only
   if (claim.closed) return state; // already resolved
 
   const p = ev.predicate as { what?: unknown; order?: unknown } | undefined;

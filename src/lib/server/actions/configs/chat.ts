@@ -1,10 +1,14 @@
 
 import type { ActionConfig } from '../types.js';
 import { getForumEntity, normalizeForum, participantIdsForForum } from '../forumAccess.js';
+import { createChatMessageConsentSpec } from '$lib/consent/specs/s2b';
 
 export const chatActions: ActionConfig[] = [
     {
         key: 'createChatMessage',
+        // S2b shadow event (message.post) — signed client-side via
+        // shadowSignRegistry after the server returns messageId.
+        consentSpec: createChatMessageConsentSpec,
         description: 'Create a new message in a forum with multi-channel notifications',
         graphqlOperation: async (params, context, { strapi }) => {
             const { forumId, message } = params;

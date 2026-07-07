@@ -116,6 +116,11 @@ function createSocketClient() {
   let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   let currentUserId: string | null = null;
 
+  // Space sync wake-ups (HANDOFF_DISTRIBUTED_DB T1). Subscriptions survive
+  // reconnects: the set is replayed on every auth_success.
+  const spaceSubscriptions = new Set<string>();
+  let spaceChangedListeners: Array<(spaceId: string) => void> = [];
+
   /**
    * Handle update strategy from socket notification
    */
@@ -241,6 +246,25 @@ function createSocketClient() {
         userId: data.userId,
         error: null
       }));
+
+      // Replay space subscriptions after every (re)connect.
+      for (const spaceId of spaceSubscriptions) {
+        socket?.emit('space:subscribe', { spaceId });
+      }
+    });
+
+    // Space changed (T1) — metadata-only wake-up; replicas pull the content
+    // themselves through the relay.
+    socket.on('space:changed', (data: { spaceId?: string }) => {
+      const spaceId = typeof data?.spaceId === 'string' ? data.spaceId : null;
+      if (!spaceId) return;
+      spaceChangedListeners.forEach(listener => {
+        try {
+          listener(spaceId);
+        } catch (error) {
+          console.error('[SocketClient] Error in space:changed listener:', error);
+        }
+      });
     });
 
     // Authentication failed
@@ -390,8 +414,36 @@ function createSocketClient() {
 
     currentUserId = null;
     notificationListeners = [];
+    spaceChangedListeners = [];
+    spaceSubscriptions.clear();
 
     set(initialState);
+  }
+
+  /**
+   * Subscribe this connection to a space's change wake-ups (T1). Idempotent;
+   * survives reconnects. Pair with unsubscribeSpace on teardown.
+   */
+  function subscribeSpace(spaceId: string): void {
+    if (!spaceId) return;
+    spaceSubscriptions.add(spaceId);
+    if (socket?.connected) socket.emit('space:subscribe', { spaceId });
+  }
+
+  function unsubscribeSpace(spaceId: string): void {
+    spaceSubscriptions.delete(spaceId);
+    if (socket?.connected) socket.emit('space:unsubscribe', { spaceId });
+  }
+
+  /**
+   * Register a space:changed listener. Returns an unsubscribe function.
+   */
+  function onSpaceChanged(listener: (spaceId: string) => void): () => void {
+    spaceChangedListeners.push(listener);
+    return () => {
+      const index = spaceChangedListeners.indexOf(listener);
+      if (index > -1) spaceChangedListeners.splice(index, 1);
+    };
   }
 
   /**
@@ -439,6 +491,9 @@ function createSocketClient() {
     connect,
     disconnect,
     onNotification,
+    subscribeSpace,
+    unsubscribeSpace,
+    onSpaceChanged,
     ping,
     getState,
     isReady

@@ -1,4 +1,5 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { completeMissionConsentSpec } from '$lib/consent/specs/s2b';
 
 /**
  * Calculate timegrama delay based on restime
@@ -237,6 +238,9 @@ const completeMissionHandler: ActionExecutionHandler = async (params, context, {
 
 export const completeMissionConfig: ActionConfig = {
   key: 'completeMission',
+  // S2b shadow event (mission.complete) — signed client-side via
+  // shadowSignRegistry; the worker's sovereign completion report.
+  consentSpec: completeMissionConsentSpec,
   description: 'Submit a mission for completion or approval. Single-user projects finish immediately; multi-user projects create a voting request.',
   graphqlOperation: completeMissionHandler,
 

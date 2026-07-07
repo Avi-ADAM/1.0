@@ -100,7 +100,14 @@
       "Bash(ls .github/)",
       "Bash(echo \"EXIT:$?\")",
       "Bash(ls src/routes/\\\\\\(reg\\\\\\)/moach/*.svelte)",
-      "Bash(ls src/routes/\\\\\\(reg\\\\\\)/*.svelte)"
+      "Bash(ls src/routes/\\\\\\(reg\\\\\\)/*.svelte)",
+      "mcp__visualize__read_me",
+      "Bash(ls \"C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\" | head -20; echo ---; ls \"C:\\\\Users\\\\babay\\\\Documents\\\\GitHub\\\\1.0b\\\\src\\\\api\" 2>/dev/null | head -30)",
+      "Bash(npx @sveltejs/mcp svelte-autofixer \"src/lib/components/consent/SpaceProjectionShadow.svelte\")",
+      "Bash(npx @sveltejs/mcp svelte-autofixer \"src/routes/\\(reg\\)/moach/[projectId]/+layout.svelte\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"http://localhost:5173/src/routes/\\(reg\\)/moach/%5BprojectId%5D/+layout.svelte\")",
+      "Bash(curl -s \"http://localhost:5173/src/routes/\\(reg\\)/moach/%5BprojectId%5D/+layout.svelte\")",
+      "Bash(npx @sveltejs/mcp svelte-autofixer \"src/routes/\\(reg\\)/me/devices/+page.svelte\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\deals\\request",

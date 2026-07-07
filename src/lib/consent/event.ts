@@ -78,10 +78,35 @@ export const ACTIONS = {
   decisionVote:     'decision.vote',
   memberAway:      'member.away',
   timeTick:        'time.tick',
+  // S2b (HANDOFF T4) — category-A vocabulary. Every name below has a reducer
+  // in src/lib/consent/reducers/. Stage-vote names (pendm/sheirutpend/ask)
+  // were already being emitted by addVoteConsentSpec via an unsafe cast;
+  // adding them here makes ActionName cover reality.
+  missionCreate:   'mission.create',
+  pendmVote:       'pendm.vote',
+  sheirutpendVote: 'sheirutpend.vote',
+  askVote:         'ask.vote',
+  halukaConfirm:   'haluka.confirm',
+  decisionCreate:  'decision.create',
+  forumCreate:     'forum.create',
+  messagePost:     'message.post',
+  // GDPR tombstone (HANDOFF T4 deletion policy): a signed request to blank
+  // deletable free-text content from the projection. The log itself is never
+  // rewritten — views keep `redacted: true`.
+  payloadRedact:   'payload.redact',
+  meetingCreate:   'pgisha.create',
+  meetingApprove:  'pgisha.approve',
   snapshotCommit:  'snapshot.commit',
   snapshotVote:    'snapshot.vote',
   deviceCert:      'device.cert',
-  deviceRevoke:    'device.revoke'
+  deviceRevoke:    'device.revoke',
+  // S3a — group-key distribution. The rotate event is PLAINTEXT by design:
+  // you cannot encrypt the key-distribution message with the key it
+  // distributes. Its predicate carries the epoch number and the epoch key
+  // wrapped to every member device (see $lib/space/e2e/epoch.ts). It has NO
+  // reducer on purpose: epochs are transport-layer state, not ProjectState —
+  // adding it to the projection would change stateRoot semantics.
+  epochRotate:     'epoch.rotate'
 } as const;
 
 export type ActionName = typeof ACTIONS[keyof typeof ACTIONS];

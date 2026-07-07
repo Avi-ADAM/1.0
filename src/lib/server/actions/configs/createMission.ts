@@ -32,6 +32,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { calcDeadlineMs } from './actionUtils.js';
+import { createMissionConsentSpec } from '$lib/consent/specs/s2b';
 
 interface ChecklistItem {
   shem: string;
@@ -349,6 +350,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
 
 export const createMissionConfig: ActionConfig = {
   key: 'createMission',
+  // S2b shadow event (mission.create) — signed client-side via
+  // shadowSignRegistry after the server returns missionId/createdEntityId.
+  consentSpec: createMissionConsentSpec,
   description:
     'Create a mission with all 4 branches: Pendm (multi-user open vote), OpenMission+Ask (multi-user assigned), OpenMission solo, or Mesimabetahalich (self-assigned solo). Server resolves user count and deadline from project.',
   graphqlOperation: handler,

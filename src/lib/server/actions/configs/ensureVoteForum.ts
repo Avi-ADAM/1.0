@@ -19,8 +19,8 @@ export const ensureVoteForumConfig: ActionConfig = {
     const { entityType, entityId, forumId } = params;
     const publishedAt = new Date().toISOString();
 
-    if (entityType !== 'pendm' && entityType !== 'pmash') {
-      throw new Error('entityType must be "pendm" or "pmash"');
+    if (entityType !== 'pendm' && entityType !== 'pmash' && entityType !== 'decision') {
+      throw new Error('entityType must be "pendm", "pmash" or "decision"');
     }
     if (!entityId) throw new Error('entityId is required');
 
@@ -36,9 +36,17 @@ export const ensureVoteForumConfig: ActionConfig = {
     }
 
     const getQid =
-      entityType === 'pendm' ? 'getPendmChatForum' : 'getPmashChatForum';
+      entityType === 'pendm'
+        ? 'getPendmChatForum'
+        : entityType === 'pmash'
+          ? 'getPmashChatForum'
+          : 'getDecisionChatForum';
     const linkQid =
-      entityType === 'pendm' ? 'linkForumToPendm' : 'linkForumToPmash';
+      entityType === 'pendm'
+        ? 'linkForumToPendm'
+        : entityType === 'pmash'
+          ? 'linkForumToPmash'
+          : 'linkForumToDecision';
 
     const getRes = await strapi.execute(
       getQid,
@@ -50,8 +58,13 @@ export const ensureVoteForumConfig: ActionConfig = {
     if (!entity) throw new Error(`${entityType} not found`);
 
     const existingForumId = entity.attributes?.forums?.data?.[0]?.id;
+    // A Decision links to `projects` (m2m) + names itself `decisionName`;
+    // pendm/pmash use a singular `project` + `name`.
     const projectId =
-      params.projectId || entity.attributes?.project?.data?.id || null;
+      params.projectId ||
+      entity.attributes?.project?.data?.id ||
+      entity.attributes?.projects?.data?.[0]?.id ||
+      null;
 
     if (existingForumId) {
       return {
@@ -66,11 +79,14 @@ export const ensureVoteForumConfig: ActionConfig = {
 
     if (!projectId) throw new Error('Project ID could not be resolved');
 
-    const subject = entity.attributes?.name
-      ? `${entity.attributes.name}`
-      : entityType === 'pendm'
-        ? 'Mission vote chat'
-        : 'Resource vote chat';
+    const subject =
+      entity.attributes?.name || entity.attributes?.decisionName
+        ? `${entity.attributes.name ?? entity.attributes.decisionName}`
+        : entityType === 'pendm'
+          ? 'Mission vote chat'
+          : entityType === 'pmash'
+            ? 'Resource vote chat'
+            : 'Sale consent chat';
 
     const createRes = await strapi.execute(
       '66CreateForumForAsk',

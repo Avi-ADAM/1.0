@@ -19,6 +19,7 @@
   import { TourItem, run } from 'svelte-tour';
   import Dialog from '$lib/celim/ui/dialog.svelte';
   import { sendToSer } from '$lib/send/sendToSer.js';
+  import { browser } from '$app/environment';
 
   let { children, data } = $props();
   const moachStore = setMoachStore();
@@ -59,6 +60,30 @@
         askCount;
     } catch (e) {
       console.error('[MoachLayout] vote count failed', e);
+    }
+  }
+
+  // Active incoming wishes (suggested/viewed, per the wishes page's "active"
+  // filter) — drives the badge on the opportunities group.
+  let wishCount = $state(0);
+  async function loadWishCount() {
+    if (!projectId) return;
+    try {
+      const res = await sendToSer(
+        { projectId, limit: 100 },
+        'getOpenWishCounts',
+        null,
+        null,
+        false,
+        fetch
+      );
+      const nodes = res?.data?.ratsonProposals?.data ?? [];
+      wishCount = nodes.filter((n) => {
+        const s = n?.attributes?.status_proposal || 'suggested';
+        return s === 'suggested' || s === 'viewed';
+      }).length;
+    } catch (e) {
+      console.error('[MoachLayout] wish count failed', e);
     }
   }
 
@@ -104,6 +129,7 @@
     }
 
     loadVoteCount();
+    loadWishCount();
 
     // Socket integration for real-time invalidation
     socketClient.connect(data.uid);
@@ -215,6 +241,10 @@
       votes: 'הצבעות',
       wishes: 'משאלות נכנסות',
       demand: 'מפת ביקוש',
+      work: 'עשייה',
+      flows: 'תהליכים',
+      money: 'כסף',
+      opps: 'הזדמנויות',
       editPic: 'עריכת תמונה',
       upload: 'העלאה',
       editDetails: 'עריכת פרטים',
@@ -238,6 +268,10 @@
       votes: 'Votes',
       wishes: 'Incoming wishes',
       demand: 'Demand map',
+      work: 'Work',
+      flows: 'Flows',
+      money: 'Money',
+      opps: 'Opportunities',
       editPic: 'Edit Picture',
       upload: 'Upload',
       editDetails: 'Edit Details',
@@ -261,6 +295,10 @@
       votes: 'التصويتات',
       wishes: 'الرغبات الواردة',
       demand: 'خريطة الطلب',
+      work: 'العمل',
+      flows: 'العمليات',
+      money: 'المال',
+      opps: 'الفرص',
       editPic: 'تعدיל الصورة',
       upload: 'تحميل',
       editDetails: 'تعدיל التفاصيل',
@@ -271,33 +309,61 @@
 
   let t = $derived(i18n[$lang] || i18n.en);
 
-  let pendingTabId = $derived(
-    navigating?.to?.url?.pathname
-      ? (tabs.find((tab) => navigating.to.url.pathname.includes(`/${tab.id}`))?.id ?? null)
-      : null
-  );
-
-  const tabs = [
-    { id: 'main', label: 'main' },
-    { id: 'edit', label: 'editDetails' },
-    { id: 'create', label: 'create' },
-    { id: 'gantt', label: 'gantt' },
-    { id: 'kanban', label: 'kanban' },
-    { id: 'progress', label: 'progress' },
-    { id: 'acts', label: 'acts' },
-    { id: 'timers', label: 'timers' },
-    { id: 'chains', label: 'chains' },
-    { id: 'processes', label: 'processes' },
-    { id: 'split', label: 'split' },
-    { id: 'sales', label: 'sales' },
-    { id: 'wishes', label: 'wishes' },
-    { id: 'demand', label: 'demand' },
-    { id: 'votes', label: 'votes' },
-    { id: 'shifts', label: 'shifts' }
+  // Two-tier navigation: 6 groups holding the original tab routes. URLs are
+  // unchanged — only the nav is regrouped. 'edit' moved to the header pencil,
+  // 'create' is the gold action pill at the start of the nav row.
+  const groups = [
+    { id: 'main', label: 'main', tabs: ['main'] },
+    { id: 'work', label: 'work', tabs: ['progress', 'acts', 'kanban', 'gantt', 'timers', 'shifts'] },
+    { id: 'flows', label: 'flows', tabs: ['processes', 'chains'] },
+    { id: 'money', label: 'money', tabs: ['sales', 'split'] },
+    { id: 'opps', label: 'opps', tabs: ['wishes', 'demand'] },
+    { id: 'votes', label: 'votes', tabs: ['votes'] }
   ];
 
-  function isActive(tabId) {
-    return currentPath.includes(`/${tabId}`);
+  // /moach/{projectId}/{tab}[/...] — 'splits/[splitId]' belongs to the split tab
+  function tabFromPath(path) {
+    const seg = path?.split('/')[3];
+    return seg === 'splits' ? 'split' : seg || 'main';
+  }
+
+  let activeTabId = $derived(tabFromPath(currentPath));
+  let activeGroup = $derived(groups.find((g) => g.tabs.includes(activeTabId)) ?? null);
+
+  let pendingTabId = $derived(
+    navigating?.to?.url?.pathname ? tabFromPath(navigating.to.url.pathname) : null
+  );
+  let pendingGroupId = $derived(
+    pendingTabId ? (groups.find((g) => g.tabs.includes(pendingTabId))?.id ?? null) : null
+  );
+
+  // Remember the last visited sub-tab per group (per project) so clicking a
+  // group returns you where you were, not to its first tab.
+  let lastTabs = $state({});
+  $effect(() => {
+    if (!browser || !projectId) return;
+    try {
+      lastTabs = JSON.parse(localStorage.getItem(`moachLastTabs_${projectId}`) || '{}');
+    } catch {
+      lastTabs = {};
+    }
+  });
+  $effect(() => {
+    if (!browser || !projectId || !activeGroup) return;
+    const gid = activeGroup.id;
+    const tid = activeTabId;
+    untrack(() => {
+      if (lastTabs[gid] !== tid) {
+        lastTabs = { ...lastTabs, [gid]: tid };
+        localStorage.setItem(`moachLastTabs_${projectId}`, JSON.stringify(lastTabs));
+      }
+    });
+  });
+
+  function groupHref(group) {
+    const remembered = lastTabs[group.id];
+    const tab = group.tabs.includes(remembered) ? remembered : group.tabs[0];
+    return `/moach/${projectId}/${tab}`;
   }
 
   const backToProjects = () => {
@@ -480,6 +546,23 @@
           >
             <Pub />
           </button>
+          <button
+            onclick={() => goto(`/moach/${projectId}/edit`)}
+            class="p-2 hover:bg-mturk rounded-full transition-colors text-gold"
+            title={t.editDetails}
+          >
+            <svg
+              class="w-6 h-6"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+            </svg>
+          </button>
         </div>
 
         <!-- Member Avatars with Timer Indicators -->
@@ -544,33 +627,62 @@
           <TourItem message={tour.gantt}><span class="tour-anchor"></span></TourItem>
         </div>
 
-        <!-- Navigation Tabs -->
-        <nav
-          class="flex justify-center flex-wrap gap-1 py-4"
-          dir={$isRtl ? 'rtl' : 'ltr'}
-        >
-          {#each tabs as tab (tab.id)}
+        <!-- Navigation: primary groups row + contextual sub-tabs row -->
+        <div class="overflow-x-auto pt-2" dir={$isRtl ? 'rtl' : 'ltr'}>
+          <nav class="flex w-max mx-auto items-center gap-1 sm:gap-2 border-b border-slate-500/60 px-2">
             <a
-              href="/moach/{projectId}/{tab.id}"
-              class="relative hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold px-4 py-2 drop-shadow-lg shadow-gold transition-all
-              {isActive(tab.id)
-                ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-blue-800 font-bold'
-                : 'bg-gradient-to-r from-gra via-grb  to-gre text-purple-700 font-bold'}
-              {pendingTabId === tab.id ? 'animate-pulse opacity-70 scale-95' : ''}"
-              style={!isActive(tab.id) ? 'text-shadow:1px 1px #fff;' : ''}
+              href="/moach/{projectId}/create"
+              class="flex items-center gap-1 my-1 px-4 py-1.5 rounded-full bg-gold text-slate-900 font-bold text-sm sm:text-base hover:bg-barbi hover:text-gold transition-colors whitespace-nowrap
+              {activeTabId === 'create' ? 'ring-2 ring-white' : ''}
+              {pendingTabId === 'create' ? 'animate-pulse opacity-70' : ''}"
             >
-              {t[tab.label]}
-              {#if tab.id === 'votes' && voteCount > 0}
-                <span
-                  class="absolute -top-2 -right-2 min-w-5 h-5 px-1 flex items-center justify-center rounded-full bg-barbi text-gold text-xs font-bold ring-2 ring-white shadow-lg animate-pulse"
-                  title={t.votes}
-                >
-                  {voteCount}
-                </span>
-              {/if}
+              <span class="text-lg leading-none">+</span>
+              {t.create}
             </a>
-          {/each}
-        </nav>
+            {#each groups as group (group.id)}
+              {@const isGroupActive = activeGroup?.id === group.id}
+              {@const badge =
+                group.id === 'votes' ? voteCount : group.id === 'opps' ? wishCount : 0}
+              <a
+                href={groupHref(group)}
+                class="relative px-3 sm:px-4 py-2 text-sm sm:text-lg font-bold whitespace-nowrap border-b-2 transition-colors
+                {isGroupActive
+                  ? 'text-gold border-gold'
+                  : 'text-slate-300 border-transparent hover:text-gold'}
+                {pendingGroupId === group.id ? 'animate-pulse opacity-70' : ''}"
+              >
+                {t[group.label]}
+                {#if badge > 0}
+                  <span
+                    class="absolute -top-1 -right-1 min-w-5 h-5 px-1 flex items-center justify-center rounded-full bg-barbi text-gold text-xs font-bold ring-2 ring-white shadow-lg animate-pulse"
+                    title={t[group.label]}
+                  >
+                    {badge}
+                  </span>
+                {/if}
+              </a>
+            {/each}
+          </nav>
+        </div>
+
+        {#if activeGroup && activeGroup.tabs.length > 1}
+          <div class="overflow-x-auto" dir={$isRtl ? 'rtl' : 'ltr'}>
+            <div class="flex w-max mx-auto gap-2 py-1 px-2">
+              {#each activeGroup.tabs as tabId (tabId)}
+                <a
+                  href="/moach/{projectId}/{tabId}"
+                  class="px-3 py-1 rounded-full text-xs sm:text-sm border whitespace-nowrap transition-colors
+                  {activeTabId === tabId
+                    ? 'border-gold text-gold font-bold'
+                    : 'border-slate-500 text-slate-300 hover:text-gold hover:border-gold'}
+                  {pendingTabId === tabId ? 'animate-pulse opacity-70' : ''}"
+                >
+                  {t[tabId]}
+                </a>
+              {/each}
+            </div>
+          </div>
+        {/if}
       </div>
     </header>
 

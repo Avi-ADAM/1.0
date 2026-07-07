@@ -1774,6 +1774,7 @@ export type ComponentProjectsNegom = {
   hm?: Maybe<Scalars['Float']['output']>;
   id: Scalars['ID']['output'];
   kindOf?: Maybe<Enum_Componentprojectsnegom_Kindof>;
+  notes?: Maybe<Scalars['String']['output']>;
   price?: Maybe<Scalars['Float']['output']>;
   sqadualed?: Maybe<Scalars['DateTime']['output']>;
   sqadualedf?: Maybe<Scalars['DateTime']['output']>;
@@ -1785,6 +1786,7 @@ export type ComponentProjectsNegomFiltersInput = {
   hm?: InputMaybe<FloatFilterInput>;
   kindOf?: InputMaybe<StringFilterInput>;
   not?: InputMaybe<ComponentProjectsNegomFiltersInput>;
+  notes?: InputMaybe<StringFilterInput>;
   or?: InputMaybe<Array<InputMaybe<ComponentProjectsNegomFiltersInput>>>;
   price?: InputMaybe<FloatFilterInput>;
   sqadualed?: InputMaybe<DateTimeFilterInput>;
@@ -1796,6 +1798,7 @@ export type ComponentProjectsNegomInput = {
   hm?: InputMaybe<Scalars['Float']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
   kindOf?: InputMaybe<Enum_Componentprojectsnegom_Kindof>;
+  notes?: InputMaybe<Scalars['String']['input']>;
   price?: InputMaybe<Scalars['Float']['input']>;
   sqadualed?: InputMaybe<Scalars['DateTime']['input']>;
   sqadualedf?: InputMaybe<Scalars['DateTime']['input']>;
@@ -2485,6 +2488,7 @@ export type Decision = {
   moreHours?: Maybe<MesimabetahalichEntityResponse>;
   negodes?: Maybe<Array<Maybe<ComponentProjectsNegodes>>>;
   negom?: Maybe<Array<Maybe<ComponentProjectsNegom>>>;
+  negos?: Maybe<NegoRelationResponseCollection>;
   newFlink?: Maybe<Scalars['String']['output']>;
   newHours?: Maybe<Scalars['Int']['output']>;
   newWlink?: Maybe<Scalars['String']['output']>;
@@ -2525,6 +2529,14 @@ export type DecisionNegodesArgs = {
 export type DecisionNegomArgs = {
   filters?: InputMaybe<ComponentProjectsNegomFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type DecisionNegosArgs = {
+  filters?: InputMaybe<NegoFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
@@ -2598,6 +2610,7 @@ export type DecisionFiltersInput = {
   moreHours?: InputMaybe<MesimabetahalichFiltersInput>;
   negodes?: InputMaybe<ComponentProjectsNegodesFiltersInput>;
   negom?: InputMaybe<ComponentProjectsNegomFiltersInput>;
+  negos?: InputMaybe<NegoFiltersInput>;
   newFlink?: InputMaybe<StringFilterInput>;
   newHours?: InputMaybe<IntFilterInput>;
   newWlink?: InputMaybe<StringFilterInput>;
@@ -2632,6 +2645,7 @@ export type DecisionInput = {
   moreHours?: InputMaybe<Scalars['ID']['input']>;
   negodes?: InputMaybe<Array<InputMaybe<ComponentProjectsNegodesInput>>>;
   negom?: InputMaybe<Array<InputMaybe<ComponentProjectsNegomInput>>>;
+  negos?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   newFlink?: InputMaybe<Scalars['String']['input']>;
   newHours?: InputMaybe<Scalars['Int']['input']>;
   newWlink?: InputMaybe<Scalars['String']['input']>;
@@ -3962,7 +3976,7 @@ export type ForumRelationResponseCollection = {
   data: Array<ForumEntity>;
 };
 
-export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsNegom | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ConsentEvent | ContentReleasesRelease | ContentReleasesReleaseAction | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maagad | MaagadMember | MaagadOffer | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | Mesimabetahalich | Message | Mission | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | OpenMashaabim | OpenMission | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pmash | Position | Project | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | Richtext | Rikmash | Sale | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Sidur | SiteReport | SiteShareContribution | Skill | Solution | Sp | Tafkidim | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UserKey | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
+export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsNegom | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ConsentEvent | ContentReleasesRelease | ContentReleasesReleaseAction | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maagad | MaagadMember | MaagadOffer | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | Mesimabetahalich | Message | Mission | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | OpenMashaabim | OpenMission | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pmash | Position | Project | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | Richtext | Rikmash | Sale | SealedEnvelope | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Sidur | SiteReport | SiteShareContribution | Skill | Solution | Sp | Tafkidim | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UserKey | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
 
 export type Haamada = {
   __typename?: 'Haamada';
@@ -6906,6 +6920,7 @@ export type Mutation = {
   createRichtextLocalization?: Maybe<RichtextEntityResponse>;
   createRikmash?: Maybe<RikmashEntityResponse>;
   createSale?: Maybe<SaleEntityResponse>;
+  createSealedEnvelope?: Maybe<SealedEnvelopeEntityResponse>;
   createSeeder?: Maybe<SeederEntityResponse>;
   createSheirut?: Maybe<SheirutEntityResponse>;
   createSheirutFulfillment?: Maybe<SheirutFulfillmentEntityResponse>;
@@ -7019,6 +7034,7 @@ export type Mutation = {
   deleteRichtext?: Maybe<RichtextEntityResponse>;
   deleteRikmash?: Maybe<RikmashEntityResponse>;
   deleteSale?: Maybe<SaleEntityResponse>;
+  deleteSealedEnvelope?: Maybe<SealedEnvelopeEntityResponse>;
   deleteSeeder?: Maybe<SeederEntityResponse>;
   deleteSheirut?: Maybe<SheirutEntityResponse>;
   deleteSheirutFulfillment?: Maybe<SheirutFulfillmentEntityResponse>;
@@ -7133,6 +7149,7 @@ export type Mutation = {
   updateRichtext?: Maybe<RichtextEntityResponse>;
   updateRikmash?: Maybe<RikmashEntityResponse>;
   updateSale?: Maybe<SaleEntityResponse>;
+  updateSealedEnvelope?: Maybe<SealedEnvelopeEntityResponse>;
   updateSeeder?: Maybe<SeederEntityResponse>;
   updateSheirut?: Maybe<SheirutEntityResponse>;
   updateSheirutFulfillment?: Maybe<SheirutFulfillmentEntityResponse>;
@@ -7683,6 +7700,11 @@ export type MutationCreateRikmashArgs = {
 
 export type MutationCreateSaleArgs = {
   data: SaleInput;
+};
+
+
+export type MutationCreateSealedEnvelopeArgs = {
+  data: SealedEnvelopeInput;
 };
 
 
@@ -8292,6 +8314,11 @@ export type MutationDeleteRikmashArgs = {
 
 
 export type MutationDeleteSaleArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteSealedEnvelopeArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -8943,6 +8970,12 @@ export type MutationUpdateSaleArgs = {
 };
 
 
+export type MutationUpdateSealedEnvelopeArgs = {
+  data: SealedEnvelopeInput;
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationUpdateSeederArgs = {
   data: SeederInput;
   id: Scalars['ID']['input'];
@@ -9146,6 +9179,7 @@ export type Nego = {
   __typename?: 'Nego';
   acceptedAt?: Maybe<Scalars['DateTime']['output']>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
+  decision?: Maybe<DecisionEntityResponse>;
   des?: Maybe<Scalars['JSON']['output']>;
   fixprice?: Maybe<Scalars['Boolean']['output']>;
   kindOf?: Maybe<Enum_Nego_Kindof>;
@@ -9237,6 +9271,7 @@ export type NegoFiltersInput = {
   acceptedAt?: InputMaybe<DateTimeFilterInput>;
   and?: InputMaybe<Array<InputMaybe<NegoFiltersInput>>>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
+  decision?: InputMaybe<DecisionFiltersInput>;
   des?: InputMaybe<JsonFilterInput>;
   fixprice?: InputMaybe<BooleanFilterInput>;
   id?: InputMaybe<IdFilterInput>;
@@ -9266,6 +9301,7 @@ export type NegoFiltersInput = {
 
 export type NegoInput = {
   acceptedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  decision?: InputMaybe<Scalars['ID']['input']>;
   des?: InputMaybe<Scalars['JSON']['input']>;
   fixprice?: InputMaybe<Scalars['Boolean']['input']>;
   kindOf?: InputMaybe<Enum_Nego_Kindof>;
@@ -12169,6 +12205,8 @@ export type Query = {
   rikmashes?: Maybe<RikmashEntityResponseCollection>;
   sale?: Maybe<SaleEntityResponse>;
   sales?: Maybe<SaleEntityResponseCollection>;
+  sealedEnvelope?: Maybe<SealedEnvelopeEntityResponse>;
+  sealedEnvelopes?: Maybe<SealedEnvelopeEntityResponseCollection>;
   seeder?: Maybe<SeederEntityResponse>;
   seeders?: Maybe<SeederEntityResponseCollection>;
   sheirut?: Maybe<SheirutEntityResponse>;
@@ -13179,6 +13217,18 @@ export type QuerySalesArgs = {
   filters?: InputMaybe<SaleFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
   publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type QuerySealedEnvelopeArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QuerySealedEnvelopesArgs = {
+  filters?: InputMaybe<SealedEnvelopeFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
@@ -14582,6 +14632,53 @@ export type SaleInput = {
 export type SaleRelationResponseCollection = {
   __typename?: 'SaleRelationResponseCollection';
   data: Array<SaleEntity>;
+};
+
+export type SealedEnvelope = {
+  __typename?: 'SealedEnvelope';
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  envelopeId: Scalars['String']['output'];
+  payload: Scalars['JSON']['output'];
+  spaceId: Scalars['String']['output'];
+  ts?: Maybe<Scalars['Long']['output']>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+export type SealedEnvelopeEntity = {
+  __typename?: 'SealedEnvelopeEntity';
+  attributes?: Maybe<SealedEnvelope>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type SealedEnvelopeEntityResponse = {
+  __typename?: 'SealedEnvelopeEntityResponse';
+  data?: Maybe<SealedEnvelopeEntity>;
+};
+
+export type SealedEnvelopeEntityResponseCollection = {
+  __typename?: 'SealedEnvelopeEntityResponseCollection';
+  data: Array<SealedEnvelopeEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type SealedEnvelopeFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<SealedEnvelopeFiltersInput>>>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  envelopeId?: InputMaybe<StringFilterInput>;
+  id?: InputMaybe<IdFilterInput>;
+  not?: InputMaybe<SealedEnvelopeFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<SealedEnvelopeFiltersInput>>>;
+  payload?: InputMaybe<JsonFilterInput>;
+  spaceId?: InputMaybe<StringFilterInput>;
+  ts?: InputMaybe<LongFilterInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+};
+
+export type SealedEnvelopeInput = {
+  envelopeId?: InputMaybe<Scalars['String']['input']>;
+  payload?: InputMaybe<Scalars['JSON']['input']>;
+  spaceId?: InputMaybe<Scalars['String']['input']>;
+  ts?: InputMaybe<Scalars['Long']['input']>;
 };
 
 export type Seeder = {

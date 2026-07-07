@@ -4,14 +4,18 @@
 import { browser } from '$app/environment';
 
 const DB_NAME = 'freemates-crypto';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 export type StoreName =
   | 'identity'
   | 'devices'
   | 'events'
   | 'peerKeys'
-  | 'pendingSync';
+  | 'pendingSync'
+  // v2 — Space sync layer (S2a): which events belong to which space, and how
+  // far each space has been pulled from the relay.
+  | 'spaceIndex'
+  | 'spaceCursors';
 
 let dbPromise: Promise<IDBDatabase> | null = null;
 
@@ -38,6 +42,15 @@ function openDb(): Promise<IDBDatabase> {
       }
       if (!db.objectStoreNames.contains('pendingSync')) {
         db.createObjectStore('pendingSync', { keyPath: 'id' });
+      }
+      if (!db.objectStoreNames.contains('spaceIndex')) {
+        // rows: { key: `${spaceId}|${eventId}`, spaceId, eventId }
+        const s = db.createObjectStore('spaceIndex', { keyPath: 'key' });
+        s.createIndex('bySpace', 'spaceId');
+      }
+      if (!db.objectStoreNames.contains('spaceCursors')) {
+        // rows: { spaceId, epoch, seq } — relay pull position per space
+        db.createObjectStore('spaceCursors', { keyPath: 'spaceId' });
       }
     };
     req.onsuccess = () => resolve(req.result);
@@ -92,6 +105,31 @@ export async function idbBySubject<T = unknown>(
   const tx = db.transaction('events', 'readonly');
   const idx = tx.objectStore('events').index('bySubject');
   return req<T[]>(idx.getAll([subjectType, subjectId]));
+}
+
+// --- Space sync helpers (v2 stores) ---
+
+export type SpaceIndexRow = { key: string; spaceId: string; eventId: string };
+export type SpaceCursor = { spaceId: string; epoch: string; seq: number };
+
+export async function idbSpaceLink(spaceId: string, eventId: string): Promise<void> {
+  await idbPut('spaceIndex', { key: `${spaceId}|${eventId}`, spaceId, eventId } satisfies SpaceIndexRow);
+}
+
+export async function idbSpaceEventIds(spaceId: string): Promise<string[]> {
+  const db = await openDb();
+  const tx = db.transaction('spaceIndex', 'readonly');
+  const idx = tx.objectStore('spaceIndex').index('bySpace');
+  const rows = await req<SpaceIndexRow[]>(idx.getAll(spaceId));
+  return rows.map((r) => r.eventId);
+}
+
+export async function idbGetCursor(spaceId: string): Promise<SpaceCursor | undefined> {
+  return idbGet<SpaceCursor>('spaceCursors', spaceId);
+}
+
+export async function idbPutCursor(cursor: SpaceCursor): Promise<void> {
+  await idbPut('spaceCursors', cursor);
 }
 
 export async function resetDb(): Promise<void> {

@@ -1,6 +1,7 @@
 import type { ConsentEvent } from '../event';
-import type { ProjectState } from '../projection';
+import type { ProjectState, MissionView } from '../projection';
 import { parseMoney, type MoneySerialized } from '$lib/crypto/money';
+import { findMissionBySubject } from './missionCreate';
 
 /**
  * mission.approve — the consensus event that credits delivered work
@@ -37,7 +38,28 @@ export function missionApprove(state: ProjectState, ev: ConsentEvent): ProjectSt
     balances.set(payee, (balances.get(payee) ?? 0n) + credit);
   }
 
-  return { ...state, members, balances };
+  // S2b (T4): close the mission lifecycle too. Tolerates legacy missions with
+  // no create/complete event in the chain — approval alone plants a stub.
+  let missions = state.missions;
+  const mission = findMissionBySubject(state, ev.subject.id);
+  const base: MissionView = mission ?? {
+    id: ev.subject.id,
+    createdBy: ev.actor,
+    createdAt: ev.ts,
+    stageIds: [],
+    state: 'completed'
+  };
+  if (base.state !== 'approved') {
+    const approvedView: MissionView = {
+      ...base,
+      state: 'approved',
+      approval: { by: ev.actor, ts: ev.ts }
+    };
+    missions = new Map(missions);
+    missions.set(base.id, approvedView);
+  }
+
+  return { ...state, members, balances, missions };
 }
 
 function tryParseMoney(x: unknown): bigint | null {

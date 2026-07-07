@@ -11,6 +11,7 @@
 import { browser } from '$app/environment';
 import { b64urlEncode } from '$lib/crypto/b64';
 import { ensureIdentity, loadIdentity, type IdentityRecord } from '$lib/crypto/identity';
+import { ensureKemKeypair } from '$lib/space/e2e/kem';
 
 export type ConsentStatusKind =
   | 'idle'              // bootstrap hasn't been attempted yet
@@ -58,6 +59,12 @@ async function publishPubkey(identity: IdentityRecord): Promise<boolean> {
   if (pubkeyPublishedFor === identity.userId) return true;
   try {
     const pubSpkiB64 = b64urlEncode(identity.pubSpki);
+    // S3a: the KEM (key-agreement) pubkey rides along so peers can wrap
+    // epoch keys to this device. Best-effort — registration must not fail
+    // on browsers where ECDH generation misbehaves.
+    const kemPubSpkiB64 = await ensureKemKeypair()
+      .then((k) => k.kemPubSpkiB64)
+      .catch(() => undefined);
     const res = await fetch('/api/consent/keys/register', {
       method: 'POST',
       credentials: 'include',
@@ -67,6 +74,7 @@ async function publishPubkey(identity: IdentityRecord): Promise<boolean> {
         devicePubB64: identity.devicePubB64,
         algo: identity.algo,
         pubSpkiB64,
+        kemPubSpkiB64,
         label: typeof navigator !== 'undefined' ? navigator.userAgent.slice(0, 40) : 'unknown'
       })
     });

@@ -255,7 +255,7 @@
   {#if kindOf == 'monthly' || kindOf == 'yearly'}
     <small class="text-barbi text-center">{start[$lang]}</small>
     <input
-      class="bg-gold hover:bg-mtork border-2 border-barbi rounded"
+      class="bg-gold hover:bg-mtork border-2 border-barbi rounded text-barbi"
       type="datetime-local"
       placeholder={start[$lang]}
       bind:value={dates}
@@ -265,7 +265,7 @@
     {/if}
     <small class="text-barbi text-center">{end[$lang]}</small>
     <input
-      class="bg-gold hover:bg-mtork border-2 border-barbi rounded"
+      class="bg-gold hover:bg-mtork border-2 border-barbi rounded text-barbi"
       type="datetime-local"
       placeholder={end[$lang]}
       bind:value={datef}

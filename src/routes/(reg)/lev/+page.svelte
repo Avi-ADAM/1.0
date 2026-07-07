@@ -453,6 +453,7 @@
         onMesima={mesima}
         onUser={user}
         onProj={proj}
+        onChat={chat}
         onStart={handleCoinLapach}
         onCards={handleViewChange}
         adder={[]}

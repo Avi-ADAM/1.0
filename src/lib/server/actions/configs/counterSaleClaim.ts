@@ -25,11 +25,10 @@ import {
 } from './saleClaimShared.js';
 
 const handler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
-  const { decisionId, projectId, newValues, why } = params as {
+  const { decisionId, projectId, newValues } = params as {
     decisionId: string;
     projectId: string;
     newValues: NegomRound;
-    why?: string;
   };
   const now = new Date();
   const userId = String(context.userId);
@@ -53,15 +52,16 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
 
   const newOrder = currentOrder + 1;
 
-  // Build the refined negom round from the proposed values.
+  // Build the refined negom round from the proposed values. The projects.negom
+  // component is numbers-only (hm/price/kindOf/dates) — it has no text field, so
+  // any free-text "why" is not persisted here; clarification happens in the
+  // decision's chat/forum, per the "chat, don't veto" principle.
   const round: NegomRound = {
     hm: newValues?.hm != null ? Number(newValues.hm) : null,
     price: newValues?.price != null ? Number(newValues.price) : null,
     kindOf: newValues?.kindOf ?? null,
     sqadualed: newValues?.sqadualed ?? null,
     sqadualedf: newValues?.sqadualedf ?? null,
-    name: newValues?.name ?? null,
-    descrip: (why as string) ?? newValues?.descrip ?? null,
   };
   const negom = [...claim.negom, round];
 
