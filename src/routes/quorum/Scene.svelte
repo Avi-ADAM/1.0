@@ -2,12 +2,36 @@
   // The Quorum ring: scattered orbs (people) drift in from the dark and
   // snap into a circle. When the circle is full — the quorum — everything
   // pulses gold. Driven from the page via `signed` / `min` / `phase`.
-  import { T, useTask } from '@threlte/core';
+  import { T, useTask, useThrelte } from '@threlte/core';
   import * as THREE from 'three';
 
   let { signed = 0, min = 10, phase = 'filling' } = $props();
 
   const RING_RADIUS = 2.35;
+
+  // Keep the ring fully visible on every aspect ratio. The PerspectiveCamera's
+  // `fov` is vertical, so on tall/narrow phones the horizontal field of view
+  // collapses and the ring spills off the x-axis. We preserve a constant
+  // *horizontal* fov by widening the vertical fov as the viewport narrows.
+  const { size } = useThrelte();
+  const BASE_FOV = 42; // vertical fov at the reference (landscape) aspect
+  const REF_ASPECT = 1.5; // aspect at which BASE_FOV frames the ring nicely
+  let camera = $state();
+  let fov = $derived.by(() => {
+    const w = $size.width;
+    const h = $size.height;
+    if (!w || !h) return BASE_FOV;
+    const aspect = w / h;
+    if (aspect >= REF_ASPECT) return BASE_FOV;
+    const hHalf = Math.atan(Math.tan((BASE_FOV * Math.PI) / 360) * REF_ASPECT);
+    const vFov = (Math.atan(Math.tan(hHalf) / aspect) * 360) / Math.PI;
+    return Math.min(82, vFov); // cap keeps the perspective from distorting too hard
+  });
+  $effect(() => {
+    if (!camera) return;
+    camera.fov = fov;
+    camera.updateProjectionMatrix();
+  });
 
   function scatterPos() {
     // random point on a loose outer shell, biased to the camera-visible band
@@ -79,9 +103,10 @@
 </script>
 
 <T.PerspectiveCamera
+  bind:ref={camera}
   makeDefault
   position={[0, 2.6, 7.6]}
-  fov={42}
+  {fov}
   oncreate={(ref) => ref.lookAt(0, 0.1, 0)}
 />
 

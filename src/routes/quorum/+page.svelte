@@ -9,9 +9,8 @@
   import Scene from './Scene.svelte';
   import { copy, demoOffers } from './copy.js';
 
-  let isHe = $derived($locale === 'he');
-  let c = $derived(isHe ? copy.he : copy.en);
-  let offers = $derived(isHe ? demoOffers.he : demoOffers.en);
+  let c = $derived(copy[$locale] ?? copy.en);
+  let offers = $derived(demoOffers[$locale] ?? demoOffers.en);
 
   // ── the self-running threshold demo (drives the 3D scene + the offer card)
   let offerIdx = $state(0);
@@ -727,12 +726,13 @@
     .q-canvas {
       opacity: 0.55;
     }
+    /* Center the live card without a transform: the hero-seq reveal animation
+       ends on `transform: none` (fill-forwards) and would override any
+       translateX centering, pushing the card off-screen. Logical insets +
+       margin-inline:auto keep it centered in both LTR and RTL. */
     .q-card {
-      inset-inline-end: 50%;
-      transform: translateX(50%);
-    }
-    .q-root[dir='rtl'] .q-card {
-      transform: translateX(-50%);
+      inset-inline: 1rem;
+      margin-inline: auto;
     }
     .q-principle:nth-child(even) {
       margin-top: 0;
