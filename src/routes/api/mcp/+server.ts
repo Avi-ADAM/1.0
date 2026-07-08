@@ -20,6 +20,7 @@ import { getPageContextTool } from '../../../mastra/tools/pageContextTool';
 import { createProjectTool } from '../../../mastra/tools/createProjectTool';
 import { createTaskTool } from '../../../mastra/tools/createTaskTool';
 import { getProjectMembersTool } from '../../../mastra/tools/getProjectMembersTool';
+import { getMemberMissionsTool } from '../../../mastra/tools/getMemberMissionsTool';
 import { prepareMissionTool } from '../../../mastra/tools/prepareMissionTool';
 import { createMissionTool } from '../../../mastra/tools/createMissionTool';
 
@@ -127,6 +128,7 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
             createProjectTool,
             createTaskTool,
             getProjectMembersTool,
+            getMemberMissionsTool,
             prepareMissionTool,
             createMissionTool,
             howToConnect // Included even in auth mode for convenience

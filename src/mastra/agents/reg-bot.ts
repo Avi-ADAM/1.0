@@ -13,6 +13,7 @@ import { findMissionTool } from '../tools/findMissionTool';
 import { createProjectTool } from '../tools/createProjectTool';
 import { createTaskTool } from '../tools/createTaskTool';
 import { getProjectMembersTool } from '../tools/getProjectMembersTool';
+import { getMemberMissionsTool } from '../tools/getMemberMissionsTool';
 import { findUserProjectsTool } from '../tools/findUserProjectsTool';
 import { getPageContextTool } from '../tools/pageContextTool';
 import { SITE_CONTEXT } from '../../lib/bot/context.js';
@@ -51,7 +52,7 @@ Core workflows:
 - Mission statistics: getMissionStatsTool
 - Project navigation: findUserProjectsTool -> navigateToPageTool
 - Create Partnership/Embroidery: createProjectTool
-- Create a task (Act) in a project for a person or a role: findUserProjectsTool -> getProjectMembersTool -> createTaskTool
+- Create a task (Act) in a project for a person or a role: findUserProjectsTool -> getProjectMembersTool -> (for a person) getMemberMissionsTool to link a mission-in-progress -> createTaskTool
 - General navigation: getSitePagesTool -> navigateToPageTool
 
 Behavior rules:
@@ -91,6 +92,7 @@ Behavior rules:
       createProjectTool,
       createTaskTool,
       getProjectMembersTool,
+      getMemberMissionsTool,
       findMissionTool,
       findUserProjectsTool,
       getPageContextTool

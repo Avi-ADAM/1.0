@@ -4,6 +4,7 @@ import { sendToSer } from '$lib/send/sendToSer.js';
 import { startTimer, stopTimer, saveTimer, updateTimer } from '$lib/func/timers.js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { actionService } from '$lib/server/actions/index.js';
+import { normalizeAdminToken } from '$lib/server/adminToken.js';
 // createServer is likely not needed when using SvelteKit endpoint for webhook
 // import { createServer } from 'https';
 
@@ -94,16 +95,19 @@ const translations = {
         noProjectsForTask: 'לא נמצאו פרויקטים שאת/ה חבר/ה בהם.',
         chooseAssigneeType: '👥 למי לשייך את המטלה?',
         assignToPersonBtn: '👤 לאדם',
-        assignToRoleBtn: '🎗️ לתפקיד',
+        assignToRoleBtn: '🏷️ לתפקיד',
         assignToNoneBtn: '📋 ללא שיוך',
         chooseTaskPerson: '👤 בחר/י אדם:',
-        chooseTaskRole: '🎗️ בחר/י תפקיד:',
+        chooseTaskRole: '🏷️ בחר/י תפקיד:',
         noPeopleInProject: 'לא נמצאו חברים בפרויקט זה.',
         noRolesInProject: 'לא נמצאו תפקידים בפרויקט זה.',
         taskNamePrompt: '✍️ שלח/י את שם המטלה (טקסט חופשי):',
         taskCreated: '✅ המטלה "{{name}}" נוצרה בהצלחה!',
         taskError: '❌ שגיאה ביצירת המטלה. נסה/י שוב.',
-        taskCancelled: 'יצירת המטלה בוטלה.'
+        taskCancelled: 'יצירת המטלה בוטלה.',
+        chooseTaskMission: '🎯 לאיזו משימה בתהליך לקשר את המטלה?',
+        noMissionsForMember: 'לאדם זה אין משימות בתהליך בפרויקט. המטלה תיווצר ללא קישור למשימה.',
+        taskMissionNoneBtn: '➖ ללא משימה'
     },
     en: {
         welcome: 'Welcome to 1💗1',
@@ -179,16 +183,19 @@ const translations = {
         noProjectsForTask: 'No projects found that you are a member of.',
         chooseAssigneeType: '👥 Who should the task be assigned to?',
         assignToPersonBtn: '👤 A person',
-        assignToRoleBtn: '🎗️ A role',
+        assignToRoleBtn: '🏷️ A role',
         assignToNoneBtn: '📋 Unassigned',
         chooseTaskPerson: '👤 Choose a person:',
-        chooseTaskRole: '🎗️ Choose a role:',
+        chooseTaskRole: '🏷️ Choose a role:',
         noPeopleInProject: 'No members found in this project.',
         noRolesInProject: 'No roles found in this project.',
         taskNamePrompt: '✍️ Send the task name (free text):',
         taskCreated: '✅ Task "{{name}}" created successfully!',
         taskError: '❌ Error creating the task. Please try again.',
-        taskCancelled: 'Task creation cancelled.'
+        taskCancelled: 'Task creation cancelled.',
+        chooseTaskMission: '🎯 Which in-progress mission should the task be linked to?',
+        noMissionsForMember: 'This person has no in-progress missions in the project. The task will be created without a mission link.',
+        taskMissionNoneBtn: '➖ No mission'
     } // Add other EN translations if needed
 };
 
@@ -374,6 +381,22 @@ async function getProjectPeopleAndRoles(projectId, fetchInstance) {
     } catch (error) {
         console.error('getProjectPeopleAndRoles error:', error);
         return { projectName: '', people: [], roles: [] };
+    }
+}
+
+// Fetch a member's in-progress missions (mesimabetahaliches) within a project.
+// A task is linked to a mission-in-progress the person performs, so this feeds
+// the mission-selection step after an assignee is chosen.
+async function getMemberMissionsInProject(memberId, projectId, fetchInstance) {
+    try {
+        const res = await sendToSer({ id: memberId }, '8getMissionsOnProgress', 0, 0, true, fetchInstance);
+        const missions = res?.data?.usersPermissionsUser?.data?.attributes?.mesimabetahaliches?.data ?? [];
+        return missions
+            .filter(m => String(m.attributes?.project?.data?.id) === String(projectId))
+            .map(m => ({ id: m.id, name: m.attributes?.name || m.attributes?.stname || `#${m.id}` }));
+    } catch (error) {
+        console.error('getMemberMissionsInProject error:', error);
+        return [];
     }
 }
 
@@ -1465,10 +1488,11 @@ async function finalizeTask(ctx, uid, lang, fetch) {
         };
         if (task.assignedUserId) params.assignedUserId = task.assignedUserId;
         if (task.tafkidId) params.tafkidims = [task.tafkidId];
+        if (task.missionId) params.missionId = task.missionId;
 
         const result = await actionService.executeAction('createTask', params, {
             userId: String(uid),
-            jwt: ADMINMONTHER,
+            jwt: normalizeAdminToken(ADMINMONTHER),
             lang,
             fetch
         });
@@ -1528,6 +1552,7 @@ bot.action(/^taskProj-(\d+)-(\d+)$/, async (ctx) => {
         assigneeName: null,
         tafkidId: null,
         roleName: null,
+        missionId: null,
         name: null,
         pendingField: null
     });
@@ -1629,6 +1654,43 @@ bot.action(/^taskPerson-(\d+)-(\d+)$/, async (ctx) => {
     task.assignedUserId = personId;
     task.assigneeName = person?.username ?? null;
     task.tafkidId = null;
+    task.missionId = null;
+
+    await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+
+    // A task is linked to a mission-in-progress the person performs — show that
+    // person's in-progress missions in the project. If they have none, skip
+    // straight to the task name.
+    const missions = await getMemberMissionsInProject(personId, task.projectId, fetch);
+    if (missions.length === 0) {
+        task.pendingField = 'name';
+        ctx.reply(getText('noMissionsForMember', lang));
+        ctx.reply(getText('taskNamePrompt', lang), Markup.inlineKeyboard([
+            [Markup.button.callback(getText('cancelEdit', lang), `taskCancel-${userId}`)]
+        ]).resize());
+    } else {
+        const buttons = missions.map(m => [
+            Markup.button.callback(m.name, `taskMission-${m.id}-${userId}`)
+        ]);
+        buttons.push([Markup.button.callback(getText('taskMissionNoneBtn', lang), `taskMission-0-${userId}`)]);
+        buttons.push([Markup.button.callback(getText('cancelEdit', lang), `taskCancel-${userId}`)]);
+        ctx.reply(getText('chooseTaskMission', lang), Markup.inlineKeyboard(buttons).resize());
+    }
+    await ctx.answerCbQuery();
+});
+
+// Mission-in-progress selected (0 = none) → prompt for task name
+bot.action(/^taskMission-(\d+)-(\d+)$/, async (ctx) => {
+    const missionId = ctx.match[1];
+    const userId = ctx.match[2];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    const task = pendingTask.get(userId.toString());
+    if (!task) { ctx.reply(getText('generalError', lang)); return ctx.answerCbQuery(); }
+
+    task.missionId = missionId === '0' ? null : missionId;
     task.pendingField = 'name';
 
     await ctx.editMessageReplyMarkup(undefined).catch(() => {});
