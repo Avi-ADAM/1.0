@@ -1,5 +1,6 @@
 <script>
   import { Drawer } from 'vaul-svelte';
+  import { Portal } from 'bits-ui';
   import { executeAction } from '$lib/client/actionClient';
   import { shadowSignFromCookie } from '$lib/client/shadowSign';
   import { addVoteConsentSpec } from '$lib/consent/specs/addVote';
@@ -314,25 +315,42 @@
   let negoModal = $state(false);
   let nqty = $state(1);
   let nprice = $state(0);
+  let nstart = $state('');
+  let nfinish = $state('');
+  let nnote = $state('');
   let negoBusy = $state(false);
+
+  // ISO datetime → yyyy-mm-dd for <input type="date"> (empty when absent).
+  function toDateInput(d) {
+    if (!d) return '';
+    try {
+      return new Date(d).toISOString().slice(0, 10);
+    } catch {
+      return '';
+    }
+  }
 
   function openNego() {
     nqty = saleClaim?.standing?.hm ?? saleClaim?.current?.unit ?? 1;
     nprice = saleClaim?.standing?.price ?? 0;
+    nstart = toDateInput(saleClaim?.standing?.sqadualed ?? saleClaim?.current?.startDate);
+    nfinish = toDateInput(saleClaim?.standing?.sqadualedf ?? saleClaim?.current?.finishDate);
+    nnote = saleClaim?.standing?.notes ?? saleClaim?.current?.note ?? '';
     negoModal = true;
   }
 
   async function sendNego() {
     if (negoBusy) return;
     negoBusy = true;
-    // projects.negom is numbers-only — a counter refines quantity/price/dates.
-    // Any explanation belongs in the decision chat, not a persisted note.
+    // A counter refines the version on the table: quantity, unit price, the
+    // start/finish dates and a free-text note. Empty date inputs clear the date.
     const newValues = {
       hm: Number(nqty),
       price: Number(nprice),
       kindOf: saleClaim?.standing?.kindOf ?? null,
-      sqadualed: saleClaim?.standing?.sqadualed ?? null,
-      sqadualedf: saleClaim?.standing?.sqadualedf ?? null
+      sqadualed: nstart ? new Date(nstart).toISOString() : null,
+      sqadualedf: nfinish ? new Date(nfinish).toISOString() : null,
+      notes: nnote?.trim() ? nnote.trim() : null
     };
     try {
       const result = await executeAction('counterSaleClaim', {
@@ -381,6 +399,9 @@
   // drawer, exactly like pendm/pmash vote cards.
   let saleClaimForumId = $state(null);
   async function openSaleClaimChat() {
+    // Close this card's own right-side drawer first, otherwise it covers the
+    // small draggable chat widget (rendered by the page footer).
+    dialogOpen = false;
     let fid = saleClaimForumId;
     if (!fid) {
       try {
@@ -1419,6 +1440,9 @@
 {/if}
 
 {#if negoModal}
+  <!-- Portal to <body>: the card lives inside Swiper's transformed subtree,
+       which would otherwise trap this position:fixed overlay. -->
+  <Portal>
   <div
     class="nego-overlay"
     role="button"
@@ -1456,6 +1480,24 @@
         <input class="nego-input" type="number" min="0" step="any" bind:value={nprice} />
       </label>
 
+      <div class="nego-dates">
+        <label class="nego-label">
+          {$lang === 'en' ? 'Start' : 'התחלה'}
+          <input class="nego-input" type="date" bind:value={nstart} />
+        </label>
+        <label class="nego-label">
+          {$lang === 'en' ? 'Finish' : 'סיום'}
+          <input class="nego-input" type="date" bind:value={nfinish} />
+        </label>
+      </div>
+
+      <label class="nego-label">
+        {$lang === 'en' ? 'Note' : 'הערה'}
+        <textarea class="nego-input" rows="2" bind:value={nnote}
+          placeholder={$lang === 'en' ? 'Optional clarification…' : 'הבהרה (רשות)…'}
+        ></textarea>
+      </label>
+
       <p class="nego-total">
         {$lang === 'en' ? 'Total' : 'סה"כ'}: {(Number(nqty) || 0) * (Number(nprice) || 0)}₪
       </p>
@@ -1476,9 +1518,17 @@
       </div>
     </div>
   </div>
+  </Portal>
 {/if}
 
 <style>
+  .nego-dates {
+    display: flex;
+    gap: 10px;
+  }
+  .nego-dates .nego-label {
+    flex: 1;
+  }
   .nego-overlay {
     position: fixed;
     inset: 0;

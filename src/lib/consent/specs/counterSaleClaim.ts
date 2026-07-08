@@ -16,7 +16,6 @@ export const proposalCounterConsentSpec: ConsentSpec = {
   restimeFrom: 'project',
   predicateFromParams: (params) => ({
     order: params.order,
-    newValues: params.newValues,
-    why: params.why
+    newValues: params.newValues
   })
 };

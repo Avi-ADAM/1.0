@@ -570,9 +570,12 @@ export const projectFilter: Writable<string | null> = writable(null);
 
 /** Current version of the snapshot data structure.
  *  v6 — saleClaim decisions carry a new `saleClaim` payload (reporter/holder,
- *  standing round, negom) plus `sale`/`reporter`/`negom` fields on the decision;
- *  bumped so returning users don't restore a v5 snapshot that lacks them. */
-const SNAPSHOT_VERSION = 6;
+ *  standing round, negom) plus `sale`/`reporter`/`negom` fields on the decision.
+ *  v7 — the saleClaim payload now also carries start/finish dates and a
+ *  free-text `note`/`notes` on `current`/`standing` (renegotiable).
+ *  v8 — saleClaim payload adds `reporterName` (for labeling negom rounds by
+ *  proposer in the side-by-side version history). */
+const SNAPSHOT_VERSION = 8;
 
 /** Snapshot data structure for localStorage */
 export interface SnapshotData {

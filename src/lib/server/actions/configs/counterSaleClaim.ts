@@ -52,16 +52,16 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
 
   const newOrder = currentOrder + 1;
 
-  // Build the refined negom round from the proposed values. The projects.negom
-  // component is numbers-only (hm/price/kindOf/dates) — it has no text field, so
-  // any free-text "why" is not persisted here; clarification happens in the
-  // decision's chat/forum, per the "chat, don't veto" principle.
+  // Build the refined negom round from the proposed values: quantity, unit
+  // price, kind, the start/finish dates and a free-text `notes` (all of which
+  // the other side then approves, refines back, or discusses — never a veto).
   const round: NegomRound = {
     hm: newValues?.hm != null ? Number(newValues.hm) : null,
     price: newValues?.price != null ? Number(newValues.price) : null,
     kindOf: newValues?.kindOf ?? null,
     sqadualed: newValues?.sqadualed ?? null,
     sqadualedf: newValues?.sqadualedf ?? null,
+    notes: newValues?.notes ?? null,
   };
   const negom = [...claim.negom, round];
 
@@ -132,8 +132,7 @@ export const counterSaleClaimConfig: ActionConfig = {
   paramSchema: {
     decisionId: { type: 'string', required: true },
     projectId: { type: 'string', required: true },
-    newValues: { type: 'object', required: true, description: 'Refined values: { hm, price, kindOf, sqadualed, sqadualedf, name, descrip }' },
-    why: { type: 'string', required: false },
+    newValues: { type: 'object', required: true, description: 'Refined values: { hm, price, kindOf, sqadualed, sqadualedf, notes }' },
   },
   authRules: [
     { type: 'jwt' },

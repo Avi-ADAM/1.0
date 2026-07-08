@@ -12,6 +12,7 @@
   import { isMobileOrTablet } from '$lib/utilities/device';
   import CardHeader from './CardHeader.svelte';
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
+  import VersionHistory from '$lib/components/conf/VersionHistory.svelte';
   import { getProjectData } from '$lib/stores/projectStore.js';
 
   /**
@@ -113,6 +114,127 @@
       ? Number(saleClaim.standing.hm) * Number(saleClaim.standing.price)
       : Number(saleClaim?.current?.in ?? saleClaimQty * saleClaimPrice)
   );
+  // Start/finish dates and a free-text note are also part of the renegotiable
+  // version (negom.sqadualed / sqadualedf / notes), falling back to the sale.
+  let saleClaimStart = $derived(saleClaim?.standing?.sqadualed ?? saleClaim?.current?.startDate ?? null);
+  let saleClaimFinish = $derived(saleClaim?.standing?.sqadualedf ?? saleClaim?.current?.finishDate ?? null);
+  let saleClaimNote = $derived(saleClaim?.standing?.notes ?? saleClaim?.current?.note ?? '');
+  const fmtDate = (d) => {
+    if (!d) return '';
+    try {
+      return new Date(d).toLocaleDateString($lang === 'he' ? 'he-IL' : 'en-GB');
+    } catch {
+      return String(d);
+    }
+  };
+
+  // ── Version history (side-by-side negom rounds) ───────────────────────────
+  // The ping-pong of a saleClaim is round 1 (the original report) followed by
+  // one negom entry per precision round. We rebuild each round's full value set
+  // and hand it to <VersionHistory> so both parties can read the whole
+  // negotiation trail at a glance and see exactly what each round changed.
+  // Proposer per round is read off the decision's `vots` (order = round), with a
+  // sensible fallback (round 1 = reporter, then the sides alternate).
+  const proposerNameForOrder = (order) => {
+    const reporter = saleClaim?.reporterName || (saleClaim?.reporterId ?? '');
+    const holder = saleClaim?.holderName || (saleClaim?.holderId ?? '');
+    if (order <= 1) return reporter;
+    const vot = (saleClaim?.vots ?? []).find(
+      (v) => Number(v?.order) === Number(order) && v?.what
+    );
+    const vid = String(
+      vot?.users_permissions_user?.data?.id ?? vot?.ide ?? ''
+    );
+    if (vid && vid === String(saleClaim?.reporterId)) return reporter;
+    if (vid && vid === String(saleClaim?.holderId)) return holder;
+    // Fallback: rounds alternate; the holder usually counters first (round 2).
+    return order % 2 === 0 ? holder : reporter;
+  };
+
+  const saleClaimVersions = $derived.by(() => {
+    if (!saleClaim) return [];
+    const negom = saleClaim.negom ?? [];
+    if (negom.length === 0) return []; // nothing to compare yet — single block shown
+    const cur = saleClaim.current ?? {};
+    const round1Price =
+      cur.unit && Number(cur.unit) !== 0
+        ? Number(cur.in) / Number(cur.unit)
+        : Number(cur.in ?? 0);
+    // Raw, comparable value tuples for every round.
+    const raw = [
+      {
+        order: 1,
+        hm: Number(cur.unit ?? 0),
+        price: round1Price,
+        start: cur.startDate ?? null,
+        finish: cur.finishDate ?? null,
+        notes: cur.note ?? ''
+      },
+      ...negom.map((n, i) => ({
+        order: i + 2,
+        hm: n?.hm != null ? Number(n.hm) : null,
+        price: n?.price != null ? Number(n.price) : null,
+        start: n?.sqadualed ?? null,
+        finish: n?.sqadualedf ?? null,
+        notes: n?.notes ?? ''
+      }))
+    ];
+    const money = (n) =>
+      n == null || Number.isNaN(Number(n)) ? '—' : `${Number(n).toLocaleString()}₪`;
+    return raw.map((r, i) => {
+      const prev = i > 0 ? raw[i - 1] : null;
+      const total = r.hm != null && r.price != null ? r.hm * r.price : null;
+      const prevTotal =
+        prev && prev.hm != null && prev.price != null ? prev.hm * prev.price : null;
+      const isCurrent = r.order === (saleClaim.standingOrder ?? raw.length);
+      return {
+        title:
+          r.order === 1
+            ? $lang === 'he'
+              ? 'הדיווח'
+              : 'The claim'
+            : $lang === 'he'
+              ? `סבב ${r.order}`
+              : `Round ${r.order}`,
+        by: proposerNameForOrder(r.order),
+        current: isCurrent,
+        fields: [
+          {
+            label: $lang === 'he' ? 'כמות' : 'Qty',
+            value: r.hm ?? '—',
+            changed: prev != null && Number(prev.hm) !== Number(r.hm)
+          },
+          {
+            label: $lang === 'he' ? 'מחיר ליח׳' : 'Unit',
+            value: money(r.price),
+            changed: prev != null && Number(prev.price) !== Number(r.price)
+          },
+          {
+            label: $lang === 'he' ? 'סה״כ' : 'Total',
+            value: money(total),
+            emphasize: true,
+            changed: prev != null && Number(prevTotal) !== Number(total)
+          },
+          {
+            label: $lang === 'he' ? 'התחלה' : 'Start',
+            value: fmtDate(r.start) || '—',
+            changed: prev != null && (prev.start ?? '') !== (r.start ?? '')
+          },
+          {
+            label: $lang === 'he' ? 'סיום' : 'Finish',
+            value: fmtDate(r.finish) || '—',
+            changed: prev != null && (prev.finish ?? '') !== (r.finish ?? '')
+          },
+          {
+            label: $lang === 'he' ? 'הערה' : 'Note',
+            value: r.notes || '—',
+            changed: prev != null && (prev.notes ?? '') !== (r.notes ?? '')
+          }
+        ]
+      };
+    });
+  });
+
   let zman = $state();
 
   onMount(() => {
@@ -284,6 +406,16 @@
           </div>
         {/if}
 
+        {#if saleClaimVersions.length > 0}
+          <!-- A negotiation trail exists: show every round side-by-side so both
+               parties can read what each precision changed. -->
+          <div class="pt-2 border-t border-gray-200 dark:border-gray-700">
+            <VersionHistory
+              versions={saleClaimVersions}
+              label={$lang === 'he' ? 'היסטוריית הדיוקים' : 'Precision history'}
+            />
+          </div>
+        {:else}
         <div class="flex flex-col gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
           <span class="text-xs font-semibold text-barbi dark:text-mpink uppercase tracking-wide flex items-center gap-1">
             <span>🧾</span>
@@ -309,7 +441,28 @@
               <div class="font-extrabold text-barbi dark:text-mpink">{saleClaimTotal}₪</div>
             </div>
           </div>
+
+          {#if saleClaimStart || saleClaimFinish}
+            <div class="grid grid-cols-2 gap-2 text-center pt-1">
+              <div class="bg-white dark:bg-gray-800 rounded-lg py-2 border border-gray-200 dark:border-gray-600">
+                <div class="text-[10px] text-gray-500 dark:text-gray-400">{$lang === 'he' ? 'התחלה' : 'Start'}</div>
+                <div class="text-sm text-gray-800 dark:text-gray-100">{fmtDate(saleClaimStart) || '—'}</div>
+              </div>
+              <div class="bg-white dark:bg-gray-800 rounded-lg py-2 border border-gray-200 dark:border-gray-600">
+                <div class="text-[10px] text-gray-500 dark:text-gray-400">{$lang === 'he' ? 'סיום' : 'Finish'}</div>
+                <div class="text-sm text-gray-800 dark:text-gray-100">{fmtDate(saleClaimFinish) || '—'}</div>
+              </div>
+            </div>
+          {/if}
+
+          {#if saleClaimNote}
+            <div class="pt-1">
+              <div class="text-[10px] text-gray-500 dark:text-gray-400 mb-1">{$lang === 'he' ? 'הערה' : 'Note'}</div>
+              <div class="text-sm text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800 rounded-lg p-2 border border-gray-200 dark:border-gray-600 whitespace-pre-wrap">{saleClaimNote}</div>
+            </div>
+          {/if}
         </div>
+        {/if}
       </div>
     {:else if kind !== 'sheirutpends' && kind !== 'pic' && (currentValue || newValue)}
       <!-- Generic before/after display for text-based decision kinds -->

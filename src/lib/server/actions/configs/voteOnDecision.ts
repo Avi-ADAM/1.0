@@ -114,6 +114,7 @@ async function handleSaleClaimVote(
       date: version.date ?? undefined,
       startDate: version.startDate ?? undefined,
       finishDate: version.finishDate ?? undefined,
+      note: version.note ?? undefined,
       holderStatus: 'confirmed',
       confirmedBy: 'vote',
       holderDecidedAt: now.toISOString(),

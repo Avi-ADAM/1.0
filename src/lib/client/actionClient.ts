@@ -503,7 +503,7 @@ export interface ActionParamsMap {
     username?: string;
   };
   ensureVoteForum: {
-    entityType: 'pendm' | 'pmash';
+    entityType: 'pendm' | 'pmash' | 'decision';
     entityId: string;
     projectId?: string;
     forumId?: string;

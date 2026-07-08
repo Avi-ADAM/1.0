@@ -19,6 +19,7 @@ export type NegomRound = {
   kindOf?: string | null;
   sqadualed?: string | null;
   sqadualedf?: string | null;
+  notes?: string | null;
   name?: string | null;
   descrip?: string | null;
   spnot?: string | null;
@@ -38,6 +39,7 @@ export type SaleClaim = {
   saleDate?: string | null;
   saleStartDate?: string | null;
   saleFinishDate?: string | null;
+  saleNote?: string | null;
   holderId: string;
   reporterId: string;
   matanotId?: string;
@@ -71,6 +73,7 @@ export async function fetchSaleClaim(strapi: any, context: any, decisionId: stri
       kindOf: n.kindOf ?? null,
       sqadualed: n.sqadualed ?? null,
       sqadualedf: n.sqadualedf ?? null,
+      notes: n.notes ?? null,
       name: n.name ?? null,
       descrip: n.descrip ?? null,
       spnot: n.spnot ?? null,
@@ -83,6 +86,7 @@ export async function fetchSaleClaim(strapi: any, context: any, decisionId: stri
     saleDate: sa.date ?? null,
     saleStartDate: sa.startDate ?? null,
     saleFinishDate: sa.finishDate ?? null,
+    saleNote: sa.note ?? null,
     holderId: String(sa.users_permissions_user?.data?.id ?? ''),
     reporterId: String(sa.reporter?.data?.id ?? ''),
     matanotId: sa.matanot?.data?.id ? String(sa.matanot.data.id) : undefined,
@@ -100,7 +104,7 @@ export function standingOrder(claim: NonNullable<SaleClaim>): number {
 export function standingSaleVersion(
   claim: NonNullable<SaleClaim>,
   order: number,
-): { in: number | null; unit: number | null; date: string | null; startDate: string | null; finishDate: string | null } {
+): { in: number | null; unit: number | null; date: string | null; startDate: string | null; finishDate: string | null; note: string | null } {
   if (order <= 1 || !claim.negom?.length) {
     // Original claim — values already live on the Sale.
     return {
@@ -109,6 +113,7 @@ export function standingSaleVersion(
       date: claim.saleDate ?? null,
       startDate: claim.saleStartDate ?? null,
       finishDate: claim.saleFinishDate ?? null,
+      note: claim.saleNote ?? null,
     };
   }
   const n = claim.negom[order - 2];
@@ -122,6 +127,7 @@ export function standingSaleVersion(
     date: claim.saleDate ?? null, // the sale/report date is not renegotiated
     startDate: n?.sqadualed ?? claim.saleStartDate ?? null,
     finishDate: n?.sqadualedf ?? claim.saleFinishDate ?? null,
+    note: n?.notes ?? claim.saleNote ?? null,
   };
 }
 

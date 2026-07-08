@@ -989,12 +989,14 @@ export function extractDecisions(userData: any): DecisionData[] {
               standingOrder,
               negom,
               holderName: sale.attributes?.users_permissions_user?.data?.attributes?.username ?? '',
+              reporterName: sale.attributes?.reporter?.data?.attributes?.username ?? '',
               productName: sale.attributes?.matanot?.data?.attributes?.name ?? '',
               current: {
                 unit: sale.attributes?.unit,
                 in: sale.attributes?.in,
                 startDate: sale.attributes?.startDate,
-                finishDate: sale.attributes?.finishDate
+                finishDate: sale.attributes?.finishDate,
+                note: sale.attributes?.note ?? null
               },
               // The version currently on the table (last negom round, or the
               // original sale values for round 1).
@@ -1004,7 +1006,8 @@ export function extractDecisions(userData: any): DecisionData[] {
                     price: lastNegom.price,
                     kindOf: lastNegom.kindOf,
                     sqadualed: lastNegom.sqadualed,
-                    sqadualedf: lastNegom.sqadualedf
+                    sqadualedf: lastNegom.sqadualedf,
+                    notes: lastNegom.notes ?? null
                   }
                 : {
                     hm: sale.attributes?.unit,
@@ -1014,7 +1017,8 @@ export function extractDecisions(userData: any): DecisionData[] {
                         : sale.attributes?.in,
                     kindOf: null,
                     sqadualed: sale.attributes?.startDate,
-                    sqadualedf: sale.attributes?.finishDate
+                    sqadualedf: sale.attributes?.finishDate,
+                    notes: sale.attributes?.note ?? null
                   }
             }
           } as any);

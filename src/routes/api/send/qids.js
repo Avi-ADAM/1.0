@@ -4270,6 +4270,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                       kindOf
                       sqadualed
                       sqadualedf
+                      notes
                     }
                     sale {
                       data {
@@ -4280,8 +4281,9 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           date
                           startDate
                           finishDate
+                          note
                           holderStatus
-                          reporter { data { id } }
+                          reporter { data { id attributes { username } } }
                           users_permissions_user { data { id attributes { username } } }
                           matanot { data { id attributes { name quant } } }
                         }
@@ -12175,7 +12177,7 @@ export const qids = {
           archived
           decisionName
           vots { what id order zman users_permissions_user { data { id } } }
-          negom { id hm price kindOf sqadualed sqadualedf }
+          negom { id hm price kindOf sqadualed sqadualedf notes }
           timegrama { data { id attributes { date done } } }
           sale {
             data {
@@ -12186,6 +12188,7 @@ export const qids = {
                 date
                 startDate
                 finishDate
+                note
                 holderStatus
                 reporter { data { id } }
                 users_permissions_user { data { id } }
@@ -12218,6 +12221,7 @@ export const qids = {
     $date: DateTime,
     $startDate: DateTime,
     $finishDate: DateTime,
+    $note: String,
     $holderStatus: ENUM_SALE_HOLDERSTATUS,
     $confirmedBy: ENUM_SALE_CONFIRMEDBY,
     $holderDecidedAt: DateTime
@@ -12228,6 +12232,7 @@ export const qids = {
       date: $date,
       startDate: $startDate,
       finishDate: $finishDate,
+      note: $note,
       holderStatus: $holderStatus,
       confirmedBy: $confirmedBy,
       holderDecidedAt: $holderDecidedAt
