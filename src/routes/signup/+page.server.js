@@ -1,4 +1,5 @@
 import { redirect, fail } from '@sveltejs/kit';
+import { importInvitedMeeting } from '$lib/server/importInvitedMeeting.js';
 
 const baseUrl = import.meta.env.VITE_URL;
 
@@ -10,11 +11,15 @@ export async function load({ cookies }) {
 }
 
 export const actions = {
-  default: async ({ request, cookies }) => {
+  default: async ({ request, cookies, fetch }) => {
     const data = await request.formData();
-    const email = String(data.get('email') || '').trim().toLowerCase();
+    const email = String(data.get('email') || '')
+      .trim()
+      .toLowerCase();
     const password = String(data.get('password') || '');
-    const displayName = String(data.get('displayName') || cookies.get('un') || '').trim();
+    const displayName = String(
+      data.get('displayName') || cookies.get('un') || ''
+    ).trim();
 
     const fpval = cookies.get('fpval');
     const countryCookie = cookies.get('country') || '';
@@ -30,7 +35,9 @@ export const actions = {
     }
 
     if (password.length < 8 || !/[A-Z]/.test(password)) {
-      return fail(400, { error: 'הסיסמה חייבת להכיל לפחות 8 תווים ואות גדולה באנגלית' });
+      return fail(400, {
+        error: 'הסיסמה חייבת להכיל לפחות 8 תווים ואות גדולה באנגלית'
+      });
     }
 
     const username = displayName
@@ -52,8 +59,13 @@ export const actions = {
       if (!res.ok) {
         const err = await res.json();
         const msg = err?.error?.message || 'שגיאה ברישום';
-        if (msg.toLowerCase().includes('already taken') || msg.toLowerCase().includes('already exist')) {
-          return fail(400, { error: 'כתובת המייל כבר רשומה במערכת. נסו להתחבר.' });
+        if (
+          msg.toLowerCase().includes('already taken') ||
+          msg.toLowerCase().includes('already exist')
+        ) {
+          return fail(400, {
+            error: 'כתובת המייל כבר רשומה במערכת. נסו להתחבר.'
+          });
         }
         return fail(400, { error: msg });
       }
@@ -71,10 +83,34 @@ export const actions = {
 
       cookies.set('jwt', jwt, { ...cookieOptions, httpOnly: true });
       cookies.set('id', String(user.id), { ...cookieOptions, httpOnly: false });
-      cookies.set('un', user.name || displayName || user.username, { ...cookieOptions, httpOnly: false });
-      cookies.set('when', Date.now().toString(), { ...cookieOptions, httpOnly: false });
+      cookies.set('un', user.name || displayName || user.username, {
+        ...cookieOptions,
+        httpOnly: false
+      });
+      cookies.set('when', Date.now().toString(), {
+        ...cookieOptions,
+        httpOnly: false
+      });
       cookies.set('email', email, { ...cookieOptions, httpOnly: false });
       cookies.set('guidMe', 'again', { ...cookieOptions, httpOnly: false });
+
+      // If the user arrived from an email-bound meeting invitation
+      // (/hascama?invite=<token>), import that meeting into the new account.
+      // Best-effort: signup must not fail if the import does.
+      const inviteToken = cookies.get('invite_token');
+      if (inviteToken) {
+        try {
+          await importInvitedMeeting(
+            inviteToken,
+            String(user.id),
+            email,
+            fetch
+          );
+        } catch (err) {
+          console.error('[signup] invited-meeting import failed:', err);
+        }
+        cookies.delete('invite_token', { path: '/' });
+      }
 
       throw redirect(303, '/signup/check-email');
     } catch (err) {
