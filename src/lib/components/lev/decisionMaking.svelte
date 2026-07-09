@@ -399,6 +399,7 @@
   // drawer, exactly like pendm/pmash vote cards.
   let saleClaimForumId = $state(null);
   async function openSaleClaimChat() {
+    console.log('[saleClaim][chat] button clicked', { askId, projectId });
     // Close this card's own right-side drawer first, otherwise it covers the
     // small draggable chat widget (rendered by the page footer).
     dialogOpen = false;
@@ -410,12 +411,17 @@
           entityId: String(askId),
           projectId: String(projectId)
         });
+        console.log('[saleClaim][chat] ensureVoteForum result', r);
         if (r.success) fid = r.data?.forumId ?? null;
       } catch (e) {
-        console.log(e);
+        console.error('[saleClaim][chat] ensureVoteForum threw', e);
       }
     }
     saleClaimForumId = fid;
+    console.log('[saleClaim][chat] resolved forumId → calling onChat', {
+      fid,
+      hasOnChat: typeof onChat === 'function'
+    });
     if (fid) onChat?.({ forumId: String(fid) });
     else onChat?.();
   }

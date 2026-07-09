@@ -2029,6 +2029,17 @@ export function processDecisions(
           .map((u) => String(u?.users_permissions_user?.data?.id ?? u?.ide ?? ''))
       );
       const ok = signedIds.size;
+      console.log(`[saleClaim][process] decision ${decision.id} → card`, {
+        standingOrder,
+        signedOnStanding: ok,
+        noofusersWaiting: Math.max(0, 2 - ok),
+        holderId: sc?.holderId,
+        reporterId: sc?.reporterId,
+        iAmHolder: sc?.iAmHolder,
+        iAmReporter: sc?.iAmReporter,
+        hasStanding: !!sc?.standing,
+        negomLen: (sc?.negom ?? []).length
+      });
       return {
         ...commonFields,
         ...decision,
@@ -2040,7 +2051,11 @@ export function processDecisions(
         noofusersNo: 0,
         noofusersWaiting: Math.max(0, 2 - ok),
         // The extractor already gated this to "my turn", so I can act now.
-        already: false
+        already: false,
+        // …which also means high priority: commonFields.pl was computed as
+        // VOTE_DONE (the round-1 signature counts as "already voted"), burying
+        // the card at the end of the scroll. It genuinely awaits my action.
+        pl: PRIORITY_BAND.VOTE_PENDING
       };
     } else if (decision.kind === 'sheirutpends') {
       return {

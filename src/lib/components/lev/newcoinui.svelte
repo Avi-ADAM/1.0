@@ -172,6 +172,10 @@
   function chat(payload) {
     // Forward a card's chat request (e.g. saleClaim → { forumId }) to the page,
     // which opens the shared chat drawer.
+    console.log('[saleClaim][chat] newcoinui.chat forwarding to page', {
+      payload,
+      hasOnChat: typeof onChat === 'function'
+    });
     onChat?.(payload);
   }
 

@@ -436,8 +436,20 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
     });
 
     // Step 3: Apply project filtering (if a project is selected)
+    const _scMerged = merged.filter((i: any) => i.kind === 'saleClaim').length;
+    const _scAfterMilon = filtered.filter((i: any) => i.kind === 'saleClaim').length;
     if ($projectFilter !== null) {
       filtered = filtered.filter(item => item.projectId === $projectFilter);
+    }
+    const _scAfterProject = filtered.filter((i: any) => i.kind === 'saleClaim').length;
+    if (_scMerged > 0 || _scAfterMilon > 0) {
+      console.log('[saleClaim][swiper] pipeline counts', {
+        afterMerge: _scMerged,
+        afterMilonFilter: _scAfterMilon,
+        afterProjectFilter: _scAfterProject,
+        milonHachla: $milon.hachla,
+        projectFilter: $projectFilter
+      });
     }
     console.log(filtered.sort((a, b) => {
       const priorityA = a.pl ?? 999;

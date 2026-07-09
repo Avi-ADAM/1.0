@@ -937,6 +937,17 @@ export function extractDecisions(userData: any): DecisionData[] {
   for (const project of projects) {
     // 1. Process Decisions
     if (project?.attributes?.decisions?.data) {
+      const _decs = project.attributes.decisions.data;
+      const _saleClaims = _decs.filter(
+        (d: any) => d?.attributes?.kind === 'saleClaim'
+      );
+      if (_saleClaims.length > 0) {
+        console.log(
+          `[saleClaim][extract] project ${project.id} has ${_decs.length} decision(s); kinds:`,
+          _decs.map((d: any) => d?.attributes?.kind),
+          `— ${_saleClaims.length} saleClaim(s)`
+        );
+      }
       for (const decision of project.attributes.decisions.data) {
         if (!decision?.id || !decision?.attributes) continue;
 
@@ -949,13 +960,17 @@ export function extractDecisions(userData: any): DecisionData[] {
         // round yet).
         if (kind === 'saleClaim') {
           const sale = decision.attributes.sale?.data;
-          if (!sale) continue; // malformed claim — nothing to consent to
+          if (!sale) {
+            console.warn(
+              `[saleClaim][extract] decision ${decision.id} SKIPPED — no linked sale`,
+              { decisionId: decision.id, projectId: project.id }
+            );
+            continue; // malformed claim — nothing to consent to
+          }
           const holderId = String(sale.attributes?.users_permissions_user?.data?.id ?? '');
           const reporterId = String(sale.attributes?.reporter?.data?.id ?? '');
           const myid = String(userData.id);
           const isParty = myid === holderId || myid === reporterId;
-          if (!isParty) continue;
-
           const negom = decision.attributes.negom || [];
           const standingOrder = negom.length + 1;
           const iSignedStanding = vots.some(
@@ -964,7 +979,36 @@ export function extractDecisions(userData: any): DecisionData[] {
               Number(v.order) === standingOrder &&
               v.what
           );
-          if (iSignedStanding) continue; // waiting on the other side, not my move
+          console.log(`[saleClaim][extract] decision ${decision.id}`, {
+            myid,
+            holderId,
+            reporterId,
+            isParty,
+            negomLen: negom.length,
+            standingOrder,
+            iSignedStanding,
+            holderStatus: sale.attributes?.holderStatus,
+            votOrders: vots.map((v: any) => ({
+              id: String(v.users_permissions_user?.data?.id ?? v.ide ?? ''),
+              order: v.order,
+              what: v.what
+            }))
+          });
+          if (!isParty) {
+            console.log(
+              `[saleClaim][extract] decision ${decision.id} SKIPPED — I am not a party (reporter/holder)`
+            );
+            continue;
+          }
+          if (iSignedStanding) {
+            console.log(
+              `[saleClaim][extract] decision ${decision.id} SKIPPED — I already signed standing round ${standingOrder}; waiting on the other side`
+            );
+            continue; // waiting on the other side, not my move
+          }
+          console.log(
+            `[saleClaim][extract] decision ${decision.id} → PUSHED to my heart (my turn, round ${standingOrder})`
+          );
 
           const lastNegom = negom.length > 0 ? negom[negom.length - 1] : null;
           decisions.push({

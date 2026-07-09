@@ -163,6 +163,7 @@ export async function initialForum (all = false,ids = [],myId = 0){
                     project { data { id attributes { projectName profilePic{data{attributes{url formats}}} } } }
                     mesimabetahaliches { data { attributes { name } } }
                     sheiruts { data { attributes { name } } }
+                    decisions(pagination:{limit:5}) { data { attributes { kind decisionName } } }
                     messages(filters:{archived: {ne:true}}, sort:["when:asc"]){data{id attributes{
                         content when users_permissions_user{data{id attributes{username profilePic{data{attributes{url formats}}}}}}
                     }}}
@@ -416,6 +417,20 @@ export function forums(dat, myId, all = false) {
       if (projectPic) md.projectPic = projectPic;
       if (mesimaName) md.mesimaName = mesimaName;
       if (sheirutName) md.transferDetails = `מכירה: ${sheirutName}`;
+
+      // A bilateral sale-holder-consent chat: title it after the reported sale
+      // (the linked saleClaim Decision's name, e.g. "product · 100₪") instead of
+      // the generic "mission in progress" fallback.
+      const saleClaimDec = (attrs.decisions?.data || []).find(
+        (d) => d?.attributes?.kind === 'saleClaim'
+      );
+      if (saleClaimDec) {
+        const dn = saleClaimDec.attributes?.decisionName || attrs.subject || '';
+        md.title = {
+          he: dn ? `דיווח מכירה: ${dn}` : 'דיווח מכירה',
+          en: dn ? `Sale report: ${dn}` : 'Sale report'
+        };
+      }
 
       // 3. Process Messages locally to avoid triggering store reactivity mid-loop
       const messagesData = attrs.messages?.data || [];

@@ -8,14 +8,15 @@
    *
    * It is presentation-only: the caller normalizes its data into `versions`,
    * pre-computing per-field `changed` (vs. the previous version) and marking the
-   * one that is `current` (on the table). Kept palette-neutral (gold/barbi) and
-   * theme/RTL aware so any card on the site can reuse it.
+   * one that is `current` (on the table). Styled with Tailwind `dark:` variants
+   * (the project's dark-mode mechanism) so it has proper contrast in both themes,
+   * and RTL-aware — any card on the site can reuse it.
    *
    * @typedef {Object} VHField
    * @property {string} label   Row label (already localized).
    * @property {string|number|null} value  Display value ('—' when empty).
    * @property {boolean} [changed]    Highlight — differs from the previous version.
-   * @property {boolean} [emphasize]  Bolder (e.g. a total).
+   * @property {boolean} [emphasize]  Bolder accent (e.g. a total).
    *
    * @typedef {Object} VHVersion
    * @property {string} title       Column heading, e.g. "סבב 2".
@@ -36,27 +37,51 @@
 </script>
 
 {#if versions.length > 0}
-  <div dir={$isRtl ? 'rtl' : 'ltr'} class="vh">
+  <div dir={$isRtl ? 'rtl' : 'ltr'} class="w-full">
     {#if label}
-      <div class="vh-label">🕓 {label}</div>
+      <div
+        class="text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-300 mb-1.5"
+      >
+        🕓 {label}
+      </div>
     {/if}
-    <div class="vh-track">
+    <div class="vh-track flex gap-2 overflow-x-auto pb-1.5 snap-x">
       {#each versions as v, i (i)}
-        <div class="vh-col" class:vh-current={v.current}>
-          <div class="vh-head">
-            <span class="vh-title">{v.title}</span>
+        <div
+          class="flex-none min-w-[8.5rem] max-w-[12rem] snap-start rounded-xl border p-2 {v.current
+            ? 'border-barbi dark:border-mpink ring-1 ring-barbi/50 dark:ring-mpink/50 bg-barbi/5 dark:bg-mpink/10'
+            : 'border-gray-200 dark:border-gray-600 bg-white/70 dark:bg-gray-800/60'}"
+        >
+          <div class="flex items-center justify-between gap-1 mb-0.5">
+            <span class="text-xs font-bold text-barbi dark:text-mpink">{v.title}</span>
             {#if v.current}
-              <span class="vh-badge">{$lang === 'he' ? 'על השולחן' : 'on table'}</span>
+              <span
+                class="text-[0.6rem] font-bold uppercase text-barbi dark:text-mpink bg-barbi/10 dark:bg-mpink/20 rounded-full px-1.5 py-0.5 whitespace-nowrap"
+              >
+                {$lang === 'he' ? 'על השולחן' : 'on table'}
+              </span>
             {/if}
           </div>
           {#if v.by}
-            <div class="vh-by">{v.by}</div>
+            <div class="text-[0.65rem] text-gray-500 dark:text-gray-400 mb-1.5 truncate">
+              {v.by}
+            </div>
           {/if}
-          <div class="vh-fields">
+          <div class="flex flex-col gap-0.5">
             {#each v.fields as f (f.label)}
-              <div class="vh-row" class:vh-changed={f.changed}>
-                <span class="vh-flabel">{f.label}</span>
-                <span class="vh-fval" class:vh-emph={f.emphasize}>
+              <div
+                class="flex items-baseline justify-between gap-1.5 px-1 py-0.5 rounded-md {f.changed
+                  ? 'bg-amber-100 dark:bg-amber-400/20'
+                  : ''}"
+              >
+                <span class="text-[0.65rem] text-gray-500 dark:text-gray-400 flex-none">
+                  {f.label}
+                </span>
+                <span
+                  class="text-xs text-end break-words {f.emphasize
+                    ? 'font-extrabold text-barbi dark:text-mpink'
+                    : 'font-semibold text-gray-900 dark:text-gray-50'}"
+                >
                   {f.value === null || f.value === '' ? '—' : f.value}
                 </span>
               </div>
@@ -69,127 +94,12 @@
 {/if}
 
 <style>
-  .vh {
-    width: 100%;
-  }
-  .vh-label {
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    color: var(--tm, #9ca3af);
-    margin-bottom: 0.4rem;
-  }
-  /* Horizontal, snap-scrolling row — never pushes the card body sideways. */
-  .vh-track {
-    display: flex;
-    gap: 0.5rem;
-    overflow-x: auto;
-    padding-bottom: 0.35rem;
-    scroll-snap-type: x proximity;
-    -webkit-overflow-scrolling: touch;
-  }
+  /* Slim horizontal scrollbar; colours come from Tailwind classes above. */
   .vh-track::-webkit-scrollbar {
     height: 5px;
   }
   .vh-track::-webkit-scrollbar-thumb {
     background: rgba(156, 163, 175, 0.4);
     border-radius: 999px;
-  }
-  .vh-col {
-    flex: 0 0 auto;
-    min-width: 8.5rem;
-    max-width: 12rem;
-    scroll-snap-align: start;
-    border: 1px solid rgba(156, 163, 175, 0.3);
-    border-radius: 0.6rem;
-    padding: 0.5rem;
-    background: rgba(255, 255, 255, 0.55);
-  }
-  :global(.dark) .vh-col {
-    background: rgba(31, 41, 55, 0.5);
-    border-color: rgba(75, 85, 99, 0.5);
-  }
-  /* The version on the table gets the accent ring + tint. */
-  .vh-current {
-    border-color: var(--barbi, #c026d3);
-    background: rgba(192, 38, 211, 0.06);
-    box-shadow: 0 0 0 1px var(--barbi, #c026d3) inset;
-  }
-  :global(.dark) .vh-current {
-    background: rgba(236, 72, 153, 0.1);
-  }
-  .vh-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.3rem;
-    margin-bottom: 0.15rem;
-  }
-  .vh-title {
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: var(--gold, #b45309);
-  }
-  .vh-badge {
-    font-size: 0.56rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-    color: var(--barbi, #c026d3);
-    background: rgba(192, 38, 211, 0.12);
-    border-radius: 999px;
-    padding: 0.05rem 0.35rem;
-    white-space: nowrap;
-  }
-  .vh-by {
-    font-size: 0.62rem;
-    color: var(--tm, #9ca3af);
-    margin-bottom: 0.35rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .vh-fields {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-  }
-  .vh-row {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 0.4rem;
-    padding: 0.15rem 0.25rem;
-    border-radius: 0.35rem;
-  }
-  /* A field that differs from the previous version. */
-  .vh-changed {
-    background: rgba(180, 83, 9, 0.12);
-  }
-  :global(.dark) .vh-changed {
-    background: rgba(251, 191, 36, 0.14);
-  }
-  .vh-flabel {
-    font-size: 0.62rem;
-    color: var(--tm, #9ca3af);
-    flex: 0 0 auto;
-  }
-  .vh-fval {
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: #1f2937;
-    text-align: end;
-    word-break: break-word;
-  }
-  :global(.dark) .vh-fval {
-    color: #f3f4f6;
-  }
-  .vh-emph {
-    font-weight: 800;
-    color: var(--barbi, #c026d3);
-  }
-  :global(.dark) .vh-emph {
-    color: #f9a8d4;
   }
 </style>

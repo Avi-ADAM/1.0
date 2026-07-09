@@ -109,9 +109,14 @@
   }
 
   function chat(payload) {
+    console.log('[saleClaim][chat] page.chat received', payload);
     if (payload && payload.forumId) {
       nowChatId.set(payload.forumId);
       isChatOpen.set(true);
+      console.log('[saleClaim][chat] page.chat set stores', {
+        nowChatId: get(nowChatId),
+        isChatOpen: get(isChatOpen)
+      });
     } else {
       // Fallback for components that don't pass a payload
       isOpen = false;

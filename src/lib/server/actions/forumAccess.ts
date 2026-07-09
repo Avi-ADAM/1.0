@@ -18,7 +18,8 @@ export type ForumKind =
   | 'haluka'
   | 'meeting'
   | 'wish'
-  | 'wishoffer';
+  | 'wishoffer'
+  | 'saleClaim';
 
 export interface ForumMessageView {
   id: string;
@@ -116,7 +117,32 @@ function ratsonProposalParticipants(attrs: any): string[] {
   return [...owners, ...proposers];
 }
 
+// A saleClaim decision-forum is bilateral (PLAN_sale_holder_consent): the chat
+// is private to the reporter (who logged the sale) and the holder (on whom it
+// was logged). We read them off the linked saleClaim Decision's sale. The
+// forum queries fetch `decisions(filters:{kind:{eq:"saleClaim"}})` so this is
+// present only for those forums; every other decision forum (pic, pmash…)
+// stays rikma-wide 'project' kind.
+function saleClaimSale(attrs: any): any {
+  const dec = entityArray(attrs?.decisions).find(
+    (d) => d?.attributes?.kind === 'saleClaim'
+  );
+  return dec?.attributes?.sale?.data || null;
+}
+
+function saleClaimParticipants(attrs: any): string[] {
+  const sale = saleClaimSale(attrs);
+  if (!sale) return [];
+  return uniqueIds([
+    entityId(sale?.attributes?.reporter?.data),
+    entityId(sale?.attributes?.users_permissions_user?.data)
+  ]);
+}
+
 function forumKind(attrs: any): ForumKind {
+  // A bilateral sale-holder consent chat is private to the two parties — checked
+  // first so it never falls through to the rikma-wide 'project' kind.
+  if (saleClaimSale(attrs)) return 'saleClaim';
   // A community-volunteer coordination chat links back via `ratson_proposal`
   // (checked before `ratson` since a proposal forum has no direct ratson link).
   if (attrs?.ratson_proposal?.data) return 'wishoffer';
@@ -247,6 +273,11 @@ export function participantIdsForForum(entity: any): string[] {
   const attrs = entity?.attributes || {};
   const kind = forumKind(attrs);
   const project = firstProject(attrs);
+
+  if (kind === 'saleClaim') {
+    // Bilateral — ONLY the reporter and the holder, never the whole rikma.
+    return saleClaimParticipants(attrs);
+  }
 
   if (kind === 'wishoffer') {
     return uniqueIds(ratsonProposalParticipants(attrs));

@@ -166,7 +166,16 @@
   function hover(event) {
     onHover?.({ id: event.id }); // Svelte 5: Replaced dispatch with callback prop
   }
-  function chat() {}
+  function chat(payload) {
+    // Forward a card's chat request (e.g. saleClaim → { forumId }) to the page,
+    // which opens the shared chat widget. Was a no-op, so chat never opened in
+    // the list/card view.
+    console.log('[saleClaim][chat] cards.chat forwarding to page', {
+      payload,
+      hasOnChat: typeof onChat === 'function'
+    });
+    onChat?.(payload);
+  }
 
   function proj(event) {
     console.log(event.id);
