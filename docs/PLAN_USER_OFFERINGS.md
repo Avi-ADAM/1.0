@@ -325,7 +325,7 @@ collection `mission-offer` מלא + `CLAUDE.md` המתעד את הענף החי.
 | **M3** ✅ | `createPersonalMatanot`/`archivePersonalMatanot` + סקשן "המוצרים שלי" ב-/me + מוכר אישי ב-`/gift/[id]` (qids 265–266) | משתמש יוצר ועורך מוצר בלי ריקמה גלויה | `userOfferings.products` |
 | **M4** ✅ | FAB "הוסיפו את ההיצע שלכם" + `AddSupplySheet` ב-/demand (עוגני `/me#my-*`; הצעת-סף → תצוגת מאגדים במפה) + שכבת `products` בעדשת join (qid 269 + `normalizeProduct`, מוצרי ריקמות ומוצרים אישיים) | ההבטחה מ-quorum ממומשת | `userOfferings.demandAdd` |
 | **M5** ✅ | הרחבת `confirmMaagadQuorum` (§3.5, qid 267) — ריקמת בית לספק יחיד + עסקאות | ספק יחיד במאגד מקבל עסקאות אמיתיות | `userOfferings.maagadSolo` |
-| **M6** | מקורות matching לקונסיירז' (§3.6) | משימות/מוצרים אישיים צפים במשאלות | `userOfferings.conciergeMatch` |
+| **M6** ✅ | מקורות matching לקונסיירז' (§3.6): ספקי mission-offers ממוזגים ל-people ב-`enrichWish` (qid 270); מוצרים אישיים כבר נתפסים ע"י `203findMatanotByText` (active + לא-archived) | משימות/מוצרים אישיים צפים במשאלות | `userOfferings.conciergeMatch` |
 | **M7** ✅ (חלון ראווה) | `UserStorefront` ב-/user/[id] (qid 268) — מוצרים, משאבים למכירה והצעות-משימה עם CTA הזמנה/קונסיירז'. **נותר:** שלבי onboarding (§4.2). | מסע ספק שלם: הרשמה → פרופיל → היצע → demand | `userOfferings.storefront` |
 | **M8** | היצע מוצע במאגד (§4.7, qid 258) + פרה-פילינג `createMaagadOffer` | ביקוש קבוצתי פוגש היצע קיים | `userOfferings.maagadSupply` |
 

@@ -12352,6 +12352,24 @@ export const qids = {
     }
   }`,
 
+  '270findMissionOffersByMission': `query FindMissionOffersByMission($ids: [ID]) {
+    missionOffers(
+      filters: { mission: { id: { in: $ids } }, active: { eq: true }, archived: { ne: true } }
+      pagination: { limit: 20 }
+    ) {
+      data { id attributes {
+        name perhour price hours
+        mission { data { id attributes { missionName } } }
+        users_permissions_user { data { id attributes {
+          username
+          profilePic { data { attributes { url } } }
+          skills { data { attributes { skillName } } }
+          projects_1s { data { attributes { projectName } } }
+        } } }
+      } }
+    }
+  }`,
+
   '269mapProducts': `query MapProducts {
     matanots(
       filters: { archived: { ne: true } }

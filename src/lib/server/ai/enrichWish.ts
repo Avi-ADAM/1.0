@@ -235,10 +235,56 @@ export async function enrichWish(
       person._matched.add(term);
     }
   });
-  const people = [...personById.values()]
+  let people = [...personById.values()]
     .map(({ _matched, ...rest }) => ({ ...rest, matchedSkills: [..._matched] }))
     .sort((a, b) => b.matchedSkills.length - a.matchedSkills.length)
     .slice(0, 10);
+
+  // Mission-offer providers (PLAN_USER_OFFERINGS §3.6 / M6): users holding an
+  // active priced offer on one of the matched mission templates are prime
+  // candidates — merge them into the people list (deduped by user id; the
+  // mission name joins their matched terms).
+  const matchedMissionIds = missions.map((m) => m.id);
+  if (matchedMissionIds.length > 0) {
+    const offerData = await sendQid(fetchFn, '270findMissionOffersByMission', {
+      ids: matchedMissionIds
+    });
+    const merged = new Map(people.map((p) => [p.id, p]));
+    for (const node of offerData?.missionOffers?.data ?? []) {
+      const a = node?.attributes ?? {};
+      const u = a.users_permissions_user?.data;
+      if (!u?.id) continue;
+      const id = String(u.id);
+      const missionName: string =
+        a.mission?.data?.attributes?.missionName ?? a.name ?? '';
+      const existing = merged.get(id);
+      if (existing) {
+        if (missionName && !existing.matchedSkills.includes(missionName)) {
+          existing.matchedSkills.push(missionName);
+        }
+        continue;
+      }
+      const ua = u.attributes ?? {};
+      merged.set(id, {
+        id,
+        username: ua.username ?? '',
+        avatar:
+          ua.profilePic?.data?.attributes?.url ??
+          ua.profilePic?.data?.attributes?.formats?.thumbnail?.url ??
+          null,
+        skills: (ua.skills?.data ?? [])
+          .map((s: any) => s?.attributes?.skillName)
+          .filter((s: any): s is string => typeof s === 'string' && s.length > 0),
+        matchedSkills: missionName ? [missionName] : [],
+        projects: (ua.projects_1s?.data ?? [])
+          .map((p: any) => p?.attributes?.projectName)
+          .filter((p: any): p is string => typeof p === 'string')
+      });
+    }
+    people = [...merged.values()]
+      .sort((a, b) => b.matchedSkills.length - a.matchedSkills.length)
+      .slice(0, 10);
+  }
 
   // Resource (Sp) aggregation ────────────────────────────────────────────────
   const resourceById = new Map<string, AvailableResource>();
