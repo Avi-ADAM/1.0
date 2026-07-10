@@ -4,7 +4,7 @@
  * `src/lib/server/map/normalizeMapItems.ts`; the client only ever sees these.
  */
 
-export type MapItemKind = 'wish' | 'maagad' | 'offer' | 'mission' | 'resource';
+export type MapItemKind = 'wish' | 'maagad' | 'offer' | 'mission' | 'resource' | 'product';
 
 export type MapItem = {
   id: string;
@@ -24,7 +24,7 @@ export type MapItem = {
   meta: Record<string, unknown>;
 };
 
-export type MapLayerId = 'wishes' | 'maagadim' | 'offers' | 'missions' | 'resources';
+export type MapLayerId = 'wishes' | 'maagadim' | 'offers' | 'missions' | 'resources' | 'products';
 
 export type MapLayer = {
   id: MapLayerId;
@@ -36,7 +36,7 @@ export type DiscoveryLens = 'join' | 'supply';
 
 /** Which layers each lens shows (PLAN_DISCOVERY_MAP §1). */
 export const LENS_LAYERS: Record<DiscoveryLens, MapLayerId[]> = {
-  join: ['wishes', 'maagadim', 'offers'],
+  join: ['wishes', 'maagadim', 'offers', 'products'],
   supply: ['missions', 'resources', 'maagadim']
 };
 
@@ -45,5 +45,6 @@ export const LAYER_COLORS: Record<MapLayerId, string> = {
   maagadim: '#8b5cf6',
   offers: '#f97316',
   missions: '#3b82f6',
-  resources: '#10b981'
+  resources: '#10b981',
+  products: '#eab308'
 };

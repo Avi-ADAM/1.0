@@ -85,5 +85,7 @@
   "add_product_hint": "מוצר במחיר קבוע שלקוחות קונים ישירות",
   "add_threshold": "הצעת-סף למאגד",
   "add_threshold_hint": "בחרו מאגד ביקוש קיים במפה והגישו בו הצעה",
-  "add_login": "התחברו כדי להציע"
+  "add_login": "התחברו כדי להציע",
+  "layer_products": "מוצרים למכירה",
+  "product_personal": "ספק עצמאי"
 }

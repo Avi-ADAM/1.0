@@ -85,5 +85,7 @@
   "add_product_hint": "A fixed-price product customers buy directly",
   "add_threshold": "Threshold offer on a pool",
   "add_threshold_hint": "Pick an existing demand pool on the map and make an offer",
-  "add_login": "Log in to offer"
+  "add_login": "Log in to offer",
+  "layer_products": "Products for sale",
+  "product_personal": "Independent provider"
 }

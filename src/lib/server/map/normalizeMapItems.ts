@@ -118,6 +118,41 @@ export function normalizeOpenMission(node: StrapiNode): MapItem | null {
   };
 }
 
+/**
+ * Products for sale (QID 269) — join lens (PLAN_USER_OFFERINGS §4.3 / M4).
+ * Both rikma products and personal products (origin='personal'); the seller
+ * shown is the owning user for personal products, the rikma otherwise.
+ */
+export function normalizeProduct(node: StrapiNode): MapItem | null {
+  const a = node?.attributes;
+  if (!a) return null;
+  const project = a.projectcreates?.data?.[0] ?? null;
+  const own = { lat: a.lat, lng: a.lng, radius: a.radius, location_hint: null };
+  const loc = resolveLocation(a.location, own, project?.attributes?.location);
+  const isOnline = a.location?.location_mode === 'online';
+  if (loc.lat === null && !isOnline) return null;
+  const personal = a.origin === 'personal';
+  return {
+    id: String(node.id),
+    kind: 'product',
+    lat: loc.lat,
+    lng: loc.lng,
+    radius: loc.radius,
+    title: a.name || '',
+    hint: loc.hint,
+    isOnline,
+    concierge: false,
+    href: `/gift/${node.id}`,
+    meta: {
+      price: num(a.price),
+      personal,
+      sellerName: personal
+        ? (a.owner_user?.data?.attributes?.username ?? null)
+        : (project?.attributes?.projectName ?? null)
+    }
+  };
+}
+
 /** Requested resources from rikmot / concierge — supplier lens (QID 209). */
 export function normalizeOpenMashaabim(node: StrapiNode): MapItem | null {
   const a = node?.attributes;

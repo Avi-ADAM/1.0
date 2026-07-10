@@ -3,7 +3,8 @@ import {
   normalizeJoinableRatson,
   normalizeMaagadim,
   normalizeOpenMashaabim,
-  normalizeOpenMission
+  normalizeOpenMission,
+  normalizeProduct
 } from './normalizeMapItems.js';
 
 const TLV = { lat: 32.0853, lng: 34.7818 };
@@ -147,5 +148,63 @@ describe('normalizeMaagadim', () => {
     ]);
     expect(maagadim).toHaveLength(1);
     expect(maagadim[0].isOnline).toBe(true);
+  });
+});
+
+describe('normalizeProduct', () => {
+  it('shows the owning user as seller for personal products', () => {
+    const item = normalizeProduct({
+      id: 5,
+      attributes: {
+        name: 'עוגת שמרים',
+        price: 80,
+        origin: 'personal',
+        location: { lat: 32.0853, lng: 34.7818 },
+        owner_user: { data: { id: 7, attributes: { username: 'dana' } } },
+        projectcreates: { data: [{ id: 9, attributes: { projectName: 'הריקמה של dana' } }] }
+      }
+    });
+    expect(item).not.toBeNull();
+    expect(item?.kind).toBe('product');
+    expect(item?.href).toBe('/gift/5');
+    expect(item?.meta.sellerName).toBe('dana');
+    expect(item?.meta.personal).toBe(true);
+    expect(item?.meta.price).toBe(80);
+  });
+
+  it('shows the rikma as seller for project products and falls back to its location', () => {
+    const item = normalizeProduct({
+      id: 6,
+      attributes: {
+        name: 'סדנה',
+        price: 120,
+        origin: 'project',
+        projectcreates: {
+          data: [
+            {
+              id: 3,
+              attributes: {
+                projectName: 'מאפיית השכונה',
+                location: { lat: 32.0853, lng: 34.7818 }
+              }
+            }
+          ]
+        }
+      }
+    });
+    expect(item?.meta.sellerName).toBe('מאפיית השכונה');
+    expect(item?.meta.personal).toBe(false);
+    expect(item?.lat).not.toBeNull();
+  });
+
+  it('drops products with no location and no online mode', () => {
+    expect(
+      normalizeProduct({ id: 7, attributes: { name: 'x', price: 5 } })
+    ).toBeNull();
+    const online = normalizeProduct({
+      id: 8,
+      attributes: { name: 'קורס', price: 5, location: { location_mode: 'online' } }
+    });
+    expect(online?.isOnline).toBe(true);
   });
 });

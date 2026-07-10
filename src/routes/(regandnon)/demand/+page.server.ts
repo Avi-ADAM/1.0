@@ -3,7 +3,8 @@ import {
   normalizeJoinableRatson,
   normalizeMaagadim,
   normalizeOpenMashaabim,
-  normalizeOpenMission
+  normalizeOpenMission,
+  normalizeProduct
 } from '$lib/server/map/normalizeMapItems.js';
 import type { PageServerLoad } from './$types';
 
@@ -21,13 +22,14 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
   const isReg = !!(locals as any)?.uid;
   const svc = !isReg;
 
-  // Four independent public reads; each degrades to an empty layer on its own.
-  const [wishesRes, missionsRes, resourcesRes, maagadimRes] =
+  // Five independent public reads; each degrades to an empty layer on its own.
+  const [wishesRes, missionsRes, resourcesRes, maagadimRes, productsRes] =
     await Promise.allSettled([
       sendToSer({}, '220mapJoinableRatsons', 0, 0, svc, fetch),
       sendToSer({}, '221mapOpenMissions', 0, 0, svc, fetch),
       sendToSer({}, '222mapOpenMashaabims', 0, 0, svc, fetch),
-      sendToSer({}, '223mapMaagadim', 0, 0, svc, fetch)
+      sendToSer({}, '223mapMaagadim', 0, 0, svc, fetch),
+      sendToSer({}, '269mapProducts', 0, 0, svc, fetch)
     ]);
 
   const wishes = nodesOf(wishesRes, 'ratsons')
@@ -40,9 +42,12 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
     .map(normalizeOpenMashaabim)
     .filter((x): x is NonNullable<typeof x> => x !== null);
   const [maagadim, offers] = normalizeMaagadim(nodesOf(maagadimRes, 'maagads'));
+  const products = nodesOf(productsRes, 'matanots')
+    .map(normalizeProduct)
+    .filter((x): x is NonNullable<typeof x> => x !== null);
 
   return {
     isLoggedIn: !!(locals as any)?.uid,
-    mapData: { wishes, maagadim, offers, missions, resources }
+    mapData: { wishes, maagadim, offers, missions, resources, products }
   };
 };

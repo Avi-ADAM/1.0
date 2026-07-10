@@ -12352,6 +12352,21 @@ export const qids = {
     }
   }`,
 
+  '269mapProducts': `query MapProducts {
+    matanots(
+      filters: { archived: { ne: true } }
+      pagination: { limit: 200 }
+      sort: "createdAt:desc"
+    ) {
+      data { id attributes {
+        name price origin lat lng radius
+        location { lat lng radius location_hint location_mode }
+        owner_user { data { id attributes { username } } }
+        projectcreates { data { id attributes { projectName location { lat lng radius location_hint location_mode } } } }
+      } }
+    }
+  }`,
+
   '268getUserStorefront': `query GetUserStorefront($uid: ID!) {
     sps(
       filters: { users_permissions_user: { id: { eq: $uid } }, archived: { ne: true }, offerScope: { in: ["customers", "both"] } }

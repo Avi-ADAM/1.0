@@ -21,7 +21,8 @@
     'maagadim',
     'offers',
     'missions',
-    'resources'
+    'resources',
+    'products'
   ];
 
   // ── URL → initial state (deep links, PLAN_DISCOVERY_MAP §2.5) ────────────
@@ -150,7 +151,8 @@
     maagad: '🤝',
     offer: '📣',
     mission: '🛠️',
-    resource: '📦'
+    resource: '📦',
+    product: '🎁'
   };
 
   function itemBadges(item: MapItem): string[] {
@@ -173,6 +175,10 @@
     } else if (item.kind === 'resource') {
       if (m.projectName) badges.push(String(m.projectName));
       if (m.kindOf) badges.push(String(m.kindOf));
+    } else if (item.kind === 'product') {
+      if (m.price != null) badges.push(`💰 ${m.price}`);
+      if (m.sellerName) badges.push(String(m.sellerName));
+      if (m.personal) badges.push($t('demand.product_personal'));
     }
     if (item.concierge) badges.push($t('demand.concierge_badge'));
     return badges;
@@ -270,7 +276,7 @@
         {#each listItems as item (item.kind + item.id)}
           <li>
             <button class="row" onclick={() => pick(item)}>
-              <span class="dot" style:--chip-color={LAYER_COLORS[item.kind === 'wish' ? 'wishes' : item.kind === 'maagad' ? 'maagadim' : item.kind === 'offer' ? 'offers' : item.kind === 'mission' ? 'missions' : 'resources']}></span>
+              <span class="dot" style:--chip-color={LAYER_COLORS[item.kind === 'wish' ? 'wishes' : item.kind === 'maagad' ? 'maagadim' : item.kind === 'offer' ? 'offers' : item.kind === 'mission' ? 'missions' : item.kind === 'product' ? 'products' : 'resources']}></span>
               <span class="row-main">
                 <span class="row-title">{kindEmoji[item.kind]} {item.title || $t('demand.untitled')}</span>
                 {#if item.hint}<span class="row-hint">{item.hint}</span>{/if}
