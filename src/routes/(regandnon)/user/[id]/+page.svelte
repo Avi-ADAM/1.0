@@ -4,6 +4,7 @@
 <script>
  import { lang } from '$lib/stores/lang.js'
   import Header from '$lib/components/header/header.svelte'
+  import UserStorefront from '$lib/components/offerings/UserStorefront.svelte'
   let { data } = $props();
   let userId = data.userId; 
 
@@ -274,9 +275,12 @@ let title = $derived({"he": `${user ? user.username : "פרופיל" } | 1💗1`
     {/if}
 
   </svg>
-  
+
       </div>
-           
+
+      <!-- Public storefront (PLAN_USER_OFFERINGS §4.5 / M7) -->
+      <UserStorefront storefront={data.storefront} userId={data.userId} />
+
             </div>
       
      

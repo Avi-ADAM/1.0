@@ -12352,6 +12352,38 @@ export const qids = {
     }
   }`,
 
+  '268getUserStorefront': `query GetUserStorefront($uid: ID!) {
+    sps(
+      filters: { users_permissions_user: { id: { eq: $uid } }, archived: { ne: true }, offerScope: { in: ["customers", "both"] } }
+      pagination: { limit: 50 }
+    ) {
+      data { id attributes {
+        name descrip price kindOf
+        matanot { data { id attributes { archived } } }
+      } }
+    }
+    missionOffers(
+      filters: { users_permissions_user: { id: { eq: $uid } }, archived: { ne: true }, active: { eq: true } }
+      pagination: { limit: 50 }
+    ) {
+      data { id attributes {
+        name descrip hours perhour price
+        mission { data { id attributes { missionName } } }
+        location { location_hint location_mode }
+      } }
+    }
+    matanots(
+      filters: { owner_user: { id: { eq: $uid } }, origin: { eq: "personal" }, archived: { ne: true } }
+      pagination: { limit: 50 }
+    ) {
+      data { id attributes {
+        name price quant kindOf
+        pic { data { attributes { url } } }
+        sp { data { id } }
+      } }
+    }
+  }`,
+
   '267setMaagadOfferProposerProject': `mutation SetMaagadOfferProposerProject($id: ID!, $project: ID) {
     updateMaagadOffer(id: $id, data: { proposer_project: $project }) {
       data { id attributes { proposer_project { data { id } } } }

@@ -81,5 +81,18 @@
     "online": "Online",
     "form_title": "What I offer to do",
     "form_note": "The offer is shown to customers and the concierge — mission, scope, rate and location"
+  },
+  "storefront": {
+    "title": "Storefront",
+    "subtitle": "What you can order from me",
+    "products": "Products",
+    "resources": "Resources for sale",
+    "missions": "Missions I do",
+    "order": "Order",
+    "ask_concierge": "Ask via the concierge",
+    "per_hour": "per hour",
+    "hours": "hours",
+    "online": "Online",
+    "empty": ""
   }
 }

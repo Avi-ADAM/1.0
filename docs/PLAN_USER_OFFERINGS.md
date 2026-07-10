@@ -324,9 +324,9 @@ collection `mission-offer` מלא + `CLAUDE.md` המתעד את הענף החי.
 | **M2** ✅ | `MissionOffersEditor` (עוטף את טופס המשימה ב-specMode) + `createMissionOffer`/`updateMissionOffer` (QIDs 258–264) + סקשן ב-/me | פרופיל מציג ומנהל משאבים + הצעות-משימה | `userOfferings.missions` |
 | **M3** ✅ | `createPersonalMatanot`/`archivePersonalMatanot` + סקשן "המוצרים שלי" ב-/me + מוכר אישי ב-`/gift/[id]` (qids 265–266) | משתמש יוצר ועורך מוצר בלי ריקמה גלויה | `userOfferings.products` |
 | **M4** ✅ (חלקי) | FAB "הוסיפו את ההיצע שלכם" + `AddSupplySheet` ב-/demand (עוגני `/me#my-*`; הצעת-סף → תצוגת מאגדים במפה). **נותר:** שכבת `products` במפה (qid 256 + normalizer). | ההבטחה מ-quorum ממומשת | `userOfferings.demandAdd` |
-| **M5** | הרחבת `confirmMaagadQuorum` (§3.5) | ספק יחיד במאגד מקבל עסקאות אמיתיות | `userOfferings.maagadSolo` |
+| **M5** ✅ | הרחבת `confirmMaagadQuorum` (§3.5, qid 267) — ריקמת בית לספק יחיד + עסקאות | ספק יחיד במאגד מקבל עסקאות אמיתיות | `userOfferings.maagadSolo` |
 | **M6** | מקורות matching לקונסיירז' (§3.6) | משימות/מוצרים אישיים צפים במשאלות | `userOfferings.conciergeMatch` |
-| **M7** | חלון ראווה ב-/user/[id] + שלבי onboarding (§4.2) | מסע ספק שלם: הרשמה → פרופיל → היצע → demand | `userOfferings.storefront` |
+| **M7** ✅ (חלון ראווה) | `UserStorefront` ב-/user/[id] (qid 268) — מוצרים, משאבים למכירה והצעות-משימה עם CTA הזמנה/קונסיירז'. **נותר:** שלבי onboarding (§4.2). | מסע ספק שלם: הרשמה → פרופיל → היצע → demand | `userOfferings.storefront` |
 | **M8** | היצע מוצע במאגד (§4.7, qid 258) + פרה-פילינג `createMaagadOffer` | ביקוש קבוצתי פוגש היצע קיים | `userOfferings.maagadSupply` |
 
 M1 הוא הניצחון המהיר (הכול קיים חוץ מהשדות וה-action); M2–M4 הם עיקר ה-UI;
