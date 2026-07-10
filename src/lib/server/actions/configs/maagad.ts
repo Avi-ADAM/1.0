@@ -28,6 +28,7 @@ import {
   type OfferState,
   type OfferStatus
 } from '../../maagad/offerStateMachine.js';
+import { ensurePersonalRikmaFor } from './ensurePersonalRikma.js';
 import { clusterWishes, type ClusterWish } from '../../maagad/clustering.js';
 
 const VISIBILITIES = new Set(['anonymous', 'first_name', 'full']);
@@ -526,9 +527,41 @@ async function activateOffer(
     (o: any) => String(o.id) === String(offerId)
   );
   const oa = offer?.attributes ?? {};
-  const proposerProjectId = oa.proposer_project?.data?.id
+  let proposerProjectId = oa.proposer_project?.data?.id
     ? String(oa.proposer_project.data.id)
     : null;
+
+  // Solo supplier without a rikma (PLAN_USER_OFFERINGS §3.5): the deal
+  // machinery needs a project, so get-or-create the confirming supplier's home
+  // rikma (a regular one-member project, open to partners) and persist it on
+  // the offer. Confirm is proposer-only (checked by the handler), so
+  // context.userId IS the proposer.
+  if (!proposerProjectId) {
+    const proposerUserId = oa.proposer_user?.data?.id
+      ? String(oa.proposer_user.data.id)
+      : null;
+    if (proposerUserId && proposerUserId === String(context.userId)) {
+      try {
+        const home = await ensurePersonalRikmaFor(
+          {
+            userId: context.userId,
+            jwt: context.jwt,
+            fetch: context.fetch
+          },
+          strapi
+        );
+        proposerProjectId = home.projectId;
+        await strapi.execute(
+          '267setMaagadOfferProposerProject',
+          { id: offerId, project: proposerProjectId },
+          context.jwt,
+          context.fetch
+        );
+      } catch (e) {
+        console.error('[activateOffer] home-rikma creation for solo supplier failed', e);
+      }
+    }
+  }
 
   // Members who signed *this* offer.
   const signedMembers = (maagadNode.attributes?.members?.data ?? []).filter(
@@ -562,9 +595,9 @@ async function activateOffer(
     const uid = m?.attributes?.user?.data?.id;
 
     // Atomic activation (§7.2): a live per-member deal on the supplier's rikma.
-    // Requires the offer to carry a proposer_project; a solo supplier without a
-    // rikma still activates (members go active) but no Sheirutpend is minted —
-    // surfaced via dealsCreated so the caller can flag it.
+    // proposerProjectId is always set for the confirming proposer (a solo
+    // supplier gets their home rikma above); it can still be null only when
+    // activation is triggered by someone other than the proposer.
     let sheirutpendId: string | null = null;
     if (proposerProjectId && uid) {
       try {

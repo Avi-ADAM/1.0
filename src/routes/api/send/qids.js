@@ -12352,6 +12352,12 @@ export const qids = {
     }
   }`,
 
+  '267setMaagadOfferProposerProject': `mutation SetMaagadOfferProposerProject($id: ID!, $project: ID) {
+    updateMaagadOffer(id: $id, data: { proposer_project: $project }) {
+      data { id attributes { proposer_project { data { id } } } }
+    }
+  }`,
+
   '266getMatanotSellerMeta': `query GetMatanotSellerMeta($id: ID!) {
     matanot(id: $id) {
       data { id attributes {
