@@ -2,6 +2,7 @@
   import { browser } from '$app/environment';
   import { page } from '$app/state';
   import DiscoveryMap from '$lib/components/location/DiscoveryMap.svelte';
+  import AddSupplySheet from '$lib/components/offerings/AddSupplySheet.svelte';
   import {
     LAYER_COLORS,
     LENS_LAYERS,
@@ -44,6 +45,8 @@
   })();
 
   let selected = $state<MapItem | null>(null);
+  /** "Add your supply" sheet (PLAN_USER_OFFERINGS §4.3) — the FAB target. */
+  let addSupplyOpen = $state(false);
   let viewportKeys = $state<Set<string>>(new Set());
   let lastView: { center: [number, number]; zoom: number } | null = null;
   let mapComponent = $state<ReturnType<typeof DiscoveryMap>>();
@@ -91,6 +94,15 @@
 
   function setLens(next: DiscoveryLens) {
     lens = next;
+    selected = null;
+    syncUrl();
+  }
+
+  /** AddSupplySheet's threshold-offer path: show only the maagadim layer so
+   *  the supplier picks a pool (the offer form lives on /maagad/[id]). */
+  function showMaagadimOnly() {
+    lens = 'join';
+    disabledLayers = new Set(['wishes', 'offers']);
     selected = null;
     syncUrl();
   }
@@ -292,9 +304,51 @@
       {/if}
     </aside>
   </div>
+
+  <!-- The quorum "suppliers, add yourselves" CTA finally has a real target
+       (PLAN_USER_OFFERINGS §4.3): a floating add-supply button. -->
+  <button
+    class="add-supply"
+    class:hot={lens === 'supply'}
+    onclick={() => (addSupplyOpen = true)}
+  >
+    ➕ {$t('demand.add_supply_fab')}
+  </button>
 </div>
 
+{#if addSupplyOpen}
+  <AddSupplySheet
+    isLoggedIn={data.isLoggedIn}
+    onShowMaagadim={showMaagadimOnly}
+    onClose={() => (addSupplyOpen = false)}
+  />
+{/if}
+
 <style>
+  .add-supply {
+    position: fixed;
+    bottom: 4.5rem;
+    inset-inline-end: 1rem;
+    z-index: 40;
+    border: none;
+    cursor: pointer;
+    border-radius: 9999px;
+    padding: 0.7rem 1.2rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: white;
+    background: linear-gradient(90deg, #ff0092, #ff77b0);
+    box-shadow: 0 6px 20px rgba(255, 0, 146, 0.35);
+    transition: transform 0.15s ease;
+  }
+  .add-supply:hover {
+    transform: translateY(-2px);
+  }
+  .add-supply.hot {
+    box-shadow:
+      0 6px 24px rgba(255, 0, 146, 0.5),
+      0 0 0 4px rgba(255, 0, 146, 0.15);
+  }
   .demand-page {
     max-width: 72rem;
     margin: 0 auto;

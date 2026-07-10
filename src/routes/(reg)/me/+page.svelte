@@ -417,6 +417,7 @@
   import ProfileBadge from '$lib/components/userPr/ProfileBadge.svelte';
   import Diamond from '$lib/components/userPr/Diamond.svelte';
   import MissionOffersEditor from '$lib/components/offerings/MissionOffersEditor.svelte';
+  import MyProductsSection from '$lib/components/offerings/MyProductsSection.svelte';
   let mass = $state(false);
 
   function massss(event) {
@@ -921,6 +922,7 @@
             </div>
             <TourItem message={message4[$lang]}>
               <div
+                id="my-resources"
                 class="category-wrapper {current === 'a3' && mass !== true
                   ? `selected ${isMobileOrTablet ? 'h-[calc(100vh-3rem)]' : 'h-screen'}`
                   : ''}"
@@ -1008,9 +1010,12 @@
           {/key}
         {/if}
         <!-- או גלילה לעשות רינדור עד מקסימום מסויים  של תפקידים כישורים וכו'ואז ההמשך בהרחבה של זה-->
-        <!-- ההיצע שלי: הצעות משימה מתומחרות (PLAN_USER_OFFERINGS §4.1.2 / M2) -->
-        <div class="w-full my-4 px-2">
+        <!-- ההיצע שלי (PLAN_USER_OFFERINGS §4.1): הצעות משימה + מוצרים אישיים -->
+        <div id="my-mission-offers" class="w-full my-4 px-2">
           <MissionOffersEditor uid={data.uid} />
+        </div>
+        <div id="my-products" class="w-full my-4 px-2">
+          <MyProductsSection uid={data.uid} />
         </div>
         <div class="a6">
           <TourItem message={message9[$lang]}>

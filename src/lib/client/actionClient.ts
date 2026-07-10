@@ -416,6 +416,8 @@ export type ActionKey =
   | 'publishUserResourceAsProduct'
   | 'createMissionOffer'
   | 'updateMissionOffer'
+  | 'createPersonalMatanot'
+  | 'archivePersonalMatanot'
   ;
 
 

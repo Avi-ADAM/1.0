@@ -30,6 +30,7 @@ export async function load({ locals, params, fetch }) {
   let alld = null;
   let archived = false;
   let existingRequests = [];
+  let personalSeller = null;
 
   try {
     const res = await sendToSer({ id: mId }, '48GetServiceById', null, null, isSer, fetch);
@@ -45,6 +46,29 @@ export async function load({ locals, params, fetch }) {
     }
   } catch (e) {
     console.error('product load error', e);
+  }
+
+  // Personal product (PLAN_USER_OFFERINGS M3): show the owning user as the
+  // seller instead of the (auto-created) home rikma. Separate tiny query so
+  // 48GetServiceById stays untouched (qids are append-only).
+  if (alld) {
+    try {
+      const metaRes = await sendToSer({ id: mId }, '266getMatanotSellerMeta', null, null, isSer, fetch);
+      const meta = metaRes?.data?.matanot?.data?.attributes;
+      if (meta?.origin === 'personal' && meta?.owner_user?.data) {
+        const ownerNode = meta.owner_user.data;
+        personalSeller = {
+          id: String(ownerNode.id),
+          username: ownerNode.attributes?.username ?? '',
+          picUrl:
+            ownerNode.attributes?.profilePic?.data?.attributes?.formats?.small?.url ||
+            ownerNode.attributes?.profilePic?.data?.attributes?.url ||
+            null
+        };
+      }
+    } catch (e) {
+      console.warn('seller meta load failed (non-fatal)', e);
+    }
   }
 
   if (tok && tok !== false && uid) {
@@ -65,7 +89,8 @@ export async function load({ locals, params, fetch }) {
     alld,
     existingRequests,
     projectUsers,
-    isMember
+    isMember,
+    personalSeller
   };
 }
 

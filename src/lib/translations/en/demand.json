@@ -73,5 +73,17 @@
   "supplier_subtitle": "Group demand and wishes waiting for a supplier near",
   "supplier_no_location": "This rikma has no location yet — showing all demand. Set a location to rank by proximity.",
   "supplier_empty": "No matching demand right now. Check back later or widen the area.",
-  "km": "km"
+  "km": "km",
+  "add_supply_fab": "Add your supply",
+  "add_supply_title": "What would you like to offer?",
+  "add_supply_sub": "Your supply is shown to customers, the concierge and weaves",
+  "add_mission": "A mission I do",
+  "add_mission_hint": "A priced service: what, for how much and where",
+  "add_resource": "A resource",
+  "add_resource_hint": "Equipment, space or capacity — for partnership or sale",
+  "add_product": "A product",
+  "add_product_hint": "A fixed-price product customers buy directly",
+  "add_threshold": "Threshold offer on a pool",
+  "add_threshold_hint": "Pick an existing demand pool on the map and make an offer",
+  "add_login": "Log in to offer"
 }

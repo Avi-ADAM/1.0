@@ -128,6 +128,8 @@ import { ensurePersonalRikmaConfig } from './ensurePersonalRikma.js';
 import { publishUserResourceAsProductConfig } from './publishUserResourceAsProduct.js';
 import { createMissionOfferConfig } from './createMissionOffer.js';
 import { updateMissionOfferConfig } from './updateMissionOffer.js';
+import { createPersonalMatanotConfig } from './createPersonalMatanot.js';
+import { archivePersonalMatanotConfig } from './archivePersonalMatanot.js';
 
 
 /**
@@ -343,6 +345,10 @@ export function registerAllActions(): void {
   // User offerings M2: priced mission offers ("missions I do")
   registerAction(createMissionOfferConfig);
   registerAction(updateMissionOfferConfig);
+
+  // User offerings M3: personal products (matanot origin=personal)
+  registerAction(createPersonalMatanotConfig);
+  registerAction(archivePersonalMatanotConfig);
 
   // Recurring monthly resources: close a mashabetahalich engine (mark done)
   registerAction(markResourceDoneConfig);

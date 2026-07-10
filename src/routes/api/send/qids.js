@@ -12338,6 +12338,32 @@ export const qids = {
     }
   }`,
 
+  '265listMyPersonalMatanots': `query ListMyPersonalMatanots($uid: ID!) {
+    matanots(
+      filters: { owner_user: { id: { eq: $uid } }, origin: { eq: "personal" }, archived: { ne: true } }
+      pagination: { limit: 100 }
+      sort: "createdAt:desc"
+    ) {
+      data { id attributes {
+        name price quant kindOf archived
+        pic { data { attributes { url } } }
+        sp { data { id attributes { name } } }
+      } }
+    }
+  }`,
+
+  '266getMatanotSellerMeta': `query GetMatanotSellerMeta($id: ID!) {
+    matanot(id: $id) {
+      data { id attributes {
+        origin
+        owner_user { data { id attributes {
+          username
+          profilePic { data { attributes { url formats } } }
+        } } }
+      } }
+    }
+  }`,
+
   '257getSpForEditWithOffer': `query GetSpForEditWithOffer($spId: ID!) {
     sp(id: $spId) {
       data { id attributes {

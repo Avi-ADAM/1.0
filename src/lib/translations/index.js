@@ -494,19 +494,19 @@ export const config = {
         {
             locale: 'he',
             key: 'offerings',
-            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/(me|onboard)/],
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/(me|onboard|gift|demand)/],
             loader: async () => (await import('./he/offerings.json')).default,
         },
         {
             locale: 'en',
             key: 'offerings',
-            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/(me|onboard)/],
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/(me|onboard|gift|demand)/],
             loader: async () => (await import('./en/offerings.json')).default,
         },
         {
             locale: 'ar',
             key: 'offerings',
-            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/(me|onboard)/],
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/(me|onboard|gift|demand)/],
             loader: async () => (await import('./ar/offerings.json')).default,
         },
     ],

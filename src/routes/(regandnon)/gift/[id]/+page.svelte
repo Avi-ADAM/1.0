@@ -1,5 +1,5 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t as t2 } from '$lib/translations';
   import { Head } from 'svead';
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
@@ -259,30 +259,62 @@
         >
           <!-- Avatar & Title -->
           <div class="flex items-center gap-4 w-full">
-            {#if data.alld.projectcreates?.data?.[0]?.attributes?.profilePic?.data?.attributes?.url}
-              <img
-                src={data.alld.projectcreates.data[0].attributes.profilePic.data
-                  .attributes.url}
-                alt="Project Profile"
-                class="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-white/30 shadow-md object-cover flex-shrink-0"
-              />
-            {/if}
+            {#if data.personalSeller}
+              <!-- Personal product (PLAN_USER_OFFERINGS M3): the seller is the
+                   owning user, not the auto-created home rikma. -->
+              {#if data.personalSeller.picUrl}
+                <img
+                  src={data.personalSeller.picUrl}
+                  alt={data.personalSeller.username}
+                  class="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-white/30 shadow-md object-cover flex-shrink-0"
+                />
+              {/if}
+              <div class="flex flex-col">
+                <span class="text-barbi font-bold text-lg sm:text-xl drop-shadow-sm"
+                  >{t.gift[$lang]}</span
+                >
+                <h1 class="text-xl sm:text-3xl font-extrabold text-white leading-tight">
+                  {data.personalSeller.username}
+                </h1>
+                <span
+                  class="mt-1 self-start text-xs font-bold bg-white/20 border border-white/40 rounded-full px-2.5 py-0.5"
+                >
+                  {$t2('offerings.products.seller_badge')}
+                </span>
+              </div>
+            {:else}
+              {#if data.alld.projectcreates?.data?.[0]?.attributes?.profilePic?.data?.attributes?.url}
+                <img
+                  src={data.alld.projectcreates.data[0].attributes.profilePic.data
+                    .attributes.url}
+                  alt="Project Profile"
+                  class="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-white/30 shadow-md object-cover flex-shrink-0"
+                />
+              {/if}
 
-            <div class="flex flex-col">
-              <span
-                class="text-barbi font-bold text-lg sm:text-xl drop-shadow-sm"
-                >{t.gift[$lang]}</span
-              >
-              <h1
-                class="text-xl sm:text-3xl font-extrabold text-white leading-tight"
-              >
-                {data.alld.projectcreates?.data?.[0]?.attributes?.projectName}
-              </h1>
-            </div>
+              <div class="flex flex-col">
+                <span
+                  class="text-barbi font-bold text-lg sm:text-xl drop-shadow-sm"
+                  >{t.gift[$lang]}</span
+                >
+                <h1
+                  class="text-xl sm:text-3xl font-extrabold text-white leading-tight"
+                >
+                  {data.alld.projectcreates?.data?.[0]?.attributes?.projectName}
+                </h1>
+              </div>
+            {/if}
           </div>
 
-          <!-- Project Button -->
-          {#if data.alld.projectcreates?.data?.[0]?.id}
+          <!-- Seller / Project Button -->
+          {#if data.personalSeller}
+            <a
+              href={`/user/${data.personalSeller.id}`}
+              class="w-full sm:w-auto px-6 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/40 rounded-full text-white font-bold transition-all transform hover:scale-105 shadow-sm whitespace-nowrap text-center"
+            >
+              {$t2('offerings.products.seller_profile')}
+            </a>
+          {:else if data.alld.projectcreates?.data?.[0]?.id}
             <button
               onclick={(e) => project(data.alld.projectcreates.data[0].id, e)}
               class="w-full sm:w-auto px-6 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/40 rounded-full text-white font-bold transition-all transform hover:scale-105 shadow-sm whitespace-nowrap"
