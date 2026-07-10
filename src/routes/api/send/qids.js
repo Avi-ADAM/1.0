@@ -11879,6 +11879,7 @@ export const qids = {
     sp(id: $spId) {
       data { id attributes {
         name descrip kindOf unit spnot price myp linkto
+        offerScope
         users_permissions_user { data { id } }
         sdate fdate
       } }
@@ -12150,6 +12151,111 @@ export const qids = {
         location { lat lng radius location_hint location_mode }
         vallues { data { id attributes { valueName } } }
       } }
+    }
+  }`,
+
+  // ── User offerings (PLAN_USER_OFFERINGS) ─────────────────────────────────
+  // Personal supply: an Sp can be published as a direct product for customers,
+  // hosted on the user's auto-created "home rikma" (a regular one-member
+  // project — user.personal_project is just the idempotency pointer).
+  // These qids target schema fields that ship with the 1.0b `shabab` branch
+  // (sp.offerScope, sp.matanot, matanot.owner_user/origin, user.personal_project).
+
+  '250getUserPersonalProject': `query GetUserPersonalProject($uid: ID!) {
+    usersPermissionsUser(id: $uid) {
+      data { id attributes {
+        username
+        personal_project { data { id attributes { projectName } } }
+      } }
+    }
+  }`,
+
+  '251setUserPersonalProject': `mutation SetUserPersonalProject($uid: ID!, $pid: ID!) {
+    updateUsersPermissionsUser(id: $uid, data: { personal_project: $pid }) {
+      data { id }
+    }
+  }`,
+
+  '252getSpForPublish': `query GetSpForPublish($spId: ID!) {
+    sp(id: $spId) {
+      data { id attributes {
+        name descrip price kindOf unit archived offerScope
+        users_permissions_user { data { id } }
+        matanot { data { id attributes { archived } } }
+        pics { data { id } }
+        location { lat lng radius location_hint location_mode }
+      } }
+    }
+  }`,
+
+  '253createPersonalMatanotFromSp': `mutation CreatePersonalMatanotFromSp(
+    $projectcreates: ID!,
+    $ownerUser: ID!,
+    $name: String!,
+    $desc: JSON,
+    $price: Float,
+    $quant: Float,
+    $kindOf: ENUM_MATANOT_KINDOF,
+    $pic: ID,
+    $location: ComponentNewLocationInput,
+    $publishedAt: DateTime
+  ) {
+    createMatanot(data: {
+      projectcreates: [$projectcreates],
+      owner_user: $ownerUser,
+      origin: personal,
+      name: $name,
+      desc: $desc,
+      price: $price,
+      quant: $quant,
+      kindOf: $kindOf,
+      fixPrice: true,
+      pricingMode: fixed,
+      status_of_voting: active,
+      appruved: true,
+      pic: $pic,
+      location: $location,
+      publishedAt: $publishedAt
+    }) {
+      data { id attributes { name price origin } }
+    }
+  }`,
+
+  '254updateSpOfferState': `mutation UpdateSpOfferState(
+    $spId: ID!,
+    $offerScope: ENUM_SP_OFFERSCOPE,
+    $matanot: ID
+  ) {
+    updateSp(id: $spId, data: { offerScope: $offerScope, matanot: $matanot }) {
+      data { id attributes { offerScope matanot { data { id } } } }
+    }
+  }`,
+
+  '255setMatanotArchived': `mutation SetMatanotArchived($id: ID!, $archived: Boolean!) {
+    updateMatanot(id: $id, data: { archived: $archived }) {
+      data { id attributes { archived } }
+    }
+  }`,
+
+  '256syncPersonalMatanotFromSp': `mutation SyncPersonalMatanotFromSp(
+    $id: ID!,
+    $name: String,
+    $desc: JSON,
+    $price: Float,
+    $quant: Float,
+    $kindOf: ENUM_MATANOT_KINDOF,
+    $location: ComponentNewLocationInput
+  ) {
+    updateMatanot(id: $id, data: {
+      archived: false,
+      name: $name,
+      desc: $desc,
+      price: $price,
+      quant: $quant,
+      kindOf: $kindOf,
+      location: $location
+    }) {
+      data { id attributes { name price archived } }
     }
   }`,
 

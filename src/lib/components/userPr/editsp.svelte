@@ -19,10 +19,15 @@
   let { onClose, meData = [] } = $props();
   let error1 = $state(null);
 
+  /** offerScope as loaded — used to detect a revert to rikma-only on save. */
+  let initialScope = $state('rikma');
+
   onMount(async () => {
     const id = meData.id;
     meData = meData.attributes;
     meData.id = id;
+    meData.offerScope = meData.offerScope || 'rikma';
+    initialScope = meData.offerScope;
     myMissionH();
     myMi();
   });
@@ -62,6 +67,23 @@
       });
 
       if (result.success && result.data) {
+        // PLAN_USER_OFFERINGS §3.2 — sync the public product when the resource
+        // is (or was) offered to customers. Idempotent server-side: mints or
+        // re-syncs the personal Matanot, or archives it on revert to 'rikma'.
+        const scope = meData.offerScope || 'rikma';
+        if (scope !== 'rikma' || initialScope !== 'rikma') {
+          const pub = await executeAction('publishUserResourceAsProduct', {
+            spId: String(meData.id),
+            offerScope: scope,
+            price
+          });
+          if (!pub.success) {
+            error1 = pub.error?.message || 'Publishing as product failed';
+            already = false;
+            return;
+          }
+          initialScope = scope;
+        }
         onClose?.({
           id: result.data.id,
           name: result.data.attributes.name,
@@ -127,6 +149,14 @@
   const pm = { he: 'חודשי', en: 'monthly' };
   const pye = { he: 'שנתי', en: 'yearly' };
   const re = { he: 'השכרה לזמן קצוב', en: 'rent' };
+  const scLabel = { he: 'למי המשאב מוצע?', en: 'offered to whom?' };
+  const scRikma = { he: 'לרקמות בלבד (שותפות)', en: 'weaves only (partnership)' };
+  const scBoth = { he: 'גם לרקמות וגם ללקוחות', en: 'weaves and customers' };
+  const scCustomers = { he: 'ללקוחות בלבד (כמוצר)', en: 'customers only (as a product)' };
+  const scNote = {
+    he: 'פרסום ללקוחות יוצר עמוד מוצר עם המחיר שלמעלה. אם אין לך עדיין ריקמה שתנהל את המכירות — נקים לך אחת, ותמיד אפשר להזמין אליה שותפים.',
+    en: 'Offering to customers creates a product page with the price above. If you do not yet have a weave to manage the sales, one will be created for you — and you can always invite partners into it.'
+  };
 </script>
 
 {#if error1 !== null}
@@ -244,6 +274,37 @@
                 <option value="perUnit">{py[$lang]}</option>
                 <option value="rent">{re[$lang]}</option>
               </select>
+            </td>
+          </tr>
+          <tr>
+            <th>{scLabel[$lang]}</th>
+            <td>
+              <select
+                bind:value={meData.offerScope}
+                class="round form-select appearance-none
+      block
+      w-full
+      px-3
+      py-1.5
+      text-barbi
+      font-normal
+      bg-gold bg-clip-padding bg-no-repeat
+      border border-solid border-gold
+      rounded
+      transition
+      ease-in-out
+      m-0
+      focus:text-barbi focus:bg-gold focus:border-barbi focus:outline-none"
+              >
+                <option value="rikma">{scRikma[$lang]}</option>
+                <option value="both">{scBoth[$lang]}</option>
+                <option value="customers">{scCustomers[$lang]}</option>
+              </select>
+              {#if meData.offerScope === 'customers' || meData.offerScope === 'both'}
+                <p class="text-sm text-barbi mt-1" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
+                  {scNote[$lang]}
+                </p>
+              {/if}
             </td>
           </tr>
           <tr style="display:{kc ? '' : 'none'};">

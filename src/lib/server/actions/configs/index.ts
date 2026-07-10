@@ -124,6 +124,8 @@ import { updateUserBasicConfig } from './updateUserBasic.js';
 import { archiveUserResourceConfig } from './archiveUserResource.js';
 import { createWeaveConfig } from './createWeave.js';
 import { markResourceDoneConfig } from './markResourceDone.js';
+import { ensurePersonalRikmaConfig } from './ensurePersonalRikma.js';
+import { publishUserResourceAsProductConfig } from './publishUserResourceAsProduct.js';
 
 
 /**
@@ -331,6 +333,10 @@ export function registerAllActions(): void {
 
   // Weave creation (baci.svelte — "יצירת ריקמה", reusable project creation)
   registerAction(createWeaveConfig);
+
+  // User offerings (PLAN_USER_OFFERINGS): home rikma + publish Sp as product
+  registerAction(ensurePersonalRikmaConfig);
+  registerAction(publishUserResourceAsProductConfig);
 
   // Recurring monthly resources: close a mashabetahalich engine (mark done)
   registerAction(markResourceDoneConfig);

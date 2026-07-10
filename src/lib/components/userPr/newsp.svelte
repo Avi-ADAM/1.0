@@ -60,6 +60,20 @@ async function han() {
       });
 
       if (result.success && result.data) {
+        // PLAN_USER_OFFERINGS §3.2 — if the user chose to offer this resource
+        // to customers too, mint the public product (idempotent server action;
+        // also creates the home rikma on first use).
+        const scope = element.offerScope || 'rikma';
+        if (scope !== 'rikma') {
+          const pub = await executeAction('publishUserResourceAsProduct', {
+            spId: String(result.data.id),
+            offerScope: scope,
+            price
+          });
+          if (!pub.success) {
+            error1 = pub.error?.message || 'Publishing as product failed';
+          }
+        }
         onClose?.({
           id:   result.data.id,
           name: result.data.attributes.name,
@@ -87,6 +101,7 @@ function myMi ()  {
   for (var i = 0; i <meData.length; i++) {
     meData[i].hm = 1;
     meData[i].easy = meData[i].price;
+    meData[i].offerScope = meData[i].offerScope || 'rikma';
         meData[i].dates = new Date().toISOString().slice(0, -1)
    meData[i].datef =  new Date(new Date().setFullYear(new Date().getFullYear() + 2)).toISOString().slice(0, -1)
   }
@@ -155,6 +170,14 @@ const py = {"he":"ליחידה", "en": "per unit"}
 const pm = {"he": "חודשי","en": "monthly"}
 const pye = {"he": "שנתי", "en": "yearly"}
 const re = {"he": "השכרה לזמן קצוב", "en": "rent"}
+const scLabel = { he: 'למי מוצע?', en: 'offered to whom?' };
+const scRikma = { he: 'לרקמות בלבד (שותפות)', en: 'weaves only (partnership)' };
+const scBoth = { he: 'גם לרקמות וגם ללקוחות', en: 'weaves and customers' };
+const scCustomers = { he: 'ללקוחות בלבד (כמוצר)', en: 'customers only (as a product)' };
+const scNote = {
+  he: 'פרסום ללקוחות יוצר עמוד מוצר עם המחיר. אם אין לך עדיין ריקמה שתנהל את המכירות — נקים לך אחת, ותמיד אפשר להזמין אליה שותפים.',
+  en: 'Offering to customers creates a product page. If you do not yet have a weave to manage the sales, one will be created for you — and you can always invite partners into it.'
+};
 import {lang} from '$lib/stores/lang'
 </script>
 
@@ -261,6 +284,39 @@ import {lang} from '$lib/stores/lang'
                   <option value="perUnit">{py[$lang]}</option>
                   <option value="rent">{re[$lang]}</option>
                 </select>
+              </td>
+            {/each}
+          </tr>
+          <tr>
+            <th>{scLabel[$lang]}</th>
+            {#each meData as data, i}
+              <td>
+                <select
+                  bind:value={data.offerScope}
+                  class="round form-select appearance-none
+      block
+      w-full
+      px-3
+      py-1.5
+      text-barbi
+      font-normal
+      bg-gold bg-clip-padding bg-no-repeat
+      border border-solid border-gold
+      rounded
+      transition
+      ease-in-out
+      m-0
+      focus:text-barbi focus:bg-gold focus:border-barbi focus:outline-none"
+                >
+                  <option value="rikma">{scRikma[$lang]}</option>
+                  <option value="both">{scBoth[$lang]}</option>
+                  <option value="customers">{scCustomers[$lang]}</option>
+                </select>
+                {#if data.offerScope === 'customers' || data.offerScope === 'both'}
+                  <p class="text-sm text-barbi mt-1" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
+                    {scNote[$lang]}
+                  </p>
+                {/if}
               </td>
             {/each}
           </tr>
