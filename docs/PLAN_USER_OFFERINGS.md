@@ -327,7 +327,7 @@ collection `mission-offer` מלא + `CLAUDE.md` המתעד את הענף החי.
 | **M5** ✅ | הרחבת `confirmMaagadQuorum` (§3.5, qid 267) — ריקמת בית לספק יחיד + עסקאות | ספק יחיד במאגד מקבל עסקאות אמיתיות | `userOfferings.maagadSolo` |
 | **M6** ✅ | מקורות matching לקונסיירז' (§3.6): ספקי mission-offers ממוזגים ל-people ב-`enrichWish` (qid 270); מוצרים אישיים כבר נתפסים ע"י `203findMatanotByText` (active + לא-archived) | משימות/מוצרים אישיים צפים במשאלות | `userOfferings.conciergeMatch` |
 | **M7** ✅ (חלון ראווה) | `UserStorefront` ב-/user/[id] (qid 268) — מוצרים, משאבים למכירה והצעות-משימה עם CTA הזמנה/קונסיירז'. **נותר:** שלבי onboarding (§4.2). | מסע ספק שלם: הרשמה → פרופיל → היצע → demand | `userOfferings.storefront` |
-| **M8** | היצע מוצע במאגד (§4.7, qid 258) + פרה-פילינג `createMaagadOffer` | ביקוש קבוצתי פוגש היצע קיים | `userOfferings.maagadSupply` |
+| **M8** ✅ (v1 מילות-מפתח) | סקשן "היצע קיים שמתאים" בעמוד המאגד (qids 203+271): מוצרים + הצעות-משימה לפי שם/קטגוריות, באדג' "שלי" לספק + CTA להצעת-סף. **שדרוג עתידי:** התאמה סמנטית (pinecone_id) + פרה-פילינג הטופס. | ביקוש קבוצתי פוגש היצע קיים | `userOfferings.maagadSupply` |
 
 M1 הוא הניצחון המהיר (הכול קיים חוץ מהשדות וה-action); M2–M4 הם עיקר ה-UI;
 M5–M6 ו-M8 סוגרים את לולאות התיווך.

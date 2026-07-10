@@ -223,6 +223,44 @@
     {/each}
   </section>
 
+  <!-- Matching existing supply (PLAN_USER_OFFERINGS §4.7 / M8): demand meets
+       supply — a discovery bridge; the formal path is the threshold offer. -->
+  {#if data.supplySuggestions && (data.supplySuggestions.products.length || data.supplySuggestions.missionOffers.length)}
+    <section class="supply-sugg">
+      <h2>{$t('demand.supply_sugg_title')}</h2>
+      <p class="muted small">{$t('demand.supply_sugg_sub')}</p>
+
+      <div class="sugg-list">
+        {#each data.supplySuggestions.products as p (p.id)}
+          <a class="sugg" href={`/gift/${p.id}`}>
+            <span class="sugg-main">
+              🎁 <strong>{p.name}</strong>
+              {#if p.sellerName}<span class="muted small">· {p.sellerName}</span>{/if}
+            </span>
+            {#if p.price != null}<span class="muted small">💰 {p.price}</span>{/if}
+          </a>
+        {/each}
+        {#each data.supplySuggestions.missionOffers as o (o.id)}
+          <a class="sugg" class:mine-sugg={o.mine} href={o.ownerId ? `/user/${o.ownerId}` : '#'}>
+            <span class="sugg-main">
+              🛠️ <strong>{o.name}</strong>
+              {#if o.ownerName}<span class="muted small">· {o.ownerName}</span>{/if}
+              {#if o.mine}<span class="badge">{$t('demand.supply_sugg_mine')}</span>{/if}
+            </span>
+            {#if o.perhour != null}<span class="muted small">💰 {o.perhour}</span>
+            {:else if o.price != null}<span class="muted small">💰 {o.price}</span>{/if}
+          </a>
+        {/each}
+      </div>
+
+      {#if data.isLoggedIn && !showOfferForm}
+        <button class="ghost" onclick={() => (showOfferForm = true)}>
+          📣 {$t('demand.supply_sugg_cta')}
+        </button>
+      {/if}
+    </section>
+  {/if}
+
   {#if errorMsg}
     <p class="error" role="alert">{errorMsg}</p>
   {/if}
@@ -368,6 +406,40 @@
     display: flex;
     flex-direction: column;
     gap: 0.45rem;
+  }
+  .supply-sugg {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .sugg-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .sugg {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    border: 1px solid rgba(120, 120, 160, 0.2);
+    border-radius: 0.8rem;
+    padding: 0.55rem 0.8rem;
+    text-decoration: none;
+    color: inherit;
+  }
+  .sugg:hover {
+    border-color: rgba(255, 0, 146, 0.5);
+  }
+  .sugg.mine-sugg {
+    border-color: rgba(234, 179, 8, 0.6);
+  }
+  .sugg-main {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    min-width: 0;
   }
   .offer.mine {
     border-color: rgba(5, 150, 105, 0.5);

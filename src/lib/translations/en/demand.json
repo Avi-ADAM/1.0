@@ -87,5 +87,9 @@
   "add_threshold_hint": "Pick an existing demand pool on the map and make an offer",
   "add_login": "Log in to offer",
   "layer_products": "Products for sale",
-  "product_personal": "Independent provider"
+  "product_personal": "Independent provider",
+  "supply_sugg_title": "Existing supply matching this demand",
+  "supply_sugg_sub": "Products and services already offered on the site — maybe this is what you're looking for? Suppliers: a great basis for a threshold offer.",
+  "supply_sugg_mine": "mine",
+  "supply_sugg_cta": "Make a threshold offer based on your supply"
 }

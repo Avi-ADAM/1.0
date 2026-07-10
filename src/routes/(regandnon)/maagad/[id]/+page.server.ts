@@ -94,9 +94,61 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
     };
   });
 
+  // Matching existing supply (PLAN_USER_OFFERINGS §4.7 / M8, keyword v1):
+  // products (rikma + personal, via 203) and priced mission offers (271) whose
+  // names match the pool's name/categories. Discovery bridge only — a formal
+  // offer still goes through the pool's threshold-offer flow.
+  const terms = [a.name, ...(a.categories?.data ?? []).map((c: any) => c?.attributes?.name)]
+    .map((s: any) => (typeof s === 'string' ? s.trim() : ''))
+    .filter((s: string) => s.length >= 2)
+    .slice(0, 3);
+  const productById = new Map<string, any>();
+  const offerByUserMission = new Map<string, any>();
+  await Promise.all(
+    terms.flatMap((q) => [
+      sendToSer({ q }, '203findMatanotByText', 0, 0, !uid, fetch)
+        .then((r: any) => {
+          for (const n of r?.data?.matanots?.data ?? []) {
+            if (productById.has(String(n.id))) continue;
+            productById.set(String(n.id), {
+              id: String(n.id),
+              name: n.attributes?.name ?? '',
+              price: n.attributes?.price ?? n.attributes?.estimatedPrice ?? null,
+              sellerName: n.attributes?.projectcreates?.data?.[0]?.attributes?.projectName ?? null
+            });
+          }
+        })
+        .catch(() => {}),
+      sendToSer({ q }, '271findMissionOffersByText', 0, 0, !uid, fetch)
+        .then((r: any) => {
+          for (const n of r?.data?.missionOffers?.data ?? []) {
+            const oa = n.attributes ?? {};
+            const owner = oa.users_permissions_user?.data;
+            const key = `${owner?.id ?? ''}-${oa.mission?.data?.id ?? n.id}`;
+            if (offerByUserMission.has(key)) continue;
+            offerByUserMission.set(key, {
+              id: String(n.id),
+              name: oa.name ?? oa.mission?.data?.attributes?.missionName ?? '',
+              perhour: oa.perhour ?? null,
+              price: oa.price ?? null,
+              ownerId: owner?.id ? String(owner.id) : null,
+              ownerName: owner?.attributes?.username ?? null,
+              mine: uid && owner?.id ? String(owner.id) === String(uid) : false
+            });
+          }
+        })
+        .catch(() => {})
+    ])
+  );
+  const supplySuggestions = {
+    products: [...productById.values()].slice(0, 6),
+    missionOffers: [...offerByUserMission.values()].slice(0, 6)
+  };
+
   return {
     uid,
     isLoggedIn: !!uid,
+    supplySuggestions,
     maagad: {
       id: String(node.id),
       name: a.name ?? '',

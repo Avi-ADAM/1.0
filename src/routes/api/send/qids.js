@@ -12352,6 +12352,25 @@ export const qids = {
     }
   }`,
 
+  '271findMissionOffersByText': `query FindMissionOffersByText($q: String) {
+    missionOffers(
+      filters: {
+        and: [
+          { archived: { ne: true } }
+          { active: { eq: true } }
+          { or: [{ name: { containsi: $q } }, { mission: { missionName: { containsi: $q } } }] }
+        ]
+      }
+      pagination: { limit: 6 }
+    ) {
+      data { id attributes {
+        name perhour price hours
+        mission { data { id attributes { missionName } } }
+        users_permissions_user { data { id attributes { username } } }
+      } }
+    }
+  }`,
+
   '270findMissionOffersByMission': `query FindMissionOffersByMission($ids: [ID]) {
     missionOffers(
       filters: { mission: { id: { in: $ids } }, active: { eq: true }, archived: { ne: true } }
