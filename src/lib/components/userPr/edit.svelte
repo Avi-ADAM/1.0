@@ -432,7 +432,7 @@ console.log("skillslist",skillslist);
     g = true;
     console.log(id);
     try {
-      const result = await sendToSer({ spId: id }, '206getSpForEdit', 0, 0, false, fetch);
+      const result = await sendToSer({ spId: id }, '257getSpForEditWithOffer', 0, 0, false, fetch);
       xd = result.data?.sp?.data;
       const meId = result.data?.me?.id;
       console.log(result);

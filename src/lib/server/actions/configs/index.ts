@@ -126,6 +126,8 @@ import { createWeaveConfig } from './createWeave.js';
 import { markResourceDoneConfig } from './markResourceDone.js';
 import { ensurePersonalRikmaConfig } from './ensurePersonalRikma.js';
 import { publishUserResourceAsProductConfig } from './publishUserResourceAsProduct.js';
+import { createMissionOfferConfig } from './createMissionOffer.js';
+import { updateMissionOfferConfig } from './updateMissionOffer.js';
 
 
 /**
@@ -337,6 +339,10 @@ export function registerAllActions(): void {
   // User offerings (PLAN_USER_OFFERINGS): home rikma + publish Sp as product
   registerAction(ensurePersonalRikmaConfig);
   registerAction(publishUserResourceAsProductConfig);
+
+  // User offerings M2: priced mission offers ("missions I do")
+  registerAction(createMissionOfferConfig);
+  registerAction(updateMissionOfferConfig);
 
   // Recurring monthly resources: close a mashabetahalich engine (mark done)
   registerAction(markResourceDoneConfig);

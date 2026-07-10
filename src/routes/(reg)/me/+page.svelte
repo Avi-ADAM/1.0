@@ -416,6 +416,7 @@
   import { end } from 'happy-dom/lib/PropertySymbol.js';
   import ProfileBadge from '$lib/components/userPr/ProfileBadge.svelte';
   import Diamond from '$lib/components/userPr/Diamond.svelte';
+  import MissionOffersEditor from '$lib/components/offerings/MissionOffersEditor.svelte';
   let mass = $state(false);
 
   function massss(event) {
@@ -1007,6 +1008,10 @@
           {/key}
         {/if}
         <!-- או גלילה לעשות רינדור עד מקסימום מסויים  של תפקידים כישורים וכו'ואז ההמשך בהרחבה של זה-->
+        <!-- ההיצע שלי: הצעות משימה מתומחרות (PLAN_USER_OFFERINGS §4.1.2 / M2) -->
+        <div class="w-full my-4 px-2">
+          <MissionOffersEditor uid={data.uid} />
+        </div>
         <div class="a6">
           <TourItem message={message9[$lang]}>
             <div

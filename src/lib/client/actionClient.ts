@@ -410,6 +410,12 @@ export type ActionKey =
   | 'createSale'
   | 'voteOnDecision'
   | 'counterSaleClaim'
+  | 'createResourceRequest'
+  | 'updateResourceRequest'
+  | 'ensurePersonalRikma'
+  | 'publishUserResourceAsProduct'
+  | 'createMissionOffer'
+  | 'updateMissionOffer'
   ;
 
 

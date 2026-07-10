@@ -11879,7 +11879,6 @@ export const qids = {
     sp(id: $spId) {
       data { id attributes {
         name descrip kindOf unit spnot price myp linkto
-        offerScope
         users_permissions_user { data { id } }
         sdate fdate
       } }
@@ -12235,6 +12234,120 @@ export const qids = {
     updateMatanot(id: $id, data: { archived: $archived }) {
       data { id attributes { archived } }
     }
+  }`,
+
+  // Mission offers (PLAN_USER_OFFERINGS §2.3 / M2): a user's priced offer to
+  // perform a mission template — authored with the standard mission form.
+
+  '258listMyMissionOffers': `query ListMyMissionOffers($uid: ID!) {
+    missionOffers(
+      filters: { users_permissions_user: { id: { eq: $uid } }, archived: { ne: true } }
+      pagination: { limit: 100 }
+      sort: "createdAt:desc"
+    ) {
+      data { id attributes {
+        name descrip hours perhour price active archived note
+        mission { data { id attributes { missionName } } }
+        location { lat lng radius location_hint location_mode }
+      } }
+    }
+  }`,
+
+  '259createMissionOffer': `mutation CreateMissionOffer(
+    $uid: ID!,
+    $mission: ID,
+    $name: String,
+    $descrip: String,
+    $hours: Float,
+    $perhour: Float,
+    $price: Float,
+    $location: ComponentNewLocationInput,
+    $note: String,
+    $publishedAt: DateTime
+  ) {
+    createMissionOffer(data: {
+      users_permissions_user: $uid,
+      mission: $mission,
+      name: $name,
+      descrip: $descrip,
+      hours: $hours,
+      perhour: $perhour,
+      price: $price,
+      location: $location,
+      note: $note,
+      active: true,
+      archived: false,
+      publishedAt: $publishedAt
+    }) {
+      data { id attributes { name mission { data { id } } } }
+    }
+  }`,
+
+  '260updateMissionOffer': `mutation UpdateMissionOffer(
+    $id: ID!,
+    $name: String,
+    $descrip: String,
+    $hours: Float,
+    $perhour: Float,
+    $price: Float,
+    $location: ComponentNewLocationInput,
+    $note: String,
+    $active: Boolean,
+    $archived: Boolean
+  ) {
+    updateMissionOffer(id: $id, data: {
+      name: $name,
+      descrip: $descrip,
+      hours: $hours,
+      perhour: $perhour,
+      price: $price,
+      location: $location,
+      note: $note,
+      active: $active,
+      archived: $archived
+    }) {
+      data { id attributes { name active archived mission { data { id } } } }
+    }
+  }`,
+
+  '261findMissionByName': `query FindMissionByName($name: String!) {
+    missions(filters: { missionName: { eqi: $name } }, pagination: { limit: 1 }) {
+      data { id attributes { missionName } }
+    }
+  }`,
+
+  '262getUserMissionsICanDo': `query GetUserMissionsICanDo($uid: ID!) {
+    usersPermissionsUser(id: $uid) {
+      data { id attributes { missions_i_can_do { data { id } } } }
+    }
+  }`,
+
+  '263setUserMissionsICanDo': `mutation SetUserMissionsICanDo($uid: ID!, $missionIds: [ID]) {
+    updateUsersPermissionsUser(id: $uid, data: { missions_i_can_do: $missionIds }) {
+      data { id }
+    }
+  }`,
+
+  '264getMissionOffer': `query GetMissionOffer($id: ID!) {
+    missionOffer(id: $id) {
+      data { id attributes {
+        name archived active
+        users_permissions_user { data { id } }
+        mission { data { id } }
+      } }
+    }
+  }`,
+
+  '257getSpForEditWithOffer': `query GetSpForEditWithOffer($spId: ID!) {
+    sp(id: $spId) {
+      data { id attributes {
+        name descrip kindOf unit spnot price myp linkto
+        offerScope
+        users_permissions_user { data { id } }
+        sdate fdate
+      } }
+    }
+    me { id }
   }`,
 
   '256syncPersonalMatanotFromSp': `mutation SyncPersonalMatanotFromSp(

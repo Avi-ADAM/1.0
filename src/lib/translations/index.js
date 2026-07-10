@@ -491,6 +491,24 @@ export const config = {
             routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/(concierge|wish)/],
             loader: async () => (await import('./ru/concierge.json')).default,
         },
+        {
+            locale: 'he',
+            key: 'offerings',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/(me|onboard)/],
+            loader: async () => (await import('./he/offerings.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'offerings',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/(me|onboard)/],
+            loader: async () => (await import('./en/offerings.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'offerings',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/(me|onboard)/],
+            loader: async () => (await import('./ar/offerings.json')).default,
+        },
     ],
 };
 

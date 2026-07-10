@@ -320,8 +320,8 @@ collection `mission-offer` מלא + `CLAUDE.md` המתעד את הענף החי.
 | # | מילסטון | תוצר | flag |
 |---|---|---|---|
 | **M0** | סכמה (§2 — כבר בענף ב-1.0b) → merge ל-`shabab` + deploy + `npm run types:update` + QIDs 250–258 | טיפוסים מעודכנים | – |
-| **M1** | `ensurePersonalRikma` + `publishUserResourceAsProduct` + toggle ב-`editsp`/`newsp` + מודאל ההסבר | משאב אישי נמכר כמוצר ב-/gift | `userOfferings.resources` |
-| **M2** | `MissionOffersEditor` + `createMissionOffer`/`updateMissionOffer` + סקשן "ההיצע שלי" ב-/me | פרופיל מציג ומנהל את שלושת הסוגים | `userOfferings.missions` |
+| **M1** ✅ | `ensurePersonalRikma` + `publishUserResourceAsProduct` + בחירת "למי מוצע?" ב-`editsp`/`newsp` (עוצבו מחדש ככרטיסים מודרניים עם i18n ותיקון גובה) | משאב אישי נמכר כמוצר ב-/gift | `userOfferings.resources` |
+| **M2** ✅ | `MissionOffersEditor` (עוטף את טופס המשימה ב-specMode) + `createMissionOffer`/`updateMissionOffer` (QIDs 258–264) + סקשן ב-/me | פרופיל מציג ומנהל משאבים + הצעות-משימה | `userOfferings.missions` |
 | **M3** | `createPersonalMatanot` + "המוצרים שלי" + התאמות `/gift/[id]` (owner_user) | משתמש יוצר ועורך מוצר בלי ריקמה גלויה | `userOfferings.products` |
 | **M4** | FAB + `AddSupplySheet` ב-/demand + שכבת `products` במפה (qid 256 + normalizer) | ההבטחה מ-quorum ממומשת | `userOfferings.demandAdd` |
 | **M5** | הרחבת `confirmMaagadQuorum` (§3.5) | ספק יחיד במאגד מקבל עסקאות אמיתיות | `userOfferings.maagadSolo` |

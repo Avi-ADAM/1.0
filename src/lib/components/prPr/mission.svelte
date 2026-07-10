@@ -449,7 +449,12 @@
         ratePerHour: Number(element.valph) || 0,
         skills: element.selectedSkills ?? [],
         roles: element.selectedRoles ?? [],
-        workways: element.selectedWorkways ?? []
+        workways: element.selectedWorkways ?? [],
+        // Additive extras (PLAN_USER_OFFERINGS §3.4): the recognised template id
+        // (hydrateFromMissionName stores it on element.id) and the location.
+        // Existing spec consumers ignore unknown keys.
+        templateId: element.id && element.id !== 0 ? String(element.id) : null,
+        location: element.location ?? null
       };
       if (publishMode) onPublish?.(spec);
       else onSpec?.(spec);

@@ -2,626 +2,332 @@
   import { onMount } from 'svelte';
   import { RingLoader } from 'svelte-loading-spinners';
   import { executeAction } from '$lib/client/actionClient';
+  import { t, isRtl } from '$lib/translations';
 
   /**
+   * Create personal resources (Sp) from selected mashaabim templates —
+   * modern stacked-cards layout (one card per resource).
+   * Contract (unchanged): props { needr, meData: MashaabimNode[], onClose(payload), onRemove(payload) }.
+   * Creates via createResourceRequest per element; when the user chose to
+   * offer a resource to customers too, syncs the public product via
+   * publishUserResourceAsProduct (PLAN_USER_OFFERINGS §3.2).
+   *
    * @typedef {Object} ClosePayload
    * @property {any} id
    * @property {string} name
    * @property {any} skob
    */
-  /**
-   * @typedef {Object} RemovePayload
-   * @property {any} id
-   * @property {any[]} data
-   */
 
   let { onRemove, needr = [], meData = [], onClose } = $props();
-  let error1 = null;
+  let error1 = $state(null);
+  let already = $state(false);
+  let ready = $state(false);
 
-function vfor(){
-  for (let i = 0; i < meData.length; i++) {
-    const id = meData[i].id
-    meData[i] = meData[i].attributes;
-    meData[i].id = id
-    
-  }
-}
-$effect(() => {
-  myMissionH()
-})
-  onMount(async () => {
-    vfor()
-   myMissionH()
-              myMi ()  
-              });
- let already = false;
-
-async function han() {
-  already = true;
-
-  for (const element of meData) {
-    const hm    = (element.hm    > 0) ? element.hm    : 1;
-    const price = (element.price > 0) ? element.price : 0;
-    const easy  = (element.easy  > 0) ? element.easy  : 0;
-
-    try {
-      const result = await executeAction('createResourceRequest', {
-        mashaabimId: element.id,
-        name:        element.name,
-        descrip:     element.descrip,
-        kindOf:      element.kindOf,
-        hm,
-        spnot:       element.spnot,
-        price,
-        myp:         easy,
-        linkto:      element.linkto,
-        sdate:       element.dates ? new Date(element.dates).toISOString() : undefined,
-        fdate:       element.datef ? new Date(element.datef).toISOString() : undefined
-      });
-
-      if (result.success && result.data) {
-        // PLAN_USER_OFFERINGS §3.2 — if the user chose to offer this resource
-        // to customers too, mint the public product (idempotent server action;
-        // also creates the home rikma on first use).
-        const scope = element.offerScope || 'rikma';
-        if (scope !== 'rikma') {
-          const pub = await executeAction('publishUserResourceAsProduct', {
-            spId: String(result.data.id),
-            offerScope: scope,
-            price
-          });
-          if (!pub.success) {
-            error1 = pub.error?.message || 'Publishing as product failed';
-          }
-        }
-        onClose?.({
-          id:   result.data.id,
-          name: result.data.attributes.name,
-          skob: result.data
-        });
-      } else {
-        error1 = result.error?.message || 'Create failed';
-      }
-    } catch (e) {
-      error1 = e;
+  onMount(() => {
+    for (let i = 0; i < meData.length; i++) {
+      const id = meData[i].id;
+      meData[i] = meData[i].attributes;
+      meData[i].id = id;
+      meData[i].hm = 1;
+      meData[i].easy = meData[i].easy ?? meData[i].price;
+      meData[i].offerScope = meData[i].offerScope || 'rikma';
+      meData[i].dates = new Date().toISOString().slice(0, -1);
+      meData[i].datef = new Date(
+        new Date().setFullYear(new Date().getFullYear() + 2)
+      )
+        .toISOString()
+        .slice(0, -1);
     }
+    ready = true;
+  });
+
+  function isRecurring(el) {
+    return el.kindOf === 'monthly' || el.kindOf === 'yearly' || el.kindOf === 'rent';
   }
-}
-function remove (id) {
-  onRemove?.({
-    id: id,
-   data: meData
-  })
-}
-
-  let ky = false;
-  let kc = false;
-  let km  = false;
-function myMi ()  {
-  for (var i = 0; i <meData.length; i++) {
-    meData[i].hm = 1;
-    meData[i].easy = meData[i].price;
-    meData[i].offerScope = meData[i].offerScope || 'rikma';
-        meData[i].dates = new Date().toISOString().slice(0, -1)
-   meData[i].datef =  new Date(new Date().setFullYear(new Date().getFullYear() + 2)).toISOString().slice(0, -1)
+  function priceUnitKey(el) {
+    return el.kindOf === 'monthly'
+      ? 'offerings.resource.per_month'
+      : el.kindOf === 'yearly'
+        ? 'offerings.resource.per_year'
+        : el.kindOf === 'rent'
+          ? 'offerings.resource.per_period'
+          : el.kindOf === 'perUnit'
+            ? 'offerings.resource.per_unit'
+            : '';
   }
-}
 
-function myMissionH ()  {
-  km = false;
-  ky = false;
-  kc = false;
-  let is = [];
+  async function han() {
+    error1 = null;
+    for (const element of meData) {
+      const goingPublic =
+        element.offerScope === 'customers' || element.offerScope === 'both';
+      if (goingPublic && !(element.price > 0)) {
+        error1 = `${element.name}: ${$t('offerings.resource.price_required')}`;
+        return;
+      }
+    }
+    already = true;
 
-for (var i = 0; i <meData.length; i++) {
-  if (meData[i].kindOf === "monthly"){
-    console.log(i,"to to")
-    ky = true;
-    meData[i].m = true;
-    meData[i].ky = true;
-         meData[i].kc = false;
-                   meData[i].r = false;
-    meData[i].y = false;
+    for (const element of meData) {
+      const hm = element.hm > 0 ? element.hm : 1;
+      const price = element.price > 0 ? element.price : 0;
+      const easy = element.easy > 0 ? element.easy : 0;
 
+      try {
+        const result = await executeAction('createResourceRequest', {
+          mashaabimId: element.id,
+          name: element.name,
+          descrip: element.descrip,
+          kindOf: element.kindOf,
+          hm,
+          spnot: element.spnot,
+          price,
+          myp: easy,
+          linkto: element.linkto,
+          sdate: element.dates ? new Date(element.dates).toISOString() : undefined,
+          fdate: element.datef ? new Date(element.datef).toISOString() : undefined
+        });
 
-  } else if (meData[i].kindOf === "yearly"){
-        console.log(i,"y")
-    ky = true;
-    meData[i].y = true;
-        meData[i].m = false;
-          meData[i].r = false;
-
-     meData[i].ky = true;
-              meData[i].kc = false;
-
-    } else if (meData[i].kindOf === "rent"){
-        console.log(i,"y")
-            meData[i].y = false;
-    ky = true;
-    meData[i].r = true;
-     meData[i].ky = true;
-             meData[i].m = false;
-
-         meData[i].kc = false;
-
-    } else if (meData[i].kindOf === "perUnit"){
-    meData[i].y = false;
-    meData[i].kc = true;
-         meData[i].ky = false;
-                 meData[i].m = false;
-          meData[i].r = false;
-
-    kc = true;
-  } else {
-        meData[i].y = false;
-    meData[i].kc = false;
-         meData[i].ky = false;
-                 meData[i].m = false;
-                     meData[i].r = false;
-
-
+        if (result.success && result.data) {
+          // PLAN_USER_OFFERINGS §3.2 — mint the public product when offered to
+          // customers (idempotent server action; creates the home rikma on
+          // first use).
+          const scope = element.offerScope || 'rikma';
+          if (scope !== 'rikma') {
+            const pub = await executeAction('publishUserResourceAsProduct', {
+              spId: String(result.data.id),
+              offerScope: scope,
+              price
+            });
+            if (!pub.success) {
+              error1 = pub.error?.message || $t('offerings.resource.publish_failed');
+            }
+          }
+          onClose?.({
+            id: result.data.id,
+            name: result.data.attributes.name,
+            skob: result.data
+          });
+        } else {
+          error1 = result.error?.message || 'Create failed';
+        }
+      } catch (e) {
+        error1 = e?.message || String(e);
+      }
+    }
+    already = false;
   }
- 
-}
- 
-};
-const ot = {"he":"עלות חד פעמית","en":"one time"}
-const py = {"he":"ליחידה", "en": "per unit"}
-const pm = {"he": "חודשי","en": "monthly"}
-const pye = {"he": "שנתי", "en": "yearly"}
-const re = {"he": "השכרה לזמן קצוב", "en": "rent"}
-const scLabel = { he: 'למי מוצע?', en: 'offered to whom?' };
-const scRikma = { he: 'לרקמות בלבד (שותפות)', en: 'weaves only (partnership)' };
-const scBoth = { he: 'גם לרקמות וגם ללקוחות', en: 'weaves and customers' };
-const scCustomers = { he: 'ללקוחות בלבד (כמוצר)', en: 'customers only (as a product)' };
-const scNote = {
-  he: 'פרסום ללקוחות יוצר עמוד מוצר עם המחיר. אם אין לך עדיין ריקמה שתנהל את המכירות — נקים לך אחת, ותמיד אפשר להזמין אליה שותפים.',
-  en: 'Offering to customers creates a product page. If you do not yet have a weave to manage the sales, one will be created for you — and you can always invite partners into it.'
-};
-import {lang} from '$lib/stores/lang'
+
+  function remove(id) {
+    onRemove?.({ id, data: meData });
+  }
+
+  const scopeOptions = [
+    { value: 'rikma', labelKey: 'offerings.resource.scope_rikma', hintKey: 'offerings.resource.scope_rikma_hint' },
+    { value: 'both', labelKey: 'offerings.resource.scope_both', hintKey: 'offerings.resource.scope_both_hint' },
+    { value: 'customers', labelKey: 'offerings.resource.scope_customers', hintKey: 'offerings.resource.scope_customers_hint' }
+  ];
 </script>
 
-{#if error1 !== null}
-  {error1}
-{:else}
-  {#each needr as n}
+{#if ready}
+  {#each needr as n (n)}
     <h1 style="display:none;">{n}</h1>
   {/each}
-  <div class="dd md:items-center border-2 border-gold rounded">
-    <div class="body items-center">
-      <table dir="rtl">
-        <caption class="sm:text-right md:text-center text-right">
-          <h1 class="md:text-center text-2xl md:text-2xl font-bold">
-            משאבים שנבחרו
-          </h1>
-        </caption>
-        <thead>
-          <tr class="gg">
-            <th class="gg">הסרת המשאב שנבחר</th>
-            {#each meData as data, i}
-              <td class="gg" style="font-size: 3rem">
-                {i + 1}
-                <button
-                  title="הסרה"
-                  aria-labelledby="title"
-                  onclick={remove({
-                    id: data.id,
-                    data: meData
-                  })}
-                  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                    <path
-                      fill="currentColor"
-                      d="M4,2H11A2,2 0 0,1 13,4V20A2,2 0 0,1 11,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2M4,10V14H11V10H4M4,16V20H11V16H4M4,4V8H11V4H4M17.59,12L15,9.41L16.41,8L19,10.59L21.59,8L23,9.41L20.41,12L23,14.59L21.59,16L19,13.41L16.41,16L15,14.59L17.59,12Z"
-                    />
-                  </svg></button
-                ></td
-              >
-            {/each}
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="ggr">
-            <th class="ggr">שם</th>
-            {#each meData as data, i}
-              <td class="ggr">
-                <div dir="rtl" class="textinput">
-                  <input
-                    type="text"
-                    id="nam"
-                    name="nam"
-                    bind:value={data.name}
-                    class="input"
-                    required
-                  />
-                  <label for="nam" class="label">שם</label>
-                  <span class="line"></span>
-                </div>
-              </td>
-            {/each}
-          </tr>
-          <tr>
-            <th>תיאור</th>
-            {#each meData as data, i}
-              <td>
-                <div dir="rtl" class="textinput">
-                  <input
-                    bind:value={data.descrip}
-                    type="text"
-                    class="input"
-                    required
-                  />
-                  <label for="name" class="label">תיאור</label>
-                  <span class="line"></span>
-                </div>
-              </td>
-            {/each}
-          </tr>
-          <tr>
-            <th>סוג</th>
-            {#each meData as data, i}
-              <td>
-                <select
-                  bind:value={data.kindOf}
-                  onchange={() => myMissionH()}
-                  class="round form-select appearance-none
-      block
-      w-full
-      px-3
-      py-1.5
-      text-barbi
-      font-normal
-      bg-gold bg-clip-padding bg-no-repeat
-      border border-solid border-gold
-      rounded
-      transition
-      ease-in-out
-      m-0
-      focus:text-barbi focus:bg-gold focus:border-barbi focus:outline-none"
-                >
-                  <option value="total">{ot[$lang]}</option>
-                  <option value="monthly">{pm[$lang]}</option>
-                  <option value="yearly">{pye[$lang]}</option>
-                  <option value="perUnit">{py[$lang]}</option>
-                  <option value="rent">{re[$lang]}</option>
-                </select>
-              </td>
-            {/each}
-          </tr>
-          <tr>
-            <th>{scLabel[$lang]}</th>
-            {#each meData as data, i}
-              <td>
-                <select
-                  bind:value={data.offerScope}
-                  class="round form-select appearance-none
-      block
-      w-full
-      px-3
-      py-1.5
-      text-barbi
-      font-normal
-      bg-gold bg-clip-padding bg-no-repeat
-      border border-solid border-gold
-      rounded
-      transition
-      ease-in-out
-      m-0
-      focus:text-barbi focus:bg-gold focus:border-barbi focus:outline-none"
-                >
-                  <option value="rikma">{scRikma[$lang]}</option>
-                  <option value="both">{scBoth[$lang]}</option>
-                  <option value="customers">{scCustomers[$lang]}</option>
-                </select>
-                {#if data.offerScope === 'customers' || data.offerScope === 'both'}
-                  <p class="text-sm text-barbi mt-1" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
-                    {scNote[$lang]}
-                  </p>
-                {/if}
-              </td>
-            {/each}
-          </tr>
-          <tr style="display:{kc ? '' : 'none'};">
-            <th>כמות</th>
-            {#each meData as data, i}
-              <td>
-                <div
-                  style="display:{meData[i].kc ? '' : 'none'};"
-                  dir="rtl"
-                  class="textinput"
-                >
-                  <input
-                    bind:value={data.hm}
-                    type="number"
-                    class="input"
-                    required
-                  />
-                  <label for="name" class="label">כמות</label>
-                  <span class="line"></span>
-                </div>
-              </td>
-            {/each}
-          </tr><tr style="display:{ky ? '' : 'none'};">
-            <th>תאריך התחלה </th>
-            {#each meData as data, i}
-              <td
-                ><input
-                  class="bg-gold hover:bg-mtork border-2 border-barbi rounded"
-                  type="datetime-local"
-                  style="display:{meData[i].ky ? '' : 'none'};"
-                  placeholder="הוספת תאריך התחלה"
-                  bind:value={data.dates}
-                /></td
-              >
-            {/each}
-          </tr>
-          <tr style="display:{ky ? '' : 'none'};">
-            <th>תאריך סיום </th>
-            {#each meData as data, i}
-              <td
-                ><input
-                  class="bg-gold hover:bg-mtork border-2 border-barbi rounded"
-                  style="display:{meData[i].ky ? '' : 'none'};"
-                  type="datetime-local"
-                  placeholder="הוספת תאריך סיום"
-                  bind:value={data.datef}
-                /></td
-              >
-            {/each}
-          </tr>
-          <tr>
-            <th>עלות</th>
-            {#each meData as data, i}
-              <td>
-                <div dir="rtl" class="textinput">
-                  <input
-                    bind:value={data.price}
-                    type="number"
-                    class="input"
-                    required
-                  />
-                  <label for="name" class="label"
-                    >שווי כספי <span
-                      style="display:{meData[i].m ? '' : 'none'};"
-                      >לכל חודש</span
-                    ><span style="display:{meData[i].y ? '' : 'none'};"
-                      >לכל שנה</span
-                    ><span style="display:{meData[i].r ? '' : 'none'};"
-                      >לכל התקופה</span
-                    ><span style="display:{kc ? '' : 'none'};">ליחידה</span>
-                  </label>
-                  <span class="line"></span>
-                </div>
-              </td>
-            {/each}
-          </tr><tr>
-            <th>שווי להשקעה בריקמה</th>
-            {#each meData as data, i}
-              <td>
-                <div dir="rtl" class="textinput">
-                  <input
-                    bind:value={data.easy}
-                    type="number"
-                    class="input"
-                    required
-                  />
-                  <label for="name" class="label"
-                    >שווי מבוקש <span
-                      style="display:{meData[i].m ? '' : 'none'};"
-                      >לכל חודש</span
-                    ><span style="display:{meData[i].y ? '' : 'none'};"
-                      >לכל שנה</span
-                    ><span style="display:{meData[i].r ? '' : 'none'};"
-                      >לכל התקופה</span
-                    ><span style="display:{kc ? '' : 'none'};">ליחידה</span>
-                  </label>
-                  <span class="line"></span>
-                </div>
-              </td>
-            {/each}
-          </tr><tr>
-            <th>הערות מיוחדות</th>
-            {#each meData as data, i}
-              <td>
-                <div dir="rtl" class="textinput">
-                  <input
-                    bind:value={data.spnot}
-                    type="text"
-                    class="input"
-                    required
-                  />
-                  <label for="name" class="label">הערות מיוחדות</label>
-                  <span class="line"></span>
-                </div>
-              </td>
-            {/each}
-          </tr>
-          <tr>
-            <th>לינק לפרטי מוצר\ מחיר \ רכישה</th>
-            {#each meData as data, i}
-              <td>
-                <div dir="rtl" class="textinput">
-                  <input
-                    bind:value={data.linkto}
-                    type="text"
-                    class="input"
-                    required
-                  />
-                  <label for="name" class="label">לינק</label>
-                  <span class="line"></span>
-                </div></td
-              >
-            {/each}
-          </tr>
-        </tbody>
-      </table>
+  <div
+    dir={$isRtl ? 'rtl' : 'ltr'}
+    class="flex flex-col w-full max-w-md mx-auto max-h-[min(85vh,44rem)] rounded-2xl bg-white dark:bg-gray-800 shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden"
+  >
+    <!-- Header -->
+    <div class="shrink-0 px-4 py-3 bg-gradient-to-l from-barbi to-mpink text-white">
+      <h2 class="text-lg font-bold">{$t('offerings.resource.title_new')}</h2>
+      <p class="text-xs opacity-80">{$t('offerings.resource.subtitle_new')}</p>
     </div>
-    <div>
+
+    <!-- Scrollable body: one card per selected resource -->
+    <div class="flex-1 overflow-y-auto p-3 space-y-4">
+      {#if error1}
+        <p class="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 rounded-xl px-3 py-2">
+          {error1}
+        </p>
+      {/if}
+
+      {#each meData as data, i (data.id)}
+        <div class="rounded-xl border border-gray-200 dark:border-gray-600 p-3 space-y-3 bg-gray-50/50 dark:bg-gray-900/30">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-sm font-bold text-barbi">#{i + 1}</span>
+            <button
+              class="text-gray-400 hover:text-red-500 transition-colors"
+              title={$t('offerings.resource.remove')}
+              aria-label={$t('offerings.resource.remove')}
+              onclick={() => remove(data.id)}
+            >
+              <svg style="width:20px;height:20px" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <label class="block">
+            <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">{$t('offerings.resource.name')}</span>
+            <input
+              type="text"
+              bind:value={data.name}
+              class="mt-1 w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-barbi focus:outline-none"
+              required
+            />
+          </label>
+
+          <label class="block">
+            <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">{$t('offerings.resource.descrip')}</span>
+            <textarea
+              bind:value={data.descrip}
+              rows="2"
+              class="mt-1 w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-barbi focus:outline-none"
+            ></textarea>
+          </label>
+
+          <label class="block">
+            <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">{$t('offerings.resource.kind')}</span>
+            <select
+              bind:value={data.kindOf}
+              class="mt-1 w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-barbi focus:outline-none"
+            >
+              <option value="total">{$t('offerings.resource.kind_total')}</option>
+              <option value="monthly">{$t('offerings.resource.kind_monthly')}</option>
+              <option value="yearly">{$t('offerings.resource.kind_yearly')}</option>
+              <option value="perUnit">{$t('offerings.resource.kind_perUnit')}</option>
+              <option value="rent">{$t('offerings.resource.kind_rent')}</option>
+            </select>
+          </label>
+
+          <div class="grid grid-cols-2 gap-3">
+            <label class="block">
+              <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                {$t('offerings.resource.price')}
+                {#if priceUnitKey(data)}· {$t(priceUnitKey(data))}{/if}
+              </span>
+              <input
+                type="number"
+                min="0"
+                bind:value={data.price}
+                class="mt-1 w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-barbi focus:outline-none"
+              />
+            </label>
+            <label class="block">
+              <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">{$t('offerings.resource.myp')}</span>
+              <input
+                type="number"
+                min="0"
+                bind:value={data.easy}
+                class="mt-1 w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-barbi focus:outline-none"
+              />
+            </label>
+          </div>
+
+          {#if data.kindOf === 'perUnit'}
+            <label class="block">
+              <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">{$t('offerings.resource.quantity')}</span>
+              <input
+                type="number"
+                min="1"
+                bind:value={data.hm}
+                class="mt-1 w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-barbi focus:outline-none"
+              />
+            </label>
+          {/if}
+
+          {#if isRecurring(data)}
+            <div class="grid grid-cols-2 gap-3">
+              <label class="block">
+                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">{$t('offerings.resource.start')}</span>
+                <input
+                  type="datetime-local"
+                  bind:value={data.dates}
+                  class="mt-1 w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 px-2 py-2 text-sm text-gray-900 dark:text-gray-100 focus:border-barbi focus:outline-none"
+                />
+              </label>
+              <label class="block">
+                <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">{$t('offerings.resource.end')}</span>
+                <input
+                  type="datetime-local"
+                  bind:value={data.datef}
+                  class="mt-1 w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 px-2 py-2 text-sm text-gray-900 dark:text-gray-100 focus:border-barbi focus:outline-none"
+                />
+              </label>
+            </div>
+          {/if}
+
+          <!-- Offer scope -->
+          <fieldset>
+            <legend class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5">
+              {$t('offerings.resource.scope_label')}
+            </legend>
+            <div class="space-y-2">
+              {#each scopeOptions as opt (opt.value)}
+                <label
+                  class="flex items-start gap-2.5 rounded-xl border px-3 py-2 cursor-pointer transition-colors {data.offerScope === opt.value
+                    ? 'border-barbi bg-barbi/5 dark:bg-barbi/10'
+                    : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'}"
+                >
+                  <input
+                    type="radio"
+                    name={`offerScope-${data.id}`}
+                    value={opt.value}
+                    bind:group={data.offerScope}
+                    class="mt-1 accent-barbi"
+                  />
+                  <span>
+                    <span class="block text-sm font-semibold text-gray-900 dark:text-gray-100">{$t(opt.labelKey)}</span>
+                    <span class="block text-xs text-gray-500 dark:text-gray-400">{$t(opt.hintKey)}</span>
+                  </span>
+                </label>
+              {/each}
+            </div>
+            {#if data.offerScope === 'customers' || data.offerScope === 'both'}
+              <p class="mt-2 text-xs text-gray-600 dark:text-gray-300 bg-gold/20 dark:bg-gold/10 rounded-xl px-3 py-2">
+                {$t('offerings.resource.scope_note')}
+              </p>
+            {/if}
+          </fieldset>
+
+          <label class="block">
+            <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">{$t('offerings.resource.notes')}</span>
+            <input
+              type="text"
+              bind:value={data.spnot}
+              class="mt-1 w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-barbi focus:outline-none"
+            />
+          </label>
+
+          <label class="block">
+            <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">{$t('offerings.resource.link')}</span>
+            <input
+              type="url"
+              bind:value={data.linkto}
+              class="mt-1 w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-barbi focus:outline-none"
+            />
+          </label>
+        </div>
+      {/each}
+    </div>
+
+    <!-- Actions footer -->
+    <div class="shrink-0 p-3 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700">
       {#if already === false}
         <button
-          class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
-          onclick={han}>פרסום משאבים</button
+          class="w-full py-2.5 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
+          onclick={han}
         >
+          {$t('offerings.resource.submit')}
+        </button>
       {:else}
-        <RingLoader size="80" color="#ff00ae" unit="px" duration="2s"
-        ></RingLoader>
+        <div class="flex justify-center py-1">
+          <RingLoader size="40" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+        </div>
       {/if}
     </div>
   </div>
 {/if}
-
-<style>
-  select.round {
-    background-image: linear-gradient(
-        315deg,
-        transparent 50%,
-        rgb(0, 174, 255) 50%
-      ),
-      linear-gradient(225deg, rgb(0, 174, 255) 50%, transparent 50%),
-      radial-gradient(#ddd 70%, transparent 72%);
-    background-position:
-      calc(0% + 20px) calc(1em + 2px),
-      calc(0% + 15px) calc(1em + 2px),
-      calc(0% + 0.5em) 0.5em;
-    background-size:
-      5px 5px,
-      5px 5px,
-      1.5em 1.5em;
-    background-repeat: no-repeat;
-  }
-
-  select.round:focus {
-    background-image: linear-gradient(315deg, white 50%, transparent 50%),
-      linear-gradient(225deg, transparent 50%, white 50%),
-      radial-gradient(gray 70%, transparent 72%);
-    background-position:
-      calc(0% + 15px) 1em,
-      calc(0% + 20px) 1em,
-      calc(0% + 0.5em) 0.5em;
-    background-size:
-      5px 5px,
-      5px 5px,
-      1.5em 1.5em;
-    background-repeat: no-repeat;
-    border-color: green;
-    outline: 0;
-  }
-  .gg {
-    position: sticky;
-    top: 1px;
-    background-color: var(--naim) !important;
-    border-width: 4px;
-    border-color: rgb(103, 232, 249);
-    border-radius: 4%;
-    opacity: 1;
-  }
-  .ggr {
-    position: sticky;
-    top: 77px;
-    background-color: var(--naim) !important;
-    opacity: 1;
-  }
-  .ggr:hover,
-  .gg:hover {
-    background: rgb(132, 241, 223);
-  }
-  .dd {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-  }
-  .body {
-    z-index: 999;
-    overflow-x: auto;
-    overflow-y: auto;
-    min-width: 96vw;
-    padding-left: 0.5em;
-    padding-right: 0.5em;
-  }
-
-  table,
-  th,
-  td {
-    border-collapse: collapse;
-    border-width: 4px;
-    border-color: rgb(103, 232, 249);
-    border-radius: 4%;
-  }
-  table {
-    text-align: center;
-    color: var(--barbi-pink);
-    margin: 0 auto;
-  }
-  th,
-  td {
-    background: var(--gold);
-    min-width: 150px;
-  }
-
-  th:hover,
-  td:hover {
-    background: rgb(132, 241, 223);
-  }
-
-  .textinput {
-    position: relative;
-    width: 100%;
-    display: block;
-  }
-
-  .input {
-    border: none;
-    margin: 0;
-    padding: 10px 0;
-    outline: none;
-    border-bottom: solid 1px var(--mturk);
-    font-size: 15px;
-    margin-top: 12px;
-    width: 100%;
-    color: var(--barbi-pink);
-    -webkit-tap-highlight-color: transparent;
-    background: transparent;
-  }
-
-  .label {
-    font-size: 15px;
-    position: absolute;
-    right: 0;
-    top: 22px;
-    transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
-    pointer-events: none;
-    color: var(--barbi-pink);
-    user-select: none;
-  }
-
-  .line {
-    height: 2px;
-    background-color: #2196f3;
-    position: absolute;
-    transform: translateX(-50%);
-    left: 50%;
-    bottom: 0;
-    width: 0;
-    transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
-  }
-
-  .input:focus ~ .line,
-  .input:valid ~ .line {
-    width: 100%;
-  }
-
-  .input:focus ~ .label,
-  .input:valid ~ .label {
-    font-size: 11px;
-    color: #2196f3;
-    top: 0;
-  }
-
-  @media (max-width: 600px) {
-    .textinput {
-      position: relative;
-      width: 100%;
-      display: block;
-    }
-  }
-</style>
