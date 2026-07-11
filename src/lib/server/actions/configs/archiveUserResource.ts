@@ -7,13 +7,36 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
  * own ownership permissions on the Sp collection enforce that the caller may
  * only archive their own resource; we additionally require a valid JWT.
  *
+ * PLAN_USER_OFFERINGS §8.5: a resource published as a product carries a linked
+ * personal Matanot — archiving the Sp archives that product too (never
+ * deletes; existing sales keep referencing it).
+ *
  * Client sends: { spId: string | number }
  */
-const handler: ActionExecutionHandler = async (params, context) => {
+const handler: ActionExecutionHandler = async (params, context, util) => {
+  const { strapi } = util;
   const spId = params.spId;
   const userId = context.userId as string;
   const jwt = context.jwt as string;
   const f = context.fetch as typeof fetch;
+
+  // Archive the linked public product first (best-effort — the Sp archive is
+  // the source of truth and must not fail because of the product).
+  try {
+    const spRes = await strapi.execute('252getSpForPublish', { spId: String(spId) }, jwt, f);
+    const spAttrs = spRes?.data?.sp?.data?.attributes;
+    const linked = spAttrs?.matanot?.data;
+    if (linked?.id && !linked.attributes?.archived) {
+      await strapi.execute(
+        '255setMatanotArchived',
+        { id: String(linked.id), archived: true },
+        jwt,
+        f
+      );
+    }
+  } catch (e) {
+    console.warn('[archiveUserResource] linked-matanot archive failed (non-fatal):', e);
+  }
 
   const res = await f(import.meta.env.VITE_URL + '/graphql', {
     method: 'POST',
