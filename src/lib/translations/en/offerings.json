@@ -94,5 +94,17 @@
     "hours": "hours",
     "online": "Online",
     "empty": ""
+  },
+  "onboard": {
+    "title": "What would you like to offer?",
+    "sub": "Priced missions and products — this is what the concierge and customers will see. You can also skip and add later from your profile.",
+    "journey": "My offerings",
+    "continue": "Finish ✨",
+    "skip": "Skip to finish",
+    "done_supply_title": "See what's in demand right now",
+    "done_supply_sub": "The demand map: missions and resources weaves and customers seek around you — plus the button to add your supply.",
+    "done_supply_meta": "For suppliers who want to start now",
+    "done_supply_chip_map": "🗺 Demand map",
+    "done_supply_chip_add": "➕ Add supply"
   }
 }

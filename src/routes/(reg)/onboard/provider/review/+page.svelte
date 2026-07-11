@@ -201,7 +201,9 @@
 
   async function confirm() {
     const ok = await persist();
-    if (ok) setTimeout(() => goto('/onboard/done'), 220);
+    // Continue to the offerings step (PLAN_USER_OFFERINGS §4.2 / M7): priced
+    // mission offers + personal products, skippable, before the finish screen.
+    if (ok) setTimeout(() => goto('/onboard/provider/offers'), 220);
   }
 
   async function editManual() {

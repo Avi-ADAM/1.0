@@ -7,7 +7,7 @@
   import Plaque from '$lib/components/onboard/Plaque.svelte';
   import { t } from '$lib/translations';
 
-  let selected = $state(/** @type {'matches' | 'business'} */ ('matches'));
+  let selected = $state(/** @type {'matches' | 'business' | 'supply'} */ ('matches'));
   let going = $state(false);
 
   const choices = $derived([
@@ -38,6 +38,18 @@
         { label: $t('onboard.done.choices.business.chips.partners'), cls: '' }
       ],
       path: '/onboard/business'
+    },
+    {
+      id: /** @type {const} */ ('supply'),
+      emoji: '🗺️',
+      title: $t('offerings.onboard.done_supply_title'),
+      sub: $t('offerings.onboard.done_supply_sub'),
+      meta: $t('offerings.onboard.done_supply_meta'),
+      chips: [
+        { label: $t('offerings.onboard.done_supply_chip_map'), cls: '' },
+        { label: $t('offerings.onboard.done_supply_chip_add'), cls: '' }
+      ],
+      path: '/demand?lens=supply'
     }
   ]);
 
