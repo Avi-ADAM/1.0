@@ -35,11 +35,14 @@
     loading = true;
     error1 = null;
     try {
+      // Offers read nested under the user (qid 277) — rides the user find
+      // permission instead of the mission-offer collection permission.
       const [offersRes, tplRes] = await Promise.all([
-        sendToSer({ uid: String(uid) }, '258listMyMissionOffers', 0, 0, false, fetch),
+        sendToSer({ uid: String(uid) }, '277myMissionOffersViaUser', 0, 0, false, fetch),
         sendToSer({}, 'getMissionTemplates', 0, 0, false, fetch)
       ]);
-      offers = offersRes?.data?.missionOffers?.data ?? [];
+      offers =
+        offersRes?.data?.usersPermissionsUser?.data?.attributes?.mission_offers?.data ?? [];
       missionTemplates = tplRes?.data?.missions?.data ?? [];
     } catch (e) {
       error1 = e?.message || String(e);

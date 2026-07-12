@@ -128,7 +128,9 @@
     "rikma_name_ph": "e.g. Dana's Studio",
     "back": "Back",
     "draft_note": "The draft is saved automatically — you can come back anytime",
-    "created": "Product created! 🎉"
+    "created": "Product created! 🎉",
+    "expand": "Expand to the full form",
+    "expand_hint": "Image, complex product (missions & resources), dates and more — the draft travels with you"
   },
   "page": {
     "title": "My missions",

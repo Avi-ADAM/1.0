@@ -12352,6 +12352,70 @@ export const qids = {
     }
   }`,
 
+  // 276-278: reads nested under the user entity — resolves through the
+  // user's own find permission instead of top-level collection permissions
+  // (mission-offer is new and its Authenticated find permission may lag).
+
+  '276myOfferingsViaUser': `query MyOfferingsViaUser($uid: ID!) {
+    usersPermissionsUser(id: $uid) {
+      data { id attributes {
+        mission_offers(
+          filters: { archived: { ne: true }, active: { eq: true } }
+          pagination: { limit: 200 }
+        ) { data { id } }
+        mesimabetahaliches(
+          filters: { finnished: { ne: true }, archived: { ne: true } }
+          pagination: { limit: 200 }
+        ) { data { id } }
+        finnished_missions(pagination: { limit: 500 }) { data { id } }
+        projects_1s(pagination: { limit: 100 }) {
+          data { id attributes {
+            matanotofs(filters: { archived: { ne: true } }, pagination: { limit: 200 }) {
+              data { id }
+            }
+          } }
+        }
+      } }
+    }
+  }`,
+
+  '277myMissionOffersViaUser': `query MyMissionOffersViaUser($uid: ID!) {
+    usersPermissionsUser(id: $uid) {
+      data { id attributes {
+        mission_offers(
+          filters: { archived: { ne: true } }
+          pagination: { limit: 100 }
+          sort: "createdAt:desc"
+        ) {
+          data { id attributes {
+            name descrip hours perhour price active archived note
+            mission { data { id attributes { missionName } } }
+            location { lat lng radius location_hint location_mode }
+          } }
+        }
+      } }
+    }
+  }`,
+
+  '278myMissionsViaUser': `query MyMissionsViaUser($uid: ID!) {
+    usersPermissionsUser(id: $uid) {
+      data { id attributes {
+        mesimabetahaliches(
+          filters: { finnished: { ne: true }, archived: { ne: true } }
+          pagination: { limit: 100 }
+        ) {
+          data { id attributes {
+            name hoursassinged howmanyhoursalready
+            project { data { id attributes { projectName } } }
+          } }
+        }
+        finnished_missions(pagination: { limit: 500 }) {
+          data { id attributes { missionName } }
+        }
+      } }
+    }
+  }`,
+
   '272myOfferingsCounts': `query MyOfferingsCounts($uid: ID!) {
     products: matanots(
       filters: { projectcreates: { user_1s: { id: { eq: $uid } } }, archived: { ne: true } }

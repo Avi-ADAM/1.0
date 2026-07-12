@@ -7,6 +7,24 @@
 
   let { data } = $props();
 
+  // Arriving from the quick create-product flow (CreateProductFlow "expand
+  // to full form", PLAN_USER_OFFERINGS): hydrate the saved draft and open in
+  // simple mode — the user can switch to complex / add an image from here.
+  const fromQuick = page.url.searchParams.get('fromQuick') === '1';
+  const DRAFT_KEY = 'offerings.productDraft.v1';
+  const quickInit = (() => {
+    if (!fromQuick || typeof localStorage === 'undefined') {
+      return { draft: null, mode: 'complex' as const };
+    }
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (raw) return { draft: JSON.parse(raw)?.draft ?? null, mode: 'simple' as const };
+    } catch {
+      /* corrupt/blocked storage — open empty */
+    }
+    return { draft: null, mode: 'complex' as const };
+  })();
+
   const t = $derived(
     $lang === 'he'
       ? {
@@ -26,6 +44,13 @@
   }
 
   function handleDone() {
+    if (fromQuick && typeof localStorage !== 'undefined') {
+      try {
+        localStorage.removeItem(DRAFT_KEY);
+      } catch {
+        /* noop */
+      }
+    }
     backToSales();
   }
 </script>
@@ -47,7 +72,8 @@
 
   <ComposeProduct
     projectId={data.projectId}
-    mode="complex"
+    mode={quickInit.mode}
+    initialDraft={quickInit.draft}
     availableMissions={data.availableMissions}
     availableResources={data.availableResources}
     projectMembers={data.projectMembers}

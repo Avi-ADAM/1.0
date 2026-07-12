@@ -32,6 +32,18 @@
       payload?: ComposeProductPayload;
     }) => void;
     onCancel?: () => void;
+    /**
+     * Prefill from the quick create-product flow (CreateProductFlow draft,
+     * PLAN_USER_OFFERINGS): { name, descrip, price, quant, kindOf }.
+     * Hydrates the base fields once on init.
+     */
+    initialDraft?: {
+      name?: string;
+      descrip?: string;
+      price?: number | null;
+      quant?: number | null;
+      kindOf?: string;
+    } | null;
   };
 
   let {
@@ -43,7 +55,8 @@
     missionTemplates = [],
     resourceTemplates = [],
     onDone,
-    onCancel
+    onCancel,
+    initialDraft = null
   }: Props = $props();
 
   const multiMember = $derived(projectMembers.length >= 2);
@@ -59,6 +72,24 @@
   let oneForeProject = $state(false);
   let croppedImage = $state<unknown>(null);
   let fixedPrice = $state(0); // used when pricingMode='fixed'
+
+  // Hydrate base fields from the quick-flow draft (once, on init).
+  if (initialDraft) {
+    if (initialDraft.name) name = initialDraft.name;
+    if (initialDraft.descrip) description = initialDraft.descrip;
+    if (initialDraft.quant != null && Number(initialDraft.quant) > 0) {
+      quant = Number(initialDraft.quant);
+    }
+    if (
+      initialDraft.kindOf &&
+      ['total', 'monthly', 'yearly', 'unlimited'].includes(initialDraft.kindOf)
+    ) {
+      kindOf = initialDraft.kindOf as typeof kindOf;
+    }
+    if (initialDraft.price != null && Number(initialDraft.price) > 0) {
+      fixedPrice = Number(initialDraft.price);
+    }
+  }
 
   // ─── complex-only fields ──────────────────────────────────────────────────
   let marginPct = $state(0);

@@ -5,11 +5,14 @@
   import CreateProductFlow from './CreateProductFlow.svelte';
 
   /**
-   * Compact offerings badges for /me (profile feedback 2026-07-13): the
+   * Compact offerings badges for /me (profile feedback 2026-07-13/14): the
    * profile has real-estate only for icon + count + expand link + a plus —
    * the full lists live on /sales-center (products, across all rikmas) and
    * /me/offerings (missions: offers + doing + ✓done).
-   * Styled like the page's gradient pill chips (a6 "הרקמות שלי").
+   *
+   * Layout: stacked full-width on mobile, side-by-side on desktop.
+   * Counts resolve NESTED under the user entity (qid 276) so they ride the
+   * user find permission — not per-collection permissions.
    *
    * Props: { uid }
    */
@@ -34,13 +37,18 @@
 
   async function load() {
     try {
-      const res = await sendToSer({ uid: String(uid) }, '272myOfferingsCounts', 0, 0, false, fetch);
-      const d = res?.data ?? {};
-      const total = (k) => d[k]?.meta?.pagination?.total ?? 0;
+      const res = await sendToSer({ uid: String(uid) }, '276myOfferingsViaUser', 0, 0, false, fetch);
+      const a = res?.data?.usersPermissionsUser?.data?.attributes ?? {};
+      const products = (a.projects_1s?.data ?? []).reduce(
+        (sum, p) => sum + (p.attributes?.matanotofs?.data?.length ?? 0),
+        0
+      );
       counts = {
-        products: total('products'),
-        missions: total('offers') + total('doing'),
-        done: total('done')
+        products,
+        missions:
+          (a.mission_offers?.data?.length ?? 0) +
+          (a.mesimabetahaliches?.data?.length ?? 0),
+        done: a.finnished_missions?.data?.length ?? 0
       };
     } catch (e) {
       console.warn('offerings counts failed', e);
@@ -49,26 +57,29 @@
   }
 </script>
 
-<div dir={$isRtl ? 'rtl' : 'ltr'} class="flex flex-wrap items-center justify-center gap-2 my-2">
+<div
+  dir={$isRtl ? 'rtl' : 'ltr'}
+  class="flex flex-col items-stretch sm:flex-row sm:items-center sm:justify-center gap-2 my-2 px-2"
+>
   <!-- Products: count → sales-center, plus → create flow -->
   <span
-    class="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-mpink via-transparent via-lpink to-barbi px-3 py-1 text-gold font-bold shadow-md"
+    class="flex items-center justify-between sm:justify-center gap-2 rounded-full bg-gradient-to-br from-mpink via-lpink to-barbi px-4 py-1.5 text-white font-bold shadow-md"
   >
     <a
       href="/sales-center"
-      class="inline-flex items-center gap-1.5 hover:scale-105 transition-transform"
+      class="inline-flex items-center gap-1.5 hover:scale-105 transition-transform drop-shadow-sm"
       title={$t('offerings.badges.open_products')}
     >
       🎁
-      <span class="hidden sm:inline">{$t('offerings.badges.products')}</span>
+      <span>{$t('offerings.badges.products')}</span>
       {#if loaded}
-        <span class="bg-gold text-barbi rounded-full px-1.5 text-xs leading-5 min-w-5 text-center">
+        <span class="bg-white text-barbi rounded-full px-1.5 text-xs leading-5 min-w-5 text-center shadow-sm">
           {counts.products}
         </span>
       {/if}
     </a>
     <button
-      class="bg-gold text-barbi rounded-full w-5 h-5 leading-5 text-sm font-extrabold hover:scale-125 transition-transform"
+      class="bg-white text-barbi rounded-full w-6 h-6 leading-6 text-base font-extrabold shadow-sm hover:scale-125 transition-transform"
       title={$t('offerings.badges.add_product')}
       aria-label={$t('offerings.badges.add_product')}
       onclick={() => (creating = true)}
@@ -79,22 +90,22 @@
 
   <!-- Missions: offers + doing count, ✓ done count → /me/offerings -->
   <span
-    class="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-mpink via-transparent via-lpink to-barbi px-3 py-1 text-gold font-bold shadow-md"
+    class="flex items-center justify-between sm:justify-center gap-2 rounded-full bg-gradient-to-br from-mpink via-lpink to-barbi px-4 py-1.5 text-white font-bold shadow-md"
   >
     <a
       href="/me/offerings"
-      class="inline-flex items-center gap-1.5 hover:scale-105 transition-transform"
+      class="inline-flex items-center gap-1.5 hover:scale-105 transition-transform drop-shadow-sm"
       title={$t('offerings.badges.open_missions')}
     >
       🛠️
-      <span class="hidden sm:inline">{$t('offerings.badges.missions')}</span>
+      <span>{$t('offerings.badges.missions')}</span>
       {#if loaded}
-        <span class="bg-gold text-barbi rounded-full px-1.5 text-xs leading-5 min-w-5 text-center">
+        <span class="bg-white text-barbi rounded-full px-1.5 text-xs leading-5 min-w-5 text-center shadow-sm">
           {counts.missions}
         </span>
         {#if counts.done > 0}
           <span
-            class="bg-emerald-500 text-white rounded-full px-1.5 text-xs leading-5 min-w-5 text-center"
+            class="bg-emerald-500 text-white rounded-full px-1.5 text-xs leading-5 min-w-5 text-center shadow-sm"
             title={$t('offerings.badges.done_tip')}
           >
             ✓{counts.done}
@@ -104,7 +115,7 @@
     </a>
     <a
       href="/me/offerings?new=1"
-      class="bg-gold text-barbi rounded-full w-5 h-5 leading-5 text-sm font-extrabold text-center hover:scale-125 transition-transform"
+      class="bg-white text-barbi rounded-full w-6 h-6 leading-6 text-base font-extrabold text-center shadow-sm hover:scale-125 transition-transform"
       title={$t('offerings.badges.add_mission')}
       aria-label={$t('offerings.badges.add_mission')}
     >

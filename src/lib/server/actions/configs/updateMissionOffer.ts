@@ -64,8 +64,9 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   // ── Archive side-effect: prune missions_i_can_do when no live offer left ──
   if (params.archived === true && missionId) {
     try {
-      const list = await strapi.execute('258listMyMissionOffers', { uid }, jwt, f);
-      const offers = list?.data?.missionOffers?.data ?? [];
+      const list = await strapi.execute('277myMissionOffersViaUser', { uid }, jwt, f);
+      const offers =
+        list?.data?.usersPermissionsUser?.data?.attributes?.mission_offers?.data ?? [];
       const stillLive = offers.some(
         (o: any) =>
           String(o.id) !== offerId &&

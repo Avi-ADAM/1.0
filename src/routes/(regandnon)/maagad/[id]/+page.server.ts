@@ -106,7 +106,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
   const offerByUserMission = new Map<string, any>();
   await Promise.all(
     terms.flatMap((q) => [
-      sendToSer({ q }, '203findMatanotByText', 0, 0, !uid, fetch)
+      sendToSer({ q }, '203findMatanotByText', 0, 0, true, fetch)
         .then((r: any) => {
           for (const n of r?.data?.matanots?.data ?? []) {
             if (productById.has(String(n.id))) continue;
@@ -119,7 +119,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
           }
         })
         .catch(() => {}),
-      sendToSer({ q }, '271findMissionOffersByText', 0, 0, !uid, fetch)
+      sendToSer({ q }, '271findMissionOffersByText', 0, 0, true, fetch)
         .then((r: any) => {
           for (const n of r?.data?.missionOffers?.data ?? []) {
             const oa = n.attributes ?? {};

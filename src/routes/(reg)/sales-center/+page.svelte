@@ -2,11 +2,13 @@
   import { isRtl } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import SaleComponent from '$lib/components/sales/SaleComponent.svelte';
+  import CreateProductFlow from '$lib/components/offerings/CreateProductFlow.svelte';
   import { RingLoader } from 'svelte-loading-spinners';
   import { toast } from 'svelte-sonner';
   import { invalidateAll } from '$app/navigation';
 
   let { data } = $props();
+  let creatingProduct = $state(false);
 
   // PLAN_sale_holder_consent — my open sale reports still awaiting the
   // claimed holder's consent (or my turn to respond after a counter).
@@ -32,8 +34,9 @@
   // Localization
   const texts = {
     he: {
-      title: 'מרכז מכירות',
-      subtitle: 'ניהול כל המכירות שלך ממקום אחד',
+      title: 'המוצרים שלי',
+      subtitle: 'כל המוצרים שלך מכל הרקמות — וניהול המכירות ממקום אחד',
+      newProduct: 'מוצר חדש',
       search: 'חיפוש מוצרים...',
       filterByProject: 'סינון לפי פרויקט',
       allProjects: 'כל הפרויקטים',
@@ -58,8 +61,9 @@
       unlimited: 'ליחידה - ללא הגבלה'
     },
     en: {
-      title: 'Sales Center',
-      subtitle: 'Manage all your sales from one place',
+      title: 'My Products',
+      subtitle: 'All your products from every weave — and sales management in one place',
+      newProduct: 'New product',
       search: 'Search products...',
       filterByProject: 'Filter by project',
       allProjects: 'All Projects',
@@ -263,11 +267,17 @@
       <h1
         class="text-4xl font-bold text-royal-blue mb-2 font-litt drop-shadow-lg glow-text"
       >
-        {t.title}
+        🎁 {t.title}
       </h1>
       <p class="text-lg text-royal-blue/90 drop-shadow glow-text">
         {t.subtitle}
       </p>
+      <button
+        class="mt-3 px-5 py-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-full shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
+        onclick={() => (creatingProduct = true)}
+      >
+        ➕ {t.newProduct}
+      </button>
     </div>
 
     {#if openSaleClaims.length > 0}
@@ -603,6 +613,17 @@
     {/if}
   </div>
 </div>
+
+{#if creatingProduct}
+  <CreateProductFlow
+    uid={data.uid}
+    onDone={async () => {
+      creatingProduct = false;
+      await invalidateAll();
+    }}
+    onClose={() => (creatingProduct = false)}
+  />
+{/if}
 
 <style>
   /* PLAN_sale_holder_consent — open claims banner */

@@ -24,9 +24,10 @@ async function awaitapi(userId, lang, tok, fetch) {
 // customer-facing offerings — products, resources offered for sale, and
 // priced mission offers. Non-fatal: the page renders without it.
 async function fetchStorefront(userId, tok, fetch) {
-  const isSer = tok === false;
+  // Always read via the service token: this is public storefront data, and
+  // logged-in viewers' JWTs may lack find permission on newer collections.
   try {
-    const res = await sendToSer({ uid: String(userId) }, '268getUserStorefront', null, null, isSer, fetch);
+    const res = await sendToSer({ uid: String(userId) }, '268getUserStorefront', null, null, true, fetch);
     const d = res?.data ?? {};
     return {
       resources: (d.sps?.data ?? []).filter(

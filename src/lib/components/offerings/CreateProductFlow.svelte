@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
   import { RingLoader } from 'svelte-loading-spinners';
   import { executeAction } from '$lib/client/actionClient';
   import { sendToSer } from '$lib/send/sendToSer.js';
@@ -109,6 +110,44 @@
           /* noop */
         }
         onDone?.(result.data);
+      }
+    } catch (e) {
+      error1 = e?.message || String(e);
+    }
+    saving = false;
+  }
+
+  /**
+   * "Expand to the full form" — image, complex products (missions+resources
+   * recipe) live in /moach/[id]/sales/new. The draft is already persisted, so
+   * the full form hydrates it via ?fromQuick=1. In 'new' mode the rikma is
+   * created first (we have its name) and the user lands on its full form —
+   * the system knows where they came from and finishes the journey there.
+   */
+  async function expandToFull() {
+    error1 = null;
+    if (mode === 'existing') {
+      if (!projectId) {
+        error1 = $t('offerings.flow.pick_rikma');
+        return;
+      }
+      goto(`/moach/${projectId}/sales/new?fromQuick=1`);
+      onClose?.();
+      return;
+    }
+    const rikmaName = draft.rikmaName?.trim() || draft.name?.trim();
+    if (!rikmaName) {
+      error1 = $t('offerings.flow.rikma_name');
+      return;
+    }
+    saving = true;
+    try {
+      const result = await executeAction('createWeave', { projectName: rikmaName });
+      if (!result.success || !result.data?.projectId) {
+        error1 = result.error?.message || $t('offerings.products.save_failed');
+      } else {
+        goto(`/moach/${result.data.projectId}/sales/new?fromQuick=1`);
+        onClose?.();
       }
     } catch (e) {
       error1 = e?.message || String(e);
@@ -256,6 +295,19 @@
         </label>
 
         <p class="text-xs text-gray-500 dark:text-gray-400">💾 {$t('offerings.flow.draft_note')}</p>
+
+        <!-- Escape hatch to the full product form (image, complex recipe) -->
+        <button
+          class="w-full flex items-center gap-2 rounded-xl border border-dashed border-gray-300 dark:border-gray-500 px-3 py-2 text-start hover:border-barbi transition-colors disabled:opacity-50"
+          onclick={expandToFull}
+          disabled={saving}
+        >
+          <span class="text-lg">🧩</span>
+          <span>
+            <span class="block text-sm font-semibold text-gray-700 dark:text-gray-200">{$t('offerings.flow.expand')}</span>
+            <span class="block text-xs text-gray-500 dark:text-gray-400">{$t('offerings.flow.expand_hint')}</span>
+          </span>
+        </button>
 
         {#if saving}
           <div class="flex justify-center py-1">

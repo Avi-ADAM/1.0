@@ -11,8 +11,10 @@ export const load = async ({ locals, fetch }) => {
   let doing = [];
   let doneCounts = [];
   try {
-    const res = await sendToSer({ uid: String(uid) }, '273myMissionsFull', 0, 0, false, fetch);
-    doing = (res?.data?.doing?.data ?? []).map((n) => ({
+    // Nested under the user (qid 278) — same permission path as /user/[id].
+    const res = await sendToSer({ uid: String(uid) }, '278myMissionsViaUser', 0, 0, false, fetch);
+    const ua = res?.data?.usersPermissionsUser?.data?.attributes ?? {};
+    doing = (ua.mesimabetahaliches?.data ?? []).map((n) => ({
       id: String(n.id),
       name: n.attributes?.name ?? '',
       hours: n.attributes?.hoursassinged ?? null,
@@ -23,7 +25,7 @@ export const load = async ({ locals, fetch }) => {
 
     // Completed missions aggregate to a verified ✓×N per mission name.
     const byName = new Map();
-    for (const n of res?.data?.done?.data ?? []) {
+    for (const n of ua.finnished_missions?.data ?? []) {
       const name = n.attributes?.missionName ?? '';
       if (!name) continue;
       byName.set(name, (byName.get(name) ?? 0) + 1);
