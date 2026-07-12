@@ -25,7 +25,7 @@
       emoji: '🛠️',
       labelKey: 'demand.add_mission',
       hintKey: 'demand.add_mission_hint',
-      href: isLoggedIn ? '/me#my-mission-offers' : `/signup?next=${next}`
+      href: isLoggedIn ? '/me/offerings?new=1' : `/signup?next=${next}`
     },
     {
       emoji: '📦',
@@ -37,7 +37,7 @@
       emoji: '🎁',
       labelKey: 'demand.add_product',
       hintKey: 'demand.add_product_hint',
-      href: isLoggedIn ? '/me#my-products' : `/signup?next=${next}`
+      href: isLoggedIn ? '/me?createProduct=1#my-products' : `/signup?next=${next}`
     }
   ]);
 

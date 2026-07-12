@@ -416,8 +416,7 @@
   import { end } from 'happy-dom/lib/PropertySymbol.js';
   import ProfileBadge from '$lib/components/userPr/ProfileBadge.svelte';
   import Diamond from '$lib/components/userPr/Diamond.svelte';
-  import MissionOffersEditor from '$lib/components/offerings/MissionOffersEditor.svelte';
-  import MyProductsSection from '$lib/components/offerings/MyProductsSection.svelte';
+  import OfferingsBadges from '$lib/components/offerings/OfferingsBadges.svelte';
   let mass = $state(false);
 
   function massss(event) {
@@ -1010,12 +1009,11 @@
           {/key}
         {/if}
         <!-- או גלילה לעשות רינדור עד מקסימום מסויים  של תפקידים כישורים וכו'ואז ההמשך בהרחבה של זה-->
-        <!-- ההיצע שלי (PLAN_USER_OFFERINGS §4.1): הצעות משימה + מוצרים אישיים -->
-        <div id="my-mission-offers" class="w-full my-4 px-2">
-          <MissionOffersEditor uid={data.uid} />
-        </div>
-        <div id="my-products" class="w-full my-4 px-2">
-          <MyProductsSection uid={data.uid} />
+        <!-- ההיצע שלי (PLAN_USER_OFFERINGS §4.1, קומפקטי): אייקון + מונה + פלוס.
+             ההרחבות: מוצרים → /sales-center, משימות → /me/offerings -->
+        <div id="my-mission-offers" class="w-full px-2">
+          <div id="my-products"></div>
+          <OfferingsBadges uid={data.uid} />
         </div>
         <div class="a6">
           <TourItem message={message9[$lang]}>

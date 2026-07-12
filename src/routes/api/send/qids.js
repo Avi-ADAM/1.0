@@ -12352,6 +12352,61 @@ export const qids = {
     }
   }`,
 
+  '272myOfferingsCounts': `query MyOfferingsCounts($uid: ID!) {
+    products: matanots(
+      filters: { projectcreates: { user_1s: { id: { eq: $uid } } }, archived: { ne: true } }
+      pagination: { limit: 1 }
+    ) { meta { pagination { total } } }
+    offers: missionOffers(
+      filters: { users_permissions_user: { id: { eq: $uid } }, archived: { ne: true }, active: { eq: true } }
+      pagination: { limit: 1 }
+    ) { meta { pagination { total } } }
+    doing: mesimabetahaliches(
+      filters: { users_permissions_user: { id: { eq: $uid } }, finnished: { ne: true }, archived: { ne: true } }
+      pagination: { limit: 1 }
+    ) { meta { pagination { total } } }
+    done: finnishedMissions(
+      filters: { users_permissions_user: { id: { eq: $uid } } }
+      pagination: { limit: 1 }
+    ) { meta { pagination { total } } }
+  }`,
+
+  '273myMissionsFull': `query MyMissionsFull($uid: ID!) {
+    doing: mesimabetahaliches(
+      filters: { users_permissions_user: { id: { eq: $uid } }, finnished: { ne: true }, archived: { ne: true } }
+      pagination: { limit: 100 }
+      sort: "createdAt:desc"
+    ) {
+      data { id attributes {
+        name hoursassinged howmanyhoursalready
+        project { data { id attributes { projectName } } }
+      } }
+    }
+    done: finnishedMissions(
+      filters: { users_permissions_user: { id: { eq: $uid } } }
+      pagination: { limit: 300 }
+    ) {
+      data { id attributes { missionName } }
+    }
+  }`,
+
+  '274getProjectMembers': `query GetProjectMembers($pid: ID!) {
+    project(id: $pid) {
+      data { id attributes {
+        projectName
+        user_1s { data { id } }
+      } }
+    }
+  }`,
+
+  '275myRikmasLite': `query MyRikmasLite($uid: ID!) {
+    usersPermissionsUser(id: $uid) {
+      data { id attributes {
+        projects_1s(pagination: { limit: 100 }) { data { id attributes { projectName } } }
+      } }
+    }
+  }`,
+
   '271findMissionOffersByText': `query FindMissionOffersByText($q: String) {
     missionOffers(
       filters: {

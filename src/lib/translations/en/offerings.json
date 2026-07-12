@@ -106,5 +106,38 @@
     "done_supply_meta": "For suppliers who want to start now",
     "done_supply_chip_map": "🗺 Demand map",
     "done_supply_chip_add": "➕ Add supply"
+  },
+  "badges": {
+    "products": "Products",
+    "missions": "Missions",
+    "done_tip": "Completed & verified missions",
+    "add_product": "New product",
+    "add_mission": "New mission offer",
+    "open_products": "All products in the sales center",
+    "open_missions": "All missions and offers"
+  },
+  "flow": {
+    "title": "New product",
+    "where": "Where should the product live?",
+    "new_rikma": "In a new weave",
+    "new_rikma_hint": "We'll create a weave to hold the product — partners can join it",
+    "existing_rikma": "In an existing weave",
+    "existing_rikma_hint": "The product is created in the weave you pick",
+    "pick_rikma": "Pick a weave",
+    "rikma_name": "New weave name",
+    "rikma_name_ph": "e.g. Dana's Studio",
+    "back": "Back",
+    "draft_note": "The draft is saved automatically — you can come back anytime",
+    "created": "Product created! 🎉"
+  },
+  "page": {
+    "title": "My missions",
+    "sub": "Service offers, missions in progress and completed missions",
+    "doing": "In progress",
+    "done": "Completed & verified",
+    "times": "times",
+    "hours_done": "hours done",
+    "empty_doing": "No missions in progress right now",
+    "empty_done": "No completed missions yet"
   }
 }

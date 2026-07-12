@@ -17,7 +17,7 @@
    * Props: { uid } — the logged-in user's id (from /me page data).
    */
 
-  let { uid } = $props();
+  let { uid, autoOpen = false } = $props();
 
   let offers = $state([]);
   let missionTemplates = $state([]);
@@ -26,7 +26,10 @@
   let composing = $state(false);
   let busyId = $state(null);
 
-  onMount(load);
+  onMount(() => {
+    if (autoOpen) composing = true;
+    load();
+  });
 
   async function load() {
     loading = true;

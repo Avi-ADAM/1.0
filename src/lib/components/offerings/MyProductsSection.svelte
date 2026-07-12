@@ -4,6 +4,7 @@
   import { executeAction } from '$lib/client/actionClient';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { t, isRtl } from '$lib/translations';
+  import CreateProductFlow from './CreateProductFlow.svelte';
 
   /**
    * "My products" — personal fixed-price products (Matanot origin='personal')
@@ -19,10 +20,7 @@
   let loading = $state(true);
   let error1 = $state(null);
   let composing = $state(false);
-  let saving = $state(false);
   let busyId = $state(null);
-
-  let draft = $state({ name: '', descrip: '', price: null, quant: null, kindOf: 'total' });
 
   onMount(load);
 
@@ -43,30 +41,6 @@
       error1 = e?.message || String(e);
     }
     loading = false;
-  }
-
-  async function create() {
-    error1 = null;
-    saving = true;
-    try {
-      const result = await executeAction('createPersonalMatanot', {
-        name: draft.name,
-        descrip: draft.descrip || null,
-        price: Number(draft.price),
-        quant: draft.quant != null && draft.quant !== '' ? Number(draft.quant) : null,
-        kindOf: draft.kindOf
-      });
-      if (!result.success) {
-        error1 = result.error?.message || $t('offerings.products.save_failed');
-      } else {
-        composing = false;
-        draft = { name: '', descrip: '', price: null, quant: null, kindOf: 'total' };
-        await load();
-      }
-    } catch (e) {
-      error1 = e?.message || String(e);
-    }
-    saving = false;
   }
 
   async function archive(product) {
@@ -93,7 +67,7 @@
     </div>
     <button
       class="shrink-0 px-3 py-1.5 bg-white/15 hover:bg-white/25 rounded-full text-sm font-bold transition-colors"
-      onclick={() => (composing = !composing)}
+      onclick={() => (composing = true)}
     >
       ➕ {$t('offerings.products.add')}
     </button>
@@ -104,78 +78,6 @@
       <p class="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 rounded-xl px-3 py-2">
         {error1}
       </p>
-    {/if}
-
-    {#if composing}
-      <div class="rounded-xl border border-barbi/40 p-3 space-y-3 bg-barbi/5 dark:bg-barbi/10">
-        <label class="block">
-          <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">{$t('offerings.products.name')}</span>
-          <input
-            type="text"
-            bind:value={draft.name}
-            class="mt-1 w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-barbi focus:outline-none"
-            required
-          />
-        </label>
-        <label class="block">
-          <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">{$t('offerings.products.descrip')}</span>
-          <textarea
-            bind:value={draft.descrip}
-            rows="2"
-            class="mt-1 w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-barbi focus:outline-none"
-          ></textarea>
-        </label>
-        <div class="grid grid-cols-2 gap-3">
-          <label class="block">
-            <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">{$t('offerings.products.price')}</span>
-            <input
-              type="number"
-              min="0"
-              bind:value={draft.price}
-              class="mt-1 w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-barbi focus:outline-none"
-              required
-            />
-          </label>
-          <label class="block">
-            <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">{$t('offerings.products.quant')}</span>
-            <input
-              type="number"
-              min="0"
-              bind:value={draft.quant}
-              class="mt-1 w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-barbi focus:outline-none"
-            />
-          </label>
-        </div>
-        <label class="block">
-          <span class="text-xs font-semibold text-gray-500 dark:text-gray-400">{$t('offerings.products.kind')}</span>
-          <select
-            bind:value={draft.kindOf}
-            class="mt-1 w-full rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-gray-900 dark:text-gray-100 focus:border-barbi focus:outline-none"
-          >
-            <option value="total">{$t('offerings.products.kind_total')}</option>
-            <option value="monthly">{$t('offerings.products.kind_monthly')}</option>
-            <option value="yearly">{$t('offerings.products.kind_yearly')}</option>
-            <option value="daily">{$t('offerings.products.kind_daily')}</option>
-            <option value="unlimited">{$t('offerings.products.kind_unlimited')}</option>
-          </select>
-        </label>
-        <p class="text-xs text-gray-600 dark:text-gray-300 bg-gold/20 dark:bg-gold/10 rounded-xl px-3 py-2">
-          {$t('offerings.products.create_note')}
-        </p>
-        {#if saving}
-          <div class="flex justify-center py-1">
-            <RingLoader size="32" color="#ff00ae" unit="px" duration="2s"></RingLoader>
-          </div>
-        {:else}
-          <button
-            class="w-full py-2.5 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:transform-none"
-            disabled={!draft.name?.trim() || !(Number(draft.price) > 0)}
-            onclick={create}
-          >
-            {$t('offerings.products.create')}
-          </button>
-        {/if}
-      </div>
     {/if}
 
     {#if loading}
@@ -244,3 +146,14 @@
     {/if}
   </div>
 </div>
+
+{#if composing}
+  <CreateProductFlow
+    {uid}
+    onDone={async () => {
+      composing = false;
+      await load();
+    }}
+    onClose={() => (composing = false)}
+  />
+{/if}
