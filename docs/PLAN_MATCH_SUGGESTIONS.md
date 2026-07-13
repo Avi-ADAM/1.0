@@ -71,6 +71,30 @@ The timegrama chain: external cron → `GET /api/pingrama` → `GET
 ${VITE_REND}api/timegrama` → dispatcher (`+server.js`) → `Pend`/`PendM` →
 matching engine (the dispatcher passes `event.fetch` through for the emails).
 
+### Creation-surface coverage (verified)
+
+Every path that mints a lev-visible open mission / open mashaabim goes
+through a hooked call site:
+
+- **moach create page** (incl. solo projects) → `prPr/mission.svelte` →
+  `createMission` action (branch 3 open-mission is hooked; branches 1/2
+  become open only via `voteOnPendm` / timegrama, both hooked).
+- **concierge / wish flows** → `publishWishNeedToCommunity` (hooked, both
+  kinds; project-less rows get a rikma-less email phrasing). Accepting a
+  ratson proposal archives the open mission, which automatically drops its
+  suggestions from the lev pull (209/212 filter `archived eq false`).
+- **maagad (demand pools)** creates no open missions/mashaabims at all — it
+  mints `Sheirutpend`s at offer activation and has its own supplier-discovery
+  surface — so there is intentionally nothing to hook there.
+
+### Email policy (`emailPolicy.ts`)
+
+"יש הצעה חדשה שיכולה להתאים לך" mails obey two tunable guards:
+send window **08:00–21:00 Asia/Jerusalem** and a rolling cap of
+**3 suggestion emails per user per 24h** (counted from `notifiedAt` on the
+user's rows via qid 213 — no extra bookkeeping). Users skipped by policy get
+their row with status `new` (in-app only); nothing is queued for later.
+
 ### Location filtering (`src/lib/server/matching/geo.ts`)
 
 Every matcher also checks location compatibility (tested in `geo.test.ts`):
