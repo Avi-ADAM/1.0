@@ -11,6 +11,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { restimeLabel, voteUrl } from './actionUtils.js';
 
 // ─── helpers ───────────────────────────────────────────────────────────────
 async function gql(
@@ -127,7 +128,7 @@ function buildLocationInput(
 }
 
 // ─── handler ───────────────────────────────────────────────────────────────
-const createResourceHandler: ActionExecutionHandler = async (params, context) => {
+const createResourceHandler: ActionExecutionHandler = async (params, context, { notifier }) => {
   const {
     projectId,
     name,
@@ -184,15 +185,26 @@ const createResourceHandler: ActionExecutionHandler = async (params, context) =>
       project(id: $id) {
         data {
           attributes {
-            user_1s { data { id } }
+            restime
+            projectName
+            profilePic { data { attributes { url } } }
+            user_1s { data { id attributes { username } } }
           }
         }
       }
     }
   `, { id: projectId });
 
-  const userCount =
-    projectData?.project?.data?.attributes?.user_1s?.data?.length ?? 0;
+  const projAttrs = projectData?.project?.data?.attributes ?? {};
+  const members: any[] = projAttrs.user_1s?.data ?? [];
+  const userCount = members.length;
+  const projectName: string = projAttrs.projectName ?? '';
+  const projectPic: string =
+    projAttrs.profilePic?.data?.attributes?.url ??
+    'https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png';
+  const creatorName: string =
+    members.find((m) => String(m.id) === String(userId))?.attributes?.username ?? '';
+  const effectiveRestime: string = (restime as string) || projAttrs.restime || 'feh';
 
   const isPmash = userCount > 1;
   const operationName = isPmash ? 'createPmash' : 'createOpenMashaabim';
@@ -537,6 +549,64 @@ const createResourceHandler: ActionExecutionHandler = async (params, context) =>
     });
   }
 
+  // ── 7. Case-specific notification (multi-member only, fire-and-forget) ──
+  // Every other member gets a deep link to the pmash vote page plus an
+  // explanation that during the restime the proposal is theirs to reshape.
+  if (isPmash && notifier) {
+    const restimeHe = restimeLabel(effectiveRestime, 'he');
+    const restimeEn = restimeLabel(effectiveRestime, 'en');
+    const url = voteUrl(String(projectId), 'pmash', createdId);
+    const selfProposal = Boolean(isAssigned);
+
+    const title = selfProposal
+      ? {
+          he: `${creatorName} מציע/ה לספק את המשאב "${name}"`,
+          en: `${creatorName} offers to provide the resource "${name}"`,
+        }
+      : {
+          he: `משאב חדש להצבעה: "${name}"`,
+          en: `New resource up for a vote: "${name}"`,
+        };
+    const body = selfProposal
+      ? {
+          he: `${creatorName} הציע/ה בריקמה "${projectName}" את המשאב "${name}"${isReceived ? ' — שכבר סופק על ידו/ה' : ' ומציע/ה לספק אותו בעצמו/ה'}. במהלך ${restimeHe} של זמן התגובה אפשר לאשר, לפתוח שיחה או להציע גרסה מדויקת משלך — ההצעה האחרונה שעל השולחן מאושרת אוטומטית בתום הזמן. לחצו להצבעה.`,
+          en: `${creatorName} proposed the resource "${name}" in the "${projectName}" rikma${isReceived ? ' — already delivered by them' : ' and offers to provide it themselves'}. During the ${restimeEn} response window you can approve, open a discussion or counter with your own refined version — the last version on the table is auto-approved when time runs out. Tap to vote.`,
+        }
+      : {
+          he: `${creatorName} הציע/ה בריקמה "${projectName}" את המשאב "${name}". במהלך ${restimeHe} של זמן התגובה אפשר לאשר, לפתוח שיחה או להציע גרסה מדויקת משלך — ההצעה משתנה כרצונך וההצעה האחרונה שעל השולחן מאושרת אוטומטית בתום הזמן. לחצו להצבעה.`,
+          en: `${creatorName} proposed the resource "${name}" in the "${projectName}" rikma. During the ${restimeEn} response window you can approve, open a discussion or counter with your own refined version — the proposal is yours to shape, and the last version on the table is auto-approved when time runs out. Tap to vote.`,
+        };
+
+    notifier
+      .notify(
+        {
+          recipients: {
+            type: 'projectMembers',
+            config: { projectIdParam: 'projectId', excludeSender: true },
+          },
+          templates: { title, body },
+          channels: ['socket', 'push', 'email'],
+          emailTemplate: 'PendJustCreated',
+          emailTemplateData: {
+            un: creatorName,
+            pl: projectPic,
+            pn: projectName,
+            kind: 'pendmash',
+            rishon: selfProposal ? creatorName : '',
+            name,
+            restime: effectiveRestime,
+            pid: projectId,
+            eid: createdId,
+          },
+          metadata: { type: 'voteUpdate', url },
+        },
+        params,
+        { projectId, createdId },
+        context,
+      )
+      .catch((e: unknown) => console.warn('[createResource] pmash notification failed:', e));
+  }
+
   return createdRecord;
 };
 
@@ -677,28 +747,7 @@ export const createResourceAction: ActionConfig = {
     }
   ],
   
-  notification: {
-    recipients: {
-      type: 'projectMembers',
-      config: {
-        projectIdParam: 'projectId',
-        excludeSender: true
-      }
-    },
-    templates: {
-      title: {
-        he: 'משאב חדשה',
-        en: 'New Resource Request'
-      },
-      body: {
-        he: 'בקשת משאב חדשה בשם "{{name}}" נוספה לפרויקט',
-        en: 'A new resource request  "{{name}}" was added to the project'
-      }
-    },
-    channels: ['socket', 'push'],
-    metadata: {
-      priority: 'normal',
-      url: '/lev?project={{projectId}}'
-    }
-  }
+  // Notifications are sent from the handler itself (case-specific: pmash vote
+  // link + restime explanation, self-proposal variant) — no static config here
+  // to avoid doubles. Solo projects have nobody else to notify.
 };

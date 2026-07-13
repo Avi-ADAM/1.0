@@ -3384,7 +3384,9 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       data {
         attributes {
           restime
-          user_1s { data { id } }
+          projectName
+          profilePic { data { attributes { url } } }
+          user_1s { data { id attributes { username } } }
         }
       }
     }

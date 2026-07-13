@@ -16,6 +16,7 @@
     vots{what order users_permissions_user {data {id}}}
     project{data{id attributes{ user_1s{data{id}}}}}
     users_permissions_user{data{id attributes{username}}}
+    open_mission{data{id attributes{isRishon rishon{data{id}}}}}
     negopendmissions(sort: "ordern:desc"){data{attributes{
       ordern proposedBy name descrip hearotMeyuchadot noofhours perhour date dates
       tafkidims{data{id}}
@@ -45,8 +46,35 @@
       const takerId = normId(a.users_permissions_user);
       const memberIds = (a.project?.data?.attributes?.user_1s?.data || []).map((m) => String(m.id));
 
-      const gate = computeNegoGate({ rounds, vots, takerId, memberIds });
+      // Assigned offer (createMission branch 2): a member created this Ask ON
+      // the taker's behalf (open_mission.isRishon). The taker never applied, so
+      // their silence is NOT consent — the mission must not be registered under
+      // their name without an explicit yes (or their own counter round).
+      const omMeta = a.open_mission?.data?.attributes ?? null;
+      const assignedOffer = omMeta?.isRishon === true;
+
+      const gate = computeNegoGate({ rounds, vots, takerId, memberIds, takerApplied: !assignedOffer });
       if (!gate.approvable) {
+        if (assignedOffer && !gate.takerYes) {
+          // The invited member never consented within the restime: the mission
+          // is not registered under their name; re-open the OpenMission so the
+          // rikma can look for someone else, and archive this invitation.
+          console.log('ask finalizer: assigned offer expired without consent, reopening', id, gate);
+          const omIdMeta = a.open_mission?.data?.id;
+          let reopen = `mutation {
+            ${omIdMeta ? `updateOpenMission(
+              id: "${omIdMeta}"
+              data: { archived: false, isRishon: false, rishon: null }
+            ) {data{id}}` : ''}
+            updateAsk(
+              id: "${id}"
+              data: { archived: true }
+            ){data{id}}
+          }`;
+          await SendTo(reopen, ADMINMONTHER).catch((e) => console.error(e));
+          await markDone(taid);
+          return;
+        }
         // Not agreed by both sides (member objection, or a project counter
         // awaiting the candidate's consent, or a candidate counter awaiting a
         // member's yes). Don't materialize; close — a resuming action recreates

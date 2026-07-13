@@ -121,6 +121,7 @@ export class EmailService {
       const templates: Record<string, () => Promise<any>> = {
         SimpleNuti: () => import('$lib/components/mail/simpleNuti.svelte'),
         PendJustCreated: () => import('$lib/components/mail/pendJustCreated.svelte'),
+        MissionInvite: () => import('$lib/components/mail/missionInvite.svelte'),
         HalukaApproved: () => import('$lib/components/mail/HalukaApproved.svelte'),
         ComeVoteJoin: () => import('$lib/components/mail/comeVoteJoin.svelte'),
         MissionAccepted: () => import('$lib/components/mail/mail.svelte'),
