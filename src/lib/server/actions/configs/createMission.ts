@@ -31,7 +31,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
-import { calcDeadlineMs } from './actionUtils.js';
+import { calcDeadlineMs, restimeLabel, voteUrl } from './actionUtils.js';
 import { createMissionConsentSpec } from '$lib/consent/specs/s2b';
 
 interface ChecklistItem {
@@ -59,7 +59,7 @@ function buildLocationInput(
   return Object.keys(loc).length > 0 ? loc : null;
 }
 
-const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
+const handler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const {
     projectId,
     existingMissionId,
@@ -105,6 +105,15 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const userCount = members.length;
   const restime: string = projAttrs.restime ?? 'feh';
   const deadlineISO = new Date(Date.now() + calcDeadlineMs(restime)).toISOString();
+
+  // Context for the case-specific notifications sent at the end of the handler.
+  const projectName: string = projAttrs.projectName ?? '';
+  const projectPic: string =
+    projAttrs.profilePic?.data?.attributes?.url ??
+    'https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png';
+  const memberName = (id: unknown): string =>
+    members.find((m) => String(m.id) === String(id))?.attributes?.username ?? '';
+  const creatorName = memberName(userId);
 
   // 2. Create the base Mission entity (if not editing an existing one)
   let missionId: string;
@@ -177,6 +186,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   let createdEntityId: string | null = null;
   let createdEntityType: string | null = null;
   let notificationKind: string | null = null;
+  let createdAskId: string | null = null;
 
   // ── BRANCH 1: Multi-user, open vote → Pendm ──────────────────────────────
   if (userCount > 1 && !assignedUserId) {
@@ -230,6 +240,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     );
     const askId = askRes?.data?.createAsk?.data?.id;
     if (askId) {
+      createdAskId = String(askId);
       await strapi.execute(
         '82createTimegramaForAsk',
         { date: deadlineISO, whatami: 'ask', askId },
@@ -336,6 +347,156 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     await strapi.execute('4crtask', taskParams, context.jwt, context.fetch).catch(() => {});
   }
 
+  // 5. Case-specific notifications (fire-and-forget — never block the response).
+  //    Branch 1 (pendm): every member gets a deep link to the vote page plus an
+  //    explanation that during the restime they may reshape the proposal.
+  //    Branch 2 (assigned): the assigned member gets a personal invitation
+  //    (nothing happens without their consent); the rest get the regular notice.
+  //    Branches 3/4 are solo projects — nobody to notify.
+  if (notifier && createdEntityId) {
+    const restimeHe = restimeLabel(restime, 'he');
+    const restimeEn = restimeLabel(restime, 'en');
+
+    if (notificationKind === 'pend') {
+      const url = voteUrl(projectId, 'pendm', createdEntityId);
+      notifier
+        .notify(
+          {
+            recipients: {
+              type: 'projectMembers',
+              config: { projectIdParam: 'projectId', excludeSender: true },
+            },
+            templates: {
+              title: {
+                he: `משימה חדשה להצבעה: "${missionName}"`,
+                en: `New mission up for a vote: "${missionName}"`,
+              },
+              body: {
+                he: `${creatorName} הציע/ה בריקמה "${projectName}" את המשימה "${missionName}". במהלך ${restimeHe} של זמן התגובה אפשר לאשר, לפתוח שיחה או להציע גרסה מדויקת משלך — ההצעה משתנה כרצונך וההצעה האחרונה שעל השולחן מאושרת אוטומטית בתום הזמן. לחצו להצבעה.`,
+                en: `${creatorName} proposed the mission "${missionName}" in the "${projectName}" rikma. During the ${restimeEn} response window you can approve, open a discussion or counter with your own refined version — the proposal is yours to shape, and the last version on the table is auto-approved when time runs out. Tap to vote.`,
+              },
+            },
+            channels: ['socket', 'push', 'email'],
+            emailTemplate: 'PendJustCreated',
+            emailTemplateData: {
+              un: creatorName,
+              pl: projectPic,
+              pn: projectName,
+              kind: 'pend',
+              rishon: '',
+              name: missionName,
+              restime,
+              pid: projectId,
+              eid: createdEntityId,
+            },
+            metadata: { type: 'voteUpdate', url },
+          },
+          params,
+          { projectId, createdEntityId },
+          context,
+        )
+        .catch((e: unknown) => console.warn('[createMission] pend notification failed:', e));
+    } else if (notificationKind === 'pendAsk' && createdAskId) {
+      const url = voteUrl(projectId, 'ask', createdAskId);
+      const assigneeName = memberName(assignedUserId);
+      const selfAssigned = String(assignedUserId) === String(userId);
+
+      // 5a. Personal invitation to the assigned member — recruiter style.
+      //     Skipped when the creator took the mission themselves (self-proposal):
+      //     no point inviting yourself; the other members still get 5b.
+      if (!selfAssigned) notifier
+        .notify(
+          {
+            recipients: { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
+            templates: {
+              title: {
+                he: `✨ ${creatorName} חושב/ת שרק את/ה מתאימ/ה למשימה "${missionName}"`,
+                en: `✨ ${creatorName} thinks you're the one for "${missionName}"`,
+              },
+              body: {
+                he: `בריקמה "${projectName}" נולדה משימה חדשה — "${missionName}" — ו${creatorName} בחר/ה דווקא בך. שום דבר לא קורה בלי ההסכמה שלך: המשימה תירשם על שמך רק אם תאשר/י אותה. יש לך ${restimeHe} לאשר, לדייק את התנאים בהצעה נגדית או לפתוח שיחה; אם לא תגיב/י עד אז, ההצעה תיפתח לכל החברים והריקמה תחפש מישהו אחר. לחצו כדי לצפות בכל הפרטים ולהצביע.`,
+                en: `A new mission was born in "${projectName}" — "${missionName}" — and ${creatorName} picked you for it. Nothing happens without your consent: the mission is registered under your name only once you approve. You have ${restimeEn} to approve, refine the terms with a counter-offer or open a discussion; if you don't respond in time the offer opens up to everyone and the rikma looks for someone else. Tap to see the full details and vote.`,
+              },
+            },
+            channels: ['socket', 'push', 'email'],
+            emailTemplate: 'MissionInvite',
+            emailTemplateData: {
+              un: creatorName,
+              pl: projectPic,
+              pn: projectName,
+              name: missionName,
+              descrip: descrip ?? '',
+              nhours: nhours > 0 ? nhours : null,
+              valph: valph > 0 ? valph : null,
+              dateStart: dateStart ?? null,
+              dateEnd: dateEnd ?? null,
+              restime,
+              pid: projectId,
+              askId: createdAskId,
+            },
+            metadata: { type: 'voteUpdate', url, priority: 'high' },
+          },
+          { recipients: [String(assignedUserId)], projectId },
+          { projectId, createdEntityId, askId: createdAskId },
+          context,
+        )
+        .catch((e: unknown) => console.warn('[createMission] invite notification failed:', e));
+
+      // 5b. Regular notice to the remaining members (not the sender, not the assignee).
+      const otherMemberIds = members
+        .map((m) => String(m.id))
+        .filter((id) => id !== String(userId) && id !== String(assignedUserId));
+      if (otherMemberIds.length > 0) {
+        const memberTemplates = selfAssigned
+          ? {
+              title: {
+                he: `${creatorName} מציע/ה לקחת את המשימה "${missionName}"`,
+                en: `${creatorName} offers to take on "${missionName}"`,
+              },
+              body: {
+                he: `${creatorName} הציע/ה בריקמה "${projectName}" את המשימה "${missionName}" ומציע/ה לבצע אותה בעצמו/ה. במהלך ${restimeHe} של זמן התגובה אפשר לאשר, לדייק את התנאים או לפתוח שיחה — ההצעה האחרונה שעל השולחן מאושרת אוטומטית בתום הזמן. לחצו להצבעה.`,
+                en: `${creatorName} proposed the mission "${missionName}" in "${projectName}" and offers to carry it out themselves. During the ${restimeEn} response window you can approve, refine the terms or open a discussion — the last version on the table is auto-approved when time runs out. Tap to vote.`,
+              },
+            }
+          : {
+              title: {
+                he: `משימה חדשה בדרך אל ${assigneeName}: "${missionName}"`,
+                en: `New mission on its way to ${assigneeName}: "${missionName}"`,
+              },
+              body: {
+                he: `${creatorName} הציע/ה בריקמה "${projectName}" את המשימה "${missionName}" והועיד/ה אותה ל${assigneeName}. ההצעה ממתינה להסכמתו/ה, וגם אתם מוזמנים להביע עמדה, לדייק או לפתוח שיחה במהלך ${restimeHe} של זמן התגובה. לחצו להצבעה.`,
+                en: `${creatorName} proposed the mission "${missionName}" in "${projectName}" and offered it to ${assigneeName}. It now awaits their consent — and you too can weigh in, refine or open a discussion during the ${restimeEn} response window. Tap to vote.`,
+              },
+            };
+        notifier
+          .notify(
+            {
+              recipients: { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
+              templates: memberTemplates,
+              channels: ['socket', 'push', 'email'],
+              emailTemplate: 'PendJustCreated',
+              emailTemplateData: {
+                un: creatorName,
+                pl: projectPic,
+                pn: projectName,
+                kind: 'pendAsk',
+                rishon: assigneeName,
+                name: missionName,
+                restime,
+                pid: projectId,
+                eid: createdAskId,
+              },
+              metadata: { type: 'voteUpdate', url },
+            },
+            { recipients: otherMemberIds, projectId },
+            { projectId, createdEntityId, askId: createdAskId },
+            context,
+          )
+          .catch((e: unknown) => console.warn('[createMission] pendAsk notification failed:', e));
+      }
+    }
+  }
+
   return {
     data: {
       missionId,
@@ -393,18 +554,9 @@ export const createMissionConfig: ActionConfig = {
     },
   ],
 
-  notification: {
-    recipients: {
-      type: 'projectMembers',
-      config: { projectIdParam: 'projectId', excludeSender: true },
-    },
-    templates: {
-      title: { he: 'משימה חדשה לאישור', en: 'New mission for approval' },
-      body:  { he: 'נוצרה משימה חדשה בפרויקט', en: 'A new mission was created in your project' },
-    },
-    channels: ['socket'],
-    metadata: { type: 'base', url: 'lev' },
-  },
+  // Notifications are sent from the handler itself (case-specific per branch:
+  // pendm open vote / personal invitation to an assigned member / regular
+  // member notice) — no static notification config here to avoid doubles.
 
   updateStrategy: { type: 'none' },
 };

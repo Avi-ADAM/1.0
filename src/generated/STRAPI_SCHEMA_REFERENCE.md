@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-07-10
+> Last updated: 2026-07-13
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -23,7 +23,7 @@ import type { StrapiEntity, StrapiCollection, StrapiMedia } from '$lib/types/str
 
 ---
 
-## 🏗️ Content Type Entities (116)
+## 🏗️ Content Type Entities (117)
 
 These are the main content types in the Strapi backend.
 
@@ -848,6 +848,21 @@ These are the main content types in the Strapi backend.
 | `simbol` | `Maybe<Scalars['String']['output']>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 
+### MatchSuggestion
+| Field | Type |
+|-------|------|
+| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `kind` | `Enum_Matchsuggestion_Kind` |
+| `matchedOn` | `Maybe<Scalars['JSON']['output']>` |
+| `notifiedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `open_mashaabim` | `Maybe<OpenMashaabimEntityResponse>` |
+| `open_mission` | `Maybe<OpenMissionEntityResponse>` |
+| `score` | `Maybe<Scalars['Int']['output']>` |
+| `source` | `Maybe<Enum_Matchsuggestion_Source>` |
+| `status` | `Maybe<Enum_Matchsuggestion_Status>` |
+| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `user` | `Maybe<UsersPermissionsUserEntityResponse>` |
+
 ### Mesimabetahalich
 | Field | Type |
 |-------|------|
@@ -1045,6 +1060,7 @@ These are the main content types in the Strapi backend.
 | `createMatanotpend` | `Maybe<MatanotpendEntityResponse>` |
 | `createMatbea` | `Maybe<MatbeaEntityResponse>` |
 | `createMatbeaLocalization` | `Maybe<MatbeaEntityResponse>` |
+| `createMatchSuggestion` | `Maybe<MatchSuggestionEntityResponse>` |
 | `createMesimabetahalich` | `Maybe<MesimabetahalichEntityResponse>` |
 | `createMessage` | `Maybe<MessageEntityResponse>` |
 | `createMission` | `Maybe<MissionEntityResponse>` |
@@ -1165,6 +1181,7 @@ These are the main content types in the Strapi backend.
 | `deleteMatanotRecipeResource` | `Maybe<MatanotRecipeResourceEntityResponse>` |
 | `deleteMatanotpend` | `Maybe<MatanotpendEntityResponse>` |
 | `deleteMatbea` | `Maybe<MatbeaEntityResponse>` |
+| `deleteMatchSuggestion` | `Maybe<MatchSuggestionEntityResponse>` |
 | `deleteMesimabetahalich` | `Maybe<MesimabetahalichEntityResponse>` |
 | `deleteMessage` | `Maybe<MessageEntityResponse>` |
 | `deleteMission` | `Maybe<MissionEntityResponse>` |
@@ -1275,6 +1292,7 @@ These are the main content types in the Strapi backend.
 | `updateMatanotRecipeResource` | `Maybe<MatanotRecipeResourceEntityResponse>` |
 | `updateMatanotpend` | `Maybe<MatanotpendEntityResponse>` |
 | `updateMatbea` | `Maybe<MatbeaEntityResponse>` |
+| `updateMatchSuggestion` | `Maybe<MatchSuggestionEntityResponse>` |
 | `updateMesimabetahalich` | `Maybe<MesimabetahalichEntityResponse>` |
 | `updateMessage` | `Maybe<MessageEntityResponse>` |
 | `updateMission` | `Maybe<MissionEntityResponse>` |
@@ -1481,6 +1499,7 @@ These are the main content types in the Strapi backend.
 | `location` | `Maybe<ComponentNewLocation>` |
 | `maap` | `Maybe<MaapEntityResponse>` |
 | `mashaabim` | `Maybe<MashaabimEntityResponse>` |
+| `match_suggestions` | `Maybe<MatchSuggestionRelationResponseCollection>` |
 | `name` | `Maybe<Scalars['String']['output']>` |
 | `nego_mashes` | `Maybe<NegoMashRelationResponseCollection>` |
 | `partofs` | `Maybe<PartofRelationResponseCollection>` |
@@ -1524,6 +1543,7 @@ These are the main content types in the Strapi backend.
 | `locale` | `Maybe<Scalars['String']['output']>` |
 | `localizations` | `Maybe<OpenMissionRelationResponseCollection>` |
 | `location` | `Maybe<ComponentNewLocation>` |
+| `match_suggestions` | `Maybe<MatchSuggestionRelationResponseCollection>` |
 | `mesimabetahaliches` | `Maybe<MesimabetahalichRelationResponseCollection>` |
 | `mission` | `Maybe<MissionEntityResponse>` |
 | `name` | `Maybe<Scalars['String']['output']>` |
@@ -1946,6 +1966,8 @@ These are the main content types in the Strapi backend.
 | `matanots` | `Maybe<MatanotEntityResponseCollection>` |
 | `matbea` | `Maybe<MatbeaEntityResponse>` |
 | `matbeas` | `Maybe<MatbeaEntityResponseCollection>` |
+| `matchSuggestion` | `Maybe<MatchSuggestionEntityResponse>` |
+| `matchSuggestions` | `Maybe<MatchSuggestionEntityResponseCollection>` |
 | `me` | `Maybe<UsersPermissionsMe>` |
 | `mesimabetahalich` | `Maybe<MesimabetahalichEntityResponse>` |
 | `mesimabetahaliches` | `Maybe<MesimabetahalichEntityResponseCollection>` |
@@ -2795,6 +2817,7 @@ These are the main content types in the Strapi backend.
 | `mashabetahaliches` | `Maybe<MashabetahalichRelationResponseCollection>` |
 | `matanot_recipe_missions` | `Maybe<MatanotRecipeMissionRelationResponseCollection>` |
 | `matanot_recipe_resources` | `Maybe<MatanotRecipeResourceRelationResponseCollection>` |
+| `match_suggestions` | `Maybe<MatchSuggestionRelationResponseCollection>` |
 | `mesimabetahaliches` | `Maybe<MesimabetahalichRelationResponseCollection>` |
 | `messages` | `Maybe<MessageRelationResponseCollection>` |
 | `mission_offers` | `Maybe<MissionOfferRelationResponseCollection>` |
@@ -3929,7 +3952,7 @@ These are Strapi components (reusable field groups).
 
 ---
 
-## 📝 Input Types (114)
+## 📝 Input Types (115)
 
 Used for creating/updating content.
 
@@ -4848,6 +4871,19 @@ Used for creating/updating content.
 | `ratson_proposals` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `simbol` | `InputMaybe<Scalars['String']['input']>` |
 
+### MatchSuggestionInput
+| Field | Type |
+|-------|------|
+| `kind` | `InputMaybe<Enum_Matchsuggestion_Kind>` |
+| `matchedOn` | `InputMaybe<Scalars['JSON']['input']>` |
+| `notifiedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `open_mashaabim` | `InputMaybe<Scalars['ID']['input']>` |
+| `open_mission` | `InputMaybe<Scalars['ID']['input']>` |
+| `score` | `InputMaybe<Scalars['Int']['input']>` |
+| `source` | `InputMaybe<Enum_Matchsuggestion_Source>` |
+| `status` | `InputMaybe<Enum_Matchsuggestion_Status>` |
+| `user` | `InputMaybe<Scalars['ID']['input']>` |
+
 ### MesimabetahalichInput
 | Field | Type |
 |-------|------|
@@ -5105,6 +5141,7 @@ Used for creating/updating content.
 | `location` | `InputMaybe<ComponentNewLocationInput>` |
 | `maap` | `InputMaybe<Scalars['ID']['input']>` |
 | `mashaabim` | `InputMaybe<Scalars['ID']['input']>` |
+| `match_suggestions` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `name` | `InputMaybe<Scalars['String']['input']>` |
 | `nego_mashes` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `partofs` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -5144,6 +5181,7 @@ Used for creating/updating content.
 | `iskvua` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `isshift` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `location` | `InputMaybe<ComponentNewLocationInput>` |
+| `match_suggestions` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `mesimabetahaliches` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `mission` | `InputMaybe<Scalars['ID']['input']>` |
 | `name` | `InputMaybe<Scalars['String']['input']>` |
@@ -6072,6 +6110,7 @@ Used for creating/updating content.
 | `mashabetahaliches` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `matanot_recipe_missions` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `matanot_recipe_resources` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `match_suggestions` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `mesimabetahaliches` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `messages` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `mission_offers` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -6233,12 +6272,12 @@ Used for creating/updating content.
 
 ---
 
-## 🔍 Filter Input Types (103)
+## 🔍 Filter Input Types (104)
 
 Used for querying/filtering content. Each content type has a corresponding filter input.
 
 <details>
-<summary>Click to expand all 103 filter types</summary>
+<summary>Click to expand all 104 filter types</summary>
 
 #### ActFiltersInput
 Fields: `and`, `createdAt`, `dateF`, `dateS`, `des`, `forums`, `hashivut`, `id`, `isAssigned`, `link`, `locale`, `localizations`, `mesimabetahaliches`, `my`, `myIshur`, `naasa`, `negopendmissions`, `not`, `open_mission`, `or`, `partofs`, `pendm`, `project`, `publishedAt`, `shem`, `status`, `tafkidims`, `taskdis`, `timegrama`, `timers`, `updatedAt`, `userAndIshur`, `vali`, `valiIshur`
@@ -6372,6 +6411,9 @@ Fields: `and`, `createdAt`, `forums`, `id`, `matanot`, `negos`, `not`, `or`, `pu
 #### MatbeaFiltersInput
 Fields: `and`, `createdAt`, `halukas`, `id`, `locale`, `localizations`, `mashabetahaliches`, `matanots`, `name`, `not`, `or`, `publishedAt`, `ratson_proposals`, `simbol`, `updatedAt`
 
+#### MatchSuggestionFiltersInput
+Fields: `and`, `createdAt`, `id`, `kind`, `matchedOn`, `not`, `notifiedAt`, `open_mashaabim`, `open_mission`, `or`, `score`, `source`, `status`, `updatedAt`, `user`
+
 #### MesimabetahalichFiltersInput
 Fields: `activeTimer`, `acts`, `admaticedai`, `and`, `createdAt`, `dates`, `decisions`, `descrip`, `finiapruvals`, `finnished`, `finnished_missions`, `forappruval`, `forums`, `hearotMeyuchadot`, `hoursassinged`, `howmanyhoursalready`, `id`, `isMust`, `isYesod`, `isglobal`, `iskvua`, `matanot_recipe_missions`, `mission`, `monter`, `monters`, `name`, `not`, `open_missions`, `or`, `partofs`, `perhour`, `privatlinks`, `project`, `publicklinks`, `publishedAt`, `seeders`, `sheirut_fulfillments`, `start`, `status`, `stname`, `tafkidims`, `timegramas`, `timer`, `timers`, `totalHoursSaved`, `updatedAt`, `users_permissions_user`, `zohars`
 
@@ -6403,10 +6445,10 @@ Fields: `acts`, `and`, `ask`, `createdAt`, `date`, `dates`, `descrip`, `filds`, 
 Fields: `and`, `arguments`, `clauses`, `createdAt`, `createdByEmail`, `creator`, `cuntries`, `currentRound`, `description`, `id`, `isLocal`, `issues`, `maxRounds`, `not`, `or`, `ownerExternalId`, `participants`, `positions`, `publishedAt`, `resolution`, `scaleMax`, `scaleMin`, `shareToken`, `sourceId`, `sourceMeta`, `sourceType`, `status`, `topic`, `updatedAt`, `visibility`
 
 #### OpenMashaabimFiltersInput
-Fields: `and`, `archived`, `askms`, `createdAt`, `cycleSize`, `declinedsps`, `descrip`, `easy`, `extractedKey`, `haamadapruvs`, `haamadas`, `hm`, `howMeny`, `id`, `isMust`, `isYesod`, `kindOf`, `linkto`, `locale`, `localizations`, `location`, `maap`, `mashaabim`, `name`, `nego_mashes`, `not`, `or`, `partofs`, `pmash`, `price`, `project`, `publishedAt`, `ratson`, `ratson_proposal`, `recurring`, `rikmashes`, `source`, `splited`, `spnot`, `sps`, `sqadualed`, `sqadualedf`, `updatedAt`, `users`
+Fields: `and`, `archived`, `askms`, `createdAt`, `cycleSize`, `declinedsps`, `descrip`, `easy`, `extractedKey`, `haamadapruvs`, `haamadas`, `hm`, `howMeny`, `id`, `isMust`, `isYesod`, `kindOf`, `linkto`, `locale`, `localizations`, `location`, `maap`, `mashaabim`, `match_suggestions`, `name`, `nego_mashes`, `not`, `or`, `partofs`, `pmash`, `price`, `project`, `publishedAt`, `ratson`, `ratson_proposal`, `recurring`, `rikmashes`, `source`, `splited`, `spnot`, `sps`, `sqadualed`, `sqadualedf`, `updatedAt`, `users`
 
 #### OpenMissionFiltersInput
-Fields: `acts`, `and`, `archived`, `asks`, `createdAt`, `dates`, `declined`, `descrip`, `extractedKey`, `hatzaas`, `hearotMeyuchadot`, `howMeny`, `id`, `isMust`, `isRishon`, `isYesod`, `isglobal`, `iskvua`, `isshift`, `locale`, `localizations`, `location`, `mesimabetahaliches`, `mission`, `name`, `negopendmissions`, `noofhours`, `not`, `or`, `partofs`, `pendm`, `perhour`, `privatlinks`, `project`, `publicklinks`, `publishedAt`, `ratson`, `ratson_proposals`, `rishon`, `rishonves`, `skills`, `source`, `sqadualed`, `tafkidims`, `updatedAt`, `users`, `usersNotRelevant`, `vallues`, `work_ways`
+Fields: `acts`, `and`, `archived`, `asks`, `createdAt`, `dates`, `declined`, `descrip`, `extractedKey`, `hatzaas`, `hearotMeyuchadot`, `howMeny`, `id`, `isMust`, `isRishon`, `isYesod`, `isglobal`, `iskvua`, `isshift`, `locale`, `localizations`, `location`, `match_suggestions`, `mesimabetahaliches`, `mission`, `name`, `negopendmissions`, `noofhours`, `not`, `or`, `partofs`, `pendm`, `perhour`, `privatlinks`, `project`, `publicklinks`, `publishedAt`, `ratson`, `ratson_proposals`, `rishon`, `rishonves`, `skills`, `source`, `sqadualed`, `tafkidims`, `updatedAt`, `users`, `usersNotRelevant`, `vallues`, `work_ways`
 
 #### PartofFiltersInput
 Fields: `acts`, `and`, `askms`, `asks`, `createdAt`, `default`, `finiapruvals`, `forums`, `id`, `maaps`, `mashabetahaliches`, `matanot`, `matanot_recipe_missions`, `matanots`, `mesimabetahaliches`, `not`, `open_mashaabims`, `open_missions`, `or`, `pendms`, `pmashes`, `ratson`, `sheirut_fulfillments`, `updatedAt`
@@ -6526,7 +6568,7 @@ Fields: `action`, `and`, `createdAt`, `id`, `not`, `or`, `role`, `updatedAt`
 Fields: `and`, `createdAt`, `description`, `id`, `name`, `not`, `or`, `permissions`, `type`, `updatedAt`, `users`
 
 #### UsersPermissionsUserFiltersInput
-Fields: `acts`, `actsVali`, `and`, `api_keys`, `arr1`, `arrdate`, `askeds`, `askms`, `asks`, `askwants`, `auto_created_via`, `availability_pref`, `bio`, `blocked`, `chezin`, `city`, `confirmationToken`, `confirmed`, `createdAt`, `cuntries`, `cv_extracted_at`, `cv_extraction`, `deals`, `declined`, `declinedByP`, `declinedm`, `device_token`, `discordlink`, `email`, `fblink`, `filtertags`, `finiapruvals`, `finnished_missions`, `forum_last_seens`, `frd`, `free_person`, `githublink`, `haamadas`, `halukasend`, `halukasres`, `haskama`, `haskamac`, `haskamaz`, `hatzaas`, `hervachti`, `iGotMOneyForSheirut`, `id`, `isSigned`, `lang`, `lat`, `levManualAlready`, `lng`, `location`, `machshirs`, `mashaabims`, `mashabetahaliches`, `matanot_recipe_missions`, `matanot_recipe_resources`, `mesimabetahaliches`, `messages`, `mission_offers`, `missions_i_can_do`, `moachManualAlready`, `nego_mashes`, `negopendmissions`, `negotiations`, `negotiationsIparticipante`, `noMail`, `noMoachGuide`, `noOfHoursProject1`, `not`, `onboarding_status`, `onboarding_track`, `open_missions`, `or`, `owned_matanots`, `password`, `pendms`, `pendmsforme`, `personal_project`, `pgishas`, `pgishasPendStrat`, `pgishauserpends`, `pgishausers`, `pmashes`, `positionsAuthor`, `preferCards`, `pricing_pref`, `profilManualAlready`, `projects_1s`, `provider`, `radius`, `ratson_proposals`, `ratson_shares`, `ratsons`, `resetPasswordToken`, `rikmashes`, `rishonvesopen`, `role`, `sales`, `sales_reported`, `sheirutnegos`, `sheirutpends`, `sheiruts`, `sheiruts_iCanGetMonay`, `shekelsPerHoureProject1`, `site_share_contributions`, `skills`, `socketId`, `sphmin`, `sps`, `tafkidims`, `telegramId`, `timeForVid`, `timers`, `twiterlink`, `updatedAt`, `username`, `vallues`, `videoval`, `votes`, `wants`, `welcom_tops`, `work_ways`, `zohars`
+Fields: `acts`, `actsVali`, `and`, `api_keys`, `arr1`, `arrdate`, `askeds`, `askms`, `asks`, `askwants`, `auto_created_via`, `availability_pref`, `bio`, `blocked`, `chezin`, `city`, `confirmationToken`, `confirmed`, `createdAt`, `cuntries`, `cv_extracted_at`, `cv_extraction`, `deals`, `declined`, `declinedByP`, `declinedm`, `device_token`, `discordlink`, `email`, `fblink`, `filtertags`, `finiapruvals`, `finnished_missions`, `forum_last_seens`, `frd`, `free_person`, `githublink`, `haamadas`, `halukasend`, `halukasres`, `haskama`, `haskamac`, `haskamaz`, `hatzaas`, `hervachti`, `iGotMOneyForSheirut`, `id`, `isSigned`, `lang`, `lat`, `levManualAlready`, `lng`, `location`, `machshirs`, `mashaabims`, `mashabetahaliches`, `matanot_recipe_missions`, `matanot_recipe_resources`, `match_suggestions`, `mesimabetahaliches`, `messages`, `mission_offers`, `missions_i_can_do`, `moachManualAlready`, `nego_mashes`, `negopendmissions`, `negotiations`, `negotiationsIparticipante`, `noMail`, `noMoachGuide`, `noOfHoursProject1`, `not`, `onboarding_status`, `onboarding_track`, `open_missions`, `or`, `owned_matanots`, `password`, `pendms`, `pendmsforme`, `personal_project`, `pgishas`, `pgishasPendStrat`, `pgishauserpends`, `pgishausers`, `pmashes`, `positionsAuthor`, `preferCards`, `pricing_pref`, `profilManualAlready`, `projects_1s`, `provider`, `radius`, `ratson_proposals`, `ratson_shares`, `ratsons`, `resetPasswordToken`, `rikmashes`, `rishonvesopen`, `role`, `sales`, `sales_reported`, `sheirutnegos`, `sheirutpends`, `sheiruts`, `sheiruts_iCanGetMonay`, `shekelsPerHoureProject1`, `site_share_contributions`, `skills`, `socketId`, `sphmin`, `sps`, `tafkidims`, `telegramId`, `timeForVid`, `timers`, `twiterlink`, `updatedAt`, `username`, `vallues`, `videoval`, `votes`, `wants`, `welcom_tops`, `work_ways`, `zohars`
 
 #### VallueFiltersInput
 Fields: `and`, `createdAt`, `decisions`, `decisionsles`, `descrip`, `id`, `locale`, `localizations`, `not`, `open_missions`, `or`, `pendms`, `projects`, `publishedAt`, `ratsons`, `updatedAt`, `users`, `valueName`
@@ -6553,12 +6595,12 @@ Fields: `allSubmited`, `and`, `createdAt`, `done`, `id`, `mesimabetahalich`, `no
 
 ---
 
-## 📦 Entity Response Types (398)
+## 📦 Entity Response Types (402)
 
 Wrapper types for GraphQL responses.
 
 <details>
-<summary>Click to expand all 398 response types</summary>
+<summary>Click to expand all 402 response types</summary>
 
 - **ActEntity**: `attributes: Maybe<Act>`, `id: Maybe<Scalars['ID']['output']>`
 - **ActEntityResponse**: `data: Maybe<ActEntity>`
@@ -6729,6 +6771,10 @@ Wrapper types for GraphQL responses.
 - **MatbeaEntityResponse**: `data: Maybe<MatbeaEntity>`
 - **MatbeaEntityResponseCollection**: `data: Array<MatbeaEntity>`, `meta: ResponseCollectionMeta`
 - **MatbeaRelationResponseCollection**: `data: Array<MatbeaEntity>`
+- **MatchSuggestionEntity**: `attributes: Maybe<MatchSuggestion>`, `id: Maybe<Scalars['ID']['output']>`
+- **MatchSuggestionEntityResponse**: `data: Maybe<MatchSuggestionEntity>`
+- **MatchSuggestionEntityResponseCollection**: `data: Array<MatchSuggestionEntity>`, `meta: ResponseCollectionMeta`
+- **MatchSuggestionRelationResponseCollection**: `data: Array<MatchSuggestionEntity>`
 - **MesimabetahalichEntity**: `attributes: Maybe<Mesimabetahalich>`, `id: Maybe<Scalars['ID']['output']>`
 - **MesimabetahalichEntityResponse**: `data: Maybe<MesimabetahalichEntity>`
 - **MesimabetahalichEntityResponseCollection**: `data: Array<MesimabetahalichEntity>`, `meta: ResponseCollectionMeta`
@@ -6962,10 +7008,10 @@ Wrapper types for GraphQL responses.
 
 ---
 
-## 🔢 Enum Types (87)
+## 🔢 Enum Types (90)
 
 <details>
-<summary>Click to expand all 87 enum types</summary>
+<summary>Click to expand all 90 enum types</summary>
 
 - **Enum_Act_Hashivut**: 
 - **Enum_Argument_Authortype**: 
@@ -7005,6 +7051,9 @@ Wrapper types for GraphQL responses.
 - **Enum_Matanot_Origin**: 
 - **Enum_Matanot_Pricingmode**: 
 - **Enum_Matanot_Status_Of_Voting**: 
+- **Enum_Matchsuggestion_Kind**: 
+- **Enum_Matchsuggestion_Source**: 
+- **Enum_Matchsuggestion_Status**: 
 - **Enum_Mission_Kindof**: 
 - **Enum_Negomash_Kindof**: 
 - **Enum_Negomash_Proposedby**: 
@@ -7069,7 +7118,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 18689 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 18839 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

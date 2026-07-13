@@ -43,12 +43,16 @@
 	} = $props();
 
 	// Deep link straight to the focused vote page when we know the project + entity.
+	// pendAsk (mission assigned to a specific member) now rides an Ask entity, so
+	// its eid is the Ask id and the link goes to the ask vote page.
 	// finiappmi (mission-completion approval) has no such page → fall back to /lev.
 	const routeKind = kind === 'pendmash'
 		? 'pmash'
-		: (kind === 'pend' || kind === 'pendAsk')
-			? 'pendm'
-			: null;
+		: kind === 'pendAsk'
+			? 'ask'
+			: kind === 'pend'
+				? 'pendm'
+				: null;
 	const voteHref = pid && eid && routeKind
 		? `https://1lev1.com/moach/${pid}/votes/${routeKind}/${eid}`
 		: 'https://1lev1.com/lev';

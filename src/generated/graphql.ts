@@ -3032,6 +3032,26 @@ export enum Enum_Matanot_Status_Of_Voting {
   Voting = 'voting'
 }
 
+export enum Enum_Matchsuggestion_Kind {
+  Mission = 'mission',
+  Resource = 'resource'
+}
+
+export enum Enum_Matchsuggestion_Source {
+  Backfill = 'backfill',
+  MissionCreated = 'missionCreated',
+  ProfileUpdated = 'profileUpdated',
+  ResourceCreated = 'resourceCreated'
+}
+
+export enum Enum_Matchsuggestion_Status {
+  Applied = 'applied',
+  Dismissed = 'dismissed',
+  New = 'new',
+  Notified = 'notified',
+  Seen = 'seen'
+}
+
 export enum Enum_Mission_Kindof {
   Admin = 'admin',
   Creative = 'creative',
@@ -3988,7 +4008,7 @@ export type ForumRelationResponseCollection = {
   data: Array<ForumEntity>;
 };
 
-export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsNegom | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ConsentEvent | ContentReleasesRelease | ContentReleasesReleaseAction | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maagad | MaagadMember | MaagadOffer | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | Mesimabetahalich | Message | Mission | MissionOffer | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | OpenMashaabim | OpenMission | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pmash | Position | Project | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | Richtext | Rikmash | Sale | SealedEnvelope | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Sidur | SiteReport | SiteShareContribution | Skill | Solution | Sp | Tafkidim | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UserKey | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
+export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsNegom | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ConsentEvent | ContentReleasesRelease | ContentReleasesReleaseAction | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maagad | MaagadMember | MaagadOffer | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | MatchSuggestion | Mesimabetahalich | Message | Mission | MissionOffer | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | OpenMashaabim | OpenMission | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pmash | Position | Project | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | Richtext | Rikmash | Sale | SealedEnvelope | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Sidur | SiteReport | SiteShareContribution | Skill | Solution | Sp | Tafkidim | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UserKey | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
 
 export type Haamada = {
   __typename?: 'Haamada';
@@ -6132,6 +6152,73 @@ export type MatbeaRelationResponseCollection = {
   data: Array<MatbeaEntity>;
 };
 
+export type MatchSuggestion = {
+  __typename?: 'MatchSuggestion';
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  kind: Enum_Matchsuggestion_Kind;
+  matchedOn?: Maybe<Scalars['JSON']['output']>;
+  notifiedAt?: Maybe<Scalars['DateTime']['output']>;
+  open_mashaabim?: Maybe<OpenMashaabimEntityResponse>;
+  open_mission?: Maybe<OpenMissionEntityResponse>;
+  score?: Maybe<Scalars['Int']['output']>;
+  source?: Maybe<Enum_Matchsuggestion_Source>;
+  status?: Maybe<Enum_Matchsuggestion_Status>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  user?: Maybe<UsersPermissionsUserEntityResponse>;
+};
+
+export type MatchSuggestionEntity = {
+  __typename?: 'MatchSuggestionEntity';
+  attributes?: Maybe<MatchSuggestion>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type MatchSuggestionEntityResponse = {
+  __typename?: 'MatchSuggestionEntityResponse';
+  data?: Maybe<MatchSuggestionEntity>;
+};
+
+export type MatchSuggestionEntityResponseCollection = {
+  __typename?: 'MatchSuggestionEntityResponseCollection';
+  data: Array<MatchSuggestionEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type MatchSuggestionFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<MatchSuggestionFiltersInput>>>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  id?: InputMaybe<IdFilterInput>;
+  kind?: InputMaybe<StringFilterInput>;
+  matchedOn?: InputMaybe<JsonFilterInput>;
+  not?: InputMaybe<MatchSuggestionFiltersInput>;
+  notifiedAt?: InputMaybe<DateTimeFilterInput>;
+  open_mashaabim?: InputMaybe<OpenMashaabimFiltersInput>;
+  open_mission?: InputMaybe<OpenMissionFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<MatchSuggestionFiltersInput>>>;
+  score?: InputMaybe<IntFilterInput>;
+  source?: InputMaybe<StringFilterInput>;
+  status?: InputMaybe<StringFilterInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+  user?: InputMaybe<UsersPermissionsUserFiltersInput>;
+};
+
+export type MatchSuggestionInput = {
+  kind?: InputMaybe<Enum_Matchsuggestion_Kind>;
+  matchedOn?: InputMaybe<Scalars['JSON']['input']>;
+  notifiedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  open_mashaabim?: InputMaybe<Scalars['ID']['input']>;
+  open_mission?: InputMaybe<Scalars['ID']['input']>;
+  score?: InputMaybe<Scalars['Int']['input']>;
+  source?: InputMaybe<Enum_Matchsuggestion_Source>;
+  status?: InputMaybe<Enum_Matchsuggestion_Status>;
+  user?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type MatchSuggestionRelationResponseCollection = {
+  __typename?: 'MatchSuggestionRelationResponseCollection';
+  data: Array<MatchSuggestionEntity>;
+};
+
 export type Mesimabetahalich = {
   __typename?: 'Mesimabetahalich';
   activeTimer?: Maybe<TimerEntityResponse>;
@@ -6997,6 +7084,7 @@ export type Mutation = {
   createMatanotpend?: Maybe<MatanotpendEntityResponse>;
   createMatbea?: Maybe<MatbeaEntityResponse>;
   createMatbeaLocalization?: Maybe<MatbeaEntityResponse>;
+  createMatchSuggestion?: Maybe<MatchSuggestionEntityResponse>;
   createMesimabetahalich?: Maybe<MesimabetahalichEntityResponse>;
   createMessage?: Maybe<MessageEntityResponse>;
   createMission?: Maybe<MissionEntityResponse>;
@@ -7119,6 +7207,7 @@ export type Mutation = {
   deleteMatanotRecipeResource?: Maybe<MatanotRecipeResourceEntityResponse>;
   deleteMatanotpend?: Maybe<MatanotpendEntityResponse>;
   deleteMatbea?: Maybe<MatbeaEntityResponse>;
+  deleteMatchSuggestion?: Maybe<MatchSuggestionEntityResponse>;
   deleteMesimabetahalich?: Maybe<MesimabetahalichEntityResponse>;
   deleteMessage?: Maybe<MessageEntityResponse>;
   deleteMission?: Maybe<MissionEntityResponse>;
@@ -7235,6 +7324,7 @@ export type Mutation = {
   updateMatanotRecipeResource?: Maybe<MatanotRecipeResourceEntityResponse>;
   updateMatanotpend?: Maybe<MatanotpendEntityResponse>;
   updateMatbea?: Maybe<MatbeaEntityResponse>;
+  updateMatchSuggestion?: Maybe<MatchSuggestionEntityResponse>;
   updateMesimabetahalich?: Maybe<MesimabetahalichEntityResponse>;
   updateMessage?: Maybe<MessageEntityResponse>;
   updateMission?: Maybe<MissionEntityResponse>;
@@ -7623,6 +7713,11 @@ export type MutationCreateMatbeaLocalizationArgs = {
   data?: InputMaybe<MatbeaInput>;
   id?: InputMaybe<Scalars['ID']['input']>;
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
+};
+
+
+export type MutationCreateMatchSuggestionArgs = {
+  data: MatchSuggestionInput;
 };
 
 
@@ -8295,6 +8390,11 @@ export type MutationDeleteMatbeaArgs = {
 };
 
 
+export type MutationDeleteMatchSuggestionArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteMesimabetahalichArgs = {
   id: Scalars['ID']['input'];
 };
@@ -8922,6 +9022,12 @@ export type MutationUpdateMatbeaArgs = {
   data: MatbeaInput;
   id: Scalars['ID']['input'];
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
+};
+
+
+export type MutationUpdateMatchSuggestionArgs = {
+  data: MatchSuggestionInput;
+  id: Scalars['ID']['input'];
 };
 
 
@@ -9932,6 +10038,7 @@ export type OpenMashaabim = {
   location?: Maybe<ComponentNewLocation>;
   maap?: Maybe<MaapEntityResponse>;
   mashaabim?: Maybe<MashaabimEntityResponse>;
+  match_suggestions?: Maybe<MatchSuggestionRelationResponseCollection>;
   name?: Maybe<Scalars['String']['output']>;
   nego_mashes?: Maybe<NegoMashRelationResponseCollection>;
   partofs?: Maybe<PartofRelationResponseCollection>;
@@ -9990,6 +10097,13 @@ export type OpenMashaabimLocalizationsArgs = {
   filters?: InputMaybe<OpenMashaabimFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
   publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type OpenMashaabimMatch_SuggestionsArgs = {
+  filters?: InputMaybe<MatchSuggestionFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
@@ -10072,6 +10186,7 @@ export type OpenMashaabimFiltersInput = {
   location?: InputMaybe<ComponentNewLocationFiltersInput>;
   maap?: InputMaybe<MaapFiltersInput>;
   mashaabim?: InputMaybe<MashaabimFiltersInput>;
+  match_suggestions?: InputMaybe<MatchSuggestionFiltersInput>;
   name?: InputMaybe<StringFilterInput>;
   nego_mashes?: InputMaybe<NegoMashFiltersInput>;
   not?: InputMaybe<OpenMashaabimFiltersInput>;
@@ -10114,6 +10229,7 @@ export type OpenMashaabimInput = {
   location?: InputMaybe<ComponentNewLocationInput>;
   maap?: InputMaybe<Scalars['ID']['input']>;
   mashaabim?: InputMaybe<Scalars['ID']['input']>;
+  match_suggestions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   name?: InputMaybe<Scalars['String']['input']>;
   nego_mashes?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   partofs?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -10161,6 +10277,7 @@ export type OpenMission = {
   locale?: Maybe<Scalars['String']['output']>;
   localizations?: Maybe<OpenMissionRelationResponseCollection>;
   location?: Maybe<ComponentNewLocation>;
+  match_suggestions?: Maybe<MatchSuggestionRelationResponseCollection>;
   mesimabetahaliches?: Maybe<MesimabetahalichRelationResponseCollection>;
   mission?: Maybe<MissionEntityResponse>;
   name?: Maybe<Scalars['String']['output']>;
@@ -10217,6 +10334,13 @@ export type OpenMissionLocalizationsArgs = {
   filters?: InputMaybe<OpenMissionFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
   publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type OpenMissionMatch_SuggestionsArgs = {
+  filters?: InputMaybe<MatchSuggestionFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
@@ -10337,6 +10461,7 @@ export type OpenMissionFiltersInput = {
   locale?: InputMaybe<StringFilterInput>;
   localizations?: InputMaybe<OpenMissionFiltersInput>;
   location?: InputMaybe<ComponentNewLocationFiltersInput>;
+  match_suggestions?: InputMaybe<MatchSuggestionFiltersInput>;
   mesimabetahaliches?: InputMaybe<MesimabetahalichFiltersInput>;
   mission?: InputMaybe<MissionFiltersInput>;
   name?: InputMaybe<StringFilterInput>;
@@ -10384,6 +10509,7 @@ export type OpenMissionInput = {
   iskvua?: InputMaybe<Scalars['Boolean']['input']>;
   isshift?: InputMaybe<Scalars['Boolean']['input']>;
   location?: InputMaybe<ComponentNewLocationInput>;
+  match_suggestions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   mesimabetahaliches?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   mission?: InputMaybe<Scalars['ID']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
@@ -12280,6 +12406,8 @@ export type Query = {
   matanots?: Maybe<MatanotEntityResponseCollection>;
   matbea?: Maybe<MatbeaEntityResponse>;
   matbeas?: Maybe<MatbeaEntityResponseCollection>;
+  matchSuggestion?: Maybe<MatchSuggestionEntityResponse>;
+  matchSuggestions?: Maybe<MatchSuggestionEntityResponseCollection>;
   me?: Maybe<UsersPermissionsMe>;
   mesimabetahalich?: Maybe<MesimabetahalichEntityResponse>;
   mesimabetahaliches?: Maybe<MesimabetahalichEntityResponseCollection>;
@@ -12988,6 +13116,18 @@ export type QueryMatbeasArgs = {
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
   pagination?: InputMaybe<PaginationArg>;
   publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type QueryMatchSuggestionArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryMatchSuggestionsArgs = {
+  filters?: InputMaybe<MatchSuggestionFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
@@ -17149,6 +17289,7 @@ export type UsersPermissionsUser = {
   mashabetahaliches?: Maybe<MashabetahalichRelationResponseCollection>;
   matanot_recipe_missions?: Maybe<MatanotRecipeMissionRelationResponseCollection>;
   matanot_recipe_resources?: Maybe<MatanotRecipeResourceRelationResponseCollection>;
+  match_suggestions?: Maybe<MatchSuggestionRelationResponseCollection>;
   mesimabetahaliches?: Maybe<MesimabetahalichRelationResponseCollection>;
   messages?: Maybe<MessageRelationResponseCollection>;
   mission_offers?: Maybe<MissionOfferRelationResponseCollection>;
@@ -17430,6 +17571,13 @@ export type UsersPermissionsUserMatanot_Recipe_ResourcesArgs = {
   filters?: InputMaybe<MatanotRecipeResourceFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
   publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type UsersPermissionsUserMatch_SuggestionsArgs = {
+  filters?: InputMaybe<MatchSuggestionFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
@@ -17830,6 +17978,7 @@ export type UsersPermissionsUserFiltersInput = {
   mashabetahaliches?: InputMaybe<MashabetahalichFiltersInput>;
   matanot_recipe_missions?: InputMaybe<MatanotRecipeMissionFiltersInput>;
   matanot_recipe_resources?: InputMaybe<MatanotRecipeResourceFiltersInput>;
+  match_suggestions?: InputMaybe<MatchSuggestionFiltersInput>;
   mesimabetahaliches?: InputMaybe<MesimabetahalichFiltersInput>;
   messages?: InputMaybe<MessageFiltersInput>;
   mission_offers?: InputMaybe<MissionOfferFiltersInput>;
@@ -17956,6 +18105,7 @@ export type UsersPermissionsUserInput = {
   mashabetahaliches?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   matanot_recipe_missions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   matanot_recipe_resources?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  match_suggestions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   mesimabetahaliches?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   messages?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   mission_offers?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;

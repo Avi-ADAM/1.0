@@ -4,6 +4,32 @@ export function calcDeadlineMs(restime: string): number {
   return (RESTIME_HOURS[restime] ?? 48) * 3600000;
 }
 
+const RESTIME_LABEL: Record<string, { he: string; en: string }> = {
+  feh: { he: 'יומיים (48 שעות)', en: '48 hours' },
+  sth: { he: 'שלושה ימים (72 שעות)', en: '72 hours' },
+  nsh: { he: 'ארבעה ימים (96 שעות)', en: '96 hours' },
+  sevend: { he: 'שבוע', en: 'one week' }
+};
+
+/** Human-readable duration of the rikma's response time (restime). */
+export function restimeLabel(restime: string | null | undefined, lang: 'he' | 'en'): string {
+  return (RESTIME_LABEL[restime ?? 'feh'] ?? RESTIME_LABEL.feh)[lang];
+}
+
+/**
+ * Deep link to the focused single-entity vote page
+ * (`/moach/[projectId]/votes/[kind]/[id]`). Relative path on purpose: the
+ * socket client `goto()`s it and the service-worker resolves it against the
+ * site origin for push clicks.
+ */
+export function voteUrl(
+  projectId: string | number,
+  kind: 'pendm' | 'pmash' | 'ask' | 'askm' | 'tosplit' | 'decision',
+  id: string | number
+): string {
+  return `/moach/${projectId}/votes/${kind}/${id}`;
+}
+
 /**
  * Extract a plain relation ID from a value that may be either a scalar
  * (`"1"` / `1`) or a populated GraphQL relation (`{ data: { id } }` / `{ id }`).
