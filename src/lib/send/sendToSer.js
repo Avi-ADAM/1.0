@@ -80,9 +80,9 @@ export async function sendToSer(arg = {}, queId = "", me = 0, project = 0, isSer
       da = data
     })
     .catch((error) => {
-      console.error('Error:', error);
+      console.error('Error:', error, queId);
       throw error
     })
-  
+
   return da
 }

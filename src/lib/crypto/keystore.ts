@@ -4,7 +4,7 @@
 import { browser } from '$app/environment';
 
 const DB_NAME = 'freemates-crypto';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 export type StoreName =
   | 'identity'
@@ -15,7 +15,10 @@ export type StoreName =
   // v2 — Space sync layer (S2a): which events belong to which space, and how
   // far each space has been pulled from the relay.
   | 'spaceIndex'
-  | 'spaceCursors';
+  | 'spaceCursors'
+  // v3 — T10 compaction: per-space pruned base state (a matured quorum
+  // snapshot's normalized ProjectState replaces the pruned history).
+  | 'spaceSnapshots';
 
 let dbPromise: Promise<IDBDatabase> | null = null;
 
@@ -51,6 +54,10 @@ function openDb(): Promise<IDBDatabase> {
       if (!db.objectStoreNames.contains('spaceCursors')) {
         // rows: { spaceId, epoch, seq } — relay pull position per space
         db.createObjectStore('spaceCursors', { keyPath: 'spaceId' });
+      }
+      if (!db.objectStoreNames.contains('spaceSnapshots')) {
+        // rows: SpaceSnapshotRow (see below) — one compaction base per space
+        db.createObjectStore('spaceSnapshots', { keyPath: 'spaceId' });
       }
     };
     req.onsuccess = () => resolve(req.result);
@@ -130,6 +137,34 @@ export async function idbGetCursor(spaceId: string): Promise<SpaceCursor | undef
 
 export async function idbPutCursor(cursor: SpaceCursor): Promise<void> {
   await idbPut('spaceCursors', cursor);
+}
+
+// --- T10 compaction helpers (v3 store) ---
+
+export type SpaceSnapshotRow = {
+  spaceId: string;
+  snapshotEventId: string;
+  stateRoot: string;
+  stateV: number;
+  /** normalizeState output — restored via restoreState on hydrate */
+  state: unknown;
+  prunedAt: number;
+};
+
+export async function idbGetSpaceSnapshot(spaceId: string): Promise<SpaceSnapshotRow | undefined> {
+  return idbGet<SpaceSnapshotRow>('spaceSnapshots', spaceId);
+}
+
+export async function idbPutSpaceSnapshot(row: SpaceSnapshotRow): Promise<void> {
+  await idbPut('spaceSnapshots', row);
+}
+
+/** Remove one event from a space's index AND the shared events store.
+ * (Spaces hold disjoint subjects in practice; if an event ever belongs to
+ * two spaces, the other space re-pulls it from the relay on next sync.) */
+export async function idbSpaceUnlink(spaceId: string, eventId: string): Promise<void> {
+  await idbDelete('spaceIndex', `${spaceId}|${eventId}`);
+  await idbDelete('events', eventId);
 }
 
 export async function resetDb(): Promise<void> {

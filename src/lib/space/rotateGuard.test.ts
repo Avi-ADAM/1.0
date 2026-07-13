@@ -78,9 +78,15 @@ describe('validateEpochRotate — continuity', () => {
     expect(res).toMatchObject({ ok: false, reason: 'rotate_epoch_gap:0->5' });
   });
 
-  it('replaying an old epoch number is rejected', () => {
-    const res = validateEpochRotate(SPACE, base, rotate('r0b', 'A', 0, 30));
-    expect(res.ok).toBe(false);
+  it('T11: a same-epoch duplicate (race record) is ACCEPTED — winner is resolved by lowest id, not by arrival', () => {
+    const res = validateEpochRotate(SPACE, base, rotate('r0b', 'B', 0, 30));
+    expect(res.ok).toBe(true);
+  });
+
+  it('T11: a late-arriving rotate for an older epoch is accepted (set convergence)', () => {
+    const events = [...base, rotate('r1', 'B', 1, 20)];
+    const res = validateEpochRotate(SPACE, events, rotate('r0x', 'B', 0, 30));
+    expect(res.ok).toBe(true);
   });
 
   it('a malformed epoch is rejected', () => {

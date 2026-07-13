@@ -15,6 +15,16 @@ import { buildAndSignEvent, type SignableEvent } from './signEvent';
 
 let pubkeyPublished = false;
 
+/**
+ * Best-effort, once-per-session device-key registration with the mirror.
+ * Exported for the space-routed shadow path (shadowSign → replica.publish):
+ * the relay verifies signatures server-side against the key registry, so the
+ * key must be registered before the first push, same as the direct path.
+ */
+export async function ensurePubkeyRegistered(identity: IdentityRecord): Promise<void> {
+  return publishPubkey(identity);
+}
+
 async function publishPubkey(identity: IdentityRecord) {
   if (pubkeyPublished) return;
   if (!browser) return;

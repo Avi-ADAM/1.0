@@ -43,6 +43,10 @@ export type SnapshotMark = {
   stateRoot: string;   // the attested root
   ts: number;
   by: string;          // signer (typically quorum.reachingActor)
+  /** T10 — the full DAG frontier the snapshot covers (a DAG can have several
+   *  heads; `upTo` alone names only one). Absent on pre-T10 marks. Excluded
+   *  from the committed state root like the rest of the mark. */
+  heads?: string[];
 };
 
 /**
@@ -329,11 +333,22 @@ export function topoSort(events: ConsentEvent[]): ConsentEvent[] {
 export function applyEvent(prev: ProjectState, ev: ConsentEvent): ProjectState {
   const reducer = reducers[ev.action];
   const next = reducer ? reducer(prev, ev) : prev;
-  next.asOf = Math.max(prev.asOf, ev.ts);
+  const asOf = Math.max(prev.asOf, ev.ts);
+  // Never mutate a state object we didn't create in this call: `prev` may be
+  // a shared base (projectFrom over a restored snapshot, T10).
+  if (next === prev) return asOf === prev.asOf ? prev : { ...prev, asOf };
+  next.asOf = asOf;
   return next;
 }
 
-export function project(events: ConsentEvent[], projectId: string | null = null): ProjectState {
+/**
+ * T10 (PLAN_T10_COMPACTION) — fold `events` on top of an existing base state
+ * instead of emptyState. This is how a compacted replica resumes: base =
+ * restoreState(snapshot.state), events = the tail after the snapshot.
+ * Ordering + dedupe semantics are identical to project(); the base is never
+ * mutated.
+ */
+export function projectFrom(base: ProjectState, events: ConsentEvent[]): ProjectState {
   const ordered = topoSort(events);
   // dedupe: keep the latest-ts entry per (actor, subject, action, order)
   const byKey = new Map<string, ConsentEvent>();
@@ -344,7 +359,11 @@ export function project(events: ConsentEvent[], projectId: string | null = null)
   }
   const finalEvents = ordered.filter((e) => byKey.get(dedupeKey(e)) === e);
 
-  let state = emptyState(projectId);
+  let state = base;
   for (const e of finalEvents) state = applyEvent(state, e);
   return state;
+}
+
+export function project(events: ConsentEvent[], projectId: string | null = null): ProjectState {
+  return projectFrom(emptyState(projectId), events);
 }

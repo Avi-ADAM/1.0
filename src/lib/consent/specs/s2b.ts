@@ -61,6 +61,12 @@ export const createHalukaConsentSpec: ConsentSpec = {
   subjectIdParam: 'halukaId',
   requireConsensus: false,
   restimeFrom: 'project',
+  // createHaluka nests everything under `data` (raw GraphQL shape) — the
+  // default params.projectId derivation would miss it.
+  projectIdFromParams: (params) => {
+    const data = (params.data ?? {}) as Record<string, unknown>;
+    return data.project != null ? String(data.project) : null;
+  },
   predicateFromParams: (params) => {
     const data = (params.data ?? {}) as Record<string, unknown>;
     return {
@@ -115,9 +121,15 @@ export const s2bShadowJobs: Record<string, ShadowJobDeriver> = {
     }];
   },
 
-  completeMission: (params) => {
+  completeMission: (params, result) => {
     if (params.missionId == null) return [];
-    return [{ spec: completeMissionConsentSpec, params }];
+    // The client call site doesn't know the project; the action result does
+    // — inject it so the shadow event routes into the project's Space.
+    const projectId = str(result.projectId);
+    return [{
+      spec: completeMissionConsentSpec,
+      params: projectId ? { ...params, projectId } : params
+    }];
   },
 
   createHaluka: (params, result) => {

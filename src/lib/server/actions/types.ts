@@ -97,6 +97,15 @@ export interface ConsentSpec {
    * proposal-creation event.
    */
   parentsFromParams?: (params: Record<string, unknown>) => string[];
+
+  /**
+   * Which rikma this event belongs to — the shadow-sign path uses it to route
+   * the event into the project's Space (relay log) so the distributed replica
+   * fills up alongside the consent mirror. When omitted, the default
+   * derivation is `params.projectId ?? params.pid`. Return null for events
+   * with no project context (they stay mirror-only).
+   */
+  projectIdFromParams?: (params: Record<string, unknown>) => string | null;
 }
 
 /**

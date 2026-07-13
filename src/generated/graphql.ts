@@ -3013,6 +3013,12 @@ export enum Enum_Matanot_Kindof {
   Yearly = 'yearly'
 }
 
+export enum Enum_Matanot_Origin {
+  Personal = 'personal',
+  Project = 'project',
+  Wish = 'wish'
+}
+
 export enum Enum_Matanot_Pricingmode {
   Estimated = 'estimated',
   Fixed = 'fixed',
@@ -3299,6 +3305,12 @@ export enum Enum_Sp_Kindof {
   Rent = 'rent',
   Total = 'total',
   Yearly = 'yearly'
+}
+
+export enum Enum_Sp_Offerscope {
+  Both = 'both',
+  Customers = 'customers',
+  Rikma = 'rikma'
 }
 
 export enum Enum_Tosplit_Split_Origin {
@@ -3976,7 +3988,7 @@ export type ForumRelationResponseCollection = {
   data: Array<ForumEntity>;
 };
 
-export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsNegom | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ConsentEvent | ContentReleasesRelease | ContentReleasesReleaseAction | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maagad | MaagadMember | MaagadOffer | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | Mesimabetahalich | Message | Mission | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | OpenMashaabim | OpenMission | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pmash | Position | Project | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | Richtext | Rikmash | Sale | SealedEnvelope | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Sidur | SiteReport | SiteShareContribution | Skill | Solution | Sp | Tafkidim | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UserKey | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
+export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsNegom | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ConsentEvent | ContentReleasesRelease | ContentReleasesReleaseAction | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maagad | MaagadMember | MaagadOffer | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | Mesimabetahalich | Message | Mission | MissionOffer | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | OpenMashaabim | OpenMission | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pmash | Position | Project | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | Richtext | Rikmash | Sale | SealedEnvelope | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Sidur | SiteReport | SiteShareContribution | Skill | Solution | Sp | Tafkidim | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UserKey | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
 
 export type Haamada = {
   __typename?: 'Haamada';
@@ -5490,6 +5502,8 @@ export type Matanot = {
   name?: Maybe<Scalars['String']['output']>;
   negos?: Maybe<NegoRelationResponseCollection>;
   oneForeProject?: Maybe<Scalars['Boolean']['output']>;
+  origin?: Maybe<Enum_Matanot_Origin>;
+  owner_user?: Maybe<UsersPermissionsUserEntityResponse>;
   partofs?: Maybe<PartofRelationResponseCollection>;
   pic?: Maybe<UploadFileEntityResponse>;
   price?: Maybe<Scalars['Float']['output']>;
@@ -5508,6 +5522,7 @@ export type Matanot = {
   sheirutpends?: Maybe<SheirutpendRelationResponseCollection>;
   sheiruts?: Maybe<SheirutRelationResponseCollection>;
   source_proposals?: Maybe<RatsonRelationResponseCollection>;
+  sp?: Maybe<SpEntityResponse>;
   startDate?: Maybe<Scalars['DateTime']['output']>;
   status_of_voting?: Maybe<Enum_Matanot_Status_Of_Voting>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -5698,6 +5713,8 @@ export type MatanotFiltersInput = {
   not?: InputMaybe<MatanotFiltersInput>;
   oneForeProject?: InputMaybe<BooleanFilterInput>;
   or?: InputMaybe<Array<InputMaybe<MatanotFiltersInput>>>;
+  origin?: InputMaybe<StringFilterInput>;
+  owner_user?: InputMaybe<UsersPermissionsUserFiltersInput>;
   partofs?: InputMaybe<PartofFiltersInput>;
   price?: InputMaybe<FloatFilterInput>;
   pricingMode?: InputMaybe<StringFilterInput>;
@@ -5715,6 +5732,7 @@ export type MatanotFiltersInput = {
   sheirutpends?: InputMaybe<SheirutpendFiltersInput>;
   sheiruts?: InputMaybe<SheirutFiltersInput>;
   source_proposals?: InputMaybe<RatsonFiltersInput>;
+  sp?: InputMaybe<SpFiltersInput>;
   startDate?: InputMaybe<DateTimeFilterInput>;
   status_of_voting?: InputMaybe<StringFilterInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
@@ -5748,6 +5766,8 @@ export type MatanotInput = {
   name?: InputMaybe<Scalars['String']['input']>;
   negos?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   oneForeProject?: InputMaybe<Scalars['Boolean']['input']>;
+  origin?: InputMaybe<Enum_Matanot_Origin>;
+  owner_user?: InputMaybe<Scalars['ID']['input']>;
   partofs?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   pic?: InputMaybe<Scalars['ID']['input']>;
   price?: InputMaybe<Scalars['Float']['input']>;
@@ -5766,6 +5786,7 @@ export type MatanotInput = {
   sheirutpends?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   sheiruts?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   source_proposals?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  sp?: InputMaybe<Scalars['ID']['input']>;
   startDate?: InputMaybe<Scalars['DateTime']['input']>;
   status_of_voting?: InputMaybe<Enum_Matanot_Status_Of_Voting>;
 };
@@ -6507,6 +6528,7 @@ export type Mission = {
   matanots?: Maybe<MatanotRelationResponseCollection>;
   mesimabetahaliches?: Maybe<MesimabetahalichRelationResponseCollection>;
   missionName: Scalars['String']['output'];
+  mission_offers?: Maybe<MissionOfferRelationResponseCollection>;
   negos?: Maybe<NegoRelationResponseCollection>;
   open_missions?: Maybe<OpenMissionRelationResponseCollection>;
   pendms?: Maybe<PendmRelationResponseCollection>;
@@ -6549,6 +6571,14 @@ export type MissionMatanotsArgs = {
 
 export type MissionMesimabetahalichesArgs = {
   filters?: InputMaybe<MesimabetahalichFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type MissionMission_OffersArgs = {
+  filters?: InputMaybe<MissionOfferFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
   publicationState?: InputMaybe<PublicationState>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -6655,6 +6685,7 @@ export type MissionFiltersInput = {
   matanots?: InputMaybe<MatanotFiltersInput>;
   mesimabetahaliches?: InputMaybe<MesimabetahalichFiltersInput>;
   missionName?: InputMaybe<StringFilterInput>;
+  mission_offers?: InputMaybe<MissionOfferFiltersInput>;
   negos?: InputMaybe<NegoFiltersInput>;
   not?: InputMaybe<MissionFiltersInput>;
   open_missions?: InputMaybe<OpenMissionFiltersInput>;
@@ -6680,6 +6711,7 @@ export type MissionInput = {
   matanots?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   mesimabetahaliches?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   missionName?: InputMaybe<Scalars['String']['input']>;
+  mission_offers?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   negos?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   open_missions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   pendms?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -6692,6 +6724,85 @@ export type MissionInput = {
   usage_count?: InputMaybe<Scalars['Int']['input']>;
   users_can_do?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   work_ways?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+};
+
+export type MissionOffer = {
+  __typename?: 'MissionOffer';
+  active?: Maybe<Scalars['Boolean']['output']>;
+  archived?: Maybe<Scalars['Boolean']['output']>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  currency?: Maybe<MatbeaEntityResponse>;
+  descrip?: Maybe<Scalars['String']['output']>;
+  hours?: Maybe<Scalars['Float']['output']>;
+  location?: Maybe<ComponentNewLocation>;
+  mission?: Maybe<MissionEntityResponse>;
+  name?: Maybe<Scalars['String']['output']>;
+  note?: Maybe<Scalars['String']['output']>;
+  perhour?: Maybe<Scalars['Float']['output']>;
+  price?: Maybe<Scalars['Float']['output']>;
+  publishedAt?: Maybe<Scalars['DateTime']['output']>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  users_permissions_user?: Maybe<UsersPermissionsUserEntityResponse>;
+};
+
+export type MissionOfferEntity = {
+  __typename?: 'MissionOfferEntity';
+  attributes?: Maybe<MissionOffer>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type MissionOfferEntityResponse = {
+  __typename?: 'MissionOfferEntityResponse';
+  data?: Maybe<MissionOfferEntity>;
+};
+
+export type MissionOfferEntityResponseCollection = {
+  __typename?: 'MissionOfferEntityResponseCollection';
+  data: Array<MissionOfferEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type MissionOfferFiltersInput = {
+  active?: InputMaybe<BooleanFilterInput>;
+  and?: InputMaybe<Array<InputMaybe<MissionOfferFiltersInput>>>;
+  archived?: InputMaybe<BooleanFilterInput>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  currency?: InputMaybe<MatbeaFiltersInput>;
+  descrip?: InputMaybe<StringFilterInput>;
+  hours?: InputMaybe<FloatFilterInput>;
+  id?: InputMaybe<IdFilterInput>;
+  location?: InputMaybe<ComponentNewLocationFiltersInput>;
+  mission?: InputMaybe<MissionFiltersInput>;
+  name?: InputMaybe<StringFilterInput>;
+  not?: InputMaybe<MissionOfferFiltersInput>;
+  note?: InputMaybe<StringFilterInput>;
+  or?: InputMaybe<Array<InputMaybe<MissionOfferFiltersInput>>>;
+  perhour?: InputMaybe<FloatFilterInput>;
+  price?: InputMaybe<FloatFilterInput>;
+  publishedAt?: InputMaybe<DateTimeFilterInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+  users_permissions_user?: InputMaybe<UsersPermissionsUserFiltersInput>;
+};
+
+export type MissionOfferInput = {
+  active?: InputMaybe<Scalars['Boolean']['input']>;
+  archived?: InputMaybe<Scalars['Boolean']['input']>;
+  currency?: InputMaybe<Scalars['ID']['input']>;
+  descrip?: InputMaybe<Scalars['String']['input']>;
+  hours?: InputMaybe<Scalars['Float']['input']>;
+  location?: InputMaybe<ComponentNewLocationInput>;
+  mission?: InputMaybe<Scalars['ID']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  note?: InputMaybe<Scalars['String']['input']>;
+  perhour?: InputMaybe<Scalars['Float']['input']>;
+  price?: InputMaybe<Scalars['Float']['input']>;
+  publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  users_permissions_user?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type MissionOfferRelationResponseCollection = {
+  __typename?: 'MissionOfferRelationResponseCollection';
+  data: Array<MissionOfferEntity>;
 };
 
 export type MissionRelationResponseCollection = {
@@ -6890,6 +7001,7 @@ export type Mutation = {
   createMessage?: Maybe<MessageEntityResponse>;
   createMission?: Maybe<MissionEntityResponse>;
   createMissionLocalization?: Maybe<MissionEntityResponse>;
+  createMissionOffer?: Maybe<MissionOfferEntityResponse>;
   createMode?: Maybe<ModeEntityResponse>;
   createMonter?: Maybe<MonterEntityResponse>;
   createNego?: Maybe<NegoEntityResponse>;
@@ -7010,6 +7122,7 @@ export type Mutation = {
   deleteMesimabetahalich?: Maybe<MesimabetahalichEntityResponse>;
   deleteMessage?: Maybe<MessageEntityResponse>;
   deleteMission?: Maybe<MissionEntityResponse>;
+  deleteMissionOffer?: Maybe<MissionOfferEntityResponse>;
   deleteMode?: Maybe<ModeEntityResponse>;
   deleteMonter?: Maybe<MonterEntityResponse>;
   deleteNego?: Maybe<NegoEntityResponse>;
@@ -7125,6 +7238,7 @@ export type Mutation = {
   updateMesimabetahalich?: Maybe<MesimabetahalichEntityResponse>;
   updateMessage?: Maybe<MessageEntityResponse>;
   updateMission?: Maybe<MissionEntityResponse>;
+  updateMissionOffer?: Maybe<MissionOfferEntityResponse>;
   updateMode?: Maybe<ModeEntityResponse>;
   updateMonter?: Maybe<MonterEntityResponse>;
   updateNego?: Maybe<NegoEntityResponse>;
@@ -7532,6 +7646,11 @@ export type MutationCreateMissionLocalizationArgs = {
   data?: InputMaybe<MissionInput>;
   id?: InputMaybe<Scalars['ID']['input']>;
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
+};
+
+
+export type MutationCreateMissionOfferArgs = {
+  data: MissionOfferInput;
 };
 
 
@@ -8192,6 +8311,11 @@ export type MutationDeleteMissionArgs = {
 };
 
 
+export type MutationDeleteMissionOfferArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteModeArgs = {
   id: Scalars['ID']['input'];
 };
@@ -8817,6 +8941,12 @@ export type MutationUpdateMissionArgs = {
   data: MissionInput;
   id: Scalars['ID']['input'];
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
+};
+
+
+export type MutationUpdateMissionOfferArgs = {
+  data: MissionOfferInput;
+  id: Scalars['ID']['input'];
 };
 
 
@@ -12156,6 +12286,8 @@ export type Query = {
   message?: Maybe<MessageEntityResponse>;
   messages?: Maybe<MessageEntityResponseCollection>;
   mission?: Maybe<MissionEntityResponse>;
+  missionOffer?: Maybe<MissionOfferEntityResponse>;
+  missionOffers?: Maybe<MissionOfferEntityResponseCollection>;
   missions?: Maybe<MissionEntityResponseCollection>;
   mode?: Maybe<ModeEntityResponse>;
   modes?: Maybe<ModeEntityResponseCollection>;
@@ -12889,6 +13021,19 @@ export type QueryMessagesArgs = {
 export type QueryMissionArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
+};
+
+
+export type QueryMissionOfferArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryMissionOffersArgs = {
+  filters?: InputMaybe<MissionOfferFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
 
@@ -15699,9 +15844,11 @@ export type Sp = {
   location?: Maybe<ComponentNewLocation>;
   maaps?: Maybe<MaapRelationResponseCollection>;
   mashaabim?: Maybe<MashaabimEntityResponse>;
+  matanot?: Maybe<MatanotEntityResponse>;
   mode?: Maybe<ModeEntityResponse>;
   myp?: Maybe<Scalars['Float']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+  offerScope?: Maybe<Enum_Sp_Offerscope>;
   openask?: Maybe<OpenMashaabimEntityResponse>;
   panui?: Maybe<Scalars['Boolean']['output']>;
   pics?: Maybe<UploadFileRelationResponseCollection>;
@@ -15782,10 +15929,12 @@ export type SpFiltersInput = {
   location?: InputMaybe<ComponentNewLocationFiltersInput>;
   maaps?: InputMaybe<MaapFiltersInput>;
   mashaabim?: InputMaybe<MashaabimFiltersInput>;
+  matanot?: InputMaybe<MatanotFiltersInput>;
   mode?: InputMaybe<ModeFiltersInput>;
   myp?: InputMaybe<FloatFilterInput>;
   name?: InputMaybe<StringFilterInput>;
   not?: InputMaybe<SpFiltersInput>;
+  offerScope?: InputMaybe<StringFilterInput>;
   openask?: InputMaybe<OpenMashaabimFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<SpFiltersInput>>>;
   panui?: InputMaybe<BooleanFilterInput>;
@@ -15813,9 +15962,11 @@ export type SpInput = {
   location?: InputMaybe<ComponentNewLocationInput>;
   maaps?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   mashaabim?: InputMaybe<Scalars['ID']['input']>;
+  matanot?: InputMaybe<Scalars['ID']['input']>;
   mode?: InputMaybe<Scalars['ID']['input']>;
   myp?: InputMaybe<Scalars['Float']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  offerScope?: InputMaybe<Enum_Sp_Offerscope>;
   openask?: InputMaybe<Scalars['ID']['input']>;
   panui?: InputMaybe<Scalars['Boolean']['input']>;
   pics?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -17000,6 +17151,7 @@ export type UsersPermissionsUser = {
   matanot_recipe_resources?: Maybe<MatanotRecipeResourceRelationResponseCollection>;
   mesimabetahaliches?: Maybe<MesimabetahalichRelationResponseCollection>;
   messages?: Maybe<MessageRelationResponseCollection>;
+  mission_offers?: Maybe<MissionOfferRelationResponseCollection>;
   missions_i_can_do?: Maybe<MissionRelationResponseCollection>;
   moachManualAlready?: Maybe<Scalars['Boolean']['output']>;
   nego_mashes?: Maybe<NegoMashRelationResponseCollection>;
@@ -17012,8 +17164,10 @@ export type UsersPermissionsUser = {
   onboarding_status?: Maybe<Enum_Userspermissionsuser_Onboarding_Status>;
   onboarding_track?: Maybe<Enum_Userspermissionsuser_Onboarding_Track>;
   open_missions?: Maybe<OpenMissionRelationResponseCollection>;
+  owned_matanots?: Maybe<MatanotRelationResponseCollection>;
   pendms?: Maybe<PendmRelationResponseCollection>;
   pendmsforme?: Maybe<PendmRelationResponseCollection>;
+  personal_project?: Maybe<ProjectEntityResponse>;
   pgishas?: Maybe<PgishaRelationResponseCollection>;
   pgishasPendStrat?: Maybe<PgishaRelationResponseCollection>;
   pgishauserpends?: Maybe<PgishauserpendRelationResponseCollection>;
@@ -17296,6 +17450,14 @@ export type UsersPermissionsUserMessagesArgs = {
 };
 
 
+export type UsersPermissionsUserMission_OffersArgs = {
+  filters?: InputMaybe<MissionOfferFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
 export type UsersPermissionsUserMissions_I_Can_DoArgs = {
   filters?: InputMaybe<MissionFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
@@ -17338,6 +17500,14 @@ export type UsersPermissionsUserNegotiationsIparticipanteArgs = {
 
 export type UsersPermissionsUserOpen_MissionsArgs = {
   filters?: InputMaybe<OpenMissionFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type UsersPermissionsUserOwned_MatanotsArgs = {
+  filters?: InputMaybe<MatanotFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
   publicationState?: InputMaybe<PublicationState>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -17662,6 +17832,7 @@ export type UsersPermissionsUserFiltersInput = {
   matanot_recipe_resources?: InputMaybe<MatanotRecipeResourceFiltersInput>;
   mesimabetahaliches?: InputMaybe<MesimabetahalichFiltersInput>;
   messages?: InputMaybe<MessageFiltersInput>;
+  mission_offers?: InputMaybe<MissionOfferFiltersInput>;
   missions_i_can_do?: InputMaybe<MissionFiltersInput>;
   moachManualAlready?: InputMaybe<BooleanFilterInput>;
   nego_mashes?: InputMaybe<NegoMashFiltersInput>;
@@ -17676,9 +17847,11 @@ export type UsersPermissionsUserFiltersInput = {
   onboarding_track?: InputMaybe<StringFilterInput>;
   open_missions?: InputMaybe<OpenMissionFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<UsersPermissionsUserFiltersInput>>>;
+  owned_matanots?: InputMaybe<MatanotFiltersInput>;
   password?: InputMaybe<StringFilterInput>;
   pendms?: InputMaybe<PendmFiltersInput>;
   pendmsforme?: InputMaybe<PendmFiltersInput>;
+  personal_project?: InputMaybe<ProjectFiltersInput>;
   pgishas?: InputMaybe<PgishaFiltersInput>;
   pgishasPendStrat?: InputMaybe<PgishaFiltersInput>;
   pgishauserpends?: InputMaybe<PgishauserpendFiltersInput>;
@@ -17785,6 +17958,7 @@ export type UsersPermissionsUserInput = {
   matanot_recipe_resources?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   mesimabetahaliches?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   messages?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  mission_offers?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   missions_i_can_do?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   moachManualAlready?: InputMaybe<Scalars['Boolean']['input']>;
   nego_mashes?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -17797,9 +17971,11 @@ export type UsersPermissionsUserInput = {
   onboarding_status?: InputMaybe<Enum_Userspermissionsuser_Onboarding_Status>;
   onboarding_track?: InputMaybe<Enum_Userspermissionsuser_Onboarding_Track>;
   open_missions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  owned_matanots?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   password?: InputMaybe<Scalars['String']['input']>;
   pendms?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   pendmsforme?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  personal_project?: InputMaybe<Scalars['ID']['input']>;
   pgishas?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   pgishasPendStrat?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   pgishauserpends?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;

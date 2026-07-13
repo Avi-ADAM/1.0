@@ -91,6 +91,64 @@ export function epochStateFromEvents(events: Iterable<ConsentEvent>): EpochState
 }
 
 /**
+ * T11 — ALL rotate events per epoch, winner first (lowest event id), the
+ * rest in the same deterministic order. Sealing always uses candidates[0]
+ * (the winner); OPENING tries every candidate, so events sealed under a
+ * losing key during a rotate race stay readable to the whole group forever —
+ * the losing rotate event carries its own wraps, exactly like the winner's.
+ */
+export function epochCandidates(
+  events: Iterable<ConsentEvent>
+): Map<number, ConsentEvent[]> {
+  const byEpoch = new Map<number, ConsentEvent[]>();
+  for (const ev of events) {
+    if (!isEpochRotateEvent(ev)) continue;
+    const n = (ev.predicate as unknown as EpochRotatePredicate).epoch;
+    const arr = byEpoch.get(n) ?? [];
+    if (!arr.some((e) => e.id === ev.id)) arr.push(ev);
+    byEpoch.set(n, arr);
+  }
+  for (const arr of byEpoch.values()) arr.sort((a, b) => a.id.localeCompare(b.id));
+  return byEpoch;
+}
+
+/** T11 — the rotate races present in the event set (epochs with >1 candidate). */
+export type RotateRace = { epoch: number; winnerId: string; loserIds: string[] };
+
+export function detectRotateRaces(events: Iterable<ConsentEvent>): RotateRace[] {
+  const races: RotateRace[] = [];
+  for (const [epoch, candidates] of epochCandidates(events)) {
+    if (candidates.length < 2) continue;
+    races.push({
+      epoch,
+      winnerId: candidates[0].id,
+      loserIds: candidates.slice(1).map((e) => e.id)
+    });
+  }
+  return races.sort((a, b) => a.epoch - b.epoch);
+}
+
+/**
+ * T11 — every epoch key THIS device can recover for `epoch`, winner first.
+ * Readers try them in order: the winner opens post-race traffic, the losers
+ * open whatever was sealed in the race window. Sealing must use index 0 only.
+ */
+export async function epochKeysForOpen(
+  events: Iterable<ConsentEvent>,
+  epoch: number,
+  myDevice: string,
+  myKemPrivateKey: CryptoKey
+): Promise<Uint8Array[]> {
+  const candidates = epochCandidates(events).get(epoch) ?? [];
+  const keys: Uint8Array[] = [];
+  for (const c of candidates) {
+    const k = await unwrapEpochKey(c, myDevice, myKemPrivateKey);
+    if (k) keys.push(k);
+  }
+  return keys;
+}
+
+/**
  * Recover this device's copy of an epoch key from the rotate event.
  * Null when this device wasn't a recipient (removed member, or joined later
  * under a newer epoch) — callers treat that as "cannot read this epoch".

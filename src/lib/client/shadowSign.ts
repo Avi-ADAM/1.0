@@ -69,6 +69,23 @@ export function deriveConsentEventFromAction(
   };
 }
 
+/**
+ * Pure derivation: which rikma does this shadow event belong to?
+ * Specs may declare `projectIdFromParams`; the fallback covers the common
+ * call-site convention (`params.projectId`, or `params.pid` on older actions).
+ * Null = no project context — the event stays on the mirror-only path.
+ */
+export function deriveProjectIdFromAction(
+  spec: ConsentSpec,
+  params: Record<string, unknown>
+): string | null {
+  const raw = spec.projectIdFromParams
+    ? spec.projectIdFromParams(params)
+    : (params.projectId ?? params.pid);
+  if (raw === undefined || raw === null || raw === '') return null;
+  return String(raw);
+}
+
 export type ShadowSignResult =
   | { ok: true; event: ConsentEvent; reason?: undefined }
   | { ok: false; reason: string };
@@ -121,6 +138,23 @@ export async function signActionShadow(
   }
   if (template === null) return { ok: false, reason: 'skipped' };
 
+  // Space-routed path (the distributed backup, HANDOFF T2↔T4 bridge): when
+  // the event has a project context and the space layer is enabled, publish
+  // it into the project's Space instead of POSTing the mirror directly —
+  // relayAppend write-throughs to consentStore, so one pipe feeds both
+  // stores, and the T1 socket wakes every subscribed replica.
+  const projectId = deriveProjectIdFromAction(spec, params);
+  if (projectId) {
+    try {
+      const { spaceSyncEnabled } = await import('$lib/space/spaceStore.svelte');
+      if (spaceSyncEnabled()) {
+        return await publishViaSpace(userId, projectId, template);
+      }
+    } catch (e) {
+      console.warn('[shadow-sign] space route unavailable, using mirror path', e);
+    }
+  }
+
   try {
     const { signAndPublish } = await import('$lib/consent/publish');
     const res = await signAndPublish(userId, {
@@ -135,4 +169,55 @@ export async function signActionShadow(
   } catch (e) {
     return { ok: false, reason: 'sign_threw: ' + (e as Error).message };
   }
+}
+
+/**
+ * Sign + apply locally + push into the project's Space (relay log).
+ *
+ * Local-first: replica.publish persists the signed event to IDB and the
+ * space index BEFORE the network push, so a failed push is never data loss —
+ * the next sync()'s computeDiff re-offers it to the relay.
+ *
+ * An E2E space (state.epoch >= 0) routes through publishSealed — plaintext
+ * must never leave the device there (HANDOFF invariant 5); falling back to
+ * the plaintext mirror POST would be a privacy leak, so a sealed failure is
+ * reported as-is rather than "recovered".
+ */
+async function publishViaSpace(
+  userId: string,
+  projectId: string,
+  template: SignableConsentEvent
+): Promise<ShadowSignResult> {
+  const [{ openSpace }, { spaceIdForProject }, { ensureIdentity }, { ensurePubkeyRegistered }] =
+    await Promise.all([
+      import('$lib/space/spaceStore.svelte'),
+      import('$lib/space/protocol'),
+      import('$lib/crypto/identity'),
+      import('$lib/consent/publish')
+    ]);
+
+  // The relay verifies signatures server-side against the key registry —
+  // the device key must be registered before its first push.
+  const identity = await ensureIdentity(userId);
+  await ensurePubkeyRegistered(identity);
+
+  const replica = openSpace(spaceIdForProject(projectId));
+  await replica.hydrate();
+
+  const partial = {
+    action: template.action,
+    subject: template.subject,
+    predicate: template.predicate,
+    // Spec-declared parents win; otherwise undefined lets replica.publish
+    // link to the current local heads, keeping the space a connected DAG.
+    parents: template.parents && template.parents.length > 0 ? template.parents : undefined
+  };
+
+  const res =
+    replica.state.epoch >= 0
+      ? await replica.publishSealed(userId, partial)
+      : await replica.publish(userId, partial);
+
+  if (!res.ok) return { ok: false, reason: 'space_publish:' + (res.reason ?? 'unknown') };
+  return { ok: true, event: res.event };
 }

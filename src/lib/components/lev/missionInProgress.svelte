@@ -425,21 +425,15 @@
     }
 
     // --- 2) call the unified server action ---
+    // executeAction (not a raw fetch) so the S2b shadow-sign registry fires:
+    // mission.complete gets signed and routed into the project's Space.
     try {
-      const res = await fetch('/api/action', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          actionKey: 'completeMission',
-          params: {
-            missionId: String(mId),
-            why: why ?? '',
-            what: newwhat ? String(newwhat) : undefined,
-            hoursdon: hoursdon
-          }
-        })
-      });
-      const result = await res.json();
+      const result = await executeAction('completeMission', {
+        missionId: String(mId),
+        why: why ?? '',
+        what: newwhat ? String(newwhat) : undefined,
+        hoursdon: hoursdon
+      }, { showErrorToast: false }); // the dialog shows its own error (error1)
       console.log('completeMission action result', result);
 
       if (!result.success) {

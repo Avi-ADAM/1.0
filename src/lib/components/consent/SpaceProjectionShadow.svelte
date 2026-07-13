@@ -20,6 +20,7 @@
   import { browser } from '$app/environment';
   import { openSpace, startAutoSync, spaceSyncEnabled } from '$lib/space/spaceStore.svelte';
   import { spaceIdForProject } from '$lib/space/protocol';
+  import { proposeGenesis, voteGenesis, genesisStatus } from '$lib/space/genesis';
   import ConsentBadge from './ConsentBadge.svelte';
 
   type GqlUserRow = { id: string | number; attributes?: { hervachti?: number | null } };
@@ -96,6 +97,48 @@
         ? 'ה-projection המקומי תואם את נתוני השרת'
         : 'אי-התאמה בין ה-projection לנתוני השרת'
   );
+
+  // ---- T6: genesis migration controls ----------------------------------
+  // The current user, same convention as shadowSignFromCookie.
+  const myId = browser
+    ? document.cookie.split('; ').find((r) => r.startsWith('id='))?.split('=')[1] ?? null
+    : null;
+
+  const genesis = $derived(projection ? genesisStatus(projection) : null);
+  const canPropose = $derived(
+    Boolean(replica && projection && !genesis && myId && users.length > 0)
+  );
+  const canVote = $derived(
+    Boolean(
+      genesis && myId && !genesis.matured &&
+      projection?.members.has(myId) && !genesis.approvals.includes(myId)
+    )
+  );
+
+  let genesisBusy = $state(false);
+  let genesisMsg = $state('');
+
+  async function onPropose() {
+    if (!replica || !myId || genesisBusy) return;
+    genesisBusy = true;
+    genesisMsg = '';
+    const res = await proposeGenesis(replica, myId, projectId);
+    if (!res.ok) genesisMsg = 'ההצעה נכשלה: ' + (res.reason ?? '');
+    genesisBusy = false;
+  }
+
+  async function onVote() {
+    if (!replica || !myId || !genesis || genesisBusy) return;
+    genesisBusy = true;
+    genesisMsg = '';
+    const res = await voteGenesis(replica, myId, genesis.eventId, true);
+    if (!res.ok) genesisMsg = 'החתימה נכשלה: ' + (res.reason ?? '');
+    else if (res.diffs && res.diffs.length > 0) {
+      // Advisory: the balances moved since the proposal was signed.
+      genesisMsg = 'נחתם; שים לב — סטייה מהייצוא הנוכחי: ' + res.diffs.join(' · ');
+    }
+    genesisBusy = false;
+  }
 </script>
 
 {#if replica && projection}
@@ -119,5 +162,41 @@
         {/each}
       </ul>
     {/if}
+
+    <!-- T6: genesis migration — import the project's present (members +
+         balances) from Strapi as a quorum-signed opening snapshot. -->
+    <div class="mt-3 flex flex-wrap items-center gap-3 border-t border-dashed border-zinc-300 pt-3 text-xs dark:border-zinc-600">
+      {#if canPropose}
+        <button
+          class="rounded-lg bg-zinc-700 px-3 py-1.5 font-semibold text-white hover:bg-zinc-600 disabled:opacity-50 dark:bg-zinc-200 dark:text-zinc-900"
+          disabled={genesisBusy}
+          onclick={onPropose}
+        >
+          ייסוד (Genesis): חתום על מצב הפתיחה מ-Strapi
+        </button>
+        <span class="text-zinc-500 dark:text-zinc-400">
+          מייבא חברים ויתרות כ-snapshot חתום — ההורה הראשון של השרשרת
+        </span>
+      {:else if genesis}
+        <span class="font-semibold text-zinc-700 dark:text-zinc-200">
+          {genesis.matured ? 'ייסוד אושר ✓' : 'ייסוד ממתין לחתימות'}
+        </span>
+        <span class="text-zinc-500 dark:text-zinc-400">
+          {genesis.approvals.length}/{genesis.membersTotal} חתמו
+        </span>
+        {#if canVote}
+          <button
+            class="rounded-lg bg-emerald-700 px-3 py-1.5 font-semibold text-white hover:bg-emerald-600 disabled:opacity-50"
+            disabled={genesisBusy}
+            onclick={onVote}
+          >
+            אמת וחתום על מצב הפתיחה
+          </button>
+        {/if}
+      {/if}
+      {#if genesisMsg}
+        <span class="text-amber-600 dark:text-amber-400">{genesisMsg}</span>
+      {/if}
+    </div>
   </section>
 {/if}

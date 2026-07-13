@@ -12364,7 +12364,7 @@ export const qids = {
           pagination: { limit: 200 }
         ) { data { id } }
         mesimabetahaliches(
-          filters: { finnished: { ne: true }, archived: { ne: true } }
+          filters: { finnished: { ne: true }, forappruval: { ne: true } }
           pagination: { limit: 200 }
         ) { data { id } }
         finnished_missions(pagination: { limit: 500 }) { data { id } }
@@ -12401,7 +12401,7 @@ export const qids = {
     usersPermissionsUser(id: $uid) {
       data { id attributes {
         mesimabetahaliches(
-          filters: { finnished: { ne: true }, archived: { ne: true } }
+          filters: { finnished: { ne: true }, forappruval: { ne: true } }
           pagination: { limit: 100 }
         ) {
           data { id attributes {

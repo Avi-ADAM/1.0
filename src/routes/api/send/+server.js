@@ -36,10 +36,10 @@ function getServiceToken(isConsensusQid) {
 // ── Consensus qid registry ─────────────────────────────────────────────────
 /** qids that belong to the consensus feature */
 const CONSENSUS_QIDS = new Set([
-  '39GetNegotiation', '40CreateNegotiation', '41CreatePosition', '42UpdatePosition',
-  'GetNegotiationByToken', 'ListLocalNegotiations',
-  'ListArguments', 'CreateArgument', 'UpdateArgument', 'ListPlaces',
-  'ListIssues', 'ListClauses', 'CreateIssue', 'CreateClause', 'UpdateClause'
+	'39GetNegotiation', '40CreateNegotiation', '41CreatePosition', '42UpdatePosition',
+	'GetNegotiationByToken', 'ListLocalNegotiations',
+	'ListArguments', 'CreateArgument', 'UpdateArgument', 'ListPlaces',
+	'ListIssues', 'ListClauses', 'CreateIssue', 'CreateClause', 'UpdateClause'
 ]);
 
 /** qids where server injects __identity → author fields before sending to Strapi */
@@ -88,9 +88,9 @@ export async function POST({ request, cookies }) {
 	// `isSer` grants the service/admin token, so it is honoured only when the
 	// request carries the internal secret (injected by handleFetch for genuine
 	// server-side calls). A client cannot forge it.
-	const isSer          = (data.isSer === true) && isInternalRequest(request);
-	const idL            = cookies.get('id');
-	const un             = cookies.get('un');   // username — used as voter-id for JWT path
+	const isSer = (data.isSer === true) && isInternalRequest(request);
+	const idL = cookies.get('id');
+	const un = cookies.get('un');   // username — used as voter-id for JWT path
 	const isConsensusQid = queId && CONSENSUS_QIDS.has(queId);
 
 	// ── Security: validate consensus proxy secret for service calls ──────────
@@ -123,7 +123,7 @@ export async function POST({ request, cookies }) {
 
 	// ── Extract __identity before building variables ─────────────────────────
 	const keyValueObject = data.data?.arg || {};
-	const identity       = keyValueObject.__identity ?? null;
+	const identity = keyValueObject.__identity ?? null;
 
 	// ── Build GraphQL variables (strip __identity and resolve idL) ───────────
 	let variablesObject = {};
@@ -136,10 +136,10 @@ export async function POST({ request, cookies }) {
 	// ── Inject identity fields for author-creation qids ─────────────────────
 	// Server uses __identity as the authoritative source — never trust client-sent author fields.
 	if (isSer && identity && IDENTITY_INJECT_QIDS.has(queId)) {
-		if (identity.email)      variablesObject.authorEmail      = identity.email;
+		if (identity.email) variablesObject.authorEmail = identity.email;
 		if (identity.externalId) variablesObject.authorExternalId = identity.externalId;
-		if (identity.type)       variablesObject.authorType       = identity.type;
-		if (identity.name)       variablesObject.authorName       = identity.name;
+		if (identity.type) variablesObject.authorType = identity.type;
+		if (identity.name) variablesObject.authorName = identity.name;
 	}
 
 	const bearer1 = 'Bearer ' + jw;
@@ -188,7 +188,7 @@ export async function POST({ request, cookies }) {
 
 		// Step 3 — Write updated voters + votes
 		const newVoters = [...currentVoters, voterId];
-		const newVotes  = (attrs.votes || 0) + 1;
+		const newVotes = (attrs.votes || 0) + 1;
 
 		const updateMutation = isPosition
 			? `mutation VotePosition($id: ID!, $voters: JSON, $votes: Int) { updatePosition(id: $id, data: { voters: $voters, votes: $votes }) { data { id attributes { votes voters } } } }`
@@ -252,7 +252,7 @@ export async function POST({ request, cookies }) {
 
 	// ── Standard GraphQL fetch ───────────────────────────────────────────────
 	const controller = new AbortController();
-	const timeoutId  = setTimeout(() => controller.abort(), 30000);
+	const timeoutId = setTimeout(() => controller.abort(), 30000);
 
 	try {
 		const res = await fetch(ep, {
@@ -285,7 +285,7 @@ export async function POST({ request, cookies }) {
 		}
 
 		if (newd.errors) {
-			console.error('GraphQL Errors from downstream:', JSON.stringify(newd.errors, null, 2));
+			console.error(`[${queId}] GraphQL Errors from downstream:`, JSON.stringify(newd.errors, null, 2));
 			const authError = newd.errors.find(err =>
 				err.message === 'Invalid token.' ||
 				err.extensions?.code === 'UNAUTHENTICATED' ||
@@ -323,13 +323,13 @@ export async function POST({ request, cookies }) {
 /*
 ללוגין
 export async function post({ request, cookies }) {
-    // ... your code
+	// ... your code
 
-    return {
-        headers: {
-            'set-cookie': `yourCookieName=${yourCookieValue}; path=/; HttpOnly; max-age=31536000`,
-        },
-        // ... your code
-    };
+	return {
+		headers: {
+			'set-cookie': `yourCookieName=${yourCookieValue}; path=/; HttpOnly; max-age=31536000`,
+		},
+		// ... your code
+	};
 }
 */

@@ -54,5 +54,8 @@ export const reducers: Record<string, Reducer> = {
   'pgisha.create':        meetingCreate,
   'pgisha.approve':       meetingApprove,
   'snapshot.commit':      snapshotCommit,
+  // T10: snapshot maturation rides the generic stage tally (unanimity) and
+  // the rounds machinery (consensus.timeout for silence-is-consent).
+  'snapshot.vote':        stageVote,
   'sale.record':          saleRecord
 };

@@ -4,9 +4,14 @@
 // tests and shadow mode, a known security hole before real use. This guard
 // closes it deterministically, from the data alone (invariant 7):
 //
-//   1. Continuity: the rotate's epoch must be exactly current+1 (no skips).
-//      A parallel duplicate of the CURRENT epoch is left to the deterministic
-//      lowest-event-id race rule (§1 of the handoff / T11), not rejected here.
+//   1. Continuity: the rotate may not SKIP forward (epoch > current+1).
+//      Same-or-older epochs are accepted on purpose (T11): two concurrent
+//      rotates for one epoch are a legitimate race — both must land in every
+//      replica so the lowest-event-id winner rule (epochStateFromEvents)
+//      resolves identically everywhere, and so the LOSER's wraps remain
+//      available to decrypt events sealed in the race window. Rejecting the
+//      second arrival would make the accepted set depend on arrival order —
+//      exactly what invariant 7 forbids.
 //   2. Membership: for a `project:<id>` space, the actor must be an active
 //      member per the projection at that moment (project.join without a
 //      subsequent project.leave). Epoch 0 on a space whose projection has no
@@ -39,7 +44,8 @@ export function validateEpochRotate(
 
   const events = [...existing];
 
-  // 1. Continuity — epoch must be current+1.
+  // 1. Continuity — no forward skips. Same/older epochs pass: race records
+  //    (T11) must converge in every replica regardless of arrival order.
   const next = (ev.predicate as unknown as EpochRotatePredicate | undefined)?.epoch;
   if (typeof next !== 'number' || !Number.isInteger(next) || next < 0) {
     return { ok: false, reason: 'rotate_bad_epoch' };
@@ -50,7 +56,7 @@ export function validateEpochRotate(
     const n = (e.predicate as unknown as EpochRotatePredicate).epoch;
     if (n > current) current = n;
   }
-  if (next !== current + 1) {
+  if (next > current + 1) {
     return { ok: false, reason: `rotate_epoch_gap:${current}->${next}` };
   }
 

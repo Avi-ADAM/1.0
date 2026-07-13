@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { deriveConsentEventFromAction, shadowSignFromCookie } from './shadowSign';
+import {
+  deriveConsentEventFromAction,
+  deriveProjectIdFromAction,
+  shadowSignFromCookie
+} from './shadowSign';
 import type { ConsentSpec } from '$lib/server/actions/types';
 
 const tosplitVoteSpec: ConsentSpec = {
@@ -251,5 +255,55 @@ describe('shadowSignFromCookie — convenience for call sites', () => {
     };
     const res = await shadowSignFromCookie(spec, { other: 'x' });
     expect(res.ok).toBe(false);
+  });
+});
+
+describe('deriveProjectIdFromAction — space routing (T2↔T4 bridge)', () => {
+  it('defaults to params.projectId', () => {
+    expect(deriveProjectIdFromAction(tosplitVoteSpec, { projectId: '54' })).toBe('54');
+  });
+
+  it('falls back to params.pid', () => {
+    expect(deriveProjectIdFromAction(tosplitVoteSpec, { pid: 54 })).toBe('54');
+  });
+
+  it('prefers projectId over pid and coerces to string', () => {
+    expect(deriveProjectIdFromAction(tosplitVoteSpec, { projectId: 7, pid: 9 })).toBe('7');
+  });
+
+  it('returns null when no project context exists (mirror-only path)', () => {
+    expect(deriveProjectIdFromAction(tosplitVoteSpec, { id: 'x' })).toBeNull();
+    expect(deriveProjectIdFromAction(tosplitVoteSpec, { projectId: null })).toBeNull();
+    expect(deriveProjectIdFromAction(tosplitVoteSpec, { projectId: '' })).toBeNull();
+  });
+
+  it('honors a spec-level projectIdFromParams override', () => {
+    const spec: ConsentSpec = {
+      ...tosplitVoteSpec,
+      projectIdFromParams: (p) => {
+        const data = (p.data ?? {}) as Record<string, unknown>;
+        return data.project != null ? String(data.project) : null;
+      }
+    };
+    expect(deriveProjectIdFromAction(spec, { data: { project: 54 } })).toBe('54');
+    expect(deriveProjectIdFromAction(spec, { data: {} })).toBeNull();
+    // The override wins even when a top-level projectId is present.
+    expect(deriveProjectIdFromAction(spec, { projectId: '9', data: { project: 54 } })).toBe('54');
+  });
+
+  it('createHalukaConsentSpec derives the project from nested data.project', async () => {
+    const { createHalukaConsentSpec } = await import('$lib/consent/specs/s2b');
+    const params = { halukaId: 'h-1', data: { project: 54, usersend: 1, userrecive: 2 } };
+    expect(deriveProjectIdFromAction(createHalukaConsentSpec, params)).toBe('54');
+  });
+
+  it('completeMission shadow job injects projectId from the action result', async () => {
+    const { s2bShadowJobs } = await import('$lib/consent/specs/s2b');
+    const jobs = s2bShadowJobs.completeMission(
+      { missionId: 'm-1', hoursdon: 3 },
+      { missionId: 'm-1', projectId: 54 }
+    );
+    expect(jobs).toHaveLength(1);
+    expect(deriveProjectIdFromAction(jobs[0].spec, jobs[0].params)).toBe('54');
   });
 });

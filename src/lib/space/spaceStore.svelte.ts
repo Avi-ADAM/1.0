@@ -33,12 +33,24 @@ import {
   idbSpaceLink,
   idbSpaceEventIds,
   idbGetCursor,
-  idbPutCursor
+  idbPutCursor,
+  idbGetSpaceSnapshot,
+  idbPutSpaceSnapshot,
+  idbSpaceUnlink
 } from '$lib/crypto/keystore';
 import { ensureIdentity, loadIdentity } from '$lib/crypto/identity';
 import { verifySignedObject } from '$lib/crypto/verify';
 import { ingestEvent } from '$lib/consent/ingest';
-import { project, type ProjectState } from '$lib/consent/projection';
+import { projectFrom, emptyState, type ProjectState } from '$lib/consent/projection';
+import { restoreState } from '$lib/consent/stateRestore';
+import {
+  buildSnapshotPredicate,
+  isSnapshotMatured,
+  computePrunableIds,
+  PRUNE_SAFETY_MS,
+  type SnapshotPredicate
+} from './compaction';
+import { projectIdOfSpace } from './rotateGuard';
 import { buildAndSignEvent, type SignableEvent } from '$lib/consent/signEvent';
 import { ACTIONS, type ConsentEvent } from '$lib/consent/event';
 import { computeHeads, computeDiff, sameHeads, isValidSpaceId } from './protocol';
@@ -46,13 +58,15 @@ import { pullEvents, pullHeads, pushEvents, pushSealed } from './relayClient';
 import { resolvePeerKey } from './peerKeys';
 import { ensureKemKeypair } from './e2e/kem';
 import {
-  epochStateFromEvents,
+  epochCandidates,
   unwrapEpochKey,
+  detectRotateRaces,
   generateEpochKeyRaw,
   buildEpochPredicate,
   isEpochRotateEvent,
   type EpochRecipient,
-  type EpochRotatePredicate
+  type EpochRotatePredicate,
+  type RotateRace
 } from './e2e/epoch';
 import { sealEvent, openSealed, type SealedEnvelope } from './e2e/seal';
 import { validateEpochRotate } from './rotateGuard';
@@ -96,8 +110,14 @@ export function createSpaceReplica(spaceId: string) {
 
   let hydratePromise: Promise<void> | null = null;
   let syncInFlight: Promise<boolean> | null = null;
-  // raw epoch keys, memory only — never persisted (re-derived after reload)
-  const epochKeysRaw = new Map<number, Uint8Array>();
+  // raw epoch keys, memory only — never persisted (re-derived after reload).
+  // T11: keyed by ROTATE EVENT ID, not by epoch number — a raced epoch has
+  // several candidate keys and every readable one must stay reachable.
+  const keysByRotateId = new Map<string, Uint8Array>();
+  // T10 — compaction base: the restored state of the latest pruned snapshot.
+  // Events in eventsById are the TAIL on top of this base. Null = no
+  // compaction happened yet (project from emptyState, the pre-T10 behavior).
+  let baseState: ProjectState | null = null;
 
   function addToState(ev: ConsentEvent) {
     if (state.eventsById.has(ev.id)) return;
@@ -114,23 +134,29 @@ export function createSpaceReplica(spaceId: string) {
     return state.epoch >= 0;
   }
 
-  /**
-   * Raw key for an epoch: memory cache, else unwrap from the rotate event
-   * with this device's KEM private key. Null = this device can't read the
-   * epoch (removed member / joined under a later epoch / keys not synced).
-   */
-  async function ensureEpochKeyRaw(epoch: number): Promise<Uint8Array | null> {
-    const cached = epochKeysRaw.get(epoch);
+  /** Unwrap (with per-rotate-event cache) the key one rotate event carries. */
+  async function keyForRotate(rotateEv: ConsentEvent): Promise<Uint8Array | null> {
+    const cached = keysByRotateId.get(rotateEv.id);
     if (cached) return cached;
-    const es = epochStateFromEvents(state.eventsById.values());
-    const rotate = es.byEpoch.get(epoch);
-    if (!rotate) return null;
     const identity = await loadIdentity();
     if (!identity) return null;
     const kem = await ensureKemKeypair();
-    const raw = await unwrapEpochKey(rotate, identity.devicePubB64, kem.privateKey);
-    if (raw) epochKeysRaw.set(epoch, raw);
+    const raw = await unwrapEpochKey(rotateEv, identity.devicePubB64, kem.privateKey);
+    if (raw) keysByRotateId.set(rotateEv.id, raw);
     return raw;
+  }
+
+  /**
+   * The WINNER key for an epoch — the only key sealing may use (T11: both
+   * race sides converge on the lowest-event-id winner, so future traffic is
+   * single-keyed). Null = this device can't read the epoch (removed member /
+   * joined under a later epoch / keys not synced / lost the race AND was
+   * excluded from the winner's wraps — see needsReRotate).
+   */
+  async function ensureEpochKeyRaw(epoch: number): Promise<Uint8Array | null> {
+    const winner = (epochCandidates(state.eventsById.values()).get(epoch) ?? [])[0];
+    if (!winner) return null;
+    return keyForRotate(winner);
   }
 
   /** Instant local load — the fast path. Safe to call repeatedly. */
@@ -140,6 +166,15 @@ export function createSpaceReplica(spaceId: string) {
     hydratePromise = (async () => {
       state.status = 'hydrating';
       try {
+        // T10: a compacted space restores its base state first — the events
+        // below are just the tail on top of it.
+        const snapRow = await idbGetSpaceSnapshot(spaceId);
+        if (snapRow) {
+          const restored = restoreState(snapRow.state);
+          if (restored.ok) baseState = restored.state;
+          // restore failure (e.g. version skew) degrades to tail-only —
+          // the next sync full-pulls and the projection self-heals.
+        }
         const ids = await idbSpaceEventIds(spaceId);
         for (const id of ids) {
           if (state.eventsById.has(id)) continue;
@@ -236,14 +271,24 @@ export function createSpaceReplica(spaceId: string) {
     return syncInFlight;
   }
 
-  /** Outer-verify + decrypt one sealed envelope. Null when unreadable. */
+  /**
+   * Outer-verify + decrypt one sealed envelope. Null when unreadable.
+   * T11: tries EVERY candidate key for the envelope's epoch (winner first) —
+   * an envelope sealed under a losing rotate's key during a race window
+   * stays readable to everyone, because the losing rotate event still
+   * carries its own wraps.
+   */
   async function openSealedEnvelope(env: SealedEnvelope): Promise<ConsentEvent | null> {
     if (env.spaceId !== spaceId) return null;
     const outer = await verifySignedObject(env, resolvePeerKey);
     if (!outer.ok) return null;
-    const raw = await ensureEpochKeyRaw(env.epoch);
-    if (!raw) return null;
-    return openSealed(env, raw);
+    for (const rotateEv of epochCandidates(state.eventsById.values()).get(env.epoch) ?? []) {
+      const raw = await keyForRotate(rotateEv);
+      if (!raw) continue;
+      const opened = await openSealed(env, raw);
+      if (opened) return opened;
+    }
+    return null;
   }
 
   /**
@@ -332,16 +377,41 @@ export function createSpaceReplica(spaceId: string) {
     const nextEpoch = state.epoch + 1;
     const rawKey = generateEpochKeyRaw();
     const predicate = await buildEpochPredicate(nextEpoch, reason, rawKey, recipients);
-    // Cache before shipping: the rotate event is applied locally even when
-    // the network push fails, and local sealed publishes need this key.
-    epochKeysRaw.set(nextEpoch, rawKey);
     const res = await publish(userId, {
       action: ACTIONS.epochRotate,
       subject: { type: 'space', id: spaceId },
       predicate: predicate as unknown as Record<string, unknown>
     });
+    // Cache under the rotate EVENT id (T11) — the event exists even when the
+    // network push failed (applied locally first), and local sealed publishes
+    // need this key without a KEM round-trip.
+    keysByRotateId.set(res.event.id, rawKey);
     // addToState (inside publish) already bumped state.epoch via the event.
     return { ok: res.ok, epoch: nextEpoch, reason: res.reason };
+  }
+
+  /** T11 — the rotate races visible in this replica (epochs with >1 rotate). */
+  function rotateRaces(): RotateRace[] {
+    return detectRotateRaces(state.eventsById.values());
+  }
+
+  /**
+   * T11 — true when this device LOST a rotate race and was left out of the
+   * winner's wraps: it can unwrap some candidate key for the current epoch
+   * but not the winner's, so it can read the race window yet cannot seal (or
+   * read) post-race traffic. The remedy is a fresh rotateEpoch() to n+1
+   * (rotate events are plaintext by design, so even a locked-out device can
+   * publish one) — the caller decides when, to avoid rotate storms.
+   */
+  async function needsReRotate(): Promise<boolean> {
+    if (!isE2E()) return false;
+    const candidates = epochCandidates(state.eventsById.values()).get(state.epoch) ?? [];
+    if (candidates.length === 0) return false;
+    if (await keyForRotate(candidates[0])) return false; // winner readable — fine
+    for (const c of candidates.slice(1)) {
+      if (await keyForRotate(c)) return true; // race participant, excluded from winner
+    }
+    return false; // can't read ANY key — not a race problem (removed member etc.)
   }
 
   /** Cheap idle poll. E2E spaces compare seq cursors (relay can't see the
@@ -374,7 +444,83 @@ export function createSpaceReplica(spaceId: string) {
   }
 
   function projectFor(projectId: string): ProjectState {
-    return project([...state.eventsById.values()], projectId);
+    const base = baseState ?? emptyState(projectId);
+    return projectFrom(base, [...state.eventsById.values()]);
+  }
+
+  /**
+   * T10 — propose a compaction snapshot of the CURRENT frontier: publishes
+   * a snapshot.commit whose parents are the covered heads and whose
+   * predicate carries the normalized state + root. Members then vote
+   * (snapshot.vote) or let restime silence mature it.
+   */
+  async function proposeSnapshot(
+    userId: string
+  ): Promise<{ ok: boolean; snapshotId?: string; reason?: string }> {
+    const projectId = projectIdOfSpace(spaceId);
+    let predicate: SnapshotPredicate;
+    try {
+      predicate = await buildSnapshotPredicate(state.eventsById.values(), projectId);
+    } catch (e) {
+      return { ok: false, reason: (e as Error).message };
+    }
+    const publishFn = isE2E() ? publishSealed : publish;
+    const res = await publishFn(userId, {
+      action: 'snapshot.commit',
+      subject: { type: 'project', id: projectId ?? spaceId },
+      predicate: predicate as unknown as Record<string, unknown>,
+      parents: predicate.heads
+    });
+    return { ok: res.ok, snapshotId: res.event.id, reason: res.reason };
+  }
+
+  /**
+   * T10 — prune the local store up to the latest MATURED snapshot that also
+   * cleared the safety window. Deletes covered events from IDB + memory and
+   * installs the snapshot's state as the new base. Returns how many events
+   * were pruned (0 = nothing eligible; never an error).
+   */
+  async function compact(now = Date.now()): Promise<number> {
+    await hydrate();
+    const projectId = projectIdOfSpace(spaceId);
+    const projection = projectFor(projectId ?? spaceId);
+
+    // Latest eligible snapshot: matured + safety window + carries a state
+    // we can restore.
+    let chosen: { ev: ConsentEvent; predicate: SnapshotPredicate } | null = null;
+    for (const ev of state.eventsById.values()) {
+      if (ev.action !== 'snapshot.commit') continue;
+      const p = ev.predicate as unknown as SnapshotPredicate | undefined;
+      if (!p || p.state === undefined || !Array.isArray(p.heads)) continue;
+      if (!isSnapshotMatured(projection, ev.id)) continue;
+      if (ev.ts + PRUNE_SAFETY_MS > now) continue;
+      if (!chosen || ev.ts > chosen.ev.ts) chosen = { ev, predicate: p };
+    }
+    if (!chosen) return 0;
+
+    const restored = restoreState(chosen.predicate.state);
+    if (!restored.ok) return 0; // version skew — refuse to prune, keep replaying
+
+    const prunable = computePrunableIds(state.eventsById.values(), chosen.ev);
+    if (prunable.size === 0) return 0;
+
+    for (const id of prunable) {
+      await idbSpaceUnlink(spaceId, id);
+    }
+    await idbPutSpaceSnapshot({
+      spaceId,
+      snapshotEventId: chosen.ev.id,
+      stateRoot: chosen.predicate.stateRoot,
+      stateV: chosen.predicate.stateV,
+      state: chosen.predicate.state,
+      prunedAt: now
+    });
+
+    const next = new Map(state.eventsById);
+    for (const id of prunable) next.delete(id);
+    state.eventsById = next;
+    baseState = restored.state;
+    return prunable.size;
   }
 
   function heads(): string[] {
@@ -389,8 +535,12 @@ export function createSpaceReplica(spaceId: string) {
     publish,
     publishSealed,
     rotateEpoch,
+    rotateRaces,
+    needsReRotate,
     pollAndSyncIfBehind,
     projectFor,
+    proposeSnapshot,
+    compact,
     heads
   };
 }
@@ -409,6 +559,7 @@ const SOCKET_FALLBACK_POLL_MS = 3 * 60_000;
  * be down; pollAndSyncIfBehind is cheap).
  */
 export function startAutoSync(replica: SpaceReplica, intervalMs = 20_000): () => void {
+  console.log("[space]",spaceSyncEnabled())
   if (!spaceSyncEnabled()) return () => {};
   let stopped = false;
   let timer: ReturnType<typeof setTimeout> | null = null;

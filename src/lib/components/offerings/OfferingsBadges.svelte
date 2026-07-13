@@ -37,7 +37,14 @@
 
   async function load() {
     try {
-      const res = await sendToSer({ uid: String(uid) }, '276myOfferingsViaUser', 0, 0, false, fetch);
+      const res = await sendToSer(
+        { uid: String(uid) },
+        '276myOfferingsViaUser',
+        0,
+        0,
+        false,
+        fetch
+      );
       const a = res?.data?.usersPermissionsUser?.data?.attributes ?? {};
       const products = (a.projects_1s?.data ?? []).reduce(
         (sum, p) => sum + (p.attributes?.matanotofs?.data?.length ?? 0),
@@ -59,7 +66,7 @@
 
 <div
   dir={$isRtl ? 'rtl' : 'ltr'}
-  class="flex flex-col items-stretch sm:flex-row sm:items-center sm:justify-center gap-2 my-2 px-2"
+  class="flex flex-col lg:flex-row items-center lg:justify-center gap-2 my-2 px-2"
 >
   <!-- Products: count → sales-center, plus → create flow -->
   <span
@@ -73,7 +80,9 @@
       🎁
       <span>{$t('offerings.badges.products')}</span>
       {#if loaded}
-        <span class="bg-white text-barbi rounded-full px-1.5 text-xs leading-5 min-w-5 text-center shadow-sm">
+        <span
+          class="bg-white text-barbi rounded-full px-1.5 text-xs leading-5 min-w-5 text-center shadow-sm"
+        >
           {counts.products}
         </span>
       {/if}
@@ -100,7 +109,9 @@
       🛠️
       <span>{$t('offerings.badges.missions')}</span>
       {#if loaded}
-        <span class="bg-white text-barbi rounded-full px-1.5 text-xs leading-5 min-w-5 text-center shadow-sm">
+        <span
+          class="bg-white text-barbi rounded-full px-1.5 text-xs leading-5 min-w-5 text-center shadow-sm"
+        >
           {counts.missions}
         </span>
         {#if counts.done > 0}
