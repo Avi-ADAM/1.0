@@ -17,6 +17,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { matchOpenMissionToUsers, matchOpenMashaabimToUsers } from '$lib/server/matching/engine';
 
 const RESOURCE_KINDOF = new Set(['monthly', 'perUnit', 'rent', 'total', 'yearly']);
 function mapKindOf(raw?: string | null): string {
@@ -191,6 +192,13 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     await persistExtractedKey(strapi, context, 'mission', openMissionId, extractedKey);
     await seedChat(strapi, context, ratAttrs, name);
 
+    // Tag matching community members with a suggestion + email.
+    await matchOpenMissionToUsers(openMissionId, 'missionCreated', {
+      strapi,
+      fetch: context.fetch,
+      lang: context.lang
+    });
+
     return {
       data: { success: true, ratsonId: String(ratsonId), kind, openMissionId, skillsMatched: skillIds.length },
       updateStrategy: { type: 'none' as const }
@@ -237,6 +245,13 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
 
   await persistExtractedKey(strapi, context, 'resource', openMashaabimId, extractedKey);
   await seedChat(strapi, context, ratAttrs, name);
+
+  // Tag users who offer this resource with a suggestion + email.
+  await matchOpenMashaabimToUsers(openMashaabimId, 'resourceCreated', {
+    strapi,
+    fetch: context.fetch,
+    lang: context.lang
+  });
 
   return {
     data: { success: true, ratsonId: String(ratsonId), kind, openMashaabimId },

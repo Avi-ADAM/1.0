@@ -104,6 +104,76 @@ export async function fetchOpenMissions(baseUrl, token, keysSorted, lang) {
 }
 
 /**
+ * Fetch the current user's precomputed match-suggestions (mission kind) from
+ * the match-suggestion collection — the clean replacement for pulling every
+ * open mission per skill/role and scoring client-side. The server replaces
+ * idL with the cookie user id, so only the caller's own rows are returned.
+ *
+ * @param {string | number} idL - The user ID (validated against cookie on server)
+ * @returns {Promise<any>} Raw GraphQL response with matchSuggestions
+ */
+export async function fetchMatchSuggestions(idL) {
+  try {
+    const response = await fetch('/api/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        data: {
+          queId: '209levMatchSuggestions',
+          arg: { idL }
+        }
+      })
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        goto('/login?from=lev');
+      }
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('Error in fetchMatchSuggestions:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch the current user's precomputed resource match-suggestions (huca) from
+ * the match-suggestion collection.
+ *
+ * @param {string | number} idL - The user ID (validated against cookie on server)
+ * @returns {Promise<any>} Raw GraphQL response with matchSuggestions (kind resource)
+ */
+export async function fetchResourceMatchSuggestions(idL) {
+  try {
+    const response = await fetch('/api/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        data: {
+          queId: '212levResourceMatchSuggestions',
+          arg: { idL }
+        }
+      })
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        goto('/login?from=lev');
+      }
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('Error in fetchResourceMatchSuggestions:', error);
+    throw error;
+  }
+}
+
+/**
  * Fetch a single quantum slice of lev data.
  *
  * Uses the mini-userData envelope pattern: every slice query returns

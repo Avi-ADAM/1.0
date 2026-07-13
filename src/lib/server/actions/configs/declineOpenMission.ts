@@ -1,4 +1,5 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { dismissSuggestion } from '$lib/server/matching/engine';
 
 const declineOpenMissionHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { openMissionId, existingDeclinedIds = [] } = params;
@@ -9,6 +10,13 @@ const declineOpenMissionHandler: ActionExecutionHandler = async (params, context
     { userId: context.userId, declinedList: newDeclinedIds },
     context.jwt,
     context.fetch
+  );
+
+  // Keep the precomputed suggestion in sync with the decline.
+  await dismissSuggestion(
+    String(context.userId),
+    { openMissionId: String(openMissionId) },
+    { strapi, fetch: context.fetch, lang: context.lang }
   );
 
   return {

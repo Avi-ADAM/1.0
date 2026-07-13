@@ -418,6 +418,8 @@ export type ActionKey =
   | 'updateMissionOffer'
   | 'createPersonalMatanot'
   | 'archivePersonalMatanot'
+  | 'refreshMySuggestions'
+  | 'declineSpForMashaabim'
   ;
 
 

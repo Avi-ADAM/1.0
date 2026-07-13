@@ -16,6 +16,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { matchOpenMissionToUsers } from '$lib/server/matching/engine';
 
 // Helper: normalise a vote component row to a plain object for GraphQL variables
 function normalizeVote(v: any): Record<string, any> {
@@ -190,6 +191,17 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
 
     if (responseData.errors) {
       throw new Error(`voteOnPendm consensus mutation failed: ${JSON.stringify(responseData.errors)}`);
+    }
+
+    // The pendm matured into a real open mission — tag matching users with
+    // suggestions and notify them by email.
+    const newOpenMissionId = responseData.data?.createOpenMission?.data?.id;
+    if (newOpenMissionId) {
+      await matchOpenMissionToUsers(String(newOpenMissionId), 'missionCreated', {
+        strapi,
+        fetch: context.fetch,
+        lang: context.lang
+      });
     }
 
     // Consensus archives the pendm and creates an OpenMission — both the

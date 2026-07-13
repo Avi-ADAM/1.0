@@ -11,6 +11,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { matchOpenMashaabimToUsers } from '$lib/server/matching/engine';
 import { restimeLabel, voteUrl } from './actionUtils.js';
 
 // ─── helpers ───────────────────────────────────────────────────────────────
@@ -128,7 +129,7 @@ function buildLocationInput(
 }
 
 // ─── handler ───────────────────────────────────────────────────────────────
-const createResourceHandler: ActionExecutionHandler = async (params, context, { notifier }) => {
+const createResourceHandler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const {
     projectId,
     name,
@@ -265,6 +266,16 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
 
   const createdRecord = created[operationName].data;
   const createdId     = createdRecord.id;
+
+  // Open (unclaimed) resource request → tag users who offer this mashaabim
+  // with a match-suggestion and notify them by email.
+  if (!isPmash && !isAssigned) {
+    await matchOpenMashaabimToUsers(String(createdId), 'resourceCreated', {
+      strapi,
+      fetch: context.fetch,
+      lang: context.lang
+    });
+  }
 
   // ── 3b. Recurring expense engine (monthly / yearly) ──────────────────────
   // A recurring resource is modelled as a "mashabetahalich" with recurring=true.

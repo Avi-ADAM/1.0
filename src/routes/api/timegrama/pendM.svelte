@@ -2,12 +2,14 @@
      import { SendTo } from '$lib/send/sendTo.svelte';
      // Server-only secret — this module is imported only by timegrama/+server.js.
      import { ADMINMONTHER } from '$env/static/private';
+     import { strapiClient } from '$lib/server/actions/index.js';
+     import { matchOpenMashaabimToUsers } from '$lib/server/matching/engine';
 //get by id
 //calculate votes
-//if no no create open mission 
+//if no no create open mission
 //archive pend
-//else 
-export async function PendM(id,taid){
+//else
+export async function PendM(id,taid,fetchFn){
     console.log(id,taid)
       let qu = `{
   pmash (id:${id}) {data{ id attributes{
@@ -58,7 +60,7 @@ export async function PendM(id,taid){
              ${dates}
              ${recur}
             }
-  ) {data{attributes {project{data{ id} }}}}
+  ) {data{ id attributes {project{data{ id} }}}}
   updatePmash(
    id: ${res2.data.pmash.data.id}
       data: { 
@@ -72,6 +74,17 @@ export async function PendM(id,taid){
       console.log(res3,"res3",id,taid)      
       if (res3.data != null) {
               console.log(res3.data,"res3 data")
+
+              // Silence-approved pmash became a real open resource request —
+              // tag users who offer this mashaabim and email them.
+              const newOpenMashaabimId = res3.data?.createOpenMashaabim?.data?.id;
+              if (newOpenMashaabimId) {
+                await matchOpenMashaabimToUsers(String(newOpenMashaabimId), 'resourceCreated', {
+                  strapi: strapiClient,
+                  fetch: fetchFn || fetch
+                });
+              }
+
               //update timegrama to done
               let que4 = `mutation { 
              updateTimegrama(

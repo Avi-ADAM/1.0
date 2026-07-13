@@ -111,6 +111,7 @@ import { updateResourceRequestConfig } from './updateResourceRequest.js';
 import { createResourceRequestConfig } from './createResourceRequest.js';
 import { createMashaabimConfig } from './createMashaabim.js';
 import { updateUserRelationConfig } from './updateUserRelation.js';
+import { refreshMySuggestionsConfig } from './refreshMySuggestions.js';
 import { loadCatalogConfig } from './loadCatalog.js';
 import { toggleGuideStatusConfig } from './toggleGuideStatus.js';
 import { createMissionTemplateConfig } from './createMissionTemplate.js';
@@ -318,6 +319,9 @@ export function registerAllActions(): void {
   // User profile relation update + catalog loader (edit.svelte)
   registerAction(updateUserRelationConfig);
   registerAction(loadCatalogConfig);
+
+  // Match-suggestion backfill/refresh for the current user (lev page)
+  registerAction(refreshMySuggestionsConfig);
 
   // Onboarding guide visibility toggle (editBasic.svelte)
   registerAction(toggleGuideStatusConfig);

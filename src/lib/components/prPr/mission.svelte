@@ -29,28 +29,43 @@
   import Button from '$lib/celim/ui/button.svelte';
   // AI suggest / improve / translate
   let aiSuggesting = $state(false);
-  let aiSuggestResult = $state(null);  // { extraction, matchResults, similarMissions }
+  let aiSuggestResult = $state(null); // { extraction, matchResults, similarMissions }
   let aiImproving = $state(false);
   let aiTranslating = $state(false);
   let aiTranslations = $state(null); // { he, en, ar }
-  let aiDescUndo = $state('');       // snapshot before improve (for undo)
+  let aiDescUndo = $state(''); // snapshot before improve (for undo)
 
   async function handleAiSuggest() {
     const name = miData[0].missionName?.trim();
-    if (!name) { toast.warning($lang === 'en' ? 'Please enter a mission name first' : 'יש להזין שם משימה תחילה'); return; }
+    if (!name) {
+      toast.warning(
+        $lang === 'en'
+          ? 'Please enter a mission name first'
+          : 'יש להזין שם משימה תחילה'
+      );
+      return;
+    }
     aiSuggesting = true;
     aiSuggestResult = null;
     try {
       const res = await fetch('/api/mission/suggest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, descrip: miData[0].descrip ?? '', lang: $lang }),
+        body: JSON.stringify({
+          name,
+          descrip: miData[0].descrip ?? '',
+          lang: $lang
+        })
       });
       const data = await res.json();
       if (!data.ok) throw new Error('suggest failed');
       aiSuggestResult = data;
     } catch (e) {
-      toast.error($lang === 'en' ? 'AI suggestion failed. Please try again.' : 'הצעת AI נכשלה, נסו שוב.');
+      toast.error(
+        $lang === 'en'
+          ? 'AI suggestion failed. Please try again.'
+          : 'הצעת AI נכשלה, נסו שוב.'
+      );
     } finally {
       aiSuggesting = false;
     }
@@ -62,34 +77,53 @@
 
     // Merge skills — only add names not already selected
     const addSkills = [
-      ...(matchResults?.skills?.matched ?? []).map(r => r.existingLabel ?? r.input),
-      ...(matchResults?.skills?.suggestions ?? []).map(r => r.existingLabel ?? r.input),
-      ...(matchResults?.skills?.newItems ?? []).map(r => r.input),
-    ].filter(n => n && !miData[0].selectedSkills.includes(n));
+      ...(matchResults?.skills?.matched ?? []).map(
+        (r) => r.existingLabel ?? r.input
+      ),
+      ...(matchResults?.skills?.suggestions ?? []).map(
+        (r) => r.existingLabel ?? r.input
+      ),
+      ...(matchResults?.skills?.newItems ?? []).map((r) => r.input)
+    ].filter((n) => n && !miData[0].selectedSkills.includes(n));
     miData[0].selectedSkills = [...miData[0].selectedSkills, ...addSkills];
 
     // Merge roles
-    const addRoles = extraction.roles.filter(n => n && !miData[0].selectedRoles.includes(n));
+    const addRoles = extraction.roles.filter(
+      (n) => n && !miData[0].selectedRoles.includes(n)
+    );
     miData[0].selectedRoles = [...miData[0].selectedRoles, ...addRoles];
 
     // Merge workways
-    const addWw = extraction.workways.filter(n => n && !miData[0].selectedWorkways.includes(n));
+    const addWw = extraction.workways.filter(
+      (n) => n && !miData[0].selectedWorkways.includes(n)
+    );
     miData[0].selectedWorkways = [...miData[0].selectedWorkways, ...addWw];
 
     // Improve descrip if empty
-    if ((!miData[0].descrip || miData[0].descrip === '<p></p>' || miData[0].descrip === '<p><br></p>') && extraction.improvedDescrip) {
+    if (
+      (!miData[0].descrip ||
+        miData[0].descrip === '<p></p>' ||
+        miData[0].descrip === '<p><br></p>') &&
+      extraction.improvedDescrip
+    ) {
       miData[0].descrip = extraction.improvedDescrip;
     }
 
     miData = miData;
     aiSuggestResult = null;
-    toast.success($lang === 'en' ? 'AI suggestions applied!' : 'הצעות AI הוחלו!');
+    toast.success(
+      $lang === 'en' ? 'AI suggestions applied!' : 'הצעות AI הוחלו!'
+    );
   }
 
   async function handleAiImprove() {
     const text = miData[0].descrip;
     if (!text || text === '<p></p>' || text === '<p><br></p>') {
-      toast.warning($lang === 'en' ? 'Please write a description first' : 'יש לכתוב תיאור תחילה');
+      toast.warning(
+        $lang === 'en'
+          ? 'Please write a description first'
+          : 'יש לכתוב תיאור תחילה'
+      );
       return;
     }
     aiImproving = true;
@@ -98,7 +132,7 @@
       const res = await fetch('/api/mission/describe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, mode: 'improve', lang: $lang }),
+        body: JSON.stringify({ text, mode: 'improve', lang: $lang })
       });
       const data = await res.json();
       if (!data.ok || !data.improved) throw new Error('improve failed');
@@ -107,7 +141,11 @@
       toast.success($lang === 'en' ? 'Description improved!' : 'התיאור שופר!');
     } catch (e) {
       aiDescUndo = '';
-      toast.error($lang === 'en' ? 'AI improve failed. Please try again.' : 'שיפור AI נכשל, נסו שוב.');
+      toast.error(
+        $lang === 'en'
+          ? 'AI improve failed. Please try again.'
+          : 'שיפור AI נכשל, נסו שוב.'
+      );
     } finally {
       aiImproving = false;
     }
@@ -124,7 +162,11 @@
   async function handleAiTranslate() {
     const text = miData[0].descrip;
     if (!text || text === '<p></p>' || text === '<p><br></p>') {
-      toast.warning($lang === 'en' ? 'Please write a description first' : 'יש לכתוב תיאור תחילה');
+      toast.warning(
+        $lang === 'en'
+          ? 'Please write a description first'
+          : 'יש לכתוב תיאור תחילה'
+      );
       return;
     }
     aiTranslating = true;
@@ -133,13 +175,17 @@
       const res = await fetch('/api/mission/describe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, mode: 'translate', lang: $lang }),
+        body: JSON.stringify({ text, mode: 'translate', lang: $lang })
       });
       const data = await res.json();
       if (!data.ok || !data.translations) throw new Error('translate failed');
       aiTranslations = data.translations;
     } catch (e) {
-      toast.error($lang === 'en' ? 'Translation failed. Please try again.' : 'תרגום נכשל, נסו שוב.');
+      toast.error(
+        $lang === 'en'
+          ? 'Translation failed. Please try again.'
+          : 'תרגום נכשל, נסו שוב.'
+      );
     } finally {
       aiTranslating = false;
     }
@@ -244,7 +290,7 @@
       try {
         const result = await executeAction('getMissionForEdit', {
           missionId: String(id),
-          lang: $lang,
+          lang: $lang
         });
         if (result.success && result.data) {
           const d = result.data;
@@ -265,8 +311,10 @@
       // specMode / publishMode editing: hydrate the form with the item's details.
       if ((specMode || publishMode) && initialSpec) {
         miData[0].missionName = initialSpec.name ?? name ?? '';
-        if (initialSpec.descrip != null) miData[0].descrip = initialSpec.descrip;
-        if (initialSpec.hours != null) miData[0].nhours = Number(initialSpec.hours) || 0;
+        if (initialSpec.descrip != null)
+          miData[0].descrip = initialSpec.descrip;
+        if (initialSpec.hours != null)
+          miData[0].nhours = Number(initialSpec.hours) || 0;
         if (initialSpec.ratePerHour != null)
           miData[0].valph = Number(initialSpec.ratePerHour) || 0;
       } else {
@@ -471,7 +519,11 @@
     if (element.date && element.date !== 'undefined' && element.date !== null) {
       dateStart = moment(element.date, 'HH:mm DD/MM/YYYY').toISOString();
     }
-    if (element.dates && element.dates !== 'undefined' && element.dates !== null) {
+    if (
+      element.dates &&
+      element.dates !== 'undefined' &&
+      element.dates !== null
+    ) {
       dateEnd = moment(element.dates, 'HH:mm DD/MM/YYYY').toISOString();
     }
 
@@ -512,7 +564,9 @@
         spnot: element.spnot,
         assignedUserId,
         checklist: element.checklist || [],
-        processId: processContext?.processId ? String(processContext.processId) : undefined,
+        processId: processContext?.processId
+          ? String(processContext.processId)
+          : undefined
       });
       if (result.success) {
         handleSuccess(result.data);
@@ -580,7 +634,7 @@
       ) {
         try {
           const result = await executeAction('createWorkWay', {
-            workWayName: selectedWorkways[i],
+            workWayName: selectedWorkways[i]
           });
           if (result.success && result.data) {
             const newOb = {
@@ -831,7 +885,9 @@
               <tr class="gg">
                 <th class="gg ddd">{mf.dayOfWeek}</th>
                 {#each days as day}
-                  <td class="gg" style="font-size: 1rem">{mf.days[day.nameKey]}</td>
+                  <td class="gg" style="font-size: 1rem"
+                    >{mf.days[day.nameKey]}</td
+                  >
                 {/each}
               </tr>
             </thead>
@@ -921,10 +977,7 @@
                   {#each days as day, i}
                     {#if day.shifts[t] != undefined}
                       <td style="font-size: 3rem">
-                        <div
-                          dir={$isRtl ? 'rtl' : 'ltr'}
-                          class="textinput"
-                        >
+                        <div dir={$isRtl ? 'rtl' : 'ltr'} class="textinput">
                           <input
                             type="number"
                             id={`part${i}`}
@@ -1006,8 +1059,8 @@
             {#if missionNameE == false}
               <h2
                 class="text-barbi text-{$lang == 'en'
-                   ? 'left'
-                   : 'right'}  font-bold text-xl lg:text-4xl underline"
+                  ? 'left'
+                  : 'right'}  font-bold text-xl lg:text-4xl underline"
               >
                 {miData[0].missionName}<button
                   onclick={() => (missionNameE = true)}><EditIcon /></button
@@ -1017,7 +1070,9 @@
               <div class="flex flex-col">
                 <label
                   for="mission-name-input"
-                  class="text-barbi font-bold text-sm mb-1 text-{$lang == 'en' ? 'left' : 'right'}"
+                  class="text-barbi font-bold text-sm mb-1 text-{$lang == 'en'
+                    ? 'left'
+                    : 'right'}"
                 >
                   {$lang === 'en' ? 'Mission name' : 'שם המשימה'}
                 </label>
@@ -1026,8 +1081,10 @@
                   type="text"
                   bind:value={miData[0].missionName}
                   list="mission-name-options"
-                  placeholder={$lang === 'en' ? 'Type or pick a template…' : 'הקלידו או בחרו מתבנית…'}
-                  class="bg-pink-950/30 border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all shadow-sm"
+                  placeholder={$lang === 'en'
+                    ? 'Type or pick a template…'
+                    : 'הקלידו או בחרו מתבנית…'}
+                  class="bg-pink-950/30 border placeholder:text-white border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all shadow-sm"
                 />
                 <datalist id="mission-name-options">
                   {#each missionTemplates as template (template.id)}
@@ -1040,37 +1097,68 @@
                   onclick={handleAiSuggest}
                   disabled={aiSuggesting}
                   class="mt-2 flex items-center gap-1 px-3 py-1.5 rounded-full border border-gold/60 text-xs text-barbi hover:bg-gold/20 transition-all disabled:opacity-50"
-                  title={$lang === 'en' ? 'Suggest skills, roles & description with AI' : 'הצע כישורים, תפקידים ותיאור עם AI'}
+                  title={$lang === 'en'
+                    ? 'Suggest skills, roles & description with AI'
+                    : 'הצע כישורים, תפקידים ותיאור עם AI'}
                 >
                   {#if aiSuggesting}
-                    <span class="animate-spin inline-block w-3 h-3 border border-barbi rounded-full border-t-transparent"></span>
+                    <span
+                      class="animate-spin inline-block w-3 h-3 border border-barbi rounded-full border-t-transparent"
+                    ></span>
                   {:else}
                     ✨
                   {/if}
-                  {$lang === 'en' ? 'Suggest with AI' : $lang === 'ar' ? 'اقتراح بالذكاء الاصطناعي' : 'הצע עם AI'}
+                  {$lang === 'en'
+                    ? 'Suggest with AI'
+                    : $lang === 'ar'
+                      ? 'اقتراح بالذكاء الاصطناعي'
+                      : 'הצע עם AI'}
                 </button>
               </div>
               <button onclick={() => (missionNameE = false)}><Done /></button>
 
               <!-- AI Suggestion result panel -->
               {#if aiSuggestResult}
-                <div class="mt-3 p-3 rounded-xl border border-gold/40 bg-pink-950/30 text-sm text-barbi space-y-2">
+                <div
+                  class="mt-3 p-3 rounded-xl border border-gold/40 bg-pink-950/30 text-sm text-barbi space-y-2"
+                >
                   <p class="font-bold text-gold">
-                    {$lang === 'en' ? '✨ AI Suggestions — click to apply:' : '✨ הצעות AI — לחצו להחלה:'}
+                    {$lang === 'en'
+                      ? '✨ AI Suggestions — click to apply:'
+                      : '✨ הצעות AI — לחצו להחלה:'}
                   </p>
                   {#if aiSuggestResult.extraction.skills.length > 0}
-                    <p><span class="text-mturk">{$lang === 'en' ? 'Skills:' : 'כישורים:'}</span> {aiSuggestResult.extraction.skills.join(', ')}</p>
+                    <p>
+                      <span class="text-mturk"
+                        >{$lang === 'en' ? 'Skills:' : 'כישורים:'}</span
+                      >
+                      {aiSuggestResult.extraction.skills.join(', ')}
+                    </p>
                   {/if}
                   {#if aiSuggestResult.extraction.roles.length > 0}
-                    <p><span class="text-mturk">{$lang === 'en' ? 'Roles:' : 'תפקידים:'}</span> {aiSuggestResult.extraction.roles.join(', ')}</p>
+                    <p>
+                      <span class="text-mturk"
+                        >{$lang === 'en' ? 'Roles:' : 'תפקידים:'}</span
+                      >
+                      {aiSuggestResult.extraction.roles.join(', ')}
+                    </p>
                   {/if}
                   {#if aiSuggestResult.extraction.workways.length > 0}
-                    <p><span class="text-mturk">{$lang === 'en' ? 'Work modes:' : 'דרכי עבודה:'}</span> {aiSuggestResult.extraction.workways.join(', ')}</p>
+                    <p>
+                      <span class="text-mturk"
+                        >{$lang === 'en' ? 'Work modes:' : 'דרכי עבודה:'}</span
+                      >
+                      {aiSuggestResult.extraction.workways.join(', ')}
+                    </p>
                   {/if}
                   {#if aiSuggestResult.similarMissions?.length > 0}
                     <p class="text-xs text-barbi/60">
-                      {$lang === 'en' ? '📚 Similar templates found:' : '📚 תבניות דומות נמצאו:'}
-                      {aiSuggestResult.similarMissions.map(m => m.missionName).join(', ')}
+                      {$lang === 'en'
+                        ? '📚 Similar templates found:'
+                        : '📚 תבניות דומות נמצאו:'}
+                      {aiSuggestResult.similarMissions
+                        .map((m) => m.missionName)
+                        .join(', ')}
                     </p>
                   {/if}
                   <div class="flex gap-2 pt-1">
@@ -1113,8 +1201,14 @@
                     disabled={aiImproving}
                     class="flex items-center gap-1 px-3 py-1.5 rounded-full border border-gold/60 text-xs text-barbi hover:bg-gold/20 transition-all disabled:opacity-50"
                   >
-                    {#if aiImproving}<span class="animate-spin inline-block w-3 h-3 border border-barbi rounded-full border-t-transparent"></span>{:else}🪄{/if}
-                    {$lang === 'en' ? 'Improve with AI' : $lang === 'ar' ? 'تحسين بالذكاء' : 'שפר עם AI'}
+                    {#if aiImproving}<span
+                        class="animate-spin inline-block w-3 h-3 border border-barbi rounded-full border-t-transparent"
+                      ></span>{:else}🪄{/if}
+                    {$lang === 'en'
+                      ? 'Improve with AI'
+                      : $lang === 'ar'
+                        ? 'تحسين بالذكاء'
+                        : 'שפר עם AI'}
                   </button>
                   {#if aiDescUndo}
                     <button
@@ -1131,29 +1225,61 @@
                     disabled={aiTranslating}
                     class="flex items-center gap-1 px-3 py-1.5 rounded-full border border-gold/60 text-xs text-barbi hover:bg-gold/20 transition-all disabled:opacity-50"
                   >
-                    {#if aiTranslating}<span class="animate-spin inline-block w-3 h-3 border border-barbi rounded-full border-t-transparent"></span>{:else}🌍{/if}
-                    {$lang === 'en' ? 'Translate' : $lang === 'ar' ? 'ترجم' : 'תרגם'}
+                    {#if aiTranslating}<span
+                        class="animate-spin inline-block w-3 h-3 border border-barbi rounded-full border-t-transparent"
+                      ></span>{:else}🌍{/if}
+                    {$lang === 'en'
+                      ? 'Translate'
+                      : $lang === 'ar'
+                        ? 'ترجم'
+                        : 'תרגם'}
                   </button>
                 </div>
                 <!-- Translation preview -->
                 {#if aiTranslations}
-                  <div class="mt-2 p-3 rounded-xl border border-gold/40 bg-pink-950/30 text-xs text-barbi space-y-2">
-                    <p class="font-bold text-gold">{$lang === 'en' ? '🌍 Translation preview:' : '🌍 תצוגה מקדימה של תרגום:'}</p>
+                  <div
+                    class="mt-2 p-3 rounded-xl border border-gold/40 bg-pink-950/30 text-xs text-barbi space-y-2"
+                  >
+                    <p class="font-bold text-gold">
+                      {$lang === 'en'
+                        ? '🌍 Translation preview:'
+                        : '🌍 תצוגה מקדימה של תרגום:'}
+                    </p>
                     {#if aiTranslations.he && $lang !== 'he'}
-                      <p><span class="text-mturk">עברית:</span> {aiTranslations.he.replace(/<[^>]+>/g,'').slice(0,120)}…</p>
+                      <p>
+                        <span class="text-mturk">עברית:</span>
+                        {aiTranslations.he
+                          .replace(/<[^>]+>/g, '')
+                          .slice(0, 120)}…
+                      </p>
                     {/if}
                     {#if aiTranslations.en && $lang !== 'en'}
-                      <p><span class="text-mturk">English:</span> {aiTranslations.en.replace(/<[^>]+>/g,'').slice(0,120)}…</p>
+                      <p>
+                        <span class="text-mturk">English:</span>
+                        {aiTranslations.en
+                          .replace(/<[^>]+>/g, '')
+                          .slice(0, 120)}…
+                      </p>
                     {/if}
                     {#if aiTranslations.ar && $lang !== 'ar'}
-                      <p><span class="text-mturk">العربية:</span> {aiTranslations.ar.replace(/<[^>]+>/g,'').slice(0,120)}…</p>
+                      <p>
+                        <span class="text-mturk">العربية:</span>
+                        {aiTranslations.ar
+                          .replace(/<[^>]+>/g, '')
+                          .slice(0, 120)}…
+                      </p>
                     {/if}
-                    <p class="text-barbi/50 text-xs">{$lang === 'en' ? 'Translations will be auto-saved after publishing.' : 'התרגומים יישמרו אוטומטית לאחר הפרסום.'}</p>
+                    <p class="text-barbi/50 text-xs">
+                      {$lang === 'en'
+                        ? 'Translations will be auto-saved after publishing.'
+                        : 'התרגומים יישמרו אוטומטית לאחר הפרסום.'}
+                    </p>
                     <button
                       type="button"
                       onclick={() => (aiTranslations = null)}
                       class="px-2 py-1 rounded-full border border-gold/40 text-xs hover:bg-pink-950/30"
-                    >{$lang === 'en' ? 'Close' : 'סגור'}</button>
+                      >{$lang === 'en' ? 'Close' : 'סגור'}</button
+                    >
                   </div>
                 {/if}
               {:else if miData[0].descrip}
@@ -1190,9 +1316,7 @@
               />
             </p>
             <div class="my-2">
-              <mark class="text-barbi text-sm lg:text-2xl"
-                >{ml.title}:</mark
-              >
+              <mark class="text-barbi text-sm lg:text-2xl">{ml.title}:</mark>
               <button onclick={() => (locationE = !locationE)}
                 >{#if locationE}<Done />{:else}<EditIcon />{/if}</button
               >
@@ -1268,8 +1392,7 @@
               >
             </div>
             <div class="my-2">
-              <mark class="text-barbi text-sm lg:text-2xl"
-                >{mf.tasksList}:</mark
+              <mark class="text-barbi text-sm lg:text-2xl">{mf.tasksList}:</mark
               >
               {#key miData}
                 {#if miData[0].checklist}
@@ -1408,8 +1531,7 @@
                   >
                     {#each miData[0].selectedRoles as rol}
                       <p
-                        onmouseenter={() =>
-                          hover(mf.requestedRole)}
+                        onmouseenter={() => hover(mf.requestedRole)}
                         onmouseleave={() => hover('0')}
                         class="m-0"
                         style="text-shadow:none;"
@@ -1470,9 +1592,7 @@
               {/if}
             </div>
             <div class="my-2">
-              <mark class="text-sm lg:text-2xl text-barbi"
-                >{mf.workways}</mark
-              >
+              <mark class="text-sm lg:text-2xl text-barbi">{mf.workways}</mark>
               <button onclick={() => (wwe = !wwe)}
                 >{#if wwe}<Done />{:else}<EditIcon />{/if}</button
               >
@@ -1483,8 +1603,7 @@
                   >
                     {#each miData[0].selectedWorkways as rol}
                       <p
-                        onmouseenter={() =>
-                          hover(mf.requestedWorkways)}
+                        onmouseenter={() => hover(mf.requestedWorkways)}
                         onmouseleave={() => hover('0')}
                         class="m-0"
                         style="text-shadow:none;"
@@ -1578,7 +1697,9 @@
                     id="tomeC"
                     name="tome"
                     value="tome"
-                    onclick={() => { miData[0].rishon = 'self'; }}
+                    onclick={() => {
+                      miData[0].rishon = 'self';
+                    }}
                   />
                   <label for="tome">{tri?.mission?.assingToMe[$lang]}</label>
                 {/if}
@@ -1673,16 +1794,18 @@
                   title={mf.isShift}><ShiftsIcon /></button
                 >{/if}
             </div>
-            <div
-              class="flex flex-row flex-wrap items-center justify-end gap-3"
-            >
+            <div class="flex flex-row flex-wrap items-center justify-end gap-3">
               {#if specMode || publishMode}
                 <button
                   type="button"
                   onclick={() => onClose?.()}
                   class="rounded-xl border border-gold/60 px-4 py-2 text-sm text-barbi hover:bg-pink-950/30 transition-all"
                 >
-                  {$lang === 'en' ? 'Cancel' : $lang === 'ar' ? 'إلغاء' : 'ביטול'}
+                  {$lang === 'en'
+                    ? 'Cancel'
+                    : $lang === 'ar'
+                      ? 'إلغاء'
+                      : 'ביטול'}
                 </button>
               {/if}
               <Button

@@ -10,6 +10,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { dismissSuggestion } from '$lib/server/matching/engine';
 
 const declineSpForMashaabimHandler: ActionExecutionHandler = async (
   params,
@@ -23,6 +24,14 @@ const declineSpForMashaabimHandler: ActionExecutionHandler = async (
     { id: String(spId), openMashaabimId: String(openMashaabimId) },
     context.jwt,
     context.fetch
+  );
+
+  // Keep the caller's precomputed resource suggestion in sync with the decline
+  // (the lev huca card fires this action with the caller's own sp).
+  await dismissSuggestion(
+    String(context.userId),
+    { openMashaabimId: String(openMashaabimId) },
+    { strapi, fetch: context.fetch, lang: context.lang }
   );
 
   return {
