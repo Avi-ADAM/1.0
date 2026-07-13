@@ -22,10 +22,12 @@ async function x(id,kind,taid, fetch){
     } else if (kind == "askm"){
       await Askm(id, taid)
     } else if (kind == 'pendm') {
-              await Pend(id,taid);
+              // fetch is passed through so the match-suggestion engine can
+              // send "new suggestion" emails via the relative /api/sendMail.
+              await Pend(id,taid, fetch);
 
     }else if(kind == "pmash"){
-      await PendM(id,taid)
+      await PendM(id,taid, fetch)
     }else if(kind == "finiapruval"){
       await finiapp(id,taid)
     }else if(kind == "decision"){

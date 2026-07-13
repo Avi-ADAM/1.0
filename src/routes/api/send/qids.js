@@ -3762,58 +3762,6 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                   id
                   attributes {
                     price
-                    open_mashaabims(filters: { archived: { eq: false } }) {
-                      data {
-                        id
-                        attributes {
-                          declinedsps {
-                            data {
-                              id
-                            }
-                          }
-                          price
-                          hm
-                          descrip
-                          spnot
-                          kindOf
-                          recurring
-                          cycleSize
-                          users {
-                            data {
-                              id
-                            }
-                          }
-                          sqadualedf
-                          sqadualed
-                          linkto
-                          createdAt
-                          hm
-                          name
-                          easy
-                          project {
-                            data {
-                              id
-                              attributes {
-                                projectName
-                                user_1s {
-                                  data {
-                                    id
-                                  }
-                                }
-                                profilePic {
-                                  data {
-                                    attributes {
-                                      url
-                                      formats
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
                   }
                 }
               }
@@ -12390,6 +12338,7 @@ export const qids = {
           name
           archived
           isglobal
+          location { lat lng radius location_mode }
           project { data { id attributes { projectName } } }
           skills { data { id } }
           tafkidims { data { id } }
@@ -12419,6 +12368,7 @@ export const qids = {
           email
           lang
           noMail
+          location { lat lng radius location_mode }
           skills { data { id } }
           tafkidims { data { id } }
           work_ways { data { id } }
@@ -12437,6 +12387,7 @@ export const qids = {
           email
           lang
           noMail
+          location { lat lng radius location_mode }
           skills { data { id } }
           tafkidims { data { id } }
           work_ways { data { id } }
@@ -12476,6 +12427,7 @@ export const qids = {
         id
         attributes {
           name
+          location { lat lng radius location_mode }
           skills { data { id } }
           tafkidims { data { id } }
           work_ways { data { id } }
@@ -12492,6 +12444,7 @@ export const qids = {
         attributes {
           name
           archived
+          location { lat lng radius location_mode }
           project { data { id attributes { projectName } } }
           mashaabim { data { id } }
           declinedsps { data { id } }
@@ -12515,6 +12468,7 @@ export const qids = {
           email
           lang
           noMail
+          location { lat lng radius location_mode }
           sps(filters: { archived: { ne: true } }) {
             data { id attributes { mashaabim { data { id } } } }
           }
@@ -12535,6 +12489,7 @@ export const qids = {
         id
         attributes {
           name
+          location { lat lng radius location_mode }
           mashaabim { data { id } }
           project { data { id } }
           declinedsps { data { id } }
@@ -12642,6 +12597,61 @@ export const qids = {
       { open_mashaabim: { id: { eq: $omashId } } }
     ] }) {
       data { id }
+    }
+  }`,
+
+  '212levResourceMatchSuggestions': `query LevResourceMatchSuggestions($idL: ID!) {
+    matchSuggestions(
+      filters: { and: [
+        { user: { id: { eq: $idL } } },
+        { status: { ne: "dismissed" } },
+        { kind: { eq: "resource" } },
+        { open_mashaabim: { archived: { eq: false } } }
+      ] }
+      pagination: { limit: 200 }
+      sort: "score:desc"
+    ) {
+      data {
+        id
+        attributes {
+          score
+          status
+          kind
+          matchedOn
+          open_mashaabim {
+            data {
+              id
+              attributes {
+                name
+                descrip
+                spnot
+                kindOf
+                price
+                easy
+                hm
+                linkto
+                sqadualed
+                sqadualedf
+                recurring
+                cycleSize
+                mashaabim { data { id } }
+                declinedsps { data { id } }
+                project {
+                  data {
+                    id
+                    attributes {
+                      projectName
+                      restime
+                      user_1s { data { id } }
+                      profilePic { data { attributes { url formats } } }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }`,
 

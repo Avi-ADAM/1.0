@@ -1388,6 +1388,108 @@ export function extractResourceSuggestions(userData: any): ResourceSuggestionDat
 }
 
 /**
+ * Build lev resource suggestions (huca) from precomputed match-suggestion
+ * records (qid 212levResourceMatchSuggestions) instead of walking
+ * sps → mashaabim → open_mashaabims client-side.
+ *
+ * The user's own sp (myp price + sp id) is looked up from the main user data
+ * (query 83 sps block) by the shared mashaabim id, and the candidate's pending
+ * Askm state is merged exactly like extractResourceSuggestions does, so the
+ * resulting objects are drop-in replacements.
+ *
+ * @param matchRecords - matchSuggestions.data array from qid 212
+ * @param userData - Raw user data from query 83 (sps / askms)
+ */
+export function buildResourceSuggestionsFromMatchRecords(
+  matchRecords: any[],
+  userData: any
+): ResourceSuggestionData[] {
+  const huca: ResourceSuggestionData[] = [];
+  if (!Array.isArray(matchRecords)) matchRecords = [];
+
+  // My sp per mashaabim id (for myp / oid on the card)
+  const spByMashaabim = new Map<string, any>();
+  for (const sp of (userData?.attributes?.sps?.data || [])) {
+    const mashId = sp?.attributes?.mashaabim?.data?.id;
+    if (mashId) spByMashaabim.set(String(mashId), sp);
+  }
+
+  // My pending Askm per open resource (Path B2 — same merge as legacy)
+  const myAskmByOm = new Map<string, any>();
+  for (const askm of (userData?.attributes?.askms?.data || [])) {
+    const omId = askm?.attributes?.open_mashaabim?.data?.id;
+    if (omId) myAskmByOm.set(String(omId), askm);
+  }
+
+  const seen = new Set<string>();
+
+  for (const record of matchRecords) {
+    const om = record?.attributes?.open_mashaabim?.data;
+    if (!om?.id || !om.attributes) continue;
+    const omId = String(om.id);
+    if (seen.has(omId)) continue;
+
+    const omAttrs = om.attributes;
+    const project = omAttrs.project?.data;
+    if (!project) continue; // Must have project (legacy rule)
+
+    const mashId = omAttrs.mashaabim?.data?.id ? String(omAttrs.mashaabim.data.id) : null;
+    const mySp = mashId ? spByMashaabim.get(mashId) : undefined;
+    const spId = mySp?.id;
+    const declinedIds = omAttrs.declinedsps?.data?.map((d: any) => d.id) || [];
+
+    // My sp was declined by the rikma → not a live suggestion for me
+    if (spId && declinedIds.map(String).includes(String(spId))) continue;
+
+    seen.add(omId);
+    const projectAttrs = project.attributes;
+    const myAskm = myAskmByOm.get(omId);
+
+    huca.push({
+      id: om.id,
+      projectId: project.id,
+      projectName: projectAttrs?.projectName,
+      srcb: projectAttrs?.profilePic?.data?.attributes?.formats?.thumbnail?.url || projectAttrs?.profilePic?.data?.attributes?.url,
+
+      mashname: omAttrs.name,
+      price: omAttrs.price,
+      easy: omAttrs.easy,
+      kindOf: omAttrs.kindOf,
+      spnot: omAttrs.spnot,
+      descrip: omAttrs.descrip,
+      sqadualed: omAttrs.sqadualed,
+      sqadualedf: omAttrs.sqadualedf,
+      sqedualed: omAttrs.sqadualed,
+      sqedualedf: omAttrs.sqadualedf,
+
+      recurring: omAttrs.recurring === true,
+      cycleSize: omAttrs.cycleSize ?? 1,
+
+      myp: mySp?.attributes?.myp,
+      oid: spId,
+      declineddarra: declinedIds,
+      already: false,
+      priority: 6,
+
+      ani: 'huca',
+      azmi: 'hazaa',
+
+      myAskId: myAskm?.id,
+      myAskUsers: myAskm?.attributes?.vots || [],
+      myRoundProposedBy:
+        myAskm?.attributes?.nego_mashes?.data?.[0]?.attributes?.proposedBy ?? null,
+      myOrdern: myAskm?.attributes?.nego_mashes?.data?.[0]?.attributes?.ordern ?? 0,
+      myRound: myAskm?.attributes?.nego_mashes?.data?.[0]?.attributes ?? null,
+
+      openMashaabimId: om.id,
+      spId: spId
+    });
+  }
+
+  return huca;
+}
+
+/**
  * Extract asked resources (askedResources) - askms resource requests you've received
  * These come from askms in projects
  * 

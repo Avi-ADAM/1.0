@@ -411,6 +411,7 @@ export type ActionKey =
   | 'voteOnDecision'
   | 'counterSaleClaim'
   | 'refreshMySuggestions'
+  | 'declineSpForMashaabim'
   ;
 
 

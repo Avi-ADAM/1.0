@@ -3,12 +3,14 @@
      import { SendTo } from '$lib/send/sendTo.svelte';
   // Server-only secret — this module is imported only by timegrama/+server.js.
   import { ADMINMONTHER } from '$env/static/private';
+  import { strapiClient } from '$lib/server/actions/index.js';
+  import { matchOpenMissionToUsers } from '$lib/server/matching/engine';
 //get by id
 //calculate votes
-//if no no create open mission 
+//if no no create open mission
 //archive pend
-//else 
-export async function Pend(id,taid){
+//else
+export async function Pend(id,taid,fetchFn){
     console.log(id, "pend compo started")
       let qu = `{
   pendm (id:${id}) {data{ id attributes{
@@ -68,7 +70,7 @@ export async function Pend(id,taid){
             ${date}
             ${dates}
             }
-  ) {data{attributes {project{data{ id} }}}}
+  ) {data{ id attributes {project{data{ id} }}}}
   updatePendm(
    id: ${res2.data.pendm.data.id}
       data: { 
@@ -82,6 +84,17 @@ export async function Pend(id,taid){
       console.log(res3,"pend res3 ",res?.errors?.locations)     
       if (res3.data != null) {
               console.log(res3.data,"pend res3 data ,pend line 83 ")
+
+              // Silence-approved pendm became a real open mission — tag
+              // matching users with match-suggestions and email them.
+              const newOpenMissionId = res3.data?.createOpenMission?.data?.id;
+              if (newOpenMissionId) {
+                await matchOpenMissionToUsers(String(newOpenMissionId), 'missionCreated', {
+                  strapi: strapiClient,
+                  fetch: fetchFn || fetch
+                });
+              }
+
               //update timegrama to done
               let que4 = `mutation { 
              updateTimegrama(

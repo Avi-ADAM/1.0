@@ -25,6 +25,7 @@ import {
   type UserCapabilities
 } from './scoring';
 import { sendNewSuggestionEmails, type SuggestionRecipient } from './notify';
+import { isLocationCompatible, type GeoLocation } from './geo';
 
 /** Hard caps so one event can never fan out unboundedly. */
 const MAX_CANDIDATES = 500;
@@ -43,6 +44,13 @@ export interface MatchDeps {
 
 const ids = (rel: any): string[] => (rel?.data ?? []).map((x: any) => String(x.id));
 const oneId = (rel: any): string | null => (rel?.data?.id != null ? String(rel.data.id) : null);
+
+/** Normalize a user's repeatable `location` component (array, object or null). */
+function userLocations(attrs: any): GeoLocation[] {
+  const loc = attrs?.location;
+  if (!loc) return [];
+  return Array.isArray(loc) ? loc : [loc];
+}
 
 async function inBatches<T>(items: T[], size: number, fn: (item: T) => Promise<void>): Promise<void> {
   for (let i = 0; i < items.length; i += size) {
@@ -125,7 +133,9 @@ export async function matchOpenMissionToUsers(
         const uid = String(u.id);
         if (alreadySuggested.has(uid) || uid === notRelevant || uid === rishon) return false;
         // user already declined this mission
-        return !ids(u.attributes?.declined).includes(mission.id);
+        if (ids(u.attributes?.declined).includes(mission.id)) return false;
+        // physical mission → user must be within reach (see geo.ts rules)
+        return isLocationCompatible(attrs.location, userLocations(u.attributes));
       })
       .map((u) => {
         const caps: UserCapabilities = {
@@ -221,6 +231,8 @@ export async function matchOpenMashaabimToUsers(
     const relevant = candidates
       .filter((u) => {
         if (alreadySuggested.has(String(u.id))) return false;
+        // physical resource request → provider must be within reach
+        if (!isLocationCompatible(attrs.location, userLocations(u.attributes))) return false;
         const spsData: any[] = u.attributes?.sps?.data ?? [];
         // the user's sp for this mashaabim must not be in the declined list
         return spsData.some(
@@ -304,6 +316,7 @@ export async function matchUserToOpenEntities(
     );
     const declinedIds = new Set(ids(uAttrs.declined));
     const askedIds = new Set(ids(uAttrs.askeds));
+    const myLocations = userLocations(uAttrs);
 
     // ── missions ────────────────────────────────────────────────────────────
     if (caps.skills.length > 0 || caps.roles.length > 0) {
@@ -317,7 +330,8 @@ export async function matchUserToOpenEntities(
       const scored = missions
         .filter((m) => {
           const mid = String(m.id);
-          return !existingMissionIds.has(mid) && !declinedIds.has(mid) && !askedIds.has(mid);
+          if (existingMissionIds.has(mid) || declinedIds.has(mid) || askedIds.has(mid)) return false;
+          return isLocationCompatible(m.attributes?.location, myLocations);
         })
         .map((m) => ({
           mission: m,
@@ -370,6 +384,7 @@ export async function matchUserToOpenEntities(
       const relevant = openMashaabims
         .filter((om) => {
           if (existingMashaabimIds.has(String(om.id))) return false;
+          if (!isLocationCompatible(om.attributes?.location, myLocations)) return false;
           const mashId = oneId(om.attributes?.mashaabim);
           const mySpId = mashId ? spByMashaabim.get(mashId) : undefined;
           if (!mySpId) return false;

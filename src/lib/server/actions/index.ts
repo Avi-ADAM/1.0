@@ -59,7 +59,10 @@ import { NotificationOrchestrator } from '$lib/server/notifications/Notification
 const STRAPI_ENDPOINT = (import.meta.env.VITE_URL || 'https://tovmeod.1lev1.com') + '/graphql';
 const ADMIN_TOKEN = (process.env.ADMINMONTHER || '').replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
 
-const strapiClient = new StrapiClient(STRAPI_ENDPOINT, ADMIN_TOKEN);
+// Shared admin-token client. Exported so server code outside the action
+// pipeline (e.g. the timegrama cron handlers) can reuse it — notably for the
+// match-suggestion engine in $lib/server/matching.
+export const strapiClient = new StrapiClient(STRAPI_ENDPOINT, ADMIN_TOKEN);
 const validator = new ValidationEngine();
 const authorizer = new AuthorizationEngine(strapiClient);
 const notifier = new NotificationOrchestrator(strapiClient);

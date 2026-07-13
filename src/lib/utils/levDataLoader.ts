@@ -51,6 +51,7 @@ import {
   extractResourceSuggestions,
   extractSuggestions,
   buildSuggestionsFromMatchRecords,
+  buildResourceSuggestionsFromMatchRecords,
   extractProjects,
   extractPmashes,
   extractWegets,
@@ -63,7 +64,7 @@ import {
   extractPurchases,
   extractWishOffers
 } from './levDataExtractors';
-import { fetchMainUserData, fetchMatchSuggestions } from './levGraphQLQueries';
+import { fetchMainUserData, fetchMatchSuggestions, fetchResourceMatchSuggestions } from './levGraphQLQueries';
 import { executeAction } from '$lib/client/actionClient';
 import { resolvePlatformIdentity } from '$lib/stores/platformStore';
 
@@ -532,23 +533,43 @@ export function clearAllData(): void {
 }
 
 /**
- * Load mission suggestions from the precomputed match-suggestion collection
- * (qid 209) and set the store. If the user has no stored rows yet (accounts
- * that predate the collection), trigger a one-time server-side backfill via
- * the refreshMySuggestions action, then re-pull.
+ * Load mission + resource suggestions from the precomputed match-suggestion
+ * collection (qids 209 / 212) and set both stores. If the user has no stored
+ * rows yet (accounts that predate the collection), trigger a one-time
+ * server-side backfill via the refreshMySuggestions action, then re-pull.
  *
- * Falls back to whatever populateStores already put in the store (ask-derived
- * suggestions) on any failure — never throws.
+ * Falls back to whatever populateStores already put in the stores on any
+ * failure — never throws.
  */
 async function loadSuggestionsFromMatchRecords(userData: any, userId: string | number) {
-  try {
-    let res = await fetchMatchSuggestions(userId);
-    let records = res?.data?.matchSuggestions?.data ?? [];
+  let missionRecords: any[] = [];
+  let resourceRecords: any[] = [];
+  let missionFetchOk = false;
+  let resourceFetchOk = false;
 
-    if (records.length === 0) {
+  const pullBoth = async () => {
+    const [missionRes, resourceRes] = await Promise.allSettled([
+      fetchMatchSuggestions(userId),
+      fetchResourceMatchSuggestions(userId)
+    ]);
+    if (missionRes.status === 'fulfilled') {
+      missionRecords = missionRes.value?.data?.matchSuggestions?.data ?? [];
+      missionFetchOk = true;
+    }
+    if (resourceRes.status === 'fulfilled') {
+      resourceRecords = resourceRes.value?.data?.matchSuggestions?.data ?? [];
+      resourceFetchOk = true;
+    }
+  };
+
+  try {
+    await pullBoth();
+
+    if (missionRecords.length === 0 && resourceRecords.length === 0) {
       const hasCaps =
         (userData?.attributes?.skills?.data?.length || 0) > 0 ||
-        (userData?.attributes?.tafkidims?.data?.length || 0) > 0;
+        (userData?.attributes?.tafkidims?.data?.length || 0) > 0 ||
+        (userData?.attributes?.sps?.data?.length || 0) > 0;
 
       if (hasCaps) {
         console.log('🌐 [levDataLoader] No stored suggestions — running one-time backfill');
@@ -557,8 +578,7 @@ async function loadSuggestionsFromMatchRecords(userData: any, userId: string | n
           const created =
             (refresh?.data?.createdMissions || 0) + (refresh?.data?.createdResources || 0);
           if (refresh?.success && created > 0) {
-            res = await fetchMatchSuggestions(userId);
-            records = res?.data?.matchSuggestions?.data ?? [];
+            await pullBoth();
           }
         } catch (err) {
           console.warn('⚠️ [levDataLoader] Suggestion backfill failed', err);
@@ -566,9 +586,16 @@ async function loadSuggestionsFromMatchRecords(userData: any, userId: string | n
       }
     }
 
-    const suggestions = buildSuggestionsFromMatchRecords(records, userData);
-    suggestionsStore.set(suggestions);
-    console.log(`✅ [levDataLoader] Suggestions loaded from match records (${suggestions.length} items)`);
+    if (missionFetchOk) {
+      const suggestions = buildSuggestionsFromMatchRecords(missionRecords, userData);
+      suggestionsStore.set(suggestions);
+      console.log(`✅ [levDataLoader] Suggestions loaded from match records (${suggestions.length} items)`);
+    }
+    if (resourceFetchOk) {
+      const resourceSuggestions = buildResourceSuggestionsFromMatchRecords(resourceRecords, userData);
+      resourceSuggestionsStore.set(resourceSuggestions);
+      console.log(`✅ [levDataLoader] Resource suggestions loaded from match records (${resourceSuggestions.length} items)`);
+    }
   } catch (err) {
     console.warn('⚠️ [levDataLoader] Failed to load match suggestions — keeping fallback', err);
   }
