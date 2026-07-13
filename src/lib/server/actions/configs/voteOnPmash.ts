@@ -16,6 +16,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { matchOpenMashaabimToUsers } from '$lib/server/matching/engine';
 
 function normalizeVote(v: any): Record<string, any> {
   const uid =
@@ -165,7 +166,7 @@ const voteOnPmashHandler: ActionExecutionHandler = async (params, context, { str
         ${sqadualedFrag}
         ${sqadualefFrag}
         ${recurringFrag}
-      }) { data { attributes { project { data { id } } } } }
+      }) { data { id attributes { project { data { id } } } } }
 
       updatePmash(id: "${pmashId}", data: {
         archived: true,
@@ -184,6 +185,17 @@ const voteOnPmashHandler: ActionExecutionHandler = async (params, context, { str
 
     if (responseData.errors) {
       throw new Error(`voteOnPmash consensus mutation failed: ${JSON.stringify(responseData.errors)}`);
+    }
+
+    // The pmash matured into a real open resource request — tag users who
+    // offer this mashaabim with suggestions and notify them by email.
+    const newOpenMashaabimId = responseData.data?.createOpenMashaabim?.data?.id;
+    if (newOpenMashaabimId) {
+      await matchOpenMashaabimToUsers(String(newOpenMashaabimId), 'resourceCreated', {
+        strapi,
+        fetch: context.fetch,
+        lang: context.lang
+      });
     }
 
     // Consensus archives the pmash and creates an OpenMashaabim — refresh everywhere.

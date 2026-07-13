@@ -3897,35 +3897,6 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         skills {
           data {
             id
-            attributes {
-              open_missions(filters: { archived: { eq: false } }) {
-                data {
-                  id
-                  attributes {
-                    project {
-                      data {
-                        id
-                      }
-                    }
-                    skills {
-                      data {
-                        id
-                      }
-                    }
-                    tafkidims {
-                      data {
-                        id
-                      }
-                    }
-                    work_ways {
-                      data {
-                        id
-                      }
-                    }
-                  }
-                }
-              }
-            }
           }
         }
         username
@@ -3956,35 +3927,6 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         tafkidims {
           data {
             id
-            attributes {
-              open_missions(filters: { archived: { eq: false } }) {
-                data {
-                  id
-                  attributes {
-                    project {
-                      data {
-                        id
-                      }
-                    }
-                    skills {
-                      data {
-                        id
-                      }
-                    }
-                    tafkidims {
-                      data {
-                        id
-                      }
-                    }
-                    work_ways {
-                      data {
-                        id
-                      }
-                    }
-                  }
-                }
-              }
-            }
           }
         }
         projects_1s {
@@ -12432,6 +12374,274 @@ export const qids = {
           work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
         }
       }
+    }
+  }`,
+
+  // ── Match-suggestion engine (src/lib/server/matching/) ────────────────────
+  // 200-208: server-side matching queries/mutations, executed with the service
+  // token by StrapiClient. 209 is the lev page's clean pull of precomputed
+  // suggestions (idL is replaced with the cookie id by /api/send).
+
+  '200matchOpenMissionContext': `query MatchOpenMissionContext($omId: ID!) {
+    openMission(id: $omId) {
+      data {
+        id
+        attributes {
+          name
+          archived
+          isglobal
+          project { data { id attributes { projectName } } }
+          skills { data { id } }
+          tafkidims { data { id } }
+          work_ways { data { id } }
+          usersNotRelevant { data { id } }
+          rishon { data { id } }
+          match_suggestions(pagination: { limit: 1000 }) {
+            data { id attributes { user { data { id } } } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '201matchCandidateUsers': `query MatchCandidateUsers($skillIds: [ID], $roleIds: [ID], $limit: Int) {
+    usersPermissionsUsers(
+      filters: { or: [
+        { skills: { id: { in: $skillIds } } },
+        { tafkidims: { id: { in: $roleIds } } }
+      ] }
+      pagination: { limit: $limit }
+    ) {
+      data {
+        id
+        attributes {
+          username
+          email
+          lang
+          noMail
+          skills { data { id } }
+          tafkidims { data { id } }
+          work_ways { data { id } }
+          declined { data { id } }
+        }
+      }
+    }
+  }`,
+
+  '202matchUserContext': `query MatchUserContext($uid: ID!) {
+    usersPermissionsUser(id: $uid) {
+      data {
+        id
+        attributes {
+          username
+          email
+          lang
+          noMail
+          skills { data { id } }
+          tafkidims { data { id } }
+          work_ways { data { id } }
+          declined { data { id } }
+          askeds { data { id } }
+          sps(filters: { archived: { ne: true } }) {
+            data { id attributes { mashaabim { data { id } } } }
+          }
+          match_suggestions(pagination: { limit: 1000 }) {
+            data {
+              id
+              attributes {
+                kind
+                status
+                open_mission { data { id } }
+                open_mashaabim { data { id } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  '203matchOpenMissionsForUser': `query MatchOpenMissionsForUser($skillIds: [ID], $roleIds: [ID], $limit: Int) {
+    openMissions(
+      filters: { and: [
+        { archived: { eq: false } },
+        { or: [
+          { skills: { id: { in: $skillIds } } },
+          { tafkidims: { id: { in: $roleIds } } }
+        ] }
+      ] }
+      pagination: { limit: $limit }
+    ) {
+      data {
+        id
+        attributes {
+          name
+          skills { data { id } }
+          tafkidims { data { id } }
+          work_ways { data { id } }
+          project { data { id } }
+        }
+      }
+    }
+  }`,
+
+  '204matchOpenMashaabimContext': `query MatchOpenMashaabimContext($omId: ID!) {
+    openMashaabim(id: $omId) {
+      data {
+        id
+        attributes {
+          name
+          archived
+          project { data { id attributes { projectName } } }
+          mashaabim { data { id } }
+          declinedsps { data { id } }
+          match_suggestions(pagination: { limit: 1000 }) {
+            data { id attributes { user { data { id } } } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '205matchUsersByMashaabim': `query MatchUsersByMashaabim($mashId: ID!, $limit: Int) {
+    usersPermissionsUsers(
+      filters: { sps: { mashaabim: { id: { eq: $mashId } } } }
+      pagination: { limit: $limit }
+    ) {
+      data {
+        id
+        attributes {
+          username
+          email
+          lang
+          noMail
+          sps(filters: { archived: { ne: true } }) {
+            data { id attributes { mashaabim { data { id } } } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '206matchOpenMashaabimsForUser': `query MatchOpenMashaabimsForUser($mashIds: [ID], $limit: Int) {
+    openMashaabims(
+      filters: { and: [
+        { archived: { eq: false } },
+        { mashaabim: { id: { in: $mashIds } } }
+      ] }
+      pagination: { limit: $limit }
+    ) {
+      data {
+        id
+        attributes {
+          name
+          mashaabim { data { id } }
+          project { data { id } }
+          declinedsps { data { id } }
+        }
+      }
+    }
+  }`,
+
+  '207createMatchSuggestion': `mutation CreateMatchSuggestion(
+    $userId: ID!, $openMissionId: ID, $openMashaabimId: ID,
+    $kind: ENUM_MATCHSUGGESTION_KIND!, $score: Int,
+    $status: ENUM_MATCHSUGGESTION_STATUS, $source: ENUM_MATCHSUGGESTION_SOURCE,
+    $matchedOn: JSON, $notifiedAt: DateTime
+  ) {
+    createMatchSuggestion(data: {
+      user: $userId,
+      open_mission: $openMissionId,
+      open_mashaabim: $openMashaabimId,
+      kind: $kind,
+      score: $score,
+      status: $status,
+      source: $source,
+      matchedOn: $matchedOn,
+      notifiedAt: $notifiedAt
+    }) {
+      data { id }
+    }
+  }`,
+
+  '208updateMatchSuggestion': `mutation UpdateMatchSuggestion($id: ID!, $status: ENUM_MATCHSUGGESTION_STATUS) {
+    updateMatchSuggestion(id: $id, data: { status: $status }) {
+      data { id }
+    }
+  }`,
+
+  '209levMatchSuggestions': `query LevMatchSuggestions($idL: ID!) {
+    matchSuggestions(
+      filters: { and: [
+        { user: { id: { eq: $idL } } },
+        { status: { ne: "dismissed" } },
+        { kind: { eq: "mission" } },
+        { open_mission: { archived: { eq: false } } }
+      ] }
+      pagination: { limit: 200 }
+      sort: "score:desc"
+    ) {
+      data {
+        id
+        attributes {
+          score
+          status
+          kind
+          matchedOn
+          open_mission {
+            data {
+              id
+              attributes {
+                name
+                descrip
+                hearotMeyuchadot
+                noofhours
+                perhour
+                dates
+                sqadualed
+                source
+                project {
+                  data {
+                    id
+                    attributes {
+                      projectName
+                      restime
+                      timeToP
+                      user_1s { data { id } }
+                      profilePic { data { attributes { url formats } } }
+                    }
+                  }
+                }
+                acts { data { id attributes { shem des } } }
+                tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+                skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
+                work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
+                ratson {
+                  data { id attributes { name logo { data { attributes { url formats } } } } }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  '210findMatchSuggestionsByMission': `query FindMatchSuggestionsByMission($uid: ID!, $omId: ID!) {
+    matchSuggestions(filters: { and: [
+      { user: { id: { eq: $uid } } },
+      { open_mission: { id: { eq: $omId } } }
+    ] }) {
+      data { id }
+    }
+  }`,
+
+  '211findMatchSuggestionsByMashaabim': `query FindMatchSuggestionsByMashaabim($uid: ID!, $omashId: ID!) {
+    matchSuggestions(filters: { and: [
+      { user: { id: { eq: $uid } } },
+      { open_mashaabim: { id: { eq: $omashId } } }
+    ] }) {
+      data { id }
     }
   }`,
 

@@ -410,6 +410,7 @@ export type ActionKey =
   | 'createSale'
   | 'voteOnDecision'
   | 'counterSaleClaim'
+  | 'refreshMySuggestions'
   ;
 
 

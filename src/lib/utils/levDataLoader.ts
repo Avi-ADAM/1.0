@@ -50,6 +50,7 @@ import {
   extractAskedResources,
   extractResourceSuggestions,
   extractSuggestions,
+  buildSuggestionsFromMatchRecords,
   extractProjects,
   extractPmashes,
   extractWegets,
@@ -62,7 +63,8 @@ import {
   extractPurchases,
   extractWishOffers
 } from './levDataExtractors';
-import { fetchMainUserData, fetchOpenMissions } from './levGraphQLQueries';
+import { fetchMainUserData, fetchMatchSuggestions } from './levGraphQLQueries';
+import { executeAction } from '$lib/client/actionClient';
 import { resolvePlatformIdentity } from '$lib/stores/platformStore';
 
 // Single in-flight full load, keyed by user id — lets concurrent callers
@@ -177,32 +179,17 @@ async function doInitializeLevData(
     // whose guard refuses to persist anything other than a full dataset.
     dataMode.set('full');
 
-    // Step 3.5 + 4 run in the background: suggestion enrichment (query 84) is
-    // a second server round-trip and must not delay first render — the cards
-    // update reactively when it lands. The snapshot is saved after enrichment
-    // so the persisted copy carries the enriched suggestions.
+    // Step 3.5 + 4 run in the background: mission suggestions come from the
+    // precomputed match-suggestion collection (qid 209) — a clean pull of
+    // ready-made, server-scored rows with full card details, instead of the
+    // old client-side matching over every open mission per skill/role. Must
+    // not delay first render — the cards update reactively when it lands. The
+    // snapshot is saved afterwards so the persisted copy carries the result.
     void (async () => {
-      const suggestions = get(suggestionsStore);
-      if (suggestions.length > 0) {
-        console.log(`🌐 [levDataLoader] Fetching details for ${suggestions.length} suggestions`);
-        const topIds = suggestions.slice(0, 50).map(s => s.id); // Optimized to fetch top 50
-
-        try {
-          const detailsData = await fetchOpenMissions(
-            import.meta.env.VITE_URL,
-            token,
-            topIds,
-            lang
-          );
-
-          if (detailsData?.data?.openMissions?.data) {
-            updateSuggestionsWithDetails(detailsData.data.openMissions.data);
-            console.log('✅ [levDataLoader] Suggestions enriched with details');
-          }
-        } catch (err) {
-          console.warn('⚠️ [levDataLoader] Failed to fetch suggestion details', err);
-        }
-      }
+      await loadSuggestionsFromMatchRecords(
+        freshData.data.usersPermissionsUser.data,
+        userId
+      );
 
       console.log('💾 [levDataLoader] Saving new snapshot');
       saveCurrentSnapshot();
@@ -545,49 +532,44 @@ export function clearAllData(): void {
 }
 
 /**
- * Update suggestions store with detailed mission data
+ * Load mission suggestions from the precomputed match-suggestion collection
+ * (qid 209) and set the store. If the user has no stored rows yet (accounts
+ * that predate the collection), trigger a one-time server-side backfill via
+ * the refreshMySuggestions action, then re-pull.
+ *
+ * Falls back to whatever populateStores already put in the store (ask-derived
+ * suggestions) on any failure — never throws.
  */
-function updateSuggestionsWithDetails(missionsData: any[]) {
-  suggestionsStore.update(currentSuggestions => {
-    const missionsMap = new Map(missionsData.map(m => [m.id, m]));
+async function loadSuggestionsFromMatchRecords(userData: any, userId: string | number) {
+  try {
+    let res = await fetchMatchSuggestions(userId);
+    let records = res?.data?.matchSuggestions?.data ?? [];
 
-    return currentSuggestions.map(suggestion => {
-      const detail = missionsMap.get(suggestion.id);
-      if (!detail || !detail.attributes) return suggestion;
+    if (records.length === 0) {
+      const hasCaps =
+        (userData?.attributes?.skills?.data?.length || 0) > 0 ||
+        (userData?.attributes?.tafkidims?.data?.length || 0) > 0;
 
-      return {
-        ...suggestion,
-        name: detail.attributes.name || suggestion.name,
-        descrip: detail.attributes.descrip || suggestion.descrip,
-        hearotMeyuchadot: detail.attributes.hearotMeyuchadot || suggestion.hearotMeyuchadot,
-        noofhours: detail.attributes.noofhours || suggestion.noofhours,
-        perhour: detail.attributes.perhour || suggestion.perhour,
-        sqadualed: detail.attributes.sqadualed || suggestion.sqadualed,
-        acts: detail.attributes.acts?.data || suggestion.acts,
-        dates: detail.attributes.dates || suggestion.dates,
-        projectId: detail.attributes.project?.data?.id || suggestion.projectId,
+      if (hasCaps) {
+        console.log('🌐 [levDataLoader] No stored suggestions — running one-time backfill');
+        try {
+          const refresh = await executeAction('refreshMySuggestions', {});
+          const created =
+            (refresh?.data?.createdMissions || 0) + (refresh?.data?.createdResources || 0);
+          if (refresh?.success && created > 0) {
+            res = await fetchMatchSuggestions(userId);
+            records = res?.data?.matchSuggestions?.data ?? [];
+          }
+        } catch (err) {
+          console.warn('⚠️ [levDataLoader] Suggestion backfill failed', err);
+        }
+      }
+    }
 
-        // Concierge branding (PLAN_CONCIERGE §5.2): a project-less open-mission
-        // carries a `ratson` link → processSuggestions renders it as "קונסירג'".
-        source: detail.attributes.source ?? suggestion.source,
-        ratsonId: detail.attributes.ratson?.data?.id ?? suggestion.ratsonId,
-        ratsonName: detail.attributes.ratson?.data?.attributes?.name ?? suggestion.ratsonName,
-
-        // Project details from the secondary fetch
-        projectDetails: detail.attributes.project?.data?.attributes ? {
-          name: detail.attributes.project.data.attributes.projectName,
-          src: detail.attributes.project.data.attributes.profilePic?.data?.attributes?.url,
-          membersCount: detail.attributes.project.data.attributes.user_1s?.data?.length || 0,
-          memberIds: detail.attributes.project.data.attributes.user_1s?.data?.map((u: any) => u.id) || [],
-          restime: detail.attributes.project.data.attributes.restime,
-          ...suggestion.projectDetails // keep existing if any
-        } : suggestion.projectDetails,
-
-        // Ensure we have correct IDs for skills/roles/workways even if previously just lists
-        skills: detail.attributes.skills?.data || suggestion.skills,
-        tafkidims: detail.attributes.tafkidims?.data || suggestion.tafkidims,
-        work_ways: detail.attributes.work_ways?.data || suggestion.work_ways
-      };
-    });
-  });
+    const suggestions = buildSuggestionsFromMatchRecords(records, userData);
+    suggestionsStore.set(suggestions);
+    console.log(`✅ [levDataLoader] Suggestions loaded from match records (${suggestions.length} items)`);
+  } catch (err) {
+    console.warn('⚠️ [levDataLoader] Failed to load match suggestions — keeping fallback', err);
+  }
 }

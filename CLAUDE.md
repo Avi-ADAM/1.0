@@ -81,3 +81,13 @@ matures by mutual agreement, a matured counter round, or restime silence. "Money
 is with me" is a sovereign self-report (`holderStatus:'self'`), final immediately.
 A sale is counted in balances/tosplits only when **effective**
 (`holderStatus` is `self`, `confirmed`, or null-legacy) — never while `open`.
+
+## Match suggestions (lev recommendations)
+
+See `docs/PLAN_MATCH_SUGGESTIONS.md`. Lev mission/resource suggestions are
+**precomputed server-side** into the Strapi `match-suggestion` collection by
+`src/lib/server/matching/` (triggered from the actions that create open
+missions / open mashaabims and from profile updates), including "new
+suggestion" emails. The lev page reads them via qid `209levMatchSuggestions` —
+do **not** reintroduce client-side matching over per-skill `open_missions`
+pulls in query 83.

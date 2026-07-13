@@ -324,7 +324,7 @@ export function extractSuggestions(userData: any): SuggestionData[] {
   // Loop 1: Tafkidims (Roles)
   if (userData.attributes.tafkidims?.data) {
     for (const role of userData.attributes.tafkidims.data) {
-      if (!role.attributes.open_missions?.data) continue;
+      if (!role.attributes?.open_missions?.data) continue;
       for (const mission of role.attributes.open_missions.data) {
         if (!mission?.id || !mission.attributes) continue;
 
@@ -347,7 +347,7 @@ export function extractSuggestions(userData: any): SuggestionData[] {
   // Loop 2: Skills
   if (userData.attributes.skills?.data) {
     for (const skill of userData.attributes.skills.data) {
-      if (!skill.attributes.open_missions?.data) continue;
+      if (!skill.attributes?.open_missions?.data) continue;
       for (const mission of skill.attributes.open_missions.data) {
         if (!mission?.id || !mission.attributes) continue;
 
@@ -474,6 +474,126 @@ export function extractSuggestions(userData: any): SuggestionData[] {
       work_ways: mission.attributes.work_ways || { data: [] }
     });
   }
+
+  return suggestions;
+}
+
+/**
+ * Build lev suggestions from precomputed match-suggestion records
+ * (qid 209levMatchSuggestions) instead of matching client-side.
+ *
+ * The records carry the full open-mission card payload and a server-computed
+ * score; user-side state (my pending ask / negotiation round, declined list)
+ * still comes from the main user data (query 83), so the resulting objects are
+ * drop-in replacements for extractSuggestions output.
+ *
+ * @param matchRecords - matchSuggestions.data array from qid 209
+ * @param userData - Raw user data from query 83 (asks / askeds / declined)
+ */
+export function buildSuggestionsFromMatchRecords(
+  matchRecords: any[],
+  userData: any
+): SuggestionData[] {
+  const suggestions: SuggestionData[] = [];
+  if (!Array.isArray(matchRecords)) matchRecords = [];
+
+  // My pending asks per open mission (same merge as extractSuggestions)
+  const askedMap = new Map<string, any>();
+  const askedMissionsFromAsks = new Map<string, any>();
+  if (userData?.attributes?.asks?.data) {
+    for (const ask of userData.attributes.asks.data) {
+      const missionId = ask.attributes?.open_mission?.data?.id;
+      if (missionId) {
+        askedMap.set(String(missionId), ask);
+        if (ask.attributes?.open_mission?.data) {
+          askedMissionsFromAsks.set(String(missionId), ask.attributes.open_mission.data);
+        }
+      }
+    }
+  }
+
+  const declinedIds = new Set<string>(
+    (userData?.attributes?.declined?.data || []).map((x: any) => String(x.id))
+  );
+  const askedIds = new Set<string>(
+    (userData?.attributes?.askeds?.data || []).map((x: any) => String(x.id))
+  );
+
+  const seen = new Set<string>();
+
+  const pushMission = (mission: any, score: number) => {
+    const missionId = String(mission.id);
+    if (seen.has(missionId) || declinedIds.has(missionId)) return;
+    seen.add(missionId);
+
+    const askData = askedMap.get(missionId);
+    const isAlreadyAsked = !!askData || askedIds.has(missionId);
+
+    suggestions.push({
+      id: mission.id,
+      projectId: mission.attributes?.project?.data?.id || '',
+      content: 'suggestion',
+      priority: -score,
+
+      type: 'suggestion',
+      score,
+      alreadyAsked: isAlreadyAsked,
+      askId: askData?.id,
+      myAskId: askData?.id,
+      myAskUsers: askData?.attributes?.vots || [],
+      myRoundProposedBy: askData?.attributes?.negopendmissions?.data?.[0]?.attributes?.proposedBy ?? null,
+      myOrdern: askData?.attributes?.negopendmissions?.data?.[0]?.attributes?.ordern ?? 0,
+      myRound: askData?.attributes?.negopendmissions?.data?.[0]?.attributes ?? null,
+      chat: askData?.attributes?.chat,
+      forumId: (askData?.attributes?.forums?.data && askData.attributes.forums.data.length > 0) ? askData.attributes.forums.data[0].id : null,
+
+      projectDetails: mission.attributes?.project?.data?.attributes ? {
+        name: mission.attributes.project.data.attributes.projectName,
+        src: mission.attributes.project.data.attributes.profilePic?.data?.attributes?.url,
+        membersCount: mission.attributes.project.data.attributes.user_1s?.data?.length || 0,
+        memberIds: mission.attributes.project.data.attributes.user_1s?.data?.map((u: any) => u.id) || [],
+        restime: mission.attributes.project.data.attributes.restime
+      } : undefined,
+
+      name: mission.attributes?.name || 'Loading...',
+      descrip: mission.attributes?.descrip || '',
+      hearotMeyuchadot: mission.attributes?.hearotMeyuchadot || '',
+      noofhours: mission.attributes?.noofhours || 0,
+      perhour: mission.attributes?.perhour || 0,
+      sqadualed: mission.attributes?.sqadualed || '',
+      dates: mission.attributes?.dates || '',
+
+      acts: mission.attributes?.acts || { data: [] },
+
+      // Concierge branding (PLAN_CONCIERGE §5.2): a project-less open-mission
+      // carries a `ratson` link → processSuggestions renders it as "קונסירג'".
+      source: mission.attributes?.source,
+      ratsonId: mission.attributes?.ratson?.data?.id,
+      ratsonName: mission.attributes?.ratson?.data?.attributes?.name,
+
+      skills: mission.attributes?.skills || { data: [] },
+      tafkidims: mission.attributes?.tafkidims || { data: [] },
+      work_ways: mission.attributes?.work_ways || { data: [] }
+    });
+  };
+
+  // 1. Precomputed records, already sorted by score desc on the server
+  for (const record of matchRecords) {
+    const mission = record?.attributes?.open_mission?.data;
+    if (!mission?.id || !mission.attributes) continue;
+    pushMission(mission, record.attributes?.score ?? 0);
+  }
+
+  // 2. Missions I applied to that have no stored suggestion (legacy behavior:
+  //    surfaced with score 2 so the negotiation state stays visible)
+  for (const [missionId, missionData] of askedMissionsFromAsks) {
+    if (!seen.has(missionId)) {
+      pushMission(missionData, 2);
+    }
+  }
+
+  // Keep highest score first (records are sorted, ask-only entries appended)
+  suggestions.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
 
   return suggestions;
 }

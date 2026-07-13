@@ -33,6 +33,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { calcDeadlineMs } from './actionUtils.js';
 import { createMissionConsentSpec } from '$lib/consent/specs/s2b';
+import { matchOpenMissionToUsers } from '$lib/server/matching/engine';
 
 interface ChecklistItem {
   shem: string;
@@ -255,6 +256,14 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     createdEntityId = openRes?.data?.createOpenMission?.data?.id;
     if (!createdEntityId) throw new Error('Failed to create OpenMission (branch 3)');
     createdEntityType = 'openMission';
+
+    // Tag every relevant user with a match-suggestion (+ email) so the lev
+    // page can pull ready-made suggestions instead of matching client-side.
+    await matchOpenMissionToUsers(String(createdEntityId), 'missionCreated', {
+      strapi,
+      fetch: context.fetch,
+      lang: context.lang
+    });
   }
   // ── BRANCH 4: Solo, self-assigned → Mesimabetahalich ─────────────────────
   else {
