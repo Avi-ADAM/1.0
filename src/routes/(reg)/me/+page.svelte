@@ -1221,6 +1221,10 @@
       max-width: 27vw;
       min-width: 27vw;
     }
+    .a1,
+    .a6 {
+      top: 26%;
+    }
   }
 
   .ceterr {
@@ -1308,6 +1312,10 @@
     top: 17%;
     left: 20%;
     overflow: visible;
+  }
+  #my-mission-offers {
+    position: relative;
+    z-index: 10;
   }
   .a4 {
     position: absolute;
