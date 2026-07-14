@@ -70,7 +70,7 @@
 >
   <!-- Products: count → sales-center, plus → create flow -->
   <span
-    class="flex items-center justify-between sm:justify-center gap-2 rounded-full bg-gradient-to-br from-mpink via-lpink to-barbi px-4 py-1.5 text-white font-bold shadow-md"
+    class="flex flex-col sm:flex-row items-center justify-between sm:justify-center gap-1 sm:gap-2 rounded-full bg-gradient-to-br from-mpink via-lpink to-barbi px-4 py-1.5 text-white font-bold shadow-md"
   >
     <a
       href="/sales-center"
@@ -99,7 +99,7 @@
 
   <!-- Missions: offers + doing count, ✓ done count → /me/offerings -->
   <span
-    class="flex items-center justify-between sm:justify-center gap-2 rounded-full bg-gradient-to-br from-mpink via-lpink to-barbi px-4 py-1.5 text-white font-bold shadow-md"
+    class="flex flex-col sm:flex-row items-center justify-between sm:justify-center gap-1 sm:gap-2 rounded-full bg-gradient-to-br from-mpink via-lpink to-barbi px-4 py-1.5 text-white font-bold shadow-md"
   >
     <a
       href="/me/offerings"

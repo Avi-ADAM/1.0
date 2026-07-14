@@ -1221,10 +1221,6 @@
       max-width: 27vw;
       min-width: 27vw;
     }
-    .a1,
-    .a6 {
-      top: 26%;
-    }
   }
 
   .ceterr {
