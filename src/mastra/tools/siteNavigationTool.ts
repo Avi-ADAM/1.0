@@ -261,7 +261,7 @@ export const getSitePagesTool = createTool({
           },
           {
             "name": "Edit Basic Profile",
-            "path": "/me?action=editbasic",
+            "path": "/me/settings",
             "description": "Edit basic profile info and register for Telegram / push notifications",
             "authRequired": true
           }

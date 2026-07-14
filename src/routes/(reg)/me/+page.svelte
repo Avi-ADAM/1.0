@@ -22,7 +22,6 @@
   import Addnewp from '$lib/components/userPr/uploadPic.svelte';
   import { uPic } from '$lib/stores/uPic.js';
   import Edit from '$lib/components/userPr/edit.svelte';
-  import EditB from '$lib/components/userPr/editBasic.svelte';
   const baseUrl = import.meta.env.VITE_URL;
   //import Profile from '../../lib/components/userPr/new.svelte';
   //import { addS } from '../../lib/stores/addS.js';
@@ -128,10 +127,6 @@
     idPr.set(id);
     goto('/moach');
   }
-  let mail = $state(data.meData?.email);
-  let lango = $state(data.meData?.lang || 'he');
-  let cards = $state(data.meData?.preferCards ?? true);
-
   /**
    * Sync local state from the server load. Re-runs whenever `data` changes —
    * i.e. after invalidate('app:meProfile') triggered by one of our actions or
@@ -143,14 +138,6 @@
     meData = data.meData;
     picLink = data.picLink;
     total = data.total;
-    mail = data.meData.email;
-    lango = data.meData.lang || 'he';
-    cards = data.meData.preferCards ?? true;
-    fblink = data.meData.fblink;
-    twiterlink = data.meData.twiterlink;
-    discordlink = data.meData.discordlink;
-    githublink = data.meData.githublink;
-    noMail = data.meData.noMail;
     isG = data.meData.profilManualAlready;
     // Hydrate the app-wide user cache so other pages don't re-fetch.
     hydrateUser(data.meData);
@@ -212,55 +199,12 @@
 }
   }
    })*/
-  let userName_value;
-  let biog;
-  let frd;
-  let fblink = $state(),
-    twiterlink = $state(),
-    discordlink = $state(),
-    githublink = $state(),
-    noMail = $state();
-  async function sendD() {
-    const result = await executeAction('updateUserBasic', {
-      username: userName_value,
-      bio: biog,
-      frd: frd,
-      lang: lango,
-      fblink: fblink,
-      twiterlink: twiterlink,
-      discordlink: discordlink,
-      githublink: githublink,
-      preferCards: cards,
-      noMail: noMail
-    });
-    isOpenM = false;
-    isOpen = false;
-    a = 0;
-    // On success the action's updateStrategy reloads the profile (app:meProfile),
-    // so the synced $effect refreshes meData. executeAction already toasts errors.
-  }
 
   function callbackFunction(event) {
     a = 2;
     files = event.files; // files is already a FormData object from the Addnewp component
     console.log(files);
     sendP();
-  }
-  function callbackFunctio(event) {
-    console.log(event);
-    a = 2;
-    fblink = event.fblink;
-    twiterlink = event.twiterlink;
-    discordlink = event.discordlink;
-    githublink = event.githublink;
-    userName_value = event.un;
-    // emailL = event.em;
-    noMail = event.noMail;
-    biog = event.bi;
-    frd = event.frd;
-    lango = event.lango;
-    cards = event.cards;
-    sendD();
   }
 
   function remove(event) {
@@ -326,10 +270,6 @@
     addpic = 0;
     a = 0;
   };
-  function basic() {
-    isOpen = true;
-    a = 1;
-  }
   function openen() {
     isOpenM = true;
     updX = 1;
@@ -479,9 +419,15 @@
         iwant = false;
         addP = true;
       } else if (page.url.searchParams.get('action') === 'editbasic') {
-        isOpen = true;
-        a = 1;
+        // Old deep link into the settings modal — now a real page.
+        goto('/me/settings');
       }
+    } else if (page.url.searchParams.get('tour') === '1') {
+      // Settings page sent us back here to resume the guided tour, whose
+      // TourItems only exist on this page.
+      await tick();
+      await goto('/me', { replaceState: true, noScroll: true, keepFocus: true });
+      guid();
     }
   });
   function guid() {
@@ -715,28 +661,7 @@
             onclick={closer}><Close /></button
           >
 
-          {#if a == 1}
-            <EditB
-              machshirs={meData?.machshirs.data}
-              projectIds={meData.projects_1s.data.map((c) => c.id)}
-              isGuidMe={!isG}
-              onGuidMeChange={(value) => (isG = !value)}
-              checked={cards}
-              lango={$lang}
-              uid={data.uid}
-              {fblink}
-              {twiterlink}
-              {noMail}
-              {discordlink}
-              {githublink}
-              frd={meData.frd}
-              {mail}
-              un={meData.username}
-              bi={meData.bio}
-              onMessage={callbackFunctio}
-              onGuid={guid}
-            />
-          {:else if a == 3}
+          {#if a == 3}
             <div class="grid items-center text-center justify-center">
               <h3 class="text-barbi">{messege}</h3>
               <button
@@ -816,8 +741,9 @@
           {/if}
 
           {#if a == 0}
-            <button
-              onclick={basic}
+            <a
+              href="/me/settings"
+              data-sveltekit-prefetch
               title={editbas[$lang]}
               class="hover:bg-gold text-mturk hover:text-barbi rounded-full"
             >
@@ -830,7 +756,7 @@
                   />
                 </svg>
               </TourItem>
-            </button>
+            </a>
           {/if}
 
           <!-- במקרה שאין תמונה וצריך כפתור העלאה ענק -->
