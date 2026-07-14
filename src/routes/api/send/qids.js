@@ -12513,7 +12513,9 @@ export const qids = {
     $finishDate: DateTime,
     $note: String,
     $reporter: ID,
-    $holderStatus: ENUM_SALE_HOLDERSTATUS
+    $holderStatus: ENUM_SALE_HOLDERSTATUS,
+    $externalId: String,
+    $source: ENUM_SALE_SOURCE
   ) {
     createSale(data: {
       project: $project,
@@ -12527,7 +12529,9 @@ export const qids = {
       finishDate: $finishDate,
       note: $note,
       reporter: $reporter,
-      holderStatus: $holderStatus
+      holderStatus: $holderStatus,
+      externalId: $externalId,
+      source: $source
     }) {
       data {
         id
@@ -12557,6 +12561,41 @@ export const qids = {
       start: $start
     }) {
       data { id }
+    }
+  }`,
+
+  // ── External Sales API (PLAN_EXTERNAL_SALES_API) ───────────────────────────
+  // Confirm a product belongs to the key's rikma and read the fields createSale
+  // needs (quant → availableQuantity, kindOf). A foreign product returns no row.
+  'salesApiProductInfo': `query SalesApiProductInfo($pid: ID!, $productId: ID!) {
+    project(id: $pid) {
+      data {
+        id
+        attributes {
+          matanotofs(filters: { id: { eq: $productId } }) {
+            data {
+              id
+              attributes {
+                name
+                quant
+                kindOf
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  // Idempotency: has this externalId already been reported for this rikma?
+  // Payment gateways retry, so a duplicate must resolve to the existing sale
+  // instead of creating a second record.
+  'saleByExternalId': `query SaleByExternalId($pid: ID!, $externalId: String!) {
+    sales(filters: {
+      project: { id: { eq: $pid } },
+      externalId: { eq: $externalId }
+    }) {
+      data { id attributes { holderStatus } }
     }
   }`,
 

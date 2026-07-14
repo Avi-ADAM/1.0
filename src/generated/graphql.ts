@@ -266,10 +266,15 @@ export type ActtInput = {
 
 export type ApiKey = {
   __typename?: 'ApiKey';
+  allowed_origins?: Maybe<Scalars['JSON']['output']>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   key_hash?: Maybe<Scalars['String']['output']>;
   key_prefix?: Maybe<Scalars['String']['output']>;
+  lastUsedAt?: Maybe<Scalars['DateTime']['output']>;
   name?: Maybe<Scalars['String']['output']>;
+  project?: Maybe<ProjectEntityResponse>;
+  revoked?: Maybe<Scalars['Boolean']['output']>;
+  scopes?: Maybe<Scalars['JSON']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   users_permissions_user?: Maybe<UsersPermissionsUserEntityResponse>;
 };
@@ -292,22 +297,32 @@ export type ApiKeyEntityResponseCollection = {
 };
 
 export type ApiKeyFiltersInput = {
+  allowed_origins?: InputMaybe<JsonFilterInput>;
   and?: InputMaybe<Array<InputMaybe<ApiKeyFiltersInput>>>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
   id?: InputMaybe<IdFilterInput>;
   key_hash?: InputMaybe<StringFilterInput>;
   key_prefix?: InputMaybe<StringFilterInput>;
+  lastUsedAt?: InputMaybe<DateTimeFilterInput>;
   name?: InputMaybe<StringFilterInput>;
   not?: InputMaybe<ApiKeyFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<ApiKeyFiltersInput>>>;
+  project?: InputMaybe<ProjectFiltersInput>;
+  revoked?: InputMaybe<BooleanFilterInput>;
+  scopes?: InputMaybe<JsonFilterInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
   users_permissions_user?: InputMaybe<UsersPermissionsUserFiltersInput>;
 };
 
 export type ApiKeyInput = {
+  allowed_origins?: InputMaybe<Scalars['JSON']['input']>;
   key_hash?: InputMaybe<Scalars['String']['input']>;
   key_prefix?: InputMaybe<Scalars['String']['input']>;
+  lastUsedAt?: InputMaybe<Scalars['DateTime']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  project?: InputMaybe<Scalars['ID']['input']>;
+  revoked?: InputMaybe<Scalars['Boolean']['input']>;
+  scopes?: InputMaybe<Scalars['JSON']['input']>;
   users_permissions_user?: InputMaybe<Scalars['ID']['input']>;
 };
 
@@ -3285,6 +3300,11 @@ export enum Enum_Sale_Holderstatus {
   Confirmed = 'confirmed',
   Open = 'open',
   Self = 'self'
+}
+
+export enum Enum_Sale_Source {
+  Api = 'api',
+  Ui = 'ui'
 }
 
 export enum Enum_Sheirutfulfillment_Status_Process {
@@ -14794,6 +14814,7 @@ export type Sale = {
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   date?: Maybe<Scalars['DateTime']['output']>;
   decision?: Maybe<DecisionEntityResponse>;
+  externalId?: Maybe<Scalars['String']['output']>;
   finishDate?: Maybe<Scalars['DateTime']['output']>;
   holderDecidedAt?: Maybe<Scalars['DateTime']['output']>;
   holderStatus?: Maybe<Enum_Sale_Holderstatus>;
@@ -14808,6 +14829,7 @@ export type Sale = {
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   reporter?: Maybe<UsersPermissionsUserEntityResponse>;
   sheiruts?: Maybe<SheirutRelationResponseCollection>;
+  source?: Maybe<Enum_Sale_Source>;
   source_project?: Maybe<ProjectEntityResponse>;
   splited: Scalars['Boolean']['output'];
   startDate?: Maybe<Scalars['DateTime']['output']>;
@@ -14862,6 +14884,7 @@ export type SaleFiltersInput = {
   createdAt?: InputMaybe<DateTimeFilterInput>;
   date?: InputMaybe<DateTimeFilterInput>;
   decision?: InputMaybe<DecisionFiltersInput>;
+  externalId?: InputMaybe<StringFilterInput>;
   finishDate?: InputMaybe<DateTimeFilterInput>;
   holderDecidedAt?: InputMaybe<DateTimeFilterInput>;
   holderStatus?: InputMaybe<StringFilterInput>;
@@ -14879,6 +14902,7 @@ export type SaleFiltersInput = {
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   reporter?: InputMaybe<UsersPermissionsUserFiltersInput>;
   sheiruts?: InputMaybe<SheirutFiltersInput>;
+  source?: InputMaybe<StringFilterInput>;
   source_project?: InputMaybe<ProjectFiltersInput>;
   splited?: InputMaybe<BooleanFilterInput>;
   startDate?: InputMaybe<DateTimeFilterInput>;
@@ -14892,6 +14916,7 @@ export type SaleInput = {
   confirmedBy?: InputMaybe<Enum_Sale_Confirmedby>;
   date?: InputMaybe<Scalars['DateTime']['input']>;
   decision?: InputMaybe<Scalars['ID']['input']>;
+  externalId?: InputMaybe<Scalars['String']['input']>;
   finishDate?: InputMaybe<Scalars['DateTime']['input']>;
   holderDecidedAt?: InputMaybe<Scalars['DateTime']['input']>;
   holderStatus?: InputMaybe<Enum_Sale_Holderstatus>;
@@ -14906,6 +14931,7 @@ export type SaleInput = {
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   reporter?: InputMaybe<Scalars['ID']['input']>;
   sheiruts?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  source?: InputMaybe<Enum_Sale_Source>;
   source_project?: InputMaybe<Scalars['ID']['input']>;
   splited?: InputMaybe<Scalars['Boolean']['input']>;
   startDate?: InputMaybe<Scalars['DateTime']['input']>;

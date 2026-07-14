@@ -1333,6 +1333,15 @@ export interface ApiApiKeyApiKey extends Schema.CollectionType {
       'manyToOne',
       'plugin::users-permissions.user'
     >;
+    project: Attribute.Relation<
+      'api::api-key.api-key',
+      'manyToOne',
+      'api::project.project'
+    >;
+    scopes: Attribute.JSON;
+    allowed_origins: Attribute.JSON;
+    revoked: Attribute.Boolean;
+    lastUsedAt: Attribute.DateTime;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -5905,6 +5914,8 @@ export interface ApiSaleSale extends Schema.CollectionType {
       'manyToMany',
       'api::sheirut.sheirut'
     >;
+    externalId: Attribute.String;
+    source: Attribute.Enumeration<['ui', 'api']> & Attribute.DefaultTo<'ui'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

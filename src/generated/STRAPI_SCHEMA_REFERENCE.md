@@ -74,10 +74,15 @@ These are the main content types in the Strapi backend.
 ### ApiKey
 | Field | Type |
 |-------|------|
+| `allowed_origins` | `Maybe<Scalars['JSON']['output']>` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `key_hash` | `Maybe<Scalars['String']['output']>` |
 | `key_prefix` | `Maybe<Scalars['String']['output']>` |
+| `lastUsedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `name` | `Maybe<Scalars['String']['output']>` |
+| `project` | `Maybe<ProjectEntityResponse>` |
+| `revoked` | `Maybe<Scalars['Boolean']['output']>` |
+| `scopes` | `Maybe<Scalars['JSON']['output']>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `users_permissions_user` | `Maybe<UsersPermissionsUserEntityResponse>` |
 
@@ -2265,6 +2270,7 @@ These are the main content types in the Strapi backend.
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `date` | `Maybe<Scalars['DateTime']['output']>` |
 | `decision` | `Maybe<DecisionEntityResponse>` |
+| `externalId` | `Maybe<Scalars['String']['output']>` |
 | `finishDate` | `Maybe<Scalars['DateTime']['output']>` |
 | `holderDecidedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `holderStatus` | `Maybe<Enum_Sale_Holderstatus>` |
@@ -2279,6 +2285,7 @@ These are the main content types in the Strapi backend.
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `reporter` | `Maybe<UsersPermissionsUserEntityResponse>` |
 | `sheiruts` | `Maybe<SheirutRelationResponseCollection>` |
+| `source` | `Maybe<Enum_Sale_Source>` |
 | `source_project` | `Maybe<ProjectEntityResponse>` |
 | `splited` | `Scalars['Boolean']['output']` |
 | `startDate` | `Maybe<Scalars['DateTime']['output']>` |
