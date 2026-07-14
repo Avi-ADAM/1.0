@@ -714,7 +714,7 @@ console.log("skillslist",skillslist);
     </h2>
     {#if data.length > 0}
       <div
-        class="flex sm:flex-row flex-wrap justify-center align-middle inner-scroll d cd p-2 mb-1"
+        class="flex flex-col sm:flex-row sm:flex-wrap justify-center items-center inner-scroll d cd p-2 mb-1"
       >
         {#each data as dat, i}
           <p class="m-0" style="text-shadow:none; white-space:none;">
@@ -768,7 +768,7 @@ console.log("skillslist",skillslist);
       </p>
       {#if data.length > 0}
         <div
-          class="  flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 mb-1"
+          class="  flex flex-col sm:flex-row sm:flex-wrap justify-center items-center d cd p-2 mb-1"
         >
           {#each data as da, i (da.id)}
             <div
@@ -1047,6 +1047,12 @@ console.log("skillslist",skillslist);
     max-height: 20vh;
     width: 100%;
     overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .inner-scroll :global(span) {
+    max-width: 100%;
+    white-space: normal;
+    word-break: break-word;
   }
   .th {
     margin-top: 0.2em;

@@ -1117,6 +1117,7 @@
   .pro {
     max-height: 15vh;
     overflow-y: scroll;
+    overflow-x: hidden;
   }
 
   :global([data-svelte-dialog-overlay].content) {
@@ -1173,6 +1174,8 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    max-width: 100%;
+    word-break: break-word;
   }
   .cont > span {
     display: none;
@@ -1210,6 +1213,7 @@
     .pro {
       max-height: 15vh;
       overflow-y: scroll;
+      overflow-x: hidden;
     }
     .another {
       max-height: 25vh;
@@ -1524,6 +1528,7 @@
     max-height: 20vh;
     width: 100%;
     overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .cot {
