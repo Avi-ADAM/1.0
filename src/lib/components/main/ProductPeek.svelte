@@ -38,13 +38,28 @@
       terms: [{ label: $t('home.peek.lev.cards.c2.t1'), value: 10, step: 1, min: 1 }]
     },
     {
-      emoji: '💰',
+      emoji: '🙋',
       glow: 'rgba(255,0,146,0.6)',
       type: $t('home.peek.lev.cards.c3.type'),
       project: $t('home.peek.lev.cards.c3.project'),
       title: $t('home.peek.lev.cards.c3.title'),
       by: $t('home.peek.lev.cards.c3.by'),
-      terms: [{ label: $t('home.peek.lev.cards.c3.t1'), value: 2400, step: 100, min: 100 }]
+      terms: [
+        { label: $t('home.peek.lev.cards.c3.t1'), value: 6, step: 1, min: 1 },
+        { label: $t('home.peek.lev.cards.c3.t2'), value: 900, step: 50, min: 50 }
+      ]
+    },
+    {
+      emoji: '📥',
+      glow: 'rgba(34,211,238,0.6)',
+      type: $t('home.peek.lev.cards.c4.type'),
+      project: $t('home.peek.lev.cards.c4.project'),
+      title: $t('home.peek.lev.cards.c4.title'),
+      by: $t('home.peek.lev.cards.c4.by'),
+      terms: [
+        { label: $t('home.peek.lev.cards.c4.t1'), value: 8, step: 1, min: 1 },
+        { label: $t('home.peek.lev.cards.c4.t2'), value: 1200, step: 50, min: 50 }
+      ]
     }
   ]);
 

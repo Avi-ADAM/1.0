@@ -386,11 +386,20 @@
           "t1": "hours/week"
         },
         "c3": {
-          "type": "Client price quote",
-          "project": "'Studio Or' partnership",
-          "title": "Portfolio website for a new client — quote",
-          "by": "Proposed by Daniel",
-          "t1": "ILS price"
+          "type": "Offer to fulfill your wish",
+          "project": "Concierge",
+          "title": "Logo design for a business — Yael offered to do it",
+          "by": "Your concierge need · awaiting your approval",
+          "t1": "Hours",
+          "t2": "ILS price"
+        },
+        "c4": {
+          "type": "Incoming concierge lead",
+          "project": "Concierge",
+          "title": "A client wants: event photography — matches you",
+          "by": "Based on your skills · submit an offer",
+          "t1": "Hours",
+          "t2": "ILS budget"
         }
       },
       "negoTitle": "Counter-offer",
