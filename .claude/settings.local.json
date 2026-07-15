@@ -115,7 +115,10 @@
       "Bash(xxd)",
       "PowerShell($null = [System.Management.Automation.PSParser]::Tokenize\\(\\(Get-Content -Raw .\\\\deploy-api.ps1\\), [ref]$null\\); if \\($?\\) { \"Parse OK\" })",
       "PowerShell($errs = $null; [System.Management.Automation.Language.Parser]::ParseFile\\(\\(Resolve-Path .\\\\deploy-api.ps1\\).Path, [ref]$null, [ref]$errs\\); if \\($errs\\) { $errs | Select-Object -First 3 | ForEach-Object { $_.Message } } else { \"Parse OK\" })",
-      "PowerShell(Get-PSDrive C | Select-Object @{n='FreeGB';e={[math]::Round\\($_.Free/1GB,1\\)}})"
+      "PowerShell(Get-PSDrive C | Select-Object @{n='FreeGB';e={[math]::Round\\($_.Free/1GB,1\\)}})",
+      "Read(//c/Users/babay/Documents/GitHub/1.0b//**)",
+      "Read(//c/Users/babay/Documents/GitHub/1.0b/**)",
+      "Bash(scp -i \"C:\\\\Users\\\\babay\\\\Downloads\\\\sail.pem\" -o StrictHostKeyChecking=no /c/Users/babay/Documents/GitHub/1.0b/nginx/default.conf ubuntu@18.159.130.31:/home/ubuntu/app/nginx/default.conf)"
     ],
     "additionalDirectories": [
       "c:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\deals\\request",

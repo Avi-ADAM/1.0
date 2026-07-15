@@ -282,6 +282,12 @@
     "desc": "For farmers, gardeners, craftspeople and anyone who wants to earn from the land — without upfront capital or going it alone.",
     "cta": "To the Grow page"
   },
+  "consensus": {
+    "eyebrow": "🤝 The Agreement Engine",
+    "title": "We have no \"no\" — every decision closes by agreement",
+    "desc": "Approve, keep talking, or propose another version. See how a real partnership runs by mutual agreement — and try a live demo.",
+    "cta": "Meet the Agreement Engine"
+  },
   "quorum": {
     "eyebrow": "◉ Group buying — without the group",
     "title": "Quorum: things that happen only when enough people want them",
@@ -346,6 +352,8 @@
       "consensus": "Consent: 3 of 4 have voted",
       "yes": "Agree",
       "no": "Negotiate",
+      "windowLabel": "Auto-approval in",
+      "silence": "If no one responds before it closes, the proposal is approved on its own. Silence = agreement.",
       "hint": "Decisions pass only by consent — every member has a voice"
     },
     "note": "This is sample data for illustration — the real system is waiting for you inside.",

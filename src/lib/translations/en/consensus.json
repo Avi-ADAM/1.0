@@ -1,5 +1,5 @@
 {
-  "nav": { "brand": "1💗1", "philosophy": "Global Agreement", "practical": "New Wish" },
+  "nav": { "brand": "1💗1", "philosophy": "Global Agreement", "practical": "New Wish", "register": "Register" },
   "hero": {
     "kicker": "The Agreement Engine",
     "title": "We don't have a \"no\"",
@@ -14,6 +14,14 @@
     "body": "Every proposal carries its own decision window — the rikma's decision time (between 48 hours and a week, depending on the settings your rikma sets). If no one responds before the window closes, the proposal stands approved. Not because anyone said yes out loud, but because no one objected. That's the rhythm of the weave: time to think, then forward motion.",
     "ringResult": "Agreed!"
   },
+  "essence": {
+    "kicker": "What this really is",
+    "title": "A place to build a livelihood together — by agreement",
+    "body": "1💗1 isn't just a nice idea. It's a platform where people run real partnerships (rikmot): a shared project, its missions, its income and its profit-split — all by mutual agreement, with no boss and no majority steamroll. The agreement engine you see here is how every decision in such a partnership is made: money, roles, tasks — each side proposes, and you only move forward on a version both sides hold.",
+    "point1": { "title": "Shared partnerships", "desc": "Run a project, its missions and its money together — in full transparency." },
+    "point2": { "title": "Fair profit-split", "desc": "Everyone's contribution is measured and split by agreement, not by force." },
+    "point3": { "title": "No boss, no majority steamroll", "desc": "Every decision matures by agreement or by silence — at the pace you set." }
+  },
   "demo": {
     "kicker": "Try it yourself",
     "title": "A live negotiation round",
@@ -26,7 +34,8 @@
     "totalLabel": "Total",
     "windowLabel": "Decision time remaining",
     "windowNote": "If you don't respond before the window closes, the proposal is silently approved.",
-    "skip": "⏩ Skip to end of window",
+    "skip": "⏩ Demo: no one responded → agreement by silence",
+    "silenceExplainer": "Silence = agreement. If the window closes and no one approves, discusses, or counters, the last version on the table is approved on its own. No explicit \"yes\" is needed — just don't object in time. Try it: leave everything untouched and let the timer run down, or skip to the end of the window.",
     "simulatePartnerCounter": "🔄 Demo: Dana counters",
     "actions": { "approve": "Approve", "discuss": "Discuss", "counter": "Counter" },
     "counterForm": {
@@ -54,17 +63,25 @@
     "signed": {
       "title": "Signed ✍️",
       "body": "Both sides now hold the exact same version. That's agreement.",
+      "silenceTitle": "Approved by silence 🔕",
+      "silenceBody": "The window closed and no one objected — so the last version on the table became agreement on its own. That's silence becoming agreement.",
       "restart": "Start a new round"
     },
     "initialNote": "Let's start here: 40 hours on the launch campaign, $120/hour.",
     "partnerCounterNote": "Let's meet a little in the middle."
   },
+  "mainCta": {
+    "kicker": "Most people come here for this",
+    "title": "Manage a real partnership by consensus",
+    "body": "Open a rikma, invite partners, and run every decision — money, roles, missions — through the agreement engine. Register and start building together.",
+    "button": "Register — start a partnership"
+  },
   "links": {
-    "philTitle": "Why we don't have a no",
-    "philBody": "The philosophy behind the mechanism — why silence can be agreement, and why that's fairer.",
+    "philTitle": "A world run by mutual agreement",
+    "philBody": "1💗1 is part of something bigger: a world managed by mutual agreement rather than coercion. Discover the global agreement — the convention it all begins with (a separate site).",
     "philCta": "To the Global Agreement",
-    "pracTitle": "Feel ready?",
-    "pracBody": "Open a new wish and let the agreement engine work for you.",
+    "pracTitle": "Just need something?",
+    "pracBody": "Not sure about a partnership? Open a new wish and the concierge will connect you with the right provider.",
     "pracCta": "Open a new wish"
   },
   "footer": "1💗1 — create together, by agreement"

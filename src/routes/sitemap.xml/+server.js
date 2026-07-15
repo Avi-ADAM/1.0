@@ -51,6 +51,28 @@ export async function GET() {
               href="https://1lev1.com/hascama" />
              </url>
              <url>
+             <loc>https://1lev1.com/consensus</loc>
+             <lastmod>2026-07-15T00:00:00+00:00</lastmod>
+             <priority>0.97</priority>
+             <changefreq>weekly</changefreq>
+             <xhtml:link
+              rel="alternate"
+              hreflang="en"
+              href="https://1lev1.com/en/consensus" />
+            <xhtml:link
+              rel="alternate"
+              hreflang="ar"
+              href="https://1lev1.com/ar/consensus" />
+            <xhtml:link
+              rel="alternate"
+              hreflang="he"
+              href="https://1lev1.com/consensus" />
+            <xhtml:link
+              rel="alternate"
+              hreflang="ru"
+              href="https://1lev1.com/ru/consensus" />
+             </url>
+             <url>
              <loc>https://1lev1.com/login</loc>
              <lastmod>2023-06-29T20:57:22+00:00</lastmod>
              <changefreq>weekly</changefreq>

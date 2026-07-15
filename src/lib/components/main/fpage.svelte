@@ -593,6 +593,74 @@
         <ProductPeek />
       </section>
 
+      <!-- ===== באנר /consensus — מנוע ההסכמה (מתחת לדמו החי) ===== -->
+      <section
+        class="w-full max-w-xl mt-6 scroll-mt-16 animate-fade-in-up"
+        style="font-family:'Sababa',sans-serif;"
+      >
+        <a
+          href="/consensus"
+          class="group relative flex flex-col sm:flex-row items-center gap-5 w-full overflow-hidden rounded-3xl border-2 border-barbi/60 bg-gradient-to-br from-[#fff6ea] via-[#fdeef4] to-[#f6e6fb] px-6 py-6 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+        >
+          <!-- רקע דקורטיבי -->
+          <div
+            class="pointer-events-none absolute -top-12 -end-12 w-48 h-48 rounded-full bg-gold/25 blur-2xl"
+          ></div>
+          <div
+            class="pointer-events-none absolute -bottom-10 -start-10 w-36 h-36 rounded-full bg-barbi/20 blur-2xl"
+          ></div>
+
+          <!-- אייקון -->
+          <div
+            class="relative shrink-0 w-16 h-16 rounded-2xl bg-barbi/10 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300"
+          >
+            <span class="text-3xl">🤝</span>
+          </div>
+
+          <!-- טקסט -->
+          <div
+            class="relative flex flex-col gap-1.5 text-center sm:text-start flex-1 min-w-0"
+          >
+            <div
+              class="inline-flex items-center gap-1.5 justify-center sm:justify-start"
+            >
+              <span class="w-1.5 h-1.5 rounded-full bg-barbi animate-pulse"></span>
+              <span
+                class="text-barbi font-semibold text-xs tracking-wide uppercase"
+              >
+                {$t('home.consensus.eyebrow')}
+              </span>
+            </div>
+            <p class="text-rose-800 font-bold text-xl sm:text-lg leading-snug">
+              {$t('home.consensus.title')}
+            </p>
+            <p class="text-slate-700/90 text-base sm:text-sm leading-relaxed">
+              {$t('home.consensus.desc')}
+            </p>
+          </div>
+
+          <!-- חץ / CTA -->
+          <div
+            class="relative shrink-0 flex items-center gap-2 bg-barbi text-gold font-bold px-5 py-2.5 rounded-xl shadow group-hover:bg-white group-hover:text-barbi group-hover:scale-105 transition-all duration-300 whitespace-nowrap text-base sm:text-sm"
+          >
+            {$t('home.consensus.cta')}
+            <svg
+              class="w-4 h-4 group-hover:translate-x-0.5 transition-transform"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d={$isRtl ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7'}
+              />
+            </svg>
+          </div>
+        </a>
+      </section>
+
       <!-- ===== גשר: שאלות הזדהות ===== -->
       <section
         class="w-full max-w-xl mt-10 animate-fade-in-up"

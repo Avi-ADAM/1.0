@@ -1,7 +1,14 @@
 <script>
-  import { t, isRtl } from '$lib/translations';
+  import { t, isRtl, locale } from '$lib/translations';
   import LangSwitch from '$lib/components/onboard/LangSwitch.svelte';
   import { onDestroy } from 'svelte';
+
+  // Registration route mirrors the home page: locale-aware convention/agreement signup.
+  let registerHref = $derived(
+    $locale === 'he' ? '/hascama' : $locale === 'ar' ? '/aitifaqia' : '/convention'
+  );
+  // The global "world by mutual agreement" is a separate site.
+  const AGREEMENT_URL = 'https://agreement.1lev1.com';
 
   const DEMO_DURATION = 18; // seconds — compressed demo window; real decision time is 48h–1wk (see decisionTime.body)
 
@@ -18,7 +25,8 @@
       counterNote: '',
       chatOpen: false,
       chatMessages: /** @type {{from:'you'|'partner', text:string}[]} */ ([]),
-      chatDraft: ''
+      chatDraft: '',
+      signedBy: /** @type {'approve'|'silence'|null} */ (null)
     };
   }
 
@@ -59,11 +67,13 @@
     if (demo.signed) return;
     demo.rounds = [...demo.rounds, { ...demo.current, status: 'silentApproved' }];
     demo.signed = true;
+    demo.signedBy = 'silence';
   }
 
   function approve() {
     demo.rounds = [...demo.rounds, { ...demo.current, status: 'approved' }];
     demo.signed = true;
+    demo.signedBy = 'approve';
   }
 
   function openCounter() {
@@ -163,8 +173,11 @@
       <span>{$t('consensus.nav.brand')}</span>
     </div>
     <nav class="cp-nav">
-      <a class="cp-link" href="/hascama">{$t('consensus.nav.philosophy')}</a>
+      <a class="cp-link" href={AGREEMENT_URL} target="_blank" rel="noopener noreferrer">
+        {$t('consensus.nav.philosophy')}
+      </a>
       <a class="cp-link" href="/wish/new">{$t('consensus.nav.practical')}</a>
+      <a class="cp-register" href={registerHref}>{$t('consensus.nav.register')}</a>
       <LangSwitch />
     </nav>
   </header>
@@ -207,6 +220,22 @@
     </div>
   </section>
 
+  <section class="cp-essence">
+    <div class="cp-essence-copy">
+      <div class="cp-kicker cp-kicker--pink">{$t('consensus.essence.kicker')}</div>
+      <h2 class="cp-h2">{$t('consensus.essence.title')}</h2>
+      <p class="cp-body-text">{$t('consensus.essence.body')}</p>
+    </div>
+    <div class="cp-essence-points">
+      {#each ['point1', 'point2', 'point3'] as p}
+        <div class="cp-essence-point">
+          <div class="cp-essence-point-title">{$t(`consensus.essence.${p}.title`)}</div>
+          <p class="cp-essence-point-desc">{$t(`consensus.essence.${p}.desc`)}</p>
+        </div>
+      {/each}
+    </div>
+  </section>
+
   <section id="demo" class="cp-demo-section">
     <div class="cp-demo-heading">
       <div class="cp-kicker cp-kicker--pink">{$t('consensus.demo.kicker')}</div>
@@ -218,9 +247,17 @@
       <div class="cp-demo-inner">
         {#if demo.signed}
           <div class="cp-signed">
-            <div class="cp-signed-emoji">✍️</div>
-            <div class="cp-signed-title">{$t('consensus.demo.signed.title')}</div>
-            <p class="cp-signed-body">{$t('consensus.demo.signed.body')}</p>
+            <div class="cp-signed-emoji">{demo.signedBy === 'silence' ? '🔕' : '✍️'}</div>
+            <div class="cp-signed-title">
+              {demo.signedBy === 'silence'
+                ? $t('consensus.demo.signed.silenceTitle')
+                : $t('consensus.demo.signed.title')}
+            </div>
+            <p class="cp-signed-body">
+              {demo.signedBy === 'silence'
+                ? $t('consensus.demo.signed.silenceBody')
+                : $t('consensus.demo.signed.body')}
+            </p>
             <div class="cp-signed-summary">
               {proposerLabel(demo.current.proposer)} · {demo.current.valuePerHour} {$t('consensus.demo.perHourUnit')} × {demo.current.hours} {$t('consensus.demo.hoursUnit')} = {currentTotal}
             </div>
@@ -250,6 +287,11 @@
                 {$t('consensus.demo.windowLabel')}: {demo.timeLeft}s — {$t('consensus.demo.windowNote')}
               </span>
               <button type="button" class="cp-skip-link" onclick={skipWait}>{$t('consensus.demo.skip')}</button>
+            </div>
+
+            <div class="cp-silence-note">
+              <span class="cp-silence-note-icon">🔕</span>
+              <span>{$t('consensus.demo.silenceExplainer')}</span>
             </div>
 
             <div class="cp-round-actions">
@@ -347,8 +389,22 @@
     </div>
   </section>
 
+  <section class="cp-maincta">
+    <div class="cp-maincta-kicker">{$t('consensus.mainCta.kicker')}</div>
+    <h2 class="cp-maincta-title">{$t('consensus.mainCta.title')}</h2>
+    <p class="cp-maincta-body">{$t('consensus.mainCta.body')}</p>
+    <a class="cp-maincta-btn" href={registerHref}>
+      {$t('consensus.mainCta.button')} {$isRtl ? '←' : '→'}
+    </a>
+  </section>
+
   <section class="cp-links">
-    <a href="/hascama" class="cp-link-card cp-link-card--gold">
+    <a
+      href={AGREEMENT_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="cp-link-card cp-link-card--gold"
+    >
       <div class="cp-link-title cp-link-title--gold">{$t('consensus.links.philTitle')}</div>
       <p class="cp-link-body">{$t('consensus.links.philBody')}</p>
       <span class="cp-link-cta cp-link-cta--gold">{$t('consensus.links.philCta')} {$isRtl ? '←' : '→'}</span>
@@ -421,7 +477,9 @@
   .cp-nav {
     display: flex;
     align-items: center;
-    gap: 22px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 14px 18px;
     font-size: 14px;
   }
   .cp-link {
@@ -431,6 +489,21 @@
   }
   .cp-link:hover {
     color: var(--cp-gold-deep);
+  }
+  .cp-register {
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 13.5px;
+    color: #3a2c1a;
+    background: linear-gradient(135deg, var(--cp-gold-gra), var(--cp-gold-grc));
+    box-shadow: var(--cp-shadow-gold);
+    padding: 8px 18px;
+    border-radius: 999px;
+    white-space: nowrap;
+    transition: transform 160ms ease;
+  }
+  .cp-register:hover {
+    transform: translateY(-1px);
   }
 
   .cp-hero {
@@ -768,6 +841,24 @@
     font-weight: 700;
     text-decoration: underline;
   }
+  .cp-silence-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(238, 232, 170, 0.08);
+    border: 1px dashed rgba(238, 232, 170, 0.4);
+    color: #e8dfae;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .cp-silence-note-icon {
+    flex-shrink: 0;
+    font-size: 15px;
+    line-height: 1.5;
+  }
   .cp-round-actions {
     display: flex;
     gap: 10px;
@@ -1042,9 +1133,100 @@
     letter-spacing: 0.04em;
   }
 
+  .cp-essence {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 10px 28px 70px;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 44px;
+    align-items: center;
+  }
+  .cp-essence-points {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .cp-essence-point {
+    padding: 16px 20px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(200, 150, 12, 0.22);
+    box-shadow: 0 3px 14px rgba(122, 98, 0, 0.08);
+  }
+  .cp-essence-point-title {
+    font-family: var(--bal);
+    font-size: 17px;
+    color: var(--cp-gold-shadow);
+    margin-bottom: 4px;
+  }
+  .cp-essence-point-desc {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #5c4d38;
+    margin: 0;
+  }
+
+  .cp-maincta {
+    max-width: 940px;
+    margin: 40px auto 60px;
+    padding: 46px 32px;
+    border-radius: 28px;
+    text-align: center;
+    box-sizing: border-box;
+    color: #fff;
+    background: linear-gradient(135deg, var(--cp-barbi), var(--cp-pink));
+    box-shadow: var(--cp-shadow-pink);
+  }
+  .cp-maincta-kicker {
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 12px;
+  }
+  .cp-maincta-title {
+    font-family: var(--bal);
+    font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+    color: #fff;
+    margin: 0 0 14px;
+  }
+  .cp-maincta-body {
+    max-width: 560px;
+    margin: 0 auto 26px;
+    font-size: 17px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.92);
+  }
+  .cp-maincta-btn {
+    display: inline-block;
+    text-decoration: none;
+    font-family: var(--bal);
+    font-size: 18px;
+    font-weight: 700;
+    color: #3a2c1a;
+    background: linear-gradient(135deg, var(--cp-gold-gra), var(--cp-gold-lighter));
+    box-shadow: var(--cp-shadow-gold);
+    padding: 14px 32px;
+    border-radius: 999px;
+    transition: transform 160ms ease;
+  }
+  .cp-maincta-btn:hover {
+    transform: translateY(-2px);
+  }
+
   @media (max-width: 720px) {
     .cp-decision-time {
       grid-template-columns: 1fr;
+    }
+    .cp-essence {
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+    .cp-maincta {
+      margin: 24px 16px 48px;
+      padding: 34px 22px;
     }
     .cp-links {
       grid-template-columns: 1fr;

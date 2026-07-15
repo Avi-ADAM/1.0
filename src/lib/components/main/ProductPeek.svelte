@@ -17,6 +17,7 @@
     {
       emoji: '🧩',
       glow: 'rgba(238,232,170,0.9)',
+      vote: true,
       type: $t('home.peek.lev.cards.c1.type'),
       project: $t('home.peek.lev.cards.c1.project'),
       title: $t('home.peek.lev.cards.c1.title'),
@@ -29,6 +30,7 @@
     {
       emoji: '🤝',
       glow: 'rgba(74,222,128,0.8)',
+      vote: true,
       type: $t('home.peek.lev.cards.c2.type'),
       project: $t('home.peek.lev.cards.c2.project'),
       title: $t('home.peek.lev.cards.c2.title'),
@@ -136,6 +138,23 @@
     { icon: '✅', text: $t('home.peek.hub.feed2') },
     { icon: '🤝', text: $t('home.peek.hub.feed3') }
   ]);
+
+  // Dummy "silence → auto-approval" countdown for the vote demo (visual only —
+  // it just loops and never actually approves anything).
+  const SILENCE_START = 45 * 3600 + 45 * 60 + 45; // 45:45:45
+  let silenceSecs = $state(SILENCE_START);
+  $effect(() => {
+    const id = setInterval(() => {
+      silenceSecs = silenceSecs > 0 ? silenceSecs - 1 : SILENCE_START;
+    }, 1000);
+    return () => clearInterval(id);
+  });
+  let silenceClock = $derived.by(() => {
+    const pad = (/** @type {number} */ n) => String(n).padStart(2, '0');
+    return `${pad(Math.floor(silenceSecs / 3600))}:${pad(
+      Math.floor((silenceSecs % 3600) / 60)
+    )}:${pad(silenceSecs % 60)}`;
+  });
 
   function register() {
     goto(
@@ -298,6 +317,24 @@
                     {/each}
                   </div>
                   <p class="text-slate-500 text-xs mt-2">{levCards[cardIdx].by}</p>
+                  {#if levCards[cardIdx].vote}
+                    <!-- מנוע השתיקה כהסכמה: שעון עצר דמה לאישור אוטומטי (ויזואלי בלבד) -->
+                    <div
+                      class="mt-2 mx-auto inline-flex flex-col items-center gap-0.5 rounded-xl bg-amber-50 border border-amber-200 px-3 py-1.5"
+                    >
+                      <span
+                        class="flex items-center gap-1 text-amber-700 text-[11px] font-semibold"
+                      >
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                        🔕 {$t('home.peek.vote.windowLabel')}
+                      </span>
+                      <span
+                        dir="ltr"
+                        class="text-amber-800 font-mono font-black text-lg tracking-wider tabular-nums leading-none"
+                        >{silenceClock}</span
+                      >
+                    </div>
+                  {/if}
                 </div>
 
                 <div class="flex border-t border-slate-100">
@@ -445,7 +482,26 @@
             {$t('home.peek.vote.proposal')}
           </p>
           <p class="text-white/50 text-xs mt-1 text-start">{$t('home.peek.vote.by')}</p>
-          <div class="mt-4">
+
+          <!-- מנוע השתיקה כהסכמה: שעון עצר דמה לאישור אוטומטי (ויזואלי בלבד) -->
+          <div
+            class="mt-3 flex flex-col items-center gap-1 rounded-2xl bg-gold/10 border border-gold/30 px-3 py-3"
+          >
+            <span class="flex items-center gap-1.5 text-white/70 text-xs">
+              <span class="w-2 h-2 rounded-full bg-gold animate-pulse"></span>
+              🔕 {$t('home.peek.vote.windowLabel')}
+            </span>
+            <span
+              dir="ltr"
+              class="text-gold font-mono font-black text-2xl sm:text-xl tracking-wider tabular-nums"
+              >{silenceClock}</span
+            >
+            <span class="text-white/55 text-[11px] text-center leading-snug">
+              {$t('home.peek.vote.silence')}
+            </span>
+          </div>
+
+          <div class="mt-3">
             <p class="text-white/70 text-sm mb-1.5 text-start">
               {$t('home.peek.vote.consensus')}
             </p>
@@ -453,7 +509,7 @@
               <div class="h-full w-3/4 rounded-full bg-green-400"></div>
             </div>
           </div>
-          <div class="mt-4 flex gap-2">
+          <div class="mt-3 flex gap-2">
             <span
               class="flex-1 text-center rounded-xl bg-green-500/20 border border-green-400/40 text-green-300 font-semibold text-sm px-3 py-2"
               >✓ {$t('home.peek.vote.yes')}</span
@@ -464,11 +520,6 @@
             >
           </div>
         </div>
-        <p
-          class="mt-4 text-center text-gold/90 text-sm bg-white/5 border border-gold/30 rounded-xl px-3 py-2.5"
-        >
-          🤝 {$t('home.peek.vote.hint')}
-        </p>
       {/if}
     </div>
   {/key}
