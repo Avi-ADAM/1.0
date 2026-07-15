@@ -1,6 +1,5 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import AppHeader from '$lib/components/AppHeader.svelte';
   import MatanotPublicView from '$lib/components/products/MatanotPublicView.svelte';
   import { toast } from 'svelte-sonner';
   import ChatSmall from '$lib/components/footer/chatSmall.svelte';
@@ -149,8 +148,6 @@
 <svelte:head>
   <title>{data.productName} · בקשת הזמנה</title>
 </svelte:head>
-
-<AppHeader />
 
 <main class="page-wrap" dir="rtl">
   <button class="back-btn" onclick={() => goto('/deals')}>← חזרה לעסקאות</button>

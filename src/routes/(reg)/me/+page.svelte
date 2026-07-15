@@ -1010,7 +1010,7 @@
         {/if}
         <!-- או גלילה לעשות רינדור עד מקסימום מסויים  של תפקידים כישורים וכו'ואז ההמשך בהרחבה של זה-->
         <!-- ההיצע שלי (PLAN_USER_OFFERINGS §4.1, קומפקטי): אייקון + מונה + פלוס.
-             ההרחבות: מוצרים → /sales-center, משימות → /me/offerings -->
+             ההרחבות: מוצרים → /deals/sales-center, משימות → /me/offerings -->
         <div id="my-mission-offers" class="w-full px-2">
           <div id="my-products"></div>
           <OfferingsBadges uid={data.uid} />

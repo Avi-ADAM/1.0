@@ -7,7 +7,7 @@
   /**
    * Compact offerings badges for /me (profile feedback 2026-07-13/14): the
    * profile has real-estate only for icon + count + expand link + a plus —
-   * the full lists live on /sales-center (products, across all rikmas) and
+   * the full lists live on /deals/sales-center (products, across all rikmas) and
    * /me/offerings (missions: offers + doing + ✓done).
    *
    * Layout: stacked full-width on mobile, side-by-side on desktop.
@@ -73,7 +73,7 @@
     class="flex flex-col sm:flex-row items-center justify-between sm:justify-center gap-1 sm:gap-2 rounded-full bg-gradient-to-br from-mpink via-lpink to-barbi px-4 py-1.5 text-white font-bold shadow-md"
   >
     <a
-      href="/sales-center"
+      href="/deals/sales-center"
       class="inline-flex items-center gap-1.5 hover:scale-105 transition-transform drop-shadow-sm"
       title={$t('offerings.badges.open_products')}
     >

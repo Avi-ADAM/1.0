@@ -1740,6 +1740,41 @@ body::before {
   margin: 0 auto;
 }
 
+/* Shared page header shell — used by /deals and its children (e.g. sales-center)
+   so a title block always reads as one page under the same AppHeader. */
+.page-top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 16px;
+}
+.page-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.page-top .accent {
+  color: var(--gold-l);
+}
+.page-logo {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.page-sub {
+  font-size: 13px;
+  color: var(--tm);
+}
+@media (max-width: 600px) {
+  .page-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
 .section-label {
   font-size: 11px;
   font-weight: 700;

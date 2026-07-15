@@ -1,0 +1,71 @@
+{
+  "nav": { "brand": "1💗1", "philosophy": "Global Agreement", "practical": "New Wish" },
+  "hero": {
+    "kicker": "The Agreement Engine",
+    "title": "We don't have a \"no\"",
+    "subtitle": "Every step in a partnership moves through one of three paths: approve, keep talking, or propose a different version. No door ever locks.",
+    "action1": { "label": "Approve", "desc": "Accept the version as it stands" },
+    "action2": { "label": "Discuss", "desc": "Keep talking before deciding" },
+    "action3": { "label": "Counter", "desc": "Propose a new version of the same ask" }
+  },
+  "decisionTime": {
+    "kicker": "The Rhythm of the Weave",
+    "title": "Silence that becomes agreement",
+    "body": "Every proposal carries its own decision window — the rikma's decision time (between 48 hours and a week, depending on the settings your rikma sets). If no one responds before the window closes, the proposal stands approved. Not because anyone said yes out loud, but because no one objected. That's the rhythm of the weave: time to think, then forward motion.",
+    "ringResult": "Agreed!"
+  },
+  "demo": {
+    "kicker": "Try it yourself",
+    "title": "A live negotiation round",
+    "subtitle": "This is a real proposal on a mission: the launch campaign. Respond the way you would in a real partnership.",
+    "roundLabel": "Round",
+    "proposerYou": "You",
+    "proposerPartner": "Dana",
+    "perHourUnit": "$/hour",
+    "hoursUnit": "hours",
+    "totalLabel": "Total",
+    "windowLabel": "Decision time remaining",
+    "windowNote": "If you don't respond before the window closes, the proposal is silently approved.",
+    "skip": "⏩ Skip to end of window",
+    "simulatePartnerCounter": "🔄 Demo: Dana counters",
+    "actions": { "approve": "Approve", "discuss": "Discuss", "counter": "Counter" },
+    "counterForm": {
+      "title": "Your version",
+      "perHourLabel": "Rate per hour ($)",
+      "hoursLabel": "Number of hours",
+      "noteLabel": "Note (optional)",
+      "notePlaceholder": "Why are you proposing this?",
+      "submit": "Send new version",
+      "cancel": "Cancel"
+    },
+    "chat": {
+      "placeholder": "Write Dana a message…",
+      "send": "Send",
+      "reply1": "Got it, give me a moment to think 🙏",
+      "reply2": "Still with you on this one — no need to rush."
+    },
+    "history": { "title": "Round history", "empty": "No previous rounds yet." },
+    "status": {
+      "pending": "Awaiting response",
+      "approved": "Approved",
+      "silentApproved": "Approved by silence",
+      "countered": "New version proposed"
+    },
+    "signed": {
+      "title": "Signed ✍️",
+      "body": "Both sides now hold the exact same version. That's agreement.",
+      "restart": "Start a new round"
+    },
+    "initialNote": "Let's start here: 40 hours on the launch campaign, $120/hour.",
+    "partnerCounterNote": "Let's meet a little in the middle."
+  },
+  "links": {
+    "philTitle": "Why we don't have a no",
+    "philBody": "The philosophy behind the mechanism — why silence can be agreement, and why that's fairer.",
+    "philCta": "To the Global Agreement",
+    "pracTitle": "Feel ready?",
+    "pracBody": "Open a new wish and let the agreement engine work for you.",
+    "pracCta": "Open a new wish"
+  },
+  "footer": "1💗1 — create together, by agreement"
+}

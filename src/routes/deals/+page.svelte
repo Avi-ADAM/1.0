@@ -1,5 +1,4 @@
 <script lang="ts">
-  import AppHeader from '$lib/components/AppHeader.svelte';
   import StatsRow from '$lib/components/deals/StatsRow.svelte';
   import DealCard from '$lib/components/deals/DealCard.svelte';
   import PendingRequestCard from '$lib/components/deals/PendingRequestCard.svelte';
@@ -39,8 +38,6 @@
   <meta property="og:title" content={$t('deals.title')} />
 </svelte:head>
 
-<AppHeader />
-
 <main class="page-wrap">
   <div class="page-top anim">
     <div>
@@ -52,7 +49,7 @@
 
   <!-- Quick Action Links -->
   <div class="quick-links anim">
-    <a href="/sales-center" class="quick-card quick-card--gold">
+    <a href="/deals/sales-center" class="quick-card quick-card--gold">
       <span class="quick-icon">🏪</span>
       <span class="quick-body">
         <span class="quick-title">{$t('deals.quick_sales_center')}</span>
@@ -138,7 +135,7 @@
             🎩 {$t('deals.cta_find_products')}
           </a>
         {:else}
-          <a href="/sales-center" class="empty-cta empty-cta--gold">
+          <a href="/deals/sales-center" class="empty-cta empty-cta--gold">
             🏪 {$t('deals.cta_start_selling')}
           </a>
         {/if}
@@ -193,32 +190,7 @@
 </main>
 
 <style>
-  .page-top {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    gap: 16px;
-  }
-  .page-title {
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--text);
-    margin-bottom: 4px;
-  }
-  .accent {
-    color: var(--gold-l);
-  }
-  .page-logo {
-    width: 90px;
-    height: 90px;
-    object-fit: contain;
-    flex-shrink: 0;
-  }
-  .page-sub {
-    font-size: 13px;
-    color: var(--tm);
-  }
+  /* .page-top / .page-title / .page-sub / .page-logo / .accent are global — see app.postcss */
 
   /* ── Quick Action Links ── */
   .quick-links {
@@ -417,10 +389,6 @@
   }
 
   @media (max-width: 600px) {
-    .page-top {
-      flex-direction: column;
-      align-items: flex-start;
-    }
     .quick-links {
       flex-direction: column;
     }

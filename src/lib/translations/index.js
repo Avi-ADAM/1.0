@@ -509,6 +509,30 @@ export const config = {
             routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/(me|onboard|gift|demand|user)/],
             loader: async () => (await import('./ar/offerings.json')).default,
         },
+        {
+            locale: 'he',
+            key: 'consensus',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/consensus/],
+            loader: async () => (await import('./he/consensus.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'consensus',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/consensus/],
+            loader: async () => (await import('./en/consensus.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'consensus',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/consensus/],
+            loader: async () => (await import('./ar/consensus.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'consensus',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/consensus/],
+            loader: async () => (await import('./ru/consensus.json')).default,
+        },
     ],
 };
 

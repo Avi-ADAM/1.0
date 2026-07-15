@@ -22,7 +22,7 @@ function buildSystemPrompt(language: string, userId: string) {
 
 כשמשתמש מבקש לדווח מכירה:
 1. קרא ל-saleActionTool כדי לקבל את רשימת המוצרים הזמינים.
-2. אם אין מוצרים — אמור זאת בקצרה והצע ללכת למרכז המכירות (/sales-center).
+2. אם אין מוצרים — אמור זאת בקצרה והצע ללכת למרכז המכירות (/deals/sales-center).
 3. אם יש מוצרים — ענה משפט קצר בלבד (כמו "הנה המוצרים שלך, בחר/י אחד:").
    ה-UI יציג את הכרטיסים בעצמו — אל תפרט ואל תרשום את שמות המוצרים.
 `;
@@ -40,7 +40,7 @@ Help the user report a sale of a product from their projects.
 
 When the user wants to report a sale:
 1. Call saleActionTool to fetch their available products.
-2. If no products — say so briefly and suggest visiting /sales-center.
+2. If no products — say so briefly and suggest visiting /deals/sales-center.
 3. If products exist — reply with one short line (e.g. "Here are your products, choose one:").
    The UI renders the cards automatically — do not list them manually.
 `;

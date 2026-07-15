@@ -249,7 +249,7 @@ export const getSitePagesTool = createTool({
           },
           {
             "name": "Sales Center",
-            "path": "/sales-center",
+            "path": "/deals/sales-center",
             "description": "Sales center: manage and list products or services for sale (registered users only)",
             "authRequired": true
           },

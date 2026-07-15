@@ -37,11 +37,13 @@
     <a href="/moach" class="nav-link"><span class="nav-icon">🧠</span><span class="nav-word">{nl('moach')}</span></a>
   </nav>
   <div class="right">
-    <div class="badge">{tr.header.premiumBadge[$lang]}</div>
-    <button class="notif" aria-label={tr.header.notifications[$lang]}>
+    <!-- TODO: re-enable once the premium tier has real meaning -->
+    <!-- <div class="badge">{tr.header.premiumBadge[$lang]}</div> -->
+    <!-- TODO: re-enable once the notifications button actually does something -->
+    <!-- <button class="notif" aria-label={tr.header.notifications[$lang]}>
       <span>🔔</span>
       <div class="notif-dot"></div>
-    </button>
+    </button> -->
     <button class="avatar" title={userName} aria-label={tr.header.profile[$lang]}>
       {#if profilePic}
         <img src={profilePic} alt={userName} class="avatar-img" />

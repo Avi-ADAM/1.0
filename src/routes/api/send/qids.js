@@ -12782,6 +12782,8 @@ export const qids = {
       data {
         id
         attributes {
+          username
+          profilePic { data { attributes { url formats } } }
           projects_1s {
             data {
               id

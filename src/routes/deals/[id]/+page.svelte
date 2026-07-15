@@ -1,7 +1,6 @@
 <script lang="ts">
   import { goto, invalidateAll } from '$app/navigation';
   import { toast } from 'svelte-sonner';
-  import AppHeader from '$lib/components/AppHeader.svelte';
   import Panel from '$lib/components/Panel.svelte';
   import DonutChart from '$lib/components/deals/DonutChart.svelte';
   import MissionList from '$lib/components/deals/MissionList.svelte';
@@ -79,8 +78,6 @@
 <svelte:head>
   <title>{deal ? `${deal.product} · עסקאות` : 'עסקה'}</title>
 </svelte:head>
-
-<AppHeader />
 
 <main class="page-wrap">
   <button class="back-btn anim" onclick={() => goto('/deals')}>
