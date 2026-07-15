@@ -1,6 +1,4 @@
 <script>
-  import { preventDefault } from 'svelte/legacy';
-
   import { fbl } from '$lib/stores/fbl.js';
 
   import { lang } from '$lib/stores/lang.js';
@@ -12,10 +10,6 @@
   import { onMount } from 'svelte';
   import { email } from '$lib/components/registration/email.js';
   import { linkos } from '$lib/stores/linkos.js';
-
-  let idx = $state(1);
-  let error;
-  const baseUrl = import.meta.env.VITE_URL;
 
   let user = 0;
 
@@ -80,47 +74,6 @@
           console.log('Registration failed with ' + error);
         });
     }
-    let error1, fppp;
-    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-    const checkStatus = (resp) => {
-      if (resp.status >= 200 && resp.status < 300) {
-        return resp;
-      }
-      return parseJSON(resp).then((resp) => {
-        throw resp;
-      });
-    };
-    const headers = {
-      'Content-Type': 'application/json'
-    };
-
-    try {
-      const res = await fetch(baseUrl + '/graphql', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `query {
-  chezins { 
-   meta {
-      pagination {
-        total
-      }
-    }
-  }
-}
-              `
-        })
-      })
-        .then(checkStatus)
-        .then(parseJSON);
-      fppp = res.data.chezins;
-
-      idx = fppp.meta.pagination.total;
-    } catch (e) {
-      error1 = e;
-    }
   });
 
   let regHelperL = $state(-1);
@@ -164,9 +117,22 @@ regHelperL = 0;
 
 <svelte:head>
   <title>{$lang === 'he' ? 'הסכמה · 1lev1' : 'Agreement · 1lev1'}</title>
-  <meta name="description" content={$lang === 'he' ? 'הצהרת העקרונות של 1lev1 — חיים בחופש, בהסכמה הדדית ובלי אלימות' : '1lev1 principles declaration — living in freedom, mutual agreement and without violence'} />
-  <meta property="og:title" content={$lang === 'he' ? 'הסכמה · 1lev1' : 'Agreement · 1lev1'} />
-  <meta property="og:description" content={$lang === 'he' ? 'הצהרת העקרונות של 1lev1 — חיים בחופש, בהסכמה הדדית ובלי אלימות' : '1lev1 principles declaration — living in freedom, mutual agreement and without violence'} />
+  <meta
+    name="description"
+    content={$lang === 'he'
+      ? 'הצהרת העקרונות של 1lev1 — חיים בחופש, בהסכמה הדדית ובלי אלימות'
+      : '1lev1 principles declaration — living in freedom, mutual agreement and without violence'}
+  />
+  <meta
+    property="og:title"
+    content={$lang === 'he' ? 'הסכמה · 1lev1' : 'Agreement · 1lev1'}
+  />
+  <meta
+    property="og:description"
+    content={$lang === 'he'
+      ? 'הצהרת העקרונות של 1lev1 — חיים בחופש, בהסכמה הדדית ובלי אלימות'
+      : '1lev1 principles declaration — living in freedom, mutual agreement and without violence'}
+  />
   <meta property="og:type" content="website" />
   <script>
     nl_pos = 'br';
@@ -185,7 +151,7 @@ regHelperL = 0;
 { goto("/lev", )}
 {:else}-->
   {#if regHelperL == 0}
-    <Amana1 {idx} />
+    <Amana1 />
   {:else if regHelperL == -1}
     <Mobile />
   {/if}

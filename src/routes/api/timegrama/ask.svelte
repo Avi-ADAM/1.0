@@ -1,5 +1,5 @@
 <script module>
-  import { SendTo } from '$lib/send/sendTo.svelte';
+  import { SendToAdmin } from '$lib/server/sendToAdmin.js';
   // Server-only secret — this module is imported only by timegrama/+server.js.
   import { ADMINMONTHER } from '$env/static/private';
   import { computeNegoGate, normId } from '$lib/server/nego/negoGate';
@@ -24,7 +24,7 @@
 }}}
  }`;
     try {
-      let res = await SendTo(qu, ADMINMONTHER).then((res) => (res = res));
+      let res = await SendToAdmin(qu, ADMINMONTHER).then((res) => (res = res));
       if (res.data == null || res.data.ask?.data == null) return;
       const a = res.data.ask.data.attributes;
 
@@ -71,7 +71,7 @@
               data: { archived: true }
             ){data{id}}
           }`;
-          await SendTo(reopen, ADMINMONTHER).catch((e) => console.error(e));
+          await SendToAdmin(reopen, ADMINMONTHER).catch((e) => console.error(e));
           await markDone(taid);
           return;
         }
@@ -93,7 +93,7 @@
        tafkidims{data{id}} name privatlinks sqadualed dates howMeny publicklinks descrip noofhours perhour iskvua mission{data{id}}}}}
         }}}
          }`;
-      let res2 = await SendTo(qua, ADMINMONTHER).then((res2) => (res2 = res2));
+      let res2 = await SendToAdmin(qua, ADMINMONTHER).then((res2) => (res2 = res2));
       if (res2.data == null) return;
       const om = res2.data.ask.data.attributes.open_mission.data.attributes;
       const omId = res2.data.ask.data.attributes.open_mission.data.id;
@@ -172,7 +172,7 @@ updateOpenMission(
 
 }
 `;
-      let res3 = await SendTo(qub, ADMINMONTHER).then((res3) => (res3 = res3));
+      let res3 = await SendToAdmin(qub, ADMINMONTHER).then((res3) => (res3 = res3));
       if (res3.data == null) return;
       let chiluzh = res3.data.createMesimabetahalich.data.id;
 
@@ -189,7 +189,7 @@ updateOpenMission(
               }
             ){data{id}}
             }`;
-        await SendTo(monti, ADMINMONTHER).catch((e) => console.error(e));
+        await SendToAdmin(monti, ADMINMONTHER).catch((e) => console.error(e));
       }
 
       // Onboarding email to a freshly-joined (non-member) candidate.
@@ -237,7 +237,7 @@ updateOpenMission(
                             }
                         ){data{id}}
                           }`;
-          await SendTo(nextquery, ADMINMONTHER).catch((e) => console.error(e));
+          await SendToAdmin(nextquery, ADMINMONTHER).catch((e) => console.error(e));
         }
       }
 
@@ -259,7 +259,7 @@ updateOpenMission(
              }
             }`;
     try {
-      await SendTo(que4, ADMINMONTHER);
+      await SendToAdmin(que4, ADMINMONTHER);
     } catch (e) {
       console.error(e);
     }

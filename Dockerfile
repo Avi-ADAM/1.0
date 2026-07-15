@@ -13,13 +13,15 @@ FROM node:22-alpine AS build
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY package*.json .npmrc ./
 RUN npm ci
 
 COPY . .
 
 # ADAPTER is unset -> svelte.config.js falls back to adapter-node (out: build)
-RUN --mount=type=secret,id=envfile,target=/app/.env npm run build
+# Bump V8 heap: the vite build peaks past the default ~2GB old-space cap and OOMs.
+RUN --mount=type=secret,id=envfile,target=/app/.env \
+    NODE_OPTIONS=--max-old-space-size=4096 npm run build
 
 # Keep only production dependencies for the runtime image
 RUN npm prune --omit=dev

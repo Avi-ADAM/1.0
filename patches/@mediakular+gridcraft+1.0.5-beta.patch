@@ -1,0 +1,13 @@
+diff --git a/node_modules/@mediakular/gridcraft/dist/components/Grid.svelte b/node_modules/@mediakular/gridcraft/dist/components/Grid.svelte
+index 673afbb..50a1653 100644
+--- a/node_modules/@mediakular/gridcraft/dist/components/Grid.svelte
++++ b/node_modules/@mediakular/gridcraft/dist/components/Grid.svelte
+@@ -104,7 +104,7 @@
+     }
+ 
+     function getUniqueKey(row: T) {
+-        return uniqueRowIds.find(x => (x.row as any).id === (row as any).id)?.id;
++        return uniqueRowIds.find(x => (x.row as any).id === (row as any).id)?.id ?? (row as any)?.id ?? row;
+     }
+ 
+     function toggleHeaderCheckbox() {

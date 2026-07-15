@@ -1,5 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
+import { STRAPI_URL } from '$env/static/private';
 
 /**
  * POST /api/upload
@@ -42,8 +43,7 @@ export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
       }
     }
 
-    const baseUrl = import.meta.env.VITE_URL;
-    const strapiUploadUrl = `${baseUrl}/api/upload`;
+    const strapiUploadUrl = `${STRAPI_URL}/api/upload`;
 
     const response = await fetch(strapiUploadUrl, {
       method: 'POST',

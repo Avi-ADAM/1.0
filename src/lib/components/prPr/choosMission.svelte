@@ -11,6 +11,7 @@
   import Button from '$lib/celim/ui/button.svelte';
   import Mission from "./mission.svelte";
   import { idPr } from '../../stores/idPr.js'
+  import { sendToSer } from '$lib/send/sendToSer.js';
 
 /**
  * @typedef {Object} Props
@@ -24,7 +25,6 @@
 
 /** @type {Props} */
  let { mission1 = [], children, pn, pl, restime, projectUsers, alit, onClose, selected = $bindable([]), processContext = null, name: initialName = '', initialDescrip = '' } = $props();
- const baseUrl = import.meta.env.VITE_URL
 
  let newcontent = $state(true);
 let newcontentR = $state(true);
@@ -37,41 +37,9 @@ onMount(() => {
 });
 
 async function findT() {
-    /*TODO: כאשר מחפשים כישורים וכן לגבי כל שאר האובייקטים להציג את היגרסה העברית והאנגלית כך שהחיפוש יוכל למצוא את כולן*/ 
-    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-    const checkStatus = (resp) => {
-      if (resp.status >= 200 && resp.status < 300) {
-        return resp;
-      }
-      return parseJSON(resp).then((resp) => {
-        throw resp;
-      });
-    };
+    /*TODO: כאשר מחפשים כישורים וכן לגבי כל שאר האובייקטים להציג את היגרסה העברית והאנגלית כך שהחיפוש יוכל למצוא את כולן*/
     try {
-      const res = await fetch(baseUrl + '/graphql', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `query {
-    skills {data{ id attributes{ skillName ${
-      $lang == 'he' ? 'localizations{data {attributes{ skillName}} }' : ''
-    } }}}
-     tafkidims {data{ id attributes{ roleDescription ${
-       $lang == 'he'
-         ? 'localizations{data {attributes{ roleDescription}} }'
-         : ''
-     }}}}
-     workWays {data{ id attributes{ workWayName ${
-       $lang == 'he' ? 'localizations{data {attributes{ workWayName}} }' : ''
-     } } }}
- }
-              `
-        })
-      })
-        .then(checkStatus)
-        .then(parseJSON);
+      const res = await sendToSer({}, '283getSkillsRolesWorkways', 0, 0, false, fetch);
     let  skills2 = res.data.skills.data;
       if ($lang == 'he') {
         for (let i = 0; i < skills2.length; i++) {

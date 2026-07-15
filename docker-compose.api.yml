@@ -1,11 +1,13 @@
 # SvelteKit API instance — runs on the Linux VPS next to Strapi.
-# Deployed by deploy-api.ps1 (the image is built locally and shipped with
-# docker save/load, so there is no `build:` section here on purpose).
+# Deployed by deploy-api.ps1 (image built locally, pushed to GHCR and pulled
+# here — or shipped with docker save/load via -Tarball; no `build:` on purpose).
+# Private GHCR package: run `docker login ghcr.io` once on the server so
+# `docker-compose pull` can fetch it (this VPS has compose v1: `docker-compose`).
 #
-# Expected layout on the server (default: /opt/1lev1/api):
+# Expected layout on the server (default: /home/ubuntu/api — ubuntu, not root):
 #   docker-compose.api.yml   <- this file (pushed by the script)
 #   .env                     <- runtime env, lives ONLY on the server:
-#                               STRAPI_URL=http://strapi:1337   (shared docker network)
+#                               STRAPI_URL=http://strapi-blue:1337  (blue/green alias on the shared net)
 #                               ORIGIN=https://api.1lev1.com
 #                               ADMINMONTHER=..., cookies secrets, etc.
 #
@@ -15,7 +17,7 @@
 
 services:
   sveltekit-api:
-    image: 1lev1/sveltekit-api:latest
+    image: ghcr.io/avi-adam/1lev1-sveltekit-api:latest
     container_name: sveltekit-api
     restart: unless-stopped
     env_file: .env

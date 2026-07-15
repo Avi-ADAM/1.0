@@ -108,7 +108,14 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"http://localhost:5173/src/routes/\\(reg\\)/moach/%5BprojectId%5D/+layout.svelte\")",
       "Bash(curl -s \"http://localhost:5173/src/routes/\\(reg\\)/moach/%5BprojectId%5D/+layout.svelte\")",
       "Bash(npx @sveltejs/mcp svelte-autofixer \"src/routes/\\(reg\\)/me/devices/+page.svelte\")",
-      "Bash(npx @sveltejs/mcp svelte-autofixer ./src/lib/components/lev/missionInProgress.svelte)"
+      "Bash(npx @sveltejs/mcp svelte-autofixer ./src/lib/components/lev/missionInProgress.svelte)",
+      "Bash(jobs)",
+      "Bash(timeout 60 cat /c/Users/babay/AppData/Local/Temp/claude/C--Users-babay-Documents-GitHub-1-0main/8edb10fc-2ea1-4b9b-b31e-68dc5d15125e/tasks/bq94w8ka3.output)",
+      "PowerShell(Get-Content *)",
+      "Bash(xxd)",
+      "PowerShell($null = [System.Management.Automation.PSParser]::Tokenize\\(\\(Get-Content -Raw .\\\\deploy-api.ps1\\), [ref]$null\\); if \\($?\\) { \"Parse OK\" })",
+      "PowerShell($errs = $null; [System.Management.Automation.Language.Parser]::ParseFile\\(\\(Resolve-Path .\\\\deploy-api.ps1\\).Path, [ref]$null, [ref]$errs\\); if \\($errs\\) { $errs | Select-Object -First 3 | ForEach-Object { $_.Message } } else { \"Parse OK\" })",
+      "PowerShell(Get-PSDrive C | Select-Object @{n='FreeGB';e={[math]::Round\\($_.Free/1GB,1\\)}})"
     ],
     "additionalDirectories": [
       "c:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\deals\\request",

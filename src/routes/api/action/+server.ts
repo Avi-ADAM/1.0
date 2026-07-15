@@ -20,11 +20,11 @@ import { NotificationOrchestrator } from '$lib/server/notifications/Notification
 import type { ActionContext } from '$lib/server/actions/types.js';
 // Import action configurations to register them
 import '$lib/server/actions/configs/index.js';
-import { ADMINMONTHER } from '$env/static/private';
+import { ADMINMONTHER, STRAPI_URL } from '$env/static/private';
 import { isInternalRequest } from '$lib/server/internalSecret.js';
 
 // Environment variables
-const STRAPI_ENDPOINT = import.meta.env.VITE_URL + '/graphql';
+const STRAPI_ENDPOINT = STRAPI_URL + '/graphql';
 if (!ADMINMONTHER) throw new Error('ADMINMONTHER env var is not set');
 const ADMIN_TOKEN = ADMINMONTHER.replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
 

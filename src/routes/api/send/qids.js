@@ -2101,6 +2101,99 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }`,
 
+  "279getChezinNames": `query GetChezinNames {
+    chezins {
+      data {
+        attributes {
+          name
+        }
+      }
+      meta {
+        pagination {
+          total
+        }
+      }
+    }
+  }`,
+
+  "280createChezin": `mutation CreateChezin($name: String!, $email: String!, $countries: [ID]!, $publishedAt: DateTime, $fullAgreement: Boolean) {
+    createChezin(data: { name: $name, email: $email, countries: $countries, publishedAt: $publishedAt, fullAgreement: $fullAgreement }) {
+      data {
+        id
+        attributes {
+          name
+          publishedAt
+          email
+          fullAgreement
+        }
+      }
+    }
+  }`,
+
+  "281createTikunolam": `mutation CreateTikunolam($amort: String, $amorts: String, $amortt: String, $amortf: String, $amorth: String, $more: String, $notes: String, $name: String, $email: String, $publishedAt: DateTime) {
+    createTikunolam(data: { amort: $amort, amorts: $amorts, amortt: $amortt, amortf: $amortf, amorth: $amorth, more: $more, notes: $notes, name: $name, email: $email, publishedAt: $publishedAt }) {
+      data {
+        id
+      }
+    }
+  }`,
+
+  "282createTranslate": `mutation CreateTranslate($amort: String, $amorts: String, $amortt: String, $amortf: String, $amorth: String, $lang: String, $from: String, $notes: String, $name: String, $email: String, $publishedAt: DateTime) {
+    createTranslate(data: { amort: $amort, amorts: $amorts, amortt: $amortt, amortf: $amortf, amorth: $amorth, lang: $lang, from: $from, notes: $notes, name: $name, email: $email, publishedAt: $publishedAt }) {
+      data {
+        id
+      }
+    }
+  }`,
+
+  "283getSkillsRolesWorkways": `query GetSkillsRolesWorkways {
+    skills {
+      data {
+        id
+        attributes {
+          skillName
+          localizations {
+            data {
+              attributes {
+                skillName
+              }
+            }
+          }
+        }
+      }
+    }
+    tafkidims {
+      data {
+        id
+        attributes {
+          roleDescription
+          localizations {
+            data {
+              attributes {
+                roleDescription
+              }
+            }
+          }
+        }
+      }
+    }
+    workWays {
+      data {
+        id
+        attributes {
+          workWayName
+          localizations {
+            data {
+              attributes {
+                workWayName
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+
   "68updateTosplit": `mutation UpdateTosplit($id: ID!, $data: TosplitInput!) {
     updateTosplit(
       id: $id,

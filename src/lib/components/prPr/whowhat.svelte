@@ -61,9 +61,6 @@
   // Display preference: card grid (default) or the legacy spreadsheet table.
   // Both render the same ulist + platform site-share, just different layouts.
   let viewMode = $state('cards'); // 'cards' | 'table'
-  const baseUrl = import.meta.env.VITE_URL;
-
-  let linkg = baseUrl + '/graphql';
   let dictid = {};
   let dictidi = {};
   let hal = false;

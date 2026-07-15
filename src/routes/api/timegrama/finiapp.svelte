@@ -1,7 +1,7 @@
 <script module>
   // Automatic finiapruval close after timegrama deadline passes
 
-  import { SendTo } from '$lib/send/sendTo.svelte';
+  import { SendToAdmin } from '$lib/server/sendToAdmin.js';
   // Server-only secret — this module is imported only by timegrama/+server.js.
   import { ADMINMONTHER } from '$env/static/private';
 
@@ -27,7 +27,7 @@
     }}}}`;
 
     try {
-      const res = await SendTo(qu, ADMINMONTHER);
+      const res = await SendToAdmin(qu, ADMINMONTHER);
       if (!res?.data?.finiapruval?.data) return;
 
       const fini = res.data.finiapruval.data;
@@ -120,7 +120,7 @@
         updateTimegrama(id: ${taid}, data: { done: true }) { data { id } }
       }`;
 
-      const res2 = await SendTo(closeMutation, ADMINMONTHER);
+      const res2 = await SendToAdmin(closeMutation, ADMINMONTHER);
       console.log('finiapp close result', res2);
       if (res2?.data) return 'sucsses' + id;
 

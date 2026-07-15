@@ -105,28 +105,37 @@
 `sales/SaleComponent`, `registration/newppp`, routes שונים. נכון ל-2026-06-10
 ה-grep `page\.data\.tok|page\.data\.jwt` נקי פרט לחריגים שב-2.1.
 
-### 2.2.1 פניות `/graphql` ישירות **ללא טוקן** שנותרו — יישברו בנעילה! (אומת 2026-06-28)
+### 2.2.1 פניות `/graphql` ישירות **ללא טוקן** — **הושלם ✅ (אומת מחדש 2026-07-14)**
 
-קומפוננטות שפונות מהדפדפן ל-`VITE_URL/graphql` בלי bearer (queries ציבוריים /
-אנונימיים). אין כאן דליפת טוקן, אבל ברגע ש-Strapi יינעל ל-localhost — **כולן
-יישברו**. חובה להגר ל-`sendToSer`/qids לפני שלב 3:
+קומפוננטות שפנו מהדפדפן ל-`VITE_URL/graphql` בלי bearer (queries ציבוריים /
+אנונימיים). הרשימה למטה הייתה "חיים — חובה להגר"; ב-2026-07-14 הרצתי את
+בדיקת ה-guardrail (`graphql` + `VITE_URL`/`baseUrl`) על כל `src` מחדש —
+**כל הקבצים ברשימה כבר נקיים**. ככל הנראה הוגרו אגב עבודת ה-action-system
+(`MIGRATION_TRACKING.md`) בלי שהמסמך הזה עודכן.
 
-**קוד מת — לא להגר, למחוק:**
+**קוד מת — לא להגר, למחוק (עדיין ממתין — ראה §3.5):**
 - ~~`src/lib/components/registration/password.svelte`~~ — **קוד מת** (2026-06-28): אף import. ההרשמה עברה לכלל ל-onboarding. למחוק.
 - ~~`src/lib/components/lev/reqtosherut.svelte`~~ — **קוד מת** (2026-06-28): אף import. הלוגיקה הוגרה ל-action `finalizeAskAcceptance`. chat reply הוא לא רק sidequest — הקובץ כולו יתום. למחוק.
 - ~~`src/lib/components/main/amann.svelte`~~ — **קוד מת** (2026-06-28): אף import. למחוק.
 
-**חיים — חובה להגר (אומת 2026-06-28):**
-- **`src/lib/components/ui/`**: `ValueSelector`, `SkillSelector`, `RoleSelector`
-- **`src/lib/components/registration/`**: `roles`, `vallues`, `workways`
-- **`src/lib/components/addnew/`**: `addNewMission`, `addNewSkill`
-- **`src/lib/components/prPr/`**: `negoM`, `choosMission`, `whowhat`
-- **`src/lib/components/main/`**: `amana`, `amanaen`, `amanar` + תלויות שלהם (`tikunolam`, `tikunar`, `tikuneng`, `tranarb`, `translatehe`, `translateeng`)
-- **routes**: `hascama/+page.svelte`, `convention/+page.svelte`, `aitifaqia/+page.svelte`
-  > שלוש הרוטים הללו **חיים** — מקושרים מ-`fpage.svelte`, `newfront.svelte`, `ProductPeek.svelte`; `signup` מפנה ל-`/hascama`.
+**היו "חיים — חובה להגר", אומת נקי 2026-07-14:**
+- **`src/lib/components/ui/`**: `ValueSelector` ✅, `SkillSelector` ✅, `RoleSelector` ✅
+- **`src/lib/components/registration/`**: `roles` ✅, `vallues` ✅, `workways` ✅
+- **`src/lib/components/addnew/`**: `addNewMission` ✅, `addNewSkill` ✅
+- **`src/lib/components/prPr/`**: `negoM` ✅, `choosMission` ✅, `whowhat` ✅
+- **`src/lib/components/main/`**: `amana` ✅, `tikunolam` ✅, `translatehe` ✅
+  > `amanaen`, `amanar`, `tikunar`, `tikuneng`, `tranarb`, `translateeng` **נמחקו** —
+  > אלה היו קבצי-כפילות לפי שפה; אוחדו לתוך `amana`/`tikunolam`/`translatehe` +
+  > נתיבי פרוקסי חדשים `/api/chezin`, `/api/tikun`, `/api/translate` (מחיקה
+  > **staged** ב-git, טרם committed נכון ל-2026-07-14 — לא לחפש את הקבצים שוב).
+- **routes**: `hascama/+page.svelte` ✅ (קיים, נקי, מוגר). `convention/+page.svelte` ו-
+  `aitifaqia/+page.svelte` **נמחקו** כחלק מאותו איחוד (staged ב-git, טרם committed).
 - ~~`src/lib/legacy/moach/OLD_monolith.svelte`~~ (legacy — לא מגרים)
 
-> grep מאמת (צריך להגיע ל-0, למעט legacy):
+> grep guardrail (2026-07-14): רק 2 קבצים תואמים בכל `src` —
+> `reqtosherut.svelte` (קוד מת, לעיל) ו-`OLD_monolith.svelte` (legacy). `pmas.svelte`
+> מכיל את המילה "graphql" רק בתוך בלוק מוער-מת (`/*saved for when graphql enable...`) —
+> לא offender אמיתי, אין צורך לטפל.
 > `grep -rln "graphql" src --include=*.svelte | xargs grep -ln "VITE_URL\|baseUrl"`
 
 ### 2.3 פניות REST ישירות (לא GraphQL) שגם תלויות בטוקן
@@ -225,10 +234,10 @@ Whitelist של פעולות מותרות; כל השאר → 404. פעולות ש
 ### 3.5 צ'קליסט שלב 1
 
 - [x] מיפוי סופי של כל צרכני `page.data.tok`/`.jwt` (אומת 2026-06-28)
-- [ ] **מחיקת קוד מת** (אומת 2026-06-28 — אף import):
-  - [ ] `src/lib/components/lev/reqtosherut.svelte` — כולו קוד מת, למחוק
-  - [ ] `src/lib/components/registration/password.svelte` — כולו קוד מת, למחוק
-  - [ ] `src/lib/components/main/amann.svelte` — כולו קוד מת, למחוק
+- [x] **מחיקת קוד מת** — בוצע 2026-07-14 (אומת 2026-06-28 — אף import):
+  - [x] `src/lib/components/lev/reqtosherut.svelte` — נמחק; הוסר גם מ-BASELINE ב-`check-proxy-security.mjs`
+  - [x] `src/lib/components/registration/password.svelte` — נמחק
+  - [x] `src/lib/components/main/amann.svelte` — נמחק (נמצא כבר כ-`amann.svelte.dead`, כלומר כבר לא `.svelte` פעיל; הוסר סופית)
 - [ ] הגירת `lev/*` לפרוקסי — לתאם עם `MIGRATION_TRACKING.md`
   - [x] `welcomTo.svelte` → `updateWelcomeCard` action (2026-05-25)
   - [x] `hevel.svelte` → `sendToSer('52GetUserById')` (2026-05-25)
@@ -239,44 +248,64 @@ Whitelist של פעולות מותרות; כל השאר → 404. פעולות ש
   - [~] `reqtosherut.svelte` — **קוד מת, למחוק** (ראה למעלה)
   - [~] `projectSuggestornew.svelte` — לא בשימוש; מדלגים
   - [ ] `mashsuggest`/`reqtom` chat replies — **sidequest** (ראה 3.6)
-- [ ] הגירת `main/*` (amana/amanaen/amanar + tikunolam/tikunar/tikuneng/tranarb/translatehe/translateeng) + routes (hascama/convention/aitifaqia) לפרוקסי
-- [ ] הגירת `addnew/*` (addNewMission, addNewSkill)
-- [ ] הגירת `ui/*` (ValueSelector, SkillSelector, RoleSelector)
-- [ ] הגירת `registration/*` (roles, vallues, workways) — password.svelte קוד מת
-- [ ] הגירת `userPr/*` — כולל `editBasic` change-password ל-auth proxy
-- [ ] הגירת `prPr/*` (negoM, choosMission, whowhat)
-- [ ] הגירת `sales/SaleComponent`, `registration/newppp`
+- [x] הגירת `main/*` (amana, tikunolam, translatehe — שאר השמות ברשימה המקורית לא קיימים בקוד) + route `hascama` (convention/aitifaqia לא קיימים) — אומת נקי 2026-07-14
+- [x] הגירת `addnew/*` (addNewMission, addNewSkill) — אומת נקי 2026-07-14
+- [x] הגירת `ui/*` (ValueSelector, SkillSelector, RoleSelector) — אומת נקי 2026-07-14
+- [x] הגירת `registration/*` (roles, vallues, workways) — אומת נקי 2026-07-14; password.svelte קוד מת
+- [x] הגירת `userPr/*` — אומת נקי 2026-07-14 (`editBasic` change-password כבר על auth proxy)
+- [x] הגירת `prPr/*` (negoM, choosMission, whowhat) — אומת נקי 2026-07-14
+- [x] הגירת `sales/SaleComponent`, `registration/newppp` — אומת 2026-07-14: `SaleComponent.svelte`
+  עצמו נקי, כבר משתמש ב-`executeAction('createSale', …)` + `createSaleConsentSpec` (לא ב-graphql ישיר);
+  `registration/newppp.svelte` כבר הומר ל-`.dead` (לא `.svelte` פעיל). **אבל ראה "ממצא חדש" למטה** —
+  `salesService.js`/`productAggregationService.js` (קוד מת נפרד, לא מיובא מ-SaleComponent) עדיין
+  מכילים קריאות graphql ישירות עם bearer שבור.
 - [ ] הגירת routes שמשתמשים בטוקן (`newlev` הושלם ✅ 2026-05-29, `me`, `oldlev`, ...)
 - [x] יצירת `/api/auth` proxy (2026-05-24) + change-password/forgot/reset/send-email-confirmation
-- [ ] היפוך 4 נקודות החשיפה ל-flag בוליאני (3.3)
-- [ ] הוספת guardrail (3.4) ו-grep מאמת = 0
+- [x] היפוך 4 נקודות החשיפה ל-flag בוליאני (3.3) — אומת 2026-07-14: כל 4 המקומות כבר
+  `tok: !!tok` / `loggedIn: !!tok` / `tok: tok==false?false:true`
+- [x] הוספת guardrail (3.4) — קיים ועובד; ⏳ עדיין לא מחובר ל-CI (אין `.github/workflows`)
 - [ ] בדיקת רגרסיה ידנית בדפדפן: login, lev, העלאת קובץ, שינוי סיסמה
 
-### 3.6 Sidequest — מיגרציית chat לאובייקט Forum (חוסם 3 קבצים)
+### ⚠️ ממצא חדש (2026-07-14) — אשכול קוד מת עם bearer שבור, לא נתפס ע"י ה-guardrail
 
-שלוש פונקציות chat ב-`lev/` עדיין שומרות את ההודעות **כמערך component בתוך ה-entity
-עצמו** (ולא כ-relation ל-`forum` עם `messages`). זוהי הדרך הארכאית; המערכת כבר עברה
-ברוב המקומות לעבוד עם `forum` ייעודי + `createMessage` (qid `1chatsend`). לכן
-הקבצים הבאים **לא יוגרו ל-action בלקוח בלבד** — הם דורשים מיגרציה שכוללת:
+תוך כדי בדיקת `sales/SaleComponent` נמצא ש-3 קבצי `.js` לקוח (**לא** `.svelte`, ולכן
+ה-guardrail הנוכחי — שסורק רק `.svelte` — לא רואה אותם) מכילים fetch ישיר מהדפדפן
+ל-`VITE_URL/graphql` עם `Authorization: bearer ${token}`:
 
-1. **שינוי סכמה ב-Strapi:** הוספת relation `forum` ל-`askm` / `ask` (אם לא קיים)
-   והפסקת השימוש בשדה ה-component `chat`.
-2. **One-off migration job:** העברת ההודעות הקיימות מ-component `chat` לתוך
-   forum + messages, ויצירת forum רטרואקטיבי לכל askm/ask קיים.
-3. **בלקוח:** החלפת ה-PUT לתוספת לתוך מערך → קריאה ל-actions הקיימים
-   (`createForum*`, `1chatsend` דרך action / sendToSer).
+- `src/lib/services/salesService.js` — `createSale`, `getUserSellableProducts`,
+  `getUserProjects`, `getProjectProducts` (שורות ~276, 436, 614, 756)
+- `src/lib/services/productAggregationService.js`, `src/lib/services/projectMembershipService.js`
+  (משתמשים ב-`authUtils.getAuthData()` לאותו bearer)
 
-| קובץ | פונקציה | מצב נוכחי | מה דרוש |
-|------|---------|-----------|---------|
-| `mashsuggest.svelte` | `replyToMash` (~255-303) | `PUT /api/askms/${askId}` עם append ל-`chat[]` | forum על askm + `createMessage` |
-| `reqtom.svelte` | chat reply (~420-475) | `PUT /api/askms/${askId}` עם append ל-`chat[]` | forum על askm + `createMessage` |
-| ~~`reqtosherut.svelte`~~ | ~~chat reply~~ | **קוד מת — הקובץ כולו יימחק** (אין importers) | לא רלוונטי |
+ה-`token`/`bearer` האלה מגיעים מ-`page.data.tok`, שכבר בוליאני (3.3) — כלומר גם אם
+מישהו כן היה קורא לקוד הזה, הוא היה שולח `Authorization: "bearer true"` ונכשל.
+**אבל זה לא רלוונטי בפועל:** אומת ב-grep שאף `.svelte`/route בקוד החי לא מייבא את
+`$lib/services` (הבארל) או את `salesService.js`/`productAggregationService.js`/
+`projectMembershipService.js` ישירות — כל השרשרת הזו (כ-2000 שורות) יתומה לגמרי.
+`SaleComponent.svelte` החי משתמש בנתיב נפרד ובטוח (`executeAction`).
 
-**יתרון:** ה-actions ליצירת פורום (`2forumCr`, `2forumCrBasic`) ולהוספת הודעה
-(`1chatsend`) כבר קיימים ומאומתים — רק צריך לחבר.
+**מסקנה:** לא סיכון אבטחה פעיל (קוד לא מגיע לריצה), אבל שני דברים לתעדף:
+1. מחיקת האשכול המת (`salesService.js`, `productAggregationService.js`,
+   `projectMembershipService.js` + מה שתלוי בהם unique ב-`authUtils.js`) — ניקוי בלבד.
+2. שקול להרחיב את ה-guardrail (3.4) גם ל-`.js`/`.ts` תחת `src/lib` (לא `src/routes/api`
+   או `src/lib/server` — שם קריאה ישירה ל-Strapi תקינה) כדי לתפוס דפוס כזה בעתיד.
 
-**עד שהמיגרציה תתבצע:** שלוש הפונקציות האלה ימשיכו לחשוף `page.data.tok` בלקוח.
-ב-checklist 3.5 הן ייחשבו "חסומות sidequest", לא "לא הוגרו".
+### 3.6 Sidequest — מיגרציית chat לאובייקט Forum — **הצד הרלוונטי לפרוקסי הושלם ✅ (אומת 2026-07-14)**
+
+שלוש פונקציות chat ב-`lev/` שמרו פעם את ההודעות **כמערך component בתוך ה-entity
+עצמו** עם `PUT /api/askms/${askId}` ישיר מהלקוח (חשיפת `page.data.tok`). אומת
+מחדש 2026-07-14:
+
+| קובץ | מצב נוכחי |
+|------|-----------|
+| `reqtom.svelte` (`afreact`, ~434-449) | ✅ עבר ל-`executeAction('addAskmChatEntry', { askId, why })` — לא PUT ישיר, לא bearer בלקוח |
+| `mashsuggest.svelte` | ✅ אין יותר `replyToMash`/chat כלל בקובץ — הפונקציונליות הוסרה |
+| ~~`reqtosherut.svelte`~~ | **נמחק** (§3.5) |
+
+**מה שנשאר, לא קריטי לתכנית הפרוקסי:** האם `addAskmChatEntry` (השרת) עדיין כותב
+לשדה ה-component `chat[]` הישן במקום ל-`forum`/`messages` אמיתי — זו שאלת סכמה/
+ארכיטקטורת דאטה, לא חשיפת אבטחה (הקריאה כבר עוברת דרך `/api/action` המאומת).
+לא נבדק כאן; אם רוצים לסגור את זה יש לבדוק את `src/lib/server/actions/configs/addAskmChatEntry.ts`.
 
 ---
 
@@ -335,9 +364,11 @@ Strapi נחסם מבחוץ ומדבר רק עם SvelteKit דרך loopback.
 1. - [x] **סעיף 0.1** — סגירת פרצת ה-`isSer` ✅ (2026-06-19)
 2. - [x] **סעיף 0.2** — חסימת raw-query בפרודקשן ✅ (2026-06-19)
 3. - [ ] **מחיקת קוד מת** — `reqtosherut.svelte`, `password.svelte`, `amann.svelte`
-4. - [ ] **`VITE_URL` → `STRAPI_URL`** (פרטי, `$env/static/private`) ב-`api/send`, `api/action`, `api/upload` — **חובה לפני שינוי הכתובת ב-VPS**
-5. - [ ] **סעיף 2.2.1** — הגירת הקומפוננטות החיות האנונימיות (amana/tikun/convention/hascama, ui selectors, registration, addnew, prPr)
-6. - [ ] השלמת שאריות שלב 1: `test-lev-socket`, sidequest ה-chat (3.6)
+4. - [x] **`VITE_URL` → `STRAPI_URL`** (פרטי, `$env/static/private`) ב-`api/send`, `api/action`, `api/upload`, `$lib/server/sendToAdmin.js` — בוצע 2026-07-14. `STRAPI_URL` כבר היה קיים ב-`.env` ובשימוש ב-5 קבצי שרת אחרים (`api-keys`, `apiKeys.ts`, `report`, `translations`, `sync-vocabulary` — האחרון עדיין על `VITE_URL`, לא טופל כאן, מחוץ לסקופ 3 הראוטים). אומת: `check:proxy` ✅, `validate:qids` ✅ (0 שגיאות, 1 warning קדום לא קשור)
+5. - [x] **סעיף 2.2.1** — הגירת הקומפוננטות החיות האנונימיות (amana/tikun/hascama, ui selectors, registration, addnew, prPr) — אומת נקי מחדש 2026-07-14, כבר היה מוגר; `convention`/`aitifaqia`/`amanaen`/`amanar`/`tikunar`/`tikuneng`/`tranarb`/`translateeng` לא קיימים בקוד (שמות פנטום)
+6. - [x] sidequest ה-chat (3.6) הושלם ✅ 2026-07-14 (הצד הרלוונטי לפרוקסי)
+   - [ ] `test-lev-socket` — עדיין קיים; `page.data.tok` שם כבר בוליאני אז לא דולף
+     טוקן אמיתי (לא מסוכן), אבל זה דף בדיקה שלא שייך לפרודקשן — למחוק או להסיר מהראוטינג
 7. - [ ] guardrails (3.4) + grep = 0
 8. - [ ] שלב 2 — rate limiting, body size, CORS
 9. - [ ] שלב 3 — פריסת SvelteKit על ה-VPS, נעילת Strapi ל-`127.0.0.1` + firewall (ufw), Nginx ל-`/admin` + TLS; **ללא** צורך ב-location מיוחד ל-`/uploads` (Cloudinary)

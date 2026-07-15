@@ -25,24 +25,10 @@ const SRC = join(ROOT, 'src');
 // Files known to still call Strapi /graphql directly from the client.
 // Shrink this list as components are migrated; never add to it.
 const BASELINE = new Set([
-	'src/lib/components/lev/reqtosherut.svelte',
-	'src/lib/components/main/amana.svelte',
-	'src/lib/components/main/amanaen.svelte',
-	'src/lib/components/main/amanar.svelte',
-	'src/lib/components/main/amann.svelte',
-	'src/lib/components/main/tikunar.svelte',
-	'src/lib/components/main/tikuneng.svelte',
-	'src/lib/components/main/tikunolam.svelte',
-	'src/lib/components/main/tranarb.svelte',
-	'src/lib/components/main/translateeng.svelte',
-	'src/lib/components/main/translatehe.svelte',
-	'src/lib/components/prPr/choosMission.svelte',
-	'src/lib/components/prPr/whowhat.svelte',
-	'src/lib/components/registration/password.svelte',
-	'src/lib/legacy/moach/OLD_monolith.svelte',
-	'src/lib/send/sendTo.svelte',
-	'src/routes/convention/+page.svelte',
-	'src/routes/hascama/+page.svelte'
+	// Dead code — zero importers anywhere in src/. Kept for reference, not
+	// migrating; listed here (rather than deleted) so the guardrail doesn't
+	// need updating again if they're ever fully removed.
+	'src/lib/legacy/moach/OLD_monolith.svelte'
 ]);
 
 /** Recursively collect .svelte files under a dir. */

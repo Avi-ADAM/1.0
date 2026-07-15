@@ -278,12 +278,14 @@ export class StrapiClient {
 
       // Check if the HTTP request was successful
       if (!response.ok) {
-        // Try to get response body for more details
+        // Try to get response body for more details (read once as text,
+        // then attempt JSON parsing — the body stream can't be read twice)
         let responseBody: any;
+        const rawBody = await response.text();
         try {
-          responseBody = await response.json();
+          responseBody = JSON.parse(rawBody);
         } catch {
-          responseBody = await response.text();
+          responseBody = rawBody;
         }
 
         console.error('[STRAPI_CLIENT] HTTP Error Details:', {

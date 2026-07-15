@@ -21,13 +21,13 @@
     "types:extract": "node scripts/extract-graphql-types.mjs",
     "types:update": "npm run codegen && npm run types:extract",
     "validate:qids": "node scripts/validate-qids.mjs",
-    "check:proxy": "node scripts/check-proxy-security.mjs"
+    "check:proxy": "node scripts/check-proxy-security.mjs",
+    "postinstall": "patch-package"
   },
   "engines": {
     "node": "22.x"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2.9.6",
     "@event-calendar/core": "^3.4.0",
     "@event-calendar/time-grid": "^3.4.0",
     "@graphql-codegen/cli": "6.1.2",
@@ -38,6 +38,7 @@
     "@sveltejs/adapter-vercel": "^5.7.2",
     "@sveltejs/kit": "^2.21.5",
     "@sveltejs/vite-plugin-svelte": "^5.1.0",
+    "@tauri-apps/cli": "^2.9.6",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/svelte": "^5.2.8",
     "@threlte/core": "^8.0.5",
@@ -52,6 +53,7 @@
     "jsdom": "^27.0.1",
     "layercake": "^8.4.3",
     "mkcert": "^3.2.0",
+    "patch-package": "^8.0.1",
     "postcss-load-config": "^6.0.1",
     "svead": "^0.0.4",
     "svelte": "^5.34.6",
@@ -71,7 +73,6 @@
   },
   "dependencies": {
     "@1lev1/svelte-share": "^0.0.9",
-    "@tauri-apps/api": "^2.9.1",
     "@ai-sdk/google": "^3.0.53",
     "@ai-sdk/groq": "^3.0.31",
     "@ai-sdk/openai": "^3.0.58",
@@ -98,6 +99,7 @@
     "@sentry/sveltekit": "^8.27.0",
     "@svelte-plugins/datepicker": "^1.0.9",
     "@tailwindcss/vite": "^4.1.11",
+    "@tauri-apps/api": "^2.9.1",
     "@tiptap/core": "^2.6.6",
     "@tiptap/extension-bubble-menu": "^2.27.2",
     "@tiptap/extension-floating-menu": "^2.6.6",

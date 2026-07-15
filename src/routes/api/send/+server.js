@@ -1,11 +1,10 @@
 // Secure endpoint that uses HttpOnly cookies for authentication.
 // Proxy to Strapi GraphQL — qids map names to safe, pre-vetted queries.
-const HTTP_ST_ENDPOINT = import.meta.env.VITE_URL
-const ep = HTTP_ST_ENDPOINT + "/graphql"
 import { qids } from './qids.js'
 import { validateAllQids, validateQuery } from './qidsValidator.js'
 import { json, error } from '@sveltejs/kit'
-import { ADMINMONTHER, CONSENSUS_PUBLIC_TOKEN, CONSENSUS_PROXY_SECRET } from '$env/static/private'
+import { ADMINMONTHER, CONSENSUS_PUBLIC_TOKEN, CONSENSUS_PROXY_SECRET, STRAPI_URL } from '$env/static/private'
+const ep = STRAPI_URL + "/graphql"
 import { createHash } from 'node:crypto'
 import { isInternalRequest } from '$lib/server/internalSecret.js'
 

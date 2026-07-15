@@ -3,7 +3,7 @@
 // Approval/FinnishedMission creation is now handled by the timerSave action flow.
 
 import { objToString } from '$lib/func/objToString.svelte';
-import { SendTo } from '$lib/send/sendTo.svelte';
+import { SendToAdmin } from '$lib/server/sendToAdmin.js';
 // Server-only secret — never exposed to the client bundle (no VITE_ prefix).
 import { ADMINMONTHER } from '$env/static/private';
 
@@ -129,7 +129,7 @@ export async function GET({ fetch }) {
   }`;
 
   try {
-    const res = await SendTo(que, ADMINMONTHER);
+    const res = await SendToAdmin(que, ADMINMONTHER);
     if (!res?.data) return new Response(JSON.stringify(suc));
 
     for (const element of res.data.mesimabetahaliches.data) {
@@ -144,7 +144,7 @@ export async function GET({ fetch }) {
       }`;
 
       try {
-        const resi = await SendTo(que2, ADMINMONTHER);
+        const resi = await SendToAdmin(que2, ADMINMONTHER);
         if (!resi?.data?.mesimabetahalich?.data) continue;
 
         const at = resi.data.mesimabetahalich.data.attributes;
@@ -197,7 +197,7 @@ export async function GET({ fetch }) {
           }) { data { id } }
         }`;
 
-        const resis = await SendTo(mutation, ADMINMONTHER);
+        const resis = await SendToAdmin(mutation, ADMINMONTHER);
         if (resis?.data) {
           console.log('monthly reset done for', id);
           suc.push(id);
@@ -240,7 +240,7 @@ async function runRecurringResources(fetchFn) {
 
   let list;
   try {
-    list = await SendTo(listQue, ADMINMONTHER);
+    list = await SendToAdmin(listQue, ADMINMONTHER);
   } catch (e) {
     console.error('monthi: failed to list recurring resources', e);
     return opened;
@@ -261,7 +261,7 @@ async function runRecurringResources(fetchFn) {
       if (end && now > end) {
         // Past the end date — close the engine so no further cycles open.
         const closeMut = `mutation { updateMashabetahalich(id: "${id}", data: { status_mashab: "closed", finnished: true }) { data { id } } }`;
-        await SendTo(closeMut, ADMINMONTHER);
+        await SendToAdmin(closeMut, ADMINMONTHER);
         continue;
       }
 
@@ -293,7 +293,7 @@ async function runRecurringResources(fetchFn) {
           publishedAt: "${now.toISOString()}"
         }) { data { id } }
       }`;
-      const created = await SendTo(createMut, ADMINMONTHER);
+      const created = await SendToAdmin(createMut, ADMINMONTHER);
       const newMaapId = created?.data?.createMaap?.data?.id;
       if (!newMaapId) {
         console.error('monthi: failed to open cycle for resource', id, created);
@@ -307,10 +307,10 @@ async function runRecurringResources(fetchFn) {
         const tgMut = `mutation {
           createTimegrama(data: { date: "${deadline.toISOString()}", done: false, whatami: "maap", maap: "${newMaapId}" }) { data { id } }
         }`;
-        const tg = await SendTo(tgMut, ADMINMONTHER);
+        const tg = await SendToAdmin(tgMut, ADMINMONTHER);
         const tgId = tg?.data?.createTimegrama?.data?.id;
         if (tgId) {
-          await SendTo(
+          await SendToAdmin(
             `mutation { updateMaap(id: "${newMaapId}", data: { timegrama: "${tgId}" }) { data { id } } }`,
             ADMINMONTHER
           );

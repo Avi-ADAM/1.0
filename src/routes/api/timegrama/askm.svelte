@@ -7,13 +7,12 @@
   // The decision is the shared bilateral gate (negoGate): approve only when the
   // latest round is agreed by both a rikma member and the taker, with no
   // objection. Materialization reuses the tested runResourceAskmAcceptance.
-  import { StrapiClient } from '$lib/server/actions/StrapiClient';
+  import { strapiClient as strapi } from '$lib/server/actions';
   import { runResourceAskmAcceptance } from '$lib/server/actions/helpers/runResourceAskmAcceptance';
   import { computeNegoGate, normId } from '$lib/server/nego/negoGate';
 
   export async function Askm(id, taid) {
     console.log(id, taid, 'askm finalizer started');
-    const strapi = new StrapiClient();
 
     try {
       const res = await strapi.execute('getAskmForFinalize', { id: String(id) });

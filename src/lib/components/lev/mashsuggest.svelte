@@ -187,7 +187,6 @@
   import Cards from './cards/sugestma.svelte';
   import Nego from '../prPr/negoPend.svelte';
   import { executeAction } from '$lib/client/actionClient';
-  import { SendTo } from '$lib/send/sendTo.svelte';
   import { DialogContent, DialogOverlay } from 'svelte-accessible-dialog';
   import { RingLoader } from 'svelte-loading-spinners';
   import Diun from './diun.svelte';

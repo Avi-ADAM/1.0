@@ -37,7 +37,6 @@
 
   let fpp = [];
   let fppp = [];
-  const baseUrl = import.meta.env.VITE_URL;
 
   let error1 = null;
 
@@ -62,28 +61,12 @@
     };
 
     try {
-      const res = await fetch(baseUrl + '/graphql', {
+      const res = await fetch('/api/chezin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          query: `query {
-chezins {
- data {
-  attributes {
-    name
-  }
-  }
-meta {
-  pagination {
-    total
-  }
-}
-}
-}
-          `
-        })
+        body: JSON.stringify({ action: 'list' })
       })
         .then(checkStatus)
         .then(parseJSON);
@@ -451,7 +434,6 @@ meta {
   let formEmail = $state('');
   let formErrors = $state({ name: '', email: '', agreement: '' });
   let g = $state(false);
-  let { idx = 1 } = $props();
   import Close from '$lib/celim/close.svelte';
   import { animateScroll } from 'svelte-scrollto-element';
   import Text1lev1 from '$lib/celim/ui/text1lev1.svelte';
@@ -532,30 +514,16 @@ meta {
     const mail = formEmail.toLowerCase().trim();
 
     try {
-      const response = await fetch(baseUrl + '/graphql', {
+      const response = await fetch('/api/chezin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          query: `
-      mutation CreateChezin($name: String!, $email: String!, $countries: [ID]!, $publishedAt: DateTime) {
-        createChezin(data: { name: $name, email: $email, countries: $countries,publishedAt: $publishedAt }) {
-          data { 
-            id 
-            attributes {
-              name
-              publishedAt
-              email
-            }
-          }
-        }
-      }
-    `,
-          variables: {
-            name: formName,
-            email: mail,
-            countries: find_contry_id(selected),
-            publishedAt: new Date().toISOString()
-          }
+          action: 'create',
+          name: formName,
+          email: mail,
+          countries: find_contry_id(selected),
+          publishedAt: new Date().toISOString(),
+          fullAgreement: agreedToFullAgreement
         })
       });
 

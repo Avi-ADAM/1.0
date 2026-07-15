@@ -1,5 +1,5 @@
 <script module>
-     import { SendTo } from '$lib/send/sendTo.svelte';
+     import { SendToAdmin } from '$lib/server/sendToAdmin.js';
      // Server-only secret — this module is imported only by timegrama/+server.js.
      import { ADMINMONTHER } from '$env/static/private';
      import { strapiClient } from '$lib/server/actions/index.js';
@@ -17,7 +17,7 @@ export async function PendM(id,taid,fetchFn){
 }}} 
  }`;
     try {
-      let res = await SendTo(qu, ADMINMONTHER).then((res) => (res = res));
+      let res = await SendToAdmin(qu, ADMINMONTHER).then((res) => (res = res));
       console.log(res);
       if (res.data != null) {
         console.log(res.data, 'pip');
@@ -31,7 +31,7 @@ export async function PendM(id,taid,fetchFn){
   }}}
                 }`
  try {
-      let res2 = await SendTo(qua, ADMINMONTHER).then((res2) => (res2 = res2));
+      let res2 = await SendToAdmin(qua, ADMINMONTHER).then((res2) => (res2 = res2));
       console.log(res2);
       if (res2.data != null) {
         console.log(res2.data,"res2 data")
@@ -70,7 +70,7 @@ export async function PendM(id,taid,fetchFn){
  } `   
  console.log(qub)
      try {
-      let res3 = await SendTo(qub, ADMINMONTHER).then((res3) => (res3 = res3));
+      let res3 = await SendToAdmin(qub, ADMINMONTHER).then((res3) => (res3 = res3));
       console.log(res3,"res3",id,taid)      
       if (res3.data != null) {
               console.log(res3.data,"res3 data")
@@ -97,7 +97,7 @@ export async function PendM(id,taid,fetchFn){
             }
               `
                try {
-      let res4 = await SendTo(que4, ADMINMONTHER).then((res4) => (res4 = res4));
+      let res4 = await SendToAdmin(que4, ADMINMONTHER).then((res4) => (res4 = res4));
             if (res4.data != null) {
               console.log("succses",id," ",res4.data )
               return "sucsses" + id

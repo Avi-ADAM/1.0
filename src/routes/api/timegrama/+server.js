@@ -10,7 +10,7 @@ import { Askm } from './askm.svelte';
 import { Decision } from './decision.svelte';
 //ask need to creater 0on first vote or on request if the requester is project member4
 //מעביר ראשון ראשון ברסק , אם מישהו ביקש מחכים למענה בעניינו ורק לאחר שיש כן 1 לפחות או לא 1 לפחות  ניתן לקבלו או לא 1 לפחות וניתן להציע לאנשים נוספים, בקשה של הקודם כאשר יש לא נשארת אך ניתן להוסיף עוד סקשות 
-import { SendTo } from '$lib/send/sendTo.svelte';
+import { SendToAdmin } from '$lib/server/sendToAdmin.js';
 // Server-only secret — never exposed to the client bundle (no VITE_ prefix).
 import { ADMINMONTHER } from '$env/static/private';
 async function x(id,kind,taid, fetch){
@@ -61,7 +61,7 @@ export async function GET({ fetch }) {
  }
     `; 
  try {
-   let res = await SendTo(qu, ADMINMONTHER).then((res) => (res = res));
+   let res = await SendToAdmin(qu, ADMINMONTHER).then((res) => (res = res));
    console.log(res,"start 49")
    if (res.data != null) {
      console.log(res.data, 'pip');

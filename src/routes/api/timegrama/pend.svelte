@@ -1,6 +1,6 @@
 <script module>
   import { sanitizeUserInput } from '$lib/func/uti/sanitizeUserInput.svelte';
-     import { SendTo } from '$lib/send/sendTo.svelte';
+     import { SendToAdmin } from '$lib/server/sendToAdmin.js';
   // Server-only secret — this module is imported only by timegrama/+server.js.
   import { ADMINMONTHER } from '$env/static/private';
   import { strapiClient } from '$lib/server/actions/index.js';
@@ -18,7 +18,7 @@ export async function Pend(id,taid,fetchFn){
   }}} 
     }`;
     try {
-      let res = await SendTo(qu, ADMINMONTHER).then((res) => (res = res));
+      let res = await SendToAdmin(qu, ADMINMONTHER).then((res) => (res = res));
       console.log(res,"pend first res", id);
       if (res.data != null) {
         console.log(res.data,"pend first res data");
@@ -38,7 +38,7 @@ export async function Pend(id,taid,fetchFn){
                 }`
                 console.log("we go second pend", id)
  try {
-      let res2 = await SendTo(qua, ADMINMONTHER).then((res2) => (res2 = res2));
+      let res2 = await SendToAdmin(qua, ADMINMONTHER).then((res2) => (res2 = res2));
       console.log(res2,"pend  res2");
       if (res2.data != null) {
         console.log(res2.data,"pend  res2 data");
@@ -80,7 +80,7 @@ export async function Pend(id,taid,fetchFn){
  } `   
  console.log(qub,"queri2")
      try {
-      let res3 = await SendTo(qub, ADMINMONTHER).then((res3) => (res3 = res3));
+      let res3 = await SendToAdmin(qub, ADMINMONTHER).then((res3) => (res3 = res3));
       console.log(res3,"pend res3 ",res?.errors?.locations)     
       if (res3.data != null) {
               console.log(res3.data,"pend res3 data ,pend line 83 ")
@@ -107,7 +107,7 @@ export async function Pend(id,taid,fetchFn){
             }
               `
                try {
-      let res4 = await SendTo(que4, ADMINMONTHER).then((res4) => (res4 = res4));
+      let res4 = await SendToAdmin(que4, ADMINMONTHER).then((res4) => (res4 = res4));
       console.log(res4,"pend res4 ")      
       if (res4.data != null) {
               console.log(res4.data,"pend res4 ")      

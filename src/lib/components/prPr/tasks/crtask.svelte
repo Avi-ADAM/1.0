@@ -165,9 +165,9 @@
             if (result.success) {
               success = true;
               onDone?.({
-                id: result.data.id,
-                name: result.data.attributes.shem,
-                user: result.data.attributes.my?.data?.id ?? null
+                id: result.data?.id,
+                name: result.data?.attributes?.shem ?? name,
+                user: result.data?.attributes?.my?.data?.id ?? null
               });
             } else {
               error = true;
