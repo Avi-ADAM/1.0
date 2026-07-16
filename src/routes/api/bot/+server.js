@@ -116,7 +116,7 @@ async function understandUserIntent(userText, history = [], uid, lang, fetchInst
 - all my timers (registered users only): /timers
 - my calendar that shows all my done timers: /myCalendar
 - create new project: /me?action=createproject
-- edit basic profile and register for telegram/device notification: /me?action=editbasic
+- edit basic profile and register for telegram/device notification: /me/settings
 `;
 
     const prompt = `
@@ -169,7 +169,7 @@ Examples:
 - User: "help" or "how does this work?" -> {"intent": "ask_help"}
 - User: "What's the weather?" -> {"intent": "unknown"}
 - User: "create a new project" -> {"intent": "navigate", "parameters": {"url": "/me?action=createproject", "pageName": "Create Project"}}
-- User: "i want to edit my profile or register for telegram notification" -> {"intent": "navigate", "parameters": {"url": "/me?action=editbasic", "pageName": "Edit Profile"}}
+- User: "i want to edit my profile or register for telegram notification" -> {"intent": "navigate", "parameters": {"url": "/me/settings", "pageName": "Edit Profile"}}
 Your JSON response:
 `;
 console.log('prompt', prompt )
