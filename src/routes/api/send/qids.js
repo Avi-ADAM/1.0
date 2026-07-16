@@ -1598,6 +1598,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           hm
           name
           easy
+          source
+          ratson { data { id attributes { name } } }
           declinedsps { data { id } }
           users { data { id } }
           mashaabim { data { id } }
@@ -1625,7 +1627,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           sqadualed
           archived
           source
-          ratson { data { id } }
+          ratson { data { id attributes { name } } }
           acts { data { id attributes { shem des dateF dateS link } } }
           users { data { id } }
           mission { data { id } }
@@ -1653,6 +1655,20 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
   'getOpenMissionExtractedKey': `query GetOpenMissionExtractedKey($id: ID!) {
     openMission(id: $id) {
       data { id attributes { extractedKey } }
+    }
+  }`,
+  // Best-effort reads of the maagad a need originates from
+  // (PLAN_HUB_LEV_DEMAND_SYNC round 2). Kept separate from 50/51 so that —
+  // until the \`maagad\` relation is live in Strapi — selecting it fails in
+  // isolation (caught by the caller) without breaking the detail pages.
+  'getOpenMissionMaagad': `query GetOpenMissionMaagad($id: ID!) {
+    openMission(id: $id) {
+      data { id attributes { maagad { data { id attributes { name } } } } }
+    }
+  }`,
+  'getOpenMashaabimMaagad': `query GetOpenMashaabimMaagad($id: ID!) {
+    openMashaabim(id: $id) {
+      data { id attributes { maagad { data { id attributes { name } } } } }
     }
   }`,
   '52GetUserById': `query GetUserById($id: ID!) {
@@ -13048,6 +13064,8 @@ export const qids = {
                 dates
                 sqadualed
                 source
+                ratson { data { id attributes { name } } }
+                maagad { data { id attributes { name } } }
                 project {
                   data {
                     id
@@ -13127,6 +13145,9 @@ export const qids = {
                 sqadualedf
                 recurring
                 cycleSize
+                source
+                ratson { data { id attributes { name } } }
+                maagad { data { id attributes { name } } }
                 mashaabim { data { id } }
                 declinedsps { data { id } }
                 project {

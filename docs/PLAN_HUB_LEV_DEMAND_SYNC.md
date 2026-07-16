@@ -56,11 +56,57 @@
 normalizers. כל עמוד שרוצה "לראות ביקוש" צורך את זה — לא שאילתות
 מקבילות משלו. ספירות (hub) הן qids נפרדים קלים באותם פילטרים.
 
-## 4. המשך (לא בסשן זה)
+## 4. סבב 2 — זהות-מקור בכל נקודות המגע (2026-07-16)
+
+הצורך: משימה/משאב פתוחים יכולים להגיע משלושה מקורות — ריקמה (project), משאלה
+(concierge / ratson) או מאגד ביקוש (maagad) — וכל נקודות התצוגה היו מוטות-ריקמה.
+
+### סכמה (1.0b, ענף העבודה)
+
+- `open-mission.maagad` + `open-mashaabim.maagad` — relation `manyToOne` אל
+  `maagad` (+ צד הופכי `maagad.open_missions` / `maagad.open_mashaabims`).
+- `source` enum בשניהם: `project | concierge | maagad`.
+- **סדר דיפלוי**: 1.0b קודם, ואז `npm run types:update` + דיפלוי 1.0 —
+  qids 209/212 בוחרים עכשיו `maagad` ו-ratson; עד דיפלוי הבקאנד הם נכשלים
+  בשקט (allSettled ב-levDataLoader) וההצעות ריקות זמנית. הקריאות בעמודי
+  הפרט (`getOpenMissionMaagad`/`getOpenMashaabimMaagad`) עטופות try/catch
+  נפרד — העמודים ממשיכים לעבוד.
+
+### עמודי הפרט (הגעה בלחיצה מ-/demand)
+
+- `availableMission/[id]`: כותרת/זהות לפי מקור (ריקמה / 🤝 מאגד / 🌟 קונסיירז'
+  + שם המשאלה), קישור ראוי — `/project`, `/maagad/[id]`, או **`/wish/[id]`**
+  (העמוד הציבורי; הקישור הישן ל-`/concierge/[id]` היה עמוד-הבעלים).
+  משימת-מאגד לא רוכבת על `applyToMission` (אין project ואין ratson) — ה-CTA
+  מפנה להצעת-סף בעמוד המאגד.
+- `availiableResorce/[id]`: היה קורס על משאב בלי project (גישה ישירה
+  ל-`project.data.attributes`); עכשיו זהות-מקור מלאה + qid 50 מחזיר
+  `source`/`ratson`. זרימת ה-Askm הישנה דורשת ריקמה — למקור משאלה/מאגד
+  מוצג CTA לעמוד המקור.
+
+### קלפי הלב (sugestmi / sugestma)
+
+- qids 209/212 מעשירים ב-`ratson`+`maagad`; ה-builders מעבירים
+  `ratsonId/Name`, `maagadId/Name`, `source`.
+- `buildResourceSuggestionsFromMatchRecords` הפיל כל משאב בלי project
+  ("legacy rule") — עכשיו משאיר גם מקור משאלה/מאגד.
+- `processSuggestions`/`processResourceSuggestions` ממתגים: `מאגד · <שם>` /
+  `קונסירג׳`, ומחשבים `sourceHref` (לחיצה על הזהות → `/wish` או `/maagad`
+  במקום דיאלוג הריקמה) ו-`offerHref` (כשה-flow הרגיל לא זמין — הכפתור הראשי
+  הופך לקישור "להצעה בעמוד המקור"; דחייה נשארת). מועבר דרך cards.svelte
+  ו-newcoinui.svelte → projectSuggestor/mashsuggest → sugestmi/sugestma.
+
+### הערה על משאלות → לב
+
+פרסום משימות ממשאלה (concierge) כבר קיים: `publishWishNeedToCommunity` יוצר
+open-mission עם `ratson` + מזין את מנוע ההתאמות. סבב זה השלים את התצוגה
+וההפניות; מה שנותר פתוח הוא זרימת יצירה של צרכים **ממאגד** (ראה §5).
+
+## 5. המשך (לא בסשן זה)
 
 | # | תוצר | הערות |
 |---|---|---|
-| F1 | מאגדים/משאלות כ-match-suggestions בלב | הרחבת `match-suggestion` (סכמה: relation ל-maagad/ratson + kind חדש) + טריגרים ב-`openMaagad`/`joinMaagad`; ההצעה תופיע כקלף לב אמיתי, לא רק במפה |
+| F1 | זרימת יצירה: מאגד מפרסם משימה/משאב פתוחים | הסכמה והתצוגה מוכנות (§4); חסר action בסגנון `publishWishNeedToCommunity` שמציב `maagad` + `source='maagad'` ומפעיל את מנוע ההתאמות |
 | F2 | מרכוז המפה בלב על מיקום המשתמש | נקודות ה-user קיימות בפרופיל; ה-panel יקבל center |
 | F3 | ספירות חיות ב-hub (socket) | היום זה snapshot ב-load |
 | F4 | badge "חדש באזורך" על ה-FAB בלב | דורש השוואת snapshot מקומי |

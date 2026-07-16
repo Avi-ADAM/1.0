@@ -199,6 +199,27 @@
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`;
   let description = data.alld?.attributes?.descrip || om[$lang];
   let url = page.url.toString();
+
+  // Source identity: rikma (project) / demand pool (maagad) / wish (concierge).
+  let maagadInfo = $derived(data.alld?.maagadInfo ?? null);
+  let isMaagadSrc = $derived(
+    !!maagadInfo || data.alld?.attributes?.source === 'maagad'
+  );
+  let ratsonId = $derived(data.alld?.attributes?.ratson?.data?.id ?? null);
+  let ratsonName = $derived(
+    data.alld?.attributes?.ratson?.data?.attributes?.name ?? ''
+  );
+  let sourceName = $derived(
+    data.alld?.attributes?.project?.data?.attributes?.projectName ??
+      (isMaagadSrc
+        ? `🤝 ${$lang === 'he' ? 'מאגד ביקוש' : 'demand pool'}${maagadInfo?.name ? ` · ${maagadInfo.name}` : ''}`
+        : `🌟 ${$lang === 'he' ? "קונסיירז'" : 'concierge'}${ratsonName ? ` · ${ratsonName}` : ''}`)
+  );
+  const seeMaagad = { he: 'לצפיה במאגד', en: 'See the pool' };
+  const offerViaMaagad = {
+    he: 'הצעות למשימה הזו מוגשות דרך עמוד המאגד',
+    en: 'Offers for this mission are made on the pool page'
+  };
   //TODO: header nav menu
 </script>
 
@@ -255,7 +276,7 @@
                 >
               </div>
               <span class="pn ml-1 text-lg sm:text-xl lg:text-2xl text-grey-200"
-                >{data.alld.attributes.project?.data?.attributes?.projectName ?? '🌟 קונסיירז\''}</span
+                >{sourceName}</span
               >
             </div>
           </div>
@@ -266,9 +287,17 @@
               class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4"
               >{seePr[$lang]}</button
             >
-            {:else if data.alld.attributes.ratson?.data?.id}
+            {:else if maagadInfo?.id}
             <a
-              href="/concierge/{data.alld.attributes.ratson.data.id}"
+              href="/maagad/{maagadInfo.id}"
+              class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4"
+              >{seeMaagad[$lang]}</a
+            >
+            {:else if data.alld.attributes.ratson?.data?.id}
+            <!-- The public wish page — right referral for any visitor (the
+                 owner-facing flow lives on /concierge/[id]) -->
+            <a
+              href="/wish/{data.alld.attributes.ratson.data.id}"
               class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4"
               >{'he' === $lang ? 'לצפיה במשאלה' : 'See the wish'}</a
             >
@@ -558,7 +587,21 @@
                   {/each}
                 </div>
               {/if}
-              {#if data.tok != false}
+              {#if isMaagadSrc}
+                <!-- Maagad-sourced need: applications don't ride applyToMission
+                     (no project, no wish) — a supplier answers the pool with a
+                     threshold offer on its page. -->
+                <div class="flex flex-col gap-3 justify-center items-center mt-7">
+                  <p class="text-barbi text-center text-xl">{offerViaMaagad[$lang]}</p>
+                  {#if maagadInfo?.id}
+                    <a
+                      href="/maagad/{maagadInfo.id}"
+                      class="button-perl text-barbi text-2xl px-4 py-3 hover:text-black hover:font-bold"
+                      >{seeMaagad[$lang]}</a
+                    >
+                  {/if}
+                </div>
+              {:else if data.tok != false}
                 <div class="flex flex-wrap gap-3 justify-center items-center">
                   {#if alr == false && !data.alld.attributes.users.data
                       .map((c) => c.id)

@@ -60,16 +60,43 @@ async function awaitapi(mId, lang, tok, fetch) {
       const langd = langAdjast(node, lang);
       const alld = { ...langd };
       const projectName = alld.attributes.project?.data?.attributes?.projectName;
-      const isConcierge = alld.attributes.source === 'concierge' || !alld.attributes.project?.data;
-      alld.title = isConcierge
-        ? {
-            he: `1💗1 | הצעה למשימה ממשאלה: "${alld.attributes.name}"`,
-            en: `1💗1 | Wish mission: "${alld.attributes.name}"`
+
+      // Source identity (PLAN_HUB_LEV_DEMAND_SYNC round 2): a need can come
+      // from a rikma (project), a wish (concierge / ratson) or a demand pool
+      // (maagad). The maagad relation is read best-effort in its own query so
+      // the page keeps working until the relation is live in Strapi.
+      if (!alld.attributes.project?.data) {
+        try {
+          const mres = await sendToSer({ id: mId }, 'getOpenMissionMaagad', 0, 0, isSer, fetch);
+          const maagadNode = mres?.data?.openMission?.data?.attributes?.maagad?.data;
+          if (maagadNode?.id) {
+            alld.maagadInfo = {
+              id: String(maagadNode.id),
+              name: maagadNode.attributes?.name ?? ''
+            };
           }
-        : {
-            he: `1💗1 | הצעה למשימה "${alld.attributes.name}" בריקמה: ${projectName}`,
-            en: `1💗1 | come see this mission "${alld.attributes.name}" on freeMates:"${projectName}"`
-          };
+        } catch (e) {
+          // Relation not deployed yet / read failed — rikma & wish paths still render.
+        }
+      }
+      const isMaagad = alld.attributes.source === 'maagad' || !!alld.maagadInfo;
+      const isConcierge =
+        !isMaagad &&
+        (alld.attributes.source === 'concierge' || !alld.attributes.project?.data);
+      alld.title = isMaagad
+        ? {
+            he: `1💗1 | הצעה למשימה ממאגד ביקוש: "${alld.attributes.name}"`,
+            en: `1💗1 | Demand-pool mission: "${alld.attributes.name}"`
+          }
+        : isConcierge
+          ? {
+              he: `1💗1 | הצעה למשימה ממשאלה: "${alld.attributes.name}"`,
+              en: `1💗1 | Wish mission: "${alld.attributes.name}"`
+            }
+          : {
+              he: `1💗1 | הצעה למשימה "${alld.attributes.name}" בריקמה: ${projectName}`,
+              en: `1💗1 | come see this mission "${alld.attributes.name}" on freeMates:"${projectName}"`
+            };
       return alld;
     }
     return null;

@@ -926,6 +926,8 @@
               hst={buble.hst}
               stb={buble.stb}
               projectName={buble.projectName}
+              sourceHref={buble.sourceHref ?? null}
+              offerHref={buble.offerHref ?? null}
               role={buble.tafkidims}
               skills={buble.skills}
               missionDetails={buble.descrip}
@@ -964,6 +966,8 @@
               myp={buble.myp}
               already={buble.already}
               projectName={buble.projectName}
+              sourceHref={buble.sourceHref ?? null}
+              offerHref={buble.offerHref ?? null}
               missionDetails={buble.descrip}
               notes={buble.hearotMeyuchadot}
               src={buble.srcb}

@@ -82,8 +82,16 @@
     onAccept,
     myRoundProposedBy = null, // 'project' → rikma countered my application (B2)
     myRound = null, // latest round terms on my application (my own / rikma counter)
-    onTochat
+    onTochat,
+    // Wish/maagad-sourced need (PLAN_HUB_LEV_DEMAND_SYNC r2): the Askm flow
+    // needs a rikma — the offer is made on the source page instead.
+    offerHref = null
   } = $props();
+
+  const offerAtSource = {
+    he: 'להצעה בעמוד המקור',
+    en: 'Offer on the source page'
+  };
 
   function hover(x) {
     onHover?.({ x: x });
@@ -440,7 +448,27 @@
     class="p-4 bg-gray-50 dark:bg-gray-900/50 flex gap-3 border-t border-gray-100 dark:border-gray-700"
   >
     {#if low == false}
-      {#if myRoundProposedBy === 'project'}
+      {#if offerHref}
+        <!-- מקור משאלה/מאגד: ההצעה מוגשת בעמוד המקור -->
+        <button
+          onmouseenter={() => hover('לא מתאים לי')}
+          onmouseleave={() => hover('0')}
+          class="flex-1 py-2 flex justify-center items-center gap-2 bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold rounded-xl transition-all"
+          onclick={() => decline('f')}
+        >
+          <div class="w-8 h-8"><No /></div>
+          <span class="whitespace-nowrap">{$t('lev.cards.decline')}</span>
+        </button>
+        <a
+          href={offerHref}
+          onmouseenter={() => hover(offerAtSource[$lang] ?? offerAtSource.he)}
+          onmouseleave={() => hover('0')}
+          class="flex-2 py-2 flex justify-center items-center gap-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
+        >
+          <div class="w-8 h-8 text-white"><Lev /></div>
+          <span class="whitespace-nowrap">{offerAtSource[$lang] ?? offerAtSource.he}</span>
+        </a>
+      {:else if myRoundProposedBy === 'project'}
         <!-- B2: הריקמה הציעה הצעה נגדית — לאשר או להעלות סבב נגדי -->
         <button
           onmouseenter={() => hover($t('lev.cards.acceptCounter'))}
