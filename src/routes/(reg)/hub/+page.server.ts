@@ -34,6 +34,22 @@ export interface HubSummary {
   profilePic?: string;
 }
 
+/**
+ * Aggregate demand-map totals for the hub teaser
+ * (PLAN_HUB_LEV_DEMAND_SYNC direction 3): how much live demand & supply sits
+ * on /demand right now — wishes, pools, threshold offers, rikma missions and
+ * resources, products. Counts only, no items — one tap opens the map.
+ */
+export interface HubDemandSummary {
+  wishes: number;
+  maagadim: number;
+  offers: number;
+  missions: number;
+  resources: number;
+  products: number;
+  total: number;
+}
+
 const URGENT_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24h
 
 function isUrgent(deadlineStr?: string): boolean {
@@ -205,6 +221,41 @@ function processHubSummary(raw: any, uid: string): HubSummary {
   };
 }
 
+function totalOf(result: PromiseSettledResult<any>, key: string): number {
+  if (result.status !== 'fulfilled') return 0;
+  const n = result.value?.data?.[key]?.meta?.pagination?.total;
+  return typeof n === 'number' && Number.isFinite(n) ? n : 0;
+}
+
+async function loadDemandSummary(
+  fetch: typeof globalThis.fetch,
+  svc: boolean
+): Promise<HubDemandSummary> {
+  // Two settled reads: 280 targets the maagad collections and degrades to
+  // zeros on its own when they don't exist yet (same guard as qid 223).
+  const [baseRes, maagadRes] = await Promise.allSettled([
+    sendToSer({}, '279demandCounts', 0, 0, svc, fetch),
+    sendToSer({}, '280maagadDemandCounts', 0, 0, svc, fetch)
+  ]);
+
+  const summary = {
+    wishes: totalOf(baseRes, 'ratsons'),
+    missions: totalOf(baseRes, 'openMissions'),
+    resources: totalOf(baseRes, 'openMashaabims'),
+    products: totalOf(baseRes, 'matanots'),
+    maagadim: totalOf(maagadRes, 'maagads'),
+    offers: totalOf(maagadRes, 'maagadOffers')
+  };
+  const total =
+    summary.wishes +
+    summary.missions +
+    summary.resources +
+    summary.products +
+    summary.maagadim +
+    summary.offers;
+  return { ...summary, total };
+}
+
 export const load: PageServerLoad = async ({ locals, fetch }) => {
   const uid = locals.uid ?? '';
 
@@ -221,5 +272,7 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
     return processHubSummary(raw, uid);
   })();
 
-  return { streamed: { summary } };
+  const demand: Promise<HubDemandSummary> = loadDemandSummary(fetch, !uid);
+
+  return { streamed: { summary, demand } };
 };

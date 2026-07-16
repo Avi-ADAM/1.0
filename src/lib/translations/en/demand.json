@@ -91,5 +91,14 @@
   "supply_sugg_title": "Existing supply matching this demand",
   "supply_sugg_sub": "Products and services already offered on the site — maybe this is what you're looking for? Suppliers: a great basis for a threshold offer.",
   "supply_sugg_mine": "mine",
-  "supply_sugg_cta": "Make a threshold offer based on your supply"
+  "supply_sugg_cta": "Make a threshold offer based on your supply",
+  "lev_panel_fab": "Demand map",
+  "lev_panel_sub": "Live demand and supply — wishes, pools, missions and resources from all weaves.",
+  "lev_panel_full": "Open the full map page",
+  "lev_panel_error": "Loading the map failed.",
+  "lev_panel_retry": "Try again",
+  "lev_panel_close": "Close",
+  "hub_teaser_sub": "What people seek and offer right now — pools and weaves together.",
+  "hub_teaser_cta": "To the demand map",
+  "hub_items_active": "active items"
 }

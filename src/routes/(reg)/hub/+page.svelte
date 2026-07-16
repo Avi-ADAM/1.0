@@ -7,6 +7,7 @@
   import UrgentVotePill from '$lib/components/hub/UrgentVotePill.svelte';
   import KindShortcut from '$lib/components/hub/KindShortcut.svelte';
   import CustomPurchaseCta from '$lib/components/hub/CustomPurchaseCta.svelte';
+  import DemandMapTeaser from '$lib/components/hub/DemandMapTeaser.svelte';
   import ActionFeed from '$lib/components/hub/ActionFeed.svelte';
   import HubSkeleton from '$lib/components/hub/HubSkeleton.svelte';
   import FirstSteps from '$lib/components/hub/FirstSteps.svelte';
@@ -125,6 +126,13 @@
         <div class="stagger" style="--i:1">
           <FirstSteps username={summary.username} />
         </div>
+        <!-- The public demand map is the recruitment engine — show a new user
+             what the community seeks and offers right now -->
+        {#await data.streamed.demand then demand}
+          <div class="stagger" style="--i:2">
+            <DemandMapTeaser {demand} />
+          </div>
+        {/await}
       {:else}
         {#if summary.kpi.urgent > 0}
           <div class="stagger" style="--i:1">
@@ -145,6 +153,12 @@
         <div class="stagger" style="--i:3">
           <CustomPurchaseCta />
         </div>
+
+        {#await data.streamed.demand then demand}
+          <div class="stagger" style="--i:4">
+            <DemandMapTeaser {demand} />
+          </div>
+        {/await}
 
         <section class="stagger" style="--i:4">
           <h2 class="section-title">{labels.shortcuts}</h2>

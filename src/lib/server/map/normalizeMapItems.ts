@@ -93,9 +93,11 @@ export function normalizeOpenMission(node: StrapiNode): MapItem | null {
   const ratson = a.ratson?.data?.attributes ?? null;
   const project = a.project?.data ?? null;
   const loc = resolveLocation(a.location, project?.attributes?.location, ratson);
+  // An unlocated mission is not location-bound: keep it as a global
+  // (list-only) item, so rikma demand is never hidden from the map page.
+  // Same semantics as the matching engine's geo rule (unlocated matches all).
   const isOnline =
-    a.location?.location_mode === 'online' || !!a.isglobal || (!!ratson?.isOnline && loc.lat === null);
-  if (loc.lat === null && !isOnline) return null;
+    a.location?.location_mode === 'online' || !!a.isglobal || loc.lat === null;
   return {
     id: String(node.id),
     kind: 'mission',
@@ -160,9 +162,9 @@ export function normalizeOpenMashaabim(node: StrapiNode): MapItem | null {
   const ratson = a.ratson?.data?.attributes ?? null;
   const project = a.project?.data ?? null;
   const loc = resolveLocation(a.location, project?.attributes?.location, ratson);
-  const isOnline =
-    a.location?.location_mode === 'online' || (!!ratson?.isOnline && loc.lat === null);
-  if (loc.lat === null && !isOnline) return null;
+  // Unlocated ⇒ global list item, like missions above — rikma resource
+  // requests always surface on the demand page.
+  const isOnline = a.location?.location_mode === 'online' || loc.lat === null;
   return {
     id: String(node.id),
     kind: 'resource',

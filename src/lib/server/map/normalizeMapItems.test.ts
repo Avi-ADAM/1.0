@@ -84,8 +84,11 @@ describe('normalizeOpenMission — location fallback chain', () => {
     expect(viaWish?.href).toBe('/availableMission/3');
   });
 
-  it('drops missions with no location anywhere and no online mode', () => {
-    expect(normalizeOpenMission({ id: 4, attributes: { name: 'm' } })).toBeNull();
+  it('keeps missions with no location anywhere as global list items', () => {
+    const item = normalizeOpenMission({ id: 4, attributes: { name: 'm' } });
+    expect(item).not.toBeNull();
+    expect(item?.isOnline).toBe(true);
+    expect(item?.lat).toBeNull();
   });
 });
 
@@ -103,6 +106,13 @@ describe('normalizeOpenMashaabim', () => {
     expect(item?.concierge).toBe(true);
     expect(item?.href).toBe('/availiableResorce/5');
     expect(item?.meta.kindOf).toBe('tool');
+  });
+
+  it('keeps unlocated resources as global list items', () => {
+    const item = normalizeOpenMashaabim({ id: 6, attributes: { name: 'r' } });
+    expect(item).not.toBeNull();
+    expect(item?.isOnline).toBe(true);
+    expect(item?.lat).toBeNull();
   });
 });
 

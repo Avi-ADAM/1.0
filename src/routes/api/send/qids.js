@@ -12415,6 +12415,43 @@ export const qids = {
     }
   }`,
 
+  // ── Demand-map counts for the hub teaser (PLAN_HUB_LEV_DEMAND_SYNC) ──────
+  // Aggregate totals only — same filters as the map layer qids (220-222, 269).
+  // 280 targets the maagad collections and is fired behind its own settled
+  // guard, like 223, until they exist in every deployment.
+
+  '279demandCounts': `query DemandCounts {
+    ratsons(
+      filters: {
+        and: [
+          { status_ratson: { in: ["open", "matching"] } }
+          { access_mode: { ne: "personal" } }
+          { or: [{ allowJoin: { eq: true } }, { joinKind: { notIn: ["solo"] } }] }
+        ]
+      }
+      pagination: { limit: 1 }
+    ) { meta { pagination { total } } }
+    openMissions(filters: { archived: { eq: false } }, pagination: { limit: 1 }) {
+      meta { pagination { total } }
+    }
+    openMashaabims(filters: { archived: { eq: false } }, pagination: { limit: 1 }) {
+      meta { pagination { total } }
+    }
+    matanots(filters: { archived: { ne: true } }, pagination: { limit: 1 }) {
+      meta { pagination { total } }
+    }
+  }`,
+
+  '280maagadDemandCounts': `query MaagadDemandCounts {
+    maagads(
+      filters: { status_maagad: { in: ["forming", "visible", "offered"] } }
+      pagination: { limit: 1 }
+    ) { meta { pagination { total } } }
+    maagadOffers(filters: { status_offer: { eq: "open" } }, pagination: { limit: 1 }) {
+      meta { pagination { total } }
+    }
+  }`,
+
   '268getUserStorefront': `query GetUserStorefront($uid: ID!) {
     sps(
       filters: { users_permissions_user: { id: { eq: $uid } }, archived: { ne: true }, offerScope: { in: ["customers", "both"] } }
