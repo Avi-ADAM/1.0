@@ -13206,6 +13206,57 @@ export const qids = {
     }
   }`,
 
+  // Public support / home page (PLAN_VOLUNTEER_RIKMA §3): one shot that pulls
+  // everything the coverage board needs. Served server-side (isSer), so it
+  // works for unregistered visitors; the page itself only ever renders
+  // aggregates of the money data, never per-member breakdowns.
+  '213publicSupportPage': `query PublicSupportPage($id: ID!) {
+    project(id: $id) {
+      data {
+        id
+        attributes {
+          projectName
+          publicDescription
+          linkToWebsite
+          githublink
+          fblink
+          discordlink
+          twiterlink
+          watsapplink
+          city
+          profilePic { data { attributes { url formats } } }
+          vallues(pagination: { limit: 50 }) { data { attributes { valueName localizations { data { attributes { valueName } } } } } }
+          user_1s(pagination: { limit: 100 }) { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          matanotofs(filters: { archived: { ne: true } }, pagination: { limit: 100 }) {
+            data { id attributes { name price pic { data { attributes { url formats } } } } }
+          }
+          open_missions(filters: { archived: { eq: false } }, pagination: { limit: 200 }) {
+            data {
+              id
+              attributes {
+                name
+                descrip
+                noofhours
+                perhour
+                users { data { id } }
+                skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
+              }
+            }
+          }
+          finnished_missions(pagination: { limit: 1000 }) {
+            data { attributes { total noofhours perhour } }
+          }
+          sales(pagination: { limit: 1000 }) {
+            data { attributes { in note holderStatus date matanot { data { id } } } }
+          }
+          halukas(pagination: { limit: 1000 }) {
+            data { attributes { amount confirmed } }
+          }
+        }
+      }
+    }
+  }`,
+
   ...qids_base,
   ...moachQids
 };

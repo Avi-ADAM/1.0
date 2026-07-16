@@ -106,7 +106,8 @@
     values: { he: '✨ הערכים שלנו', en: '✨ Our Values' },
     missions: { he: '🚀 משימות פנויות', en: '🚀 Open Missions' },
     team: { he: 'הצוות', en: 'The Team' },
-    visit: { he: 'בקרו באתר', en: 'Visit Website' }
+    visit: { he: 'בקרו באתר', en: 'Visit Website' },
+    support: { he: '💗 דף התמיכה והשקיפות', en: '💗 Support & Transparency' }
   };
 
   let pageTitle = $derived({
@@ -241,6 +242,14 @@
             </a>
           {/if}
         </div>
+
+        <!-- Support & transparency page (PLAN_VOLUNTEER_RIKMA §3) -->
+        <a
+          href="/project/{projectId}/support"
+          class="inline-block px-6 py-2.5 rounded-full font-bold text-black bg-gradient-to-r from-gold via-[#d4af37] to-[#b8860b] shadow-lg hover:scale-105 transition-transform hover:shadow-gold/50"
+        >
+          {texts.support[$lang]}
+        </a>
       </div>
 
       <!-- 2. Unregistered User Invitation (Gold & Pink Card) -->
