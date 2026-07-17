@@ -8613,6 +8613,7 @@ export const moachQids = {
           publicDescription
           profilePic { data { attributes { url formats } } }
           user_1s { data { id attributes { email username lang profilePic { data { attributes { url formats } } } } } }
+          supportPage
           restime githublink fblink discordlink drivelink twiterlink watsapplink linkToWebsite
           vallues { data { id attributes { valueName localizations { data { attributes { valueName } } } } } }
           acts{data{id attributes{shem hashivut isAssigned open_mission{data{id attributes {name}}} pendm{data{id attributes{name}}}
@@ -8634,6 +8635,7 @@ export const moachQids = {
           publicDescription
           profilePic { data { attributes { url formats } } }
           user_1s { data { id attributes { email username lang profilePic { data { attributes { url formats } } } } } }
+          supportPage
           restime githublink fblink discordlink drivelink twiterlink watsapplink linkToWebsite
           vallues { data { id attributes { valueName localizations { data { attributes { locale valueName } } } } } }
           acts{data{id attributes{shem hashivut isAssigned open_mission{data{id attributes {name}}} pendm{data{id attributes{name}}}
@@ -13467,6 +13469,8 @@ export const qids = {
           twiterlink
           watsapplink
           city
+          supportPage
+          restime
           profilePic { data { attributes { url formats } } }
           vallues(pagination: { limit: 50 }) { data { attributes { valueName localizations { data { attributes { valueName } } } } } }
           user_1s(pagination: { limit: 100 }) { data { id attributes { username profilePic { data { attributes { url } } } } } }
@@ -13495,6 +13499,67 @@ export const qids = {
           halukas(pagination: { limit: 1000 }) {
             data { attributes { amount confirmed } }
           }
+        }
+      }
+    }
+  }`,
+
+  // Volunteer-rikma (PLAN_VOLUNTEER_RIKMA §7): flip the support-page gate
+  // (off · members · public). Any project member may toggle it.
+  'updateProjectSupportPage': `mutation UpdateProjectSupportPage($id: ID!, $supportPage: ENUM_PROJECT_SUPPORTPAGE!) {
+    updateProject(id: $id, data: { supportPage: $supportPage }) {
+      data { id attributes { supportPage } }
+    }
+  }`,
+
+  // Volunteer-rikma (§2.1): a donation is a Sale with NO linked product,
+  // isDonation:true and a structured donation note (buildDonationNote).
+  'createDonationSaleRecord': `mutation CreateDonationSaleRecord(
+    $project: ID!,
+    $users_permissions_user: ID!,
+    $in: Float!,
+    $date: DateTime!,
+    $publishedAt: DateTime!,
+    $note: String,
+    $reporter: ID,
+    $holderStatus: ENUM_SALE_HOLDERSTATUS
+  ) {
+    createSale(data: {
+      project: $project,
+      users_permissions_user: $users_permissions_user,
+      in: $in,
+      unit: 1,
+      date: $date,
+      publishedAt: $publishedAt,
+      note: $note,
+      reporter: $reporter,
+      holderStatus: $holderStatus,
+      isDonation: true
+    }) {
+      data {
+        id
+        attributes {
+          in
+          note
+          holderStatus
+          users_permissions_user { data { id attributes { username } } }
+        }
+      }
+    }
+  }`,
+
+  // Volunteer-rikma (§2.2): a supporter's donation intent needs the rikma's
+  // member list + restime so the coordinating notification/claim can target
+  // the right people at the project's own pace.
+  'donationProjectInfo': `query DonationProjectInfo($pid: ID!) {
+    project(id: $pid) {
+      data {
+        id
+        attributes {
+          projectName
+          restime
+          supportPage
+          user_1s { data { id attributes { username } } }
         }
       }
     }

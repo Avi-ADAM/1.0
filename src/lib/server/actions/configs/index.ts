@@ -123,6 +123,9 @@ import { addAskmChatEntryConfig } from './addAskmChatEntry.js';
 import { addAskChatEntryConfig } from './addAskChatEntry.js';
 import { createSaleConfig } from './createSale.js';
 import { counterSaleClaimConfig } from './counterSaleClaim.js';
+import { setSupportPageConfig } from './setSupportPage.js';
+import { createDonationSaleConfig } from './createDonationSale.js';
+import { requestDonationConfig } from './requestDonation.js';
 import { updateUserProfilePicConfig } from './updateUserProfilePic.js';
 import { updateUserBasicConfig } from './updateUserBasic.js';
 import { archiveUserResourceConfig } from './archiveUserResource.js';
@@ -341,6 +344,11 @@ export function registerAllActions(): void {
   registerAction(createSaleConfig);
   // Bilateral holder-consent negotiation on a saleClaim Decision
   registerAction(counterSaleClaimConfig);
+
+  // Volunteer-rikma (PLAN_VOLUNTEER_RIKMA): support-page gate + donations
+  registerAction(setSupportPageConfig);
+  registerAction(createDonationSaleConfig);
+  registerAction(requestDonationConfig);
 
   // User profile (me page): picture, basic info, resource archive
   registerAction(updateUserProfilePicConfig);
