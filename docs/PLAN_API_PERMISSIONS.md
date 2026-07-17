@@ -68,7 +68,14 @@
 
 ### שלב 1 — `resolvePrincipal`: זיהוי אחיד של הטוקן
 
-- [ ] מודול חדש `src/lib/server/authz/principal.ts`:
+**בוצע ✅ (2026-07-17):** `src/lib/server/authz/principal.ts` —
+`resolveCookiePrincipal` / `resolveServicePrincipal` / `resolvePrincipal` /
+`resolveApiKeyPrincipal` + בדיקות יחידה (`principal.test.ts`). ה־resolution
+לעולם לא זורק על credential רע — מדרדר ל־cookie/anonymous בדיוק כהתנהגות
+הקיימת. הערה: ב־`api/send` בדיקת ה־consensus-secret הקיימת (401 על סוד שגוי)
+נשארה לפני השכבה החדשה, כך שההתנהגות זהה.
+
+- [x] מודול חדש `src/lib/server/authz/principal.ts`:
 
 ```ts
 export type PrincipalKind =
@@ -87,18 +94,25 @@ export interface Principal {
 }
 ```
 
-- [ ] `resolvePrincipal({ request, cookies, body })` מרכז את הלוגיקה שהיום
-  מפוזרת: `isInternalRequest`, `CONSENSUS_QIDS`+`x-consensus-secret`,
-  `verifyApiKey`, cookies. **אין שינוי התנהגות** — רק חילוץ.
-- [ ] `api/send`, `api/action`, `api/v1/actions`, `api/mcp` עוברים להשתמש בו.
-- [ ] בדיקות יחידה: כל שילוב (isSer בלי secret ⇒ user, apiKey לא תקין ⇒
-  anonymous, וכו').
+- [x] `resolvePrincipal({ request, cookies, isSerFlag })` מרכז את הלוגיקה שהיום
+  מפוזרת: `isInternalRequest`, `x-consensus-secret`, `verifyApiKey`, cookies.
+  **אין שינוי התנהגות** — רק חילוץ.
+- [x] `api/send`, `api/action`, `api/v1/actions` עוברים להשתמש בו.
+  (`api/mcp` ממשיך עם `verifyApiKey` ישירות — הכלים שלו לא עוברים דרך
+  qids/actions; חיבור עתידי כשה־tools ימופו ל־ops.)
+- [x] בדיקות יחידה: כל שילוב (isSer בלי secret ⇒ user, apiKey לא תקין ⇒
+  null/401, וכו').
 
 ### שלב 2 — מניפסט הרשאות פר-operation
 
 **ל-qids — קובץ אחות `src/routes/api/send/qidsAccess.js`:**
 
-- [ ] לכל qid רשומה אחת:
+**בוצע ✅ (2026-07-17):** נוצר ע"י `scripts/build-qids-access.mjs` (423 qids:
+358 user+serviceAdmin, 11 serviceAdmin בלבד, 15 consensus, 39 מסומנים
+unreferenced). בדיקת הכיסוי `qidsAccess.test.ts` נכשלת על drift דו-כיווני.
+**נשאר לביקורת ידנית:** לעבור על הרשומות המסומנות `unreferenced` ולהדק.
+
+- [x] לכל qid רשומה אחת:
 
 ```js
 export const qidsAccess = {
@@ -110,24 +124,30 @@ export const qidsAccess = {
 };
 ```
 
-- [ ] **סקריפט חד-פעמי לבנייה** (`scripts/build-qids-access.mjs`): grep על כל
-  קריאות `sendToSer(...)` / `sendToSerTyped(...)` בקוד — qid שנקרא רק עם
+- [x] **סקריפט לבנייה** (`scripts/build-qids-access.mjs`): סורק את כל
+  קריאות `sendToSer(...)` / `sendToSerTyped(...)` / `queId:` בקוד — qid שנקרא רק עם
   `isSer:true` מסווג `serviceAdmin`; qid שנקרא מקומפוננטות ⇒ `user`;
   qid ב-`CONSENSUS_QIDS` ⇒ `serviceConsensus`. הפלט הוא **טיוטה לביקורת
-  ידנית**, לא אמת אוטומטית.
-- [ ] **בדיקת כיסוי ב-CI** (vitest): נכשלת אם קיים qid ב-`qids.js` בלי רשומה
+  ידנית**, לא אמת אוטומטית (הרצה חוזרת דורסת הידוק ידני — למזג ביד).
+- [x] **בדיקת כיסוי ב-CI** (vitest): נכשלת אם קיים qid ב-`qids.js` בלי רשומה
   ב-`qidsAccess.js` (ולהפך). כך qid חדש מחייב סיווג מודע.
 
 **ל-actions — שדה חדש ב-`ActionConfig` (`src/lib/server/actions/types.ts`):**
 
-- [ ] `access?: PrincipalKind[]` — ברירת מחדל `['user', 'serviceAdmin']`
+- [x] `access?: PrincipalKind[]` — ברירת מחדל `['user', 'serviceAdmin']`
   (המצב הקיים). פעולה שרוצים לחשוף ל-API keys מוסיפה `'apiKey'`.
-- [ ] `createTask` מקבל `access: ['user', 'serviceAdmin', 'apiKey']` —
-  ומחליף את `ALLOWED_ACTIONS` הקשיח ב-`api/v1/actions/+server.ts:9`.
+- [x] `createTask` מקבל `access: ['user', 'serviceAdmin', 'apiKey']` —
+  ומחליף את `ALLOWED_ACTIONS` הקשיח ב-`api/v1/actions/+server.ts`.
 
 ### שלב 3 — `authorize()` מרכזי + העברת ה-if-ים הידניים ל-guards
 
-- [ ] `src/lib/server/authz/authorize.ts`:
+**בוצע חלקית ✅ (2026-07-17):** `authorize.ts` (`authorizeOperation`,
+`checkApiKeyProjectScope`, `applyAuthz`, `getAuthzMode`) + חיווט לשלושת
+הנתיבים + בדיקות יחידה. **בכוונה לא הועברו** ה-if-ים הידניים ל-guards —
+הם נשארו inline ב-`api/send` כשכבה שנייה (הקטנת סיכון; אפשר לרפקטר
+בנפרד כשהשכבה החדשה מוכחת בפרודקשן).
+
+- [x] `src/lib/server/authz/authorize.ts`:
 
 ```ts
 export type AuthzDecision =
@@ -140,24 +160,31 @@ export function authorizeOperation(p: Principal, op: string): AuthzDecision;
 ```
 
   החלק הסטטי (allow-list פר-kind) הוא סינכרוני וזול — מתאים גם ל-introspection.
-- [ ] **`api/send`:** מיד אחרי resolve של `queId` + principal —
-  `authorizeOperation`; `denied` ⇒ `403` עם ה-reason. זה קורה **לפני** בחירת
-  הטוקן ולפני ה-fetch ל-Strapi.
-- [ ] ה-if-ים הידניים הופכים ל-guards רשומים במניפסט (`guards.ts`), עם אותה
-  חתימה `(principal, variables, ctx) => AuthorizationResult`:
-  - `42UpdatePosition` בלי `support:true` ⇒ service אסור (`+server.js:217`).
-  - `UpdateClause` — כללי body/issueId + בעלות `authorExternalId` (`:224-250`).
-  - `39GetNegotiation` — הסתרת private מנתיב service (`:277-282`).
-  ה-handler נשאר רזה: resolve → authorize → guard (אם יש) → execute.
-- [ ] **`api/action`:** `authorizeOperation(principal, 'action:'+actionKey)`
+- [x] **`api/send`:** מיד אחרי resolve של `queId` + principal —
+  `applyAuthz`; `denied` ⇒ `403` עם ה-reason (במצב enforce). זה קורה
+  **לפני** בחירת הטוקן ולפני ה-fetch ל-Strapi.
+- [ ] ה-if-ים הידניים הופכים ל-guards רשומים במניפסט (`guards.ts`) —
+  **נדחה בכוונה**, ראו הערה למעלה:
+  - `42UpdatePosition` בלי `support:true` ⇒ service אסור.
+  - `UpdateClause` — כללי body/issueId + בעלות `authorExternalId`.
+  - `39GetNegotiation` — הסתרת private מנתיב service.
+- [x] **`api/action`:** `applyAuthz(principal, 'action:'+actionKey)`
   לפני `service.executeAction` (שממשיך להריץ את `authRules` — שכבה שנייה,
-  תלוית-params). `AuthorizationEngine` לא משתנה.
-- [ ] **`api/v1/actions` + `api/mcp`:** מוחקים whitelists מקומיים; משתמשים
-  באותו `authorizeOperation` עם principal מסוג `apiKey`.
+  תלוית-params). `AuthorizationEngine` לא השתנה. action לא מוכר ממשיך
+  ל-ActionService כדי לשמר את סמנטיקת ה-404.
+- [x] **`api/v1/actions`:** נמחק ה-whitelist המקומי (`ALLOWED_ACTIONS`);
+  משתמש ב-`applyAuthz` עם principal מסוג `apiKey` — **נאכף תמיד**, בלי
+  קשר ל-`AUTHZ_MODE`, כי הנתיב היה deny-by-default עוד קודם.
+  (`api/mcp` — חיבור עתידי, הכלים שלו אינם qids/actions.)
 
 ### שלב 4 — endpoint introspection: "האם לטוקן הזה מותר X?"
 
-- [ ] `POST /api/permissions/check` — רץ עם הטוקן של הפונה (cookie או Bearer):
+**בוצע ✅ (2026-07-17):** `src/routes/api/permissions/+server.ts` —
+`POST /api/permissions` (בדיקת רשימת ops) + `GET /api/permissions` (כל
+ה-ops המותרים לטוקן הפונה). anonymous מקבל 401 (מניעת enumeration).
+עוטף לקוח: `src/lib/send/canI.js` עם cache של 60 שניות.
+
+- [x] `POST /api/permissions` — רץ עם הטוקן של הפונה (cookie או Bearer):
 
 ```jsonc
 // request
@@ -172,37 +199,48 @@ export function authorizeOperation(p: Principal, op: string): AuthzDecision;
   } }
 ```
 
-  - בלי `params` — תשובה סטטית מהמניפסט (`conditional` כשיש `authRules`
-    תלויי-ישות). עם `params` — מריצים גם את ה-`authRules`/guard בפועל
-    ומחזירים `allowed`/`denied` סופי.
-  - `GET /api/permissions` (לאותו טוקן) מחזיר את כל רשימת ה-ops המותרים —
+  - [x] בלי `params` — תשובה סטטית מהמניפסט (`conditional` כשיש `authRules`
+    תלויי-ישות).
+  - [ ] עם `params` — להריץ גם את ה-`authRules`/guard בפועל ולהחזיר
+    `allowed`/`denied` סופי (שלב המשך).
+  - [x] `GET /api/permissions` (לאותו טוקן) מחזיר את כל רשימת ה-ops המותרים —
     שימושי ל-MCP tools discovery ול-UI.
-- [ ] עוטף לקוח `src/lib/send/canI.js`: `canI(['action:createTask'])` עם
+- [x] עוטף לקוח `src/lib/send/canI.js`: `canI(['action:createTask'])` עם
   cache קצר — להפעלה/הסתרה של כפתורים ב-UI במקום ניחוש.
-- [ ] Rate-limit בסיסי + אין הבחנה בהודעת השגיאה בין "qid לא קיים" ל"אין
-  הרשאה" עבור anonymous (למנוע enumeration).
+- [ ] Rate-limit בסיסי (anonymous כבר מקבל 401 בלי פירוט — מניעת enumeration).
 
 ### שלב 5 — Rollout: shadow → אכיפה
 
-- [ ] דגל סביבה `AUTHZ_MODE = off | log | enforce` (ברירת מחדל בפריסה
-  ראשונה: `log`).
+- [x] דגל סביבה `AUTHZ_MODE = off | log | enforce` (ברירת מחדל: `log`;
+  נקרא דרך `$env/dynamic/private` — ניתן לשינוי בלי build) (2026-07-17).
   - `log`: מחשבים החלטה; אם `denied` — כותבים ללוג
     (`[authz-shadow] denied send:7getTelegramIds principal=user uid=…`)
     **וממשיכים** בהתנהגות הישנה.
   - `enforce`: מחזירים 403.
+  - חריג: תעבורת apiKey **תמיד** נאכפת, בכל mode.
 - [ ] שבוע-שבועיים ב-`log` בפרודקשן; סקירת הלוגים ⇒ תיקון סיווגים שגויים
-  במניפסט; רק אז `enforce`.
-- [ ] בדיקות אינטגרציה (לצד `endpoint.integration.test.ts` הקיים):
-  מטריצת principal × דגימת ops מכל קטגוריה — user מקבל 403 על qid של cron,
-  apiKey מקבל 403 על action לא-חשוף, serviceConsensus חסום מחוץ ל-consensus.
+  במניפסט; רק אז `AUTHZ_MODE=enforce`.
+- [x] בדיקות יחידה למטריצה (authorize.test.ts): user נחסם על qid של cron,
+  apiKey נחסם על action לא-חשוף, serviceAdmin חסום על consensus,
+  serviceConsensus מותר על consensus. (בדיקות אינטגרציה מלאות ברמת
+  ה-endpoint — שלב המשך.)
 
-### שלב 6 (אופציונלי, אחרי 1–5) — scopes פר-API-key
+### שלב 6 — scopes פר-API-key (פר-פרויקט + פר-op)
 
-- [ ] שדה `scopes` (JSON) ב-content-type `api-key` בסטרפי — רשימת ops
-  (`["action:createTask", "send:12mission"]`) או `["*"]`.
-- [ ] `verifyApiKey` מחזיר גם `scopes`; `authorizeOperation` חותך:
-  `kind ∈ allow` **וגם** `op ∈ scopes`.
-- [ ] UI ניהול המפתחות (הקיים מעל `api/api-keys`) מציג ומאפשר לבחור scopes.
+> **הקשר:** סטרפי לא מכיר את מנגנון ה-API keys כאימות — רק אנחנו אוכפים,
+> ומאחורי הקלעים הפעולה מתבצעת עם טוקן האדמין. לכן ה-scopes כאן הם גבול
+> ההרשאה האמיתי היחיד של מפתח.
+
+- [ ] שדה `scopes` (JSON) ב-content-type `api-key` בסטרפי, בפורמט
+  `{ "projects": ["17"], "ops": ["action:createTask"] }` (או מערך פשוט של
+  project ids — נתמך כ-legacy). אחרי ההוספה: `npm run types:update`.
+- [x] `verifyApiKey` שולף גם `scopes` (עם fallback חינני כשהשדה עוד לא קיים
+  בסכמה) ומנרמל דרך `normalizeApiKeyScopes` (2026-07-17).
+- [x] `authorizeOperation` חותך `kind ∈ allow` **וגם** `op ∈ scopes.ops`;
+  `checkApiKeyProjectScope` אוכף `params.projectId ∈ scopes.projects`
+  (מפתח מוגבל-פרויקטים חייב param של פרויקט) (2026-07-17).
+- [ ] UI ניהול המפתחות (הקיים מעל `api/api-keys`) מציג ומאפשר לבחור scopes,
+  ו-`POST /api/api-keys` שומר אותם.
 - כך "טוקן" ספציפי (ולא רק סוג-טוקן) מקבל תשובה מדויקת פר-פעולה — הסגירה
   המלאה של מטרת-העל.
 

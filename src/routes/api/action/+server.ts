@@ -22,6 +22,9 @@ import type { ActionContext } from '$lib/server/actions/types.js';
 import '$lib/server/actions/configs/index.js';
 import { ADMINMONTHER, STRAPI_URL } from '$env/static/private';
 import { isInternalRequest } from '$lib/server/internalSecret.js';
+import { resolvePrincipal } from '$lib/server/authz/principal.js';
+import { applyAuthz } from '$lib/server/authz/authorize.js';
+import { getAction } from '$lib/server/actions/registry.js';
 
 // Environment variables
 const STRAPI_ENDPOINT = STRAPI_URL + '/graphql';
@@ -94,6 +97,17 @@ export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
     // Validate user authentication
     if (!userId || !jwt) {
       throw error(401, 'Authentication required. Please log in.');
+    }
+
+    // Static authorization: principal kind × action (see src/lib/server/authz).
+    // Unknown actions fall through so ActionService keeps returning
+    // UNKNOWN_ACTION/404. Entity-level authRules still run inside
+    // executeAction — this is the coarse first layer. AUTHZ_MODE=log
+    // (default) only logs would-be denials; enforce returns 403.
+    if (getAction(actionKey)) {
+      const principal = resolvePrincipal({ request, cookies, isSerFlag: isSer === true });
+      const { blocked, decision } = applyAuthz({ principal, op: `action:${actionKey}`, params });
+      if (blocked) throw error(403, `Forbidden: ${decision.reason}`);
     }
 
     // Build action context

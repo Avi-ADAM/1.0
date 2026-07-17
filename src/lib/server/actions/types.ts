@@ -29,6 +29,14 @@ export interface ActionConfig {
   /** Authorization rules that must be satisfied */
   authRules: AuthRule[];
 
+  /**
+   * Principal kinds allowed to invoke this action (static authz layer,
+   * see src/lib/server/authz/). Defaults to ['user', 'serviceAdmin'] —
+   * today's reachability. Add 'apiKey' to expose the action to API keys
+   * via /api/v1/actions (replaces the old hardcoded ALLOWED_ACTIONS list).
+   */
+  access?: import('../authz/types.js').PrincipalKind[];
+
   /** Notification configuration (optional) */
   notification?: NotificationConfig;
 

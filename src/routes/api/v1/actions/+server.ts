@@ -1,12 +1,10 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { verifyApiKey } from '$lib/server/apiKeys';
+import { resolveApiKeyPrincipal } from '$lib/server/authz/principal.js';
+import { applyAuthz } from '$lib/server/authz/authorize.js';
 import { actionService } from '$lib/server/actions/index.js';
 import type { ActionContext } from '$lib/server/actions/types.js';
 import { ADMINMONTHER } from '$env/static/private';
-
-// Whitelist of actions allowed via API
-const ALLOWED_ACTIONS = ['createTask'];
 
 // Admin token for Strapi bypass (internal use)
 const ADMIN_TOKEN = ADMINMONTHER.replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
@@ -26,14 +24,12 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
         throw error(401, 'Missing Authorization header');
     }
 
-    const apiKey = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
-    const user = await verifyApiKey(apiKey);
-
-    if (!user) {
+    const principal = await resolveApiKeyPrincipal(authHeader);
+    if (!principal?.userId) {
         throw error(401, 'Invalid or expired API key');
     }
 
-    console.log(`[API-Actions] Authenticated request from user ${user.id} (${user.username})`);
+    console.log(`[API-Actions] Authenticated request from user ${principal.userId}`);
 
     try {
         // 2. Parse and Validate Request Body
@@ -48,27 +44,32 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
             throw error(400, 'Missing or invalid params');
         }
 
-        // 3. Check Whitelist
-        if (!ALLOWED_ACTIONS.includes(actionKey)) {
-            console.warn(`[API-Actions] Action "${actionKey}" is not allowed via API`);
-            throw error(403, `Action "${actionKey}" is not permitted via this endpoint`);
+        // 3. Authorize: manifest (ActionConfig.access must include 'apiKey')
+        // + this key's op/project scopes. API-key traffic is always enforced
+        // regardless of AUTHZ_MODE — this path was deny-by-default before.
+        const { blocked, decision } = applyAuthz({
+            principal,
+            op: `action:${actionKey}`,
+            params
+        });
+        if (blocked) {
+            console.warn(`[API-Actions] Denied "${actionKey}" for user ${principal.userId}: ${decision.reason}`);
+            throw error(403, `Action "${actionKey}" is not permitted via this endpoint: ${decision.reason}`);
         }
 
         // 4. Build Action Context
-        // We use the ADMIN_TOKEN for the JWT because API keys identify the USER, 
-        // but the internal action system might need a valid Strapi JWT.
-        // Usually, the action system should be able to work with the user ID directly if it has admin rights,
-        // or we need to ensure the context has a JWT that Strapi accepts.
-        // In this case, we use the verified user's ID.
+        // Strapi does not know API keys — the key only identifies the USER here,
+        // and execution uses the ADMIN_TOKEN behind the scenes. That is why the
+        // authorization above is the real permission boundary for this path.
         const context: ActionContext = {
-            userId: user.id.toString(),
+            userId: principal.userId,
             jwt: ADMIN_TOKEN, // Using admin token to perform actions on behalf of the user
             lang: 'he',
             fetch
         };
 
         // 5. Execute Action
-        console.log(`[API-Actions] Executing action: ${actionKey} for user ${user.id}`);
+        console.log(`[API-Actions] Executing action: ${actionKey} for user ${principal.userId}`);
         const result = await actionService.executeAction(actionKey, params, context);
 
         // 6. Return Result

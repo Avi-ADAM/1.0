@@ -80,6 +80,37 @@ export function extractUserIdFromKey(raw: string): number | null {
 const KEY_CACHE = new Map<string, { user: any; expiresAt: number }>();
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 דקות
 
+// ─── Scopes ──────────────────────────────────────────────────────
+// Scopes narrow what a key may do on behalf of its owning user:
+//   { projects: [projectIds], ops: ['action:createTask', ...] }
+// A legacy plain array is treated as project ids (per-project scoping).
+// The `scopes` JSON field may not exist yet on the api-key content type in
+// Strapi — the query falls back gracefully so verification keeps working.
+
+export interface ApiKeyScopes {
+  projects?: string[];
+  ops?: string[];
+}
+
+export function normalizeApiKeyScopes(raw: unknown): ApiKeyScopes | null {
+  if (raw == null) return null;
+  if (Array.isArray(raw)) {
+    const projects = raw.map(String).filter(Boolean);
+    return projects.length ? { projects } : null;
+  }
+  if (typeof raw === 'object') {
+    const obj = raw as Record<string, unknown>;
+    const projects = Array.isArray(obj.projects) ? obj.projects.map(String).filter(Boolean) : undefined;
+    const ops = Array.isArray(obj.ops) ? obj.ops.map(String).filter(Boolean) : undefined;
+    if (!projects?.length && !ops?.length) return null;
+    return {
+      ...(projects?.length ? { projects } : {}),
+      ...(ops?.length ? { ops } : {})
+    };
+  }
+  return null;
+}
+
 // ─── verifyApiKey מהיר יותר עם userId ────────────────────────────
 
 export async function verifyApiKey(rawKey: string) {
@@ -98,12 +129,13 @@ export async function verifyApiKey(rawKey: string) {
   // 2. שלוף רק מפתחות של אותו משתמש (סט קטן בהרבה)
   const hash = hashKey(rawKey);
   console.log(`[API Keys] Generated hash: ${hash.slice(0, 10)}...`);
-  const query = `
+  const buildQuery = (withScopes: boolean) => `
     query GetApiKey($hash: String!) {
       apiKeys(filters: { key_hash: { eq: $hash } }) {
         data {
           id
           attributes {
+            ${withScopes ? 'scopes' : ''}
             users_permissions_user {
               data {
                 id
@@ -115,28 +147,41 @@ export async function verifyApiKey(rawKey: string) {
     }
   `;
 
-  const res = await fetch(`${STRAPI_URL}/graphql`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${STRAPI_TOKEN}`
-    },
-    body: JSON.stringify({
-      query,
-      variables: { hash }
-    })
-  });
+  const runQuery = async (withScopes: boolean) =>
+    fetch(`${STRAPI_URL}/graphql`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${STRAPI_TOKEN}`
+      },
+      body: JSON.stringify({
+        query: buildQuery(withScopes),
+        variables: { hash }
+      })
+    });
 
+  let res = await runQuery(true);
   console.log(`[API Keys] GraphQL request status: ${res.status}`);
-  
+
   if (!res.ok) {
     const errorText = await res.text();
     console.error(`[API Keys] GraphQL error: ${errorText}`);
     return null;
   }
-  
-  const { data: gqlData, errors } = await res.json();
-  
+
+  let { data: gqlData, errors } = await res.json();
+
+  // The `scopes` field may not exist yet in the Strapi schema — retry without it.
+  if (errors && JSON.stringify(errors).includes('scopes')) {
+    console.warn('[API Keys] api-key.scopes not in Strapi schema yet — querying without it');
+    res = await runQuery(false);
+    if (!res.ok) {
+      console.error(`[API Keys] GraphQL error on fallback: ${await res.text()}`);
+      return null;
+    }
+    ({ data: gqlData, errors } = await res.json());
+  }
+
   if (errors) {
     console.error(`[API Keys] GraphQL Errors: ${JSON.stringify(errors)}`);
     return null;
@@ -155,8 +200,10 @@ export async function verifyApiKey(rawKey: string) {
 
   if (keyUserId && parseInt(keyUserId) === parseInt(userId)) {
       console.log(`[API Keys] Match found! Authorized as user ${keyUserId}`);
-      KEY_CACHE.set(rawKey, { user: userObj, expiresAt: Date.now() + CACHE_TTL_MS });
-      return userObj;
+      const scopes = normalizeApiKeyScopes(keyData.scopes);
+      const verified = scopes ? { ...userObj, scopes } : userObj;
+      KEY_CACHE.set(rawKey, { user: verified, expiresAt: Date.now() + CACHE_TTL_MS });
+      return verified;
   }
 
   console.warn(`[API Keys] Key exists but user mismatch: Key belongs to ${keyUserId}, request is for ${userId}`);
