@@ -1054,6 +1054,7 @@
                   negopendmissions={buble.negopendmissions || []}
                   orderon={buble.orderon || 0}
                   forumId={buble.forumId}
+                  selfNomination={buble.openMissionData?.source === 'selfNomination'}
                 /></SwiperSlide
               >
             {:else if buble.ani === 'askedm' && milon.askmap == true}
@@ -1116,6 +1117,7 @@
                   pendingMainVote={buble.pendingMainVote === true}
                   negopendmissions={buble.negopendmissions || []}
                   orderon={buble.orderon || 0}
+                  selfNomination={buble.openMashaabimData?.source === 'selfNomination'}
                 /></SwiperSlide
               >
             {:else if buble.ani === 'meData' && milon.sugg == true}
@@ -1161,6 +1163,7 @@
                   noOfHours={buble.noofhours}
                   perhour={buble.perhour}
                   total={buble.noofhours * buble.perhour}
+                  selfNomination={buble.source === 'selfNomination'}
                   cards="true"
                 /></SwiperSlide
               >
@@ -1209,6 +1212,7 @@
                   descrip={buble.descrip}
                   spnot={buble.spnot}
                   easy={buble.easy}
+                  selfNomination={buble.source === 'selfNomination'}
                 /></SwiperSlide
               >
             {:else if buble.ani === 'hachla' && milon.hachla == true}

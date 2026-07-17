@@ -54,6 +54,7 @@
    * @property {any[]} [myAskUsers] - my application's vots (for accept/counter)
    * @property {any} [myRound] - latest round terms on my application (my own counter-offer)
    * @property {any} order - Order data
+   * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
    */
   /** @type {ComponentProps} */
   let {
@@ -101,6 +102,7 @@
     myRound = null, // latest round terms on my application (my own counter-offer)
     order = {},
     onModal,
+    selfNomination = false,
     // Project-less sources (PLAN_HUB_LEV_DEMAND_SYNC r2): identity click goes
     // to the wish/maagad page; offerHref replaces the apply flow (maagad).
     sourceHref = null,
@@ -114,13 +116,34 @@
     onLess?.({ ani: 'prsug', coinlapach: coinlapach });
   }
 
+  // Withdraw my own self-nominated proposal (PLAN_SELF_NOMINATION §3.3):
+  // archives my Ask AND the mission I authored, and tells the members.
+  let withdrawing = $state(false);
+  async function withdrawSelfNom() {
+    if (withdrawing || !oid) return;
+    withdrawing = true;
+    try {
+      const result = await executeAction('dismissSelfNomination', {
+        side: 'mission',
+        id: String(oid),
+        mode: 'withdraw'
+      });
+      if (result.success) less(oid);
+      else error1 = result.error;
+    } catch (e) {
+      error1 = e;
+    } finally {
+      withdrawing = false;
+    }
+  }
+
   async function agree(oid) {
     already = true;
     try {
       /** @type {Record<string, unknown>} */
       const actionParams = {
         openMissionId: String(oid),
-        existingAskedIds: askedarr.map(String),
+        existingAskedIds: askedarr.map(String)
       };
       // Only pass projectId when it exists — concierge open missions have no project
       // and the action detects that case via the missing projectId.
@@ -162,11 +185,16 @@
         projectId: String(projectId),
         ordern: myOrdern ?? 0,
         newValues,
-        users: myAskUsers ?? [],
+        users: myAskUsers ?? []
       };
     } else {
       action = 'proposeOnOpenMission';
-      params = { openMissionId: String(oid), projectId: String(projectId), newValues, originalValues };
+      params = {
+        openMissionId: String(oid),
+        projectId: String(projectId),
+        newValues,
+        originalValues
+      };
     }
     const result = await executeAction(action, params);
     if (!result.success) throw new Error(result.error || `${action} failed`);
@@ -184,7 +212,7 @@
         askId: String(askId),
         projectId: String(projectId),
         ordern: myOrdern ?? 0,
-        users: myAskUsers ?? [],
+        users: myAskUsers ?? []
       });
       if (result.success) less(oid);
       else error1 = result.error;
@@ -204,7 +232,7 @@
     try {
       const result = await executeAction('declineOpenMission', {
         openMissionId: String(oid),
-        existingDeclinedIds: declineddarr.map(String),
+        existingDeclinedIds: declineddarr.map(String)
       });
       if (result.success) {
         declineddarr.push(`${oid}`);
@@ -451,7 +479,9 @@
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
   <div transition:fly={{ y: 40, opacity: 0, duration: 250 }}>
     <DialogContent class="nego-modal" aria-label="form">
-      <button class="nego-modal-close" onclick={close} aria-label="סגירה">✕</button>
+      <button class="nego-modal-close" onclick={close} aria-label="סגירה"
+        >✕</button
+      >
       {#if loading === true}
         <RingLoader size="200" color="#ff00ae" unit="px" duration="2s" />
       {:else if negoOpen === true}
@@ -2793,7 +2823,7 @@
             onmouseleave={() => hover('0')}
           >
             {#if skills}
-              {#each (skills?.data ?? skills ?? []) as skill}
+              {#each skills?.data ?? skills ?? [] as skill}
                 <Tile bg="green" word={skill?.attributes?.skillName ?? skill} />
               {/each}
             {/if}
@@ -2932,6 +2962,8 @@
               {workways}
               {timeToP}
               {noOfusers}
+              {selfNomination}
+              onWithdraw={withdrawSelfNom}
               {offerHref}
             />
           </div>
@@ -2973,6 +3005,8 @@
     {src}
     {workways}
     {timeToP}
+    {selfNomination}
+    onWithdraw={withdrawSelfNom}
     {offerHref}
   />
 {/if}

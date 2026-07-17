@@ -106,7 +106,22 @@
     values: { he: '✨ הערכים שלנו', en: '✨ Our Values' },
     missions: { he: '🚀 משימות פנויות', en: '🚀 Open Missions' },
     team: { he: 'הצוות', en: 'The Team' },
-    visit: { he: 'בקרו באתר', en: 'Visit Website' }
+    visit: { he: 'בקרו באתר', en: 'Visit Website' },
+    about: { he: 'מי אנחנו', en: 'Who we are' },
+    supportTitle: { he: '💗 לתמוך בעשייה', en: '💗 Support the work' },
+    supportDesc: {
+      he: 'שקיפות מלאה: כמה נעשה, כמה כוסה, ואיך כל תרומה מתחלקת',
+      en: 'Full transparency: what was done, what’s covered, how every donation is shared'
+    },
+    joinTitle: { he: '🤝 להיות חלק', en: '🤝 Become a part' },
+    joinDesc: {
+      he: 'מציעים את עצמכם בתנאים שלכם — משימה שתבצעו או משאב שתביאו',
+      en: 'Nominate yourself on your own terms — a mission you’ll do or a resource you’ll bring'
+    },
+    selfNomCta: {
+      he: 'מתחברים לכיוון? הציעו את עצמכם לריקמה ←',
+      en: 'Feeling the direction? Nominate yourself →'
+    }
   };
 
   let pageTitle = $derived({
@@ -241,6 +256,19 @@
             </a>
           {/if}
         </div>
+
+        <!-- The two public doors: support (PLAN_VOLUNTEER_RIKMA §3) and
+             self-nomination (PLAN_SELF_NOMINATION §4) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl">
+          <a href="/project/{projectId}/support" class="door-card border-gold/40 hover:border-gold">
+            <span class="text-xl font-black text-gold mb-1">{texts.supportTitle[$lang]}</span>
+            <span class="text-sm text-gray-300 leading-snug">{texts.supportDesc[$lang]}</span>
+          </a>
+          <a href="/project/{projectId}/join" class="door-card border-barbi/40 hover:border-barbi">
+            <span class="text-xl font-black text-barbi mb-1">{texts.joinTitle[$lang]}</span>
+            <span class="text-sm text-gray-300 leading-snug">{texts.joinDesc[$lang]}</span>
+          </a>
+        </div>
       </div>
 
       <!-- 2. Unregistered User Invitation (Gold & Pink Card) -->
@@ -275,6 +303,7 @@
       <!-- 3. Description -->
       {#if project.attributes.publicDescription}
         <div class="glass-panel mb-8 text-center">
+          <h2 class="section-title mb-3">{texts.about[$lang]}</h2>
           <RichText
             editable={false}
             outpot={project.attributes.publicDescription}
@@ -287,7 +316,7 @@
         <div class="mb-10 text-center">
           <h3 class="section-title mb-4">{texts.team[$lang]}</h3>
           <div dir="ltr" class="flex flex-wrap justify-center gap-2">
-            {#each projectUsers as user}
+            {#each projectUsers as user (user.id)}
               <button
                 onclick={() => us(user.id)}
                 class="relative transition-transform hover:-translate-y-1 group"
@@ -344,7 +373,7 @@
           </h3>
           <div class="flex flex-wrap justify-center gap-2 w-full">
             {#if projecto.length > 0}
-              {#each projecto as om}
+              {#each projecto as om (om.id)}
                 <button
                   onclick={() => mesima(om.id)}
                   class="transform hover:scale-105 transition-transform"
@@ -361,6 +390,15 @@
               <p class="text-gray-400 text-sm">אין משימות פתוחות כרגע</p>
             {/if}
           </div>
+          <!-- Self-nomination entry (PLAN_SELF_NOMINATION §4.1): even with no
+               open missions, anyone who connects to the direction can offer
+               themselves on their own terms. -->
+          <a
+            href="/project/{projectId}/join"
+            class="mt-4 text-sm text-barbi underline hover:text-white transition-colors"
+          >
+            {texts.selfNomCta[$lang]}
+          </a>
         </div>
       </div>
 
@@ -383,7 +421,7 @@
               <h3 class="text-2xl text-gold mb-6 font-bold">{showl[$lang]}</h3>
 
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {#each project.attributes.matanotofs.data as matanot}
+                {#each project.attributes.matanotofs.data as matanot (matanot.id)}
                   <div
                     class="bg-black/40 rounded-xl p-4 border border-white/10 hover:border-gold/50 transition-colors"
                   >
@@ -449,6 +487,28 @@
   .border-barbi {
     border-color: #ff00ae;
   }
+
+  .door-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.25rem 1.5rem;
+    border-radius: 1.25rem;
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(10px);
+    border-width: 1px;
+    border-style: solid;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  }
+  .door-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  }
+  .border-gold\/40 { border-color: rgba(255, 215, 0, 0.4); }
+  .hover\:border-gold:hover { border-color: #ffd700; }
+  .border-barbi\/40 { border-color: rgba(255, 0, 174, 0.4); }
+  .hover\:border-barbi:hover { border-color: #ff00ae; }
 
   .social-btn {
     width: 2.5rem;

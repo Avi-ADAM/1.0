@@ -1,6 +1,6 @@
 ﻿<script>
   import { lang } from '$lib/stores/lang.js';
-  import { t, isRtl} from '$lib/translations';
+  import { t, isRtl } from '$lib/translations';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte';
@@ -48,6 +48,8 @@
    * @property {string|null} [myRoundProposedBy]
    * @property {any} [myRound]
    * @property {() => void} [onTochat]
+   * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
+   * @property {(() => void) | null} [onWithdraw] - withdraw my self-nomination entirely
    */
 
   /** @type {Props} */
@@ -85,7 +87,11 @@
     onTochat,
     // Wish/maagad-sourced need (PLAN_HUB_LEV_DEMAND_SYNC r2): the Askm flow
     // needs a rikma — the offer is made on the source page instead.
-    offerHref = null
+    offerHref = null,
+    // Self-nomination (PLAN_SELF_NOMINATION §4.2): this is the candidate's own
+    // authored resource offer — they may withdraw it entirely.
+    selfNomination = false,
+    onWithdraw = null
   } = $props();
 
   const offerAtSource = {
@@ -156,9 +162,7 @@
     cycleCount != null
       ? (() => {
           const rounded = Math.round(cycleCount * 10) / 10;
-          return rounded === 1
-            ? unitWord.one
-            : `${rounded} ${unitWord.many}`;
+          return rounded === 1 ? unitWord.one : `${rounded} ${unitWord.many}`;
         })()
       : ''
   );
@@ -211,7 +215,9 @@
     <!-- ההצעה שלי — מוצגת כשהגשתי התאמה אישית (סבב מו"מ על המועמדות שלי) -->
     {#if myRound}
       {@const byCandidate = myRound.proposedBy !== 'project'}
-      {@const roundDate = myRound.createdAt ? new Date(myRound.createdAt) : null}
+      {@const roundDate = myRound.createdAt
+        ? new Date(myRound.createdAt)
+        : null}
       {@const descChanged = myRound.descrip && myRound.descrip !== descrip}
       {@const notesChanged = myRound.spnot && myRound.spnot !== spnot}
       {@const easyChanged = myRound.easy != null && myRound.easy !== easy}
@@ -231,7 +237,9 @@
               ? 'bg-barbi/20'
               : 'bg-gold/30'}"
           >
-            {byCandidate ? tr.nego.candidateRound[$lang] : tr.nego.projectRound[$lang]}
+            {byCandidate
+              ? tr.nego.candidateRound[$lang]
+              : tr.nego.projectRound[$lang]}
           </span>
           {#if roundDate && !isNaN(roundDate.getTime())}
             <span class="text-xs font-normal text-gray-500 dark:text-gray-400">
@@ -249,12 +257,16 @@
               alt=""
             />
             <span
-              class={byCandidate ? 'text-barbi' : 'text-yellow-700 dark:text-yellow-400'}
+              class={byCandidate
+                ? 'text-barbi'
+                : 'text-yellow-700 dark:text-yellow-400'}
             >
-              {(myRound.easy ?? easy)?.toLocaleString?.() ?? (myRound.easy ?? easy)}
+              {(myRound.easy ?? easy)?.toLocaleString?.() ??
+                myRound.easy ??
+                easy}
               {askedVal[$lang]}
               {#if myRound.price != null}
-                · {(myRound.price)?.toLocaleString?.() ?? myRound.price} שווי מקובל
+                · {myRound.price?.toLocaleString?.() ?? myRound.price} שווי מקובל
               {/if}
             </span>
             {#if easyChanged || priceChanged}
@@ -280,8 +292,14 @@
             >
               {tr.nego.updatedDescription[$lang]}
             </div>
-            <div class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed">
-              <RichText outpot={myRound.descrip} editable={false} trans={true} />
+            <div
+              class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed"
+            >
+              <RichText
+                outpot={myRound.descrip}
+                editable={false}
+                trans={true}
+              />
             </div>
           </div>
         {/if}
@@ -294,7 +312,9 @@
             >
               {tr.nego.updatedNotes[$lang]}
             </div>
-            <div class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed">
+            <div
+              class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed"
+            >
               <RichText outpot={myRound.spnot} editable={false} trans={true} />
             </div>
           </div>
@@ -320,7 +340,8 @@
             </span>
             {#if cycleSize > 1}
               <span class="text-sm text-gray-600 dark:text-gray-300">
-                · כל {cycleSize} {unitWord.many}
+                · כל {cycleSize}
+                {unitWord.many}
               </span>
             {/if}
           </div>
@@ -466,7 +487,9 @@
           class="flex-2 py-2 flex justify-center items-center gap-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
         >
           <div class="w-8 h-8 text-white"><Lev /></div>
-          <span class="whitespace-nowrap">{offerAtSource[$lang] ?? offerAtSource.he}</span>
+          <span class="whitespace-nowrap"
+            >{offerAtSource[$lang] ?? offerAtSource.he}</span
+          >
         </a>
       {:else if myRoundProposedBy === 'project'}
         <!-- B2: הריקמה הציעה הצעה נגדית — לאשר או להעלות סבב נגדי -->
@@ -520,6 +543,39 @@
           <div class="w-8 h-8 text-white"><Lev /></div>
           <span class="whitespace-nowrap">{$t('lev.cards.approve')}</span>
         </button>
+      {:else}
+        <!-- ההצעה שלי ממתינה לריקמה — תקשורת זמינה תמיד, ומשיכה על הצעה עצמית -->
+        {#if onTochat}
+          <button
+            onmouseenter={() => hover({ he: "צ'אט", en: 'chat' })}
+            onmouseleave={() => hover('0')}
+            class="flex-2 py-2 flex justify-center items-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold rounded-xl shadow-md hover:opacity-90 transition-all"
+            style="flex: 2;"
+            onclick={() => tochat()}
+          >
+            <span class="whitespace-nowrap"
+              >{$lang === 'he' ? "פתיחת צ'אט" : 'Open Chat'}</span
+            >
+          </button>
+        {/if}
+        {#if selfNomination && onWithdraw}
+          <!-- משיכת הצעה עצמית (PLAN_SELF_NOMINATION §3.3) — המשאב כולו שלי,
+               ולכן המשיכה מארכבת אותו יחד עם הבקשה. -->
+          <button
+            onmouseenter={() =>
+              hover({
+                he: 'משיכת ההצעה העצמית — הצעת המשאב שחיברת תיסגר כולה',
+                en: 'Withdraw your self-nomination — the resource offer you authored closes entirely'
+              })}
+            onmouseleave={() => hover('0')}
+            class="flex-1 py-2 flex justify-center items-center gap-2 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-gray-400 hover:text-gray-600 font-bold rounded-xl transition-all"
+            onclick={() => onWithdraw?.()}
+          >
+            <span class="whitespace-nowrap"
+              >🌱 {$lang === 'he' ? 'משיכת ההצעה' : 'Withdraw'}</span
+            >
+          </button>
+        {/if}
       {/if}
     {:else if low == true}
       <div class="w-full flex justify-center">

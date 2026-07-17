@@ -3,11 +3,11 @@
   import { t } from '$lib/translations';
   import { goto } from '$app/navigation';
   import { fly } from 'svelte/transition';
-      	import { Drawer } from 'vaul-svelte';
+  import { Drawer } from 'vaul-svelte';
   import { clickOutside } from './outsidclick.js';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
-    let dialogOpen = $state(false)
-  const baseUrl = import.meta.env.VITE_URL
+  let dialogOpen = $state(false);
+  const baseUrl = import.meta.env.VITE_URL;
 
   let token;
   let uId;
@@ -39,7 +39,7 @@
   let miData = [];
   let error1 = null;
   let pcli = $state(0);
-  
+
   function linke() {
     pcli += 1;
     if (pcli >= 2) {
@@ -65,7 +65,7 @@
         openMashaabimId: String(id),
         projectId: String(projectId),
         spId: String(oid),
-        missionName: mashName != null ? String(mashName) : undefined,
+        missionName: mashName != null ? String(mashName) : undefined
       });
       if (result.success) {
         less();
@@ -252,6 +252,7 @@
    * @property {number} [myOrdern]
    * @property {any[]} [myAskUsers]
    * @property {any} [myRound]
+   * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
    */
 
   /** @type {Props} */
@@ -299,11 +300,33 @@
     onProj,
     onHover,
     onModal,
+    selfNomination = false,
     // Project-less sources (PLAN_HUB_LEV_DEMAND_SYNC r2): identity click goes
     // to the wish/maagad page; offerHref replaces the Askm flow buttons.
     sourceHref = null,
     offerHref = null
   } = $props();
+
+  // Withdraw my own self-nominated resource offer (PLAN_SELF_NOMINATION §3.3):
+  // archives my Askm AND the OpenMashaabim I authored, and tells the members.
+  let withdrawing = $state(false);
+  async function withdrawSelfNom() {
+    if (withdrawing || !id) return;
+    withdrawing = true;
+    try {
+      const result = await executeAction('dismissSelfNomination', {
+        side: 'resource',
+        id: String(id),
+        mode: 'withdraw'
+      });
+      if (result.success) less();
+      else error1 = result.error;
+    } catch (e) {
+      error1 = e;
+    } finally {
+      withdrawing = false;
+    }
+  }
   let isOpen = $state(false),
     diunm = $state(false),
     masa = $state(false),
@@ -320,7 +343,7 @@
     try {
       const result = await executeAction('addAskmChatEntry', {
         askId: String(askId),
-        why: String(why),
+        why: String(why)
       });
       if (result.success) {
         chat = result.data.chat ?? chat;
@@ -336,7 +359,9 @@
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
   <div transition:fly={{ y: 40, opacity: 0, duration: 250 }}>
     <DialogContent class="nego-modal" aria-label="form">
-      <button class="nego-modal-close" onclick={close} aria-label="סגירה">✕</button>
+      <button class="nego-modal-close" onclick={close} aria-label="סגירה"
+        >✕</button
+      >
       {#if loading === true}
         <RingLoader size="200" color="#ff00ae" unit="px" duration="2s" />
       {:else if masa === true}
@@ -345,17 +370,17 @@
           onClose={afternego}
           onSubmit={handleNegoSubmit}
           masaalr={false}
-          descrip={descrip}
-          projectName={projectName}
+          {descrip}
+          {projectName}
           name1={mashName}
-          spnot={spnot}
-          kindOf={kindOf}
+          {spnot}
+          {kindOf}
           hm={0}
-          projectId={projectId}
-          total={total}
+          {projectId}
+          {total}
           noofusers={1}
-          price={price}
-          easy={easy}
+          {price}
+          {easy}
           linkto={''}
           pendId={null}
           sqadualedf={sqedualedf}
@@ -385,10 +410,12 @@
 {#if cards == false}
   <div
     style="position: relative;"
-onclick={()=>{modal = true
-  onModal()
-dialogOpen = true}}
-role="button"
+    onclick={() => {
+      modal = true;
+      onModal();
+      dialogOpen = true;
+    }}
+    role="button"
     style:z-index={hovered === false ? 11 : 16}
     onmouseenter={() => (hovered = true)}
     onmouseleave={() => (hovered = false)}
@@ -543,49 +570,56 @@ role="button"
     </Swiper>
   </div>
   {#if modal}
-<div data-vaul-drawer-wrapper>
-<Drawer.Root bind:open={dialogOpen} direction="right" shouldScaleBackground>
-	<Drawer.Trigger/>
-	<Drawer.Portal>
-		<Drawer.Overlay class="fixed inset-0 bg-black/40 " />
-		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
-			<div class="swiper-slidec mx-auto ">
-        
-  <Cards
-    onAgree={() => agree(oid)}
-    onDecline={() => decline(oid)}
-    onNego={() => nego(oid)}
-    onAccept={() => acceptCounter()}
-    {myRoundProposedBy}
-    {myRound}
-    onHover={hoverc}
-    onTochat={tochat}
-    {low}
-    {mashName}
-    {easy}
-    {myp}
-    {already}
-    {deadLine}
-    {sqedualedf}
-    {sqadualedf}
-    {kindOf}
-    {recurring}
-    {cycleSize}
-    {price}
-    {total}
-    {descrip}
-    {projectName}
-    {src}
-    {spnot}
-    {offerHref}
-    onProj={projectNav}
-  />
-      </div>
-      </Drawer.Content>
-      </Drawer.Portal>
+    <div data-vaul-drawer-wrapper>
+      <Drawer.Root
+        bind:open={dialogOpen}
+        direction="right"
+        shouldScaleBackground
+      >
+        <Drawer.Trigger />
+        <Drawer.Portal>
+          <Drawer.Overlay class="fixed inset-0 bg-black/40 " />
+          <Drawer.Content
+            class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse"
+          >
+            <div class="swiper-slidec mx-auto">
+              <Cards
+                onAgree={() => agree(oid)}
+                onDecline={() => decline(oid)}
+                onNego={() => nego(oid)}
+                onAccept={() => acceptCounter()}
+                {myRoundProposedBy}
+                {myRound}
+                onHover={hoverc}
+                onTochat={tochat}
+                {low}
+                {mashName}
+                {easy}
+                {myp}
+                {already}
+                {deadLine}
+                {sqedualedf}
+                {sqadualedf}
+                {kindOf}
+                {recurring}
+                {cycleSize}
+                {price}
+                {total}
+                {descrip}
+                {projectName}
+                {src}
+                {spnot}
+                {selfNomination}
+                onWithdraw={withdrawSelfNom}
+                {offerHref}
+                onProj={projectNav}
+              />
+            </div>
+          </Drawer.Content>
+        </Drawer.Portal>
       </Drawer.Root>
-      </div>
-      {/if}
+    </div>
+  {/if}
 {:else}
   <Cards
     onAgree={() => agree(oid)}
@@ -614,6 +648,8 @@ role="button"
     {projectName}
     {src}
     {spnot}
+    {selfNomination}
+    onWithdraw={withdrawSelfNom}
     {offerHref}
     onProj={projectNav}
   />
@@ -621,16 +657,16 @@ role="button"
 
 <style>
   .swiper-slidec {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 18px !important;
-  border: 1px solid var(--barbi-pink);
-  font-size: 22px;
-  font-weight: bold;
-  min-height:100vh;
-  min-width: 25vw !important;
-  max-width: 80vw !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px !important;
+    border: 1px solid var(--barbi-pink);
+    font-size: 22px;
+    font-weight: bold;
+    min-height: 100vh;
+    min-width: 25vw !important;
+    max-width: 80vw !important;
   }
   .ab {
     grid-column: 1/3;

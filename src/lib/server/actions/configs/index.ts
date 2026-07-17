@@ -66,6 +66,9 @@ import { updateWelcomeCardConfig } from './updateWelcomeCard.js';
 import { createMashaabimRequestConfig } from './createMashaabimRequest.js';
 import { declineSpForMashaabimConfig } from './declineSpForMashaabim.js';
 import { applyToMissionConfig } from './applyToMission.js';
+import { nominateSelfMissionConfig } from './nominateSelfMission.js';
+import { nominateSelfResourceConfig } from './nominateSelfResource.js';
+import { dismissSelfNominationConfig } from './dismissSelfNomination.js';
 import { declineOpenMissionConfig } from './declineOpenMission.js';
 import { declineMissionRequestConfig } from './declineMissionRequest.js';
 import { finalizeAskmAcceptanceConfig } from './finalizeAskmAcceptance.js';
@@ -216,6 +219,11 @@ export function registerAllActions(): void {
   // Open mission: apply / decline
   registerAction(applyToMissionConfig);
   registerAction(declineOpenMissionConfig);
+
+  // Self-nomination (PLAN_SELF_NOMINATION): join a rikma on your own terms
+  registerAction(nominateSelfMissionConfig);
+  registerAction(nominateSelfResourceConfig);
+  registerAction(dismissSelfNominationConfig);
 
   // Mission request: project-member decline / Askm accept+decline
   registerAction(declineMissionRequestConfig);

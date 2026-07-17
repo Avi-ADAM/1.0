@@ -2,7 +2,7 @@
   import Tile from '$lib/celim/tile.svelte';
   import Chaticon from '$lib/celim/chaticon.svelte';
   import { lang } from '$lib/stores/lang.js';
-  import { t, isRtl} from '$lib/translations';
+  import { t, isRtl } from '$lib/translations';
   import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import Lev from '$lib/celim/lev.svelte';
@@ -18,6 +18,8 @@
   /**
    * @typedef {Object} Props
    * ... (כל ה-Props המקוריים שלך נשארים כאן)
+   * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
+   * @property {(() => void) | null} [onWithdraw] - withdraw my self-nomination entirely
    */
 
   let {
@@ -45,8 +47,8 @@
     already = $bindable(),
     allr = false,
     isVisible = false,
-    sqadualed,
-    sqadualedf,
+    sqadualed = null,
+    sqadualedf = null,
     onHover,
     onAgree,
     onDecline,
@@ -60,10 +62,12 @@
 
     // Props חדשים לתמיכה במבנה המודרני
     glowColor = 'green', // מוגדר לירוק עבור משימה מוצעת
-    onProj,
-    // Maagad-sourced need (PLAN_HUB_LEV_DEMAND_SYNC r2): applying doesn't ride
-    // applyToMission — the offer is made on the pool page instead.
-    offerHref = null
+    onProj = null,
+    offerHref = null,
+    // Self-nomination (PLAN_SELF_NOMINATION §4.2): this is the candidate's own
+    // authored proposal — they may withdraw it entirely.
+    selfNomination = false,
+    onWithdraw = null
   } = $props();
 
   const offerAtSource = {
@@ -162,10 +166,14 @@
     <!-- ההצעה שלי — מוצגת כשהגשתי התאמה אישית (סבב מו"מ על המועמדות שלי) -->
     {#if myRound}
       {@const byCandidate = myRound.proposedBy !== 'project'}
-      {@const roundDate = myRound.createdAt ? new Date(myRound.createdAt) : null}
-      {@const descChanged = myRound.descrip && myRound.descrip !== missionDetails}
+      {@const roundDate = myRound.createdAt
+        ? new Date(myRound.createdAt)
+        : null}
+      {@const descChanged =
+        myRound.descrip && myRound.descrip !== missionDetails}
       {@const notesChanged =
-        myRound.hearotMeyuchadot && myRound.hearotMeyuchadot !== hearotMeyuchadot}
+        myRound.hearotMeyuchadot &&
+        myRound.hearotMeyuchadot !== hearotMeyuchadot}
       {@const hoursChanged =
         (myRound.noofhours != null && myRound.noofhours !== noOfHours) ||
         (myRound.perhour != null && myRound.perhour !== perhour)}
@@ -184,7 +192,9 @@
               ? 'bg-barbi/20'
               : 'bg-gold/30'}"
           >
-            {byCandidate ? tr.nego.candidateRound[$lang] : tr.nego.projectRound[$lang]}
+            {byCandidate
+              ? tr.nego.candidateRound[$lang]
+              : tr.nego.projectRound[$lang]}
           </span>
           {#if roundDate && !isNaN(roundDate.getTime())}
             <span class="text-xs font-normal text-gray-500 dark:text-gray-400">
@@ -202,15 +212,21 @@
               alt=""
             />
             <span
-              class={byCandidate ? 'text-barbi' : 'text-yellow-700 dark:text-yellow-400'}
+              class={byCandidate
+                ? 'text-barbi'
+                : 'text-yellow-700 dark:text-yellow-400'}
             >
-              {(myRound.noofhours ?? noOfHours).toLocaleString()} {hourss[$lang]}
+              {(myRound.noofhours ?? noOfHours).toLocaleString()}
+              {hourss[$lang]}
               × {(myRound.perhour ?? perhour).toLocaleString()}
-              = {((myRound.noofhours ?? noOfHours) * (myRound.perhour ?? perhour)).toLocaleString()}
+              = {(
+                (myRound.noofhours ?? noOfHours) * (myRound.perhour ?? perhour)
+              ).toLocaleString()}
             </span>
             {#if hoursChanged}
               <span class="text-xs text-gray-500 dark:text-gray-400">
-                ({tr.nego.rikmaReq[$lang]}: {noOfHours} × {perhour} = {noOfHours * perhour})
+                ({tr.nego.rikmaReq[$lang]}: {noOfHours} × {perhour} = {noOfHours *
+                  perhour})
               </span>
             {/if}
           </div>
@@ -231,8 +247,14 @@
             >
               {tr.nego.updatedDescription[$lang]}
             </div>
-            <div class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed">
-              <RichText outpot={myRound.descrip} editable={false} trans={true} />
+            <div
+              class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed"
+            >
+              <RichText
+                outpot={myRound.descrip}
+                editable={false}
+                trans={true}
+              />
             </div>
           </div>
         {/if}
@@ -245,8 +267,14 @@
             >
               {tr.nego.updatedNotes[$lang]}
             </div>
-            <div class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed">
-              <RichText outpot={myRound.hearotMeyuchadot} editable={false} trans={true} />
+            <div
+              class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed"
+            >
+              <RichText
+                outpot={myRound.hearotMeyuchadot}
+                editable={false}
+                trans={true}
+              />
             </div>
           </div>
         {/if}
@@ -356,7 +384,7 @@
           {cardT.acts[$lang]}
         </h4>
         <ul class="space-y-2">
-          {#each (acts?.data ?? acts ?? []) as datai}
+          {#each acts?.data ?? acts ?? [] as datai}
             <li
               class="flex items-center gap-3 py-2 border-b border-gray-100 dark:border-slate-700 last:border-0"
             >
@@ -380,7 +408,7 @@
             {cardT.skneed[$lang]}
           </h4>
           <div class="flex flex-wrap gap-2">
-            {#each (skills?.data ?? skills ?? []) as skill}
+            {#each skills?.data ?? skills ?? [] as skill}
               <Tile
                 sm={true}
                 big={true}
@@ -398,7 +426,7 @@
             {cardT.rneed[$lang]}
           </h4>
           <div class="flex flex-wrap gap-2">
-            {#each (role?.data ?? role ?? []) as rol}
+            {#each role?.data ?? role ?? [] as rol}
               <Tile
                 sm={true}
                 big={true}
@@ -416,7 +444,7 @@
             {cardT.wwneed[$lang]}
           </h4>
           <div class="flex flex-wrap gap-2">
-            {#each (workways?.data ?? workways ?? []) as wo}
+            {#each workways?.data ?? workways ?? [] as wo}
               <Tile
                 sm={true}
                 big={true}
@@ -475,7 +503,9 @@
           onmouseleave={() => hover('0')}
         >
           <div class="w-8 h-8 text-white"><Lev /></div>
-          <span class="whitespace-nowrap">{offerAtSource[$lang] ?? offerAtSource.he}</span>
+          <span class="whitespace-nowrap"
+            >{offerAtSource[$lang] ?? offerAtSource.he}</span
+          >
         </a>
       {:else if myRoundProposedBy === 'project'}
         <!-- B2: הריקמה הציעה הצעה נגדית — לאשר או להעלות סבב נגדי -->
@@ -513,7 +543,8 @@
         {#if onNego}
           <button
             class="flex-1 py-3 bg-white dark:bg-gray-800 border-2 border-yellow-500 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 font-bold rounded-xl flex justify-center items-center gap-2 transition-all hover:scale-105"
-            onmouseenter={() => hover({ he: 'הצעה מקבילה', en: 'counter proposal' })}
+            onmouseenter={() =>
+              hover({ he: 'הצעה מקבילה', en: 'counter proposal' })}
             onmouseleave={() => hover('0')}
             onclick={() => nego(null)}
           >
@@ -535,7 +566,10 @@
       {:else if alreadyi == true}
         <!-- מצב צ'אט -->
         <button
-          class="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold rounded-xl shadow-md flex justify-center items-center gap-2 hover:opacity-90 transition-all"
+          class="{selfNomination && onWithdraw
+            ? 'flex-2'
+            : 'w-full'} py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold rounded-xl shadow-md flex justify-center items-center gap-2 hover:opacity-90 transition-all"
+          style={selfNomination && onWithdraw ? 'flex: 2;' : ''}
           onmouseenter={() => hover({ he: "צ'אט", en: 'chat' })}
           onmouseleave={() => hover('0')}
           onclick={() => tochat()}
@@ -543,6 +577,24 @@
           <span>{$lang === 'he' ? "פתיחת צ'אט" : 'Open Chat'}</span>
           <div class="w-6 h-6"><Chaticon /></div>
         </button>
+        {#if selfNomination && onWithdraw}
+          <!-- משיכת הצעה עצמית (PLAN_SELF_NOMINATION §3.3) — המשימה כולה שלי,
+               ולכן המשיכה מארכבת אותה יחד עם הבקשה. -->
+          <button
+            class="flex-1 py-3 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-gray-400 hover:text-gray-600 font-bold rounded-xl flex justify-center items-center gap-2 transition-all"
+            onmouseenter={() =>
+              hover({
+                he: 'משיכת ההצעה העצמית — המשימה שחיברת תיסגר כולה',
+                en: 'Withdraw your self-nomination — the mission you authored closes entirely'
+              })}
+            onmouseleave={() => hover('0')}
+            onclick={() => onWithdraw?.()}
+          >
+            <span class="whitespace-nowrap"
+              >🌱 {$lang === 'he' ? 'משיכת ההצעה' : 'Withdraw'}</span
+            >
+          </button>
+        {/if}
       {/if}
     {:else if low == true}
       <Lowbtn isCart={true} />

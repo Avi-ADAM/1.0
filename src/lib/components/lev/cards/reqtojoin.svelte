@@ -53,6 +53,8 @@
    * @property {number} [orderon]
    * @property {any[]} [users]
    * @property {number} [activeOrder]
+   * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
+   * @property {(() => void) | null} [onDismiss] - fully dismiss a self-nominated proposal
    */
 
   /** @type {Props} */
@@ -94,7 +96,11 @@
     negopendmissions = [],
     orderon = 0,
     users = [],
-    activeOrder = 0
+    activeOrder = 0,
+    // Self-nomination (PLAN_SELF_NOMINATION §4.2): candidate-authored proposal —
+    // members get a full-dismiss option alongside approve/nego/chat.
+    selfNomination = false,
+    onDismiss = null
   } = $props();
   let user_1s = $derived.by(() => {
     return getProjectData(projectId, 'us') || [];
@@ -196,6 +202,16 @@
       {/if}
     {/snippet}
     {#snippet actions()}
+      {#if selfNomination}
+        <span
+          class="text-xs bg-emerald-600/90 text-white px-2 py-1 rounded-full whitespace-nowrap"
+          title={$lang === 'he'
+            ? 'המועמד/ת חיבר/ה את המשימה והתנאים בעצמו/ה'
+            : 'The candidate authored this mission and its terms'}
+        >
+          🌱 {$lang === 'he' ? 'הצעה עצמית' : 'Self-nomination'}
+        </span>
+      {/if}
       {#if negotiationMode}
         <span class="text-sm bg-gold text-white px-2 py-1 rounded-full">
           {$lang === 'he' ? 'מצב משא ומתן' : 'Negotiation Mode'}
@@ -782,6 +798,26 @@
           >{tr?.common.watchthe[$lang]}</span
         >
       </button>
+      {#if selfNomination && onDismiss && already === false}
+        <!-- Not a veto on content (approve/chat/counter stay primary) — removes
+             the externally-initiated proposal entirely, with a respectful note. -->
+        <button
+          aria-label={$lang === 'he' ? 'לא מתאים לנו כרגע' : 'Not a fit right now'}
+          onmouseenter={() =>
+            hover(
+              $lang === 'he'
+                ? 'סגירת ההצעה העצמית כולה — המועמד/ת יקבל/תקבל הודעה מכבדת'
+                : 'Close the whole self-nomination — the candidate gets a respectful note'
+            )}
+          onmouseleave={() => hover('0')}
+          class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-gray-400 hover:text-gray-600 font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+          onclick={() => onDismiss?.()}
+        >
+          <span class="text-xs sm:text-sm whitespace-nowrap"
+            >{$lang === 'he' ? 'לא מתאים כרגע' : 'Not now'}</span
+          >
+        </button>
+      {/if}
     {:else if low == true}
       <Lowbtn isCart={true} />
     {/if}

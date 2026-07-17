@@ -56,6 +56,8 @@
    * @property {any[]} [negopendmissions]
    * @property {number} [orderon]
    * @property {() => void} [onProj]
+   * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
+   * @property {(() => void) | null} [onDismiss] - fully dismiss a self-nominated proposal
    */
 
   /** @type {Props} */
@@ -100,6 +102,10 @@
     isRishon = false,
     negopendmissions = [],
     orderon = 0,
+    // Self-nomination (PLAN_SELF_NOMINATION §4.2): candidate-authored offer —
+    // members get a full-dismiss option alongside approve/nego/chat.
+    selfNomination = false,
+    onDismiss = null,
   } = $props();
 
   let user_1s = $derived.by(() => {
@@ -244,6 +250,16 @@
       {/if}
     {/snippet}
     {#snippet actions()}
+      {#if selfNomination}
+        <span
+          class="text-xs bg-emerald-600/90 text-white px-2 py-1 rounded-full whitespace-nowrap"
+          title={$lang === 'he'
+            ? 'המועמד/ת חיבר/ה את הצעת המשאב והתנאים בעצמו/ה'
+            : 'The candidate authored this resource offer and its terms'}
+        >
+          🌱 {$lang === 'he' ? 'הצעה עצמית' : 'Self-nomination'}
+        </span>
+      {/if}
       {#if negotiationMode}
         <span class="text-sm bg-gold text-white px-2 py-1 rounded-full">
           {$lang === 'he' ? 'מצב משא ומתן' : 'Negotiation Mode'}
@@ -509,6 +525,26 @@
             onclick={() => tochat()}
           >
             <Chaticon />
+          </button>
+        {/if}
+        {#if selfNomination && onDismiss}
+          <!-- Not a veto on content — removes the externally-initiated offer
+               entirely, with a respectful note to the candidate. -->
+          <button
+            aria-label={$lang === 'he' ? 'לא מתאים לנו כרגע' : 'Not a fit right now'}
+            onmouseenter={() =>
+              hover(
+                $lang === 'he'
+                  ? 'סגירת ההצעה העצמית כולה — המועמד/ת יקבל/תקבל הודעה מכבדת'
+                  : 'Close the whole self-nomination — the candidate gets a respectful note'
+              )}
+            onmouseleave={() => hover('0')}
+            class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-gray-400 hover:text-gray-600 font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+            onclick={() => onDismiss?.()}
+          >
+            <span class="text-xs sm:text-sm whitespace-nowrap"
+              >{$lang === 'he' ? 'לא מתאים כרגע' : 'Not now'}</span
+            >
           </button>
         {/if}
       {/if}
