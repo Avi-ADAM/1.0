@@ -130,6 +130,10 @@
       he: 'אין כרגע משימות פתוחות — אפשר לתמוך כדי לכסות את מה שכבר נעשה 💗',
       en: 'No open missions right now — you can still support what was already done 💗'
     },
+    proposeYourOwn: {
+      he: 'לא מצאתם משימה מתאימה? הציעו את עצמכם בתנאים שלכם ←',
+      en: 'No mission fits? Nominate yourself on your own terms →'
+    },
     donateTitle: { he: 'איך תומכים?', en: 'How to support' },
     donateMoney: { he: 'תרומה כספית', en: 'Donate' },
     donateMoneyDesc: {
@@ -361,6 +365,12 @@
             {t.noMissions[$lang]}
           </div>
         {/if}
+
+        <p class="mt-4 text-sm">
+          <a href="/project/{projectId}/join" class="text-barbi underline hover:text-white">
+            {t.proposeYourOwn[$lang]}
+          </a>
+        </p>
       </section>
 
       <!-- ═══════════ 4. HOW TO SUPPORT ═══════════ -->

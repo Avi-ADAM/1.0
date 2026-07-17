@@ -498,7 +498,7 @@ const qids_base = {
    }
 }`,
   "27GetOpenMissionsRegTr": `query GetOpenMissionsRegTr($start: Int, $limit: Int)
-{  openMissions(pagination: { start: $start, limit: $limit }) {
+{  openMissions(filters: { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }, pagination: { start: $start, limit: $limit }) {
     data{
       id 
       attributes{ 
@@ -526,7 +526,7 @@ const qids_base = {
   }
 }`,
   "28GetOpenMissionsReg": `query GetOpenMissionsReg($start: Int, $limit: Int)
-{  openMissions(pagination: { start: $start, limit: $limit }) {
+{  openMissions(filters: { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }, pagination: { start: $start, limit: $limit }) {
     data{
       id 
       attributes{ 
@@ -554,7 +554,7 @@ const qids_base = {
   }
 }`,
   "29GetOpenMissionsNonregTr": `query GetOpenMissionsNonregTr($start: Int, $limit: Int)
-{  openMissions(pagination: { start: $start, limit: $limit }) {
+{  openMissions(filters: { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }, pagination: { start: $start, limit: $limit }) {
     data{
       id
       attributes{ 
@@ -577,7 +577,7 @@ const qids_base = {
   }
 }`,
   "30GetOpenMissionsNonreg": `query GetOpenMissionsNonreg($start: Int, $limit: Int)
-{  openMissions(pagination: { start: $start, limit: $limit }) {
+{  openMissions(filters: { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }, pagination: { start: $start, limit: $limit }) {
     data{
       id
       attributes{ 
@@ -1574,7 +1574,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           vallues { data { attributes { valueName localizations { data { attributes { valueName } } } } } }
           publicDescription
           profilePic { data { attributes { url formats } } }
-          open_missions(filters: { archived: { eq: false } }) { data { id attributes { name } } }
+          open_missions(filters: { and: [{ archived: { eq: false } }, { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }] }) { data { id attributes { name } } }
         }
       }
     }
@@ -13206,6 +13206,135 @@ export const qids = {
     }
   }`,
 
+  // ── Self-nomination (PLAN_SELF_NOMINATION) ────────────────────────────────
+  // A non-member proposes themselves to a rikma: they author the OpenMission /
+  // OpenMashaabim (source:'selfNomination') and the existing candidacy machine
+  // (Ask/Askm, negoGate, timegrama-on-first-member-vote) takes over.
+  '214createSelfNomOpenMission': `mutation CreateSelfNomOpenMission(
+    $projectId: ID!
+    $missionId: ID!
+    $name: String!
+    $descrip: String
+    $noofhours: Float
+    $perhour: Float
+    $hearotMeyuchadot: String
+    $source: ENUM_OPENMISSION_SOURCE
+    $publishedAt: DateTime!
+  ) {
+    createOpenMission(data: {
+      project: $projectId
+      mission: $missionId
+      name: $name
+      descrip: $descrip
+      noofhours: $noofhours
+      perhour: $perhour
+      hearotMeyuchadot: $hearotMeyuchadot
+      source: $source
+      isRishon: false
+      archived: false
+      publishedAt: $publishedAt
+    }) {
+      data { id }
+    }
+  }`,
+
+  '215createSelfNomOpenMashaabim': `mutation CreateSelfNomOpenMashaabim(
+    $projectId: ID!
+    $name: String!
+    $descrip: String
+    $spnot: String
+    $price: Float
+    $hm: Float
+    $kindOf: ENUM_OPENMASHAABIM_KINDOF
+    $recurring: Boolean
+    $source: ENUM_OPENMASHAABIM_SOURCE
+    $publishedAt: DateTime!
+  ) {
+    createOpenMashaabim(data: {
+      project: $projectId
+      name: $name
+      descrip: $descrip
+      spnot: $spnot
+      price: $price
+      hm: $hm
+      kindOf: $kindOf
+      recurring: $recurring
+      source: $source
+      archived: false
+      publishedAt: $publishedAt
+    }) {
+      data { id }
+    }
+  }`,
+
+  '216getSelfNomMissionContext': `query GetSelfNomMissionContext($id: ID!) {
+    openMission(id: $id) {
+      data {
+        id
+        attributes {
+          name
+          source
+          archived
+          project {
+            data {
+              id
+              attributes { projectName restime user_1s { data { id } } }
+            }
+          }
+          asks(filters: { archived: { ne: true } }) {
+            data { id attributes { users_permissions_user { data { id } } } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '217getSelfNomMashaabimContext': `query GetSelfNomMashaabimContext($id: ID!) {
+    openMashaabim(id: $id) {
+      data {
+        id
+        attributes {
+          name
+          source
+          archived
+          project {
+            data {
+              id
+              attributes { projectName restime user_1s { data { id } } }
+            }
+          }
+          askms(filters: { archived: { ne: true } }) {
+            data { id attributes { users_permissions_user { data { id } } } }
+          }
+        }
+      }
+    }
+  }`,
+
+  '218createSelfNomSp': `mutation CreateSelfNomSp(
+    $name: String!
+    $descrip: String
+    $spnot: String
+    $price: Float
+    $unit: Float
+    $kindOf: ENUM_SP_KINDOF
+    $userId: ID!
+    $publishedAt: DateTime!
+  ) {
+    createSp(data: {
+      name: $name
+      descrip: $descrip
+      spnot: $spnot
+      price: $price
+      unit: $unit
+      kindOf: $kindOf
+      users_permissions_user: $userId
+      publishedAt: $publishedAt
+    }) {
+      data { id }
+    }
+  }`,
+
   // Public support / home page (PLAN_VOLUNTEER_RIKMA §3): one shot that pulls
   // everything the coverage board needs. Served server-side (isSer), so it
   // works for unregistered visitors; the page itself only ever renders
@@ -13230,7 +13359,7 @@ export const qids = {
           matanotofs(filters: { archived: { ne: true } }, pagination: { limit: 100 }) {
             data { id attributes { name price pic { data { attributes { url formats } } } } }
           }
-          open_missions(filters: { archived: { eq: false } }, pagination: { limit: 200 }) {
+          open_missions(filters: { and: [{ archived: { eq: false } }, { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }] }, pagination: { limit: 200 }) {
             data {
               id
               attributes {
