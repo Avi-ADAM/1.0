@@ -74,10 +74,15 @@ These are the main content types in the Strapi backend.
 ### ApiKey
 | Field | Type |
 |-------|------|
+| `allowed_origins` | `Maybe<Scalars['JSON']['output']>` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `key_hash` | `Maybe<Scalars['String']['output']>` |
 | `key_prefix` | `Maybe<Scalars['String']['output']>` |
+| `lastUsedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `name` | `Maybe<Scalars['String']['output']>` |
+| `project` | `Maybe<ProjectEntityResponse>` |
+| `revoked` | `Maybe<Scalars['Boolean']['output']>` |
+| `scopes` | `Maybe<Scalars['JSON']['output']>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `users_permissions_user` | `Maybe<UsersPermissionsUserEntityResponse>` |
 
@@ -1778,6 +1783,7 @@ These are the main content types in the Strapi backend.
 |-------|------|
 | `acts` | `Maybe<ActRelationResponseCollection>` |
 | `addHoursManualy` | `Maybe<Scalars['Boolean']['output']>` |
+| `api_keys` | `Maybe<ApiKeyRelationResponseCollection>` |
 | `askms` | `Maybe<AskmRelationResponseCollection>` |
 | `asks` | `Maybe<AskRelationResponseCollection>` |
 | `askwants` | `Maybe<AskwantRelationResponseCollection>` |
@@ -2269,6 +2275,7 @@ These are the main content types in the Strapi backend.
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `date` | `Maybe<Scalars['DateTime']['output']>` |
 | `decision` | `Maybe<DecisionEntityResponse>` |
+| `externalId` | `Maybe<Scalars['String']['output']>` |
 | `finishDate` | `Maybe<Scalars['DateTime']['output']>` |
 | `holderDecidedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `holderStatus` | `Maybe<Enum_Sale_Holderstatus>` |
@@ -2283,6 +2290,7 @@ These are the main content types in the Strapi backend.
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `reporter` | `Maybe<UsersPermissionsUserEntityResponse>` |
 | `sheiruts` | `Maybe<SheirutRelationResponseCollection>` |
+| `source` | `Maybe<Enum_Sale_Source>` |
 | `source_project` | `Maybe<ProjectEntityResponse>` |
 | `splited` | `Scalars['Boolean']['output']` |
 | `startDate` | `Maybe<Scalars['DateTime']['output']>` |
@@ -4001,9 +4009,14 @@ Used for creating/updating content.
 ### ApiKeyInput
 | Field | Type |
 |-------|------|
+| `allowed_origins` | `InputMaybe<Scalars['JSON']['input']>` |
 | `key_hash` | `InputMaybe<Scalars['String']['input']>` |
 | `key_prefix` | `InputMaybe<Scalars['String']['input']>` |
+| `lastUsedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `name` | `InputMaybe<Scalars['String']['input']>` |
+| `project` | `InputMaybe<Scalars['ID']['input']>` |
+| `revoked` | `InputMaybe<Scalars['Boolean']['input']>` |
+| `scopes` | `InputMaybe<Scalars['JSON']['input']>` |
 | `users_permissions_user` | `InputMaybe<Scalars['ID']['input']>` |
 
 ### ArgumentInput
@@ -5387,6 +5400,7 @@ Used for creating/updating content.
 |-------|------|
 | `acts` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `addHoursManualy` | `InputMaybe<Scalars['Boolean']['input']>` |
+| `api_keys` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `askms` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `asks` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `askwants` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -5638,6 +5652,7 @@ Used for creating/updating content.
 | `confirmedBy` | `InputMaybe<Enum_Sale_Confirmedby>` |
 | `date` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `decision` | `InputMaybe<Scalars['ID']['input']>` |
+| `externalId` | `InputMaybe<Scalars['String']['input']>` |
 | `finishDate` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `holderDecidedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `holderStatus` | `InputMaybe<Enum_Sale_Holderstatus>` |
@@ -5652,6 +5667,7 @@ Used for creating/updating content.
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `reporter` | `InputMaybe<Scalars['ID']['input']>` |
 | `sheiruts` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `source` | `InputMaybe<Enum_Sale_Source>` |
 | `source_project` | `InputMaybe<Scalars['ID']['input']>` |
 | `splited` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `startDate` | `InputMaybe<Scalars['DateTime']['input']>` |
@@ -6294,7 +6310,7 @@ Fields: `and`, `createdAt`, `dateF`, `dateS`, `des`, `forums`, `hashivut`, `id`,
 Fields: `and`, `createdAt`, `id`, `link`, `name`, `not`, `or`, `publishedAt`, `timegrama`, `updatedAt`
 
 #### ApiKeyFiltersInput
-Fields: `and`, `createdAt`, `id`, `key_hash`, `key_prefix`, `name`, `not`, `or`, `updatedAt`, `users_permissions_user`
+Fields: `allowed_origins`, `and`, `createdAt`, `id`, `key_hash`, `key_prefix`, `lastUsedAt`, `name`, `not`, `or`, `project`, `revoked`, `scopes`, `updatedAt`, `users_permissions_user`
 
 #### ArgumentFiltersInput
 Fields: `and`, `arguments`, `authorEmail`, `authorExternalId`, `authorName`, `authorType`, `body`, `createdAt`, `id`, `negotiation`, `not`, `or`, `parent`, `position`, `publishedAt`, `stance`, `updatedAt`, `voters`, `votes`
@@ -6480,7 +6496,7 @@ Fields: `and`, `archived`, `askm`, `createdAt`, `cycleSize`, `descrip`, `diun`, 
 Fields: `aiMeta`, `and`, `arguments`, `author`, `authorEmail`, `authorExternalId`, `authorType`, `clauses`, `createdAt`, `description`, `heading`, `id`, `intensity`, `isAnchor`, `kind`, `location`, `negotiation`, `not`, `or`, `order`, `pole`, `publishedAt`, `relativePlacement`, `selfPlacement`, `tags`, `updatedAt`, `voters`, `votes`
 
 #### ProjectFiltersInput
-Fields: `acts`, `addHoursManualy`, `and`, `askms`, `asks`, `askwants`, `city`, `countries`, `createdAt`, `deals`, `decisions`, `deffinitions`, `descripFor`, `discordlink`, `drivelink`, `fblink`, `finiapruvals`, `finnishedM72HForDecline`, `finnishedMAllApruve`, `finnished_missions`, `forums`, `githublink`, `haamadapruvs`, `haamadas`, `halukas`, `halukas_recive`, `id`, `isMachzikim`, `isMachzikimPublik`, `isOt`, `isPlatform`, `linkToWebsite`, `locale`, `localizations`, `location`, `maaps`, `machshirs`, `mashaabims`, `mashabetahaliches`, `matanotofs`, `mesimabetahaliches`, `missions`, `newMeMissionOuto72ho`, `newOpenMissionAllApruve`, `newOpenMotoAfter72hoursWithnono`, `newmeOpenAllapruve`, `not`, `open_mashaabims`, `open_missions`, `or`, `pendms`, `pmashes`, `projectName`, `publicDescription`, `publishedAt`, `ratson_proposals`, `restime`, `rikmashes`, `sales`, `sales_source`, `sheirutpends`, `sheiruts`, `sheiruts_sourced`, `site_share_contributions`, `sps`, `tafkidims`, `timeToP`, `timerOnlyTOrAlsoManuallyF`, `timers`, `tosplits`, `totalinyearone`, `totalinyearsec`, `totalmaxyearone`, `totalmaxyearsec`, `totalminyearone`, `totalminyearsec`, `twiterlink`, `updatedAt`, `user_1s`, `usersOfP`, `vallues`, `watsapplink`, `welcom_tops`, `work_ways`, `zohars`
+Fields: `acts`, `addHoursManualy`, `and`, `api_keys`, `askms`, `asks`, `askwants`, `city`, `countries`, `createdAt`, `deals`, `decisions`, `deffinitions`, `descripFor`, `discordlink`, `drivelink`, `fblink`, `finiapruvals`, `finnishedM72HForDecline`, `finnishedMAllApruve`, `finnished_missions`, `forums`, `githublink`, `haamadapruvs`, `haamadas`, `halukas`, `halukas_recive`, `id`, `isMachzikim`, `isMachzikimPublik`, `isOt`, `isPlatform`, `linkToWebsite`, `locale`, `localizations`, `location`, `maaps`, `machshirs`, `mashaabims`, `mashabetahaliches`, `matanotofs`, `mesimabetahaliches`, `missions`, `newMeMissionOuto72ho`, `newOpenMissionAllApruve`, `newOpenMotoAfter72hoursWithnono`, `newmeOpenAllapruve`, `not`, `open_mashaabims`, `open_missions`, `or`, `pendms`, `pmashes`, `projectName`, `publicDescription`, `publishedAt`, `ratson_proposals`, `restime`, `rikmashes`, `sales`, `sales_source`, `sheirutpends`, `sheiruts`, `sheiruts_sourced`, `site_share_contributions`, `sps`, `tafkidims`, `timeToP`, `timerOnlyTOrAlsoManuallyF`, `timers`, `tosplits`, `totalinyearone`, `totalinyearsec`, `totalmaxyearone`, `totalmaxyearsec`, `totalminyearone`, `totalminyearsec`, `twiterlink`, `updatedAt`, `user_1s`, `usersOfP`, `vallues`, `watsapplink`, `welcom_tops`, `work_ways`, `zohars`
 
 #### ProviderProfileFiltersInput
 Fields: `ai_meta`, `and`, `archived`, `avg_rating`, `bio_raw`, `createdAt`, `display_name`, `id`, `lat`, `lng`, `location`, `not`, `or`, `owner_id`, `owner_type`, `pinecone_id`, `publishedAt`, `radius_km`, `updatedAt`
@@ -6504,7 +6520,7 @@ Fields: `and`, `bg`, `createdAt`, `desc`, `id`, `locale`, `localizations`, `not`
 Fields: `agprice`, `and`, `createdAt`, `cyclesCount`, `deliveries`, `firstDeliveryAt`, `haamadas`, `hm`, `id`, `isMust`, `isYesod`, `kindOf`, `lastDeliveryAt`, `maaps`, `mashabetahalich`, `name`, `not`, `open_mashaabim`, `or`, `price`, `project`, `publishedAt`, `quantityDelivered`, `sp`, `spnot`, `sqadualed`, `sqadualef`, `summary`, `total`, `updatedAt`, `users_permissions_user`
 
 #### SaleFiltersInput
-Fields: `and`, `confirmedBy`, `createdAt`, `date`, `decision`, `finishDate`, `holderDecidedAt`, `holderStatus`, `id`, `in`, `isMonterActive`, `isSiteShareIncome`, `matanot`, `monters`, `not`, `note`, `or`, `pending`, `project`, `publishedAt`, `reporter`, `sheiruts`, `source_project`, `splited`, `startDate`, `tosplits`, `unit`, `updatedAt`, `users_permissions_user`
+Fields: `and`, `confirmedBy`, `createdAt`, `date`, `decision`, `externalId`, `finishDate`, `holderDecidedAt`, `holderStatus`, `id`, `in`, `isMonterActive`, `isSiteShareIncome`, `matanot`, `monters`, `not`, `note`, `or`, `pending`, `project`, `publishedAt`, `reporter`, `sheiruts`, `source`, `source_project`, `splited`, `startDate`, `tosplits`, `unit`, `updatedAt`, `users_permissions_user`
 
 #### SealedEnvelopeFiltersInput
 Fields: `and`, `createdAt`, `envelopeId`, `id`, `not`, `or`, `payload`, `spaceId`, `ts`, `updatedAt`
@@ -7016,10 +7032,10 @@ Wrapper types for GraphQL responses.
 
 ---
 
-## 🔢 Enum Types (90)
+## 🔢 Enum Types (91)
 
 <details>
-<summary>Click to expand all 90 enum types</summary>
+<summary>Click to expand all 91 enum types</summary>
 
 - **Enum_Act_Hashivut**: 
 - **Enum_Argument_Authortype**: 
@@ -7096,6 +7112,7 @@ Wrapper types for GraphQL responses.
 - **Enum_Rikmash_Kindof**: 
 - **Enum_Sale_Confirmedby**: 
 - **Enum_Sale_Holderstatus**: 
+- **Enum_Sale_Source**: 
 - **Enum_Sheirutfulfillment_Status_Process**: 
 - **Enum_Sitereport_Status**: 
 - **Enum_Sitereport_Type**: 
@@ -7126,7 +7143,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 18871 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 18907 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

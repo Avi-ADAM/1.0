@@ -44,7 +44,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     kindOf = 'total',
     startDate = null,
     finishDate = null,
-    note = ''
+    note = '',
+    externalId = null,
+    source = null
   } = params as {
     productId: string;
     projectId: string;
@@ -57,6 +59,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     startDate?: string | null;
     finishDate?: string | null;
     note?: string;
+    externalId?: string | null;
+    source?: string | null;
   };
 
   const now = new Date().toISOString();
@@ -102,6 +106,9 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
   if (startDate) saleVars.startDate = startDate;
   if (finishDate) saleVars.finishDate = finishDate;
   if ((note as string)?.trim()) saleVars.note = (note as string).trim();
+  // External Sales API: order id for idempotency + provenance tag.
+  if ((externalId as string)?.trim()) saleVars.externalId = (externalId as string).trim();
+  if (source) saleVars.source = source;
 
   const saleRes = await strapi.execute('createSaleRecord', saleVars, context.jwt, context.fetch);
   const saleData = saleRes?.data?.createSale?.data;
@@ -252,7 +259,9 @@ export const createSaleConfig: ActionConfig = {
     kindOf: { type: 'string', required: false },
     startDate: { type: 'string', required: false },
     finishDate: { type: 'string', required: false },
-    note: { type: 'string', required: false }
+    note: { type: 'string', required: false },
+    externalId: { type: 'string', required: false },
+    source: { type: 'string', required: false }
   },
   authRules: [
     { type: 'jwt', errorMessage: 'Must be logged in to report a sale' },

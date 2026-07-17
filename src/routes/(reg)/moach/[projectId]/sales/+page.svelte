@@ -1,6 +1,7 @@
 <script>
   const moachStore = getMoachStore();
   import Hamatanot from '$lib/components/prPr/hamatanot.svelte';
+  import SalesApiIntegration from '$lib/components/prPr/SalesApiIntegration.svelte';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   import { page } from '$app/state';
   import { sendToSer } from '$lib/send/sendToSer.js';
@@ -48,6 +49,11 @@
       restime={base?.restime}
       projectUsers={base?.user_1s?.data || []}
       bmiData={financials.matanotofs?.data || []}
+    />
+    <SalesApiIntegration
+      {projectId}
+      bmiData={financials.matanotofs?.data || []}
+      projectUsers={base?.user_1s?.data || []}
     />
   {/if}
 </div>
