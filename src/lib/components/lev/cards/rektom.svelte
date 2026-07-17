@@ -56,6 +56,8 @@
    * @property {any[]} [negopendmissions]
    * @property {number} [orderon]
    * @property {() => void} [onProj]
+   * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
+   * @property {(() => void) | null} [onDismiss] - fully dismiss a self-nominated proposal
    */
 
   /** @type {Props} */

@@ -53,6 +53,8 @@
    * @property {number} [orderon]
    * @property {any[]} [users]
    * @property {number} [activeOrder]
+   * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
+   * @property {(() => void) | null} [onDismiss] - fully dismiss a self-nominated proposal
    */
 
   /** @type {Props} */

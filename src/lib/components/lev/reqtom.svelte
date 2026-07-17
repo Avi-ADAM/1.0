@@ -76,6 +76,7 @@
    * @property {() => void} [onModal]
    * @property {(payload: { id: any }) => void} [onUser]
    * @property {(payload: { id: any }) => void} [onProj]
+   * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
    */
 
   /** @type {Props} */

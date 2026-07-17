@@ -1256,10 +1256,98 @@ export function extractDecisions(userData: any): DecisionData[] {
  * 
  * **Validates: Requirements 1.1, 1.4**
  */
+/**
+ * Append the candidate's own pending resource offers (Askms) that no suggestion
+ * row surfaced — a self-nominated resource, or any external offer whose
+ * open_mashaabim has no match record / sps-walk hit. Without this the candidate
+ * has NO lev card for their pending offer: no chat, no view of the rikma's
+ * counter (B2). Mirrors the mission-side askedMissionsFromAsks merge.
+ *
+ * Entries are pushed with `already: true` (it's a pending application, not an
+ * open suggestion) and carry myAskId / myRound so the huca card's existing
+ * chat + accept/counter flows work unchanged.
+ */
+function appendMyPendingAskmEntries(
+  userData: any,
+  huca: ResourceSuggestionData[],
+  seenOmIds: Set<string>
+): void {
+  const spMypById = new Map<string, number | undefined>();
+  for (const sp of userData?.attributes?.sps?.data || []) {
+    if (sp?.id) spMypById.set(String(sp.id), sp?.attributes?.myp);
+  }
+
+  for (const askm of userData?.attributes?.askms?.data || []) {
+    const attrs = askm?.attributes;
+    const om = attrs?.open_mashaabim?.data;
+    if (!om?.id || !om.attributes) continue;
+    // Member self-proposals live in the member view (askedm cards), not here.
+    if (attrs.isSelfProposal === true) continue;
+    const omId = String(om.id);
+    if (seenOmIds.has(omId)) continue;
+
+    const project = attrs.project?.data;
+    if (!project) continue;
+    seenOmIds.add(omId);
+
+    const omAttrs = om.attributes;
+    const projectAttrs = project.attributes ?? {};
+    const spId = attrs.sp?.data?.id ? String(attrs.sp.data.id) : '';
+    const latest = attrs.nego_mashes?.data?.[0]?.attributes ?? null;
+
+    huca.push({
+      id: om.id,
+      projectId: project.id,
+      projectName: projectAttrs.projectName,
+      srcb:
+        projectAttrs.profilePic?.data?.attributes?.formats?.thumbnail?.url ||
+        projectAttrs.profilePic?.data?.attributes?.url,
+
+      mashname: omAttrs.name,
+      price: omAttrs.price,
+      easy: omAttrs.easy,
+      kindOf: omAttrs.kindOf,
+      spnot: omAttrs.spnot,
+      descrip: omAttrs.descrip,
+      sqadualed: omAttrs.sqadualed,
+      sqadualedf: omAttrs.sqadualedf,
+      sqedualed: omAttrs.sqadualed,
+      sqedualedf: omAttrs.sqadualedf,
+
+      recurring: omAttrs.recurring === true,
+      cycleSize: omAttrs.cycleSize ?? 1,
+
+      myp: spId ? spMypById.get(spId) : undefined,
+      oid: spId,
+      declineddarra: [],
+      already: true,
+      alreadyAsked: true,
+      priority: 6,
+
+      ani: 'huca',
+      azmi: 'hazaa',
+
+      myAskId: askm.id,
+      myAskUsers: attrs.vots || [],
+      myRoundProposedBy: latest?.proposedBy ?? null,
+      myOrdern: latest?.ordern ?? 0,
+      myRound: latest,
+
+      // Self-nomination badge / withdraw (PLAN_SELF_NOMINATION §4.2)
+      source: omAttrs.source,
+
+      openMashaabimId: om.id,
+      spId
+    });
+  }
+}
+
 export function extractResourceSuggestions(userData: any): ResourceSuggestionData[] {
   const huca: ResourceSuggestionData[] = [];
 
   if (!userData?.attributes?.sps?.data) {
+    // No sps to walk — but the candidate's own pending offers must still surface.
+    appendMyPendingAskmEntries(userData, huca, new Set());
     return huca;
   }
 
@@ -1395,6 +1483,10 @@ export function extractResourceSuggestions(userData: any): ResourceSuggestionDat
     }
   }
 
+  // Surface my pending offers (incl. self-nominated resources) that the
+  // sps → mashaabim walk could not reach.
+  appendMyPendingAskmEntries(userData, huca, new Set(huca.map((h) => String(h.id))));
+
   return huca;
 }
 
@@ -1452,6 +1544,9 @@ export function buildResourceSuggestionsFromMatchRecords(
     // My sp was declined by the rikma → not a live suggestion for me
     if (spId && declinedIds.map(String).includes(String(spId))) continue;
 
+    // Self-nominated resources surface only for their author (PLAN_SELF_NOMINATION §4.3).
+    if (omAttrs.source === 'selfNomination' && !myAskmByOm.has(omId)) continue;
+
     seen.add(omId);
     const projectAttrs = project.attributes;
     const myAskm = myAskmByOm.get(omId);
@@ -1492,10 +1587,18 @@ export function buildResourceSuggestionsFromMatchRecords(
       myOrdern: myAskm?.attributes?.nego_mashes?.data?.[0]?.attributes?.ordern ?? 0,
       myRound: myAskm?.attributes?.nego_mashes?.data?.[0]?.attributes ?? null,
 
+      // Self-nomination badge / withdraw (PLAN_SELF_NOMINATION §4.2)
+      source: omAttrs.source,
+
       openMashaabimId: om.id,
       spId: spId
     });
   }
+
+  // Surface my pending offers (incl. self-nominated resources) that have no
+  // stored match record — otherwise the candidate has no card, no chat, no
+  // view of the rikma's counter.
+  appendMyPendingAskmEntries(userData, huca, seen);
 
   return huca;
 }

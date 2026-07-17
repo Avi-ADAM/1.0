@@ -18,6 +18,8 @@
   /**
    * @typedef {Object} Props
    * ... (כל ה-Props המקוריים שלך נשארים כאן)
+   * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
+   * @property {(() => void) | null} [onWithdraw] - withdraw my self-nomination entirely
    */
 
   let {
@@ -45,8 +47,8 @@
     already = $bindable(),
     allr = false,
     isVisible = false,
-    sqadualed,
-    sqadualedf,
+    sqadualed = null,
+    sqadualedf = null,
     onHover,
     onAgree,
     onDecline,
@@ -60,7 +62,7 @@
 
     // Props חדשים לתמיכה במבנה המודרני
     glowColor = 'green', // מוגדר לירוק עבור משימה מוצעת
-    onProj,
+    onProj = null,
 
     // Self-nomination (PLAN_SELF_NOMINATION §4.2): this is the candidate's own
     // authored proposal — they may withdraw it entirely.

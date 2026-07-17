@@ -67,6 +67,7 @@
    * @property {any} [onDecline]
    * @property {any} [onHover]
    * @property {any} [onModal]
+   * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
    */
 
   /** @type {Props} */

@@ -242,6 +242,7 @@
    * @property {number} [myOrdern]
    * @property {any[]} [myAskUsers]
    * @property {any} [myRound]
+   * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
    */
 
   /** @type {Props} */
@@ -288,8 +289,30 @@
     onLess,
     onProj,
     onHover,
-    onModal
+    onModal,
+    selfNomination = false
   } = $props();
+
+  // Withdraw my own self-nominated resource offer (PLAN_SELF_NOMINATION §3.3):
+  // archives my Askm AND the OpenMashaabim I authored, and tells the members.
+  let withdrawing = $state(false);
+  async function withdrawSelfNom() {
+    if (withdrawing || !id) return;
+    withdrawing = true;
+    try {
+      const result = await executeAction('dismissSelfNomination', {
+        side: 'resource',
+        id: String(id),
+        mode: 'withdraw'
+      });
+      if (result.success) less();
+      else error1 = result.error;
+    } catch (e) {
+      error1 = e;
+    } finally {
+      withdrawing = false;
+    }
+  }
   let isOpen = $state(false),
     diunm = $state(false),
     masa = $state(false),
@@ -563,6 +586,8 @@ role="button"
     {projectName}
     {src}
     {spnot}
+    {selfNomination}
+    onWithdraw={withdrawSelfNom}
   />
       </div>
       </Drawer.Content>
@@ -598,6 +623,8 @@ role="button"
     {projectName}
     {src}
     {spnot}
+    {selfNomination}
+    onWithdraw={withdrawSelfNom}
   />
 {/if}
 

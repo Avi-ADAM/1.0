@@ -53,6 +53,7 @@
    * @property {any[]} [myAskUsers] - my application's vots (for accept/counter)
    * @property {any} [myRound] - latest round terms on my application (my own counter-offer)
    * @property {any} order - Order data
+   * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
    */
   /** @type {ComponentProps} */
   let {

@@ -48,6 +48,8 @@
    * @property {string|null} [myRoundProposedBy]
    * @property {any} [myRound]
    * @property {() => void} [onTochat]
+   * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
+   * @property {(() => void) | null} [onWithdraw] - withdraw my self-nomination entirely
    */
 
   /** @type {Props} */
@@ -82,7 +84,12 @@
     onAccept,
     myRoundProposedBy = null, // 'project' → rikma countered my application (B2)
     myRound = null, // latest round terms on my application (my own / rikma counter)
-    onTochat
+    onTochat,
+
+    // Self-nomination (PLAN_SELF_NOMINATION §4.2): this is the candidate's own
+    // authored resource offer — they may withdraw it entirely.
+    selfNomination = false,
+    onWithdraw = null
   } = $props();
 
   function hover(x) {
@@ -492,6 +499,35 @@
           <div class="w-8 h-8 text-white"><Lev /></div>
           <span class="whitespace-nowrap">{$t('lev.cards.approve')}</span>
         </button>
+      {:else}
+        <!-- ההצעה שלי ממתינה לריקמה — תקשורת זמינה תמיד, ומשיכה על הצעה עצמית -->
+        {#if onTochat}
+          <button
+            onmouseenter={() => hover({ he: "צ'אט", en: 'chat' })}
+            onmouseleave={() => hover('0')}
+            class="flex-2 py-2 flex justify-center items-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold rounded-xl shadow-md hover:opacity-90 transition-all"
+            style="flex: 2;"
+            onclick={() => tochat()}
+          >
+            <span class="whitespace-nowrap">{$lang === 'he' ? "פתיחת צ'אט" : 'Open Chat'}</span>
+          </button>
+        {/if}
+        {#if selfNomination && onWithdraw}
+          <!-- משיכת הצעה עצמית (PLAN_SELF_NOMINATION §3.3) — המשאב כולו שלי,
+               ולכן המשיכה מארכבת אותו יחד עם הבקשה. -->
+          <button
+            onmouseenter={() =>
+              hover({
+                he: 'משיכת ההצעה העצמית — הצעת המשאב שחיברת תיסגר כולה',
+                en: 'Withdraw your self-nomination — the resource offer you authored closes entirely'
+              })}
+            onmouseleave={() => hover('0')}
+            class="flex-1 py-2 flex justify-center items-center gap-2 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-gray-400 hover:text-gray-600 font-bold rounded-xl transition-all"
+            onclick={() => onWithdraw?.()}
+          >
+            <span class="whitespace-nowrap">🌱 {$lang === 'he' ? 'משיכת ההצעה' : 'Withdraw'}</span>
+          </button>
+        {/if}
       {/if}
     {:else if low == true}
       <div class="w-full flex justify-center">

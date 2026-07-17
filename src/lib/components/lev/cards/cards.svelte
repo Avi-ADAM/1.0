@@ -1208,6 +1208,7 @@
                   descrip={buble.descrip}
                   spnot={buble.spnot}
                   easy={buble.easy}
+                  selfNomination={buble.source === 'selfNomination'}
                 /></SwiperSlide
               >
             {:else if buble.ani === 'hachla' && milon.hachla == true}
