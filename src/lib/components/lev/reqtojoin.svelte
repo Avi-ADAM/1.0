@@ -134,8 +134,28 @@
     userRole,
     userWorkway,
     negopendmissions = [],
-    acts = []
+    acts = [],
+    selfNomination = false
   } = $props();
+
+  // Full dismiss of a self-nominated proposal (PLAN_SELF_NOMINATION §3.3):
+  // archives the Ask, cancels the timegrama and archives the OpenMission itself.
+  let dismissing = $state(false);
+  async function dismissSelfNom() {
+    if (dismissing || !openMid) return;
+    dismissing = true;
+    try {
+      const result = await executeAction('dismissSelfNomination', {
+        side: 'mission',
+        id: String(openMid)
+      });
+      if (result.success) {
+        onDecline?.({ ani: 'asked', coinlapach });
+      }
+    } finally {
+      dismissing = false;
+    }
+  }
   let dialogOpen = $state(false);
   let resP = [];
 
@@ -973,6 +993,8 @@
                 {negopendmissions}
                 {orderon}
                 {acts}
+                {selfNomination}
+                onDismiss={dismissSelfNom}
               />
             </div>
           </Drawer.Content>
@@ -1017,6 +1039,8 @@
     {negopendmissions}
     {orderon}
     {acts}
+    {selfNomination}
+    onDismiss={dismissSelfNom}
   />
 {/if}
 

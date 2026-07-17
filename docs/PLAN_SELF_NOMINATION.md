@@ -33,13 +33,27 @@
 - qids: 214–218 (יצירת OpenMission/OpenMashaabim/Sp להצעה עצמית +
   שאילתות ההקשר לביטול).
 
-**חסם סכמה (S1)**: להוסיף ב-Strapi את הערך `selfNomination` ל-enum
-`source` של `open-mission` ו-`open-mashaabim`, ואז `npm run types:update`.
-עד אז הפעולות מחזירות שגיאה מוסברת. (שינוי אדמין של דקות.)
+**S1 סכמה**: ✅ בוצע (הערך `selfNomination` נוסף ב-Strapi לשני ה-enums).
 
-**נותר**: S5 (באדג' 🌱 + כפתור ביטול/משיכה בכרטיסי הלב — extractors:
-`source`), S6 בדיקות unit לפעולות, S7 גילוי (hub), וסינון ה-processors
-בלב (§4.3 סיפא).
+**S5 כרטיסי לב** ✅ (2026-07-17):
+- query 83 מושכת עכשיו `source` על ה-open_mission/open_mashaabim בכל
+  ארבע הבחירות (צד חבר וצד מועמד).
+- **צד החברים**: באדג' "🌱 הצעה עצמית" בכותרת הכרטיס + כפתור
+  "לא מתאים כרגע" (משני, לצד אשר·נגדית·צ'אט — לא וטו) שמפעיל
+  `dismissSelfNomination` — בכרטיס המשימה (`cards/reqtojoin`) ובכרטיס
+  המשאב (`cards/rektom`), דרך ה-wrappers (`lev/reqtojoin`, `lev/reqtom`).
+- **צד המועמד** (משימות): כרטיס ההצעה שלי (`projectSuggestor`/`sugestmi`)
+  מקבל כפתור "🌱 משיכת ההצעה" (`mode:'withdraw'`).
+- **§4.3 processors**: משימת selfNomination שאינה שלי מדולגת גם בבניית
+  ההצעות (extractSuggestions + buildSuggestionsFromMatchRecords) —
+  בנוסף לסינון בשאילתות.
+- הערת פער ידוע: הצעת-משאב עצמית של מועמד לא מופיעה אצלו בלב (askm ללא
+  match-record לא ממוזג ל-huca — פער קיים לכל הצעות המשאב החיצוניות,
+  לא רגרסיה); משיכה זמינה לו בינתיים דרך צד המשימות בלבד. וכרטיסי ה-UI
+  החלופיים (`coinui`/`newcoinui`) לא קיבלו את הבאדג'.
+
+**נותר**: S6 בדיקות unit לפעולות, S7 גילוי (hub), השלמת משיכת-משאב
+לצד המועמד, ובאדג' ב-UI החלופי.
 
 ---
 

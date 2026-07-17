@@ -99,7 +99,8 @@
     myAskUsers = [],
     myRound = null, // latest round terms on my application (my own counter-offer)
     order = {},
-    onModal
+    onModal,
+    selfNomination = false
   } = $props();
   let already = $state(false);
   let error1 = $state(null);
@@ -107,6 +108,27 @@
   function less(oid) {
     console.log('less');
     onLess?.({ ani: 'prsug', coinlapach: coinlapach });
+  }
+
+  // Withdraw my own self-nominated proposal (PLAN_SELF_NOMINATION §3.3):
+  // archives my Ask AND the mission I authored, and tells the members.
+  let withdrawing = $state(false);
+  async function withdrawSelfNom() {
+    if (withdrawing || !oid) return;
+    withdrawing = true;
+    try {
+      const result = await executeAction('dismissSelfNomination', {
+        side: 'mission',
+        id: String(oid),
+        mode: 'withdraw'
+      });
+      if (result.success) less(oid);
+      else error1 = result.error;
+    } catch (e) {
+      error1 = e;
+    } finally {
+      withdrawing = false;
+    }
   }
 
   async function agree(oid) {
@@ -2922,6 +2944,8 @@
               {workways}
               {timeToP}
               {noOfusers}
+              {selfNomination}
+              onWithdraw={withdrawSelfNom}
             />
           </div>
           <!---<div>
@@ -2962,6 +2986,8 @@
     {src}
     {workways}
     {timeToP}
+    {selfNomination}
+    onWithdraw={withdrawSelfNom}
   />
 {/if}
 

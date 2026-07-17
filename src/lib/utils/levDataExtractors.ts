@@ -421,6 +421,11 @@ export function extractSuggestions(userData: any): SuggestionData[] {
     // 2. It's in askeds list (user asked to do this mission)
     const isAlreadyAsked = !!askData || askedIdsSet.has(id);
 
+    // Self-nominated missions are personal proposals (PLAN_SELF_NOMINATION §4.3):
+    // they surface only for the candidate who authored them, never as a
+    // suggestion for anyone else.
+    if (mission.attributes.source === 'selfNomination' && !isAlreadyAsked) continue;
+
     // Map to SuggestionData
     suggestions.push({
       id: mission.id,
@@ -467,6 +472,9 @@ export function extractSuggestions(userData: any): SuggestionData[] {
       dates: mission.attributes.dates || '',
 
       acts: mission.attributes.acts || { data: [] },
+
+      // Self-nomination badge / withdraw (PLAN_SELF_NOMINATION §4.2)
+      source: mission.attributes.source,
 
       // Pass arrays for completeness
       skills: mission.attributes.skills || { data: [] },
@@ -524,10 +532,13 @@ export function buildSuggestionsFromMatchRecords(
   const pushMission = (mission: any, score: number) => {
     const missionId = String(mission.id);
     if (seen.has(missionId) || declinedIds.has(missionId)) return;
-    seen.add(missionId);
 
     const askData = askedMap.get(missionId);
     const isAlreadyAsked = !!askData || askedIds.has(missionId);
+
+    // Self-nominated missions surface only for their author (PLAN_SELF_NOMINATION §4.3).
+    if (mission.attributes?.source === 'selfNomination' && !isAlreadyAsked) return;
+    seen.add(missionId);
 
     suggestions.push({
       id: mission.id,

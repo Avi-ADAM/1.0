@@ -3673,6 +3673,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                   attributes {
                     name
                     isRishon
+                    source
                   }
                 }
               }
@@ -3784,6 +3785,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                 data {
                   id
                   attributes {
+                    source
                     price
                     descrip
                     spnot
@@ -4787,6 +4789,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                       data {
                         id
                         attributes {
+                          source
                           price
                           descrip
                           spnot
@@ -4944,6 +4947,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                       data {
                         id
                         attributes {
+                          source
                           acts {
                             data {
                               id
@@ -11238,6 +11242,7 @@ export const qids = {
                       data {
                         id
                         attributes {
+                          source
                           price
                           descrip
                           spnot

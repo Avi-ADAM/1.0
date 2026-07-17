@@ -144,9 +144,29 @@
     pendingMainVote = false,  // = הצבעה כפולה: גם על הצורך וגם שהחבר נותן אותו
     negopendmissions = [],
     orderon = 0,
+    selfNomination = false,
   } = $props();
   let dialogOpen = $state(false);
   let resP = [];
+
+  // Full dismiss of a self-nominated resource offer (PLAN_SELF_NOMINATION §3.3):
+  // archives the Askm, cancels the timegrama and archives the OpenMashaabim.
+  let dismissing = $state(false);
+  async function dismissSelfNom() {
+    if (dismissing || !openMid) return;
+    dismissing = true;
+    try {
+      const result = await executeAction('dismissSelfNomination', {
+        side: 'resource',
+        id: String(openMid)
+      });
+      if (result.success) {
+        onDecline?.({ ani: 'askedma', coinlapach });
+      }
+    } finally {
+      dismissing = false;
+    }
+  }
 
   // Negotiation state management
   let negotiationMode = $state(false);
@@ -890,6 +910,8 @@
                 {negotiationMode}
                 {negopendmissions}
                 {orderon}
+                {selfNomination}
+                onDismiss={dismissSelfNom}
               />
             </div>
           </Drawer.Content>
@@ -932,6 +954,8 @@
     {negotiationMode}
     {negopendmissions}
     {orderon}
+    {selfNomination}
+    onDismiss={dismissSelfNom}
   />
 {/if}
 

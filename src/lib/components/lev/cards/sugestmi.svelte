@@ -60,7 +60,12 @@
 
     // Props חדשים לתמיכה במבנה המודרני
     glowColor = 'green', // מוגדר לירוק עבור משימה מוצעת
-    onProj
+    onProj,
+
+    // Self-nomination (PLAN_SELF_NOMINATION §4.2): this is the candidate's own
+    // authored proposal — they may withdraw it entirely.
+    selfNomination = false,
+    onWithdraw = null
   } = $props();
 
   function hover(x) {
@@ -506,7 +511,8 @@
       {:else if alreadyi == true}
         <!-- מצב צ'אט -->
         <button
-          class="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold rounded-xl shadow-md flex justify-center items-center gap-2 hover:opacity-90 transition-all"
+          class="{selfNomination && onWithdraw ? 'flex-2' : 'w-full'} py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold rounded-xl shadow-md flex justify-center items-center gap-2 hover:opacity-90 transition-all"
+          style={selfNomination && onWithdraw ? 'flex: 2;' : ''}
           onmouseenter={() => hover({ he: "צ'אט", en: 'chat' })}
           onmouseleave={() => hover('0')}
           onclick={() => tochat()}
@@ -514,6 +520,24 @@
           <span>{$lang === 'he' ? "פתיחת צ'אט" : 'Open Chat'}</span>
           <div class="w-6 h-6"><Chaticon /></div>
         </button>
+        {#if selfNomination && onWithdraw}
+          <!-- משיכת הצעה עצמית (PLAN_SELF_NOMINATION §3.3) — המשימה כולה שלי,
+               ולכן המשיכה מארכבת אותה יחד עם הבקשה. -->
+          <button
+            class="flex-1 py-3 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-gray-400 hover:text-gray-600 font-bold rounded-xl flex justify-center items-center gap-2 transition-all"
+            onmouseenter={() =>
+              hover({
+                he: 'משיכת ההצעה העצמית — המשימה שחיברת תיסגר כולה',
+                en: 'Withdraw your self-nomination — the mission you authored closes entirely'
+              })}
+            onmouseleave={() => hover('0')}
+            onclick={() => onWithdraw?.()}
+          >
+            <span class="whitespace-nowrap"
+              >🌱 {$lang === 'he' ? 'משיכת ההצעה' : 'Withdraw'}</span
+            >
+          </button>
+        {/if}
       {/if}
     {:else if low == true}
       <Lowbtn isCart={true} />
