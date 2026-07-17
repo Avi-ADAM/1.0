@@ -1,5 +1,6 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { matchUserToOpenEntities } from '$lib/server/matching/engine';
+import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 
 const KISH_VALC: Record<string, string> = {
   skills:     'skillName',
@@ -19,7 +20,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
 
   const idList = (ids as string[]).map(id => `"${id}"`).join(', ');
 
-  const res = await f(import.meta.env.VITE_URL + '/graphql', {
+  const res = await f(STRAPI_GRAPHQL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
     body: JSON.stringify({

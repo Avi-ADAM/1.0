@@ -1,6 +1,7 @@
 import datai from '$lib/components/main/data.json';
-const baseUrl = import.meta.env.VITE_URL;
-console.log(baseUrl)
+// Server load (not universal): the public countries query must run on the
+// server so it works when Strapi is gated (x-strapi-gate via hooks fetch patch).
+import { STRAPI_URL as baseUrl } from '$lib/server/strapiUrl.js';
 
 export const load = async ({fetch}) => {
     let error, country,data
@@ -81,9 +82,9 @@ export const load = async ({fetch}) => {
                 }
               }
             }
-            data.total = total
-            console.log(data,data.total);
-           return resolve(data);
+            // plain object — extra props on an array don't survive devalue
+            // serialization from a server load
+           return resolve({ list: data, total });
          })
          .catch((error) => {
            console.log(error);

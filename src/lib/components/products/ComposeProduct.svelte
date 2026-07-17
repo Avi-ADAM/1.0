@@ -260,8 +260,7 @@
   async function uploadPicIfAny(): Promise<string | null> {
     if (!croppedImage) return null;
     try {
-      const baseUrl = import.meta.env.VITE_URL;
-      const res = await fetch(baseUrl + '/api/upload', {
+      const res = await fetch('/api/upload', {
         method: 'POST',
         credentials: 'include',
         body: croppedImage as FormData

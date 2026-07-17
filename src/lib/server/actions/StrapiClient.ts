@@ -7,6 +7,8 @@
  * Validates: Requirements 3.1, 3.2, 3.3
  */
 
+import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
+
 // Environment variables - these will be passed to the constructor
 // or loaded from process.env in the server context
 
@@ -145,7 +147,9 @@ export class StrapiClient {
     retryConfig?: Partial<RetryConfig>
   ) {
     // Use provided values or fall back to environment variables or defaults
-    this.endpoint = endpoint || import.meta.env.VITE_URL || 'https://tovmeod.1lev1.com';
+    // NOTE: endpoint is the full GraphQL URL (the old VITE_URL fallback was
+    // missing the /graphql suffix and would 404 if ever hit).
+    this.endpoint = endpoint || STRAPI_GRAPHQL;
     this.adminToken = (adminToken || process.env.ADMINMONTHER || '').replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
     this.retryConfig = { ...DEFAULT_RETRY_CONFIG, ...retryConfig };
     this.connectionPool = new ConnectionPool();

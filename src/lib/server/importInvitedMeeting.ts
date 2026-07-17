@@ -13,6 +13,7 @@
 import { env } from '$env/dynamic/private';
 import { qids } from '../../routes/api/send/qids.js';
 import { verifyInviteToken } from './guestInvite.js';
+import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 
 function adminToken(): string {
   let t = String(env.ADMINMONTHER ?? '').replace(/\s+/g, '');
@@ -57,7 +58,7 @@ export async function importInvitedMeeting(
   const meetingId = res.payload.meetingId;
 
   try {
-    const endpoint = import.meta.env.VITE_URL + '/graphql';
+    const endpoint = STRAPI_GRAPHQL;
     const response = await fetchFn(endpoint, {
       method: 'POST',
       headers: {

@@ -1,4 +1,5 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 
 const handler: ActionExecutionHandler = async (params, context) => {
   const { id, name, descrip, kindOf, hm, spnot, price, myp, linkto, sdate, fdate } = params;
@@ -20,7 +21,7 @@ const handler: ActionExecutionHandler = async (params, context) => {
   if (sdate) spData.sdate = sdate;
   if (fdate) spData.fdate = fdate;
 
-  const res = await f(import.meta.env.VITE_URL + '/graphql', {
+  const res = await f(STRAPI_GRAPHQL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
     body: JSON.stringify({

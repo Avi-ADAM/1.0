@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { env } from '$env/dynamic/private';
+import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 
 export async function load({ params, cookies, fetch }) {
   const projectId = params.projectId;
@@ -47,7 +47,7 @@ export async function load({ params, cookies, fetch }) {
   `;
 
   try {
-    const res = await fetch(`${env.VITE_URL || 'http://127.0.0.1:1337'}/graphql`, {
+    const res = await fetch(STRAPI_GRAPHQL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,

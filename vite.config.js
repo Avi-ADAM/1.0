@@ -20,7 +20,11 @@ const config = {
           hmr: { protocol: 'ws', host: tauriDevHost, port: 5183 }
         }
       }
-    : {}),
+    : {
+        // hosts-file alias (127.0.0.1 dev.1lev1.com) for testing VITE_API_BASE
+        // against api.1lev1.com with same-site cookies — see PLAN_PROXY_SECURITY §9
+        server: { allowedHosts: ['dev.1lev1.com'] }
+      }),
   resolve: {
     alias: {
       '$generated': path.resolve('./src/generated')

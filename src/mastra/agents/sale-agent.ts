@@ -54,14 +54,14 @@ export function createSaleAgent(apiKey: string, language: string = 'he', userId:
     model: (() => {
       if (hasGoogleModelConfig(apiKey)) {
         return [
-          { model: createGoogleModel(apiKey, 'gemini-flash-latest', { thinkingBudget: 0 }), maxRetries: 2 },
+          { model: createGoogleModel(apiKey, 'gemini-3-flash-preview', { thinkingBudget: 0 }), maxRetries: 2 },
           { model: createGoogleModel(apiKey, 'gemini-flash-lite-latest'), maxRetries: 2 }
         ];
       }
       if (hasGroqModelConfig()) {
         return [{ model: createGroqModel(), maxRetries: 2 }];
       }
-      return [{ model: createGoogleModel(apiKey, 'gemini-flash-latest', { thinkingBudget: 0 }), maxRetries: 2 }];
+      return [{ model: createGoogleModel(apiKey, 'gemini-3-flash-preview', { thinkingBudget: 0 }), maxRetries: 2 }];
     })(),
     tools: { saleActionTool }
   });

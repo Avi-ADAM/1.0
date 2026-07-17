@@ -13,7 +13,7 @@ import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
 import { VOCAB_KINDS, isVocabKind } from '$lib/vocab/vocabKinds';
 
-const STRAPI_GRAPHQL = (import.meta.env.VITE_URL ?? 'http://127.0.0.1:1337') + '/graphql';
+import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 
 function adminToken(): string {
 	return String(env.ADMINMONTHER ?? '').replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');

@@ -134,7 +134,7 @@
     await scrollToBottom();
 
     try {
-      const apiUrl = dev ? '/api/chat' : 'https://rend.1lev1.com/api/chat';
+      const apiUrl = dev ? '/api/chat' : 'https://api.1lev1.com/api/chat';
       const res = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

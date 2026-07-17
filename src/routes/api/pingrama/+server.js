@@ -1,3 +1,10 @@
+import { env } from '$env/dynamic/private';
+
+// יעד ההרצה של cron/timegrama. ברירת מחדל: אינסטנס ה-API על ה-VPS
+// (api.1lev1.com) — החליף את אינסטנס ה-Render (rend.1lev1.com) שנרדם.
+// אפשר לעקוף בזמן ריצה עם REND_URL.
+const REND_BASE = (env.REND_URL || 'https://api.1lev1.com/').replace(/\/?$/, '/');
+
 export async function GET({url, fetch}){
     try{
         let mode = url.searchParams.get('mode');
@@ -8,7 +15,7 @@ export async function GET({url, fetch}){
         const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 שניות timeout
 
         try {
-            const response = await fetch(import.meta.env.VITE_REND + add, {
+            const response = await fetch(REND_BASE + add, {
                 method: 'GET',
                 signal: controller.signal,
                 headers: {

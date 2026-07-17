@@ -6,7 +6,9 @@ import { join } from 'path';
 import { embedBatch } from '../embed/gemini-embeddings';
 import { upsertVectors, fetchExistingIds, type VocabNamespace } from '../embed/pinecone';
 
-const STRAPI_URL = process.env.VITE_URL!;
+// process.env (not $env) — this file also runs standalone via `npx tsx`.
+// STRAPI_URL is the runtime address (internal docker net on the VPS); VITE_URL is the dev fallback.
+const STRAPI_URL = process.env.STRAPI_URL || process.env.VITE_URL!;
 const STRAPI_TOKEN = process.env.NEW_S!;
 
 // ─── Embedding cache ──────────────────────────────────────────────────────────
@@ -323,6 +325,6 @@ import { fileURLToPath } from 'url';
 const isDirectRun = process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];
 if (isDirectRun) {
     console.log('PINECONE_API_KEY:', process.env.PINECONE ? '✓' : '✗ חסר');
-    console.log('STRAPI_URL:', process.env.VITE_URL ?? '✗ חסר');
+    console.log('STRAPI_URL:', process.env.STRAPI_URL ?? process.env.VITE_URL ?? '✗ חסר');
     syncVocabulary().catch(err => { console.error('❌', err); process.exit(1); });
 }

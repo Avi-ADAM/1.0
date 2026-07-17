@@ -108,14 +108,36 @@ docker tag  ghcr.io/avi-adam/1lev1-sveltekit-api:<sha-קודם> ghcr.io/avi-adam
 docker-compose -f /home/ubuntu/api/docker-compose.api.yml up -d
 ```
 
+## ⚠️ api.1lev1.com הוא לא Strapi
+
+`api.1lev1.com` הוא אינסטנס SvelteKit (הפרוקסי) — אין בו REST/GraphQL של Strapi.
+**אסור** להצביע עליו עם `VITE_URL` / `STRAPI_URL`: זה יגרום לכל קריאות Strapi
+(למשל `/api/user-keys` של ה-consent mirror) לפגוע בפרוקסי ולקבל 404 (קרה בפועל
+2026-07-16). הערכים הנכונים:
+
+| משתנה | dev מקומי / Vercel | בקונטיינר בשרת (`/home/ubuntu/api/.env`) |
+|---|---|---|
+| `STRAPI_URL` / `VITE_URL` | `https://tovmeod.1lev1.com` | `http://strapi-blue:1337` |
+
+(אגב, `GET /api/env` / `GET /api/config` שמופיעים בלוגים של הקונטיינר הם סריקות
+בוטים על הדומיין הציבורי — לא קוד שלנו; אפשר להתעלם.)
+
 ## ⚠️ הערות build חשובות
 
+- **החלפת קונטיינר רץ:** `deploy-api.ps1` עושה `docker rm -f sveltekit-api` בין
+  ה-pull ל-`up -d` — compose v1 נכשל על name conflict כשהקונטיינר הרץ לא נוצר
+  מאותו compose project (למשל אחרי הרצה ידנית).
+
 - **ה-`.env` הלוקאלי נדרש בזמן build** (ערכי `VITE_*` ו-`$env/static` נטמעים
-  ב-bundle). הוא מועבר כ-BuildKit secret ולא נשאר ב-image. שים לב למלכודת
-  `VITE_URL` המתוארת ב-`PLAN_PROXY_SECURITY.md` סעיף 5 — כל עוד קבצי השרת
-  משתמשים ב-`VITE_URL`, הערך שנטמע ב-build הזה הוא שיקבע לאן הפרוקסי פונה.
-  אחרי המעבר ל-`STRAPI_URL` (`$env/dynamic/private`) הכתובת תיקבע בזמן ריצה
-  מה-`.env` שבשרת.
+  ב-bundle). הוא מועבר כ-BuildKit secret ולא נשאר ב-image.
+- **✅ (2026-07-16) המעבר ל-runtime הושלם:** כל קבצי השרת קוראים את כתובת Strapi
+  דרך `src/lib/server/strapiUrl.js` (`$env/dynamic/private` → `STRAPI_URL` מתוך
+  ה-`.env` שבשרת, fallback ל-`VITE_URL` ב-dev). כלומר `STRAPI_URL=http://strapi-blue:1337`
+  ב-`/home/ubuntu/api/.env` נכנס לתוקף ב-restart, בלי rebuild. ⚠️ לוודא ש-`STRAPI_URL`
+  מופיע **פעם אחת בלבד** בקובץ — שורה כפולה מאוחרת דורסת את הפנימית (קרה בפועל).
+- ל-`.env` שבשרת יש להוסיף גם `SOCKET_SERVER_URL=http://unified-action-socket-server:3001`
+  (ברירת המחדל `localhost:3001` לא מגיעה לקונטיינר ה-socket) ואופציונלית `REND_URL`
+  (יעד `api/pingrama`; ברירת מחדל `https://api.1lev1.com/` — החליף את rend.1lev1.com).
 - ה-runtime env (`/opt/1lev1/api/.env`) נטען דרך `env_file` של ה-compose —
   זמין ל-`$env/dynamic/private` בלי rebuild.
 - `ORIGIN` חובה ל-adapter-node (בדיקות origin/CSRF מאחורי proxy).

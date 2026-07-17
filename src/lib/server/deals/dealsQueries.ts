@@ -2,6 +2,7 @@ import type { SaleData } from '$lib/stores/levStores';
 import { mapSaleData } from '$lib/utils/levDataExtractors';
 import { stripHtml } from '$lib/utils/stripHtml';
 import { qids } from '../../../routes/api/send/qids.js';
+import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 
 export interface PendingRequestData {
   id: string;
@@ -135,7 +136,7 @@ async function gql<T = any>(
   query: string,
   variables: Record<string, unknown>
 ): Promise<T> {
-  const endpoint = (import.meta.env.VITE_URL as string) + '/graphql';
+  const endpoint = STRAPI_GRAPHQL;
   const res = await fetchFn(endpoint, {
     method: 'POST',
     headers: {

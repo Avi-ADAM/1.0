@@ -1,11 +1,12 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { qids } from '../../../api/send/qids.js';
+import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 
 async function fetchPendingForMatanot(fetchFn, tok, uid, matId) {
   try {
     const query = qids['125userPendingForMatanot'];
     if (!query) return [];
-    const endpoint = import.meta.env.VITE_URL + '/graphql';
+    const endpoint = STRAPI_GRAPHQL;
     const res = await fetchFn(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${tok}` },

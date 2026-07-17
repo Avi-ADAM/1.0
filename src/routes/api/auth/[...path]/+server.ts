@@ -14,7 +14,7 @@ import type { RequestHandler } from '@sveltejs/kit';
  * POST /api/auth/<action>
  */
 
-const BASE_URL = import.meta.env.VITE_URL as string;
+import { STRAPI_URL as BASE_URL } from '$lib/server/strapiUrl.js';
 
 type AuthAction = {
   /** Requires an authenticated user; token is taken from the httpOnly cookie. */

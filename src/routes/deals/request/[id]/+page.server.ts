@@ -1,6 +1,7 @@
 import { redirect, error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { qids } from '../../../../routes/api/send/qids.js';
+import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 
 async function gql<T = any>(
   fetchFn: typeof fetch,
@@ -8,7 +9,7 @@ async function gql<T = any>(
   query: string,
   variables: Record<string, unknown>
 ): Promise<T> {
-  const endpoint = (import.meta.env.VITE_URL as string) + '/graphql';
+  const endpoint = STRAPI_GRAPHQL;
   const res = await fetchFn(endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },

@@ -56,7 +56,7 @@ import { StrapiClient } from './StrapiClient.js';
 import { ActionService } from './ActionService.js';
 import { NotificationOrchestrator } from '$lib/server/notifications/NotificationOrchestrator.js';
 
-const STRAPI_ENDPOINT = (import.meta.env.VITE_URL || 'https://tovmeod.1lev1.com') + '/graphql';
+import { STRAPI_GRAPHQL as STRAPI_ENDPOINT } from '$lib/server/strapiUrl.js';
 const ADMIN_TOKEN = (process.env.ADMINMONTHER || '').replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');
 
 // Shared admin-token client. Exported so server code outside the action

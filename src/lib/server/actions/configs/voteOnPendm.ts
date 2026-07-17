@@ -17,6 +17,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { matchOpenMissionToUsers } from '$lib/server/matching/engine';
+import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 
 // Helper: normalise a vote component row to a plain object for GraphQL variables
 function normalizeVote(v: any): Record<string, any> {
@@ -125,7 +126,7 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
     const sqadualedFrag = attrs.sqadualed ? `sqadualed: "${attrs.sqadualed}"` : '';
     const datesFrag = attrs.dates ? `dates: "${attrs.dates}"` : '';
 
-    const strapiUrl = import.meta.env.VITE_URL ?? 'https://tovmeod.1lev1.com';
+    const strapiUrl = STRAPI_URL;
     const graphqlUrl = `${strapiUrl}/graphql`;
     const headers = {
       Authorization: `bearer ${context.jwt}`,

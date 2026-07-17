@@ -1,3 +1,4 @@
+import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 // Shared server helper: loads the authenticated user's EXISTING profile
 // vocabulary (skills, roles, methods, values) as plain id lists.
 //
@@ -35,7 +36,7 @@ export async function loadProfileVocabIds(fetch, tok, uid) {
   if (!tok || tok === false || !uid || uid === false) return empty();
 
   try {
-    const res = await fetch(import.meta.env.VITE_URL + '/graphql', {
+    const res = await fetch(STRAPI_GRAPHQL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

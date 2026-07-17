@@ -1,7 +1,7 @@
 import { redirect, fail } from '@sveltejs/kit';
 import { importInvitedMeeting } from '$lib/server/importInvitedMeeting.js';
 
-const baseUrl = import.meta.env.VITE_URL;
+import { STRAPI_URL as baseUrl } from '$lib/server/strapiUrl.js';
 
 export async function load({ cookies }) {
   const fpval = cookies.get('fpval');

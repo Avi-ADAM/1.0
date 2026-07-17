@@ -24,7 +24,7 @@ export const weatherAgent = new Agent({
 
       Use the weatherTool to fetch current weather data.
 `,
-  model: google('gemini-flash-latest'),
+  model: google('gemini-3-flash-preview'),
   tools: { weatherTool },
   memory: new Memory({
     storage: new LibSQLStore({

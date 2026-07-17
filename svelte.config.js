@@ -46,7 +46,20 @@ if (process.env.ADAPTER === 'vercel') {
     kit: {
       adapter: adapter({
         out: 'build'
-      })
+      }),
+      // The node instance (api.1lev1.com) receives cross-origin /api/* calls
+      // from the Vercel-served frontend. Without this, SvelteKit's CSRF check
+      // rejects cross-origin form/multipart POSTs (/api/upload) with 403.
+      // JSON POSTs pass anyway; cookie auth stays same-site (*.1lev1.com).
+      csrf: {
+        trustedOrigins: [
+          'https://www.1lev1.com',
+          'https://1lev1.com',
+          'https://app.1lev1.com',
+          'http://dev.1lev1.com:5173',
+          'http://localhost:5173'
+        ]
+      }
     }
   };
 }

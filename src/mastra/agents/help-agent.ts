@@ -12,8 +12,8 @@ export function createGeneralHelpAgent(apiKey: string, language: string = 'he') 
   // Select model - priority order: Google Flash > Flash Lite > Groq > NVIDIA
   let model;
   if (hasGoogleModelConfig(apiKey)) {
-    console.log('[HelpAgent] Using Google gemini-flash-latest (thinkingBudget=0)');
-    model = createGoogleModel(apiKey, 'gemini-flash-latest', { thinkingBudget: 0 });
+    console.log('[HelpAgent] Using Google gemini-3-flash-preview (thinkingBudget=0)');
+    model = createGoogleModel(apiKey, 'gemini-3-flash-preview', { thinkingBudget: 0 });
   } else if (hasGroqModelConfig()) {
     console.log('[HelpAgent] Using Groq model');
     model = createGroqModel();

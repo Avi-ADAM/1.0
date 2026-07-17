@@ -1,4 +1,5 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 
 const applyToMissionHandler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const { openMissionId, projectId } = params;
@@ -217,7 +218,7 @@ const applyToMissionHandler: ActionExecutionHandler = async (params, context, { 
 
     // 2. Atomic mutation: createMesimabetahalich + updateOpenMission (archive)
     //    (same pattern as finalizeJoinAcceptance main mutation, minus Ask/member parts)
-    const strapiUrl = import.meta.env.VITE_URL || 'https://tovmeod.1lev1.com';
+    const strapiUrl = STRAPI_URL;
     const graphqlUrl = `${strapiUrl}/graphql`;
     const headers = {
       Authorization: `bearer ${context.jwt}`,

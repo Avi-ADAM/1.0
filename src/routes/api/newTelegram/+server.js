@@ -210,7 +210,7 @@ if (!geminiApiKey) throw new Error("Gemini API Key not found!");
 
 const bot = new Telegraf(Token);
 const genAI = new GoogleGenerativeAI(geminiApiKey);
-const geminiModel = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+const geminiModel = genAI.getGenerativeModel({ model: "gemini-3-flash-preview-preview" });
 
 let allD = [];
 let appIds = [];
@@ -1054,7 +1054,7 @@ bot.action(/^editTimerIntervals-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
         const timerData = missionData?.data?.mesimabetahalich?.data?.attributes?.activeTimer?.data;
 
         if (!timerData) {
-            await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+            await ctx.editMessageReplyMarkup(undefined).catch(() => { });
             ctx.reply(getText('timerNotFound', lang));
             return ctx.answerCbQuery();
         }
@@ -1066,7 +1066,7 @@ bot.action(/^editTimerIntervals-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
             .filter(({ interval }) => interval.start && interval.stop);
 
         if (completedIntervals.length === 0) {
-            await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+            await ctx.editMessageReplyMarkup(undefined).catch(() => { });
             ctx.reply(getText('noIntervals', lang));
             return ctx.answerCbQuery();
         }
@@ -1078,7 +1078,7 @@ bot.action(/^editTimerIntervals-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
             )
         ]);
 
-        await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+        await ctx.editMessageReplyMarkup(undefined).catch(() => { });
         ctx.reply(getText('chooseInterval', lang), Markup.inlineKeyboard(buttons).resize());
     } catch (error) {
         console.error('Error in editTimerIntervals:', error);
@@ -1115,7 +1115,7 @@ bot.action(/^editInterval-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
             [Markup.button.callback(getText('backToIntervals', lang), `editTimerIntervals-${missionId}-${userId}-${timerId}`)]
         ];
 
-        await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+        await ctx.editMessageReplyMarkup(undefined).catch(() => { });
         const whatToEdit = lang === 'he' ? 'מה ברצונך לשנות?' : 'What would you like to edit?';
         ctx.reply(`${intervalText}\n\n${whatToEdit}`, Markup.inlineKeyboard(buttons).resize());
     } catch (error) {
@@ -1160,7 +1160,7 @@ bot.action(/^editIntervalField-(\d+)-(\d+)-(\d+)-(\d+)-(start|end)$/, async (ctx
             ? new Date(currentVal).toLocaleString(lang === 'he' ? 'he-IL' : 'en-US', {
                 day: '2-digit', month: '2-digit', year: 'numeric',
                 hour: '2-digit', minute: '2-digit', hour12: false
-              })
+            })
             : '---';
 
         pendingEdits.set(userInfo.uid.toString(), {
@@ -1169,7 +1169,7 @@ bot.action(/^editIntervalField-(\d+)-(\d+)-(\d+)-(\d+)-(start|end)$/, async (ctx
             totalHours: timerData.attributes.totalHours || 0
         });
 
-        await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+        await ctx.editMessageReplyMarkup(undefined).catch(() => { });
         const currentLabel = lang === 'he' ? 'ערך נוכחי' : 'Current value';
         ctx.reply(
             `${currentLabel}: ${currentFormatted}\n\n${getText('editIntervalPrompt', lang)}`,
@@ -1193,7 +1193,7 @@ bot.action(/^cancelEdit-(\d+)$/, async (ctx) => {
 
     pendingEdits.delete(userInfo.uid.toString());
     await ctx.answerCbQuery(lang === 'he' ? 'העריכה בוטלה' : 'Edit cancelled');
-    await ctx.editMessageText(lang === 'he' ? 'העריכה בוטלה.' : 'Edit cancelled.').catch(() => {});
+    await ctx.editMessageText(lang === 'he' ? 'העריכה בוטלה.' : 'Edit cancelled.').catch(() => { });
 });
 
 // ─── Sale Action Handlers ──────────────────────────────────────────────────
@@ -1209,13 +1209,13 @@ bot.action(/^reportSale-(\d+)$/, async (ctx) => {
     try {
         const products = await getUserProducts(userId, fetch);
         if (products.length === 0) {
-            await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+            await ctx.editMessageReplyMarkup(undefined).catch(() => { });
             ctx.reply(getText('noProducts', lang));
         } else {
             const buttons = products.map(p => [
                 Markup.button.callback(`${p.name} | ${p.projectName}`, `saleProd-${p.id}-${userId}`)
             ]);
-            await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+            await ctx.editMessageReplyMarkup(undefined).catch(() => { });
             ctx.reply(getText('chooseProduct', lang), Markup.inlineKeyboard(buttons).resize());
         }
     } catch (error) {
@@ -1238,7 +1238,7 @@ bot.action(/^saleProd-(\d+)-(\d+)$/, async (ctx) => {
         const products = await getUserProducts(userId, fetch);
         const product = products.find(p => p.id == productId);
         if (!product) {
-            await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+            await ctx.editMessageReplyMarkup(undefined).catch(() => { });
             ctx.reply(getText('missionNotFound', lang));
             return ctx.answerCbQuery();
         }
@@ -1270,7 +1270,7 @@ bot.action(/^saleProd-(\d+)-(\d+)$/, async (ctx) => {
         };
         pendingSale.set(userId.toString(), sale);
 
-        await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+        await ctx.editMessageReplyMarkup(undefined).catch(() => { });
         const msg = await ctx.reply(formatSaleCard(sale, lang), {
             parse_mode: 'Markdown',
             ...buildSaleCardKeyboard(sale, userId, lang)
@@ -1301,7 +1301,7 @@ bot.action(/^saleHolder-(\d+)$/, async (ctx) => {
     ]);
     buttons.push([Markup.button.callback(getText('backToStart', lang), `saleBack-${userId}`)]);
 
-    await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+    await ctx.editMessageReplyMarkup(undefined).catch(() => { });
     ctx.reply(getText('chooseHolder', lang), Markup.inlineKeyboard(buttons).resize());
     await ctx.answerCbQuery();
 });
@@ -1324,7 +1324,7 @@ bot.action(/^saleHolderSel-(\d+)-(\d+)$/, async (ctx) => {
     sale.holderName = holder.attributes.username;
     sale.pendingField = null;
 
-    await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+    await ctx.editMessageReplyMarkup(undefined).catch(() => { });
     const msg = await ctx.reply(formatSaleCard(sale, lang), {
         parse_mode: 'Markdown',
         ...buildSaleCardKeyboard(sale, userId, lang)
@@ -1374,7 +1374,7 @@ bot.action(/^saleCancelFld-(\d+)$/, async (ctx) => {
     const sale = pendingSale.get(userId.toString());
     if (sale) sale.pendingField = null;
     await ctx.answerCbQuery(lang === 'he' ? 'בוטל' : 'Cancelled');
-    await ctx.editMessageText(lang === 'he' ? 'ההקלדה בוטלה.' : 'Input cancelled.').catch(() => {});
+    await ctx.editMessageText(lang === 'he' ? 'ההקלדה בוטלה.' : 'Input cancelled.').catch(() => { });
 });
 
 // Back to sale card (from holder list)
@@ -1388,7 +1388,7 @@ bot.action(/^saleBack-(\d+)$/, async (ctx) => {
     if (!sale) { ctx.reply(getText('generalError', lang)); return ctx.answerCbQuery(); }
 
     sale.pendingField = null;
-    await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+    await ctx.editMessageReplyMarkup(undefined).catch(() => { });
     const msg = await ctx.reply(formatSaleCard(sale, lang), {
         parse_mode: 'Markdown',
         ...buildSaleCardKeyboard(sale, userId, lang)
@@ -1448,7 +1448,7 @@ bot.action(/^saleSend-(\d+)$/, async (ctx) => {
         }
 
         pendingSale.delete(userId.toString());
-        await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+        await ctx.editMessageReplyMarkup(undefined).catch(() => { });
         ctx.reply(getText('saleCreated', lang));
     } catch (error) {
         console.error('saleSend error:', error);
@@ -1466,7 +1466,7 @@ bot.action(/^saleCancel-(\d+)$/, async (ctx) => {
 
     pendingSale.delete(userId.toString());
     await ctx.answerCbQuery(lang === 'he' ? 'בוטל' : 'Cancelled');
-    await ctx.editMessageText(getText('saleCancelled', lang)).catch(() => {});
+    await ctx.editMessageText(getText('saleCancelled', lang)).catch(() => { });
 });
 
 // ─── Task (Act) Creation Handlers ──────────────────────────────────────────
@@ -1520,7 +1520,7 @@ bot.action(/^newTask-(\d+)$/, async (ctx) => {
 
     try {
         const projects = await getUserProjectsForTask(userId, fetch);
-        await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+        await ctx.editMessageReplyMarkup(undefined).catch(() => { });
         if (projects.length === 0) {
             ctx.reply(getText('noProjectsForTask', lang));
         } else {
@@ -1557,7 +1557,7 @@ bot.action(/^taskProj-(\d+)-(\d+)$/, async (ctx) => {
         pendingField: null
     });
 
-    await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+    await ctx.editMessageReplyMarkup(undefined).catch(() => { });
     ctx.reply(getText('chooseAssigneeType', lang), Markup.inlineKeyboard([
         [Markup.button.callback(getText('assignToPersonBtn', lang), `taskAsPerson-${userId}`)],
         [Markup.button.callback(getText('assignToRoleBtn', lang), `taskAsRole-${userId}`)],
@@ -1579,7 +1579,7 @@ bot.action(/^taskAsPerson-(\d+)$/, async (ctx) => {
     if (!task) { ctx.reply(getText('generalError', lang)); return ctx.answerCbQuery(); }
 
     const { people } = await getProjectPeopleAndRoles(task.projectId, fetch);
-    await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+    await ctx.editMessageReplyMarkup(undefined).catch(() => { });
     if (people.length === 0) {
         ctx.reply(getText('noPeopleInProject', lang));
     } else {
@@ -1604,7 +1604,7 @@ bot.action(/^taskAsRole-(\d+)$/, async (ctx) => {
     if (!task) { ctx.reply(getText('generalError', lang)); return ctx.answerCbQuery(); }
 
     const { roles } = await getProjectPeopleAndRoles(task.projectId, fetch);
-    await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+    await ctx.editMessageReplyMarkup(undefined).catch(() => { });
     if (roles.length === 0) {
         ctx.reply(getText('noRolesInProject', lang));
     } else {
@@ -1630,7 +1630,7 @@ bot.action(/^taskAsNone-(\d+)$/, async (ctx) => {
     task.assignedUserId = null;
     task.tafkidId = null;
     task.pendingField = 'name';
-    await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+    await ctx.editMessageReplyMarkup(undefined).catch(() => { });
     ctx.reply(getText('taskNamePrompt', lang), Markup.inlineKeyboard([
         [Markup.button.callback(getText('cancelEdit', lang), `taskCancel-${userId}`)]
     ]).resize());
@@ -1656,7 +1656,7 @@ bot.action(/^taskPerson-(\d+)-(\d+)$/, async (ctx) => {
     task.tafkidId = null;
     task.missionId = null;
 
-    await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+    await ctx.editMessageReplyMarkup(undefined).catch(() => { });
 
     // A task is linked to a mission-in-progress the person performs — show that
     // person's in-progress missions in the project. If they have none, skip
@@ -1693,7 +1693,7 @@ bot.action(/^taskMission-(\d+)-(\d+)$/, async (ctx) => {
     task.missionId = missionId === '0' ? null : missionId;
     task.pendingField = 'name';
 
-    await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+    await ctx.editMessageReplyMarkup(undefined).catch(() => { });
     ctx.reply(getText('taskNamePrompt', lang), Markup.inlineKeyboard([
         [Markup.button.callback(getText('cancelEdit', lang), `taskCancel-${userId}`)]
     ]).resize());
@@ -1719,7 +1719,7 @@ bot.action(/^taskRole-(\d+)-(\d+)$/, async (ctx) => {
     task.assignedUserId = null;
     task.pendingField = 'name';
 
-    await ctx.editMessageReplyMarkup(undefined).catch(() => {});
+    await ctx.editMessageReplyMarkup(undefined).catch(() => { });
     ctx.reply(getText('taskNamePrompt', lang), Markup.inlineKeyboard([
         [Markup.button.callback(getText('cancelEdit', lang), `taskCancel-${userId}`)]
     ]).resize());
@@ -1735,7 +1735,7 @@ bot.action(/^taskCancel-(\d+)$/, async (ctx) => {
 
     pendingTask.delete(userId.toString());
     await ctx.answerCbQuery(lang === 'he' ? 'בוטל' : 'Cancelled');
-    await ctx.editMessageText(getText('taskCancelled', lang)).catch(() => {});
+    await ctx.editMessageText(getText('taskCancelled', lang)).catch(() => { });
 });
 
 // --- Text Message Handler (Using global fetch for helpers) ---

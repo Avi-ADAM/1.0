@@ -1,6 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
-import { STRAPI_URL } from '$env/static/private';
+import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 
 /**
  * POST /api/upload

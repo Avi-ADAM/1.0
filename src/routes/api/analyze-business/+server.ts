@@ -70,7 +70,7 @@ async function extractWithGemini(text: string, sourceHint: 'url' | 'text', lang:
     name: 'BusinessExtractor',
     instructions:
       'You extract project/business details from a website page or free-text description. Return JSON only — no explanations, no markdown fences.',
-    model: createGoogleModel(undefined, 'gemini-flash-latest', { thinkingBudget: 0 })
+    model: createGoogleModel(undefined, 'gemini-3-flash-preview', { thinkingBudget: 0 })
   });
 
   const langName = LANG_NAMES[lang];

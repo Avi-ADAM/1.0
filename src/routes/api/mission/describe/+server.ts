@@ -33,7 +33,7 @@ function makeAgent() {
     name: 'MissionDescriptionEditor',
     instructions:
       'You improve and translate mission descriptions. Return only the requested output — no extra commentary.',
-    model: createGoogleModel(undefined, 'gemini-flash-latest', { thinkingBudget: 0 })
+    model: createGoogleModel(undefined, 'gemini-3-flash-preview', { thinkingBudget: 0 })
   });
 }
 

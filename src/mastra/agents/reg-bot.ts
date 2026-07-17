@@ -68,7 +68,7 @@ Behavior rules:
       
       // Priority order: Google Flash (thinkingBudget=0) > Google Flash Lite > Groq > NVIDIA
       if (hasGoogleModelConfig(apiKey)) {
-        models.push({ model: createGoogleModel(apiKey, 'gemini-flash-latest', { thinkingBudget: 0 }), maxRetries: 2 });
+        models.push({ model: createGoogleModel(apiKey, 'gemini-3-flash-preview', { thinkingBudget: 0 }), maxRetries: 2 });
         models.push({ model: createGoogleModel(apiKey, 'gemini-flash-lite-latest'), maxRetries: 2 });
       }
       if (hasGroqModelConfig()) {
@@ -78,7 +78,7 @@ Behavior rules:
         models.push({ model: createNvidiaModel(apiKey), maxRetries: 1 });
       }
       
-      return models.length > 0 ? models : [{ model: createGoogleModel(apiKey, 'gemini-flash-latest', { thinkingBudget: 0 }), maxRetries: 2 }];
+      return models.length > 0 ? models : [{ model: createGoogleModel(apiKey, 'gemini-3-flash-preview', { thinkingBudget: 0 }), maxRetries: 2 }];
     })(),
     tools: {
       getMissionDetailsTool,

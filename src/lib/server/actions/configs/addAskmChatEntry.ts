@@ -1,8 +1,9 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 
 const addAskmChatEntryHandler: ActionExecutionHandler = async (params, context) => {
   const { askId, why } = params;
-  const strapiUrl = import.meta.env.VITE_URL || 'https://tovmeod.1lev1.com';
+  const strapiUrl = STRAPI_URL;
 
   // 1. Fetch current askm chat
   const getRes = await context.fetch(

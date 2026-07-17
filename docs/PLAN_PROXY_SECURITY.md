@@ -365,6 +365,26 @@ Strapi נחסם מבחוץ ומדבר רק עם SvelteKit דרך loopback.
 2. - [x] **סעיף 0.2** — חסימת raw-query בפרודקשן ✅ (2026-06-19)
 3. - [ ] **מחיקת קוד מת** — `reqtosherut.svelte`, `password.svelte`, `amann.svelte`
 4. - [x] **`VITE_URL` → `STRAPI_URL`** (פרטי, `$env/static/private`) ב-`api/send`, `api/action`, `api/upload`, `$lib/server/sendToAdmin.js` — בוצע 2026-07-14. `STRAPI_URL` כבר היה קיים ב-`.env` ובשימוש ב-5 קבצי שרת אחרים (`api-keys`, `apiKeys.ts`, `report`, `translations`, `sync-vocabulary` — האחרון עדיין על `VITE_URL`, לא טופל כאן, מחוץ לסקופ 3 הראוטים). אומת: `check:proxy` ✅, `validate:qids` ✅ (0 שגיאות, 1 warning קדום לא קשור)
+   - [x] **הושלם לכל צד השרת + מעבר ל-runtime (2026-07-16):** נוצר
+     `src/lib/server/strapiUrl.js` — מקור אמת יחיד: `STRAPI_URL`/`STRAPI_GRAPHQL`
+     מ-**`$env/dynamic/private`** (נקרא בזמן ריצה מה-`.env` של הקונטיינר, בלי rebuild)
+     עם fallback ל-`VITE_URL` ל-dev. הוגרו אליו **כל** קבצי השרת: `api/send`,
+     `api/action`, `api/upload`, `api/report`, `api/auth`, `api/translations`,
+     `api/vocab/*`, `api/consent/genesis`, `api/onboard/save`, `api/stat`, `api/cron`,
+     `api/api-keys`, `sendToAdmin`, `apiKeys.ts`, `StrapiClient.ts` (גם תוקן fallback
+     שבור בלי `/graphql`), `actions/index.ts`, כל 18 `actions/configs/*`,
+     `importInvitedMeeting`, `sealedMirror`, `strapiMirror`, `dealsQueries`,
+     `profileVocab`, `vocab/moderation`, וכל ה-`+page.server` (login, signup, me,
+     sales-center, deals/request, gift, moach/chains). `sync-vocabulary.ts` נשאר על
+     `process.env` (רץ גם standalone) אבל מעדיף `STRAPI_URL`. **לא** הוגרו (במכוון):
+     `api/pusher` (VAPID subject — מזהה, לא קריאת Strapi), קבצים אוניברסליים/לקוח
+     (`love/+page.js`, `levDataLoader`, `platform/index.js`) וקוד מת. אומת:
+     `check:proxy` ✅, `validate:qids` ✅, טסטים של `api/action` (22) ✅, build ✅.
+   - [x] **`VITE_REND` (אינסטנס Render שנרדם) הוחלף (2026-07-16):** `api/pingrama`
+     פונה כעת ל-`https://api.1lev1.com/` (ניתן לעקוף ב-runtime עם `REND_URL`);
+     `Bot.svelte` + `routes/chat` פונים ל-`https://api.1lev1.com/api/chat` במקום
+     `rend.1lev1.com` (ל-`/api/chat` יש כבר CORS ל-`www.1lev1.com`). אפשר לסגור את
+     אינסטנס ה-Render אחרי פריסת ה-image המעודכן ל-VPS ואימות.
 5. - [x] **סעיף 2.2.1** — הגירת הקומפוננטות החיות האנונימיות (amana/tikun/hascama, ui selectors, registration, addnew, prPr) — אומת נקי מחדש 2026-07-14, כבר היה מוגר; `convention`/`aitifaqia`/`amanaen`/`amanar`/`tikunar`/`tikuneng`/`tranarb`/`translateeng` לא קיימים בקוד (שמות פנטום)
 6. - [x] sidequest ה-chat (3.6) הושלם ✅ 2026-07-14 (הצד הרלוונטי לפרוקסי)
    - [ ] `test-lev-socket` — עדיין קיים; `page.data.tok` שם כבר בוליאני אז לא דולף
@@ -373,4 +393,73 @@ Strapi נחסם מבחוץ ומדבר רק עם SvelteKit דרך loopback.
 8. - [ ] שלב 2 — rate limiting, body size, CORS
 9. - [ ] שלב 3 — פריסת SvelteKit על ה-VPS, נעילת Strapi ל-`127.0.0.1` + firewall (ufw), Nginx ל-`/admin` + TLS; **ללא** צורך ב-location מיוחד ל-`/uploads` (Cloudinary)
    - [x] קבצי docker + סקריפט פריסה לאינסטנס ה-API נוצרו (2026-07-02): `Dockerfile`, `.dockerignore`, `docker-compose.api.yml`, `deploy-api.ps1`, `/api/health` — ראה `docs/DEPLOY_API_DOCKER.md`
+   - [x] **מנגנון ניתוב תנועת הדפדפן ל-api.1lev1.com נבנה (2026-07-16), ממתין לבדיקת dev + הפעלה:**
+     - `VITE_API_BASE` (build-time, ריק=כבוי): `installApiBasePatch()` ב-`$lib/platform`
+       (מותקן מ-`+layout.js`) מנתב כל `fetch`/XHR של הדפדפן ל-`/api/*` אל הבסיס,
+       עם `credentials:'include'` (ה-cookie same-site — `.1lev1.com`). axios (auth
+       flows) מכוסה דרך פאץ' ה-XHR. דפי `__data.json`/form actions נשארים ב-origin.
+     - CORS מרוכז ב-`hooks.server.js` לכל `/api/*` — allowlist (www/app/1lev1.com +
+       dev.1lev1.com:5173/localhost), עונה ל-preflight OPTIONS, override עם
+       `CORS_ALLOWED_ORIGINS` ב-`.env` של הקונטיינר. `headers.set` כדי לא להכפיל
+       מול ראוטים עם CORS משלהם (`/api/chat`).
+     - `svelte.config.js` (ענף node): `csrf.trustedOrigins` — בלעדיו SvelteKit חוסם
+       POST cross-origin של multipart (`/api/upload`).
+     - vite `server.allowedHosts: ['dev.1lev1.com']` לבדיקת dev עם cookies.
 10. - [ ] שלב 4 — אימות סופי, ניקוי, תיעוד
+
+---
+
+## 9. הפעלת ניתוב הדפדפן ל-api.1lev1.com — סדר בדיקה (dev → prod)
+
+1. **לפרוס את ה-image החדש ל-VPS** (`.\deploy-api.ps1`) — בלי זה אין CORS בצד
+   api.1lev1.com וכל בדיקה תיחסם בדפדפן.
+2. **בדיקת dev אנונימית:** בלוקאל `VITE_API_BASE=https://api.1lev1.com` ב-`.env`,
+   להריץ dev, לבדוק ב-Network שדפים אנונימיים (hascama, love) שולחים `/api/send`
+   ל-api.1lev1.com ומקבלים 200 (עם preflight OPTIONS 204 לפניהם).
+3. **בדיקת dev מחובר (cookies):** מ-localhost הדפדפן לא ישלח את ה-jwt
+   (cross-site + SameSite=Lax). הפתרון: שורה `127.0.0.1 dev.1lev1.com` ב-
+   `C:\Windows\System32\drivers\etc\hosts`, לגלוש ל-`http://dev.1lev1.com:5173`,
+   להתחבר שם (ה-cookie נקבע על `.1lev1.com` בלי Secure ב-dev) — ואז lev/פעולות
+   עוברים דרך api.1lev1.com עם ה-cookie (same-site).
+4. **הפעלה בפרודקשן:** `VITE_API_BASE=https://api.1lev1.com` ב-env של Vercel +
+   redeploy. חזרה לאחור = להסיר את המשתנה ו-redeploy (הכל חוזר יחסי).
+5. **מה זה עדיין לא סוגר:** SSR של Vercel (`+page.server`) ממשיך לפנות ל-Strapi
+   (tovmeod) ישירות — נעילת tovmeod תבוא רק אחרי זה: שער header-סוד ב-nginx
+   שמתיר רק את Vercel, הגנת `/admin` (basic-auth / allowlist IP), ו-firewall.
+
+## 10. strapi-gate — נעילת tovmeod עם סוויץ' (נבנה 2026-07-17)
+
+**המנגנון** (שני צדדים + מתג):
+
+- **צד השרתים (SvelteKit):** `src/hooks.server.js` עוטף את ה-fetch הגלובלי בצד
+  שרת — כל בקשה ל-origin של Strapi (`STRAPI_URL` / `VITE_URL`) מקבלת header
+  `x-strapi-gate` עם הסוד `STRAPI_GATE_KEY` (מ-`$env/dynamic/private`; בלי
+  המשתנה — no-op). מכסה את כל ~45 אתרי הקריאה (login/me/deals/actions/send)
+  בלי לגעת בהם.
+- **צד tovmeod (nginx על ה-VPS):**
+  - `/etc/nginx/conf.d/strapi-gate.conf` — map של הסוד (chmod 600).
+  - `/etc/nginx/conf.d/strapi-gate-state.conf` — מצב פתוח/סגור (map סטטי).
+  - בבלוק של tovmeod: אם אין header נכון וגם המצב סגור → 403, **חוץ מ**
+    `/uploads/*` (תמונות לדפדפן) ו-acme-challenge (חידוש תעודות).
+- **המתג (מה שביקשת):** בשרת — `sudo strapi-gate open` (חושף הכל, לעבודת אדמין),
+  `sudo strapi-gate close` (נועל), `strapi-gate status`. עושה nginx reload לבד.
+
+**תיקוני client שנדרשו** (קריאות דפדפן ישירות ל-tovmeod שנחסמו בעתיד):
+forum `[forumId]` שלח `/api/action` ל-VITE_URL (באג — תוקן ליחסי);
+`ComposeProduct.svelte` העלה ישירות ל-Strapi (תוקן ל-`/api/upload` יחסי);
+`love/+page.js` הפך ל-`+page.server.js` (השאילתה רצה בשרת). legacy שנשאר
+(salesService/authUtils עם bearer מהclient) ממילא מת מאז שה-jwt הפך httpOnly.
+
+**סדר הפעלה:**
+1. חד-פעמי בשרת: `bash /tmp/setup-gate.sh` (הקבצים כבר ב-/tmp; ברירת מחדל פתוח).
+2. להוסיף `STRAPI_GATE_KEY` (מה-`.env` המקומי) ל-env של **Vercel** + redeploy,
+   ולפרוס image חדש ל-api (`.\deploy-api.ps1` — גם בשבילו ה-key ב-.env בשרת).
+3. בדיקה בלי סיכון: `curl -s -o /dev/null -w '%{http_code}' -H "x-strapi-gate: <KEY>"
+   https://tovmeod.1lev1.com/api/cuntries` → 200 גם כשסגור.
+4. `sudo strapi-gate close` → לוודא: אתר עובד (login/lev/me/deals), תמונות
+   נטענות, וגישה ישירה ל-tovmeod (בלי header) מחזירה 403.
+5. תקלה? `sudo strapi-gate open` מחזיר הכל מיד.
+
+**נשאר פתוח גם אחרי הסגירה:** מי שיש לו את הסוד עובר; `/uploads` ציבורי;
+כשצריך אדמין — open, לעבוד, close. עדיין כדאי בהמשך firewall אמיתי (למנוע
+עקיפת nginx על פורט 1337 אם הוא חשוף) — לבדוק `sudo ss -tlnp | grep 1337`.

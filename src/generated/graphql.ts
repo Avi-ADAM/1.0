@@ -3125,12 +3125,16 @@ export enum Enum_Openmashaabim_Kindof {
 
 export enum Enum_Openmashaabim_Source {
   Concierge = 'concierge',
-  Project = 'project'
+  Maagad = 'maagad',
+  Project = 'project',
+  SelfNomination = 'selfNomination'
 }
 
 export enum Enum_Openmission_Source {
   Concierge = 'concierge',
-  Project = 'project'
+  Maagad = 'maagad',
+  Project = 'project',
+  SelfNomination = 'selfNomination'
 }
 
 export enum Enum_Pmash_Kindof {
@@ -4619,6 +4623,8 @@ export type Maagad = {
   members?: Maybe<MaagadMemberRelationResponseCollection>;
   name?: Maybe<Scalars['String']['output']>;
   offers?: Maybe<MaagadOfferRelationResponseCollection>;
+  open_mashaabims?: Maybe<OpenMashaabimRelationResponseCollection>;
+  open_missions?: Maybe<OpenMissionRelationResponseCollection>;
   origin?: Maybe<Enum_Maagad_Origin>;
   pinecone_id?: Maybe<Scalars['String']['output']>;
   process?: Maybe<PartofEntityResponse>;
@@ -4651,6 +4657,22 @@ export type MaagadMembersArgs = {
 
 export type MaagadOffersArgs = {
   filters?: InputMaybe<MaagadOfferFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type MaagadOpen_MashaabimsArgs = {
+  filters?: InputMaybe<OpenMashaabimFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type MaagadOpen_MissionsArgs = {
+  filters?: InputMaybe<OpenMissionFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
   publicationState?: InputMaybe<PublicationState>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -4703,6 +4725,8 @@ export type MaagadFiltersInput = {
   name?: InputMaybe<StringFilterInput>;
   not?: InputMaybe<MaagadFiltersInput>;
   offers?: InputMaybe<MaagadOfferFiltersInput>;
+  open_mashaabims?: InputMaybe<OpenMashaabimFiltersInput>;
+  open_missions?: InputMaybe<OpenMissionFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<MaagadFiltersInput>>>;
   origin?: InputMaybe<StringFilterInput>;
   pinecone_id?: InputMaybe<StringFilterInput>;
@@ -4727,6 +4751,8 @@ export type MaagadInput = {
   members?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   name?: InputMaybe<Scalars['String']['input']>;
   offers?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  open_mashaabims?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  open_missions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   origin?: InputMaybe<Enum_Maagad_Origin>;
   pinecone_id?: InputMaybe<Scalars['String']['input']>;
   process?: InputMaybe<Scalars['ID']['input']>;
@@ -10036,6 +10062,7 @@ export type OpenMashaabim = {
   locale?: Maybe<Scalars['String']['output']>;
   localizations?: Maybe<OpenMashaabimRelationResponseCollection>;
   location?: Maybe<ComponentNewLocation>;
+  maagad?: Maybe<MaagadEntityResponse>;
   maap?: Maybe<MaapEntityResponse>;
   mashaabim?: Maybe<MashaabimEntityResponse>;
   match_suggestions?: Maybe<MatchSuggestionRelationResponseCollection>;
@@ -10184,6 +10211,7 @@ export type OpenMashaabimFiltersInput = {
   locale?: InputMaybe<StringFilterInput>;
   localizations?: InputMaybe<OpenMashaabimFiltersInput>;
   location?: InputMaybe<ComponentNewLocationFiltersInput>;
+  maagad?: InputMaybe<MaagadFiltersInput>;
   maap?: InputMaybe<MaapFiltersInput>;
   mashaabim?: InputMaybe<MashaabimFiltersInput>;
   match_suggestions?: InputMaybe<MatchSuggestionFiltersInput>;
@@ -10227,6 +10255,7 @@ export type OpenMashaabimInput = {
   kindOf?: InputMaybe<Enum_Openmashaabim_Kindof>;
   linkto?: InputMaybe<Scalars['String']['input']>;
   location?: InputMaybe<ComponentNewLocationInput>;
+  maagad?: InputMaybe<Scalars['ID']['input']>;
   maap?: InputMaybe<Scalars['ID']['input']>;
   mashaabim?: InputMaybe<Scalars['ID']['input']>;
   match_suggestions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -10277,6 +10306,7 @@ export type OpenMission = {
   locale?: Maybe<Scalars['String']['output']>;
   localizations?: Maybe<OpenMissionRelationResponseCollection>;
   location?: Maybe<ComponentNewLocation>;
+  maagad?: Maybe<MaagadEntityResponse>;
   match_suggestions?: Maybe<MatchSuggestionRelationResponseCollection>;
   mesimabetahaliches?: Maybe<MesimabetahalichRelationResponseCollection>;
   mission?: Maybe<MissionEntityResponse>;
@@ -10461,6 +10491,7 @@ export type OpenMissionFiltersInput = {
   locale?: InputMaybe<StringFilterInput>;
   localizations?: InputMaybe<OpenMissionFiltersInput>;
   location?: InputMaybe<ComponentNewLocationFiltersInput>;
+  maagad?: InputMaybe<MaagadFiltersInput>;
   match_suggestions?: InputMaybe<MatchSuggestionFiltersInput>;
   mesimabetahaliches?: InputMaybe<MesimabetahalichFiltersInput>;
   mission?: InputMaybe<MissionFiltersInput>;
@@ -10509,6 +10540,7 @@ export type OpenMissionInput = {
   iskvua?: InputMaybe<Scalars['Boolean']['input']>;
   isshift?: InputMaybe<Scalars['Boolean']['input']>;
   location?: InputMaybe<ComponentNewLocationInput>;
+  maagad?: InputMaybe<Scalars['ID']['input']>;
   match_suggestions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   mesimabetahaliches?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   mission?: InputMaybe<Scalars['ID']['input']>;

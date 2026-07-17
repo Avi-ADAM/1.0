@@ -16,7 +16,7 @@ import { env } from '$env/dynamic/private';
 
 // ─── CONFIG ────────────────────────────────────────────────────────────────────
 
-const STRAPI_URL = import.meta.env.VITE_URL ?? 'http://localhost:1337';
+import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 const GROQ_MODEL = env.GROQ_MODEL ?? 'llama-3.1-8b-instant';
 
 // ─── HELPERS ───────────────────────────────────────────────────────────────────

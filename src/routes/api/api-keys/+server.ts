@@ -4,7 +4,7 @@ import { json, error }      from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { generateApiKey }   from '$lib/server/apiKeys';
 
-const STRAPI_URL = process.env.STRAPI_URL!;
+import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 
 // ─── POST — create a new key ──────────────────────────────────────
 

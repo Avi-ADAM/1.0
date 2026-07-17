@@ -30,8 +30,8 @@
   let liveForum = $derived($forumStore[data.forum.id]);
   let messages = $derived(
     (liveForum?.messages?.length ?? 0) >= (data.forum.messages?.length ?? 0)
-      ? liveForum?.messages ?? []
-      : data.forum.messages ?? []
+      ? (liveForum?.messages ?? [])
+      : (data.forum.messages ?? [])
   );
 
   const copy = {
@@ -66,7 +66,8 @@
         [id]: {
           id,
           subject: title,
-          messages: existing.length > serverMessages.length ? existing : serverMessages,
+          messages:
+            existing.length > serverMessages.length ? existing : serverMessages,
           loading: false,
           md
         }
@@ -78,7 +79,7 @@
     const message = event.why?.trim();
     if (!message) return;
 
-    const response = await fetch('/api/action', {
+    const response = await fetch(`/api/action`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

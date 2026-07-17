@@ -20,7 +20,7 @@ import { embedText } from '$lib/embed/gemini-embeddings';
 import { upsertVectors } from '$lib/embed/pinecone';
 import { moderateVocabItem } from '$lib/server/vocab/moderation';
 
-const STRAPI_GRAPHQL = (import.meta.env.VITE_URL ?? 'http://127.0.0.1:1337') + '/graphql';
+import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 
 function adminToken(): string {
 	return String(env.ADMINMONTHER ?? '').replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');

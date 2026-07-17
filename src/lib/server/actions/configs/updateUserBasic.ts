@@ -1,4 +1,5 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 
 /**
  * Update the current user's basic profile fields and settings.
@@ -57,7 +58,7 @@ const handler: ActionExecutionHandler = async (params, context) => {
     };
   }
 
-  const res = await f(import.meta.env.VITE_URL + '/graphql', {
+  const res = await f(STRAPI_GRAPHQL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
     body: JSON.stringify({

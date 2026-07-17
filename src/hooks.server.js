@@ -1,7 +1,92 @@
 
 // hooks.server.(js|ts)
 //import * as Sentry from '@sentry/sveltekit';
+import { env } from '$env/dynamic/private';
 import { getInternalSecret, INTERNAL_HEADER } from '$lib/server/internalSecret.js';
+import { STRAPI_URL } from '$lib/server/strapiUrl.js';
+
+// ── Strapi gate: stamp every server→Strapi request with a shared secret ─────
+// tovmeod's nginx blocks requests without x-strapi-gate once the gate is
+// closed (`strapi-gate close` on the VPS — see docs/PLAN_PROXY_SECURITY.md §10).
+// Patching the global fetch here covers every call site (SSR loads, /api
+// routes, actions) without touching them. No-op unless STRAPI_GATE_KEY is set.
+const STRAPI_GATE_KEY = env.STRAPI_GATE_KEY || '';
+if (STRAPI_GATE_KEY && !globalThis.__strapiGateFetchPatched) {
+  globalThis.__strapiGateFetchPatched = true;
+  // STRAPI_URL covers the runtime address (strapi-green on the api container);
+  // env.VITE_URL covers code paths still building URLs off the public tovmeod
+  // address. Both get stamped — an extra header is harmless.
+  const gateOrigins = new Set(
+    [STRAPI_URL, env.VITE_URL]
+      .filter(Boolean)
+      .map((u) => {
+        try { return new URL(u).origin; } catch { return null; }
+      })
+      .filter(Boolean)
+  );
+  const baseFetch = globalThis.fetch.bind(globalThis);
+  globalThis.fetch = (input, init) => {
+    try {
+      const raw =
+        typeof input === 'string' ? input : input instanceof URL ? input.href : input?.url;
+      if (raw && gateOrigins.has(new URL(raw).origin)) {
+        if (input instanceof Request && !init) {
+          const headers = new Headers(input.headers);
+          headers.set('x-strapi-gate', STRAPI_GATE_KEY);
+          input = new Request(input, { headers });
+        } else {
+          init = { ...(init || {}) };
+          const headers = new Headers(
+            init.headers || (input instanceof Request ? input.headers : undefined)
+          );
+          headers.set('x-strapi-gate', STRAPI_GATE_KEY);
+          init.headers = headers;
+        }
+      }
+    } catch {
+      // gating must never break a fetch — fall through with the original args
+    }
+    return baseFetch(input, init);
+  };
+}
+
+// Frontend origins allowed to call /api/* cross-origin (the api.1lev1.com
+// instance serving browsers that load the app from Vercel). Cookies ride along
+// because *.1lev1.com is same-site; CORS is what un-blocks the JS response.
+// Override with CORS_ALLOWED_ORIGINS (comma-separated) in the runtime .env.
+const DEFAULT_CORS_ORIGINS = [
+  'https://www.1lev1.com',
+  'https://1lev1.com',
+  'https://app.1lev1.com',
+  // dev: hosts-file alias dev.1lev1.com → 127.0.0.1 keeps cookies same-site
+  'http://dev.1lev1.com:5173',
+  'http://localhost:5173',
+  'http://127.0.0.1:5173'
+];
+
+function allowedCorsOrigins() {
+  const fromEnv = (env.CORS_ALLOWED_ORIGINS || '')
+    .split(',')
+    .map((s) => s.trim().replace(/\/+$/, ''))
+    .filter(Boolean);
+  return fromEnv.length ? fromEnv : DEFAULT_CORS_ORIGINS;
+}
+
+// set() (not append) so a route with its own CORS headers (e.g. /api/chat)
+// doesn't end up with duplicate values the browser rejects.
+function applyCorsHeaders(headers, origin, request) {
+  headers.set('Access-Control-Allow-Origin', origin);
+  headers.set('Access-Control-Allow-Credentials', 'true');
+  headers.append('Vary', 'Origin');
+  if (request.method === 'OPTIONS') {
+    headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+    headers.set(
+      'Access-Control-Allow-Headers',
+      request.headers.get('access-control-request-headers') || 'Content-Type'
+    );
+    headers.set('Access-Control-Max-Age', '86400');
+  }
+}
 
 /**
  * Inject the internal proxy secret on same-origin /api/* requests made with the
@@ -165,7 +250,19 @@ export async function handle({ event, resolve }) {
       headers: { Location: '/' }
     });
   } else if (event.url.pathname.startsWith('/api')) {
-    return applySecurityHeaders(await resolve(event), isSecure);
+    const origin = event.request.headers.get('origin');
+    const corsAllowed = origin && allowedCorsOrigins().includes(origin.replace(/\/+$/, ''));
+
+    // Answer preflights here — API routes don't declare OPTIONS handlers.
+    if (corsAllowed && event.request.method === 'OPTIONS') {
+      const preflight = new Response(null, { status: 204 });
+      applyCorsHeaders(preflight.headers, origin, event.request);
+      return applySecurityHeaders(preflight, isSecure);
+    }
+
+    const response = applySecurityHeaders(await resolve(event), isSecure);
+    if (corsAllowed) applyCorsHeaders(response.headers, origin, event.request);
+    return response;
   }
 
   const response = await resolve(event, {

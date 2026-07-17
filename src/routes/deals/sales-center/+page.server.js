@@ -1,4 +1,5 @@
 import { qids } from '../../api/send/qids.js';
+import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 
 export async function load({ locals, fetch }) {
   const uid = locals.uid;
@@ -13,7 +14,7 @@ export async function load({ locals, fetch }) {
   let profilePic = '';
 
   try {
-    const endpoint = import.meta.env.VITE_URL + '/graphql';
+    const endpoint = STRAPI_GRAPHQL;
     const res = await fetch(endpoint, {
       method: 'POST',
       headers: {

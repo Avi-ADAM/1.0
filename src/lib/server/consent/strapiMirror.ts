@@ -16,7 +16,7 @@ import { env } from '$env/dynamic/private';
 import type { ConsentEvent } from '$lib/consent/event';
 import type { StoredPubKey } from './store';
 
-const BASE = (import.meta.env.VITE_URL as string | undefined) ?? 'http://127.0.0.1:1337';
+import { STRAPI_URL as BASE } from '$lib/server/strapiUrl.js';
 
 function adminToken(): string {
   return String(env.ADMINMONTHER ?? '').replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');

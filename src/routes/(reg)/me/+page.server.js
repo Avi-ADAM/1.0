@@ -1,5 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import { qids } from '../../api/send/qids.js';
+import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 
 const DEFAULT_PIC =
   'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
@@ -49,7 +50,7 @@ export async function load({ locals, fetch, depends }) {
   }
 
   try {
-    const res = await fetch(import.meta.env.VITE_URL + '/graphql', {
+    const res = await fetch(STRAPI_GRAPHQL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

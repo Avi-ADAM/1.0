@@ -22,7 +22,7 @@ import { SITE_CONTEXT } from '../../lib/bot/context.js';
 export function createTaskAgent(apiKey: string, language: string = 'he', userId: string) {
   const model = (() => {
     if (hasGoogleModelConfig(apiKey)) {
-      return createGoogleModel(apiKey, 'gemini-flash-latest', { thinkingBudget: 0 });
+      return createGoogleModel(apiKey, 'gemini-3-flash-preview', { thinkingBudget: 0 });
     }
     if (hasGroqModelConfig()) return createGroqModel();
     if (hasNvidiaModelConfig(apiKey)) return createNvidiaModel(apiKey);

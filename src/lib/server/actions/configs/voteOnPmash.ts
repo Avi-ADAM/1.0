@@ -17,6 +17,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { matchOpenMashaabimToUsers } from '$lib/server/matching/engine';
+import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 
 function normalizeVote(v: any): Record<string, any> {
   const uid =
@@ -122,7 +123,7 @@ const voteOnPmashHandler: ActionExecutionHandler = async (params, context, { str
       ? `recurring: true, cycleSize: ${parseInt(String(attrs.cycleSize ?? 1), 10) || 1},`
       : '';
 
-    const strapiUrl = import.meta.env.VITE_URL ?? 'https://tovmeod.1lev1.com';
+    const strapiUrl = STRAPI_URL;
     const graphqlUrl = `${strapiUrl}/graphql`;
     const headers = {
       Authorization: `bearer ${context.jwt}`,

@@ -13,7 +13,8 @@
  *   - lang:        Short text
  *   - status:      Enumeration ['new', 'in_review', 'resolved']  default 'new'
  */
-import { TELEGRAM_BOT_TOKEN_NEW, NEW_TELEGRAM, STRAPI_URL, ADMINMONTHER } from '$env/static/private';
+import { TELEGRAM_BOT_TOKEN_NEW, NEW_TELEGRAM, ADMINMONTHER } from '$env/static/private';
+import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 

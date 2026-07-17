@@ -53,7 +53,7 @@ async function extractWithGemini(
     name: 'MissionExtractor',
     instructions:
       'You extract mission metadata from a name and description. Return JSON only — no explanations, no markdown fences.',
-    model: createGoogleModel(undefined, 'gemini-flash-latest', { thinkingBudget: 0 })
+    model: createGoogleModel(undefined, 'gemini-3-flash-preview', { thinkingBudget: 0 })
   });
 
   const langName = LANG_NAMES[lang];

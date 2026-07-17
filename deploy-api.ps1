@@ -119,7 +119,10 @@ if (-not $Tarball) {
     Step "Pulling image and restarting container"
     # compose 'pull' always fetches the current :latest (server must be logged in for a private package).
     # This VPS has compose v1 (`docker-compose`); fall back to the v2 plugin if present.
-    Invoke-Remote "cd $RemoteDir && DC=`$(docker compose version >/dev/null 2>&1 && echo 'docker compose' || echo docker-compose) && `$DC -f docker-compose.api.yml pull && `$DC -f docker-compose.api.yml up -d && docker image prune -f"
+    # The old container is force-removed AFTER the pull (minimal downtime) and
+    # before 'up' — compose v1 fails with a name conflict when the running
+    # container wasn't created by this exact compose project.
+    Invoke-Remote "cd $RemoteDir && DC=`$(docker compose version >/dev/null 2>&1 && echo 'docker compose' || echo docker-compose) && `$DC -f docker-compose.api.yml pull && (docker rm -f sveltekit-api >/dev/null 2>&1 || true) && `$DC -f docker-compose.api.yml up -d && docker image prune -f"
 }
 else {
     # ---- fallback: docker save -> scp tarball -> docker load ----
@@ -137,7 +140,7 @@ else {
     Remove-Item $TarFile -Force
 
     Step "Loading image and restarting container"
-    Invoke-Remote "cd $RemoteDir && DC=`$(docker compose version >/dev/null 2>&1 && echo 'docker compose' || echo docker-compose) && docker load -i sveltekit-api.tar && rm -f sveltekit-api.tar && `$DC -f docker-compose.api.yml up -d && docker image prune -f"
+    Invoke-Remote "cd $RemoteDir && DC=`$(docker compose version >/dev/null 2>&1 && echo 'docker compose' || echo docker-compose) && docker load -i sveltekit-api.tar && rm -f sveltekit-api.tar && (docker rm -f sveltekit-api >/dev/null 2>&1 || true) && `$DC -f docker-compose.api.yml up -d && docker image prune -f"
 }
 
 # ---------- 4. health check ----------

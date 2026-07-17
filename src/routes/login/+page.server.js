@@ -1,4 +1,4 @@
-const baseUrl = import.meta.env.VITE_URL;
+import { STRAPI_URL as baseUrl } from '$lib/server/strapiUrl.js';
 
 export const actions = {
     login: async ({ request, cookies, url }) => {

@@ -6,7 +6,7 @@
  * rather than the requesting user's session. Never import this from a
  * .svelte component that reaches the client bundle.
  */
-import { STRAPI_URL } from '$env/static/private';
+import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 
 const HTTP_ST_ENDPOINT = STRAPI_URL;
 

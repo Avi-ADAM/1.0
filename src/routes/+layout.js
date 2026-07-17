@@ -1,7 +1,7 @@
 import { dev } from '$app/environment';
 import { inject } from '@vercel/analytics';
 import { locale, loadTranslations } from '$lib/translations';
-import { isMobileBuild, installMobileFetchPatch } from '$lib/platform';
+import { isMobileBuild, installMobileFetchPatch, installApiBasePatch } from '$lib/platform';
 
 // Mobile (Tauri) build is a pure SPA: no SvelteKit server, so no SSR and no
 // +layout.server.js data. Web builds keep SSR exactly as before.
@@ -10,6 +10,7 @@ export const ssr = !import.meta.env.VITE_TAURI;
 if (isMobileBuild) {
   installMobileFetchPatch();
 } else {
+  installApiBasePatch(); // no-op unless VITE_API_BASE is set at build time
   inject({ mode: dev ? 'development' : 'production' });
 }
 

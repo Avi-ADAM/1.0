@@ -1,5 +1,6 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { EmailService } from '../../notifications/EmailService.js';
+import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 
 function formatVotesForInline(votes: any[]): string {
   if (!Array.isArray(votes) || votes.length === 0) return '';
@@ -89,7 +90,7 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
   const tafkidimsStr = finalTafkidims.join(',');
   const otherAsksFragment = variant === 'allVoted' ? 'asks { data { id } }' : '';
 
-  const strapiUrl = import.meta.env.VITE_URL || 'https://tovmeod.1lev1.com';
+  const strapiUrl = STRAPI_URL;
   const graphqlUrl = `${strapiUrl}/graphql`;
   const headers = {
     Authorization: `bearer ${context.jwt}`,

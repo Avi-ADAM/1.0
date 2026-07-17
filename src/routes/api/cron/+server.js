@@ -1,4 +1,4 @@
-const baseUrl = import.meta.env.VITE_URL;
+import { STRAPI_URL as baseUrl } from '$lib/server/strapiUrl.js';
 let url = baseUrl+'/api/cuntries/5';
 // Deploy webhook is a secret — prefer the server-only var. The VITE_ fallback
 // keeps the existing deployment working until the env is renamed (see docs).

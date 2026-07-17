@@ -152,8 +152,8 @@ No context: "open a task for the developers role" -> {"type": "task", "confidenc
       // Priority order: Google Flash → Google Flash Lite → Groq → NVIDIA (last resort)
       if (hasGoogleModelConfig(apiKey)) {
         try {
-          console.log('[IntentAgent] Using Google gemini-flash-latest (thinkingBudget=0)');
-          return createGoogleModel(apiKey, 'gemini-flash-latest', { thinkingBudget: 0 });
+          console.log('[IntentAgent] Using Google gemini-3-flash-preview (thinkingBudget=0)');
+          return createGoogleModel(apiKey, 'gemini-3-flash-preview', { thinkingBudget: 0 });
         } catch (e) {
           console.warn('[IntentAgent] Google Flash failed, trying Flash Lite...', e);
           try {

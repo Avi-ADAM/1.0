@@ -220,7 +220,7 @@ const analyzeWithGeminiStep = createStep({
     // src/mastra/agents/*.
     const models: Array<{ model: any; maxRetries: number }> = [];
     if (hasGoogleModelConfig()) {
-      models.push({ model: createGoogleModel(undefined, 'gemini-flash-latest', { thinkingBudget: 0 }), maxRetries: 2 });
+      models.push({ model: createGoogleModel(undefined, 'gemini-3-flash-preview', { thinkingBudget: 0 }), maxRetries: 2 });
       models.push({ model: createGoogleModel(undefined, 'gemini-flash-lite-latest'), maxRetries: 2 });
     }
     if (hasGroqModelConfig()) {

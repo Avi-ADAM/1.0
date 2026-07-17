@@ -18,6 +18,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 
 function normalizeVote(v: any): Record<string, any> {
   const uid =
@@ -337,7 +338,7 @@ const voteOnMaapHandler: ActionExecutionHandler = async (params, context, { stra
       const agprice = om ? (myp + easy) / 2 : myp;
       const total = computeTotal(kindOf, agprice, hm, sqadualed, sqadualedf);
 
-      const strapiUrl = import.meta.env.VITE_URL ?? 'https://tovmeod.1lev1.com';
+      const strapiUrl = STRAPI_URL;
       const graphqlUrl = `${strapiUrl}/graphql`;
       const headers = {
         Authorization: `bearer ${context.jwt}`,

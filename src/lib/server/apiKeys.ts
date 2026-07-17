@@ -2,7 +2,7 @@
 import crypto from 'crypto';
 import 'dotenv/config';
 
-const STRAPI_URL   = process.env.STRAPI_URL!;
+import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 const STRAPI_TOKEN = process.env.STRAPI_API_NEW!;
 
 export const KEY_PREFIX = '1lev1_';

@@ -1,7 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import { ADMINMONTHER } from '$env/static/private';
 
-const EP = import.meta.env.VITE_URL + '/graphql';
+import { STRAPI_GRAPHQL as EP } from '$lib/server/strapiUrl.js';
 
 function normalizeToken(value) {
   return String(value ?? '').replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');

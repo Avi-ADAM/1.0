@@ -8,7 +8,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 
-const baseUrl = import.meta.env.VITE_URL;
+import { STRAPI_URL as baseUrl } from '$lib/server/strapiUrl.js';
 
 type SaveItem = { name: string; existingId?: string; descrip?: string };
 type Lang = 'he' | 'en' | 'ar';

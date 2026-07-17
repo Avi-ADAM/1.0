@@ -13,6 +13,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { matchOpenMashaabimToUsers } from '$lib/server/matching/engine';
 import { restimeLabel, voteUrl } from './actionUtils.js';
+import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 
 // ─── helpers ───────────────────────────────────────────────────────────────
 async function gql(
@@ -21,7 +22,7 @@ async function gql(
   query: string,
   variables?: Record<string, unknown>
 ) {
-  const res = await fetchFn(import.meta.env.VITE_URL + '/graphql', {
+  const res = await fetchFn(STRAPI_GRAPHQL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

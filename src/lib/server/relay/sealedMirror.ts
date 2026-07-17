@@ -13,7 +13,7 @@ import { env } from '$env/dynamic/private';
 import type { SealedEnvelope } from '$lib/space/e2e/seal';
 import { isSealedEnvelopeShape } from '$lib/space/e2e/seal';
 
-const BASE = (import.meta.env.VITE_URL as string | undefined) ?? 'http://127.0.0.1:1337';
+import { STRAPI_URL as BASE } from '$lib/server/strapiUrl.js';
 
 function adminToken(): string {
   return String(env.ADMINMONTHER ?? '').replace(/\s+/g, '').replace(/^ADMINMONTHER=/, '');

@@ -40,16 +40,15 @@
   let topCountry = $state({ name: '', count: 0 });
 
   onMount(() => {
-    data.streamed.data.then(function (data) {
+    data.streamed.data.then(function ({ list, total }) {
       isok = true;
-      noof = data.total;
-      console.log(noof, 'tesr');
+      noof = total;
 
       let maxCount = 0;
       let activeCount = 0;
       let topC = { name: '', count: 0 };
 
-      data.forEach((d) => {
+      list.forEach((d) => {
         dataLookup.set(d[dataJoinKey], d);
 
         // Calculate stats
@@ -104,7 +103,7 @@
         {$t('love.title')} - {noof}
       </h1>
 
-      {#if value.length > 0 && isok}
+      {#if value.list.length > 0 && isok}
         <div class="wwa">
           <div class="chart-container">
             <LayerCake

@@ -1,4 +1,5 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 
 /**
  * Append a chat entry to an Ask record (PUT /api/asks/:id).
@@ -10,7 +11,7 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
  */
 const addAskChatEntryHandler: ActionExecutionHandler = async (params, context) => {
   const { askId, why, what } = params;
-  const strapiUrl = import.meta.env.VITE_URL || 'https://tovmeod.1lev1.com';
+  const strapiUrl = STRAPI_URL;
 
   // 1. Fetch current ask chat
   const getRes = await context.fetch(

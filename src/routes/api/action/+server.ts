@@ -20,7 +20,8 @@ import { NotificationOrchestrator } from '$lib/server/notifications/Notification
 import type { ActionContext } from '$lib/server/actions/types.js';
 // Import action configurations to register them
 import '$lib/server/actions/configs/index.js';
-import { ADMINMONTHER, STRAPI_URL } from '$env/static/private';
+import { ADMINMONTHER } from '$env/static/private';
+import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { isInternalRequest } from '$lib/server/internalSecret.js';
 
 // Environment variables

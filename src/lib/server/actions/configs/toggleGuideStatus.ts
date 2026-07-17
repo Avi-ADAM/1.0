@@ -1,4 +1,5 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 
 /**
  * Toggle the onboarding guide visibility for the current user.
@@ -20,7 +21,7 @@ const handler: ActionExecutionHandler = async (params, context) => {
   // show=false (stop guide)  → profilManualAlready=true
   const profilManualAlready = !show;
 
-  const res = await f(import.meta.env.VITE_URL + '/graphql', {
+  const res = await f(STRAPI_GRAPHQL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
     body: JSON.stringify({

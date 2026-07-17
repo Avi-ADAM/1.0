@@ -1,4 +1,5 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
 
 const CATALOG: Record<string, string> = {
   mashaabims: 'name',
@@ -18,7 +19,7 @@ const handler: ActionExecutionHandler = async (params, context) => {
 
   const more = lang !== 'en' ? `localizations { data { attributes { ${field} } } }` : '';
 
-  const res = await f(import.meta.env.VITE_URL + '/graphql', {
+  const res = await f(STRAPI_GRAPHQL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
     body: JSON.stringify({
