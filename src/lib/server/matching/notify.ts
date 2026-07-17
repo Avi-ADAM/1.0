@@ -25,27 +25,31 @@ function buildNotification(
   entityName: string,
   projectName: string
 ): NotificationData {
+  // Concierge-published needs are project-less — phrase without the rikma.
+  const inProjectHe = projectName ? ` ברקמה "${projectName}"` : '';
+  const inProjectEn = projectName ? ` in project "${projectName}"` : '';
+
   if (kind === 'resource') {
     return {
       title: {
-        he: 'הזדמנות חדשה למשאב שלך מחכה בלב 💚',
-        en: 'A new opportunity for your resource is waiting in your heart 💚'
+        he: 'יש הצעה חדשה שיכולה להתאים לך 💚',
+        en: 'There is a new suggestion that could fit you 💚'
       },
       body: {
-        he: `הרקמה "${projectName}" מחפשת את המשאב "${entityName}" — בדיוק מה שיש לך להציע. היכנסו לעמוד הלב כדי להגיב.`,
-        en: `The project "${projectName}" is looking for the resource "${entityName}" — exactly what you have to offer. Visit your heart page to respond.`
+        he: `מחפשים את המשאב "${entityName}"${inProjectHe} — בדיוק מה שיש לך להציע. היכנסו לעמוד הלב כדי להגיב.`,
+        en: `The resource "${entityName}"${inProjectEn} is wanted — exactly what you have to offer. Visit your heart page to respond.`
       },
       metadata: { url: 'lev', priority: 'normal' }
     };
   }
   return {
     title: {
-      he: 'הצעה חדשה למשימה מחכה לך בלב 💚',
-      en: 'A new mission suggestion is waiting in your heart 💚'
+      he: 'יש הצעה חדשה שיכולה להתאים לך 💚',
+      en: 'There is a new suggestion that could fit you 💚'
     },
     body: {
-      he: `המשימה "${entityName}" ברקמה "${projectName}" מתאימה לכישורים ולתפקידים שלך. היכנסו לעמוד הלב כדי להגיב.`,
-      en: `The mission "${entityName}" in project "${projectName}" matches your skills and roles. Visit your heart page to respond.`
+      he: `המשימה "${entityName}"${inProjectHe} מתאימה לכישורים ולתפקידים שלך. היכנסו לעמוד הלב כדי להגיב.`,
+      en: `The mission "${entityName}"${inProjectEn} matches your skills and roles. Visit your heart page to respond.`
     },
     metadata: { url: 'lev', priority: 'normal' }
   };

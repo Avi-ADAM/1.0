@@ -26,6 +26,7 @@ import {
 } from './scoring';
 import { sendNewSuggestionEmails, type SuggestionRecipient } from './notify';
 import { isLocationCompatible, type GeoLocation } from './geo';
+import { isWithinSendWindow, underDailyCap, capWindowStartIso } from './emailPolicy';
 
 /** Hard caps so one event can never fan out unboundedly. */
 const MAX_CANDIDATES = 500;
@@ -50,6 +51,31 @@ function userLocations(attrs: any): GeoLocation[] {
   const loc = attrs?.location;
   if (!loc) return [];
   return Array.isArray(loc) ? loc : [loc];
+}
+
+/**
+ * How many suggestion emails each of these users already got inside the
+ * rolling cap window (counted from notifiedAt on their existing rows).
+ * Returns an empty map on failure — failing open would spam, failing closed
+ * would silence everyone, so a partial count (0) that allows sending mirrors
+ * the pre-policy behavior and is the least surprising fallback.
+ */
+async function recentEmailCounts(deps: MatchDeps, userIds: string[]): Promise<Map<string, number>> {
+  const counts = new Map<string, number>();
+  if (userIds.length === 0) return counts;
+  try {
+    const res = await deps.strapi.execute('213recentSuggestionEmailCounts', {
+      uids: userIds,
+      since: capWindowStartIso()
+    });
+    for (const row of res?.data?.matchSuggestions?.data ?? []) {
+      const uid = oneId(row.attributes?.user);
+      if (uid) counts.set(uid, (counts.get(uid) ?? 0) + 1);
+    }
+  } catch (err) {
+    console.error('[matching] recentEmailCounts failed (treating as 0):', err);
+  }
+  return counts;
 }
 
 async function inBatches<T>(items: T[], size: number, fn: (item: T) => Promise<void>): Promise<void> {
@@ -149,10 +175,21 @@ export async function matchOpenMissionToUsers(
       .sort((a, b) => b.match.score - a.match.score)
       .slice(0, MAX_SUGGESTIONS_PER_EVENT);
 
+    // Email policy: only inside the local send window, and only for users
+    // still under their rolling daily cap. Others get status 'new' (in-app only).
+    const windowOpen = isWithinSendWindow();
+    const sentCounts = windowOpen
+      ? await recentEmailCounts(deps, scored.map((s) => String(s.user.id)))
+      : new Map<string, number>();
+
     let created = 0;
     const emailable: SuggestionRecipient[] = [];
     await inBatches(scored, CREATE_CONCURRENCY, async ({ user, match }) => {
-      const wantsMail = user.attributes?.noMail !== true && !!user.attributes?.email;
+      const wantsMail =
+        user.attributes?.noMail !== true &&
+        !!user.attributes?.email &&
+        windowOpen &&
+        underDailyCap(sentCounts.get(String(user.id)) ?? 0);
       const ok = await createSuggestion(deps, {
         userId: String(user.id),
         openMissionId: mission.id,
@@ -241,10 +278,20 @@ export async function matchOpenMashaabimToUsers(
       })
       .slice(0, MAX_SUGGESTIONS_PER_EVENT);
 
+    // Same email policy as the mission flow (send window + rolling daily cap).
+    const windowOpen = isWithinSendWindow();
+    const sentCounts = windowOpen
+      ? await recentEmailCounts(deps, relevant.map((u) => String(u.id)))
+      : new Map<string, number>();
+
     let created = 0;
     const emailable: SuggestionRecipient[] = [];
     await inBatches(relevant, CREATE_CONCURRENCY, async (user) => {
-      const wantsMail = user.attributes?.noMail !== true && !!user.attributes?.email;
+      const wantsMail =
+        user.attributes?.noMail !== true &&
+        !!user.attributes?.email &&
+        windowOpen &&
+        underDailyCap(sentCounts.get(String(user.id)) ?? 0);
       const ok = await createSuggestion(deps, {
         userId: String(user.id),
         openMashaabimId: String(om.id),

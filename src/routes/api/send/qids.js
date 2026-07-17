@@ -13151,6 +13151,18 @@ export const qids = {
     }
   }`,
 
+  '213recentSuggestionEmailCounts': `query RecentSuggestionEmailCounts($uids: [ID], $since: DateTime) {
+    matchSuggestions(
+      filters: { and: [
+        { user: { id: { in: $uids } } },
+        { notifiedAt: { gte: $since } }
+      ] }
+      pagination: { limit: 1000 }
+    ) {
+      data { id attributes { user { data { id } } } }
+    }
+  }`,
+
   '212levResourceMatchSuggestions': `query LevResourceMatchSuggestions($idL: ID!) {
     matchSuggestions(
       filters: { and: [
