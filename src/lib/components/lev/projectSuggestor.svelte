@@ -2,6 +2,7 @@
   import Tile from '$lib/celim/tile.svelte';
   import { Drawer } from 'vaul-svelte';
   import { page } from '$app/state';
+  import { goto } from '$app/navigation';
   import { executeAction } from '$lib/client/actionClient';
   import { clickOutside } from './outsidclick.js';
   import { scale, fly } from 'svelte/transition';
@@ -99,7 +100,11 @@
     myAskUsers = [],
     myRound = null, // latest round terms on my application (my own counter-offer)
     order = {},
-    onModal
+    onModal,
+    // Project-less sources (PLAN_HUB_LEV_DEMAND_SYNC r2): identity click goes
+    // to the wish/maagad page; offerHref replaces the apply flow (maagad).
+    sourceHref = null,
+    offerHref = null
   } = $props();
   let already = $state(false);
   let error1 = $state(null);
@@ -289,10 +294,15 @@
       pcli = 0;
     }, 6000);
     if (pcli >= 2) {
-      onProj?.({ id: projectId });
+      project();
     }
   }
   function project() {
+    // Wish/maagad-sourced needs have no rikma dialog — go to the source page.
+    if (sourceHref) {
+      goto(sourceHref);
+      return;
+    }
     onProj?.({ id: projectId });
   }
   onMount(function () {
@@ -2922,6 +2932,7 @@
               {workways}
               {timeToP}
               {noOfusers}
+              {offerHref}
             />
           </div>
           <!---<div>
@@ -2962,6 +2973,7 @@
     {src}
     {workways}
     {timeToP}
+    {offerHref}
   />
 {/if}
 

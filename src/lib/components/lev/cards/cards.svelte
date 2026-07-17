@@ -1148,6 +1148,8 @@
                   forumId={buble.forumId}
                   oid={buble.id}
                   projectName={buble.projectName}
+                  sourceHref={buble.sourceHref ?? null}
+                  offerHref={buble.offerHref ?? null}
                   role={buble.tafkidims}
                   skills={buble.skills}
                   missionDetails={buble.descrip}
@@ -1197,6 +1199,8 @@
                   already={buble.already}
                   restime={buble.restime}
                   projectName={buble.projectName}
+                  sourceHref={buble.sourceHref ?? null}
+                  offerHref={buble.offerHref ?? null}
                   missionDetails={buble.descrip}
                   notes={buble.hearotMeyuchadot}
                   src={buble.srcb}

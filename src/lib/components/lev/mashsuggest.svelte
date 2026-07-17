@@ -1,6 +1,7 @@
 <script>
   import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
+  import { goto } from '$app/navigation';
   import { fly } from 'svelte/transition';
       	import { Drawer } from 'vaul-svelte';
   import { clickOutside } from './outsidclick.js';
@@ -42,8 +43,17 @@
   function linke() {
     pcli += 1;
     if (pcli >= 2) {
-      onProj?.({ id: projectId });
+      projectNav();
     }
+  }
+
+  function projectNav() {
+    // Wish/maagad-sourced needs have no rikma dialog — go to the source page.
+    if (sourceHref) {
+      goto(sourceHref);
+      return;
+    }
+    onProj?.({ id: projectId });
   }
 
   async function agree(oid) {
@@ -288,7 +298,11 @@
     onLess,
     onProj,
     onHover,
-    onModal
+    onModal,
+    // Project-less sources (PLAN_HUB_LEV_DEMAND_SYNC r2): identity click goes
+    // to the wish/maagad page; offerHref replaces the Askm flow buttons.
+    sourceHref = null,
+    offerHref = null
   } = $props();
   let isOpen = $state(false),
     diunm = $state(false),
@@ -563,6 +577,8 @@ role="button"
     {projectName}
     {src}
     {spnot}
+    {offerHref}
+    onProj={projectNav}
   />
       </div>
       </Drawer.Content>
@@ -598,6 +614,8 @@ role="button"
     {projectName}
     {src}
     {spnot}
+    {offerHref}
+    onProj={projectNav}
   />
 {/if}
 

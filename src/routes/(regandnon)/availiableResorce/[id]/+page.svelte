@@ -297,11 +297,36 @@
 
     let { askedarr = [], alr = $bindable(false), data } = $props();
     console.log(data);
-    
+
     let title = 'This is Svead a Svelte Head Component';
     let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`;
     let description = page?.data.alld?.descrip || om[$lang];
     let url = page.url.toString();
+
+    const FALLBACK_LOGO = 'https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png';
+
+    // Source identity: rikma (project) / demand pool (maagad) / wish (concierge).
+    let hasProject = $derived(!!data.alld?.project?.data);
+    let maagadInfo = $derived(data.alld?.maagadInfo ?? null);
+    let isMaagadSrc = $derived(!!maagadInfo || data.alld?.source === 'maagad');
+    let ratsonId = $derived(data.alld?.ratson?.data?.id ?? null);
+    let ratsonName = $derived(data.alld?.ratson?.data?.attributes?.name ?? '');
+    let sourceName = $derived(
+        data.alld?.project?.data?.attributes?.projectName ??
+            (isMaagadSrc
+                ? `🤝 ${$lang === 'he' ? 'מאגד ביקוש' : 'demand pool'}${maagadInfo?.name ? ` · ${maagadInfo.name}` : ''}`
+                : `🌟 ${$lang === 'he' ? "קונסיירז'" : 'concierge'}${ratsonName ? ` · ${ratsonName}` : ''}`)
+    );
+    const seeMaagad = { he: 'לצפיה במאגד', en: 'See the pool' };
+    const seeWish = { he: 'לצפיה במשאלה', en: 'See the wish' };
+    const offerViaMaagad = {
+        he: 'הצעות למשאב הזה מוגשות דרך עמוד המאגד',
+        en: 'Offers for this resource are made on the pool page'
+    };
+    const offerViaWish = {
+        he: 'הצעת עזרה למשאב הזה מוגשת דרך עמוד המשאלה',
+        en: 'Help with this resource is offered on the wish page'
+    };
 </script>
 
 {#await data.alld}
@@ -354,17 +379,24 @@
                 <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
                     <div class="relative flex items-center space-x-1">
                         <div class="relative">
-                            <img src={data.alld.project.data.attributes.profilePic.data?.attributes.url} alt="" class="w-10 sm:w-16 h-10 sm:h-16 rounded-full" />
+                            <img src={data.alld.project?.data?.attributes?.profilePic?.data?.attributes?.url ?? FALLBACK_LOGO} alt="" class="w-10 sm:w-16 h-10 sm:h-16 rounded-full" />
                         </div>
                         <div class="flex flex-col leading-tight">
                             <div class="sm:text-sm text-md mt-1 flex items-center">
                                 <span class="text-barbi text-center mr-3 sm:text-2xl lg:text-4xl text-xl">{headi[$lang]}</span>
                             </div>
-                            <span class="pn ml-1 text-lg sm:text-xl lg:text-2xl text-grey-200">{data.alld.project.data.attributes.projectName}</span>
+                            <span class="pn ml-1 text-lg sm:text-xl lg:text-2xl text-grey-200">{sourceName}</span>
                         </div>
                     </div>
                     <div>
+                        {#if hasProject}
                         <button onclick={() => project(data.alld.project.data.id)} class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4">{seePr[$lang]}</button>
+                        {:else if maagadInfo?.id}
+                        <a href="/maagad/{maagadInfo.id}" class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4">{seeMaagad[$lang]}</a>
+                        {:else if ratsonId}
+                        <!-- The public wish page — right referral for any visitor -->
+                        <a href="/wish/{ratsonId}" class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4">{seeWish[$lang]}</a>
+                        {/if}
                     </div>
                 </div>
                 <div class="lg:bg-gray-700 bg-transparent rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
@@ -490,7 +522,18 @@
                                 </div>
                             </div>
 
-                            {#if page.data.tok != false}
+                            {#if !hasProject}
+                                <!-- Wish/maagad-sourced resource: the legacy Askm share flow
+                                     needs a rikma — offers go through the source page instead. -->
+                                <div class="flex flex-col gap-3 justify-center items-center mt-7">
+                                    <p class="text-barbi text-center text-xl">{isMaagadSrc ? offerViaMaagad[$lang] : offerViaWish[$lang]}</p>
+                                    {#if maagadInfo?.id}
+                                        <a href="/maagad/{maagadInfo.id}" class="button-perl text-barbi text-2xl px-4 py-3 hover:text-black hover:font-bold">{seeMaagad[$lang]}</a>
+                                    {:else if ratsonId}
+                                        <a href="/wish/{ratsonId}" class="button-perl text-barbi text-2xl px-4 py-3 hover:text-black hover:font-bold">{seeWish[$lang]}</a>
+                                    {/if}
+                                </div>
+                            {:else if page.data.tok != false}
                                 <div class="flex justify-center min-h-fit">
                                     {#if alr == false && !data.alld.declinedsps.data.map((c) => c.id).includes(data.uid)}
                                         <button onclick={second} onmouseenter={() => (hovered = true)} onmouseleave={() => (hovered = false)} class:button-perl={hovered == false} class:button-gold={hovered == true} class=" mx-auto mt-7 text-3xl px-4 py-3 hover:text-black hover:font-bold text-barbi">{iwantto[$lang]}</button>

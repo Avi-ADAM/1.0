@@ -565,11 +565,14 @@ export function buildSuggestionsFromMatchRecords(
 
       acts: mission.attributes?.acts || { data: [] },
 
-      // Concierge branding (PLAN_CONCIERGE §5.2): a project-less open-mission
-      // carries a `ratson` link → processSuggestions renders it as "קונסירג'".
+      // Source identity (PLAN_CONCIERGE §5.2, PLAN_HUB_LEV_DEMAND_SYNC r2): a
+      // project-less open-mission carries a `ratson` (wish/concierge) or a
+      // `maagad` (demand pool) link → processSuggestions brands it accordingly.
       source: mission.attributes?.source,
       ratsonId: mission.attributes?.ratson?.data?.id,
       ratsonName: mission.attributes?.ratson?.data?.attributes?.name,
+      maagadId: mission.attributes?.maagad?.data?.id,
+      maagadName: mission.attributes?.maagad?.data?.attributes?.name,
 
       skills: mission.attributes?.skills || { data: [] },
       tafkidims: mission.attributes?.tafkidims || { data: [] },
@@ -1431,7 +1434,12 @@ export function buildResourceSuggestionsFromMatchRecords(
 
     const omAttrs = om.attributes;
     const project = omAttrs.project?.data;
-    if (!project) continue; // Must have project (legacy rule)
+    // A needed resource may also come from a wish (concierge) or a demand
+    // pool (maagad) instead of a rikma (PLAN_HUB_LEV_DEMAND_SYNC r2) — keep
+    // those; drop only records with no identifiable source at all.
+    const ratsonNode = omAttrs.ratson?.data;
+    const maagadNode = omAttrs.maagad?.data;
+    if (!project && !ratsonNode && !maagadNode && omAttrs.source !== 'concierge') continue;
 
     const mashId = omAttrs.mashaabim?.data?.id ? String(omAttrs.mashaabim.data.id) : null;
     const mySp = mashId ? spByMashaabim.get(mashId) : undefined;
@@ -1442,14 +1450,21 @@ export function buildResourceSuggestionsFromMatchRecords(
     if (spId && declinedIds.map(String).includes(String(spId))) continue;
 
     seen.add(omId);
-    const projectAttrs = project.attributes;
+    const projectAttrs = project?.attributes;
     const myAskm = myAskmByOm.get(omId);
 
     huca.push({
       id: om.id,
-      projectId: project.id,
+      projectId: project?.id ?? '',
       projectName: projectAttrs?.projectName,
       srcb: projectAttrs?.profilePic?.data?.attributes?.formats?.thumbnail?.url || projectAttrs?.profilePic?.data?.attributes?.url,
+
+      // Source identity for project-less needs (wish / demand pool)
+      source: omAttrs.source,
+      ratsonId: ratsonNode?.id,
+      ratsonName: ratsonNode?.attributes?.name,
+      maagadId: maagadNode?.id,
+      maagadName: maagadNode?.attributes?.name,
 
       mashname: omAttrs.name,
       price: omAttrs.price,

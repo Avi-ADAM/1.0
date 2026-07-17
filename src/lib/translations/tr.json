@@ -1355,6 +1355,30 @@
             "he": "אין פעילות כרגע",
             "en": "No activity right now",
             "ar": "لا يوجد نشاط حالياً"
+        },
+        "demandMapTitle": {
+            "he": "מפת הביקוש",
+            "en": "Demand map",
+            "ar": "خريطة الطلب",
+            "ru": "Карта спроса"
+        },
+        "demandMapSub": {
+            "he": "מה מחפשים ומה מציעים עכשיו — מהמאגדים ומהרקמות יחד",
+            "en": "What people seek and offer right now — pools and weaves together",
+            "ar": "ما يبحث عنه الناس وما يعرضونه الآن — التجمّعات والنسائج معًا",
+            "ru": "Что ищут и предлагают прямо сейчас — пулы и ткани вместе"
+        },
+        "demandMapItems": {
+            "he": "פריטים פעילים",
+            "en": "active items",
+            "ar": "عناصر نشطة",
+            "ru": "активных элементов"
+        },
+        "demandMapBtn": {
+            "he": "למפה",
+            "en": "Open map",
+            "ar": "إلى الخريطة",
+            "ru": "К карте"
         }
     }
 }

@@ -60,8 +60,16 @@
 
     // Props חדשים לתמיכה במבנה המודרני
     glowColor = 'green', // מוגדר לירוק עבור משימה מוצעת
-    onProj
+    onProj,
+    // Maagad-sourced need (PLAN_HUB_LEV_DEMAND_SYNC r2): applying doesn't ride
+    // applyToMission — the offer is made on the pool page instead.
+    offerHref = null
   } = $props();
+
+  const offerAtSource = {
+    he: 'להצעה בעמוד המאגד',
+    en: 'Offer on the pool page'
+  };
 
   function hover(x) {
     onHover?.(x);
@@ -448,7 +456,28 @@
     class="p-4 bg-gray-50 dark:bg-gray-900/80 flex gap-3 border-t border-gray-100 dark:border-gray-800"
   >
     {#if low == false}
-      {#if myRoundProposedBy === 'project'}
+      {#if offerHref}
+        <!-- מקור מאגד: ההצעה מוגשת בעמוד המאגד -->
+        <button
+          class="flex-1 py-3 bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold rounded-xl flex justify-center items-center gap-2 transition-all hover:scale-105"
+          onmouseenter={() => hover({ he: 'לא מתאים לי', en: 'not for me' })}
+          onmouseleave={() => hover('0')}
+          onclick={decline}
+        >
+          <div class="w-8 h-8"><No /></div>
+          <span class="whitespace-nowrap">{$t('lev.cards.decline')}</span>
+        </button>
+        <a
+          href={offerHref}
+          class="flex-2 py-3 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg flex justify-center items-center gap-2 transform hover:-translate-y-1 transition-all"
+          style="flex: 2;"
+          onmouseenter={() => hover(offerAtSource)}
+          onmouseleave={() => hover('0')}
+        >
+          <div class="w-8 h-8 text-white"><Lev /></div>
+          <span class="whitespace-nowrap">{offerAtSource[$lang] ?? offerAtSource.he}</span>
+        </a>
+      {:else if myRoundProposedBy === 'project'}
         <!-- B2: הריקמה הציעה הצעה נגדית — לאשר או להעלות סבב נגדי -->
         <button
           class="flex-2 py-3 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg flex justify-center items-center gap-2 transform hover:-translate-y-1 transition-all"

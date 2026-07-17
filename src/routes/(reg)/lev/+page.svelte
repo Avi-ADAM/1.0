@@ -43,6 +43,7 @@
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { fly } from 'svelte/transition';
   import Levchat from '$lib/components/lev/levchat.svelte';
+  import LevDemandPanel from '$lib/components/lev/LevDemandPanel.svelte';
   import Hevel from '$lib/components/lev/hevel.svelte';
   import Rikma from '$lib/components/lev/rikma.svelte';
   import Mesima from '$lib/components/lev/mesima.svelte';
@@ -485,6 +486,10 @@
       />
     {/if}
   </Tooltip>
+
+  <!-- The maagad's discovery map, one tap away from the heart
+       (PLAN_HUB_LEV_DEMAND_SYNC) -->
+  <LevDemandPanel />
 {/if}
 
 <style>

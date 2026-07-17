@@ -1092,17 +1092,35 @@ export function processSuggestions(
 
     // Use stored project data if available (member), otherwise use embedded details (non-member)
     const projectInfo = createProjectInfo(suggestion.projectId);
-    // Concierge-sourced suggestions (PLAN_CONCIERGE §5.2) belong to no weave —
-    // they carry a `ratson` link. Brand them as "קונסירג'" with the concierge logo.
-    const isConcierge = !!(suggestion.ratsonName || suggestion.source === 'concierge');
-    const projectName = isConcierge
-      ? 'קונסירג׳'
-      : (project?.attributes.projectName || suggestion.projectDetails?.name || '');
+    // Project-less suggestions belong to no weave — they carry a `maagad`
+    // (demand pool) or a `ratson` (wish → "קונסירג'", PLAN_CONCIERGE §5.2)
+    // link. Brand them accordingly (PLAN_HUB_LEV_DEMAND_SYNC r2).
+    const isMaagad = !!(suggestion.maagadId || suggestion.maagadName || suggestion.source === 'maagad');
+    const isConcierge =
+      !isMaagad && !!(suggestion.ratsonName || suggestion.ratsonId || suggestion.source === 'concierge');
+    const projectName = isMaagad
+      ? (suggestion.maagadName ? `מאגד · ${suggestion.maagadName}` : 'מאגד ביקוש')
+      : isConcierge
+        ? 'קונסירג׳'
+        : (project?.attributes.projectName || suggestion.projectDetails?.name || '');
     const projectImageUrl = isConcierge
       ? '/logo-concierge.png'
-      : (project?.attributes.profilePic?.data?.attributes?.url || suggestion.projectDetails?.src || '');
+      : isMaagad
+        ? ''
+        : (project?.attributes.profilePic?.data?.attributes?.url || suggestion.projectDetails?.src || '');
     const memberCount = project?.attributes.user_1s?.data?.length || suggestion.projectDetails?.membersCount || 0;
     const restime = project?.attributes.restime || suggestion.projectDetails?.restime;
+
+    // Where the card's identity click should land for project-less sources
+    // (a rikma suggestion keeps the in-page rikma dialog), and where an offer
+    // is made when applyToMission can't serve it (maagad needs are answered
+    // with a threshold offer on the pool page).
+    const sourceHref = isMaagad && suggestion.maagadId
+      ? `/maagad/${suggestion.maagadId}`
+      : isConcierge && suggestion.ratsonId
+        ? `/wish/${suggestion.ratsonId}`
+        : null;
+    const offerHref = isMaagad && suggestion.maagadId ? `/maagad/${suggestion.maagadId}` : null;
 
     // Suggestions sit below actionable votes but above already-voted items —
     // unless the rikma countered the candidate's application (Path B2), in which
@@ -1132,6 +1150,8 @@ export function processSuggestions(
       content: suggestion.content,
       noOfusers: memberCount,
       restime: restime,
+      sourceHref,
+      offerHref,
 
       // Pass through all other fields from raw data
       ...suggestion,
@@ -1198,9 +1218,29 @@ export function processResourceSuggestions(
     // We try to get "real" project info if available to ensure consistency (like member counts)
     const projectInfo = createProjectInfo(projectId);
 
-    // Fallback/Override with huca specific embedded data
-    const finalProjectName = huca.projectName || projectInfo.projectName;
-    const finalSrc = huca.srcb || projectInfo.src || projectInfo.profilePic?.data?.attributes?.url || '';
+    // Fallback/Override with huca specific embedded data. Project-less needs
+    // carry a wish (concierge) or demand-pool (maagad) identity instead
+    // (PLAN_HUB_LEV_DEMAND_SYNC r2).
+    const isMaagad = !!(huca.maagadId || huca.maagadName || huca.source === 'maagad');
+    const isConcierge =
+      !isMaagad && !projectId && !!(huca.ratsonId || huca.ratsonName || huca.source === 'concierge');
+    const finalProjectName = isMaagad
+      ? (huca.maagadName ? `מאגד · ${huca.maagadName}` : 'מאגד ביקוש')
+      : isConcierge
+        ? 'קונסירג׳'
+        : (huca.projectName || projectInfo.projectName);
+    const finalSrc = isConcierge
+      ? '/logo-concierge.png'
+      : (huca.srcb || projectInfo.src || projectInfo.profilePic?.data?.attributes?.url || '');
+
+    // The resource Askm flow needs a rikma — wish/maagad needs are answered
+    // on their source page instead.
+    const sourceHref = isMaagad && huca.maagadId
+      ? `/maagad/${huca.maagadId}`
+      : isConcierge && huca.ratsonId
+        ? `/wish/${huca.ratsonId}`
+        : null;
+    const offerHref = !projectId ? sourceHref : null;
 
     const restime = getProjectRestime(projectId);
 
@@ -1218,8 +1258,6 @@ export function processResourceSuggestions(
       coinlapach: `huca-${huca.id}`,
 
       ...projectInfo,
-      projectName: finalProjectName,
-      src: finalSrc, // project pic for huca logic is 'srcb'
 
       // Huca specific
       id: huca.id,
@@ -1238,7 +1276,15 @@ export function processResourceSuggestions(
       declineddarra: huca.declineddarra,
 
       // Pass through
-      ...huca
+      ...huca,
+
+      // Source identity — set AFTER the passthrough so the branded values win
+      // over huca's raw (possibly empty) projectName/srcb for wish/maagad needs.
+      projectName: finalProjectName,
+      src: finalSrc, // project pic for huca logic is 'srcb'
+      srcb: finalSrc, // the card wiring reads srcb directly
+      sourceHref,
+      offerHref
     };
   });
 }
