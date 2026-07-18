@@ -5,6 +5,8 @@
   import { lang } from '$lib/stores/lang.js';
   import { RingLoader } from 'svelte-loading-spinners';
   import RichText from '$lib/celim/ui/richText.svelte';
+  import { invalidate } from '$app/navigation';
+  import DonateDialog from '$lib/components/revenue/DonateDialog.svelte';
 
   let { data } = $props();
 
@@ -13,6 +15,19 @@
   let project = $derived(data.projectData);
   let attrs = $derived(project?.attributes);
   let coverage = $derived(data.coverage);
+  let available = $derived(data.available !== false);
+  let gate = $derived(data.gate ?? 'off');
+  let isMember = $derived(data.isMember === true);
+  let members = $derived(data.members ?? []);
+  let uid = $derived(data.uid ?? null);
+
+  let donateOpen = $state(false);
+  function openDonate() {
+    donateOpen = true;
+  }
+  function onDonated() {
+    invalidate(`project-support:${projectId}`);
+  }
 
   /** @type {'rtl' | 'ltr'} */
   let dir = $derived($lang === 'he' ? 'rtl' : 'ltr');
@@ -170,7 +185,26 @@
     },
     joinBtn: { he: 'הצטרפות / התחברות', en: 'Join / Log in' },
     toFullPage: { he: 'לעמוד הריקמה המלא', en: 'Full project page' },
-    poweredBy: { he: 'נבנה באהבה על', en: 'Built with love on' }
+    poweredBy: { he: 'נבנה באהבה על', en: 'Built with love on' },
+    unavailableTitle: { he: 'דף התמיכה אינו פעיל', en: 'Support page is not active' },
+    unavailableBody: {
+      he: 'הריקמה עדיין לא פתחה את דף התמיכה הציבורי שלה.',
+      en: 'This rikma has not opened its public support page yet.'
+    },
+    unavailableMembers: {
+      he: 'דף התמיכה פתוח לחברי האתר בלבד — התחבר/י כדי לצפות.',
+      en: 'The support page is open to signed-in members only — please log in.'
+    },
+    backHome: { he: 'לעמוד הבית', en: 'Home' },
+    gateBannerOff: {
+      he: 'הדף כבוי — מבקרים לא רואים אותו. את/ה רואה אותו כי את/ה חבר/ת ריקמה.',
+      en: "This page is OFF — visitors can't see it. You see it because you're a member."
+    },
+    gateBannerMembers: {
+      he: 'הדף פתוח לחברי אתר מזוהים בלבד. אורחים לא רשומים לא יראו אותו.',
+      en: 'This page is visible to signed-in members only. Unregistered guests can’t see it.'
+    },
+    gateManage: { he: 'ניהול דף התמיכה ←', en: 'Manage support page →' }
   };
 
   let pageTitle = $derived(
@@ -197,9 +231,37 @@
   <Header />
 {/if}
 
-{#if project && coverage}
+{#if !available}
+  <!-- Gated off (or members-only for a guest): friendly, self-standing screen. -->
+  <div class="support-page min-h-screen text-white font-sans flex items-center justify-center px-4">
+    <div class="glass rounded-3xl p-10 max-w-md text-center">
+      {#if logoSrc}
+        <div class="logo-ring mx-auto mb-6"><img src={logoSrc} alt={attrs?.projectName} /></div>
+      {/if}
+      {#if attrs?.projectName}
+        <h1 class="text-2xl font-black text-gold mb-3">{attrs.projectName}</h1>
+      {/if}
+      <p class="text-white/70 mb-6">
+        {gate === 'members' && !isRegisteredUser ? t.unavailableMembers[$lang] : t.unavailableBody[$lang]}
+      </p>
+      <div class="flex flex-wrap justify-center gap-3">
+        {#if gate === 'members' && !isRegisteredUser}
+          <a href="/" class="btn-primary">{t.joinBtn[$lang]}</a>
+        {/if}
+        <a href="/project/{projectId}" class="btn-ghost">{t.toFullPage[$lang]}</a>
+      </div>
+    </div>
+  </div>
+{:else if project && coverage}
   <div class="support-page min-h-screen text-white font-sans overflow-x-hidden">
     <div {dir} class="max-w-5xl mx-auto px-4 pb-24">
+      {#if isMember && gate !== 'public'}
+        <!-- Member-only preview banner: this page is not (fully) public yet. -->
+        <div class="gate-banner">
+          <span>{gate === 'off' ? t.gateBannerOff[$lang] : t.gateBannerMembers[$lang]}</span>
+          <a href="/moach/{projectId}/sales">{t.gateManage[$lang]}</a>
+        </div>
+      {/if}
       <!-- ═══════════ 1. HERO ═══════════ -->
       <section class="pt-14 pb-10 text-center relative">
         <div class="hero-glow" aria-hidden="true"></div>
@@ -225,7 +287,7 @@
         </p>
 
         <div class="flex flex-wrap justify-center gap-3 mb-7">
-          <a href="#donate" class="btn-primary">{t.donateCta[$lang]}</a>
+          <button type="button" class="btn-primary" onclick={openDonate}>{t.donateCta[$lang]}</button>
           <a href="#missions" class="btn-secondary">{t.volunteerCta[$lang]}</a>
           {#if attrs.linkToWebsite}
             <a
@@ -379,10 +441,13 @@
           {t.donateTitle[$lang]}
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="glass rounded-2xl p-6 border-t-4 border-t-gold">
+          <div class="glass rounded-2xl p-6 border-t-4 border-t-gold flex flex-col">
             <div class="text-3xl mb-3">💗</div>
             <h3 class="font-bold text-lg mb-2">{t.donateMoney[$lang]}</h3>
-            <p class="text-white/60 text-sm leading-relaxed">{t.donateMoneyDesc[$lang]}</p>
+            <p class="text-white/60 text-sm leading-relaxed mb-4">{t.donateMoneyDesc[$lang]}</p>
+            <button type="button" class="btn-primary !text-sm mt-auto self-start" onclick={openDonate}>
+              {t.donateCta[$lang]}
+            </button>
           </div>
           <div class="glass rounded-2xl p-6 border-t-4 border-t-barbi">
             <div class="text-3xl mb-3">🎁</div>
@@ -528,7 +593,40 @@
   </div>
 {/if}
 
+{#if available && project}
+  <DonateDialog
+    bind:isOpen={donateOpen}
+    {projectId}
+    projectName={attrs?.projectName ?? ''}
+    {members}
+    {isRegisteredUser}
+    {isMember}
+    {uid}
+    onDone={onDonated}
+  />
+{/if}
+
 <style>
+  .gate-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding: 0.75rem 1.1rem;
+    border-radius: 0.9rem;
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    color: #ffe36e;
+    font-size: 0.85rem;
+  }
+  .gate-banner a {
+    color: #fff;
+    font-weight: 700;
+    text-decoration: underline;
+    white-space: nowrap;
+  }
   .support-page {
     background:
       radial-gradient(1200px 500px at 80% -10%, rgba(255, 215, 0, 0.08), transparent 60%),

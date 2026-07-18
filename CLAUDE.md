@@ -1,8 +1,79 @@
-# CLAUDE.md — guidance for Claude / AI agents working in this repo
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 This file is read automatically by Claude Code (and other agents that honour
 `CLAUDE.md`). Read [`AGENTS.md`](./AGENTS.md) too — it holds the project config,
 the Unified Action System, and the Svelte MCP workflow.
+
+---
+
+## Commands
+
+SvelteKit + Svelte 5 app, npm, Node 22.
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Dev server (`vite dev --host`). |
+| `npm run build` | Production build (adapter chosen by env). |
+| `npm run check` | `svelte-kit sync` + `svelte-check` against `jsconfig.json` — the typecheck. |
+| `npm test` | Vitest, single run. |
+| `npm run test:watch` | Vitest watch mode. |
+| `npx vitest run path/to/file.test.ts` | Run **one** test file. |
+| `npx vitest run -t "name"` | Run tests matching a name. |
+| `npm run types:update` | Regenerate GraphQL types after schema changes (`codegen` + `types:extract`). |
+| `npm run validate:qids` | Validate every qid in `qids.js` against the Strapi schema. |
+| `npm run check:proxy` | Proxy-security lint (see `docs/PLAN_PROXY_SECURITY.md`). |
+
+Tests are colocated (`*.test.ts` / `*.integration.test.ts` / `*.pbt.test.ts`
+property-based via fast-check) and run on the `happy-dom`/`jsdom` environment.
+There is no separate lint script — `npm run check` is the gate.
+
+## Architecture — request & data flow
+
+The browser never talks to Strapi directly. Two server proxies front the
+**Strapi** backend (GraphQL), and both now pass through a shared static
+authorization layer.
+
+**1. `/api/send` — the QIDS proxy** (`src/routes/api/send/+server.js`)
+- The client calls it with a `queId` naming a **pre-vetted** query from
+  `src/routes/api/send/qids.js` (the whitelist — raw GraphQL is dev-only).
+- Client helpers live in `src/lib/send/`: `sendTo.svelte` (cookie/JWT path),
+  `sendToSer.js` / `sendToSerTyped.ts` (service path), `canI.js` (permission
+  introspection against `/api/permissions`).
+- `isSer:true` requests get the admin/service token, but **only** when the
+  request also carries the internal secret (`isInternalRequest`) injected by
+  `handleFetch`. A client cannot forge it.
+
+**2. `/api/action` + `/api/v1/actions` — the Unified Action System**
+(`src/lib/server/actions/`) — the required path for all **writes** / server-side
+operations. Flow: Validation → Authorization → Execution → Notifications →
+structured result. Actions are defined in `src/lib/server/actions/configs/`
+(~140 configs, one per action) and registered via `registry.ts`. Execute with:
+```typescript
+import { actionService } from '$lib/server/actions/index.js';
+const result = await actionService.executeAction('actionKey', params, context);
+```
+
+**Authorization is two-layered** (`src/lib/server/authz/`, see
+`docs/PLAN_API_PERMISSIONS.md`):
+- **Static** — principal-kind × operation, answered synchronously from manifests
+  (`qidsAccess.js` for qids, `ActionConfig.access` for actions). Gated by
+  `AUTHZ_MODE` env: `off` / `log` (default, shadow-only) / `enforce`. API-key
+  traffic is **always** enforced. This layer also powers `/api/permissions`.
+- **Entity-level** — ownership/membership rules in the action's `authRules` and
+  inline guards in `/api/send`, evaluated at execution. When these exist the
+  static answer is `conditional`, not `allowed`.
+
+**Server→Strapi fetch** is globally patched in `hooks.server.js` to stamp the
+`x-strapi-gate` secret (nginx blocks ungated requests) and CORS for the
+`api.1lev1.com` instance. Use `STRAPI_URL` from `src/lib/server/strapiUrl.js` in
+server code — never `import.meta.env.VITE_URL`.
+
+**Route groups** under `src/routes/`: `(reg)` = registered-user-only pages
+(`lev`, `moach`, `hub`, `me`, `onboard`, …); `(regandnon)` = public/mixed
+(`project`, `user`, `consensus`, `meeting`, …). `src/routes/api/` holds all
+server endpoints.
 
 ---
 
