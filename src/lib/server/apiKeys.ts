@@ -85,8 +85,15 @@ export interface VerifiedApiKey {
   name: string | null;
   /** Rikma the key is scoped to, if any. Sales-API keys always carry one. */
   project: { id: string } | null;
-  /** Granted scopes, e.g. ["sales:report"]. Empty ⇒ legacy/unscoped key. */
-  scopes: string[];
+  /**
+   * Raw `scopes` JSON from Strapi. Two shapes coexist:
+   *  - a flat array of scope strings (e.g. ["sales:report"]) — checked with
+   *    `assertScope` by the External Sales API.
+   *  - `{ projects?, ops? }` (or a legacy plain array of project ids) — read
+   *    via `normalizeApiKeyScopes` by the static authz layer (see authz/types.ts).
+   * Empty/absent ⇒ legacy/unscoped key.
+   */
+  scopes: unknown;
   revoked: boolean;
   /** Optional hardening: allowed request origins. */
   allowedOrigins: string[];
@@ -95,6 +102,35 @@ export interface VerifiedApiKey {
 
 const KEY_CACHE = new Map<string, { verified: VerifiedApiKey; expiresAt: number }>();
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 דקות
+
+// ─── Scopes ──────────────────────────────────────────────────────
+// Op/project scopes narrow what a key may do on behalf of its owning user:
+//   { projects: [projectIds], ops: ['action:createTask', ...] }
+// A legacy plain array is treated as project ids (per-project scoping).
+
+export interface ApiKeyScopes {
+  projects?: string[];
+  ops?: string[];
+}
+
+export function normalizeApiKeyScopes(raw: unknown): ApiKeyScopes | null {
+  if (raw == null) return null;
+  if (Array.isArray(raw)) {
+    const projects = raw.map(String).filter(Boolean);
+    return projects.length ? { projects } : null;
+  }
+  if (typeof raw === 'object') {
+    const obj = raw as Record<string, unknown>;
+    const projects = Array.isArray(obj.projects) ? obj.projects.map(String).filter(Boolean) : undefined;
+    const ops = Array.isArray(obj.ops) ? obj.ops.map(String).filter(Boolean) : undefined;
+    if (!projects?.length && !ops?.length) return null;
+    return {
+      ...(projects?.length ? { projects } : {}),
+      ...(ops?.length ? { ops } : {})
+    };
+  }
+  return null;
+}
 
 /**
  * Full verification: returns the owning user plus the key's scoping metadata
@@ -196,7 +232,7 @@ export async function verifyApiKeyDetailed(rawKey: string): Promise<VerifiedApiK
     keyId: String(keyId),
     name: keyData.name ?? null,
     project: keyData.project?.data ? { id: String(keyData.project.data.id) } : null,
-    scopes: Array.isArray(keyData.scopes) ? keyData.scopes : [],
+    scopes: keyData.scopes ?? null,
     revoked: !!keyData.revoked,
     allowedOrigins: Array.isArray(keyData.allowed_origins) ? keyData.allowed_origins : [],
     lastUsedAt: keyData.lastUsedAt ?? null
@@ -207,16 +243,19 @@ export async function verifyApiKeyDetailed(rawKey: string): Promise<VerifiedApiK
 }
 
 // ─── verifyApiKey מהיר יותר עם userId ────────────────────────────
-// Backwards-compatible wrapper: returns just the owning user object (or null).
+// Backwards-compatible wrapper: returns just the owning user object (or null),
+// with normalized `{ projects, ops }` scopes attached when present — this is
+// what the authz layer's Principal.scopes reads (see authz/principal.ts).
 // A revoked key resolves to null everywhere it is used.
 
 export async function verifyApiKey(rawKey: string) {
   const verified = await verifyApiKeyDetailed(rawKey);
   if (!verified || verified.revoked) return null;
-  return verified.user;
+  const scopes = normalizeApiKeyScopes(verified.scopes);
+  return scopes ? { ...verified.user, scopes } : verified.user;
 }
 
-/** True iff the verified key was granted the given scope. */
+/** True iff the verified key was granted the given (flat-string) scope. */
 export function assertScope(key: VerifiedApiKey, scope: string): boolean {
   return Array.isArray(key.scopes) && key.scopes.includes(scope);
 }

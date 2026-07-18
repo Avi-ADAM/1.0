@@ -202,7 +202,11 @@ export const createTaskAction: ActionConfig = {
       description: 'End date'
     }
   },
-  
+
+  // Exposed to external API keys via /api/v1/actions (was the hardcoded
+  // ALLOWED_ACTIONS whitelist there).
+  access: ['user', 'serviceAdmin', 'apiKey'],
+
   authRules: [
     {
       type: 'jwt',

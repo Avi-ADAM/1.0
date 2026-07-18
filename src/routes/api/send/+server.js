@@ -8,6 +8,8 @@ import { STRAPI_URL } from '$lib/server/strapiUrl.js'
 const ep = STRAPI_URL + "/graphql"
 import { createHash } from 'node:crypto'
 import { isInternalRequest } from '$lib/server/internalSecret.js'
+import { resolveServicePrincipal, resolveCookiePrincipal } from '$lib/server/authz/principal.js'
+import { applyAuthz } from '$lib/server/authz/authorize.js'
 
 function normalizeSecret(value, name) {
 	let normalized = String(value ?? '').replace(/\s+/g, '');
@@ -104,6 +106,18 @@ export async function POST({ request, cookies }) {
 		if (incoming !== consensusProxySecret) {
 			throw error(401, 'Unauthorized: Invalid consensus proxy secret');
 		}
+	}
+
+	// ── Static authorization: principal kind × qid (see src/lib/server/authz) ─
+	// Runs after the consensus-secret validation above so a bad secret still
+	// 401s exactly as before. Raw dev queries (no queId) are dev-only and skip
+	// this layer. AUTHZ_MODE=log (default) only logs would-be denials;
+	// AUTHZ_MODE=enforce returns 403. Entity-level guards further down and the
+	// per-action authRules are unaffected — this is the coarse first layer.
+	const principal = isSer ? resolveServicePrincipal(request) : resolveCookiePrincipal(cookies);
+	if (queId) {
+		const { blocked, decision } = applyAuthz({ principal, op: `send:${queId}` });
+		if (blocked) throw error(403, `Forbidden: ${decision.reason}`);
 	}
 
 	// ── Token selection ──────────────────────────────────────────────────────
