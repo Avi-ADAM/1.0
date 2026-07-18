@@ -23,7 +23,7 @@ export const qidsAccess = {
   '203findMatanotByText': { allow: ['user', 'serviceAdmin'] },
   '204getAllMashaabims': { allow: ['user', 'serviceAdmin'] },
   '205getMashaabimsByIds': { allow: ['user', 'serviceAdmin'] },
-  '206getSpForEdit': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  '206getSpForEdit': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '220mapJoinableRatsons': { allow: ['user', 'serviceAdmin'] },
   '221mapOpenMissions': { allow: ['user', 'serviceAdmin'] },
   '222mapOpenMashaabims': { allow: ['user', 'serviceAdmin'] },
@@ -46,7 +46,7 @@ export const qidsAccess = {
   '253createPersonalMatanotFromSp': { allow: ['user', 'serviceAdmin'] },
   '254updateSpOfferState': { allow: ['user', 'serviceAdmin'] },
   '255setMatanotArchived': { allow: ['user', 'serviceAdmin'] },
-  '258listMyMissionOffers': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  '258listMyMissionOffers': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '259createMissionOffer': { allow: ['user', 'serviceAdmin'] },
   '260updateMissionOffer': { allow: ['user', 'serviceAdmin'] },
   '261findMissionByName': { allow: ['user', 'serviceAdmin'] },
@@ -57,8 +57,8 @@ export const qidsAccess = {
   '276myOfferingsViaUser': { allow: ['user', 'serviceAdmin'] },
   '277myMissionOffersViaUser': { allow: ['user', 'serviceAdmin'] },
   '278myMissionsViaUser': { allow: ['user', 'serviceAdmin'] },
-  '272myOfferingsCounts': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
-  '273myMissionsFull': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  '272myOfferingsCounts': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  '273myMissionsFull': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '274getProjectMembers': { allow: ['user', 'serviceAdmin'] },
   '275myRikmasLite': { allow: ['user', 'serviceAdmin'] },
   '271findMissionOffersByText': { allow: ['serviceAdmin'] }, // server-only callers
@@ -113,17 +113,17 @@ export const qidsAccess = {
   '6addTelegram': { allow: ['user', 'serviceAdmin'] },
   '7getTelegramIds': { allow: ['serviceAdmin'] }, // server-only callers
   '8getMissionsOnProgress': { allow: ['user', 'serviceAdmin'] },
-  '9startTimer': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  '9startTimer': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '10stopTimer': { allow: ['user', 'serviceAdmin'] },
   '11saveTimer': { allow: ['user', 'serviceAdmin'] },
   '12mission': { allow: ['user', 'serviceAdmin'] },
   '13missionById': { allow: ['serviceAdmin'] }, // server-only callers
-  '14changeOnline': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
-  '15createPgishauser': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
-  '16createPgisha': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  '14changeOnline': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  '15createPgishauser': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  '16createPgisha': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '17getUsers': { allow: ['user', 'serviceAdmin'] },
-  '170getMyCoMembers': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
-  '171findUserByExact': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  '170getMyCoMembers': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  '171findUserByExact': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '18createNewMeeting': { allow: ['user', 'serviceAdmin'] },
   '19CreatePendMeeting': { allow: ['user', 'serviceAdmin'] },
   '20CreateUserMeeting': { allow: ['user', 'serviceAdmin'] },
@@ -131,9 +131,9 @@ export const qidsAccess = {
   '22setOnline': { allow: ['user', 'serviceAdmin'] },
   '23myUserMeeting': { allow: ['user', 'serviceAdmin'] },
   '24userJSONQue': { allow: ['user', 'serviceAdmin'] },
-  '25UserArr1': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
-  '26addUserArr1': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
-  '27getFiniApp': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  '25UserArr1': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  '26addUserArr1': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  '27getFiniApp': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '27GetOpenMissionsRegTr': { allow: ['user', 'serviceAdmin'] },
   '28GetOpenMissionsReg': { allow: ['user', 'serviceAdmin'] },
   '29GetOpenMissionsNonregTr': { allow: ['user', 'serviceAdmin'] },
@@ -151,8 +151,8 @@ export const qidsAccess = {
   '41CreatePosition': { allow: ['user', 'serviceConsensus'] }, // consensus
   '42UpdatePosition': { allow: ['user', 'serviceConsensus'] }, // consensus
   'GetNegotiationByToken': { allow: ['user', 'serviceConsensus'] }, // consensus
-  'GetNegotiationBySource': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
-  '43SetNegotiationResolution': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  'GetNegotiationBySource': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  '43SetNegotiationResolution': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   'GetNegotiationResolutionBySource': { allow: ['user', 'serviceAdmin'] },
   'ListLocalNegotiations': { allow: ['user', 'serviceConsensus'] }, // consensus
   'ListArguments': { allow: ['user', 'serviceConsensus'] }, // consensus
@@ -167,15 +167,15 @@ export const qidsAccess = {
   '43updateProfilePic': { allow: ['user', 'serviceAdmin'] },
   '44updateWelcomeCard': { allow: ['user', 'serviceAdmin'] },
   '45deleteMachshir': { allow: ['serviceAdmin'] }, // server-only callers
-  '46getMachshirByEndpoint': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
-  '47GetGiftById': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  '46getMachshirByEndpoint': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  '47GetGiftById': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '48GetServiceById': { allow: ['user', 'serviceAdmin'] },
   '49GetProjectById': { allow: ['user', 'serviceAdmin'] },
   '50GetOpenMashaabimById': { allow: ['user', 'serviceAdmin'] },
   '51GetOpenMissionById': { allow: ['user', 'serviceAdmin'] },
   'getOpenMissionExtractedKey': { allow: ['user', 'serviceAdmin'] },
   '52GetUserById': { allow: ['user', 'serviceAdmin'] },
-  '61ApproveAct': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  '61ApproveAct': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '62MarkActDone': { allow: ['user', 'serviceAdmin'] },
   '63SetActStatus': { allow: ['user', 'serviceAdmin'] },
   '64getUserProjectList': { allow: ['user', 'serviceAdmin'] },
@@ -218,7 +218,7 @@ export const qidsAccess = {
   '75createWelcomeTop': { allow: ['user', 'serviceAdmin'] },
   '76archiveAsk': { allow: ['user', 'serviceAdmin'] },
   '77createMonter': { allow: ['user', 'serviceAdmin'] },
-  '78archiveMultipleAsks': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  '78archiveMultipleAsks': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '79approveTosplit': { allow: ['user', 'serviceAdmin'] },
   '72getSheirutpendById': { allow: ['user', 'serviceAdmin'] },
   '80updateSale': { allow: ['user', 'serviceAdmin'] },
@@ -236,7 +236,7 @@ export const qidsAccess = {
   '150updatePmashDiun': { allow: ['user', 'serviceAdmin'] },
   '154updateMissionStatus': { allow: ['user', 'serviceAdmin'] },
   '151getMaapForVote': { allow: ['user', 'serviceAdmin'] },
-  '152archiveMaapWithVotes': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  '152archiveMaapWithVotes': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '153addVoteToMaap': { allow: ['user', 'serviceAdmin'] },
   '155getHalukaForReceive': { allow: ['user', 'serviceAdmin'] },
   '156getHalukaChatre': { allow: ['user', 'serviceAdmin'] },
@@ -246,7 +246,7 @@ export const qidsAccess = {
   '160archiveDecision': { allow: ['user', 'serviceAdmin'] },
   '161getDecisionDisplayInfo': { allow: ['user', 'serviceAdmin'] },
   '85addVoteToPend': { allow: ['user', 'serviceAdmin'] },
-  '86addVoteToSheirutpend': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  '86addVoteToSheirutpend': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '53GetPendingMeetings': { allow: ['user', 'serviceAdmin'] },
   '54ApprovePendMeeting': { allow: ['user', 'serviceAdmin'] },
   '55CheckMeetingStatus': { allow: ['user', 'serviceAdmin'] },
@@ -254,7 +254,7 @@ export const qidsAccess = {
   '57StartMeeting': { allow: ['user', 'serviceAdmin'] },
   '58CreateMeetingForum': { allow: ['user', 'serviceAdmin'] },
   '59GetMeetingDetails': { allow: ['user', 'serviceAdmin'] },
-  '60EndMeeting': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  '60EndMeeting': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '61RequestMeetingStart': { allow: ['user', 'serviceAdmin'] },
   '62SetUserReadyForStart': { allow: ['user', 'serviceAdmin'] },
   '63CheckMeetingReadyStatus': { allow: ['user', 'serviceAdmin'] },
@@ -284,7 +284,7 @@ export const qidsAccess = {
   '86addVoteToSheirutpend_v2': { allow: ['user', 'serviceAdmin'] },
   '87createSheirut': { allow: ['user', 'serviceAdmin'] },
   '88GetMissionTimersForRecalc': { allow: ['user', 'serviceAdmin'] },
-  '89getUsersCount': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  '89getUsersCount': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '90myActsQuery': { allow: ['user', 'serviceAdmin'] },
   '91createPartof': { allow: ['user', 'serviceAdmin'] },
   '92updateForumSubject': { allow: ['user', 'serviceAdmin'] },
@@ -308,7 +308,7 @@ export const qidsAccess = {
   '113createFinnishedMissionForTimerSave': { allow: ['user', 'serviceAdmin'] },
   '114updateFinnishedMissionHours': { allow: ['user', 'serviceAdmin'] },
   '115updateMissionTotalHoursSaved': { allow: ['user', 'serviceAdmin'] },
-  '116monthlyReset': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  '116monthlyReset': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '118updateFiniapruvalVots': { allow: ['user', 'serviceAdmin'] },
   '119createFinnishedMissionFinal': { allow: ['user', 'serviceAdmin'] },
   '117getFiniapruvalForClose': { allow: ['user', 'serviceAdmin'] },
@@ -319,15 +319,15 @@ export const qidsAccess = {
   '125userPendingForMatanot': { allow: ['user', 'serviceAdmin'] },
   '124sheirutForDeal': { allow: ['user', 'serviceAdmin'] },
   '125createMatanotRecipeMission': { allow: ['user', 'serviceAdmin'] },
-  '126updateMatanotRecipeMission': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
-  '127deleteMatanotRecipeMission': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  '126updateMatanotRecipeMission': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  '127deleteMatanotRecipeMission': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '128createMatanotRecipeResource': { allow: ['user', 'serviceAdmin'] },
-  '129updateMatanotRecipeResource': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
-  '130deleteMatanotRecipeResource': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
-  '131createSheirutFulfillment': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
-  '132updateSheirutFulfillment': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
-  '133queryComplexMatanot': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
-  '134updateMatanotStatus': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  '129updateMatanotRecipeResource': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  '130deleteMatanotRecipeResource': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  '131createSheirutFulfillment': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  '132updateSheirutFulfillment': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  '133queryComplexMatanot': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  '134updateMatanotStatus': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '135approveMatanot': { allow: ['user', 'serviceAdmin'] },
   '136createMatanot': { allow: ['user', 'serviceAdmin'] },
   '137createPendmForRecipe': { allow: ['user', 'serviceAdmin'] },
@@ -376,18 +376,18 @@ export const qidsAccess = {
   'applyRoundToOpenMashaabim': { allow: ['user', 'serviceAdmin'] },
   'negoCreateNegopendmissionRound': { allow: ['user', 'serviceAdmin'] },
   'getAskNegoRounds': { allow: ['user', 'serviceAdmin'] },
-  'applyRoundToOpenMission': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  'applyRoundToOpenMission': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   'getAskmForFinalize': { allow: ['user', 'serviceAdmin'] },
-  'archiveAskmSimple': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  'archiveAskmSimple': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   'getActiveTimegramaForAsk': { allow: ['user', 'serviceAdmin'] },
   'getActiveTimegramaForAskm': { allow: ['user', 'serviceAdmin'] },
   'getAskProjectRestime': { allow: ['user', 'serviceAdmin'] },
   'getAskmProjectRestime': { allow: ['user', 'serviceAdmin'] },
   'mrCreateMashabetahalich': { allow: ['user', 'serviceAdmin'] },
   'mrUpdateMashabetahalich': { allow: ['user', 'serviceAdmin'] },
-  'mrGetMashabetahalich': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
-  'mrGetRecurringForMonthi': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
-  'mrCreateCycleMaap': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  'mrGetMashabetahalich': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  'mrGetRecurringForMonthi': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  'mrCreateCycleMaap': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   'mrGetRikmashForDelivery': { allow: ['user', 'serviceAdmin'] },
   'mrCreateRikmash': { allow: ['user', 'serviceAdmin'] },
   'mrUpdateRikmash': { allow: ['user', 'serviceAdmin'] },
@@ -397,7 +397,7 @@ export const qidsAccess = {
   'mrCreateCycleTimegrama': { allow: ['user', 'serviceAdmin'] },
   'mrLinkMaapTimegrama': { allow: ['user', 'serviceAdmin'] },
   'mrCreateNego': { allow: ['user', 'serviceAdmin'] },
-  'mrGetMashabForum': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  'mrGetMashabForum': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   'mrCreateForumMashab': { allow: ['user', 'serviceAdmin'] },
   'mrGetProjectRestime': { allow: ['user', 'serviceAdmin'] },
   'mrSetTimegramaDone': { allow: ['user', 'serviceAdmin'] },
@@ -409,7 +409,7 @@ export const qidsAccess = {
   'getProjectMissions': { allow: ['user', 'serviceAdmin'] },
   'getMissionTemplates': { allow: ['user', 'serviceAdmin'] },
   'getProjectFinancials': { allow: ['user', 'serviceAdmin'] },
-  'getProjectProcesses': { allow: ['user', 'serviceAdmin'] }, // unreferenced — candidate for tightening
+  'getProjectProcesses': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   'getProjectVotes': { allow: ['user', 'serviceAdmin'] },
   'getOpenVoteCounts': { allow: ['user', 'serviceAdmin'] },
   'getOpenWishCounts': { allow: ['user', 'serviceAdmin'] },
@@ -429,4 +429,43 @@ export const qidsAccess = {
   '104getUserForumSources': { allow: ['user', 'serviceAdmin'] },
   'getMashaabims': { allow: ['user', 'serviceAdmin'] },
   'getUserSpByMashaabim': { allow: ['user', 'serviceAdmin'] },
+
+  // ─── Manually classified (added after the script's last run — see
+  //     docs/PLAN_API_PERMISSIONS.md §2 "נשאר לביקורת ידנית") ──────────
+
+  // hub/+page.server.ts: svc = !uid — same public/registered split as the
+  // qids below; aggregate counts only, nothing per-user or sensitive.
+  '279demandCounts': { allow: ['user', 'serviceAdmin'] },
+  '280maagadDemandCounts': { allow: ['user', 'serviceAdmin'] },
+
+  // matching/engine.ts: always run through StrapiClient with the admin
+  // token, never with a user JWT — writes suggestion data for *other* users.
+  '213recentSuggestionEmailCounts': { allow: ['serviceAdmin'] },
+
+  // Self-nomination action configs (nominateSelfMission/Resource.ts,
+  // dismissSelfNomination.ts) — executed via strapi.execute(..., context.jwt),
+  // i.e. with the calling user's own token, same trust boundary as a direct
+  // /api/send call from that user.
+  '214createSelfNomOpenMission': { allow: ['user', 'serviceAdmin'] },
+  '215createSelfNomOpenMashaabim': { allow: ['user', 'serviceAdmin'] },
+  '216getSelfNomMissionContext': { allow: ['user', 'serviceAdmin'] },
+  '217getSelfNomMashaabimContext': { allow: ['user', 'serviceAdmin'] },
+  '218createSelfNomSp': { allow: ['user', 'serviceAdmin'] },
+
+  // project/[id]/support/+page.server.js: public rikma homepage, deliberately
+  // readable without a login (isSer = tok === false); the handler strips raw
+  // money rows before they reach the client, so exposure to serviceAdmin here
+  // is safe.
+  '213publicSupportPage': { allow: ['user', 'serviceAdmin'] },
+
+  // availableMission/[id] & availiableResorce/[id] +page.server.js: same
+  // public/registered split (isSer = tok === false).
+  'getOpenMissionMaagad': { allow: ['user', 'serviceAdmin'] },
+  'getOpenMashaabimMaagad': { allow: ['user', 'serviceAdmin'] },
+
+  // api/v1/sales/+server.ts (External Sales API): looked up with ADMIN_TOKEN
+  // directly via strapiClient.execute, bypassing /api/send entirely — never
+  // reachable with a user JWT or a plain apiKey principal.
+  'salesApiProductInfo': { allow: ['serviceAdmin'] },
+  'saleByExternalId': { allow: ['serviceAdmin'] },
 };

@@ -110,7 +110,21 @@ export interface Principal {
 **בוצע ✅ (2026-07-17):** נוצר ע"י `scripts/build-qids-access.mjs` (423 qids:
 358 user+serviceAdmin, 11 serviceAdmin בלבד, 15 consensus, 39 מסומנים
 unreferenced). בדיקת הכיסוי `qidsAccess.test.ts` נכשלת על drift דו-כיווני.
-**נשאר לביקורת ידנית:** לעבור על הרשומות המסומנות `unreferenced` ולהדק.
+
+**ביקורת ידנית — בוצע ✅ (2026-07-18):**
+- מוינו 13 qids שנוספו ל-`qids.js` אחרי ריצת הסקריפט האחרונה (טרם היו
+  ב-`qidsAccess.js`, מפילים את בדיקת הכיסוי): קאונטרים ציבוריים/רשומים
+  (`279demandCounts`, `280maagadDemandCounts`, `213publicSupportPage`,
+  `getOpenMissionMaagad`, `getOpenMashaabimMaagad` — כולם `isSer = tok===false`
+  ⇒ `['user','serviceAdmin']`), qids פנימיים ל-self-nomination שרצים עם
+  `context.jwt` (`214`–`218` ⇒ `['user','serviceAdmin']`, כמו תקדים ה-actions
+  האחרים), ו-qids שרצים אך ורק עם `ADMIN_TOKEN`/ה-matching engine בלי JWT
+  משתמש בכלל (`213recentSuggestionEmailCounts`, `salesApiProductInfo`,
+  `saleByExternalId` ⇒ `['serviceAdmin']` בלבד).
+- 39 הרשומות המסומנות `unreferenced` נבדקו (grep מקיף על כל `src/` — אפס
+  קריאות בקוד לכל אחת) והודקו מ-`['user','serviceAdmin']` ל-`['serviceAdmin']`
+  בלבד, עם הערה מתועדת. מצב `AUTHZ_MODE=log` (ברירת מחדל) אומר שההידוק הזה
+  ילוג בלבד עד לאכיפה מודעת בשלב 5 — לא חוסם כלום כרגע.
 
 - [x] לכל qid רשומה אחת:
 
