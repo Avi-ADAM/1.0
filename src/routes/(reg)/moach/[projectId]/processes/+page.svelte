@@ -38,19 +38,22 @@
       pendm: 'משימות ממתינות', openMission: 'משימות פתוחות', ask: 'בקשות הצטרפות',
       betahalich: 'משימות בביצוע', act: 'מטלות', finiapruval: 'אשרורי סיום',
       finnished: 'משימות שהושלמו', pmash: 'משאבים ממתינים', openMashaabim: 'משאבים פתוחים',
-      askm: 'הצעות אספקה', maap: 'אספקות בתהליך', rikmash: 'משאבים שהתקבלו'
+      askm: 'הצעות אספקה', maap: 'אספקות בתהליך', rikmash: 'משאבים שהתקבלו',
+      matanot: 'מוצרים', sale: 'מכירות'
     },
     en: {
       pendm: 'Pending missions', openMission: 'Open missions', ask: 'Join requests',
       betahalich: 'Missions in progress', act: 'Tasks', finiapruval: 'Finish approvals',
       finnished: 'Completed missions', pmash: 'Pending resources', openMashaabim: 'Open resources',
-      askm: 'Supply proposals', maap: 'Deliveries in progress', rikmash: 'Received resources'
+      askm: 'Supply proposals', maap: 'Deliveries in progress', rikmash: 'Received resources',
+      matanot: 'Products', sale: 'Sales'
     },
     ar: {
       pendm: 'مهام معلقة', openMission: 'مهام مفتوحة', ask: 'طلبات انضمام',
       betahalich: 'مهام قيد التنفيذ', act: 'مهام صغيرة', finiapruval: 'موافقات إنهاء',
       finnished: 'مهام مكتملة', pmash: 'موارد معلقة', openMashaabim: 'موارد مفتوحة',
-      askm: 'عروض توريد', maap: 'توريدات قيد التنفيذ', rikmash: 'موارد مستلمة'
+      askm: 'عروض توريد', maap: 'توريدات قيد التنفيذ', rikmash: 'موارد مستلمة',
+      matanot: 'منتجات', sale: 'مبيعات'
     }
   };
   let objectLabels = $derived(objectTypeLabels[$lang] || objectTypeLabels.en);

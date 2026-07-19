@@ -133,25 +133,96 @@ export function normalizeMonter(monter: any[] | null | undefined) {
 }
 
 /**
+ * A sale is counted in balances/tosplits only when **effective** — the money
+ * holder self-reported (`self`), the bilateral saleClaim matured (`confirmed`)
+ * or the sale predates the consent flow (null legacy). `open` means the claim
+ * is still awaiting the holder's consent. (See PLAN_sale_holder_consent.)
+ */
+export function saleEffective(attrs: any): boolean {
+  const status = attrs?.holderStatus ?? null;
+  return status === 'self' || status === 'confirmed' || status == null;
+}
+
+export interface SaleChain {
+  /** `matanot-<id>` for product chains, `sale-<id>` for stand-alone sales */
+  id: string;
+  matanot: any | null;
+  recipeMissions: any[];
+  recipeResources: any[];
+  sales: any[];
+}
+
+/**
+ * Reconstructs sale lifecycle chains: one chain per product (matanot) holding
+ * its recipe missions/resources (each pointing into a mission/resource chain
+ * via pendm / mesimabetahalich / pmash) and its sale records; sales without a
+ * product (donations, site-share income, ad-hoc records) each form a
+ * stand-alone chain. A complex-product sale is itself a process made of many
+ * missions and resources — this is the seam that ties them together.
+ */
+export function reconstructSaleChains(
+  matanots: any[] | null | undefined,
+  sales: any[] | null | undefined
+): SaleChain[] {
+  const chains: SaleChain[] = [];
+  const chainByMatanotId = new Map<string, SaleChain>();
+
+  for (const matanot of asArray(matanots)) {
+    if (!(matanot as any)?.id) continue;
+    const chain: SaleChain = {
+      id: `matanot-${(matanot as any).id}`,
+      matanot,
+      recipeMissions: asArray((matanot as any)?.attributes?.matanot_recipe_missions?.data),
+      recipeResources: asArray((matanot as any)?.attributes?.matanot_recipe_resources?.data),
+      sales: []
+    };
+    chains.push(chain);
+    chainByMatanotId.set(String((matanot as any).id), chain);
+  }
+
+  for (const sale of asArray(sales)) {
+    if (!(sale as any)?.id) continue;
+    const matanotId = String((sale as any)?.attributes?.matanot?.data?.id ?? '');
+    const chain = matanotId ? chainByMatanotId.get(matanotId) : undefined;
+    if (chain) {
+      chain.sales.push(sale);
+    } else {
+      chains.push({
+        id: `sale-${(sale as any).id}`,
+        matanot: null,
+        recipeMissions: [],
+        recipeResources: [],
+        sales: [sale]
+      });
+    }
+  }
+
+  return chains;
+}
+
+/**
  * Resolves the chain a process-page ref points at.
  *
  * Accepted refs:
  *  - mission chain ids as produced by reconstructMissionChains:
  *    `pendm-<id>`, `om-<id>`, `bm-<id>`
  *  - resource chain ids: plain numeric open_mashaabim id
+ *  - sale chain ids: `matanot-<id>` (product) / `sale-<id>` (stand-alone sale)
  *  - entity refs for anything inside a chain: `ask-<id>`, `act-<id>`,
  *    `fini-<id>`, `fm-<id>`, `askm-<id>`, `maap-<id>`, `pmash-<id>`,
  *    `rikmash-<id>`, `mash-<id>` (open_mashaabim)
  *
  * A prefixed chain id may not exist verbatim (e.g. `om-12` when open_mission
- * 12 was merged into the `pendm-…` chain), so entity search is the fallback
- * for every prefixed ref, not only the non-chain ones.
+ * 12 was merged into the `pendm-…` chain, or `sale-7` when sale 7 belongs to
+ * a product chain), so entity search is the fallback for every prefixed ref,
+ * not only the non-chain ones.
  */
 export function findChainByRef(
   missionChains: any[],
   resourceChains: any[],
-  ref: string | null | undefined
-): { chain: any; kind: 'mission' | 'resource' } | null {
+  ref: string | null | undefined,
+  saleChains: any[] = []
+): { chain: any; kind: 'mission' | 'resource' | 'sale' } | null {
   if (!ref) return null;
   const direct =
     missionChains.find((chain) => String(chain.id) === ref) ??
@@ -160,6 +231,9 @@ export function findChainByRef(
 
   const directResource = resourceChains.find((chain) => String(chain.id) === ref) ?? null;
   if (directResource) return { chain: directResource, kind: 'resource' };
+
+  const directSale = saleChains.find((chain) => String(chain.id) === ref) ?? null;
+  if (directSale) return { chain: directSale, kind: 'sale' };
 
   const dash = ref.indexOf('-');
   if (dash <= 0) return null;
@@ -201,6 +275,16 @@ export function findChainByRef(
     return chain ? { chain, kind: 'resource' } : null;
   }
 
+  const saleMatchers: Record<string, (chain: any) => boolean> = {
+    matanot: (chain) => String(chain.matanot?.id ?? '') === id,
+    sale: (chain) => asArray(chain.sales).some((sale: any) => String(sale?.id ?? '') === id)
+  };
+  const saleMatcher = saleMatchers[prefix];
+  if (saleMatcher) {
+    const chain = saleChains.find(saleMatcher);
+    return chain ? { chain, kind: 'sale' } : null;
+  }
+
   return null;
 }
 
@@ -212,8 +296,9 @@ export function findChainByRef(
 export function chainsForPartof(
   missionChains: any[],
   resourceChains: any[],
-  partofId: string
-): { missionChains: any[]; resourceChains: any[] } {
+  partofId: string,
+  saleChains: any[] = []
+): { missionChains: any[]; resourceChains: any[]; saleChains: any[] } {
   const hasPartof = (entity: any) =>
     asArray(entity?.attributes?.partofs?.data).some(
       (partof: any) => String(partof?.id ?? '') === partofId
@@ -222,6 +307,7 @@ export function chainsForPartof(
     missionChains: missionChains.filter(
       (chain) => hasPartof(chain.openMission) || hasPartof(chain.mesimabetahalich)
     ),
-    resourceChains: resourceChains.filter((chain) => hasPartof(chain.openMashaabim))
+    resourceChains: resourceChains.filter((chain) => hasPartof(chain.openMashaabim)),
+    saleChains: saleChains.filter((chain) => hasPartof(chain.matanot))
   };
 }

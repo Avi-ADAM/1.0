@@ -20,8 +20,9 @@
   import { isRtl } from '$lib/translations';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { reconstructMissionChains, reconstructResourceChains } from '$lib/utils/reconstructChains.js';
-  import { chainsForPartof, findChainByRef } from '$lib/utils/processLifecycle';
+  import { chainsForPartof, findChainByRef, reconstructSaleChains } from '$lib/utils/processLifecycle';
   import ProcessLifecycle from '$lib/components/process/lifecycle/ProcessLifecycle.svelte';
+  import SaleLifecycle from '$lib/components/process/lifecycle/SaleLifecycle.svelte';
   import Lowding from '$lib/celim/lowding.svelte';
 
   let projectId = $derived(page.params.projectId);
@@ -57,11 +58,14 @@
   let resourceChains = $derived(
     attrs ? reconstructResourceChains(attrs.open_mashaabims?.data ?? [], []) : []
   );
+  let saleChains = $derived(
+    attrs ? reconstructSaleChains(attrs.matanotofs?.data ?? [], attrs.sales?.data ?? []) : []
+  );
 
   // Resolution: direct chain / entity ref first, partof-based process second.
-  let direct = $derived(findChainByRef(missionChains, resourceChains, processId));
+  let direct = $derived(findChainByRef(missionChains, resourceChains, processId, saleChains));
   let partofMatches = $derived(
-    direct || !attrs ? null : chainsForPartof(missionChains, resourceChains, processId)
+    direct || !attrs ? null : chainsForPartof(missionChains, resourceChains, processId, saleChains)
   );
 
   let matched = $derived(
@@ -70,7 +74,8 @@
       : partofMatches
         ? [
             ...partofMatches.missionChains.map((chain) => ({ chain, kind: 'mission' })),
-            ...partofMatches.resourceChains.map((chain) => ({ chain, kind: 'resource' }))
+            ...partofMatches.resourceChains.map((chain) => ({ chain, kind: 'resource' })),
+            ...partofMatches.saleChains.map((chain) => ({ chain, kind: 'sale' }))
           ]
         : []
   );
@@ -83,6 +88,7 @@
       chain?.mesimabetahalich?.attributes?.name ??
       chain?.pmash?.attributes?.name ??
       chain?.openMashaabim?.attributes?.name ??
+      chain?.matanot?.attributes?.name ??
       `#${chain?.id ?? processId}`
     );
   }
@@ -96,6 +102,7 @@
       notFoundSub: 'לא נמצאה שרשרת או תהליך המתאימים למזהה המבוקש בפרויקט זה.',
       missionChain: 'תהליך משימה',
       resourceChain: 'תהליך משאב',
+      saleChain: 'תהליך מכירה',
       loading: 'טוען תהליך…',
       error: 'שגיאה בטעינת הנתונים'
     },
@@ -107,6 +114,7 @@
       notFoundSub: 'No chain or process matches the requested id in this project.',
       missionChain: 'Mission process',
       resourceChain: 'Resource process',
+      saleChain: 'Sale process',
       loading: 'Loading process…',
       error: 'Failed to load data'
     },
@@ -118,6 +126,7 @@
       notFoundSub: 'لا توجد سلسلة أو عملية تطابق المعرف المطلوب في هذا المشروع.',
       missionChain: 'عملية مهمة',
       resourceChain: 'عملية مورد',
+      saleChain: 'عملية بيع',
       loading: 'جارٍ التحميل…',
       error: 'فشل تحميل البيانات'
     }
@@ -162,12 +171,24 @@
     {#each matched as entry (entry.chain.id)}
       <article class="ppd-chain">
         <header class="ppd-header">
-          <span class="ppd-icon" aria-hidden="true">{entry.kind === 'mission' ? '◆' : '◇'}</span>
+          <span class="ppd-icon" aria-hidden="true">
+            {entry.kind === 'mission' ? '◆' : entry.kind === 'sale' ? '✦' : '◇'}
+          </span>
           <h1 class="ppd-title">{chainName(entry)}</h1>
-          <span class="ppd-type">{entry.kind === 'mission' ? t.missionChain : t.resourceChain}</span>
+          <span class="ppd-type">
+            {entry.kind === 'mission'
+              ? t.missionChain
+              : entry.kind === 'sale'
+                ? t.saleChain
+                : t.resourceChain}
+          </span>
         </header>
         <div class="ppd-card">
-          <ProcessLifecycle kind={entry.kind} chain={entry.chain} {projectId} lang={$lang} />
+          {#if entry.kind === 'sale'}
+            <SaleLifecycle chain={entry.chain} {projectId} lang={$lang} />
+          {:else}
+            <ProcessLifecycle kind={entry.kind} chain={entry.chain} {projectId} lang={$lang} />
+          {/if}
         </div>
       </article>
     {/each}
@@ -175,70 +196,42 @@
 </div>
 
 <style>
-  /* Same design-token cascade as ProcessChainView / the chain detail page, so
-     the lifecycle components inherit identical light/dark palettes. */
+  /* Design-token cascade for the lifecycle components — tuned to the moach
+     look: the layout's dark slate gradient shows through, cards are
+     translucent slate, and the accents are the site gold (--gold #eee8aa)
+     with barbi-pink for "active now". Always dark — the moach shell is dark
+     regardless of the OS color scheme. */
   .ppd {
-    --gold:   #d97706;
-    --gold-h: #f59e0b;
-    --rose:   #be123c;
+    --gold:   #eee8aa;
+    --gold-h: #ffd700;
+    --rose:   var(--barbi-pink, #ff0092);
 
-    --pcv-bg:           #fffbf0;
-    --pcv-card:         #ffffff;
-    --pcv-card-hover:   #fef9ec;
-    --pcv-node-bg:      #ffffff;
-    --pcv-node-hover:   #fffbf0;
-    --pcv-node-border:  #e7e5e4;
-    --pcv-border:       #f3e8c8;
-    --pcv-text:         #1c1917;
-    --pcv-text-2:       #78716c;
-    --pcv-text-3:       #a8a29e;
+    --pcv-bg:           transparent;
+    --pcv-card:         rgba(15, 23, 42, 0.72);
+    --pcv-card-hover:   rgba(30, 41, 59, 0.8);
+    --pcv-node-bg:      rgba(30, 41, 59, 0.55);
+    --pcv-node-hover:   rgba(51, 65, 85, 0.6);
+    --pcv-node-border:  rgba(148, 163, 184, 0.28);
+    --pcv-border:       rgba(148, 163, 184, 0.32);
+    --pcv-text:         #f1f5f9;
+    --pcv-text-2:       #cbd5e1;
+    --pcv-text-3:       #94a3b8;
 
-    --badge-gold-bg:    rgba(217,119,  6, .10);
-    --badge-gold-text:  #b45309;
-    --badge-rose-bg:    rgba(225, 29, 72, .10);
-    --badge-rose-text:  #be123c;
-    --badge-green-bg:   rgba(  5,150,105, .10);
-    --badge-green-text: #065f46;
-    --badge-sky-bg:     rgba(  2,132,199, .10);
-    --badge-sky-text:   #0369a1;
-    --badge-grey-bg:    rgba(107,114,128, .10);
-    --badge-grey-text:  #6b7280;
+    --badge-gold-bg:    rgba(238, 232, 170, 0.14);
+    --badge-gold-text:  #eee8aa;
+    --badge-rose-bg:    rgba(255,   0, 146, 0.16);
+    --badge-rose-text:  #ff9ad5;
+    --badge-green-bg:   rgba( 46, 255, 168, 0.12);
+    --badge-green-text: #2effa8;
+    --badge-sky-bg:     rgba( 34, 211, 238, 0.12);
+    --badge-sky-text:   #67e8f9;
+    --badge-grey-bg:    rgba(148, 163, 184, 0.14);
+    --badge-grey-text:  #94a3b8;
 
     min-height: 60vh;
     background: var(--pcv-bg);
-    border-radius: 16px;
-    padding: 1rem 1rem 2rem;
+    padding: 0.25rem 0.25rem 2rem;
     text-align: start;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    .ppd {
-      --gold:   #fbbf24;
-      --gold-h: #f59e0b;
-      --rose:   #fb7185;
-
-      --pcv-bg:           #09090b;
-      --pcv-card:         #18181b;
-      --pcv-card-hover:   #1f1f23;
-      --pcv-node-bg:      #18181b;
-      --pcv-node-hover:   #27272a;
-      --pcv-node-border:  #3f3f46;
-      --pcv-border:       #27272a;
-      --pcv-text:         #fafaf9;
-      --pcv-text-2:       #a8a29e;
-      --pcv-text-3:       #52525b;
-
-      --badge-gold-bg:    rgba(251,191, 36, .14);
-      --badge-gold-text:  #fbbf24;
-      --badge-rose-bg:    rgba(251,113,133, .14);
-      --badge-rose-text:  #fb7185;
-      --badge-green-bg:   rgba( 52,211,153, .12);
-      --badge-green-text: #34d399;
-      --badge-sky-bg:     rgba( 56,189,248, .12);
-      --badge-sky-text:   #38bdf8;
-      --badge-grey-bg:    rgba(113,113,122, .12);
-      --badge-grey-text:  #71717a;
-    }
   }
 
   .ppd-nav {
@@ -293,7 +286,7 @@
     margin: 0;
     font-size: clamp(1.05rem, 3vw, 1.4rem);
     font-weight: 700;
-    color: var(--pcv-text);
+    color: var(--gold);
     word-break: break-word;
   }
 
@@ -315,7 +308,8 @@
     border: 1px solid var(--pcv-border);
     background: var(--pcv-card);
     overflow: hidden;
-    box-shadow: 0 0 0 1px rgba(245,158,11,.08), 0 4px 20px rgba(245,158,11,.06);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 0 0 1px rgba(238,232,170,.10), 0 4px 24px rgba(0,0,0,.35);
   }
 
   .ppd-state {

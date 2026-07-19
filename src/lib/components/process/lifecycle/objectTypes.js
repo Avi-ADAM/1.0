@@ -153,6 +153,31 @@ export const OBJECT_TYPES = {
     archived: () => true,
     votes: () => null,
     forumId: () => null
+  },
+  matanot: {
+    kind: 'sale',
+    refPrefix: 'matanot',
+    voteKind: null,
+    fromChain: (chain) => chain.matanot,
+    listFromChains: (chains) => chains.map((chain) => chain.matanot).filter(Boolean),
+    name: (attrs) => attrs.name,
+    archived: (attrs) => attrs.archived === true,
+    votes: () => null,
+    forumId: () => null
+  },
+  sale: {
+    kind: 'sale',
+    refPrefix: 'sale',
+    voteKind: null,
+    fromChain: (chain, id) =>
+      (chain.sales ?? []).find((sale) => String(sale.id) === String(id)) ?? null,
+    listFromChains: (chains) => chains.flatMap((chain) => chain.sales ?? []),
+    // never surface the raw note as a display name — site-share notes are
+    // structured strings that must go through parseSiteShareNote
+    name: (attrs) => attrs.matanot?.data?.attributes?.name ?? null,
+    archived: (attrs) => attrs.splited === true,
+    votes: () => null,
+    forumId: () => null
   }
 };
 
@@ -163,10 +188,15 @@ export function objectRef(type, id) {
 }
 
 /** All entities of a type across the reconstructed chains, with their chain. */
-export function listObjects(type, missionChains, resourceChains) {
+export function listObjects(type, missionChains, resourceChains, saleChains = []) {
   const config = OBJECT_TYPES[type];
   if (!config) return [];
-  const chains = config.kind === 'mission' ? missionChains : resourceChains;
+  const chains =
+    config.kind === 'mission'
+      ? missionChains
+      : config.kind === 'resource'
+        ? resourceChains
+        : saleChains;
   return chains.flatMap((chain) =>
     config
       .listFromChains([chain])

@@ -15,7 +15,8 @@
   import { isRtl } from '$lib/translations';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { reconstructMissionChains, reconstructResourceChains } from '$lib/utils/reconstructChains.js';
-  import { findChainByRef, mediaUrl } from '$lib/utils/processLifecycle';
+  import { findChainByRef, mediaUrl, reconstructSaleChains, saleEffective } from '$lib/utils/processLifecycle';
+  import { parseSiteShareNote } from '$lib/revenue/parseSiteShareNote';
   import { OBJECT_TYPES, objectRef } from '$lib/components/process/lifecycle/objectTypes.js';
   import VoteRounds from '$lib/components/process/lifecycle/VoteRounds.svelte';
   import TimersPanel from '$lib/components/process/lifecycle/TimersPanel.svelte';
@@ -57,9 +58,14 @@
   let resourceChains = $derived(
     attrsRoot ? reconstructResourceChains(attrsRoot.open_mashaabims?.data ?? [], []) : []
   );
+  let saleChains = $derived(
+    attrsRoot ? reconstructSaleChains(attrsRoot.matanotofs?.data ?? [], attrsRoot.sales?.data ?? []) : []
+  );
 
   let found = $derived(
-    config ? findChainByRef(missionChains, resourceChains, objectRef(type, objectId)) : null
+    config
+      ? findChainByRef(missionChains, resourceChains, objectRef(type, objectId), saleChains)
+      : null
   );
   let entity = $derived(found && config ? config.fromChain(found.chain, objectId) : null);
   let attrs = $derived(entity?.attributes ?? null);
@@ -78,19 +84,22 @@
       pendm: 'משימה ממתינה', openMission: 'משימה פתוחה', ask: 'בקשת הצטרפות',
       betahalich: 'משימה בביצוע', act: 'מטלה', finiapruval: 'אשרור סיום',
       finnished: 'משימה שהושלמה (ארכיון)', pmash: 'משאב ממתין', openMashaabim: 'משאב פתוח',
-      askm: 'הצעת אספקה', maap: 'אספקה בתהליך', rikmash: 'משאב שהתקבל (ארכיון)'
+      askm: 'הצעת אספקה', maap: 'אספקה בתהליך', rikmash: 'משאב שהתקבל (ארכיון)',
+      matanot: 'מוצר', sale: 'מכירה'
     },
     en: {
       pendm: 'Pending mission', openMission: 'Open mission', ask: 'Join request',
       betahalich: 'Mission in progress', act: 'Task', finiapruval: 'Finish approval',
       finnished: 'Completed mission (archive)', pmash: 'Pending resource', openMashaabim: 'Open resource',
-      askm: 'Supply proposal', maap: 'Delivery in progress', rikmash: 'Received resource (archive)'
+      askm: 'Supply proposal', maap: 'Delivery in progress', rikmash: 'Received resource (archive)',
+      matanot: 'Product', sale: 'Sale'
     },
     ar: {
       pendm: 'مهمة معلقة', openMission: 'مهمة مفتوحة', ask: 'طلب انضمام',
       betahalich: 'مهمة قيد التنفيذ', act: 'مهمة صغيرة', finiapruval: 'موافقة إنهاء',
       finnished: 'مهمة مكتملة (أرشيف)', pmash: 'مورد معلق', openMashaabim: 'مورد مفتوح',
-      askm: 'عرض توريد', maap: 'توريد قيد التنفيذ', rikmash: 'مورد مستلم (أرشيف)'
+      askm: 'عرض توريد', maap: 'توريد قيد التنفيذ', rikmash: 'مورد مستلم (أرشيف)',
+      matanot: 'منتج', sale: 'بيع'
     }
   };
 
@@ -118,7 +127,14 @@
       created: 'נוצר', start: 'התחלה', finish: 'סיום', due: 'יעד', kind: 'סוג',
       progress: 'התקדמות', of: 'מתוך', by: 'אחראי/ת', validator: 'מאשר/ת',
       done: 'בוצע', notDone: 'טרם בוצע', delivered: 'סופק', why: 'סיכום',
-      actsBoard: 'ללוח המטלות', progressBoard: 'למשימות בתהליך', timersBoard: 'לטיימרים'
+      actsBoard: 'ללוח המטלות', progressBoard: 'למשימות בתהליך', timersBoard: 'לטיימרים',
+      salesBoard: 'ללוח המכירות', salePage: 'לעמוד המכירה',
+      holderStatus: 'מצב הסכמת מחזיק/ת הכסף',
+      holderSelf: 'דיווח עצמי', holderConfirmed: 'אושר ע״י המחזיק/ה',
+      holderOpen: 'ממתין להסכמה', holderLegacy: 'נספר במאזן',
+      splitState: 'חלוקה', splited: 'חולק', notSplited: 'טרם חולק',
+      donation: 'תרומה', siteShare: 'חלק האתר', paid: 'שולם', fromRikma: 'מריקמה',
+      fixPrice: 'מחיר קבוע', dynamicPrice: 'מחיר מתגבש בתהליך'
     },
     en: {
       backProcess: 'Full process page',
@@ -143,7 +159,14 @@
       created: 'Created', start: 'Start', finish: 'Finish', due: 'Due', kind: 'Kind',
       progress: 'Progress', of: 'of', by: 'Owner', validator: 'Validator',
       done: 'Done', notDone: 'Not done yet', delivered: 'Delivered', why: 'Summary',
-      actsBoard: 'Tasks board', progressBoard: 'Missions in progress', timersBoard: 'Timers'
+      actsBoard: 'Tasks board', progressBoard: 'Missions in progress', timersBoard: 'Timers',
+      salesBoard: 'Sales board', salePage: 'Sale page',
+      holderStatus: 'Holder consent',
+      holderSelf: 'Self report', holderConfirmed: 'Confirmed by holder',
+      holderOpen: 'Awaiting consent', holderLegacy: 'Counted in balance',
+      splitState: 'Split', splited: 'Split done', notSplited: 'Not split yet',
+      donation: 'Donation', siteShare: 'Site share', paid: 'Paid', fromRikma: 'From rikma',
+      fixPrice: 'Fixed price', dynamicPrice: 'Price shaped in process'
     },
     ar: {
       backProcess: 'صفحة العملية الكاملة',
@@ -168,7 +191,14 @@
       created: 'أنشئ', start: 'بداية', finish: 'نهاية', due: 'موعد', kind: 'نوع',
       progress: 'تقدم', of: 'من', by: 'مسؤول', validator: 'معتمد',
       done: 'تم', notDone: 'لم يتم بعد', delivered: 'تم التوريد', why: 'ملخص',
-      actsBoard: 'لوحة المهام', progressBoard: 'المهام قيد التنفيذ', timersBoard: 'المؤقتات'
+      actsBoard: 'لوحة المهام', progressBoard: 'المهام قيد التنفيذ', timersBoard: 'المؤقتات',
+      salesBoard: 'لوحة المبيعات', salePage: 'صفحة البيع',
+      holderStatus: 'موافقة حائز المال',
+      holderSelf: 'تقرير ذاتي', holderConfirmed: 'أكده الحائز',
+      holderOpen: 'بانتظار الموافقة', holderLegacy: 'محسوب في الرصيد',
+      splitState: 'التوزيع', splited: 'تم التوزيع', notSplited: 'لم يوزع بعد',
+      donation: 'تبرع', siteShare: 'حصة الموقع', paid: 'مدفوع', fromRikma: 'من مجموعة',
+      fixPrice: 'سعر ثابت', dynamicPrice: 'سعر يتشكل في العملية'
     }
   };
   let t = $derived(i18n[$lang] ?? i18n.en);
@@ -216,18 +246,50 @@
       add(t.validator, attrs.vali?.data?.attributes?.username);
     }
     add(t.deadline, attrs.timegrama?.data?.attributes?.date ? formatDate(attrs.timegrama.data.attributes.date) : null);
+    if (type === 'sale') {
+      if (attrs.in != null) add(t.amount, attrs.in);
+      const holderLabel =
+        attrs.holderStatus === 'self'
+          ? t.holderSelf
+          : attrs.holderStatus === 'confirmed'
+            ? t.holderConfirmed
+            : attrs.holderStatus === 'open'
+              ? t.holderOpen
+              : t.holderLegacy;
+      add(t.holderStatus, holderLabel);
+      add(t.splitState, attrs.splited ? t.splited : t.notSplited);
+      if (attrs.isDonation) add(t.kind, t.donation);
+      if (attrs.isSiteShareIncome) {
+        const parsed = parseSiteShareNote(attrs.note);
+        add(t.kind, t.siteShare);
+        if (parsed?.paid != null) add(t.paid, parsed.paid);
+        if (parsed?.fromProjectId) add(t.fromRikma, `#${parsed.fromProjectId}`);
+      }
+      add(t.start, formatDate(attrs.date));
+    }
+    if (type === 'matanot') {
+      add(t.kind, attrs.fixPrice ? t.fixPrice : t.dynamicPrice);
+      if (attrs.quant != null) add(t.amount, attrs.quant);
+      if (attrs.estimatedPrice != null && attrs.price == null) add(t.price, attrs.estimatedPrice);
+    }
     return rows;
   });
 
   let owner = $derived(attrs?.users_permissions_user?.data ?? attrs?.rishon?.data ?? null);
   let description = $derived(
-    attrs?.descrip || attrs?.des || attrs?.hearotMeyuchadot || attrs?.spnot || attrs?.why || ''
+    type === 'sale'
+      ? // a site-share note is a structured string — rendered as parsed facts
+        // above, never as raw text
+        (attrs?.isSiteShareIncome ? '' : attrs?.note || '')
+      : attrs?.descrip || attrs?.des || attrs?.hearotMeyuchadot || attrs?.spnot || attrs?.why || ''
   );
 
   // Relevant board links per type (in addition to vote/chat/process links)
   let boardLink = $derived.by(() => {
     if (type === 'act') return { href: `/moach/${projectId}/acts`, label: t.actsBoard };
     if (type === 'betahalich') return { href: `/moach/${projectId}/progress/${objectId}`, label: t.progressBoard };
+    if (type === 'matanot') return { href: `/moach/${projectId}/sales`, label: t.salesBoard };
+    if (type === 'sale') return { href: `/moach/${projectId}/sales/${objectId}`, label: t.salePage };
     return null;
   });
 </script>
@@ -348,57 +410,33 @@
 </div>
 
 <style>
+  /* Moach look — translucent slate cards over the layout's dark gradient,
+     site gold (#eee8aa) accents, barbi-pink for "active". Always dark. */
   .op {
-    --pcv-card:         #ffffff;
-    --pcv-node-bg:      #ffffff;
-    --pcv-node-border:  #e7e5e4;
-    --pcv-border:       #f3e8c8;
-    --pcv-text:         #1c1917;
-    --pcv-text-2:       #78716c;
-    --pcv-text-3:       #a8a29e;
-    --gold:             #d97706;
-    --rose:             #be123c;
-    --badge-gold-bg:    rgba(217,119,  6, .10);
-    --badge-gold-text:  #b45309;
-    --badge-rose-bg:    rgba(225, 29, 72, .10);
-    --badge-rose-text:  #be123c;
-    --badge-green-bg:   rgba(  5,150,105, .10);
-    --badge-green-text: #065f46;
-    --badge-sky-bg:     rgba(  2,132,199, .10);
-    --badge-sky-text:   #0369a1;
-    --badge-grey-bg:    rgba(107,114,128, .10);
-    --badge-grey-text:  #6b7280;
+    --pcv-card:         rgba(15, 23, 42, 0.72);
+    --pcv-node-bg:      rgba(30, 41, 59, 0.55);
+    --pcv-node-border:  rgba(148, 163, 184, 0.28);
+    --pcv-border:       rgba(148, 163, 184, 0.32);
+    --pcv-text:         #f1f5f9;
+    --pcv-text-2:       #cbd5e1;
+    --pcv-text-3:       #94a3b8;
+    --gold:             #eee8aa;
+    --rose:             var(--barbi-pink, #ff0092);
+    --badge-gold-bg:    rgba(238, 232, 170, 0.14);
+    --badge-gold-text:  #eee8aa;
+    --badge-rose-bg:    rgba(255,   0, 146, 0.16);
+    --badge-rose-text:  #ff9ad5;
+    --badge-green-bg:   rgba( 46, 255, 168, 0.12);
+    --badge-green-text: #2effa8;
+    --badge-sky-bg:     rgba( 34, 211, 238, 0.12);
+    --badge-sky-text:   #67e8f9;
+    --badge-grey-bg:    rgba(148, 163, 184, 0.14);
+    --badge-grey-text:  #94a3b8;
 
     min-height: 60vh;
-    background: #fffbf0;
-    border-radius: 16px;
-    padding: 1rem 1rem 2rem;
+    background: transparent;
+    padding: 0.25rem 0.25rem 2rem;
     text-align: start;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    .op {
-      --pcv-card:         #18181b;
-      --pcv-node-bg:      #18181b;
-      --pcv-node-border:  #3f3f46;
-      --pcv-border:       #27272a;
-      --pcv-text:         #fafaf9;
-      --pcv-text-2:       #a8a29e;
-      --pcv-text-3:       #52525b;
-      --gold:             #fbbf24;
-      --rose:             #fb7185;
-      --badge-gold-bg:    rgba(251,191, 36, .14);
-      --badge-gold-text:  #fbbf24;
-      --badge-rose-bg:    rgba(251,113,133, .14);
-      --badge-rose-text:  #fb7185;
-      --badge-green-bg:   rgba( 52,211,153, .12);
-      --badge-green-text: #34d399;
-      --badge-sky-bg:     rgba( 56,189,248, .12);
-      --badge-sky-text:   #38bdf8;
-      --badge-grey-bg:    rgba(113,113,122, .12);
-      --badge-grey-text:  #71717a;
-      background: #09090b;
-    }
   }
 
   .op-nav {
@@ -453,7 +491,7 @@
     margin: 0;
     font-size: clamp(1.05rem, 3vw, 1.4rem);
     font-weight: 700;
-    color: var(--pcv-text);
+    color: var(--gold);
     word-break: break-word;
   }
 
@@ -514,6 +552,8 @@
     background: var(--pcv-card);
     padding: 12px 14px;
     color: var(--pcv-text);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 0 0 1px rgba(238,232,170,.08), 0 4px 24px rgba(0,0,0,.30);
   }
 
   .op-card-title {

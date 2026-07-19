@@ -8813,6 +8813,28 @@ export const moachQids = {
             mesimabetahalich { data { id } }
             users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
           } } }
+          sales { data { id attributes {
+            in date pending splited holderStatus isDonation isSiteShareIncome note source createdAt startDate finishDate
+            matanot { data { id attributes { name } } }
+            users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            reporter { data { id attributes { username } } }
+            tosplits { data { id attributes { finished } } }
+          } } }
+          matanotofs { data { id attributes {
+            name price quant kindOf fixPrice pricingMode appruved archived createdAt startDate finnishDate estimatedPrice marginPct
+            partofs { data { id } }
+            matanot_recipe_missions { data { id attributes {
+              mode notes hoursPerUnit ratePerHour unitsPerProduct
+              pendm { data { id attributes { name } } }
+              mesimabetahalich { data { id attributes { name } } }
+              assignedMember { data { id attributes { username } } }
+            } } }
+            matanot_recipe_resources { data { id attributes {
+              mode notes kindOf pricePerUnit quantityPerUnit
+              pmash { data { id attributes { name } } }
+              assignedMember { data { id attributes { username } } }
+            } } }
+          } } }
           open_mashaabims { data { id attributes {
             name descrip spnot kindOf hm price easy archived createdAt sqadualed sqadualedf recurring
             partofs { data { id } }

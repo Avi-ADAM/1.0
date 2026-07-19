@@ -11,6 +11,7 @@
   import { isRtl } from '$lib/translations';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { reconstructMissionChains, reconstructResourceChains } from '$lib/utils/reconstructChains.js';
+  import { reconstructSaleChains } from '$lib/utils/processLifecycle';
   import { OBJECT_TYPES, listObjects } from '$lib/components/process/lifecycle/objectTypes.js';
   import Lowding from '$lib/celim/lowding.svelte';
 
@@ -48,8 +49,13 @@
   let resourceChains = $derived(
     attrsRoot ? reconstructResourceChains(attrsRoot.open_mashaabims?.data ?? [], []) : []
   );
+  let saleChains = $derived(
+    attrsRoot ? reconstructSaleChains(attrsRoot.matanotofs?.data ?? [], attrsRoot.sales?.data ?? []) : []
+  );
 
-  let items = $derived(config ? listObjects(type, missionChains, resourceChains) : []);
+  let items = $derived(
+    config ? listObjects(type, missionChains, resourceChains, saleChains) : []
+  );
   let activeItems = $derived(items.filter((item) => !config.archived(item.entity.attributes ?? {})));
   let archivedItems = $derived(items.filter((item) => config.archived(item.entity.attributes ?? {})));
 
@@ -58,19 +64,22 @@
       pendm: 'משימות ממתינות', openMission: 'משימות פתוחות', ask: 'בקשות הצטרפות',
       betahalich: 'משימות בביצוע', act: 'מטלות', finiapruval: 'אשרורי סיום',
       finnished: 'משימות שהושלמו', pmash: 'משאבים ממתינים', openMashaabim: 'משאבים פתוחים',
-      askm: 'הצעות אספקה', maap: 'אספקות בתהליך', rikmash: 'משאבים שהתקבלו'
+      askm: 'הצעות אספקה', maap: 'אספקות בתהליך', rikmash: 'משאבים שהתקבלו',
+      matanot: 'מוצרים', sale: 'מכירות'
     },
     en: {
       pendm: 'Pending missions', openMission: 'Open missions', ask: 'Join requests',
       betahalich: 'Missions in progress', act: 'Tasks', finiapruval: 'Finish approvals',
       finnished: 'Completed missions', pmash: 'Pending resources', openMashaabim: 'Open resources',
-      askm: 'Supply proposals', maap: 'Deliveries in progress', rikmash: 'Received resources'
+      askm: 'Supply proposals', maap: 'Deliveries in progress', rikmash: 'Received resources',
+      matanot: 'Products', sale: 'Sales'
     },
     ar: {
       pendm: 'مهام معلقة', openMission: 'مهام مفتوحة', ask: 'طلبات انضمام',
       betahalich: 'مهام قيد التنفيذ', act: 'مهام صغيرة', finiapruval: 'موافقات إنهاء',
       finnished: 'مهام مكتملة', pmash: 'موارد معلقة', openMashaabim: 'موارد مفتوحة',
-      askm: 'عروض توريد', maap: 'توريدات قيد التنفيذ', rikmash: 'موارد مستلمة'
+      askm: 'عروض توريد', maap: 'توريدات قيد التنفيذ', rikmash: 'موارد مستلمة',
+      matanot: 'منتجات', sale: 'مبيعات'
     }
   };
 
@@ -166,39 +175,24 @@
 </div>
 
 <style>
+  /* Moach look — translucent slate cards over the layout's dark gradient,
+     site gold (#eee8aa) accents. Always dark. */
   .oi {
-    --pcv-card:         #ffffff;
-    --pcv-border:       #f3e8c8;
-    --pcv-text:         #1c1917;
-    --pcv-text-2:       #78716c;
-    --pcv-text-3:       #a8a29e;
-    --gold:             #d97706;
-    --badge-gold-bg:    rgba(217,119,6,.10);
-    --badge-gold-text:  #b45309;
-    --badge-grey-bg:    rgba(107,114,128,.10);
-    --badge-grey-text:  #6b7280;
+    --pcv-card:         rgba(15, 23, 42, 0.72);
+    --pcv-border:       rgba(148, 163, 184, 0.32);
+    --pcv-text:         #f1f5f9;
+    --pcv-text-2:       #cbd5e1;
+    --pcv-text-3:       #94a3b8;
+    --gold:             #eee8aa;
+    --badge-gold-bg:    rgba(238, 232, 170, 0.14);
+    --badge-gold-text:  #eee8aa;
+    --badge-grey-bg:    rgba(148, 163, 184, 0.14);
+    --badge-grey-text:  #94a3b8;
 
     min-height: 60vh;
-    background: #fffbf0;
-    border-radius: 16px;
-    padding: 1rem 1rem 2rem;
+    background: transparent;
+    padding: 0.25rem 0.25rem 2rem;
     text-align: start;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    .oi {
-      --pcv-card:         #18181b;
-      --pcv-border:       #27272a;
-      --pcv-text:         #fafaf9;
-      --pcv-text-2:       #a8a29e;
-      --pcv-text-3:       #52525b;
-      --gold:             #fbbf24;
-      --badge-gold-bg:    rgba(251,191,36,.14);
-      --badge-gold-text:  #fbbf24;
-      --badge-grey-bg:    rgba(113,113,122,.12);
-      --badge-grey-text:  #71717a;
-      background: #09090b;
-    }
   }
 
   .oi-nav { margin-bottom: 10px; }
@@ -247,7 +241,7 @@
     margin: 0 0 10px;
     font-size: clamp(1.05rem, 3vw, 1.4rem);
     font-weight: 700;
-    color: var(--pcv-text);
+    color: var(--gold);
   }
 
   .oi-section {

@@ -5,7 +5,9 @@ import {
   groupTimersByMonth,
   groupVotesByRound,
   normalizeMonter,
-  normalizeVotes
+  normalizeVotes,
+  reconstructSaleChains,
+  saleEffective
 } from './processLifecycle';
 
 const user = (id: string, username = `user${id}`) => ({
@@ -119,6 +121,63 @@ describe('findChainByRef', () => {
   });
 });
 
+describe('saleEffective', () => {
+  it('follows the holder-consent rule: self/confirmed/legacy-null count, open does not', () => {
+    expect(saleEffective({ holderStatus: 'self' })).toBe(true);
+    expect(saleEffective({ holderStatus: 'confirmed' })).toBe(true);
+    expect(saleEffective({})).toBe(true);
+    expect(saleEffective({ holderStatus: null })).toBe(true);
+    expect(saleEffective({ holderStatus: 'open' })).toBe(false);
+  });
+});
+
+describe('reconstructSaleChains', () => {
+  const matanot = {
+    id: '1',
+    attributes: {
+      name: 'Complex product',
+      matanot_recipe_missions: { data: [{ id: '11' }] },
+      matanot_recipe_resources: { data: [{ id: '21' }] }
+    }
+  };
+  const productSale = { id: '31', attributes: { matanot: { data: { id: '1' } }, in: 100 } };
+  const donationSale = { id: '32', attributes: { isDonation: true, in: 50 } };
+
+  it('groups sales under their product and keeps recipe arrays', () => {
+    const chains = reconstructSaleChains([matanot], [productSale, donationSale]);
+    expect(chains).toHaveLength(2);
+    const productChain = chains.find((chain) => chain.id === 'matanot-1');
+    expect(productChain?.sales.map((sale) => sale.id)).toEqual(['31']);
+    expect(productChain?.recipeMissions).toHaveLength(1);
+    expect(productChain?.recipeResources).toHaveLength(1);
+    const orphanChain = chains.find((chain) => chain.id === 'sale-32');
+    expect(orphanChain?.matanot).toBeNull();
+    expect(orphanChain?.sales).toHaveLength(1);
+  });
+
+  it('handles empty input', () => {
+    expect(reconstructSaleChains(null, undefined)).toEqual([]);
+  });
+});
+
+describe('findChainByRef — sale chains', () => {
+  const saleChains = reconstructSaleChains(
+    [{ id: '1', attributes: {} }],
+    [
+      { id: '31', attributes: { matanot: { data: { id: '1' } } } },
+      { id: '32', attributes: {} }
+    ]
+  );
+
+  it('resolves direct sale-chain ids and nested sale refs', () => {
+    expect(findChainByRef([], [], 'matanot-1', saleChains)?.kind).toBe('sale');
+    // sale-31 belongs to the product chain — resolved via entity search
+    expect(findChainByRef([], [], 'sale-31', saleChains)?.chain.id).toBe('matanot-1');
+    expect(findChainByRef([], [], 'sale-32', saleChains)?.chain.id).toBe('sale-32');
+    expect(findChainByRef([], [], 'sale-99', saleChains)).toBeNull();
+  });
+});
+
 describe('chainsForPartof', () => {
   it('matches chains whose entities carry the partof id', () => {
     const partofs = { data: [{ id: '5' }] };
@@ -131,8 +190,14 @@ describe('chainsForPartof', () => {
       { id: '9', openMashaabim: { id: '9', attributes: { partofs } } },
       { id: '8', openMashaabim: { id: '8', attributes: {} } }
     ];
-    const result = chainsForPartof(missionChains, resourceChains, '5');
+    const saleChains = [
+      { id: 'matanot-4', matanot: { id: '4', attributes: { partofs } } },
+      { id: 'matanot-5', matanot: { id: '5', attributes: {} } },
+      { id: 'sale-6', matanot: null }
+    ];
+    const result = chainsForPartof(missionChains, resourceChains, '5', saleChains);
     expect(result.missionChains.map((chain) => chain.id)).toEqual(['om-1', 'bm-3']);
     expect(result.resourceChains.map((chain) => chain.id)).toEqual(['9']);
+    expect(result.saleChains.map((chain) => chain.id)).toEqual(['matanot-4']);
   });
 });
