@@ -51,9 +51,10 @@
   let total = $state(0);
   let hm = $state(1);
   let note = $state('');
-  // PLAN_RECURRING_SALES: exact 1lev1 username/email of the paying customer,
-  // only for open-ended monthly/yearly sales (standing orders). When set, the
-  // customer gets a monthly card on their deals page to report the transfer.
+  // PLAN_SALE_CUSTOMER_LINK: exact 1lev1 username/email of the customer.
+  // Links customer↔sale through a Sheirut intermediary. On a regular sale the
+  // money already moved ("שולם") so no customer confirmation is needed; on a
+  // standing order the customer confirms their transfer every month.
   let customerIdentifier = $state('');
   let placeholder = tr.sales.withWhomMoney;
   let already = $state(false);
@@ -147,9 +148,10 @@
       if (kindOf === 'monthly' || kindOf === 'yearly') {
         actionParams.startDate = new Date(dates).toISOString();
         if (datef !== null) actionParams.finishDate = new Date(datef).toISOString();
-        else if (customerIdentifier.trim())
-          actionParams.customerIdentifier = customerIdentifier.trim();
       }
+
+      if (customerIdentifier.trim())
+        actionParams.customerIdentifier = customerIdentifier.trim();
 
       const result = await executeAction('createSale', actionParams);
 
@@ -284,28 +286,34 @@
     {#if datef === null}
       <small class="text-barbi text-center "><mark>{noFinnish[$lang]}</mark></small>
     {/if}
-
-    {#if isRecurring}
-      <!-- Standing order: optional paying customer (registered user) who will
-           report the monthly transfer from their deals page. -->
-      <small class="text-barbi text-center mt-2">
-        {$lang === 'en'
-          ? 'Customer (optional) — exact 1lev1 username or email'
-          : 'לקוח (אופציונלי) — שם משתמש או אימייל מדויק ב-1lev1'}
-      </small>
-      <input
-        class="bg-gold hover:bg-mtork border-2 border-barbi rounded text-barbi placeholder-barbi/70 p-1"
-        type="text"
-        placeholder={$lang === 'en' ? 'username or email' : 'שם משתמש או אימייל'}
-        bind:value={customerIdentifier}
-      />
-      <small class="text-barbi/70 text-center text-xs">
-        {$lang === 'en'
-          ? 'A standing order opens a monthly report card; a named customer also confirms their transfer each month.'
-          : 'מכירה מתחדשת פותחת כרטיס דיווח חודשי; לקוח מזוהה גם יעדכן כל חודש כמה העביר.'}
-      </small>
-    {/if}
   {/if}
+
+  <!-- Customer (PLAN_SALE_CUSTOMER_LINK): linked through a Sheirut so the
+       purchase shows on the customer's deals page. On a regular sale the money
+       already moved (paid — no customer confirmation); on a standing order the
+       customer confirms the transfer every month. -->
+  <small class="text-barbi text-center mt-2">
+    {$lang === 'en'
+      ? `Customer (optional${isRecurring ? '' : ' · paid'}) — exact 1lev1 username or email`
+      : `לקוח (אופציונלי${isRecurring ? '' : ' · שולם'}) — שם משתמש או אימייל מדויק ב-1lev1`}
+  </small>
+  <input
+    class="bg-gold hover:bg-mtork border-2 border-barbi rounded text-barbi placeholder-barbi/70 p-1"
+    type="text"
+    placeholder={$lang === 'en' ? 'username or email' : 'שם משתמש או אימייל'}
+    bind:value={customerIdentifier}
+  />
+  <small class="text-barbi/70 text-center text-xs">
+    {#if isRecurring}
+      {$lang === 'en'
+        ? 'A standing order opens a monthly report card; a named customer also confirms their transfer each month.'
+        : 'מכירה מתחדשת פותחת כרטיס דיווח חודשי; לקוח מזוהה גם יעדכן כל חודש כמה העביר.'}
+    {:else}
+      {$lang === 'en'
+        ? 'The sale is recorded as already paid — the purchase appears on the customer\'s deals page, no confirmation needed.'
+        : 'המכירה נרשמת כשולמה — הרכישה תופיע בעמוד העסקאות של הלקוח, ללא צורך באשרור.'}
+    {/if}
+  </small>
 
   <div class="grid justify-center align-center ">
     <h3 class="text-center text-barbi">{change[$lang]}</h3>

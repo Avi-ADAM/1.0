@@ -35,12 +35,16 @@
 1. **יצירה** — `createSale` (SaleComponent במרכז המכירות / moach / gift):
    מכירה חודשית/שנתית עם תאריך התחלה ובלי תאריך סיום מסומנת אוטומטית כמנוע
    (`recurring:true`). אפשר לציין **לקוח** בשם משתמש/אימייל מדויק
-   (`customerIdentifier`, נפתר ב-qid `mrsFindCustomer`; חייב להיות משתמש רשום).
+   (`customerIdentifier`, נפתר ב-qid `mrsFindCustomer`; חייב להיות משתמש
+   רשום). הקישור הקנוני ללקוח הוא **Sheirut** שנוצר עבור הוראת הקבע
+   (ראו `docs/PLAN_SALE_CUSTOMER_LINK.md`); `Sale.customer` הוא דנורמליזציה
+   לשאילתות המחזורים בלבד.
 2. **ה-monther** — `/api/monthi` (`runRecurringSaleCycles`): פעם בחודש, לכל
    מנוע חי שבחלון הפעילות שלו, נפתחת Sale-בת למחזור הנוכחי (אם עוד לא נפתחה —
-   בדיקת כפילות לפי חודש `cycleStart`, כמו maap). מנוע שעבר את `finishDate`
-   נסגר. מיילים: לאוחז (`role:'holder'` → מרכז המכירות) וללקוח
-   (`role:'customer'` → עמוד העסקאות) — `monthlyRecurringSale.svelte`.
+   בדיקת כפילות לפי חודש `cycleStart`, כמו maap), המקושרת גם ל-Sheirut של
+   המנוע. מנוע שעבר את `finishDate` נסגר. מיילים: לאוחז (`role:'holder'` →
+   מרכז המכירות) וללקוח (`role:'customer'` → עמוד העסקאות) —
+   `monthlyRecurringSale.svelte`.
 3. **דיווח האוחז** — מרכז המכירות (`/deals/sales-center`), סקשן "מכירות
    מתחדשות — דיווח חודשי" (`RecurringCycleCard`, `role='holder'`): פעולת
    `reportRecurringSaleCycle` (jwt + בדיקת ישות: האוחז בלבד). אם הסכום זהה

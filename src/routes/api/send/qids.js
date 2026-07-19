@@ -12742,6 +12742,7 @@ export const qids = {
         project { data { id attributes { projectName restime } } }
         users_permissions_user { data { id attributes { username email lang noMail } } }
         customer { data { id attributes { username email lang noMail } } }
+        sheiruts { data { id } }
         recurringSales(pagination: { limit: 500 }) { data { id attributes { cycleStart pending } } }
       } }
     }
@@ -12753,6 +12754,7 @@ export const qids = {
     $matanot: ID,
     $users_permissions_user: ID!,
     $customer: ID,
+    $sheiruts: [ID],
     $recurringSource: ID!,
     $unit: Float,
     $date: DateTime!,
@@ -12766,6 +12768,7 @@ export const qids = {
       matanot: $matanot,
       users_permissions_user: $users_permissions_user,
       customer: $customer,
+      sheiruts: $sheiruts,
       recurringSource: $recurringSource,
       unit: $unit,
       date: $date,

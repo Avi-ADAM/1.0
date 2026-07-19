@@ -434,11 +434,15 @@ async function runRecurringSaleCycles(fetchFn) {
       if (hasOpenCycleFor(children, cycleStart)) continue; // already opened this window
 
       const customer = a.customer?.data;
+      // The engine's Sheirut is the standing-order record (the canonical
+      // customer link) — attach each monthly cycle to it as well.
+      const sheirutIds = (a.sheiruts?.data ?? []).map((s) => s.id);
       const vars = {
         project: projectId,
         matanot: a.matanot?.data?.id ?? null,
         users_permissions_user: holder.id,
         customer: customer?.id ?? null,
+        sheiruts: sheirutIds.length > 0 ? sheirutIds : null,
         recurringSource: id,
         unit: a.unit ?? null,
         date: cycleStart.toISOString(),
