@@ -8742,6 +8742,109 @@ export const moachQids = {
     }
   }`,
 
+  /* Detailed process page (moach/[projectId]/processes/[processId]): the full
+   * lifecycle snapshot of every mission/resource chain in the project,
+   * INCLUDING archived entities — the page shows the whole life of a mission
+   * or resource, from the initial decision (votes/negotiation) through the
+   * open offer + join requests, execution (acts, timers, monthly hours),
+   * finish approvals and the official archive. partofs are selected so the
+   * page can also resolve a partof-based "process" id from the processes tab. */
+  'processLifecycleData': `query ProcessLifecycleData($pid: ID!) {
+    project(id: $pid) {
+      data {
+        id
+        attributes {
+          projectName
+          restime
+          acts { data { id attributes {
+            shem des link hashivut naasa myIshur valiIshur status dateS dateF createdAt
+            my { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            vali { data { id attributes { username } } }
+            pendm { data { id } }
+            open_mission { data { id } }
+            mesimabetahaliches { data { id } }
+          } } }
+          pendms { data { id attributes {
+            name descrip hearotMeyuchadot noofhours perhour dates sqadualed iskvua archived createdAt
+            rishon { data { id attributes { username } } }
+            mission { data { id } }
+            open_mission { data { id } }
+            timegrama { data { id attributes { date done } } }
+            forums { data { id } }
+            tafkidims { data { id attributes { roleDescription } } }
+            users { id what why order zman users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } } }
+          } } }
+          open_missions { data { id attributes {
+            name descrip hearotMeyuchadot noofhours perhour sqadualed archived createdAt
+            pendm { data { id } }
+            rishon { data { id attributes { username } } }
+            partofs { data { id } }
+            tafkidims { data { id attributes { roleDescription } } }
+            asks { data { id attributes {
+              archived createdAt
+              users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+              vots { id what why order zman users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } } }
+              forums { data { id } }
+              timegrama { data { id attributes { date done } } }
+            } } }
+          } } }
+          mesimabetahaliches { data { id attributes {
+            name descrip status iskvua finnished start createdAt dates
+            howmanyhoursalready hoursassinged perhour totalHoursSaved
+            monter { id monthStart hours hoursDone isDone finnished_mission { data { id } } }
+            forums { data { id } }
+            partofs { data { id } }
+            open_missions { data { id } }
+            users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+            finiapruvals { data { id attributes {
+              missname archived createdAt month noofhours why isTimerSave
+              vots { id what why order zman users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } } }
+              users_permissions_user { data { id attributes { username } } }
+              timegrama { data { id attributes { date done } } }
+            } } }
+            timers { data { id attributes {
+              start finnish totalHours isActive saved appruved saveText saveLinks
+              users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+              acts { data { id attributes { shem } } }
+            } } }
+          } } }
+          finnished_missions { data { id attributes {
+            missionName descrip hearotMeyuchadot why start finish month total noofhours perhour createdAt
+            mesimabetahalich { data { id } }
+            users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          } } }
+          open_mashaabims { data { id attributes {
+            name descrip spnot kindOf hm price easy archived createdAt sqadualed sqadualedf recurring
+            partofs { data { id } }
+            pmash { data { id attributes {
+              name descrip spnot kindOf hm price easy archived createdAt
+              forums { data { id } }
+              timegrama { data { id attributes { date done } } }
+              users { id what why order zman users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } } }
+            } } }
+            askms { data { id attributes {
+              archived createdAt isSelfProposal
+              users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
+              sp { data { id attributes { users_permissions_user { data { id attributes { username } } } } } }
+              vots { id what why order zman users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } } }
+              forum { data { id } }
+              timegrama { data { id attributes { date done } } }
+            } } }
+            maap { data { id attributes {
+              name archived createdAt quantityDelivered unit
+              vots { id what why order zman users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } } }
+              forum { data { id } }
+              timegrama { data { id attributes { date done } } }
+            } } }
+            rikmashes { data { id attributes {
+              name kindOf total hm price agprice spnot summary createdAt quantityDelivered
+              users_permissions_user { data { id attributes { username } } }
+            } } }
+          } } }
+        }
+      }
+    }
+  }`,
   'getProjectMissions': `query GetProjectMissions($pid: ID!) {
     project(id: $pid) {
       data {

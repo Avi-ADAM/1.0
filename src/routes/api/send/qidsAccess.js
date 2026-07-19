@@ -73,6 +73,9 @@ export const qidsAccess = {
   'updateMatanotQuant': { allow: ['user', 'serviceAdmin'] },
   'createMonterForSale': { allow: ['user', 'serviceAdmin'] },
   'saleClaimProjectInfo': { allow: ['user', 'serviceAdmin'] },
+  'updateProjectSupportPage': { allow: ['serviceAdmin'] }, // server-only callers (setSupportPage action via StrapiClient)
+  'createDonationSaleRecord': { allow: ['serviceAdmin'] }, // server-only callers (createDonationSale action via StrapiClient)
+  'donationProjectInfo': { allow: ['serviceAdmin'] }, // server-only callers (donation actions via StrapiClient)
   'createSaleClaimDecision': { allow: ['user', 'serviceAdmin'] },
   'updateSaleHolderLink': { allow: ['user', 'serviceAdmin'] },
   'getSaleClaimDecision': { allow: ['user', 'serviceAdmin'] },
@@ -406,6 +409,7 @@ export const qidsAccess = {
   'getProjectBaseInfoWithAuth': { allow: ['user', 'serviceAdmin'] },
   'chainExtraData': { allow: ['user', 'serviceAdmin'] },
   'chainDetailProjectData': { allow: ['user', 'serviceAdmin'] },
+  'processLifecycleData': { allow: ['user', 'serviceAdmin'] },
   'getProjectMissions': { allow: ['user', 'serviceAdmin'] },
   'getMissionTemplates': { allow: ['user', 'serviceAdmin'] },
   'getProjectFinancials': { allow: ['user', 'serviceAdmin'] },
