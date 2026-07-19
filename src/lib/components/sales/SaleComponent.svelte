@@ -51,11 +51,19 @@
   let total = $state(0);
   let hm = $state(1);
   let note = $state('');
+  // PLAN_RECURRING_SALES: exact 1lev1 username/email of the paying customer,
+  // only for open-ended monthly/yearly sales (standing orders). When set, the
+  // customer gets a monthly card on their deals page to report the transfer.
+  let customerIdentifier = $state('');
   let placeholder = tr.sales.withWhomMoney;
   let already = $state(false);
   let per = $state(false);
   let dates = $state(null);
   let datef = $state(null);
+  // Open-ended monthly/yearly sale = a recurring engine (standing order).
+  let isRecurring = $derived(
+    (kindOf === 'monthly' || kindOf === 'yearly') && dates !== null && datef === null
+  );
   let noSelectedE = $state(false);
   let datesE = $state(false);
   let currentOperationId = $state(null);
@@ -139,6 +147,8 @@
       if (kindOf === 'monthly' || kindOf === 'yearly') {
         actionParams.startDate = new Date(dates).toISOString();
         if (datef !== null) actionParams.finishDate = new Date(datef).toISOString();
+        else if (customerIdentifier.trim())
+          actionParams.customerIdentifier = customerIdentifier.trim();
       }
 
       const result = await executeAction('createSale', actionParams);
@@ -273,6 +283,27 @@
     />
     {#if datef === null}
       <small class="text-barbi text-center "><mark>{noFinnish[$lang]}</mark></small>
+    {/if}
+
+    {#if isRecurring}
+      <!-- Standing order: optional paying customer (registered user) who will
+           report the monthly transfer from their deals page. -->
+      <small class="text-barbi text-center mt-2">
+        {$lang === 'en'
+          ? 'Customer (optional) — exact 1lev1 username or email'
+          : 'לקוח (אופציונלי) — שם משתמש או אימייל מדויק ב-1lev1'}
+      </small>
+      <input
+        class="bg-gold hover:bg-mtork border-2 border-barbi rounded text-barbi placeholder-barbi/70 p-1"
+        type="text"
+        placeholder={$lang === 'en' ? 'username or email' : 'שם משתמש או אימייל'}
+        bind:value={customerIdentifier}
+      />
+      <small class="text-barbi/70 text-center text-xs">
+        {$lang === 'en'
+          ? 'A standing order opens a monthly report card; a named customer also confirms their transfer each month.'
+          : 'מכירה מתחדשת פותחת כרטיס דיווח חודשי; לקוח מזוהה גם יעדכן כל חודש כמה העביר.'}
+      </small>
     {/if}
   {/if}
 

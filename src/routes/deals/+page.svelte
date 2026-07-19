@@ -4,6 +4,9 @@
   import PendingRequestCard from '$lib/components/deals/PendingRequestCard.svelte';
   import IncomingWishCard from '$lib/components/deals/IncomingWishCard.svelte';
   import { t } from '$lib/translations';
+  import { lang } from '$lib/stores/lang.js';
+  import { invalidateAll } from '$app/navigation';
+  import RecurringCycleCard from '$lib/components/sales/RecurringCycleCard.svelte';
   import {
     saleToDeal,
     salesToStats,
@@ -22,6 +25,10 @@
   const pendingAll = $derived([...pendingBuy, ...pendingSell]);
   const incomingWishes = $derived(data.incomingWishes ?? []);
   const newWishCount = $derived(incomingWishes.filter((w) => w.status === 'suggested').length);
+
+  // PLAN_RECURRING_SALES — standing orders where I'm the paying customer:
+  // one open cycle per month, asking how much I transferred.
+  const customerCycles = $derived(data.customerCycles ?? []);
 
   const activeList = $derived(tab === 'purchase' ? purchases : tab === 'sale' ? sales : []);
   const deals = $derived(
@@ -66,6 +73,26 @@
       <span class="quick-arrow">←</span>
     </a>
   </div>
+
+  {#if customerCycles.length > 0}
+    <section class="cycles-section anim">
+      <h2 class="cycles-title">
+        {$lang === 'he'
+          ? `💳 הוראות קבע — עדכון חודשי (${customerCycles.length})`
+          : `💳 Standing orders — monthly update (${customerCycles.length})`}
+      </h2>
+      <p class="cycles-sub">
+        {$lang === 'he'
+          ? 'כמה העברת החודש? העדכון שלך יאפשר למוכר לאשרר שהתקבל. גם 0 הוא עדכון.'
+          : 'How much did you transfer this month? Your update lets the seller confirm receipt. 0 counts too.'}
+      </p>
+      <div class="cycles-grid">
+        {#each customerCycles as cycle (cycle.id)}
+          <RecurringCycleCard {cycle} role="customer" onDone={() => invalidateAll()} />
+        {/each}
+      </div>
+    </section>
+  {/if}
 
   <!-- Tabs -->
   <div class="tabs anim">
@@ -191,6 +218,32 @@
 
 <style>
   /* .page-top / .page-title / .page-sub / .page-logo / .accent are global — see app.postcss */
+
+  /* ── Standing orders — monthly customer update ── */
+  .cycles-section {
+    margin-bottom: 24px;
+  }
+  .cycles-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gold-l);
+    margin: 0 0 4px;
+  }
+  .cycles-sub {
+    font-size: 13px;
+    color: var(--tm);
+    margin: 0 0 14px;
+  }
+  .cycles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 16px;
+  }
+  @media (max-width: 600px) {
+    .cycles-grid {
+      grid-template-columns: 1fr;
+    }
+  }
 
   /* ── Quick Action Links ── */
   .quick-links {

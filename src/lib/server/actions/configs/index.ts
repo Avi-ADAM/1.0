@@ -122,6 +122,8 @@ import { offerWishHelpConfig } from './offerWishHelp.js';
 import { addAskmChatEntryConfig } from './addAskmChatEntry.js';
 import { addAskChatEntryConfig } from './addAskChatEntry.js';
 import { createSaleConfig } from './createSale.js';
+import { reportRecurringSaleCycleConfig } from './reportRecurringSaleCycle.js';
+import { customerReportRecurringSaleCycleConfig } from './customerReportRecurringSaleCycle.js';
 import { counterSaleClaimConfig } from './counterSaleClaim.js';
 import { setSupportPageConfig } from './setSupportPage.js';
 import { createDonationSaleConfig } from './createDonationSale.js';
@@ -342,6 +344,9 @@ export function registerAllActions(): void {
 
   // Sale reporting (SaleComponent — shared by gift/[id] and sales-center)
   registerAction(createSaleConfig);
+  // Recurring sales (PLAN_RECURRING_SALES): monthly cycle reporting
+  registerAction(reportRecurringSaleCycleConfig);
+  registerAction(customerReportRecurringSaleCycleConfig);
   // Bilateral holder-consent negotiation on a saleClaim Decision
   registerAction(counterSaleClaimConfig);
 

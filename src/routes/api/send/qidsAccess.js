@@ -72,6 +72,18 @@ export const qidsAccess = {
   'createSaleRecord': { allow: ['user', 'serviceAdmin'] },
   'updateMatanotQuant': { allow: ['user', 'serviceAdmin'] },
   'createMonterForSale': { allow: ['user', 'serviceAdmin'] },
+  // Recurring sales (PLAN_RECURRING_SALES) — monthi-only qids are serviceAdmin;
+  // report/confirm qids run inside actions with the user's JWT (entity-level
+  // holder/customer checks live in the action handlers).
+  'mrsListRecurringSaleEngines': { allow: ['serviceAdmin'] },
+  'mrsCreateCycleSale': { allow: ['serviceAdmin'] },
+  'mrsCloseRecurringSale': { allow: ['user', 'serviceAdmin'] },
+  'mrsGetCycleForReport': { allow: ['user', 'serviceAdmin'] },
+  'mrsReportCycleSale': { allow: ['user', 'serviceAdmin'] },
+  'mrsCustomerReportCycle': { allow: ['user', 'serviceAdmin'] },
+  'saleCenterPendingCycles': { allow: ['user', 'serviceAdmin'] },
+  'dealsCustomerPendingCycles': { allow: ['user', 'serviceAdmin'] },
+  'mrsFindCustomer': { allow: ['user', 'serviceAdmin'] },
   'saleClaimProjectInfo': { allow: ['user', 'serviceAdmin'] },
   'createSaleClaimDecision': { allow: ['user', 'serviceAdmin'] },
   'updateSaleHolderLink': { allow: ['user', 'serviceAdmin'] },

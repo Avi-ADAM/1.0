@@ -46,7 +46,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     finishDate = null,
     note = '',
     externalId = null,
-    source = null
+    source = null,
+    customerIdentifier = null
   } = params as {
     productId: string;
     projectId: string;
@@ -61,6 +62,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     note?: string;
     externalId?: string | null;
     source?: string | null;
+    customerIdentifier?: string | null;
   };
 
   const now = new Date().toISOString();
@@ -91,6 +93,25 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
 
   const holderStatus = isSelf ? 'self' : 'open';
 
+  // Recurring engine (PLAN_RECURRING_SALES): an open-ended monthly/yearly sale
+  // is a standing order — the monther opens a monthly report cycle for it.
+  const isRecurringEngine =
+    (kindOf === 'monthly' || kindOf === 'yearly') && !!startDate && !finishDate;
+
+  // Optional paying customer — must be a registered user (exact username or
+  // email) so they can report their monthly transfers on the deals page.
+  let customerId: string | null = null;
+  if (isRecurringEngine && (customerIdentifier as string)?.trim()) {
+    const q = (customerIdentifier as string).trim();
+    const found = await strapi.execute('mrsFindCustomer', { q }, context.jwt, context.fetch);
+    customerId = found?.data?.usersPermissionsUsers?.data?.[0]?.id
+      ? String(found.data.usersPermissionsUsers.data[0].id)
+      : null;
+    if (!customerId) {
+      throw new Error(`Customer "${q}" not found — use their exact 1lev1 username or email`);
+    }
+  }
+
   // 1. Create the sale record (with reporter + holderStatus).
   const saleVars: Record<string, unknown> = {
     project: projectId,
@@ -105,6 +126,11 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
   };
   if (startDate) saleVars.startDate = startDate;
   if (finishDate) saleVars.finishDate = finishDate;
+  if (isRecurringEngine) {
+    saleVars.recurring = true;
+    saleVars.isMonterActive = true;
+    if (customerId) saleVars.customer = customerId;
+  }
   if ((note as string)?.trim()) saleVars.note = (note as string).trim();
   // External Sales API: order id for idempotency + provenance tag.
   if ((externalId as string)?.trim()) saleVars.externalId = (externalId as string).trim();
@@ -133,7 +159,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
   }
 
   // 3. Create recurring Monter for open-ended monthly/yearly sales.
-  if ((kindOf === 'monthly' || kindOf === 'yearly') && startDate && !finishDate) {
+  if (isRecurringEngine) {
     try {
       await strapi.execute(
         'createMonterForSale',
@@ -261,7 +287,12 @@ export const createSaleConfig: ActionConfig = {
     finishDate: { type: 'string', required: false },
     note: { type: 'string', required: false },
     externalId: { type: 'string', required: false },
-    source: { type: 'string', required: false }
+    source: { type: 'string', required: false },
+    customerIdentifier: {
+      type: 'string',
+      required: false,
+      description: 'Exact 1lev1 username or email of the paying customer (recurring sales only)'
+    }
   },
   authRules: [
     { type: 'jwt', errorMessage: 'Must be logged in to report a sale' },

@@ -94,6 +94,43 @@ export async function load({ locals, fetch }) {
     console.error('sales-center load error', e);
   }
 
+  // Recurring sales (PLAN_RECURRING_SALES): my pending monthly report cycles
+  // as the money-holder — one card per cycle, settled by reporting the actual
+  // amount that came in this month.
+  let pendingCycles = [];
+  try {
+    const res = await fetch(STRAPI_GRAPHQL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${tok}`
+      },
+      body: JSON.stringify({
+        query: qids['saleCenterPendingCycles'],
+        variables: { uid: String(uid) }
+      })
+    });
+    const json = await res.json();
+    pendingCycles = (json?.data?.sales?.data ?? []).map((s) => {
+      const at = s.attributes ?? {};
+      return {
+        id: s.id,
+        cycleStart: at.cycleStart,
+        cycleEnd: at.cycleEnd,
+        note: at.note ?? '',
+        customerAmount: at.customerAmount ?? null,
+        customerReportedAt: at.customerReportedAt ?? null,
+        customerName: at.customer?.data?.attributes?.username ?? '',
+        productName: at.matanot?.data?.attributes?.name ?? '',
+        projectName: at.project?.data?.attributes?.projectName ?? '',
+        engineId: at.recurringSource?.data?.id ?? null,
+        expectedAmount: at.recurringSource?.data?.attributes?.in ?? null
+      };
+    });
+  } catch (e) {
+    console.error('sales-center pending cycles load error', e);
+  }
+
   return {
     uid,
     lang,
@@ -101,6 +138,7 @@ export async function load({ locals, fetch }) {
     projects,
     projectUsersMap,
     openSaleClaims,
+    pendingCycles,
     user: {
       username,
       profilePic

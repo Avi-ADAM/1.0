@@ -2,6 +2,7 @@
   import { isRtl } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import SaleComponent from '$lib/components/sales/SaleComponent.svelte';
+  import RecurringCycleCard from '$lib/components/sales/RecurringCycleCard.svelte';
   import CreateProductFlow from '$lib/components/offerings/CreateProductFlow.svelte';
   import { RingLoader } from 'svelte-loading-spinners';
   import { toast } from 'svelte-sonner';
@@ -15,6 +16,10 @@
   let openSaleClaims = $derived(data.openSaleClaims ?? []);
   let myTurnClaims = $derived(openSaleClaims.filter((c) => c.myTurn));
   let waitingClaims = $derived(openSaleClaims.filter((c) => !c.myTurn));
+
+  // PLAN_RECURRING_SALES — my pending monthly cycles as the money-holder:
+  // one card per standing order per month, settled by reporting the amount.
+  let pendingCycles = $derived(data.pendingCycles ?? []);
 
   let loading = $state(false);
   let error = $state(null);
@@ -289,6 +294,26 @@
     </div>
   {/if}
 
+  {#if pendingCycles.length > 0}
+    <section class="cycles-section anim">
+      <h2 class="cycles-title">
+        {$lang === 'he'
+          ? `🔁 מכירות מתחדשות — דיווח חודשי (${pendingCycles.length})`
+          : `🔁 Recurring sales — monthly report (${pendingCycles.length})`}
+      </h2>
+      <p class="cycles-sub">
+        {$lang === 'he'
+          ? 'כמה נכנס החודש מכל הוראת קבע? גם 0 הוא דיווח — והוראה שבוטלה אפשר לסגור כאן.'
+          : 'How much came in this month from each standing order? 0 is a valid report — and a cancelled order can be closed here.'}
+      </p>
+      <div class="cycles-grid">
+        {#each pendingCycles as cycle (cycle.id)}
+          <RecurringCycleCard {cycle} role="holder" onDone={() => invalidateAll()} />
+        {/each}
+      </div>
+    </section>
+  {/if}
+
   {#if loading}
     <div class="state-block">
       <RingLoader size="60" color="var(--gold)" />
@@ -524,6 +549,32 @@
     background: var(--gold-d);
     color: var(--gold-l);
     border: 1px solid var(--border-g);
+  }
+
+  /* ── Recurring monthly cycles ── */
+  .cycles-section {
+    margin-bottom: 28px;
+  }
+  .cycles-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gold-l);
+    margin: 0 0 4px;
+  }
+  .cycles-sub {
+    font-size: 13px;
+    color: var(--tm);
+    margin: 0 0 14px;
+  }
+  .cycles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 16px;
+  }
+  @media (max-width: 600px) {
+    .cycles-grid {
+      grid-template-columns: 1fr;
+    }
   }
 
   /* ── Loading / error state ── */
