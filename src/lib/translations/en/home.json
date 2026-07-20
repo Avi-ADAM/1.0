@@ -93,6 +93,11 @@
     "pain4": "And there are only two options: an employee with no freedom, or a lone entrepreneur carrying all the risk.",
     "painCost": "So whole years are sold cheap — and the dream is postponed to another 'someday'.",
     "painTurn": "What if work could be both a calling — and an asset that stays yours?",
+    "painCustomerTitle": "And the biggest loser of all? The customer.",
+    "painCustomer1": "The person serving you is an employee — their money comes from the boss, not from you. There is no financial bond between you.",
+    "painCustomer2": "So their loyalty naturally flows to the boss — and the customer becomes a nuisance, just another part of the job.",
+    "painCustomer3": "The simple truth? All the money comes from the customer. You are the one who deserves the full attention.",
+    "painCustomerTurn": "In a Rikma, whoever serves you is a partner: your money is their direct income — and the customer is back at the center.",
     "oldWayTitle": "Why the old way doesn't really work",
     "oldWaySub": "Between two bad options — there's a third way.",
     "colEmployee_t": "Employee",
@@ -128,7 +133,8 @@
     "customerCta": "Tell us what you want ✨",
     "providerTitle": "For business owners & providers",
     "providerDesc": "Customers are already searching — let them find you. Every wish that includes what you offer reaches you as a warm, pre-matched lead, with partners who complete you into a whole package.",
-    "providerCta": "Get leads — join as a provider"
+    "providerCta": "Get leads — join as a provider",
+    "bridge": "That's why wishes and partnerships live on one site: when providers are partners in a Rikma rather than someone's employees, your money is their direct income — and their heart is exactly where the customer is."
   },
   "maze": {
     "title": "Let's clear things up",
