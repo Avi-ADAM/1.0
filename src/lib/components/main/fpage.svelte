@@ -492,6 +492,38 @@
         >
           {$t('home.sections.painCost')}
         </p>
+        <!-- המפסיד הגדול מכולם: הלקוח -->
+        <div
+          class="mt-6 bg-white/55 backdrop-blur-sm border-2 border-gold/70 rounded-2xl px-4 py-4 shadow-sm"
+        >
+          <h3
+            class="text-rose-700 font-bold text-xl sm:text-lg mb-3 text-center"
+          >
+            {$t('home.sections.painCustomerTitle')}
+          </h3>
+          <div class="flex flex-col gap-2.5">
+            {#each [['painCustomer1', false], ['painCustomer2', false], ['painCustomer3', true]] as [p, good]}
+              <div class="flex items-start gap-3">
+                <span
+                  class="shrink-0 mt-0.5 w-6 h-6 rounded-full {good
+                    ? 'bg-amber-100'
+                    : 'bg-rose-100 text-rose-500'} flex items-center justify-center text-sm font-bold"
+                  >{good ? '💗' : '✕'}</span
+                >
+                <p
+                  class="text-slate-800 text-base sm:text-sm leading-relaxed text-start"
+                >
+                  {$t(`home.sections.${p}`)}
+                </p>
+              </div>
+            {/each}
+          </div>
+          <p
+            class="text-center text-rose-700 font-semibold text-base sm:text-sm mt-3"
+          >
+            {$t('home.sections.painCustomerTurn')}
+          </p>
+        </div>
         <div class="mt-5 text-center">
           <p
             class="inline-block bg-gradient-to-r from-gold via-barbi to-gold bg-[length:200%_auto] animate-gradientx text-white font-bold text-xl sm:text-lg px-6 py-3 rounded-2xl shadow-lg"
@@ -874,6 +906,11 @@
               </button>
             </div>
           </div>
+          <p
+            class="mt-4 text-center bg-white/60 backdrop-blur-sm border border-gold/70 rounded-2xl px-4 py-3 text-slate-800 text-base sm:text-sm leading-relaxed"
+          >
+            {$t('home.concierge.bridge')}
+          </p>
         </section>
 
         <!-- בלוק: למי זה מתאים -->
