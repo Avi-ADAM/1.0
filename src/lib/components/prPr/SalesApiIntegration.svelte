@@ -365,10 +365,10 @@
 
 <style>
   .sales-api {
-    margin: 1rem 0;
     border: 1px solid var(--mtork, #d4af37);
     border-radius: 0.5rem;
     overflow: hidden;
+    align-self: start;
   }
   .accordion-toggle {
     width: 100%;

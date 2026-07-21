@@ -46,7 +46,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     finishDate = null,
     note = '',
     externalId = null,
-    source = null
+    source = null,
+    customerIdentifier = null
   } = params as {
     productId: string;
     projectId: string;
@@ -61,6 +62,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     note?: string;
     externalId?: string | null;
     source?: string | null;
+    customerIdentifier?: string | null;
   };
 
   const now = new Date().toISOString();
@@ -91,6 +93,27 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
 
   const holderStatus = isSelf ? 'self' : 'open';
 
+  // Recurring engine (PLAN_RECURRING_SALES): an open-ended monthly/yearly sale
+  // is a standing order — the monther opens a monthly report cycle for it.
+  const isRecurringEngine =
+    (kindOf === 'monthly' || kindOf === 'yearly') && !!startDate && !finishDate;
+
+  // Optional customer (PLAN_SALE_CUSTOMER_LINK) — any sale kind may name one.
+  // Must resolve to a registered user (exact username or email): the canonical
+  // customer↔sale link is a Sheirut intermediary created below, which needs
+  // the real user so the purchase shows on their deals page.
+  let customerId: string | null = null;
+  if ((customerIdentifier as string)?.trim()) {
+    const q = (customerIdentifier as string).trim();
+    const found = await strapi.execute('mrsFindCustomer', { q }, context.jwt, context.fetch);
+    customerId = found?.data?.usersPermissionsUsers?.data?.[0]?.id
+      ? String(found.data.usersPermissionsUsers.data[0].id)
+      : null;
+    if (!customerId) {
+      throw new Error(`Customer "${q}" not found — use their exact 1lev1 username or email`);
+    }
+  }
+
   // 1. Create the sale record (with reporter + holderStatus).
   const saleVars: Record<string, unknown> = {
     project: projectId,
@@ -105,6 +128,13 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
   };
   if (startDate) saleVars.startDate = startDate;
   if (finishDate) saleVars.finishDate = finishDate;
+  if (isRecurringEngine) {
+    saleVars.recurring = true;
+    saleVars.isMonterActive = true;
+  }
+  // Denormalized pointer for the monthly-cycle queries; the canonical link is
+  // the Sheirut intermediary created after the sale record.
+  if (customerId) saleVars.customer = customerId;
   if ((note as string)?.trim()) saleVars.note = (note as string).trim();
   // External Sales API: order id for idempotency + provenance tag.
   if ((externalId as string)?.trim()) saleVars.externalId = (externalId as string).trim();
@@ -132,8 +162,50 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     }
   }
 
+  // 2b. Customer named → create the Sheirut intermediary, the platform's
+  // standard customer↔sale link (PLAN_SALE_CUSTOMER_LINK). It records the
+  // purchase on the customer's deals page. A regular sale is reported only
+  // once the money moved ("שולם") ⇒ moneyTransfered:true and no customer
+  // confirmation; a recurring engine's sheirut is the ongoing standing order
+  // whose payment state is settled per monthly cycle instead.
+  let sheirutId: string | undefined;
+  if (customerId) {
+    try {
+      const productName = saleData.attributes?.matanot?.data?.attributes?.name ?? '';
+      const qty = Number(quantity);
+      const sheirutData: Record<string, unknown> = {
+        project: projectId,
+        users_permissions_users: [customerId],
+        matanot: productId,
+        sales: [saleId],
+        name: productName || 'מכירה',
+        price: qty > 0 ? Number(total) / qty : Number(total),
+        quant: qty,
+        total: Number(total),
+        oneTime: !isRecurringEngine,
+        isApruved: true,
+        archived: false,
+        moneyTransfered: !isRecurringEngine
+      };
+      if (startDate) sheirutData.startDate = startDate;
+      if (finishDate) sheirutData.finnishDate = finishDate;
+      const shRes = await strapi.execute(
+        '87createSheirut',
+        { data: sheirutData },
+        context.jwt,
+        context.fetch
+      );
+      sheirutId = shRes?.data?.createSheirut?.data?.id
+        ? String(shRes.data.createSheirut.data.id)
+        : undefined;
+      if (!sheirutId) console.warn('[createSale] sheirut creation returned no id', shRes);
+    } catch (err) {
+      console.warn('[createSale] customer sheirut creation failed:', err);
+    }
+  }
+
   // 3. Create recurring Monter for open-ended monthly/yearly sales.
-  if ((kindOf === 'monthly' || kindOf === 'yearly') && startDate && !finishDate) {
+  if (isRecurringEngine) {
     try {
       await strapi.execute(
         'createMonterForSale',
@@ -239,7 +311,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     newQuantity,
     matana: saleData,
     holderStatus,
-    decisionId
+    decisionId,
+    sheirutId
   };
 };
 
@@ -261,7 +334,13 @@ export const createSaleConfig: ActionConfig = {
     finishDate: { type: 'string', required: false },
     note: { type: 'string', required: false },
     externalId: { type: 'string', required: false },
-    source: { type: 'string', required: false }
+    source: { type: 'string', required: false },
+    customerIdentifier: {
+      type: 'string',
+      required: false,
+      description:
+        'Exact 1lev1 username or email of the customer. Links customer↔sale via a Sheirut intermediary; on regular sales this asserts the money already moved (paid), on recurring sales the customer confirms monthly.'
+    }
   },
   authRules: [
     { type: 'jwt', errorMessage: 'Must be logged in to report a sale' },

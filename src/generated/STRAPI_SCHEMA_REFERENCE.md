@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-07-17
+> Last updated: 2026-07-21
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -2297,6 +2297,11 @@ These are the main content types in the Strapi backend.
 |-------|------|
 | `confirmedBy` | `Maybe<Enum_Sale_Confirmedby>` |
 | `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `customer` | `Maybe<UsersPermissionsUserEntityResponse>` |
+| `customerAmount` | `Maybe<Scalars['Float']['output']>` |
+| `customerReportedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `cycleEnd` | `Maybe<Scalars['DateTime']['output']>` |
+| `cycleStart` | `Maybe<Scalars['DateTime']['output']>` |
 | `date` | `Maybe<Scalars['DateTime']['output']>` |
 | `decision` | `Maybe<DecisionEntityResponse>` |
 | `externalId` | `Maybe<Scalars['String']['output']>` |
@@ -2313,6 +2318,10 @@ These are the main content types in the Strapi backend.
 | `pending` | `Maybe<Scalars['Boolean']['output']>` |
 | `project` | `Maybe<ProjectEntityResponse>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `receivedConfirmedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `recurring` | `Maybe<Scalars['Boolean']['output']>` |
+| `recurringSales` | `Maybe<SaleRelationResponseCollection>` |
+| `recurringSource` | `Maybe<SaleEntityResponse>` |
 | `reporter` | `Maybe<UsersPermissionsUserEntityResponse>` |
 | `sheiruts` | `Maybe<SheirutRelationResponseCollection>` |
 | `source` | `Maybe<Enum_Sale_Source>` |
@@ -2895,6 +2904,7 @@ These are the main content types in the Strapi backend.
 | `rishonvesopen` | `Maybe<OpenMissionRelationResponseCollection>` |
 | `role` | `Maybe<UsersPermissionsRoleEntityResponse>` |
 | `sales` | `Maybe<SaleRelationResponseCollection>` |
+| `sales_as_customer` | `Maybe<SaleRelationResponseCollection>` |
 | `sales_reported` | `Maybe<SaleRelationResponseCollection>` |
 | `sheirutnegos` | `Maybe<SheirutnegoRelationResponseCollection>` |
 | `sheirutpends` | `Maybe<SheirutpendRelationResponseCollection>` |
@@ -5693,6 +5703,11 @@ Used for creating/updating content.
 | Field | Type |
 |-------|------|
 | `confirmedBy` | `InputMaybe<Enum_Sale_Confirmedby>` |
+| `customer` | `InputMaybe<Scalars['ID']['input']>` |
+| `customerAmount` | `InputMaybe<Scalars['Float']['input']>` |
+| `customerReportedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `cycleEnd` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `cycleStart` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `date` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `decision` | `InputMaybe<Scalars['ID']['input']>` |
 | `externalId` | `InputMaybe<Scalars['String']['input']>` |
@@ -5709,6 +5724,10 @@ Used for creating/updating content.
 | `pending` | `InputMaybe<Scalars['Boolean']['input']>` |
 | `project` | `InputMaybe<Scalars['ID']['input']>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `receivedConfirmedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `recurring` | `InputMaybe<Scalars['Boolean']['input']>` |
+| `recurringSales` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `recurringSource` | `InputMaybe<Scalars['ID']['input']>` |
 | `reporter` | `InputMaybe<Scalars['ID']['input']>` |
 | `sheiruts` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `source` | `InputMaybe<Enum_Sale_Source>` |
@@ -6221,6 +6240,7 @@ Used for creating/updating content.
 | `rishonvesopen` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `role` | `InputMaybe<Scalars['ID']['input']>` |
 | `sales` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `sales_as_customer` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `sales_reported` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `sheirutnegos` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `sheirutpends` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -6568,7 +6588,7 @@ Fields: `and`, `bg`, `createdAt`, `desc`, `id`, `locale`, `localizations`, `not`
 Fields: `agprice`, `and`, `createdAt`, `cyclesCount`, `deliveries`, `firstDeliveryAt`, `haamadas`, `hm`, `id`, `isMust`, `isYesod`, `kindOf`, `lastDeliveryAt`, `maaps`, `mashabetahalich`, `name`, `not`, `open_mashaabim`, `or`, `price`, `project`, `publishedAt`, `quantityDelivered`, `sp`, `spnot`, `sqadualed`, `sqadualef`, `summary`, `total`, `updatedAt`, `users_permissions_user`
 
 #### SaleFiltersInput
-Fields: `and`, `confirmedBy`, `createdAt`, `date`, `decision`, `externalId`, `finishDate`, `holderDecidedAt`, `holderStatus`, `id`, `in`, `isDonation`, `isMonterActive`, `isSiteShareIncome`, `matanot`, `monters`, `not`, `note`, `or`, `pending`, `project`, `publishedAt`, `reporter`, `sheiruts`, `source`, `source_project`, `splited`, `startDate`, `tosplits`, `unit`, `updatedAt`, `users_permissions_user`
+Fields: `and`, `confirmedBy`, `createdAt`, `customer`, `customerAmount`, `customerReportedAt`, `cycleEnd`, `cycleStart`, `date`, `decision`, `externalId`, `finishDate`, `holderDecidedAt`, `holderStatus`, `id`, `in`, `isDonation`, `isMonterActive`, `isSiteShareIncome`, `matanot`, `monters`, `not`, `note`, `or`, `pending`, `project`, `publishedAt`, `receivedConfirmedAt`, `recurring`, `recurringSales`, `recurringSource`, `reporter`, `sheiruts`, `source`, `source_project`, `splited`, `startDate`, `tosplits`, `unit`, `updatedAt`, `users_permissions_user`
 
 #### SealedEnvelopeFiltersInput
 Fields: `and`, `createdAt`, `envelopeId`, `id`, `not`, `or`, `payload`, `spaceId`, `ts`, `updatedAt`
@@ -6640,7 +6660,7 @@ Fields: `action`, `and`, `createdAt`, `id`, `not`, `or`, `role`, `updatedAt`
 Fields: `and`, `createdAt`, `description`, `id`, `name`, `not`, `or`, `permissions`, `type`, `updatedAt`, `users`
 
 #### UsersPermissionsUserFiltersInput
-Fields: `acts`, `actsVali`, `and`, `api_keys`, `arr1`, `arrdate`, `askeds`, `askms`, `asks`, `askwants`, `auto_created_via`, `availability_pref`, `bio`, `blocked`, `chezin`, `city`, `confirmationToken`, `confirmed`, `createdAt`, `cuntries`, `cv_extracted_at`, `cv_extraction`, `deals`, `declined`, `declinedByP`, `declinedm`, `device_token`, `discordlink`, `email`, `fblink`, `filtertags`, `finiapruvals`, `finnished_missions`, `forum_last_seens`, `frd`, `free_person`, `githublink`, `haamadas`, `halukasend`, `halukasres`, `haskama`, `haskamac`, `haskamaz`, `hatzaas`, `hervachti`, `iGotMOneyForSheirut`, `id`, `isSigned`, `lang`, `lat`, `levManualAlready`, `lng`, `location`, `machshirs`, `mashaabims`, `mashabetahaliches`, `matanot_recipe_missions`, `matanot_recipe_resources`, `match_suggestions`, `mesimabetahaliches`, `messages`, `mission_offers`, `missions_i_can_do`, `moachManualAlready`, `nego_mashes`, `negopendmissions`, `negotiations`, `negotiationsIparticipante`, `noMail`, `noMoachGuide`, `noOfHoursProject1`, `not`, `onboarding_status`, `onboarding_track`, `open_missions`, `or`, `owned_matanots`, `password`, `pendms`, `pendmsforme`, `personal_project`, `pgishas`, `pgishasPendStrat`, `pgishauserpends`, `pgishausers`, `pledges`, `pmashes`, `positionsAuthor`, `preferCards`, `pricing_pref`, `profilManualAlready`, `projects_1s`, `provider`, `radius`, `ratson_proposals`, `ratson_shares`, `ratsons`, `resetPasswordToken`, `rikmashes`, `rishonvesopen`, `role`, `sales`, `sales_reported`, `sheirutnegos`, `sheirutpends`, `sheiruts`, `sheiruts_iCanGetMonay`, `shekelsPerHoureProject1`, `site_share_contributions`, `skills`, `socketId`, `sphmin`, `sps`, `tafkidims`, `telegramId`, `timeForVid`, `timers`, `twiterlink`, `updatedAt`, `username`, `vallues`, `videoval`, `votes`, `wants`, `welcom_tops`, `work_ways`, `zohars`
+Fields: `acts`, `actsVali`, `and`, `api_keys`, `arr1`, `arrdate`, `askeds`, `askms`, `asks`, `askwants`, `auto_created_via`, `availability_pref`, `bio`, `blocked`, `chezin`, `city`, `confirmationToken`, `confirmed`, `createdAt`, `cuntries`, `cv_extracted_at`, `cv_extraction`, `deals`, `declined`, `declinedByP`, `declinedm`, `device_token`, `discordlink`, `email`, `fblink`, `filtertags`, `finiapruvals`, `finnished_missions`, `forum_last_seens`, `frd`, `free_person`, `githublink`, `haamadas`, `halukasend`, `halukasres`, `haskama`, `haskamac`, `haskamaz`, `hatzaas`, `hervachti`, `iGotMOneyForSheirut`, `id`, `isSigned`, `lang`, `lat`, `levManualAlready`, `lng`, `location`, `machshirs`, `mashaabims`, `mashabetahaliches`, `matanot_recipe_missions`, `matanot_recipe_resources`, `match_suggestions`, `mesimabetahaliches`, `messages`, `mission_offers`, `missions_i_can_do`, `moachManualAlready`, `nego_mashes`, `negopendmissions`, `negotiations`, `negotiationsIparticipante`, `noMail`, `noMoachGuide`, `noOfHoursProject1`, `not`, `onboarding_status`, `onboarding_track`, `open_missions`, `or`, `owned_matanots`, `password`, `pendms`, `pendmsforme`, `personal_project`, `pgishas`, `pgishasPendStrat`, `pgishauserpends`, `pgishausers`, `pledges`, `pmashes`, `positionsAuthor`, `preferCards`, `pricing_pref`, `profilManualAlready`, `projects_1s`, `provider`, `radius`, `ratson_proposals`, `ratson_shares`, `ratsons`, `resetPasswordToken`, `rikmashes`, `rishonvesopen`, `role`, `sales`, `sales_as_customer`, `sales_reported`, `sheirutnegos`, `sheirutpends`, `sheiruts`, `sheiruts_iCanGetMonay`, `shekelsPerHoureProject1`, `site_share_contributions`, `skills`, `socketId`, `sphmin`, `sps`, `tafkidims`, `telegramId`, `timeForVid`, `timers`, `twiterlink`, `updatedAt`, `username`, `vallues`, `videoval`, `votes`, `wants`, `welcom_tops`, `work_ways`, `zohars`
 
 #### VallueFiltersInput
 Fields: `and`, `createdAt`, `decisions`, `decisionsles`, `descrip`, `id`, `locale`, `localizations`, `not`, `open_missions`, `or`, `pendms`, `projects`, `publishedAt`, `ratsons`, `updatedAt`, `users`, `valueName`
@@ -7199,7 +7219,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 19089 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 19135 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

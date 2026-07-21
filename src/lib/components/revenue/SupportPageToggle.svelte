@@ -87,12 +87,7 @@
 
 <style>
   .spt {
-    border: 2px solid var(--gold, #d4af37);
-    border-radius: 1rem;
-    padding: 1rem 1.25rem;
-    background: rgba(255, 215, 0, 0.06);
-    max-width: 32rem;
-    margin: 0 auto;
+    width: 100%;
   }
   .spt-head {
     display: flex;
@@ -107,13 +102,14 @@
   .spt-view {
     font-size: 0.85rem;
     font-weight: 700;
-    color: var(--gold, #b8860b);
+    color: var(--gold-l, #f1c47a);
     text-decoration: underline;
     white-space: nowrap;
   }
   .spt-desc {
     font-size: 0.85rem;
-    color: rgba(0, 0, 0, 0.6);
+    color: inherit;
+    opacity: 0.85;
     margin: 0.5rem 0 0.9rem;
   }
   .spt-seg {

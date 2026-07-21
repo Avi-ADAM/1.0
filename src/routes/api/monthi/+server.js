@@ -4,6 +4,7 @@
 
 import { objToString } from '$lib/func/objToString.svelte';
 import { SendToAdmin } from '$lib/server/sendToAdmin.js';
+import { sendToSer } from '$lib/send/sendToSer.js';
 // Server-only secret — never exposed to the client bundle (no VITE_ prefix).
 import { ADMINMONTHER } from '$env/static/private';
 
@@ -215,7 +216,10 @@ export async function GET({ fetch }) {
   // ── Recurring resources (mashabetahalich): open this month's cycle ─────────
   const sucRes = await runRecurringResources(fetch);
 
-  return new Response(JSON.stringify({ missions: suc, resources: sucRes }));
+  // ── Recurring sales (standing orders): open this month's report cycle ──────
+  const sucSales = await runRecurringSaleCycles(fetch);
+
+  return new Response(JSON.stringify({ missions: suc, resources: sucRes, sales: sucSales }));
 }
 
 // For every active recurring resource, open a Maap cycle for the current month
@@ -333,6 +337,143 @@ async function runRecurringResources(fetchFn) {
       opened.push(id);
     } catch (e) {
       console.error('monthi: error processing recurring resource', id, e);
+    }
+  }
+
+  return opened;
+}
+
+// Render the monthly recurring-sale email (holder or customer flavor) and post
+// it to the existing sendMail endpoint.
+async function sendRecurringSaleEmail(fetchFn, user, role, payload) {
+  if (!user?.email || user?.noMail === true) return;
+  try {
+    const { render } = await import('svelty-email');
+    const mod = await import('$lib/components/mail/monthlyRecurringSale.svelte');
+    const lang = ['he', 'en', 'ar'].includes(user.lang) ? user.lang : 'he';
+    const previewText =
+      role === 'customer'
+        ? lang === 'en'
+          ? `Report this month's transfer for ${payload.productName}`
+          : `עדכון ההעברה החודשית עבור ${payload.productName}`
+        : lang === 'en'
+          ? `Report this month's income from ${payload.productName}`
+          : `דיווח ההכנסה החודשית מ-${payload.productName}`;
+    const emailHtml = await render(mod.default, {
+      username: user.username || '',
+      productName: payload.productName,
+      projectName: payload.projectName,
+      expectedAmount: payload.expectedAmount,
+      monthLabel: payload.monthLabel,
+      role,
+      lang,
+      previewText
+    });
+    await fetchFn('/api/sendMail', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: user.email,
+        emailHtml,
+        previewText,
+        emailText: previewText
+      })
+    });
+  } catch (e) {
+    console.error('monthi: failed to send recurring-sale email', e);
+  }
+}
+
+// For every live recurring-sale engine (standing order / subscription —
+// PLAN_RECURRING_SALES), open this month's report cycle: a child Sale
+// (pending:true, holderStatus:'open') the money-holder settles by reporting
+// how much actually came in. Past-end engines are closed. The holder — and
+// the paying customer, when one is named — get a reminder email.
+async function runRecurringSaleCycles(fetchFn) {
+  const opened = [];
+
+  let list;
+  try {
+    list = await sendToSer({}, 'mrsListRecurringSaleEngines', 0, 0, true, fetchFn);
+  } catch (e) {
+    console.error('monthi: failed to list recurring-sale engines', e);
+    return opened;
+  }
+  const engines = list?.data?.sales?.data ?? [];
+  const now = new Date();
+
+  for (const eng of engines) {
+    const id = eng.id;
+    const a = eng.attributes ?? {};
+    try {
+      const start = a.startDate ? new Date(a.startDate) : null;
+      const end = a.finishDate ? new Date(a.finishDate) : null;
+
+      if (start && now < start) continue; // not started yet
+
+      if (end && now > end) {
+        // Past the end date — stop opening cycles for this standing order.
+        await sendToSer({ id }, 'mrsCloseRecurringSale', 0, 0, true, fetchFn);
+        continue;
+      }
+
+      const projectId = a.project?.data?.id;
+      const holder = a.users_permissions_user?.data;
+      if (!projectId || !holder?.id) {
+        console.error('monthi: recurring sale engine missing project/holder', id);
+        continue;
+      }
+
+      // Sale engines cycle monthly unless the product is a yearly subscription.
+      const unit = a.matanot?.data?.attributes?.kindOf === 'yearly' ? 'year' : 'month';
+      const anchor = start ?? now;
+      const { cycleStart, cycleEnd } = cycleWindow(unit, anchor, 1, now);
+
+      // Child cycles carry cycleStart, so the maap duplicate-check applies as-is.
+      const children = a.recurringSales?.data ?? [];
+      if (hasOpenCycleFor(children, cycleStart)) continue; // already opened this window
+
+      const customer = a.customer?.data;
+      // The engine's Sheirut is the standing-order record (the canonical
+      // customer link) — attach each monthly cycle to it as well.
+      const sheirutIds = (a.sheiruts?.data ?? []).map((s) => s.id);
+      const vars = {
+        project: projectId,
+        matanot: a.matanot?.data?.id ?? null,
+        users_permissions_user: holder.id,
+        customer: customer?.id ?? null,
+        sheiruts: sheirutIds.length > 0 ? sheirutIds : null,
+        recurringSource: id,
+        unit: a.unit ?? null,
+        date: cycleStart.toISOString(),
+        cycleStart: cycleStart.toISOString(),
+        cycleEnd: cycleEnd.toISOString(),
+        note: a.note ?? null,
+        publishedAt: now.toISOString()
+      };
+      const created = await sendToSer(vars, 'mrsCreateCycleSale', 0, 0, true, fetchFn);
+      const cycleId = created?.data?.createSale?.data?.id;
+      if (!cycleId) {
+        console.error('monthi: failed to open sale cycle for engine', id, created);
+        continue;
+      }
+
+      const monthLabel = `${String(cycleStart.getMonth() + 1).padStart(2, '0')}/${cycleStart.getFullYear()}`;
+      const payload = {
+        productName: a.matanot?.data?.attributes?.name ?? '',
+        projectName: a.project?.data?.attributes?.projectName ?? '',
+        expectedAmount: a.in ?? 0,
+        monthLabel
+      };
+      await sendRecurringSaleEmail(fetchFn, holder.attributes, 'holder', payload);
+      if (customer?.attributes) {
+        await sendRecurringSaleEmail(fetchFn, customer.attributes, 'customer', payload);
+      }
+
+      console.log('monthi: opened sale cycle', cycleId, 'for engine', id);
+      opened.push(id);
+    } catch (e) {
+      console.error('monthi: error processing recurring sale engine', id, e);
     }
   }
 

@@ -423,6 +423,8 @@ export type ActionKey =
   | 'archivePersonalMatanot'
   | 'refreshMySuggestions'
   | 'declineSpForMashaabim'
+  | 'reportRecurringSaleCycle'
+  | 'customerReportRecurringSaleCycle'
   ;
 
 

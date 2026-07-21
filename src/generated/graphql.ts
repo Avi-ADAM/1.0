@@ -15022,6 +15022,11 @@ export type Sale = {
   __typename?: 'Sale';
   confirmedBy?: Maybe<Enum_Sale_Confirmedby>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
+  customer?: Maybe<UsersPermissionsUserEntityResponse>;
+  customerAmount?: Maybe<Scalars['Float']['output']>;
+  customerReportedAt?: Maybe<Scalars['DateTime']['output']>;
+  cycleEnd?: Maybe<Scalars['DateTime']['output']>;
+  cycleStart?: Maybe<Scalars['DateTime']['output']>;
   date?: Maybe<Scalars['DateTime']['output']>;
   decision?: Maybe<DecisionEntityResponse>;
   externalId?: Maybe<Scalars['String']['output']>;
@@ -15038,6 +15043,10 @@ export type Sale = {
   pending?: Maybe<Scalars['Boolean']['output']>;
   project?: Maybe<ProjectEntityResponse>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
+  receivedConfirmedAt?: Maybe<Scalars['DateTime']['output']>;
+  recurring?: Maybe<Scalars['Boolean']['output']>;
+  recurringSales?: Maybe<SaleRelationResponseCollection>;
+  recurringSource?: Maybe<SaleEntityResponse>;
   reporter?: Maybe<UsersPermissionsUserEntityResponse>;
   sheiruts?: Maybe<SheirutRelationResponseCollection>;
   source?: Maybe<Enum_Sale_Source>;
@@ -15054,6 +15063,14 @@ export type Sale = {
 export type SaleMontersArgs = {
   filters?: InputMaybe<MonterFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type SaleRecurringSalesArgs = {
+  filters?: InputMaybe<SaleFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
@@ -15093,6 +15110,11 @@ export type SaleFiltersInput = {
   and?: InputMaybe<Array<InputMaybe<SaleFiltersInput>>>;
   confirmedBy?: InputMaybe<StringFilterInput>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
+  customer?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  customerAmount?: InputMaybe<FloatFilterInput>;
+  customerReportedAt?: InputMaybe<DateTimeFilterInput>;
+  cycleEnd?: InputMaybe<DateTimeFilterInput>;
+  cycleStart?: InputMaybe<DateTimeFilterInput>;
   date?: InputMaybe<DateTimeFilterInput>;
   decision?: InputMaybe<DecisionFiltersInput>;
   externalId?: InputMaybe<StringFilterInput>;
@@ -15112,6 +15134,10 @@ export type SaleFiltersInput = {
   pending?: InputMaybe<BooleanFilterInput>;
   project?: InputMaybe<ProjectFiltersInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
+  receivedConfirmedAt?: InputMaybe<DateTimeFilterInput>;
+  recurring?: InputMaybe<BooleanFilterInput>;
+  recurringSales?: InputMaybe<SaleFiltersInput>;
+  recurringSource?: InputMaybe<SaleFiltersInput>;
   reporter?: InputMaybe<UsersPermissionsUserFiltersInput>;
   sheiruts?: InputMaybe<SheirutFiltersInput>;
   source?: InputMaybe<StringFilterInput>;
@@ -15126,6 +15152,11 @@ export type SaleFiltersInput = {
 
 export type SaleInput = {
   confirmedBy?: InputMaybe<Enum_Sale_Confirmedby>;
+  customer?: InputMaybe<Scalars['ID']['input']>;
+  customerAmount?: InputMaybe<Scalars['Float']['input']>;
+  customerReportedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  cycleEnd?: InputMaybe<Scalars['DateTime']['input']>;
+  cycleStart?: InputMaybe<Scalars['DateTime']['input']>;
   date?: InputMaybe<Scalars['DateTime']['input']>;
   decision?: InputMaybe<Scalars['ID']['input']>;
   externalId?: InputMaybe<Scalars['String']['input']>;
@@ -15142,6 +15173,10 @@ export type SaleInput = {
   pending?: InputMaybe<Scalars['Boolean']['input']>;
   project?: InputMaybe<Scalars['ID']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  receivedConfirmedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  recurring?: InputMaybe<Scalars['Boolean']['input']>;
+  recurringSales?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  recurringSource?: InputMaybe<Scalars['ID']['input']>;
   reporter?: InputMaybe<Scalars['ID']['input']>;
   sheiruts?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   source?: InputMaybe<Enum_Sale_Source>;
@@ -17569,6 +17604,7 @@ export type UsersPermissionsUser = {
   rishonvesopen?: Maybe<OpenMissionRelationResponseCollection>;
   role?: Maybe<UsersPermissionsRoleEntityResponse>;
   sales?: Maybe<SaleRelationResponseCollection>;
+  sales_as_customer?: Maybe<SaleRelationResponseCollection>;
   sales_reported?: Maybe<SaleRelationResponseCollection>;
   sheirutnegos?: Maybe<SheirutnegoRelationResponseCollection>;
   sheirutpends?: Maybe<SheirutpendRelationResponseCollection>;
@@ -18029,6 +18065,14 @@ export type UsersPermissionsUserSalesArgs = {
 };
 
 
+export type UsersPermissionsUserSales_As_CustomerArgs = {
+  filters?: InputMaybe<SaleFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
 export type UsersPermissionsUserSales_ReportedArgs = {
   filters?: InputMaybe<SaleFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
@@ -18270,6 +18314,7 @@ export type UsersPermissionsUserFiltersInput = {
   rishonvesopen?: InputMaybe<OpenMissionFiltersInput>;
   role?: InputMaybe<UsersPermissionsRoleFiltersInput>;
   sales?: InputMaybe<SaleFiltersInput>;
+  sales_as_customer?: InputMaybe<SaleFiltersInput>;
   sales_reported?: InputMaybe<SaleFiltersInput>;
   sheirutnegos?: InputMaybe<SheirutnegoFiltersInput>;
   sheirutpends?: InputMaybe<SheirutpendFiltersInput>;
@@ -18397,6 +18442,7 @@ export type UsersPermissionsUserInput = {
   rishonvesopen?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   role?: InputMaybe<Scalars['ID']['input']>;
   sales?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  sales_as_customer?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   sales_reported?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   sheirutnegos?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   sheirutpends?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;

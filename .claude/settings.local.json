@@ -119,7 +119,8 @@
       "Read(//c/Users/babay/Documents/GitHub/1.0b//**)",
       "Read(//c/Users/babay/Documents/GitHub/1.0b/**)",
       "Bash(scp -i \"C:\\\\Users\\\\babay\\\\Downloads\\\\sail.pem\" -o StrictHostKeyChecking=no /c/Users/babay/Documents/GitHub/1.0b/nginx/default.conf ubuntu@18.159.130.31:/home/ubuntu/app/nginx/default.conf)",
-      "Bash(curl *)"
+      "Bash(curl *)",
+      "Skill(update-config)"
     ],
     "additionalDirectories": [
       "c:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\deals\\request",

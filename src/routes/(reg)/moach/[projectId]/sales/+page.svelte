@@ -59,14 +59,6 @@
 </svelte:head>
 
 <div class="sales-page px-0 py-4">
-  <!-- Donations & support-page controls (PLAN_VOLUNTEER_RIKMA) -->
-  <div class="donation-bar">
-    <SupportPageToggle {projectId} value={base?.supportPage ?? 'off'} />
-    <button type="button" class="record-donation-btn" onclick={() => (donateOpen = true)}>
-      💗 {$lang === 'he' ? 'רשום תרומה' : $lang === 'ar' ? 'تسجيل تبرع' : 'Record donation'}
-    </button>
-  </div>
-
   {#if loading && !financials}
     <div class="flex justify-center p-12">
       <Lowding />
@@ -82,11 +74,21 @@
       projectUsers={base?.user_1s?.data || []}
       bmiData={financials.matanotofs?.data || []}
     />
-    <SalesApiIntegration
-      {projectId}
-      bmiData={financials.matanotofs?.data || []}
-      projectUsers={base?.user_1s?.data || []}
-    />
+
+    <!-- Donations, support-page visibility & API integration (PLAN_VOLUNTEER_RIKMA / PLAN_EXTERNAL_SALES_API) -->
+    <div class="sales-extras">
+      <div class="extras-card">
+        <SupportPageToggle {projectId} value={base?.supportPage ?? 'off'} />
+        <button type="button" class="record-donation-btn" onclick={() => (donateOpen = true)}>
+          💗 {$lang === 'he' ? 'רשום תרומה' : $lang === 'ar' ? 'تسجيل تبرع' : 'Record donation'}
+        </button>
+      </div>
+      <SalesApiIntegration
+        {projectId}
+        bmiData={financials.matanotofs?.data || []}
+        projectUsers={base?.user_1s?.data || []}
+      />
+    </div>
   {/if}
 </div>
 
@@ -103,15 +105,25 @@
 />
 
 <style>
-  .donation-bar {
+  .sales-extras {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    align-items: start;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  .extras-card {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    border: 1px solid var(--gold, #d4af37);
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: var(--bg2, rgba(255, 255, 255, 0.04));
   }
   .record-donation-btn {
+    align-self: center;
     border: 2px solid var(--gold, #d4af37);
     border-radius: 9999px;
     padding: 0.6rem 1.4rem;

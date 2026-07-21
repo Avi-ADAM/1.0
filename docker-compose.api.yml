@@ -7,7 +7,9 @@
 # Expected layout on the server (default: /home/ubuntu/api — ubuntu, not root):
 #   docker-compose.api.yml   <- this file (pushed by the script)
 #   .env                     <- runtime env, lives ONLY on the server:
-#                               STRAPI_URL=http://strapi-blue:1337  (blue/green alias on the shared net)
+#                               STRAPI_URL=http://strapi:1337  (stable alias, always the
+#                               active blue/green color — deploy.ps1 in the Strapi repo
+#                               keeps it pointed correctly on every deploy, see below)
 #                               ORIGIN=https://api.1lev1.com
 #                               ADMINMONTHER=..., cookies secrets, etc.
 #

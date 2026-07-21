@@ -12793,7 +12793,10 @@ export const qids = {
     $reporter: ID,
     $holderStatus: ENUM_SALE_HOLDERSTATUS,
     $externalId: String,
-    $source: ENUM_SALE_SOURCE
+    $source: ENUM_SALE_SOURCE,
+    $recurring: Boolean,
+    $isMonterActive: Boolean,
+    $customer: ID
   ) {
     createSale(data: {
       project: $project,
@@ -12809,7 +12812,10 @@ export const qids = {
       reporter: $reporter,
       holderStatus: $holderStatus,
       externalId: $externalId,
-      source: $source
+      source: $source,
+      recurring: $recurring,
+      isMonterActive: $isMonterActive,
+      customer: $customer
     }) {
       data {
         id
@@ -12839,6 +12845,166 @@ export const qids = {
       start: $start
     }) {
       data { id }
+    }
+  }`,
+
+  // ── Recurring sales (PLAN_RECURRING_SALES) ─────────────────────────────────
+  // A recurring engine = an open-ended monthly/yearly Sale (recurring:true,
+  // isMonterActive:true). Each month the monther (/api/monthi) opens a child
+  // cycle Sale (pending:true, holderStatus:'open') so the holder reports how
+  // much actually came in — like mashabetahalich → Maap, but the cycle IS a
+  // Sale so it flows into tosplits once effective.
+
+  // monthi: list all live recurring-sale engines with their existing cycles.
+  'mrsListRecurringSaleEngines': `query MrsListRecurringSaleEngines {
+    sales(
+      filters: { recurring: { eq: true }, isMonterActive: { eq: true } }
+      pagination: { limit: 300 }
+    ) {
+      data { id attributes {
+        in unit startDate finishDate note
+        matanot { data { id attributes { name kindOf } } }
+        project { data { id attributes { projectName restime } } }
+        users_permissions_user { data { id attributes { username email lang noMail } } }
+        customer { data { id attributes { username email lang noMail } } }
+        sheiruts { data { id } }
+        recurringSales(pagination: { limit: 500 }) { data { id attributes { cycleStart pending } } }
+      } }
+    }
+  }`,
+
+  // monthi: open this month's cycle for an engine.
+  'mrsCreateCycleSale': `mutation MrsCreateCycleSale(
+    $project: ID!,
+    $matanot: ID,
+    $users_permissions_user: ID!,
+    $customer: ID,
+    $sheiruts: [ID],
+    $recurringSource: ID!,
+    $unit: Float,
+    $date: DateTime!,
+    $cycleStart: DateTime!,
+    $cycleEnd: DateTime!,
+    $note: String,
+    $publishedAt: DateTime!
+  ) {
+    createSale(data: {
+      project: $project,
+      matanot: $matanot,
+      users_permissions_user: $users_permissions_user,
+      customer: $customer,
+      sheiruts: $sheiruts,
+      recurringSource: $recurringSource,
+      unit: $unit,
+      date: $date,
+      cycleStart: $cycleStart,
+      cycleEnd: $cycleEnd,
+      note: $note,
+      pending: true,
+      holderStatus: open,
+      publishedAt: $publishedAt
+    }) {
+      data { id }
+    }
+  }`,
+
+  // Close a standing order: no further cycles will be opened.
+  'mrsCloseRecurringSale': `mutation MrsCloseRecurringSale($id: ID!, $finishDate: DateTime) {
+    updateSale(id: $id, data: { isMonterActive: false, finishDate: $finishDate }) {
+      data { id }
+    }
+  }`,
+
+  // Server-authoritative cycle state for the report/confirm actions.
+  'mrsGetCycleForReport': `query MrsGetCycleForReport($id: ID!) {
+    sale(id: $id) {
+      data { id attributes {
+        pending holderStatus in cycleStart cycleEnd
+        customerAmount customerReportedAt receivedConfirmedAt
+        users_permissions_user { data { id attributes { username } } }
+        customer { data { id attributes { username email lang noMail } } }
+        project { data { id attributes { projectName } } }
+        matanot { data { id attributes { name } } }
+        recurringSource { data { id attributes {
+          in isMonterActive
+          users_permissions_user { data { id } }
+        } } }
+      } }
+    }
+  }`,
+
+  // Holder reports the month's actual amount (0 = nothing came in) → the
+  // cycle becomes an effective self-reported sale.
+  'mrsReportCycleSale': `mutation MrsReportCycleSale($id: ID!, $data: SaleInput!) {
+    updateSale(id: $id, data: $data) {
+      data { id attributes { in pending holderStatus } }
+    }
+  }`,
+
+  // Customer reports how much they transferred this month.
+  'mrsCustomerReportCycle': `mutation MrsCustomerReportCycle(
+    $id: ID!, $customerAmount: Float!, $customerReportedAt: DateTime!
+  ) {
+    updateSale(id: $id, data: {
+      customerAmount: $customerAmount,
+      customerReportedAt: $customerReportedAt
+    }) {
+      data { id attributes { customerAmount customerReportedAt } }
+    }
+  }`,
+
+  // Sales-center: my pending monthly cycles as the money-holder.
+  'saleCenterPendingCycles': `query SaleCenterPendingCycles($uid: ID!) {
+    sales(
+      filters: {
+        users_permissions_user: { id: { eq: $uid } },
+        pending: { eq: true },
+        recurringSource: { id: { notNull: true } }
+      }
+      pagination: { limit: 100 }
+      sort: "cycleStart:desc"
+    ) {
+      data { id attributes {
+        cycleStart cycleEnd note
+        customerAmount customerReportedAt
+        matanot { data { id attributes { name } } }
+        project { data { id attributes { projectName } } }
+        customer { data { id attributes { username } } }
+        recurringSource { data { id attributes { in unit } } }
+      } }
+    }
+  }`,
+
+  // Deals page: my pending monthly cycles as the paying customer.
+  'dealsCustomerPendingCycles': `query DealsCustomerPendingCycles($uid: ID!) {
+    sales(
+      filters: {
+        customer: { id: { eq: $uid } },
+        pending: { eq: true },
+        recurringSource: { id: { notNull: true } }
+      }
+      pagination: { limit: 100 }
+      sort: "cycleStart:desc"
+    ) {
+      data { id attributes {
+        cycleStart cycleEnd note
+        customerAmount customerReportedAt
+        matanot { data { id attributes { name } } }
+        project { data { id attributes { projectName } } }
+        users_permissions_user { data { id attributes { username } } }
+        recurringSource { data { id attributes { in unit } } }
+      } }
+    }
+  }`,
+
+  // Resolve a customer by exact username or email when creating a recurring
+  // sale (the payer must be a registered user to report transfers).
+  'mrsFindCustomer': `query MrsFindCustomer($q: String!) {
+    usersPermissionsUsers(
+      filters: { or: [ { username: { eq: $q } }, { email: { eq: $q } } ] }
+      pagination: { limit: 1 }
+    ) {
+      data { id attributes { username } }
     }
   }`,
 

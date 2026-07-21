@@ -40,9 +40,15 @@ EOF
 ```
 
 > **חיבור ל-Strapi:** Strapi רץ כאן בקונפיגורציית blue/green — יש aliases
-> `strapi-blue` / `strapi-green` (כרגע רק blue למעלה), אין alias יציב בשם `strapi`.
-> ה-API החדש מצטרף ל-`app_app-network`, לכן `STRAPI_URL=http://strapi-blue:1337`
-> (החלף ל-`strapi-green` כשמחליפים צבע). 1337 לא מפורסם החוצה כלל.
+> `strapi-blue` / `strapi-green`, וגם alias יציב בשם `strapi` שמוצמד תמיד
+> לצבע הפעיל. **(2026-07-21) `deploy.ps1` (בריפו `1.0b`) מנהל את ה-alias
+> `strapi` אוטומטית בכל דיפלוי** — מצמיד אותו לקונטיינר החדש לפני החלפת
+> nginx (כשהוא עוד לא מקבל תנועה, בלי לגעת בקונטיינר הפעיל), ומנתק אותו
+> מהישן אחרי שהוא נעצר. הוא גם מסנכרן את `/home/ubuntu/api/.env` ומפעיל
+> מחדש את `sveltekit-api` כדי שיישאר תמיד `STRAPI_URL=http://strapi:1337` —
+> **אין יותר צורך להחליף ידנית בין blue/green**. זה מחליף את הבאג החוזר
+> שבו ה-API "מאבד קשר" ל-Strapi בכל דיפלוי כי איש לא עדכן את הצבע. 1337 לא
+> מפורסם החוצה כלל.
 
 ### Nginx (TLS → הקונטיינר)
 
@@ -117,7 +123,7 @@ docker-compose -f /home/ubuntu/api/docker-compose.api.yml up -d
 
 | משתנה | dev מקומי / Vercel | בקונטיינר בשרת (`/home/ubuntu/api/.env`) |
 |---|---|---|
-| `STRAPI_URL` / `VITE_URL` | `https://tovmeod.1lev1.com` | `http://strapi-blue:1337` |
+| `STRAPI_URL` / `VITE_URL` | `https://tovmeod.1lev1.com` | `http://strapi:1337` (stable alias, see above — no longer `strapi-blue`/`strapi-green`) |
 
 (אגב, `GET /api/env` / `GET /api/config` שמופיעים בלוגים של הקונטיינר הם סריקות
 בוטים על הדומיין הציבורי — לא קוד שלנו; אפשר להתעלם.)
@@ -132,9 +138,14 @@ docker-compose -f /home/ubuntu/api/docker-compose.api.yml up -d
   ב-bundle). הוא מועבר כ-BuildKit secret ולא נשאר ב-image.
 - **✅ (2026-07-16) המעבר ל-runtime הושלם:** כל קבצי השרת קוראים את כתובת Strapi
   דרך `src/lib/server/strapiUrl.js` (`$env/dynamic/private` → `STRAPI_URL` מתוך
-  ה-`.env` שבשרת, fallback ל-`VITE_URL` ב-dev). כלומר `STRAPI_URL=http://strapi-blue:1337`
+  ה-`.env` שבשרת, fallback ל-`VITE_URL` ב-dev). כלומר `STRAPI_URL`
   ב-`/home/ubuntu/api/.env` נכנס לתוקף ב-restart, בלי rebuild. ⚠️ לוודא ש-`STRAPI_URL`
   מופיע **פעם אחת בלבד** בקובץ — שורה כפולה מאוחרת דורסת את הפנימית (קרה בפועל).
+- **✅ (2026-07-21) `STRAPI_URL` כבר לא תלוי בצבע:** `deploy.ps1` מצמיד alias
+  `strapi` יציב לקונטיינר הפעיל בכל דיפלוי ומסנכרן את `.env` + מפעיל מחדש
+  את `sveltekit-api` אוטומטית (ראו סעיף "חיבור ל-Strapi" למעלה). לפני זה
+  `STRAPI_URL=http://strapi-blue:1337` היה נשאר תקוע כשהצבע הפעיל מתחלף,
+  וה-API "מאבד קשר" ל-Strapi בכל דיפלוי — זה היה באג חוזר, לא תקלה חד-פעמית.
 - ל-`.env` שבשרת יש להוסיף גם `SOCKET_SERVER_URL=http://unified-action-socket-server:3001`
   (ברירת המחדל `localhost:3001` לא מגיעה לקונטיינר ה-socket) ואופציונלית `REND_URL`
   (יעד `api/pingrama`; ברירת מחדל `https://api.1lev1.com/` — החליף את rend.1lev1.com).
