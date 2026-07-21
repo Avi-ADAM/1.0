@@ -343,11 +343,19 @@ export class StrapiClient {
         throw error;
       }
 
-      // Log network errors with details
+      // Log network errors with details. `fetch failed` from undici is a
+      // generic wrapper — the actual reason (ECONNREFUSED, ETIMEDOUT, socket
+      // hang up, DNS failure...) lives on `error.cause`, which is lost if not
+      // logged explicitly.
+      const cause = error instanceof Error ? (error as any).cause : undefined;
       console.error('[STRAPI_CLIENT] Network Error Details:', {
         queryId,
+        endpoint: this.endpoint,
         variables: JSON.stringify(variables, null, 2),
         error: error instanceof Error ? error.message : String(error),
+        cause: cause instanceof Error
+          ? { message: cause.message, code: (cause as any).code, stack: cause.stack }
+          : cause,
         stack: error instanceof Error ? error.stack : undefined
       });
 
