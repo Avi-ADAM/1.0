@@ -15,6 +15,8 @@ export const HIDDEN_PROJECT_IDS: string[] = [
   '63',
   '72',
   '80',
+  '67',
+  '43'
     // '123',
 ];
 
