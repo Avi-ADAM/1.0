@@ -469,6 +469,30 @@ export const config = {
         },
         {
             locale: 'he',
+            key: 'discover',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/(demand|project|gift|availableMission)/],
+            loader: async () => (await import('./he/discover.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'discover',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/(demand|project|gift|availableMission)/],
+            loader: async () => (await import('./en/discover.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'discover',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/(demand|project|gift|availableMission)/],
+            loader: async () => (await import('./ar/discover.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'discover',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/(demand|project|gift|availableMission)/],
+            loader: async () => (await import('./ru/discover.json')).default,
+        },
+        {
+            locale: 'he',
             key: 'concierge',
             routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/(concierge|wish)/],
             loader: async () => (await import('./he/concierge.json')).default,

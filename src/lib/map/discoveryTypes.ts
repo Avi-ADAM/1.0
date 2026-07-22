@@ -4,7 +4,14 @@
  * `src/lib/server/map/normalizeMapItems.ts`; the client only ever sees these.
  */
 
-export type MapItemKind = 'wish' | 'maagad' | 'offer' | 'mission' | 'resource' | 'product';
+export type MapItemKind =
+  | 'wish'
+  | 'maagad'
+  | 'offer'
+  | 'mission'
+  | 'resource'
+  | 'product'
+  | 'project';
 
 export type MapItem = {
   id: string;
@@ -24,7 +31,15 @@ export type MapItem = {
   meta: Record<string, unknown>;
 };
 
-export type MapLayerId = 'wishes' | 'maagadim' | 'offers' | 'missions' | 'resources' | 'products';
+export type MapLayerId =
+  | 'wishes'
+  | 'maagadim'
+  | 'offers'
+  | 'missions'
+  | 'resources'
+  | 'products'
+  /** Directory-page embeds only (/project) — never a /demand lens layer. */
+  | 'projects';
 
 export type MapLayer = {
   id: MapLayerId;
@@ -46,5 +61,6 @@ export const LAYER_COLORS: Record<MapLayerId, string> = {
   offers: '#f97316',
   missions: '#3b82f6',
   resources: '#10b981',
-  products: '#eab308'
+  products: '#eab308',
+  projects: '#ff0092'
 };

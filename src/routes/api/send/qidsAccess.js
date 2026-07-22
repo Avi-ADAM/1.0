@@ -454,6 +454,12 @@ export const qidsAccess = {
   '279demandCounts': { allow: ['user', 'serviceAdmin'] },
   '280maagadDemandCounts': { allow: ['user', 'serviceAdmin'] },
 
+  // (regandnon)/project + (regandnon)/gift index pages: public discovery
+  // directories, same svc = !uid split as the map qids; the loads reduce
+  // relation slices to aggregate counts before returning data.
+  '281discoverProjects': { allow: ['user', 'serviceAdmin'] },
+  '282discoverProducts': { allow: ['user', 'serviceAdmin'] },
+
   // matching/engine.ts: always run through StrapiClient with the admin
   // token, never with a user JWT — writes suggestion data for *other* users.
   '213recentSuggestionEmailCounts': { allow: ['serviceAdmin'] },

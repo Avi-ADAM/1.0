@@ -2,6 +2,7 @@
   import { browser } from '$app/environment';
   import { page } from '$app/state';
   import DiscoveryMap from '$lib/components/location/DiscoveryMap.svelte';
+  import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
   import AddSupplySheet from '$lib/components/offerings/AddSupplySheet.svelte';
   import {
     LAYER_COLORS,
@@ -189,6 +190,7 @@
 
 <div class="demand-page" dir={$isRtl ? 'rtl' : 'ltr'}>
   <header class="head">
+    <DiscoveryNav current="map" />
     <h1>{$t('demand.title')}</h1>
     <p class="sub">{$t('demand.subtitle')}</p>
 
@@ -262,6 +264,11 @@
             </a>
           {:else}
             <span class="soon">{$t('demand.coming_soon')}</span>
+          {/if}
+          {#if selected.meta.projectId}
+            <a class="proj-link" href={`/project/${selected.meta.projectId}`}>
+              🧶 {$t('discover.to_project')}
+            </a>
           {/if}
         </aside>
       {/if}
@@ -498,6 +505,17 @@
     margin-top: 0.7rem;
     font-size: 0.8rem;
     opacity: 0.6;
+  }
+  .proj-link {
+    display: inline-block;
+    margin-top: 0.7rem;
+    margin-inline-start: 0.5rem;
+    color: #7c3aed;
+    border: 1px solid rgba(124, 58, 237, 0.4);
+    border-radius: 9999px;
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+    text-decoration: none;
   }
   .side h2 {
     font-weight: 700;

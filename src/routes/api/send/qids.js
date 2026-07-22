@@ -12693,6 +12693,46 @@ export const qids = {
     }
   }`,
 
+  // ── Public discovery directories (PLAN_DISCOVERY pages /project + /gift) ──
+  // Read-only, anonymous-friendly lists behind the same service-token split as
+  // the map qids (220-223, 269). Counts come as id-only relation slices; the
+  // server load turns them into aggregates before anything reaches the client.
+
+  '281discoverProjects': `query DiscoverProjects {
+    projects(
+      filters: { isPlatform: { ne: true } }
+      pagination: { limit: 100 }
+      sort: "createdAt:desc"
+    ) {
+      data { id attributes {
+        projectName publicDescription city createdAt
+        profilePic { data { attributes { url formats } } }
+        location { lat lng radius location_hint location_mode }
+        user_1s(pagination: { limit: 100 }) { data { id } }
+        open_missions(filters: { archived: { eq: false } }, pagination: { limit: 50 }) { data { id } }
+        open_mashaabims(filters: { archived: { eq: false } }, pagination: { limit: 50 }) { data { id } }
+        matanotofs(filters: { archived: { ne: true } }, pagination: { limit: 50 }) { data { id } }
+      } }
+    }
+  }`,
+
+  '282discoverProducts': `query DiscoverProducts {
+    matanots(
+      filters: { archived: { ne: true } }
+      pagination: { limit: 200 }
+      sort: "createdAt:desc"
+    ) {
+      data { id attributes {
+        name price quant kindOf origin createdAt lat lng radius
+        pic { data { attributes { url formats } } }
+        location { lat lng radius location_hint location_mode }
+        owner_user { data { id attributes { username } } }
+        projectcreates { data { id attributes { projectName location { lat lng radius location_hint location_mode } } } }
+        categories { data { id attributes { name } } }
+      } }
+    }
+  }`,
+
   '268getUserStorefront': `query GetUserStorefront($uid: ID!) {
     sps(
       filters: { users_permissions_user: { id: { eq: $uid } }, archived: { ne: true }, offerScope: { in: ["customers", "both"] } }

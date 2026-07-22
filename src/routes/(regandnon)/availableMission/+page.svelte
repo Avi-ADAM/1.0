@@ -1,4 +1,5 @@
 <script>
+  import DiscoveryNav from "$lib/components/discovery/DiscoveryNav.svelte";
   import Dates from "$lib/components/grid/dates.svelte";
   import ListOfTiles from "$lib/components/grid/listOfTiles.svelte";
     import { Grid , PrelineTheme,PlainTableCssTheme ,CardsPlusTheme ,PagingData, GridFooter} from "@mediakular/gridcraft";
@@ -187,6 +188,9 @@ let columns = $state([
     </script>
 <Head title={title[$lang]} description={description[$lang]} {image} {url} />
 <div class="w-full px-2 text-center bg-gold text-barbi" dir={$isRtl ? 'rtl' : 'ltr'}>
+<div class="flex justify-center py-2">
+  <DiscoveryNav current="missions" />
+</div>
 <h2 class="flex justify-center items-center">{intitle[$lang]}{#if isLoading || isLoadingMore}
     <RingLoader size={30}/>
      {/if}</h2>

@@ -30,8 +30,9 @@ function hasPoint(lat: number | null, lng: number | null): boolean {
 /**
  * PLAN_LOCATION_MAPS §6 fallback chain: own location → project location →
  * source-wish location. Returns the first entry with a usable point.
+ * Exported for the directory-card normalizers (src/lib/server/discovery/).
  */
-function resolveLocation(
+export function resolveLocation(
   ...candidates: Array<LocationComponent | { lat?: unknown; lng?: unknown; radius?: unknown; location_hint?: unknown } | null | undefined>
 ): { lat: number | null; lng: number | null; radius: number | null; hint: string | null } {
   for (const c of candidates) {
@@ -110,6 +111,7 @@ export function normalizeOpenMission(node: StrapiNode): MapItem | null {
     concierge: !!a.ratson?.data || a.source === 'concierge',
     href: `/availableMission/${node.id}`,
     meta: {
+      projectId: project ? String(project.id) : null,
       projectName: project?.attributes?.projectName ?? null,
       hours: num(a.noofhours),
       perhour: num(a.perhour),
@@ -148,6 +150,9 @@ export function normalizeProduct(node: StrapiNode): MapItem | null {
     meta: {
       price: num(a.price),
       personal,
+      // Rikma products link back to their project's public page; personal
+      // products point at their (auto-created) home rikma too — harmless.
+      projectId: project ? String(project.id) : null,
       sellerName: personal
         ? (a.owner_user?.data?.attributes?.username ?? null)
         : (project?.attributes?.projectName ?? null)
@@ -177,6 +182,7 @@ export function normalizeOpenMashaabim(node: StrapiNode): MapItem | null {
     concierge: !!a.ratson?.data || a.source === 'concierge',
     href: `/availiableResorce/${node.id}`,
     meta: {
+      projectId: project ? String(project.id) : null,
       projectName: project?.attributes?.projectName ?? null,
       kindOf: a.kindOf ?? null
     }
