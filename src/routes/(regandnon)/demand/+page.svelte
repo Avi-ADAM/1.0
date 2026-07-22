@@ -510,12 +510,15 @@
     display: inline-block;
     margin-top: 0.7rem;
     margin-inline-start: 0.5rem;
-    color: #7c3aed;
-    border: 1px solid rgba(124, 58, 237, 0.4);
+    color: var(--barbi-pink, #ff0092);
+    border: 1px solid rgba(179, 135, 40, 0.5);
     border-radius: 9999px;
     padding: 0.4rem 1rem;
     font-size: 0.85rem;
     text-decoration: none;
+  }
+  .proj-link:hover {
+    background: var(--gold, #eee8aa);
   }
   .side h2 {
     font-weight: 700;

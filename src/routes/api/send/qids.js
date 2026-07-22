@@ -12700,7 +12700,9 @@ export const qids = {
 
   '281discoverProjects': `query DiscoverProjects {
     projects(
-      filters: { isPlatform: { ne: true } }
+      # ne:true misses rows where the column is NULL (SQL: NULL != true is not
+      # true) — and most rikmot never set isPlatform. Match false OR null.
+      filters: { or: [{ isPlatform: { eq: false } }, { isPlatform: { null: true } }] }
       pagination: { limit: 100 }
       sort: "createdAt:desc"
     ) {
@@ -12711,14 +12713,15 @@ export const qids = {
         user_1s(pagination: { limit: 100 }) { data { id } }
         open_missions(filters: { archived: { eq: false } }, pagination: { limit: 50 }) { data { id } }
         open_mashaabims(filters: { archived: { eq: false } }, pagination: { limit: 50 }) { data { id } }
-        matanotofs(filters: { archived: { ne: true } }, pagination: { limit: 50 }) { data { id } }
+        matanotofs(filters: { or: [{ archived: { eq: false } }, { archived: { null: true } }] }, pagination: { limit: 50 }) { data { id } }
       } }
     }
   }`,
 
   '282discoverProducts': `query DiscoverProducts {
     matanots(
-      filters: { archived: { ne: true } }
+      # Same NULL guard as 281 — never-archived products often have NULL here.
+      filters: { or: [{ archived: { eq: false } }, { archived: { null: true } }] }
       pagination: { limit: 200 }
       sort: "createdAt:desc"
     ) {
@@ -12738,7 +12741,7 @@ export const qids = {
   '283discoverMissions': `query DiscoverMissions {
     openMissions(
       filters: { archived: { eq: false } }
-      pagination: { limit: 250 }
+      pagination: { limit: 500 }
       sort: "createdAt:desc"
     ) {
       data { id attributes {
@@ -12757,7 +12760,7 @@ export const qids = {
   '284discoverResources': `query DiscoverResources {
     openMashaabims(
       filters: { archived: { eq: false } }
-      pagination: { limit: 250 }
+      pagination: { limit: 500 }
       sort: "createdAt:desc"
     ) {
       data { id attributes {

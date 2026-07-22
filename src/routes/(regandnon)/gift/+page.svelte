@@ -205,6 +205,16 @@
     font-size: 1.6rem;
     font-weight: 700;
     margin-top: 0.75rem;
+    color: var(--stgold, #574010);
+  }
+  .head h1::after {
+    content: '';
+    display: block;
+    width: 5.5rem;
+    height: 4px;
+    margin-top: 0.35rem;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, #bf953f, #fcf6ba, #b38728);
   }
   .sub {
     opacity: 0.75;
@@ -220,7 +230,7 @@
   .controls input {
     flex: 1 1 14rem;
     max-width: 22rem;
-    border: 1px solid rgba(120, 120, 160, 0.3);
+    border: 1px solid rgba(179, 135, 40, 0.45);
     border-radius: 9999px;
     padding: 0.45rem 1rem;
     font-size: 0.9rem;
@@ -233,7 +243,7 @@
     gap: 0.5rem;
   }
   .filter-chips button {
-    border: 1px solid rgba(120, 120, 160, 0.25);
+    border: 1px solid rgba(179, 135, 40, 0.4);
     background: white;
     color: #2b2740;
     border-radius: 9999px;
@@ -242,8 +252,8 @@
     cursor: pointer;
   }
   .filter-chips button.active {
-    background: #7c3aed;
-    border-color: #7c3aed;
+    background: var(--barbi-pink, #ff0092);
+    border-color: var(--barbi-pink, #ff0092);
     color: white;
   }
   .count {
@@ -258,7 +268,7 @@
     font-size: 0.85rem;
   }
   .map-note a {
-    color: #7c3aed;
+    color: var(--barbi-pink, #ff0092);
     text-decoration: none;
   }
   .selected-card {
@@ -296,17 +306,20 @@
   .cta {
     display: inline-block;
     margin-top: 0.7rem;
-    background: #7c3aed;
+    background: var(--barbi-pink, #ff0092);
     color: white;
     border-radius: 9999px;
     padding: 0.4rem 1rem;
     font-size: 0.85rem;
     text-decoration: none;
   }
+  .cta:hover {
+    box-shadow: 0 4px 14px rgba(179, 135, 40, 0.5);
+  }
   .cta.ghost {
     background: transparent;
-    color: #7c3aed;
-    border: 1px solid #7c3aed;
+    color: var(--barbi-pink, #ff0092);
+    border: 1px solid var(--barbi-pink, #ff0092);
   }
   .empty {
     font-size: 0.9rem;
@@ -322,7 +335,7 @@
   .card {
     display: flex;
     flex-direction: column;
-    border: 1px solid rgba(120, 120, 160, 0.18);
+    border: 1px solid rgba(179, 135, 40, 0.35);
     border-radius: 1rem;
     background: white;
     color: #2b2740;
@@ -330,7 +343,7 @@
     transition: box-shadow 0.15s ease, transform 0.15s ease;
   }
   .card:hover {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 20px rgba(179, 135, 40, 0.28);
     transform: translateY(-2px);
   }
   .card-link {
@@ -351,7 +364,7 @@
     align-items: center;
     justify-content: center;
     font-size: 2.4rem;
-    background: linear-gradient(120deg, #fde68a, #fca5a5);
+    background: linear-gradient(120deg, #fcf6ba, #eee8aa);
   }
   .card-body {
     padding: 0.75rem 0.85rem;
@@ -382,7 +395,9 @@
     padding: 0.15rem 0.6rem;
   }
   .badge.price {
-    background: rgba(234, 179, 8, 0.18);
+    background: linear-gradient(120deg, rgba(252, 246, 186, 0.9), rgba(238, 232, 170, 0.7));
+    border: 1px solid rgba(179, 135, 40, 0.45);
+    color: var(--stgold, #574010);
     font-weight: 700;
   }
   .card-actions {
@@ -391,7 +406,7 @@
     padding: 0 0.85rem 0.75rem;
   }
   .mini {
-    border: 1px solid rgba(120, 120, 160, 0.25);
+    border: 1px solid rgba(179, 135, 40, 0.4);
     background: white;
     color: #2b2740;
     border-radius: 9999px;
@@ -408,7 +423,8 @@
     gap: 0.75rem;
     border-radius: 1rem;
     padding: 1rem 1.25rem;
-    background: linear-gradient(120deg, rgba(234, 179, 8, 0.1), rgba(255, 0, 146, 0.08));
+    border: 1px solid rgba(179, 135, 40, 0.4);
+    background: linear-gradient(120deg, rgba(238, 232, 170, 0.5), rgba(255, 0, 146, 0.07));
   }
   .join-banner h2 {
     font-size: 1.05rem;

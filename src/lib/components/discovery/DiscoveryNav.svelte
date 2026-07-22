@@ -44,9 +44,9 @@
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    border: 1px solid rgba(120, 120, 160, 0.25);
+    border: 1px solid rgba(179, 135, 40, 0.45);
     background: white;
-    color: #2b2740;
+    color: var(--stgold, #574010);
     border-radius: 9999px;
     padding: 0.35rem 0.9rem;
     font-size: 0.88rem;
@@ -54,11 +54,12 @@
     text-decoration: none;
   }
   .pill:hover {
-    border-color: rgba(124, 58, 237, 0.5);
+    background: var(--gold, #eee8aa);
+    border-color: #b38728;
   }
   .pill.active {
-    background: #7c3aed;
-    border-color: #7c3aed;
+    background: var(--barbi-pink, #ff0092);
+    border-color: var(--barbi-pink, #ff0092);
     color: white;
   }
 </style>
