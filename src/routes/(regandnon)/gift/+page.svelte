@@ -76,7 +76,7 @@
 
 <div class="directory" dir={$isRtl ? 'rtl' : 'ltr'}>
   <header class="head">
-    <DiscoveryNav current="products" />
+    <DiscoveryNav current="products" isLoggedIn={data.isLoggedIn} />
     <h1>🎁 {$t('discover.products_title')}</h1>
     <p class="sub">{$t('discover.products_subtitle')}</p>
 
@@ -214,7 +214,9 @@
     height: 4px;
     margin-top: 0.35rem;
     border-radius: 9999px;
-    background: linear-gradient(90deg, #bf953f, #fcf6ba, #b38728);
+    background: linear-gradient(110deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c, #fbf5b7, #b38728, #fcf6ba, #bf953f);
+    background-size: 220% auto;
+    animation: gold-shine 3.5s linear infinite;
   }
   .sub {
     opacity: 0.75;
@@ -395,7 +397,9 @@
     padding: 0.15rem 0.6rem;
   }
   .badge.price {
-    background: linear-gradient(120deg, rgba(252, 246, 186, 0.9), rgba(238, 232, 170, 0.7));
+    background: linear-gradient(110deg, rgba(252, 246, 186, 0.95), rgba(238, 232, 170, 0.75), rgba(191, 149, 63, 0.4), rgba(238, 232, 170, 0.75), rgba(252, 246, 186, 0.95));
+    background-size: 220% auto;
+    animation: gold-shine 5s linear infinite;
     border: 1px solid rgba(179, 135, 40, 0.45);
     color: var(--stgold, #574010);
     font-weight: 700;
@@ -438,5 +442,58 @@
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
+  }
+  /* ✨ shimmering gold accents (paused for prefers-reduced-motion) */
+  @keyframes gold-shine {
+    to {
+      background-position: 220% center;
+    }
+  }
+  @keyframes cta-glint {
+    0%,
+    55% {
+      transform: translateX(-160%) skewX(-20deg);
+    }
+    100% {
+      transform: translateX(420%) skewX(-20deg);
+    }
+  }
+  .card {
+    position: relative;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 3px;
+    background: linear-gradient(110deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c, #fbf5b7, #b38728, #fcf6ba, #bf953f);
+    background-size: 250% auto;
+    animation: gold-shine 6s linear infinite;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .cta {
+    position: relative;
+    overflow: hidden;
+  }
+  .cta::after {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    left: 0;
+    width: 45%;
+    background: linear-gradient(120deg, transparent, rgba(252, 246, 186, 0.8), transparent);
+    transform: translateX(-160%) skewX(-20deg);
+    animation: cta-glint 4.5s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card::before,
+    .cta::after,
+    .head h1::after,
+    .badge.price {
+      animation: none;
+    }
   }
 </style>

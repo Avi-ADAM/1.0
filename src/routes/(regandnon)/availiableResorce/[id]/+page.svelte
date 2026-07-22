@@ -1,6 +1,7 @@
 <script>
     import { toast } from 'svelte-sonner';
     import SucssesConf from '$lib/celim/sucssesConf.svelte';
+    import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
     import Share from '$lib/components/share/shareButtons/index.svelte';
     import { page } from '$app/state';
     import { lang } from '$lib/stores/lang.js';
@@ -376,6 +377,10 @@
         {#if data.alld?.archived != true && data.alld != null}
             <Head title={page.data?.alld?.title[$lang] ?? headi[$lang]} {description} {image} {url} />
             <div bind:clientWidth={wid} dir="rtl" style="overflow-y:auto" class="d mb-4 sm:pt-4 w-full lg:w-1/2 mx-auto">
+                <!-- Discovery cross-links: back to the big picture (directories + map) -->
+                <div class="mb-3 flex justify-center">
+                    <DiscoveryNav current="resources" isLoggedIn={data.tok == true} />
+                </div>
                 <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
                     <div class="relative flex items-center space-x-1">
                         <div class="relative">

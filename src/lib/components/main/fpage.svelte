@@ -770,8 +770,9 @@
         <!-- Discovery strip: live counts linking into the public discovery
              pages (/project, /availableMission, /availiableResorce, /gift,
              /demand) — wander first, sign up later. -->
+        <div class="gold-frame rounded-xl p-[3px] shadow-lg">
         <section
-          class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-4 shadow-lg"
+          class="bg-white/85 backdrop-blur-sm rounded-lg px-4 py-4"
           style="font-family:'Sababa',sans-serif;"
         >
           <h2 class="text-rose-700 font-bold text-2xl sm:text-xl text-center mb-1">
@@ -824,6 +825,7 @@
             </a>
           </div>
         </section>
+        </div>
 
         <!-- Mobile CTA (Original style) -->
         <div
@@ -1438,6 +1440,33 @@
 />
 
 <style>
+  /* ✨ shimmering gold frame for the discovery strip */
+  .gold-frame {
+    background: linear-gradient(
+      110deg,
+      #bf953f,
+      #fcf6ba,
+      #b38728,
+      #fbf5b7,
+      #aa771c,
+      #fbf5b7,
+      #b38728,
+      #fcf6ba,
+      #bf953f
+    );
+    background-size: 250% auto;
+    animation: gold-shine 6s linear infinite;
+  }
+  @keyframes gold-shine {
+    to {
+      background-position: 250% center;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gold-frame {
+      animation: none;
+    }
+  }
   .flip {
     -moz-transform: scale(-1, 1);
     -webkit-transform: scale(-1, 1);

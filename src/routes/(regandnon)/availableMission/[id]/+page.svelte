@@ -1,6 +1,7 @@
 <script>
   import { toast } from 'svelte-sonner';
   import SucssesConf from '$lib/celim/sucssesConf.svelte';
+  import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
   import Tile from '$lib/celim/tile.svelte';
   import Share from '$lib/components/share/shareButtons/index.svelte';
   import { page } from '$app/state';
@@ -246,6 +247,10 @@
         style="overflow-y:auto"
         class=" d mb-4 sm:pt-4 w-full lg:w-1/2 mx-auto"
       >
+        <!-- Discovery cross-links: back to the big picture (directories + map) -->
+        <div class="mb-3 flex justify-center">
+          <DiscoveryNav current="missions" isLoggedIn={data.tok == true} />
+        </div>
         <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
     </div>-->
         <div

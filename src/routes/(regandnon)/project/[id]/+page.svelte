@@ -11,6 +11,7 @@
 
   // ייבוא הקומפוננטה החדשה (נניח שהיא באותה תיקייה או בתיקיית הקומפוננטות)
   import AuthorityBadge from '$lib/components/ui/AuthorityBadge.svelte';
+  import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
 
   let { data } = $props();
   // Derived so navigating between /project/A and /project/B (same component
@@ -145,6 +146,10 @@
     class="min-h-screen bg-gradient-to-br from-[#1a0515] via-[#2c0b1e] to-[#120f26] text-white overflow-y-auto overflow-x-hidden font-sans"
   >
     <div dir="rtl" class="max-w-4xl mx-auto px-4 py-8 pb-32 relative">
+      <!-- Discovery cross-links: back to the big picture (directories + map) -->
+      <div class="mb-5 flex justify-center">
+        <DiscoveryNav current="projects" isLoggedIn={isRegisteredUser} />
+      </div>
       <!-- 1. Hero Section with Authority Badge -->
       <div
         class="flex flex-col items-center justify-center mb-8 animate-fade-in-up"

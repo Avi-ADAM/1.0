@@ -8,16 +8,24 @@
    */
   type Props = {
     current?: 'map' | 'projects' | 'products' | 'missions' | 'resources';
+    /** Anonymous visitors also get a pill back to the public homepage. */
+    isLoggedIn?: boolean;
   };
-  let { current }: Props = $props();
+  let { current, isLoggedIn = true }: Props = $props();
 
-  const links = [
+  const BASE_LINKS = [
     { key: 'map', href: '/demand', emoji: '🗺️' },
     { key: 'projects', href: '/project', emoji: '🧶' },
     { key: 'products', href: '/gift', emoji: '🎁' },
     { key: 'missions', href: '/availableMission', emoji: '🛠️' },
     { key: 'resources', href: '/availiableResorce', emoji: '📦' }
   ] as const;
+
+  const links = $derived(
+    isLoggedIn
+      ? [...BASE_LINKS]
+      : [{ key: 'home', href: '/', emoji: '💗' } as const, ...BASE_LINKS]
+  );
 </script>
 
 <nav class="discovery-nav" aria-label={$t('discover.nav_label')}>
@@ -61,5 +69,20 @@
     background: var(--barbi-pink, #ff0092);
     border-color: var(--barbi-pink, #ff0092);
     color: white;
+    animation: gold-pulse 2.6s ease-in-out infinite;
+  }
+  @keyframes gold-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 4px rgba(252, 246, 186, 0.45);
+    }
+    50% {
+      box-shadow: 0 0 14px rgba(191, 149, 63, 0.85);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pill.active {
+      animation: none;
+    }
   }
 </style>

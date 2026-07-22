@@ -11,6 +11,7 @@
   import { toast } from 'svelte-sonner';
   import NumberInput from '$lib/celim/ui/numberInput.svelte';
   import MatanotPublicView from '$lib/components/products/MatanotPublicView.svelte';
+  import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
 
   // Icon imports (using SVG strings inline for performance if icons aren't provided via library)
   // Assuming standard icons or library usage in your project context.
@@ -246,6 +247,10 @@
     dir={$isRtl ? 'rtl' : 'ltr'}
     class="container mx-auto px-4 py-6 max-w-4xl pb-24"
   >
+    <!-- Discovery cross-links: back to the big picture (directories + map) -->
+    <div class="mb-4 flex justify-center">
+      <DiscoveryNav current="products" isLoggedIn={data.tok} />
+    </div>
     <!-- Main Card -->
     <div
       class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700"

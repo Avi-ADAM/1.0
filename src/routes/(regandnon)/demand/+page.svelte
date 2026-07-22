@@ -190,7 +190,7 @@
 
 <div class="demand-page" dir={$isRtl ? 'rtl' : 'ltr'}>
   <header class="head">
-    <DiscoveryNav current="map" />
+    <DiscoveryNav current="map" isLoggedIn={data.isLoggedIn} />
     <h1>{$t('demand.title')}</h1>
     <p class="sub">{$t('demand.subtitle')}</p>
 
