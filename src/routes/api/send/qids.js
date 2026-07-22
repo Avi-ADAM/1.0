@@ -12700,9 +12700,6 @@ export const qids = {
 
   '281discoverProjects': `query DiscoverProjects {
     projects(
-      # ne:true misses rows where the column is NULL (SQL: NULL != true is not
-      # true) — and most rikmot never set isPlatform. Match false OR null.
-      filters: { or: [{ isPlatform: { eq: false } }, { isPlatform: { null: true } }] }
       pagination: { limit: 100 }
       sort: "createdAt:desc"
     ) {

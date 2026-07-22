@@ -69,7 +69,7 @@ export function normalizeProjectCard(node: StrapiNode): ProjectCard | null {
   return {
     id: String(node.id),
     name: a.projectName,
-    description: a.publicDescription ?? null,
+    description: excerptOf(a.publicDescription),
     city: a.city ?? null,
     picUrl: picUrlOf(a.profilePic),
     lat: loc.lat,

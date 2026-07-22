@@ -295,7 +295,7 @@
   }
   .skill {
     font-size: 0.78rem;
-    background: rgba(59, 130, 246, 0.08);
+    background: #e6f0fe;
   }
   .skill.active {
     background: #3b82f6;

@@ -282,7 +282,7 @@
   }
   .kind {
     font-size: 0.78rem;
-    background: rgba(16, 185, 129, 0.08);
+    background: #e6f8f1;
   }
   .kind.active {
     background: #10b981;
