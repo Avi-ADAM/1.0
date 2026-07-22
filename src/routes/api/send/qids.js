@@ -12733,6 +12733,42 @@ export const qids = {
     }
   }`,
 
+  // Field superset of 221mapOpenMissions, so the same nodes feed both the
+  // card normalizer and normalizeOpenMission for the embedded map.
+  '283discoverMissions': `query DiscoverMissions {
+    openMissions(
+      filters: { archived: { eq: false } }
+      pagination: { limit: 250 }
+      sort: "createdAt:desc"
+    ) {
+      data { id attributes {
+        name descrip noofhours perhour iskvua isglobal dates sqadualed source createdAt
+        location { lat lng radius location_hint location_mode }
+        project { data { id attributes { projectName profilePic { data { attributes { url formats } } } location { lat lng radius location_hint location_mode } } } }
+        skills { data { id attributes { skillName } } }
+        work_ways { data { id attributes { workWayName } } }
+        tafkidims { data { id attributes { roleDescription } } }
+        ratson { data { id attributes { lat lng radius isOnline } } }
+      } }
+    }
+  }`,
+
+  // Field superset of 222mapOpenMashaabims — same dual use as 283.
+  '284discoverResources': `query DiscoverResources {
+    openMashaabims(
+      filters: { archived: { eq: false } }
+      pagination: { limit: 250 }
+      sort: "createdAt:desc"
+    ) {
+      data { id attributes {
+        name descrip kindOf price howMeny recurring source createdAt
+        location { lat lng radius location_hint location_mode }
+        project { data { id attributes { projectName profilePic { data { attributes { url formats } } } location { lat lng radius location_hint location_mode } } } }
+        ratson { data { id attributes { lat lng radius isOnline } } }
+      } }
+    }
+  }`,
+
   '268getUserStorefront': `query GetUserStorefront($uid: ID!) {
     sps(
       filters: { users_permissions_user: { id: { eq: $uid } }, archived: { ne: true }, offerScope: { in: ["customers", "both"] } }

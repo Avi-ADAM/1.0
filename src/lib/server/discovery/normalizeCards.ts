@@ -21,6 +21,27 @@ function picUrlOf(pic: any): string | null {
   return attrs.formats?.small?.url || attrs.formats?.thumbnail?.url || attrs.url || null;
 }
 
+/** descrip fields hold tiptap HTML — cards want a plain-text excerpt. */
+function excerptOf(html: unknown, max = 220): string | null {
+  if (typeof html !== 'string' || !html) return null;
+  const text = html
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!text) return null;
+  return text.length > max ? `${text.slice(0, max - 1)}…` : text;
+}
+
+function namesOf(rel: any, field: string): string[] {
+  return (rel?.data ?? [])
+    .map((n: any) => n?.attributes?.[field])
+    .filter(Boolean);
+}
+
 export type ProjectCard = {
   id: string;
   name: string;
@@ -60,6 +81,111 @@ export function normalizeProjectCard(node: StrapiNode): ProjectCard | null {
     openMissionsCount: a.open_missions?.data?.length ?? 0,
     openResourcesCount: a.open_mashaabims?.data?.length ?? 0,
     productsCount: a.matanotofs?.data?.length ?? 0,
+    createdAt: a.createdAt ?? null
+  };
+}
+
+export type MissionCard = {
+  id: string;
+  name: string;
+  excerpt: string | null;
+  hours: number | null;
+  perhour: number | null;
+  /** hours × perhour when both exist — the mission's shovi. */
+  value: number | null;
+  iskvua: boolean;
+  date: string | null;
+  skills: string[];
+  workWays: string[];
+  roles: string[];
+  concierge: boolean;
+  projectId: string | null;
+  projectName: string | null;
+  projectPicUrl: string | null;
+  lat: number | null;
+  lng: number | null;
+  hint: string | null;
+  isOnline: boolean;
+  createdAt: string | null;
+};
+
+/** Open-missions directory (QID 283). Location fallback chain matches
+ *  normalizeOpenMission (own → project → source wish). */
+export function normalizeMissionCard(node: StrapiNode): MissionCard | null {
+  const a = node?.attributes;
+  if (!a || !a.name) return null;
+  const ratson = a.ratson?.data?.attributes ?? null;
+  const project = a.project?.data ?? null;
+  const loc = resolveLocation(a.location, project?.attributes?.location, ratson);
+  const hours = num(a.noofhours);
+  const perhour = num(a.perhour);
+  return {
+    id: String(node.id),
+    name: a.name,
+    excerpt: excerptOf(a.descrip),
+    hours,
+    perhour,
+    value: hours !== null && perhour !== null ? hours * perhour : null,
+    iskvua: !!a.iskvua,
+    date: a.dates ?? a.sqadualed ?? null,
+    skills: namesOf(a.skills, 'skillName'),
+    workWays: namesOf(a.work_ways, 'workWayName'),
+    roles: namesOf(a.tafkidims, 'roleDescription'),
+    concierge: !!a.ratson?.data || a.source === 'concierge',
+    projectId: project ? String(project.id) : null,
+    projectName: project?.attributes?.projectName ?? null,
+    projectPicUrl: picUrlOf(project?.attributes?.profilePic),
+    lat: loc.lat,
+    lng: loc.lng,
+    hint: loc.hint,
+    isOnline:
+      a.location?.location_mode === 'online' || !!a.isglobal || loc.lat === null,
+    createdAt: a.createdAt ?? null
+  };
+}
+
+export type ResourceCard = {
+  id: string;
+  name: string;
+  excerpt: string | null;
+  kindOf: string | null;
+  price: number | null;
+  howMany: number | null;
+  recurring: boolean;
+  concierge: boolean;
+  projectId: string | null;
+  projectName: string | null;
+  projectPicUrl: string | null;
+  lat: number | null;
+  lng: number | null;
+  hint: string | null;
+  isOnline: boolean;
+  createdAt: string | null;
+};
+
+/** Requested-resources directory (QID 284) — same rules as the mission cards. */
+export function normalizeResourceCard(node: StrapiNode): ResourceCard | null {
+  const a = node?.attributes;
+  if (!a || !a.name) return null;
+  const ratson = a.ratson?.data?.attributes ?? null;
+  const project = a.project?.data ?? null;
+  const loc = resolveLocation(a.location, project?.attributes?.location, ratson);
+  return {
+    id: String(node.id),
+    name: a.name,
+    excerpt: excerptOf(a.descrip),
+    kindOf: a.kindOf ?? null,
+    price: num(a.price),
+    howMany: num(a.howMeny),
+    recurring: !!a.recurring,
+    concierge: !!a.ratson?.data || a.source === 'concierge',
+    projectId: project ? String(project.id) : null,
+    projectName: project?.attributes?.projectName ?? null,
+    projectPicUrl: picUrlOf(project?.attributes?.profilePic),
+    lat: loc.lat,
+    lng: loc.lng,
+    hint: loc.hint,
+    isOnline: a.location?.location_mode === 'online' || loc.lat === null,
     createdAt: a.createdAt ?? null
   };
 }

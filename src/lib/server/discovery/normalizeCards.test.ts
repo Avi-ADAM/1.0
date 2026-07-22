@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { normalizeProductCard, normalizeProjectCard } from './normalizeCards.js';
+import {
+  normalizeMissionCard,
+  normalizeProductCard,
+  normalizeProjectCard,
+  normalizeResourceCard
+} from './normalizeCards.js';
 
 const TLV = { lat: 32.0853, lng: 34.7818 };
 
@@ -79,5 +84,68 @@ describe('normalizeProductCard', () => {
     const card = normalizeProductCard({ id: 7, attributes: { name: 'x', price: 5 } });
     expect(card).not.toBeNull();
     expect(card?.lat).toBeNull();
+  });
+});
+
+describe('normalizeMissionCard', () => {
+  it('computes the shovi, strips the tiptap HTML and flattens tags', () => {
+    const card = normalizeMissionCard({
+      id: 11,
+      attributes: {
+        name: 'בניית אתר',
+        descrip: '<p>נדרש <strong>מפתח</strong> &amp; מעצב</p>',
+        noofhours: 10,
+        perhour: 120,
+        project: {
+          data: {
+            id: 2,
+            attributes: { projectName: 'רקמת רשת', location: { ...TLV } }
+          }
+        },
+        skills: { data: [{ id: 1, attributes: { skillName: 'svelte' } }] },
+        work_ways: { data: [{ id: 1, attributes: { workWayName: 'remote' } }] },
+        tafkidims: { data: [{ id: 1, attributes: { roleDescription: 'dev' } }] }
+      }
+    });
+    expect(card?.value).toBe(1200);
+    expect(card?.excerpt).toBe('נדרש מפתח & מעצב');
+    expect(card?.skills).toEqual(['svelte']);
+    expect(card?.workWays).toEqual(['remote']);
+    expect(card?.roles).toEqual(['dev']);
+    expect(card?.projectId).toBe('2');
+    expect(card?.lat).toBe(TLV.lat);
+  });
+
+  it('marks concierge missions and keeps unlocated ones as online', () => {
+    const card = normalizeMissionCard({
+      id: 12,
+      attributes: { name: 'm', ratson: { data: { id: 1, attributes: {} } } }
+    });
+    expect(card?.concierge).toBe(true);
+    expect(card?.isOnline).toBe(true);
+    expect(card?.value).toBeNull();
+  });
+});
+
+describe('normalizeResourceCard', () => {
+  it('carries kind, quantity and the project fallback location', () => {
+    const card = normalizeResourceCard({
+      id: 21,
+      attributes: {
+        name: 'מקרן',
+        kindOf: 'tool',
+        howMeny: 2,
+        recurring: true,
+        project: {
+          data: { id: 4, attributes: { projectName: 'קולנוע שכונתי', location: { ...TLV } } }
+        }
+      }
+    });
+    expect(card?.kindOf).toBe('tool');
+    expect(card?.howMany).toBe(2);
+    expect(card?.recurring).toBe(true);
+    expect(card?.projectId).toBe('4');
+    expect(card?.lat).toBe(TLV.lat);
+    expect(card?.isOnline).toBe(false);
   });
 });

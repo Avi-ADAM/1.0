@@ -414,5 +414,16 @@
       "negoBack": "Back",
       "negoSent": "Sent to negotiation!"
     }
+  },
+  "discover": {
+    "title": "Come wander and explore",
+    "sub": "You can discover all of these before signing up:",
+    "projects": "active rikmas",
+    "missions": "missions waiting for candidates",
+    "resources": "wanted resources",
+    "products": "products you can buy",
+    "map": "The live demand map",
+    "mapSub": "All demand and supply on one map",
+    "view": "View"
   }
 }

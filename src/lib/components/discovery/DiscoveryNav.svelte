@@ -6,14 +6,17 @@
    * the demand map, the projects directory, the products directory and the
    * open-missions list — so visitors can wander between them freely.
    */
-  type Props = { current?: 'map' | 'projects' | 'products' | 'missions' };
+  type Props = {
+    current?: 'map' | 'projects' | 'products' | 'missions' | 'resources';
+  };
   let { current }: Props = $props();
 
   const links = [
     { key: 'map', href: '/demand', emoji: '🗺️' },
     { key: 'projects', href: '/project', emoji: '🧶' },
     { key: 'products', href: '/gift', emoji: '🎁' },
-    { key: 'missions', href: '/availableMission', emoji: '🛠️' }
+    { key: 'missions', href: '/availableMission', emoji: '🛠️' },
+    { key: 'resources', href: '/availiableResorce', emoji: '📦' }
   ] as const;
 </script>
 

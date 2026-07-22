@@ -459,6 +459,8 @@ export const qidsAccess = {
   // relation slices to aggregate counts before returning data.
   '281discoverProjects': { allow: ['user', 'serviceAdmin'] },
   '282discoverProducts': { allow: ['user', 'serviceAdmin'] },
+  '283discoverMissions': { allow: ['user', 'serviceAdmin'] },
+  '284discoverResources': { allow: ['user', 'serviceAdmin'] },
 
   // matching/engine.ts: always run through StrapiClient with the admin
   // token, never with a user JWT — writes suggestion data for *other* users.

@@ -3,49 +3,45 @@
   import DiscoveryMap from '$lib/components/location/DiscoveryMap.svelte';
   import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
   import { LAYER_COLORS, type MapItem, type MapLayer } from '$lib/map/discoveryTypes';
-  import { t, isRtl, locale } from '$lib/translations';
+  import { t, isRtl } from '$lib/translations';
   import { Head } from 'svead';
 
   let { data } = $props();
 
-  type MissionCard = (typeof data.missions)[number];
+  type ResourceCard = (typeof data.resources)[number];
 
   let search = $state('');
-  let filter = $state<'all' | 'concierge' | 'paid'>('all');
-  let skillFilter = $state<string | null>(null);
+  let concierge = $state(false);
+  let kindFilter = $state<string | null>(null);
   let selected = $state<MapItem | null>(null);
   let mapComponent = $state<ReturnType<typeof DiscoveryMap>>();
 
-  /** The most common skills across all open missions — quick-filter chips. */
-  const topSkills = $derived.by(() => {
+  /** The kinds actually present in the data — quick-filter chips. */
+  const kinds = $derived.by(() => {
     const counts = new Map<string, number>();
-    for (const m of data.missions as MissionCard[]) {
-      for (const s of m.skills) counts.set(s, (counts.get(s) ?? 0) + 1);
+    for (const r of data.resources as ResourceCard[]) {
+      if (r.kindOf) counts.set(r.kindOf, (counts.get(r.kindOf) ?? 0) + 1);
     }
-    return [...counts.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 8)
-      .map(([name]) => name);
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
   });
 
   const filtered = $derived.by(() => {
     const q = search.trim().toLowerCase();
-    return (data.missions as MissionCard[]).filter((m) => {
-      if (filter === 'concierge' && !m.concierge) return false;
-      if (filter === 'paid' && !m.value) return false;
-      if (skillFilter && !m.skills.includes(skillFilter)) return false;
+    return (data.resources as ResourceCard[]).filter((r) => {
+      if (concierge && !r.concierge) return false;
+      if (kindFilter && r.kindOf !== kindFilter) return false;
       if (!q) return true;
-      return [m.name, m.excerpt, m.projectName, m.hint, ...m.skills, ...m.roles]
+      return [r.name, r.excerpt, r.projectName, r.hint, r.kindOf]
         .some((s) => (s ?? '').toLowerCase().includes(q));
     });
   });
 
-  const filteredIds = $derived(new Set(filtered.map((m) => m.id)));
+  const filteredIds = $derived(new Set(filtered.map((r) => r.id)));
 
   const mapLayers = $derived.by<MapLayer[]>(() => [
     {
-      id: 'missions',
-      color: LAYER_COLORS.missions,
+      id: 'resources',
+      color: LAYER_COLORS.resources,
       items: (data.mapItems as MapItem[]).filter(
         (i) => i.lat !== null && filteredIds.has(i.id)
       )
@@ -54,66 +50,57 @@
 
   const locatedCount = $derived(mapLayers[0].items.length);
 
-  function pickOnMap(m: MissionCard) {
-    const item = mapLayers[0].items.find((i) => i.id === m.id);
+  function pickOnMap(r: ResourceCard) {
+    const item = mapLayers[0].items.find((i) => i.id === r.id);
     if (item) {
       selected = item;
       mapComponent?.flyTo(item);
     }
   }
 
-  function demandHref(m: MissionCard | null): string {
-    const base = '/demand?lens=supply';
-    return m && m.lat !== null ? `${base}&c=${m.lng},${m.lat},12` : base;
-  }
-
-  function fmtDate(d: string | null): string | null {
-    if (!d) return null;
-    const date = new Date(d);
-    return Number.isNaN(date.getTime()) ? null : date.toLocaleDateString($locale || 'he');
+  function demandHref(r: ResourceCard | null): string {
+    const base = '/demand?lens=supply&off=missions';
+    return r && r.lat !== null ? `${base}&c=${r.lng},${r.lat},12` : base;
   }
 </script>
 
 <Head
   url={page.url.href}
-  title={$t('discover.missions_title')}
-  description={$t('discover.missions_subtitle')}
+  title={$t('discover.resources_title')}
+  description={$t('discover.resources_subtitle')}
 />
 
 <div class="directory" dir={$isRtl ? 'rtl' : 'ltr'}>
   <header class="head">
-    <DiscoveryNav current="missions" />
-    <h1>🛠️ {$t('discover.missions_title')}</h1>
-    <p class="sub">{$t('discover.missions_subtitle')}</p>
+    <DiscoveryNav current="resources" />
+    <h1>📦 {$t('discover.resources_title')}</h1>
+    <p class="sub">{$t('discover.resources_subtitle')}</p>
 
     <div class="controls">
       <input
         type="search"
-        placeholder={$t('discover.missions_search_ph')}
+        placeholder={$t('discover.resources_search_ph')}
         bind:value={search}
       />
-      <div class="filter-chips" role="group" aria-label={$t('discover.missions_title')}>
-        <button class:active={filter === 'all'} onclick={() => (filter = 'all')}>
-          {$t('discover.filter_all')} <span class="count">{data.missions.length}</span>
+      <div class="filter-chips" role="group" aria-label={$t('discover.resources_title')}>
+        <button class:active={!concierge} onclick={() => (concierge = false)}>
+          {$t('discover.filter_all')} <span class="count">{data.resources.length}</span>
         </button>
-        <button class:active={filter === 'paid'} onclick={() => (filter = 'paid')}>
-          💰 {$t('discover.filter_with_value')}
-        </button>
-        <button class:active={filter === 'concierge'} onclick={() => (filter = 'concierge')}>
+        <button class:active={concierge} onclick={() => (concierge = true)}>
           🪄 {$t('discover.filter_concierge')}
         </button>
       </div>
     </div>
 
-    {#if topSkills.length}
-      <div class="skill-chips">
-        {#each topSkills as s (s)}
+    {#if kinds.length}
+      <div class="kind-chips">
+        {#each kinds as [kind, count] (kind)}
           <button
-            class="skill"
-            class:active={skillFilter === s}
-            onclick={() => (skillFilter = skillFilter === s ? null : s)}
+            class="kind"
+            class:active={kindFilter === kind}
+            onclick={() => (kindFilter = kindFilter === kind ? null : kind)}
           >
-            {s}
+            {kind} <span class="count">{count}</span>
           </button>
         {/each}
       </div>
@@ -125,21 +112,21 @@
       <DiscoveryMap
         bind:this={mapComponent}
         layers={mapLayers}
-        visibleLayerIds={['missions']}
+        visibleLayerIds={['resources']}
         height="min(44vh, 380px)"
         onSelect={(item) => (selected = item)}
       />
       {#if selected}
         <aside class="selected-card" aria-live="polite">
           <div class="card-head">
-            <span aria-hidden="true">🛠️</span>
+            <span aria-hidden="true">📦</span>
             <strong>{selected.title}</strong>
             <button class="close" onclick={() => (selected = null)} aria-label="✕">✕</button>
           </div>
           {#if selected.hint}
             <p class="hint">📍 {selected.hint}</p>
           {/if}
-          <a class="cta" href={selected.href}>{$t('discover.missions_apply')}</a>
+          <a class="cta" href={selected.href}>{$t('discover.resources_apply')}</a>
         </aside>
       {/if}
       <p class="map-note">
@@ -149,62 +136,61 @@
   {/if}
 
   {#if filtered.length === 0}
-    <p class="empty">{$t('discover.missions_empty')}</p>
+    <p class="empty">{$t('discover.resources_empty')}</p>
   {/if}
 
   <ul class="cards">
-    {#each filtered as m (m.id)}
+    {#each filtered as r (r.id)}
       <li class="card">
-        <a class="card-link" href={`/availableMission/${m.id}`}>
+        <a class="card-link" href={`/availiableResorce/${r.id}`}>
           <div class="card-top">
-            {#if m.projectPicUrl}
-              <img class="avatar" src={m.projectPicUrl} alt="" loading="lazy" />
+            {#if r.projectPicUrl}
+              <img class="avatar" src={r.projectPicUrl} alt="" loading="lazy" />
             {:else}
-              <div class="avatar fallback" aria-hidden="true">🧶</div>
+              <div class="avatar fallback" aria-hidden="true">📦</div>
             {/if}
             <div class="top-text">
-              <h2>{m.name}</h2>
-              {#if m.projectName}
-                <p class="proj-name">🧶 {m.projectName}</p>
+              <h2>{r.name}</h2>
+              {#if r.projectName}
+                <p class="proj-name">🧶 {r.projectName}</p>
               {/if}
             </div>
-            {#if m.value}
-              <div class="value" title={$t('discover.missions_value')}>
-                <strong>{m.value}</strong>
-                <span>{m.hours} {$t('discover.missions_hours')} × {m.perhour}</span>
+            {#if r.price}
+              <div class="value">
+                <strong>{r.price}</strong>
+                {#if r.recurring}
+                  <span>{$t('discover.resources_recurring')}</span>
+                {/if}
               </div>
             {/if}
           </div>
-          {#if m.excerpt}
-            <p class="desc">{m.excerpt}</p>
+          {#if r.excerpt}
+            <p class="desc">{r.excerpt}</p>
           {/if}
           <div class="badges">
-            {#if m.concierge}
+            {#if r.kindOf}
+              <span class="badge kind-badge">{r.kindOf}</span>
+            {/if}
+            {#if r.concierge}
               <span class="badge concierge">🪄 {$t('discover.concierge_badge')}</span>
             {/if}
-            {#if m.isOnline}
+            {#if r.isOnline}
               <span class="badge">🌐 {$t('discover.online_badge')}</span>
-            {:else if m.hint}
-              <span class="badge">📍 {m.hint}</span>
+            {:else if r.hint}
+              <span class="badge">📍 {r.hint}</span>
             {/if}
-            {#if fmtDate(m.date)}
-              <span class="badge">🗓️ {fmtDate(m.date)}</span>
+            {#if r.howMany && r.howMany > 1}
+              <span class="badge">×{r.howMany}</span>
             {/if}
-            {#each m.skills.slice(0, 3) as s (s)}
-              <span class="badge skill-badge">{s}</span>
-            {/each}
-            {#each m.roles.slice(0, 1) as r (r)}
-              <span class="badge role-badge">{r}</span>
-            {/each}
           </div>
         </a>
         <div class="card-actions">
-          <a class="cta small" href={`/availableMission/${m.id}`}>{$t('discover.missions_apply')}</a>
-          {#if m.projectId}
-            <a class="mini" href={`/project/${m.projectId}`}>🧶 {$t('discover.to_project')}</a>
+          <a class="cta small" href={`/availiableResorce/${r.id}`}>{$t('discover.resources_apply')}</a>
+          {#if r.projectId}
+            <a class="mini" href={`/project/${r.projectId}`}>🧶 {$t('discover.to_project')}</a>
           {/if}
-          {#if m.lat !== null}
-            <button class="mini" onclick={() => pickOnMap(m)}>📍 {$t('discover.show_here')}</button>
+          {#if r.lat !== null}
+            <button class="mini" onclick={() => pickOnMap(r)}>📍 {$t('discover.show_here')}</button>
           {/if}
         </div>
       </li>
@@ -214,11 +200,12 @@
   {#if !data.isLoggedIn}
     <aside class="join-banner">
       <div>
-        <h2>{$t('discover.missions_banner_title')}</h2>
-        <p>{$t('discover.missions_banner_sub')}</p>
+        <h2>{$t('discover.resources_banner_title')}</h2>
+        <p>{$t('discover.resources_banner_sub')}</p>
       </div>
       <div class="banner-ctas">
         <a class="cta" href="/signup">{$t('discover.join_banner_cta')}</a>
+        <a class="cta ghost" href="/demand">🗺️ {$t('discover.nav_map')}</a>
       </div>
     </aside>
   {/if}
@@ -260,16 +247,16 @@
     color: #2b2740;
   }
   .filter-chips,
-  .skill-chips {
+  .kind-chips {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
   }
-  .skill-chips {
+  .kind-chips {
     margin-top: 0.6rem;
   }
   .filter-chips button,
-  .skill {
+  .kind {
     border: 1px solid rgba(120, 120, 160, 0.25);
     background: white;
     color: #2b2740;
@@ -283,13 +270,13 @@
     border-color: #7c3aed;
     color: white;
   }
-  .skill {
+  .kind {
     font-size: 0.78rem;
-    background: rgba(59, 130, 246, 0.08);
+    background: rgba(16, 185, 129, 0.08);
   }
-  .skill.active {
-    background: #3b82f6;
-    border-color: #3b82f6;
+  .kind.active {
+    background: #10b981;
+    border-color: #10b981;
     color: white;
   }
   .count {
@@ -354,6 +341,11 @@
     padding: 0.25rem 0.8rem;
     font-size: 0.78rem;
   }
+  .cta.ghost {
+    background: transparent;
+    color: #7c3aed;
+    border: 1px solid #7c3aed;
+  }
   .empty {
     font-size: 0.9rem;
     opacity: 0.65;
@@ -404,7 +396,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(120deg, #7c3aed, #3b82f6);
+    background: linear-gradient(120deg, #10b981, #3b82f6);
     font-size: 1.2rem;
   }
   .top-text {
@@ -458,10 +450,7 @@
     border-radius: 9999px;
     padding: 0.15rem 0.6rem;
   }
-  .badge.skill-badge {
-    background: rgba(59, 130, 246, 0.14);
-  }
-  .badge.role-badge {
+  .badge.kind-badge {
     background: rgba(16, 185, 129, 0.14);
   }
   .badge.concierge {
@@ -492,7 +481,7 @@
     gap: 0.75rem;
     border-radius: 1rem;
     padding: 1rem 1.25rem;
-    background: linear-gradient(120deg, rgba(59, 130, 246, 0.08), rgba(124, 58, 237, 0.08));
+    background: linear-gradient(120deg, rgba(16, 185, 129, 0.08), rgba(124, 58, 237, 0.08));
   }
   .join-banner h2 {
     font-size: 1.05rem;

@@ -150,6 +150,12 @@ export async function GET() {
              <priority>0.95</priority>
              <changefreq>daily</changefreq>
              </url>
+             <url>
+             <loc>https://1lev1.com/availiableResorce</loc>
+             <lastmod>2026-07-22T00:00:00+00:00</lastmod>
+             <priority>0.95</priority>
+             <changefreq>daily</changefreq>
+             </url>
        </urlset>
      `.trim(),
        {

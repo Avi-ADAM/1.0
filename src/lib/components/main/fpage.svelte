@@ -126,6 +126,9 @@
   let projectsCount = $state(0);
   let membersCount = $state(0);
   let usersCount = $state(0);
+  let openMissionsCount = $state(0);
+  let openResourcesCount = $state(0);
+  let productsCount = $state(0);
   let statsLoaded = $state(false);
 
   let pageurl = {
@@ -147,6 +150,9 @@
       projectsCount = data.projects ?? 0;
       membersCount = data.members ?? 0;
       usersCount = data.users ?? 0;
+      openMissionsCount = data.openMissions ?? 0;
+      openResourcesCount = data.openResources ?? 0;
+      productsCount = data.products ?? 0;
       statsLoaded = true;
     } catch (e) {
       console.error('Error loading stats:', e);
@@ -760,6 +766,64 @@
             </div>
           {/if}
         </div>
+
+        <!-- Discovery strip: live counts linking into the public discovery
+             pages (/project, /availableMission, /availiableResorce, /gift,
+             /demand) — wander first, sign up later. -->
+        <section
+          class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-4 shadow-lg"
+          style="font-family:'Sababa',sans-serif;"
+        >
+          <h2 class="text-rose-700 font-bold text-2xl sm:text-xl text-center mb-1">
+            {$t('home.discover.title')}
+          </h2>
+          <p class="text-center text-slate-700 text-base sm:text-sm mb-4">
+            {$t('home.discover.sub')}
+          </p>
+          <div class="flex flex-col gap-2">
+            {#each [
+              { icon: '🧶', count: projectsCount, key: 'projects', href: '/project' },
+              { icon: '🛠️', count: openMissionsCount, key: 'missions', href: '/availableMission' },
+              { icon: '📦', count: openResourcesCount, key: 'resources', href: '/availiableResorce' },
+              { icon: '🎁', count: productsCount, key: 'products', href: '/gift' }
+            ] as { icon, count, key, href } (key)}
+              <a
+                {href}
+                class="group flex items-center gap-3 bg-white/80 hover:bg-gold/20 border border-gold/60 rounded-lg px-3 py-2 transition-colors"
+              >
+                <span class="text-2xl" aria-hidden="true">{icon}</span>
+                <span class="flex-1 text-slate-800 text-lg sm:text-base">
+                  {#if statsLoaded && count}
+                    <strong class="text-rose-700">{count}</strong>
+                  {/if}
+                  {$t(`home.discover.${key}`)}
+                </span>
+                <span
+                  class="text-barbi font-semibold text-base sm:text-sm group-hover:underline whitespace-nowrap"
+                >
+                  {$t('home.discover.view')} {$isRtl ? '‹' : '›'}
+                </span>
+              </a>
+            {/each}
+            <a
+              href="/demand"
+              class="group flex items-center gap-3 bg-gradient-to-l from-gold/30 to-barbi/20 hover:from-gold/40 border border-gold/60 rounded-lg px-3 py-2 transition-colors"
+            >
+              <span class="text-2xl" aria-hidden="true">🗺️</span>
+              <span class="flex-1 text-slate-800 text-lg sm:text-base">
+                <strong>{$t('home.discover.map')}</strong>
+                <span class="block text-sm sm:text-xs text-slate-600"
+                  >{$t('home.discover.mapSub')}</span
+                >
+              </span>
+              <span
+                class="text-barbi font-semibold text-base sm:text-sm group-hover:underline whitespace-nowrap"
+              >
+                {$t('home.discover.view')} {$isRtl ? '‹' : '›'}
+              </span>
+            </a>
+          </div>
+        </section>
 
         <!-- Mobile CTA (Original style) -->
         <div

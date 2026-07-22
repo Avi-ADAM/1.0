@@ -1,53 +1,28 @@
+import { sendToSer } from '$lib/send/sendToSer.js';
+import { normalizeMissionCard } from '$lib/server/discovery/normalizeCards.js';
+import { normalizeOpenMission } from '$lib/server/map/normalizeMapItems.js';
 
+// Public open-missions directory — same anonymous/service-token split as the
+// other (regandnon) discovery pages (see the note in demand/+page.server.ts).
+// QID 283 is a field superset of the map qid, so one query feeds both the
+// cards and the embedded-map items.
+export const load = async ({ locals, fetch }) => {
+  const isReg = !!/** @type {any} */ (locals)?.uid;
 
-import { sendToSer } from "$lib/send/sendToSer.js";
-
-export async function load({ locals, url, fetch }) {
-  const lang = locals.lang;
-  const tok = locals.tok;
-  const uid = locals.uid;
-
-  // For initial load, fetch only the first batch
-  const start = 0;
-  const limit = 10;
-
-  let userLang = lang;
-  let isReg = tok == false ? false : true;
-  const qid = userLang != "en"
-      ? isReg ? "27GetOpenMissionsRegTr" : "29GetOpenMissionsNonregTr"
-      : isReg ? "28GetOpenMissionsReg" : "30GetOpenMissionsNonreg";
-  
-  const variables = {
-      start: start,
-      limit: limit
-  };
-  
   let missions = [];
-  let total = 0;
-  let hasMoreData = false;
-
+  let mapItems = [];
   try {
-      const response = await sendToSer(variables, qid, null, null, !isReg, fetch);
-      
-      if (response.data.openMissions.data) {
-          const newData = response.data.openMissions.data;
-          const pagination = response.data.openMissions.meta.pagination;
-          
-          const reformatArray = arr => arr.map(({id, attributes}) => ({id, ...attributes}));
-          missions = reformatArray(newData);
-          total = pagination.total;
-          hasMoreData = start + limit < pagination.total;
-      }
+    const res = await sendToSer({}, '283discoverMissions', 0, 0, !isReg, fetch);
+    const nodes = res?.data?.openMissions?.data ?? [];
+    missions = nodes.map(normalizeMissionCard).filter((m) => m !== null);
+    mapItems = nodes.map(normalizeOpenMission).filter((m) => m !== null);
   } catch (error) {
-      console.error("Error fetching initial missions on server:", error);
+    console.error('Error loading missions directory:', error);
   }
 
   return {
-    uid,
-    lang,
-    tok: tok == false ? false : true,
+    isLoggedIn: isReg,
     missions,
-    total,
-    hasMoreData
+    mapItems
   };
-}
+};
