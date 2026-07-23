@@ -3,6 +3,9 @@
 	import {  useTask } from '@threlte/core'
 import { onMount } from 'svelte';
 import Glttf from './11.svelte'
+import Withlev from './withlev.svelte'
+import Rikma from './story/Rikma.svelte'
+import Fruit from './story/Fruit.svelte'
 import { T } from '@threlte/core'
 let s = $state(true)
 onMount(()=>{
@@ -38,8 +41,36 @@ onMount(()=>{
 let rotationt = $state(0)
 let poz = $state({z:0, y:0, x:0});
 
+// ===== סיפור הגלילה: מבודדים → ריקמה → עולם =====
+// כדור-הארץ מגיע מ-withlev.glb (11MB, כבר בשימוש באתר). אין צורך בגלובוס
+// ה-GLB הכבד (static/3d/כדור.glb ~45MB).
+const clamp01 = (x) => Math.min(1, Math.max(0, x))
+const smooth = (x) => x * x * (3 - 2 * x)
+const reduceMotion =
+  typeof window !== 'undefined' &&
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+
+// מערכה 1 — הלוגו נסוג לאחור וקטן כשמתחילים לגלול
+let logoFade = $derived(smooth(clamp01((scrollProgress - 0.08) / 0.3)))
+let logoScale = $derived(1 - logoFade * 0.88)
+let logoLift = $derived(logoFade * 2.6)
+let logoZ = $derived(-logoFade * 3)
+
+// מערכה 2 — כדור-הארץ/הלב (withlev.glb) צומח כשהרשת מתלכדת, ונסוג במעט
+// כשהריקמה נפרשת לרשת עולמית סביבו במערכה 3.
+let heartGrow = $derived(smooth(clamp01((scrollProgress - 0.22) / 0.3)))
+let heartRecede = $derived(smooth(clamp01((scrollProgress - 0.62) / 0.3)))
+let heartScale = $derived(3.9 * heartGrow * (1 - 0.72 * heartRecede))
+let heartVisible = $derived(heartScale > 0.02)
+let heartRef = $state()
+let heartSpin = 0
+
 let up = $state(true)
- useTask(() => {
+ useTask((delta) => {
+    if (heartRef && !reduceMotion) {
+      heartSpin += delta * 0.25
+      heartRef.rotation.y = heartSpin
+    }
     if (s == false){
       ss =0
     if(poz.y < 2.5 && up == false){
@@ -158,4 +189,24 @@ let isHovering = false, isPointerDown = false
 
 <T.DirectionalLight  intensity={0.81} position={{ y: -20, z: -5, x: 5 }} />
 <T.DirectionalLight  intensity={0.91} position={{ y: 10, z: 10 }} />
-<Glttf {poz} s={ss} {fi} {hover} {scrolli}/>
+<T.PointLight intensity={scrollProgress * 12} position={[0, 0.2, 2.5]} color="#ffd27a" />
+
+<!-- מערכה 1: הלוגו "1💗1" — נסוג לאחור וקטן ככל שגוללים -->
+<T.Group scale={logoScale} position.y={logoLift} position.z={logoZ}>
+  <Glttf {poz} s={ss} {fi} {hover} {scrolli}/>
+</T.Group>
+
+<!-- מערכה 2: לב-הליבה (withlev.glb) שהריקמה מתלכדת סביבו -->
+{#if heartVisible}
+  <Withlev
+    bind:ref={heartRef}
+    scale={heartScale}
+    position={[0, 0.2, -0.4]}
+  />
+{/if}
+
+<!-- הריקמה: נקודות בודדות → רשת בצורת לב → כדור-עולם -->
+<Rikma {scrollProgress} />
+
+<!-- הפרי המשותף: מטבעות-זהב שזורמים מהמרכז אל השותפים -->
+<Fruit {scrollProgress} />
