@@ -428,27 +428,41 @@ describe('AuthorizationEngine', () => {
   });
   
   describe('Role-Based Authorization', () => {
-    it('should pass role check (placeholder implementation)', async () => {
+    it('should DENY a configured role check (not implemented → fail-closed)', async () => {
+      const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       const rules: AuthRule[] = [
-        { 
+        {
           type: 'role',
           config: {
             requiredRole: 'admin'
           }
         }
       ];
-      
+
       const result = await authEngine.authorize(
         'user123',
         rules,
         {},
         testContext
       );
-      
-      // Current implementation is a placeholder that always passes
-      expect(result.authorized).toBe(true);
+
+      // Role checking is not implemented; it must fail closed, never pass.
+      expect(result.authorized).toBe(false);
+      expect(result.reason).toContain('not implemented');
+      errSpy.mockRestore();
     });
-    
+
+    it('should honour a custom errorMessage on the role rule', async () => {
+      const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const rules: AuthRule[] = [
+        { type: 'role', config: { requiredRole: 'admin' }, errorMessage: 'Admins only' }
+      ];
+      const result = await authEngine.authorize('user123', rules, {}, testContext);
+      expect(result.authorized).toBe(false);
+      expect(result.reason).toBe('Admins only');
+      errSpy.mockRestore();
+    });
+
     it('should fail when required role is not configured', async () => {
       const rules: AuthRule[] = [
         { 

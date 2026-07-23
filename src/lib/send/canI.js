@@ -57,6 +57,30 @@ export async function canI(ops, fetchFn = globalThis.fetch) {
   return results;
 }
 
+/**
+ * Params-aware check for a single op: resolves a 'conditional' action to a
+ * final 'allowed'/'denied' by running its entity-level authRules server-side
+ * (e.g. "may I approveHaluka on project 17?"). NOT cached — the answer depends
+ * on the params, and on entity state that can change between calls.
+ *
+ * @param {string} op - a single operation string, e.g. 'action:approveHaluka'
+ * @param {Record<string, any>} params - params for that op (projectId, userId, …)
+ * @param {typeof globalThis.fetch} [fetchFn]
+ * @returns {Promise<{ result: string, reason?: string }>}
+ */
+export async function canIWith(op, params, fetchFn = globalThis.fetch) {
+  const res = await fetchFn('/api/permissions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ops: [op], params: { [op]: params } })
+  });
+  if (!res.ok) {
+    return { result: 'denied', reason: `check failed (${res.status})` };
+  }
+  const data = await res.json();
+  return data.results?.[op] ?? { result: 'denied', reason: 'missing from response' };
+}
+
 /** Clear the cache (e.g. after login/logout). */
 export function clearCanICache() {
   cache.clear();

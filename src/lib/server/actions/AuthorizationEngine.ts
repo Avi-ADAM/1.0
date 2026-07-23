@@ -116,7 +116,7 @@ export class AuthorizationEngine {
         return await this.checkOr(rule, userId, params, context);
 
       case 'role':
-        return await this.checkRole(rule, userId, params, context);
+        return this.checkRole(rule, userId);
 
       case 'custom':
         return await this.checkCustom(rule, userId, params, context);
@@ -420,47 +420,43 @@ export class AuthorizationEngine {
   }
 
   /**
-   * Check if user has a required role
-   * 
-   * This is a placeholder implementation. The actual role system
-   * depends on how roles are stored in the application.
-   * 
+   * Check if user has a required role.
+   *
+   * NOT IMPLEMENTED — and therefore FAIL-CLOSED. Role-to-Strapi mapping was
+   * never wired, so this rule cannot make a trustworthy positive decision.
+   * It previously returned `authorized: true` unconditionally, which is a
+   * silent fail-open: any action that declared a `role` rule would be
+   * effectively unguarded. Until a real implementation exists (query the
+   * user's Strapi role, compare to requiredRole), the only safe answer is
+   * to deny. No action currently uses this rule type.
+   *
    * @param rule - The role authorization rule
    * @param userId - The user ID to check
-   * @param params - Action parameters
-   * @param context - Action execution context
-   * @returns Authorization result
+   * @returns Authorization result (always denied)
    */
-  private async checkRole(
+  private checkRole(
     rule: AuthRule,
-    userId: string,
-    params: Record<string, any>,
-    context: ActionContext
-  ): Promise<AuthorizationResult> {
+    userId: string
+  ): AuthorizationResult {
     const requiredRole = rule.config?.requiredRole;
-    
+
     if (!requiredRole) {
       return {
         authorized: false,
         reason: 'Role authorization rule is missing required role configuration'
       };
     }
-    
-    // TODO: Implement actual role checking based on the application's role system
-    // For now, this is a placeholder that always returns true
-    // In a real implementation, you would:
-    // 1. Query the user's roles from Strapi
-    // 2. Check if the required role is present
-    // 3. Return the appropriate result
-    
-    console.warn(
-      `Role-based authorization is not fully implemented. ` +
+
+    console.error(
+      `Role-based authorization is not implemented — denying by default. ` +
       `Required role: ${requiredRole}, User: ${userId}`
     );
-    
+
     return {
-      authorized: true,
-      reason: undefined
+      authorized: false,
+      reason:
+        rule.errorMessage ||
+        'Role-based authorization is not implemented; this action is denied by default'
     };
   }
   

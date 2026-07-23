@@ -10,6 +10,7 @@ import { createHash } from 'node:crypto'
 import { isInternalRequest } from '$lib/server/internalSecret.js'
 import { resolveServicePrincipal, resolveCookiePrincipal } from '$lib/server/authz/principal.js'
 import { applyAuthz } from '$lib/server/authz/authorize.js'
+import { runSendGuards, filterSendResponse } from './guards.js'
 
 function normalizeSecret(value, name) {
 	let normalized = String(value ?? '').replace(/\s+/g, '');
@@ -227,42 +228,10 @@ export async function POST({ request, cookies }) {
 		}
 	}
 
-	// ── Enforce: service accounts cannot directly edit positions ─────────────
-	// (editing = UpdatePosition without support:true — only registered JWT users allowed)
-	if (isSer && queId === '42UpdatePosition' && keyValueObject.support !== true) {
-		throw error(403, 'Forbidden: Service accounts cannot edit positions directly');
-	}
-
-	// ── Enforce: UpdateClause ownership rules ────────────────────────────────
-	// body/issueId: JWT (registered owner) only — block service path entirely.
-	// stanceValue/confirmedByAuthor: service path allowed, but only for the clause author.
-	if (queId === 'UpdateClause') {
-		if (isSer && (keyValueObject.body != null || keyValueObject.issueId != null)) {
-			throw error(403, 'Forbidden: Service accounts cannot edit clause body or issueId');
-		}
-		if (isSer) {
-			const clauseId = variablesObject.id;
-			if (!clauseId) throw error(400, 'Missing id for UpdateClause');
-			const ownerExternalId = identity?.externalId;
-			if (!ownerExternalId) throw error(403, 'Forbidden: Missing __identity.externalId for UpdateClause');
-
-			let fetchData;
-			try {
-				const fetchRes = await fetch(ep, {
-					method: 'POST',
-					body: JSON.stringify({ query: `query { clause(id: "${clauseId}") { data { attributes { authorExternalId } } } }` }),
-					headers: { 'Content-Type': 'application/json', Authorization: bearer1 }
-				});
-				fetchData = await fetchRes.json();
-			} catch (e) {
-				throw error(500, `Failed to fetch clause for ownership check: ${e.message}`);
-			}
-			const clauseAuthor = fetchData.data?.clause?.data?.attributes?.authorExternalId;
-			if (clauseAuthor !== ownerExternalId) {
-				throw error(403, 'Forbidden: Not the clause author');
-			}
-		}
-	}
+	// ── Entity-level guards (qid-specific ownership/visibility) ──────────────
+	// Registered in src/routes/api/send/guards.js; run here (after the vote
+	// handler, before the fetch). PRE guards throw error() to block.
+	await runSendGuards({ queId, isSer, keyValueObject, variablesObject, identity, bearer1, ep });
 
 	// ── Standard GraphQL fetch ───────────────────────────────────────────────
 	const controller = new AbortController();
@@ -284,16 +253,11 @@ export async function POST({ request, cookies }) {
 		const newd = await res.json();
 
 		if (newd.data) {
-			// §5 bridge spec: never hand a private (bridge) discussion to the
-			// service path (guest/charter). Registered users read it through the
-			// JWT path, where Strapi enforces visibility. GetNegotiationByToken is
-			// link-based and ListLocalNegotiations already excludes private — so
-			// only the read-by-id qid needs guarding here.
-			if (isSer && queId === '39GetNegotiation') {
-				const vis = newd.data?.negotiation?.data?.attributes?.visibility;
-				if (vis === 'private') {
-					return json({ data: { negotiation: { data: null } } });
-				}
+			// Post-execution response filters (e.g. hide private negotiations from
+			// the service path — §5 bridge spec). See guards.js.
+			const replacement = filterSendResponse({ queId, isSer, newd });
+			if (replacement !== undefined) {
+				return json({ data: replacement });
 			}
 			return json(newd);
 		}

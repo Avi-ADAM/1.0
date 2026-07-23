@@ -64,7 +64,10 @@ const ADMIN_TOKEN = (process.env.ADMINMONTHER || '').replace(/\s+/g, '').replace
 // match-suggestion engine in $lib/server/matching.
 export const strapiClient = new StrapiClient(STRAPI_ENDPOINT, ADMIN_TOKEN);
 const validator = new ValidationEngine();
-const authorizer = new AuthorizationEngine(strapiClient);
+// Exported so the permissions introspection endpoint can evaluate an action's
+// entity-level authRules with real params (final allowed/denied) without going
+// through the full execute pipeline.
+export const authorizer = new AuthorizationEngine(strapiClient);
 const notifier = new NotificationOrchestrator(strapiClient);
 
 export const actionService = new ActionService(

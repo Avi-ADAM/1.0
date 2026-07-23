@@ -155,11 +155,15 @@ export const qidsAccess = {
 
 ### שלב 3 — `authorize()` מרכזי + העברת ה-if-ים הידניים ל-guards
 
-**בוצע חלקית ✅ (2026-07-17):** `authorize.ts` (`authorizeOperation`,
+**בוצע ✅ (2026-07-17):** `authorize.ts` (`authorizeOperation`,
 `checkApiKeyProjectScope`, `applyAuthz`, `getAuthzMode`) + חיווט לשלושת
-הנתיבים + בדיקות יחידה. **בכוונה לא הועברו** ה-if-ים הידניים ל-guards —
-הם נשארו inline ב-`api/send` כשכבה שנייה (הקטנת סיכון; אפשר לרפקטר
-בנפרד כשהשכבה החדשה מוכחת בפרודקשן).
+הנתיבים + בדיקות יחידה.
+
+**רפקטור ה-guards בוצע ✅ (2026-07-23):** ה-if-ים הידניים הוצאו ל-
+`src/routes/api/send/guards.js` — `PRE_GUARDS` (חוסמים לפני ה-fetch) ו-
+`POST_FILTERS` (מסננים את התגובה). ההנדלר קורא `runSendGuards(...)` במקום
+שרשרת ה-if-ים ו-`filterSendResponse(...)` על התגובה. התנהגות 1:1 (אותם
+תנאים, קודי-סטטוס והודעות), עם בדיקות יחידה ב-`guards.test.js`.
 
 - [x] `src/lib/server/authz/authorize.ts`:
 
@@ -177,11 +181,10 @@ export function authorizeOperation(p: Principal, op: string): AuthzDecision;
 - [x] **`api/send`:** מיד אחרי resolve של `queId` + principal —
   `applyAuthz`; `denied` ⇒ `403` עם ה-reason (במצב enforce). זה קורה
   **לפני** בחירת הטוקן ולפני ה-fetch ל-Strapi.
-- [ ] ה-if-ים הידניים הופכים ל-guards רשומים במניפסט (`guards.ts`) —
-  **נדחה בכוונה**, ראו הערה למעלה:
-  - `42UpdatePosition` בלי `support:true` ⇒ service אסור.
-  - `UpdateClause` — כללי body/issueId + בעלות `authorExternalId`.
-  - `39GetNegotiation` — הסתרת private מנתיב service.
+- [x] ה-if-ים הידניים הפכו ל-guards רשומים במניפסט (`guards.js`) (2026-07-23):
+  - `42UpdatePosition` בלי `support:true` ⇒ service אסור (PRE).
+  - `UpdateClause` — כללי body/issueId + בעלות `authorExternalId` (PRE).
+  - `39GetNegotiation` — הסתרת private מנתיב service (POST filter).
 - [x] **`api/action`:** `applyAuthz(principal, 'action:'+actionKey)`
   לפני `service.executeAction` (שממשיך להריץ את `authRules` — שכבה שנייה,
   תלוית-params). `AuthorizationEngine` לא השתנה. action לא מוכר ממשיך
@@ -215,12 +218,15 @@ export function authorizeOperation(p: Principal, op: string): AuthzDecision;
 
   - [x] בלי `params` — תשובה סטטית מהמניפסט (`conditional` כשיש `authRules`
     תלויי-ישות).
-  - [ ] עם `params` — להריץ גם את ה-`authRules`/guard בפועל ולהחזיר
-    `allowed`/`denied` סופי (שלב המשך).
+  - [x] עם `params` — להריץ גם את ה-`authRules` בפועל ולהחזיר
+    `allowed`/`denied` סופי (2026-07-23). ממומש ל-action ops בלבד ולעקרון
+    `user` (נושא cookie JWT + userId שה-authRules צריכים); `send:` ops נשארים
+    `conditional` כי ה-guards שלהם inline בהנדלר. משתמש ב-`authorizer` המשותף
+    (AuthorizationEngine עם client טוקן-אדמין) המיוצא מ-`actions/index.ts`.
   - [x] `GET /api/permissions` (לאותו טוקן) מחזיר את כל רשימת ה-ops המותרים —
     שימושי ל-MCP tools discovery ול-UI.
 - [x] עוטף לקוח `src/lib/send/canI.js`: `canI(['action:createTask'])` עם
-  cache קצר — להפעלה/הסתרה של כפתורים ב-UI במקום ניחוש.
+  cache קצר; `canIWith(op, params)` לבדיקה תלוית-params ללא cache.
 - [ ] Rate-limit בסיסי (anonymous כבר מקבל 401 בלי פירוט — מניעת enumeration).
 
 ### שלב 5 — Rollout: shadow → אכיפה
