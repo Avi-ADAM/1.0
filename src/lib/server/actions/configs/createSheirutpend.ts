@@ -38,6 +38,15 @@ export const createSheirutpendConfig: ActionConfig = {
     {
       type: 'jwt',
       errorMessage: 'Must be authenticated to create Sheirutpend'
+    },
+    {
+      // The pending belongs to `userId`; a client may only create one for
+      // themselves. Cross-user creation (e.g. materializeWish) uses the raw
+      // `71createSheirutpend` qid, not this action, so it is unaffected. Server
+      // (isSer) calls set context.userId = params.userId and therefore pass.
+      type: 'self',
+      config: { userIdParam: 'userId' },
+      errorMessage: 'You can only create a service request for yourself'
     }
   ],
 

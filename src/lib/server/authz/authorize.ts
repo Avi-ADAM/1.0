@@ -15,8 +15,11 @@
  *
  * Rollout is controlled by AUTHZ_MODE (dynamic env):
  *   off      — compute nothing, never block
- *   log      — compute + log denials, never block (default; shadow mode)
- *   enforce  — denials return 403
+ *   log      — compute + log denials, never block (shadow mode)
+ *   enforce  — denials return 403 (DEFAULT)
+ * The default is `enforce`: the shadow period is complete, so an unset env now
+ * blocks unauthorized principal-kind × operation pairs. Set AUTHZ_MODE=log to
+ * fall back to shadow logging, or AUTHZ_MODE=off to disable, without a rebuild.
  * API-key traffic is ALWAYS enforced regardless of mode: that path was
  * deny-by-default before this layer existed, so shadow mode would loosen it.
  *
@@ -35,7 +38,7 @@ export type AuthzMode = 'off' | 'log' | 'enforce';
 
 export function getAuthzMode(): AuthzMode {
   const mode = env.AUTHZ_MODE;
-  return mode === 'enforce' || mode === 'off' ? mode : 'log';
+  return mode === 'log' || mode === 'off' ? mode : 'enforce';
 }
 
 function denied(reason: string): AuthzDecision {

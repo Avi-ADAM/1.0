@@ -59,11 +59,16 @@ const result = await actionService.executeAction('actionKey', params, context);
 `docs/PLAN_API_PERMISSIONS.md`):
 - **Static** — principal-kind × operation, answered synchronously from manifests
   (`qidsAccess.js` for qids, `ActionConfig.access` for actions). Gated by
-  `AUTHZ_MODE` env: `off` / `log` (default, shadow-only) / `enforce`. API-key
-  traffic is **always** enforced. This layer also powers `/api/permissions`.
-- **Entity-level** — ownership/membership rules in the action's `authRules` and
-  inline guards in `/api/send`, evaluated at execution. When these exist the
-  static answer is `conditional`, not `allowed`.
+  `AUTHZ_MODE` env: `off` / `log` (shadow-only) / `enforce` (**default** — an
+  unset env blocks unauthorized kind×op pairs). API-key traffic is **always**
+  enforced. This layer also powers `/api/permissions`.
+- **Entity-level** — ownership/membership rules in the action's `authRules`
+  (`jwt`, `self`, `projectMember`, `sheirutCustomer`, `sheirutpendRequester`,
+  `forumParticipant`, `or`, `custom`) and inline guards in `/api/send`,
+  evaluated at execution. When these exist the static answer is `conditional`,
+  not `allowed`. The `self` rule verifies a target-user param equals the
+  authenticated `context.userId` (from the cookie), so a client cannot act on
+  another user's behalf.
 
 **Server→Strapi fetch** is globally patched in `hooks.server.js` to stamp the
 `x-strapi-gate` secret (nginx blocks ungated requests) and CORS for the

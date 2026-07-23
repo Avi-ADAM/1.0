@@ -89,7 +89,86 @@ describe('AuthorizationEngine', () => {
       expect(result.reason).toBe('You must be logged in to perform this action');
     });
   });
-  
+
+  describe('Self Check', () => {
+    it('should pass when the target user id matches the acting user', async () => {
+      const rules: AuthRule[] = [{ type: 'self' }];
+      const result = await authEngine.authorize(
+        'user123',
+        rules,
+        { userId: 'user123' },
+        testContext
+      );
+      expect(result.authorized).toBe(true);
+      expect(result.reason).toBeUndefined();
+    });
+
+    it('should fail when the target user id differs from the acting user', async () => {
+      const rules: AuthRule[] = [{ type: 'self' }];
+      const result = await authEngine.authorize(
+        'user123',
+        rules,
+        { userId: 'someoneElse' },
+        testContext
+      );
+      expect(result.authorized).toBe(false);
+      expect(result.reason).toBe('You can only perform this action on your own account');
+    });
+
+    it('should compare loosely across number/string ids', async () => {
+      const rules: AuthRule[] = [{ type: 'self' }];
+      const result = await authEngine.authorize(
+        '42',
+        rules,
+        { userId: 42 },
+        testContext
+      );
+      expect(result.authorized).toBe(true);
+    });
+
+    it('should honour a custom userIdParam (with dot-notation)', async () => {
+      const rules: AuthRule[] = [
+        { type: 'self', config: { userIdParam: 'data.ownerId' } }
+      ];
+      const ok = await authEngine.authorize(
+        'user123',
+        rules,
+        { data: { ownerId: 'user123' } },
+        testContext
+      );
+      expect(ok.authorized).toBe(true);
+
+      const bad = await authEngine.authorize(
+        'user123',
+        rules,
+        { data: { ownerId: 'other' } },
+        testContext
+      );
+      expect(bad.authorized).toBe(false);
+    });
+
+    it('should fail (deny-by-default) when the target param is missing', async () => {
+      const rules: AuthRule[] = [{ type: 'self' }];
+      const result = await authEngine.authorize('user123', rules, {}, testContext);
+      expect(result.authorized).toBe(false);
+      expect(result.reason).toContain('userId');
+    });
+
+    it('should use a custom error message when provided', async () => {
+      const rules: AuthRule[] = [
+        { type: 'self', errorMessage: 'Only your own account' }
+      ];
+      const result = await authEngine.authorize(
+        'user123',
+        rules,
+        { userId: 'other' },
+        testContext
+      );
+      expect(result.authorized).toBe(false);
+      expect(result.reason).toBe('Only your own account');
+    });
+  });
+
   describe('Project Membership Check', () => {
     it('should pass when user is a project member', async () => {
       const rules: AuthRule[] = [

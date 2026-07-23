@@ -225,15 +225,16 @@ export function authorizeOperation(p: Principal, op: string): AuthzDecision;
 
 ### שלב 5 — Rollout: shadow → אכיפה
 
-- [x] דגל סביבה `AUTHZ_MODE = off | log | enforce` (ברירת מחדל: `log`;
-  נקרא דרך `$env/dynamic/private` — ניתן לשינוי בלי build) (2026-07-17).
+- [x] דגל סביבה `AUTHZ_MODE = off | log | enforce`
+  (נקרא דרך `$env/dynamic/private` — ניתן לשינוי בלי build) (2026-07-17).
   - `log`: מחשבים החלטה; אם `denied` — כותבים ללוג
     (`[authz-shadow] denied send:7getTelegramIds principal=user uid=…`)
     **וממשיכים** בהתנהגות הישנה.
   - `enforce`: מחזירים 403.
   - חריג: תעבורת apiKey **תמיד** נאכפת, בכל mode.
-- [ ] שבוע-שבועיים ב-`log` בפרודקשן; סקירת הלוגים ⇒ תיקון סיווגים שגויים
-  במניפסט; רק אז `AUTHZ_MODE=enforce`.
+- [x] **ברירת המחדל שונתה ל-`enforce` (2026-07-23):** תום תקופת ה-shadow —
+  env לא-מוגדר חוסם כעת זוגות kind×op לא-מורשים (`getAuthzMode` ב-`authorize.ts`).
+  לגלגול-לאחור בלי build: `AUTHZ_MODE=log` (shadow) או `AUTHZ_MODE=off`.
 - [x] בדיקות יחידה למטריצה (authorize.test.ts): user נחסם על qid של cron,
   apiKey נחסם על action לא-חשוף, serviceAdmin חסום על consensus,
   serviceConsensus מותר על consensus. (בדיקות אינטגרציה מלאות ברמת

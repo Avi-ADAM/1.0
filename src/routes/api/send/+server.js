@@ -111,8 +111,8 @@ export async function POST({ request, cookies }) {
 	// ── Static authorization: principal kind × qid (see src/lib/server/authz) ─
 	// Runs after the consensus-secret validation above so a bad secret still
 	// 401s exactly as before. Raw dev queries (no queId) are dev-only and skip
-	// this layer. AUTHZ_MODE=log (default) only logs would-be denials;
-	// AUTHZ_MODE=enforce returns 403. Entity-level guards further down and the
+	// this layer. AUTHZ_MODE=enforce (default) returns 403 on denial;
+	// AUTHZ_MODE=log only logs would-be denials. Entity-level guards further down and the
 	// per-action authRules are unaffected — this is the coarse first layer.
 	const principal = isSer ? resolveServicePrincipal(request) : resolveCookiePrincipal(cookies);
 	if (queId) {

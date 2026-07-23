@@ -103,8 +103,8 @@ export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
     // Static authorization: principal kind × action (see src/lib/server/authz).
     // Unknown actions fall through so ActionService keeps returning
     // UNKNOWN_ACTION/404. Entity-level authRules still run inside
-    // executeAction — this is the coarse first layer. AUTHZ_MODE=log
-    // (default) only logs would-be denials; enforce returns 403.
+    // executeAction — this is the coarse first layer. AUTHZ_MODE=enforce
+    // (default) returns 403 on denial; set AUTHZ_MODE=log for shadow logging.
     if (getAction(actionKey)) {
       const principal = resolvePrincipal({ request, cookies, isSerFlag: isSer === true });
       const { blocked, decision } = applyAuthz({ principal, op: `action:${actionKey}`, params });

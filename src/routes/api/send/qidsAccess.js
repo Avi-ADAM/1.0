@@ -3,7 +3,7 @@
 // Kinds: 'user' (cookie JWT) | 'serviceAdmin' (isSer + internal secret) |
 //        'serviceConsensus' (isSer + x-consensus-secret) | 'apiKey' (Bearer 1lev1_…).
 // A qid missing here fails the coverage test (qidsAccess.test.ts) — classify it consciously.
-// Enforcement mode is controlled by AUTHZ_MODE (off | log | enforce), see src/lib/server/authz/.
+// Enforcement mode is controlled by AUTHZ_MODE (off | log | enforce; default enforce), see src/lib/server/authz/.
 
 export const qidsAccess = {
   '85levHubSummary': { allow: ['user', 'serviceAdmin'] },

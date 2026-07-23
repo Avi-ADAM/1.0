@@ -96,7 +96,10 @@ export class AuthorizationEngine {
     switch (rule.type) {
       case 'jwt':
         return this.checkJwt(rule, context);
-        
+
+      case 'self':
+        return this.checkSelf(rule, userId, params);
+
       case 'projectMember':
         return await this.checkProjectMembership(rule, userId, params, context);
 
@@ -153,8 +156,52 @@ export class AuthorizationEngine {
   }
   
   /**
+   * Check that the action targets the acting user themselves.
+   *
+   * For actions that take a target-user param (e.g. `userId`), this guarantees
+   * the id the client supplied matches the authenticated user (context.userId,
+   * which comes from the httpOnly cookie — never from the request body). It is
+   * the declarative form of the "verify it's really them" ownership check for
+   * self-scoped operations (editing one's own profile, voting as oneself, …).
+   *
+   * Server/bot calls (isSer) are unaffected: /api/action sets
+   * context.userId = params.userId for those, so the two always match.
+   *
+   * @param rule - The self authorization rule (config.userIdParam, default 'userId')
+   * @param userId - The acting user id (from context)
+   * @param params - Action parameters (should contain the target user id)
+   * @returns Authorization result
+   */
+  private checkSelf(
+    rule: AuthRule,
+    userId: string,
+    params: Record<string, any>
+  ): AuthorizationResult {
+    const userIdParam = rule.config?.userIdParam || 'userId';
+    const target = this.getNestedValue(params, userIdParam);
+
+    // Require the param — a self-scoped action must name whom it acts on so the
+    // match is explicit (deny-by-default, like the other entity checks).
+    if (target === undefined || target === null || target === '') {
+      return {
+        authorized: false,
+        reason: rule.errorMessage || `User ID parameter "${userIdParam}" is required for this action`
+      };
+    }
+
+    if (String(target) !== String(userId)) {
+      return {
+        authorized: false,
+        reason: rule.errorMessage || 'You can only perform this action on your own account'
+      };
+    }
+
+    return { authorized: true };
+  }
+
+  /**
    * Check if user is a member of a project
-   * 
+   *
    * Uses the existing QIDS query 65checkProjectMembership to verify
    * that the user is a member of the specified project.
    * 
