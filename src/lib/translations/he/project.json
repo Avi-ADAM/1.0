@@ -85,7 +85,7 @@
     "chartPeriodYearly": "שנתי",
     "selectYear": "בחירת שנה",
     "noSalesInPeriod": "אין מכירות בתקופה זו",
-    "awaitingSplit": "(ממתינות לחלוקה)",
+    "awaitingSplit": "ממתין לחלוקה:",
     "tableView": "תצוגת טבלה",
     "downloadCsv": "הורדת CSV",
     "close": "סגור",
@@ -140,7 +140,19 @@
       "varSaleDate": "תאריך מכירה (ISO, ברירת מחדל: עכשיו)",
       "agentTitle": "פרומפט לסוכן ה-AI שבונה את האתר",
       "agentSubtitle": "העתיקו לסוכן שבונה לכם את האתר כדי שיבצע את האינטגרציה לבד."
-    }
+    },
+    "unknownProduct": "מוצר לא ידוע",
+    "autoApproved": "אושר בשתיקה",
+    "confirmed": "אושר",
+    "unverifiedLegacy": "לא מאומת (legacy)",
+    "split": "חולק",
+    "pending": "בהצבעה",
+    "awaiting": "ממתין",
+    "fileDownloaded": "הקובץ הורד בהצלחה",
+    "totalSales": "סך הכל מכירות:",
+    "inVoting": "בהצבעה:",
+    "status": "סטטוס",
+    "perUnitUnlimited": "ליחידה - ללא הגבלה"
   },
   "newmatana": {
     "unlimited": "ליחידה - ללא הגבלה",

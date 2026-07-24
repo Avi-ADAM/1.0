@@ -85,7 +85,7 @@
     "chartPeriodYearly": "ежегодно",
     "selectYear": "выберите год",
     "noSalesInPeriod": "нет продаж за этот период",
-    "awaitingSplit": "(ожидают раздела)",
+    "awaitingSplit": "Ожидает раздела:",
     "tableView": "Вид таблицы",
     "downloadCsv": "Скачать CSV",
     "close": "Закрыть",
@@ -140,7 +140,19 @@
       "varSaleDate": "Дата продажи (ISO, по умолчанию сейчас)",
       "agentTitle": "Промпт для ИИ-агента, создающего ваш сайт",
       "agentSubtitle": "Скопируйте его агенту, который строит ваш сайт, чтобы он сам настроил интеграцию."
-    }
+    },
+    "unknownProduct": "Неизвестный продукт",
+    "autoApproved": "авто-одобрено",
+    "confirmed": "подтверждено",
+    "unverifiedLegacy": "не подтверждено (legacy)",
+    "split": "Разделено",
+    "pending": "На голосовании",
+    "awaiting": "Ожидание",
+    "fileDownloaded": "Файл успешно загружен",
+    "totalSales": "Всего продаж:",
+    "inVoting": "На голосовании:",
+    "status": "Статус",
+    "perUnitUnlimited": "За ед. — без ограничений"
   },
   "newmatana": {
     "unlimited": "За единицу — без ограничений",

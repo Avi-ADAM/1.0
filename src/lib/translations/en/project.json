@@ -85,7 +85,7 @@
     "chartPeriodYearly": "yearly",
     "selectYear": "select year",
     "noSalesInPeriod": "no sales in this period",
-    "awaitingSplit": "(awaiting split)",
+    "awaitingSplit": "Awaiting Split:",
     "tableView": "Table View",
     "downloadCsv": "Download CSV",
     "close": "Close",
@@ -140,7 +140,19 @@
       "varSaleDate": "Sale date (ISO, defaults to now)",
       "agentTitle": "Prompt for the AI agent that builds your site",
       "agentSubtitle": "Copy this to the agent building your site so it wires up the integration on its own."
-    }
+    },
+    "unknownProduct": "Unknown product",
+    "autoApproved": "auto-approved",
+    "confirmed": "confirmed",
+    "unverifiedLegacy": "unverified (legacy)",
+    "split": "Split",
+    "pending": "Pending",
+    "awaiting": "Awaiting",
+    "fileDownloaded": "File downloaded successfully",
+    "totalSales": "Total Sales:",
+    "inVoting": "In Voting:",
+    "status": "Status",
+    "perUnitUnlimited": "Unlimited"
   },
   "newmatana": {
     "unlimited": "unlimited",

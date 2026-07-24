@@ -85,7 +85,7 @@
     "chartPeriodYearly": "سنوي",
     "selectYear": "اختر السنة",
     "noSalesInPeriod": "لا توجد مبيعات في هذه الفترة",
-    "awaitingSplit": "(في انتظار التقسيم)",
+    "awaitingSplit": "في انتظار التقسيم:",
     "tableView": "عرض الجدول",
     "downloadCsv": "تحميل CSV",
     "close": "إغلاق",
@@ -140,7 +140,19 @@
       "varSaleDate": "تاريخ البيع (ISO، الافتراضي الآن)",
       "agentTitle": "موجّه لوكيل الذكاء الاصطناعي الذي يبني موقعك",
       "agentSubtitle": "انسخه إلى الوكيل الذي يبني موقعك لينفّذ التكامل بنفسه."
-    }
+    },
+    "unknownProduct": "منتج غير معروف",
+    "autoApproved": "مُعتمد تلقائيًا",
+    "confirmed": "مؤكَّد",
+    "unverifiedLegacy": "غير موثّق (قديم)",
+    "split": "تم التقسيم",
+    "pending": "في انتظار التصويت",
+    "awaiting": "في الانتظار",
+    "fileDownloaded": "تم تنزيل الملف بنجاح",
+    "totalSales": "إجمالي المبيعات:",
+    "inVoting": "قيد التصويت:",
+    "status": "الحالة",
+    "perUnitUnlimited": "للوحدة - بلا حدود"
   },
   "newmatana": {
     "unlimited": "غير محدود",

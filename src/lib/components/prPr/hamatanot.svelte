@@ -9,6 +9,7 @@
   import 'dayjs/locale/ru.js';
   import { lang } from '$lib/stores/lang.js';
   import { t, isRtl} from '$lib/translations';
+  import { get } from 'svelte/store';
   import { idPr } from '$lib/stores/idPr.js';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { fly } from 'svelte/transition';
@@ -279,7 +280,7 @@
     if (isSiteShareNote(sale?.attributes?.note)) {
       return $t('project.hamatanot.siteShare.label');
     }
-    return $lang === 'he' ? 'מוצר לא ידוע' : 'Unknown product';
+    return get(t)('project.hamatanot.unknownProduct');
   }
 
   // Holder-consent status chip (PLAN_sale_holder_consent). holderStatus is
@@ -304,12 +305,12 @@
       return {
         cls: 'chip-confirmed',
         text: byTimeout
-          ? ($lang === 'he' ? 'אושר בשתיקה' : 'auto-approved')
-          : ($lang === 'he' ? 'אושר' : 'confirmed')
+          ? (get(t)('project.hamatanot.autoApproved'))
+          : (get(t)('project.hamatanot.confirmed'))
       };
     }
     // null = legacy, predates this feature
-    return { cls: 'chip-legacy', text: $lang === 'he' ? 'לא מאומת (legacy)' : 'unverified (legacy)' };
+    return { cls: 'chip-legacy', text: get(t)('project.hamatanot.unverifiedLegacy') };
   }
   let arrc = [
     { year: 2019, bananas: 3840, cherries: 1920, dates: 960 },
@@ -391,10 +392,10 @@
 
     const rows = salee.map((sale) => {
       const status = sale.attributes.splited
-        ? ($lang === 'he' ? 'חולק' : $lang === 'ar' ? 'تم التقسيم' : 'Split')
+        ? (get(t)('project.hamatanot.split'))
         : sale.attributes.pending
-          ? ($lang === 'he' ? 'בהצבעה' : $lang === 'ar' ? 'في انتظار التصويت' : 'Pending')
-          : ($lang === 'he' ? 'ממתין' : $lang === 'ar' ? 'في الانتظار' : 'Awaiting');
+          ? (get(t)('project.hamatanot.pending'))
+          : (get(t)('project.hamatanot.awaiting'));
 
       return [
         getMatanaName(sale),
@@ -426,7 +427,7 @@
     document.body.removeChild(link);
 
     toast.success(
-      $lang === 'he' ? 'הקובץ הורד בהצלחה' : 'File downloaded successfully'
+      get(t)('project.hamatanot.fileDownloaded')
     );
   }
 
@@ -604,9 +605,7 @@
                           <span>{$t('project.hamatanot.unlimited')}</span>
                         {:else}
                           {data.attributes.quant === -1
-                            ? $lang === 'he'
-                              ? 'ליחידה - ללא הגבלה'
-                              : 'Unlimited'
+                            ? $t('project.hamatanot.perUnitUnlimited')
                             : data.attributes.quant}
                         {/if}
                       {/if}
@@ -730,13 +729,13 @@
                 <div
                   class="absolute -top-3 -right-3 bg-green-500 text-white text-xs px-2 py-1 rounded"
                 >
-                  ✓ {$lang === 'he' ? 'חולק' : 'Split'}
+                  ✓ {$t('project.hamatanot.split')}
                 </div>
               {:else if data.attributes.pending}
                 <div
                   class="absolute -top-3 -right-3 bg-blue-500 text-white text-xs px-2 py-1 rounded"
                 >
-                  ⏳ {$lang === 'he' ? 'בהצבעה' : 'Pending'}
+                  ⏳ {$t('project.hamatanot.pending')}
                 </div>
               {/if}
               <!-- Holder-consent status chip -->
@@ -821,21 +820,21 @@
         >
           <div class="mb-2">
             <h2 class="text-sm font-medium">
-              {$lang === 'he' ? 'סך הכל מכירות:' : 'Total Sales:'}
+              {$t('project.hamatanot.totalSales')}
             </h2>
             <p class="font-bold text-lg">{totalSales}</p>
           </div>
           {#if salee.some((s) => s.attributes.splited || s.attributes.pending)}
             <div class="border-t border-barbi/30 pt-2">
               <h2 class="text-sm font-medium">
-                {$lang === 'he' ? 'ממתין לחלוקה:' : 'Awaiting Split:'}
+                {$t('project.hamatanot.awaitingSplit')}
               </h2>
               <p class="font-bold text-lg">{allin}</p>
             </div>
             {#if salee.some((s) => s.attributes.pending)}
               <div class="border-t border-barbi/30 pt-2 mt-2">
                 <h2 class="text-sm font-medium text-blue-600">
-                  {$lang === 'he' ? 'בהצבעה:' : 'In Voting:'}
+                  {$t('project.hamatanot.inVoting')}
                 </h2>
                 <p class="font-bold text-lg text-blue-600">
                   {salee
@@ -1016,7 +1015,7 @@
                   <th>{$t('project.hamatanot.salesByDate')}</th>
                   <th>{$t('project.hamatanot.type')}</th>
                   <th>{$t('project.hamatanot.note')}</th>
-                  <th>{$lang === 'he' ? 'סטטוס' : 'Status'}</th>
+                  <th>{$t('project.hamatanot.status')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -1048,15 +1047,15 @@
                     <td>
                       {#if sale.attributes.splited}
                         <span class="status-badge split-badge"
-                          >✓ {$lang === 'he' ? 'חולק' : $lang === 'ar' ? 'تم التقسيم' : 'Split'}</span
+                          >✓ {$t('project.hamatanot.split')}</span
                         >
                       {:else if sale.attributes.pending}
                         <span class="status-badge pending-badge"
-                          >⏳ {$lang === 'he' ? 'בהצבעה' : $lang === 'ar' ? 'في انتظار التصويت' : 'Pending'}</span
+                          >⏳ {$t('project.hamatanot.pending')}</span
                         >
                       {:else}
                         <span class="status-badge awaiting-badge"
-                          >{$lang === 'he' ? 'ממתין' : $lang === 'ar' ? 'في الانتظار' : 'Awaiting'}</span
+                          >{$t('project.hamatanot.awaiting')}</span
                         >
                       {/if}
                     </td>
