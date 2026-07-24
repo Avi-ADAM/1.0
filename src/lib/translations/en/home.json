@@ -50,7 +50,8 @@
     "en": "English",
     "he": "עברית",
     "ar": "العربية",
-    "ru": "Русский"
+    "ru": "Русский",
+    "es": "Español"
   },
   "loading": {
     "title": "Loading a three-dimensional design element"

@@ -1,0 +1,30 @@
+{
+  "_review": true,
+  "creator": {
+    "title": "Crear proceso",
+    "subtitle": "Crea primero la necesidad y luego añade misiones o recursos.",
+    "name": "Nombre del proceso",
+    "description": "Descripción de la necesidad",
+    "create": "Crear proceso",
+    "pickExisting": "O continúa un proceso existente",
+    "useThis": "Usar"
+  },
+  "board": {
+    "empty": "Aún no hay procesos para este proyecto.",
+    "stages": {
+      "need": "Necesidad",
+      "pending": "Pendiente",
+      "open": "Abierto",
+      "candidates": "Candidatos",
+      "execution": "Ejecución",
+      "approval": "Aprobación final",
+      "completion": "Finalización"
+    },
+    "next": "Siguiente etapa",
+    "forum": "Foro principal",
+    "select": "Seleccionar para añadir"
+  },
+  "node": {
+    "chatLabel": "Abrir chat"
+  }
+}

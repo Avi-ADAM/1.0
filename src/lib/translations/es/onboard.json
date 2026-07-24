@@ -1,0 +1,233 @@
+{
+  "_review": true,
+  "title": "Elige tu camino · 1💗1",
+  "journey": "Paso 3 · Selección de camino",
+  "plaque": {
+    "title": "Nos encantaría conocerte",
+    "sub": "¿Cómo te gustaría integrarte en la red de Rikmas de 1💗1?"
+  },
+  "tile_info": "Esto afecta a lo que te ofrecemos: adaptamos el ritmo a quién eres.",
+  "tracks": {
+    "provider": {
+      "title": "Quiero ofrecer habilidades y unirme a una Rikma",
+      "sub": "Construyamos un perfil que muestre tus capacidades, para integrarte como socio igualitario en Rikmas (asociaciones por consenso), participar en votaciones y en el reparto de beneficios, o dar una respuesta colectiva a la demanda de clientes.",
+      "meta": "~ 4 min · Perfil creado a partir del CV o manualmente",
+      "chips": ["Perfil de habilidades", "Unirse a una Rikma", "Reparto de beneficios"]
+    },
+    "business": {
+      "title": "Tengo un negocio o una idea de proyecto",
+      "sub": "Crea una nueva Rikma (asociación por consenso) o envuelve un negocio existente, para reclutar socios igualitarios, gestionar beneficios y decisiones juntos y, sobre todo, conectarte directamente con un flujo de clientes y proyectos en el sistema.",
+      "meta": "~ 5 min · Extraído del sitio o de una descripción libre",
+      "chips": ["Crear Rikma y socios", "Votación y reparto de beneficios", "Conectar con proyectos y clientes"]
+    }
+  },
+  "done": {
+    "title": "¡Has llegado! · 1💗1",
+    "journey": "¡Has llegado! Perfil listo",
+    "plaque": {
+      "title": "¡Qué alegría que lo hayas logrado!",
+      "sub": "Tu perfil está vivo y respirando"
+    },
+    "info": "🎉 Perfil guardado. La Conserjería ya está empezando a buscar coincidencias, Rikmas potenciales y deseos de clientes.<br /><b>¿Por dónde seguimos?</b>",
+    "choices": {
+      "matches": {
+        "title": "A tu perfil + guía de usuario",
+        "sub": "La Conserjería ya está buscando Rikmas y demandas de clientes que coincidan. Aprendamos a gestionar una asociación por consenso sobre la marcha.",
+        "meta": "Recomendado — La forma natural de continuar",
+        "chips": {
+          "realtime": "✨ Sugerencias en tiempo real",
+          "guide": "📖 Guía breve"
+        }
+      },
+      "business": {
+        "title": "Crear una Rikma (Asociación)",
+        "sub": "¿Tienes una idea de proyecto, producto o asociación? Es hora de crear una Rikma, reclutar socios y conectar con proyectos de clientes en el sistema.",
+        "meta": "También se puede hacer más tarde desde el perfil",
+        "chips": {
+          "project": "Crear una Rikma",
+          "products": "Votación y beneficios",
+          "partners": "Socios y clientes"
+        }
+      }
+    }
+  },
+  "provider": {
+    "title": "Crear perfil de proveedor · 1💗1",
+    "journey": "Paso 4 · Creación del perfil",
+    "plaque": {
+      "title": "¿Cómo empezamos a construirlo?",
+      "sub": "Un método · Se puede editar más tarde"
+    },
+    "or": "o",
+    "choices": {
+      "cv": {
+        "title": "Subir CV",
+        "sub": "La IA extraerá tus habilidades y experiencia del CV para emparejarte con Rikmas y proyectos adecuados.",
+        "meta": "~ 30 s · PDF · DOCX · TXT",
+        "chips": {
+          "suggested": "⚡ Recomendado",
+          "success": "El 90 % lo logra"
+        }
+      },
+      "describe": {
+        "title": "Describe con tus palabras",
+        "sub": "Escribe libremente sobre tus habilidades, deseos y experiencia. La IA te conectará con Rikmas adecuadas.",
+        "meta": "~ 2 min · 2-3 párrafos",
+        "chips": {
+          "free": "✍️ Libre"
+        }
+      },
+      "manual": {
+        "title": "Rellenado manual en cuatro pasos",
+        "sub": "Valores → Habilidades → Roles → Estilo.",
+        "meta": "~ 4 min · Sin IA"
+      }
+    },
+    "cv_page": {
+      "title": "Subir CV · 1💗1",
+      "journey": "Paso 4 · Procesamiento del CV",
+      "plaque": {
+        "title": "Arrastra el CV aquí",
+        "sub": "Todo queda con nosotros · Nada se expone"
+      },
+      "drop_title": "Arrastra y suelta tu CV aquí o haz clic para subirlo",
+      "loading_title": "Analizando tu CV",
+      "loading_hint": "El proceso suele tardar 10-15 segundos",
+      "stage_parse": "Leyendo el archivo",
+      "stage_extract": "Extracción con IA",
+      "stage_match": "Emparejando con las listas del sitio",
+      "stage_ready": "Listo para confirmar",
+      "err_size": "El archivo es demasiado grande: hasta 5 MB",
+      "err_format": "Formato no compatible",
+      "info": "✨ La IA extraerá tus habilidades y experiencia del CV para poder ofrecerte Rikmas adecuadas y una cogestión por consenso. Siempre puedes editarlo.",
+      "back_choice": "← Volver a la elección"
+    },
+    "describe_page": {
+      "title": "Habla sobre ti · 1💗1",
+      "journey": "Paso 4 · Historia personal",
+      "plaque": {
+        "title": "Cuéntanos sobre ti",
+        "sub": "La IA extraerá habilidades y valores para emparejarte con Rikmas adecuadas"
+      },
+      "info": "✨ 2-3 párrafos libres: cuáles son tus habilidades, a qué Rikmas te interesa unirte como socio igualitario y qué valor deseas aportar.",
+      "label": "Tu historia",
+      "placeholder": "Ejemplo: Desarrollo fullstack con 5 años de experiencia. Interesado en unirme a startups en fase inicial como socio tecnológico, especialmente en educación y salud. Mi rutina diaria incluye React y Node.js, diseño de bases de datos y desarrollo principal...",
+      "analyzing": "✨ Analizando la historia...",
+      "working": "Lev está trabajando..."
+    },
+    "review_page": {
+      "title": "Confirmar perfil · 1💗1",
+      "journey": "Paso 5 · Confirmación del perfil",
+      "loading": "Cargando...",
+      "plaque": {
+        "title": "Esto es lo que encontramos",
+        "sub": "Marca lo que es correcto · Todo se puede editar"
+      },
+      "summary": "✓ Encontrados {{total}} elementos · <b>{{matched}}</b> coincidentes · <b>{{suggested}}</b> sugerencias · <b>{{newItems}}</b> nuevos",
+      "sections": {
+        "vallues": {
+          "label": "Valores principales"
+        },
+        "skills": {
+          "label": "Habilidades"
+        },
+        "roles": {
+          "label": "Roles"
+        },
+        "methods": {
+          "label": "Estilo de trabajo"
+        },
+        "missions": {
+          "label": "Misiones que eres capaz de realizar",
+          "hint": "Haz clic en una misión para quitarla · Se puede editar y añadir más tarde"
+        }
+      },
+      "close_to": "Cercano a: {{label}}",
+      "resources": {
+        "label": "📦 Recursos para compartir",
+        "hint": "Objetos físicos en tu poder que se pueden ofrecer: haz clic para seleccionar"
+      },
+      "save_failed": "Error al guardar ({{status}})",
+      "network_error": "Error de red: inténtalo de nuevo",
+      "actions": {
+        "skip": "Saltar para finalizar 🗝",
+        "saving": "Guardando...",
+        "edit": "Continuar para editar ✍️"
+      },
+      "next_hint": "En la edición añadiremos más valores, afinaremos habilidades y seleccionaremos misiones y recursos de las listas del sitio. Siempre puedes editar desde el perfil."
+    },
+    "tabs": {
+      "values": "Valores",
+      "skills": "Habilidades",
+      "roles": "Roles",
+      "style": "Estilo"
+    }
+  },
+  "actions": {
+    "skip": "Saltar · Elegiré más tarde",
+    "continue": "Continuar 🗝",
+    "going": "Avanzando...",
+    "back": "← Atrás",
+    "skip_manual": "Saltar al rellenado manual",
+    "choose_other": "← Elegir otra"
+  },
+  "business": {
+    "title": "Crear una Rikma (Asociación) · 1💗1",
+    "journey": "Paso 4 · Construyendo la Rikma",
+    "plaque": {
+      "title": "Cuéntanos sobre tu Rikma",
+      "sub": "Asociación por consenso, reparto de beneficios y conexión directa con clientes"
+    },
+    "choices": {
+      "url": {
+        "title": "Tengo un sitio web o página de negocio",
+        "sub": "Pega la URL: la IA creará la Rikma, definirá las áreas de actividad y extraerá coincidencias para socios y proyectos de clientes.",
+        "meta": "~ 45 s · Todo se puede editar",
+        "chips": {
+          "fast": "⚡ Lo más rápido",
+          "public": "URL pública"
+        }
+      },
+      "describe": {
+        "title": "Describe con tus palabras",
+        "sub": "2-3 párrafos libres. Escribe sobre la Rikma, tus necesidades y cómo te gustaría atender los proyectos de clientes.",
+        "meta": "~ 2 min · La IA creará un borrador"
+      },
+      "manual": {
+        "title": "Rellenado manual",
+        "sub": "Campo por campo. Sin IA.",
+        "meta": "~ 5 min · Lo más preciso"
+      }
+    },
+    "url_page": {
+      "title": "Pega el enlace a la Rikma · 1💗1",
+      "journey": "Paso 5 · Configurando la Rikma",
+      "plaque": {
+        "title": "Pega el enlace de la Rikma",
+        "sub": "Sitio web / Página de aterrizaje / Facebook / Instagram"
+      },
+      "info": "⚡ La IA leerá la página y configurará la Rikma automáticamente, incluyendo el nombre del proyecto, la descripción y las habilidades requeridas para los socios; siempre puedes editar.",
+      "label": "Enlace",
+      "hint_ok": "✓ Tiene buena pinta",
+      "hint_err": "Pega la dirección completa, incluyendo https://",
+      "analyzing": "✨ Analizando la página...",
+      "scanning": "Lev está escaneando..."
+    },
+    "describe_page": {
+      "title": "Describe la Rikma · 1💗1",
+      "journey": "Paso 5 · Configurando la Rikma",
+      "plaque": {
+        "title": "Cuéntanos sobre la Rikma",
+        "sub": "La IA creará un borrador de Rikma, definiciones de socios y proyectos de clientes que coincidan"
+      },
+      "info": "✨ 2-3 párrafos libres: sobre tu Rikma o proyecto, qué tipo de socios necesitas y qué habilidades te complementarían.",
+      "label": "Descripción",
+      "placeholder": "Ejemplo: Creando una Rikma (asociación) que conecta a agricultores locales con consumidores directos. Se busca socio para liderar marketing y ventas, con experiencia en gestión de comunidad y redes sociales. Se ofrece una asociación igualitaria, incluyendo toma de decisiones por consenso y reparto estructurado de beneficios...",
+      "char_count": "caracteres",
+      "can_continue": "✓ Se puede continuar",
+      "min_chars": "Alcanza al menos {{count}}",
+      "analyzing": "✨ Analizando el texto...",
+      "working": "Lev está trabajando..."
+    }
+  }
+}

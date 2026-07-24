@@ -43,6 +43,13 @@
       locale.set('ru');
       document.cookie =
         `lang=${$lang}; expires=` + new Date(2027, 0, 1).toUTCString();
+    } else if (lan == 'es') {
+      doesLang.set(true);
+      langUs.set('es');
+      lang.set('es');
+      locale.set('es');
+      document.cookie =
+        `lang=${$lang}; expires=` + new Date(2027, 0, 1).toUTCString();
     }
     trans = false;
   }
@@ -79,7 +86,8 @@
     ar: 'https://1lev1.com/ar',
     en: 'https://1lev1.com/en',
     he: 'https://1lev1.com/he',
-    ru: 'https://1lev1.com/ru'
+    ru: 'https://1lev1.com/ru',
+    es: 'https://1lev1.com/es'
   };
   let size = $derived({
     width: w < 320 ? w : Math.min(w * 1.15, h * 1.5), // הגבל רוחב לפי יחס גובה
@@ -218,6 +226,14 @@
               title="Russian"
               class="text-barbi border border-lturk hover:text-gold bg-white text-center hover:bg-gray-50 px-2 py-0.5 rounded text-sm"
               >{$t('home.languages.ru')}</button
+            >
+          {/if}
+          {#if $lang != 'es'}
+            <button
+              onclick={() => change('es')}
+              title="Spanish"
+              class="text-barbi border border-lturk hover:text-gold bg-white text-center hover:bg-gray-50 px-2 py-0.5 rounded text-sm"
+              >{$t('home.languages.es')}</button
             >
           {/if}
         </div>

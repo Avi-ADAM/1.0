@@ -8,6 +8,7 @@ export const config = {
         he: { lang },
         ar: { lang },
         ru: { lang },
+        es: { lang },
     },
     loaders: [
         {
@@ -556,6 +557,139 @@ export const config = {
             key: 'consensus',
             routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/consensus/],
             loader: async () => (await import('./ru/consensus.json')).default,
+        },
+        // --- Spanish (es) ---
+        {
+            locale: 'es',
+            key: 'onboard',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru|\/es)?\/onboard/],
+            loader: async () => (await import('./es/onboard.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'tasks',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru|\/es)?\/myacts/],
+            loader: async () => (await import('./es/tasks.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'bot',
+            loader: async () => (await import('./es/bot.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'negotiation',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru|\/es)?\/negotiation/],
+            loader: async () => (await import('./es/negotiation.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'guide',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru|\/es)?\/guid/],
+            loader: async () => (await import('./es/guide.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'faq',
+            routes: [/^\/faq/],
+            loader: async () => (await import('./es/faq.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'love',
+            routes: ['/love'],
+            loader: async () => (await import('./es/love.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'home',
+            loader: async () => (await import('./es/home.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'grow',
+            loader: async () => (await import('./es/grow.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'nav',
+            loader: async () => (await import('./es/nav.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'auth',
+            loader: async () => (await import('./es/auth.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'lev',
+            loader: async () => (await import('./es/lev.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'countries',
+            loader: async () => (await import('./es/countries.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'deals',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru|\/es)?\/deals/],
+            loader: async () => (await import('./es/deals.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'process',
+            loader: async () => (await import('./es/process.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'timers',
+            loader: async () => (await import('./es/timers.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'project',
+            loader: async () => (await import('./es/project.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'mission',
+            loader: async () => (await import('./es/mission.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'location',
+            loader: async () => (await import('./es/location.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'demand',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru|\/es)?\/(demand|maagad|lev)/, /\/moach\/[^/]+\/demand/],
+            loader: async () => (await import('./es/demand.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'discover',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru|\/es)?\/(demand|project|gift|availableMission|availiableResorce)/],
+            loader: async () => (await import('./es/discover.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'concierge',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru|\/es)?\/(concierge|wish)/],
+            loader: async () => (await import('./es/concierge.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'offerings',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru|\/es)?\/(me|onboard|gift|demand|user)/],
+            loader: async () => (await import('./es/offerings.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'consensus',
+            routes: [/^(?:\/he|\/en|\/ar|\/ru|\/es)?\/consensus/],
+            loader: async () => (await import('./es/consensus.json')).default,
         },
     ],
 };

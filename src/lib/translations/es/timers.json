@@ -1,0 +1,20 @@
+{
+  "_review": true,
+  "saveTimer": "Guardar temporizador",
+  "editTimer": "Editar temporizador",
+  "saveTimerBtn": "Guardar temporizador",
+  "updateTasks": "Actualizar tarea",
+  "editTimes": "Editar tiempos",
+  "updateHint": "puedes actualizar las tareas en las que estás trabajando o editar los tiempos del temporizador",
+  "clearTimer": "Borrar temporizador",
+  "manageTime": "Gestionar tiempos",
+  "clearAll": "Borrar todo",
+  "noTimes": "No hay tiempos que gestionar",
+  "chooseTasks": "Elegir tareas",
+  "update": "Actualizar",
+  "timerUpdated": "Temporizador actualizado correctamente",
+  "clearSuccess": "Temporizadores borrados correctamente",
+  "clearError": "No se pudieron borrar los temporizadores",
+  "saveSuccess": "Temporizador guardado correctamente",
+  "saveError": "Error al guardar el temporizador"
+}

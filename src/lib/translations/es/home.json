@@ -1,0 +1,431 @@
+{
+  "_review": true,
+  "meta": {
+    "title": "1💗1 | Crear juntos en armonía | Consenso mundial por la libertad",
+    "description": "1💗1 Consenso mundial por la seguridad y la paz | plataforma de colaboración, crear juntos en armonía | plataforma de gestión de asociaciones basada en el consenso | juntos podemos"
+  },
+  "hero": {
+    "subtitle": "Asociación empresarial inteligente: crea con pasión, gana con justicia",
+    "headline1": "Seguridad financiera a través de la co-creación",
+    "headline2": "Gestión empresarial inteligente con el corazón abierto",
+    "headline3": "Plena independencia dentro de una comunidad que te apoya",
+    "headline4": "Deja de alquilar tu tiempo",
+    "headline5": "Convierte cada hora en propiedad — juntos, por consenso"
+  },
+  "intro": {
+    "q1": "¿Tienes un talento increíble pero te cuesta monetizarlo solo?",
+    "q2": "¿Quieres dejar de perseguir un sueldo y empezar a construir un activo que rinda, juntos?"
+  },
+  "features": {
+    "welcome": "Bienvenido a 1💗1, una nueva plataforma de asociación. Aquí, cada mujer es una reina. Cada hombre es un rey. Aquí creamos juntos, sin renunciar a la independencia.",
+    "createRikma": "Crear una 'Rikma': una asociación dinámica basada en valores",
+    "joinRikma": "Unirte a Rikmas existentes que encajan perfectamente con tu horario, tus habilidades y tu pasión",
+    "livelihood": "Sustento con propósito: cada hora trabajada y cada recurso compartido se convierte en participación. Reparto real de beneficios, no solo un salario.",
+    "sharedManagement": "Gestión compartida: votaciones, decisiones, presupuestos, con el pleno acuerdo de todo el grupo de la asociación",
+    "transparency": "Plena transparencia tecnológica: el sistema registra cada acción y decisión en tiempo real. Construir confianza mediante la transparencia, no la burocracia.",
+    "tools": "Tareas, tableros, gráficos y herramientas adicionales para una gestión colaborativa sencilla y eficiente",
+    "ownership": "No solo un salario, sino propiedad. Cada inversión de tiempo o recursos se transforma en participación y beneficios futuros.",
+    "formula": "Nuestra fórmula: (Tiempo + Recursos) = % en los beneficios. \n En 1💗1 nadie decide por ti. Cada tarea y pago pasa por un acuerdo grupal transparente.",
+    "mission": "En 1💗1 convertimos la \"guerra por la supervivencia\" en un \"tapiz de prosperidad\". Usamos la tecnología para asegurar que cada uno reciba exactamente lo que merece, para que puedas crear con tranquilidad."
+  },
+  "stats": {
+    "currently": "Actualmente en el sitio",
+    "partnerships": "asociaciones activas",
+    "members": "miembros",
+    "loading": "Cargando datos..."
+  },
+  "cta": {
+    "agree": "¿Quieres traer sentido y alegría a tu vida? ¿Quieres abrir la puerta a una nueva realidad? Conéctate al acuerdo y regístrate ahora. Tu acuerdo aparecerá en el ",
+    "agreementMap": "Mapa de acuerdos",
+    "agreeEnd": " y te abrirá el camino para crear una nueva realidad. Juntos crearemos un mundo mejor",
+    "login": "Iniciar sesión",
+    "register": "Acuerdo y registro"
+  },
+  "nav": {
+    "about": "Acerca de",
+    "faq": "Preguntas frecuentes",
+    "agreementMap": "Mapa de acuerdos",
+    "changeLanguage": "Cambiar idioma"
+  },
+  "languages": {
+    "en": "English",
+    "he": "עברית",
+    "ar": "العربية",
+    "ru": "Русский",
+    "es": "Español"
+  },
+  "loading": {
+    "title": "Cargando un elemento de diseño tridimensional"
+  },
+  "sections": {
+    "problemTitle": "¿Conoces esa sensación?",
+    "howTitle": "Cómo empezar — en 4 pasos",
+    "faqTitle": "Preguntas frecuentes",
+    "featuresTitle": "Todo lo que necesitas para gestionar una asociación, en un solo lugar",
+    "featuresSub": "Herramientas reales ya integradas en el sistema, no promesas.",
+    "ctaFinalTitle": "¿Listo para crear una Rikma?",
+    "ctaFinalSub": "Únete a la plataforma donde cada contribución se convierte en propiedad, por pleno acuerdo.",
+    "navFeatures": "Capacidades",
+    "navHow": "Cómo funciona",
+    "navConcierge": "Conserjería",
+    "navFaq": "Preguntas frecuentes",
+    "ctaTop": "Iniciar una Rikma",
+    "proofTitle": "Parte de un movimiento global",
+    "proofSub": "Cada Rikma creada aquí es prueba viviente de que podemos trabajar de otra manera: por acuerdo, con transparencia y justicia.",
+    "proofStatProjects": "Rikmas activas",
+    "proofStatMembers": "miembros",
+    "proofStatSigners": "firmaron el acuerdo",
+    "mapTitle": "Un acuerdo que se extiende por el mundo",
+    "mapSub": "Cientos de miles de personas en todo el mundo eligieron acordar una vida de libertad, sin coerción y sin violencia. Tu acuerdo se suma al mapa en vivo.",
+    "mapCta": "Al mapa de acuerdos",
+    "whoTitle": "¿Para quién es?",
+    "whoSub": "Para cualquiera que quiera crear en conjunto y ganar de forma justa.",
+    "whoFreelancer_t": "Autónomos y profesionales",
+    "whoFreelancer_d": "Convierte las horas de trabajo en participación de propiedad y únete a asociaciones que encajen con tus habilidades y tu horario.",
+    "whoBusiness_t": "Dueños de negocios",
+    "whoBusiness_d": "Consigue clientes potenciales de una demanda real, gestiona con transparencia y conecta tu negocio a una red de socios complementarios.",
+    "whoCreators_t": "Creadores y comunidades",
+    "whoCreators_d": "Construye un proyecto compartido en torno a un sueño o un objetivo, con decisiones por acuerdo y reparto transparente de beneficios.",
+    "modelTitle": "¿Cuánto cuesta?",
+    "modelSub": "Empezar es gratis. Ganas cuando la Rikma gana: sin cuotas de suscripción ocultas, solo total transparencia.",
+    "painLead": "La verdad de la que nadie habla:",
+    "pain1": "Te despiertas para un trabajo que es un 'deber', no un 'querer'.",
+    "pain2": "Inviertes horas, talento y energía, y el valor que construyes sigue siendo de otro.",
+    "pain3": "A fin de mes el sueldo se acaba y empiezas de cero otra vez. No se acumula ningún activo.",
+    "pain4": "Y solo hay dos opciones: un empleado sin libertad o un emprendedor solitario que carga con todo el riesgo.",
+    "painCost": "Así se venden años enteros a bajo precio, y el sueño se pospone a otro 'algún día'.",
+    "painTurn": "¿Y si el trabajo pudiera ser a la vez una vocación y un activo que sigue siendo tuyo?",
+    "painCustomerTitle": "¿Y el mayor perdedor de todos? El cliente.",
+    "painCustomer1": "Quien te atiende es un empleado: su dinero viene del jefe, no de ti. No hay ningún vínculo financiero entre vosotros.",
+    "painCustomer2": "Así que su lealtad fluye naturalmente hacia el jefe, y el cliente se convierte en una molestia, una parte más del trabajo.",
+    "painCustomer3": "¿La verdad simple? Todo el dinero viene del cliente. Tú eres quien merece toda la atención.",
+    "painCustomerTurn": "En una Rikma, quien te atiende es un socio: tu dinero es su ingreso directo, y el cliente vuelve al centro.",
+    "oldWayTitle": "Por qué la vieja forma no funciona de verdad",
+    "oldWaySub": "Entre dos malas opciones, hay un tercer camino.",
+    "colEmployee_t": "Empleado",
+    "colEmployee_d": "Seguridad falsa•Sin propiedad•Otro decide por ti•El sueldo se acaba cada mes",
+    "colSolo_t": "Emprendedor solitario",
+    "colSolo_d": "Todo el riesgo sobre ti•Soledad•Carga de gestión pesada•Sin red de seguridad",
+    "colRikma_t": "En 1💗1 — una Rikma",
+    "colRikma_badge": "El tercer camino",
+    "colRikma_d": "Propiedad real en %•Plena libertad•Decisiones por consenso•Socios que te complementan•Beneficio de por vida",
+    "navDemo": "Demo en vivo"
+  },
+  "platform": {
+    "projectMgmt_t": "Todo tu proyecto de un vistazo",
+    "projectMgmt_d": "Tableros Kanban, Gantt, procesos, tareas y turnos: toda la Rikma organizada en un solo lugar, transparente para todos.",
+    "negotiation_t": "Sistema de negociación inteligente",
+    "negotiation_d": "Una herramienta de negociación con IA integrada que analiza posturas, sugiere compromisos y te guía hacia un acuerdo justo, sin mediación costosa.",
+    "onboarding_t": "Incorporación inteligente",
+    "onboarding_d": "Sube un CV o un enlace a tu sitio/negocio y la IA mapea automáticamente tus habilidades, roles y las Rikmas que mejor te encajan.",
+    "telegram_t": "Control desde Telegram",
+    "telegram_d": "Inicia temporizadores, recibe notificaciones y realiza acciones directamente desde el bot de Telegram, sin necesidad de abrir el ordenador.",
+    "aiBot_t": "Asistente y agentes de IA (MCP)",
+    "aiBot_d": "Un bot integrado que navega, abre tareas y te resume la situación. Incluso puedes conectar agentes de IA externos para operar la Rikma vía MCP.",
+    "transparency_t": "Transparencia y decisiones por acuerdo",
+    "transparency_d": "Cada acción y decisión se registra en tiempo real, y las resoluciones pasan por votación y consenso con un 'tiempo de decisión' definido."
+  },
+  "concierge": {
+    "eyebrow": "◈ Conserjería personal ◈",
+    "title": "¿Quieres algo? No lo busques: pídelo.",
+    "subtitle": "Cuéntanos con tus palabras qué necesitas, y en torno a tu deseo se formará un grupo para hacerlo realidad: un nuevo producto, desde cero.",
+    "flow": "Nos lo cuentas → Lev lo desglosa → se forma un grupo de proveedores → apruebas y recibes",
+    "customerTitle": "Para clientes",
+    "customerDesc": "Sin categorías, sin perseguir proveedores. Describe lo que quieres y recibe un plan completo para aprobar. Nada sale hasta que lo publicas.",
+    "customerCta": "Cuéntanos lo que quieres ✨",
+    "providerTitle": "Para dueños de negocios y proveedores",
+    "providerDesc": "Los clientes ya están buscando: deja que te encuentren. Cada deseo que incluya lo que ofreces te llega como un cliente potencial cálido y preseleccionado, con socios que te completan en un paquete entero.",
+    "providerCta": "Consigue clientes: únete como proveedor",
+    "bridge": "Por eso los deseos y las asociaciones viven en un mismo sitio: cuando los proveedores son socios de una Rikma en lugar de empleados de alguien, tu dinero es su ingreso directo, y su corazón está justo donde está el cliente."
+  },
+  "maze": {
+    "title": "Aclaremos las cosas",
+    "subtitle": "Todo lo que necesitas saber antes de unirte",
+    "tabs": {
+      "platform": "La plataforma – 1💗1",
+      "agreement": "Los acuerdos"
+    },
+    "platform": {
+      "name": "Plataforma 1💗1",
+      "desc": "Una plataforma para gestionar colaboraciones, co-creación y acuerdos mutuos entre personas.",
+      "f1": "Gestiona grupos ('rikmas') en torno a un sueño o un objetivo",
+      "f2": "Negocia y alcanza acuerdos compartidos",
+      "f3": "Distribuye tareas, recursos y beneficios",
+      "f4": "Registro solo después de aceptar los términos"
+    },
+    "agreementSite": {
+      "name": "Sitio del acuerdo completo",
+      "desc": "Un sitio independiente dedicado a la visión de un acuerdo global sobre la libertad y la paz.",
+      "f1": "Firma el acuerdo global completo",
+      "f2": "Cientos de miles de firmantes en todo el mundo",
+      "f3": "Mapa en vivo del acuerdo global",
+      "f4": "Regreso automático a la plataforma tras firmar"
+    },
+    "rikma": {
+      "title": "¿Qué es una 'Rikma'?",
+      "desc": "Una rikma es un grupo creado en 1💗1 en torno a un objetivo compartido: un negocio, un proyecto, un sueño o cualquier otra idea. Los miembros negocian, alcanzan acuerdos y distribuyen recursos y beneficios, todo por consentimiento mutuo."
+    },
+    "flow": {
+      "title": "¿Qué ocurre durante el registro?",
+      "s1": {
+        "title": "Rellena tus datos",
+        "desc": "Nombre, ubicación en el mundo y correo electrónico: eso es todo"
+      },
+      "s2": {
+        "title": "Elige un acuerdo",
+        "desc": "Acuerdo básico (casilla) o acuerdo completo (haz clic en el botón destacado)"
+      },
+      "s3": {
+        "title": "Haz clic en el botón del globo giratorio",
+        "desc": "El botón de enviar, situado en la parte inferior de la página"
+      },
+      "s4": {
+        "title": "¡Bienvenido a 1💗1!",
+        "desc": "Se abre el registro; rellena más datos y únete a la comunidad"
+      }
+    },
+    "compare": {
+      "title": "¿Cuál es la diferencia entre los acuerdos?",
+      "basic": {
+        "title": "Acuerdo básico",
+        "scope": "Enfocado: solo la plataforma 1💗1",
+        "desc": "Comprométete a usar la plataforma solo por consentimiento mutuo y a respetar la libertad de elección de cada usuario.",
+        "cta": "Marca la casilla en el formulario"
+      },
+      "full": {
+        "title": "Acuerdo completo",
+        "scope": "Visión global: toda la humanidad",
+        "desc": "Una declaración de una amplia visión global: toda la humanidad acordando vivir en libertad, sin violencia y sin coerción.",
+        "cta": "Ir al sitio del acuerdo completo"
+      }
+    },
+    "faq": {
+      "title": "Preguntas frecuentes",
+      "q1": "¿Qué es exactamente 1💗1?",
+      "a1": "1💗1 es una plataforma para gestionar acuerdos y colaboraciones. Permite a las personas crear grupos ('rikmas') en torno a objetivos compartidos, negociar y alcanzar acuerdos de forma transparente y organizada.",
+      "q2": "¿Cuál es la diferencia entre 1💗1 y el sitio del acuerdo?",
+      "a2": "1💗1 (1lev1.com) es la plataforma de colaboración: el lugar donde creas rikmas, gestionas proyectos y trabajas en conjunto. agreement.1lev1.com es un sitio independiente dedicado a la visión global del acuerdo mundial.",
+      "q3": "¿Es obligatorio visitar el sitio del acuerdo completo?",
+      "a3": "¡No! Puedes aceptar el acuerdo básico (casilla en el formulario) y continuar directamente al registro. El sitio del acuerdo completo es una extensión opcional para quienes quieren sumarse a la visión global.",
+      "q4": "¿Qué ocurre cuando vuelvo del sitio del acuerdo completo?",
+      "a4": "Vuelves automáticamente a la página de registro con la confirmación de que has firmado. Los datos que rellenaste en el formulario se guardan y puedes continuar directamente al registro.",
+      "q5": "¿Qué significa 'rikma'?",
+      "a5": "Una rikma es un grupo en 1💗1 creado en torno a un objetivo compartido. La metáfora es una colonia biológica: células que cooperan y juntas crean algo mayor, conservando cada una su propia autonomía celular. Cada miembro es una célula, y juntos son la rikma.",
+      "q6": "¿Qué ocurre después del registro?",
+      "a6": "Tras el registro puedes unirte a rikmas existentes, crear una nueva rikma, gestionar proyectos y trabajar con personas de todo el mundo, todo por consentimiento mutuo."
+    }
+  },
+  "skipToEnd": "Saltar al final",
+  "amana": {
+    "title": "1💗1 | Registro en la plataforma",
+    "description": "Únete a la plataforma de colaboración 1💗1: un lugar para la asociación, la co-creación y el acuerdo mutuo",
+    "headerTitle": "Regístrate en 1💗1",
+    "headerSubtitle": "Únete a la plataforma de co-creación",
+    "agreedFull": "Aceptaste el acuerdo ampliado",
+    "form": {
+      "nameLabel": "Mi nombre",
+      "namePlaceholder": "Mi nombre",
+      "locationLabel": "Mi lugar en el mundo",
+      "locationPlaceholder": "Mi ubicación",
+      "emailLabel": "Mi correo electrónico",
+      "submit": "Registrarse"
+    },
+    "errors": {
+      "nameRequired": "El nombre es obligatorio",
+      "nameTaken": "El nombre elegido ya está en uso",
+      "emailInvalid": "Se requiere un correo electrónico válido",
+      "locationRequired": "Debe seleccionarse al menos una ubicación",
+      "agreementRequired": "Debes aceptar los términos de uso",
+      "serverSleep": "El servidor se durmió 😴, lo despertamos, intentándolo de nuevo",
+      "contactSupport": "Si el problema persiste, puedes contactar con"
+    },
+    "agreement": {
+      "title": "Aceptación de los términos de uso",
+      "fullButton": "Al acuerdo ampliado",
+      "note": "Únete al acuerdo global",
+      "basicText1": "Yo, <strong>{{name}}</strong>, crearé, actuaré y resolveré disputas en el sitio 1💗1 solo por acuerdo mutuo.",
+      "basicText2": "Yo, <strong>{{name}}</strong>, no quiero dañar a nadie por ningún motivo y deseo una cooperación voluntaria, sin coerción.",
+      "checkboxLabel": "He leído y acepto el acuerdo básico",
+      "infoTitle": "Diferencia entre los acuerdos:",
+      "basicInfo": "<strong>Acuerdo básico</strong> - Compromiso de usar el acuerdo mutuo en el sitio",
+      "fullAgreementLink": "<strong>Acuerdo ampliado</strong>",
+      "fullAgreementDesc": " - Una visión global más amplia de paz y acuerdo"
+    },
+    "status": {
+      "successTitle": "¡Enviado correctamente!",
+      "successMessage": "Muchas gracias, nos pondremos en contacto pronto.",
+      "loading": "Un momento, por favor...",
+      "errorTitle": "Ocurrió un error",
+      "errorMessage": "Algo salió mal. Inténtalo de nuevo."
+    },
+    "nav": {
+      "explanation": "Explicación",
+      "changeRequest": "Solicitud de cambio",
+      "translation": "Traducción",
+      "login": "Iniciar sesión"
+    },
+    "common": {
+      "or": "O",
+      "tryAgain": "Intentar de nuevo",
+      "close": "Cerrar",
+      "justAMoment": "Un momento..."
+    }
+  },
+  "setitle": "Creando una nueva realidad, juntos",
+  "introQuestions": {
+    "q1": "¿Sientes que tienes algo que aportar, pero es difícil solo?",
+    "q2": "¿Sabes que estás destinado a más, pero buscas a las personas adecuadas con quienes caminar?"
+  },
+  "features2": {
+    "passiveIncome": "Ingresos pasivos reales: beneficios de por vida, según la inversión, según el acuerdo",
+    "ledger": "Libro mayor digital distribuido: total transparencia, sin burocracia",
+    "sharingItems": "Compartir objetos y abundancia entre Rikmas y personas: reciclar, conectar y ganar",
+    "freedomCharter": "¿Quieres caminar con nosotros? Es sencillo. Debes aceptar la Carta Mundial de la Libertad: un documento de valores, no de leyes.",
+    "agreementMapText": "Tu acuerdo aparecerá en el Mapa de acuerdos y te abrirá el camino para crear una nueva realidad",
+    "rikmaDefinition": "Una Rikma es un grupo de personas con distintas habilidades y recursos que crean juntas un producto o prestan un servicio y reparten los beneficios según la inversión relativa y el acuerdo"
+  },
+  "grow": {
+    "eyebrow": "🌱 Agricultura colaborativa y trabajo con las manos",
+    "title": "¿Te encanta cultivar, construir o crear con tus manos? Ven a ver cómo 1💗1 puede ayudarte",
+    "desc": "Para agricultores, jardineros, artesanos y cualquiera que quiera ganarse la vida con la tierra, sin capital inicial ni ir en solitario.",
+    "cta": "A la página de Cultivar"
+  },
+  "consensus": {
+    "eyebrow": "🤝 El motor de acuerdos",
+    "title": "No tenemos un \"no\": cada decisión se cierra por acuerdo",
+    "desc": "Aprueba, sigue hablando o propón otra versión. Mira cómo funciona una asociación real por acuerdo mutuo, y prueba una demo en vivo.",
+    "cta": "Conoce el motor de acuerdos"
+  },
+  "quorum": {
+    "eyebrow": "◉ Compra colectiva, sin el grupo",
+    "title": "Quórum: cosas que ocurren solo cuando suficientes personas las quieren",
+    "desc": "Una caja de verduras, una línea de minibús, un taller: firmas solo por ti mismo, y sucede solo cuando suficientes firman también. Sin comité, sin votaciones.",
+    "cta": "Descubre el Quórum"
+  },
+  "fpage": {
+    "whyDifferentTitle": "💗 Por qué somos diferentes",
+    "whyDifferentDesc": "1💗1 no es solo una plataforma de negocios: <strong>somos parte de un movimiento global</strong> de personas que eligen trabajar por acuerdo mutuo, no por coerción. Cada asociación aquí es prueba viviente de que trabajar de otra manera es posible.",
+    "discoverAgreement": "Descubre el acuerdo global ➜",
+    "agreedOnAgreement": "Aceptaron el acuerdo"
+  },
+  "tooltip": {
+    "name": "Nombre",
+    "iso3": "ISO3",
+    "agreements": "Acuerdos"
+  },
+  "bein": {
+    "title": "Registro en 1💗1",
+    "confirmEmail": "revisa tu correo electrónico, por favor; gracias",
+    "seeSoon": "¡hasta pronto!",
+    "contactMessage": "si no lo recibiste, haz clic aquí para contactarnos",
+    "tabValues": "Valores",
+    "tabSkills": "Habilidades",
+    "tabRoles": "Roles",
+    "tabStyle": "Estilo",
+    "tabPassword": "Contraseña"
+  },
+  "peek": {
+    "title": "Un vistazo en vivo por dentro",
+    "sub": "Así se ve la plataforma desde dentro, antes de registrarte.",
+    "badge": "Demo",
+    "tabs": {
+      "hub": "Mi centro",
+      "mission": "Misión y temporizador",
+      "vote": "Votar y consentir"
+    },
+    "hub": {
+      "votes": "votos",
+      "urgent": "urgentes",
+      "suggestions": "ofertas",
+      "shortcuts": "Accesos directos",
+      "missions": "Misiones activas",
+      "rikma": "Asociaciones",
+      "inbound": "Entrantes",
+      "feedTitle": "Actividad reciente",
+      "feed1": "Sivan propuso un nuevo reparto de beneficios en 'Estudio Or'",
+      "feed2": "Misión 'Diseño de logo' aprobada: se añadieron 2,5 horas",
+      "feed3": "La asociación 'Huerto comunitario' busca un carpintero"
+    },
+    "mission": {
+      "header": "Misión en curso",
+      "name": "Diseño de logo · asociación 'Estudio Or'",
+      "timerLabel": "Temporizador en marcha",
+      "hours": "Horas registradas en esta misión: 6,5",
+      "equity": "Cada hora se registra con transparencia y se convierte en una parte de los beneficios de la asociación"
+    },
+    "vote": {
+      "header": "Propuesta sometida a votación",
+      "proposal": "Aprobar un presupuesto de 1.200 ILS para equipo de fotografía",
+      "by": "Propuesto por Daniel · asociación 'Estudio Or'",
+      "consensus": "Consentimiento: 3 de 4 han votado",
+      "yes": "De acuerdo",
+      "no": "Negociar",
+      "windowLabel": "Aprobación automática en",
+      "silence": "Si nadie responde antes de que se cierre, la propuesta se aprueba por sí sola. El silencio = acuerdo.",
+      "hint": "Las decisiones pasan solo por consentimiento: cada miembro tiene voz"
+    },
+    "note": "Estos son datos de muestra a modo de ilustración; el sistema real te espera dentro.",
+    "cta": "¿Quieres una propia? Acepta y regístrate",
+    "lev": {
+      "tab": "Tarjetas del Corazón",
+      "header": "El Corazón: acciones que esperan tu consentimiento",
+      "hint": "Desliza a la derecha para aprobar, a la izquierda para negociar; pruébalo 👇",
+      "approve": "Aprobar",
+      "reject": "Negociar",
+      "approved": "¡Aprobada!",
+      "rejected": "A negociación",
+      "done": "¡Eso es todo! Acabas de gestionar una asociación en 20 segundos 💗",
+      "doneSub": "En 1💗1 no hay rechazo: solo consentimiento o negociación, tarjeta a tarjeta, hasta que todos estén en paz con la decisión.",
+      "restart": "De nuevo ↺",
+      "cards": {
+        "c1": {
+          "type": "Aprobación de misión",
+          "project": "asociación 'Estudio Or'",
+          "title": "Añadir misión: 'Diseño de packaging'",
+          "by": "Propuesto por Sivan",
+          "t1": "horas",
+          "t2": "ILS/hora"
+        },
+        "c2": {
+          "type": "Solicitud de unión",
+          "project": "asociación 'Huerto comunitario'",
+          "title": "Yoav el carpintero pide unirse",
+          "by": "3 de 4 ya aprobaron",
+          "t1": "horas/semana"
+        },
+        "c3": {
+          "type": "Oferta para cumplir tu deseo",
+          "project": "Conserjería",
+          "title": "Diseño de logo para un negocio: Yael se ofreció a hacerlo",
+          "by": "Tu necesidad de conserjería · esperando tu aprobación",
+          "t1": "Horas",
+          "t2": "Precio en ILS"
+        },
+        "c4": {
+          "type": "Cliente potencial entrante de conserjería",
+          "project": "Conserjería",
+          "title": "Un cliente quiere: fotografía de eventos, encaja contigo",
+          "by": "Según tus habilidades · envía una oferta",
+          "t1": "Horas",
+          "t2": "Presupuesto en ILS"
+        }
+      },
+      "negoTitle": "Contraoferta",
+      "negoOrig": "Propuesto:",
+      "negoSend": "Enviar contraoferta 🤝",
+      "negoBack": "Atrás",
+      "negoSent": "¡Enviado a negociación!"
+    }
+  },
+  "discover": {
+    "title": "Ven a explorar y descubrir",
+    "sub": "Puedes descubrir todo esto antes de registrarte:",
+    "projects": "rikmas activas",
+    "missions": "misiones esperando candidatos",
+    "resources": "recursos buscados",
+    "products": "productos que puedes comprar",
+    "map": "El mapa de demanda en vivo",
+    "mapSub": "Toda la demanda y la oferta en un solo mapa",
+    "view": "Ver"
+  }
+}

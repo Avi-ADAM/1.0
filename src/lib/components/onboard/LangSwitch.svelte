@@ -5,10 +5,15 @@
   const langs = /** @type {const} */ ([
     { code: 'he', label: 'עב', dir: 'rtl' },
     { code: 'en', label: 'EN', dir: 'ltr' },
-    { code: 'ar', label: 'عر', dir: 'rtl' }
+    { code: 'ar', label: 'عر', dir: 'rtl' },
+    { code: 'ru', label: 'RU', dir: 'ltr' },
+    { code: 'es', label: 'ES', dir: 'ltr' }
   ]);
 
-  /** @param {'he'|'en'|'ar'} code */
+  // Locales that render left-to-right; everything else is RTL.
+  const ltrLocales = ['en', 'ru', 'es'];
+
+  /** @param {'he'|'en'|'ar'|'ru'|'es'} code */
   function pick(code) {
     if ($locale === code) return;
     lang.set(code);
@@ -18,7 +23,7 @@
     document.cookie =
       `lang=${code}; path=/; expires=` + new Date(2027, 0, 1).toUTCString();
     // Update document dir so RTL/LTR layout flips immediately.
-    document.documentElement.setAttribute('dir', code === 'en' ? 'ltr' : 'rtl');
+    document.documentElement.setAttribute('dir', ltrLocales.includes(code) ? 'ltr' : 'rtl');
     document.documentElement.setAttribute('lang', code);
   }
 </script>

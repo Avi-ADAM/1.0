@@ -1,0 +1,351 @@
+{
+  "_review": true,
+  "missionInProgress": {
+    "uploadTitle": "Sube un archivo o describe la finalización de la misión",
+    "uploadDescription": "Sube un archivo con la finalización de la misión o descríbela con palabras",
+    "fileLabel": "Subir archivo",
+    "descriptionPlaceholder": "Describe la finalización de la misión con palabras...",
+    "submitButton": "Enviar para aprobación",
+    "pleaseWait": "Espera, por favor...",
+    "cancel": "Cancelar",
+    "timerStopped": "temporizador detenido correctamente",
+    "success": "¡aprobado correctamente!",
+    "error": "error: inténtalo de nuevo; si el problema continúa, contacta en baruch@1lev1.com",
+    "statusLabel": "estado del progreso de la misión",
+    "save": "guardar",
+    "done": "hecho",
+    "saved": "guardado correctamente",
+    "oneMonent": "un momento, por favor",
+    "editTimer": "editar temporizador"
+  },
+  "cards": {
+    "approve": "Lo quiero",
+    "decline": "No es para mí",
+    "nego": "Personalizar",
+    "acceptCounter": "Aceptar",
+    "proposeOther": "Otra propuesta",
+    "requesterDetails": "Datos del solicitante",
+    "confirmApprove": "Aprobar",
+    "confirmDecline": "Rechazar",
+    "viewChat": "Ver chat",
+    "replyChat": "Responder",
+    "negotiate": "Negociar",
+    "newNegotiation": "Nueva negociación",
+    "toNegotiate": "Nego",
+    "saleCard": {
+      "customer": "Cliente:",
+      "product": "Producto:",
+      "price": "Precio:",
+      "quantity": "Cantidad:",
+      "total": "Total:",
+      "startDate": "Inicio:",
+      "endDate": "Fin:",
+      "confirmDelivery": "Confirmar entrega",
+      "confirmPayment": "Dinero recibido",
+      "chat": "Chat",
+      "creatingChat": "Creando chat...",
+      "processing": "Procesando...",
+      "deliveryConfirmed": "Entrega confirmada",
+      "paymentConfirmed": "Recepción del dinero confirmada",
+      "operationError": "La acción falló",
+      "deliveryApprovals": "Confirmaciones de entrega",
+      "customerReceived": "El cliente recibió",
+      "customerPaid": "El cliente pagó",
+      "moneyReceived": "Dinero recibido",
+      "delivered": "Entregado",
+      "awaitingApproval": "Esperando tu confirmación",
+      "youShouldReceive": "Deberías recibir el dinero",
+      "moneyReceivers": "Receptores del dinero",
+      "addReceiver": "Define un receptor del dinero",
+      "addReceiverHint": "Para que el cliente pueda transferirte el dinero, añádete como receptor",
+      "addMeReceiver": "Añadirme como receptor del dinero",
+      "removeMeReceiver": "Quitarme de la lista"
+    },
+    "voteStatus": {
+      "approved": "Aprobada",
+      "oldVersion": "Versión antigua",
+      "waiting": "Esperando",
+      "rejected": "Rechazada"
+    },
+    "filter": {
+      "heartTitle": "Corazón del sistema",
+      "heartDesc": "Corazón del sistema; haz clic en los diamantes para filtrar las acciones",
+      "switchView": "Cambia la vista de monedas a tarjetas",
+      "showSuggestions": "Mostrar solo misiones sugeridas en los freemates",
+      "showVotes": "Mostrar solo votos sobre nuevas misiones",
+      "showJoinRequests": "Mostrar solo solicitudes para realizar misiones para los FreeMates",
+      "showSplitRequests": "Mostrar solo votos sobre repartos de dinero",
+      "showInProgress": "Mostrar solo mis misiones en curso",
+      "showWelcome": "Mostrar solo bienvenidas a los FreeMates",
+      "showCompletionApproval": "Mostrar solo aprobaciones de misiones finalizadas",
+      "personalDashboard": "Haz clic para ir a tu sala de control",
+      "showResourceApproval": "Mostrar solo votos sobre la aprobación de recepción de recursos",
+      "showResourceInvestment": "Mostrar solo inversiones sugeridas de recursos en los FreeMates",
+      "showResourceVotes": "Mostrar solo votos sobre nuevos recursos para los FreeMates",
+      "showJoinAndInvest": "Mostrar solo solicitudes para unirse e invertir recursos en los FreeMates",
+      "showMyPurchases": "Mostrar solo mis compras",
+      "items": {
+        "fiap": "Aprobaciones de finalización de misión ({{count}})",
+        "sugg": "Propuestas de misión ({{count}})",
+        "pend": "Misiones pendientes de aprobación ({{count}})",
+        "asks": "Aprobaciones de asignación de misión ({{count}})",
+        "betaha": "Misiones en curso ({{count}})",
+        "desi": "Decisiones generales ({{count}})",
+        "ppmash": "Recursos pendientes de aprobación ({{count}})",
+        "pmashs": "Propuestas de compartir recursos ({{count}})",
+        "pmaap": "Aprobaciones de recepción de recursos ({{count}})",
+        "askmap": "Aprobaciones de asignación de recursos ({{count}})",
+        "hachla": "Aprobaciones generales ({{count}})",
+        "sheirutp": "Solicitudes de servicio ({{count}})",
+        "purchases": "Mis compras ({{count}})"
+      }
+    },
+    "voteCard": {
+      "neged": "Se necesita negociación",
+      "totalVotes": "Total de votos para negociación",
+      "inFavor": "A favor",
+      "notYet": "Todavía no",
+      "notVotedYet": "Aún no votaron",
+      "perYear": "Al año",
+      "oneYear": "Un año",
+      "years": "Años",
+      "inTotal": "En total",
+      "oneMonth": "Un mes"
+    },
+    "resourcePeriod": {
+      "monthly": "Mensual",
+      "yearly": "Anual",
+      "recurring": "Recurso recurrente",
+      "noEndDate": "Sin fecha de fin",
+      "months": "meses"
+    },
+    "inpro": {
+      "missionInProgress": "Misión en curso",
+      "progressStatus": "Estado del progreso de la misión",
+      "missionDetails": "Detalles de la misión",
+      "notes": "Notas",
+      "hoursDone": "Horas hechas y guardadas",
+      "from": "De",
+      "timer": "Temporizador",
+      "totalHours": "Total de horas asignadas a la misión",
+      "hoursCount": "Número de horas hechas y guardadas",
+      "completionApproval": "Aprobación de recepción exitosa de un recurso",
+      "editTimer": "Editar temporizador",
+      "monthlyHours": "Horas mensuales",
+      "totalHoursLabel": "Total de horas"
+    }
+  },
+  "taskApproval": {
+    "approve": "Aprobar",
+    "approving": "Aprobando...",
+    "approved": "Aprobada",
+    "successMessage": "¡Tarea aprobada correctamente!"
+  },
+  "reqtojoin": {
+    "chatWith": "chatear con",
+    "onJoining": "sobre unirse"
+  },
+  "reqtosherut": {
+    "chatWith": "chatear con",
+    "onJoining": "sobre unirse"
+  },
+  "mashsuggest": {
+    "cancel": "cerrar",
+    "chatOnJoining": "chatear sobre unirse"
+  },
+  "pandingMesima": {
+    "error": "error: inténtalo de nuevo; si el problema continúa, contacta en baruch@1lev1.com"
+  },
+  "haluka": {
+    "bridge": {
+      "openDiscussion": "🤝 Discusión profunda",
+      "openDiscussionHint": "Abre una discusión de mediación estructurada sobre este reparto",
+      "resolved": "La discusión de consenso llegó a una decisión",
+      "resolvedShare": "Parte acordada",
+      "toDiscussion": "Abrir discusión completa ←",
+      "voteStillNeeded": "La decisión guía el voto; la aprobación final queda aquí, en la tarjeta."
+    },
+    "successMessage": "¡Reparto aprobado correctamente! 🎉",
+    "errorMessage": "Error al aprobar el reparto. Inténtalo de nuevo.",
+    "table": {
+      "name": "Nombre",
+      "due": "Debido",
+      "actual": "Real",
+      "giving": "Entrega",
+      "receiving": "Recibe",
+      "transfers": "Transferencias",
+      "siteShare": "Participación del sitio",
+      "status": "Estado",
+      "paid": "Pagado",
+      "sent": "Enviado",
+      "pending": "Pendiente",
+      "membersGave": "Los miembros dieron hasta ahora",
+      "decided": "decidido",
+      "to1lev1": "a 1💗1"
+    }
+  },
+  "reqtom": {
+    "voteTitle": "votar sobre la solicitud de unirse a los FreeMates y compartir un recurso ",
+    "heartOf": "el corazón de 1💗1",
+    "clickToProfile": "haz doble clic para ver el perfil de {name}",
+    "resourceName": "nombre del recurso sugerido",
+    "clickToPublic": "haz doble clic para ver la página pública de los FreeMates",
+    "clickToBrain": "haz doble clic para ir al Cerebro de {projectName}",
+    "cancel": "cerrar",
+    "chatOnJoining": "chatear sobre unirse"
+  },
+  "pmas": {
+    "error": "error: inténtalo de nuevo; si el problema continúa, contacta en baruch@1lev1.com"
+  },
+  "diun": {
+    "labelMoney": "Datos para ayudar a completar la transferencia (número de cuenta, detalles de la transferencia, etc.)",
+    "labelRejection": "Motivo del rechazo (mínimo 27 caracteres)",
+    "labelDiscussion": "Mensaje - por favor, ten en cuenta los mensajes anteriores",
+    "labelForum": "Escribe un mensaje..."
+  },
+  "productRequest": {
+    "request": "Solicitar"
+  },
+  "didiget": {
+    "approveOf": "aprobar la recepción",
+    "from": "de",
+    "success": "¡aprobado correctamente!",
+    "error": "error: inténtalo de nuevo; si el problema continúa, contacta en baruch@1lev1.com",
+    "messageSent": "mensaje enviado correctamente"
+  },
+  "mesima": {
+    "suggestedMission": "misión sugerida",
+    "openMission": "misión abierta"
+  },
+  "welcomTo": {
+    "joined": "bienvenido a los FreeMates",
+    "toHeadquarters": "al cuartel general de los FreeMates",
+    "welcome": "bienvenidos nuevos FreeMates",
+    "heartOf": "el corazón de 1💗1"
+  },
+  "revenue": {
+    "siteShareDecision": {
+      "title": "Tu contribución a 1💗1",
+      "sub": "De lo que ganaste ({basis} {currency}), el servicio de gestión y asociación de 1💗1. Sugerido: {proposed} {currency}. Da lo sugerido, más o menos: es tu contribución personal y no cambia las partes de los demás socios.",
+      "skipped": "Elegiste no dar esta vez. Puedes cambiarlo.",
+      "gave": "Diste {amount} {currency}. Puedes actualizarlo.",
+      "asIs": "Como sugerido ({proposed})",
+      "more": "Me gustaría dar más",
+      "less": "Dar menos",
+      "amount": "Cantidad",
+      "reasonReq": "Motivo (obligatorio)",
+      "reasonOpt": "Motivo (opcional)",
+      "placeholder": "¿Por qué?",
+      "confirm": "Confirmar contribución",
+      "skip": "Esta vez no"
+    },
+    "openSiteShareReminder": {
+      "title": "Decisiones de contribución pendientes",
+      "sub": "Aún tienes una contribución personal a 1💗1 por decidir en los repartos de abajo. Da, o elige no hacerlo esta vez.",
+      "rikma": "Rikma"
+    },
+    "siteSharePayCard": {
+      "cardType": "DAR A 1💗1",
+      "done": "Transferencia completada 💗",
+      "pickReceiver": "Elige un receptor",
+      "errOpen": "No se pudo abrir la transferencia",
+      "errNet": "Error al abrir la transferencia",
+      "errInvalidReceiver": "Elige primero un receptor",
+      "errZeroSkip": "No hay transferencia para un reparto omitido o de cero",
+      "errNotOwner": "Solo el titular de la contribución puede transferir",
+      "body": "Te comprometiste a dar a 1💗1 de este reparto. Coordina en el chat y confirma cuando hayas enviado el dinero. Se completa cuando el receptor también confirma.",
+      "noVol": "Ningún miembro de 1💗1 se ha ofrecido a recibir todavía. La transferencia se abre en cuanto alguien lo haga."
+    },
+    "siteShareAutoApprovedCard": {
+      "cardType": "CONFIRMAR ENTREGA A 1💗1",
+      "saved": "Guardado 💗",
+      "errSave": "No se pudo guardar",
+      "errNet": "Error al guardar",
+      "autoNotice": "Este reparto ya se aprobó automáticamente y se cerró. No lo bloqueaste; solo queda confirmar tu entrega personal a 1💗1.",
+      "body": "Elige cuánto dar a 1💗1 de tu parte personal de este reparto, u omítelo esta vez. No afecta a lo que se reparten los socios."
+    },
+    "siteShareIncomeCard": {
+      "cardType": "INGRESO POR PARTICIPACIÓN DEL SITIO",
+      "body": "Este es un ingreso de participación del sitio de los miembros de una rikma. No hay producto ni paso de entrega: solo asegúrate de que alguien se ofrezca a recibir y de que quien da y quien recibe confirmen que el dinero se movió.",
+      "totalIncome": "Ingreso total",
+      "you": "Tú",
+      "transfers": "Transferencias de miembros",
+      "complete": "completa",
+      "noTransfers": "Aún no hay transferencias de miembros. Aparecen aquí en cuanto un miembro que da elige un receptor y envía."
+    }
+  },
+  "fiappru": {
+    "whyHeading": "Explica por qué, por favor",
+    "taskNotCompleted": "¿Por qué no se completó la tarea?",
+    "offerRejected": "Explica por qué rechazas esta oferta",
+    "addHours": "Añadir horas"
+  },
+  "weget": {
+    "howMuchSpentThisMonth": "¿Cuánto gastaste este mes?",
+    "approveMonthlyExpense": "Aprobar gasto mensual",
+    "cycleLabel": "Ciclo",
+    "reportedExpenseOf": "reportó un gasto de:",
+    "actualAmountPlaceholder": "Cantidad realmente gastada este mes",
+    "confirmExpense": "Confirmar gasto",
+    "doneResourceTitle": "Finalizar recurso mensual: no se abrirán más cargos mensuales",
+    "doneResource": "Hecho (Finalizar recurso)",
+    "mustExplain": "Explica, por favor",
+    "missingForApproval": "¿Qué falta para confirmar que se recibió el recurso?",
+    "proposeOtherAmount": "Proponer una cantidad diferente",
+    "reportedAmount": "Cantidad reportada:",
+    "proposedAmount": "Cantidad propuesta:",
+    "amountYouPropose": "Cantidad que propones",
+    "whyMoveAmount": "¿Por qué cambiar la cantidad? (se publicará en el chat)",
+    "submitProposal": "Enviar propuesta",
+    "explainProposal": "Explica la propuesta, por favor",
+    "addHours": "Añadir horas"
+  },
+  "levchat": {
+    "messagePlaceholder": "Escribe tu mensaje..."
+  },
+  "halukaask": {
+    "offerRejected": "Explica por qué rechazas esta oferta",
+    "yourResponse": "Tu respuesta",
+    "yourResponseLabel": "Tu respuesta",
+    "canRespond": "Puedes responder y explicar por qué",
+    "decline": "rechazar",
+    "approve": "aprobar",
+    "theOffer": "la oferta",
+    "referToPrevious": "Ten en cuenta la respuesta anterior y aborda las afirmaciones planteadas",
+    "previousResponse": "Respuesta anterior"
+  },
+  "taskModal": {
+    "progress": "Progreso",
+    "createdBy": "Creada por",
+    "unknown": "Desconocido",
+    "assignedTo": "Asignada a",
+    "accepted": "Aceptada",
+    "awaitingAccept": "Esperando aceptación",
+    "openForRoles": "Abierta para los roles:",
+    "openUnassigned": "Abierta – sin asignar",
+    "start": "Inicio:",
+    "due": "Vencimiento:",
+    "description": "Descripción",
+    "assigneeAccepted": "El asignado aceptó la tarea",
+    "yes": "Sí",
+    "pending": "Pendiente",
+    "markedDone": "El asignado marcó como hecha",
+    "creatorValidated": "El creador validó la finalización",
+    "stage0": "Creada",
+    "stage1": "Asignada",
+    "stage2": "Aceptada",
+    "stage3": "En curso",
+    "stage4": "Hecha",
+    "stage5": "Validada",
+    "badge0": "Abierta",
+    "badge1": "Esperando asignación",
+    "badge2": "Pendiente de aceptación",
+    "badge3": "En curso",
+    "badge4": "Pendiente de validación",
+    "badge5": "Completada",
+    "urgency_white": "Normal",
+    "urgency_green": "Baja",
+    "urgency_yellow": "Media",
+    "urgency_red": "Urgente"
+  }
+}

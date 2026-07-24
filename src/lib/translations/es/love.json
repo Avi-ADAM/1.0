@@ -1,0 +1,31 @@
+{
+  "_review": true,
+  "title": "Total de acuerdos",
+  "tooltip": {
+    "Name": "Nombre",
+    "iso3": "ISO3",
+    "Agrees": "Acuerdos"
+  },
+  "legend": {
+    "title": "Leyenda de datos",
+    "high": "Alto (100+)",
+    "medium": "Medio (10-99)",
+    "low": "Bajo (1-9)",
+    "none": "Ninguno todavía"
+  },
+  "scroll": "Desplázate hacia abajo",
+  "cta": {
+    "header": "💗 ¿Quieres unirte al mapa?",
+    "sub": "Únete a miles que eligen vivir por consentimiento mutuo",
+    "btn1": "Firma el acuerdo",
+    "btn2": "Empieza a crear redes",
+    "footer": "¿Ya lo firmaste? ¡Genial! Ahora haz realidad la visión"
+  },
+  "stats": {
+    "title": "Estadísticas en vivo",
+    "total": "Total de acuerdos",
+    "top": "País principal",
+    "countries": "Países activos"
+  },
+  "loading": "Un momento, por favor"
+}
