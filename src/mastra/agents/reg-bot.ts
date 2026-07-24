@@ -16,6 +16,7 @@ import { getProjectMembersTool } from '../tools/getProjectMembersTool';
 import { getMemberMissionsTool } from '../tools/getMemberMissionsTool';
 import { findUserProjectsTool } from '../tools/findUserProjectsTool';
 import { getPageContextTool } from '../tools/pageContextTool';
+import { getProjectContextTool } from '../tools/getProjectContextTool';
 import { SITE_CONTEXT } from '../../lib/bot/context.js';
 import { createGoogleModel, createGroqModel, createNvidiaModel, hasGroqModelConfig, hasNvidiaModelConfig, hasGoogleModelConfig } from '../lib/createModel';
 
@@ -51,6 +52,7 @@ Core workflows:
 - Mission details: listUserMissionsTool / getMissionDetailsTool
 - Mission statistics: getMissionStatsTool
 - Project navigation: findUserProjectsTool -> navigateToPageTool
+- What's happening in a project (open missions, your tasks, members, values): getProjectContextTool(projectId)
 - Create Partnership/Embroidery: createProjectTool
 - Create a task (Act) in a project for a person or a role: findUserProjectsTool -> getProjectMembersTool -> (for a person) getMemberMissionsTool to link a mission-in-progress -> createTaskTool
 - General navigation: getSitePagesTool -> navigateToPageTool
@@ -95,7 +97,8 @@ Behavior rules:
       getMemberMissionsTool,
       findMissionTool,
       findUserProjectsTool,
-      getPageContextTool
+      getPageContextTool,
+      getProjectContextTool
     }
   });
 };

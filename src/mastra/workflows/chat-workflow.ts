@@ -11,6 +11,37 @@ import {
   getAgentReply
 } from '../lib/agent-response';
 import { setMcpContext, clearMcpContext } from '../../lib/server/mcpContext.js';
+import {
+  extractProjectId,
+  getProjectContext,
+  summarizeProjectContext
+} from '../../lib/server/ai/projectContext.js';
+
+/**
+ * When the user is chatting from inside a project page (`/moach/[id]/*`),
+ * fetch a compact snapshot of that project so the agent answers "what's
+ * happening?" with real data instead of just the page name. Returns an empty
+ * string on any failure — context is an enhancement, never a hard dependency.
+ */
+async function buildProjectContextPreamble(
+  currentPath: string | undefined,
+  userId: string | undefined,
+  language: string,
+  fetchInstance: any
+): Promise<string> {
+  const projectId = extractProjectId(currentPath);
+  if (!projectId || !userId || !fetchInstance) return '';
+  try {
+    // Internal JWT bot → cookie/JWT path (isServerRequest=false).
+    const ctx = await getProjectContext(projectId, String(userId), fetchInstance, {
+      isServerRequest: false
+    });
+    return summarizeProjectContext(ctx, language);
+  } catch (err) {
+    console.error('⚠️ buildProjectContextPreamble failed:', err);
+    return '';
+  }
+}
 
 interface IntentResult {
   type: 'timer' | 'navigation' | 'general' | 'report' | 'sale' | 'task';
@@ -232,7 +263,8 @@ const routeToAgent = createStep({
       language,
       apiKey,
       intent,
-      fetchInstance
+      fetchInstance,
+      currentPath
     } = inputData;
 
     console.log('🚀 Routing to agent for intent:', intent.type);
@@ -327,13 +359,28 @@ const routeToAgent = createStep({
         // from previous turns, which we don't have when replaying from client-side history.
       }));
 
+    // Inject a compact project snapshot when the user is on a /moach/ page.
+    // Merged into the current user turn (rather than a separate message) to
+    // avoid provider-specific role-alternation constraints.
+    const projectPreamble = await buildProjectContextPreamble(
+      currentPath,
+      userId,
+      language,
+      fetchInstance
+    );
+    const currentUserContent = projectPreamble
+      ? `${projectPreamble}\n\n---\n\nUser message: ${message}`
+      : message;
+
     messages.push({
       role: 'user',
-      content: message
+      content: currentUserContent
     });
 
     console.log(
-      `🤖 Executing ${agentType} agent with ${messages.length} messages`
+      `🤖 Executing ${agentType} agent with ${messages.length} messages${
+        projectPreamble ? ' (+project context)' : ''
+      }`
     );
     console.log(
       '📝 Recent messages:',

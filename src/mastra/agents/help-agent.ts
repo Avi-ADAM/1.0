@@ -4,6 +4,7 @@ import { getChatHistoryTool } from '../tools/getChatHistoryTool';
 import { getSitePagesTool } from '../tools/siteNavigationTool';
 import { delegateToAgentTool } from '../tools/delegateToAgentTool';
 import { getPageContextTool } from '../tools/pageContextTool';
+import { getProjectContextTool } from '../tools/getProjectContextTool';
 import { createProjectTool } from '../tools/createProjectTool';
 import { reportIssueTool } from '../tools/reportIssueTool';
 import { SITE_CONTEXT } from '../../lib/bot/context.js';
@@ -36,6 +37,7 @@ ${SITE_CONTEXT}
 - getChatHistoryTool: לגישה להיסטוריית השיחה המורחבת במידת הצורך
 - getSitePagesTool: לקבלת רשימת כל העמודים הזמינים באתר עם תיאורים מפורטים
 - getPageContextTool: לקבלת מידע ספציפי על העמוד הנוכחי שהמשתמש נמצא בו, כולל פעולות אפשריות ותיאור העמוד
+- getProjectContextTool: לקבלת תמונת מצב חיה של פרויקט (משימות פתוחות, המשימות שלך בתהליך, חברים, ערכים) — השתמש כשהמשתמש שואל "מה קורה כאן?" או על מצב הפרויקט, במיוחד בעמוד /moach/[projectId]
 - createProjectTool: ליצירת פרויקטים חדשים באמצעות קישור יצירת פרויקט מוגדר
 - delegateToAgentTool: להעברת בקשות לסוכנים מתמחים (טיימר או ניווט) כאשר המשתמש זקוק לפונקציונליות ספציפית
 - reportIssueTool: לדיווח על תקלות, הצעת פיצ'רים, פנייה לצוות האתר או פנייה לשותפות
@@ -73,6 +75,7 @@ Your tools:
 - getChatHistoryTool: For accessing extended chat history when needed
 - getSitePagesTool: To get a list of all available pages on the site with detailed descriptions
 - getPageContextTool: To get specific information about the current page the user is on, including possible actions and page description
+- getProjectContextTool: To get a live snapshot of a project (open missions, the user's in-progress missions, members, values). Use it when the user asks "what's happening here?" or about a project's state, especially on a /moach/[projectId] page
 - delegateToAgentTool: To delegate requests to specialized agents (timer or navigation) when the user needs specific functionality
 - createProjectTool: To create new projects by generating a project creation URL
 - reportIssueTool: To report bugs, suggest features, submit partnership inquiries, or contact the site team
@@ -111,6 +114,7 @@ Always be helpful and friendly, and provide comprehensive answers based on the a
 			getSitePagesTool,
 			delegateToAgentTool,
 			getPageContextTool,
+			getProjectContextTool,
 			createProjectTool,
 			reportIssueTool,
 		}
