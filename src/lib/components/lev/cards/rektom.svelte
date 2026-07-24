@@ -253,23 +253,19 @@
       {#if selfNomination}
         <span
           class="text-xs bg-emerald-600/90 text-white px-2 py-1 rounded-full whitespace-nowrap"
-          title={$lang === 'he'
-            ? 'המועמד/ת חיבר/ה את הצעת המשאב והתנאים בעצמו/ה'
-            : 'The candidate authored this resource offer and its terms'}
+          title={$t('lev.rektom.selfNominationTitle')}
         >
-          🌱 {$lang === 'he' ? 'הצעה עצמית' : 'Self-nomination'}
+          🌱 {$t('lev.rektom.selfNomination')}
         </span>
       {/if}
       {#if negotiationMode}
         <span class="text-sm bg-gold text-white px-2 py-1 rounded-full">
-          {$lang === 'he' ? 'מצב משא ומתן' : 'Negotiation Mode'}
+          {$t('lev.rektom.negotiationMode')}
         </span>
       {/if}
       {#if negopendmissions && negopendmissions.length > 0}
         <span class="text-xs bg-blue-500 text-white px-2 py-1 rounded-full">
-          {$lang === 'he'
-            ? `${negopendmissions.length} משא ומתן`
-            : `${negopendmissions.length} negotiations`}
+          {negopendmissions.length} {$t('lev.rektom.negotiationsWord')}
         </span>
       {/if}
     {/snippet}
@@ -340,8 +336,8 @@
       <div class="text-sm flex-1">
         <p class="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
           {isRishon
-            ? ($lang === 'he' ? 'חבר/ת הריקמה המציע/ה:' : 'Team member proposing:')
-            : ($lang === 'he' ? 'מציע/ה את המשאב:' : 'Resource offered by:')}
+            ? ($t('lev.rektom.memberProposing'))
+            : ($t('lev.rektom.resourceOfferedBy'))}
         </p>
         <p class="text-gray-900 dark:text-white font-bold text-base mb-1">
           {useraplyname}
@@ -363,10 +359,10 @@
         <div class="flex flex-col sm:flex-row sm:items-center gap-2 text-sm sm:text-base flex-1">
           <div class="flex items-center gap-1">
             <span class="text-xs text-gray-500 dark:text-gray-400">
-              {$lang === 'he' ? 'עלות:' : 'Cost:'}
+              {$t('lev.rektom.cost')}
             </span>
             <span
-              onmouseenter={() => hover($lang === 'he' ? 'עלות רשומה' : 'Listed cost')}
+              onmouseenter={() => hover($t('lev.rektom.listedCost'))}
               onmouseleave={() => hover('0')}
               class="text-gray-900 dark:text-white font-bold"
             >
@@ -376,10 +372,10 @@
           <span class="text-gray-400 hidden sm:inline">|</span>
           <div class="flex items-center gap-1">
             <span class="text-xs text-gray-500 dark:text-gray-400">
-              {$lang === 'he' ? 'שווי מוצע:' : 'Offered value:'}
+              {$t('lev.rektom.offeredValue')}
             </span>
             <span
-              onmouseenter={() => hover($lang === 'he' ? 'ההצעה שהתקבלה' : 'Submitted offer')}
+              onmouseenter={() => hover($t('lev.rektom.submittedOffer'))}
               onmouseleave={() => hover('0')}
               class="text-barbi font-bold"
             >
@@ -389,10 +385,10 @@
           <span class="text-gray-400 hidden sm:inline">|</span>
           <div class="flex items-center gap-1">
             <span class="text-xs text-gray-500 dark:text-gray-400">
-              {$lang === 'he' ? 'שווי הריקמה:' : 'Our value:'}
+              {$t('lev.rektom.ourValue')}
             </span>
             <span
-              onmouseenter={() => hover($lang === 'he' ? 'ההצעה של הריקמה' : 'Our offer')}
+              onmouseenter={() => hover($t('lev.rektom.ourOffer'))}
               onmouseleave={() => hover('0')}
               class="text-gray-700 dark:text-gray-300 font-medium"
             >
@@ -423,7 +419,7 @@
         class="text-sm text-gray-700 dark:text-gray-300 bg-gray-50/50 dark:bg-gray-900/20 p-3 rounded-lg border border-gray-100 dark:border-gray-700"
       >
         <p class="text-xs font-bold text-barbi mb-1">
-          {$lang === 'he' ? 'תיאור המשאב:' : 'Resource description:'}
+          {$t('lev.rektom.resourceDescription')}
         </p>
         <RichText outpot={missionDetails} editable={false} />
       </div>
@@ -435,7 +431,7 @@
         class="text-sm text-gray-700 dark:text-gray-300 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-lg border border-amber-200 dark:border-amber-700"
       >
         <p class="text-xs font-bold text-amber-700 dark:text-amber-400 mb-1">
-          {$lang === 'he' ? 'הערות מיוחדות:' : 'Special notes:'}
+          {$t('lev.rektom.specialNotes')}
         </p>
         <p class="text-gray-700 dark:text-gray-300">{specialNotes}</p>
       </div>
@@ -474,15 +470,15 @@
         <button
           aria-label={isRishon
             ? negotiationMode
-              ? ($lang === 'he' ? 'יציאה ממשא ומתן' : 'Exit Negotiation')
-              : ($lang === 'he' ? 'משא ומתן' : 'Negotiate')
+              ? ($t('common.exitNego'))
+              : ($t('common.nego'))
             : $t('lev.cards.confirmDecline')}
           onmouseenter={() =>
             hover(
               isRishon
                 ? negotiationMode
-                  ? ($lang === 'he' ? 'יציאה ממשא ומתן' : 'Exit Negotiation')
-                  : ($lang === 'he' ? 'משא ומתן' : 'Negotiate')
+                  ? ($t('common.exitNego'))
+                  : ($t('common.nego'))
                 : $t('lev.cards.confirmDecline')
             )}
           onmouseleave={() => hover('0')}
@@ -498,7 +494,7 @@
                 <path fill="currentColor" d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
               </svg>
               <span class="ms-2 text-xs sm:text-sm whitespace-nowrap">
-                {$lang === 'he' ? 'יציאה' : 'Exit'}
+                {$t('lev.rektom.exit')}
               </span>
             {:else}
               <!-- Negotiate icon -->
@@ -506,7 +502,7 @@
                 <path fill="currentColor" d="M12.75,3.94C13.75,3.22 14.91,2.86 16.22,2.86C16.94,2.86 17.73,3.05 18.59,3.45C19.45,3.84 20.13,4.3 20.63,4.83C21.66,6.11 22.09,7.6 21.94,9.3C21.78,11 21.22,12.33 20.25,13.27L12.66,20.86C12.47,21.05 12.23,21.14 11.95,21.14C11.67,21.14 11.44,21.05 11.25,20.86C11.06,20.67 10.97,20.44 10.97,20.16C10.97,19.88 11.06,19.64 11.25,19.45L15.84,14.86C16.09,14.64 16.09,14.41 15.84,14.16C15.59,13.91 15.36,13.91 15.14,14.16L10.55,18.75C10.36,18.94 10.13,19.03 9.84,19.03C9.56,19.03 9.33,18.94 9.14,18.75C8.95,18.56 8.86,18.33 8.86,18.05C8.86,17.77 8.95,17.53 9.14,17.34L13.73,12.75C14,12.5 14,12.25 13.73,12C13.5,11.75 13.28,11.75 13.03,12L8.44,16.64C8.25,16.83 8,16.92 7.73,16.92C7.45,16.92 7.21,16.83 7,16.64C6.8,16.45 6.7,16.22 6.7,15.94C6.7,15.66 6.81,15.41 7.03,15.19L11.63,10.59C11.88,10.34 11.88,10.11 11.63,9.89C11.38,9.67 11.14,9.67 10.92,9.89L6.28,14.5C6.06,14.7 5.83,14.81 5.58,14.81C5.3,14.81 5.06,14.71 4.88,14.5C4.69,14.3 4.59,14.06 4.59,13.78C4.59,13.5 4.69,13.27 4.88,13.08C7.94,10 9.83,8.14 10.55,7.45L14.11,10.97C14.5,11.34 14.95,11.53 15.5,11.53C16.2,11.53 16.75,11.25 17.16,10.69C17.44,10.28 17.54,9.83 17.46,9.33C17.38,8.83 17.17,8.41 16.83,8.06L12.75,3.94M14.81,10.27L10.55,6L3.47,13.08C2.63,12.23 2.15,10.93 2.04,9.16C1.93,7.4 2.41,5.87 3.47,4.59C4.66,3.41 6.08,2.81 7.73,2.81C9.39,2.81 10.8,3.41 11.95,4.59L16.22,8.86C16.41,9.05 16.5,9.28 16.5,9.56C16.5,9.84 16.41,10.08 16.22,10.27C16.03,10.45 15.8,10.55 15.5,10.55C15.23,10.55 15,10.45 14.81,10.27V10.27Z"/>
               </svg>
               <span class="ms-2 text-xs sm:text-sm whitespace-nowrap">
-                {$lang === 'he' ? 'משא ומתן' : 'Negotiate'}
+                {$t('common.nego')}
               </span>
             {/if}
           {:else}
@@ -518,8 +514,8 @@
         <!-- כפתור צ'אט -->
         {#if onTochat}
           <button
-            aria-label={$lang === 'he' ? "צ'אט" : 'Chat'}
-            onmouseenter={() => hover($lang === 'he' ? "צ'אט" : 'Chat')}
+            aria-label={$t('lev.rektom.chat')}
+            onmouseenter={() => hover($t('lev.rektom.chat'))}
             onmouseleave={() => hover('0')}
             class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-blue-500 text-blue-500 hover:bg-blue-50 font-bold rounded-xl transition-all flex items-center justify-center gap-2"
             onclick={() => tochat()}
@@ -531,19 +527,15 @@
           <!-- Not a veto on content — removes the externally-initiated offer
                entirely, with a respectful note to the candidate. -->
           <button
-            aria-label={$lang === 'he' ? 'לא מתאים לנו כרגע' : 'Not a fit right now'}
+            aria-label={$t('lev.rektom.notAFit')}
             onmouseenter={() =>
-              hover(
-                $lang === 'he'
-                  ? 'סגירת ההצעה העצמית כולה — המועמד/ת יקבל/תקבל הודעה מכבדת'
-                  : 'Close the whole self-nomination — the candidate gets a respectful note'
-              )}
+              hover($t('lev.rektom.closeSelfNomination'))}
             onmouseleave={() => hover('0')}
             class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-gray-400 hover:text-gray-600 font-bold rounded-xl transition-all flex items-center justify-center gap-2"
             onclick={() => onDismiss?.()}
           >
             <span class="text-xs sm:text-sm whitespace-nowrap"
-              >{$lang === 'he' ? 'לא מתאים כרגע' : 'Not now'}</span
+              >{$t('lev.rektom.notNow')}</span
             >
           </button>
         {/if}

@@ -2,6 +2,7 @@
   import { isRtl } from '$lib/translations';
   import { toggleScrollable, isScrolable } from './isScrolable.svelte.js';
   import { t } from '$lib/translations';
+  import { get } from 'svelte/store';
   import { onMount } from 'svelte';
   import Lev from '../../../celim/lev.svelte';
   import { lang } from '$lib/stores/lang.js';
@@ -190,43 +191,39 @@
       return {
         title:
           r.order === 1
-            ? $lang === 'he'
-              ? 'הדיווח'
-              : 'The claim'
-            : $lang === 'he'
-              ? `סבב ${r.order}`
-              : `Round ${r.order}`,
+            ? get(t)('lev.hachlata.theClaim')
+            : `${get(t)('lev.hachlata.roundWord')} ${r.order}`,
         by: proposerNameForOrder(r.order),
         current: isCurrent,
         fields: [
           {
-            label: $lang === 'he' ? 'כמות' : 'Qty',
+            label: get(t)('lev.hachlata.qty'),
             value: r.hm ?? '—',
             changed: prev != null && Number(prev.hm) !== Number(r.hm)
           },
           {
-            label: $lang === 'he' ? 'מחיר ליח׳' : 'Unit',
+            label: get(t)('lev.hachlata.unitShort'),
             value: money(r.price),
             changed: prev != null && Number(prev.price) !== Number(r.price)
           },
           {
-            label: $lang === 'he' ? 'סה״כ' : 'Total',
+            label: get(t)('lev.hachlata.total'),
             value: money(total),
             emphasize: true,
             changed: prev != null && Number(prevTotal) !== Number(total)
           },
           {
-            label: $lang === 'he' ? 'התחלה' : 'Start',
+            label: get(t)('lev.hachlata.start'),
             value: fmtDate(r.start) || '—',
             changed: prev != null && (prev.start ?? '') !== (r.start ?? '')
           },
           {
-            label: $lang === 'he' ? 'סיום' : 'Finish',
+            label: get(t)('lev.hachlata.finish'),
             value: fmtDate(r.finish) || '—',
             changed: prev != null && (prev.finish ?? '') !== (r.finish ?? '')
           },
           {
-            label: $lang === 'he' ? 'הערה' : 'Note',
+            label: get(t)('lev.hachlata.note'),
             value: r.notes || '—',
             changed: prev != null && (prev.notes ?? '') !== (r.notes ?? '')
           }
@@ -391,7 +388,7 @@
       >
         <div class="flex items-center justify-between gap-2">
           <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-            {$lang === 'he' ? 'הכסף אצל' : 'Money held by'}
+            {$t('lev.hachlata.moneyHeldBy')}
           </span>
           <span class="text-sm font-bold text-gray-800 dark:text-gray-100">
             {saleClaim?.holderName || '—'}
@@ -400,7 +397,7 @@
         {#if saleClaim?.productName}
           <div class="flex items-center justify-between gap-2">
             <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-              {$lang === 'he' ? 'מוצר' : 'Product'}
+              {$t('lev.hachlata.product')}
             </span>
             <span class="text-sm text-gray-800 dark:text-gray-100">{saleClaim.productName}</span>
           </div>
@@ -412,7 +409,7 @@
           <div class="pt-2 border-t border-gray-200 dark:border-gray-700">
             <VersionHistory
               versions={saleClaimVersions}
-              label={$lang === 'he' ? 'היסטוריית הדיוקים' : 'Precision history'}
+              label={$t('lev.hachlata.precisionHistory')}
             />
           </div>
         {:else}
@@ -420,24 +417,20 @@
           <span class="text-xs font-semibold text-barbi dark:text-mpink uppercase tracking-wide flex items-center gap-1">
             <span>🧾</span>
             {(saleClaim?.standingOrder ?? 1) > 1
-              ? $lang === 'he'
-                ? `הגרסה שעל השולחן (סבב ${saleClaim?.standingOrder})`
-                : `On the table (round ${saleClaim?.standingOrder})`
-              : $lang === 'he'
-                ? 'הדיווח'
-                : 'The claim'}
+              ? `${$t('lev.hachlata.onTheTablePrefix')} (${$t('lev.hachlata.roundWord')} ${saleClaim?.standingOrder})`
+              : $t('lev.hachlata.theClaim')}
           </span>
           <div class="grid grid-cols-3 gap-2 text-center">
             <div class="bg-white dark:bg-gray-800 rounded-lg py-2 border border-gray-200 dark:border-gray-600">
-              <div class="text-[10px] text-gray-500 dark:text-gray-400">{$lang === 'he' ? 'כמות' : 'Qty'}</div>
+              <div class="text-[10px] text-gray-500 dark:text-gray-400">{$t('lev.hachlata.qty')}</div>
               <div class="font-bold text-gray-800 dark:text-gray-100">{saleClaimQty}</div>
             </div>
             <div class="bg-white dark:bg-gray-800 rounded-lg py-2 border border-gray-200 dark:border-gray-600">
-              <div class="text-[10px] text-gray-500 dark:text-gray-400">{$lang === 'he' ? 'מחיר ליח׳' : 'Unit price'}</div>
+              <div class="text-[10px] text-gray-500 dark:text-gray-400">{$t('lev.hachlata.unitPrice')}</div>
               <div class="font-bold text-gray-800 dark:text-gray-100">{saleClaimPrice}₪</div>
             </div>
             <div class="bg-barbi/5 dark:bg-mpink/10 rounded-lg py-2 border border-barbi/30 dark:border-mpink/30">
-              <div class="text-[10px] text-gray-500 dark:text-gray-400">{$lang === 'he' ? 'סה״כ' : 'Total'}</div>
+              <div class="text-[10px] text-gray-500 dark:text-gray-400">{$t('lev.hachlata.total')}</div>
               <div class="font-extrabold text-barbi dark:text-mpink">{saleClaimTotal}₪</div>
             </div>
           </div>
@@ -445,11 +438,11 @@
           {#if saleClaimStart || saleClaimFinish}
             <div class="grid grid-cols-2 gap-2 text-center pt-1">
               <div class="bg-white dark:bg-gray-800 rounded-lg py-2 border border-gray-200 dark:border-gray-600">
-                <div class="text-[10px] text-gray-500 dark:text-gray-400">{$lang === 'he' ? 'התחלה' : 'Start'}</div>
+                <div class="text-[10px] text-gray-500 dark:text-gray-400">{$t('lev.hachlata.start')}</div>
                 <div class="text-sm text-gray-800 dark:text-gray-100">{fmtDate(saleClaimStart) || '—'}</div>
               </div>
               <div class="bg-white dark:bg-gray-800 rounded-lg py-2 border border-gray-200 dark:border-gray-600">
-                <div class="text-[10px] text-gray-500 dark:text-gray-400">{$lang === 'he' ? 'סיום' : 'Finish'}</div>
+                <div class="text-[10px] text-gray-500 dark:text-gray-400">{$t('lev.hachlata.finish')}</div>
                 <div class="text-sm text-gray-800 dark:text-gray-100">{fmtDate(saleClaimFinish) || '—'}</div>
               </div>
             </div>
@@ -457,7 +450,7 @@
 
           {#if saleClaimNote}
             <div class="pt-1">
-              <div class="text-[10px] text-gray-500 dark:text-gray-400 mb-1">{$lang === 'he' ? 'הערה' : 'Note'}</div>
+              <div class="text-[10px] text-gray-500 dark:text-gray-400 mb-1">{$t('lev.hachlata.note')}</div>
               <div class="text-sm text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800 rounded-lg p-2 border border-gray-200 dark:border-gray-600 whitespace-pre-wrap">{saleClaimNote}</div>
             </div>
           {/if}
@@ -474,7 +467,7 @@
           <div class="flex flex-col gap-1">
             <span class="text-xs font-semibold text-red-500 dark:text-red-400 uppercase tracking-wide flex items-center gap-1">
               <span>🗑️</span>
-              {$lang === 'he' ? 'יוסרו מהפרויקט' : 'Will be removed'}
+              {$t('lev.hachlata.willBeRemoved')}
             </span>
             <p class="text-gray-700 dark:text-gray-200 text-sm bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg border border-red-200 dark:border-red-800">
               {currentValue}
@@ -485,7 +478,7 @@
           <div class="flex flex-col gap-1">
             <span class="text-xs font-semibold text-green-600 dark:text-green-400 uppercase tracking-wide flex items-center gap-1">
               <span>➕</span>
-              {$lang === 'he' ? 'יתווספו לפרויקט' : 'Will be added'}
+              {$t('lev.hachlata.willBeAdded')}
             </span>
             <p class="text-gray-700 dark:text-gray-200 text-sm bg-green-50 dark:bg-green-900/20 px-3 py-2 rounded-lg border border-green-200 dark:border-green-800">
               {newValue}
@@ -497,7 +490,7 @@
             <div class="flex flex-col gap-1">
               <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide flex items-center gap-1">
                 <span>📌</span>
-                {$lang === 'he' ? 'כרגע' : 'Current'}
+                {$t('lev.hachlata.current')}
               </span>
               <p class="text-gray-600 dark:text-gray-400 text-sm bg-white dark:bg-gray-800 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 line-through opacity-70 break-all">
                 {currentValue}
@@ -509,7 +502,7 @@
             <div class="flex flex-col gap-1">
               <span class="text-xs font-semibold text-barbi dark:text-mpink uppercase tracking-wide flex items-center gap-1">
                 <span>✨</span>
-                {$lang === 'he' ? 'מוצע' : 'Proposed'}
+                {$t('lev.hachlata.proposed')}
               </span>
               <p class="text-gray-800 dark:text-gray-100 text-sm bg-barbi/5 dark:bg-mpink/10 px-3 py-2 rounded-lg border border-barbi/30 dark:border-mpink/30 font-medium break-all">
                 {newValue}
@@ -525,7 +518,7 @@
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
         </svg>
-        <span class="text-sm">{$lang === 'he' ? 'טוען פרטים...' : 'Loading details...'}</span>
+        <span class="text-sm">{$t('lev.hachlata.loadingDetails')}</span>
       </div>
     {:else if kind == 'pic'}
       <div
@@ -1002,7 +995,7 @@
           <!-- Clarify / deep-discuss with the other party (opens the decision forum). -->
           <button
             class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/40 font-bold rounded-xl transition-all flex justify-center items-center"
-            onmouseenter={() => hover($lang === 'he' ? 'צ׳אט / בירור' : 'chat / clarify')}
+            onmouseenter={() => hover($t('lev.hachlata.chatClarify'))}
             onmouseleave={() => hover('0')}
             onclick={chat}
           >
@@ -1016,7 +1009,7 @@
           <!-- No absolute "no": a saleClaim is refined via negotiation, never rejected. -->
           <button
             class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 font-bold rounded-xl transition-all flex justify-center items-center gap-2"
-            onmouseenter={() => hover($lang === 'he' ? 'משא-ומתן / דיוק' : 'negotiate / refine')}
+            onmouseenter={() => hover($t('lev.hachlata.negotiateRefine'))}
             onmouseleave={() => hover('0')}
             onclick={negotiate}
           >
