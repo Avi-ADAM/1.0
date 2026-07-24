@@ -67,5 +67,28 @@
     "editTask": "Editar tarea",
     "addNewTask": "Añadir nueva tarea",
     "startDateTime": "Fecha y hora de inicio"
+  },
+  "cand": {
+    "proposalRef": "Propuesta del candidato (referencia):",
+    "qty": "Cant.:",
+    "price": "Precio:",
+    "levValue": "Valor Lev:",
+    "total": "Total:",
+    "start": "Inicio:",
+    "end": "Fin:",
+    "candidate": "Candidato:",
+    "candidateProposed": "El candidato propuso:",
+    "hours": "Horas:",
+    "perHour": "Por hora:",
+    "deeperDiscussion": "🤝 Abrir una discusión más profunda",
+    "recurringExpense": "Gasto recurrente",
+    "estCostPerCycle": "Coste estimado por ciclo",
+    "openEndedNoEnd": "∞ Sin fecha de fin",
+    "removeEndDate": "Quitar fecha de fin",
+    "recurringResourceNote": "Recurso recurrente: el importe de abajo es el coste por ciclo (mensual). Cada ciclo se aprueba por separado. Puedes dejar la fecha de fin vacía para un gasto sin límite.",
+    "approvedEachCycle": "Se aprueba cada ciclo; borra la fecha de fin para un gasto sin límite.",
+    "everyN": "Cada N",
+    "years": "años",
+    "months": "meses"
   }
 }

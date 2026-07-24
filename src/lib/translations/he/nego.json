@@ -66,5 +66,28 @@
     "editTask": "עריכת מטלה",
     "addNewTask": "הוספת מטלה חדשה",
     "startDateTime": "תאריך ושעת התחלה"
+  },
+  "cand": {
+    "proposalRef": "הצעת המועמד (לעיון):",
+    "qty": "כמות:",
+    "price": "מחיר:",
+    "levValue": "שווי לב:",
+    "total": "סה\"כ:",
+    "start": "התחלה:",
+    "end": "סיום:",
+    "candidate": "מועמד:",
+    "candidateProposed": "מועמד הציע:",
+    "hours": "שעות:",
+    "perHour": "לשעה:",
+    "deeperDiscussion": "🤝 דיון מעמיק",
+    "recurringExpense": "הוצאה חוזרת",
+    "estCostPerCycle": "עלות משוערת למחזור",
+    "openEndedNoEnd": "∞ ללא תאריך סיום",
+    "removeEndDate": "הסרת תאריך סיום",
+    "recurringResourceNote": "משאב חוזר — הסכום למטה הוא העלות לכל מחזור (חודשי). כל מחזור עובר אישור בנפרד. ניתן להשאיר תאריך סיום ריק להוצאה ללא הגבלת זמן.",
+    "approvedEachCycle": "מאושר בכל מחזור; ניתן להסיר תאריך סיום למצב ללא הגבלה.",
+    "everyN": "כל כמה",
+    "years": "שנים",
+    "months": "חודשים"
   }
 }

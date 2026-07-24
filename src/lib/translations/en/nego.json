@@ -66,5 +66,28 @@
     "editTask": "Edit Task",
     "addNewTask": "Add New Task",
     "startDateTime": "Start Date & Time"
+  },
+  "cand": {
+    "proposalRef": "Candidate proposal (for reference):",
+    "qty": "Qty:",
+    "price": "Price:",
+    "levValue": "Lev value:",
+    "total": "Total:",
+    "start": "Start:",
+    "end": "End:",
+    "candidate": "Candidate:",
+    "candidateProposed": "Candidate:",
+    "hours": "Hours:",
+    "perHour": "Per hour:",
+    "deeperDiscussion": "🤝 Open a deeper discussion",
+    "recurringExpense": "Recurring expense",
+    "estCostPerCycle": "Estimated cost per cycle",
+    "openEndedNoEnd": "∞ Open-ended (no end date)",
+    "removeEndDate": "Remove end date",
+    "recurringResourceNote": "Recurring resource — the value below is the per-cycle (monthly) cost. Every cycle is approved separately. You may leave the end date empty for an open-ended expense.",
+    "approvedEachCycle": "Approved each cycle; clear the end date for an open-ended expense.",
+    "everyN": "Every N",
+    "years": "years",
+    "months": "months"
   }
 }

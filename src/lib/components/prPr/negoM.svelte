@@ -571,23 +571,23 @@
       {@const candTot = (candidateRound.noofhours ?? noofhours) * (candidateRound.perhour ?? perhour)}
       <div class="mx-2 my-2 rounded-lg border border-barbi/50 bg-barbi/5 p-3 text-sm space-y-1">
         <p class="font-bold text-barbi text-base">
-          💡 {$lang === 'he' ? 'הצעת המועמד (לעיון):' : 'Candidate proposal (for reference):'}
+          💡 {$t('nego.cand.proposalRef')}
         </p>
         <div class="flex flex-wrap gap-x-4 gap-y-1 text-barbi/80">
           {#if candidateRound.noofhours != null}
-            <span>{$lang === 'he' ? 'שעות:' : 'Hours:'} <strong>{candidateRound.noofhours}</strong></span>
+            <span>{$t('nego.cand.hours')} <strong>{candidateRound.noofhours}</strong></span>
           {/if}
           {#if candidateRound.perhour != null}
-            <span>{$lang === 'he' ? 'לשעה:' : 'Per hour:'} <strong>{candidateRound.perhour}</strong></span>
+            <span>{$t('nego.cand.perHour')} <strong>{candidateRound.perhour}</strong></span>
           {/if}
           {#if candTot > 0}
-            <span class="font-bold">{$lang === 'he' ? 'סה"כ:' : 'Total:'} <strong>{candTot.toLocaleString()}</strong></span>
+            <span class="font-bold">{$t('nego.cand.total')} <strong>{candTot.toLocaleString()}</strong></span>
           {/if}
           {#if candidateRound.mdate}
-            <span>{$lang === 'he' ? 'התחלה:' : 'Start:'} <strong>{new Date(candidateRound.mdate).toLocaleDateString($lang)}</strong></span>
+            <span>{$t('nego.cand.start')} <strong>{new Date(candidateRound.mdate).toLocaleDateString($lang)}</strong></span>
           {/if}
           {#if candidateRound.mdates}
-            <span>{$lang === 'he' ? 'סיום:' : 'End:'} <strong>{new Date(candidateRound.mdates).toLocaleDateString($lang)}</strong></span>
+            <span>{$t('nego.cand.end')} <strong>{new Date(candidateRound.mdates).toLocaleDateString($lang)}</strong></span>
           {/if}
         </div>
       </div>
@@ -606,7 +606,7 @@
             : null}
     />
     {#if onSubmit && candidateRound?.noofhours != null && candidateRound.noofhours !== noofhours}
-      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} <strong>{candidateRound.noofhours}</strong></p>
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$t('nego.cand.candidateProposed')} <strong>{candidateRound.noofhours}</strong></p>
     {/if}
     <Number
       old={negopendmissions.map((c) => c?.attributes?.perhour)}
@@ -615,11 +615,11 @@
       lebel={$t('mission.hourlyVallue')}
     />
     {#if onSubmit && candidateRound?.perhour != null && candidateRound.perhour !== perhour}
-      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} <strong>{candidateRound.perhour}</strong></p>
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$t('nego.cand.candidateProposed')} <strong>{candidateRound.perhour}</strong></p>
     {/if}
     <DateNego date={mdate} bind:dateb={mdate2} lebel={$t('common.startDate')} />
     {#if onSubmit && candidateRound?.mdate}
-      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} {new Date(candidateRound.mdate).toLocaleDateString($lang)}</p>
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$t('nego.cand.candidateProposed')} {new Date(candidateRound.mdate).toLocaleDateString($lang)}</p>
     {/if}
     <DateNego
       date={mdates}
@@ -627,7 +627,7 @@
       lebel={$t('common.finishDate')}
     />
     {#if onSubmit && candidateRound?.mdates}
-      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} {new Date(candidateRound.mdates).toLocaleDateString($lang)}</p>
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$t('nego.cand.candidateProposed')} {new Date(candidateRound.mdates).toLocaleDateString($lang)}</p>
     {/if}
 
     <LocationNego
@@ -781,7 +781,7 @@
       type="button"
       class="mx-auto text-sm border border-gold/50 text-gold hover:bg-gold/20 rounded-full px-4 py-1"
     >
-      {$lang === 'en' ? '🤝 Open a deeper discussion' : '🤝 דיון מעמיק'}
+      {$t('nego.cand.deeperDiscussion')}
     </button>
   </div>
 </div>
