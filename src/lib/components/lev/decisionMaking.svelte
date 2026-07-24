@@ -1,4 +1,6 @@
 <script>
+  import { t } from '$lib/translations';
+  import { get } from 'svelte/store';
   import { Drawer } from 'vaul-svelte';
   import { Portal } from 'bits-ui';
   import { executeAction } from '$lib/client/actionClient';
@@ -368,16 +370,16 @@
         already = true;
         negoModal = false;
         toast.success(
-          $lang === 'en' ? 'Refinement sent — the ball is in their court.' : 'הדיוק נשלח — הכדור אצל הצד השני.'
+          get(t)('lev.decisionMaking.refinementSent')
         );
         onAcsept?.({ ani: 'askedma', coinlapach });
       } else {
         error1 = result.error;
-        toast.error($lang === 'en' ? 'Could not send refinement' : 'שליחת הדיוק נכשלה');
+        toast.error(get(t)('lev.decisionMaking.couldNotSend'));
       }
     } catch (e) {
       error1 = e;
-      toast.error($lang === 'en' ? 'Could not send refinement' : 'שליחת הדיוק נכשלה');
+      toast.error(get(t)('lev.decisionMaking.couldNotSend'));
     } finally {
       negoBusy = false;
     }
@@ -1462,64 +1464,56 @@
   >
     <div class="nego-card" dir={$lang === 'en' ? 'ltr' : 'rtl'}>
       <h3 class="nego-title">
-        {$lang === 'en' ? 'Refine the sale claim' : 'דיוק דיווח המכירה'}
+        {$t('lev.decisionMaking.refineSaleClaim')}
       </h3>
       <p class="nego-sub">
-        {$lang === 'en'
-          ? 'Propose the version you can sign. Silence for the response window means the standing version is auto-approved.'
-          : 'הציעו את הגרסה שאתם חתומים עליה. שתיקה עד תום זמן התגובה = הגרסה שעל השולחן מאושרת אוטומטית.'}
+        {$t('lev.decisionMaking.proposeVersion')}
       </p>
 
       <label class="nego-label">
-        {$lang === 'en' ? 'Quantity' : 'כמות'}
+        {$t('lev.decisionMaking.quantity')}
         <span class="nego-ref"
-          >{$lang === 'en' ? 'on table:' : 'על השולחן:'} {saleClaim?.standing?.hm ?? '—'}</span
+          >{$t('lev.decisionMaking.onTable')} {saleClaim?.standing?.hm ?? '—'}</span
         >
         <input class="nego-input" type="number" min="0" step="any" bind:value={nqty} />
       </label>
 
       <label class="nego-label">
-        {$lang === 'en' ? 'Price per unit' : 'מחיר ליחידה'}
+        {$t('lev.decisionMaking.pricePerUnit')}
         <span class="nego-ref"
-          >{$lang === 'en' ? 'on table:' : 'על השולחן:'} {saleClaim?.standing?.price ?? '—'}</span
+          >{$t('lev.decisionMaking.onTable')} {saleClaim?.standing?.price ?? '—'}</span
         >
         <input class="nego-input" type="number" min="0" step="any" bind:value={nprice} />
       </label>
 
       <div class="nego-dates">
         <label class="nego-label">
-          {$lang === 'en' ? 'Start' : 'התחלה'}
+          {$t('lev.decisionMaking.start')}
           <input class="nego-input" type="date" bind:value={nstart} />
         </label>
         <label class="nego-label">
-          {$lang === 'en' ? 'Finish' : 'סיום'}
+          {$t('lev.decisionMaking.finish')}
           <input class="nego-input" type="date" bind:value={nfinish} />
         </label>
       </div>
 
       <label class="nego-label">
-        {$lang === 'en' ? 'Note' : 'הערה'}
+        {$t('lev.decisionMaking.note')}
         <textarea class="nego-input" rows="2" bind:value={nnote}
-          placeholder={$lang === 'en' ? 'Optional clarification…' : 'הבהרה (רשות)…'}
+          placeholder={$t('lev.decisionMaking.optionalClarification')}
         ></textarea>
       </label>
 
       <p class="nego-total">
-        {$lang === 'en' ? 'Total' : 'סה"כ'}: {(Number(nqty) || 0) * (Number(nprice) || 0)}₪
+        {$t('lev.decisionMaking.total')}: {(Number(nqty) || 0) * (Number(nprice) || 0)}₪
       </p>
 
       <div class="nego-actions">
         <button class="nego-btn nego-cancel" onclick={() => (negoModal = false)}>
-          {$lang === 'en' ? 'Cancel' : 'ביטול'}
+          {$t('lev.decisionMaking.cancel')}
         </button>
         <button class="nego-btn nego-send" onclick={sendNego} disabled={negoBusy}>
-          {negoBusy
-            ? $lang === 'en'
-              ? 'Sending…'
-              : 'שולח…'
-            : $lang === 'en'
-              ? 'Send refinement'
-              : 'שליחת דיוק'}
+          {negoBusy ? $t('lev.decisionMaking.sending') : $t('lev.decisionMaking.sendRefinement')}
         </button>
       </div>
     </div>

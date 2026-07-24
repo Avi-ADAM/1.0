@@ -143,7 +143,14 @@
   },
   "reqtojoin": {
     "chatWith": "دردشة مع",
-    "onJoining": "بشأن انضمامه إلى الشبكة"
+    "onJoining": "بشأن انضمامه إلى الشبكة",
+    "selfNominationTitle": "قام المرشح بصياغة هذه المهمة وشروطها بنفسه",
+    "requester": "الطالب:",
+    "tasksList": "قائمة المهام",
+    "unnamedActivity": "نشاط بلا اسم",
+    "fromDate": "من:",
+    "untilDate": "حتى:",
+    "taskLink": "رابط المهمة"
   },
   "reqtosherut": {
     "chatWith": "دردشة مع",
@@ -390,5 +397,29 @@
     "negotiateRefine": "تفاوض / تدقيق",
     "roundWord": "الجولة",
     "onTheTablePrefix": "النسخة المطروحة"
+  },
+  "endOfLine": "وصلت إلى النهاية",
+  "missionInProgress2": {
+    "tasks": "المهام",
+    "clickToUpdate": "انقر لتحديث التقدم",
+    "approveFinish": "الموافقة على الإنهاء",
+    "pendingApproval": "في انتظار الموافقة"
+  },
+  "decisionMaking": {
+    "refinementSent": "تم إرسال التدقيق — الكرة الآن في ملعبهم.",
+    "couldNotSend": "تعذّر إرسال التدقيق",
+    "refineSaleClaim": "تدقيق بلاغ البيع",
+    "proposeVersion": "اقترح النسخة التي يمكنك توقيعها. الصمت حتى انتهاء مهلة الرد يعني أن النسخة المطروحة تُعتمد تلقائيًا.",
+    "quantity": "الكمية",
+    "onTable": "على الطاولة:",
+    "pricePerUnit": "سعر الوحدة",
+    "start": "البداية",
+    "finish": "النهاية",
+    "note": "ملاحظة",
+    "optionalClarification": "توضيح اختياري…",
+    "total": "الإجمالي",
+    "cancel": "إلغاء",
+    "sending": "جارٍ الإرسال…",
+    "sendRefinement": "إرسال التدقيق"
   }
 }

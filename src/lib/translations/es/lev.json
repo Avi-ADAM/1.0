@@ -144,7 +144,14 @@
   },
   "reqtojoin": {
     "chatWith": "chatear con",
-    "onJoining": "sobre unirse"
+    "onJoining": "sobre unirse",
+    "selfNominationTitle": "El candidato redactó esta misión y sus términos",
+    "requester": "Solicitante:",
+    "tasksList": "Lista de tareas",
+    "unnamedActivity": "Actividad sin nombre",
+    "fromDate": "Desde:",
+    "untilDate": "Hasta:",
+    "taskLink": "Enlace de la tarea"
   },
   "reqtosherut": {
     "chatWith": "chatear con",
@@ -391,5 +398,29 @@
     "negotiateRefine": "negociar / precisar",
     "roundWord": "Ronda",
     "onTheTablePrefix": "La versión sobre la mesa"
+  },
+  "endOfLine": "Estás al día",
+  "missionInProgress2": {
+    "tasks": "Tareas",
+    "clickToUpdate": "Haz clic para actualizar el progreso",
+    "approveFinish": "Aprobar finalización",
+    "pendingApproval": "Pendiente de aprobación"
+  },
+  "decisionMaking": {
+    "refinementSent": "Precisión enviada: la pelota está en su tejado.",
+    "couldNotSend": "No se pudo enviar la precisión",
+    "refineSaleClaim": "Precisar la declaración de venta",
+    "proposeVersion": "Propón la versión que puedes firmar. El silencio durante la ventana de respuesta significa que la versión sobre la mesa se aprueba automáticamente.",
+    "quantity": "Cantidad",
+    "onTable": "sobre la mesa:",
+    "pricePerUnit": "Precio por unidad",
+    "start": "Inicio",
+    "finish": "Fin",
+    "note": "Nota",
+    "optionalClarification": "Aclaración opcional…",
+    "total": "Total",
+    "cancel": "Cancelar",
+    "sending": "Enviando…",
+    "sendRefinement": "Enviar precisión"
   }
 }

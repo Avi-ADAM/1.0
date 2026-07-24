@@ -143,7 +143,14 @@
   },
   "reqtojoin": {
     "chatWith": "צ'אט עם",
-    "onJoining": "על צירופו לריקמה"
+    "onJoining": "על צירופו לריקמה",
+    "selfNominationTitle": "המועמד/ת חיבר/ה את המשימה והתנאים בעצמו/ה",
+    "requester": "מבקש/ת:",
+    "tasksList": "רשימת מטלות",
+    "unnamedActivity": "פעילות ללא שם",
+    "fromDate": "מתאריך:",
+    "untilDate": "עד תאריך:",
+    "taskLink": "קישור למטלה"
   },
   "reqtosherut": {
     "chatWith": "צ'אט עם",
@@ -390,5 +397,29 @@
     "negotiateRefine": "משא-ומתן / דיוק",
     "roundWord": "סבב",
     "onTheTablePrefix": "הגרסה שעל השולחן"
+  },
+  "endOfLine": "התעדכנת בהכל",
+  "missionInProgress2": {
+    "tasks": "מטלות",
+    "clickToUpdate": "לחץ לעדכון התקדמות",
+    "approveFinish": "אשר סיום",
+    "pendingApproval": "ממתין לאישור"
+  },
+  "decisionMaking": {
+    "refinementSent": "הדיוק נשלח — הכדור אצל הצד השני.",
+    "couldNotSend": "שליחת הדיוק נכשלה",
+    "refineSaleClaim": "דיוק דיווח המכירה",
+    "proposeVersion": "הציעו את הגרסה שאתם חתומים עליה. שתיקה עד תום זמן התגובה = הגרסה שעל השולחן מאושרת אוטומטית.",
+    "quantity": "כמות",
+    "onTable": "על השולחן:",
+    "pricePerUnit": "מחיר ליחידה",
+    "start": "התחלה",
+    "finish": "סיום",
+    "note": "הערה",
+    "optionalClarification": "הבהרה (רשות)…",
+    "total": "סה\"כ",
+    "cancel": "ביטול",
+    "sending": "שולח…",
+    "sendRefinement": "שליחת דיוק"
   }
 }

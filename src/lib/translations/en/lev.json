@@ -143,7 +143,14 @@
   },
   "reqtojoin": {
     "chatWith": "chat with",
-    "onJoining": "on joining"
+    "onJoining": "on joining",
+    "selfNominationTitle": "The candidate authored this mission and its terms",
+    "requester": "Requester:",
+    "tasksList": "Tasks List",
+    "unnamedActivity": "Unnamed Activity",
+    "fromDate": "From:",
+    "untilDate": "Until:",
+    "taskLink": "Task Link"
   },
   "reqtosherut": {
     "chatWith": "chat with",
@@ -390,5 +397,29 @@
     "negotiateRefine": "negotiate / refine",
     "roundWord": "Round",
     "onTheTablePrefix": "On the table"
+  },
+  "endOfLine": "End of the line",
+  "missionInProgress2": {
+    "tasks": "Tasks",
+    "clickToUpdate": "Click to update progress",
+    "approveFinish": "Approve",
+    "pendingApproval": "Pending approval"
+  },
+  "decisionMaking": {
+    "refinementSent": "Refinement sent — the ball is in their court.",
+    "couldNotSend": "Could not send refinement",
+    "refineSaleClaim": "Refine the sale claim",
+    "proposeVersion": "Propose the version you can sign. Silence for the response window means the standing version is auto-approved.",
+    "quantity": "Quantity",
+    "onTable": "on table:",
+    "pricePerUnit": "Price per unit",
+    "start": "Start",
+    "finish": "Finish",
+    "note": "Note",
+    "optionalClarification": "Optional clarification…",
+    "total": "Total",
+    "cancel": "Cancel",
+    "sending": "Sending…",
+    "sendRefinement": "Send refinement"
   }
 }

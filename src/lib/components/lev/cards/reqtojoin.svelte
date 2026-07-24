@@ -205,23 +205,19 @@
       {#if selfNomination}
         <span
           class="text-xs bg-emerald-600/90 text-white px-2 py-1 rounded-full whitespace-nowrap"
-          title={$lang === 'he'
-            ? 'המועמד/ת חיבר/ה את המשימה והתנאים בעצמו/ה'
-            : 'The candidate authored this mission and its terms'}
+          title={$trans('lev.reqtojoin.selfNominationTitle')}
         >
-          🌱 {$lang === 'he' ? 'הצעה עצמית' : 'Self-nomination'}
+          🌱 {$trans('lev.rektom.selfNomination')}
         </span>
       {/if}
       {#if negotiationMode}
         <span class="text-sm bg-gold text-white px-2 py-1 rounded-full">
-          {$lang === 'he' ? 'מצב משא ומתן' : 'Negotiation Mode'}
+          {$trans('lev.rektom.negotiationMode')}
         </span>
       {/if}
       {#if negopendmissions && negopendmissions.length > 0}
         <span class="text-xs bg-blue-500 text-white px-2 py-1 rounded-full">
-          {$lang === 'he'
-            ? `${negopendmissions.length} משא ומתן`
-            : `${negopendmissions.length} negotiations`}
+          {negopendmissions.length} {$trans('lev.rektom.negotiationsWord')}
         </span>
       {/if}
     {/snippet}
@@ -245,7 +241,7 @@
         />
         <div>
           <div class="text-[20px] text-gray-500 uppercase">
-            {$lang === 'he' ? 'מבקש/ת:' : 'Requester:'}
+            {$trans('lev.reqtojoin.requester')}
           </div>
           <div class="font-bold text-gray-800 dark:text-gray-200">
             {useraplyname}
@@ -421,8 +417,7 @@
             <div
               class="mb-2 font-bold text-green-600 dark:text-green-400 text-sm"
             >
-              {$trans('common.matchedSkillsHeadline') ||
-                ($lang === 'he' ? 'כישורים תואמים' : 'Matched skills')}
+              {$trans('common.matchedSkillsHeadline')}
             </div>
             <div class="flex flex-wrap gap-2">
               {#each matched as skill}
@@ -433,8 +428,7 @@
               <div
                 class="mt-3 mb-2 font-bold text-red-600 dark:text-red-400 text-sm"
               >
-                {$trans('common.missingSkillsHeadline') ||
-                  ($lang === 'he' ? 'כישורים חסרים' : 'Missing skills')}
+                {$trans('common.missingSkillsHeadline')}
               </div>
               <div class="flex flex-wrap gap-2">
                 {#each missing as skill}
@@ -446,8 +440,7 @@
               <div
                 class="mt-3 mb-2 font-bold text-blue-600 dark:text-blue-400 text-sm"
               >
-                {$trans('common.extraSkillsHeadline') ||
-                  ($lang === 'he' ? 'כישורים נוספים' : 'Extra skills')}
+                {$trans('common.extraSkillsHeadline')}
               </div>
               <div class="flex flex-wrap gap-2">
                 {#each extra as skill}
@@ -488,8 +481,7 @@
             <div
               class="mb-2 font-bold text-green-600 dark:text-green-400 text-sm"
             >
-              {$trans('common.matchedRolesHeadline') ||
-                ($lang === 'he' ? 'תפקידים תואמים' : 'Matched roles')}
+              {$trans('common.matchedRolesHeadline')}
             </div>
             <div class="flex flex-wrap gap-2">
               {#each matchedRoles as roleDesc}
@@ -500,8 +492,7 @@
               <div
                 class="mt-3 mb-2 font-bold text-red-600 dark:text-red-400 text-sm"
               >
-                {$trans('common.missingRolesHeadline') ||
-                  ($lang === 'he' ? 'תפקידים חסרים' : 'Missing roles')}
+                {$trans('common.missingRolesHeadline')}
               </div>
               <div class="flex flex-wrap gap-2">
                 {#each missingRoles as roleDesc}
@@ -513,8 +504,7 @@
               <div
                 class="mt-3 mb-2 font-bold text-blue-600 dark:text-blue-400 text-sm"
               >
-                {$trans('common.extraRolesHeadline') ||
-                  ($lang === 'he' ? 'תפקידים נוספים' : 'Extra roles')}
+                {$trans('common.extraRolesHeadline')}
               </div>
               <div class="flex flex-wrap gap-2">
                 {#each extraRoles as roleDesc}
@@ -549,8 +539,7 @@
             <div
               class="mb-2 font-bold text-green-600 dark:text-green-400 text-sm"
             >
-              {$trans('common.matchedWaysHeadline') ||
-                ($lang === 'he' ? 'דרכי עבודה תואמות' : 'Matched workways')}
+              {$trans('common.matchedWaysHeadline')}
             </div>
             <div class="flex flex-wrap gap-2">
               {#each matchedWays as wayName}
@@ -561,8 +550,7 @@
               <div
                 class="mt-3 mb-2 font-bold text-red-600 dark:text-red-400 text-sm"
               >
-                {$trans('common.missingWaysHeadline') ||
-                  ($lang === 'he' ? 'דרכי עבודה חסרות' : 'Missing workways')}
+                {$trans('common.missingWaysHeadline')}
               </div>
               <div class="flex flex-wrap gap-2">
                 {#each missingWays as wayName}
@@ -574,8 +562,7 @@
               <div
                 class="mt-3 mb-2 font-bold text-blue-600 dark:text-blue-400 text-sm"
               >
-                {$trans('common.extraWaysHeadline') ||
-                  ($lang === 'he' ? 'דרכי עבודה נוספות' : 'Extra workways')}
+                {$trans('common.extraWaysHeadline')}
               </div>
               <div class="flex flex-wrap gap-2">
                 {#each extraWays as wayName}
@@ -605,7 +592,7 @@
     {#if acts?.data && acts.data.length > 0}
       <div>
         <div class="mb-2 font-bold text-barbi text-lg">
-          {$lang === 'he' ? 'רשימת מטלות' : 'Tasks List'}
+          {$trans('lev.reqtojoin.tasksList')}
         </div>
         <div class="grid gap-3 sm:grid-cols-2">
           {#each acts.data as act}
@@ -618,7 +605,7 @@
                   class="font-bold text-base text-gray-800 dark:text-gray-200 leading-tight"
                 >
                   {attrs.shem ||
-                    ($lang === 'he' ? 'פעילות ללא שם' : 'Unnamed Activity')}
+                    ($trans('lev.reqtojoin.unnamedActivity'))}
                 </h3>
               </div>
 
@@ -647,7 +634,7 @@
                       />
                     </svg>
                     <span>
-                      {$lang === 'he' ? 'מתאריך:' : 'From:'}
+                      {$trans('lev.reqtojoin.fromDate')}
                       {new Date(attrs.dateF).toLocaleDateString($lang)}
                     </span>
                   </div>
@@ -669,7 +656,7 @@
                       />
                     </svg>
                     <span>
-                      {$lang === 'he' ? 'עד תאריך:' : 'Until:'}
+                      {$trans('lev.reqtojoin.untilDate')}
                       {new Date(attrs.dateS).toLocaleDateString($lang)}
                     </span>
                   </div>
@@ -695,7 +682,7 @@
                           d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"
                         />
                       </svg>
-                      {$lang === 'he' ? 'קישור למטלה' : 'Task Link'}
+                      {$trans('lev.reqtojoin.taskLink')}
                     </a>
                   </div>
                 {/if}
@@ -802,19 +789,17 @@
         <!-- Not a veto on content (approve/chat/counter stay primary) — removes
              the externally-initiated proposal entirely, with a respectful note. -->
         <button
-          aria-label={$lang === 'he' ? 'לא מתאים לנו כרגע' : 'Not a fit right now'}
+          aria-label={$trans('lev.rektom.notAFit')}
           onmouseenter={() =>
             hover(
-              $lang === 'he'
-                ? 'סגירת ההצעה העצמית כולה — המועמד/ת יקבל/תקבל הודעה מכבדת'
-                : 'Close the whole self-nomination — the candidate gets a respectful note'
+              $trans('lev.rektom.closeSelfNomination')
             )}
           onmouseleave={() => hover('0')}
           class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-gray-400 hover:text-gray-600 font-bold rounded-xl transition-all flex items-center justify-center gap-2"
           onclick={() => onDismiss?.()}
         >
           <span class="text-xs sm:text-sm whitespace-nowrap"
-            >{$lang === 'he' ? 'לא מתאים כרגע' : 'Not now'}</span
+            >{$trans('lev.rektom.notNow')}</span
           >
         </button>
       {/if}

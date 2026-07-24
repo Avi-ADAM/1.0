@@ -1,5 +1,5 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { page } from '$app/state';
   import Lowding from '$lib/celim/lowding.svelte';
   import { lang } from '$lib/stores/lang.js';
@@ -1268,7 +1268,7 @@
               class="flex flex-col items-center justify-center h-full w-full"
             >
               <h2 class="text-2xl font-bold mb-4">
-                {$lang === 'he' ? 'התעדכנת בהכל' : 'End of the line'}
+                {$t('lev.endOfLine')}
               </h2>
               <Button
                 onClick={() => swiperRef?.slideTo(0)}

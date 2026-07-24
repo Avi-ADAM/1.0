@@ -143,7 +143,14 @@
   },
   "reqtojoin": {
     "chatWith": "Чат с",
-    "onJoining": "о присоединении к рикме"
+    "onJoining": "о присоединении к рикме",
+    "selfNominationTitle": "Кандидат сам составил эту миссию и её условия",
+    "requester": "Запросил:",
+    "tasksList": "Список задач",
+    "unnamedActivity": "Действие без названия",
+    "fromDate": "С:",
+    "untilDate": "До:",
+    "taskLink": "Ссылка на задачу"
   },
   "reqtosherut": {
     "chatWith": "Чат с",
@@ -390,5 +397,29 @@
     "negotiateRefine": "переговоры / уточнение",
     "roundWord": "Раунд",
     "onTheTablePrefix": "Версия на столе"
+  },
+  "endOfLine": "Вы всё просмотрели",
+  "missionInProgress2": {
+    "tasks": "Задачи",
+    "clickToUpdate": "Нажмите, чтобы обновить прогресс",
+    "approveFinish": "Подтвердить завершение",
+    "pendingApproval": "Ожидает одобрения"
+  },
+  "decisionMaking": {
+    "refinementSent": "Уточнение отправлено — мяч на их стороне.",
+    "couldNotSend": "Не удалось отправить уточнение",
+    "refineSaleClaim": "Уточнить заявление о продаже",
+    "proposeVersion": "Предложите версию, которую вы готовы подписать. Молчание до конца окна ответа означает автоматическое одобрение текущей версии.",
+    "quantity": "Количество",
+    "onTable": "на столе:",
+    "pricePerUnit": "Цена за единицу",
+    "start": "Начало",
+    "finish": "Конец",
+    "note": "Заметка",
+    "optionalClarification": "Необязательное уточнение…",
+    "total": "Итого",
+    "cancel": "Отмена",
+    "sending": "Отправка…",
+    "sendRefinement": "Отправить уточнение"
   }
 }
