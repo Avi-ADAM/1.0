@@ -132,8 +132,12 @@
       "completionApproval": "Утверждение получения ресурса голосованием",
       "editTimer": "Редактировать таймер",
       "monthlyHours": "Ежемесячные часы",
-      "totalHoursLabel": "Часов итого"
-    }
+      "totalHoursLabel": "Часов итого",
+      "completeTask": "Завершить миссию",
+      "taskLink": "Ссылка на миссию"
+    },
+    "openChat": "Открыть чат",
+    "withdraw": "Отозвать предложение"
   },
   "taskApproval": {
     "approve": "Утвердить",

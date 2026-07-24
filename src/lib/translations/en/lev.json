@@ -132,8 +132,12 @@
       "completionApproval": "Approval of getting a resource successfully",
       "editTimer": "Edit Timer",
       "monthlyHours": "Monthly hours",
-      "totalHoursLabel": "Total hours"
-    }
+      "totalHoursLabel": "Total hours",
+      "completeTask": "Complete Task",
+      "taskLink": "Task Link"
+    },
+    "openChat": "Open Chat",
+    "withdraw": "Withdraw"
   },
   "taskApproval": {
     "approve": "Approve",

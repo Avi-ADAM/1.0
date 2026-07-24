@@ -4,6 +4,7 @@
   import { getProjectData } from '$lib/stores/projectStore';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { t } from '$lib/translations';
+  import { get } from 'svelte/store';
 
   /**
    * @typedef {Object} Props
@@ -37,12 +38,12 @@
 
   function locationSummary(loc) {
     if (!loc) return '—';
-    if (loc.location_mode === 'online') return $lang === 'he' ? 'אונליין' : 'Online';
+    if (loc.location_mode === 'online') return get(t)('location.online');
     const hasPoint = Number.isFinite(loc.lat) && Number.isFinite(loc.lng);
     if (hasPoint) {
       const hint = loc.location_hint?.trim();
       const r = loc.radius || 15;
-      return `${hint ? hint + ' · ' : ''}${r} ${$lang === 'he' ? 'ק״מ' : 'km'}`;
+      return `${hint ? hint + ' · ' : ''}${r} ${get(t)('location.km')}`;
     }
     return loc.location_hint?.trim() || '—';
   }

@@ -553,7 +553,7 @@
             onclick={() => tochat()}
           >
             <span class="whitespace-nowrap"
-              >{$lang === 'he' ? "פתיחת צ'אט" : 'Open Chat'}</span
+              >{$t('lev.cards.openChat')}</span
             >
           </button>
         {/if}
@@ -571,7 +571,7 @@
             onclick={() => onWithdraw?.()}
           >
             <span class="whitespace-nowrap"
-              >🌱 {$lang === 'he' ? 'משיכת ההצעה' : 'Withdraw'}</span
+              >🌱 {$t('lev.cards.withdraw')}</span
             >
           </button>
         {/if}

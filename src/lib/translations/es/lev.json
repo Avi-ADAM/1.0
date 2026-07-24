@@ -133,8 +133,12 @@
       "completionApproval": "Aprobación de recepción exitosa de un recurso",
       "editTimer": "Editar temporizador",
       "monthlyHours": "Horas mensuales",
-      "totalHoursLabel": "Total de horas"
-    }
+      "totalHoursLabel": "Total de horas",
+      "completeTask": "Completar misión",
+      "taskLink": "Enlace de la misión"
+    },
+    "openChat": "Abrir chat",
+    "withdraw": "Retirar la oferta"
   },
   "taskApproval": {
     "approve": "Aprobar",

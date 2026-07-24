@@ -573,7 +573,7 @@
           onmouseleave={() => hover('0')}
           onclick={() => tochat()}
         >
-          <span>{$lang === 'he' ? "פתיחת צ'אט" : 'Open Chat'}</span>
+          <span>{$t('lev.cards.openChat')}</span>
           <div class="w-6 h-6"><Chaticon /></div>
         </button>
         {#if selfNomination && onWithdraw}
@@ -590,7 +590,7 @@
             onclick={() => onWithdraw?.()}
           >
             <span class="whitespace-nowrap"
-              >🌱 {$lang === 'he' ? 'משיכת ההצעה' : 'Withdraw'}</span
+              >🌱 {$t('lev.cards.withdraw')}</span
             >
           </button>
         {/if}

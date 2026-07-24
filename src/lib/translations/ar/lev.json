@@ -132,8 +132,12 @@
       "completionApproval": "موافقة على استلام مورد بنجاح",
       "editTimer": "تعديل المؤقت",
       "monthlyHours": "ساعات شهرية",
-      "totalHoursLabel": "إجمالي الساعات"
-    }
+      "totalHoursLabel": "إجمالي الساعات",
+      "completeTask": "إنهاء المهمة",
+      "taskLink": "رابط المهمة"
+    },
+    "openChat": "فتح الدردشة",
+    "withdraw": "سحب العرض"
   },
   "taskApproval": {
     "approve": "موافقة",

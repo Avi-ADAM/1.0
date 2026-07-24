@@ -132,8 +132,12 @@
       "completionApproval": "אישור קבלת משאב בהצבלה",
       "editTimer": "עריכת הטיימר",
       "monthlyHours": "שעות חודשיות",
-      "totalHoursLabel": "שעות סך הכל"
-    }
+      "totalHoursLabel": "שעות סך הכל",
+      "completeTask": "סיום משימה",
+      "taskLink": "קישור למשימה"
+    },
+    "openChat": "פתיחת צ'אט",
+    "withdraw": "משיכת ההצעה"
   },
   "taskApproval": {
     "approve": "אישור",
