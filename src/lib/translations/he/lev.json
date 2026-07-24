@@ -58,7 +58,8 @@
       "addReceiver": "מלאו מקבל כסף",
       "addReceiverHint": "כדי שהלקוח יוכל להעביר לכם כסף, הגש.י את עצמך כמקבל.ת",
       "addMeReceiver": "הוסף אותי כמקבל כסף",
-      "removeMeReceiver": "הסר אותי מהרשימה"
+      "removeMeReceiver": "הסר אותי מהרשימה",
+      "activeSale": "מכירה פעילה"
     },
     "voteStatus": {
       "approved": "אישרו",

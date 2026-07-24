@@ -59,7 +59,8 @@
       "addReceiver": "Define un receptor del dinero",
       "addReceiverHint": "Para que el cliente pueda transferirte el dinero, añádete como receptor",
       "addMeReceiver": "Añadirme como receptor del dinero",
-      "removeMeReceiver": "Quitarme de la lista"
+      "removeMeReceiver": "Quitarme de la lista",
+      "activeSale": "VENTA ACTIVA"
     },
     "voteStatus": {
       "approved": "Aprobada",

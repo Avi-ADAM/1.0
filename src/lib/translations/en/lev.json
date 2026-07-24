@@ -58,7 +58,8 @@
       "addReceiver": "Set a money receiver",
       "addReceiverHint": "So the customer can transfer money to you, add yourself as a recipient",
       "addMeReceiver": "Add me as money recipient",
-      "removeMeReceiver": "Remove me from list"
+      "removeMeReceiver": "Remove me from list",
+      "activeSale": "ACTIVE SALE"
     },
     "voteStatus": {
       "approved": "Approved",

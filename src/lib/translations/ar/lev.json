@@ -58,7 +58,8 @@
       "addReceiver": "حدد مستلم المال",
       "addReceiverHint": "حتى يتمكن العميل من تحويل الأموال إليك، أضف نفسك كمستلم",
       "addMeReceiver": "أضفني كمستلم",
-      "removeMeReceiver": "أزلني من القائمة"
+      "removeMeReceiver": "أزلني من القائمة",
+      "activeSale": "بيع نشط"
     },
     "voteStatus": {
       "approved": "وافقوا",

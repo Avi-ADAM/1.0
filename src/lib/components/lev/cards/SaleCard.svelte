@@ -292,7 +292,7 @@
   <CardHeader
     logoSrc={buble.projectSrc}
     projectName={buble.projectName}
-    cardType={$lang === 'he' ? 'מכירה פעילה' : 'ACTIVE SALE'}
+    cardType={$t('lev.cards.saleCard.activeSale')}
     cardTitle={buble.name}
     {glowColor}
     onProjectClick={handleProjectClick}
