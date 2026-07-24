@@ -6,6 +6,7 @@
   "ofTotal": "שווי משימה {{value}} מתוך {{total}}",
   "perMonthEstimate": "≈ {{amount}} ₪ בחודש",
   "estimateDisclaimer": "אומדן לפי הכנסות העבר",
+  "estimateDisclaimerCommitments": "אומדן לפי התחייבויות חודשיות",
   "yourShareIfDone": "החלק שלך בריקמה בסיום המשימה",
   "missionShareAtCreation": "כמה מהריקמה תהיה שווה המשימה הזו"
 }

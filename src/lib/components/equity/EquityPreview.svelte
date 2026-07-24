@@ -97,6 +97,12 @@
     if (scenario?.monthlyEstimate == null) return null;
     return $t('equity.perMonthEstimate', { amount: fmtNum(scenario.monthlyEstimate) });
   }
+  // Which "how we estimated" tooltip to show — real income vs. commitments.
+  const estimateDisclaimer = $derived(
+    fetched?.monthlyIncomeSource === 'commitments'
+      ? $t('equity.estimateDisclaimerCommitments')
+      : $t('equity.estimateDisclaimer')
+  );
 
   function hover(x) {
     onHover?.(x);
@@ -143,7 +149,7 @@
           <span class="font-bold text-gold">{formatSharePct(current.sharePct)}</span>
           <span class="text-xs text-gray-400 dark:text-gray-500">({detail(current)})</span>
           {#if monthly(current)}
-            <span class="text-xs text-emerald-600 dark:text-emerald-400" title={$t('equity.estimateDisclaimer')}>
+            <span class="text-xs text-emerald-600 dark:text-emerald-400" title={estimateDisclaimer}>
               {monthly(current)}
             </span>
           {/if}
@@ -162,7 +168,7 @@
           <span class="font-bold text-gray-800 dark:text-gray-100">{formatSharePct(approved.sharePct)}</span>
           <span class="text-xs text-gray-400 dark:text-gray-500">({detail(approved)})</span>
           {#if monthly(approved)}
-            <span class="text-xs text-emerald-600 dark:text-emerald-400" title={$t('equity.estimateDisclaimer')}>
+            <span class="text-xs text-emerald-600 dark:text-emerald-400" title={estimateDisclaimer}>
               {monthly(approved)}
             </span>
           {/if}
@@ -181,7 +187,7 @@
           <span class="font-semibold">{formatSharePct(pipeline.sharePct)}</span>
           <span class="text-xs text-gray-400 dark:text-gray-500">({detail(pipeline)})</span>
           {#if monthly(pipeline)}
-            <span class="text-xs text-emerald-600 dark:text-emerald-400" title={$t('equity.estimateDisclaimer')}>
+            <span class="text-xs text-emerald-600 dark:text-emerald-400" title={estimateDisclaimer}>
               {monthly(pipeline)}
             </span>
           {/if}

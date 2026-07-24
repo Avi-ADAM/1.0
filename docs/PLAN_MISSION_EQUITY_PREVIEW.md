@@ -1,11 +1,13 @@
 # PLAN — Mission Equity Preview (שווי צפוי בריקמה)
 
-> Status: **implemented (phases 1–3 / steps 1–7)** — pure math module + tests,
+> Status: **implemented (steps 1–8, all phases)** — pure math module + tests,
 > `getProjectValueSummary` qid + dedup cache, the reusable `EquityPreview`
 > component (he/en/ar/ru), and all wired integration points: lev cards
 > (sugestmi/sugestma + parents), the public availableMission page, the mission
 > creation form + nego dialog, and the moach in-progress reward column. Phase 4
-> (₪/month estimate) remains the one open, optional extension.
+> (₪/month estimate) is included: `computeMonthlyIncome` averages effective
+> sales over a trailing 6-month window and falls back to monthly commitments,
+> surfaced per baseline row with the matching disclaimer.
 > Owner request (2026-07-07): show candidates a *realistic* picture of the share
 > (%) they will hold in a rikma if they complete a suggested mission — both
 > against the rikma's **current** value and against **all already-approved

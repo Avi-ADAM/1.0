@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   computeEquityScenarios,
+  computeMonthlyIncome,
   summarize,
   formatSharePct,
   type ProjectValueSummary
@@ -10,7 +11,8 @@ const emptySummary: ProjectValueSummary = {
   currentValue: 0,
   approvedInProgressValue: 0,
   openPipelineValue: 0,
-  monthlyIncomeEstimate: null
+  monthlyIncomeEstimate: null,
+  monthlyIncomeSource: null
 };
 
 function byBaseline(scenarios: ReturnType<typeof computeEquityScenarios>) {
@@ -42,7 +44,8 @@ describe('computeEquityScenarios', () => {
       currentValue: 1000,
       approvedInProgressValue: 1000,
       openPipelineValue: 2000,
-      monthlyIncomeEstimate: null
+      monthlyIncomeEstimate: null,
+      monthlyIncomeSource: null
     };
     const s = byBaseline(computeEquityScenarios(summary, 1000)); // alreadyCountedIn 'none'
     // current : 1000/(1000+1000)=50
@@ -65,7 +68,8 @@ describe('computeEquityScenarios', () => {
       currentValue: 0,
       approvedInProgressValue: 0,
       openPipelineValue: 1000, // the mission itself is one of these
-      monthlyIncomeEstimate: null
+      monthlyIncomeEstimate: null,
+      monthlyIncomeSource: null
     };
     const s = byBaseline(computeEquityScenarios(summary, 1000, { alreadyCountedIn: 'pipeline' }));
     // pipeline base = 0 + 0 + 1000 (+0, already counted) → 1000/1000 = 100%
@@ -80,7 +84,8 @@ describe('computeEquityScenarios', () => {
       currentValue: 1000,
       approvedInProgressValue: 1000, // includes the mission
       openPipelineValue: 0,
-      monthlyIncomeEstimate: null
+      monthlyIncomeEstimate: null,
+      monthlyIncomeSource: null
     };
     const s = byBaseline(computeEquityScenarios(summary, 1000, { alreadyCountedIn: 'approved' }));
     // approved base = 1000 + 1000 (+0) = 2000 → 1000/2000 = 50%
@@ -95,7 +100,8 @@ describe('computeEquityScenarios', () => {
       currentValue: 800,
       approvedInProgressValue: 600,
       openPipelineValue: 400,
-      monthlyIncomeEstimate: null
+      monthlyIncomeEstimate: null,
+      monthlyIncomeSource: null
     };
     const s = byBaseline(computeEquityScenarios(summary, 300));
     expect(s.current.sharePct).toBeGreaterThanOrEqual(s.approved.sharePct);
@@ -139,6 +145,99 @@ describe('summarize', () => {
     expect(summary.currentValue).toBe(0);
     expect(summary.approvedInProgressValue).toBe(0);
     expect(summary.openPipelineValue).toBe(0);
+  });
+});
+
+describe('computeMonthlyIncome (phase 4)', () => {
+  const now = new Date('2026-07-15T00:00:00Z');
+  const salesColl = (rows: Array<{ in: number; date: string | null; holderStatus?: string | null }>) => ({
+    data: rows.map((attributes) => ({ attributes }))
+  });
+  const matanotColl = (rows: Array<{ price: number; kindOf: string }>) => ({
+    data: rows.map((attributes) => ({ attributes }))
+  });
+
+  it('trailing average of effective sales over the window', () => {
+    const r = computeMonthlyIncome(
+      salesColl([
+        { in: 600, date: '2026-07-10', holderStatus: 'self' },
+        { in: 600, date: '2026-06-10', holderStatus: 'confirmed' }
+      ]),
+      null,
+      now
+    );
+    // first sale month Jun → divide by 2 (Jun, Jul): 1200/2 = 600
+    expect(r.source).toBe('sales');
+    expect(r.estimate).toBeCloseTo(600, 5);
+  });
+
+  it("excludes 'open' sales; null/self/confirmed count", () => {
+    const openOnly = computeMonthlyIncome(
+      salesColl([{ in: 1000, date: '2026-07-10', holderStatus: 'open' }]),
+      null,
+      now
+    );
+    expect(openOnly.estimate).toBeNull();
+
+    const nullLegacy = computeMonthlyIncome(
+      salesColl([{ in: 300, date: '2026-07-01', holderStatus: null }]),
+      null,
+      now
+    );
+    expect(nullLegacy.source).toBe('sales');
+    expect(nullLegacy.estimate).toBeCloseTo(300, 5); // Jul only → /1
+  });
+
+  it('young rikma divides by months since first sale, not the full window', () => {
+    const r = computeMonthlyIncome(
+      salesColl([{ in: 900, date: '2026-06-15', holderStatus: 'self' }]),
+      null,
+      now
+    );
+    expect(r.estimate).toBeCloseTo(450, 5); // Jun+Jul = 2 months
+  });
+
+  it('falls back to monthly commitments when no recent income', () => {
+    const r = computeMonthlyIncome(
+      salesColl([{ in: 5000, date: '2025-01-01', holderStatus: 'self' }]), // before window
+      matanotColl([{ price: 200, kindOf: 'monthly' }]),
+      now
+    );
+    expect(r.source).toBe('commitments');
+    expect(r.estimate).toBeCloseTo(200, 5);
+  });
+
+  it('commitments: monthly→price, yearly→price/12, others ignored', () => {
+    const r = computeMonthlyIncome(
+      null,
+      matanotColl([
+        { price: 100, kindOf: 'monthly' },
+        { price: 1200, kindOf: 'yearly' },
+        { price: 50, kindOf: 'total' }
+      ]),
+      now
+    );
+    expect(r.source).toBe('commitments');
+    expect(r.estimate).toBeCloseTo(200, 5); // 100 + 1200/12
+  });
+
+  it('null when there is neither income nor commitments', () => {
+    expect(computeMonthlyIncome(null, null, now)).toEqual({ estimate: null, source: null });
+  });
+});
+
+describe('summarize (phase 4 income)', () => {
+  it('populates monthlyIncomeEstimate and source with an injected now', () => {
+    const summary = summarize(
+      {
+        finnished_missions: { data: [{ attributes: { total: 1000 } }] },
+        sales: { data: [{ attributes: { in: 600, date: '2026-07-01', holderStatus: 'self' } }] }
+      },
+      new Date('2026-07-15T00:00:00Z')
+    );
+    expect(summary.currentValue).toBe(1000);
+    expect(summary.monthlyIncomeEstimate).toBeCloseTo(600, 5);
+    expect(summary.monthlyIncomeSource).toBe('sales');
   });
 });
 

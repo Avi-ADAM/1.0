@@ -6,6 +6,7 @@
   "ofTotal": "mission value {{value}} of {{total}}",
   "perMonthEstimate": "≈ ₪{{amount}} / month",
   "estimateDisclaimer": "Estimate based on past income",
+  "estimateDisclaimerCommitments": "Estimate based on monthly commitments",
   "yourShareIfDone": "Your share in the rikma once the mission is done",
   "missionShareAtCreation": "How much of the rikma this mission will be worth"
 }

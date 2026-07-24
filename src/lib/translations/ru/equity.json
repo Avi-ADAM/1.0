@@ -6,6 +6,7 @@
   "ofTotal": "стоимость миссии {{value}} из {{total}}",
   "perMonthEstimate": "≈ {{amount}} ₪ в месяц",
   "estimateDisclaimer": "Оценка по прошлым доходам",
+  "estimateDisclaimerCommitments": "Оценка по ежемесячным обязательствам",
   "yourShareIfDone": "Ваша доля в рикме по завершении миссии",
   "missionShareAtCreation": "Какую часть рикмы будет стоить эта миссия"
 }

@@ -18,6 +18,12 @@ export interface ProjectValueSummary {
   openPipelineValue: number;
   /** Trailing monthly income estimate, null when no data (phase 4). */
   monthlyIncomeEstimate: number | null;
+  /**
+   * Where {@link monthlyIncomeEstimate} came from — drives which disclaimer the
+   * UI shows. 'sales' = trailing average of real income; 'commitments' = weaker
+   * estimate from standing monthly product commitments; null = no estimate.
+   */
+  monthlyIncomeSource: 'sales' | 'commitments' | null;
 }
 
 export type EquityBaseline = 'current' | 'approved' | 'pipeline';
@@ -126,6 +132,97 @@ export interface RawProjectValue {
     noofhours?: number | null;
     perhour?: number | null;
   }> | null;
+  sales?: RawCollection<{
+    in?: number | null;
+    date?: string | null;
+    holderStatus?: string | null;
+  }> | null;
+  matanotofs?: RawCollection<{
+    price?: number | null;
+    kindOf?: string | null;
+  }> | null;
+}
+
+/** Number of trailing calendar months the income average spans (phase 4). */
+const INCOME_WINDOW_MONTHS = 6;
+
+/**
+ * A sale counts toward income only when **effective** — matching the
+ * balances/tosplits rule in the sale-holder-consent super-principle: holderStatus
+ * in self/confirmed/null-legacy, never 'open'.
+ */
+function isEffectiveSale(status: string | null | undefined): boolean {
+  return status == null || status === 'self' || status === 'confirmed';
+}
+
+/** UTC start-of-month, so the window math is timezone-stable. */
+function startOfMonth(d: Date): Date {
+  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
+}
+
+/** Calendar months from `a` to `b` inclusive (both start-of-month), min 1. */
+function monthsInclusive(a: Date, b: Date): number {
+  const n =
+    (b.getUTCFullYear() - a.getUTCFullYear()) * 12 +
+    (b.getUTCMonth() - a.getUTCMonth()) +
+    1;
+  return n > 0 ? n : 1;
+}
+
+/**
+ * Estimate ₪/month for a rikma (phase 4). Prefers a trailing average of real
+ * income (Σ effective sales.in over the last {@link INCOME_WINDOW_MONTHS}
+ * calendar months, dividing only by the months since the first sale so a young
+ * rikma isn't diluted by empty months). Falls back to standing monthly product
+ * commitments (matanotofs: monthly→price, yearly→price/12) when there is no
+ * recent income, and to null when there's neither.
+ */
+export function computeMonthlyIncome(
+  sales: RawProjectValue['sales'],
+  matanotofs: RawProjectValue['matanotofs'],
+  now: Date
+): { estimate: number | null; source: 'sales' | 'commitments' | null } {
+  const nowMonth = startOfMonth(now);
+  const windowStart = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - (INCOME_WINDOW_MONTHS - 1), 1)
+  );
+
+  const datedSales = (sales?.data ?? [])
+    .map((row) => row?.attributes)
+    .filter((a): a is NonNullable<typeof a> => !!a && isEffectiveSale(a.holderStatus))
+    .map((a) => ({ inAmt: num(a.in), date: a.date ? new Date(a.date) : null }))
+    .filter((s) => s.date != null && !Number.isNaN(s.date.getTime())) as Array<{
+    inAmt: number;
+    date: Date;
+  }>;
+
+  if (datedSales.length > 0) {
+    const firstMonth = startOfMonth(
+      new Date(Math.min(...datedSales.map((s) => s.date.getTime())))
+    );
+    const effectiveStart = firstMonth > windowStart ? firstMonth : windowStart;
+    const sum = datedSales
+      .filter((s) => {
+        const m = startOfMonth(s.date);
+        return m >= effectiveStart && m <= nowMonth;
+      })
+      .reduce((t, s) => t + s.inAmt, 0);
+    if (sum > 0) {
+      return { estimate: sum / monthsInclusive(effectiveStart, nowMonth), source: 'sales' };
+    }
+  }
+
+  let monthlyCommit = 0;
+  for (const row of matanotofs?.data ?? []) {
+    const a = row?.attributes;
+    if (!a) continue;
+    const price = num(a.price);
+    if (a.kindOf === 'monthly') monthlyCommit += price;
+    else if (a.kindOf === 'yearly') monthlyCommit += price / 12;
+  }
+  if (monthlyCommit > 0) return { estimate: monthlyCommit, source: 'commitments' };
+
+  return { estimate: null, source: null };
 }
 
 function sumAttr<T>(
@@ -143,10 +240,13 @@ function sumAttr<T>(
 
 /**
  * Fold a raw `project.attributes` payload into a ProjectValueSummary.
- * Treats every missing/null number as 0. `monthlyIncomeEstimate` stays null
- * until phase 4 wires up the sales/commitments math.
+ * Treats every missing/null number as 0. `now` is injectable for deterministic
+ * tests of the phase-4 income window.
  */
-export function summarize(raw: RawProjectValue | null | undefined): ProjectValueSummary {
+export function summarize(
+  raw: RawProjectValue | null | undefined,
+  now: Date = new Date()
+): ProjectValueSummary {
   const currentValue =
     sumAttr(raw?.finnished_missions, (a) => num(a.total)) +
     sumAttr(raw?.rikmashes, (a) => num(a.total));
@@ -161,11 +261,14 @@ export function summarize(raw: RawProjectValue | null | undefined): ProjectValue
     (a) => num(a.noofhours) * num(a.perhour)
   );
 
+  const income = computeMonthlyIncome(raw?.sales, raw?.matanotofs, now);
+
   return {
     currentValue,
     approvedInProgressValue,
     openPipelineValue,
-    monthlyIncomeEstimate: null
+    monthlyIncomeEstimate: income.estimate,
+    monthlyIncomeSource: income.source
   };
 }
 

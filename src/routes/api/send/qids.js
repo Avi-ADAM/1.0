@@ -9048,6 +9048,12 @@ export const moachQids = {
           ) {
             data { id attributes { noofhours perhour } }
           }
+          sales(pagination: { limit: -1 }) {
+            data { id attributes { in date holderStatus } }
+          }
+          matanotofs(pagination: { limit: -1 }) {
+            data { id attributes { price kindOf } }
+          }
         }
       }
     }

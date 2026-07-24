@@ -6,6 +6,7 @@
   "ofTotal": "قيمة المهمة {{value}} من {{total}}",
   "perMonthEstimate": "≈ {{amount}} ₪ شهريًا",
   "estimateDisclaimer": "تقدير بناءً على الدخل السابق",
+  "estimateDisclaimerCommitments": "تقدير بناءً على الالتزامات الشهرية",
   "yourShareIfDone": "حصتك في الريكما عند إتمام المهمة",
   "missionShareAtCreation": "كم ستساوي هذه المهمة من الريكما"
 }
