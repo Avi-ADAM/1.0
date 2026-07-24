@@ -1,17 +1,21 @@
 <!--
   Fruit.svelte — the shared fruit / profit of the ריקמה.
 
-  Small gold "coins" bloom from the centre and stream outward to the partners,
-  looping continuously. Emission distance and brightness grow with scroll, so
-  the abundance visibly increases as the story unfolds. One InstancedMesh keeps
-  it cheap.
+  Gold coins stamped with the 1💗1 logo bloom from the centre and stream
+  outward to the partners, looping continuously. Emission distance and
+  brightness grow with scroll, so the abundance visibly increases as the
+  story unfolds. One InstancedMesh keeps it cheap.
+
+  The coin face uses the same logo texture as the original hero scene
+  (11.svelte), so the money reads as "our" coin, not a generic sphere.
 -->
 <script>
-  import { T, useTask } from '@threlte/core';
+  import { T, useTask, useLoader } from '@threlte/core';
   import {
     InstancedMesh,
-    SphereGeometry,
+    CylinderGeometry,
     MeshStandardMaterial,
+    TextureLoader,
     Object3D,
     Color
   } from 'three';
@@ -23,7 +27,7 @@
    */
 
   /** @type {Props} */
-  let { scrollProgress = 0, count = 48 } = $props();
+  let { scrollProgress = 0, count = 18 } = $props();
 
   const reduce =
     typeof window !== 'undefined' &&
@@ -34,16 +38,30 @@
     return x - Math.floor(x);
   };
 
-  const geo = new SphereGeometry(1, 12, 12);
+  // the 1💗1 logo, mapped onto the coin faces (same asset as the hero scene).
+  const texture = useLoader(TextureLoader).load(
+    'https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png'
+  );
+
+  // a flat disc — a coin. Unit radius; per-instance scale sets the real size.
+  const geo = new CylinderGeometry(1, 1, 0.14, 32);
   const mat = new MeshStandardMaterial({
-    color: new Color('#E9C46A'),
+    color: new Color('#EEE8AA'),
     emissive: new Color('#7a5c14'),
-    emissiveIntensity: 0.5,
-    metalness: 0.75,
-    roughness: 0.25
+    emissiveIntensity: 0.35,
+    metalness: 0.7,
+    roughness: 0.35
   });
   const mesh = new InstancedMesh(geo, mat, count);
   const dummy = new Object3D();
+
+  // apply the logo texture to the coin faces once it has loaded.
+  $effect(() => {
+    if ($texture) {
+      mat.map = $texture;
+      mat.needsUpdate = true;
+    }
+  });
 
   // per-coin seed: a normalised outward direction, a life phase and a size.
   const seeds = Array.from({ length: count }, (_, i) => {
@@ -57,8 +75,9 @@
     return {
       dir: [dx, dy, dz],
       phase: rnd(i + 13),
-      speed: 0.12 + rnd(i + 17) * 0.22,
-      size: 0.05 + rnd(i + 21) * 0.06
+      speed: 0.1 + rnd(i + 17) * 0.16,
+      size: 0.22 + rnd(i + 21) * 0.14,
+      tumble: 0.6 + rnd(i + 25) * 0.8
     };
   });
 
@@ -71,7 +90,7 @@
     mesh.visible = flow > 0.01;
     if (!mesh.visible) return;
 
-    const reach = 1.4 + 2.6 * flow;
+    const reach = 1.2 + 2.2 * flow;
     for (let i = 0; i < count; i++) {
       const s = seeds[i];
       const life = (time * s.speed + s.phase) % 1;
@@ -82,10 +101,16 @@
         s.dir[2] * dist
       );
       // grow briefly, then fade toward the end of the journey
-      const fade = life < 0.15 ? life / 0.15 : 1 - (life - 0.15) / 0.85;
-      const sc = s.size * (0.4 + flow) * clamp01(fade);
+      const fade = life < 0.12 ? life / 0.12 : 1 - (life - 0.12) / 0.88;
+      const sc = s.size * (0.55 + 0.6 * flow) * clamp01(fade);
       dummy.scale.setScalar(Math.max(0.0001, sc));
-      dummy.rotation.set(time * 0.6 + i, time * 0.8, 0);
+      // lay the coin face toward the viewer (+Z) and let it tumble & spin,
+      // so the logo catches the light instead of showing the thin edge.
+      dummy.rotation.set(
+        Math.PI / 2 + Math.sin(time * 0.9 + i) * 0.5,
+        Math.cos(time * 0.6 + i) * 0.4,
+        time * s.tumble
+      );
       dummy.updateMatrix();
       mesh.setMatrixAt(i, dummy.matrix);
     }
