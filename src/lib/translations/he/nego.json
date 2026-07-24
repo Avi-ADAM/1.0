@@ -45,5 +45,26 @@
   "noTasksOriginally": "לא היו מטלות במקור",
   "noName": "ללא שם",
   "approvedFinal": "מאושר (גרסה סופית):",
-  "noTasksFinal": "אין מטלות בגרסה הסופית"
+  "noTasksFinal": "אין מטלות בגרסה הסופית",
+  "acts": {
+    "new": "חדש",
+    "modified": "שונה",
+    "removed": "הוסר",
+    "noTasks": "אין מטלות",
+    "editTasks": "עריכת מטלות",
+    "taskNamePh": "שם המטלה",
+    "taskName": "שם המטלה",
+    "taskDescPh": "תיאור המטלה",
+    "description": "תיאור",
+    "taskLinkPh": "קישור למטלה",
+    "link": "קישור",
+    "endDateTime": "תאריך ושעת סיום",
+    "save": "שמור",
+    "cancel": "ביטול",
+    "addTask": "הוסף מטלה",
+    "done": "סיום",
+    "editTask": "עריכת מטלה",
+    "addNewTask": "הוספת מטלה חדשה",
+    "startDateTime": "תאריך ושעת התחלה"
+  }
 }

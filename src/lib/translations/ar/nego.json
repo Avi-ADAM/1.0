@@ -45,5 +45,26 @@
   "noTasksOriginally": "لا مهام في الأصل",
   "noName": "بدون اسم",
   "approvedFinal": "معتمد (النسخة النهائية):",
-  "noTasksFinal": "لا مهام في النسخة النهائية"
+  "noTasksFinal": "لا مهام في النسخة النهائية",
+  "acts": {
+    "new": "جديد",
+    "modified": "مُعدَّل",
+    "removed": "مُزال",
+    "noTasks": "لا مهام",
+    "editTasks": "تعديل المهام",
+    "taskNamePh": "اسم المهمة",
+    "taskName": "اسم المهمة",
+    "taskDescPh": "وصف المهمة",
+    "description": "الوصف",
+    "taskLinkPh": "رابط المهمة",
+    "link": "رابط",
+    "endDateTime": "تاريخ ووقت الانتهاء",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "addTask": "إضافة مهمة",
+    "done": "تم",
+    "editTask": "تعديل المهمة",
+    "addNewTask": "إضافة مهمة جديدة",
+    "startDateTime": "تاريخ ووقت البدء"
+  }
 }

@@ -46,5 +46,26 @@
   "noTasksOriginally": "No había tareas originalmente",
   "noName": "Sin nombre",
   "approvedFinal": "Aprobado (versión final):",
-  "noTasksFinal": "Sin tareas en la versión final"
+  "noTasksFinal": "Sin tareas en la versión final",
+  "acts": {
+    "new": "Nuevo",
+    "modified": "Modificado",
+    "removed": "Eliminado",
+    "noTasks": "Sin tareas",
+    "editTasks": "Editar tareas",
+    "taskNamePh": "Nombre de la tarea",
+    "taskName": "Nombre de la tarea",
+    "taskDescPh": "Descripción de la tarea",
+    "description": "Descripción",
+    "taskLinkPh": "Enlace de la tarea",
+    "link": "Enlace",
+    "endDateTime": "Fecha y hora de fin",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "addTask": "Añadir tarea",
+    "done": "Hecho",
+    "editTask": "Editar tarea",
+    "addNewTask": "Añadir nueva tarea",
+    "startDateTime": "Fecha y hora de inicio"
+  }
 }

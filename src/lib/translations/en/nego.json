@@ -45,5 +45,26 @@
   "noTasksOriginally": "No tasks originally",
   "noName": "No name",
   "approvedFinal": "Approved (Final Version):",
-  "noTasksFinal": "No tasks in final version"
+  "noTasksFinal": "No tasks in final version",
+  "acts": {
+    "new": "New",
+    "modified": "Modified",
+    "removed": "Removed",
+    "noTasks": "No tasks",
+    "editTasks": "Edit Tasks",
+    "taskNamePh": "Task name",
+    "taskName": "Task Name",
+    "taskDescPh": "Task description",
+    "description": "Description",
+    "taskLinkPh": "Task link",
+    "link": "Link",
+    "endDateTime": "End Date & Time",
+    "save": "Save",
+    "cancel": "Cancel",
+    "addTask": "Add Task",
+    "done": "Done",
+    "editTask": "Edit Task",
+    "addNewTask": "Add New Task",
+    "startDateTime": "Start Date & Time"
+  }
 }

@@ -1,6 +1,7 @@
 <script>
   import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
+  import { get } from 'svelte/store';
   import pic from './../../celim/pic.js';
   import { idPr } from '../../stores/idPr.js';
   import { onMount } from 'svelte';
@@ -158,7 +159,7 @@
     );
     for (let user of ulist) {
       if (user.x > 0 && !existingUserIds.includes(user.uid)) {
-        const addedText = $lang === 'he' ? 'נוסף לחלוקה' : 'added to split';
+        const addedText = get(t)('mission.whowhat.addedToSplit');
         changes.push(`${user.username} ${addedText}`);
         changesForDisplay.push({
           label: `${user.username}:`,
@@ -211,10 +212,10 @@
 
     if (newSales.length > 0) {
       hasChanges = true;
-      const newSalesText = $lang === 'he' ? 'מכירות חדשות נוספו' : 'new sales added';
+      const newSalesText = get(t)('mission.whowhat.newSalesAdded');
       changes.push(`${newSales.length} ${newSalesText}`);
       changesForDisplay.push({
-        label: $lang === 'he' ? 'מכירות חדשות:' : 'New sales:',
+        label: get(t)('mission.whowhat.newSalesLabel'),
         oldValue: existingSalesIds.length.toString(),
         newValue: (existingSalesIds.length + newSales.length).toString()
       });
@@ -234,11 +235,7 @@
       siteShareDirection === 'less' &&
       !siteShareReason.trim()
     ) {
-      toast.error(
-        $lang === 'he'
-          ? 'נא לציין סיבה להנחה בחלק האתר'
-          : 'Please give a reason for the site-share discount'
-      );
+      toast.error(get(t)('mission.whowhat.reasonForDiscount'));
       return;
     }
 
@@ -543,11 +540,7 @@
       siteShareDirection === 'less' &&
       !siteShareReason.trim()
     ) {
-      toast.error(
-        $lang === 'he'
-          ? 'נא לציין סיבה להנחה בחלק האתר'
-          : 'Please give a reason for the site-share discount'
-      );
+      toast.error(get(t)('mission.whowhat.reasonForDiscount'));
       return;
     }
 
@@ -564,7 +557,7 @@
     
     if (!cookieValueId) {
       console.error('User ID not found in cookies');
-      toast.error($lang === 'he' ? 'לא נמצא מזהה משתמש' : 'User ID not found');
+      toast.error(get(t)('mission.whowhat.userIdNotFound'));
       isLoading = false;
       isError = true;
       return;
@@ -794,7 +787,7 @@
       );
 
       console.log('✅ Tosplit created successfully with automatic notifications!');
-      toast.success($lang === 'he' ? 'החלוקה נוצרה בהצלחה!' : 'Split created successfully!');
+      toast.success(get(t)('mission.whowhat.splitCreated'));
       isLoading = false;
       isSuccess = true;
 
@@ -810,7 +803,7 @@
     } catch (e) {
       error1 = e;
       console.error('Error creating tosplit:', error1);
-      toast.error($lang === 'he' ? 'שגיאה ביצירת החלוקה' : 'Error creating split');
+      toast.error(get(t)('mission.whowhat.errorCreatingSplit'));
       isLoading = false;
       isError = true;
     }
@@ -1295,7 +1288,7 @@
         aria-pressed={viewMode === 'cards'}
         onclick={() => (viewMode = 'cards')}
       >
-        {$lang === 'he' ? 'כרטיסים' : 'Cards'}
+        {$t('mission.whowhat.cards')}
       </button>
       <button
         type="button"
@@ -1304,7 +1297,7 @@
         aria-pressed={viewMode === 'table'}
         onclick={() => (viewMode = 'table')}
       >
-        {$lang === 'he' ? 'טבלה' : 'Table'}
+        {$t('mission.whowhat.table')}
       </button>
     </div>
 
@@ -1345,7 +1338,7 @@
               </div>
             {:else}
               <div class="prow even">
-                <span>{$lang === 'he' ? 'מאוזן' : 'Balanced'}</span>
+                <span>{$t('mission.whowhat.balanced')}</span>
                 <b>✓</b>
               </div>
             {/if}
@@ -1369,21 +1362,21 @@
             <div class="pcard-id">
               <span class="pcard-name">1💗1</span>
               <span class="pcard-pct">
-                {revach > 0 ? ((siteShareFinal / revach) * 100).toFixed(1) : '0'}% · {$lang === 'he' ? 'שירות ניהול ושותפות' : 'management & partnership'}
+                {revach > 0 ? ((siteShareFinal / revach) * 100).toFixed(1) : '0'}% · {$t('mission.whowhat.mgmtPartnership')}
               </span>
             </div>
           </div>
 
           <div class="pcard-rows">
             <div class="prow get">
-              <span>{$lang === 'he' ? 'חלק האתר' : 'Site share'}</span>
+              <span>{$t('mission.whowhat.siteShare')}</span>
               <b>{siteShareFinal.toFixed(2)}</b>
             </div>
           </div>
 
           {#if platformTransfers.length > 0}
             <div class="pcard-transfers">
-              <span class="pt-head">{$lang === 'he' ? 'ממומן ע"י' : 'Funded by'}</span>
+              <span class="pt-head">{$t('mission.whowhat.fundedBy')}</span>
               {#each platformTransfers as tr}
                 <span class="pt-chip platform">{tr.fromName} · {tr.amount.toFixed(2)}</span>
               {/each}
@@ -1469,9 +1462,7 @@
       <div class="site-share" dir="rtl">
         <div class="ss-head">
           <span class="ss-title">
-            {$lang === 'he'
-              ? 'שירות הניהול והשותפות של 1💗1'
-              : '1💗1 management & partnership service'}
+            {$t('mission.whowhat.mgmtService')}
           </span>
           <span class="ss-amount">{siteShareFinal.toFixed(2)}</span>
         </div>
@@ -1499,7 +1490,7 @@
               checked={siteShareDirection === 'more'}
               onchange={() => pickDirection('more')}
             />
-            <span>{$lang === 'he' ? 'ארצה לתת יותר' : "I'd like to give more"}</span>
+            <span>{$t('mission.whowhat.giveMore')}</span>
           </label>
 
           <label class="ss-opt">
@@ -1509,14 +1500,14 @@
               checked={siteShareDirection === 'less'}
               onchange={() => pickDirection('less')}
             />
-            <span>{$lang === 'he' ? 'אשמח להנחה — אשלם פחות' : "I'd like a discount — pay less"}</span>
+            <span>{$t('mission.whowhat.discountLess')}</span>
           </label>
         </div>
 
         {#if siteShareDirection !== 'as_is'}
           <div class="ss-adjust">
             <label class="ss-field">
-              <span>{$lang === 'he' ? 'סכום' : 'Amount'}</span>
+              <span>{$t('mission.whowhat.amount')}</span>
               <input
                 type="number"
                 min="0"
@@ -1528,13 +1519,13 @@
             <label class="ss-field ss-reason">
               <span>
                 {siteShareDirection === 'less'
-                  ? ($lang === 'he' ? 'סיבה (חובה)' : 'Reason (required)')
-                  : ($lang === 'he' ? 'סיבה (אופציונלי)' : 'Reason (optional)')}
+                  ? ($t('mission.whowhat.reasonRequired'))
+                  : ($t('mission.whowhat.reasonOptional'))}
               </span>
               <input
                 type="text"
                 bind:value={siteShareReason}
-                placeholder={$lang === 'he' ? 'מה הסיבה?' : 'Why?'}
+                placeholder={$t('mission.whowhat.whyPh')}
               />
             </label>
           </div>
