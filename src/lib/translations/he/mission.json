@@ -214,5 +214,32 @@
   "publicLinks": "קישורים ציבוריים",
   "privatLinks": "קישורים יחודיים לריקמה שלי",
   "linkToMission": "קישור לאתר בו מבוצעת המשימה ",
-  "noOfHours": "כמה שעות זה אמור לקחת?"
+  "noOfHours": "כמה שעות זה אמור לקחת?",
+  "ai": {
+    "enterNameFirst": "יש להזין שם משימה תחילה",
+    "suggestFailed": "הצעת AI נכשלה, נסו שוב.",
+    "suggestionsApplied": "הצעות AI הוחלו!",
+    "writeDescFirst": "יש לכתוב תיאור תחילה",
+    "descImproved": "התיאור שופר!",
+    "improveFailed": "שיפור AI נכשל, נסו שוב.",
+    "translateFailed": "תרגום נכשל, נסו שוב.",
+    "missionName": "שם המשימה",
+    "typePickTemplate": "הקלידו או בחרו מתבנית…",
+    "suggestTitle": "הצע כישורים, תפקידים ותיאור עם AI",
+    "suggestWithAi": "הצע עם AI",
+    "suggestionsHeader": "✨ הצעות AI — לחצו להחלה:",
+    "skillsLabel": "כישורים:",
+    "rolesLabel": "תפקידים:",
+    "workModesLabel": "דרכי עבודה:",
+    "similarTemplates": "📚 תבניות דומות נמצאו:",
+    "applyAll": "✅ החל הכל",
+    "dismiss": "סגור",
+    "improveWithAi": "שפר עם AI",
+    "undo": "בטל שיפור",
+    "translate": "תרגם",
+    "translationPreview": "🌍 תצוגה מקדימה של תרגום:",
+    "autoSaveNote": "התרגומים יישמרו אוטומטית לאחר הפרסום.",
+    "close": "סגור",
+    "cancel": "ביטול"
+  }
 }

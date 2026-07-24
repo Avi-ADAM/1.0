@@ -215,5 +215,32 @@
   "publicLinks": "enlaces públicos",
   "privatLinks": "enlaces específicos de los FreeMates",
   "linkToMission": "enlace al lugar donde se realiza la misión",
-  "noOfHours": "¿cuántas horas debería llevar?"
+  "noOfHours": "¿cuántas horas debería llevar?",
+  "ai": {
+    "enterNameFirst": "Primero introduce un nombre de misión",
+    "suggestFailed": "La sugerencia de IA falló. Inténtalo de nuevo.",
+    "suggestionsApplied": "¡Sugerencias de IA aplicadas!",
+    "writeDescFirst": "Primero escribe una descripción",
+    "descImproved": "¡Descripción mejorada!",
+    "improveFailed": "La mejora con IA falló. Inténtalo de nuevo.",
+    "translateFailed": "La traducción falló. Inténtalo de nuevo.",
+    "missionName": "Nombre de la misión",
+    "typePickTemplate": "Escribe o elige una plantilla…",
+    "suggestTitle": "Sugerir habilidades, roles y descripción con IA",
+    "suggestWithAi": "Sugerir con IA",
+    "suggestionsHeader": "✨ Sugerencias de IA: haz clic para aplicar:",
+    "skillsLabel": "Habilidades:",
+    "rolesLabel": "Roles:",
+    "workModesLabel": "Modos de trabajo:",
+    "similarTemplates": "📚 Plantillas similares encontradas:",
+    "applyAll": "✅ Aplicar todo",
+    "dismiss": "Descartar",
+    "improveWithAi": "Mejorar con IA",
+    "undo": "Deshacer",
+    "translate": "Traducir",
+    "translationPreview": "🌍 Vista previa de la traducción:",
+    "autoSaveNote": "Las traducciones se guardarán automáticamente tras publicar.",
+    "close": "Cerrar",
+    "cancel": "Cancelar"
+  }
 }

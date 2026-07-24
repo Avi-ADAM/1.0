@@ -214,5 +214,32 @@
   "publicLinks": "public links ",
   "privatLinks": "FreeMates specific links",
   "linkToMission": "link to where the mission is done",
-  "noOfHours": "how many hours it should take?"
+  "noOfHours": "how many hours it should take?",
+  "ai": {
+    "enterNameFirst": "Please enter a mission name first",
+    "suggestFailed": "AI suggestion failed. Please try again.",
+    "suggestionsApplied": "AI suggestions applied!",
+    "writeDescFirst": "Please write a description first",
+    "descImproved": "Description improved!",
+    "improveFailed": "AI improve failed. Please try again.",
+    "translateFailed": "Translation failed. Please try again.",
+    "missionName": "Mission name",
+    "typePickTemplate": "Type or pick a template…",
+    "suggestTitle": "Suggest skills, roles & description with AI",
+    "suggestWithAi": "Suggest with AI",
+    "suggestionsHeader": "✨ AI Suggestions — click to apply:",
+    "skillsLabel": "Skills:",
+    "rolesLabel": "Roles:",
+    "workModesLabel": "Work modes:",
+    "similarTemplates": "📚 Similar templates found:",
+    "applyAll": "✅ Apply all",
+    "dismiss": "Dismiss",
+    "improveWithAi": "Improve with AI",
+    "undo": "Undo",
+    "translate": "Translate",
+    "translationPreview": "🌍 Translation preview:",
+    "autoSaveNote": "Translations will be auto-saved after publishing.",
+    "close": "Close",
+    "cancel": "Cancel"
+  }
 }

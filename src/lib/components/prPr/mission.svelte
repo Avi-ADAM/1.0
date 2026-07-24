@@ -22,6 +22,7 @@
   import Addnewro from '../addnew/addNewRole.svelte';
   import SkillSelector from '../ui/SkillSelector.svelte';
   import { t as trans } from '$lib/translations';
+  import { get } from 'svelte/store';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { quintOut } from 'svelte/easing';
   import Expand from '$lib/celim/icons/expand.svelte';
@@ -38,11 +39,7 @@
   async function handleAiSuggest() {
     const name = miData[0].missionName?.trim();
     if (!name) {
-      toast.warning(
-        $lang === 'en'
-          ? 'Please enter a mission name first'
-          : 'יש להזין שם משימה תחילה'
-      );
+      toast.warning(get(trans)('mission.ai.enterNameFirst'));
       return;
     }
     aiSuggesting = true;
@@ -61,11 +58,7 @@
       if (!data.ok) throw new Error('suggest failed');
       aiSuggestResult = data;
     } catch (e) {
-      toast.error(
-        $lang === 'en'
-          ? 'AI suggestion failed. Please try again.'
-          : 'הצעת AI נכשלה, נסו שוב.'
-      );
+      toast.error(get(trans)('mission.ai.suggestFailed'));
     } finally {
       aiSuggesting = false;
     }
@@ -112,18 +105,14 @@
     miData = miData;
     aiSuggestResult = null;
     toast.success(
-      $lang === 'en' ? 'AI suggestions applied!' : 'הצעות AI הוחלו!'
+      get(trans)('mission.ai.suggestionsApplied')
     );
   }
 
   async function handleAiImprove() {
     const text = miData[0].descrip;
     if (!text || text === '<p></p>' || text === '<p><br></p>') {
-      toast.warning(
-        $lang === 'en'
-          ? 'Please write a description first'
-          : 'יש לכתוב תיאור תחילה'
-      );
+      toast.warning(get(trans)('mission.ai.writeDescFirst'));
       return;
     }
     aiImproving = true;
@@ -138,14 +127,10 @@
       if (!data.ok || !data.improved) throw new Error('improve failed');
       miData[0].descrip = data.improved;
       miData = miData;
-      toast.success($lang === 'en' ? 'Description improved!' : 'התיאור שופר!');
+      toast.success(get(trans)('mission.ai.descImproved'));
     } catch (e) {
       aiDescUndo = '';
-      toast.error(
-        $lang === 'en'
-          ? 'AI improve failed. Please try again.'
-          : 'שיפור AI נכשל, נסו שוב.'
-      );
+      toast.error(get(trans)('mission.ai.improveFailed'));
     } finally {
       aiImproving = false;
     }
@@ -162,11 +147,7 @@
   async function handleAiTranslate() {
     const text = miData[0].descrip;
     if (!text || text === '<p></p>' || text === '<p><br></p>') {
-      toast.warning(
-        $lang === 'en'
-          ? 'Please write a description first'
-          : 'יש לכתוב תיאור תחילה'
-      );
+      toast.warning(get(trans)('mission.ai.writeDescFirst'));
       return;
     }
     aiTranslating = true;
@@ -181,11 +162,7 @@
       if (!data.ok || !data.translations) throw new Error('translate failed');
       aiTranslations = data.translations;
     } catch (e) {
-      toast.error(
-        $lang === 'en'
-          ? 'Translation failed. Please try again.'
-          : 'תרגום נכשל, נסו שוב.'
-      );
+      toast.error(get(trans)('mission.ai.translateFailed'));
     } finally {
       aiTranslating = false;
     }
@@ -1073,16 +1050,14 @@
                     ? 'left'
                     : 'right'}"
                 >
-                  {$lang === 'en' ? 'Mission name' : 'שם המשימה'}
+                  {$trans('mission.ai.missionName')}
                 </label>
                 <input
                   id="mission-name-input"
                   type="text"
                   bind:value={miData[0].missionName}
                   list="mission-name-options"
-                  placeholder={$lang === 'en'
-                    ? 'Type or pick a template…'
-                    : 'הקלידו או בחרו מתבנית…'}
+                  placeholder={$trans('mission.ai.typePickTemplate')}
                   class="bg-pink-950/30 border placeholder:text-white border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all shadow-sm"
                 />
                 <datalist id="mission-name-options">
@@ -1096,9 +1071,7 @@
                   onclick={handleAiSuggest}
                   disabled={aiSuggesting}
                   class="mt-2 flex items-center gap-1 px-3 py-1.5 rounded-full border border-gold/60 text-xs text-barbi hover:bg-gold/20 transition-all disabled:opacity-50"
-                  title={$lang === 'en'
-                    ? 'Suggest skills, roles & description with AI'
-                    : 'הצע כישורים, תפקידים ותיאור עם AI'}
+                  title={$trans('mission.ai.suggestTitle')}
                 >
                   {#if aiSuggesting}
                     <span
@@ -1107,11 +1080,7 @@
                   {:else}
                     ✨
                   {/if}
-                  {$lang === 'en'
-                    ? 'Suggest with AI'
-                    : $lang === 'ar'
-                      ? 'اقتراح بالذكاء الاصطناعي'
-                      : 'הצע עם AI'}
+                  {$trans('mission.ai.suggestWithAi')}
                 </button>
               </div>
               <button onclick={() => (missionNameE = false)}><Done /></button>
@@ -1122,14 +1091,12 @@
                   class="mt-3 p-3 rounded-xl border border-gold/40 bg-pink-950/30 text-sm text-barbi space-y-2"
                 >
                   <p class="font-bold text-gold">
-                    {$lang === 'en'
-                      ? '✨ AI Suggestions — click to apply:'
-                      : '✨ הצעות AI — לחצו להחלה:'}
+                    {$trans('mission.ai.suggestionsHeader')}
                   </p>
                   {#if aiSuggestResult.extraction.skills.length > 0}
                     <p>
                       <span class="text-mturk"
-                        >{$lang === 'en' ? 'Skills:' : 'כישורים:'}</span
+                        >{$trans('mission.ai.skillsLabel')}</span
                       >
                       {aiSuggestResult.extraction.skills.join(', ')}
                     </p>
@@ -1137,7 +1104,7 @@
                   {#if aiSuggestResult.extraction.roles.length > 0}
                     <p>
                       <span class="text-mturk"
-                        >{$lang === 'en' ? 'Roles:' : 'תפקידים:'}</span
+                        >{$trans('mission.ai.rolesLabel')}</span
                       >
                       {aiSuggestResult.extraction.roles.join(', ')}
                     </p>
@@ -1145,16 +1112,14 @@
                   {#if aiSuggestResult.extraction.workways.length > 0}
                     <p>
                       <span class="text-mturk"
-                        >{$lang === 'en' ? 'Work modes:' : 'דרכי עבודה:'}</span
+                        >{$trans('mission.ai.workModesLabel')}</span
                       >
                       {aiSuggestResult.extraction.workways.join(', ')}
                     </p>
                   {/if}
                   {#if aiSuggestResult.similarMissions?.length > 0}
                     <p class="text-xs text-barbi/60">
-                      {$lang === 'en'
-                        ? '📚 Similar templates found:'
-                        : '📚 תבניות דומות נמצאו:'}
+                      {$trans('mission.ai.similarTemplates')}
                       {aiSuggestResult.similarMissions
                         .map((m) => m.missionName)
                         .join(', ')}
@@ -1166,14 +1131,14 @@
                       onclick={applyAiSuggestions}
                       class="px-3 py-1 rounded-full bg-gold text-barbi text-xs font-bold hover:bg-mturk transition-all"
                     >
-                      {$lang === 'en' ? '✅ Apply all' : '✅ החל הכל'}
+                      {$trans('mission.ai.applyAll')}
                     </button>
                     <button
                       type="button"
                       onclick={() => (aiSuggestResult = null)}
                       class="px-3 py-1 rounded-full border border-gold/60 text-barbi text-xs hover:bg-pink-950/30 transition-all"
                     >
-                      {$lang === 'en' ? 'Dismiss' : 'סגור'}
+                      {$trans('mission.ai.dismiss')}
                     </button>
                   </div>
                 </div>
@@ -1203,11 +1168,7 @@
                     {#if aiImproving}<span
                         class="animate-spin inline-block w-3 h-3 border border-barbi rounded-full border-t-transparent"
                       ></span>{:else}🪄{/if}
-                    {$lang === 'en'
-                      ? 'Improve with AI'
-                      : $lang === 'ar'
-                        ? 'تحسين بالذكاء'
-                        : 'שפר עם AI'}
+                    {$trans('mission.ai.improveWithAi')}
                   </button>
                   {#if aiDescUndo}
                     <button
@@ -1215,7 +1176,7 @@
                       onclick={undoAiImprove}
                       class="flex items-center gap-1 px-3 py-1.5 rounded-full border border-gold/40 text-xs text-barbi hover:bg-pink-950/30 transition-all"
                     >
-                      ↩️ {$lang === 'en' ? 'Undo' : 'בטל שיפור'}
+                      ↩️ {$trans('mission.ai.undo')}
                     </button>
                   {/if}
                   <button
@@ -1227,11 +1188,7 @@
                     {#if aiTranslating}<span
                         class="animate-spin inline-block w-3 h-3 border border-barbi rounded-full border-t-transparent"
                       ></span>{:else}🌍{/if}
-                    {$lang === 'en'
-                      ? 'Translate'
-                      : $lang === 'ar'
-                        ? 'ترجم'
-                        : 'תרגם'}
+                    {$trans('mission.ai.translate')}
                   </button>
                 </div>
                 <!-- Translation preview -->
@@ -1240,9 +1197,7 @@
                     class="mt-2 p-3 rounded-xl border border-gold/40 bg-pink-950/30 text-xs text-barbi space-y-2"
                   >
                     <p class="font-bold text-gold">
-                      {$lang === 'en'
-                        ? '🌍 Translation preview:'
-                        : '🌍 תצוגה מקדימה של תרגום:'}
+                      {$trans('mission.ai.translationPreview')}
                     </p>
                     {#if aiTranslations.he && $lang !== 'he'}
                       <p>
@@ -1269,15 +1224,13 @@
                       </p>
                     {/if}
                     <p class="text-barbi/50 text-xs">
-                      {$lang === 'en'
-                        ? 'Translations will be auto-saved after publishing.'
-                        : 'התרגומים יישמרו אוטומטית לאחר הפרסום.'}
+                      {$trans('mission.ai.autoSaveNote')}
                     </p>
                     <button
                       type="button"
                       onclick={() => (aiTranslations = null)}
                       class="px-2 py-1 rounded-full border border-gold/40 text-xs hover:bg-pink-950/30"
-                      >{$lang === 'en' ? 'Close' : 'סגור'}</button
+                      >{$trans('mission.ai.close')}</button
                     >
                   </div>
                 {/if}
@@ -1800,11 +1753,7 @@
                   onclick={() => onClose?.()}
                   class="rounded-xl border border-gold/60 px-4 py-2 text-sm text-barbi hover:bg-pink-950/30 transition-all"
                 >
-                  {$lang === 'en'
-                    ? 'Cancel'
-                    : $lang === 'ar'
-                      ? 'إلغاء'
-                      : 'ביטול'}
+                  {$trans('mission.ai.cancel')}
                 </button>
               {/if}
               <Button

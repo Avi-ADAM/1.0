@@ -214,5 +214,32 @@
   "publicLinks": "روابط عامة",
   "privatLinks": "روابط خاصة بمجموعتي",
   "linkToMission": "رابط موقع تنفيذ المهمة",
-  "noOfHours": "كم ساعة من المتوقع أن تستغرق؟"
+  "noOfHours": "كم ساعة من المتوقع أن تستغرق؟",
+  "ai": {
+    "enterNameFirst": "يرجى إدخال اسم المهمة أولًا",
+    "suggestFailed": "فشل اقتراح الذكاء الاصطناعي. حاول مرة أخرى.",
+    "suggestionsApplied": "تم تطبيق اقتراحات الذكاء الاصطناعي!",
+    "writeDescFirst": "يرجى كتابة وصف أولًا",
+    "descImproved": "تم تحسين الوصف!",
+    "improveFailed": "فشل تحسين الذكاء الاصطناعي. حاول مرة أخرى.",
+    "translateFailed": "فشلت الترجمة. حاول مرة أخرى.",
+    "missionName": "اسم المهمة",
+    "typePickTemplate": "اكتب أو اختر من قالب…",
+    "suggestTitle": "اقترح المهارات والأدوار والوصف بالذكاء الاصطناعي",
+    "suggestWithAi": "اقتراح بالذكاء الاصطناعي",
+    "suggestionsHeader": "✨ اقتراحات الذكاء الاصطناعي — انقر للتطبيق:",
+    "skillsLabel": "المهارات:",
+    "rolesLabel": "الأدوار:",
+    "workModesLabel": "أنماط العمل:",
+    "similarTemplates": "📚 عُثر على قوالب مشابهة:",
+    "applyAll": "✅ تطبيق الكل",
+    "dismiss": "إغلاق",
+    "improveWithAi": "تحسين بالذكاء",
+    "undo": "تراجع",
+    "translate": "ترجم",
+    "translationPreview": "🌍 معاينة الترجمة:",
+    "autoSaveNote": "ستُحفظ الترجمات تلقائيًا بعد النشر.",
+    "close": "إغلاق",
+    "cancel": "إلغاء"
+  }
 }
