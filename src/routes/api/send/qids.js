@@ -9019,6 +9019,39 @@ export const moachQids = {
       }
     }
   }`,
+  // Lightweight rikma-value summary for the mission-equity preview
+  // (docs/PLAN_MISSION_EQUITY_PREVIEW.md §3.1). Fetches only the numbers the
+  // equity math needs. finnished_missions is left UNFILTERED to match
+  // getProjectFinancials / the split page. Every collection carries
+  // pagination:{ limit:-1 } — Strapi's default page size is 10, which would
+  // silently truncate the totals on any real rikma.
+  'getProjectValueSummary': `query GetProjectValueSummary($pid: ID!) {
+    project(id: $pid) {
+      data {
+        id
+        attributes {
+          finnished_missions(pagination: { limit: -1 }) {
+            data { id attributes { total } }
+          }
+          rikmashes(pagination: { limit: -1 }) {
+            data { id attributes { total } }
+          }
+          mesimabetahaliches(
+            filters: { finnished: { ne: true }, forappruval: { ne: true } }
+            pagination: { limit: -1 }
+          ) {
+            data { id attributes { hoursassinged perhour } }
+          }
+          open_missions(
+            filters: { archived: { eq: false } }
+            pagination: { limit: -1 }
+          ) {
+            data { id attributes { noofhours perhour } }
+          }
+        }
+      }
+    }
+  }`,
   'getProjectProcesses': `query GetProjectProcesses($pid: ID!) {
     project(id: $pid) {
       data {

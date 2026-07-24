@@ -1,0 +1,11 @@
+{
+  "title": "Ожидаемая доля в рикме",
+  "baselineCurrent": "По текущей стоимости",
+  "baselineApproved": "С учётом одобренных и выполняемых миссий",
+  "baselinePipeline": "Если одобрят всё открытое",
+  "ofTotal": "стоимость миссии {{value}} из {{total}}",
+  "perMonthEstimate": "≈ {{amount}} ₪ в месяц",
+  "estimateDisclaimer": "Оценка по прошлым доходам",
+  "yourShareIfDone": "Ваша доля в рикме по завершении миссии",
+  "missionShareAtCreation": "Какую часть рикмы будет стоить эта миссия"
+}

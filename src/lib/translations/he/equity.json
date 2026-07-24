@@ -1,0 +1,11 @@
+{
+  "title": "שווי צפוי בריקמה",
+  "baselineCurrent": "לפי השווי הנוכחי",
+  "baselineApproved": "כולל משימות שאושרו ובביצוע",
+  "baselinePipeline": "אם יאושר כל מה שפתוח",
+  "ofTotal": "שווי משימה {{value}} מתוך {{total}}",
+  "perMonthEstimate": "≈ {{amount}} ₪ בחודש",
+  "estimateDisclaimer": "אומדן לפי הכנסות העבר",
+  "yourShareIfDone": "החלק שלך בריקמה בסיום המשימה",
+  "missionShareAtCreation": "כמה מהריקמה תהיה שווה המשימה הזו"
+}

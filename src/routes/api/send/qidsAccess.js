@@ -425,6 +425,7 @@ export const qidsAccess = {
   'getProjectMissions': { allow: ['user', 'serviceAdmin'] },
   'getMissionTemplates': { allow: ['user', 'serviceAdmin'] },
   'getProjectFinancials': { allow: ['user', 'serviceAdmin'] },
+  'getProjectValueSummary': { allow: ['user', 'serviceAdmin'] }, // mission-equity preview; serviceAdmin path serves the public availableMission page
   'getProjectProcesses': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   'getProjectVotes': { allow: ['user', 'serviceAdmin'] },
   'getOpenVoteCounts': { allow: ['user', 'serviceAdmin'] },

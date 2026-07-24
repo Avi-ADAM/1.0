@@ -7,6 +7,7 @@
   import Close from '$lib/celim/close.svelte';
   import { fly } from 'svelte/transition';
   import Tile from '$lib/celim/tile.svelte';
+  import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
   import { onMount } from 'svelte';
   import { slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
@@ -118,6 +119,7 @@
     actdata = [],
     onChat,
     onActClick,
+    projectId = null,
     bmiData: propBmiData = []
   } = $props();
   let bmiData = $state(JSON.parse(JSON.stringify(propBmiData)));
@@ -249,6 +251,9 @@
           <th class="sm:text-xl text-sm">{pro[$lang]}</th>
           <th class="sm:text-xl text-sm">{hd[$lang]}</th>
           <!--- <th class="sm:text-xl text-sm">{sho[$lang]}</th>-->
+          {#if projectId}
+            <th class="sm:text-xl text-sm">{$t('equity.yourShareIfDone')}</th>
+          {/if}
           <th class="sm:text-xl text-sm">{ro[$lang]}</th>
         </tr>
       </thead>
@@ -378,7 +383,20 @@
                       </p>
                     {/if}
                   </td>
-                  <!----<td><p class="md:text-xl text-sm">{(data.attributes.hoursassinged * data.attributes.perhour).toLocaleString('en-US', {maximumFractionDigits:2}) }</p></td>-->
+                  <!-- שווי צפוי בריקמה — החלק שלך בריקמה בסיום המשימה.
+                       המשימה כבר נספרת ב-approvedInProgressValue ⇒
+                       alreadyCountedIn="approved" (לא להוסיף V פעמיים). -->
+                  {#if projectId}
+                    <td>
+                      <EquityPreview
+                        {projectId}
+                        missionValue={(Number(data.attributes.hoursassinged) ||
+                          0) * (Number(data.attributes.perhour) || 0)}
+                        alreadyCountedIn="approved"
+                        compact={true}
+                      />
+                    </td>
+                  {/if}
                   <td>
                     {#each data.attributes.tafkidims?.data ?? [] as taf, i}
                       <Tile

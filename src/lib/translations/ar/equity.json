@@ -1,0 +1,11 @@
+{
+  "title": "الحصة المتوقعة في الريكما",
+  "baselineCurrent": "حسب القيمة الحالية",
+  "baselineApproved": "شاملة المهام المعتمدة وقيد التنفيذ",
+  "baselinePipeline": "إذا تمت الموافقة على كل المفتوح",
+  "ofTotal": "قيمة المهمة {{value}} من {{total}}",
+  "perMonthEstimate": "≈ {{amount}} ₪ شهريًا",
+  "estimateDisclaimer": "تقدير بناءً على الدخل السابق",
+  "yourShareIfDone": "حصتك في الريكما عند إتمام المهمة",
+  "missionShareAtCreation": "كم ستساوي هذه المهمة من الريكما"
+}

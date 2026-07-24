@@ -21,6 +21,7 @@
   import { updatePendsStore } from '$lib/utils/levSocketHandler';
   import { toIsoDateString } from '$lib/func/montsi.svelte';
   import { fetchBridgeResolution, openNegoBridge, readNegoBridgeReturn } from '$lib/func/negoBridge.js';
+  import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
   /**
    * @typedef {Object} Props
    * @property {any} [negopendmissions]
@@ -618,6 +619,18 @@
     />
     {#if onSubmit && candidateRound?.perhour != null && candidateRound.perhour !== perhour}
       <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} <strong>{candidateRound.perhour}</strong></p>
+    {/if}
+    <!-- שווי צפוי בריקמה — תצוגה חיה של החלק שהמשימה תהווה לפי השעות/השווי
+         שמוקלדים כרגע. המשימה כבר קיימת ב-open_missions ⇒ alreadyCountedIn="pipeline". -->
+    {#if projectId}
+      <div class="mx-2 my-2">
+        <EquityPreview
+          {projectId}
+          missionValue={(Number(noofhours2) || 0) * (Number(perhour2) || 0)}
+          alreadyCountedIn="pipeline"
+          titleKey="equity.missionShareAtCreation"
+        />
+      </div>
     {/if}
     <DateNego date={mdate} bind:dateb={mdate2} lebel={tri?.common.startDate} />
     {#if onSubmit && candidateRound?.mdate}

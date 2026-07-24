@@ -12,11 +12,13 @@
 
   // רכיבים מודרניים חדשים
   import CardHeader from './CardHeader.svelte';
+  import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
 
   /**
    * @typedef {Object} Props
    * @property {boolean} [low]
    * @property {boolean} [isVisible]
+   * @property {any} [projectId] - rikma id, forwarded to the equity preview
    * @property {any} mashName
    * @property {any} easy
    * @property {any} myp
@@ -56,6 +58,7 @@
   let {
     low = false,
     isVisible = false,
+    projectId = null,
     mashName,
     easy,
     myp,
@@ -165,6 +168,19 @@
           return rounded === 1 ? unitWord.one : `${rounded} ${unitWord.many}`;
         })()
       : ''
+  );
+
+  // Value V for the equity preview. On acceptance Rikmash.total is derived from
+  // the *accepted* value (agprice × quantity), so prefer the precomputed `total`,
+  // then the accepted value (price), then the asked value (easy). Recurring
+  // resources use the whole-window estimate (per-cycle when open-ended).
+  let equityValue = $derived(
+    recurring
+      ? (recurTotal ?? perCycle)
+      : Number(total) ||
+          Number(myRound?.price ?? price) ||
+          Number(myRound?.easy ?? easy) ||
+          0
   );
 </script>
 
@@ -420,6 +436,18 @@
           </p>
         {/if}
       </div>
+
+      <!-- שווי צפוי בריקמה — משאב פתוח אינו נמצא ב-open_missions,
+           ולכן alreadyCountedIn="none". -->
+      {#if projectId}
+        <EquityPreview
+          {projectId}
+          missionValue={equityValue}
+          alreadyCountedIn="none"
+          compact={isMobileOrTablet()}
+          onHover={hover}
+        />
+      {/if}
 
       <!-- תאריכים -->
       {#if deadLine || sqadualedf}

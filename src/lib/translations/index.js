@@ -557,6 +557,28 @@ export const config = {
             routes: [/^(?:\/he|\/en|\/ar|\/ru)?\/consensus/],
             loader: async () => (await import('./ru/consensus.json')).default,
         },
+        // equity — mission-equity preview, loaded globally (used on lev, moach
+        // and the public availableMission routes). No `routes:` restriction.
+        {
+            locale: 'he',
+            key: 'equity',
+            loader: async () => (await import('./he/equity.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'equity',
+            loader: async () => (await import('./en/equity.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'equity',
+            loader: async () => (await import('./ar/equity.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'equity',
+            loader: async () => (await import('./ru/equity.json')).default,
+        },
     ],
 };
 

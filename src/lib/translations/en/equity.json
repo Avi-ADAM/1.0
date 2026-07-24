@@ -1,0 +1,11 @@
+{
+  "title": "Projected share in the rikma",
+  "baselineCurrent": "Against the current value",
+  "baselineApproved": "Including approved & in-progress missions",
+  "baselinePipeline": "If everything open is approved",
+  "ofTotal": "mission value {{value}} of {{total}}",
+  "perMonthEstimate": "≈ ₪{{amount}} / month",
+  "estimateDisclaimer": "Estimate based on past income",
+  "yourShareIfDone": "Your share in the rikma once the mission is done",
+  "missionShareAtCreation": "How much of the rikma this mission will be worth"
+}

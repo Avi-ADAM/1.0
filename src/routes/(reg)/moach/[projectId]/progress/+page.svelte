@@ -46,6 +46,7 @@
   {#if missions}
     <Bethas
       bmiData={missions.mesimabetahaliches?.data ?? []}
+      projectId={page.params.projectId}
       onChat={handleChat}
       onActClick={handleActClick}
     />

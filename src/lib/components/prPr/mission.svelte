@@ -203,6 +203,7 @@
   import MobileModal from '$lib/celim/ui/mobileModal.svelte';
   import { page } from '$app/state';
   import LocationPicker from '$lib/components/location/LocationPicker.svelte';
+  import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
 
   let {
     pu = [],
@@ -1391,6 +1392,20 @@
                 {#if valphE}<Done />{:else}<EditIcon />{/if}</button
               >
             </div>
+            <!-- שווי צפוי בריקמה — כמה מהריקמה תהווה המשימה החדשה שנוצרת כאן.
+                 משימה חדשה שעדיין לא פורסמה ⇒ alreadyCountedIn="none".
+                 specMode/publishMode הם ללא ריקמה, ולכן projectId ריק והתצוגה מוסתרת. -->
+            {#if projectId && !specMode && !publishMode}
+              <div class="my-2">
+                <EquityPreview
+                  {projectId}
+                  missionValue={(Number(miData[0].nhours) || 0) *
+                    (Number(miData[0].valph) || 0)}
+                  alreadyCountedIn="none"
+                  titleKey="equity.missionShareAtCreation"
+                />
+              </div>
+            {/if}
             <div class="my-2">
               <mark class="text-barbi text-sm lg:text-2xl">{mf.tasksList}:</mark
               >

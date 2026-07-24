@@ -14,6 +14,7 @@
   // ייבוא רכיבים מודרניים חדשים
   import CardHeader from './CardHeader.svelte';
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
+  import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
 
   /**
    * @typedef {Object} Props
@@ -24,6 +25,7 @@
 
   let {
     low = false,
+    projectId = null,
     projectName,
     timeToP,
     acts,
@@ -342,6 +344,19 @@
         {isMonthly ? ' ' + monhly[$lang] : ''}
       </span>
     </div>
+
+    <!-- שווי צפוי בריקמה — כמה מהריקמה תהיה שווה המשימה אם תושלם היום.
+         המשימה היא אחת מ-open_missions ⇒ alreadyCountedIn="pipeline". -->
+    {#if projectId}
+      <EquityPreview
+        {projectId}
+        missionValue={(myRound?.noofhours ?? noOfHours) *
+          (myRound?.perhour ?? perhour)}
+        alreadyCountedIn="pipeline"
+        compact={isMobileOrTablet()}
+        onHover={hover}
+      />
+    {/if}
 
     <!-- תגית צפי רווח -->
     <div
