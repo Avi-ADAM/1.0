@@ -97,13 +97,13 @@
   </div>
   <div class="nav-row">
     <button class="btn-nav btn-back" onclick={back} disabled={show_value <= 1}>
-      {$lang === 'en' ? '← Back' : 'חזרה →'}
+      {$t('reg.back')}
     </button>
     <button class="btn-nav btn-skip" onclick={toend}>
-      {$lang === 'en' ? 'Skip' : 'דלג'}
+      {$t('reg.skip')}
     </button>
     <button class="btn-nav btn-next" onclick={increment}>
-      {$lang === 'en' ? 'Next →' : '← הבא'}
+      {$t('reg.next')}
     </button>
   </div>
 </div>

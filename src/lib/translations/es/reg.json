@@ -6,5 +6,8 @@
   "rolesPlaceholder": "roles preferidos",
   "skillsQuestion": "¿Qué sabes hacer?",
   "valuesPlaceholder": "valores y objetivos",
-  "workwaysPlaceholder": "formas de creación"
+  "workwaysPlaceholder": "formas de creación",
+  "back": "← Atrás",
+  "skip": "Omitir",
+  "next": "Siguiente →"
 }

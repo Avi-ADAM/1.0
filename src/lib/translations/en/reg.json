@@ -5,5 +5,8 @@
   "rolesPlaceholder": "preferred roles",
   "skillsQuestion": "What you can do?",
   "valuesPlaceholder": "values and goals",
-  "workwaysPlaceholder": "ways of creation"
+  "workwaysPlaceholder": "ways of creation",
+  "back": "← Back",
+  "skip": "Skip",
+  "next": "Next →"
 }

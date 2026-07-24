@@ -5,5 +5,8 @@
   "rolesPlaceholder": "תפקידים מועדפים",
   "skillsQuestion": "מה הן היכולות והכישורים שלך?",
   "valuesPlaceholder": "בחירת ערכים ומטרות",
-  "workwaysPlaceholder": "דרכי יצירה מתאימות"
+  "workwaysPlaceholder": "דרכי יצירה מתאימות",
+  "back": "חזרה →",
+  "skip": "דלג",
+  "next": "← הבא"
 }

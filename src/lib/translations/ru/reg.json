@@ -5,5 +5,8 @@
   "rolesPlaceholder": "предпочитаемые роли",
   "skillsQuestion": "Что вы умеете?",
   "valuesPlaceholder": "ценности и цели",
-  "workwaysPlaceholder": "способы создания"
+  "workwaysPlaceholder": "способы создания",
+  "back": "← Назад",
+  "skip": "Пропустить",
+  "next": "Далее →"
 }
