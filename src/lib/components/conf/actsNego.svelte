@@ -1,5 +1,5 @@
 <script>
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
   import Close from '$lib/celim/close.svelte';
   import { lang } from '$lib/stores/lang.js';
   import { onMount } from 'svelte';
@@ -310,7 +310,7 @@
           <div class="space-y-2 text-sm">
             <div>
               <small class:text-right={$lang === 'he'}
-                >{tr?.nego?.original[$lang]}:</small
+                >{$t('nego.original')}:</small
               >
               <div class="space-y-1">
                 {#each acts?.data && Array.isArray(acts.data) ? acts.data : [] as act}
@@ -328,7 +328,7 @@
 
             <div>
               <small class:text-right={$lang === 'he'} class="text-gold"
-                >{tr?.nego?.sugestion[$lang]}:</small
+                >{$t('nego.sugestion')}:</small
               >
               <div class="space-y-1">
                 {#each actsb as act}
@@ -349,7 +349,7 @@
             {#each old as o, i}
               <div>
                 <small class:text-right={$lang === 'he'} class="text-gold"
-                  >{tr?.nego?.oldno[$lang]}:{i + 1}</small
+                  >{$t('nego.oldno')}:{i + 1}</small
                 >
                 <div class="text-gold text-xs">{JSON.stringify(o)}</div>
               </div>

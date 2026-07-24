@@ -2,7 +2,7 @@
   import Close from '$lib/celim/close.svelte';
   import Tile from '$lib/celim/tile.svelte';
   import { lang } from '$lib/stores/lang';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
   import { MultiSelect } from 'svelte-multiselect';
   import AddNewSkill from '../addnew/addNewSkill.svelte';
   import { find_skill_id } from '$lib/func/findSkillId.svelte';
@@ -157,7 +157,7 @@
         <div class="flex flex-col align-middle justify-center">
           <button onclick={() => (show2 = false)}><Close /></button>
           <small class:text-right={$lang == 'he'}
-            >{tr?.nego.original[$lang]}:</small
+            >{$t('nego.original')}:</small
           >
           {#if datai.length > 0}
             <div
@@ -176,7 +176,7 @@
             </div>
           {/if}
           <small class:text-right={$lang == 'he'} class="text-gold"
-            >{tr?.nego.sugestion[$lang]}:</small
+            >{$t('nego.sugestion')}:</small
           >
           {#if dataib.length > 0}
             <div

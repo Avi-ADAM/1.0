@@ -1,0 +1,15 @@
+{
+  "searchValues": "חיפוש או בחירת ערכים",
+  "searchSkills": "חיפוש או בחירת כישורים",
+  "searchRoles": "חיפוש או בחירת תפקידים",
+  "searchWorkways": "חיפוש או בחירת דרכי יצירה",
+  "identicalValue": "ערך זהה כבר קיים במערכת:",
+  "identicalSkill": "כישור זהה כבר קיים במערכת:",
+  "identicalRole": "תפקיד זהה כבר קיים במערכת:",
+  "identicalWorkway": "דרך יצירה זהה כבר קיימת במערכת:",
+  "similarValue": "דומה מאוד לערך קיים:",
+  "similarSkill": "דומה מאוד לכישור קיים:",
+  "similarRole": "דומה מאוד לתפקיד קיים:",
+  "similarWorkway": "דומה מאוד לדרך יצירה קיימת:",
+  "addPrefix": "הוספת"
+}

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
 
   let {
@@ -84,20 +84,20 @@
   <!-- Legend -->
   <div class="legend">
     <div class="row">
-      <div class="dot-group"><div class="dot gold"></div><span>{tr.deals.donutCompleted[$lang]}</span></div>
-      <span class="val">{done} {tr.deals.donutMissions[$lang]}</span>
+      <div class="dot-group"><div class="dot gold"></div><span>{$t('deals.donutCompleted')}</span></div>
+      <span class="val">{done} {$t('deals.donutMissions')}</span>
     </div>
     <div class="row">
-      <div class="dot-group"><div class="dot pink"></div><span>{tr.deals.donutInProgress[$lang]}</span></div>
-      <span class="val">{inProgress} {tr.deals.donutMissions[$lang]}</span>
+      <div class="dot-group"><div class="dot pink"></div><span>{$t('deals.donutInProgress')}</span></div>
+      <span class="val">{inProgress} {$t('deals.donutMissions')}</span>
     </div>
     <div class="row">
-      <div class="dot-group"><div class="dot dim"></div><span>{tr.deals.donutNotStarted[$lang]}</span></div>
-      <span class="val">{total - done - inProgress} {tr.deals.donutMissions[$lang]}</span>
+      <div class="dot-group"><div class="dot dim"></div><span>{$t('deals.donutNotStarted')}</span></div>
+      <span class="val">{total - done - inProgress} {$t('deals.donutMissions')}</span>
     </div>
     <div class="hours">
-      <div class="hours-label">{tr.deals.donutTotalHours[$lang]}</div>
-      <div class="hours-value">{hoursDone} / {hoursTotal} {tr.deals.hoursShort[$lang]}</div>
+      <div class="hours-label">{$t('deals.donutTotalHours')}</div>
+      <div class="hours-value">{hoursDone} / {hoursTotal} {$t('deals.hoursShort')}</div>
     </div>
   </div>
 </div>

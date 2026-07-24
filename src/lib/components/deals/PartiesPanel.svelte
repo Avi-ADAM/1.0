@@ -1,13 +1,13 @@
 <script lang="ts">
   import Panel from '$lib/components/Panel.svelte';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import type { Party } from '$lib/types';
 
   let { parties }: { parties: Party[] } = $props();
 </script>
 
-<Panel title={tr.deals.partiesTitle[$lang]}>
+<Panel title={$t('deals.partiesTitle')}>
   {#each parties as p (p.name)}
     <div class="item">
       <div class="av" style={p.avatarStyle}>{p.initials}</div>
@@ -16,7 +16,7 @@
         <div class="role">{p.role}</div>
       </div>
       <div class="badge" class:active={p.status === 'active'} class:waiting={p.status === 'waiting'}>
-        {p.status === 'active' ? tr.deals.statusActive[$lang] : tr.deals.statusWaiting[$lang]}
+        {p.status === 'active' ? $t('deals.statusActive') : $t('deals.statusWaiting')}
       </div>
     </div>
   {/each}

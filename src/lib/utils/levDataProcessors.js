@@ -3,7 +3,6 @@ import { getProjectData } from '$lib/stores/projectStore.js';
 import { getOccurrence } from '$lib/func/getOccurrence.svelte';
 import { montsi } from '$lib/func/montsi.svelte';
 import { kindOfTranslation } from '$lib/func/kindOfTranslate.svelte';
-import tr from '$lib/translations/tr.json';
 
 export function letters(data) {
   let namer = [];

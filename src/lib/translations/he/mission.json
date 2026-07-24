@@ -173,5 +173,26 @@
   "sheirut": {
     "serviceCreated": "השירות נוצר בהצלחה",
     "requestSent": "בקשתך נשלחה בהצלחה"
-  }
+  },
+  "checklistadd": "הוספת פריט לרשימת מטלות",
+  "seechecklist": "צפיה ברשימת מטלות",
+  "checklist": "רשימת מטלות",
+  "perMonth": "בכל חודש:",
+  "iskvua": "האם זו משרה קבועה",
+  "addNewSkills": "בחירת כישורים נוספים ",
+  "addNewRoles": "בחירת תפקידים נוספים ",
+  "addNewww": "בחירת דרכי יצירה נוספים ",
+  "requireSkills": "כישורים נדרשים:",
+  "requiredRoles": "הגדרת תפקיד:",
+  "requiredWW": "דרכי יצירה מבוקשות:",
+  "total": "שווי סך הכל למשימה ",
+  "assingToMe": "להשים את המשימה לעצמי? ",
+  "assingHelp": "אם ריק: תפורסם משרה פנויה",
+  "assingTo": "השמת המשימה ל- ",
+  "hourlyVallue": "כמה שווה שעה ?",
+  "specialNotes": "הערות יחודיות לריקמה שלי",
+  "publicLinks": "קישורים ציבוריים",
+  "privatLinks": "קישורים יחודיים לריקמה שלי",
+  "linkToMission": "קישור לאתר בו מבוצעת המשימה ",
+  "noOfHours": "כמה שעות זה אמור לקחת?"
 }

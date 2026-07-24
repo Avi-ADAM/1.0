@@ -1,7 +1,6 @@
 ﻿<script>
   import { isRtl, t } from '$lib/translations';
   import Chaticon from '../../../celim/chaticon.svelte';
-  import tr from '$lib/translations/tr.json';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte';
@@ -416,7 +415,7 @@
   <CardHeader
     logoSrc={src}
     {projectName}
-    cardType={tr.headers.haluka[$lang]}
+    cardType={$t('headers.haluka')}
     cardTitle={missionBName}
     memberCount={user_1s?.length ||
       noofusers ||

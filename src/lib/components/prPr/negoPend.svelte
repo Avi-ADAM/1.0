@@ -1,13 +1,12 @@
 ﻿<script>
   import { isRtl } from '$lib/translations';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
   import Text from '../conf/text.svelte';
   import NumberField from '../conf/number.svelte';
   import DateNego from '../conf/dateNego.svelte';
   import TotalBar from '../conf/barb.svelte';
   import KindOfnego from '$lib/components/conf/kindOfnego.svelte';
   import LocationNego from '$lib/components/conf/locationNego.svelte';
-  const tri = tr;
   import { lang } from '$lib/stores/lang';
   import { montsi, toIsoDateString } from '$lib/func/montsi.svelte';
   import { toast } from 'svelte-sonner';
@@ -214,7 +213,7 @@
     onLoad?.();
 
     if (!onSubmit && !pendId) {
-      toast.error(tr?.toasts?.er?.[$lang] ?? 'Missing resource id');
+      toast.error($t('toasts.er') ?? 'Missing resource id');
       return;
     }
 
@@ -302,12 +301,12 @@
     if (onSubmit) {
       try {
         await onSubmit({ newValues, originalValues, hasChanges });
-        toast.success(tr?.toasts.suc[$lang]);
+        toast.success($t('toasts.suc'));
         close();
       } catch (e) {
         error1 = e;
         console.log(error1);
-        toast.error(tr?.toasts?.er?.[$lang] ?? 'Error');
+        toast.error($t('toasts.er') ?? 'Error');
       }
       return;
     }
@@ -332,15 +331,15 @@
         if (result.data?.id) {
           updatePmashesStore(result.data);
         }
-        toast.success(tr?.toasts.suc[$lang]);
+        toast.success($t('toasts.suc'));
         close();
       } else {
-        toast.error(tr?.toasts?.er?.[$lang] ?? 'Error');
+        toast.error($t('toasts.er') ?? 'Error');
       }
     } catch (e) {
       error1 = e;
       console.log(error1);
-      toast.error(tr?.toasts?.er?.[$lang] ?? 'Error');
+      toast.error($t('toasts.er') ?? 'Error');
     }
   }
   const effectiveHmNew = $derived(
@@ -388,22 +387,22 @@
 
   const datai = $derived([
     {
-      leb: `${tri?.nego?.new[$lang]},${totalNew.toLocaleString()}`,
+      leb: `${$t('nego.new')},${totalNew.toLocaleString()}`,
       value: totalNew
     },
     {
-      leb: `${tri?.nego?.original[$lang]},${totalOrig.toLocaleString()}`,
+      leb: `${$t('nego.original')},${totalOrig.toLocaleString()}`,
       value: totalOrig
     }
   ]);
 
   const dataiEasy = $derived([
     {
-      leb: `${tri?.nego?.new[$lang]},${totalEasyNew.toLocaleString()}`,
+      leb: `${$t('nego.new')},${totalEasyNew.toLocaleString()}`,
       value: totalEasyNew
     },
     {
-      leb: `${tri?.nego?.original[$lang]},${totalEasyOrig.toLocaleString()}`,
+      leb: `${$t('nego.original')},${totalEasyOrig.toLocaleString()}`,
       value: totalEasyOrig
     }
   ]);
@@ -411,7 +410,7 @@
 
 <div class="text-barbi" dir={$isRtl ? 'rtl' : 'ltr'}>
   <h1 class="md:text-center text-2xl md:text-2xl font-bold underline">
-    {onSubmit ? tri?.nego?.headMashCandidate[$lang] : tri?.nego?.headmash[$lang]}:
+    {onSubmit ? $t('nego.headMashCandidate') : $t('nego.headmash')}:
     {name1}
   </h1>
 
@@ -455,25 +454,25 @@
     </div>
   {/if}
   <div class="flex flex-col align-middle justify-center">
-    <Text text={name1} bind:textb={name2} lebel={tri?.common?.name} />
+    <Text text={name1} bind:textb={name2} lebel={$t('common.name')} />
     {#if onSubmit && candidateRound?.name && candidateRound.name !== name1}
       <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד:' : 'Candidate:'} {candidateRound.name}</p>
     {/if}
     <Rich
       text={descrip}
       bind:textb={descrip2}
-      lebel={tri?.common?.description}
+      lebel={$t('common.description')}
     />
     <Text
       text={spnot}
       bind:textb={spnot2}
       lebel={{ he: 'הערות מיוחדות', en: 'Special notes' }}
     />
-    <Text text={linkto} bind:textb={linkto2} lebel={tri?.mash?.linkto} />
-    <KindOfnego {kindOf} bind:kindOfb lebel={tri?.mash.kindof} />
+    <Text text={linkto} bind:textb={linkto2} lebel={$t('mash.linkto')} />
+    <KindOfnego {kindOf} bind:kindOfb lebel={$t('mash.kindof')} />
 
     {#if !(kindOf == 'total' && kindOfb == 'total')}
-      <NumberField number={hm} bind:numberb={hm2} lebel={tri?.mash?.noof[$lang]} />
+      <NumberField number={hm} bind:numberb={hm2} lebel={$t('mash.noof')} />
       {#if onSubmit && candidateRound?.hm != null && candidateRound.hm !== hm}
         <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} <strong>{candidateRound.hm}</strong></p>
       {/if}
@@ -481,7 +480,7 @@
     <NumberField
       number={price}
       bind:numberb={price2}
-      lebel={tri?.mash?.shovi[$lang]}
+      lebel={$t('mash.shovi')}
     />
     {#if onSubmit && candidateRound?.price != null && candidateRound.price !== price}
       <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} <strong>{candidateRound.price}</strong></p>
@@ -489,7 +488,7 @@
     <NumberField
       number={easy}
       bind:numberb={easy2}
-      lebel={tri?.mash?.shovile[$lang]}
+      lebel={$t('mash.shovile')}
     />
     {#if onSubmit && candidateRound?.easy != null && candidateRound.easy !== easy}
       <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} <strong>{candidateRound.easy}</strong></p>
@@ -498,7 +497,7 @@
       <DateNego
         date={sqadualed}
         bind:dateb={sqadualed2}
-        lebel={tri?.common.startDate}
+        lebel={$t('common.startDate')}
       />
       {#if onSubmit && candidateRound?.sqadualed}
         <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} {new Date(candidateRound.sqadualed).toLocaleDateString($lang)}</p>
@@ -506,7 +505,7 @@
       <DateNego
         date={sqadualedf}
         bind:dateb={sqadualedf2}
-        lebel={tri?.common.finishDate}
+        lebel={$t('common.finishDate')}
       />
       {#if onSubmit && candidateRound?.sqadualedf}
         <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} {new Date(candidateRound.sqadualedf).toLocaleDateString($lang)}</p>
@@ -558,7 +557,7 @@
 
     <!---<div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
     <div class="flex flex-row align-middle justify-center gap-x-2">
-        <h2 class="underline decoration-mturk">{tr?.mission.iskvua[$lang]}: </h2>
+        <h2 class="underline decoration-mturk">{$t('mission.iskvua')}: </h2>
   <input
     bind:checked={isKavua2}
     type="checkbox" id="tomeC" name="isKavua2" >
@@ -567,7 +566,7 @@
 
 <div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
     <div class="flex flex-row align-middle justify-center gap-x-2">
-        <h2 class="underline decoration-mturk">{tr?.mission.assingToMe[$lang]}: </h2>
+        <h2 class="underline decoration-mturk">{$t('mission.assingToMe')}: </h2>
   <input
     bind:checked={myM}
     type="checkbox" id="tomeC" name="tome" value="tome" onclick={()=> myMission()}>
@@ -581,16 +580,16 @@
       {#if recurring2}
         {$lang === 'en' ? 'Estimated cost per cycle' : 'עלות משוערת למחזור'}
       {:else}
-        {tri?.mash.tota[$lang]}
+        {$t('mash.tota')}
       {/if}
     </h2>
     {#if valuesChanged}
       <div class="flex flex-col gap-2">
         <div>
           <p class="text-gold">
-            {tri?.mash?.shovi[$lang]}: {totalNew.toLocaleString()}
+            {$t('mash.shovi')}: {totalNew.toLocaleString()}
             <span class="text-barbi text-sm">
-              ({tri?.nego?.original[$lang]}: {totalOrig.toLocaleString()})
+              ({$t('nego.original')}: {totalOrig.toLocaleString()})
             </span>
           </p>
           {#key chartKey}
@@ -602,9 +601,9 @@
         {#if Number(easy) !== Number(easy2) || Number(price) !== Number(price2)}
           <div>
             <p class="text-gold">
-              {tri?.mash?.shovile[$lang]}: {totalEasyNew.toLocaleString()}
+              {$t('mash.shovile')}: {totalEasyNew.toLocaleString()}
               <span class="text-barbi text-sm">
-                ({tri?.nego?.original[$lang]}: {totalEasyOrig.toLocaleString()})
+                ({$t('nego.original')}: {totalEasyOrig.toLocaleString()})
               </span>
             </p>
             {#key `${chartKey}-easy`}
@@ -618,7 +617,7 @@
     {:else if totalNew > 0}
       {totalNew.toLocaleString()}
       {#if Number(price2) !== Number(easy2)}
-        {tri?.mash?.shovile[$lang]}:
+        {$t('mash.shovile')}:
         {totalEasyNew.toLocaleString()}
       {/if}
     {:else}
@@ -631,7 +630,7 @@
       onclick={increment}
       class="mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
       type="submit"
-      name="addm">{onSubmit ? tri?.nego?.submitProposal[$lang] : tri?.common.puttovote[$lang]}</button
+      name="addm">{onSubmit ? $t('nego.submitProposal') : $t('common.puttovote')}</button
     >
     <button
       onclick={openBridge}

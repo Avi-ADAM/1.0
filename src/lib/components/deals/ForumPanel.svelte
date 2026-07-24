@@ -1,6 +1,6 @@
 <script lang="ts">
   import Panel from '$lib/components/Panel.svelte';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import type { ForumMessage, AuthorType } from '$lib/types';
 
@@ -13,7 +13,7 @@
   };
 </script>
 
-<Panel title={tr.deals.latestUpdates[$lang]} actionLabel={tr.deals.fullThread[$lang]}>
+<Panel title={$t('deals.latestUpdates')} actionLabel={$t('deals.fullThread')}>
   {#each messages as m (m.id)}
     <div class="msg">
       <div class="av" style={AVATAR_STYLE[m.authorType]}>{m.initials}</div>

@@ -57,7 +57,7 @@
 
   onDestroy(() => socketUnsub?.());
 
-  import tr from '$lib/translations/tr.json';
+  import { t as trans } from '$lib/translations';
 
   const i18n = {
     he: { title: 'הצבעות פתוחות', splitVotes: 'הצבעות חלוקה', joinVotes: 'בקשות הצטרפות', resourceJoinVotes: 'בקשות צירוף משאב', decisionVotes: 'החלטות', resourceProposals: 'הצעות משאב', missionProposals: 'הצעות משימה', votes: 'הצבעות', toVote: 'להצבעה', noneOpen: 'אין הצבעות פתוחות כרגע 🎉' },
@@ -66,7 +66,9 @@
   };
   function decisionLabel(decision) {
     const kind = decision?.attributes?.kind;
-    return tr?.headers?.[kind]?.[$lang] || decision?.attributes?.newname || kind || '—';
+    const label = $trans(`headers.${kind}`);
+    if (label && label !== `headers.${kind}`) return label;
+    return decision?.attributes?.newname || kind || '—';
   }
   let t = $derived(i18n[$lang] || i18n.en);
 

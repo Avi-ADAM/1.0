@@ -1,0 +1,18 @@
+{
+  "votes": "Голоса",
+  "urgent": "Срочно",
+  "suggestions": "Предложения",
+  "purchases": "Покупки",
+  "sales": "Продажи",
+  "activitySummary": "Сводка активности",
+  "urgentVoteMsg": "срочное голосование скоро завершится!",
+  "handleBtn": "Обработать",
+  "customPurchaseText": "Создайте индивидуальную покупку",
+  "customPurchaseSub": "Опишите, что вам нужно, и найдите партнёров",
+  "startBtn": "Начать",
+  "noActivity": "Сейчас нет активности",
+  "demandMapTitle": "Карта спроса",
+  "demandMapSub": "Что люди ищут и предлагают прямо сейчас — пулы и переплетения вместе",
+  "demandMapItems": "активных элементов",
+  "demandMapBtn": "Открыть карту"
+}

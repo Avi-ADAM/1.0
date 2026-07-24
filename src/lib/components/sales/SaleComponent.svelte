@@ -9,7 +9,7 @@
   import { executeAction } from '$lib/client/actionClient';
   import { shadowSignFromCookie } from '$lib/client/shadowSign';
   import { createSaleConsentSpec } from '$lib/consent/specs/createSale';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
 
   /**
    * @typedef {Object} Props
@@ -56,7 +56,6 @@
   // money already moved ("שולם") so no customer confirmation is needed; on a
   // standing order the customer confirms their transfer every month.
   let customerIdentifier = $state('');
-  let placeholder = tr.sales.withWhomMoney;
   let already = $state(false);
   let per = $state(false);
   let dates = $state(null);
@@ -113,14 +112,14 @@
   async function add() {
     if (selected[0] == null) {
       noSelectedE = true;
-      toast.error(noSelected[$lang]);
+      toast.error($t('sales.noUserSelected'));
       return;
     }
 
     if (kindOf === 'monthly' || kindOf === 'yearly') {
       if (dates === null) {
         datesE = true;
-        toast.warning(datesEmessage[$lang]);
+        toast.warning($t('sales.noStartDate'));
         return;
       }
       datesE = false;
@@ -195,7 +194,7 @@
       }
     } catch (e) {
       console.log('Sale error:', e);
-      const errorMessage = e.message || tr.sales.saleError[$lang];
+      const errorMessage = e.message || $t('sales.saleError');
       onError?.(errorMessage, currentOperationId);
     } finally {
       currentOperationId = null;
@@ -204,20 +203,6 @@
   }
 
   // Localization strings
-  const change = tr.sales.changeSaleDate;
-  const quantT = tr.sales.howManyUnits;
-  const forEachT = tr.sales.howManyPerUnit;
-  const perMonth = tr.sales.perMonth;
-  const perYear = tr.sales.perYear;
-  const datesEmessage = tr.sales.noStartDate;
-  const noFinnish = tr.sales.noEndDate;
-  const noSelected = tr.sales.noUserSelected;
-  const start = tr.sales.startDate;
-  const end = tr.sales.endDate;
-  const addL = tr.sales.addSale;
-  const totalT = tr.sales.total;
-  const noteT = tr.sales.noteOptional;
-  const notePlaceholder = tr.sales.notePlaceholder;
 
   $effect(() => {
     dayjs.locale($lang);
@@ -256,35 +241,35 @@
   {#if kindOf !== 'total'}
     <NumberInput
       bind:value={hm}
-      topLebel={quantT[$lang]}
+      topLebel={$t('sales.howManyUnits')}
       barbi={true}
       noNegative={true}
       noMoreThen={availableQuantity === -1 ? undefined : availableQuantity}
     />
   {/if}
-  <NumberInput bind:value={each} topLebel={forEachT[$lang]} barbi={true} noNegative={true} />
+  <NumberInput bind:value={each} topLebel={$t('sales.howManyPerUnit')} barbi={true} noNegative={true} />
 
   {#if kindOf == 'monthly' || kindOf == 'yearly'}
-    <small class="text-barbi text-center">{start[$lang]}</small>
+    <small class="text-barbi text-center">{$t('sales.startDate')}</small>
     <input
       class="bg-gold hover:bg-mtork border-2 border-barbi rounded text-barbi"
       type="datetime-local"
-      placeholder={start[$lang]}
+      placeholder={$t('sales.startDate')}
       bind:value={dates}
     />
     {#if datesE}
-      <small class="text-barbi text-cente"><mark>{datesEmessage[$lang]}</mark></small>
+      <small class="text-barbi text-cente"><mark>{$t('sales.noStartDate')}</mark></small>
     {/if}
-    <small class="text-barbi text-center">{end[$lang]}</small>
+    <small class="text-barbi text-center">{$t('sales.endDate')}</small>
     <input
       class="bg-gold hover:bg-mtork border-2 border-barbi rounded text-barbi"
       type="datetime-local"
-      placeholder={end[$lang]}
+      placeholder={$t('sales.endDate')}
       bind:value={datef}
       min={dates}
     />
     {#if datef === null}
-      <small class="text-barbi text-center "><mark>{noFinnish[$lang]}</mark></small>
+      <small class="text-barbi text-center "><mark>{$t('sales.noEndDate')}</mark></small>
     {/if}
   {/if}
 
@@ -316,7 +301,7 @@
   </small>
 
   <div class="grid justify-center align-center ">
-    <h3 class="text-center text-barbi">{change[$lang]}</h3>
+    <h3 class="text-center text-barbi">{$t('sales.changeSaleDate')}</h3>
     <Datepicker
       bind:store
       {theme}
@@ -331,21 +316,21 @@
       liSelectedClass="!bg-barbi !text-gold"
       maxSelect={1}
       bind:selected
-      placeholder={placeholder[$lang]}
+      placeholder={$t('sales.withWhomMoney')}
       options={projectUsers.map((c) => c.attributes.username)}
     />
     {#if noSelectedE}
-      <small class="text-barbi text-center"><mark>{noSelected[$lang]}</mark></small>
+      <small class="text-barbi text-center"><mark>{$t('sales.noUserSelected')}</mark></small>
     {/if}
   </div>
 
   <!-- Note input -->
   <div class="mt-4">
-    <small class="text-barbi text-center block mb-2">{noteT[$lang]}</small>
+    <small class="text-barbi text-center block mb-2">{$t('sales.noteOptional')}</small>
     <textarea
       class="w-full bg-gold hover:bg-mtork border-2 border-barbi rounded p-2 text-barbi placeholder-barbi/70 resize-none"
       rows="3"
-      placeholder={notePlaceholder[$lang]}
+      placeholder={$t('sales.notePlaceholder')}
       bind:value={note}
       maxlength="500"
     ></textarea>
@@ -354,9 +339,9 @@
     {/if}
   </div>
   <small class="text-barbi text-center"
-    >{totalT[$lang]}
+    >{$t('sales.total')}
     {#if per == true}
-      {kindOf === 'monthly' ? perMonth[$lang] : perYear[$lang]}
+      {kindOf === 'monthly' ? $t('sales.perMonth') : $t('sales.perYear')}
     {/if}
   </small>
   <p class="text-center text-barbi">{total}</p>
@@ -368,7 +353,7 @@
         class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"
         onclick={add}
       >
-        {addL[$lang]}
+        {$t('sales.addSale')}
       </button>
     </div>
   {/if}

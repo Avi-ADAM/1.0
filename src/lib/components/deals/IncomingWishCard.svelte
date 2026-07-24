@@ -1,6 +1,6 @@
 ﻿<script lang="ts">
   import { isRtl } from '$lib/translations';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import { invalidateAll } from '$app/navigation';
   import AcceptWishOffer from '$lib/components/concierge/AcceptWishOffer.svelte';
@@ -31,10 +31,10 @@
   // kind → a human label. 'partial' = a resource/slice was requested,
   // 'existing_project' = the wisher invited the member's weave/skill.
   const KIND_LABEL = $derived<Record<string, string>>({
-    existing_project: tr.deals.inviteKindPerson[$lang],
-    partial: tr.deals.inviteKindResource[$lang]
+    existing_project: $t('deals.inviteKindPerson'),
+    partial: $t('deals.inviteKindResource')
   });
-  const kindLabel = $derived(KIND_LABEL[wish.kind] ?? tr.deals.inviteKindPerson[$lang]);
+  const kindLabel = $derived(KIND_LABEL[wish.kind] ?? $t('deals.inviteKindPerson'));
 
   const isNew = $derived(wish.status === 'suggested');
 
@@ -44,9 +44,9 @@
   }
 
   function formatDate(iso?: string) {
-    if (!iso) return tr.deals.flexible[$lang];
+    if (!iso) return $t('deals.flexible');
     const d = new Date(iso);
-    if (isNaN(d.getTime())) return tr.deals.flexible[$lang];
+    if (isNaN(d.getTime())) return $t('deals.flexible');
     return `${d.getDate()}.${d.getMonth() + 1}.${String(d.getFullYear()).slice(2)}`;
   }
 
@@ -63,12 +63,12 @@
   <div class="toper">
     <span class="gem-badge">
       <span class="gem"></span>
-      {tr.deals.incomingWish[$lang]}
+      {$t('deals.incomingWish')}
     </span>
     {#if isNew}
-      <span class="badge new">● {tr.deals.inviteNew[$lang]}</span>
+      <span class="badge new">● {$t('deals.inviteNew')}</span>
     {:else}
-      <span class="badge">{tr.deals.inviteViewed[$lang]}</span>
+      <span class="badge">{$t('deals.inviteViewed')}</span>
     {/if}
   </div>
 
@@ -80,8 +80,8 @@
       <span class="avatar fallback">{initials(wish.wisherName)}</span>
     {/if}
     <div class="wisher-body">
-      <div class="wisher-name">{wish.wisherName || tr.deals.aWisher[$lang]}</div>
-      <div class="wisher-sub">{tr.deals.invitedYou[$lang]}</div>
+      <div class="wisher-name">{wish.wisherName || $t('deals.aWisher')}</div>
+      <div class="wisher-sub">{$t('deals.invitedYou')}</div>
     </div>
   </div>
 
@@ -99,21 +99,21 @@
 
   <div class="meta">
     <div class="meta-item">
-      <div class="ml">{tr.deals.inviteBudget[$lang]}</div>
+      <div class="ml">{$t('deals.inviteBudget')}</div>
       <div class="mv gold">
         {wish.totalBounti != null
           ? `₪ ${Number(wish.totalBounti).toLocaleString()}`
-          : tr.deals.byOffer[$lang]}
+          : $t('deals.byOffer')}
       </div>
     </div>
     <div class="meta-item">
-      <div class="ml">{tr.deals.inviteWhen[$lang]}</div>
+      <div class="ml">{$t('deals.inviteWhen')}</div>
       <div class="mv">{formatDate(wish.startDate)}</div>
     </div>
   </div>
 
   <button class="cta" onclick={(e) => { e.stopPropagation(); openOffer(); }}>
-    {tr.deals.inviteRespond[$lang]} →
+    {$t('deals.inviteRespond')} →
   </button>
 </div>
 

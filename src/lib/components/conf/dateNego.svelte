@@ -1,7 +1,7 @@
 <script>
 import SveltyPicker from 'svelty-picker'
 
-import tr from '$lib/translations/tr.json'
+  import { t } from '$lib/translations';
   import Close from '$lib/celim/close.svelte';
 import { lang } from '$lib/stores/lang.js'
   import { onMount } from 'svelte';
@@ -69,7 +69,7 @@ function checkAll (a, b){
 
     {#if edit == false}
     <div class="flex flex-row align-middle justify-center gap-x-2">
-        <h2 class="underline decoration-mturk">{lebel[$lang]}: </h2>
+        <h2 class="underline decoration-mturk">{(typeof lebel === 'string' ? lebel : lebel?.[$lang])}: </h2>
         <p class="text-gold">{@html htmlon}</p><button onclick={()=>edit = true}>
             {#if date == dateb}🖍️{:else}✏️{/if}</button>
         {#if date != dateb && show2 != true}
@@ -77,9 +77,9 @@ function checkAll (a, b){
         {:else if show2 == true}
         <div class="flex flex-col align-middle justify-center ">
         <button onclick={()=>show2 = false}><Close/></button>
-        <small class:text-right={$lang == "he"}>{tr?.nego.original[$lang]}:</small>
+        <small class:text-right={$lang == "he"}>{$t('nego.original')}:</small>
         <p>{fdate.toLocaleDateString($lang)}</p>
-        <small class:text-right={$lang == "he"} class="text-gold">{tr?.nego.sugestion[$lang]}:</small>
+        <small class:text-right={$lang == "he"} class="text-gold">{$t('nego.sugestion')}:</small>
         <p class="text-gold">{fdateb.toLocaleDateString($lang)}</p>
         </div>
         {/if}
@@ -87,7 +87,7 @@ function checkAll (a, b){
 {:else}
 
 <div dir="rtl" class=' max-w-sm mx-auto'>
-  <small>{lebel[$lang]}</small>
+  <small>{(typeof lebel === 'string' ? lebel : lebel?.[$lang])}</small>
 
     <SveltyPicker
       inputClasses="form-control"

@@ -4,7 +4,6 @@
   import { get } from 'svelte/store';
   import { lang } from '$lib/stores/lang';
   import { t, isRtl} from '$lib/translations';
-  import tr from '$lib/translations/tr.json';
   import Text from '../conf/text.svelte';
   import SkillSelector from '../ui/SkillSelector.svelte';
   import RoleSelector from '../ui/RoleSelector.svelte';
@@ -128,11 +127,11 @@
   $effect(() => {
     const items = [
       {
-        leb: `${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,
+        leb: `${$t('nego.new')},${noofhours2 * perhour2}`,
         value: noofhours2 * perhour2
       },
       {
-        leb: `${tri?.nego?.original[$lang]},${noofhours * perhour}`,
+        leb: `${$t('nego.original')},${noofhours * perhour}`,
         value: noofhours * perhour
       }
     ];
@@ -143,7 +142,7 @@
           negopendmissions[i].attributes.noofhours != null
         ) {
           items.push({
-            leb: `${tri?.nego?.oldno[$lang]}-${i + 1}, ${(negopendmissions[i].attributes.noofhours ?? noofhours) * (negopendmissions[i].attributes.perhour ?? perhour)}`,
+            leb: `${$t('nego.oldno')}-${i + 1}, ${(negopendmissions[i].attributes.noofhours ?? noofhours) * (negopendmissions[i].attributes.perhour ?? perhour)}`,
             value:
               (negopendmissions[i].attributes.noofhours ?? noofhours) *
               (negopendmissions[i].attributes.perhour ?? perhour)
@@ -154,7 +153,6 @@
     datai = items;
   });
   console.log(negopendmissions);
-  const tri = tr;
   let isKavua2 = $state();
 
   let error1;
@@ -440,12 +438,12 @@
     if (onSubmit) {
       try {
         await onSubmit({ newValues, originalValues });
-        toast.success(tr?.toasts.suc[$lang]);
+        toast.success($t('toasts.suc'));
         close();
       } catch (e) {
         error1 = e;
         console.log(error1);
-        toast.warning(tr?.toasts.er[$lang]);
+        toast.warning($t('toasts.er'));
       }
       return;
     }
@@ -491,15 +489,15 @@
         if ((isAsk ?? 0) === 0 && result.data?.id) {
           updatePendsStore(result.data);
         }
-        toast.success(tr?.toasts.suc[$lang]);
+        toast.success($t('toasts.suc'));
         close();
       } else {
-        toast.warning(tr?.toasts.er[$lang]);
+        toast.warning($t('toasts.er'));
       }
     } catch (e) {
       error1 = e;
       console.log(error1);
-      toast.warning(tr?.toasts.er[$lang]);
+      toast.warning($t('toasts.er'));
     }
   }
   onMount(() => {
@@ -517,57 +515,57 @@
 
 <div class="text-barbi" dir={$isRtl ? 'rtl' : 'ltr'}>
   <h1 class="md:text-center text-2xl md:text-2xl font-bold underline">
-    {onSubmit ? tri?.nego?.headMissionCandidate[$lang] : tri?.nego?.head[$lang]}:
+    {onSubmit ? $t('nego.headMissionCandidate') : $t('nego.head')}:
     {name1}
   </h1>
   <div class="flex flex-col align-middle justify-center">
     <Text
       text={name1}
       bind:textb={name2}
-      lebel={tri?.common?.name}
+      lebel={$t('common.name')}
       old={negopendmissions.map((c) => c?.attributes?.name)}
     />
     <Rich
       old={negopendmissions.map((c) => c?.attributes?.descrip)}
       text={descrip}
       bind:textb={descrip2}
-      lebel={tri?.common?.description}
+      lebel={$t('common.description')}
     />
     <div class="m-2">
       <h3 class="text-center text-sm text-barbi underline decoration-mturk">
-        {tri?.mission?.requireSkills?.[$lang]}
+        {$t('mission.requireSkills')}
       </h3>
       <SkillSelector
         bind:selectedSkills
-        placeholder={tri?.mission?.addNewSkills?.[$lang]}
+        placeholder={$t('mission.addNewSkills')}
         autoCreate={true}
       />
     </div>
     <div class="m-2">
       <h3 class="text-center text-sm text-barbi underline decoration-mturk">
-        {tri?.mission?.requiredRoles?.[$lang]}
+        {$t('mission.requiredRoles')}
       </h3>
       <RoleSelector
         bind:selectedRoles
-        placeholder={tri?.mission?.addNewRoles?.[$lang]}
+        placeholder={$t('mission.addNewRoles')}
         autoCreate={true}
       />
     </div>
     <div class="m-2">
       <h3 class="text-center text-sm text-barbi underline decoration-mturk">
-        {tri?.mission?.requiredWW?.[$lang]}
+        {$t('mission.requiredWW')}
       </h3>
       <WorkwaySelector
         bind:selectedWorkways
-        placeholder={tri?.mission?.addNewww?.[$lang]}
+        placeholder={$t('mission.addNewww')}
         autoCreate={true}
       />
     </div>
-    <!----<Text long={true} text={hearotMeyuchadot} bind:textb={hearotMeyuchadot2} lebel={tri?.mission?.specialNotes}/>
+    <!----<Text long={true} text={hearotMeyuchadot} bind:textb={hearotMeyuchadot2} lebel={$t('mission.specialNotes')}/>
             --><Text
       text={privatlinks}
       bind:textb={privatlinks2}
-      lebel={tri?.mission?.linkToMission}
+      lebel={$t('mission.linkToMission')}
     />
     {#if onSubmit && candidateRound}
       {@const candTot = (candidateRound.noofhours ?? noofhours) * (candidateRound.perhour ?? perhour)}
@@ -598,7 +596,7 @@
       old={negopendmissions.map((c) => c?.attributes?.noofhours)}
       number={noofhours}
       bind:numberb={noofhours2}
-      lebel={`${tri?.mission?.noOfHours[$lang]} ${isKavua == true && isKavua2 == true ? tri?.mission.perMonth[$lang] : ''}`}
+      lebel={`${$t('mission.noOfHours')} ${isKavua == true && isKavua2 == true ? $t('mission.perMonth') : ''}`}
       splebel={isKavua == true && isKavua2 == true
         ? null
         : isKavua == true && isKavua2 == false
@@ -614,19 +612,19 @@
       old={negopendmissions.map((c) => c?.attributes?.perhour)}
       number={perhour}
       bind:numberb={perhour2}
-      lebel={tri?.mission?.hourlyVallue[$lang]}
+      lebel={$t('mission.hourlyVallue')}
     />
     {#if onSubmit && candidateRound?.perhour != null && candidateRound.perhour !== perhour}
       <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} <strong>{candidateRound.perhour}</strong></p>
     {/if}
-    <DateNego date={mdate} bind:dateb={mdate2} lebel={tri?.common.startDate} />
+    <DateNego date={mdate} bind:dateb={mdate2} lebel={$t('common.startDate')} />
     {#if onSubmit && candidateRound?.mdate}
       <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} {new Date(candidateRound.mdate).toLocaleDateString($lang)}</p>
     {/if}
     <DateNego
       date={mdates}
       bind:dateb={mdates2}
-      lebel={tri?.common.finishDate}
+      lebel={$t('common.finishDate')}
     />
     {#if onSubmit && candidateRound?.mdates}
       <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} {new Date(candidateRound.mdates).toLocaleDateString($lang)}</p>
@@ -643,7 +641,7 @@
       class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2"
     >
       <div class="flex flex-row align-middle justify-center gap-x-2">
-        <h2 class="underline decoration-mturk">{tr?.mission.iskvua[$lang]}:</h2>
+        <h2 class="underline decoration-mturk">{$t('mission.iskvua')}:</h2>
         <input
           bind:checked={isKavua2}
           type="checkbox"
@@ -655,7 +653,7 @@
     <!---
 <div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
     <div class="flex flex-row align-middle justify-center gap-x-2">
-        <h2 class="underline decoration-mturk">{tr?.mission.assingToMe[$lang]}: </h2>
+        <h2 class="underline decoration-mturk">{$t('mission.assingToMe')}: </h2>
   <input
     bind:checked={myM}
     type="checkbox" id="tomeC" name="tome" value="tome" onclick={()=> myMission()}>
@@ -665,7 +663,7 @@
   <div
     class="border border-gold border-opacity-80 rounded m-2 flex flex-col align-middle justify-center gap-x-2"
   >
-    <h2 class="underline decoration-mturk">{tri?.mission.total[$lang]}</h2>
+    <h2 class="underline decoration-mturk">{$t('mission.total')}</h2>
     {#if noofhours == noofhours2 && perhour == perhour2}
       {#if noofhours > 0 && perhour > 0}
         {noofhours * perhour}
@@ -682,8 +680,8 @@
 <table dir="rtl" >
       <tr class="ggr">
         <th class="ggr" > </th>
-        <td class="ggr">{tri?.nego?.original[$lang]}</td>
-        <td class="ggr">{tri?.nego?.new[$lang]}</td>
+        <td class="ggr">{$t('nego.original')}</td>
+        <td class="ggr">{$t('nego.new')}</td>
     </tr> 
    <tr>
                    <th>שווי סך הכל למשימה </th>
@@ -776,7 +774,7 @@
       onclick={increment}
       class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
       type="submit"
-      name="addm">{onSubmit ? tri?.nego?.submitProposal[$lang] : tri?.common.puttovote[$lang]}</button
+      name="addm">{onSubmit ? $t('nego.submitProposal') : $t('common.puttovote')}</button
     >
     <button
       onclick={openBridge}

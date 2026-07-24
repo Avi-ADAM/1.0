@@ -1,0 +1,15 @@
+{
+  "searchValues": "ابحث أو اختر قيماً",
+  "searchSkills": "ابحث أو اختر مهارات",
+  "searchRoles": "ابحث أو اختر أدواراً",
+  "searchWorkways": "ابحث أو اختر طرق العمل",
+  "identicalValue": "قيمة مطابقة موجودة بالفعل:",
+  "identicalSkill": "مهارة مطابقة موجودة بالفعل:",
+  "identicalRole": "دور مطابق موجود بالفعل:",
+  "identicalWorkway": "طريقة عمل مطابقة موجودة بالفعل:",
+  "similarValue": "مشابه جداً لقيمة موجودة:",
+  "similarSkill": "مشابه جداً لمهارة موجودة:",
+  "similarRole": "مشابه جداً لدور موجود:",
+  "similarWorkway": "مشابه جداً لطريقة عمل موجودة:",
+  "addPrefix": "إضافة"
+}

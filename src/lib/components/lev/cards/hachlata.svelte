@@ -1,7 +1,7 @@
 ﻿<script>
   import { isRtl } from '$lib/translations';
   import { toggleScrollable, isScrolable } from './isScrolable.svelte.js';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
   import { onMount } from 'svelte';
   import Lev from '../../../celim/lev.svelte';
   import { lang } from '$lib/stores/lang.js';
@@ -310,7 +310,7 @@
   <CardHeader
     logoSrc={src}
     {projectName}
-    cardType={tr?.headers[kind]?.[$lang] || kind}
+    cardType={$t(`headers.${kind}`) || kind}
     cardTitle={kind === 'sheirutpends' &&
     spdata?.sheirut?.data?.attributes?.name
       ? spdata.sheirut.data.attributes.name

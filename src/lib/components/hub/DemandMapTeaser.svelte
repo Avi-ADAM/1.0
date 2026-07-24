@@ -4,13 +4,12 @@
    * maagad's live demand & supply, one glance and one tap from the hub.
    */
   import { lang } from '$lib/stores/lang.js';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
   import type { HubDemandSummary } from '../../../routes/(reg)/hub/+page.server';
 
   let { demand }: { demand: HubDemandSummary } = $props();
 
-  const L = (key: keyof typeof tr.hub) =>
-    (tr.hub[key] as Record<string, string>)[$lang] ?? (tr.hub[key] as Record<string, string>).en;
+  const L = (key: string): string => $t(`hub.${key}`);
 
   let labels = $derived({
     title: L('demandMapTitle'),

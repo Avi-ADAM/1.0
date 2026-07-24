@@ -173,5 +173,26 @@
   "sheirut": {
     "serviceCreated": "تم إنشاء الخدمة بنجاح",
     "requestSent": "تم إرسال طلبك بنجاح"
-  }
+  },
+  "checklistadd": "إضافة عنصر إلى قائمة المهام",
+  "seechecklist": "عرض قائمة المهام",
+  "checklist": "قائمة المهام",
+  "perMonth": "كل شهر:",
+  "iskvua": "هل هذه وظيفة دائمة",
+  "addNewSkills": "إضافة مزيد من المهارات",
+  "addNewRoles": "إضافة مزيد من الأدوار",
+  "addNewww": "إضافة مزيد من طرق الإنشاء",
+  "requireSkills": "المهارات المطلوبة:",
+  "requiredRoles": "الدور:",
+  "requiredWW": "طرق الإنشاء المطلوبة للمهمة:",
+  "total": "إجمالي قيمة المهمة",
+  "assingToMe": "هل ستنجز المهمة بنفسك؟",
+  "assingHelp": "إذا كان فارغاً: سيتم نشر منصب شاغر",
+  "assingTo": "تعيين هذه المهمة إلى -",
+  "hourlyVallue": "معدل الساعة",
+  "specialNotes": "ملاحظات خاصة بمجموعتي",
+  "publicLinks": "روابط عامة",
+  "privatLinks": "روابط خاصة بمجموعتي",
+  "linkToMission": "رابط موقع تنفيذ المهمة",
+  "noOfHours": "كم ساعة من المتوقع أن تستغرق؟"
 }

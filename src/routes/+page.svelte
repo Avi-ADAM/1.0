@@ -1,14 +1,14 @@
 <script>
   import Fpage from '$lib/components/main/fpage.svelte';
   import { lang } from '$lib/stores/lang.js';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
 </script>
 
 <svelte:head>
-  <title>{tr.pages.homeTitle[$lang]}</title>
-  <meta name="description" content={tr.pages.homeDescription[$lang]} />
-  <meta property="og:title" content={tr.pages.homeTitle[$lang]} />
-  <meta property="og:description" content={tr.pages.homeDescription[$lang]} />
+  <title>{$t('pages.homeTitle')}</title>
+  <meta name="description" content={$t('pages.homeDescription')} />
+  <meta property="og:title" content={$t('pages.homeTitle')} />
+  <meta property="og:description" content={$t('pages.homeDescription')} />
   <meta property="og:type" content="website" />
 </svelte:head>
 

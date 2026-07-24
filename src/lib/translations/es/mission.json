@@ -174,5 +174,26 @@
   "sheirut": {
     "serviceCreated": "el servicio se creó correctamente",
     "requestSent": "tu solicitud se envió correctamente"
-  }
+  },
+  "checklistadd": "añadir elemento a la lista de tareas",
+  "seechecklist": "ver la lista de tareas",
+  "checklist": "lista de tareas",
+  "perMonth": "al mes:",
+  "iskvua": "¿es un trabajo constante?",
+  "addNewSkills": "añadir más habilidades",
+  "addNewRoles": "añadir más roles",
+  "addNewww": "añadir más formas de creación",
+  "requireSkills": "habilidades requeridas:",
+  "requiredRoles": "rol:",
+  "requiredWW": "formas de creación para la misión:",
+  "total": "valor total de la misión",
+  "assingToMe": "¿vas a realizar la misión?",
+  "assingHelp": "si se deja vacío: se publicará un puesto disponible",
+  "assingTo": "asignar esta misión a -",
+  "hourlyVallue": "tarifa por hora",
+  "specialNotes": "notas específicas de los FreeMates",
+  "publicLinks": "enlaces públicos",
+  "privatLinks": "enlaces específicos de los FreeMates",
+  "linkToMission": "enlace al lugar donde se realiza la misión",
+  "noOfHours": "¿cuántas horas debería llevar?"
 }

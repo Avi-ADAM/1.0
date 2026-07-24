@@ -6,7 +6,7 @@
   import { show } from './store-show.js';
   import { roles2 } from './roles2.js';
   import { role } from '$lib/components/prPr/mi.js';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
   /**
    * @typedef {Object} Props
    * @property {string} [userName_value]
@@ -88,11 +88,10 @@
     onProgres?.({ tx: 0, txx: 20 });
   }
 
-  const what = tr.reg.rolesQuestion;
 </script>
 
 <div class="step-inner" dir={$isRtl ? 'rtl' : 'ltr'}>
-  <h2 class="step-title">{userName_value}&nbsp;{what[$lang]}</h2>
+  <h2 class="step-title">{userName_value}&nbsp;{$t('reg.rolesQuestion')}</h2>
   <div class="multi-wrap">
     <RoleSelector bind:selectedRoles={selected} color="--gold" />
   </div>

@@ -1,0 +1,9 @@
+{
+  "_review": true,
+  "totalin": "total de votos a favor",
+  "notyet": "aún no votaron",
+  "totalno": "total de votos en contra",
+  "inFavor": "a favor",
+  "against": "no a favor",
+  "votedOn": "votaron solo en otras versiones"
+}

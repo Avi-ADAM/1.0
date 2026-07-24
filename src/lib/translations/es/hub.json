@@ -1,0 +1,19 @@
+{
+  "_review": true,
+  "votes": "Votos",
+  "urgent": "Urgente",
+  "suggestions": "Propuestas",
+  "purchases": "Compras",
+  "sales": "Ventas",
+  "activitySummary": "Resumen de actividad",
+  "urgentVoteMsg": "¡una votación urgente termina pronto!",
+  "handleBtn": "Gestionar",
+  "customPurchaseText": "Crea una compra personalizada",
+  "customPurchaseSub": "Describe lo que necesitas y encuentra socios",
+  "startBtn": "Empezar",
+  "noActivity": "No hay actividad ahora mismo",
+  "demandMapTitle": "Mapa de demanda",
+  "demandMapSub": "Lo que la gente busca y ofrece ahora mismo — grupos y tejidos juntos",
+  "demandMapItems": "elementos activos",
+  "demandMapBtn": "Abrir mapa"
+}

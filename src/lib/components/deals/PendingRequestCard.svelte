@@ -1,7 +1,7 @@
 ﻿<script lang="ts">
   import { isRtl } from '$lib/translations';
   import { goto } from '$app/navigation';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import type { PendingRequestData } from '$lib/server/deals/dealsQueries';
 
@@ -26,16 +26,16 @@
   }: { req: PendingRequestData; kind: 'buy' | 'sell' } = $props();
 
   const KIND_LABEL = $derived<Record<string, string>>({
-    monthly: tr.deals.kindMonthly[$lang],
-    yearly: tr.deals.kindYearly[$lang],
-    total: tr.deals.kindTotal[$lang],
-    unlimited: tr.deals.kindUnlimited[$lang],
-    daily: tr.deals.kindDaily[$lang]
+    monthly: $t('deals.kindMonthly'),
+    yearly: $t('deals.kindYearly'),
+    total: $t('deals.kindTotal'),
+    unlimited: $t('deals.kindUnlimited'),
+    daily: $t('deals.kindDaily')
   });
 
   const icon = $derived(KIND_ICON[req.productKindOf ?? ''] ?? '🎁');
   const bg = $derived(KIND_BG[req.productKindOf ?? ''] ?? 'linear-gradient(135deg,#1a1200,#2e2000)');
-  const category = $derived(KIND_LABEL[req.productKindOf ?? ''] ?? tr.deals.kindDefault[$lang]);
+  const category = $derived(KIND_LABEL[req.productKindOf ?? ''] ?? $t('deals.kindDefault'));
 
   function formatDate(iso?: string) {
     if (!iso) return '—';
@@ -59,7 +59,7 @@
 >
   <div class="toper">
     <div class="icon" style="background:{bg}">{icon}</div>
-    <span class="badge">⏳ {kind === 'buy' ? tr.deals.pendingBuy[$lang] : tr.deals.pendingSell[$lang]}</span>
+    <span class="badge">⏳ {kind === 'buy' ? $t('deals.pendingBuy') : $t('deals.pendingSell')}</span>
   </div>
 
   {#if req.sourceRatsonId}
@@ -67,10 +67,10 @@
       href={`/concierge/${req.sourceRatsonId}`}
       class="wish-source"
       onclick={(e) => e.stopPropagation()}
-      title={tr.deals.fromWishTitle[$lang]}
+      title={$t('deals.fromWishTitle')}
     >
       <span class="ws-gem"></span>
-      <span class="ws-label">{tr.deals.fromWish[$lang]}</span>
+      <span class="ws-label">{$t('deals.fromWish')}</span>
       <span class="ws-name">{req.sourceRatsonName || ''}</span>
       <span class="ws-arrow">›</span>
     </a>
@@ -88,15 +88,15 @@
 
   <div class="meta">
     <div class="meta-item">
-      <div class="ml">{tr.deals.metaTotal[$lang]}</div>
+      <div class="ml">{$t('deals.metaTotal')}</div>
       <div class="mv gold">₪ {Number(req.total || 0).toLocaleString()}</div>
     </div>
     <div class="meta-item">
-      <div class="ml">{tr.deals.metaQuantity[$lang]}</div>
+      <div class="ml">{$t('deals.metaQuantity')}</div>
       <div class="mv">{req.quant}</div>
     </div>
     <div class="meta-item">
-      <div class="ml">{tr.deals.metaRequestDate[$lang]}</div>
+      <div class="ml">{$t('deals.metaRequestDate')}</div>
       <div class="mv">{formatDate(req.createdAt)}</div>
     </div>
   </div>

@@ -691,6 +691,432 @@ export const config = {
             routes: [/^(?:\/he|\/en|\/ar|\/ru|\/es)?\/consensus/],
             loader: async () => (await import('./es/consensus.json')).default,
         },
+        // --- migrated from tr.json (global) ---
+        {
+            locale: 'he',
+            key: 'ask',
+            loader: async () => (await import('./he/ask.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'ask',
+            loader: async () => (await import('./en/ask.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'ask',
+            loader: async () => (await import('./ar/ask.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'ask',
+            loader: async () => (await import('./ru/ask.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'ask',
+            loader: async () => (await import('./es/ask.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'headers',
+            loader: async () => (await import('./he/headers.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'headers',
+            loader: async () => (await import('./en/headers.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'headers',
+            loader: async () => (await import('./ar/headers.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'headers',
+            loader: async () => (await import('./ru/headers.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'headers',
+            loader: async () => (await import('./es/headers.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'mash',
+            loader: async () => (await import('./he/mash.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'mash',
+            loader: async () => (await import('./en/mash.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'mash',
+            loader: async () => (await import('./ar/mash.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'mash',
+            loader: async () => (await import('./ru/mash.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'mash',
+            loader: async () => (await import('./es/mash.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'common',
+            loader: async () => (await import('./he/common.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'common',
+            loader: async () => (await import('./en/common.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'common',
+            loader: async () => (await import('./ar/common.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'common',
+            loader: async () => (await import('./ru/common.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'common',
+            loader: async () => (await import('./es/common.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'finiapp',
+            loader: async () => (await import('./he/finiapp.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'finiapp',
+            loader: async () => (await import('./en/finiapp.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'finiapp',
+            loader: async () => (await import('./ar/finiapp.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'finiapp',
+            loader: async () => (await import('./ru/finiapp.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'finiapp',
+            loader: async () => (await import('./es/finiapp.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'vots',
+            loader: async () => (await import('./he/vots.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'vots',
+            loader: async () => (await import('./en/vots.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'vots',
+            loader: async () => (await import('./ar/vots.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'vots',
+            loader: async () => (await import('./ru/vots.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'vots',
+            loader: async () => (await import('./es/vots.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'nego',
+            loader: async () => (await import('./he/nego.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'nego',
+            loader: async () => (await import('./en/nego.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'nego',
+            loader: async () => (await import('./ar/nego.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'nego',
+            loader: async () => (await import('./ru/nego.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'nego',
+            loader: async () => (await import('./es/nego.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'pending',
+            loader: async () => (await import('./he/pending.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'pending',
+            loader: async () => (await import('./en/pending.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'pending',
+            loader: async () => (await import('./ar/pending.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'pending',
+            loader: async () => (await import('./ru/pending.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'pending',
+            loader: async () => (await import('./es/pending.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'nuti',
+            loader: async () => (await import('./he/nuti.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'nuti',
+            loader: async () => (await import('./en/nuti.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'nuti',
+            loader: async () => (await import('./ar/nuti.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'nuti',
+            loader: async () => (await import('./ru/nuti.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'nuti',
+            loader: async () => (await import('./es/nuti.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'toasts',
+            loader: async () => (await import('./he/toasts.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'toasts',
+            loader: async () => (await import('./en/toasts.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'toasts',
+            loader: async () => (await import('./ar/toasts.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'toasts',
+            loader: async () => (await import('./ru/toasts.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'toasts',
+            loader: async () => (await import('./es/toasts.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'ui',
+            loader: async () => (await import('./he/ui.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'ui',
+            loader: async () => (await import('./en/ui.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'ui',
+            loader: async () => (await import('./ar/ui.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'ui',
+            loader: async () => (await import('./ru/ui.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'ui',
+            loader: async () => (await import('./es/ui.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'selector',
+            loader: async () => (await import('./he/selector.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'selector',
+            loader: async () => (await import('./en/selector.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'selector',
+            loader: async () => (await import('./ar/selector.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'selector',
+            loader: async () => (await import('./ru/selector.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'selector',
+            loader: async () => (await import('./es/selector.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'header',
+            loader: async () => (await import('./he/header.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'header',
+            loader: async () => (await import('./en/header.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'header',
+            loader: async () => (await import('./ar/header.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'header',
+            loader: async () => (await import('./ru/header.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'header',
+            loader: async () => (await import('./es/header.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'reg',
+            loader: async () => (await import('./he/reg.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'reg',
+            loader: async () => (await import('./en/reg.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'reg',
+            loader: async () => (await import('./ar/reg.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'reg',
+            loader: async () => (await import('./ru/reg.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'reg',
+            loader: async () => (await import('./es/reg.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'sales',
+            loader: async () => (await import('./he/sales.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'sales',
+            loader: async () => (await import('./en/sales.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'sales',
+            loader: async () => (await import('./ar/sales.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'sales',
+            loader: async () => (await import('./ru/sales.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'sales',
+            loader: async () => (await import('./es/sales.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'pages',
+            loader: async () => (await import('./he/pages.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'pages',
+            loader: async () => (await import('./en/pages.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'pages',
+            loader: async () => (await import('./ar/pages.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'pages',
+            loader: async () => (await import('./ru/pages.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'pages',
+            loader: async () => (await import('./es/pages.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'hub',
+            loader: async () => (await import('./he/hub.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'hub',
+            loader: async () => (await import('./en/hub.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'hub',
+            loader: async () => (await import('./ar/hub.json')).default,
+        },
+        {
+            locale: 'ru',
+            key: 'hub',
+            loader: async () => (await import('./ru/hub.json')).default,
+        },
+        {
+            locale: 'es',
+            key: 'hub',
+            loader: async () => (await import('./es/hub.json')).default,
+        },
     ],
 };
 

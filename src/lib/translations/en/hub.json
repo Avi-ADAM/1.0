@@ -1,0 +1,18 @@
+{
+  "votes": "Votes",
+  "urgent": "Urgent",
+  "suggestions": "Proposals",
+  "purchases": "Purchases",
+  "sales": "Sales",
+  "activitySummary": "Activity Summary",
+  "urgentVoteMsg": "urgent vote expiring soon!",
+  "handleBtn": "Handle",
+  "customPurchaseText": "Create a custom purchase",
+  "customPurchaseSub": "Describe what you need and find partners",
+  "startBtn": "Start",
+  "noActivity": "No activity right now",
+  "demandMapTitle": "Demand map",
+  "demandMapSub": "What people seek and offer right now — pools and weaves together",
+  "demandMapItems": "active items",
+  "demandMapBtn": "Open map"
+}

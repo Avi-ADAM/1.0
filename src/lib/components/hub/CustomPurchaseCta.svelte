@@ -1,9 +1,8 @@
 <script lang="ts">
   import { lang } from '$lib/stores/lang.js';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
 
-  const L = (key: keyof typeof tr.hub) =>
-    (tr.hub[key] as Record<string, string>)[$lang] ?? (tr.hub[key] as Record<string, string>).en;
+  const L = (key: string): string => $t(`hub.${key}`);
 
   let labels = $derived({
     text: L('customPurchaseText'),

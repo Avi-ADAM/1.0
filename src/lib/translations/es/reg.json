@@ -1,0 +1,10 @@
+{
+  "_review": true,
+  "rolesQuestion": "¿Tienes un rol preferido?",
+  "skipToEnd": "saltar al final del registro; siempre podrás añadir estos datos desde la página de tu perfil",
+  "notInList": "Aún no está en la lista; añádelo con el botón \"Añadir nuevo rol\" de abajo",
+  "rolesPlaceholder": "roles preferidos",
+  "skillsQuestion": "¿Qué sabes hacer?",
+  "valuesPlaceholder": "valores y objetivos",
+  "workwaysPlaceholder": "formas de creación"
+}

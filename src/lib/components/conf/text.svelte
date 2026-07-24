@@ -1,5 +1,5 @@
 <script>
-import tr from '$lib/translations/tr.json'
+  import { t } from '$lib/translations';
   import Close from '$lib/celim/close.svelte';
 import { lang } from '$lib/stores/lang.js'
   import { onMount } from 'svelte';
@@ -109,7 +109,7 @@ function checkAll(a, b) {
 
     {#if edit == false}
     <div class="flex flex-row align-middle justify-center gap-x-2">
-        <h2 class="underline decoration-mturk">{lebel[$lang]}: </h2>
+        <h2 class="underline decoration-mturk">{(typeof lebel === 'string' ? lebel : lebel?.[$lang])}: </h2>
         <p class="text-gold">{@html htmlon}</p><button onclick={()=>edit = true}>
             {#if text == textb}🖍️{:else}✏️{/if}</button>
         {#if text != textb && show2 != true}
@@ -117,12 +117,12 @@ function checkAll(a, b) {
         {:else if show2 == true}
         <div class="flex flex-col align-middle justify-center ">
         <button onclick={()=>show2 = false}><Close/></button>
-        <small class:text-right={$lang == "he"}>{tr?.nego.original[$lang]}:</small>
+        <small class:text-right={$lang == "he"}>{$t('nego.original')}:</small>
         <p>{text}</p>
-        <small class:text-right={$lang == "he"} class="text-gold">{tr?.nego.sugestion[$lang]}:</small>
+        <small class:text-right={$lang == "he"} class="text-gold">{$t('nego.sugestion')}:</small>
         <p class="text-gold">{textb}</p>
         {#each old  as o, i}
-        <small class:text-right={$lang == "he"} class="text-gold">{tr?.nego.oldno[$lang]}:{i+1}</small>
+        <small class:text-right={$lang == "he"} class="text-gold">{$t('nego.oldno')}:{i+1}</small>
         <p class="text-gold">{o ?? text}</p>
         {/each}
         </div>
@@ -137,7 +137,7 @@ function checkAll(a, b) {
       <textarea name="des"  bind:value={textb}     
  type='text' class='input d' required></textarea>
   {/if}
-  <label for="des" class='label' >{lebel[$lang]}</label>
+  <label for="des" class='label' >{(typeof lebel === 'string' ? lebel : lebel?.[$lang])}</label>
   <span class='line '></span>
 </div><button onclick={()=>{edit = false
 checkAll(text,textb)

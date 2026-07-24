@@ -1,0 +1,9 @@
+{
+  "rolesQuestion": "Do you have a preferred role?",
+  "skipToEnd": "skip to end of registration, you can always add those details from your profile page",
+  "notInList": "Not on the list yet, add it with the \"Add new roll\" button bellow",
+  "rolesPlaceholder": "preferred roles",
+  "skillsQuestion": "What you can do?",
+  "valuesPlaceholder": "values and goals",
+  "workwaysPlaceholder": "ways of creation"
+}

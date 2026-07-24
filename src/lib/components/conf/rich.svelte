@@ -142,7 +142,7 @@ const result = {
   }
  
   let outjsonb = []
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
   import Close from '$lib/celim/close.svelte';
   import { lang } from '$lib/stores/lang.js';
   import { onMount, onDestroy } from 'svelte';
@@ -222,7 +222,7 @@ const result = {
 >
   {#if edit == false}
     <div class="flex flex-row align-middle justify-center gap-x-2">
-      <h2 class="underline decoration-mturk">{lebel[$lang]}:</h2>
+      <h2 class="underline decoration-mturk">{(typeof lebel === 'string' ? lebel : lebel?.[$lang])}:</h2>
       {#key htmlon}
         <RichText outpot={htmlon} {outjson} {showJson} editable={false} sml={true} />
       {/key}
@@ -235,16 +235,16 @@ const result = {
         <div class="flex flex-col align-middle justify-center">
           <button onclick={() => (show2 = false)}><Close /></button>
           <small class:text-right={$lang == 'he'}
-            >{tr?.nego.original[$lang]}:</small
+            >{$t('nego.original')}:</small
           >
           <RichText outpot={text} editable={false} sml={true} />
           <small class:text-right={$lang == 'he'} class="text-gold"
-            >{tr?.nego.sugestion[$lang]}:</small
+            >{$t('nego.sugestion')}:</small
           >
           <RichText outpot={textb} editable={false} sml={true} />
           {#each old  as o, i}
           <small class:text-right={$lang == 'he'} class="text-gold"
-          >{tr?.nego.oldno[$lang]}:{i+1}</small
+          >{$t('nego.oldno')}:{i+1}</small
         >
         <RichText outpot={o ?? text} editable={false} sml={true} />
         {/each}
@@ -253,7 +253,7 @@ const result = {
     </div>
   {:else}
   
-        <label for="des" class="label">{lebel[$lang]}</label>
+        <label for="des" class="label">{(typeof lebel === 'string' ? lebel : lebel?.[$lang])}</label>
 
         <RichText bind:outpot={textb}  editable={true} sml={true} />
     <button

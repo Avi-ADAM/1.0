@@ -21,7 +21,7 @@
   import arMission from '$lib/translations/ar/mission.json';
   import Addnewro from '../addnew/addNewRole.svelte';
   import SkillSelector from '../ui/SkillSelector.svelte';
-  import tr from '$lib/translations/tr.json';
+  import { t as trans } from '$lib/translations';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { quintOut } from 'svelte/easing';
   import Expand from '$lib/celim/icons/expand.svelte';
@@ -797,7 +797,6 @@
     onClose?.({ md });
   }
 
-  const tri = tr;
   let wid = $state(0);
   //TODO: כמות לכל משימה עד אינסוף
   let dialog = $state(1);
@@ -1186,7 +1185,7 @@
             text-{$lang == 'en' ? 'left' : 'right'} 
             font-bold text-lg lg:text-2xl underline"
               >
-                <mark>{tri?.common?.description[$lang]}:</mark><button
+                <mark>{$trans('common.description')}:</mark><button
                   onclick={() => (descripE = !descripE)}
                   >{#if descripE}<Done />{:else}<EditIcon />{/if}</button
                 >
@@ -1291,7 +1290,7 @@
               {/if}
             {/if}
             <!----   <h3 class="text-barbi font-bold text-lg lg:text-2xl underline ">
-            {tri?.mission?.specialNotes[$lang]}</h3>
+            {$trans('mission.specialNotes')}</h3>
     <RichText bind:outpot={miData[0].spnot} editable={spnotE}/>-->
 
             <p
@@ -1412,7 +1411,7 @@
                               itemid = t;
                               isOpen = true;
                             }}
-                            title={tri?.mission?.seechecklist[$lang]}
+                            title={$trans('mission.seechecklist')}
                           >
                             <Expand /></button
                           >
@@ -1446,14 +1445,14 @@
                       itemid = -1;
                       isOpen = true;
                     }}
-                    title={tri?.mission?.seechecklist[$lang]}
+                    title={$trans('mission.seechecklist')}
                   >
                     <Expand /></button
                   >
                   <!--expand list of items with checkmark as list counter and x for deliting-->
                 {/if}
                 <button
-                  title=" {tri?.mission?.checklistadd[$lang]}"
+                  title=" {$trans('mission.checklistadd')}"
                   onclick={() => {
                     dialog = 2;
                     misid = miData[0].id;
@@ -1672,8 +1671,8 @@
             <div>
               {#if assignE}
                 {#if userslength > 1}
-                  <mark>{tri?.mission?.assingTo[$lang]}</mark>
-                  <p>{tri?.mission?.assingHelp[$lang]}</p>
+                  <mark>{$trans('mission.assingTo')}</mark>
+                  <p>{$trans('mission.assingHelp')}</p>
                   <MultiSelect
                     outerDivClass="!bg-gold !text-barbi"
                     inputClass="!bg-gold !text-barbi"
@@ -1689,8 +1688,8 @@
                     }}
                   />
                 {:else}
-                  <mark>{tri?.mission?.assingToMe[$lang]}</mark>
-                  <p>{tri?.mission?.assingHelp[$lang]}</p>
+                  <mark>{$trans('mission.assingToMe')}</mark>
+                  <p>{$trans('mission.assingHelp')}</p>
                   <input
                     bind:checked={miData[0].myM}
                     type="checkbox"
@@ -1701,12 +1700,12 @@
                       miData[0].rishon = 'self';
                     }}
                   />
-                  <label for="tome">{tri?.mission?.assingToMe[$lang]}</label>
+                  <label for="tome">{$trans('mission.assingToMe')}</label>
                 {/if}
                 <button
-                  title={tri?.mission?.assingTo[$lang] +
+                  title={$trans('mission.assingTo') +
                     ' ' +
-                    tri?.mission?.assingHelp[$lang]}
+                    $trans('mission.assingHelp')}
                   onclick={() => (assignE = !assignE)}
                   class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                   ><Done /></button
@@ -1715,29 +1714,29 @@
             </div>
             <div>
               {#if publinkE}
-                <mark>{tri?.mission?.publicLinks[$lang]}</mark>
+                <mark>{$trans('mission.publicLinks')}</mark>
                 <TextInput
                   bind:text={miData[0].publicklinks}
-                  lebel={tri?.mission?.publicLinks}
+                  lebel={$trans('mission.publicLinks')}
                 />
                 <button
                   onclick={() => (publinkE = !publinkE)}
                   class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                  title={tri?.mission?.publicLinks[$lang]}><Done /></button
+                  title={$trans('mission.publicLinks')}><Done /></button
                 >
               {/if}
             </div>
             <div>
               {#if mislinkE}
-                <mark>{tri?.mission?.linkToMission[$lang]}</mark>
+                <mark>{$trans('mission.linkToMission')}</mark>
                 <TextInput
                   bind:text={miData[0].privatlinks}
-                  lebel={tri?.mission?.linkToMission}
+                  lebel={$trans('mission.linkToMission')}
                 />
                 <button
                   onclick={() => (mislinkE = !mislinkE)}
                   class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                  title={tri?.mission?.linkToMission[$lang]}><Done /></button
+                  title={$trans('mission.linkToMission')}><Done /></button
                 >
               {/if}
             </div>
@@ -1771,12 +1770,12 @@
                 <button
                   onclick={() => (publinkE = !publinkE)}
                   class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                  title={tri?.mission?.publicLinks[$lang]}><LinkIcon /></button
+                  title={$trans('mission.publicLinks')}><LinkIcon /></button
                 >{/if}
               {#if !assignE && !specMode && !publishMode}<button
-                  title={tri?.mission?.assingTo[$lang] +
+                  title={$trans('mission.assingTo') +
                     ' ' +
-                    tri?.mission?.assingHelp[$lang]}
+                    $trans('mission.assingHelp')}
                   onclick={() => (assignE = !assignE)}
                   class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                   ><AddPerson /></button
@@ -1784,7 +1783,7 @@
               {#if !mislinkE}<button
                   onclick={() => (mislinkE = !mislinkE)}
                   class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                  title={tri?.mission?.linkToMission[$lang]}
+                  title={$trans('mission.linkToMission')}
                   ><LinkToIcon /></button
                 >{/if}
               {#if !shiftE}

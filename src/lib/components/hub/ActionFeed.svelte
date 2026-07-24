@@ -1,6 +1,6 @@
 <script lang="ts">
   import { lang } from '$lib/stores/lang.js';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
 
   interface FeedItem {
     id: string;
@@ -18,10 +18,7 @@
 
   let { items }: Props = $props();
 
-  let emptyLabel = $derived(
-    (tr.hub.noActivity as Record<string, string>)[$lang] ??
-      (tr.hub.noActivity as Record<string, string>).en
-  );
+  let emptyLabel = $derived($t('hub.noActivity'));
 </script>
 
 <section class="space-y-2">

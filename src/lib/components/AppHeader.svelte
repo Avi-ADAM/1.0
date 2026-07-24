@@ -1,10 +1,10 @@
 <script lang="ts">
   import { page } from '$app/stores';
   import { lang } from '$lib/stores/lang.js';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
 
   const user = $derived($page.data.user || $page.data);
-  const userName = $derived(user?.username || user?.un || tr.header.guest[$lang]);
+  const userName = $derived(user?.username || user?.un || $t('header.guest'));
   const profilePic = $derived(user?.profilePic);
   
   const initials = $derived(
@@ -38,13 +38,13 @@
   </nav>
   <div class="right">
     <!-- TODO: re-enable once the premium tier has real meaning -->
-    <!-- <div class="badge">{tr.header.premiumBadge[$lang]}</div> -->
+    <!-- <div class="badge">{$t('header.premiumBadge')}</div> -->
     <!-- TODO: re-enable once the notifications button actually does something -->
-    <!-- <button class="notif" aria-label={tr.header.notifications[$lang]}>
+    <!-- <button class="notif" aria-label={$t('header.notifications')}>
       <span>🔔</span>
       <div class="notif-dot"></div>
     </button> -->
-    <button class="avatar" title={userName} aria-label={tr.header.profile[$lang]}>
+    <button class="avatar" title={userName} aria-label={$t('header.profile')}>
       {#if profilePic}
         <img src={profilePic} alt={userName} class="avatar-img" />
       {:else}

@@ -173,5 +173,26 @@
   "sheirut": {
     "serviceCreated": "service has created successfully",
     "requestSent": "your request has sent successfully"
-  }
+  },
+  "checklistadd": "add item to checklist",
+  "seechecklist": "see checklist",
+  "checklist": "checklist",
+  "perMonth": "per month:",
+  "iskvua": "is that a constant job",
+  "addNewSkills": "add more skills",
+  "addNewRoles": "add more roles",
+  "addNewww": "add more creation ways",
+  "requireSkills": "required skills:",
+  "requiredRoles": "role:",
+  "requiredWW": "ways of creation for the mission:",
+  "total": "total mission vallue",
+  "assingToMe": "are you going to do the mission?",
+  "assingHelp": "if empty: will publish available position",
+  "assingTo": "asign this mission to -",
+  "hourlyVallue": "hour rate",
+  "specialNotes": "FreeMates specific notes",
+  "publicLinks": "public links ",
+  "privatLinks": "FreeMates specific links",
+  "linkToMission": "link to where the mission is done",
+  "noOfHours": "how many hours it should take?"
 }

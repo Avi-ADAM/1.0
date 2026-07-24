@@ -1,0 +1,18 @@
+{
+  "votes": "הצבעות",
+  "urgent": "דחוף",
+  "suggestions": "הצעות",
+  "purchases": "קניות",
+  "sales": "מכירות",
+  "activitySummary": "סיכום פעילות",
+  "urgentVoteMsg": "הצבעה דחופה מסתיימת בקרוב!",
+  "handleBtn": "לטיפול",
+  "customPurchaseText": "צור קנייה מותאמת אישית",
+  "customPurchaseSub": "תאר מה אתה צריך ומצא שותפים",
+  "startBtn": "התחל",
+  "noActivity": "אין פעילות כרגע",
+  "demandMapTitle": "מפת הביקוש",
+  "demandMapSub": "מה מחפשים ומה מציעים עכשיו — מהמאגדים ומהרקמות יחד",
+  "demandMapItems": "פריטים פעילים",
+  "demandMapBtn": "למפה"
+}

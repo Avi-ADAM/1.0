@@ -1,0 +1,19 @@
+{
+  "_review": true,
+  "withWhomMoney": "Con quién está el dinero",
+  "saleError": "Error al procesar la venta",
+  "changeSaleDate": "cambiar la fecha de venta",
+  "howManyUnits": "¿Cuántas unidades?",
+  "howManyPerUnit": "¿Cuántas por unidad?",
+  "perMonth": "al mes",
+  "perYear": "al año",
+  "noStartDate": "Sin fecha de inicio",
+  "noEndDate": "Sin fecha de fin; puedes dejarlo vacío para una venta continua hasta que se cancele",
+  "noUserSelected": "No se seleccionó ningún usuario",
+  "startDate": "Fecha de inicio",
+  "endDate": "Fecha de fin",
+  "addSale": "Añadir venta",
+  "total": "Total",
+  "noteOptional": "Nota (opcional)",
+  "notePlaceholder": "Añade una nota a la venta..."
+}

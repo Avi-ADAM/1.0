@@ -1,5 +1,5 @@
 <script>
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
   import Close from '$lib/celim/close.svelte';
   import { lang } from '$lib/stores/lang.js';
   import LocationPicker from '$lib/components/location/LocationPicker.svelte';
@@ -104,10 +104,10 @@
       {:else if show2 == true}
         <div class="flex flex-col align-middle justify-center">
           <button onclick={() => (show2 = false)}><Close /></button>
-          <small class:text-right={$lang == 'he'}>{tr?.nego.original[$lang]}:</small>
+          <small class:text-right={$lang == 'he'}>{$t('nego.original')}:</small>
           <p>{summary(location)}</p>
           <small class:text-right={$lang == 'he'} class="text-gold"
-            >{tr?.nego.sugestion[$lang]}:</small
+            >{$t('nego.sugestion')}:</small
           >
           <p class="text-gold">{summary(locationb)}</p>
         </div>

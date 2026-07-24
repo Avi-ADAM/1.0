@@ -3,7 +3,7 @@
   import ComparisonDisplay from './ComparisonDisplay.svelte';
   import { getProjectData } from '$lib/stores/projectStore';
   import RichText from '$lib/celim/ui/richText.svelte';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
 
   /**
    * @typedef {Object} Props
@@ -51,7 +51,7 @@
 {#if negopendmissions && negopendmissions.length > 0}
   <div class="mt-6">
     <div class="mb-2 font-bold text-barbi text-xl lg:text-2xl">
-      {isCandidateFlow ? tr.nego.candidateHistory[$lang] : tr.nego.history[$lang]}
+      {isCandidateFlow ? $t('nego.candidateHistory') : $t('nego.history')}
     </div>
     <div class="space-y-3">
       {#each negopendmissions as negoItem}
@@ -59,8 +59,8 @@
         {@const byCandidate = attrs.proposedBy === 'candidate'}
         {@const prevLoc = Array.isArray(attrs.location) ? attrs.location[0] : attrs.location}
         {@const roundLabel = isCandidateFlow
-          ? (byCandidate ? tr.nego.candidateRound[$lang] : tr.nego.projectRound[$lang])
-          : tr.nego.proposedBy[$lang]}
+          ? (byCandidate ? $t('nego.candidateRound') : $t('nego.projectRound'))
+          : $t('nego.proposedBy')}
         {@const old_hours = isCandidateFlow ? noofhours : (attrs.noofhours ?? noofhours)}
         {@const new_hours = isCandidateFlow ? (attrs.noofhours ?? noofhours) : noofhours}
         {@const old_perhour = isCandidateFlow ? perhour : (attrs.perhour ?? perhour)}
@@ -97,7 +97,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
             {#if attrs.name && attrs.name !== openmissionName}
               <ComparisonDisplay
-                label={tr.common.nameLabel[$lang]}
+                label={$t('common.nameLabel')}
                 oldValue={old_name}
                 newValue={new_name}
               />
@@ -105,7 +105,7 @@
 
             {#if attrs.noofhours && attrs.noofhours !== noofhours}
               <ComparisonDisplay
-                label={tr.common.hoursLabel[$lang]}
+                label={$t('common.hoursLabel')}
                 oldValue={old_hours}
                 newValue={new_hours}
               />
@@ -113,7 +113,7 @@
 
             {#if attrs.perhour && attrs.perhour !== perhour}
               <ComparisonDisplay
-                label={tr.common.perhourLabel[$lang]}
+                label={$t('common.perhourLabel')}
                 oldValue={old_perhour}
                 newValue={new_perhour}
               />
@@ -121,7 +121,7 @@
 
             {#if (attrs.perhour && attrs.perhour !== perhour) || (attrs.noofhours && attrs.noofhours !== noofhours)}
               <ComparisonDisplay
-                label={tr.common.totalLabel[$lang]}
+                label={$t('common.totalLabel')}
                 oldValue={String(old_hours * old_perhour)}
                 newValue={String(new_hours * new_perhour)}
               />
@@ -140,7 +140,7 @@
             <div class="mt-3 text-sm md:text-base rounded-lg bg-white/70 dark:bg-gray-900/40 p-3">
               <span
                 class="font-medium text-blue-700 dark:text-blue-300 text-base md:text-lg"
-                >{tr.nego.updatedDescription[$lang]}</span
+                >{$t('nego.updatedDescription')}</span
               >
               <div
                 class="text-gray-800 dark:text-gray-100 mt-2 text-sm md:text-base leading-relaxed"
@@ -154,7 +154,7 @@
             <div class="mt-3 text-sm md:text-base rounded-lg bg-white/70 dark:bg-gray-900/40 p-3">
               <span
                 class="font-medium text-blue-700 dark:text-blue-300 text-base md:text-lg"
-                >{tr.nego.updatedNotes[$lang]}</span
+                >{$t('nego.updatedNotes')}</span
               >
               <div
                 class="text-gray-800 dark:text-gray-100 mt-2 text-sm md:text-base leading-relaxed"
@@ -192,25 +192,25 @@
             {#if hasActsChanges}
               <div class="mt-3 text-sm md:text-base">
                 <span class="font-medium text-blue-700 text-base md:text-lg"
-                  >{tr.nego.tasksChanges[$lang]}</span
+                  >{$t('nego.tasksChanges')}</span
                 >
                 <div class="mt-2 space-y-3">
                   <!-- Proposed/Rejected Tasks -->
                   <div class="text-sm md:text-base text-gray-600 font-medium">
-                    {tr.nego.proposedRejected[$lang]}
+                    {$t('nego.proposedRejected')}
                   </div>
                   <div class="line-through text-gray-500 space-y-2">
                     {#if originalActs.length === 0}
                       <div
                         class="bg-gray-100 p-3 rounded text-sm md:text-base italic"
                       >
-                        {tr.nego.noTasksOriginally[$lang]}
+                        {$t('nego.noTasksOriginally')}
                       </div>
                     {:else}
                       {#each originalActs as act}
                         <div class="bg-gray-100 p-3 rounded">
                           <div class="font-medium text-sm md:text-base">
-                            {act.attributes.shem || tr.nego.noName[$lang]}
+                            {act.attributes.shem || $t('nego.noName')}
                           </div>
                           {#if act.attributes.des}
                             <div class="text-xs md:text-sm mt-1">
@@ -226,14 +226,14 @@
                   <div
                     class="text-sm md:text-base text-green-700 font-medium mt-3"
                   >
-                    {tr.nego.approvedFinal[$lang]}
+                    {$t('nego.approvedFinal')}
                   </div>
                   <div class="text-green-600 space-y-2">
                     {#if proposedActs.length === 0}
                       <div
                         class="bg-green-50 p-3 rounded border border-green-200 text-sm md:text-base italic"
                       >
-                        {tr.nego.noTasksFinal[$lang]}
+                        {$t('nego.noTasksFinal')}
                       </div>
                     {:else}
                       {#each proposedActs as act}
@@ -241,7 +241,7 @@
                           class="bg-green-50 p-3 rounded border border-green-200"
                         >
                           <div class="font-medium text-sm md:text-base">
-                            {act.attributes.shem || tr.nego.noName[$lang]}
+                            {act.attributes.shem || $t('nego.noName')}
                           </div>
                           {#if act.attributes.des}
                             <div class="text-xs md:text-sm mt-1">

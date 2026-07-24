@@ -8,7 +8,6 @@
   import { isMobileOrTablet } from '$lib/utilities/device';
   import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
   import moment from 'moment';
-  import tr from '$lib/translations/tr.json';
 
   // רכיבים מודרניים חדשים
   import CardHeader from './CardHeader.svelte';
@@ -238,8 +237,8 @@
               : 'bg-gold/30'}"
           >
             {byCandidate
-              ? tr.nego.candidateRound[$lang]
-              : tr.nego.projectRound[$lang]}
+              ? $t('nego.candidateRound')
+              : $t('nego.projectRound')}
           </span>
           {#if roundDate && !isNaN(roundDate.getTime())}
             <span class="text-xs font-normal text-gray-500 dark:text-gray-400">
@@ -271,14 +270,14 @@
             </span>
             {#if easyChanged || priceChanged}
               <span class="text-xs text-gray-500 dark:text-gray-400">
-                ({tr.nego.rikmaReq[$lang]}: {easy}{price ? ` · ${price}` : ''})
+                ({$t('nego.rikmaReq')}: {easy}{price ? ` · ${price}` : ''})
               </span>
             {/if}
           </div>
         {/if}
         {#if myRound.name && myRound.name !== mashName}
           <div class="text-xs text-gray-600 dark:text-gray-300">
-            <span class="font-medium">{tr.common.nameLabel[$lang]}:</span>
+            <span class="font-medium">{$t('common.nameLabel')}:</span>
             <span class="text-gray-400 line-through mx-1">{mashName}</span>
             → <span class="font-semibold">{myRound.name}</span>
           </div>
@@ -290,7 +289,7 @@
                 ? 'text-barbi'
                 : 'text-yellow-700 dark:text-yellow-400'}"
             >
-              {tr.nego.updatedDescription[$lang]}
+              {$t('nego.updatedDescription')}
             </div>
             <div
               class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed"
@@ -310,7 +309,7 @@
                 ? 'text-barbi'
                 : 'text-yellow-700 dark:text-yellow-400'}"
             >
-              {tr.nego.updatedNotes[$lang]}
+              {$t('nego.updatedNotes')}
             </div>
             <div
               class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed"

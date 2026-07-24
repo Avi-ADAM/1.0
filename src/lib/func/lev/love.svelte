@@ -1,5 +1,6 @@
 <script module>
-    import tr from '$lib/translations/tr.json'
+  import { t } from '$lib/translations';
+  import { get } from 'svelte/store';
    export function peace(miData, id,lang,myid) {
         console.log("peace askeds")  /*{data{ id attributes{
             archived
@@ -16,7 +17,7 @@
             console.log("peace",mtahan[i])
             mtaha.push({
                  message: `${miData.data.usersPermissionsUser.data.attributes.username} 
-                            ${tr?.ask.askedTo[lang]} 
+                            ${get(t)('ask.askedTo')} 
                             ${mtahan[i].attributes.open_mission.data.attributes.name}`,
                     what: true,
                     pic: mtahan[i].attributes.project.data.attributes.profilePic.data.attributes.url,
@@ -30,8 +31,8 @@
             for (let x = 0; x < mtahan[i].attributes.vots.length; x++) {
               //  let src22 = getProjectData(dictasked[t]. ,"upic",dictasked[t].users[x].users_permissions_user.data.id)
                 mtaha.push({
-                    message: `${tr?.ask.onpm[lang]}  
-                  ${mtahan[i].attributes.vots[x].what == true ? " " + tr?.vots.inFavor[lang] : " "+ tr?.vots.against[lang]} `,
+                    message: `${get(t)('ask.onpm')}  
+                  ${mtahan[i].attributes.vots[x].what == true ? " " + get(t)('vots.inFavor') : " "+ get(t)('vots.against')} `,
                     what: mtahan[i].attributes.vots[x].what ?? true,
                     pic: "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png",
                     timestamp:new Date(mtahan[i].attributes.vots[x].zman ?? Date.now()) ,

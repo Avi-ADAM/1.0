@@ -1,7 +1,7 @@
 ﻿<script>
   import { isRtl } from '$lib/translations';
   import Chaticon from '../../../celim/chaticon.svelte';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import Lev from '../../../celim/lev.svelte';
@@ -146,7 +146,7 @@
   <CardHeader
     logoSrc={src2}
     {projectName}
-    cardType={tr.headers.misfini[$lang]}
+    cardType={$t('headers.misfini')}
     cardTitle={missionBName}
     memberCount={user_1s?.length ||
       noofusersOk + noofusersWaiting + noofusersNo}
@@ -194,28 +194,28 @@
         >
           <span
             class="hover:text-gray-900 dark:hover:text-white transition-colors"
-            onmouseenter={() => hover(`${tr.common.valph[$lang]}`)}
+            onmouseenter={() => hover(`${$t('common.valph')}`)}
             onmouseleave={() => hover('0')}
-            >{valph} {tr.common.perhour[$lang]}</span
+            >{valph} {$t('common.perhour')}</span
           >
           <span class="text-gray-400 px-1 font-bold">*</span>
           <span
             class="hover:text-gray-900 dark:hover:text-white transition-colors"
             onmouseenter={() =>
               hover(
-                `${tr.common.noofhours?.[$lang] || tr.common.hours[$lang]}`
+                `${$t('common.noofhours') || $t('common.hours')}`
               )}
             onmouseleave={() => hover('0')}
             >{(nhours || 0).toLocaleString('en-US', {
               maximumFractionDigits: 2
             })}
-            {tr.common.hours[$lang]}</span
+            {$t('common.hours')}</span
           >
         </div>
       </div>
       <div
         class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2 bg-green-50 dark:bg-green-900/20 px-4 py-2 rounded-xl border border-green-100 dark:border-green-800/30"
-        onmouseenter={() => hover(`${tr.common.total[$lang]}`)}
+        onmouseenter={() => hover(`${$t('common.total')}`)}
         onmouseleave={() => hover('0')}
       >
         <span class="text-green-500 dark:text-green-400 text-sm font-normal"
@@ -240,7 +240,7 @@
     {#if hearotMeyuchadot && hearotMeyuchadot !== 'null' && hearotMeyuchadot !== 'undefined'}
       <div
         class="flex gap-2 text-gray-600 dark:text-gray-400 text-sm bg-yellow-50 dark:bg-yellow-900/10 p-3 rounded-xl border border-yellow-100 dark:border-yellow-900/30 cd"
-        onmouseenter={() => hover(`${tr.common.notes[$lang]}`)}
+        onmouseenter={() => hover(`${$t('common.notes')}`)}
         onmouseleave={() => hover('0')}
       >
         <svg
@@ -271,7 +271,7 @@
             target="_blank"
             href={why}
             class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors border border-blue-100 dark:border-blue-800/30"
-            onmouseenter={() => hover(`${tr.common.finalwords[$lang]}`)}
+            onmouseenter={() => hover(`${$t('common.finalwords')}`)}
             onmouseleave={() => hover('0')}
           >
             <svg
@@ -287,12 +287,12 @@
                 d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
               ></path></svg
             >
-            {tr.common.link ? tr.common.link[$lang] : 'Link'}
+            {$t('common.publicLinks')}
           </a>
         {:else}
           <div
             class="flex-1 bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm cd"
-            onmouseenter={() => hover(`${tr.common.finalwords[$lang]}`)}
+            onmouseenter={() => hover(`${$t('common.finalwords')}`)}
             onmouseleave={() => hover('0')}
           >
             {why}
@@ -304,7 +304,7 @@
           target="_blank"
           href={whatt}
           class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-barbi/10 text-barbi rounded-xl text-sm font-medium hover:bg-barbi/20 transition-colors border border-barbi/20"
-          onmouseenter={() => hover(`${tr.finiapp.file[$lang]}`)}
+          onmouseenter={() => hover(`${$t('finiapp.file')}`)}
           onmouseleave={() => hover('0')}
         >
           <svg
@@ -325,7 +325,7 @@
               points="10 9 9 9 8 9"
             ></polyline></svg
           >
-          {tr.finiapp.file[$lang]}
+          {$t('finiapp.file')}
         </a>
       {/if}
     </div>
@@ -349,7 +349,7 @@
         <div class="flex flex-wrap items-center gap-2 text-xs font-semibold">
           <div
             class="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-md"
-            onmouseenter={() => hover(`${tr.vots.totalin[$lang]}`)}
+            onmouseenter={() => hover(`${$t('vots.totalin')}`)}
             onmouseleave={() => hover('0')}
           >
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"
@@ -358,7 +358,7 @@
           </div>
           <div
             class="flex items-center gap-1 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-2 py-0.5 rounded-md"
-            onmouseenter={() => hover(`${tr.vots.notyet[$lang]}`)}
+            onmouseenter={() => hover(`${$t('vots.notyet')}`)}
             onmouseleave={() => hover('0')}
           >
             <span class="w-1.5 h-1.5 rounded-full bg-blue-500"
@@ -367,7 +367,7 @@
           </div>
           <div
             class="flex items-center gap-1 text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 rounded-md"
-            onmouseenter={() => hover(`${tr.vots.totalno[$lang]}`)}
+            onmouseenter={() => hover(`${$t('vots.totalno')}`)}
             onmouseleave={() => hover('0')}
           >
             <span class="w-1.5 h-1.5 rounded-full bg-rose-500"
@@ -407,7 +407,7 @@
 
         <button
           class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-yellow-500 text-yellow-600 dark:text-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 font-bold rounded-xl transition-all flex justify-center items-center"
-          onmouseenter={() => hover(`${tr.common.nego[$lang]}`)}
+          onmouseenter={() => hover(`${$t('common.nego')}`)}
           onmouseleave={() => hover('0')}
           onclick={() => nego('f')}
         >

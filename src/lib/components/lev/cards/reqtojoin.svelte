@@ -143,7 +143,7 @@
     formonth: { he: 'בכל חודש', en: 'every month' },
     onPrevious: { he: 'על גרסה קודמת', en: 'on previous version' }
   };
-  import tr from '$lib/translations/tr.json';
+  import { t as trans } from '$lib/translations';
   import Tile from '$lib/celim/tile.svelte';
   import { getProjectData } from '$lib/stores/projectStore';
   function getSkillNames(arr) {
@@ -268,7 +268,7 @@
         <div class="rounded-xl border-2 p-3 space-y-2 {byCandidate ? 'border-barbi bg-barbi/5' : 'border-gold bg-gold/5'}">
           <div class="font-bold text-sm flex items-center gap-2 {byCandidate ? 'text-barbi' : 'text-yellow-700 dark:text-yellow-400'}">
             <span class="px-2 py-0.5 rounded-full text-xs {byCandidate ? 'bg-barbi/20' : 'bg-gold/30'}">
-              {byCandidate ? tr.nego.candidateRound[$lang] : tr.nego.projectRound[$lang]}
+              {byCandidate ? $trans('nego.candidateRound') : $trans('nego.projectRound')}
             </span>
             {#if roundDate && !isNaN(roundDate.getTime())}
               <span class="text-xs font-normal text-gray-500 dark:text-gray-400">
@@ -280,20 +280,20 @@
             <div class="flex flex-wrap items-center gap-2 text-sm font-bold text-gray-800 dark:text-gray-100">
               <img style="width:1.5rem;" src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="" />
               <span class="{byCandidate ? 'text-barbi' : 'text-yellow-700 dark:text-yellow-400'}">
-                {(latestRound.noofhours ?? noofhours).toLocaleString()} {tr?.common?.hours?.[$lang]}
+                {(latestRound.noofhours ?? noofhours).toLocaleString()} {$trans('common.hours')}
                 × {(latestRound.perhour ?? perhour).toLocaleString()}
                 = {((latestRound.noofhours ?? noofhours) * (latestRound.perhour ?? perhour)).toLocaleString()}
               </span>
               {#if latestRound?.noofhours !== noofhours || latestRound?.perhour !== perhour}
                 <span class="text-xs text-gray-500 dark:text-gray-400">
-                  ({tr.nego.rikmaReq[$lang]}: {noofhours} × {perhour} = {noofhours * perhour})
+                  ({$trans('nego.rikmaReq')}: {noofhours} × {perhour} = {noofhours * perhour})
                 </span>
               {/if}
             </div>
           {/if}
           {#if latestRound?.name && latestRound.name !== openmissionName}
             <div class="text-xs text-gray-600 dark:text-gray-300">
-              <span class="font-medium">{tr.common.nameLabel[$lang]}:</span>
+              <span class="font-medium">{$trans('common.nameLabel')}:</span>
               <span class="text-gray-400 line-through ml-1">{openmissionName}</span>
               → <span class="font-semibold">{latestRound.name}</span>
             </div>
@@ -301,7 +301,7 @@
           {#if descChanged}
             <div class="rounded-lg bg-white/70 dark:bg-gray-900/40 p-2">
               <div class="font-semibold text-xs mb-1 {byCandidate ? 'text-barbi' : 'text-yellow-700 dark:text-yellow-400'}">
-                {tr.nego.updatedDescription[$lang]}
+                {$trans('nego.updatedDescription')}
               </div>
               <div class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed">
                 <RichText outpot={latestRound.descrip} editable={false} trans={true} />
@@ -311,7 +311,7 @@
           {#if notesChanged}
             <div class="rounded-lg bg-white/70 dark:bg-gray-900/40 p-2">
               <div class="font-semibold text-xs mb-1 {byCandidate ? 'text-barbi' : 'text-yellow-700 dark:text-yellow-400'}">
-                {tr.nego.updatedNotes[$lang]}
+                {$trans('nego.updatedNotes')}
               </div>
               <div class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed">
                 <RichText outpot={latestRound.hearotMeyuchadot} editable={false} trans={true} />
@@ -336,28 +336,28 @@
           <span
             class="font-bold text-gray-800 dark:text-gray-200"
             role="contentinfo"
-            onmouseenter={() => hover(tr?.common.valph[$lang])}
+            onmouseenter={() => hover($trans('common.valph'))}
             onmouseleave={() => hover('0')}
           >
             {perhour}
-            {tr?.common.perhour[$lang]}
+            {$trans('common.perhour')}
           </span>
           <span class="text-gray-600 dark:text-gray-400">*</span>
           <span
             class="font-bold text-gray-800 dark:text-gray-200"
             role="contentinfo"
-            onmouseenter={() => hover(tr?.common.noofhours[$lang])}
+            onmouseenter={() => hover($trans('common.noofhours'))}
             onmouseleave={() => hover('0')}
           >
             {noofhours.toLocaleString('en-US', { maximumFractionDigits: 2 })}
-            {tr?.common.hours[$lang]}
+            {$trans('common.hours')}
             {iskvua == true ? t.formonth[$lang] : ''}
           </span>
           <span class="text-gray-600 dark:text-gray-400">=</span>
           <span
             class="font-bold text-barbi"
             role="contentinfo"
-            onmouseenter={() => hover(tr.mission.total[$lang])}
+            onmouseenter={() => hover($trans('mission.total'))}
             onmouseleave={() => hover('0')}
             >{(noofhours * perhour).toLocaleString('en-US', {
               maximumFractionDigits: 2
@@ -421,7 +421,7 @@
             <div
               class="mb-2 font-bold text-green-600 dark:text-green-400 text-sm"
             >
-              {tr.common.matchedSkillsHeadline?.[$lang] ||
+              {$trans('common.matchedSkillsHeadline') ||
                 ($lang === 'he' ? 'כישורים תואמים' : 'Matched skills')}
             </div>
             <div class="flex flex-wrap gap-2">
@@ -433,7 +433,7 @@
               <div
                 class="mt-3 mb-2 font-bold text-red-600 dark:text-red-400 text-sm"
               >
-                {tr.common.missingSkillsHeadline?.[$lang] ||
+                {$trans('common.missingSkillsHeadline') ||
                   ($lang === 'he' ? 'כישורים חסרים' : 'Missing skills')}
               </div>
               <div class="flex flex-wrap gap-2">
@@ -446,7 +446,7 @@
               <div
                 class="mt-3 mb-2 font-bold text-blue-600 dark:text-blue-400 text-sm"
               >
-                {tr.common.extraSkillsHeadline?.[$lang] ||
+                {$trans('common.extraSkillsHeadline') ||
                   ($lang === 'he' ? 'כישורים נוספים' : 'Extra skills')}
               </div>
               <div class="flex flex-wrap gap-2">
@@ -488,7 +488,7 @@
             <div
               class="mb-2 font-bold text-green-600 dark:text-green-400 text-sm"
             >
-              {tr.common.matchedRolesHeadline?.[$lang] ||
+              {$trans('common.matchedRolesHeadline') ||
                 ($lang === 'he' ? 'תפקידים תואמים' : 'Matched roles')}
             </div>
             <div class="flex flex-wrap gap-2">
@@ -500,7 +500,7 @@
               <div
                 class="mt-3 mb-2 font-bold text-red-600 dark:text-red-400 text-sm"
               >
-                {tr.common.missingRolesHeadline?.[$lang] ||
+                {$trans('common.missingRolesHeadline') ||
                   ($lang === 'he' ? 'תפקידים חסרים' : 'Missing roles')}
               </div>
               <div class="flex flex-wrap gap-2">
@@ -513,7 +513,7 @@
               <div
                 class="mt-3 mb-2 font-bold text-blue-600 dark:text-blue-400 text-sm"
               >
-                {tr.common.extraRolesHeadline?.[$lang] ||
+                {$trans('common.extraRolesHeadline') ||
                   ($lang === 'he' ? 'תפקידים נוספים' : 'Extra roles')}
               </div>
               <div class="flex flex-wrap gap-2">
@@ -549,7 +549,7 @@
             <div
               class="mb-2 font-bold text-green-600 dark:text-green-400 text-sm"
             >
-              {tr.common.matchedWaysHeadline?.[$lang] ||
+              {$trans('common.matchedWaysHeadline') ||
                 ($lang === 'he' ? 'דרכי עבודה תואמות' : 'Matched workways')}
             </div>
             <div class="flex flex-wrap gap-2">
@@ -561,7 +561,7 @@
               <div
                 class="mt-3 mb-2 font-bold text-red-600 dark:text-red-400 text-sm"
               >
-                {tr.common.missingWaysHeadline?.[$lang] ||
+                {$trans('common.missingWaysHeadline') ||
                   ($lang === 'he' ? 'דרכי עבודה חסרות' : 'Missing workways')}
               </div>
               <div class="flex flex-wrap gap-2">
@@ -574,7 +574,7 @@
               <div
                 class="mt-3 mb-2 font-bold text-blue-600 dark:text-blue-400 text-sm"
               >
-                {tr.common.extraWaysHeadline?.[$lang] ||
+                {$trans('common.extraWaysHeadline') ||
                   ($lang === 'he' ? 'דרכי עבודה נוספות' : 'Extra workways')}
               </div>
               <div class="flex flex-wrap gap-2">
@@ -719,8 +719,8 @@
     {#if low == false}
       {#if already === false}
         <button
-          aria-label={tr?.common.approve[$lang]}
-          onmouseenter={() => hover(tr?.common.approve[$lang])}
+          aria-label={$trans('common.approve')}
+          onmouseenter={() => hover($trans('common.approve'))}
           onmouseleave={() => hover('0')}
           onclick={agree}
           class="flex-[2] py-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
@@ -728,22 +728,22 @@
         >
           <Lev />
           <span class="text-xs sm:text-sm whitespace-nowrap"
-            >{tr?.common.approve[$lang]}</span
+            >{$trans('common.approve')}</span
           >
         </button>
         <button
           aria-label={isRishon
             ? negotiationMode
-              ? tr?.common.exitNego[$lang]
-              : tr?.common.nego[$lang]
-            : tr?.common.nego[$lang]}
+              ? $trans('common.exitNego')
+              : $trans('common.nego')
+            : $trans('common.nego')}
           onmouseenter={() =>
             hover(
               isRishon
                 ? negotiationMode
-                  ? tr?.common.exitNego[$lang]
-                  : tr?.common.nego[$lang]
-                : tr?.common.nego[$lang]
+                  ? $trans('common.exitNego')
+                  : $trans('common.nego')
+                : $trans('common.nego')
             )}
           onmouseleave={() => hover('0')}
           onclick={() => nego('f')}
@@ -765,7 +765,7 @@
               />
             </svg>
             <span class="text-xs sm:text-sm whitespace-nowrap"
-              >{tr?.common.exitNego[$lang]}</span
+              >{$trans('common.exitNego')}</span
             >
           {:else}
             <svg
@@ -781,21 +781,21 @@
               /></svg
             >
             <span class="text-xs sm:text-sm whitespace-nowrap"
-              >{tr?.common.nego[$lang]}</span
+              >{$trans('common.nego')}</span
             >
           {/if}
         </button>
       {/if}
       <button
-        aria-label={tr?.common.watchthe[$lang]}
-        onmouseenter={() => hover(tr?.common.watchthe[$lang])}
+        aria-label={$trans('common.watchthe')}
+        onmouseenter={() => hover($trans('common.watchthe'))}
         onmouseleave={() => hover('0')}
         class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-blue-500 text-blue-500 hover:bg-blue-50 font-bold rounded-xl transition-all flex items-center justify-center gap-2"
         onclick={() => tochat()}
       >
         <Chaticon />
         <span class="text-xs sm:text-sm whitespace-nowrap"
-          >{tr?.common.watchthe[$lang]}</span
+          >{$trans('common.watchthe')}</span
         >
       </button>
       {#if selfNomination && onDismiss && already === false}
