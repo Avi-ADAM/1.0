@@ -3276,6 +3276,24 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
             } 
           }
           startedBy { data { id attributes { username } } }
+          pgishauserpends(filters: { archived: { ne: true } }) {
+            data {
+              id
+              attributes {
+                approved
+                users_permissions_user {
+                  data {
+                    id
+                    attributes {
+                      username
+                      email
+                      profilePic { data { attributes { url } } }
+                    }
+                  }
+                }
+              }
+            }
+          }
           pgishausers {
             data {
               id
