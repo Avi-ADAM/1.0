@@ -21,10 +21,14 @@
  * @property {any} projectUsers
  * @property {any} alit
  * @property {() => void} [onClose] - Callback when the component should close.
+ * @property {{name?:string, descrip?:string, nhours?:number, valph?:number, skills?:string[], roles?:string[], workways?:string[]}|null} [prefillSpec]
+ *   Full AI prefill forwarded to mission.svelte's `initialSpec`. Supersedes
+ *   `initialDescrip` (kept for backward compatibility) so suggestions richer
+ *   than a description — skills, roles, hours — survive into the form.
  */
 
 /** @type {Props} */
- let { mission1 = [], children, pn, pl, restime, projectUsers, alit, onClose, selected = $bindable([]), processContext = null, name: initialName = '', initialDescrip = '' } = $props();
+ let { mission1 = [], children, pn, pl, restime, projectUsers, alit, onClose, selected = $bindable([]), processContext = null, name: initialName = '', initialDescrip = '', prefillSpec = null } = $props();
 
  let newcontent = $state(true);
 let newcontentR = $state(true);
@@ -192,7 +196,11 @@ function closeMobileModal() {
         {processContext}
         missionTemplates={mission1}
         onClose={onClose}
-        initialSpec={initialDescrip ? { name, descrip: initialDescrip } : null}
+        initialSpec={prefillSpec
+          ? { ...prefillSpec, name: prefillSpec.name ?? name }
+          : initialDescrip
+            ? { name, descrip: initialDescrip }
+            : null}
         />
         {/if}
  </div>

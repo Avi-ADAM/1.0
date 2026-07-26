@@ -29,8 +29,19 @@
   // Prefill state for action=createmission URL param
   let prefillMissionName = $state('');
   let prefillMissionDescrip = $state('');
+  /** @type {{name?:string, descrip?:string, nhours?:number, valph?:number, skills?:string[], roles?:string[], workways?:string[]}|null} */
+  let prefillMissionSpec = $state(null);
 
-  // Consumer for ?action=createmission — mirrors the createproject consumer in me/+page.svelte
+  /** `a,b , c` → ['a','b','c'] */
+  const csv = (v) =>
+    (v ?? '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+  // Consumer for ?action=createmission — mirrors the createproject consumer in me/+page.svelte.
+  // Reads every param prepareMissionTool emits so the AI's suggestions (skills,
+  // roles, work-ways, hours, rate) reach the form instead of being dropped.
   $effect(async () => {
     if (page.url.searchParams.has('action')) {
       await tick();
@@ -38,6 +49,19 @@
         const params = page.url.searchParams;
         prefillMissionName    = params.get('name') ?? '';
         prefillMissionDescrip = params.get('descrip') ?? '';
+
+        const nhours = Number(params.get('nhours'));
+        const valph  = Number(params.get('valph'));
+
+        prefillMissionSpec = {
+          name: prefillMissionName,
+          descrip: prefillMissionDescrip,
+          skills:   csv(params.get('skills')),
+          roles:    csv(params.get('roles')),
+          workways: csv(params.get('workways')),
+          ...(Number.isFinite(nhours) && params.get('nhours') ? { nhours } : {}),
+          ...(Number.isFinite(valph)  && params.get('valph')  ? { valph }  : {})
+        };
         addM = true;
       }
     }
@@ -291,7 +315,7 @@
               </svg>
             </button>
           </div>
-          <ChoosMission mission1={missionTemplates} {pn} {pl} {restime} {projectUsers} {alit} onClose={closeM} name={prefillMissionName} initialDescrip={prefillMissionDescrip} />
+          <ChoosMission mission1={missionTemplates} {pn} {pl} {restime} {projectUsers} {alit} onClose={closeM} name={prefillMissionName} initialDescrip={prefillMissionDescrip} prefillSpec={prefillMissionSpec} />
         </div>
       {/if}
 
