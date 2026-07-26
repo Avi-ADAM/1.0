@@ -63,7 +63,7 @@
 
 | שדה | טיפוס | תפקיד |
 |---|---|---|
-| `kind` | enum | `mission` / `resource` / `product` / `note` |
+| `kind` | enum | `mission` / **`act`** / `resource` / `product` / `note` |
 | `name`, `descrip` | string/text | |
 | `imp` | enum | `must` / `nice` |
 | `status` | enum | `proposed` → `accepted` → `created` / `dismissed` |
@@ -80,6 +80,35 @@ nullable היו מלכלכים את הסכמה; `{type,id}` כן ומספיק.
 מפורסם. אם היא תהפוך ל-relation אמיתי היא תתחיל לצוף במנוע ההתאמה של הלב לפני
 שאדם אישר אותה. ה-IDs נשמרים בתוך ה-json ומועברים לטופס בזמן היצירה.
 
+### 2.1 `kind: 'act'` — מטלה לחבר קיים (ולא משימה חדשה)
+
+בריקמה קיימת עם חברים ומשימות שכבר רצות, המהלך הזול והמועיל ביותר הוא בדרך כלל
+**לא** לפתוח משימה חדשה אלא להטיל **מטלה (Act)**:
+
+- **לאדם ספציפי על משימה ספציפית** — `assignedUserId` + `missionId`.
+- **לפי תפקיד** — `tafkidims[]`, ואז מי שמחזיק בתפקיד **מקבל התראה** ויכול לגשת
+  ולבצע.
+
+**כל זה כבר עובד** ב-action `createTask` הקיים, כולל
+`resolveRoleHoldersInProject` שמצמצם את ההתראה למחזיקי התפקיד **שהם חברי
+הריקמה הזו** בלבד. לכן התוספת ללוחות היא רק ה-`kind` — פרטי הנמען רוכבים על
+ה-`spec` הקיים:
+
+```jsonc
+{
+  "assigneeKind": "person" | "role",
+  "assigneeUserId": "12", "assigneeName": "דנה",   // person
+  "missionId": "88", "missionName": "עיצוב האתר",  // המשימה-בתהליך לקשר אליה
+  "roleIds": ["3"], "roleNames": ["מעצב"],          // role
+  "hashivut": "green", "link": "", "dateS": null, "dateF": null
+}
+```
+
+**מה שחסר לצד ה-UI:** `crtask.svelte` מחזיק את `isPersonal` כ-state פנימי
+(ברירת מחדל `true`) ולא כ-prop, ו-`selected` הוא מערך תוויות
+(`"username - missionName - missionId"`). כדי לפתוח את הטופס ממולא במצב תפקיד
+צריך לחשוף `isPersonal` כ-prop ולבנות את התווית מה-spec. שינוי קטן, אבל נדרש.
+
 ---
 
 ## 3. שרת (`1.0`) — מה צריך להיבנות
@@ -95,21 +124,34 @@ nullable היו מלכלכים את הסכמה; `{type,id}` כן ומספיק.
   `existingRef`) → `resolveMissionSpec()` (קיים, Pinecone) לכל שורת משימה →
   items.
 
-### 3.2 Actions (`src/lib/server/actions/configs/`)
+### 3.2 Actions (`src/lib/server/actions/configs/planningBoards.ts`) ✅ בוצע
 | Action | תפקיד |
 |---|---|
-| `scanProjectDirections` | מדרגה 1 — יוצר N לוחות `suggested` |
-| `expandPlanBoard` | מדרגה 2 — ממלא לוח ב-items |
-| `createPlanBoardFromText` | מסלול הטקסט החופשי |
-| `updatePlanItem` | must↔nice, accept, dismiss, עריכת שם/תיאור |
+| `createPlanBoard` | יצירת לוח/כיוון (`manual` → `active`, `quickScan` → `suggested`) |
+| `updatePlanBoard` | אישור כיוון, שינוי שם, ארכוב, רישום בקשת רוויזיה |
+| `createPlanItem` | הוספת שורה (mission / act / resource / product / note) |
+| `updatePlanItem` | must↔nice, accept, dismiss, עריכת שם/תיאור/spec |
 | `markPlanItemCreated` | נקרא אחרי יצירה מוצלחת בטופס → `status:'created'` + `createdRef` |
-| `archivePlanBoard` | |
 
-הרשאות: `projectMember` — רק חברי הריקמה רואים ומשנים לוחות.
+**הרשאות:** כל הפעולות `jwt` + `projectMember`. מכיוון שמזהה לוח לא נושא בתוכו
+פרויקט, כל פעולה מקבלת `projectId` **מפורש** ומאמתת שהלוח באמת שייך לו — אחרת
+חבר בפרויקט א' היה יכול לערוך לוח של פרויקט ב' בניחוש מזהה. אף פעולה אינה
+חשופה ל-`apiKey`.
 
-### 3.3 QIDs
-`getProjectPlanBoards(pid)` (לוחות + items), `getPlanBoard(id)`,
-ומוטציות ה-CRUD המקבילות.
+**שתי מוסכמות שנאכפות בקוד:** `created` הוא מצב סופי (אי אפשר לערוך שורה
+שכבר הפכה לישות אמיתית — הלוח לא יסטה מהמציאות), ורק `markPlanItemCreated`
+רשאי לקבוע אותו, כי הוא חייב לרשום *מה* נוצר. הפעולה אידמפוטנטית — retry לא
+דורס את ה-`createdRef` המקורי.
+
+### 3.3 QIDs ✅ בוצע
+`285getProjectPlanBoards` (לוחות + items), `286getPlanBoard`,
+`287createPlanBoard`, `288updatePlanBoard`, `289createPlanItem`,
+`290updatePlanItem`. הקריאות פתוחות ל-`user`; **המוטציות `serviceAdmin` בלבד**
+כדי שכתיבה תעבור אך ורק דרך הפעולות המאובטחות.
+
+> ⚠️ `npm run validate:qids` יכשל על שישה אלה עד שהסכמה תיפרס — הטיפוסים
+> `ProjectPlanBoardInput` / `ENUM_PROJECTPLANITEM_KIND` נוצרים רק אחרי דיפלוי
+> ב-Strapi. אחרי הפריסה: `npm run types:update`.
 
 ---
 
@@ -162,11 +204,12 @@ nullable היו מלכלכים את הסכמה; `{type,id}` כן ומספיק.
 
 | # | שלב | סטטוס |
 |---|---|---|
-| 1 | סכמת Strapi (`project-plan-board` + `project-plan-item`) | ✅ בוצע |
-| 2 | תיקון דליפת ה-prefill (§5) | ⏳ |
-| 3 | QIDs + actions CRUD ללוחות | ⏳ |
+| 1 | סכמת Strapi (`project-plan-board` + `project-plan-item`, כולל `act`) | ✅ בוצע |
+| 2 | תיקון דליפת ה-prefill (§5) | ✅ בוצע |
+| 3 | QIDs + actions CRUD ללוחות (+14 טסטים) | ✅ בוצע |
 | 4 | `quickScan.ts` + `scanProjectDirections` (מדרגה 1) | ⏳ |
 | 5 | `expandDirection.ts` + `expandPlanBoard` (מדרגה 2) | ⏳ |
-| 6 | `PlanBoards.svelte` + `PlanBoard.svelte` | ⏳ |
-| 7 | חיבור "פתח בטופס" + `markPlanItemCreated` | ⏳ |
-| 8 | `planProjectWorkTool` לבוט/MCP (מחזיר `boardId` + `reviewUrl`) | ⏳ |
+| 6 | חשיפת `isPersonal` כ-prop ב-`crtask.svelte` (§2.1) | ⏳ |
+| 7 | `PlanBoards.svelte` + `PlanBoard.svelte` | ⏳ |
+| 8 | חיבור "פתח בטופס" + `markPlanItemCreated` | ⏳ |
+| 9 | `planProjectWorkTool` לבוט/MCP (מחזיר `boardId` + `reviewUrl`) | ⏳ |

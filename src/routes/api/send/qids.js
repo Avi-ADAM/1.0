@@ -13932,6 +13932,88 @@ export const qids = {
     }
   }`,
 
+  // ── Planning boards (PLAN_PROJECT_PLANNING_BOARDS) ──────────────────────
+  // Persistent, amorphous planning spaces for a rikma. A board is one
+  // "direction"; its items are proposed missions/acts/resources that only
+  // become real once a human approves them in the normal creation form.
+  '285getProjectPlanBoards': `query GetProjectPlanBoards($pid: ID!) {
+    projectPlanBoards(
+      filters: { project: { id: { eq: $pid } }, status: { ne: "archived" } }
+      pagination: { limit: 50 }
+      sort: ["order:asc", "createdAt:desc"]
+    ) {
+      data { id attributes {
+        title descrip rationale origin status sourceText revisionNote
+        expandedAt order createdAt
+        createdBy { data { id attributes { username } } }
+        items(pagination: { limit: 100 }, sort: ["order:asc"]) {
+          data { id attributes {
+            kind name descrip imp status spec existingRef createdRef order
+          } }
+        }
+      } }
+    }
+  }`,
+
+  '286getPlanBoard': `query GetPlanBoard($id: ID!) {
+    projectPlanBoard(id: $id) {
+      data { id attributes {
+        title descrip rationale origin status sourceText revisionNote
+        ai_meta expandedAt order createdAt
+        project { data { id attributes { projectName restime } } }
+        createdBy { data { id attributes { username } } }
+        items(pagination: { limit: 100 }, sort: ["order:asc"]) {
+          data { id attributes {
+            kind name descrip imp status spec existingRef createdRef order
+          } }
+        }
+      } }
+    }
+  }`,
+
+  '287createPlanBoard': `mutation CreatePlanBoard($title: String!, $descrip: String, $rationale: String, $origin: ENUM_PROJECTPLANBOARD_ORIGIN, $status: ENUM_PROJECTPLANBOARD_STATUS, $sourceText: String, $ai_meta: JSON, $order: Int, $projectId: ID, $userId: ID, $publishedAt: DateTime) {
+    createProjectPlanBoard(data: {
+      title: $title,
+      descrip: $descrip,
+      rationale: $rationale,
+      origin: $origin,
+      status: $status,
+      sourceText: $sourceText,
+      ai_meta: $ai_meta,
+      order: $order,
+      project: $projectId,
+      createdBy: $userId,
+      publishedAt: $publishedAt
+    }) { data { id attributes { title status origin } } }
+  }`,
+
+  '288updatePlanBoard': `mutation UpdatePlanBoard($id: ID!, $data: ProjectPlanBoardInput!) {
+    updateProjectPlanBoard(id: $id, data: $data) {
+      data { id attributes { title status origin expandedAt } }
+    }
+  }`,
+
+  '289createPlanItem': `mutation CreatePlanItem($kind: ENUM_PROJECTPLANITEM_KIND!, $name: String!, $descrip: String, $imp: ENUM_PROJECTPLANITEM_IMP, $status: ENUM_PROJECTPLANITEM_STATUS, $spec: JSON, $existingRef: JSON, $order: Int, $boardId: ID, $publishedAt: DateTime) {
+    createProjectPlanItem(data: {
+      kind: $kind,
+      name: $name,
+      descrip: $descrip,
+      imp: $imp,
+      status: $status,
+      spec: $spec,
+      existingRef: $existingRef,
+      order: $order,
+      board: $boardId,
+      publishedAt: $publishedAt
+    }) { data { id attributes { kind name status } } }
+  }`,
+
+  '290updatePlanItem': `mutation UpdatePlanItem($id: ID!, $data: ProjectPlanItemInput!) {
+    updateProjectPlanItem(id: $id, data: $data) {
+      data { id attributes { kind name imp status createdRef } }
+    }
+  }`,
+
   ...qids_base,
   ...moachQids
 };

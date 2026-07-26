@@ -492,4 +492,15 @@ export const qidsAccess = {
   // reachable with a user JWT or a plain apiKey principal.
   'salesApiProductInfo': { allow: ['serviceAdmin'] },
   'saleByExternalId': { allow: ['serviceAdmin'] },
+
+  // Planning boards (PLAN_PROJECT_PLANNING_BOARDS). Reads are done by project
+  // members from the moach create page; writes go exclusively through the
+  // planning actions (projectMember-gated) via StrapiClient, so the mutations
+  // are serviceAdmin-only and never reachable with a raw user JWT or apiKey.
+  '285getProjectPlanBoards': { allow: ['user', 'serviceAdmin'] },
+  '286getPlanBoard': { allow: ['user', 'serviceAdmin'] },
+  '287createPlanBoard': { allow: ['serviceAdmin'] },
+  '288updatePlanBoard': { allow: ['serviceAdmin'] },
+  '289createPlanItem': { allow: ['serviceAdmin'] },
+  '290updatePlanItem': { allow: ['serviceAdmin'] },
 };
