@@ -12,6 +12,9 @@
   import ResourceCreator from '$lib/components/resource/ResourceCreator.svelte';
   import Mashman from '$lib/components/prPr/mashmam.svelte';
   import Handp from '$lib/components/prPr/handp.svelte';
+  import PlanBoards from '$lib/components/planning/PlanBoards.svelte';
+  import Crtask from '$lib/components/prPr/tasks/crtask.svelte';
+  import { executeAction } from '$lib/client/actionClient';
   import { invalidateAll } from '$app/navigation';
 
   const moachStore = getMoachStore();
@@ -90,6 +93,25 @@
   let restime = $derived(projectBase?.restime);
   /** @type {string[]} */
   let alit = $derived(projectBase?.vallues?.data?.map((v) => v.id) ?? []);
+
+  // Missions in progress + the roles they carry — what crtask.svelte needs to
+  // offer an assignee (a person on a mission, or a role whose holders get
+  // notified). Same derivation as the acts page.
+  let bmiData = $derived(projectMissionsData?.mesimabetahaliches?.data ?? []);
+  let proles = $derived.by(() => {
+    /** @type {{ id: string; name: string }[]} */
+    const roles = [];
+    const seen = new Set();
+    for (const bmi of bmiData) {
+      for (const role of bmi.attributes?.tafkidims?.data ?? []) {
+        if (!seen.has(role.id)) {
+          seen.add(role.id);
+          roles.push({ id: role.id, name: role.attributes?.roleDescription ?? '' });
+        }
+      }
+    }
+    return roles;
+  });
 
   let openResources = $derived(projectMissionsData?.open_mashaabims?.data ?? []);
   let pmashes = $derived(projectMissionsData?.pmashes?.data ?? []);
@@ -178,11 +200,118 @@
     openMS = false;
     addN = false;
     openMA = false;
+    addAct = false;
+    // Backing out of a form means the plan row was not turned into anything.
+    pendingPlanItem = null;
   }
 
   async function handleCreated() {
     await invalidateAll();
     handleBack();
+  }
+
+  // ── Planning boards ────────────────────────────────────────────────
+  // A board row is only a proposal: opening it prefills the *real* creation
+  // form, and the row is marked `created` afterwards with whatever the form
+  // actually produced. See PLAN_PROJECT_PLANNING_BOARDS.
+
+  /** The plan row currently being turned into a real entity, if any. */
+  let pendingPlanItem = $state(/** @type {any} */ (null));
+  let planBoardsRef = $state(/** @type {any} */ (null));
+  let addAct = $state(false);
+  let actPrefill = $state({ name: '', teur: '', isPersonal: true });
+  // Bindables crtask.svelte writes back into (assignee resolved from the
+  // selected mission, and the optional start/end dates).
+  let actUserMevatzeaId = $state(null);
+  let actMimatai = $state(undefined);
+  let actAdMatai = $state(undefined);
+
+  /**
+   * Record on the board what the form actually created. Best-effort: a failure
+   * here must not swallow the fact that the entity itself was created.
+   */
+  async function markPlanRowCreated(createdType, createdId) {
+    const item = pendingPlanItem;
+    pendingPlanItem = null;
+    if (!item || !createdType || !createdId) return;
+    try {
+      await executeAction(
+        'markPlanItemCreated',
+        {
+          itemId: String(item.itemId),
+          boardId: String(item.boardId),
+          projectId: String(projectId),
+          createdType: String(createdType),
+          createdId: String(createdId)
+        },
+        { showErrorToast: false }
+      );
+      await planBoardsRef?.reload?.();
+    } catch (err) {
+      console.warn('[create] could not mark plan row as created:', err);
+    }
+  }
+
+  /** Open a plan row in the creation form that matches its kind. */
+  function openPlanItem(item, board) {
+    const a = item?.attributes ?? {};
+    const spec = a.spec ?? {};
+    pendingPlanItem = { itemId: item.id, boardId: board.id, kind: a.kind };
+
+    if (a.kind === 'act') {
+      actPrefill = {
+        name: a.name ?? '',
+        teur: a.descrip ?? '',
+        // Role-assigned chores open in role mode so the holders get notified.
+        isPersonal: spec.assigneeKind !== 'role'
+      };
+      addAct = true;
+      return;
+    }
+
+    if (a.kind === 'resource' || a.kind === 'product') {
+      addN = true;
+      return;
+    }
+
+    // Default: a mission. Reuse the same prefill path as ?action=createmission.
+    prefillMissionName = a.name ?? '';
+    prefillMissionDescrip = a.descrip ?? '';
+    prefillMissionSpec = {
+      name: a.name ?? '',
+      descrip: a.descrip ?? '',
+      skills: Array.isArray(spec.skills) ? spec.skills : [],
+      roles: Array.isArray(spec.roles) ? spec.roles : [],
+      workways: Array.isArray(spec.workways) ? spec.workways : [],
+      ...(spec.nhours != null ? { nhours: Number(spec.nhours) } : {}),
+      ...(spec.valph != null ? { valph: Number(spec.valph) } : {})
+    };
+    addM = true;
+  }
+
+  /** mission.svelte reports `{ md: { createdEntityType, createdEntityId } }`. */
+  async function handleMissionClosed(payload) {
+    const md = payload?.md;
+    if (md?.createdEntityId) {
+      await markPlanRowCreated(md.createdEntityType ?? 'mission', md.createdEntityId);
+    } else {
+      pendingPlanItem = null;
+    }
+    closeM();
+  }
+
+  async function handleResourceCreated(data) {
+    const id = data?.id ?? data?.data?.id;
+    if (id) await markPlanRowCreated('openMashaabim', id);
+    else pendingPlanItem = null;
+    await handleCreated();
+  }
+
+  async function handleActDone(payload) {
+    if (payload?.id) await markPlanRowCreated('act', payload.id);
+    else pendingPlanItem = null;
+    addAct = false;
+    await invalidateAll();
   }
 </script>
 
@@ -195,7 +324,7 @@
 <div class="create-page p-4">
 
   <!-- כרטיסים עם עיגולים מוטמעים — נעלמים כשפורם פתוח -->
-  {#if !addM && !openMS && !addN && !openMA && createMode !== 'process'}
+  {#if !addM && !openMS && !addN && !openMA && !addAct && createMode !== 'process'}
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto py-12">
 
       <!-- משימה -->
@@ -265,10 +394,13 @@
       </div>
 
     </div>
+
+    <!-- לוחות תכנון — הצעות שהופכות למשימות רק אחרי אישור בטופס -->
+    <PlanBoards bind:this={planBoardsRef} {projectId} onOpenItem={openPlanItem} />
   {/if}
 
   <!-- פורמים — עם כפתור חזרה -->
-  {#if addM || openMS || addN || openMA || createMode === 'process'}
+  {#if addM || openMS || addN || openMA || addAct || createMode === 'process'}
     <div class="max-w-4xl mx-auto">
       <button
         onclick={handleBack}
@@ -315,7 +447,7 @@
               </svg>
             </button>
           </div>
-          <ChoosMission mission1={missionTemplates} {pn} {pl} {restime} {projectUsers} {alit} onClose={closeM} name={prefillMissionName} initialDescrip={prefillMissionDescrip} prefillSpec={prefillMissionSpec} />
+          <ChoosMission mission1={missionTemplates} {pn} {pl} {restime} {projectUsers} {alit} onClose={handleMissionClosed} name={prefillMissionName} initialDescrip={prefillMissionDescrip} prefillSpec={prefillMissionSpec} />
         </div>
       {/if}
 
@@ -340,8 +472,11 @@
         <div class="m-4 border-2 border-barbi rounded bg-white/80 backdrop-blur-sm shadow-xl p-6">
           <ResourceCreator
             {projectId}
-            onCreated={handleCreated}
-            onCancel={() => (addN = false)}
+            onCreated={handleResourceCreated}
+            onCancel={() => {
+              pendingPlanItem = null;
+              addN = false;
+            }}
           />
         </div>
       {/if}
@@ -353,6 +488,26 @@
           onCreated={() => { createMode = null; }}
           onSelect={() => {}}
         />
+      {/if}
+
+      <!-- מטלה (Act) — נפתח משורת לוח מסוג act -->
+      {#if addAct}
+        <div class="m-4 border-2 border-barbi rounded bg-white/80 backdrop-blur-sm shadow-xl p-4">
+          <Crtask
+            {bmiData}
+            {proles}
+            id={0}
+            misid={undefined}
+            fromMis={false}
+            name={actPrefill.name}
+            teur={actPrefill.teur}
+            isPersonal={actPrefill.isPersonal}
+            bind:userMevatzeaId={actUserMevatzeaId}
+            bind:mimatai={actMimatai}
+            bind:adMatai={actAdMatai}
+            onDone={handleActDone}
+          />
+        </div>
       {/if}
     </div>
   {/if}

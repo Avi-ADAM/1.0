@@ -16,8 +16,19 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
-import { scanProjectDirections } from '../../planning/quickScan.js';
-import { expandDirection, type ExpandedItem } from '../../planning/expandDirection.js';
+import type { ExpandedItem } from '../../planning/expandDirection.js';
+
+/**
+ * The planning engines are loaded lazily, inside the handlers.
+ *
+ * They pull in the embeddings/vector stack and the model clients, which read
+ * `$env/static/private`. Importing them at module scope would drag all of that
+ * into the action registry — and therefore into every consumer of
+ * `/api/action` — at import time. Deferring keeps the registry cheap to load
+ * and side-effect free until a planning run is actually requested.
+ */
+const loadQuickScan = () => import('../../planning/quickScan.js');
+const loadExpandDirection = () => import('../../planning/expandDirection.js');
 
 type Lang = 'he' | 'en' | 'ar';
 
@@ -72,6 +83,7 @@ async function loadBoardInProject(
 const scanHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { projectId, lang } = params as Record<string, any>;
 
+  const { scanProjectDirections } = await loadQuickScan();
   const scan = await scanProjectDirections(
     String(projectId),
     String(context.userId),
@@ -149,6 +161,7 @@ const expandHandler: ActionExecutionHandler = async (params, context, { strapi }
 
   if (!brief.trim()) throw new Error('This board has no text to expand');
 
+  const { expandDirection } = await loadExpandDirection();
   const expansion = await expandDirection(
     String(projectId),
     String(context.userId),
@@ -221,6 +234,7 @@ const fromTextHandler: ActionExecutionHandler = async (params, context, { strapi
     throw new Error('Write a little more so the plan has something to work with');
   }
 
+  const { expandDirection } = await loadExpandDirection();
   const expansion = await expandDirection(
     String(projectId),
     String(context.userId),

@@ -2,7 +2,6 @@
   import { idPr } from '$lib/stores/idPr.js';
   import moment from 'moment';
   import { onMount } from 'svelte';
-  let isPersonal = $state(true);
   let isEdit = $state(false);
   onMount(() => {
     console.log(editdata);
@@ -53,6 +52,9 @@
    * @property {string} [teur]
    * @property {any} [selected]
    * @property {string} [link]
+   * @property {boolean} [isPersonal] - true = assign to a person on a mission;
+   *   false = assign to roles, whose holders get notified. Bindable so a caller
+   *   (e.g. a planning board opening an `act` row) can preselect the mode.
    * @property {(payload: { id: any; name: any; user: any; }) => void} [onDone]
    * @property {(payload: { isEdit: boolean; id: any; data: { des: any; shem: any; link: any; dateS: any; dateF: any; }; }) => void} [onAdd]
    */
@@ -74,6 +76,7 @@
     selected = $bindable([]),
     link = $bindable(''),
     hashivut = $bindable('white'),
+    isPersonal = $bindable(true),
     onDone,
     onAdd
   } = $props();

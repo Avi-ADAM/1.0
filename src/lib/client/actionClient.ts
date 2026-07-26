@@ -425,6 +425,15 @@ export type ActionKey =
   | 'declineSpForMashaabim'
   | 'reportRecurringSaleCycle'
   | 'customerReportRecurringSaleCycle'
+  // Planning boards (PLAN_PROJECT_PLANNING_BOARDS)
+  | 'scanProjectDirections'
+  | 'expandPlanBoard'
+  | 'createPlanBoardFromText'
+  | 'createPlanBoard'
+  | 'updatePlanBoard'
+  | 'createPlanItem'
+  | 'updatePlanItem'
+  | 'markPlanItemCreated'
   ;
 
 

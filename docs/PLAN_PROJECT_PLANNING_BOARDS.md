@@ -104,10 +104,13 @@ nullable היו מלכלכים את הסכמה; `{type,id}` כן ומספיק.
 }
 ```
 
-**מה שחסר לצד ה-UI:** `crtask.svelte` מחזיק את `isPersonal` כ-state פנימי
-(ברירת מחדל `true`) ולא כ-prop, ו-`selected` הוא מערך תוויות
-(`"username - missionName - missionId"`). כדי לפתוח את הטופס ממולא במצב תפקיד
-צריך לחשוף `isPersonal` כ-prop ולבנות את התווית מה-spec. שינוי קטן, אבל נדרש.
+**צד ה-UI ✅ בוצע:** `isPersonal` נחשף כ-`$bindable` prop ב-`crtask.svelte`, כך
+ששורת `act` עם `spec.assigneeKind === 'role'` נפתחת ישירות במצב תפקיד.
+
+**מה שעדיין ידני:** `selected` (בחירת האדם/התפקיד) הוא מערך **תוויות**
+(`"username - missionName - missionId"`), ולכן ה-prefill כרגע ממלא שם, תיאור
+ומצב — אך **לא** בוחר אוטומטית את הנמען. המשתמש בוחר אותו בטופס. השלמה
+אפשרית: לבנות את התווית מה-spec מול `bmiData`/`proles`.
 
 ---
 
@@ -222,7 +225,25 @@ nullable היו מלכלכים את הסכמה; `{type,id}` כן ומספיק.
 | 3 | QIDs + actions CRUD ללוחות (+14 טסטים) | ✅ בוצע |
 | 4 | `quickScan.ts` + `scanProjectDirections` (מדרגה 1) | ✅ בוצע |
 | 5 | `expandDirection.ts` + `expandPlanBoard` (מדרגה 2) | ✅ בוצע |
-| 6 | חשיפת `isPersonal` כ-prop ב-`crtask.svelte` (§2.1) | ⏳ |
-| 7 | `PlanBoards.svelte` + `PlanBoard.svelte` | ⏳ |
-| 8 | חיבור "פתח בטופס" + `markPlanItemCreated` | ⏳ |
+| 6 | חשיפת `isPersonal` כ-prop ב-`crtask.svelte` (§2.1) | ✅ בוצע |
+| 7 | `PlanBoards.svelte` + `PlanBoard.svelte` | ✅ בוצע |
+| 8 | חיבור "פתח בטופס" + `markPlanItemCreated` | ✅ בוצע |
 | 9 | `planProjectWorkTool` לבוט/MCP (מחזיר `boardId` + `reviewUrl`) | ⏳ |
+
+## 8. הערות מימוש UI
+
+- **טעינה עצלה של הלוחות.** `PlanBoards` טוען את הלוחות בצד-לקוח ב-`onMount`
+  ולא ב-`+page.server.ts`. זה מכוון: כל עוד הסכמה לא נפרסה, הרכיב פשוט
+  **מסתיר את עצמו** במקום לשבור את כל דף היצירה.
+- **טעינה עצלה של המנועים.** `planningRuns.ts` מייבא את `quickScan`/
+  `expandDirection` דרך `await import()` בתוך ה-handlers. ייבוא ברמת המודול
+  גורר את כל מחסנית ה-embeddings והמודלים (שקוראת `$env/static/private`) לתוך
+  רג'יסטרי הפעולות — מה ששבר בפועל שני קבצי בדיקה של `/api/action`.
+- **מיפוי שורה→טופס** ב-`create/+page.svelte`: `act` → `crtask.svelte`
+  (במצב תפקיד אם `spec.assigneeKind === 'role'`), `resource`/`product` →
+  `ResourceCreator`, ברירת מחדל → `mission.svelte` דרך אותו נתיב prefill של
+  `?action=createmission`.
+- **סימון `created`** מתבצע מהחזרת הטופס עצמו: `mission.svelte` מחזיר
+  `{ md: { createdEntityType, createdEntityId } }`, `ResourceCreator` מחזיר את
+  הרשומה, ו-`crtask` מחזיר `{ id }`. אם לא הוחזר מזהה — השורה **לא** מסומנת,
+  כדי שלא יירשם `createdRef` שקרי.
