@@ -8432,10 +8432,16 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
   }`,
 
   // Read an Ask's negotiation rounds (latest first) for the card / finalization.
+  // Also carries everything the bilateral acceptance gate needs (the taker, the
+  // project members and open_mission.isRishon = assigned offer), so the
+  // immediate acceptance path can enforce the same rule the timegrama does.
   'getAskNegoRounds': `query GetAskNegoRounds($id: ID!) {
     ask(id: $id) { data { id attributes {
       archived
-      vots { what order users_permissions_user { data { id } } }
+      vots { what why zman ide order users_permissions_user { data { id } } }
+      users_permissions_user { data { id } }
+      open_mission { data { id attributes { isRishon } } }
+      project { data { id attributes { user_1s { data { id } } } } }
       negopendmissions(sort: "ordern:desc") { data { id attributes {
         ordern proposedBy status name descrip hearotMeyuchadot
         noofhours perhour date dates

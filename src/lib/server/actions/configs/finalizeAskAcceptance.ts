@@ -1,6 +1,8 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { EmailService } from '../../notifications/EmailService.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
+import { evaluateAskAcceptance } from '$lib/server/nego/askAcceptance.js';
+import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
 
 function formatVotesForInline(votes: any[]): string {
   if (!Array.isArray(votes) || votes.length === 0) return '';
@@ -15,7 +17,8 @@ function formatVotesForInline(votes: any[]): string {
     const order = attrs.order ?? 0;
     const ide = attrs.ide ?? uid;
     const zman = attrs.zman ?? new Date().toISOString();
-    return `{what:${what} users_permissions_user:${parseInt(String(uid), 10)} order:${order} ide:${parseInt(String(ide), 10)} zman:"${zman}"}`;
+    const why = attrs.why ? ` why:${JSON.stringify(String(attrs.why))}` : '';
+    return `{what:${what} users_permissions_user:${parseInt(String(uid), 10)} order:${order} ide:${parseInt(String(ide), 10)} zman:"${zman}"${why}}`;
   }).join(',');
 }
 
@@ -39,12 +42,10 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
     tafkidims = [],
     sqedualed,
     deadline,
-    existingVotes = [],
     projectName = '',
     projectSrc = '',
   } = params;
 
-  const voterUserId = context.userId;
   const d = new Date();
   const now = d.toISOString();
 
@@ -59,6 +60,7 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
   let finalSqedualed = sqedualed;
   let finalDeadline = deadline;
 
+  let askAttributes: any = null;
   try {
     const roundsRes: any = await strapi.execute(
       'getAskNegoRounds',
@@ -66,7 +68,47 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
       context.jwt,
       context.fetch
     );
-    const rounds = roundsRes?.data?.ask?.data?.attributes?.negopendmissions?.data ?? [];
+    askAttributes = roundsRes?.data?.ask?.data?.attributes ?? null;
+  } catch (e) {
+    console.error('[finalizeAskAcceptance] ask fetch failed:', e);
+  }
+  if (!askAttributes) throw new Error(`Ask ${askId} could not be loaded — acceptance aborted`);
+
+  // Consent gate — see finalizeJoinAcceptance / askAcceptance.ts. An assigned
+  // offer (open_mission.isRishon) never materializes without the assignee's yes.
+  const check = evaluateAskAcceptance({
+    askAttributes,
+    callerId: context.userId,
+    acceptedUserId,
+    now: d,
+  });
+  if (!check.allowed) {
+    if (check.reason === 'awaitingAssigneeConsent') {
+      await strapi.execute(
+        '120addVoteToAsk',
+        { askId: String(askId), vots: check.vots },
+        context.jwt,
+        context.fetch
+      );
+      await ensureCandidacyTimegrama(strapi, context, { side: 'ask', id: String(askId) });
+      return {
+        data: {
+          askId: String(askId),
+          materialized: false,
+          pending: 'assigneeConsent',
+          takerId: check.takerId,
+        },
+        updateStrategy: { type: 'fullRefresh' },
+      };
+    }
+    if (check.reason === 'archived') {
+      throw new Error(`Ask ${askId} was already resolved`);
+    }
+    throw new Error(`acceptedUserId ${acceptedUserId} is not the candidate of ask ${askId}`);
+  }
+
+  {
+    const rounds = askAttributes?.negopendmissions?.data ?? [];
     const latest = rounds[0]?.attributes; // ordern:desc → [0] is the latest round
     if (latest) {
       if (latest.name != null) finalName = latest.name;
@@ -79,11 +121,11 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
       if (latest.date != null) finalSqedualed = latest.date;
       if (latest.dates != null) finalDeadline = latest.dates;
     }
-  } catch {
-    /* negotiated terms are best-effort; baseline params still work */
   }
 
-  const votesStr = formatVotesForInline(existingVotes);
+  // Server's own view of the votes (DB rows + this approver's yes at the
+  // current round) — the client's array is not trusted.
+  const votesStr = formatVotesForInline(check.vots);
 
   const dateFragment = finalDeadline ? `admaticedai: "${finalDeadline}"` : '';
   const sdateFragment = finalSqedualed ? `start: "${finalSqedualed}"` : '';
@@ -123,7 +165,7 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
 
     updateAsk(id: "${askId}", data: {
       archived: true,
-      vots: [${votesStr}${votesStr ? ',' : ''}{ what: true users_permissions_user: "${voterUserId}" }]
+      vots: [${votesStr}]
     }) { data { id } }
   }`;
 

@@ -1,6 +1,8 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { EmailService } from '../../notifications/EmailService.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
+import { evaluateAskAcceptance } from '$lib/server/nego/askAcceptance.js';
+import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
 
 function formatVotesForInline(votes: any[]): string {
   if (!Array.isArray(votes) || votes.length === 0) return '';
@@ -15,7 +17,10 @@ function formatVotesForInline(votes: any[]): string {
     const order = attrs.order ?? 0;
     const ide = attrs.ide ?? uid;
     const zman = attrs.zman ?? new Date().toISOString();
-    return `{what:${what} users_permissions_user:${uid} order:${order} ide:${ide} zman:"${zman}"}`;
+    // `why` (the voter's words) is part of the vote — carry it through the
+    // rewrite instead of dropping it on acceptance.
+    const why = attrs.why ? ` why:${JSON.stringify(String(attrs.why))}` : '';
+    return `{what:${what} users_permissions_user:${uid} order:${order} ide:${ide} zman:"${zman}"${why}}`;
   }).join(',');
 }
 
@@ -41,7 +46,6 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
     deadline,
     timegramaId,
     existingMemberIds = [],  // project.user_1s ids BEFORE acceptance
-    existingVotes = [],
     projectName = '',
     projectSrc = '',
   } = params;
@@ -52,7 +56,8 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
 
   const newnew = !existingMemberIds.map(String).includes(String(acceptedUserId));
 
-  const votesStr = formatVotesForInline(existingVotes);
+  // Filled from the server's authoritative vote rows once the gate has run.
+  let votesStr = '';
 
   // Apply the latest negotiated round's terms (if any) to the materialized
   // Mesimabetahalich. When a candidate proposed custom terms and the member
@@ -67,6 +72,10 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
   let fTafkidims = Array.isArray(tafkidims) ? tafkidims.slice() : [];
   let fStart = sqedualed;
   let fDates = deadline;
+  // One fetch feeds both the consent gate and the negotiated terms. It must
+  // succeed: without it we cannot tell an assigned offer from an application,
+  // and materializing blind is exactly the failure this guard exists to stop.
+  let askAttributes: any = null;
   try {
     const roundsRes = await strapi.execute(
       'getAskNegoRounds',
@@ -74,20 +83,67 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
       context.jwt,
       context.fetch
     );
-    const latest =
-      roundsRes?.data?.ask?.data?.attributes?.negopendmissions?.data?.[0]?.attributes ?? null;
-    if (latest) {
-      if (latest.name != null) fName = latest.name;
-      if (latest.descrip != null) fDescrip = latest.descrip;
-      if (latest.hearotMeyuchadot != null) fHearot = latest.hearotMeyuchadot;
-      if (latest.noofhours != null) fHours = latest.noofhours;
-      if (latest.perhour != null) fPer = latest.perhour;
-      if (latest.tafkidims?.data?.length > 0) fTafkidims = latest.tafkidims.data.map((c: any) => c.id);
-      if (latest.date != null) fStart = latest.date;
-      if (latest.dates != null) fDates = latest.dates;
-    }
+    askAttributes = roundsRes?.data?.ask?.data?.attributes ?? null;
   } catch (e) {
-    console.error('[finalizeJoinAcceptance] nego rounds fetch failed:', e);
+    console.error('[finalizeJoinAcceptance] ask fetch failed:', e);
+  }
+  if (!askAttributes) throw new Error(`Ask ${askId} could not be loaded — acceptance aborted`);
+
+  // ── Consent gate ──────────────────────────────────────────────────────────
+  // The same bilateral rule the timegrama finalizer applies at restime: an
+  // ASSIGNED offer (open_mission.isRishon — a member created the mission on
+  // someone else's behalf) may never be registered under the assignee's name
+  // without their explicit yes. Client-computed vote counts are advisory only.
+  const check = evaluateAskAcceptance({
+    askAttributes,
+    callerId: context.userId,
+    acceptedUserId,
+    now: d,
+  });
+
+  if (!check.allowed) {
+    if (check.reason === 'awaitingAssigneeConsent') {
+      // Not a failure: the approving member's yes is real and must be kept.
+      // Store it at the current round and leave the Ask open — the assignee
+      // still has until the timegrama expires to agree, counter or talk.
+      await strapi.execute(
+        '120addVoteToAsk',
+        { askId: String(askId), vots: check.vots },
+        context.jwt,
+        context.fetch
+      );
+      await ensureCandidacyTimegrama(strapi, context, { side: 'ask', id: String(askId) });
+
+      return {
+        data: {
+          askId: String(askId),
+          materialized: false,
+          pending: 'assigneeConsent',
+          takerId: check.takerId,
+        },
+        updateStrategy: { type: 'fullRefresh' },
+      };
+    }
+    if (check.reason === 'archived') {
+      throw new Error(`Ask ${askId} was already resolved`);
+    }
+    throw new Error(`acceptedUserId ${acceptedUserId} is not the candidate of ask ${askId}`);
+  }
+
+  // Persist the server's own view of the votes (DB rows + this approver's yes
+  // at the current round) rather than the client-supplied array.
+  votesStr = formatVotesForInline(check.vots);
+
+  const latest = askAttributes?.negopendmissions?.data?.[0]?.attributes ?? null;
+  if (latest) {
+    if (latest.name != null) fName = latest.name;
+    if (latest.descrip != null) fDescrip = latest.descrip;
+    if (latest.hearotMeyuchadot != null) fHearot = latest.hearotMeyuchadot;
+    if (latest.noofhours != null) fHours = latest.noofhours;
+    if (latest.perhour != null) fPer = latest.perhour;
+    if (latest.tafkidims?.data?.length > 0) fTafkidims = latest.tafkidims.data.map((c: any) => c.id);
+    if (latest.date != null) fStart = latest.date;
+    if (latest.dates != null) fDates = latest.dates;
   }
 
   const dateFragment = fDates ? `admaticedai: "${fDates}"` : '';
@@ -151,7 +207,7 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
 
     updateAsk(id: "${askId}", data: {
       archived: true,
-      vots: [${votesStr}${votesStr ? ',' : ''}{ what: true users_permissions_user: ${voterUserId} }]
+      vots: [${votesStr}]
     }) { data { id } }
   }`;
 

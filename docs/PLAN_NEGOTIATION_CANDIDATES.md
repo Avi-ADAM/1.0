@@ -124,6 +124,14 @@
   (לא דורס) + מעדכן vots.
 - `applyToMission.ts` — מסלול A/C; solo מאשר ישירות.
 - `finalizeAskAcceptance.ts` — מחיל את הסבב האחרון לפני `createMesimabetahalich`.
+- `askAcceptance.ts` (`evaluateAskAcceptance`) — **שער ההסכמה של המסלול המיידי**:
+  `finalizeJoinAcceptance`/`finalizeAskAcceptance` מריצים את אותו `computeNegoGate`
+  של הפקיעה לפני שהם מייצרים `Mesimabetahalich`. בהצעה **מוקצית**
+  (`open_mission.isRishon` — חבר יצר משימה עבור מישהו אחר) שתיקת המוקצה אינה
+  הסכמה: אם ה-taker לא הצביע בעד ב-`order ≥ L` (ולא העלה סבב `candidate` משלו),
+  הפעולה **לא** מממשת — היא רק שומרת את הצבעת-הבעד של החבר המאשר ומוודאת
+  timegrama פעיל, וההצעה נשארת פתוחה. ספירות ההצבעות של הלקוח (`noofpu ===
+  noofusersOk`, `variant`) הן אינדיקציה בלבד; ה-vots נכתבים מהמצב שבשרת.
 
 ### 3.3 פקיעת הזמן (cron)
 - `src/routes/api/timegrama/+server.js` — `x()` מנתב לפי `whatami`:
