@@ -38,8 +38,13 @@ export const EMPTY_EXTRACTION: WishExtraction = {
   hints: []
 };
 
-/** Strip ```json fences / stray prose and return the first JSON object found. */
-function coerceJson(raw: string): unknown {
+/**
+ * Strip ```json fences / stray prose and return the first JSON object found.
+ *
+ * Exported because every "ask the model for JSON" caller needs the same
+ * defensive parse (see `src/lib/server/planning/`).
+ */
+export function coerceJson(raw: string): unknown {
   if (!raw) return null;
   let s = raw.trim();
   // Remove leading/trailing code fences.

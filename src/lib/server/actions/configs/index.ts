@@ -60,6 +60,11 @@ import {
   updatePlanItemAction,
   markPlanItemCreatedAction
 } from './planningBoards.js';
+import {
+  scanProjectDirectionsAction,
+  expandPlanBoardAction,
+  createPlanBoardFromTextAction
+} from './planningRuns.js';
 import { requestSuggestionConfig } from './requestSuggestion.js';
 import { requestWishMissionConfig } from './requestWishMission.js';
 import { requestWishResourceConfig } from './requestWishResource.js';
@@ -280,6 +285,9 @@ export function registerAllActions(): void {
   registerAction(createPlanItemAction);
   registerAction(updatePlanItemAction);
   registerAction(markPlanItemCreatedAction);
+  registerAction(scanProjectDirectionsAction);
+  registerAction(expandPlanBoardAction);
+  registerAction(createPlanBoardFromTextAction);
   registerAction(requestSuggestionConfig);
   registerAction(requestWishMissionConfig);
   registerAction(requestWishResourceConfig);

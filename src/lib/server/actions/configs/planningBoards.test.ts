@@ -35,7 +35,7 @@ function item(id: string, attrs: Record<string, any> = {}) {
 
 /** Minimal strapi double: routes each qid to a canned response. */
 function strapiDouble(responses: Record<string, any>) {
-  const execute = vi.fn(async (qid: string) => {
+  const execute = vi.fn(async (qid: string, _args?: any, _jwt?: any, _fetch?: any) => {
     if (!(qid in responses)) throw new Error(`unexpected qid ${qid}`);
     const r = responses[qid];
     return typeof r === 'function' ? r() : r;
@@ -164,11 +164,11 @@ describe('input normalisation', () => {
 
     const a = strapiDouble({ '287createPlanBoard': made });
     await run(createPlanBoardAction, { projectId: '42', title: 'A', origin: 'quickScan' }, a.strapi);
-    expect(a.execute.mock.calls[0][1].status).toBe('suggested');
+    expect((a.execute.mock.calls[0] as any[])[1].status).toBe('suggested');
 
     const b = strapiDouble({ '287createPlanBoard': made });
     await run(createPlanBoardAction, { projectId: '42', title: 'B', origin: 'manual' }, b.strapi);
-    expect(b.execute.mock.calls[0][1].status).toBe('active');
+    expect((b.execute.mock.calls[0] as any[])[1].status).toBe('active');
   });
 
   it('falls back to a manual origin when given an unknown one', async () => {
@@ -176,7 +176,7 @@ describe('input normalisation', () => {
       '287createPlanBoard': { data: { createProjectPlanBoard: { data: { id: '1' } } } }
     });
     await run(createPlanBoardAction, { projectId: '42', title: 'A', origin: 'wat' }, strapi);
-    expect(execute.mock.calls[0][1].origin).toBe('manual');
+    expect((execute.mock.calls[0] as any[])[1].origin).toBe('manual');
   });
 
   it('rejects unknown item kinds and blank names', async () => {
@@ -200,7 +200,7 @@ describe('input normalisation', () => {
       { boardId: '1', projectId: '42', kind: 'act', name: 'עדכון הלוגו', imp: 'must', spec },
       strapi
     );
-    const args = execute.mock.calls.find(([q]) => q === '289createPlanItem')?.[1] as any;
+    const args = (execute.mock.calls.find(([q]) => q === '289createPlanItem') as any[])[1];
     expect(args.kind).toBe('act');
     expect(args.imp).toBe('must');
     expect(args.spec).toEqual(spec);

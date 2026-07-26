@@ -1,0 +1,292 @@
+/**
+ * Planning AI runs — PLAN_PROJECT_PLANNING_BOARDS §1
+ *
+ * The two tiers that actually invoke a model, and persist what comes back.
+ * Both are triggered by an explicit user action — **neither runs
+ * automatically**, and neither creates a real mission/act/resource. They only
+ * produce proposals a human then approves in the normal creation form.
+ *
+ *  - `scanProjectDirections` (tier 1, thin/cheap): reads the project's real
+ *    state and proposes 3–5 directions as `suggested` boards with no items.
+ *  - `expandPlanBoard` (tier 2, the big run): breaks ONE direction into
+ *    concrete rows, deduplicated against what the project already has.
+ *
+ * `createPlanBoardFromText` is the free-text entry point: it creates a board
+ * and expands it in a single step.
+ */
+
+import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { scanProjectDirections } from '../../planning/quickScan.js';
+import { expandDirection, type ExpandedItem } from '../../planning/expandDirection.js';
+
+type Lang = 'he' | 'en' | 'ar';
+
+function asLang(v: unknown): Lang {
+  return v === 'en' || v === 'ar' ? v : 'he';
+}
+
+/** Persist one expansion row as a `project-plan-item`. */
+async function persistItem(
+  strapi: any,
+  context: any,
+  boardId: string,
+  item: ExpandedItem
+): Promise<void> {
+  await strapi.execute(
+    '289createPlanItem',
+    {
+      kind: item.kind,
+      name: item.name,
+      descrip: item.descrip ?? '',
+      imp: item.imp === 'must' ? 'must' : 'nice',
+      status: 'proposed',
+      spec: item.spec ?? {},
+      existingRef: item.existingRef ?? null,
+      order: item.order ?? 0,
+      boardId: String(boardId),
+      publishedAt: new Date().toISOString()
+    },
+    context.jwt,
+    context.fetch
+  );
+}
+
+/** Load a board and assert it belongs to `projectId` (see planningBoards.ts). */
+async function loadBoardInProject(
+  strapi: any,
+  context: any,
+  boardId: string,
+  projectId: string
+): Promise<any> {
+  const res = await strapi.execute('286getPlanBoard', { id: String(boardId) }, context.jwt, context.fetch);
+  const board = res?.data?.projectPlanBoard?.data;
+  if (!board) throw new Error(`Planning board ${boardId} not found`);
+  if (String(board.attributes?.project?.data?.id) !== String(projectId)) {
+    throw new Error('This planning board does not belong to the given project');
+  }
+  return board;
+}
+
+// ── Tier 1: scanProjectDirections ──────────────────────────────────────────
+
+const scanHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
+  const { projectId, lang } = params as Record<string, any>;
+
+  const scan = await scanProjectDirections(
+    String(projectId),
+    String(context.userId),
+    context.fetch,
+    { lang: asLang(lang) }
+  );
+
+  // Persist each direction as a *suggested* board: thin, no items, waiting for
+  // the user to accept it before anything is expanded.
+  const created: any[] = [];
+  for (const [i, d] of scan.directions.entries()) {
+    const res = await strapi.execute(
+      '287createPlanBoard',
+      {
+        title: d.title,
+        descrip: d.descrip,
+        rationale: d.rationale,
+        origin: 'quickScan',
+        status: 'suggested',
+        sourceText: '',
+        order: i,
+        projectId: String(projectId),
+        userId: String(context.userId),
+        publishedAt: new Date().toISOString()
+      },
+      context.jwt,
+      context.fetch
+    );
+    const node = res?.data?.createProjectPlanBoard?.data;
+    if (node) created.push({ id: node.id, ...d });
+  }
+
+  return {
+    stage: scan.stage,
+    signals: scan.signals,
+    boards: created,
+    // Surfaced so the UI can explain an empty result instead of showing nothing.
+    generated: scan.directions.length
+  };
+};
+
+export const scanProjectDirectionsAction: ActionConfig = {
+  key: 'scanProjectDirections',
+  description:
+    'Tier 1 — a thin, cheap scan of the project that proposes a few directions for advancing it, saved as suggested boards. Never runs automatically.',
+  graphqlOperation: scanHandler,
+  paramSchema: {
+    projectId: { type: 'string', required: true, description: 'ID of the project to scan' },
+    lang: { type: 'string', required: false, description: 'he | en | ar' }
+  },
+  access: ['user', 'serviceAdmin'],
+  authRules: [
+    { type: 'jwt', errorMessage: 'You must be logged in to plan' },
+    {
+      type: 'projectMember',
+      config: { projectIdParam: 'projectId' },
+      errorMessage: 'You must be a member of this project to scan it'
+    }
+  ]
+};
+
+// ── Tier 2: expandPlanBoard ────────────────────────────────────────────────
+
+const expandHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
+  const { boardId, projectId, lang, revisionNote } = params as Record<string, any>;
+
+  const board = await loadBoardInProject(strapi, context, boardId, projectId);
+  const attrs = board.attributes ?? {};
+
+  // Everything the direction knows about itself becomes the brief. A revision
+  // note (this run only) lets the user steer without rewriting the board.
+  const brief = [attrs.title, attrs.descrip, attrs.sourceText, revisionNote]
+    .filter((s: unknown) => typeof s === 'string' && s.trim())
+    .join('\n');
+
+  if (!brief.trim()) throw new Error('This board has no text to expand');
+
+  const expansion = await expandDirection(
+    String(projectId),
+    String(context.userId),
+    brief,
+    context.fetch,
+    { lang: asLang(lang) }
+  );
+
+  for (const item of expansion.items) {
+    await persistItem(strapi, context, String(boardId), item);
+  }
+
+  // The board is now expanded — and accepted by definition, since the user
+  // asked for this run.
+  await strapi.execute(
+    '288updatePlanBoard',
+    {
+      id: String(boardId),
+      data: {
+        status: 'expanded',
+        expandedAt: new Date().toISOString(),
+        ...(revisionNote ? { revisionNote: String(revisionNote) } : {})
+      }
+    },
+    context.jwt,
+    context.fetch
+  );
+
+  return {
+    boardId: String(boardId),
+    itemCount: expansion.items.length,
+    duplicateCount: expansion.items.filter((i) => i.existingRef).length,
+    hints: expansion.hints
+  };
+};
+
+export const expandPlanBoardAction: ActionConfig = {
+  key: 'expandPlanBoard',
+  description:
+    'Tier 2 — break one direction into concrete proposed rows (missions/resources), deduplicated against what the project already has. Runs only on explicit request.',
+  graphqlOperation: expandHandler,
+  paramSchema: {
+    boardId: { type: 'string', required: true, description: 'ID of the board to expand' },
+    projectId: { type: 'string', required: true, description: 'ID of the project the board belongs to' },
+    lang: { type: 'string', required: false, description: 'he | en | ar' },
+    revisionNote: {
+      type: 'string',
+      required: false,
+      description: 'Free-text steer for this run ("more marketing, drop the budget ones")'
+    }
+  },
+  access: ['user', 'serviceAdmin'],
+  authRules: [
+    { type: 'jwt', errorMessage: 'You must be logged in to plan' },
+    {
+      type: 'projectMember',
+      config: { projectIdParam: 'projectId' },
+      errorMessage: 'You must be a member of this project to expand its planning boards'
+    }
+  ]
+};
+
+// ── Free-text entry point ──────────────────────────────────────────────────
+
+const fromTextHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
+  const { projectId, text, title, lang } = params as Record<string, any>;
+
+  const brief = String(text || '').trim();
+  if (brief.length < 20) {
+    throw new Error('Write a little more so the plan has something to work with');
+  }
+
+  const expansion = await expandDirection(
+    String(projectId),
+    String(context.userId),
+    brief,
+    context.fetch,
+    { lang: asLang(lang) }
+  );
+
+  const boardTitle =
+    String(title || '').trim() ||
+    expansion.extraction.titleSuggestion ||
+    brief.slice(0, 60);
+
+  const boardRes = await strapi.execute(
+    '287createPlanBoard',
+    {
+      title: boardTitle,
+      descrip: '',
+      rationale: '',
+      origin: 'freeText',
+      // Free text arrives already expanded — the user wrote the direction.
+      status: 'expanded',
+      sourceText: brief,
+      order: 0,
+      projectId: String(projectId),
+      userId: String(context.userId),
+      publishedAt: new Date().toISOString()
+    },
+    context.jwt,
+    context.fetch
+  );
+
+  const boardNode = boardRes?.data?.createProjectPlanBoard?.data;
+  if (!boardNode) throw new Error('Failed to create planning board');
+
+  for (const item of expansion.items) {
+    await persistItem(strapi, context, String(boardNode.id), item);
+  }
+
+  return {
+    boardId: String(boardNode.id),
+    title: boardTitle,
+    itemCount: expansion.items.length,
+    duplicateCount: expansion.items.filter((i) => i.existingRef).length,
+    hints: expansion.hints
+  };
+};
+
+export const createPlanBoardFromTextAction: ActionConfig = {
+  key: 'createPlanBoardFromText',
+  description:
+    'Create a planning board from free text the user wrote, expanded into proposed rows in one step.',
+  graphqlOperation: fromTextHandler,
+  paramSchema: {
+    projectId: { type: 'string', required: true, description: 'ID of the project' },
+    text: { type: 'string', required: true, description: 'What the user wrote' },
+    title: { type: 'string', required: false, description: 'Optional board title (defaults to an AI suggestion)' },
+    lang: { type: 'string', required: false, description: 'he | en | ar' }
+  },
+  access: ['user', 'serviceAdmin'],
+  authRules: [
+    { type: 'jwt', errorMessage: 'You must be logged in to plan' },
+    {
+      type: 'projectMember',
+      config: { projectIdParam: 'projectId' },
+      errorMessage: 'You must be a member of this project to plan it'
+    }
+  ]
+};

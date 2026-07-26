@@ -113,16 +113,26 @@ nullable היו מלכלכים את הסכמה; `{type,id}` כן ומספיק.
 
 ## 3. שרת (`1.0`) — מה צריך להיבנות
 
-### 3.1 מנוע
-`src/lib/server/planning/`
-- **`quickScan.ts`** — `scanProject(projectId, userId, fetch)`:
-  `buildProjectContext()` → מסווג חדש/קיים → פרומפט קצר → 3–5 `{title, descrip, rationale}`.
-  זול; בלי Pinecone.
-- **`expandDirection.ts`** — `expandBoard(boardId, ...)`:
-  `extractWish()` (קיים) על `descrip`+`sourceText` → **דה-דופליקציה מול
-  `buildProjectContext()`** (לא להציע "עיצוב לוגו" אם יש כזו פתוחה — מסמן
-  `existingRef`) → `resolveMissionSpec()` (קיים, Pinecone) לכל שורת משימה →
-  items.
+### 3.1 מנוע ✅ בוצע — `src/lib/server/planning/`
+
+- **`signals.ts`** (טהור, 11 טסטים) — `classifyProjectStage()` + `buildScanSignals()`.
+  פרויקט הוא `new` כשלא נוצר בו כלום (0 משימות פתוחות + 0 מוצרים + 0 עבודה
+  בתהליך). **גודל הצוות לבדו לא הופך פרויקט ל"קיים"** — חמישה חברים שלא יצרו
+  כלום עדיין צריכים עצות התנעה. ה-`facts` הם תצפיות מחושבות בלבד ולא מכילים
+  טקסט חופשי של משתמשים (יש טסט שמוודא שניסיון prompt-injection בשם הפרויקט
+  לא מחלחל אליהם).
+- **`quickScan.ts`** (10 טסטים) — `scanProjectDirections()`: קריאה קצרה אחת
+  ל-flash-lite מעל ה-snapshot שכבר נבנה לצ'אט. בלי שאילתות נוספות, בלי
+  Pinecone. `parseDirections()` סופג התנהגות מודל: code fences, פטפוט מסביב,
+  מערך עירום במקום אובייקט, כפילויות, שדות ארוכים מדי, וג'אנק מוחלט → מחזיר
+  מערך ריק במקום לזרוק. כשל בסריקה **לא שובר את הדף**.
+- **`expandDirection.ts`** (13 טסטים) — `extractWish()` (קיים) →
+  `resolveMissionSpec()` (קיים, Pinecone) → **דה-דופליקציה מול הפרויקט**.
+
+**החלטה בדה-דופליקציה:** שורה כפולה **מסומנת ולא נמחקת** (`existingRef`), כי
+"כבר קיים" הוא מידע שימושי למשתמש — הוא רוצה לדעת שהכיוון נכון אבל כבר טופל.
+בנוסף השורות ממוינות כך שמה שחדש-וחובה עולה למעלה והכפילויות יורדות למטה.
+סף הדמיון `0.7` מעל `fuzzyMissionMatch`.
 
 ### 3.2 Actions (`src/lib/server/actions/configs/planningBoards.ts`) ✅ בוצע
 | Action | תפקיד |
@@ -132,6 +142,9 @@ nullable היו מלכלכים את הסכמה; `{type,id}` כן ומספיק.
 | `createPlanItem` | הוספת שורה (mission / act / resource / product / note) |
 | `updatePlanItem` | must↔nice, accept, dismiss, עריכת שם/תיאור/spec |
 | `markPlanItemCreated` | נקרא אחרי יצירה מוצלחת בטופס → `status:'created'` + `createdRef` |
+| **`scanProjectDirections`** | **מדרגה 1** — סורק ויוצר N לוחות `suggested` בלי items |
+| **`expandPlanBoard`** | **מדרגה 2** — מפרק כיוון אחד ל-items (תומך `revisionNote` לריצה הזו) |
+| **`createPlanBoardFromText`** | מסלול הטקסט החופשי — לוח + פירוק בצעד אחד |
 
 **הרשאות:** כל הפעולות `jwt` + `projectMember`. מכיוון שמזהה לוח לא נושא בתוכו
 פרויקט, כל פעולה מקבלת `projectId` **מפורש** ומאמתת שהלוח באמת שייך לו — אחרת
@@ -207,8 +220,8 @@ nullable היו מלכלכים את הסכמה; `{type,id}` כן ומספיק.
 | 1 | סכמת Strapi (`project-plan-board` + `project-plan-item`, כולל `act`) | ✅ בוצע |
 | 2 | תיקון דליפת ה-prefill (§5) | ✅ בוצע |
 | 3 | QIDs + actions CRUD ללוחות (+14 טסטים) | ✅ בוצע |
-| 4 | `quickScan.ts` + `scanProjectDirections` (מדרגה 1) | ⏳ |
-| 5 | `expandDirection.ts` + `expandPlanBoard` (מדרגה 2) | ⏳ |
+| 4 | `quickScan.ts` + `scanProjectDirections` (מדרגה 1) | ✅ בוצע |
+| 5 | `expandDirection.ts` + `expandPlanBoard` (מדרגה 2) | ✅ בוצע |
 | 6 | חשיפת `isPersonal` כ-prop ב-`crtask.svelte` (§2.1) | ⏳ |
 | 7 | `PlanBoards.svelte` + `PlanBoard.svelte` | ⏳ |
 | 8 | חיבור "פתח בטופס" + `markPlanItemCreated` | ⏳ |
