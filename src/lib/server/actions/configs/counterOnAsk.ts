@@ -8,6 +8,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { normalizeLocationInput, extractRelationId } from './actionUtils.js';
+import { buildRoundActs } from '../helpers/roundActs.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
 
 interface UserVote {
@@ -27,6 +28,15 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const nextOrder = (Number(params.ordern) || 0) + 1;
 
   // 1. The project's counter terms as a new Negopendmission round on the candidate's Ask.
+  // The negotiated checklist rides on the round, not on the shared OpenMission
+  // (parallel candidates each keep their own). Rounds carry the full proposed
+  // list, so acceptance can take it as-is.
+  const roundActs = await buildRoundActs(strapi, context, {
+    projectId,
+    newActs: params.newActs ?? [],
+    existingActsIds: params.existingActsIds ?? [],
+  });
+
   const loc = normalizeLocationInput(newValues.location);
   await strapi.execute(
     'negoCreateNegopendmissionRound',
@@ -49,6 +59,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       work_ways: newValues.workwayIds ?? null,
       sqadualed: newValues.sqadualed ?? null,
       dates: newValues.dates ?? null,
+      acts: roundActs,
       location: loc ? [loc] : [],
     },
     context.jwt,
@@ -121,6 +132,9 @@ export const counterOnAskConfig: ActionConfig = {
       required: false,
       description: 'Counter terms: name, descrip, hearotMeyuchadot, noofhours, perhour, skillIds, roleIds, workwayIds, sqadualed, dates, location',
     },
+    newActs: { type: 'array', required: false, description: 'Checklist items added in this round: [{shem, des?, link?, dateS?, dateF?}]' },
+    existingActsIds: { type: 'array', required: false, description: 'Ids of the checklist items this round keeps' },
+    actsChanged: { type: 'boolean', required: false, description: 'True when the negotiator edited the checklist' },
     users: { type: 'array', required: false, description: 'Existing Ask vots array' },
   },
 

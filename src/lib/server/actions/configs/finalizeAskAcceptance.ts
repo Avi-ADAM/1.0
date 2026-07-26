@@ -3,6 +3,7 @@ import { EmailService } from '../../notifications/EmailService.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { evaluateAskAcceptance } from '$lib/server/nego/askAcceptance.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
+import { resolveAcceptedActs } from '../helpers/roundActs.js';
 
 function formatVotesForInline(votes: any[]): string {
   if (!Array.isArray(votes) || votes.length === 0) return '';
@@ -131,6 +132,7 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
   const sdateFragment = finalSqedualed ? `start: "${finalSqedualed}"` : '';
   const tafkidimsStr = finalTafkidims.join(',');
   const otherAsksFragment = variant === 'allVoted' ? 'asks { data { id } }' : '';
+  const actsFragment = 'acts { data { id } }';
 
   const strapiUrl = STRAPI_URL;
   const graphqlUrl = `${strapiUrl}/graphql`;
@@ -160,7 +162,7 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
     }) { data { id attributes { project { data { id } } } } }
 
     updateOpenMission(id: "${openMid}", data: { archived: true }) {
-      data { id attributes { archived ${otherAsksFragment} } }
+      data { id attributes { archived ${otherAsksFragment} ${actsFragment} } }
     }
 
     updateAsk(id: "${askId}", data: {
@@ -178,6 +180,33 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
 
   if (responseData.errors) {
     throw new Error(`Mutation failed: ${JSON.stringify(responseData.errors)}`);
+  }
+
+  // Hand the accepted checklist to the new mission: the winning round's list
+  // when it carries one, else the OpenMission baseline.
+  const newMbId = responseData.data?.createMesimabetahalich?.data?.id;
+  const acceptedActIds = resolveAcceptedActs(
+    askAttributes?.negopendmissions?.data,
+    responseData.data?.updateOpenMission?.data?.attributes?.acts
+  );
+  for (const actId of acceptedActIds) {
+    if (!newMbId) break;
+    await strapi
+      .execute(
+        '31updateTask',
+        {
+          id: actId,
+          myIshur: true,
+          isAssigned: true,
+          uid: [String(context.userId)],
+          mesimabetahaliches: [newMbId],
+        },
+        context.jwt,
+        context.fetch
+      )
+      .catch(() => {
+        /* one stubborn checklist row must not undo the acceptance */
+      });
   }
 
   // allVoted case: archive other asks + optional createMonter on first iteration

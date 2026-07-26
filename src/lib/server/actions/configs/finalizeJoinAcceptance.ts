@@ -3,6 +3,7 @@ import { EmailService } from '../../notifications/EmailService.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { evaluateAskAcceptance } from '$lib/server/nego/askAcceptance.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
+import { resolveAcceptedActs } from '../helpers/roundActs.js';
 
 function formatVotesForInline(votes: any[]): string {
   if (!Array.isArray(votes) || votes.length === 0) return '';
@@ -224,7 +225,12 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
 
   const chiluzh = responseData.data?.createMesimabetahalich?.data?.id;
   const openMissionAttrs = responseData.data?.updateOpenMission?.data?.attributes || {};
-  const acts: any[] = openMissionAttrs.acts?.data || [];
+  // The accepted checklist: the winning round's list when it has one, else the
+  // OpenMission baseline (see helpers/roundActs.ts).
+  const actIds: string[] = resolveAcceptedActs(
+    askAttributes?.negopendmissions?.data,
+    openMissionAttrs.acts
+  );
 
   // Inherit process anchors from the OpenMission
   if (chiluzh && openMid) {
@@ -299,12 +305,12 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
   }
 
   // Update acts (tasks): mark as assigned
-  for (const act of acts) {
+  for (const actId of actIds) {
     try {
       await strapi.execute(
         '31updateTask',
         {
-          id: act.id,
+          id: actId,
           myIshur: true,
           isAssigned: true,
           uid: [String(voterUserId)],

@@ -304,5 +304,14 @@ timegrama פעיל, ליצור; אם יש, להאריך/לאפס את ה-date ל
        (`myid === userId`) → `candidateCounterOnAsk` (סבב `candidate`, עוצר את השעון),
        שאר החברים → `counterOnAsk` (סבב `project`). השרת מאמת ב-`candidateCounterOnAsk`
        שהקורא הוא באמת ה-taker.
+- [x] **צ'קליסט (acts) שורד את המו"מ** — `negoM` מעביר את רשימת המטלות גם במסלול
+       ה-`onSubmit` (Ask), ו-`counterOnAsk`/`candidateCounterOnAsk`/`submitNegoMission`
+       שומרים אותה **על הסבב** (`Negopendmission.acts`) ולא על ה-OpenMission
+       המשותף — אחרת הצ'קליסט של מועמד אחד נכנס לבסיס של כולם. באישור
+       (`finalizeJoinAcceptance`/`finalizeAskAcceptance`/`ask.svelte` בפקיעה)
+       המטלות של הסבב האחרון שרשם צ'קליסט עוברות ל-Mesimabetahalich; סבב שלא אמר
+       דבר על הצ'קליסט (למשל הצעה ראשונה של מועמד, שאין בה UI למטלות) נופל אחורה
+       לסבב הקודם ואז לבסיס (`helpers/roundActs.ts`). דיאלוג המו"מ והכרטיס נטענים
+       מאותה רשימה, כדי שהצעה-נגדית-על-הצעה-נגדית לא תמחק מטלות שהצד השני הוסיף.
 - [ ] helper משותף לחישוב סבב/תור/approvable (אופציונלי — השרת כבר מכריע).
 - [ ] כפתורים בדפים הקבועים

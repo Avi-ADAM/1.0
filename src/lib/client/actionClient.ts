@@ -299,6 +299,9 @@ export interface CounterOnAskParams {
   ordern?: number;
   candidateUserId?: string;
   newValues?: Record<string, any>;
+  newActs?: Array<{ shem: string; des?: string | null; link?: string | null; dateS?: string | null; dateF?: string | null }>;
+  existingActsIds?: Array<string | number>;
+  actsChanged?: boolean;
   users?: Array<{ what: boolean; users_permissions_user: any; order?: number; zman?: string; ide?: number }>;
 }
 
@@ -331,6 +334,9 @@ export interface CandidateCounterOnAskParams {
   projectId: string;
   ordern?: number;
   newValues?: Record<string, any>;
+  newActs?: Array<{ shem: string; des?: string | null; link?: string | null; dateS?: string | null; dateF?: string | null }>;
+  existingActsIds?: Array<string | number>;
+  actsChanged?: boolean;
   users?: Array<{ what: boolean; users_permissions_user: any; order?: number; zman?: string; ide?: number }>;
 }
 

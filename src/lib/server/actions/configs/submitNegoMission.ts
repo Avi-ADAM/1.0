@@ -42,7 +42,11 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
       mbId: null,
       assignedId: null,
       pendm: params.isAsk === 0 ? params.pendId : null,
-      open_mission: params.isAsk !== 0 ? params.pendId : null,
+      // OpenMission path: the item belongs to the candidate's round, not to the
+      // shared offer — otherwise one candidate's checklist becomes everyone's
+      // baseline. It is attached to the round below (and to the mission only if
+      // that round is the one accepted).
+      open_mission: null,
       dateS,
       dateF,
       myIshur: null,
@@ -201,6 +205,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     work_ways: nv.workwayIds ?? null,
     sqadualed: nv.sqadualed ?? null,
     dates: nv.dates ?? null,
+    // The round carries the full proposed checklist (kept + newly created).
+    acts: finalActIds,
     // Omit when absent — repeatable component rejects explicit `null` (see snapshot above).
     ...(roundLoc ? { location: [roundLoc] } : {}),
   }, context.jwt, context.fetch);
