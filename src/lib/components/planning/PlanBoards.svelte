@@ -25,10 +25,12 @@
    * @typedef {Object} Props
    * @property {string} projectId
    * @property {(item: any, board: any) => void} [onOpenItem] - Open a row in its real creation form.
+   * @property {string|null} [initialBoardId] - Board to open on load. Set from the
+   *   `?board=` deep link that planProjectWorkTool hands back as its reviewUrl.
    */
 
   /** @type {Props} */
-  let { projectId, onOpenItem } = $props();
+  let { projectId, onOpenItem, initialBoardId = null } = $props();
 
   let boards = $state(/** @type {any[]} */ ([]));
   let loading = $state(true);
@@ -39,6 +41,13 @@
   let freeText = $state('');
   let submittingText = $state(false);
   let openBoardId = $state(/** @type {string|null} */ (null));
+
+  // Sync the deep link into local state. Not a plain initialiser: `?board=`
+  // can arrive through client-side navigation (the bot hands the user a
+  // reviewUrl), and a plain $state() would only capture the first value.
+  $effect(() => {
+    if (initialBoardId) openBoardId = String(initialBoardId);
+  });
 
   const i18n = {
     he: {

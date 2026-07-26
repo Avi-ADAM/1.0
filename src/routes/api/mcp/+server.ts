@@ -23,6 +23,7 @@ import { getProjectMembersTool } from '../../../mastra/tools/getProjectMembersTo
 import { getMemberMissionsTool } from '../../../mastra/tools/getMemberMissionsTool';
 import { prepareMissionTool } from '../../../mastra/tools/prepareMissionTool';
 import { createMissionTool } from '../../../mastra/tools/createMissionTool';
+import { planProjectWorkTool, scanProjectDirectionsTool } from '../../../mastra/tools/planningTools';
 
 // --- Public Tools for Unauthenticated Users ---
 
@@ -131,6 +132,8 @@ async function handleMcpRequest(request: Request, url: URL, svelteFetch: typeof 
             getMemberMissionsTool,
             prepareMissionTool,
             createMissionTool,
+            planProjectWorkTool,
+            scanProjectDirectionsTool,
             howToConnect // Included even in auth mode for convenience
         };
     } else {

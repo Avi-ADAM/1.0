@@ -228,7 +228,7 @@ nullable היו מלכלכים את הסכמה; `{type,id}` כן ומספיק.
 | 6 | חשיפת `isPersonal` כ-prop ב-`crtask.svelte` (§2.1) | ✅ בוצע |
 | 7 | `PlanBoards.svelte` + `PlanBoard.svelte` | ✅ בוצע |
 | 8 | חיבור "פתח בטופס" + `markPlanItemCreated` | ✅ בוצע |
-| 9 | `planProjectWorkTool` לבוט/MCP (מחזיר `boardId` + `reviewUrl`) | ⏳ |
+| 9 | `planProjectWorkTool` + `scanProjectDirectionsTool` לבוט/MCP | ✅ בוצע |
 
 ## 8. הערות מימוש UI
 
@@ -243,6 +243,21 @@ nullable היו מלכלכים את הסכמה; `{type,id}` כן ומספיק.
   (במצב תפקיד אם `spec.assigneeKind === 'role'`), `resource`/`product` →
   `ResourceCreator`, ברירת מחדל → `mission.svelte` דרך אותו נתיב prefill של
   `?action=createmission`.
+### כלי הבוט/MCP (`src/mastra/tools/planningTools.ts`)
+
+- **`scanProjectDirectionsTool`** — מדרגה 1 לשאלה פתוחה ("מה כדאי לעשות?").
+- **`planProjectWorkTool`** — טקסט חופשי → לוח עם שורות → `reviewUrl`.
+
+שניהם רשומים ב-`reg-bot` וב-`/api/mcp`, ושניהם מחזירים `reviewUrl` במקום ליצור
+ישויות — זהו דפוס "הצעה + ניווט לאישור" של `PLAN_AI_ERA` שלב 2, על *קבוצת*
+ישויות. ה-`reviewUrl` הוא deep link `?board=<id>` שהדף צורך ופותח את הלוח.
+
+**אבטחה:** ה-authz הסטטי (`access`) נאכף ב-route של `/api/v1/actions`, לא בתוך
+`actionService`. הכלים קוראים ל-`actionService` בתהליך, ולכן ההגנה בפועל היא
+ה-`authRules` — `jwt` + **`projectMember`**. לכן סוכן חיצוני לא יכול לתכנן
+בריקמה שבעל המפתח אינו חבר בה. הפעולות **לא** נחשפו ל-`apiKey` ב-`access`,
+כלומר אין להן נתיב REST ישיר.
+
 - **סימון `created`** מתבצע מהחזרת הטופס עצמו: `mission.svelte` מחזיר
   `{ md: { createdEntityType, createdEntityId } }`, `ResourceCreator` מחזיר את
   הרשומה, ו-`crtask` מחזיר `{ id }`. אם לא הוחזר מזהה — השורה **לא** מסומנת,

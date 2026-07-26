@@ -215,6 +215,12 @@
   // form, and the row is marked `created` afterwards with whatever the form
   // actually produced. See PLAN_PROJECT_PLANNING_BOARDS.
 
+  /**
+   * Board to open on load — the `?board=` deep link planProjectWorkTool hands
+   * the user after drafting a plan from the bot or an external agent.
+   */
+  let deepLinkedBoardId = $derived(page.url.searchParams.get('board'));
+
   /** The plan row currently being turned into a real entity, if any. */
   let pendingPlanItem = $state(/** @type {any} */ (null));
   let planBoardsRef = $state(/** @type {any} */ (null));
@@ -396,7 +402,12 @@
     </div>
 
     <!-- לוחות תכנון — הצעות שהופכות למשימות רק אחרי אישור בטופס -->
-    <PlanBoards bind:this={planBoardsRef} {projectId} onOpenItem={openPlanItem} />
+    <PlanBoards
+      bind:this={planBoardsRef}
+      {projectId}
+      onOpenItem={openPlanItem}
+      initialBoardId={deepLinkedBoardId}
+    />
   {/if}
 
   <!-- פורמים — עם כפתור חזרה -->
