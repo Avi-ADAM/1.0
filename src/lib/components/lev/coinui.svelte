@@ -531,6 +531,7 @@
             chat={buble.chat}
             declined={buble.decid}
             isRishon={buble.openMissionData.isRishon}
+            myid={buble.myid}
             timegramaId={buble.timegramaId}
             timegramaDate={buble.timegramaDate}
             negopendmissions={buble.negopendmissions || []}

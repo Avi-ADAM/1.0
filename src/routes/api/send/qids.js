@@ -2743,6 +2743,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         id
         attributes {
           name descrip hearotMeyuchadot noofhours perhour iskvua privatlinks publicklinks sqadualed dates
+          rishon { data { id } }
           mission { data { id } }
           skills { data { id } }
           tafkidims { data { id } }

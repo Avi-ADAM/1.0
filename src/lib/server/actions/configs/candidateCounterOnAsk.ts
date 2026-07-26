@@ -29,6 +29,17 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const userId = String(context.userId);
   const nextOrder = (Number(params.ordern) || 0) + 1;
 
+  // Only the Ask's own candidate speaks for the candidate side. A member's
+  // counter is a `project` round (counterOnAsk) — routing it here would let the
+  // rikma's own terms pass as the taker's implicit consent in the nego gate.
+  const askRes: any = await strapi
+    .execute('getAskNegoRounds', { id: String(askId) }, context.jwt, context.fetch)
+    .catch(() => null);
+  const takerId = askRes?.data?.ask?.data?.attributes?.users_permissions_user?.data?.id;
+  if (takerId != null && String(takerId) !== userId) {
+    throw new Error('Only the candidate of this Ask may counter as the candidate');
+  }
+
   const loc = normalizeLocationInput(newValues.location);
   await strapi.execute(
     'negoCreateNegopendmissionRound',

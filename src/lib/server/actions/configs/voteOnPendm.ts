@@ -18,6 +18,8 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { matchOpenMissionToUsers } from '$lib/server/matching/engine';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
+import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
+import { voteUrl } from './actionUtils.js';
 
 // Helper: normalise a vote component row to a plain object for GraphQL variables
 function normalizeVote(v: any): Record<string, any> {
@@ -36,7 +38,7 @@ function normalizeVote(v: any): Record<string, any> {
   return row;
 }
 
-const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
+const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const { pendId, projectId, what, why } = params;
 
   const now = new Date();
@@ -116,6 +118,10 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
 
   if (what === true && yesMemberCount >= totalMembers && totalMembers > 0) {
     // ── Full YES consensus: create OpenMission + archive pendm + mark timegrama done ──
+    // A pendm with `rishon` was proposed FOR a specific person: the rikma's yes
+    // matures it, but the offer stays closed and goes to them as an Ask — the
+    // mission is registered on their name only once they agree.
+    const assigneeId = attrs.rishon?.data?.id ? String(attrs.rishon.data.id) : null;
     const skillIds = (attrs.skills?.data ?? []).map((s: any) => s.id);
     const tafkidimIds = (attrs.tafkidims?.data ?? []).map((t: any) => t.id);
     const workwayIds = (attrs.work_ways?.data ?? []).map((w: any) => w.id);
@@ -171,6 +177,7 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
         privatlinks: """${(attrs.privatlinks ?? '').replace(/"""/g, '"')}""",
         publicklinks: """${(attrs.publicklinks ?? '').replace(/"""/g, '"')}""",
         pendm: "${pendId}",
+        ${assigneeId ? `isRishon: true, rishon: "${assigneeId}", archived: true,` : ''}
         ${sqadualedFrag}
         ${datesFrag}
       }) { data { id } }
@@ -194,10 +201,74 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
       throw new Error(`voteOnPendm consensus mutation failed: ${JSON.stringify(responseData.errors)}`);
     }
 
-    // The pendm matured into a real open mission — tag matching users with
-    // suggestions and notify them by email.
     const newOpenMissionId = responseData.data?.createOpenMission?.data?.id;
-    if (newOpenMissionId) {
+
+    if (assigneeId && newOpenMissionId) {
+      // Assigned proposal → offer it to the assignee instead of to everyone.
+      // The Ask carries the members' yes votes; their own consent is still
+      // required before it materializes (src/lib/server/nego/askAcceptance.ts).
+      const vote = allVots
+        .filter((v) => v.what === true && (v.order ?? 0) === orderon)
+        .map((v) => ({
+          what: true,
+          users_permissions_user: String(v.users_permissions_user),
+          order: 0,
+          ide: parseInt(String(v.ide ?? v.users_permissions_user), 10),
+          zman: now.toISOString(),
+        }));
+
+      const askRes = await strapi.execute(
+        '81.5createAsk',
+        {
+          userId: assigneeId,
+          openMissionId: String(newOpenMissionId),
+          projectId: String(projectId),
+          publishedAt: now.toISOString(),
+          vote,
+        },
+        context.jwt,
+        context.fetch,
+      );
+      const askId = askRes?.data?.createAsk?.data?.id;
+      if (askId) {
+        await ensureCandidacyTimegrama(strapi, context, { side: 'ask', id: String(askId) });
+
+        // The assignee must know an offer is waiting — silence inside the
+        // restime lets it expire, so a card with no notice is a trap.
+        if (notifier) {
+          notifier
+            .notify(
+              {
+                recipients: { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
+                templates: {
+                  title: {
+                    he: `המשימה "${attrs.name ?? ''}" מחכה לאישור שלך`,
+                    en: `The mission "${attrs.name ?? ''}" is waiting for your consent`,
+                  },
+                  body: {
+                    he: 'הריקמה אישרה את ההצעה והועידה אותה אליך. שום דבר לא נרשם על שמך בלי הסכמתך — אפשר לאשר, לדייק את התנאים בהצעה נגדית או לפתוח שיחה.',
+                    en: "The rikma approved the proposal and offered it to you. Nothing is registered under your name without your consent — approve, refine the terms with a counter-offer or open a discussion.",
+                  },
+                },
+                channels: ['socket', 'push', 'email'],
+                metadata: {
+                  type: 'voteUpdate',
+                  url: voteUrl(projectId, 'ask', String(askId)),
+                  priority: 'high',
+                },
+              },
+              { recipients: [assigneeId], projectId },
+              { projectId, askId },
+              context,
+            )
+            .catch((e: unknown) =>
+              console.warn('[voteOnPendm] assignee invite notification failed:', e),
+            );
+        }
+      }
+    } else if (newOpenMissionId) {
+      // The pendm matured into a real open mission — tag matching users with
+      // suggestions and notify them by email.
       await matchOpenMissionToUsers(String(newOpenMissionId), 'missionCreated', {
         strapi,
         fetch: context.fetch,

@@ -795,6 +795,7 @@
               chat={buble.chat}
               declined={buble.decid}
               isRishon={buble?.openMissionData?.isRishon || buble.isRishon}
+              myid={buble.myid}
               forumId={buble.forumId}
               timegramaId={buble.timegramaId}
               timegramaDate={buble.timegramaDate}

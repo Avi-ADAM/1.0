@@ -137,8 +137,13 @@
 - `src/routes/api/timegrama/+server.js` — `x()` מנתב לפי `whatami`:
   `ask`→`ask.svelte`, `pendm`→`pend.svelte`, `pmash`→`pendM.svelte`,
   `finiapruval`→`finiapp.svelte`.
-- `ask.svelte` — מאשר כש-`vots.length>0` ואין `false`, ואז יוצר
-  `Mesimabetahalich` + מארכב OpenMission/Ask/asks אחרים.
+- `ask.svelte` — מאשר לפי `computeNegoGate` (הסכמה דו-צדדית על הסבב האחרון),
+  ואז יוצר `Mesimabetahalich` + מארכב OpenMission/Ask/asks אחרים. בהצעה מוקצית
+  (`isRishon`) ללא הסכמת המוקצה — פותח מחדש את ה-OpenMission ומארכב את ה-Ask.
+- `pend.svelte` — pendm שהבשיל בשתיקה: ללא `rishon` → OpenMission ציבורי
+  (+match-suggestions); עם `rishon` → OpenMission מוקצה (`isRishon`, `archived`)
+  + Ask למוקצה + timegrama משלו, כך שההקצאה נשמרת וההסכמה שלו עדיין נדרשת.
+  (אותו פיצול ב-`voteOnPendm` כשהריקמה מאשרת פה-אחד, כולל נוטיפיקציה למוקצה.)
 
 ---
 
@@ -293,5 +298,11 @@ timegrama פעיל, ליצור; אם יש, להאריך/לאפס את ה-date ל
        (בוחר SP קיים או יוצר חדש מסוג המשאב, כפי שהמשתמש תיאר); כפתור "להציע תנאים
        אחרים" בשני המסלולים (יצירה/בחירה) → פותח `<Nego>` → `proposeOnOpenMashaabim`
        עם ה-spId (השרת מנתב חבר/לא-חבר).
+- [x] **תיקון מסלול המו"מ ל-isRishon ב-reqtojoin** — להצעה מוקצית אין pendm משלה,
+       ולכן `pendId={openMid}` + `isAsk=0` שלחו את `submitNegoMission` למסלול ה-pendm
+       ועדכנו ישות זרה. עכשיו כל מו"מ בכרטיס רץ על סבבי ה-Ask: המוקצה/המועמד
+       (`myid === userId`) → `candidateCounterOnAsk` (סבב `candidate`, עוצר את השעון),
+       שאר החברים → `counterOnAsk` (סבב `project`). השרת מאמת ב-`candidateCounterOnAsk`
+       שהקורא הוא באמת ה-taker.
 - [ ] helper משותף לחישוב סבב/תור/approvable (אופציונלי — השרת כבר מכריע).
 - [ ] כפתורים בדפים הקבועים

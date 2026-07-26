@@ -30,6 +30,7 @@
    * @property {string} [link]
    * @property {string} [linkU]
    * @property {any} userId
+   * @property {any} [myid] viewer id — tells the taker's side from the rikma's
    * @property {string} [missionDetails]
    * @property {any} name
    * @property {number} [noofpu]
@@ -130,6 +131,7 @@
     timegramaDone = false,
     cards = false,
     isRishon = false,
+    myid = null,
     workways = [],
     userSkills,
     userRole,
@@ -388,9 +390,19 @@
     }
   }
 
+  // Am I the one this Ask is about (the candidate / the assignee of an
+  // isRishon offer)? Then my counter is the taker's side of the negotiation,
+  // not the rikma's — it must open a `candidate` round so the rikma has to
+  // respond before anything matures.
+  const iAmTaker = $derived(
+    myid != null && userId != null && String(myid) === String(userId)
+  );
+
   // Rights-holder intermediate proposal on a candidate's Ask. Stored as a
   // Negopendmission round (proposedBy=project) — never overwriting the shared
-  // OpenMission. For self-proposals (isRishon) the internal pendm flow is used.
+  // OpenMission. Assigned offers (isRishon) run through the very same Ask
+  // rounds: they have no pendm of their own, so the internal pendm flow would
+  // have written to a foreign entity.
   async function handleCounter({ newValues, originalValues }) {
     const result = await executeAction('counterOnAsk', {
       askId: String(askId),
@@ -401,7 +413,21 @@
       newValues,
       users
     });
-    if (!result.success) throw new Error(result.error || 'counterOnAsk failed');
+    if (!result.success) throw new Error(String(result.error ?? 'counterOnAsk failed'));
+  }
+
+  // The taker's own counter — a `candidate` round at ordern+1 that hands the
+  // turn back to the rikma (and stops the auto-approval clock).
+  async function handleCandidateCounter({ newValues }) {
+    const result = await executeAction('candidateCounterOnAsk', {
+      askId: String(askId),
+      openMissionId: openMid != null ? String(openMid) : undefined,
+      projectId: String(projectId),
+      ordern: orderon ?? 0,
+      newValues,
+      users
+    });
+    if (!result.success) throw new Error(String(result.error ?? 'candidateCounterOnAsk failed'));
   }
 
   async function decline() {
@@ -602,12 +628,10 @@
               masaalr={false}
               onLoad={() => (negotiationLoading = true)}
               onClose={afternego}
-              onSubmit={isRishon ? null : handleCounter}
-              candidateRound={!isRishon
-                ? (negopendmissions?.find(
-                    (r) => r.attributes?.proposedBy === 'candidate'
-                  )?.attributes ?? null)
-                : null}
+              onSubmit={iAmTaker ? handleCandidateCounter : handleCounter}
+              candidateRound={negopendmissions?.find(
+                (r) => r.attributes?.proposedBy === 'candidate'
+              )?.attributes ?? null}
               {timegramaId}
               {negopendmissions}
               descrip={missionDetails}
@@ -622,7 +646,7 @@
               noofusers={noofpu}
               missionId={missId}
               {skills}
-              isAsk={isRishon ? 0 : (askId ?? 1)}
+              isAsk={askId ?? 1}
               tafkidims={role}
               {workways}
               mdate={sqedualed}
@@ -631,7 +655,7 @@
               {publicklinks}
               {privatlinks}
               restime={getProjectData(projectId, 'restime')}
-              pendId={isRishon ? openMid : null}
+              pendId={null}
               {users}
               {acts}
             />
