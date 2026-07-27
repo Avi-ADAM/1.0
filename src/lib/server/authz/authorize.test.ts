@@ -144,8 +144,15 @@ describe('checkApiKeyProjectScope', () => {
 });
 
 describe('applyAuthz — modes', () => {
-  it('defaults to log mode and does not block users', () => {
-    expect(getAuthzMode()).toBe('log');
+  it('defaults to enforce mode and blocks unauthorized users', () => {
+    expect(getAuthzMode()).toBe('enforce');
+    const { blocked, decision } = applyAuthz({ principal: user, op: 'send:7getTelegramIds' });
+    expect(blocked).toBe(true);
+    expect(decision.result).toBe('denied');
+  });
+
+  it('shadow-logs without blocking in log mode', () => {
+    (env as any).AUTHZ_MODE = 'log';
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const { blocked } = applyAuthz({ principal: user, op: 'send:7getTelegramIds' });
     expect(blocked).toBe(false);

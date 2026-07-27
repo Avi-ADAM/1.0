@@ -10,9 +10,17 @@
  *     they are reachable, subject to entity-level rules at execution time.
  *
  * POST /api/permissions
- *   Body: { ops: string[] }  (max 100)
+ *   Body: { ops: string[], params?: { [op]: Record<string, any> } }  (max 100 ops)
  *   → { principal, results: { [op]: { result: 'allowed'|'denied'|'conditional',
  *                                     reason? } } }
+ *
+ *   Without `params` the answer is the STATIC decision from the manifest —
+ *   'conditional' whenever the op has entity-level authRules. With a `params`
+ *   entry for a *conditional action* op (and a `user` caller), the endpoint
+ *   also runs that action's authRules against the params and returns the final
+ *   'allowed'/'denied' — the same entity-level check /api/action performs at
+ *   execution time, minus the execution. (send: ops keep their inline guards
+ *   in the handler and cannot be pre-evaluated here, so they stay conditional.)
  *
  * Authentication: the caller's own credentials — httpOnly cookies (user) or
  * Authorization: Bearer 1lev1_… (API key). Anonymous callers get 401 rather
@@ -27,9 +35,11 @@ import {
 } from '$lib/server/authz/principal.js';
 import { authorizeOperation } from '$lib/server/authz/authorize.js';
 import type { Principal } from '$lib/server/authz/types.js';
+import type { ActionContext } from '$lib/server/actions/types.js';
 import { qidsAccess } from '../send/qidsAccess.js';
-import { getAllActionKeys } from '$lib/server/actions/registry.js';
-// Register action configurations
+import { getAction, getAllActionKeys } from '$lib/server/actions/registry.js';
+// Register action configurations + shared AuthorizationEngine (admin-token client)
+import { authorizer } from '$lib/server/actions/index.js';
 import '$lib/server/actions/configs/index.js';
 
 const MAX_OPS_PER_CHECK = 100;
@@ -65,7 +75,7 @@ export const GET: RequestHandler = async ({ request, cookies }) => {
   return json({ principal: principal.kind, ops });
 };
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
   const principal = await resolveCaller(request, cookies);
 
   let body: any;
@@ -83,9 +93,49 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     throw error(400, `Too many ops — max ${MAX_OPS_PER_CHECK} per request`);
   }
 
+  const paramsByOp: Record<string, Record<string, any>> =
+    body?.params && typeof body.params === 'object' ? body.params : {};
+
+  // Entity-level evaluation runs with the caller's own context. Scoped to
+  // `user` principals: they carry the cookie JWT + userId the authRules
+  // (projectMember, self, …) need. Other kinds keep the static answer.
+  const canEvaluate = principal.kind === 'user' && Boolean(principal.userId);
+  const context: ActionContext | null = canEvaluate
+    ? {
+        userId: principal.userId as string,
+        jwt: cookies.get('jwt') ?? '',
+        lang: cookies.get('lang') ?? 'he',
+        fetch
+      }
+    : null;
+
   const results: Record<string, { result: string; reason?: string }> = {};
   for (const op of ops) {
     const decision = authorizeOperation(principal, op);
+
+    // Resolve a 'conditional' action to a final answer when params are given.
+    if (
+      decision.result === 'conditional' &&
+      context &&
+      op.startsWith('action:') &&
+      paramsByOp[op] &&
+      typeof paramsByOp[op] === 'object'
+    ) {
+      const config = getAction(op.slice('action:'.length));
+      if (config) {
+        const authResult = await authorizer.authorize(
+          context.userId,
+          config.authRules,
+          paramsByOp[op],
+          context
+        );
+        results[op] = authResult.authorized
+          ? { result: 'allowed' }
+          : { result: 'denied', reason: authResult.reason ?? 'Entity-level authorization failed' };
+        continue;
+      }
+    }
+
     results[op] = decision.reason
       ? { result: decision.result, reason: decision.reason }
       : { result: decision.result };

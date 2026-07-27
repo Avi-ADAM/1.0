@@ -264,7 +264,7 @@
 <!-- Sticky header: anchor nav + שפות/קישורים + CTA (מחשב) -->
 <header
   dir={$isRtl ? 'rtl' : 'ltr'}
-  class="hidden sm:flex fixed top-0 inset-x-0 z-[600] items-center gap-4 px-6 py-2 bg-white/40 backdrop-blur-md border-b border-white/40 shadow-sm"
+  class="hidden sm:flex fixed top-0 inset-x-0 z-[600] items-center gap-4 px-6 py-2 bg-cyan-50/40 backdrop-blur-md border-b border-white/40 shadow-sm"
   style="font-family:'Sababa',sans-serif;"
 >
   <img
@@ -353,7 +353,7 @@
   >
     {#if $progress < 1}
       <div
-        class="w-full h-full flex flex-col items-center justify-center bg-white/50 backdrop-blur-sm z-50 absolute inset-0"
+        class="w-full h-full flex flex-col items-center justify-center bg-cyan-50/50 backdrop-blur-sm z-50 absolute inset-0"
         title={$t('home.loading.title')}
       >
         <img
@@ -479,7 +479,7 @@
         <div class="flex flex-col gap-2.5">
           {#each ['pain1', 'pain2', 'pain3', 'pain4'] as p}
             <div
-              class="flex items-start gap-3 bg-white/55 backdrop-blur-sm border border-rose-300/70 rounded-xl px-4 py-3 shadow-sm"
+              class="flex items-start gap-3 bg-cyan-50/55 backdrop-blur-sm border border-rose-300/70 rounded-xl px-4 py-3 shadow-sm"
             >
               <span
                 class="shrink-0 mt-0.5 w-6 h-6 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center text-sm font-bold"
@@ -500,7 +500,7 @@
         </p>
         <!-- המפסיד הגדול מכולם: הלקוח -->
         <div
-          class="mt-6 bg-white/55 backdrop-blur-sm border-2 border-gold/70 rounded-2xl px-4 py-4 shadow-sm"
+          class="mt-6 bg-cyan-50/55 backdrop-blur-sm border-2 border-gold/70 rounded-2xl px-4 py-4 shadow-sm"
         >
           <h3
             class="text-rose-700 font-bold text-xl sm:text-lg mb-3 text-center"
@@ -706,12 +706,12 @@
       >
         <div class="flex flex-col gap-3">
           <p
-            class="bg-white/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-3 text-slate-900 text-lg sm:text-base shadow text-center"
+            class="bg-cyan-50/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-3 text-slate-900 text-lg sm:text-base shadow text-center"
           >
             {$t('home.intro.q1')}
           </p>
           <p
-            class="bg-white/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-3 text-slate-900 text-lg sm:text-base shadow text-center"
+            class="bg-cyan-50/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-3 text-slate-900 text-lg sm:text-base shadow text-center"
           >
             {$t('home.intro.q2')}
           </p>
@@ -733,7 +733,7 @@
                 {$t('home.stats.currently')}
               </p>
               <div class="flex justify-center items-center gap-3 flex-wrap">
-                <div class="bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
+                <div class="bg-cyan-50/20 rounded-lg px-3 py-2 backdrop-blur-sm">
                   <div class="text-2xl font-bold text-gold">
                     {projectsCount}
                   </div>
@@ -742,14 +742,14 @@
                   </div>
                 </div>
                 <div class="text-gold text-2xl">•</div>
-                <div class="bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
+                <div class="bg-cyan-50/20 rounded-lg px-3 py-2 backdrop-blur-sm">
                   <div class="text-2xl font-bold text-gold">{usersCount}</div>
                   <div class="text-white text-base sm:text-sm">
                     {$t('home.stats.members')}
                   </div>
                 </div>
                 <div class="text-gold text-2xl">•</div>
-                <div class="bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
+                <div class="bg-cyan-50/20 rounded-lg px-3 py-2 backdrop-blur-sm">
                   <div class="text-2xl font-bold text-gold">{membersCount}</div>
                   <div class="text-white text-sm">
                     {$t('home.fpage.agreedOnAgreement')}
@@ -772,7 +772,7 @@
              /demand) — wander first, sign up later. -->
         <div class="gold-frame rounded-xl p-[3px] shadow-lg">
         <section
-          class="bg-white/85 backdrop-blur-sm rounded-lg px-4 py-4"
+          class="bg-cyan-50/85 backdrop-blur-sm rounded-lg px-4 py-4"
           style="font-family:'Sababa',sans-serif;"
         >
           <h2 class="text-rose-700 font-bold text-2xl sm:text-xl text-center mb-1">
@@ -790,7 +790,7 @@
             ] as { icon, count, key, href } (key)}
               <a
                 {href}
-                class="group flex items-center gap-3 bg-white/80 hover:bg-gold/20 border border-gold/60 rounded-lg px-3 py-2 transition-colors"
+                class="group flex items-center gap-3 bg-cyan-50/80 hover:bg-gold/20 border border-gold/60 rounded-lg px-3 py-2 transition-colors"
               >
                 <span class="text-2xl" aria-hidden="true">{icon}</span>
                 <span class="flex-1 text-slate-800 text-lg sm:text-base">
@@ -874,7 +874,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {#each [['🗂️', 'projectMgmt'], ['🤝', 'negotiation'], ['🚀', 'onboarding'], ['📲', 'telegram'], ['🤖', 'aiBot'], ['🔍', 'transparency']] as [icon, key]}
               <div
-                class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
+                class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
               >
                 <div class="text-2xl mb-1">{icon}</div>
                 <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
@@ -936,7 +936,7 @@
           </p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div
-              class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
+              class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
             >
               <h3 class="text-rose-700 font-bold text-xl sm:text-lg mb-2">
                 {$t('home.concierge.customerTitle')}
@@ -954,7 +954,7 @@
               </button>
             </div>
             <div
-              class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
+              class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
             >
               <h3 class="text-rose-700 font-bold text-xl sm:text-lg mb-2">
                 {$t('home.concierge.providerTitle')}
@@ -973,7 +973,7 @@
             </div>
           </div>
           <p
-            class="mt-4 text-center bg-white/60 backdrop-blur-sm border border-gold/70 rounded-2xl px-4 py-3 text-slate-800 text-base sm:text-sm leading-relaxed"
+            class="mt-4 text-center bg-cyan-50/60 backdrop-blur-sm border border-gold/70 rounded-2xl px-4 py-3 text-slate-800 text-base sm:text-sm leading-relaxed"
           >
             {$t('home.concierge.bridge')}
           </p>
@@ -992,7 +992,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {#each [['🧑‍🎨', 'whoFreelancer'], ['🏪', 'whoBusiness'], ['🌱', 'whoCreators']] as [icon, key]}
               <div
-                class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col text-center"
+                class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col text-center"
               >
                 <div class="text-3xl mb-1">{icon}</div>
                 <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
@@ -1158,7 +1158,7 @@
         <!-- בלוק: מודל / תמחור -->
         <section class="text-center">
           <div
-            class="bg-white/70 backdrop-blur-sm border-2 border-gold rounded-2xl px-5 py-5 shadow"
+            class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-2xl px-5 py-5 shadow"
           >
             <h2 class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1">
               {$t('home.sections.modelTitle')}
@@ -1181,7 +1181,7 @@
           <div class="flex flex-col gap-2">
             {#each ['1', '2', '3', '5', '6'] as q}
               <details
-                class="bg-white/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-2 shadow"
+                class="bg-cyan-50/60 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-2 shadow"
               >
                 <summary
                   class="text-rose-700 font-semibold text-lg sm:text-base cursor-pointer py-1"
@@ -1386,7 +1386,7 @@
     class:right-8={$locale !== 'he' && $locale !== 'ar'}
   >
     <button
-      class="group flex flex-row items-center gap-3 px-6 py-3 rounded-2xl bg-white/40 backdrop-blur-md border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] hover:bg-white/60 hover:scale-105 transition-all duration-300 min-w-[160px]"
+      class="group flex flex-row items-center gap-3 px-6 py-3 rounded-2xl bg-cyan-50/40 backdrop-blur-md border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] hover:bg-cyan-50/60 hover:scale-105 transition-all duration-300 min-w-[160px]"
       onclick={() => {
         goto('/login');
         loadinga = true;

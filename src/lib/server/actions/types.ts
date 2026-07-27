@@ -159,7 +159,7 @@ export interface ParamRule {
  */
 export interface AuthRule {
   /** Type of authorization check */
-  type: 'jwt' | 'projectMember' | 'sheirutCustomer' | 'forumParticipant' | 'role' | 'custom' | 'or';
+  type: 'jwt' | 'self' | 'projectMember' | 'sheirutCustomer' | 'sheirutpendRequester' | 'forumParticipant' | 'role' | 'custom' | 'or';
 
   /** Configuration specific to the auth rule type */
   config?: AuthRuleConfig;
@@ -172,8 +172,19 @@ export interface AuthRule {
  * Configuration for authorization rules
  */
 export interface AuthRuleConfig {
+  /**
+   * Parameter name holding the target user id (for the `self` check). Supports
+   * dot-notation for nested params. Defaults to 'userId'. The rule passes only
+   * when this param equals the acting user's id (context.userId), so a client
+   * cannot perform the action on another user's behalf.
+   */
+  userIdParam?: string;
+
   /** Parameter name containing project ID (for projectMember check) */
   projectIdParam?: string;
+
+  /** Parameter name containing sheirutpend ID (for sheirutpendRequester check) */
+  sheirutpendIdParam?: string;
 
   /** Parameter name containing sheirut ID (for sheirutCustomer check) */
   sheirutIdParam?: string;
