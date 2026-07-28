@@ -64,5 +64,16 @@
   "filters_my_skills": "يناسب مهاراتي",
   "filters_urgent": "عاجل",
   "location_not_specified": "الموقع غير محدد",
-  "km_away": "على بعد {distance} كم منك"
+  "km_away": "على بعد {distance} كم منك",
+  "new": {
+    "titlePlaceholder": "في جملة واحدة — ما الذي تودّ أن يحدث؟",
+    "readyStatus": "جاهز للإرسال إلى Lev",
+    "notReadyStatus": "قليلاً بعد…",
+    "readyHint": "بمجرد موافقتك، سأبحث عن شراكات مناسبة وأعيد إليك خطة لموافقتك عليها.",
+    "notReadyHint": "اكتب عنواناً قصيراً وبضعة أسطر من الوصف — وهذا يكفي.",
+    "saveDraft": "حفظ المسودة",
+    "publish": "✨ نشر الأمنية",
+    "publishing": "⏳ جارٍ الإرسال إلى Lev…",
+    "afterPublish": "بمجرد النشر، يُنهي Lev تحليله خلال دقائق، وسترى العروض خلال ساعة أو ساعتين."
+  }
 }

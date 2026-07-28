@@ -425,5 +425,12 @@
     "map": "The live demand map",
     "mapSub": "All demand and supply on one map",
     "view": "View"
+  },
+  "videos": {
+    "howItWorksCta": "See how 1💗1 works",
+    "howItWorksLabel": "Video: how 1💗1 works",
+    "thirdWayCta": "Watch the video: The Third Way — why it’s needed",
+    "thirdWayLabel": "Video: The Third Way",
+    "close": "Close"
   }
 }

@@ -64,5 +64,16 @@
   "filters_my_skills": "Fits My Skills",
   "filters_urgent": "Urgent",
   "location_not_specified": "Location not specified",
-  "km_away": "{distance} km away"
+  "km_away": "{distance} km away",
+  "new": {
+    "titlePlaceholder": "In one sentence — what would you like to happen?",
+    "readyStatus": "Ready to send to Lev",
+    "notReadyStatus": "Just a little more…",
+    "readyHint": "Once you approve, I'll look for suitable partnerships and bring back a plan for your agreement.",
+    "notReadyHint": "Write a short title and a few lines of description — that’s enough.",
+    "saveDraft": "Save draft",
+    "publish": "✨ Publish the wish",
+    "publishing": "⏳ Sending to Lev…",
+    "afterPublish": "Once you publish, Lev finishes its analysis within minutes, and you’ll see offers within an hour or two."
+  }
 }
