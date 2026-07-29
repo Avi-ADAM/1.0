@@ -54,6 +54,7 @@
 3. **Clustering** — cluster יליד של MapLibre (`cluster:true` על GeoJSON source) פר-שכבה; צבע ה-cluster כצבע השכבה.
 4. **סנכרון מפה↔רשימה** — רשימת-צד מציגה את הפריטים שב-viewport הנוכחי; hover ברשימה מדגיש במפה.
 5. **Deep-links** — `?lens=supply&layers=missions,maagads&c=32.1,34.9,10` לשיתוף מסונן (ערוץ הגיוס של §6.2).
+6. **Opt-out של המוכר** — `matanot.hideFromDiscovery` (בוליאני, ברירת מחדל `false`; `NULL` בשורות ותיקות = לא מוסתר) מוציא מוצר מדף הגילוי הציבורי `/gift` (QID `282discoverProducts`) ומהסימון על המפה (`269mapProducts`). המוצר נשאר פעיל לגמרי: עמוד `/gift/[id]`, עמוד הרקמה, דיווח מכירות ושירותים. הדגל מתהפך רק דרך action `setMatanotDiscovery` — חבר בכל אחת מהרקמות של המוצר, או בעל מוצר אישי (`origin='personal'`). ה-UI: כפתור 🌍/🙈 על כרטיס המוצר ב-`/moach/[projectId]/sales` ובכרטיס "המוצרים שלי" (`MyProductsSection`).
 
 ## 3. ארכיטקטורה
 

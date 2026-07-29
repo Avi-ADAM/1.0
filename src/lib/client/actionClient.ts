@@ -421,6 +421,7 @@ export type ActionKey =
   | 'updateMissionOffer'
   | 'createPersonalMatanot'
   | 'archivePersonalMatanot'
+  | 'setMatanotDiscovery'
   | 'refreshMySuggestions'
   | 'declineSpForMashaabim'
   | 'reportRecurringSaleCycle'
@@ -522,6 +523,11 @@ export interface ActionParamsMap {
     entityId: string;
     projectId?: string;
     forumId?: string;
+  };
+  setMatanotDiscovery: {
+    matanotId: string;
+    /** true = keep this product out of the public /gift directory. */
+    hideFromDiscovery: boolean;
   };
 }
 

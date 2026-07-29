@@ -9010,7 +9010,7 @@ export const moachQids = {
             data {
               id
               attributes {
-                name price quant kindOf startDate finnishDate
+                name price quant kindOf startDate finnishDate hideFromDiscovery
               }
             }
           }
@@ -12496,7 +12496,7 @@ export const qids = {
       sort: "createdAt:desc"
     ) {
       data { id attributes {
-        name price quant kindOf archived
+        name price quant kindOf archived hideFromDiscovery
         pic { data { attributes { url } } }
         sp { data { id attributes { name } } }
       } }
@@ -12661,7 +12661,12 @@ export const qids = {
 
   '269mapProducts': `query MapProducts {
     matanots(
-      filters: { archived: { ne: true } }
+      # Sellers that opted a product out of the public directory (282) are opted
+      # out of the map pin too — same discovery surface, same NULL guard.
+      filters: {
+        archived: { ne: true }
+        or: [{ hideFromDiscovery: { eq: false } }, { hideFromDiscovery: { null: true } }]
+      }
       pagination: { limit: 200 }
       sort: "createdAt:desc"
     ) {
@@ -12733,10 +12738,20 @@ export const qids = {
     }
   }`,
 
+  // hideFromDiscovery is the seller's own opt-out of this directory (a rikma
+  // that sells only to its members, a product not ready for the public). Same
+  // NULL guard as `archived` — rows created before the field exists read NULL,
+  // which means "not hidden". Hidden products stay reachable everywhere else:
+  // /gift/[id], the project page and the sales flows.
   '282discoverProducts': `query DiscoverProducts {
     matanots(
       # Same NULL guard as 281 — never-archived products often have NULL here.
-      filters: { or: [{ archived: { eq: false } }, { archived: { null: true } }] }
+      filters: {
+        and: [
+          { or: [{ archived: { eq: false } }, { archived: { null: true } }] },
+          { or: [{ hideFromDiscovery: { eq: false } }, { hideFromDiscovery: { null: true } }] }
+        ]
+      }
       pagination: { limit: 200 }
       sort: "createdAt:desc"
     ) {
@@ -12825,15 +12840,27 @@ export const qids = {
     }
   }`,
 
+  // Also the authorization source for setMatanotDiscovery: origin + owner_user
+  // decide the personal-product owner check, projectcreates the rikma-member one.
   '266getMatanotSellerMeta': `query GetMatanotSellerMeta($id: ID!) {
     matanot(id: $id) {
       data { id attributes {
         origin
+        hideFromDiscovery
+        projectcreates { data { id } }
         owner_user { data { id attributes {
           username
           profilePic { data { attributes { url formats } } }
         } } }
       } }
+    }
+  }`,
+
+  // Discovery-directory visibility gate, flipped by the setMatanotDiscovery
+  // action (never by the client directly — see qidsAccess).
+  '285setMatanotDiscovery': `mutation SetMatanotDiscovery($id: ID!, $hideFromDiscovery: Boolean!) {
+    updateMatanot(id: $id, data: { hideFromDiscovery: $hideFromDiscovery }) {
+      data { id attributes { hideFromDiscovery } }
     }
   }`,
 

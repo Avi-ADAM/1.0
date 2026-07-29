@@ -462,6 +462,11 @@ export const qidsAccess = {
   '283discoverMissions': { allow: ['user', 'serviceAdmin'] },
   '284discoverResources': { allow: ['user', 'serviceAdmin'] },
 
+  // Discovery-visibility write: server-only caller (the setMatanotDiscovery
+  // action via StrapiClient, which checks rikma membership / personal-product
+  // ownership first). A client must never flip another seller's flag.
+  '285setMatanotDiscovery': { allow: ['serviceAdmin'] },
+
   // matching/engine.ts: always run through StrapiClient with the admin
   // token, never with a user JWT — writes suggestion data for *other* users.
   '213recentSuggestionEmailCounts': { allow: ['serviceAdmin'] },

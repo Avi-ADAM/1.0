@@ -5621,6 +5621,7 @@ export type Matanot = {
   estimatedPrice?: Maybe<Scalars['Float']['output']>;
   finnishDate?: Maybe<Scalars['DateTime']['output']>;
   fixPrice?: Maybe<Scalars['Boolean']['output']>;
+  hideFromDiscovery?: Maybe<Scalars['Boolean']['output']>;
   kindOf?: Maybe<Enum_Matanot_Kindof>;
   lat?: Maybe<Scalars['Float']['output']>;
   lng?: Maybe<Scalars['Float']['output']>;
@@ -5829,6 +5830,7 @@ export type MatanotFiltersInput = {
   estimatedPrice?: InputMaybe<FloatFilterInput>;
   finnishDate?: InputMaybe<DateTimeFilterInput>;
   fixPrice?: InputMaybe<BooleanFilterInput>;
+  hideFromDiscovery?: InputMaybe<BooleanFilterInput>;
   id?: InputMaybe<IdFilterInput>;
   kindOf?: InputMaybe<StringFilterInput>;
   lat?: InputMaybe<FloatFilterInput>;
@@ -5887,6 +5889,7 @@ export type MatanotInput = {
   estimatedPrice?: InputMaybe<Scalars['Float']['input']>;
   finnishDate?: InputMaybe<Scalars['DateTime']['input']>;
   fixPrice?: InputMaybe<Scalars['Boolean']['input']>;
+  hideFromDiscovery?: InputMaybe<Scalars['Boolean']['input']>;
   kindOf?: InputMaybe<Enum_Matanot_Kindof>;
   lat?: InputMaybe<Scalars['Float']['input']>;
   lng?: InputMaybe<Scalars['Float']['input']>;

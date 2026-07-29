@@ -62,7 +62,13 @@
     "save_failed": "Saving failed",
     "seller_badge": "Independent provider",
     "seller_profile": "Seller profile",
-    "submitVote": "Submit for vote"
+    "submitVote": "Submit for vote",
+    "discovery": {
+      "shown": "In discovery",
+      "hidden": "Hidden",
+      "showTitle": "Show this product on the public discovery page",
+      "hideTitle": "Hide this product from the public discovery page — it stays active in the rikma and by direct link"
+    }
   },
   "missions": {
     "title": "Missions I do",

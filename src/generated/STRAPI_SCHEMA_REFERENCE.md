@@ -748,6 +748,7 @@ These are the main content types in the Strapi backend.
 | `estimatedPrice` | `Maybe<Scalars['Float']['output']>` |
 | `finnishDate` | `Maybe<Scalars['DateTime']['output']>` |
 | `fixPrice` | `Maybe<Scalars['Boolean']['output']>` |
+| `hideFromDiscovery` | `Maybe<Scalars['Boolean']['output']>` |
 | `kindOf` | `Maybe<Enum_Matanot_Kindof>` |
 | `lat` | `Maybe<Scalars['Float']['output']>` |
 | `lng` | `Maybe<Scalars['Float']['output']>` |

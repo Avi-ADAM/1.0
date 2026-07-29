@@ -139,6 +139,7 @@ import { createMissionOfferConfig } from './createMissionOffer.js';
 import { updateMissionOfferConfig } from './updateMissionOffer.js';
 import { createPersonalMatanotConfig } from './createPersonalMatanot.js';
 import { archivePersonalMatanotConfig } from './archivePersonalMatanot.js';
+import { setMatanotDiscoveryConfig } from './setMatanotDiscovery.js';
 
 
 /**
@@ -374,6 +375,9 @@ export function registerAllActions(): void {
   // User offerings M3: personal products (matanot origin=personal)
   registerAction(createPersonalMatanotConfig);
   registerAction(archivePersonalMatanotConfig);
+
+  // Products discovery directory: per-product opt-out of the public /gift list
+  registerAction(setMatanotDiscoveryConfig);
 
   // Recurring monthly resources: close a mashabetahalich engine (mark done)
   registerAction(markResourceDoneConfig);

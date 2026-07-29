@@ -63,7 +63,13 @@
     "save_failed": "No se pudo guardar",
     "seller_badge": "Proveedor independiente",
     "seller_profile": "Perfil del vendedor",
-    "submitVote": "Enviar a votación"
+    "submitVote": "Enviar a votación",
+    "discovery": {
+      "shown": "En descubrimiento",
+      "hidden": "Oculto",
+      "showTitle": "Mostrar el producto en la página pública de descubrimiento",
+      "hideTitle": "Ocultar el producto de la página pública de descubrimiento — sigue activo en la rikma y por enlace directo"
+    }
   },
   "missions": {
     "title": "Misiones que realizo",
