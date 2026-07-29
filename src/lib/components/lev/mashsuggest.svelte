@@ -607,6 +607,7 @@
                 {total}
                 {descrip}
                 {projectName}
+                {projectId}
                 {src}
                 {spnot}
                 {selfNomination}
@@ -646,6 +647,7 @@
     {total}
     {descrip}
     {projectName}
+    {projectId}
     {src}
     {spnot}
     {selfNomination}

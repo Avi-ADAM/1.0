@@ -2923,6 +2923,7 @@
               {workways}
               {timeToP}
               {noOfusers}
+              {projectId}
               {selfNomination}
               onWithdraw={withdrawSelfNom}
               {offerHref}
@@ -2966,6 +2967,7 @@
     {src}
     {workways}
     {timeToP}
+    {projectId}
     {selfNomination}
     onWithdraw={withdrawSelfNom}
     {offerHref}

@@ -216,7 +216,16 @@
       "askedVal": "הצעת הריקמה",
       "myval": "ההצעה שלי",
       "offerAtSource": "להצעה בעמוד המקור",
-      "withdrawSelfNomination": "משיכת ההצעה העצמית — הצעת המשאב שחיברת תיסגר כולה"
+      "withdrawSelfNomination": "משיכת ההצעה העצמית — הצעת המשאב שחיברת תיסגר כולה",
+      "value": "שווי",
+      "acceptedVal": "שווי מקובל",
+      "perCycleHint": "עלות משוערת למחזור",
+      "everyNMonths": "· כל {{count}} חודשים",
+      "everyNYears": "· כל {{count}} שנים",
+      "totalInvest": "סך השקעה משוער",
+      "totalInvestHint": "סך השקעה משוער לכל התקופה",
+      "noEndDate": "ללא תאריך סיום — עד לסימון כהושלם",
+      "cycleApprovalNote": "בכל מחזור ייפתח חיוב לאישור ההוצאה בפועל מול הריקמה"
     },
     "welcome": {
       "welcome": "ברוך הבא {{username}} לרקמה {{projectName}}!",
@@ -304,7 +313,12 @@
       "numMonths": "כמות חודשים",
       "yearlyValue": "שווי לשנה",
       "numYears": "מספר השנים",
-      "counterProposal": "הצעה מקבילה"
+      "counterProposal": "הצעה מקבילה",
+      "perYear": "לשנה",
+      "month": "חודש",
+      "months": "חודשים",
+      "year": "שנה",
+      "years": "שנים"
     },
     "reqtojoin": {
       "headRishon": "אישור והשמת משימה",

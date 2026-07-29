@@ -11,6 +11,7 @@
   import { goto } from '$app/navigation';
   import { executeAction } from '$lib/client/actionClient';
   import NegoM from '$lib/components/prPr/negoM.svelte';
+  import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { fly } from 'svelte/transition';
 
@@ -433,6 +434,23 @@
                       {data.alld.attributes.iskvua ? $t('pages.availMission.monhly') : ''}
                     </span>
                   </p>
+                  <!-- שווי צפוי בריקמה — עמוד ציבורי, ולכן isSer מושך דרך
+                       טוקן השירות; מסתתר בשקט אם אין הרשאת קריאה. -->
+                  {#if data.alld.attributes.project?.data?.id}
+                    <div class="my-3">
+                      <EquityPreview
+                        projectId={data.alld.attributes.project.data.id}
+                        missionValue={(data.alld.attributes.noofhours || 0) *
+                          (data.alld.attributes.perhour || 0)}
+                        monthlyValue={data.alld.attributes.iskvua
+                          ? (data.alld.attributes.noofhours || 0) *
+                            (data.alld.attributes.perhour || 0)
+                          : null}
+                        alreadyCountedIn="pipeline"
+                        isSer={true}
+                      />
+                    </div>
+                  {/if}
                   {#if data.alld.attributes.acts.data.length > 0}
                     <div class="border-2 border-gold">
                       <ul>

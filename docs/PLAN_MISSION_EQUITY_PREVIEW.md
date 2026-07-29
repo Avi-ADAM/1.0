@@ -1,6 +1,13 @@
 # PLAN — Mission Equity Preview (שווי צפוי בריקמה)
 
-> Status: **draft, approved for execution**
+> Status: **implemented (steps 1–8, all phases)** — pure math module + tests,
+> `getProjectValueSummary` qid + dedup cache, the reusable `EquityPreview`
+> component (he/en/ar/ru), and all wired integration points: lev cards
+> (sugestmi/sugestma + parents), the public availableMission page, the mission
+> creation form + nego dialog, and the moach in-progress reward column. Phase 4
+> (₪/month estimate) is included: `computeMonthlyIncome` averages effective
+> sales over a trailing 6-month window and falls back to monthly commitments,
+> surfaced per baseline row with the matching disclaimer.
 > Owner request (2026-07-07): show candidates a *realistic* picture of the share
 > (%) they will hold in a rikma if they complete a suggested mission — both
 > against the rikma's **current** value and against **all already-approved
@@ -87,6 +94,8 @@ export interface ProjectValueSummary {
   approvedInProgressValue: number;
   /** Σ open_missions (noofhours×perhour) — the still-open pipeline */
   openPipelineValue: number;
+  /** Σ the recurring (iskvua) slice of the in-progress bucket — ₪/month (§2.1) */
+  recurringMonthlyValue: number;
   /** trailing monthly income estimate, null when no data (phase 4) */
   monthlyIncomeEstimate: number | null;
 }
@@ -142,6 +151,42 @@ baseline (see `alreadyCountedIn`). Edge cases that MUST be unit-tested:
 
 Percent formatting helper: `formatSharePct(pct)` → `<0.1%` floor, 1 decimal
 otherwise (avoid "0.0%").
+
+### 2.1 Recurring missions — `computeEquityHorizons`
+
+A **monthly** mission (`iskvua: true`) has `noofhours × perhour` as *one month's*
+value, so the single-shot scenarios above price only the first month. With no end
+date the member keeps accruing, and the honest question is where it lands after
+1 / 2 / 5 years (`HORIZON_MONTHS = [12, 24, 60]`).
+
+Both sides of the fraction must grow:
+
+```
+share(N months) =        monthlyValue × N
+                  ───────────────────────────────────────────
+                  currentValue + oneOffApproved + rikmaMonthly × N
+
+oneOffApproved = approvedInProgressValue − recurringMonthlyValue   (lands once)
+rikmaMonthly   = recurringMonthlyValue (+ monthlyValue unless already counted)
+```
+
+Growing only the numerator — the "rikma stays frozen for five years" model —
+marches every projection to ~100% and is worthless. Growing both makes the
+series converge on `monthlyValue / rikmaMonthly`: the mission's share of the
+rikma's **flow** rather than of its stock, approached from below and never
+reached. That ceiling is the property worth asserting in tests.
+
+`recurringMonthlyValue` is the `iskvua` slice of `mesimabetahaliches` (so the
+qid selects `iskvua`), i.e. the rikma's standing monthly value flow. Recurring
+*resources* (`rikmash.recurring`) are **not** in it yet — that undercounts the
+rikma's growth and therefore overstates the member's projected share. Revisit if
+recurring resources become common.
+
+UI-wise the component takes `monthlyValue` separately from `missionValue`, so a
+non-monthly cycle (a yearly recurring resource in `sugestma`) can pass a cycle
+as V and a twelfth of it as the monthly figure. The horizon block states its
+assumptions in visible text: the mission keeps running, and the rikma keeps
+accruing at today's recurring rate.
 
 ---
 
@@ -239,7 +284,17 @@ Behavior:
      pipeline scenario.
 - Each row shows: label, bold %, and muted `(שווי משימה X מתוך Y)` detail.
 - Phase 4 adds a `≈ ₪N בחודש` suffix per row when `monthlyIncomeEstimate` is
-  available, with an "אומדן לפי הכנסות העבר" disclaimer tooltip.
+  available. The `≈` is part of the string in every locale — the money figure
+  must never render as a bare number.
+- **The estimate note is visible text, not only a tooltip.** A `title=` is
+  invisible on touch, and the ₪ figure is the one number a reader can mistake
+  for a promise. A footer line inside the card states, explicitly: that the
+  amount is approximate (`≈`), *what* it was computed from (the rikma's income
+  over the last `INCOME_WINDOW_MONTHS` months, or its standing monthly
+  commitments), and that **it can change**. Shown only when there is an
+  estimate at all. Keep the wording neutral — "may change", not "for better or
+  worse": the note describes the number's basis, it does not editorialise
+  about the rikma's prospects.
 - Styling: follow the existing card idiom (rounded-xl, `bg-gray-100
   dark:bg-slate-800`, gold/barbi accents). Keep it visually smaller than the
   שכר block — it's supporting info, not the headline.
@@ -249,7 +304,8 @@ Behavior:
   globally (no `routes:` restriction — it's used on lev, moach and
   availableMission routes). Keys: `title`, `baselineCurrent`,
   `baselineApproved`, `baselinePipeline`, `ofTotal`, `perMonthEstimate`,
-  `estimateDisclaimer`, `yourShareIfDone`, `missionShareAtCreation`.
+  `estimateNote`, `estimateNoteCommitments`, `yourShareIfDone`,
+  `missionShareAtCreation`.
 
 ---
 

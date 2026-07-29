@@ -217,7 +217,16 @@
       "askedVal": "Valor solicitado",
       "myval": "Mi propuesta",
       "offerAtSource": "Oferta en la página de origen",
-      "withdrawSelfNomination": "Retirar tu autopostulación: la oferta de recurso que creaste se cerrará por completo"
+      "withdrawSelfNomination": "Retirar tu autopostulación: la oferta de recurso que creaste se cerrará por completo",
+      "value": "Valor",
+      "acceptedVal": "valor aceptado",
+      "perCycleHint": "Coste estimado por ciclo",
+      "everyNMonths": "· cada {{count}} meses",
+      "everyNYears": "· cada {{count}} años",
+      "totalInvest": "Inversión total estimada",
+      "totalInvestHint": "Inversión total estimada para todo el periodo",
+      "noEndDate": "Sin fecha de fin — hasta que se marque como completado",
+      "cycleApprovalNote": "Cada ciclo abre un cargo para que la rikma apruebe el gasto real"
     },
     "welcome": {
       "welcome": "¡Bienvenido {{username}} a {{projectName}}!",
@@ -305,7 +314,12 @@
       "numMonths": "Número de meses",
       "yearlyValue": "Valor anual",
       "numYears": "Número de años",
-      "counterProposal": "Contrapropuesta"
+      "counterProposal": "Contrapropuesta",
+      "perYear": "al año",
+      "month": "mes",
+      "months": "meses",
+      "year": "año",
+      "years": "años"
     },
     "reqtojoin": {
       "headRishon": "Aprobación y asignación de la misión",

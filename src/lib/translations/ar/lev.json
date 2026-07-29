@@ -216,7 +216,16 @@
       "askedVal": "القيمة المطلوبة",
       "myval": "عرضي",
       "offerAtSource": "العرض في صفحة المصدر",
-      "withdrawSelfNomination": "سحب ترشيحك الذاتي — سيُغلق عرض المورد الذي أنشأته بالكامل"
+      "withdrawSelfNomination": "سحب ترشيحك الذاتي — سيُغلق عرض المورد الذي أنشأته بالكامل",
+      "value": "القيمة",
+      "acceptedVal": "القيمة المقبولة",
+      "perCycleHint": "التكلفة التقديرية لكل دورة",
+      "everyNMonths": "· كل {{count}} أشهر",
+      "everyNYears": "· كل {{count}} سنوات",
+      "totalInvest": "إجمالي الاستثمار التقديري",
+      "totalInvestHint": "إجمالي الاستثمار التقديري لكل الفترة",
+      "noEndDate": "بلا تاريخ انتهاء — حتى يُعلَّم كمكتمل",
+      "cycleApprovalNote": "في كل دورة يُفتح طلب لاعتماد المصروف الفعلي أمام الريكما"
     },
     "welcome": {
       "welcome": "مرحبًا {{username}} في {{projectName}}!",
@@ -304,7 +313,12 @@
       "numMonths": "عدد الأشهر",
       "yearlyValue": "القيمة السنوية",
       "numYears": "عدد السنوات",
-      "counterProposal": "عرض مقابل"
+      "counterProposal": "عرض مقابل",
+      "perYear": "سنويًا",
+      "month": "شهر",
+      "months": "أشهر",
+      "year": "سنة",
+      "years": "سنوات"
     },
     "reqtojoin": {
       "headRishon": "الموافقة وإسناد المهمة",

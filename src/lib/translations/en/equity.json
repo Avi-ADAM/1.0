@@ -1,0 +1,19 @@
+{
+  "title": "Projected share in the rikma",
+  "baselineCurrent": "Against the current value",
+  "baselineApproved": "Including approved & in-progress missions",
+  "baselinePipeline": "If everything open is approved",
+  "ofTotal": "mission value {{value}} of {{total}}",
+  "ofTotalMonthly": "monthly value {{value}} of {{total}}",
+  "ofTotalCumulative": "cumulative {{value}} of {{total}}",
+  "horizonsTitle": "If it keeps running with no end date — month after month",
+  "horizon1y": "After 1 year",
+  "horizon2y": "After 2 years",
+  "horizon5y": "After 5 years",
+  "horizonNote": "The projection assumes the mission keeps running and that the rikma keeps accruing value at the rate of the recurring missions it has today.",
+  "perMonthEstimate": "≈ ₪{{amount}} / month",
+  "estimateNote": "The ₪ figure is a rough estimate only (≈): it is calculated from the rikma's income over the last {{months}} months, and it can change.",
+  "estimateNoteCommitments": "The ₪ figure is a rough estimate only (≈): it is calculated from the rikma's standing monthly commitments, and it can change.",
+  "yourShareIfDone": "Your share in the rikma once the mission is done",
+  "missionShareAtCreation": "How much of the rikma this mission will be worth"
+}

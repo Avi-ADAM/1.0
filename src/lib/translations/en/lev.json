@@ -216,7 +216,16 @@
       "askedVal": "Asked value",
       "myval": "My value",
       "offerAtSource": "Offer on the source page",
-      "withdrawSelfNomination": "Withdraw your self-nomination — the resource offer you authored closes entirely"
+      "withdrawSelfNomination": "Withdraw your self-nomination — the resource offer you authored closes entirely",
+      "value": "Value",
+      "acceptedVal": "accepted value",
+      "perCycleHint": "Estimated cost per cycle",
+      "everyNMonths": "· every {{count}} months",
+      "everyNYears": "· every {{count}} years",
+      "totalInvest": "Estimated total investment",
+      "totalInvestHint": "Estimated total investment over the whole period",
+      "noEndDate": "No end date — until marked as completed",
+      "cycleApprovalNote": "Each cycle opens a charge for the rikma to approve the actual expense"
     },
     "welcome": {
       "welcome": "Welcome {{username}} to {{projectName}}!",
@@ -304,7 +313,12 @@
       "numMonths": "number of months",
       "yearlyValue": "yearly value",
       "numYears": "number of years",
-      "counterProposal": "counter proposal"
+      "counterProposal": "counter proposal",
+      "perYear": "per year",
+      "month": "month",
+      "months": "months",
+      "year": "year",
+      "years": "years"
     },
     "reqtojoin": {
       "headRishon": "Approval and mission assignment",
