@@ -1,7 +1,7 @@
 <script>
+  import { t } from '$lib/translations';
   const moachStore = getMoachStore();
   import { page } from '$app/state';
-  import { lang } from '$lib/stores/lang.js';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { onMount } from 'svelte';
@@ -24,13 +24,6 @@
       loading = false;
     }
   });
-
-  const i18n = {
-    he: { participants: 'שותפים', actions: 'פעולות', confirm: 'אישור חלוקה', reject: 'התנגדות' },
-    en: { participants: 'Partners', actions: 'Actions', confirm: 'Confirm Split', reject: 'Object' },
-    ar: { participants: 'شركاء', actions: 'إجراءات', confirm: 'تأكيد التقسيم', reject: 'اعتراض' }
-  };
-  let t = $derived(i18n[$lang] || i18n.en);
 
   let jsonLd = $derived(split ? {
     "@context": "https://schema.org",
@@ -88,13 +81,13 @@
 
       <div class="space-y-6">
         <aside id="actions" aria-label="actions" class="bg-white p-6 rounded-xl shadow-sm">
-          <h2 class="text-lg font-bold mb-4 border-b pb-2">{t.actions}</h2>
+          <h2 class="text-lg font-bold mb-4 border-b pb-2">{$t('moach.splitDetail.actions')}</h2>
           <div class="space-y-3">
             <button class="w-full py-2 px-4 bg-primary text-white rounded-lg font-bold hover:opacity-90 transition-opacity">
-              {t.confirm}
+              {$t('moach.splitDetail.confirm')}
             </button>
             <button class="w-full py-2 px-4 border border-red-500 text-red-500 rounded-lg font-bold hover:bg-red-50 transition-colors">
-              {t.reject}
+              {$t('moach.splitDetail.reject')}
             </button>
           </div>
         </aside>

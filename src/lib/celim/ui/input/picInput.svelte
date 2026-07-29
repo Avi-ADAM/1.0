@@ -1,6 +1,5 @@
 <script>
       import { RingLoader } from 'svelte-loading-spinners';
-        import { lang } from '$lib/stores/lang.js';
         import AddImg from '$lib/celim/icons/addImg.svelte';
   import UploadPic from '$lib/components/userPr/uploadPic.svelte';
         let pic = $state(false)
@@ -23,9 +22,9 @@
     files = $bindable(),
     cropShape = 'round',
 		aspect = 1,
-    ladd = { he: 'הוספת תמונה', en: 'add image' },
-    cencel = { he: 'ביטול', en: 'cancel' },
-    om = { he: 'מעלה תמונה', en: 'uploading image' }
+    ladd = '',
+    cencel = '',
+    om = ''
   } = $props();
      let a = $state(0);
      let psrc = $state('');
@@ -58,7 +57,7 @@
 
 {#if pic != true}
 <button
-title="{ladd[$lang]}"
+title="{ladd}"
 onclick={openen}
 class="border flex flex-row border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold rounded px-2 py-1"
 > <AddImg/>
@@ -69,13 +68,13 @@ class="border flex flex-row border-barbi hover:border-gold bg-gradient-to-br fro
 {:else}
 <div> <button
     class=" hover:bg-barbi text-mturk rounded-full"
-    onclick={closer}>{cencel[$lang]}</button
+    onclick={closer}>{cencel}</button
   >
   {#if a == 0}
     <UploadPic onMessage={callbackFunction} {aspect}/>
   {:else if a == 2}
     <div class="sp bg-gold">
-      <h3 class="text-barbi">{om[$lang]}</h3>
+      <h3 class="text-barbi">{om}</h3>
       <br />
       <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
       ></RingLoader>

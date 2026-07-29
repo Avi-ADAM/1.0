@@ -236,6 +236,7 @@ export async function POST({ request, cookies }) {
 	// ── Standard GraphQL fetch ───────────────────────────────────────────────
 	const controller = new AbortController();
 	const timeoutId = setTimeout(() => controller.abort(), 30000);
+	const fetchStartedAt = Date.now();
 
 	try {
 		const res = await fetch(ep, {
@@ -250,6 +251,10 @@ export async function POST({ request, cookies }) {
 		});
 
 		clearTimeout(timeoutId);
+		const elapsedMs = Date.now() - fetchStartedAt;
+		if (elapsedMs > 10000) {
+			console.warn(`[${queId}] Slow Strapi response: ${elapsedMs}ms (idL=${idL ?? 'n/a'}, isSer=${isSer})`);
+		}
 		const newd = await res.json();
 
 		if (newd.data) {
@@ -290,11 +295,11 @@ export async function POST({ request, cookies }) {
 	} catch (e) {
 		clearTimeout(timeoutId);
 		if (e.name === 'AbortError') {
-			console.error('Fetch request timed out.');
+			console.error(`[${queId}] Fetch to Strapi timed out after ${Date.now() - fetchStartedAt}ms (idL=${idL ?? 'n/a'}, isSer=${isSer})`);
 			throw error(504, 'Gateway Timeout: The server did not respond in time.');
 		}
 		if (e.status && e.body) throw e;
-		console.error('Error:', e);
+		console.error(`[${queId}] Error:`, e);
 		throw error(500, e.message || 'An internal server error occurred.');
 	}
 }

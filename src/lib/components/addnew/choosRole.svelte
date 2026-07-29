@@ -1,5 +1,5 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
 import MultiSelect from 'svelte-multiselect';
 import { missionNew } from '../../stores/missionNew';
   import { onMount } from 'svelte';
@@ -45,20 +45,17 @@ function inc() {
   let { selected = $bindable([]) } = $props();
       const placeholder = `${$lang == "he" ? "בחירת תפקידים נדרשים" : "needed roles"}`;
 
-const adds = {"he":"בחירת תפקידים נדרשים","en": "Add needed roles"}
-  const nom = {"he": "לא קיים עדיין ברשימה, ניתן להוסיף בלחיצה על כפתור \"הוספת תפקיד חדש\" שלמטה","en":"Not on the list yet , add it with the \"Add new roll\" button bellow"}
-
 </script>
 
 
 <div dir="{$isRtl ? 'rtl' : 'ltr'}">
-  <lebel for="choos">{adds[$lang]}</lebel>
+  <lebel for="choos">{$t('addnew.choosRole.adds')}</lebel>
 <MultiSelect
 id="choos"
   onChange={inc}
 bind:selected
 {placeholder}
-          noMatchingOptionsMsg={nom[$lang]}
+          noMatchingOptionsMsg={$t('addnew.choosRole.nom')}
 {loading}
 options={roles1.map(c => c.attributes.roleDescription)}
 /> </div>

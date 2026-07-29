@@ -1,4 +1,5 @@
 <script>
+  import { t } from '$lib/translations';
   import { page } from '$app/state';
   import { untrack } from 'svelte';
   import { tick } from 'svelte';
@@ -82,55 +83,6 @@
     }
   });
 
-  const hosafa = {
-    he: 'הוספת פעולות נדרשות לריקמה',
-    en: 'add needed missions to FreeMates',
-    ar: ''
-  };
-
-  const hosafat = {
-    he: 'הוספת משאבים נדרשים לריקמה',
-    en: 'add needed resources to FreeMates',
-    ar: ''
-  };
-
-  const i18n = {
-    he: {
-      mission: 'יצירת משימה',
-      missionDesc: 'הוספת משימה חדשה לפרויקט',
-      resource: 'בקשת משאב',
-      resourceDesc: 'בקשת כסף, ציוד או מידע',
-      process: 'יצירת תהליך',
-      processDesc: 'בניית שרשרת פעולות מורכבת',
-      back: 'חזרה',
-      clickHandMission: 'לחיצה על היד כדי ליצור משימה',
-      clickHandResource: 'לחיצה על היד כדי לבקש משאב'
-    },
-    en: {
-      mission: 'Create Mission',
-      missionDesc: 'Add a new mission to the project',
-      resource: 'Request Resource',
-      resourceDesc: 'Request money, gear, or info',
-      process: 'Create Process',
-      processDesc: 'Build a complex chain of actions',
-      back: 'Back',
-      clickHandMission: 'Click on the hand to create a mission',
-      clickHandResource: 'Click on the hand to request a resource'
-    },
-    ar: {
-      mission: 'إنشاء مهمة',
-      missionDesc: 'إضافة مهمة جديدة للمشروع',
-      resource: 'طلب مورد',
-      resourceDesc: 'طلب مال أو معدات أو معلومات',
-      process: 'إنشاء عملية',
-      processDesc: 'بناء سلسلة معقدة من الإجراءات',
-      back: 'عودة',
-      clickHandMission: 'انقر على اليد لإنشاء مهمة',
-      clickHandResource: 'انقر على اليد لطلب مورد'
-    }
-  };
-
-  let t = $derived(i18n[$lang] || i18n.en);
 
   function hosa() {
     addM = true;
@@ -176,12 +128,12 @@
 
       <!-- משימה -->
       <div class="flex flex-col items-center gap-3 p-6 border border-barbi rounded-2xl bg-gradient-to-br from-gra via-grb to-gre drop-shadow-lg shadow-gold">
-        <h3 class="text-lg font-bold">{t.mission}</h3>
-        <p class="text-sm text-gray-500 text-center">{t.missionDesc}</p>
+        <h3 class="text-lg font-bold">{$t('moach.create.mission')}</h3>
+        <p class="text-sm text-gray-500 text-center">{$t('moach.create.missionDesc')}</p>
         {#if hovered}
           <button onclick={hosa} onmouseleave={() => (hovered = false)}>
             <img
-              title={hosafa[$lang]}
+              title={$t('moach.create.hosafa')}
               style="max-width:45vw; max-height:45vw;"
               width="240"
               height="240"
@@ -197,19 +149,19 @@
             {noofopen}
             {openMS}
             {addM}
-            hosafa={hosafa[$lang]}
+            hosafa={$t('moach.create.hosafa')}
           />
         {/if}
       </div>
 
       <!-- משאב -->
       <div class="flex flex-col items-center gap-3 p-6 border border-barbi rounded-2xl bg-gradient-to-br from-gra via-grb to-gre drop-shadow-lg shadow-gold">
-        <h3 class="text-lg font-bold">{t.resource}</h3>
-        <p class="text-sm text-gray-500 text-center">{t.resourceDesc}</p>
+        <h3 class="text-lg font-bold">{$t('moach.create.resource')}</h3>
+        <p class="text-sm text-gray-500 text-center">{$t('moach.create.resourceDesc')}</p>
         {#if hoveredd}
           <button onclick={() => (addN = true)} onmouseleave={() => (hoveredd = false)}>
             <img
-              title={hosafat[$lang]}
+              title={$t('moach.create.hosafat')}
               style="max-width:45vw; max-height:45vw;"
               width="240"
               height="240"
@@ -221,7 +173,7 @@
           <Handd
             {addN}
             {openMA}
-            hosafat={hosafat[$lang]}
+            hosafat={$t('moach.create.hosafat')}
             noofopenm={combinedResources.length}
             onMasi={() => (addN = true)}
             onBighandd={() => (hoveredd = !hoveredd)}
@@ -232,10 +184,10 @@
 
       <!-- תהליך -->
       <div class="flex flex-col items-center gap-3 p-6 border border-barbi rounded-2xl bg-gradient-to-br from-gra via-grb to-gre drop-shadow-lg shadow-gold">
-        <h3 class="text-lg font-bold">{t.process}</h3>
-        <p class="text-sm text-gray-500 text-center">{t.processDesc}</p>
+        <h3 class="text-lg font-bold">{$t('moach.create.process')}</h3>
+        <p class="text-sm text-gray-500 text-center">{$t('moach.create.processDesc')}</p>
         <Handp
-          hosafap={t.process}
+          hosafap={$t('moach.create.process')}
           onClick={() => (createMode = 'process')}
         />
       </div>
@@ -258,7 +210,7 @@
           stroke="currentColor"
           stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7" /></svg
         >
-        {t.back}
+        {$t('moach.create.back')}
       </button>
 
       <!-- פורמי משימה -->
@@ -267,7 +219,7 @@
           <div class="p-2 flex justify-end">
             <button
               onclick={() => (openMS = false)}
-              aria-label={t.back}
+              aria-label={$t('moach.create.back')}
               class="hover:bg-barbi text-gold hover:text-white font-bold p-1 rounded-full transition-colors"
             >
               <svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -283,7 +235,7 @@
           <div class="p-2 flex justify-end">
             <button
               onclick={closeM}
-              aria-label={t.back}
+              aria-label={$t('moach.create.back')}
               class="hover:bg-barbi text-gold hover:text-white font-bold p-1 rounded-full transition-colors"
             >
               <svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -301,7 +253,7 @@
           <div class="p-2 flex justify-end">
             <button
               onclick={() => (openMA = false)}
-              aria-label={t.back}
+              aria-label={$t('moach.create.back')}
               class="hover:bg-barbi text-gold hover:text-white font-bold p-1 rounded-full transition-colors"
             >
               <svg style="width:24px;height:24px" viewBox="0 0 24 24">

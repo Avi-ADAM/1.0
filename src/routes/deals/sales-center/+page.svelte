@@ -1,5 +1,5 @@
 <script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import SaleComponent from '$lib/components/sales/SaleComponent.svelte';
   import RecurringCycleCard from '$lib/components/sales/RecurringCycleCard.svelte';
@@ -37,68 +37,6 @@
   });
 
   // Localization
-  const texts = {
-    he: {
-      title: 'המוצרים שלי',
-      subtitle: 'כל המוצרים שלך מכל הרקמות — וניהול המכירות ממקום אחד',
-      newProduct: 'מוצר חדש',
-      search: 'חיפוש מוצרים...',
-      filterByProject: 'סינון לפי פרויקט',
-      allProjects: 'כל הפרויקטים',
-      noProducts: 'לא נמצאו מוצרים',
-      noProductsDesc: 'אין לך מוצרים זמינים למכירה כרגע',
-      loading: 'המוצרים נטענים...',
-      error: 'שגיאה בטעינת המוצרים',
-      productName: 'שם המוצר',
-      price: 'מחיר',
-      quantity: 'כמות זמינה',
-      project: 'פרויקט',
-      actions: 'פעולות',
-      sellButton: 'מכירה',
-      shekel: '₪',
-      refresh: 'רענן נתונים',
-      processing: 'עיבוד מכירה...',
-      expand: 'הרחבה',
-      collapse: 'כיווץ',
-      share: 'שיתוף',
-      viewProduct: 'צפייה במוצר',
-      type: 'סוג',
-      unlimited: 'ליחידה - ללא הגבלה',
-      outOfStock: 'אזל מהמלאי',
-      tryAgain: 'לא להתייאש, לנסות שוב'
-    },
-    en: {
-      title: 'My Products',
-      subtitle: 'All your products from every weave — and sales management in one place',
-      newProduct: 'New product',
-      search: 'Search products...',
-      filterByProject: 'Filter by project',
-      allProjects: 'All Projects',
-      noProducts: 'No products found',
-      noProductsDesc: 'You have no products available for sale at the moment',
-      loading: 'Loading products...',
-      error: 'Error loading products',
-      productName: 'Product Name',
-      price: 'Price',
-      quantity: 'Available Quantity',
-      project: 'Project',
-      actions: 'Actions',
-      sellButton: 'Sell',
-      shekel: '₪',
-      refresh: 'Refresh data',
-      processing: 'Processing sale...',
-      expand: 'Expand',
-      collapse: 'Collapse',
-      share: 'Share',
-      viewProduct: 'View Product',
-      type: 'Type',
-      unlimited: 'Unlimited',
-      outOfStock: 'Out of Stock',
-      tryAgain: 'Try Again'
-    }
-  };
-
-  let t = $derived(texts[$lang] || texts.he);
 
   function filterProducts() {
     let filtered = products;
@@ -246,7 +184,7 @@
       await invalidateAll();
       toast.success($lang === 'he' ? 'נתוני המוצרים עודכנו' : 'Product data refreshed');
     } catch {
-      toast.error(t.error);
+      toast.error($t('pages.salesCenter.error'));
     } finally {
       loading = false;
     }
@@ -261,17 +199,17 @@
 </script>
 
 <svelte:head>
-  <title>{t.title}</title>
+  <title>{$t('pages.salesCenter.title')}</title>
 </svelte:head>
 
 <main class="page-wrap" dir={$isRtl ? 'rtl' : 'ltr'}>
   <div class="page-top anim">
     <div>
-      <h1 class="page-title">{t.title} <span class="accent">🎁</span></h1>
-      <p class="page-sub">{t.subtitle}</p>
+      <h1 class="page-title">{$t('pages.salesCenter.title')} <span class="accent">🎁</span></h1>
+      <p class="page-sub">{$t('pages.salesCenter.subtitle')}</p>
     </div>
     <button class="new-btn" onclick={() => (creatingProduct = true)}>
-      ➕ {t.newProduct}
+      ➕ {$t('pages.salesCenter.newProduct')}
     </button>
   </div>
 
@@ -317,12 +255,12 @@
   {#if loading}
     <div class="state-block">
       <RingLoader size="60" color="var(--gold)" />
-      <p class="loading-text">{t.loading}</p>
+      <p class="loading-text">{$t('pages.salesCenter.loading')}</p>
     </div>
   {:else if error}
     <div class="state-block">
       <div class="error-box">{error}</div>
-      <button class="retry-btn" onclick={refreshProductData}>{t.tryAgain}</button>
+      <button class="retry-btn" onclick={refreshProductData}>{$t('pages.salesCenter.tryAgain')}</button>
     </div>
   {:else}
     <!-- Filters and Search -->
@@ -332,12 +270,12 @@
         id="search-input"
         class="search-input"
         bind:value={searchTerm}
-        placeholder={t.search}
+        placeholder={$t('pages.salesCenter.search')}
       />
 
-      <label for="project-filter" class="sr-only">{t.filterByProject}</label>
+      <label for="project-filter" class="sr-only">{$t('pages.salesCenter.filterByProject')}</label>
       <select id="project-filter" bind:value={selectedProject} class="project-select">
-        <option value="all">{t.allProjects}</option>
+        <option value="all">{$t('pages.salesCenter.allProjects')}</option>
         {#each data.projects as project}
           <option value={project.id}>{project.name}</option>
         {/each}
@@ -346,8 +284,8 @@
       <button
         onclick={refreshProductData}
         class="refresh-btn"
-        title={t.refresh}
-        aria-label={t.refresh}
+        title={$t('pages.salesCenter.refresh')}
+        aria-label={$t('pages.salesCenter.refresh')}
       >
         <svg class="icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -360,13 +298,13 @@
       </button>
     </div>
 
-    <div class="section-label">{t.productName}</div>
+    <div class="section-label">{$t('pages.salesCenter.productName')}</div>
 
     <!-- Products Grid -->
     {#if filteredProducts.length === 0}
       <div class="empty">
-        <p class="empty-text">{t.noProducts}</p>
-        <p class="empty-sub">{t.noProductsDesc}</p>
+        <p class="empty-text">{$t('pages.salesCenter.noProducts')}</p>
+        <p class="empty-sub">{$t('pages.salesCenter.noProductsDesc')}</p>
       </div>
     {:else}
       <div class="products-grid">
@@ -381,8 +319,8 @@
                 <button
                   onclick={() => shareProduct(product.id, product.attributes.name)}
                   class="icon-btn"
-                  title={t.share}
-                  aria-label={t.share}
+                  title={$t('pages.salesCenter.share')}
+                  aria-label={$t('pages.salesCenter.share')}
                 >
                   <svg class="icon-svg-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -397,8 +335,8 @@
                 <button
                   onclick={() => viewProduct(product.id)}
                   class="icon-btn"
-                  title={t.viewProduct}
-                  aria-label={t.viewProduct}
+                  title={$t('pages.salesCenter.viewProduct')}
+                  aria-label={$t('pages.salesCenter.viewProduct')}
                 >
                   <svg class="icon-svg-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -420,23 +358,23 @@
 
             <div class="product-details">
               <div class="detail-row">
-                <span class="dl">{t.price}:</span>
-                <span class="dv gold">{product.attributes.price} {t.shekel}</span>
+                <span class="dl">{$t('pages.salesCenter.price')}:</span>
+                <span class="dv gold">{product.attributes.price} {$t('pages.salesCenter.shekel')}</span>
               </div>
               <div class="detail-row">
-                <span class="dl">{t.quantity}:</span>
+                <span class="dl">{$t('pages.salesCenter.quantity')}:</span>
                 <span class="dv">
-                  {product.attributes.quant === -1 ? t.unlimited : product.attributes.quant}
+                  {product.attributes.quant === -1 ? $t('pages.salesCenter.unlimited') : product.attributes.quant}
                 </span>
               </div>
               <div class="detail-row">
-                <span class="dl">{t.type}:</span>
+                <span class="dl">{$t('pages.salesCenter.type')}:</span>
                 <span class="dv">{product.attributes.kindOf}</span>
               </div>
             </div>
 
             <button class="expand-btn" onclick={() => toggleCardExpansion(product.id)}>
-              <span>{isCardExpanded(product.id) ? t.collapse : t.expand}</span>
+              <span>{isCardExpanded(product.id) ? $t('pages.salesCenter.collapse') : $t('pages.salesCenter.expand')}</span>
               <svg
                 class="chevron"
                 class:open={isCardExpanded(product.id)}
@@ -461,7 +399,7 @@
                   {#if isSaleInProgress(product.id)}
                     <div class="sale-processing" dir={$isRtl ? 'rtl' : 'ltr'}>
                       <div class="spinner"></div>
-                      <span>{t.processing}</span>
+                      <span>{$t('pages.salesCenter.processing')}</span>
                     </div>
                   {:else}
                     <SaleComponent
@@ -480,7 +418,7 @@
                     />
                   {/if}
                 {:else}
-                  <p class="out-of-stock">{t.outOfStock}</p>
+                  <p class="out-of-stock">{$t('pages.salesCenter.outOfStock')}</p>
                 {/if}
               </div>
             {/if}

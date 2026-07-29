@@ -1,0 +1,18 @@
+{
+  "withWhomMoney": "אצל מי הכסף",
+  "saleError": "שגיאה בביצוע המכירה",
+  "changeSaleDate": "שינוי תאריך מכירה",
+  "howManyUnits": "כמה יחידות?",
+  "howManyPerUnit": "כמה ליחידה?",
+  "perMonth": "לחודש",
+  "perYear": "לשנה",
+  "noStartDate": "אין תאריך התחלה",
+  "noEndDate": "אין תאריך סיום, ניתן להשאיר ריק אם רוצים מכירה מתמשכת עד אשר תבוטל באופן יזום",
+  "noUserSelected": "שדה אצל מי הכסף נשאר ריק",
+  "startDate": "תאריך התחלה",
+  "endDate": "תאריך סיום",
+  "addSale": "הוספת מכירה",
+  "total": "סה\"כ",
+  "noteOptional": "הערה (אופציונלי)",
+  "notePlaceholder": "הוספת הערה למכירה..."
+}

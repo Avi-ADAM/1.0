@@ -125,29 +125,39 @@ const manifestLink = {
   he: "https://res.cloudinary.com/love1/raw/upload/v1749551626/manifest_with_new_routes_qktyc3.json?v=3",
   en: "https://res.cloudinary.com/love1/raw/upload/v1749552534/eng-mani-updated_xpcxdf.json?v=2",
   ar: "https://res.cloudinary.com/love1/raw/upload/v1749552534/eng-mani-updated_xpcxdf.json?v=2",
-  ru: "https://res.cloudinary.com/love1/raw/upload/v1749552534/eng-mani-updated_xpcxdf.json?v=2"
+  ru: "https://res.cloudinary.com/love1/raw/upload/v1749552534/eng-mani-updated_xpcxdf.json?v=2",
+  es: "https://res.cloudinary.com/love1/raw/upload/v1749552534/eng-mani-updated_xpcxdf.json?v=2"
 };
 
 const desc = {
   he: '1💗1 הסכמה עולמית על חירות | ליצור יחד בהסכמה. לכל 1 יש כישרונות ויכולות ייחודים, לכל 1 יש חלום. ביחד ניתן ליצור כל דבר, לשתף פעולה, לחלום, להעז, להצליח ולהרוויח בגדול.',
   en: '1💗1 WorldWide consensus for Security and Peace | collaboration platform, create together harmoniously | consensus based partnerships management platform | we can together',
   ar: '1💗1 اتفاق عالمي للحرية والسلام، منصة تعاون، نخلق معًا بتناغم | نظام إدارة الشراكات القائم على التوافق، يمكننا معًا',
-  ru: '1💗1 Всемирное согласие на свободу и безопасность | платформа сотрудничества, создавать вместе в согласии | система управления партнёрствами на основе консенсуса | вместе мы можем'
+  ru: '1💗1 Всемирное согласие на свободу и безопасность | платформа сотрудничества, создавать вместе в согласии | система управления партнёрствами на основе консенсуса | вместе мы можем',
+  es: '1💗1 Consenso mundial por la libertad y la paz | plataforma de colaboración, crear juntos en armonía | plataforma de gestión de asociaciones basada en el consenso | juntos podemos'
 };
 
 const title = {
   en: '1💗1 | Create together harmoniously | Worldwide Consensus for Freedom',
   he: 'הסכמה עולמית על חירות וביטחון | 1💗1️ ליצור ביחד בהסכמה | 1💗1',
   ar: '1💗1 | نخلق معًا بتناغم | اتفاق عالمي للحرية',
-  ru: '1💗1 | Создавать вместе в согласии | Всемирное согласие на свободу'
+  ru: '1💗1 | Создавать вместе в согласии | Всемирное согласие на свободу',
+  es: '1💗1 | Crear juntos en armonía | Consenso mundial por la libertad'
 };
 
 const cl = {
   he: 'he-IL',
   en: 'en-gb',
   ar: 'ar-EG',
-  ru: 'ru-RU'
+  ru: 'ru-RU',
+  es: 'es-ES'
 };
+
+// Every locale the site can actually render. Kept in one place so the URL/cookie
+// resolution below and the per-locale metadata maps above can't drift apart —
+// an unlisted locale used to reach transformPageChunk and stamp `undefined`
+// into <title>, the description and the manifest link.
+const SUPPORTED_LANGS = ['he', 'en', 'ar', 'ru', 'es'];
 
 let lang = 'he'; // Default language set to Hebrew
 
@@ -157,21 +167,19 @@ function getLanguage(event) {
   const coociLang = event.cookies.get('lang');
   const userAgent = event.request.headers.get('accept-language');
 
-  if (qlang && ['he', 'en', 'ar', 'ru'].includes(qlang)) {
+  if (qlang && SUPPORTED_LANGS.includes(qlang)) {
     return qlang;
-  } else if (event.url.pathname === '/en') {
-    return 'en';
-  } else if (event.url.pathname === '/ar') {
-    return 'ar';
-  } else if (event.url.pathname === '/he') {
-    return 'he';
-  } else if (event.url.pathname === '/ru') {
-    return 'ru';
-  } else if (!coociLang) {
-    return userAgent?.includes('he') ? 'he' : 'en';
-  } else {
-    return coociLang;
   }
+  const fromPath = event.url.pathname.slice(1);
+  if (SUPPORTED_LANGS.includes(fromPath)) {
+    return fromPath;
+  }
+  if (!coociLang) {
+    return userAgent?.includes('he') ? 'he' : 'en';
+  }
+  // The cookie is user-writable, so validate it too — an unknown value here
+  // would propagate into locals.lang and out to the metadata maps.
+  return SUPPORTED_LANGS.includes(coociLang) ? coociLang : 'he';
 }
 // Baseline security headers applied to every response. A full Content-Security-Policy
 // is intentionally NOT set here — it needs a dedicated, tested pass to whitelist all

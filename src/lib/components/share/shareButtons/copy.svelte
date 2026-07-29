@@ -1,24 +1,16 @@
 <script>
+  import { t } from '$lib/translations';
     import { toast } from 'svelte-sonner';
     import { copy } from "svelte-copy";
-  import {lang} from '$lib/stores/lang'
-  const su = {
-    "he": "!העתקת בהצלחה",
-    "en": "you copied successfully"
-  }
-  const er = {
-    "he": "שגיאה בהעתקה!",
-    "en": "error while copying"
-  }
   const handleSuccessfullyCopied = (e) => {
     console.log(e)
         checked = true
-        toast.success(su[$lang])
+        toast.success($t('common.status.copied'))
         setTimeout(()=>checked = false,15000)
     }
 
   const handleFailedCopy = () => {
-       toast.warning(er[$lang])
+       toast.warning($t('common.status.copyError'))
        error = true
         setTimeout(()=>checked = true,15000)
   }
@@ -40,7 +32,7 @@
 
     <button  use:copy={{text:url, events: ['click'], 
     onCopy:handleSuccessfullyCopied, onError({error}){
-       toast.warning(er[$lang])
+       toast.warning($t('common.status.copyError'))
        error = true
         setTimeout(()=>checked = true,15000)
   }}}  >

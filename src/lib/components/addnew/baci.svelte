@@ -1,5 +1,5 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
     import { lang } from '$lib/stores/lang.js'
     import { Confetti } from "svelte-confetti"
    import { quintOut } from "svelte/easing";
@@ -24,15 +24,16 @@ let success = $state(false)
 let run = [];
 let files;
   let shgi = $state(false);
+  let naex = $state('');
     let nam;
 async function sendP() {
   if ($baciStore.projectName_value.length < 1) {
-    naex = { he: 'שם הריקמה חייב להיות ארוך יותר', en: 'please choose name for the FreeMate' };
+    naex = $t('addnew.baci.nameTooShort');
     shgi = true;
     return;
   }
   if (run.includes($baciStore.projectName_value)) {
-    naex = { he: 'השם כבר קיים נא לבחור שם אחר', en: 'name already exists please try another name' };
+    naex = $t('addnew.baci.naex');
     shgi = true;
     return;
   }
@@ -152,7 +153,7 @@ let vallues = $state([]);
 
 let suc = $state(false);
 
-        const placeholder = `${$lang == "he" ? "ערכים ומטרות" : "vallues and goals"}`;
+        const placeholder = $t('addnew.baci.valuesAndGoals');
 
  function project () {
     // idPr was already set to the new weave id in sendPP().
@@ -195,48 +196,18 @@ let suc = $state(false);
   let ugug = $state(``);
   let valE = $state(false)
     let newcontent = $state(true)
-  let addne = $derived({"he":`הוספת "${ugug}"`,"en": `Create "${ugug}"`})
-const timeto = {"he":"כמה זמן עד שהריקמה תכניס כסף", "en":"how much time until the FreeMates will be profitable"}
-const timetoex = {"he":"חישוב הזמן עד שניתן יהיה לחלק כסף מרגע שאוישו כל המשימות ונתקבלו כל המשאבים הנדרשים", "en" : "the time until money can be splited from when all of the missions has asigned and all the resources has accepted" }
-const cvar = {"he":"הריקמה כבר רווחית", "en": "the FreeMates is already profitable"}
-const week = {"he":"שבוע" , "en": "week"}
-const month = {"he": "חודש", "en": "month"}
-const threemonth = {"he": "שלושה חודשים", "en": "three months"}
-const halt = {"he": "חצי שנה" , "en": "half a year"}
-const year = {"he": "שנה" , "en": "year"}
-const toyers = {"he": "שנתיים", "en": "two years"}
-const more = {"he": "יותר משנתיים", "en": "more then 2 years" }
-const never = {"he": "לעולם לא", "en": "never"}
-const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
-const cencel = {"he":"ביטול","en": "cencel"}
-const crn = {"he":"יצירת ריקמה חדשה", "en": "Create new FreeMates"}
-const frn = {"he":"שם הריקמה", "en":"FreeMates name"}
-const hours = {"he": "שעות", "en": "hours"}
-const hrex = {"he": "לאחר זמן זה חוסר מענה יחשב כהסכמה", "en": "after that: non-voting will consider as agreement"}
-const hre = {"he":"זמן תגובה לקבלת החלטות בריקמה", "en":"time to respond to FreeMates voting"}
-const teure = {"he": "תיאור שיהיה גלוי לכל", "en": "short description with public visibility"} 
-const prte = {"he": "תאור מפורט שגלוי רק בתוך הריקמה", "en":"long description visible only to the FreeMates members"}
-const wel = {"he":"לינק לאתר (אם יש)" ,"en":"link to a website (if any)"}
-let naex = $state({"he":"השם כבר קיים נא לבחור שם אחר" , "en":"name already exists please try another name"})
-const whva = {"he":"אלו ערכים ומטרות הריקמה תקדם" , "en":"which vallues and goals the FreeMates will promote"}
-const ladd = {"he":"הוספת לוגו", "en": "add Logo"} 
-const su = {"he": "לוגו נוסף בהצלחה", "en": "logo has successfully added"}
-const addn = {"he":"הוספת ערך חדש","en": "Add new Vallue"}
-const cree = {"he": "ליצור ולפרסם ריקמה", "en": "Create new FreeMate"}
-const sur = {"he":"הריקמה נוצרה בהצלחה", "en":"new FreeMates has created"}
-const tob = {"he":"מעבר לניהול הריקמה במוח הריקמה", "en":"to the FreeMates brain"}
-const inc = {"he":"ניתן להזין את הערך המוערך של ההכנסה אם ידוע, אחרת ניתן יהיה לחשב בהמשך מדף הניהול","en":"if you know the aproximate vallue of income, else you can later caculate it"}
+
  </script>  
 {#if isOpen}
       <div class="center-upload" dir="rtl" >
              <button class=" hover:bg-barbi text-mturk rounded-full"
-          onclick={closer}>{cencel[$lang]}</button>
+          onclick={closer}>{$t('addnew.baci.cencel')}</button>
           {#if a == 1}
           <Uplad current="https://res.cloudinary.com/onelove1/image/upload/v1645805397/pngegg_2_8aeb98b032.png" onMessage={callbackFunction}/>
 
           {:else if a == 2 && isOpen}
           <div class="sp bg-gold">
-            <h3 class="text-barbi">{om[$lang]}</h3>
+            <h3 class="text-barbi">{$t('addnew.baci.om')}</h3>
           <br>
          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
          </div> 
@@ -250,59 +221,59 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
   {#if before == false}
 
 <div transition:scale={{ delay: 250, duration: 300, easing: quintOut }} dir="{$isRtl ? 'rtl' : 'ltr'}" class="jho {isMobileOrTablet ? "pb-12" : ""} flex flex-col items-center text-center justify-center">
-  <h1 class="text-gold">{crn[$lang]}</h1>
+  <h1 class="text-gold">{$t('addnew.baci.crn')}</h1>
 <br>
 
         <div dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
   <input name="des" bind:value={$baciStore.projectName_value}
  type='text' class='input'required >
-  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="des" class='label'>{frn[$lang]}</label>
+  <label style:right={$isRtl ? "0" : "none"} style:left={$isRtl ? "none" : "0"} for="des" class='label'>{$t('addnew.baci.frn')}</label>
   <span class='line'></span>
 </div>
-{#if shgi == true}<small class="text-red-600 bg-slate-50">{naex[$lang]}</small>{/if}
+{#if shgi == true}<small class="text-red-600 bg-slate-50">{naex}</small>{/if}
 <!----
     <div dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
   <textarea name="es"  bind:value={desP}    
  type='text' class='input d' required ></textarea>
-  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="es" class='label'>{teure[$lang]}</label>
+  <label style:right={$isRtl ? "0" : "none"} style:left={$isRtl ? "none" : "0"} for="es" class='label'>{$t('addnew.baci.teure')}</label>
   <span class='line'></span>
 </div>-->
 <br>
 <div class="w-full">
-<h2 class="text-barbi">{teure[$lang]}</h2>
+<h2 class="text-barbi">{$t('addnew.baci.teure')}</h2>
 <RichText bind:outpot={$baciStore.desP}/>
 </div>
 <!----
    <div dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
   <textarea name="s"  bind:value={$baciStore.desPl}
  type='text' class='input d' required></textarea>
-  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="s" class='label'>{prte[$lang]}</label>
+  <label style:right={$isRtl ? "0" : "none"} style:left={$isRtl ? "none" : "0"} for="s" class='label'>{$t('addnew.baci.prte')}</label>
   <span class='line'></span>
 </div>-->
 <div class="w-full">
-    <h2 class="text-barbi">{prte[$lang]}</h2>
+    <h2 class="text-barbi">{$t('addnew.baci.prte')}</h2>
 
 <RichText bind:outpot={$baciStore.desPl}/>
 </div>
  <div dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
   <input name="de"    bind:value={$baciStore.linkP}
  type='text' class='input' required>
-  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="de" class='label'>{wel[$lang]}</label>
+  <label style:right={$isRtl ? "0" : "none"} style:left={$isRtl ? "none" : "0"} for="de" class='label'>{$t('addnew.baci.wel')}</label>
   <span class='line'></span>
 </div>
 <br>
 <div class="">
 <h2 
- class=" text-barbi " >{ladd[$lang]}</h2>
+ class=" text-barbi " >{$t('addnew.baci.ladd')}</h2>
 <Uplad
   noHeader={true}
  current="https://res.cloudinary.com/onelove1/image/upload/v1645805397/pngegg_2_8aeb98b032.png" onMessage={callbackFunction}/>
 
-{#if suc == true}<small class="text-barbi">{su[$lang]}</small>{/if}
+{#if suc == true}<small class="text-barbi">{$t('addnew.baci.su')}</small>{/if}
 </div>         
 <h1 class="midscreenText-2 text-center text-gold">
   {userName_value} 
-  {whva[$lang]}
+  {$t('addnew.baci.whva')}
 ?
 </h1> 
 {#if !isMobileOrTablet()}
@@ -311,7 +282,7 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
      outerDivClass="!bg-gold !text-barbi"
      inputClass="!bg-gold !text-barbi"
      liSelectedClass="!bg-barbi !text-gold"
-      createOptionMsg={addne[$lang]}
+      createOptionMsg={$t('addnew.baci.addne', { name: ugug })}
      allowUserOptions={"append"}
       loading={newcontent}
       bind:searchText={ugug}
@@ -321,14 +292,14 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
      />
   </div>
 {:else}
-  <MobileModal onClose={()=> valE = false} bind:isOpen={valE} title={placeholder[$lang]}>
+  <MobileModal onClose={()=> valE = false} bind:isOpen={valE} title={placeholder}>
         <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
 
        <MultiSelect
      outerDivClass="!bg-gold !text-barbi"
      inputClass="!bg-gold !text-barbi"
      liSelectedClass="!bg-barbi !text-gold"
-      createOptionMsg={addne[$lang]}
+      createOptionMsg={$t('addnew.baci.addne', { name: ugug })}
      allowUserOptions={"append"}
       loading={newcontent}
       bind:searchText={ugug}
@@ -341,8 +312,8 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
 {/if}
   <br>
  <div dir="{$isRtl ? 'rtl' : 'ltr'}" class="mb-3 xl:w-96 m-2">
-      <h2 class="text-center text-gold">{hre[$lang]}</h2>
-    <select class:round={$lang == "he"} class:rounden={$lang == "en"} bind:value={$baciStore.restime} class=" form-select appearance-none
+      <h2 class="text-center text-gold">{$t('addnew.baci.hre')}</h2>
+    <select class:round={$isRtl} class:rounden={!$isRtl} bind:value={$baciStore.restime} class=" form-select appearance-none
       block
       w-full
       px-3
@@ -356,17 +327,17 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
       ease-in-out
       m-0
       focus:text-barbi focus:bg-lturk focus:border-barbi focus:outline-none">
-<option value="feh" selected> 48 {hours[$lang]} </option>
-<option value="sth">72 {hours[$lang]} </option>
-<option value="nsh">96 {hours[$lang]} </option>
-<option value="sevend">{week[$lang]}</option>
+<option value="feh" selected> 48 {$t('addnew.baci.hours')} </option>
+<option value="sth">72 {$t('addnew.baci.hours')} </option>
+<option value="nsh">96 {$t('addnew.baci.hours')} </option>
+<option value="sevend">{$t('addnew.baci.week')}</option>
 
 </select>
-<small style="color: turquoise;">{hrex[$lang]}</small>
+<small style="color: turquoise;">{$t('addnew.baci.hrex')}</small>
 </div>
 <div dir="{$isRtl ? 'rtl' : 'ltr'}" class="mb-3 xl:w-96 m-2">
-      <h2 class="text-center text-gold">{timeto[$lang]}</h2>
-    <select class:round={$lang == "he"} class:rounden={$lang == "en"} bind:value={$baciStore.timeToP} class=" form-select appearance-none
+      <h2 class="text-center text-gold">{$t('addnew.baci.timeto')}</h2>
+    <select class:round={$isRtl} class:rounden={!$isRtl} bind:value={$baciStore.timeToP} class=" form-select appearance-none
       block
       w-full
       px-3
@@ -380,25 +351,25 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
       ease-in-out
       m-0
       focus:text-barbi focus:bg-lturk focus:border-barbi focus:outline-none">
-<option value="already" selected>{cvar[$lang]}</option>
-<option value="week">{week[$lang]}</option>
-<option value="month">{month[$lang]}</option>
-<option value="threeM">{threemonth[$lang]}</option>
-<option value="sixM">{halt[$lang]}</option>
-<option value="oneY">{year[$lang]}</option>
-<option value="twoY">{toyers[$lang]}</option>
-<option value="more">{more[$lang]}</option>
-<option value="never">{never[$lang]}</option>
+<option value="already" selected>{$t('addnew.baci.cvar')}</option>
+<option value="week">{$t('addnew.baci.week')}</option>
+<option value="month">{$t('addnew.baci.month')}</option>
+<option value="threeM">{$t('addnew.baci.threemonth')}</option>
+<option value="sixM">{$t('addnew.baci.halt')}</option>
+<option value="oneY">{$t('addnew.baci.year')}</option>
+<option value="twoY">{$t('addnew.baci.toyers')}</option>
+<option value="more">{$t('addnew.baci.more')}</option>
+<option value="never">{$t('addnew.baci.never')}</option>
 </select>
-<small style="color: turquoise;">{timetoex[$lang]}</small>
+<small style="color: turquoise;">{$t('addnew.baci.timetoex')}</small>
 </div>
-<Chooser tr={{"he":"ריקמה מתמשכת","en":"continuous"}}   
-  fl={{"he":"ריקמה חד פעמית","en":"one timed"}} 
-  level={{"he":"הריקמה מיועדת להיות אירוע חד פעמי או מתמשך? לדוגמה: הפקת אירוע או הקמת עסק להפקת אירועים","en":"those the FreeMates intend to be a one time think or a continouse one? for exmple: event production vs openting a production company"}} 
+<Chooser tr={$t('addnew.baci.continuous')}   
+  fl={$t('addnew.baci.oneTimed')} 
+  level={$t('addnew.baci.continuousLevel')} 
   bind:checked={$baciStore.ont} />
   <!-- הדוגמה א טובה צריך לתת פתיחה של מסעדה מול אירוע חד פעמי, גם כדאי לשים בשורה נפרדת של הערות 
 {#if ont == true}
-<h3 class="text-barbi">{inc[$lang]}</h3>
+<h3 class="text-barbi">{$t('addnew.baci.inc')}</h3>
 <input type="number"/>
 {/if}-->
   {#if loading == false}
@@ -406,14 +377,14 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
 <button 
     class="cen bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold p-4 rounded-full"
      onclick={sendP}
-     name="addm">{cree[$lang]}</button>
+     name="addm">{$t('addnew.baci.cree')}</button>
        {:else}  <RingLoader size="100" color="#ff00ae" unit="px" duration="2s"></RingLoader>
 {/if}</div>
 {:else}
 <div class="aft">
-  <h1 class="text-barbi">{sur[$lang]}</h1>
+  <h1 class="text-barbi">{$t('addnew.baci.sur')}</h1>
   <button class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"
- onclick={project} >{tob[$lang]}</button>
+ onclick={project} >{$t('addnew.baci.tob')}</button>
 </div>
 {/if}
   {#if success}

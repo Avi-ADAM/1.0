@@ -1,0 +1,89 @@
+{
+  "_review": true,
+  "nav": { "brand": "1💗1", "philosophy": "Acuerdo global", "practical": "Nuevo deseo", "register": "Registrarse" },
+  "hero": {
+    "kicker": "El motor de acuerdos",
+    "title": "No tenemos un \"no\"",
+    "subtitle": "Cada paso en una asociación avanza por uno de tres caminos: aprobar, seguir hablando o proponer una versión distinta. Ninguna puerta se cierra con llave.",
+    "action1": { "label": "Aprobar", "desc": "Acepta la versión tal como está" },
+    "action2": { "label": "Discutir", "desc": "Sigue hablando antes de decidir" },
+    "action3": { "label": "Contrapropuesta", "desc": "Propón una nueva versión de la misma petición" }
+  },
+  "decisionTime": {
+    "kicker": "El ritmo del tejido",
+    "title": "El silencio que se convierte en acuerdo",
+    "body": "Cada propuesta lleva su propia ventana de decisión: el tiempo de decisión de la rikma (entre 48 horas y una semana, según los ajustes que defina tu rikma). Si nadie responde antes de que la ventana se cierre, la propuesta queda aprobada. No porque alguien dijera que sí en voz alta, sino porque nadie objetó. Ese es el ritmo del tejido: tiempo para pensar y luego avanzar.",
+    "ringResult": "¡Acordado!"
+  },
+  "essence": {
+    "kicker": "Qué es esto realmente",
+    "title": "Un lugar para construir juntos un sustento — por acuerdo",
+    "body": "1💗1 no es solo una idea bonita. Es una plataforma donde las personas gestionan asociaciones reales (rikmot): un proyecto compartido, sus misiones, sus ingresos y su reparto de beneficios, todo por acuerdo mutuo, sin jefe ni imposición de la mayoría. El motor de acuerdos que ves aquí es la forma en que se toma cada decisión en una asociación así: dinero, roles, tareas; cada parte propone, y solo se avanza con una versión que ambas partes sostienen.",
+    "point1": { "title": "Asociaciones compartidas", "desc": "Gestiona un proyecto, sus misiones y su dinero en conjunto, con total transparencia." },
+    "point2": { "title": "Reparto justo de beneficios", "desc": "La contribución de cada uno se mide y se reparte por acuerdo, no por la fuerza." },
+    "point3": { "title": "Sin jefe ni imposición de la mayoría", "desc": "Cada decisión madura por acuerdo o por silencio, al ritmo que tú marcas." }
+  },
+  "demo": {
+    "kicker": "Pruébalo tú mismo",
+    "title": "Una ronda de negociación en vivo",
+    "subtitle": "Esta es una propuesta real sobre una misión: la campaña de lanzamiento. Responde como lo harías en una asociación real.",
+    "roundLabel": "Ronda",
+    "proposerYou": "Tú",
+    "proposerPartner": "Dana",
+    "perHourUnit": "$/hora",
+    "hoursUnit": "horas",
+    "totalLabel": "Total",
+    "windowLabel": "Tiempo de decisión restante",
+    "windowNote": "Si no respondes antes de que la ventana se cierre, la propuesta se aprueba en silencio.",
+    "skip": "⏩ Demo: nadie respondió → acuerdo por silencio",
+    "silenceExplainer": "El silencio = acuerdo. Si la ventana se cierra y nadie aprueba, discute o contrapropone, la última versión sobre la mesa se aprueba por sí sola. No hace falta un \"sí\" explícito: basta con no objetar a tiempo. Pruébalo: deja todo intacto y que el temporizador llegue a cero, o salta al final de la ventana.",
+    "simulatePartnerCounter": "🔄 Demo: Dana contrapropone",
+    "actions": { "approve": "Aprobar", "discuss": "Discutir", "counter": "Contraproponer" },
+    "counterForm": {
+      "title": "Tu versión",
+      "perHourLabel": "Tarifa por hora ($)",
+      "hoursLabel": "Número de horas",
+      "noteLabel": "Nota (opcional)",
+      "notePlaceholder": "¿Por qué propones esto?",
+      "submit": "Enviar nueva versión",
+      "cancel": "Cancelar"
+    },
+    "chat": {
+      "placeholder": "Escribe un mensaje a Dana…",
+      "send": "Enviar",
+      "reply1": "Entendido, dame un momento para pensar 🙏",
+      "reply2": "Sigo contigo en esto, no hace falta apurarse."
+    },
+    "history": { "title": "Historial de rondas", "empty": "Aún no hay rondas anteriores." },
+    "status": {
+      "pending": "Esperando respuesta",
+      "approved": "Aprobada",
+      "silentApproved": "Aprobada por silencio",
+      "countered": "Nueva versión propuesta"
+    },
+    "signed": {
+      "title": "Firmado ✍️",
+      "body": "Ahora ambas partes sostienen exactamente la misma versión. Eso es un acuerdo.",
+      "silenceTitle": "Aprobada por silencio 🔕",
+      "silenceBody": "La ventana se cerró y nadie objetó, así que la última versión sobre la mesa se convirtió en acuerdo por sí sola. Eso es el silencio convertido en acuerdo.",
+      "restart": "Iniciar una nueva ronda"
+    },
+    "initialNote": "Empecemos aquí: 40 horas en la campaña de lanzamiento, 120 $/hora.",
+    "partnerCounterNote": "Encontrémonos un poco a mitad de camino."
+  },
+  "mainCta": {
+    "kicker": "La mayoría viene aquí por esto",
+    "title": "Gestiona una asociación real por consenso",
+    "body": "Abre una rikma, invita a socios y gestiona cada decisión —dinero, roles, misiones— a través del motor de acuerdos. Regístrate y empieza a construir juntos.",
+    "button": "Regístrate — inicia una asociación"
+  },
+  "links": {
+    "philTitle": "Un mundo gestionado por acuerdo mutuo",
+    "philBody": "1💗1 forma parte de algo más grande: un mundo gestionado por acuerdo mutuo en lugar de por la coerción. Descubre el acuerdo global, la convención con la que todo empieza (un sitio aparte).",
+    "philCta": "Al acuerdo global",
+    "pracTitle": "¿Solo necesitas algo?",
+    "pracBody": "¿No estás seguro de una asociación? Abre un nuevo deseo y la conserjería te conectará con el proveedor adecuado.",
+    "pracCta": "Abrir un nuevo deseo"
+  },
+  "footer": "1💗1 — crear juntos, por acuerdo"
+}

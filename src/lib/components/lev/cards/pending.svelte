@@ -2,7 +2,7 @@
   import { isRtl } from '$lib/translations';
   import Chaticon from '../../../celim/chaticon.svelte';
   import { onMount } from 'svelte';
-  import tr from '$lib/translations/tr.json';
+  import { t as trans } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import Lev from '../../../celim/lev.svelte';
@@ -128,19 +128,6 @@
     onProj?.({ projectName });
   }
 
-  const t = {
-    acts: { he: 'מטלות:', en: 'Tasks:' },
-    wwneed: { he: 'דרכי עבודה מבוקשות:', en: 'ways of work for the mission:' },
-    skneed: { he: 'הכישורים הנדרשים:', en: 'needed skills:' },
-    rneed: { he: 'תפקיד מבוקש:', en: 'requested role:' },
-    perMonth: { he: 'לחודש', en: 'per month' },
-    formonth: { he: 'בכל חודש', en: 'every month' },
-    onPrevious: { he: 'על גרסה קודמת', en: 'on previous version' }
-  };
-  const timero = {
-    he: 'מונה זמן לסיום הדיון',
-    en: 'time counter for end of discution'
-  };
 </script>
 
 <div
@@ -154,7 +141,7 @@
   class="d {isMobileOrTablet()
     ? 'w-full h-full'
     : ' w-[90%] h-[90%]'} lg:w-[90%] {isVisible
-    ? $lang == 'he'
+    ? $isRtl
       ? 'boxleft'
       : 'boxright'
     : ''} flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isScrolable.value
@@ -174,7 +161,7 @@
   <CardHeader
     logoSrc={src}
     {projectName}
-    cardType={tr?.pending.head[$lang]}
+    cardType={$trans('pending.head')}
     cardTitle={name}
     {glowColor}
     onProjectClick={handleProjectClick}
@@ -221,10 +208,10 @@
         >
         <span
           role="contentinfo"
-          aria-label={timero[$lang]}
+          aria-label={$trans('lev.cards.common.timero')}
           class="text-blue-500 dark:text-blue-400 text-xl sm:text-2xl font-bold whitespace-nowrap"
           style:font-family="Digital"
-          onmouseenter={() => hover(timero[$lang])}
+          onmouseenter={() => hover($trans('lev.cards.common.timero'))}
           onmouseleave={() => hover('0')}
           style="letter-spacing: 2px;"
         >
@@ -244,7 +231,7 @@
         >
           <div
             class="flex items-center gap-1"
-            onmouseenter={() => hover(tr?.common.valph[$lang])}
+            onmouseenter={() => hover($trans('common.valph'))}
             onmouseleave={() => hover('0')}
           >
             <img
@@ -252,31 +239,31 @@
               src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg"
               alt="howmuch"
             />
-            <span>{perhour} {tr?.common.perhour[$lang]}</span>
+            <span>{perhour} {$trans('common.perhour')}</span>
           </div>
           <span class="text-gray-400 font-bold">*</span>
           <div
             class="flex items-center gap-1"
-            onmouseenter={() => hover(tr?.common.noofhours[$lang])}
+            onmouseenter={() => hover($trans('common.noofhours'))}
             onmouseleave={() => hover('0')}
           >
             <span
               >{noofhours.toLocaleString('en-US', { maximumFractionDigits: 2 })}
-              {tr?.common.hours[$lang]}
-              {isKavua ? t.formonth[$lang] : ''}</span
+              {$trans('common.hours')}
+              {isKavua ? $trans('lev.cards.common.formonth') : ''}</span
             >
           </div>
           <span class="text-gray-400 font-bold">=</span>
           <div
             class="flex items-center gap-1 text-blue-600 dark:text-blue-400 font-bold"
-            onmouseenter={() => hover(tr.mission.total[$lang])}
+            onmouseenter={() => hover($trans('mission.total'))}
             onmouseleave={() => hover('0')}
           >
             <span
               >{(noofhours * perhour).toLocaleString('en-US', {
                 maximumFractionDigits: 2
               })}
-              {isKavua ? t.perMonth[$lang] : ''}</span
+              {isKavua ? $trans('lev.cards.common.perMonth') : ''}</span
             >
           </div>
         </div>
@@ -333,7 +320,7 @@
           <div>
             <span
               class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 block"
-              >{t.skneed[$lang]}</span
+              >{$trans('lev.cards.common.skneed')}</span
             >
             <div class="flex flex-wrap gap-2">
               {#each skills.data as skill}
@@ -352,7 +339,7 @@
           <div>
             <span
               class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 block"
-              >{t.rneed[$lang]}</span
+              >{$trans('lev.cards.common.rneed')}</span
             >
             <div class="flex flex-wrap gap-2">
               {#each tafkidims.data as rol}
@@ -371,7 +358,7 @@
           <div>
             <span
               class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 block"
-              >{t.wwneed[$lang]}</span
+              >{$trans('lev.cards.common.wwneed')}</span
             >
             <div class="flex flex-wrap gap-2">
               {#each workways.data as wo}
@@ -394,7 +381,7 @@
         >
           <span
             class="text-sm font-bold text-blue-600 dark:text-blue-400 mb-3 block"
-            >{t.acts[$lang]}</span
+            >{$trans('lev.cards.common.acts')}</span
           >
           <ul class="space-y-2">
             {#each acts.data as datai}
@@ -446,7 +433,7 @@
       >
         <div
           class="flex items-center gap-1 text-green-500 dark:text-green-400"
-          onmouseenter={() => hover(tr?.vots.totalin[$lang])}
+          onmouseenter={() => hover($trans('vots.totalin'))}
           onmouseleave={() => hover('0')}
         >
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"
@@ -456,11 +443,11 @@
               clip-rule="evenodd"
             ></path></svg
           >
-          <span>{noofusersOk} {tr?.vots.inFavor[$lang]}</span>
+          <span>{noofusersOk} {$trans('vots.inFavor')}</span>
         </div>
         <div
           class="flex items-center gap-1 text-blue-500 dark:text-blue-400"
-          onmouseenter={() => hover(tr?.vots.notyet[$lang])}
+          onmouseenter={() => hover($trans('vots.notyet'))}
           onmouseleave={() => hover('0')}
         >
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"
@@ -470,11 +457,11 @@
               clip-rule="evenodd"
             ></path></svg
           >
-          <span>{noofusersWaiting} {tr?.vots.notyet[$lang]}</span>
+          <span>{noofusersWaiting} {$trans('vots.notyet')}</span>
         </div>
         <div
           class="flex items-center gap-1 text-purple-500 dark:text-purple-400"
-          onmouseenter={() => hover(t.onPrevious[$lang])}
+          onmouseenter={() => hover($trans('lev.cards.common.onPrevious'))}
           onmouseleave={() => hover('0')}
         >
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"
@@ -484,7 +471,7 @@
               clip-rule="evenodd"
             ></path></svg
           >
-          <span>{noofusersNo} {t.onPrevious[$lang]}</span>
+          <span>{noofusersNo} {$trans('lev.cards.common.onPrevious')}</span>
         </div>
       </div>
     {/if}
@@ -500,10 +487,10 @@
         <button
           class="flex-1 py-2.5 bg-white dark:bg-gray-800 border-2 border-yellow-500 text-yellow-600 dark:text-yellow-500 hover:bg-yellow-50 dark:hover:bg-gray-700 font-bold rounded-xl transition-all flex items-center justify-center gap-2 group"
           onclick={() => nego('f')}
-          onmouseenter={() => hover(tr?.common.nego[$lang])}
+          onmouseenter={() => hover($trans('common.nego'))}
           onmouseleave={() => hover('0')}
         >
-          <span class="hidden sm:inline">{tr?.common.nego[$lang]}</span>
+          <span class="hidden sm:inline">{$trans('common.nego')}</span>
           <svg
             class="w-5 h-5 group-hover:scale-110 transition-transform"
             xmlns="http://www.w3.org/2000/svg"
@@ -518,24 +505,24 @@
         <button
           class="flex-2 py-2.5 bg-gradient-to-r from-blue-500 to-blue-400 text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 group"
           onclick={() => agree('f')}
-          onmouseenter={() => hover(tr?.common.approve[$lang])}
+          onmouseenter={() => hover($trans('common.approve'))}
           onmouseleave={() => hover('0')}
         >
           <span class="group-hover:scale-110 transition-transform"><Lev /></span
           >
-          <span>{tr?.common.approve[$lang]}</span>
+          <span>{$trans('common.approve')}</span>
         </button>
       {/if}
       <button
         class="flex-1 py-2.5 bg-white dark:bg-gray-800 border-2 border-blue-500 text-blue-500 hover:bg-blue-50 dark:hover:bg-gray-700 font-bold rounded-xl transition-all flex items-center justify-center gap-2 group"
         onclick={() => tochat()}
-        onmouseenter={() => hover(tr?.common.watchthe[$lang])}
+        onmouseenter={() => hover($trans('common.watchthe'))}
         onmouseleave={() => hover('0')}
       >
         <span class="group-hover:scale-110 transition-transform"
           ><Chaticon /></span
         >
-        <span>{tr?.common.watchthe[$lang]}</span>
+        <span>{$trans('common.watchthe')}</span>
       </button>
     {:else}
       <Lowbtn isCart={true} />

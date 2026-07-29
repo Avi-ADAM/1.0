@@ -1,15 +1,10 @@
 <script>
+  import { t } from '$lib/translations';
  import Tile from "$lib/celim/tile.svelte";
   import Button from "$lib/celim/ui/button.svelte";
   import { sendToSer } from "$lib/send/sendToSer.js";
-  import {lang} from '$lib/stores/lang';
   import { toast } from 'svelte-sonner';
-  const pending = { he: 'ממתין לאישור', en: 'Pending Approval' };
-  const pendingVal = { he: 'ממתין לאישרור', en: 'Pending Validation' };
-  const completed = { he: 'הושלם בהצלחה', en: 'Completed Successfully' };
-  const approve = { he: 'אישור', en: 'Approve' };
-  const validate = { he: 'אישור ביצוע', en: 'Validate Completion' };
-  const availableRoles = { he: 'תפקידים זמינים:', en: 'Available Roles:' };
+
   /**
    * @typedef {Object} Props
    * @property {string} [src]
@@ -56,12 +51,10 @@
     pendingValidation = $bindable(false),
     isCompleted = false,
     id,
-    text = {"he":"אני אבצע", "en":"assign to me"},
+    text = '',
     onClick = () => {}
   } = $props();
   let loading = $state(false), success = $state(false), error = $state(false);
-  const suc = { he: 'בוצע בהצלחה', en: 'Success' };
-
  async function handleApprove() {
     loading = true;
     await sendToSer(
@@ -82,7 +75,7 @@
         loading = false;
         //toast
 
-        toast.success(suc[$lang]);
+        toast.success($t('common.status.success'));
         onApprove();
         
         }else{
@@ -115,7 +108,7 @@
             pendingValidation = false;
         loading = false;
         //toast
-        toast.success(suc[$lang]);
+        toast.success($t('common.status.success'));
         onValidate();
         }else{
         loading = false;
@@ -221,20 +214,20 @@
             {/if}
         </div>
         {#if isPending}
-            <span class="text-yellow-500 text-sm">{pending[$lang]}</span>
+            <span class="text-yellow-500 text-sm">{$t('common.status.pending')}</span>
         {/if}
         {#if pendingValidation}
-            <span class="text-green-500 text-sm">{pendingVal[$lang]}</span>
+            <span class="text-green-500 text-sm">{$t('common.status.pendingVal')}</span>
             {#if isValidator}
-                <Button  {success} {error} {loading} size="sm" onClick={handleValidate} text={validate} />
+                <Button  {success} {error} {loading} size="sm" onClick={handleValidate} text={$t('tasks.confirmDo')} />
          
             {/if}
         {/if}
         {#if isCompleted}
-            <span class="text-green-600 text-sm font-medium">{completed[$lang]}</span>
+            <span class="text-green-600 text-sm font-medium">{$t('common.status.completed')}</span>
         {/if}
         {#if isCurrentUser && isPending}
-            <Button {success} {error} {loading} size="sm" onClick={handleApprove} text={approve} />
+            <Button {success} {error} {loading} size="sm" onClick={handleApprove} text={$t('common.approve')} />
               
         {/if}
         {#if mname}

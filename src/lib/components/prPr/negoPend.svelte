@@ -1,13 +1,11 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
-  import tr from '$lib/translations/tr.json';
+  import { isRtl, t } from '$lib/translations';
   import Text from '../conf/text.svelte';
   import NumberField from '../conf/number.svelte';
   import DateNego from '../conf/dateNego.svelte';
   import TotalBar from '../conf/barb.svelte';
   import KindOfnego from '$lib/components/conf/kindOfnego.svelte';
   import LocationNego from '$lib/components/conf/locationNego.svelte';
-  const tri = tr;
   import { lang } from '$lib/stores/lang';
   import { montsi, toIsoDateString } from '$lib/func/montsi.svelte';
   import { toast } from 'svelte-sonner';
@@ -214,7 +212,7 @@
     onLoad?.();
 
     if (!onSubmit && !pendId) {
-      toast.error(tr?.toasts?.er?.[$lang] ?? 'Missing resource id');
+      toast.error($t('toasts.er') ?? 'Missing resource id');
       return;
     }
 
@@ -302,12 +300,12 @@
     if (onSubmit) {
       try {
         await onSubmit({ newValues, originalValues, hasChanges });
-        toast.success(tr?.toasts.suc[$lang]);
+        toast.success($t('toasts.suc'));
         close();
       } catch (e) {
         error1 = e;
         console.log(error1);
-        toast.error(tr?.toasts?.er?.[$lang] ?? 'Error');
+        toast.error($t('toasts.er') ?? 'Error');
       }
       return;
     }
@@ -332,15 +330,15 @@
         if (result.data?.id) {
           updatePmashesStore(result.data);
         }
-        toast.success(tr?.toasts.suc[$lang]);
+        toast.success($t('toasts.suc'));
         close();
       } else {
-        toast.error(tr?.toasts?.er?.[$lang] ?? 'Error');
+        toast.error($t('toasts.er') ?? 'Error');
       }
     } catch (e) {
       error1 = e;
       console.log(error1);
-      toast.error(tr?.toasts?.er?.[$lang] ?? 'Error');
+      toast.error($t('toasts.er') ?? 'Error');
     }
   }
   const effectiveHmNew = $derived(
@@ -388,22 +386,22 @@
 
   const datai = $derived([
     {
-      leb: `${tri?.nego?.new[$lang]},${totalNew.toLocaleString()}`,
+      leb: `${$t('nego.new')},${totalNew.toLocaleString()}`,
       value: totalNew
     },
     {
-      leb: `${tri?.nego?.original[$lang]},${totalOrig.toLocaleString()}`,
+      leb: `${$t('nego.original')},${totalOrig.toLocaleString()}`,
       value: totalOrig
     }
   ]);
 
   const dataiEasy = $derived([
     {
-      leb: `${tri?.nego?.new[$lang]},${totalEasyNew.toLocaleString()}`,
+      leb: `${$t('nego.new')},${totalEasyNew.toLocaleString()}`,
       value: totalEasyNew
     },
     {
-      leb: `${tri?.nego?.original[$lang]},${totalEasyOrig.toLocaleString()}`,
+      leb: `${$t('nego.original')},${totalEasyOrig.toLocaleString()}`,
       value: totalEasyOrig
     }
   ]);
@@ -411,7 +409,7 @@
 
 <div class="text-barbi" dir={$isRtl ? 'rtl' : 'ltr'}>
   <h1 class="md:text-center text-2xl md:text-2xl font-bold underline">
-    {onSubmit ? tri?.nego?.headMashCandidate[$lang] : tri?.nego?.headmash[$lang]}:
+    {onSubmit ? $t('nego.headMashCandidate') : $t('nego.headmash')}:
     {name1}
   </h1>
 
@@ -420,26 +418,26 @@
     {@const candTotal = (candidateRound.hm ?? hm) * (candidateRound.easy ?? candidateRound.price ?? easy ?? price)}
     <div class="mx-2 my-2 rounded-lg border border-barbi/50 bg-barbi/8 p-3 text-sm space-y-1">
       <p class="font-bold text-barbi text-base">
-        💡 {$lang === 'he' ? 'הצעת המועמד (לעיון):' : 'Candidate proposal (for reference):'}
+        💡 {$t('nego.cand.proposalRef')}
       </p>
       <div class="flex flex-wrap gap-x-4 gap-y-1 text-barbi/80">
         {#if candidateRound.hm != null}
-          <span>{$lang === 'he' ? 'כמות:' : 'Qty:'} <strong>{candidateRound.hm}</strong></span>
+          <span>{$t('nego.cand.qty')} <strong>{candidateRound.hm}</strong></span>
         {/if}
         {#if candidateRound.price != null}
-          <span>{$lang === 'he' ? 'מחיר:' : 'Price:'} <strong>{candidateRound.price}</strong></span>
+          <span>{$t('nego.cand.price')} <strong>{candidateRound.price}</strong></span>
         {/if}
         {#if candidateRound.easy != null}
-          <span>{$lang === 'he' ? 'שווי לב:' : 'Lev value:'} <strong>{candidateRound.easy}</strong></span>
+          <span>{$t('nego.cand.levValue')} <strong>{candidateRound.easy}</strong></span>
         {/if}
         {#if candTotal > 0}
-          <span class="font-bold">{$lang === 'he' ? 'סה"כ:' : 'Total:'} <strong>{candTotal.toLocaleString()}</strong></span>
+          <span class="font-bold">{$t('nego.cand.total')} <strong>{candTotal.toLocaleString()}</strong></span>
         {/if}
         {#if candidateRound.sqadualed}
-          <span>{$lang === 'he' ? 'התחלה:' : 'Start:'} <strong>{new Date(candidateRound.sqadualed).toLocaleDateString($lang)}</strong></span>
+          <span>{$t('nego.cand.start')} <strong>{new Date(candidateRound.sqadualed).toLocaleDateString($lang)}</strong></span>
         {/if}
         {#if candidateRound.sqadualedf}
-          <span>{$lang === 'he' ? 'סיום:' : 'End:'} <strong>{new Date(candidateRound.sqadualedf).toLocaleDateString($lang)}</strong></span>
+          <span>{$t('nego.cand.end')} <strong>{new Date(candidateRound.sqadualedf).toLocaleDateString($lang)}</strong></span>
         {/if}
       </div>
     </div>
@@ -449,67 +447,65 @@
     <div
       class="mx-2 my-2 rounded-lg border border-gold/60 bg-gold/10 p-2 text-sm text-center"
     >
-      🔁 {$lang === 'en'
-        ? 'Recurring resource — the value below is the per-cycle (monthly) cost. Every cycle is approved separately. You may leave the end date empty for an open-ended expense.'
-        : 'משאב חוזר — הסכום למטה הוא העלות לכל מחזור (חודשי). כל מחזור עובר אישור בנפרד. ניתן להשאיר תאריך סיום ריק להוצאה ללא הגבלת זמן.'}
+      🔁 {$t('nego.cand.recurringResourceNote')}
     </div>
   {/if}
   <div class="flex flex-col align-middle justify-center">
-    <Text text={name1} bind:textb={name2} lebel={tri?.common?.name} />
+    <Text text={name1} bind:textb={name2} lebel={$t('common.name')} />
     {#if onSubmit && candidateRound?.name && candidateRound.name !== name1}
-      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד:' : 'Candidate:'} {candidateRound.name}</p>
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$t('nego.cand.candidate')} {candidateRound.name}</p>
     {/if}
     <Rich
       text={descrip}
       bind:textb={descrip2}
-      lebel={tri?.common?.description}
+      lebel={$t('common.description')}
     />
     <Text
       text={spnot}
       bind:textb={spnot2}
-      lebel={{ he: 'הערות מיוחדות', en: 'Special notes' }}
+      lebel={$t('common.labels.specialNotes')}
     />
-    <Text text={linkto} bind:textb={linkto2} lebel={tri?.mash?.linkto} />
-    <KindOfnego {kindOf} bind:kindOfb lebel={tri?.mash.kindof} />
+    <Text text={linkto} bind:textb={linkto2} lebel={$t('mash.linkto')} />
+    <KindOfnego {kindOf} bind:kindOfb lebel={$t('mash.kindof')} />
 
     {#if !(kindOf == 'total' && kindOfb == 'total')}
-      <NumberField number={hm} bind:numberb={hm2} lebel={tri?.mash?.noof[$lang]} />
+      <NumberField number={hm} bind:numberb={hm2} lebel={$t('mash.noof')} />
       {#if onSubmit && candidateRound?.hm != null && candidateRound.hm !== hm}
-        <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} <strong>{candidateRound.hm}</strong></p>
+        <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$t('nego.cand.candidateProposed')} <strong>{candidateRound.hm}</strong></p>
       {/if}
     {/if}
     <NumberField
       number={price}
       bind:numberb={price2}
-      lebel={tri?.mash?.shovi[$lang]}
+      lebel={$t('mash.shovi')}
     />
     {#if onSubmit && candidateRound?.price != null && candidateRound.price !== price}
-      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} <strong>{candidateRound.price}</strong></p>
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$t('nego.cand.candidateProposed')} <strong>{candidateRound.price}</strong></p>
     {/if}
     <NumberField
       number={easy}
       bind:numberb={easy2}
-      lebel={tri?.mash?.shovile[$lang]}
+      lebel={$t('mash.shovile')}
     />
     {#if onSubmit && candidateRound?.easy != null && candidateRound.easy !== easy}
-      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} <strong>{candidateRound.easy}</strong></p>
+      <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$t('nego.cand.candidateProposed')} <strong>{candidateRound.easy}</strong></p>
     {/if}
     {#if kindOf == 'yearly' || kindOfb == 'yearly' || kindOfb == 'monthly' || kindOf == 'monthly' || kindOf == 'rent' || kindOfb == 'rent'}
       <DateNego
         date={sqadualed}
         bind:dateb={sqadualed2}
-        lebel={tri?.common.startDate}
+        lebel={$t('common.startDate')}
       />
       {#if onSubmit && candidateRound?.sqadualed}
-        <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} {new Date(candidateRound.sqadualed).toLocaleDateString($lang)}</p>
+        <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$t('nego.cand.candidateProposed')} {new Date(candidateRound.sqadualed).toLocaleDateString($lang)}</p>
       {/if}
       <DateNego
         date={sqadualedf}
         bind:dateb={sqadualedf2}
-        lebel={tri?.common.finishDate}
+        lebel={$t('common.finishDate')}
       />
       {#if onSubmit && candidateRound?.sqadualedf}
-        <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$lang === 'he' ? 'מועמד הציע:' : 'Candidate:'} {new Date(candidateRound.sqadualedf).toLocaleDateString($lang)}</p>
+        <p class="text-xs text-barbi/70 px-2 -mt-1 mb-1 inline-flex items-center gap-1">💡 {$t('nego.cand.candidateProposed')} {new Date(candidateRound.sqadualedf).toLocaleDateString($lang)}</p>
       {/if}
     {/if}
 
@@ -519,22 +515,18 @@
       >
         <label class="flex flex-row items-center justify-center gap-x-2">
           <span class="underline decoration-mturk"
-            >{$lang === 'en' ? 'Recurring expense' : 'הוצאה חוזרת'}</span
+            >{$t('nego.cand.recurringExpense')}</span
           >
           <input type="checkbox" bind:checked={recurring2} />
         </label>
         {#if recurring2}
           <p class="text-xs text-center text-barbi/80">
-            {$lang === 'en'
-              ? 'Approved each cycle; clear the end date for an open-ended expense.'
-              : 'מאושר בכל מחזור; ניתן להסיר תאריך סיום למצב ללא הגבלה.'}
+            {$t('nego.cand.approvedEachCycle')}
           </p>
           <NumberField
             number={cycleSize}
             bind:numberb={cycleSize2}
-            lebel={$lang === 'en'
-              ? `Every N ${kindOfb === 'yearly' ? 'years' : 'months'}`
-              : `כל כמה ${kindOfb === 'yearly' ? 'שנים' : 'חודשים'}`}
+            lebel={`${$t('nego.cand.everyN')} ${kindOfb === 'yearly' ? $t('nego.cand.years') : $t('nego.cand.months')}`}
           />
           <button
             type="button"
@@ -543,8 +535,8 @@
             class="mx-auto text-sm border border-gold/50 rounded-full px-3 py-1 hover:bg-gold/20 disabled:opacity-40"
           >
             {sqadualedf2 == null || sqadualedf2 === ''
-              ? $lang === 'en' ? '∞ Open-ended (no end date)' : '∞ ללא תאריך סיום'
-              : $lang === 'en' ? 'Remove end date' : 'הסרת תאריך סיום'}
+              ? $t('nego.cand.openEndedNoEnd')
+              : $t('nego.cand.removeEndDate')}
           </button>
         {/if}
       </div>
@@ -553,12 +545,12 @@
     <LocationNego
       {location}
       bind:locationb={location2}
-      lebel={{ he: 'מיקום', en: 'Location' }}
+      lebel={$t('common.labels.location')}
     />
 
     <!---<div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
     <div class="flex flex-row align-middle justify-center gap-x-2">
-        <h2 class="underline decoration-mturk">{tr?.mission.iskvua[$lang]}: </h2>
+        <h2 class="underline decoration-mturk">{$t('mission.iskvua')}: </h2>
   <input
     bind:checked={isKavua2}
     type="checkbox" id="tomeC" name="isKavua2" >
@@ -567,7 +559,7 @@
 
 <div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
     <div class="flex flex-row align-middle justify-center gap-x-2">
-        <h2 class="underline decoration-mturk">{tr?.mission.assingToMe[$lang]}: </h2>
+        <h2 class="underline decoration-mturk">{$t('mission.assingToMe')}: </h2>
   <input
     bind:checked={myM}
     type="checkbox" id="tomeC" name="tome" value="tome" onclick={()=> myMission()}>
@@ -579,18 +571,18 @@
   >
     <h2 class="underline decoration-mturk">
       {#if recurring2}
-        {$lang === 'en' ? 'Estimated cost per cycle' : 'עלות משוערת למחזור'}
+        {$t('nego.cand.estCostPerCycle')}
       {:else}
-        {tri?.mash.tota[$lang]}
+        {$t('mash.tota')}
       {/if}
     </h2>
     {#if valuesChanged}
       <div class="flex flex-col gap-2">
         <div>
           <p class="text-gold">
-            {tri?.mash?.shovi[$lang]}: {totalNew.toLocaleString()}
+            {$t('mash.shovi')}: {totalNew.toLocaleString()}
             <span class="text-barbi text-sm">
-              ({tri?.nego?.original[$lang]}: {totalOrig.toLocaleString()})
+              ({$t('nego.original')}: {totalOrig.toLocaleString()})
             </span>
           </p>
           {#key chartKey}
@@ -602,9 +594,9 @@
         {#if Number(easy) !== Number(easy2) || Number(price) !== Number(price2)}
           <div>
             <p class="text-gold">
-              {tri?.mash?.shovile[$lang]}: {totalEasyNew.toLocaleString()}
+              {$t('mash.shovile')}: {totalEasyNew.toLocaleString()}
               <span class="text-barbi text-sm">
-                ({tri?.nego?.original[$lang]}: {totalEasyOrig.toLocaleString()})
+                ({$t('nego.original')}: {totalEasyOrig.toLocaleString()})
               </span>
             </p>
             {#key `${chartKey}-easy`}
@@ -618,7 +610,7 @@
     {:else if totalNew > 0}
       {totalNew.toLocaleString()}
       {#if Number(price2) !== Number(easy2)}
-        {tri?.mash?.shovile[$lang]}:
+        {$t('mash.shovile')}:
         {totalEasyNew.toLocaleString()}
       {/if}
     {:else}
@@ -631,14 +623,14 @@
       onclick={increment}
       class="mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
       type="submit"
-      name="addm">{onSubmit ? tri?.nego?.submitProposal[$lang] : tri?.common.puttovote[$lang]}</button
+      name="addm">{onSubmit ? $t('nego.submitProposal') : $t('common.puttovote')}</button
     >
     <button
       onclick={openBridge}
       type="button"
       class="mx-auto text-sm border border-gold/50 text-gold hover:bg-gold/20 rounded-full px-4 py-1"
     >
-      {$lang === 'en' ? '🤝 Open a deeper discussion' : '🤝 דיון מעמיק'}
+      {$t('nego.cand.deeperDiscussion')}
     </button>
   </div>
 </div>

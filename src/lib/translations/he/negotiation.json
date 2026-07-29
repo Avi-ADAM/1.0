@@ -66,7 +66,7 @@
   "back": "חזור",
   "rounds": "סבבים",
   "finish_discussion": "סיים דיון",
-  "next_round": "סבב {{n}}",
+  "next_round": "סבב {{count}}",
   "reset": "איפוס",
   "error_loading": "שגיאה בטעינת הדיון",
   "error_adding_position": "שגיאה בהוספת עמדה חדשה",
@@ -74,5 +74,7 @@
   "error_communication": "שגיאת תקשורת עם AI",
   "error_generic": "שגיאה",
   "discussion_not_found": "דיון לא נמצא",
-  "loading": "טוען..."
+  "loading": "טוען...",
+  "anonymous": "אנונימי/ת",
+  "discussion_created_by": "הדיון נפתח על ידי"
 }

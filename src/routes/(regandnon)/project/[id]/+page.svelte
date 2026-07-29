@@ -1,4 +1,5 @@
 <script>
+  import { t } from '$lib/translations';
   import Header from '$lib/components/header/header.svelte';
   import { goto, invalidate } from '$app/navigation';
   import { onMount, onDestroy } from 'svelte';
@@ -39,7 +40,6 @@
   let discordlink = $derived(project?.attributes?.discordLink);
   let twiterlink = $derived(project?.attributes?.twiterLink);
 
-  const showl = { he: '🎁 הצגת התוצרים שלנו', en: '🎁 Our Products' };
   let show = $state(false);
 
   // Values, re-synced from the (possibly re-fetched) project and translated for he.
@@ -97,42 +97,15 @@
   let isMobile = $derived(w < 640);
 
   // טקסטים
-  const texts = {
-    joinTitle: { he: 'הצטרפו לריקמה הזו', en: 'Join this FreeMate' },
-    joinDesc: {
-      he: 'כדי לקחת חלק פעיל, לראות את כל המידע וליצור שיתופי פעולה, מומלץ להירשם.',
-      en: 'To participate, view full info and collaborate, please register.'
-    },
-    login: { he: 'התחברות / הרשמה', en: 'Login / Register' },
-    values: { he: '✨ הערכים שלנו', en: '✨ Our Values' },
-    missions: { he: '🚀 משימות פנויות', en: '🚀 Open Missions' },
-    team: { he: 'הצוות', en: 'The Team' },
-    visit: { he: 'בקרו באתר', en: 'Visit Website' },
-    about: { he: 'מי אנחנו', en: 'Who we are' },
-    supportTitle: { he: '💗 לתמוך בעשייה', en: '💗 Support the work' },
-    supportDesc: {
-      he: 'שקיפות מלאה: כמה נעשה, כמה כוסה, ואיך כל תרומה מתחלקת',
-      en: 'Full transparency: what was done, what’s covered, how every donation is shared'
-    },
-    joinTitle: { he: '🤝 להיות חלק', en: '🤝 Become a part' },
-    joinDesc: {
-      he: 'מציעים את עצמכם בתנאים שלכם — משימה שתבצעו או משאב שתביאו',
-      en: 'Nominate yourself on your own terms — a mission you’ll do or a resource you’ll bring'
-    },
-    selfNomCta: {
-      he: 'מתחברים לכיוון? הציעו את עצמכם לריקמה ←',
-      en: 'Feeling the direction? Nominate yourself →'
-    }
-  };
-
-  let pageTitle = $derived({
-    he: `1💗1 | ${project?.attributes?.projectName || 'ריקמה'}`,
-    en: `1💗1 | ${project?.attributes?.projectName || 'FreeMate'}`
-  });
+  let pageTitle = $derived(
+    $t('pages.projectPublic.pageTitle', {
+      projectName: project?.attributes?.projectName || $t('pages.projectPublic.fallbackName')
+    })
+  );
 </script>
 
 <svelte:head>
-  <title>{pageTitle[$lang]}</title>
+  <title>{pageTitle}</title>
 </svelte:head>
 
 {#if isRegisteredUser}
@@ -189,7 +162,7 @@
               target="_blank"
               href={linkP}
               class="social-btn group text-gold"
-              title={texts.visit[$lang]}
+              title={$t('pages.projectPublic.visit')}
             >
               <!-- Website Icon -->
               <svg
@@ -266,12 +239,12 @@
              self-nomination (PLAN_SELF_NOMINATION §4) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl">
           <a href="/project/{projectId}/support" class="door-card border-gold/40 hover:border-gold">
-            <span class="text-xl font-black text-gold mb-1">{texts.supportTitle[$lang]}</span>
-            <span class="text-sm text-gray-300 leading-snug">{texts.supportDesc[$lang]}</span>
+            <span class="text-xl font-black text-gold mb-1">{$t('pages.projectPublic.supportTitle')}</span>
+            <span class="text-sm text-gray-300 leading-snug">{$t('pages.projectPublic.supportDesc')}</span>
           </a>
           <a href="/project/{projectId}/join" class="door-card border-barbi/40 hover:border-barbi">
-            <span class="text-xl font-black text-barbi mb-1">{texts.joinTitle[$lang]}</span>
-            <span class="text-sm text-gray-300 leading-snug">{texts.joinDesc[$lang]}</span>
+            <span class="text-xl font-black text-barbi mb-1">{$t('pages.projectPublic.joinTitle')}</span>
+            <span class="text-sm text-gray-300 leading-snug">{$t('pages.projectPublic.joinDesc')}</span>
           </a>
         </div>
       </div>
@@ -291,16 +264,16 @@
           <h2
             class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-l from-gold via-white to-gold mb-2"
           >
-            {texts.joinTitle[$lang]}
+            {$t('pages.projectPublic.joinTitle')}
           </h2>
           <p class="text-gray-200 mb-6 max-w-lg mx-auto leading-relaxed">
-            {texts.joinDesc[$lang]}
+            {$t('pages.projectPublic.joinDesc')}
           </p>
           <a
             href="/"
             class="inline-block px-8 py-3 rounded-full bg-gradient-to-r from-gold via-[#d4af37] to-[#b8860b] text-black font-bold shadow-lg hover:scale-105 transition-transform hover:shadow-gold/50"
           >
-            {texts.login[$lang]}
+            {$t('pages.projectPublic.login')}
           </a>
         </div>
       {/if}
@@ -308,7 +281,7 @@
       <!-- 3. Description -->
       {#if project.attributes.publicDescription}
         <div class="glass-panel mb-8 text-center">
-          <h2 class="section-title mb-3">{texts.about[$lang]}</h2>
+          <h2 class="section-title mb-3">{$t('pages.projectPublic.about')}</h2>
           <RichText
             editable={false}
             outpot={project.attributes.publicDescription}
@@ -319,7 +292,7 @@
       <!-- 4. Team Members (Circular Avatars with Gold Rings) -->
       {#if projectUsers.length > 0}
         <div class="mb-10 text-center">
-          <h3 class="section-title mb-4">{texts.team[$lang]}</h3>
+          <h3 class="section-title mb-4">{$t('pages.projectPublic.team')}</h3>
           <div dir="ltr" class="flex flex-wrap justify-center gap-2">
             {#each projectUsers as user (user.id)}
               <button
@@ -352,7 +325,7 @@
             class="glass-panel flex flex-col items-center border-t-4 border-t-gold"
           >
             <h2 class="text-xl font-bold text-gold mb-4 drop-shadow-md">
-              {texts.values[$lang]}
+              {$t('pages.projectPublic.values')}
             </h2>
             <div class="flex flex-wrap justify-center gap-2">
               {#each vallues as vallue}
@@ -374,7 +347,7 @@
           class="glass-panel flex flex-col items-center border-t-4 border-t-barbi"
         >
           <h3 class="text-xl font-bold text-barbi mb-4 drop-shadow-md">
-            {texts.missions[$lang]}
+            {$t('pages.projectPublic.missions')}
           </h3>
           <div class="flex flex-wrap justify-center gap-2 w-full">
             {#if projecto.length > 0}
@@ -402,7 +375,7 @@
             href="/project/{projectId}/join"
             class="mt-4 text-sm text-barbi underline hover:text-white transition-colors"
           >
-            {texts.selfNomCta[$lang]}
+            {$t('pages.projectPublic.selfNomCta')}
           </a>
         </div>
       </div>
@@ -412,7 +385,7 @@
         <div class="text-center">
           {#if !show}
             <button class="cta-button-pink" onclick={() => (show = true)}>
-              {showl[$lang]}
+              {$t('pages.projectPublic.showProducts')}
             </button>
           {:else}
             <div class="glass-panel mt-4 animate-fade-in relative">
@@ -423,7 +396,7 @@
                 <Close />
               </button>
 
-              <h3 class="text-2xl text-gold mb-6 font-bold">{showl[$lang]}</h3>
+              <h3 class="text-2xl text-gold mb-6 font-bold">{$t('pages.projectPublic.showProducts')}</h3>
 
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {#each project.attributes.matanotofs.data as matanot (matanot.id)}

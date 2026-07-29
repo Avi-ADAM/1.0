@@ -1,0 +1,15 @@
+{
+  "searchValues": "Search or select values",
+  "searchSkills": "Search or select skills",
+  "searchRoles": "Search or select roles",
+  "searchWorkways": "Search or select ways of creation",
+  "identicalValue": "An identical value already exists:",
+  "identicalSkill": "An identical skill already exists:",
+  "identicalRole": "An identical role already exists:",
+  "identicalWorkway": "An identical way of creation already exists:",
+  "similarValue": "Very similar to an existing value:",
+  "similarSkill": "Very similar to an existing skill:",
+  "similarRole": "Very similar to an existing role:",
+  "similarWorkway": "Very similar to an existing way of creation:",
+  "addPrefix": "Create"
+}

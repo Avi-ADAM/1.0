@@ -233,7 +233,7 @@
         class="flex-1 py-3 rounded-xl text-sm font-bold text-white bg-violet-600 hover:bg-violet-700 active:scale-95 transition-all"
       >
         {currentRound < maxRounds
-          ? $t('negotiation.next_round', { n: currentRound + 1 }) + ' →'
+          ? $t('negotiation.next_round', { count: currentRound + 1 }) + ' →'
           : $t('negotiation.finish_discussion')}
       </button>
     </div>

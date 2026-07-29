@@ -1,11 +1,11 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
     import { page } from '$app/state';
   import MobileModal from '$lib/celim/ui/mobileModal.svelte';
   import MultiSelect from 'svelte-multiselect';
   import Arrow from '$lib/celim/icons/arrow.svelte';
   import { showFoot } from '$lib/stores/showFoot';
-    import {lang } from '$lib/stores/lang.js' 
+    import { lang } from '$lib/stores/lang.js' 
     import {mi} from './mi.js'
     import { skil, ww, role } from './mi.js';
   import Button from '$lib/celim/ui/button.svelte';
@@ -100,14 +100,8 @@ function find_mission_id(mission_name_arr){
       return arr;
 };
 let moving = $state([]);
-const placeholder = {"he":`בחירה מרשימה או יצירת חדשה`,"en":"choose from list or create new"};
-
-
-const head = {"he":"הוספת משימות הנדרשות לתפקוד הריקמה","en":"choose missions that require to initiate or to oporate the FreeMate"}
 let id = $state(0)
-let ugug = $state(``);
-let addn = $derived({"he":`יצירת משימה חדשה: "${ugug}"`,"en": `Create new mission: "${ugug}"`});
-// When a prefill name arrives via URL param, start with the mission form directly open
+let ugug = $state(``);// When a prefill name arrives via URL param, start with the mission form directly open
 let name = $state('')
 $effect(() => { if (initialName && !name) name = initialName; })
 let before = $state(false);
@@ -123,11 +117,6 @@ let before = $state(false);
     }
     before = false;
   }
-
-  const mn = {
-  "he": "שם המשימה",
-  "en": "mission name"
-}
 
 let noRiset = $state(true)
 let showMobileModal = $state(false);
@@ -150,10 +139,10 @@ function closeMobileModal() {
 
 <div dir="{$isRtl ? 'rtl' : 'ltr'}" >
   {#if children}{@render children()}{:else}
-<h2 class="text-barbi font-bold">{head[$lang]}</h2>
+<h2 class="text-barbi font-bold">{$t('project.choosMission.head')}</h2>
   {/if}
             {#if before}
-        <h3>{mn[$lang]}</h3>
+        <h3>{$t('project.choosMission.mn')}</h3>
       {/if}
       {#if before && noRiset}
       <div  class=" w-full flex-row	flex items-center justify-center space-x-2">
@@ -163,11 +152,11 @@ function closeMobileModal() {
           inputClass="!bg-gold !text-barbi"
           liSelectedClass="!bg-barbi !text-gold"
         loading={mission1.length > 0 ? false : true}
-        createOptionMsg={addn[$lang]}
+        createOptionMsg={$t('project.choosMission.addn', { name: ugug })}
         allowUserOptions={"append"}
          bind:searchText={ugug}
           bind:selected
-          placeholder={placeholder[$lang]}
+          placeholder={$t('project.choosMission.placeholder')}
           options={mission1.map(c => c.attributes.missionName)}
         maxSelect={1}
           />

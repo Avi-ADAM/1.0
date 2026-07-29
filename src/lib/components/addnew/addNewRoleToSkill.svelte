@@ -1,5 +1,5 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
            import { lang } from '$lib/stores/lang.js'
     import { liUN } from '$lib/stores/liUN.js';
 
@@ -59,28 +59,23 @@
     name: roleName_value
     } );
        };
-const addn = {"he":"הוספת תפקיד חדש","en": "Add new Role"}
-const valn = {"he":"שם התפקיד", "en": "Role name"}
-const des = {"he": "תיאור קצר", "en": "Role short description"}
-const btnTitles = {"he": "הוספה", "en": "Add"}
-const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
     </script>
     
-        <h1 style="font-size: 1rem; line-height: normal; color: var(--barbi-pink); ">{addn[$lang]}</h1>    
+        <h1 style="font-size: 1rem; line-height: normal; color: var(--barbi-pink); ">{$t('addnew.addNewRoleToSkill.addn')}</h1>    
     
    
 <div style="--the:{`var(${color})`};" dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
   <input    bind:value={roleName_value}
  type='text' class='input' required>
-  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="name" class='label'>{valn[$lang]}</label>
+  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="name" class='label'>{$t('addnew.addNewRoleToSkill.valn')}</label>
   <span class='line'></span>
 </div>
-{#if shgi == true}<small class="text-red-600">{errmsg[$lang]}</small>{/if}
+{#if shgi == true}<small class="text-red-600">{$t('addnew.addNewRoleToSkill.errmsg')}</small>{/if}
 
            <div dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
   <input bind:value={desS}  
  type='text' class='input' required>
-  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="des" class='label'>{des[$lang]}</label>
+  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="des" class='label'>{$t('addnew.addNewRoleToSkill.des')}</label>
   <span class='line'></span>
 </div>
           
@@ -88,7 +83,7 @@ const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
           <div dir="{$isRtl ? 'rtl' : 'ltr'}" >
 
           <button onclick={add}
-          title="{btnTitles[$lang]}"
+          title="{$t('addnew.addNewRoleToSkill.btnTitles')}"
           class=" hover:bg-barbi hover:text-mturk text-gold font-bold  rounded-full" 
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
             <path fill="currentColor" d="M14.3 21.7C13.6 21.9 12.8 22 12 22C6.5 22 2 17.5 2 12S6.5 2 12 2C13.3 2 14.6 2.3 15.8 2.7L14.2 4.3C13.5 4.1 12.8 4 12 4C7.6 4 4 7.6 4 12S7.6 20 12 20C12.4 20 12.9 20 13.3 19.9C13.5 20.6 13.9 21.2 14.3 21.7M7.9 10.1L6.5 11.5L11 16L21 6L19.6 4.6L11 13.2L7.9 10.1M18 14V17H15V19H18V22H20V19H23V17H20V14H18Z" />

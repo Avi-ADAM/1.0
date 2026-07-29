@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-07-21
+> Last updated: 2026-07-27
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -23,7 +23,7 @@ import type { StrapiEntity, StrapiCollection, StrapiMedia } from '$lib/types/str
 
 ---
 
-## 🏗️ Content Type Entities (118)
+## 🏗️ Content Type Entities (120)
 
 These are the main content types in the Strapi backend.
 
@@ -439,6 +439,7 @@ These are the main content types in the Strapi backend.
 | `pgisha` | `Maybe<PgishaEntityResponse>` |
 | `pmashes` | `Maybe<PmashRelationResponseCollection>` |
 | `project` | `Maybe<ProjectEntityResponse>` |
+| `project_plan_boards` | `Maybe<ProjectPlanBoardRelationResponseCollection>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `ratson` | `Maybe<RatsonEntityResponse>` |
 | `ratson_proposal` | `Maybe<RatsonProposalEntityResponse>` |
@@ -1094,6 +1095,8 @@ These are the main content types in the Strapi backend.
 | `createPosition` | `Maybe<PositionEntityResponse>` |
 | `createProject` | `Maybe<ProjectEntityResponse>` |
 | `createProjectLocalization` | `Maybe<ProjectEntityResponse>` |
+| `createProjectPlanBoard` | `Maybe<ProjectPlanBoardEntityResponse>` |
+| `createProjectPlanItem` | `Maybe<ProjectPlanItemEntityResponse>` |
 | `createProviderProfile` | `Maybe<ProviderProfileEntityResponse>` |
 | `createRatson` | `Maybe<RatsonEntityResponse>` |
 | `createRatsonLocalization` | `Maybe<RatsonEntityResponse>` |
@@ -1211,6 +1214,8 @@ These are the main content types in the Strapi backend.
 | `deletePmash` | `Maybe<PmashEntityResponse>` |
 | `deletePosition` | `Maybe<PositionEntityResponse>` |
 | `deleteProject` | `Maybe<ProjectEntityResponse>` |
+| `deleteProjectPlanBoard` | `Maybe<ProjectPlanBoardEntityResponse>` |
+| `deleteProjectPlanItem` | `Maybe<ProjectPlanItemEntityResponse>` |
 | `deleteProviderProfile` | `Maybe<ProviderProfileEntityResponse>` |
 | `deleteRatson` | `Maybe<RatsonEntityResponse>` |
 | `deleteRatsonMatchJob` | `Maybe<RatsonMatchJobEntityResponse>` |
@@ -1323,6 +1328,8 @@ These are the main content types in the Strapi backend.
 | `updatePmash` | `Maybe<PmashEntityResponse>` |
 | `updatePosition` | `Maybe<PositionEntityResponse>` |
 | `updateProject` | `Maybe<ProjectEntityResponse>` |
+| `updateProjectPlanBoard` | `Maybe<ProjectPlanBoardEntityResponse>` |
+| `updateProjectPlanItem` | `Maybe<ProjectPlanItemEntityResponse>` |
 | `updateProviderProfile` | `Maybe<ProviderProfileEntityResponse>` |
 | `updateRatson` | `Maybe<RatsonEntityResponse>` |
 | `updateRatsonMatchJob` | `Maybe<RatsonMatchJobEntityResponse>` |
@@ -1853,6 +1860,7 @@ These are the main content types in the Strapi backend.
 | `pmashes` | `Maybe<PmashRelationResponseCollection>` |
 | `profilePic` | `Maybe<UploadFileEntityResponse>` |
 | `projectName` | `Scalars['String']['output']` |
+| `project_plan_boards` | `Maybe<ProjectPlanBoardRelationResponseCollection>` |
 | `publicDescription` | `Maybe<Scalars['String']['output']>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `ratson_proposals` | `Maybe<RatsonProposalRelationResponseCollection>` |
@@ -1887,6 +1895,43 @@ These are the main content types in the Strapi backend.
 | `welcom_tops` | `Maybe<WelcomTopRelationResponseCollection>` |
 | `work_ways` | `Maybe<WorkWayRelationResponseCollection>` |
 | `zohars` | `Maybe<ZoharRelationResponseCollection>` |
+
+### ProjectPlanBoard
+| Field | Type |
+|-------|------|
+| `ai_meta` | `Maybe<Scalars['JSON']['output']>` |
+| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `descrip` | `Maybe<Scalars['String']['output']>` |
+| `expandedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `forums` | `Maybe<ForumRelationResponseCollection>` |
+| `items` | `Maybe<ProjectPlanItemRelationResponseCollection>` |
+| `order` | `Maybe<Scalars['Int']['output']>` |
+| `origin` | `Maybe<Enum_Projectplanboard_Origin>` |
+| `project` | `Maybe<ProjectEntityResponse>` |
+| `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `rationale` | `Maybe<Scalars['String']['output']>` |
+| `revisionNote` | `Maybe<Scalars['String']['output']>` |
+| `sourceText` | `Maybe<Scalars['String']['output']>` |
+| `status` | `Maybe<Enum_Projectplanboard_Status>` |
+| `title` | `Scalars['String']['output']` |
+| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
+
+### ProjectPlanItem
+| Field | Type |
+|-------|------|
+| `board` | `Maybe<ProjectPlanBoardEntityResponse>` |
+| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `createdRef` | `Maybe<Scalars['JSON']['output']>` |
+| `descrip` | `Maybe<Scalars['String']['output']>` |
+| `existingRef` | `Maybe<Scalars['JSON']['output']>` |
+| `imp` | `Maybe<Enum_Projectplanitem_Imp>` |
+| `kind` | `Enum_Projectplanitem_Kind` |
+| `name` | `Scalars['String']['output']` |
+| `order` | `Maybe<Scalars['Int']['output']>` |
+| `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `spec` | `Maybe<Scalars['JSON']['output']>` |
+| `status` | `Maybe<Enum_Projectplanitem_Status>` |
+| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
 
 ### ProviderProfile
 | Field | Type |
@@ -2042,6 +2087,10 @@ These are the main content types in the Strapi backend.
 | `position` | `Maybe<PositionEntityResponse>` |
 | `positions` | `Maybe<PositionEntityResponseCollection>` |
 | `project` | `Maybe<ProjectEntityResponse>` |
+| `projectPlanBoard` | `Maybe<ProjectPlanBoardEntityResponse>` |
+| `projectPlanBoards` | `Maybe<ProjectPlanBoardEntityResponseCollection>` |
+| `projectPlanItem` | `Maybe<ProjectPlanItemEntityResponse>` |
+| `projectPlanItems` | `Maybe<ProjectPlanItemEntityResponseCollection>` |
 | `projects` | `Maybe<ProjectEntityResponseCollection>` |
 | `providerProfile` | `Maybe<ProviderProfileEntityResponse>` |
 | `providerProfiles` | `Maybe<ProviderProfileEntityResponseCollection>` |
@@ -4000,7 +4049,7 @@ These are Strapi components (reusable field groups).
 
 ---
 
-## 📝 Input Types (116)
+## 📝 Input Types (118)
 
 Used for creating/updating content.
 
@@ -4463,6 +4512,7 @@ Used for creating/updating content.
 | `pgisha` | `InputMaybe<Scalars['ID']['input']>` |
 | `pmashes` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `project` | `InputMaybe<Scalars['ID']['input']>` |
+| `project_plan_boards` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `ratson` | `InputMaybe<Scalars['ID']['input']>` |
 | `ratson_proposal` | `InputMaybe<Scalars['ID']['input']>` |
@@ -5498,6 +5548,7 @@ Used for creating/updating content.
 | `pmashes` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `profilePic` | `InputMaybe<Scalars['ID']['input']>` |
 | `projectName` | `InputMaybe<Scalars['String']['input']>` |
+| `project_plan_boards` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `publicDescription` | `InputMaybe<Scalars['String']['input']>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
 | `ratson_proposals` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -5531,6 +5582,39 @@ Used for creating/updating content.
 | `welcom_tops` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `work_ways` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `zohars` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+
+### ProjectPlanBoardInput
+| Field | Type |
+|-------|------|
+| `ai_meta` | `InputMaybe<Scalars['JSON']['input']>` |
+| `descrip` | `InputMaybe<Scalars['String']['input']>` |
+| `expandedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `forums` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `items` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
+| `order` | `InputMaybe<Scalars['Int']['input']>` |
+| `origin` | `InputMaybe<Enum_Projectplanboard_Origin>` |
+| `project` | `InputMaybe<Scalars['ID']['input']>` |
+| `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `rationale` | `InputMaybe<Scalars['String']['input']>` |
+| `revisionNote` | `InputMaybe<Scalars['String']['input']>` |
+| `sourceText` | `InputMaybe<Scalars['String']['input']>` |
+| `status` | `InputMaybe<Enum_Projectplanboard_Status>` |
+| `title` | `InputMaybe<Scalars['String']['input']>` |
+
+### ProjectPlanItemInput
+| Field | Type |
+|-------|------|
+| `board` | `InputMaybe<Scalars['ID']['input']>` |
+| `createdRef` | `InputMaybe<Scalars['JSON']['input']>` |
+| `descrip` | `InputMaybe<Scalars['String']['input']>` |
+| `existingRef` | `InputMaybe<Scalars['JSON']['input']>` |
+| `imp` | `InputMaybe<Enum_Projectplanitem_Imp>` |
+| `kind` | `InputMaybe<Enum_Projectplanitem_Kind>` |
+| `name` | `InputMaybe<Scalars['String']['input']>` |
+| `order` | `InputMaybe<Scalars['Int']['input']>` |
+| `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `spec` | `InputMaybe<Scalars['JSON']['input']>` |
+| `status` | `InputMaybe<Enum_Projectplanitem_Status>` |
 
 ### ProviderProfileInput
 | Field | Type |
@@ -6361,12 +6445,12 @@ Used for creating/updating content.
 
 ---
 
-## 🔍 Filter Input Types (105)
+## 🔍 Filter Input Types (107)
 
 Used for querying/filtering content. Each content type has a corresponding filter input.
 
 <details>
-<summary>Click to expand all 105 filter types</summary>
+<summary>Click to expand all 107 filter types</summary>
 
 #### ActFiltersInput
 Fields: `and`, `createdAt`, `dateF`, `dateS`, `des`, `forums`, `hashivut`, `id`, `isAssigned`, `link`, `locale`, `localizations`, `mesimabetahaliches`, `my`, `myIshur`, `naasa`, `negopendmissions`, `not`, `open_mission`, `or`, `partofs`, `pendm`, `project`, `publishedAt`, `shem`, `status`, `tafkidims`, `taskdis`, `timegrama`, `timers`, `updatedAt`, `userAndIshur`, `vali`, `valiIshur`
@@ -6438,7 +6522,7 @@ Fields: `and`, `archived`, `createdAt`, `finnished_mission`, `forum`, `id`, `isT
 Fields: `and`, `createdAt`, `descrip`, `finiapruvals`, `finish`, `hearotMeyuchadot`, `id`, `idYesod`, `isFinished`, `isMust`, `isNotFinished`, `isglobal`, `iskvua`, `locale`, `localizations`, `mesimabetahalich`, `mission`, `missionName`, `month`, `noofhours`, `not`, `or`, `perhour`, `project`, `publishedAt`, `start`, `tafkidims`, `total`, `updatedAt`, `users_permissions_user`, `why`
 
 #### ForumFiltersInput
-Fields: `acts`, `and`, `askm`, `asks`, `askwant`, `createdAt`, `decisions`, `done`, `finiapruvals`, `forum_last_seens`, `haluka`, `id`, `maaps`, `mashabetahalich`, `matanotpend`, `mesimabetahaliches`, `messages`, `not`, `or`, `partofs`, `pendms`, `pgisha`, `pmashes`, `project`, `publishedAt`, `ratson`, `ratson_proposal`, `sheirutpend`, `sheiruts`, `spec`, `subject`, `updatedAt`
+Fields: `acts`, `and`, `askm`, `asks`, `askwant`, `createdAt`, `decisions`, `done`, `finiapruvals`, `forum_last_seens`, `haluka`, `id`, `maaps`, `mashabetahalich`, `matanotpend`, `mesimabetahaliches`, `messages`, `not`, `or`, `partofs`, `pendms`, `pgisha`, `pmashes`, `project`, `project_plan_boards`, `publishedAt`, `ratson`, `ratson_proposal`, `sheirutpend`, `sheiruts`, `spec`, `subject`, `updatedAt`
 
 #### ForumLastSeenFiltersInput
 Fields: `and`, `archived`, `createdAt`, `forum`, `id`, `lastReadAt`, `not`, `or`, `updatedAt`, `users_permissions_user`
@@ -6564,7 +6648,13 @@ Fields: `and`, `archived`, `askm`, `createdAt`, `cycleSize`, `descrip`, `diun`, 
 Fields: `aiMeta`, `and`, `arguments`, `author`, `authorEmail`, `authorExternalId`, `authorType`, `clauses`, `createdAt`, `description`, `heading`, `id`, `intensity`, `isAnchor`, `kind`, `location`, `negotiation`, `not`, `or`, `order`, `pole`, `publishedAt`, `relativePlacement`, `selfPlacement`, `tags`, `updatedAt`, `voters`, `votes`
 
 #### ProjectFiltersInput
-Fields: `acts`, `addHoursManualy`, `and`, `api_keys`, `askms`, `asks`, `askwants`, `city`, `countries`, `createdAt`, `deals`, `decisions`, `deffinitions`, `descripFor`, `discordlink`, `drivelink`, `fblink`, `finiapruvals`, `finnishedM72HForDecline`, `finnishedMAllApruve`, `finnished_missions`, `forums`, `githublink`, `haamadapruvs`, `haamadas`, `halukas`, `halukas_recive`, `id`, `isMachzikim`, `isMachzikimPublik`, `isOt`, `isPlatform`, `joinPolicy`, `linkToWebsite`, `locale`, `localizations`, `location`, `maaps`, `machshirs`, `mashaabims`, `mashabetahaliches`, `matanotofs`, `mesimabetahaliches`, `missions`, `newMeMissionOuto72ho`, `newOpenMissionAllApruve`, `newOpenMotoAfter72hoursWithnono`, `newmeOpenAllapruve`, `not`, `open_mashaabims`, `open_missions`, `or`, `pendms`, `pledges`, `pmashes`, `projectName`, `publicDescription`, `publishedAt`, `ratson_proposals`, `restime`, `rikmashes`, `sales`, `sales_source`, `sheirutpends`, `sheiruts`, `sheiruts_sourced`, `site_share_contributions`, `spirit`, `sps`, `supportPage`, `tafkidims`, `timeToP`, `timerOnlyTOrAlsoManuallyF`, `timers`, `tosplits`, `totalinyearone`, `totalinyearsec`, `totalmaxyearone`, `totalmaxyearsec`, `totalminyearone`, `totalminyearsec`, `twiterlink`, `updatedAt`, `user_1s`, `usersOfP`, `vallues`, `watsapplink`, `welcom_tops`, `work_ways`, `zohars`
+Fields: `acts`, `addHoursManualy`, `and`, `api_keys`, `askms`, `asks`, `askwants`, `city`, `countries`, `createdAt`, `deals`, `decisions`, `deffinitions`, `descripFor`, `discordlink`, `drivelink`, `fblink`, `finiapruvals`, `finnishedM72HForDecline`, `finnishedMAllApruve`, `finnished_missions`, `forums`, `githublink`, `haamadapruvs`, `haamadas`, `halukas`, `halukas_recive`, `id`, `isMachzikim`, `isMachzikimPublik`, `isOt`, `isPlatform`, `joinPolicy`, `linkToWebsite`, `locale`, `localizations`, `location`, `maaps`, `machshirs`, `mashaabims`, `mashabetahaliches`, `matanotofs`, `mesimabetahaliches`, `missions`, `newMeMissionOuto72ho`, `newOpenMissionAllApruve`, `newOpenMotoAfter72hoursWithnono`, `newmeOpenAllapruve`, `not`, `open_mashaabims`, `open_missions`, `or`, `pendms`, `pledges`, `pmashes`, `projectName`, `project_plan_boards`, `publicDescription`, `publishedAt`, `ratson_proposals`, `restime`, `rikmashes`, `sales`, `sales_source`, `sheirutpends`, `sheiruts`, `sheiruts_sourced`, `site_share_contributions`, `spirit`, `sps`, `supportPage`, `tafkidims`, `timeToP`, `timerOnlyTOrAlsoManuallyF`, `timers`, `tosplits`, `totalinyearone`, `totalinyearsec`, `totalmaxyearone`, `totalmaxyearsec`, `totalminyearone`, `totalminyearsec`, `twiterlink`, `updatedAt`, `user_1s`, `usersOfP`, `vallues`, `watsapplink`, `welcom_tops`, `work_ways`, `zohars`
+
+#### ProjectPlanBoardFiltersInput
+Fields: `ai_meta`, `and`, `createdAt`, `descrip`, `expandedAt`, `forums`, `id`, `items`, `not`, `or`, `order`, `origin`, `project`, `publishedAt`, `rationale`, `revisionNote`, `sourceText`, `status`, `title`, `updatedAt`
+
+#### ProjectPlanItemFiltersInput
+Fields: `and`, `board`, `createdAt`, `createdRef`, `descrip`, `existingRef`, `id`, `imp`, `kind`, `name`, `not`, `or`, `order`, `publishedAt`, `spec`, `status`, `updatedAt`
 
 #### ProviderProfileFiltersInput
 Fields: `ai_meta`, `and`, `archived`, `avg_rating`, `bio_raw`, `createdAt`, `display_name`, `id`, `lat`, `lng`, `location`, `not`, `or`, `owner_id`, `owner_type`, `pinecone_id`, `publishedAt`, `radius_km`, `updatedAt`
@@ -6687,12 +6777,12 @@ Fields: `allSubmited`, `and`, `createdAt`, `done`, `id`, `mesimabetahalich`, `no
 
 ---
 
-## 📦 Entity Response Types (406)
+## 📦 Entity Response Types (414)
 
 Wrapper types for GraphQL responses.
 
 <details>
-<summary>Click to expand all 406 response types</summary>
+<summary>Click to expand all 414 response types</summary>
 
 - **ActEntity**: `attributes: Maybe<Act>`, `id: Maybe<Scalars['ID']['output']>`
 - **ActEntityResponse**: `data: Maybe<ActEntity>`
@@ -6950,6 +7040,14 @@ Wrapper types for GraphQL responses.
 - **ProjectEntity**: `attributes: Maybe<Project>`, `id: Maybe<Scalars['ID']['output']>`
 - **ProjectEntityResponse**: `data: Maybe<ProjectEntity>`
 - **ProjectEntityResponseCollection**: `data: Array<ProjectEntity>`, `meta: ResponseCollectionMeta`
+- **ProjectPlanBoardEntity**: `attributes: Maybe<ProjectPlanBoard>`, `id: Maybe<Scalars['ID']['output']>`
+- **ProjectPlanBoardEntityResponse**: `data: Maybe<ProjectPlanBoardEntity>`
+- **ProjectPlanBoardEntityResponseCollection**: `data: Array<ProjectPlanBoardEntity>`, `meta: ResponseCollectionMeta`
+- **ProjectPlanBoardRelationResponseCollection**: `data: Array<ProjectPlanBoardEntity>`
+- **ProjectPlanItemEntity**: `attributes: Maybe<ProjectPlanItem>`, `id: Maybe<Scalars['ID']['output']>`
+- **ProjectPlanItemEntityResponse**: `data: Maybe<ProjectPlanItemEntity>`
+- **ProjectPlanItemEntityResponseCollection**: `data: Array<ProjectPlanItemEntity>`, `meta: ResponseCollectionMeta`
+- **ProjectPlanItemRelationResponseCollection**: `data: Array<ProjectPlanItemEntity>`
 - **ProjectRelationResponseCollection**: `data: Array<ProjectEntity>`
 - **ProviderProfileEntity**: `attributes: Maybe<ProviderProfile>`, `id: Maybe<Scalars['ID']['output']>`
 - **ProviderProfileEntityResponse**: `data: Maybe<ProviderProfileEntity>`
@@ -7104,10 +7202,10 @@ Wrapper types for GraphQL responses.
 
 ---
 
-## 🔢 Enum Types (95)
+## 🔢 Enum Types (100)
 
 <details>
-<summary>Click to expand all 95 enum types</summary>
+<summary>Click to expand all 100 enum types</summary>
 
 - **Enum_Act_Hashivut**: 
 - **Enum_Argument_Authortype**: 
@@ -7167,6 +7265,11 @@ Wrapper types for GraphQL responses.
 - **Enum_Position_Authortype**: 
 - **Enum_Position_Kind**: 
 - **Enum_Position_Pole**: 
+- **Enum_Projectplanboard_Origin**: 
+- **Enum_Projectplanboard_Status**: 
+- **Enum_Projectplanitem_Imp**: 
+- **Enum_Projectplanitem_Kind**: 
+- **Enum_Projectplanitem_Status**: 
 - **Enum_Project_Joinpolicy**: 
 - **Enum_Project_Restime**: 
 - **Enum_Project_Spirit**: 
@@ -7219,7 +7322,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 19135 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 19433 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

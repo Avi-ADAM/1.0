@@ -83,20 +83,13 @@ async function awaitapi(mId, lang, tok, fetch) {
       const isConcierge =
         !isMaagad &&
         (alld.attributes.source === 'concierge' || !alld.attributes.project?.data);
-      alld.title = isMaagad
-        ? {
-            he: `1💗1 | הצעה למשימה ממאגד ביקוש: "${alld.attributes.name}"`,
-            en: `1💗1 | Demand-pool mission: "${alld.attributes.name}"`
-          }
+      // Resolved on the client with $t — the server has no per-request locale.
+      alld.titleKey = isMaagad
+        ? 'pages.availMission.titles.maagad'
         : isConcierge
-          ? {
-              he: `1💗1 | הצעה למשימה ממשאלה: "${alld.attributes.name}"`,
-              en: `1💗1 | Wish mission: "${alld.attributes.name}"`
-            }
-          : {
-              he: `1💗1 | הצעה למשימה "${alld.attributes.name}" בריקמה: ${projectName}`,
-              en: `1💗1 | come see this mission "${alld.attributes.name}" on freeMates:"${projectName}"`
-            };
+          ? 'pages.availMission.titles.wish'
+          : 'pages.availMission.titles.project';
+      alld.titleParams = { name: alld.attributes.name, projectName };
       return alld;
     }
     return null;

@@ -1,8 +1,8 @@
 <script lang="ts">
+  import { t } from '$lib/translations';
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { idPr } from '$lib/stores/idPr.js';
-  import { lang } from '$lib/stores/lang.js';
   import CrNewProject from '$lib/celim/icons/crNewProject.svelte';
   interface Project {
     id: string;
@@ -12,8 +12,6 @@
 
   let { data }: { data: { projects: Project[] } } = $props();
 
-  const choo = { he: 'בחירת ריקמה', en: 'choose FreeMate' };
-  const createNewRikma = { he: 'יצירת ריקמה חדשה', en: 'Create new FreeMate' };
 
   onMount(() => {
     if ($idPr && $idPr !== 0) {
@@ -39,7 +37,7 @@
 </script>
 
 <svelte:head>
-  <title>{{ he: 'הריקמות שלי', en: 'My Projects', ar: 'مشاريعي' }[$lang] ?? 'My Projects'} · 1lev1</title>
+  <title>{$t('moach.list.myProjects')} · 1lev1</title>
 </svelte:head>
 
 <div
@@ -50,7 +48,7 @@
   <h1
     class="text-barbi underline text-2xl decoration-lturk font-bold py-2 px-4 mb-4 text-center rounded-full"
   >
-    {choo[$lang]}
+    {$t('moach.list.choose')}
   </h1>
   <div class="flex flex-wrap justify-center items-center gap-4">
     {#each data.projects as project}
@@ -91,10 +89,10 @@
   <button
     class="inline-flex items-center gap-2 border-2 border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-3 px-6 m-4 rounded-full shadow-md shadow-fuchsia-400 hover:shadow-2xl hover:shadow-fuchsia-400 transition-all"
     onclick={() => goto('/me?action=createproject')}
-    title={createNewRikma[$lang]}
+    title={$t('moach.list.createNew')}
   >
     <CrNewProject />
-    <span class="text-lg md:text-xl">{createNewRikma[$lang]}</span>
+    <span class="text-lg md:text-xl">{$t('moach.list.createNew')}</span>
   </button>
 </div>
 

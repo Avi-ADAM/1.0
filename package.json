@@ -22,6 +22,8 @@
     "types:update": "npm run codegen && npm run types:extract",
     "validate:qids": "node scripts/validate-qids.mjs",
     "check:proxy": "node scripts/check-proxy-security.mjs",
+    "check:i18n": "node scripts/check-i18n-routes.mjs",
+    "check:script": "node scripts/check-mixed-script.mjs",
     "postinstall": "patch-package"
   },
   "engines": {

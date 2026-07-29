@@ -49,7 +49,7 @@
         }
         success = true;
         setTimeout(() => { success = false; }, 15000);
-        toast.success($t('lev.cards.wishApplied') || fnnn[$lang]);
+        toast.success($t('lev.cards.wishApplied') || $t('pages.availMission.fnnn'));
       } catch (error) {
         console.error('שגיאה:', error);
         toast.error('אירעה שגיאה');
@@ -78,7 +78,7 @@
 
       success = true;
       setTimeout(() => { success = false; }, 15000);
-      toast.success(`${fnnn[$lang]}`);
+      toast.success(`${$t('pages.availMission.fnnn')}`);
     } catch (error) {
       console.error('שגיאה:', error);
       toast.error('אירעה שגיאה');
@@ -118,7 +118,7 @@
       alr = true;
       success = true;
       setTimeout(() => { success = false; }, 15000);
-      toast.success(`${fnnn[$lang]}`);
+      toast.success(`${$t('pages.availMission.fnnn')}`);
     } catch (error) {
       console.error('שגיאה:', error);
       toast.error('אירעה שגיאה');
@@ -130,32 +130,7 @@
 
   function hover(a) {}
   console.log(data);
-  const fnnn = { he: 'הבקשה נשלחה בהצלחה', en: 'request has sent sucsesfully' };
 
-  const headi = {
-    he: 'הצעה למשימה',
-    en: 'suggested mission'
-  };
-  const om = {
-    he: 'משימה פתוחה',
-    en: 'open mission'
-  };
-  const requireSkills = {
-    he: 'כישורים נדרשים:',
-    en: 'required skills:'
-  };
-  const seePr = {
-    he: 'לצפיה בריקמה',
-    en: 'see the freeMates page'
-  };
-  const requiredRoles = {
-    he: 'תפקידים נדרשים:',
-    en: 'required roles:'
-  };
-  const requiredWW = {
-    he: 'דרכי עבודה מבוקשות:',
-    en: 'ways of work for the mission:'
-  };
   function reg() {
     if ($lang == 'he') {
       goto('/');
@@ -171,34 +146,12 @@
     goto(`/login?from=availableMission/${data.mId}`);
   }
   let wid = $state();
-  const mand = {
-    he: 'המשימה אוישה בהצלחה',
-    en: 'the mission has already assigned'
-  };
-  const alri = {
-    he: 'כבר הגשת בקשה לבצע את המשימה הזו',
-    en: 'you have already requested to do this mission'
-  };
-  const iwantto = { he: 'אני אשמח לבצע!', en: 'I want to do it!' };
-  const info = {
-    he: 'בכדי לבקש להצטרף לצוות ולבצע את המשימה וגם בכדי לקבל הצעות למשימות, לפתוח רקמות (פרויקטים) חדשות ולהתנהל בהן בהסכמה יש להתחבר או להירשם',
-    en: 'You are not connected'
-  };
-  const registratio = { he: 'להרשמה', en: 'To Registration' };
-  const logi = { he: 'להתחברות', en: 'To Login' };
-  const perho = { he: 'לשעה', en: 'per hour' };
-  const hourss = { he: 'שעות', en: 'hours' };
-  const monhly = { he: 'בחודש', en: 'per month' };
-  const foreg = {
-    he: 'כדי לראות את כל המידע נדרשת התחברות או הרשמה',
-    en: 'some information is available only for registersd users'
-  };
   import { Head } from 'svead';
   import RichText from '$lib/celim/ui/richText.svelte';
 
   let title = 'This is Svead a Svelte Head Component';
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`;
-  let description = data.alld?.attributes?.descrip || om[$lang];
+  let description = data.alld?.attributes?.descrip || $t('pages.availMission.om');
   let url = page.url.toString();
 
   // Source identity: rikma (project) / demand pool (maagad) / wish (concierge).
@@ -216,11 +169,6 @@
         ? `🤝 ${$lang === 'he' ? 'מאגד ביקוש' : 'demand pool'}${maagadInfo?.name ? ` · ${maagadInfo.name}` : ''}`
         : `🌟 ${$lang === 'he' ? "קונסיירז'" : 'concierge'}${ratsonName ? ` · ${ratsonName}` : ''}`)
   );
-  const seeMaagad = { he: 'לצפיה במאגד', en: 'See the pool' };
-  const offerViaMaagad = {
-    he: 'הצעות למשימה הזו מוגשות דרך עמוד המאגד',
-    en: 'Offers for this mission are made on the pool page'
-  };
   //TODO: header nav menu
 </script>
 
@@ -232,7 +180,7 @@
   </div>
 {:then a}
   <Head
-    title={data?.alld?.title[$lang] ?? headi[$lang]}
+    title={data?.alld?.titleKey ? $t(data.alld.titleKey, data.alld.titleParams) : $t('pages.availMission.headi')}
     {description}
     {image}
     {url}
@@ -277,7 +225,7 @@
               <div class="sm:text-sm text-md mt-1 flex items-center">
                 <span
                   class="text-barbi text-center mr-3 sm:text-2xl lg:text-4xl text-xl"
-                  >{headi[$lang]}</span
+                  >{$t('pages.availMission.headi')}</span
                 >
               </div>
               <span class="pn ml-1 text-lg sm:text-xl lg:text-2xl text-grey-200"
@@ -290,13 +238,13 @@
             <button
               onclick={() => project(data.alld.attributes.project.data.id)}
               class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4"
-              >{seePr[$lang]}</button
+              >{$t('pages.availMission.seePr')}</button
             >
             {:else if maagadInfo?.id}
             <a
               href="/maagad/{maagadInfo.id}"
               class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4"
-              >{seeMaagad[$lang]}</a
+              >{$t('pages.availMission.seeMaagad')}</a
             >
             {:else if data.alld.attributes.ratson?.data?.id}
             <!-- The public wish page — right referral for any visitor (the
@@ -354,7 +302,7 @@
                         class="flex items-center w-full space-x-2 max-w-[480px]"
                       >
                         <small class="text-barbi text-lg leading-3 sm:text-2xl"
-                          >{foreg[$lang]}</small
+                          >{$t('pages.availMission.foreg')}</small
                         >
                         <div
                           class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24"
@@ -453,36 +401,36 @@
                     <span
                       role="contentinfo"
                       onmouseenter={() =>
-                        hover({ he: 'שווי לשעה', en: 'vallue per hour' })}
+                        hover($t('common.valph'))}
                       onmouseleave={() => hover('0')}
                     >
                       {data.alld.attributes.perhour.toLocaleString('en-US', {
                         maximumFractionDigits: 2
                       })}
-                      {perho[$lang]}
+                      {$t('pages.availMission.perho')}
                     </span>
                     *
                     <span
                       role="contentinfo"
                       onmouseenter={() =>
-                        hover({ he: 'כמות השעות', en: 'amount of hours' })}
+                        hover($t('common.noofhours'))}
                       onmouseleave={() => hover('0')}
                     >
                       {data.alld.attributes.noofhours.toLocaleString('en-US', {
                         maximumFractionDigits: 2
                       })}
-                      {hourss[$lang]}
-                      {data.alld.attributes.iskvua ? monhly[$lang] : ''}</span
+                      {$t('pages.availMission.hourss')}
+                      {data.alld.attributes.iskvua ? $t('pages.availMission.monhly') : ''}</span
                     >
                     =
                     <span
-                      onmouseenter={() => hover({ he: 'סך הכל', en: 'total' })}
+                      onmouseenter={() => hover($t('lev.cards.voteCard.inTotal'))}
                       onmouseleave={() => hover('0')}
                       >{(
                         data.alld.attributes.noofhours *
                         data.alld.attributes.perhour
                       ).toLocaleString('en-US', { maximumFractionDigits: 2 })}
-                      {data.alld.attributes.iskvua ? monhly[$lang] : ''}
+                      {data.alld.attributes.iskvua ? $t('pages.availMission.monhly') : ''}
                     </span>
                   </p>
                   {#if data.alld.attributes.acts.data.length > 0}
@@ -507,10 +455,10 @@
                 <div class="">
                   <Share
                     slug={'availableMission/' + data.mId}
-                    title={data.alld.title[$lang]}
+                    title={data.alld.titleKey ? $t(data.alld.titleKey, data.alld.titleParams) : ''}
                     desc="a new mission"
                     hashtags={['1💗1', 'consensus']}
-                    quote={data.alld.title[$lang]}
+                    quote={data.alld.titleKey ? $t(data.alld.titleKey, data.alld.titleParams) : ''}
                     related={[]}
                     via={''}
                   />
@@ -519,7 +467,7 @@
 
               {#if data.alld.attributes.skills.data.length > 0}
                 <small class="text-barbi text-sm lg:text-2xl"
-                  >{requireSkills[$lang]}</small
+                  >{$t('pages.availMission.requireSkills')}</small
                 >
                 <div
                   class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 lg:p-4"
@@ -527,7 +475,7 @@
                   {#each data.alld.attributes.skills.data as skill}
                     <p
                       onmouseenter={() =>
-                        hover({ he: 'הכישורים הנדרשים', en: 'needed skills' })}
+                        hover($t('lev.cards.common.skneed'))}
                       onmouseleave={() => hover('0')}
                     >
                       <Tile
@@ -542,7 +490,7 @@
               {/if}
               {#if data.alld.attributes.tafkidims.data.length > 0}
                 <small class="text-sm text-barbi lg:text-2xl"
-                  >{requiredRoles[$lang]}</small
+                  >{$t('pages.availMission.requiredRoles')}</small
                 >
                 <div
                   class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle d cd p-2"
@@ -550,7 +498,7 @@
                   {#each data.alld.attributes.tafkidims.data as rol}
                     <p
                       onmouseenter={() =>
-                        hover({ he: 'תפקיד מבוקש', en: 'requested role' })}
+                        hover($t('lev.cards.common.rneed'))}
                       onmouseleave={() => hover('0')}
                       class="m-0"
                       style="text-shadow:none;"
@@ -566,7 +514,7 @@
               {/if}
               {#if data.alld.attributes.work_ways.data.length > 0}
                 <small class="text-sm lg:text-2xl text-barbi"
-                  >{requiredWW[$lang]}</small
+                  >{$t('pages.availMission.requiredWW')}</small
                 >
                 <div
                   class="border border-gold flex sm:flex-row flex-wrap lg:p-4 justify-center align-middle d cd p-2"
@@ -574,10 +522,7 @@
                   {#each data.alld.attributes.work_ways.data as rol}
                     <p
                       onmouseenter={() =>
-                        hover({
-                          he: 'דרכי עבודה מבוקשות',
-                          en: 'ways of work for the mission'
-                        })}
+                        hover($t('lev.cards.common.wwneed'))}
                       onmouseleave={() => hover('0')}
                       class="m-0"
                       style="text-shadow:none;"
@@ -597,12 +542,12 @@
                      (no project, no wish) — a supplier answers the pool with a
                      threshold offer on its page. -->
                 <div class="flex flex-col gap-3 justify-center items-center mt-7">
-                  <p class="text-barbi text-center text-xl">{offerViaMaagad[$lang]}</p>
+                  <p class="text-barbi text-center text-xl">{$t('pages.availMission.offerViaMaagad')}</p>
                   {#if maagadInfo?.id}
                     <a
                       href="/maagad/{maagadInfo.id}"
                       class="button-perl text-barbi text-2xl px-4 py-3 hover:text-black hover:font-bold"
-                      >{seeMaagad[$lang]}</a
+                      >{$t('pages.availMission.seeMaagad')}</a
                     >
                   {/if}
                 </div>
@@ -618,7 +563,7 @@
                       class:button-perl={hovered == false}
                       class:button-gold={hovered == true}
                       class=" mx-auto mt-7 text-3xl px-4 py-3 hover:text-black hover:font-bold text-barbi"
-                      >{iwantto[$lang]}</button
+                      >{$t('pages.availMission.iwantto')}</button
                     >
                     <button
                       onclick={() => (negoOpen = true)}
@@ -629,7 +574,7 @@
                     .map((c) => c.id)
                     .includes(data.uid)}
                     <h3 class="button-perl text-barbi px-4 py-1">
-                      {alri[$lang]}
+                      {$t('pages.availMission.alri')}
                     </h3>
                   {/if}
                 </div>
@@ -688,16 +633,16 @@
                     class:button-gold={hovered == true}
                   >
                     <p class="text-center font-bold text-2xl p-2">
-                      {info[$lang]}
+                      {$t('pages.availMission.info')}
                     </p>
                     <div class="flex flex-row flex-auto justify-between">
                       <button
                         class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4"
-                        onclick={reg}>{registratio[$lang]}</button
+                        onclick={reg}>{$t('pages.availMission.registratio')}</button
                       >
                       <button
                         class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4"
-                        onclick={login}>{logi[$lang]}</button
+                        onclick={login}>{$t('pages.availMission.logi')}</button
                       >
                     </div>
                   </div>
@@ -709,7 +654,7 @@
       </div>
     {:else}
       <div class="text-center pt-14">
-        <h1 class="text-barbi sm:text-xl my-5">{mand[$lang]}</h1>
+        <h1 class="text-barbi sm:text-xl my-5">{$t('pages.availMission.mand')}</h1>
         {#if data.tok != false}
           <a
             href="/lev"
@@ -719,15 +664,15 @@
         {:else}
           <div class="  w-screen">
             <div class="w-1/2 mx-auto border border-barbi button-bronze">
-              <h3 class="font-bold text-2xl p-2">{info[$lang]}</h3>
+              <h3 class="font-bold text-2xl p-2">{$t('pages.availMission.info')}</h3>
               <div class="flex flex-row flex-auto justify-between">
                 <button
                   class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4"
-                  onclick={reg}>{registratio[$lang]}</button
+                  onclick={reg}>{$t('pages.availMission.registratio')}</button
                 >
                 <button
                   class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4"
-                  onclick={login}>{logi[$lang]}</button
+                  onclick={login}>{$t('pages.availMission.logi')}</button
                 >
               </div>
             </div>
@@ -747,15 +692,15 @@
       {:else}
         <div class="  w-screen">
           <div class="w-1/2 mx-auto border border-barbi button-bronze">
-            <h1 class=" font-bold text-2xl p-2">{info[$lang]}</h1>
+            <h1 class=" font-bold text-2xl p-2">{$t('pages.availMission.info')}</h1>
             <div class="flex flex-row flex-auto justify-between">
               <button
                 class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4"
-                onclick={reg}>{registratio[$lang]}</button
+                onclick={reg}>{$t('pages.availMission.registratio')}</button
               >
               <button
                 class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4"
-                onclick={login}>{logi[$lang]}</button
+                onclick={login}>{$t('pages.availMission.logi')}</button
               >
             </div>
           </div>

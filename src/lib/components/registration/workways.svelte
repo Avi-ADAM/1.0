@@ -1,5 +1,5 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import WorkwaySelector from '$lib/components/ui/WorkwaySelector.svelte';
   import { userName } from '../../stores/store.js';
   import { show } from './store-show.js';
@@ -79,27 +79,22 @@
     show.update((n) => n - 1);
     onProgres?.({ tx: 0, txx: 16 });
   }
-
-  const ws = {
-    he: 'מה הם העדפות היצירה שלך?',
-    en: 'How do you prefer to Create?'
-  };
 </script>
 
 <div class="step-inner" dir={$isRtl ? 'rtl' : 'ltr'}>
-  <h2 class="step-title">{userName_value}&nbsp;{ws[$lang]}</h2>
+  <h2 class="step-title">{userName_value}&nbsp;{$t('reg.hello.workwaysQuestion')}</h2>
   <div class="multi-wrap">
     <WorkwaySelector bind:selectedWorkways={selected} color="--gold" />
   </div>
   <div class="nav-row">
     <button class="btn-nav btn-back" onclick={back} disabled={show_value <= 1}>
-      {$lang === 'en' ? '← Back' : 'חזרה →'}
+      {$t('reg.back')}
     </button>
     <button class="btn-nav btn-skip" onclick={toend}>
-      {$lang === 'en' ? 'Skip' : 'דלג'}
+      {$t('reg.skip')}
     </button>
     <button class="btn-nav btn-next" onclick={increment}>
-      {$lang === 'en' ? 'Next →' : '← הבא'}
+      {$t('reg.next')}
     </button>
   </div>
 </div>

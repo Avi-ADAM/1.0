@@ -1,4 +1,5 @@
 <script>
+  import { t } from '$lib/translations';
   /**
    * DonateDialog — the "communication between a person and the rikma to move
    * money, recorded properly as a donation" (PLAN_VOLUNTEER_RIKMA §2, §4).
@@ -56,50 +57,6 @@
   let holderId = $state(mode === 'record' && isMember && uid ? String(uid) : '');
   let busy = $state(false);
 
-  const t = {
-    title: { he: 'תרומה', en: 'Donate' },
-    intro: {
-      he: 'כל תרומה מתחלקת בין העושים בשקיפות ונכנסת למדד הכיסוי.',
-      en: 'Every donation is shared transparently among the doers and counts toward coverage.'
-    },
-    needLogin: {
-      he: 'כדי לתאם תרומה דרך האתר צריך להתחבר. אפשר גם לפנות אלינו ישירות דרך הקישורים בעמוד.',
-      en: 'To coordinate a donation through the site please log in. You can also reach us directly via the links on this page.'
-    },
-    login: { he: 'התחברות / הרשמה', en: 'Log in / Sign up' },
-    tabCoordinate: { he: 'אני רוצה לתרום', en: 'I want to donate' },
-    tabRecord: { he: 'רשום תרומה שהתקבלה', en: 'Record a received donation' },
-    coordinateHelp: {
-      he: 'נודיע לחברי הריקמה שתרצה/י לתרום, והם יחזרו אליך לתיאום העברת הכסף. אחרי שהכסף יתקבל — הוא יירשם כתרומה.',
-      en: "We'll let the rikma's members know you'd like to give; they'll reach out to arrange the transfer. Once received it is recorded as a donation."
-    },
-    recordHelp: {
-      he: 'רשמו תרומה שכבר התקבלה. אם הכסף אצל חבר/ה אחר/ת — הוא יאשר/תאשר את הקבלה לפני שהתרומה תיכנס לחישוב.',
-      en: 'Log a donation that already arrived. If the money is held by another member they confirm receipt before it counts.'
-    },
-    amount: { he: 'סכום (₪)', en: 'Amount (₪)' },
-    amountOpt: { he: 'סכום (₪) — לא חובה', en: 'Amount (₪) — optional' },
-    name: { he: 'שם התורם/ת (או השאירו ריק לאנונימי)', en: 'Donor name (leave blank for anonymous)' },
-    message: { he: 'הקדשה / הודעה', en: 'Dedication / message' },
-    contact: { he: 'איך ליצור איתך קשר? (טלפון / אימייל)', en: 'How can we reach you? (phone / email)' },
-    holder: { he: 'אצל מי הכסף?', en: 'Who holds the money?' },
-    me: { he: 'אצלי', en: 'Me' },
-    send: { he: 'שליחה', en: 'Send' },
-    record: { he: 'רישום תרומה', en: 'Record donation' },
-    cancel: { he: 'ביטול', en: 'Cancel' },
-    okReq: {
-      he: 'תודה! הודענו לחברי הריקמה והם יחזרו אליך לתיאום.',
-      en: 'Thank you! The rikma has been notified and will reach out.'
-    },
-    okSelf: { he: 'התרומה נרשמה ✓', en: 'Donation recorded ✓' },
-    okClaim: {
-      he: 'נרשם — ממתין לאישור המחזיק/ה. יאושר אוטומטית בתום זמן התגובה אם אין תגובה.',
-      en: 'Recorded — awaiting the holder\'s confirmation (auto-approves after the response time).'
-    },
-    needAmount: { he: 'נא להזין סכום', en: 'Please enter an amount' },
-    needHolder: { he: 'נא לבחור אצל מי הכסף', en: 'Please choose who holds the money' }
-  };
-
   function close() {
     isOpen = false;
     busy = false;
@@ -116,7 +73,7 @@
         contact: contact.trim() || undefined
       });
       if (!res.success) throw new Error(res.error?.message ?? 'failed');
-      toast.success(t.okReq[$lang]);
+      toast.success($t('revenue.donate.okReq'));
       onDone?.();
       close();
     } catch (e) {
@@ -127,11 +84,11 @@
 
   async function submitRecord() {
     if (!(amount > 0)) {
-      toast.error(t.needAmount[$lang]);
+      toast.error($t('revenue.donate.needAmount'));
       return;
     }
     if (!holderId) {
-      toast.error(t.needHolder[$lang]);
+      toast.error($t('revenue.donate.needHolder'));
       return;
     }
     busy = true;
@@ -145,7 +102,7 @@
         via: mode === 'record' ? 'manual' : 'page'
       });
       if (!res.success) throw new Error(res.error?.message ?? 'failed');
-      toast.success(res.data?.holderStatus === 'self' ? t.okSelf[$lang] : t.okClaim[$lang]);
+      toast.success(res.data?.holderStatus === 'self' ? $t('revenue.donate.okSelf') : $t('revenue.donate.okClaim'));
       onDone?.();
       close();
     } catch (e) {
@@ -157,17 +114,17 @@
 
 <DialogOverlay style="z-index: 900;" {isOpen} onDismiss={close}>
   <div style="z-index: 900;" transition:fly|local={{ y: 200, opacity: 0.4, duration: 400 }}>
-    <DialogContent class="donate-dialog" aria-label={t.title[$lang]}>
+    <DialogContent class="donate-dialog" aria-label={$t('revenue.donate.title')}>
       <div dir={rtl ? 'rtl' : 'ltr'} class="dd-body">
         <div class="dd-head">
-          <h2>💗 {t.title[$lang]}</h2>
-          <button class="dd-x" onclick={close} aria-label={t.cancel[$lang]}>✕</button>
+          <h2>💗 {$t('revenue.donate.title')}</h2>
+          <button class="dd-x" onclick={close} aria-label={$t('revenue.donate.cancel')}>✕</button>
         </div>
-        <p class="dd-intro">{t.intro[$lang]}</p>
+        <p class="dd-intro">{$t('revenue.donate.intro')}</p>
 
         {#if !isRegisteredUser}
-          <p class="dd-help">{t.needLogin[$lang]}</p>
-          <button class="dd-primary" onclick={() => goto('/')}>{t.login[$lang]}</button>
+          <p class="dd-help">{$t('revenue.donate.needLogin')}</p>
+          <button class="dd-primary" onclick={() => goto('/')}>{$t('revenue.donate.login')}</button>
         {:else}
           <!-- Members can both coordinate and record; supporters just coordinate. -->
           {#if isMember}
@@ -175,62 +132,62 @@
               <button
                 class="dd-tab"
                 class:active={tab === 'coordinate'}
-                onclick={() => (tab = 'coordinate')}>{t.tabCoordinate[$lang]}</button
+                onclick={() => (tab = 'coordinate')}>{$t('revenue.donate.tabCoordinate')}</button
               >
               <button
                 class="dd-tab"
                 class:active={tab === 'record'}
-                onclick={() => (tab = 'record')}>{t.tabRecord[$lang]}</button
+                onclick={() => (tab = 'record')}>{$t('revenue.donate.tabRecord')}</button
               >
             </div>
           {/if}
 
           {#if tab === 'coordinate'}
-            <p class="dd-help">{t.coordinateHelp[$lang]}</p>
+            <p class="dd-help">{$t('revenue.donate.coordinateHelp')}</p>
             <label class="dd-field">
-              <span>{t.name[$lang]}</span>
+              <span>{$t('revenue.donate.name')}</span>
               <input type="text" bind:value={from} maxlength="80" />
             </label>
             <label class="dd-field">
-              <span>{t.amountOpt[$lang]}</span>
+              <span>{$t('revenue.donate.amountOpt')}</span>
               <input type="number" min="0" bind:value={amount} />
             </label>
             <label class="dd-field">
-              <span>{t.contact[$lang]}</span>
+              <span>{$t('revenue.donate.contact')}</span>
               <input type="text" bind:value={contact} maxlength="120" />
             </label>
             <label class="dd-field">
-              <span>{t.message[$lang]}</span>
+              <span>{$t('revenue.donate.message')}</span>
               <textarea rows="2" bind:value={msg} maxlength="300"></textarea>
             </label>
             <button class="dd-primary" disabled={busy} onclick={submitCoordinate}>
-              {busy ? '…' : t.send[$lang]}
+              {busy ? '…' : $t('revenue.donate.send')}
             </button>
           {:else}
-            <p class="dd-help">{t.recordHelp[$lang]}</p>
+            <p class="dd-help">{$t('revenue.donate.recordHelp')}</p>
             <label class="dd-field">
-              <span>{t.amount[$lang]}</span>
+              <span>{$t('revenue.donate.amount')}</span>
               <input type="number" min="0" bind:value={amount} />
             </label>
             <label class="dd-field">
-              <span>{t.holder[$lang]}</span>
+              <span>{$t('revenue.donate.holder')}</span>
               <select bind:value={holderId}>
                 <option value="" disabled>—</option>
                 {#each members as m (m.id)}
-                  <option value={m.id}>{m.id === uid ? `${m.username} (${t.me[$lang]})` : m.username}</option>
+                  <option value={m.id}>{m.id === uid ? `${m.username} (${$t('revenue.donate.me')})` : m.username}</option>
                 {/each}
               </select>
             </label>
             <label class="dd-field">
-              <span>{t.name[$lang]}</span>
+              <span>{$t('revenue.donate.name')}</span>
               <input type="text" bind:value={from} maxlength="80" />
             </label>
             <label class="dd-field">
-              <span>{t.message[$lang]}</span>
+              <span>{$t('revenue.donate.message')}</span>
               <textarea rows="2" bind:value={msg} maxlength="300"></textarea>
             </label>
             <button class="dd-primary" disabled={busy} onclick={submitRecord}>
-              {busy ? '…' : t.record[$lang]}
+              {busy ? '…' : $t('revenue.donate.record')}
             </button>
           {/if}
         {/if}

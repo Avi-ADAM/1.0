@@ -1,5 +1,5 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { onMount } from 'svelte';
   import { Calendar } from '@fullcalendar/core';
   import dayGridPlugin from '@fullcalendar/daygrid';
@@ -27,69 +27,7 @@
   let showTimerModal = $state(false);
   let selectedTimerData = $state(null);
   console.log(timersData)
-  // טקסטים בשפות שונות
-  const texts = {
-    he: {
-      projectTimers: 'טיימרים בפרויקט',
-      active: 'פעיל',
-      saved: 'נשמר',
-      completed: 'הושלם',
-      notSaved: 'לא נשמר',
-      noTimers: 'אין טיימרים זמינים לפרויקט זה',
-      detailedTimersList: 'רשימת טיימרים מפורטת',
-      noTaskName: 'ללא שם משימה',
-      totalHours: 'סה"כ שעות',
-      assignedHours: 'שעות שהוקצו',
-      completedHours: 'שעות שבוצעו',
-      tasksInProgress: 'מטלות בביצוע',
-      taskDetails: 'פרטי משימה',
-      taskDetailsTitle: 'פרטי מטלות',
-      expand: 'הרחב',
-      hide: 'הסתר',
-      timeDetails: 'פרטי זמנים',
-      start: 'התחלה',
-      end: 'סיום',
-      stillActive: 'עדיין פעיל',
-      notAvailable: 'לא זמין',
-      duration: 'משך',
-      minutes: 'דקות',
-      close: 'סגור',
-      task: 'משימה',
-      status: 'סטטוס',
-      totalTimerHours: 'סה"כ שעות בטיימר'
-    },
-    en: {
-      projectTimers: 'Project Timers',
-      active: 'Active',
-      saved: 'Saved',
-      completed: 'Completed',
-      notSaved: 'Not Saved',
-      noTimers: 'No timers available for this project',
-      detailedTimersList: 'Detailed Timers List',
-      noTaskName: 'No Task Name',
-      totalHours: 'Total Hours',
-      assignedHours: 'Assigned Hours',
-      completedHours: 'Completed Hours',
-      tasksInProgress: 'Tasks in Progress',
-      taskDetails: 'Task Details',
-      taskDetailsTitle: 'Task Details',
-      expand: 'Expand',
-      hide: 'Hide',
-      timeDetails: 'Time Details',
-      start: 'Start',
-      end: 'End',
-      stillActive: 'Still Active',
-      notAvailable: 'Not Available',
-      duration: 'Duration',
-      minutes: 'Minutes',
-      close: 'Close',
-      task: 'Task',
-      status: 'Status',
-      totalTimerHours: 'Total Timer Hours'
-    }
-  };
-  
-  let currentTexts = $derived(texts[$lang] || texts.he);
+  // טקסטים בשפות שונות  
   
   // פונקציה להמרת ISO string לאובייקט Date
   function parseISODate(isoString) {
@@ -112,7 +50,7 @@
           
           events.push({
             id: `${timer.id}-${index}`,
-            title: mesimabetahalich?.name || currentTexts.noTaskName,
+            title: mesimabetahalich?.name || $t('project.timersCalendar.noTaskName'),
             start: startDate,
             end: endDate,
             backgroundColor: timerData.isActive ? '#10b981' : (timerData.saved ? '#3b82f6' : '#f59e0b'),
@@ -135,7 +73,7 @@
         
         events.push({
           id: `${timer.id}-active`,
-          title: `🔴 ${mesimabetahalich?.name || currentTexts.noTaskName} - ${currentTexts.active}`,
+          title: `🔴 ${mesimabetahalich?.name || $t('project.timersCalendar.noTaskName')} - ${$t('project.timersCalendar.active')}`,
           start: startDate,
           end: now,
           backgroundColor: '#ef4444',
@@ -173,7 +111,7 @@
         center: 'title',
         right: 'dayGridMonth,timeGridWeek,timeGridDay'
       },
-      locale: $lang === 'he' ? 'he' : 'en',
+      locale: $lang,
       direction: $isRtl ? 'rtl' : 'ltr',
       height: 'auto',
       events: events,
@@ -229,11 +167,11 @@
     tooltipEl.className = 'calendar-tooltip';
     tooltipEl.innerHTML = `
       <div class="tooltip-content">
-        <div><strong>${currentTexts.task}:</strong> ${mesima?.name || currentTexts.noTaskName}</div>
-        <div><strong>${currentTexts.assignedHours}:</strong> ${mesima?.hoursassinged || 0}</div>
-        <div><strong>${currentTexts.completedHours}:</strong> ${mesima?.howmanyhoursalready || 0}</div>
-        <div><strong>${currentTexts.status}:</strong> ${timer.isActive ? currentTexts.active : (timer.saved ? currentTexts.saved : currentTexts.notSaved)}</div>
-        <div><strong>${currentTexts.totalTimerHours}:</strong> ${timer.totalHours || 0}</div>
+        <div><strong>${$t('project.timersCalendar.task')}:</strong> ${mesima?.name || $t('project.timersCalendar.noTaskName')}</div>
+        <div><strong>${$t('project.timersCalendar.assignedHours')}:</strong> ${mesima?.hoursassinged || 0}</div>
+        <div><strong>${$t('project.timersCalendar.completedHours')}:</strong> ${mesima?.howmanyhoursalready || 0}</div>
+        <div><strong>${$t('project.timersCalendar.status')}:</strong> ${timer.isActive ? $t('project.timersCalendar.active') : (timer.saved ? $t('project.timersCalendar.saved') : $t('project.timersCalendar.notSaved'))}</div>
+        <div><strong>${$t('project.timersCalendar.totalTimerHours')}:</strong> ${timer.totalHours || 0}</div>
       </div>
     `;
     
@@ -290,7 +228,7 @@
       const timers = timersData.timers.data;
       const events = createCalendarEvents(timers);
       calendar.setOption('events', events);
-      calendar.setOption('locale', $lang === 'he' ? 'he' : 'en');
+      calendar.setOption('locale', $lang);
       calendar.setOption('direction', $isRtl ? 'rtl' : 'ltr');
     }
   });
@@ -299,23 +237,23 @@
 <!-- הקומפוננטה עם הנתונים -->
 <div class="project-timers-calendar bg-white rounded-lg shadow-lg pt-4 px-1 sm:p-6" dir={$isRtl ? 'rtl' : 'ltr'}>
   <div class="flex justify-between items-center mb-6" dir={$isRtl ? 'rtl' : 'ltr'}>
-    <h2 class="text-2xl font-bold text-gray-800">{currentTexts.projectTimers}</h2>
+    <h2 class="text-2xl font-bold text-gray-800">{$t('project.timersCalendar.projectTimers')}</h2>
     <div class="flex gap-4 text-sm">
       <div class="flex items-center gap-2">
         <div class="w-4 h-4 bg-red-500 rounded"></div>
-        <span>{currentTexts.active}</span>
+        <span>{$t('project.timersCalendar.active')}</span>
       </div>
       <div class="flex items-center gap-2">
         <div class="w-4 h-4 bg-blue-500 rounded"></div>
-        <span>{currentTexts.saved}</span>
+        <span>{$t('project.timersCalendar.saved')}</span>
       </div>
       <div class="flex items-center gap-2">
         <div class="w-4 h-4 bg-green-500 rounded"></div>
-        <span>{currentTexts.completed}</span>
+        <span>{$t('project.timersCalendar.completed')}</span>
       </div>
       <div class="flex items-center gap-2">
         <div class="w-4 h-4 bg-yellow-500 rounded"></div>
-        <span>{currentTexts.notSaved}</span>
+        <span>{$t('project.timersCalendar.notSaved')}</span>
       </div>
     </div>
   </div>
@@ -327,7 +265,7 @@
     </div>
    {:else}
     <div class="text-center py-12 text-gray-500">
-      <p class="text-lg">{currentTexts.noTimers}</p>
+      <p class="text-lg">{$t('project.timersCalendar.noTimers')}</p>
     </div>
     {/if}
   {:else}
@@ -336,7 +274,7 @@
     
     <!-- רשימת טיימרים מפורטת -->
     <div class="mt-8">
-      <h3 class="text-xl font-semibold mb-4">{currentTexts.detailedTimersList}</h3>
+      <h3 class="text-xl font-semibold mb-4">{$t('project.timersCalendar.detailedTimersList')}</h3>
       <div class="space-y-4">
         {#each timersData.timers.data as timer}
           {@const timerData = timer.attributes}
@@ -348,33 +286,33 @@
               <div class="flex-1">
                 <div class="flex items-center gap-3 mb-2">
                   <h4 class="font-semibold text-lg">
-                    {mesimabetahalich?.name || currentTexts.noTaskName}
+                    {mesimabetahalich?.name || $t('project.timersCalendar.noTaskName')}
                   </h4>
                   <span class="px-2 py-1 rounded text-xs font-medium
                     {timerData.isActive ? 'bg-red-100 text-red-800' : 
                      timerData.saved ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}">
-                    {timerData.isActive ? currentTexts.active : timerData.saved ? currentTexts.saved : currentTexts.notSaved}
+                    {timerData.isActive ? $t('project.timersCalendar.active') : timerData.saved ? $t('project.timersCalendar.saved') : $t('project.timersCalendar.notSaved')}
                   </span>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
                   <div>
-                    <span class="font-medium">{currentTexts.totalHours}:</span>
+                    <span class="font-medium">{$t('project.timersCalendar.totalHours')}:</span>
                     {timerData.totalHours || 0}
                   </div>
                   <div>
-                    <span class="font-medium">{currentTexts.assignedHours}:</span>
+                    <span class="font-medium">{$t('project.timersCalendar.assignedHours')}:</span>
                     {mesimabetahalich?.hoursassinged || 0}
                   </div>
                   <div>
-                    <span class="font-medium">{currentTexts.completedHours}:</span>
+                    <span class="font-medium">{$t('project.timersCalendar.completedHours')}:</span>
                     {mesimabetahalich?.howmanyhoursalready || 0}
                   </div>
                 </div>
                 
                 {#if timerData.acts?.data?.length > 0}
                   <div class="mt-3">
-                    <span class="font-medium text-sm">{currentTexts.tasksInProgress}:</span>
+                    <span class="font-medium text-sm">{$t('project.timersCalendar.tasksInProgress')}:</span>
                     <div class="flex flex-wrap gap-2 mt-1">
                       {#each timerData.acts.data as act}
                         <span class="px-2 py-1 bg-indigo-100 text-indigo-800 rounded text-xs">
@@ -391,7 +329,7 @@
                   class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors"
                   onclick={() => handleTaskDetails(mesimabetahalich)}
                 >
-                  {currentTexts.taskDetails}
+                  {$t('project.timersCalendar.taskDetails')}
                 </button>
                 
                 {#if timerData.acts?.data?.length > 0}
@@ -399,7 +337,7 @@
                     class="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors"
                     onclick={() => handleActsDetails(timerData.acts.data)}
                   >
-                    {currentTexts.taskDetailsTitle}
+                    {$t('project.timersCalendar.taskDetailsTitle')}
                   </button>
                 {/if}
                 
@@ -407,30 +345,30 @@
                   class="px-3 py-1 bg-gray-600 text-white rounded text-sm hover:bg-gray-700 transition-colors"
                   onclick={() => toggleTimerExpansion(timer.id)}
                 >
-                  {expandedTimer === timer.id ? currentTexts.hide : currentTexts.expand}
+                  {expandedTimer === timer.id ? $t('project.timersCalendar.hide') : $t('project.timersCalendar.expand')}
                 </button>
               </div>
             </div>
             
             {#if expandedTimer === timer.id && timerData.timers?.length > 0}
               <div class="mt-4 pt-4 border-t">
-                <h5 class="font-medium mb-3">{currentTexts.timeDetails}:</h5>
+                <h5 class="font-medium mb-3">{$t('project.timersCalendar.timeDetails')}:</h5>
                 <div class="space-y-2">
                   {#each timerData.timers as timeEntry, index}
                     <div class="flex justify-between items-center bg-white p-3 rounded border">
                       <div class="flex gap-4">
                         <span class="text-sm">
-                          <strong>{currentTexts.start}:</strong> 
-                          {timeEntry.start ? new Date(timeEntry.start).toLocaleString($lang === 'he' ? 'he-IL' : 'en-US') : currentTexts.notAvailable}
+                          <strong>{$t('project.timersCalendar.start')}:</strong> 
+                          {timeEntry.start ? new Date(timeEntry.start).toLocaleString($lang) : $t('project.timersCalendar.notAvailable')}
                         </span>
                         <span class="text-sm">
-                          <strong>{currentTexts.end}:</strong> 
-                          {timeEntry.stop ? new Date(timeEntry.stop).toLocaleString($lang === 'he' ? 'he-IL' : 'en-US') : currentTexts.stillActive}
+                          <strong>{$t('project.timersCalendar.end')}:</strong> 
+                          {timeEntry.stop ? new Date(timeEntry.stop).toLocaleString($lang) : $t('project.timersCalendar.stillActive')}
                         </span>
                       </div>
                       {#if timeEntry.start && timeEntry.stop}
                         <span class="text-sm text-gray-600">
-                          {currentTexts.duration}: {Math.round((new Date(timeEntry.stop) - new Date(timeEntry.start)) / (1000 * 60))} {currentTexts.minutes}
+                          {$t('project.timersCalendar.duration')}: {Math.round((new Date(timeEntry.stop) - new Date(timeEntry.start)) / (1000 * 60))} {$t('project.timersCalendar.minutes')}
                         </span>
                       {/if}
                     </div>
@@ -451,7 +389,7 @@
     <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto" onclick={(e) => e.stopPropagation()} dir={$isRtl ? 'rtl' : 'ltr'} >
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-xl font-semibold">
-          {selectedTimerData.mesimabetahalich?.name || currentTexts.noTaskName}
+          {selectedTimerData.mesimabetahalich?.name || $t('project.timersCalendar.noTaskName')}
         </h3>
         <button 
           class="text-gray-500 hover:text-gray-700 text-xl"
@@ -464,32 +402,32 @@
       <div class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <div class="bg-gray-50 p-3 rounded">
-            <span class="font-medium">{currentTexts.totalHours}:</span>
+            <span class="font-medium">{$t('project.timersCalendar.totalHours')}:</span>
             <div class="text-lg font-bold">{selectedTimerData.timerData.totalHours || 0}</div>
           </div>
           <div class="bg-gray-50 p-3 rounded">
-            <span class="font-medium">{currentTexts.assignedHours}:</span>
+            <span class="font-medium">{$t('project.timersCalendar.assignedHours')}:</span>
             <div class="text-lg font-bold">{selectedTimerData.mesimabetahalich?.hoursassinged || 0}</div>
           </div>
           <div class="bg-gray-50 p-3 rounded">
-            <span class="font-medium">{currentTexts.completedHours}:</span>
+            <span class="font-medium">{$t('project.timersCalendar.completedHours')}:</span>
             <div class="text-lg font-bold">{selectedTimerData.mesimabetahalich?.howmanyhoursalready || 0}</div>
           </div>
         </div>
         
         <div class="flex items-center gap-2">
-          <span class="font-medium">{currentTexts.status}:</span>
+          <span class="font-medium">{$t('project.timersCalendar.status')}:</span>
           <span class="px-2 py-1 rounded text-xs font-medium
             {selectedTimerData.timerData.isActive ? 'bg-red-100 text-red-800' : 
              selectedTimerData.timerData.saved ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}">
-            {selectedTimerData.timerData.isActive ? currentTexts.active : 
-             selectedTimerData.timerData.saved ? currentTexts.saved : currentTexts.notSaved}
+            {selectedTimerData.timerData.isActive ? $t('project.timersCalendar.active') : 
+             selectedTimerData.timerData.saved ? $t('project.timersCalendar.saved') : $t('project.timersCalendar.notSaved')}
           </span>
         </div>
         
         {#if selectedTimerData.timerData.acts?.data?.length > 0}
           <div>
-            <span class="font-medium">{currentTexts.tasksInProgress}:</span>
+            <span class="font-medium">{$t('project.timersCalendar.tasksInProgress')}:</span>
             <div class="flex flex-wrap gap-2 mt-2">
               {#each selectedTimerData.timerData.acts.data as act}
                 <span class="px-2 py-1 bg-indigo-100 text-indigo-800 rounded text-sm">
@@ -502,23 +440,23 @@
         
         {#if selectedTimerData.timerData.timers?.length > 0}
           <div>
-            <h4 class="font-medium mb-3">{currentTexts.timeDetails}:</h4>
+            <h4 class="font-medium mb-3">{$t('project.timersCalendar.timeDetails')}:</h4>
             <div class="space-y-2 max-h-60 overflow-y-auto">
               {#each selectedTimerData.timerData.timers as timeEntry, index}
                 <div class="flex justify-between items-center bg-gray-50 p-3 rounded border">
                   <div class="flex gap-4">
                     <span class="text-sm">
-                      <strong>{currentTexts.start}:</strong> 
-                      {timeEntry.start ? new Date(timeEntry.start).toLocaleString($lang === 'he' ? 'he-IL' : 'en-US') : currentTexts.notAvailable}
+                      <strong>{$t('project.timersCalendar.start')}:</strong> 
+                      {timeEntry.start ? new Date(timeEntry.start).toLocaleString($lang) : $t('project.timersCalendar.notAvailable')}
                     </span>
                     <span class="text-sm">
-                      <strong>{currentTexts.end}:</strong> 
-                      {timeEntry.stop ? new Date(timeEntry.stop).toLocaleString($lang === 'he' ? 'he-IL' : 'en-US') : currentTexts.stillActive}
+                      <strong>{$t('project.timersCalendar.end')}:</strong> 
+                      {timeEntry.stop ? new Date(timeEntry.stop).toLocaleString($lang) : $t('project.timersCalendar.stillActive')}
                     </span>
                   </div>
                   {#if timeEntry.start && timeEntry.stop}
                     <span class="text-sm text-gray-600">
-                      {currentTexts.duration}: {Math.round((new Date(timeEntry.stop) - new Date(timeEntry.start)) / (1000 * 60))} {currentTexts.minutes}
+                      {$t('project.timersCalendar.duration')}: {Math.round((new Date(timeEntry.stop) - new Date(timeEntry.start)) / (1000 * 60))} {$t('project.timersCalendar.minutes')}
                     </span>
                   {/if}
                 </div>
@@ -532,13 +470,13 @@
             class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
             onclick={() => handleTaskDetails(selectedTimerData.mesimabetahalich)}
           >
-            {currentTexts.taskDetails}
+            {$t('project.timersCalendar.taskDetails')}
           </button>
           <button
             class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
             onclick={closeModal}
           >
-            {currentTexts.close}
+            {$t('project.timersCalendar.close')}
           </button>
         </div>
       </div>

@@ -15,7 +15,7 @@
     ru: { morning: 'Доброе утро', noon: 'Добрый день', evening: 'Добрый вечер', night: 'Доброй ночи' }
   };
 
-  const locales: Record<string, string> = { he: 'he-IL', en: 'en-US', ar: 'ar', ru: 'ru-RU' };
+  const locales: Record<string, string> = { he: 'he-IL', en: 'en-US', ar: 'ar', ru: 'ru-RU', es: 'es-ES' };
 
   const now = new Date();
 

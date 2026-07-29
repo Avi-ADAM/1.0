@@ -1,7 +1,6 @@
 <script>
-      import {lang} from '$lib/stores/lang.js'
-    const text = {he: "פעולות פתוחות", ar: "", en:  "add missions"}		
-  /**
+  import { t } from '$lib/translations';
+        /**
    * @typedef {Object} Props
    * @property {boolean} [addM]
    * @property {boolean} [openMS]
@@ -144,8 +143,8 @@ function trym (){
    <g transform="matrix(3.031137, 0, 0, 3.031137, 372.679657, 593.32428)">
          <path id="curve" d="M -64.983 -33.564 C -61.345 -35.597 -47.782 -81.5 -0.468 -80.97 C 46.095 -80.44 62.939 -33.076 64.737 -30.119"/>
 
-      <text id="text2" class="s-y1SdroFNffHn" fill="rgb(171, 55, 200)" style=" font-size: 32.9909px; line-height: 121.037px; stroke-width: 42px; word-spacing: -0.8px; white-space: pre;" bx:origin="0.691816 1.299581"><textPath fill="rgb(171, 55, 200)" style=" font-size: 32.9909px; line-height: 121.037px; stroke-width: 42px; word-spacing: -0.8px; white-space: pre;" startOffset="0" class="s-y1SdroFNffHn" xlink:href="#curve">{text[$lang]} </textPath></text>
-      <text id="text3" class="s-y1SdroFNffHn" fill="url(#linearGradient42480)" style=" font-size: 32.9909px; line-height: 121.037px; paint-order: stroke markers; stroke-width: 42px; word-spacing: -0.8px; white-space: pre;" transform="matrix(1, 0, 0, 1, -0.998111, 0)" bx:origin="0.691816 1.299581"><textPath startOffset="0" class="s-y1SdroFNffHn">{text[$lang]}</textPath></text>
+      <text id="text2" class="s-y1SdroFNffHn" fill="rgb(171, 55, 200)" style=" font-size: 32.9909px; line-height: 121.037px; stroke-width: 42px; word-spacing: -0.8px; white-space: pre;" bx:origin="0.691816 1.299581"><textPath fill="rgb(171, 55, 200)" style=" font-size: 32.9909px; line-height: 121.037px; stroke-width: 42px; word-spacing: -0.8px; white-space: pre;" startOffset="0" class="s-y1SdroFNffHn" xlink:href="#curve">{$t('project.misc.openActions')} </textPath></text>
+      <text id="text3" class="s-y1SdroFNffHn" fill="url(#linearGradient42480)" style=" font-size: 32.9909px; line-height: 121.037px; paint-order: stroke markers; stroke-width: 42px; word-spacing: -0.8px; white-space: pre;" transform="matrix(1, 0, 0, 1, -0.998111, 0)" bx:origin="0.691816 1.299581"><textPath startOffset="0" class="s-y1SdroFNffHn">{$t('project.misc.openActions')}</textPath></text>
     </g>
     {/if}
     {#if addM == false}

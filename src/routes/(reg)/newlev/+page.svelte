@@ -1,4 +1,6 @@
 <script>
+  import { get } from 'svelte/store';
+  import { t } from '$lib/translations';
   import { onMount, onDestroy } from 'svelte';
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
@@ -6,7 +8,7 @@
   import { RingLoader } from 'svelte-loading-spinners';
 
   // Language stores
-  import { lang, langUs, doesLang } from '$lib/stores/lang.js';
+  import { langUs, doesLang } from '$lib/stores/lang.js';
   import { locale } from '$lib/translations';
 
   // New architecture imports
@@ -56,8 +58,7 @@
   let eizeme = $state();
 
   // Tooltip state
-  const defaulti = { he: 'מסך הלב', en: 'heart of 1💗1' };
-  let u = $state(defaulti[$lang]);
+  let u = $state(get(t)('lev.page.heartScreen'));
 
   function close() {
     if (mode !== 4) {
@@ -158,11 +159,10 @@
     }
   });
 
-  const title = { he: 'לב 1💗1', en: 'heart of 1💗1' };
 </script>
 
 <svelte:head>
-  <title>{title[$lang]}</title>
+  <title>{$t('lev.page.title')}</title>
 </svelte:head>
 
 {#if loading}

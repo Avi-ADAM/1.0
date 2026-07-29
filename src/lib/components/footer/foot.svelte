@@ -1,4 +1,5 @@
 <script module>
+  import { t } from '$lib/translations';
   import mapTouchToMouseFor from 'svelte-touch-to-mouse';
 </script>
 
@@ -52,8 +53,6 @@
   };
   let loading = false;
   let newMeeting = $state(false);
-  const cencel = { he: 'ביטול', en: 'cencel' };
-
   /**
    * @typedef {Object} Props
    * @property {any} un
@@ -119,8 +118,6 @@
       isOnline.set(!changedTo);
     }
   }
-  const back = { he: "חזרה לרשימת הצ'אטים", en: 'back to chat list' };
-
   /**** Svelte Event Handling ****/
 
   function onDraggableInit() {
@@ -201,7 +198,7 @@
               <button
                 onclick={close}
                 class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-                title={cencel[$lang]}
+                title={$t('common.chat.cancel')}
                 ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                   <path
                     fill="currentColor"
@@ -222,7 +219,7 @@
                 <button
                   onclick={() => ($nowChatId = 0)}
                   class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-                  title={back[$lang]}><Arrow back={true} /></button
+                  title={$t('common.chat.backToList')}><Arrow back={true} /></button
                 >
               </div>
             {/if}

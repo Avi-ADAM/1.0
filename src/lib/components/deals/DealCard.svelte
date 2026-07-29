@@ -1,17 +1,17 @@
 ﻿<script lang="ts">
   import { isRtl } from '$lib/translations';
   import { goto } from '$app/navigation';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import type { Deal } from '$lib/types';
 
   let { deal }: { deal: Deal } = $props();
 
   const STATUS = $derived({
-    active: { label: tr.deals.statusInProgress[$lang], cls: 'active' },
-    pending: { label: tr.deals.statusCoordination[$lang], cls: 'pending' },
-    approval: { label: tr.deals.pendingApproval[$lang], cls: 'approval' },
-    done: { label: tr.deals.statusDone[$lang], cls: 'done' }
+    active: { label: $t('deals.statusInProgress'), cls: 'active' },
+    pending: { label: $t('deals.statusCoordination'), cls: 'pending' },
+    approval: { label: $t('deals.pendingApproval'), cls: 'approval' },
+    done: { label: $t('deals.statusDone'), cls: 'done' }
   });
 
   const progressVariant = $derived(
@@ -44,7 +44,7 @@
   <div class="chips">
     <span class="chip">{deal.category}</span>
     {#if deal.pendingApprovalCount > 0}
-      <span class="chip warn">⚡ {deal.pendingApprovalCount} {tr.deals.approvalCount[$lang]}</span>
+      <span class="chip warn">⚡ {deal.pendingApprovalCount} {$t('deals.approvalCount')}</span>
     {/if}
   </div>
 
@@ -54,7 +54,7 @@
 
   <!-- Progress -->
   <div class="prog-header">
-    <span class="prog-label">{tr.deals.missionsCompleted[$lang]}</span>
+    <span class="prog-label">{$t('deals.missionsCompleted')}</span>
     <span class="prog-pct">{deal.progressPct}%</span>
   </div>
   <div class="prog-track">
@@ -67,15 +67,15 @@
   <!-- Meta -->
   <div class="meta">
     <div class="meta-item">
-      <div class="ml">{tr.deals.totalCost[$lang]}</div>
+      <div class="ml">{$t('deals.totalCost')}</div>
       <div class="mv gold">₪ {deal.totalCost.toLocaleString()}</div>
     </div>
     <div class="meta-item">
-      <div class="ml">{tr.deals.paid[$lang]}</div>
+      <div class="ml">{$t('deals.paid')}</div>
       <div class="mv">₪ {deal.paid.toLocaleString()}</div>
     </div>
     <div class="meta-item">
-      <div class="ml">{tr.deals.estimatedEnd[$lang]}</div>
+      <div class="ml">{$t('deals.estimatedEnd')}</div>
       <div class="mv">{deal.endDate}</div>
     </div>
   </div>

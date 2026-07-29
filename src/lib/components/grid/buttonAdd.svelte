@@ -1,6 +1,5 @@
 <script>
   import Button from "$lib/celim/ui/button.svelte";
-  import {lang} from '$lib/stores/lang'
-  let { text = {"he":"אני אבצע", "en":"assign to me"}, onClick = () => {} } = $props();
+  let { text = '', onClick = () => {} } = $props();
 </script>
-<Button text={text[$lang]} onClick={onClick}/>
+<Button {text} onClick={onClick}/>

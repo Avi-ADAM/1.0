@@ -1,29 +1,23 @@
    <script>
+  import { t } from '$lib/translations';
   import Plus from "$lib/celim/plus.svelte";
   import { quintOut } from "svelte/easing";
   import { slide } from "svelte/transition";
-    import {lang} from '$lib/stores/lang.js'
   let { tasks = [], onNew } = $props();
-      const head = {"he":"רשימת מטלות","en":"checklist"}
-        const nama = {"he":"שם המטלה ", "en":"action name"}
-    const des = {"he":"תיאור","en":"decription"}
-      const dates = {"he": "תאריכים" , "en":"dates"}
-    const button = {"he":"יצירת מטלה חדשה", "en":"create new task"}
-    const linkdes = {"he": "לינק", "en": "link"}
-    </script>
+</script>
    {#key tasks}
    <div  class="w-full border-b-2 border-x-2 border-gold">
-    <h1>{head[$lang]}</h1>
+    <h1>{$t('project.expandTask.head')}</h1>
           <div  class="mx-auto">
             <div class="tbl-header">
 
           <table cellpadding="0" cellspacing="0" border="0">
       <thead>
         <tr class="sm:text-xl text-lg">
-          <th class="sm:text-xl text-sm">{nama[$lang]}</th>
-          <th class="sm:text-xl text-sm">{des[$lang]}</th>
-          <th class="sm:text-xl text-sm">{dates[$lang]}</th>
-        <th class="sm:text-xl text-sm">{linkdes[$lang]}</th>
+          <th class="sm:text-xl text-sm">{$t('project.expandTask.nama')}</th>
+          <th class="sm:text-xl text-sm">{$t('project.expandTask.des')}</th>
+          <th class="sm:text-xl text-sm">{$t('project.expandTask.dates')}</th>
+        <th class="sm:text-xl text-sm">{$t('project.expandTask.linkdes')}</th>
         </tr>
       </thead>
     </table>

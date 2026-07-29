@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/translations';
   import { onMount } from 'svelte';
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
@@ -15,13 +16,6 @@
   /** @type {{ data: import('./$types').PageData }} */
   let { data } = $props();
 
-  const t = {
-    he: { shortcuts: 'קיצורי דרך', lev: 'הלב', moach: 'מוח', me: 'הפרופיל שלי', feed: 'ממתין לטיפולך' },
-    en: { shortcuts: 'Shortcuts', lev: 'The Heart', moach: 'Brain', me: 'My profile', feed: 'Waiting for you' },
-    ar: { shortcuts: 'اختصارات', lev: 'القلب', moach: 'العقل', me: 'ملفي', feed: 'بانتظارك' },
-    ru: { shortcuts: 'Ярлыки', lev: 'Сердце', moach: 'Мозг', me: 'Мой профиль', feed: 'Ждут вас' }
-  };
-
   // Feed item type (= lev `ani` value) → icon + localized label.
   // The type doubles as the ?focus= param for the quantum deep-link.
   const feedIcons: Record<string, string> = {
@@ -33,22 +27,12 @@
     haluk: '💸',
     sheirutp: '🛍️'
   };
-  const feedTypeLabels: Record<string, Record<string, string>> = {
-    pends: { he: 'מועמדות למשימה', en: 'Mission application', ar: 'ترشح لمهمة', ru: 'Заявка на миссию' },
-    fiapp: { he: 'אישור סיום', en: 'Completion approval', ar: 'اعتماد إنجاز', ru: 'Подтверждение завершения' },
-    askedm: { he: 'בקשת משאב', en: 'Resource request', ar: 'طلب مورد', ru: 'Запрос ресурса' },
-    wegets: { he: 'אישור משאב', en: 'Resource approval', ar: 'اعتماد مورد', ru: 'Одобрение ресурса' },
-    hachla: { he: 'החלטת פרויקט', en: 'Project decision', ar: 'قرار مشروع', ru: 'Решение проекта' },
-    haluk: { he: 'הצעת חלוקה', en: 'Split proposal', ar: 'اقتراح توزيع', ru: 'Предложение о разделе' },
-    sheirutp: { he: 'בקשת רכישה', en: 'Purchase request', ar: 'طلب شراء', ru: 'Запрос на покупку' }
-  };
 
-  let labels = $derived(t[$lang as keyof typeof t] ?? t.he);
   let dir = $derived(($lang === 'he' || $lang === 'ar' ? 'rtl' : 'ltr') as 'rtl' | 'ltr');
 
   function toFeedItems(topFive: any[]) {
     return topFive.map((f: any) => {
-      const typeLabel = feedTypeLabels[f.type]?.[$lang] ?? feedTypeLabels[f.type]?.he ?? '';
+      const typeLabel = f.type ? $t(`common.feedTypes.${f.type}`) : '';
       return {
         id: `${f.type}-${f.id}`,
         type: f.type,
@@ -62,9 +46,9 @@
   }
 
   const shortcuts = $derived([
-    { icon: '💗', label: labels.lev,   href: '/lev',   badge: 0 },
-    { icon: '🧠', label: labels.moach, href: '/moach', badge: 0 },
-    { icon: '👤', label: labels.me,    href: '/me',    badge: 0 }
+    { icon: '💗', label: $t('hub.nav.lev'),   href: '/lev',   badge: 0 },
+    { icon: '🧠', label: $t('hub.nav.moach'), href: '/moach', badge: 0 },
+    { icon: '👤', label: $t('hub.nav.me'),    href: '/me',    badge: 0 }
   ]);
 
   onMount(() => {
@@ -161,7 +145,7 @@
         {/await}
 
         <section class="stagger" style="--i:4">
-          <h2 class="section-title">{labels.shortcuts}</h2>
+          <h2 class="section-title">{$t('hub.nav.shortcuts')}</h2>
           <div class="flex gap-3">
             {#each shortcuts as s (s.href)}
               <KindShortcut icon={s.icon} label={s.label} href={s.href} badge={s.badge} />
@@ -171,7 +155,7 @@
 
         {#if summary.topFive.length > 0}
           <section class="stagger" style="--i:5">
-            <h2 class="section-title">{labels.feed}</h2>
+            <h2 class="section-title">{$t('hub.nav.feed')}</h2>
             <ActionFeed items={toFeedItems(summary.topFive)} />
           </section>
         {/if}

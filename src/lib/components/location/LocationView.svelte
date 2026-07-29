@@ -1,7 +1,6 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { onDestroy, tick } from 'svelte';
-  import { lang } from '$lib/stores/lang.js';
   import { Globe2, MapPin, MapPinned, RadioTower, ChevronDown } from '@lucide/svelte';
   import 'maplibre-gl/dist/maplibre-gl.css';
 
@@ -34,17 +33,6 @@
 
   const DEFAULT_RADIUS_KM = 15;
 
-  const T = {
-    online: { he: 'אונליין', en: 'Online' },
-    onsite: { he: 'פיזי', en: 'On-site' },
-    hybrid: { he: 'היברידי', en: 'Hybrid' },
-    empty: { he: 'מיקום לא צוין', en: 'No location set' },
-    range: { he: 'טווח', en: 'range' },
-    km: { he: 'ק״מ', en: 'km' },
-    showMap: { he: 'הצג מפה', en: 'Show map' },
-    hideMap: { he: 'הסתר מפה', en: 'Hide map' }
-  };
-
   const hasPoint = $derived(
     typeof location?.lat === 'number' &&
       Number.isFinite(location.lat) &&
@@ -69,7 +57,7 @@
     isOnline ? Globe2 : mode === 'hybrid' ? RadioTower : hasPoint ? MapPinned : MapPin
   );
   const modeLabel = $derived(
-    isOnline ? T.online[$lang] : mode === 'hybrid' ? T.hybrid[$lang] : T.onsite[$lang]
+    isOnline ? $t('ui.locationView.online') : mode === 'hybrid' ? $t('ui.locationView.hybrid') : $t('ui.locationView.onsite')
   );
 
   // ── lazy read-only map ─────────────────────────────────────────────────────
@@ -184,19 +172,19 @@
       </span>
 
       {#if isEmpty}
-        <span class="loc-muted">{T.empty[$lang]}</span>
+        <span class="loc-muted">{$t('ui.locationView.empty')}</span>
       {:else}
         {#if hint}
           <span class="loc-hint" title={hint}>{hint}</span>
         {/if}
         {#if !isOnline && hasPoint}
-          <span class="loc-radius">{T.range[$lang]} · {radiusKm} {T.km[$lang]}</span>
+          <span class="loc-radius">{$t('ui.locationView.range')} · {radiusKm} {$t('ui.locationView.km')}</span>
         {/if}
       {/if}
 
       {#if showMap && hasPoint && !isOnline}
         <button type="button" class="loc-mapbtn" onclick={toggleMap} aria-expanded={expanded}>
-          <span>{expanded ? T.hideMap[$lang] : T.showMap[$lang]}</span>
+          <span>{expanded ? $t('ui.locationView.hideMap') : $t('ui.locationView.showMap')}</span>
           <span class="loc-chev" class:open={expanded}><ChevronDown size={14} /></span>
         </button>
       {/if}
@@ -206,7 +194,7 @@
       <div class="loc-map" style:height={mapHeight}>
         <div bind:this={mapEl} class="loc-map-canvas"></div>
         {#if !mapLoaded}
-          <div class="loc-map-state">{$lang === 'he' ? 'טוען מפה…' : 'Loading map…'}</div>
+          <div class="loc-map-state">{$t('ui.locationView.loadingMap')}</div>
         {/if}
       </div>
     {/if}

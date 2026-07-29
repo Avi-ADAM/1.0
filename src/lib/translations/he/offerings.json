@@ -61,7 +61,8 @@
     "create_note": "המוצר יתארח על ריקמת הבית שלך (תוקם אוטומטית אם צריך) ויהיה זמין לרכישה מיד. תמונה אפשר להוסיף בעמוד העריכה.",
     "save_failed": "השמירה נכשלה",
     "seller_badge": "ספק עצמאי",
-    "seller_profile": "לפרופיל המוכר"
+    "seller_profile": "לפרופיל המוכר",
+    "submitVote": "שלח להצבעה"
   },
   "missions": {
     "title": "משימות שאני עושה",
@@ -141,5 +142,41 @@
     "hours_done": "שעות בוצעו",
     "empty_doing": "אין כרגע משימות בביצוע",
     "empty_done": "עוד לא הושלמו משימות"
+  },
+  "compose": {
+    "title": "יצירת מוצר",
+    "modeSimple": "מוצר פשוט",
+    "modeComplex": "מוצר מורכב",
+    "previewBadge": "תצוגה מקדימה - השרת עוד לא מחובר",
+    "name": "שם המוצר",
+    "desc": "תיאור",
+    "image": "תמונה",
+    "price": "מחיר",
+    "kindOf": "סוג",
+    "kindTotal": "ליחידה",
+    "kindMonthly": "חודשי",
+    "kindYearly": "שנתי",
+    "kindUnlimited": "ללא הגבלה",
+    "quant": "כמות מצויה",
+    "unlimitedQuant": "ללא הגבלה",
+    "startDate": "תאריך התחלת זמינות",
+    "endDate": "תאריך סיום זמינות",
+    "optional": "(לא חובה)",
+    "oneForeProject": "מוצר יחיד לפרויקט",
+    "missions": "משימות נדרשות",
+    "resources": "משאבים נדרשים",
+    "marginPct": "אחוז רווח / Overhead",
+    "subtotal": "סך עלות BOM",
+    "estimated": "מחיר משוער (כולל Overhead)",
+    "total": "סהכ",
+    "cancel": "ביטול",
+    "openWarn": "יש פריטים ללא שיוך - יוצגו ללקוחות בתגית \"מחפשים ספק\" וייתכן עיכוב באספקה.",
+    "complexHint": "התוספת של \"מוצר מורכב\" - מתכון של משימות ומשאבים. כל השאר זהה למוצר פשוט.",
+    "locationTitle": "מיקום המוצר",
+    "locationHelper": "ציינו אם המוצר/שירות ניתן אונליין, פיזית, או שניהם.",
+    "locationEmpty": "הוסיפו מיקום (לא חובה)",
+    "locationOnline": "אונליין",
+    "locationSelected": "מיקום נבחר",
+    "locationDone": "סיים מיקום"
   }
 }

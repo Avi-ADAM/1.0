@@ -1,5 +1,4 @@
 <script>
-    import { lang } from '$lib/stores/lang';
     let diff = Math.random()
     /**
      * @typedef {Object} Props
@@ -13,7 +12,7 @@
     /** @type {Props} */
     let {
         name = "",
-        lebel = {"he":"","en":""},
+        lebel = '',
         value = $bindable(1),
         placeholder = 1,
         notMin = true
@@ -25,7 +24,7 @@
 </script>
 
 <form class="max-w-xs mx-auto flex flex-col items-center justify-center align-middle">
-    <label for="quantity-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{lebel[$lang]}:</label>
+    <label for="quantity-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{lebel}:</label>
     <div class="relative flex items-center w-[8rem]">
         <button type="button" id="decrement-button-{diff}" onclick={() => value--} class="bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:border-gray-600 hover:bg-gray-200 border border-gray-300 rounded-s-lg p-3 h-11 focus:ring-gray-100 dark:focus:ring-gray-700 focus:ring-2 focus:outline-none">
             <svg class="md:w-3 w-2  md:h-3 h-2 text-gray-900 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 2">

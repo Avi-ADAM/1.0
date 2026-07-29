@@ -1,4 +1,5 @@
 <script>
+  import { t } from '$lib/translations';
   import Header from '$lib/components/header/header.svelte';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
@@ -107,106 +108,6 @@
       .slice(0, 160)
   );
 
-  const t = {
-    heroTagline: {
-      he: 'עושים — בשקיפות מלאה. כל שעה נרשמת בשוויה, וכל תרומה מחולקת ביושר.',
-      en: 'Doing — in full transparency. Every hour is valued, every donation shared fairly.'
-    },
-    donateCta: { he: '💗 לתמוך בעשייה', en: '💗 Support the work' },
-    volunteerCta: { he: '🤝 לבוא להתנדב', en: '🤝 Volunteer' },
-    visitSite: { he: 'לאתר שלנו', en: 'Our website' },
-    share: { he: 'שיתוף הדף', en: 'Share this page' },
-    copied: { he: 'הקישור הועתק ✓', en: 'Link copied ✓' },
-    coverageTitle: { he: 'שקוף עד הסוף', en: 'Fully transparent' },
-    coverageSub: {
-      he: 'כמה מהשווי של כל מה שנעשה כאן כבר כוסה בתרומות ובהכנסות',
-      en: 'How much of the value created here is already covered by donations and income'
-    },
-    doneValue: { he: 'שווי העשייה עד כה', en: 'Value created so far' },
-    incomeTotal: { he: 'תרומות והכנסות', en: 'Donations & income' },
-    paidOut: { he: 'כבר חולק לעושים', en: 'Already paid out' },
-    availableForFuture: { he: 'זמין למשימות הבאות', en: 'Available for what’s next' },
-    incomeBreakdown: { he: 'מאיפה הגיע', en: 'Where it came from' },
-    srcDonations: { he: 'תרומות', en: 'Donations' },
-    srcProducts: { he: 'מכירת מוצרים', en: 'Product sales' },
-    srcOther: { he: 'הכנסות אחרות', en: 'Other income' },
-    covered: { he: 'כוסה', en: 'covered' },
-    missionsTitle: { he: 'מה עוד מחכה שיעשו אותו', en: 'What still needs doing' },
-    missionsSub: {
-      he: 'כל משימה מוערכת בשעות ובשכר שעתי אידאלי. ממומנת? המבצע מקבל תשלום מיד בסיום. עוד לא? השווי נרשם — ויכוסה כשיגיעו תרומות.',
-      en: 'Each mission is valued in hours × an ideal hourly rate. Funded? The doer is paid on completion. Not yet? The value is recorded — and covered as donations arrive.'
-    },
-    funded: { he: '✓ ממומן — תשלום מיד בסיום', en: '✓ Funded — paid on completion' },
-    notFunded: { he: '⏳ ממתין למימון', en: '⏳ Awaiting funding' },
-    inProgress: { he: 'כבר בביצוע', en: 'In progress' },
-    hours: { he: 'שעות', en: 'hours' },
-    iWillDoIt: { he: 'אני אבצע ←', en: 'I’ll do it →' },
-    noMissions: {
-      he: 'אין כרגע משימות פתוחות — אפשר לתמוך כדי לכסות את מה שכבר נעשה 💗',
-      en: 'No open missions right now — you can still support what was already done 💗'
-    },
-    proposeYourOwn: {
-      he: 'לא מצאתם משימה מתאימה? הציעו את עצמכם בתנאים שלכם ←',
-      en: 'No mission fits? Nominate yourself on your own terms →'
-    },
-    donateTitle: { he: 'איך תומכים?', en: 'How to support' },
-    donateMoney: { he: 'תרומה כספית', en: 'Donate' },
-    donateMoneyDesc: {
-      he: 'כל תרומה מתחלקת בין העושים לפי התרומה היחסית של כל אחד — אוטומטית ובשקיפות. תרומה מקוונת בדרך; בינתיים אפשר לתאם דרך הצוות או הקישורים למעלה.',
-      en: 'Every donation is split between the doers by their relative contribution — automatically and transparently. Online giving is coming; meanwhile reach us via the team or the links above.'
-    },
-    donateBuy: { he: 'קנייה שתומכת', en: 'Buy & support' },
-    donateBuyDesc: {
-      he: 'ההכנסות ממוצרים שלנו נכנסות לאותו סל שקוף ומכסות את העשייה.',
-      en: 'Income from our products flows into the same transparent pool and covers the work.'
-    },
-    donateTime: { he: 'תרומת זמן', en: 'Give time' },
-    donateTimeDesc: {
-      he: 'בוחרים משימה, מגדירים שכר שעתי אידאלי — ופשוט עושים. השווי נרשם לזכותכם מהרגע הראשון.',
-      en: 'Pick a mission, set your ideal hourly rate — and just do it. Your value is recorded from day one.'
-    },
-    toProducts: { he: 'למוצרים ↓', en: 'To products ↓' },
-    toMissions: { he: 'למשימות ↑', en: 'To missions ↑' },
-    productsTitle: { he: 'המוצרים שלנו', en: 'Our products' },
-    productsSub: {
-      he: 'אפשר גם לתמוך בקנייה — כל רכישה מוצגת כאן כחלק מההכנסות, באותה שקיפות.',
-      en: 'You can also support by buying — every purchase shows up in the same transparent income.'
-    },
-    productLink: { he: 'לפרטים ורכישה', en: 'Details & purchase' },
-    supportersTitle: { he: 'קיר התומכים', en: 'Supporter wall' },
-    anonymous: { he: 'תורם/ת אנונימי/ת', en: 'Anonymous supporter' },
-    aboutTitle: { he: 'מי אנחנו', en: 'About us' },
-    valuesTitle: { he: 'הערכים שלנו', en: 'Our values' },
-    teamTitle: { he: 'הצוות', en: 'The team' },
-    joinTitle: { he: 'רוצים יותר מלתמוך?', en: 'Want more than supporting?' },
-    joinDesc: {
-      he: 'הצטרפו כחברים מלאים — עם קול, עם חלק שווה בהחלטות, ועם שווי שנרשם על כל שעה.',
-      en: 'Join as a full member — with a voice, an equal say, and value recorded for every hour.'
-    },
-    joinBtn: { he: 'הצטרפות / התחברות', en: 'Join / Log in' },
-    toFullPage: { he: 'לעמוד הריקמה המלא', en: 'Full project page' },
-    poweredBy: { he: 'נבנה באהבה על', en: 'Built with love on' },
-    unavailableTitle: { he: 'דף התמיכה אינו פעיל', en: 'Support page is not active' },
-    unavailableBody: {
-      he: 'הריקמה עדיין לא פתחה את דף התמיכה הציבורי שלה.',
-      en: 'This rikma has not opened its public support page yet.'
-    },
-    unavailableMembers: {
-      he: 'דף התמיכה פתוח לחברי האתר בלבד — התחבר/י כדי לצפות.',
-      en: 'The support page is open to signed-in members only — please log in.'
-    },
-    backHome: { he: 'לעמוד הבית', en: 'Home' },
-    gateBannerOff: {
-      he: 'הדף כבוי — מבקרים לא רואים אותו. את/ה רואה אותו כי את/ה חבר/ת ריקמה.',
-      en: "This page is OFF — visitors can't see it. You see it because you're a member."
-    },
-    gateBannerMembers: {
-      he: 'הדף פתוח לחברי אתר מזוהים בלבד. אורחים לא רשומים לא יראו אותו.',
-      en: 'This page is visible to signed-in members only. Unregistered guests can’t see it.'
-    },
-    gateManage: { he: 'ניהול דף התמיכה ←', en: 'Manage support page →' }
-  };
-
   let pageTitle = $derived(
     attrs?.projectName
       ? $lang === 'he'
@@ -242,13 +143,13 @@
         <h1 class="text-2xl font-black text-gold mb-3">{attrs.projectName}</h1>
       {/if}
       <p class="text-white/70 mb-6">
-        {gate === 'members' && !isRegisteredUser ? t.unavailableMembers[$lang] : t.unavailableBody[$lang]}
+        {gate === 'members' && !isRegisteredUser ? $t('pages.projectSupport.unavailableMembers') : $t('pages.projectSupport.unavailableBody')}
       </p>
       <div class="flex flex-wrap justify-center gap-3">
         {#if gate === 'members' && !isRegisteredUser}
-          <a href="/" class="btn-primary">{t.joinBtn[$lang]}</a>
+          <a href="/" class="btn-primary">{$t('pages.projectSupport.joinBtn')}</a>
         {/if}
-        <a href="/project/{projectId}" class="btn-ghost">{t.toFullPage[$lang]}</a>
+        <a href="/project/{projectId}" class="btn-ghost">{$t('pages.projectSupport.toFullPage')}</a>
       </div>
     </div>
   </div>
@@ -258,8 +159,8 @@
       {#if isMember && gate !== 'public'}
         <!-- Member-only preview banner: this page is not (fully) public yet. -->
         <div class="gate-banner">
-          <span>{gate === 'off' ? t.gateBannerOff[$lang] : t.gateBannerMembers[$lang]}</span>
-          <a href="/moach/{projectId}/sales">{t.gateManage[$lang]}</a>
+          <span>{gate === 'off' ? $t('pages.projectSupport.gateBannerOff') : $t('pages.projectSupport.gateBannerMembers')}</span>
+          <a href="/moach/{projectId}/sales">{$t('pages.projectSupport.gateManage')}</a>
         </div>
       {/if}
       <!-- ═══════════ 1. HERO ═══════════ -->
@@ -283,18 +184,18 @@
         {/if}
 
         <p class="max-w-xl mx-auto text-lg text-white/80 mb-8">
-          {t.heroTagline[$lang]}
+          {$t('pages.projectSupport.heroTagline')}
         </p>
 
         <div class="flex flex-wrap justify-center gap-3 mb-7">
-          <button type="button" class="btn-primary" onclick={openDonate}>{t.donateCta[$lang]}</button>
-          <a href="#missions" class="btn-secondary">{t.volunteerCta[$lang]}</a>
+          <button type="button" class="btn-primary" onclick={openDonate}>{$t('pages.projectSupport.donateCta')}</button>
+          <a href="#missions" class="btn-secondary">{$t('pages.projectSupport.volunteerCta')}</a>
           {#if attrs.linkToWebsite}
             <a
               href={attrs.linkToWebsite}
               target="_blank"
               rel="noopener"
-              class="btn-ghost">🌐 {t.visitSite[$lang]}</a
+              class="btn-ghost">🌐 {$t('pages.projectSupport.visitSite')}</a
             >
           {/if}
         </div>
@@ -307,7 +208,7 @@
           {#if attrs.githublink}<a class="social-dot" target="_blank" rel="noopener" href={attrs.githublink} title="GitHub">🐙</a>{/if}
           {#if attrs.watsapplink}<a class="social-dot" target="_blank" rel="noopener" href={attrs.watsapplink} title="WhatsApp">💬</a>{/if}
           <button class="btn-ghost !py-1.5 !px-4 text-sm" onclick={shareLink}>
-            {copied ? t.copied[$lang] : `🔗 ${t.share[$lang]}`}
+            {copied ? $t('pages.projectSupport.copied') : `🔗 ${$t('pages.projectSupport.share')}`}
           </button>
         </div>
       </section>
@@ -316,14 +217,14 @@
       <section class="glass rounded-3xl p-6 sm:p-10 mb-14 relative overflow-hidden">
         <div class="board-shimmer" aria-hidden="true"></div>
         <h2 class="text-2xl sm:text-3xl font-bold text-gold mb-1">
-          {t.coverageTitle[$lang]}
+          {$t('pages.projectSupport.coverageTitle')}
         </h2>
-        <p class="text-white/60 mb-8">{t.coverageSub[$lang]}</p>
+        <p class="text-white/60 mb-8">{$t('pages.projectSupport.coverageSub')}</p>
 
         <!-- the big bar -->
         <div class="mb-3 flex justify-between items-end flex-wrap gap-2">
-          <span class="text-white/70 text-sm">{t.doneValue[$lang]}: <b class="text-white">₪{fmt(coverage.doneValue)}</b></span>
-          <span class="text-gold font-black text-3xl">{coveragePct}% <span class="text-base font-normal text-white/60">{t.covered[$lang]}</span></span>
+          <span class="text-white/70 text-sm">{$t('pages.projectSupport.doneValue')}: <b class="text-white">₪{fmt(coverage.doneValue)}</b></span>
+          <span class="text-gold font-black text-3xl">{coveragePct}% <span class="text-base font-normal text-white/60">{$t('pages.projectSupport.covered')}</span></span>
         </div>
         <div class="coverage-track" role="img" aria-label="{coveragePct}%">
           <div class="coverage-fill" style="width: {coveragePct}%"></div>
@@ -333,19 +234,19 @@
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-8">
           <div class="stat">
             <span class="stat-num">₪{fmt(coverage.doneValue)}</span>
-            <span class="stat-label">{t.doneValue[$lang]}</span>
+            <span class="stat-label">{$t('pages.projectSupport.doneValue')}</span>
           </div>
           <div class="stat">
             <span class="stat-num text-gold">₪{fmt(coverage.incomeTotal)}</span>
-            <span class="stat-label">{t.incomeTotal[$lang]}</span>
+            <span class="stat-label">{$t('pages.projectSupport.incomeTotal')}</span>
           </div>
           <div class="stat">
             <span class="stat-num">₪{fmt(coverage.paidOut)}</span>
-            <span class="stat-label">{t.paidOut[$lang]}</span>
+            <span class="stat-label">{$t('pages.projectSupport.paidOut')}</span>
           </div>
           <div class="stat">
             <span class="stat-num text-barbi">₪{fmt(coverage.availableForFuture)}</span>
-            <span class="stat-label">{t.availableForFuture[$lang]}</span>
+            <span class="stat-label">{$t('pages.projectSupport.availableForFuture')}</span>
           </div>
         </div>
 
@@ -353,13 +254,13 @@
         {#if coverage.incomeTotal > 0}
           <div class="mt-8">
             <h3 class="text-sm uppercase tracking-widest text-white/50 mb-3">
-              {t.incomeBreakdown[$lang]}
+              {$t('pages.projectSupport.incomeBreakdown')}
             </h3>
             <div class="flex flex-wrap gap-2">
-              <span class="chip chip-gold">💗 {t.srcDonations[$lang]} · ₪{fmt(coverage.donationIncome)}</span>
-              <span class="chip chip-pink">🎁 {t.srcProducts[$lang]} · ₪{fmt(coverage.productIncome)}</span>
+              <span class="chip chip-gold">💗 {$t('pages.projectSupport.srcDonations')} · ₪{fmt(coverage.donationIncome)}</span>
+              <span class="chip chip-pink">🎁 {$t('pages.projectSupport.srcProducts')} · ₪{fmt(coverage.productIncome)}</span>
               {#if coverage.otherIncome > 0}
-                <span class="chip">✨ {t.srcOther[$lang]} · ₪{fmt(coverage.otherIncome)}</span>
+                <span class="chip">✨ {$t('pages.projectSupport.srcOther')} · ₪{fmt(coverage.otherIncome)}</span>
               {/if}
             </div>
           </div>
@@ -369,9 +270,9 @@
       <!-- ═══════════ 3. MISSIONS ═══════════ -->
       <section id="missions" class="mb-14 scroll-mt-8">
         <h2 class="text-2xl sm:text-3xl font-bold mb-1 text-barbi">
-          {t.missionsTitle[$lang]}
+          {$t('pages.projectSupport.missionsTitle')}
         </h2>
-        <p class="text-white/60 mb-6 max-w-2xl">{t.missionsSub[$lang]}</p>
+        <p class="text-white/60 mb-6 max-w-2xl">{$t('pages.projectSupport.missionsSub')}</p>
 
         {#if openMissions.length > 0}
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -382,11 +283,11 @@
                 <div class="flex justify-between items-start gap-2">
                   <h3 class="font-bold text-lg leading-snug">{om.attributes.name}</h3>
                   {#if assigned}
-                    <span class="badge badge-muted">{t.inProgress[$lang]}</span>
+                    <span class="badge badge-muted">{$t('pages.projectSupport.inProgress')}</span>
                   {:else if st?.funded}
-                    <span class="badge badge-funded">{t.funded[$lang]}</span>
+                    <span class="badge badge-funded">{$t('pages.projectSupport.funded')}</span>
                   {:else}
-                    <span class="badge badge-waiting">{t.notFunded[$lang]}</span>
+                    <span class="badge badge-waiting">{$t('pages.projectSupport.notFunded')}</span>
                   {/if}
                 </div>
 
@@ -396,7 +297,7 @@
 
                 <div class="flex flex-wrap items-center gap-2 text-sm text-white/70">
                   {#if om.attributes.noofhours}
-                    <span>⏱ {fmt(om.attributes.noofhours)} {t.hours[$lang]}</span>
+                    <span>⏱ {fmt(om.attributes.noofhours)} {$t('pages.projectSupport.hours')}</span>
                   {/if}
                   {#if st?.value}
                     <span class="text-gold font-semibold">≈ ₪{fmt(st.value)}</span>
@@ -416,7 +317,7 @@
                     class="btn-primary !text-sm mt-auto self-start"
                     onclick={() => goto(`/availableMission/${om.id}`)}
                   >
-                    {t.iWillDoIt[$lang]}
+                    {$t('pages.projectSupport.iWillDoIt')}
                   </button>
                 {/if}
               </div>
@@ -424,13 +325,13 @@
           </div>
         {:else}
           <div class="glass rounded-2xl p-8 text-center text-white/60">
-            {t.noMissions[$lang]}
+            {$t('pages.projectSupport.noMissions')}
           </div>
         {/if}
 
         <p class="mt-4 text-sm">
           <a href="/project/{projectId}/join" class="text-barbi underline hover:text-white">
-            {t.proposeYourOwn[$lang]}
+            {$t('pages.projectSupport.proposeYourOwn')}
           </a>
         </p>
       </section>
@@ -438,30 +339,30 @@
       <!-- ═══════════ 4. HOW TO SUPPORT ═══════════ -->
       <section id="donate" class="mb-14 scroll-mt-8">
         <h2 class="text-2xl sm:text-3xl font-bold text-gold mb-6">
-          {t.donateTitle[$lang]}
+          {$t('pages.projectSupport.donateTitle')}
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="glass rounded-2xl p-6 border-t-4 border-t-gold flex flex-col">
             <div class="text-3xl mb-3">💗</div>
-            <h3 class="font-bold text-lg mb-2">{t.donateMoney[$lang]}</h3>
-            <p class="text-white/60 text-sm leading-relaxed mb-4">{t.donateMoneyDesc[$lang]}</p>
+            <h3 class="font-bold text-lg mb-2">{$t('pages.projectSupport.donateMoney')}</h3>
+            <p class="text-white/60 text-sm leading-relaxed mb-4">{$t('pages.projectSupport.donateMoneyDesc')}</p>
             <button type="button" class="btn-primary !text-sm mt-auto self-start" onclick={openDonate}>
-              {t.donateCta[$lang]}
+              {$t('pages.projectSupport.donateCta')}
             </button>
           </div>
           <div class="glass rounded-2xl p-6 border-t-4 border-t-barbi">
             <div class="text-3xl mb-3">🎁</div>
-            <h3 class="font-bold text-lg mb-2">{t.donateBuy[$lang]}</h3>
-            <p class="text-white/60 text-sm leading-relaxed mb-3">{t.donateBuyDesc[$lang]}</p>
+            <h3 class="font-bold text-lg mb-2">{$t('pages.projectSupport.donateBuy')}</h3>
+            <p class="text-white/60 text-sm leading-relaxed mb-3">{$t('pages.projectSupport.donateBuyDesc')}</p>
             {#if products.length > 0}
-              <a href="#products" class="text-gold text-sm underline hover:text-white">{t.toProducts[$lang]}</a>
+              <a href="#products" class="text-gold text-sm underline hover:text-white">{$t('pages.projectSupport.toProducts')}</a>
             {/if}
           </div>
           <div class="glass rounded-2xl p-6 border-t-4 border-t-white/40">
             <div class="text-3xl mb-3">🤝</div>
-            <h3 class="font-bold text-lg mb-2">{t.donateTime[$lang]}</h3>
-            <p class="text-white/60 text-sm leading-relaxed mb-3">{t.donateTimeDesc[$lang]}</p>
-            <a href="#missions" class="text-gold text-sm underline hover:text-white">{t.toMissions[$lang]}</a>
+            <h3 class="font-bold text-lg mb-2">{$t('pages.projectSupport.donateTime')}</h3>
+            <p class="text-white/60 text-sm leading-relaxed mb-3">{$t('pages.projectSupport.donateTimeDesc')}</p>
+            <a href="#missions" class="text-gold text-sm underline hover:text-white">{$t('pages.projectSupport.toMissions')}</a>
           </div>
         </div>
       </section>
@@ -470,9 +371,9 @@
       {#if products.length > 0}
         <section id="products" class="mb-14 scroll-mt-8">
           <h2 class="text-2xl sm:text-3xl font-bold text-barbi mb-1">
-            {t.productsTitle[$lang]}
+            {$t('pages.projectSupport.productsTitle')}
           </h2>
-          <p class="text-white/60 mb-6 max-w-2xl">{t.productsSub[$lang]}</p>
+          <p class="text-white/60 mb-6 max-w-2xl">{$t('pages.projectSupport.productsSub')}</p>
           <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {#each products as matanot (matanot.id)}
               <a href="/gift/{matanot.id}" class="glass rounded-2xl overflow-hidden product-card group">
@@ -493,7 +394,7 @@
                     <p class="text-gold font-bold">₪{fmt(matanot.attributes.price)}</p>
                   {/if}
                   <p class="text-xs text-white/50 underline group-hover:text-gold mt-1">
-                    {t.productLink[$lang]}
+                    {$t('pages.projectSupport.productLink')}
                   </p>
                 </div>
               </a>
@@ -506,12 +407,12 @@
       {#if coverage.supporters.length > 0}
         <section class="mb-14">
           <h2 class="text-2xl sm:text-3xl font-bold text-gold mb-6">
-            {t.supportersTitle[$lang]}
+            {$t('pages.projectSupport.supportersTitle')}
           </h2>
           <div class="flex flex-wrap gap-3">
             {#each coverage.supporters as s, i (i)}
               <div class="glass rounded-xl px-4 py-3 min-w-[10rem]">
-                <p class="font-semibold">{s.name || t.anonymous[$lang]}</p>
+                <p class="font-semibold">{s.name || $t('pages.projectSupport.anonymous')}</p>
                 <p class="text-gold text-sm font-bold">₪{fmt(s.amount)}</p>
                 {#if s.msg}
                   <p class="text-white/60 text-xs italic mt-1">"{s.msg}"</p>
@@ -525,7 +426,7 @@
       <!-- ═══════════ 7. ABOUT / VALUES / TEAM ═══════════ -->
       {#if attrs.publicDescription}
         <section class="glass rounded-3xl p-6 sm:p-10 mb-10">
-          <h2 class="text-2xl font-bold text-white mb-4">{t.aboutTitle[$lang]}</h2>
+          <h2 class="text-2xl font-bold text-white mb-4">{$t('pages.projectSupport.aboutTitle')}</h2>
           <div class="text-white/80 leading-relaxed">
             <RichText editable={false} outpot={attrs.publicDescription} />
           </div>
@@ -535,7 +436,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-14">
         {#if vallues.length > 0}
           <section class="glass rounded-2xl p-6">
-            <h2 class="text-xl font-bold text-gold mb-4">✨ {t.valuesTitle[$lang]}</h2>
+            <h2 class="text-xl font-bold text-gold mb-4">✨ {$t('pages.projectSupport.valuesTitle')}</h2>
             <div class="flex flex-wrap gap-2">
               {#each vallues as v (v)}
                 <span class="chip chip-gold">{v}</span>
@@ -546,7 +447,7 @@
 
         {#if team.length > 0}
           <section class="glass rounded-2xl p-6">
-            <h2 class="text-xl font-bold text-barbi mb-4">{t.teamTitle[$lang]}</h2>
+            <h2 class="text-xl font-bold text-barbi mb-4">{$t('pages.projectSupport.teamTitle')}</h2>
             <div class="flex flex-wrap gap-2">
               {#each team as user (user.id)}
                 <button
@@ -570,19 +471,19 @@
       <!-- ═══════════ 8. JOIN + FOOTER ═══════════ -->
       <section class="text-center glass rounded-3xl p-8 sm:p-12 mb-10 join-card">
         <h2 class="text-2xl sm:text-3xl font-black mb-3 bg-clip-text text-transparent bg-gradient-to-l from-gold via-white to-barbi">
-          {t.joinTitle[$lang]}
+          {$t('pages.projectSupport.joinTitle')}
         </h2>
-        <p class="text-white/70 max-w-lg mx-auto mb-6">{t.joinDesc[$lang]}</p>
+        <p class="text-white/70 max-w-lg mx-auto mb-6">{$t('pages.projectSupport.joinDesc')}</p>
         <div class="flex flex-wrap justify-center gap-3">
           {#if !isRegisteredUser}
-            <a href="/" class="btn-primary">{t.joinBtn[$lang]}</a>
+            <a href="/" class="btn-primary">{$t('pages.projectSupport.joinBtn')}</a>
           {/if}
-          <a href="/project/{projectId}" class="btn-ghost">{t.toFullPage[$lang]}</a>
+          <a href="/project/{projectId}" class="btn-ghost">{$t('pages.projectSupport.toFullPage')}</a>
         </div>
       </section>
 
       <footer class="text-center text-white/40 text-sm">
-        {t.poweredBy[$lang]}
+        {$t('pages.projectSupport.poweredBy')}
         <a href="/" class="text-gold hover:text-white font-semibold">1💗1</a>
       </footer>
     </div>

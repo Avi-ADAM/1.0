@@ -1,4 +1,5 @@
 <script>
+  import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import RichText from '$lib/celim/ui/richText.svelte';
   import Tile from '$lib/celim/tile.svelte';
@@ -8,13 +9,6 @@
   let projectBase = $derived(data.projectBase);
   let vallues = $derived(projectBase?.vallues?.data || []);
 
-  const i18n = {
-    he: { vap: 'ערכי הפרויקט' },
-    en: { vap: 'Project Values' },
-    ar: { vap: 'قيم المشروع' }
-  };
-
-  let t = $derived(i18n[$lang] || i18n.en);
 
   let innerWidth = $state(0);
 </script>
@@ -43,7 +37,7 @@
 
     {#if vallues.length > 0}
       <section class="bg-white p-6 rounded-xl shadow-sm">
-        <h2 class="text-xl font-bold text-primary mb-4">{t.vap}</h2>
+        <h2 class="text-xl font-bold text-primary mb-4">{$t('moach.main.vap')}</h2>
         <div
           class="flex flex-wrap justify-center gap-2 p-4 bg-gray-50 rounded-lg border border-gold"
         >

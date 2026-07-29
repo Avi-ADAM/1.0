@@ -1,4 +1,5 @@
 <script>
+  import { t } from '$lib/translations';
   import { sendToSer } from '$lib/send/sendToSer.js';
     import TimersCalendar from '$lib/components/timers/TimersCalendar.svelte';
     import {onMount} from 'svelte'
@@ -18,10 +19,6 @@
     }
 
     onMount(loadTimers);
-    const loadingText = {
-      he: 'טוען נתונים...',
-      en: 'Loading data...'
-    };
   </script>
 
 <svelte:head>
@@ -30,7 +27,7 @@
 
   {#if isLoading}
     <div class="flex justify-center items-center p-8">
-        <p class="text-lg">{loadingText[$lang]}</p>
+        <p class="text-lg">{$t('common.misc.loadingData')}</p>
     </div>
   {:else if timersData?.data?.usersPermissionsUser}
     {#key  timersData}

@@ -1,8 +1,7 @@
 <script>
   import { formatTime } from "../utils";
 import { onMount, onDestroy } from "svelte";
-import { lang } from "$lib/stores/lang";
-const timero = {"he":"מונה זמן לסיום הדיון", "en":"time counter for end of discution"}
+import { t } from '$lib/translations';
   let { timegramaDate, onHover = () => {} } = $props();
 function hover(text) {
     onHover?.(text);
@@ -17,6 +16,6 @@ let timer;
   })
   onDestroy(() => clearInterval(timer))
 </script>
-<div class="flex items-center justify-center m-1 "><span role="contentinfo" aria-label="{timero[$lang]}" class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre text-center text-barbi p-2 sm:text-2xl text-lg" style:font-family="Digital" onmouseenter={()=>hover(timero[$lang])} onmouseleave={()=>hover("0")}  style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;">
+<div class="flex items-center justify-center m-1 "><span role="contentinfo" aria-label="{$t('lev.cards.common.timero')}" class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre text-center text-barbi p-2 sm:text-2xl text-lg" style:font-family="Digital" onmouseenter={()=>hover($t('lev.cards.common.timero'))} onmouseleave={()=>hover("0")}  style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;">
     {formatTime(zman)}
 </span></div>

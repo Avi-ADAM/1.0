@@ -46,10 +46,10 @@
   "no_date": "No date",
   "by_proposal": "By proposal",
   "just_now": "Just now",
-  "minutes_ago": "{n}m ago",
-  "hours_ago": "{n} hours ago",
-  "days_ago": "{n} days ago",
-  "weeks_ago": "{n} weeks ago",
+  "minutes_ago": "{{count}}m ago",
+  "hours_ago": "{{count}} hours ago",
+  "days_ago": "{{count}} days ago",
+  "weeks_ago": "{{count}} weeks ago",
   "lev_agent_title": "LEV",
   "lev_agent_sub": "Summarizes the status for you",
   "quick_look_title": "Quick Look",
@@ -64,5 +64,253 @@
   "filters_my_skills": "Fits My Skills",
   "filters_urgent": "Urgent",
   "location_not_specified": "Location not specified",
-  "km_away": "{distance} km away"
+  "km_away": "{{distance}} km away",
+  "new": {
+    "titlePlaceholder": "In one sentence — what would you like to happen?",
+    "readyStatus": "Ready to send to Lev",
+    "notReadyStatus": "Almost there…",
+    "readyHint": "Once you confirm, I will look for matching partnerships and bring back a plan for your approval.",
+    "notReadyHint": "Write a short title and a few lines of description — that is enough.",
+    "saveDraft": "Save draft",
+    "publish": "✨ Publish the wish",
+    "publishing": "⏳ Sending to Lev…",
+    "afterPublish": "Once you publish, Lev finishes its analysis within minutes and you will see proposals within an hour or two.",
+    "brandSub": "· Concierge",
+    "avatarFallback": "WI",
+    "register": "Sign up",
+    "notifications": "Notifications",
+    "profileAlt": "Profile",
+    "close": "Close",
+    "save": "Save",
+    "navNotice": "Sign up to reach «{{label}}»",
+    "backToList": "⟵ Back to my wish list",
+    "nav": {
+      "overview": "My overview",
+      "wishes": "Wishes",
+      "deals": "Deals",
+      "moach": "Rikmas",
+      "wishList": "my wish list"
+    },
+    "steps": {
+      "wish": "wish",
+      "understand": "understanding",
+      "proposals": "proposals",
+      "consent": "consent"
+    },
+    "incantRule": "◈ ───── A NEW WISH ───── ◈",
+    "incantTitle": "What would you like to happen?",
+    "incantBody": "Tell it in your own words. We will find the people, suggest how to connect, and you approve.",
+    "incantPrivacy": "Nothing leaves this page until you publish.",
+    "draftBadge": "New wish · draft",
+    "autosaved": "Saved automatically · just now",
+    "wordCount": "{{count}} words",
+    "tool": {
+      "mic": "Microphone",
+      "attach": "Attach an image",
+      "phrasing": "Phrasing suggestion from Lev",
+      "language": "Language"
+    },
+    "sectionDetails": "Practical details",
+    "sectionValues": "Values that matter to me",
+    "publishRegister": "Sign up to publish ←",
+    "publishAndSee": "Publish and see proposals ←",
+    "publishFailed": "Something went wrong creating the wish",
+    "online": "Online",
+    "locationChosen": "Location chosen",
+    "km": "km",
+    "seeds": {
+      "gift": {
+        "label": "A gift for someone I love",
+        "hint": "a day off, an experience, a thrill"
+      },
+      "task": {
+        "label": "Something I cannot manage alone",
+        "hint": "a repair, a clear-out, a project"
+      },
+      "community": {
+        "label": "A small community event",
+        "hint": "a gathering, a workshop, an initiative"
+      },
+      "trip": {
+        "label": "Planning a trip",
+        "hint": "destination, hotel, lodging"
+      },
+      "family": {
+        "label": "Support for the family",
+        "hint": "childcare, cooking, company"
+      },
+      "free": {
+        "label": "An open wish",
+        "hint": "say it all, freely"
+      }
+    },
+    "values": {
+      "consent": "Consent",
+      "equality": "Equality",
+      "community": "Community",
+      "transparency": "Transparency",
+      "accessibility": "Accessibility",
+      "ecology": "Ecology",
+      "reciprocity": "Reciprocity",
+      "creativity": "Creativity",
+      "generosity": "Generosity",
+      "trust": "Trust"
+    },
+    "jewels": {
+      "when": {
+        "label": "When",
+        "placeholder": "tap to pick a date"
+      },
+      "where": {
+        "label": "Where",
+        "placeholder": "city, area, or at home"
+      },
+      "budget": {
+        "label": "Budget",
+        "placeholder": "a flexible range, or by proposal"
+      },
+      "whoCanOffer": {
+        "label": "Who can offer",
+        "placeholder": "open to all / rikma members"
+      },
+      "whoCanSee": {
+        "label": "Who can see",
+        "placeholder": "private · rikmas only · community"
+      },
+      "invite": {
+        "label": "Invite partners?",
+        "placeholder": "yes — personally, or via Lev"
+      },
+      "joinKind": {
+        "label": "Shared initiative",
+        "placeholder": "personal · or group"
+      }
+    },
+    "whoCanOffer": {
+      "open": {
+        "label": "Open to all",
+        "hint": "Anyone holding a suitable offering can propose."
+      },
+      "mine": {
+        "label": "My rikmas only",
+        "hint": "Only members of projects I belong to can propose."
+      }
+    },
+    "whoCanSee": {
+      "personal": {
+        "label": "Private",
+        "hint": "Only you see it. The wish stays off the public board."
+      },
+      "free_threshold": {
+        "label": "Open to the community",
+        "hint": "Appears on the community wish board for every registered member."
+      },
+      "pay_to_access": {
+        "label": "Paid access",
+        "hint": "Access to the wish via token/payment (M+)."
+      }
+    },
+    "invitePartners": {
+      "lev": {
+        "label": "Through Lev",
+        "hint": "Lev finds and approaches them automatically."
+      },
+      "manual": {
+        "label": "I invite them myself",
+        "hint": "A personal invitation to the partners you want."
+      },
+      "none": {
+        "label": "No invitations",
+        "hint": "No invitations up front — choose from the proposals that arrive."
+      }
+    },
+    "joinKind": {
+      "solo": {
+        "label": "Personal initiative",
+        "hint": "I organise, others propose."
+      },
+      "group_purchase": {
+        "label": "Group purchase",
+        "hint": "Several people buy together and share the cost."
+      },
+      "group_trip": {
+        "label": "Group trip",
+        "hint": "Planning and paying for a trip together."
+      },
+      "community_event": {
+        "label": "Community event",
+        "hint": "A gathering or a shared initiative in the community."
+      },
+      "public_renovation": {
+        "label": "Renovation / public project",
+        "hint": "A shared space several people renovate together."
+      },
+      "recurring_subscription": {
+        "label": "Shared recurring subscription",
+        "hint": "A repeating commitment split between the participants."
+      },
+      "other": {
+        "label": "Other",
+        "hint": "A shared initiative of another kind."
+      }
+    },
+    "lev": {
+      "sub": "listening, marking gently",
+      "anonCta": "✨ {{count}} possible matches found · sign up to see who",
+      "analyzing": "analysing…",
+      "identified": "what I can see so far · {{count}}",
+      "realtime": "live analysis",
+      "listening": "listening…",
+      "missions": "✦ Missions",
+      "resources": "◐ Resources",
+      "emptyHint": "Start writing and I will pick out missions and resources automatically",
+      "skills": "✶ Skills needed",
+      "existing": "◆ Already in the system",
+      "freeResources": "◐ Available resources · {{count}}",
+      "people": "♥ People who could help · {{count}}",
+      "hiddenIdentity": "Identity hidden",
+      "hints": "Gentle suggestions",
+      "privacy": "Everything I read stays between us until you approve. No partner sees anything until you publish."
+    },
+    "locationModal": {
+      "eyebrow": "Location",
+      "title": "Where does it happen?",
+      "closeAria": "Close location picker",
+      "label": "Wish location",
+      "helper": "Choose whether it is online, physical or hybrid. The point and radius help Lev suggest nearby providers.",
+      "save": "Save location"
+    },
+    "modal": {
+      "when": "When will it happen?",
+      "budget": "How much would you like to give?",
+      "whoCanOffer": "Who can offer?",
+      "whoCanSee": "Who can see?",
+      "invite": "How should partners be invited?",
+      "joinKind": "Personal or group initiative?"
+    },
+    "dateFrom": "Start",
+    "dateTo": "End",
+    "preset": {
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "week": "Within a week",
+      "month": "Within a month",
+      "clear": "Clear"
+    },
+    "dateHint": "Optional — leave it empty and Lev will suggest flexible dates.",
+    "budgetLabel": "Maximum amount (₪)",
+    "budgetPlaceholder": "e.g. 500",
+    "budgetNoCap": "No ceiling",
+    "budgetHint": "A maximum. Proposals are ordered by how well they match, not by price alone.",
+    "inviteHint": "This helps Lev judge how much to initiate on its own and how much to wait for you.",
+    "minJoiners": "Minimum participants",
+    "minJoinersPlaceholder": "e.g. 2",
+    "maxJoiners": "Maximum (optional)",
+    "maxJoinersPlaceholder": "No ceiling",
+    "joinDeadline": "Joining closes on (optional)",
+    "groupHint": "Once {{count}} participants join you can lock the group, decide together and pay together. Until then the wish is gathering.",
+    "soloHint": "The default — you organise and the community proposes. Choosing a group kind opens joining, shared decisions and shared payment."
+  },
+  "no_wishes_found_title": "No wishes found",
+  "proposals_so_far": "Proposals so far"
 }

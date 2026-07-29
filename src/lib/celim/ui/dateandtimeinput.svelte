@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/translations';
  import Calendar from "$lib/components/ui/calendar/calendar.svelte";
  import * as Popover from "$lib/components/ui/popover/index.js";
  import { Button } from "$lib/components/ui/button/index.js";
@@ -9,7 +10,6 @@
  import type { DateValue } from "@internationalized/date";
   import SveltyPicker from 'svelty-picker';
 
- import { lang } from "$lib/stores/lang.js";
  const id = $props.id();
  let { outpot = $bindable<string | undefined>(), minDate } = $props<{
     outpot?: string | undefined;
@@ -45,18 +45,6 @@ const outputFormat = 'HH:mm dd/MM/yy';
     outpot = combineAndFormat(value, time);
     console.log(outpot, value, time)
  });
- const dateLabel = {
-    he: "תאריך",
-    en: "Date"
- };
- const timeLabel = {
-    he: "שעה",
-    en: "Time"
- };
- const select = {
-    he: "בחירת תאריך",
-    en: "Select"
- }
 </script>
  
 <div class="flex gap-4">
@@ -71,7 +59,7 @@ const outputFormat = 'HH:mm dd/MM/yy';
      >
       {value
        ? value.toDate(getLocalTimeZone()).toLocaleDateString()
-       : select[$lang]}
+       : $t('ui.dateInput.select')}
       <ChevronDownIcon />
      </Button>
     {/snippet}

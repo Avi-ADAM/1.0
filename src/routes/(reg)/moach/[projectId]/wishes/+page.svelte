@@ -1,5 +1,6 @@
 <script>
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
@@ -8,14 +9,15 @@
 
   const projectId = $derived(page.params.projectId);
 
-  /* ===== Status meta — visible from the provider's perspective ===== */
+  /* ===== Status meta — visible from the provider's perspective =====
+     Colours stay here; the words live in moach.wishes.status.<key>.* */
   const STATUS_META = {
-    suggested:   { he: 'Lev התאימה',         en: 'Matched by Lev',  color: '#9a8f80', dot: '#9a8f80', desc: { he: 'מועמדות אוטומטית — הלקוחה עוד לא צפתה.', en: 'Auto matched — wisher has not viewed yet.' } },
-    viewed:      { he: 'הלקוחה צפתה',         en: 'Wisher viewed',   color: '#74bfff', dot: '#74bfff', desc: { he: 'הלקוחה פתחה את ההצעה.', en: 'The wisher opened your proposal.' } },
-    accepted:    { he: 'הלקוחה בחרה',         en: 'Wisher chose you', color: '#02ffbb', dot: '#02ffbb', desc: { he: 'נפתחה בקשת שירות — עברו ל־דילים לאישור.', en: 'A service request was opened — head to deals to approve.' } },
-    rejected:    { he: 'נדחתה',                en: 'Dismissed',       color: '#52493e', dot: '#52493e', desc: { he: 'הלקוחה דחתה — אין צורך בפעולה.', en: 'Wisher dismissed — no action needed.' } },
-    expired:     { he: 'פג תוקף',              en: 'Expired',         color: '#52493e', dot: '#52493e', desc: { he: 'חלון הזמן עבר.', en: 'Window expired.' } }
-  };
+    suggested:   { key: 'suggested', color: '#9a8f80', dot: '#9a8f80' },
+    viewed:      { key: 'viewed',    color: '#74bfff', dot: '#74bfff' },
+    accepted:    { key: 'accepted',  color: '#02ffbb', dot: '#02ffbb' },
+    rejected:    { key: 'rejected',  color: '#52493e', dot: '#52493e' },
+    expired:     { key: 'expired',   color: '#52493e', dot: '#52493e' }
+  }
 
   const FILTERS = [
     { id: 'all',       he: 'הכל' },
@@ -145,7 +147,7 @@
           <div class="flex items-center justify-between mb-3 gap-2">
             <span class="inline-flex items-center gap-2 text-xs font-bold tracking-[.16em] uppercase" style="color:{meta.color}">
               <span class="w-2 h-2 rounded-full" style="background:{meta.dot};box-shadow:0 0 8px {meta.dot}"></span>
-              {meta.he}
+              {$t(`moach.wishes.status.${meta.key}.label`)}
             </span>
             <code class="text-[10.5px] font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">{p.ratsonCode}</code>
           </div>
@@ -189,7 +191,7 @@
 
           <!-- Status note -->
           <div class="text-xs text-slate-500 italic border-t border-slate-100 pt-3 mb-3">
-            {meta.desc.he}
+            {$t(`moach.wishes.status.${meta.key}.desc`)}
           </div>
 
           <!-- Actions -->

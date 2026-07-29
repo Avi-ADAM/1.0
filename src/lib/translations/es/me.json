@@ -1,0 +1,24 @@
+{
+  "_review": true,
+  "title": "Cuántos acuerdos aceptamos de cada lugar",
+  "guide": {
+    "header": "Mostrar la guía del usuario",
+    "text": "¿Quieres ver la guía de uso de 1💗1? \n (Puedes desactivar o restaurar este diálogo en los ajustes)",
+    "yes": "Sí",
+    "no": "No"
+  },
+  "identity": {
+    "title": "Tu identidad criptográfica",
+    "explainer": "El sitio genera para ti una clave de firma digital que se guarda solo en tu navegador. El servidor nunca tiene una copia. Una vez configurada, cada acción significativa (votar, aprobar, unirse) la firmas tú, y ni siquiera nosotros podemos falsificarla.",
+    "status": "Estado",
+    "fingerprint": "Huella de la clave",
+    "fullKey": "Mostrar la clave completa",
+    "hideKey": "Ocultar",
+    "algo": "Algoritmo",
+    "createdAt": "Creado el",
+    "signedEvents": "Tus eventos firmados",
+    "retry": "Reintentar",
+    "backToMe": "Volver al perfil",
+    "nothing": "— sin datos —"
+  }
+}

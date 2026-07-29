@@ -50,7 +50,8 @@
     "en": "English",
     "he": "עברית",
     "ar": "العربية",
-    "ru": "Русский"
+    "ru": "Русский",
+    "es": "Español"
   },
   "loading": {
     "title": "Loading a three-dimensional design element"
@@ -425,5 +426,18 @@
     "map": "The live demand map",
     "mapSub": "All demand and supply on one map",
     "view": "View"
-  }
+  },
+  "headlines": [
+    "Financial security from creating together",
+    "Smart business management with an open heart",
+    "Full independence inside a supportive community"
+  ],
+  "videos": {
+    "howItWorksCta": "See how 1💗1 works",
+    "howItWorksLabel": "Video: how 1💗1 works",
+    "thirdWayCta": "Watch the video: the third way — why it is needed",
+    "thirdWayLabel": "Video: the third way",
+    "close": "Close"
+  },
+  "pageUrl": "https://1lev1.com/en"
 }

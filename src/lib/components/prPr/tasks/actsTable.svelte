@@ -336,10 +336,11 @@
             if (newFiltersUi.length === 0 || !newFiltersUi.map(e => e.id).includes(acts[i].tafkidims.data[t].id)) {
               newFiltersUi.push({
                 id: acts[i].tafkidims.data[t].id,
-                word: {
-                  he: acts[i].tafkidims.data[t].attributes?.localizations?.data ? acts[i].tafkidims.data[t].attributes.localizations.data[0].attributes.roleDescription : acts[i].tafkidims.data[t].attributes.roleDescription,
-                  en: acts[i].tafkidims.data[t].attributes.roleDescription
-                },
+                // Role names come from Strapi; Hebrew lives in `localizations`.
+                word:
+                  $lang === 'he' && acts[i].tafkidims.data[t].attributes?.localizations?.data?.[0]
+                    ? acts[i].tafkidims.data[t].attributes.localizations.data[0].attributes.roleDescription
+                    : acts[i].tafkidims.data[t].attributes.roleDescription,
                 checked: false,
                 color: colors[counter]
               });
@@ -411,7 +412,7 @@
               big={false}
               sm={false}
               bg={ui.color}
-              word={ui.word[$lang]}
+              word={ui.word}
               closei={!ui.checked}
               openi={ui.checked}
             />

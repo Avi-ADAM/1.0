@@ -1,7 +1,6 @@
 // Voting and decision processing utilities for lev page
 import { getProjectData } from '$lib/stores/projectStore.js';
 import { getOccurrence } from '$lib/func/getOccurrence.svelte';
-import tr from '$lib/translations/tr.json';
 
 export function processVotingData(items, myid) {
   for (let k = 0; k < items.length; k++) {

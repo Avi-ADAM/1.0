@@ -1,6 +1,6 @@
 <script lang="ts">
   import { lang } from '$lib/stores/lang.js';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
 
   interface Props {
     votes: number;
@@ -12,9 +12,8 @@
 
   let { votes, urgent, suggestions, activePurchases, activeSales }: Props = $props();
 
-  // Translation helper with graceful fallback (tr.hub only has he/en/ar).
-  const L = (key: keyof typeof tr.hub) =>
-    (tr.hub[key] as Record<string, string>)[$lang] ?? (tr.hub[key] as Record<string, string>).en;
+  // Translation helper via the i18n store.
+  const L = (key: string): string => $t(`hub.${key}`);
 
   let labels = $derived({
     votes: L('votes'),
@@ -24,16 +23,9 @@
     sales: L('sales')
   });
 
-  const caughtUp = { he: 'הכל מעודכן', en: 'All caught up', ar: 'كل شيء محدث', ru: 'Всё в порядке' };
-  const waiting = {
-    he: 'ממתינות להצבעה שלך',
-    en: 'waiting for your vote',
-    ar: 'بانتظار تصويتك',
-    ru: 'ждут вашего голоса'
-  };
 
-  let caughtUpLabel = $derived(caughtUp[$lang as keyof typeof caughtUp] ?? caughtUp.en);
-  let waitingLabel = $derived(waiting[$lang as keyof typeof waiting] ?? waiting.en);
+  let caughtUpLabel = $derived($t('hub.kpi.caughtUp'));
+  let waitingLabel = $derived($t('hub.kpi.waiting'));
 
   // Secondary stat tiles — each deep-links into the matching lev quantum slice.
   let tiles = $derived([

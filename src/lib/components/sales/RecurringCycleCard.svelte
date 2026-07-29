@@ -1,6 +1,6 @@
 <script>
+  import { t } from '$lib/translations';
   import { executeAction } from '$lib/client/actionClient';
-  import { lang } from '$lib/stores/lang.js';
   import { toast } from 'svelte-sonner';
 
   /**
@@ -27,42 +27,6 @@
 
   /** @type {{ cycle: Cycle, role?: 'holder' | 'customer', onDone?: () => void }} */
   let { cycle, role = 'holder', onDone = () => {} } = $props();
-
-  const texts = {
-    he: {
-      month: 'חודש',
-      expected: 'סכום צפוי',
-      customerReported: (name, amt) => `${name || 'הלקוח'} דיווח שהעביר ${amt} ₪`,
-      customerWaiting: 'הלקוח טרם דיווח על העברה החודש',
-      amountLabelHolder: 'כמה נכנס החודש בפועל? (0 = לא נכנס)',
-      amountLabelCustomer: 'כמה העברת החודש? (0 = לא העברתי)',
-      report: 'דיווח',
-      confirmReceived: 'אישור שהתקבל',
-      closeEngine: 'לסגור את הוראת הקבע (לא ייפתחו חודשים נוספים)',
-      reported: 'הדיווח נרשם — תודה!',
-      customer: 'לקוח',
-      seller: 'מוכר',
-      invalid: 'נדרש סכום תקין (0 ומעלה)',
-      error: 'שגיאה בשליחת הדיווח'
-    },
-    en: {
-      month: 'Month',
-      expected: 'Expected amount',
-      customerReported: (name, amt) => `${name || 'The customer'} reported transferring ${amt} ₪`,
-      customerWaiting: 'The customer has not reported a transfer this month yet',
-      amountLabelHolder: 'How much actually came in this month? (0 = nothing)',
-      amountLabelCustomer: 'How much did you transfer this month? (0 = nothing)',
-      report: 'Report',
-      confirmReceived: 'Confirm received',
-      closeEngine: 'Close this standing order (no further monthly cycles)',
-      reported: 'Report recorded — thanks!',
-      customer: 'Customer',
-      seller: 'Seller',
-      invalid: 'A valid amount (0 or more) is required',
-      error: 'Failed to submit the report'
-    }
-  };
-  let t = $derived(texts[$lang] || texts.he);
 
   // Seed once from the cycle — the card is keyed by cycle.id, so a data
   // refresh remounts it with fresh values.
@@ -94,7 +58,7 @@
   async function submit() {
     const num = Number(amount);
     if (amount === '' || Number.isNaN(num) || num < 0) {
-      toast.error(t.invalid);
+      toast.error($t('project.recurringCycle.invalid'));
       return;
     }
     busy = true;
@@ -106,12 +70,12 @@
       if (role === 'holder' && closeEngine) params.closeEngine = true;
       const result = await executeAction(key, params);
       if (result?.success === false) {
-        throw new Error(result?.error?.message || t.error);
+        throw new Error(result?.error?.message || $t('project.recurringCycle.error'));
       }
-      toast.success(t.reported);
+      toast.success($t('project.recurringCycle.reported'));
       onDone();
     } catch (e) {
-      toast.error(e?.message || t.error);
+      toast.error(e?.message || $t('project.recurringCycle.error'));
     } finally {
       busy = false;
     }
@@ -124,45 +88,45 @@
       {cycle.productName || '🔁'}
       {#if cycle.projectName}<span class="cycle-project">· {cycle.projectName}</span>{/if}
     </span>
-    <span class="cycle-month">{t.month} {monthLabel}</span>
+    <span class="cycle-month">{$t('project.recurringCycle.month')} {monthLabel}</span>
   </div>
 
   <div class="cycle-meta">
     {#if cycle.expectedAmount != null}
-      <span>{t.expected}: <b>{cycle.expectedAmount} ₪</b></span>
+      <span>{$t('project.recurringCycle.expected')}: <b>{cycle.expectedAmount} ₪</b></span>
     {/if}
     {#if role === 'holder' && cycle.customerName}
-      <span>{t.customer}: <b>{cycle.customerName}</b></span>
+      <span>{$t('project.recurringCycle.customer')}: <b>{cycle.customerName}</b></span>
     {/if}
     {#if role === 'customer' && cycle.sellerName}
-      <span>{t.seller}: <b>{cycle.sellerName}</b></span>
+      <span>{$t('project.recurringCycle.seller')}: <b>{cycle.sellerName}</b></span>
     {/if}
   </div>
 
   {#if role === 'holder' && cycle.customerName}
     {#if cycle.customerReportedAt && cycle.customerAmount != null}
       <p class="cycle-customer-line ok">
-        💳 {t.customerReported(cycle.customerName, cycle.customerAmount)}
+        💳 {$t('project.recurringCycle.customerReported', { name: cycle.customerName || $t('project.recurringCycle.customer'), amt: cycle.customerAmount })}
       </p>
     {:else}
-      <p class="cycle-customer-line">💳 {t.customerWaiting}</p>
+      <p class="cycle-customer-line">💳 {$t('project.recurringCycle.customerWaiting')}</p>
     {/if}
   {/if}
 
   <label class="cycle-amount">
-    <span>{role === 'customer' ? t.amountLabelCustomer : t.amountLabelHolder}</span>
+    <span>{role === 'customer' ? $t('project.recurringCycle.amountLabelCustomer') : $t('project.recurringCycle.amountLabelHolder')}</span>
     <input type="number" min="0" step="any" bind:value={amount} disabled={busy} />
   </label>
 
   {#if role === 'holder'}
     <label class="cycle-close">
       <input type="checkbox" bind:checked={closeEngine} disabled={busy} />
-      <span>{t.closeEngine}</span>
+      <span>{$t('project.recurringCycle.closeEngine')}</span>
     </label>
   {/if}
 
   <button class="cycle-submit" onclick={submit} disabled={busy}>
-    {#if busy}⏳{:else}{confirmsCustomer ? `✔ ${t.confirmReceived}` : t.report}{/if}
+    {#if busy}⏳{:else}{confirmsCustomer ? `✔ ${$t('project.recurringCycle.confirmReceived')}` : $t('project.recurringCycle.report')}{/if}
   </button>
 </div>
 

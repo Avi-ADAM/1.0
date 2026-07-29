@@ -11,7 +11,7 @@
   import { Tour } from 'svelte-tour';
   import TourTip from '$lib/components/tour/tourMeEnd.svelte';
   import { lang, doesLang, langUs } from '$lib/stores/lang.js';
-  import { locale } from '$lib/translations';
+  import { locale, t } from '$lib/translations';
   import { onMount, onDestroy, tick } from 'svelte';
   import { browser } from '$app/environment';
   import { executeAction } from '$lib/client/actionClient';
@@ -79,11 +79,7 @@
     }
 
     if (!hasFiles) {
-      const msg = {
-        he: 'נא לבחור קובץ להעלאה',
-        en: 'Please select a file to upload'
-      };
-      toast.warning(msg[$lang]);
+      toast.warning($t('pages.me.pickFile'));
       a = 0;
       return;
     }
@@ -113,11 +109,7 @@
     } catch (e) {
       error1 = e;
       console.log('An error occurred:', e);
-      const msg = {
-        he: 'שגיאה בהעלאת קובץ',
-        en: 'Error uploading file'
-      };
-      toast.error(msg[$lang]);
+      toast.error($t('pages.me.uploadError'));
       a = 0;
     }
   }
@@ -153,7 +145,10 @@
   // Keep the language stores in sync with the user's saved preference.
   $effect(() => {
     const lng = data.meData?.lang;
-    if (browser && (lng === 'he' || lng === 'en')) {
+    // Accept every locale the site ships, not just he/en — the old whitelist
+    // silently dropped a saved ar/ru/es preference, so those users kept
+    // browsing in whatever the cookie happened to hold.
+    if (browser && ['he', 'en', 'ar', 'ru', 'es'].includes(lng)) {
       if ($lang !== lng) {
         lang.set(lng);
         locale.set(lng);
@@ -454,146 +449,17 @@
       window.removeEventListener('online', goOnline);
       window.removeEventListener('offline', goOffline);
     });
-  });
-
-  const title = {
-    he: 'פרופיל והגדרות 1💗1',
-    en: '1💗1 profile and settings',
-    ar: '1💗1 الملف الشخصي والإعدادات'
-  };
-  const deletew = { he: 'מחיקה', en: 'delete', ar: 'حذف' };
-  const om = {
-    he: 'רק רגע בבקשה',
-    en: 'one moment please',
-    ar: 'لحظة من فضلك'
-  };
-  const message1 = {
-    he: 'לחיצה על הכתר מובילה ללב 1💗1, שם נמצאות ההצעות, ההצבעות והפעולות השונות',
-    en: 'click on the crown to move to the heart of 1💗1, there are offers, voting and various actions',
-    ar: 'انقر على التاج للانتقال إلى قلب 1💗1، حيث توجد العروض والتصويت والإجراءات المختلفة'
-  };
-  const levtitle = {
-    he: 'ללב 1💗1',
-    en: 'to the heart of 1💗1',
-    ar: 'إلى قلب 1💗1'
-  };
-  const message2 = {
-    he: 'רשימת הכישורים שלך, לחיצה על כפתור העריכה להוספת או הסרת כישורים',
-    en: 'list of your skills, press the edit button below to add more skills or to remove some from your list',
-    ar: 'قائمة مهاراتك، اضغط على زر التعديل أدناه لإضافة أو إزالة المهارات'
-  };
-  const message3 = {
-    he: 'רשימת התפקידים, עריכה להוספת או הסרת תפקידים, יש ללחוץ על כפתור האישור למטה כדי שהעריכה תישמר',
-    en: 'youre roles list, after adding or removing remember to press the button below to save your edit',
-    ar: 'قائمة أدوارك، بعد الإضافة أو الإزالة اضغط على الزر أدناه لحفظ التعديل'
-  };
-  const message4 = {
-    he: 'רשימת המשאבים שלך (למטה מימין), נציע לך רקמות שנדרשים להן המשאבים שהצעת',
-    en: "Bottom right is youre resource list, on the heart you'll get offers from FreeMates who need them",
-    ar: 'أسفل اليمين قائمة مواردك، في القلب ستحصل على عروض من الأعضاء الذين يحتاجونها'
-  };
-  const message5 = {
-    he: 'רשימת הערכים שלך, אנו נציע לך רקמות שמקדמות ערכים כמו אלו שבחרת',
-    en: 'list of your Vallues, we will offer you FreeMates who promoting those vallues',
-    ar: 'قائمة قيمك، سنقترح لك مجموعات تعزز تلك القيم'
-  };
-  const message6 = {
-    he: 'רשימת דרכי היצירה שלך (למטה משמאל), אנו נציע לך משימות שעשייתן היא בתנאים שהצבת',
-    en: 'Bottom left are your ways of creation list, we will offer you missions that accsept those terms',
-    ar: 'أسفل اليسار قائمة طرق الإبداع، سنقترح لك مهام تقبل تلك الشروط'
-  };
-  const message7 = {
-    he: 'עריכת תמונת הפרופיל',
-    en: 'edit your profile picture',
-    ar: 'تعديل صورة الملف الشخصي'
-  };
-  const message8 = {
-    he: ' העלאת תמונת פרופיל חדשה',
-    en: 'upload new profile picture',
-    ar: 'رفع صورة ملف شخصي جديدة'
-  };
-  const message9 = {
-    he: 'רשימת הרקמות שלך, ריקמה היא קבוצה שמשתפת פעולה, לחיצה על שם הריקמה למעבר למוח שלה, המנורה למטה משמשת בכדי ליצור ריקמה חדשה',
-    en: 'your FreeMates list, FreeMates is a group who Collaborate, press on FreeMates name to go to her Brain, the lamp bellow is for creating a new FreeMates',
-    ar: 'قائمة مجموعاتك، FreeMates مجموعة تتعاون معاً، اضغط على اسم المجموعة للانتقال إلى عقلها، المصباح أدناه لإنشاء مجموعة جديدة'
-  };
-  const myfr = { he: 'הרקמות שלי', en: 'My FreeMates', ar: 'مجموعاتي' };
-  const crnfr = {
-    he: 'יצירת ריקמה חדשה',
-    en: 'create a new FreeMates',
-    ar: 'إنشاء مجموعة جديدة'
-  };
-  const message10 = {
-    he: 'כמה הרווחת עד כה (היהלום למטה במרכז), סכום הכסף הכולל שקיבלת מרקמות מופיע כאן',
-    en: 'The Diamond down shows how much you earn from FreeMates so far',
-    ar: 'الماسة أدناه تعرض مجموع أرباحك من المجموعات حتى الآن'
-  };
-  const sofartit = {
-    he: 'סך הכל הרווחתי',
-    en: 'total earnings',
-    ar: 'إجمالي الأرباح'
-  };
-  const editbas = {
-    he: 'עריכת פרטים בסיסיים והגדרות',
-    en: 'Edit Basic Information and Settings',
-    ar: 'تعديل المعلومات الأساسية والإعدادات'
-  };
-  const message11 = {
-    he: 'עריכת פרטים והגדרות, הפעלת התראות במכשיר, בחירת יום חופשי וביטול הצגת המדריך',
-    en: 'edit your info, settings, add device alerts, choosing a free day and cencel guid',
-    ar: 'تعديل بياناتك والإعدادات، إضافة تنبيهات الجهاز، اختيار يوم إجازة وإلغاء الدليل'
-  };
-  const message12 = {
-    he: "סרגל הניווט התחתון - מוח הרקמות, צ'אט, יצירת פרויקט חדש, הלב ותפריט הפרופיל",
-    en: 'Bottom navigation bar - Brain of FreeMates, Chat, Create new project, Heart, and Profile menu',
-    ar: 'شريط التنقل السفلي - عقل المجموعات، المحادثة، إنشاء مشروع جديد، القلب، وقائمة الملف الشخصي'
-  };
-  const cencel = { he: 'ביטול', en: 'cencel', ar: 'إلغاء' };
-  const sk = { he: 'כישורים', en: 'skills', ar: 'مهارات' };
-  const rl = { he: 'תפקידים', en: 'roles', ar: 'أدوار' };
-  const ms = { he: 'משאבים', en: 'resources', ar: 'موارد' };
-  const ar = { he: 'ערכים', en: 'Vallues', ar: 'قيم' };
-  const ww = { he: 'דרכי היצירה', en: 'ways of creation', ar: 'طرق الإبداع' };
-  const plv = { he: 'בחירת ערכים', en: 'choose Vallues', ar: 'اختيار قيم' };
-  const pls = { he: 'בחירת כישורים', en: 'choose skills', ar: 'اختيار مهارات' };
-  const plm = {
-    he: 'בחירת משאבים',
-    en: 'choose resources',
-    ar: 'اختيار موارد'
-  };
-  const plw = {
-    he: 'בחירת דרכי יצירה',
-    en: 'choose ways of creation',
-    ar: 'اختيار طرق الإبداع'
-  };
-  const plt = { he: 'בחירת תפקידים', en: 'choose roles', ar: 'اختيار أدوار' };
-  let width = $state(),
+  });  let width = $state(),
     height = $state();
   let showSaveDialog = $state(data.showGuide);
-  const dialogHeader = {
-    he: 'הצגת מדריך משתמש',
-    en: 'Show User Guide',
-    ar: 'عرض دليل المستخدم'
-  };
-  const innerText = {
-    he: 'האם ברצונך לראות מדריך שימוש ב1💗1? \n (ניתן לבטל או להחזיר את הדו שיח הזה בפעמים הבאות בתפריט ההגדרות) ',
-    en: 'Would you like to see the user guide?',
-    ar: 'هل تريد رؤية دليل استخدام 1💗1؟ \n (يمكنك إلغاء أو إعادة هذا الحوار في المرات القادمة من قائمة الإعدادات)'
-  };
-  const innerDialogButton = {
-    he: 'אשמח',
-    en: 'Yes',
-    ar: 'نعم'
-  };
-  const clearButton = {
-    he: 'לא',
-    en: 'No',
-    ar: 'لا'
-  };
+
+
+
+
 </script>
 
 <svelte:head>
-  <title>{title[$lang]}</title>
+  <title>{$t('pages.me.title')}</title>
 </svelte:head>
 {#if (!online || data.loadError) && meData}
   <div class="stale-banner" dir="rtl">
@@ -614,7 +480,7 @@
         onclick={() => invalidateAll()}
         class="bg-gradient-to-br from-barbi to-mpink text-gold font-bold py-2 px-4 rounded-full mt-2"
       >
-        {$lang === 'he' ? 'נסה שוב' : 'Retry'}
+        {$t('pages.me.retry')}
       </button>
     </div>
   </div>
@@ -625,10 +491,10 @@
 {:else}
   <Dialog
     bind:showSaveDialog
-    {dialogHeader}
-    {innerText}
-    {innerDialogButton}
-    {clearButton}
+    dialogHeader={$t('me.guide.header')}
+    innerText={$t('me.guide.text')}
+    innerDialogButton={$t('me.guide.yes')}
+    clearButton={$t('me.guide.no')}
     onSaveTimer={async () => {
       showSaveDialog = false;
       // Resume guide → profilManualAlready=false
@@ -666,12 +532,12 @@
               <h3 class="text-barbi">{messege}</h3>
               <button
                 class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
-                onclick={han}>{deletew[$lang]}</button
+                onclick={han}>{$t('pages.me.deletew')}</button
               >
             </div>
           {:else if a == 2}
             <div class="sp bg-gold">
-              <h3 class="text-barbi">{om[$lang]}</h3>
+              <h3 class="text-barbi">{$t('pages.me.om')}</h3>
               <br />
               <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
               ></RingLoader>
@@ -684,11 +550,11 @@
   {#if a == 0 && isOpenM}
     <div class="center-upload">
       <Addnewp onMessage={callbackFunction} current={picLink} />
-      <button onclick={closer}>{cencel[$lang]}</button>
+      <button onclick={closer}>{$t('pages.me.cencel')}</button>
     </div>
   {:else if a == 2 && isOpenM}
     <div class="center-upload">
-      <h3 class="text-barbi">{om[$lang]}</h3>
+      <h3 class="text-barbi">{$t('pages.me.om')}</h3>
       <br />
       <RingLoader size="40" color="#ff00ae" unit="px" duration="2s"
       ></RingLoader>
@@ -710,9 +576,9 @@
         <!-- Snippet לכתר (יוזרק למעלה) -->
         {#snippet crownContent()}
           <a data-sveltekit-prefetch target="_self" href="/lev">
-            <TourItem message={message1[$lang]}>
+            <TourItem message={$t('pages.me.message1')}>
               <img
-                title={levtitle[$lang]}
+                title={$t('pages.me.levtitle')}
                 class="ceterr name-hover"
                 src="https://res.cloudinary.com/love1/image/upload/v1641481504/newC_qq5z3l.svg"
                 alt="link to the heart page"
@@ -727,9 +593,9 @@
             <button
               onclick={openen}
               class="hover:bg-gold text-mturk hover:text-barbi rounded-full"
-              title={message7[$lang]}
+              title={$t('pages.me.message7')}
             >
-              <TourItem message={message7[$lang]}>
+              <TourItem message={$t('pages.me.message7')}>
                 <svg style="width:32px;height:32px" viewBox="0 0 24 24">
                   <path
                     fill="currentColor"
@@ -744,10 +610,10 @@
             <a
               href="/me/settings"
               data-sveltekit-prefetch
-              title={editbas[$lang]}
+              title={$t('pages.me.editbas')}
               class="hover:bg-gold text-mturk hover:text-barbi rounded-full"
             >
-              <TourItem message={message11[$lang]}>
+              <TourItem message={$t('pages.me.message11')}>
                 <svg style="width:32px;height:32px" viewBox="0 0 24 24">
                   <path
                     transition:draw|local={{ duration: 1000 }}
@@ -764,9 +630,9 @@
             <button
               onclick={openen}
               class="hover:bg-gold text-mturk hover:text-barbi rounded-full"
-              title={message8[$lang]}
+              title={$t('pages.me.message8')}
             >
-              <TourItem message={message8[$lang]}>
+              <TourItem message={$t('pages.me.message8')}>
                 <svg style="width:32px;height:32px" viewBox="0 0 24 24">
                   <path
                     fill="currentColor"
@@ -780,10 +646,10 @@
 
         {#snippet diamondContent()}
           <!-- עוטפים את היהלום במדריך (TourItem) ומעבירים אליו את הסכום והכותרת -->
-          <TourItem message={message10[$lang]}>
+          <TourItem message={$t('pages.me.message10')}>
             <Diamond
               total={total != null ? total : 0}
-              title={sofartit[$lang]}
+              title={$t('pages.me.sofartit')}
             />
           </TourItem>
         {/snippet}
@@ -797,7 +663,7 @@
                 ? `selected ${isMobileOrTablet ? 'h-[calc(100vh-3rem)]' : 'h-screen'}`
                 : ' a1'}"
             >
-              <TourItem message={message2[$lang]}>
+              <TourItem message={$t('pages.me.message2')}>
                 <Edit
                   {width}
                   onAddnew={addnew}
@@ -808,13 +674,13 @@
                   addSl={addSl1}
                   meData={odata}
                   {allvn}
-                  Valname={sk[$lang]}
+                  Valname={$t('pages.me.sk')}
                   valc={'skillName'}
                   bind:data={meData.skills.data}
                   datan={'skil'}
                   linkp={'skills'}
                   kish={'skills'}
-                  placeholder={pls[$lang]}
+                  placeholder={$t('pages.me.pls')}
                 />
               </TourItem>
             </div>
@@ -823,7 +689,7 @@
                 ? `selected ${isMobileOrTablet ? 'h-[calc(100vh-3rem)]' : 'h-screen'}`
                 : ' a2'}"
             >
-              <TourItem message={message3[$lang]}>
+              <TourItem message={$t('pages.me.message3')}>
                 <Edit
                   {width}
                   onAddnew={addnew}
@@ -834,18 +700,18 @@
                   addSl={addSl2}
                   meData={odata}
                   {allvn}
-                  Valname={rl[$lang]}
+                  Valname={$t('pages.me.rl')}
                   valc={'roleDescription'}
                   bgi={'pink'}
                   bind:data={meData.tafkidims.data}
                   datan={'taf'}
                   linkp={'tafkidims'}
                   kish={'tafkidims'}
-                  placeholder={plt[$lang]}
+                  placeholder={$t('pages.me.plt')}
                 />
               </TourItem>
             </div>
-            <TourItem message={message4[$lang]}>
+            <TourItem message={$t('pages.me.message4')}>
               <div
                 id="my-resources"
                 class="category-wrapper {current === 'a3' && mass !== true
@@ -867,13 +733,13 @@
                   meData={odata}
                   {allvn}
                   bgi={'indigo'}
-                  Valname={ms[$lang]}
+                  Valname={$t('pages.me.ms')}
                   valc={'name'}
                   bind:data={meData.sps.data}
                   datan={'mash'}
                   linkp={'mashaabims'}
                   kish={'sps'}
-                  placeholder={plm[$lang]}
+                  placeholder={$t('pages.me.plm')}
                 />
               </div>
             </TourItem>
@@ -883,7 +749,7 @@
                 ? `selectedl ${isMobileOrTablet ? 'h-[calc(100vh-3rem)]' : 'h-screen'}`
                 : ' a4'}"
             >
-              <TourItem message={message5[$lang]}>
+              <TourItem message={$t('pages.me.message5')}>
                 <Edit
                   {width}
                   onAddnew={addnew}
@@ -894,18 +760,18 @@
                   addSl={addSl4}
                   meData={odata}
                   {allvn}
-                  Valname={ar[$lang]}
+                  Valname={$t('pages.me.valuesLabel')}
                   bgi={'gold'}
                   valc={'valueName'}
                   bind:data={meData.vallues.data}
                   datan={'val'}
                   linkp={'vallues'}
                   kish={'vallues'}
-                  placeholder={plv[$lang]}
+                  placeholder={$t('pages.me.plv')}
                 />
               </TourItem>
             </div>
-            <TourItem message={message6[$lang]}>
+            <TourItem message={$t('pages.me.message6')}>
               <div
                 class="category-wrapper {current === 'a5'
                   ? `selectedl ${isMobileOrTablet ? 'h-[calc(100vh-3rem)]' : 'h-screen'}`
@@ -921,14 +787,14 @@
                   addSl={addSl5}
                   meData={odata}
                   {allvn}
-                  Valname={ww[$lang]}
+                  Valname={$t('pages.me.ww')}
                   bgi={'yellow'}
                   valc={'workWayName'}
                   bind:data={meData.work_ways.data}
                   datan={'work'}
                   linkp={'workWays'}
                   kish={'work_ways'}
-                  placeholder={plw[$lang]}
+                  placeholder={$t('pages.me.plw')}
                 />
               </div>
             </TourItem>
@@ -942,14 +808,14 @@
           <OfferingsBadges uid={data.uid} />
         </div>
         <div class="a6">
-          <TourItem message={message9[$lang]}>
+          <TourItem message={$t('pages.me.message9')}>
             <div
               in:fly|local={{ x: -(width / 2), opacity: 0.5 }}
               out:scale|local={{ opacity: 0.5, start: 0.1 }}
               class="another"
               dir="rtl"
             >
-              <h2 class="cot">{myfr[$lang]}</h2>
+              <h2 class="cot">{$t('pages.me.myfr')}</h2>
               {#if load == false}
                 <div class="inner-scroll d pro">
                   {#each meData.projects_1s.data as data, i}
@@ -978,28 +844,28 @@
               {/if}
 
               <button
-                aria-label={crnfr[$lang]}
+                aria-label={$t('pages.me.crnfr')}
                 style="z-index: 7;"
                 class=" hover:scale-150"
                 onclick={() => {
                   iwant = false;
                   addP = true;
                 }}
-                title={crnfr[$lang]}
+                title={$t('pages.me.crnfr')}
               >
                 <CrNewProject />
               </button>
             </div>
           </TourItem>
         </div>
-        <TourItem message={message12[$lang]}>
+        <TourItem message={$t('pages.me.message12')}>
           <div class="footer-tour-anchor" aria-hidden="true"></div>
         </TourItem>
       </div>
     </div>
   {:else if addP == true}
     <button
-      title={cencel[$lang]}
+      title={$t('pages.me.cencel')}
       onclick={() => (addP = false)}
       style="margin: 0 auto;"
       class=" hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full"

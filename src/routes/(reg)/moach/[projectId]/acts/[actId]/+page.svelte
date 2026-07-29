@@ -1,6 +1,6 @@
 <script>
+  import { t } from '$lib/translations';
   import { page } from '$app/state';
-  import { lang } from '$lib/stores/lang.js';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   const moachStore = getMoachStore();
   import { sendToSer } from '$lib/send/sendToSer.js';
@@ -25,13 +25,6 @@
     }
   });
 
-  const i18n = {
-    he: { assignee: 'מבצע', validator: 'מאשר', actions: 'פעולות', markDone: 'סימון כבוצע', validate: 'אישור פעולה' },
-    en: { assignee: 'Assignee', validator: 'Validator', actions: 'Actions', markDone: 'Mark Done', validate: 'Validate' },
-    ar: { assignee: 'المكلف', validator: 'الموثק', actions: 'إجراءات', markDone: 'تحديد كمكتمل', validate: 'توثيق' }
-  };
-  let t = $derived(i18n[$lang] || i18n.en);
-
   let jsonLd = $derived(act ? {
     "@context": "https://schema.org",
     "@type": "MoachEntity",
@@ -41,7 +34,7 @@
     "title": act.attributes.shem,
     "status": act.attributes.status === 1 ? "done" : "open",
     "availableActions": [
-      { "id": "markActDone", "label": t.markDone, "actionKey": "markActDone" }
+      { "id": "markActDone", "label": $t('moach.acts.markDone'), "actionKey": "markActDone" }
     ]
   } : null);
 </script>
@@ -82,16 +75,16 @@
 
       <div class="space-y-6">
         <section id="participants" class="bg-white p-6 rounded-xl shadow-sm">
-          <h2 class="text-lg font-bold mb-4 border-b pb-2">{t.assignee}</h2>
+          <h2 class="text-lg font-bold mb-4 border-b pb-2">{$t('moach.acts.assignee')}</h2>
           <div class="flex items-center gap-3">
              <span class="font-medium">{act.attributes.my?.data?.attributes?.username || 'Unassigned'}</span>
           </div>
         </section>
 
         <aside id="actions" aria-label="actions" class="bg-white p-6 rounded-xl shadow-sm">
-          <h2 class="text-lg font-bold mb-4 border-b pb-2">{t.actions}</h2>
+          <h2 class="text-lg font-bold mb-4 border-b pb-2">{$t('moach.acts.actions')}</h2>
           <button class="w-full py-2 px-4 bg-primary text-white rounded-lg font-bold hover:opacity-90 transition-opacity">
-            {t.markDone}
+            {$t('moach.acts.markDone')}
           </button>
         </aside>
       </div>

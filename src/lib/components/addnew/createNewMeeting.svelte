@@ -1,5 +1,5 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { username } from '$lib/stores/pendMisMes';
   import { page } from '$app/state';
   /**
@@ -12,23 +12,8 @@
   import TextInput from '$lib/celim/ui/input/textInput.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { sendToSer } from '$lib/send/sendToSer.js';
-  import { lang } from '$lib/stores/lang';
   import { onMount } from 'svelte';
   import { MultiSelect } from 'svelte-multiselect';
-  const placeholder = {
-    he: 'צירוף לפגישה',
-    en: 'Choose Users to add to your meeting'
-  };
-  const addn = { he: 'עוד פרטים על הפגישה', en: 'Add meeting details' };
-  const head = { he: 'יצירת פגישת זהב חדשה', en: 'Create New Gold Meeting' };
-  const explanetion = {
-    he: 'פגישת זהב היא פגישה ללא תאריך מוגדר מראש, זמן הפגישה נקבע בזמן הזהב הזמן שנוח ומסתדר לכל המשתתפים והמשתתפות.',
-    en: "Gold meeting is a meeting without a predefined date, the time of meeting is set in the golden timing when it is compteble for all the participant's."
-  };
-  const second = {
-    he: 'בכדי שהקסם יקרה יש לעדכן סטטוס ללייב בכל פעם שיש לך זמן לפגישה, ניתן לעדכן כאן למעלה או דרך הבוט שלנו לטלגרם',
-    en: 'For the magic to happen, you have to update the status to live when you are avauilable for the meeting, you can update it in the top or through our telegram bot.'
-  };
   let name = $state('');
   let sucsses = $state(false);
 
@@ -109,7 +94,7 @@
       class="font-bold text-center underline text-decoration-solid"
       style="font-size: 1rem; line-height: normal; color: var(--barbi-pink); "
     >
-      {head[$lang]}
+      {$t('addnew.createNewMeeting.head')}
     </h1>
     {#if explanetionOpen == false}
       <button
@@ -133,33 +118,33 @@
         class="text-center"
         style="font-size: 0.8rem; line-height: normal; color: var(--barbi-pink); "
       >
-        {explanetion[$lang]}
+        {$t('addnew.createNewMeeting.explanetion')}
       </p>
       <p
         class="text-center"
         style="font-size: 0.8rem; line-height: normal; color: var(--barbi-pink); "
       >
-        {second[$lang]}
+        {$t('addnew.createNewMeeting.second')}
       </p>
     </div>
   {/if}
   <TextInput
     color="barbi"
     bind:text={name}
-    label={{ he: 'שם הפגישה', en: 'Meeting Name' }}
+    label={$t('addnew.meeting.nameLabel')}
   />
   <h3 class="text-start underline decoration-barbi text-barbi">
-    {addn[$lang]}
+    {$t('addnew.createNewMeeting.addn')}
   </h3>
   <RichText bind:outpot />
   <h3 class="text-start underline decoration-barbi text-barbi">
-    {placeholder[$lang]}
+    {$t('addnew.createNewMeeting.placeholder')}
   </h3>
   <MultiSelect
     {loading}
     bind:selected
     options={users.map((c) => c.attributes.username)}
-    placeholder={placeholder[$lang]}
+    placeholder={$t('addnew.createNewMeeting.placeholder')}
     outerDivClass="!bg-gold !text-barbi"
     inputClass="!bg-gold !text-barbi"
   />

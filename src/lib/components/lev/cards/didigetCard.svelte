@@ -1,6 +1,5 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
-  import { lang } from '$lib/stores/lang.js';
+  import { isRtl, t } from '$lib/translations';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import { toggleScrollable, isScrolable } from './isScrolable.svelte.js';
   import CardHeader from './CardHeader.svelte';
@@ -64,103 +63,6 @@
     onProj
   } = $props();
 
-  const ishur = {
-    he: 'אישור קבלת',
-    en: 'Approve receiving',
-    ar: 'تأكيد الاستلام'
-  };
-  const me = { he: 'מאת', en: 'from', ar: 'من' };
-
-  // תרגומים
-  const translations = {
-    transferMoney: {
-      he: 'אישור העברת כספים',
-      en: 'Approve money transfer',
-      ar: 'تأكيد تحويل الأموال'
-    },
-    receiveMoney: {
-      he: 'אישור קבלת כספים',
-      en: 'Approve receiving money',
-      ar: 'تأكيد استلام الأموال'
-    },
-    transferring: { he: 'העברת', en: 'Transferring', ar: 'تحويل' },
-    receiving: { he: 'קבלת', en: 'Receiving', ar: 'استلام' },
-    receiver: { he: 'מקבל', en: 'Receiver', ar: 'المستلم' },
-
-    // הודעות מצב התחלתי
-    coordinateWith: {
-      he: (name) => `💬 מומלץ לתאם עם ${name} את הדרך המועדפת להעברת הכסף`,
-      en: (name) =>
-        `💬 It's recommended to coordinate with ${name} the preferred way to transfer the money`,
-      ar: (name) =>
-        `💬 يُنصح بالتنسيق مع ${name} حول الطريقة المفضلة لتحويل الأموال`
-    },
-    coordinateReceive: {
-      he: (name) => `💬 מומלץ לתאם עם ${name} את הדרך המועדפת לקבלת הכסף`,
-      en: (name) =>
-        `💬 It's recommended to coordinate with ${name} the preferred way to receive the money`,
-      ar: (name) =>
-        `💬 يُنصح بالتنسيق مع ${name} حول الطريقة المفضلة لاستلام الأموال`
-    },
-
-    // הודעות אחרי שהנותן אישר
-    confirmedTransfer: {
-      he: '✓ אישרת שהעברת את הכסף',
-      en: '✓ You confirmed that you transferred the money',
-      ar: '✓ أكدت أنك حولت الأموال'
-    },
-    waitingConfirmation: {
-      he: (name) => `ממתין לאישור מ-${name} שקיבל`,
-      en: (name) => `Waiting for confirmation from ${name} that they received`,
-      ar: (name) => `في انتظار التأكيد من ${name} أنه استلم`
-    },
-    senderConfirmed: {
-      he: (name, amount) => `${name} אישר שהעביר לך ${amount}`,
-      en: (name, amount) =>
-        `${name} confirmed that they transferred ${amount} to you`,
-      ar: (name, amount) => `${name} أكد أنه حول لك ${amount}`
-    },
-    pleaseConfirm: {
-      he: "אנא סמן אם קיבלת או פנה אליו בצ'אט אם נדרש בירור",
-      en: 'Please confirm if you received or contact them via chat if clarification is needed',
-      ar: 'يرجى التأكيد إذا استلمت أو التواصل عبر الدردشة إذا كان هناك حاجة للتوضيح'
-    },
-
-    // הודעת השלמה
-    completed: {
-      he: '✓ ההעברה הושלמה בהצלחה',
-      en: '✓ The transfer was completed successfully',
-      ar: '✓ تم التحويل بنجاح'
-    },
-
-    // כפתורים
-    confirmTransferred: {
-      he: 'אישור העברה',
-      en: 'Confirm Transfer',
-      ar: 'تأكيد التحويل'
-    },
-    confirmReceived: {
-      he: 'אישור קבלה',
-      en: 'Confirm Receipt',
-      ar: 'تأكيد الاستلام'
-    },
-    openChat: {
-      he: "צ'אט לתיאום",
-      en: 'Chat to coordinate',
-      ar: 'دردشة للتنسيق'
-    },
-    openChatClarify: {
-      he: "צ'אט לבירור",
-      en: 'Chat for clarification',
-      ar: 'دردشة للتوضيح'
-    },
-    viewHistory: {
-      he: 'היסטוריית שיחה',
-      en: 'Chat history',
-      ar: 'سجل المحادثة'
-    }
-  };
-
   function hover(x) {
     onHover?.({ x: x });
   }
@@ -202,7 +104,7 @@
   class="d {isMobileOrTablet()
     ? 'w-full h-full'
     : ' w-[90%] h-[90%]'} lg:w-[90%] {isVisible
-    ? $lang == 'he'
+    ? $isRtl
       ? 'boxleft'
       : 'boxright'
     : ''} flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isScrolable.value
@@ -231,9 +133,9 @@
     logoSrc={src}
     {projectName}
     cardType={kind == 'send'
-      ? translations.transferMoney[$lang]
-      : translations.receiveMoney[$lang]}
-    cardTitle={`${kind == 'send' ? translations.transferring[$lang] : translations.receiving[$lang]} ${amount}`}
+      ? $t('lev.cards.didiget.transferMoney')
+      : $t('lev.cards.didiget.receiveMoney')}
+    cardTitle={`${kind == 'send' ? $t('lev.cards.didiget.transferring') : $t('lev.cards.didiget.receiving')} ${amount}`}
     memberCount={2}
     {glowColor}
     onProjectClick={handleProjectClick}
@@ -260,9 +162,9 @@
             <span
               class="absolute -bottom-1 -right-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white border-2 border-white dark:border-gray-800 shadow"
               title={kind == 'send'
-                ? translations.confirmedTransfer[$lang]
-                : translations.senderConfirmed[$lang](sendname, amount)}
-              aria-label="אישר העברה"
+                ? $t('lev.cards.didiget.confirmedTransfer')
+                : $t('lev.cards.didiget.senderConfirmed', { name: sendname, amount })}
+              aria-label={$t('lev.cards.didiget.senderConfirmedBadge')}
             >
               <svg viewBox="0 0 24 24" class="w-3.5 h-3.5"
                 ><path
@@ -274,8 +176,8 @@
           {:else}
             <span
               class="absolute -bottom-1 -right-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-700 text-white border-2 border-white dark:border-gray-800 shadow"
-              title="טרם אישר העברה"
-              aria-label="טרם אישר העברה"
+              title={$t('lev.cards.didiget.senderPendingBadge')}
+              aria-label={$t('lev.cards.didiget.senderPendingBadge')}
             >
               <svg viewBox="0 0 24 24" class="w-3.5 h-3.5"
                 ><path
@@ -291,7 +193,7 @@
         >
           {sendname}
         </h5>
-        <p class="text-xs text-gray-500 dark:text-gray-400">{me[$lang]}</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400">{$t('lev.cards.didiget.from')}</p>
       </div>
 
       <div class="flex items-center pb-4">
@@ -305,9 +207,9 @@
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d={$lang === 'en'
-              ? 'M13 7l5 5m0 0l-5 5m5-5H6'
-              : 'M11 17l-5-5m0 0l5-5m-5 5h12'}
+            d={$isRtl
+              ? 'M11 17l-5-5m0 0l5-5m-5 5h12'
+              : 'M13 7l5 5m0 0l-5 5m5-5H6'}
           />
         </svg>
       </div>
@@ -323,8 +225,8 @@
           {#if confirmed}
             <span
               class="absolute -bottom-1 -right-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white border-2 border-white dark:border-gray-800 shadow"
-              title="אישר קבלה"
-              aria-label="אישר קבלה"
+              title={$t('lev.cards.didiget.receiverConfirmedBadge')}
+              aria-label={$t('lev.cards.didiget.receiverConfirmedBadge')}
             >
               <svg viewBox="0 0 24 24" class="w-3.5 h-3.5"
                 ><path
@@ -336,8 +238,8 @@
           {:else}
             <span
               class="absolute -bottom-1 -right-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-700 text-white border-2 border-white dark:border-gray-800 shadow"
-              title="טרם אישר קבלה"
-              aria-label="טרם אישר קבלה"
+              title={$t('lev.cards.didiget.receiverPendingBadge')}
+              aria-label={$t('lev.cards.didiget.receiverPendingBadge')}
             >
               <svg viewBox="0 0 24 24" class="w-3.5 h-3.5"
                 ><path
@@ -354,7 +256,7 @@
           {resname}
         </h5>
         <p class="text-xs text-gray-500 dark:text-gray-400">
-          {translations.receiver[$lang]}
+          {$t('lev.cards.didiget.receiver')}
         </p>
       </div>
     </div>
@@ -369,9 +271,9 @@
           class="text-center text-gray-700 dark:text-gray-300 text-sm font-medium"
         >
           {#if kind == 'send'}
-            {translations.coordinateWith[$lang](resname)}
+            {$t('lev.cards.didiget.coordinateWith', { name: resname })}
           {:else}
-            {translations.coordinateReceive[$lang](sendname)}
+            {$t('lev.cards.didiget.coordinateReceive', { name: sendname })}
           {/if}
         </p>
       {:else if sendcon && !confirmed}
@@ -380,25 +282,25 @@
           <p
             class="text-center text-green-600 dark:text-green-400 font-bold mb-1"
           >
-            {translations.confirmedTransfer[$lang]}
+            {$t('lev.cards.didiget.confirmedTransfer')}
           </p>
           <p class="text-center text-gray-600 dark:text-gray-400 text-xs">
-            {translations.waitingConfirmation[$lang](resname)}
+            {$t('lev.cards.didiget.waitingConfirmation', { name: resname })}
           </p>
         {:else}
           <p
             class="text-center text-blue-600 dark:text-blue-400 font-bold mb-1"
           >
-            {translations.senderConfirmed[$lang](sendname, amount)}
+            {$t('lev.cards.didiget.senderConfirmed', { name: sendname, amount })}
           </p>
           <p class="text-center text-gray-700 dark:text-gray-300 text-xs">
-            {translations.pleaseConfirm[$lang]}
+            {$t('lev.cards.didiget.pleaseConfirm')}
           </p>
         {/if}
       {:else if confirmed}
         <!-- שני הצדדים אישרו -->
         <p class="text-center text-green-600 dark:text-green-400 font-bold">
-          {translations.completed[$lang]}
+          {$t('lev.cards.didiget.completed')}
         </p>
       {/if}
     </div>
@@ -412,7 +314,7 @@
       {#if !sendcon && !confirmed}
         <!-- מצב התחלתי - כפתורים לשני הצדדים -->
         <button
-          onmouseenter={() => hover(translations.openChat[$lang])}
+          onmouseenter={() => hover($t('lev.cards.didiget.openChat'))}
           onmouseleave={() => hover('0')}
           class="flex-1 py-2 px-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 font-bold rounded-xl transition-all flex items-center justify-center gap-2"
           onclick={(e) => {
@@ -421,15 +323,15 @@
           }}
         >
           <div class="w-6 h-6"><Chaticon /></div>
-          <span class="text-sm">{translations.openChat[$lang]}</span>
+          <span class="text-sm">{$t('lev.cards.didiget.openChat')}</span>
         </button>
 
         <button
           onmouseenter={() =>
             hover(
               kind == 'send'
-                ? translations.confirmTransferred[$lang]
-                : translations.confirmReceived[$lang]
+                ? $t('lev.cards.didiget.confirmTransferred')
+                : $t('lev.cards.didiget.confirmReceived')
             )}
           onmouseleave={() => hover('0')}
           onclick={(e) => {
@@ -441,15 +343,15 @@
           <div class="w-6 h-6"><Lev /></div>
           <span class="text-sm"
             >{kind == 'send'
-              ? translations.confirmTransferred[$lang]
-              : translations.confirmReceived[$lang]}</span
+              ? $t('lev.cards.didiget.confirmTransferred')
+              : $t('lev.cards.didiget.confirmReceived')}</span
           >
         </button>
       {:else if sendcon && !confirmed}
         {#if kind == 'send'}
           <!-- הנותן אישר - רק כפתור צ'אט -->
           <button
-            onmouseenter={() => hover(translations.openChat[$lang])}
+            onmouseenter={() => hover($t('lev.cards.didiget.openChat'))}
             onmouseleave={() => hover('0')}
             class="w-full py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 font-bold rounded-xl transition-all flex items-center justify-center gap-2"
             onclick={(e) => {
@@ -458,12 +360,12 @@
             }}
           >
             <div class="w-6 h-6"><Chaticon /></div>
-            <span>{translations.openChat[$lang]}</span>
+            <span>{$t('lev.cards.didiget.openChat')}</span>
           </button>
         {:else}
           <!-- המקבל צריך לאשר -->
           <button
-            onmouseenter={() => hover(translations.openChatClarify[$lang])}
+            onmouseenter={() => hover($t('lev.cards.didiget.openChatClarify'))}
             onmouseleave={() => hover('0')}
             class="flex-1 py-2 px-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 font-bold rounded-xl transition-all flex items-center justify-center gap-2"
             onclick={(e) => {
@@ -472,11 +374,11 @@
             }}
           >
             <div class="w-6 h-6"><Chaticon /></div>
-            <span class="text-sm">{translations.openChatClarify[$lang]}</span>
+            <span class="text-sm">{$t('lev.cards.didiget.openChatClarify')}</span>
           </button>
 
           <button
-            onmouseenter={() => hover(translations.confirmReceived[$lang])}
+            onmouseenter={() => hover($t('lev.cards.didiget.confirmReceived'))}
             onmouseleave={() => hover('0')}
             onclick={(e) => {
               e.stopPropagation();
@@ -485,13 +387,13 @@
             class="flex-2 py-2 px-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
           >
             <div class="w-6 h-6"><Lev /></div>
-            <span class="text-sm">{translations.confirmReceived[$lang]}</span>
+            <span class="text-sm">{$t('lev.cards.didiget.confirmReceived')}</span>
           </button>
         {/if}
       {:else if confirmed}
         <!-- הושלם - רק כפתור צ'אט -->
         <button
-          onmouseenter={() => hover(translations.viewHistory[$lang])}
+          onmouseenter={() => hover($t('lev.cards.didiget.viewHistory'))}
           onmouseleave={() => hover('0')}
           class="w-full py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 font-bold rounded-xl transition-all flex items-center justify-center gap-2"
           onclick={(e) => {
@@ -500,7 +402,7 @@
           }}
         >
           <div class="w-6 h-6"><Chaticon /></div>
-          <span>{translations.viewHistory[$lang]}</span>
+          <span>{$t('lev.cards.didiget.viewHistory')}</span>
         </button>
       {/if}
     {:else if low == true}

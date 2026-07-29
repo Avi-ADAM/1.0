@@ -1,4 +1,5 @@
 <script>
+  import { t } from '$lib/translations';
   import Tile from '$lib/celim/tile.svelte';
   import { crossfade } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
@@ -448,27 +449,7 @@ console.log("skillslist",skillslist);
       console.log(error1);
     }
   }
-  //style="margin:auto; overflow:auto;"
-  const cencel = { he: 'ביטול', en: 'cencel' };
-  const less = { he: 'הסרה', en: 'remove' };
-  const bef = { he: 'ה', en: 'My ' };
-  const aft = { he: ' שלי', en: '' };
-  const edito = { he: 'עריכה', en: 'edit' };
-  const edbef = { he: 'עריכת ה', en: 'edit My ' };
-  const edaft = { he: ' שלי ', en: '' };
-  const save = { he: 'שמירה', en: 'save' };
-  const rem = { he: 'הסרת ', en: 'remove ' };
-  const adbf = { he: ' בחירת ', en: 'choose more ' };
-  const adaf = { he: ' נוספים', en: '' };
-  const om = { he: 'רק רגע בבקשה', en: 'one moment please' };
-  const onin = { he: 'מושקע בריקמה', en: 'invested on FreeMates' };
-  //add new msg
   let searchText = $state(``);
-
-  let addn = $derived({
-    he: ` \"${searchText}\" לא קיים עדיין ברשימה, ניתן להוסיף בלחיצה על כפתור  \"הוספת חדש\" שלמטה`,
-    en: `\"${searchText}\" Not on the list yet , add it with the \"Add new\" button bellow`
-  });
 
   /**
    * @typedef {Object} Props
@@ -684,7 +665,7 @@ console.log("skillslist",skillslist);
     <button
       class=" hover:bg-barbi text-gold font-bold rounded-full"
       style="width:24px; height:24px; margin: 0 auto;"
-      title={cencel[$lang]}
+      title={$t('pages.editPic.cencel')}
       onclick={bitulm}
       ><svg style="width:24px; height:24px;" viewBox="0 0 24 24">
         <path
@@ -710,7 +691,7 @@ console.log("skillslist",skillslist);
       style="font-weight: 400;  color: var(--barbi-pink); text-shadow: 1px 1px #feeb02 ; "
       class="th"
     >
-      {bef[$lang]}{Valname}{aft[$lang]}
+      {$t('pages.editPic.myThing', { name: Valname })}
     </h2>
     {#if data.length > 0}
       <div
@@ -738,7 +719,7 @@ console.log("skillslist",skillslist);
            {/each} </span>{/if}-->
     <button
       class=" hover:bg-barbi text-mturk rounded-full h-6 w-6"
-      title={edito[$lang]}
+      title={$t('pages.editPic.edito')}
       onclick={open}
       ><svg class="e" viewBox="0 0 24 24">
         <path
@@ -753,7 +734,7 @@ console.log("skillslist",skillslist);
     <div>
       <button
         class=" hover:bg-barbi text-gold font-bold rounded-full"
-        title={cencel[$lang]}
+        title={$t('pages.editPic.cencel')}
         onclick={bitul}
         ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
           <path
@@ -764,7 +745,7 @@ console.log("skillslist",skillslist);
       >
 
       <p class="text-center text-md text-white">
-        {edbef[$lang]}{Valname}{edaft[$lang]}
+        {$t('pages.editPic.editMyThing', { name: Valname })}
       </p>
       {#if data.length > 0}
         <div
@@ -791,9 +772,9 @@ console.log("skillslist",skillslist);
                   {#if da.attributes.panui != false}
                     <button
                       class="text-barbi hover:text-red-700"
-                      title={less[$lang]}
+                      title={$t('pages.editPic.less')}
                       onclick={() => min(da.id, da.attributes[valc])}
-                      aria-label={less[$lang]}
+                      aria-label={$t('pages.editPic.less')}
                       ><svg style="width:17px;height:17px" viewBox="0 0 24 24">
                         <path
                           fill="currentColor"
@@ -803,9 +784,9 @@ console.log("skillslist",skillslist);
                     >
                     <button
                       class=" hover:bg-gold text-barbi rounded-full"
-                      title={edito[$lang]}
+                      title={$t('pages.editPic.edito')}
                       onclick={() => edit(da.id)}
-                      aria-label={edito[$lang]}
+                      aria-label={$t('pages.editPic.edito')}
                       ><svg style="width:17px;height:17px" viewBox="0 0 24 24">
                         <path
                           fill="currentColor"
@@ -816,8 +797,8 @@ console.log("skillslist",skillslist);
                   {:else}
                     <button
                       class=" hover:bg-barbi text-barbi rounded-full"
-                      title={onin[$lang]}
-                      aria-label={onin[$lang]}
+                      title={$t('pages.editPic.onin')}
+                      aria-label={$t('pages.editPic.onin')}
                     >
                       <Grow width={17} height={17} /></button
                     >
@@ -826,7 +807,7 @@ console.log("skillslist",skillslist);
               {:else if datan !== 'skil' && datan !== 'taf' && datan !== 'val' && datan !== 'work'}
                 <div
                   class="text-center text-sm text-lturk md:text-xl"
-                  title={less[$lang]}
+                  title={$t('pages.editPic.less')}
                   onclick={() => min(da.id, da.attributes[valc])}
                 >
                   <Tile
@@ -848,9 +829,9 @@ console.log("skillslist",skillslist);
         {#if datan === 'mash' && yy == 2}
           <button
             onclick={increment}
-            title="{rem[$lang]}{Valname} "
+            title={$t('pages.editPic.removeThing', { name: Valname })}
             class="bt hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-2 m-4 rounded-full hover:scale-150"
-            aria-label="{rem[$lang]}{Valname}"
+            aria-label={$t('pages.editPic.removeThing', { name: Valname })}
             ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
@@ -864,7 +845,7 @@ console.log("skillslist",skillslist);
       {#if datan != 'skil' && datan != 'val' && datan != 'taf' && datan != 'work'}
         <div>
           <h3 class="text-center text-sm text-barbi">
-            {adbf[$lang]}{Valname}{adaf[$lang]}
+            {$t('pages.editPic.chooseMoreThing', { name: Valname })}
           </h3>
           <div class="flex justify-center">
             <MultiSelect
@@ -873,7 +854,7 @@ console.log("skillslist",skillslist);
               inputClass="!bg-gold !text-barbi"
               liSelectedClass="!bg-barbi !text-gold"
               bind:searchText
-              noMatchingOptionsMsg={addn[$lang]}
+              noMatchingOptionsMsg={$t('pages.editPic.addn', { searchText })}
               {placeholder}
               options={filteredAllvn}
               --sms-width={'200px'}
@@ -938,7 +919,7 @@ console.log("skillslist",skillslist);
     </div>
     <br />
     {#if datan === 'mash' && data?.selected2?.length > 0}
-      <Button onClick={() => adm(data.selected2)} text={save} aria-label={save}
+      <Button onClick={() => adm(data.selected2)} text={$t('pages.editPic.save')} aria-label={$t('pages.editPic.save')}
         >✅</Button
       >
     {/if}
@@ -946,8 +927,8 @@ console.log("skillslist",skillslist);
       <Button
         variant="default"
         size="default"
-        text={save}
-        aria-label={save}
+        text={$t('pages.editPic.save')}
+        aria-label={$t('pages.editPic.save')}
         onClick={increment}
         loading={g}
       >
@@ -961,7 +942,7 @@ console.log("skillslist",skillslist);
     {/if}
   {:else if g == true}
     <div class="sp">
-      <h3 class="text-barbi">{om[$lang]}</h3>
+      <h3 class="text-barbi">{$t('pages.editPic.om')}</h3>
       <br />
       <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
       ></RingLoader>

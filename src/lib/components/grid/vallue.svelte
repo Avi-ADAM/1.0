@@ -1,5 +1,6 @@
 <script>
-    import {lang} from '$lib/stores/lang.js'
+  import { t } from '$lib/translations';
+    
     /**
      * @typedef {Object} Props
      * @property {number} [noofhours]
@@ -9,19 +10,18 @@
 
     /** @type {Props} */
     let { noofhours = 0, perhour = 0, iskvua = false } = $props();
-    const perho = {"he":"לשעה","en":"per hour"}
-        const hourss = {"he":"שעות","en":"hours"}
-        const monhly = {"he":"בחודש", "en": "per month"}
-        const total = {"he":"סך הכל","en": "total"}
+
+
+
 </script>
 <div class="text-barbi">
 <span>
         {perhour.toLocaleString('en-US', {maximumFractionDigits:2})} 
-    {perho[$lang]}
+    {$t('lev.cards.common.perHour')}
     </span><span> ✖ </span><span>
            {noofhours.toLocaleString('en-US', {maximumFractionDigits:2})}
-           {hourss[$lang]} {iskvua ? monhly[$lang] : total[$lang] }
+           {$t('lev.cards.common.hours')} {iskvua ? $t('lev.cards.common.monthly') : $t('lev.cards.customerSale.total') }
            </span> <span> = </span> <span  
             >{(noofhours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})}
-            {iskvua ? monhly[$lang] : total[$lang] } </span>
+            {iskvua ? $t('lev.cards.common.monthly') : $t('lev.cards.customerSale.total') } </span>
 </div>

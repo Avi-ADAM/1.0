@@ -1,5 +1,5 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
   import { idPr } from '$lib/stores/idPr.js';
@@ -19,52 +19,6 @@
   // ---------------------------------------------------------------------------
   // i18n
   // ---------------------------------------------------------------------------
-  const i18n = {
-    he: {
-      back:        'חזרה לפרויקט',
-      loading:     'טוען תהליך…',
-      notFound:    'תהליך לא נמצא',
-      notFoundSub: 'לא ניתן למצוא את התהליך המבוקש בפרויקט זה.',
-      noProject:   'לא נבחר פרויקט',
-      noProjectSub:'יש לחזור ולבחור פרויקט תחילה.',
-      missionChain: 'שרשרת משימות',
-      resourceChain:'שרשרת משאבים',
-      processPage: 'עמוד תהליך',
-      id:          'מזהה',
-      chatSoon:    'דיון בתהליך — בקרוב',
-      chatDesc:    'כאן יתאפשר לנהל דיון ואינטגרציה של צ׳אטים ישירות בתוך התהליך.'
-    },
-    en: {
-      back:        'Back to project',
-      loading:     'Loading process…',
-      notFound:    'Process not found',
-      notFoundSub: 'Could not find the requested process in this project.',
-      noProject:   'No project selected',
-      noProjectSub:'Please go back and select a project first.',
-      missionChain: 'Mission Chain',
-      resourceChain:'Resource Chain',
-      processPage: 'Process Page',
-      id:          'ID',
-      chatSoon:    'Process discussion — coming soon',
-      chatDesc:    'Discussion threads and chat integration will appear here.'
-    },
-    ar: {
-      back:        'العودة إلى المشروع',
-      loading:     'جارٍ التحميل…',
-      notFound:    'العملية غير موجودة',
-      notFoundSub: 'تعذر العثور على العملية المطلوبة في هذا المشروع.',
-      noProject:   'لم يتم اختيار مشروع',
-      noProjectSub:'يرجى العودة واختيار مشروع أولاً.',
-      missionChain: 'سلسلة المهام',
-      resourceChain:'سلسلة الموارد',
-      processPage: 'صفحة العملية',
-      id:          'معرف',
-      chatSoon:    'مناقشة العملية — قريبًا',
-      chatDesc:    'ستظهر هنا سلاسل النقاش وتكامل الدردشة.'
-    }
-  };
-
-  let t = $derived(i18n[$lang] ?? i18n.en);
 
   // ---------------------------------------------------------------------------
   // Data state
@@ -188,7 +142,7 @@
 </script>
 
 <svelte:head>
-  <title>{chainName} — {t.processPage}</title>
+  <title>{chainName} — {$t('moach.chains.processPage')}</title>
 </svelte:head>
 
 <div class="pp" dir={$isRtl ? 'rtl' : 'ltr'}>
@@ -203,7 +157,7 @@
           <polyline points="15 18 9 12 15 6" />
         {/if}
       </svg>
-      {t.back}
+      {$t('moach.chains.back')}
     </button>
   </div>
 
@@ -211,34 +165,34 @@
   {#if !$idPr || $idPr === 0}
     <div class="pp-state">
       <span class="pp-state-icon" aria-hidden="true">◈</span>
-      <p class="pp-state-title">{t.noProject}</p>
-      <p class="pp-state-sub">{t.noProjectSub}</p>
+      <p class="pp-state-title">{$t('moach.chains.noProject')}</p>
+      <p class="pp-state-sub">{$t('moach.chains.noProjectSub')}</p>
       <button type="button" class="pp-cta" onclick={() => goto('/')}>
-        {t.back}
+        {$t('moach.chains.back')}
       </button>
     </div>
 
   <!-- ── Loading ──────────────────────────────────────────────────────────── -->
   {:else if loading}
     <div class="pp-state">
-      <div class="pp-spinner" aria-label={t.loading}>
+      <div class="pp-spinner" aria-label={$t('moach.chains.loading')}>
         <svg viewBox="0 0 24 24" class="pp-spin-svg" aria-hidden="true">
           <circle class="pp-spin-track" cx="12" cy="12" r="10" />
           <path class="pp-spin-arc" d="M4 12a8 8 0 018-8v8H4z" />
         </svg>
       </div>
-      <p class="pp-state-sub">{t.loading}</p>
+      <p class="pp-state-sub">{$t('moach.chains.loading')}</p>
     </div>
 
   <!-- ── Chain not found ──────────────────────────────────────────────────── -->
   {:else if !chain}
     <div class="pp-state">
       <span class="pp-state-icon" aria-hidden="true">◇</span>
-      <p class="pp-state-title">{t.notFound}</p>
-      <p class="pp-state-sub">{t.notFoundSub}</p>
+      <p class="pp-state-title">{$t('moach.chains.notFound')}</p>
+      <p class="pp-state-sub">{$t('moach.chains.notFoundSub')}</p>
       <code class="pp-id-pill">{processId}</code>
       <button type="button" class="pp-cta" onclick={() => goto(`/moach/${projectId}/chains`)}>
-        {t.back}
+        {$t('moach.chains.back')}
       </button>
     </div>
 
@@ -256,9 +210,9 @@
 
         <div class="pp-meta">
           <span class="pp-type-badge">
-            {isMissionChain ? t.missionChain : t.resourceChain}
+            {isMissionChain ? $t('moach.chains.missionChain') : $t('moach.chains.resourceChain')}
           </span>
-          <span class="pp-id-pill">{t.id}: {processId}</span>
+          <span class="pp-id-pill">{$t('moach.chains.id')}: {processId}</span>
         </div>
       </div>
     </header>
@@ -300,8 +254,8 @@
           </svg>
         </div>
         <div>
-          <h2 id="chat-heading" class="pp-chat-title">{t.chatSoon}</h2>
-          <p class="pp-chat-desc">{t.chatDesc}</p>
+          <h2 id="chat-heading" class="pp-chat-title">{$t('moach.chains.chatSoon')}</h2>
+          <p class="pp-chat-desc">{$t('moach.chains.chatDesc')}</p>
         </div>
       </div>
     </section>

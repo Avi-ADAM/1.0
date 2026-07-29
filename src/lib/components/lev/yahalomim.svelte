@@ -1,17 +1,16 @@
 <script>
+import { t } from '$lib/translations';
+let fir = 'lev.page.diamondsHint';
+let u = 'lev.page.diamondsHint';
     //לב במרכז נקי היהלומים מסביב עם מספר עליהם שיהיה גם אדום או משהו כזה כשדחוף 
     //לחיצה על היהלום מביאה בדיספאצ' למצב של מיון לפי נושא מסוים
     //על כל יהלום באותיות סבירות שם הקטגוריה\
     //לשאוף למינימום קטגוריות הצבעות החלטות משימות מטלות חלוקות בקשות-הצטרפויות הצעות
     //על הלב צורה של יהלומים מבולגנת שתביא למצב שכרגע הוא הרגיל, במצב הרגיל איזה סימון של סדר למצב הזה
-    //تفكيرקו בחשיכה
+    //קו בחשיכה
 
 import Sv from "./sv.svelte";
  import pic from "$lib/celim/pic.json" 
-
-import { lang} from '$lib/stores/lang.js'
-let fir = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
-let u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
 
 let sugg =  $state("sugg");
 let pend = $state("pend");
@@ -90,44 +89,44 @@ function hover (event){
 hovere = !hovere
 if (hovere === true){
 if (num === "a"){
-   fir = {"he":"הצגת הצעות לרקמות בלבד","en":"show only suggested mission in freemates"}
+   fir = 'lev.diamonds.onlySuggestedMissions'
 aa2 = "matrix(1.923973, 0, 0, 1.923973, -290, -642)"
 } else if (num === "b"){
-   fir = {"he":"הצגת הצבעות על משימות חדשות","en":"show only vot's on new mission"}
+   fir = 'lev.diamonds.onlyNewMissionVotes'
 bb = "matrix(1.804202, 0, 0, 1.804202, 100.91, -749.63)"
 } else if (num === "c"){
-   fir ={"he" :"הצגת בקשות הצטרפות לרקמות בלבד", "en":"show only requests for doing missions for FreeMates"}
+   fir ='lev.diamonds.onlyJoinRequests'
 cc = " matrix(2.038709, 0, 0, 2.038709, -400, -849.63)"
 } else if (num === "d"){
-   fir = {"he":"הצגת בקשות לחלוקת כספים בלבד", "en":"show only vots on money splitings"}
+   fir = 'lev.diamonds.onlyMoneySplitVotes'
 dd = "matrix(1.713625, 0, 0, 1.713625, 58, -862)"
 } else if (num === "e"){
-   fir = {"he":"הצגת פעולות בתהליך ביצוע בלבד", "en":"show only my missions in progress"}
+   fir = 'lev.diamonds.onlyInProgress'
 ee = "matrix(2.177643, 0, 0, 2.177643, -192, -585)"
 } else if (num === "f"){  
-   fir = {"he":"הצגת קבלות פנים לרקמות בלבד", "en":"show only wellcomes to FreeMates"}
+   fir = 'lev.diamonds.onlyWelcomes'
   ff = "matrix(2.32876, 0, 0, 2.32876, -45, -893)"
 } else if (num === "g"){
-   fir = {"he":"הצגת אישור פעולות שהסתיימו בלבד", "en":"show only approval of finnished missions"}
+   fir = 'lev.diamonds.onlyFinishedApprovals'
     gg = " matrix(2.190674, 0, 0, 2.190674, -372, -850)"
 } else if (num === "h"){
-      fir ={"he":"ללוח הבקרה האישי", "en": "click to go to your controle room"}
+      fir ='lev.diamonds.toControlRoom'
   hh = "matrix(10.802134, 0, 0, 10.038354, 330, -61.017)"
 } else if (num === "q"){
-     fir = {"he":"הצגת אישור קבלת משאבים לרקמות בלבד", "en":"show only vote on approval of reciving resorses"}
+     fir = 'lev.diamonds.onlyResourceReceiptApprovals'
  qq = "matrix(1.931463, 0, 0, 1.931463, -10, -648)";
 } else if (num === "j"){
-     fir = {"he":"הצגת הצעות להשקעת משאבים ברקמות בלבד", "en": "show only suggested investments of resorses in FreeMates"}
+     fir = 'lev.diamonds.onlyResourceInvestmentOffers'
  jj = "matrix(2.252314, 0, 0, 2.252314, -340, -1010)";
 } else if (num === "y"){
-   fir = {"he":"הצגת הצבעות על בקשת משאבים לרקמות בלבד", "en": "show only vot's on new resource for FreeMates"}
+   fir = 'lev.diamonds.onlyResourceRequestVotes'
  yy = "matrix(2.158774, 0, 0, 2.158774, -44.82, -980.43)";
 }  else if (num === "x"){
-   fir = {"he":"הצגת בקשות להצטרפות ולהשקעת משאבים ברקמות בלבד", "en": "show only requests to join and invest resorces on freeMates"}
+   fir = 'lev.diamonds.onlyJoinAndInvestRequests'
  xx = "matrix(2.108646, 0, 0, 2.108646, -350, -1060)";
 }
 } else {
-   fir = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1 heart, click on the diamonds to sort the actions"}
+   fir = 'lev.page.diamondsHint'
 if (num === "a"){
 aa2 = "translate(-140.71 -177.44)"
 } else if (num === "b"){
@@ -154,7 +153,7 @@ ee ="translate(3.8484 -18.405)";
  xx = "translate(-188.36 -539.11)";
 }
 }
-    onHover?.({id: fir[$lang]});
+    onHover?.({ id: $t(fir) });
 
 }
 
@@ -164,17 +163,17 @@ function getAzmi (){
 
 let hovered = false;
 function hoverede(x){
-        let t = {"he":"לב המערכת", "en": "heart of 1💗1"}
+        let key = 'lev.page.heartTitle'
     if (x == "x"){
-        t = {"he":"שינוי התצוגה ממטבעות לקלפים", "en": "change the view from coins to cards"}
+        key = 'lev.page.toggleCoinsCards'
     }
    hovered = !hovered
     if (hovered == false){
-    u = t
+    u = key
   } else {
-u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
+u = 'lev.page.diamondsHint'
   }
-  onHover?.({id: u[$lang]});
+  onHover?.({ id: $t(u) });
  }
   import Switch from '../../celim/switch.svelte'
   /**

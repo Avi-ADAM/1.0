@@ -7,7 +7,7 @@
   import { clickOutside } from './outsidclick.js';
   import { scale, fly } from 'svelte/transition';
   import { onMount } from 'svelte';
-  import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import dayjs from 'dayjs';
   import { nowId, addMes, initialForum } from '$lib/stores/pendMisMes.js';
@@ -274,33 +274,24 @@
 
   // import required modules
   import { EffectFlip, Navigation } from 'swiper';
-  let u = {
-    he: 'הצעה להצטרפות לריקמה',
-    en: 'suggested FreeMates to join and do mission'
-  };
+  let u = '';
   let hovered = $state(false);
   function hover(id) {
     if (id == '0') {
-      u = {
-        he: 'הצעה להצטרפות לריקמה',
-        en: 'suggested FreeMates to join and do mission'
-      };
+      u = $t('lev.suggestor.joinSuggestion');
     } else {
       u = id;
     }
-    onHover?.({ id: u[$lang] });
+    onHover?.({ id: u });
   }
   function hoverede() {
     hovered = !hovered;
     if (hovered == false) {
-      u = { he: 'לב המערכת', en: 'heart of 1💗1' };
+      u = $t('lev.page.heartTitle');
     } else {
-      u = {
-        he: 'הצעה להצטרפות לריקמה',
-        en: 'suggested FreeMates to join and do mission'
-      };
+      u = $t('lev.suggestor.joinSuggestion');
     }
-    onHover?.({ id: u[$lang] });
+    onHover?.({ id: u });
   }
   let pclim = $state(0);
 
@@ -338,31 +329,17 @@
   });
   function hoverc(event) {
     if (event == '0') {
-      u = {
-        he: 'הצעה להצטרפות לריקמה',
-        en: 'suggested FreeMates to join and do mission'
-      };
-    } else if (typeof event === 'string') {
-      u = { he: event, en: event };
+      u = $t('lev.suggestor.joinSuggestion');
     } else {
       u = event;
     }
-    onHover?.({ id: u[$lang] });
+    onHover?.({ id: u });
   }
   import Cards from './cards/sugestmi.svelte';
   import { DialogContent, DialogOverlay } from 'svelte-accessible-dialog';
   import Diun from './diun.svelte';
   import { RingLoader } from 'svelte-loading-spinners';
   import NegoM from '../prPr/negoM.svelte';
-  const ttal = { he: 'נכנס כבר כסף', en: 'already has income' };
-  const ttwe = { he: 'צפי רווח: שבוע', en: 'exp income: one week ' };
-  const ttmo = { he: 'צפי רווח: חודש', en: 'exp income: one month ' };
-  const tt3mo = { he: 'צפי רווח: 3 חודשים', en: 'exp income: three months' };
-  const tt6mo = { he: 'צפי רווח: חצי שנה', en: 'exp income: 6 months ' };
-  const tt1y = { he: 'צפי רווח: שנה', en: 'exp income: 1 year' };
-  const tt2y = { he: 'צפי רווח: שנתיים', en: 'exp income: 2 years ' };
-  const ttmor = { he: 'צפי רווח: ארוך טווח', en: 'exp income: long term' };
-  const ttne = { he: 'ללא רווח', en: 'not profitable' };
   let isOpen = $state(false),
     diunm = $state(false),
     loading = false;
@@ -473,8 +450,7 @@
     onModal?.();
     dialogOpen = true;
   }
-  const chatdes2 = { he: "צ'אט על הצטרפות לריקמה", en: 'chat on joining' };
-</script>
+  </script>
 
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
   <div transition:fly={{ y: 40, opacity: 0, duration: 250 }}>
@@ -512,7 +488,7 @@
         <Diun
           onRect={afreact}
           smalldes={projectName + '-' + missionName}
-          nameChatPartner={`${chatdes2[$lang]} ${projectName}`}
+          nameChatPartner={`${$t('lev.suggestor.chatOnJoining')} ${projectName}`}
           mypos={true}
           rect={true}
           {clicked}
@@ -2670,10 +2646,7 @@
                 stroke-width=".62511px"
                 onclick={() => linke()}
                 onmouseenter={() =>
-                  hover({
-                    he: ` לחיצה כפולה לצפיה בעמוד הציבורי של ריקמת ${projectName} `,
-                    en: `click two times to view the publick profile of ${projectName}`
-                  })}
+                  hover($t('lev.suggestor.openPublicPage', { projectName }))}
                 onmouseleave={() => hover('0')}
                 style="white-space:pre; stroke-width: 0 !important; fill: url(#sugzzt) !important; font-weight:bold; font-family: gan, Powerr; "
                 bx:origin="0.5 -0.369851"
@@ -2694,10 +2667,7 @@
                   startOffset={stb}
                   xlink:href="#sugzzl"
                   onmouseenter={() =>
-                    hover({
-                      he: 'שם המשימה, 2 לחיצות להרחבה',
-                      en: 'suggested mission, click 2 times to expand'
-                    })}
+                    hover($t('lev.suggestor.missionNameHint'))}
                   onmouseleave={() => hover('0')}>{missionName}</textPath
                 ></text
               >
@@ -2738,23 +2708,23 @@
                   stroke-width=".62511px"
                 >
                   {#if timeToP == 'alreadi'}
-                    {ttal[$lang]}
+                    {$t('lev.income.already')}
                   {:else if timeToP == 'week'}
-                    {ttwe[$lang]}
+                    {$t('lev.income.week')}
                   {:else if timeToP == 'month'}
-                    {ttmo[$lang]}
+                    {$t('lev.income.month')}
                   {:else if timeToP == 'threeM'}
-                    {tt3mo[$lang]}
+                    {$t('lev.income.months3')}
                   {:else if timeToP == 'sixM'}
-                    {tt6mo[$lang]}
+                    {$t('lev.income.months6')}
                   {:else if timeToP == 'oneY'}
-                    {tt1y[$lang]}
+                    {$t('lev.income.year1')}
                   {:else if timeToP == 'twoY'}
-                    {tt2y[$lang]}
+                    {$t('lev.income.years2')}
                   {:else if timeToP == 'more'}
-                    {ttmor[$lang]}
+                    {$t('lev.income.longTerm')}
                   {:else if timeToP == 'never'}
-                    {ttne[$lang]}
+                    {$t('lev.income.none')}
                   {/if}
                   <tspan dx="0" dy="1.2em" font-size="17px"></tspan></text
                 >
@@ -2763,10 +2733,7 @@
             <image
               onclick={() => linke()}
               onmouseenter={() =>
-                hover({
-                  he: ` לחיצה כפולה לצפיה בעמוד הציבורי של ריקמת ${projectName} `,
-                  en: `click two times to view the publick profile of ${projectName}`
-                })}
+                hover($t('lev.suggestor.openPublicPage', { projectName }))}
               onmouseleave={() => hover('0')}
               clip-path="url(#sugclipCircle)"
               transform="matrix(.068594 0 0 .068593 73.499 125.85)"
@@ -2785,28 +2752,28 @@
               </path>
             </g>
           </svg>
-          <!--  <img on:click={()=>linke()} on:mouseenter={()=>hover({"he":` לחיצה כפולה לצפיה בעמוד הציבורי של ריקמת ${projectName} `, "en":`click two times to view the publick profile of ${projectName}`})} on:mouseleave={()=>hover("0")} class="img" src={src}  alt="logo">
-        <button on:click={()=>linke()} on:mouseenter={()=>hover({"he":` לחיצה כפולה לצפיה בעמוד הציבורי של ריקמת ${projectName} `, "en":`click two times to view the publick profile of ${projectName}`})} on:mouseleave={()=>hover("0")}  ><h7 class="text-lturk pn" >{projectName}</h7></button>
-        <h1 on:mouseenter={()=>hover({"he":"המשימה המוצעת","en": "suggested mission"})} on:mouseleave={()=>hover("0")} style="color: rgb(233, 239, 239); " class="lt">{missionName}</h1>
+          <!--  <img on:click={()=>linke()} on:mouseenter={()=>hover($t('lev.suggestor.openPublicPage', { projectName }))} on:mouseleave={()=>hover("0")} class="img" src={src}  alt="logo">
+        <button on:click={()=>linke()} on:mouseenter={()=>hover($t('lev.suggestor.openPublicPage', { projectName }))} on:mouseleave={()=>hover("0")}  ><h7 class="text-lturk pn" >{projectName}</h7></button>
+        <h1 on:mouseenter={()=>hover($t('lev.suggestor.suggestedMission'))} on:mouseleave={()=>hover("0")} style="color: rgb(233, 239, 239); " class="lt">{missionName}</h1>
         {#if total} <p class="lt">{total}</p>{/if}
         {#if timeToP == "alreadi"}
-          <p>{ttal[$lang]}</p>
+          <p>{$t('lev.income.already')}</p>
          {:else if timeToP == "week"}
-          <p>{ttwe[$lang]}</p>
+          <p>{$t('lev.income.week')}</p>
           {:else if timeToP == "month"}
-          <p>{ttmo[$lang]}</p>
+          <p>{$t('lev.income.month')}</p>
            {:else if timeToP == "threeM"}
-          <p>{tt3mo[$lang]}</p>
+          <p>{$t('lev.income.months3')}</p>
            {:else if timeToP == "sixM"}
-          <p>{tt6mo[$lang]}</p>
+          <p>{$t('lev.income.months6')}</p>
            {:else if timeToP == "oneY"}
-          <p>{tt1y[$lang]}</p>
+          <p>{$t('lev.income.year1')}</p>
          {:else if timeToP == "twoY"}
-          <p>{tt2y[$lang]}</p>
+          <p>{$t('lev.income.years2')}</p>
          {:else if timeToP == "more"}
-          <p>{ttmor[$lang]}</p>
+          <p>{$t('lev.income.longTerm')}</p>
           {:else if timeToP == "never"}
-          <p>{ttne[$lang]}</p>
+          <p>{$t('lev.income.none')}</p>
         {/if}
         <span class="bg-gold font-semibold opacity-80 inline-flex items-center mr-2 px-2.5 py-0.5 rounded">
         </span>
@@ -2819,7 +2786,7 @@
             class="ltn ab p-0 d flex flex-wrap items-center justify-center"
             style="text-shadow:none;"
             onmouseenter={() =>
-              hover({ he: 'הכישורים הנדרשים', en: 'needed skills' })}
+              hover($t('lev.suggestor.neededSkills'))}
             onmouseleave={() => hover('0')}
           >
             {#if skills}
@@ -2831,10 +2798,7 @@
           {#if deadLine != undefined && deadLine != 'undefined'}
             <h5
               onmouseenter={() =>
-                hover({
-                  he: 'תאריך אחרון לביצוע',
-                  en: 'last date to do the mission'
-                })}
+                hover($t('lev.suggestor.lastDate'))}
               onmouseleave={() => hover('0')}
               class="lt bc"
             >
@@ -2843,10 +2807,7 @@
           {#if deadLinefi != undefined && deadLine != 'undefined'}
             <h5
               onmouseenter={() =>
-                hover({
-                  he: 'תאריך אחרון לביצוע',
-                  en: 'last date to do the mission'
-                })}
+                hover($t('lev.suggestor.lastDate'))}
               onmouseleave={() => hover('0')}
               class="lt bc"
             >
@@ -2855,7 +2816,7 @@
 
           <h4
             onmouseenter={() =>
-              hover({ he: 'פרטי המשימה', en: 'mission details' })}
+              hover($t('lev.suggestor.missionDetails'))}
             onmouseleave={() => hover('0')}
             class="ltn cd d"
             style=" line-height: 0.9;"
@@ -2864,7 +2825,7 @@
           </h4>
           <div
             onmouseenter={() =>
-              hover({ he: 'תפקיד מבוקש', en: 'requested role' })}
+              hover($t('lev.suggestor.requestedRole'))}
             onmouseleave={() => hover('0')}
             style="text-shadow:none;"
             class="ltn de d flex flex-wrap items-center justify-middle"
@@ -2878,7 +2839,7 @@
           {#if low == false}
             {#if already === false}
               <button
-                onmouseenter={() => hover({ he: 'אני רוצה', en: 'Yes I want' })}
+                onmouseenter={() => hover($t('lev.suggestor.iWant'))}
                 onmouseleave={() => hover('0')}
                 onclick={() => agree(oid)}
                 class="btn a"
@@ -2900,7 +2861,7 @@
    -->
               <button
                 onmouseenter={() =>
-                  hover({ he: 'לא מתאים לי', en: 'not for me' })}
+                  hover($t('lev.suggestor.notForMe'))}
                 onmouseleave={() => hover('0')}
                 onclick={() => decline(oid)}
                 class="btn b"

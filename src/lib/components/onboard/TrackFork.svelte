@@ -1,5 +1,5 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { goto } from '$app/navigation';
   import { fly, scale } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
@@ -11,19 +11,13 @@
     {
       id: 'provider',
       emoji: '🛠',
-      he: 'נותן/ת שירות',
-      en: 'Service Provider',
-      sub_he: 'פרילנסר, עצמאי/ת, מציע/ה כישורים ושירותים לאחרים',
-      sub_en: 'Freelancer, independent, offering skills & services',
+      key: 'provider',
       path: '/onboard/provider'
     },
     {
       id: 'business',
       emoji: '🏢',
-      he: 'בעל/ת עסק קיים',
-      en: 'Business Owner',
-      sub_he: 'עסק מוקם — מוצרים, שירותים, שותפות, ספק מוסדי',
-      sub_en: 'Established business — products, services, partnerships',
+      key: 'business',
       path: '/onboard/business'
     }
   ];
@@ -57,9 +51,9 @@
         in:fly={{ y: 24, duration: 550, delay: 200 + i * 80, easing: quintOut }}
       >
         <span class="opt-emoji">{track.emoji}</span>
-        <span class="opt-title">{track[$lang === 'en' ? 'en' : 'he']}</span>
+        <span class="opt-title">{$t(`onboard.trackFork.${track.key}.title`)}</span>
         <span class="opt-sub">
-          {track[$lang === 'en' ? 'sub_en' : 'sub_he']}
+          {$t(`onboard.trackFork.${track.key}.sub`)}
         </span>
         {#if selected === track.id}
           <span class="opt-check" in:scale={{ duration: 200 }}>✓</span>

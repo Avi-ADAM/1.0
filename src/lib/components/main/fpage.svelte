@@ -131,12 +131,6 @@
   let productsCount = $state(0);
   let statsLoaded = $state(false);
 
-  let pageurl = {
-    ar: 'https://1lev1.com/ar',
-    en: 'https://1lev1.com/en',
-    he: 'https://1lev1.com/he',
-    ru: 'https://1lev1.com/ru'
-  };
   let size = $derived({
     width: w,
     height: h
@@ -170,7 +164,7 @@
   title={$t('home.meta.title')}
   description={$t('home.meta.description')}
   {image}
-  url={pageurl[$lang]}
+  url={$t('home.pageUrl')}
 />
 {#snippet utilityNav(compact = false)}
   {#if trans === false}

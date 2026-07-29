@@ -1,4 +1,5 @@
 <script>
+  import { t } from '$lib/translations';
   import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang.js';
   import { isChatOpen } from '$lib/stores/pendMisMes.js';
@@ -44,20 +45,18 @@
   }
 
   // Visible tab labels — every footer item carries a word, not just an icon.
-  const labels = {
-    hub: { he: 'מרכז', en: 'Hub', ar: 'المركز', ru: 'Хаб' },
-    moach: { he: 'רקמות', en: 'Rikmot', ar: 'ركموت', ru: 'Рикмот' },
-    chat: { he: 'צ׳אט', en: 'Chat', ar: 'دردشة', ru: 'Чат' },
-    concierge: { he: 'קונסיירז׳', en: 'Concierge', ar: 'كونسيرج', ru: 'Консьерж' },
-    deals: { he: 'עסקאות', en: 'Deals', ar: 'صفقات', ru: 'Сделки' },
-    lev: { he: 'הלב', en: 'Heart', ar: 'القلب', ru: 'Сердце' },
-    minimize: { he: 'מזעור', en: 'Minimize', ar: 'تصغير', ru: 'Свернуть' },
-    openUp: { he: 'פתח למעלה', en: 'Open upward', ar: 'افتح لأعلى', ru: 'Открыть вверх' },
-    openBar: { he: 'פתח לרוחב', en: 'Open sideways', ar: 'افتح جانبياً', ru: 'Открыть в ряд' }
+  const KEYS = {
+    hub: 'common.nav.hub',
+    moach: 'common.nav.moach',
+    chat: 'lev.cards.saleCard.chat',
+    concierge: 'deals.quick_concierge',
+    deals: 'common.footer.deals',
+    lev: 'common.nav.lev',
+    minimize: 'common.footer.minimize',
+    openUp: 'common.footer.openUp',
+    openBar: 'common.footer.openBar'
   };
-  const L = (key) => labels[key][$lang] ?? labels[key].he;
-
-  const brainLeb = { he: 'מוח הרקמות', en: 'brain of organiczations' };
+  const L = (key) => $t(KEYS[key]);
 
   let vertical = $derived(footMode === 'vertical');
   // Shared per-item classes for both orientations
@@ -215,7 +214,7 @@
         role="tooltip"
         class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700"
       >
-        {brainLeb[$lang]}
+        {$t('common.footer.brain')}
         <div class="tooltip-arrow"></div>
       </div>
 

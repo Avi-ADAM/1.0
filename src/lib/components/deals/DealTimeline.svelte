@@ -1,13 +1,13 @@
 <script lang="ts">
   import Panel from '$lib/components/Panel.svelte';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import type { TimelineEvent } from '$lib/types';
 
   let { events }: { events: TimelineEvent[] } = $props();
 </script>
 
-<Panel title={tr.deals.timelineTitle[$lang]}>
+<Panel title={$t('deals.timelineTitle')}>
   <div class="timeline">
     {#each events as e, i (i)}
       <div class="item">

@@ -39,11 +39,13 @@ export async function load({ locals, params, fetch }) {
     const node = dataNode?.attributes || null;
     if (node) {
       archived = node.archived === true;
-      const title = {
-        he: `1💗1 | מוצר "${node.name}" בריקמה: ${node.projectcreates?.data?.[0]?.attributes?.projectName || ''}`,
-        en: `1💗1 | product "${node.name}" on freeMates: ${node.projectcreates?.data?.[0]?.attributes?.projectName || ''}`
+      // Resolved on the client with $t — the server has no per-request locale.
+      const titleKey = 'pages.gift.pageTitle';
+      const titleParams = {
+        name: node.name,
+        projectName: node.projectcreates?.data?.[0]?.attributes?.projectName || ''
       };
-      alld = { ...node, id: dataNode.id, title };
+      alld = { ...node, id: dataNode.id, titleKey, titleParams };
     }
   } catch (e) {
     console.error('product load error', e);

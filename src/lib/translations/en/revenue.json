@@ -1,0 +1,36 @@
+{
+  "donate": {
+    "title": "Donate",
+    "intro": "Every donation is shared transparently among the doers and counts toward coverage.",
+    "needLogin": "To coordinate a donation through the site please log in. You can also reach us directly via the links on this page.",
+    "login": "Log in / Sign up",
+    "tabCoordinate": "I want to donate",
+    "tabRecord": "Record a received donation",
+    "coordinateHelp": "We'll let the rikma's members know you'd like to give; they'll reach out to arrange the transfer. Once received it is recorded as a donation.",
+    "recordHelp": "Log a donation that already arrived. If the money is held by another member they confirm receipt before it counts.",
+    "amount": "Amount (₪)",
+    "amountOpt": "Amount (₪) — optional",
+    "name": "Donor name (leave blank for anonymous)",
+    "message": "Dedication / message",
+    "contact": "How can we reach you? (phone / email)",
+    "holder": "Who holds the money?",
+    "me": "Me",
+    "send": "Send",
+    "record": "Record donation",
+    "cancel": "Cancel",
+    "okReq": "Thank you! The rikma has been notified and will reach out.",
+    "okSelf": "Donation recorded ✓",
+    "okClaim": "Recorded — awaiting the holder's confirmation (auto-approves after the response time).",
+    "needAmount": "Please enter an amount",
+    "needHolder": "Please choose who holds the money"
+  },
+  "supportToggle": {
+    "title": "Support & donations page",
+    "desc": "Controls who can see the public support page — where people donate, volunteer and view the transparent coverage board.",
+    "view": "View page →",
+    "saved": "Saved ✓",
+    "off": "Off",
+    "members": "Members",
+    "public": "Public"
+  }
+}

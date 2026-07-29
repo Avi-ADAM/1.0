@@ -1,4 +1,5 @@
 <script>
+  import { t } from '$lib/translations';
   import Header from '$lib/components/header/header.svelte';
   import { lang } from '$lib/stores/lang.js';
   import { RingLoader } from 'svelte-loading-spinners';
@@ -39,15 +40,8 @@
       })
       .filter(Boolean);
   });
-
-  const RESTIME_LABEL = {
-    feh: { he: '48 שעות', en: '48 hours' },
-    sth: { he: '72 שעות', en: '72 hours' },
-    nsh: { he: '96 שעות', en: '96 hours' },
-    sevend: { he: 'שבוע', en: 'a week' }
-  };
   let restimeLabel = $derived(
-    RESTIME_LABEL[attrs?.restime]?.[$lang] ?? RESTIME_LABEL.feh[$lang]
+    $t(`pages.restime.${attrs?.restime ?? 'feh'}`)
   );
 
   /** @type {'mission' | 'resource'} */
@@ -107,79 +101,6 @@
     }
   }
 
-  const t = {
-    title: { he: 'בואו להיות חלק', en: 'Come be a part' },
-    sub: {
-      he: 'מציעים את עצמכם בתנאים שלכם — אתם קובעים מה תעשו או תביאו, וכמה זה שווה. ההצעה שלכם היא נקודת הפתיחה של השיחה.',
-      en: 'Nominate yourself on your own terms — you decide what you’ll do or bring, and what it’s worth. Your offer is the opening point of the conversation.'
-    },
-    valuesTitle: { he: 'הערכים שמובילים כאן', en: 'The values that lead here' },
-    kindMission: { he: '🚀 אני אעשה…', en: '🚀 I’ll do…' },
-    kindResource: { he: '🧰 אני אביא…', en: '🧰 I’ll bring…' },
-    mName: { he: 'מה תעשו? (כותרת המשימה)', en: 'What will you do? (mission title)' },
-    mDescrip: { he: 'פרטו קצת — מה בדיוק, איך, למה דווקא אתם', en: 'A few details — what exactly, how, why you' },
-    mHours: { he: 'כמה שעות?', en: 'How many hours?' },
-    mPerhour: {
-      he: 'השכר השעתי האידאלי שלכם (₪)',
-      en: 'Your ideal hourly rate (₪)'
-    },
-    perhourHint: {
-      he: 'לא ״כמה תדרשו״ — כמה העבודה שלכם שווה. הרישום בשווי מלא הוא הבסיס לחלוקה הוגנת של הכנסות, עכשיו או בעתיד.',
-      en: 'Not “what you demand” — what your work is worth. Full-value recording is the basis for fair income sharing, now or later.'
-    },
-    rName: { he: 'מה תביאו? (שם המשאב)', en: 'What will you bring? (resource name)' },
-    rDescrip: { he: 'פרטו קצת על המשאב', en: 'A few details about the resource' },
-    rPrice: { he: 'השווי האידאלי (₪)', en: 'Ideal value (₪)' },
-    rKindOf: { he: 'אופן התמחור', en: 'Pricing mode' },
-    rHm: { he: 'כמות/יחידות', en: 'Quantity/units' },
-    rRecurring: { he: 'משאב מתמשך (מתחדש)', en: 'Recurring resource' },
-    kinds: {
-      total: { he: 'סה״כ', en: 'Total' },
-      monthly: { he: 'חודשי', en: 'Monthly' },
-      perUnit: { he: 'ליחידה', en: 'Per unit' },
-      rent: { he: 'השכרה', en: 'Rent' },
-      yearly: { he: 'שנתי', en: 'Yearly' }
-    },
-    send: { he: 'שליחת ההצעה שלי', en: 'Send my offer' },
-    sending: { he: 'שולח…', en: 'Sending…' },
-    how: { he: 'איך זה עובד?', en: 'How does it work?' },
-    howSteps: {
-      he: [
-        'אתם מנסחים הצעה — משימה שתבצעו או משאב שתביאו, בתנאים שלכם.',
-        'חברי הריקמה מקבלים אותה ללב שלהם: הם יכולים לאשר, לשוחח, או להציע נגדית — אין ״לא״ מוחלט.',
-        'מרגע שחבר נענה — שתיקה היא הסכמה: בלי מענה בתוך {restime}, ההצעה האחרונה שעל השולחן מתאשרת.'
-      ],
-      en: [
-        'You phrase an offer — a mission you’ll do or a resource you’ll bring, on your terms.',
-        'The rikma members get it in their Lev: they can approve, chat, or counter — there is no absolute “no”.',
-        'Once a member engages — silence is consent: with no reply within {restime}, the last offer on the table is approved.'
-      ]
-    },
-    sentTitle: { he: 'ההצעה נשלחה! 🎉', en: 'Your offer was sent! 🎉' },
-    sentBody: {
-      he: 'חברי הריקמה קיבלו התראה. מרגע שחבר ייענה, יש לריקמה {restime} להגיב — ואפשר לעקוב אחרי הכול בלב שלכם.',
-      en: 'The members were notified. Once a member engages, the rikma has {restime} to respond — follow everything in your Lev.'
-    },
-    toLev: { he: 'ללב שלי ←', en: 'To my Lev →' },
-    backToProject: { he: 'חזרה לעמוד הריקמה', en: 'Back to the project page' },
-    memberTitle: { he: 'את/ה כבר חלק 💗', en: 'You’re already part of this 💗' },
-    memberBody: {
-      he: 'חברי ריקמה יוצרים משימות ומשאבים מהמוח — שם כל הכלים שלכם.',
-      en: 'Members create missions and resources from the moach — all your tools are there.'
-    },
-    toMoach: { he: 'למוח הריקמה ←', en: 'To the moach →' },
-    guestTitle: { he: 'צריך חשבון (חינם) כדי להציע', en: 'You need a (free) account to offer' },
-    guestBody: {
-      he: 'ההצעה שלכם פותחת שיחה אמיתית עם הריקמה — ולשם כך צריך זהות. ההרשמה פתוחה וחינמית.',
-      en: 'Your offer opens a real conversation with the rikma — that needs an identity. Registration is open and free.'
-    },
-    login: { he: 'הרשמה / התחברות', en: 'Register / Log in' },
-    supportInstead: {
-      he: 'רק רוצים לתמוך? לדף התמיכה והשקיפות ←',
-      en: 'Just want to support? To the support page →'
-    }
-  };
-
   let pageTitle = $derived(
     attrs?.projectName
       ? $lang === 'he'
@@ -219,16 +140,16 @@
         <h1
           class="text-3xl sm:text-5xl font-black mb-4 bg-clip-text text-transparent bg-gradient-to-l from-gold via-white to-barbi leading-tight"
         >
-          {t.title[$lang]}
+          {$t('pages.projectJoin.title')}
         </h1>
-        <p class="text-white/75 max-w-xl mx-auto">{t.sub[$lang]}</p>
+        <p class="text-white/75 max-w-xl mx-auto">{$t('pages.projectJoin.sub')}</p>
       </div>
 
       <!-- Values as context -->
       {#if vallues.length > 0}
         <div class="text-center mb-8">
           <p class="text-xs uppercase tracking-widest text-white/40 mb-2">
-            {t.valuesTitle[$lang]}
+            {$t('pages.projectJoin.valuesTitle')}
           </p>
           <div class="flex flex-wrap justify-center gap-2">
             {#each vallues as v (v)}
@@ -241,20 +162,20 @@
       {#if isMember}
         <!-- Member: redirect to moach -->
         <div class="glass rounded-3xl p-8 text-center">
-          <h2 class="text-2xl font-bold text-gold mb-2">{t.memberTitle[$lang]}</h2>
-          <p class="text-white/70 mb-6">{t.memberBody[$lang]}</p>
-          <a href="/moach/{projectId}" class="btn-primary">{t.toMoach[$lang]}</a>
+          <h2 class="text-2xl font-bold text-gold mb-2">{$t('pages.projectJoin.memberTitle')}</h2>
+          <p class="text-white/70 mb-6">{$t('pages.projectJoin.memberBody')}</p>
+          <a href="/moach/{projectId}" class="btn-primary">{$t('pages.projectJoin.toMoach')}</a>
         </div>
       {:else if sent}
         <!-- Success -->
         <div class="glass rounded-3xl p-8 text-center">
-          <h2 class="text-2xl font-bold text-gold mb-2">{t.sentTitle[$lang]}</h2>
+          <h2 class="text-2xl font-bold text-gold mb-2">{$t('pages.projectJoin.sentTitle')}</h2>
           <p class="text-white/70 mb-6 max-w-lg mx-auto">
-            {t.sentBody[$lang].replace('{restime}', restimeLabel)}
+            {$t('pages.projectJoin.sentBody').replace('{restime}', restimeLabel)}
           </p>
           <div class="flex flex-wrap justify-center gap-3">
-            <a href="/lev" class="btn-primary">{t.toLev[$lang]}</a>
-            <a href="/project/{projectId}" class="btn-ghost">{t.backToProject[$lang]}</a>
+            <a href="/lev" class="btn-primary">{$t('pages.projectJoin.toLev')}</a>
+            <a href="/project/{projectId}" class="btn-ghost">{$t('pages.projectJoin.backToProject')}</a>
           </div>
         </div>
       {:else}
@@ -269,7 +190,7 @@
               class:kind-active={kind === 'mission'}
               onclick={() => (kind = 'mission')}
             >
-              {t.kindMission[$lang]}
+              {$t('pages.projectJoin.kindMission')}
             </button>
             <button
               role="tab"
@@ -278,60 +199,60 @@
               class:kind-active={kind === 'resource'}
               onclick={() => (kind = 'resource')}
             >
-              {t.kindResource[$lang]}
+              {$t('pages.projectJoin.kindResource')}
             </button>
           </div>
 
           {#if kind === 'mission'}
             <label class="field">
-              <span>{t.mName[$lang]}</span>
+              <span>{$t('pages.projectJoin.mName')}</span>
               <input type="text" bind:value={mName} maxlength="120" disabled={!isRegisteredUser} />
             </label>
             <label class="field">
-              <span>{t.mDescrip[$lang]}</span>
+              <span>{$t('pages.projectJoin.mDescrip')}</span>
               <textarea rows="4" bind:value={mDescrip} disabled={!isRegisteredUser}></textarea>
             </label>
             <div class="grid grid-cols-2 gap-4">
               <label class="field">
-                <span>{t.mHours[$lang]}</span>
+                <span>{$t('pages.projectJoin.mHours')}</span>
                 <input type="number" min="0" step="0.5" bind:value={mHours} disabled={!isRegisteredUser} />
               </label>
               <label class="field">
-                <span>{t.mPerhour[$lang]}</span>
+                <span>{$t('pages.projectJoin.mPerhour')}</span>
                 <input type="number" min="0" step="1" bind:value={mPerhour} disabled={!isRegisteredUser} />
               </label>
             </div>
-            <p class="text-xs text-white/50 leading-relaxed mt-1">{t.perhourHint[$lang]}</p>
+            <p class="text-xs text-white/50 leading-relaxed mt-1">{$t('pages.projectJoin.perhourHint')}</p>
           {:else}
             <label class="field">
-              <span>{t.rName[$lang]}</span>
+              <span>{$t('pages.projectJoin.rName')}</span>
               <input type="text" bind:value={rName} maxlength="120" disabled={!isRegisteredUser} />
             </label>
             <label class="field">
-              <span>{t.rDescrip[$lang]}</span>
+              <span>{$t('pages.projectJoin.rDescrip')}</span>
               <textarea rows="4" bind:value={rDescrip} disabled={!isRegisteredUser}></textarea>
             </label>
             <div class="grid grid-cols-3 gap-4">
               <label class="field">
-                <span>{t.rPrice[$lang]}</span>
+                <span>{$t('pages.projectJoin.rPrice')}</span>
                 <input type="number" min="0" step="1" bind:value={rPrice} disabled={!isRegisteredUser} />
               </label>
               <label class="field">
-                <span>{t.rKindOf[$lang]}</span>
+                <span>{$t('pages.projectJoin.rKindOf')}</span>
                 <select bind:value={rKindOf} disabled={!isRegisteredUser}>
-                  {#each Object.entries(t.kinds) as [k, label] (k)}
-                    <option value={k}>{label[$lang]}</option>
+                  {#each ['total', 'monthly', 'perUnit', 'rent', 'yearly'] as k (k)}
+                    <option value={k}>{$t(`pages.projectJoin.kinds.${k}`)}</option>
                   {/each}
                 </select>
               </label>
               <label class="field">
-                <span>{t.rHm[$lang]}</span>
+                <span>{$t('pages.projectJoin.rHm')}</span>
                 <input type="number" min="1" step="1" bind:value={rHm} disabled={!isRegisteredUser} />
               </label>
             </div>
             <label class="flex items-center gap-2 mt-3 text-sm text-white/70">
               <input type="checkbox" bind:checked={rRecurring} disabled={!isRegisteredUser} />
-              {t.rRecurring[$lang]}
+              {$t('pages.projectJoin.rRecurring')}
             </label>
           {/if}
 
@@ -345,22 +266,22 @@
               disabled={sending || (kind === 'mission' ? !mName.trim() : !rName.trim())}
               onclick={submit}
             >
-              {sending ? t.sending[$lang] : t.send[$lang]}
+              {sending ? $t('pages.projectJoin.sending') : $t('pages.projectJoin.send')}
             </button>
           {:else}
             <div class="mt-6 text-center border-t border-white/10 pt-6">
-              <h3 class="font-bold text-gold mb-1">{t.guestTitle[$lang]}</h3>
-              <p class="text-white/60 text-sm mb-4 max-w-md mx-auto">{t.guestBody[$lang]}</p>
-              <a href="/" class="btn-primary">{t.login[$lang]}</a>
+              <h3 class="font-bold text-gold mb-1">{$t('pages.projectJoin.guestTitle')}</h3>
+              <p class="text-white/60 text-sm mb-4 max-w-md mx-auto">{$t('pages.projectJoin.guestBody')}</p>
+              <a href="/" class="btn-primary">{$t('pages.projectJoin.login')}</a>
             </div>
           {/if}
         </div>
 
         <!-- How it works -->
         <div class="glass rounded-2xl p-6 mb-6">
-          <h3 class="font-bold text-white/80 mb-3">{t.how[$lang]}</h3>
+          <h3 class="font-bold text-white/80 mb-3">{$t('pages.projectJoin.how')}</h3>
           <ol class="space-y-2 text-sm text-white/60 list-decimal ps-5">
-            {#each t.howSteps[$lang] as step (step)}
+            {#each $t('pages.projectJoin.howSteps') as step (step)}
               <li>{step.replace('{restime}', restimeLabel)}</li>
             {/each}
           </ol>
@@ -368,7 +289,7 @@
 
         <p class="text-center text-sm">
           <a href="/project/{projectId}/support" class="text-gold underline hover:text-white">
-            {t.supportInstead[$lang]}
+            {$t('pages.projectJoin.supportInstead')}
           </a>
         </p>
       {/if}

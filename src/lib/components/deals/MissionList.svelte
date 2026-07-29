@@ -1,5 +1,5 @@
 <script lang="ts">
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import type { Mission, MissionStatus } from '$lib/types';
 
@@ -21,8 +21,8 @@
 
   function statusText(m: Mission): string {
     switch (m.status) {
-      case 'done':           return tr.deals.missionPaid[$lang];
-      case 'needs-approval': return tr.deals.missionNeedsApproval[$lang];
+      case 'done':           return $t('deals.missionPaid');
+      case 'needs-approval': return $t('deals.missionNeedsApproval');
       case 'in-progress':    return Math.round((m.hoursDone / m.hours) * 100) + '%';
       default:               return '—';
     }
@@ -45,7 +45,7 @@
         {#if m.sub}<div class="sub">{m.sub}</div>{/if}
       </div>
       <div class="right">
-        <div class="hours">{m.hours} {tr.deals.hoursShort[$lang]}</div>
+        <div class="hours">{m.hours} {$t('deals.hoursShort')}</div>
         <div class="status" style="color:{STATUS_COLOR[m.status]}">{statusText(m)}</div>
       </div>
     </div>

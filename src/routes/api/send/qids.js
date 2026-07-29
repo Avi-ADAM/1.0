@@ -13342,6 +13342,7 @@ export const qids = {
           bio
           preferCards
           lang
+          location { location_mode lat lng radius location_hint }
           machshirs { data { id attributes { jsoni } } }
           email
           noMail

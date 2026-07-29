@@ -1,0 +1,29 @@
+{
+  "votes": "التصويتات",
+  "urgent": "عاجل",
+  "suggestions": "المقترحات",
+  "purchases": "المشتريات",
+  "sales": "المبيعات",
+  "activitySummary": "ملخص النشاط",
+  "urgentVoteMsg": "تصويت عاجل على وشك الانتهاء!",
+  "handleBtn": "معالجة",
+  "customPurchaseText": "إنشاء عملية شراء مخصصة",
+  "customPurchaseSub": "صف ما تحتاجه وابحث عن شركاء",
+  "startBtn": "ابدأ",
+  "noActivity": "لا يوجد نشاط حالياً",
+  "demandMapTitle": "خريطة الطلب",
+  "demandMapSub": "ما يبحث عنه الناس وما يعرضونه الآن — التجمّعات والنسائج معًا",
+  "demandMapItems": "عناصر نشطة",
+  "demandMapBtn": "إلى الخريطة",
+  "kpi": {
+    "caughtUp": "كل شيء محدث",
+    "waiting": "بانتظار تصويتك"
+  },
+  "nav": {
+    "shortcuts": "اختصارات",
+    "lev": "القلب",
+    "moach": "العقل",
+    "me": "ملفي",
+    "feed": "بانتظارك"
+  }
+}

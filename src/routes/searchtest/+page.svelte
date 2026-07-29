@@ -1,5 +1,6 @@
 <!-- src/routes/Search.svelte -->
 <script>
+  import { t } from '$lib/translations';
 
   import Succses from "$lib/celim/icons/succses.svelte";
   import Button from "$lib/celim/ui/button.svelte";
@@ -37,7 +38,7 @@ import TextInput from "$lib/celim/ui/input/textInput.svelte";
   <div dir="rtl"	class="flex flex-col items-center justify-center bg-barbi h-screen">
   <form onsubmit={handleSubmit}>
     <div class="w-[50vw] flex flex-col space-y-2">
-    <TextInput  bind:text={searchText} lebel={{"he":"מה הצורך שלך","en":"what you need"}} />
+    <TextInput  bind:text={searchText} lebel={$t('common.labels.whatDoYouNeed')} />
     <Button {loading} {error} {succses} onClick={handleSubmit}>תציעו לי</Button>
 
     </div>

@@ -1,6 +1,6 @@
 ﻿
 <script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
 import { onMount } from 'svelte';
 import { lang } from '$lib/stores/lang.js'
     import { liUN } from '$lib/stores/liUN.js';
@@ -129,15 +129,6 @@ skillslist = find_skill_id(selected);
     onB
   } = $props();
 
-const cencel = {"he":"ביטול","en": "cencel"}
-const adds = {"he":"הוספת כישור חדש","en": "Add new Skill"}
-
-const addn = {"he":"הוספת תפקיד חדש","en": "Add new Role"}
-const valn = {"he":"שם התפקיד", "en": "Role name"}
-const des = {"he": "תיאור קצר", "en": "Role short description"}
-const btnTitles = {"he": "הוספה", "en": "Add"}
-const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
-const nom = {"he": "לא קיים עדיין ברשימה, ניתן להוסיף בלחיצה על כפתור \"הוספת כישור חדש\" שלמטה","en":"Not on the list yet , add it with the \"Add new skill\" button bellow"}
 let addsk = $state(false);
 let newsk;
 function finnish (event) {
@@ -166,11 +157,11 @@ function dispatchb () {
 {#if addR == false}
 <button 
 class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-0.5 px-4 rounded-full"
-onclick={() => addR = true}>{addn[$lang]}</button>
+onclick={() => addR = true}>{$t('addnew.addNewRole.addn')}</button>
 {:else}
 <div class="bg-opacity-10 bg-barbi p-4">
 
-<button title={cencel[$lang]}
+<button title={$t('addnew.addNewRole.cencel')}
 onclick={dispatchb}
 class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded-full"
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -178,19 +169,19 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded-full"
 </svg></button> 
   
 
-    <h1 class="font-bold text-gold" style="font-size: 1rem; line-height: normal; color: var({color}); ">{addn[$lang]}</h1>    
+    <h1 class="font-bold text-gold" style="font-size: 1rem; line-height: normal; color: var({color}); ">{$t('addnew.addNewRole.addn')}</h1>    
 <div dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
   <input  bind:value={roleName_value}
  type='text' class='input' required>
-  <label  style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="name" class='label'>{valn[$lang]}</label>
+  <label  style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="name" class='label'>{$t('addnew.addNewRole.valn')}</label>
   <span class='line'></span>
 </div>
-{#if shgi == true}<small class="text-red-600">{errmsg[$lang]}</small>{/if}
+{#if shgi == true}<small class="text-red-600">{$t('addnew.addNewRole.errmsg')}</small>{/if}
 
    <div dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
   <input bind:value={desR}  
  type='text' class='input' required>
-  <label  style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="des" class='label'>{des[$lang]}</label>
+  <label  style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="des" class='label'>{$t('addnew.addNewRole.des')}</label>
   <span class='line'></span>
 </div>
 <br>
@@ -198,7 +189,7 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded-full"
       <MultiSelect
         outerDivClass="!bg-gold !text-barbi"
         inputClass="!bg-gold !text-barbi"
-        noMatchingOptionsMsg={nom[$lang]}
+        noMatchingOptionsMsg={$t('addnew.addNewRole.nom')}
       bind:selected
       {placeholder}
       options={skills2.map(c => c.attributes.skillName)}
@@ -210,18 +201,18 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded-full"
       <button
        onclick={() => addsk = true} 
        class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold px-1 rounded-full"
-       >{adds[$lang]}</button>
+       >{$t('addnew.addNewRole.adds')}</button>
        <br/>
        <div class="grid items-center justify-center">
     <button onclick={addrole}
-    title="{btnTitles[$lang]}"
+    title="{$t('addnew.addNewRole.btnTitles')}"
     class=" hover:bg-barbi hover:text-mturk text-gold font-bold py-1 px-2 rounded-full" 
     ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
       <path fill="currentColor" d="M14.3 21.7C13.6 21.9 12.8 22 12 22C6.5 22 2 17.5 2 12S6.5 2 12 2C13.3 2 14.6 2.3 15.8 2.7L14.2 4.3C13.5 4.1 12.8 4 12 4C7.6 4 4 7.6 4 12S7.6 20 12 20C12.4 20 12.9 20 13.3 19.9C13.5 20.6 13.9 21.2 14.3 21.7M7.9 10.1L6.5 11.5L11 16L21 6L19.6 4.6L11 13.2L7.9 10.1M18 14V17H15V19H18V22H20V19H23V17H20V14H18Z" />
     </svg></button>
     </div>
       {:else} 
-      <button title={cencel[$lang]}
+      <button title={$t('addnew.addNewRole.cencel')}
     onclick={() => addsk = false}
      class=" hover:bg-barbi hover:text-mturk text-gold font-bold p-1 rounded-full"
      ><svg style="width:24px;height:24px" viewBox="0 0 24 24">

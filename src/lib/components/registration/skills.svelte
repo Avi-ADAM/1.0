@@ -77,24 +77,23 @@
     onProgres?.({ tx: 600, txx: 20 });
   }
 
-  import tr from '$lib/translations/tr.json';
-  const ws = tr.reg.skillsQuestion;
+  import { t } from '$lib/translations';
 </script>
 
 <div class="step-inner" dir={$isRtl ? 'rtl' : 'ltr'}>
-  <h2 class="step-title">{userName_value}&nbsp;{ws[$lang]}</h2>
+  <h2 class="step-title">{userName_value}&nbsp;{$t('reg.skillsQuestion')}</h2>
   <div class="multi-wrap">
     <SkillSelector bind:selectedSkills={selected} color="--gold" />
   </div>
   <div class="nav-row">
     <button class="btn-nav btn-back" onclick={back} disabled={show_value <= 1}>
-      {$lang === 'en' ? '← Back' : 'חזרה →'}
+      {$t('reg.back')}
     </button>
     <button class="btn-nav btn-skip" onclick={toend}>
-      {$lang === 'en' ? 'Skip' : 'דלג'}
+      {$t('reg.skip')}
     </button>
     <button class="btn-nav btn-next" onclick={increment}>
-      {$lang === 'en' ? 'Next →' : '← הבא'}
+      {$t('reg.next')}
     </button>
   </div>
 </div>

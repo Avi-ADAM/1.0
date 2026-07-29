@@ -1,0 +1,134 @@
+{
+  "baci": {
+    "addne": "Create \"{{name}}\"",
+    "timeto": "How long until the rikma becomes profitable",
+    "timetoex": "The time until money can be split, counted from when all missions are staffed and all required resources received",
+    "cvar": "The rikma is already profitable",
+    "week": "Week",
+    "month": "Month",
+    "threemonth": "Three months",
+    "halt": "Half a year",
+    "year": "Year",
+    "toyers": "Two years",
+    "more": "More than two years",
+    "never": "Never",
+    "om": "One moment please",
+    "cencel": "Cancel",
+    "crn": "Create a new rikma",
+    "frn": "Rikma name",
+    "hours": "Hours",
+    "hrex": "After that time, no response counts as agreement",
+    "hre": "Response time for the rikma's decisions",
+    "teure": "Short description, publicly visible",
+    "prte": "Detailed description, visible only inside the rikma",
+    "wel": "Link to a website (if any)",
+    "naex": "That name already exists — please choose another",
+    "whva": "Which values and goals will the rikma promote",
+    "ladd": "Add a logo",
+    "su": "Logo added successfully",
+    "cree": "Create and publish the rikma",
+    "sur": "The rikma was created successfully",
+    "tob": "Go to the rikma's brain to manage it",
+    "inc": "You can enter the estimated income if you know it, otherwise you can calculate it later from the management page",
+    "valuesAndGoals": "Values and goals",
+    "nameTooShort": "Please choose a longer name for the rikma",
+    "continuous": "Ongoing rikma",
+    "oneTimed": "One-off rikma",
+    "continuousLevel": "Is the rikma meant to be a one-off or an ongoing thing? For example: producing one event, versus founding an event-production business"
+  },
+  "addNewNeed": {
+    "hekind": "Kind of value",
+    "val": "Monetary value",
+    "sho": "Short description",
+    "blib": "Link to product details, price or purchase",
+    "cen": "Cancel",
+    "nena": "Resource name",
+    "adn": "Add a resource that is not on the list",
+    "adni": "Add a new resource",
+    "ot": "One-time cost",
+    "py": "Per unit",
+    "pm": "Monthly",
+    "pye": "Yearly",
+    "re": "Rent for a fixed period",
+    "crn": "Create a new resource"
+  },
+  "addNewSkill": {
+    "cencel": "Cancel",
+    "adds": "Add new skill",
+    "nom": "Not on the list yet — add it with the \"Add new role\" button below",
+    "addn": "Add new role",
+    "valn": "Skill name",
+    "des": "Short description",
+    "btnTitles": "Add",
+    "dup": {
+      "found": "An identical skill already exists:",
+      "similar": "Very similar to an existing skill:",
+      "override": "Add anyway"
+    }
+  },
+  "addNewRole": {
+    "cencel": "Cancel",
+    "adds": "Add new skill",
+    "addn": "Add new role",
+    "valn": "Role name",
+    "des": "Short description",
+    "btnTitles": "Add",
+    "errmsg": "Name already exists",
+    "nom": "Not on the list yet — add it with the \"Add new skill\" button below"
+  },
+  "addNewMission": {
+    "placeholder": "Choose needed skills",
+    "chsk": "Choose needed skills",
+    "nom": "Not on the list yet — add it with the \"Add new skill\" button below",
+    "yeve": "Create and add a new mission",
+    "sho": "Short description",
+    "placeholderr": "Choose needed roles",
+    "miname": "Mission name",
+    "adds": "Choose needed roles",
+    "nomv": "Not on the list yet — add it with the \"Add new role\" button below",
+    "addnewhed": "Add a new mission"
+  },
+  "addnewval": {
+    "cencel": "Cancel",
+    "addn": "Add new value",
+    "valn": "Value name",
+    "des": "Short description",
+    "btnTitles": "Add",
+    "errmsg": "Name already exists"
+  },
+  "addnewWorkway": {
+    "cencel": "Cancel",
+    "adds": "Add a new way of creation",
+    "valn": "Name",
+    "btnTitles": "Add",
+    "errmsg": "Name already exists"
+  },
+  "createNewMeeting": {
+    "placeholder": "Choose users to add to your meeting",
+    "addn": "Add meeting details",
+    "head": "Create a new Gold Meeting",
+    "explanetion": "A Gold Meeting has no predefined date — it happens at the golden moment that suits every participant.",
+    "second": "For the magic to happen, set your status to live whenever you have time to meet — from up here, or through our Telegram bot."
+  },
+  "addNewSkillToRole": {
+    "adds": "Add new skill",
+    "valn": "Skill name",
+    "des": "Short description",
+    "btnTitles": "Add",
+    "errmsg": "Name already exists"
+  },
+  "addNewRoleToSkill": {
+    "addn": "Add new role",
+    "valn": "Role name",
+    "des": "Short description",
+    "btnTitles": "Add",
+    "errmsg": "Name already exists"
+  },
+  "choosRole": {
+    "adds": "Choose needed roles",
+    "nom": "Not on the list yet — add it with the \"Add new role\" button below"
+  },
+  "meeting": {
+    "nameLabel": "Meeting Name"
+  }
+}

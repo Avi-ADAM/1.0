@@ -1,6 +1,6 @@
 <script>
+  import { t } from '$lib/translations';
   import { executeAction } from '$lib/client/actionClient';
-  import { lang } from '$lib/stores/lang.js';
 
   let clicked = $state(false);
   let needName = $state();
@@ -53,32 +53,18 @@
     addnee = $bindable(false),
     onNewn
   } = $props();
-const hekind = {"he":"סוג שווי","en":"kind of vallue"}
-const val = {"he":"שווי כספי ","en":"vallue"}
-  const sho = {"he":"תיאור קצר","en":"short description"}
-const blib = {"he":"לינק לפרטי מוצר, למחיר או לרכישה","en":"link to product details, description or price" }
-const cen = {"he":"ביטול","en":"cencel"}
-const nena = {"he":"שם המשאב","en":"need name"}
-const adn = {"he":"הוספת משאב שאינו ברשימה","en":"create need that is not on the list"}
-const adni = {"he":"הוספת משאב חדש","en":"add new need"}  
-const ot = {"he":"עלות חד פעמית","en":"one time"}
-const py = {"he":"ליחידה", "en": "per unit"}
-const pm = {"he": "חודשי","en": "monthly"}
-const pye = {"he": "שנתי", "en": "yearly"}
-const re = {"he": "השכרה לזמן קצוב", "en": "rent"}
-const crn = {"he":"יצירת משאב חדש","en":"create new need"}
   </script>
  {#if addnee === false}
 
       <button onclick={() => addnee = true} 
         class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-0.5 px-4 rounded-full"
-        >{adn[$lang]}</button>
+        >{$t('addnew.addNewNeed.adn')}</button>
       {:else if addnee === true}
       <div  
       class="p-2 m-2 border-2 border-gold rounded " 
       class:bg-slate-900={onmo == true}>
   <button
-  title="{cen[$lang]}"
+  title="{$t('addnew.addNewNeed.cen')}"
        onclick={() => addnee = false}
         class=" hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full"
         ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -89,37 +75,37 @@ const crn = {"he":"יצירת משאב חדש","en":"create new need"}
         class="flex flex-col items-center text-center">
     <h1 
     class="text-barbi text-2xl text-center"
-    >{adni[$lang]}</h1>    
+    >{$t('addnew.addNewNeed.adni')}</h1>    
    <div style="--the:{`var(${color})`}; width:100%;" class="flex flex-col items-center text-center">
       
 <div dir="rtl" class='textinput'>
   <input         bind:value={needName}
  type='text' class='input' required>
-  <label for="name" class='label'>{nena[$lang]}</label>
+  <label for="name" class='label'>{$t('addnew.addNewNeed.nena')}</label>
   <span class='line'></span>
 </div>
 <div dir="rtl" class='textinput'>
   <input         bind:value={desN}
  type='text' class='input' required>
-  <label for="name" class='label'>{sho[$lang]}</label>
+  <label for="name" class='label'>{$t('addnew.addNewNeed.sho')}</label>
   <span class='line'></span>
 </div>
 <div dir="rtl" class='textinput'>
   <input         bind:value={linkto}
  type='text' class='input' required>
-  <label for="name" class='label'>{blib[$lang]}</label>
+  <label for="name" class='label'>{$t('addnew.addNewNeed.blib')}</label>
   <span class='line'></span>
 </div>
  <div dir="rtl" class='textinput'>
   <input         bind:value={price}
  type="number" class='input' required>
-  <label for="name" class='label'>{val[$lang]}</label>
+  <label for="name" class='label'>{$t('addnew.addNewNeed.val')}</label>
   <span class='line'></span>
 </div>
 
   
    <div dir="rtl"  style="width:80%">
-   <h2 class="text-center text-barbi">{hekind[$lang]}</h2>
+   <h2 class="text-center text-barbi">{$t('addnew.addNewNeed.hekind')}</h2>
     <select bind:value={valued} class="round form-select appearance-none
       block
       w-full
@@ -134,18 +120,18 @@ const crn = {"he":"יצירת משאב חדש","en":"create new need"}
       ease-in-out
       m-0
       focus:text-barbi focus:bg-gold focus:border-barbi focus:outline-none">
-<option value="total">{ot[$lang]}</option>
-<option value="monthly">{pm[$lang]}</option>
-<option value="yearly">{pye[$lang]}</option>
-<option value="perUnit">{py[$lang]}</option>
-<option value="rent">{re[$lang]}</option>
+<option value="total">{$t('addnew.addNewNeed.ot')}</option>
+<option value="monthly">{$t('addnew.addNewNeed.pm')}</option>
+<option value="yearly">{$t('addnew.addNewNeed.pye')}</option>
+<option value="perUnit">{$t('addnew.addNewNeed.py')}</option>
+<option value="rent">{$t('addnew.addNewNeed.re')}</option>
 </select>
 </div>
 {#if clicked == false}
   <button
  onclick={subm} 
  class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full"
- >{crn[$lang]}</button>
+ >{$t('addnew.addNewNeed.crn')}</button>
  {/if}
    </div>
   </div>

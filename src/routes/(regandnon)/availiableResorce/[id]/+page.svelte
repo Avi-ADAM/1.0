@@ -219,7 +219,7 @@
                     setTimeout(function () {
                         success = false;
                     }, 15000);
-                    toast.success(`${fnnn[$lang]}`);
+                    toast.success(`${$t('pages.availResource.fnnn')}`);
                 }
             }
         }
@@ -258,7 +258,7 @@
             closeNego();
             success = true;
             setTimeout(() => { success = false; }, 15000);
-            toast.success(`${fnnn[$lang]}`);
+            toast.success(`${$t('pages.availResource.fnnn')}`);
         } catch (e) {
             console.error(e);
             toast.error('אירעה שגיאה');
@@ -266,42 +266,13 @@
         }
     }
 
-    const fnnn = { "he": 'הבקשה נשלחה בהצלחה', "en": 'request has sent sucsesfully' };
-    const headi = { "he": 'הצעה לשיתוף משאב', "en": 'oportunity for sharing resource' };
-    const om = { "he": 'משאב נדרש', "en": 'needed resorce' };
-    const seePr = { "he": 'לצפיה בריקמה', "en": 'see the freeMates page' };
-    const rangehead = {"he":"נא לבחור את השווי בו יוצע המשאב שלך","en":"please choose the vallue you will share it"}
-    const okk = {"he":"אישור השווי שלי ובקשת שיתוף","en":"create with this value and ask to share"}
-    const ok = {"he":"שיתוף המשאב הנבחר","en":"share selected resorce"}
-    const creatnew = {"he":"יצירת משאב חדש","en":"create new resorce"}
-    const choosee = {"he":"בחירה מתוך המשאבים שלי","en":"choose from my resorces"}
-    const mand = { "he": 'המשאב שותף כבר בהצלחה', "en": 'the resorce has already assigned' };
-    const alri = { "he": 'כבר הגשת בקשה לשתף את המשאב הזה', "en": 'you have already requested to share this resorce' };
-    const iwantto = { "he": 'אני אשמח לשתף!', "en": 'I want to share it!' };
-    const info = { "he": 'בכדי לבקש להצטרף לריקמה ולשתף איתה את המשאב וגם בכדי לקבל הצעות למשימות, לפתוח רקמות (פרויקטים) חדשות ולהתנהל בהן בהסכמה יש להתחבר או להירשם', "en": 'You are not connected' };
-    const registratio = { "he": 'להרשמה', "en": 'To Registration' };
-    const logi = { "he": 'להתחברות', "en": 'To Login' };
-    const foreg = { "he": 'כדי לראות את כל המידע נדרשת התחברות או הרשמה', "en": 'some information is available only for registersd users' };
-    const units ={ "he":"יחידות", "en":"unit's" }
-    const monts = { "he":"חודשים", "en": "month's" }
-    const years = { "he":"שנים", "en":"year's" }
-    const total = { "he":"בסך הכל", "en":"total" }
-    const recurH = { "he":"משאב חוזר · אישרור כל מחזור", "en":"recurring resource · approved each cycle" }
-    const everyH = { "he":"כל", "en":"every" }
-    const noEndH = { "he":"ללא תאריך סיום", "en":"no end date" }
-    const perM = { "he":"לחודש", "en":"per month" }
-    const perY = { "he":"לשנה", "en":"per year" }
-    const nomash = { "he":"לא יצרת משאב מתאים נא ליצור עם הכפתור ליד", "en":"no resorce matching create one with the button" }
-    const plh = { "he": "בחירת משאב", "en":"choose resorce" }
-    const nom = { "he":"לא נמצא משאב מתאים, ניתן ליצור את המשאב המבוקש עם הכפתור הסמוך", "en":"no matching resorce, you can create new same as the requested with the button on the side" }
-    const tolev = { "he" :'לצפיה במשאבים אחרים ובכל העדכונים שלך', "en": 'see your updates & nutifictions' };
 
     let { askedarr = [], alr = $bindable(false), data } = $props();
     console.log(data);
 
     let title = 'This is Svead a Svelte Head Component';
     let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`;
-    let description = page?.data.alld?.descrip || om[$lang];
+    let description = page?.data.alld?.descrip || $t('pages.availResource.om');
     let url = page.url.toString();
 
     const FALLBACK_LOGO = 'https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png';
@@ -318,16 +289,6 @@
                 ? `🤝 ${$lang === 'he' ? 'מאגד ביקוש' : 'demand pool'}${maagadInfo?.name ? ` · ${maagadInfo.name}` : ''}`
                 : `🌟 ${$lang === 'he' ? "קונסיירז'" : 'concierge'}${ratsonName ? ` · ${ratsonName}` : ''}`)
     );
-    const seeMaagad = { he: 'לצפיה במאגד', en: 'See the pool' };
-    const seeWish = { he: 'לצפיה במשאלה', en: 'See the wish' };
-    const offerViaMaagad = {
-        he: 'הצעות למשאב הזה מוגשות דרך עמוד המאגד',
-        en: 'Offers for this resource are made on the pool page'
-    };
-    const offerViaWish = {
-        he: 'הצעת עזרה למשאב הזה מוגשת דרך עמוד המשאלה',
-        en: 'Help with this resource is offered on the wish page'
-    };
 </script>
 
 {#await data.alld}
@@ -375,7 +336,7 @@
         </DialogOverlay>
 
         {#if data.alld?.archived != true && data.alld != null}
-            <Head title={page.data?.alld?.title[$lang] ?? headi[$lang]} {description} {image} {url} />
+            <Head title={page.data?.alld?.titleKey ? $t(page.data.alld.titleKey, page.data.alld.titleParams) : $t('pages.availResource.headi')} {description} {image} {url} />
             <div bind:clientWidth={wid} dir="rtl" style="overflow-y:auto" class="d mb-4 sm:pt-4 w-full lg:w-1/2 mx-auto">
                 <!-- Discovery cross-links: back to the big picture (directories + map) -->
                 <div class="mb-3 flex justify-center">
@@ -388,19 +349,19 @@
                         </div>
                         <div class="flex flex-col leading-tight">
                             <div class="sm:text-sm text-md mt-1 flex items-center">
-                                <span class="text-barbi text-center mr-3 sm:text-2xl lg:text-4xl text-xl">{headi[$lang]}</span>
+                                <span class="text-barbi text-center mr-3 sm:text-2xl lg:text-4xl text-xl">{$t('pages.availResource.headi')}</span>
                             </div>
                             <span class="pn ml-1 text-lg sm:text-xl lg:text-2xl text-grey-200">{sourceName}</span>
                         </div>
                     </div>
                     <div>
                         {#if hasProject}
-                        <button onclick={() => project(data.alld.project.data.id)} class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4">{seePr[$lang]}</button>
+                        <button onclick={() => project(data.alld.project.data.id)} class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4">{$t('pages.availResource.seePr')}</button>
                         {:else if maagadInfo?.id}
-                        <a href="/maagad/{maagadInfo.id}" class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4">{seeMaagad[$lang]}</a>
+                        <a href="/maagad/{maagadInfo.id}" class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4">{$t('pages.availResource.seeMaagad')}</a>
                         {:else if ratsonId}
                         <!-- The public wish page — right referral for any visitor -->
-                        <a href="/wish/{ratsonId}" class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4">{seeWish[$lang]}</a>
+                        <a href="/wish/{ratsonId}" class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4">{$t('pages.availResource.seeWish')}</a>
                         {/if}
                     </div>
                 </div>
@@ -412,12 +373,12 @@
                                     <h2 class="text-barbi font-bold text-xl lg:text-4xl underline">{data.alld.name}</h2>
                                     {#if data.alld.recurring}
                                         <div class="inline-flex flex-wrap items-center gap-2 my-2 px-3 py-1.5 rounded-xl bg-blue-900/40 border border-gold/40">
-                                            <span class="text-gold font-bold text-sm lg:text-xl">🔁 {recurH[$lang]}</span>
+                                            <span class="text-gold font-bold text-sm lg:text-xl">🔁 {$t('pages.availResource.recurH')}</span>
                                             {#if Number(data.alld.cycleSize) > 1}
-                                                <span class="text-gray-100 text-xs lg:text-lg">· {everyH[$lang]} {data.alld.cycleSize} {data.alld.kindOf == "yearly" ? years[$lang] : monts[$lang]}</span>
+                                                <span class="text-gray-100 text-xs lg:text-lg">· {$t('pages.availResource.everyH')} {data.alld.cycleSize} {data.alld.kindOf == "yearly" ? $t('pages.availResource.years') : $t('pages.availResource.monts')}</span>
                                             {/if}
                                             {#if !data.alld.sqadualedf}
-                                                <span class="text-gray-100 text-xs lg:text-lg">· ♾️ {noEndH[$lang]}</span>
+                                                <span class="text-gray-100 text-xs lg:text-lg">· ♾️ {$t('pages.availResource.noEndH')}</span>
                                             {/if}
                                         </div>
                                     {/if}
@@ -445,18 +406,18 @@
                                                 <span> ↔️ {data.alld.easy}</span>
                                             {/if}
                                             {#if data.alld.recurring}
-                                                <span class="text-gold"> ₪ {data.alld.kindOf == "yearly" ? perY[$lang] : perM[$lang]}</span>
+                                                <span class="text-gold"> ₪ {data.alld.kindOf == "yearly" ? $t('pages.availResource.perY') : $t('pages.availResource.perM')}</span>
                                             {/if}
                                         </span>
                                         {#if data.alld.kindOf != "total" && data.alld.hm > 1}
-                                            <span> ✖️ {data.alld.hm} {units[$lang]}</span>
+                                            <span> ✖️ {data.alld.hm} {$t('pages.availResource.units')}</span>
                                         {/if}
                                         {#if (data.alld.kindOf == "monthly" || data.alld.kindOf == "years" || data.alld.kindOf == "yearly" || data.alld.kindOf == "rent") && !(data.alld.recurring && !data.alld.sqadualedf)}
                                             <span> ✖️ {montsi(data.alld.kindOf,data.alld.sqadualed,data.alld.sqadualedf,true)}
                                                 {#if data.alld.kindOf == "monthly" || data.alld.kindOf == "rent"}
-                                                    <span>{monts[$lang]}</span>
+                                                    <span>{$t('pages.availResource.monts')}</span>
                                                 {:else if data.alld.kindOf == "years" || data.alld.kindOf == "yearly"}
-                                                    <span>{years[$lang]}</span>
+                                                    <span>{$t('pages.availResource.years')}</span>
                                                 {/if}
                                             </span>
                                         {/if}
@@ -465,7 +426,7 @@
                                                 {#if data.alld.price != data.alld.easy}
                                                     <span> ↔️ {data.alld.easy * data.alld.hm * montsi(data.alld.kindOf, data.alld.sqadualed, data.alld.sqadualedf,true)}</span>
                                                 {/if}
-                                                {total[$lang]}
+                                                {$t('pages.availResource.total')}
                                             </span>
                                         {/if}
                                     </p>
@@ -482,7 +443,7 @@
                                                 <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-full"></div>
                                             </div>
                                             <div class="flex items-center w-full space-x-2 max-w-[480px]">
-                                                <small class="text-barbi text-lg leading-3 sm:text-2xl">{foreg[$lang]}</small>
+                                                <small class="text-barbi text-lg leading-3 sm:text-2xl">{$t('pages.availResource.foreg')}</small>
                                                 <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24"></div>
                                             </div>
                                             <span class="sr-only">for registered users only...</span>
@@ -492,30 +453,30 @@
                                     {#if alr == true && alrr == false && !data.alld.declinedsps.data.map((c) => c.id).includes(data.uid)}
                                         <div class="flex justify-center">
                                             {#if easychoose != true}
-                                                <button onclick={torange} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full">{creatnew[$lang]}</button>
+                                                <button onclick={torange} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full">{$t('pages.availResource.creatnew')}</button>
                                             {:else}
-                                                <h3 class="text-barbi">{rangehead[$lang]}</h3>
+                                                <h3 class="text-barbi">{$t('pages.availResource.rangehead')}</h3>
                                                 <div class="w-full">
                                                     <RangeSlider float={true} onstop={(e) => { console.log(e) }} bind:values={easyy} min=0 max={Number(data.alld.easy) ?? Number(data.alld.price)} />
                                                 </div>
-                                                <button onclick={()=>ask(0)} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full">{okk[$lang]}</button>
+                                                <button onclick={()=>ask(0)} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full">{$t('pages.availResource.okk')}</button>
                                                 <button onclick={()=>openNego(0)} class="border border-gold rounded-full text-gold hover:text-barbi hover:border-barbi font-bold py-2 px-4 m-4">{$t('lev.cards.proposeOther')}</button>
                                             {/if}
                                             
                                             {#if tochoose != true && alrr == false}
-                                                <button onclick={tochoos} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full">{choosee[$lang]}</button>
+                                                <button onclick={tochoos} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full">{$t('pages.availResource.choosee')}</button>
                                             {:else if alrr == false}
                                                 {#if loading == true || loading !=true && mash.length >0}
                                                     <div class="m-4 mt-6">
-                                                        <MultiSelect {loading} --sms-open-z-index=4 --sms-options-max-height="10vh" --sms-text-color="var(--barbi-pink)" --sms-max-width="100%" bind:selected maxSelect={1} placeholder={plh[$lang]} noMatchingOptionsMsg={nom[$lang]} options={mash.map(c => c.attributes.name)} />
+                                                        <MultiSelect {loading} --sms-open-z-index=4 --sms-options-max-height="10vh" --sms-text-color="var(--barbi-pink)" --sms-max-width="100%" bind:selected maxSelect={1} placeholder={$t('pages.availResource.plh')} noMatchingOptionsMsg={$t('pages.availResource.nom')} options={mash.map(c => c.attributes.name)} />
                                                     </div>
                                                 {:else}
                                                     <div class="m-4 mt-6">
-                                                        <p class="text-barbi">{nomash[$lang]}</p>
+                                                        <p class="text-barbi">{$t('pages.availResource.nomash')}</p>
                                                     </div>
                                                 {/if}
                                                 {#if selected.length>0}
-                                                    <button onclick={afterChoose} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full">{ok[$lang]}</button>
+                                                    <button onclick={afterChoose} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full">{$t('pages.availResource.ok')}</button>
                                                     <button onclick={afterChooseNego} class="border border-gold rounded-full text-gold hover:text-barbi hover:border-barbi font-bold py-2 px-4 m-4">{$t('lev.cards.proposeOther')}</button>
                                                 {/if}
                                             {/if}
@@ -523,7 +484,7 @@
                                     {/if}
                                 </div>
                                 <div class="">
-                                    <Share slug={'/availableResorce/' + page.data?.mId} title={data.alld?.title[$lang]} desc="it's new thing" hashtags={['1💗1', 'consensus']} quote={data.alld?.title[$lang]} related={[]} via={''} />
+                                    <Share slug={'/availableResorce/' + page.data?.mId} title={data.alld?.titleKey ? $t(data.alld.titleKey, data.alld.titleParams) : ''} desc="it's new thing" hashtags={['1💗1', 'consensus']} quote={data.alld?.titleKey ? $t(data.alld.titleKey, data.alld.titleParams) : ''} related={[]} via={''} />
                                 </div>
                             </div>
 
@@ -531,28 +492,28 @@
                                 <!-- Wish/maagad-sourced resource: the legacy Askm share flow
                                      needs a rikma — offers go through the source page instead. -->
                                 <div class="flex flex-col gap-3 justify-center items-center mt-7">
-                                    <p class="text-barbi text-center text-xl">{isMaagadSrc ? offerViaMaagad[$lang] : offerViaWish[$lang]}</p>
+                                    <p class="text-barbi text-center text-xl">{isMaagadSrc ? $t('pages.availResource.offerViaMaagad') : $t('pages.availResource.offerViaWish')}</p>
                                     {#if maagadInfo?.id}
-                                        <a href="/maagad/{maagadInfo.id}" class="button-perl text-barbi text-2xl px-4 py-3 hover:text-black hover:font-bold">{seeMaagad[$lang]}</a>
+                                        <a href="/maagad/{maagadInfo.id}" class="button-perl text-barbi text-2xl px-4 py-3 hover:text-black hover:font-bold">{$t('pages.availResource.seeMaagad')}</a>
                                     {:else if ratsonId}
-                                        <a href="/wish/{ratsonId}" class="button-perl text-barbi text-2xl px-4 py-3 hover:text-black hover:font-bold">{seeWish[$lang]}</a>
+                                        <a href="/wish/{ratsonId}" class="button-perl text-barbi text-2xl px-4 py-3 hover:text-black hover:font-bold">{$t('pages.availResource.seeWish')}</a>
                                     {/if}
                                 </div>
                             {:else if page.data.tok != false}
                                 <div class="flex justify-center min-h-fit">
                                     {#if alr == false && !data.alld.declinedsps.data.map((c) => c.id).includes(data.uid)}
-                                        <button onclick={second} onmouseenter={() => (hovered = true)} onmouseleave={() => (hovered = false)} class:button-perl={hovered == false} class:button-gold={hovered == true} class=" mx-auto mt-7 text-3xl px-4 py-3 hover:text-black hover:font-bold text-barbi">{iwantto[$lang]}</button>
+                                        <button onclick={second} onmouseenter={() => (hovered = true)} onmouseleave={() => (hovered = false)} class:button-perl={hovered == false} class:button-gold={hovered == true} class=" mx-auto mt-7 text-3xl px-4 py-3 hover:text-black hover:font-bold text-barbi">{$t('pages.availResource.iwantto')}</button>
                                     {:else if data.alld.declinedsps.data.map((c) => c.id).includes(data.uid)}
-                                        <h3 class="button-perl text-barbi px-4 py-1">{alri[$lang]}</h3>
+                                        <h3 class="button-perl text-barbi px-4 py-1">{$t('pages.availResource.alri')}</h3>
                                     {/if}
                                 </div>
                             {:else}
                                 <div class="flex justify-center">
                                     <div role="contentinfo" class="mx-8 mt-7 text-barbi hover:text-black" onmouseenter={() => (hovered = true)} onmouseleave={() => (hovered = false)} class:button-perl={hovered == false} class:button-gold={hovered == true}>
-                                        <p class="text-center font-bold text-2xl p-2">{info[$lang]}</p>
+                                        <p class="text-center font-bold text-2xl p-2">{$t('pages.availResource.info')}</p>
                                         <div class="flex flex-row flex-auto justify-between">
-                                            <button class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4" onclick={reg}>{registratio[$lang]}</button>
-                                            <button class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4" onclick={login}>{logi[$lang]}</button>
+                                            <button class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4" onclick={reg}>{$t('pages.availResource.registratio')}</button>
+                                            <button class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4" onclick={login}>{$t('pages.availResource.logi')}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -563,16 +524,16 @@
             </div>
         {:else if data.alld?.archived == true}
             <div class="text-center pt-14">
-                <h1 class="text-barbi sm:text-xl my-5">{mand[$lang]}</h1>
+                <h1 class="text-barbi sm:text-xl my-5">{$t('pages.availResource.mand')}</h1>
                 {#if page?.data.tok != false}
-                    <a href="/lev" class="text-lturk hover:text-barbi hover:border-barbi border border-gold rounded-xl px-4 py-2 sm:text-xl">{tolev[$lang]}</a>
+                    <a href="/lev" class="text-lturk hover:text-barbi hover:border-barbi border border-gold rounded-xl px-4 py-2 sm:text-xl">{$t('pages.availResource.tolev')}</a>
                 {:else}
                     <div class="w-screen">
                         <div class="w-1/2 mx-auto border border-barbi button-bronze">
-                            <h3 class="font-bold text-2xl p-2">{info[$lang]}</h3>
+                            <h3 class="font-bold text-2xl p-2">{$t('pages.availResource.info')}</h3>
                             <div class="flex flex-row flex-auto justify-between">
-                                <button class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4" onclick={reg}>{registratio[$lang]}</button>
-                                <button class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4" onclick={login}>{logi[$lang]}</button>
+                                <button class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4" onclick={reg}>{$t('pages.availResource.registratio')}</button>
+                                <button class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4" onclick={login}>{$t('pages.availResource.logi')}</button>
                             </div>
                         </div>
                     </div>
@@ -582,14 +543,14 @@
             <div class="text-center pt-14">
                 <h3 class="text-barbi sm:text-xl my-5">error | שגיאה</h3>
                 {#if page.data.tok != false}
-                    <a href="/lev" class="text-lturk hover:text-barbi hover:border-barbi border border-gold rounded-xl px-4 py-2 sm:text-xl">{tolev[$lang]}</a>
+                    <a href="/lev" class="text-lturk hover:text-barbi hover:border-barbi border border-gold rounded-xl px-4 py-2 sm:text-xl">{$t('pages.availResource.tolev')}</a>
                 {:else}
                     <div class="w-screen">
                         <div class="w-1/2 mx-auto border border-barbi button-bronze">
-                            <h1 class=" font-bold text-2xl p-2">{info[$lang]}</h1>
+                            <h1 class=" font-bold text-2xl p-2">{$t('pages.availResource.info')}</h1>
                             <div class="flex flex-row flex-auto justify-between">
-                                <button class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4" onclick={reg}>{registratio[$lang]}</button>
-                                <button class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4" onclick={login}>{logi[$lang]}</button>
+                                <button class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4" onclick={reg}>{$t('pages.availResource.registratio')}</button>
+                                <button class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4" onclick={login}>{$t('pages.availResource.logi')}</button>
                             </div>
                         </div>
                     </div>
@@ -600,14 +561,14 @@
         <div class="text-center pt-14">
             <h3 class="text-barbi sm:text-xl my-5">error | שגיאה</h3>
             {#if page.data.tok != false}
-                <a href="/lev" class="text-lturk hover:text-barbi hover:border-barbi border border-gold rounded-xl px-4 py-2 sm:text-xl">{tolev[$lang]}</a>
+                <a href="/lev" class="text-lturk hover:text-barbi hover:border-barbi border border-gold rounded-xl px-4 py-2 sm:text-xl">{$t('pages.availResource.tolev')}</a>
             {:else}
                 <div class="w-screen">
                     <div class="w-1/2 mx-auto border border-barbi button-bronze">
-                        <h1 class=" font-bold text-2xl p-2">{info[$lang]}</h1>
+                        <h1 class=" font-bold text-2xl p-2">{$t('pages.availResource.info')}</h1>
                         <div class="flex flex-row flex-auto justify-between">
-                            <button class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4" onclick={reg}>{registratio[$lang]}</button>
-                            <button class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4" onclick={login}>{logi[$lang]}</button>
+                            <button class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4" onclick={reg}>{$t('pages.availResource.registratio')}</button>
+                            <button class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4" onclick={login}>{$t('pages.availResource.logi')}</button>
                         </div>
                     </div>
                 </div>

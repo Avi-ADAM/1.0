@@ -1,7 +1,7 @@
 ﻿<script>
   import { isRtl } from '$lib/translations';
   import {isToday }from '$lib/func/uti/isToday.svelte';
-   import {lang} from '$lib/stores/lang'
+   import { lang } from '$lib/stores/lang'
   import { isChatLoading, nowChatId } from '$lib/stores/pendMisMes';
   import { Rainbow } from 'svelte-loading-spinners';
   import { quintOut } from 'svelte/easing';

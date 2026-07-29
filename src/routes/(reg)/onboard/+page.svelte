@@ -42,8 +42,8 @@
 
   function go() {
     going = true;
-    const t = tracks.find((x) => x.id === selected);
-    if (t) setTimeout(() => goto(t.path), 220);
+    const track = tracks.find((x) => x.id === selected);
+    if (track) setTimeout(() => goto(track.path), 220);
   }
 </script>
 

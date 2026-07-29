@@ -1,6 +1,5 @@
 ﻿<script lang="ts">
-  import { isRtl } from '$lib/translations';
-  import { lang } from '$lib/stores/lang.js';
+  import { isRtl, t } from '$lib/translations';
   import { toast } from 'svelte-sonner';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
@@ -88,7 +87,7 @@
           onChat({ forumId: newForumId, sheirutId: buble.id });
         } catch (err) {
           console.error(err);
-          toast.error(t.error[$lang]);
+          toast.error($t('lev.cards.customerSale.error'));
         } finally {
           isCreatingChat = false;
         }
@@ -96,76 +95,6 @@
     }
   }
 
-  const t = {
-    seller: { he: 'מוכר:', en: 'Seller:', ar: 'البائع:' },
-    product: { he: 'מוצר:', en: 'Product:', ar: 'المنتج:' },
-    price: { he: 'מחיר:', en: 'Price:', ar: 'السعر:' },
-    quantity: { he: 'כמות:', en: 'Quantity:', ar: 'الكمية:' },
-    total: { he: 'סה"כ:', en: 'Total:', ar: 'المجموع:' },
-    startDate: { he: 'התחלה:', en: 'Start:', ar: 'البداية:' },
-    endDate: { he: 'סיום:', en: 'End:', ar: 'النهاية:' },
-    confirmReceipt: {
-      he: 'אישור קבלת מוצר',
-      en: 'Confirm Receipt',
-      ar: 'تأكيد الاستلام'
-    },
-    selectSeller: {
-      he: 'בחר את מי לתאם איתו את ההעברה:',
-      en: 'Select who to coordinate the transfer with:',
-      ar: 'اختر من تنسق معه التحويل'
-    },
-    noReceivers: {
-      he: 'עדיין אין חברי פרויקט שציינו שיכולים לקבל כסף',
-      en: 'No project members indicated they can receive money yet',
-      ar: 'لا يوجد أعضاء أشاروا أنهم يستطيعون استلام المال بعد'
-    },
-    askInChat: {
-      he: 'כדאי לבקש בצ׳אט',
-      en: 'Ask in chat',
-      ar: 'اسأل في المحادثة'
-    },
-    chat: { he: 'צ׳אט', en: 'Chat', ar: 'محادثة' },
-    creatingChat: {
-      he: 'יוצר צ׳אט...',
-      en: 'Creating chat...',
-      ar: 'جاري إنشاء محادثة...'
-    },
-    submitting: { he: 'מעבד...', en: 'Processing...', ar: 'جاري المعالجة...' },
-    successReceipt: {
-      he: 'אישרת קבלת המוצר',
-      en: 'Receipt confirmed',
-      ar: 'تم تأكيد الاستلام'
-    },
-    successTransfer: {
-      he: 'נפתח תהליך ההעברה',
-      en: 'Transfer process started',
-      ar: 'تم بدء عملية التحويل'
-    },
-    error: {
-      he: 'שגיאה בביצוע הפעולה',
-      en: 'Action failed',
-      ar: 'فشل الإجراء'
-    },
-    statusLabels: {
-      iGotIt: { he: 'קיבלתי', en: 'I received', ar: 'استلمת' },
-      transferInProgress: { he: 'בתהליך העברה', en: 'Transfer in progress', ar: 'التحويل قيد التنفيذ' },
-      sellersClaimDelivered: {
-        he: 'המוכרים טוענים שמסרו',
-        en: 'Sellers claim delivered',
-        ar: 'يدّعي البائعون أنهم سلّموا'
-      },
-      sellerConfirmedMoney: {
-        he: 'המקבל אישר קבלת הכסף',
-        en: 'Recipient confirmed receipt',
-        ar: 'أكد المستلم استلام المال'
-      },
-      coordinatingWith: {
-        he: 'בתיאום עם:',
-        en: 'Coordinating with:',
-        ar: 'بالتنسيق مع:'
-      }
-    }
-  };
 
   let isProcessing = $state(false);
   let showSellerSelect = $state(false);
@@ -192,10 +121,10 @@
       if (!result.success) throw new Error(result.error?.message || 'Failed');
 
       buble.iGotIt = true;
-      toast.success(t.successReceipt[$lang]);
+      toast.success($t('lev.cards.customerSale.successReceipt'));
     } catch (err) {
       console.error(err);
-      toast.error(t.error[$lang]);
+      toast.error($t('lev.cards.customerSale.error'));
     } finally {
       isProcessing = false;
     }
@@ -233,10 +162,10 @@
         buble.iTransferedTo = selectedReceiver;
       }
       showSellerSelect = false;
-      toast.success(t.successTransfer[$lang]);
+      toast.success($t('lev.cards.customerSale.successTransfer'));
     } catch (err) {
       console.error(err);
-      toast.error(t.error[$lang]);
+      toast.error($t('lev.cards.customerSale.error'));
     } finally {
       isProcessing = false;
     }
@@ -288,20 +217,20 @@
     const items = [];
 
     if (buble.iGotIt) {
-      items.push({ label: t.statusLabels.iGotIt[$lang], color: 'green' });
+      items.push({ label: $t('lev.cards.customerSale.statusLabels.iGotIt'), color: 'green' });
     }
     if (buble.iTransferMoney) {
-      items.push({ label: t.statusLabels.transferInProgress[$lang], color: 'blue' });
+      items.push({ label: $t('lev.cards.customerSale.statusLabels.transferInProgress'), color: 'blue' });
     }
     if (buble.weFinnish && buble.weFinnish.length > 0) {
       items.push({
-        label: t.statusLabels.sellersClaimDelivered[$lang],
+        label: $t('lev.cards.customerSale.statusLabels.sellersClaimDelivered'),
         color: 'orange'
       });
     }
     if (isMoneyConfirmedByRecipient) {
       items.push({
-        label: t.statusLabels.sellerConfirmedMoney[$lang],
+        label: $t('lev.cards.customerSale.statusLabels.sellerConfirmedMoney'),
         color: 'green'
       });
     }
@@ -322,7 +251,7 @@
   class="{isMobileOrTablet()
     ? 'w-full h-full'
     : ' w-[90%] h-[90%]'}  lg:w-[90%] {isFirst
-    ? $lang == 'he'
+    ? $isRtl
       ? 'boxleft'
       : 'boxright'
     : ''} flex d flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isScrolable.value
@@ -334,7 +263,7 @@
   <CardHeader
     logoSrc={buble.projectSrc}
     projectName={buble.projectName}
-    cardType={$lang === 'he' ? 'הקניה שלי' : 'MY PURCHASE'}
+    cardType={$t('lev.cards.customerSale.myPurchase')}
     cardTitle={buble.name}
     glowColor="blue"
     onProjectClick={handleProjectClick}
@@ -345,7 +274,7 @@
           class="bg-white/70 dark:bg-gray-900/50 backdrop-blur-sm rounded-xl px-3 py-1.5 shadow-sm"
         >
           <div class="text-[10px] text-orange-600 uppercase font-bold mb-1">
-            {t.statusLabels.sellersClaimDelivered[$lang]}
+            {$t('lev.cards.customerSale.statusLabels.sellersClaimDelivered')}
           </div>
           <VoteStatusDisplay
             compact
@@ -383,7 +312,7 @@
       {/if}
       <div>
         <div class="text-[10px] text-blue-600 uppercase font-semibold">
-          {t.seller[$lang]}
+          {$t('lev.cards.customerSale.seller')}
         </div>
         <div class="font-bold text-gray-800 dark:text-gray-200">
           {buble.projectName || 'Project'}
@@ -437,7 +366,7 @@
     <div class="grid grid-cols-2 gap-3 text-sm">
       <div class="bg-gray-50 dark:bg-gray-700/30 p-2 rounded-lg">
         <span class="text-gray-500 block text-[10px] uppercase"
-          >{t.price[$lang]}</span
+          >{$t('lev.cards.customerSale.price')}</span
         >
         <div class="flex items-center gap-2">
           <img
@@ -452,7 +381,7 @@
       </div>
       <div class="bg-gray-50 dark:bg-gray-700/30 p-2 rounded-lg">
         <span class="text-gray-500 block text-[10px] uppercase"
-          >{t.quantity[$lang]}</span
+          >{$t('lev.cards.customerSale.quantity')}</span
         >
         <span class="font-bold text-gray-800 dark:text-gray-100"
           >{buble.quant}</span
@@ -462,7 +391,7 @@
         class="col-span-2 bg-gradient-to-r from-blue-500/5 to-indigo-500/5 p-2 rounded-lg border border-blue-500/10"
       >
         <span class="text-blue-600 block text-[10px] uppercase font-bold"
-          >{t.total[$lang]}</span
+          >{$t('lev.cards.customerSale.total')}</span
         >
         <div class="flex items-center gap-2">
           <img
@@ -483,7 +412,7 @@
         <div
           class="text-[10px] text-indigo-700 dark:text-indigo-400 uppercase font-semibold mb-2"
         >
-          {t.selectSeller[$lang]}
+          {$t('lev.cards.customerSale.selectSeller')}
         </div>
         <div class="flex flex-wrap gap-2">
           {#each buble.iCanGetMonay || [] as member}
@@ -510,13 +439,13 @@
           {:else}
             <div class="flex items-center justify-between w-full gap-2">
               <span class="text-xs text-gray-500 dark:text-gray-400 italic">
-                {t.noReceivers[$lang]}
+                {$t('lev.cards.customerSale.noReceivers')}
               </span>
               <button
                 class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 underline underline-offset-2 hover:text-indigo-800 transition-colors shrink-0"
                 onclick={handleOpenChat}
               >
-                {t.askInChat[$lang]}
+                {$t('lev.cards.customerSale.askInChat')}
               </button>
             </div>
           {/each}
@@ -545,7 +474,7 @@
   {#if buble.weFinnish && buble.weFinnish.length > 0 && isMobileOrTablet()}
     <div class="px-4">
       <div class="text-[10px] text-orange-600 uppercase font-bold mb-1">
-        {t.statusLabels.sellersClaimDelivered[$lang]}
+        {$t('lev.cards.customerSale.statusLabels.sellersClaimDelivered')}
       </div>
       <VoteStatusDisplay
         votes={weFinnishVotes}
@@ -580,9 +509,9 @@
         />
       </svg>
       {#if isCreatingChat}
-        {t.creatingChat[$lang]}
+        {$t('lev.cards.customerSale.creatingChat')}
       {:else}
-        {t.chat[$lang]}
+        {$t('lev.cards.customerSale.chat')}
       {/if}
     </button>
 
@@ -594,9 +523,9 @@
         disabled={isProcessing}
       >
         {#if isProcessing}
-          {t.submitting[$lang]}
+          {$t('lev.cards.customerSale.submitting')}
         {:else}
-          {t.confirmReceipt[$lang]}
+          {$t('lev.cards.customerSale.confirmReceipt')}
         {/if}
       </button>
     {/if}

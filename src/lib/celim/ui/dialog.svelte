@@ -20,14 +20,13 @@
      */
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
     import { fly } from 'svelte/transition';
-    import { lang } from '$lib/stores/lang';
   /**
    * @typedef {Object} Props
    * @property {boolean} [showSaveDialog]
-   * @property {any} [dialogHeader]
-   * @property {any} [innerText]
-   * @property {any} [innerDialogButton]
-   * @property {any} [clearButton]
+   * @property {string} [dialogHeader]
+   * @property {string} [innerText]
+   * @property {string} [innerDialogButton]
+   * @property {string} [clearButton]
    * @property {() => void} [onSaveTimer]
    * @property {() => void} [onClearTimer]
    */
@@ -35,22 +34,10 @@
   /** @type {Props} */
   let {
     showSaveDialog = $bindable(false),
-    dialogHeader = {
-      en: 'Save Timer',
-      he: 'שמור טיימר'
-    },
-    innerText = {
-      en: 'Would you like to save this timer?',
-      he: 'האם תרצה לשמור את הטיימר הזה?'
-    },
-    innerDialogButton = {
-      en: 'Save',
-      he: 'שמור'
-    },
-    clearButton = {
-      en: 'Clear',
-      he: 'נקה'
-    },
+    dialogHeader = '',
+    innerText = '',
+    innerDialogButton = '',
+    clearButton = '',
     onSaveTimer,
     onClearTimer
   } = $props();
@@ -81,22 +68,22 @@
       class="timer-dialog"
     >
       <div class="dialog-content" dir={$isRtl ? 'rtl' : 'ltr'}>
-        <h2 class="dialog-title">{dialogHeader[$lang]}</h2>
+        <h2 class="dialog-title">{dialogHeader}</h2>
         <p class="dialog-message">
-          {innerText[$lang]}
+          {innerText}
         </p>
         <div class="dialog-buttons">
           <button
             class="save-btn"
             onclick={handleSaveButton}
           >
-            {innerDialogButton[$lang]}
+            {innerDialogButton}
           </button>
           <button
             class="clear-btn"
             onclick={handleCancelButton}
           >
-            {clearButton[$lang]}
+            {clearButton}
           </button>
         </div>
       </div>

@@ -1,12 +1,16 @@
 
-import { loadTranslations, locale } from '$lib/translations';
+import { loadTranslations } from '$lib/translations';
 
 export const load = async ({ url, locals }) => {
   const { pathname } = url;
   const { lang, uid, un, email, isDesktop, userAgent, tok } = locals;
-  const defaultLocale = lang || 'he'; // get from cookie, user session, ...
-  
-  const initLocale = locale.get() || defaultLocale; // set default if no locale already set
+  // `locale` (from sveltekit-i18n) is a single module-level store shared by
+  // every concurrent request this server process handles — it is NOT
+  // per-request state. Reading `locale.get()` here used to let one user's
+  // resolved language leak into another user's response (whoever's request
+  // set it last "wins"). The only per-request source of truth is `locals.lang`,
+  // which hooks.server.js derives fresh from this request's own cookie/URL.
+  const initLocale = lang || 'he';
 
   await loadTranslations(initLocale, pathname); // keep this just before the `return`
 
@@ -14,7 +18,7 @@ export const load = async ({ url, locals }) => {
     email,
     isDesktop,
     userAgent,
-    lang,
+    lang: initLocale,
     uid,
     un,
     id: uid,  // Alias for socket client

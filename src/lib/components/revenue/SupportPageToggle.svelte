@@ -1,4 +1,5 @@
 <script>
+  import { t } from '$lib/translations';
   /**
    * SupportPageToggle — lets a rikma member open or close its public support /
    * donation page (PLAN_VOLUNTEER_RIKMA §7). Three states:
@@ -6,7 +7,6 @@
    *   members  — visible to signed-in site members only.
    *   public   — visible to everyone (an amuta's homepage).
    */
-  import { lang } from '$lib/stores/lang.js';
   import { toast } from 'svelte-sonner';
   import { executeAction } from '$lib/client/actionClient';
 
@@ -21,20 +21,10 @@
   let busy = $state(false);
 
   const options = [
-    { key: 'off', icon: '⛔', label: { he: 'כבוי', en: 'Off' } },
-    { key: 'members', icon: '🔒', label: { he: 'חברי אתר', en: 'Members' } },
-    { key: 'public', icon: '🌍', label: { he: 'ציבורי', en: 'Public' } }
+    { key: 'off', icon: '⛔' },
+    { key: 'members', icon: '🔒' },
+    { key: 'public', icon: '🌍' }
   ];
-
-  const t = {
-    title: { he: 'דף תמיכה ותרומות', en: 'Support & donations page' },
-    desc: {
-      he: 'קובע מי רואה את דף התמיכה הציבורי — שבו אפשר לתרום, להתנדב ולראות את מדד הכיסוי בשקיפות.',
-      en: 'Controls who can see the public support page — where people donate, volunteer and view the transparent coverage board.'
-    },
-    view: { he: 'צפייה בדף ←', en: 'View page →' },
-    saved: { he: 'נשמר ✓', en: 'Saved ✓' }
-  };
 
   async function choose(key) {
     if (key === current || busy) return;
@@ -47,7 +37,7 @@
         supportPage: key
       });
       if (!res.success) throw new Error(res.error?.message ?? 'failed');
-      toast.success(t.saved[$lang]);
+      toast.success($t('revenue.supportToggle.saved'));
     } catch (e) {
       current = prev; // revert
       toast.error(e instanceof Error ? e.message : String(e));
@@ -59,15 +49,15 @@
 
 <div class="spt">
   <div class="spt-head">
-    <h3>💗 {t.title[$lang]}</h3>
+    <h3>💗 {$t('revenue.supportToggle.title')}</h3>
     {#if current !== 'off'}
       <a class="spt-view" href="/project/{projectId}/support" target="_blank" rel="noopener">
-        {t.view[$lang]}
+        {$t('revenue.supportToggle.view')}
       </a>
     {/if}
   </div>
-  <p class="spt-desc">{t.desc[$lang]}</p>
-  <div class="spt-seg" role="radiogroup" aria-label={t.title[$lang]}>
+  <p class="spt-desc">{$t('revenue.supportToggle.desc')}</p>
+  <div class="spt-seg" role="radiogroup" aria-label={$t('revenue.supportToggle.title')}>
     {#each options as o (o.key)}
       <button
         type="button"
@@ -79,7 +69,7 @@
         onclick={() => choose(o.key)}
       >
         <span aria-hidden="true">{o.icon}</span>
-        {o.label[$lang]}
+        {$t(`revenue.supportToggle.${o.key}`)}
       </button>
     {/each}
   </div>

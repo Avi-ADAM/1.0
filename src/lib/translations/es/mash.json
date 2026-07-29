@@ -1,0 +1,15 @@
+{
+  "_review": true,
+  "tota": "valor total del recurso",
+  "kindof": "tipo de recurso",
+  "total": "una vez",
+  "perUnit": "por unidad",
+  "monthly": "mensual",
+  "yearly": "anual",
+  "rent": "alquiler",
+  "linkto": "enlace a la cotización de precio",
+  "noof": "cantidad",
+  "shovi": "valor",
+  "shovile": "hasta un valor de",
+  "shovilem": "valor máximo total"
+}

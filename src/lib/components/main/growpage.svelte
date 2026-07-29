@@ -50,12 +50,6 @@
 
   const image =
     'https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png';
-  const pageurl = {
-    ar: 'https://1lev1.com/grow',
-    en: 'https://1lev1.com/grow',
-    he: 'https://1lev1.com/grow',
-    ru: 'https://1lev1.com/grow'
-  };
 
   let projectsCount = $state(0);
   let membersCount = $state(0);
@@ -165,7 +159,7 @@
   title={$t('grow.meta.title')}
   description={$t('grow.meta.description')}
   {image}
-  url={pageurl[$locale] ?? pageurl.he}
+  url={$t('home.pageUrl')}
 />
 
 <div

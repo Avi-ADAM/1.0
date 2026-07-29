@@ -1,7 +1,7 @@
 <script>
 import { Confetti } from "svelte-confetti";
 import { fly } from 'svelte/transition';
-import { lang } from '$lib/stores/lang';
+import { t, isRtl } from '$lib/translations';
   import { goto } from "$app/navigation";
   import { idPr } from "$lib/stores/idPr";
   import RichText from "$lib/celim/ui/richText.svelte";
@@ -42,24 +42,7 @@ function handleHover(enter) {
   isHovered = enter;
 }
 
-let texts = $derived({
-  he: {
-    welcome: `ברוך הבא ${username} לרקמה ${projectName}!`,
-    partnership: `הצטרפת לרקמה ${projectName}`,
-    enterProject: `לכניסה למטה "${projectName}"`,
-    notAgain: "לא להציג שוב",
-    celebrate: "קונפטי כדי לחגוג! 🎉",
-    heartOf: "לב השותפות 💗"
-  },
-  en: {
-    welcome: `Welcome ${username} to ${projectName}!`,
-    partnership: `You joined ${projectName}`,
-    enterProject: `Enter "${projectName}" HQ`,
-    notAgain: "Don't show again",
-    celebrate: "Celebrate! 🎉",
-    heartOf: "Heart of Partnership 💗"
-  }
-});
+
 
 </script>
 
@@ -165,10 +148,9 @@ z-index: 9999;"
     
     <div class="header-info">
       <div class="celebration-badge">
-        {texts[$lang].celebrate}
+        {$t('lev.cards.welcome.celebrate')}
       </div>
-      <h2 class="welcome-title">{texts[$lang].welcome}</h2>
-  <!---   <div class="heart-subtitle">{isHovered ? texts[$lang].heartOf : texts[$lang].welcome}</div>-->
+      <h2 class="welcome-title">{$t('lev.cards.welcome.welcome', { username, projectName })}</h2>
     </div>
   </div>
 
@@ -189,8 +171,8 @@ z-index: 9999;"
         class="btn-primary sparkle-btn"
         onclick={onProjectClick}
       >
-        <span>{texts[$lang].enterProject}</span>
-        <svg class="btn-icon {$lang == "he" ? "rotate-180":""}" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <span>{$t('lev.cards.welcome.enterProject', { projectName })}</span>
+        <svg class="btn-icon {$isRtl ? "rotate-180":""}" viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <path d="m9 18 6-6-6-6"/>
         </svg>
       </button>
@@ -199,7 +181,7 @@ z-index: 9999;"
         class="btn-secondary"
         onclick={onChatClick}
       >
-        <span>{texts[$lang].notAgain}</span>
+        <span>{$t('lev.cards.welcome.notAgain')}</span>
         <Close />
       </button>
     </div>

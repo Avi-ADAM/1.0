@@ -1,4 +1,5 @@
 <script>
+  import { t } from '$lib/translations';
   import Hach from '$lib/components/prPr/hachcal.svelte';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   import { page } from '$app/state';
@@ -43,13 +44,6 @@
       }
     }
   });
-
-  const i18n = {
-    he: { calc: 'מחשבון חלוקה', status: 'מצב חלוקות' },
-    en: { calc: 'Split Calculator', status: 'Split Status' },
-    ar: { calc: 'حاسبة التقسيم', status: 'حالة التقسيم' }
-  };
-  let t = $derived(i18n[$lang] || i18n.en);
 </script>
 
 <svelte:head>
@@ -68,7 +62,7 @@
       <SpaceProjectionShadow {projectId} users={base?.user_1s?.data || []} />
     {/key}
     <section class="bg-white p-6 rounded-xl shadow-sm">
-      <h2 class="text-xl font-bold mb-4 text-primary">{t.status}</h2>
+      <h2 class="text-xl font-bold mb-4 text-primary">{$t('moach.split.status')}</h2>
       <Fini
         fmiData={financials.finnished_missions?.data || []}
         rikmashes={financials.rikmashes?.data || []}
@@ -76,7 +70,7 @@
       />
     </section>
     <section class="bg-white p-6 rounded-xl shadow-sm">
-      <h2 class="text-xl font-bold mb-4 text-primary">{t.calc}</h2>
+      <h2 class="text-xl font-bold mb-4 text-primary">{$t('moach.split.calc')}</h2>
       <Hach
         fmiData={financials.finnished_missions?.data || []}
         rikmashes={financials.rikmashes?.data || []}

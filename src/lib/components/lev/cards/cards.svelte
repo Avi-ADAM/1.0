@@ -1,5 +1,5 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { page } from '$app/state';
   import Lowding from '$lib/celim/lowding.svelte';
   import { lang } from '$lib/stores/lang.js';
@@ -85,14 +85,6 @@
   import './stylec.css';
   let currentIndex = $state(0);
   let swiperInstance;
-  const noThings = {
-    he: 'לא נמצאו הצעות או פעולות עבורך, מומלץ לגשת לעמוד הפרופיל כדי להוסיף כישורים, משאבים או כדי ליצור ריקמה חדשה, בהצלחה ',
-    en: 'There are no suggestions or actions for you, it is recommended to go to the profile page to add connections, resources or create a new freeMates'
-  };
-  const toProfile = {
-    he: ' לעמוד הפרופיל',
-    en: 'to the profile page'
-  };
 
   // הוסף פונקציה לטיפול באירוע swiper
   function handleSwiper(e) {
@@ -182,38 +174,23 @@
     onProj?.({ id: event.id }); // Svelte 5: Replaced dispatch with callback prop
   }
   let hovered = false;
-  const srca = {
-    he: 'https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg',
-    en: 'https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg'
-  };
-  const srcb = {
-    he: 'https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg',
-    en: 'https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg'
-  };
-  let d = { he: 'לב 1💗1', en: 'heart of 1💗1' };
-  let u = { he: 'לב 1💗1', en: 'heart of 1💗1' };
-  const nexttitle = { he: ' יאללה נקסט!', en: '  next!' };
-  const pretitle = { he: 'רגע, מה זה היה?', en: 'wait.. what was that?' };
+  let u = $state('');
   function hoverede() {
     hovered = !hovered;
     if (hovered == false) {
-      u = d[$lang];
+      u = $t('lev.cards.nav.heart');
     }
     onHover?.({ id: u }); // Svelte 5: Replaced dispatch with callback prop
   }
   function hoverc(id) {
     if (id == '0') {
-      u = d[$lang];
+      u = $t('lev.cards.nav.heart');
     } else {
       u = id;
     }
 
     onHover?.({ id: u }); // Svelte 5: Replaced dispatch with callback prop
   }
-  const nav = {
-    he: 'ניווט: לעמוד הפרופיל האישי מימין, למוח הרקמות שמאל',
-    en: 'Navigation: right side, bottom'
-  };
   //exclude meData huca
   function showonly(event) {
     console.log(event, 'event');
@@ -241,8 +218,7 @@
   }
   let filter = $state(false),
     filter2 = $state(false);
-  const filterT = { he: 'מיון', en: 'filter' };
-  let filteredArr = $state(arr1); // Initialize with arr1
+    let filteredArr = $state(arr1); // Initialize with arr1
   let currentProjectIdFilter = $state(null);
 
   // Effect to keep filteredArr in sync with arr1 or apply project filter
@@ -334,19 +310,19 @@
   >
     {#if !isMobileOrTablet()}
       <img
-        onmouseenter={() => hoverc(nexttitle[$lang])}
+        onmouseenter={() => hoverc($t('lev.cards.nav.next'))}
         onmouseleave={() => hoverc('0')}
-        class={$lang == 'he' ? 'perv' : '	next'}
-        src={srcb[$lang]}
-        alt={$lang == 'he' ? 'חזרה' : '	next'}
+        class={$isRtl ? 'perv' : 'next'}
+        src={$t('lev.cards.nav.nextImage')}
+        alt={$t('lev.cards.nav.back')}
       />
       <img
-        onmouseenter={() => hoverc(pretitle[$lang])}
+        onmouseenter={() => hoverc($t('lev.cards.nav.prev'))}
         onmouseleave={() => hoverc('0')}
-        class={$lang == 'he' ? 'next' : 'perv'}
+        class={$isRtl ? 'next' : 'perv'}
         class:hidden={currentIndex == 0}
-        src={srca[$lang]}
-        alt={$lang == 'he' ? 'הבא' : '	next'}
+        src={$t('lev.cards.nav.prevImage')}
+        alt={$t('lev.cards.nav.forward')}
       />
       <div
         dir="ltr"
@@ -367,7 +343,7 @@
       <div
         dir="ltr"
         role="contentinfo"
-        onmouseenter={() => hoverc(filterT[$lang])}
+        onmouseenter={() => hoverc($t('lev.cards.nav.filter'))}
         onmouseleave={() => hoverc('0')}
         style:visibility={low == true ? 'hidden' : 'visible'}
         class="z-[1000] top-4 absolute left-4 flex flex-row items-start justify-start"
@@ -406,7 +382,7 @@
       <div
         dir="ltr"
         role="contentinfo"
-        onmouseenter={() => hoverc(filterT[$lang])}
+        onmouseenter={() => hoverc($t('lev.cards.nav.filter'))}
         onmouseleave={() => hoverc('0')}
         style:visibility={low == true ? 'hidden' : 'visible'}
         class="z-[1000] top-4 absolute right-4 flex flex-row-reverse items-start justify-start"
@@ -456,7 +432,7 @@
           <div
             dir="ltr"
             role="contentinfo"
-            onmouseenter={() => hoverc(filterT[$lang])}
+            onmouseenter={() => hoverc($t('lev.cards.nav.filter'))}
             onmouseleave={() => hoverc('0')}
             style:visibility={low == true ? 'hidden' : 'visible'}
             class="z-[1000] px-4 flex flex-row items-center justify-center"
@@ -531,8 +507,8 @@
           navigation={isMobileOrTablet()
             ? false
             : {
-                nextEl: $lang == 'he' ? '.perv' : '.next',
-                prevEl: $lang == 'he' ? '.next' : '.perv'
+                nextEl: $isRtl ? '.perv' : '.next',
+                prevEl: $isRtl ? '.next' : '.perv'
               }}
         >
           {#each filteredArr as buble, i}
@@ -1268,11 +1244,11 @@
               class="flex flex-col items-center justify-center h-full w-full"
             >
               <h2 class="text-2xl font-bold mb-4">
-                {$lang === 'he' ? 'התעדכנת בהכל' : 'End of the line'}
+                {$t('lev.endOfLine')}
               </h2>
               <Button
                 onClick={() => swiperRef?.slideTo(0)}
-                text={{ he: 'חזרה להתחלה', en: 'Back to Start' }}
+                text={$t('common.buttons.backToStart')}
               />
             </div>
           </SwiperSlide>
@@ -1292,9 +1268,9 @@
 {:else}
   <div class="body flex flex-col items-center justify-center">
     <h1 class="text-2xl font-bold text-barbi text-center">
-      {noThings[$lang]}
+      {$t('lev.cards.nav.nothing')}
     </h1>
-    <Button onClick={() => goto('/me')} text={toProfile} />
+    <Button onClick={() => goto('/me')} text={$t('lev.cards.toProfile')} />
   </div>
 {/if}
 

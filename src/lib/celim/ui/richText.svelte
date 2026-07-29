@@ -1,6 +1,5 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
-  import { lang } from '$lib/stores/lang';
+  import { isRtl, t } from '$lib/translations';
   import { onMount, onDestroy } from 'svelte';
   import List from '$lib/celim/icons/list.svelte';
   import { Editor } from '@tiptap/core';
@@ -216,7 +215,7 @@
         TextAlign.configure({
           types: ['heading', 'paragraph'],
           alignments: ['left', 'right', 'center', 'justify'],
-          defaultAlignment: $lang == 'he' ? 'right' : 'left'
+          defaultAlignment: $isRtl ? 'right' : 'left'
         }),
         Underline,
         BubbleMenu.configure({
@@ -254,24 +253,13 @@
   });
 
   // --- הגדרות שפה ואייקונים ---
-  const spaceLeb = { he: 'רווח', en: 'Space' };
-  const lineLeb = { he: 'קו מפריד', en: 'Line' };
-  const quoteLeb = { he: 'ציטוט', en: 'Quote' };
-  const listNLeb = { he: '1. רשימה', en: 'List 1.' };
-  const listLeb = { he: ` רשימה`, en: `List` };
-  const linkPro = { he: 'כתובת קישור', en: 'Enter URL' };
-  const parLeb = { he: `<p>פסקה</p>`, en: `<p>Paragraph</p>` };
-  const h1Leb = { he: `<h1>כותרת</h1>`, en: `<h1>Header</h1>` };
-  const h3Leb = { he: `<h3>כותרת משנית</h3>`, en: `<h3>Sub Header</h3>` };
-  const bet = { he: 'ב', en: 'B' };
-
   let hide = $state(true);
-  let active = $state(parLeb[$lang]);
+  let active = $state($t('ui.richText.paragraph'));
   let hides = $state(true);
 
   function setLink() {
     const previousUrl = editor.getAttributes('link').href;
-    const url = window.prompt(linkPro[$lang], previousUrl);
+    const url = window.prompt($t('ui.richText.linkPrompt'), previousUrl);
     if (url === null) return;
     if (url === '') {
       editor.chain().focus().extendMarkRange('link').unsetLink().run();
@@ -286,7 +274,7 @@
   const centersvg = `<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3 4a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm-3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3 4a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>`;
   const justifysvg = `<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>`;
 
-  let actives = $state($lang == 'he' ? rightsvg : leftsvg);
+  let actives = $state($isRtl ? rightsvg : leftsvg);
   let show = $state(false);
 </script>
 
@@ -305,25 +293,25 @@
         onclick={() => editor.chain().focus().toggleBold().run()}
         class:active={activeStates.bold}
       >
-        <strong>{bet[$lang]}</strong>
+        <strong>{$t('ui.richText.boldLetter')}</strong>
       </button>
       <button
         onclick={() => editor.chain().focus().toggleStrike().run()}
         class:active={activeStates.strike}
       >
-        <s>{bet[$lang]}</s>
+        <s>{$t('ui.richText.boldLetter')}</s>
       </button>
       <button
         onclick={() => editor.chain().focus().toggleItalic().run()}
         class:active={activeStates.italic}
       >
-        <em>{bet[$lang]}</em>
+        <em>{$t('ui.richText.boldLetter')}</em>
       </button>
       <button
         onclick={() => editor.chain().focus().toggleUnderline().run()}
         class:active={activeStates.underline}
       >
-        <u>{bet[$lang]}</u>
+        <u>{$t('ui.richText.boldLetter')}</u>
       </button>
 
       <div class="w-px h-6 bg-gold/50 mx-1"></div>
@@ -538,7 +526,7 @@
                 class:active={activeStates.heading1}
                 class="menu-item"
               >
-                {@html h1Leb[$lang]}
+                {@html $t('ui.richText.h1')}
               </button>
               <button
                 onclick={() => {
@@ -548,7 +536,7 @@
                 class:active={activeStates.heading3}
                 class="menu-item"
               >
-                {@html h3Leb[$lang]}
+                {@html $t('ui.richText.h3')}
               </button>
               <button
                 onclick={() => {
@@ -558,7 +546,7 @@
                 class:active={activeStates.paragraph}
                 class="menu-item"
               >
-                {@html parLeb[$lang]}
+                {@html $t('ui.richText.paragraph')}
               </button>
               <div class="h-px bg-gray-100 my-1"></div>
               <button
@@ -570,7 +558,7 @@
                 class="menu-item flex items-center gap-2"
               >
                 <List class="w-4 h-4" />
-                {@html listLeb[$lang]}
+                {@html $t('ui.richText.list')}
               </button>
               <button
                 onclick={() => {
@@ -580,7 +568,7 @@
                 class:active={activeStates.orderedList}
                 class="menu-item"
               >
-                {listNLeb[$lang]}
+                {$t('ui.richText.numberedList')}
               </button>
               <button
                 onclick={() => {
@@ -590,7 +578,7 @@
                 class:active={activeStates.blockquote}
                 class="menu-item"
               >
-                {quoteLeb[$lang]}
+                {$t('ui.richText.quote')}
               </button>
               <div class="h-px bg-gray-100 my-1"></div>
               <button
@@ -600,7 +588,7 @@
                 }}
                 class="menu-item text-xs"
               >
-                {lineLeb[$lang]}
+                {$t('ui.richText.line')}
               </button>
             </div>
           {/if}

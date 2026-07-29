@@ -1,0 +1,263 @@
+{
+  "progress": {
+    "participants": "Participantes",
+    "discussion": "Debate",
+    "actions": "Acciones",
+    "status": "Estado"
+  },
+  "split": {
+    "calc": "Calculadora de reparto",
+    "status": "Estado del reparto"
+  },
+  "process": {
+    "title": "Página detallada del proceso",
+    "back": "Todos los procesos",
+    "chains": "Cadenas",
+    "notFound": "Proceso no encontrado",
+    "notFoundSub": "Ninguna cadena o proceso coincide con el id solicitado en este proyecto.",
+    "missionChain": "Proceso de misión",
+    "resourceChain": "Proceso de recurso",
+    "saleChain": "Proceso de venta",
+    "loading": "Cargando el proceso…",
+    "error": "No se pudieron cargar los datos"
+  },
+  "splitDetail": {
+    "participants": "Socios",
+    "actions": "Acciones",
+    "confirm": "Confirmar el reparto",
+    "reject": "Objetar"
+  },
+  "votes": {
+    "title": "Votaciones abiertas",
+    "splitVotes": "Votaciones de reparto",
+    "joinVotes": "Solicitudes de incorporación",
+    "resourceJoinVotes": "Solicitudes de aporte de recursos",
+    "decisionVotes": "Decisiones",
+    "resourceProposals": "Propuestas de recursos",
+    "missionProposals": "Propuestas de misiones",
+    "votes": "votos",
+    "toVote": "Votar",
+    "noneOpen": "No hay votaciones abiertas ahora mismo 🎉"
+  },
+  "main": {
+    "vap": "Valores del proyecto"
+  },
+  "sale": {
+    "details": "Detalles de la venta",
+    "amount": "Importe",
+    "date": "Fecha",
+    "buyer": "Comprador",
+    "note": "Nota",
+    "status": "Estado"
+  },
+  "acts": {
+    "assignee": "Responsable",
+    "validator": "Validador",
+    "actions": "Acciones",
+    "markDone": "Marcar como hecha",
+    "validate": "Validar"
+  },
+  "vote": {
+    "proposal": "Propuesta",
+    "reason": "Motivo",
+    "participants": "Votantes",
+    "actions": "Acciones",
+    "voteYes": "A favor",
+    "voteNo": "En contra"
+  },
+  "chains": {
+    "back": "Volver al proyecto",
+    "loading": "Cargando el proceso…",
+    "notFound": "Proceso no encontrado",
+    "notFoundSub": "No se pudo encontrar el proceso solicitado en este proyecto.",
+    "noProject": "Ningún proyecto seleccionado",
+    "noProjectSub": "Vuelve atrás y selecciona primero un proyecto.",
+    "missionChain": "Cadena de misión",
+    "resourceChain": "Cadena de recurso",
+    "processPage": "Página del proceso",
+    "id": "ID",
+    "chatSoon": "Debate del proceso: próximamente",
+    "chatDesc": "Aquí aparecerán los hilos de debate y el chat."
+  },
+  "layout": {
+    "back": "Volver a la lista",
+    "main": "Principal",
+    "create": "Crear",
+    "gantt": "Gantt",
+    "split": "Reparto",
+    "progress": "Progreso",
+    "acts": "Acciones",
+    "timers": "Temporizadores",
+    "kanban": "Kanban",
+    "chains": "Cadenas",
+    "sales": "Ventas",
+    "shifts": "Turnos",
+    "processes": "Procesos",
+    "votes": "Votaciones",
+    "wishes": "Deseos entrantes",
+    "demand": "Mapa de demanda",
+    "work": "Trabajo",
+    "flows": "Flujos",
+    "money": "Dinero",
+    "opps": "Oportunidades",
+    "editPic": "Editar imagen",
+    "upload": "Subir",
+    "editDetails": "Editar los datos",
+    "publicProfile": "Página pública",
+    "activeNow": "Activos ahora"
+  },
+  "create": {
+    "mission": "Crear una misión",
+    "missionDesc": "Añadir una misión nueva al proyecto",
+    "resource": "Solicitar un recurso",
+    "resourceDesc": "Pedir dinero, equipo o información",
+    "process": "Crear un proceso",
+    "processDesc": "Construir una cadena compleja de acciones",
+    "back": "Atrás",
+    "clickHandMission": "Pulsa la mano para crear una misión",
+    "clickHandResource": "Pulsa la mano para solicitar un recurso",
+    "hosafa": "Añadir las misiones que la rikma necesita",
+    "hosafat": "Añadir los recursos que la rikma necesita"
+  },
+  "objectList": {
+    "active": "Activos",
+    "archived": "Archivo",
+    "empty": "No hay objetos de este tipo en el proyecto",
+    "process": "Página del proceso",
+    "unknownType": "Tipo de objeto desconocido",
+    "loading": "Cargando…",
+    "error": "No se pudieron cargar los datos",
+    "backProcesses": "Todos los procesos"
+  },
+  "objectDetail": {
+    "backProcess": "Página completa del proceso",
+    "backList": "Todos los objetos de este tipo",
+    "active": "Activo",
+    "archived": "Archivado: solo lectura",
+    "readOnly": "Este objeto está archivado: la página es de solo lectura, sin acciones.",
+    "actions": "Acciones",
+    "votePage": "Página de votación y negociación",
+    "chat": "Chat",
+    "votes": "Votaciones y negociación",
+    "description": "Descripción",
+    "details": "Detalles",
+    "timers": "Temporizadores y horas",
+    "notFound": "Objeto no encontrado",
+    "notFoundSub": "No hay ningún objeto de este tipo con el id solicitado en este proyecto.",
+    "unknownType": "Tipo de objeto desconocido",
+    "loading": "Cargando…",
+    "error": "No se pudieron cargar los datos",
+    "hours": "horas",
+    "perhour": "por hora",
+    "price": "Precio",
+    "amount": "Cantidad",
+    "easy": "Flexibilidad",
+    "total": "Total",
+    "month": "Mes",
+    "deadline": "Plazo de respuesta (el silencio es consentimiento)",
+    "created": "Creado",
+    "start": "Inicio",
+    "finish": "Fin",
+    "due": "Vencimiento",
+    "kind": "Tipo",
+    "progress": "Progreso",
+    "of": "de",
+    "by": "Responsable",
+    "validator": "Validador",
+    "done": "Hecho",
+    "notDone": "Aún no hecho",
+    "delivered": "Entregado",
+    "why": "Resumen",
+    "actsBoard": "Tablero de tareas",
+    "progressBoard": "Misiones en curso",
+    "timersBoard": "Temporizadores",
+    "salesBoard": "Tablero de ventas",
+    "salePage": "Página de la venta",
+    "holderStatus": "Consentimiento del tenedor",
+    "holderSelf": "Autoinforme",
+    "holderConfirmed": "Confirmado por el tenedor",
+    "holderOpen": "Esperando consentimiento",
+    "holderLegacy": "Contado en el balance",
+    "splitState": "Reparto",
+    "splited": "Repartido",
+    "notSplited": "Todavía sin repartir",
+    "donation": "Donación",
+    "siteShare": "Parte del sitio",
+    "paid": "Pagado",
+    "fromRikma": "De la rikma",
+    "fixPrice": "Precio fijo",
+    "dynamicPrice": "Precio definido en el proceso"
+  },
+  "processes": {
+    "title": "Procesos",
+    "empty": "Todavía no hay procesos en este proyecto",
+    "objects": "Objetos por tipo:"
+  },
+  "objectTypes": {
+    "pendm": "Misiones pendientes",
+    "openMission": "Misiones abiertas",
+    "ask": "Solicitudes de incorporación",
+    "betahalich": "Misiones en curso",
+    "act": "Tareas",
+    "finiapruval": "Aprobaciones de finalización",
+    "finnished": "Misiones completadas",
+    "pmash": "Recursos pendientes",
+    "openMashaabim": "Recursos abiertos",
+    "askm": "Propuestas de suministro",
+    "maap": "Entregas en curso",
+    "rikmash": "Recursos recibidos",
+    "matanot": "Productos",
+    "sale": "Ventas"
+  },
+  "tour": {
+    "badge": "Una rikma es un grupo de colaboración: cada persona aporta sus habilidades y gana según su contribución",
+    "members": "Miembros de la rikma: un anillo verde que late significa que esa persona está trabajando ahora en el proyecto. Pulsa una foto para ver su perfil",
+    "tabsIntro": "Las pestañas son el centro de gestión de la rikma: cada una muestra un aspecto distinto del proyecto",
+    "create": "📋 Crear: crea misiones y solicita recursos (dinero, equipo, información), tanto para los miembros actuales como para encontrar nuevas personas socias. Cada misión o recurso publicado obtiene un enlace propio con una página cuidada, optimizada para redes sociales y para captar colaboradores",
+    "progress": "🔄 En curso: lista de todas las misiones activas: quién trabaja en qué y en qué fase",
+    "acts": "✅ Acciones y tareas: gestiona las tareas pequeñas: qué está hecho y qué está en camino",
+    "timers": "⏱️ Temporizadores: mira cuándo estuvo activa cada persona para el proyecto y en qué trabajó. Cuando alguien inicia un temporizador, aparece un anillo verde alrededor de su avatar arriba",
+    "wishes": "💌 Deseos entrantes: oportunidades cálidas de clientes del conserje a quienes les encaja tu proyecto: oportunidades de negocio listas",
+    "sales": "🛒 Ventas y productos: producto simple = precio fijo. Producto complejo = precio definido por misiones, recursos y decisiones tomadas en conjunto durante la compra. Cada producto tiene su propia página cuidada, optimizada para redes sociales y para atraer clientela",
+    "split": "💰 Reparto: calculadora de reparto de ingresos: cada persona cobra según su contribución",
+    "votes": "🗳️ Votaciones: las decisiones se toman por consenso, con herramientas de negociación propias hasta que el resultado convence de verdad a todo el mundo. No es mayoría, es acuerdo real de todos los miembros de la rikma",
+    "chains": "🔗 Cadenas: cada misión y recurso a lo largo de todo su ciclo de vida, desde la propuesta inicial y la votación hasta el archivo. Transparencia total y comprensión profunda de cada proceso del proyecto",
+    "gantt": "📊 Gantt y Kanban: gestión visual del proyecto y línea de tiempo",
+    "helpBtn": "Volver a mostrar la guía"
+  },
+  "list": {
+    "myProjects": "Mis rikmas",
+    "choose": "Elegir una rikma",
+    "createNew": "Crear una nueva rikma"
+  },
+  "guide": {
+    "header": "Guía del cerebro de la rikmá",
+    "text": "¿Quieres un recorrido rápido por lo que puedes hacer en el cerebro de la rikmá?\n(Puedes reabrirlo con el botón ? de la cabecera)",
+    "yes": "Sí",
+    "no": "No, gracias"
+  },
+  "wishes": {
+    "status": {
+      "suggested": {
+        "label": "Emparejado por Lev",
+        "desc": "Emparejado automáticamente: quien lo desea aún no lo ha visto."
+      },
+      "viewed": {
+        "label": "Visto por quien lo desea",
+        "desc": "Quien lo desea abrió tu propuesta."
+      },
+      "accepted": {
+        "label": "Quien lo desea te eligió",
+        "desc": "Se abrió una solicitud de servicio: ve a acuerdos para aprobarla."
+      },
+      "rejected": {
+        "label": "Descartado",
+        "desc": "Quien lo desea lo descartó: no hace falta actuar."
+      },
+      "expired": {
+        "label": "Caducado",
+        "desc": "La ventana de tiempo expiró."
+      }
+    }
+  }
+}

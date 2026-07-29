@@ -1,0 +1,24 @@
+{
+  "_review": true,
+  "rolesQuestion": "¿Tienes un rol preferido?",
+  "skipToEnd": "saltar al final del registro; siempre podrás añadir estos datos desde la página de tu perfil",
+  "notInList": "Aún no está en la lista; añádelo con el botón \"Añadir nuevo rol\" de abajo",
+  "rolesPlaceholder": "roles preferidos",
+  "skillsQuestion": "¿Qué sabes hacer?",
+  "valuesPlaceholder": "valores y objetivos",
+  "workwaysPlaceholder": "formas de creación",
+  "back": "← Atrás",
+  "skip": "Omitir",
+  "next": "Siguiente →",
+  "hello": {
+    "clickToOpen": "Pulsa para abrir",
+    "hello": "Hola",
+    "agreementReceived": "¡Se recibió tu acuerdo!",
+    "youArePlace": "Eres la persona número {{place}} en aceptar",
+    "nowYouCanOpen": "Ahora puedes abrir",
+    "openOneLove": "Abrir 1💗1",
+    "whatValues": "¿Qué valores y objetivos quieres promover?",
+    "valuesInfo": "Cuando tu trabajo encarna tus valores y sirve a tus objetivos, se convierte en creación gozosa: te ayudaremos a promoverlos",
+    "workwaysQuestion": "¿Cómo prefieres crear?"
+  }
+}

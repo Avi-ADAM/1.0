@@ -1,5 +1,5 @@
 <script>
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
   import Close from '$lib/celim/close.svelte';
   import { lang } from '$lib/stores/lang.js';
   import { onMount } from 'svelte';
@@ -29,7 +29,7 @@
     acts = { data: [] },
     actsb = $bindable([]),
     old = [],
-    lebel = { he: 'מטלות', en: 'Tasks' },
+    lebel = '',
     stepState = 2
   } = $props();
 
@@ -207,22 +207,22 @@
   {#if !edit}
     <div class="flex flex-col gap-2">
       <div class="flex flex-row align-middle justify-center gap-x-2">
-        <h2 class="underline decoration-mturk">{lebel[$lang]}:</h2>
+        <h2 class="underline decoration-mturk">{lebel}:</h2>
       </div>
 
       {#if hasChanges()}
         <div class="text-xs opacity-70 text-center">
           <span class="inline-flex items-center gap-1 mx-1">
             <span class="w-3 h-3 bg-green-500 rounded"></span>
-            {$lang === 'he' ? 'חדש' : 'New'}
+            {$t('nego.acts.new')}
           </span>
           <span class="inline-flex items-center gap-1 mx-1">
             <span class="w-3 h-3 bg-yellow-500 rounded"></span>
-            {$lang === 'he' ? 'שונה' : 'Modified'}
+            {$t('nego.acts.modified')}
           </span>
           <span class="inline-flex items-center gap-1 mx-1">
             <span class="w-3 h-3 bg-red-500 rounded"></span>
-            {$lang === 'he' ? 'הוסר' : 'Removed'}
+            {$t('nego.acts.removed')}
           </span>
         </div>
       {/if}
@@ -230,7 +230,7 @@
       <div class="flex-1">
         {#if actsb.length === 0}
           <p class="text-gold italic">
-            {$lang === 'he' ? 'אין מטלות' : 'No tasks'}
+            {$t('nego.acts.noTasks')}
           </p>
         {:else}
           <div class="space-y-2">
@@ -243,13 +243,13 @@
                     <span
                       class="text-xs bg-green-600 text-white px-2 py-1 rounded flex items-center gap-1"
                     >
-                      ✨ {$lang === 'he' ? 'חדש' : 'New'}
+                      ✨ {$t('nego.acts.new')}
                     </span>
                   {:else if status === 'modified'}
                     <span
                       class="text-xs bg-yellow-600 text-white px-2 py-1 rounded flex items-center gap-1"
                     >
-                      ✏️ {$lang === 'he' ? 'שונה' : 'Modified'}
+                      ✏️ {$t('nego.acts.modified')}
                     </span>
                   {/if}
                 </div>
@@ -283,7 +283,7 @@
                   <span
                     class="text-xs bg-red-600 text-white px-2 py-1 rounded flex items-center gap-1"
                   >
-                    🗑️ {$lang === 'he' ? 'הוסר' : 'Removed'}
+                    🗑️ {$t('nego.acts.removed')}
                   </span>
                 </div>
                 {#if removedTask.attributes.des}
@@ -310,7 +310,7 @@
           <div class="space-y-2 text-sm">
             <div>
               <small class:text-right={$lang === 'he'}
-                >{tr?.nego?.original[$lang]}:</small
+                >{$t('nego.original')}:</small
               >
               <div class="space-y-1">
                 {#each acts?.data && Array.isArray(acts.data) ? acts.data : [] as act}
@@ -328,7 +328,7 @@
 
             <div>
               <small class:text-right={$lang === 'he'} class="text-gold"
-                >{tr?.nego?.sugestion[$lang]}:</small
+                >{$t('nego.sugestion')}:</small
               >
               <div class="space-y-1">
                 {#each actsb as act}
@@ -349,7 +349,7 @@
             {#each old as o, i}
               <div>
                 <small class:text-right={$lang === 'he'} class="text-gold"
-                  >{tr?.nego?.oldno[$lang]}:{i + 1}</small
+                  >{$t('nego.oldno')}:{i + 1}</small
                 >
                 <div class="text-gold text-xs">{JSON.stringify(o)}</div>
               </div>
@@ -361,7 +361,7 @@
   {:else}
     <div class="space-y-4 p-4">
       <h3 class="text-lg font-semibold">
-        {$lang === 'he' ? 'עריכת מטלות' : 'Edit Tasks'}
+        {$t('nego.acts.editTasks')}
       </h3>
 
       <!-- Existing acts list -->
@@ -380,13 +380,13 @@
                   <span
                     class="text-xs bg-green-600 text-white px-2 py-1 rounded flex items-center gap-1"
                   >
-                    ✨ {$lang === 'he' ? 'חדש' : 'New'}
+                    ✨ {$t('nego.acts.new')}
                   </span>
                 {:else if status === 'modified'}
                   <span
                     class="text-xs bg-yellow-600 text-white px-2 py-1 rounded flex items-center gap-1"
                   >
-                    ✏️ {$lang === 'he' ? 'שונה' : 'Modified'}
+                    ✏️ {$t('nego.acts.modified')}
                   </span>
                 {/if}
               </div>
@@ -414,13 +414,7 @@
       <!-- Add/Edit form -->
       <div class="border border-gold border-opacity-50 rounded p-4 space-y-3">
         <h4 class="font-medium">
-          {editingIndex >= 0
-            ? $lang === 'he'
-              ? 'עריכת מטלה'
-              : 'Edit Task'
-            : $lang === 'he'
-              ? 'הוספת מטלה חדשה'
-              : 'Add New Task'}
+          {editingIndex >= 0 ? $t('nego.acts.editTask') : $t('nego.acts.addNewTask')}
         </h4>
 
         <div class="textinput">
@@ -430,10 +424,10 @@
             bind:value={newAct.shem}
             class="input"
             required
-            placeholder={$lang === 'he' ? 'שם המטלה' : 'Task name'}
+            placeholder={$t('nego.acts.taskNamePh')}
           />
           <label for="act-shem" class="label"
-            >{$lang === 'he' ? 'שם המטלה' : 'Task Name'}</label
+            >{$t('nego.acts.taskName')}</label
           >
           <span class="line"></span>
         </div>
@@ -444,10 +438,10 @@
             type="text"
             bind:value={newAct.des}
             class="input"
-            placeholder={$lang === 'he' ? 'תיאור המטלה' : 'Task description'}
+            placeholder={$t('nego.acts.taskDescPh')}
           />
           <label for="act-des" class="label"
-            >{$lang === 'he' ? 'תיאור' : 'Description'}</label
+            >{$t('nego.acts.description')}</label
           >
           <span class="line"></span>
         </div>
@@ -458,10 +452,10 @@
             type="url"
             bind:value={newAct.link}
             class="input"
-            placeholder={$lang === 'he' ? 'קישור למטלה' : 'Task link'}
+            placeholder={$t('nego.acts.taskLinkPh')}
           />
           <label for="act-link" class="label"
-            >{$lang === 'he' ? 'קישור' : 'Link'}</label
+            >{$t('nego.acts.link')}</label
           >
           <span class="line"></span>
         </div>
@@ -475,9 +469,7 @@
               class="input"
             />
             <label for="act-dateS" class="label"
-              >{$lang === 'he'
-                ? 'תאריך ושעת התחלה'
-                : 'Start Date & Time'}</label
+              >{$t('nego.acts.startDateTime')}</label
             >
             <span class="line"></span>
           </div>
@@ -490,7 +482,7 @@
               class="input"
             />
             <label for="act-dateF" class="label"
-              >{$lang === 'he' ? 'תאריך ושעת סיום' : 'End Date & Time'}</label
+              >{$t('nego.acts.endDateTime')}</label
             >
             <span class="line"></span>
           </div>
@@ -502,20 +494,20 @@
               onclick={saveEdit}
               class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
             >
-              {$lang === 'he' ? 'שמור' : 'Save'}
+              {$t('nego.acts.save')}
             </button>
             <button
               onclick={cancelEdit}
               class="px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700"
             >
-              {$lang === 'he' ? 'ביטול' : 'Cancel'}
+              {$t('nego.acts.cancel')}
             </button>
           {:else}
             <button
               onclick={addAct}
               class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
-              {$lang === 'he' ? 'הוסף מטלה' : 'Add Task'}
+              {$t('nego.acts.addTask')}
             </button>
           {/if}
         </div>
@@ -529,7 +521,7 @@
           }}
           class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
         >
-          ✅ {$lang === 'he' ? 'סיום' : 'Done'}
+          ✅ {$t('nego.acts.done')}
         </button>
       </div>
     </div>

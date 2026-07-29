@@ -17,7 +17,7 @@
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang.js';
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { reconstructMissionChains, reconstructResourceChains } from '$lib/utils/reconstructChains.js';
   import { chainsForPartof, findChainByRef, reconstructSaleChains } from '$lib/utils/processLifecycle';
@@ -92,51 +92,11 @@
       `#${chain?.id ?? processId}`
     );
   }
-
-  const i18n = {
-    he: {
-      title: 'עמוד תהליך מפורט',
-      back: 'לכל התהליכים',
-      chains: 'לשרשראות',
-      notFound: 'תהליך לא נמצא',
-      notFoundSub: 'לא נמצאה שרשרת או תהליך המתאימים למזהה המבוקש בפרויקט זה.',
-      missionChain: 'תהליך משימה',
-      resourceChain: 'תהליך משאב',
-      saleChain: 'תהליך מכירה',
-      loading: 'טוען תהליך…',
-      error: 'שגיאה בטעינת הנתונים'
-    },
-    en: {
-      title: 'Detailed process page',
-      back: 'All processes',
-      chains: 'Chains',
-      notFound: 'Process not found',
-      notFoundSub: 'No chain or process matches the requested id in this project.',
-      missionChain: 'Mission process',
-      resourceChain: 'Resource process',
-      saleChain: 'Sale process',
-      loading: 'Loading process…',
-      error: 'Failed to load data'
-    },
-    ar: {
-      title: 'صفحة عملية مفصلة',
-      back: 'كل العمليات',
-      chains: 'السلاسل',
-      notFound: 'العملية غير موجودة',
-      notFoundSub: 'لا توجد سلسلة أو عملية تطابق المعرف المطلوب في هذا المشروع.',
-      missionChain: 'عملية مهمة',
-      resourceChain: 'عملية مورد',
-      saleChain: 'عملية بيع',
-      loading: 'جارٍ التحميل…',
-      error: 'فشل تحميل البيانات'
-    }
-  };
-  let t = $derived(i18n[$lang] ?? i18n.en);
 </script>
 
 <svelte:head>
   <title>
-    {matched.length === 1 ? `${chainName(matched[0])} · ` : ''}{t.title} · 1lev1
+    {matched.length === 1 ? `${chainName(matched[0])} · ` : ''}{$t('moach.process.title')} · 1lev1
   </title>
 </svelte:head>
 
@@ -146,25 +106,25 @@
       <svg viewBox="0 0 24 24" aria-hidden="true">
         {#if $isRtl}<polyline points="9 18 15 12 9 6" />{:else}<polyline points="15 18 9 12 15 6" />{/if}
       </svg>
-      {t.back}
+      {$t('moach.process.back')}
     </button>
     <button type="button" class="ppd-back" onclick={() => goto(`/moach/${projectId}/chains`)}>
-      {t.chains}
+      {$t('moach.process.chains')}
     </button>
   </div>
 
   {#if loading}
-    <div class="ppd-state"><Lowding /><p class="ppd-state-sub">{t.loading}</p></div>
+    <div class="ppd-state"><Lowding /><p class="ppd-state-sub">{$t('moach.process.loading')}</p></div>
   {:else if loadError}
     <div class="ppd-state">
-      <p class="ppd-state-title">{t.error}</p>
+      <p class="ppd-state-title">{$t('moach.process.error')}</p>
       <code class="ppd-id">{loadError}</code>
     </div>
   {:else if matched.length === 0}
     <div class="ppd-state">
       <span class="ppd-state-icon" aria-hidden="true">◈</span>
-      <p class="ppd-state-title">{t.notFound}</p>
-      <p class="ppd-state-sub">{t.notFoundSub}</p>
+      <p class="ppd-state-title">{$t('moach.process.notFound')}</p>
+      <p class="ppd-state-sub">{$t('moach.process.notFoundSub')}</p>
       <code class="ppd-id">{processId}</code>
     </div>
   {:else}
@@ -177,10 +137,10 @@
           <h1 class="ppd-title">{chainName(entry)}</h1>
           <span class="ppd-type">
             {entry.kind === 'mission'
-              ? t.missionChain
+              ? $t('moach.process.missionChain')
               : entry.kind === 'sale'
-                ? t.saleChain
-                : t.resourceChain}
+                ? $t('moach.process.saleChain')
+                : $t('moach.process.resourceChain')}
           </span>
         </header>
         <div class="ppd-card">

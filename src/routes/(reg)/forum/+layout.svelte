@@ -1,11 +1,10 @@
 ﻿<script lang="ts">
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { page } from '$app/state';
   import { afterNavigate, invalidate } from '$app/navigation';
   import { onDestroy, onMount } from 'svelte';
   import { toast } from 'svelte-sonner';
   import ForumInboxList from '$lib/components/forum/ForumInboxList.svelte';
-  import { lang } from '$lib/stores/lang.js';
   import { socketClient } from '$lib/stores/socketClient';
   import { forumStore } from '$lib/stores/forumStore';
   import { registerUpdateStrategies } from '$lib/client/updateStrategies';
@@ -45,31 +44,6 @@
   let socketUnsubscribe: (() => void) | null = null;
   let lastBlockedUrl = '';
 
-  const copy = {
-    he: {
-      title: 'פורומים',
-      subtitle: 'כל השיחות הרלוונטיות אליך במקום אחד',
-      search: 'חיפוש לפי שם, ריקמה או הודעה',
-      blocked: 'אין לך הרשאה לצפות בפורום הזה.',
-      loadError: 'לא הצלחנו לטעון את הפורומים כרגע.'
-    },
-    en: {
-      title: 'Forums',
-      subtitle: 'All conversations relevant to you in one place',
-      search: 'Search by title, project or message',
-      blocked: 'You do not have permission to view that forum.',
-      loadError: 'We could not load your forums right now.'
-    },
-    ar: {
-      title: 'Forums',
-      subtitle: 'All conversations relevant to you in one place',
-      search: 'Search by title, project or message',
-      blocked: 'You do not have permission to view that forum.',
-      loadError: 'We could not load your forums right now.'
-    }
-  };
-
-  let t = $derived(copy[$lang] || copy.he);
   let selectedId = $derived(page.params.forumId ? String(page.params.forumId) : null);
   let isThreadRoute = $derived(Boolean(selectedId));
   let filteredForums = $derived(
@@ -131,7 +105,7 @@
     const currentUrl = page.url.toString();
     if (page.url.searchParams.get('forum') === 'blocked' && lastBlockedUrl !== currentUrl) {
       lastBlockedUrl = currentUrl;
-      toast.warning(t.blocked);
+      toast.warning($t('common.forumLayout.blocked'));
     }
   }
 
@@ -166,7 +140,7 @@
 </script>
 
 <svelte:head>
-  <title>{t.title} | 1lev1</title>
+  <title>{$t('common.forumLayout.title')} | 1lev1</title>
 </svelte:head>
 
 <div
@@ -182,24 +156,24 @@
       <header class="mb-4">
         <div class="flex items-end justify-between gap-3">
           <div>
-            <h1 class="text-2xl font-black text-gold sm:text-3xl">{t.title}</h1>
-            <p class="mt-1 text-sm text-pink-100/70">{t.subtitle}</p>
+            <h1 class="text-2xl font-black text-gold sm:text-3xl">{$t('common.forumLayout.title')}</h1>
+            <p class="mt-1 text-sm text-pink-100/70">{$t('common.forumLayout.subtitle')}</p>
           </div>
           <span class="rounded-full border border-barbi/50 bg-barbi/15 px-3 py-1 text-xs font-bold text-pink-50">
             {data.forums.length}
           </span>
         </div>
         <label class="mt-4 block">
-          <span class="sr-only">{t.search}</span>
+          <span class="sr-only">{$t('common.forumLayout.search')}</span>
           <input
             bind:value={query}
-            placeholder={t.search}
+            placeholder={$t('common.forumLayout.search')}
             class="w-full rounded-md border border-white/10 bg-white/[0.065] px-4 py-3 text-sm text-white placeholder:text-pink-100/45 outline-none transition focus:border-gold/70 focus:ring-2 focus:ring-gold/25"
           />
         </label>
         {#if data.loadError}
           <p class="mt-3 rounded-md border border-red-300/30 bg-red-500/10 px-3 py-2 text-sm text-red-100">
-            {t.loadError}
+            {$t('common.forumLayout.loadError')}
           </p>
         {/if}
       </header>

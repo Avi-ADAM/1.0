@@ -2,7 +2,8 @@
 import { getProjectData } from '$lib/stores/projectStore.js';
 import { montsi } from '$lib/func/montsi.svelte';
 import { kindOfTranslation } from '$lib/func/kindOfTranslate.svelte';
-import tr from '$lib/translations/tr.json';
+import { get } from 'svelte/store';
+import { t as i18nT } from '$lib/translations';
 
 export function createMessagesForAsked(dictasked, lang, idL, askMisMes) {
   if (dictasked.length > 0) {
@@ -11,7 +12,7 @@ export function createMessagesForAsked(dictasked, lang, idL, askMisMes) {
       
       dictasked[t].messeges = [];
       dictasked[t].messeges.push({
-        message: `${dictasked[t].username} ${tr?.ask.askedTo[lang]} ${dictasked[t].openName}`,
+        message: `${dictasked[t].username} ${get(i18nT)('ask.askedTo')} ${dictasked[t].openName}`,
         what: true,
         pic: dictasked[t].src,
         timestamp: new Date(dictasked[t].createdAt),
@@ -34,8 +35,8 @@ export function createMessagesForAsked(dictasked, lang, idL, askMisMes) {
             )}  
               ${
                 dictasked[t].users[x].what == true
-                  ? tr?.vots.inFavor[lang]
-                  : tr?.vots.against[lang]
+                  ? get(i18nT)('vots.inFavor')
+                  : get(i18nT)('vots.against')
               } `,
             what: dictasked[t].users[x].what,
             pic: src22,
@@ -93,7 +94,7 @@ export function createNegoMessages(items, lang, myid, projectId) {
         'un',
         items[x].attributes.users_permissions_user.data.id
       )}
-        ${tr?.nego.didNego[lang]}</span>
+        ${get(i18nT)('nego.didNego')}</span>
         ${createNegoDetails(items[x], lang)}`,
       what: true,
       pic: src22,
@@ -126,7 +127,7 @@ export function createVotingMessages(users, lang, myid, projectId) {
         projectId,
         'un',
         users[x].users_permissions_user.data.id
-      )} ${tr?.vots.inFavor[lang]}`,
+      )} ${get(i18nT)('vots.inFavor')}`,
       what: users[x].what,
       pic: src22,
       timestamp: new Date(users[x].zman),

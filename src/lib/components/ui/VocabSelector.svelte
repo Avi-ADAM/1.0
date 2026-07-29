@@ -21,7 +21,7 @@
   import { onMount } from 'svelte';
   import { SvelteSet } from 'svelte/reactivity';
   import { get } from 'svelte/store';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
 
   let {
     kind,
@@ -37,7 +37,7 @@
   const STORES = { skills: skil, vallues: valluesStore, roles: role, workways: ww };
   const store = STORES[kind];
 
-  let defaultPlaceholder = $derived(tr.selector[meta.searchKey][$lang]);
+  let defaultPlaceholder = $derived($t(`selector.${meta.searchKey}`));
   let actualPlaceholder = $derived(placeholder || defaultPlaceholder);
 
   // --- Catalog (subscribed from the shared store) ---
@@ -201,11 +201,8 @@
     onadd?.(data);
   }
 
-  const dupMsg = {
-    he: { found: tr.selector['identical' + meta.i18nSuffix].he, similar: tr.selector['similar' + meta.i18nSuffix].he },
-    en: { found: tr.selector['identical' + meta.i18nSuffix].en, similar: tr.selector['similar' + meta.i18nSuffix].en },
-    ar: { found: tr.selector['identical' + meta.i18nSuffix].ar, similar: tr.selector['similar' + meta.i18nSuffix].ar }
-  };
+  const dupLabel = (status) =>
+    $t(`selector.${status === 'found' ? 'identical' : 'similar'}${meta.i18nSuffix}`);
   const pct = (sim) => `${Math.round(sim * 100)}%`;
 
   // --- Create on user add ---
@@ -244,11 +241,7 @@
     }
   }
 
-  let addnMsg = $derived({
-    he: `${tr.selector.addPrefix.he} "${searchText}"`,
-    en: `${tr.selector.addPrefix.en} "${searchText}"`,
-    ar: `${tr.selector.addPrefix.ar} "${searchText}"`
-  });
+  let addnMsg = $derived(`${$t('selector.addPrefix')} "${searchText}"`);
 </script>
 
 <div
@@ -261,7 +254,7 @@
     inputClass="!bg-gold !text-barbi w-full"
     liSelectedClass="!bg-barbi !text-gold"
     --sms-width="100%"
-    createOptionMsg={searchText ? addnMsg[$lang] : '...'}
+    createOptionMsg={searchText ? addnMsg : '...'}
     allowUserOptions="append"
     filterFunc={optionFilter}
     loading={dupStatus === 'checking'}
@@ -281,7 +274,7 @@
           <span class="dup-suggestion-body">
             <span class="dup-suggestion-label">{suggestionLabel}</span>
             <small class="dup-suggestion-hint"
-              >{dupMsg[$lang][dupStatus]} {pct(dupMatch.similarity)}</small
+              >{dupLabel(dupStatus)} {pct(dupMatch.similarity)}</small
             >
           </span>
         </div>

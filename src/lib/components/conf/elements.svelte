@@ -2,7 +2,7 @@
   import Close from '$lib/celim/close.svelte';
   import Tile from '$lib/celim/tile.svelte';
   import { lang } from '$lib/stores/lang';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
   import { MultiSelect } from 'svelte-multiselect';
   import AddNewSkill from '../addnew/addNewSkill.svelte';
   import { find_skill_id } from '$lib/func/findSkillId.svelte';
@@ -33,7 +33,7 @@
     datai = $bindable([]),
     dataib = $bindable(),
     show2 = $bindable(false),
-    lebel = { he: '', en: '' },
+    lebel = '',
     valc,
     edit = $bindable(false),
     bgi = 'gold',
@@ -130,7 +130,7 @@
 <div class="border border-gold border-opacity-20 rounded m-2">
   {#if edit == false}
     <div class="flex flex-row align-middle justify-center gap-x-2">
-      <h2 class="underline decoration-mturk">{lebel[$lang]}</h2>
+      <h2 class="underline decoration-mturk">{lebel}</h2>
       {#if dati.length > 0}
         <div
           class="  flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 mb-1"
@@ -157,7 +157,7 @@
         <div class="flex flex-col align-middle justify-center">
           <button onclick={() => (show2 = false)}><Close /></button>
           <small class:text-right={$lang == 'he'}
-            >{tr?.nego.original[$lang]}:</small
+            >{$t('nego.original')}:</small
           >
           {#if datai.length > 0}
             <div
@@ -176,7 +176,7 @@
             </div>
           {/if}
           <small class:text-right={$lang == 'he'} class="text-gold"
-            >{tr?.nego.sugestion[$lang]}:</small
+            >{$t('nego.sugestion')}:</small
           >
           {#if dataib.length > 0}
             <div
@@ -206,9 +206,9 @@
         --sms-bg="var(--gold)"
         loading={newcontent}
         bind:selected={dataibn}
-        placeholder={placeholder[$lang]}
+        placeholder={placeholder}
         options={alld.map((c) => c.attributes[valc])}
-        noMatchingOptionsMsg={nom[$lang]}
+        noMatchingOptionsMsg={nom}
       />
       <div class="mx-auto">
         {#if valc == 'skillName'}

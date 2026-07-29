@@ -1,0 +1,18 @@
+{
+  "withWhomMoney": "مع من هو المال",
+  "saleError": "خطأ في معالجة البيع",
+  "changeSaleDate": "تغيير تاريخ البيع",
+  "howManyUnits": "كم وحدة؟",
+  "howManyPerUnit": "كم لكل وحدة؟",
+  "perMonth": "شهرياً",
+  "perYear": "سنوياً",
+  "noStartDate": "لا يوجد تاريخ بدء",
+  "noEndDate": "لا يوجد تاريخ انتهاء، يمكن تركه فارغاً لبيع مستمر حتى يتم إلغاؤه",
+  "noUserSelected": "لم يتم تحديد مستخدم",
+  "startDate": "تاريخ البدء",
+  "endDate": "تاريخ الانتهاء",
+  "addSale": "إضافة بيع",
+  "total": "المجموع",
+  "noteOptional": "ملاحظة (اختياري)",
+  "notePlaceholder": "أضف ملاحظة للبيع..."
+}

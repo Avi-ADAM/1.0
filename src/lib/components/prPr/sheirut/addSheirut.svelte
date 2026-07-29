@@ -1,5 +1,5 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import Close from '$lib/celim/close.svelte';
   import SucssesConf from '$lib/celim/sucssesConf.svelte';
   import Chooser from '$lib/celim/ui/chooser.svelte';
@@ -7,7 +7,6 @@
   import { sanitizeUserInput } from '$lib/func/uti/sanitizeUserInput.svelte';
   import {SendTo} from '$lib/send/sendTo.svelte';
   import { idPr } from '$lib/stores/idPr';
-  import { lang } from '$lib/stores/lang'
   import { toast } from 'svelte-sonner';
   /**
    * @typedef {Object} Props
@@ -19,23 +18,6 @@
   /** @type {Props} */
   let { restime = "feh", usersNum = 1, onClose } = $props();
     let name = $state() , descrip = $state(),oneTime = $state(false),isPublik = false,already = $state(false), success = $state(false) , equaliSplited = $state(true)
-    const heading = {"he":"יצירת שירות חדש","en":"create new service"}
-    const expl = {"he":"","en":""}
-    const action = {"he":"יצירת שירות חדש","en":"create new service"}
-    const namede = {"he":"שם","en":"name"}
-    const desde = {"he":"תיאור","en":"description"}
-    const isPublikLevel ={"he":"לפרסם ולפתוח את השירות לכל?","en":"is the service should be public and open for everyone ?"}
-    const isPublikFl = {"he":"ציבורי","en":"public"}
-    const isPublikTr = {"he":"פרטי","en":"private"}
-    const oneTimeLevel = {"he":"השירות הינו חד פעמי או על בסיס חודשי","en":"one time service or monthly based"}
-    const oneTimeTr = {"he":"חודשי","en":"monthly"}
-    const oneTimeFl = {"he":"חד פעמי","en":"one time"}
-    const createLebel = {"he":"יצירת שירות חדש","en":"create new service"}
-    const equaliSplitedLevel = {"he":"עלויות השירות מחולקות באופן שווה או שאין סכום מסוים שחובה לתת","en":"is the service cost are splited equally or the subscribers pay what they want"}
-    const equaliSplitedFl = {"he":"חלוקה שווה","en":"splited equally"}
-    const equaliSplitedTr = {"he":"דמי מנוי","en":"subscription"}
-    const fnnn = { he: ' השירות נוצר בהצלחה', en: 'service has created sucsessfully' };
-
     let open = $state(false)
     async function create(){
         already = true
@@ -114,7 +96,7 @@ let pendque = `mutation {
      setTimeout(function(){  
     success = false
   },15000)
-   toast.success(`${fnnn[$lang]}`);
+   toast.success(`${$t('project.sheirut.fnnnCreated')}`);
    onClose?.()
 }
     }
@@ -124,7 +106,7 @@ let pendque = `mutation {
      setTimeout(function(){  
     success = false
   },15000)
-  toast.success(`${fnnn[$lang]}`);
+  toast.success(`${$t('project.sheirut.fnnnCreated')}`);
       onClose?.()
   }
   }
@@ -136,7 +118,7 @@ let pendque = `mutation {
  {#if open === false}
    <button   
             class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
-        onclick={()=>open = true}>{createLebel[$lang]}
+        onclick={()=>open = true}>{$t('project.sheirut.createNew')}
     </button>
   {:else} 
       <div class="flex flex-col items-center justify-center sm:w-1/2 p-8 mx-auto bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400"> 
@@ -144,28 +126,28 @@ let pendque = `mutation {
                 class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
             onclick={()=>open = false}><Close/>
         </button>
-        <h1 class="text-barbi">{heading[$lang]}</h1>
+        <h1 class="text-barbi">{$t('project.sheirut.createNew')}</h1>
         <div dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
               <input name="des" bind:value={name}  
              type='text' class='input'required >
-              <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="des" class='label'>{namede[$lang]}</label>
+              <label style:right={$isRtl ? "0" : "none"} style:left={$isRtl ? "none" : "0"} for="des" class='label'>{$t('project.sheirut.name')}</label>
               <span class='line'></span>
         </div>
 
         <div dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
               <textarea name="es"  bind:value={descrip}    
              type='text' class='input d' required ></textarea>
-              <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="es" class='label'>{desde[$lang]}</label>
+              <label style:right={$isRtl ? "0" : "none"} style:left={$isRtl ? "none" : "0"} for="es" class='label'>{$t('project.sheirut.description')}</label>
               <span class='line'></span>
         </div>
 
-        <!----<Chooser bind:checked={equaliSplited} tr={equaliSplitedTr} level={equaliSplitedLevel} fl={equaliSplitedFl}/>-->
-        <Chooser bind:checked={oneTime} tr={oneTimeTr} level={oneTimeLevel} fl={oneTimeFl}/>
-        <Chooser bind:checked={equaliSplited} tr={equaliSplitedTr} level={equaliSplitedLevel} fl={equaliSplitedFl}/>
+        <!----<Chooser bind:checked={equaliSplited} tr={$t('project.sheirut.splitEqually')} level={$t('project.sheirut.equaliSplitedLevel')} fl={$t('project.sheirut.subscription')}/>-->
+        <Chooser bind:checked={oneTime} tr={$t('project.sheirut.oneTime')} level={$t('project.sheirut.oneTimeLevel')} fl={$t('project.sheirut.monthly')}/>
+        <Chooser bind:checked={equaliSplited} tr={$t('project.sheirut.splitEqually')} level={$t('project.sheirut.equaliSplitedLevel')} fl={$t('project.sheirut.subscription')}/>
              {#if already === false}
    <button   
             class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
-        onclick={create}>{action[$lang]}
+        onclick={create}>{$t('project.sheirut.createNew')}
     </button>
     {/if}   
     </div>

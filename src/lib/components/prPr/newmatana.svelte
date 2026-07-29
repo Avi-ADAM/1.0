@@ -115,7 +115,7 @@
 
 <div class="flex flex-col align-middle justify-center gap-x-2">
   <h2 class="text-barbi font-bold text-center underline">{$t('project.newmatana.create')}</h2>
-  <TextInput lebel={{ he: 'שם', en: 'Name', ar: 'الاسم' }} bind:text={name} />
+  <TextInput lebel={$t('common.labels.name')} bind:text={name} />
   <br />
   <small class="text-center text-barbi">{$t('project.newmatana.description')}:</small>
   <RichText bind:outpot={description} editable={true} />
@@ -161,7 +161,7 @@
     {/if}
   {/key}
   {#if kindOf == 'monthly' || kindOf == 'yearly'}
-    <Checkbox bind:value={unlimitedM} lebel={{ he: 'ליחידה - ללא הגבלה', en: 'unlimited', ar: 'غير محدود' }} />
+    <Checkbox bind:value={unlimitedM} lebel={$t('common.labels.unlimitedPerUnit')} />
     <small class="text-center text-barbi"
       >{$t('project.newmatana.startDate')} - {$t('project.newmatana.optional')}</small
     >
@@ -203,7 +203,7 @@
   <br />
   <Checkbox
     bind:value={oneForeProject}
-    lebel={{ he: 'מוצר יחיד לפרויקט', en: 'one product for one project', ar: 'منتج واحد لكل مشروع' }}
+    lebel={$t('common.labels.oneProductPerProject')}
   />
-  <Button text={{ he: 'הוספת מוצר', en: 'Add product', ar: 'إضافة منتج' }} onClick={add} {loading} {success} {error} />
+  <Button text={$t('common.buttons.addProduct')} onClick={add} {loading} {success} {error} />
 </div>

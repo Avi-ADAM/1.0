@@ -1,0 +1,36 @@
+{
+  "donate": {
+    "title": "Donar",
+    "intro": "Cada donación se reparte con transparencia entre quienes hacen el trabajo y cuenta para el índice de cobertura.",
+    "needLogin": "Para coordinar una donación desde el sitio hay que iniciar sesión. También puedes contactarnos directamente con los enlaces de la página.",
+    "login": "Iniciar sesión / Registrarse",
+    "tabCoordinate": "Quiero donar",
+    "tabRecord": "Registrar una donación recibida",
+    "coordinateHelp": "Avisaremos a los miembros de la rikma de que quieres donar y se pondrán en contacto para coordinar la transferencia. Una vez recibida, se registra como donación.",
+    "recordHelp": "Registra una donación que ya llegó. Si el dinero lo tiene otra persona, debe confirmar la recepción antes de que cuente.",
+    "amount": "Importe (₪)",
+    "amountOpt": "Importe (₪), opcional",
+    "name": "Nombre de quien dona (déjalo vacío para donar de forma anónima)",
+    "message": "Dedicatoria / mensaje",
+    "contact": "¿Cómo podemos contactarte? (teléfono / correo)",
+    "holder": "¿Quién tiene el dinero?",
+    "me": "Yo",
+    "send": "Enviar",
+    "record": "Registrar la donación",
+    "cancel": "Cancelar",
+    "okReq": "¡Gracias! Se avisó a la rikma y se pondrán en contacto.",
+    "okSelf": "Donación registrada ✓",
+    "okClaim": "Registrada: a la espera de la confirmación de quien tiene el dinero (se aprueba automáticamente al pasar el plazo de respuesta).",
+    "needAmount": "Introduce un importe",
+    "needHolder": "Elige quién tiene el dinero"
+  },
+  "supportToggle": {
+    "title": "Página de apoyo y donaciones",
+    "desc": "Define quién puede ver la página pública de apoyo, donde se dona, se hace voluntariado y se consulta el índice de cobertura con transparencia.",
+    "view": "Ver la página →",
+    "saved": "Guardado ✓",
+    "off": "Desactivada",
+    "members": "Miembros",
+    "public": "Pública"
+  }
+}

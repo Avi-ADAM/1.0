@@ -1,6 +1,5 @@
 <script>
   import Tooltip from './../../celim/tooltipb.svelte';
-  import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
   import pic from './../../celim/pic.js';
   import Finisin from './finisin.svelte';
@@ -381,7 +380,7 @@
       <th>עלות</th>
       {#each meData as data, i}
       <td>
-  <small for="name" class='label'>{monetaryValue[$lang]} <span style="display:{ meData[i].m  ? "" : "none"};">{perMonth[$lang]}</span><span style="display:{ meData[i].y  ? "" : "none"};">{perYear[$lang]}</span><span style="display:{ meData[i].r  ? "" : "none"};">{forPeriod[$lang]}</span><span style="display:{meData[i].kc ? "" : "none"};">{perUnit[$lang]}</span> </small>
+  <small for="name" class='label'>{$t('project.fini.monetaryValue')} <span style="display:{ meData[i].m  ? "" : "none"};">{$t('project.fini.perMonth')}</span><span style="display:{ meData[i].y  ? "" : "none"};">{$t('project.fini.perYear')}</span><span style="display:{ meData[i].r  ? "" : "none"};">{$t('project.fini.forPeriod')}</span><span style="display:{meData[i].kc ? "" : "none"};">{$t('project.fini.perUnit')}</span> </small>
   <h2>{data.price.toFixed(2)}</h2>  
   {/each}
     </tr>--><tr

@@ -1,5 +1,4 @@
 <script>
-  import { lang } from '$lib/stores/lang';
   import Lowding from '$lib/celim/lowding.svelte';
   import List from '../icons/list.svelte';
   import SucssesConf from '../sucssesConf.svelte';
@@ -23,7 +22,7 @@
     loading = false,
     success = false,
     error = false,
-    text = { he: 'יצירה', en: 'Create' },
+    text = '',
     name = 'button',
     size = 'big',
     disabled = false,
@@ -55,7 +54,7 @@ font-bold font-rubik {className}"
   onmouseleave={() => (hover = false)}
   {onclick}
   disabled={disabled ? true : undefined}
-  title={text[$lang]}
+  title={text}
   {name}
   ><div class="flex flex-row align-center justify-center items-center gap-4">
     {#if children}{@render children()}{/if}
@@ -68,7 +67,7 @@ font-bold font-rubik {className}"
         : 'bg-[linear-gradient(to_top,theme(colors.pink.300),theme(colors.fuchsia.400),theme(colors.mpink),theme(colors.fuchsia.400),theme(colors.pink.300))]'}	
 "
     >
-      {text[$lang]}
+      {text}
     </h2>
     {#if loading}
       <div class="w-8 h-8">

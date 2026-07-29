@@ -1,0 +1,108 @@
+{
+  "_review": true,
+  "meta": {
+    "title": "1💗1 · Crecer juntos — un sustento de la tierra, sin ir en solitario",
+    "description": "Un sustento ecológico que parte de la comunidad y reduce el riesgo. Tierra, plantones, manos y tiempo: cada persona aporta su parte única y, juntos, crean un sustento armónico y circular basado en la demanda real."
+  },
+  "hero": {
+    "eyebrow": "◈ Hacer ecológico · Conexión con la tierra · Comunidad creativa ◈",
+    "h1": "Un sustento de la tierra, sin hacerlo en solitario",
+    "h2": "Una profesión ecológica parte de la comunidad, no del riesgo",
+    "h3": "Cada uno aporta lo que tiene y ama: juntos crece un sustento",
+    "h4": "Del comensal de vuelta a la tierra: un círculo entero y armónico",
+    "h5": "Empieza por los clientes. El negocio se construye en torno a la necesidad",
+    "sub": "No hace falta capital inicial, comprar tierra ni ir en solitario. Cada uno aporta su parte —tierra, plantones, manos que trabajan, tiempo o ganas de consumir— y el modelo cooperativo de 1💗1 lo coordina todo con transparencia y reparte los frutos de forma justa.",
+    "ctaPrimary": "Crezcamos juntos ✿",
+    "ctaSecondary": "Quiero pedir una caja de verduras local 🥬"
+  },
+  "nav": {
+    "barriers": "Las barreras",
+    "weave": "El tejido: una asociación viva",
+    "demand": "Empieza por el cliente",
+    "how": "Cómo empezar",
+    "who": "Para quién es",
+    "join": "Únete al círculo"
+  },
+  "problem": {
+    "title": "La dificultad de fundar un proyecto agrícola en solitario",
+    "lead": "El sueño suena simple y puro: trabajar la tierra, cultivar alimentos sanos y ganarse la vida con dignidad. Pero en la práctica, los retos sobre el terreno son casi infranqueables para una persona sola.",
+    "b1": "Falta de tierra disponible, y un temor natural de los propietarios a arrendarla a largo plazo.",
+    "b2": "Altos costes de puesta en marcha en equipo, plantones e infraestructura antes de vender el primer producto.",
+    "b3": "Inestabilidad de comercialización: sin clientes garantizados de antemano, una parte importante de la cosecha puede desperdiciarse.",
+    "b4": "Agotamiento y soledad: trabajo físico duro a todas horas, sin poder tomar días de descanso ni contar con reemplazo.",
+    "cost": "Así se desvanece el sueño y la tierra fértil queda desolada.",
+    "turn": "En 1💗1 convertimos cada barrera en una oportunidad para otro socio del círculo ✿"
+  },
+  "weave": {
+    "title": "El tejido: una asociación viva inspirada en la naturaleza",
+    "sub": "En 1💗1, una asociación se llama 'tejido', inspirada en el tejido vivo de un cuerpo. Cada célula del tejido tiene plena independencia, un rol único y libertad de acción, y juntas crean un organismo entero, palpitante y funcional que permite florecer en común sin renunciar a la libertad personal.",
+    "r1_t": "🌍 La célula del suelo y ancla del proyecto",
+    "r1_d": "Aporta la tierra disponible para el proyecto, participa en la toma de decisiones y disfruta de un retorno justo. La tierra vuelve a la vida en lugar de quedar en barbecho.",
+    "r2_t": "🌱 La célula de germinación y conocimiento",
+    "r2_d": "Prepara y cuida plantones de calidad como parte de la inversión inicial en el tejido, y acompaña profesionalmente el proceso de cultivo.",
+    "r3_t": "🧑‍🌾 La célula de hacer y cuidar",
+    "r3_d": "Viene al trabajo práctico en el campo por pasión y conexión con la tierra. Las horas y la energía se traducen con transparencia en propiedad dentro del tejido.",
+    "r4_t": "🛡️ La célula de respaldo y resiliencia",
+    "r4_d": "Garantiza la continuidad y la estabilidad. Cuando hace falta descanso o vacaciones, otros socios apoyan y cubren, para que la tierra y el tejido sigan floreciendo.",
+    "r5_t": "⚖️ El sistema nervioso: sincronización y justicia",
+    "r5_d": "La interfaz tecnológica de 1💗1 funciona como un sistema nervioso silencioso: coordina, documenta la contribución de cada célula y reparte los beneficios por consenso pleno.",
+    "note": "Aquí no hay una estructura piramidal de 'empleadores' y 'empleados'. Hay un tejido igualitario: cada célula tiene libertad e independencia, y todos se complementan en armonía."
+  },
+  "demand": {
+    "title": "Empieza por la comunidad — reduce el riesgo",
+    "sub": "En lugar de cultivar y esperar que alguien compre, damos la vuelta a la ecuación y lo basamos todo en una demanda definida de antemano.",
+    "p1": "Los vecinos expresan interés y encargan por adelantado una caja de verduras de temporada regular.",
+    "p2": "En torno a esta demanda, propietarios, cultivadores y cuidadores de la misma zona se organizan juntos.",
+    "p3": "Cultivamos exactamente lo que se encargó y en la cantidad necesaria: sin excedentes, sin desperdicio y con la máxima frescura.",
+    "basket": "🥬 Una caja de verduras semanal, local y rica, hecha especialmente para las personas que la esperan."
+  },
+  "paths": {
+    "title": "Dos caminos de crecimiento — tú eliges",
+    "simple_t": "Reparto directo de ingresos",
+    "simple_d": "Cultiva, vende, y los ingresos se dividen de forma automática y sencilla entre todos los socios según su proporción de inversión y horas.",
+    "economy_t": "Una economía local completa",
+    "economy_d": "Construir un sistema de suscripción integral en torno a las necesidades de la comunidad: cajas semanales, productos complementarios y una amplia integración comunitaria.",
+    "note": "Puedes empezar de forma sencilla con ventas básicas y ampliar hacia una economía local completa al ritmo que mejor te convenga."
+  },
+  "how": {
+    "title": "Cuatro pasos sencillos para empezar",
+    "s1_t": "Únete y presenta tus recursos",
+    "s1_d": "¿Tierra disponible? ¿Capacidad de cultivo? ¿Tiempo libre y manos que trabajan? ¿O tal vez el deseo de apoyar como consumidor? Cada contribución es un excelente punto de partida.",
+    "s2_t": "Conectar y formar el círculo",
+    "s2_d": "Conectamos a socios complementarios de la misma zona geográfica para crear un grupo de trabajo armónico y equilibrado.",
+    "s3_t": "Acuerdo y total transparencia",
+    "s3_d": "Definimos y aprobamos de forma digital y clara, por adelantado, el reparto de roles, las inversiones y cómo se comparten los beneficios.",
+    "s4_t": "Cultiva y comparte la abundancia",
+    "s4_d": "El huerto arranca, la producción llega a los consumidores y los ingresos se reparten según el modelo acordado con transparencia."
+  },
+  "who": {
+    "title": "¿Para quién es esto?",
+    "sub": "Para cualquiera que quiera participar en un cambio ecológico y social real, y para cualquiera que quiera consumir alimentos limpios y de calidad.",
+    "w1_t": "Propietarios de tierra y espacios abiertos",
+    "w1_d": "Que quieren ver su tierra dando frutos y devolviendo vida, mediante la implicación social y la asociación.",
+    "w2_t": "Amantes de la tierra y la jardinería",
+    "w2_d": "Personas que quieren convertir su pasión en un trabajo agrícola práctico y gratificante, sin capital.",
+    "w3_t": "Agricultores al inicio de su camino",
+    "w3_d": "Que quieren adquirir experiencia práctica, construir comunidad y reducir los riesgos de puesta en marcha y comercialización que implica empezar solos.",
+    "w4_t": "Localidades y comunidades locales",
+    "w4_d": "Que aspiran a fortalecer su resiliencia económica y social mediante una agricultura local cooperativa y conectada.",
+    "w5_t": "Consumidores conscientes",
+    "w5_d": "Personas que quieren verduras frescas y locales directamente del campo, y conocer a los socios que las cultivaron."
+  },
+  "values": {
+    "title": "Los valores que nos impulsan",
+    "v1_t": "Circularidad y ciclos",
+    "v1_d": "De la semilla al plato y de vuelta a la tierra. Reducimos al mínimo posible los intermediarios y el desperdicio de alimentos.",
+    "v2_t": "Armonía personal",
+    "v2_d": "Cada socio se centra en lo que mejor hace y ama. El trabajo se hace desde la conexión y la realización, no desde el agotamiento.",
+    "v3_t": "Confianza y transparencia",
+    "v3_d": "La documentación clara y accesible de cada hora, recurso y fruto permite construir relaciones a largo plazo basadas en una verdadera asociación."
+  },
+  "cta": {
+    "title": "La tierra está lista, la comunidad espera",
+    "sub": "Ya sea que tengas tierra que ofrecer, manos que trabajan, conocimiento profesional, o simplemente ganas de comer alimentos locales y sanos, hay un lugar para ti en nuestro círculo.",
+    "register": "Crezcamos juntos ✿",
+    "wish": "Quiero una caja local 🥬",
+    "login": "Iniciar sesión en una cuenta existente"
+  }
+}

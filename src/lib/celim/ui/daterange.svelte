@@ -1,6 +1,5 @@
 <script>
   import Arrow from "$lib/celim/icons/arrow.svelte";
-  import {lang} from '$lib/stores/lang.js'
   import { format } from 'date-fns';
  import moment from 'moment';
    import SveltyPicker from 'svelty-picker';
@@ -21,8 +20,8 @@
   let {
     start = $bindable(),
     finnish = $bindable(),
-    startplaceholder = {"he":"תאריך התחלה","en":"start Date"},
-    finnishplaceholder = {"he":"תאריך סיום","en":"finnish Date"},
+    startplaceholder = '',
+    finnishplaceholder = '',
     dir = "rtl",
     onEdit,
     onEditStop
@@ -44,12 +43,12 @@
  
 </script>
 <div class="flex flex-{showstart || showend ? "col border border-gold p-2 rounded space-y-2" : "row"} sm:flex-row align-middle justify-center space-x-2 sm:text-2xl font-bold items-center  " {dir}>
-    <button onclick={toggleDatePicker}>{startplaceholder[$lang]}:</button>
+    <button onclick={toggleDatePicker}>{startplaceholder}:</button>
   {#if showstart}
 <!---<Dateandtimeinput bind:outpot={start}/>-->
 <span dir="rtl">
  <SveltyPicker
-      placeholder={startplaceholder[$lang]}
+      placeholder={startplaceholder}
       inputClasses="form-control text-right"
       format=" hh:ii dd/mm/yyyy"
       bind:value={start}
@@ -60,11 +59,11 @@
   <button onclick={toggleDatePicker}>{start != undefined ? formatDate(start) : "--"}</button>
   {/if}
 <Arrow back={dir == "ltr"}/>
-    <button onclick={toggleDatePickerend}>{finnishplaceholder[$lang]}:</button>
+    <button onclick={toggleDatePickerend}>{finnishplaceholder}:</button>
 {#if showend}
 <span dir="rtl">
  <SveltyPicker
-      placeholder={finnishplaceholder[$lang]}
+      placeholder={finnishplaceholder}
       inputClasses="form-control text-right"
       format=" hh:ii dd/mm/yyyy"
       bind:value={finnish}

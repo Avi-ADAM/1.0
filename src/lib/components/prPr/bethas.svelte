@@ -159,21 +159,6 @@
             }
         }*/
   }
-  const who = { he: ' על ידי', en: 'by' };
-  const pro = { he: 'אחוז ביצוע', en: 'progress' };
-  const hd = { he: 'שעות שהושמו / בוצעו', en: 'hours asigned/ done' };
-  const sho = { he: 'שווי המשימה', en: 'mission vallue' };
-  const ro = { he: 'תפקיד', en: 'role' };
-  const acts = { he: 'דיון ומטלות', en: 'chat & actions' };
-  const prevMonths = { he: 'חודשים קודמים', en: 'Previous months' };
-  const monthCol = { he: 'חודש', en: 'Month' };
-  const hoursAssigned = { he: 'שעות הוקצו', en: 'Hours assigned' };
-  const hoursDone = { he: 'שעות בוצעו', en: 'Hours done' };
-  const statusCol = { he: 'סטטוס', en: 'Status' };
-  const completed = { he: 'הושלם', en: 'Completed' };
-  const inProgress = { he: 'בתהליך', en: 'In progress' };
-  const totalAllMonths = { he: 'סה״כ כל החודשים', en: 'Total all months' };
-  const des = { he: 'תיאור', en: 'decription' };
   let w = $state(0);
 
   let id = $state(0);
@@ -243,13 +228,13 @@
     <table cellpadding="0" cellspacing="0" border="0">
       <thead>
         <tr>
-          <th class="sm:text-xl text-sm">{acts[$lang]}</th>
+          <th class="sm:text-xl text-sm">{$t('project.bethas.acts')}</th>
           <th class="sm:text-xl text-sm">{$t('mission.bethas.missionName')}</th>
           <th class="sm:text-xl text-sm">{$t('mission.bethas.by')}</th>
-          <th class="sm:text-xl text-sm">{pro[$lang]}</th>
-          <th class="sm:text-xl text-sm">{hd[$lang]}</th>
-          <!--- <th class="sm:text-xl text-sm">{sho[$lang]}</th>-->
-          <th class="sm:text-xl text-sm">{ro[$lang]}</th>
+          <th class="sm:text-xl text-sm">{$t('project.bethas.pro')}</th>
+          <th class="sm:text-xl text-sm">{$t('project.bethas.hd')}</th>
+          <!--- <th class="sm:text-xl text-sm">{$t('project.bethas.sho')}</th>-->
+          <th class="sm:text-xl text-sm">{$t('project.bethas.ro')}</th>
         </tr>
       </thead>
     </table>
@@ -263,7 +248,7 @@
               {#if data.isAct == false}
                 <tr
                   transition:slide={{ duration: 1000, easing: quintOut }}
-                  class:border-r-2={data.open == true && $lang == 'he'}
+                  class:border-r-2={data.open == true && $isRtl}
                   class:border-t-2={data.open}
                   class="border-gold"
                 >
@@ -369,7 +354,7 @@
                     </p>
                     {#if getTotalMonterHours(data.attributes?.monter) > 0}
                       <p class="text-xs text-white/80">
-                        ({totalAllMonths[$lang]}: {(
+                        ({$t('project.bethas.totalAllMonths')}: {(
                           getTotalMonterHours(data.attributes?.monter) +
                           (data.attributes.howmanyhoursalready ?? 0)
                         ).toLocaleString('en-US', {
@@ -403,8 +388,8 @@
                           <thead>
                             <tr class="sm:text-xl text-lg">
                               <th class="sm:text-xl text-sm">{$t('mission.bethas.actionName')}</th>
-                              <th class="sm:text-xl text-sm">{des[$lang]}</th>
-                              <th class="sm:text-xl text-sm">{pro[$lang]}</th>
+                              <th class="sm:text-xl text-sm">{$t('project.bethas.des')}</th>
+                              <th class="sm:text-xl text-sm">{$t('project.bethas.pro')}</th>
                             </tr>
                           </thead>
                         </table>
@@ -454,7 +439,7 @@
                       {#if getMonterList(data.attributes?.monter).length > 0}
                         <div class="px-4 pb-4">
                           <h3 class="text-lg font-semibold text-white mb-2">
-                            {prevMonths[$lang]}
+                            {$t('project.bethas.prevMonths')}
                           </h3>
                           <div
                             class="overflow-x-auto rounded border border-white/20"
@@ -463,16 +448,16 @@
                               <thead>
                                 <tr class="bg-white/10">
                                   <th class="px-3 py-2 text-right"
-                                    >{monthCol[$lang]}</th
+                                    >{$t('project.bethas.monthCol')}</th
                                   >
                                   <th class="px-3 py-2 text-right"
-                                    >{hoursAssigned[$lang]}</th
+                                    >{$t('project.bethas.hoursAssigned')}</th
                                   >
                                   <th class="px-3 py-2 text-right"
-                                    >{hoursDone[$lang]}</th
+                                    >{$t('project.bethas.hoursDone')}</th
                                   >
                                   <th class="px-3 py-2 text-right"
-                                    >{statusCol[$lang]}</th
+                                    >{$t('project.bethas.statusCol')}</th
                                   >
                                 </tr>
                               </thead>
@@ -488,11 +473,11 @@
                                     <td class="px-3 py-2">
                                       {#if m.isDone || (m.hours > 0 && (m.hoursDone ?? 0) >= m.hours)}
                                         <span class="text-green-400"
-                                          >{completed[$lang]}</span
+                                          >{$t('project.bethas.completed')}</span
                                         >
                                       {:else}
                                         <span class="text-amber-400"
-                                          >{inProgress[$lang]}</span
+                                          >{$t('project.bethas.inProgress')}</span
                                         >
                                       {/if}
                                     </td>

@@ -1,8 +1,7 @@
 <script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { page, navigating } from '$app/state';
   import { goto } from '$app/navigation';
-  import { lang } from '$lib/stores/lang.js';
   import { idPr } from '$lib/stores/idPr.js';
   import AuthorityBadge from '$lib/components/ui/AuthorityBadge.svelte';
   import Pub from '$lib/celim/icons/pub.svelte';
@@ -89,18 +88,6 @@
 
   let showGuideDialog = $state(false);
 
-  const guideDialogHeader = {
-    he: 'מדריך למוח הריקמה',
-    en: 'Project Brain Guide',
-    ar: 'دليل عقل المجموعة'
-  };
-  const guideDialogText = {
-    he: 'האם ברצונך לראות מדריך קצר שיסביר מה ניתן לעשות במוח הריקמה?\n(ניתן לפתוח מחדש בלחיצה על סימן ה-? בכותרת)',
-    en: 'Would you like a quick tour of what you can do in the project brain?\n(You can reopen it via the ? button in the header)',
-    ar: 'هل تريد جولة سريعة لعقل المشروع?\n(يمكنك إعادة فتحه من خلال زر ? في الرأس)'
-  };
-  const guideYes = { he: 'אשמח', en: 'Yes', ar: 'نعم' };
-  const guideNo = { he: 'לא תודה', en: 'No thanks', ar: 'لا شكراً' };
 
   function startGuide() {
     run();
@@ -170,144 +157,7 @@
   onDestroy(() => {
     if (socketUnsubscribe) socketUnsubscribe();
   });
-  const tourMessages = {
-    he: {
-      badge: 'ריקמה היא קבוצת שיתוף פעולה — כל אחד תורם את הכישורים שלו ומרוויח לפי תרומתו',
-      members: 'חברי הריקמה — עיגול ירוק פועם = חבר שעובד עכשיו לטובת הפרויקט. לחיצה על תמונה עוברת לפרופיל',
-      tabsIntro: 'הטאבים הם מרכז הניהול של הריקמה — כל טאב מציג היבט אחר של הפרויקט',
-      create: '📋 יצירה: יוצרים משימות ומבקשים משאבים (כסף, ציוד, מידע) — הן עבור חברי הפרויקט הקיימים, והן כדי לאתר שותפים ושותפות חדשים. כל משימה או משאב שתפרסמו מקבלים לינק שיתוף לדף ייחודי ויפיפה — מותאם לרשתות חברתיות ולגיוס שותפים',
-      progress: '🔄 בתהליך: רשימת כל המשימות הפעילות — מי עובד על מה ובאיזה שלב',
-      acts: '✅ פעולות ומטלות: ניהול המשימות הקטנות — מה נגמר, מה בדרך',
-      timers: '⏱️ טיימרים: כאן רואים מתי כל חבר פרויקט היה פעיל לטובת הפרויקט ומה עשה. כשחבר מפעיל טיימר מופיע עיגול ירוק מסביב לתמונה שלו למעלה',
-      wishes: '💌 משאלות נכנסות: לידים חמים מלקוחות הקונסיירז\' שהפרויקט שלכם מתאים לתת להם שירות או מוצר — הזדמנויות עסקיות מוכנות',
-      sales: '🛒 מכירות ומוצרים: מוצר פשוט = מחיר קבוע. מוצר מורכב = מחיר שמתגבש תוך כדי תהליך הקניה — לפי משימות, משאבים והחלטות שמתקבלות יחד עם הלקוח. כל מוצר מקבל דף יפיפה מותאם לשיתוף ולקבלת לקוחות',
-      split: '💰 חלוקה: מחשבון חלוקת ההכנסות — כל אחד מקבל לפי מה שתרם',
-      votes: '🗳️ הצבעות: קבלת החלטות מתוך קונצנזוס — משא ומתן בכלים ייחודיים עד שכולם שמחים עם התוצאה. לא הצבעת רוב אלא הסכמה אמיתית של כל חברי הריקמה',
-      chains: '🔗 שרשראות: כל משימה ומשאב לאורך כל חייהם — מהצעת הפתיחה דרך ההצבעה ועד לארכיון. שקיפות מלאה והבנה עמוקה של כל תהליך בפרויקט',
-      gantt: '📊 גאנט וקאנבן: ניהול ויזואלי של הפרויקט ולוח זמנים',
-      helpBtn: 'הצגת מדריך מחדש'
-    },
-    en: {
-      badge: 'FreeMates is a collaboration group — everyone contributes their skills and earns according to their contribution',
-      members: 'FreeMates members — a pulsing green ring means a member is currently working on the project. Click a photo to visit their profile',
-      tabsIntro: 'The tabs are the management hub of the FreeMates — each tab shows a different aspect of the project',
-      create: '📋 Create: add missions and request resources (money, gear, info) — for existing members or to find new partners. Every published mission or resource gets a unique shareable link with a beautiful page optimized for social networks and partner recruitment',
-      progress: '🔄 Progress: list of all active missions — who is working on what and at which stage',
-      acts: '✅ Acts & Tasks: manage small tasks — what is done, what is on the way',
-      timers: '⏱️ Timers: see when each member was active for the project and what they worked on. When a member starts a timer, a green ring appears around their avatar above',
-      wishes: '💌 Incoming Wishes: warm leads from concierge customers that your project is a match for — ready business opportunities',
-      sales: '🛒 Sales & Products: Simple product = fixed price. Complex product = price shaped by missions, resources and decisions made together during the purchase process. Every product gets a beautiful shareable page optimized for social media and attracting customers',
-      split: '💰 Split: revenue-split calculator — everyone gets paid according to their contribution',
-      votes: '🗳️ Votes: decisions made through consensus — unique negotiation tools until everyone is genuinely happy with the outcome. Not majority vote, but real agreement from all FreeMates members',
-      chains: '🔗 Chains: every mission and resource across its entire lifecycle — from the opening proposal through voting all the way to the archive. Full transparency and deep understanding of every project process',
-      gantt: '📊 Gantt & Kanban: visual project management and timeline',
-      helpBtn: 'Show guide again'
-    },
-    ar: {
-      badge: 'FreeMates مجموعة تعاون — كل شخص يساهم بمهاراته ويكسب وفقاً لمساهمته',
-      members: 'أعضاء المجموعة — حلقة خضراء نابضة = عضو يعمل الآن. انقر على صورة للذهاب إلى ملفهم الشخصي',
-      tabsIntro: 'التبويبات هي مركز إدارة المجموعة — كل تبويب يعرض جانباً مختلفاً من المشروع',
-      create: '📋 إنشاء: أنشئ مهام واطلب موارد — للأعضاء الحاليين أو لاستقطاب شركاء جدد. كل مهمة أو مورد تنشره يحصل على رابط مشاركة لصفحة فريدة وجميلة مناسبة للشبكات الاجتماعية',
-      progress: '🔄 قيد التنفيذ: قائمة بجميع المهام النشطة',
-      acts: '✅ الأعمال والمهام: إدارة المهام الصغيرة',
-      timers: '⏱️ المؤقتات: شاهد متى كان كل عضو نشطاً وماذا عمل. عند تشغيل مؤقت تظهر حلقة خضراء حول صورته',
-      wishes: '💌 الرغبات الواردة: عملاء محتملون من الكونسيرج يناسبهم مشروعكم — فرص عمل جاهزة',
-      sales: '🛒 المبيعات والمنتجات: منتج بسيط = سعر ثابت. منتج معقد = سعر يتشكل خلال عملية الشراء بناءً على المهام والموارد والقرارات المشتركة. كل منتج يحصل على صفحة جميلة للمشاركة',
-      split: '💰 التقسيم: حاسبة توزيع الإيرادات',
-      votes: '🗳️ التصويتات: قرارات من خلال إجماع — تفاوض بأدوات فريدة حتى يكون الجميع سعداء بالنتيجة. ليس تصويت أغلبية بل اتفاق حقيقي',
-      chains: '🔗 السلاسل: كل مهمة ومورد عبر دورة حياتهم الكاملة — من الاقتراح الأولي مروراً بالتصويت وحتى الأرشيف. شفافية كاملة وفهم عميق لكل عملية',
-      gantt: '📊 جانت وكانبان: إدارة المشروع بصرياً',
-      helpBtn: 'عرض الدليل مجدداً'
-    }
-  };
 
-  let tour = $derived(tourMessages[$lang] || tourMessages.he);
-
-  const i18n = {
-    he: {
-      back: 'חזרה לרשימה',
-      main: 'ראשי',
-      create: 'יצירה',
-      gantt: 'גאנט',
-      split: 'חלוקה',
-      progress: 'בתהליך',
-      acts: 'פעולות',
-      timers: 'טיימרים',
-      kanban: 'קאנבן',
-      chains: 'שרשראות',
-      sales: 'מכירות',
-      shifts: 'משמרות',
-      processes: 'תהליכים',
-      votes: 'הצבעות',
-      wishes: 'משאלות נכנסות',
-      demand: 'מפת ביקוש',
-      work: 'עשייה',
-      flows: 'תהליכים',
-      money: 'כסף',
-      opps: 'הזדמנויות',
-      editPic: 'עריכת תמונה',
-      upload: 'העלאה',
-      editDetails: 'עריכת פרטים',
-      publicProfile: 'פרופיל ציבורי',
-      activeNow: 'פעיל כעת'
-    },
-    en: {
-      back: 'Back to list',
-      main: 'Main',
-      create: 'Create',
-      gantt: 'Gantt',
-      split: 'Split',
-      progress: 'Progress',
-      acts: 'Acts',
-      timers: 'Timers',
-      kanban: 'Kanban',
-      chains: 'Chains',
-      sales: 'Sales',
-      shifts: 'Shifts',
-      processes: 'Processes',
-      votes: 'Votes',
-      wishes: 'Incoming wishes',
-      demand: 'Demand map',
-      work: 'Work',
-      flows: 'Flows',
-      money: 'Money',
-      opps: 'Opportunities',
-      editPic: 'Edit Picture',
-      upload: 'Upload',
-      editDetails: 'Edit Details',
-      publicProfile: 'Public Profile',
-      activeNow: 'Active Now'
-    },
-    ar: {
-      back: 'العودة للقائمة',
-      main: 'الرئيسية',
-      create: 'إنشاء',
-      gantt: 'جانت',
-      split: 'تقسيم',
-      progress: 'قيد التنفيذ',
-      acts: 'أعمال',
-      timers: 'مؤقتات',
-      kanban: 'كانبان',
-      chains: 'سلاسل',
-      sales: 'مبيعات',
-      shifts: 'مناوبات',
-      processes: 'العمليات',
-      votes: 'التصويتات',
-      wishes: 'الرغبات الواردة',
-      demand: 'خريطة الطلب',
-      work: 'العمل',
-      flows: 'العمليات',
-      money: 'المال',
-      opps: 'الفرص',
-      editPic: 'تعدיל الصورة',
-      upload: 'تحميل',
-      editDetails: 'تعدיל التفاصيل',
-      publicProfile: 'الملف الشخصي العام',
-      activeNow: 'نشط الآن'
-    }
-  };
-
-  let t = $derived(i18n[$lang] || i18n.en);
 
   // Two-tier navigation: 6 groups holding the original tab routes. URLs are
   // unchanged — only the nav is regrouped. 'edit' moved to the header pencil,
@@ -375,10 +225,10 @@
 {#if projectBase}
   <Dialog
     bind:showSaveDialog={showGuideDialog}
-    dialogHeader={guideDialogHeader}
-    innerText={guideDialogText}
-    innerDialogButton={guideYes}
-    clearButton={guideNo}
+    dialogHeader={$t('moach.guide.header')}
+    innerText={$t('moach.guide.text')}
+    innerDialogButton={$t('moach.guide.yes')}
+    clearButton={$t('moach.guide.no')}
     onSaveTimer={() => {
       showGuideDialog = false;
       localStorage.setItem(`moachGuide_${projectId}`, 'done');
@@ -403,17 +253,17 @@
           <button
             class="absolute left-0 sm:left-4 top-0 flex items-center border border-gold gap-1 text-barbi hover:text-gold hover:bg-barbi/20 rounded-full p-2 transition-colors"
             onclick={backToProjects}
-            title={t.back}
+            title={$t('moach.layout.back')}
           >
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
               <path
                 d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
               />
             </svg>
-            <span class="text-sm font-medium hidden sm:inline">{t.back}</span>
+            <span class="text-sm font-medium hidden sm:inline">{$t('moach.layout.back')}</span>
           </button>
 
-          <TourItem message={tour.badge}>
+          <TourItem message={$t('moach.tour.badge')}>
             <AuthorityBadge
               logoSrc={getImageUrl(projectBase.profilePic?.data?.attributes?.url)}
               projectName={projectBase.projectName}
@@ -426,7 +276,7 @@
           <button
             class="absolute right-0 sm:right-4 top-0 flex items-center justify-center w-8 h-8 rounded-full border border-gold text-gold hover:bg-gold hover:text-barbi transition-colors font-bold text-sm"
             onclick={() => { localStorage.removeItem(`moachGuide_${projectId}`); startGuide(); }}
-            title={tour.helpBtn}
+            title={$t('moach.tour.helpBtn')}
           >?</button>
         </div>
 
@@ -542,14 +392,14 @@
           <button
             onclick={() => goto(`/project/${projectId}`)}
             class="p-2 hover:bg-white rounded-full transition-colors text-barbi"
-            title={t.publicProfile}
+            title={$t('moach.layout.publicProfile')}
           >
             <Pub />
           </button>
           <button
             onclick={() => goto(`/moach/${projectId}/edit`)}
             class="p-2 hover:bg-mturk rounded-full transition-colors text-gold"
-            title={t.editDetails}
+            title={$t('moach.layout.editDetails')}
           >
             <svg
               class="w-6 h-6"
@@ -566,7 +416,7 @@
         </div>
 
         <!-- Member Avatars with Timer Indicators -->
-        <TourItem message={tour.members}>
+        <TourItem message={$t('moach.tour.members')}>
         <div
           class="flex items-center justify-center py-2"
           dir={$isRtl ? 'rtl' : 'ltr'}
@@ -586,7 +436,7 @@
                 class="relative transition-all duration-300 {hasActiveTimer
                   ? 'scale-110'
                   : ''}"
-                title={`${user.attributes.username}${hasActiveTimer ? ' ' + t.activeNow : ''}`}
+                title={`${user.attributes.username}${hasActiveTimer ? ' ' + $t('moach.layout.activeNow') : ''}`}
               >
                 <img
                   class="inline-block h-10 w-10 rounded-full ring-2 transition-all duration-300 {hasActiveTimer
@@ -614,17 +464,17 @@
 
         <!-- Tour anchors — invisible spans that drive next/next over the nav -->
         <div class="tour-anchors-row" aria-hidden="true">
-          <TourItem message={tour.tabsIntro}><span class="tour-anchor"></span></TourItem>
-          <TourItem message={tour.create}><span class="tour-anchor"></span></TourItem>
-          <TourItem message={tour.progress}><span class="tour-anchor"></span></TourItem>
-          <TourItem message={tour.acts}><span class="tour-anchor"></span></TourItem>
-          <TourItem message={tour.timers}><span class="tour-anchor"></span></TourItem>
-          <TourItem message={tour.wishes}><span class="tour-anchor"></span></TourItem>
-          <TourItem message={tour.sales}><span class="tour-anchor"></span></TourItem>
-          <TourItem message={tour.split}><span class="tour-anchor"></span></TourItem>
-          <TourItem message={tour.votes}><span class="tour-anchor"></span></TourItem>
-          <TourItem message={tour.chains}><span class="tour-anchor"></span></TourItem>
-          <TourItem message={tour.gantt}><span class="tour-anchor"></span></TourItem>
+          <TourItem message={$t('moach.tour.tabsIntro')}><span class="tour-anchor"></span></TourItem>
+          <TourItem message={$t('moach.tour.create')}><span class="tour-anchor"></span></TourItem>
+          <TourItem message={$t('moach.tour.progress')}><span class="tour-anchor"></span></TourItem>
+          <TourItem message={$t('moach.tour.acts')}><span class="tour-anchor"></span></TourItem>
+          <TourItem message={$t('moach.tour.timers')}><span class="tour-anchor"></span></TourItem>
+          <TourItem message={$t('moach.tour.wishes')}><span class="tour-anchor"></span></TourItem>
+          <TourItem message={$t('moach.tour.sales')}><span class="tour-anchor"></span></TourItem>
+          <TourItem message={$t('moach.tour.split')}><span class="tour-anchor"></span></TourItem>
+          <TourItem message={$t('moach.tour.votes')}><span class="tour-anchor"></span></TourItem>
+          <TourItem message={$t('moach.tour.chains')}><span class="tour-anchor"></span></TourItem>
+          <TourItem message={$t('moach.tour.gantt')}><span class="tour-anchor"></span></TourItem>
         </div>
 
         <!-- Navigation: primary groups row + contextual sub-tabs row -->
@@ -637,7 +487,7 @@
               {pendingTabId === 'create' ? 'animate-pulse opacity-70' : ''}"
             >
               <span class="text-lg leading-none">+</span>
-              {t.create}
+              {$t('moach.layout.create')}
             </a>
             {#each groups as group (group.id)}
               {@const isGroupActive = activeGroup?.id === group.id}
@@ -651,11 +501,11 @@
                   : 'text-slate-300 border-transparent hover:text-gold'}
                 {pendingGroupId === group.id ? 'animate-pulse opacity-70' : ''}"
               >
-                {t[group.label]}
+                {$t(`moach.layout.${group.label}`)}
                 {#if badge > 0}
                   <span
                     class="absolute -top-1 -right-1 min-w-5 h-5 px-1 flex items-center justify-center rounded-full bg-barbi text-gold text-xs font-bold ring-2 ring-white shadow-lg animate-pulse"
-                    title={t[group.label]}
+                    title={$t(`moach.layout.${group.label}`)}
                   >
                     {badge}
                   </span>
@@ -677,7 +527,7 @@
                     : 'border-slate-500 text-slate-300 hover:text-gold hover:border-gold'}
                   {pendingTabId === tabId ? 'animate-pulse opacity-70' : ''}"
                 >
-                  {t[tabId]}
+                  {$t(`moach.layout.${tabId}`)}
                 </a>
               {/each}
             </div>

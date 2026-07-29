@@ -331,11 +331,14 @@
       const displayTotal = savedHours + unsavedHours;
 
       // Format for display
-      const msg = {
-        en: `Recalculation Complete:\nSaved Hours: ${savedHours.toFixed(2)}\nUnsaved (Running): ${unsavedHours.toFixed(2)}\nTotal: ${displayTotal.toFixed(2)}`,
-        he: `חישוב מחדש הושלם:\nשעות שנשמרו: ${savedHours.toFixed(2)}\nשעות לא שמורות (רץ): ${unsavedHours.toFixed(2)}\nסך הכל: ${displayTotal.toFixed(2)}`
-      };
-      toast.success(msg[$lang], { duration: 5000 });
+      toast.success(
+        $t('common.misc.recalcDone', {
+          saved: savedHours.toFixed(2),
+          unsaved: unsavedHours.toFixed(2),
+          total: displayTotal.toFixed(2)
+        }),
+        { duration: 5000 }
+      );
     } else {
       toast.error($lang === 'he' ? 'חישוב נכשל' : 'Recalculation failed');
     }

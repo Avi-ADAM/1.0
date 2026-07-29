@@ -1,5 +1,5 @@
 ﻿<script lang="ts">
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { lang } from '$lib/stores/lang.js';
@@ -25,6 +25,16 @@
   import ObjectChooser from '$lib/celim/ui/objectChooser.svelte';
   import { executeAction } from '$lib/client/actionClient';
   import ConsentStatusBadge from '$lib/components/consent/ConsentStatusBadge.svelte';
+  import LocationPicker from '$lib/components/location/LocationPicker.svelte';
+
+  type EditLocation = {
+    location_mode: 'online' | 'onsite' | 'hybrid' | 'unspecified';
+    isOnline?: boolean;
+    lat?: number | null;
+    lng?: number | null;
+    radius?: number | null;
+    location_hint?: string | null;
+  };
 
   // Props
   let {
@@ -45,10 +55,18 @@
     bi = $bindable(''),
     frd = $bindable(''),
     lango = $bindable(''),
+    location = $bindable<EditLocation>({
+      location_mode: 'unspecified',
+      isOnline: false,
+      lat: null,
+      lng: null,
+      radius: 15,
+      location_hint: ''
+    }),
     uid = $bindable(''),
     onMessage,
     onGuid
-  } = $props();
+  }: { location?: EditLocation } & Record<string, any> = $props();
 
   // State
   let chan = $state(false);
@@ -65,133 +83,7 @@
   let initialValues = $state(null);
 
   // Translations
-  const noEmails = {
-    he: 'אל תשלחו לי מיילים',
-    en: 'Do not send me emails'
-  };
-  const t = {
-    he: {
-      head: 'עריכת פרופיל',
-      save: 'שמור שינויים',
-      personalDetails: 'פרטים אישיים',
-      name: 'שם',
-      nameExists: 'השם כבר קיים, נא לבחור שם אחר',
-      bio: 'ביוגרפיה',
-      links: 'קישורים',
-      github: 'גיטהאב',
-      twitter: 'טוויטר',
-      discord: 'דיסקורד',
-      facebook: 'פייסבוק',
-      settings: 'הגדרות',
-      freeDay: 'היום החופשי שלי',
-      preferredLang: 'שפה מועדפת',
-      levDisplay: 'תצוגה מועדפת במסך הלב',
-      coins: 'מטבעות',
-      cards: 'קלפים',
-      security: 'אבטחה והתראות',
-      changePass: 'שנה סיסמה',
-      newPass: 'סיסמה חדשה',
-      oldPass: 'סיסמה ישנה',
-      passChanged: 'הסיסמה שונתה בהצלחה!',
-      passVal1: 'לפחות 6 תווים',
-      passVal2: 'לפחות אות גדולה אחת',
-      passVal3: 'לפחות מספר אחד',
-      deviceNuti: 'הרשמה להתראות במכשיר זה',
-      telegramNuti: 'הרשמה להתראות בטלגרם',
-      manageTelegram: 'ניהול הרשמה לטלגרם',
-      account: 'ניהול חשבון',
-      logout: 'יציאה מהחשבון',
-      resumeGuid: 'החזרת המדריך',
-      stopGuid: 'ביטול הצגת המדריך',
-      guidResumed: 'המדריך חזר! יש לרענן את העמוד',
-      guidStopped: 'המדריך לא יוצג שוב',
-      error: 'אירעה שגיאה',
-      nutiSuccess: 'נרשמת בהצלחה להתראות במכשיר זה',
-      apiKeys: 'מפתחות API',
-      apiKeysDesc: 'השתמש במפתחות אלו לחיבור סוכן ה-AI שלך לחשבונך.',
-      createKey: 'צור מפתח חדש',
-      keyName: 'שם המפתח',
-      noKeys: 'אין מפתחות עדיין',
-      deleteKey: 'מחק',
-      copied: 'הועתק',
-      copy: 'העתק',
-      newKeySuccess: 'המפתח נוצר בהצלחה',
-      saveKeyWarning: 'שמור אותו עכשיו - הוא לא יוצג שוב.',
-      cancel: 'ביטול',
-      create: 'צור',
-      identityTitle: 'הזהות הקריפטוגרפית שלך',
-      identityDesc: 'מפתח חתימה אישי שנשמר רק בדפדפן שלך. השרת לא מחזיק עותק — אפילו אנחנו לא יכולים לזייף פעולות בשמך.',
-      identityManage: 'פרטים נוספים'
-    },
-    en: {
-      head: 'Edit Profile',
-      save: 'Save Changes',
-      personalDetails: 'Personal Details',
-      name: 'Name',
-      nameExists: 'Name already exists, please choose another one',
-      bio: 'Biography',
-      links: 'Links',
-      github: 'GitHub',
-      twitter: 'Twitter',
-      discord: 'Discord',
-      facebook: 'Facebook',
-      settings: 'Settings',
-      freeDay: 'My Free Day',
-      preferredLang: 'Preferred Language',
-      levDisplay: 'Preferred Lev Page Display',
-      coins: 'Coins',
-      cards: 'Cards',
-      noEmails: 'Do not send me emails',
-      security: 'Security & Notifications',
-      changePass: 'Change Password',
-      newPass: 'New Password',
-      oldPass: 'Old Password',
-      passChanged: 'Password changed successfully!',
-      passVal1: 'At least 6 characters',
-      passVal2: 'At least one capital letter',
-      passVal3: 'At least one number',
-      deviceNuti: 'Register for notifications on this device',
-      telegramNuti: 'Register for Telegram notifications',
-      manageTelegram: 'Manage Telegram subscription',
-      account: 'Account Management',
-      logout: 'Logout',
-      resumeGuid: 'Resume Guide',
-      stopGuid: 'Stop Guide',
-      guidResumed: 'Guide is back! Please refresh the page',
-      guidStopped: 'The guide will not be shown again',
-      error: 'An error occurred',
-      nutiSuccess: 'Successfully registered for notifications on this device',
-      apiKeys: 'API Keys',
-      apiKeysDesc: 'Use these keys to connect your AI agent to your account.',
-      createKey: 'Create New Key',
-      keyName: 'Key Name',
-      noKeys: 'No keys yet',
-      deleteKey: 'Delete',
-      copied: 'Copied',
-      copy: 'Copy',
-      newKeySuccess: 'Key created successfully',
-      saveKeyWarning: 'Save it now - it will not be shown again.',
-      cancel: 'Cancel',
-      create: 'Create',
-      identityTitle: 'Your cryptographic identity',
-      identityDesc: 'A personal signing key that lives only in your browser. The server never holds a copy — even we cannot forge actions on your behalf.',
-      identityManage: 'Details'
-    }
-  };
-
-  const days = {
-    he: ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'],
-    en: [
-      'Sunday',
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday'
-    ]
-  };
-  const dayValues = ['sun', 'mon', 'thu', 'wen', 'teh', 'fri', 'shabat'];
+const dayValues = ['sun', 'mon', 'thu', 'wen', 'teh', 'fri', 'shabat'];
 
   // Functions
   onMount(async () => {
@@ -210,7 +102,8 @@
       frd,
       lango,
       checked,
-      noMail
+      noMail,
+      location: JSON.stringify(location)
     };
     fetchKeys();
   });
@@ -251,7 +144,7 @@
         newKeyName = '';
         isCreatingKey = false;
         await fetchKeys();
-        toast.success(t[$lang].newKeySuccess);
+        toast.success($t('pages.editBasic.newKeySuccess'));
       } else {
         const err = await response.json();
         toast.error(err.message || 'Error creating key');
@@ -302,7 +195,8 @@
       frd !== initialValues.frd ||
       lango !== initialValues.lango ||
       checked !== initialValues.checked ||
-      noMail !== initialValues.noMail;
+      noMail !== initialValues.noMail ||
+      JSON.stringify(location) !== initialValues.location;
     chan = changed;
     console.log('Changed:', changed, {
       un,
@@ -330,7 +224,8 @@
       un,
       em: mail,
       lango,
-      cards: checked
+      cards: checked,
+      location
     });
     chan = false;
     toast.success('השינויים נשמרו');
@@ -365,11 +260,11 @@
         password: passwordx,
         passwordConfirmation: passwordx
       });
-      toast.success(t[$lang].passChanged);
+      toast.success($t('pages.editBasic.passChanged'));
       beforePasswordChange = false;
     } catch (err) {
       console.error(err);
-      errorl = err.response?.data?.error?.message || t[$lang].error;
+      errorl = err.response?.data?.error?.message || $t('pages.editBasic.error');
       toast.error(errorl);
     }
   }
@@ -417,11 +312,11 @@
       // Assuming SendTo handles GraphQL requests
       // await SendTo(que, variables);
       console.log('Sending subscription to server', variables);
-      toast.success(t[$lang].nutiSuccess);
+      toast.success($t('pages.editBasic.nutiSuccess'));
       sub = currentSub;
     } catch (e) {
       console.error(e);
-      toast.error(t[$lang].error, { description: e.message });
+      toast.error($t('pages.editBasic.error'), { description: e.message });
     }
   }
 
@@ -441,11 +336,11 @@
         throw new Error(result.error?.message || 'Failed to update guide status');
       }
 
-      toast.success(show ? t[$lang].guidResumed : t[$lang].guidStopped);
+      toast.success(show ? $t('pages.editBasic.guidResumed') : $t('pages.editBasic.guidStopped'));
       if (show) onGuid?.();
     } catch (e) {
       console.error(e);
-      toast.error(t[$lang].error);
+      toast.error($t('pages.editBasic.error'));
       // Revert local state on error
       onGuidMeChange?.(!show);
     } finally {
@@ -455,19 +350,19 @@
 </script>
 
 <div dir={$isRtl ? 'rtl' : 'ltr'}>
-  <h1 class="text-2xl font-bold text-center mb-6 text-gold">{t[$lang].head}</h1>
+  <h1 class="text-2xl font-bold text-center mb-6 text-gold">{$t('pages.editBasic.head')}</h1>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-5">
     <!-- Personal Details -->
     <Card>
       <CardHeader>
-        <CardTitle>{t[$lang].personalDetails}</CardTitle>
+        <CardTitle>{$t('pages.editBasic.personalDetails')}</CardTitle>
       </CardHeader>
       <CardContent class="space-y-4 ">
-        <TextInput lebel={{ en: 'Name', he: 'שם' }} bind:text={un} />
+        <TextInput lebel={$t('common.labels.name')} bind:text={un} />
         <div>
           <label for="bio" class="block text-gold text-sm font-medium mb-1"
-            >{t[$lang].bio}</label
+            >{$t('pages.editBasic.bio')}</label
           >
           <textarea
             id="bio"
@@ -482,52 +377,62 @@
     <!-- Links -->
     <Card>
       <CardHeader>
-        <CardTitle>{t[$lang].links}</CardTitle>
+        <CardTitle>{$t('pages.editBasic.links')}</CardTitle>
       </CardHeader>
       <CardContent class="space-y-4">
         <TextInput
-          lebel={{ en: 'GitHub', he: 'גיטהאב' }}
+          lebel={$t('pages.editBasic.github')}
           bind:text={githublink}
         />
         <TextInput
-          lebel={{ en: 'Twitter', he: 'טוויטר' }}
+          lebel={$t('pages.editBasic.twitter')}
           bind:text={twiterlink}
         />
         <TextInput
-          lebel={{ en: 'Discord', he: 'דיסקורד' }}
+          lebel={$t('pages.editBasic.discord')}
           bind:text={discordlink}
         />
         <TextInput
-          lebel={{ en: 'Facebook', he: 'פייסבוק' }}
+          lebel={$t('pages.editBasic.facebook')}
           bind:text={fblink}
         />
+      </CardContent>
+    </Card>
+
+    <!-- Location -->
+    <Card class="md:col-span-2">
+      <CardHeader>
+        <CardTitle>{$t('pages.editBasic.location')}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <LocationPicker bind:value={location} />
       </CardContent>
     </Card>
 
     <!-- Settings -->
     <Card>
       <CardHeader>
-        <CardTitle>{t[$lang].settings}</CardTitle>
+        <CardTitle>{$t('pages.editBasic.settings')}</CardTitle>
       </CardHeader>
       <CardContent class="space-y-6">
         <div>
           <label for="free-day" class="block text-sm font-medium mb-1 text-gold"
-            >{t[$lang].freeDay}</label
+            >{$t('pages.editBasic.freeDay')}</label
           >
           <select
             id="free-day"
             bind:value={frd}
             class="w-full p-2 border rounded-md bg-barbi text-lg text-gold"
           >
-            <option value="na" selected>{t[$lang].freeDay}</option>
+            <option value="na" selected>{$t('pages.editBasic.freeDay')}</option>
             {#each dayValues as day, i (day)}
-              <option value={day}>{days[$lang][i]}</option>
+              <option value={day}>{$t(`pages.editBasic.days.${i}`)}</option>
             {/each}
           </select>
         </div>
         <div>
           <label for="language" class="block text-sm font-medium text-gold mb-1"
-            >{t[$lang].preferredLang}</label
+            >{$t('pages.editBasic.preferredLang')}</label
           >
           <select
             id="language"
@@ -536,25 +441,28 @@
           >
             <option value="he">עברית</option>
             <option value="en">English</option>
+            <option value="ar">العربية</option>
+            <option value="es">Español</option>
+            <option value="ru">Русский</option>
           </select>
         </div>
         <ObjectChooser
-          level={{ he: t.he.levDisplay, en: t.en.levDisplay }}
+          level={$t('pages.editBasic.levDisplay')}
           bind:checked
-          tr={{ he: t.he.coins, en: t.en.coins }}
-          fl={{ he: t.he.cards, en: t.en.cards }}
+          tr={$t('pages.editBasic.coins')}
+          fl={$t('pages.editBasic.cards')}
         />
         <Separator />
         {#if isGuidMe}
           <Button
-            text={{ he: t.he.stopGuid, en: t.en.stopGuid }}
+            text={$t('pages.editBasic.stopGuid')}
             onClick={() => toggleGuide(false)}
             disabled={pressed}
             loading={pressed}
           />
         {:else}
           <Button
-            text={{ he: t.he.resumeGuid, en: t.en.resumeGuid }}
+            text={$t('pages.editBasic.resumeGuid')}
             onClick={() => toggleGuide(true)}
             disabled={pressed}
             loading={pressed}
@@ -566,8 +474,8 @@
     <!-- Cryptographic Identity -->
     <Card>
       <CardHeader>
-        <CardTitle>{t[$lang].identityTitle}</CardTitle>
-        <CardDescription>{t[$lang].identityDesc}</CardDescription>
+        <CardTitle>{$t('pages.editBasic.identityTitle')}</CardTitle>
+        <CardDescription>{$t('pages.editBasic.identityDesc')}</CardDescription>
       </CardHeader>
       <CardContent class="flex items-center justify-between gap-3 flex-wrap">
         <ConsentStatusBadge expanded lang={$lang === 'en' ? 'en' : 'he'} />
@@ -576,7 +484,7 @@
           data-sveltekit-prefetch
           class="text-sm text-gold hover:underline"
         >
-          {t[$lang].identityManage} →
+          {$t('pages.editBasic.identityManage')} →
         </a>
       </CardContent>
     </Card>
@@ -584,18 +492,18 @@
     <!-- API Keys -->
     <Card>
       <CardHeader>
-        <CardTitle>{t[$lang].apiKeys}</CardTitle>
-        <CardDescription>{t[$lang].apiKeysDesc}</CardDescription>
+        <CardTitle>{$t('pages.editBasic.apiKeys')}</CardTitle>
+        <CardDescription>{$t('pages.editBasic.apiKeysDesc')}</CardDescription>
       </CardHeader>
       <CardContent class="space-y-4">
         {#if lastCreatedKey}
           <div class="bg-green-50 border border-green-300 rounded-lg p-4 mb-4">
             <p class="font-semibold text-green-800 mb-1">
-              ✅ {t[$lang].newKeySuccess}: <strong>{lastCreatedKey.name}</strong
+              ✅ {$t('pages.editBasic.newKeySuccess')}: <strong>{lastCreatedKey.name}</strong
               >
             </p>
             <p class="text-sm text-green-700 mb-2">
-              {t[$lang].saveKeyWarning}
+              {$t('pages.editBasic.saveKeyWarning')}
             </p>
             <div
               class="flex items-center gap-2 bg-white border border-green-200 rounded p-2 font-mono text-sm break-all text-black"
@@ -605,14 +513,14 @@
                 onclick={() => copyKey(lastCreatedKey.raw)}
                 class="shrink-0 text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700"
               >
-                {copiedKey ? t[$lang].copied : t[$lang].copy}
+                {copiedKey ? $t('pages.editBasic.copied') : $t('pages.editBasic.copy')}
               </button>
             </div>
             <button
               onclick={() => (lastCreatedKey = null)}
               class="mt-3 text-xs text-gray-500 hover:underline"
             >
-              {t[$lang].cancel}
+              {$t('pages.editBasic.cancel')}
             </button>
           </div>
         {/if}
@@ -622,7 +530,7 @@
             <label
               for="api-key-name"
               class="block text-sm font-medium text-gold"
-              >{t[$lang].keyName}</label
+              >{$t('pages.editBasic.keyName')}</label
             >
             <div class="flex gap-2">
               <input
@@ -637,19 +545,19 @@
                 onclick={createKey}
                 class="px-4 py-2 bg-gold text-barbi rounded text-sm font-bold hover:brightness-110"
               >
-                {t[$lang].create}
+                {$t('pages.editBasic.create')}
               </button>
               <button
                 onclick={() => (isCreatingKey = false)}
                 class="px-4 py-2 border rounded text-sm hover:bg-gray-100/10 text-gold shadow-md"
               >
-                {t[$lang].cancel}
+                {$t('pages.editBasic.cancel')}
               </button>
             </div>
           </div>
         {:else}
           <Button
-            text={{ he: t.he.createKey, en: t.en.createKey }}
+            text={$t('pages.editBasic.createKey')}
             onClick={() => (isCreatingKey = true)}
           />
         {/if}
@@ -657,7 +565,7 @@
         <div class="space-y-2 mt-4">
           {#if keys.length === 0}
             <p class="text-gray-400 text-sm text-center py-4 border rounded-lg">
-              {t[$lang].noKeys}
+              {$t('pages.editBasic.noKeys')}
             </p>
           {:else}
             <div
@@ -679,7 +587,7 @@
                     onclick={() => deleteKey(key.id, key.name)}
                     class="text-xs text-red-400 hover:text-red-300 hover:underline ms-2"
                   >
-                    {t[$lang].deleteKey}
+                    {$t('pages.editBasic.deleteKey')}
                   </button>
                 </div>
               {/each}
@@ -692,17 +600,17 @@
     <!-- Security & Notifications -->
     <Card>
       <CardHeader>
-        <CardTitle>{t[$lang].security}</CardTitle>
+        <CardTitle>{$t('pages.editBasic.security')}</CardTitle>
       </CardHeader>
       <CardContent class="space-y-4">
         <Button
-          text={{ he: t.he.deviceNuti, en: t.en.deviceNuti }}
+          text={$t('pages.editBasic.deviceNuti')}
           onClick={handleNotificationPermission}
           disabled={!!sub}
         />
         <div>
           <h3 class="flex items-center justify-center text-gold font-bold p-2">
-            {teleredy ? t[$lang].manageTelegram : t[$lang].telegramNuti}
+            {teleredy ? $t('pages.editBasic.manageTelegram') : $t('pages.editBasic.telegramNuti')}
             <svg class="h-5 w-5 ms-2" fill="#1da1f2" viewBox="0 0 24 24">
               <path
                 d="M18.384,22.779c0.322,0.228 0.737,0.285 1.107,0.145c0.37,-0.141 0.642,-0.457 0.724,-0.84c0.869,-4.084 2.977,-14.421 3.768,-18.136c0.06,-0.28 -0.04,-0.571 -0.26,-0.758c-0.22,-0.187 -0.525,-0.241 -0.797,-0.14c-4.193,1.552 -17.106,6.397 -22.384,8.35c-0.335,0.124 -0.553,0.446 -0.542,0.799c0.012,0.354 0.25,0.661 0.593,0.764c2.367,0.708 5.474,1.693 5.474,1.693c0,0 1.452,4.385 2.209,6.615c0.095,0.28 0.314,0.5 0.603,0.576c0.288,0.075 0.596,-0.004 0.811,-0.207c1.216,-1.148 3.096,-2.923 3.096,-2.923c0,0 3.572,2.619 5.598,4.062Zm-11.01,-8.677l1.679,5.538l0.373,-3.507c0,0 6.487,-5.851 10.185,-9.186c0.108,-0.098 0.123,-0.262 0.033,-0.377c-0.089,-0.115 -0.253,-0.142 -0.376,-0.064c-4.286,2.737 -11.894,7.596 -11.894,7.596Z"
@@ -719,51 +627,51 @@
         <Separator />
         <Checkbox
           name="noMail"
-          lebel={noEmails}
+          lebel={$t('pages.editBasic.noEmails')}
           lang={$lang}
           bind:value={noMail}
         />
         <Separator />
         {#if !changePassword}
           <Button
-            text={{ he: 'שנה סיסמה', en: 'Change Password' }}
+            text={$t('common.buttons.changePassword')}
             onClick={() => (changePassword = !changePassword)}
           />
         {:else}
           <div class="p-4 border rounded-md mt-4 space-y-4">
             {#if beforePasswordChange}
               <TextInput
-                lebel={{ en: t.en.oldPass, he: t.he.oldPass }}
+                lebel={$t('pages.editBasic.oldPass')}
                 type="password"
                 bind:text={passi}
                 autocomplete="current-password"
               />
               <TextInput
-                lebel={{ en: t.en.newPass, he: t.he.newPass }}
+                lebel={$t('pages.editBasic.newPass')}
                 type={showPassword ? 'text' : 'password'}
                 bind:text={passwordx}
                 autocomplete="new-password"
               />
               <!--						<ul class="text-xs space-y-1">
 								<li class={validations[0] ? 'text-green-500' : 'text-red-500'}>
-									{validations[0] ? '✓' : '✗'} {t[$lang].passVal1}
+									{validations[0] ? '✓' : '✗'} {$t('pages.editBasic.passVal1')}
 								</li>
 								<li class={validations[1] ? 'text-green-500' : 'text-red-500'}>
-									{validations[1] ? '✓' : '✗'} {t[$lang].passVal2}
+									{validations[1] ? '✓' : '✗'} {$t('pages.editBasic.passVal2')}
 								</li>
 								<li class={validations[2] ? 'text-green-500' : 'text-red-500'}>
-									{validations[2] ? '✓' : '✗'} {t[$lang].passVal3}
+									{validations[2] ? '✓' : '✗'} {$t('pages.editBasic.passVal3')}
 								</li>
 							</ul>
 							disabled={Boolean(strength < 3)}
 -->
               <Button
-                text={{ he: 'שנה סיסמה', en: 'Change Password' }}
+                text={$t('common.buttons.changePassword')}
                 onClick={handleChangePassword}
                 loading={false}
               />
             {:else}
-              <p class="text-green-500">{t[$lang].passChanged}</p>
+              <p class="text-green-500">{$t('pages.editBasic.passChanged')}</p>
             {/if}
           </div>
         {/if}
@@ -777,7 +685,7 @@
             class="flex flex-row align-center justify-center items-center gap-4"
           >
             <h2 class="text-lg font-bold text-gold">
-              {t[$lang].logout}
+              {$t('pages.editBasic.logout')}
             </h2>
           </div>
         </button>
@@ -785,10 +693,23 @@
     </Card>
   </div>
   {#if chan}
-    <Button
-      text={{ he: t.he.save, en: t.en.save }}
-      onClick={save}
-      disabled={!chan}
-    />
+    <div
+      class="fixed inset-x-0 bottom-0 z-50 border-t border-zinc-200 dark:border-zinc-700 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm shadow-[0_-4px_16px_rgba(0,0,0,0.12)]"
+    >
+      <div
+        class="max-w-3xl mx-auto flex items-center justify-between gap-4 px-4 py-3 flex-wrap"
+      >
+        <p class="text-sm font-medium text-gold">
+          {$t('pages.editBasic.unsavedChanges')}
+        </p>
+        <Button
+          text={$t('pages.editBasic.save')}
+          size="sm"
+          onClick={save}
+          disabled={!chan}
+        />
+      </div>
+    </div>
+    <div class="h-20"></div>
   {/if}
 </div>

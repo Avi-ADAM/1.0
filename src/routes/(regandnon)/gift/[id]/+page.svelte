@@ -1,5 +1,5 @@
 ﻿<script>
-  import { isRtl, t as t2 } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { Head } from 'svead';
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
@@ -36,58 +36,6 @@
   const firstPendingId = $derived((data.existingRequests ?? [])[0]?.id ?? null);
 
   // Translations
-  const t = {
-    gift: { he: 'מוצר', en: 'Product' },
-    seeProject: { he: 'לצפיה בפרויקט', en: 'See project' },
-    buyNow: { he: 'לרכישה', en: 'Buy now' },
-    notAvailable: { he: 'לא זמין', en: 'Not available' },
-    unlimited: { he: 'ליחידה - ללא הגבלה', en: 'Unlimited' },
-    monthly: { he: 'חודשי', en: 'Monthly' },
-    yearly: { he: 'שנתי', en: 'Yearly' },
-    perUnit: { he: 'ליחידה', en: 'Per unit' },
-    inviteTitle: {
-      he: 'הירשמ/י כדי לרכוש',
-      en: 'Register to Purchase',
-      ar: 'سجّل للشراء'
-    },
-    inviteSubtitle: {
-      he: 'התחבר/י או הירשמ/י כדי לרכוש את המוצר בשקיפות מלאה',
-      en: 'Login or register to buy this product with full transparency',
-      ar: 'سجّل الدخول أو أنشئ حساباً لشراء هذا المنتج بشفافية تامة'
-    },
-    toLogin: { he: 'התחברות', en: 'Login', ar: 'تسجيل الدخول' },
-    toRegister: { he: 'הרשמה', en: 'Register', ar: 'إنشاء حساب' },
-    orText: { he: 'או', en: 'or', ar: 'أو' },
-    left: { he: 'נותרו', en: 'left' },
-    reportSale: { he: 'דיווח מכירה (מנהלים)', en: 'Report Sale (Admin)' },
-    hideReport: { he: 'סגור דיווח', en: 'Close Report' },
-    saleSuccess: { he: 'מכירה דווחה בהצלחה', en: 'Sale reported successfully' },
-    saleError: { he: 'שגיאה בדיווח המכירה', en: 'Error reporting sale' },
-    totalEst: { he: 'סה"כ משוער:', en: 'Estimated total:' },
-    cancel: { he: 'ביטול', en: 'Cancel' },
-    confirm: { he: 'אשר רכישה', en: 'Confirm Purchase' },
-    submitting: { he: 'שולח...', en: 'Submitting...' },
-    purchaseDetails: { he: 'פרטי הזמנה', en: 'Order Details' },
-    amount: { he: 'כמות', en: 'Quantity' },
-    unitPrice: { he: 'מחיר ליחידה', en: 'Price per unit' },
-    startD: { he: 'תאריך התחלה', en: 'Start Date' },
-    endD: { he: 'תאריך סיום (אופציונלי)', en: 'End Date (optional)' },
-    cantOrderMore: {
-      he: 'לא ניתן להזמין יותר מ-',
-      en: 'Cannot order more than '
-    },
-    complexPriceMaxLabel: {
-      he: 'מחיר מקסימלי',
-      en: 'Maximum price',
-      ar: 'السعر الأقصى'
-    },
-    complexPriceExplain: {
-      he: 'המחיר המוצג הוא המקסימלי — בהנחה שכל המשאבים והמשימות ייצרכו במלואם. בפועל תשלמ/י רק על שעות המשימות וכמות המשאבים שנצרכו בפועל. אם יידרש יותר מהמשוער, תקבל/י בקשת אישור להוצאות נוספות.',
-      en: 'The price shown is the maximum — assuming all resources and tasks are fully consumed. In practice, you pay only for actual task hours and resources used. If more than estimated is needed, you will receive an overhead approval request.',
-      ar: 'السعر المعروض هو الحد الأقصى — بافتراض استهلاك جميع الموارد والمهام بالكامل. في الواقع، تدفع فقط مقابل ساعات المهام والموارد المستخدمة فعلياً. إذا احتجت إلى أكثر من المقدّر، ستتلقى طلب موافقة على التكاليف الإضافية.'
-    }
-  };
-
   // --- Logic Functions ---
 
   function project(x, e) {
@@ -116,7 +64,7 @@
       }
 
       if (currentQuantity !== -1 && quantity > currentQuantity) {
-        toast.error(`${t.cantOrderMore[$lang]}${currentQuantity}`);
+        toast.error(`${$t('pages.gift.cantOrderMore')}${currentQuantity}`);
         isSubmitting = false;
         return;
       }
@@ -150,14 +98,14 @@
 
       showPurchaseForm = false;
       isSubmitting = false;
-      toast.success(t.saleSuccess[$lang]);
+      toast.success($t('pages.gift.saleSuccess'));
 
       // Redirect to the pending request page (or /deals as fallback)
       const newId = result?.data?.createSheirutpend?.data?.id;
       await goto(newId ? `/deals/request/${newId}` : '/deals');
     } catch (error) {
       console.error('Error creating service request:', error);
-      toast.error(t.saleError[$lang]);
+      toast.error($t('pages.gift.saleError'));
       isSubmitting = false;
     }
   }
@@ -168,13 +116,13 @@
 
   function handleSaleSuccess(saleResult) {
     if (saleResult.un !== undefined) currentQuantity = saleResult.un;
-    toast.success(t.saleSuccess[$lang]);
+    toast.success($t('pages.gift.saleSuccess'));
     showSaleInterface = false;
   }
 
   function handleSaleError(error) {
     console.error('Sale error:', error);
-    toast.error(error || t.saleError[$lang]);
+    toast.error(error || $t('pages.gift.saleError'));
   }
 
   function login(e) {
@@ -200,12 +148,12 @@
 
   // Derived Values
   let title = data.alld?.name
-    ? `${t.gift[$lang]} - ${data.alld.name}`
-    : t.gift[$lang];
+    ? $t('pages.gift.titleWithName', { kind: $t('pages.gift.gift'), name: data.alld.name })
+    : $t('pages.gift.gift');
   let image =
     data.alld?.pic?.data?.attributes?.url ||
     'https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png';
-  let description = data.alld?.desc || t.gift[$lang];
+  let description = data.alld?.desc || $t('pages.gift.gift');
   let url = page.url.toString();
 
   // Effects
@@ -276,7 +224,7 @@
               {/if}
               <div class="flex flex-col">
                 <span class="text-barbi font-bold text-lg sm:text-xl drop-shadow-sm"
-                  >{t.gift[$lang]}</span
+                  >{$t('pages.gift.gift')}</span
                 >
                 <h1 class="text-xl sm:text-3xl font-extrabold text-white leading-tight">
                   {data.personalSeller.username}
@@ -284,7 +232,7 @@
                 <span
                   class="mt-1 self-start text-xs font-bold bg-white/20 border border-white/40 rounded-full px-2.5 py-0.5"
                 >
-                  {$t2('offerings.products.seller_badge')}
+                  {$t('offerings.products.seller_badge')}
                 </span>
               </div>
             {:else}
@@ -300,7 +248,7 @@
               <div class="flex flex-col">
                 <span
                   class="text-barbi font-bold text-lg sm:text-xl drop-shadow-sm"
-                  >{t.gift[$lang]}</span
+                  >{$t('pages.gift.gift')}</span
                 >
                 <h1
                   class="text-xl sm:text-3xl font-extrabold text-white leading-tight"
@@ -317,14 +265,14 @@
               href={`/user/${data.personalSeller.id}`}
               class="w-full sm:w-auto px-6 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/40 rounded-full text-white font-bold transition-all transform hover:scale-105 shadow-sm whitespace-nowrap text-center"
             >
-              {$t2('offerings.products.seller_profile')}
+              {$t('offerings.products.seller_profile')}
             </a>
           {:else if data.alld.projectcreates?.data?.[0]?.id}
             <button
               onclick={(e) => project(data.alld.projectcreates.data[0].id, e)}
               class="w-full sm:w-auto px-6 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/40 rounded-full text-white font-bold transition-all transform hover:scale-105 shadow-sm whitespace-nowrap"
             >
-              {t.seeProject[$lang]}
+              {$t('pages.gift.seeProject')}
             </button>
           {/if}
         </div>
@@ -355,13 +303,13 @@
               <div class="scale-90 origin-top-right rtl:origin-top-left">
                 <ShareButtons
                   slug={'gift/' + data.mId}
-                  title={data.alld.title ? data.alld.title[$lang] : null}
-                  desc={t.gift[$lang]}
+                  title={data.alld.titleKey ? $t(data.alld.titleKey, data.alld.titleParams) : null}
+                  desc={$t('pages.gift.gift')}
                   hashtags={['1💗1', 'consensus']}
-                  quote={data.alld.title ? data.alld.title[$lang] : null}
+                  quote={data.alld.titleKey ? $t(data.alld.titleKey, data.alld.titleParams) : null}
                   related={[]}
                   via={''}
-                  siteTitle={t.gift[$lang]}
+                  siteTitle={$t('pages.gift.gift')}
                   siteUrl={page.url.toString()}
                 />
               </div>
@@ -395,16 +343,16 @@
                   {/if}
                   <span class="text-sm font-normal text-gray-500">
                     {#if data.alld.kindOf === 'monthly'}
-                      {t.monthly[$lang]}
+                      {$t('pages.gift.monthly')}
                     {/if}
                     {#if data.alld.kindOf === 'yearly'}
-                      {t.yearly[$lang]}
+                      {$t('pages.gift.yearly')}
                     {/if}
                     {#if data.alld.kindOf === 'total'}
-                      {t.perUnit[$lang]}
+                      {$t('pages.gift.perUnit')}
                     {/if}
                     {#if data.alld.kindOf === 'unlimited'}
-                      {t.unlimited[$lang]}
+                      {$t('pages.gift.unlimited')}
                     {/if}
                   </span>
                 </span>
@@ -422,8 +370,8 @@
               >
                 <span class="mt-0.5 shrink-0 text-amber-500">ℹ️</span>
                 <div class="text-amber-800 dark:text-amber-300">
-                  <span class="font-bold">{t.complexPriceMaxLabel[$lang]}: </span>
-                  {t.complexPriceExplain[$lang]}
+                  <span class="font-bold">{$t('pages.gift.complexPriceMaxLabel')}: </span>
+                  {$t('pages.gift.complexPriceExplain')}
                 </div>
               </div>
             {/if}
@@ -483,9 +431,9 @@
                   onclick={openPurchaseForm}
                 >
                   {#if data.alld.archived === true || (currentQuantity !== -1 && currentQuantity <= 0)}
-                    {t.notAvailable[$lang]}
+                    {$t('pages.gift.notAvailable')}
                   {:else}
-                    {t.buyNow[$lang]}
+                    {$t('pages.gift.buyNow')}
                   {/if}
                 </button>
 
@@ -494,8 +442,8 @@
                     class="text-sm font-medium text-barbi bg-barbi/10 px-3 py-1 rounded-full"
                   >
                     {currentQuantity === -1
-                      ? t.unlimited[$lang]
-                      : `${currentQuantity} ${t.left[$lang]}`}
+                      ? $t('pages.gift.unlimited')
+                      : `${currentQuantity} ${$t('pages.gift.left')}`}
                   </div>
                 {/if}
               </div>
@@ -519,8 +467,8 @@
                   >
                     <span class="text-xl">⚙️</span>
                     {showSaleInterface
-                      ? t.hideReport[$lang]
-                      : t.reportSale[$lang]}
+                      ? $t('pages.gift.hideReport')
+                      : $t('pages.gift.reportSale')}
                   </button>
 
                   {#if showSaleInterface}
@@ -549,12 +497,12 @@
               >
                 <div class="mb-1 text-2xl">🛒</div>
                 <h3 class="mb-1 text-base font-bold text-barbi">
-                  {t.inviteTitle[$lang]}
+                  {$t('pages.gift.inviteTitle')}
                 </h3>
                 <p
                   class="mb-4 text-sm leading-relaxed text-gray-500 dark:text-gray-400"
                 >
-                  {t.inviteSubtitle[$lang]}
+                  {$t('pages.gift.inviteSubtitle')}
                 </p>
 
                 <div
@@ -569,14 +517,14 @@
                     class="flex-1 rounded-lg bg-gradient-to-r from-barbi to-mpink py-2.5 px-4 font-bold text-gold shadow-md transition-all hover:brightness-110"
                     onclick={register}
                   >
-                    {t.toRegister[$lang]}
+                    {$t('pages.gift.toRegister')}
                   </button>
-                  <span class="text-xs text-gray-400">{t.orText[$lang]}</span>
+                  <span class="text-xs text-gray-400">{$t('pages.gift.orText')}</span>
                   <button
                     class="flex-1 rounded-lg border border-barbi/40 py-2.5 px-4 font-bold text-barbi transition-all hover:bg-barbi/10"
                     onclick={login}
                   >
-                    {t.toLogin[$lang]}
+                    {$t('pages.gift.toLogin')}
                   </button>
                 </div>
               </div>
@@ -588,7 +536,7 @@
   </div>
 {:else if data.archived}
   <div class="flex justify-center items-center h-[50vh]">
-    <div class="text-2xl font-bold text-gray-400">{t.notAvailable[$lang]}</div>
+    <div class="text-2xl font-bold text-gray-400">{$t('pages.gift.notAvailable')}</div>
   </div>
 {:else}
   <div
@@ -614,7 +562,7 @@
       <div
         class="bg-gradient-to-r from-barbi to-mpink p-4 flex justify-between items-center text-white"
       >
-        <h3 class="text-xl font-bold">{t.purchaseDetails[$lang]}</h3>
+        <h3 class="text-xl font-bold">{$t('pages.gift.purchaseDetails')}</h3>
         <button
           onclick={closePurchaseForm}
           class="text-white/80 hover:text-white text-2xl leading-none"
@@ -628,7 +576,7 @@
           class="mb-6 text-center bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg border border-gray-100 dark:border-gray-600"
         >
           <span class="text-sm text-gray-500 block mb-1"
-            >{t.totalEst[$lang]}</span
+            >{$t('pages.gift.totalEst')}</span
           >
           <span class="text-3xl font-bold text-barbi"
             >{totalPrice.toFixed(2)}</span
@@ -639,7 +587,7 @@
           <div>
             <NumberInput
               bind:value={quantity}
-              topLebel={t.amount[$lang]}
+              topLebel={$t('pages.gift.amount')}
               barbi={true}
               noNegative={true}
               noMoreThen={currentQuantity === -1 ? undefined : currentQuantity}
@@ -649,7 +597,7 @@
           <div>
             <NumberInput
               bind:value={price}
-              topLebel={t.unitPrice[$lang]}
+              topLebel={$t('pages.gift.unitPrice')}
               barbi={true}
               noNegative={true}
             />
@@ -661,7 +609,7 @@
                   for="startDate"
                   class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
-                  {t.startD[$lang]}
+                  {$t('pages.gift.startD')}
                 </label>
                 <input
                   id="startDate"
@@ -678,7 +626,7 @@
                   for="endDate"
                   class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
-                  {t.endD[$lang]}
+                  {$t('pages.gift.endD')}
                 </label>
                 <input
                   id="endDate"
@@ -699,14 +647,14 @@
               class="flex-1 py-2.5 px-4 text-sm font-bold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
               disabled={isSubmitting}
             >
-              {t.cancel[$lang]}
+              {$t('pages.gift.cancel')}
             </button>
             <button
               type="submit"
               class="flex-1 py-2.5 px-4 text-sm font-bold text-white bg-gradient-to-r from-barbi to-mpink rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:transform-none"
               disabled={isSubmitting}
             >
-              {isSubmitting ? t.submitting[$lang] : t.confirm[$lang]}
+              {isSubmitting ? $t('pages.gift.submitting') : $t('pages.gift.confirm')}
             </button>
           </div>
         </form>

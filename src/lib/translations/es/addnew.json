@@ -1,0 +1,134 @@
+{
+  "baci": {
+    "addne": "Crear \"{{name}}\"",
+    "timeto": "Cuánto tiempo hasta que la rikma sea rentable",
+    "timetoex": "El tiempo hasta que se pueda repartir el dinero, contado desde que todas las misiones estén asignadas y se reciban todos los recursos necesarios",
+    "cvar": "La rikma ya es rentable",
+    "week": "Semana",
+    "month": "Mes",
+    "threemonth": "Tres meses",
+    "halt": "Medio año",
+    "year": "Un año",
+    "toyers": "Dos años",
+    "more": "Más de dos años",
+    "never": "Nunca",
+    "om": "Un momento, por favor",
+    "cencel": "Cancelar",
+    "crn": "Crear una nueva rikma",
+    "frn": "Nombre de la rikma",
+    "hours": "Horas",
+    "hrex": "Pasado ese tiempo, la falta de respuesta cuenta como acuerdo",
+    "hre": "Tiempo de respuesta para las decisiones de la rikma",
+    "teure": "Descripción breve, visible para todos",
+    "prte": "Descripción detallada, visible solo dentro de la rikma",
+    "wel": "Enlace al sitio web (si lo hay)",
+    "naex": "Ese nombre ya existe, por favor elige otro",
+    "whva": "Qué valores y objetivos promoverá la rikma",
+    "ladd": "Añadir logo",
+    "su": "Logo añadido con éxito",
+    "cree": "Crear y publicar la rikma",
+    "sur": "La rikma se creó con éxito",
+    "tob": "Ir al cerebro de la rikma para gestionarla",
+    "inc": "Puedes introducir el ingreso estimado si lo conoces; si no, podrás calcularlo después desde la página de gestión",
+    "valuesAndGoals": "Valores y objetivos",
+    "nameTooShort": "El nombre de la rikma debe ser más largo",
+    "continuous": "Rikma continua",
+    "oneTimed": "Rikma puntual",
+    "continuousLevel": "¿La rikma está pensada como algo puntual o continuo? Por ejemplo: producir un evento frente a fundar una empresa de producción de eventos"
+  },
+  "addNewNeed": {
+    "hekind": "Tipo de valor",
+    "val": "Valor monetario",
+    "sho": "Descripción breve",
+    "blib": "Enlace a los detalles del producto, precio o compra",
+    "cen": "Cancelar",
+    "nena": "Nombre del recurso",
+    "adn": "Añadir un recurso que no está en la lista",
+    "adni": "Añadir un recurso nuevo",
+    "ot": "Coste único",
+    "py": "Por unidad",
+    "pm": "Mensual",
+    "pye": "Anual",
+    "re": "Alquiler por un periodo",
+    "crn": "Crear un recurso nuevo"
+  },
+  "addNewSkill": {
+    "cencel": "Cancelar",
+    "adds": "Añadir una habilidad nueva",
+    "nom": "Todavía no está en la lista: añádelo con el botón \"Añadir un rol nuevo\" de abajo",
+    "addn": "Añadir un rol nuevo",
+    "valn": "Nombre de la habilidad",
+    "des": "Descripción breve",
+    "btnTitles": "Añadir",
+    "dup": {
+      "found": "Ya existe una habilidad idéntica:",
+      "similar": "Muy parecido a una habilidad existente:",
+      "override": "Añadir de todos modos"
+    }
+  },
+  "addNewRole": {
+    "cencel": "Cancelar",
+    "adds": "Añadir una habilidad nueva",
+    "addn": "Añadir un rol nuevo",
+    "valn": "Nombre del rol",
+    "des": "Descripción breve",
+    "btnTitles": "Añadir",
+    "errmsg": "El nombre ya existe",
+    "nom": "Todavía no está en la lista: añádelo con el botón \"Añadir una habilidad nueva\" de abajo"
+  },
+  "addNewMission": {
+    "placeholder": "Elegir las habilidades necesarias",
+    "chsk": "Elegir las habilidades necesarias",
+    "nom": "Todavía no está en la lista: añádelo con el botón \"Añadir una habilidad nueva\" de abajo",
+    "yeve": "Crear y añadir una misión nueva",
+    "sho": "Descripción breve",
+    "placeholderr": "Elegir los roles necesarios",
+    "miname": "Nombre de la misión",
+    "adds": "Elegir los roles necesarios",
+    "nomv": "Todavía no está en la lista: añádelo con el botón \"Añadir un rol nuevo\" de abajo",
+    "addnewhed": "Añadir una misión nueva"
+  },
+  "addnewval": {
+    "cencel": "Cancelar",
+    "addn": "Añadir un valor nuevo",
+    "valn": "Nombre del valor",
+    "des": "Descripción breve",
+    "btnTitles": "Añadir",
+    "errmsg": "El nombre ya existe"
+  },
+  "addnewWorkway": {
+    "cencel": "Cancelar",
+    "adds": "Añadir una nueva forma de creación",
+    "valn": "Nombre",
+    "btnTitles": "Añadir",
+    "errmsg": "El nombre ya existe"
+  },
+  "createNewMeeting": {
+    "placeholder": "Elige a quién añadir a tu reunión",
+    "addn": "Añadir detalles de la reunión",
+    "head": "Crear una nueva Reunión de Oro",
+    "explanetion": "Una Reunión de Oro no tiene fecha predefinida: ocurre en el momento dorado que le conviene a todas las personas participantes.",
+    "second": "Para que la magia ocurra, pon tu estado en directo siempre que tengas tiempo para reunirte, desde aquí arriba o a través de nuestro bot de Telegram."
+  },
+  "addNewSkillToRole": {
+    "adds": "Añadir una habilidad nueva",
+    "valn": "Nombre de la habilidad",
+    "des": "Descripción breve",
+    "btnTitles": "Añadir",
+    "errmsg": "El nombre ya existe"
+  },
+  "addNewRoleToSkill": {
+    "addn": "Añadir un rol nuevo",
+    "valn": "Nombre del rol",
+    "des": "Descripción breve",
+    "btnTitles": "Añadir",
+    "errmsg": "El nombre ya existe"
+  },
+  "choosRole": {
+    "adds": "Elegir los roles necesarios",
+    "nom": "Todavía no está en la lista: añádelo con el botón \"Añadir un rol nuevo\" de abajo"
+  },
+  "meeting": {
+    "nameLabel": "Nombre de la reunión"
+  }
+}

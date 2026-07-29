@@ -3,7 +3,7 @@
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { lang } from '$lib/stores/lang.js';
   import Lowding from '$lib/celim/lowding.svelte';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
 
   // Components for different states
   import PendsM from '$lib/components/prPr/pendsM.svelte';
@@ -20,7 +20,6 @@
     projectData
   } = $props();
 
-  const errmsg = tr.ui.errorMsg;
 
   function closer() {
     isOpen = false;
@@ -65,12 +64,12 @@
           </div>
         {:else if a == 3}
           <div class="text-center p-8">
-            <h1 class="text-xl text-white mb-4">{errmsg[$lang]}</h1>
+            <h1 class="text-xl text-white mb-4">{$t('ui.errorMsg')}</h1>
             <button
               class="px-6 py-2 bg-gold text-barbi rounded-full font-bold hover:bg-white transition-colors"
               onclick={() => (a = 0)}
             >
-              {tr.ui.tryAgain[$lang]}
+              {$t('ui.tryAgain')}
             </button>
           </div>
         {:else if a == 4}

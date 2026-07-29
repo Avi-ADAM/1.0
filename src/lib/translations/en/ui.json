@@ -1,0 +1,81 @@
+{
+  "searching": "Searching...",
+  "selectAndAdd": "Select",
+  "dismiss": "Dismiss",
+  "addAnyway": "Add anyway",
+  "tryAgain": "Try Again",
+  "errorMsg": "Oops, something went wrong. Please try again",
+  "richText": {
+    "paragraph": "<p>Paragraph</p>",
+    "linkPrompt": "Enter URL",
+    "boldLetter": "B",
+    "h1": "<h1>Header</h1>",
+    "h3": "<h3>Sub header</h3>",
+    "list": "List",
+    "numberedList": "1. List",
+    "quote": "Quote",
+    "line": "Divider"
+  },
+  "dateInput": {
+    "select": "Select a date"
+  },
+  "numberInput": {
+    "maxQuantityReached": "Maximum available quantity reached",
+    "minQuantityReached": "Minimum quantity reached",
+    "cannotExceedAvailable": "Cannot exceed available quantity: {{max}}",
+    "cannotGoBelowZero": "Cannot go below zero"
+  },
+  "locationView": {
+    "online": "Online",
+    "onsite": "On-site",
+    "hybrid": "Hybrid",
+    "empty": "No location set",
+    "range": "Range",
+    "km": "km",
+    "showMap": "Show map",
+    "hideMap": "Hide map",
+    "loadingMap": "Loading map…"
+  },
+  "input": {
+    "addImage": "add image",
+    "uploadingImage": "uploading image"
+  },
+  "consent": {
+    "badge": {
+      "signed": "Verified",
+      "pending": "Pending",
+      "unsigned": "Unsigned",
+      "unverified": "Verification failed"
+    },
+    "status": {
+      "idle": {
+        "label": "Initializing",
+        "help": "The cryptographic identity has not been created yet"
+      },
+      "creating": {
+        "label": "Creating key…",
+        "help": "Generating a non-extractable Ed25519 key"
+      },
+      "registering": {
+        "label": "Registering…",
+        "help": "Publishing public key to the mirror server"
+      },
+      "ready": {
+        "label": "Signing ready",
+        "help": "Every meaningful action you take will be cryptographically signed"
+      },
+      "local-only": {
+        "label": "Local only",
+        "help": "Key exists locally; server has not acknowledged it yet"
+      },
+      "unsupported": {
+        "label": "Unsupported",
+        "help": "This browser does not support WebCrypto / IndexedDB"
+      },
+      "error": {
+        "label": "Error",
+        "help": "Identity setup failed — see the identity page for details"
+      }
+    }
+  }
+}

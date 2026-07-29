@@ -9,7 +9,6 @@
   import No from '$lib/celim/no.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device';
-  import tr from '$lib/translations/tr.json';
 
   // ייבוא רכיבים מודרניים חדשים
   import CardHeader from './CardHeader.svelte';
@@ -70,10 +69,6 @@
     onWithdraw = null
   } = $props();
 
-  const offerAtSource = {
-    he: 'להצעה בעמוד המאגד',
-    en: 'Offer on the pool page'
-  };
 
   function hover(x) {
     onHover?.(x);
@@ -97,30 +92,7 @@
     onTochat?.();
   }
 
-  const ttal = { he: 'נכנס כבר כסף', en: 'already has income' };
-  const ttwe = { he: 'צפי רווח: שבוע', en: 'exp income: one week ' };
-  const ttmo = { he: 'צפי רווח: חודש', en: 'exp income: one month ' };
-  const tt3mo = { he: 'צפי רווח: 3 חודשים', en: 'exp income: three months' };
-  const tt6mo = { he: 'צפי רווח: חצי שנה', en: 'exp income: 6 months ' };
-  const tt1y = { he: 'צפי רווח: שנה', en: 'exp income: 1 year' };
-  const tt2y = { he: 'צפי רווח: שנתיים', en: 'exp income: 2 years ' };
-  const ttmor = { he: 'צפי רווח: ארוך טווח', en: 'exp income: long term' };
-  const ttne = { he: 'ללא רווח', en: 'not profitable' };
-  const headi = { he: 'הצעה למשימה', en: 'suggested mission' };
 
-  const cardT = {
-    acts: { he: 'רשימת מטלות:', en: 'todo list:' },
-    wwneed: { he: 'דרכי עבודה מבוקשות:', en: 'ways of work for the mission:' },
-    skneed: { he: 'הכישורים הנדרשים:', en: 'needed skills:' },
-    rneed: { he: 'תפקיד מבוקש:', en: 'requested role:' },
-    watchpr: { he: 'לצפיה בריקמה', en: 'see the FreeMate' },
-    min: { he: 'מינימום', en: 'min.' },
-    max: { he: '', en: 'max.' },
-    firyer: { he: '', en: 'first year' }
-  };
-  const perho = { he: 'לשעה', en: 'per hour' };
-  const hourss = { he: 'שעות', en: 'hours' };
-  const monhly = { he: 'בחודש', en: 'per month' };
 </script>
 
 <!-- 1. Container מרכזי עם אפקטי Glow -->
@@ -135,7 +107,7 @@
   class="{isMobileOrTablet()
     ? 'w-full h-full'
     : 'w-[90%] h-[90%]'} lg:w-[90%] {isVisible
-    ? $lang == 'he'
+    ? $isRtl
       ? 'boxleft'
       : 'boxright'
     : ''} 
@@ -149,7 +121,7 @@
   <CardHeader
     logoSrc={src}
     {projectName}
-    cardType={headi[$lang]}
+    cardType={$t('lev.cards.sugestmi.head')}
     cardTitle={missionName}
     memberCount={noOfusers}
     {glowColor}
@@ -193,8 +165,8 @@
               : 'bg-gold/30'}"
           >
             {byCandidate
-              ? tr.nego.candidateRound[$lang]
-              : tr.nego.projectRound[$lang]}
+              ? $t('nego.candidateRound')
+              : $t('nego.projectRound')}
           </span>
           {#if roundDate && !isNaN(roundDate.getTime())}
             <span class="text-xs font-normal text-gray-500 dark:text-gray-400">
@@ -217,7 +189,7 @@
                 : 'text-yellow-700 dark:text-yellow-400'}
             >
               {(myRound.noofhours ?? noOfHours).toLocaleString()}
-              {hourss[$lang]}
+              {$t('lev.cards.common.hours')}
               × {(myRound.perhour ?? perhour).toLocaleString()}
               = {(
                 (myRound.noofhours ?? noOfHours) * (myRound.perhour ?? perhour)
@@ -225,7 +197,7 @@
             </span>
             {#if hoursChanged}
               <span class="text-xs text-gray-500 dark:text-gray-400">
-                ({tr.nego.rikmaReq[$lang]}: {noOfHours} × {perhour} = {noOfHours *
+                ({$t('nego.rikmaReq')}: {noOfHours} × {perhour} = {noOfHours *
                   perhour})
               </span>
             {/if}
@@ -233,7 +205,7 @@
         {/if}
         {#if myRound.name && myRound.name !== missionName}
           <div class="text-xs text-gray-600 dark:text-gray-300">
-            <span class="font-medium">{tr.common.nameLabel[$lang]}:</span>
+            <span class="font-medium">{$t('common.nameLabel')}:</span>
             <span class="text-gray-400 line-through mx-1">{missionName}</span>
             → <span class="font-semibold">{myRound.name}</span>
           </div>
@@ -245,7 +217,7 @@
                 ? 'text-barbi'
                 : 'text-yellow-700 dark:text-yellow-400'}"
             >
-              {tr.nego.updatedDescription[$lang]}
+              {$t('nego.updatedDescription')}
             </div>
             <div
               class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed"
@@ -265,7 +237,7 @@
                 ? 'text-barbi'
                 : 'text-yellow-700 dark:text-yellow-400'}"
             >
-              {tr.nego.updatedNotes[$lang]}
+              {$t('nego.updatedNotes')}
             </div>
             <div
               class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed"
@@ -313,33 +285,33 @@
       <span
         role="contentinfo"
         class="cursor-help"
-        onmouseenter={() => hover({ he: 'שווי לשעה', en: 'vallue per hour' })}
+        onmouseenter={() => hover($t('common.valph'))}
         onmouseleave={() => hover('0')}
       >
         {perhour.toLocaleString('en-US', { maximumFractionDigits: 2 })}
-        {perho[$lang]}
+        {$t('lev.cards.common.perHour')}
       </span>
       <span class="text-gray-400 mx-1">*</span>
       <span
         role="contentinfo"
         class="cursor-help"
-        onmouseenter={() => hover({ he: 'כמות השעות', en: 'amount of hours' })}
+        onmouseenter={() => hover($t('common.noofhours'))}
         onmouseleave={() => hover('0')}
       >
         {noOfHours.toLocaleString('en-US', { maximumFractionDigits: 2 })}
-        {hourss[$lang]}
+        {$t('lev.cards.common.hours')}
       </span>
       <span class="text-gray-400 mx-1">=</span>
       <span
         role="contentinfo"
         class="text-green-600 dark:text-green-400 cursor-help"
-        onmouseenter={() => hover({ he: 'סך הכל', en: 'total' })}
+        onmouseenter={() => hover($t('lev.cards.voteCard.inTotal'))}
         onmouseleave={() => hover('0')}
       >
         {(noOfHours * perhour).toLocaleString('en-US', {
           maximumFractionDigits: 2
         })}
-        {isMonthly ? ' ' + monhly[$lang] : ''}
+        {isMonthly ? ' ' + $t('lev.cards.common.monthly') : ''}
       </span>
     </div>
 
@@ -347,15 +319,15 @@
     <div
       class="inline-block px-4 py-2 bg-gradient-to-r from-yellow-100 to-yellow-50 dark:from-yellow-900/40 dark:to-yellow-800/20 border border-yellow-300 dark:border-yellow-700 text-yellow-800 dark:text-yellow-400 rounded-full text-sm md:text-base font-bold shadow-sm"
     >
-      {#if timeToP == 'alreadi'}{ttal[$lang]}
-      {:else if timeToP == 'week'}{ttwe[$lang]}
-      {:else if timeToP == 'month'}{ttmo[$lang]}
-      {:else if timeToP == 'threeM'}{tt3mo[$lang]}
-      {:else if timeToP == 'sixM'}{tt6mo[$lang]}
-      {:else if timeToP == 'oneY'}{tt1y[$lang]}
-      {:else if timeToP == 'twoY'}{tt2y[$lang]}
-      {:else if timeToP == 'more'}{ttmor[$lang]}
-      {:else if timeToP == 'never'}{ttne[$lang]}
+      {#if timeToP == 'alreadi'}{$t('lev.income.already')}
+      {:else if timeToP == 'week'}{$t('lev.income.week')}
+      {:else if timeToP == 'month'}{$t('lev.income.month')}
+      {:else if timeToP == 'threeM'}{$t('lev.income.months3')}
+      {:else if timeToP == 'sixM'}{$t('lev.income.months6')}
+      {:else if timeToP == 'oneY'}{$t('lev.income.year1')}
+      {:else if timeToP == 'twoY'}{$t('lev.income.years2')}
+      {:else if timeToP == 'more'}{$t('lev.income.longTerm')}
+      {:else if timeToP == 'never'}{$t('lev.income.none')}
       {/if}
     </div>
 
@@ -381,7 +353,7 @@
         class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-xl p-4 shadow-sm"
       >
         <h4 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-3">
-          {cardT.acts[$lang]}
+          {$t('lev.cards.common.todoList')}
         </h4>
         <ul class="space-y-2">
           {#each acts?.data ?? acts ?? [] as datai}
@@ -405,7 +377,7 @@
       {#if (skills?.data ?? skills)?.length > 0}
         <div>
           <h4 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2">
-            {cardT.skneed[$lang]}
+            {$t('lev.cards.common.skneed')}
           </h4>
           <div class="flex flex-wrap gap-2">
             {#each skills?.data ?? skills ?? [] as skill}
@@ -423,7 +395,7 @@
       {#if (role?.data ?? role)?.length > 0}
         <div>
           <h4 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2">
-            {cardT.rneed[$lang]}
+            {$t('lev.cards.common.rneed')}
           </h4>
           <div class="flex flex-wrap gap-2">
             {#each role?.data ?? role ?? [] as rol}
@@ -441,7 +413,7 @@
       {#if (workways?.data ?? workways)?.length > 0}
         <div>
           <h4 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2">
-            {cardT.wwneed[$lang]}
+            {$t('lev.cards.common.wwneed')}
           </h4>
           <div class="flex flex-wrap gap-2">
             {#each workways?.data ?? workways ?? [] as wo}
@@ -488,7 +460,7 @@
         <!-- מקור מאגד: ההצעה מוגשת בעמוד המאגד -->
         <button
           class="flex-1 py-3 bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold rounded-xl flex justify-center items-center gap-2 transition-all hover:scale-105"
-          onmouseenter={() => hover({ he: 'לא מתאים לי', en: 'not for me' })}
+          onmouseenter={() => hover($t('lev.suggestor.notForMe'))}
           onmouseleave={() => hover('0')}
           onclick={decline}
         >
@@ -499,12 +471,12 @@
           href={offerHref}
           class="flex-2 py-3 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg flex justify-center items-center gap-2 transform hover:-translate-y-1 transition-all"
           style="flex: 2;"
-          onmouseenter={() => hover(offerAtSource)}
+          onmouseenter={() => hover($t('lev.cards.sugestmi.offerAtSource'))}
           onmouseleave={() => hover('0')}
         >
           <div class="w-8 h-8 text-white"><Lev /></div>
           <span class="whitespace-nowrap"
-            >{offerAtSource[$lang] ?? offerAtSource.he}</span
+            >{$t('lev.cards.sugestmi.offerAtSource')}</span
           >
         </a>
       {:else if myRoundProposedBy === 'project'}
@@ -531,7 +503,7 @@
         <!-- כפתור דחייה -->
         <button
           class="flex-1 py-3 bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold rounded-xl flex justify-center items-center gap-2 transition-all hover:scale-105"
-          onmouseenter={() => hover({ he: 'לא מתאים לי', en: 'not for me' })}
+          onmouseenter={() => hover($t('lev.suggestor.notForMe'))}
           onmouseleave={() => hover('0')}
           onclick={decline}
         >
@@ -544,7 +516,7 @@
           <button
             class="flex-1 py-3 bg-white dark:bg-gray-800 border-2 border-yellow-500 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 font-bold rounded-xl flex justify-center items-center gap-2 transition-all hover:scale-105"
             onmouseenter={() =>
-              hover({ he: 'הצעה מקבילה', en: 'counter proposal' })}
+              hover($t('lev.cards.common.counterProposal'))}
             onmouseleave={() => hover('0')}
             onclick={() => nego(null)}
           >
@@ -556,7 +528,7 @@
         <button
           class="flex-2 py-3 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg flex justify-center items-center gap-2 transform hover:-translate-y-1 transition-all"
           style="flex: 2;"
-          onmouseenter={() => hover({ he: 'אני רוצה', en: 'yes I want' })}
+          onmouseenter={() => hover($t('lev.cards.approve'))}
           onmouseleave={() => hover('0')}
           onclick={agree}
         >
@@ -570,11 +542,11 @@
             ? 'flex-2'
             : 'w-full'} py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold rounded-xl shadow-md flex justify-center items-center gap-2 hover:opacity-90 transition-all"
           style={selfNomination && onWithdraw ? 'flex: 2;' : ''}
-          onmouseenter={() => hover({ he: "צ'אט", en: 'chat' })}
+          onmouseenter={() => hover($t('lev.rektom.chat'))}
           onmouseleave={() => hover('0')}
           onclick={() => tochat()}
         >
-          <span>{$lang === 'he' ? "פתיחת צ'אט" : 'Open Chat'}</span>
+          <span>{$t('lev.cards.openChat')}</span>
           <div class="w-6 h-6"><Chaticon /></div>
         </button>
         {#if selfNomination && onWithdraw}
@@ -583,15 +555,12 @@
           <button
             class="flex-1 py-3 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-gray-400 hover:text-gray-600 font-bold rounded-xl flex justify-center items-center gap-2 transition-all"
             onmouseenter={() =>
-              hover({
-                he: 'משיכת ההצעה העצמית — המשימה שחיברת תיסגר כולה',
-                en: 'Withdraw your self-nomination — the mission you authored closes entirely'
-              })}
+              hover($t('lev.cards.sugestmi.withdrawSelfNomination'))}
             onmouseleave={() => hover('0')}
             onclick={() => onWithdraw?.()}
           >
             <span class="whitespace-nowrap"
-              >🌱 {$lang === 'he' ? 'משיכת ההצעה' : 'Withdraw'}</span
+              >🌱 {$t('lev.cards.withdraw')}</span
             >
           </button>
         {/if}

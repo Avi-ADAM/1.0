@@ -5,7 +5,6 @@
   import { Drawer } from 'vaul-svelte';
   import { goto } from '$app/navigation';
   import { idPr } from '../../stores/idPr.js';
-  import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
   import { toast } from 'svelte-sonner';
   import moment from 'moment';
@@ -227,14 +226,12 @@
           }
 
           miDatan = result.data;
-          const successMsg = { he: 'החלוקה אושרה בהצלחה! 🎉', en: 'Division approved successfully! 🎉' };
-          toast.success(successMsg[$lang] || successMsg.he);
+          toast.success($t('lev.cards.halukaask.approved'));
 
           coinLapach();
         } catch (e) {
           error1 = e;
-          const errorMsg = { he: 'שגיאה באישור החלוקה. נסה שוב.', en: 'Error approving division. Please try again.' };
-          toast.error(errorMsg[$lang] || errorMsg.he);
+          toast.error($t('lev.cards.halukaask.approveError'));
         }
       } else {
         // Not all users approved yet — add partial vote

@@ -1,5 +1,5 @@
 ﻿<script lang="ts">
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import Button from '$lib/celim/ui/button.svelte';
   import UploadPic from '$lib/components/userPr/uploadPic.svelte';
@@ -123,7 +123,7 @@
   function hasLocationValue(loc: typeof locationScope) {
     return loc?.location_mode !== 'unspecified' || hasLocationPoint(loc) || Boolean(loc?.location_hint?.trim());
   }
-  function locationSummary(loc: typeof locationScope, tl: typeof t) {
+  function locationSummary(loc: typeof locationScope, tl: typeof ui) {
     if (!loc || !hasLocationValue(loc)) return tl.locationEmpty;
     if (loc.location_mode === 'online') return tl.locationOnline;
     if (hasLocationPoint(loc)) {
@@ -173,89 +173,44 @@
   });
 
   // ─── i18n ─────────────────────────────────────────────────────────────────
-  const t = $derived(
-    $lang === 'he'
-      ? {
-          title: 'יצירת מוצר',
-          modeSimple: 'מוצר פשוט',
-          modeComplex: 'מוצר מורכב',
-          previewBadge: 'תצוגה מקדימה - השרת עוד לא מחובר',
-          name: 'שם המוצר',
-          desc: 'תיאור',
-          image: 'תמונה',
-          price: 'מחיר',
-          kindOf: 'סוג',
-          kindTotal: 'ליחידה',
-          kindMonthly: 'חודשי',
-          kindYearly: 'שנתי',
-          kindUnlimited: 'ללא הגבלה',
-          quant: 'כמות מצויה',
-          unlimitedQuant: 'ללא הגבלה',
-          startDate: 'תאריך התחלת זמינות',
-          endDate: 'תאריך סיום זמינות',
-          optional: '(לא חובה)',
-          oneForeProject: 'מוצר יחיד לפרויקט',
-          missions: 'משימות נדרשות',
-          resources: 'משאבים נדרשים',
-          marginPct: 'אחוז רווח / Overhead',
-          subtotal: 'סך עלות BOM',
-          estimated: 'מחיר משוער (כולל Overhead)',
-          total: 'סהכ',
-          submit: { he: 'שמירה', en: 'Save' },
-          submitVote: { he: 'שלח להצבעה', en: 'Submit for vote' },
-          cancel: 'ביטול',
-          openWarn:
-            'יש פריטים ללא שיוך - יוצגו ללקוחות בתגית "מחפשים ספק" וייתכן עיכוב באספקה.',
-          complexHint:
-            'התוספת של "מוצר מורכב" - מתכון של משימות ומשאבים. כל השאר זהה למוצר פשוט.',
-          locationTitle: 'מיקום המוצר',
-          locationHelper: 'ציינו אם המוצר/שירות ניתן אונליין, פיזית, או שניהם.',
-          locationEmpty: 'הוסיפו מיקום (לא חובה)',
-          locationOnline: 'אונליין',
-          locationSelected: 'מיקום נבחר',
-          locationDone: 'סיים מיקום'
-        }
-      : {
-          title: 'Create Product',
-          modeSimple: 'Simple',
-          modeComplex: 'Complex',
-          previewBadge: 'Preview - server action not wired yet',
-          name: 'Product name',
-          desc: 'Description',
-          image: 'Image',
-          price: 'Price',
-          kindOf: 'Kind',
-          kindTotal: 'per unit',
-          kindMonthly: 'monthly',
-          kindYearly: 'yearly',
-          kindUnlimited: 'unlimited',
-          quant: 'Available quantity',
-          unlimitedQuant: 'unlimited',
-          startDate: 'Availability start',
-          endDate: 'Availability end',
-          optional: '(optional)',
-          oneForeProject: 'One product per project',
-          missions: 'Required missions',
-          resources: 'Required resources',
-          marginPct: 'Margin / Overhead %',
-          subtotal: 'BOM subtotal',
-          estimated: 'Estimated price (with Overhead)',
-          total: 'Total',
-          submit: { he: 'שמירה', en: 'Save' },
-          submitVote: { he: 'שלח להצבעה', en: 'Submit for vote' },
-          cancel: 'Cancel',
-          openWarn:
-            'Items without an assignee will be shown as "looking for provider"; delivery may be delayed.',
-          complexHint:
-            'Complex products add a recipe of missions and resources. The base fields remain the same as a simple product.',
-          locationTitle: 'Product location',
-          locationHelper: 'Specify if the product/service is online, onsite, or hybrid.',
-          locationEmpty: 'Add location (optional)',
-          locationOnline: 'Online',
-          locationSelected: 'Location set',
-          locationDone: 'Done'
-        }
-  );
+  const ui = $derived({
+    title: $t('offerings.compose.title'),
+    modeSimple: $t('offerings.compose.modeSimple'),
+    modeComplex: $t('offerings.compose.modeComplex'),
+    previewBadge: $t('offerings.compose.previewBadge'),
+    name: $t('offerings.compose.name'),
+    desc: $t('offerings.compose.desc'),
+    image: $t('offerings.compose.image'),
+    price: $t('offerings.compose.price'),
+    kindOf: $t('offerings.compose.kindOf'),
+    kindTotal: $t('offerings.compose.kindTotal'),
+    kindMonthly: $t('offerings.compose.kindMonthly'),
+    kindYearly: $t('offerings.compose.kindYearly'),
+    kindUnlimited: $t('offerings.compose.kindUnlimited'),
+    quant: $t('offerings.compose.quant'),
+    unlimitedQuant: $t('offerings.compose.unlimitedQuant'),
+    startDate: $t('offerings.compose.startDate'),
+    endDate: $t('offerings.compose.endDate'),
+    optional: $t('offerings.compose.optional'),
+    oneForeProject: $t('offerings.compose.oneForeProject'),
+    missions: $t('offerings.compose.missions'),
+    resources: $t('offerings.compose.resources'),
+    marginPct: $t('offerings.compose.marginPct'),
+    subtotal: $t('offerings.compose.subtotal'),
+    estimated: $t('offerings.compose.estimated'),
+    total: $t('offerings.compose.total'),
+    cancel: $t('offerings.compose.cancel'),
+    openWarn: $t('offerings.compose.openWarn'),
+    complexHint: $t('offerings.compose.complexHint'),
+    locationTitle: $t('offerings.compose.locationTitle'),
+    locationHelper: $t('offerings.compose.locationHelper'),
+    locationEmpty: $t('offerings.compose.locationEmpty'),
+    locationOnline: $t('offerings.compose.locationOnline'),
+    locationSelected: $t('offerings.compose.locationSelected'),
+    locationDone: $t('offerings.compose.locationDone'),
+    submit: $t('common.save'),
+    submitVote: $t('offerings.products.submitVote')
+  });
 
   async function uploadPicIfAny(): Promise<string | null> {
     if (!croppedImage) return null;
@@ -380,7 +335,7 @@
       aria-selected={mode === 'simple'}
       onclick={() => (mode = 'simple')}
     >
-      {t.modeSimple}
+      {ui.modeSimple}
     </button>
     <button
       type="button"
@@ -389,20 +344,20 @@
       aria-selected={mode === 'complex'}
       onclick={() => (mode = 'complex')}
     >
-      {t.modeComplex}
+      {ui.modeComplex}
     </button>
   </div>
 
   <h2 class="title">
-    {t.title}
+    {ui.title}
     <span class="title-mode">
-      · {isComplex ? t.modeComplex : t.modeSimple}
+      · {isComplex ? ui.modeComplex : ui.modeSimple}
     </span>
   </h2>
 
   <!-- Image -->
   <section class="section">
-    <div class="label-block">{t.image}</div>
+    <div class="label-block">{ui.image}</div>
     <UploadPic
       aspect={16 / 9}
       cropShape="rect"
@@ -415,25 +370,25 @@
 
   <!-- Name -->
   <label class="field">
-    <span class="label-block">{t.name}</span>
-    <input bind:value={name} class="inputt" placeholder={t.name} />
+    <span class="label-block">{ui.name}</span>
+    <input bind:value={name} class="inputt" placeholder={ui.name} />
   </label>
 
   <!-- Description -->
   <label class="field">
-    <span class="label-block">{t.desc}</span>
+    <span class="label-block">{ui.desc}</span>
     <textarea
       bind:value={description}
       class="inputt textarea"
       rows="3"
-      placeholder={t.desc}
+      placeholder={ui.desc}
     ></textarea>
   </label>
 
   <!-- Price (simple only) -->
   {#if !isComplex}
     <label class="field">
-      <span class="label-block">{t.price}</span>
+      <span class="label-block">{ui.price}</span>
       <input
         class="inputt"
         type="number"
@@ -446,19 +401,19 @@
 
   <!-- Kind -->
   <label class="field">
-    <span class="label-block">{t.kindOf}</span>
+    <span class="label-block">{ui.kindOf}</span>
     <select class="inputt" bind:value={kindOf}>
-      <option value="total">{t.kindTotal}</option>
-      <option value="monthly">{t.kindMonthly}</option>
-      <option value="yearly">{t.kindYearly}</option>
-      <option value="unlimited">{t.kindUnlimited}</option>
+      <option value="total">{ui.kindTotal}</option>
+      <option value="monthly">{ui.kindMonthly}</option>
+      <option value="yearly">{ui.kindYearly}</option>
+      <option value="unlimited">{ui.kindUnlimited}</option>
     </select>
   </label>
 
   <!-- Quantity (hidden when unlimited) -->
   {#if kindOf !== 'unlimited' && !unlimitedM}
     <label class="field">
-      <span class="label-block">{t.quant}</span>
+      <span class="label-block">{ui.quant}</span>
       <input class="inputt" type="number" min="0" step="1" bind:value={quant} />
     </label>
   {/if}
@@ -466,19 +421,19 @@
   {#if kindOf === 'monthly' || kindOf === 'yearly'}
     <label class="checkbox-row">
       <input type="checkbox" bind:checked={unlimitedM} />
-      <span>{t.unlimitedQuant}</span>
+      <span>{ui.unlimitedQuant}</span>
     </label>
 
     <label class="field">
       <span class="label-block"
-        >{t.startDate} <small class="hint">{t.optional}</small></span
+        >{ui.startDate} <small class="hint">{ui.optional}</small></span
       >
       <input class="inputt" type="datetime-local" bind:value={dates} />
     </label>
 
     <label class="field">
       <span class="label-block"
-        >{t.endDate} <small class="hint">{t.optional}</small></span
+        >{ui.endDate} <small class="hint">{ui.optional}</small></span
       >
       <input
         class="inputt"
@@ -491,7 +446,7 @@
 
   <label class="checkbox-row">
     <input type="checkbox" bind:checked={oneForeProject} />
-    <span>{t.oneForeProject}</span>
+    <span>{ui.oneForeProject}</span>
   </label>
 
   <!-- Location -->
@@ -502,13 +457,13 @@
       class:active={locationOpen || hasLocationValue(locationScope)}
       onclick={() => (locationOpen = !locationOpen)}
     >
-      {locationOpen ? t.locationDone : locationSummary(locationScope, t)}
+      {locationOpen ? ui.locationDone : locationSummary(locationScope, ui)}
     </button>
     {#if locationOpen}
       <LocationPicker
         bind:value={locationScope}
-        label={t.locationTitle}
-        helper={t.locationHelper}
+        label={ui.locationTitle}
+        helper={ui.locationHelper}
         height="280px"
       />
     {/if}
@@ -518,7 +473,7 @@
   {#if !isComplex}
     <div class="summary">
       <div class="sum-row total">
-        <span>{t.total}</span>
+        <span>{ui.total}</span>
         <strong>
           ₪ {simpleTotal.toLocaleString('en', { maximumFractionDigits: 2 })}
           {#if unlimitedM || kindOf === 'unlimited'}
@@ -531,11 +486,11 @@
 
   <!-- ── COMPLEX-ONLY ADDITIONS ────────────────────────────────────────── -->
   {#if isComplex}
-    <div class="complex-hint">{t.complexHint}</div>
+    <div class="complex-hint">{ui.complexHint}</div>
 
     <section class="section">
       <div class="section-head">
-        <h3>{t.missions}</h3>
+        <h3>{ui.missions}</h3>
       </div>
       <MissionPickerList
         bind:rows={recipeMissions}
@@ -549,7 +504,7 @@
 
     <section class="section">
       <div class="section-head">
-        <h3>{t.resources}</h3>
+        <h3>{ui.resources}</h3>
       </div>
       <ResourcePickerList
         bind:rows={recipeResources}
@@ -564,7 +519,7 @@
     <section class="section margin-section">
       <label class="field">
         <span class="label-block">
-          {t.marginPct}: <strong>{marginPct.toFixed(1)}%</strong>
+          {ui.marginPct}: <strong>{marginPct.toFixed(1)}%</strong>
         </span>
         <input
           type="range"
@@ -578,19 +533,19 @@
 
     <div class="summary">
       <div class="sum-row">
-        <span>{t.subtotal}</span>
+        <span>{ui.subtotal}</span>
         <strong>
           ₪ {subTotal.toLocaleString('en', { maximumFractionDigits: 2 })}
         </strong>
       </div>
       <div class="sum-row total">
-        <span>{t.estimated}</span>
+        <span>{ui.estimated}</span>
         <strong>
           ₪ {estimatedPrice.toLocaleString('en', { maximumFractionDigits: 2 })}
         </strong>
       </div>
       {#if openItems > 0}
-        <div class="open-warn">⚡ {t.openWarn} ({openItems})</div>
+        <div class="open-warn">⚡ {ui.openWarn} ({openItems})</div>
       {/if}
     </div>
   {/if}
@@ -598,11 +553,11 @@
   <div class="actions">
     {#if onCancel}
       <button class="btn-secondary" type="button" onclick={onCancel}>
-        {t.cancel}
+        {ui.cancel}
       </button>
     {/if}
     <Button
-      text={isComplex ? t.submitVote : t.submit}
+      text={isComplex ? ui.submitVote : ui.submit}
       onClick={handleSubmit}
       {loading}
       {success}

@@ -1,5 +1,5 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import Addnewro from './addNewRoleToSkill.svelte';
   import MultiSelect from 'svelte-multiselect';
   import { onMount } from 'svelte';
@@ -46,29 +46,7 @@
   const placeholder = $derived(
     $lang === 'he' ? 'תפקידים קשורים' : 'Related Roles'
   );
-  const cencel = { he: 'ביטול', en: 'Cancel' };
-  const adds = { he: 'הוספת כישור חדש', en: 'Add new Skill' };
-  const nom = {
-    he: 'לא קיים עדיין ברשימה, ניתן להוסיף בלחיצה על כפתור "הוספת תפקיד חדש" שלמטה',
-    en: 'Not on the list yet, add it with the "Add new role" button below'
-  };
-  const addn = { he: 'הוספת תפקיד חדש', en: 'Add new Role' };
-  const valn = { he: 'שם הכישור', en: 'Skill name' };
-  const des = { he: 'תיאור קצר', en: 'Skill short description' };
-  const btnTitles = { he: 'הוספה', en: 'Add' };
 
-  const dupMsg = {
-    he: {
-      found: 'כישור זהה כבר קיים:',
-      similar: 'דומה מאוד לכישור קיים:',
-      override: 'הוסף בכל זאת'
-    },
-    en: {
-      found: 'An identical skill already exists:',
-      similar: 'Very similar to an existing skill:',
-      override: 'Add anyway'
-    }
-  };
 
   // ─── onMount: טעינת תפקידים (דרך הפרוקסי) ────────────────────────────────────
 
@@ -247,13 +225,13 @@
     <button
       style="--the:{color};"
       class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-0.5 px-4 rounded-full"
-      onclick={() => (addS = true)}>{adds[$lang]}</button
+      onclick={() => (addS = true)}>{$t('addnew.addNewSkill.adds')}</button
     >
   {:else}
     <div class="bg-barbi bg-opacity-10 p-4">
       <!-- כפתור ביטול -->
       <button
-        title={cencel[$lang]}
+        title={$t('addnew.addNewSkill.cencel')}
         onclick={dispatchb}
         class="hover:bg-barbi text-gold hover:text-lturk font-bold py-1 px-1 rounded-full text-center"
       >
@@ -266,7 +244,7 @@
       </button>
 
       <h1 style="font-size: 1rem; line-height: normal; color: var({color});">
-        {adds[$lang]}
+        {$t('addnew.addNewSkill.adds')}
       </h1>
 
       <!-- שם כישור + בדיקת כפילות -->
@@ -284,7 +262,7 @@
           for="name"
           class="label"
         >
-          {valn[$lang]}
+          {$t('addnew.addNewSkill.valn')}
           {#if dupStatus === 'checking'}
             <span class="checking-dot">…</span>
           {/if}
@@ -295,7 +273,7 @@
       <!-- כפילות מדויקת — חסום -->
       {#if dupStatus === 'found' && dupMatch}
         <div class="dup-banner dup-exact">
-          <span>{dupMsg[$lang].found}</span>
+          <span>{$t('addnew.addNewSkill.dup.found')}</span>
           <strong>"{dupMatch.label}"</strong>
           <small>({pct(dupMatch.similarity)})</small>
         </div>
@@ -304,11 +282,11 @@
       <!-- דמיון גבוה — אזהרה עם אפשרות override -->
       {#if dupStatus === 'similar' && dupMatch && !dupOverride}
         <div class="dup-banner dup-similar">
-          <span>{dupMsg[$lang].similar}</span>
+          <span>{$t('addnew.addNewSkill.dup.similar')}</span>
           <strong>"{dupMatch.label}"</strong>
           <small>({pct(dupMatch.similarity)})</small>
           <button class="override-btn" onclick={() => (dupOverride = true)}>
-            {dupMsg[$lang].override}
+            {$t('addnew.addNewSkill.dup.override')}
           </button>
         </div>
       {/if}
@@ -325,7 +303,7 @@
           style:right={$lang === 'he' ? '0' : 'none'}
           style:left={$lang === 'en' ? '0' : 'none'}
           for="des"
-          class="label">{des[$lang]}</label
+          class="label">{$t('addnew.addNewSkill.des')}</label
         >
         <span class="line"></span>
       </div>
@@ -341,7 +319,7 @@
           --sms-max-width="60vw"
           bind:selected
           {placeholder}
-          noMatchingOptionsMsg={nom[$lang]}
+          noMatchingOptionsMsg={$t('addnew.addNewSkill.nom')}
           options={roles1.map((c) => c.attributes.roleDescription)}
         />
       </div>
@@ -353,7 +331,7 @@
           <button
             onclick={() => (addro = true)}
             class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold px-1 rounded-full"
-            >{addn[$lang]}</button
+            >{$t('addnew.addNewSkill.addn')}</button
           >
 
           <br /><br />
@@ -362,7 +340,7 @@
           <div class="grid align-middle justify-center">
             <button
               onclick={addNewSkill}
-              title={btnTitles[$lang]}
+              title={$t('addnew.addNewSkill.btnTitles')}
               disabled={!canSubmit}
               class="hover:bg-barbi hover:text-mturk text-gold font-bold py-1 px-2 rounded-full disabled:opacity-40"
             >
@@ -389,7 +367,7 @@
         {:else}
           <br />
           <button
-            title={cencel[$lang]}
+            title={$t('addnew.addNewSkill.cencel')}
             onclick={() => (addro = false)}
             class="hover:bg-barbi hover:text-mturk font-bold p-1 rounded-full"
             class:text-mturk={nobr === true}

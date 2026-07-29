@@ -1,4 +1,5 @@
 <script>
+  import { t } from '$lib/translations';
     import Calendar from '@event-calendar/core';
     import TimeGrid from '@event-calendar/time-grid';
     import Interaction from '@event-calendar/interaction'
@@ -55,10 +56,8 @@
         },
         eventStartEditable: true
     };
-    console.log(options)
-    const inDev = {'he':'בפיתוח נמרץ בקרוב ניתן יהיה לראות ולסדר משמרות כאן','en':'in development, coming soon~!'}
-</script>
-<h1>{inDev[$lang]}</h1>
+    console.log(options)</script>
+<h1>{$t('project.misc.sidurInDev')}</h1>
 <Calendar bind:this={ec} {plugins} {options} />
 <style>
    

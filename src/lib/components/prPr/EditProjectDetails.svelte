@@ -1,5 +1,5 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
   import { sendToSer } from '$lib/send/sendToSer.js';
@@ -50,103 +50,6 @@
 
   const isMultiUser = memberCount > 1;
 
-  const i18n = {
-    he: {
-      title: 'עריכת פרטי פרויקט',
-      name: 'שם הפרויקט',
-      nameTaken: 'שם זה כבר קיים',
-      pubDesc: 'תיאור קצר (גלוי לכולם)',
-      privDesc: 'תיאור מפורט (נראות סלקטיבית)',
-      website: 'לינק לאתר',
-      github: 'לינק לגיטהאב',
-      facebook: 'לינק לפייסבוק',
-      discord: 'לינק לדיסקורד',
-      drive: 'לינק לגוגל דרייב',
-      twitter: 'לינק לטוויטר',
-      whatsapp: 'לינק לוואטסאפ',
-      restime: 'זמן תגובה להחלטות',
-      restime48: '48 שעות',
-      restime72: '72 שעות',
-      restime96: '96 שעות',
-      restimeWeek: 'שבוע',
-      restimeNote: 'לאחר זמן זה, חוסר מענה יחשב כהסכמה',
-      values: 'ערכים ומטרות',
-      save: 'שמירת שינויים',
-      cancel: 'ביטול',
-      saving: 'שומר...',
-      successSingle: 'הפרטים עודכנו בהצלחה!',
-      successMulti: 'השינויים הועלו להצבעה!',
-      successNoChange: 'לא זוהו שינויים',
-      errorMsg: 'שגיאה בשמירה, נסה שנית',
-      multiUserNote: 'פרויקט עם מספר חברים - השינויים יועלו להצבעה',
-      addValue: 'הוסף ערך',
-      uploadPic: 'תמונת פרופיל'
-    },
-    en: {
-      title: 'Edit Project Details',
-      name: 'Project Name',
-      nameTaken: 'This name already exists',
-      pubDesc: 'Short public description',
-      privDesc: 'Detailed private description',
-      website: 'Website link',
-      github: 'GitHub link',
-      facebook: 'Facebook link',
-      discord: 'Discord link',
-      drive: 'Google Drive link',
-      twitter: 'Twitter link',
-      whatsapp: 'WhatsApp link',
-      restime: 'Decision response time',
-      restime48: '48 hours',
-      restime72: '72 hours',
-      restime96: '96 hours',
-      restimeWeek: '1 week',
-      restimeNote: 'After this time, no response = approval',
-      values: 'Values & goals',
-      save: 'Save changes',
-      cancel: 'Cancel',
-      saving: 'Saving...',
-      successSingle: 'Details updated successfully!',
-      successMulti: 'Changes submitted for voting!',
-      successNoChange: 'No changes detected',
-      errorMsg: 'Error saving, please try again',
-      multiUserNote: 'Multi-member project — changes will go to a vote',
-      addValue: 'Add value',
-      uploadPic: 'Profile Picture'
-    },
-    ar: {
-      title: 'تعديل تفاصيل المشروع',
-      name: 'اسم المشروع',
-      nameTaken: 'هذا الاسم موجود مسبقاً',
-      pubDesc: 'وصف قصير عام',
-      privDesc: 'وصف مفصل (رؤية انتقائية)',
-      website: 'رابط الموقع',
-      github: 'رابط GitHub',
-      facebook: 'رابط Facebook',
-      discord: 'رابط Discord',
-      drive: 'رابط Google Drive',
-      twitter: 'رابط Twitter',
-      whatsapp: 'رابط WhatsApp',
-      restime: 'وقت الاستجابة للقرارات',
-      restime48: '48 ساعة',
-      restime72: '72 ساعة',
-      restime96: '96 ساعة',
-      restimeWeek: 'أسبوع',
-      restimeNote: 'بعد هذا الوقت، غياب الرد يعتبر موافقة',
-      values: 'القيم والأهداف',
-      save: 'حفظ التغييرات',
-      cancel: 'إلغاء',
-      saving: 'جاري الحفظ...',
-      successSingle: 'تم تحديث التفاصيل بنجاح!',
-      successMulti: 'تم رفع التغييرات للتصويت!',
-      successNoChange: 'لم يتم اكتشاف أي تغييرات',
-      errorMsg: 'خطأ في الحفظ، يرجى المحاولة مرة أخرى',
-      multiUserNote: 'مشروع متعدد الأعضاء - ستخضع التغييرات للتصويت',
-      addValue: 'إضافة قيمة',
-      uploadPic: 'صورة الملف الشخصي'
-    }
-  };
-
-  let t = $derived(i18n[$lang] || i18n.en);
   /** @type {'rtl' | 'ltr'} */
   let dir = $derived($isRtl ? 'rtl' : 'ltr');
 
@@ -195,7 +98,7 @@
       }
     } catch (e) {
       console.error('Upload failed', e);
-      errorMsg = t.errorMsg;
+      errorMsg = $t('project.editDetails.errorMsg');
     } finally {
       loading = false;
     }
@@ -229,32 +132,32 @@
     if (result.success) {
       const count = result.data?.decisionsCreated ?? 0;
       if (isMultiUser && count === 0 && !result.data?.projectName) {
-        successMsg = t.successNoChange;
+        successMsg = $t('project.editDetails.successNoChange');
       } else if (isMultiUser) {
-        successMsg = t.successMulti;
+        successMsg = $t('project.editDetails.successMulti');
       } else {
-        successMsg = t.successSingle;
+        successMsg = $t('project.editDetails.successSingle');
         await invalidateAll();
       }
       onSuccess?.();
     } else {
-      errorMsg = result.error?.message || t.errorMsg;
+      errorMsg = result.error?.message || $t('project.editDetails.errorMsg');
     }
   }
 </script>
 
 <div {dir} class="edit-project-details space-y-5 p-4 bg-white rounded-xl shadow-md">
-  <h2 class="text-xl font-bold text-primary">{t.title}</h2>
+  <h2 class="text-xl font-bold text-primary">{$t('project.editDetails.title')}</h2>
 
   {#if isMultiUser}
     <div class="bg-amber-50 border border-amber-300 text-amber-800 rounded-lg p-3 text-sm">
-      {t.multiUserNote}
+      {$t('project.editDetails.multiUserNote')}
     </div>
   {/if}
 
   <!-- Profile Pic -->
   <div class="field-group">
-    <label class="field-label">{t.uploadPic}</label>
+    <label class="field-label">{$t('project.editDetails.uploadPic')}</label>
     <div class="flex justify-center bg-gray-50 rounded-lg p-4 border-2 border-dashed border-gold/30">
       <Uplad onMessage={handleUpload} current={srcP} noHeader={true} />
     </div>
@@ -262,84 +165,84 @@
 
   <!-- Name -->
   <div class="field-group">
-    <label class="field-label" for="epd-name">{t.name}</label>
+    <label class="field-label" for="epd-name">{$t('project.editDetails.name')}</label>
     <input id="epd-name" class="field-input" type="text" bind:value={projectName} required />
   </div>
 
   <!-- Public description -->
   <div class="field-group">
-    <label class="field-label" for="epd-pubdesc">{t.pubDesc}</label>
+    <label class="field-label" for="epd-pubdesc">{$t('project.editDetails.pubDesc')}</label>
     <RichText bind:outpot={publicDescription} sml={true} />
   </div>
 
   <!-- Private description -->
   <div class="field-group">
-    <label class="field-label" for="epd-privdesc">{t.privDesc}</label>
+    <label class="field-label" for="epd-privdesc">{$t('project.editDetails.privDesc')}</label>
     <RichText bind:outpot={descripFor} sml={true} />
   </div>
 
   <!-- Website -->
   <div class="field-group">
-    <label class="field-label" for="epd-website">{t.website}</label>
+    <label class="field-label" for="epd-website">{$t('project.editDetails.website')}</label>
     <input id="epd-website" class="field-input" type="url" bind:value={linkToWebsite} />
   </div>
 
   <!-- GitHub -->
   <div class="field-group">
-    <label class="field-label" for="epd-github">{t.github}</label>
+    <label class="field-label" for="epd-github">{$t('project.editDetails.github')}</label>
     <input id="epd-github" class="field-input" type="url" bind:value={githublink} />
   </div>
 
   <!-- Facebook -->
   <div class="field-group">
-    <label class="field-label" for="epd-facebook">{t.facebook}</label>
+    <label class="field-label" for="epd-facebook">{$t('project.editDetails.facebook')}</label>
     <input id="epd-facebook" class="field-input" type="url" bind:value={fblink} />
   </div>
 
   <!-- Discord -->
   <div class="field-group">
-    <label class="field-label" for="epd-discord">{t.discord}</label>
+    <label class="field-label" for="epd-discord">{$t('project.editDetails.discord')}</label>
     <input id="epd-discord" class="field-input" type="url" bind:value={discordlink} />
   </div>
 
   <!-- Drive -->
   <div class="field-group">
-    <label class="field-label" for="epd-drive">{t.drive}</label>
+    <label class="field-label" for="epd-drive">{$t('project.editDetails.drive')}</label>
     <input id="epd-drive" class="field-input" type="url" bind:value={drivelink} />
   </div>
 
   <!-- Twitter -->
   <div class="field-group">
-    <label class="field-label" for="epd-twitter">{t.twitter}</label>
+    <label class="field-label" for="epd-twitter">{$t('project.editDetails.twitter')}</label>
     <input id="epd-twitter" class="field-input" type="url" bind:value={twiterlink} />
   </div>
 
   <!-- WhatsApp -->
   <div class="field-group">
-    <label class="field-label" for="epd-whatsapp">{t.whatsapp}</label>
+    <label class="field-label" for="epd-whatsapp">{$t('project.editDetails.whatsapp')}</label>
     <input id="epd-whatsapp" class="field-input" type="url" bind:value={watsapplink} />
   </div>
 
   <!-- Response time -->
   <div class="field-group">
-    <label class="field-label" for="epd-restime">{t.restime}</label>
+    <label class="field-label" for="epd-restime">{$t('project.editDetails.restime')}</label>
     <select id="epd-restime" class="field-select" bind:value={restime}>
-      <option value="feh">{t.restime48}</option>
-      <option value="sth">{t.restime72}</option>
-      <option value="nsh">{t.restime96}</option>
-      <option value="sevend">{t.restimeWeek}</option>
+      <option value="feh">{$t('project.editDetails.restime48')}</option>
+      <option value="sth">{$t('project.editDetails.restime72')}</option>
+      <option value="nsh">{$t('project.editDetails.restime96')}</option>
+      <option value="sevend">{$t('project.editDetails.restimeWeek')}</option>
     </select>
-    <small class="text-gold">{t.restimeNote}</small>
+    <small class="text-gold">{$t('project.editDetails.restimeNote')}</small>
   </div>
 
   <!-- Values -->
   {#if allVallues.length > 0}
     <div class="field-group">
-      <label class="field-label">{t.values}</label>
+      <label class="field-label">{$t('project.editDetails.values')}</label>
       <MultiSelect
         bind:selected={selectedVallueNames}
         options={allVallues.map((v) => v.attributes.valueName)}
-        placeholder={t.addValue}
+        placeholder={$t('project.editDetails.addValue')}
         --sms-li-selected-bg="var(--gold)"
         outerDivClass="!bg-gold !text-barbi"
         inputClass="!bg-gold !text-barbi"
@@ -367,14 +270,14 @@
       onclick={onCancel}
       disabled={loading}
     >
-      {t.cancel}
+      {$t('project.editDetails.cancel')}
     </button>
     <button
       class="btn-primary"
       onclick={handleSubmit}
       disabled={loading || !projectName.trim()}
     >
-      {loading ? t.saving : t.save}
+      {loading ? $t('project.editDetails.saving') : $t('project.editDetails.save')}
     </button>
   </div>
 </div>

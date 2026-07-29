@@ -1,5 +1,5 @@
 ﻿<script lang="ts">
-  import { isRtl } from '$lib/translations';
+  import { t, isRtl } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import { toast } from 'svelte-sonner';
   import { userStore } from '$lib/stores/levStores';
@@ -19,31 +19,6 @@
     goto(`/deals/request/${buble.id}`);
   }
 
-  const t = {
-    requestFrom: { he: 'בקשה מ:', en: 'Request from:', ar: 'طلب من:' },
-    approve: { he: 'אישור', en: 'Approve', ar: 'موافقة' },
-    refuse: { he: 'דחייה', en: 'Refuse', ar: 'دحياة' },
-    price: { he: 'מחיר:', en: 'Price:', ar: 'السعر:' },
-    quantity: { he: 'כמות:', en: 'Quantity:', ar: 'الكمية:' },
-    total: { he: 'סה"כ:', en: 'Total:', ar: 'المجموع:' },
-    startDate: { he: 'התחלה:', en: 'Start:', ar: 'البداية:' },
-    endDate: { he: 'סיום:', en: 'End:', ar: 'النهاية:' },
-    submitting: { he: 'מעבד...', en: 'Processing...', ar: 'جاري المعالجة...' },
-    successApprove: {
-      he: 'הבקשה אושרה בהצלחה',
-      en: 'Request approved',
-      ar: 'تمت الموافقة'
-    },
-    successReject: {
-      he: 'הבקשה נדחתה',
-      en: 'Request rejected',
-      ar: 'تم رفض الطلب'
-    },
-    error: { he: 'שגיאה בביצוע הפעולה', en: 'Action failed', ar: 'فشل الإجراء' },
-    chat: { he: 'צ׳אט', en: 'Chat', ar: 'محادثة' },
-    creatingChat: { he: 'יוצר צ׳אט...', en: 'Creating chat...', ar: 'جاري إنشاء محادثة...' },
-    viewRequest: { he: 'לצפיה בבקשה', en: 'View Request', ar: 'عرض الطلب' }
-  };
 
   let isProcessing = $state(false);
   let isCreatingChat = $state(false);
@@ -94,7 +69,7 @@
         buble.forumId = forumId;
       } catch (err) {
         console.error(err);
-        toast.error(t.error[$lang]);
+        toast.error($t('lev.cards.productRequest.error'));
         isCreatingChat = false;
         return;
       } finally {
@@ -135,10 +110,10 @@
 
         if (!result.success) throw new Error(result.error?.message || 'Failed');
 
-        toast.success(t.successReject[$lang]);
+        toast.success($t('lev.cards.productRequest.successReject'));
       } catch (err) {
         console.error(err);
-        toast.error(t.error[$lang]);
+        toast.error($t('lev.cards.productRequest.error'));
       } finally {
         isProcessing = false;
       }
@@ -158,10 +133,10 @@
         throw new Error(result.error?.message || 'Failed to add vote');
       }
 
-      toast.success(t.successApprove[$lang]);
+      toast.success($t('lev.cards.productRequest.successApprove'));
     } catch (err) {
       console.error(err);
-      toast.error(t.error[$lang]);
+      toast.error($t('lev.cards.productRequest.error'));
     } finally {
       isProcessing = false;
     }
@@ -180,7 +155,7 @@
   class="{isMobileOrTablet()
     ? 'w-full h-full'
     : ' w-[90%] h-[90%]'}  lg:w-[90%] {isFirst
-    ? $lang == 'he'
+    ? $isRtl
       ? 'boxleft'
       : 'boxright'
     : ''} flex d flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isScrolable.value
@@ -201,9 +176,7 @@
     logoSrc={buble.projectSrc}
     projectName={buble.projectName}
     cardType={buble.ani === 'sheirutp'
-      ? $lang === 'he'
-        ? 'בקשת מוצר'
-        : 'PRODUCT REQUEST'
+      ? $t('lev.cards.productRequest.productRequest')
       : buble.ani}
     cardTitle={buble.name}
     {glowColor}
@@ -227,7 +200,7 @@
         onclick={(e) => { e.stopPropagation(); handleViewRequest(); }}
         class="px-3 py-1 text-barbi hover:text-gold hover:bg-barbi bg-gold rounded-lg text-sm font-semibold transition-all shadow-sm hover:shadow-md"
       >
-        {t.viewRequest[$lang]}
+        {$t('lev.cards.productRequest.viewRequest')}
       </button>
     {/snippet}
   </CardHeader>
@@ -257,7 +230,7 @@
       {/if}
       <div>
         <div class="text-[10px] text-gray-500 uppercase">
-          {t.requestFrom[$lang]}
+          {$t('lev.cards.productRequest.requestFrom')}
         </div>
         <a
           href="/user/{buble.userId}"
@@ -282,7 +255,7 @@
     <div class="grid grid-cols-2 gap-3 text-sm">
       <div class="bg-gray-50 dark:bg-gray-700/30 p-2 rounded-lg">
         <span class="text-gray-500 block text-[10px] uppercase"
-          >{t.price[$lang]}</span
+          >{$t('lev.cards.productRequest.price')}</span
         >
         <div class="flex items-center gap-2">
           <img
@@ -297,7 +270,7 @@
       </div>
       <div class="bg-gray-50 dark:bg-gray-700/30 p-2 rounded-lg">
         <span class="text-gray-500 block text-[10px] uppercase"
-          >{t.quantity[$lang]}</span
+          >{$t('lev.cards.productRequest.quantity')}</span
         >
         <span class="font-bold text-gray-800 dark:text-gray-100"
           >{buble.quant}</span
@@ -307,7 +280,7 @@
         class="col-span-2 bg-gradient-to-r from-barbi/5 to-mpink/5 p-2 rounded-lg border border-barbi/10"
       >
         <span class="text-barbi block text-[10px] uppercase font-bold"
-          >{t.total[$lang]}</span
+          >{$t('lev.cards.productRequest.total')}</span
         >
         <div class="flex items-center gap-2">
           <img
@@ -332,7 +305,7 @@
             class="w-5 h-5"
           />
           <div class="flex items-center gap-1">
-            <span class="font-semibold">{t.startDate[$lang]}</span>
+            <span class="font-semibold">{$t('lev.cards.productRequest.startDate')}</span>
             <span>{new Date(buble.startDate).toLocaleDateString($lang)}</span>
           </div>
         </div>
@@ -344,7 +317,7 @@
               class="w-5 h-5"
             />
             <div class="flex items-center gap-1">
-              <span class="font-semibold">{t.endDate[$lang]}</span>
+              <span class="font-semibold">{$t('lev.cards.productRequest.endDate')}</span>
               <span>{new Date(buble.finishDate).toLocaleDateString($lang)}</span
               >
             </div>
@@ -397,9 +370,9 @@
         />
       </svg>
       {#if isCreatingChat}
-        {t.creatingChat[$lang]}
+        {$t('lev.cards.productRequest.creatingChat')}
       {:else}
-        {t.chat[$lang]}
+        {$t('lev.cards.productRequest.chat')}
       {/if}
     </button>
 
@@ -408,7 +381,7 @@
       onclick={(e) => { e.stopPropagation(); handleAction('reject'); }}
       disabled={isProcessing}
     >
-      {t.refuse[$lang]}
+      {$t('lev.cards.productRequest.refuse')}
     </button>
     <button
       class="flex-2 py-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all disabled:opacity-50"
@@ -416,17 +389,13 @@
       disabled={isProcessing || buble.already}
     >
       {#if isProcessing}
-        {t.submitting[$lang]}
+        {$t('lev.cards.productRequest.submitting')}
       {:else if buble.already}
         {buble.mypos === true
-          ? $lang === 'he'
-            ? 'כבר אישרת'
-            : 'Already approved'
-          : $lang === 'he'
-            ? 'כבר דחית'
-            : 'Already rejected'}
+          ? $t('lev.cards.productRequest.alreadyApproved')
+          : $t('lev.cards.productRequest.alreadyRejected')}
       {:else}
-        {t.approve[$lang]}
+        {$t('lev.cards.productRequest.approve')}
       {/if}
     </button>
   </div>

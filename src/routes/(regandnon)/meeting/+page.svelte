@@ -1,5 +1,5 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import CreateNewMeeting from '$lib/components/addnew/createNewMeeting.svelte';
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang';
@@ -353,78 +353,6 @@
     }
   }
 
-  const titles = {
-    he: {
-      title: 'פגישות קסם',
-      subtitle: 'המקום שבו הזמן פוגש את המטרה',
-      create: 'יצירת פגישה חדשה',
-      pending: 'בקשות לפגישה',
-      noPending: 'אין בקשות ממתינות לפגישה',
-      approve: 'אישור פגישה',
-      participants: 'משתתפים:',
-      onlineStatus: 'סטטוס זמינות',
-      onlineDesc: 'הפעל כדי להראות שאתה זמין לפגישות',
-      approved: 'פגישות מאושרות',
-      noApproved: 'אין פגישות מאושרות',
-      available: 'זמין עכשיו',
-      startMeeting: 'התחל פגישה',
-      startMeetingTitle: 'התחל פגישת וידאו',
-      videoLinkPlaceholder: 'הדבק קישור לZoom, Google Meet או פלטפורמה אחרת',
-      videoLinkHelp: 'הזן קישור לפגישת וידאו. המשתתפים יקבלו התראה עם הקישור.',
-      cancel: 'ביטול',
-      start: 'התחל פגישה',
-      starting: 'מתחיל...',
-      liveMeeting: 'פגישה פעילה',
-      joinVideo: 'הצטרף לוידאו',
-      openChat: "פתיחת צ'אט",
-      pendingStart: 'ממתין לאישורי הצטרפות',
-      joinMeeting: 'אישור הצטרפות',
-      ready: 'מוכן לצאת לדרך!',
-      globalOnline: 'סטטוס זמינות כללי',
-      meetingOnline: 'זמין לפגישה זו',
-      goldExplanation:
-        'פגישת זהב היא פגישה ללא תאריך מוגדר מראש, זמן הפגישה נקבע בזמן הזהב - הזמן שבו כל המשתתפים זמינים בו זמנית.',
-      goldMagic:
-        'בכדי שהקסם יקרה יש לעדכן סטטוס לזמין בכל פעם שיש לך זמן לפגישה, כאן למעלה או דרך הבוט שלנו בטלגרם.'
-    },
-    en: {
-      title: 'Magic Meetings',
-      subtitle: 'Where time meets purpose',
-      create: 'Create New Meeting',
-      pending: 'Meeting Requests',
-      noPending: 'No pending meeting requests',
-      approve: 'Approve Meeting',
-      participants: 'Participants:',
-      onlineStatus: 'Availability Status',
-      onlineDesc: 'Enable to show you are available for meetings',
-      approved: 'Approved Meetings',
-      noApproved: 'No approved meetings',
-      available: 'Available Now',
-      startMeeting: 'Start Meeting',
-      startMeetingTitle: 'Start Video Meeting',
-      videoLinkPlaceholder:
-        'Paste a link to Zoom, Google Meet or another platform',
-      videoLinkHelp:
-        'Enter a video meeting link. Participants will receive a notification with the link.',
-      cancel: 'Cancel',
-      start: 'Start Meeting',
-      starting: 'Starting...',
-      liveMeeting: 'Live Meeting',
-      joinVideo: 'Join Video',
-      openChat: 'Open Chat',
-      pendingStart: 'Waiting for participants',
-      joinMeeting: 'Join Meeting',
-      ready: 'Ready to go!',
-      globalOnline: 'Global Availability',
-      meetingOnline: 'Available for this meeting',
-      goldExplanation:
-        'A Gold Meeting is a meeting without a predefined date. The timing is set during the "Golden window" when all participants are available simultaneously.',
-      goldMagic:
-        "For the magic to happen, update your status whenever you're available, either here or via our Telegram bot."
-    }
-  };
-
-  let t = $derived(titles[$lang] || titles.he);
 </script>
 
 <svelte:head>
@@ -449,10 +377,10 @@
       class="font-bold text-5xl md:text-7xl mb-4 pb-4 text-transparent bg-clip-text bg-colorfulGrad bg-[length:200%_auto] animate-gradientx drop-shadow-[0_2px_10px_rgba(255,255,255,0.3)] sticky z-70"
       style=" font-weight: bold; font-size: 3rem;"
     >
-      {t.title}
+      {$t('pages.meetings.title')}
     </h2>
     <p class="text-xl text-gray-200 font-light relative z-10 drop-shadow-md">
-      {t.subtitle}
+      {$t('pages.meetings.subtitle')}
     </p>
 
     <!-- Gold Meeting Explanation -->
@@ -461,11 +389,11 @@
     >
       <div class="flex items-center gap-2 text-pink-300 font-bold mb-1">
         <span>✨</span>
-        <span>{t.goldExplanation}</span>
+        <span>{$t('pages.meetings.goldExplanation')}</span>
       </div>
       <div class="flex items-center gap-2 text-purple-300 leading-relaxed">
         <span>🪄</span>
-        <span>{t.goldMagic}</span>
+        <span>{$t('pages.meetings.goldMagic')}</span>
       </div>
     </div>
 
@@ -479,7 +407,7 @@
             ? 'text-green-400'
             : 'text-gray-400'}"
         >
-          {t.globalOnline}
+          {$t('pages.meetings.globalOnline')}
         </span>
         <OnlineSwitch bind:checked={$isOnline} onChange={toggleGlobalOnline} />
       </div>
@@ -495,7 +423,7 @@
         class="flex justify-between items-center mb-6 border-b border-pink-500/30 pb-2"
       >
         <h2 class="text-2xl font-bold text-pink-300">
-          {t.create}
+          {$t('pages.meetings.create')}
         </h2>
         {#if creating}
           <button
@@ -519,13 +447,13 @@
           >
             <span class="text-4xl">✨</span>
           </div>
-          <p class="text-center text-gray-300 max-w-xs">{t.subtitle}</p>
+          <p class="text-center text-gray-300 max-w-xs">{$t('pages.meetings.subtitle')}</p>
           <button
             class="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:-translate-y-1 hover:shadow-pink-500/50 flex items-center gap-2"
             onclick={() => (creating = true)}
           >
             <span>+</span>
-            {t.create}
+            {$t('pages.meetings.create')}
           </button>
         </div>
       {/if}
@@ -540,12 +468,12 @@
         <h2
           class="text-2xl font-bold mb-6 text-green-300 border-b border-green-500/30 pb-2 inline-block"
         >
-          {t.approved}
+          {$t('pages.meetings.approved')}
         </h2>
 
         {#if Object.values($meetingsData).length === 0}
           <div class="text-center py-6 text-gray-500">
-            <p>{t.noApproved}</p>
+            <p>{$t('pages.meetings.noApproved')}</p>
           </div>
         {:else}
           <div class="space-y-4">
@@ -562,7 +490,7 @@
                   >
                     <span class="w-2 h-2 bg-white rounded-full animate-ping"
                     ></span>
-                    {t.available}
+                    {$t('pages.meetings.available')}
                   </div>
                 {/if}
 
@@ -586,7 +514,7 @@
                   <div class="mt-3 flex flex-wrap gap-2 items-center">
                     <span
                       class="text-[10px] uppercase tracking-wider text-gray-500 font-bold"
-                      >{t.participants}</span
+                      >{$t('pages.meetings.participants')}</span
                     >
                     <div class="flex -space-x-2 overflow-hidden">
                       {#each meeting.attributes.pgishausers.data as puser}
@@ -653,7 +581,7 @@
                           ? 'text-green-400'
                           : 'text-gray-400'}"
                       >
-                        {t.meetingOnline}
+                        {$t('pages.meetings.meetingOnline')}
                       </span>
                       <div class="scale-90 origin-right">
                         <OnlineSwitch
@@ -670,7 +598,7 @@
                           class="bg-red-500/20 text-red-400 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 animate-pulse"
                         >
                           <span class="w-2 h-2 bg-red-500 rounded-full"></span>
-                          {t.liveMeeting}
+                          {$t('pages.meetings.liveMeeting')}
                         </div>
                         <a
                           href={meeting.attributes.videoLink}
@@ -679,7 +607,7 @@
                           class="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white text-sm font-bold py-2 px-4 rounded-full shadow-lg transform transition hover:-translate-y-1 hover:shadow-blue-500/30 flex items-center gap-2"
                         >
                           <span>🎥</span>
-                          {t.joinVideo}
+                          {$t('pages.meetings.joinVideo')}
                         </a>
                         <button
                           class="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white text-sm font-bold py-2 px-4 rounded-full shadow-lg transform transition hover:-translate-y-1 hover:shadow-purple-500/30 flex items-center gap-2"
@@ -688,7 +616,7 @@
                           }}
                         >
                           <span>💬</span>
-                          {t.openChat}
+                          {$t('pages.meetings.openChat')}
                         </button>
                       </div>
                     {:else if meeting.attributes.pendingStart}
@@ -699,7 +627,7 @@
                         >
                           <span class="w-2 h-2 bg-yellow-500 rounded-full"
                           ></span>
-                          {t.pendingStart}
+                          {$t('pages.meetings.pendingStart')}
                           {#if meeting.readyCount !== undefined}
                             ({meeting.readyCount}/{meeting.totalCount})
                           {/if}
@@ -709,7 +637,7 @@
                             class="bg-green-500/20 text-green-400 text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-2 border border-green-500/30"
                           >
                             <span>✅</span>
-                            {t.ready}
+                            {$t('pages.meetings.ready')}
                           </div>
                         {:else}
                           <button
@@ -724,7 +652,7 @@
                             {:else}
                               <span>✋</span>
                             {/if}
-                            {t.joinMeeting}
+                            {$t('pages.meetings.joinMeeting')}
                           </button>
                         {/if}
                       </div>
@@ -736,7 +664,7 @@
                           onclick={() => openStartMeetingModal(meeting)}
                         >
                           <span>🚀</span>
-                          {t.startMeeting}
+                          {$t('pages.meetings.startMeeting')}
                         </button>
                       </div>
                     {/if}
@@ -755,7 +683,7 @@
         <h2
           class="text-2xl font-bold mb-6 text-purple-300 border-b border-purple-500/30 pb-2 inline-block"
         >
-          {t.pending}
+          {$t('pages.meetings.pending')}
         </h2>
 
         {#if pending.length === 0}
@@ -763,7 +691,7 @@
             class="text-center py-12 text-gray-400 flex flex-col items-center"
           >
             <span class="text-6xl mb-4 opacity-50">✨</span>
-            <p>{t.noPending}</p>
+            <p>{$t('pages.meetings.noPending')}</p>
           </div>
         {:else}
           <div class="space-y-6">
@@ -819,7 +747,7 @@
                     {:else}
                       <span>✓</span>
                     {/if}
-                    {t.approve}
+                    {$t('pages.meetings.approve')}
                   </button>
                 </div>
               </div>
@@ -870,7 +798,7 @@
           <span class="text-3xl">🎥</span>
         </div>
         <h3 class="text-2xl font-bold text-white mb-2">
-          {t.startMeetingTitle}
+          {$t('pages.meetings.startMeetingTitle')}
         </h3>
         {#if selectedMeetingForStart}
           <p class="text-green-300 font-medium">
@@ -893,7 +821,7 @@
               id="video-link-input"
               type="url"
               bind:value={videoLinkInput}
-              placeholder={t.videoLinkPlaceholder}
+              placeholder={$t('pages.meetings.videoLinkPlaceholder')}
               class="w-full px-4 py-3 bg-gray-800/80 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
               dir="ltr"
             />
@@ -907,7 +835,7 @@
             </div>
           </div>
           <p class="text-xs text-gray-500 mt-2">
-            {t.videoLinkHelp}
+            {$t('pages.meetings.videoLinkHelp')}
           </p>
         </div>
 
@@ -947,7 +875,7 @@
           onclick={closeStartMeetingModal}
           disabled={startingMeeting}
         >
-          {t.cancel}
+          {$t('pages.meetings.cancel')}
         </button>
         <button
           class="flex-1 py-3 px-6 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold shadow-lg shadow-green-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
@@ -958,10 +886,10 @@
             <span
               class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"
             ></span>
-            {t.starting}
+            {$t('pages.meetings.starting')}
           {:else}
             <span>🚀</span>
-            {t.start}
+            {$t('pages.meetings.start')}
           {/if}
         </button>
       </div>

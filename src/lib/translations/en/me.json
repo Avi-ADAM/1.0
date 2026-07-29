@@ -1,3 +1,23 @@
 {
-    "title": "How many agreements we accepted from each place"
+  "title": "How many agreements we accepted from each place",
+  "guide": {
+    "header": "Show User Guide",
+    "text": "Would you like to see the user guide?",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "identity": {
+    "title": "Your cryptographic identity",
+    "explainer": "This site generates a digital signing key for you that lives only in your browser. The server never holds a copy. Once it is set up, every meaningful action you take (vote, approve, join) is signed by you — and even we cannot forge it.",
+    "status": "Status",
+    "fingerprint": "Fingerprint",
+    "fullKey": "Show full key",
+    "hideKey": "Hide",
+    "algo": "Algorithm",
+    "createdAt": "Created at",
+    "signedEvents": "Your signed events",
+    "retry": "Retry",
+    "backToMe": "Back to profile",
+    "nothing": "— no data —"
+  }
 }

@@ -8,7 +8,7 @@
   import { page } from '$app/state';
   import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang.js';
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { reconstructMissionChains, reconstructResourceChains } from '$lib/utils/reconstructChains.js';
   import { reconstructSaleChains } from '$lib/utils/processLifecycle';
@@ -59,50 +59,6 @@
   let activeItems = $derived(items.filter((item) => !config.archived(item.entity.attributes ?? {})));
   let archivedItems = $derived(items.filter((item) => config.archived(item.entity.attributes ?? {})));
 
-  const typeLabels = {
-    he: {
-      pendm: 'משימות ממתינות', openMission: 'משימות פתוחות', ask: 'בקשות הצטרפות',
-      betahalich: 'משימות בביצוע', act: 'מטלות', finiapruval: 'אשרורי סיום',
-      finnished: 'משימות שהושלמו', pmash: 'משאבים ממתינים', openMashaabim: 'משאבים פתוחים',
-      askm: 'הצעות אספקה', maap: 'אספקות בתהליך', rikmash: 'משאבים שהתקבלו',
-      matanot: 'מוצרים', sale: 'מכירות'
-    },
-    en: {
-      pendm: 'Pending missions', openMission: 'Open missions', ask: 'Join requests',
-      betahalich: 'Missions in progress', act: 'Tasks', finiapruval: 'Finish approvals',
-      finnished: 'Completed missions', pmash: 'Pending resources', openMashaabim: 'Open resources',
-      askm: 'Supply proposals', maap: 'Deliveries in progress', rikmash: 'Received resources',
-      matanot: 'Products', sale: 'Sales'
-    },
-    ar: {
-      pendm: 'مهام معلقة', openMission: 'مهام مفتوحة', ask: 'طلبات انضمام',
-      betahalich: 'مهام قيد التنفيذ', act: 'مهام صغيرة', finiapruval: 'موافقات إنهاء',
-      finnished: 'مهام مكتملة', pmash: 'موارد معلقة', openMashaabim: 'موارد مفتوحة',
-      askm: 'عروض توريد', maap: 'توريدات قيد التنفيذ', rikmash: 'موارد مستلمة',
-      matanot: 'منتجات', sale: 'مبيعات'
-    }
-  };
-
-  const i18n = {
-    he: {
-      active: 'פעילים', archived: 'ארכיון', empty: 'אין אובייקטים מסוג זה בפרויקט',
-      process: 'לעמוד התהליך', unknownType: 'סוג אובייקט לא מוכר', loading: 'טוען…',
-      error: 'שגיאה בטעינת הנתונים', backProcesses: 'לכל התהליכים'
-    },
-    en: {
-      active: 'Active', archived: 'Archive', empty: 'No objects of this type in the project',
-      process: 'Process page', unknownType: 'Unknown object type', loading: 'Loading…',
-      error: 'Failed to load data', backProcesses: 'All processes'
-    },
-    ar: {
-      active: 'نشطة', archived: 'أرشيف', empty: 'لا توجد كائنات من هذا النوع في المشروع',
-      process: 'صفحة العملية', unknownType: 'نوع كائن غير معروف', loading: 'جارٍ التحميل…',
-      error: 'فشل تحميل البيانات', backProcesses: 'كل العمليات'
-    }
-  };
-  let t = $derived(i18n[$lang] ?? i18n.en);
-  let labels = $derived(typeLabels[$lang] ?? typeLabels.en);
-
   function formatDate(value) {
     if (!value) return '';
     try {
@@ -117,12 +73,12 @@
 </script>
 
 <svelte:head>
-  <title>{labels[type] ?? type} · 1lev1</title>
+  <title>{$t(`moach.objectTypes.${type}`) ?? type} · 1lev1</title>
 </svelte:head>
 
 <div class="oi" dir={$isRtl ? 'rtl' : 'ltr'}>
   <div class="oi-nav">
-    <a class="oi-back" href={`/moach/${projectId}/processes`}>{t.backProcesses}</a>
+    <a class="oi-back" href={`/moach/${projectId}/processes`}>{$t('moach.objectList.backProcesses')}</a>
   </div>
 
   <div class="oi-chips">
@@ -132,26 +88,26 @@
         class:oi-chip--active={key === type}
         href={`/moach/${projectId}/object/${key}`}
       >
-        {labels[key]}
+        {$t(`moach.objectTypes.${key}`)}
       </a>
     {/each}
   </div>
 
   {#if loading}
-    <div class="oi-state"><Lowding /><p class="oi-state-sub">{t.loading}</p></div>
+    <div class="oi-state"><Lowding /><p class="oi-state-sub">{$t('moach.objectList.loading')}</p></div>
   {:else if !config}
-    <div class="oi-state"><p class="oi-state-title">{t.unknownType}</p><code class="oi-id">{type}</code></div>
+    <div class="oi-state"><p class="oi-state-title">{$t('moach.objectList.unknownType')}</p><code class="oi-id">{type}</code></div>
   {:else if loadError}
-    <div class="oi-state"><p class="oi-state-title">{t.error}</p><code class="oi-id">{loadError}</code></div>
+    <div class="oi-state"><p class="oi-state-title">{$t('moach.objectList.error')}</p><code class="oi-id">{loadError}</code></div>
   {:else}
-    <h1 class="oi-title">{labels[type]}</h1>
+    <h1 class="oi-title">{$t(`moach.objectTypes.${type}`)}</h1>
 
     {#if items.length === 0}
-      <div class="oi-state"><p class="oi-state-sub">{t.empty}</p></div>
+      <div class="oi-state"><p class="oi-state-sub">{$t('moach.objectList.empty')}</p></div>
     {:else}
       {#each [{ key: 'active', list: activeItems }, { key: 'archived', list: archivedItems }] as section (section.key)}
         {#if section.list.length > 0}
-          <h2 class="oi-section">{section.key === 'active' ? t.active : t.archived} ({section.list.length})</h2>
+          <h2 class="oi-section">{section.key === 'active' ? $t('moach.objectList.active') : $t('moach.objectList.archived')} ({section.list.length})</h2>
           <ul class="oi-list" class:oi-list--archived={section.key === 'archived'}>
             {#each section.list as item ((item.chain.id ?? '') + '-' + item.entity.id)}
               {@const attrs = item.entity.attributes ?? {}}
@@ -163,7 +119,7 @@
                   <span class="oi-item-date">{formatDate(attrs.createdAt)}</span>
                 {/if}
                 <a class="oi-item-process" href={`/moach/${projectId}/processes/${item.chain.id}`}>
-                  {t.process}
+                  {$t('moach.objectList.process')}
                 </a>
               </li>
             {/each}

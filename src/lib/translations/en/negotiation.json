@@ -66,7 +66,7 @@
   "back": "Back",
   "rounds": "Rounds",
   "finish_discussion": "Finish Discussion",
-  "next_round": "Round {{n}}",
+  "next_round": "Round {{count}}",
   "reset": "Reset",
   "error_loading": "Error loading discussion",
   "error_adding_position": "Error adding new position",
@@ -74,5 +74,7 @@
   "error_communication": "AI communication error",
   "error_generic": "Error",
   "discussion_not_found": "Discussion not found",
-  "loading": "Loading..."
+  "loading": "Loading...",
+  "anonymous": "Anonymous",
+  "discussion_created_by": "Discussion opened by"
 }

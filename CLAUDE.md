@@ -24,6 +24,8 @@ SvelteKit + Svelte 5 app, npm, Node 22.
 | `npm run types:update` | Regenerate GraphQL types after schema changes (`codegen` + `types:extract`). |
 | `npm run validate:qids` | Validate every qid in `qids.js` against the Strapi schema. |
 | `npm run check:proxy` | Proxy-security lint (see `docs/PLAN_PROXY_SECURITY.md`). |
+| `npm run check:i18n` | Verifies every `$t('ns.…')` is reachable on the routes that use it (see i18n section). |
+| `npm run check:script` | Flags words that mix alphabets (a Cyrillic `г` inside a Hebrew word, …). |
 
 Tests are colocated (`*.test.ts` / `*.integration.test.ts` / `*.pbt.test.ts`
 property-based via fast-check) and run on the `happy-dom`/`jsdom` environment.
@@ -104,6 +106,44 @@ query ids ("QIDS") live in `src/routes/api/send/qids.js`.
 > real types instead of inventing them.
 
 ---
+
+## i18n — `$t()` + JSON namespaces
+
+All UI text lives in `src/lib/translations/<locale>/<namespace>.json` (he, en,
+ar, ru, es) and is read with `$t('namespace.key')`. A `{ he: …, en: … }` object
+inside a component is a regression — the only correct multi-locale objects are
+the ones indexed by the *recipient's* language (server notification payloads,
+action configs, `src/lib/components/mail/*`), which `$t()` cannot express.
+
+The loader table in `src/lib/translations/index.js` is **generated** from
+`routes.js`: every locale gets the same namespace list and the same route gate.
+Most namespaces load globally; the ones in `ROUTED` are fetched only on the
+routes listed there.
+
+> Four ways `$t()` silently renders **nothing** — no warning, no crash, and both
+> `svelte-check` and key-parity checks pass:
+> 1. the namespace isn't loaded on the current route (the key does exist in the
+>    JSON — it was just never fetched);
+> 2. the store is used as a dictionary, `t[key]` / `t.foo`, which is what a
+>    deleted `const t = { he: …, en: … }` leaves behind when its lookups stay;
+> 3. a placeholder written `{name}` — the default parser only substitutes
+>    `{{name}}`, so the user reads the placeholder itself;
+> 4. a placeholder name shorter than two characters. `{{n}}` cannot be matched
+>    by the parser's key regex, so it resolves to the empty default. Use
+>    `{{count}}`.
+>
+> `npm run check:i18n` catches all four. Run it after moving a component between
+> routes, after removing an inline dictionary, or after adding an interpolation.
+
+Interpolation is `$t('ns.key', { count })` against `"… {{count}} …"`. A few
+older call sites substitute by hand instead — `$t(k).replace('{restime}', v)` —
+and the checker allows a single-brace placeholder when a matching `.replace()`
+exists.
+
+Hebrew, Arabic and Cyrillic have look-alike letters, and a bad bulk edit leaves
+one alphabet's glyph inside another's word (`מפгש`, `ליוوي`, `pתוח`). It renders
+as garbage and reorders the RTL run, and no other check sees it —
+`npm run check:script` does.
 
 ## Money / revenue domain (site-share)
 

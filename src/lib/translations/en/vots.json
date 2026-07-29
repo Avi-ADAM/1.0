@@ -1,0 +1,13 @@
+{
+  "totalin": "total votes in favor",
+  "notyet": "not voted yet",
+  "totalno": "total votes against",
+  "inFavor": "in favor",
+  "against": "not in favor",
+  "votedOn": "voted only on other versions",
+  "voteDetail": {
+    "back": "→ All project votes",
+    "closed": "This vote is resolved — thanks for taking part!",
+    "missing": "This item was not found or has already been archived."
+  }
+}

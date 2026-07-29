@@ -1,8 +1,9 @@
 <script>
+  import { t } from '$lib/translations';
 	import  RichText from '$lib/celim/ui/richText.svelte';
   import Share from '$lib/components/share/shareButtons/index.svelte';
   import Tile from '$lib/celim/tile.svelte';
-  import {lang} from '$lib/stores/lang'
+  import { lang } from '$lib/stores/lang'
   let isonly = $state(false);
    import { onMount } from 'svelte';
   import { langAdjast } from '$lib/func/langAdjast.svelte';
@@ -41,26 +42,7 @@ function edit (id) {
 function hover(){
     
 }
-const om = {
-    "he": "משימה פתוחה",
-    "en": "open mission"
-}
-const requireSkills = {
-    "he": "כישורים נדרשים:",
-    "en": "required skills:"
-}
-const seePr = {
-    "he": "לצפיה בדף המשימה",
-    "en": "View Mission Page"
-}
-const requiredRoles = {
-    "he": "תפקידים נדרשים:",
-    "en": "required roles:"
-}
-const requiredWW = {
-    "he":"דרכי עבודה מבוקשות:",
-    "en":"ways of work for the mission:"
-    }
+
     let wid = $state()
     </script>
 
@@ -93,7 +75,7 @@ bg-gray-700">
     {/if}
      <p style="line-height: 1;" class="text-sm text-gray-100 flex items-center lg:text-2xl m-5">
         <img  class="w-12 lg:w-24"  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-        <span onmouseenter={()=>hover({"he":"שווי לשעה","en":"vallue per hour"})} onmouseleave={()=>hover("0")} > {data.perhour.toLocaleString('en-US', {maximumFractionDigits:2})} לשעה </span> * <span onmouseenter={()=>hover({"he":"כמות השעות", "en":"amount of hours"})} onmouseleave={()=>hover("0")}  > {data.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span onmouseenter={()=>hover({"he":"סך הכל","en": "total"})} onmouseleave={()=>hover("0")}>{(data.noofhours * data.perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
+        <span onmouseenter={()=>hover($t('common.valph'))} onmouseleave={()=>hover("0")} > {data.perhour.toLocaleString('en-US', {maximumFractionDigits:2})} לשעה </span> * <span onmouseenter={()=>hover($t('common.noofhours'))} onmouseleave={()=>hover("0")}  > {data.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span onmouseenter={()=>hover($t('lev.cards.voteCard.inTotal'))} onmouseleave={()=>hover("0")}>{(data.noofhours * data.perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
     </p>
        {#if data.acts.data.length > 0}
                           <ul>
@@ -111,28 +93,28 @@ bg-gray-700">
                         {/if}
                    
     {#if data.skills.data.length > 0}
-    <small class="text-barbi text-sm lg:text-2xl">{requireSkills[$lang]}</small>
+    <small class="text-barbi text-sm lg:text-2xl">{$t('project.newOpn.requireSkills')}</small>
     <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 lg:p-4 ">
         {#each data.skills.data as skill}
         <p 
-        onmouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} 
+        onmouseenter={()=>hover($t('lev.cards.common.skneed'))} 
         onmouseleave={()=>hover("0")}  >
             <Tile sm={wid > 555 ? true : false} big={wid > 555 ? true : false}  pink={true} word={skill.attributes.skillName}/></p>
                 {/each}
                 </div>
                 {/if}
                 {#if data.tafkidims.data.length > 0}  
-                <small class="text-sm text-barbi lg:text-2xl">{requiredRoles[$lang]}</small>
+                <small class="text-sm text-barbi lg:text-2xl">{$t('project.newOpn.requiredRoles')}</small>
                 <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle d  cd p-2">
                     {#each data.tafkidims.data as rol}
-                    <p onmouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
+                    <p onmouseenter={()=>hover($t('lev.cards.common.rneed'))} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
     <Tile sm={wid > 555 ? true : false} big={wid > 555 ? true : false}  word={rol.attributes.roleDescription} wow={true}/></p>{/each}
       </div>
       {/if}
-      {#if data.work_ways.data.length > 0}  <small class="text-sm lg:text-2xl text-barbi">{requiredWW[$lang]}</small>
+      {#if data.work_ways.data.length > 0}  <small class="text-sm lg:text-2xl text-barbi">{$t('project.newOpn.requiredWW')}</small>
       <div class="border border-gold flex sm:flex-row flex-wrap lg:p-4 justify-center align-middle d cd p-2 ">
           {#each data.work_ways.data as rol}
-          <p onmouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
+          <p onmouseenter={()=>hover($t('lev.cards.common.wwneed'))} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
               <Tile bg="gold" sm={wid > 555 ? true : false} big={wid > 555 ? true : false} word={rol.attributes.workWayName}/>
           </p>
           {/each}
@@ -153,15 +135,15 @@ bg-gray-700">
                   rel="noopener noreferrer"
                   class="bg-gold hover:bg-barbi text-gray-900 font-bold py-2 px-4 rounded-lg text-center transition-colors duration-200 shadow-md hover:shadow-lg"
                 >
-                  {seePr[$lang]}
+                  {$t('project.newOpn.seePr')}
                 </a>
                 
                 <Share
                 slug="{"/availableMission/"+datai.id}"
-	 title="{title[$lang]}"
+	 title="{$t('project.newOpn.title', { name: data.name, projectName })}"
      desc="its new thing"
      hashtags={['1💗1','consensus']}
-	 quote="{title[$lang]}"
+	 quote="{$t('project.newOpn.title', { name: data.name, projectName })}"
 	 related={[]}
 	 via={''}
 	 />

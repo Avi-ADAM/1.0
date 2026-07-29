@@ -1,5 +1,5 @@
 ﻿<script>
-  import { locale, isRtl } from '$lib/translations';
+  import { locale, isRtl, t } from '$lib/translations';
   /**
    * SplitsArchive — M5 comprehensive distribution archive (PLAN_SITE_SHARE_PER_MEMBER §6).
    *
@@ -24,67 +24,6 @@
   let data = $state(null);
   let loading = $state(true);
   let expanded = $state({}); // splitId -> bool
-
-  const i18n = {
-    he: {
-      summary: 'סיכום חלוקות לאורך זמן',
-      totalDistributed: 'סך הכל חולק',
-      splits: 'חלוקות',
-      allSplits: 'כל החלוקות',
-      whoGot: 'מי קיבל כמה',
-      open: 'פתוחה',
-      finished: 'הושלמה',
-      transfers: 'העברות',
-      giver: 'נותן',
-      receiver: 'מקבל',
-      due: 'מגיע',
-      actual: 'בפועל',
-      gave: 'נתן',
-      got: 'קיבל',
-      empty: 'עדיין לא היו חלוקות בריקמה.',
-      anon: 'ללא שם',
-      participated: 'חלוקות'
-    },
-    en: {
-      summary: 'Distribution summary over time',
-      totalDistributed: 'Total distributed',
-      splits: 'splits',
-      allSplits: 'All splits',
-      whoGot: 'Who got how much',
-      open: 'Open',
-      finished: 'Done',
-      transfers: 'transfers',
-      giver: 'gives',
-      receiver: 'gets',
-      due: 'Due',
-      actual: 'Actual',
-      gave: 'gave',
-      got: 'got',
-      empty: 'No splits in the rikma yet.',
-      anon: 'Unnamed',
-      participated: 'splits'
-    },
-    ar: {
-      summary: 'ملخّص التوزيعات عبر الزمن',
-      totalDistributed: 'إجمالي الموزّع',
-      splits: 'توزيعات',
-      allSplits: 'كل التوزيعات',
-      whoGot: 'من حصل وكم',
-      open: 'مفتوحة',
-      finished: 'مكتملة',
-      transfers: 'تحويلات',
-      giver: 'يُعطي',
-      receiver: 'يستلم',
-      due: 'مستحق',
-      actual: 'فعلي',
-      gave: 'أعطى',
-      got: 'استلم',
-      empty: 'لا توجد توزيعات في النسيج بعد.',
-      anon: 'بدون اسم',
-      participated: 'توزيعات'
-    }
-  };
-  let t = $derived(i18n[$lang] || i18n.en);
   let isHe = $derived($locale === 'he');
 
   const fmt = (n) => `₪${(Number(n) || 0).toLocaleString()}`;
@@ -131,24 +70,24 @@
   {#if hasSplits}
     <!-- All-time per-member summary -->
     <section class="bg-white p-6 rounded-xl shadow-sm" dir={$isRtl ? 'rtl' : 'ltr'}>
-      <h2 class="text-xl font-bold text-primary mb-3">{t.summary}</h2>
+      <h2 class="text-xl font-bold text-primary mb-3">{$t('project.splitsArchive.summary')}</h2>
       <div class="sa-total">
-        <span class="sa-total-label">{t.totalDistributed}</span>
+        <span class="sa-total-label">{$t('project.splitsArchive.totalDistributed')}</span>
         <span class="sa-total-value">{fmt(data.totalDistributed)}</span>
-        <span class="sa-total-meta">{data.splitsCount} {t.splits}</span>
+        <span class="sa-total-meta">{data.splitsCount} {$t('project.splitsArchive.splits')}</span>
       </div>
       <ul class="sa-list mt-4">
         {#each byMember as m (m.userId)}
           <li class="sa-row">
             <span class="sa-who">
               {#if m.pic}<img src={m.pic} alt="" class="sa-pic" />{/if}
-              <span>{m.username || t.anon}</span>
+              <span>{m.username || $t('project.splitsArchive.anon')}</span>
             </span>
             <span class="sa-amts">
               <b>{fmt(m.total)}</b>
-              {#if m.given > 0}<span class="sa-neg">{t.gave} {fmt(m.given)}</span>{/if}
-              {#if m.received > 0}<span class="sa-pos">{t.got} {fmt(m.received)}</span>{/if}
-              <span class="sa-muted">{m.splitsCount} {t.participated}</span>
+              {#if m.given > 0}<span class="sa-neg">{$t('project.splitsArchive.gave')} {fmt(m.given)}</span>{/if}
+              {#if m.received > 0}<span class="sa-pos">{$t('project.splitsArchive.got')} {fmt(m.received)}</span>{/if}
+              <span class="sa-muted">{m.splitsCount} {$t('project.splitsArchive.participated')}</span>
             </span>
           </li>
         {/each}
@@ -157,7 +96,7 @@
 
     <!-- Per-split list -->
     <section class="bg-white p-6 rounded-xl shadow-sm" dir={$isRtl ? 'rtl' : 'ltr'}>
-      <h2 class="text-xl font-bold text-primary mb-3">{t.allSplits}</h2>
+      <h2 class="text-xl font-bold text-primary mb-3">{$t('project.splitsArchive.allSplits')}</h2>
       <div class="space-y-2">
         {#each splits as s (s.id)}
           <div class="sa-split">
@@ -170,7 +109,7 @@
                 <span class="sa-chev" class:open={expanded[s.id]} aria-hidden="true">▾</span>
                 <span class="sa-split-name">{s.name || `#${s.id}`}</span>
                 <span class="sa-badge" class:done={s.finished}>
-                  {s.finished ? t.finished : t.open}
+                  {s.finished ? $t('project.splitsArchive.finished') : $t('project.splitsArchive.open')}
                 </span>
               </span>
               <span class="sa-split-meta">
@@ -186,28 +125,28 @@
                     <div class="sa-alloc-head">
                       <span class="sa-who">
                         {#if a.pic}<img src={a.pic} alt="" class="sa-pic" />{/if}
-                        <span>{a.username || t.anon}</span>
-                        {#if a.isNoten}<span class="sa-tag">{t.giver}</span>
-                        {:else if a.isMekabel}<span class="sa-tag get">{t.receiver}</span>{/if}
+                        <span>{a.username || $t('project.splitsArchive.anon')}</span>
+                        {#if a.isNoten}<span class="sa-tag">{$t('project.splitsArchive.giver')}</span>
+                        {:else if a.isMekabel}<span class="sa-tag get">{$t('project.splitsArchive.receiver')}</span>{/if}
                       </span>
                       <span class="sa-figs">
                         <span class="sa-fig">
-                          <span class="sa-fig-l">{t.due}</span>
+                          <span class="sa-fig-l">{$t('project.splitsArchive.due')}</span>
                           <span>{fmt(a.amount)}</span>
                         </span>
                         <span class="sa-fig">
-                          <span class="sa-fig-l">{t.actual}</span>
+                          <span class="sa-fig-l">{$t('project.splitsArchive.actual')}</span>
                           <b class="sa-fig-actual">{fmt(a.actual)}</b>
                         </span>
                         {#if a.noten > 0}
                           <span class="sa-fig">
-                            <span class="sa-fig-l">{t.gave}</span>
+                            <span class="sa-fig-l">{$t('project.splitsArchive.gave')}</span>
                             <span class="sa-neg">{fmt(a.noten)}</span>
                           </span>
                         {/if}
                         {#if a.meca > 0}
                           <span class="sa-fig">
-                            <span class="sa-fig-l">{t.got}</span>
+                            <span class="sa-fig-l">{$t('project.splitsArchive.got')}</span>
                             <span class="sa-pos">{fmt(a.meca)}</span>
                           </span>
                         {/if}
@@ -225,7 +164,7 @@
               </ul>
               {#if s.transferCount > 0}
                 <div class="sa-transfers">
-                  {s.confirmedTransferCount}/{s.transferCount} {t.transfers}
+                  {s.confirmedTransferCount}/{s.transferCount} {$t('project.splitsArchive.transfers')}
                 </div>
               {/if}
             {/if}
@@ -235,7 +174,7 @@
     </section>
   {:else if data}
     <section class="bg-white p-6 rounded-xl shadow-sm">
-      <p class="text-sm text-gray-400">{t.empty}</p>
+      <p class="text-sm text-gray-400">{$t('project.splitsArchive.empty')}</p>
     </section>
   {/if}
 

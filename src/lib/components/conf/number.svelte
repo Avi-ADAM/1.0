@@ -2,7 +2,7 @@
 
     import RangeSlider from "svelte-range-slider-pips";
     import Barb from './barb.svelte'
-    import tr from '$lib/translations/tr.json'
+  import { t } from '$lib/translations';
 
 
   import Close from '$lib/celim/close.svelte';
@@ -41,7 +41,7 @@ function commitEdit() {
     checkAll(number, numberb)
     updateDatai()
   } else {
-    alert(tr.common.noLesFromZero[$lang])
+    alert($t('common.noLesFromZero'))
   }
 }
 function checkAll(a,b){
@@ -52,14 +52,14 @@ function checkAll(a,b){
 function updateDatai() {
   const oldValues = old ?? [];
   const items = [
-    { leb: `${tr?.nego?.new[$lang]},${numberb}`, value: Number(numberb) },
-    { leb: `${tr?.nego?.original[$lang]},${number}`, value: Number(number) }
+    { leb: `${$t('nego.new')},${numberb}`, value: Number(numberb) },
+    { leb: `${$t('nego.original')},${number}`, value: Number(number) }
   ];
   if (oldValues.length > 0) {
     for (let i = 0; i < oldValues.length; i++) {
       console.log(oldValues[i]);
       if (oldValues[i] != null) {
-        items.push({ value: Number(oldValues[i]), leb: `${tr?.nego?.oldno[$lang]}-${i + 1},${oldValues[i]}` });
+        items.push({ value: Number(oldValues[i]), leb: `${$t('nego.oldno')}-${i + 1},${oldValues[i]}` });
       }
     }
   }
@@ -76,7 +76,7 @@ $effect.pre(() => {
         <h2 class="underline decoration-mturk">{lebel}: <span class:line-through={splebel == false}
            class:text-barbi={splebel == false}
            class:text-wow={splebel == true}
-           class:hidden={splebel == null}>{tr?.mission.perMonth[$lang]}</span></h2>
+           class:hidden={splebel == null}>{$t('mission.perMonth')}</span></h2>
        {#if Number(number) === Number(numberb)} 
        <p class="text-gold">{number}</p>
        {:else}
@@ -94,16 +94,16 @@ $effect.pre(() => {
         <div class="flex flex-col items-center flex-wrap justify-center m-4">
         <button onclick={()=>show2 = false}><Close width={10} height={10}/></button>
         <div class="flex flex-row">
-        <small class:text-right={$lang == "he"}>{tr?.nego.original[$lang]}:</small>
+        <small class:text-right={$lang == "he"}>{$t('nego.original')}:</small>
         <p>{number}</p>
       </div>
       <div class="flex flex-row">
-        <small class:text-right={$lang == "he"} class="text-gold">{tr?.nego.sugestion[$lang]}:</small>
+        <small class:text-right={$lang == "he"} class="text-gold">{$t('nego.sugestion')}:</small>
         <p class="text-gold">{numberb}</p>
         </div>
         {#each old ?? [] as o, i}
         <div class="flex flex-row justify-center items-center">
-        <small class:text-right={$lang == "he"} class="text-gold p-4">{tr?.nego.oldno[$lang]}:{i+1}</small>
+        <small class:text-right={$lang == "he"} class="text-gold p-4">{$t('nego.oldno')}:{i+1}</small>
         <p class="text-gold">{o ?? number}</p></div>
         {/each}
         </div>

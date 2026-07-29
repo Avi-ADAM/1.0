@@ -1,5 +1,5 @@
 ﻿<script lang="ts">
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   /**
    * /me/identity — your cryptographic identity at a glance.
    *
@@ -23,25 +23,8 @@
   let showFullKey = $state(false);
   let signedEventCount = $state<number | null>(null);
 
-  const labels = {
-    title:         { he: 'הזהות הקריפטוגרפית שלך', en: 'Your cryptographic identity' },
-    explainer:     {
-      he: 'באתר קיים מנגנון שמייצר עבורך מפתח חתימה דיגיטלי הנשמר רק בדפדפן שלך. השרת לא מחזיק עותק. מרגע שהוא מוגדר, כל פעולה משמעותית (הצבעה, אישור, הצטרפות) נחתמת על ידך — ואפילו אנחנו לא יכולים לזייף אותה.',
-      en: 'This site generates a digital signing key for you that lives only in your browser. The server never holds a copy. Once it is set up, every meaningful action you take (vote, approve, join) is signed by you — and even we cannot forge it.'
-    },
-    status:        { he: 'סטטוס', en: 'Status' },
-    fingerprint:   { he: 'טביעת המפתח', en: 'Fingerprint' },
-    fullKey:       { he: 'הצג מפתח מלא', en: 'Show full key' },
-    hideKey:       { he: 'הסתר', en: 'Hide' },
-    algo:          { he: 'אלגוריתם', en: 'Algorithm' },
-    createdAt:     { he: 'נוצר ב', en: 'Created at' },
-    signedEvents:  { he: 'אירועים חתומים שלך', en: 'Your signed events' },
-    retry:         { he: 'נסה שוב', en: 'Retry' },
-    backToMe:      { he: 'חזרה לפרופיל', en: 'Back to profile' },
-    nothing:       { he: '— אין נתון —', en: '— no data —' }
-  };
 
-  const t = (key: keyof typeof labels) => labels[key][$lang === 'en' ? 'en' : 'he'] ?? labels[key].he;
+  const label = (key: string) => $t(`me.identity.${key}`);
 
   onMount(async () => {
     if (browser && page.data?.uid) {
@@ -72,36 +55,36 @@
 </script>
 
 <svelte:head>
-  <title>{t('title')} · 1lev1</title>
+  <title>{label('title')} · 1lev1</title>
 </svelte:head>
 
 <main class="mx-auto max-w-2xl p-4 md:p-8 text-zinc-800 dark:text-zinc-100" dir={$isRtl ? 'rtl' : 'ltr'}>
-  <a href="/me" class="text-sm text-zinc-500 hover:underline">← {t('backToMe')}</a>
+  <a href="/me" class="text-sm text-zinc-500 hover:underline">← {label('backToMe')}</a>
 
-  <h1 class="text-2xl font-bold mt-4 mb-2">{t('title')}</h1>
+  <h1 class="text-2xl font-bold mt-4 mb-2">{label('title')}</h1>
   <p class="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed mb-6">
-    {t('explainer')}
+    {label('explainer')}
   </p>
 
   <section class="rounded-xl border border-zinc-200 dark:border-zinc-700 p-4 md:p-5 space-y-4 bg-white/60 dark:bg-zinc-900/40">
 
     <div class="flex items-center justify-between gap-3 flex-wrap">
-      <span class="font-medium">{t('status')}</span>
+      <span class="font-medium">{label('status')}</span>
       <ConsentStatusBadge expanded lang={$lang === 'en' ? 'en' : 'he'} />
     </div>
 
     <div class="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2 text-sm">
-      <span class="text-zinc-500">{t('algo')}</span>
-      <span class="font-mono">{consentStatus.algo ?? t('nothing')}</span>
+      <span class="text-zinc-500">{label('algo')}</span>
+      <span class="font-mono">{consentStatus.algo ?? label('nothing')}</span>
 
-      <span class="text-zinc-500">{t('createdAt')}</span>
+      <span class="text-zinc-500">{label('createdAt')}</span>
       <span class="font-mono">
         {consentStatus.createdAt
           ? new Date(consentStatus.createdAt).toLocaleString($lang === 'en' ? 'en-US' : 'he-IL')
-          : t('nothing')}
+          : label('nothing')}
       </span>
 
-      <span class="text-zinc-500">{t('fingerprint')}</span>
+      <span class="text-zinc-500">{label('fingerprint')}</span>
       <span class="font-mono break-all">
         {#if consentStatus.devicePubB64}
           {showFullKey
@@ -112,15 +95,15 @@
             class="ms-2 text-emerald-600 hover:underline text-xs"
             onclick={() => (showFullKey = !showFullKey)}
           >
-            {showFullKey ? t('hideKey') : t('fullKey')}
+            {showFullKey ? label('hideKey') : label('fullKey')}
           </button>
         {:else}
-          {t('nothing')}
+          {label('nothing')}
         {/if}
       </span>
 
       {#if signedEventCount !== null}
-        <span class="text-zinc-500">{t('signedEvents')}</span>
+        <span class="text-zinc-500">{label('signedEvents')}</span>
         <span class="font-mono">{signedEventCount}</span>
       {/if}
     </div>
@@ -137,7 +120,7 @@
           onclick={retry}
           class="px-3 py-1.5 text-sm rounded-md bg-emerald-600 hover:bg-emerald-700 text-white"
         >
-          {t('retry')}
+          {label('retry')}
         </button>
       </div>
     {/if}

@@ -66,7 +66,7 @@
   "back": "عودة",
   "rounds": "جولات",
   "finish_discussion": "إنهاء النقاش",
-  "next_round": "الجولة {{n}}",
+  "next_round": "الجولة {{count}}",
   "reset": "إعادة ضبط",
   "error_loading": "خطأ في تحميل النقاش",
   "error_adding_position": "خطأ في إضافة موقف جديد",
@@ -74,5 +74,7 @@
   "error_communication": "خطأ في الاتصال بالذكاء الاصطناعي",
   "error_generic": "خطأ",
   "discussion_not_found": "النقاش غير موجود",
-  "loading": "جاري التحميل..."
+  "loading": "جاري التحميل...",
+  "anonymous": "مجهول",
+  "discussion_created_by": "فتح النقاش"
 }

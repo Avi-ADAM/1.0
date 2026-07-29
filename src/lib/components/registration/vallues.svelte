@@ -1,5 +1,5 @@
 <script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import ValueSelector from '$lib/components/ui/ValueSelector.svelte';
   import { userName } from '../../stores/store.js';
   import { lang } from '$lib/stores/lang.js';
@@ -85,33 +85,23 @@
     saveToStore();
     show.update((n) => n - 1);
     onProgres?.({ tx: 600, txx: 20 });
-  }
-
-  const what = {
-    he: 'אלו ערכים ומטרות ברצונך לקדם?',
-    en: 'which values you wish to promote?'
-  };
-  const info = {
-    he: 'כאשר העבודה שלך מגשימה את הערכים ומקדמת את המטרות שלך היא הופכת ליצירה מהנה, אנו נסייע לך לקדם את הערכים והמטרות שלך',
-    en: 'When your work aligns with your values and advances your goals, it becomes enjoyable creation. We will assist you in promoting your values and goals.'
-  };
-</script>
+  }</script>
 
 <div class="step-inner" dir={$isRtl ? 'rtl' : 'ltr'}>
-  <h2 class="step-title">{userName_value}&nbsp;{what[$lang]}</h2>
-  <p class="step-desc">{info[$lang]}</p>
+  <h2 class="step-title">{userName_value}&nbsp;{$t('reg.hello.whatValues')}</h2>
+  <p class="step-desc">{$t('reg.hello.valuesInfo')}</p>
   <div class="multi-wrap">
     <ValueSelector bind:selectedValues={selected} color="--gold" />
   </div>
   <div class="nav-row">
     <button class="btn-nav btn-back" onclick={back} disabled={show_value <= 1}>
-      {$lang === 'en' ? '← Back' : 'חזרה →'}
+      {$t('reg.back')}
     </button>
     <button class="btn-nav btn-skip" onclick={toend}>
-      {$lang === 'en' ? 'Skip' : 'דלג'}
+      {$t('reg.skip')}
     </button>
     <button class="btn-nav btn-next" onclick={increment}>
-      {$lang === 'en' ? 'Next →' : '← הבא'}
+      {$t('reg.next')}
     </button>
   </div>
 </div>

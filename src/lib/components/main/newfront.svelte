@@ -43,6 +43,13 @@
       locale.set('ru');
       document.cookie =
         `lang=${$lang}; expires=` + new Date(2027, 0, 1).toUTCString();
+    } else if (lan == 'es') {
+      doesLang.set(true);
+      langUs.set('es');
+      lang.set('es');
+      locale.set('es');
+      document.cookie =
+        `lang=${$lang}; expires=` + new Date(2027, 0, 1).toUTCString();
     }
     trans = false;
   }
@@ -75,12 +82,6 @@
   let projectsCount = $state(0);
   let membersCount = $state(0);
   let statsLoaded = $state(false);
-  let pageurl = {
-    ar: 'https://1lev1.com/ar',
-    en: 'https://1lev1.com/en',
-    he: 'https://1lev1.com/he',
-    ru: 'https://1lev1.com/ru'
-  };
   let size = $derived({
     width: w < 320 ? w : Math.min(w * 1.15, h * 1.5), // הגבל רוחב לפי יחס גובה
     height: w > 320 ? Math.min(h, w * 0.8) : h / 2 // הגבל גובה לפי יחס רוחב
@@ -136,7 +137,7 @@
   title={$t('home.meta.title')}
   description={$t('home.meta.description')}
   {image}
-  url={pageurl[$lang]}
+  url={$t('home.pageUrl')}
 />
 <!-- 
 	מבנה העמוד הראשי:
@@ -220,8 +221,16 @@
               >{$t('home.languages.ru')}</button
             >
           {/if}
+          {#if $lang != 'es'}
+            <button
+              onclick={() => change('es')}
+              title="Spanish"
+              class="text-barbi border border-lturk hover:text-gold bg-white text-center hover:bg-gray-50 px-2 py-0.5 rounded text-sm"
+              >{$t('home.languages.es')}</button
+            >
+          {/if}
         </div>
-        {#if $lang == 'he'}
+        {#if $isRtl}
           <a href="/about" class="text-sm font-bold text-barbi underline"
             >{$t('home.nav.about')}</a
           >
@@ -423,7 +432,7 @@
         >{changel['he']}</button
       >
     {/if}
-    {#if $lang == 'he'}
+    {#if $isRtl}
       <a
         class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5"
         title=" 1💗1 אודות "
@@ -436,7 +445,7 @@
     <a
       class="text-barbi border-2 border-lturk text-bold hover:text-gold text-center bg-gold hover:bg-barbi px-1 py-0.5"
       data-sveltekit-prefetch
-      href="/love">{mapa[$lang]}</a
+      href="/love">{$t('home.cta.agreementMap')}</a
     >
   {/if}
 </div>
@@ -499,7 +508,7 @@
         class="font-bold mt-3 sm:text-5xl text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_left,theme(colors.fuchsia.300),theme(colors.sky.400),theme(colors.barbi),theme(colors.mpink),theme(colors.barbi),theme(colors.sky.400),theme(colors.fuchsia.300))] overline decoration-mturk text-xl"
         style="text-shadow:none;"
       >
-        {setitle[$lang]}
+        {$t('home.setitle')}
       </h2>
 
       <h3
@@ -507,7 +516,7 @@
         style="font-family: Sababa, system-ui;text-shadow:none;"
       >
         <AnimatedHeadline
-          texts={desc[$lang]}
+          texts={$t('home.headlines')}
           wait={3000}
           fade={500}
           slide={300}
@@ -526,13 +535,13 @@
           class="text-xl sm:text-2xl mb-2 text-white font-semibold relative"
           style="font-family: 'Sababa', sans-serif;"
         >
-          {introQuestions[$lang].q1}
+          {$t('home.introQuestions.q1')}
         </p>
         <p
           class="text-xl sm:text-2xl text-white font-semibold relative"
           style="font-family: 'Sababa', sans-serif;"
         >
-          {introQuestions[$lang].q2}
+          {$t('home.introQuestions.q2')}
         </p>
       </div>
 
@@ -543,7 +552,7 @@
           sm={true}
           reverse={true}
           openi={true}
-          word={wordNew[$lang]}
+          word={$t('home.features.welcome')}
         />
         <Tile
           bg={'neww'}
@@ -551,7 +560,7 @@
           sm={true}
           reverse={true}
           openi={true}
-          word={word1[$lang]}
+          word={$t('home.features.createRikma')}
         />
         <Tile
           bg={'neww'}
@@ -559,7 +568,7 @@
           sm={true}
           reverse={true}
           openi={true}
-          word={word2[$lang]}
+          word={$t('home.features.joinRikma')}
         />
         <Tile
           bg={'neww'}
@@ -567,7 +576,7 @@
           sm={true}
           reverse={true}
           openi={true}
-          word={word3[$lang]}
+          word={$t('home.features.livelihood')}
         />
         <Tile
           bg={'neww'}
@@ -575,7 +584,7 @@
           sm={true}
           reverse={true}
           openi={true}
-          word={word4[$lang]}
+          word={$t('home.features.sharedManagement')}
         />
         <Tile
           bg={'neww'}
@@ -583,7 +592,7 @@
           sm={true}
           reverse={true}
           openi={true}
-          word={word5[$lang]}
+          word={$t('home.features.transparency')}
         />
         <Tile
           bg={'neww'}
@@ -591,7 +600,7 @@
           sm={true}
           reverse={true}
           openi={true}
-          word={word6[$lang]}
+          word={$t('home.features2.passiveIncome')}
         />
         <Tile
           bg={'neww'}
@@ -599,7 +608,7 @@
           sm={true}
           reverse={true}
           openi={true}
-          word={word7[$lang]}
+          word={$t('home.features2.ledger')}
         />
         <Tile
           bg={'neww'}
@@ -607,11 +616,8 @@
           sm={true}
           reverse={true}
           openi={true}
-          word={word8[$lang]}
+          word={$t('home.features2.sharingItems')}
         />-->
-<!-- <Tile bg={"neww"} big={true} sm={true} reverse={true} openi={true} word={word9[$lang]} />-->
-<!---   <Tile bg={'gold'} big={true} sm={true} word={word10[$lang]} />-->
-<!--<Tile bg={"pink"} big={true} sm={true} word={"<div>"+agree[$lang]+`<a style="color:var(--barbi-pink)" href="./love">`+agree2[$lang]+"</a>"+agree3[$lang]+"</div>"}/>-->
 <!---- </div>
       <div
         class="bg-gradient-to-br from-sky-400 via-mturk to-sky-400 px-4 py-3 mt-2 rounded-lg border-2 border-gold shadow-lg"
@@ -619,23 +625,23 @@
         {#if statsLoaded}
           <div class="text-center">
             <p class="text-white font-semibold text-lg mb-2" style="font-family: 'Sababa', sans-serif;">
-              {statsText[$lang].currently}
+              {$t('home.stats.currently')}
             </p>
             <div class="flex justify-center items-center gap-4 flex-wrap">
               <div class="bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
                 <div class="text-2xl font-bold text-gold">{projectsCount}</div>
-                <div class="text-white text-sm">{statsText[$lang].partnerships}</div>
+                <div class="text-white text-sm">{$t('home.stats.partnerships')}</div>
               </div>
               <div class="text-gold text-2xl">•</div>
               <div class="bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
                 <div class="text-2xl font-bold text-gold">{membersCount}</div>
-                <div class="text-white text-sm">{statsText[$lang].members}</div>
+                <div class="text-white text-sm">{$t('home.stats.members')}</div>
               </div>
             </div>
           </div>
         {:else}
           <div class="text-center text-white font-semibold" style="font-family: 'Sababa', sans-serif;">
-            {statsText[$lang].loading}
+            {$t('home.stats.loading')}
           </div>
         {/if}
       </div>
@@ -647,11 +653,11 @@
           style="text-shadow:none;"
           class="text-bold sm:text-2xl text-xl mx-6 text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_right,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]"
         >
-          {agree[$lang]}<a
+          {$t('home.cta.agree')}<a
             class="text-gold hover:text-lturk font-bold underline"
-            href="/love">{agree2[$lang]}</a
+            href="/love">{$t('home.cta.agreementMap')}</a
           >
-          {agree3[$lang]}
+          {$t('home.cta.agreeEnd')}
         </h2>
       </div>
     </div>
@@ -668,11 +674,11 @@
         onfocus={() => (btna = true)}
         onmouseover={() => (btna = true)}
         onmouseleave={() => (btna = false)}
-        >{login[$lang]}
+        >{$t('home.cta.login')}
         {#if btna == true && loadinga == false}
           <span class="mx-2 mb-0.5"
             ><Arrow
-              back={$lang == 'he' || $lang == 'ar' ? false : true}
+              back={!$isRtl}
               height="32"
               color={'var(--gold)'}
               fill="var(--barbi-pink)"
@@ -697,11 +703,11 @@
         onfocus={() => (btnb = true)}
         onmouseover={() => (btnb = true)}
         onmouseleave={() => (btnb = false)}
-        >{reg[$lang]}
+        >{$t('home.cta.register')}
         {#if btnb == true && loading == false}
           <span class="mx-2 mb-0.5"
             ><Arrow
-              back={$lang == 'he' || $lang == 'ar' ? false : true}
+              back={!$isRtl}
               height="32"
               color={'var(--gold)'}
               fill="var(--barbi-pink)"
@@ -724,7 +730,7 @@
     {#if $progress < 1}
       <div
         class="w-full h-full sm:h-screen flex flex-col items-center justify-end sm:justify-center"
-        title={loadingTitle[$lang]}
+        title={$t('home.loading.title')}
       >
         <img
           class="ani"

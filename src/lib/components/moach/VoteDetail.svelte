@@ -21,8 +21,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
-  import { lang } from '$lib/stores/lang.js';
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { socketClient } from '$lib/stores/socketClient';
   import { projects } from '$lib/stores/projectStore.js';
@@ -234,13 +233,6 @@
     if (id) goto(`/user/${id}`);
   };
   const noop = () => {};
-
-  const i18n = {
-    he: { back: '→ לכל ההצבעות בריקמה', closed: 'ההצבעה הוכרעה — תודה על ההשתתפות!', missing: 'הפריט לא נמצא או כבר הועבר לארכיון.' },
-    en: { back: '→ All project votes', closed: 'This vote is resolved — thanks for taking part!', missing: 'This item was not found or has already been archived.' },
-    ar: { back: '→ كل تصويتات المشروع', closed: 'تم حسم التصويت — شكراً لمشاركتك!', missing: 'العنصر غير موجود أو تمت أرشفته.' }
-  };
-  let t = $derived(i18n[$lang] || i18n.en);
 </script>
 
 <div class="vote-detail mx-auto max-w-xl px-3 py-4" dir={$isRtl ? 'rtl' : 'ltr'}>
@@ -248,7 +240,7 @@
     href={backHref}
     class="inline-block mb-4 text-sm text-blue-500 hover:underline"
   >
-    {t.back}
+    {$t('vots.voteDetail.back')}
   </a>
 
   {#if !browser || !mounted}
@@ -258,18 +250,18 @@
       class="rounded-2xl bg-white dark:bg-gray-800 shadow-lg p-8 text-center space-y-4"
     >
       <div class="text-4xl">✨</div>
-      <p class="text-lg font-bold text-gray-800 dark:text-gray-100">{t.closed}</p>
+      <p class="text-lg font-bold text-gray-800 dark:text-gray-100">{$t('vots.voteDetail.closed')}</p>
       <a
         href={backHref}
         class="inline-block px-5 py-2.5 bg-blue-500 text-white font-bold rounded-xl"
-        >{t.back}</a
+        >{$t('vots.voteDetail.back')}</a
       >
     </div>
   {:else if !buble}
     <div
       class="rounded-2xl bg-white dark:bg-gray-800 shadow-lg p-8 text-center text-gray-600 dark:text-gray-300"
     >
-      {t.missing}
+      {$t('vots.voteDetail.missing')}
     </div>
   {:else if kind === 'pmash'}
     <div class="vote-card-wrap mx-auto">

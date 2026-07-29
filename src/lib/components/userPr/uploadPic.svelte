@@ -1,5 +1,5 @@
 <script>
-  import { lang } from '$lib/stores/lang.js'
+  import { t } from '$lib/translations';
 
   /**
    * @property {(payload: MessagePayload) => void} [onMessage] - Callback for the message event.
@@ -19,10 +19,9 @@
     })
   };
     
- const up = {"he":"העלאת תמונה", "en": "upload picture"}
-const adj = {"he":"התאמת גודל התמונה", "en": "adjust picture size"}
-const cut = {"he":"לחתוך!","en": "cut!"}
-const re = {"he":"להתחיל הכל מהתחלה?", "en": "start over"}
+
+
+
 
 import { getFileFromUrl } from '$lib/components/ui/image-cropper';
 	import * as ImageCropper from '$lib/components/ui/image-cropper';
@@ -32,7 +31,7 @@ import { getFileFromUrl } from '$lib/components/ui/image-cropper';
 
 
 {#if noHeader == false}
-<h2 class="text-center text-barbi">{up[$lang]}</h2>
+<h2 class="text-center text-barbi">{$t('pages.editPic.up')}</h2>
 {/if}
 <div class="flex justify-center items-center">
 <ImageCropper.Root

@@ -1,0 +1,81 @@
+{
+  "searching": "מחפש התאמות...",
+  "selectAndAdd": "בחר והוסף",
+  "dismiss": "התעלם",
+  "addAnyway": "הוסף בכל זאת",
+  "tryAgain": "לנסות שוב",
+  "errorMsg": "אופס, משהו השתבש. כדאי לנסות שוב",
+  "richText": {
+    "paragraph": "<p>פסקה</p>",
+    "linkPrompt": "כתובת קישור",
+    "boldLetter": "ב",
+    "h1": "<h1>כותרת</h1>",
+    "h3": "<h3>כותרת משנית</h3>",
+    "list": "רשימה",
+    "numberedList": "1. רשימה",
+    "quote": "ציטוט",
+    "line": "קו מפריד"
+  },
+  "dateInput": {
+    "select": "בחירת תאריך"
+  },
+  "numberInput": {
+    "maxQuantityReached": "הגעת לכמות המקסימלית הזמינה",
+    "minQuantityReached": "הגעת לכמות המינימלית",
+    "cannotExceedAvailable": "לא ניתן לחרוג מהכמות הזמינה: {{max}}",
+    "cannotGoBelowZero": "לא ניתן לרדת מתחת לאפס"
+  },
+  "locationView": {
+    "online": "אונליין",
+    "onsite": "פיזי",
+    "hybrid": "היברידי",
+    "empty": "מיקום לא צוין",
+    "range": "טווח",
+    "km": "ק״מ",
+    "showMap": "הצג מפה",
+    "hideMap": "הסתר מפה",
+    "loadingMap": "טוען מפה…"
+  },
+  "input": {
+    "addImage": "הוספת תמונה",
+    "uploadingImage": "מעלה תמונה"
+  },
+  "consent": {
+    "badge": {
+      "signed": "מאומת",
+      "pending": "בהמתנה",
+      "unsigned": "ללא חתימה",
+      "unverified": "אימות נכשל"
+    },
+    "status": {
+      "idle": {
+        "label": "בהמתנה",
+        "help": "הזהות הקריפטוגרפית טרם נוצרה"
+      },
+      "creating": {
+        "label": "יוצר מפתח…",
+        "help": "מייצרים מפתח Ed25519 לא-נשלף"
+      },
+      "registering": {
+        "label": "רושם…",
+        "help": "מפרסם מפתח ציבורי לשרת המראה"
+      },
+      "ready": {
+        "label": "חתימה פעילה",
+        "help": "כל פעולה משמעותית שלך תיחתם קריפטוגרפית"
+      },
+      "local-only": {
+        "label": "מקומית בלבד",
+        "help": "מפתח קיים בדפדפן, השרת עוד לא קיבל אישור"
+      },
+      "unsupported": {
+        "label": "לא נתמך",
+        "help": "הדפדפן הזה לא תומך ב-WebCrypto / IndexedDB"
+      },
+      "error": {
+        "label": "שגיאה",
+        "help": "הזהות לא הופעלה — ראה פרטים בעמוד הזהות"
+      }
+    }
+  }
+}

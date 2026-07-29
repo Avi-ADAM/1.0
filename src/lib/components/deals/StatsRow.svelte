@@ -1,6 +1,6 @@
 <script lang="ts">
   import StatsCard from './StatsCard.svelte';
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import type { DashboardStats } from '$lib/types';
 
@@ -9,29 +9,29 @@
 
 <div class="row">
   <StatsCard
-    label={tr.deals.activeDeals[$lang]}
+    label={$t('deals.activeDeals')}
     value={stats.activeDeals}
-    sub={`<span style="color:#4ade80">↑ 1</span> ${tr.deals.fromLastMonth[$lang]}`}
+    sub={`<span style="color:#4ade80">↑ 1</span> ${$t('deals.fromLastMonth')}`}
     icon="⚡"
     variant="gold"
   />
   <StatsCard
-    label={tr.deals.totalPaid[$lang]}
+    label={$t('deals.totalPaid')}
     value="₪ {stats.totalPaid.toLocaleString()}"
-    sub="{tr.deals.outOf[$lang]} {stats.totalCost.toLocaleString()} ₪"
+    sub="{$t('deals.outOf')} {stats.totalCost.toLocaleString()} ₪"
     icon="₪"
   />
   <StatsCard
-    label={tr.deals.pendingApprovalTitle[$lang]}
+    label={$t('deals.pendingApprovalTitle')}
     value={stats.pendingApprovals}
-    sub={tr.deals.newItems[$lang]}
+    sub={$t('deals.newItems')}
     icon="⏳"
     variant="pink"
   />
   <StatsCard
-    label={tr.deals.completed[$lang]}
+    label={$t('deals.completed')}
     value={stats.completedDeals}
-    sub={tr.deals.fullProduct[$lang]}
+    sub={$t('deals.fullProduct')}
     icon="✓"
   />
 </div>

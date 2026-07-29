@@ -1,4 +1,5 @@
 <script>
+  import { t } from '$lib/translations';
   import ListSmall from '../forum/listSmall.svelte';
   import {
     forum,
@@ -7,7 +8,6 @@
     initialForum
   } from '$lib/stores/pendMisMes.js';
   import Diun from '../lev/diun.svelte';
-  import { lang } from '$lib/stores/lang';
   import { page } from '$app/state';
   import { createMessage } from '$lib/func/chat/createMessage.svelte';
   import { createForum } from '$lib/func/chat/createForum.svelte';
@@ -61,16 +61,6 @@
   let clicked = $state(false),
     ani = 'forum';
   console.log(messagesArray);
-  const er = {
-    he: 'אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ',
-    en: 'error: please try again, if the problem continue contact at baruch@1lev1.com'
-  };
-
-  const messs = {
-    he: 'הודעתך נשלחה בהצלחה',
-    en: 'your message was send succsefully'
-  };
-
   async function afreact(e) {
     const m = e.why;
     if ($nowChatId != -1) {
@@ -83,18 +73,16 @@
       if (c == 'sucsses') {
         clicked = false;
         console.log(clicked);
-        toast.success(`${messs[$lang]}`);
+        toast.success(`${$t('common.chat.sent')}`);
       } else {
-        toast.success(`${er[$lang]}`);
+        toast.success(`${$t('common.chat.error')}`);
         clicked = false;
       }
     } else {
       console.log(m);
-      let t = await createForum($newChat.md.pid, $newChat.md.mbId).then(
-        (t) => (t = t)
-      );
-      if (t != 'error') {
-        const forumId = t.data.createForum.data.id;
+      const forumRes = await createForum($newChat.md.pid, $newChat.md.mbId);
+      if (forumRes != 'error') {
+        const forumId = forumRes.data.createForum.data.id;
         console.log($forum[forumId], '55');
         $forum[forumId] = $forum[-1];
         $forum[-1] = {
@@ -110,22 +98,17 @@
         if (c == 'sucsses') {
           clicked = false;
           console.log(clicked);
-          toast.success(`${messs[$lang]}`);
+          toast.success(`${$t('common.chat.sent')}`);
         } else {
-          toast.warning(`${er[$lang]}`);
+          toast.warning(`${$t('common.chat.error')}`);
           clicked = false;
         }
       } else {
         console.error('error');
-        toast.warning(`${er[$lang]}`);
+        toast.warning(`${$t('common.chat.error')}`);
       }
     }
-  }
-  let nameChatPartner = {
-    he: 'דיון על משימה בתהליך ',
-    en: 'chat on mission in progress'
-  };
-</script>
+  }</script>
 
 {#if $nowChatId == 0}
   {#key messagesArray}
@@ -137,7 +120,7 @@
     rikmaName={$forum[$nowChatId].md.projectName}
     onRect={afreact}
     smalldes={$forum[$nowChatId].md.mesimaName}
-    nameChatPartner={nameChatPartner[$lang]}
+    nameChatPartner={$t('common.chat.missionChat')}
     mypos={true}
     bind:clicked
     pendId={$nowChatId}

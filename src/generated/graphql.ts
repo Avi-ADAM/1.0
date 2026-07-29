@@ -3184,6 +3184,40 @@ export enum Enum_Position_Pole {
   Pole = 'pole'
 }
 
+export enum Enum_Projectplanboard_Origin {
+  Agent = 'agent',
+  FreeText = 'freeText',
+  Manual = 'manual',
+  QuickScan = 'quickScan'
+}
+
+export enum Enum_Projectplanboard_Status {
+  Active = 'active',
+  Archived = 'archived',
+  Expanded = 'expanded',
+  Suggested = 'suggested'
+}
+
+export enum Enum_Projectplanitem_Imp {
+  Must = 'must',
+  Nice = 'nice'
+}
+
+export enum Enum_Projectplanitem_Kind {
+  Act = 'act',
+  Mission = 'mission',
+  Note = 'note',
+  Product = 'product',
+  Resource = 'resource'
+}
+
+export enum Enum_Projectplanitem_Status {
+  Accepted = 'accepted',
+  Created = 'created',
+  Dismissed = 'dismissed',
+  Proposed = 'proposed'
+}
+
 export enum Enum_Project_Joinpolicy {
   Light = 'light',
   Nego = 'nego',
@@ -3410,7 +3444,10 @@ export enum Enum_Userspermissionsuser_Frd {
 export enum Enum_Userspermissionsuser_Lang {
   Ar = 'ar',
   En = 'en',
-  He = 'he'
+  Es = 'es',
+  Fr = 'fr',
+  He = 'he',
+  Ru = 'ru'
 }
 
 export enum Enum_Userspermissionsuser_Onboarding_Status {
@@ -3815,6 +3852,7 @@ export type Forum = {
   pgisha?: Maybe<PgishaEntityResponse>;
   pmashes?: Maybe<PmashRelationResponseCollection>;
   project?: Maybe<ProjectEntityResponse>;
+  project_plan_boards?: Maybe<ProjectPlanBoardRelationResponseCollection>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   ratson?: Maybe<RatsonEntityResponse>;
   ratson_proposal?: Maybe<RatsonProposalEntityResponse>;
@@ -3912,6 +3950,14 @@ export type ForumPmashesArgs = {
 };
 
 
+export type ForumProject_Plan_BoardsArgs = {
+  filters?: InputMaybe<ProjectPlanBoardFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
 export type ForumSheirutsArgs = {
   filters?: InputMaybe<SheirutFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
@@ -3960,6 +4006,7 @@ export type ForumFiltersInput = {
   pgisha?: InputMaybe<PgishaFiltersInput>;
   pmashes?: InputMaybe<PmashFiltersInput>;
   project?: InputMaybe<ProjectFiltersInput>;
+  project_plan_boards?: InputMaybe<ProjectPlanBoardFiltersInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   ratson?: InputMaybe<RatsonFiltersInput>;
   ratson_proposal?: InputMaybe<RatsonProposalFiltersInput>;
@@ -3990,6 +4037,7 @@ export type ForumInput = {
   pgisha?: InputMaybe<Scalars['ID']['input']>;
   pmashes?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   project?: InputMaybe<Scalars['ID']['input']>;
+  project_plan_boards?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   ratson?: InputMaybe<Scalars['ID']['input']>;
   ratson_proposal?: InputMaybe<Scalars['ID']['input']>;
@@ -4056,7 +4104,7 @@ export type ForumRelationResponseCollection = {
   data: Array<ForumEntity>;
 };
 
-export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsNegom | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ConsentEvent | ContentReleasesRelease | ContentReleasesReleaseAction | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maagad | MaagadMember | MaagadOffer | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | MatchSuggestion | Mesimabetahalich | Message | Mission | MissionOffer | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | OpenMashaabim | OpenMission | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pledge | Pmash | Position | Project | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | Richtext | Rikmash | Sale | SealedEnvelope | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Sidur | SiteReport | SiteShareContribution | Skill | Solution | Sp | Tafkidim | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UserKey | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
+export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsNegom | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ConsentEvent | ContentReleasesRelease | ContentReleasesReleaseAction | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maagad | MaagadMember | MaagadOffer | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | MatchSuggestion | Mesimabetahalich | Message | Mission | MissionOffer | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | OpenMashaabim | OpenMission | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pledge | Pmash | Position | Project | ProjectPlanBoard | ProjectPlanItem | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | Richtext | Rikmash | Sale | SealedEnvelope | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Sidur | SiteReport | SiteShareContribution | Skill | Solution | Sp | Tafkidim | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UserKey | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
 
 export type Haamada = {
   __typename?: 'Haamada';
@@ -7181,6 +7229,8 @@ export type Mutation = {
   createPosition?: Maybe<PositionEntityResponse>;
   createProject?: Maybe<ProjectEntityResponse>;
   createProjectLocalization?: Maybe<ProjectEntityResponse>;
+  createProjectPlanBoard?: Maybe<ProjectPlanBoardEntityResponse>;
+  createProjectPlanItem?: Maybe<ProjectPlanItemEntityResponse>;
   createProviderProfile?: Maybe<ProviderProfileEntityResponse>;
   createRatson?: Maybe<RatsonEntityResponse>;
   createRatsonLocalization?: Maybe<RatsonEntityResponse>;
@@ -7300,6 +7350,8 @@ export type Mutation = {
   deletePmash?: Maybe<PmashEntityResponse>;
   deletePosition?: Maybe<PositionEntityResponse>;
   deleteProject?: Maybe<ProjectEntityResponse>;
+  deleteProjectPlanBoard?: Maybe<ProjectPlanBoardEntityResponse>;
+  deleteProjectPlanItem?: Maybe<ProjectPlanItemEntityResponse>;
   deleteProviderProfile?: Maybe<ProviderProfileEntityResponse>;
   deleteRatson?: Maybe<RatsonEntityResponse>;
   deleteRatsonMatchJob?: Maybe<RatsonMatchJobEntityResponse>;
@@ -7418,6 +7470,8 @@ export type Mutation = {
   updatePmash?: Maybe<PmashEntityResponse>;
   updatePosition?: Maybe<PositionEntityResponse>;
   updateProject?: Maybe<ProjectEntityResponse>;
+  updateProjectPlanBoard?: Maybe<ProjectPlanBoardEntityResponse>;
+  updateProjectPlanItem?: Maybe<ProjectPlanItemEntityResponse>;
   updateProviderProfile?: Maybe<ProviderProfileEntityResponse>;
   updateRatson?: Maybe<RatsonEntityResponse>;
   updateRatsonMatchJob?: Maybe<RatsonMatchJobEntityResponse>;
@@ -7936,6 +7990,16 @@ export type MutationCreateProjectLocalizationArgs = {
   data?: InputMaybe<ProjectInput>;
   id?: InputMaybe<Scalars['ID']['input']>;
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
+};
+
+
+export type MutationCreateProjectPlanBoardArgs = {
+  data: ProjectPlanBoardInput;
+};
+
+
+export type MutationCreateProjectPlanItemArgs = {
+  data: ProjectPlanItemInput;
 };
 
 
@@ -8580,6 +8644,16 @@ export type MutationDeletePositionArgs = {
 export type MutationDeleteProjectArgs = {
   id: Scalars['ID']['input'];
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
+};
+
+
+export type MutationDeleteProjectPlanBoardArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteProjectPlanItemArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -9242,6 +9316,18 @@ export type MutationUpdateProjectArgs = {
   data: ProjectInput;
   id: Scalars['ID']['input'];
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
+};
+
+
+export type MutationUpdateProjectPlanBoardArgs = {
+  data: ProjectPlanBoardInput;
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateProjectPlanItemArgs = {
+  data: ProjectPlanItemInput;
+  id: Scalars['ID']['input'];
 };
 
 
@@ -11839,6 +11925,7 @@ export type Project = {
   pmashes?: Maybe<PmashRelationResponseCollection>;
   profilePic?: Maybe<UploadFileEntityResponse>;
   projectName: Scalars['String']['output'];
+  project_plan_boards?: Maybe<ProjectPlanBoardRelationResponseCollection>;
   publicDescription?: Maybe<Scalars['String']['output']>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   ratson_proposals?: Maybe<RatsonProposalRelationResponseCollection>;
@@ -12113,6 +12200,14 @@ export type ProjectPmashesArgs = {
 };
 
 
+export type ProjectProject_Plan_BoardsArgs = {
+  filters?: InputMaybe<ProjectPlanBoardFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
 export type ProjectRatson_ProposalsArgs = {
   filters?: InputMaybe<RatsonProposalFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
@@ -12324,6 +12419,7 @@ export type ProjectFiltersInput = {
   pledges?: InputMaybe<PledgeFiltersInput>;
   pmashes?: InputMaybe<PmashFiltersInput>;
   projectName?: InputMaybe<StringFilterInput>;
+  project_plan_boards?: InputMaybe<ProjectPlanBoardFiltersInput>;
   publicDescription?: InputMaybe<StringFilterInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   ratson_proposals?: InputMaybe<RatsonProposalFiltersInput>;
@@ -12412,6 +12508,7 @@ export type ProjectInput = {
   pmashes?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   profilePic?: InputMaybe<Scalars['ID']['input']>;
   projectName?: InputMaybe<Scalars['String']['input']>;
+  project_plan_boards?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   publicDescription?: InputMaybe<Scalars['String']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   ratson_proposals?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -12445,6 +12542,177 @@ export type ProjectInput = {
   welcom_tops?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   work_ways?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   zohars?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+};
+
+export type ProjectPlanBoard = {
+  __typename?: 'ProjectPlanBoard';
+  ai_meta?: Maybe<Scalars['JSON']['output']>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  descrip?: Maybe<Scalars['String']['output']>;
+  expandedAt?: Maybe<Scalars['DateTime']['output']>;
+  forums?: Maybe<ForumRelationResponseCollection>;
+  items?: Maybe<ProjectPlanItemRelationResponseCollection>;
+  order?: Maybe<Scalars['Int']['output']>;
+  origin?: Maybe<Enum_Projectplanboard_Origin>;
+  project?: Maybe<ProjectEntityResponse>;
+  publishedAt?: Maybe<Scalars['DateTime']['output']>;
+  rationale?: Maybe<Scalars['String']['output']>;
+  revisionNote?: Maybe<Scalars['String']['output']>;
+  sourceText?: Maybe<Scalars['String']['output']>;
+  status?: Maybe<Enum_Projectplanboard_Status>;
+  title: Scalars['String']['output'];
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+
+export type ProjectPlanBoardForumsArgs = {
+  filters?: InputMaybe<ForumFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type ProjectPlanBoardItemsArgs = {
+  filters?: InputMaybe<ProjectPlanItemFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+export type ProjectPlanBoardEntity = {
+  __typename?: 'ProjectPlanBoardEntity';
+  attributes?: Maybe<ProjectPlanBoard>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type ProjectPlanBoardEntityResponse = {
+  __typename?: 'ProjectPlanBoardEntityResponse';
+  data?: Maybe<ProjectPlanBoardEntity>;
+};
+
+export type ProjectPlanBoardEntityResponseCollection = {
+  __typename?: 'ProjectPlanBoardEntityResponseCollection';
+  data: Array<ProjectPlanBoardEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type ProjectPlanBoardFiltersInput = {
+  ai_meta?: InputMaybe<JsonFilterInput>;
+  and?: InputMaybe<Array<InputMaybe<ProjectPlanBoardFiltersInput>>>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  descrip?: InputMaybe<StringFilterInput>;
+  expandedAt?: InputMaybe<DateTimeFilterInput>;
+  forums?: InputMaybe<ForumFiltersInput>;
+  id?: InputMaybe<IdFilterInput>;
+  items?: InputMaybe<ProjectPlanItemFiltersInput>;
+  not?: InputMaybe<ProjectPlanBoardFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ProjectPlanBoardFiltersInput>>>;
+  order?: InputMaybe<IntFilterInput>;
+  origin?: InputMaybe<StringFilterInput>;
+  project?: InputMaybe<ProjectFiltersInput>;
+  publishedAt?: InputMaybe<DateTimeFilterInput>;
+  rationale?: InputMaybe<StringFilterInput>;
+  revisionNote?: InputMaybe<StringFilterInput>;
+  sourceText?: InputMaybe<StringFilterInput>;
+  status?: InputMaybe<StringFilterInput>;
+  title?: InputMaybe<StringFilterInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+};
+
+export type ProjectPlanBoardInput = {
+  ai_meta?: InputMaybe<Scalars['JSON']['input']>;
+  descrip?: InputMaybe<Scalars['String']['input']>;
+  expandedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  forums?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  items?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  order?: InputMaybe<Scalars['Int']['input']>;
+  origin?: InputMaybe<Enum_Projectplanboard_Origin>;
+  project?: InputMaybe<Scalars['ID']['input']>;
+  publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  rationale?: InputMaybe<Scalars['String']['input']>;
+  revisionNote?: InputMaybe<Scalars['String']['input']>;
+  sourceText?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Enum_Projectplanboard_Status>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ProjectPlanBoardRelationResponseCollection = {
+  __typename?: 'ProjectPlanBoardRelationResponseCollection';
+  data: Array<ProjectPlanBoardEntity>;
+};
+
+export type ProjectPlanItem = {
+  __typename?: 'ProjectPlanItem';
+  board?: Maybe<ProjectPlanBoardEntityResponse>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  createdRef?: Maybe<Scalars['JSON']['output']>;
+  descrip?: Maybe<Scalars['String']['output']>;
+  existingRef?: Maybe<Scalars['JSON']['output']>;
+  imp?: Maybe<Enum_Projectplanitem_Imp>;
+  kind: Enum_Projectplanitem_Kind;
+  name: Scalars['String']['output'];
+  order?: Maybe<Scalars['Int']['output']>;
+  publishedAt?: Maybe<Scalars['DateTime']['output']>;
+  spec?: Maybe<Scalars['JSON']['output']>;
+  status?: Maybe<Enum_Projectplanitem_Status>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+export type ProjectPlanItemEntity = {
+  __typename?: 'ProjectPlanItemEntity';
+  attributes?: Maybe<ProjectPlanItem>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type ProjectPlanItemEntityResponse = {
+  __typename?: 'ProjectPlanItemEntityResponse';
+  data?: Maybe<ProjectPlanItemEntity>;
+};
+
+export type ProjectPlanItemEntityResponseCollection = {
+  __typename?: 'ProjectPlanItemEntityResponseCollection';
+  data: Array<ProjectPlanItemEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type ProjectPlanItemFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<ProjectPlanItemFiltersInput>>>;
+  board?: InputMaybe<ProjectPlanBoardFiltersInput>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  createdRef?: InputMaybe<JsonFilterInput>;
+  descrip?: InputMaybe<StringFilterInput>;
+  existingRef?: InputMaybe<JsonFilterInput>;
+  id?: InputMaybe<IdFilterInput>;
+  imp?: InputMaybe<StringFilterInput>;
+  kind?: InputMaybe<StringFilterInput>;
+  name?: InputMaybe<StringFilterInput>;
+  not?: InputMaybe<ProjectPlanItemFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<ProjectPlanItemFiltersInput>>>;
+  order?: InputMaybe<IntFilterInput>;
+  publishedAt?: InputMaybe<DateTimeFilterInput>;
+  spec?: InputMaybe<JsonFilterInput>;
+  status?: InputMaybe<StringFilterInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+};
+
+export type ProjectPlanItemInput = {
+  board?: InputMaybe<Scalars['ID']['input']>;
+  createdRef?: InputMaybe<Scalars['JSON']['input']>;
+  descrip?: InputMaybe<Scalars['String']['input']>;
+  existingRef?: InputMaybe<Scalars['JSON']['input']>;
+  imp?: InputMaybe<Enum_Projectplanitem_Imp>;
+  kind?: InputMaybe<Enum_Projectplanitem_Kind>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  order?: InputMaybe<Scalars['Int']['input']>;
+  publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  spec?: InputMaybe<Scalars['JSON']['input']>;
+  status?: InputMaybe<Enum_Projectplanitem_Status>;
+};
+
+export type ProjectPlanItemRelationResponseCollection = {
+  __typename?: 'ProjectPlanItemRelationResponseCollection';
+  data: Array<ProjectPlanItemEntity>;
 };
 
 export type ProjectRelationResponseCollection = {
@@ -12665,6 +12933,10 @@ export type Query = {
   position?: Maybe<PositionEntityResponse>;
   positions?: Maybe<PositionEntityResponseCollection>;
   project?: Maybe<ProjectEntityResponse>;
+  projectPlanBoard?: Maybe<ProjectPlanBoardEntityResponse>;
+  projectPlanBoards?: Maybe<ProjectPlanBoardEntityResponseCollection>;
+  projectPlanItem?: Maybe<ProjectPlanItemEntityResponse>;
+  projectPlanItems?: Maybe<ProjectPlanItemEntityResponseCollection>;
   projects?: Maybe<ProjectEntityResponseCollection>;
   providerProfile?: Maybe<ProviderProfileEntityResponse>;
   providerProfiles?: Maybe<ProviderProfileEntityResponseCollection>;
@@ -13617,6 +13889,32 @@ export type QueryPositionsArgs = {
 export type QueryProjectArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
+};
+
+
+export type QueryProjectPlanBoardArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryProjectPlanBoardsArgs = {
+  filters?: InputMaybe<ProjectPlanBoardFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type QueryProjectPlanItemArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryProjectPlanItemsArgs = {
+  filters?: InputMaybe<ProjectPlanItemFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
 

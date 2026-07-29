@@ -1,12 +1,8 @@
 <script>
-  import tr from '$lib/translations/tr.json';
+  import { t } from '$lib/translations';
   import Close from '$lib/celim/close.svelte';
   import { lang } from '$lib/stores/lang.js';
   import LocationPicker from '$lib/components/location/LocationPicker.svelte';
-
-  const und = { he: 'לא הוגדר', en: 'undefined' };
-  const onlineL = { he: 'אונליין', en: 'Online' };
-  const kmL = { he: 'ק״מ', en: 'km' };
 
   /**
    * @typedef {Object} LocationValue
@@ -39,7 +35,7 @@
   let {
     stepState = 2,
     location = emptyLocation(),
-    lebel = { he: 'מיקום', en: 'Location' },
+    lebel = '',
     locationb = $bindable(emptyLocation())
   } = $props();
 
@@ -56,16 +52,16 @@
   }
 
   function summary(loc) {
-    if (!loc) return und[$lang];
-    if (loc.location_mode === 'online') return onlineL[$lang];
+    if (!loc) return $t('nego.conf.undefinedVal');
+    if (loc.location_mode === 'online') return $t('nego.conf.online');
     if (hasPoint(loc)) {
       const hint = loc.location_hint?.trim();
       const radius = loc.radius || 15;
       const coords = `${Number(loc.lat).toFixed(4)}, ${Number(loc.lng).toFixed(4)}`;
-      return `${hint ? hint + ' · ' : ''}${coords} · ${radius} ${kmL[$lang]}`;
+      return `${hint ? hint + ' · ' : ''}${coords} · ${radius} ${$t('nego.conf.km')}`;
     }
     if (loc.location_hint?.trim()) return loc.location_hint.trim();
-    return und[$lang];
+    return $t('nego.conf.undefinedVal');
   }
 
   function sameLoc(a, b) {
@@ -87,7 +83,7 @@
 >
   {#if edit == false}
     <div class="flex flex-row align-middle justify-center gap-x-2">
-      <h2 class="underline decoration-mturk">{lebel[$lang]}:</h2>
+      <h2 class="underline decoration-mturk">{lebel}:</h2>
       <p class="text-gold">
         {#if changed}
           <span class="line-through text-barbi">{summary(location)}</span>
@@ -104,10 +100,10 @@
       {:else if show2 == true}
         <div class="flex flex-col align-middle justify-center">
           <button onclick={() => (show2 = false)}><Close /></button>
-          <small class:text-right={$lang == 'he'}>{tr?.nego.original[$lang]}:</small>
+          <small class:text-right={$lang == 'he'}>{$t('nego.original')}:</small>
           <p>{summary(location)}</p>
           <small class:text-right={$lang == 'he'} class="text-gold"
-            >{tr?.nego.sugestion[$lang]}:</small
+            >{$t('nego.sugestion')}:</small
           >
           <p class="text-gold">{summary(locationb)}</p>
         </div>
@@ -115,7 +111,7 @@
     </div>
   {:else}
     <div dir="ltr" class="mx-auto w-full max-w-xl">
-      <LocationPicker bind:value={locationb} label={lebel[$lang]} />
+      <LocationPicker bind:value={locationb} label={lebel} />
     </div>
     <button onclick={() => (edit = false)}>✅</button>
   {/if}

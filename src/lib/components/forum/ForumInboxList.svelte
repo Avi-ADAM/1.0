@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
 
   type ForumSummary = {
@@ -25,46 +26,7 @@
     selectedId?: string | null;
   } = $props();
 
-  const labels: Record<string, Record<string, string>> = {
-    he: {
-      project: 'ריקמה',
-      process: 'תהליך',
-      mission: 'משימה',
-      ask: 'בקשה',
-      sheirut: 'מכירה',
-      haluka: 'כספים',
-      meeting: 'פגישה',
-      emptyTitle: 'אין פורומים להצגה',
-      emptyBody: 'כשיהיו שיחות שרלוונטיות אליך הן יופיעו כאן.',
-      system: 'מערכת'
-    },
-    en: {
-      project: 'Project',
-      process: 'Process',
-      mission: 'Mission',
-      ask: 'Request',
-      sheirut: 'Sale',
-      haluka: 'Money',
-      meeting: 'Meeting',
-      emptyTitle: 'No forums yet',
-      emptyBody: 'Relevant conversations will appear here.',
-      system: 'System'
-    },
-    ar: {
-      project: 'Project',
-      process: 'Process',
-      mission: 'Mission',
-      ask: 'Request',
-      sheirut: 'Sale',
-      haluka: 'Money',
-      meeting: 'Meeting',
-      emptyTitle: 'No forums yet',
-      emptyBody: 'Relevant conversations will appear here.',
-      system: 'System'
-    }
-  };
 
-  let t = $derived(labels[$lang] || labels.he);
 
   function formatTime(value: string | null | undefined) {
     if (!value) return '';
@@ -102,8 +64,8 @@
       >
         1
       </div>
-      <h2 class="text-lg font-bold text-gold">{t.emptyTitle}</h2>
-      <p class="mt-2 text-sm text-pink-100/70">{t.emptyBody}</p>
+      <h2 class="text-lg font-bold text-gold">{$t('common.forumInbox.emptyTitle')}</h2>
+      <p class="mt-2 text-sm text-pink-100/70">{$t('common.forumInbox.emptyBody')}</p>
     </div>
   </div>
 {:else}
@@ -148,7 +110,7 @@
             <span
               class="shrink-0 rounded-full border border-barbi/40 bg-barbi/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-normal text-pink-100"
             >
-              {t[forum.kind] || forum.kind}
+              {$t(`common.forumInbox.${forum.kind}`) || forum.kind}
             </span>
           </span>
           <span class="mt-1 block truncate text-xs text-gold/80">
@@ -157,11 +119,11 @@
           <span class="mt-1 block truncate text-xs text-pink-100/65">
             {#if forum.lastMessage}
               <strong class="text-pink-100/90"
-                >{forum.lastMessage.username || t.system}:</strong
+                >{forum.lastMessage.username || $t('common.forumInbox.system')}:</strong
               >
               {forum.lastMessage.message}
             {:else}
-              {t.system}
+              {$t('common.forumInbox.system')}
             {/if}
           </span>
         </span>

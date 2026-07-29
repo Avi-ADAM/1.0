@@ -799,7 +799,7 @@
             <!-- Tasks header -->
             <div class="flex items-center gap-2">
               <h5 class="text-base font-bold text-gray-800">
-                {$locale === 'he' ? 'מטלות' : 'Tasks'}
+                {$t('lev.missionInProgress2.tasks')}
               </h5>
               <span
                 class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-blue-600 rounded-full"
@@ -838,7 +838,7 @@
                           onkeypress={() => clicked(i)}
                           role="button"
                           tabindex="0"
-                          title={$locale === 'he' ? 'לחץ לעדכון התקדמות' : 'Click to update progress'}
+                          title={$t('lev.missionInProgress2.clickToUpdate')}
                           class="cursor-pointer border-2 rounded-xl border-purple-300 hover:border-purple-500 overflow-hidden transition-colors bg-gray-50"
                         >
                           <div
@@ -886,7 +886,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24">
                               <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                             </svg>
-                            {$locale === 'he' ? 'אשר סיום' : 'Approve'}
+                            {$t('lev.missionInProgress2.approveFinish')}
                           </button>
                         {:else}
                           <!-- Waiting for validator -->
@@ -894,7 +894,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24">
                               <path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
                             </svg>
-                            {$locale === 'he' ? 'ממתין לאישור' : 'Pending approval'}
+                            {$t('lev.missionInProgress2.pendingApproval')}
                           </span>
                         {/if}
                       {:else if task.attributes.myIshur == false}

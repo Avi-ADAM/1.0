@@ -342,6 +342,6 @@
     <small class="text-red-900 bg-slate-200 px-2">{$t('mission.crtask.missionRequired')}</small>
   {/if}
   <hr class="h-2" />
-  <Button onClick={sub} {loading} {success} text={{ he: $t('mission.crtask.send'), en: $t('mission.crtask.send'), ar: $t('mission.crtask.send') }} {error} />
+  <Button onClick={sub} {loading} {success} text={$t('mission.crtask.send')} {error} />
 </div>
 

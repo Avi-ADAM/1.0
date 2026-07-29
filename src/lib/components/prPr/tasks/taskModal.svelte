@@ -15,7 +15,7 @@
 
   function fmtDate(d) {
     if (!d) return null;
-    const lc = { he: 'he-IL', ar: 'ar-SA', ru: 'ru-RU', en: 'en-GB' }[$locale] ?? 'en-GB';
+    const lc = { he: 'he-IL', ar: 'ar-SA', ru: 'ru-RU', es: 'es-ES', en: 'en-GB' }[$locale] ?? 'en-GB';
     return new Date(d).toLocaleDateString(lc, { day: '2-digit', month: 'short', year: 'numeric' });
   }
 

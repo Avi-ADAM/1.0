@@ -47,7 +47,7 @@ export const approveSheirutpendConfig: ActionConfig = {
             body: {
                 he: 'הבקשה שלך למוצר/שירות אושרה בהצלחה',
                 en: 'Your product/service request has been approved',
-                ar: 'لقد تمت المواפقة على طلب المنتج/الخدمة الخاص بك'
+                ar: 'لقد تمت الموافقة على طلب المنتج/الخدمة الخاص بك'
             }
         },
         channels: ['socket', 'push'],

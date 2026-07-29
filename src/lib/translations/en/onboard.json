@@ -11,13 +11,21 @@
       "title": "Want to offer skills and join a Rikma",
       "sub": "Let's build a profile displaying your capabilities, to integrate as an equal partner in Rikmas (consensual partnerships), participate in voting and profit sharing, or provide a collective response to client demands.",
       "meta": "~ 4 min · Profile built from CV or manually",
-      "chips": ["Skills Profile", "Join a Rikma", "Profit Sharing"]
+      "chips": [
+        "Skills Profile",
+        "Join a Rikma",
+        "Profit Sharing"
+      ]
     },
     "business": {
       "title": "Have a business or a project idea",
       "sub": "Set up a new Rikma (consensual partnership) or wrap an existing business — to recruit equal partners, manage profits and decisions together, and above all connect directly to a stream of clients and projects in the system.",
       "meta": "~ 5 min · Extracted from site or free description",
-      "chips": ["Set up Rikma & Partners", "Voting & Profit Sharing", "Connect to Projects & Clients"]
+      "chips": [
+        "Set up Rikma & Partners",
+        "Voting & Profit Sharing",
+        "Connect to Projects & Clients"
+      ]
     }
   },
   "done": {
@@ -227,6 +235,16 @@
       "min_chars": "Please reach at least {{count}}",
       "analyzing": "✨ Analyzing text...",
       "working": "Lev is working..."
+    }
+  },
+  "trackFork": {
+    "provider": {
+      "title": "Service Provider",
+      "sub": "Freelancer, independent, offering skills & services"
+    },
+    "business": {
+      "title": "Business Owner",
+      "sub": "Established business — products, services, partnerships"
     }
   }
 }

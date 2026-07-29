@@ -47,7 +47,7 @@ export const rejectSheirutpendConfig: ActionConfig = {
             body: {
                 he: 'הבקשה שלך למוצר/שירות נדחתה',
                 en: 'Your product/service request has been rejected',
-                ar: 'تم رفض طلب المنتج/الخدمה الخاص بك'
+                ar: 'تم رفض طلب المنتج/الخدمة الخاص بك'
             }
         },
         channels: ['socket', 'push'],

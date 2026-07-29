@@ -57,18 +57,13 @@
 
   onDestroy(() => socketUnsub?.());
 
-  import tr from '$lib/translations/tr.json';
-
-  const i18n = {
-    he: { title: 'הצבעות פתוחות', splitVotes: 'הצבעות חלוקה', joinVotes: 'בקשות הצטרפות', resourceJoinVotes: 'בקשות צירוף משאב', decisionVotes: 'החלטות', resourceProposals: 'הצעות משאב', missionProposals: 'הצעות משימה', votes: 'הצבעות', toVote: 'להצבעה', noneOpen: 'אין הצבעות פתוחות כרגע 🎉' },
-    en: { title: 'Open Votes', splitVotes: 'Split Votes', joinVotes: 'Join Requests', resourceJoinVotes: 'Resource Join Requests', decisionVotes: 'Decisions', resourceProposals: 'Resource proposals', missionProposals: 'Mission proposals', votes: 'votes', toVote: 'Vote', noneOpen: 'No open votes right now 🎉' },
-    ar: { title: 'تصويتات مفتوحة', splitVotes: 'تصويتات التقسيم', joinVotes: 'طلبات الانضمام', resourceJoinVotes: 'طلبات ضم الموارد', decisionVotes: 'قرارات', resourceProposals: 'مقترحات الموارد', missionProposals: 'مقترحات المهام', votes: 'أصوات', toVote: 'تصويت', noneOpen: 'لا توجد تصويتات مفتوحة حالياً 🎉' }
-  };
+  import { t as trans } from '$lib/translations';
   function decisionLabel(decision) {
     const kind = decision?.attributes?.kind;
-    return tr?.headers?.[kind]?.[$lang] || decision?.attributes?.newname || kind || '—';
+    const label = $trans(`headers.${kind}`);
+    if (label && label !== `headers.${kind}`) return label;
+    return decision?.attributes?.newname || kind || '—';
   }
-  let t = $derived(i18n[$lang] || i18n.en);
 
   // Join requests live nested inside the open missions (field is `open_missions`
   // in the query; older code referenced `openMissions`, so accept both). Flattened
@@ -98,12 +93,12 @@
   // Overview: count of open items awaiting a vote, per category. Each tile
   // jumps to its section below, where every item links to its focused page.
   let summary = $derived([
-    { key: 'pmash', label: t.resourceProposals, count: pmashes.length, anchor: '#sec-pmash', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-    { key: 'pendm', label: t.missionProposals, count: pendms.length, anchor: '#sec-pendm', color: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
-    { key: 'split', label: t.splitVotes, count: votesData?.tosplits?.data?.length ?? 0, anchor: '#sec-split', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-    { key: 'decision', label: t.decisionVotes, count: votesData?.decisions?.data?.length ?? 0, anchor: '#sec-decision', color: 'bg-violet-50 text-violet-700 border-violet-200' },
-    { key: 'join', label: t.joinVotes, count: joinList.length, anchor: '#sec-join', color: 'bg-amber-50 text-amber-700 border-amber-200' },
-    { key: 'askm', label: t.resourceJoinVotes, count: askmList.length, anchor: '#sec-askm', color: 'bg-rose-50 text-rose-700 border-rose-200' }
+    { key: 'pmash', label: $trans('moach.votes.resourceProposals'), count: pmashes.length, anchor: '#sec-pmash', color: 'bg-blue-50 text-blue-700 border-blue-200' },
+    { key: 'pendm', label: $trans('moach.votes.missionProposals'), count: pendms.length, anchor: '#sec-pendm', color: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
+    { key: 'split', label: $trans('moach.votes.splitVotes'), count: votesData?.tosplits?.data?.length ?? 0, anchor: '#sec-split', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+    { key: 'decision', label: $trans('moach.votes.decisionVotes'), count: votesData?.decisions?.data?.length ?? 0, anchor: '#sec-decision', color: 'bg-violet-50 text-violet-700 border-violet-200' },
+    { key: 'join', label: $trans('moach.votes.joinVotes'), count: joinList.length, anchor: '#sec-join', color: 'bg-amber-50 text-amber-700 border-amber-200' },
+    { key: 'askm', label: $trans('moach.votes.resourceJoinVotes'), count: askmList.length, anchor: '#sec-askm', color: 'bg-rose-50 text-rose-700 border-rose-200' }
   ]);
   let totalOpen = $derived(summary.reduce((s, c) => s + c.count, 0));
 </script>
@@ -113,7 +108,7 @@
 </svelte:head>
 
 <div class="votes-page space-y-8">
-  <h1 class="text-2xl font-bold text-primary">{t.title}</h1>
+  <h1 class="text-2xl font-bold text-primary">{$trans('moach.votes.title')}</h1>
 
   {#if loading}
     <div class="flex justify-center p-12"><Lowding /></div>
@@ -132,13 +127,13 @@
         {/each}
       </div>
     {:else}
-      <p class="text-center text-gray-400 py-8">{t.noneOpen}</p>
+      <p class="text-center text-gray-400 py-8">{$trans('moach.votes.noneOpen')}</p>
     {/if}
 
     <!-- Resource proposals (pmash) -->
     {#if pmashes.length > 0}
       <section id="sec-pmash" class="bg-white p-6 rounded-xl shadow-sm scroll-mt-24">
-        <h2 class="text-lg font-bold mb-4">{t.resourceProposals}</h2>
+        <h2 class="text-lg font-bold mb-4">{$trans('moach.votes.resourceProposals')}</h2>
         <div class="space-y-4">
           {#each pmashes as pmash (pmash.id)}
             <button
@@ -147,7 +142,7 @@
             >
               <span class="font-medium">{pmash.attributes.name}</span>
               <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded shrink-0"
-                >{t.toVote} · {voteCount(pmash)} {t.votes}</span
+                >{$trans('moach.votes.toVote')} · {voteCount(pmash)} {$trans('moach.votes.votes')}</span
               >
             </button>
           {/each}
@@ -158,7 +153,7 @@
     <!-- Mission proposals (pendm) -->
     {#if pendms.length > 0}
       <section id="sec-pendm" class="bg-white p-6 rounded-xl shadow-sm scroll-mt-24">
-        <h2 class="text-lg font-bold mb-4">{t.missionProposals}</h2>
+        <h2 class="text-lg font-bold mb-4">{$trans('moach.votes.missionProposals')}</h2>
         <div class="space-y-4">
           {#each pendms as pendm (pendm.id)}
             <button
@@ -167,7 +162,7 @@
             >
               <span class="font-medium">{pendm.attributes.name}</span>
               <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded shrink-0"
-                >{t.toVote} · {voteCount(pendm)} {t.votes}</span
+                >{$trans('moach.votes.toVote')} · {voteCount(pendm)} {$trans('moach.votes.votes')}</span
               >
             </button>
           {/each}
@@ -180,7 +175,7 @@
     <!-- Split Votes -->
     {#if votesData.tosplits?.data?.length > 0}
       <section id="sec-split" class="bg-white p-6 rounded-xl shadow-sm scroll-mt-24">
-        <h2 class="text-lg font-bold mb-4">{t.splitVotes}</h2>
+        <h2 class="text-lg font-bold mb-4">{$trans('moach.votes.splitVotes')}</h2>
         <div class="space-y-4">
           {#each votesData.tosplits.data as split (split.id)}
             <button
@@ -189,7 +184,7 @@
             >
               <span class="font-medium">{split.attributes.name}</span>
               <span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded shrink-0"
-                >{t.toVote} · {split.attributes.vots?.length || 0} {t.votes}</span
+                >{$trans('moach.votes.toVote')} · {split.attributes.vots?.length || 0} {$trans('moach.votes.votes')}</span
               >
             </button>
           {/each}
@@ -200,7 +195,7 @@
     <!-- Decisions → focused decision page -->
     {#if votesData?.decisions?.data?.length > 0}
       <section id="sec-decision" class="bg-white p-6 rounded-xl shadow-sm scroll-mt-24">
-        <h2 class="text-lg font-bold mb-4">{t.decisionVotes}</h2>
+        <h2 class="text-lg font-bold mb-4">{$trans('moach.votes.decisionVotes')}</h2>
         <div class="space-y-4">
           {#each votesData.decisions.data as decision (decision.id)}
             <button
@@ -209,7 +204,7 @@
             >
               <span class="font-medium">{decisionLabel(decision)}</span>
               <span class="text-xs bg-violet-100 text-violet-700 px-2 py-1 rounded shrink-0"
-                >{t.toVote} · {decision.attributes.vots?.length || 0} {t.votes}</span
+                >{$trans('moach.votes.toVote')} · {decision.attributes.vots?.length || 0} {$trans('moach.votes.votes')}</span
               >
             </button>
           {/each}
@@ -220,7 +215,7 @@
     <!-- Join Requests (asks, nested inside open missions) → focused ask page -->
     {#if joinList.length > 0}
       <section id="sec-join" class="bg-white p-6 rounded-xl shadow-sm scroll-mt-24">
-        <h2 class="text-lg font-bold mb-4">{t.joinVotes}</h2>
+        <h2 class="text-lg font-bold mb-4">{$trans('moach.votes.joinVotes')}</h2>
         <div class="space-y-4">
           {#each joinList as ask (ask.id)}
             <button
@@ -229,7 +224,7 @@
             >
               <span class="font-medium">{ask.missionName}</span>
               <span class="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded shrink-0"
-                >{t.toVote} · {ask.attributes?.vots?.length || 0} {t.votes}</span
+                >{$trans('moach.votes.toVote')} · {ask.attributes?.vots?.length || 0} {$trans('moach.votes.votes')}</span
               >
             </button>
           {/each}
@@ -240,7 +235,7 @@
     <!-- Resource Join Requests (askms) → focused askm page -->
     {#if askmList.length > 0}
       <section id="sec-askm" class="bg-white p-6 rounded-xl shadow-sm scroll-mt-24">
-        <h2 class="text-lg font-bold mb-4">{t.resourceJoinVotes}</h2>
+        <h2 class="text-lg font-bold mb-4">{$trans('moach.votes.resourceJoinVotes')}</h2>
         <div class="space-y-4">
           {#each askmList as askm (askm.id)}
             <button
@@ -249,7 +244,7 @@
             >
               <span class="font-medium">{askmName(askm)}</span>
               <span class="text-xs bg-rose-100 text-rose-700 px-2 py-1 rounded shrink-0"
-                >{t.toVote} · {askm.attributes?.vots?.length || 0} {t.votes}</span
+                >{$trans('moach.votes.toVote')} · {askm.attributes?.vots?.length || 0} {$trans('moach.votes.votes')}</span
               >
             </button>
           {/each}

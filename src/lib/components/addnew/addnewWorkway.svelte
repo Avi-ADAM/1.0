@@ -1,6 +1,6 @@
 ﻿
 <script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
                import { lang } from '$lib/stores/lang.js'
                import { liUN } from '$lib/stores/liUN.js';
 
@@ -70,12 +70,6 @@ if (rn.includes(Name_value)){
     };
     
 
-       const cencel = {"he":"ביטול","en": "cencel"}
-const adds = {"he":"הוספת דרך יצירה חדשה","en": "Add new Way of creation"}
-
-const valn = {"he":"שם", "en": "name"}
-const btnTitles = {"he": "הוספה", "en": "Add"}
-const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
   function dispatchb () {
    addW = false
   onB?.();
@@ -86,11 +80,11 @@ const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
     {#if addW == false}
     <button style="--the:{color};"
     class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
-    onclick={() => addW = true}>{adds[$lang]}</button>
+    onclick={() => addW = true}>{$t('addnew.addnewWorkway.adds')}</button>
     {:else}
 
     
-    <button title={cencel[$lang]}
+    <button title={$t('addnew.addnewWorkway.cencel')}
     onclick={dispatchb}
     class=" hover:bg-barbi text-gold hover:text-mturk font-bold  p-0.5 rounded-full"
      ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -98,22 +92,22 @@ const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
     </svg></button> 
       
     <div dir="{$isRtl ? 'rtl' : 'ltr'}">
-        <h1 style="font-size: 1rem; line-height: normal; color: var(--barbi-pink);">{adds[$lang]}</h1>    
+        <h1 style="font-size: 1rem; line-height: normal; color: var(--barbi-pink);">{$t('addnew.addnewWorkway.adds')}</h1>    
     </div>
 
 <div dir="{$isRtl ? 'rtl' : 'ltr'}" class='textinput'>
   <input         bind:value={Name_value}
  type='text' class='input' required>
-  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="name" class='label'>{valn[$lang]}</label>
+  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="name" class='label'>{$t('addnew.addnewWorkway.valn')}</label>
   <span class='line'></span>
 </div>
-{#if shgi == true}<small class="text-red-600">{errmsg[$lang]}</small>{/if}
+{#if shgi == true}<small class="text-red-600">{$t('addnew.addnewWorkway.errmsg')}</small>{/if}
 
 <br/>
 
 
        <button onclick={addww}
-       title="{btnTitles[$lang]}"
+       title="{$t('addnew.addnewWorkway.btnTitles')}"
        class=" hover:bg-barbi hover:text-mturk text-gold font-bold py-1 px-2 rounded-full" 
        ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
          <path fill="currentColor" d="M14.3 21.7C13.6 21.9 12.8 22 12 22C6.5 22 2 17.5 2 12S6.5 2 12 2C13.3 2 14.6 2.3 15.8 2.7L14.2 4.3C13.5 4.1 12.8 4 12 4C7.6 4 4 7.6 4 12S7.6 20 12 20C12.4 20 12.9 20 13.3 19.9C13.5 20.6 13.9 21.2 14.3 21.7M7.9 10.1L6.5 11.5L11 16L21 6L19.6 4.6L11 13.2L7.9 10.1M18 14V17H15V19H18V22H20V19H23V17H20V14H18Z" />

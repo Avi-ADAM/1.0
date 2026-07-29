@@ -1,6 +1,7 @@
 <script>
 
-import tr from '$lib/translations/tr.json'
+  import { t } from '$lib/translations';
+  import { get } from 'svelte/store';
   import Close from '$lib/celim/close.svelte';
 import { lang } from '$lib/stores/lang.js'
   import { onMount } from 'svelte';
@@ -19,18 +20,16 @@ import { lang } from '$lib/stores/lang.js'
   let {
     stepState = 2,
     kindOf,
-    lebel = {"he":"עריכה", "en": "edit"},
+    lebel = '',
     kindOfb = $bindable(kindOf),
     long = false
-  } = $props();
-    const und = {"he":"לא הוגדר","en":"undefined"}
-onMount(()=>{
-    console.log(kindOf,kindOfb,tr?.mash[kindOf][$lang])
+  } = $props();onMount(()=>{
+    console.log(kindOf,kindOfb,get(t)(`mash.${kindOf}`))
     if (kindOf == kindOfb){
         if(kindOf == undefined ||kindOf == "undefined"){
-            htmlon = und[$lang]
+            htmlon = $t('nego.conf.undefinedVal')
         }else{
-            //htmlon = tr?.mash[kindOf][$lang]
+            //htmlon = $t(`mash.${kindOf}`)
         }
     } else{
         console.log("HEE")
@@ -49,32 +48,24 @@ function check (lettera, letterb){
 function checkAll (a, b){
     let al = a
     let bl = b
-    let t = 0
     htmlon = ``
 
     if (check(al, bl) == true){
-        htmlon += `${tr?.mash[al][$lang]} `
+        htmlon += `${get(t)(`mash.${al}`)} `
     } else{
              if(al != undefined){
-        htmlon+= `<span class="line-through text-barbi">${tr?.mash[al][$lang]}</span> `
+        htmlon+= `<span class="line-through text-barbi">${get(t)(`mash.${al}`)}</span> `
         }
-        htmlon += `<span class="text-wow">${tr?.mash[bl][$lang]} </span>`
+        htmlon += `<span class="text-wow">${get(t)(`mash.${bl}`)} </span>`
     }
     }
-    let first = $derived(tr?.mash[kindOf][$lang])
-    const hekind = {"he":"סוג שווי","en":"kind of vallue"}
-
- const ot = {"he":"עלות חד פעמית","en":"one time"}
-const py = {"he":"ליחידה", "en": "per unit"}
-const pm = {"he": "חודשי","en": "monthly"}
-const pye = {"he": "שנתי", "en": "yearly"}
-const re = {"he": "השכרה לזמן קצוב", "en": "rent"}
-    </script>
+    let first = $derived($t(`mash.${kindOf}`))
+</script>
     <div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
 
     {#if edit == false}
     <div class="flex flex-row align-middle justify-center gap-x-2">
-        <h2 class="underline decoration-mturk">{lebel[$lang]}: </h2>
+        <h2 class="underline decoration-mturk">{lebel}: </h2>
         <p class="text-gold">{#if htmlon.length > 0}{@html htmlon} {:else} {first}{/if}</p><button onclick={()=>edit = true}>
             {#if kindOf == kindOfb}🖍️{:else}✏️{/if}</button>
         {#if kindOf != kindOfb && show2 != true}
@@ -82,16 +73,16 @@ const re = {"he": "השכרה לזמן קצוב", "en": "rent"}
         {:else if show2 == true}
         <div class="flex flex-col align-middle justify-center ">
         <button onclick={()=>show2 = false}><Close/></button>
-        <small class:text-right={$lang == "he"}>{tr?.nego.original[$lang]}:</small>
-        <p>{tr?.mash[kindOf][$lang]}</p>
-        <small class:text-right={$lang == "he"} class="text-gold">{tr?.nego.sugestion[$lang]}:</small>
-        <p class="text-gold">{tr?.mash[kindOfb][$lang]}</p>
+        <small class:text-right={$lang == "he"}>{$t('nego.original')}:</small>
+        <p>{$t(`mash.${kindOf}`)}</p>
+        <small class:text-right={$lang == "he"} class="text-gold">{$t('nego.sugestion')}:</small>
+        <p class="text-gold">{$t(`mash.${kindOfb}`)}</p>
         </div>
         {/if}
         </div>
 {:else}
  <div dir="rtl"   class="flex items-center justify-center aling-center">
-   <h2 class="text-center text-barbi">{hekind[$lang]}: </h2>
+   <h2 class="text-center text-barbi">{$t('nego.conf.kindOfValue')}: </h2>
     <select bind:value={kindOfb} class="round form-select appearance-none
       block
       w-fit
@@ -106,11 +97,11 @@ const re = {"he": "השכרה לזמן קצוב", "en": "rent"}
       ease-in-out
       m-0
       focus:text-barbi focus:bg-gold focus:border-barbi focus:outline-none">
-<option value="total">{ot[$lang]}</option>
-<option value="monthly">{pm[$lang]}</option>
-<option value="yearly">{pye[$lang]}</option>
-<option value="perUnit">{py[$lang]}</option>
-<option value="rent">{re[$lang]}</option>
+<option value="total">{$t('nego.conf.oneTimeCost')}</option>
+<option value="monthly">{$t('nego.conf.monthly')}</option>
+<option value="yearly">{$t('nego.conf.yearly')}</option>
+<option value="perUnit">{$t('nego.conf.perUnit')}</option>
+<option value="rent">{$t('nego.conf.rent')}</option>
 </select>
 </div>  
 <button onclick={()=>{edit = false

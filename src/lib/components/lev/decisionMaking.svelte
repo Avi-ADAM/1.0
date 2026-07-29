@@ -1,4 +1,6 @@
 <script>
+  import { t, isRtl } from '$lib/translations';
+  import { get } from 'svelte/store';
   import { Drawer } from 'vaul-svelte';
   import { Portal } from 'bits-ui';
   import { executeAction } from '$lib/client/actionClient';
@@ -118,24 +120,15 @@
     console.log('HACHLATA!!!');
     st = 115;
     if (kind === 'pic') {
-      openmissionName = {
-        he: `הצבעה על שינוי הלוגו`,
-        en: 'vote on Logo change'
-      };
+      openmissionName = $t('lev.decision.logoVoteShort');
     } else if (kind === 'saleClaim') {
       const pn = saleClaim?.productName ? ` (${saleClaim.productName})` : '';
-      openmissionName = {
-        he: `הסכמה על מכירה${pn}`,
-        en: `sale consent${pn}`
-      };
+      openmissionName = $t('lev.decision.saleConsent', { suffix: pn });
       // Prefill the negotiation form with the version currently on the table.
       nqty = saleClaim?.standing?.hm ?? saleClaim?.current?.unit ?? 1;
       nprice = saleClaim?.standing?.price ?? 0;
     } else if (kind === 'sheirutpends') {
-      openmissionName = {
-        he: 'הצבעה על יצירת שירות חדש',
-        en: 'vote on creating new service'
-      };
+      openmissionName = $t('lev.decision.newServiceVote');
     } else if (askId && projectId) {
       // Fetch current vs. proposed values for all other decision kinds
       try {
@@ -368,16 +361,16 @@
         already = true;
         negoModal = false;
         toast.success(
-          $lang === 'en' ? 'Refinement sent — the ball is in their court.' : 'הדיוק נשלח — הכדור אצל הצד השני.'
+          get(t)('lev.decisionMaking.refinementSent')
         );
         onAcsept?.({ ani: 'askedma', coinlapach });
       } else {
         error1 = result.error;
-        toast.error($lang === 'en' ? 'Could not send refinement' : 'שליחת הדיוק נכשלה');
+        toast.error(get(t)('lev.decisionMaking.couldNotSend'));
       }
     } catch (e) {
       error1 = e;
-      toast.error($lang === 'en' ? 'Could not send refinement' : 'שליחת הדיוק נכשלה');
+      toast.error(get(t)('lev.decisionMaking.couldNotSend'));
     } finally {
       negoBusy = false;
     }
@@ -429,51 +422,26 @@
 
   let h = $state(0);
 
-  let u = {
-    he: 'הצבעה על שינוי לוגו הריקמה',
-    en: 'vote on changing FreeMates logo'
-  };
+
+  let u = $state('');
 
   function hover(id) {
-    if (id == '0') {
-      u = {
-        he: 'הצבעה על שינוי לוגו הריקמה',
-        en: 'vote on changing FreeMates logo'
-      };
-    } else {
-      u = id;
-    }
-    onHover?.({ id: u[$lang] });
+    u = id == '0' ? $t('lev.decision.logoVote') : id;
+    onHover?.({ id: u });
   }
   function hoverede() {
     hovered = !hovered;
-    if (hovered == false) {
-      u = { he: 'לב המערכת', en: 'heart of 1💗1' };
-    } else {
-      u = {
-        he: 'הצבעה על שינוי לוגו הריקמה',
-        en: 'vote on changing FreeMates logo'
-      };
-    }
-    onHover?.({ id: u[$lang] });
+    u = hovered ? $t('lev.decision.logoVote') : $t('lev.page.heartTitle');
+    onHover?.({ id: u });
   }
 
   function hoverc(event) {
-    if (event.x == '0') {
-      u = {
-        he: 'הצבעה על שינוי לוגו הריקמה',
-        en: 'vote on changing FreeMates logo'
-      };
-    } else {
-      u = event.x;
-    }
-    onHover?.({ id: u[$lang] });
+    u = event.x == '0' ? $t('lev.decision.logoVote') : event.x;
+    onHover?.({ id: u });
   }
   import Card from './cards/hachlata.svelte';
   import { idPr } from '$lib/stores/idPr';
-  const newlogo = { he: 'הלוגו החדש שמוצע', en: 'new Logo offered' };
-  const oldob = { he: 'הלוגו העכשווי', en: 'old Logo' };
-
+    
   let dialogOpen = $state(false);
   let top = $state();
   function tomodal() {
@@ -1124,7 +1092,7 @@
                   onclick={() => linke('u')}
                   onkeypress={() => linke('u')}
                   onmouseenter={() =>
-                    hover({ he: 'הלוגו העכשווי', en: 'old Logo' })}
+                    hover($t('lev.cards.hachlata.oldLogo'))}
                   onmouseleave={() => hover('0')}
                   x="1276"
                   y="820"
@@ -1136,7 +1104,7 @@
                   <img
                     width="38px"
                     height="38px"
-                    alt={oldob[$lang]}
+                    alt={$t('lev.decision.currentLogo')}
                     {src}
                     style="border-radius: 50%;"
                   />
@@ -1150,7 +1118,7 @@
                     transform="translate(-25,-25)"
                   >
                     <img
-                      onmouseenter={() => hover(newlogo[$lang])}
+                      onmouseenter={() => hover($t('lev.decision.offeredLogo'))}
                       onmouseleave={() => hover('0')}
                       style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;"
                       src={src2}
@@ -1171,17 +1139,14 @@
                   <textPath
                     role="contentinfo"
                     onmouseenter={() =>
-                      hover({
-                        he: `הצבעה על שינוי הלוגו`,
-                        en: 'vote on Logo change'
-                      })}
+                      hover($t('lev.decision.logoVoteShort'))}
                     onmouseleave={() => hover('0')}
                     style="fill: url(#desgradient-5); font-family: &quot;hooge 05_55&quot;; paint-order: stroke; stroke: url(#desgradient-8-9); stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 1; stroke-width: 1.26413px; text-anchor: middle; white-space: pre;"
                     class="curved-text"
                     startOffset={st}
                     xlink:href="#curveeuu"
                   >
-                    {openmissionName?.[$lang] || ''}
+                    {openmissionName || ''}
                   </textPath>
                 </text>
                 <path
@@ -1229,14 +1194,14 @@
                                                 <path id="curvee" d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"/>
                                                     <text color="#EEE8AA" width="208.55" x="-90" y="-90" style="white-space: pre-wrap;">
                                                         <textPath on:mouseenter={()=>hover("שם המשאב")} on:mouseleave={()=>hover("0")} color="#EEE8AA" x="-90" y="-90" class="curved-text" startOffset={st} xlink:href="#curvee">
-                                                            {openmissionName[$lang]}
+                                                            {openmissionName}
                                                         </textPath>
                                                     </text>
                                               <g on:click={()=>linke("p")} on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  data-sveltekit-prefetch x="0" y="-40" >
                                                     <text fill="#FF0092" text-anchor="middle"  x="0" y="-29"   style="font-size: 15px; line-height: 1; font-weight: bold; white-space: pre;">{projectName}</text>
                                               </g>  
                                                     <foreignObject x='-50' y='0 ' width='56px' height='56px' transform="translate(-28,-28)" >
-                                                   <button on:click={()=>project()} on:mouseenter={()=>hover(newlogo[$lang])} on:mouseleave={()=>hover("0")}>
+                                                   <button on:click={()=>project()} on:mouseenter={()=>hover($t('lev.decision.offeredLogo'))} on:mouseleave={()=>hover("0")}>
                                                         <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="40" height="40" alt="projectlogo" title={projectName}>
                                                    </button>
 
@@ -1261,19 +1226,19 @@
             <p style="margin-top: 10px;">
               <span
                 role="contentinfo"
-                onmouseenter={() => hover({ he: 'בעד', en: 'in favor' })}
+                onmouseenter={() => hover($t('lev.cards.voteCard.inFavor'))}
                 onmouseleave={() => hover('0')}
                 style="color:var(--gold)"
                 >{noofusersOk}
               </span><span
                 onmouseenter={() =>
-                  hover({ he: 'לא הצביעו', en: 'not voted yet' })}
+                  hover($t('lev.cards.voteCard.notVotedYet'))}
                 onmouseleave={() => hover('0')}
                 role="contentinfo"
                 style="color:aqua"
                 >{noofusersWaiting}
               </span><span
-                onmouseenter={() => hover({ he: 'נגד', en: 'against' })}
+                onmouseenter={() => hover($t('lev.cards.common.against'))}
                 onmouseleave={() => hover('0')}
                 role="contentinfo"
                 style="color:var(--barbi-pink)"
@@ -1284,7 +1249,7 @@
             <!--  <button on:click={tochat}><Chaticon/></button>-->
             {#if deadline}
               <p
-                onmouseenter={() => hover({ he: 'תאריך הביצוע', en: 'date' })}
+                onmouseenter={() => hover($t('lev.decision.executionDate'))}
                 onmouseleave={() => hover('0')}
                 class="hslink ab"
               >
@@ -1293,7 +1258,7 @@
             {#if low == false}
               {#if already === false}
                 <button
-                  onmouseenter={() => hover({ he: 'אישור', en: 'approve' })}
+                  onmouseenter={() => hover($t('common.approve'))}
                   onmouseleave={() => hover('0')}
                   onclick={agree}
                   class="btn ga"
@@ -1316,7 +1281,7 @@
                   <!-- No absolute "no": a saleClaim is refined via negotiation
                        (scales icon), never rejected. -->
                   <button
-                    onmouseenter={() => hover({ he: 'משא-ומתן / דיוק', en: 'negotiate / refine' })}
+                    onmouseenter={() => hover($t('lev.hachlata.negotiateRefine'))}
                     onmouseleave={() => hover('0')}
                     onclick={openNego}
                     class="btn gb"
@@ -1335,7 +1300,7 @@
                   >
                 {:else}
                   <button
-                    onmouseenter={() => hover({ he: 'דחיה', en: 'reject' })}
+                    onmouseenter={() => hover($t('lev.cards.wishOffer.reject'))}
                     onmouseleave={() => hover('0')}
                     onclick={decline}
                     class="btn gb"
@@ -1460,66 +1425,58 @@
       if (e.key === 'Escape') negoModal = false;
     }}
   >
-    <div class="nego-card" dir={$lang === 'en' ? 'ltr' : 'rtl'}>
+    <div class="nego-card" dir={$isRtl ? 'rtl' : 'ltr'}>
       <h3 class="nego-title">
-        {$lang === 'en' ? 'Refine the sale claim' : 'דיוק דיווח המכירה'}
+        {$t('lev.decisionMaking.refineSaleClaim')}
       </h3>
       <p class="nego-sub">
-        {$lang === 'en'
-          ? 'Propose the version you can sign. Silence for the response window means the standing version is auto-approved.'
-          : 'הציעו את הגרסה שאתם חתומים עליה. שתיקה עד תום זמן התגובה = הגרסה שעל השולחן מאושרת אוטומטית.'}
+        {$t('lev.decisionMaking.proposeVersion')}
       </p>
 
       <label class="nego-label">
-        {$lang === 'en' ? 'Quantity' : 'כמות'}
+        {$t('lev.decisionMaking.quantity')}
         <span class="nego-ref"
-          >{$lang === 'en' ? 'on table:' : 'על השולחן:'} {saleClaim?.standing?.hm ?? '—'}</span
+          >{$t('lev.decisionMaking.onTable')} {saleClaim?.standing?.hm ?? '—'}</span
         >
         <input class="nego-input" type="number" min="0" step="any" bind:value={nqty} />
       </label>
 
       <label class="nego-label">
-        {$lang === 'en' ? 'Price per unit' : 'מחיר ליחידה'}
+        {$t('lev.decisionMaking.pricePerUnit')}
         <span class="nego-ref"
-          >{$lang === 'en' ? 'on table:' : 'על השולחן:'} {saleClaim?.standing?.price ?? '—'}</span
+          >{$t('lev.decisionMaking.onTable')} {saleClaim?.standing?.price ?? '—'}</span
         >
         <input class="nego-input" type="number" min="0" step="any" bind:value={nprice} />
       </label>
 
       <div class="nego-dates">
         <label class="nego-label">
-          {$lang === 'en' ? 'Start' : 'התחלה'}
+          {$t('lev.decisionMaking.start')}
           <input class="nego-input" type="date" bind:value={nstart} />
         </label>
         <label class="nego-label">
-          {$lang === 'en' ? 'Finish' : 'סיום'}
+          {$t('lev.decisionMaking.finish')}
           <input class="nego-input" type="date" bind:value={nfinish} />
         </label>
       </div>
 
       <label class="nego-label">
-        {$lang === 'en' ? 'Note' : 'הערה'}
+        {$t('lev.decisionMaking.note')}
         <textarea class="nego-input" rows="2" bind:value={nnote}
-          placeholder={$lang === 'en' ? 'Optional clarification…' : 'הבהרה (רשות)…'}
+          placeholder={$t('lev.decisionMaking.optionalClarification')}
         ></textarea>
       </label>
 
       <p class="nego-total">
-        {$lang === 'en' ? 'Total' : 'סה"כ'}: {(Number(nqty) || 0) * (Number(nprice) || 0)}₪
+        {$t('lev.decisionMaking.total')}: {(Number(nqty) || 0) * (Number(nprice) || 0)}₪
       </p>
 
       <div class="nego-actions">
         <button class="nego-btn nego-cancel" onclick={() => (negoModal = false)}>
-          {$lang === 'en' ? 'Cancel' : 'ביטול'}
+          {$t('lev.decisionMaking.cancel')}
         </button>
         <button class="nego-btn nego-send" onclick={sendNego} disabled={negoBusy}>
-          {negoBusy
-            ? $lang === 'en'
-              ? 'Sending…'
-              : 'שולח…'
-            : $lang === 'en'
-              ? 'Send refinement'
-              : 'שליחת דיוק'}
+          {negoBusy ? $t('lev.decisionMaking.sending') : $t('lev.decisionMaking.sendRefinement')}
         </button>
       </div>
     </div>

@@ -1,5 +1,5 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { onMount } from 'svelte';
   import MultiSelect from 'svelte-multiselect';
   import { lang } from '$lib/stores/lang.js';
@@ -193,139 +193,15 @@
     );
   }
 
-  const i18n = {
-    he: {
-      title: 'בקשת משאב חדש',
-      selectPlaceholder: 'בחירה מרשימה או הקלדת שם למשאב חדש...',
-      createOption: 'יצירת משאב חדש: "{name}"',
-      name: 'שם המשאב',
-      description: 'תיאור',
-      price: 'שווי / מחיר',
-      maxInvestment: 'שווי לחישוב בפרויקט',
-      maxInvestmentHint: 'הצעת ערך גבוה יותר שמכיל את הסיכון',
-      minValue: 'שווי מינימום',
-      maxValue: 'שווי מקסימום',
-      maxValueHint: 'הערך המקסימלי שתהיו מוכנים לשלם / לקבל עבור המשאב',
-      kindOf: 'סוג שווי',
-      quantity: 'כמות',
-      link: 'לינק לפרטים / רכישה',
-      notes: 'הערות מיוחדות',
-      startDate: 'תאריך התחלה',
-      endDate: 'תאריך סיום',
-      submit: 'פרסום דרישת משאב',
-      cancel: 'ביטול',
-      loading: 'טוען משאבים...',
-      success: 'דרישת המשאב פורסמה בהצלחה',
-      error: 'שגיאה בפרסום דרישת המשאב',
-      datesRequired: 'יש לציין תאריך התחלה ותאריך סיום',
-      recurring: 'הוצאה חוזרת חודשית',
-      recurringHint: 'תשלום קבוע שחוזר כל חודש (שרת, שכירות, דוכן). בכל חודש תתבקשו לאשר את הסכום שהוצא, וזה ייכנס לארכיון לאחר אישור הריקמה.',
-      recurringEndOptional: 'תאריך סיום (לא חובה — עד לסימון כהושלם)',
-      cycleSize: 'תדירות החיוב',
-      cycleSizeHintMonthly: 'כל כמה חודשים נפתח חיוב לאישור (1 = כל חודש)',
-      cycleSizeHintYearly: 'כל כמה שנים נפתח חיוב לאישור (1 = כל שנה)',
-      cycleUnitMonthly: 'חודשים',
-      cycleUnitYearly: 'שנים',
-      totalPrice: 'סה"כ עלות משוערת',
-      totalMax: 'סה"כ שווי בריקמה',
-      summaryTitle: 'סיכום עלות',
-      selfAssign: 'השמה לעצמי',
-      selfAssignHint: 'לחץ לסמן שאתה תספק משאב זה',
-      chooseExistingSp: 'בחר מהמשאבים שלי',
-      createNewSp: 'יצירת משאב חדש (Sp)',
-      resourceReceived: 'האם המשאב התקבל?',
-      resourceReceivedHint: 'סמן אם קיבלת את המשאב כבר',
-      noMatchingSp: 'אין לך משאבים מתאימים',
-      noSpForResource: 'אין לך את המשאב הזה',
-      confirmCreateSp: 'כן, צור משאב חדש',
-      newSpWillBeCreated: 'משאב חדש ייווצר עבורך',
-      kinds: {
-        total: 'עלות חד פעמית',
-        monthly: 'חודשי',
-        yearly: 'שנתי',
-        perUnit: 'ליחידה',
-        rent: 'השכרה'
-      },
-      locationTitle: 'מיקום',
-      locationHelper:
-        'בחרו האם המשאב ניתן אונליין, במקום או היברידי, ואת רדיוס השירות.',
-      locationEmpty: 'לא הוגדר מיקום',
-      locationSelected: 'מיקום נבחר',
-      locationOnline: 'אונליין',
-      locationDone: 'סיום'
-    },
-    en: {
-      title: 'Request New Resource',
-      selectPlaceholder: 'Choose from list or type a new name...',
-      createOption: 'Create new resource: "{name}"',
-      name: 'Resource Name',
-      description: 'Description',
-      price: 'Value / Price',
-      maxInvestment: 'Maximum Investment Value',
-      maxInvestmentHint: 'Suggested higher value to cover risk',
-      minValue: 'Minimum value',
-      maxValue: 'Maximum value',
-      maxValueHint: 'The maximum value you would pay / accept for the resource',
-      kindOf: 'Value Type',
-      quantity: 'Quantity',
-      link: 'Link to details / purchase',
-      notes: 'Special Notes',
-      startDate: 'Start Date',
-      endDate: 'End Date',
-      submit: 'Publish Resource Requirement',
-      cancel: 'Cancel',
-      loading: 'Loading resources...',
-      success: 'Resource requirement published successfully',
-      error: 'Error publishing resource requirement',
-      datesRequired: 'Start and end dates are required',
-      recurring: 'Recurring monthly expense',
-      recurringHint: 'A fixed payment that repeats every month (server, rent, stall). Each month you will be asked to confirm the amount spent, and it is archived after the weave approves it.',
-      recurringEndOptional: 'End date (optional — until marked done)',
-      cycleSize: 'Billing frequency',
-      cycleSizeHintMonthly: 'Open a confirmation every N months (1 = every month)',
-      cycleSizeHintYearly: 'Open a confirmation every N years (1 = every year)',
-      cycleUnitMonthly: 'months',
-      cycleUnitYearly: 'years',
-      totalPrice: 'Total Estimated Cost',
-      totalMax: 'Total Maximum Value',
-      summaryTitle: 'Cost Summary',
-      selfAssign: 'Self Assignment',
-      selfAssignHint: 'Click to mark that you will provide this resource',
-      chooseExistingSp: 'Choose from my resources',
-      createNewSp: 'Create new resource (Sp)',
-      resourceReceived: 'Was the resource received?',
-      resourceReceivedHint: 'Check if you already received the resource',
-      noMatchingSp: 'No matching resources found',
-      noSpForResource: "You don't have this resource",
-      confirmCreateSp: 'Yes, create new resource',
-      newSpWillBeCreated: 'A new resource will be created for you',
-      kinds: {
-        total: 'One-time cost',
-        monthly: 'Monthly',
-        yearly: 'Yearly',
-        perUnit: 'Per unit',
-        rent: 'Rent'
-      },
-      locationTitle: 'Location',
-      locationHelper:
-        'Choose whether this resource is online, on-site, or hybrid, and set the service radius.',
-      locationEmpty: 'No location set',
-      locationSelected: 'Location selected',
-      locationOnline: 'Online',
-      locationDone: 'Done'
-    }
-  };
-
-  let t = $derived(i18n[$lang] || i18n.en);
 
   function locationSummary(location) {
-    if (!location || !hasLocationValue(location)) return t.locationEmpty;
-    if (location.location_mode === 'online') return t.locationOnline;
+    if (!location || !hasLocationValue(location)) return $t('project.resourceCreator.locationEmpty');
+    if (location.location_mode === 'online') return $t('project.resourceCreator.locationOnline');
     if (hasLocationPoint(location)) {
-      const hint = location.location_hint?.trim() || t.locationSelected;
+      const hint = location.location_hint?.trim() || $t('project.resourceCreator.locationSelected');
       return `${hint} - ${location.radius || 15} km`;
     }
-    return location.location_hint?.trim() || t.locationSelected;
+    return location.location_hint?.trim() || $t('project.resourceCreator.locationSelected');
   }
 
   onMount(async () => {
@@ -472,7 +348,7 @@
   async function handleSubmit() {
     if (!canSubmit) {
       if (showDates && !hasValidDates) {
-        toast.error(t.datesRequired);
+        toast.error($t('project.resourceCreator.datesRequired'));
       }
       return;
     }
@@ -566,15 +442,15 @@
       });
 
       if (result.success) {
-        toast.success(t.success);
+        toast.success($t('project.resourceCreator.success'));
         // Forward the created record so callers (e.g. AcceptWishOffer) can link
         // it. Existing no-arg callers are unaffected.
         onCreated?.(result.data);
       } else {
-        toast.error(t.error + ': ' + result.error.message);
+        toast.error($t('project.resourceCreator.error') + ': ' + result.error.message);
       }
     } catch (e) {
-      toast.error(t.error);
+      toast.error($t('project.resourceCreator.error'));
       console.error(e);
     } finally {
       isSubmitting = false;
@@ -584,7 +460,7 @@
 
 <div class="resource-creator space-y-6" dir={$isRtl ? 'rtl' : 'ltr'}>
   <header class="flex justify-between items-center mb-4">
-    <h2 class="text-2xl font-bold text-barbi">{specMode ? ($lang === 'en' ? 'Resource offer' : 'הצעת משאב') : publishMode ? ($lang === 'en' ? 'Publish to community' : 'פרסום משאב לקהילה') : t.title}</h2>
+    <h2 class="text-2xl font-bold text-barbi">{specMode ? ($lang === 'en' ? 'Resource offer' : 'הצעת משאב') : publishMode ? ($lang === 'en' ? 'Publish to community' : 'פרסום משאב לקהילה') : $t('project.resourceCreator.title')}</h2>
     {#if onCancel}
       <button
         onclick={onCancel}
@@ -619,12 +495,12 @@
             liOptionClass="!text-white hover:!bg-gold/20"
             liSelectedClass="!bg-gold !text-white"
             loading={isLoading}
-            placeholder={t.selectPlaceholder}
+            placeholder={$t('project.resourceCreator.selectPlaceholder')}
             options={mashaabimTemplates.map((t) => t.attributes.name)}
             bind:selected={selectedTemplateName}
             bind:searchText
             allowUserOptions="append"
-            createOptionMsg={t.createOption.replace('{name}', searchText)}
+            createOptionMsg={$t('project.resourceCreator.createOption').replace('{name}', searchText)}
             maxSelect={1}
           />
         </div>
@@ -641,7 +517,7 @@
     >
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="flex flex-col">
-          <label class="text-sm text-barbie mb-1">{t.name}</label>
+          <label class="text-sm text-barbie mb-1">{$t('project.resourceCreator.name')}</label>
           <input
             type="text"
             bind:value={name}
@@ -657,29 +533,29 @@
           </datalist>
         </div>
         <div class="flex flex-col">
-          <label class="text-sm text-barbie mb-1">{t.kindOf}</label>
+          <label class="text-sm text-barbie mb-1">{$t('project.resourceCreator.kindOf')}</label>
           <select
             bind:value={kindOf}
             class="bg-pink-950/30 border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all shadow-sm"
           >
-            {#each Object.entries(t.kinds) as [val, label] (val)}
-              <option value={val} class="bg-pink-900">{label}</option>
+            {#each ['total', 'monthly', 'yearly', 'perUnit', 'rent'] as val (val)}
+              <option value={val} class="bg-pink-900">{$t(`project.resourceCreator.kinds.${val}`)}</option>
             {/each}
           </select>
         </div>
 
         <div class="flex flex-col">
           <label class="text-sm text-barbie mb-1 font-medium"
-            >{publishMode ? t.minValue : t.price}</label
+            >{publishMode ? $t('project.resourceCreator.minValue') : $t('project.resourceCreator.price')}</label
           >
           <NumberInput value={price} onValueChange={handlePriceInput} />
         </div>
         <div class="flex flex-col">
           <label class="text-sm text-barbie mb-1 font-medium"
-            >{publishMode ? t.maxValue : t.maxInvestment}</label
+            >{publishMode ? $t('project.resourceCreator.maxValue') : $t('project.resourceCreator.maxInvestment')}</label
           >
           <p class="text-xs text-barbie/80 mb-1">
-            {publishMode ? t.maxValueHint : t.maxInvestmentHint}
+            {publishMode ? $t('project.resourceCreator.maxValueHint') : $t('project.resourceCreator.maxInvestmentHint')}
           </p>
           <NumberInput
             value={maxInvestment}
@@ -690,7 +566,7 @@
         {#if showQuantity}
           <div class="md:col-span-2 flex flex-col">
             <label class="text-sm text-barbie mb-1 font-medium"
-              >{t.quantity}</label
+              >{$t('project.resourceCreator.quantity')}</label
             >
             <NumberInput bind:value={hm} />
           </div>
@@ -705,8 +581,8 @@
               class:!bg-gold-600={isRecurring}
             >
               <span class="flex flex-col">
-                <span class="text-sm font-semibold text-white">🔁 {t.recurring}</span>
-                <span class="text-xs text-barbie/90">{t.recurringHint}</span>
+                <span class="text-sm font-semibold text-white">🔁 {$t('project.resourceCreator.recurring')}</span>
+                <span class="text-xs text-barbie/90">{$t('project.resourceCreator.recurringHint')}</span>
               </span>
               <span
                 class="shrink-0 w-12 h-7 rounded-full flex items-center px-1 transition-colors"
@@ -726,12 +602,12 @@
                 class="mt-3 flex flex-col rounded-xl border border-gold/40 bg-pink-950/10 p-3 animate-in fade-in duration-300"
               >
                 <label class="text-sm text-barbie mb-1 font-medium"
-                  >{t.cycleSize}</label
+                  >{$t('project.resourceCreator.cycleSize')}</label
                 >
                 <p class="text-xs text-barbie/80 mb-2">
                   {kindOf === 'yearly'
-                    ? t.cycleSizeHintYearly
-                    : t.cycleSizeHintMonthly}
+                    ? $t('project.resourceCreator.cycleSizeHintYearly')
+                    : $t('project.resourceCreator.cycleSizeHintMonthly')}
                 </p>
                 <div class="flex items-center gap-3">
                   <NumberInput
@@ -740,8 +616,8 @@
                   />
                   <span class="text-sm text-barbie/90 whitespace-nowrap">
                     {kindOf === 'yearly'
-                      ? t.cycleUnitYearly
-                      : t.cycleUnitMonthly}
+                      ? $t('project.resourceCreator.cycleUnitYearly')
+                      : $t('project.resourceCreator.cycleUnitMonthly')}
                   </span>
                 </div>
               </div>
@@ -751,7 +627,7 @@
 
         {#if showDates}
           <div class="flex flex-col">
-            <label class="text-sm text-barbie mb-1">{t.startDate} *</label>
+            <label class="text-sm text-barbie mb-1">{$t('project.resourceCreator.startDate')} *</label>
             <input
               type="date"
               value={startDate}
@@ -763,7 +639,7 @@
           </div>
           <div class="flex flex-col">
             <label class="text-sm text-barbie mb-1"
-              >{isRecurring ? t.recurringEndOptional : `${t.endDate} *`}</label
+              >{isRecurring ? $t('project.resourceCreator.recurringEndOptional') : `${$t('project.resourceCreator.endDate')} *`}</label
             >
             <input
               type="date"
@@ -777,7 +653,7 @@
         {/if}
 
         <div class="md:col-span-2 flex flex-col">
-          <label class="text-sm text-barbie mb-1">{t.link}</label>
+          <label class="text-sm text-barbie mb-1">{$t('project.resourceCreator.link')}</label>
           <input
             type="url"
             bind:value={linkto}
@@ -787,7 +663,7 @@
         </div>
 
         <div class="md:col-span-2">
-          <label class="text-sm text-barbie mb-1">{t.description}</label>
+          <label class="text-sm text-barbie mb-1">{$t('project.resourceCreator.description')}</label>
           <textarea
             bind:value={description}
             class="w-full bg-pink-950/30 border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all h-24 resize-none shadow-sm"
@@ -795,7 +671,7 @@
         </div>
 
         <div class="md:col-span-2">
-          <label class="text-sm text-barbie mb-1">{t.notes}</label>
+          <label class="text-sm text-barbie mb-1">{$t('project.resourceCreator.notes')}</label>
           <textarea
             bind:value={spnot}
             class="w-full bg-pink-950/30 border border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all h-20 resize-none shadow-sm"
@@ -803,7 +679,7 @@
         </div>
 
         <div class="md:col-span-2 space-y-2">
-          <label class="text-sm text-barbie mb-1">{t.locationTitle}</label>
+          <label class="text-sm text-barbie mb-1">{$t('project.resourceCreator.locationTitle')}</label>
           <button
             type="button"
             onclick={() => (locationOpen = !locationOpen)}
@@ -813,13 +689,13 @@
             class:bg-gold-700={locationOpen}
             class:hover:bg-gold-600={locationOpen}
           >
-            {locationOpen ? t.locationDone : locationSummary(locationScope)}
+            {locationOpen ? $t('project.resourceCreator.locationDone') : locationSummary(locationScope)}
           </button>
           {#if locationOpen}
             <LocationPicker
               bind:value={locationScope}
-              label={t.locationTitle}
-              helper={t.locationHelper}
+              label={$t('project.resourceCreator.locationTitle')}
+              helper={$t('project.resourceCreator.locationHelper')}
               height="280px"
             />
           {/if}
@@ -836,9 +712,9 @@
               <h3
                 class="text-sm font-semibold text-barbie/80 uppercase tracking-wider"
               >
-                {t.selfAssign}
+                {$t('project.resourceCreator.selfAssign')}
               </h3>
-              <p class="text-xs text-barbie/90 mt-0.5">{t.selfAssignHint}</p>
+              <p class="text-xs text-barbie/90 mt-0.5">{$t('project.resourceCreator.selfAssignHint')}</p>
             </div>
             <button
               type="button"
@@ -850,7 +726,7 @@
               class:hover:bg-gold-500={isSelfAssigned}
               class:text-white={true}
             >
-              {t.selfAssign}
+              {$t('project.resourceCreator.selfAssign')}
               {#if isSelfAssigned}<span>✓</span>{/if}
             </button>
           </div>
@@ -865,7 +741,7 @@
                   <label
                     class="text-xs text-barbie font-semibold uppercase tracking-wider mb-1 block"
                   >
-                    {t.chooseExistingSp}
+                    {$t('project.resourceCreator.chooseExistingSp')}
                   </label>
                   <MultiSelect
                     outerDivClass="!bg-pink-900/40 !border-gold focus-within:!border-gold !text-white !rounded-xl !p-2"
@@ -873,10 +749,10 @@
                     ulOptionsClass="!bg-pink-900 !border-gold !text-white !rounded-xl"
                     liOptionClass="!text-white hover:!bg-gold-500/20"
                     liSelectedClass="!bg-gold-600 !text-white"
-                    placeholder={t.chooseExistingSp}
+                    placeholder={$t('project.resourceCreator.chooseExistingSp')}
                     options={existingSpOptions.map((s) => s.attributes.name)}
                     bind:selected={selectedSpName}
-                    noMatchingOptionsMsg={t.noMatchingSp}
+                    noMatchingOptionsMsg={$t('project.resourceCreator.noMatchingSp')}
                     maxSelect={1}
                   />
                 </div>
@@ -891,31 +767,31 @@
                     class:hover:bg-pink-400={isReceived}
                     class:text-white={true}
                   >
-                    {t.resourceReceived}
+                    {$t('project.resourceCreator.resourceReceived')}
                     {#if isReceived}<span>✓</span>{/if}
                   </button>
                   {#if isReceived}
                     <p class="text-xs text-pink-200/70 text-center">
-                      {t.resourceReceivedHint}
+                      {$t('project.resourceCreator.resourceReceivedHint')}
                     </p>
                   {/if}
                 {/if}
               {:else if !createNewSp}
                 <!-- אין SPs – שאל אם ליצור חדש -->
                 <div class="text-center space-y-3 py-2">
-                  <p class="text-sm font-semibold text-barbie">{t.noSpForResource}</p>
+                  <p class="text-sm font-semibold text-barbie">{$t('project.resourceCreator.noSpForResource')}</p>
                   <button
                     type="button"
                     onclick={() => (createNewSp = true)}
                     class="w-full px-4 py-2 text-sm font-semibold rounded-xl bg-pink-800 hover:bg-pink-700 text-white transition-all duration-200 shadow-sm"
                   >
-                    {t.confirmCreateSp}
+                    {$t('project.resourceCreator.confirmCreateSp')}
                   </button>
                 </div>
               {:else}
                 <!-- createNewSp = true – SP חדש ייוצר -->
                 <div class="space-y-3">
-                  <p class="text-sm text-center text-barbie/90">{t.newSpWillBeCreated}</p>
+                  <p class="text-sm text-center text-barbie/90">{$t('project.resourceCreator.newSpWillBeCreated')}</p>
                   <button
                     type="button"
                     onclick={() => (isReceived = !isReceived)}
@@ -926,12 +802,12 @@
                     class:hover:bg-pink-400={isReceived}
                     class:text-white={true}
                   >
-                    {t.resourceReceived}
+                    {$t('project.resourceCreator.resourceReceived')}
                     {#if isReceived}<span>✓</span>{/if}
                   </button>
                   {#if isReceived}
                     <p class="text-xs text-pink-200/70 text-center">
-                      {t.resourceReceivedHint}
+                      {$t('project.resourceCreator.resourceReceivedHint')}
                     </p>
                   {/if}
                 </div>
@@ -948,17 +824,17 @@
         <h3
           class="text-sm font-semibold text-gold-400 uppercase tracking-wider"
         >
-          {t.summaryTitle}
+          {$t('project.resourceCreator.summaryTitle')}
         </h3>
         <div class="grid grid-cols-2 gap-3">
           <div class="summary-item">
-            <span class="summary-label">{t.totalPrice}</span>
+            <span class="summary-label">{$t('project.resourceCreator.totalPrice')}</span>
             <span class="summary-value price"
               >{(+totalPrice || 0).toLocaleString()} ₪</span
             >
           </div>
           <div class="summary-item">
-            <span class="summary-label">{t.totalMax}</span>
+            <span class="summary-label">{$t('project.resourceCreator.totalMax')}</span>
             <span class="summary-value max"
               >{(+totalMax || 0).toLocaleString()} ₪</span
             >
@@ -971,7 +847,7 @@
           onClick={handleSubmit}
           disabled={isSubmitting || !canSubmit}
           loading={isSubmitting}
-          text={specMode ? { he: 'שליחת הצעה לספק', en: 'Send offer to provider' } : publishMode ? { he: 'פרסום לקהילה 📣', en: 'Publish to community 📣' } : { he: t.submit, en: t.submit }}
+          text={specMode ? $t('common.buttons.sendOfferToProvider') : publishMode ? $t('common.buttons.publishToCommunity') : $t('project.resourceCreator.submit')}
           class="flex-grow !py-4 text-lg font-bold !bg-gold-600 hover:!bg-gold !text-pink-950 shadow-md"
         />
         <Button
@@ -979,7 +855,7 @@
             if (onCancel) onCancel();
             else showForm = false;
           }}
-          text={{ he: t.cancel, en: t.cancel }}
+          text={$t('project.resourceCreator.cancel')}
           class="!bg-pink-900 hover:!bg-pink-800 !text-pink-200"
         />
       </div>

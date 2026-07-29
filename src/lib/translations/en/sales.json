@@ -1,0 +1,18 @@
+{
+  "withWhomMoney": "With whom is the money",
+  "saleError": "Error processing sale",
+  "changeSaleDate": "change sale date",
+  "howManyUnits": "How many units?",
+  "howManyPerUnit": "How many per unit?",
+  "perMonth": "per month",
+  "perYear": "per year",
+  "noStartDate": "No start date",
+  "noEndDate": "No end date, can leave empty for ongoing sale until cancelled",
+  "noUserSelected": "No user selected",
+  "startDate": "Start Date",
+  "endDate": "End Date",
+  "addSale": "Add Sale",
+  "total": "Total",
+  "noteOptional": "Note (optional)",
+  "notePlaceholder": "Add a note to the sale..."
+}

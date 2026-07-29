@@ -1,6 +1,6 @@
 <script>
+  import { t } from '$lib/translations';
   import { toast } from 'svelte-sonner';
-  import { lang } from '$lib/stores/lang.js';
 
   /**
    * @typedef {Object} Props
@@ -25,25 +25,10 @@
   } = $props();
 
   // Localization for toast messages
-  const messages = {
-    he: {
-      maxQuantityReached: 'הגעת לכמות המקסימלית הזמינה',
-      minQuantityReached: 'הגעת לכמות המינימלית',
-      cannotExceedAvailable: 'לא ניתן לחרוג מהכמות הזמינה: {max}',
-      cannotGoBelowZero: 'לא ניתן לרדת מתחת לאפס'
-    },
-    en: {
-      maxQuantityReached: 'Maximum available quantity reached',
-      minQuantityReached: 'Minimum quantity reached',
-      cannotExceedAvailable: 'Cannot exceed available quantity: {max}',
-      cannotGoBelowZero: 'Cannot go below zero'
-    }
-  };
-
   // Reactive variables for button states
   let isIncrementDisabled = $derived(noMoreThen >= 0 && value >= noMoreThen);
   let isDecrementDisabled = $derived(noNegative && value <= 0);
-  let currentMessages = $derived(messages[$lang] || messages.he);
+
 
   function setValue(newValue) {
     value = newValue;
@@ -55,10 +40,7 @@
     if (noMoreThen >= 0 && value >= noMoreThen) {
       // Show toast when trying to exceed maximum
       toast.warning(
-        currentMessages.cannotExceedAvailable.replace(
-          '{max}',
-          noMoreThen.toString()
-        )
+        $t('ui.numberInput.cannotExceedAvailable', { max: noMoreThen.toString() })
       );
       return;
     }
@@ -74,7 +56,7 @@
   function decrement() {
     if (noNegative && value <= 0) {
       // Show toast when trying to go below minimum
-      toast.warning(currentMessages.cannotGoBelowZero);
+      toast.warning($t('ui.numberInput.cannotGoBelowZero'));
       return;
     }
 

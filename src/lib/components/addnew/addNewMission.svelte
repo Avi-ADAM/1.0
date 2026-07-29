@@ -1,5 +1,5 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
 import Addnewskil from './addNewSkill.svelte';
            import { lang } from '$lib/stores/lang.js'
 import { executeAction } from '$lib/client/actionClient';
@@ -86,7 +86,6 @@ let missionName_value = $state();
    };
 
      let desM = $state();
-    const placeholder = {"he":"בחירת כישורים נדרשים","en":"choose needed skills"};
      let loading = $state(true)
 
 async function subm() {
@@ -121,7 +120,6 @@ function addnew (event){
 selected.push(newN);
 selected = newSele;
   }
-        const nom = {"he":"חסר ברשימה, ניתן להוסיפו עם הכפתור \"הוספת כישור חדש\" למטה","en": "Missing, you can use the \"Add new Skill\" button bellow to add it"}
  function addnewrole (event){
     console.log("ezra")
     const newOb = event.skob;
@@ -137,54 +135,46 @@ selectedrole.push(newN);
 selectedrole = newSele;
 
 }
-  const yeve = {"he":"יצירת והוספת משימה חדשה","en":"create and add new mission"}
-  const chsk = {"he":"בחירת כישורים נדרשים","en":"choose needed skills"}
-  const sho = {"he":"תיאור קצר","en":"short description"}
-  const placeholderr = { "he" : "בחירת תפקידים נדרשים" ,"en" :"needed roles"};
-  const miname = {"he":"שם המשימה","en":"mission name"}
-  const adds = {"he":"בחירת תפקידים נדרשים","en": "Add needed roles"}
-  const nomv = {"he": "לא קיים עדיין ברשימה, ניתן להוסיף בלחיצה על כפתור \"הוספת תפקיד חדש\" שלמטה","en":"Not on the list yet , add it with the \"Add new roll\" button bellow"}
-  const addnewhed = { "he":"הוספת משימה חדשה","en":"add new mission"}
 </script>
  
     
   <div class="grid items-center text-center justify-items-center ">
-    <h1 class="text-center">{addnewhed[$lang]}</h1>
+    <h1 class="text-center">{$t('addnew.addNewMission.addnewhed')}</h1>
 </div>
 <div style="width: 50%; margin: 0 auto;">
   
      <div dir="rtl" class='textinput'>
   <input type="text"  id="nam" name="nam"   bind:value={missionName_value}  class='input' required>
-  <label for="nam" class='label'>{miname[$lang]}</label>
+  <label for="nam" class='label'>{$t('addnew.addNewMission.miname')}</label>
   <span class='line'></span>
 </div>
   
    <div dir="rtl" class='textinput'>
   <input type="text"  id="des" name="des" bind:value={desM}  class='input' required>
-  <label for="des" class='label'>{sho[$lang]}</label>
+  <label for="des" class='label'>{$t('addnew.addNewMission.sho')}</label>
   <span class='line'></span>
 </div>
 
-    <lebel for="selectskill">{chsk[$lang]}</lebel>
+    <lebel for="selectskill">{$t('addnew.addNewMission.chsk')}</lebel>
         <MultiSelect
       bind:selected
       options={skills2.map(c => c.attributes.skillName)}
       id="selectskill"
-      placeholder={placeholder[$lang]}
+      placeholder={$t('addnew.addNewMission.placeholder')}
       loading={loading}
-        noMatchingOptionsMsg={nom[$lang]}
+        noMatchingOptionsMsg={$t('addnew.addNewMission.nom')}
       />
     
      
      <Addnewskil onAddnewskill={addnew} nobr={false} color={"--barbi-pink"} />
 
      <div dir="{$isRtl ? 'rtl' : 'ltr'}">
-  <lebel for="choos">{adds[$lang]}</lebel>
+  <lebel for="choos">{$t('addnew.addNewMission.adds')}</lebel>
 <MultiSelect
 id="choos"
 bind:selected={selectedrole}
-      placeholder={placeholderr[$lang]}
-          noMatchingOptionsMsg={nomv[$lang]}
+      placeholder={$t('addnew.addNewMission.placeholderr')}
+          noMatchingOptionsMsg={$t('addnew.addNewMission.nomv')}
 {loading}
 options={roles.map(c => c.attributes.roleDescription)}
 /> </div>
@@ -196,7 +186,7 @@ options={roles.map(c => c.attributes.roleDescription)}
 <button
  onclick={subm} 
  class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-6 px-4 m-4 rounded-full"
- >{yeve[$lang]}</button>
+ >{$t('addnew.addNewMission.yeve')}</button>
  
 </div>
 </div>

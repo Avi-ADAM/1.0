@@ -1,7 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { isRtl } from '$lib/translations';
-  import { lang } from '$lib/stores/lang.js';
+  import { t, isRtl } from '$lib/translations';
   import { toast } from 'svelte-sonner';
   import { wishOffersStore } from '$lib/stores/levStores';
   import { isMobileOrTablet } from '$lib/utilities/device';
@@ -10,22 +9,6 @@
 
   let { buble, isFirst = false, onUser, onChat } = $props();
 
-  const t = {
-    cardType: { he: 'הצעה לביצוע משאלה', en: 'Offer to fulfill your wish', ar: 'عرض لتنفيذ أمنيتك' },
-    concierge: { he: 'קונסירג׳', en: 'Concierge', ar: 'كونسيرج' },
-    offeredBy: { he: 'הציע/ה לעזור', en: 'Offered to help', ar: 'عرض المساعدة' },
-    forNeed: { he: 'עבור הצורך', en: 'For the need', ar: 'للحاجة' },
-    hours: { he: 'שעות', en: 'Hours', ar: 'ساعات' },
-    price: { he: 'מחיר', en: 'Price', ar: 'السعر' },
-    byOffer: { he: 'בהצעה', en: 'By offer', ar: 'بالعرض' },
-    chat: { he: 'צ׳אט תיאום', en: 'Coordination chat', ar: 'دردشة التنسيق' },
-    accept: { he: 'אישור', en: 'Accept', ar: 'قبول' },
-    reject: { he: 'דחייה', en: 'Reject', ar: 'رفض' },
-    processing: { he: 'מעבד...', en: 'Processing...', ar: 'جاري المعالجة...' },
-    accepted: { he: 'המתנדב/ת אושר/ה 💗', en: 'Volunteer accepted 💗', ar: 'تم قبول المتطوع 💗' },
-    rejected: { he: 'ההצעה נדחתה', en: 'Offer rejected', ar: 'تم رفض العرض' },
-    error: { he: 'שגיאה בביצוע הפעולה', en: 'Action failed', ar: 'فشل الإجراء' }
-  };
 
   let isProcessing = $state(false);
   let isOpeningChat = $state(false);
@@ -80,7 +63,7 @@
       onChat?.({ forumId: String(newForumId) });
     } catch (err) {
       console.error(err);
-      toast.error(t.error[$lang]);
+      toast.error($t('lev.cards.wishOffer.error'));
     } finally {
       isOpeningChat = false;
     }
@@ -104,11 +87,11 @@
       const result = await response.json();
       if (!result.success) throw new Error(result.error?.message || 'Failed');
 
-      toast.success(action === 'accept' ? t.accepted[$lang] : t.rejected[$lang]);
+      toast.success(action === 'accept' ? $t('lev.cards.wishOffer.accepted') : $t('lev.cards.wishOffer.rejected'));
       dropOffer();
     } catch (err) {
       console.error(err);
-      toast.error(t.error[$lang]);
+      toast.error($t('lev.cards.wishOffer.error'));
     } finally {
       isProcessing = false;
     }
@@ -133,8 +116,8 @@
   <!-- Gold header, concierge-branded (logo + name), like every other card -->
   <CardHeader
     logoSrc={CONCIERGE_LOGO}
-    projectName={t.concierge[$lang]}
-    cardType={t.cardType[$lang]}
+    projectName={$t('lev.cards.wishOffer.concierge')}
+    cardType={$t('lev.cards.wishOffer.cardType')}
     cardTitle={buble.ratsonName || '—'}
     glowColor="gold"
     onProjectClick={goToWish}
@@ -157,7 +140,7 @@
         <span class="avatar fallback">{initials(buble.volunteerName)}</span>
       {/if}
       <div class="min-w-0">
-        <div class="text-xs text-gray-500 dark:text-gray-400">{t.offeredBy[$lang]}</div>
+        <div class="text-xs text-gray-500 dark:text-gray-400">{$t('lev.cards.wishOffer.offeredBy')}</div>
         <div class="text-base font-bold text-gray-800 dark:text-gray-100 group-hover:text-barbi">
           {buble.volunteerName || '—'}
         </div>
@@ -172,7 +155,7 @@
 
     <!-- The offered need -->
     <div class="rounded-xl bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-600 p-3">
-      <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">{t.forNeed[$lang]}</div>
+      <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">{$t('lev.cards.wishOffer.forNeed')}</div>
       <div class="text-base font-bold text-yellow-700 dark:text-yellow-400">{buble.missionName || '—'}</div>
     </div>
 
@@ -180,14 +163,14 @@
     <div class="flex gap-4 border-t border-gray-200 dark:border-slate-600 pt-4">
       {#if buble.hours != null}
         <div class="flex-1">
-          <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-0.5">{t.hours[$lang]}</div>
+          <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-0.5">{$t('lev.cards.wishOffer.hours')}</div>
           <div class="text-base font-bold">{buble.hours}</div>
         </div>
       {/if}
       <div class="flex-1">
-        <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-0.5">{t.price[$lang]}</div>
+        <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-0.5">{$t('lev.cards.wishOffer.price')}</div>
         <div class="text-base font-bold text-yellow-700 dark:text-yellow-400">
-          {buble.price != null ? `₪ ${Number(buble.price).toLocaleString()}` : t.byOffer[$lang]}
+          {buble.price != null ? `₪ ${Number(buble.price).toLocaleString()}` : $t('lev.cards.wishOffer.byOffer')}
         </div>
       </div>
     </div>
@@ -204,7 +187,7 @@
       }}
       disabled={isOpeningChat}
     >
-      {isOpeningChat ? t.processing[$lang] : t.chat[$lang]}
+      {isOpeningChat ? $t('lev.cards.wishOffer.processing') : $t('lev.cards.wishOffer.chat')}
     </button>
     <button
       type="button"
@@ -215,7 +198,7 @@
       }}
       disabled={isProcessing}
     >
-      {isProcessing ? t.processing[$lang] : t.reject[$lang]}
+      {isProcessing ? $t('lev.cards.wishOffer.processing') : $t('lev.cards.wishOffer.reject')}
     </button>
     <button
       type="button"
@@ -227,7 +210,7 @@
       }}
       disabled={isProcessing}
     >
-      {isProcessing ? t.processing[$lang] : t.accept[$lang]}
+      {isProcessing ? $t('lev.cards.wishOffer.processing') : $t('lev.cards.wishOffer.accept')}
     </button>
   </div>
 </div>

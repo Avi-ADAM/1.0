@@ -1,7 +1,7 @@
 <script>
+  import { t } from '$lib/translations';
   const moachStore = getMoachStore();
   import { page } from '$app/state';
-  import { lang } from '$lib/stores/lang.js';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { onMount } from 'svelte';
@@ -25,13 +25,6 @@
     }
   });
 
-  const i18n = {
-    he: { proposal: 'הצעה', reason: 'נימוק', participants: 'מצביעים', actions: 'פעולות', voteYes: 'בעד', voteNo: 'נגד' },
-    en: { proposal: 'Proposal', reason: 'Reason', participants: 'Voters', actions: 'Actions', voteYes: 'In Favor', voteNo: 'Against' },
-    ar: { proposal: 'اقتراح', reason: 'سبب', participants: 'المصوتون', actions: 'إجراءات', voteYes: 'مؤيد', voteNo: 'معارض' }
-  };
-  let t = $derived(i18n[$lang] || i18n.en);
-
   let jsonLd = $derived(vote ? {
     "@context": "https://schema.org",
     "@type": "MoachEntity",
@@ -41,8 +34,8 @@
     "title": vote.attributes.what,
     "status": "open",
     "availableActions": [
-      { "id": "vote-yes", "label": t.voteYes, "method": "POST", "actionKey": "voteYes" },
-      { "id": "vote-no", "label": t.voteNo, "method": "POST", "actionKey": "voteNo" }
+      { "id": "vote-yes", "label": $t('moach.vote.voteYes'), "method": "POST", "actionKey": "voteYes" },
+      { "id": "vote-no", "label": $t('moach.vote.voteNo'), "method": "POST", "actionKey": "voteNo" }
     ]
   } : null);
 </script>
@@ -73,27 +66,27 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div class="lg:col-span-2 space-y-6">
         <section id="description" class="bg-white p-6 rounded-xl shadow-sm">
-          <h2 class="text-lg font-bold mb-4 border-b pb-2">{t.reason}</h2>
+          <h2 class="text-lg font-bold mb-4 border-b pb-2">{$t('moach.vote.reason')}</h2>
           <p class="text-gray-700 whitespace-pre-wrap">{vote.attributes.why || 'No reason provided.'}</p>
         </section>
       </div>
 
       <div class="space-y-6">
         <section id="participants" class="bg-white p-6 rounded-xl shadow-sm">
-          <h2 class="text-lg font-bold mb-4 border-b pb-2">{t.participants}</h2>
+          <h2 class="text-lg font-bold mb-4 border-b pb-2">{$t('moach.vote.participants')}</h2>
           <div class="flex items-center gap-3">
              <span class="font-medium">{vote.attributes.users_permissions_user?.data?.attributes?.username}</span>
           </div>
         </section>
 
         <aside id="actions" aria-label="actions" class="bg-white p-6 rounded-xl shadow-sm">
-          <h2 class="text-lg font-bold mb-4 border-b pb-2">{t.actions}</h2>
+          <h2 class="text-lg font-bold mb-4 border-b pb-2">{$t('moach.vote.actions')}</h2>
           <div class="grid grid-cols-2 gap-4">
             <button class="py-2 px-4 bg-green-500 text-white rounded-lg font-bold hover:bg-green-600 transition-colors">
-              {t.voteYes}
+              {$t('moach.vote.voteYes')}
             </button>
             <button class="py-2 px-4 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition-colors">
-              {t.voteNo}
+              {$t('moach.vote.voteNo')}
             </button>
           </div>
         </aside>

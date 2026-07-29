@@ -7,7 +7,7 @@
 
   // Language stores
   import { lang, langUs, doesLang } from '$lib/stores/lang.js';
-  import { locale } from '$lib/translations';
+  import { locale, t } from '$lib/translations';
 
   // New architecture imports
   import { finalSwiperArray } from '$lib/stores/levDerived';
@@ -76,9 +76,6 @@
     cards = $isCardsView;
   });
 
-  const focusChipText = { he: 'תצוגה ממוקדת', en: 'Focused view' };
-  const showAllText = { he: 'הצג הכל', en: 'Show all' };
-  const stillLoadingText = { he: 'טוען את שאר הנתונים…', en: 'Loading the rest…' };
 
   function clearFocus() {
     focusFilter = null;
@@ -93,8 +90,7 @@
   let eizeme = $state();
 
   // Tooltip state
-  const defaulti = { he: 'מסך הלב', en: 'heart of 1💗1' };
-  let u = $state(defaulti[$lang]);
+  let u = $state(get(t)('lev.page.heartScreen'));
 
   function close() {
     if (mode !== 4) {
@@ -327,11 +323,10 @@
     console.log('🧹 LEV PAGE CLEANUP COMPLETE');
   });
 
-  const title = { he: 'לב 1💗1', en: 'heart of 1💗1' };
 </script>
 
 <svelte:head>
-  <title>{title[$lang]}</title>
+  <title>{$t('lev.page.title')}</title>
 </svelte:head>
 
 {#if loading}
@@ -389,9 +384,9 @@
   <!-- Focused-view chip: visible while a ?focus= deep-link filter is active -->
   {#if focusFilter}
     <div class="focus-chip" dir="auto">
-      <span>{focusChipText[$lang] ?? focusChipText.he}</span>
+      <span>{$t('lev.page.focusChip')}</span>
       <button type="button" onclick={clearFocus}>
-        {showAllText[$lang] ?? showAllText.he}
+        {$t('lev.page.showAll')}
       </button>
     </div>
   {:else if $dataMode !== 'full'}
@@ -399,7 +394,7 @@
          dataset is still streaming in behind them -->
     <div class="focus-chip" dir="auto" role="status">
       <span class="loading-dot"></span>
-      <span>{stillLoadingText[$lang] ?? stillLoadingText.he}</span>
+      <span>{$t('lev.page.stillLoading')}</span>
     </div>
   {/if}
   

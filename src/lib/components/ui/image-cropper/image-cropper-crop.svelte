@@ -3,10 +3,10 @@
 -->
 
 <script lang="ts">
+  import { t } from '$lib/translations';
 	import { type ButtonElementProps, Button } from '$lib/components/ui/button';
 	import { useImageCropperCrop } from './image-cropper.svelte.js';
 	import CropIcon from '@lucide/svelte/icons/crop';
-	import { lang } from '$lib/stores/lang';
 	let {
 		ref = $bindable(null),
 		variant = 'default',
@@ -15,9 +15,7 @@
 		...rest
 	}: ButtonElementProps = $props();
 
-	const cropState = useImageCropperCrop();
-	const crop = {"he":"חיתוך", "en": "crop"}
-</script>
+	const cropState = useImageCropperCrop();</script>
 
 <Button
 	{...rest}
@@ -36,5 +34,5 @@
 	}}
 >
 	<CropIcon />
-	<span>{crop[$lang]}</span>
+	<span>{$t('common.status.crop')}</span>
 </Button>

@@ -12,7 +12,7 @@
   import { page } from '$app/state';
   import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang.js';
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { reconstructMissionChains, reconstructResourceChains } from '$lib/utils/reconstructChains.js';
   import { findChainByRef, mediaUrl, reconstructSaleChains, saleEffective } from '$lib/utils/processLifecycle';
@@ -78,131 +78,7 @@
   let processHref = $derived(
     found ? `/moach/${projectId}/processes/${found.chain.id}` : null
   );
-
-  const typeLabels = {
-    he: {
-      pendm: 'משימה ממתינה', openMission: 'משימה פתוחה', ask: 'בקשת הצטרפות',
-      betahalich: 'משימה בביצוע', act: 'מטלה', finiapruval: 'אשרור סיום',
-      finnished: 'משימה שהושלמה (ארכיון)', pmash: 'משאב ממתין', openMashaabim: 'משאב פתוח',
-      askm: 'הצעת אספקה', maap: 'אספקה בתהליך', rikmash: 'משאב שהתקבל (ארכיון)',
-      matanot: 'מוצר', sale: 'מכירה'
-    },
-    en: {
-      pendm: 'Pending mission', openMission: 'Open mission', ask: 'Join request',
-      betahalich: 'Mission in progress', act: 'Task', finiapruval: 'Finish approval',
-      finnished: 'Completed mission (archive)', pmash: 'Pending resource', openMashaabim: 'Open resource',
-      askm: 'Supply proposal', maap: 'Delivery in progress', rikmash: 'Received resource (archive)',
-      matanot: 'Product', sale: 'Sale'
-    },
-    ar: {
-      pendm: 'مهمة معلقة', openMission: 'مهمة مفتوحة', ask: 'طلب انضمام',
-      betahalich: 'مهمة قيد التنفيذ', act: 'مهمة صغيرة', finiapruval: 'موافقة إنهاء',
-      finnished: 'مهمة مكتملة (أرشيف)', pmash: 'مورد معلق', openMashaabim: 'مورد مفتوح',
-      askm: 'عرض توريد', maap: 'توريد قيد التنفيذ', rikmash: 'مورد مستلم (أرشيف)',
-      matanot: 'منتج', sale: 'بيع'
-    }
-  };
-
-  const i18n = {
-    he: {
-      backProcess: 'לעמוד התהליך המלא',
-      backList: 'לכל האובייקטים מסוג זה',
-      active: 'פעיל',
-      archived: 'ארכיון — לקריאה בלבד',
-      readOnly: 'האובייקט אורכב: העמוד מוצג לקריאה בלבד, ללא פעולות.',
-      actions: 'פעולות',
-      votePage: 'לעמוד ההצבעה והמו״מ',
-      chat: 'לצ׳אט',
-      votes: 'הצבעות ומו״מ',
-      description: 'תיאור',
-      details: 'פרטים',
-      timers: 'טיימרים ושעות',
-      notFound: 'האובייקט לא נמצא',
-      notFoundSub: 'לא נמצא אובייקט מסוג זה עם המזהה המבוקש בפרויקט.',
-      unknownType: 'סוג אובייקט לא מוכר',
-      loading: 'טוען…',
-      error: 'שגיאה בטעינת הנתונים',
-      hours: 'שעות', perhour: 'לשעה', price: 'מחיר', amount: 'כמות', easy: 'גמישות',
-      total: 'סה״כ', month: 'חודש', deadline: 'מועד מענה (שתיקה = הסכמה)',
-      created: 'נוצר', start: 'התחלה', finish: 'סיום', due: 'יעד', kind: 'סוג',
-      progress: 'התקדמות', of: 'מתוך', by: 'אחראי/ת', validator: 'מאשר/ת',
-      done: 'בוצע', notDone: 'טרם בוצע', delivered: 'סופק', why: 'סיכום',
-      actsBoard: 'ללוח המטלות', progressBoard: 'למשימות בתהליך', timersBoard: 'לטיימרים',
-      salesBoard: 'ללוח המכירות', salePage: 'לעמוד המכירה',
-      holderStatus: 'מצב הסכמת מחזיק/ת הכסף',
-      holderSelf: 'דיווח עצמי', holderConfirmed: 'אושר ע״י המחזיק/ה',
-      holderOpen: 'ממתין להסכמה', holderLegacy: 'נספר במאזן',
-      splitState: 'חלוקה', splited: 'חולק', notSplited: 'טרם חולק',
-      donation: 'תרומה', siteShare: 'חלק האתר', paid: 'שולם', fromRikma: 'מריקמה',
-      fixPrice: 'מחיר קבוע', dynamicPrice: 'מחיר מתגבש בתהליך'
-    },
-    en: {
-      backProcess: 'Full process page',
-      backList: 'All objects of this type',
-      active: 'Active',
-      archived: 'Archived — read only',
-      readOnly: 'This object is archived: the page is read-only, no actions.',
-      actions: 'Actions',
-      votePage: 'Vote & negotiation page',
-      chat: 'Chat',
-      votes: 'Votes & negotiation',
-      description: 'Description',
-      details: 'Details',
-      timers: 'Timers & hours',
-      notFound: 'Object not found',
-      notFoundSub: 'No object of this type with the requested id in this project.',
-      unknownType: 'Unknown object type',
-      loading: 'Loading…',
-      error: 'Failed to load data',
-      hours: 'hours', perhour: 'per hour', price: 'Price', amount: 'Amount', easy: 'Flexibility',
-      total: 'Total', month: 'Month', deadline: 'Response deadline (silence = consent)',
-      created: 'Created', start: 'Start', finish: 'Finish', due: 'Due', kind: 'Kind',
-      progress: 'Progress', of: 'of', by: 'Owner', validator: 'Validator',
-      done: 'Done', notDone: 'Not done yet', delivered: 'Delivered', why: 'Summary',
-      actsBoard: 'Tasks board', progressBoard: 'Missions in progress', timersBoard: 'Timers',
-      salesBoard: 'Sales board', salePage: 'Sale page',
-      holderStatus: 'Holder consent',
-      holderSelf: 'Self report', holderConfirmed: 'Confirmed by holder',
-      holderOpen: 'Awaiting consent', holderLegacy: 'Counted in balance',
-      splitState: 'Split', splited: 'Split done', notSplited: 'Not split yet',
-      donation: 'Donation', siteShare: 'Site share', paid: 'Paid', fromRikma: 'From rikma',
-      fixPrice: 'Fixed price', dynamicPrice: 'Price shaped in process'
-    },
-    ar: {
-      backProcess: 'صفحة العملية الكاملة',
-      backList: 'كل الكائنات من هذا النوع',
-      active: 'نشط',
-      archived: 'أرشيف — للقراءة فقط',
-      readOnly: 'هذا الكائن مؤرشف: الصفحة للقراءة فقط، بلا إجراءات.',
-      actions: 'إجراءات',
-      votePage: 'صفحة التصويت والتفاوض',
-      chat: 'دردشة',
-      votes: 'التصويت والتفاوض',
-      description: 'وصف',
-      details: 'تفاصيل',
-      timers: 'المؤقتات والساعات',
-      notFound: 'الكائن غير موجود',
-      notFoundSub: 'لا يوجد كائن من هذا النوع بالمعرف المطلوب في هذا المشروع.',
-      unknownType: 'نوع كائن غير معروف',
-      loading: 'جارٍ التحميل…',
-      error: 'فشل تحميل البيانات',
-      hours: 'ساعات', perhour: 'للساعة', price: 'السعر', amount: 'الكمية', easy: 'مرونة',
-      total: 'المجموع', month: 'شهر', deadline: 'موعد الرد (الصمت = موافقة)',
-      created: 'أنشئ', start: 'بداية', finish: 'نهاية', due: 'موعد', kind: 'نوع',
-      progress: 'تقدم', of: 'من', by: 'مسؤول', validator: 'معتمد',
-      done: 'تم', notDone: 'لم يتم بعد', delivered: 'تم التوريد', why: 'ملخص',
-      actsBoard: 'لوحة المهام', progressBoard: 'المهام قيد التنفيذ', timersBoard: 'المؤقتات',
-      salesBoard: 'لوحة المبيعات', salePage: 'صفحة البيع',
-      holderStatus: 'موافقة حائز المال',
-      holderSelf: 'تقرير ذاتي', holderConfirmed: 'أكده الحائز',
-      holderOpen: 'بانتظار الموافقة', holderLegacy: 'محسوب في الرصيد',
-      splitState: 'التوزيع', splited: 'تم التوزيع', notSplited: 'لم يوزع بعد',
-      donation: 'تبرع', siteShare: 'حصة الموقع', paid: 'مدفوع', fromRikma: 'من مجموعة',
-      fixPrice: 'سعر ثابت', dynamicPrice: 'سعر يتشكل في العملية'
-    }
-  };
-  let t = $derived(i18n[$lang] ?? i18n.en);
-  let typeLabel = $derived((typeLabels[$lang] ?? typeLabels.en)[type] ?? type);
+  let typeLabel = $derived($t(`moach.objectTypes.${type}`) || type);
 
   function formatDate(value) {
     if (!value) return '';
@@ -223,54 +99,54 @@
     const add = (label, value) => {
       if (value !== null && value !== undefined && value !== '') rows.push({ label, value });
     };
-    add(t.created, formatDate(attrs.createdAt));
-    if (attrs.noofhours != null) add(t.hours, `${attrs.noofhours}${attrs.perhour ? ` · ${attrs.perhour} ${t.perhour}` : ''}`);
+    add($t('moach.objectDetail.created'), formatDate(attrs.createdAt));
+    if (attrs.noofhours != null) add($t('moach.objectDetail.hours'), `${attrs.noofhours}${attrs.perhour ? ` · ${attrs.perhour} ${$t('moach.objectDetail.perhour')}` : ''}`);
     if (type === 'betahalich') {
-      add(t.progress, `${Math.round((attrs.howmanyhoursalready ?? 0) * 100) / 100} ${t.of} ${attrs.hoursassinged ?? '—'} ${t.hours}`);
-      add(t.start, formatDate(attrs.start));
+      add($t('moach.objectDetail.progress'), `${Math.round((attrs.howmanyhoursalready ?? 0) * 100) / 100} ${$t('moach.objectDetail.of')} ${attrs.hoursassinged ?? '—'} ${$t('moach.objectDetail.hours')}`);
+      add($t('moach.objectDetail.start'), formatDate(attrs.start));
     }
-    add(t.kind, attrs.kindOf);
-    if (attrs.price != null) add(t.price, attrs.price);
-    if (attrs.hm != null) add(t.amount, attrs.hm);
-    if (attrs.easy != null) add(t.easy, attrs.easy);
-    if (attrs.quantityDelivered != null) add(t.delivered, `${attrs.quantityDelivered}${attrs.unit ? ` ${attrs.unit}` : ''}`);
-    if (attrs.total != null) add(t.total, `${attrs.total}`);
-    add(t.month, attrs.month ? formatDate(attrs.month) : null);
-    add(t.due, formatDate(attrs.sqadualed ?? attrs.dates ?? attrs.dateF));
+    add($t('moach.objectDetail.kind'), attrs.kindOf);
+    if (attrs.price != null) add($t('moach.objectDetail.price'), attrs.price);
+    if (attrs.hm != null) add($t('moach.objectDetail.amount'), attrs.hm);
+    if (attrs.easy != null) add($t('moach.objectDetail.easy'), attrs.easy);
+    if (attrs.quantityDelivered != null) add($t('moach.objectDetail.delivered'), `${attrs.quantityDelivered}${attrs.unit ? ` ${attrs.unit}` : ''}`);
+    if (attrs.total != null) add($t('moach.objectDetail.total'), `${attrs.total}`);
+    add($t('moach.objectDetail.month'), attrs.month ? formatDate(attrs.month) : null);
+    add($t('moach.objectDetail.due'), formatDate(attrs.sqadualed ?? attrs.dates ?? attrs.dateF));
     if (type === 'finnished') {
-      add(t.start, formatDate(attrs.start));
-      add(t.finish, formatDate(attrs.finish));
+      add($t('moach.objectDetail.start'), formatDate(attrs.start));
+      add($t('moach.objectDetail.finish'), formatDate(attrs.finish));
     }
     if (type === 'act') {
-      add(t.by, attrs.my?.data?.attributes?.username);
-      add(t.validator, attrs.vali?.data?.attributes?.username);
+      add($t('moach.objectDetail.by'), attrs.my?.data?.attributes?.username);
+      add($t('moach.objectDetail.validator'), attrs.vali?.data?.attributes?.username);
     }
-    add(t.deadline, attrs.timegrama?.data?.attributes?.date ? formatDate(attrs.timegrama.data.attributes.date) : null);
+    add($t('moach.objectDetail.deadline'), attrs.timegrama?.data?.attributes?.date ? formatDate(attrs.timegrama.data.attributes.date) : null);
     if (type === 'sale') {
-      if (attrs.in != null) add(t.amount, attrs.in);
+      if (attrs.in != null) add($t('moach.objectDetail.amount'), attrs.in);
       const holderLabel =
         attrs.holderStatus === 'self'
-          ? t.holderSelf
+          ? $t('moach.objectDetail.holderSelf')
           : attrs.holderStatus === 'confirmed'
-            ? t.holderConfirmed
+            ? $t('moach.objectDetail.holderConfirmed')
             : attrs.holderStatus === 'open'
-              ? t.holderOpen
-              : t.holderLegacy;
-      add(t.holderStatus, holderLabel);
-      add(t.splitState, attrs.splited ? t.splited : t.notSplited);
-      if (attrs.isDonation) add(t.kind, t.donation);
+              ? $t('moach.objectDetail.holderOpen')
+              : $t('moach.objectDetail.holderLegacy');
+      add($t('moach.objectDetail.holderStatus'), holderLabel);
+      add($t('moach.objectDetail.splitState'), attrs.splited ? $t('moach.objectDetail.splited') : $t('moach.objectDetail.notSplited'));
+      if (attrs.isDonation) add($t('moach.objectDetail.kind'), $t('moach.objectDetail.donation'));
       if (attrs.isSiteShareIncome) {
         const parsed = parseSiteShareNote(attrs.note);
-        add(t.kind, t.siteShare);
-        if (parsed?.paid != null) add(t.paid, parsed.paid);
-        if (parsed?.fromProjectId) add(t.fromRikma, `#${parsed.fromProjectId}`);
+        add($t('moach.objectDetail.kind'), $t('moach.objectDetail.siteShare'));
+        if (parsed?.paid != null) add($t('moach.objectDetail.paid'), parsed.paid);
+        if (parsed?.fromProjectId) add($t('moach.objectDetail.fromRikma'), `#${parsed.fromProjectId}`);
       }
-      add(t.start, formatDate(attrs.date));
+      add($t('moach.objectDetail.start'), formatDate(attrs.date));
     }
     if (type === 'matanot') {
-      add(t.kind, attrs.fixPrice ? t.fixPrice : t.dynamicPrice);
-      if (attrs.quant != null) add(t.amount, attrs.quant);
-      if (attrs.estimatedPrice != null && attrs.price == null) add(t.price, attrs.estimatedPrice);
+      add($t('moach.objectDetail.kind'), attrs.fixPrice ? $t('moach.objectDetail.fixPrice') : $t('moach.objectDetail.dynamicPrice'));
+      if (attrs.quant != null) add($t('moach.objectDetail.amount'), attrs.quant);
+      if (attrs.estimatedPrice != null && attrs.price == null) add($t('moach.objectDetail.price'), attrs.estimatedPrice);
     }
     return rows;
   });
@@ -286,10 +162,10 @@
 
   // Relevant board links per type (in addition to vote/chat/process links)
   let boardLink = $derived.by(() => {
-    if (type === 'act') return { href: `/moach/${projectId}/acts`, label: t.actsBoard };
-    if (type === 'betahalich') return { href: `/moach/${projectId}/progress/${objectId}`, label: t.progressBoard };
-    if (type === 'matanot') return { href: `/moach/${projectId}/sales`, label: t.salesBoard };
-    if (type === 'sale') return { href: `/moach/${projectId}/sales/${objectId}`, label: t.salePage };
+    if (type === 'act') return { href: `/moach/${projectId}/acts`, label: $t('moach.objectDetail.actsBoard') };
+    if (type === 'betahalich') return { href: `/moach/${projectId}/progress/${objectId}`, label: $t('moach.objectDetail.progressBoard') };
+    if (type === 'matanot') return { href: `/moach/${projectId}/sales`, label: $t('moach.objectDetail.salesBoard') };
+    if (type === 'sale') return { href: `/moach/${projectId}/sales/${objectId}`, label: $t('moach.objectDetail.salePage') };
     return null;
   });
 </script>
@@ -300,29 +176,29 @@
 
 <div class="op" dir={$isRtl ? 'rtl' : 'ltr'}>
   <div class="op-nav">
-    <a class="op-back" href={`/moach/${projectId}/object/${type}`}>{t.backList}</a>
+    <a class="op-back" href={`/moach/${projectId}/object/${type}`}>{$t('moach.objectDetail.backList')}</a>
     {#if processHref}
-      <a class="op-back op-back--gold" href={processHref}>{t.backProcess}</a>
+      <a class="op-back op-back--gold" href={processHref}>{$t('moach.objectDetail.backProcess')}</a>
     {/if}
   </div>
 
   {#if loading}
-    <div class="op-state"><Lowding /><p class="op-state-sub">{t.loading}</p></div>
+    <div class="op-state"><Lowding /><p class="op-state-sub">{$t('moach.objectDetail.loading')}</p></div>
   {:else if !config}
     <div class="op-state">
-      <p class="op-state-title">{t.unknownType}</p>
+      <p class="op-state-title">{$t('moach.objectDetail.unknownType')}</p>
       <code class="op-id">{type}</code>
     </div>
   {:else if loadError}
     <div class="op-state">
-      <p class="op-state-title">{t.error}</p>
+      <p class="op-state-title">{$t('moach.objectDetail.error')}</p>
       <code class="op-id">{loadError}</code>
     </div>
   {:else if !entity}
     <div class="op-state">
       <span class="op-state-icon" aria-hidden="true">◈</span>
-      <p class="op-state-title">{t.notFound}</p>
-      <p class="op-state-sub">{t.notFoundSub}</p>
+      <p class="op-state-title">{$t('moach.objectDetail.notFound')}</p>
+      <p class="op-state-sub">{$t('moach.objectDetail.notFoundSub')}</p>
       <code class="op-id">{type} / {objectId}</code>
     </div>
   {:else}
@@ -330,7 +206,7 @@
       <span class="op-type">{typeLabel}</span>
       <h1 class="op-title">{entityName}</h1>
       <span class="op-badge {isArchived ? 'op-badge--grey' : 'op-badge--green'}">
-        {isArchived ? t.archived : t.active}
+        {isArchived ? $t('moach.objectDetail.archived') : $t('moach.objectDetail.active')}
       </span>
       {#if owner}
         <span class="op-owner">
@@ -343,28 +219,28 @@
     </header>
 
     {#if isArchived}
-      <div class="op-readonly" role="note">{t.readOnly}</div>
+      <div class="op-readonly" role="note">{$t('moach.objectDetail.readOnly')}</div>
     {/if}
 
     <div class="op-grid">
       <div class="op-main">
         {#if description}
           <section class="op-card">
-            <h2 class="op-card-title">{t.description}</h2>
+            <h2 class="op-card-title">{$t('moach.objectDetail.description')}</h2>
             <RichText editable={false} outpot={description} />
           </section>
         {/if}
 
         {#if entityVotes}
           <section class="op-card">
-            <h2 class="op-card-title">{t.votes}</h2>
+            <h2 class="op-card-title">{$t('moach.objectDetail.votes')}</h2>
             <VoteRounds vots={entityVotes} lang={$lang} />
           </section>
         {/if}
 
         {#if type === 'betahalich'}
           <section class="op-card">
-            <h2 class="op-card-title">{t.timers}</h2>
+            <h2 class="op-card-title">{$t('moach.objectDetail.timers')}</h2>
             <TimersPanel monter={attrs.monter} timers={attrs.timers?.data ?? []} lang={$lang} />
           </section>
         {/if}
@@ -373,7 +249,7 @@
       <aside class="op-side">
         {#if facts.length > 0}
           <section class="op-card">
-            <h2 class="op-card-title">{t.details}</h2>
+            <h2 class="op-card-title">{$t('moach.objectDetail.details')}</h2>
             <dl class="op-facts">
               {#each facts as fact (fact.label)}
                 <div class="op-fact">
@@ -386,21 +262,21 @@
         {/if}
 
         <section class="op-card">
-          <h2 class="op-card-title">{t.actions}</h2>
+          <h2 class="op-card-title">{$t('moach.objectDetail.actions')}</h2>
           <div class="op-actions">
             {#if !isArchived && config.voteKind}
               <a class="op-action op-action--primary" href={`/moach/${projectId}/votes/${config.voteKind}/${objectId}`}>
-                {t.votePage}
+                {$t('moach.objectDetail.votePage')}
               </a>
             {/if}
             {#if forumId}
-              <a class="op-action" href={`/forum/${forumId}`}>{t.chat}</a>
+              <a class="op-action" href={`/forum/${forumId}`}>{$t('moach.objectDetail.chat')}</a>
             {/if}
             {#if !isArchived && boardLink}
               <a class="op-action" href={boardLink.href}>{boardLink.label}</a>
             {/if}
             {#if processHref}
-              <a class="op-action" href={processHref}>{t.backProcess}</a>
+              <a class="op-action" href={processHref}>{$t('moach.objectDetail.backProcess')}</a>
             {/if}
           </div>
         </section>

@@ -73,7 +73,7 @@ async function xyd () {
     <div  class="mb-8">
          <p style="line-height: 1;" class="text-sm text-gray-600 flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-            <span onmouseenter={()=>hover({"he":"שווי לשעה","en":"vallue per hour"})} onmouseleave={()=>hover("0")} > {data.perhour.toLocaleString('en-US', {maximumFractionDigits:2})} לשעה </span> * <span onmouseenter={()=>hover({"he":"כמות השעות", "en":"amount of hours"})} onmouseleave={()=>hover("0")}  > {data.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span onmouseenter={()=>hover({"he":"סך הכל","en": "total"})} onmouseleave={()=>hover("0")}>{(data.noofhours * data.perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
+            <span onmouseenter={()=>hover($t('common.valph'))} onmouseleave={()=>hover("0")} > {data.perhour.toLocaleString('en-US', {maximumFractionDigits:2})} לשעה </span> * <span onmouseenter={()=>hover($t('common.noofhours'))} onmouseleave={()=>hover("0")}  > {data.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span onmouseenter={()=>hover($t('lev.cards.voteCard.inTotal'))} onmouseleave={()=>hover("0")}>{(data.noofhours * data.perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
       </p>
       <div style="font-size: 17px;" class="  mb-2"><h2 class="text-barbi font-bold">{data.name}</h2></div>
   {#if data.descrip !== null && data.descrip !== "null"  && data.descrip !== "undefined"  && data.descrip !== undefined} <RichText outpot={data.descrip} editable={false} /> {/if}
@@ -83,7 +83,7 @@ async function xyd () {
     {#if data.skills.data.length > 0}
             <small class="text-barbi text-sm ">כישורים נדרשים:</small>
             <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 ">
-               {#each data.skills.data as skill}<p onmouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} onmouseleave={()=>hover("0")}  >
+               {#each data.skills.data as skill}<p onmouseenter={()=>hover($t('lev.cards.common.skneed'))} onmouseleave={()=>hover("0")}  >
                 <Tile pink={true} word={skill.attributes.skillName}/></p>
                 {/each}
     </div>
@@ -91,12 +91,12 @@ async function xyd () {
      {#if data.tafkidims.data.length > 0}  <small class="text-sm text-barbi">תפקידים נדרשים:</small>
             <div class="border border-gold flex flex-row  flex-wrap justify-center align-middle d  cd p-2">
               {#each data.tafkidims.data as rol}
-              <p onmouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
+              <p onmouseenter={()=>hover($t('lev.cards.common.rneed'))} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
         <Tile word={rol.attributes.roleDescription} wow={true}/></p>{/each}
     </div>{/if}
     {#if data.work_ways.data.length > 0}  <small class="text-sm text-barbi">דרכי העבודה:</small>
             <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 ">
-                {#each data.work_ways.data as rol}<p onmouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
+                {#each data.work_ways.data as rol}<p onmouseenter={()=>hover($t('lev.cards.common.wwneed'))} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
               <Tile bg="gold"   word={rol.attributes.workWayName}/></p>{/each}
     </div>{/if}
            <button onclick={()=>project(data.project.data.id)} class="px-4 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-sm mt-2 border-2 border-gold" >לצפיה בריקמה </button >

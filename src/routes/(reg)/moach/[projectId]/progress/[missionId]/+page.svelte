@@ -1,7 +1,7 @@
 <script>
+  import { t } from '$lib/translations';
   import { page } from '$app/state';
   const moachStore = getMoachStore();
-  import { lang } from '$lib/stores/lang.js';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { onMount } from 'svelte';
@@ -34,13 +34,6 @@
       loading = false;
     }
   });
-
-  const i18n = {
-    he: { participants: 'משתתפים', discussion: 'דיון', actions: 'פעולות', status: 'סטטוס' },
-    en: { participants: 'Participants', discussion: 'Discussion', actions: 'Actions', status: 'Status' },
-    ar: { participants: 'المشاركون', discussion: 'مناقشة', actions: 'إجراءات', status: 'حالة' }
-  };
-  let t = $derived(i18n[$lang] || i18n.en);
 
   let jsonLd = $derived(mission ? {
     "@context": "https://schema.org",
@@ -92,7 +85,7 @@
         </section>
 
         <section id="discussion" class="bg-white p-6 rounded-xl shadow-sm">
-          <h2 class="text-lg font-bold mb-4 border-b pb-2">{t.discussion}</h2>
+          <h2 class="text-lg font-bold mb-4 border-b pb-2">{$t('moach.progress.discussion')}</h2>
           <div class="p-8 text-center text-gray-400 italic">
             Forum integration coming soon...
           </div>
@@ -101,7 +94,7 @@
 
       <div class="space-y-6">
         <section id="participants" class="bg-white p-6 rounded-xl shadow-sm">
-          <h2 class="text-lg font-bold mb-4 border-b pb-2">{t.participants}</h2>
+          <h2 class="text-lg font-bold mb-4 border-b pb-2">{$t('moach.progress.participants')}</h2>
           <div class="flex items-center gap-3">
             <img
               class="w-10 h-10 rounded-full"
@@ -113,7 +106,7 @@
         </section>
 
         <aside id="actions" aria-label="actions" class="bg-white p-6 rounded-xl shadow-sm">
-          <h2 class="text-lg font-bold mb-4 border-b pb-2">{t.actions}</h2>
+          <h2 class="text-lg font-bold mb-4 border-b pb-2">{$t('moach.progress.actions')}</h2>
           <button class="w-full py-2 px-4 bg-primary text-white rounded-lg font-bold hover:opacity-90 transition-opacity">
             Mark as Finished
           </button>

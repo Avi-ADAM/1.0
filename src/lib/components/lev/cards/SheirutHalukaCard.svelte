@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t, isRtl } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import { toast } from 'svelte-sonner';
   import {
@@ -61,6 +62,17 @@
     return ensuredId;
   }
 
+  const md = $derived({
+    pid: Number(projectId),
+    mbId: 0,
+    halukId: Number(ensuredId ?? halukaId),
+    senderId,
+    receiverId,
+    participants: [senderId, receiverId],
+    title: { he: 'סיכום העברת כספים', en: 'Money Transfer Summary' },
+    transferDetails: `${senderName} → ${receiverName}${amount != null ? ` (${amount})` : ''}`
+  });
+
   const isSender = $derived(String(myId) === String(senderId));
   const isReceiver = $derived(String(myId) === String(receiverId));
   const isParticipant = $derived(isSender || isReceiver);
@@ -68,21 +80,6 @@
   let isProcessing = $state(false);
   let isOpeningChat = $state(false);
 
-  const t = {
-    senderLabel: { he: 'שולח', en: 'Sender' },
-    receiverLabel: { he: 'מקבל', en: 'Receiver' },
-    chat: { he: "צ'אט פרטי", en: 'Private chat' },
-    confirmSent: { he: 'אישור — שלחתי', en: 'Confirm — I sent it' },
-    confirmReceived: { he: 'אישור — קיבלתי', en: 'Confirm — I received it' },
-    senderConfirmed: { he: 'השולח אישר שליחה', en: 'Sender confirmed' },
-    receiverConfirmed: { he: 'המקבל אישר קבלה', en: 'Receiver confirmed' },
-    pendingConfirm: { he: 'ממתין לאישור', en: 'Pending' },
-    processing: { he: 'מעבד...', en: 'Processing...' },
-    openingChat: { he: "פותח צ'אט...", en: 'Opening chat...' },
-    error: { he: 'שגיאה', en: 'Error' },
-    transferStatus: { he: 'העברת כסף', en: 'Money transfer' },
-    complete: { he: 'הושלם', en: 'Complete' }
-  };
 
   const isComplete = $derived(senderconf && confirmed);
 
@@ -103,11 +100,11 @@
       const result = await res.json();
       if (!result.success) throw new Error(result.error?.message || 'Failed');
       senderconf = true;
-      toast.success(t.senderConfirmed[$lang]);
+      toast.success($t('lev.cards.sheirutHaluka.senderConfirmed'));
       if (confirmed) oncomplete?.();
     } catch (err) {
       console.error(err);
-      toast.error(t.error[$lang]);
+      toast.error($t('lev.cards.sheirutHaluka.error'));
     } finally {
       isProcessing = false;
     }
@@ -130,11 +127,11 @@
       const result = await res.json();
       if (!result.success) throw new Error(result.error?.message || 'Failed');
       confirmed = true;
-      toast.success(t.receiverConfirmed[$lang]);
+      toast.success($t('lev.cards.sheirutHaluka.receiverConfirmed'));
       if (senderconf) oncomplete?.();
     } catch (err) {
       console.error(err);
-      toast.error(t.error[$lang]);
+      toast.error($t('lev.cards.sheirutHaluka.error'));
     } finally {
       isProcessing = false;
     }
@@ -164,7 +161,7 @@
         forumId = chatForumId;
       } catch (err) {
         console.error(err);
-        toast.error(t.error[$lang]);
+        toast.error($t('lev.cards.sheirutHaluka.error'));
         isOpeningChat = false;
         return;
       } finally {
@@ -172,16 +169,6 @@
       }
     }
 
-    const md = {
-      pid: Number(projectId),
-      mbId: 0,
-      halukId: Number(ensuredId ?? halukaId),
-      senderId,
-      receiverId,
-      participants: [senderId, receiverId],
-      title: { he: 'סיכום העברת כספים', en: 'Money Transfer Summary' },
-      transferDetails: `${senderName} → ${receiverName}${amount != null ? ` (${amount})` : ''}`
-    };
 
     if (chatForumId && chatForumId !== '-1') {
       const tempF = $forum;
@@ -216,13 +203,13 @@
         ? 'text-green-700 dark:text-green-400'
         : 'text-amber-700 dark:text-amber-400'}"
     >
-      {t.transferStatus[$lang]}
+      {$t('lev.cards.sheirutHaluka.transferStatus')}
     </span>
     {#if isComplete}
       <span
         class="text-[10px] font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/50 px-2 py-0.5 rounded-full"
       >
-        ✓ {t.complete[$lang]}
+        ✓ {$t('lev.cards.sheirutHaluka.complete')}
       </span>
     {/if}
   </div>
@@ -232,7 +219,7 @@
     <!-- Sender -->
     <div class="flex flex-col items-center gap-1 flex-1 min-w-0">
       <div class="text-[9px] text-gray-500 dark:text-gray-400 uppercase">
-        {t.senderLabel[$lang]}
+        {$t('lev.cards.sheirutHaluka.senderLabel')}
       </div>
       {#if senderPic}
         <img
@@ -273,9 +260,7 @@
         >
       {/if}
       <svg
-        class="w-8 h-4 text-gray-400 {$lang == 'he' || $lang == 'ar'
-          ? 'rotate-180'
-          : ''}"
+        class="w-8 h-4 text-gray-400 {$isRtl ? 'rotate-180' : ''}"
         fill="none"
         viewBox="0 0 32 12"
       >
@@ -292,7 +277,7 @@
     <!-- Receiver -->
     <div class="flex flex-col items-center gap-1 flex-1 min-w-0">
       <div class="text-[9px] text-gray-500 dark:text-gray-400 uppercase">
-        {t.receiverLabel[$lang]}
+        {$t('lev.cards.sheirutHaluka.receiverLabel')}
       </div>
       {#if receiverPic}
         <img
@@ -331,10 +316,10 @@
     class="flex justify-between text-[10px] text-gray-500 dark:text-gray-400 px-1"
   >
     <span
-      >{senderconf ? t.senderConfirmed[$lang] : t.pendingConfirm[$lang]}</span
+      >{senderconf ? $t('lev.cards.sheirutHaluka.senderConfirmed') : $t('lev.cards.sheirutHaluka.pendingConfirm')}</span
     >
     <span
-      >{confirmed ? t.receiverConfirmed[$lang] : t.pendingConfirm[$lang]}</span
+      >{confirmed ? $t('lev.cards.sheirutHaluka.receiverConfirmed') : $t('lev.cards.sheirutHaluka.pendingConfirm')}</span
     >
   </div>
 
@@ -364,7 +349,7 @@
             d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
           />
         </svg>
-        {isOpeningChat ? t.openingChat[$lang] : t.chat[$lang]}
+        {isOpeningChat ? $t('lev.cards.sheirutHaluka.openingChat') : $t('lev.cards.sheirutHaluka.chat')}
       </button>
 
       <!-- Sender confirm button -->
@@ -374,7 +359,7 @@
           onclick={handleConfirmSent}
           disabled={isProcessing}
         >
-          {isProcessing ? t.processing[$lang] : t.confirmSent[$lang]}
+          {isProcessing ? $t('lev.cards.sheirutHaluka.processing') : $t('lev.cards.sheirutHaluka.confirmSent')}
         </button>
       {/if}
 
@@ -385,7 +370,7 @@
           onclick={handleConfirmReceived}
           disabled={isProcessing}
         >
-          {isProcessing ? t.processing[$lang] : t.confirmReceived[$lang]}
+          {isProcessing ? $t('lev.cards.sheirutHaluka.processing') : $t('lev.cards.sheirutHaluka.confirmReceived')}
         </button>
       {/if}
     </div>

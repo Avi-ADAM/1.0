@@ -8,7 +8,6 @@
   import { isMobileOrTablet } from '$lib/utilities/device';
   import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
   import moment from 'moment';
-  import tr from '$lib/translations/tr.json';
 
   // רכיבים מודרניים חדשים
   import CardHeader from './CardHeader.svelte';
@@ -94,10 +93,6 @@
     onWithdraw = null
   } = $props();
 
-  const offerAtSource = {
-    he: 'להצעה בעמוד המקור',
-    en: 'Offer on the source page'
-  };
 
   function hover(x) {
     onHover?.({ x: x });
@@ -120,22 +115,6 @@
     onProj?.();
   }
 
-  const askedVal = {
-    en: 'asked value',
-    he: 'הצעת הריקמה'
-  };
-  const myval = {
-    en: 'my value',
-    he: 'ההצעה שלי'
-  };
-  const head = {
-    he: 'הצעה לשיתוף משאב בריקמה',
-    en: 'Suggestion for sharing a resource with FreeMates'
-  };
-  const recurHead = {
-    he: '🔁 משאב חוזר · אישרור כל מחזור',
-    en: '🔁 Recurring resource · approved each cycle'
-  };
 
   // Per-cycle amount for a recurring expense (value-for-calc, falling back to price).
   let perCycle = $derived(Number(easy) > 0 ? Number(easy) : Number(price) || 0);
@@ -180,7 +159,7 @@
   class="{isMobileOrTablet()
     ? 'w-full h-full'
     : 'w-[90%] h-[90%]'} lg:w-[90%] {isVisible
-    ? $lang == 'he'
+    ? $isRtl
       ? 'boxleft'
       : 'boxright'
     : ''} flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isScrolable.value
@@ -200,7 +179,7 @@
   <CardHeader
     logoSrc={src}
     {projectName}
-    cardType={recurring ? recurHead[$lang] : head[$lang]}
+    cardType={recurring ? $t('lev.cards.sugestma.recurHead') : $t('lev.cards.sugestma.head')}
     cardTitle={mashName}
     {glowColor}
     onProjectClick={handleProjectClick}
@@ -238,8 +217,8 @@
               : 'bg-gold/30'}"
           >
             {byCandidate
-              ? tr.nego.candidateRound[$lang]
-              : tr.nego.projectRound[$lang]}
+              ? $t('nego.candidateRound')
+              : $t('nego.projectRound')}
           </span>
           {#if roundDate && !isNaN(roundDate.getTime())}
             <span class="text-xs font-normal text-gray-500 dark:text-gray-400">
@@ -264,21 +243,21 @@
               {(myRound.easy ?? easy)?.toLocaleString?.() ??
                 myRound.easy ??
                 easy}
-              {askedVal[$lang]}
+              {$t('lev.cards.sugestma.askedVal')}
               {#if myRound.price != null}
                 · {myRound.price?.toLocaleString?.() ?? myRound.price} שווי מקובל
               {/if}
             </span>
             {#if easyChanged || priceChanged}
               <span class="text-xs text-gray-500 dark:text-gray-400">
-                ({tr.nego.rikmaReq[$lang]}: {easy}{price ? ` · ${price}` : ''})
+                ({$t('nego.rikmaReq')}: {easy}{price ? ` · ${price}` : ''})
               </span>
             {/if}
           </div>
         {/if}
         {#if myRound.name && myRound.name !== mashName}
           <div class="text-xs text-gray-600 dark:text-gray-300">
-            <span class="font-medium">{tr.common.nameLabel[$lang]}:</span>
+            <span class="font-medium">{$t('common.nameLabel')}:</span>
             <span class="text-gray-400 line-through mx-1">{mashName}</span>
             → <span class="font-semibold">{myRound.name}</span>
           </div>
@@ -290,7 +269,7 @@
                 ? 'text-barbi'
                 : 'text-yellow-700 dark:text-yellow-400'}"
             >
-              {tr.nego.updatedDescription[$lang]}
+              {$t('nego.updatedDescription')}
             </div>
             <div
               class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed"
@@ -310,7 +289,7 @@
                 ? 'text-barbi'
                 : 'text-yellow-700 dark:text-yellow-400'}"
             >
-              {tr.nego.updatedNotes[$lang]}
+              {$t('nego.updatedNotes')}
             </div>
             <div
               class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed"
@@ -379,22 +358,22 @@
         />
         <span
           role="contentinfo"
-          onmouseenter={() => hover(askedVal[$lang])}
+          onmouseenter={() => hover($t('lev.cards.sugestma.askedVal'))}
           onmouseleave={() => hover('0')}
           class="font-bold text-barbi"
         >
           {easy}
-          {askedVal[$lang]}
+          {$t('lev.cards.sugestma.askedVal')}
         </span>
         <span class="text-gray-400 font-light">/</span>
         <span
           role="contentinfo"
-          onmouseenter={() => hover(myval[$lang])}
+          onmouseenter={() => hover($t('lev.cards.sugestma.myval'))}
           onmouseleave={() => hover('0')}
           class="font-bold"
         >
           {myp}
-          {myval[$lang]}
+          {$t('lev.cards.sugestma.myval')}
         </span>
       </div>
 
@@ -482,13 +461,13 @@
         </button>
         <a
           href={offerHref}
-          onmouseenter={() => hover(offerAtSource[$lang] ?? offerAtSource.he)}
+          onmouseenter={() => hover($t('lev.cards.sugestma.offerAtSource'))}
           onmouseleave={() => hover('0')}
           class="flex-2 py-2 flex justify-center items-center gap-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
         >
           <div class="w-8 h-8 text-white"><Lev /></div>
           <span class="whitespace-nowrap"
-            >{offerAtSource[$lang] ?? offerAtSource.he}</span
+            >{$t('lev.cards.sugestma.offerAtSource')}</span
           >
         </a>
       {:else if myRoundProposedBy === 'project'}
@@ -547,14 +526,14 @@
         <!-- ההצעה שלי ממתינה לריקמה — תקשורת זמינה תמיד, ומשיכה על הצעה עצמית -->
         {#if onTochat}
           <button
-            onmouseenter={() => hover({ he: "צ'אט", en: 'chat' })}
+            onmouseenter={() => hover($t('lev.rektom.chat'))}
             onmouseleave={() => hover('0')}
             class="flex-2 py-2 flex justify-center items-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold rounded-xl shadow-md hover:opacity-90 transition-all"
             style="flex: 2;"
             onclick={() => tochat()}
           >
             <span class="whitespace-nowrap"
-              >{$lang === 'he' ? "פתיחת צ'אט" : 'Open Chat'}</span
+              >{$t('lev.cards.openChat')}</span
             >
           </button>
         {/if}
@@ -563,16 +542,13 @@
                ולכן המשיכה מארכבת אותו יחד עם הבקשה. -->
           <button
             onmouseenter={() =>
-              hover({
-                he: 'משיכת ההצעה העצמית — הצעת המשאב שחיברת תיסגר כולה',
-                en: 'Withdraw your self-nomination — the resource offer you authored closes entirely'
-              })}
+              hover($t('lev.cards.sugestma.withdrawSelfNomination'))}
             onmouseleave={() => hover('0')}
             class="flex-1 py-2 flex justify-center items-center gap-2 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-gray-400 hover:text-gray-600 font-bold rounded-xl transition-all"
             onclick={() => onWithdraw?.()}
           >
             <span class="whitespace-nowrap"
-              >🌱 {$lang === 'he' ? 'משיכת ההצעה' : 'Withdraw'}</span
+              >🌱 {$t('lev.cards.withdraw')}</span
             >
           </button>
         {/if}

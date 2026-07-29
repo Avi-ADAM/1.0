@@ -1,0 +1,16 @@
+{
+  "_review": true,
+  "searchValues": "Busca o selecciona valores",
+  "searchSkills": "Busca o selecciona habilidades",
+  "searchRoles": "Busca o selecciona roles",
+  "searchWorkways": "Busca o selecciona formas de creación",
+  "identicalValue": "Ya existe un valor idéntico:",
+  "identicalSkill": "Ya existe una habilidad idéntica:",
+  "identicalRole": "Ya existe un rol idéntico:",
+  "identicalWorkway": "Ya existe una forma de creación idéntica:",
+  "similarValue": "Muy parecido a un valor existente:",
+  "similarSkill": "Muy parecido a una habilidad existente:",
+  "similarRole": "Muy parecido a un rol existente:",
+  "similarWorkway": "Muy parecido a una forma de creación existente:",
+  "addPrefix": "Crear"
+}

@@ -1,5 +1,5 @@
 ﻿<script>
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang';
 
@@ -28,70 +28,6 @@
   });
 
   // ─── Translations ──────────────────────────────────────────────
-  const i18n = {
-    he: {
-      title_single: 'פעולה שבוצעה ואושרה',
-      title_multi: 'ארכיון פעולות שבוצעו ואושרו',
-      badge: 'ארכיון',
-      badge_single: 'בוצע ואושר',
-      name: 'שם המשימה',
-      description: 'תיאור',
-      date: 'תאריך ביצוע',
-      public_links: 'קישורים ציבוריים',
-      private_notes: 'הערות אישיות לריקמה',
-      private_links: 'קישורים פרטיים',
-      hours: 'שעות עבודה',
-      per_hour: 'שווי שעה',
-      total: 'שווי כולל',
-      closing_notes: 'הערות סיום',
-      done_by: 'בוצע על ידי',
-      task_no: 'משימה',
-      currency: '₪',
-      hours_unit: 'שעות'
-    },
-    en: {
-      title_single: 'Completed & Approved Action',
-      title_multi: 'Completed & Approved Actions Archive',
-      badge: 'Archive',
-      badge_single: 'Completed',
-      name: 'Task Name',
-      description: 'Description',
-      date: 'Completion Date',
-      public_links: 'Public Links',
-      private_notes: 'Personal Notes',
-      private_links: 'Private Links',
-      hours: 'Hours Worked',
-      per_hour: 'Value / Hour',
-      total: 'Total Value',
-      closing_notes: 'Closing Notes',
-      done_by: 'Completed By',
-      task_no: 'Task',
-      currency: '₪',
-      hours_unit: 'hrs'
-    },
-    ar: {
-      title_single: 'إجراء مكتمل ومعتمد',
-      title_multi: 'أرشيف الإجراءات المكتملة والمعتمدة',
-      badge: 'الأرشيف',
-      badge_single: 'مكتمل',
-      name: 'اسم المهمة',
-      description: 'الوصف',
-      date: 'تاريخ الإنجاز',
-      public_links: 'روابط عامة',
-      private_notes: 'ملاحظات خاصة',
-      private_links: 'روابط خاصة',
-      hours: 'ساعات العمل',
-      per_hour: 'قيمة الساعة',
-      total: 'القيمة الإجمالية',
-      closing_notes: 'ملاحظات الإغلاق',
-      done_by: 'أُنجز بواسطة',
-      task_no: 'مهمة',
-      currency: '₪',
-      hours_unit: 'ساعة'
-    }
-  };
-
-  const labels = $derived(i18n[$lang] ?? i18n['he']);
   const dir = $derived($lang === 'ar' || $isRtl ? 'rtl' : 'ltr');
 </script>
 
@@ -99,10 +35,10 @@
   <!-- Header -->
   <div class="archive-header">
     <span class="badge" class:badge-single={isonly}>
-      {isonly ? labels.badge_single : labels.badge}
+      {isonly ? $t('project.finisin.badge_single') : $t('project.finisin.badge')}
     </span>
     <h1 class="archive-title">
-      {isonly ? labels.title_single : labels.title_multi}
+      {isonly ? $t('project.finisin.title_single') : $t('project.finisin.title_multi')}
     </h1>
     {#if !isonly}
       <span class="count-pill">{fmiData.length}</span>
@@ -118,7 +54,7 @@
         <header class="card-head">
           <div class="card-index">
             {#if !isonly}<span class="index-num">{i + 1}</span>{/if}
-            <span class="task-label">{labels.task_no}</span>
+            <span class="task-label">{$t('project.finisin.task_no')}</span>
           </div>
           <div class="card-title-block">
             <h2 class="card-title">{a.missionName}</h2>
@@ -134,35 +70,35 @@
         <div class="fields-grid">
           {#if a.descrip}
             <div class="field full-width">
-              <span class="field-label">{labels.description}</span>
+              <span class="field-label">{$t('project.finisin.description')}</span>
               <span class="field-value">{a.descrip}</span>
             </div>
           {/if}
 
           {#if a.Sqadualed}
             <div class="field">
-              <span class="field-label">{labels.date}</span>
+              <span class="field-label">{$t('project.finisin.date')}</span>
               <span class="field-value date-val">{a.Sqadualed}</span>
             </div>
           {/if}
 
           {#if a.noofhours > 0}
             <div class="field">
-              <span class="field-label">{labels.hours}</span>
+              <span class="field-label">{$t('project.finisin.hours')}</span>
               <span class="field-value numeric">
                 {a.noofhours.toLocaleString('en-US', {
                   maximumFractionDigits: 2
                 })}
-                <small>{labels.hours_unit}</small>
+                <small>{$t('project.finisin.hours_unit')}</small>
               </span>
             </div>
           {/if}
 
           {#if a.perhour > 0}
             <div class="field">
-              <span class="field-label">{labels.per_hour}</span>
+              <span class="field-label">{$t('project.finisin.per_hour')}</span>
               <span class="field-value numeric">
-                {labels.currency}{a.perhour.toLocaleString('en-US', {
+                {$t('project.finisin.currency')}{a.perhour.toLocaleString('en-US', {
                   maximumFractionDigits: 2
                 })}
               </span>
@@ -171,16 +107,16 @@
 
           {#if a.total}
             <div class="field highlight-field">
-              <span class="field-label">{labels.total}</span>
+              <span class="field-label">{$t('project.finisin.total')}</span>
               <span class="field-value total-val">
-                {labels.currency}{a.total}
+                {$t('project.finisin.currency')}{a.total}
               </span>
             </div>
           {/if}
 
           {#if a.why}
             <div class="field full-width">
-              <span class="field-label">{labels.closing_notes}</span>
+              <span class="field-label">{$t('project.finisin.closing_notes')}</span>
               <span class="field-value">{a.why}</span>
             </div>
           {/if}
@@ -191,7 +127,7 @@
           <div class="private-section">
             {#if a.publicklinks}
               <div class="field">
-                <span class="field-label link-label">{labels.public_links}</span
+                <span class="field-label link-label">{$t('project.finisin.public_links')}</span
                 >
                 <span class="field-value link-val">{a.publicklinks}</span>
               </div>
@@ -199,7 +135,7 @@
             {#if a.hearotMeyuchadot}
               <div class="field full-width">
                 <span class="field-label private-label"
-                  >{labels.private_notes}</span
+                  >{$t('project.finisin.private_notes')}</span
                 >
                 <span class="field-value">{a.hearotMeyuchadot}</span>
               </div>
@@ -207,7 +143,7 @@
             {#if a.privatlinks}
               <div class="field">
                 <span class="field-label private-label"
-                  >{labels.private_links}</span
+                  >{$t('project.finisin.private_links')}</span
                 >
                 <span class="field-value link-val">{a.privatlinks}</span>
               </div>

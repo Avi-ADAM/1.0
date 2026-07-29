@@ -1,44 +1,8 @@
 <script>
+  import { t } from '$lib/translations';
   import { goto } from '$app/navigation';
-  import { lang } from '$lib/stores/lang';
 
   let showMenu = $state(false);
-
-  const translations = {
-    he: {
-      more: 'עוד',
-      deals: 'עסקאות',
-      profile: 'פרופיל',
-      timers: 'טיימרים',
-      calendar: 'לוח שנה',
-      salesCenter: 'מרכז מכירות',
-      profileMenu: 'תפריט פרופיל',
-      meeting: 'פגישות',
-      myActs: 'המטלות שלי'
-    },
-    en: {
-      more: 'More',
-      deals: 'Deals',
-      profile: 'Profile',
-      timers: 'Timers',
-      calendar: 'Calendar',
-      salesCenter: 'Sales Center',
-      profileMenu: 'Profile Menu',
-      meeting: 'Meetings',
-      myActs: 'My Tasks'
-    },
-    ar: {
-      more: 'المزيد',
-      deals: 'صفقات',
-      profile: 'الملف الشخصي',
-      timers: 'المؤقتات',
-      calendar: 'التقويم',
-      salesCenter: 'مركز المبيعات',
-      profileMenu: 'قائمة الملف الشخصي',
-      meeting: 'اجتماعات',
-      myActs: 'مهامي'
-    }
-  };
 
   // SVG Icons
   const profileIcon = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>`;
@@ -84,10 +48,10 @@
       ></path>
     </svg>
     <span class="text-[9px] leading-none text-gray-500 dark:text-gray-300">
-      {translations[$lang]?.more || translations.en.more}
+      {$t('common.footer.more')}
     </span>
     <span class="sr-only">
-      {translations[$lang]?.profileMenu || translations.en.profileMenu}
+      {$t('common.footer.profileMenu')}
     </span>
   </button>
 
@@ -108,7 +72,7 @@
         >
           {@html profileIcon}
           <span class="mx-2">
-            {translations[$lang]?.profile || translations.en.profile}
+            {$t('common.footer.profile')}
           </span>
         </button>
         <!-- Deals moves in here on screens too narrow for its footer tab -->
@@ -119,7 +83,7 @@
         >
           {@html dealsIcon}
           <span class="mx-2">
-            {translations[$lang]?.deals || translations.en.deals}
+            {$t('common.footer.deals')}
           </span>
         </button>
         <button
@@ -129,7 +93,7 @@
         >
           {@html myActsIcon}
           <span class="mx-2">
-            {translations[$lang]?.myActs || translations.en.myActs}
+            {$t('common.footer.myActs')}
           </span>
         </button>
         <button
@@ -139,7 +103,7 @@
         >
           {@html salesIcon}
           <span class="mx-2">
-            {translations[$lang]?.salesCenter || translations.en.salesCenter}
+            {$t('common.footer.salesCenter')}
           </span>
         </button>
         <button
@@ -149,7 +113,7 @@
         >
           {@html timersIcon}
           <span class="mx-2">
-            {translations[$lang]?.timers || translations.en.timers}
+            {$t('common.footer.timers')}
           </span>
         </button>
         <button
@@ -159,7 +123,7 @@
         >
           {@html calendarIcon}
           <span class="mx-2">
-            {translations[$lang]?.calendar || translations.en.calendar}
+            {$t('common.footer.calendar')}
           </span>
         </button>
         <button
@@ -169,7 +133,7 @@
         >
           {@html meetingIcon}
           <span class="mx-2">
-            {translations[$lang]?.meeting || translations.en.meeting}
+            {$t('common.footer.meeting')}
           </span>
         </button>
       </div>

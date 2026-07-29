@@ -3,10 +3,10 @@
 -->
 
 <script lang="ts">
+  import { t } from '$lib/translations';
 	import { type ButtonElementProps, Button } from '$lib/components/ui/button';
 	import { useImageCropperCancel } from './image-cropper.svelte.js';
 	import Trash2Icon from '@lucide/svelte/icons/trash-2';
-	import { lang } from '$lib/stores/lang';
 	let {
 		ref = $bindable(null),
 		variant = 'outline',
@@ -15,9 +15,7 @@
 		...rest
 	}: ButtonElementProps = $props();
 
-	const cancelState = useImageCropperCancel();
-	const cancel = {"he":"ביטול", "en": "cancel"}
-</script>
+	const cancelState = useImageCropperCancel();</script>
 
 <Button
 	{...rest}
@@ -36,5 +34,5 @@
 	}}
 >
 	<Trash2Icon />
-	<span>{cancel[$lang]}</span>
+	<span>{$t('common.status.cancel')}</span>
 </Button>

@@ -61,7 +61,8 @@
     "create_note": "The product is hosted on your home weave (created automatically if needed) and is purchasable right away. You can add an image on the edit page.",
     "save_failed": "Saving failed",
     "seller_badge": "Independent provider",
-    "seller_profile": "Seller profile"
+    "seller_profile": "Seller profile",
+    "submitVote": "Submit for vote"
   },
   "missions": {
     "title": "Missions I do",
@@ -141,5 +142,41 @@
     "hours_done": "hours done",
     "empty_doing": "No missions in progress right now",
     "empty_done": "No completed missions yet"
+  },
+  "compose": {
+    "title": "Create Product",
+    "modeSimple": "Simple",
+    "modeComplex": "Complex",
+    "previewBadge": "Preview - server action not wired yet",
+    "name": "Product name",
+    "desc": "Description",
+    "image": "Image",
+    "price": "Price",
+    "kindOf": "Kind",
+    "kindTotal": "per unit",
+    "kindMonthly": "monthly",
+    "kindYearly": "yearly",
+    "kindUnlimited": "unlimited",
+    "quant": "Available quantity",
+    "unlimitedQuant": "unlimited",
+    "startDate": "Availability start",
+    "endDate": "Availability end",
+    "optional": "(optional)",
+    "oneForeProject": "One product per project",
+    "missions": "Required missions",
+    "resources": "Required resources",
+    "marginPct": "Margin / Overhead %",
+    "subtotal": "BOM subtotal",
+    "estimated": "Estimated price (with Overhead)",
+    "total": "Total",
+    "cancel": "Cancel",
+    "openWarn": "Items without an assignee will be shown as \"looking for provider\"; delivery may be delayed.",
+    "complexHint": "Complex products add a recipe of missions and resources. The base fields remain the same as a simple product.",
+    "locationTitle": "Product location",
+    "locationHelper": "Specify if the product/service is online, onsite, or hybrid.",
+    "locationEmpty": "Add location (optional)",
+    "locationOnline": "Online",
+    "locationSelected": "Location set",
+    "locationDone": "Done"
   }
 }

@@ -1163,7 +1163,7 @@ export class SalesService {
         he: 'שגיאה לא ידועה',
         en: 'Unknown error'
       }
-    };
+    }
 
     return messages[errorCode]?.[language] || messages.UNKNOWN_ERROR[language];
   }

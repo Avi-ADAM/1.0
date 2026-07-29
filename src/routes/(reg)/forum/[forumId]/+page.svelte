@@ -1,10 +1,10 @@
 <script lang="ts">
+  import { t } from '$lib/translations';
   import { goto, invalidate } from '$app/navigation';
   import { ArrowLeft, Copy } from '@lucide/svelte';
   import { toast } from 'svelte-sonner';
   import Diun from '$lib/components/lev/diun.svelte';
   import { forumStore } from '$lib/stores/forumStore';
-  import { lang } from '$lib/stores/lang.js';
 
   type ForumThread = {
     id: string;
@@ -34,28 +34,6 @@
       : (data.forum.messages ?? [])
   );
 
-  const copy = {
-    he: {
-      back: 'חזרה לרשימה',
-      copy: 'העתקת קישור',
-      copied: 'הקישור הועתק',
-      error: 'לא הצלחנו לשלוח את ההודעה'
-    },
-    en: {
-      back: 'Back to list',
-      copy: 'Copy link',
-      copied: 'Link copied',
-      error: 'Could not send the message'
-    },
-    ar: {
-      back: 'Back to list',
-      copy: 'Copy link',
-      copied: 'Link copied',
-      error: 'Could not send the message'
-    }
-  };
-
-  let t = $derived(copy[$lang] || copy.he);
 
   $effect(() => {
     const { id, title, messages: serverMessages, md } = data.forum;
@@ -93,7 +71,7 @@
     const result = await response.json();
 
     if (!response.ok || !result.success) {
-      toast.warning(result.error?.message || t.error);
+      toast.warning(result.error?.message || $t('common.forumThread.error'));
       clicked = false;
       return;
     }
@@ -108,7 +86,7 @@
       window.location.origin
     ).toString();
     await navigator.clipboard.writeText(url);
-    toast.success(t.copied);
+    toast.success($t('common.forumThread.copied'));
   }
 </script>
 
@@ -124,8 +102,8 @@
       <button
         type="button"
         class="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-gold/40 bg-gold/10 text-gold transition hover:border-barbi hover:text-pink-100 lg:hidden"
-        title={t.back}
-        aria-label={t.back}
+        title={$t('common.forumThread.back')}
+        aria-label={$t('common.forumThread.back')}
         onclick={() => goto('/forum')}
       >
         <ArrowLeft size={20} />
@@ -144,8 +122,8 @@
     <button
       type="button"
       class="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.055] text-pink-100 transition hover:border-gold hover:text-gold"
-      title={t.copy}
-      aria-label={t.copy}
+      title={$t('common.forumThread.copy')}
+      aria-label={$t('common.forumThread.copy')}
       onclick={copyLink}
     >
       <Copy size={18} />

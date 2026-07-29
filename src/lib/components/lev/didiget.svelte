@@ -432,41 +432,20 @@ id: ${pendId}
   }
   let w = $state(0);
 
-  let u = {
-    he: `אישור ${kind == 'send' ? 'העברת' : 'קבלת'} כספים על פי החלוקה שנקבעה`,
-    en: `apruval of ${
-      kind == 'send' ? 'sending' : 'reciving'
-    } money acording to the appruved spliting`
-  };
+  const headline = $derived(
+    kind == 'send' ? $t('lev.didiget.approveSend') : $t('lev.didiget.approveReceive')
+  );
 
   let hovered = $state(false);
   function hover(id) {
-    let t;
-    if (id == '0') {
-      t = u[$lang];
-    } else {
-      t = id;
-    }
-    onHover?.({ id: t });
+    onHover?.({ id: id == '0' ? headline : id });
   }
   function hoverede() {
     hovered = !hovered;
-    let t;
-    if (hovered == false) {
-      t = 'לב המערכת';
-    } else {
-      t = u[$lang];
-    }
-    onHover?.({ id: t });
+    onHover?.({ id: hovered ? headline : $t('lev.page.heartTitle') });
   }
   function hoverc(event) {
-    let t;
-    if (event.x == '0') {
-      t = u[$lang];
-    } else {
-      t = event.x;
-    }
-    onHover?.({ id: t });
+    onHover?.({ id: event.x == '0' ? headline : event.x });
   }
 
   function claf(event) {
@@ -474,12 +453,6 @@ id: ${pendId}
     let d = event.y;
     console.log(o, d);
   }
-  let apru = {
-    he: `אישור ${kind == 'send' ? 'שהעברתי' : 'שקיבלתי'} את הכסף`,
-    en: `I already ${kind == 'send' ? 'send' : 'recive'} the money`
-  };
-  let mes = { he: ``, en: `` };
-  let noo = { he: ``, en: `` };
 </script>
 
 <DialogOverlay class="overlay" {isOpen} onDismiss={close}>
@@ -674,7 +647,7 @@ id: ${pendId}
           {#if low == false}
             {#if !iConfirmed}
               <button
-                onmouseenter={() => hover(apru[$lang])}
+                onmouseenter={() => hover(kind == 'send' ? $t('lev.didiget.iSent') : $t('lev.didiget.iReceived'))}
                 onmouseleave={() => hover('0')}
                 onclick={agree}
                 style="margin: 0;"
@@ -692,7 +665,7 @@ id: ${pendId}
                 ></button
               >
               <button
-                onmouseenter={() => hover(mes[$lang])}
+                onmouseenter={() => hover('')}
                 onmouseleave={() => hover('0')}
                 onclick={react}
                 style="margin: 0;"
@@ -700,7 +673,7 @@ id: ${pendId}
                 name="negotiate"><Chaticon /></button
               >
               <button
-                onmouseenter={() => hover(noo[$lang])}
+                onmouseenter={() => hover('')}
                 onmouseleave={() => hover('0')}
                 onclick={decline}
                 style="margin: 0;"
@@ -746,7 +719,7 @@ id: ${pendId}
                 >
               </div>
               <button
-                onmouseenter={() => hover(mes[$lang])}
+                onmouseenter={() => hover('')}
                 onmouseleave={() => hover('0')}
                 onclick={() => react()}
                 style="margin: 0;"

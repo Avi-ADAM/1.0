@@ -1,0 +1,82 @@
+{
+  "_review": true,
+  "searching": "Buscando...",
+  "selectAndAdd": "Seleccionar",
+  "dismiss": "Descartar",
+  "addAnyway": "Añadir de todos modos",
+  "tryAgain": "Intentar de nuevo",
+  "errorMsg": "Vaya, algo salió mal. Inténtalo de nuevo",
+  "richText": {
+    "paragraph": "<p>Párrafo</p>",
+    "linkPrompt": "Introduce la URL",
+    "boldLetter": "N",
+    "h1": "<h1>Título</h1>",
+    "h3": "<h3>Subtítulo</h3>",
+    "list": "Lista",
+    "numberedList": "1. Lista",
+    "quote": "Cita",
+    "line": "Línea divisoria"
+  },
+  "dateInput": {
+    "select": "Elegir una fecha"
+  },
+  "numberInput": {
+    "maxQuantityReached": "Has alcanzado la cantidad máxima disponible",
+    "minQuantityReached": "Has alcanzado la cantidad mínima",
+    "cannotExceedAvailable": "No se puede superar la cantidad disponible: {{max}}",
+    "cannotGoBelowZero": "No se puede bajar de cero"
+  },
+  "locationView": {
+    "online": "En línea",
+    "onsite": "Presencial",
+    "hybrid": "Híbrido",
+    "empty": "Sin ubicación indicada",
+    "range": "Alcance",
+    "km": "km",
+    "showMap": "Mostrar el mapa",
+    "hideMap": "Ocultar el mapa",
+    "loadingMap": "Cargando el mapa…"
+  },
+  "input": {
+    "addImage": "Añadir imagen",
+    "uploadingImage": "Subiendo imagen"
+  },
+  "consent": {
+    "badge": {
+      "signed": "Verificado",
+      "pending": "Pendiente",
+      "unsigned": "Sin firmar",
+      "unverified": "Verificación fallida"
+    },
+    "status": {
+      "idle": {
+        "label": "Inicializando",
+        "help": "La identidad criptográfica aún no se ha creado"
+      },
+      "creating": {
+        "label": "Creando la clave…",
+        "help": "Generando una clave Ed25519 no extraíble"
+      },
+      "registering": {
+        "label": "Registrando…",
+        "help": "Publicando la clave pública en el servidor espejo"
+      },
+      "ready": {
+        "label": "Firma activa",
+        "help": "Cada acción significativa que hagas se firmará criptográficamente"
+      },
+      "local-only": {
+        "label": "Solo local",
+        "help": "La clave existe localmente; el servidor aún no la ha confirmado"
+      },
+      "unsupported": {
+        "label": "No compatible",
+        "help": "Este navegador no admite WebCrypto / IndexedDB"
+      },
+      "error": {
+        "label": "Error",
+        "help": "La configuración de la identidad falló: mira la página de identidad"
+      }
+    }
+  }
+}

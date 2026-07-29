@@ -6,7 +6,7 @@
   import LocationPicker from '$lib/components/location/LocationPicker.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { uPic } from '$lib/stores/uPic.js';
-  import { t, locale } from '$lib/translations';
+  import { t, locale, isRtl } from '$lib/translations';
 
   /**
    * @type {{
@@ -53,7 +53,7 @@
   }
 
   function getUserInitials(name) {
-    if (!name) return 'מש';
+    if (!name) return $t('concierge.new.avatarFallback');
     const parts = name.trim().split(/\s+/);
     if (parts.length === 1) {
       return parts[0].slice(0, 2);
@@ -62,18 +62,14 @@
   }
 
   /* ===== Inspiration seeds ===== */
-  /* ===== Inspiration seeds ===== */
+  /* Label and hint come from `concierge.new.seeds.<key>`. */
   const SEEDS = [
-    { icon: '🎁', label: 'מתנה לאדם אהוב', hint: 'יום חופש, חוויה, התרגשות' },
-    {
-      icon: '🛠',
-      label: 'משימה שלא מצליחים לבד',
-      hint: 'תיקון, סידור, פרויקט'
-    },
-    { icon: '🌿', label: 'אירוע קטן בקהילה', hint: 'מפгש, סדנה, יוזמה' },
-    { icon: '✈', label: 'תכנון נסיעה', hint: 'יעד, מלון, לינה' },
-    { icon: '👶', label: 'תמיכה במשפחה', hint: 'השגחה, בישול, ליוوي' },
-    { icon: '✍', label: 'משאלה חופשית', hint: 'ספרו הכל בחופשיות' }
+    { icon: '🎁', key: 'gift' },
+    { icon: '🛠', key: 'task' },
+    { icon: '🌿', key: 'community' },
+    { icon: '✈', key: 'trip' },
+    { icon: '👶', key: 'family' },
+    { icon: '✍', key: 'free' }
   ];
 
   /* ===== AI extraction (Lev rail — live analysis) ===== */
@@ -152,141 +148,59 @@
     return () => clearTimeout(timer);
   });
 
+  /* Value keys — labels live under `concierge.new.values.<key>`. */
   const ALL_VALUES = [
-    'הסכמה',
-    'שוויון',
-    'קהילתיות',
-    'שקיפות',
-    'נגישות',
-    'אקולוגיה',
-    'הדדיות',
-    'יצירתיות',
-    'נדיבות',
-    'אמון'
+    'consent',
+    'equality',
+    'community',
+    'transparency',
+    'accessibility',
+    'ecology',
+    'reciprocity',
+    'creativity',
+    'generosity',
+    'trust'
   ];
 
+  /* Label/placeholder come from `concierge.new.jewels.<key>`. */
   const DETAIL_JEWELS = [
-    {
-      icon: '📅',
-      label: 'מתי',
-      placeholder: 'לחיצה לבחירת תאריך',
-      accent: 'gold'
-    },
-    {
-      icon: '📍',
-      label: 'היכן',
-      placeholder: 'עיר, אזור, או הביתה',
-      accent: 'blue'
-    },
-    {
-      icon: '💰',
-      label: 'תקציב',
-      placeholder: 'טווח גמיש או לפי הצעה',
-      accent: 'green'
-    },
-    {
-      icon: '👥',
-      label: 'מי יכול/ה להציע',
-      placeholder: 'פתוח לכל / חברי הריקמה',
-      accent: 'barbi'
-    },
-    {
-      icon: '🔒',
-      label: 'מי יכול/ה לראות',
-      placeholder: 'פרטי · ריקמות בלבד · קהילה',
-      accent: 'gold'
-    },
-    {
-      icon: '🤝',
-      label: 'האם להזמין שותפים',
-      placeholder: 'כן — אישית, או דרך Lev',
-      accent: 'green'
-    },
-    {
-      icon: '🫂',
-      label: 'יוזמה משותפת',
-      placeholder: 'אישית · או קבוצתית',
-      accent: 'barbi'
-    }
+    { icon: '📅', key: 'when', accent: 'gold' },
+    { icon: '📍', key: 'where', accent: 'blue' },
+    { icon: '💰', key: 'budget', accent: 'green' },
+    { icon: '👥', key: 'whoCanOffer', accent: 'barbi' },
+    { icon: '🔒', key: 'whoCanSee', accent: 'gold' },
+    { icon: '🤝', key: 'invite', accent: 'green' },
+    { icon: '🫂', key: 'joinKind', accent: 'barbi' }
   ];
 
+  /* Every option list below carries only its stored `value` plus the `key` used
+     to look up `<group>.<key>.label` / `.hint`. Where the stored value is
+     already a string it doubles as the key. */
   const WHO_CAN_OFFER_OPTIONS = [
-    {
-      value: true,
-      label: 'פתוח לכל',
-      hint: 'כל מי שיש לו/ה מוצר מתאים יכול/ה להציע.'
-    },
-    {
-      value: false,
-      label: 'ריקמות שלי בלבד',
-      hint: 'רק חברי/ות פרויקטים שאני בהם יוכלו להציע.'
-    }
+    { value: true, key: 'open' },
+    { value: false, key: 'mine' }
   ];
   const WHO_CAN_SEE_OPTIONS = [
-    {
-      value: 'personal',
-      label: 'פרטי',
-      hint: 'רק המשתמש/ת רואה. המשאלה לא תיכנס למסך הציבורי.'
-    },
-    {
-      value: 'free_threshold',
-      label: 'פתוח לקהילה',
-      hint: 'מופיע במסך משאלות הקהילה לכל הרשומים.'
-    },
-    {
-      value: 'pay_to_access',
-      label: 'גישה בתשלום',
-      hint: 'גישה למשאלה דרך טוקן/תשלום (M+).'
-    }
+    { value: 'personal' },
+    { value: 'free_threshold' },
+    { value: 'pay_to_access' }
   ];
   const INVITE_PARTNERS_OPTIONS = [
-    { value: 'lev', label: 'דרך Lev', hint: 'Lev תמצא ותפנה אוטומטית.' },
-    {
-      value: 'manual',
-      label: 'הזמנה עצמית',
-      hint: 'הזמנה אישית של השותפים הרצויים.'
-    },
-    {
-      value: 'none',
-      label: 'בלי',
-      hint: 'ללא הזמנה מראש — בחירה עצמית מתוך ההצעות הקיימות.'
-    }
+    { value: 'lev' },
+    { value: 'manual' },
+    { value: 'none' }
   ];
   /* Shared-purchase initiative kinds (PLAN_SHARED_PURCHASE S0).
      'solo' = today's behaviour. Any other value opens a group that others
      can join, decide and pay together. */
   const JOIN_KIND_OPTIONS = [
-    {
-      value: 'solo',
-      label: 'יוזמה אישית',
-      hint: 'אני מארגנ/ת, אחרים מציעים.'
-    },
-    {
-      value: 'group_purchase',
-      label: 'רכישה משותפת',
-      hint: 'כמה אנשים קונים יחד ומתחלקים בעלות.'
-    },
-    {
-      value: 'group_trip',
-      label: 'טיול קבוצתי',
-      hint: 'מתכננים ומשלמים יחד על נסיעה.'
-    },
-    {
-      value: 'community_event',
-      label: 'אירוע קהילתי',
-      hint: 'מפגש או יוזמה משותפת בקהילה.'
-    },
-    {
-      value: 'public_renovation',
-      label: 'שיפוץ / פרויקט ציבורי',
-      hint: 'מרחב משותף שכמה אנשים משפצים יחד.'
-    },
-    {
-      value: 'recurring_subscription',
-      label: 'מנוי משותף מתמשך',
-      hint: 'התחייבות חוזרת שמתחלקת בין המשתתפים.'
-    },
-    { value: 'other', label: 'אחר', hint: 'יוזמה משותפת מסוג אחר.' }
+    { value: 'solo' },
+    { value: 'group_purchase' },
+    { value: 'group_trip' },
+    { value: 'community_event' },
+    { value: 'public_renovation' },
+    { value: 'recurring_subscription' },
+    { value: 'other' }
   ];
 
   const ACCENT = {
@@ -316,11 +230,13 @@
     }
   };
 
+  /* `code` is the decorative Latin small-caps on the rail and stays as-is in
+     every locale; the word beside it is translated. */
   const STEPS = [
-    { id: 0, en: 'WISH', he: 'משאלה' },
-    { id: 1, en: 'UNDERSTAND', he: 'הבנה' },
-    { id: 2, en: 'PROPOSALS', he: 'הצעות' },
-    { id: 3, en: 'CONSENT', he: 'הסכמה' }
+    { id: 0, code: 'WISH', key: 'wish' },
+    { id: 1, code: 'UNDERSTAND', key: 'understand' },
+    { id: 2, code: 'PROPOSALS', key: 'proposals' },
+    { id: 3, code: 'CONSENT', key: 'consent' }
   ];
 
   /* ===== Form state ===== */
@@ -355,26 +271,16 @@
   let joinDeadline = $state(''); // ISO yyyy-mm-dd
   const isGroupKind = $derived(joinKind !== 'solo');
 
-  /* Display formatters */
-  const HE_MONTHS_FULL = [
-    'בינואר',
-    'בפברואר',
-    'במרץ',
-    'באפריל',
-    'במאי',
-    'ביוני',
-    'ביולי',
-    'באוגוסט',
-    'בספטמבר',
-    'באוקטובר',
-    'בנובמבר',
-    'בדצמבר'
-  ];
+  /* Display formatters — the runtime supplies the month names per locale, so
+     there is no month table to translate. */
   function fmtDayMon(iso) {
     if (!iso) return '';
     const d = new Date(iso);
     if (Number.isNaN(d.getTime())) return '';
-    return `${d.getDate()} ${HE_MONTHS_FULL[d.getMonth()]}`;
+    return d.toLocaleDateString($locale || 'he', {
+      day: 'numeric',
+      month: 'long'
+    });
   }
   const whenJewelValue = $derived.by(() => {
     if (!startDate && !finnishDate) return '';
@@ -386,20 +292,20 @@
     typeof budgetAmount === 'number' &&
       Number.isFinite(budgetAmount) &&
       budgetAmount > 0
-      ? `₪ ${budgetAmount.toLocaleString('he-IL')}`
+      ? `₪ ${budgetAmount.toLocaleString($locale || 'he')}`
       : ''
   );
   const whoCanOfferJewelValue = $derived(
-    WHO_CAN_OFFER_OPTIONS.find((o) => o.value === whoCanOffer)?.label || ''
+    $t(`concierge.new.whoCanOffer.${whoCanOffer ? 'open' : 'mine'}.label`)
   );
   const whoCanSeeJewelValue = $derived(
-    WHO_CAN_SEE_OPTIONS.find((o) => o.value === whoCanSee)?.label || ''
+    $t(`concierge.new.whoCanSee.${whoCanSee}.label`)
   );
   const invitePartnersJewelValue = $derived(
-    INVITE_PARTNERS_OPTIONS.find((o) => o.value === invitePartners)?.label || ''
+    $t(`concierge.new.invitePartners.${invitePartners}.label`)
   );
   const joinKindJewelValue = $derived(
-    JOIN_KIND_OPTIONS.find((o) => o.value === joinKind)?.label || ''
+    $t(`concierge.new.joinKind.${joinKind}.label`)
   );
 
   const bodyText = $derived.by(() =>
@@ -441,10 +347,11 @@
       Boolean(location.location_hint?.trim())
   );
   const locationJewelValue = $derived.by(() => {
-    if (location.location_mode === 'online') return 'אונליין';
+    if (location.location_mode === 'online') return $t('concierge.new.online');
     if (hasLocationPoint) {
-      const hint = location.location_hint?.trim() || 'מיקום נבחר';
-      return `${hint} · ${location.radius || 15} ק״מ`;
+      const hint =
+        location.location_hint?.trim() || $t('concierge.new.locationChosen');
+      return `${hint} · ${location.radius || 15} ${$t('concierge.new.km')}`;
     }
     return location.location_hint?.trim() || '';
   });
@@ -589,7 +496,9 @@
     } catch (err) {
       console.error('[concierge/new] publish failed:', err);
       publishError =
-        err instanceof Error ? err.message : 'אירעה שגיאה ביצירת המשאלה';
+        err instanceof Error
+          ? err.message
+          : $t('concierge.new.publishFailed');
     } finally {
       publishing = false;
     }
@@ -602,7 +511,7 @@
   }
 
   function pickSeed(seed) {
-    title = seed.label;
+    title = $t(`concierge.new.seeds.${seed.key}.label`);
   }
 
   function openLocationModal() {
@@ -644,7 +553,7 @@
     if (index === LOCATION_JEWEL_INDEX) return hasLocationValue;
     if (index === 0) return Boolean(whenJewelValue);
     if (index === 2) return Boolean(budgetJewelValue);
-    if (index === 3) return whoCanOffer !== true; // 'pתוח לכל' is default → only highlight when changed
+    if (index === 3) return whoCanOffer !== true; // 'פתוח לכל' is default → only highlight when changed
     if (index === 4) return whoCanSee !== 'personal';
     if (index === 5) return invitePartners !== 'lev';
     if (index === 6) return joinKind !== 'solo';
@@ -652,15 +561,16 @@
   }
 
   function detailJewelValue(jewel, index) {
+    const placeholder = $t(`concierge.new.jewels.${jewel.key}.placeholder`);
     if (index === LOCATION_JEWEL_INDEX)
-      return locationJewelValue || jewel.placeholder;
-    if (index === 0) return whenJewelValue || jewel.placeholder;
-    if (index === 2) return budgetJewelValue || jewel.placeholder;
-    if (index === 3) return whoCanOfferJewelValue || jewel.placeholder;
-    if (index === 4) return whoCanSeeJewelValue || jewel.placeholder;
-    if (index === 5) return invitePartnersJewelValue || jewel.placeholder;
-    if (index === 6) return joinKindJewelValue || jewel.placeholder;
-    return jewel.placeholder;
+      return locationJewelValue || placeholder;
+    if (index === 0) return whenJewelValue || placeholder;
+    if (index === 2) return budgetJewelValue || placeholder;
+    if (index === 3) return whoCanOfferJewelValue || placeholder;
+    if (index === 4) return whoCanSeeJewelValue || placeholder;
+    if (index === 5) return invitePartnersJewelValue || placeholder;
+    if (index === 6) return joinKindJewelValue || placeholder;
+    return placeholder;
   }
 
   /* Quick budget presets */
@@ -696,7 +606,7 @@
       : 'border-color:rgba(255,255,255,0.06)';
   }
   function accentText(acc, hasVal) {
-    return hasVal ? (ACCENT[acc] || ACCENT.gold).text : '#52493e';
+    return hasVal ? (ACCENT[acc] || ACCENT.gold).text : '#9a8f80';
   }
   function accentBg(acc, hasVal) {
     if (!hasVal) return 'rgba(255,255,255,0.03)';
@@ -729,7 +639,7 @@
   function navGuard(event, dest, label) {
     if (!anon) return; // logged in → let the link/button navigate normally
     event.preventDefault();
-    navNotice = `יש להירשם כדי להגיע אל «${label}»`;
+    navNotice = $t('concierge.new.navNotice', { label });
     navNoticeDest = dest;
     clearTimeout(navNoticeTimer);
     navNoticeTimer = setTimeout(() => (navNotice = ''), 6000);
@@ -745,7 +655,7 @@
 <!-- ===================================================================
      NEW WISH — form page (mock, design-only)
      =================================================================== -->
-<div class="cp" dir="rtl">
+<div class="cp" dir={$isRtl ? 'rtl' : 'ltr'}>
   <!-- ── HEADER ─────────────────────────────────────────────────────── -->
   <header class="hdr">
     <div class="hdr-logo">
@@ -753,44 +663,54 @@
       <div class="hdr-brand">
         <span class="hdr-dot"></span>
         <span class="hdr-name">Concierge</span>
-        <span class="hdr-sub hide-xs">· קונסיירז׳</span>
+        <span class="hdr-sub hide-xs">{$t('concierge.new.brandSub')}</span>
       </div>
     </div>
     <nav class="hdr-nav hide-sm">
       <a
         href="/lev"
         class="nav-lnk"
-        onclick={(e) => navGuard(e, '/lev', 'הסקירה שלי')}>הסקירה שלי</a
+        onclick={(e) => navGuard(e, '/lev', $t('concierge.new.nav.overview'))}
+        >{$t('concierge.new.nav.overview')}</a
       >
       <a
         href="/concierge"
         class="nav-lnk nav-act"
-        onclick={(e) => navGuard(e, '/concierge', 'משאלות')}>משאלות</a
+        onclick={(e) =>
+          navGuard(e, '/concierge', $t('concierge.new.nav.wishes'))}
+        >{$t('concierge.new.nav.wishes')}</a
       >
       <a
         href="/deals"
         class="nav-lnk"
-        onclick={(e) => navGuard(e, '/deals', 'דילים')}>דילים</a
+        onclick={(e) => navGuard(e, '/deals', $t('concierge.new.nav.deals'))}
+        >{$t('concierge.new.nav.deals')}</a
       >
       <a
         href="/moach"
         class="nav-lnk"
-        onclick={(e) => navGuard(e, '/moach', 'ריקמות')}>ריקמות</a
+        onclick={(e) => navGuard(e, '/moach', $t('concierge.new.nav.moach'))}
+        >{$t('concierge.new.nav.moach')}</a
       >
     </nav>
     <div class="hdr-right">
       {#if anon}
         <button
           class="hdr-register"
-          onclick={() => gotoRegister('/concierge/new')}>הרשמה</button
+          onclick={() => gotoRegister('/concierge/new')}
+          >{$t('concierge.new.register')}</button
         >
       {:else}
-        <button class="notif-btn" aria-label="התראות"
+        <button class="notif-btn" aria-label={$t('concierge.new.notifications')}
           >🔔<span class="notif-pip"></span></button
         >
         <button class="av-btn" onclick={() => goto('/me')}>
           {#if $uPic}
-            <img src={$uPic} alt="פרופיל" class="av-img" />
+            <img
+              src={$uPic}
+              alt={$t('concierge.new.profileAlt')}
+              class="av-img"
+            />
           {:else}
             {getUserInitials(data.un)}
           {/if}
@@ -803,10 +723,12 @@
     <div class="nav-notice" role="status" transition:fade={{ duration: 140 }}>
       <span class="nav-notice-txt">{navNotice}</span>
       <button class="nav-notice-reg" onclick={() => gotoRegister(navNoticeDest)}
-        >הרשמה</button
+        >{$t('concierge.new.register')}</button
       >
-      <button class="nav-notice-x" aria-label="סגירה" onclick={dismissNavNotice}
-        >×</button
+      <button
+        class="nav-notice-x"
+        aria-label={$t('concierge.new.close')}
+        onclick={dismissNavNotice}>×</button
       >
     </div>
   {/if}
@@ -822,8 +744,10 @@
               i === activeStep ? 'active' : i < activeStep ? 'done' : ''}
             <div class="step {st}">
               <span class="step-dot">{step.id + 1}</span>
-              <span class="step-en hide-xs">{step.en}</span>
-              <span class="step-he hide-xs">· {step.he}</span>
+              <span class="step-en hide-xs">{step.code}</span>
+              <span class="step-he hide-xs"
+                >· {$t(`concierge.new.steps.${step.key}`)}</span
+              >
             </div>
             {#if i < STEPS.length - 1}<span class="step-sep"></span>{/if}
           {/each}
@@ -831,29 +755,36 @@
         <a
           href="/concierge"
           class="btn-ghost btn-xs"
-          onclick={(e) => navGuard(e, '/concierge', 'רשימת המשאלות שלי')}
-          >⟵ חזרה לרשימת המשאלות שלי</a
+          onclick={(e) =>
+            navGuard(e, '/concierge', $t('concierge.new.nav.wishList'))}
+          >{$t('concierge.new.backToList')}</a
         >
       </div>
 
       <!-- OPENING INCANTATION -->
       <div class="anim anim-d1" style="text-align:center;padding:24px 0 6px">
-        <div class="incant-rule">◈ ───── משאלה חדשה ───── ◈</div>
-        <h1 class="incant-h1">מה תרצו שיקרה?</h1>
+        <div class="incant-rule">{$t('concierge.new.incantRule')}</div>
+        <h1 class="incant-h1">{$t('concierge.new.incantTitle')}</h1>
         <p class="incant-p">
-          ספרו בלשונכם. אנחנו נמצא את האנשים, נציע איך לחבר, ותוכלו לאשר.<br />
-          <span style="color:#fde68a">שום דבר לא יוצא החוצה עד שתפרסמו.</span>
+          {$t('concierge.new.incantBody')}<br />
+          <span style="color:#fde68a"
+            >{$t('concierge.new.incantPrivacy')}</span
+          >
         </p>
       </div>
 
       <!-- INSPIRATION SEEDS -->
       <div class="seeds anim anim-d2">
-        {#each SEEDS as seed (seed.label)}
+        {#each SEEDS as seed (seed.key)}
           <button class="seed-card" onclick={() => pickSeed(seed)}>
             <span class="seed-icon">{seed.icon}</span>
             <div style="min-width:0;text-align:start">
-              <div class="seed-label">{seed.label}</div>
-              <div class="seed-hint">{seed.hint}</div>
+              <div class="seed-label">
+                {$t(`concierge.new.seeds.${seed.key}.label`)}
+              </div>
+              <div class="seed-hint">
+                {$t(`concierge.new.seeds.${seed.key}.hint`)}
+              </div>
             </div>
           </button>
         {/each}
@@ -879,12 +810,12 @@
               <span
                 style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#fde68a"
               >
-                משאלה חדשה · טיוטה
+                {$t('concierge.new.draftBadge')}
               </span>
               <span style="flex:1"></span>
               <span
-                style="font-family:'Bellefair',serif;font-size:12px;color:#52493e"
-                >נשמר אוטומטית · עכשיו</span
+                style="font-family:'Bellefair',serif;font-size:12px;color:#9a8f80"
+                >{$t('concierge.new.autosaved')}</span
               >
             </div>
 
@@ -904,15 +835,25 @@
             <!-- Toolbar -->
             <div class="scroll-toolbar">
               <div style="display:flex;gap:6px">
-                <button class="tool-btn" title="מיקרופון">🎙</button>
-                <button class="tool-btn" title="צרפו תמונה">📎</button>
-                <button class="tool-btn" title="הצעת ניסוח של Lev">✨</button>
-                <button class="tool-btn" title="שפה">⇄</button>
+                <button class="tool-btn" title={$t('concierge.new.tool.mic')}
+                  >🎙</button
+                >
+                <button class="tool-btn" title={$t('concierge.new.tool.attach')}
+                  >📎</button
+                >
+                <button
+                  class="tool-btn"
+                  title={$t('concierge.new.tool.phrasing')}>✨</button
+                >
+                <button
+                  class="tool-btn"
+                  title={$t('concierge.new.tool.language')}>⇄</button
+                >
               </div>
               <div style="display:flex;align-items:center;gap:12px">
                 <span
                   style="font-family:'Bellefair',serif;font-size:12px;color:#7a6f5e"
-                  >{words} מילים</span
+                  >{$t('concierge.new.wordCount', { count: words })}</span
                 >
                 <div class="word-gauge">
                   <div class="word-fill" style="width:{fullness * 100}%"></div>
@@ -923,9 +864,9 @@
           <!-- /scroll-frame -->
 
           <!-- PRACTICAL DETAILS -->
-          <div class="subsection">פרטים מעשיים</div>
+          <div class="subsection">{$t('concierge.new.sectionDetails')}</div>
           <div class="jewels-grid">
-            {#each DETAIL_JEWELS as j, i (j.label)}
+            {#each DETAIL_JEWELS as j, i (j.key)}
               {@const has = detailJewelHasValue(j, i)}
               <button
                 class:location-trigger={i === LOCATION_JEWEL_INDEX}
@@ -944,7 +885,9 @@
                   style="background:{accentBg(j.accent, has)}">{j.icon}</span
                 >
                 <div style="flex:1;min-width:0;text-align:start">
-                  <div class="jewel-label">{j.label}</div>
+                  <div class="jewel-label">
+                    {$t(`concierge.new.jewels.${j.key}.label`)}
+                  </div>
                   <div
                     class="jewel-val"
                     style="color:{accentText(j.accent, has)}"
@@ -958,13 +901,14 @@
           </div>
 
           <!-- VALUES -->
-          <div class="subsection">ערכים שחשובים לי</div>
+          <div class="subsection">{$t('concierge.new.sectionValues')}</div>
           <div class="values-grid anim anim-d4">
             {#each ALL_VALUES as v (v)}
               {@const on = values.includes(v)}
               <button
                 class="val-pill {on ? 'on' : ''}"
-                onclick={() => toggleValue(v)}>{v}</button
+                onclick={() => toggleValue(v)}
+                >{$t(`concierge.new.values.${v}`)}</button
               >
             {/each}
           </div>
@@ -1004,18 +948,18 @@
                   ? '1px 1px 0 rgba(255,255,255,0.5)'
                   : 'none'}"
                 >{anon
-                  ? 'הירשמו כדי לפרסם ←'
+                  ? $t('concierge.new.publishRegister')
                   : publishing
                     ? $t('concierge.new.publishing')
                     : hasMatches
-                      ? 'פרסום ומעבר להצעות ←'
+                      ? $t('concierge.new.publishAndSee')
                       : $t('concierge.new.publish')}</button
               >
             </div>
           </div>
 
           <div
-            style="margin-top:14px;text-align:center;font-family:'Bellefair',serif;font-size:12px;color:#52493e"
+            style="margin-top:14px;text-align:center;font-family:'Bellefair',serif;font-size:12px;color:#9a8f80"
           >
             {$t('concierge.new.afterPublish')}
           </div>
@@ -1053,16 +997,19 @@
               <div
                 style="font-family:'Bellefair',serif;font-size:11px;color:#7a6f5e"
               >
-                מקשיב/ת ומסמנ/ת בעדינות
+                {$t('concierge.new.lev.sub')}
               </div>
             </div>
           </div>
 
           {#if anon && hasMatches}
             <button class="anon-cta" onclick={saveDraftAndRegister}>
-              ✨ נמצאו {matchedPeople.length +
-                matchedResources.length +
-                matchedMissions.length} התאמות אפשריות · הירשמו כדי לראות מי
+              {$t('concierge.new.lev.anonCta', {
+                count:
+                  matchedPeople.length +
+                  matchedResources.length +
+                  matchedMissions.length
+              })}
             </button>
           {/if}
 
@@ -1071,27 +1018,32 @@
             <span class="lead" style="display:flex;align-items:center;gap:8px">
               <span class="gem" style="width:6px;height:6px"></span>
               {#if extracting}
-                מנתח/ת…
+                {$t('concierge.new.lev.analyzing')}
               {:else if extractedMissions.length + extractedResources.length > 0}
-                מה אני מזהה עד עכשיו · {extractedMissions.length +
-                  extractedResources.length}
+                {$t('concierge.new.lev.identified', {
+                  count: extractedMissions.length + extractedResources.length
+                })}
               {:else}
-                ניתוח בזמן אמת
+                {$t('concierge.new.lev.realtime')}
               {/if}
             </span>
           </div>
 
           {#if extracting}
             <div
-              style="padding:14px 12px;border-radius:10px;background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.08);font-family:'Bellefair',serif;font-size:12.5px;color:#52493e;line-height:1.55;text-align:center"
+              style="padding:14px 12px;border-radius:10px;background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.08);font-family:'Bellefair',serif;font-size:12.5px;color:#9a8f80;line-height:1.55;text-align:center"
             >
-              <span style="opacity:.6">מקשיב/ת…</span>
+              <span style="opacity:.6"
+                >{$t('concierge.new.lev.listening')}</span
+              >
             </div>
           {:else if extractedMissions.length > 0 || extractedResources.length > 0}
             <div style="display:flex;flex-direction:column;gap:10px">
               {#if extractedMissions.length > 0}
                 <div>
-                  <div class="lev-col-lbl">✦ משימות</div>
+                  <div class="lev-col-lbl">
+                    {$t('concierge.new.lev.missions')}
+                  </div>
                   <div style="display:flex;flex-wrap:wrap;gap:5px">
                     {#each extractedMissions as m (m.name)}
                       <span
@@ -1107,7 +1059,9 @@
               {/if}
               {#if extractedResources.length > 0}
                 <div>
-                  <div class="lev-col-lbl">◐ משאבים</div>
+                  <div class="lev-col-lbl">
+                    {$t('concierge.new.lev.resources')}
+                  </div>
                   <div style="display:flex;flex-wrap:wrap;gap:5px">
                     {#each extractedResources as r (r.name)}
                       <span
@@ -1126,16 +1080,16 @@
             <!-- body has text but no results yet — show nothing, wait for debounce -->
           {:else}
             <div
-              style="padding:14px 12px;border-radius:10px;background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.08);font-family:'Bellefair',serif;font-size:12.5px;color:#52493e;line-height:1.55;text-align:center"
+              style="padding:14px 12px;border-radius:10px;background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.08);font-family:'Bellefair',serif;font-size:12.5px;color:#9a8f80;line-height:1.55;text-align:center"
             >
-              התחילו לכתוב ואזהה<br />משימות ומשאבים אוטומטית
+              {$t('concierge.new.lev.emptyHint')}
             </div>
           {/if}
 
           <!-- Skills the wish implies -->
           {#if extractedSkills.length > 0}
             <div style="margin-top:14px">
-              <div class="lev-col-lbl">✶ כישורים שצריך</div>
+              <div class="lev-col-lbl">{$t('concierge.new.lev.skills')}</div>
               <div style="display:flex;flex-wrap:wrap;gap:5px">
                 {#each extractedSkills as s (s.name)}
                   <span class="chip" style="font-size:11.5px;padding:3px 9px"
@@ -1152,7 +1106,7 @@
               style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.05)"
             >
               <div class="lev-col-lbl" style="margin-bottom:8px">
-                ◆ כבר קיים במערכת
+                {$t('concierge.new.lev.existing')}
               </div>
               <div style="display:flex;flex-direction:column;gap:6px">
                 {#each matchedMissions as m (m.id)}
@@ -1172,7 +1126,9 @@
               style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.05)"
             >
               <div class="lev-col-lbl" style="margin-bottom:8px">
-                ◐ משאבים פנויים · {matchedResources.length}
+                {$t('concierge.new.lev.freeResources', {
+                  count: matchedResources.length
+                })}
               </div>
               <div style="display:flex;flex-direction:column;gap:6px">
                 {#each matchedResources as r (r.id)}
@@ -1218,7 +1174,7 @@
               style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.05)"
             >
               <div class="lev-col-lbl" style="margin-bottom:8px">
-                ♥ אנשים שיכולים לעזור · {matchedPeople.length}
+                {$t('concierge.new.lev.people', { count: matchedPeople.length })}
               </div>
               <div style="display:flex;flex-direction:column;gap:8px">
                 {#each matchedPeople as p (p.id)}
@@ -1228,7 +1184,8 @@
                     {#if anon}
                       <span
                         style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(116,191,255,.12);color:#74bfff;font-size:12px;flex-shrink:0"
-                        aria-label="זהות מוסתרת">🔒</span
+                        aria-label={$t('concierge.new.lev.hiddenIdentity')}
+                        >🔒</span
                       >
                     {:else if p.avatar}
                       <img
@@ -1268,7 +1225,7 @@
               style="margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.05)"
             >
               <div class="lev-col-lbl" style="margin-bottom:10px">
-                הצעות עדינות
+                {$t('concierge.new.lev.hints')}
               </div>
               <div style="display:flex;flex-direction:column;gap:10px">
                 {#each extractedHints as hint (hint.text)}
@@ -1306,8 +1263,7 @@
             <div
               style="font-family:'Bellefair',serif;font-size:11.5px;color:#9a8f80;line-height:1.55"
             >
-              כל מה שאני קורא/ת נשאר בינינו עד שתאשרו. שום שותפ/ה לא רואה כלום
-              עד שתפרסמו.
+              {$t('concierge.new.lev.privacy')}
             </div>
           </div>
         </div>
@@ -1334,32 +1290,37 @@
       >
         <div class="location-modal-head">
           <div>
-            <div class="modal-eyebrow">Location</div>
-            <h2 id="location-modal-title">איפה זה קורה?</h2>
+            <div class="modal-eyebrow">
+              {$t('concierge.new.locationModal.eyebrow')}
+            </div>
+            <h2 id="location-modal-title">
+              {$t('concierge.new.locationModal.title')}
+            </h2>
           </div>
           <button
             class="modal-close"
             type="button"
-            aria-label="סגירת בחירת מיקום"
+            aria-label={$t('concierge.new.locationModal.closeAria')}
             onclick={closeLocationModal}>×</button
           >
         </div>
 
         <LocationPicker
           bind:value={location}
-          label="מיקום המשאלה"
-          helper="בחרו אם זה אונליין, פיזי או היברידי. הנקודה והרדיוס יעזרו ל-Lev להציע ספקים קרובים."
+          label={$t('concierge.new.locationModal.label')}
+          helper={$t('concierge.new.locationModal.helper')}
           height="420px"
         />
 
         <div class="location-modal-actions">
           <button class="btn-ghost" type="button" onclick={closeLocationModal}
-            >סגירה</button
+            >{$t('concierge.new.close')}</button
           >
           <button
             class="btn-jewel modal-save"
             type="button"
-            onclick={closeLocationModal}>שמירת מיקום</button
+            onclick={closeLocationModal}
+            >{$t('concierge.new.locationModal.save')}</button
           >
         </div>
       </div>
@@ -1382,27 +1343,28 @@
         <div class="location-modal-head">
           <div>
             <div class="modal-eyebrow">
-              {DETAIL_JEWELS[editingJewel].icon} · {DETAIL_JEWELS[editingJewel]
-                .label}
+              {DETAIL_JEWELS[editingJewel].icon} · {$t(
+                `concierge.new.jewels.${DETAIL_JEWELS[editingJewel].key}.label`
+              )}
             </div>
             <h2 id="jewel-modal-title">
               {editingJewel === 0
-                ? 'מתי זה יקרה?'
+                ? $t('concierge.new.modal.when')
                 : editingJewel === 2
-                  ? 'כמה ברצונך לתת?'
+                  ? $t('concierge.new.modal.budget')
                   : editingJewel === 3
-                    ? 'מי יכול/ה להציע?'
+                    ? $t('concierge.new.modal.whoCanOffer')
                     : editingJewel === 4
-                      ? 'מי יכול/ה לראות?'
+                      ? $t('concierge.new.modal.whoCanSee')
                       : editingJewel === 5
-                        ? 'איך להזמין שותפים?'
-                        : 'יוזמה אישית או קבוצתית?'}
+                        ? $t('concierge.new.modal.invite')
+                        : $t('concierge.new.modal.joinKind')}
             </h2>
           </div>
           <button
             class="modal-close"
             type="button"
-            aria-label="סגירה"
+            aria-label={$t('concierge.new.close')}
             onclick={closeJewelModal}>×</button
           >
         </div>
@@ -1412,11 +1374,11 @@
             <!-- When -->
             <div class="field-grid">
               <label class="field">
-                <span class="field-lbl">מתי להתחיל</span>
+                <span class="field-lbl">{$t('concierge.new.dateFrom')}</span>
                 <input type="date" bind:value={startDate} class="field-inp" />
               </label>
               <label class="field">
-                <span class="field-lbl">מתי לסיים</span>
+                <span class="field-lbl">{$t('concierge.new.dateTo')}</span>
                 <input type="date" bind:value={finnishDate} class="field-inp" />
               </label>
             </div>
@@ -1424,43 +1386,48 @@
               <button
                 type="button"
                 class="preset-pill"
-                onclick={() => setDatePreset(0)}>היום</button
+                onclick={() => setDatePreset(0)}
+                >{$t('concierge.new.preset.today')}</button
               >
               <button
                 type="button"
                 class="preset-pill"
-                onclick={() => setDatePreset(1)}>מחר</button
+                onclick={() => setDatePreset(1)}
+                >{$t('concierge.new.preset.tomorrow')}</button
               >
               <button
                 type="button"
                 class="preset-pill"
-                onclick={() => setDatePreset(7)}>תוך שבוע</button
+                onclick={() => setDatePreset(7)}
+                >{$t('concierge.new.preset.week')}</button
               >
               <button
                 type="button"
                 class="preset-pill"
-                onclick={() => setDatePreset(30)}>תוך חודש</button
+                onclick={() => setDatePreset(30)}
+                >{$t('concierge.new.preset.month')}</button
               >
               <button
                 type="button"
                 class="preset-pill ghost"
-                onclick={clearDates}>לנקות</button
+                onclick={clearDates}
+                >{$t('concierge.new.preset.clear')}</button
               >
             </div>
             <p class="modal-hint">
-              לא חובה לבחור — אפשר להשאיר ריק ו-Lev תציע מועדים גמישים.
+              {$t('concierge.new.dateHint')}
             </p>
           {:else if editingJewel === 2}
             <!-- Budget -->
             <label class="field">
-              <span class="field-lbl">סכום מקסימלי (₪)</span>
+              <span class="field-lbl">{$t('concierge.new.budgetLabel')}</span>
               <input
                 type="number"
                 inputmode="numeric"
                 min="0"
                 step="50"
                 bind:value={budgetAmount}
-                placeholder="למשל 500"
+                placeholder={$t('concierge.new.budgetPlaceholder')}
                 class="field-inp"
               />
             </label>
@@ -1470,22 +1437,23 @@
                   type="button"
                   class="preset-pill"
                   onclick={() => pickBudgetPreset(v)}
-                  >₪ {v.toLocaleString('he-IL')}</button
+                  >₪ {v.toLocaleString($locale || 'he')}</button
                 >
               {/each}
               <button
                 type="button"
                 class="preset-pill ghost"
-                onclick={clearBudget}>בלי תקרה</button
+                onclick={clearBudget}
+                >{$t('concierge.new.budgetNoCap')}</button
               >
             </div>
             <p class="modal-hint">
-              סכום מירבי. הצעות יוצגו ממוין לפי איכות התאמה ולא רק לפי מחיר.
+              {$t('concierge.new.budgetHint')}
             </p>
           {:else if editingJewel === 3}
             <!-- Who can offer -->
             <div class="radio-list">
-              {#each WHO_CAN_OFFER_OPTIONS as opt (opt.label)}
+              {#each WHO_CAN_OFFER_OPTIONS as opt (opt.key)}
                 <label
                   class="radio-row {whoCanOffer === opt.value ? 'on' : ''}"
                 >
@@ -1497,8 +1465,12 @@
                     onchange={() => (whoCanOffer = opt.value)}
                   />
                   <div>
-                    <div class="radio-label">{opt.label}</div>
-                    <div class="radio-hint">{opt.hint}</div>
+                    <div class="radio-label">
+                      {$t(`concierge.new.whoCanOffer.${opt.key}.label`)}
+                    </div>
+                    <div class="radio-hint">
+                      {$t(`concierge.new.whoCanOffer.${opt.key}.hint`)}
+                    </div>
                   </div>
                 </label>
               {/each}
@@ -1516,8 +1488,12 @@
                     onchange={() => (whoCanSee = opt.value)}
                   />
                   <div>
-                    <div class="radio-label">{opt.label}</div>
-                    <div class="radio-hint">{opt.hint}</div>
+                    <div class="radio-label">
+                      {$t(`concierge.new.whoCanSee.${opt.value}.label`)}
+                    </div>
+                    <div class="radio-hint">
+                      {$t(`concierge.new.whoCanSee.${opt.value}.hint`)}
+                    </div>
                   </div>
                 </label>
               {/each}
@@ -1537,14 +1513,18 @@
                     onchange={() => (invitePartners = opt.value)}
                   />
                   <div>
-                    <div class="radio-label">{opt.label}</div>
-                    <div class="radio-hint">{opt.hint}</div>
+                    <div class="radio-label">
+                      {$t(`concierge.new.invitePartners.${opt.value}.label`)}
+                    </div>
+                    <div class="radio-hint">
+                      {$t(`concierge.new.invitePartners.${opt.value}.hint`)}
+                    </div>
                   </div>
                 </label>
               {/each}
             </div>
             <p class="modal-hint">
-              בחירה זו עוזרת ל־Lev להבין כמה ביוזמה לקחת בעצמה ועד כמה לחכות לך.
+              {$t('concierge.new.inviteHint')}
             </p>
           {:else if editingJewel === 6}
             <!-- Shared-purchase initiative kind -->
@@ -1559,8 +1539,12 @@
                     onchange={() => (joinKind = opt.value)}
                   />
                   <div>
-                    <div class="radio-label">{opt.label}</div>
-                    <div class="radio-hint">{opt.hint}</div>
+                    <div class="radio-label">
+                      {$t(`concierge.new.joinKind.${opt.value}.label`)}
+                    </div>
+                    <div class="radio-hint">
+                      {$t(`concierge.new.joinKind.${opt.value}.hint`)}
+                    </div>
                   </div>
                 </label>
               {/each}
@@ -1569,32 +1553,35 @@
             {#if isGroupKind}
               <div class="field-grid" style="margin-top:14px">
                 <label class="field">
-                  <span class="field-lbl">מינימום משתתפים</span>
+                  <span class="field-lbl">{$t('concierge.new.minJoiners')}</span
+                  >
                   <input
                     type="number"
                     inputmode="numeric"
                     min="1"
                     step="1"
                     bind:value={minJoiners}
-                    placeholder="למשל 2"
+                    placeholder={$t('concierge.new.minJoinersPlaceholder')}
                     class="field-inp"
                   />
                 </label>
                 <label class="field">
-                  <span class="field-lbl">מקסימום (לא חובה)</span>
+                  <span class="field-lbl">{$t('concierge.new.maxJoiners')}</span
+                  >
                   <input
                     type="number"
                     inputmode="numeric"
                     min="1"
                     step="1"
                     bind:value={maxJoiners}
-                    placeholder="ללא תקרה"
+                    placeholder={$t('concierge.new.maxJoinersPlaceholder')}
                     class="field-inp"
                   />
                 </label>
               </div>
               <label class="field" style="margin-top:10px">
-                <span class="field-lbl">תאריך סגירה להצטרפות (לא חובה)</span>
+                <span class="field-lbl">{$t('concierge.new.joinDeadline')}</span
+                >
                 <input
                   type="date"
                   bind:value={joinDeadline}
@@ -1602,13 +1589,11 @@
                 />
               </label>
               <p class="modal-hint">
-                כש־{minJoiners || 1} משתתפים יצטרפו אפשר יהיה לנעול את הקבוצה, לקבל
-                החלטות יחד ולשלם יחד. עד אז המשאלה במצב גיוס.
+                {$t('concierge.new.groupHint', { count: minJoiners || 1 })}
               </p>
             {:else}
               <p class="modal-hint">
-                ברירת המחדל — את/ה מארגנ/ת והקהילה מציעה. בחירת סוג קבוצתי פותחת
-                הצטרפות, החלטות משותפות ותשלום משותף.
+                {$t('concierge.new.soloHint')}
               </p>
             {/if}
           {/if}
@@ -1616,12 +1601,12 @@
 
         <div class="location-modal-actions">
           <button class="btn-ghost" type="button" onclick={closeJewelModal}
-            >סגירה</button
+            >{$t('concierge.new.close')}</button
           >
           <button
             class="btn-jewel modal-save"
             type="button"
-            onclick={closeJewelModal}>שמירה</button
+            onclick={closeJewelModal}>{$t('concierge.new.save')}</button
           >
         </div>
       </div>
@@ -2170,9 +2155,11 @@
     line-height: 1.2;
   }
   .seed-hint {
-    font-size: 10px;
-    color: #52493e;
-    margin-top: 2px;
+    font-size: 11.5px;
+    /* #52493e sat at 2.3:1 against the near-black page — unreadable. */
+    color: #9a8f80;
+    margin-top: 3px;
+    line-height: 1.35;
   }
 
   /* ── Compose layout ── */
@@ -2260,7 +2247,7 @@
     transition: border-color 0.2s;
   }
   .wish-title-inp::placeholder {
-    color: #52493e;
+    color: #7a6f5e;
     font-weight: 400;
     font-family: 'Bellefair', serif;
   }
@@ -2286,9 +2273,10 @@
     line-height: 1.7 !important;
   }
   .rich-body-wrap :global(.custom-prose p.is-editor-empty:first-child::before) {
-    color: #52493e;
+    color: #7a6f5e;
     content: attr(data-placeholder);
-    float: right;
+    /* `right` pinned the placeholder to the wrong edge in LTR locales. */
+    float: inline-start;
     pointer-events: none;
     height: 0;
   }
@@ -2324,7 +2312,7 @@
     min-height: 160px;
   }
   .wish-body-inp::placeholder {
-    color: #52493e;
+    color: #7a6f5e;
     line-height: 1.7;
   }
 
@@ -2621,7 +2609,7 @@
     margin: 0;
     font-family: 'Bellefair', serif;
     font-size: 12.5px;
-    color: #52493e;
+    color: #9a8f80;
     line-height: 1.55;
   }
 

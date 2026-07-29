@@ -26,9 +26,9 @@ export interface VocabKindMeta {
 	relationFields?: string[];
 	/** contentType passed to /api/translations (Strapi REST plural id). Omit to skip auto-translation. */
 	translationContentType?: string;
-	/** Suffix for tr.selector keys: identical<Suffix> / similar<Suffix> (selector kinds only) */
+	/** Suffix for selector.* i18n keys: identical<Suffix> / similar<Suffix> (selector kinds only) */
 	i18nSuffix?: 'Skill' | 'Value' | 'Role' | 'Workway';
-	/** tr.selector key for the search placeholder (selector kinds only) */
+	/** selector.* i18n key for the search placeholder (selector kinds only) */
 	searchKey?: 'searchSkills' | 'searchValues' | 'searchRoles' | 'searchWorkways';
 	/** Hebrew telemetry verb sent to /api/ste (owner notification) */
 	telemetryVerb: string;

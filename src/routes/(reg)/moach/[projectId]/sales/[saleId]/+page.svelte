@@ -1,4 +1,5 @@
 <script>
+  import { t } from '$lib/translations';
   const moachStore = getMoachStore();
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
@@ -21,13 +22,6 @@
       loading = false;
     }
   });
-
-  const i18n = {
-    he: { details: 'פרטי מכירה', amount: 'סכום', date: 'תאריך', buyer: 'קונה', note: 'הערה', status: 'סטטוס' },
-    en: { details: 'Sale Details', amount: 'Amount', date: 'Date', buyer: 'Buyer', note: 'Note', status: 'Status' },
-    ar: { details: 'تفاصيل البيع', amount: 'المبلغ', date: 'التاريخ', buyer: 'المشتري', note: 'ملاحظة', status: 'الحالة' }
-  };
-  let t = $derived(i18n[$lang] || i18n.en);
 
   // Holder-consent status chip (PLAN_sale_holder_consent). null = legacy sale
   // predating this feature — shown unverified but still counted (grandfathered).
@@ -75,26 +69,26 @@
       <nav class="text-sm text-gray-500 mb-2">
         Moach > {projectId} > Sales
       </nav>
-      <h1 class="text-2xl font-bold text-gray-900">{t.details}</h1>
+      <h1 class="text-2xl font-bold text-gray-900">{$t('moach.sale.details')}</h1>
     </header>
 
     <div class="bg-white p-6 rounded-xl shadow-sm space-y-4">
       <div class="grid grid-cols-2 gap-4 border-b pb-4">
         <div>
-          <p class="text-sm text-gray-500">{t.amount}</p>
+          <p class="text-sm text-gray-500">{$t('moach.sale.amount')}</p>
           <p class="text-xl font-bold">{sale.attributes.in}</p>
         </div>
         <div>
-          <p class="text-sm text-gray-500">{t.date}</p>
+          <p class="text-sm text-gray-500">{$t('moach.sale.date')}</p>
           <p class="font-medium">{sale.attributes.date}</p>
         </div>
       </div>
       <div>
-        <p class="text-sm text-gray-500">{t.note}</p>
+        <p class="text-sm text-gray-500">{$t('moach.sale.note')}</p>
         <p class="text-gray-700">{sale.attributes.note || 'No note.'}</p>
       </div>
       <div>
-        <p class="text-sm text-gray-500">{t.status}</p>
+        <p class="text-sm text-gray-500">{$t('moach.sale.status')}</p>
         <p class="font-medium">{holderLabel(sale)}</p>
       </div>
     </div>

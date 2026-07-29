@@ -1,7 +1,6 @@
 // Mission processing utilities for lev page
 import { getProjectData } from '$lib/stores/projectStore.js';
 import { letters, txx } from './levDataProcessors.js';
-import tr from '$lib/translations/tr.json';
 
 export function mesimabetahalicha(data, mtaha, beta, lang) {
   const mtahan = data.data.usersPermissionsUser.data.attributes.mesimabetahaliches.data;

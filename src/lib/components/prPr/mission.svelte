@@ -21,7 +21,8 @@
   import arMission from '$lib/translations/ar/mission.json';
   import Addnewro from '../addnew/addNewRole.svelte';
   import SkillSelector from '../ui/SkillSelector.svelte';
-  import tr from '$lib/translations/tr.json';
+  import { t as trans } from '$lib/translations';
+  import { get } from 'svelte/store';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { quintOut } from 'svelte/easing';
   import Expand from '$lib/celim/icons/expand.svelte';
@@ -38,11 +39,7 @@
   async function handleAiSuggest() {
     const name = miData[0].missionName?.trim();
     if (!name) {
-      toast.warning(
-        $lang === 'en'
-          ? 'Please enter a mission name first'
-          : 'יש להזין שם משימה תחילה'
-      );
+      toast.warning(get(trans)('mission.ai.enterNameFirst'));
       return;
     }
     aiSuggesting = true;
@@ -61,11 +58,7 @@
       if (!data.ok) throw new Error('suggest failed');
       aiSuggestResult = data;
     } catch (e) {
-      toast.error(
-        $lang === 'en'
-          ? 'AI suggestion failed. Please try again.'
-          : 'הצעת AI נכשלה, נסו שוב.'
-      );
+      toast.error(get(trans)('mission.ai.suggestFailed'));
     } finally {
       aiSuggesting = false;
     }
@@ -112,18 +105,14 @@
     miData = miData;
     aiSuggestResult = null;
     toast.success(
-      $lang === 'en' ? 'AI suggestions applied!' : 'הצעות AI הוחלו!'
+      get(trans)('mission.ai.suggestionsApplied')
     );
   }
 
   async function handleAiImprove() {
     const text = miData[0].descrip;
     if (!text || text === '<p></p>' || text === '<p><br></p>') {
-      toast.warning(
-        $lang === 'en'
-          ? 'Please write a description first'
-          : 'יש לכתוב תיאור תחילה'
-      );
+      toast.warning(get(trans)('mission.ai.writeDescFirst'));
       return;
     }
     aiImproving = true;
@@ -138,14 +127,10 @@
       if (!data.ok || !data.improved) throw new Error('improve failed');
       miData[0].descrip = data.improved;
       miData = miData;
-      toast.success($lang === 'en' ? 'Description improved!' : 'התיאור שופר!');
+      toast.success(get(trans)('mission.ai.descImproved'));
     } catch (e) {
       aiDescUndo = '';
-      toast.error(
-        $lang === 'en'
-          ? 'AI improve failed. Please try again.'
-          : 'שיפור AI נכשל, נסו שוב.'
-      );
+      toast.error(get(trans)('mission.ai.improveFailed'));
     } finally {
       aiImproving = false;
     }
@@ -162,11 +147,7 @@
   async function handleAiTranslate() {
     const text = miData[0].descrip;
     if (!text || text === '<p></p>' || text === '<p><br></p>') {
-      toast.warning(
-        $lang === 'en'
-          ? 'Please write a description first'
-          : 'יש לכתוב תיאור תחילה'
-      );
+      toast.warning(get(trans)('mission.ai.writeDescFirst'));
       return;
     }
     aiTranslating = true;
@@ -181,11 +162,7 @@
       if (!data.ok || !data.translations) throw new Error('translate failed');
       aiTranslations = data.translations;
     } catch (e) {
-      toast.error(
-        $lang === 'en'
-          ? 'Translation failed. Please try again.'
-          : 'תרגום נכשל, נסו שוב.'
-      );
+      toast.error(get(trans)('mission.ai.translateFailed'));
     } finally {
       aiTranslating = false;
     }
@@ -797,7 +774,6 @@
     onClose?.({ md });
   }
 
-  const tri = tr;
   let wid = $state(0);
   //TODO: כמות לכל משימה עד אינסוף
   let dialog = $state(1);
@@ -1074,16 +1050,14 @@
                     ? 'left'
                     : 'right'}"
                 >
-                  {$lang === 'en' ? 'Mission name' : 'שם המשימה'}
+                  {$trans('mission.ai.missionName')}
                 </label>
                 <input
                   id="mission-name-input"
                   type="text"
                   bind:value={miData[0].missionName}
                   list="mission-name-options"
-                  placeholder={$lang === 'en'
-                    ? 'Type or pick a template…'
-                    : 'הקלידו או בחרו מתבנית…'}
+                  placeholder={$trans('mission.ai.typePickTemplate')}
                   class="bg-pink-950/30 border placeholder:text-white border-gold rounded-xl p-3 text-white focus:border-gold outline-none transition-all shadow-sm"
                 />
                 <datalist id="mission-name-options">
@@ -1097,9 +1071,7 @@
                   onclick={handleAiSuggest}
                   disabled={aiSuggesting}
                   class="mt-2 flex items-center gap-1 px-3 py-1.5 rounded-full border border-gold/60 text-xs text-barbi hover:bg-gold/20 transition-all disabled:opacity-50"
-                  title={$lang === 'en'
-                    ? 'Suggest skills, roles & description with AI'
-                    : 'הצע כישורים, תפקידים ותיאור עם AI'}
+                  title={$trans('mission.ai.suggestTitle')}
                 >
                   {#if aiSuggesting}
                     <span
@@ -1108,11 +1080,7 @@
                   {:else}
                     ✨
                   {/if}
-                  {$lang === 'en'
-                    ? 'Suggest with AI'
-                    : $lang === 'ar'
-                      ? 'اقتراح بالذكاء الاصطناعي'
-                      : 'הצע עם AI'}
+                  {$trans('mission.ai.suggestWithAi')}
                 </button>
               </div>
               <button onclick={() => (missionNameE = false)}><Done /></button>
@@ -1123,14 +1091,12 @@
                   class="mt-3 p-3 rounded-xl border border-gold/40 bg-pink-950/30 text-sm text-barbi space-y-2"
                 >
                   <p class="font-bold text-gold">
-                    {$lang === 'en'
-                      ? '✨ AI Suggestions — click to apply:'
-                      : '✨ הצעות AI — לחצו להחלה:'}
+                    {$trans('mission.ai.suggestionsHeader')}
                   </p>
                   {#if aiSuggestResult.extraction.skills.length > 0}
                     <p>
                       <span class="text-mturk"
-                        >{$lang === 'en' ? 'Skills:' : 'כישורים:'}</span
+                        >{$trans('mission.ai.skillsLabel')}</span
                       >
                       {aiSuggestResult.extraction.skills.join(', ')}
                     </p>
@@ -1138,7 +1104,7 @@
                   {#if aiSuggestResult.extraction.roles.length > 0}
                     <p>
                       <span class="text-mturk"
-                        >{$lang === 'en' ? 'Roles:' : 'תפקידים:'}</span
+                        >{$trans('mission.ai.rolesLabel')}</span
                       >
                       {aiSuggestResult.extraction.roles.join(', ')}
                     </p>
@@ -1146,16 +1112,14 @@
                   {#if aiSuggestResult.extraction.workways.length > 0}
                     <p>
                       <span class="text-mturk"
-                        >{$lang === 'en' ? 'Work modes:' : 'דרכי עבודה:'}</span
+                        >{$trans('mission.ai.workModesLabel')}</span
                       >
                       {aiSuggestResult.extraction.workways.join(', ')}
                     </p>
                   {/if}
                   {#if aiSuggestResult.similarMissions?.length > 0}
                     <p class="text-xs text-barbi/60">
-                      {$lang === 'en'
-                        ? '📚 Similar templates found:'
-                        : '📚 תבניות דומות נמצאו:'}
+                      {$trans('mission.ai.similarTemplates')}
                       {aiSuggestResult.similarMissions
                         .map((m) => m.missionName)
                         .join(', ')}
@@ -1167,14 +1131,14 @@
                       onclick={applyAiSuggestions}
                       class="px-3 py-1 rounded-full bg-gold text-barbi text-xs font-bold hover:bg-mturk transition-all"
                     >
-                      {$lang === 'en' ? '✅ Apply all' : '✅ החל הכל'}
+                      {$trans('mission.ai.applyAll')}
                     </button>
                     <button
                       type="button"
                       onclick={() => (aiSuggestResult = null)}
                       class="px-3 py-1 rounded-full border border-gold/60 text-barbi text-xs hover:bg-pink-950/30 transition-all"
                     >
-                      {$lang === 'en' ? 'Dismiss' : 'סגור'}
+                      {$trans('mission.ai.dismiss')}
                     </button>
                   </div>
                 </div>
@@ -1186,7 +1150,7 @@
             text-{$lang == 'en' ? 'left' : 'right'} 
             font-bold text-lg lg:text-2xl underline"
               >
-                <mark>{tri?.common?.description[$lang]}:</mark><button
+                <mark>{$trans('common.description')}:</mark><button
                   onclick={() => (descripE = !descripE)}
                   >{#if descripE}<Done />{:else}<EditIcon />{/if}</button
                 >
@@ -1204,11 +1168,7 @@
                     {#if aiImproving}<span
                         class="animate-spin inline-block w-3 h-3 border border-barbi rounded-full border-t-transparent"
                       ></span>{:else}🪄{/if}
-                    {$lang === 'en'
-                      ? 'Improve with AI'
-                      : $lang === 'ar'
-                        ? 'تحسين بالذكاء'
-                        : 'שפר עם AI'}
+                    {$trans('mission.ai.improveWithAi')}
                   </button>
                   {#if aiDescUndo}
                     <button
@@ -1216,7 +1176,7 @@
                       onclick={undoAiImprove}
                       class="flex items-center gap-1 px-3 py-1.5 rounded-full border border-gold/40 text-xs text-barbi hover:bg-pink-950/30 transition-all"
                     >
-                      ↩️ {$lang === 'en' ? 'Undo' : 'בטל שיפור'}
+                      ↩️ {$trans('mission.ai.undo')}
                     </button>
                   {/if}
                   <button
@@ -1228,11 +1188,7 @@
                     {#if aiTranslating}<span
                         class="animate-spin inline-block w-3 h-3 border border-barbi rounded-full border-t-transparent"
                       ></span>{:else}🌍{/if}
-                    {$lang === 'en'
-                      ? 'Translate'
-                      : $lang === 'ar'
-                        ? 'ترجم'
-                        : 'תרגם'}
+                    {$trans('mission.ai.translate')}
                   </button>
                 </div>
                 <!-- Translation preview -->
@@ -1241,9 +1197,7 @@
                     class="mt-2 p-3 rounded-xl border border-gold/40 bg-pink-950/30 text-xs text-barbi space-y-2"
                   >
                     <p class="font-bold text-gold">
-                      {$lang === 'en'
-                        ? '🌍 Translation preview:'
-                        : '🌍 תצוגה מקדימה של תרגום:'}
+                      {$trans('mission.ai.translationPreview')}
                     </p>
                     {#if aiTranslations.he && $lang !== 'he'}
                       <p>
@@ -1270,15 +1224,13 @@
                       </p>
                     {/if}
                     <p class="text-barbi/50 text-xs">
-                      {$lang === 'en'
-                        ? 'Translations will be auto-saved after publishing.'
-                        : 'התרגומים יישמרו אוטומטית לאחר הפרסום.'}
+                      {$trans('mission.ai.autoSaveNote')}
                     </p>
                     <button
                       type="button"
                       onclick={() => (aiTranslations = null)}
                       class="px-2 py-1 rounded-full border border-gold/40 text-xs hover:bg-pink-950/30"
-                      >{$lang === 'en' ? 'Close' : 'סגור'}</button
+                      >{$trans('mission.ai.close')}</button
                     >
                   </div>
                 {/if}
@@ -1291,7 +1243,7 @@
               {/if}
             {/if}
             <!----   <h3 class="text-barbi font-bold text-lg lg:text-2xl underline ">
-            {tri?.mission?.specialNotes[$lang]}</h3>
+            {$trans('mission.specialNotes')}</h3>
     <RichText bind:outpot={miData[0].spnot} editable={spnotE}/>-->
 
             <p
@@ -1382,8 +1334,8 @@
                   >{mf.isRecurring}
                   <Chooser
                     bind:checked={miData[0].iskvua}
-                    tr={{ he: mf.recurring, en: mf.recurring }}
-                    fl={{ he: mf.oneTime, en: mf.oneTime }}
+                    tr={mf.recurring}
+                    fl={mf.oneTime}
                   /></span
                 >
               {/if}
@@ -1412,7 +1364,7 @@
                               itemid = t;
                               isOpen = true;
                             }}
-                            title={tri?.mission?.seechecklist[$lang]}
+                            title={$trans('mission.seechecklist')}
                           >
                             <Expand /></button
                           >
@@ -1446,14 +1398,14 @@
                       itemid = -1;
                       isOpen = true;
                     }}
-                    title={tri?.mission?.seechecklist[$lang]}
+                    title={$trans('mission.seechecklist')}
                   >
                     <Expand /></button
                   >
                   <!--expand list of items with checkmark as list counter and x for deliting-->
                 {/if}
                 <button
-                  title=" {tri?.mission?.checklistadd[$lang]}"
+                  title=" {$trans('mission.checklistadd')}"
                   onclick={() => {
                     dialog = 2;
                     misid = miData[0].id;
@@ -1672,8 +1624,8 @@
             <div>
               {#if assignE}
                 {#if userslength > 1}
-                  <mark>{tri?.mission?.assingTo[$lang]}</mark>
-                  <p>{tri?.mission?.assingHelp[$lang]}</p>
+                  <mark>{$trans('mission.assingTo')}</mark>
+                  <p>{$trans('mission.assingHelp')}</p>
                   <MultiSelect
                     outerDivClass="!bg-gold !text-barbi"
                     inputClass="!bg-gold !text-barbi"
@@ -1689,8 +1641,8 @@
                     }}
                   />
                 {:else}
-                  <mark>{tri?.mission?.assingToMe[$lang]}</mark>
-                  <p>{tri?.mission?.assingHelp[$lang]}</p>
+                  <mark>{$trans('mission.assingToMe')}</mark>
+                  <p>{$trans('mission.assingHelp')}</p>
                   <input
                     bind:checked={miData[0].myM}
                     type="checkbox"
@@ -1701,12 +1653,12 @@
                       miData[0].rishon = 'self';
                     }}
                   />
-                  <label for="tome">{tri?.mission?.assingToMe[$lang]}</label>
+                  <label for="tome">{$trans('mission.assingToMe')}</label>
                 {/if}
                 <button
-                  title={tri?.mission?.assingTo[$lang] +
+                  title={$trans('mission.assingTo') +
                     ' ' +
-                    tri?.mission?.assingHelp[$lang]}
+                    $trans('mission.assingHelp')}
                   onclick={() => (assignE = !assignE)}
                   class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                   ><Done /></button
@@ -1715,29 +1667,29 @@
             </div>
             <div>
               {#if publinkE}
-                <mark>{tri?.mission?.publicLinks[$lang]}</mark>
+                <mark>{$trans('mission.publicLinks')}</mark>
                 <TextInput
                   bind:text={miData[0].publicklinks}
-                  lebel={tri?.mission?.publicLinks}
+                  lebel={$trans('mission.publicLinks')}
                 />
                 <button
                   onclick={() => (publinkE = !publinkE)}
                   class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                  title={tri?.mission?.publicLinks[$lang]}><Done /></button
+                  title={$trans('mission.publicLinks')}><Done /></button
                 >
               {/if}
             </div>
             <div>
               {#if mislinkE}
-                <mark>{tri?.mission?.linkToMission[$lang]}</mark>
+                <mark>{$trans('mission.linkToMission')}</mark>
                 <TextInput
                   bind:text={miData[0].privatlinks}
-                  lebel={tri?.mission?.linkToMission}
+                  lebel={$trans('mission.linkToMission')}
                 />
                 <button
                   onclick={() => (mislinkE = !mislinkE)}
                   class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                  title={tri?.mission?.linkToMission[$lang]}><Done /></button
+                  title={$trans('mission.linkToMission')}><Done /></button
                 >
               {/if}
             </div>
@@ -1771,12 +1723,12 @@
                 <button
                   onclick={() => (publinkE = !publinkE)}
                   class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                  title={tri?.mission?.publicLinks[$lang]}><LinkIcon /></button
+                  title={$trans('mission.publicLinks')}><LinkIcon /></button
                 >{/if}
               {#if !assignE && !specMode && !publishMode}<button
-                  title={tri?.mission?.assingTo[$lang] +
+                  title={$trans('mission.assingTo') +
                     ' ' +
-                    tri?.mission?.assingHelp[$lang]}
+                    $trans('mission.assingHelp')}
                   onclick={() => (assignE = !assignE)}
                   class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                   ><AddPerson /></button
@@ -1784,7 +1736,7 @@
               {#if !mislinkE}<button
                   onclick={() => (mislinkE = !mislinkE)}
                   class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
-                  title={tri?.mission?.linkToMission[$lang]}
+                  title={$trans('mission.linkToMission')}
                   ><LinkToIcon /></button
                 >{/if}
               {#if !shiftE}
@@ -1801,21 +1753,11 @@
                   onclick={() => onClose?.()}
                   class="rounded-xl border border-gold/60 px-4 py-2 text-sm text-barbi hover:bg-pink-950/30 transition-all"
                 >
-                  {$lang === 'en'
-                    ? 'Cancel'
-                    : $lang === 'ar'
-                      ? 'إلغاء'
-                      : 'ביטול'}
+                  {$trans('mission.ai.cancel')}
                 </button>
               {/if}
               <Button
-                text={publishMode
-                  ? {
-                      he: 'פרסום לקהילה 📣',
-                      en: 'Publish to community 📣',
-                      ar: 'النشر للمجتمع 📣'
-                    }
-                  : { he: mf.publish, en: mf.publish, ar: mf.publish }}
+                text={publishMode ? $trans('common.buttons.publishToCommunity') : mf.publish}
                 onClick={increment}
                 {loading}
                 {success}

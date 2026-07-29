@@ -1,4 +1,5 @@
 <script>
+  import { t } from '$lib/translations';
   import { goto } from "$app/navigation";
   import Arrow from "$lib/celim/icons/arrow.svelte";
   import Lowding from "$lib/celim/lowding.svelte";
@@ -7,15 +8,11 @@
   import Scene from '$lib/components/main/1lev1.svelte'
   import { useProgress } from '@threlte/extras'
   import CircleProgresBar from "$lib/celim/ui/circleProgresBar.svelte";
-	import {lang,langUs,doesLang} from '$lib/stores/lang'
+	import { lang, langUs, doesLang } from '$lib/stores/lang'
 	const { progress } = useProgress()
 	const url = 'https://1lev1.com/';
 	const title = '1️💗1️';
-	const setitle = {
-  "he": "ליצור יחד בהסכמה",
-  "en": "create together harmoniously",
-  "ar": "الإبداع معًا بتناغم"
-};//"טעם לחיים!"
+//"טעם לחיים!"
 function change(lan){
   if (lan == "en"){
     doesLang.set(true)
@@ -35,135 +32,20 @@ function change(lan){
   }
   trans = false
 }
-const changel = {
-  "en": "English",
-  "he": "עברית",
-  "ar": "العربية"
-};
 
-const desc = {
-  "he": 'ליצור צוות מנצח להגשמת כל חלום, להתנהל ו',
-  "en": 'Creating a winning team to fulfill every dream, to manage and',
-  "ar": 'إنشاء فريق رابح لتحقيق كل حلم ، لإدارة و'
-};
 
-const desc2 = {
-  "he": "ליצור יחד בהסכמה",
-  "en": " to create together in harmony",
-  "ar": "للإبداع معًا بانسجام"
-};
-const word1 = {
-  "he": "מערכת ייחודית לקבלת החלטות פה-אחד",
-  "en": "Unanimous Decision Making: Our unique system facilitates unanimous decision-making among project collaborators.",
-  "ar": "اتخاذ قرارات بالإجماع: نظامنا الفريد يسهل اتخاذ القرارات بالإجماع بين المشاركين في المشروع."
-};
-const wordNew = {
-  "he": "כל אחת היא מלכה וכל אחד הוא מלך! כאן יוצרים, בונים ומרוויחים יחד תוך שמירה על עצמאות אישית וחירות מלאה",
-  "en": "Every woman is a queen, and every man is a king! Here we create, build, and earn together while preserving personal autonomy and complete freedom",
-  "ar": "كل امرأة هي ملكة، وكل رجل هو ملك! هنا نقوم بالإبداع، والبناء، والكسب المشترك مع الحفاظ على الاستقلال الشخصي والحرية الكاملة"
-};
 
-const word2 = {
-  "he": "לייסד ריקמה (שותפות) בקליק ולאתר את מרכיביה האנושיים והחומריים בקלות",
-  "en": "Founding a FreeMates project with a click and easily identifying its human and material components",
-  "ar": "تأسيس مشروع FreeMates بنقرة واحدة وتحديد مكوناته البشرية والمادية بسهولة."
-};
-const word3 = {
-  "he": "למצוא ולהתחבר לריקמה שמתאימה בדיוק לערכים, הכישורים ודרך העבודה שלך",
-  "en": "Finding and connecting to a FreeMate that aligns precisely with your values, skills, and work style",
-  "ar": "العثور والاتصال بـ FreeMate الذي يتوافق تمامًا مع قيمك ومهاراتك ونمط عملك"
-};
 
-const word4 = {
-  "he": "פנקס דיגיטלי מבוזר לניהול החשבונות בריקמה לפי ההסכמות",
-  "en": "Distributed digital ledger for accounting management in the FreeMates based on agreements",
-  "ar": "دفتر الأستاذ الرقمي الموزع لإدارة المحاسبة في FreeMates بناءً على الاتفاقات"
-};
 
-const word5 = {
-  "he": "מערכת הצבעות, אישרורים ומשא ומתן לניהול משותף על בסיס הסכמה פה-אחד",
-  "en": "Voting system, approvals, and negotiation for collaborative management based on unanimous agreement",
-  "ar": "نظام التصويت والموافقات والمفاوضات لإدارة تعاونية بناءً على اتفاق بالإجماع"
-};
-const word6 = {
-  "he": "חישוב וחלוקת כספים לפי סך ההשקעה ולפי ההסכמות",
-  "en": "Calculation and distribution of funds based on investment and agreements",
-  "ar": "حساب وتوزيع الأموال استنادًا إلى الاستثمار والاتفاقات"
-};
 
-const word7 = {
-  "he": "גרפים, גאנט, לוח משימות ועוד כלים שמתווספים כל הזמן במסך ניהול הריקמה המשותף",
-  "en": "Graphs, Gantt charts, task boards, and other tools that are constantly added to the shared FreeMates management screen",
-  "ar": "رسوم بيانية، جداول Gantt، لوحات المهام، وأدوات أخرى يتم إضافتها باستمرار إلى شاشة إدارة FreeMates المشتركة"
-};
 
-const word8 = {
-  "he": "לשתף את החפצים המיותרים שלך עם רקמות שמתאימות לערכים שלך ולהרוויח",
-  "en": "Sharing your unnecessary items with FreeMates that align with your values and earning",
-  "ar": "مشاركة العناصر الزائدة الخاصة بك مع FreeMates التي تتوافق مع قيمك وكسب المال"
-};
 
-const word9 = {
-  "he": "הכנסה פאסיבית  - הופכת למציאות! בריקמה לא מקבלים תשלום מוגדר אלא אחוז דינמי מהרווחים לכל אורך חיי הריקמה",
-  "en": "Passive income - becomes a reality! In FreeMates, you don't receive a fixed payment but a dynamic percentage of profits throughout the lifespan of the FreeMate",
-  "ar": "الدخل السلبي - يصبح واقعًا! في FreeMates ، لا تتلقى دفعة محددة ولكن نسبة ديناميكية من الأرباح طوال فترة حياة FreeMate"
-};
 
-const word10 = {
-  "he": "רקמות הן קבוצות המורכבות מכישורים ומשאבים שונים אשר יוצרות יחד מוצר או נותנות שירות ומתחלקות בהכנסות לפי ההשקעה היחסית ובהסכמה",
-  "en": "FreeMates are groups composed of different skills and resources that come together to create a product or provide a service and share income based on relative investment and agreement",
-  "ar": "FreeMates هي مجموعات مكونة من مهارات وموارد مختلفة تجتمع معًا لإنشاء منتج أو تقديم خدمة وتقاسم الدخل استنادًا إلى الاستثمار النسبي والاتفاق"
-};
 
-const regesh1 = {
-  "he": "רוצה להביא משמעות ושמחה לחיים שלך?",
-  "en": "Want to bring meaning and joy to your life?",
-  "ar": "هل تريد إضفاء الدلالة والفرح على حياتك؟"
-};
 
-const regesh2 = {
-  "he": "רוצה לפתוח דלת אל מציאות חדשה?",
-  "en": "Want to open the door to a new reality?",
-  "ar": "هل تريد فتح الباب أمام واقع جديد؟"
-};
 
-const login = {
-  "he": "להתחברות",
-  "en": "Login",
-  "ar": "تسجيل الدخول"
-};
 
-const reg = {
-  "he": "להסכמה והרשמה",
-  "en": "Agreement and Registration",
-  "ar": "الموافقة والتسجيل"
-};
-const loadingTitle = {
-  "he": "טעינת אלמנט עיצובי תלת מימדי",
-  "en": "Loading a three-dimensional design element",
-  "ar": "تحميل عنصر تصميم ثلاثي الأبعاد"
-};
-const agree = {
-  "he": ' כדי להירשם ולהינות מ-1️💗1️ יש להוסיף את ההסכמה שלך ל"אמנת החירות העולמית" שבעמוד הבא, כך נוודא את המחויבות שלך להתנהלות בהסכמה עם השאר. בנוסף הסכמתך תתווסף ל',
-  "ar": 'للتسجيل والاستمتاع ب-1️💗1️ ، يجب إضافة موافقتك على "الميثاق العالمي للحريات" في الصفحة التالية ، وبهذا سنضمن التزامك بالتعامل بموافقة مع الآخرين. بالإضافة إلى ذلك ، سيتم إضافة موافقتك إلى ',
-  "en": "To register and benefit from 1️💗1️, you need to add your agreement to the 'Global Freedom Charter' on the next page, ensuring your commitment to engaging in agreement with others. Additionally, your agreement will be added to"
-};
 
-const agree2 = {
-  "he": '"מפת ההסכמה"',
-  "ar": '"خريطة الاتفاق"',
-  "en": '"Agreement Map"'
-};
-const mapa = {
-  "he": 'מפת ההסכמה',
-  "ar": 'خريطة الاتفاق',
-  "en": 'Agreement Map'
-};
-const agree3 = {
-  "he": " ויחד ניצור עולם טוב יותר",
-  "ar": " ومعًا سنخلق عالمًا أفضل",
-  "en": "Together we will create a better world"
-};
 
 	let btna = $state(false);
   
@@ -184,19 +66,19 @@ const agree3 = {
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button>
 {#if $lang != "en"}
-      <button onclick={() =>change("en")} title="change language to English" class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5">{changel["en"]}</button>
+      <button onclick={() =>change("en")} title="change language to English" class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5">{$t('home.languages.en')}</button>
 {/if} 
 
 {#if $lang != "ar"}
-      <button onclick={() =>change("ar")} title="change language to Arabic" class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5">{changel["ar"]}</button>
+      <button onclick={() =>change("ar")} title="change language to Arabic" class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5">{$t('home.languages.ar')}</button>
 {/if}
 {#if $lang != "he"}
-      <button onclick={() =>change("he")} title="change language to Hebrew" class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5">{changel["he"]}</button>
+      <button onclick={() =>change("he")} title="change language to Hebrew" class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5">{$t('home.languages.he')}</button>
 {/if}
 {#if $lang == "he"}
       <a class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5 " title=" 1💗1 אודות "   data-sveltekit-prefetch href="/about" > אודות</a>
     {/if}
-	  <a class="text-barbi border-2 border-lturk text-bold hover:text-gold text-center bg-gold hover:bg-barbi px-1 py-0.5 "  data-sveltekit-prefetch href="/love">{mapa[$lang]}</a>
+	  <a class="text-barbi border-2 border-lturk text-bold hover:text-gold text-center bg-gold hover:bg-barbi px-1 py-0.5 "  data-sveltekit-prefetch href="/love">{$t('home.cta.agreementMap')}</a>
           {/if}
           </div>
 <div dir={$lang === "he" || $lang == "ar" ? "rtl" : "ltr"} class="h-screen w-screen  flex flex-col-reverse sm:flex-row button-whitegold overflow-hidden bg-[length:200%_auto] animate-gradientx">
@@ -220,20 +102,20 @@ const agree3 = {
 	setTimeout(()=>scrolli = false,1500)
 	}} >
 		<h2 class="font-bold mt-3 sm:text-5xl text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_left,theme(colors.fuchsia.300),theme(colors.sky.400),theme(colors.barbi),theme(colors.mpink),theme(colors.barbi),theme(colors.sky.400),theme(colors.fuchsia.300))]  overline decoration-mturk text-xl"
-    style="text-shadow:none;">{setitle[$lang]}</h2>
-		<h3 class="text-xl sm:text-2xl p-2 px-2 text-barbi">{desc[$lang]}<span class="underline decoration-lturk" style="font-family: 'Popins','Dorian';">{desc2[$lang]}</span></h3>
+    style="text-shadow:none;">{$t('home.setitle')}</h2>
+		<h3 class="text-xl sm:text-2xl p-2 px-2 text-barbi">{$t('home.hero.subtitle')}<span class="underline decoration-lturk" style="font-family: 'Popins','Dorian';">{''}</span></h3>
 		<div dir={$lang == "en" ? "ltr" : "rtl"}>
       <LoginT requestAccess={true} username="onelev_bot"/>
     </div>
 		<div class="bg-gradient-to-br from-fuchsia-400 via-barbi  to-mpink px-3 py-4 mt-1 border-4 border-spacing-2 ">
-		<h2 style="text-shadow:none;" class="text-bold sm:text-2xl text-xl mx-6 text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_right,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]  ">{regesh1[$lang]}<br>{regesh2[$lang]}</h2>
+		<h2 style="text-shadow:none;" class="text-bold sm:text-2xl text-xl mx-6 text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_right,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]  ">{$t('home.cta.agree')}</h2>
     </div>
 	</div>
 		<div style="font-family:Gan, Power;" class="flex flex-row">
 			<button class="transition-all duration-300 flex flex-row text-barbi px-4 py-2 mx-2 my-4 text-2xl hover:text-slate-800 rounded-xl" onclick={()=>{goto("/login") 
 				loadinga = true
 				fi = true}} class:button-perl={btna ==  false} class:button-gold={btna == true} onfocus={()=> btna = true} onmouseover={()=>btna = true} 
-					onmouseleave={()=> btna = false}>{login[$lang]}
+					onmouseleave={()=> btna = false}>{$t('home.cta.login')}
 			{#if btna == true && loadinga == false}
 			<span class="mx-2 mb-0.5"><Arrow back={$lang == "he" || $lang == "ar" ? false : true} height="32" color={"var(--gold)"} fill="var(--barbi-pink)"/></span>
 			{/if}
@@ -244,7 +126,7 @@ const agree3 = {
 			<button class="transition-all duration-300 text-barbi px-4 py-2 mx-2 my-4 text-2xl hover:text-slate-800 rounded-xl flex flex-row"onclick={()=>{goto(`${$lang == "he" ? "/hascama" : $lang == "ar" ? "/ar" : "/en"}`) 
 			loading = true
 			fi = true
-		}}  class:button-perl={btnb ==  false} class:button-gold={btnb == true} onfocus={()=> btnb = true} onmouseover={()=>btnb = true} onmouseleave={()=> btnb = false}>{reg[$lang]}
+		}}  class:button-perl={btnb ==  false} class:button-gold={btnb == true} onfocus={()=> btnb = true} onmouseover={()=>btnb = true} onmouseleave={()=> btnb = false}>{$t('home.cta.register')}
 			{#if btnb == true && loading == false}
 			<span class="mx-2 mb-0.5"><Arrow back={$lang == "he"  || $lang == "ar" ? false : true} height="32" color={"var(--gold)"} fill="var(--barbi-pink)"/></span>
 			{/if}
@@ -256,7 +138,7 @@ const agree3 = {
 	</div>
 	<div id="levi" bind:clientHeight={h} bind:clientWidth={w} class:flex={$progress == 1} class="sm:w-1/2 h-1/2 sm:h-screen z-0 items-center justify-center">
 		{#if $progress < 1}
-		<div class="w-full h-1/2 sm:h-screen flex flex-col items-center  justify-center" title="{loadingTitle[$lang]}">
+		<div class="w-full h-1/2 sm:h-screen flex flex-col items-center  justify-center" title={$t('home.loading.title')}>
 			<img class="ani"  src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png" alt="logo">
 			<CircleProgresBar progress={$progress}/>
 		</div>

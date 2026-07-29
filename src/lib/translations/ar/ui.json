@@ -1,0 +1,81 @@
+{
+  "searching": "جار البحث...",
+  "selectAndAdd": "اختر وأضف",
+  "dismiss": "تجاهل",
+  "addAnyway": "أضف على أي حال",
+  "tryAgain": "حاول مجدداً",
+  "errorMsg": "عذراً، حدث خطأ ما. يرجى المحاولة مجدداً",
+  "richText": {
+    "paragraph": "<p>فقرة</p>",
+    "linkPrompt": "أدخل الرابط",
+    "boldLetter": "ع",
+    "h1": "<h1>عنوان</h1>",
+    "h3": "<h3>عنوان فرعي</h3>",
+    "list": "قائمة",
+    "numberedList": "1. قائمة",
+    "quote": "اقتباس",
+    "line": "خط فاصل"
+  },
+  "dateInput": {
+    "select": "اختيار تاريخ"
+  },
+  "numberInput": {
+    "maxQuantityReached": "وصلت إلى الحد الأقصى المتاح",
+    "minQuantityReached": "وصلت إلى الحد الأدنى",
+    "cannotExceedAvailable": "لا يمكن تجاوز الكمية المتاحة: {{max}}",
+    "cannotGoBelowZero": "لا يمكن النزول تحت الصفر"
+  },
+  "locationView": {
+    "online": "عبر الإنترنت",
+    "onsite": "حضوري",
+    "hybrid": "مختلط",
+    "empty": "لم يُحدَّد موقع",
+    "range": "النطاق",
+    "km": "كم",
+    "showMap": "إظهار الخريطة",
+    "hideMap": "إخفاء الخريطة",
+    "loadingMap": "جاري تحميل الخريطة…"
+  },
+  "input": {
+    "addImage": "إضافة صورة",
+    "uploadingImage": "جارٍ رفع الصورة"
+  },
+  "consent": {
+    "badge": {
+      "signed": "موثّق",
+      "pending": "قيد الانتظار",
+      "unsigned": "غير موقّع",
+      "unverified": "فشل التحقق"
+    },
+    "status": {
+      "idle": {
+        "label": "قيد الانتظار",
+        "help": "لم تُنشأ الهوية التشفيرية بعد"
+      },
+      "creating": {
+        "label": "جارٍ إنشاء المفتاح…",
+        "help": "يجري توليد مفتاح Ed25519 غير قابل للاستخراج"
+      },
+      "registering": {
+        "label": "جارٍ التسجيل…",
+        "help": "نشر المفتاح العام إلى خادم المرآة"
+      },
+      "ready": {
+        "label": "التوقيع مُفعّل",
+        "help": "كل إجراء مهم تقوم به سيُوقَّع تشفيرياً"
+      },
+      "local-only": {
+        "label": "محلي فقط",
+        "help": "المفتاح موجود محلياً؛ لم يؤكده الخادم بعد"
+      },
+      "unsupported": {
+        "label": "غير مدعوم",
+        "help": "هذا المتصفح لا يدعم WebCrypto / IndexedDB"
+      },
+      "error": {
+        "label": "خطأ",
+        "help": "فشل إعداد الهوية — راجع صفحة الهوية للتفاصيل"
+      }
+    }
+  }
+}

@@ -1,0 +1,263 @@
+{
+  "progress": {
+    "participants": "Participants",
+    "discussion": "Discussion",
+    "actions": "Actions",
+    "status": "Status"
+  },
+  "split": {
+    "calc": "Split Calculator",
+    "status": "Split Status"
+  },
+  "process": {
+    "title": "Detailed process page",
+    "back": "All processes",
+    "chains": "Chains",
+    "notFound": "Process not found",
+    "notFoundSub": "No chain or process matches the requested id in this project.",
+    "missionChain": "Mission process",
+    "resourceChain": "Resource process",
+    "saleChain": "Sale process",
+    "loading": "Loading process…",
+    "error": "Failed to load data"
+  },
+  "splitDetail": {
+    "participants": "Partners",
+    "actions": "Actions",
+    "confirm": "Confirm Split",
+    "reject": "Object"
+  },
+  "votes": {
+    "title": "Open Votes",
+    "splitVotes": "Split Votes",
+    "joinVotes": "Join Requests",
+    "resourceJoinVotes": "Resource Join Requests",
+    "decisionVotes": "Decisions",
+    "resourceProposals": "Resource proposals",
+    "missionProposals": "Mission proposals",
+    "votes": "votes",
+    "toVote": "Vote",
+    "noneOpen": "No open votes right now 🎉"
+  },
+  "main": {
+    "vap": "Project Values"
+  },
+  "sale": {
+    "details": "Sale Details",
+    "amount": "Amount",
+    "date": "Date",
+    "buyer": "Buyer",
+    "note": "Note",
+    "status": "Status"
+  },
+  "acts": {
+    "assignee": "Assignee",
+    "validator": "Validator",
+    "actions": "Actions",
+    "markDone": "Mark Done",
+    "validate": "Validate"
+  },
+  "vote": {
+    "proposal": "Proposal",
+    "reason": "Reason",
+    "participants": "Voters",
+    "actions": "Actions",
+    "voteYes": "In Favor",
+    "voteNo": "Against"
+  },
+  "chains": {
+    "back": "Back to project",
+    "loading": "Loading process…",
+    "notFound": "Process not found",
+    "notFoundSub": "Could not find the requested process in this project.",
+    "noProject": "No project selected",
+    "noProjectSub": "Please go back and select a project first.",
+    "missionChain": "Mission Chain",
+    "resourceChain": "Resource Chain",
+    "processPage": "Process Page",
+    "id": "ID",
+    "chatSoon": "Process discussion — coming soon",
+    "chatDesc": "Discussion threads and chat integration will appear here."
+  },
+  "layout": {
+    "back": "Back to list",
+    "main": "Main",
+    "create": "Create",
+    "gantt": "Gantt",
+    "split": "Split",
+    "progress": "Progress",
+    "acts": "Acts",
+    "timers": "Timers",
+    "kanban": "Kanban",
+    "chains": "Chains",
+    "sales": "Sales",
+    "shifts": "Shifts",
+    "processes": "Processes",
+    "votes": "Votes",
+    "wishes": "Incoming wishes",
+    "demand": "Demand map",
+    "work": "Work",
+    "flows": "Flows",
+    "money": "Money",
+    "opps": "Opportunities",
+    "editPic": "Edit Picture",
+    "upload": "Upload",
+    "editDetails": "Edit Details",
+    "publicProfile": "Public Profile",
+    "activeNow": "Active Now"
+  },
+  "create": {
+    "mission": "Create Mission",
+    "missionDesc": "Add a new mission to the project",
+    "resource": "Request Resource",
+    "resourceDesc": "Request money, gear, or info",
+    "process": "Create Process",
+    "processDesc": "Build a complex chain of actions",
+    "back": "Back",
+    "clickHandMission": "Click on the hand to create a mission",
+    "clickHandResource": "Click on the hand to request a resource",
+    "hosafa": "Add the missions the rikma needs",
+    "hosafat": "Add the resources the rikma needs"
+  },
+  "objectList": {
+    "active": "Active",
+    "archived": "Archive",
+    "empty": "No objects of this type in the project",
+    "process": "Process page",
+    "unknownType": "Unknown object type",
+    "loading": "Loading…",
+    "error": "Failed to load data",
+    "backProcesses": "All processes"
+  },
+  "objectDetail": {
+    "backProcess": "Full process page",
+    "backList": "All objects of this type",
+    "active": "Active",
+    "archived": "Archived — read only",
+    "readOnly": "This object is archived: the page is read-only, no actions.",
+    "actions": "Actions",
+    "votePage": "Vote & negotiation page",
+    "chat": "Chat",
+    "votes": "Votes & negotiation",
+    "description": "Description",
+    "details": "Details",
+    "timers": "Timers & hours",
+    "notFound": "Object not found",
+    "notFoundSub": "No object of this type with the requested id in this project.",
+    "unknownType": "Unknown object type",
+    "loading": "Loading…",
+    "error": "Failed to load data",
+    "hours": "hours",
+    "perhour": "per hour",
+    "price": "Price",
+    "amount": "Amount",
+    "easy": "Flexibility",
+    "total": "Total",
+    "month": "Month",
+    "deadline": "Response deadline (silence = consent)",
+    "created": "Created",
+    "start": "Start",
+    "finish": "Finish",
+    "due": "Due",
+    "kind": "Kind",
+    "progress": "Progress",
+    "of": "of",
+    "by": "Owner",
+    "validator": "Validator",
+    "done": "Done",
+    "notDone": "Not done yet",
+    "delivered": "Delivered",
+    "why": "Summary",
+    "actsBoard": "Tasks board",
+    "progressBoard": "Missions in progress",
+    "timersBoard": "Timers",
+    "salesBoard": "Sales board",
+    "salePage": "Sale page",
+    "holderStatus": "Holder consent",
+    "holderSelf": "Self report",
+    "holderConfirmed": "Confirmed by holder",
+    "holderOpen": "Awaiting consent",
+    "holderLegacy": "Counted in balance",
+    "splitState": "Split",
+    "splited": "Split done",
+    "notSplited": "Not split yet",
+    "donation": "Donation",
+    "siteShare": "Site share",
+    "paid": "Paid",
+    "fromRikma": "From rikma",
+    "fixPrice": "Fixed price",
+    "dynamicPrice": "Price shaped in process"
+  },
+  "processes": {
+    "title": "Processes",
+    "empty": "No processes in this project yet",
+    "objects": "Objects by type:"
+  },
+  "objectTypes": {
+    "pendm": "Pending missions",
+    "openMission": "Open missions",
+    "ask": "Join requests",
+    "betahalich": "Missions in progress",
+    "act": "Tasks",
+    "finiapruval": "Finish approvals",
+    "finnished": "Completed missions",
+    "pmash": "Pending resources",
+    "openMashaabim": "Open resources",
+    "askm": "Supply proposals",
+    "maap": "Deliveries in progress",
+    "rikmash": "Received resources",
+    "matanot": "Products",
+    "sale": "Sales"
+  },
+  "tour": {
+    "badge": "FreeMates is a collaboration group — everyone contributes their skills and earns according to their contribution",
+    "members": "FreeMates members — a pulsing green ring means a member is currently working on the project. Click a photo to visit their profile",
+    "tabsIntro": "The tabs are the management hub of the FreeMates — each tab shows a different aspect of the project",
+    "create": "📋 Create: add missions and request resources (money, gear, info) — for existing members or to find new partners. Every published mission or resource gets a unique shareable link with a beautiful page optimized for social networks and partner recruitment",
+    "progress": "🔄 Progress: list of all active missions — who is working on what and at which stage",
+    "acts": "✅ Acts & Tasks: manage small tasks — what is done, what is on the way",
+    "timers": "⏱️ Timers: see when each member was active for the project and what they worked on. When a member starts a timer, a green ring appears around their avatar above",
+    "wishes": "💌 Incoming Wishes: warm leads from concierge customers that your project is a match for — ready business opportunities",
+    "sales": "🛒 Sales & Products: Simple product = fixed price. Complex product = price shaped by missions, resources and decisions made together during the purchase process. Every product gets a beautiful shareable page optimized for social media and attracting customers",
+    "split": "💰 Split: revenue-split calculator — everyone gets paid according to their contribution",
+    "votes": "🗳️ Votes: decisions made through consensus — unique negotiation tools until everyone is genuinely happy with the outcome. Not majority vote, but real agreement from all FreeMates members",
+    "chains": "🔗 Chains: every mission and resource across its entire lifecycle — from the opening proposal through voting all the way to the archive. Full transparency and deep understanding of every project process",
+    "gantt": "📊 Gantt & Kanban: visual project management and timeline",
+    "helpBtn": "Show guide again"
+  },
+  "list": {
+    "myProjects": "My rikmas",
+    "choose": "Choose a rikma",
+    "createNew": "Create a new rikma"
+  },
+  "guide": {
+    "header": "Project Brain Guide",
+    "text": "Would you like a quick tour of what you can do in the project brain?\n(You can reopen it via the ? button in the header)",
+    "yes": "Yes",
+    "no": "No thanks"
+  },
+  "wishes": {
+    "status": {
+      "suggested": {
+        "label": "Matched by Lev",
+        "desc": "Auto matched — wisher has not viewed yet."
+      },
+      "viewed": {
+        "label": "Wisher viewed",
+        "desc": "The wisher opened your proposal."
+      },
+      "accepted": {
+        "label": "Wisher chose you",
+        "desc": "A service request was opened — head to deals to approve."
+      },
+      "rejected": {
+        "label": "Dismissed",
+        "desc": "Wisher dismissed — no action needed."
+      },
+      "expired": {
+        "label": "Expired",
+        "desc": "Window expired."
+      }
+    }
+  }
+}

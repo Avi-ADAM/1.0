@@ -1,7 +1,10 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 
+// The page resolves these with $t — the server has no per-request locale of
+// its own to render them in.
 const goneTitle = {
-  title: { he: '1💗1 |  הצעה לשיתוף משאב שאיננה זמינה', en: 'not relevant old proposal' },
+  titleKey: 'pages.availResource.titles.gone',
+  titleParams: {},
   archived: true
 };
 
@@ -35,20 +38,15 @@ async function awaitapi(mId, lang, tok, fetch) {
         }
         const isMaagad = data.source === 'maagad' || !!data.maagadInfo;
         const isConcierge = !isMaagad && (data.source === 'concierge' || !data.project?.data);
-        data.title = isMaagad
-          ? {
-              he: `1💗1 | משאב מבוקש במאגד ביקוש: "${data.name}"`,
-              en: `1💗1 | Demand-pool resource: "${data.name}"`
-            }
+        data.titleKey = isMaagad
+          ? 'pages.availResource.titles.maagad'
           : isConcierge
-            ? {
-                he: `1💗1 | משאב מבוקש ממשאלה: "${data.name}"`,
-                en: `1💗1 | Wish resource: "${data.name}"`
-              }
-            : {
-                he: `1💗1 | הצעה לשיתוף משאב "${data.name}" בריקמה: ${data.project?.data?.attributes?.projectName}`,
-                en: 'come see this proposal on'
-              };
+            ? 'pages.availResource.titles.wish'
+            : 'pages.availResource.titles.project';
+        data.titleParams = {
+          name: data.name,
+          projectName: data.project?.data?.attributes?.projectName ?? ''
+        };
         data.fullfild = true;
         return data;
       }

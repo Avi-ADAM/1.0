@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/translations';
   /**
    * ConsentBadge — visual indicator that an action carries a verified signed
    * ConsentEvent (PLAN_user_sovereign_consent Phase 1 shadow signing).
@@ -23,13 +24,6 @@
 
   let { status, title, compact = false, eventId }: Props = $props();
 
-  const labels: Record<Status, { he: string; en: string }> = {
-    signed:     { he: 'מאומת',       en: 'Verified' },
-    pending:    { he: 'בהמתנה',      en: 'Pending' },
-    unsigned:   { he: 'ללא חתימה',   en: 'Unsigned' },
-    unverified: { he: 'אימות נכשל',  en: 'Verification failed' }
-  };
-
   const dotColors: Record<Status, string> = {
     signed:     'bg-emerald-500',
     pending:    'bg-amber-400',
@@ -39,14 +33,14 @@
 
   const tooltip = $derived(
     title ??
-      (eventId ? `${labels[status].he} · ${eventId.slice(0, 10)}…` : labels[status].he)
+      (eventId ? `${$t(`ui.consent.badge.${status}`)} · ${eventId.slice(0, 10)}…` : $t(`ui.consent.badge.${status}`))
   );
 </script>
 
 <span
   class="inline-flex items-center gap-1.5 text-xs"
   title={tooltip}
-  aria-label={labels[status].he}
+  aria-label={$t(`ui.consent.badge.${status}`)}
   data-consent-status={status}
 >
   <span
@@ -54,6 +48,6 @@
     aria-hidden="true"
   ></span>
   {#if !compact}
-    <span class="text-zinc-600 dark:text-zinc-300">{labels[status].he}</span>
+    <span class="text-zinc-600 dark:text-zinc-300">{$t(`ui.consent.badge.${status}`)}</span>
   {/if}
 </span>

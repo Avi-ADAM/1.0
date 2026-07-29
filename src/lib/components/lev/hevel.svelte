@@ -1,5 +1,6 @@
 <script>
  import { lang } from '$lib/stores/lang.js'
+ import { t } from '$lib/translations';
   import { onMount } from 'svelte';
   import { sendToSer } from '$lib/send/sendToSer.js';
   let { userId, onProj } = $props();
@@ -45,7 +46,7 @@ let error1 = null;
             const datea = key
             const ano = value
             fmm.push({
-              missionName: `${$lang == "en" ?  key : ""}${value > 1 ? ` ${$lang == "en" ?  ":" : ""}${value}${$lang == "he" ?  ":" : ""}` : ""}${$lang == "he" ?  key : ""}`
+              missionName: value > 1 ? $t('lev.hevel.missionCount', { name: key, count: value }) : key
             })
          }
         }
@@ -97,11 +98,6 @@ let error1 = null;
         }
     });
     let linkP = "https://www.google.co.il" 
-const towel = {"he":"לינק","en":"link"}
-const todis = {"he":"לינק לדיסקורד","en":"link to discord"}
-const tofac = {"he":"לינק לפייסבוק" ,"en":"link to Facebook"}
-const togit = {"he":" לינק לגיטהב","en":"link to GitHub"}
-const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
 let h = $state(),w = $state(), height = $state(),width = $state();
 $effect(() => {
     if(h > w){
@@ -115,13 +111,6 @@ $effect(() => {
   });
 let viewBox="460 0 1000 1080"//1450
 
-const sk = {"he": "כישורים", "en":"skills"}
-const ro = {"he": "תפקידים", "en":"roles"}
-const ww = {"he": "דרכי יצירה", "en": "ways of creation"}
-const re = {"he": "רקמות", "en": "FreeMates"}
-const vv = {"he": "ערכים", "en": "vallues"}
-const rr = {"he": "משאבים", "en": "resources"}
-const mm = {"he": "משימות","en":"missions"}
 
   </script>
  <span style=" position:absolute;
@@ -143,7 +132,7 @@ const mm = {"he": "משימות","en":"missions"}
 {/if}
 <foreignObject class:rou={load == false} x='820' y='60' width='280' height='280'  >
   <div class="  h-full  max-w-full flex-row  bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre" style="padding: 0 10px; text-align:center;  border-radius:50%; border: 2px solid var(--gold);" >
-    <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{sk[$lang]}</h6>
+    <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{$t('lev.hevel.skills')}</h6>
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
     {#each uskill as dat, i}
        <span style="font-size:25px;" class="font-bold text-gold bg-barbi rounded-lg px-1 my-1 ">{dat.attributes.skillName}</span>
@@ -153,7 +142,7 @@ const mm = {"he": "משימות","en":"missions"}
 </foreignObject>
 <foreignObject class:rou={load == false} fill="#d2d555" x='546' y='184' width='280' height='280'  >
   <div class="  h-full  max-w-full flex-row bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre " style="padding: 0 10px;  text-align:center;  border-radius:50%; border: 2px solid var(--gold);" >
-    <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{ro[$lang]}</h6>
+    <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{$t('lev.hevel.roles')}</h6>
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
     {#each ur as dat, i}
        <span style="font-size:25px;" class="font-bold text-gold bg-barbi rounded-lg px-1 my-1 ">{dat.attributes.roleDescription}</span>
@@ -163,7 +152,7 @@ const mm = {"he": "משימות","en":"missions"}
 </foreignObject>
 <foreignObject class:rou={load == false} fill="#d2d555" x='1094' y='184' width='280' height='280'  >
   <div class="  h-full  max-w-full flex-row bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre " style="padding: 0 10px;  text-align:center;  border-radius:50%; border: 2px solid var(--gold);" >
-    <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{re[$lang]}</h6>
+    <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{$t('lev.hevel.freemates')}</h6>
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
         {#each projects as data, i}
        <span style="font-size:25px;" class="font-bold hover:scale-110 text-gold bg-barbi rounded-lg px-1 my-1 ">
@@ -175,7 +164,7 @@ const mm = {"he": "משימות","en":"missions"}
 </foreignObject>
 <foreignObject class:rou={load == false} fill="#d2d555" x='486' y='469' width='280' height='280'  >
   <div class="  h-full  max-w-full flex-row bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre " style="padding: 0 10px; text-align:center;  border-radius:50%; border: 2px solid var(--gold);" >
-    <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{ww[$lang]}</h6>
+    <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{$t('lev.hevel.waysOfCreation')}</h6>
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
     {#each uww as dat, i}
        <span style="font-size:25px;" class="font-bold text-gold bg-barbi rounded-lg px-1 my-1 ">{dat.attributes.workWayName}</span>
@@ -185,7 +174,7 @@ const mm = {"he": "משימות","en":"missions"}
 </foreignObject>
 <foreignObject class:rou={load == false} fill="#d2d555" x='1166' y='469' width='280' height='280'  >
   <div class="  h-full  max-w-full flex-row bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre " style="padding: 0 10px;  text-align:center;  border-radius:50%; border: 2px solid var(--gold);" >
-    <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{vv[$lang]}</h6>
+    <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{$t('lev.hevel.values')}</h6>
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
     {#each val as dat, i}
        <span style="font-size:25px;" class="font-bold text-gold bg-barbi rounded-lg px-1 my-1 ">{dat.attributes.valueName}</span>
@@ -195,7 +184,7 @@ const mm = {"he": "משימות","en":"missions"}
 </foreignObject>
 <foreignObject class:rou={load == false} fill="#d2d555" x='677' y='707' width='280' height='280'  >
   <div class="  h-full  max-w-full flex-row bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre " style="padding: 0 10px;  text-align:center;  border-radius:50%; border: 2px solid var(--gold);" >
-    <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{rr[$lang]}</h6>
+    <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{$t('lev.hevel.resources')}</h6>
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
     {#each mash as dat, i}
        <span style="font-size:25px;" class="font-bold text-gold bg-barbi rounded-lg px-1 my-1 ">{dat.attributes.name}</span>
@@ -205,7 +194,7 @@ const mm = {"he": "משימות","en":"missions"}
 </foreignObject>
 <foreignObject class:rou={load == false} fill="#d2d555" x='982' y='707' width='280' height='280'  >
   <div class="  h-full  max-w-full flex-row bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre " style="padding: 0 10px;  text-align:center;  border-radius:50%; border: 2px solid var(--gold);" >
-    <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{mm[$lang]}</h6>
+    <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{$t('lev.hevel.missions')}</h6>
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
     {#each fmm as dat, i}
        <span style="font-size:25px;" class="font-bold text-gold bg-barbi rounded-lg px-1 my-1 ">{dat.missionName}</span>
@@ -228,7 +217,7 @@ const mm = {"he": "משימות","en":"missions"}
                      rel="noreferrer"
                      target="_blank" href={discordlink}
           class=" hover:bg-white text-barbi rounded-full"
-          title={todis[$lang]}
+          title={$t('lev.hevel.toDiscord')}
           >
           <img style="width:48px;height:48px" src="https://res.cloudinary.com/love1/image/upload/v1662563246/discord-icon-svgrepo-com_d4vk6m.svg" alt="Discord"/>
           </a>
@@ -238,7 +227,7 @@ const mm = {"he": "משימות","en":"missions"}
                       rel="noreferrer"
                      target="_blank" href={twiterlink}
           class=" hover:bg-white text-barbi rounded-full"
-          title={totwi[$lang]}
+          title={$t('lev.hevel.toTwitter')}
           >
           <img style="width:48px;height:48px" src="https://visualpharm.com/assets/700/Twitter-595b40b65ba036ed117d4613.svg" alt="Twitter"/>
           </a>
@@ -247,7 +236,7 @@ const mm = {"he": "משימות","en":"missions"}
                      <a
                      target="_blank" href={linkP}
           class=" hover:bg-white text-barbi rounded-full"
-          title={towel[$lang]}
+          title={$t('lev.hevel.toWebsite')}
           >
           <img style="width:48px;height:48px" src="https://tochat.be/whatsapp-icon-white.png" alt="WhatsApp"/>
           </a>
@@ -257,7 +246,7 @@ const mm = {"he": "משימות","en":"missions"}
                       rel="noreferrer"
                      target="_blank" href={githublink}
           class=" hover:bg-white text-barbi rounded-full"
-          title={togit[$lang]}
+          title={$t('lev.hevel.toGithub')}
           >
           <img style="width:48px;height:48px" src="https://visualpharm.com/assets/720/Github-595b40b65ba036ed117d442f.svg" alt="GitHub"/>
           </a>
@@ -267,7 +256,7 @@ const mm = {"he": "משימות","en":"missions"}
                       rel="noreferrer"
                      target="_blank" href={fblink}
           class=" hover:bg-white text-barbi rounded-full"
-          title={tofac[$lang]}
+          title={$t('lev.hevel.toFacebook')}
           >
           <img style="width:48px;height:48px" src="https://res.cloudinary.com/love1/image/upload/v1639258134/NicePng_oro-png_2336309_rkhbf8.png" alt="Facebook"/>
           </a>

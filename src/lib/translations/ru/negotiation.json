@@ -66,7 +66,7 @@
   "back": "Назад",
   "rounds": "Раунды",
   "finish_discussion": "Завершить обсуждение",
-  "next_round": "Раунд {{n}}",
+  "next_round": "Раунд {{count}}",
   "reset": "Сброс",
   "error_loading": "Ошибка загрузки обсуждения",
   "error_adding_position": "Ошибка при добавлении новой позиции",
@@ -74,5 +74,7 @@
   "error_communication": "Ошибка связи с ИИ",
   "error_generic": "Ошибка",
   "discussion_not_found": "Обсуждение не найдено",
-  "loading": "Загрузка..."
+  "loading": "Загрузка...",
+  "anonymous": "Аноним",
+  "discussion_created_by": "Обсуждение открыл"
 }

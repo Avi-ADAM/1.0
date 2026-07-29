@@ -1,5 +1,5 @@
 ﻿<script lang="ts">
-  import { isRtl } from '$lib/translations';
+  import { isRtl, t } from '$lib/translations';
   import { lang } from '$lib/stores/lang';
   import { fly } from 'svelte/transition';
   import { toast } from 'svelte-sonner';
@@ -241,70 +241,11 @@
     }
   }
 
-  const t = $derived(
-    {
-      he: {
-        meetingRoom: 'חדר פגישה',
-        joinVideo: 'הצטרף לוידאו',
-        participants: 'משתתפים',
-        online: 'מחובר',
-        offline: 'לא מחובר',
-        chat: "צ'אט",
-        typeMessage: 'הקלד הודעה...',
-        send: 'שלח',
-        noMessages: 'אין הודעות עדיין. היה הראשון לכתוב!',
-        meetingNotFound: 'הפגישה לא נמצאה',
-        backToMeetings: 'חזור לפגישות',
-        meetingNotLive: 'הפגישה עדיין לא התחילה',
-        videoLink: 'קישור לפגישת וידאו',
-        startedBy: 'התחיל על ידי',
-        startedAt: 'התחיל ב',
-        pendingStart: 'ממתין לאישורי הצטרפות',
-        joinMeeting: 'אני מוכן! הצטרף לפגישה',
-        waitingForOthers: 'ממתין למשתתפים נוספים...'
-      },
-      en: {
-        meetingRoom: 'Meeting Room',
-        joinVideo: 'Join Video',
-        participants: 'Participants',
-        online: 'Online',
-        offline: 'Offline',
-        chat: 'Chat',
-        typeMessage: 'Type a message...',
-        send: 'Send',
-        noMessages: 'No messages yet. Be the first to write!',
-        meetingNotFound: 'Meeting not found',
-        backToMeetings: 'Back to Meetings',
-        meetingNotLive: 'Meeting has not started yet',
-        videoLink: 'Video Meeting Link',
-        startedBy: 'Started by',
-        startedAt: 'Started at',
-        pendingStart: 'Waiting for participants to join',
-        joinMeeting: 'I am ready! Join Meeting',
-        waitingForOthers: 'Waiting for other participants...'
-      }
-    }[$lang] || {
-      meetingRoom: 'Meeting Room',
-      joinVideo: 'Join Video',
-      participants: 'Participants',
-      online: 'Online',
-      offline: 'Offline',
-      chat: 'Chat',
-      typeMessage: 'Type a message...',
-      send: 'Send',
-      noMessages: 'No messages yet. Be the first to write!',
-      meetingNotFound: 'Meeting not found',
-      backToMeetings: 'Back to Meetings',
-      meetingNotLive: 'Meeting has not started yet',
-      videoLink: 'Video Meeting Link',
-      startedBy: 'Started by',
-      startedAt: 'Started at'
-    }
-  );
+
 </script>
 
 <svelte:head>
-  <title>{data.meeting?.title ?? ($lang === 'he' ? 'פגישה' : 'Meeting')} · 1lev1</title>
+  <title>{data.meeting?.title ?? $t('common.footer.meeting')} · 1lev1</title>
 </svelte:head>
 
 <div
@@ -316,12 +257,12 @@
     <div class="flex items-center justify-center min-h-screen">
       <div class="text-center p-8">
         <span class="text-6xl mb-4 block">😕</span>
-        <h1 class="text-2xl font-bold text-white mb-4">{t.meetingNotFound}</h1>
+        <h1 class="text-2xl font-bold text-white mb-4">{$t('pages.meetingRoom.meetingNotFound')}</h1>
         <a
           href="/meeting"
           class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-all"
         >
-          ← {t.backToMeetings}
+          ← {$t('pages.meetingRoom.backToMeetings')}
         </a>
       </div>
     </div>
@@ -353,13 +294,13 @@
                   class="bg-yellow-500 text-black text-xs px-2 py-0.5 rounded-full animate-pulse flex items-center gap-1"
                 >
                   <span class="w-2 h-2 bg-black rounded-full"></span>
-                  {t.pendingStart}
+                  {$t('pages.meetingRoom.pendingStart')}
                 </span>
               {/if}
             </h1>
             {#if meeting?.startedBy}
               <p class="text-sm text-gray-400">
-                {t.startedBy}: {meeting.startedBy}
+                {$t('pages.meetingRoom.startedBy')}: {meeting.startedBy}
               </p>
             {/if}
           </div>
@@ -373,7 +314,7 @@
             class="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-2 px-6 rounded-full shadow-lg transform transition hover:-translate-y-1 hover:shadow-blue-500/30 flex items-center gap-2"
           >
             <span>🎥</span>
-            {t.joinVideo}
+            {$t('pages.meetingRoom.joinVideo')}
           </a>
         {:else if meeting?.pendingStart}
           <button
@@ -388,7 +329,7 @@
             {:else}
               <span>🚀</span>
             {/if}
-            {t.joinMeeting}
+            {$t('pages.meetingRoom.joinMeeting')}
           </button>
         {/if}
       </div>
@@ -405,7 +346,7 @@
           class="text-lg font-bold text-purple-300 mb-4 flex items-center gap-2"
         >
           <span>👥</span>
-          {t.participants}
+          {$t('pages.meetingRoom.participants')}
         </h2>
 
         <div class="space-y-3">
@@ -437,7 +378,7 @@
                     ? 'text-green-400'
                     : 'text-gray-500'}"
                 >
-                  {participant.available ? t.online : t.offline}
+                  {participant.available ? $t('pages.meetingRoom.online') : $t('pages.meetingRoom.offline')}
                 </p>
               </div>
             </div>
@@ -453,7 +394,7 @@
           <div class="flex items-center justify-between">
             <h2 class="text-lg font-bold text-green-300 flex items-center gap-2">
               <span>💬</span>
-              {t.chat}
+              {$t('pages.meetingRoom.chat')}
             </h2>
             <button
               onclick={refreshMessages}
@@ -474,7 +415,7 @@
             <div class="flex items-center justify-center h-full text-gray-500">
               <div class="text-center">
                 <span class="text-4xl mb-2 block">💬</span>
-                <p>{t.noMessages}</p>
+                <p>{$t('pages.meetingRoom.noMessages')}</p>
                 <p class="text-xs mt-2">Debug: {JSON.stringify({ messagesLength: messages.length, hasForumId: !!data.meeting?.forumId })}</p>
               </div>
             </div>
@@ -531,7 +472,7 @@
             <input
               type="text"
               bind:value={messageInput}
-              placeholder={t.typeMessage}
+              placeholder={$t('pages.meetingRoom.typeMessage')}
               class="flex-1 px-4 py-3 bg-gray-800/80 border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               onkeydown={handleKeyPress}
               disabled={!data.meeting.forumId}
@@ -550,7 +491,7 @@
               {:else}
                 <span>📤</span>
               {/if}
-              {t.send}
+              {$t('pages.meetingRoom.send')}
             </button>
           </div>
           {#if !data.meeting.forumId}
