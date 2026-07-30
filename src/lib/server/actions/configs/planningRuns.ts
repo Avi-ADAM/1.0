@@ -31,9 +31,25 @@ const loadQuickScan = () => import('../../planning/quickScan.js');
 const loadExpandDirection = () => import('../../planning/expandDirection.js');
 
 type Lang = 'he' | 'en' | 'ar';
+type SiteMode = 'auto' | 'always' | 'never';
 
 function asLang(v: unknown): Lang {
   return v === 'en' || v === 'ar' ? v : 'he';
+}
+
+/**
+ * Whether this run may read the rikma's own website for context.
+ *
+ * `auto` is the default and the point of the feature: the site is read only
+ * when the rikma's own description is too thin to plan from. `always` is the
+ * member ticking the box; `never` is them unticking it. Anything else — an
+ * older client, a confused agent — falls back to `auto`.
+ */
+function asSiteMode(v: unknown): SiteMode {
+  if (v === 'always' || v === 'never') return v;
+  if (v === true) return 'always';
+  if (v === false) return 'never';
+  return 'auto';
 }
 
 /** Persist one expansion row as a `project-plan-item`. */
@@ -81,14 +97,14 @@ async function loadBoardInProject(
 // ── Tier 1: scanProjectDirections ──────────────────────────────────────────
 
 const scanHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
-  const { projectId, lang } = params as Record<string, any>;
+  const { projectId, lang, siteMode } = params as Record<string, any>;
 
   const { scanProjectDirections } = await loadQuickScan();
   const scan = await scanProjectDirections(
     String(projectId),
     String(context.userId),
     context.fetch,
-    { lang: asLang(lang) }
+    { lang: asLang(lang), siteMode: asSiteMode(siteMode) }
   );
 
   // Persist each direction as a *suggested* board: thin, no items, waiting for
@@ -121,7 +137,9 @@ const scanHandler: ActionExecutionHandler = async (params, context, { strapi }) 
     signals: scan.signals,
     boards: created,
     // Surfaced so the UI can explain an empty result instead of showing nothing.
-    generated: scan.directions.length
+    generated: scan.directions.length,
+    // Told to the member, so "it read our site" is visible rather than magic.
+    siteUsed: scan.siteUsed
   };
 };
 
@@ -132,7 +150,13 @@ export const scanProjectDirectionsAction: ActionConfig = {
   graphqlOperation: scanHandler,
   paramSchema: {
     projectId: { type: 'string', required: true, description: 'ID of the project to scan' },
-    lang: { type: 'string', required: false, description: 'he | en | ar' }
+    lang: { type: 'string', required: false, description: 'he | en | ar' },
+    siteMode: {
+      type: 'string',
+      required: false,
+      description:
+        "Whether to read the rikma's own website for extra context: auto (default — only when its description is too thin) | always | never"
+    }
   },
   access: ['user', 'serviceAdmin'],
   authRules: [
@@ -148,7 +172,7 @@ export const scanProjectDirectionsAction: ActionConfig = {
 // ── Tier 2: expandPlanBoard ────────────────────────────────────────────────
 
 const expandHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
-  const { boardId, projectId, lang, revisionNote } = params as Record<string, any>;
+  const { boardId, projectId, lang, revisionNote, siteMode } = params as Record<string, any>;
 
   const board = await loadBoardInProject(strapi, context, boardId, projectId);
   const attrs = board.attributes ?? {};
@@ -167,7 +191,7 @@ const expandHandler: ActionExecutionHandler = async (params, context, { strapi }
     String(context.userId),
     brief,
     context.fetch,
-    { lang: asLang(lang) }
+    { lang: asLang(lang), siteMode: asSiteMode(siteMode) }
   );
 
   for (const item of expansion.items) {
@@ -194,7 +218,9 @@ const expandHandler: ActionExecutionHandler = async (params, context, { strapi }
     boardId: String(boardId),
     itemCount: expansion.items.length,
     duplicateCount: expansion.items.filter((i) => i.existingRef).length,
-    hints: expansion.hints
+    hints: expansion.hints,
+    siteUsed: expansion.siteUsed,
+    usedFallback: expansion.usedFallback
   };
 };
 
@@ -211,6 +237,12 @@ export const expandPlanBoardAction: ActionConfig = {
       type: 'string',
       required: false,
       description: 'Free-text steer for this run ("more marketing, drop the budget ones")'
+    },
+    siteMode: {
+      type: 'string',
+      required: false,
+      description:
+        "Whether to read the rikma's own website for extra context: auto (default) | always | never"
     }
   },
   access: ['user', 'serviceAdmin'],
@@ -227,7 +259,7 @@ export const expandPlanBoardAction: ActionConfig = {
 // ── Free-text entry point ──────────────────────────────────────────────────
 
 const fromTextHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
-  const { projectId, text, title, lang } = params as Record<string, any>;
+  const { projectId, text, title, lang, siteMode } = params as Record<string, any>;
 
   const brief = String(text || '').trim();
   if (brief.length < 20) {
@@ -240,12 +272,12 @@ const fromTextHandler: ActionExecutionHandler = async (params, context, { strapi
     String(context.userId),
     brief,
     context.fetch,
-    { lang: asLang(lang) }
+    { lang: asLang(lang), siteMode: asSiteMode(siteMode) }
   );
 
   const boardTitle =
     String(title || '').trim() ||
-    expansion.extraction.titleSuggestion ||
+    expansion.titleSuggestion ||
     brief.slice(0, 60);
 
   const boardRes = await strapi.execute(
@@ -279,7 +311,9 @@ const fromTextHandler: ActionExecutionHandler = async (params, context, { strapi
     title: boardTitle,
     itemCount: expansion.items.length,
     duplicateCount: expansion.items.filter((i) => i.existingRef).length,
-    hints: expansion.hints
+    hints: expansion.hints,
+    siteUsed: expansion.siteUsed,
+    usedFallback: expansion.usedFallback
   };
 };
 
@@ -292,7 +326,13 @@ export const createPlanBoardFromTextAction: ActionConfig = {
     projectId: { type: 'string', required: true, description: 'ID of the project' },
     text: { type: 'string', required: true, description: 'What the user wrote' },
     title: { type: 'string', required: false, description: 'Optional board title (defaults to an AI suggestion)' },
-    lang: { type: 'string', required: false, description: 'he | en | ar' }
+    lang: { type: 'string', required: false, description: 'he | en | ar' },
+    siteMode: {
+      type: 'string',
+      required: false,
+      description:
+        "Whether to read the rikma's own website for extra context: auto (default) | always | never"
+    }
   },
   access: ['user', 'serviceAdmin'],
   authRules: [

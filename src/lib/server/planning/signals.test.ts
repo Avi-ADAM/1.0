@@ -52,6 +52,16 @@ describe('classifyProjectStage', () => {
   ])('is established with %s', (_label, over) => {
     expect(classifyProjectStage(ctx(over as Partial<ProjectContext>))).toBe('established');
   });
+
+  it('is established when ANOTHER member is mid-mission', () => {
+    // ctx.myMissions holds only the asking member's work, so without the
+    // rikma-wide count this project used to be handed kickoff advice.
+    expect(classifyProjectStage(ctx(), { missionsInProgressCount: 3 })).toBe('established');
+  });
+
+  it('is established when a resource was requested and not yet supplied', () => {
+    expect(classifyProjectStage(ctx(), { openResourceCount: 1 })).toBe('established');
+  });
 });
 
 describe('buildScanSignals', () => {
@@ -103,6 +113,28 @@ describe('buildScanSignals', () => {
     expect(s.stage).toBe('new');
     expect(joined).toMatch(/no public description/);
     expect(joined).toMatch(/no values have been declared/);
+  });
+
+  it('flags resources requested and never supplied', () => {
+    const s = buildScanSignals(ctx(), { openResourceCount: 2 });
+    expect(s.facts.join(' ')).toMatch(/2 resource\(s\) were requested/);
+  });
+
+  it('points at a chore when there is running work and a role to aim it at', () => {
+    const s = buildScanSignals(ctx(), { missionsInProgressCount: 2, roleCount: 1 });
+    expect(s.facts.join(' ')).toMatch(/chore \(act\) can be aimed at someone real/);
+  });
+
+  it('notes an unread website only when the rikma described itself nowhere else', () => {
+    expect(buildScanSignals(ctx(), { hasWebsite: true }).facts.join(' ')).toMatch(
+      /website on file that was not read/
+    );
+    expect(
+      buildScanSignals(ctx(), { hasWebsite: true, siteAnalyzed: true }).facts.join(' ')
+    ).not.toMatch(/was not read/);
+    expect(
+      buildScanSignals(ctx({ description: 'a real description' }), { hasWebsite: true }).facts.join(' ')
+    ).not.toMatch(/was not read/);
   });
 
   it('carries no user-authored free text into the trusted facts', () => {

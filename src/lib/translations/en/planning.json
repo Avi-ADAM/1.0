@@ -16,7 +16,10 @@
     "close": "Close",
     "dismissDirection": "Not relevant",
     "empty": "No planning boards yet.",
-    "suggested": "Suggestion"
+    "suggested": "Suggestion",
+    "useSite": "Let the agent read the rikma’s website",
+    "useSiteHelp": "Read only when the profile description is too thin to plan from.",
+    "siteRead": "This plan also read:"
   },
   "board": {
     "empty": "This direction has not been broken down yet.",
@@ -34,6 +37,8 @@
     "created": "✓ Created",
     "exists": "Already exists",
     "hint": "Clarifying questions",
+    "why": "Why:",
+    "siteRead": "This breakdown also read:",
     "kinds": {
       "mission": "Mission",
       "act": "Task",

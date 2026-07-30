@@ -504,4 +504,5 @@ export const qidsAccess = {
   '288updatePlanBoard': { allow: ['serviceAdmin'] },
   '289createPlanItem': { allow: ['serviceAdmin'] },
   '290updatePlanItem': { allow: ['serviceAdmin'] },
+  '291getProjectPlanningContext': { allow: ['user', 'serviceAdmin'] },
 };

@@ -17,17 +17,26 @@
    * @typedef {Object} Props
    * @property {any} board - Board node: { id, attributes: { title, …, items } }
    * @property {string} projectId
+   * @property {'auto'|'always'|'never'} [siteMode] - Whether the expansion run may
+   *   read the rikma's website for context. See `src/lib/server/planning/siteContext.ts`.
    * @property {(item: any, board: any) => void} [onOpenItem] - Open the row in its real creation form.
    * @property {() => void} [onChanged] - Ask the parent to reload after a change.
    */
 
   /** @type {Props} */
-  let { board, projectId, onOpenItem, onChanged } = $props();
+  let { board, projectId, siteMode = 'auto', onOpenItem, onChanged } = $props();
 
   let busyItemId = $state(/** @type {string|null} */ (null));
   let expanding = $state(false);
   let revisionNote = $state('');
   let showRevision = $state(false);
+  /**
+   * Clarifying questions the run came back with. They live on the action's
+   * result rather than on the board, so they are shown for this run only —
+   * previously they were returned and silently dropped.
+   */
+  let hints = $state(/** @type {{kind: string, text: string}[]} */ ([]));
+  let siteUsed = $state(/** @type {string|null} */ (null));
 
   let attrs = $derived(board?.attributes ?? {});
   let items = $derived(attrs.items?.data ?? []);
@@ -39,6 +48,12 @@
     return Array.isArray(raw) ? raw.filter(Boolean).slice(0, 6) : [];
   }
 
+  /** Why the AI proposed this row, grounded in the rikma's real state. */
+  function rationaleOf(item) {
+    const raw = item?.attributes?.spec?.rationale;
+    return typeof raw === 'string' ? raw.trim() : '';
+  }
+
   async function expand() {
     if (expanding) return;
     expanding = true;
@@ -47,11 +62,14 @@
         boardId: String(board.id),
         projectId: String(projectId),
         lang: $lang,
+        siteMode,
         ...(revisionNote.trim() ? { revisionNote: revisionNote.trim() } : {})
       });
       if (res.success) {
         revisionNote = '';
         showRevision = false;
+        hints = Array.isArray(res.data?.hints) ? res.data.hints : [];
+        siteUsed = res.data?.siteUsed ?? null;
         onChanged?.();
       }
     } finally {
@@ -93,6 +111,24 @@
       {expanding ? $t('planning.board.expanding') : $t('planning.board.expand')}
     </Button>
   {:else}
+    {#if siteUsed}
+      <p class="text-xs mb-3 text-gray-600 dark:text-gray-300">
+        {$t('planning.board.siteRead')}
+        <a class="underline break-all" href={siteUsed} target="_blank" rel="noopener noreferrer">{siteUsed}</a>
+      </p>
+    {/if}
+
+    {#if hints.length > 0}
+      <div class="mb-3 rounded-xl border border-barbi/30 bg-white/60 dark:bg-black/20 p-3">
+        <p class="text-xs font-semibold mb-1 text-[color:var(--stgold,#574010)]">{$t('planning.board.hint')}</p>
+        <ul class="list-disc list-inside text-sm text-gray-700 dark:text-gray-300">
+          {#each hints as hint (hint.text)}
+            <li>{hint.text}</li>
+          {/each}
+        </ul>
+      </div>
+    {/if}
+
     <ul class="flex flex-col gap-3">
       {#each items as item (item.id)}
         {@const a = item.attributes}
@@ -138,6 +174,11 @@
           <p class="font-semibold text-gray-900 dark:text-gray-100">{a.name}</p>
           {#if a.descrip}
             <p class="text-sm text-gray-600 dark:text-gray-300">{a.descrip}</p>
+          {/if}
+          {#if rationaleOf(item)}
+            <p class="text-xs text-gray-500 dark:text-gray-400 italic mt-1">
+              {$t('planning.board.why')} {rationaleOf(item)}
+            </p>
           {/if}
 
           {#if skillsOf(item).length > 0}

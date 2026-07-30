@@ -43,6 +43,19 @@
   let submittingText = $state(false);
   let openBoardId = $state(/** @type {string|null} */ (null));
 
+  /**
+   * May the planner read the rikma's own website?
+   *
+   * On by default, but that does NOT mean the site is fetched every run: the
+   * server treats this as `siteMode:'auto'` and only reads the site when the
+   * rikma's own description is too thin to plan from. Unticking sends
+   * `'never'`. See `src/lib/server/planning/siteContext.ts`.
+   */
+  let allowSite = $state(true);
+  let siteMode = $derived(/** @type {'auto'|'never'} */ (allowSite ? 'auto' : 'never'));
+  /** The URL a run actually read, so "it looked at our site" is visible. */
+  let siteUsed = $state(/** @type {string|null} */ (null));
+
   // Sync the deep link into local state. Not a plain initialiser: `?board=`
   // can arrive through client-side navigation (the bot hands the user a
   // reviewUrl), and a plain $state() would only capture the first value.
@@ -90,10 +103,12 @@
     try {
       const res = await executeAction('scanProjectDirections', {
         projectId: String(projectId),
-        lang: $lang
+        lang: $lang,
+        siteMode
       });
       if (res.success) {
         scanned = true;
+        siteUsed = res.data?.siteUsed ?? null;
         await reload();
       }
     } finally {
@@ -109,10 +124,12 @@
       const res = await executeAction('createPlanBoardFromText', {
         projectId: String(projectId),
         text,
-        lang: $lang
+        lang: $lang,
+        siteMode
       });
       if (res.success) {
         freeText = '';
+        siteUsed = res.data?.siteUsed ?? null;
         await reload();
         if (res.data?.boardId) openBoardId = String(res.data.boardId);
       }
@@ -152,7 +169,7 @@
     <p class="text-sm font-medium mb-4 text-[color:var(--stgold,#574010)]">{$t('planning.boards.intro')}</p>
 
     <!-- Tier 1 — the thin scan. Explicit click only. -->
-    <div class="flex flex-wrap items-center gap-3 mb-4">
+    <div class="flex flex-wrap items-center gap-3 mb-2">
       <Button onClick={runScan} disabled={scanning}>
         {scanning ? $t('planning.boards.scanning') : scanned ? $t('planning.boards.rescan') : $t('planning.boards.scan')}
       </Button>
@@ -160,6 +177,23 @@
         <span class="text-sm font-medium text-[color:var(--stgold,#574010)]">{$t('planning.boards.noDirections')}</span>
       {/if}
     </div>
+
+    <!-- Website analysis: permission, not a command — the server still reads
+         the site only when the rikma's own description is too thin. -->
+    <label class="flex items-start gap-2 mb-4 text-sm text-[color:var(--stgold,#574010)] cursor-pointer">
+      <input type="checkbox" bind:checked={allowSite} class="mt-0.5 accent-barbi" />
+      <span>
+        {$t('planning.boards.useSite')}
+        <span class="block text-xs opacity-80">{$t('planning.boards.useSiteHelp')}</span>
+      </span>
+    </label>
+
+    {#if siteUsed}
+      <p class="text-xs mb-4 text-[color:var(--stgold,#574010)]">
+        {$t('planning.boards.siteRead')}
+        <a class="underline break-all" href={siteUsed} target="_blank" rel="noopener noreferrer">{siteUsed}</a>
+      </p>
+    {/if}
 
     <!-- Suggested directions: thin cards, nothing expanded yet -->
     {#if suggested.length > 0}
@@ -206,7 +240,7 @@
             </button>
             {#if isOpen}
               <div class="mt-2">
-                <PlanBoard {board} {projectId} {onOpenItem} onChanged={reload} />
+                <PlanBoard {board} {projectId} {siteMode} {onOpenItem} onChanged={reload} />
               </div>
             {/if}
           </li>

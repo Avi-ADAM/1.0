@@ -32,21 +32,47 @@ export interface ScanSignals {
   runningTimerCount: number;
   valueCount: number;
   hasDescription: boolean;
+  /** Rikma-wide counts, present once the planning extras were loaded. */
+  openResourceCount: number;
+  missionsInProgressCount: number;
+  roleCount: number;
+  hasWebsite: boolean;
+  siteAnalyzed: boolean;
   /** Short, human-readable facts handed to the model as grounding. */
   facts: string[];
 }
 
 /**
- * A project is "new" when nothing has been produced yet — no open missions, no
- * products, no work in progress. Team size alone does not make a project
- * established: five members who have not created anything still need kickoff
- * advice, not optimisation advice.
+ * Rikma-wide counts that only the planning snapshot has
+ * (`planningContext.ts`). Declared structurally rather than imported so this
+ * module stays dependency-free and free of an import cycle.
  */
-export function classifyProjectStage(ctx: ProjectContext): ProjectStage {
+export interface ExtraSignals {
+  openResourceCount?: number;
+  /** In-progress missions across the WHOLE rikma, not just the caller's. */
+  missionsInProgressCount?: number;
+  roleCount?: number;
+  hasWebsite?: boolean;
+  siteAnalyzed?: boolean;
+}
+
+/**
+ * A project is "new" when nothing has been produced yet — no open missions, no
+ * products, no work in progress, no resources requested. Team size alone does
+ * not make a project established: five members who have not created anything
+ * still need kickoff advice, not optimisation advice.
+ *
+ * `extra` matters: `ctx.myMissions` holds only the *asking member's* work, so a
+ * rikma where somebody else is mid-mission reads as empty without it — and used
+ * to be handed kickoff advice months into its life.
+ */
+export function classifyProjectStage(ctx: ProjectContext, extra: ExtraSignals = {}): ProjectStage {
   const activity =
     (ctx.openMissions?.length ?? 0) +
     (ctx.products?.length ?? 0) +
-    (ctx.myMissions?.length ?? 0);
+    (ctx.myMissions?.length ?? 0) +
+    (extra.missionsInProgressCount ?? 0) +
+    (extra.openResourceCount ?? 0);
   return activity === 0 ? 'new' : 'established';
 }
 
@@ -57,7 +83,7 @@ export function classifyProjectStage(ctx: ProjectContext): ProjectStage {
  * no user-authored free text — names and descriptions stay in the delimited
  * block produced by `summarizeProjectContext`.
  */
-export function buildScanSignals(ctx: ProjectContext): ScanSignals {
+export function buildScanSignals(ctx: ProjectContext, extra: ExtraSignals = {}): ScanSignals {
   const memberCount = ctx.members?.length ?? 0;
   const openMissionCount = ctx.openMissions?.length ?? 0;
   const productCount = ctx.products?.length ?? 0;
@@ -66,17 +92,27 @@ export function buildScanSignals(ctx: ProjectContext): ScanSignals {
   const runningTimerCount = myMissions.filter((m) => m.activeTimer?.isActive).length;
   const valueCount = ctx.values?.length ?? 0;
   const hasDescription = Boolean((ctx.description ?? '').trim());
-  const stage = classifyProjectStage(ctx);
+  const openResourceCount = extra.openResourceCount ?? 0;
+  const missionsInProgressCount = extra.missionsInProgressCount ?? myInProgressCount;
+  const roleCount = extra.roleCount ?? 0;
+  const hasWebsite = Boolean(extra.hasWebsite);
+  const siteAnalyzed = Boolean(extra.siteAnalyzed);
+  const stage = classifyProjectStage(ctx, extra);
 
   const facts: string[] = [
     `stage=${stage}`,
     `members=${memberCount}`,
     `open_missions=${openMissionCount}`,
+    `open_resources=${openResourceCount}`,
     `products=${productCount}`,
-    `missions_in_progress=${myInProgressCount}`,
+    `missions_in_progress=${missionsInProgressCount}`,
+    `my_missions_in_progress=${myInProgressCount}`,
     `running_timers=${runningTimerCount}`,
+    `roles_defined=${roleCount}`,
     `declared_values=${valueCount}`,
-    `has_public_description=${hasDescription}`
+    `has_public_description=${hasDescription}`,
+    `has_website=${hasWebsite}`,
+    `website_was_read=${siteAnalyzed}`
   ];
 
   // Observations worth surfacing explicitly — these are the hooks a good
@@ -87,9 +123,19 @@ export function buildScanSignals(ctx: ProjectContext): ScanSignals {
         `${openMissionCount} mission(s) are published and still waiting for someone to take them`
       );
     }
-    if (productCount === 0 && myInProgressCount > 0) {
+    if (openResourceCount > 0) {
+      facts.push(
+        `${openResourceCount} resource(s) were requested and have not been supplied yet`
+      );
+    }
+    if (productCount === 0 && missionsInProgressCount > 0) {
       facts.push(
         'work is happening but the project has no product defined, so nothing can be sold yet'
+      );
+    }
+    if (missionsInProgressCount > 0 && roleCount > 0) {
+      facts.push(
+        'there are missions in progress and roles defined, so a chore (act) can be aimed at someone real instead of opening a new mission'
       );
     }
     if (memberCount <= 1) {
@@ -99,6 +145,10 @@ export function buildScanSignals(ctx: ProjectContext): ScanSignals {
     if (!hasDescription) facts.push('there is no public description yet');
     if (valueCount === 0) facts.push('no values have been declared yet');
     if (memberCount <= 1) facts.push('the project has a single member');
+  }
+
+  if (!hasDescription && hasWebsite && !siteAnalyzed) {
+    facts.push('the project has a website on file that was not read for this run');
   }
 
   return {
@@ -111,6 +161,11 @@ export function buildScanSignals(ctx: ProjectContext): ScanSignals {
     runningTimerCount,
     valueCount,
     hasDescription,
+    openResourceCount,
+    missionsInProgressCount,
+    roleCount,
+    hasWebsite,
+    siteAnalyzed,
     facts
   };
 }

@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { parseDirections, buildScanPrompt } from './quickScan';
 import { buildScanSignals } from './signals';
+import { EMPTY_EXTRAS, type PlanningSnapshot } from './planningContext';
 import type { ProjectContext } from '../ai/projectContext';
+import type { SiteAnalysis } from './siteContext';
 
 const ok = JSON.stringify({
   directions: [
@@ -79,17 +81,45 @@ describe('buildScanPrompt', () => {
     fetchedAt: Date.now()
   };
 
+  const snap = (ctx: ProjectContext, site: SiteAnalysis | null = null): PlanningSnapshot => ({
+    ctx,
+    extras: { ...EMPTY_EXTRAS },
+    signals: buildScanSignals(ctx),
+    site
+  });
+
   it('states the stage explicitly so the model branches correctly', () => {
-    const newP = buildScanPrompt(base, buildScanSignals(base), 'en');
-    expect(newP).toMatch(/NEW stage/);
+    expect(buildScanPrompt(snap(base), 'en')).toMatch(/NEW stage/);
 
     const est = { ...base, openMissions: [{ id: '1', name: 'A' }] };
-    expect(buildScanPrompt(est, buildScanSignals(est), 'en')).toMatch(/ESTABLISHED/);
+    expect(buildScanPrompt(snap(est), 'en')).toMatch(/ESTABLISHED/);
   });
 
   it('keeps user-authored content inside the untrusted delimiters', () => {
-    const prompt = buildScanPrompt(base, buildScanSignals(base), 'en');
+    const prompt = buildScanPrompt(snap(base), 'en');
     expect(prompt).toContain('untrusted');
     expect(prompt).toContain('<<<Green Roofs>>>');
+  });
+
+  it('includes the website text, delimited, when the site was read', () => {
+    const prompt = buildScanPrompt(
+      snap(base, {
+        url: 'https://greenroofs.example/',
+        ok: true,
+        title: 'Green Roofs',
+        text: 'We build rooftop gardens for schools.'
+      }),
+      'en'
+    );
+    expect(prompt).toContain('<<<We build rooftop gardens for schools.>>>');
+    expect(prompt).toContain('https://greenroofs.example/');
+  });
+
+  it('says nothing about a site that could not be read', () => {
+    const prompt = buildScanPrompt(
+      snap(base, { url: 'https://x.example/', ok: false, title: '', text: '', error: 'timeout' }),
+      'en'
+    );
+    expect(prompt).not.toContain('x.example');
   });
 });

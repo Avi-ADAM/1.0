@@ -16,7 +16,10 @@
     "close": "Cerrar",
     "dismissDirection": "No relevante",
     "empty": "Aún no hay tableros de planificación.",
-    "suggested": "Sugerencia"
+    "suggested": "Sugerencia",
+    "useSite": "Permitir que el agente lea el sitio web de la rikma",
+    "useSiteHelp": "Se lee solo si la descripción del perfil es demasiado breve para planificar.",
+    "siteRead": "Este plan también leyó:"
   },
   "board": {
     "empty": "Esta dirección aún no se ha desglosado en tareas.",
@@ -34,6 +37,8 @@
     "created": "✓ Creado",
     "exists": "Ya existe",
     "hint": "Preguntas aclaratorias",
+    "why": "Por qué:",
+    "siteRead": "Este desglose también leyó:",
     "kinds": {
       "mission": "Misión",
       "act": "Tarea",

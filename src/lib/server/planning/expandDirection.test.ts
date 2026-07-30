@@ -3,9 +3,12 @@ import {
   findExisting,
   dedupeAgainstProject,
   collectExistingCandidates,
+  toExpandedItem,
   DUPLICATE_THRESHOLD,
   type ExpandedItem
 } from './expandDirection';
+import { EMPTY_EXTRAS, type PlanningExtras } from './planningContext';
+import type { PlannedRow } from './expandAgent';
 import type { ProjectContext } from '../ai/projectContext';
 
 function ctx(over: Partial<ProjectContext> = {}): ProjectContext {
@@ -110,6 +113,111 @@ describe('findExisting', () => {
     const hit = findExisting('Design logo for the brand', candidates);
     expect(hit!.id).toBe('2');
     expect(hit!.similarity).toBeGreaterThanOrEqual(DUPLICATE_THRESHOLD);
+  });
+});
+
+describe('collectExistingCandidates with planning extras', () => {
+  const extras: PlanningExtras = {
+    ...EMPTY_EXTRAS,
+    openResources: [{ id: '50', name: 'מצלמה', kindOf: 'equipment', price: null }],
+    resourcesInProgress: [{ id: '51', name: 'Studio space', kindOf: 'space', price: null }],
+    // Another member's work — invisible in ctx.myMissions.
+    missionsInProgress: [{ id: '60', name: 'Community outreach', holder: 'dana', roles: [] }]
+  };
+
+  it('adds resources and rikma-wide work in progress', () => {
+    const c = collectExistingCandidates(liveProject, extras);
+    expect(c.map((x) => x.type)).toContain('openResource');
+    expect(c.map((x) => x.type)).toContain('resourceInProgress');
+    expect(c.filter((x) => x.type === 'missionInProgress')).toHaveLength(2);
+  });
+
+  it('does not list the same mission twice when both sources carry it', () => {
+    const c = collectExistingCandidates(liveProject, {
+      ...EMPTY_EXTRAS,
+      missionsInProgress: [{ id: '20', name: 'Write landing page copy', holder: 'me', roles: [] }]
+    });
+    expect(c.filter((x) => x.type === 'missionInProgress')).toHaveLength(1);
+  });
+
+  it('flags a resource the rikma already asked for', () => {
+    const hit = findExisting('מצלמה', collectExistingCandidates(liveProject, extras), DUPLICATE_THRESHOLD, 'resource');
+    expect(hit?.type).toBe('openResource');
+  });
+
+  it('never calls a mission a duplicate of a resource', () => {
+    const candidates = collectExistingCandidates(liveProject, extras);
+    expect(findExisting('מצלמה', candidates, DUPLICATE_THRESHOLD, 'mission')).toBeNull();
+    // …and a resource is not a duplicate of a similarly-named mission.
+    expect(findExisting('עיצוב לוגו', candidates, DUPLICATE_THRESHOLD, 'resource')).toBeNull();
+  });
+
+  it('never flags a note row', () => {
+    const candidates = collectExistingCandidates(liveProject, extras);
+    expect(findExisting('עיצוב לוגו', candidates, DUPLICATE_THRESHOLD, 'note')).toBeNull();
+  });
+});
+
+describe('toExpandedItem', () => {
+  function planned(over: Partial<PlannedRow> = {}): PlannedRow {
+    return {
+      kind: 'mission',
+      name: 'Build the landing page',
+      descrip: 'Live page with the three offerings.',
+      imp: 'must',
+      rationale: 'The site lists three workshops with no way to book.',
+      skills: ['מתכנת'],
+      roles: [],
+      workways: [],
+      nhours: 12,
+      valph: null,
+      assigneeKind: null,
+      assigneeName: null,
+      missionName: null,
+      kindOf: null,
+      price: null,
+      quantity: null,
+      ...over
+    };
+  }
+
+  it('carries the mission prefill the creation form actually reads', () => {
+    const item = toExpandedItem(planned(), 0);
+    expect(item.spec).toEqual({
+      rationale: 'The site lists three workshops with no way to book.',
+      skills: ['מתכנת'],
+      nhours: 12
+    });
+    expect(item.descrip).toBe('Live page with the three offerings.');
+  });
+
+  it('carries the chore target on an act row', () => {
+    const item = toExpandedItem(
+      planned({
+        kind: 'act',
+        skills: [],
+        nhours: null,
+        assigneeKind: 'role',
+        missionName: 'Community outreach'
+      }),
+      1
+    );
+    expect(item.spec.assigneeKind).toBe('role');
+    expect(item.spec.missionName).toBe('Community outreach');
+    expect(item.spec.skills).toBeUndefined();
+  });
+
+  it('carries price and kind on a resource row', () => {
+    const item = toExpandedItem(
+      planned({ kind: 'resource', skills: [], nhours: null, kindOf: 'equipment', price: 900 }),
+      2
+    );
+    expect(item.spec).toMatchObject({ kindOf: 'equipment', price: 900 });
+  });
+
+  it('drops empty fields rather than writing nulls into the spec', () => {
+    const item = toExpandedItem(planned({ rationale: '', skills: [], nhours: null }), 0);
+    expect(Object.keys(item.spec)).toEqual([]);
   });
 });
 

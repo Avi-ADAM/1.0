@@ -14072,6 +14072,35 @@ export const qids = {
     }
   }`,
 
+  // The planning snapshot (PLAN_PROJECT_PLANNING_BOARDS §1.2). Everything the
+  // planner needs *beyond* 49GetProjectById: what the rikma already has open
+  // so a plan does not re-propose it, who holds which role so a chore can be
+  // aimed at someone real, and the website to read when the description is too
+  // thin to plan from. Deliberately a separate qid — the chat bot's per-turn
+  // context must stay cheap, and this is only pulled for a planning run.
+  '291getProjectPlanningContext': `query GetProjectPlanningContext($pid: ID!) {
+    project(id: $pid) {
+      data { id attributes {
+        projectName publicDescription linkToWebsite
+        open_mashaabims(filters: { archived: { eq: false } }, pagination: { limit: 30 }) {
+          data { id attributes { name kindOf price hm } }
+        }
+        mashabetahaliches(filters: { finnished: { ne: true } }, pagination: { limit: 30 }) {
+          data { id attributes { name kindOf } }
+        }
+        mesimabetahaliches(filters: { finnished: { ne: true } }, pagination: { limit: 30 }) {
+          data { id attributes {
+            name
+            users_permissions_user { data { id attributes { username } } }
+            tafkidims { data { id attributes { roleDescription } } }
+          } }
+        }
+        tafkidims(pagination: { limit: 30 }) { data { id attributes { roleDescription } } }
+        work_ways(pagination: { limit: 20 }) { data { id attributes { workWayName } } }
+      } }
+    }
+  }`,
+
   ...qids_base,
   ...moachQids
 };
