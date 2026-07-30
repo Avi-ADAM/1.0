@@ -39,5 +39,6 @@ export const ROUTED = {
     discover: at('/demand', '/project', '/gift', '/availableMission', '/availiableResorce'),
     concierge: at('/concierge', '/wish'),
     offerings: at('/me', '/onboard', '/gift', '/user', '/deals/sales-center', /\/moach\/[^/]+\/sales/),
-    consensus: at('/consensus')
+    consensus: at('/consensus'),
+    planning: at(/\/moach\/[^/]+\/create/)
 };

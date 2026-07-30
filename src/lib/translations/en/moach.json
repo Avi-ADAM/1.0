@@ -117,7 +117,13 @@
     "clickHandMission": "Click on the hand to create a mission",
     "clickHandResource": "Click on the hand to request a resource",
     "hosafa": "Add the missions the rikma needs",
-    "hosafat": "Add the resources the rikma needs"
+    "hosafat": "Add the resources the rikma needs",
+    "aiBanner": {
+      "eyebrow": "🤖 AI-powered",
+      "title": "Come build with AI",
+      "desc": "Our AI scans the project and suggests directions and tasks ready for your approval — try it below",
+      "cta": "Plan with AI"
+    }
   },
   "objectList": {
     "active": "Active",

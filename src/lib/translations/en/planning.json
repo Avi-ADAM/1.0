@@ -1,0 +1,45 @@
+{
+  "boards": {
+    "aiBadge": "🤖 AI-powered",
+    "heading": "Planning boards",
+    "intro": "A space to plan how to advance the project. Nothing is created until you approve it in the form.",
+    "scan": "🧭 What's worth advancing?",
+    "scanning": "Scanning the project…",
+    "rescan": "Scan again",
+    "noDirections": "No suggestions right now. Try writing your own direction.",
+    "freeTextLabel": "Or write freely what you want to advance",
+    "freeTextPlaceholder": "e.g. we want to start selling our first product and reach customers…",
+    "freeTextSend": "Build me a plan",
+    "sending": "Building…",
+    "tooShort": "Write a little more so we can build a plan",
+    "open": "Open",
+    "close": "Close",
+    "dismissDirection": "Not relevant",
+    "empty": "No planning boards yet.",
+    "suggested": "Suggestion"
+  },
+  "board": {
+    "empty": "This direction has not been broken down yet.",
+    "expand": "✨ Break this direction into tasks",
+    "expanding": "Breaking down…",
+    "revise": "Ask for a revision",
+    "revisePlaceholder": "What should change? e.g. more marketing, drop the budget ones",
+    "reviseSend": "Send request",
+    "cancel": "Cancel",
+    "openInForm": "Open in form",
+    "dismiss": "Not relevant",
+    "restore": "Restore",
+    "must": "Must",
+    "nice": "Nice",
+    "created": "✓ Created",
+    "exists": "Already exists",
+    "hint": "Clarifying questions",
+    "kinds": {
+      "mission": "Mission",
+      "act": "Task",
+      "resource": "Resource",
+      "product": "Product",
+      "note": "Note"
+    }
+  }
+}

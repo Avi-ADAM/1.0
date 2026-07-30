@@ -216,10 +216,18 @@
     publishMode = false,
     onPublish,
     /**
-     * Optional prefill for specMode editing (PLAN_CONCIERGE plan editing):
-     * `{ name, descrip, hours, ratePerHour }`. When present, the form opens with
-     * these values so the wisher edits an existing plan item with all its
-     * details. Ignored outside specMode.
+     * Optional prefill for the form:
+     * `{ name, descrip, hours|nhours, ratePerHour|valph, skills[], roles[], workways[] }`.
+     *
+     * Used by two families of callers:
+     *  - specMode / publishMode editing (PLAN_CONCIERGE plan editing);
+     *  - the AI prefill routes — `?action=createmission` (prepareMissionTool) and
+     *    the planning boards (PLAN_PROJECT_PLANNING_BOARDS) — which open the
+     *    normal creation form with the AI's suggestion already filled in so the
+     *    user reviews and approves it.
+     *
+     * Vocabulary arrays arrive as plain names, exactly like `applyAiSuggestions`
+     * produces them; SkillSelector resolves names → ids on submit.
      */
     initialSpec = null
   } = $props();
@@ -286,15 +294,34 @@
         gloading = false;
       }
     } else {
-      // specMode / publishMode editing: hydrate the form with the item's details.
-      if ((specMode || publishMode) && initialSpec) {
+      // Hydrate the form from a supplied spec. Honoured whenever a spec is
+      // given — not only in specMode — because the AI prefill routes open the
+      // *normal* creation form pre-filled for human review.
+      if (initialSpec) {
         miData[0].missionName = initialSpec.name ?? name ?? '';
         if (initialSpec.descrip != null)
           miData[0].descrip = initialSpec.descrip;
-        if (initialSpec.hours != null)
-          miData[0].nhours = Number(initialSpec.hours) || 0;
-        if (initialSpec.ratePerHour != null)
-          miData[0].valph = Number(initialSpec.ratePerHour) || 0;
+
+        const hours = initialSpec.hours ?? initialSpec.nhours;
+        if (hours != null) miData[0].nhours = Number(hours) || 0;
+
+        const rate = initialSpec.ratePerHour ?? initialSpec.valph;
+        if (rate != null) miData[0].valph = Number(rate) || 0;
+
+        // AI-suggested vocabulary: pre-select it (the user can remove any chip).
+        const asNames = (v) =>
+          (Array.isArray(v) ? v : [])
+            .map((n) => (typeof n === 'string' ? n : (n?.name ?? '')).trim())
+            .filter(Boolean);
+
+        const preSkills = asNames(initialSpec.skills);
+        if (preSkills.length) miData[0].selectedSkills = [...preSkills];
+
+        const preRoles = asNames(initialSpec.roles);
+        if (preRoles.length) miData[0].selectedRoles = [...preRoles];
+
+        const preWorkways = asNames(initialSpec.workways);
+        if (preWorkways.length) miData[0].selectedWorkways = [...preWorkways];
       } else {
         miData[0].missionName = name;
       }

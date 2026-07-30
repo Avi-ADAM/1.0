@@ -1,0 +1,45 @@
+{
+  "boards": {
+    "aiBadge": "🤖 Con tecnología de IA",
+    "heading": "Tableros de planificación",
+    "intro": "Un espacio para planificar cómo avanzar el proyecto. No se crea nada hasta que lo apruebes en el formulario.",
+    "scan": "🧭 ¿Qué vale la pena avanzar?",
+    "scanning": "Escaneando el proyecto…",
+    "rescan": "Escanear de nuevo",
+    "noDirections": "No hay sugerencias por ahora. Intenta escribir tu propia dirección.",
+    "freeTextLabel": "O escribe libremente qué quieres avanzar",
+    "freeTextPlaceholder": "Por ejemplo: queremos empezar a vender nuestro primer producto y llegar a clientes…",
+    "freeTextSend": "Constrúyeme un plan",
+    "sending": "Construyendo…",
+    "tooShort": "Escribe un poco más para poder construir un plan",
+    "open": "Abrir",
+    "close": "Cerrar",
+    "dismissDirection": "No relevante",
+    "empty": "Aún no hay tableros de planificación.",
+    "suggested": "Sugerencia"
+  },
+  "board": {
+    "empty": "Esta dirección aún no se ha desglosado en tareas.",
+    "expand": "✨ Desglosar esta dirección en tareas",
+    "expanding": "Desglosando…",
+    "revise": "Solicitar una revisión",
+    "revisePlaceholder": "¿Qué debería cambiar? Por ejemplo: más marketing, sin tareas de presupuesto",
+    "reviseSend": "Enviar solicitud",
+    "cancel": "Cancelar",
+    "openInForm": "Abrir en el formulario",
+    "dismiss": "No relevante",
+    "restore": "Restaurar",
+    "must": "Obligatorio",
+    "nice": "Deseable",
+    "created": "✓ Creado",
+    "exists": "Ya existe",
+    "hint": "Preguntas aclaratorias",
+    "kinds": {
+      "mission": "Misión",
+      "act": "Tarea",
+      "resource": "Recurso",
+      "product": "Producto",
+      "note": "Nota"
+    }
+  }
+}

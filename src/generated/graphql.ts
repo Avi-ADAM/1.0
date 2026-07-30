@@ -12548,6 +12548,7 @@ export type ProjectPlanBoard = {
   __typename?: 'ProjectPlanBoard';
   ai_meta?: Maybe<Scalars['JSON']['output']>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
+  creator?: Maybe<UsersPermissionsUserEntityResponse>;
   descrip?: Maybe<Scalars['String']['output']>;
   expandedAt?: Maybe<Scalars['DateTime']['output']>;
   forums?: Maybe<ForumRelationResponseCollection>;
@@ -12601,6 +12602,7 @@ export type ProjectPlanBoardFiltersInput = {
   ai_meta?: InputMaybe<JsonFilterInput>;
   and?: InputMaybe<Array<InputMaybe<ProjectPlanBoardFiltersInput>>>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
+  creator?: InputMaybe<UsersPermissionsUserFiltersInput>;
   descrip?: InputMaybe<StringFilterInput>;
   expandedAt?: InputMaybe<DateTimeFilterInput>;
   forums?: InputMaybe<ForumFiltersInput>;
@@ -12622,6 +12624,7 @@ export type ProjectPlanBoardFiltersInput = {
 
 export type ProjectPlanBoardInput = {
   ai_meta?: InputMaybe<Scalars['JSON']['input']>;
+  creator?: InputMaybe<Scalars['ID']['input']>;
   descrip?: InputMaybe<Scalars['String']['input']>;
   expandedAt?: InputMaybe<Scalars['DateTime']['input']>;
   forums?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -17892,6 +17895,7 @@ export type UsersPermissionsUser = {
   pricing_pref?: Maybe<Scalars['JSON']['output']>;
   profilManualAlready?: Maybe<Scalars['Boolean']['output']>;
   profilePic?: Maybe<UploadFileEntityResponse>;
+  project_plan_boards?: Maybe<ProjectPlanBoardRelationResponseCollection>;
   projects_1s?: Maybe<ProjectRelationResponseCollection>;
   provider?: Maybe<Scalars['String']['output']>;
   radius?: Maybe<Scalars['Long']['output']>;
@@ -18307,6 +18311,14 @@ export type UsersPermissionsUserPositionsAuthorArgs = {
 };
 
 
+export type UsersPermissionsUserProject_Plan_BoardsArgs = {
+  filters?: InputMaybe<ProjectPlanBoardFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
 export type UsersPermissionsUserProjects_1sArgs = {
   filters?: InputMaybe<ProjectFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
@@ -18601,6 +18613,7 @@ export type UsersPermissionsUserFiltersInput = {
   preferCards?: InputMaybe<BooleanFilterInput>;
   pricing_pref?: InputMaybe<JsonFilterInput>;
   profilManualAlready?: InputMaybe<BooleanFilterInput>;
+  project_plan_boards?: InputMaybe<ProjectPlanBoardFiltersInput>;
   projects_1s?: InputMaybe<ProjectFiltersInput>;
   provider?: InputMaybe<StringFilterInput>;
   radius?: InputMaybe<LongFilterInput>;
@@ -18729,6 +18742,7 @@ export type UsersPermissionsUserInput = {
   pricing_pref?: InputMaybe<Scalars['JSON']['input']>;
   profilManualAlready?: InputMaybe<Scalars['Boolean']['input']>;
   profilePic?: InputMaybe<Scalars['ID']['input']>;
+  project_plan_boards?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   projects_1s?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   provider?: InputMaybe<Scalars['String']['input']>;
   radius?: InputMaybe<Scalars['Long']['input']>;

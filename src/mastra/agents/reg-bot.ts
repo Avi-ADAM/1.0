@@ -16,6 +16,8 @@ import { getProjectMembersTool } from '../tools/getProjectMembersTool';
 import { getMemberMissionsTool } from '../tools/getMemberMissionsTool';
 import { findUserProjectsTool } from '../tools/findUserProjectsTool';
 import { getPageContextTool } from '../tools/pageContextTool';
+import { getProjectContextTool } from '../tools/getProjectContextTool';
+import { planProjectWorkTool, scanProjectDirectionsTool } from '../tools/planningTools';
 import { SITE_CONTEXT } from '../../lib/bot/context.js';
 import { createGoogleModel, createGroqModel, createNvidiaModel, hasGroqModelConfig, hasNvidiaModelConfig, hasGoogleModelConfig } from '../lib/createModel';
 
@@ -51,9 +53,18 @@ Core workflows:
 - Mission details: listUserMissionsTool / getMissionDetailsTool
 - Mission statistics: getMissionStatsTool
 - Project navigation: findUserProjectsTool -> navigateToPageTool
+- What's happening in a project (open missions, your tasks, members, values): getProjectContextTool(projectId)
+- "What should we do next?" (open-ended, no specific goal): scanProjectDirectionsTool(projectId) -> relay the directions with their rationale
+- "We want to achieve X" (a concrete brief): planProjectWorkTool(projectId, text) -> relay the reviewUrl
 - Create Partnership/Embroidery: createProjectTool
 - Create a task (Act) in a project for a person or a role: findUserProjectsTool -> getProjectMembersTool -> (for a person) getMemberMissionsTool to link a mission-in-progress -> createTaskTool
 - General navigation: getSitePagesTool -> navigateToPageTool
+
+Planning rule:
+- scanProjectDirectionsTool and planProjectWorkTool only draft proposals; they never
+  create missions, chores or resources. Always say the plan is a draft and that the
+  user approves each row at the reviewUrl.
+- Both need a projectId — resolve it with findUserProjectsTool first when unknown.
 
 Behavior rules:
 - Always respond in the user's language.
@@ -95,7 +106,10 @@ Behavior rules:
       getMemberMissionsTool,
       findMissionTool,
       findUserProjectsTool,
-      getPageContextTool
+      getPageContextTool,
+      getProjectContextTool,
+      planProjectWorkTool,
+      scanProjectDirectionsTool
     }
   });
 };
