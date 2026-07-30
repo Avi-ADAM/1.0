@@ -1,54 +1,24 @@
 // POST /api/analyze-business
-// Body: { url: string } OR { text: string }
-// Returns: { ok, name, desc, details, vals[] } — pre-fill payload for /me?action=createproject
+// Body: { url: string } OR { text: string }, plus optional { lang, withPlan }
+// Returns: { ok, name, desc, details, vals[], plan } — the pre-fill payload for
+// /me?action=createproject, and the starter planning boards the member will
+// review row by row after approving the rikma (PLAN_ONBOARDING Track B).
+//
+// Two model calls, deliberately separate: the project fields are the critical
+// path the member is waiting for, and a failed plan draft must not cost them
+// their rikma. The plan is therefore best-effort and comes back `null` on
+// failure.
 
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import { Agent } from '@mastra/core/agent';
 import { createGoogleModel } from '../../../mastra/lib/createModel';
+import { fetchSiteSummary } from '$lib/server/planning/siteContext.js';
+import { generateSeedPlan, countSeedItems } from '$lib/server/planning/seedPlan.js';
 
-const MAX_HTML = 60_000;
 const MIN_TEXT = 50;
-
-function stripTags(html: string): string {
-  return html
-    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, ' ')
-    .replace(/<noscript\b[^>]*>[\s\S]*?<\/noscript>/gi, ' ')
-    .replace(/<!--[\s\S]*?-->/g, ' ')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-async function fetchUrlText(url: string): Promise<string> {
-  let resp: Response;
-  try {
-    resp = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; 1lev1-onboard/1.0)',
-        Accept: 'text/html,application/xhtml+xml'
-      },
-      redirect: 'follow'
-    });
-  } catch (e) {
-    throw new Error('Could not reach the URL — make sure it is publicly accessible.');
-  }
-  if (!resp.ok) {
-    throw new Error(`Site responded ${resp.status} — it may be private or blocking bots.`);
-  }
-  const html = await resp.text();
-  const text = stripTags(html).slice(0, MAX_HTML);
-  if (text.length < MIN_TEXT) {
-    throw new Error('Could not extract text from page — it may require JavaScript or be empty.');
-  }
-  return text;
-}
+/** Enough of a landing page for both the extraction and the plan to be specific. */
+const SITE_CHARS = 8000;
 
 type Lang = 'he' | 'en' | 'ar';
 type ExtractedBusiness = {
@@ -64,14 +34,62 @@ const LANG_NAMES: Record<Lang, string> = {
   ar: 'Arabic (العربية)'
 };
 
-async function extractWithGemini(text: string, sourceHint: 'url' | 'text', lang: Lang): Promise<ExtractedBusiness> {
-  const agent = new Agent({
-    id: 'BusinessExtractor',
-    name: 'BusinessExtractor',
-    instructions:
-      'You extract project/business details from a website page or free-text description. Return JSON only — no explanations, no markdown fences.',
+/**
+ * Read the business's own site.
+ *
+ * Goes through `fetchSiteSummary` rather than a bare `fetch`: this endpoint
+ * takes a URL straight from an onboarding form, and the previous
+ * implementation followed redirects to any host — including `127.0.0.1` and
+ * the cloud metadata endpoint. The shared helper refuses loopback / private /
+ * link-local hosts, re-checks every redirect hop, and caps time and bytes.
+ * See `src/lib/server/planning/siteContext.ts`.
+ */
+async function fetchUrlText(url: string): Promise<string> {
+  const site = await fetchSiteSummary(url, { maxChars: SITE_CHARS });
+  if (site.ok) return site.text;
+
+  switch (site.error) {
+    case 'unusable-url':
+    case 'unsafe-redirect':
+      throw new Error('That address cannot be read — use a public http(s) website address.');
+    case 'timeout':
+      throw new Error('The site took too long to answer. Try again, or describe the business instead.');
+    case 'not-html':
+      throw new Error('That link is not a web page we can read. Try the site home page.');
+    case 'empty':
+      throw new Error('Could not extract text from page — it may require JavaScript or be empty.');
+    default:
+      throw new Error('Could not reach the URL — make sure it is publicly accessible.');
+  }
+}
+
+function stripFences(raw: string): string {
+  return (raw ?? '')
+    .replace(/^```json\s*/i, '')
+    .replace(/^```\s*/i, '')
+    .replace(/```\s*$/i, '')
+    .trim();
+}
+
+/** Same model for both calls; only the instructions differ. */
+function makeAgent(id: string, instructions: string): Agent {
+  return new Agent({
+    id,
+    name: id,
+    instructions,
     model: createGoogleModel(undefined, 'gemini-3-flash-preview', { thinkingBudget: 0 })
   });
+}
+
+async function extractWithGemini(
+  text: string,
+  sourceHint: 'url' | 'text',
+  lang: Lang
+): Promise<ExtractedBusiness> {
+  const agent = makeAgent(
+    'BusinessExtractor',
+    'You extract project/business details from a website page or free-text description. Return JSON only — no explanations, no markdown fences.'
+  );
 
   const langName = LANG_NAMES[lang];
   const prompt = `Analyze the following ${sourceHint === 'url' ? 'webpage text' : 'free-text description'} and return JSON ONLY:
@@ -93,12 +111,7 @@ ${text.slice(0, 12000)}
 ---`;
 
   const result = await agent.generate([{ role: 'user', content: prompt }]);
-
-  const cleaned = (result.text ?? '')
-    .replace(/^```json\s*/i, '')
-    .replace(/^```\s*/i, '')
-    .replace(/```\s*$/i, '')
-    .trim();
+  const cleaned = stripFences(result.text ?? '');
 
   try {
     const parsed = JSON.parse(cleaned);
@@ -106,7 +119,9 @@ ${text.slice(0, 12000)}
       name: String(parsed.name ?? '').slice(0, 80),
       desc: String(parsed.desc ?? '').slice(0, 240),
       details: String(parsed.details ?? '').slice(0, 2000),
-      vals: Array.isArray(parsed.vals) ? parsed.vals.slice(0, 7).map((v: any) => String(v).slice(0, 40)) : []
+      vals: Array.isArray(parsed.vals)
+        ? parsed.vals.slice(0, 7).map((v: any) => String(v).slice(0, 40))
+        : []
     };
   } catch (e) {
     console.error('[analyze-business] parse failed:', cleaned.slice(0, 300));
@@ -121,7 +136,7 @@ function pickLang(raw: unknown, cookieLang: string | undefined): Lang {
 }
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
-  let body: { url?: string; text?: string; lang?: string };
+  let body: { url?: string; text?: string; lang?: string; withPlan?: boolean };
   try {
     body = await request.json();
   } catch {
@@ -131,6 +146,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
   const lang = pickLang(body.lang, cookies.get('lang'));
   let inputText: string;
   let sourceHint: 'url' | 'text';
+  let sourceUrl: string | null = null;
 
   if (body.url && body.url.trim()) {
     const u = body.url.trim();
@@ -139,6 +155,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     }
     inputText = await fetchUrlText(u);
     sourceHint = 'url';
+    sourceUrl = u;
   } else if (body.text && body.text.trim().length >= MIN_TEXT) {
     inputText = body.text.trim();
     sourceHint = 'text';
@@ -147,5 +164,33 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
   }
 
   const extracted = await extractWithGemini(inputText, sourceHint, lang);
-  return json({ ok: true, lang, ...extracted });
+
+  // The starter boards. Best-effort by design — see the file header.
+  let plan: { boards: unknown[]; sourceUrl: string | null } | null = null;
+  let planItemCount = 0;
+  if (body.withPlan !== false) {
+    const seed = await generateSeedPlan(
+      inputText,
+      async (system, user) => {
+        const result = await makeAgent('BusinessSeedPlanner', system).generate([
+          { role: 'user', content: user }
+        ]);
+        return result.text ?? '';
+      },
+      { projectName: extracted.name, siteUsed: sourceUrl }
+    );
+    if (seed.boards.length > 0) {
+      plan = { boards: seed.boards, sourceUrl };
+      planItemCount = countSeedItems(seed.boards);
+    }
+  }
+
+  return json({
+    ok: true,
+    lang,
+    ...extracted,
+    plan,
+    planBoardCount: plan?.boards.length ?? 0,
+    planItemCount
+  });
 };

@@ -236,6 +236,10 @@
       "min_chars": "Alcanza al menos {{count}}",
       "analyzing": "✨ Analizando el texto...",
       "working": "Lev está trabajando..."
+    },
+    "seed_plan": {
+      "label": "Prepárame también un plan inicial para la rikma",
+      "help": "Propondremos productos, misiones y recursos a partir de lo que leamos aquí. No se crea nada: tú apruebas cada fila."
     }
   },
   "trackFork": {

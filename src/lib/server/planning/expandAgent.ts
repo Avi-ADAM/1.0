@@ -201,7 +201,15 @@ function asText(v: unknown, max: number): string {
   return String(v ?? '').trim().slice(0, max);
 }
 
-function normRow(raw: unknown): PlannedRow | null {
+/**
+ * Normalise one model-produced row: clamp the text, drop fields that do not
+ * belong to the row's kind, and refuse invented numbers.
+ *
+ * Exported because every "a model proposed a row" path needs exactly this —
+ * `seedPlan.ts` reuses it both for the model's output and for re-validating a
+ * plan that came back through the client.
+ */
+export function normalizePlannedRow(raw: unknown): PlannedRow | null {
   const o = (raw ?? {}) as Record<string, unknown>;
   const name = asText(o.name, 120);
   if (!name) return null;
@@ -267,7 +275,7 @@ export function parsePlanRows(rawText: string): PlanRowsResult {
   const items: PlannedRow[] = [];
   const seen = new Set<string>();
   for (const entry of list) {
-    const row = normRow(entry);
+    const row = normalizePlannedRow(entry);
     if (!row) continue;
     const key = `${row.kind}:${row.name.toLowerCase()}`;
     if (seen.has(key)) continue;

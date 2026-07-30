@@ -63,7 +63,8 @@ import {
 import {
   scanProjectDirectionsAction,
   expandPlanBoardAction,
-  createPlanBoardFromTextAction
+  createPlanBoardFromTextAction,
+  seedPlanBoardsAction
 } from './planningRuns.js';
 import { requestSuggestionConfig } from './requestSuggestion.js';
 import { requestWishMissionConfig } from './requestWishMission.js';
@@ -288,6 +289,7 @@ export function registerAllActions(): void {
   registerAction(scanProjectDirectionsAction);
   registerAction(expandPlanBoardAction);
   registerAction(createPlanBoardFromTextAction);
+  registerAction(seedPlanBoardsAction);
   registerAction(requestSuggestionConfig);
   registerAction(requestWishMissionConfig);
   registerAction(requestWishResourceConfig);

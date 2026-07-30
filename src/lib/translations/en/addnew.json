@@ -34,7 +34,8 @@
     "nameTooShort": "Please choose a longer name for the rikma",
     "continuous": "Ongoing rikma",
     "oneTimed": "One-off rikma",
-    "continuousLevel": "Is the rikma meant to be a one-off or an ongoing thing? For example: producing one event, versus founding an event-production business"
+    "continuousLevel": "Is the rikma meant to be a one-off or an ongoing thing? For example: producing one event, versus founding an event-production business",
+    "seedPlanWaiting": "We drafted {{count}} proposals for this rikma — products, missions and resources. They will be waiting on your board after it is created, for you to approve one by one."
   },
   "addNewNeed": {
     "hekind": "Kind of value",

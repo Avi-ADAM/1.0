@@ -8,12 +8,18 @@
   import { onMount, onDestroy } from 'svelte';
   import { showFoot } from '$lib/stores/showFoot.js';
   import { t, locale } from '$lib/translations';
+  import { stashSeedPlan } from '$lib/onboard/seedPlanHandoff.js';
 
   onMount(() => showFoot.set(false));
   onDestroy(() => showFoot.set(true));
   let text = $state('');
   let submitting = $state(false);
   let error = $state('');
+  /**
+   * Draft the rikma's starter boards from the same description. On by default;
+   * unticking asks the analysis for the project fields only.
+   */
+  let withPlan = $state(true);
 
   let charCount = $derived(text.trim().length);
   let canSubmit = $derived(charCount >= 60);
@@ -37,7 +43,7 @@
       const res = await fetch('/api/analyze-business', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: text.trim(), lang: $locale })
+        body: JSON.stringify({ text: text.trim(), lang: $locale, withPlan })
       });
       const body = await res.json().catch(() => ({}));
       if (!res.ok || body?.ok === false) {
@@ -45,6 +51,8 @@
       }
       sessionStorage.setItem('onboard.businessResult', JSON.stringify(body));
       sessionStorage.setItem('onboard.businessSource', 'describe');
+      // The boards wait here until the rikma is actually approved and created.
+      stashSeedPlan(body?.plan, 'describe');
       toMeWithPrefill(body);
     } catch (e) {
       error = /** @type {any} */ (e)?.message || 'שגיאה — נסי שוב';
@@ -105,6 +113,14 @@
       </div>
     </div>
 
+    <label class="plan-opt">
+      <input type="checkbox" bind:checked={withPlan} />
+      <span>
+        {$t('onboard.business.seed_plan.label')}
+        <span class="plan-opt-help">{$t('onboard.business.seed_plan.help')}</span>
+      </span>
+    </label>
+
     {#if error}
       <p class="error-msg" in:fly={{ y: -6, duration: 300 }}>{error}</p>
     {/if}
@@ -157,6 +173,25 @@
   .char-count.ok {
     color: #035a3e;
     font-weight: 700;
+  }
+  .plan-opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+    font-size: 13px;
+    color: #574010;
+    cursor: pointer;
+    text-align: start;
+  }
+  .plan-opt input {
+    margin-top: 3px;
+    flex: none;
+  }
+  .plan-opt-help {
+    display: block;
+    font-size: 11px;
+    opacity: 0.8;
   }
   .error-msg {
     padding: 9px 13px;

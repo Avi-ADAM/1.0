@@ -28,6 +28,8 @@
    * @property {(payload: {name:string, descrip:string, price:number, easy:number, kindOf:string, quantity:number, recurring:boolean, cycleSize:number|null, linkto:string, spnot:string, mashaabimId:string|null, startDate:string|null, endDate:string|null, isOnline:boolean, lat:number|null, lng:number|null, radius:number|null, location_hint:string|null}) => void} [onPublish]
    * @property {() => void} [onCreated]
    * @property {() => void} [onCancel]
+   * @property {{name?:string, descrip?:string, price?:number, quantity?:number, kindOf?:string}|null} [initialSpec]
+   *   - פרה-מילוי: מצב specMode (עריכת מפרט קונסיירז') וגם שורת `resource` מלוח תכנון.
    */
 
   /** @type {Props} */
@@ -42,10 +44,10 @@
     onCreated,
     onCancel,
     /**
-     * Optional prefill for specMode editing (PLAN_CONCIERGE plan editing):
-     * `{ name, descrip, price, quantity, kindOf }`. When present, the form opens
-     * with these values so the wisher edits an existing plan item with all its
-     * details. Ignored outside specMode.
+     * Optional prefill: `{ name, descrip, price, quantity, kindOf }`. When
+     * present the form opens with these values — used both by specMode plan
+     * editing (PLAN_CONCIERGE) and by a planning-board `resource` row opened in
+     * the ordinary creation form (PLAN_PROJECT_PLANNING_BOARDS §4).
      */
     initialSpec = null
   } = $props();
@@ -205,8 +207,10 @@
   }
 
   onMount(async () => {
-    // specMode / publishMode: hydrate the form with the incoming item's details.
-    if ((specMode || publishMode) && initialSpec) {
+    // Hydrate from whatever the caller knows about the item. Not gated on
+    // specMode any more: a planning-board `resource` row opens the ordinary
+    // creation form, and gating this on specMode threw away even its name.
+    if (initialSpec) {
       if (initialSpec.name != null) name = initialSpec.name;
       if (initialSpec.descrip != null) description = initialSpec.descrip;
       if (initialSpec.price != null) price = Number(initialSpec.price) || 0;

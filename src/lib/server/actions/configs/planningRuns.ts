@@ -13,6 +13,10 @@
  *
  * `createPlanBoardFromText` is the free-text entry point: it creates a board
  * and expands it in a single step.
+ *
+ * `seedPlanBoards` is the onboarding entry point: it persists the starter
+ * boards drafted from a business description into the rikma the member has
+ * just approved (PLAN_ONBOARDING Track B).
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
@@ -341,6 +345,131 @@ export const createPlanBoardFromTextAction: ActionConfig = {
       type: 'projectMember',
       config: { projectIdParam: 'projectId' },
       errorMessage: 'You must be a member of this project to plan it'
+    }
+  ]
+};
+
+// ── Onboarding: seed a brand-new rikma with its starter boards ──────────────
+
+const loadSeedPlan = () => import('../../planning/seedPlan.js');
+
+/**
+ * Persist the starter boards drafted during business onboarding.
+ *
+ * The plan is drafted by `/api/analyze-business` *before* the rikma exists —
+ * boards need a project id, and the member has not approved the rikma yet — so
+ * it makes a round trip through the browser. What arrives here is therefore
+ * client-supplied and is re-validated by `normalizeSeedPlan` rather than
+ * trusted: clamped text, capped counts, no assignees, no fields on the wrong
+ * kind. A member could in any case create these boards by hand; what must not
+ * happen is an unbounded blob reaching Strapi.
+ *
+ * Still nothing real: every row lands as `proposed`, and becomes a mission /
+ * product / resource only when a human opens it in the creation form.
+ */
+const seedHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
+  const { projectId, plan, sourceUrl } = params as Record<string, any>;
+
+  const { normalizeSeedPlan, countSeedItems } = await loadSeedPlan();
+  const boards = normalizeSeedPlan(plan);
+  if (boards.length === 0) {
+    return { boardIds: [], boardCount: 0, itemCount: 0, skipped: 'empty-plan' };
+  }
+
+  const boardIds: string[] = [];
+  for (const [i, board] of boards.entries()) {
+    const res = await strapi.execute(
+      '287createPlanBoard',
+      {
+        title: board.title,
+        descrip: board.descrip,
+        rationale: board.rationale,
+        origin: 'agent',
+        // Seed boards arrive with their rows already in them, so they are
+        // `expanded` from birth — there is nothing left to expand.
+        status: 'expanded',
+        sourceText: String(sourceUrl || ''),
+        order: i,
+        projectId: String(projectId),
+        userId: String(context.userId),
+        publishedAt: new Date().toISOString()
+      },
+      context.jwt,
+      context.fetch
+    );
+
+    const node = res?.data?.createProjectPlanBoard?.data;
+    if (!node) continue;
+    boardIds.push(String(node.id));
+
+    for (const [order, row] of board.items.entries()) {
+      await persistItem(strapi, context, String(node.id), {
+        kind: row.kind,
+        name: row.name,
+        descrip: row.descrip,
+        imp: row.imp,
+        spec: seedSpec(row),
+        existingRef: null,
+        order
+      });
+    }
+  }
+
+  return {
+    boardIds,
+    boardCount: boardIds.length,
+    itemCount: countSeedItems(boards),
+    firstBoardId: boardIds[0] ?? null
+  };
+};
+
+/**
+ * The prefill a seeded row carries into the real creation form. Same keys the
+ * forms already read (`mission.svelte` via `initialSpec`, `ResourceCreator`,
+ * `newmatana`), so nothing the draft suggested is lost at the form's door.
+ */
+function seedSpec(row: any): Record<string, unknown> {
+  const spec: Record<string, unknown> = {};
+  if (row.rationale) spec.rationale = row.rationale;
+  if (row.kind === 'mission') {
+    if (row.skills?.length) spec.skills = row.skills;
+    if (row.roles?.length) spec.roles = row.roles;
+    if (row.workways?.length) spec.workways = row.workways;
+    if (row.nhours != null) spec.nhours = row.nhours;
+    if (row.valph != null) spec.valph = row.valph;
+  } else if (row.kind === 'resource' || row.kind === 'product') {
+    if (row.kindOf) spec.kindOf = row.kindOf;
+    if (row.price != null) spec.price = row.price;
+    if (row.quantity != null) spec.quantity = row.quantity;
+  }
+  return spec;
+}
+
+export const seedPlanBoardsAction: ActionConfig = {
+  key: 'seedPlanBoards',
+  description:
+    'Persist the starter planning boards drafted during business onboarding into a newly created rikma. Creates proposals only — no mission, resource or product is created.',
+  graphqlOperation: seedHandler,
+  paramSchema: {
+    projectId: { type: 'string', required: true, description: 'ID of the rikma just created' },
+    plan: {
+      type: 'object',
+      required: true,
+      description: 'The drafted plan: { boards: [{ title, descrip, rationale, items: [...] }] }'
+    },
+    sourceUrl: {
+      type: 'string',
+      required: false,
+      description: 'The website or note the plan was drafted from, kept on the board'
+    }
+  },
+  access: ['user', 'serviceAdmin'],
+  authRules: [
+    { type: 'jwt', errorMessage: 'You must be logged in to plan' },
+    {
+      type: 'projectMember',
+      config: { projectIdParam: 'projectId' },
+      errorMessage: 'You must be a member of this rikma to seed its planning boards'
     }
   ]
 };

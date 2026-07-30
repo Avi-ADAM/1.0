@@ -235,6 +235,10 @@
       "min_chars": "Please reach at least {{count}}",
       "analyzing": "✨ Analyzing text...",
       "working": "Lev is working..."
+    },
+    "seed_plan": {
+      "label": "Draft a starter plan for the rikma too",
+      "help": "We will propose products, missions and resources from what we read here. Nothing is created — you approve each row yourself."
     }
   },
   "trackFork": {

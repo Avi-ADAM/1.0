@@ -15,6 +15,7 @@
   import Handp from '$lib/components/prPr/handp.svelte';
   import PlanBoards from '$lib/components/planning/PlanBoards.svelte';
   import Crtask from '$lib/components/prPr/tasks/crtask.svelte';
+  import Newmatana from '$lib/components/prPr/newmatana.svelte';
   import { executeAction } from '$lib/client/actionClient';
   import { invalidateAll } from '$app/navigation';
 
@@ -153,6 +154,9 @@
     addN = false;
     openMA = false;
     addAct = false;
+    addProduct = false;
+    resourcePrefill = null;
+    productPrefill = null;
     // Backing out of a form means the plan row was not turned into anything.
     pendingPlanItem = null;
   }
@@ -178,6 +182,10 @@
   let planBoardsRef = $state(/** @type {any} */ (null));
   let addAct = $state(false);
   let actPrefill = $state({ name: '', teur: '', isPersonal: true });
+  /** Resource/product rows carry their own prefill into their own form. */
+  let addProduct = $state(false);
+  let resourcePrefill = $state(/** @type {any} */ (null));
+  let productPrefill = $state(/** @type {any} */ (null));
   // Bindables crtask.svelte writes back into (assignee resolved from the
   // selected mission, and the optional start/end dates).
   let actUserMevatzeaId = $state(null);
@@ -227,8 +235,35 @@
       return;
     }
 
-    if (a.kind === 'resource' || a.kind === 'product') {
+    // A product is what the rikma SELLS — it has its own form and its own
+    // action (createComplexMatanot). Sending it to the resource creator, as
+    // this page used to, silently turned an offering into a need.
+    if (a.kind === 'product') {
+      productPrefill = {
+        name: a.name ?? '',
+        descrip: a.descrip ?? '',
+        ...(spec.price != null ? { price: Number(spec.price) } : {}),
+        ...(spec.quantity != null ? { quantity: Number(spec.quantity) } : {})
+      };
+      addProduct = true;
+      return;
+    }
+
+    if (a.kind === 'resource') {
+      resourcePrefill = {
+        name: a.name ?? '',
+        descrip: a.descrip ?? '',
+        ...(spec.kindOf ? { kindOf: spec.kindOf } : {}),
+        ...(spec.price != null ? { price: Number(spec.price) } : {}),
+        ...(spec.quantity != null ? { quantity: Number(spec.quantity) } : {})
+      };
       addN = true;
+      return;
+    }
+
+    // A note is not a form — there is nothing to create from it.
+    if (a.kind === 'note') {
+      pendingPlanItem = null;
       return;
     }
 
@@ -271,6 +306,16 @@
     addAct = false;
     await invalidateAll();
   }
+
+  /** newmatana.svelte reports `{ matana }` once the product really exists. */
+  async function handleProductDone(payload) {
+    const id = payload?.matana?.id ?? payload?.matana?.data?.id ?? payload?.id;
+    if (id) await markPlanRowCreated('matanot', id);
+    else pendingPlanItem = null;
+    addProduct = false;
+    productPrefill = null;
+    await invalidateAll();
+  }
 </script>
 
 <svelte:head>
@@ -282,7 +327,7 @@
 <div class="create-page p-4">
 
   <!-- כרטיסים עם עיגולים מוטמעים — נעלמים כשפורם פתוח -->
-  {#if !addM && !openMS && !addN && !openMA && !addAct && createMode !== 'process'}
+  {#if !addM && !openMS && !addN && !openMA && !addAct && !addProduct && createMode !== 'process'}
     <!-- באנר AI — גולל ללוחות התכנון בהמשך העמוד -->
     <a
       href="#ai-planning-boards"
@@ -394,7 +439,7 @@
   {/if}
 
   <!-- פורמים — עם כפתור חזרה -->
-  {#if addM || openMS || addN || openMA || addAct || createMode === 'process'}
+  {#if addM || openMS || addN || openMA || addAct || addProduct || createMode === 'process'}
     <div class="max-w-4xl mx-auto">
       <button
         onclick={handleBack}
@@ -466,11 +511,26 @@
         <div class="m-4 border-2 border-barbi rounded bg-white/80 backdrop-blur-sm shadow-xl p-6">
           <ResourceCreator
             {projectId}
+            initialSpec={resourcePrefill}
             onCreated={handleResourceCreated}
             onCancel={() => {
               pendingPlanItem = null;
+              resourcePrefill = null;
               addN = false;
             }}
+          />
+        </div>
+      {/if}
+
+      <!-- מוצר — נפתח משורת לוח מסוג product -->
+      {#if addProduct}
+        <div class="m-4 border-2 border-barbi rounded bg-white/80 backdrop-blur-sm shadow-xl p-6">
+          <Newmatana
+            initialName={productPrefill?.name ?? ''}
+            initialDescrip={productPrefill?.descrip ?? ''}
+            initialPrice={productPrefill?.price}
+            initialQuantity={productPrefill?.quantity}
+            onDone={handleProductDone}
           />
         </div>
       {/if}

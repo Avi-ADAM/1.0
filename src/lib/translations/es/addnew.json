@@ -34,7 +34,8 @@
     "nameTooShort": "El nombre de la rikma debe ser más largo",
     "continuous": "Rikma continua",
     "oneTimed": "Rikma puntual",
-    "continuousLevel": "¿La rikma está pensada como algo puntual o continuo? Por ejemplo: producir un evento frente a fundar una empresa de producción de eventos"
+    "continuousLevel": "¿La rikma está pensada como algo puntual o continuo? Por ejemplo: producir un evento frente a fundar una empresa de producción de eventos",
+    "seedPlanWaiting": "Preparamos {{count}} propuestas para esta rikma: productos, misiones y recursos. Te esperarán en el tablero después de crearla, para que apruebes cada una."
   },
   "addNewNeed": {
     "hekind": "Tipo de valor",

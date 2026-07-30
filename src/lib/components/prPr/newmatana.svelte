@@ -8,6 +8,8 @@
   import Button from '$lib/celim/ui/button.svelte';
   import UploadPic from '../userPr/uploadPic.svelte';
   import { executeAction } from '$lib/client/actionClient';
+  import { untrack } from 'svelte';
+  let hydratedFromPrefill = false;
   let oneForeProject = $state(false);
   let description = $state('');
   let loading = $state(false);
@@ -106,10 +108,38 @@
   /**
    * @typedef {Object} Props
    * @property {(data: { matana: any }) => void} [onDone] - Callback function triggered when the gift creation is complete.
+   * @property {string} [initialName] - Prefill, e.g. from a planning-board `product` row.
+   * @property {string} [initialDescrip] - Prefill description.
+   * @property {number} [initialPrice] - Prefill price.
+   * @property {number} [initialQuantity] - Prefill quantity.
    */
 
   /** @type {Props} */
-  let { onDone } = $props();
+  let {
+    onDone,
+    initialName = '',
+    initialDescrip = '',
+    initialPrice = undefined,
+    initialQuantity = undefined
+  } = $props();
+
+  // Hydrate once from the prefill. A planning-board row is a *proposal*: the
+  // form opens filled in, and the product exists only once the member submits
+  // it here.
+  $effect(() => {
+    const seed = { initialName, initialDescrip, initialPrice, initialQuantity };
+    untrack(() => {
+      if (hydratedFromPrefill) return;
+      if (!seed.initialName && !seed.initialDescrip && seed.initialPrice == null) return;
+      hydratedFromPrefill = true;
+      if (seed.initialName) name = seed.initialName;
+      if (seed.initialDescrip) description = seed.initialDescrip;
+      if (Number.isFinite(Number(seed.initialPrice))) price = Number(seed.initialPrice);
+      if (Number.isFinite(Number(seed.initialQuantity)) && Number(seed.initialQuantity) > 0) {
+        quant = Number(seed.initialQuantity);
+      }
+    });
+  });
   //תמונה מלבנית
 </script>
 

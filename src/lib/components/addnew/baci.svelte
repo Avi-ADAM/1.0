@@ -7,6 +7,7 @@
     import { baciStore, resetBaciStore } from '$lib/stores/baciStore.js';
     import { executeAction } from '$lib/client/actionClient';
     import { goto } from '$app/navigation';
+    import { peekSeedPlan, takeSeedPlan, countStashedItems } from '$lib/onboard/seedPlanHandoff.js';
     import AddnewVal from './addnewval.svelte';
     import MultiSelect from 'svelte-multiselect';
     import { onMount } from 'svelte';
@@ -90,8 +91,9 @@ async function sendPP() {
       return; // executeAction already surfaced the error toast
     }
 
+    const newProjectId = result.data.projectId;
     success = true;
-    idPr.set(result.data.projectId);
+    idPr.set(newProjectId);
     before = true;
     loading = false;
 
@@ -105,24 +107,73 @@ async function sendPP() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
-    })
-      .then(() => {
-        resetBaciStore();
-        goto('/moach');
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
+    }).catch((error) => {
+      console.error('Error:', error);
+    });
+
+    // Business onboarding may have drafted starter boards from the site or the
+    // description. Now — and only now — is there a rikma to hang them on. They
+    // are still proposals: nothing becomes a real mission, resource or product
+    // until the member approves it in its own creation form.
+    const seeded = await seedPendingPlan(newProjectId);
+
+    resetBaciStore();
+    // Land on the board itself when there is one — `?board=` opens it, so the
+    // member sees actual proposals rather than a list of closed titles.
+    goto(
+      seeded
+        ? `/moach/${newProjectId}/create${seeded.firstBoardId ? `?board=${seeded.firstBoardId}` : ''}`
+        : '/moach'
+    );
   } catch (error) {
     console.log('צריך לתקן:', error);
     loading = false;
   }
 }
 
+/**
+ * Persist the parked onboarding plan, if there is one.
+ * Best-effort: losing the starter boards must never cost the member the rikma
+ * they just created, so a failure here only means they land on /moach.
+ *
+ * @param {string} projectId
+ * @returns {Promise<{ firstBoardId: string|null }|null>} null when nothing was seeded
+ */
+async function seedPendingPlan(projectId) {
+  const plan = takeSeedPlan();
+  if (!plan || !projectId) return null;
+  try {
+    const res = await executeAction(
+      'seedPlanBoards',
+      {
+        projectId: String(projectId),
+        plan: { boards: plan.boards },
+        ...(plan.sourceUrl ? { sourceUrl: String(plan.sourceUrl) } : {})
+      },
+      { showErrorToast: false }
+    );
+    if (!res?.success || !(res.data?.boardCount > 0)) return null;
+    return { firstBoardId: res.data?.firstBoardId ?? null };
+  } catch (e) {
+    console.warn('[baci] could not seed the onboarding plan:', e);
+    return null;
+  }
+}
+
 let vallues = $state([]);
     let error1 = null;
     let addval = false;
-    
+
+    /**
+     * Rows drafted during business onboarding and waiting for a rikma to live
+     * in. Shown before the button so the member knows what approving creates —
+     * and what it does not: the rows themselves still need approving one by one.
+     */
+    let pendingItems = $state(0);
+    onMount(() => {
+      pendingItems = countStashedItems(peekSeedPlan());
+    });
+
     onMount(async () => {
         // Read vallue options + existing project names through the secure proxy,
         // which injects the JWT from the HttpOnly cookie (no token on the client).
@@ -372,9 +423,14 @@ let suc = $state(false);
 <h3 class="text-barbi">{$t('addnew.baci.inc')}</h3>
 <input type="number"/>
 {/if}-->
+  {#if pendingItems > 0}
+    <p class="seed-note">
+      {$t('addnew.baci.seedPlanWaiting', { count: pendingItems })}
+    </p>
+  {/if}
   {#if loading == false}
 
-<button 
+<button
     class="cen bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold p-4 rounded-full"
      onclick={sendP}
      name="addm">{$t('addnew.baci.cree')}</button>
@@ -405,6 +461,17 @@ pointer-events: none;">
 </div>
 {/if}
 <style>
+  .seed-note {
+    max-width: 34em;
+    margin: 0.5em auto;
+    padding: 0.6em 0.9em;
+    border: 1px solid var(--barbi, #ff00ae);
+    border-radius: 0.9em;
+    background: rgba(255, 255, 255, 0.55);
+    color: var(--stgold, #574010);
+    font-size: 0.85rem;
+    text-align: center;
+  }
  .center-upload {
   position: fixed;
   top: 50%;

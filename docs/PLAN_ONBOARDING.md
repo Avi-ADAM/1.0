@@ -111,6 +111,34 @@
 
 ### 1.3 Track B — מסלול בעל עסק / שותפות
 
+> **עדכון (✅ בוצע): הריקמה נולדת עם תוכן, לא ריקה.**
+>
+> B1 ידע להפוך אתר או פסקה לשדות ה**פרויקט** בלבד — שם, תיאור, ערכים. החבר
+> אישר ריקמה ונחת במוח ריק. היום אותו ניתוח מחזיר גם **תכנית פתיחה**: 2–4
+> לוחות תכנון עם מוצרים, משימות, משאבים ומטלות, שנכתבים מאותו טקסט
+> (`src/lib/server/planning/seedPlan.ts`, ראו
+> [`PLAN_PROJECT_PLANNING_BOARDS.md`](PLAN_PROJECT_PLANNING_BOARDS.md) §1.4).
+>
+> **סדר האישורים נשמר בקפדנות:** התכנית נוצרת לפני שהריקמה קיימת, ולכן היא
+> ממתינה ב-`sessionStorage` (`src/lib/onboard/seedPlanHandoff.js`). רק אחרי
+> ש-`baci.svelte` באמת יצר את הריקמה — כלומר אחרי שהחבר אישר — נקראת הפעולה
+> `seedPlanBoards` והשורות נשמרות כ**הצעות** (`status:'proposed'`). משימה,
+> משאב או מוצר אמיתיים נוצרים רק כשאדם פותח שורה בטופס שלה ומאשר. אין שום
+> יצירה אוטומטית, לא של הריקמה ולא של תוכנה.
+>
+> אחרי היצירה החבר מנותב ל-`/moach/<id>/create` (במקום `/moach`) — שם הלוחות
+> כבר מחכים לו.
+>
+> **תיבת סימון** בשני מסכי B1 מאפשרת לוותר על התכנית (`withPlan:false`), והכשל
+> בה הוא תמיד רך: אם הטיוטה נכשלת, שדות הפרויקט — מה שהחבר באמת מחכה לו —
+> מגיעים כרגיל.
+>
+> **תוקן בדרך (אבטחה):** `/api/analyze-business` שלף כל URL עם
+> `redirect:'follow'` ובלי שום בדיקת יעד — כלומר SSRF מלא מטופס אונבורדינג
+> (`127.0.0.1`, `169.254.169.254`, כתובות פנימיות). הוא עובר עכשיו דרך
+> `fetchSiteSummary` המשותף, שחוסם לולאה-חוזרת/פרטי/link-local, בודק מחדש כל
+> קפיצת הפניה, ומגביל זמן ובייטים.
+
 ```
 /onboard?track=business
    │
@@ -337,6 +365,7 @@
 | **M5**   | Track A resources — `/onboard/provider/resources` משלב את `newsp.svelte` הקיים ברשימה (multi‑add). אם יש `proposed_sps` מ‑CV — פרה‑מילוי.                                                  | משאבים אישיים נכנסים לפרופיל בלי לעצב מחדש UI            | `onboard.resources=on`            |
 | **M6**   | Track B manual — `/onboard/business/+page.svelte` עם redirect ל‑`/me?action=createproject`. כפתור "הוסף מוצר ראשון" → redirect ל‑newmatana קיים.                                           | בעל עסק יוצר פרויקט+מוצר ידנית דרך wizard                | `onboard.businessManual=on`       |
 | **M7**   | Track B free text — חיבור ל‑bot קיים (`/api/bot`), workflow `import-business-text`. UI: `BusinessImportReview` להחזיר proposal. accept → קורא ל‑actions קיימים.                            | תיאור חופשי → פרויקט+מוצרים אוטומטית                     | `onboard.businessAI=on`           |
+| **M7.5** | ✅ **בוצע** — תכנית פתיחה: `seedPlan.ts` + `seedPlanBoards` + `seedPlanHandoff.js`. הניתוח מחזיר גם לוחות; הם נשמרים כהצעות אחרי אישור הריקמה, והחבר מנותב ל‑`/moach/<id>/create`.        | ריקמה חדשה נולדת עם מוצרים/משימות/משאבים לאישור          | –                                 |
 | **M8**   | Track B URL — `import-business-url` workflow עם playwright scrape. Schema: `business-import-job`.                                                                                          | URL → פרויקט+מוצרים                                      | `onboard.businessUrl=on`          |
 | **M9**   | אינטגרציה עם complex products — אם המשתמש בוחר "מוצר מורכב" → קורא ל‑`createComplexMatanot` (M2 של PLAN_COMPLEX_PRODUCTS).                                                                 | מסלול שלם לבעל עסק עד מוצר מורכב                         | תלוי `complexProducts.compose=on` |
 | **M10**  | אינטגרציה עם concierge — בסיום onboarding emit event שמטריגר `matchRatson` רטרואקטיבי על משאלות פתוחות שיכולות להתאים לספק החדש.                                                           | ספק חדש מקבל הצעות מטץ' תוך דקות                         | תלוי `concierge.matchBasic=on`    |
