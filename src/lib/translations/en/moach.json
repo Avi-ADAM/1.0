@@ -123,7 +123,8 @@
       "title": "Come build with AI",
       "desc": "Our AI scans the project and suggests directions and tasks ready for your approval — try it below",
       "cta": "Plan with AI"
-    }
+    },
+    "preparingMission": "Matching the suggested skills to the platform’s vocabulary…"
   },
   "objectList": {
     "active": "Active",

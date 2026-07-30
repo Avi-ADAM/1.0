@@ -36,6 +36,8 @@
   let prefillMissionDescrip = $state('');
   /** @type {{name?:string, descrip?:string, nhours?:number, valph?:number, skills?:string[], roles?:string[], workways?:string[], vocab?:{skills?:{id:string,name:string}[], roles?:{id:string,name:string}[], workways?:{id:string,name:string}[]}}|null} */
   let prefillMissionSpec = $state(null);
+  /** Resolving the URL's vocabulary against the catalogue, before the form opens. */
+  let preparingMission = $state(false);
 
   /** `a,b , c` → ['a','b','c'] */
   const csv = (v) =>
@@ -43,6 +45,43 @@
       .split(',')
       .map((s) => s.trim())
       .filter(Boolean);
+
+  /**
+   * Turn free-text vocabulary from the URL into real catalogue entries.
+   *
+   * The URL carries names only — any producer can build it (the bot's
+   * prepareMissionTool, an external MCP agent, a pasted link) — and the form
+   * maps chips back to ids against the catalogue it loaded, dropping whatever
+   * it cannot find. Rows that come from a planning board are resolved on the
+   * server before they are stored; this is the same step for the URL path.
+   *
+   * Best-effort: on failure the names are used as they are, which is exactly
+   * the old behaviour.
+   */
+  async function resolveUrlVocab(names, missionName) {
+    if (!names.skills.length && !names.roles.length && !names.workways.length) return null;
+    // Resolution embeds and may create entries, so it is not instant. Bound it:
+    // a slow vector store must delay the form by seconds, never hold it shut.
+    const abort = new AbortController();
+    const timer = setTimeout(() => abort.abort(), 8000);
+    try {
+      const res = await fetch('/api/vocab/resolve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...names, name: missionName, lang: $lang }),
+        signal: abort.signal
+      });
+      if (!res.ok) return null;
+      const body = await res.json();
+      if (!body?.ok) return null;
+      return { skills: body.skills ?? [], roles: body.roles ?? [], workways: body.workways ?? [] };
+    } catch (err) {
+      console.warn('[create] could not resolve URL vocabulary:', err);
+      return null;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
 
   // Consumer for ?action=createmission — mirrors the createproject consumer in me/+page.svelte.
   // Reads every param prepareMissionTool emits so the AI's suggestions (skills,
@@ -58,12 +97,28 @@
         const nhours = Number(params.get('nhours'));
         const valph  = Number(params.get('valph'));
 
+        const names = {
+          skills:   csv(params.get('skills')),
+          roles:    csv(params.get('roles')),
+          workways: csv(params.get('workways'))
+        };
+
+        // Resolve BEFORE opening the form: mission.svelte hydrates from
+        // `initialSpec` on mount only, so ids that arrive later would never
+        // reach it.
+        preparingMission = true;
+        const vocab = await resolveUrlVocab(names, prefillMissionName);
+        preparingMission = false;
+
         prefillMissionSpec = {
           name: prefillMissionName,
           descrip: prefillMissionDescrip,
-          skills:   csv(params.get('skills')),
-          roles:    csv(params.get('roles')),
-          workways: csv(params.get('workways')),
+          ...names,
+          // Canonical names + the ids the form submits (see resolveUrlVocab).
+          ...(vocab?.skills.length ? { skills: vocab.skills.map((t) => t.name) } : {}),
+          ...(vocab?.roles.length ? { roles: vocab.roles.map((t) => t.name) } : {}),
+          ...(vocab?.workways.length ? { workways: vocab.workways.map((t) => t.name) } : {}),
+          ...(vocab ? { vocab } : {}),
           ...(Number.isFinite(nhours) && params.get('nhours') ? { nhours } : {}),
           ...(Number.isFinite(valph)  && params.get('valph')  ? { valph }  : {})
         };
@@ -329,6 +384,12 @@
 </svelte:head>
 
 <div class="create-page p-4">
+
+  {#if preparingMission}
+    <p class="max-w-4xl mx-auto mt-6 text-center text-sm text-[color:var(--stgold,#574010)]">
+      {$t('moach.create.preparingMission')}
+    </p>
+  {/if}
 
   <!-- כרטיסים עם עיגולים מוטמעים — נעלמים כשפורם פתוח -->
   {#if !addM && !openMS && !addN && !openMA && !addAct && !addProduct && createMode !== 'process'}

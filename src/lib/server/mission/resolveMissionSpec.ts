@@ -105,6 +105,19 @@ interface CreatedVocab {
   name: string;
 }
 
+/**
+ * Pinecone namespaces and vocab kinds are NOT the same words: the vector
+ * namespace for ways-of-working is `work_ways`, the catalogue kind is
+ * `workways`. Getting this wrong is silent — `/api/vocab/create` answers 400
+ * and the term is dropped.
+ */
+const VOCAB_KIND_BY_NAMESPACE = {
+  skills: 'skills',
+  roles: 'roles',
+  work_ways: 'workways',
+  vallues: 'vallues'
+} as const;
+
 async function createVocabEntry(
   fetchFn: typeof fetch,
   namespace: 'skills' | 'roles' | 'work_ways' | 'vallues',
@@ -112,17 +125,36 @@ async function createVocabEntry(
   lang: 'he' | 'en' | 'ar'
 ): Promise<CreatedVocab | null> {
   try {
+    // The endpoint's contract is { kind, label, lang } and it answers
+    // { success, item: { id, label } }. This used to post { namespace, name }
+    // and read `data.id`, so every single creation 400'd and was swallowed by
+    // the catch below — "create it when nothing matches" never once ran, and
+    // the term was quietly dropped from the mission instead.
     const res = await fetchFn('/api/vocab/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ namespace, name, lang })
+      body: JSON.stringify({
+        kind: VOCAB_KIND_BY_NAMESPACE[namespace],
+        label: name,
+        lang,
+        createdBy: 'ai'
+      })
     });
     if (!res.ok) {
       console.warn(`[resolveMissionSpec] vocab create HTTP ${res.status} for "${name}"`);
       return null;
     }
     const data = await res.json();
-    if (data?.id) return { id: String(data.id), name };
+    // Flagged by moderation → archived for owner review; never hand it back as
+    // if it were a usable catalogue entry.
+    if (data?.moderation?.flagged) {
+      console.warn(`[resolveMissionSpec] vocab "${name}" was flagged by moderation`);
+      return null;
+    }
+    const id = data?.item?.id;
+    if (data?.success && id != null) {
+      return { id: String(id), name: data.item.label ?? name };
+    }
     return null;
   } catch (err) {
     console.warn(`[resolveMissionSpec] vocab create failed for "${name}":`, err);

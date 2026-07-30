@@ -123,7 +123,8 @@
       "title": "Construyamos con IA",
       "desc": "Nuestra IA escanea el proyecto y sugiere direcciones y tareas listas para tu aprobación — pruébalo abajo",
       "cta": "Planificar con IA"
-    }
+    },
+    "preparingMission": "Emparejando las habilidades sugeridas con el vocabulario de la plataforma…"
   },
   "objectList": {
     "active": "Activos",
