@@ -368,13 +368,19 @@ const loadSeedPlan = () => import('../../planning/seedPlan.js');
  * product / resource only when a human opens it in the creation form.
  */
 const seedHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
-  const { projectId, plan, sourceUrl } = params as Record<string, any>;
+  const { projectId, plan, sourceUrl, lang } = params as Record<string, any>;
 
   const { normalizeSeedPlan, countSeedItems } = await loadSeedPlan();
   const boards = normalizeSeedPlan(plan);
   if (boards.length === 0) {
     return { boardIds: [], boardCount: 0, itemCount: 0, skipped: 'empty-plan' };
   }
+
+  // The creation form does not take free-text vocabulary — it maps chips back
+  // to catalogue ids and drops what it cannot find. Resolve every mission row's
+  // skills/roles/work-ways to real entries (creating what does not exist yet)
+  // before persisting, so the member's approval is not quietly trimmed.
+  const { resolveRowVocabulary } = await loadExpandDirection();
 
   const boardIds: string[] = [];
   for (const [i, board] of boards.entries()) {
@@ -402,16 +408,19 @@ const seedHandler: ActionExecutionHandler = async (params, context, { strapi }) 
     if (!node) continue;
     boardIds.push(String(node.id));
 
-    for (const [order, row] of board.items.entries()) {
-      await persistItem(strapi, context, String(node.id), {
-        kind: row.kind,
-        name: row.name,
-        descrip: row.descrip,
-        imp: row.imp,
-        spec: seedSpec(row),
-        existingRef: null,
-        order
-      });
+    const rows: ExpandedItem[] = board.items.map((row, order) => ({
+      kind: row.kind,
+      name: row.name,
+      descrip: row.descrip,
+      imp: row.imp,
+      spec: seedSpec(row),
+      existingRef: null,
+      order
+    }));
+
+    const resolved = await resolveRowVocabulary(rows, context.fetch, asLang(lang));
+    for (const row of resolved) {
+      await persistItem(strapi, context, String(node.id), row);
     }
   }
 
@@ -461,6 +470,11 @@ export const seedPlanBoardsAction: ActionConfig = {
       type: 'string',
       required: false,
       description: 'The website or note the plan was drafted from, kept on the board'
+    },
+    lang: {
+      type: 'string',
+      required: false,
+      description: 'he | en | ar — the language new vocabulary entries are created in'
     }
   },
   access: ['user', 'serviceAdmin'],

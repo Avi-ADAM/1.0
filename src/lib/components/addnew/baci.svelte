@@ -148,6 +148,8 @@ async function seedPendingPlan(projectId) {
       {
         projectId: String(projectId),
         plan: { boards: plan.boards },
+        // The language any vocabulary the resolver has to create is minted in.
+        lang: $lang === 'en' || $lang === 'ar' ? $lang : 'he',
         ...(plan.sourceUrl ? { sourceUrl: String(plan.sourceUrl) } : {})
       },
       { showErrorToast: false }

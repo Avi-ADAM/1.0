@@ -285,13 +285,24 @@ async function fallbackToConcierge(
 }
 
 /**
- * Resolve platform vocabulary for the mission rows so the prefilled form opens
- * with canonical skills/roles and can reuse an existing catalog template.
+ * Resolve platform vocabulary for the mission rows.
+ *
+ * This is not cosmetic. The creation form does **not** accept free text for
+ * skills, roles or work-ways: it renders chips by name and maps them back to
+ * ids against the catalogue it loaded on mount, dropping anything it cannot
+ * find. So a skill the model invented — or spelled its own way — was shown to
+ * the member as a chip and then silently vanished on submit, and the mission
+ * was created with less than the member approved.
+ *
+ * `resolveMissionSpec` is the existing pipeline for exactly this: match against
+ * the real vocabulary, and create the entry when nothing matches. Here we keep
+ * both halves of its answer — the canonical NAME for the chip, and the ID the
+ * form must submit — so nothing depends on the client's catalogue being fresh.
  *
  * Best-effort: Pinecone is optional infra, so a failure leaves the raw names in
  * place rather than failing the whole expansion.
  */
-async function resolveVocabulary(
+export async function resolveRowVocabulary(
   items: ExpandedItem[],
   fetchInstance: typeof fetch,
   lang: 'he' | 'en' | 'ar'
@@ -299,26 +310,48 @@ async function resolveVocabulary(
   return Promise.all(
     items.map(async (item) => {
       if (item.kind !== 'mission') return item;
+
+      const skills = (item.spec.skills as string[]) ?? [];
+      const roles = (item.spec.roles as string[]) ?? [];
+      const workways = (item.spec.workways as string[]) ?? [];
+      if (skills.length === 0 && roles.length === 0 && workways.length === 0) return item;
+
       try {
         const resolved = await resolveMissionSpec(
           {
             name: item.name,
             descrip: item.descrip || undefined,
-            skills: (item.spec.skills as string[]) ?? [],
-            roles: (item.spec.roles as string[]) ?? [],
-            workways: (item.spec.workways as string[]) ?? [],
+            skills,
+            roles,
+            workways,
             nhours: (item.spec.nhours as number) ?? undefined,
             valph: (item.spec.valph as number) ?? undefined,
             lang
           },
           fetchInstance
         );
+
         return {
           ...item,
           spec: {
             ...item.spec,
-            skillIds: resolved.skills.ids,
-            roleIds: resolved.roles.ids,
+            // Names become the CANONICAL ones — what the member sees is what
+            // the platform actually has.
+            ...(resolved.skills.resolved.length
+              ? { skills: resolved.skills.resolved.map((t) => t.name) }
+              : {}),
+            ...(resolved.roles.resolved.length
+              ? { roles: resolved.roles.resolved.map((t) => t.name) }
+              : {}),
+            ...(resolved.workways.resolved.length
+              ? { workways: resolved.workways.resolved.map((t) => t.name) }
+              : {}),
+            // The authoritative half: id + name pairs the form submits directly.
+            vocab: {
+              skills: resolved.skills.resolved,
+              roles: resolved.roles.resolved,
+              workways: resolved.workways.resolved
+            },
             matchedMissionId: resolved.matchedMissionId ?? null,
             matchedMissionName: resolved.matchedMissionName ?? null
           }
@@ -383,7 +416,7 @@ export async function expandDirection(
     usedFallback = true;
   }
 
-  const withVocab = await resolveVocabulary(items, fetchInstance, lang);
+  const withVocab = await resolveRowVocabulary(items, fetchInstance, lang);
 
   return {
     items: dedupeAgainstProject(withVocab, snapshot.ctx, { extras: snapshot.extras }),

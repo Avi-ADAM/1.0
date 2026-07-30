@@ -49,8 +49,26 @@ export interface MissionSpecInput {
   lang: 'he' | 'en' | 'ar';
 }
 
+/** One resolved vocabulary term: the real entry, with the label it really has. */
+export interface ResolvedTerm {
+  id: string;
+  /** The CANONICAL label — the catalogue's spelling, not what the model wrote. */
+  name: string;
+}
+
 export interface ResolvedCategory {
   ids: string[];                 // IDs ready to pass to createMission
+  /**
+   * id + canonical name, in the same order as `ids`.
+   *
+   * `ids` alone is not enough for a *form*: the creation form shows chips by
+   * name and maps them back to ids against the catalogue it loaded on mount.
+   * A term this resolver just created is not in that catalogue, and a term
+   * whose canonical spelling differs from the model's is not found either — so
+   * either way the chip is shown to the member and then silently dropped on
+   * submit. Carrying the pair lets the form keep the id it was given.
+   */
+  resolved: ResolvedTerm[];
   suggestions: MatchResult[];   // similarity 0.72–0.88 — show to user
   newlyCreated: string[];       // names that were created (got new IDs)
 }
@@ -121,11 +139,11 @@ async function resolveCategory(
   fetchFn: typeof fetch
 ): Promise<ResolvedCategory> {
   if (!inputs || inputs.length === 0) {
-    return { ids: [], suggestions: [], newlyCreated: [] };
+    return { ids: [], resolved: [], suggestions: [], newlyCreated: [] };
   }
 
   const results = await safeMatchCategory(inputs, namespace);
-  const ids: string[] = [];
+  const resolved: ResolvedTerm[] = [];
   const suggestions: MatchResult[] = [];
   const newlyCreated: string[] = [];
 
@@ -133,24 +151,41 @@ async function resolveCategory(
 
   for (const r of toProcess) {
     if (r.status === 'matched' && r.existingId) {
-      ids.push(r.existingId);
+      // Keep the catalogue's own spelling, not the model's.
+      resolved.push({ id: r.existingId, name: r.existingLabel || r.input });
     } else if (r.status === 'suggestion') {
       suggestions.push(r);
       // For autonomous mode: also collect the existing ID so we still have
       // something useful, but flag it as a suggestion for review
-      if (r.existingId) ids.push(r.existingId);
+      if (r.existingId) {
+        resolved.push({ id: r.existingId, name: r.existingLabel || r.input });
+      }
     } else {
       // 'new' — create it
       const created = await createVocabEntry(fetchFn, namespace, r.input, lang);
       if (created) {
-        ids.push(created.id);
+        resolved.push({ id: created.id, name: created.name });
         newlyCreated.push(r.input);
       }
       // If creation fails: silently skip (best-effort)
     }
   }
 
-  return { ids, suggestions, newlyCreated };
+  // De-duplicate: two model terms can resolve to the same catalogue entry
+  // ("מתכנת" and "מפתח תוכנה"), and the form must not show the chip twice.
+  const seen = new Set<string>();
+  const unique = resolved.filter((t) => {
+    if (seen.has(t.id)) return false;
+    seen.add(t.id);
+    return true;
+  });
+
+  return {
+    ids: unique.map((t) => t.id),
+    resolved: unique,
+    suggestions,
+    newlyCreated
+  };
 }
 
 // ── Main resolver ─────────────────────────────────────────────────────────────

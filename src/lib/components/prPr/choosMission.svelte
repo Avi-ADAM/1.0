@@ -21,7 +21,7 @@
  * @property {any} projectUsers
  * @property {any} alit
  * @property {() => void} [onClose] - Callback when the component should close.
- * @property {{name?:string, descrip?:string, nhours?:number, valph?:number, skills?:string[], roles?:string[], workways?:string[]}|null} [prefillSpec]
+ * @property {{name?:string, descrip?:string, nhours?:number, valph?:number, skills?:string[], roles?:string[], workways?:string[], vocab?:{skills?:{id:string,name:string}[], roles?:{id:string,name:string}[], workways?:{id:string,name:string}[]}}|null} [prefillSpec]
  *   Full AI prefill forwarded to mission.svelte's `initialSpec`. Supersedes
  *   `initialDescrip` (kept for backward compatibility) so suggestions richer
  *   than a description — skills, roles, hours — survive into the form.

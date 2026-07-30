@@ -309,18 +309,31 @@
         if (rate != null) miData[0].valph = Number(rate) || 0;
 
         // AI-suggested vocabulary: pre-select it (the user can remove any chip).
+        //
+        // `initialSpec.vocab` carries the server-resolved `{id, name}` pairs —
+        // real catalogue entries, created there if they did not exist. Keep
+        // their ids so the chips survive submit even when this component's
+        // catalogue predates them; the names come from the same source, so a
+        // chip the member removes simply never reaches find_*_id.
         const asNames = (v) =>
           (Array.isArray(v) ? v : [])
             .map((n) => (typeof n === 'string' ? n : (n?.name ?? '')).trim())
             .filter(Boolean);
 
-        const preSkills = asNames(initialSpec.skills);
+        const vocab = initialSpec.vocab ?? {};
+        preresolvedVocab = {
+          skills: vocabMap(vocab.skills),
+          roles: vocabMap(vocab.roles),
+          workways: vocabMap(vocab.workways)
+        };
+
+        const preSkills = asNames(vocab.skills ?? initialSpec.skills);
         if (preSkills.length) miData[0].selectedSkills = [...preSkills];
 
-        const preRoles = asNames(initialSpec.roles);
+        const preRoles = asNames(vocab.roles ?? initialSpec.roles);
         if (preRoles.length) miData[0].selectedRoles = [...preRoles];
 
-        const preWorkways = asNames(initialSpec.workways);
+        const preWorkways = asNames(vocab.workways ?? initialSpec.workways);
         if (preWorkways.length) miData[0].selectedWorkways = [...preWorkways];
       } else {
         miData[0].missionName = name;
@@ -443,9 +456,42 @@
   // Roles use a raw MultiSelect whose options are the master `roleDescription`,
   // so match on that — but against the live store (not the stale `roles1`
   // snapshot) so refreshed entries still resolve.
+  /**
+   * Vocabulary ids resolved on the server for an AI prefill, keyed by the chip
+   * label — see `initialSpec.vocab` and `resolveMissionSpec`.
+   *
+   * The lookups below map a chip back to a catalogue id and drop whatever they
+   * cannot find, which is correct for what the member typed but wrong for a
+   * suggestion the server already resolved: a term created moments ago is not
+   * in the catalogue this component loaded on mount, so its chip was shown and
+   * then silently dropped on submit. Consulting this map first keeps the id.
+   */
+  let preresolvedVocab = $state({
+    skills: /** @type {Record<string, string>} */ ({}),
+    roles: /** @type {Record<string, string>} */ ({}),
+    workways: /** @type {Record<string, string>} */ ({})
+  });
+
+  /** `[{id,name}]` → `{ name: id }`, ignoring malformed entries. */
+  function vocabMap(pairs) {
+    /** @type {Record<string, string>} */
+    const out = {};
+    for (const p of Array.isArray(pairs) ? pairs : []) {
+      const name = typeof p?.name === 'string' ? p.name.trim() : '';
+      const id = p?.id != null ? String(p.id) : '';
+      if (name && id) out[name] = id;
+    }
+    return out;
+  }
+
   function find_role_id(role_name_arr) {
     const arr = [];
     for (const nm of role_name_arr) {
+      const pre = preresolvedVocab.roles[nm];
+      if (pre) {
+        arr.push(pre);
+        continue;
+      }
       const hit = $role.find((c) => c.attributes.roleDescription === nm);
       if (hit) arr.push(hit.id);
     }
@@ -455,6 +501,11 @@
   function find_workway_id(workway_arr) {
     let arr = [];
     for (let j = 0; j < workway_arr.length; j++) {
+      const pre = preresolvedVocab.workways[workway_arr[j]];
+      if (pre) {
+        arr.push(pre);
+        continue;
+      }
       for (let i = 0; i < $ww.length; i++) {
         if ($ww[i].attributes.workWayName === workway_arr[j]) {
           arr.push($ww[i].id);
@@ -481,6 +532,11 @@
   function find_skill_id(skill_name_arr) {
     const arr = [];
     for (const nm of skill_name_arr) {
+      const pre = preresolvedVocab.skills[nm];
+      if (pre) {
+        arr.push(pre);
+        continue;
+      }
       const hit = $skil.find((c) => catName(c, 'skillName') === nm);
       if (hit) arr.push(hit.id);
     }

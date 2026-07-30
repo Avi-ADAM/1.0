@@ -34,7 +34,7 @@
   // Prefill state for action=createmission URL param
   let prefillMissionName = $state('');
   let prefillMissionDescrip = $state('');
-  /** @type {{name?:string, descrip?:string, nhours?:number, valph?:number, skills?:string[], roles?:string[], workways?:string[]}|null} */
+  /** @type {{name?:string, descrip?:string, nhours?:number, valph?:number, skills?:string[], roles?:string[], workways?:string[], vocab?:{skills?:{id:string,name:string}[], roles?:{id:string,name:string}[], workways?:{id:string,name:string}[]}}|null} */
   let prefillMissionSpec = $state(null);
 
   /** `a,b , c` → ['a','b','c'] */
@@ -276,6 +276,10 @@
       skills: Array.isArray(spec.skills) ? spec.skills : [],
       roles: Array.isArray(spec.roles) ? spec.roles : [],
       workways: Array.isArray(spec.workways) ? spec.workways : [],
+      // Server-resolved `{id, name}` pairs — real catalogue entries. Without
+      // them the form maps chips back to ids against its own catalogue and
+      // drops whatever it cannot find, losing suggestions the member approved.
+      ...(spec.vocab ? { vocab: spec.vocab } : {}),
       ...(spec.nhours != null ? { nhours: Number(spec.nhours) } : {}),
       ...(spec.valph != null ? { valph: Number(spec.valph) } : {})
     };
