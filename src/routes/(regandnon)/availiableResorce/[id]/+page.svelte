@@ -11,6 +11,7 @@
     import { SendTo } from '$lib/send/sendTo.svelte';
     import { executeAction } from '$lib/client/actionClient';
     import Nego from '$lib/components/prPr/negoPend.svelte';
+    import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
     import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
     import { fly } from 'svelte/transition';
     import RangeSlider from "svelte-range-slider-pips";
@@ -289,6 +290,30 @@
                 ? `🤝 ${$lang === 'he' ? 'מאגד ביקוש' : 'demand pool'}${maagadInfo?.name ? ` · ${maagadInfo.name}` : ''}`
                 : `🌟 ${$lang === 'he' ? "קונסיירז'" : 'concierge'}${ratsonName ? ` · ${ratsonName}` : ''}`)
     );
+
+    // ── שווי צפוי בריקמה ─────────────────────────────────────────────────
+    // אותו חישוב שמוצג בשורת הכסף למעלה: השווי המבוקש × כמות × מספר המחזורים.
+    // משאב מתחדש בלי תאריך סיום מתומחר במחזור אחד, ושורות ה-1/2/5 שנים הן שנותנות
+    // את התמונה הארוכה.
+    let isOpenEnded = $derived(!!data.alld?.recurring && !data.alld?.sqadualedf);
+    let perCycleValue = $derived(
+        Number(data.alld?.easy) > 0 ? Number(data.alld.easy) : Number(data.alld?.price) || 0
+    );
+    let equityValue = $derived(
+        perCycleValue *
+            Math.max(1, Number(data.alld?.hm) || 1) *
+            (isOpenEnded
+                ? 1
+                : Number(montsi(data.alld?.kindOf, data.alld?.sqadualed, data.alld?.sqadualedf, true)) || 1)
+    );
+    // ₪ לחודש — רק למשאב מתחדש בלי תאריך סיום, שממשיך לחייב ללא הגבלה.
+    let equityMonthlyValue = $derived(
+        isOpenEnded && perCycleValue > 0
+            ? (perCycleValue * Math.max(1, Number(data.alld?.hm) || 1)) /
+                  (Math.max(1, Number(data.alld?.cycleSize) || 1) *
+                      (data.alld?.kindOf === 'yearly' ? 12 : 1))
+            : null
+    );
 </script>
 
 {#await data.alld}
@@ -431,6 +456,21 @@
                                         {/if}
                                     </p>
                                     
+                                    <!-- שווי צפוי בריקמה — עמוד ציבורי, ולכן isSer מושך דרך
+                                         טוקן השירות; מסתתר בשקט אם אין הרשאת קריאה. -->
+                                    {#if hasProject}
+                                        <div class="my-3 mx-5">
+                                            <EquityPreview
+                                                projectId={data.alld.project.data.id}
+                                                missionValue={equityValue}
+                                                monthlyValue={equityMonthlyValue}
+                                                alreadyCountedIn="pipeline"
+                                                subject="resource"
+                                                isSer={true}
+                                            />
+                                        </div>
+                                    {/if}
+
                                     <p onmouseenter={() => hover('הערות')} onmouseleave={() => hover('0')} class="text-gray-100 lg:text-2xl max-h-16 cd text-sm d overflow-y-auto mt-2">
                                         {data.alld.spnot !== undefined && data.alld.spnot !== null && data.alld.spnot !== 'undefined' ? data.alld.spnot : ''}
                                     </p>

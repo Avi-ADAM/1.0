@@ -3,8 +3,14 @@ import {
   computeEquityScenarios,
   computeEquityHorizons,
   computeMonthlyIncome,
+  computeResourceValue,
+  computeResourceMonthlyValue,
+  resourceCycles,
+  buildEquityBreakdown,
+  buildHorizonBreakdown,
   summarize,
   formatSharePct,
+  type EquitySliceKey,
   type ProjectValueSummary
 } from './computeMissionEquity';
 
@@ -268,6 +274,189 @@ describe('summarize', () => {
     });
     expect(summary.approvedInProgressValue).toBe(3500);
     expect(summary.recurringMonthlyValue).toBe(1000);
+  });
+
+  it('counts open resource requests in the pipeline alongside open missions', () => {
+    const summary = summarize({
+      open_missions: { data: [{ attributes: { noofhours: 4, perhour: 100 } }] }, // 400
+      open_mashaabims: {
+        data: [
+          { attributes: { easy: 300, kindOf: 'total' } }, // 300
+          { attributes: { price: 50, hm: 4, kindOf: 'perUnit' } }, // 200
+          { attributes: { easy: 0, price: 0, kindOf: 'total' } } // priceless ⇒ 0
+        ]
+      }
+    });
+    expect(summary.openPipelineValue).toBe(900);
+  });
+
+  it('folds recurring-resource engines into the monthly flow, as a subset of the approved bucket', () => {
+    const summary = summarize({
+      mesimabetahaliches: {
+        data: [{ attributes: { hoursassinged: 10, perhour: 100, iskvua: false } }] // 1,000 one-off
+      },
+      mashabetahaliches: {
+        data: [
+          { attributes: { pricePerUnit: 400, kindOf: 'monthly', cycleSize: 1, recurring: true } }, // 400/mo
+          { attributes: { pricePerUnit: 1200, kindOf: 'yearly', cycleSize: 1, recurring: true } } // 100/mo
+        ]
+      }
+    });
+    expect(summary.recurringMonthlyValue).toBe(500);
+    expect(summary.approvedInProgressValue).toBe(1500); // 1,000 one-off + 500 flow
+    // The horizon math relies on this: the recurring flow never exceeds the bucket.
+    expect(summary.recurringMonthlyValue).toBeLessThanOrEqual(summary.approvedInProgressValue);
+  });
+});
+
+describe('resource value terms', () => {
+  it('one-off / perUnit: asked price × quantity', () => {
+    expect(computeResourceValue({ easy: 250, kindOf: 'total' })).toBe(250);
+    expect(computeResourceValue({ easy: 50, hm: 4, kindOf: 'perUnit' })).toBe(200);
+  });
+
+  it('prefers the rikma\'s asked value (easy) over the market price', () => {
+    expect(computeResourceValue({ easy: 80, price: 200, kindOf: 'total' })).toBe(80);
+    expect(computeResourceValue({ easy: 0, price: 200, kindOf: 'total' })).toBe(200);
+  });
+
+  it('a dated monthly window is priced over its cycles', () => {
+    const value = computeResourceValue({
+      easy: 100,
+      kindOf: 'monthly',
+      sqadualed: '2026-01-01T00:00:00Z',
+      sqadualedf: '2026-07-01T00:00:00Z'
+    });
+    expect(value).toBeGreaterThan(550); // ~6 months
+    expect(value).toBeLessThan(650);
+  });
+
+  it('an open-ended recurring resource is priced at a single cycle', () => {
+    expect(resourceCycles({ kindOf: 'monthly', sqadualed: '2026-01-01T00:00:00Z' })).toBe(1);
+    expect(computeResourceValue({ easy: 100, kindOf: 'monthly', recurring: true })).toBe(100);
+  });
+
+  it('an end date before the start does not produce a negative value', () => {
+    expect(
+      computeResourceValue({
+        easy: 100,
+        kindOf: 'monthly',
+        sqadualed: '2026-07-01T00:00:00Z',
+        sqadualedf: '2026-01-01T00:00:00Z'
+      })
+    ).toBe(100);
+  });
+
+  it('₪/month spreads a cycle over its months', () => {
+    expect(computeResourceMonthlyValue({ easy: 300, kindOf: 'monthly', cycleSize: 3 })).toBe(100);
+    expect(computeResourceMonthlyValue({ easy: 1200, kindOf: 'yearly', cycleSize: 1 })).toBe(100);
+    expect(computeResourceMonthlyValue({ easy: 500, kindOf: 'total' })).toBe(0);
+    expect(computeResourceMonthlyValue({ easy: 0, kindOf: 'monthly' })).toBe(0);
+  });
+
+  it('garbage terms are 0, not NaN', () => {
+    expect(computeResourceValue(null)).toBe(0);
+    expect(computeResourceValue({ easy: Number.NaN, kindOf: 'total' })).toBe(0);
+    expect(computeResourceValue({ easy: 100, hm: -5, kindOf: 'perUnit' })).toBe(100);
+  });
+});
+
+describe('buildEquityBreakdown (pie slices)', () => {
+  const summary: ProjectValueSummary = {
+    ...emptySummary,
+    currentValue: 6000,
+    approvedInProgressValue: 3000,
+    openPipelineValue: 1000
+  };
+  const pick = (b: ReturnType<typeof buildEquityBreakdown>, key: EquitySliceKey) =>
+    b.slices.find((s) => s.key === key);
+
+  it('slices sum to the scenario base and mine% is the scenario share', () => {
+    for (const baseline of ['current', 'approved', 'pipeline'] as const) {
+      const scenario = computeEquityScenarios(summary, 2000, {
+        alreadyCountedIn: 'pipeline'
+      }).find((s) => s.baseline === baseline)!;
+      const breakdown = buildEquityBreakdown(summary, 2000, {
+        baseline,
+        alreadyCountedIn: 'pipeline'
+      });
+      const sum = breakdown.slices.reduce((t, s) => t + s.value, 0);
+      expect(sum).toBeCloseTo(scenario.base, 6);
+      expect(breakdown.total).toBeCloseTo(scenario.base, 6);
+      expect(breakdown.sharePct).toBeCloseTo(scenario.sharePct, 6);
+      expect(breakdown.slices.reduce((t, s) => t + s.pct, 0)).toBeCloseTo(100, 6);
+    }
+  });
+
+  it('the current baseline is just mine + the rikma as it stands', () => {
+    const b = buildEquityBreakdown(summary, 2000, { baseline: 'current' });
+    expect(b.slices.map((s) => s.key)).toEqual(['mine', 'existing']);
+    expect(pick(b, 'mine')!.value).toBe(2000);
+    expect(pick(b, 'existing')!.value).toBe(6000);
+  });
+
+  it('carves my own value out of the bucket that already holds it', () => {
+    const approved = buildEquityBreakdown(summary, 2000, {
+      baseline: 'approved',
+      alreadyCountedIn: 'approved'
+    });
+    expect(pick(approved, 'approvedOthers')!.value).toBe(1000); // 3,000 − my 2,000
+
+    const pipeline = buildEquityBreakdown(summary, 400, {
+      baseline: 'pipeline',
+      alreadyCountedIn: 'pipeline'
+    });
+    expect(pick(pipeline, 'pipelineOthers')!.value).toBe(600); // 1,000 − my 400
+    expect(pick(pipeline, 'approvedOthers')!.value).toBe(3000);
+  });
+
+  it('drops empty slices instead of drawing zero-width wedges', () => {
+    const b = buildEquityBreakdown(emptySummary, 500, { baseline: 'pipeline' });
+    expect(b.slices.map((s) => s.key)).toEqual(['mine']);
+    expect(b.sharePct).toBe(100);
+  });
+
+  it('a valueless mission produces no slice of its own and no crash', () => {
+    const b = buildEquityBreakdown(summary, 0, { baseline: 'current' });
+    expect(pick(b, 'mine')).toBeUndefined();
+    expect(b.sharePct).toBe(0);
+    expect(b.total).toBe(6000);
+  });
+});
+
+describe('buildHorizonBreakdown (pie slices over time)', () => {
+  const summary: ProjectValueSummary = {
+    ...emptySummary,
+    currentValue: 10000,
+    approvedInProgressValue: 5000,
+    recurringMonthlyValue: 1000 // ⇒ 4,000 of one-off work
+  };
+
+  it('matches computeEquityHorizons for the same month count', () => {
+    const horizons = computeEquityHorizons(summary, 500);
+    for (const h of horizons) {
+      const b = buildHorizonBreakdown(summary, 500, h.months);
+      expect(b.total).toBeCloseTo(h.base, 6);
+      expect(b.sharePct).toBeCloseTo(h.sharePct, 6);
+      expect(b.slices.reduce((t, s) => t + s.value, 0)).toBeCloseTo(h.base, 6);
+    }
+  });
+
+  it('separates the rikma\'s own recurring flow from one-off approved work', () => {
+    const b = buildHorizonBreakdown(summary, 500, 12);
+    const slice = (key: EquitySliceKey) => b.slices.find((s) => s.key === key)!;
+    expect(slice('mine').value).toBe(6000); // 500 × 12
+    expect(slice('existing').value).toBe(10000);
+    expect(slice('approvedOthers').value).toBe(4000); // 5,000 − 1,000 flow
+    expect(slice('recurringOthers').value).toBe(12000); // 1,000/mo × 12
+    expect(b.months).toBe(12);
+  });
+
+  it('does not double-count a mission already inside the rikma\'s flow', () => {
+    const b = buildHorizonBreakdown(summary, 400, 12, { alreadyCountedIn: 'approved' });
+    const others = b.slices.find((s) => s.key === 'recurringOthers')!;
+    expect(others.value).toBe(7200); // (1,000 − 400) × 12
+    expect(b.total).toBe(10000 + 4000 + 12000);
   });
 });
 

@@ -9066,6 +9066,21 @@ export const moachQids = {
           ) {
             data { id attributes { noofhours perhour } }
           }
+          mashabetahaliches(
+            filters: { finnished: { ne: true }, forappruval: { ne: true }, recurring: { eq: true } }
+            pagination: { limit: -1 }
+          ) {
+            data { id attributes { pricePerUnit kindOf cycleSize recurring } }
+          }
+          open_mashaabims(
+            filters: { archived: { ne: true } }
+            pagination: { limit: -1 }
+          ) {
+            data {
+              id
+              attributes { easy price hm kindOf recurring cycleSize sqadualed sqadualedf }
+            }
+          }
           sales(pagination: { limit: -1 }) {
             data { id attributes { in date holderStatus } }
           }

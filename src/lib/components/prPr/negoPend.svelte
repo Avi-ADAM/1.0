@@ -6,6 +6,7 @@
   import TotalBar from '../conf/barb.svelte';
   import KindOfnego from '$lib/components/conf/kindOfnego.svelte';
   import LocationNego from '$lib/components/conf/locationNego.svelte';
+  import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
   import { lang } from '$lib/stores/lang';
   import { montsi, toIsoDateString } from '$lib/func/montsi.svelte';
   import { toast } from 'svelte-sonner';
@@ -371,6 +372,20 @@
     Number(easy) * effectiveHmOrig * montsiOrig
   );
 
+  // שווי המשאב לצורך "שווי צפוי בריקמה": השווי המבוקש (easy) הוא מה שנרשם על
+  // המשאב, ואם לא הוצע — השווי המלא. הוצאה מתחדשת נמדדת במחזור אחד (totalNew
+  // כבר לא מכפיל בחודשים), ובלי תאריך סיום היא נמדדת גם בזרימה חודשית.
+  const equityValue = $derived(totalEasyNew > 0 ? totalEasyNew : totalNew);
+  const equityMonthlyValue = $derived(
+    (() => {
+      if (!recurring2 || sqadualedf2) return null;
+      if (!(equityValue > 0)) return null;
+      const months =
+        Math.max(1, Number(cycleSize2) || 1) * (kindOfb === 'yearly' ? 12 : 1);
+      return equityValue / months;
+    })()
+  );
+
   const valuesChanged = $derived(
     Number(price) !== Number(price2) ||
       effectiveHmOrig !== effectiveHmNew ||
@@ -617,6 +632,22 @@
       <p>0</p>
     {/if}
   </div>
+
+  <!-- שווי צפוי בריקמה — תצוגה חיה של החלק שהמשאב יהווה לפי השווי/הכמות
+       שמוקלדים כרגע. המשאב הפתוח כבר נמנה ב-open_mashaabims ⇒
+       alreadyCountedIn="pipeline". -->
+  {#if projectId && equityValue > 0}
+    <div class="mx-2 my-2">
+      <EquityPreview
+        {projectId}
+        missionValue={equityValue}
+        monthlyValue={equityMonthlyValue}
+        alreadyCountedIn="pipeline"
+        subject="resource"
+        titleKey="equity.resourceShareAtCreation"
+      />
+    </div>
+  {/if}
 
   <div class="w-fit mx-auto flex flex-col items-center gap-y-2">
     <button
