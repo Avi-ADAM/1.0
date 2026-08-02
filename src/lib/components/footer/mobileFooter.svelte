@@ -49,12 +49,18 @@
     hub: 'common.nav.hub',
     moach: 'common.nav.moach',
     chat: 'lev.cards.saleCard.chat',
-    concierge: 'deals.quick_concierge',
+    // `common.*` — the footer renders on every route, so its labels must come
+    // from globally-loaded namespaces. `deals.*` is route-gated to /deals,
+    // /lev, /newlev, so this key rendered raw everywhere else.
+    concierge: 'common.footer.concierge',
     deals: 'common.footer.deals',
     lev: 'common.nav.lev',
     minimize: 'common.footer.minimize',
     openUp: 'common.footer.openUp',
-    openBar: 'common.footer.openBar'
+    openBar: 'common.footer.openBar',
+    brain: 'common.footer.brain',
+    newWish: 'common.footer.newWish',
+    createNew: 'common.footer.createNew'
   };
   const L = (key) => $t(KEYS[key]);
 
@@ -214,7 +220,7 @@
         role="tooltip"
         class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700"
       >
-        {$t('common.footer.brain')}
+        {L('brain')}
         <div class="tooltip-arrow"></div>
       </div>
 
@@ -231,7 +237,7 @@
         role="tooltip"
         class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700"
       >
-        רצון חדש
+        {L('newWish')}
         <div class="tooltip-arrow" data-popper-arrow></div>
       </div>
       <div class="flex flex-col items-center justify-center gap-0.5 {vertical ? 'py-1.5' : ''}">
@@ -249,7 +255,7 @@
             aria-hidden="true"
             class="w-full h-full object-cover"
           />
-          <span class="sr-only">קונסיירז' · רצון חדש</span>
+          <span class="sr-only">{L('concierge')}</span>
         </button>
         <span class="text-[9px] leading-none text-gray-500 dark:text-gray-300">{L('concierge')}</span>
       </div>
@@ -258,7 +264,7 @@
         role="tooltip"
         class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700"
       >
-        Create new item
+        {L('createNew')}
         <div class="tooltip-arrow" data-popper-arrow></div>
       </div>
       <button
@@ -319,7 +325,7 @@
         role="tooltip"
         class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700"
       >
-        Lev
+        {L('lev')}
         <div class="tooltip-arrow" data-popper-arrow></div>
       </div>
 
