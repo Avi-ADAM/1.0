@@ -14,6 +14,7 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { matchOpenMashaabimToUsers } from '$lib/server/matching/engine';
 import { restimeLabel, voteUrl } from './actionUtils.js';
 import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
+import { resolveRecurringPlan, cycleWindowIso } from '$lib/recurring/recurringPlan.js';
 
 // ─── helpers ───────────────────────────────────────────────────────────────
 async function gql(
@@ -84,38 +85,6 @@ async function ensureMashaabim(
 }
 
 // ─── recurring-resource helpers ──────────────────────────────────────────
-/**
- * Bounds of the cycle containing `ref`, anchored to `anchor` and stepping by
- * `size` units. Mirrors /api/monthi's cycleWindow so cycle #1's window aligns
- * with the windows monthi opens later — otherwise a cycleSize > 1 resource
- * would get a duplicate first cycle.
- */
-function currentCycleBounds(
-  unit: 'month' | 'year',
-  anchor: Date,
-  size = 1,
-  ref = new Date()
-) {
-  const step = Math.max(1, Number(size) || 1);
-  if (unit === 'year') {
-    const since = ref.getFullYear() - anchor.getFullYear();
-    const idx = Math.max(0, Math.floor(since / step));
-    const y = anchor.getFullYear() + idx * step;
-    return {
-      cycleStart: new Date(y, 0, 1).toISOString(),
-      cycleEnd: new Date(y + step - 1, 11, 31, 23, 59, 59).toISOString()
-    };
-  }
-  const since =
-    (ref.getFullYear() - anchor.getFullYear()) * 12 + (ref.getMonth() - anchor.getMonth());
-  const idx = Math.max(0, Math.floor(since / step));
-  const m = anchor.getMonth() + idx * step;
-  return {
-    cycleStart: new Date(anchor.getFullYear(), m, 1).toISOString(),
-    cycleEnd: new Date(anchor.getFullYear(), m + step, 0, 23, 59, 59).toISOString()
-  };
-}
-
 async function createMashabetahalichRecord(
   fetchFn: typeof fetch,
   jwt: string,
@@ -233,16 +202,12 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
   const typeName      = isPmash ? 'Pmash'       : 'OpenMashaabim';
 
   // ── Recurring terms (monthly / yearly) ──────────────────────────────────
-  // Resolved before the payload is built, because `recurring`/`cycleSize` are
-  // stamped on the record itself — on a Pmash *and* on an OpenMashaabim — so a
-  // recurring resource stays recognizably recurring while it is still open for
-  // the community to discover and offer on. The mashabetahalich engine is a
-  // separate, later step: immediately when the creator is also the provider,
-  // otherwise on askm approval (see activateRecurringEngine).
-  const isRecurring =
-    Boolean(recurring) && (kindOf === 'monthly' || kindOf === 'yearly');
-  const cycleUnit: 'month' | 'year' = kindOf === 'yearly' ? 'year' : 'month';
-  const cycleEvery = Math.max(1, Number(cycleSize) || 1);
+  // Resolved before the payload is built: `recurring`/`cycleSize` are stamped on
+  // the record itself, so a recurring resource stays recognizably recurring
+  // while it is still open for the community to discover and offer on. The rules
+  // live in $lib/recurring/recurringPlan (pure + tested).
+  const plan = resolveRecurringPlan({ recurring, kindOf, isPmash, isAssigned, cycleSize });
+  const { isRecurring, unit: cycleUnit, cycleEvery } = plan;
   const pricePerUnit = (easy && easy > 0 ? easy : price) || 0;
 
   // ── 2. Build the main resource payload ──────────────────────────────────
@@ -266,7 +231,7 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
 
   // Recurrence lives on the record for both kinds, so an OpenMashaabim that is
   // still looking for a provider carries its own terms into the askm flow.
-  if (isRecurring) {
+  if (plan.stampOnRecord) {
     resourceData.recurring = true;
     resourceData.cycleSize = cycleEvery;
   }
@@ -316,13 +281,12 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
   // Each month /api/monthi opens a cycle (a Maap) that surfaces on the lev screen;
   // the responsible user confirms the amount and it is archived on a Rikmash.
   //
-  // The engine is only spun up here when a provider is already known, i.e. the
-  // solo creator assigned the resource to themselves. Without that, the resource
-  // is a standing *need* looking for someone to cover it: the OpenMashaabim must
-  // stay open so it keeps showing on the hub map, the lev feed and
-  // /availiableResorce/[id], and the engine is created on askm approval instead
-  // (activateRecurringEngine) — exactly like the multi-member Pmash path.
-  if (isRecurring && !isPmash && isAssigned) {
+  // `engineOn: 'now'` means a provider is already known — the solo creator
+  // claimed the resource. Otherwise the plan says 'onApproval': the record stays
+  // open so it keeps showing on the hub map, the lev feed and
+  // /availiableResorce/[id], and the engine is built from the final agreed terms
+  // on askm approval (activateRecurringEngine).
+  if (plan.engineOn === 'now') {
     // Responsible user = creator. Reuse or create an Sp so the monthly cycle
     // cards carry the provider's identity.
     let spId = existingSpId ?? null;
@@ -370,7 +334,7 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
 
     // Open the first cycle so the card shows on lev right away, anchored to the
     // start date so a cycleSize > 1 resource lines up with monthi's windows.
-    const { cycleStart, cycleEnd } = currentCycleBounds(
+    const { cycleStart, cycleEnd } = cycleWindowIso(
       cycleUnit,
       startDate ? new Date(startDate) : new Date(now),
       cycleEvery

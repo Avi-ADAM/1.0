@@ -7,6 +7,7 @@ import { SendToAdmin } from '$lib/server/sendToAdmin.js';
 import { sendToSer } from '$lib/send/sendToSer.js';
 // Server-only secret — never exposed to the client bundle (no VITE_ prefix).
 import { ADMINMONTHER } from '$env/static/private';
+import { cycleWindow } from '$lib/recurring/recurringPlan.js';
 
 function formatDate(date = new Date()) {
   const year = date.toLocaleString('default', { year: 'numeric' });
@@ -22,31 +23,9 @@ function calcDeadline(restime, ref = new Date()) {
   return new Date(ref.getTime() + hours * 3600000);
 }
 
-// The cycle window [start,end] containing `ref`, anchored to the engine `start`
-// and stepping by `size` units. cycleSize lets a resource run e.g. bi-monthly:
-// one cycle every `size` months instead of every month (size=1 ⇒ monthly/yearly
-// as before). The window is anchored to `anchor` so cycles stay aligned to the
-// resource's start date across runs.
-function cycleWindow(unit, anchor, size, ref = new Date()) {
-  const step = Math.max(1, Number(size) || 1);
-  if (unit === 'year') {
-    const since = ref.getFullYear() - anchor.getFullYear();
-    const idx = Math.max(0, Math.floor(since / step));
-    const y = anchor.getFullYear() + idx * step;
-    return {
-      cycleStart: new Date(y, 0, 1),
-      cycleEnd: new Date(y + step - 1, 11, 31, 23, 59, 59)
-    };
-  }
-  const since =
-    (ref.getFullYear() - anchor.getFullYear()) * 12 + (ref.getMonth() - anchor.getMonth());
-  const idx = Math.max(0, Math.floor(since / step));
-  const m = anchor.getMonth() + idx * step;
-  return {
-    cycleStart: new Date(anchor.getFullYear(), m, 1),
-    cycleEnd: new Date(anchor.getFullYear(), m + step, 0, 23, 59, 59)
-  };
-}
+// cycleWindow (imported): the window containing `ref`, anchored to the engine
+// `start` and stepping by cycleSize units — shared with resource creation and
+// askm acceptance so cycle #1 lands on the same window monthi would compute.
 
 // Does a cycle already exist for this window? Includes archived cycles: with a
 // multi-month cycleSize the same window spans several monthi runs, and once its

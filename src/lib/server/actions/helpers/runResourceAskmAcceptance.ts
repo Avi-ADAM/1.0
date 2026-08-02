@@ -3,6 +3,8 @@
  * (finalizeAskmAcceptance solo/allVoted, or solo-member createMashaabimRequest).
  */
 
+import { cycleWindowIso, normalizeCycleSize } from '$lib/recurring/recurringPlan.js';
+
 type StrapiExecutor = {
   execute: (
     queryId: string,
@@ -40,37 +42,6 @@ function normalizeVotes(existingVotes: unknown[]) {
       v.users_permissions_user?.id ??
       v.users_permissions_user,
   }));
-}
-
-/**
- * The cycle window [start,end] containing `ref`, anchored to `anchor` and
- * stepping by `size` units (cycleSize). Mirrors /api/monthi's cycleWindow so
- * cycle #1's window aligns with the windows monthi opens for later cycles.
- */
-function currentCycleBounds(
-  unit: 'month' | 'year',
-  anchor: Date,
-  size = 1,
-  ref = new Date()
-) {
-  const step = Math.max(1, Number(size) || 1);
-  if (unit === 'year') {
-    const since = ref.getFullYear() - anchor.getFullYear();
-    const idx = Math.max(0, Math.floor(since / step));
-    const y = anchor.getFullYear() + idx * step;
-    return {
-      cycleStart: new Date(y, 0, 1).toISOString(),
-      cycleEnd: new Date(y + step - 1, 11, 31, 23, 59, 59).toISOString(),
-    };
-  }
-  const since =
-    (ref.getFullYear() - anchor.getFullYear()) * 12 + (ref.getMonth() - anchor.getMonth());
-  const idx = Math.max(0, Math.floor(since / step));
-  const m = anchor.getMonth() + idx * step;
-  return {
-    cycleStart: new Date(anchor.getFullYear(), m, 1).toISOString(),
-    cycleEnd: new Date(anchor.getFullYear(), m + step, 0, 23, 59, 59).toISOString(),
-  };
 }
 
 /**
@@ -132,7 +103,7 @@ export async function activateRecurringEngine(
   const negEasy = Number(pm.easy) || 0;
   const negPrice = Number(pm.price) || 0;
   const pricePerUnit = negEasy > 0 ? negEasy : negPrice;
-  const cycleSize = Number(pm.cycleSize) || 1;
+  const cycleSize = normalizeCycleSize(pm.cycleSize);
   const mashaabimId = pm.mashaabim?.data?.id;
   const now = new Date();
 
@@ -166,7 +137,7 @@ export async function activateRecurringEngine(
   if (!mashId || !maapId) return;
 
   const startAnchor = pm.sqadualed ? new Date(pm.sqadualed) : now;
-  const { cycleStart, cycleEnd } = currentCycleBounds(unit, startAnchor, cycleSize, now);
+  const { cycleStart, cycleEnd } = cycleWindowIso(unit, startAnchor, cycleSize, now);
   // Turn the acceptance Maap into cycle #1. Leave quantityDelivered unset (null):
   // the responsible user must still report the actual spend for this first month
   // before the rest of the project can approve it. pricePerUnit (on the engine)
