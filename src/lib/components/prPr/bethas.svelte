@@ -8,11 +8,14 @@
   import { fly } from 'svelte/transition';
   import Tile from '$lib/celim/tile.svelte';
   import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import { slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
   import Chaticon from '$lib/celim/chaticon.svelte';
   import { toast } from 'svelte-sonner';
+  import MonthlyHours from '$lib/components/mission/MonthlyHours.svelte';
+  import { sendToSer } from '$lib/send/sendToSer.js';
+  import { buildMonthlyLedger, segmentsFromTimers } from '$lib/recurring/missionMonths.js';
 
   let isOpen = $state(false);
   let xx = {};
@@ -175,22 +178,53 @@
       }
     });
   }
-  function formatMonthLabel(monthStart) {
-    if (!monthStart) return '-';
-    const d = new Date(monthStart);
-    return $lang === 'he'
-      ? d.toLocaleDateString('he-IL', { month: 'long', year: 'numeric' })
-      : d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  // ── Live monthly hours ───────────────────────────────────────────────────
+  // `howmanyhoursalready` is a month-less counter that only moves when a timer
+  // is *saved*, so the column used to under-report the month in progress and
+  // said nothing about a timer running right now. The timer segments are the
+  // only month-aware record, so they are fetched separately (their own qid —
+  // getProjectMissions feeds eight pages and doesn't need the weight) and the
+  // months are derived from them with the same arithmetic /api/monthi files.
+  /** @type {Record<string, {start?: string|null, stop?: string|null}[]>} */
+  let segmentsByMission = $state({});
+  let tickNow = $state(new Date());
+  let tick = null;
+
+  onMount(async () => {
+    if (!projectId) return;
+    try {
+      const res = await sendToSer({ pid: projectId }, 'projectMissionTimerSegments', null, null, false, fetch);
+      /** @type {Record<string, any[]>} */
+      const map = {};
+      for (const timer of res?.data?.timers?.data ?? []) {
+        const mid = timer.attributes?.mesimabetahalich?.data?.id;
+        if (!mid) continue;
+        map[String(mid)] = [...(map[String(mid)] ?? []), ...segmentsFromTimers([timer])];
+      }
+      segmentsByMission = map;
+      // A segment with no `stop` is a timer running now — re-read the clock
+      // while it runs so the row keeps counting up on its own.
+      const running = Object.values(map).some((segs) => segs.some((s) => s?.start && !s.stop));
+      if (running) tick = setInterval(() => (tickNow = new Date()), 30_000);
+    } catch (e) {
+      console.error('[bethas] live timer segments failed', e);
+    }
+  });
+  onDestroy(() => clearInterval(tick));
+
+  /** The month-by-month ledger of one mission, current month included. */
+  function ledgerOf(data) {
+    return buildMonthlyLedger({
+      rows: data.attributes?.monter,
+      segments: segmentsByMission[String(data.id)] ?? [],
+      hoursassinged: data.attributes?.hoursassinged,
+      counter: data.attributes?.howmanyhoursalready,
+      now: tickNow
+    });
   }
-  function getMonterList(monter) {
-    if (!monter || !Array.isArray(monter) || monter.length === 0) return [];
-    return [...monter].sort(
-      (a, b) => new Date(b.monthStart || 0) - new Date(a.monthStart || 0)
-    );
-  }
-  function getTotalMonterHours(monter) {
-    const list = getMonterList(monter);
-    return list.reduce((sum, m) => sum + (m.hoursDone ?? 0), 0);
+
+  function hrs(value) {
+    return (Number(value) || 0).toLocaleString('en-US', { maximumFractionDigits: 2 });
   }
 </script>
 
@@ -251,6 +285,7 @@
           {#key bmiData}
             {#each sodata as data, i}
               {#if data.isAct == false}
+                {@const ledger = ledgerOf(data)}
                 <tr
                   transition:slide={{ duration: 1000, easing: quintOut }}
                   class:border-r-2={data.open == true && $isRtl}
@@ -279,29 +314,32 @@
                         <Chaticon /></button
                       >
                     {/if}
-                    {#if data.hasAct == true}<button
-                        onclick={() => {
-                          data.open = !data.open;
-                          console.log(data.open);
-                        }}
-                        ><svg
-                          class:rotate-90={data.open == false}
-                          class="sm:w-5 sm:h-5 sm:ms-5 h-3 w-3 ms-3"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 10 6"
-                        >
-                          <path
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="m1 1 4 4 4-4"
-                          />
-                        </svg></button
+                    <!-- Always expandable: the panel holds the monthly hours
+                         ledger too, and a mission with no tasks yet had no way
+                         to open it. -->
+                    <button
+                      title={$t('project.bethas.prevMonths')}
+                      onclick={() => {
+                        data.open = !data.open;
+                      }}
+                      ><svg
+                        class:rotate-90={data.open == false}
+                        class="sm:w-5 sm:h-5 sm:ms-5 h-3 w-3 ms-3"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 10 6"
                       >
-                    {:else}
+                        <path
+                          stroke="currentColor"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="m1 1 4 4 4-4"
+                        />
+                      </svg></button
+                    >
+                    {#if data.hasAct != true}
                       <button
                         onclick={() => {
                           isOpen = true;
@@ -310,7 +348,23 @@
                       >
                     {/if}
                   </td>
-                  <td><h2 class="md:text-xl">{data.attributes.name}</h2></td>
+                  <td>
+                    <!-- The whole life of this mission — decision, votes, join
+                         requests, timers by month, approvals — lives on the
+                         process page; the row is the way in. -->
+                    {#if projectId}
+                      <a
+                        class="mission-link md:text-xl"
+                        href={`/moach/${projectId}/processes/bm-${data.id}`}
+                        title={$t('process.months.openProcess')}
+                      >
+                        <h2 class="md:text-xl">{data.attributes.name}</h2>
+                        <span class="mission-link-arrow" aria-hidden="true">{$isRtl ? '←' : '→'}</span>
+                      </a>
+                    {:else}
+                      <h2 class="md:text-xl">{data.attributes.name}</h2>
+                    {/if}
+                  </td>
                   <td>
                     <div class="flex flex-col items-center justify-center">
                       <div>
@@ -347,24 +401,13 @@
                   </td>
                   <td>
                     <p class="md:text-xl text-sm">
-                      {data.attributes.howmanyhoursalready == null
-                        ? 0
-                        : data.attributes.howmanyhoursalready.toLocaleString(
-                            'en-US',
-                            { maximumFractionDigits: 2 }
-                          )} / {data.attributes.hoursassinged.toLocaleString(
-                        'en-US',
-                        { maximumFractionDigits: 2 }
+                      {hrs(ledger.openMonth?.hoursDone ?? 0)} / {hrs(
+                        data.attributes.hoursassinged
                       )}
                     </p>
-                    {#if getTotalMonterHours(data.attributes?.monter) > 0}
+                    {#if ledger.totalDone > (ledger.openMonth?.hoursDone ?? 0)}
                       <p class="text-xs text-white/80">
-                        ({$t('project.bethas.totalAllMonths')}: {(
-                          getTotalMonterHours(data.attributes?.monter) +
-                          (data.attributes.howmanyhoursalready ?? 0)
-                        ).toLocaleString('en-US', {
-                          maximumFractionDigits: 2
-                        })})
+                        ({$t('project.bethas.totalAllMonths')}: {hrs(ledger.totalDone)})
                       </p>
                     {/if}
                   </td>
@@ -405,6 +448,7 @@
                 {#if data.open == true}
                   <div class="w-screen border-b-2 border-x-2 border-gold">
                     <div style="max-width:94vw;" class="mx-auto">
+                      {#if (data.attributes.acts?.data ?? []).length > 0}
                       <div class="tbl-header">
                         <table cellpadding="0" cellspacing="0" border="0">
                           <thead>
@@ -458,58 +502,30 @@
                           </tbody>
                         </table>
                       </div>
-                      {#if getMonterList(data.attributes?.monter).length > 0}
-                        <div class="px-4 pb-4">
-                          <h3 class="text-lg font-semibold text-white mb-2">
-                            {$t('project.bethas.prevMonths')}
-                          </h3>
-                          <div
-                            class="overflow-x-auto rounded border border-white/20"
-                          >
-                            <table class="w-full text-sm">
-                              <thead>
-                                <tr class="bg-white/10">
-                                  <th class="px-3 py-2 text-right"
-                                    >{$t('project.bethas.monthCol')}</th
-                                  >
-                                  <th class="px-3 py-2 text-right"
-                                    >{$t('project.bethas.hoursAssigned')}</th
-                                  >
-                                  <th class="px-3 py-2 text-right"
-                                    >{$t('project.bethas.hoursDone')}</th
-                                  >
-                                  <th class="px-3 py-2 text-right"
-                                    >{$t('project.bethas.statusCol')}</th
-                                  >
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {#each getMonterList(data.attributes?.monter) as m}
-                                  <tr class="border-t border-white/10">
-                                    <td class="px-3 py-2"
-                                      >{formatMonthLabel(m.monthStart)}</td
-                                    >
-                                    <td class="px-3 py-2">{m.hours ?? 0}</td>
-                                    <td class="px-3 py-2">{m.hoursDone ?? 0}</td
-                                    >
-                                    <td class="px-3 py-2">
-                                      {#if m.isDone || (m.hours > 0 && (m.hoursDone ?? 0) >= m.hours)}
-                                        <span class="text-green-400"
-                                          >{$t('project.bethas.completed')}</span
-                                        >
-                                      {:else}
-                                        <span class="text-amber-400"
-                                          >{$t('project.bethas.inProgress')}</span
-                                        >
-                                      {/if}
-                                    </td>
-                                  </tr>
-                                {/each}
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
                       {/if}
+                      <!-- The same ledger the process page shows: every month
+                           of this mission, the current one counting up live
+                           from the timers. -->
+                      <div class="px-4 pb-4">
+                        <h3 class="text-lg font-semibold text-white mb-2">
+                          {$t('project.bethas.prevMonths')}
+                        </h3>
+                        <MonthlyHours
+                          monter={data.attributes?.monter}
+                          segments={segmentsByMission[String(data.id)] ?? []}
+                          hoursassinged={data.attributes?.hoursassinged}
+                          counter={data.attributes?.howmanyhoursalready}
+                          showTitle={false}
+                        />
+                        {#if projectId}
+                          <a
+                            class="mt-2 inline-block text-sm underline text-white/90 hover:text-gold"
+                            href={`/moach/${projectId}/processes/bm-${data.id}`}
+                          >
+                            {$t('process.months.openProcess')} {$isRtl ? '←' : '→'}
+                          </a>
+                        {/if}
+                      </div>
                       <button
                         class="m-2 text-white"
                         onclick={() => {
@@ -550,6 +566,30 @@
       width: 50vw;
     }
   }
+  .mission-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color 0.12s, border-color 0.12s;
+  }
+  .mission-link:hover,
+  .mission-link:focus-visible {
+    color: #eee8aa;
+    border-bottom-color: currentColor;
+  }
+  .mission-link-arrow {
+    font-size: 0.85em;
+    opacity: 0;
+    transition: opacity 0.12s;
+  }
+  .mission-link:hover .mission-link-arrow,
+  .mission-link:focus-visible .mission-link-arrow {
+    opacity: 0.9;
+  }
+
   h1 {
     font-size: 30px;
     color: #fff;

@@ -44,22 +44,55 @@ describe('normalizeVotes / groupVotesByRound', () => {
 });
 
 describe('groupTimersByMonth', () => {
-  const timer = (id: string, start: string | null, totalHours = 1) => ({
+  /** Local-time ISO string, so the test reads the same month the code does. */
+  const at = (y: number, m: number, d: number, h = 0, min = 0) =>
+    new Date(y, m - 1, d, h, min).toISOString();
+  const timer = (id: string, segments: { start: string; stop?: string | null }[], totalHours = 0) => ({
     id,
-    attributes: { start, totalHours }
+    attributes: { start: segments[0]?.start ?? null, totalHours, timers: segments }
   });
 
-  it('groups by YYYY-MM, newest month first, and sums hours', () => {
+  it('groups by the month the work happened in, newest first, and sums hours', () => {
     const groups = groupTimersByMonth([
-      timer('1', '2026-05-02T10:00:00Z', 2),
-      timer('2', '2026-06-01T09:00:00Z', 3),
-      timer('3', '2026-05-20T08:00:00Z', 1.5),
-      timer('4', null, 4)
+      timer('1', [{ start: at(2026, 5, 2, 10), stop: at(2026, 5, 2, 12) }]),
+      timer('2', [{ start: at(2026, 6, 1, 9), stop: at(2026, 6, 1, 12) }]),
+      timer('3', [{ start: at(2026, 5, 20, 8), stop: at(2026, 5, 20, 9, 30) }]),
+      timer('4', [], 4)
     ]);
     expect(groups.map((group) => group.month)).toEqual(['2026-06', '2026-05', '']);
     expect(groups[1].totalHours).toBeCloseTo(3.5);
-    // newest timer first inside the month
-    expect(groups[1].timers[0].id).toBe('3');
+    // newest entry first inside the month
+    expect(groups[1].entries[0].timer.id).toBe('3');
+    // a timer with no segment keeps its lifetime total in the '' bucket
+    expect(groups[2].entries[0].hours).toBe(4);
+  });
+
+  it('splits one reused timer across every month it actually ran in', () => {
+    // The entity's `start` is only its latest session — the whole life of the
+    // timer lives in its segments, and each month gets its own hours.
+    const groups = groupTimersByMonth([
+      timer(
+        '9',
+        [
+          { start: at(2026, 6, 3, 9), stop: at(2026, 6, 3, 13) },
+          { start: at(2026, 7, 3, 9), stop: at(2026, 7, 3, 12) }
+        ],
+        7
+      )
+    ]);
+    expect(groups.map((g) => g.month)).toEqual(['2026-07', '2026-06']);
+    expect(groups[0].totalHours).toBeCloseTo(3);
+    expect(groups[1].totalHours).toBeCloseTo(4);
+  });
+
+  it('measures a still-running timer up to now', () => {
+    const nowMs = new Date(2026, 7, 2, 12).getTime();
+    const groups = groupTimersByMonth(
+      [timer('7', [{ start: at(2026, 8, 2, 9), stop: null }])],
+      nowMs
+    );
+    expect(groups[0].month).toBe('2026-08');
+    expect(groups[0].totalHours).toBeCloseTo(3);
   });
 });
 

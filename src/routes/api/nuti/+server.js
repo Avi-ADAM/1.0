@@ -1,7 +1,6 @@
 import { render } from 'svelty-email';
 import PendJustCreated from '$lib/components/mail/pendJustCreated.svelte';
-import nodemailer from 'nodemailer';
-import { ZOHO } from '$env/static/private';
+import { sendMailSafe } from '$lib/server/mailer.js';
 
 async function sendMail(
   restime,
@@ -20,16 +19,6 @@ async function sendMail(
       "he": `הצבעה על ${kind == "finiappmi"? "אישור סיום המשימה":"ההצעה"} של ${un} בריקמה ${pn}`,
       "en":`Vote for ${un}'s ${kind == "finiappmi"?"mission complition appruval":"suggestion"} on the freeMates ${pn}`
     };
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.zoho.com',
-    secure: true,
-    port: 465,
-    auth: {
-      user: "notifications@1lev1.com",	
-      pass: ZOHO,
-    },
-  });
-  
   const emailHtmlObj = await render(
     PendJustCreated,
     {
@@ -48,24 +37,14 @@ async function sendMail(
   );
   const emailHtml = emailHtmlObj.html || "";
 
-  const options = {
-    from:"notifications@1lev1.com",
-    to:email ,
-    subject:previewText[lang],
+  // Awaited and non-throwing: a refused address is logged and skipped rather
+  // than crashing the process or aborting the rest of the recipients.
+  await sendMailSafe({
+    to: email,
+    subject: previewText[lang],
     html: emailHtml
-  };
-  
-  transporter.sendMail(options);
-  transporter.verify(function(err, success) {
-  if (err) {
-    console.log(err)
-    return 'error';
-} 
-else {
-  console.log(success)
-    return 'OK';
+  });
 }
-});}
 async function renderText(
   un,
   username,

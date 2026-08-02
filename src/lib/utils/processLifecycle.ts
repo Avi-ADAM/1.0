@@ -6,6 +6,8 @@
  * returned by the `processLifecycleData` qid. No network calls are made here.
  */
 
+import { hoursByMonth, monthKeyOf, segmentsFromTimers } from '$lib/recurring/missionMonths.js';
+
 export interface NormalizedVote {
   id: string;
   what: boolean | null;
@@ -22,11 +24,20 @@ export interface VoteRound {
   votes: NormalizedVote[];
 }
 
+export interface TimerMonthEntry {
+  /** The Timer entity. */
+  timer: any;
+  /** Hours this timer accumulated **inside this month**. */
+  hours: number;
+  /** First segment of this timer that starts in the month, for the date label. */
+  from: string | null;
+}
+
 export interface TimerMonthGroup {
-  /** `YYYY-MM`, or `''` for timers without a start date */
+  /** `YYYY-MM`, or `''` for timers with no usable segment */
   month: string;
   totalHours: number;
-  timers: any[];
+  entries: TimerMonthEntry[];
 }
 
 function asArray<T>(value: T[] | undefined | null): T[] {
@@ -82,34 +93,56 @@ export function groupVotesByRound(vots: any[] | null | undefined): VoteRound[] {
 }
 
 /**
- * Groups timer entities by the month of their `start` (YYYY-MM), newest month
- * first; timers inside a month are sorted newest first. Timers without a start
- * date land in a final `''` group.
+ * Groups timer work by the month it actually happened in (`YYYY-MM`), newest
+ * month first.
+ *
+ * The month comes from the timer's **segments**, not from the entity's `start`
+ * and `totalHours`: a Timer is reused across sessions, so `start` is only its
+ * latest session while `totalHours` accumulates its whole life. Grouping by
+ * those two made a timer that had run since April report all of its hours under
+ * August. A timer whose segments span several months appears in each of them
+ * with the hours it earned there. A timer with no usable segment at all keeps a
+ * final `''` group, with its `totalHours` as the only thing known about it.
  */
-export function groupTimersByMonth(timers: any[] | null | undefined): TimerMonthGroup[] {
-  const byMonth = new Map<string, any[]>();
-  for (const timer of asArray(timers)) {
-    const start = (timer as any)?.attributes?.start;
-    const month = typeof start === 'string' && start.length >= 7 ? start.slice(0, 7) : '';
+export function groupTimersByMonth(
+  timers: any[] | null | undefined,
+  nowMs: number = Date.now()
+): TimerMonthGroup[] {
+  const byMonth = new Map<string, TimerMonthEntry[]>();
+  const push = (month: string, entry: TimerMonthEntry) => {
     const list = byMonth.get(month);
-    if (list) list.push(timer);
-    else byMonth.set(month, [timer]);
+    if (list) list.push(entry);
+    else byMonth.set(month, [entry]);
+  };
+
+  for (const timer of asArray(timers)) {
+    const segments = segmentsFromTimers([timer]);
+    const hours = hoursByMonth(segments, nowMs);
+    if (hours.size === 0) {
+      push('', { timer, hours: Number((timer as any)?.attributes?.totalHours) || 0, from: null });
+      continue;
+    }
+    for (const [month, monthHours] of hours) {
+      // The label is the first segment that *starts* in the month; a segment
+      // spilling over from the previous month has none, and shows the month only.
+      const from = segments
+        .map((seg) => seg.start ?? null)
+        .filter((start): start is string => Boolean(start) && monthKeyOf(start) === month)
+        .sort()[0] ?? null;
+      push(month, { timer, hours: monthHours, from });
+    }
   }
+
   return [...byMonth.entries()]
     .sort((a, b) => {
       if (a[0] === '') return 1;
       if (b[0] === '') return -1;
       return b[0].localeCompare(a[0]);
     })
-    .map(([month, list]) => ({
+    .map(([month, entries]) => ({
       month,
-      totalHours: list.reduce(
-        (sum, timer: any) => sum + (Number(timer?.attributes?.totalHours) || 0),
-        0
-      ),
-      timers: [...list].sort((a: any, b: any) =>
-        String(b?.attributes?.start ?? '').localeCompare(String(a?.attributes?.start ?? ''))
-      )
+      totalHours: entries.reduce((sum, entry) => sum + entry.hours, 0),
+      entries: [...entries].sort((a, b) => String(b.from ?? '').localeCompare(String(a.from ?? '')))
     }));
 }
 

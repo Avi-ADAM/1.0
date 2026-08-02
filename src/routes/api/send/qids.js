@@ -8835,6 +8835,7 @@ export const moachQids = {
             } } }
             timers { data { id attributes {
               start finnish totalHours isActive saved appruved saveText saveLinks
+              timers { start stop }
               users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
               acts { data { id attributes { shem } } }
             } } }
@@ -8894,6 +8895,27 @@ export const moachQids = {
               users_permissions_user { data { id attributes { username } } }
             } } }
           } } }
+        }
+      }
+    }
+  }`,
+  // Timer segments only, for the live monthly hours of a rikma's missions in
+  // progress. Deliberately separate from getProjectMissions: that query feeds
+  // eight pages, and the segment components would bloat all of them for a
+  // number only the progress board reads.
+  'projectMissionTimerSegments': `query ProjectMissionTimerSegments($pid: ID!) {
+    timers(
+      filters: { mesimabetahalich: { project: { id: { eq: $pid } }, finnished: { ne: true } } }
+      pagination: { limit: -1 }
+    ) {
+      data {
+        id
+        attributes {
+          start
+          finnish
+          isActive
+          timers { start stop }
+          mesimabetahalich { data { id } }
         }
       }
     }

@@ -9,6 +9,7 @@
   import LifecycleStation from './LifecycleStation.svelte';
   import VoteRounds from './VoteRounds.svelte';
   import TimersPanel from './TimersPanel.svelte';
+  import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
   import { mediaUrl } from '$lib/utils/processLifecycle';
 
   let {
@@ -202,6 +203,12 @@
     }
   }
 
+  function formatNum(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return '';
+    return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  }
+
   function archStatus(archived, activeText, activeTone) {
     return archived
       ? { text: t.archived, tone: 'grey' }
@@ -265,6 +272,20 @@
         {#if plainText(attrs.descrip || attrs.hearotMeyuchadot)}
           <p class="pl-desc">{plainText(attrs.descrip || attrs.hearotMeyuchadot)}</p>
         {/if}
+
+        <!-- Still an offer nobody executes: the share is what whoever takes it
+             would earn. It lives in the open pipeline, so price it from there.
+             Once execution starts the equity block moves to that station. -->
+        {#if projectId && !betahalich && Number(attrs.noofhours) > 0 && Number(attrs.perhour) > 0}
+          <div class="pl-equity">
+            <EquityPreview
+              {projectId}
+              missionValue={Number(attrs.noofhours) * Number(attrs.perhour)}
+              alreadyCountedIn="pipeline"
+            />
+          </div>
+        {/if}
+
         {#if asks.length > 0}
           <div class="pl-votes">
             <h4 class="pl-subheading">{t.asks} ({asks.length})</h4>
@@ -366,7 +387,29 @@
           </div>
         {/if}
 
-        <TimersPanel monter={attrs.monter} timers={attrs.timers?.data ?? []} {lang} />
+        <TimersPanel
+          monter={attrs.monter}
+          timers={attrs.timers?.data ?? []}
+          hoursassinged={attrs.hoursassinged}
+          counter={attrs.howmanyhoursalready}
+        />
+
+        <!-- What this mission is worth as a share of the rikma. A mission in
+             progress is already inside the approved baseline, so it must not be
+             added on top of it a second time (alreadyCountedIn="approved");
+             a `kvua` one earns its value every month, which unlocks the
+             1/2/5-year horizons. -->
+        {#if projectId && Number(attrs.hoursassinged) > 0 && Number(attrs.perhour) > 0}
+          {@const cycleValue = Number(attrs.hoursassinged) * Number(attrs.perhour)}
+          <div class="pl-equity">
+            <EquityPreview
+              {projectId}
+              missionValue={cycleValue}
+              monthlyValue={attrs.iskvua ? cycleValue : null}
+              alreadyCountedIn="approved"
+            />
+          </div>
+        {/if}
       </LifecycleStation>
     {/if}
 
@@ -420,10 +463,20 @@
         {lang}
       >
         {#if fAttrs}
+          {@const fHours = fAttrs.noofhours ?? null}
+          {@const fRate = fAttrs.perhour ?? null}
+          {@const fTotal =
+            fAttrs.total ?? (fHours != null && fRate != null ? fHours * fRate : null)}
           <div class="pl-facts">
             {#if fAttrs.start}<span class="pl-fact">{t.start}: {formatDate(fAttrs.start)}</span>{/if}
             {#if fAttrs.finish}<span class="pl-fact">{t.finish}: {formatDate(fAttrs.finish)}</span>{/if}
-            {#if fAttrs.total != null}<span class="pl-fact">{t.total}: {fAttrs.total} {t.hours}</span>{/if}
+            <!-- hours × rate = money. `total` is the money value, never hours. -->
+            {#if fHours != null}
+              <span class="pl-fact">
+                {formatNum(fHours)} {t.hours}{fRate != null ? ` × ${formatNum(fRate)} ${t.perhour}` : ''}
+              </span>
+            {/if}
+            {#if fTotal != null}<span class="pl-fact">{t.total}: {formatNum(fTotal)}</span>{/if}
           </div>
           {#if plainText(fAttrs.why || fAttrs.descrip)}
             <p class="pl-desc">{t.why}: {plainText(fAttrs.why || fAttrs.descrip)}</p>
@@ -716,6 +769,12 @@
   .pl-badge--gold  { background: var(--badge-gold-bg, rgba(217,119,6,.10));   color: var(--badge-gold-text, #b45309); }
   .pl-badge--green { background: var(--badge-green-bg, rgba(5,150,105,.10));  color: var(--badge-green-text, #065f46); }
   .pl-badge--grey  { background: var(--badge-grey-bg, rgba(107,114,128,.10)); color: var(--badge-grey-text, #6b7280); }
+
+  /* The equity widget brings its own (tailwind) skin — cap its width so it
+     reads as a card inside the station instead of a full-width banner. */
+  .pl-equity {
+    max-width: 30rem;
+  }
 
   .pl-acts {
     list-style: none;

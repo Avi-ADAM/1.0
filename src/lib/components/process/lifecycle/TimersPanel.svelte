@@ -1,80 +1,38 @@
 <script>
   /**
    * TimersPanel — the execution-time detail of a mesimabetahalich:
-   *  · monthly hours plan/actual from the `monter` component (per month:
-   *    assigned hours, done hours, closed or still open), and
+   *  · the monthly hours ledger (MonthlyHours — plan vs. actual per month, with
+   *    the current month counting up live from the running timer), and
    *  · the actual timer entities grouped by month, each with its user, date,
    *    hours, save/approve state and what was worked on.
    */
-  import { groupTimersByMonth, mediaUrl, normalizeMonter } from '$lib/utils/processLifecycle';
+  import { t } from '$lib/translations';
+  import { lang as langStore } from '$lib/stores/lang.js';
+  import { groupTimersByMonth, mediaUrl } from '$lib/utils/processLifecycle';
+  import MonthlyHours from '$lib/components/mission/MonthlyHours.svelte';
 
-  let { monter = [], timers = [], lang = 'en' } = $props();
+  let { monter = [], timers = [], hoursassinged = 0, counter = 0 } = $props();
 
-  const i18n = {
-    he: {
-      monthly: 'שעות לפי חודש',
-      month: 'חודש',
-      assigned: 'שעות שהוקצו',
-      done: 'שעות שבוצעו',
-      closed: 'נסגר',
-      open: 'פתוח',
-      timers: 'טיימרים',
-      hours: 'שעות',
-      active: 'פעיל כעת',
-      saved: 'נשמר',
-      approved: 'אושר',
-      awaiting: 'ממתין לאישור',
-      noTimers: 'אין טיימרים עדיין',
-      noMonths: 'אין חלוקה חודשית',
-      total: 'סה״כ'
-    },
-    en: {
-      monthly: 'Hours by month',
-      month: 'Month',
-      assigned: 'Assigned',
-      done: 'Done',
-      closed: 'Closed',
-      open: 'Open',
-      timers: 'Timers',
-      hours: 'hours',
-      active: 'Running now',
-      saved: 'Saved',
-      approved: 'Approved',
-      awaiting: 'Awaiting approval',
-      noTimers: 'No timers yet',
-      noMonths: 'No monthly breakdown',
-      total: 'Total'
-    },
-    ar: {
-      monthly: 'الساعات حسب الشهر',
-      month: 'شهر',
-      assigned: 'ساعات مخصصة',
-      done: 'ساعات منجزة',
-      closed: 'مغلق',
-      open: 'مفتوح',
-      timers: 'المؤقتات',
-      hours: 'ساعات',
-      active: 'نشط الآن',
-      saved: 'محفوظ',
-      approved: 'معتمد',
-      awaiting: 'بانتظار الموافقة',
-      noTimers: 'لا توجد مؤقتات بعد',
-      noMonths: 'لا يوجد توزيع شهري',
-      total: 'المجموع'
-    }
-  };
-  let t = $derived(i18n[lang] ?? i18n.en);
-
-  let months = $derived(normalizeMonter(monter));
   let timerGroups = $derived(groupTimersByMonth(timers));
 
-  let locale = $derived(lang === 'he' ? 'he-IL' : lang === 'ar' ? 'ar' : 'en-GB');
+  let locale = $derived(
+    $langStore === 'he'
+      ? 'he-IL'
+      : $langStore === 'ar'
+        ? 'ar'
+        : $langStore === 'ru'
+          ? 'ru-RU'
+          : $langStore === 'es'
+            ? 'es-ES'
+            : 'en-GB'
+  );
 
   function monthLabel(value) {
     if (!value) return '—';
     try {
-      // value is either `YYYY-MM` (timer group) or a full date (monthStart)
-      const date = new Date(value.length === 7 ? `${value}-01` : value);
+      // value is `YYYY-MM` (timer group), or '' for timers with no start date
+      const date = new Date(`${value}-01`);
+      if (Number.isNaN(date.getTime())) return value;
       return date.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
     } catch {
       return value;
@@ -96,56 +54,27 @@
 </script>
 
 <div class="tp">
-  <!-- ── Monthly plan/actual (monter component) ─────────────────────────── -->
-  <div class="tp-block">
-    <h4 class="tp-heading">{t.monthly}</h4>
-    {#if months.length === 0}
-      <p class="tp-empty">{t.noMonths}</p>
-    {:else}
-      <div class="tp-table-wrap">
-        <table class="tp-table">
-          <thead>
-            <tr>
-              <th>{t.month}</th>
-              <th>{t.assigned}</th>
-              <th>{t.done}</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {#each months as entry (entry.id || entry.monthStart)}
-              <tr>
-                <td>{monthLabel(entry.monthStart)}</td>
-                <td>{roundHours(entry.hours)}</td>
-                <td>{roundHours(entry.hoursDone)}</td>
-                <td>
-                  <span class="tp-badge {entry.isDone ? 'tp-badge--done' : 'tp-badge--open'}">
-                    {entry.isDone ? t.closed : t.open}
-                  </span>
-                </td>
-              </tr>
-            {/each}
-          </tbody>
-        </table>
-      </div>
-    {/if}
-  </div>
+  <!-- ── Monthly ledger, current month live ─────────────────────────────── -->
+  <MonthlyHours {monter} {timers} {hoursassinged} {counter} />
 
   <!-- ── Timer entities grouped by month ────────────────────────────────── -->
   <div class="tp-block">
-    <h4 class="tp-heading">{t.timers}</h4>
+    <h4 class="tp-heading">{$t('process.timers.title')}</h4>
     {#if timerGroups.length === 0}
-      <p class="tp-empty">{t.noTimers}</p>
+      <p class="tp-empty">{$t('process.timers.none')}</p>
     {:else}
       {#each timerGroups as group (group.month)}
         <div class="tp-month">
           <div class="tp-month-head">
             <span class="tp-month-name">{monthLabel(group.month)}</span>
-            <span class="tp-month-total">{t.total}: {roundHours(group.totalHours)} {t.hours}</span>
+            <span class="tp-month-total">
+              {$t('process.timers.monthTotal')}: {roundHours(group.totalHours)}
+              {$t('process.timers.hours')}
+            </span>
           </div>
           <ul class="tp-list">
-            {#each group.timers as timer (timer.id)}
-              {@const attrs = timer.attributes ?? {}}
+            {#each group.entries as entry (entry.timer.id)}
+              {@const attrs = entry.timer.attributes ?? {}}
               {@const timerUser = attrs.users_permissions_user?.data}
               <li class="tp-timer">
                 {#if timerUser?.attributes?.profilePic?.data?.attributes?.url}
@@ -161,16 +90,20 @@
                   </span>
                 {/if}
                 <span class="tp-timer-user">{timerUser?.attributes?.username ?? ''}</span>
-                <span class="tp-timer-date">{dayLabel(attrs.start)}</span>
-                <span class="tp-timer-hours">{roundHours(attrs.totalHours)} {t.hours}</span>
+                <span class="tp-timer-date">{dayLabel(entry.from)}</span>
+                <!-- this timer's hours *in this month*, not its lifetime total -->
+                <span class="tp-timer-hours">
+                  {roundHours(entry.hours)}
+                  {$t('process.timers.hours')}
+                </span>
                 {#if attrs.isActive}
-                  <span class="tp-badge tp-badge--active">{t.active}</span>
+                  <span class="tp-badge tp-badge--active">{$t('process.timers.running')}</span>
                 {:else if attrs.appruved}
-                  <span class="tp-badge tp-badge--done">{t.approved}</span>
+                  <span class="tp-badge tp-badge--done">{$t('process.timers.approved')}</span>
                 {:else if attrs.saved}
-                  <span class="tp-badge tp-badge--saved">{t.saved}</span>
+                  <span class="tp-badge tp-badge--saved">{$t('process.timers.saved')}</span>
                 {:else}
-                  <span class="tp-badge tp-badge--open">{t.awaiting}</span>
+                  <span class="tp-badge tp-badge--open">{$t('process.timers.awaiting')}</span>
                 {/if}
                 {#if attrs.saveText}
                   <p class="tp-timer-note">{attrs.saveText}</p>
@@ -190,7 +123,7 @@
 </div>
 
 <style>
-  .tp { display: flex; flex-direction: column; gap: 12px; }
+  .tp { display: flex; flex-direction: column; gap: 14px; }
 
   .tp-block { display: flex; flex-direction: column; gap: 6px; }
 
@@ -208,31 +141,6 @@
     font-size: 12px;
     color: var(--pcv-text-3, #a8a29e);
     font-style: italic;
-  }
-
-  .tp-table-wrap { overflow-x: auto; }
-
-  .tp-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-    color: var(--pcv-text, #1c1917);
-  }
-
-  .tp-table th {
-    text-align: start;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--pcv-text-3, #a8a29e);
-    padding: 3px 8px;
-    border-bottom: 1px solid var(--pcv-border, #f3e8c8);
-  }
-
-  .tp-table td {
-    padding: 5px 8px;
-    border-bottom: 1px solid var(--pcv-border, #f3e8c8);
   }
 
   .tp-badge {

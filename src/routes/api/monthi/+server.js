@@ -8,6 +8,7 @@ import { sendToSer } from '$lib/send/sendToSer.js';
 // Server-only secret — never exposed to the client bundle (no VITE_ prefix).
 import { ADMINMONTHER } from '$env/static/private';
 import { cycleWindow } from '$lib/recurring/recurringPlan.js';
+import { hoursInMonth, monthKeyOf, normalizeRows } from '$lib/recurring/missionMonths.js';
 
 function formatDate(date = new Date()) {
   const year = date.toLocaleString('default', { year: 'numeric' });
@@ -62,7 +63,7 @@ async function sendActivationEmail(fetchFn, user, payload) {
       lang,
       previewText
     });
-    await fetchFn('/api/sendMail', {
+    const res = await fetchFn('/api/sendMail', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -72,27 +73,18 @@ async function sendActivationEmail(fetchFn, user, payload) {
         emailText: previewText
       })
     });
+    // A refused send must be visible: the cycle is already open, so a silent
+    // failure means nobody is told to report the month's spend.
+    if (!res.ok) {
+      console.error('monthi: activation email rejected for', user.email, res.status);
+    }
   } catch (e) {
     console.error('monthi: failed to send activation email', e);
   }
 }
 
-// Hours from timer segments that fall within the given year+month
-function hoursInMonth(timers, year, month) {
-  if (!timers || !Array.isArray(timers)) return 0;
-  const monthStart = new Date(year, month, 1).getTime();
-  const monthEnd = new Date(year, month + 1, 1).getTime();
-  let total = 0;
-  for (const seg of timers) {
-    if (!seg.start) continue;
-    const start = new Date(seg.start).getTime();
-    const stop = seg.stop ? new Date(seg.stop).getTime() : Date.now();
-    const s = Math.max(start, monthStart);
-    const e = Math.min(stop, monthEnd);
-    if (e > s) total += (e - s) / 1000 / 3600;
-  }
-  return total;
-}
+// hoursInMonth / monthKeyOf / normalizeRows (imported): the month arithmetic is
+// shared with /api/fixer, which rebuilds a whole ledger from the same segments.
 
 let suc = [];
 
@@ -115,12 +107,19 @@ export async function GET({ fetch }) {
     for (const element of res.data.mesimabetahaliches.data) {
       const id = element.id;
 
+      // Every Timer is created with `mesimabetahalich` set (qid 33CreateTimer),
+      // saved or not, so this is the full record of when the work happened —
+      // the only month-aware source. `howmanyhoursalready` is a single scalar
+      // with no month attached and cannot be trusted to describe the target
+      // month; it is kept only as a fallback for legacy timer-less missions.
       const que2 = `{
         mesimabetahalich(id: ${id}) { data { attributes {
           name dates hoursassinged howmanyhoursalready
           monter { monthStart hours isDone hoursDone }
-          activeTimer { data { attributes { timers { start stop } isActive } } }
         }}}
+        timers(filters: { mesimabetahalich: { id: { eq: "${id}" } } }, pagination: { limit: -1 }) {
+          data { attributes { timers { start stop } } }
+        }
       }`;
 
       try {
@@ -148,32 +147,75 @@ export async function GET({ fetch }) {
           continue;
         }
 
-        // Add hours from still-running activeTimer that fall in the target month
-        const activeTimerSegments = at.activeTimer?.data?.attributes?.timers ?? [];
-        const activeHrsThisMonth = at.activeTimer?.data?.attributes?.isActive
-          ? hoursInMonth(activeTimerSegments, targetYear, targetMonth)
+        // Segments from every timer of this mission, saved or running.
+        const timerRows = resi.data.timers?.data ?? [];
+        const segments = timerRows.flatMap((t) => t.attributes?.timers ?? []);
+        const hasTimers = segments.length > 0;
+
+        // Hours actually worked in the month being closed, and in the month we
+        // are standing in. Running monthi on the 2nd of August must file July's
+        // real hours under July and leave August's own hours on the counter —
+        // the old code filed the raw counter (August's hours, once July's had
+        // been consumed by an earlier run) under July and then zeroed it,
+        // losing both months.
+        const targetHours = hasTimers
+          ? hoursInMonth(segments, targetYear, targetMonth)
+          : (at.howmanyhoursalready ?? 0);
+        const currentHours = hasTimers
+          ? hoursInMonth(segments, now.getFullYear(), now.getMonth())
           : 0;
 
-        const monthTotal = (at.howmanyhoursalready ?? 0) + activeHrsThisMonth;
+        const rows = normalizeRows(at.monter);
+        const targetKey = monthKeyOf(targetDate);
+        const isTargetRow = (r) => monthKeyOf(r.monthStart) === targetKey;
+        const targetRows = rows.filter(isTargetRow);
+        const targetApproved = targetRows.some((r) => r.isDone === true);
 
-        if (monthTotal === 0) {
-          console.log('no hours this month for', id, '— skipping');
+        let nextRows = rows;
+        if (!hasTimers) {
+          // No timers = no evidence of when the work happened. Append the
+          // counter once and never rewrite it; a rewrite here would file 0.
+          if (targetHours > 0 && targetRows.length === 0) {
+            nextRows = [
+              ...rows,
+              { monthStart: formatDate(targetDate), hours: at.hoursassinged ?? 0, isDone: false, hoursDone: targetHours }
+            ];
+          }
+        } else if (!targetApproved) {
+          // The timers are authoritative, so an unapproved row for this month is
+          // rewritten rather than duplicated — that also repairs rows a previous
+          // run filled with the wrong month's hours.
+          nextRows = rows.filter((r) => !isTargetRow(r));
+          if (targetHours > 0) {
+            nextRows.push({
+              monthStart: formatDate(targetDate),
+              hours: targetRows[0]?.hours ?? at.hoursassinged ?? 0,
+              isDone: false,
+              hoursDone: targetHours
+            });
+          }
+        }
+
+        // Chronological, so a rewritten row lands back in place instead of at the
+        // end — otherwise every run would "differ" from the last and rewrite.
+        nextRows = [...nextRows].sort((a, b) => String(a.monthStart).localeCompare(String(b.monthStart)));
+
+        const monterChanged = JSON.stringify(nextRows) !== JSON.stringify(rows);
+        // Without timers there is no evidence of *when* the counter's hours were
+        // worked, so only reset it as part of filing them — never on its own.
+        const scalarIsStale =
+          (hasTimers || monterChanged) &&
+          Math.abs((at.howmanyhoursalready ?? 0) - currentHours) > 1e-6;
+
+        if (!monterChanged && !scalarIsStale) {
+          console.log('nothing to do for', id, targetRows.length ? '(month already filed)' : '(no hours)');
           continue;
         }
 
-        const monter = objToString(at.monter);
         const mutation = `mutation {
           updateMesimabetahalich(id: "${id}", data: {
-            monter: [
-              ${monter}
-              {
-                monthStart: "${formatDate(targetDate)}",
-                hours: ${at.hoursassinged ?? 0},
-                isDone: false,
-                hoursDone: ${monthTotal}
-              }
-            ],
-            howmanyhoursalready: 0
+            monter: [ ${objToString(nextRows)} ],
+            howmanyhoursalready: ${currentHours}
           }) { data { id } }
         }`;
 
@@ -348,7 +390,7 @@ async function sendRecurringSaleEmail(fetchFn, user, role, payload) {
       lang,
       previewText
     });
-    await fetchFn('/api/sendMail', {
+    const res = await fetchFn('/api/sendMail', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -358,6 +400,9 @@ async function sendRecurringSaleEmail(fetchFn, user, role, payload) {
         emailText: previewText
       })
     });
+    if (!res.ok) {
+      console.error('monthi: recurring-sale email rejected for', user.email, res.status);
+    }
   } catch (e) {
     console.error('monthi: failed to send recurring-sale email', e);
   }

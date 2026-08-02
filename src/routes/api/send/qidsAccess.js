@@ -424,6 +424,7 @@ export const qidsAccess = {
   'chainDetailProjectData': { allow: ['user', 'serviceAdmin'] },
   'processLifecycleData': { allow: ['user', 'serviceAdmin'] },
   'getProjectMissions': { allow: ['user', 'serviceAdmin'] },
+  'projectMissionTimerSegments': { allow: ['user', 'serviceAdmin'] },
   'getMissionTemplates': { allow: ['user', 'serviceAdmin'] },
   'getProjectFinancials': { allow: ['user', 'serviceAdmin'] },
   'getProjectValueSummary': { allow: ['user', 'serviceAdmin'] }, // mission-equity preview; serviceAdmin path serves the public availableMission page

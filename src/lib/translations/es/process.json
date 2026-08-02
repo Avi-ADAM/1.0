@@ -24,6 +24,32 @@
     "forum": "Foro principal",
     "select": "Seleccionar para añadir"
   },
+  "months": {
+    "title": "Horas por mes",
+    "total": "Total",
+    "hours": "horas",
+    "stateLive": "Mes actual",
+    "stateApproved": "Aprobado",
+    "stateFiled": "Cerrado",
+    "stateMismatch": "Según los temporizadores",
+    "stateUnverified": "Sin temporizador",
+    "noteFiled": "El registro mensual dice {{hours}} — el número aquí se calcula con los temporizadores.",
+    "noteMissing": "Este mes nunca se escribió en el registro mensual; el número se calcula con los temporizadores.",
+    "noteUnverified": "Ningún temporizador cubre este mes — se muestra lo que guarda el registro.",
+    "noteRunning": "Hay un temporizador en marcha — el número se actualiza en vivo.",
+    "noteOpen": "El mes sigue abierto; se registrará al comenzar el siguiente.",
+    "openProcess": "Página del proceso"
+  },
+  "timers": {
+    "title": "Temporizadores",
+    "none": "Aún no hay temporizadores",
+    "monthTotal": "Total",
+    "hours": "horas",
+    "running": "En marcha ahora",
+    "saved": "Guardado",
+    "approved": "Aprobado",
+    "awaiting": "Esperando aprobación"
+  },
   "node": {
     "chatLabel": "Abrir chat"
   }
