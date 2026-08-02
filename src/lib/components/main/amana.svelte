@@ -503,8 +503,18 @@
     document.cookie = `${name}=${value}; expires=${expires}; path=/; SameSite=Lax${secure}`;
   }
 
-  // Form submit handler
-  async function handleSubmit() {
+  /**
+   * Form submit handler.
+   *
+   * Svelte 5 has no `|preventDefault` modifier, so without this the browser
+   * also runs its own GET submission and the signatory's name and email end up
+   * in the URL (and in the Referer sent to every third-party asset on the
+   * page). Called from <Scene onSubmit> too, with no event — hence `?.`.
+   *
+   * @param {SubmitEvent} [event]
+   */
+  async function handleSubmit(event) {
+    event?.preventDefault();
     track('tryToSign', {}, { flags: ['tryToSign'] });
     nameuse = false;
 
