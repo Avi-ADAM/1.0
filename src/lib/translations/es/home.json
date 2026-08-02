@@ -269,6 +269,11 @@
       "tryAgain": "Intentar de nuevo",
       "close": "Cerrar",
       "justAMoment": "Un momento..."
+    },
+    "redirect": {
+      "title": "Un momento, estamos abriendo tu cuenta…",
+      "hint": "Si esta pantalla no cambia en unos segundos, continúa desde aquí:",
+      "link": "Continuar al registro"
     }
   },
   "setitle": "Creando una nueva realidad, juntos",

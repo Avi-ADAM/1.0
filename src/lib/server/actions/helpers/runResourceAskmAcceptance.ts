@@ -74,19 +74,30 @@ function currentCycleBounds(
 }
 
 /**
- * When the approved resource is a recurring expense (the final, possibly
- * negotiated, Pmash is still flagged recurring), spin up the mashabetahalich
- * engine on approval: create it active, assign the responsible user, configure
- * it from the Pmash's final terms, and turn the freshly-created acceptance Maap
- * into cycle #1. No-op for non-recurring resources (incl. those negotiated from
- * recurring → false, since the query filters recurring: true).
+ * When the approved resource is a recurring expense, spin up the mashabetahalich
+ * engine on approval: create it active, assign the responsible user, configure it
+ * from the resource's final (possibly negotiated) terms, and turn the freshly
+ * created acceptance Maap into cycle #1.
+ *
+ * The terms come from whichever record the rikma actually used: a Pmash in a
+ * multi-member rikma, or the OpenMashaabim itself in a solo one — a solo creator
+ * can publish a recurring need to the community too, and it must get the same
+ * engine when someone takes it on. No-op for non-recurring resources, including
+ * ones negotiated from recurring → false (both lookups require recurring: true).
  */
 export async function activateRecurringEngine(
   strapi: StrapiExecutor,
   context: AcceptContext,
-  args: { projectId: string; resourceName: string; acceptedUserId: string; maapId?: string }
+  args: {
+    projectId: string;
+    resourceName: string;
+    acceptedUserId: string;
+    maapId?: string;
+    /** Solo-rikma fallback source when no recurring Pmash matches. */
+    openMashaabimId?: string;
+  }
 ): Promise<void> {
-  const { projectId, resourceName, acceptedUserId, maapId } = args;
+  const { projectId, resourceName, acceptedUserId, maapId, openMashaabimId } = args;
   if (!resourceName) return;
 
   const res: any = await strapi.execute(
@@ -95,7 +106,24 @@ export async function activateRecurringEngine(
     context.jwt,
     context.fetch
   );
-  const pmash = res?.data?.pmashes?.data?.[0];
+  let pmash = res?.data?.pmashes?.data?.[0] ?? null;
+  let termsFromPmash = Boolean(pmash);
+
+  if (!pmash && openMashaabimId) {
+    const omRes: any = await strapi.execute(
+      'mrGetOpenMashaabimRecurringTerms',
+      { id: String(openMashaabimId) },
+      context.jwt,
+      context.fetch
+    );
+    const om = omRes?.data?.openMashaabim?.data;
+    // Read by id, so filter on recurring here rather than in the query.
+    if (om?.attributes?.recurring === true) {
+      pmash = om;
+      termsFromPmash = false;
+    }
+  }
+
   if (!pmash) return; // not recurring (or negotiated off) → nothing to do
 
   const pm = pmash.attributes ?? {};
@@ -115,7 +143,9 @@ export async function activateRecurringEngine(
         name: resourceName,
         project: projectId,
         users_permissions_user: acceptedUserId,
-        pmash: pmash.id,
+        // Only a real Pmash may be linked — Mashabetahalich has no
+        // open_mashaabim relation, so the solo path simply carries none.
+        ...(termsFromPmash ? { pmash: pmash.id } : {}),
         ...(mashaabimId ? { mashaabim: mashaabimId } : {}),
         kindOf,
         unit,
@@ -287,11 +317,14 @@ export async function runResourceAskmAcceptance(
   }
 
   // Recurring expense? Activate the draft engine and make this Maap cycle #1.
+  // The open resource was just archived, but the lookup reads it by id, so a
+  // solo rikma's recurring OpenMashaabim still yields its terms.
   await activateRecurringEngine(strapi, context, {
     projectId,
     resourceName: missionName,
     acceptedUserId,
     maapId,
+    openMashaabimId,
   });
 
   if (newnew) {

@@ -15,6 +15,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { sendToSer } from '$lib/send/sendToSer.js';
+import { signupCookieOptions } from '$lib/server/signupCookies.js';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': 'https://agreement.1lev1.com',
@@ -22,7 +23,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type'
 };
 
-export const POST: RequestHandler = async ({ request, fetch }) => {
+export const POST: RequestHandler = async ({ request, fetch, cookies, url }) => {
   const body = await request.json();
 
   if (body?.action === 'list') {
@@ -43,6 +44,21 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
       true,
       fetch
     );
+
+    // Seat the /signup handshake from the server. A Set-Cookie survives where
+    // the page's own document.cookie write does not (iOS Safari, in-app
+    // browsers), and /signup's load redirects back to /hascama without
+    // `fpval`. Cross-origin callers (agreement.1lev1.com) simply won't store
+    // them — the response carries no Allow-Credentials — which is harmless.
+    const chezinId = (result as any)?.data?.createChezin?.data?.id;
+    if (chezinId) {
+      const opts = signupCookieOptions(url);
+      cookies.set('fpval', String(chezinId), { ...opts, httpOnly: true });
+      cookies.set('un', name, { ...opts, httpOnly: false });
+      cookies.set('email', email, { ...opts, httpOnly: false });
+      cookies.set('country', (countries ?? []).join(','), { ...opts, httpOnly: false });
+    }
+
     return json(result, { headers: corsHeaders });
   }
 

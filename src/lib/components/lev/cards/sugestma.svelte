@@ -437,14 +437,15 @@
         {/if}
       </div>
 
-      <!-- שווי צפוי בריקמה — משאב פתוח אינו נמצא ב-open_missions,
-           ולכן alreadyCountedIn="none". -->
+      <!-- שווי צפוי בריקמה — משאב פתוח נמנה ב-open_mashaabims, כלומר הוא כבר
+           בתוך ה-pipeline של הריקמה, ולכן alreadyCountedIn="pipeline". -->
       {#if projectId}
         <EquityPreview
           {projectId}
           missionValue={equityValue}
           monthlyValue={equityMonthlyValue}
-          alreadyCountedIn="none"
+          alreadyCountedIn="pipeline"
+          subject="resource"
           compact={isMobileOrTablet()}
           onHover={hover}
         />

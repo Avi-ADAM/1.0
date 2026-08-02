@@ -8577,6 +8577,19 @@ export const moachQids = {
       } }
     }
   }`,
+  // Same, for a solo rikma, where the resource is an OpenMashaabim rather than a
+  // Pmash. Read by id (not by name) because the caller already holds it, and
+  // without an `archived` filter — acceptance archives the record just before
+  // the engine is built. Negotiated rounds were already flowed onto it by then,
+  // so these are the final agreed terms.
+  'mrGetOpenMashaabimRecurringTerms': `query MrGetOpenMashaabimRecurringTerms($id: ID!) {
+    openMashaabim(id: $id) {
+      data { id attributes {
+        recurring cycleSize easy price kindOf sqadualed sqadualedf
+        mashaabim { data { id } }
+      } }
+    }
+  }`,
   'mrUpdateCycleMaap': `mutation MrUpdateCycleMaap($id: ID!, $data: MaapInput!) {
     updateMaap(id: $id, data: $data) { data { id } }
   }`,
@@ -9065,6 +9078,21 @@ export const moachQids = {
             pagination: { limit: -1 }
           ) {
             data { id attributes { noofhours perhour } }
+          }
+          mashabetahaliches(
+            filters: { finnished: { ne: true }, forappruval: { ne: true }, recurring: { eq: true } }
+            pagination: { limit: -1 }
+          ) {
+            data { id attributes { pricePerUnit kindOf cycleSize recurring } }
+          }
+          open_mashaabims(
+            filters: { archived: { ne: true } }
+            pagination: { limit: -1 }
+          ) {
+            data {
+              id
+              attributes { easy price hm kindOf recurring cycleSize sqadualed sqadualedf }
+            }
           }
           sales(pagination: { limit: -1 }) {
             data { id attributes { in date holderStatus } }

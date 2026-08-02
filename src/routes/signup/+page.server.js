@@ -2,16 +2,39 @@ import { redirect, fail } from '@sveltejs/kit';
 import { importInvitedMeeting } from '$lib/server/importInvitedMeeting.js';
 
 import { STRAPI_URL as baseUrl } from '$lib/server/strapiUrl.js';
+import { signupCookieOptions } from '$lib/server/signupCookies.js';
 
-export async function load({ cookies }) {
-  const fpval = cookies.get('fpval');
+export async function load({ cookies, url }) {
+  const opts = signupCookieOptions(url);
+
+  // /hascama also passes the signatory id (and name/countries) in the URL,
+  // because a cookie written by the browser does not always survive the hop —
+  // see signupCookies.js. Re-seat whatever is missing so the action below and
+  // the page's own cookie readers find it.
+  let fpval = cookies.get('fpval');
+  const fromUrl = url.searchParams.get('fp');
+  if (!fpval && fromUrl) {
+    fpval = fromUrl;
+    cookies.set('fpval', fromUrl, { ...opts, httpOnly: true });
+  }
+
   if (!fpval) {
     throw redirect(302, '/hascama');
+  }
+
+  for (const [param, name] of [
+    ['un', 'un'],
+    ['con', 'country']
+  ]) {
+    const value = url.searchParams.get(param);
+    if (value && !cookies.get(name)) {
+      cookies.set(name, value, { ...opts, httpOnly: false });
+    }
   }
 }
 
 export const actions = {
-  default: async ({ request, cookies, fetch }) => {
+  default: async ({ request, cookies, fetch, url }) => {
     const data = await request.formData();
     const email = String(data.get('email') || '')
       .trim()
@@ -21,8 +44,11 @@ export const actions = {
       data.get('displayName') || cookies.get('un') || ''
     ).trim();
 
-    const fpval = cookies.get('fpval');
-    const countryCookie = cookies.get('country') || '';
+    // The form posts back to this same URL, so the ?fp=/&con= fallback from
+    // load() is still available if the cookie never stuck.
+    const fpval = cookies.get('fpval') || url.searchParams.get('fp') || '';
+    const countryCookie =
+      cookies.get('country') || url.searchParams.get('con') || '';
     const countries = countryCookie
       ? countryCookie
           .split(',')

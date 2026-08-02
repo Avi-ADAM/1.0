@@ -490,6 +490,19 @@
     window.location.href = agreementUrl;
   }
 
+  /**
+   * A cookie with no `path`/`SameSite`/`Secure` is the first thing iOS Safari
+   * and in-app browsers throw away. /api/chezin sets the same four values from
+   * the server (see signupCookies.js) — these are the client-side mirror.
+   */
+  function setSignupCookie(name, value) {
+    const expires = new Date(
+      Date.now() + 1000 * 60 * 60 * 24 * 30
+    ).toUTCString();
+    const secure = location.protocol === 'https:' ? '; Secure' : '';
+    document.cookie = `${name}=${value}; expires=${expires}; path=/; SameSite=Lax${secure}`;
+  }
+
   // Form submit handler
   async function handleSubmit() {
     track('tryToSign', {}, { flags: ['tryToSign'] });
@@ -533,25 +546,43 @@
         throw new Error(result.errors[0].message);
       }
 
-      g = false;
-      already = true;
-      const expiresDate = new Date(2027, 0, 1).toUTCString();
-      document.cookie = `email=${mail}; expires=${expiresDate}`;
-      document.cookie = `un=${encodeURIComponent(formName)}; expires=${expiresDate}`;
-      document.cookie = `country=${find_contry_id(selected)}; expires=${expiresDate}`;
+      meData = result?.data?.createChezin;
+      const chezinId = meData?.data?.id;
+      if (!chezinId) {
+        throw new Error('createChezin returned no id');
+      }
+
+      const countries = find_contry_id(selected);
+      setSignupCookie('email', mail);
+      setSignupCookie('un', encodeURIComponent(formName));
+      setSignupCookie('country', countries.join(','));
+      setSignupCookie('fpval', chezinId);
+
       userName.set(formName);
       liUN.set(formName);
       email.set(mail);
-      contriesi.set(find_contry_id(selected));
+      contriesi.set(countries);
+      fpval.set(chezinId);
+      linkos.set(
+        `ref=true&id=${chezinId}&con=${countries}&un=${formName}&em=${mail}`
+      );
+
+      // The id also rides in the URL: /signup's load bounces back to /hascama
+      // when it finds no `fpval`, and the cookie does not always survive.
+      // Only once we are actually there do we tear this screen down — if the
+      // navigation fails the form (and its error box) has to stay standing.
+      await goto(
+        `/signup?fp=${encodeURIComponent(chezinId)}` +
+          `&un=${encodeURIComponent(formName)}` +
+          `&con=${encodeURIComponent(countries.join(','))}`
+      );
+
+      g = false;
+      already = true;
       regHelper.set(1);
-      meData = result.data.createChezin;
-      fpval.set(meData.data.id);
-      document.cookie = `fpval=${meData.data.id}; expires=${expiresDate}`;
-      let linko = `ref=true&id=${$fpval}&con=${find_contry_id(selected)}&un=${$liUN}&em=${$email}`;
-      linkos.set(linko);
-      goto('/signup');
     } catch (error) {
       g = false;
+      already = false;
       erorim.st = true;
       if (!error.response) {
         erorim.msg = $t('home.amana.errors.serverSleep');

@@ -1,5 +1,15 @@
 # PLAN — Mission Equity Preview (שווי צפוי בריקמה)
 
+> **Round 2 (2026-07-30) — resources + the donut.** Owner request: do for
+> **משאבים** what was done for missions, and add an interactive pie chart beside
+> the textual rows. Both are implemented; see §9 for what changed and §4.1 for the
+> chart. In short: the rikma summary now counts resources too
+> (`mashabetahaliches` in the approved/monthly buckets, `open_mashaabims` in the
+> pipeline), the preview takes a `subject` prop that switches the wording to
+> resources, `EquityPie.svelte` draws any scenario/horizon row as a donut, and the
+> resource surfaces (`availiableResorce/[id]`, `ResourceCreator`, `negoPend`,
+> `dowegeot`) carry the widget the way the mission ones do.
+
 > Status: **implemented (steps 1–8, all phases)** — pure math module + tests,
 > `getProjectValueSummary` qid + dedup cache, the reusable `EquityPreview`
 > component (he/en/ar/ru), and all wired integration points: lev cards
@@ -177,10 +187,8 @@ rikma's **flow** rather than of its stock, approached from below and never
 reached. That ceiling is the property worth asserting in tests.
 
 `recurringMonthlyValue` is the `iskvua` slice of `mesimabetahaliches` (so the
-qid selects `iskvua`), i.e. the rikma's standing monthly value flow. Recurring
-*resources* (`rikmash.recurring`) are **not** in it yet — that undercounts the
-rikma's growth and therefore overstates the member's projected share. Revisit if
-recurring resources become common.
+qid selects `iskvua`) **plus** every active recurring-resource engine's ₪/month
+(§9.1), i.e. the rikma's standing monthly value flow.
 
 UI-wise the component takes `monthlyValue` separately from `missionValue`, so a
 non-monthly cycle (a yearly recurring resource in `sugestma`) can pass a cycle
@@ -408,6 +416,90 @@ Cross-checks before finishing:
   autofixer MCP on every new/edited `.svelte` file.
 - No new voting/consent flow is introduced — this is display-only, so the
   Decision-model super-principle is untouched.
+
+## 9. Round 2 — resources & the interactive donut
+
+### 9.1 The rikma summary now counts resources
+
+Until now `summarize()` looked only at missions, so a resource card was diluted
+against a rikma whose resource half was invisible. Added to the
+`getProjectValueSummary` qid and to `summarize()`:
+
+| Source | Filter | Where it lands |
+|---|---|---|
+| `mashabetahaliches` (recurring-resource engines) | `finnished ≠ true`, `forappruval ≠ true`, `recurring = true` | `approvedInProgressValue` **and** `recurringMonthlyValue`, as ₪/month |
+| `open_mashaabims` (open resource requests) | `archived ≠ true` | `openPipelineValue`, as planned value |
+
+- **Engines are pure flow.** A `mashabetahalich` has no `total` — it bills a cycle
+  at a time and each approved cycle is archived onto a `Rikmash` (which is already
+  inside `currentValue`). So it enters as `pricePerUnit / (cycleSize × 12 if
+  yearly)`: one month's worth in the stock *and* the same figure in the flow.
+  That keeps `recurringMonthlyValue ⊆ approvedInProgressValue`, which the horizon
+  math depends on (`oneOffApproved = approved − recurring`), and matches how an
+  `iskvua` mission is counted. `pricePerUnit` is the whole cycle's planned spend —
+  the default the cycle-approval flow reports — so it is **not** multiplied by a
+  quantity.
+- **Open resources are priced like the cards price them:**
+  `computeResourceValue` = asked value (`easy`, else `price`) × quantity (`hm`) ×
+  cycles, where cycles comes from the dated window (`resourceCycles`, the
+  dependency-free twin of the `montsi()` UI helper). An **open-ended recurring**
+  resource has no total at all, so it is priced at a single cycle and the horizon
+  rows carry the long-run picture.
+- Consequence for missions: the `pipeline` baseline ("if everything open is
+  approved") now includes open resources, so its denominator grew. That is the
+  honest number — the row's own label promises exactly that — and the
+  `baselineApproved` copy was updated in all five locales to say *missions and
+  resources*.
+
+### 9.2 `subject` — the same widget, resource wording
+
+`EquityPreview` takes `subject: 'mission' | 'resource'` (default `'mission'`),
+which only picks between literal `$t()` keys: `ofTotal` / `ofTotalResource`,
+`sliceMine` / `sliceMineResource`, and the callers choose their own `titleKey`
+(`resourceShareAtCreation`, `yourShareIfGiven`). No branching on language, no
+inline dictionaries — `npm run check:i18n` sees every key.
+
+### 9.3 The donut — `src/lib/components/equity/EquityPie.svelte`
+
+Two pure functions decompose the *same* numbers the rows show into slices:
+`buildEquityBreakdown(summary, V, { baseline, alreadyCountedIn })` and
+`buildHorizonBreakdown(summary, monthlyValue, months, opts)`. Both derive their
+denominator from the shared `scenarioBase()` helper that `computeEquityScenarios`
+uses, and the tests assert `Σ slices = scenario.base` and
+`mine.pct = scenario.sharePct` — the chart cannot drift from the text. Slices are
+`mine` · `existing` · `approvedOthers` · `pipelineOthers` (or `recurringOthers`
+on a horizon), and the reader's own value is carved out of whichever bucket
+already holds it so it is drawn exactly once. Slices are filled in order with the
+last one absorbing the remainder, so even contradictory inputs (a mission
+"already in the pipeline" worth more than the whole pipeline) shrink a
+neighbouring slice instead of breaking the invariant.
+
+UI rules the component keeps:
+
+- **Text stays primary.** The rows above are the reading; the donut is an extra
+  view of a row the reader picks (rows are buttons; the picked one is tinted, and
+  a caption names the drawn scenario). Collapsible, open by default.
+- **Colour** — one accent for `mine` (orange: light `#eb6834` / dark `#d95926`)
+  and an ordinal blue ramp for the rest of the rikma, darkest = already earned →
+  lightest = merely open, which is also the certainty order. Both modes are
+  stepped and validated separately (CVD separation of accent-vs-every-step ≥ 23
+  ΔE; the ramp passes the ordinal monotonicity/step/contrast checks against each
+  surface). Dark values are declared under both `prefers-color-scheme` and
+  `:root[data-theme='dark']` so the site's theme toggle wins either way.
+- **Identity is never colour-alone.** The legend is also the table view — swatch,
+  name, ₪ and % per slice — and it is the keyboard-accessible control (hover /
+  focus highlights, click pins). The ring itself is `aria-hidden`, with a 2px gap
+  between fills.
+
+### 9.4 Resource surfaces wired
+
+| Surface | V | `alreadyCountedIn` | Label |
+|---|---|---|---|
+| `lev/cards/sugestma.svelte` | accepted/asked value, or the recurring window | `pipeline` (open resources are in `open_mashaabims` now) | `equity.title` |
+| `(regandnon)/availiableResorce/[id]` | `easy‖price × hm × montsi(…)`, one cycle when open-ended | `pipeline` | `equity.title` (public page ⇒ `isSer`) |
+| `resource/ResourceCreator.svelte` | `totalMax` (the asked `easy`), live as the form is typed | `none` | `resourceShareAtCreation` |
+| `prPr/negoPend.svelte` | `totalEasyNew` of the current counter-offer | `pipeline` | `resourceShareAtCreation` |
+| `lev/cards/dowegeot.svelte` | reported/planned cycle spend, or the delivery total | `approved` for a recurring cycle, else `none` | `yourShareIfGiven` |
 
 ## 8. Explicit non-goals
 

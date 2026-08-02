@@ -84,16 +84,36 @@ async function ensureMashaabim(
 }
 
 // ─── recurring-resource helpers ──────────────────────────────────────────
-/** Month/year bounds for the cycle that contains `ref` (default: now). */
-function currentCycleBounds(unit: 'month' | 'year', ref = new Date()) {
+/**
+ * Bounds of the cycle containing `ref`, anchored to `anchor` and stepping by
+ * `size` units. Mirrors /api/monthi's cycleWindow so cycle #1's window aligns
+ * with the windows monthi opens later — otherwise a cycleSize > 1 resource
+ * would get a duplicate first cycle.
+ */
+function currentCycleBounds(
+  unit: 'month' | 'year',
+  anchor: Date,
+  size = 1,
+  ref = new Date()
+) {
+  const step = Math.max(1, Number(size) || 1);
   if (unit === 'year') {
-    const start = new Date(ref.getFullYear(), 0, 1);
-    const end = new Date(ref.getFullYear(), 11, 31, 23, 59, 59);
-    return { cycleStart: start.toISOString(), cycleEnd: end.toISOString() };
+    const since = ref.getFullYear() - anchor.getFullYear();
+    const idx = Math.max(0, Math.floor(since / step));
+    const y = anchor.getFullYear() + idx * step;
+    return {
+      cycleStart: new Date(y, 0, 1).toISOString(),
+      cycleEnd: new Date(y + step - 1, 11, 31, 23, 59, 59).toISOString()
+    };
   }
-  const start = new Date(ref.getFullYear(), ref.getMonth(), 1);
-  const end = new Date(ref.getFullYear(), ref.getMonth() + 1, 0, 23, 59, 59);
-  return { cycleStart: start.toISOString(), cycleEnd: end.toISOString() };
+  const since =
+    (ref.getFullYear() - anchor.getFullYear()) * 12 + (ref.getMonth() - anchor.getMonth());
+  const idx = Math.max(0, Math.floor(since / step));
+  const m = anchor.getMonth() + idx * step;
+  return {
+    cycleStart: new Date(anchor.getFullYear(), m, 1).toISOString(),
+    cycleEnd: new Date(anchor.getFullYear(), m + step, 0, 23, 59, 59).toISOString()
+  };
 }
 
 async function createMashabetahalichRecord(
@@ -212,6 +232,19 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
   const operationName = isPmash ? 'createPmash' : 'createOpenMashaabim';
   const typeName      = isPmash ? 'Pmash'       : 'OpenMashaabim';
 
+  // ── Recurring terms (monthly / yearly) ──────────────────────────────────
+  // Resolved before the payload is built, because `recurring`/`cycleSize` are
+  // stamped on the record itself — on a Pmash *and* on an OpenMashaabim — so a
+  // recurring resource stays recognizably recurring while it is still open for
+  // the community to discover and offer on. The mashabetahalich engine is a
+  // separate, later step: immediately when the creator is also the provider,
+  // otherwise on askm approval (see activateRecurringEngine).
+  const isRecurring =
+    Boolean(recurring) && (kindOf === 'monthly' || kindOf === 'yearly');
+  const cycleUnit: 'month' | 'year' = kindOf === 'yearly' ? 'year' : 'month';
+  const cycleEvery = Math.max(1, Number(cycleSize) || 1);
+  const pricePerUnit = (easy && easy > 0 ? easy : price) || 0;
+
   // ── 2. Build the main resource payload ──────────────────────────────────
   const resourceData: Record<string, unknown> = {
     name,
@@ -231,6 +264,13 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
   if (startDate)    resourceData.sqadualed  = startDate;
   if (endDate)      resourceData.sqadualedf = endDate;
 
+  // Recurrence lives on the record for both kinds, so an OpenMashaabim that is
+  // still looking for a provider carries its own terms into the askm flow.
+  if (isRecurring) {
+    resourceData.recurring = true;
+    resourceData.cycleSize = cycleEvery;
+  }
+
   const locationInput = buildLocationInput(isOnline, lat, lng, radius, location_hint);
   if (locationInput) resourceData.location = locationInput;
 
@@ -242,13 +282,6 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
       order: 0,
       zman:  now
     }];
-    // Recurring expense flag lives on the Pmash so members can negotiate it.
-    // The mashabetahalich engine itself is created on askm approval from the
-    // final (possibly negotiated) Pmash terms — see runResourceAskmAcceptance.
-    if (recurring && (kindOf === 'monthly' || kindOf === 'yearly')) {
-      resourceData.recurring = true;
-      resourceData.cycleSize = cycleSize ?? 1;
-    }
     if (isAssigned) {
       resourceData.isSelfProposal   = true;
       resourceData.selfProposalUser = userId;
@@ -282,17 +315,16 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
   // A recurring resource is modelled as a "mashabetahalich" with recurring=true.
   // Each month /api/monthi opens a cycle (a Maap) that surfaces on the lev screen;
   // the responsible user confirms the amount and it is archived on a Rikmash.
-  const isRecurring =
-    Boolean(recurring) && (kindOf === 'monthly' || kindOf === 'yearly');
-  const cycleUnit: 'month' | 'year' = kindOf === 'yearly' ? 'year' : 'month';
-  const pricePerUnit = (easy && easy > 0 ? easy : price) || 0;
-
-  // Multi-member recurring resources carry `recurring`/`cycleSize` on the Pmash
-  // (set above) and the engine is created on approval — nothing more to do here.
-
-  if (isRecurring && !isPmash) {
-    // Single-member: activate immediately, responsible user = creator. Reuse or
-    // create an Sp so the monthly cycle cards carry the provider's identity.
+  //
+  // The engine is only spun up here when a provider is already known, i.e. the
+  // solo creator assigned the resource to themselves. Without that, the resource
+  // is a standing *need* looking for someone to cover it: the OpenMashaabim must
+  // stay open so it keeps showing on the hub map, the lev feed and
+  // /availiableResorce/[id], and the engine is created on askm approval instead
+  // (activateRecurringEngine) — exactly like the multi-member Pmash path.
+  if (isRecurring && !isPmash && isAssigned) {
+    // Responsible user = creator. Reuse or create an Sp so the monthly cycle
+    // cards carry the provider's identity.
     let spId = existingSpId ?? null;
     if (!spId) {
       const spData = await gql(f, jwt, `
@@ -330,14 +362,19 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
       recurring: true,
       start: startDate || now,
       ...(endDate ? { end: endDate } : {}),
-      cycleSize: 1,
+      cycleSize: cycleEvery,
       pricePerUnit,
       finnished: false,
       publishedAt: now
     });
 
-    // Open the first cycle (current month) so the card shows on lev right away.
-    const { cycleStart, cycleEnd } = currentCycleBounds(cycleUnit);
+    // Open the first cycle so the card shows on lev right away, anchored to the
+    // start date so a cycleSize > 1 resource lines up with monthi's windows.
+    const { cycleStart, cycleEnd } = currentCycleBounds(
+      cycleUnit,
+      startDate ? new Date(startDate) : new Date(now),
+      cycleEvery
+    );
     await gql(f, jwt, `
       mutation MrCreateCycleMaap($data: MaapInput!) { createMaap(data: $data) { data { id } } }
     `, {
@@ -354,13 +391,10 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
       }
     });
 
-    // The OpenMashaabim is vestigial for a recurring resource — the engine + its
-    // monthly cycle Maaps drive the card. Archive it so it doesn't linger as an
-    // open need on the lev screen.
-    await gql(f, jwt, `
-      mutation ArchiveOm($id: ID!) { updateOpenMashaabim(id: $id, data: { archived: true }) { data { id } } }
-    `, { id: createdId });
-
+    // The OpenMashaabim is vestigial once the engine exists — the engine + its
+    // cycle Maaps drive the card. It was already created archived (`archived:
+    // isAssigned` above, and this branch only runs when isAssigned), so there is
+    // nothing left to close.
     return { ...createdRecord, mashabetahalichId, recurring: true };
   }
 

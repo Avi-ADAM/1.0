@@ -10,6 +10,8 @@
   import { onMount } from 'svelte';
   import { email } from '$lib/components/registration/email.js';
   import { linkos } from '$lib/stores/linkos.js';
+  import { fpval } from '$lib/components/registration/fpval.js';
+  import { t } from '$lib/translations';
 
   let user = 0;
 
@@ -81,6 +83,13 @@
   regHelper.subscribe((value) => {
     regHelperL = value;
   });
+
+  // regHelperL === 1 means the signature was recorded and we are on our way to
+  // /signup. Without this the page rendered nothing at all — a bare hearts
+  // background — whenever that navigation did not land.
+  let signupHref = $derived(
+    $fpval ? `/signup?fp=${encodeURIComponent($fpval)}` : '/signup'
+  );
 
   /*function toggle() {
 
@@ -154,6 +163,15 @@ regHelperL = 0;
     <Amana1 />
   {:else if regHelperL == -1}
     <Mobile />
+  {:else}
+    <div class="handoff">
+      <div class="handoff-heart">💗</div>
+      <h2>{$t('home.amana.redirect.title')}</h2>
+      <p>{$t('home.amana.redirect.hint')}</p>
+      <a class="handoff-link" href={signupHref}
+        >{$t('home.amana.redirect.link')}</a
+      >
+    </div>
   {/if}
 </div>
 
@@ -173,6 +191,56 @@ regHelperL = 0;
   *:after,
   *:before {
     box-sizing: border-box;
+  }
+
+  .handoff {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem;
+    text-align: center;
+    background: rgba(26, 10, 46, 0.85);
+    color: #fff;
+    font-family: 'Rubik', sans-serif;
+  }
+
+  .handoff-heart {
+    font-size: 3rem;
+    animation: handoffBeat 1.6s ease-in-out infinite;
+  }
+
+  @keyframes handoffBeat {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.15);
+    }
+  }
+
+  .handoff h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #ffd700;
+  }
+
+  .handoff p {
+    margin: 0;
+    max-width: 32ch;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .handoff-link {
+    padding: 0.85rem 2rem;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #ff00ae, #ffb800);
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
   }
 
   @media (min-width: 1100px) {

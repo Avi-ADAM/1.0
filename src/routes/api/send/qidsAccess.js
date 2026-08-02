@@ -408,6 +408,7 @@ export const qidsAccess = {
   'mrUpdateRikmash': { allow: ['user', 'serviceAdmin'] },
   'mrLinkRikmashToMashabetahalich': { allow: ['user', 'serviceAdmin'] },
   'mrGetPmashRecurringTerms': { allow: ['user', 'serviceAdmin'] },
+  'mrGetOpenMashaabimRecurringTerms': { allow: ['user', 'serviceAdmin'] },
   'mrUpdateCycleMaap': { allow: ['user', 'serviceAdmin'] },
   'mrCreateCycleTimegrama': { allow: ['user', 'serviceAdmin'] },
   'mrLinkMaapTimegrama': { allow: ['user', 'serviceAdmin'] },

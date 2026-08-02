@@ -12,15 +12,23 @@
 export interface ProjectValueSummary {
   /** Σ finnished_missions.total + Σ rikmashes.total — matches split page. */
   currentValue: number;
-  /** Σ mesimabetahalich(finnished≠true, forappruval≠true) hoursassinged×perhour. */
+  /**
+   * Approved-but-not-yet-landed value: Σ mesimabetahalich(finnished≠true,
+   * forappruval≠true) hoursassinged×perhour **plus** the monthly equivalent of
+   * every active recurring-resource engine (mashabetahalich).
+   */
   approvedInProgressValue: number;
-  /** Σ open_missions (noofhours×perhour) — the still-open pipeline. */
+  /**
+   * The still-open pipeline: Σ open_missions (noofhours×perhour) **plus** the
+   * planned value of every open resource request (open_mashaabim).
+   */
   openPipelineValue: number;
   /**
-   * Σ of the **recurring** (`iskvua`) in-progress missions' monthly value — how
-   * much value the rikma adds every month from standing commitments. A subset
-   * of {@link approvedInProgressValue}. Drives the multi-year horizons: without
-   * it the rikma would look frozen while the member keeps accruing, and every
+   * Σ of the **recurring** in-progress work's monthly value — the `iskvua`
+   * missions plus the recurring-resource engines. How much value the rikma adds
+   * every month from standing commitments; a subset of
+   * {@link approvedInProgressValue}. Drives the multi-year horizons: without it
+   * the rikma would look frozen while the member keeps accruing, and every
    * projection would converge on 100%.
    */
   recurringMonthlyValue: number;
@@ -91,6 +99,34 @@ function shareOf(missionValue: number, base: number): number {
 }
 
 /**
+ * The denominator one baseline dilutes against. The single definition of each
+ * base, so the scenario rows and the pie slices can never drift apart.
+ */
+function scenarioBase(
+  summary: ProjectValueSummary,
+  V: number,
+  baseline: EquityBaseline,
+  alreadyCountedIn: AlreadyCountedIn
+): number {
+  const current = num(summary?.currentValue);
+  const approvedInProgress = num(summary?.approvedInProgressValue);
+  const openPipeline = num(summary?.openPipelineValue);
+
+  // 'current': the mission is never part of currentValue, so always add V.
+  if (baseline === 'current') return current + V;
+
+  // 'approved': add V unless the mission already sits inside approvedInProgress.
+  if (baseline === 'approved') {
+    return current + approvedInProgress + (alreadyCountedIn === 'approved' ? 0 : V);
+  }
+
+  // 'pipeline': add V unless the mission already sits inside a counted bucket.
+  return (
+    current + approvedInProgress + openPipeline + (alreadyCountedIn === 'none' ? V : 0)
+  );
+}
+
+/**
  * Build the equity scenarios for a mission worth `missionValue` in a rikma
  * described by `summary`. Dilution model — "if the mission were completed today".
  */
@@ -100,40 +136,19 @@ export function computeEquityScenarios(
   opts: ComputeEquityOptions = {}
 ): EquityScenario[] {
   const alreadyCountedIn = opts.alreadyCountedIn ?? 'none';
-
-  const current = num(summary?.currentValue);
-  const approvedInProgress = num(summary?.approvedInProgressValue);
-  const openPipeline = num(summary?.openPipelineValue);
   const V = num(missionValue);
-
-  // 'current': the mission is never part of currentValue, so always add V.
-  const currentBase = current + V;
-
-  // 'approved': add V unless the mission already sits inside approvedInProgress.
-  const approvedBase =
-    current + approvedInProgress + (alreadyCountedIn === 'approved' ? 0 : V);
-
-  // 'pipeline': add V unless the mission already sits inside a counted bucket.
-  const pipelineBase =
-    current +
-    approvedInProgress +
-    openPipeline +
-    (alreadyCountedIn === 'none' ? V : 0);
 
   const estimate = summary?.monthlyIncomeEstimate ?? null;
   const monthly = (pct: number): number | null =>
     estimate != null && Number.isFinite(estimate) ? (pct / 100) * estimate : null;
 
-  const build = (baseline: EquityBaseline, base: number): EquityScenario => {
+  const build = (baseline: EquityBaseline): EquityScenario => {
+    const base = scenarioBase(summary, V, baseline, alreadyCountedIn);
     const sharePct = shareOf(V, base);
     return { baseline, base, sharePct, monthlyEstimate: monthly(sharePct) };
   };
 
-  return [
-    build('current', currentBase),
-    build('approved', approvedBase),
-    build('pipeline', pipelineBase)
-  ];
+  return [build('current'), build('approved'), build('pipeline')];
 }
 
 /**
@@ -196,6 +211,153 @@ export function computeEquityHorizons(
 }
 
 // ---------------------------------------------------------------------------
+// Breakdown — the same numbers as the scenarios above, decomposed into the
+// slices a pie chart can draw. Kept next to the scenario math so the two can
+// never disagree: Σ slices is asserted to equal the scenario's `base`, and the
+// 'mine' slice's percentage *is* the scenario's `sharePct`.
+// ---------------------------------------------------------------------------
+
+/**
+ * The parts a rikma's projected value splits into, from the viewer's angle:
+ *  - `mine`            the mission/resource being previewed.
+ *  - `existing`        what the rikma is already worth today.
+ *  - `approvedOthers`  other approved-and-in-progress work.
+ *  - `pipelineOthers`  everything else still open on offer.
+ *  - `recurringOthers` (horizons only) the rikma's other standing monthly work,
+ *                      accumulated over the horizon.
+ */
+export type EquitySliceKey =
+  | 'mine'
+  | 'existing'
+  | 'approvedOthers'
+  | 'pipelineOthers'
+  | 'recurringOthers';
+
+export interface EquitySlice {
+  key: EquitySliceKey;
+  value: number;
+  /** 0..100 — this slice's share of {@link EquityBreakdown.total}. */
+  pct: number;
+}
+
+export interface EquityBreakdown {
+  /** Which scenario this decomposes; 'horizon' for a projected month count. */
+  baseline: EquityBaseline | 'horizon';
+  /** Months projected — only set when `baseline === 'horizon'`. */
+  months: number | null;
+  /** Σ of every slice — equals the matching scenario/horizon `base`. */
+  total: number;
+  /** The `mine` slice's percentage — equals the scenario's `sharePct`. */
+  sharePct: number;
+  /** Non-zero slices, `mine` first. */
+  slices: EquitySlice[];
+}
+
+/** Drop empty slices and attach each one's percentage of the total. */
+function toSlices(
+  total: number,
+  parts: Array<{ key: EquitySliceKey; value: number }>
+): EquitySlice[] {
+  return parts
+    .filter((p) => p.value > 0)
+    .map((p) => ({
+      key: p.key,
+      value: p.value,
+      pct: total > 0 ? Math.min(100, (p.value / total) * 100) : 0
+    }));
+}
+
+/**
+ * Decompose one scenario into pie slices. Mirrors
+ * {@link computeEquityScenarios} exactly — same inputs, same denominator, just
+ * itemised.
+ */
+export function buildEquityBreakdown(
+  summary: ProjectValueSummary,
+  missionValue: number,
+  opts: ComputeEquityOptions & { baseline?: EquityBaseline } = {}
+): EquityBreakdown {
+  const baseline = opts.baseline ?? 'current';
+  const alreadyCountedIn = opts.alreadyCountedIn ?? 'none';
+
+  const V = num(missionValue);
+  const existing = num(summary?.currentValue);
+  // The scenario's denominator is authoritative; the slices are that same
+  // number itemised, so they are filled in order and the last one absorbs the
+  // remainder. Nonsensical inputs (a mission "already in the pipeline" that is
+  // worth more than the whole pipeline) then shrink a neighbouring slice instead
+  // of breaking the invariant Σ slices = base.
+  const total = scenarioBase(summary, V, baseline, alreadyCountedIn);
+
+  // The mission's own value is carved out of whichever bucket already holds it,
+  // so it appears exactly once — as the `mine` slice.
+  const approvedAll = num(summary?.approvedInProgressValue);
+  const remainder = Math.max(0, total - V - existing);
+  const approvedOthers =
+    baseline === 'current'
+      ? 0
+      : Math.min(
+          remainder,
+          Math.max(0, approvedAll - (alreadyCountedIn === 'approved' ? V : 0))
+        );
+  const pipelineOthers =
+    baseline === 'pipeline' ? Math.max(0, remainder - approvedOthers) : 0;
+
+  return {
+    baseline,
+    months: null,
+    total,
+    sharePct: shareOf(V, total),
+    slices: toSlices(total, [
+      { key: 'mine', value: V },
+      { key: 'existing', value: existing },
+      { key: 'approvedOthers', value: approvedOthers },
+      { key: 'pipelineOthers', value: pipelineOthers }
+    ])
+  };
+}
+
+/**
+ * Decompose one recurring horizon into pie slices. Mirrors
+ * {@link computeEquityHorizons} for the same `months`.
+ */
+export function buildHorizonBreakdown(
+  summary: ProjectValueSummary,
+  monthlyValue: number,
+  months: number,
+  opts: ComputeEquityOptions = {}
+): EquityBreakdown {
+  const alreadyCountedIn = opts.alreadyCountedIn ?? 'none';
+  const monthly = num(monthlyValue);
+  const n = num(months);
+
+  const existing = num(summary?.currentValue);
+  const approvedAll = num(summary?.approvedInProgressValue);
+  const recurring = num(summary?.recurringMonthlyValue);
+  const oneOffApproved = Math.max(0, approvedAll - recurring);
+
+  const rikmaMonthly = recurring + (alreadyCountedIn === 'approved' ? 0 : monthly);
+  const mine = monthly * n;
+  // Everything the *rest* of the rikma accrues over the same window.
+  const recurringOthers = Math.max(0, (rikmaMonthly - monthly) * n);
+
+  const total = existing + oneOffApproved + rikmaMonthly * n;
+
+  return {
+    baseline: 'horizon',
+    months: n,
+    total,
+    sharePct: shareOf(mine, total),
+    slices: toSlices(total, [
+      { key: 'mine', value: mine },
+      { key: 'existing', value: existing },
+      { key: 'approvedOthers', value: oneOffApproved },
+      { key: 'recurringOthers', value: recurringOthers }
+    ])
+  };
+}
+
+// ---------------------------------------------------------------------------
 // summarize() — GraphQL payload → ProjectValueSummary. Lives here (not in the
 // store) so it is unit-testable with fixture payloads. See PLAN §3.2.
 // ---------------------------------------------------------------------------
@@ -217,6 +379,19 @@ export interface RawProjectValue {
     noofhours?: number | null;
     perhour?: number | null;
   }> | null;
+  /**
+   * Recurring-resource engines (`recurring: true`, one per standing expense).
+   * `pricePerUnit` is **one cycle's** spend, a cycle being `cycleSize`
+   * months — or years when `kindOf: 'yearly'`.
+   */
+  mashabetahaliches?: RawCollection<{
+    pricePerUnit?: number | null;
+    cycleSize?: number | null;
+    kindOf?: string | null;
+    recurring?: boolean | null;
+  }> | null;
+  /** Open resource requests still on offer — the resource half of the pipeline. */
+  open_mashaabims?: RawCollection<RawResourceTerms> | null;
   sales?: RawCollection<{
     in?: number | null;
     date?: string | null;
@@ -226,6 +401,89 @@ export interface RawProjectValue {
     price?: number | null;
     kindOf?: string | null;
   }> | null;
+}
+
+// ---------------------------------------------------------------------------
+// Resources — a resource's value is not hours×rate. Its terms decide whether the
+// asked price is a one-off, a per-unit price, or a per-cycle expense.
+// ---------------------------------------------------------------------------
+
+/** The value-bearing terms shared by OpenMashaabim / Sp / Pmash rows. */
+export interface RawResourceTerms {
+  /** The rikma's asked value (`easy`) — preferred over the market `price`. */
+  easy?: number | null;
+  price?: number | null;
+  /** Quantity ("how many"). */
+  hm?: number | null;
+  /** 'total' | 'perUnit' | 'monthly' | 'yearly' | 'rent'. */
+  kindOf?: string | null;
+  recurring?: boolean | null;
+  /** Every N months (or years for `kindOf: 'yearly'`). */
+  cycleSize?: number | null;
+  /** Window start / end — a dated monthly/rent/yearly resource has a cycle count. */
+  sqadualed?: string | null;
+  sqadualedf?: string | null;
+}
+
+/** Average days per month / per year — matches `createResource.ts`'s divisors. */
+const DAYS_PER_MONTH = 30.44;
+const DAYS_PER_YEAR = 365.25;
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+/**
+ * How many cycles a dated resource window spans (1 when undated or one-off).
+ * `montsi()` (the UI helper) computes the same figure with moment; the tiny
+ * difference on partial months is invisible here — these cycles only ever
+ * aggregate *other* resources into the rikma's totals, never the previewed one,
+ * whose value its host component supplies directly.
+ */
+export function resourceCycles(terms: RawResourceTerms | null | undefined): number {
+  const kind = terms?.kindOf ?? 'total';
+  if (kind !== 'monthly' && kind !== 'yearly' && kind !== 'rent') return 1;
+  const start = terms?.sqadualed ? new Date(terms.sqadualed) : null;
+  const end = terms?.sqadualedf ? new Date(terms.sqadualedf) : null;
+  if (!start || !end || Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+    return 1;
+  }
+  const days = (end.getTime() - start.getTime()) / MS_PER_DAY;
+  if (!(days > 0)) return 1;
+  const cycles = days / (kind === 'yearly' ? DAYS_PER_YEAR : DAYS_PER_MONTH);
+  return cycles > 0 ? cycles : 1;
+}
+
+/**
+ * A resource's planned value: asked price × quantity × cycles. Mirrors what the
+ * cards show (`price × hm × montsi(…)`) and what lands in `Rikmash.total` on
+ * acceptance.
+ *
+ * An **open-ended recurring** resource (recurring, no end date) has no total to
+ * speak of — it bills forever — so it is priced at a single cycle here, and the
+ * horizon rows are what give the honest long-run picture.
+ */
+export function computeResourceValue(terms: RawResourceTerms | null | undefined): number {
+  const perCycle = num(terms?.easy) || num(terms?.price);
+  if (perCycle <= 0) return 0;
+  const quantity = Math.max(1, num(terms?.hm) || 1);
+  return perCycle * quantity * resourceCycles(terms);
+}
+
+/**
+ * A recurring resource's ₪/month — what it adds to the rikma's monthly flow.
+ * A cycle covers `cycleSize` months (or years when `kindOf: 'yearly'`), so a
+ * quarterly ₪300 expense is ₪100/month and a yearly ₪1,200 one is ₪100/month.
+ * Returns 0 for anything that isn't a recurring monthly/yearly resource.
+ */
+export function computeResourceMonthlyValue(
+  terms: RawResourceTerms | null | undefined
+): number {
+  const kind = terms?.kindOf ?? '';
+  if (kind !== 'monthly' && kind !== 'yearly') return 0;
+  const perCycle = num(terms?.easy) || num(terms?.price);
+  if (perCycle <= 0) return 0;
+  const quantity = Math.max(1, num(terms?.hm) || 1);
+  const cycleMonths =
+    Math.max(1, num(terms?.cycleSize) || 1) * (kind === 'yearly' ? 12 : 1);
+  return (perCycle * quantity) / cycleMonths;
 }
 
 /**
@@ -340,20 +598,34 @@ export function summarize(
     sumAttr(raw?.finnished_missions, (a) => num(a.total)) +
     sumAttr(raw?.rikmashes, (a) => num(a.total));
 
-  const approvedInProgressValue = sumAttr(
-    raw?.mesimabetahaliches,
-    (a) => num(a.hoursassinged) * num(a.perhour)
+  // A recurring-resource engine has no total — it bills a cycle at a time — so
+  // it enters both buckets below as its ₪/month equivalent. That keeps
+  // recurringMonthlyValue a true subset of approvedInProgressValue (the horizon
+  // math subtracts one from the other) and matches how an `iskvua` mission is
+  // counted: one month's worth in the stock, the same figure in the flow.
+  // `pricePerUnit` is the whole cycle's planned spend (that is the default the
+  // cycle-approval flow reports), so it is not multiplied by a quantity here.
+  const recurringResourceMonthly = sumAttr(raw?.mashabetahaliches, (a) =>
+    computeResourceMonthlyValue({
+      easy: a.pricePerUnit,
+      kindOf: a.kindOf ?? 'monthly',
+      cycleSize: a.cycleSize
+    })
   );
+
+  const approvedInProgressValue =
+    sumAttr(raw?.mesimabetahaliches, (a) => num(a.hoursassinged) * num(a.perhour)) +
+    recurringResourceMonthly;
 
   // The recurring slice of the same bucket — the rikma's monthly value flow.
-  const recurringMonthlyValue = sumAttr(raw?.mesimabetahaliches, (a) =>
-    a.iskvua === true ? num(a.hoursassinged) * num(a.perhour) : 0
-  );
+  const recurringMonthlyValue =
+    sumAttr(raw?.mesimabetahaliches, (a) =>
+      a.iskvua === true ? num(a.hoursassinged) * num(a.perhour) : 0
+    ) + recurringResourceMonthly;
 
-  const openPipelineValue = sumAttr(
-    raw?.open_missions,
-    (a) => num(a.noofhours) * num(a.perhour)
-  );
+  const openPipelineValue =
+    sumAttr(raw?.open_missions, (a) => num(a.noofhours) * num(a.perhour)) +
+    sumAttr(raw?.open_mashaabims, (a) => computeResourceValue(a));
 
   const income = computeMonthlyIncome(raw?.sales, raw?.matanotofs, now);
 

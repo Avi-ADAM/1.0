@@ -10,6 +10,7 @@
   import Button from '$lib/celim/ui/button.svelte';
   import NumberInput from '$lib/celim/ui/numberInput.svelte';
   import LocationPicker from '$lib/components/location/LocationPicker.svelte';
+  import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
   import moment from 'moment';
 
   /**
@@ -169,6 +170,19 @@
                 )
               ).toFixed(2)
             : mx;
+    })()
+  );
+
+  // ₪ לחודש עבור הצגת השווי בריקמה — רק להוצאה מתחדשת בלי תאריך סיום, שממשיכה
+  // לחייב ללא הגבלה ולכן נמדדת בזרימה חודשית ולא בסכום חד-פעמי.
+  let equityMonthlyValue = $derived(
+    (() => {
+      if (!isRecurring || endDate) return null;
+      const per = maxInvestment > 0 ? maxInvestment : price;
+      if (!(per > 0)) return null;
+      const months =
+        Math.max(1, Number(cycleSize) || 1) * (kindOf === 'yearly' ? 12 : 1);
+      return per / months;
     })()
   );
 
@@ -844,6 +858,19 @@
             >
           </div>
         </div>
+
+        <!-- כמה מהריקמה יהיה שווה המשאב הזה — מתעדכן בזמן אמת עם הטופס.
+             השווי הוא סכום ההשקעה המבוקש (easy), כפי שנרשם על המשאב. -->
+        {#if projectId && totalMax > 0}
+          <EquityPreview
+            projectId={String(projectId)}
+            missionValue={+totalMax || 0}
+            monthlyValue={equityMonthlyValue}
+            alreadyCountedIn="none"
+            subject="resource"
+            titleKey="equity.resourceShareAtCreation"
+          />
+        {/if}
       </div>
 
       <div class="flex gap-4 pt-4">

@@ -9,6 +9,7 @@
   // Modernization Imports
   import CardHeader from './CardHeader.svelte';
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
+  import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
   import { getProjectData } from '$lib/stores/projectStore';
 
   /**
@@ -107,6 +108,19 @@
   let reportInput = $state(/** @type {number | null} */ (null));
   const plannedDefault = $derived(Number(quantityDelivered || pricePerUnit || 0));
   const effectiveAmount = $derived(reportInput ?? plannedDefault);
+  // שווי המשאב עבור "החלק שלך בריקמה": מחזור מתחדש נמדד בסכום המדווח/מתוכנן
+  // לחודש הזה, ואספקה חד-פעמית לפי אותו חישוב שמוצג בשורת הכסף שמעליה.
+  const equityValue = $derived(
+    isRecurringCycle
+      ? Number(effectiveAmount) || 0
+      : kindOf === 'perUnit'
+        ? (Number(agprice) || 0) * (Number(hm) || 1)
+        : kindOf === 'monthly'
+          ? (Number(agprice) || 0) * (Number(monts) || 1)
+          : kindOf === 'yearly'
+            ? (Number(agprice) || 0) * (Number(yers) || 1)
+            : Number(agprice) || 0
+  );
   function report() {
     already = true;
     onReport?.({ amount: Number(effectiveAmount) || 0 });
@@ -380,6 +394,22 @@
           </p>
         {/if}
       </div>
+
+      <!-- שווי צפוי בריקמה — מה החלק שהמשאב הזה מקנה בריקמה. מחזור של הוצאה
+           מתחדשת כבר נמנה בזרימה החודשית של הריקמה (alreadyCountedIn="approved"),
+           ואילו אספקה חד-פעמית עוד לא נמצאת באף דלי. -->
+      {#if projectId && equityValue > 0}
+        <EquityPreview
+          {projectId}
+          missionValue={equityValue}
+          monthlyValue={isRecurringCycle ? equityValue : null}
+          alreadyCountedIn={isRecurringCycle ? 'approved' : 'none'}
+          subject="resource"
+          titleKey="equity.yourShareIfGiven"
+          compact={isMobileOrTablet()}
+          onHover={(x) => hover(x)}
+        />
+      {/if}
 
       <!-- Notes -->
       {#if spnot !== null && spnot !== 'null' && spnot !== 'undefined' && spnot !== undefined}

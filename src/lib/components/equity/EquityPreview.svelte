@@ -13,23 +13,28 @@
   import {
     computeEquityScenarios,
     computeEquityHorizons,
+    buildEquityBreakdown,
+    buildHorizonBreakdown,
     formatSharePct,
     INCOME_WINDOW_MONTHS
   } from '$lib/equity/computeMissionEquity.js';
   import { getProjectValueSummary } from '$lib/equity/projectValueStore.svelte.js';
+  import EquityPie from './EquityPie.svelte';
 
   /**
    * @typedef {import('$lib/equity/computeMissionEquity.js').ProjectValueSummary} ProjectValueSummary
    *
    * @typedef {Object} Props
    * @property {string|number|null|undefined} projectId - rikma id; falsy ⇒ render nothing (e.g. concierge missions with no project).
-   * @property {number} missionValue - the mission's value V (₪). For a recurring mission this is **one month's** worth.
-   * @property {number|null} [monthlyValue] - ₪/month for an open-ended recurring mission (`iskvua`), which unlocks the 1/2/5-year rows. Usually the same number as `missionValue`; pass the per-month equivalent when the cycle isn't monthly. Null/0 ⇒ one-off, no horizons.
+   * @property {number} missionValue - the mission's (or resource's) value V (₪). For a recurring one this is **one cycle's** worth.
+   * @property {number|null} [monthlyValue] - ₪/month for an open-ended recurring mission (`iskvua`) or resource, which unlocks the 1/2/5-year rows. Usually the same number as `missionValue`; pass the per-month equivalent when the cycle isn't monthly. Null/0 ⇒ one-off, no horizons.
    * @property {'none'|'approved'|'pipeline'} [alreadyCountedIn] - where the mission already lives, to avoid double-counting.
+   * @property {'mission'|'resource'} [subject] - what is being previewed; only changes the wording.
    * @property {ProjectValueSummary|null} [summary] - preloaded summary; skips the fetch when provided.
    * @property {boolean} [compact] - single-line chip that expands on click.
    * @property {boolean} [isSer] - use the service token (public availableMission page).
    * @property {string} [titleKey] - i18n key for the heading (default 'equity.title').
+   * @property {boolean} [chart] - draw the interactive donut under the rows (default true).
    * @property {((x: any) => void)|null} [onHover] - passthrough for the lev cards' hover hint.
    */
 
@@ -39,10 +44,12 @@
     missionValue,
     monthlyValue = null,
     alreadyCountedIn = 'none',
+    subject = 'mission',
     summary = null,
     compact = false,
     isSer = false,
     titleKey = 'equity.title',
+    chart = true,
     onHover = null
   } = $props();
 
@@ -108,8 +115,12 @@
   // twelfth of it as monthlyValue — there "monthly value" would be a lie.
   const valueIsMonthly = $derived(perMonth > 0 && Math.abs(perMonth - value) < 0.5);
   function detail(scenario) {
-    return valueIsMonthly
-      ? $t('equity.ofTotalMonthly', { value: fmtNum(value), total: fmtNum(scenario.base) })
+    if (valueIsMonthly) {
+      return $t('equity.ofTotalMonthly', { value: fmtNum(value), total: fmtNum(scenario.base) });
+    }
+    // Literal keys (not a lookup table) so `npm run check:i18n` can see them.
+    return subject === 'resource'
+      ? $t('equity.ofTotalResource', { value: fmtNum(value), total: fmtNum(scenario.base) })
       : $t('equity.ofTotal', { value: fmtNum(value), total: fmtNum(scenario.base) });
   }
   function horizonDetail(h) {
@@ -141,6 +152,72 @@
   function hover(x) {
     onHover?.(x);
   }
+
+  // ── the donut ────────────────────────────────────────────────────────────
+  // Text first, chart second: the rows above stay the primary reading, and the
+  // donut draws whichever of them the reader selects (a scenario baseline, or
+  // one of the recurring horizons).
+  /** Which row the donut draws: a baseline, or `h<months>` for a horizon. */
+  let selected = $state(
+    /** @type {'current'|'approved'|'pipeline'|`h${number}`} */ ('current')
+  );
+  let chartOpen = $state(true);
+
+  // Keep the selection valid when the rows change under it (a nego round can
+  // remove the pipeline row, a mission can stop being recurring).
+  const selectedScenario = $derived(
+    selected === 'pipeline' && !showPipeline ? 'current' : selected
+  );
+  const selectedHorizonMonths = $derived(
+    typeof selectedScenario === 'string' && selectedScenario.startsWith('h')
+      ? Number(selectedScenario.slice(1))
+      : null
+  );
+  const activeHorizon = $derived(
+    selectedHorizonMonths != null
+      ? (horizons.find((h) => h.months === selectedHorizonMonths) ?? null)
+      : null
+  );
+
+  const breakdown = $derived(
+    !fetched
+      ? null
+      : activeHorizon
+        ? buildHorizonBreakdown(fetched, perMonth, activeHorizon.months, { alreadyCountedIn })
+        : buildEquityBreakdown(fetched, value, {
+            alreadyCountedIn,
+            baseline: /** @type {'current'|'approved'|'pipeline'} */ (
+              selectedHorizonMonths != null ? 'current' : selectedScenario
+            )
+          })
+  );
+
+  // Literal $t() calls per slice so `npm run check:i18n` can see every key.
+  function sliceLabel(key) {
+    if (key === 'mine') {
+      return subject === 'resource' ? $t('equity.sliceMineResource') : $t('equity.sliceMine');
+    }
+    if (key === 'existing') return $t('equity.sliceExisting');
+    if (key === 'approvedOthers') return $t('equity.sliceApprovedOthers');
+    if (key === 'recurringOthers') return $t('equity.sliceRecurringOthers');
+    return $t('equity.slicePipelineOthers');
+  }
+
+  const pieSlices = $derived(
+    (breakdown?.slices ?? []).map((s) => ({ ...s, label: sliceLabel(s.key) }))
+  );
+
+  // What the donut is currently drawing — named in visible text, so a reader who
+  // scrolled past the rows still knows which scenario the wedges belong to.
+  const chartCaption = $derived(
+    activeHorizon
+      ? horizonLabel(activeHorizon.months)
+      : selectedScenario === 'approved'
+        ? $t('equity.baselineApproved')
+        : selectedScenario === 'pipeline'
+          ? $t('equity.baselinePipeline')
+          : $t('equity.baselineCurrent')
+  );
 </script>
 
 <!-- render nothing until we have data, or if it failed / value is non-positive -->
@@ -171,64 +248,84 @@
         <span>{heading}</span>
       </div>
 
+      <!-- Rows 1–3 double as the chart's selector: picking one redraws the
+           donut for that scenario. They stay readable on their own. -->
       <!-- 1. current value -->
       {#if current}
-        <div
-          class="flex flex-wrap items-baseline gap-x-2 cursor-help"
+        <button
+          type="button"
+          class="row"
+          class:picked={chart && chartOpen && selectedScenario === 'current'}
+          aria-pressed={chart && chartOpen && selectedScenario === 'current'}
+          onclick={(e) => {
+            e.stopPropagation();
+            selected = 'current';
+          }}
           onmouseenter={() => hover($t('equity.baselineCurrent'))}
           onmouseleave={() => hover('0')}
-          role="contentinfo"
         >
           <span class="text-gray-700 dark:text-gray-200">{$t('equity.baselineCurrent')}</span>
           <span class="font-bold text-gold">{formatSharePct(current.sharePct)}</span>
           <span class="text-xs text-gray-400 dark:text-gray-500">({detail(current)})</span>
           {#if monthly(current)}
-            <span class="text-xs text-emerald-600 dark:text-emerald-400" title={estimateNote}>
+            <span class="text-xs text-emerald-600 dark:text-emerald-400">
               {monthly(current)}
             </span>
           {/if}
-        </div>
+        </button>
       {/if}
 
       <!-- 2. including approved & in-progress -->
       {#if approved}
-        <div
-          class="flex flex-wrap items-baseline gap-x-2 cursor-help"
+        <button
+          type="button"
+          class="row"
+          class:picked={chart && chartOpen && selectedScenario === 'approved'}
+          aria-pressed={chart && chartOpen && selectedScenario === 'approved'}
+          onclick={(e) => {
+            e.stopPropagation();
+            selected = 'approved';
+          }}
           onmouseenter={() => hover($t('equity.baselineApproved'))}
           onmouseleave={() => hover('0')}
-          role="contentinfo"
         >
           <span class="text-gray-700 dark:text-gray-200">{$t('equity.baselineApproved')}</span>
           <span class="font-bold text-gray-800 dark:text-gray-100">{formatSharePct(approved.sharePct)}</span>
           <span class="text-xs text-gray-400 dark:text-gray-500">({detail(approved)})</span>
           {#if monthly(approved)}
-            <span class="text-xs text-emerald-600 dark:text-emerald-400" title={estimateNote}>
+            <span class="text-xs text-emerald-600 dark:text-emerald-400">
               {monthly(approved)}
             </span>
           {/if}
-        </div>
+        </button>
       {/if}
 
       <!-- 3. optional: whole open pipeline -->
       {#if showPipeline && pipeline}
-        <div
-          class="flex flex-wrap items-baseline gap-x-2 text-gray-500 dark:text-gray-400 cursor-help"
+        <button
+          type="button"
+          class="row text-gray-500 dark:text-gray-400"
+          class:picked={chart && chartOpen && selectedScenario === 'pipeline'}
+          aria-pressed={chart && chartOpen && selectedScenario === 'pipeline'}
+          onclick={(e) => {
+            e.stopPropagation();
+            selected = 'pipeline';
+          }}
           onmouseenter={() => hover($t('equity.baselinePipeline'))}
           onmouseleave={() => hover('0')}
-          role="contentinfo"
         >
           <span>{$t('equity.baselinePipeline')}</span>
           <span class="font-semibold">{formatSharePct(pipeline.sharePct)}</span>
           <span class="text-xs text-gray-400 dark:text-gray-500">({detail(pipeline)})</span>
           {#if monthly(pipeline)}
-            <span class="text-xs text-emerald-600 dark:text-emerald-400" title={estimateNote}>
+            <span class="text-xs text-emerald-600 dark:text-emerald-400">
               {monthly(pipeline)}
             </span>
           {/if}
-        </div>
+        </button>
       {/if}
 
-      <!-- 4. recurring mission with no end date — where it lands over time -->
+      <!-- 4. recurring mission/resource with no end date — where it lands over time -->
       {#if horizons.length > 0}
         <div class="pt-1.5 mt-1 border-t border-gray-200 dark:border-slate-600 space-y-1">
           <div
@@ -241,18 +338,58 @@
             <span>{$t('equity.horizonsTitle')}</span>
           </div>
           {#each horizons as h (h.months)}
-            <div class="flex flex-wrap items-baseline gap-x-2">
+            <button
+              type="button"
+              class="row"
+              class:picked={chart && chartOpen && activeHorizon?.months === h.months}
+              aria-pressed={chart && chartOpen && activeHorizon?.months === h.months}
+              onclick={(e) => {
+                e.stopPropagation();
+                selected = `h${h.months}`;
+              }}
+            >
               <span class="text-gray-700 dark:text-gray-200">{horizonLabel(h.months)}</span>
               <span class="font-bold text-gold">{formatSharePct(h.sharePct)}</span>
               <span class="text-xs text-gray-400 dark:text-gray-500">({horizonDetail(h)})</span>
               {#if monthly(h)}
                 <span class="text-xs text-emerald-600 dark:text-emerald-400">{monthly(h)}</span>
               {/if}
-            </div>
+            </button>
           {/each}
           <p class="text-[11px] leading-snug text-gray-500 dark:text-gray-400">
             {$t('equity.horizonNote')}
           </p>
+        </div>
+      {/if}
+
+      <!-- 4b. the same numbers as a donut: what the rikma is made of, and which
+           wedge would be the reader's. -->
+      {#if chart && breakdown && pieSlices.length > 0}
+        <div class="pt-2 mt-1 border-t border-gray-200 dark:border-slate-600">
+          <button
+            type="button"
+            class="flex items-center gap-1.5 text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-gold"
+            aria-expanded={chartOpen}
+            onclick={(e) => {
+              e.stopPropagation();
+              chartOpen = !chartOpen;
+            }}
+          >
+            <span>{chartOpen ? '▾' : '▸'}</span>
+            <span>{$t('equity.chartTitle')}</span>
+            {#if chartOpen}
+              <span class="font-normal normal-case">· {chartCaption}</span>
+            {/if}
+          </button>
+          {#if chartOpen}
+            <div class="mt-2">
+              <EquityPie
+                slices={pieSlices}
+                format={fmtNum}
+                ariaLabel={`${$t('equity.chartTitle')} · ${chartCaption}`}
+              />
+            </div>
+          {/if}
         </div>
       {/if}
 
@@ -267,3 +404,42 @@
     </div>
   {/if}
 {/if}
+
+<style>
+  /* A scenario row: a plain line of text that happens to be clickable (it picks
+     what the donut draws). Kept borderless so it doesn't read as a form button. */
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.5rem;
+    width: 100%;
+    text-align: start;
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+  }
+  .row:hover,
+  .row:focus-visible {
+    background: rgb(0 0 0 / 0.04);
+  }
+  .row.picked {
+    background: rgb(0 0 0 / 0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme='light'])) .row:hover,
+    :root:where(:not([data-theme='light'])) .row:focus-visible {
+      background: rgb(255 255 255 / 0.06);
+    }
+    :root:where(:not([data-theme='light'])) .row.picked {
+      background: rgb(255 255 255 / 0.1);
+    }
+  }
+  :root[data-theme='dark'] .row:hover,
+  :root[data-theme='dark'] .row:focus-visible {
+    background: rgb(255 255 255 / 0.06);
+  }
+  :root[data-theme='dark'] .row.picked {
+    background: rgb(255 255 255 / 0.1);
+  }
+</style>
