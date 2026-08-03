@@ -258,7 +258,8 @@
     "close": "Закрыть",
     "task": "Задача",
     "status": "Статус",
-    "totalTimerHours": "Всего часов по таймеру"
+    "totalTimerHours": "Всего часов по таймеру",
+    "workNote": "Что сделано"
   },
   "splitsArchive": {
     "summary": "Сводка распределений по времени",

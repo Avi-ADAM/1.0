@@ -258,7 +258,8 @@
     "close": "Close",
     "task": "Task",
     "status": "Status",
-    "totalTimerHours": "Total Timer Hours"
+    "totalTimerHours": "Total Timer Hours",
+    "workNote": "What was done"
   },
   "splitsArchive": {
     "summary": "Distribution summary over time",

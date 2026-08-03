@@ -278,7 +278,7 @@ const qids_base = {
               users_permissions_user{data{id}}
               acts{data{id attributes{shem myIshur link hashivut valiIshur des dateF dateS status naasa}}}
                activeTimer{data{id
-                attributes{start totalHours timers{start stop} acts{data{id}} isActive saved}}} 
+                attributes{start totalHours timers{start stop} acts{data{id}} isActive saved saveText}}}
                 project{data{id attributes{projectName profilePic{data{attributes{formats url}}}}}} }}}
             }
           }
@@ -644,7 +644,7 @@ const qids_base = {
         }
       `,
   '34UpdateTimer': `
-      mutation UpdateTimer($saved: Boolean,$timerId: ID!,$tasks: [ID], $newStart: DateTime , $timers:[ComponentNewTimesInput], $totalHours:Float, $isActive: Boolean) {
+      mutation UpdateTimer($saved: Boolean,$timerId: ID!,$tasks: [ID], $newStart: DateTime , $timers:[ComponentNewTimesInput], $totalHours:Float, $isActive: Boolean, $saveText: String) {
         updateTimer(id: $timerId,
           data: {
             saved: $saved,
@@ -652,13 +652,14 @@ const qids_base = {
             isActive: $isActive,
             timers: $timers,
             totalHours: $totalHours,
-            acts: $tasks
+            acts: $tasks,
+            saveText: $saveText
           }
         ) {
           data {
             id
             attributes {
-             start totalHours timers{start stop} acts{data{id}} isActive saved
+             start totalHours timers{start stop} acts{data{id}} isActive saved saveText
             }
           }
         }
@@ -696,6 +697,7 @@ const qids_base = {
               }
               isActive
               saved
+              saveText
             }
           }
         }
@@ -737,7 +739,7 @@ const qids_base = {
         data{
           id
           attributes{
-          start totalHours timers{start stop} isActive saved acts{data{id attributes{
+          start totalHours timers{start stop} isActive saved saveText acts{data{id attributes{
                   shem
                   } }}
           mesimabetahalich{data{id
@@ -6442,7 +6444,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
             }
           }
           finnished_missions(filters: { isNotFinished: { eq: true } }) {
-            data { id attributes { noofhours perhour } }
+            data { id attributes { noofhours perhour why } }
           }
         }
       }
@@ -6458,7 +6460,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $users_permissions_user: ID,
     $vots: [ComponentProjectsVotsInput],
     $timer: ID,
-    $month: Date
+    $month: Date,
+    $why: String
   ) {
     createFiniapruval(
       data: {
@@ -6471,7 +6474,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         vots: $vots,
         isTimerSave: true,
         timer: $timer,
-        month: $month
+        month: $month,
+        why: $why
       }
     ) { data { id } }
   }`,
@@ -6525,12 +6529,13 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
   '114updateFinnishedMissionHours': `mutation UpdateFinnishedMissionHours(
     $id: ID!,
     $noofhours: Float!,
-    $total: Float!
+    $total: Float!,
+    $why: String
   ) {
     updateFinnishedMission(
       id: $id,
-      data: { noofhours: $noofhours, total: $total }
-    ) { data { id attributes { noofhours total } } }
+      data: { noofhours: $noofhours, total: $total, why: $why }
+    ) { data { id attributes { noofhours total why } } }
   }`,
 
   '115updateMissionTotalHoursSaved': `mutation UpdateMissionTotalHoursSaved(

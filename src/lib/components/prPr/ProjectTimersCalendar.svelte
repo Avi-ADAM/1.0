@@ -155,26 +155,37 @@
     showTooltip(info.el, props);
   }
   
+  // The tooltip is built as raw HTML, and the note is text a member typed —
+  // escape everything that comes from the data before it goes in.
+  function esc(value) {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
   function showTooltip(element, props) {
     const mesima = props.mesimabetahalich;
     const timer = props.timerData;
-    
+
     if (tooltipEl) {
       document.body.removeChild(tooltipEl);
     }
-    
+
     tooltipEl = document.createElement('div');
     tooltipEl.className = 'calendar-tooltip';
     tooltipEl.innerHTML = `
       <div class="tooltip-content">
-        <div><strong>${$t('project.timersCalendar.task')}:</strong> ${mesima?.name || $t('project.timersCalendar.noTaskName')}</div>
-        <div><strong>${$t('project.timersCalendar.assignedHours')}:</strong> ${mesima?.hoursassinged || 0}</div>
-        <div><strong>${$t('project.timersCalendar.completedHours')}:</strong> ${mesima?.howmanyhoursalready || 0}</div>
+        <div><strong>${$t('project.timersCalendar.task')}:</strong> ${esc(mesima?.name || $t('project.timersCalendar.noTaskName'))}</div>
+        <div><strong>${$t('project.timersCalendar.assignedHours')}:</strong> ${esc(mesima?.hoursassinged || 0)}</div>
+        <div><strong>${$t('project.timersCalendar.completedHours')}:</strong> ${esc(mesima?.howmanyhoursalready || 0)}</div>
         <div><strong>${$t('project.timersCalendar.status')}:</strong> ${timer.isActive ? $t('project.timersCalendar.active') : (timer.saved ? $t('project.timersCalendar.saved') : $t('project.timersCalendar.notSaved'))}</div>
-        <div><strong>${$t('project.timersCalendar.totalTimerHours')}:</strong> ${timer.totalHours || 0}</div>
+        <div><strong>${$t('project.timersCalendar.totalTimerHours')}:</strong> ${esc(timer.totalHours || 0)}</div>
+        ${timer.saveText ? `<div><strong>${$t('project.timersCalendar.workNote')}:</strong> ${esc(timer.saveText)}</div>` : ''}
       </div>
     `;
-    
+
     document.body.appendChild(tooltipEl);
     
     const rect = element.getBoundingClientRect();
@@ -310,6 +321,13 @@
                   </div>
                 </div>
                 
+                {#if timerData.saveText}
+                  <div class="mt-3">
+                    <span class="font-medium text-sm">{$t('project.timersCalendar.workNote')}:</span>
+                    <p class="mt-1 text-sm text-gray-700 whitespace-pre-line">{timerData.saveText}</p>
+                  </div>
+                {/if}
+
                 {#if timerData.acts?.data?.length > 0}
                   <div class="mt-3">
                     <span class="font-medium text-sm">{$t('project.timersCalendar.tasksInProgress')}:</span>
@@ -425,6 +443,13 @@
           </span>
         </div>
         
+        {#if selectedTimerData.timerData.saveText}
+          <div>
+            <span class="font-medium">{$t('project.timersCalendar.workNote')}:</span>
+            <p class="mt-1 text-sm text-gray-700 whitespace-pre-line">{selectedTimerData.timerData.saveText}</p>
+          </div>
+        {/if}
+
         {#if selectedTimerData.timerData.acts?.data?.length > 0}
           <div>
             <span class="font-medium">{$t('project.timersCalendar.tasksInProgress')}:</span>

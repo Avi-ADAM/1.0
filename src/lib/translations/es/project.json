@@ -259,7 +259,8 @@
     "close": "Cerrar",
     "task": "Tarea",
     "status": "Estado",
-    "totalTimerHours": "Horas totales del temporizador"
+    "totalTimerHours": "Horas totales del temporizador",
+    "workNote": "Qué se hizo"
   },
   "splitsArchive": {
     "summary": "Resumen de repartos a lo largo del tiempo",

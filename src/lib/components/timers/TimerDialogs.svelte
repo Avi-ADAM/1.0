@@ -1,4 +1,5 @@
 ﻿<script lang="ts">
+  import { untrack } from 'svelte';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { fly, slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
@@ -42,6 +43,25 @@
     taskSearchTerm = $bindable(''),
     onUpdateTimer
   } = $props();
+
+  // The member's own account of what they did during this timer. It rides along
+  // with the save into the timer, the approval vote and the finished-mission
+  // row, so the rikma can read it in the moach next to the hours.
+  // The note is copied into `why` on the approval / finished-mission row, a
+  // 255-char Strapi string, so keep a single note comfortably inside it.
+  const SAVE_TEXT_MAX = 240;
+  let saveText = $state('');
+  let saveTextTouched = $state(false);
+
+  // Seed from whatever is already on the timer, but never stomp on what the
+  // member is typing right now.
+  $effect(() => {
+    const stored = timer?.attributes?.activeTimer?.data?.attributes?.saveText;
+    if (typeof stored !== 'string' || !stored) return;
+    untrack(() => {
+      if (!saveTextTouched && !saveText) saveText = stored;
+    });
+  });
 
   // פונקציות
   function closeDialog() {
@@ -134,7 +154,7 @@
     await updateTimer(
       timer.attributes.activeTimer.data,
       'tasks',
-      { selectedTaskIds },
+      { selectedTaskIds, saveText: saveText.trim() },
       fetch,
       timer.projectId,
       page.data.uid
@@ -183,20 +203,27 @@
       false,
       tasksToSave,
       timer.projectId,
-      page.data.uid
+      page.data.uid,
+      saveText
     );
 
     if (result) {
       console.log('טיימר נשמר בהצלחה', result);
+      // The timerSave action answers with { success, missionId } — it carries
+      // neither the timer nor the mission, so read both defensively. The
+      // `refresh: true` unlock below is what brings the real state back.
+      const hoursdon = result?.mission?.attributes?.howmanyhoursalready;
       onUpdateTimer?.({
-        timer: result.timer,
+        timer: result?.timer ?? null,
         running: false,
-        hoursdon: result.mission.attributes.howmanyhoursalready
+        ...(hoursdon !== undefined ? { hoursdon } : {})
       });
 
       showSaveFinal = false;
       showSaveDialog = false;
       dialogEdit = false;
+      saveText = '';
+      saveTextTouched = false;
       unlockTimerForEdit(timer.mId, { refresh: true });
 
       toast.success($t('timers.saveSuccess'));
@@ -586,11 +613,18 @@
           {dialogEdit == true ? $t('timers.updateHint') : innerText}
         </p>
         <div class="dialog-buttons">
+          <!-- Saving is the everyday action, so it sits on the first screen of
+               the menu instead of one level in. On a phone the row only has
+               space for two, and "update tasks" opens the very same dialog as
+               "save timer" — so that is the one that gives way. -->
           <button class="save-btn" onclick={handleSaveTimer}>
-            {dialogEdit == true
-              ? $t('timers.updateTasks')
-              : $t('timers.saveTimerBtn')}
+            {$t('timers.saveTimerBtn')}
           </button>
+          {#if dialogEdit == true}
+            <button class="save-btn tasks-btn" onclick={handleSaveTimer}>
+              {$t('timers.updateTasks')}
+            </button>
+          {/if}
           <button class="clear-btn" onclick={handleClearTimer}>
             {dialogEdit == true ? $t('timers.editTimes') : $t('timers.clearTimer')}
           </button>
@@ -650,6 +684,22 @@
             </div>
           </div>
         {/if}
+
+        <div class="save-note">
+          <label class="save-note-label" for="timer-save-note">
+            {$t('timers.whatDidYouDo')}
+          </label>
+          <textarea
+            id="timer-save-note"
+            class="save-note-input"
+            rows="3"
+            maxlength={SAVE_TEXT_MAX}
+            bind:value={saveText}
+            oninput={() => (saveTextTouched = true)}
+            placeholder={$t('timers.whatDidYouDoPlaceholder')}
+          ></textarea>
+          <span class="save-note-count">{saveText.length}/{SAVE_TEXT_MAX}</span>
+        </div>
 
         {#if dialogEdit != true}
           <div class="time-summary">
@@ -841,6 +891,7 @@
 
   .dialog-buttons {
     display: flex;
+    flex-wrap: wrap;
     justify-content: flex-end;
     gap: 1rem;
   }
@@ -853,6 +904,57 @@
     font-weight: bold;
     cursor: pointer;
     transition: transform 0.2s;
+  }
+
+  /* Three buttons do not fit a phone. "Update tasks" opens the same dialog as
+     "save timer", so dropping it there costs the member nothing. */
+  @media (max-width: 480px) {
+    .tasks-btn {
+      display: none;
+    }
+
+    .save-btn,
+    .clear-btn {
+      padding: 0.75rem 1rem;
+    }
+  }
+
+  .save-note {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .save-note-label {
+    font-size: 0.95rem;
+    color: #00ffff;
+  }
+
+  .save-note-input {
+    width: 100%;
+    resize: vertical;
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.25);
+    color: #fff;
+    font: inherit;
+    line-height: 1.4;
+  }
+
+  .save-note-input::placeholder {
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  .save-note-input:focus {
+    outline: none;
+    border-color: #00ffff;
+  }
+
+  .save-note-count {
+    align-self: flex-end;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.55);
   }
 
   .save-btn {

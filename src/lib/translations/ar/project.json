@@ -258,7 +258,8 @@
     "close": "إغلاق",
     "task": "مهمة",
     "status": "الحالة",
-    "totalTimerHours": "إجمالي ساعات المؤقّت"
+    "totalTimerHours": "إجمالي ساعات المؤقّت",
+    "workNote": "ما تم إنجازه"
   },
   "splitsArchive": {
     "summary": "ملخّص التوزيعات عبر الزمن",

@@ -173,9 +173,10 @@ export async function stopTimer(timer, fetch, isSer = false, projectId = '', use
  * @param {Array} [tasks=null] - Optional task IDs
  * @param {string} [projectId=''] - Project ID
  * @param {string} [userId=''] - User ID
+ * @param {string} [saveText=''] - Short description of what was done in this timer
  * @returns {Promise<Object>} - Results
  */
-export async function saveTimer(timer, missionID, fetch, isSer = false, tasks = null, projectId = '', userId = '') {
+export async function saveTimer(timer, missionID, fetch, isSer = false, tasks = null, projectId = '', userId = '', saveText = '') {
   try {
     if (!timer || !missionID) {
       console.error("Missing parameters for saveTimer");
@@ -211,6 +212,7 @@ export async function saveTimer(timer, missionID, fetch, isSer = false, tasks = 
       stname: "saved",
       x: 0,
       tasks: tasks || [],
+      saveText: (saveText || '').trim(),
       isSer: isSer
     };
 
@@ -308,6 +310,9 @@ export async function updateTimer(timer, whatToUpdate, params = {}, fetch, proje
         tasks: (params.selectedTaskIds || []).map(id => id.toString()),
         isSer: params.isSer
       };
+      // Only send the note when the caller has one — an absent GraphQL variable
+      // leaves the stored saveText alone, an empty string would wipe it.
+      if (params.saveText) paramsToUpdate.saveText = params.saveText;
       
       return unwrapTimerResult(await executeTimerAction('timerLogUpdate', paramsToUpdate, fetch));
     }

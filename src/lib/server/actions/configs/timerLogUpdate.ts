@@ -47,6 +47,11 @@ export const timerLogUpdateConfig: ActionConfig = {
             type: 'array',
             required: false,
             description: 'Array of task IDs assigned to this timer'
+        },
+        saveText: {
+            type: 'string',
+            required: false,
+            description: 'Short description of what was done during this timer'
         }
     },
 

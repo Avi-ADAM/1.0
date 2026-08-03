@@ -1,6 +1,24 @@
 import type { ActionConfig } from '../types.js';
 import { calcDeadlineMs } from './actionUtils.js';
 
+/**
+ * `why` on Finiapruval and FinnishedMission is a Strapi `string` — a 255-char
+ * column. The timer's own `saveText` is richtext and keeps the note in full;
+ * these copies are summaries, so trim them rather than let the write fail.
+ * The newest note is the one that matters, so trimming eats the oldest lines.
+ */
+const WHY_MAX = 250;
+
+function clampWhy(text: string): string {
+    if (text.length <= WHY_MAX) return text;
+    const lines = text.split('\n');
+    while (lines.length > 1 && lines.join('\n').length > WHY_MAX - 2) lines.shift();
+    const kept = lines.join('\n');
+    if (kept.length <= WHY_MAX - 2) return `…\n${kept}`;
+    // A single note longer than the column on its own — cut its head off.
+    return `…${kept.slice(kept.length - (WHY_MAX - 1))}`;
+}
+
 function todayDateString(): string {
   const d = new Date();
   const y = d.getFullYear();
@@ -16,13 +34,20 @@ export const timerSaveConfig: ActionConfig = {
         const mId = (params.missionId || params.mId)?.toString();
         const now = new Date();
 
+        // The member's own account of what they did during this timer. It is
+        // written on the timer itself (shown in the moach process timeline) and
+        // carried into whatever the save produces — the approval vote or the
+        // finished-mission row — so the rikma reads it wherever the hours land.
+        const saveText: string = (params.saveText ?? '').toString().trim();
+
         // Step 1: Mark timer as saved
         if (params.timerId && params.timerId !== '0') {
             await strapi.execute('34UpdateTimer', {
                 timerId: params.timerId,
                 isActive: false,
                 saved: true,
-                tasks: params.tasks || []
+                tasks: params.tasks || [],
+                ...(saveText ? { saveText } : {})
             }, context.jwt, context.fetch);
         }
 
@@ -52,10 +77,17 @@ export const timerSaveConfig: ActionConfig = {
 
             if (existingFm) {
                 const newHours = (existingFm.attributes.noofhours ?? 0) + sessionHoursTotal;
+                // The row accumulates sessions, so the notes accumulate too —
+                // one line per save, oldest first, rather than the last one winning.
+                const prevWhy: string = (existingFm.attributes.why ?? '').toString();
+                const mergedWhy = saveText
+                    ? (prevWhy && prevWhy !== 'timer save' ? `${prevWhy}\n${saveText}` : saveText)
+                    : null;
                 await strapi.execute('114updateFinnishedMissionHours', {
                     id: existingFm.id,
                     noofhours: newHours,
-                    total: newHours * (at.perhour ?? 0)
+                    total: newHours * (at.perhour ?? 0),
+                    ...(mergedWhy ? { why: clampWhy(mergedWhy) } : {})
                 }, context.jwt, context.fetch);
             } else {
                 await strapi.execute('113createFinnishedMissionForTimerSave', {
@@ -68,7 +100,7 @@ export const timerSaveConfig: ActionConfig = {
                     users_permissions_user: at.users_permissions_user?.data?.id,
                     perhour: at.perhour,
                     total: sessionHoursTotal * (at.perhour ?? 0),
-                    why: 'timer save'
+                    why: saveText ? clampWhy(saveText) : 'timer save'
                 }, context.jwt, context.fetch);
             }
 
@@ -90,7 +122,8 @@ export const timerSaveConfig: ActionConfig = {
                 users_permissions_user: at.users_permissions_user?.data?.id,
                 vots,
                 timer: params.timerId && params.timerId !== '0' ? params.timerId : undefined,
-                month: todayDateString()
+                month: todayDateString(),
+                ...(saveText ? { why: clampWhy(saveText) } : {})
             }, context.jwt, context.fetch);
 
             const finiId = finiRes?.data?.createFiniapruval?.data?.id;
@@ -120,6 +153,7 @@ export const timerSaveConfig: ActionConfig = {
         howmanyhoursalready: { type: 'number', required: false, description: 'New monthly hours total (currentHours + sessionHoursThisMonth)' },
         totalHours: { type: 'number', required: false, description: 'Fallback total hours' },
         stname: { type: 'string', required: false, description: 'Status name' },
+        saveText: { type: 'string', required: false, description: 'Short description of what was done during this timer' },
         x: { type: 'number', required: false, description: 'Legacy timer value (unused)' },
         tasks: { type: 'array', required: false, description: 'Task IDs to link to the timer' }
     },

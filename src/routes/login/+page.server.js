@@ -1,5 +1,14 @@
 import { STRAPI_URL as baseUrl } from '$lib/server/strapiUrl.js';
 
+/**
+ * The address is remembered at signup and re-stamped by /confirm-email, so the
+ * user who just clicked the mail link only has to type the password. Read on
+ * the server because the cookie may carry a `.1lev1.com` domain.
+ */
+export async function load({ cookies }) {
+    return { prefillEmail: cookies.get('email') ?? '' };
+}
+
 export const actions = {
     login: async ({ request, cookies, url }) => {
         const data = await request.formData();

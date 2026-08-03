@@ -1,5 +1,6 @@
 <script>
   import { t } from '$lib/translations';
+  import { onMount, untrack } from 'svelte';
   import { fade } from 'svelte/transition';
   import { goto } from '$app/navigation';
   import { enhance } from '$app/forms';
@@ -14,9 +15,22 @@
   let { data, form } = $props();
 
   let active = $state(false);
-  let email = $state('');
+  // Prefilled from the `email` cookie (signup / email confirmation) so the
+  // returning user only types a password. The password itself is never
+  // prefilled — that is the browser's password manager to offer, via the
+  // autocomplete hints below.
+  let email = $state(untrack(() => data?.prefillEmail ?? ''));
   let password = $state('');
   let showPassword = $state(false);
+  /** @type {HTMLInputElement | undefined} */
+  let passwordEl = $state();
+
+  // Landing here from the mail link with the address already filled: the only
+  // thing left to do is the password, so start there. On mount only — as an
+  // $effect it would yank focus away every time the email field is edited.
+  onMount(() => {
+    if (email) passwordEl?.focus();
+  });
   // Writable derived: tracks the form action's error, but can be cleared
   // locally when a new submit starts.
   let loginError = $derived(form?.error ?? null);
@@ -139,6 +153,7 @@
         type={showPassword ? 'text' : 'password'}
         name="password"
         id="password"
+        bind:this={passwordEl}
         bind:value={password}
         placeholder={$t('auth.login.passwordPlaceholder')}
         aria-required="true"

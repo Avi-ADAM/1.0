@@ -258,7 +258,8 @@
     "close": "סגור",
     "task": "משימה",
     "status": "סטטוס",
-    "totalTimerHours": "סה\"כ שעות בטיימר"
+    "totalTimerHours": "סה\"כ שעות בטיימר",
+    "workNote": "מה נעשה"
   },
   "splitsArchive": {
     "summary": "סיכום חלוקות לאורך זמן",

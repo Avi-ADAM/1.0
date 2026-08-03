@@ -1,5 +1,6 @@
 import { redirect, fail } from '@sveltejs/kit';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
+import { signupCookieOptions } from '$lib/server/signupCookies.js';
 import type { Actions, PageServerLoad } from './$types';
 
 /**
@@ -24,9 +25,24 @@ import type { Actions, PageServerLoad } from './$types';
 
 const CONFIRM_ENDPOINT = `${STRAPI_URL}/api/auth/email-confirmation`;
 
+/**
+ * The address this link was sent to, so the login page it hands off to can be
+ * prefilled. The `e` param comes from the mail template (`<%= USER.email %>`)
+ * and therefore also works when the link is opened on a different device than
+ * the signup — the `email` cookie only covers the same browser.
+ *
+ * A raw `+` in a query string decodes to a space, which would break tagged
+ * gmail addresses; put it back rather than demand `encodeURIComponent` in the
+ * template. Anything that doesn't look like an address is ignored.
+ */
+function emailFromLink(url: URL): string {
+  const raw = (url.searchParams.get('e') ?? '').trim().replace(/ /g, '+');
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw) ? raw.toLowerCase() : '';
+}
+
 export const load: PageServerLoad = async ({ url, cookies, fetch }) => {
   const token = url.searchParams.get('confirmation');
-  const email = cookies.get('email') ?? '';
+  const email = emailFromLink(url) || (cookies.get('email') ?? '');
 
   if (!token) {
     return { state: 'missing' as const, email };
@@ -52,6 +68,13 @@ export const load: PageServerLoad = async ({ url, cookies, fetch }) => {
   // a 4xx/5xx is a real failure.
   if (status >= 400) {
     return { state: 'spent' as const, email };
+  }
+
+  // Confirmed. Remember the address so the login form can prefill it — only on
+  // this branch, where a valid single-use token proves the visitor holds the
+  // mailbox. Doing it earlier would let any URL seed someone else's address.
+  if (email) {
+    cookies.set('email', email, { ...signupCookieOptions(url), httpOnly: false });
   }
 
   // Strapi's endpoint returns no JWT, so a session can only be continued, not
