@@ -84,7 +84,8 @@
     "discover_projects": "רקמות",
     "discover_products": "מוצרים",
     "discover_missions": "משימות פתוחות",
-    "discover_resources": "משאבים מבוקשים"
+    "discover_resources": "משאבים מבוקשים",
+    "guide": "מדריך"
   },
   "status": {
     "success": "בוצע בהצלחה",

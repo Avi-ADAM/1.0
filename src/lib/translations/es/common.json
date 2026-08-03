@@ -85,7 +85,8 @@
     "discover_projects": "Rikmas",
     "discover_products": "Productos",
     "discover_missions": "Misiones abiertas",
-    "discover_resources": "Recursos buscados"
+    "discover_resources": "Recursos buscados",
+    "guide": "Guía"
   },
   "status": {
     "success": "Hecho con éxito",

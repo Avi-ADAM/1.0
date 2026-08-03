@@ -35,6 +35,12 @@
 <h1 class="auth-heading">{$t('auth.login.heading')}</h1>
 <p class="auth-sub">{$t('auth.login.subtitle')}</p>
 
+{#if data?.confirmed && !loginError}
+  <div class="auth-ok" role="status" in:fade>
+    {$t('auth.login.emailConfirmed')}
+  </div>
+{/if}
+
 {#if loginError}
   <div class="auth-alert" role="alert" in:fade>
     {loginError}
@@ -216,3 +222,18 @@
     {$t('auth.login.signupLink')}
   </button>
 </form>
+
+<style>
+  .auth-ok {
+    display: block;
+    background: #effaf1;
+    border: 1px solid rgba(21, 128, 61, 0.3);
+    color: #15803d;
+    border-radius: 0.9rem;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    margin-bottom: 1.1rem;
+    text-align: start;
+  }
+</style>

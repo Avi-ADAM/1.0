@@ -84,7 +84,8 @@
     "discover_projects": "Рикмы",
     "discover_products": "Продукты",
     "discover_missions": "Открытые миссии",
-    "discover_resources": "Нужные ресурсы"
+    "discover_resources": "Нужные ресурсы",
+    "guide": "Руководство"
   },
   "status": {
     "success": "Успешно",

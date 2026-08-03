@@ -156,6 +156,18 @@ export async function GET() {
              <priority>0.95</priority>
              <changefreq>daily</changefreq>
              </url>
+             <url>
+             <loc>https://1lev1.com/guid</loc>
+             <lastmod>2026-08-03T00:00:00+00:00</lastmod>
+             <priority>0.90</priority>
+             <changefreq>monthly</changefreq>
+             </url>
+             <url>
+             <loc>https://1lev1.com/guid/ai</loc>
+             <lastmod>2026-08-03T00:00:00+00:00</lastmod>
+             <priority>0.60</priority>
+             <changefreq>monthly</changefreq>
+             </url>
        </urlset>
      `.trim(),
        {

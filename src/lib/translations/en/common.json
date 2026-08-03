@@ -84,7 +84,8 @@
     "discover_projects": "Rikmas",
     "discover_products": "Products",
     "discover_missions": "Open missions",
-    "discover_resources": "Wanted resources"
+    "discover_resources": "Wanted resources",
+    "guide": "Guide"
   },
   "status": {
     "success": "Success",

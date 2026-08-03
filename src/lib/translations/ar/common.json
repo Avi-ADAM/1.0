@@ -84,7 +84,8 @@
     "discover_projects": "مشاريع",
     "discover_products": "منتجات",
     "discover_missions": "مهام مفتوحة",
-    "discover_resources": "موارد مطلوبة"
+    "discover_resources": "موارد مطلوبة",
+    "guide": "الدليل"
   },
   "status": {
     "success": "تم بنجاح",

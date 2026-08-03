@@ -44,6 +44,7 @@
   "nav": {
     "about": "Acerca de",
     "faq": "Preguntas frecuentes",
+    "guide": "Guía",
     "agreementMap": "Mapa de acuerdos",
     "changeLanguage": "Cambiar idioma"
   },
@@ -294,6 +295,12 @@
     "title": "¿Te encanta cultivar, construir o crear con tus manos? Ven a ver cómo 1💗1 puede ayudarte",
     "desc": "Para agricultores, jardineros, artesanos y cualquiera que quiera ganarse la vida con la tierra, sin capital inicial ni ir en solitario.",
     "cta": "A la página de Cultivar"
+  },
+  "guide": {
+    "eyebrow": "📖 La guía completa",
+    "title": "Todo lo que contiene el sistema, en un solo lugar",
+    "desc": "Rikma, misión, recurso, producto, venta, reparto, agregado de demanda: qué es cada uno, por qué pasa desde la idea hasta el reparto del beneficio, y dónde se pulsa exactamente.",
+    "cta": "Leer la guía"
   },
   "consensus": {
     "eyebrow": "🤝 El motor de acuerdos",

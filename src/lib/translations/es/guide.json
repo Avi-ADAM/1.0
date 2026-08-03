@@ -1,53 +1,333 @@
 {
   "_review": true,
   "title": "La guía completa de 1💗1",
-  "human_section": "Guía para humanos",
-  "ai_section": "Guía para agentes de IA",
-  "glossary": {
-    "title": "Glosario",
-    "pendm_label": "Pendm (Misión pendiente)",
-    "pendm_desc": "Una propuesta de nueva misión que se encuentra en la fase inicial de negociación antes de convertirse en una misión abierta.",
-    "rikma_label": "Rikma (Asociación)",
-    "rikma_desc": "Una asociación o proyecto donde los miembros colaboran y comparten beneficios.",
-    "decision_time_label": "Tiempo de decisión",
-    "decision_time_desc": "El plazo definido en la Rikma durante el cual los miembros pueden responder, objetar o hacer contrapropuestas antes de que una acción se apruebe automáticamente."
+  "tagline": "Qué es cada cosa en el sistema, dónde está y cómo nace y crece",
+  "intro": "1💗1 es un sistema para hacer cosas juntos. Un grupo de personas — una rikma — decide en conjunto qué hay que hacer, quién lo hace, cuánto vale y cómo se reparte lo creado. En lugar de un jefe que decide, hay un único motor de consentimiento por el que pasa todo.",
+  "intro2": "Esta guía recorre todos los tipos de objeto del sistema y cada etapa de su vida, y enlaza directamente con la pantalla donde realmente se actúa. Cada título aquí es un enlace: pulsa y llegas.",
+  "backToTop": "Volver arriba",
+  "toc": {
+    "title": "En breve",
+    "quickstart": "Primeros pasos",
+    "map": "Mapa del sistema",
+    "objects": "Tipos de objeto",
+    "flows": "Procesos centrales",
+    "principles": "Reglas rectoras"
   },
-  "steps": {
-    "open_rikma": {
-      "title": "Cómo abrir una Rikma",
-      "human": "Para abrir una nueva Rikma, ve a la página 'Unirse' o usa el bot. Debes definir un nombre, una descripción, valores y un tiempo de decisión.",
-      "ai": "Usa createProjectTool con los parámetros adecuados (nombre, descripción, valores, etc.). Asegúrate de proporcionar una URL válida para completar el registro.",
-      "screenshot_placeholder": "[Captura: Formulario de creación de una nueva Rikma]"
-    },
-    "create_task": {
-      "title": "Cómo crear tareas",
-      "human": "Dentro de la página de la Rikma, puedes añadir una 'Misión pendiente' (Pendm). Define la esencia de la tarea y la recompensa propuesta.",
-      "ai": "Envía una solicitud para crear un objeto pendm vinculado al pid (ID del proyecto). Usa la función actionClient o crTask.",
-      "screenshot_placeholder": "[Captura: Botón de añadir tarea y pantalla de definición del pendm]"
-    },
-    "approval_process": {
-      "title": "Proceso de aprobación y negociación de tareas",
-      "human": "Cada Pendm entra en un periodo de negociación. Cada nueva propuesta reinicia el temporizador que cuenta hacia el tiempo de decisión, según lo definido por la Rikma. Una vez confirmada, la misión pasa a 'Abierta' y se pueden recibir ofertas para ejecutarla.",
-      "ai": "Supervisa el estado del pendm. Ten en cuenta que cualquier actualización de los campos de la tarea reinicia el temporizador de consenso.",
-      "screenshot_placeholder": "[Captura: Cronología de negociación y temporizador activo]"
-    },
-    "automatic_approval": {
-      "title": "Aprobación automática",
-      "human": "Una vez que al menos un miembro del proyecto aprueba y ha pasado el tiempo de decisión sin objeciones, la propuesta se aprueba automáticamente.",
-      "ai": "Comprueba el campo de aprobaciones y el tiempo transcurrido desde la última actualización frente al ajuste decision_time de la Rikma.",
-      "screenshot_placeholder": "[Captura: Indicador de aprobación de un miembro y cuenta atrás hacia la aprobación automática]"
-    },
-    "execution_timers": {
-      "title": "Ejecución de tareas y temporizadores",
-      "human": "Durante la ejecución de una tarea, puedes iniciar y detener un temporizador desde varios lugares: el bot de Telegram, la interfaz MCP, la página del Corazón (página principal) o una página dedicada de temporizadores.",
-      "ai": "Los temporizadores se pueden operar mediante la API del bot o actualizando un objeto act con las horas de inicio y fin.",
-      "screenshot_placeholder": "[Captura: Interfaz del temporizador en Telegram y en la página del Corazón]"
-    },
-    "archiving": {
-      "title": "Finalización, aprobación y archivado",
-      "human": "Al completar una tarea, puedes subir un archivo de prueba. Los miembros del proyecto votan para aprobarla. Una vez aprobada, las horas y la contribución se registran en la Rikma (archivadas) y cuentan para tu valor en el proyecto.",
-      "ai": "Sube un archivo a Strapi y vincúlalo al act correspondiente. Espera el estado 'approved' antes de archivar.",
-      "screenshot_placeholder": "[Captura: Pantalla de subida de archivo y votación de aprobación final]"
+  "labels": {
+    "lifecycle": "Ciclo de vida",
+    "where": "Dónde está",
+    "actions": "Qué puedes hacer",
+    "howto": "Cómo llegar",
+    "goto": "Abrir"
+  },
+  "quickstart": {
+    "title": "Los primeros seis pasos",
+    "desc": "Si acabas de llegar, este es el orden que hace que el sistema trabaje para ti.",
+    "steps": {
+      "signup": {
+        "title": "Registro",
+        "text": "Una sola cuenta para todas tus rikmas. Tras registrarte se abre una breve presentación de las pantallas principales.",
+        "cta": "Registrarse"
+      },
+      "profile": {
+        "title": "Habilidades, valores y roles",
+        "text": "En tu perfil eliges de un vocabulario compartido por todo el sitio: qué sabes hacer, qué te importa y en qué roles te ves. Si falta algo, puedes añadirlo y entra en el vocabulario común. De estos campos el sistema construye tus sugerencias de coincidencia.",
+        "cta": "Ir al perfil"
+      },
+      "offerings": {
+        "title": "Tu oferta",
+        "text": "Lo que estás dispuesto a dar al mundo: un servicio, un producto, conocimiento, equipo o tiempo. Es lo que permite que otras rikmas y la comunidad te encuentren, y no solo al revés.",
+        "cta": "Definir tu oferta"
+      },
+      "rikma": {
+        "title": "Una rikma: abrir o unirse",
+        "text": "Puedes abrir una rikma nueva en un minuto, o unirte a una existente desde su página pública. Si aún no lo tienes claro, es mejor unirte a algo que ya funciona y verlo desde dentro.",
+        "cta": "Abrir una rikma"
+      },
+      "lev": {
+        "title": "Lev: tu pantalla diaria",
+        "text": "Lev reúne en un solo lugar todo lo que te espera a ti: propuestas por aprobar, ventas por confirmar, repartos que esperan tu firma, sugerencias de coincidencia y misiones en curso. Si abres una pantalla al día, que sea esta.",
+        "cta": "Ir a Lev"
+      },
+      "hub": {
+        "title": "Centro: la vista general",
+        "text": "El centro muestra los números grandes: cuántas votaciones hay abiertas, qué es urgente, qué se ha vendido y qué ocurre en el mapa de demanda. Desde ahí saltas directo al elemento correspondiente en Lev.",
+        "cta": "Ir al centro"
+      }
     }
-  }
+  },
+  "map": {
+    "title": "Mapa del sistema: dónde está cada cosa",
+    "desc": "Todas las pantallas que existen, agrupadas por aquello a lo que se va a ellas.",
+    "groups": {
+      "daily": {
+        "title": "Tu día a día",
+        "desc": "Lo que se abre cada día: las decisiones, las tareas y el tiempo."
+      },
+      "rikma": {
+        "title": "El cerebro de la rikma",
+        "desc": "Todo lo que ocurre dentro de una rikma. Estos enlaces llevan a tu rikma activa."
+      },
+      "discover": {
+        "title": "Páginas de descubrimiento",
+        "desc": "La ventana pública: qué busca la comunidad y qué ofrece. Abierta también a visitantes."
+      },
+      "wish": {
+        "title": "Deseos y conserjería",
+        "desc": "El lado del consumidor: decir qué necesitas y recibir una respuesta."
+      },
+      "money": {
+        "title": "Dinero y tratos",
+        "desc": "Ventas, solicitudes de compra y su seguimiento."
+      },
+      "me": {
+        "title": "Yo",
+        "desc": "Tu perfil, tus preferencias y tus dispositivos."
+      },
+      "learn": {
+        "title": "Contexto y acuerdo",
+        "desc": "El material que explica por qué el sistema está construido así."
+      }
+    },
+    "links": {
+      "hub": { "label": "Centro", "desc": "Vista diaria: votaciones urgentes, ventas, demanda y novedades." },
+      "lev": { "label": "Lev", "desc": "Todo lo que te espera personalmente, como tarjetas sobre las que decidir." },
+      "myacts": { "label": "Mis tareas", "desc": "Las pequeñas acciones que asumiste, de todas tus rikmas." },
+      "timers": { "label": "Temporizadores", "desc": "Iniciar y detener la medición del tiempo, y tu historial de horas." },
+      "calendar": { "label": "Calendario", "desc": "Turnos, fechas y plazos que te afectan." },
+      "meeting": { "label": "Reuniones", "desc": "Videollamadas y coordinación de encuentros entre miembros." },
+      "moach": { "label": "Cerebro de rikmas", "desc": "Elige una rikma y desde ahí todo lo que ocurre dentro." },
+      "moachCreate": { "label": "Crear", "desc": "Crear una misión, pedir un recurso o armar un proceso, también con IA." },
+      "moachWork": { "label": "Trabajo", "desc": "En curso, acciones, kanban, gantt, temporizadores y turnos." },
+      "moachFlows": { "label": "Flujos", "desc": "Procesos y cadenas: el orden en que ocurren las cosas." },
+      "moachMoney": { "label": "Dinero", "desc": "Ventas y productos de la rikma, y el reparto de lo acumulado." },
+      "moachOpps": { "label": "Oportunidades", "desc": "Deseos entrantes, a qué está abierta la rikma y su mapa de demanda." },
+      "moachVotes": { "label": "Votaciones", "desc": "Cada propuesta abierta de la rikma, cada una con su reloj." },
+      "projectPublic": { "label": "Perfil público de la rikma", "desc": "La cara que la rikma muestra hacia fuera, y desde donde se pide entrar." },
+      "demand": { "label": "Mapa de demanda", "desc": "Un mapa, dos lados: qué se pide cerca y quién puede darlo." },
+      "projects": { "label": "Rikmas", "desc": "Todas las rikmas abiertas: buscar sociedad y unirse." },
+      "products": { "label": "Productos", "desc": "Lo que venden las rikmas, con precio y disponibilidad." },
+      "missions": { "label": "Misiones abiertas", "desc": "Trabajo que busca manos: puedes pedir hacerlo." },
+      "resources": { "label": "Recursos buscados", "desc": "Dinero, equipo, espacio o información que buscan las rikmas." },
+      "concierge": { "label": "Conserjería", "desc": "Recibe tu deseo, lo entiende y le busca respuesta." },
+      "newWish": { "label": "Deseo nuevo", "desc": "Escribe con tus palabras lo que necesitas, sin formularios." },
+      "deals": { "label": "Tratos", "desc": "Lo que compraste, lo que vendes y lo que espera coordinación." },
+      "salesCenter": { "label": "Centro de ventas", "desc": "Registro de ventas, clientes y ventas recurrentes." },
+      "dealsRequest": { "label": "Solicitud de compra", "desc": "Pedir un producto o servicio a una rikma existente." },
+      "profile": { "label": "Perfil", "desc": "Habilidades, valores, roles y zona de actividad." },
+      "settings": { "label": "Ajustes", "desc": "Idioma, notificaciones y preferencias de visualización." },
+      "offerings": { "label": "Mi oferta", "desc": "Lo que ofreces al mundo: la base de las coincidencias." },
+      "identity": { "label": "Identidad", "desc": "Verificación y datos de identidad usados en los tratos." },
+      "devices": { "label": "Dispositivos", "desc": "Dispositivos conectados y permisos de acceso." },
+      "onboard": { "label": "Introducción", "desc": "El recorrido corto que vuelve a presentarte el sistema." },
+      "faq": { "label": "Preguntas frecuentes", "desc": "Respuestas cortas a lo que más se pregunta." },
+      "consensus": { "label": "Motor de consentimiento", "desc": "El sitio aparte para la discusión profunda y la formulación precisa de un desacuerdo." },
+      "agreement": { "label": "El acuerdo", "desc": "El acuerdo en el que se apoya el sistema, y quienes lo firmaron." },
+      "love": { "label": "Mapa de acuerdos", "desc": "Quién estuvo de acuerdo, desde qué parte del mundo y cuántos." }
+    }
+  },
+  "objects": {
+    "title": "Tipos de objeto y sus ciclos de vida",
+    "desc": "El sistema se construye con unos pocos tipos de objeto. Quien entiende esta lista entiende todo el sistema. Cada objeto pasa por las mismas cuatro etapas: nace como propuesta, se acuerda, se ejecuta y recibe valor.",
+    "items": {
+      "rikma": {
+        "name": "Rikma",
+        "code": "Project",
+        "what": "Una rikma es un grupo de personas que crean algo juntas y comparten lo creado. Es el contenedor de todo: los valores, los miembros, las misiones, los recursos, los productos, las ventas y los repartos. Cada rikma tiene su propio tiempo de decisión: cuánto permanece abierta una propuesta antes de aceptarse por sí sola. Una rikma rápida fija un día; una prudente, dos semanas. Es decisión del grupo, no del sistema.",
+        "stages": "Idea → abrir una rikma → fijar valores y tiempo de decisión → sumar miembros → actividad continua → repartir lo acumulado",
+        "where": "Todas tus rikmas están en el cerebro de rikmas. La cara pública de una rikma es su página de proyecto, y desde ahí también se pide entrar.",
+        "do": "Abrir una rikma, editar nombre, descripción, imagen y enlaces externos, fijar el tiempo de decisión, publicarla como abierta a socios y gestionar los miembros."
+      },
+      "user": {
+        "name": "Tu perfil y tu oferta",
+        "code": "User · Offerings",
+        "what": "Tu perfil no es un currículum sino una interfaz: las habilidades, los valores y los roles que eliges vienen de un vocabulario común a todo el sitio, de modo que el sistema puede cruzar lo que sabes con lo que buscan las rikmas. Tu oferta personal es el lado activo: lo que estás dispuesto a dar — un servicio, un producto, conocimiento, equipo o tiempo.",
+        "stages": "Registro → introducción → habilidades, valores y roles → zona de actividad → oferta personal → sugerencias de coincidencia en Lev",
+        "where": "En tu perfil y en la página de mi oferta. Las coincidencias construidas a partir de ellos te llegan como tarjetas en Lev.",
+        "do": "Actualizar habilidades y valores, añadir un elemento nuevo al vocabulario común, fijar tu zona y publicar una oferta personal visible en las páginas de descubrimiento."
+      },
+      "mission": {
+        "name": "Misión",
+        "code": "Mission → Pendm → Open Mission → en curso → terminada",
+        "what": "Una misión es trabajo que alguien asume en nombre de la rikma. Empieza como plantilla del vocabulario común («hacer una página de aterrizaje»), se convierte en propuesta concreta con horas, tarifa y habilidades requeridas, y solo tras el consentimiento se abre a ejecución. Las horas aprobadas al final son el material del que se deriva tu valor en la rikma: por eso cada paso necesita acuerdo y no un anuncio.",
+        "stages": "Plantilla de misión → propuesta en votación → misión abierta → petición de hacerla → en curso con temporizador → terminada → aprobación de cierre → archivo y valor",
+        "where": "Se crea en el cerebro → Crear. Se sigue en el cerebro → Trabajo (en curso, kanban, gantt). Las misiones abiertas de todo el sitio están en la página de misiones abiertas. Cualquier propuesta que te espere aparece en Lev.",
+        "do": "Proponer una misión, negociar horas y tarifa, pedir hacerla, poner un temporizador, dividirla en acciones pequeñas, subir prueba de trabajo y aprobar los cierres de otros."
+      },
+      "resource": {
+        "name": "Recurso",
+        "code": "Mashaabim → Pmash → Open Mashaabim → aportado",
+        "what": "Un recurso es todo lo que la rikma necesita y no son horas de trabajo: dinero, equipo, materiales, un espacio, un vehículo, información o un contacto. El sistema lo trata igual que a una misión: entra por consentimiento, tiene cantidad y precio por unidad, y también cuenta en el valor de quien lo aportó. Eso permite que quien no tiene tiempo pero sí equipo sea socio pleno.",
+        "stages": "Necesidad detectada → petición de recurso en votación → recurso buscado y abierto → oferta de aportarlo → aportado y recibido → aprobación → valor en la rikma",
+        "where": "Se crea en el cerebro → Crear → pedir un recurso. Los recursos buscados de todo el sitio están en la página de recursos buscados y en el mapa de demanda.",
+        "do": "Pedir un recurso, fijar cantidad, unidad y precio por unidad, ofrecer un recurso a otra rikma, marcar una entrega parcial y confirmar la recepción."
+      },
+      "product": {
+        "name": "Producto",
+        "code": "Matanot · simple y compuesto",
+        "what": "Un producto es lo que la rikma vende. Un producto simple es un nombre, una descripción, una imagen y un precio. Un producto compuesto es exactamente lo mismo, más una receta encima: qué misiones y qué recursos requiere una unidad y cuánto de cada uno. Lo compuesto amplía lo simple en lugar de sustituirlo: todo campo del simple existe también en él. De la receta el sistema deriva el coste por unidad y, a partir de ahí, un precio por margen o un precio fijo que fijáis vosotros.",
+        "stages": "Idea → propuesta de producto en votación → producto aprobado → receta (en el compuesto) → precio: fijo o por margen → publicación en la página de productos → venta → reparto",
+        "where": "Los productos de la rikma están en el cerebro → Dinero → Ventas. Todos los productos del sitio están en la página pública de productos, desde donde también se pide comprar.",
+        "do": "Proponer un producto, armar una receta con misiones y recursos existentes, elegir el método de precio, fijar cantidad disponible y ubicación, y publicar o archivar."
+      },
+      "sale": {
+        "name": "Venta",
+        "code": "Sale",
+        "what": "Una venta es el registro de dinero que entró gracias a la rikma. Su campo crítico no es el importe sino quién tiene el dinero en realidad. «El dinero lo tengo yo» es un autoinforme soberano y es definitivo de inmediato. Pero decir «el dinero lo tiene X» es una afirmación sobre la situación financiera de otra persona, así que se abre como consentimiento bilateral entre quien informa y quien supuestamente lo tiene. Una venta cuenta en saldos y repartos solo cuando es efectiva, nunca mientras la afirmación sigue abierta.",
+        "stages": "Registrar una venta → vincular producto y cliente → quién tiene el dinero → si es otro: consentimiento bilateral → venta efectiva → entra en el reparto",
+        "where": "Cerebro → Dinero → Ventas, y el centro de ventas personal. Cualquier afirmación de tenencia que te espere aparece en Lev como tarjeta con aprobar, conversar o contrapropuesta.",
+        "do": "Registrar una venta, vincular producto y cliente, definirla como recurrente, aprobar o contraproponer una afirmación de tenencia y registrar un pago transferido."
+      },
+      "split": {
+        "name": "Reparto",
+        "code": "Tosplit · Haluka · hervachti",
+        "what": "El reparto es el momento en que lo acumulado se divide entre los miembros. El sistema calcula la parte de cada uno según lo que aportó realmente — horas aprobadas, recursos aportados, productos vendidos — y presenta la propuesta a todos, no solo a quien la creó. Si la propia 1lev1 participó como socia prestadora de servicio, también recibe una parte con exactamente las mismas reglas y la misma transparencia.",
+        "stages": "Acumulación de valor → crear una propuesta de reparto → parte personal de cada miembro → aprobar, conversar o contraproponer → reparto cerrado → transferencia real",
+        "where": "Cerebro → Dinero → Reparto. Un reparto que espera tu firma aparece en Lev.",
+        "do": "Crear un reparto, ver de qué se compone la parte de cada uno, aprobar, proponer otro reparto y marcar las transferencias hechas."
+      },
+      "decision": {
+        "name": "Decisión y votación",
+        "code": "Decision · Vots · Timegrama",
+        "what": "Todo lo que requiere el consentimiento de más de una persona pasa por el mismo mecanismo: una propuesta con reloj. No existe un «no» absoluto: un rechazo unilateral cierra la conversación. Hay tres formas de responder: aprobar, abrir una conversación para entender o hacer una contrapropuesta precisa. «No recibí nada» se dice como contrapropuesta por un importe de 0, no como veto. Cada contrapropuesta reinicia el reloj y empieza una ronda nueva, hasta que ambas partes firman la misma versión.",
+        "stages": "Propuesta → el reloj arranca según el tiempo de decisión de la rikma → aprobar / conversar / contraproponer → nueva ronda o maduración → decisión",
+        "where": "Todas las votaciones abiertas de una rikma están en el cerebro → Votaciones, cada una con su reloj. Lo que te espera personalmente llega a Lev. Para la discusión profunda hay un sitio aparte: el motor de consentimiento.",
+        "do": "Aprobar, abrir una conversación, contraproponer, ver quién ya votó y cuánto queda, y revisar rondas anteriores."
+      },
+      "nego": {
+        "name": "Negociación",
+        "code": "Nego · Negotiation",
+        "what": "Una negociación es una contrapropuesta que va y viene hasta que ambas partes firman la misma versión. No es un mecanismo aparte sino el mismo mecanismo de decisión a escala de dos: un candidato y una rikma, un cliente y un proveedor, quien informa una venta y quien tiene el dinero. Cuando el desacuerdo es demasiado profundo para una tarjeta, puede pasar al motor de consentimiento y formularse ahí con precisión.",
+        "stages": "Primera oferta → contrapropuesta → otra ronda → ambas partes firman la misma versión → queda ligado a la ejecución",
+        "where": "Dentro de la propia tarjeta en Lev y en las tarjetas de votación del cerebro. La discusión profunda pasa al motor de consentimiento.",
+        "do": "Contraproponer, razonar tu postura, revisar el historial de rondas y cerrar con firma conjunta."
+      },
+      "wish": {
+        "name": "Deseo y conserjería",
+        "code": "Ratson · Concierge",
+        "what": "Un deseo es lo que necesitas, escrito con tus palabras y sin formulario. La conserjería lo recibe, lo entiende y le busca respuesta: un producto existente, un prestador de servicio o un grupo que ya busca lo mismo. Si no hay respuesta, publica el deseo a la comunidad como misión abierta o recurso buscado, y entonces cualquiera puede ofrecerse. Así una necesidad personal se convierte en trabajo compartido.",
+        "stages": "Escribir un deseo → comprensión e identificación → respuestas sugeridas → elección → publicación a la comunidad si hace falta → voluntario o proveedor → ejecución y seguimiento",
+        "where": "La conserjería y la página de deseo nuevo. Un deseo publicado aparece también en el mapa de demanda y en las páginas de misiones y recursos.",
+        "do": "Escribir un deseo, fijar zona y presupuesto, abrirlo para que otros se sumen, elegir entre ofertas y marcar que llegó una respuesta."
+      },
+      "maagad": {
+        "name": "Agregado de demanda",
+        "code": "Maagad · compra compartida",
+        "what": "Un agregado de demanda son deseos parecidos de personas distintas que se unen en una sola fuerza de compra. Mientras es pequeño se muestra solo como rango, sin revelar quién se sumó. Cuando se acumula suficiente demanda en una zona, se vuelve visible para los proveedores, y un proveedor puede hacer una oferta condicionada a umbral: «un minibús, sale con 10 inscritos». La oferta solo se cumple si el umbral se cruza a tiempo, así que ninguna parte se compromete sola.",
+        "stages": "Deseos parecidos → agregado en formación → umbral de exposición superado → visible para proveedores → oferta condicionada a umbral → umbral superado → se realiza",
+        "where": "En el mapa público de demanda y en la página del propio agregado. Una rikma también ve agregados relevantes en el cerebro → Oportunidades.",
+        "do": "Sumarte a un agregado, ver cuántos faltan para el umbral, hacer una oferta como proveedor y seguir la fecha de cierre."
+      },
+      "service": {
+        "name": "Servicio y solicitud de compra",
+        "code": "Sheirut · Sheirutpend",
+        "what": "Una solicitud de compra es el lado entrante del mercado: alguien de fuera quiere comprar un producto o recibir un servicio de la rikma. La solicitud llega como propuesta, se coordina entre el cliente y la rikma (fecha, cantidad, precio) y, cuando ambas partes acuerdan, se convierte en trabajo y al final en venta y reparto. Es la vía por la que el dinero externo entra al sistema por consentimiento y no como pedido anónimo.",
+        "stages": "Solicitud del cliente → oferta y coordinación → acuerdo de ambas partes → ejecución → venta → reparto",
+        "where": "La página de tratos y el centro de ventas. Las solicitudes que te esperan aparecen en Lev, y los productos que se pueden pedir están en la página de productos.",
+        "do": "Enviar una solicitud de compra, coordinar fecha y cantidad, aprobar o contraproponer, marcarla como hecha y convertirla en venta."
+      },
+      "timer": {
+        "name": "Temporizador y acciones",
+        "code": "Timer · Act",
+        "what": "El temporizador es la medición real del tiempo sobre una misión en curso, y las acciones son la misión desglosada en pasos pequeños que se pueden marcar. Las horas medidas son el material del que se deriva tu parte en el reparto, así que deben ser exactas: por eso también las aprueba al final la rikma y no se cierran por tu cuenta.",
+        "stages": "Misión en curso → iniciar temporizador → parar y reanudar → resumen de horas → aprobación de cierre → horas contadas en el valor",
+        "where": "En la página de temporizadores, en la tarjeta de la misión en Lev y en el cerebro → Trabajo → Temporizadores. También por el bot de Telegram y la interfaz MCP.",
+        "do": "Iniciar, detener y corregir un temporizador, marcar acciones completadas, revisar el historial de horas y presentarlas para aprobación."
+      },
+      "process": {
+        "name": "Proceso y cadena",
+        "code": "Process · Chain",
+        "what": "Un proceso es un contenedor que agrupa misiones y recursos en un solo orden: un «lanzamiento de producto» con diseño, desarrollo, materiales y difusión. Una cadena es lo mismo desde el ángulo del ciclo de vida: qué sigue siendo propuesta, qué ya está abierto, qué está en curso y qué terminó. Juntos permiten ver un proyecto entero y no una lista de recados.",
+        "stages": "Definir un proceso → asociar misiones y recursos → orden y dependencias → seguimiento en la cadena → cierre",
+        "where": "Cerebro → Flujos, y en las vistas gantt y kanban que muestran lo mismo en una línea de tiempo y en un tablero.",
+        "do": "Crear un proceso, asociarle misiones y recursos existentes o nuevos, fijar el orden y seguir el avance."
+      }
+    }
+  },
+  "flows": {
+    "title": "Los procesos centrales, paso a paso",
+    "desc": "Los mismos objetos de arriba, esta vez en el orden en que realmente actúas.",
+    "steps": {
+      "open_rikma": {
+        "title": "Abrir una rikma",
+        "text": "Una rikma se abre con un nombre, una descripción y unos valores. Los valores no son decoración: se eligen del vocabulario común, y eso es lo que permite que gente con valores parecidos os encuentre. En este paso también se fija el tiempo de decisión: cuánto permanece abierta cada propuesta antes de aceptarse por sí sola. Se puede cambiar después, pero conviene empezar con un número que se ajuste al ritmo real del grupo.",
+        "where": "Perfil → crear una rikma. Tras crearla llegas directamente al cerebro de la rikma nueva.",
+        "cta": "Abrir una rikma"
+      },
+      "create_task": {
+        "title": "Proponer una misión o un recurso",
+        "text": "En el cerebro, la pestaña de creación ofrece tres vías: una misión, una petición de recurso o un proceso que contiene ambos. Defines qué hay que hacer, cuántas horas lleva, cuál es la tarifa por hora y qué habilidades se necesitan; o, en el recurso, qué cantidad y a qué precio por unidad. En esta etapa sigue siendo solo una propuesta: entra en una votación, no en la lista de tareas.",
+        "where": "Cerebro → Crear. También hay una vía con IA que revisa la rikma y propone misiones listas para vuestra aprobación.",
+        "cta": "Ir a crear"
+      },
+      "negotiation": {
+        "title": "Negociación y consentimiento",
+        "text": "Cada propuesta entra en un periodo de negociación tan largo como el tiempo de decisión de la rikma. Un miembro puede aprobar, abrir una conversación para entender o hacer una contrapropuesta precisa: «no 20 horas sino 12», «no 150 la hora sino 120». Una contrapropuesta no es un rechazo: es una versión nueva sobre la mesa, y reinicia el reloj y empieza otra ronda. Esto sigue hasta que ambas partes firman la misma versión.",
+        "where": "Cerebro → Votaciones, y todo lo que te espera personalmente en Lev.",
+        "cta": "Mis votaciones"
+      },
+      "auto_approve": {
+        "title": "Aprobación por silencio",
+        "text": "Si pasa el tiempo de decisión y nadie respondió, la última versión sobre la mesa se aprueba automáticamente. No es un detalle técnico sino una postura: el silencio es consentimiento, al ritmo que el propio grupo eligió. Quien quiera influir responde a tiempo; quien no, confía en el grupo. Tras la aprobación, una misión queda abierta y se puede asumir, y un recurso queda buscado y se puede aportar.",
+        "where": "Cada propuesta muestra su reloj: en el cerebro → Votaciones y en la tarjeta dentro de Lev.",
+        "cta": "Ir a Lev"
+      },
+      "execution": {
+        "title": "Ejecución y temporizadores",
+        "text": "Una misión abierta espera a que alguien pida asumirla. Aceptada la petición, la misión pasa a «en curso» y se abre un temporizador sobre ella. Se puede iniciar y detener desde cualquier sitio: la página de temporizadores, la tarjeta de la misión en Lev, el cerebro, el bot de Telegram o la interfaz MCP, y las horas se acumulan. También puedes dividir la misión en acciones pequeñas e irlas marcando.",
+        "where": "Temporizadores, mis tareas y cerebro → Trabajo → En curso.",
+        "cta": "Ir a temporizadores"
+      },
+      "finish": {
+        "title": "Cierre, aprobación y archivo",
+        "text": "Al terminar se presenta la misión para su aprobación y se puede adjuntar prueba de trabajo: un archivo, un enlace o una imagen. Los miembros de la rikma aprueban, y si alguien cree que las horas no son exactas propone otro número en lugar de rechazar. Tras la aprobación la misión pasa al archivo y las horas cuentan en tu valor dentro de la rikma, que es lo que determinará tu parte en el próximo reparto.",
+        "where": "Cerebro → Trabajo → En curso, y las aprobaciones de cierre que te esperan en Lev.",
+        "cta": "Mis aprobaciones"
+      },
+      "money": {
+        "title": "De la venta al reparto",
+        "text": "Cuando entra dinero registras una venta, la vinculas a un producto y a un cliente e indicas quién tiene el dinero. Si lo tiene otra persona se abre un consentimiento bilateral, y la venta solo cuenta una vez es efectiva. Cuando se ha acumulado lo suficiente creas un reparto: el sistema calcula la parte de cada miembro según las horas y los recursos que le fueron aprobados, todos aprueban o proponen otra cosa, y después marcas las transferencias realizadas.",
+        "where": "El centro de ventas, y cerebro → Dinero → Ventas y Reparto.",
+        "cta": "Ir al centro de ventas"
+      }
+    }
+  },
+  "principles": {
+    "title": "Reglas rectoras",
+    "desc": "Cinco reglas que explican casi cada decisión de diseño del sistema. Si algo en la interfaz te parece raro, la respuesta probablemente esté aquí.",
+    "items": {
+      "noHardNo": {
+        "title": "No hay un «no» absoluto",
+        "text": "Un rechazo unilateral cierra la conversación, así que aquí no existe. En su lugar hay tres formas de responder: aprobar, abrir una conversación o hacer una contrapropuesta precisa. Incluso «no recibí nada» se dice como contrapropuesta por un importe de 0: una afirmación que se puede discutir, no un veto que no deja nada que decir."
+      },
+      "silence": {
+        "title": "El silencio es consentimiento, al ritmo de la rikma",
+        "text": "Cada propuesta permanece abierta durante el tiempo de decisión de la rikma. Si no hay respuesta a tiempo, se aprueba la última versión. El ritmo lo fija el grupo y no el sistema, y una contrapropuesta siempre reinicia el reloj."
+      },
+      "oneEngine": {
+        "title": "Un solo motor de decisión para todo",
+        "text": "Una misión, un recurso, un producto, una venta, un reparto y un cambio en los ajustes de la rikma pasan todos por el mismo mecanismo de propuesta, reloj y consentimiento. No hay vía alternativa para ningún tipo de decisión, por eso basta con aprenderlo una vez."
+      },
+      "saleHolder": {
+        "title": "Una afirmación sobre otra persona requiere su consentimiento",
+        "text": "Decir «el dinero lo tengo yo» es un autoinforme y es definitivo de inmediato. Decir «el dinero lo tiene X» es afirmar algo sobre la situación financiera de otra persona, así que se abre como consentimiento bilateral. Hasta que se cierra, la venta no cuenta ni en saldos ni en repartos."
+      },
+      "sovereignty": {
+        "title": "Soberanía y privacidad por defecto",
+        "text": "Nadie actúa en tu nombre sin tu aprobación, y toda acción que te afecta se te muestra antes de cerrarse. Las páginas públicas muestran números agregados y no identidades: ubicación redondeada, un rango en lugar de un número exacto, y un nombre solo se revela al entrar en el propio elemento y según sus reglas de acceso."
+      }
+    }
+  },
+  "help": {
+    "title": "¿No encontraste respuesta?",
+    "text": "Para preguntas cortas hay una página de preguntas frecuentes, y para un desacuerdo profundo hay un motor de consentimiento aparte. También puedes abrir una conversación con la conserjería y describir con tus palabras qué falta.",
+    "faq": "Preguntas frecuentes",
+    "concierge": "Ir a conserjería"
+  },
+  "ai": {
+    "title": "Guía para agentes de IA",
+    "desc": "Una guía técnica aparte para agentes que actúan en nombre de un usuario: mapa de direcciones, contrato de descubrimiento de cada entidad, flujos de trabajo y reglas de seguridad.",
+    "cta": "A la guía de agentes"
+  },
+  "footer": "1💗1 — Creamos juntos, en armonía"
 }

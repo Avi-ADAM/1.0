@@ -43,6 +43,7 @@
   "nav": {
     "about": "About",
     "faq": "FAQ",
+    "guide": "Guide",
     "agreementMap": "Agreement Map",
     "changeLanguage": "Change Language"
   },
@@ -293,6 +294,12 @@
     "title": "Love to grow, build, or create with your hands? Come see how 1💗1 can help you",
     "desc": "For farmers, gardeners, craftspeople and anyone who wants to earn from the land — without upfront capital or going it alone.",
     "cta": "To the Grow page"
+  },
+  "guide": {
+    "eyebrow": "📖 The complete guide",
+    "title": "Everything the system holds, in one place",
+    "desc": "Rikma, mission, resource, product, sale, split, demand aggregate — what each one is, what it goes through from idea to profit split, and exactly where you click.",
+    "cta": "Read the guide"
   },
   "consensus": {
     "eyebrow": "🤝 The Agreement Engine",
