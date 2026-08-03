@@ -86,7 +86,11 @@
   let time = 0;
   useTask((delta) => {
     if (!reduce) time += delta;
-    const flow = clamp01((scrollProgress - 0.2) / 0.5);
+    // the coins belong to the globe act: they bloom with it and draw back in
+    // at the end, clearing the stage for the 1💗1 reveal.
+    const flow =
+      clamp01((scrollProgress - 0.14) / 0.4) *
+      (1 - clamp01((scrollProgress - 0.66) / 0.26));
     mesh.visible = flow > 0.01;
     if (!mesh.visible) return;
 

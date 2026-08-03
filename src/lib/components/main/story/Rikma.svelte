@@ -2,9 +2,11 @@
   Rikma.svelte — the "ריקמה" (network) that tells the site's story with scroll.
 
   A single cloud of points morphs through three layouts driven by scrollProgress:
-    scatter (isolated individuals)  →  heart (a connected ריקמה)  →  globe (a
-    global movement). Glowing lines between neighbours fade in as the points
-    gather, so the viewer literally watches "alone" become "together".
+    scatter (a few isolated individuals, the minimal opening)  →  globe (a
+    worldwide movement)  →  heart (the ריקמה closing around the "1💗1" reveal).
+  Glowing lines between neighbours fade in as the points gather into the globe,
+  so the viewer literally watches "alone" become "together", and fade out again
+  when the heart forms so the final logo reveal stays clean.
 
   Everything is procedural + instanced (one Points object, one LineSegments),
   so it is light and animates entirely from a single scroll value.
@@ -72,7 +74,9 @@
     ];
   }
 
-  // 2) heart — classic parametric heart curve, filled inward for volume.
+  // 2) heart — classic parametric heart curve. It is the *last* act now, and it
+  // has to frame the revealed 1💗1 logo, so the points stay on the outer rim
+  // (large radius, only lightly filled) instead of crowding the centre.
   function heartPoint(i, n) {
     const t = (i / n) * Math.PI * 2;
     const x = 16 * Math.pow(Math.sin(t), 3);
@@ -81,10 +85,10 @@
       5 * Math.cos(2 * t) -
       2 * Math.cos(3 * t) -
       Math.cos(4 * t);
-    const fill = 0.5 + 0.5 * rnd(i + 7); // pull some points toward the centre
+    const fill = 0.82 + 0.18 * rnd(i + 7); // keep them near the outline
     return [
-      (x / 16) * 2.4 * fill,
-      (y / 16) * 2.4 * fill + 0.25,
+      (x / 16) * 3.2 * fill,
+      (y / 16) * 3.2 * fill + 0.15,
       (rnd(i + 11) - 0.5) * 0.9
     ];
   }
@@ -126,15 +130,17 @@
     })
   );
 
-  // --- neighbour links (computed on the heart layout) ----------------------
+  // --- neighbour links (computed on the globe layout) ----------------------
+  // The globe is the act the links belong to — nearest neighbours on the sphere
+  // draw the worldwide mesh. They fade out again once the heart forms.
   const pairs = [];
   for (let i = 0; i < count; i++) {
     const cand = [];
     for (let j = 0; j < count; j++) {
       if (i === j) continue;
-      const dx = heart[i][0] - heart[j][0];
-      const dy = heart[i][1] - heart[j][1];
-      const dz = heart[i][2] - heart[j][2];
+      const dx = globe[i][0] - globe[j][0];
+      const dy = globe[i][1] - globe[j][1];
+      const dz = globe[i][2] - globe[j][2];
       cand.push([dx * dx + dy * dy + dz * dz, j]);
     }
     cand.sort((a, b) => a[0] - b[0]);
@@ -174,22 +180,23 @@
     if (!reduce) time += delta;
     const p = scrollProgress;
 
-    // act weights: gather (scatter→heart) then wrap (heart→globe)
-    const gather = smooth(clamp01((p - 0.28) / 0.34)); // 0.28 .. 0.62
-    const wrap = smooth(clamp01((p - 0.6) / 0.36)); //    0.60 .. 0.96
-    if (!reduce && wrap > 0.001) spin += delta * (0.12 + wrap * 0.45);
+    // act weights: gather (scatter→globe) then bloom (globe→heart)
+    const gather = smooth(clamp01((p - 0.1) / 0.34)); //  0.10 .. 0.44
+    const bloom = smooth(clamp01((p - 0.62) / 0.3)); //   0.62 .. 0.92
+    if (!reduce && gather > 0.001)
+      spin += delta * (0.12 + gather * 0.45) * (1 - bloom);
 
     const drift = (1 - gather) * 0.25; // gentle isolation float, gone once joined
     for (let i = 0; i < count; i++) {
       const s = scatter[i];
-      const h = heart[i];
       const g = globe[i];
-      let x = lerp(s[0], h[0], gather);
-      let y = lerp(s[1], h[1], gather);
-      let z = lerp(s[2], h[2], gather);
-      x = lerp(x, g[0], wrap);
-      y = lerp(y, g[1], wrap);
-      z = lerp(z, g[2], wrap);
+      const h = heart[i];
+      let x = lerp(s[0], g[0], gather);
+      let y = lerp(s[1], g[1], gather);
+      let z = lerp(s[2], g[2], gather);
+      x = lerp(x, h[0], bloom);
+      y = lerp(y, h[1], bloom);
+      z = lerp(z, h[2], bloom);
       if (drift > 0) {
         y += Math.sin(time * 0.8 + i) * drift;
         x += Math.cos(time * 0.6 + i * 1.3) * drift * 0.6;
@@ -211,11 +218,12 @@
     }
     lgeom.attributes.position.needsUpdate = true;
 
-    // globe spin (points + lines share the same rotation so links stay attached)
-    rig.rotation.y = spin;
+    // globe spin (points + lines share the same rotation so links stay attached).
+    // It unwinds back to 0 as the heart forms, so the heart faces the viewer.
+    rig.rotation.y = spin * (1 - bloom);
 
-    lines.material.opacity = 0.4 * gather * (1 - 0.5 * wrap);
-    points.material.opacity = 0.22 + 0.72 * gather;
+    lines.material.opacity = 0.4 * gather * (1 - bloom);
+    points.material.opacity = 0.18 + 0.6 * gather + 0.2 * bloom;
   });
 </script>
 

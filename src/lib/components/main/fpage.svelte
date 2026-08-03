@@ -136,6 +136,10 @@
     height: h
   });
 
+  // בדסקטופ פאנל התוכן תופס חצי מסך (ימין ב‑RTL, שמאל אחרת). הגילוי הסופי של
+  // הלוגו "1💗1" מוזז אל החצי הפנוי כדי שלא ייחתך מתחתיו. במובייל — נשאר במרכז.
+  let logoShiftX = $derived(w >= 640 ? ($isRtl ? -1.7 : 1.7) : 0);
+
   async function loadStats() {
     try {
       const res = await fetch('/api/stat');
@@ -371,6 +375,7 @@
           hover={btna == true || btnb == true ? true : false}
           {scrolli}
           {scrollProgress}
+          logoShiftX={logoShiftX}
         />
       </Canvas>
     </div>

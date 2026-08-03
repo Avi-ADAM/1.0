@@ -35,13 +35,16 @@ onMount(()=>{
     hover = false,
     scrolli = false,
     scrollProgress = 0,
+    // הזזה אופקית (יחידות three) של הגילוי הסופי אל החצי הפנוי של המסך —
+    // בדסקטופ פאנל התוכן מכסה חצי מסך, ובלעדיה חלק מהלוגו נשאר מתחתיו.
+    logoShiftX = 0,
     size = {w:0,h:0}
   } = $props();
 
 let rotationt = $state(0)
 let poz = $state({z:0, y:0, x:0});
 
-// ===== סיפור הגלילה: מבודדים → ריקמה → עולם =====
+// ===== סיפור הגלילה: מינימלי → עולם ומטבעות → הגילוי "1💗1" =====
 // כדור-הארץ מגיע מ-withlev.glb (11MB, כבר בשימוש באתר). אין צורך בגלובוס
 // ה-GLB הכבד (static/3d/כדור.glb ~45MB).
 const clamp01 = (x) => Math.min(1, Math.max(0, x))
@@ -50,18 +53,24 @@ const reduceMotion =
   typeof window !== 'undefined' &&
   window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
-// מערכה 1 — הלוגו נסוג לאחור וקטן כשמתחילים לגלול
-let logoFade = $derived(smooth(clamp01((scrollProgress - 0.08) / 0.3)))
-let logoScale = $derived(1 - logoFade * 0.88)
-let logoLift = $derived(logoFade * 2.6)
-let logoZ = $derived(-logoFade * 3)
+// מערכה 1 — פתיחה מינימליסטית: אין לוגו ואין גלובוס, רק נקודות בודדות
+// שנסחפות לאט (Rikma). כל השאר נכנס בהמשך הגלילה.
 
-// מערכה 2 — כדור-הארץ/הלב (withlev.glb) צומח כשהרשת מתלכדת, ונסוג במעט
-// כשהריקמה נפרשת לרשת עולמית סביבו במערכה 3.
-let heartGrow = $derived(smooth(clamp01((scrollProgress - 0.22) / 0.3)))
-let heartRecede = $derived(smooth(clamp01((scrollProgress - 0.62) / 0.3)))
-let heartScale = $derived(3.9 * heartGrow * (1 - 0.72 * heartRecede))
+// מערכה 2 — כדור-הארץ/הלב (withlev.glb) צומח יחד עם הרשת העולמית והמטבעות,
+// ונסוג לקראת הסוף כדי לפנות את הבמה לגילוי.
+let heartGrow = $derived(smooth(clamp01((scrollProgress - 0.12) / 0.3)))
+let heartRecede = $derived(smooth(clamp01((scrollProgress - 0.6) / 0.28)))
+let heartScale = $derived(3.9 * heartGrow * (1 - 0.94 * heartRecede))
 let heartVisible = $derived(heartScale > 0.02)
+
+// מערכה 3 — הגילוי: "1💗1" הוורוד עולה מהעומק אל המרכז בסוף הגלילה
+let logoReveal = $derived(smooth(clamp01((scrollProgress - 0.68) / 0.28)))
+let logoVisible = $derived(logoReveal > 0.01)
+// בסוף הגלילה ה-wrapper של הקנבס כבר מוגדל (scale 1.1) ומוסט מעלה (‎-5%‎),
+// לכן הלוגו נעצר על ~0.85 ויורד מעט — אחרת הוא נחתך מחוץ למסך.
+let logoScale = $derived(0.12 + 0.73 * logoReveal)
+let logoLift = $derived((1 - logoReveal) * 1.8 - 0.4 * logoReveal)
+let logoZ = $derived(-(1 - logoReveal) * 4)
 let heartRef = $state()
 let heartSpin = 0
 
@@ -189,10 +198,22 @@ let isHovering = false, isPointerDown = false
 
 <T.DirectionalLight  intensity={0.81} position={{ y: -20, z: -5, x: 5 }} />
 <T.DirectionalLight  intensity={0.91} position={{ y: 10, z: 10 }} />
-<T.PointLight intensity={scrollProgress * 12} position={[0, 0.2, 2.5]} color="#ffd27a" />
+<T.PointLight
+  intensity={12 * heartGrow * (1 - 0.6 * heartRecede) + 5 * logoReveal}
+  position={[0, 0.2, 2.5]}
+  color="#ffd27a"
+/>
 
-<!-- מערכה 1: הלוגו "1💗1" — נסוג לאחור וקטן ככל שגוללים -->
-<T.Group scale={logoScale} position.y={logoLift} position.z={logoZ}>
+<!-- מערכה 3: הגילוי — הלוגו "1💗1" עולה מהעומק בסוף הגלילה.
+     נשאר מותקן (mounted) כל הזמן כדי שה-GLB ייטען מראש עם מסך הטעינה,
+     ורק מוסתר עד רגע הגילוי. -->
+<T.Group
+  visible={logoVisible}
+  scale={logoScale}
+  position.x={logoShiftX * logoReveal}
+  position.y={logoLift}
+  position.z={logoZ}
+>
   <Glttf {poz} s={ss} {fi} {hover} {scrolli}/>
 </T.Group>
 
