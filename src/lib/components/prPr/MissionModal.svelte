@@ -85,7 +85,7 @@
         {:else if modal.kind === 'pendm'}
           <PendsM who={modal.id} pmiData={getDataArray()} />
         {:else if modal.kind === 'openM'}
-          <NewOpn who={modal.id} omiData={getDataArray()} {projectName} />
+          <NewOpn who={modal.id} omiData={getDataArray()} {projectName} {projectId} />
         {:else if modal.kind === 'done'}
           <Finisin who={modal.id} fmiData={getDataArray()} />
         {:else if modal.kind === 'assign'}

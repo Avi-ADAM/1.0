@@ -104,7 +104,8 @@
     "upload": "Upload",
     "editDetails": "Edit Details",
     "publicProfile": "Public Profile",
-    "activeNow": "Active Now"
+    "activeNow": "Active Now",
+    "open": "Open for partners"
   },
   "create": {
     "mission": "Create Mission",
@@ -266,5 +267,39 @@
         "desc": "Window expired."
       }
     }
+  },
+  "open": {
+    "title": "Open for partners",
+    "subtitle": "Every mission and resource this rikma is still looking for someone for — in one place",
+    "searchPh": "Search by name, description, skill or role…",
+    "tabAll": "All",
+    "tabMissions": "Missions",
+    "tabResources": "Resources",
+    "missionsHeading": "Open missions",
+    "resourcesHeading": "Needed resources",
+    "singleHeading": "Open mission",
+    "openBadge": "Published, looking for partners",
+    "pendingBadge": "Awaiting the rikma’s approval",
+    "pendingToggle": "Also show items awaiting approval",
+    "pendingHeading": "Awaiting the rikma’s approval",
+    "pendingNote": "Proposals that have not passed a vote yet — they are not open to anyone outside the rikma.",
+    "empty": "This rikma has no open missions or needed resources right now.",
+    "emptyCta": "Create a mission or request a resource",
+    "emptyFiltered": "Nothing matches this search.",
+    "fullBoard": "Open the full board",
+    "hours": "hours",
+    "totalValue": "Mission value",
+    "acts": "actions",
+    "candidates": "candidates",
+    "noCandidates": "No candidates yet",
+    "toVote": "Go to the vote",
+    "viewResource": "View resource page",
+    "more": "+{{count}}",
+    "perMonth": "per month",
+    "perYear": "per year",
+    "perUnit": "per unit",
+    "perPeriod": "for the whole period",
+    "shareResource": "Resource \"{{name}}\" needed in the rikma {{projectName}} on 1💗1",
+    "progressLink": "{{count}} missions and resources are still looking for partners"
   }
 }

@@ -20,6 +20,7 @@
     negopendmissions(sort: "ordern:desc"){data{attributes{
       ordern proposedBy name descrip hearotMeyuchadot noofhours perhour date dates
       tafkidims{data{id}}
+      acts{data{id}}
     }}}
 }}}
  }`;
@@ -90,7 +91,8 @@
 
       let qua = `{ask (id:${id}) {data{ id attributes{
     open_mission{data{id attributes{hearotMeyuchadot
-       tafkidims{data{id}} name privatlinks sqadualed dates howMeny publicklinks descrip noofhours perhour iskvua mission{data{id}}}}}
+       tafkidims{data{id}} name privatlinks sqadualed dates howMeny publicklinks descrip noofhours perhour iskvua mission{data{id}}
+       acts{data{id}}}}}
         }}}
          }`;
       let res2 = await SendToAdmin(qua, ADMINMONTHER).then((res2) => (res2 = res2));
@@ -223,6 +225,25 @@ updateOpenMission(
         } catch (e) {
           console.error(e);
         }
+      }
+
+      // Hand the agreed checklist to the new mission: the winning round's list
+      // when it carries one, else the OpenMission baseline. Without this the
+      // tasks stay orphaned on the (now archived) offer.
+      // The most recent round that recorded a checklist wins; rounds that said
+      // nothing about it (e.g. a first proposal) fall through to the baseline.
+      const roundWithActs = (a.negopendmissions?.data || []).find(
+        (r) => r.attributes?.acts?.data?.length > 0
+      );
+      const actIds = (roundWithActs?.attributes?.acts?.data ?? om.acts?.data ?? []).map((x) => x.id);
+      for (const actId of actIds) {
+        let assign = `mutation {
+          updateAct(
+            id: "${actId}"
+            data: { isAssigned: true, myIshur: true, mesimabetahaliches: [${chiluzh}] }
+          ){data{id}}
+        }`;
+        await SendToAdmin(assign, ADMINMONTHER).catch((e) => console.error(e));
       }
 
       // Archive the other (losing) candidates' asks on this mission.

@@ -167,7 +167,10 @@
     { id: 'work', label: 'work', tabs: ['progress', 'acts', 'kanban', 'gantt', 'timers', 'shifts'] },
     { id: 'flows', label: 'flows', tabs: ['processes', 'chains'] },
     { id: 'money', label: 'money', tabs: ['sales', 'split'] },
-    { id: 'opps', label: 'opps', tabs: ['wishes', 'demand'] },
+    // 'open' = the rikma's own open missions/resources looking for partners.
+    // It sits after 'wishes' so the group keeps its landing page (and its
+    // incoming-wishes badge) unchanged.
+    { id: 'opps', label: 'opps', tabs: ['wishes', 'open', 'demand'] },
     { id: 'votes', label: 'votes', tabs: ['votes'] }
   ];
 

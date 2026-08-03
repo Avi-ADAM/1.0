@@ -124,13 +124,26 @@
   (לא דורס) + מעדכן vots.
 - `applyToMission.ts` — מסלול A/C; solo מאשר ישירות.
 - `finalizeAskAcceptance.ts` — מחיל את הסבב האחרון לפני `createMesimabetahalich`.
+- `askAcceptance.ts` (`evaluateAskAcceptance`) — **שער ההסכמה של המסלול המיידי**:
+  `finalizeJoinAcceptance`/`finalizeAskAcceptance` מריצים את אותו `computeNegoGate`
+  של הפקיעה לפני שהם מייצרים `Mesimabetahalich`. בהצעה **מוקצית**
+  (`open_mission.isRishon` — חבר יצר משימה עבור מישהו אחר) שתיקת המוקצה אינה
+  הסכמה: אם ה-taker לא הצביע בעד ב-`order ≥ L` (ולא העלה סבב `candidate` משלו),
+  הפעולה **לא** מממשת — היא רק שומרת את הצבעת-הבעד של החבר המאשר ומוודאת
+  timegrama פעיל, וההצעה נשארת פתוחה. ספירות ההצבעות של הלקוח (`noofpu ===
+  noofusersOk`, `variant`) הן אינדיקציה בלבד; ה-vots נכתבים מהמצב שבשרת.
 
 ### 3.3 פקיעת הזמן (cron)
 - `src/routes/api/timegrama/+server.js` — `x()` מנתב לפי `whatami`:
   `ask`→`ask.svelte`, `pendm`→`pend.svelte`, `pmash`→`pendM.svelte`,
   `finiapruval`→`finiapp.svelte`.
-- `ask.svelte` — מאשר כש-`vots.length>0` ואין `false`, ואז יוצר
-  `Mesimabetahalich` + מארכב OpenMission/Ask/asks אחרים.
+- `ask.svelte` — מאשר לפי `computeNegoGate` (הסכמה דו-צדדית על הסבב האחרון),
+  ואז יוצר `Mesimabetahalich` + מארכב OpenMission/Ask/asks אחרים. בהצעה מוקצית
+  (`isRishon`) ללא הסכמת המוקצה — פותח מחדש את ה-OpenMission ומארכב את ה-Ask.
+- `pend.svelte` — pendm שהבשיל בשתיקה: ללא `rishon` → OpenMission ציבורי
+  (+match-suggestions); עם `rishon` → OpenMission מוקצה (`isRishon`, `archived`)
+  + Ask למוקצה + timegrama משלו, כך שההקצאה נשמרת וההסכמה שלו עדיין נדרשת.
+  (אותו פיצול ב-`voteOnPendm` כשהריקמה מאשרת פה-אחד, כולל נוטיפיקציה למוקצה.)
 
 ---
 
@@ -197,9 +210,17 @@ timegrama פעיל, ליצור; אם יש, להאריך/לאפס את ה-date ל
    ה-`done` נטען על ה-asks/askms ב-`83levMainUserQuery` וממופה ב-extractors
    (`timegramaDone`). כרטיסי pendm/finiapruval/maap/decision כבר הציגו שעון.
 
-1. **טעינת תנאי המועמד לכרטיס בעל-הזכות** — שאילתות ה-askm/ask בעמוד הלב טוענות
-   רק את בסיס ה-open_mashaabim/open_mission. להוסיף `nego_mashes`/`negopendmissions`
-   (ordern:desc) כדי ש-`reqtom`/`reqtojoin` יציגו את ההצעה האחרונה.
+1. **טעינת תנאי המועמד לכרטיס בעל-הזכות — ✅ בוצע.** `83levMainUserQuery`,
+   `87levSliceAskedResources` ו-`getAskmForVote` טוענות `nego_mashes(ordern:desc)`
+   (כולל `createdAt` + מציע הסבב), וה-extractor חושף אותן כ-`negopendmissions`+
+   `orderon`. **הרינדור:** `cards/reqtojoin.svelte` (משימה) ו-`cards/rektom.svelte`
+   (משאב) מציגים באנר "ההצעה החיה" עם הסבב האחרון — תג `candidate`/`project`,
+   מספר הסבב ותאריכו, שווי/עלות מול דרישת הריקמה, שינויי שם/מועדים/תיאור/הערות.
+   ב-`rektom` גם החישובים הנגזרים (עלות למחזור, סך השקעה, כותרת הקלף) רצים על
+   התנאים ה**אפקטיביים** (`round ?? baseline`) — אותם תנאים ש-
+   `runResourceAskmAcceptance` מחיל על ה-OpenMashaabim באישור. באנר של תג
+   `N משא ומתן` בלבד היה מסתיר את ההצעה עצמה מחברי הריקמה.
+   *(ל-`isRishon` הסבבים הם snapshots היסטוריים של ה-pmash ולכן אינם מוצגים כאן.)*
 2. **חישוב סבב/תור בצד הלקוח** — helper משותף שגוזר `currentRound=max(ordern)`,
    `turn` מ-`proposedBy` של הסבב האחרון, ו-`approvable` (אותה נוסחה כמו השרת,
    A.1) — לשימוש חוזר בכרטיסים ובפקיעה.
@@ -285,5 +306,20 @@ timegrama פעיל, ליצור; אם יש, להאריך/לאפס את ה-date ל
        (בוחר SP קיים או יוצר חדש מסוג המשאב, כפי שהמשתמש תיאר); כפתור "להציע תנאים
        אחרים" בשני המסלולים (יצירה/בחירה) → פותח `<Nego>` → `proposeOnOpenMashaabim`
        עם ה-spId (השרת מנתב חבר/לא-חבר).
+- [x] **תיקון מסלול המו"מ ל-isRishon ב-reqtojoin** — להצעה מוקצית אין pendm משלה,
+       ולכן `pendId={openMid}` + `isAsk=0` שלחו את `submitNegoMission` למסלול ה-pendm
+       ועדכנו ישות זרה. עכשיו כל מו"מ בכרטיס רץ על סבבי ה-Ask: המוקצה/המועמד
+       (`myid === userId`) → `candidateCounterOnAsk` (סבב `candidate`, עוצר את השעון),
+       שאר החברים → `counterOnAsk` (סבב `project`). השרת מאמת ב-`candidateCounterOnAsk`
+       שהקורא הוא באמת ה-taker.
+- [x] **צ'קליסט (acts) שורד את המו"מ** — `negoM` מעביר את רשימת המטלות גם במסלול
+       ה-`onSubmit` (Ask), ו-`counterOnAsk`/`candidateCounterOnAsk`/`submitNegoMission`
+       שומרים אותה **על הסבב** (`Negopendmission.acts`) ולא על ה-OpenMission
+       המשותף — אחרת הצ'קליסט של מועמד אחד נכנס לבסיס של כולם. באישור
+       (`finalizeJoinAcceptance`/`finalizeAskAcceptance`/`ask.svelte` בפקיעה)
+       המטלות של הסבב האחרון שרשם צ'קליסט עוברות ל-Mesimabetahalich; סבב שלא אמר
+       דבר על הצ'קליסט (למשל הצעה ראשונה של מועמד, שאין בה UI למטלות) נופל אחורה
+       לסבב הקודם ואז לבסיס (`helpers/roundActs.ts`). דיאלוג המו"מ והכרטיס נטענים
+       מאותה רשימה, כדי שהצעה-נגדית-על-הצעה-נגדית לא תמחק מטלות שהצד השני הוסיף.
 - [ ] helper משותף לחישוב סבב/תור/approvable (אופציונלי — השרת כבר מכריע).
 - [ ] כפתורים בדפים הקבועים

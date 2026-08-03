@@ -37,6 +37,7 @@
   "candidateRound": "اقتراح المرشح",
   "projectRound": "عرض مضاد من المشروع",
   "rikmaReq": "متطلب المشروع",
+  "roundNo": "الجولة {{count}}",
   "proposedBy": "اقترحه:",
   "updatedDescription": "وصف محدث:",
   "updatedNotes": "ملاحظات محدثة:",

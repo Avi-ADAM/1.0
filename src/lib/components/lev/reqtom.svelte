@@ -150,6 +150,15 @@
   let dialogOpen = $state(false);
   let resP = [];
 
+  // Approving an Askm from an offerer who isn't a rikma member yet also onboards
+  // them (runResourceAskmAcceptance → 74addUserToProject). That — not "ratifying
+  // a cycle" — is what this vote decides; recurring cycles only start afterwards.
+  const joinsRikma = $derived(
+    !isRishon &&
+      userId != null &&
+      !(Array.isArray(pid) ? pid.map(String) : []).includes(String(userId))
+  );
+
   // Full dismiss of a self-nominated resource offer (PLAN_SELF_NOMINATION §3.3):
   // archives the Askm, cancels the timegrama and archives the OpenMashaabim.
   let dismissing = $state(false);
@@ -911,6 +920,7 @@
                 {negotiationMode}
                 {negopendmissions}
                 {orderon}
+                {joinsRikma}
                 {selfNomination}
                 onDismiss={dismissSelfNom}
               />

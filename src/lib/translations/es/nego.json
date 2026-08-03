@@ -38,6 +38,7 @@
   "candidateRound": "Propuesta del candidato",
   "projectRound": "Contrapropuesta del proyecto",
   "rikmaReq": "Requisito del proyecto",
+  "roundNo": "Ronda {{count}}",
   "proposedBy": "Propuesto por:",
   "updatedDescription": "Descripción actualizada:",
   "updatedNotes": "Notas actualizadas:",

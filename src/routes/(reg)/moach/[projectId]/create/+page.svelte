@@ -8,10 +8,9 @@
   import Handd from '$lib/components/prPr/handd.svelte';
   import ProcessCreator from '$lib/components/process/ProcessCreator.svelte';
   import ChoosMission from '$lib/components/prPr/choosMission.svelte';
-  import OpenM from '$lib/components/prPr/newOpn.svelte';
+  import OpenBoard from '$lib/components/prPr/open/OpenBoard.svelte';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
   import ResourceCreator from '$lib/components/resource/ResourceCreator.svelte';
-  import Mashman from '$lib/components/prPr/mashmam.svelte';
   import Handp from '$lib/components/prPr/handp.svelte';
   import PlanBoards from '$lib/components/planning/PlanBoards.svelte';
   import Crtask from '$lib/components/prPr/tasks/crtask.svelte';
@@ -133,6 +132,8 @@
   let projectMissionsData = $derived(data.projectMissionsData);
   let noofopen = $derived(projectMissionsData?.open_missions?.data?.length ?? 0);
   let omiData = $derived(projectMissionsData?.open_missions?.data ?? []);
+  /** Mission proposals still awaiting a vote — an opt-in section on the board. */
+  let pendmData = $derived(projectMissionsData?.pendms?.data ?? []);
   /** @type {any[]} */
   let missionTemplates = $derived(data.missionTemplates ?? []);
   const getImageUrl = (url) => {
@@ -523,7 +524,7 @@
 
       <!-- פורמי משימה -->
       {#if openMS}
-        <div class="m-4 border-2 border-barbi rounded bg-white/80 backdrop-blur-sm shadow-xl">
+        <div class="m-4 border-2 border-barbi rounded bg-slate-900/70 backdrop-blur-sm shadow-xl">
           <div class="p-2 flex justify-end">
             <button
               onclick={() => (openMS = false)}
@@ -535,7 +536,17 @@
               </svg>
             </button>
           </div>
-          <OpenM {omiData} projectName={pn} />
+          <div class="p-2 sm:p-4">
+            <OpenBoard
+              {projectId}
+              projectName={pn}
+              missions={omiData}
+              pendms={pendmData}
+              only="missions"
+              showHeader={false}
+              linkToFullBoard={true}
+            />
+          </div>
         </div>
       {/if}
       {#if addM}
@@ -557,7 +568,7 @@
 
       <!-- פורמי משאב -->
       {#if openMA}
-        <div class="m-4 border-2 border-barbi rounded bg-white/80 backdrop-blur-sm shadow-xl">
+        <div class="m-4 border-2 border-barbi rounded bg-slate-900/70 backdrop-blur-sm shadow-xl">
           <div class="p-2 flex justify-end">
             <button
               onclick={() => (openMA = false)}
@@ -569,7 +580,17 @@
               </svg>
             </button>
           </div>
-          <Mashman meData={combinedResources} />
+          <div class="p-2 sm:p-4">
+            <OpenBoard
+              {projectId}
+              projectName={pn}
+              resources={openResources}
+              pmashes={pmashes}
+              only="resources"
+              showHeader={false}
+              linkToFullBoard={true}
+            />
+          </div>
         </div>
       {/if}
       {#if addN}

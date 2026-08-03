@@ -40,7 +40,10 @@
 		via = '',
 		body = "",
 	} = $props();
-    const url = `${siteUrl}/${slug}`;
+	// Call sites pass the slug both ways — '/availableMission/7' and 'gift/7' —
+	// so join them instead of concatenating, or the shared link comes out as
+	// `https://1lev1.com//availableMission/7`.
+	const url = `${siteUrl.replace(/\/+$/, '')}/${String(slug ?? '').replace(/^\/+/, '')}`;
 	$effect(() => {
 		body = desc + " to see this click on " + url
 	})

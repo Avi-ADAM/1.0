@@ -57,7 +57,8 @@
     
     function login() {
         // Use page.params.id instead of data.mId since data might not be available yet
-        goto(`/login?from=availableResorce/${page.params.id}`);
+        // The route is spelled `availiableResorce` — anything else 404s after login.
+        goto(`/login?from=/availiableResorce/${page.params.id}`);
     }
 
     function torange(){
@@ -524,7 +525,7 @@
                                     {/if}
                                 </div>
                                 <div class="">
-                                    <Share slug={'/availableResorce/' + page.data?.mId} title={data.alld?.titleKey ? $t(data.alld.titleKey, data.alld.titleParams) : ''} desc="it's new thing" hashtags={['1💗1', 'consensus']} quote={data.alld?.titleKey ? $t(data.alld.titleKey, data.alld.titleParams) : ''} related={[]} via={''} />
+                                    <Share slug={'availiableResorce/' + page.data?.mId} title={data.alld?.titleKey ? $t(data.alld.titleKey, data.alld.titleParams) : ''} desc="it's new thing" hashtags={['1💗1', 'consensus']} quote={data.alld?.titleKey ? $t(data.alld.titleKey, data.alld.titleParams) : ''} related={[]} via={''} />
                                 </div>
                             </div>
 

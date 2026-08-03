@@ -76,7 +76,15 @@
     "myActs": "Мои задачи",
     "minimize": "Свернуть",
     "openUp": "Открыть вверх",
-    "openBar": "Открыть в ряд"
+    "openBar": "Открыть в ряд",
+    "discover": "Открытия",
+    "discoverLabel": "Страницы открытий",
+    "close": "Закрыть",
+    "discover_map": "Карта спроса",
+    "discover_projects": "Рикмы",
+    "discover_products": "Продукты",
+    "discover_missions": "Открытые миссии",
+    "discover_resources": "Нужные ресурсы"
   },
   "status": {
     "success": "Успешно",

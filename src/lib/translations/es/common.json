@@ -77,7 +77,15 @@
     "myActs": "Mis tareas",
     "minimize": "Minimizar",
     "openUp": "Abrir hacia arriba",
-    "openBar": "Abrir en horizontal"
+    "openBar": "Abrir en horizontal",
+    "discover": "Descubrir",
+    "discoverLabel": "Páginas de descubrimiento",
+    "close": "Cerrar",
+    "discover_map": "Mapa de demanda",
+    "discover_projects": "Rikmas",
+    "discover_products": "Productos",
+    "discover_missions": "Misiones abiertas",
+    "discover_resources": "Recursos buscados"
   },
   "status": {
     "success": "Hecho con éxito",

@@ -76,7 +76,15 @@
     "myActs": "המטלות שלי",
     "minimize": "מזעור",
     "openUp": "פתח למעלה",
-    "openBar": "פתח לרוחב"
+    "openBar": "פתח לרוחב",
+    "discover": "גילוי",
+    "discoverLabel": "עמודי גילוי",
+    "close": "סגירה",
+    "discover_map": "מפת הביקוש",
+    "discover_projects": "רקמות",
+    "discover_products": "מוצרים",
+    "discover_missions": "משימות פתוחות",
+    "discover_resources": "משאבים מבוקשים"
   },
   "status": {
     "success": "בוצע בהצלחה",

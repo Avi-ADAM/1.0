@@ -104,7 +104,8 @@
     "upload": "העלאה",
     "editDetails": "עריכת פרטים",
     "publicProfile": "פרופיל ציבורי",
-    "activeNow": "פעיל כעת"
+    "activeNow": "פעיל כעת",
+    "open": "פתוח לשותפים"
   },
   "create": {
     "mission": "יצירת משימה",
@@ -266,5 +267,39 @@
         "desc": "חלון הזמן עבר."
       }
     }
+  },
+  "open": {
+    "title": "פתוח לשותפים",
+    "subtitle": "כל המשימות והמשאבים של הריקמה שעדיין מחפשים מי שייקח אותם — במקום אחד",
+    "searchPh": "חיפוש לפי שם, תיאור, כישור או תפקיד…",
+    "tabAll": "הכל",
+    "tabMissions": "משימות",
+    "tabResources": "משאבים",
+    "missionsHeading": "משימות פתוחות",
+    "resourcesHeading": "משאבים נדרשים",
+    "singleHeading": "משימה פתוחה",
+    "openBadge": "פורסם ומחפש שותפים",
+    "pendingBadge": "ממתין לאישור הריקמה",
+    "pendingToggle": "להציג גם ממתינים לאישור",
+    "pendingHeading": "ממתינים לאישור הריקמה",
+    "pendingNote": "הצעות שטרם אושרו בהצבעה — הן עדיין לא פתוחות למי שמחוץ לריקמה.",
+    "empty": "אין כרגע משימות או משאבים פתוחים בריקמה.",
+    "emptyCta": "ליצירת משימה או בקשת משאב",
+    "emptyFiltered": "אין תוצאות לחיפוש הזה.",
+    "fullBoard": "לתצוגה המרוכזת",
+    "hours": "שעות",
+    "totalValue": "שווי המשימה",
+    "acts": "פעולות",
+    "candidates": "מועמדים",
+    "noCandidates": "אין עדיין מועמדים",
+    "toVote": "לדף ההצבעה",
+    "viewResource": "לצפיה בדף המשאב",
+    "more": "+{{count}}",
+    "perMonth": "לכל חודש",
+    "perYear": "לכל שנה",
+    "perUnit": "ליחידה",
+    "perPeriod": "לכל התקופה",
+    "shareResource": "דרוש משאב \"{{name}}\" בריקמה: {{projectName}}, באתר 1💗1",
+    "progressLink": "{{count}} משימות ומשאבים עדיין מחפשים שותפים"
   }
 }

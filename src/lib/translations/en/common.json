@@ -76,7 +76,15 @@
     "myActs": "My tasks",
     "minimize": "Minimize",
     "openUp": "Open upward",
-    "openBar": "Open sideways"
+    "openBar": "Open sideways",
+    "discover": "Discover",
+    "discoverLabel": "Discovery pages",
+    "close": "Close",
+    "discover_map": "Demand map",
+    "discover_projects": "Rikmas",
+    "discover_products": "Products",
+    "discover_missions": "Open missions",
+    "discover_resources": "Wanted resources"
   },
   "status": {
     "success": "Success",

@@ -37,6 +37,7 @@
   "candidateRound": "Candidate's proposal",
   "projectRound": "Project's counter",
   "rikmaReq": "Project requirement",
+  "roundNo": "Round {{count}}",
   "proposedBy": "Proposed by:",
   "updatedDescription": "Updated description:",
   "updatedNotes": "Updated notes:",

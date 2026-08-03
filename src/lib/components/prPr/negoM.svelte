@@ -63,6 +63,8 @@
    * @property {Function} [onClose]
    * @property {Function} [onLoad]
    * @property {number} [isAsk]
+   * @property {Function | null} [onSubmit]
+   * @property {any} [candidateRound]
    */
 
   /** @type {Props} */
@@ -110,8 +112,9 @@
     /**
      * Optional: when provided, hands the diff to the parent instead of calling
      * submitNegoMission. Used by the open-mission candidate/counter flow where
-     * the terms become a parallel Negopendmission round. Receives { newValues, originalValues }.
-     * @type {((d: { newValues: any, originalValues: any }) => Promise<void>) | null}
+     * the terms become a parallel Negopendmission round. Receives the field diff
+     * plus the negotiated acts (checklist) so a counter can add/drop tasks too.
+     * @type {((d: { newValues: any, originalValues: any, newActs: any[], existingActsIds: any[], snapshotActIds: any[], actsChanged: boolean }) => Promise<void>) | null}
      */
     onSubmit = null,
     /**
@@ -435,21 +438,8 @@
     // Guard: skip if nothing changed and user already voted (masaalr + mypos)
     if (!hasChanges && masaalr && mypos) return;
 
-    // Parent-handled flow (open-mission candidate/counter): hand the diff to the parent.
-    if (onSubmit) {
-      try {
-        await onSubmit({ newValues, originalValues });
-        toast.success($t('toasts.suc'));
-        close();
-      } catch (e) {
-        error1 = e;
-        console.log(error1);
-        toast.warning($t('toasts.er'));
-      }
-      return;
-    }
-
-    // Build acts data for server
+    // Build acts data for server — the negotiated checklist travels with every
+    // flow, so a counter that adds/drops a task keeps that change.
     const acts2Array = Array.isArray(acts2) ? acts2 : [];
     const newActs = acts2Array
       .filter((a) => a.id?.startsWith('temp_'))
@@ -464,6 +454,27 @@
       .filter((a) => a.id && !a.id.startsWith('temp_'))
       .map((a) => a.id);
     const snapshotActIds = (acts?.data ?? []).map((a) => a.id);
+
+    // Parent-handled flow (open-mission candidate/counter): hand the diff to the parent.
+    if (onSubmit) {
+      try {
+        await onSubmit({
+          newValues,
+          originalValues,
+          newActs,
+          existingActsIds,
+          snapshotActIds,
+          actsChanged
+        });
+        toast.success($t('toasts.suc'));
+        close();
+      } catch (e) {
+        error1 = e;
+        console.log(error1);
+        toast.warning($t('toasts.er'));
+      }
+      return;
+    }
 
     try {
       const result = await submitNegoMission({

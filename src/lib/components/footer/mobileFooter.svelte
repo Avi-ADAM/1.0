@@ -10,6 +10,7 @@
   import MoachIcon from '$lib/celim/icons/moachIcon.svelte';
   import Lev from '$lib/celim/lev.svelte';
   import ProfileMenu from '$lib/components/footer/ProfileMenu.svelte';
+  import DiscoverMenu from '$lib/components/footer/DiscoverMenu.svelte';
   import { idPr } from '$lib/stores/idPr';
   /**
    * @typedef {Object} Props
@@ -65,6 +66,17 @@
   const L = (key) => $t(KEYS[key]);
 
   let vertical = $derived(footMode === 'vertical');
+
+  // The bar keeps concierge dead centre by always holding an *odd* number of
+  // tabs, shedding one from each side as it narrows:
+  //   ≥520px  4|1|4  hub moach chat deals · concierge · discover lev profile more
+  //   ≥400px  3|1|3  hub moach chat · concierge · discover lev more
+  //   <400px  2|1|2  hub moach · concierge · lev more
+  // Whatever the bar sheds reappears inside the "more" menu, so nothing
+  // becomes unreachable. The vertical column has room for every tab and so
+  // never hides one.
+  let fromMid = $derived(vertical ? '' : 'max-[399px]:hidden');
+  let fromWide = $derived(vertical ? '' : 'max-[519px]:hidden');
   // Shared per-item classes for both orientations
   let itemClass = $derived(
     vertical
@@ -158,7 +170,7 @@
     <div
       class={vertical
         ? 'flex flex-col items-stretch pb-1'
-        : 'grid h-full max-w-lg grid-cols-6 min-[400px]:grid-cols-7 mx-auto'}
+        : 'grid h-full max-w-lg grid-cols-5 min-[400px]:grid-cols-7 min-[520px]:grid-cols-9 mx-auto'}
     >
       <button
         onclick={() => {
@@ -215,6 +227,7 @@
         </div>
         <span class="text-[9px] leading-none text-gray-500 dark:text-gray-300">{L('moach')}</span>
       </button>
+
       <div
         id="tooltip-home"
         role="tooltip"
@@ -227,11 +240,46 @@
       <button
         onclick={() => addi('chat')}
         type="button"
-        class="{$isChatOpen ? 'border-b-2 border-gold' : ''} {itemClass}"
+        class="{$isChatOpen ? 'border-b-2 border-gold' : ''} {fromMid} {itemClass}"
       >
         <Chaticon />
         <span class="text-[9px] leading-none text-gray-500 dark:text-gray-300">{L('chat')}</span>
       </button>
+
+      <button
+        onclick={() => {
+          activeRoute = '/deals';
+          goto('/deals');
+        }}
+        type="button"
+        class="{activeRoute == '/deals'
+          ? 'border-b-2 border-gold'
+          : ''} {fromWide} {itemClass}"
+      >
+        <div class="relative">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.8"
+            stroke="currentColor"
+            class="w-6 h-6 text-barbi"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0"
+            />
+          </svg>
+          {#if navigating && navigating.to?.url.pathname === '/deals'}
+            <div
+              class="absolute -inset-1 rounded-full border-2 border-transparent border-t-gold animate-spin"
+            ></div>
+          {/if}
+        </div>
+        <span class="text-[9px] leading-none text-gray-500 dark:text-gray-300">{L('deals')}</span>
+      </button>
+
       <div
         id="tooltip-wallet"
         role="tooltip"
@@ -267,39 +315,11 @@
         {L('createNew')}
         <div class="tooltip-arrow" data-popper-arrow></div>
       </div>
-      <button
-        onclick={() => {
-          activeRoute = '/deals';
-          goto('/deals');
-        }}
-        type="button"
-        class="{activeRoute == '/deals' ? 'border-b-2 border-gold' : ''} {vertical
-          ? ''
-          : 'max-[399px]:hidden'} {itemClass}"
-      >
-        <div class="relative">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.8"
-            stroke="currentColor"
-            class="w-6 h-6 text-barbi"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0"
-            />
-          </svg>
-          {#if navigating && navigating.to?.url.pathname === '/deals'}
-            <div
-              class="absolute -inset-1 rounded-full border-2 border-transparent border-t-gold animate-spin"
-            ></div>
-          {/if}
-        </div>
-        <span class="text-[9px] leading-none text-gray-500 dark:text-gray-300">{L('deals')}</span>
-      </button>
+      <!-- The five public discovery pages (demand map, rikmas, products, open
+           missions, wanted resources) share one tab — the bar has no room for
+           five more, and they belong together anyway. -->
+      <DiscoverMenu {vertical} {itemClass} extraClass={fromMid} />
+
       <button
         onclick={() => {
           activeRoute = '/lev';
@@ -329,7 +349,45 @@
         <div class="tooltip-arrow" data-popper-arrow></div>
       </div>
 
-      <ProfileMenu />
+      <!-- From 520px the bar is wide enough for profile to leave the "more"
+           menu and take the ninth slot, which is what keeps the count odd. -->
+      <button
+        onclick={() => {
+          activeRoute = '/me';
+          goto('/me');
+        }}
+        type="button"
+        class="{activeRoute == '/me'
+          ? 'border-b-2 border-gold'
+          : ''} {fromWide} {itemClass}"
+      >
+        <div class="relative">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.8"
+            stroke="currentColor"
+            class="w-6 h-6 text-barbi"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+            />
+          </svg>
+          {#if navigating && navigating.to?.url.pathname === '/me'}
+            <div
+              class="absolute -inset-1 rounded-full border-2 border-transparent border-t-gold animate-spin"
+            ></div>
+          {/if}
+        </div>
+        <span class="text-[9px] leading-none text-gray-500 dark:text-gray-300"
+          >{$t('common.footer.profile')}</span
+        >
+      </button>
+
+      <ProfileMenu {onChat} />
     </div>
   </div>
 {/if}

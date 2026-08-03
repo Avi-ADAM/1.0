@@ -76,7 +76,15 @@
     "myActs": "مهامي",
     "minimize": "تصغير",
     "openUp": "افتح لأعلى",
-    "openBar": "افتح جانبياً"
+    "openBar": "افتح جانبياً",
+    "discover": "استكشاف",
+    "discoverLabel": "صفحات الاستكشاف",
+    "close": "إغلاق",
+    "discover_map": "خريطة الطلب",
+    "discover_projects": "مشاريع",
+    "discover_products": "منتجات",
+    "discover_missions": "مهام مفتوحة",
+    "discover_resources": "موارد مطلوبة"
   },
   "status": {
     "success": "تم بنجاح",

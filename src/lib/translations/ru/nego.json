@@ -37,6 +37,7 @@
   "candidateRound": "Предложение кандидата",
   "projectRound": "Встречное предложение проекта",
   "rikmaReq": "Требование проекта",
+  "roundNo": "Раунд {{count}}",
   "proposedBy": "Предложено:",
   "updatedDescription": "Обновлённое описание:",
   "updatedNotes": "Обновлённые заметки:",

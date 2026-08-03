@@ -212,7 +212,7 @@
     },
     "sugestma": {
       "head": "Suggestion for sharing a resource with FreeMates",
-      "recurHead": "🔁 Recurring resource · approved each cycle",
+      "recurHead": "🔁 Recurring resource · offer to share a resource with the weave",
       "askedVal": "Asked value",
       "myval": "My value",
       "offerAtSource": "Offer on the source page",
@@ -337,9 +337,10 @@
       "approveError": "Error approving division. Please try again."
     },
     "rektom": {
-      "recurring": "🔁 Recurring resource · approved each cycle",
+      "recurringTag": "🔁 Recurring resource",
       "assignment": "Resource assignment & share approval",
-      "request": "Resource request approval"
+      "request": "Resource request approval",
+      "joinRequest": "Approve joining the weave & sharing the resource"
     },
     "nav": {
       "heart": "Heart of 1💗1",
@@ -603,7 +604,24 @@
     "chat": "Chat",
     "notAFit": "Not a fit right now",
     "closeSelfNomination": "Close the whole self-nomination — the candidate gets a respectful note",
-    "notNow": "Not now"
+    "notNow": "Not now",
+    "willJoinRikma": "Approving also brings them into the weave",
+    "baselineTerms": "The weave's baseline terms (the live offer is above):",
+    "roundDates": "Dates in this offer:",
+    "perCycleHint": "Estimated cost per cycle",
+    "perMonth": "per month",
+    "perYear": "per year",
+    "month": "month",
+    "months": "months",
+    "year": "year",
+    "years": "years",
+    "everyNMonths": "· every {{count}} months",
+    "everyNYears": "· every {{count}} years",
+    "totalInvest": "Estimated total investment:",
+    "totalInvestHint": "Estimated total investment for the whole period",
+    "noEndDate": "No end date — until marked complete",
+    "recurringApprovalNote": "Approval starts the recurring-resource engine; each cycle then opens its own charge for the weave to approve the actual spend",
+    "recurringJoinNote": "Approval brings the offerer into the weave and starts the recurring-resource engine; only afterwards does each cycle open its own charge for the actual spend"
   },
   "hachlata": {
     "theClaim": "The claim",

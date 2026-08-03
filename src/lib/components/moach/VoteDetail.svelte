@@ -365,6 +365,7 @@
         stylef={buble.stylef}
         st={buble.st}
         isRishon={buble?.openMissionData?.isRishon || buble.isRishon}
+        myid={buble.myid}
         declined={buble.decid}
         timegramaId={buble.timegramaId}
         timegramaDate={buble.timegramaDate}

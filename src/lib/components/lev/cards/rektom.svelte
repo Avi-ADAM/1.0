@@ -55,6 +55,7 @@
    * @property {boolean} [isRishon]
    * @property {any[]} [negopendmissions]
    * @property {number} [orderon]
+   * @property {boolean} [joinsRikma] - approving also onboards the offerer as a rikma member
    * @property {() => void} [onProj]
    * @property {boolean} [selfNomination] - candidate-authored proposal (PLAN_SELF_NOMINATION)
    * @property {(() => void) | null} [onDismiss] - fully dismiss a self-nominated proposal
@@ -102,6 +103,7 @@
     isRishon = false,
     negopendmissions = [],
     orderon = 0,
+    joinsRikma = false,
     // Self-nomination (PLAN_SELF_NOMINATION §4.2): candidate-authored offer —
     // members get a full-dismiss option alongside approve/nego/chat.
     selfNomination = false,
@@ -139,26 +141,61 @@
     onProj?.();
   }
 
+  // ── Latest negotiation round on this candidacy ──
+  // Rounds (NegoMash) are sorted ordern:desc by the query, so [0] is the live
+  // proposal. In the candidate flow (proposeOnOpenMashaabim / counterOnAskm) a
+  // round holds the *proposed* terms — the shared OpenMashaabim is never
+  // overwritten, so without showing the round members only see the rikma's own
+  // baseline and have no idea what they are actually voting on.
+  // isRishon (self-proposal) negotiates over the pmash instead, and those rounds
+  // are historical snapshots — never rendered here.
+  const latestRound = $derived(
+    !isRishon && negopendmissions?.length > 0 && negopendmissions[0]?.attributes?.proposedBy
+      ? negopendmissions[0].attributes
+      : null
+  );
+  const roundByCandidate = $derived(latestRound?.proposedBy === 'candidate');
+  const roundDate = $derived(
+    latestRound?.createdAt ? new Date(latestRound.createdAt) : null
+  );
+
+  // Terms that would actually materialize on approval: runResourceAskmAcceptance
+  // flows the latest round onto the resource before creating the Maap, so the
+  // round wins wherever it set a value.
+  const effPrice = $derived(latestRound?.price ?? price);
+  const effEasy = $derived(latestRound?.easy ?? easy);
+  const effKindOf = $derived(latestRound?.kindOf ?? kindOf);
+  const effStart = $derived(latestRound?.sqadualed ?? deadline);
+  const effEnd = $derived(latestRound?.sqadualedf ?? sqadualedf);
+
   // טקסט כותרת:
   // isRishon (isSelfProposal) = חבר פרויקט שיצר ישירות → אישרור כפול: גם ה"צורך" וגם שהחבר נותן אותו
-  // אחרת = ספק חיצוני הציע → אישרור השמה רגיל בלבד
+  // joinsRikma = המציע/ה עדיין אינו/ה חבר/ה → האישור מצרף אותו/ה לריקמה
+  // recurring הוא *תוספת* לכותרת ולא מחליף אותה: הפעולה כאן אינה אישרור מחזור
+  // (המחזורים נפתחים רק אחרי הצירוף), אלא אישרור הצירוף ושיתוף המשאב.
   const cardTypeKey = $derived(
-    recurring
-      ? 'lev.cards.rektom.recurring'
-      : isRishon
-        ? 'lev.cards.rektom.assignment'
+    isRishon
+      ? 'lev.cards.rektom.assignment'
+      : joinsRikma
+        ? 'lev.cards.rektom.joinRequest'
         : 'lev.cards.rektom.request'
+  );
+  const cardType = $derived(
+    recurring
+      ? `${$t('lev.cards.rektom.recurringTag')} · ${$t(cardTypeKey)}`
+      : $t(cardTypeKey)
   );
 
   // ── Recurring-expense breakdown (mirrors sugestma.svelte) ──
   // Per-cycle amount: the value-for-calc (easy), falling back to listed price.
-  let perCycle = $derived(Number(easy) > 0 ? Number(easy) : Number(price) || 0);
-  // Cycles between start (deadline) and end (sqadualedf); null when open-ended.
+  // Uses the negotiated terms — a stale baseline here would misprice the vote.
+  let perCycle = $derived(Number(effEasy) > 0 ? Number(effEasy) : Number(effPrice) || 0);
+  // Cycles between start and end; null when open-ended.
   let cycleCount = $derived(
     (() => {
-      if (!recurring || !deadline || !sqadualedf) return null;
-      const unit = kindOf === 'yearly' ? 'years' : 'months';
-      const n = moment(sqadualedf).diff(moment(deadline), unit, true);
+      if (!recurring || !effStart || !effEnd) return null;
+      const unit = effKindOf === 'yearly' ? 'years' : 'months';
+      const n = moment(effEnd).diff(moment(effStart), unit, true);
       return n > 0 ? n : null;
     })()
   );
@@ -166,9 +203,17 @@
     cycleCount != null ? Math.round(perCycle * cycleCount) : null
   );
   let unitWord = $derived(
-    kindOf === 'yearly'
-      ? { per: 'לשנה', many: 'שנים', one: 'שנה' }
-      : { per: 'לחודש', many: 'חודשים', one: 'חודש' }
+    effKindOf === 'yearly'
+      ? {
+          per: $t('lev.rektom.perYear'),
+          many: $t('lev.rektom.years'),
+          one: $t('lev.rektom.year')
+        }
+      : {
+          per: $t('lev.rektom.perMonth'),
+          many: $t('lev.rektom.months'),
+          one: $t('lev.rektom.month')
+        }
   );
   let cycleCountLabel = $derived(
     cycleCount != null
@@ -229,8 +274,8 @@
   <CardHeader
     logoSrc={src2}
     {projectName}
-    cardType={$t(cardTypeKey)}
-    cardTitle={openmissionName}
+    {cardType}
+    cardTitle={latestRound?.name || openmissionName}
     memberCount={noofusersNo + noofusersOk + noofusersWaiting || 0}
     {glowColor}
     onProjectClick={handleProjectClick}
@@ -277,6 +322,153 @@
       ? 'bg-white dark:bg-slate-800'
       : 'bg-gray-50 dark:bg-slate-700'} transition-all duration-300 p-4 flex-1 overflow-y-auto d flex flex-col space-y-4"
   >
+    <!-- ההצעה החיה: סבב המו"מ האחרון על המועמדות הזו.
+         בלעדיו חברי הריקמה רואים רק את תנאי הבסיס שלהם ולא את מה שהוצע בפועל. -->
+    {#if latestRound}
+      {@const nameChanged =
+        latestRound.name && latestRound.name !== openmissionName}
+      {@const descChanged =
+        latestRound.descrip && latestRound.descrip !== missionDetails}
+      {@const notesChanged =
+        latestRound.spnot && latestRound.spnot !== (hearotMeyuchadot || spnot)}
+      {@const easyChanged = latestRound.easy != null && latestRound.easy !== easy}
+      {@const priceChanged =
+        latestRound.price != null && latestRound.price !== price}
+      {@const startChanged =
+        latestRound.sqadualed &&
+        (!deadline ||
+          new Date(latestRound.sqadualed).getTime() !==
+            new Date(deadline).getTime())}
+      {@const endChanged =
+        latestRound.sqadualedf &&
+        (!sqadualedf ||
+          new Date(latestRound.sqadualedf).getTime() !==
+            new Date(sqadualedf).getTime())}
+      <div
+        class="rounded-xl border-2 p-3 space-y-2 {roundByCandidate
+          ? 'border-barbi bg-barbi/5'
+          : 'border-gold bg-gold/5'}"
+      >
+        <div
+          class="font-bold text-sm flex items-center gap-2 flex-wrap {roundByCandidate
+            ? 'text-barbi'
+            : 'text-yellow-700 dark:text-yellow-400'}"
+        >
+          <span
+            class="px-2 py-0.5 rounded-full text-xs {roundByCandidate
+              ? 'bg-barbi/20'
+              : 'bg-gold/30'}"
+          >
+            {roundByCandidate
+              ? $t('nego.candidateRound')
+              : $t('nego.projectRound')}
+          </span>
+          {#if orderon > 0}
+            <span class="text-xs font-normal text-gray-500 dark:text-gray-400">
+              {$t('nego.roundNo', { count: orderon })}
+            </span>
+          {/if}
+          {#if roundDate && !isNaN(roundDate.getTime())}
+            <span class="text-xs font-normal text-gray-500 dark:text-gray-400">
+              {roundDate.toLocaleDateString($lang)}
+            </span>
+          {/if}
+        </div>
+
+        {#if latestRound.easy != null || latestRound.price != null}
+          <div
+            class="flex flex-wrap items-center gap-2 text-sm font-bold text-gray-800 dark:text-gray-100"
+          >
+            <img
+              style="width:1.5rem;"
+              src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg"
+              alt=""
+            />
+            <span
+              class={roundByCandidate
+                ? 'text-barbi'
+                : 'text-yellow-700 dark:text-yellow-400'}
+            >
+              {$t('lev.rektom.ourValue')}
+              {Number(effEasy || 0).toLocaleString()}
+              · {$t('lev.rektom.cost')}
+              {Number(effPrice || 0).toLocaleString()}
+            </span>
+            {#if easyChanged || priceChanged}
+              <span class="text-xs text-gray-500 dark:text-gray-400">
+                ({$t('nego.rikmaReq')}: {Number(easy || 0).toLocaleString()} · {Number(
+                  price || 0
+                ).toLocaleString()})
+              </span>
+            {/if}
+          </div>
+        {/if}
+
+        {#if nameChanged}
+          <div class="text-xs text-gray-600 dark:text-gray-300">
+            <span class="font-medium">{$t('common.nameLabel')}</span>
+            <span class="text-gray-400 line-through mx-1">{openmissionName}</span
+            >
+            → <span class="font-semibold">{latestRound.name}</span>
+          </div>
+        {/if}
+
+        {#if startChanged || endChanged}
+          <div class="text-xs text-gray-600 dark:text-gray-300">
+            <span class="font-medium">{$t('lev.rektom.roundDates')}</span>
+            <span class="mx-1">
+              {effStart ? new Date(effStart).toLocaleDateString($lang) : '—'}
+              {#if effEnd}
+                – {new Date(effEnd).toLocaleDateString($lang)}
+              {/if}
+            </span>
+          </div>
+        {/if}
+
+        {#if descChanged}
+          <div class="rounded-lg bg-white/70 dark:bg-gray-900/40 p-2">
+            <div
+              class="font-semibold text-xs mb-1 {roundByCandidate
+                ? 'text-barbi'
+                : 'text-yellow-700 dark:text-yellow-400'}"
+            >
+              {$t('nego.updatedDescription')}
+            </div>
+            <div
+              class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed"
+            >
+              <RichText
+                outpot={latestRound.descrip}
+                editable={false}
+                trans={true}
+              />
+            </div>
+          </div>
+        {/if}
+
+        {#if notesChanged}
+          <div class="rounded-lg bg-white/70 dark:bg-gray-900/40 p-2">
+            <div
+              class="font-semibold text-xs mb-1 {roundByCandidate
+                ? 'text-barbi'
+                : 'text-yellow-700 dark:text-yellow-400'}"
+            >
+              {$t('nego.updatedNotes')}
+            </div>
+            <div
+              class="text-sm text-gray-800 dark:text-gray-100 leading-relaxed"
+            >
+              <RichText
+                outpot={latestRound.spnot}
+                editable={false}
+                trans={true}
+              />
+            </div>
+          </div>
+        {/if}
+      </div>
+    {/if}
+
     <!-- באנר משאב חוזר: עלות למחזור + תדירות + סך השקעה משוער / ללא סיום -->
     {#if recurring}
       <div
@@ -285,7 +477,7 @@
         <div class="flex items-center flex-wrap gap-2">
           <span class="text-lg">🔁</span>
           <span
-            onmouseenter={() => hover('עלות משוערת למחזור')}
+            onmouseenter={() => hover($t('lev.rektom.perCycleHint'))}
             onmouseleave={() => hover('0')}
             class="font-bold text-barbi text-base sm:text-lg"
           >
@@ -293,17 +485,19 @@
           </span>
           {#if cycleSize > 1}
             <span class="text-sm text-gray-600 dark:text-gray-300">
-              · כל {cycleSize} {unitWord.many}
+              {effKindOf === 'yearly'
+                ? $t('lev.rektom.everyNYears', { count: cycleSize })
+                : $t('lev.rektom.everyNMonths', { count: cycleSize })}
             </span>
           {/if}
         </div>
         {#if recurTotal != null}
           <div
-            onmouseenter={() => hover('סך השקעה משוער לכל התקופה')}
+            onmouseenter={() => hover($t('lev.rektom.totalInvestHint'))}
             onmouseleave={() => hover('0')}
             class="text-sm text-gray-700 dark:text-gray-200"
           >
-            סך השקעה משוער:
+            {$t('lev.rektom.totalInvest')}
             <span class="font-black text-gray-900 dark:text-white"
               >{recurTotal.toLocaleString()} ₪</span
             >
@@ -313,11 +507,15 @@
           </div>
         {:else}
           <div class="text-sm font-semibold text-gray-800 dark:text-gray-100">
-            ♾️ ללא תאריך סיום — עד לסימון כהושלם
+            ♾️ {$t('lev.rektom.noEndDate')}
           </div>
         {/if}
+        <!-- מה האישור *באמת* עושה: לא אישרור מחזור, אלא צירוף המציע/ה ופתיחת
+             המנוע. החיוב לכל מחזור מגיע אחר כך, כפעולה נפרדת. -->
         <div class="text-xs text-gray-500 dark:text-gray-400">
-          עם האישור ייפתח מנוע משאב חוזר; בכל מחזור ייפתח חיוב לאישור ההוצאה בפועל מול הריקמה
+          {joinsRikma
+            ? $t('lev.rektom.recurringJoinNote')
+            : $t('lev.rektom.recurringApprovalNote')}
         </div>
       </div>
     {/if}
@@ -342,6 +540,12 @@
         <p class="text-gray-900 dark:text-white font-bold text-base mb-1">
           {useraplyname}
         </p>
+        <!-- העיקר של הפעולה כשהמציע/ה עדיין לא בריקמה: האישור מצרף אותו/ה. -->
+        {#if joinsRikma}
+          <p class="text-xs text-emerald-700 dark:text-emerald-400 font-semibold">
+            🤝 {$t('lev.rektom.willJoinRikma')}
+          </p>
+        {/if}
       </div>
     </div>
 
@@ -349,6 +553,12 @@
     <div
       class="bg-gray-100 dark:bg-gray-900/50 p-4 rounded-xl space-y-3 border border-gray-200 dark:border-gray-700/50"
     >
+      {#if latestRound}
+        <!-- כשיש סבב פתוח, המספרים כאן הם בסיס הריקמה — ההצעה החיה למעלה. -->
+        <p class="text-xs text-gray-500 dark:text-gray-400">
+          {$t('lev.rektom.baselineTerms')}
+        </p>
+      {/if}
       <div class="flex items-center gap-3 flex-wrap">
         <img
           style="width:2.5rem;"

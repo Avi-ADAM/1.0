@@ -1,162 +1,178 @@
 <script>
-  import { t } from '$lib/translations';
-	import  RichText from '$lib/celim/ui/richText.svelte';
+  /**
+   * Open missions of a rikma.
+   *
+   * Two modes:
+   *   - `who` set → one mission, in full (this is what `MissionModal` opens);
+   *   - `who = 0`  → the whole list, rendered with the same cards the
+   *     "open for partners" board uses (`OpenMissionCard`).
+   *
+   * The previous version filtered and localized inside `onMount`, mutating the
+   * `omiData` prop: data that arrived after mount was never filtered, and
+   * `langAdjast` threw on nodes whose skills carry no `localizations` (which is
+   * every node `getProjectMissions` returns). Both are derivations now.
+   */
+  import { t, locale } from '$lib/translations';
+  import RichText from '$lib/celim/ui/richText.svelte';
   import Share from '$lib/components/share/shareButtons/index.svelte';
   import Tile from '$lib/celim/tile.svelte';
-  import { lang } from '$lib/stores/lang'
-  let isonly = $state(false);
-   import { onMount } from 'svelte';
-  import { langAdjast } from '$lib/func/langAdjast.svelte';
+  import OpenMissionCard from '$lib/components/prPr/open/OpenMissionCard.svelte';
+
   /**
    * @typedef {Object} Props
    * @property {any} [omiData]
-   * @property {number} [who]
+   * @property {number|string} [who] - a mission id to show alone, or 0 for the list
    * @property {any} projectName
+   * @property {string} [projectId]
    */
 
   /** @type {Props} */
-  let { omiData = $bindable([]), who = 0, projectName } = $props();
-   onMount(async () => {
- if (who !== 0){
-      isonly = true
-      var filtered = omiData.filter(function(event){
-    return event.id == who;
-});
-    omiData = filtered;
-    }
-    for(let i = 0; i < omiData.length; i++){
-      if (omiData[i]?.attributes) { // Add check for attributes existence
-        const langd = langAdjast(omiData[i].attributes, $lang);
-        omiData[i] = { ...omiData[i], attributes: langd };
-      }
-    }
-    // No need for omiData = omiData here as individual items are reassigned
-})
+  let { omiData = [], who = 0, projectName, projectId = '' } = $props();
 
-function remove (id) {
-  console.log(id)
-};
-function edit (id) {
-  console.log(id)
-}
-function hover(){
-    
-}
+  let isonly = $derived(who !== 0 && who !== null && who !== undefined);
+  let items = $derived(
+    isonly ? (omiData ?? []).filter((m) => String(m?.id) === String(who)) : (omiData ?? [])
+  );
 
-    let wid = $state()
-    </script>
+  let wid = $state(0);
 
-<div bind:clientWidth={wid} class="h-screen overflow-auto md:items-center border-2 border-gold rounded d 
-bg-gray-700">
-  <div class=" items-center d" class:full={who == 0}>
-          <h1 class="md:text-center text-2xl md:text-2xl font-bold text-gold"
-      >{isonly == true ? " פעולה פתוחה" : "פעולות פתוחות"}</h1>
-    {#each omiData as datai, i}
-    {@const data = datai.attributes}
-    {@const title = {
-                he: `הצעה למשימה בשם "${data.name}" בריקמה: ${projectName}, באתר 1💗1 `,
-                en: 'come see this mission on 1💗1'
-              }} 
-    <div dir="rtl"  style="overflow-y:auto" class={isonly == false ? "lg:w-1/2 d mb-4 pt-4 w-full  mx-auto" : "d mb-4 pt-4 w-full"}>
-    <div  class=" bg-gray-700  rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal ">
-         <div  class="mb-8">
-              <div class="  mb-2 text-start">
-        <div class="flex flex-row justify-between">
-            <div class="px-2 sm:basis-3/4 ">
-            <h2 class="text-barbi font-bold text-xl lg:text-4xl underline ">{data.name}</h2>
-            {#if data.descrip !== null && data.descrip !== "null"  && data.descrip !== "undefined"  && data.descrip !== undefined} 
-           <RichText outpot={data.descrip} editable={false} sml={true}/>
-            {/if}
-    {#if data.hearotMeyuchadot}
-    {#if data.hearotMeyuchadot !== undefined && data.hearotMeyuchadot !== null && data.hearotMeyuchadot !== "undefined" ? data.hearotMeyuchadot : ""}
-    <RichText outpot={data.hearotMeyuchadot} editable={false} sml={true}/>
-    {/if}
-   
-    {/if}
-     <p style="line-height: 1;" class="text-sm text-gray-100 flex items-center lg:text-2xl m-5">
-        <img  class="w-12 lg:w-24"  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-        <span onmouseenter={()=>hover($t('common.valph'))} onmouseleave={()=>hover("0")} > {data.perhour.toLocaleString('en-US', {maximumFractionDigits:2})} לשעה </span> * <span onmouseenter={()=>hover($t('common.noofhours'))} onmouseleave={()=>hover("0")}  > {data.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span onmouseenter={()=>hover($t('lev.cards.voteCard.inTotal'))} onmouseleave={()=>hover("0")}>{(data.noofhours * data.perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
-    </p>
-       {#if data.acts.data.length > 0}
-                          <ul>
-                            {#each data.acts.data as datai, t}
-                              <li>
-                                <div
-                                  class="flex flex-row space-x-2 items-start border-y-2 border-y-mturk"
-                                >
-                                  <span class="p-1">✅</span>
-                                  <h2 class="md:text-xl p-1 text-gold hover:text-barbi">{datai.attributes.shem}</h2>
-                                </div>
-                              </li>
-                            {/each}
-                          </ul>
-                        {/if}
-                   
-    {#if data.skills.data.length > 0}
-    <small class="text-barbi text-sm lg:text-2xl">{$t('project.newOpn.requireSkills')}</small>
-    <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 lg:p-4 ">
-        {#each data.skills.data as skill}
-        <p 
-        onmouseenter={()=>hover($t('lev.cards.common.skneed'))} 
-        onmouseleave={()=>hover("0")}  >
-            <Tile sm={wid > 555 ? true : false} big={wid > 555 ? true : false}  pink={true} word={skill.attributes.skillName}/></p>
-                {/each}
-                </div>
-                {/if}
-                {#if data.tafkidims.data.length > 0}  
-                <small class="text-sm text-barbi lg:text-2xl">{$t('project.newOpn.requiredRoles')}</small>
-                <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle d  cd p-2">
-                    {#each data.tafkidims.data as rol}
-                    <p onmouseenter={()=>hover($t('lev.cards.common.rneed'))} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
-    <Tile sm={wid > 555 ? true : false} big={wid > 555 ? true : false}  word={rol.attributes.roleDescription} wow={true}/></p>{/each}
+  const fmtNum = (n) => Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 2 });
+
+  /** `descrip`/`hearotMeyuchadot` legitimately hold the strings 'null'/'undefined' in old rows. */
+  const hasText = (v) => !!v && v !== 'null' && v !== 'undefined';
+
+  function fmtDate(d) {
+    if (!d) return null;
+    const date = new Date(d);
+    return Number.isNaN(date.getTime()) ? null : date.toLocaleDateString($locale || 'he');
+  }
+</script>
+
+{#if !isonly}
+  <!-- List mode — one card per open mission. -->
+  <div bind:clientWidth={wid} class="rounded-2xl border-2 border-gold bg-slate-800/60 p-4">
+    <h1 class="mb-4 text-center text-2xl font-bold text-gold">{$t('moach.open.missionsHeading')}</h1>
+    {#if items.length === 0}
+      <p class="py-6 text-center text-sm text-slate-300">{$t('moach.open.empty')}</p>
+    {:else}
+      <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {#each items as node (node.id)}
+          <OpenMissionCard {node} {projectId} {projectName} />
+        {/each}
       </div>
-      {/if}
-      {#if data.work_ways.data.length > 0}  <small class="text-sm lg:text-2xl text-barbi">{$t('project.newOpn.requiredWW')}</small>
-      <div class="border border-gold flex sm:flex-row flex-wrap lg:p-4 justify-center align-middle d cd p-2 ">
-          {#each data.work_ways.data as rol}
-          <p onmouseenter={()=>hover($t('lev.cards.common.wwneed'))} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
-              <Tile bg="gold" sm={wid > 555 ? true : false} big={wid > 555 ? true : false} word={rol.attributes.workWayName}/>
-          </p>
-          {/each}
-          </div>
+    {/if}
+  </div>
+{:else}
+  <div bind:clientWidth={wid} class="rounded-2xl border-2 border-gold bg-slate-800/60 p-4 text-start">
+    <h1 class="mb-4 text-center text-2xl font-bold text-gold">{$t('moach.open.singleHeading')}</h1>
+
+    {#each items as datai (datai.id)}
+      {@const data = datai.attributes ?? {}}
+      {@const hours = Number(data.noofhours) || 0}
+      {@const perhour = Number(data.perhour) || 0}
+      {@const skills = data.skills?.data ?? []}
+      {@const roles = data.tafkidims?.data ?? []}
+      {@const workWays = data.work_ways?.data ?? []}
+      {@const acts = data.acts?.data ?? []}
+      {@const candidates = (data.asks?.data ?? []).filter((k) => k?.attributes?.archived !== true)}
+      {@const shareTitle = $t('project.newOpn.title', { name: data.name ?? '', projectName })}
+
+      <article class="flex flex-col gap-4">
+        <header class="flex flex-wrap items-start justify-between gap-3">
+          <h2 class="text-2xl font-bold text-barbi underline lg:text-4xl">{data.name}</h2>
+          {#if hours > 0 && perhour > 0}
+            <div class="flex flex-col items-center rounded-xl border border-gold/60 bg-slate-900/70 px-3 py-2 text-gold">
+              <strong class="text-xl">{fmtNum(hours * perhour)}</strong>
+              <span class="text-xs opacity-80">
+                {fmtNum(hours)} {$t('moach.open.hours')} × {fmtNum(perhour)}
+              </span>
+            </div>
           {/if}
-          <!--
-          <div class="flex justify-center">
-            {#if alr == false}
-          <button onclick={ask} onmouseenter={()=>hovered = true} onmouseleave={()=>hovered = false} class:button-perl={hovered == false} class:button-gold={hovered == true}  
-            class=" mx-auto mt-7 text-3xl px-4 py-3 hover:text-black hover:font-bold  text-barbi">אני אשמח לבצע</button>
-        {/if}  
-        </div>-->
-           </div>
-            <div class="basis-14 flex flex-col gap-2" >
-                <a 
-                  href="/availableMission/{datai.id}" 
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="bg-gold hover:bg-barbi text-gray-900 font-bold py-2 px-4 rounded-lg text-center transition-colors duration-200 shadow-md hover:shadow-lg"
-                >
-                  {$t('project.newOpn.seePr')}
-                </a>
-                
-                <Share
-                slug="{"/availableMission/"+datai.id}"
-	 title="{$t('project.newOpn.title', { name: data.name, projectName })}"
-     desc="its new thing"
-     hashtags={['1💗1','consensus']}
-	 quote="{$t('project.newOpn.title', { name: data.name, projectName })}"
-	 related={[]}
-	 via={''}
-	 />
-            </div>     
+        </header>
+
+        {#if hasText(data.descrip)}
+          <RichText outpot={data.descrip} editable={false} sml={true} />
+        {/if}
+        {#if hasText(data.hearotMeyuchadot)}
+          <RichText outpot={data.hearotMeyuchadot} editable={false} sml={true} />
+        {/if}
+
+        {#if acts.length > 0}
+          <ul class="flex flex-col">
+            {#each acts as act (act.id)}
+              <li class="flex flex-row items-start gap-2 border-y border-mturk/60 py-1">
+                <span>✅</span>
+                <h3 class="text-gold hover:text-barbi md:text-xl">{act.attributes?.shem}</h3>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+
+        {#if skills.length > 0}
+          <div>
+            <small class="text-sm text-barbi lg:text-xl">{$t('project.newOpn.requireSkills')}</small>
+            <div class="flex flex-wrap items-center justify-center gap-1 rounded border border-gold p-2 lg:p-4">
+              {#each skills as skill (skill.id)}
+                <Tile sm={wid > 555} big={wid > 555} pink={true} word={skill.attributes?.skillName} />
+              {/each}
+            </div>
+          </div>
+        {/if}
+
+        {#if roles.length > 0}
+          <div>
+            <small class="text-sm text-barbi lg:text-xl">{$t('project.newOpn.requiredRoles')}</small>
+            <div class="flex flex-wrap items-center justify-center gap-1 rounded border border-gold p-2 lg:p-4">
+              {#each roles as rol (rol.id)}
+                <Tile sm={wid > 555} big={wid > 555} wow={true} word={rol.attributes?.roleDescription} />
+              {/each}
+            </div>
+          </div>
+        {/if}
+
+        {#if workWays.length > 0}
+          <div>
+            <small class="text-sm text-barbi lg:text-xl">{$t('project.newOpn.requiredWW')}</small>
+            <div class="flex flex-wrap items-center justify-center gap-1 rounded border border-gold p-2 lg:p-4">
+              {#each workWays as ww (ww.id)}
+                <Tile bg="gold" sm={wid > 555} big={wid > 555} word={ww.attributes?.workWayName} />
+              {/each}
+            </div>
+          </div>
+        {/if}
+
+        <div class="flex flex-wrap items-center gap-1.5 text-xs text-slate-200">
+          {#if fmtDate(data.sqadualed)}
+            <span class="rounded-full bg-slate-700/70 px-2 py-0.5">🗓️ {fmtDate(data.sqadualed)}</span>
+          {/if}
+          {#if candidates.length}
+            <span class="rounded-full bg-barbi/30 px-2 py-0.5 font-semibold text-gold">
+              🙋 {candidates.length} {$t('moach.open.candidates')}
+            </span>
+          {:else}
+            <span class="rounded-full bg-slate-700/70 px-2 py-0.5 opacity-70">{$t('moach.open.noCandidates')}</span>
+          {/if}
         </div>
-          </div>
-          
-          </div>
-          
-          </div>
-          
-          </div>
-          
-                    {/each}
-</div>
-</div>
+
+        <footer class="flex flex-wrap items-center justify-between gap-3 border-t border-gold/30 pt-3">
+          <a
+            href="/availableMission/{datai.id}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="rounded-lg bg-gold px-4 py-2 text-center font-bold text-slate-900 shadow-md transition-colors duration-200 hover:bg-barbi hover:text-gold hover:shadow-lg"
+          >
+            {$t('project.newOpn.seePr')}
+          </a>
+
+          <Share
+            slug={`availableMission/${datai.id}`}
+            title={shareTitle}
+            desc={shareTitle}
+            hashtags={['1💗1', 'consensus']}
+            quote={shareTitle}
+          />
+        </footer>
+      </article>
+    {/each}
+  </div>
+{/if}

@@ -104,7 +104,8 @@
     "upload": "Subir",
     "editDetails": "Editar los datos",
     "publicProfile": "Página pública",
-    "activeNow": "Activos ahora"
+    "activeNow": "Activos ahora",
+    "open": "Abierto a socios"
   },
   "create": {
     "mission": "Crear una misión",
@@ -266,5 +267,39 @@
         "desc": "La ventana de tiempo expiró."
       }
     }
+  },
+  "open": {
+    "title": "Abierto a socios",
+    "subtitle": "Todas las misiones y recursos de la rikma que aún buscan a alguien, en un solo lugar",
+    "searchPh": "Buscar por nombre, descripción, habilidad o rol…",
+    "tabAll": "Todo",
+    "tabMissions": "Misiones",
+    "tabResources": "Recursos",
+    "missionsHeading": "Misiones abiertas",
+    "resourcesHeading": "Recursos necesarios",
+    "singleHeading": "Misión abierta",
+    "openBadge": "Publicado, buscando socios",
+    "pendingBadge": "Esperando la aprobación de la rikma",
+    "pendingToggle": "Mostrar también los pendientes de aprobación",
+    "pendingHeading": "Pendientes de aprobación de la rikma",
+    "pendingNote": "Propuestas que aún no pasaron una votación: todavía no están abiertas a quienes están fuera de la rikma.",
+    "empty": "Ahora mismo esta rikma no tiene misiones abiertas ni recursos necesarios.",
+    "emptyCta": "Crear una misión o pedir un recurso",
+    "emptyFiltered": "No hay resultados para esta búsqueda.",
+    "fullBoard": "Ver el tablero completo",
+    "hours": "horas",
+    "totalValue": "Valor de la misión",
+    "acts": "acciones",
+    "candidates": "candidatos",
+    "noCandidates": "Aún no hay candidatos",
+    "toVote": "Ir a la votación",
+    "viewResource": "Ver la página del recurso",
+    "more": "+{{count}}",
+    "perMonth": "por mes",
+    "perYear": "por año",
+    "perUnit": "por unidad",
+    "perPeriod": "por todo el período",
+    "shareResource": "Se necesita el recurso \"{{name}}\" en la rikma {{projectName}} en 1💗1",
+    "progressLink": "{{count}} misiones y recursos siguen buscando socios"
   }
 }

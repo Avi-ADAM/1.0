@@ -2743,6 +2743,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         id
         attributes {
           name descrip hearotMeyuchadot noofhours perhour iskvua privatlinks publicklinks sqadualed dates
+          rishon { data { id } }
           mission { data { id } }
           skills { data { id } }
           tafkidims { data { id } }
@@ -3697,6 +3698,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                     date
                     dates
                     createdAt
+                    acts { data { id attributes { shem link des dateF dateS } } }
                   }
                 }
               }
@@ -4787,6 +4789,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           sqadualed
                           sqadualedf
                           linkto
+                          createdAt
+                          users_permissions_user { data { id } }
                         }
                       }
                     }
@@ -4929,6 +4933,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           date
                           dates
                           createdAt
+                          acts { data { id attributes { shem link des dateF dateS } } }
                         }
                       }
                     }
@@ -8404,7 +8409,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $noofhours: Float, $perhour: Float,
     $hearotMeyuchadot: String, $descrip: String, $name: String,
     $skills: [ID], $tafkidims: [ID], $work_ways: [ID],
-    $sqadualed: DateTime, $dates: DateTime,
+    $sqadualed: DateTime, $dates: DateTime, $acts: [ID],
     $location: [ComponentNewLocationInput]
   ) {
     createNegopendmission(data: {
@@ -8427,21 +8432,29 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       work_ways: $work_ways
       date: $sqadualed
       dates: $dates
+      acts: $acts
       location: $location
     }) { data { id } }
   }`,
 
   // Read an Ask's negotiation rounds (latest first) for the card / finalization.
+  // Also carries everything the bilateral acceptance gate needs (the taker, the
+  // project members and open_mission.isRishon = assigned offer), so the
+  // immediate acceptance path can enforce the same rule the timegrama does.
   'getAskNegoRounds': `query GetAskNegoRounds($id: ID!) {
     ask(id: $id) { data { id attributes {
       archived
-      vots { what order users_permissions_user { data { id } } }
+      vots { what why zman ide order users_permissions_user { data { id } } }
+      users_permissions_user { data { id } }
+      open_mission { data { id attributes { isRishon } } }
+      project { data { id attributes { user_1s { data { id } } } } }
       negopendmissions(sort: "ordern:desc") { data { id attributes {
         ordern proposedBy status name descrip hearotMeyuchadot
         noofhours perhour date dates
         skills { data { id } }
         tafkidims { data { id } }
         work_ways { data { id } }
+        acts { data { id } }
         users_permissions_user { data { id } }
       } } }
     } } }
@@ -9282,7 +9295,8 @@ export const moachQids = {
           vots { what why zman order id users_permissions_user { data { id } } }
           timegrama { data { id attributes { date done } } }
           negopendmissions(sort: "ordern:desc") {
-            data { id attributes { ordern proposedBy status name descrip hearotMeyuchadot noofhours perhour date dates createdAt } }
+            data { id attributes { ordern proposedBy status name descrip hearotMeyuchadot noofhours perhour date dates createdAt
+              acts { data { id attributes { shem link des dateF dateS } } } } }
           }
           createdAt
           chat { why id ide what zman users_permissions_user { data { id } } }
@@ -9337,7 +9351,7 @@ export const moachQids = {
           vots { what zman why id users_permissions_user { data { id } } }
           timegrama { data { id attributes { date done } } }
           nego_mashes(sort: "ordern:desc") {
-            data { id attributes { ordern proposedBy status name descrip spnot easy hm price kindOf sqadualed sqadualedf linkto } }
+            data { id attributes { ordern proposedBy status name descrip spnot easy hm price kindOf sqadualed sqadualedf linkto createdAt users_permissions_user { data { id } } } }
           }
           createdAt
           chat { why ide what zman id users_permissions_user { data { id } } }
@@ -11456,6 +11470,8 @@ export const qids = {
                           sqadualed
                           sqadualedf
                           linkto
+                          createdAt
+                          users_permissions_user { data { id } }
                         }
                       }
                     }

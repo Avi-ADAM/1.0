@@ -213,7 +213,7 @@
     },
     "sugestma": {
       "head": "Propuesta para compartir un recurso con la rikma",
-      "recurHead": "🔁 Recurso recurrente · aprobado en cada ciclo",
+      "recurHead": "🔁 Recurso recurrente · oferta para compartir un recurso con el tejido",
       "askedVal": "Valor solicitado",
       "myval": "Mi propuesta",
       "offerAtSource": "Oferta en la página de origen",
@@ -338,9 +338,10 @@
       "approveError": "Error al aprobar el reparto. Inténtalo de nuevo."
     },
     "rektom": {
-      "recurring": "🔁 Recurso recurrente · aprobado en cada ciclo",
+      "recurringTag": "🔁 Recurso recurrente",
       "assignment": "Aprobación de asignación y uso compartido del recurso",
-      "request": "Aprobación de solicitud de recurso compartido"
+      "request": "Aprobación de solicitud de recurso compartido",
+      "joinRequest": "Aprobación de incorporación al tejido y del recurso compartido"
     },
     "nav": {
       "heart": "Corazón de 1💗1",
@@ -604,7 +605,24 @@
     "chat": "Chat",
     "notAFit": "Ahora mismo no encaja",
     "closeSelfNomination": "Cerrar toda la autonominación: el candidato recibirá un mensaje respetuoso",
-    "notNow": "Ahora no"
+    "notNow": "Ahora no",
+    "willJoinRikma": "La aprobación también lo/la incorpora al tejido",
+    "baselineTerms": "Condiciones base del tejido (la oferta vigente está arriba):",
+    "roundDates": "Fechas de esta oferta:",
+    "perCycleHint": "Coste estimado por ciclo",
+    "perMonth": "al mes",
+    "perYear": "al año",
+    "month": "mes",
+    "months": "meses",
+    "year": "año",
+    "years": "años",
+    "everyNMonths": "· cada {{count}} meses",
+    "everyNYears": "· cada {{count}} años",
+    "totalInvest": "Inversión total estimada:",
+    "totalInvestHint": "Inversión total estimada para todo el período",
+    "noEndDate": "Sin fecha de fin — hasta marcarlo como completado",
+    "recurringApprovalNote": "La aprobación pone en marcha el motor de recurso recurrente; después, cada ciclo abre su propio cargo para que el tejido apruebe el gasto real",
+    "recurringJoinNote": "La aprobación incorpora a quien ofrece al tejido y pone en marcha el motor de recurso recurrente; solo después cada ciclo abre su propio cargo para el gasto real"
   },
   "hachlata": {
     "theClaim": "La declaración",
