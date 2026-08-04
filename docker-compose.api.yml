@@ -6,12 +6,17 @@
 #
 # Expected layout on the server (default: /home/ubuntu/api — ubuntu, not root):
 #   docker-compose.api.yml   <- this file (pushed by the script)
+#   vector.toml              <- log-shipper config (pushed by the script)
 #   .env                     <- runtime env, lives ONLY on the server:
 #                               STRAPI_URL=http://strapi:1337  (stable alias, always the
 #                               active blue/green color — deploy.ps1 in the Strapi repo
 #                               keeps it pointed correctly on every deploy, see below)
 #                               ORIGIN=https://api.1lev1.com
 #                               ADMINMONTHER=..., cookies secrets, etc.
+#                               MASTRA_PG_PASSWORD=...   (postgres service, below)
+#                               MASTRA_DB_URL=postgresql://mastra_user:<same>@postgres:5432/mastra
+#                               AXIOM_TOKEN=xaat-...     (vector service, below)
+#                               AXIOM_DATASET=vps-docker
 #
 # Strapi stays bound to 127.0.0.1 / the internal docker network — only this
 # service and Nginx (TLS -> 127.0.0.1:3000) are reachable from outside.
@@ -29,6 +34,14 @@ services:
       # adapter-node needs ORIGIN for correct CSRF/origin checks behind Nginx
       - ORIGIN=${ORIGIN:-https://api.1lev1.com}
       - BODY_SIZE_LIMIT=${BODY_SIZE_LIMIT:-50M}
+    # /etc/docker/daemon.json sets the same caps globally, but only for
+    # containers created AFTER a daemon restart — declaring it here means the
+    # rotation is real from the next `up -d`, with no daemon bounce.
+    logging: &json-log
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     ports:
       # loopback only — Nginx terminates TLS and proxies to 127.0.0.1:3000
       - "127.0.0.1:3000:3000"
@@ -40,6 +53,73 @@ services:
       start_period: 15s
     networks:
       - app-network
+
+  # ---- Mastra persistence (docs/PLAN_MASTRA_STORAGE.md) ----
+  # Strapi's Postgres is a managed Aiven service, NOT a container here, so
+  # Mastra gets its own local instance. Never published to a host port: only
+  # containers on app-network can reach it, as `postgres:5432`.
+  # Tuned for the box, not for throughput — 1.9GB RAM total, shared with
+  # Strapi, nginx, socket-server and the API. Postgres would otherwise size
+  # its caches off the host's total RAM and push everything into swap.
+  postgres:
+    image: postgres:16-alpine
+    container_name: mastra-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=mastra
+      - POSTGRES_USER=mastra_user
+      - POSTGRES_PASSWORD=${MASTRA_PG_PASSWORD:?set MASTRA_PG_PASSWORD in .env}
+    command:
+      - postgres
+      - -c
+      - max_connections=25
+      - -c
+      - shared_buffers=96MB
+      - -c
+      - effective_cache_size=256MB
+      - -c
+      - work_mem=4MB
+      - -c
+      - maintenance_work_mem=32MB
+    volumes:
+      - mastra-pgdata:/var/lib/postgresql/data
+    logging: *json-log
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mastra_user -d mastra"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - app-network
+
+  # ---- Log shipper -> Axiom ----
+  # Vercel already drains into Axiom; this puts the VPS containers in the same
+  # place. `docker_logs` reads every container on the box (api, nginx, Strapi,
+  # socket-server), so crashes and nginx 5xx land there too — not just what the
+  # app chose to log. Config in vector.toml, uploaded next to this file.
+  #
+  # NOTE: mounting docker.sock grants Vector full Docker API access. `:ro`
+  # applies to the socket file, not to the API. That is the standard trade for
+  # container-name metadata; the alternative is tailing the raw json logs and
+  # losing the labels.
+  vector:
+    image: timberio/vector:0.57.0-alpine
+    container_name: vector
+    restart: unless-stopped
+    # AXIOM_TOKEN / AXIOM_DATASET come from .env; vector.toml expands them.
+    env_file: .env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./vector.toml:/etc/vector/vector.toml:ro
+      - vector-data:/var/lib/vector
+    logging: *json-log
+    networks:
+      - app-network
+
+volumes:
+  mastra-pgdata:
+  vector-data:
 
 networks:
   # Same external network the socket-server joins; put the Strapi container on

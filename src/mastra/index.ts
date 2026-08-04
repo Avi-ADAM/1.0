@@ -3,6 +3,7 @@ import { Mastra } from '@mastra/core/mastra';
 import { PinoLogger } from '@mastra/loggers';
 import { Agent } from '@mastra/core/agent';
 import { LibSQLStore } from '@mastra/libsql';
+import { PostgresStore } from '@mastra/pg';
 import { chatWorkflow } from './workflows/chat-workflow';
 import { analyzeCvWorkflow } from './workflows/analyze-cv';
 import { createUnregisteredBotAgent } from './agents/nonreg-bot';
@@ -26,6 +27,24 @@ const REGISTRY_LANG = 'he';
 // previous in-memory behaviour when unset.
 const MASTRA_DB_URL = process.env.MASTRA_DB_URL || ':memory:';
 
+// A `postgres://` / `postgresql://` URL selects the Postgres store; anything
+// else stays on libSQL (`:memory:`, `file:…`, Turso). See
+// docs/PLAN_MASTRA_STORAGE.md — the VPS runs a dedicated `postgres` container
+// on the app-network, so the URL there is postgres://…@postgres:5432/mastra.
+// The pool is deliberately small: that container is capped at
+// max_connections=25 and shares 1.9GB of RAM with Strapi, nginx and this app.
+const storage = /^postgres(ql)?:\/\//.test(MASTRA_DB_URL)
+  ? new PostgresStore({
+      id: 'pg-storage',
+      connectionString: MASTRA_DB_URL,
+      max: 5,
+      idleTimeoutMillis: 30_000
+    })
+  : new LibSQLStore({
+      url: MASTRA_DB_URL,
+      id: 'libsql-storage'
+    });
+
 export const mastra = new Mastra({
   workflows: { chatWorkflow, 'analyze-cv': analyzeCvWorkflow },
   agents: {
@@ -34,10 +53,7 @@ export const mastra = new Mastra({
     unregisteredBotAgent: createUnregisteredBotAgent(REGISTRY_API_KEY, REGISTRY_LANG) as Agent<any, any>,
     enhancedBotAgent: createEnhancedBotAgent(REGISTRY_API_KEY, REGISTRY_LANG, 'system') as Agent<any, any>
   },
-  storage: new LibSQLStore({
-    url: MASTRA_DB_URL,
-    id: 'libsql-storage'
-  }),
+  storage,
   logger: new PinoLogger({
     name: 'Mastra',
     level: 'info'

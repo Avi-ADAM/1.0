@@ -104,9 +104,27 @@ Step "Uploading compose file"
 & scp @sshArgs "$RepoRoot\docker-compose.api.yml" "$User@${Server}:$RemoteDir/docker-compose.api.yml"
 if ($LASTEXITCODE -ne 0) { Fail "scp of compose file failed" }
 
+# The vector service bind-mounts this next to the compose file, so it has to
+# land before 'up -d' or the container starts with an empty config.
+Step "Uploading vector.toml (log shipper config)"
+& scp @sshArgs "$RepoRoot\vector.toml" "$User@${Server}:$RemoteDir/vector.toml"
+if ($LASTEXITCODE -ne 0) { Fail "scp of vector.toml failed" }
+
 Invoke-Remote "cd $RemoteDir && test -f .env || { echo 'MISSING $RemoteDir/.env on server (STRAPI_URL, ORIGIN, secrets) — create it first'; exit 1; }"
 
 # ---------- 3. deliver + restart on the server ----------
+
+# compose v1 (1.29.2, what this VPS has) cannot RECREATE a container that
+# declares volumes against a modern Docker: it dies with
+# `KeyError: 'ContainerConfig'` in get_container_data_volumes. Worse, it renames
+# the old container to `<hash>_<name>` BEFORE that step, so a failed run leaves
+# a stale container behind and the next `up` hits a name conflict too.
+# Forcing the create path (no existing container to inherit from) sidesteps
+# both. `docker ps -aq --filter name=` matches substrings, so the renamed
+# leftovers are caught as well. Volumes are named, so postgres keeps its data.
+#   Long-term fix: install the compose v2 plugin on the server — the $DC probe
+#   below already prefers it, and v2 does not have this bug.
+$RemoveStale = "docker ps -aq --filter name=sveltekit-api --filter name=mastra-postgres --filter name=vector | xargs -r docker rm -f >/dev/null 2>&1 || true"
 if (-not $Tarball) {
     # ---- default: push to GHCR, pull on the server ----
     Step "Pushing $FullImage to $Registry"
@@ -119,10 +137,10 @@ if (-not $Tarball) {
     Step "Pulling image and restarting container"
     # compose 'pull' always fetches the current :latest (server must be logged in for a private package).
     # This VPS has compose v1 (`docker-compose`); fall back to the v2 plugin if present.
-    # The old container is force-removed AFTER the pull (minimal downtime) and
-    # before 'up' — compose v1 fails with a name conflict when the running
-    # container wasn't created by this exact compose project.
-    Invoke-Remote "cd $RemoteDir && DC=`$(docker compose version >/dev/null 2>&1 && echo 'docker compose' || echo docker-compose) && `$DC -f docker-compose.api.yml pull && (docker rm -f sveltekit-api >/dev/null 2>&1 || true) && `$DC -f docker-compose.api.yml up -d && docker image prune -f"
+    # The old containers are force-removed AFTER the pull (minimal downtime) and
+    # before 'up' — see $RemoveStale above for why this is mandatory, not just
+    # a name-conflict workaround.
+    Invoke-Remote "cd $RemoteDir && DC=`$(docker compose version >/dev/null 2>&1 && echo 'docker compose' || echo docker-compose) && `$DC -f docker-compose.api.yml pull && ($RemoveStale) && `$DC -f docker-compose.api.yml up -d && docker image prune -f"
 }
 else {
     # ---- fallback: docker save -> scp tarball -> docker load ----
@@ -140,7 +158,7 @@ else {
     Remove-Item $TarFile -Force
 
     Step "Loading image and restarting container"
-    Invoke-Remote "cd $RemoteDir && DC=`$(docker compose version >/dev/null 2>&1 && echo 'docker compose' || echo docker-compose) && docker load -i sveltekit-api.tar && rm -f sveltekit-api.tar && (docker rm -f sveltekit-api >/dev/null 2>&1 || true) && `$DC -f docker-compose.api.yml up -d && docker image prune -f"
+    Invoke-Remote "cd $RemoteDir && DC=`$(docker compose version >/dev/null 2>&1 && echo 'docker compose' || echo docker-compose) && docker load -i sveltekit-api.tar && rm -f sveltekit-api.tar && ($RemoveStale) && `$DC -f docker-compose.api.yml up -d && docker image prune -f"
 }
 
 # ---------- 4. health check ----------

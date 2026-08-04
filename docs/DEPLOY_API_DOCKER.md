@@ -11,7 +11,8 @@
 |------|-------|
 | `Dockerfile` | build רב-שלבי (node:22-alpine). `ADAPTER` לא מוגדר → adapter-node. ה-`.env` מוזרק ל-build כ-**BuildKit secret** ולא נשמר באף layer. |
 | `.dockerignore` | מצמצם את ה-context (בלי `node_modules`, `android`, `remotion`, `socket-server`, `.env`...). |
-| `docker-compose.api.yml` | הרצת הקונטיינר בשרת: פורט 3000 על loopback בלבד, `env_file: .env` מקומי לשרת, רשת `app_app-network` משותפת עם Strapi וה-socket-server. |
+| `docker-compose.api.yml` | הרצת הקונטיינרים בשרת: `sveltekit-api` (פורט 3000 על loopback בלבד, `env_file: .env` מקומי לשרת), `postgres` (אחסון Mastra) ו-`vector` (שילוח לוגים). כולם על רשת `app_app-network` המשותפת עם Strapi וה-socket-server. |
+| `vector.toml` | קונפיג ה-log shipper. נשלח ל-`/home/ubuntu/api/vector.toml` ע"י `deploy-api.ps1` ומוצמד ל-container ב-bind mount. |
 | `deploy-api.ps1` | build **לוקאלי** → `docker push` ל-GHCR → בשרת `docker-compose pull` + `up -d` + health check. עם `-Tarball` חוזרים ל-`docker save`→scp→`docker load` (fallback ללא רישום). ה-build נשאר לוקאלי בכוונה — ל-VPS יש 1.9GB RAM בלי swap והוא יקרוס (OOM) על vite build. |
 | `src/routes/api/health/+server.js` | endpoint ל-HEALTHCHECK של Docker ול-Nginx. |
 
@@ -114,6 +115,49 @@ docker tag  ghcr.io/avi-adam/1lev1-sveltekit-api:<sha-קודם> ghcr.io/avi-adam
 docker-compose -f /home/ubuntu/api/docker-compose.api.yml up -d
 ```
 
+## לוגים — Docker → Axiom
+
+הפרונט ב-Vercel כבר נשפך ל-Axiom דרך האינטגרציה. כדי שלא יהיו שני מקומות
+לחפש בהם, גם הלוגים של השרת נשלחים לאותו Axiom.
+
+**קונטיינר `vector`** (`timberio/vector:0.57.0-alpine`, מוגדר ב-`vector.toml`)
+קורא את ה-Docker API ואוסף את הפלט של **כל** הקונטיינרים בשרת — `sveltekit-api`,
+`app_nginx_1`, `app_strapi-blue_1`, `unified-action-socket-server` ו-`mastra-postgres` —
+לא רק את מה שהאפליקציה בחרה לרשום. זה בכוונה: כשמשהו קורס, השורות
+המעניינות הן דווקא של nginx (5xx) או של תהליך שמת לפני שהספיק לרשום כלום.
+
+הקונפיג מפרסר JSON: לוגי pino של SvelteKit מגיעים כמחרוזת JSON בתוך `.message`,
+והם נפרשים לשדות אמיתיים (`level`, `msg`, …) כדי שיהיו ניתנים לשאילתה ב-Axiom
+במקום בלוק אטום אחד. `level` מספרי מתורגם למילים (`error`/`warn`/…).
+nginx ו-Strapi רושמים טקסט חופשי ועוברים כמות שהם.
+
+נדרש ב-`.env` שבשרת:
+```
+AXIOM_TOKEN=xaat-...      # API token עם הרשאת ingest ל-dataset
+AXIOM_DATASET=vps-docker  # dataset נפרד מזה של Vercel; סינון לפי השדה service
+```
+
+> **אבטחה:** ל-`vector` יש mount של `/var/run/docker.sock`. ה-`:ro` חל על קובץ
+> ה-socket, **לא** על ה-API — כלומר לקונטיינר יש למעשה גישת root לדוקר. זו
+> העלות של קבלת שם הקונטיינר כמטא-דאטה; החלופה היא לקרוא את קבצי ה-json
+> הגולמיים ולוותר על התוויות.
+
+### רוטציה של לוגים
+
+עד 2026-08 לא הייתה **שום** רוטציה על השרת (`/var/lib/docker/containers/*.log`
+גדלו בלי גבול; nginx הגיע ל-28MB). עכשיו:
+
+- `/etc/docker/daemon.json` מגדיר `max-size: 10m` / `max-file: 3` כברירת מחדל
+  גלובלית — **אבל היא חלה רק על קונטיינרים שנוצרים אחרי restart של הדימון**,
+  ולכן היא לא הופעלה רטרואקטיבית (זה היה מפיל את כל הפרודקשן).
+- לכן `docker-compose.api.yml` מגדיר `logging:` מפורש (anchor `*json-log`) על
+  שלושת השירותים שלו — כך הרוטציה אמיתית כבר מה-`up -d` הבא, בלי bounce לדימון.
+- `app_nginx_1` ו-`app_strapi-blue_1` מגיעים מ-compose אחר (ריפו `1.0b`) ויקבלו
+  את ברירת המחדל בפעם הבאה שהם נוצרים מחדש.
+
+`docker logs` ממשיך לעבוד כרגיל — Vector רק מעתיק את הזרם החוצה, ואם הוא נופל
+לא הולכים לאיבוד לוגים מקומיים.
+
 ## ⚠️ api.1lev1.com הוא לא Strapi
 
 `api.1lev1.com` הוא אינסטנס SvelteKit (הפרוקסי) — אין בו REST/GraphQL של Strapi.
@@ -130,9 +174,27 @@ docker-compose -f /home/ubuntu/api/docker-compose.api.yml up -d
 
 ## ⚠️ הערות build חשובות
 
-- **החלפת קונטיינר רץ:** `deploy-api.ps1` עושה `docker rm -f sveltekit-api` בין
-  ה-pull ל-`up -d` — compose v1 נכשל על name conflict כשהקונטיינר הרץ לא נוצר
-  מאותו compose project (למשל אחרי הרצה ידנית).
+- **החלפת קונטיינר רץ:** `deploy-api.ps1` מוחק בכוח את הקונטיינרים בין ה-pull
+  ל-`up -d`. במקור זה היה רק בגלל name conflict, אבל מ-2026-08-04 זו **דרישה
+  קשיחה**:
+
+  > **⚠️ compose v1 לא מסוגל ל-recreate קונטיינר עם volumes.**
+  > לשרת יש `docker-compose` 1.29.2 מול Docker 29 — ו-`up -d` על שירות קיים
+  > שהקונפיג שלו השתנה קורס עם
+  > `KeyError: 'ContainerConfig'` (ב-`get_container_data_volumes`; ה-image
+  > manifest המודרני כבר לא מכיל את השדה הזה).
+  > **גרוע מזה:** compose משנה את שם הקונטיינר הישן ל-`<hash>_<name>` *לפני*
+  > הקריסה, כך שריצה כושלת משאירה קונטיינר יתום — והריצה הבאה נופלת שוב.
+  > קרה בפועל על `mastra-postgres`.
+  >
+  > העקיפה: לכפות את מסלול ה-**create** ע"י מחיקת כל הקונטיינרים (כולל
+  > המשוכפלים ששונו שמם) לפני `up -d` — זה מה ש-`$RemoveStale` בסקריפט עושה.
+  > ה-volumes הם named, אז `mastra-postgres` שומר על הדאטה שלו.
+  >
+  > **התיקון האמיתי:** להתקין את plugin של compose v2 בשרת
+  > (`sudo apt install docker-compose-plugin`). הוא מותקן *לצד* v1 ולא משנה
+  > את ההתנהגות של שום סקריפט שקורא `docker-compose`, ו-`deploy-api.ps1` כבר
+  > מעדיף אותו אוטומטית אם הוא קיים. טרם בוצע.
 
 - **ה-`.env` הלוקאלי נדרש בזמן build** (ערכי `VITE_*` ו-`$env/static` נטמעים
   ב-bundle). הוא מועבר כ-BuildKit secret ולא נשאר ב-image.

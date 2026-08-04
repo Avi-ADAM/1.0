@@ -1,0 +1,69 @@
+# Vector — ships every container's stdout/stderr on the VPS to Axiom, the same
+# place the Vercel deployment already drains to. Uploaded to the server next to
+# docker-compose.api.yml by deploy-api.ps1; see docs/DEPLOY_API_DOCKER.md.
+#
+# Requires in the server .env:  AXIOM_TOKEN=xaat-...   AXIOM_DATASET=vps-docker
+#
+# Docker's json-file driver is still the system of record on the box (rotation
+# is capped in /etc/docker/daemon.json), so `docker logs` keeps working —
+# Vector only copies the stream out. Losing Vector never loses local logs.
+
+data_dir = "/var/lib/vector"
+
+# ---------------------------------------------------------------------------
+# Source: every container on the daemon, via the Docker API.
+# ---------------------------------------------------------------------------
+[sources.docker]
+type = "docker_logs"
+# Without this Vector ingests its own output and, on any log line it emits
+# while shipping, feeds itself in a loop.
+exclude_containers = ["vector"]
+
+# ---------------------------------------------------------------------------
+# Transform: lift structured logs into real fields, tag the source.
+# ---------------------------------------------------------------------------
+# The SvelteKit API logs pino JSON on stdout, so its lines arrive as a JSON
+# string inside .message — parsing it here is what makes `level`, `msg`,
+# `reqId` etc. queryable in Axiom instead of one opaque blob. nginx and Strapi
+# log plain text; those fall through untouched.
+[transforms.prepare]
+type = "remap"
+inputs = ["docker"]
+source = '''
+.service = .container_name
+
+parsed, err = parse_json(.message)
+if err == null && is_object(parsed) {
+  . = merge(., object!(parsed), deep: true)
+  # pino writes numeric levels; Axiom filters read much better as words.
+  if is_integer(.level) {
+    lvl = int!(.level)
+    .level = if lvl >= 60 { "fatal" } else if lvl >= 50 { "error" }
+      else if lvl >= 40 { "warn" } else if lvl >= 30 { "info" }
+      else if lvl >= 20 { "debug" } else { "trace" }
+  }
+}
+
+# Docker hands back the full label map; it is mostly compose bookkeeping and
+# would multiply the field count in Axiom for no query value.
+del(.label)
+'''
+
+# ---------------------------------------------------------------------------
+# Sink: Axiom.
+# ---------------------------------------------------------------------------
+[sinks.axiom]
+type = "axiom"
+inputs = ["prepare"]
+token = "${AXIOM_TOKEN}"
+dataset = "${AXIOM_DATASET:-vps-docker}"
+
+# Survive an Axiom outage or a network blip across a Vector restart. 256MiB is
+# the smallest disk buffer Vector accepts; the box has ~38GB free.
+[sinks.axiom.buffer]
+type = "disk"
+max_size = 268435488
+# Prefer keeping the backlog we already have over the newest lines: a full
+# buffer means Axiom is unreachable, and the start of an incident is the part
+# worth keeping.
+when_full = "drop_newest"
