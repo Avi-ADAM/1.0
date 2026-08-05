@@ -19,15 +19,28 @@ FROM node:22-alpine AS prod-deps
 WORKDIR /app
 
 COPY package*.json .npmrc ./
-RUN npm ci --omit=dev
+# --ignore-scripts: the `postinstall` hook is `patch-package`, which is a
+# devDependency and therefore absent here (exit 127). The only patch we carry
+# (@mediakular/gridcraft Grid.svelte) is compiled into the bundle by vite in
+# stage 1b, where the full `npm ci` does run it — the runtime node_modules
+# never reads that file.
+RUN --mount=type=cache,id=npm,target=/root/.npm \
+    npm ci --omit=dev --ignore-scripts
 
 # ---- Stage 1b: build ----
 FROM node:22-alpine AS build
 
 WORKDIR /app
 
+# patches/ must land BEFORE npm ci: the postinstall hook is patch-package, and
+# with no patches dir it just logs "No patch files found" and exits 0 — the
+# build would succeed with an UNpatched @mediakular/gridcraft.
 COPY package*.json .npmrc ./
-RUN npm ci
+COPY patches ./patches
+# Shared npm tarball cache (both stages use id=npm). Not a layer, so it costs
+# nothing in image size; it only skips the re-download when the lockfile moves.
+RUN --mount=type=cache,id=npm,target=/root/.npm \
+    npm ci
 
 COPY . .
 
