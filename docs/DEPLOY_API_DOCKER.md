@@ -137,6 +137,28 @@ AXIOM_TOKEN=xaat-...      # API token עם הרשאת ingest ל-dataset
 AXIOM_DATASET=vps-docker  # dataset נפרד מזה של Vercel; סינון לפי השדה service
 ```
 
+### ⚠️ שתי מלכודות שעלו בהפעלה הראשונה (2026-08-05)
+
+**1. ה-image לא קורא `vector.toml` מעצמו.** ל-`timberio/vector` אין בכלל
+תיקיית `/etc/vector`, ונתיב ברירת המחדל שהוא מחפש הוא
+`/etc/vector/vector.`**`yaml`**. bind mount של קובץ `.toml` פשוט לא נקרא,
+והקונטיינר נכנס ל-crash-loop עם `Config file not found in path`. לכן השירות
+מריץ `command: ["--config", "/etc/vector/vector.toml"]` מפורשות. אימות:
+```bash
+docker logs vector | grep 'Loading configs'   # -> paths=["/etc/vector/vector.toml"]
+```
+
+**2. ה-dataset חייב להיווצר מראש ב-Axiom.** Vector לא יוצר אותו, ורוב
+ה-API tokens לא מורשים ליצור datasets (`403 ... action: create`) — צריך
+Datasets → New ב-UI. כל עוד הוא חסר, ingest מחזיר `404 dataset not found`
+ו-Vector מדווח עליו כ-`Unauthorized` (הוא ממפה כל non-2xx לשם), מה ששולח
+לחיפוש אחרי בעיית הרשאות שלא קיימת. שים לב שה-**healthcheck של ה-sink עובר**
+גם כשה-dataset חסר, אז "Healthcheck passed" בלוג לא מוכיח כלום. בדיקה אמיתית:
+```bash
+docker logs vector | grep -i 'events dropped'          # ריק = הכל נשלח
+curl -s -H "Authorization: Bearer $AXIOM_TOKEN" https://api.axiom.co/v2/datasets
+```
+
 > **אבטחה:** ל-`vector` יש mount של `/var/run/docker.sock`. ה-`:ro` חל על קובץ
 > ה-socket, **לא** על ה-API — כלומר לקונטיינר יש למעשה גישת root לדוקר. זו
 > העלות של קבלת שם הקונטיינר כמטא-דאטה; החלופה היא לקרוא את קבצי ה-json

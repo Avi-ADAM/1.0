@@ -137,6 +137,9 @@
       const apiUrl = dev ? '/api/chat' : 'https://api.1lev1.com/api/chat';
       const res = await fetch(apiUrl, {
         method: 'POST',
+        // See Bot.svelte: without this the prod cross-origin call carries no
+        // jwt cookie and every tool the agent runs is denied as "anonymous".
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: messages.map((m) => ({ role: m.role, content: m.content })),

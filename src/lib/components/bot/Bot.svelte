@@ -55,6 +55,12 @@
       const apiUrl = dev ? '/api/chat' : 'https://api.1lev1.com/api/chat';
       const response = await fetch(apiUrl, {
         method: 'POST',
+        // Cross-ORIGIN in prod (www → api), so fetch's default
+        // credentials:'same-origin' sends no cookies and the route's tools end
+        // up as principal "anonymous" → every qid 403s. api.1lev1.com is
+        // same-SITE and the jwt cookie is scoped to .1lev1.com, so asking for
+        // credentials is all that's needed; CORS already allows them.
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: apiMessages,

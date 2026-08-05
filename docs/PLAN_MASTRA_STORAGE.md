@@ -118,6 +118,30 @@ docker exec mastra-postgres psql -U mastra_user -d mastra -c '\dt'
 
 אמורות להופיע טבלאות `mastra_*` (threads/messages/traces/evals).
 
+### מה נמדד בפועל (2026-08-05)
+
+Mastra יצר **32 טבלאות** בהרצה הראשונה, וה-store אכן נכתב אליו:
+
+```
+ workflow_name |                run_id                |        createdAt        |       updatedAt
+---------------+--------------------------------------+-------------------------+------------------------
+ chat-workflow | 25e98099-cc81-41ab-84b7-201de79ed1cb | 2026-08-05 17:06:19.156 | 2026-08-05 17:07:35.14
+```
+
+זו הרצת צ'אט אמיתית שנשמרה ל-Postgres — כלומר האחסון חי, לא רק סכימה ריקה.
+
+### ⚠️ `mastra_threads` / `mastra_messages` יישארו 0 — וזה לא באג באחסון
+
+קל לפרש "הטבלאות ריקות" כ-"ה-DB לא בשימוש". ההסבר: **אף agent בפרויקט לא
+מגדיר `memory:`**. `Memory` מיובא רק ב-`src/mastra/agents/weather-agent.ts`,
+שהוא דמו שלא רשום ב-`mastra` בכלל — ועוד עם `url: ':memory:'` משלו.
+
+`storage` ברמת ה-`Mastra` מזין telemetry/workflow-snapshots, אבל **זיכרון שיחה
+נכתב רק ע"י instance של `Memory` שמחובר ל-agent**. כלומר: התוכנית הזו (אחסון)
+הושלמה; הפעלת הזיכרון עצמו היא שלב 1 של [`PLAN_AI_ERA.md`](PLAN_AI_ERA.md)
+וטרם בוצעה. כרגע `/api/chat` מעביר היסטוריה ידנית בכל בקשה (`history` ב-body),
+ולכן שום דבר לא נשבר — פשוט אין המשכיות בין sessions.
+
 ## 5. שמירה על גודל ה-DB
 
 **אין כרגע שום מנגנון ניקוי.** traces, evals והודעות יגדלו בלי גבול.

@@ -107,6 +107,11 @@ services:
     image: timberio/vector:0.57.0-alpine
     container_name: vector
     restart: unless-stopped
+    # The image ships no /etc/vector at all and its default config path is
+    # /etc/vector/vector.YAML — a bind-mounted .toml is silently never read and
+    # the container crash-loops on "Config file not found". Point it at the file
+    # explicitly. (Entrypoint is the vector binary itself, so this is argv.)
+    command: ["--config", "/etc/vector/vector.toml"]
     # AXIOM_TOKEN / AXIOM_DATASET come from .env; vector.toml expands them.
     env_file: .env
     volumes:
