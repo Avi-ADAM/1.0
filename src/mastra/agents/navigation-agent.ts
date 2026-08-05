@@ -11,6 +11,7 @@ import { navigateToPageTool } from '../tools/navigateToPageTool';
 import { findUserProjectsTool } from '../tools/findUserProjectsTool';
 import { getSitePagesTool } from '../tools/siteNavigationTool';
 import { getChatHistoryTool } from '../tools/getChatHistoryTool';
+import { getChatMemory, workingMemoryInstructions } from '../lib/chatMemory';
 
 export function createNavigationAgent(
   apiKey: string,
@@ -191,7 +192,8 @@ Your tools:
   return new Agent({
     id: 'NavigationAgent',
     name: 'NavigationAgent',
-    instructions: systemPrompt,
+    instructions: systemPrompt + workingMemoryInstructions(language),
+    memory: getChatMemory(),
     model: (() => {
       const models = [];
       

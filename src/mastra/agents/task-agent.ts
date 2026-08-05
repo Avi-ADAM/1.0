@@ -12,6 +12,7 @@ import { getProjectMembersTool } from '../tools/getProjectMembersTool';
 import { getMemberMissionsTool } from '../tools/getMemberMissionsTool';
 import { createTaskTool } from '../tools/createTaskTool';
 import { SITE_CONTEXT } from '../../lib/bot/context.js';
+import { getChatMemory, workingMemoryInstructions } from '../lib/chatMemory';
 
 /**
  * Task agent — creates tasks (Acts) in a project, optionally assigned to a
@@ -64,8 +65,9 @@ Rules:
   return new Agent({
     id: 'TaskAgent',
     name: 'TaskAgent',
-    instructions,
+    instructions: instructions + workingMemoryInstructions(language),
     model,
+    memory: getChatMemory(),
     tools: {
       findUserProjectsTool,
       getProjectMembersTool,

@@ -6,6 +6,7 @@ import {
   hasGroqModelConfig
 } from '../lib/createModel';
 import { saleActionTool } from '../tools/saleActionTool';
+import { getChatMemory, workingMemoryInstructions } from '../lib/chatMemory';
 
 function buildSystemPrompt(language: string, userId: string) {
   if (language === 'he') {
@@ -50,7 +51,8 @@ export function createSaleAgent(apiKey: string, language: string = 'he', userId:
   return new Agent({
     id: 'SaleAgent',
     name: 'SaleAgent',
-    instructions: buildSystemPrompt(language, userId),
+    instructions: buildSystemPrompt(language, userId) + workingMemoryInstructions(language),
+    memory: getChatMemory(),
     model: (() => {
       if (hasGoogleModelConfig(apiKey)) {
         return [

@@ -145,7 +145,10 @@
           messages: messages.map((m) => ({ role: m.role, content: m.content })),
           userId,
           lang: userLang,
-          currentPath: page.url.pathname
+          currentPath: page.url.pathname,
+          // Server-side conversation thread (Mastra memory). Shared with the
+          // Bot popup; `clearChat` mints a new one.
+          threadId: chatMessages.threadId()
         })
       });
 

@@ -7,6 +7,7 @@ import {
   hasNvidiaModelConfig,
   hasGoogleModelConfig
 } from '../lib/createModel';
+import { getChatMemory, workingMemoryInstructions } from '../lib/chatMemory';
 import {
   getMissionDetailsTool,
   listUserMissionsTool,
@@ -139,7 +140,8 @@ export function createTimerAgent(
   return new Agent({
     id: 'AdvancedTimerAgent',
     name: 'AdvancedTimerAgent',
-    instructions: buildSystemPrompt(language, userId),
+    instructions: buildSystemPrompt(language, userId) + workingMemoryInstructions(language),
+    memory: getChatMemory(),
     model: (() => {
       const models = [];
       

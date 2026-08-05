@@ -26,6 +26,10 @@ export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
   const userId = body.userId || body.user?.id;
   const lang = body.lang || body.user?.lang || 'he';
   const currentPath = body.currentPath || body.payload?.currentPath || '/';
+  // Conversation id minted by the client (chatStore) and reset when the user
+  // clears the chat. Untrusted — `buildChatMemoryScope` validates its shape and
+  // namespaces it under the authenticated user id.
+  const threadKey = body.threadId || body.payload?.threadId;
 
   let rawMessages = body.messages || [];
   // Fallback for legacy format (payload.text + payload.history)
@@ -152,7 +156,8 @@ export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
         language: lang,
         apiKey: GEMINI_API_KEY,
         fetchInstance: fetch,
-        currentPath
+        currentPath,
+        threadKey
       }
     };
 

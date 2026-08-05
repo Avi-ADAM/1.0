@@ -66,7 +66,9 @@ push). כל פעולה עסקית בפלטפורמה — הצבעות, חלוק�
 
 1. **קונטקסט קטן** — הבוט לא מכיר את הפרויקט שהמשתמש בתוכו: חברים, הצבעות
    פתוחות, משימות בתהליך, דיונים.
-2. **אין זיכרון** — LibSQL בזיכרון; כל שיחה מתחילה מאפס.
+2. ~~**אין זיכרון** — LibSQL בזיכרון; כל שיחה מתחילה מאפס.~~ ✅ נסגר —
+   Postgres מתמיד + Mastra Memory (היסטוריה פר-שיחה, פרופיל מובנה פר-משתמש).
+   נותר: semantic recall (דורש pgvector), retention וגיבוי.
 3. **216 פעולות, 3 כלים** — רוב הפלטפורמה לא נגישה לסוכנים.
 4. **אין דפוס אישור אחיד** — `createProjectTool` עושה prefill-URL (מצוין),
    `createTaskTool` יוצר ישירות עם admin token (מסוכן כברירת מחדל).
@@ -94,8 +96,11 @@ push). כל פעולה עסקית בפלטפורמה — הצבעות, חלוק�
 3. **הזרקה אוטומטית**: ב-`/api/chat`, כש-`currentPath` מתחיל ב-`/moach/`,
    לחלץ projectId ולהזריק תקציר קונטקסט (מכווץ, ~1–2K טוקנים) ל-instructions
    של הסוכן. הדאטה כבר יש — זה חיבור, לא בנייה.
-4. **זיכרון**: להחליף את `LibSQLStore(':memory:')` בקובץ/Postgres, ולהוסיף
-   Mastra Memory עם thread לפי `userId:projectId` — שיחה נמשכת גם מחר.
+4. **זיכרון** — ✅ **בוצע (2026-08-05)**: האחסון עבר ל-Postgres ייעודי
+   ([`PLAN_MASTRA_STORAGE.md`](PLAN_MASTRA_STORAGE.md)) וסוכני הצ'אט חוברו
+   ל-Mastra Memory — thread לפי שיחה (`u<userId>-<clientKey>`) + **זיכרון
+   עבודה מובנה** (סכימת zod) לפי משתמש, שחוצה שיחות ומכשירים. פרטים,
+   גבולות אבטחה ומה שנשאר פתוח: [`PLAN_CHAT_MEMORY.md`](PLAN_CHAT_MEMORY.md).
 5. **RAG (שלב 1.5)**: namespace חדש ב-Pinecone (`project-content`), אינדוקס
    תיאורי משימות/דיונים/החלטות עם metadata של projectId, וכלי
    `searchProjectKnowledgeTool`. כל צנרת ה-embeddings כבר קיימת ב-`src/lib/embed/`.
@@ -224,8 +229,9 @@ push). כל פעולה עסקית בפלטפורמה — הצבעות, חלוק�
 ```
 
 ### Quick wins לשבוע הראשון
-1. אחסון Mastra מתמיד במקום `:memory:` (שורה אחת + קובץ db).
-2. `buildProjectContext` + הזרקה ל-`/api/chat` — האפקט המורגש ביותר למשתמש.
+1. ✅ אחסון Mastra מתמיד במקום `:memory:` — ומעליו הזיכרון עצמו
+   (`PLAN_CHAT_MEMORY.md`).
+2. ✅ `buildProjectContext` + הזרקה ל-`/api/chat` — האפקט המורגש ביותר למשתמש.
 3. `actionConfigToTool` + 10 פעולות קריאה ראשונות ב-MCP.
 4. תיקון placeholders ב-`mastra/index.ts` והחלפת דאטה הדמו בצ'אט.
 5. שדה scopes למפתחות API (ברירת מחדל read+propose).

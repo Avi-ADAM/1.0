@@ -66,7 +66,10 @@
           messages: apiMessages,
           userId: data.uid ?? null,
           lang: data.lang,
-          currentPath: $page.url.pathname
+          currentPath: $page.url.pathname,
+          // Server-side conversation thread (Mastra memory) — same id as /chat,
+          // so the popup and the full page continue one conversation.
+          threadId: chatMessages.threadId()
         })
       });
 

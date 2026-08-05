@@ -8,6 +8,7 @@ import { getProjectContextTool } from '../tools/getProjectContextTool';
 import { createProjectTool } from '../tools/createProjectTool';
 import { reportIssueTool } from '../tools/reportIssueTool';
 import { SITE_CONTEXT } from '../../lib/bot/context.js';
+import { getChatMemory, workingMemoryInstructions } from '../lib/chatMemory';
 
 export function createGeneralHelpAgent(apiKey: string, language: string = 'he') {
   // Select model - priority order: Google Flash > Flash Lite > Groq > NVIDIA
@@ -107,8 +108,9 @@ Always be helpful and friendly, and provide comprehensive answers based on the a
 	return new Agent({
 		id: 'GeneralHelpAgent',
 		name: 'GeneralHelpAgent',
-		instructions: systemPrompt,
+		instructions: systemPrompt + workingMemoryInstructions(language),
 		model,
+		memory: getChatMemory(),
 		tools: {
 			getChatHistoryTool,
 			getSitePagesTool,

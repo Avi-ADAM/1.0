@@ -11,6 +11,7 @@ import {
   getAgentReply
 } from '../lib/agent-response';
 import { setMcpContext, clearMcpContext } from '../../lib/server/mcpContext.js';
+import { buildChatMemoryScope } from '../lib/chatMemory';
 import {
   extractProjectId,
   getProjectContext,
@@ -97,7 +98,8 @@ const analyzeIntent = createStep({
     language: z.string(),
     apiKey: z.string().optional(),
     fetchInstance: z.any().optional(),
-    currentPath: z.string().optional()
+    currentPath: z.string().optional(),
+    threadKey: z.string().optional()
   }),
   outputSchema: z.object({
     message: z.string(),
@@ -107,6 +109,7 @@ const analyzeIntent = createStep({
     apiKey: z.string().optional(),
     fetchInstance: z.any().optional(),
     currentPath: z.string().optional(),
+    threadKey: z.string().optional(),
     intent: z.object({
       type: z.enum(['timer', 'navigation', 'general', 'report', 'sale', 'task']),
       confidence: z.number(),
@@ -240,6 +243,7 @@ const routeToAgent = createStep({
     apiKey: z.string().optional(),
     fetchInstance: z.any().optional(),
     currentPath: z.string().optional(),
+    threadKey: z.string().optional(),
     intent: z.object({
       type: z.enum(['timer', 'navigation', 'general', 'report', 'sale', 'task']),
       confidence: z.number(),
@@ -264,7 +268,8 @@ const routeToAgent = createStep({
       apiKey,
       intent,
       fetchInstance,
-      currentPath
+      currentPath,
+      threadKey
     } = inputData;
 
     console.log('🚀 Routing to agent for intent:', intent.type);
@@ -331,10 +336,22 @@ const routeToAgent = createStep({
         agentType = 'general';
     }
 
+    // Persistent memory (docs/PLAN_CHAT_MEMORY.md): when the user is
+    // registered and a durable store is configured, Mastra replays the thread
+    // from Postgres and injects the user's structured working memory. In that
+    // mode the client's `history` array is NOT re-sent — doing both duplicates
+    // every turn in storage and lets client timestamps reorder the thread.
+    const memoryScope = buildChatMemoryScope(userId, threadKey, {
+      projectId: extractProjectId(currentPath) ?? undefined,
+      language
+    });
+
     // Build conversation messages - limit to last 10 messages to avoid context overflow
     // For Google/Gemini models: strip any messages that contain tool calls or non-text parts
     // to avoid the "thought_signature" error when replaying history with tool invocations.
-    const recentHistory = history.slice(-10);
+    // (Memory-replayed history keeps the signatures, so this only applies to the
+    // client-history fallback below.)
+    const recentHistory = memoryScope ? [] : history.slice(-10);
     const messages = recentHistory
       .filter((msg: any) => {
         const content = msg.content || msg.text || '';
@@ -360,27 +377,25 @@ const routeToAgent = createStep({
       }));
 
     // Inject a compact project snapshot when the user is on a /moach/ page.
-    // Merged into the current user turn (rather than a separate message) to
-    // avoid provider-specific role-alternation constraints.
+    // Passed as a per-call system message, not merged into the user turn: it is
+    // regenerated every request, and merging it would persist a stale copy of
+    // the snapshot inside the stored conversation.
     const projectPreamble = await buildProjectContextPreamble(
       currentPath,
       userId,
       language,
       fetchInstance
     );
-    const currentUserContent = projectPreamble
-      ? `${projectPreamble}\n\n---\n\nUser message: ${message}`
-      : message;
 
     messages.push({
       role: 'user',
-      content: currentUserContent
+      content: message
     });
 
     console.log(
       `🤖 Executing ${agentType} agent with ${messages.length} messages${
         projectPreamble ? ' (+project context)' : ''
-      }`
+      }${memoryScope ? ` (memory thread ${memoryScope.thread.id})` : ''}`
     );
     console.log(
       '📝 Recent messages:',
@@ -394,7 +409,9 @@ const routeToAgent = createStep({
       userId: userId,
       intent: intent,
       maxSteps: DEFAULT_AGENT_MAX_STEPS,
-      toolChoice: 'auto'
+      toolChoice: 'auto',
+      ...(projectPreamble ? { system: projectPreamble } : {}),
+      ...(memoryScope ? { memory: memoryScope } : {})
     });
     function logAgentResult(result: any) {
       const cleanResult = {
@@ -607,7 +624,8 @@ const chatWorkflow = createWorkflow({
     language: z.string(),
     apiKey: z.string().optional(),
     fetchInstance: z.any().optional(),
-    currentPath: z.string().optional()
+    currentPath: z.string().optional(),
+    threadKey: z.string().optional()
   }),
   outputSchema: z.object({
     reply: z.string(),
