@@ -93,6 +93,14 @@ export interface OpenDecisionInput {
   /** Who opened it. A dormancy-opened proposal still needs a signer. */
   initiatorId: string;
   decisionName: string;
+  /**
+   * Set when approving this would also end someone's membership of the rikma
+   * (their only commitment, nothing accrued). Stored on the Decision so the
+   * card can say so before anyone signs — the consequence must never be a
+   * surprise discovered after the fact.
+   */
+  endsMembership?: boolean;
+  memberId?: string | null;
 }
 
 export interface OpenDecisionResult {
@@ -111,6 +119,7 @@ export async function openObjectChangeDecision(
   input: OpenDecisionInput,
 ): Promise<OpenDecisionResult> {
   const { kind, target, round, scope, source, why, initiatorId, decisionName } = input;
+  const { endsMembership, memberId } = input;
   const now = new Date();
   const nowISO = now.toISOString();
   const deadline = new Date(now.getTime() + calcDeadlineMs(target.projectRestime ?? 'feh'));
@@ -125,6 +134,8 @@ export async function openObjectChangeDecision(
     strField('decisionName', decisionName),
     strField('archWhy', why),
     strField(targetRelation, target.id),
+    endsMembership ? 'archEndsMembership: true' : null,
+    endsMembership && memberId ? strField('archMember', memberId) : null,
     target.projectId ? `projects: [${gqlStr(target.projectId)}]` : null,
     dateField('publishedAt', nowISO),
     `negoarch: [${roundFragment({ ...round, ordern: 1 }, initiatorId, nowISO)}]`,

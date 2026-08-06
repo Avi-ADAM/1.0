@@ -30,6 +30,7 @@ import type { Exec } from '$lib/server/archive/gql.js';
 import { openObjectChangeDecision } from '$lib/server/archive/decision.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { fetchTarget, TARGET_META, TARGET_KINDS, type TargetKind } from '$lib/server/archive/targets.js';
+import { assessMembership } from '$lib/server/archive/membership.js';
 import { effectiveDormancyDays, hasAccruedValue, isDormant } from '$lib/archive/dormancy.js';
 
 const OUTCOMES: readonly HoursOutcome[] = ['credit', 'waive', 'transfer', 'endOfCycle'];
@@ -100,6 +101,23 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     throw new Error('endOfCycle needs an effectiveFrom date — this object has no known cycle end');
   }
 
+  const dormant = isDormant(
+    {
+      hoursAlready: target.hoursAlready,
+      finnishedMissionCount: target.finnishedMissionIds.length,
+      hasActiveTimer: target.hasActiveTimer,
+      lastActivityAt: target.lastActivityAt,
+    },
+    effectiveDormancyDays(target.dormancyDays, target.projectDormancyDays),
+  );
+
+  // ── does this end a membership? ─────────────────────────────────────────
+  // Someone who joined for this one mission, with nothing accrued, has no
+  // other tie to the rikma — approving the removal ends their membership.
+  // Assessed here so the proposal states it before anyone signs; re-checked
+  // at maturation, because the situation can change during the restime.
+  const membership = await assessMembership(exec, target, userId);
+
   const round: StandingRound = {
     ordern: 1,
     mode: 'archive',
@@ -110,16 +128,6 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     transferToId,
     effectiveFrom: params.effectiveFrom ? String(params.effectiveFrom) : target.cycleEnd,
   };
-
-  const dormant = isDormant(
-    {
-      hoursAlready: target.hoursAlready,
-      finnishedMissionCount: target.finnishedMissionIds.length,
-      hasActiveTimer: target.hasActiveTimer,
-      lastActivityAt: target.lastActivityAt,
-    },
-    effectiveDormancyDays(target.dormancyDays, target.projectDormancyDays),
-  );
 
   // ── the immediate paths ─────────────────────────────────────────────────
   // (a) a rikma of one has nobody to ask; (b) withdrawing my own commitment
@@ -153,7 +161,16 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     }
 
     return {
-      data: { ...result, immediate: true, dormant, decisionId: null, followUpDecisionId },
+      data: {
+        ...result,
+        immediate: true,
+        dormant,
+        decisionId: null,
+        followUpDecisionId,
+        // `result.membershipEnded` is the authoritative answer (re-checked at
+        // apply time); this is what the user was told would happen.
+        endsMembership: membership.isLastTie,
+      },
       updateStrategy: { type: 'fullRefresh' as const },
     };
   }
@@ -169,6 +186,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     why: why || null,
     initiatorId: userId,
     decisionName,
+    endsMembership: membership.isLastTie,
+    memberId: membership.isLastTie ? membership.userId : null,
   });
 
   await setProposedLifecycle(exec, target.kind, target.id);
@@ -186,8 +205,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
               en: `Proposal to ${scope === 'release' ? 'release' : 'archive'}: ${target.name}`,
             },
             body: {
-              he: `${why || 'ללא נימוק'} — אפשר לאשר, להציע נוסחה חליפית או לפתוח שיחה. ללא תגובה תוך ${restimeLabel(target.projectRestime, 'he')} ההצעה תאושר מעצמה.`,
-              en: `${why || 'No reason given'} — approve, propose different terms, or open a discussion. With no response within ${window} it is approved on its own.`,
+              he: `${why || 'ללא נימוק'}${membership.isLastTie ? ' · שימו לב: זו המשימה היחידה של החבר בריקמה ולא נצברו בה שעות, ולכן אישור ההצעה יסיים גם את חברותו בריקמה.' : ''} — אפשר לאשר, להציע נוסחה חליפית או לפתוח שיחה. ללא תגובה תוך ${restimeLabel(target.projectRestime, 'he')} ההצעה תאושר מעצמה.`,
+              en: `${why || 'No reason given'}${membership.isLastTie ? ' · Note: this is the member’s only commitment here and nothing accrued, so approving also ends their membership of the rikma.' : ''} — approve, propose different terms, or open a discussion. With no response within ${window} it is approved on its own.`,
             },
           },
           channels: ['socket', 'push'],
@@ -210,6 +229,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
       scope,
       dormant,
       immediate: false,
+      endsMembership: membership.isLastTie,
+      membershipUserId: membership.isLastTie ? membership.userId : null,
     },
     updateStrategy: { type: 'fullRefresh' as const },
   };

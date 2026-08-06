@@ -24,6 +24,7 @@ import {
   type Exec,
 } from './gql.js';
 import { TARGET_META, type ArchiveTarget, type Lifecycle, type TargetKind } from './targets.js';
+import { assessMembership, endMembership } from './membership.js';
 
 export type RoundMode = 'archive' | 'keep';
 export type HoursOutcome = 'credit' | 'waive' | 'transfer' | 'endOfCycle';
@@ -61,6 +62,12 @@ export interface ApplyResult {
   closedOfferIds: string[];
   /** The open mission a released assignment went back to. */
   reopenedOpenMissionId?: string;
+  /**
+   * Set when this was the member's last tie to the rikma and their membership
+   * ended with the object. Never a silent side effect — the proposal says so
+   * before the vote, and this reports what actually happened.
+   */
+  membershipEnded?: { userId: string; projectId: string; remainingMembers: number };
 }
 
 /** Set `lifecycle` (and optionally `archiveEffectiveFrom`) on any target. */
@@ -352,6 +359,11 @@ export async function applyObjectChange(
 
   await setLifecycle(exec, target.kind, target.id, lifecycle);
 
+  // Someone who joined for this one thing has nothing left holding them here.
+  // Re-checked now rather than trusting the proposal: during the restime
+  // window they may well have taken on something else, and then they stay.
+  const membershipEnded = await endMembershipIfLastTie(exec, target);
+
   return {
     ...base,
     lifecycle,
@@ -359,5 +371,34 @@ export async function applyObjectChange(
     hoursCredited,
     closedOfferIds,
     reopenedOpenMissionId,
+    membershipEnded,
   };
+}
+
+async function endMembershipIfLastTie(
+  exec: Exec,
+  target: ArchiveTarget,
+): Promise<ApplyResult['membershipEnded']> {
+  try {
+    const assessment = await assessMembership(exec, target, target.ownerId ?? '');
+    if (!assessment.isLastTie) return undefined;
+
+    const { removed, remainingMemberIds } = await endMembership(
+      exec,
+      assessment.projectId,
+      assessment.userId,
+    );
+    if (!removed) return undefined;
+
+    return {
+      userId: assessment.userId,
+      projectId: assessment.projectId,
+      remainingMembers: remainingMemberIds.length,
+    };
+  } catch (e) {
+    // The object is already archived; a failure here leaves a member on the
+    // list, which is recoverable — losing the archive would not be.
+    console.warn('[archive] membership check failed (non-fatal):', e);
+    return undefined;
+  }
 }

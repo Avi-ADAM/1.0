@@ -11,6 +11,8 @@ interface MissionShape {
   openDecisions?: string[];
   updatedAt?: string;
   finnishedMissions?: string[];
+  /** Other ties the owner has to the rikma; 0 means this is their last one. */
+  otherTies?: number;
 }
 
 /**
@@ -27,6 +29,7 @@ function fakeStrapi(mission: MissionShape = {}) {
     openDecisions = [],
     updatedAt = '2026-01-01T00:00:00.000Z',
     finnishedMissions = [],
+    otherTies = 0,
   } = mission;
 
   const node = {
@@ -68,6 +71,23 @@ function fakeStrapi(mission: MissionShape = {}) {
     else if (query.includes('createTimegrama')) data = { createTimegrama: { data: { id: '600' } } };
     else if (query.includes('createFinnishedMission'))
       data = { createFinnishedMission: { data: { id: '900' } } };
+    else if (query.includes('otherMissions:')) {
+      const meta = (n: number) => ({ meta: { pagination: { total: n } } });
+      data = {
+        otherMissions: meta(otherTies),
+        otherResources: meta(0),
+        finnishedMissions: meta(0),
+        sales: meta(0),
+        halukas: meta(0),
+        openAsks: meta(0),
+        openAskms: meta(0),
+      };
+    } else if (query.includes('project(id:'))
+      data = {
+        project: {
+          data: { id: '5', attributes: { user_1s: { data: members.map((id) => ({ id })) } } },
+        },
+      };
     return { json: async () => ({ data }) };
   };
 
@@ -231,5 +251,51 @@ describe('proposeObjectArchive — opening the proposal', () => {
     expect(decision).toContain('הלקוח ביטל');
     expect(decision).toContain('hoursOutcome: credit');
     expect(decision).toContain('hoursToCredit: 4');
+  });
+});
+
+describe('proposeObjectArchive — when this also ends a membership', () => {
+  it('says so in the result, so the caller can warn before anyone signs', async () => {
+    const s = fakeStrapi({ hours: 0, members: ['1', '2'], ownerId: '2', otherTies: 0 });
+    const res = await handler(params({ why: 'הצורך התבטל' }), ctx(s, '1'), {});
+
+    expect(res.data.endsMembership).toBe(true);
+    expect(res.data.membershipUserId).toBe('2');
+  });
+
+  it('records it on the Decision, so the card can state it too', async () => {
+    const s = fakeStrapi({ hours: 0, members: ['1', '2'], ownerId: '2', otherTies: 0 });
+    await handler(params({ why: 'הצורך התבטל' }), ctx(s, '1'), {});
+
+    const [decision] = s.matching('createDecision');
+    expect(decision).toContain('archEndsMembership: true');
+    expect(decision).toContain('archMember: "2"');
+  });
+
+  it('does not claim it when the member has other ties to the rikma', async () => {
+    const s = fakeStrapi({ hours: 0, members: ['1', '2'], ownerId: '2', otherTies: 1 });
+    const res = await handler(params({ why: 'הצורך התבטל' }), ctx(s, '1'), {});
+
+    expect(res.data.endsMembership).toBe(false);
+    expect(s.matching('archEndsMembership')).toHaveLength(0);
+  });
+
+  it('does not claim it when hours accrued — that member has a stake', async () => {
+    const s = fakeStrapi({ hours: 3, members: ['1', '2'], ownerId: '2', otherTies: 0 });
+    const res = await handler(
+      params({ why: 'נעצר', hoursOutcome: 'credit' }),
+      ctx(s, '1'),
+      {},
+    );
+    expect(res.data.endsMembership).toBe(false);
+  });
+
+  it('leaving on my own is still my call — released immediately, membership ends', async () => {
+    const s = fakeStrapi({ hours: 0, members: ['1', '2'], ownerId: '1', otherTies: 0 });
+    const res = await handler(params({ scope: 'release' }), ctx(s, '1'), {});
+
+    expect(res.data.immediate).toBe(true);
+    expect(res.data.membershipEnded?.userId).toBe('1');
+    expect(s.matching('updateProject')[0]).toContain('user_1s: ["2"]');
   });
 });

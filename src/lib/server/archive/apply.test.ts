@@ -2,8 +2,14 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { applyObjectChange, type StandingRound } from './apply.js';
 import type { ArchiveTarget } from './targets.js';
 
-/** Records every document the applier sends, and answers the reads it makes. */
-function fakeExec() {
+/**
+ * Records every document the applier sends, and answers the reads it makes.
+ *
+ * `ties` controls the membership assessment: how many other things bind the
+ * mission's owner to the rikma. Zero means archiving this object also ends
+ * their membership.
+ */
+function fakeExec(ties = 0, projectMembers = ['1', '2']) {
   const sent: string[] = [];
   const exec = async (query: string) => {
     sent.push(query);
@@ -12,6 +18,29 @@ function fakeExec() {
     }
     if (query.includes('finnishedMission(id:')) {
       return { data: { finnishedMission: { data: { id: '77', attributes: { noofhours: 5 } } } } };
+    }
+    if (query.includes('otherMissions:')) {
+      const meta = (n: number) => ({ meta: { pagination: { total: n } } });
+      return {
+        data: {
+          otherMissions: meta(ties),
+          otherResources: meta(0),
+          finnishedMissions: meta(0),
+          sales: meta(0),
+          halukas: meta(0),
+          openAsks: meta(0),
+          openAskms: meta(0),
+        },
+      };
+    }
+    if (query.includes('project(id:')) {
+      return {
+        data: {
+          project: {
+            data: { id: '5', attributes: { user_1s: { data: projectMembers.map((id) => ({ id })) } } },
+          },
+        },
+      };
     }
     return { data: {} };
   };
@@ -227,6 +256,88 @@ describe('applyObjectChange — recurring commitments', () => {
         round: archiveRound({ hoursOutcome: 'endOfCycle' }),
       }),
     ).rejects.toThrow(/effectiveFrom/);
+  });
+});
+
+describe('applyObjectChange — membership', () => {
+  it('ends the membership when the archived mission was the member’s last tie', async () => {
+    const { exec, matching } = fakeExec(0);
+    const result = await applyObjectChange(exec, {
+      target: missionInProgress({ hoursAlready: 0 }),
+      round: archiveRound(),
+    });
+
+    expect(result.membershipEnded).toEqual({
+      userId: '2',
+      projectId: '5',
+      remainingMembers: 1,
+    });
+    expect(matching('updateProject')[0]).toContain('user_1s: ["1"]');
+  });
+
+  it('a release ends it too — the tie is gone either way', async () => {
+    const { exec } = fakeExec(0);
+    const result = await applyObjectChange(exec, {
+      target: missionInProgress({ hoursAlready: 0 }),
+      round: archiveRound(),
+      scope: 'release',
+    });
+    expect(result.membershipEnded?.userId).toBe('2');
+  });
+
+  it('keeps the membership when something else still binds them', async () => {
+    const { exec, matching } = fakeExec(1);
+    const result = await applyObjectChange(exec, {
+      target: missionInProgress({ hoursAlready: 0 }),
+      round: archiveRound(),
+    });
+    expect(result.membershipEnded).toBeUndefined();
+    expect(matching('updateProject')).toHaveLength(0);
+  });
+
+  it('keeps the membership when hours accrued, whatever the settlement', async () => {
+    const { exec, matching } = fakeExec(0);
+    const result = await applyObjectChange(exec, {
+      target: missionInProgress({ hoursAlready: 12 }),
+      round: archiveRound({ hoursOutcome: 'waive' }),
+    });
+    expect(result.membershipEnded).toBeUndefined();
+    expect(matching('updateProject')).toHaveLength(0);
+  });
+
+  it('re-checks at apply time rather than trusting the proposal', async () => {
+    // Nothing bound them when the proposal opened; by maturation they had
+    // taken on another mission — so they stay.
+    const { exec } = fakeExec(1);
+    const result = await applyObjectChange(exec, {
+      target: missionInProgress({ hoursAlready: 0 }),
+      round: archiveRound(),
+    });
+    expect(result.membershipEnded).toBeUndefined();
+  });
+
+  it('archives the object anyway when the membership check itself fails', async () => {
+    const sent: string[] = [];
+    const flaky = async (query: string) => {
+      sent.push(query);
+      if (query.includes('otherMissions:')) throw new Error('strapi down');
+      return { data: {} };
+    };
+    const result = await applyObjectChange(flaky, {
+      target: missionInProgress({ hoursAlready: 0 }),
+      round: archiveRound(),
+    });
+    expect(result.lifecycle).toBe('archived');
+    expect(result.membershipEnded).toBeUndefined();
+  });
+
+  it('does not touch membership for an object nobody personally carries', async () => {
+    const { exec, matching } = fakeExec(0);
+    await applyObjectChange(exec, {
+      target: missionInProgress({ kind: 'openMission', hoursAlready: 0 }),
+      round: archiveRound(),
+    });
+    expect(matching('updateProject')).toHaveLength(0);
   });
 });
 
