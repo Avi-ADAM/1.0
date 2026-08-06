@@ -154,6 +154,7 @@ import { createPersonalMatanotConfig } from './createPersonalMatanot.js';
 import { archivePersonalMatanotConfig } from './archivePersonalMatanot.js';
 import { proposeObjectArchiveConfig } from './proposeObjectArchive.js';
 import { proposeObjectEditConfig } from './proposeObjectEdit.js';
+import { counterObjectChangeConfig } from './counterObjectChange.js';
 
 
 /**
@@ -407,6 +408,7 @@ export function registerAllActions(): void {
   // Object archival & edit consent flow (PLAN_OBJECT_ARCHIVAL)
   registerAction(proposeObjectArchiveConfig);
   registerAction(proposeObjectEditConfig);
+  registerAction(counterObjectChangeConfig);
 
   // Future actions will be registered here
   // registerAction(createTaskAction);

@@ -1,0 +1,77 @@
+{
+  "card": {
+    "typeArchive": "Propuesta de retirada",
+    "typeEdit": "Propuesta de cambio",
+    "typeRelease": "Propuesta de liberación",
+    "byDormancy": "Abierta automáticamente — sin actividad registrada",
+    "reason": "Motivo",
+    "noReason": "Sin motivo indicado",
+    "round": "Ronda {{count}}",
+    "standing": "La versión sobre la mesa",
+    "original": "La propuesta original",
+    "keepMode": "El objeto se queda — cambian sus términos",
+    "archiveMode": "El objeto sale de la rikma",
+    "releaseMode": "El compromiso termina y la necesidad vuelve al grupo abierto",
+    "proposedBy": "Propuesto por {{name}}",
+    "awaiting": "Faltan {{count}}",
+    "signed": "Firmaron: {{count}}",
+    "autoApprove": "Sin respuesta se aprueba por sí sola",
+    "objectName": "Objeto",
+    "target": {
+      "openMission": "Misión abierta",
+      "missionInProgress": "Misión en curso",
+      "openResource": "Recurso abierto",
+      "resourceInProgress": "Recurso en curso",
+      "matanot": "Producto"
+    }
+  },
+  "hours": {
+    "title": "Horas acumuladas",
+    "accrued": "{{count}} horas acumuladas",
+    "none": "Sin horas acumuladas",
+    "credit": "Se acreditan al miembro",
+    "waive": "Renuncia acordada",
+    "transfer": "Se pasan a otra misión",
+    "endOfCycle": "Surte efecto al final del ciclo",
+    "creditAmount": "Acreditar {{count}} horas",
+    "transferTo": "Destino: {{name}}",
+    "effectiveFrom": "Vigente desde {{date}}"
+  },
+  "membership": {
+    "warning": "Aprobar también termina la pertenencia de {{name}} a la rikma",
+    "explain": "Es su único compromiso aquí y no se acumularon horas, así que no queda vínculo con la rikma.",
+    "ended": "La pertenencia terminó junto con el objeto"
+  },
+  "actions": {
+    "approve": "Apruebo",
+    "chat": "Conversar",
+    "negotiate": "Proponer distinto",
+    "approving": "Un momento…"
+  },
+  "nego": {
+    "title": "Proponer otra versión",
+    "modeQuestion": "¿Qué propones?",
+    "modeKeep": "Mantenerlo, con cambios",
+    "modeArchive": "Retirarlo, en otros términos",
+    "name": "Nombre",
+    "descrip": "Descripción",
+    "hm": "Horas / cantidad",
+    "price": "Precio por unidad",
+    "startDate": "Desde",
+    "endDate": "Hasta",
+    "why": "Por qué",
+    "whyPlaceholder": "Qué te lleva a esta propuesta",
+    "was": "antes: {{value}}",
+    "hoursQuestion": "¿Qué pasa con las horas acumuladas?",
+    "submit": "Enviar propuesta",
+    "cancel": "Cancelar",
+    "sending": "Enviando…",
+    "clockReset": "Enviar reinicia el reloj de la decisión"
+  },
+  "toast": {
+    "approved": "Firmaste la versión sobre la mesa",
+    "matured": "Aprobado por unanimidad y aplicado",
+    "countered": "Propuesta enviada — el reloj se reinició",
+    "error": "Algo salió mal, inténtalo de nuevo"
+  }
+}

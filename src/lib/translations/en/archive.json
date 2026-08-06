@@ -1,0 +1,77 @@
+{
+  "card": {
+    "typeArchive": "Removal proposal",
+    "typeEdit": "Change proposal",
+    "typeRelease": "Release proposal",
+    "byDormancy": "Opened automatically — no activity recorded",
+    "reason": "Reason",
+    "noReason": "No reason given",
+    "round": "Round {{count}}",
+    "standing": "The version on the table",
+    "original": "The original proposal",
+    "keepMode": "The object stays — its terms change",
+    "archiveMode": "The object leaves the rikma",
+    "releaseMode": "The commitment ends and the need returns to the open pool",
+    "proposedBy": "Proposed by {{name}}",
+    "awaiting": "Awaiting {{count}}",
+    "signed": "Signed: {{count}}",
+    "autoApprove": "With no response it is approved on its own",
+    "objectName": "Object",
+    "target": {
+      "openMission": "Open mission",
+      "missionInProgress": "Mission in progress",
+      "openResource": "Open resource",
+      "resourceInProgress": "Resource in progress",
+      "matanot": "Product"
+    }
+  },
+  "hours": {
+    "title": "Accrued hours",
+    "accrued": "{{count}} hours accrued",
+    "none": "No hours accrued",
+    "credit": "Credited to the member",
+    "waive": "Agreed waiver",
+    "transfer": "Moved to another mission",
+    "endOfCycle": "Takes effect at the end of the cycle",
+    "creditAmount": "Credit {{count}} hours",
+    "transferTo": "Moving to: {{name}}",
+    "effectiveFrom": "Effective from {{date}}"
+  },
+  "membership": {
+    "warning": "Approving also ends {{name}}’s membership of the rikma",
+    "explain": "This is their only commitment here and nothing accrued, so no tie to the rikma remains.",
+    "ended": "The membership ended along with the object"
+  },
+  "actions": {
+    "approve": "Approve",
+    "chat": "Discuss",
+    "negotiate": "Propose differently",
+    "approving": "One moment…"
+  },
+  "nego": {
+    "title": "Propose a different version",
+    "modeQuestion": "What are you proposing?",
+    "modeKeep": "Keep it, with changes",
+    "modeArchive": "Remove it, on other terms",
+    "name": "Name",
+    "descrip": "Description",
+    "hm": "Hours / quantity",
+    "price": "Price per unit",
+    "startDate": "From",
+    "endDate": "Until",
+    "why": "Why",
+    "whyPlaceholder": "What leads you to this proposal",
+    "was": "was: {{value}}",
+    "hoursQuestion": "What happens to the accrued hours?",
+    "submit": "Send proposal",
+    "cancel": "Cancel",
+    "sending": "Sending…",
+    "clockReset": "Sending resets the decision clock"
+  },
+  "toast": {
+    "approved": "You signed the version on the table",
+    "matured": "Approved unanimously and applied",
+    "countered": "Proposal sent — the clock reset",
+    "error": "Something went wrong, please try again"
+  }
+}

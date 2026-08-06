@@ -1,0 +1,77 @@
+{
+  "card": {
+    "typeArchive": "הצעה להסרה",
+    "typeEdit": "הצעה לעדכון",
+    "typeRelease": "הצעה לשחרור",
+    "byDormancy": "נפתח אוטומטית — לא נרשמה פעילות",
+    "reason": "הנימוק",
+    "noReason": "לא נכתב נימוק",
+    "round": "סבב {{count}}",
+    "standing": "הגרסה שעל השולחן",
+    "original": "ההצעה המקורית",
+    "keepMode": "האובייקט יישאר — הפרטים ישתנו",
+    "archiveMode": "האובייקט יוסר מהריקמה",
+    "releaseMode": "המחויבות תסתיים והצורך יחזור לבריכה הפתוחה",
+    "proposedBy": "הציע/ה: {{name}}",
+    "awaiting": "ממתינים לתגובת {{count}}",
+    "signed": "חתמו: {{count}}",
+    "autoApprove": "ללא תגובה — יאושר מעצמו",
+    "objectName": "האובייקט",
+    "target": {
+      "openMission": "משימה פתוחה",
+      "missionInProgress": "משימה בתהליך",
+      "openResource": "משאב פתוח",
+      "resourceInProgress": "משאב בתהליך",
+      "matanot": "מוצר"
+    }
+  },
+  "hours": {
+    "title": "השעות שנצברו",
+    "accrued": "נצברו {{count}} שעות",
+    "none": "לא נצברו שעות",
+    "credit": "יזוכו לחבר",
+    "waive": "ויתור מוסכם",
+    "transfer": "יועברו למשימה אחרת",
+    "endOfCycle": "הסגירה תיכנס לתוקף בסוף המחזור",
+    "creditAmount": "לזכות {{count}} שעות",
+    "transferTo": "יעד ההעברה: {{name}}",
+    "effectiveFrom": "בתוקף מ־{{date}}"
+  },
+  "membership": {
+    "warning": "אישור ההצעה יסיים גם את חברותו של {{name}} בריקמה",
+    "explain": "זו המחויבות היחידה שלו/ה כאן ולא נצברו בה שעות, ולכן לא נותר קשר לריקמה.",
+    "ended": "החברות בריקמה הסתיימה יחד עם האובייקט"
+  },
+  "actions": {
+    "approve": "מאשר/ת",
+    "chat": "לשיחה",
+    "negotiate": "להציע אחרת",
+    "approving": "רגע…"
+  },
+  "nego": {
+    "title": "להציע גרסה אחרת",
+    "modeQuestion": "מה את/ה מציע/ה?",
+    "modeKeep": "להשאיר, עם שינויים",
+    "modeArchive": "להסיר, בתנאים אחרים",
+    "name": "שם",
+    "descrip": "תיאור",
+    "hm": "שעות / כמות",
+    "price": "מחיר ליחידה",
+    "startDate": "מתאריך",
+    "endDate": "עד תאריך",
+    "why": "למה",
+    "whyPlaceholder": "מה מוביל אותך להצעה הזו",
+    "was": "קודם: {{value}}",
+    "hoursQuestion": "מה עושים עם השעות שנצברו?",
+    "submit": "לשלוח הצעה",
+    "cancel": "ביטול",
+    "sending": "שולח…",
+    "clockReset": "שליחת ההצעה מאפסת את שעון ההחלטה"
+  },
+  "toast": {
+    "approved": "אישרת את הגרסה שעל השולחן",
+    "matured": "ההצעה אושרה פה אחד והוחלה",
+    "countered": "ההצעה נשלחה — השעון התאפס",
+    "error": "משהו השתבש, אפשר לנסות שוב"
+  }
+}

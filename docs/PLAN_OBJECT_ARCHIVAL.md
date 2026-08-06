@@ -494,7 +494,7 @@ authRules: [ jwt, projectMember(projectIdParam:'projectId') ]
 > שדה לא מוכר. מיד אחרי הפריסה: `npm run types:update` +
 > `npm run validate:qids`.
 
-### פאזה 2 — הצבעה, מו״מ וקלף בעמוד הלב
+### פאזה 2 — הצבעה, מו״מ וקלף בעמוד הלב ✅ יושמה
 
 **`voteOnDecision.ts`** — ענף `kind === 'archiveObject' | 'editObject'`:
 היקף הקונסנזוס הוא **כלל-ריקמתי** (בשונה מ-`saleClaim` הדו-צדדי). הצבעה
@@ -527,6 +527,24 @@ params: { decisionId, projectId, ordern, mode, why?,
   transfer + סכום + בורר משימת יעד) שמוצג רק כשיש שעות.
 - `levSocketHandler.ts` — רענון חי, `levStores`/`levDerived` אם נוסף ani
   נפרד לגרסה הרדומה.
+
+**מה נכתב בפועל:**
+`src/lib/server/archive/read.ts` (קריאת ההצעה + הסבב העומד + מי חתם) ·
+`src/lib/server/archive/vote.ts` (`signObjectChange` + `counterObjectChange`
++ `applyStandingVersion` המשותף להצבעה ולשתיקה) ·
+ענף `archiveObject|editObject` ב-`voteOnDecision.ts` ·
+`configs/counterObjectChange.ts` ·
+`src/lib/archive/decisionView.ts` (טהור — בונה את ה-payload לקלף) ·
+extractor + processor + milon + slice registry ·
+`cards/ArchiveObjectCard.svelte` + `negoArchive.svelte` ·
+namespace `archive` בחמש שפות · 27 טסטים נוספים (סה"כ 107).
+
+**שתי הכרעות ביישום:**
+1. **ירושת שדות בסבב נגדי** — סבב שלא מזכיר שדה יורש אותו מהגרסה העומדת
+   ולא מאפס אותו ל-null. אחרת מו״מ על השעות היה מוחק בשקט תאריכים שכבר
+   הוסכמו.
+2. **`applyStandingVersion` אחד** — גם מסלול הפה-אחד וגם מסלול השתיקה
+   (פאזה 3) קוראים לאותה פונקציה, כדי ששני המסלולים לא יוכלו להתפצל.
 
 **Exit:** פינג-פונג מלא בשני דפדפנים: A מציע לארכב משימה בתהליך עם 12
 שעות; B פותח מו״מ ומציע `keep` עם 8 שעות מזוכות; A מאשר → המשימה נשארת,

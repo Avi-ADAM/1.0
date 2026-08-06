@@ -429,6 +429,7 @@ export type ActionKey =
   | 'archivePersonalMatanot'
   | 'proposeObjectArchive'
   | 'proposeObjectEdit'
+  | 'counterObjectChange'
   | 'refreshMySuggestions'
   | 'declineSpForMashaabim'
   | 'reportRecurringSaleCycle'

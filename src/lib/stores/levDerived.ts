@@ -429,6 +429,8 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
         case 'sitesharedecide':
           return true; // Always show: an open giving decision on an auto-approved split
         case 'hachla':
+        // Archive/edit proposals are decisions too — same filter switch.
+        case 'archObject':
           return $milon.hachla;
         default:
           return true; // Show unknown types by default

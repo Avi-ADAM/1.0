@@ -27,6 +27,7 @@ import type {
   SaleData,
   WishOfferData
 } from '$lib/stores/levStores';
+import { buildArchiveDecisionView } from '$lib/archive/decisionView.js';
 import { calculateScore } from './suggestionMatchers';
 
 /**
@@ -1087,6 +1088,37 @@ export function extractDecisions(userData: any): DecisionData[] {
 
         const kind = decision.attributes.kind || '';
         const vots = decision.attributes.vots || [];
+
+        // Archive/edit proposals (PLAN_OBJECT_ARCHIVAL). Same pipeline as the
+        // other decision kinds, with a payload the card needs: which version
+        // is on the table, what it costs in hours, and whether approving also
+        // ends someone's membership of the rikma.
+        if (kind === 'archiveObject' || kind === 'editObject') {
+          const memberIds = (project.attributes?.user_1s?.data ?? []).map((u: any) =>
+            String(u.id)
+          );
+          const view = buildArchiveDecisionView(decision, memberIds, String(userData.id));
+          if (!view) continue; // malformed proposal — nothing to decide on
+          // Only surface it while it is actually my move; once I have signed
+          // the standing round the ball is in someone else's court.
+          if (!view.myTurn) continue;
+
+          decisions.push({
+            id: decision.id,
+            projectId: project.id,
+            decision: 'archObject',
+            priority: 10,
+            myid: userData.id,
+            kind,
+            createdAt: decision.attributes.createdAt,
+            vots,
+            users: vots,
+            timegramaId: decision.attributes.timegrama?.data?.id,
+            timegramaDate: decision.attributes.timegrama?.data?.attributes?.date,
+            archive: view
+          } as any);
+          continue;
+        }
 
         // Bilateral sale-holder consent (PLAN_sale_holder_consent). Only two
         // parties (reporter + holder), and it belongs on *my* heart only when

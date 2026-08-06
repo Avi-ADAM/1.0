@@ -10999,6 +10999,55 @@ export const qids = {
                         }
                       }
                     }
+                    targetKind
+                    archScope
+                    archSource
+                    archWhy
+                    archEndsMembership
+                    archMember { data { id attributes { username } } }
+                    negoarch {
+                      ordern
+                      mode
+                      why
+                      zman
+                      name
+                      descrip
+                      hm
+                      price
+                      kindOf
+                      sqadualed
+                      sqadualedf
+                      hoursOutcome
+                      hoursToCredit
+                      effectiveFrom
+                      proposedBy { data { id attributes { username } } }
+                      transferTo { data { id attributes { name } } }
+                    }
+                    archOpenMission {
+                      data { id attributes { name descrip noofhours perhour sqadualed dates } }
+                    }
+                    archMesimabetahalich {
+                      data { id attributes {
+                        name descrip howmanyhoursalready hoursassinged perhour start dates
+                        users_permissions_user { data { id attributes {
+                          username profilePic { data { attributes { url formats } } }
+                        } } }
+                      } }
+                    }
+                    archOpenMashaabim {
+                      data { id attributes { name descrip hm price kindOf sqadualed sqadualedf } }
+                    }
+                    archMashabetahalich {
+                      data { id attributes {
+                        name descrip quantityAssigned pricePerUnit recurring end
+                        users_permissions_user { data { id attributes {
+                          username profilePic { data { attributes { url formats } } }
+                        } } }
+                      } }
+                    }
+                    archMatanot {
+                      data { id attributes { name desc price quant kindOf } }
+                    }
                   }
                 }
               }

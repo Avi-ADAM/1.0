@@ -111,6 +111,7 @@
     scrolltotop
   } from 'svelte-scrollto-element';
   import Vid from './didiget.svelte';
+  import ArchiveObjectCard from './cards/ArchiveObjectCard.svelte';
   import ProductRequestCoin from './ProductRequestCoin.svelte';
   import Desi from './decisionMaking.svelte';
   import Mid from './midi.svelte';
@@ -856,6 +857,24 @@
               negopendmissions={buble.negopendmissions || []}
               orderon={buble.orderon || 0}
               {low}
+            />
+          </div>
+        {:else if buble.ani === 'archObject' && milon.hachla == true}
+          <div
+            class="hachla normSml"
+            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
+          >
+            <ArchiveObjectCard
+              archive={buble.archive}
+              projectId={buble.projectId}
+              projectName={buble.projectName}
+              logoSrc={buble.src}
+              memberCount={buble.noof}
+              timegramaDate={buble.timegramaDate}
+              onProj={proj}
+              onUser={user}
+              onChat={chat}
+              onDone={delo}
             />
           </div>
         {:else if buble.ani === 'hachla' && milon.hachla == true}
