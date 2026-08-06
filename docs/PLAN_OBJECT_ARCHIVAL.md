@@ -391,7 +391,20 @@ dormant = howmanyhoursalready ∈ {0, null}
 
 **Exit:** הסכימה עולה, ה-codegen עובר, `STRAPI_SCHEMA_REFERENCE.md` מעודכן.
 
-### פאזה 1 — פתיחת הצעה + ריקמת יחיד + כיבוד `lifecycle` בסינון
+### פאזה 1 — פתיחת הצעה + ריקמת יחיד + כיבוד `lifecycle` בסינון ✅ יושמה
+
+**מה נכתב בפועל:**
+`src/lib/archive/dormancy.ts` (טהור, משותף) ·
+`src/lib/server/archive/{gql,targets,apply,decision,exec}.ts` ·
+`configs/proposeObjectArchive.ts` · `configs/proposeObjectEdit.ts` ·
+סריקת הסינון ב-`qids.js` (58 אתרים + שאילתות ה-match-suggestion) ·
+42 טסטים.
+
+**הערה על ה-`Exec`:** המודול מדבר מחרוזות GraphQL גולמיות ומקבל
+`exec` בהזרקה, כדי ששלושת מסלולי ההפעלה (הצבעה, cron של timegrama,
+המסלול המיידי) יריצו *בדיוק* אותה לוגיקת הבשלה. זו הסיבה שלא נוספו qids
+לכתיבה — רק הסינון ב-qids הקיימים.
+
 
 **Actions חדשים:**
 
@@ -436,6 +449,12 @@ authRules: [ jwt, projectMember(projectIdParam:'projectId') ]
 
 **Exit:** אפשר לפתוח הצעת ארכוב; בריקמת יחיד האובייקט נעלם מיד; בריקמה
 מרובה נוצר Decision פתוח והאובייקט מסומן "בדיון".
+
+> ⚠️ **סדר פריסה — חובה.** מרגע שפאזה 1 בענף, `qids.js` מסנן על
+> `lifecycle` ומודול הארכוב קורא אותו. **קודם פורסים את הסכימה של 1.0b,
+> ורק אחר כך את הפרונט** — אחרת כל שאילתת משימות/משאבים/מוצרים תיפול על
+> שדה לא מוכר. מיד אחרי הפריסה: `npm run types:update` +
+> `npm run validate:qids`.
 
 ### פאזה 2 — הצבעה, מו״מ וקלף בעמוד הלב
 

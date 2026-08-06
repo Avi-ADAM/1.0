@@ -1,3 +1,17 @@
+/**
+ * "Not archived by a rikma decision" (PLAN_OBJECT_ARCHIVAL).
+ *
+ * `lifecycle` is a NEW field, so every object that predates the archival flow
+ * carries NULL — and in SQL `lifecycle <> 'archived'` is NULL for those rows,
+ * i.e. every existing mission/resource/product would silently vanish from the
+ * lists. The null branch is what keeps legacy objects visible; do not
+ * "simplify" it away. Same idiom as the `source` filter below.
+ *
+ * Note this is deliberately separate from `archived`, which already means
+ * "taken/assigned" on an open mission, not "removed".
+ */
+const NOT_ARCHIVED = `{ or: [{ lifecycle: { null: true } }, { lifecycle: { ne: "archived" } }] }`;
+
 const qids_base = {
   '1chatsend': `mutation  CreateMessage($fid : ID, $fidn: Int, $idL: ID , $da: DateTime, $mes: String)
     {createMessage(
@@ -273,7 +287,7 @@ const qids_base = {
               username
               telegramId
               lang 
-              mesimabetahaliches(filters:{finnished:{ne: true },forappruval: { ne: true }}) {data{id
+              mesimabetahaliches(filters:{ and: [ { finnished:{ne: true },forappruval: { ne: true } }, ${NOT_ARCHIVED} ] }) {data{id
                attributes{name stname timer howmanyhoursalready hoursassinged
               users_permissions_user{data{id}}
               acts{data{id attributes{shem myIshur link hashivut valiIshur des dateF dateS status naasa}}}
@@ -498,7 +512,7 @@ const qids_base = {
    }
 }`,
   "27GetOpenMissionsRegTr": `query GetOpenMissionsRegTr($start: Int, $limit: Int)
-{  openMissions(filters: { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }, pagination: { start: $start, limit: $limit }) {
+{  openMissions(filters: { and: [ { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }, ${NOT_ARCHIVED} ] }, pagination: { start: $start, limit: $limit }) {
     data{
       id 
       attributes{ 
@@ -526,7 +540,7 @@ const qids_base = {
   }
 }`,
   "28GetOpenMissionsReg": `query GetOpenMissionsReg($start: Int, $limit: Int)
-{  openMissions(filters: { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }, pagination: { start: $start, limit: $limit }) {
+{  openMissions(filters: { and: [ { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }, ${NOT_ARCHIVED} ] }, pagination: { start: $start, limit: $limit }) {
     data{
       id 
       attributes{ 
@@ -554,7 +568,7 @@ const qids_base = {
   }
 }`,
   "29GetOpenMissionsNonregTr": `query GetOpenMissionsNonregTr($start: Int, $limit: Int)
-{  openMissions(filters: { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }, pagination: { start: $start, limit: $limit }) {
+{  openMissions(filters: { and: [ { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }, ${NOT_ARCHIVED} ] }, pagination: { start: $start, limit: $limit }) {
     data{
       id
       attributes{ 
@@ -577,7 +591,7 @@ const qids_base = {
   }
 }`,
   "30GetOpenMissionsNonreg": `query GetOpenMissionsNonreg($start: Int, $limit: Int)
-{  openMissions(filters: { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }, pagination: { start: $start, limit: $limit }) {
+{  openMissions(filters: { and: [ { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }, ${NOT_ARCHIVED} ] }, pagination: { start: $start, limit: $limit }) {
     data{
       id
       attributes{ 
@@ -1576,7 +1590,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           vallues { data { attributes { valueName localizations { data { attributes { valueName } } } } } }
           publicDescription
           profilePic { data { attributes { url formats } } }
-          open_missions(filters: { and: [{ archived: { eq: false } }, { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }] }) { data { id attributes { name } } }
+          open_missions(filters: { and: [{ archived: { eq: false } }, { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }, ${NOT_ARCHIVED} ] }) { data { id attributes { name } } }
         }
       }
     }
@@ -3904,7 +3918,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           }
         }
         mesimabetahaliches(
-          filters: { forappruval: { eq: false }, finnished: { eq: false } }
+          filters: { and: [ { forappruval: { eq: false }, finnished: { eq: false } }, ${NOT_ARCHIVED} ] }
         ) {
           data {
             id
@@ -5506,7 +5520,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                   }
                 }
               }
-              open_missions(filters: { archived: { eq: false } }) {
+              open_missions(filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }) {
                 data {
                   id
                   attributes {
@@ -5878,7 +5892,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       id
       attributes {
         mesimabetahaliches(
-          filters: { forappruval: { eq: false }, finnished: { eq: false } }
+          filters: { and: [ { forappruval: { eq: false }, finnished: { eq: false } }, ${NOT_ARCHIVED} ] }
         ) {
           data {
             id
@@ -6144,7 +6158,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
               }
             }
           }
-          open_missions(filters: { archived: { ne: true } }) {
+          open_missions(filters: { and: [ { archived: { ne: true } }, ${NOT_ARCHIVED} ] }) {
             data {
               id
               attributes {
@@ -6181,7 +6195,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
               }
             }
           }
-          open_mashaabims(filters: { archived: { ne: true } }) {
+          open_mashaabims(filters: { and: [ { archived: { ne: true } }, ${NOT_ARCHIVED} ] }) {
             data {
               id
               attributes {
@@ -6243,7 +6257,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
               }
             }
           }
-          mesimabetahaliches(filters: { finnished: { ne: true } }) {
+          mesimabetahaliches(filters: { and: [ { finnished: { ne: true } }, ${NOT_ARCHIVED} ] }) {
             data {
               id
               attributes {
@@ -7680,10 +7694,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
 
   '110listCandidateMatanots': `query ListCandidateMatanots($limit: Int) {
     matanots(
-      filters: {
-        archived: { eq: false }
-        status_of_voting: { eq: "active" }
-      }
+      filters: { and: [ { archived: { eq: false }
+        status_of_voting: { eq: "active" } }, ${NOT_ARCHIVED} ] }
       pagination: { limit: $limit }
     ) {
       data {
@@ -8543,7 +8555,7 @@ export const moachQids = {
   // Used by /api/monthi: every active, non-finished recurring resource.
   'mrGetRecurringForMonthi': `query MrGetRecurringForMonthi {
     mashabetahaliches(
-      filters: { recurring: { eq: true }, status_mashab: { eq: "active" }, finnished: { eq: false } }
+      filters: { and: [ { recurring: { eq: true }, status_mashab: { eq: "active" }, finnished: { eq: false } }, ${NOT_ARCHIVED} ] }
       pagination: { limit: 300 }
     ) {
       data { id attributes {
@@ -8743,7 +8755,7 @@ export const moachQids = {
             my { data { id attributes { username profilePic { data { attributes { url } } } } } }
             vali { data { id } }
           } } }
-          mesimabetahaliches(filters: { finnished: { eq: false } }) { data {
+          mesimabetahaliches(filters: { and: [ { finnished: { eq: false } }, ${NOT_ARCHIVED} ] }) { data {
             id attributes {
               name status iskvua createdAt
               open_missions { data { id } }
@@ -8753,7 +8765,7 @@ export const moachQids = {
               acts { data { id attributes { shem dateS naasa myIshur valiIshur status } } }
             }
           } }
-          open_missions(filters: { archived: { eq: false } }) { data {
+          open_missions(filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }) { data {
             id attributes {
               name descrip noofhours perhour sqadualed createdAt
               pendm { data { id } }
@@ -8774,7 +8786,7 @@ export const moachQids = {
               mesimabetahalich { data { id } }
             }
           } }
-          open_mashaabims(filters: { archived: { eq: false } }) { data {
+          open_mashaabims(filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }) { data {
             id attributes {
               name kindOf hm descrip price easy spnot sqadualed sqadualedf
               pmash { data { id attributes { name } } }
@@ -8942,7 +8954,7 @@ export const moachQids = {
     project(id: $pid) {
       data {
         attributes {
-          open_missions(filters: { archived: { eq: false } }) {
+          open_missions(filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }) {
             data {
               id
               attributes {
@@ -8959,7 +8971,7 @@ export const moachQids = {
               }
             }
           }
-          mesimabetahaliches(filters: { finnished: { ne: true } }) {
+          mesimabetahaliches(filters: { and: [ { finnished: { ne: true } }, ${NOT_ARCHIVED} ] }) {
             data {
               id
               attributes {
@@ -8994,7 +9006,7 @@ export const moachQids = {
               }
             }
           }
-          open_mashaabims(filters: { archived: { eq: false } }) {
+          open_mashaabims(filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }) {
             data {
               id
               attributes {
@@ -9108,25 +9120,25 @@ export const moachQids = {
             data { id attributes { total } }
           }
           mesimabetahaliches(
-            filters: { finnished: { ne: true }, forappruval: { ne: true } }
+            filters: { and: [ { finnished: { ne: true }, forappruval: { ne: true } }, ${NOT_ARCHIVED} ] }
             pagination: { limit: -1 }
           ) {
             data { id attributes { hoursassinged perhour iskvua } }
           }
           open_missions(
-            filters: { archived: { eq: false } }
+            filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }
             pagination: { limit: -1 }
           ) {
             data { id attributes { noofhours perhour } }
           }
           mashabetahaliches(
-            filters: { finnished: { ne: true }, forappruval: { ne: true }, recurring: { eq: true } }
+            filters: { and: [ { finnished: { ne: true }, forappruval: { ne: true }, recurring: { eq: true } }, ${NOT_ARCHIVED} ] }
             pagination: { limit: -1 }
           ) {
             data { id attributes { pricePerUnit kindOf cycleSize recurring } }
           }
           open_mashaabims(
-            filters: { archived: { ne: true } }
+            filters: { and: [ { archived: { ne: true } }, ${NOT_ARCHIVED} ] }
             pagination: { limit: -1 }
           ) {
             data {
@@ -9137,7 +9149,7 @@ export const moachQids = {
           sales(pagination: { limit: -1 }) {
             data { id attributes { in date holderStatus } }
           }
-          matanotofs(pagination: { limit: -1 }) {
+          matanotofs(filters: ${NOT_ARCHIVED} pagination: { limit: -1 }) {
             data { id attributes { price kindOf } }
           }
         }
@@ -9171,7 +9183,7 @@ export const moachQids = {
           decisions(filters: { archived: { eq: false } }) {
             data { id attributes { kind newname vots { what users_permissions_user { data { id } } } } }
           }
-          open_missions(filters: { archived: { eq: false } }) {
+          open_missions(filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }) {
             data {
               id
               attributes {
@@ -9210,7 +9222,7 @@ export const moachQids = {
           tosplits(filters: { finished: { eq: false } }) { data { id } }
           decisions(filters: { archived: { eq: false } }) { data { id } }
           askms(filters: { archived: { eq: false } }) { data { id } }
-          open_missions(filters: { archived: { eq: false } }) {
+          open_missions(filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }) {
             data { id attributes { asks(filters: { archived: { eq: false } }) { data { id } } } }
           }
         }
@@ -10203,7 +10215,7 @@ export const qids = {
         }
         # Active missions count (proxy for suggestions KPI)
         mesimabetahaliches(
-          filters: { forappruval: { eq: false }, finnished: { eq: false } }
+          filters: { and: [ { forappruval: { eq: false }, finnished: { eq: false } }, ${NOT_ARCHIVED} ] }
         ) {
           data {
             id
@@ -11754,7 +11766,7 @@ export const qids = {
           }
         }
         mesimabetahaliches(
-          filters: { forappruval: { eq: false }, finnished: { eq: false }, project: { id: { in: $pids } } }
+          filters: { and: [ { forappruval: { eq: false }, finnished: { eq: false }, project: { id: { in: $pids } } }, ${NOT_ARCHIVED} ] }
         ) {
           data {
             id
@@ -12101,11 +12113,9 @@ export const qids = {
   // the built-in service-request flow (createSheirutpend). Active, non-archived only.
   '203findMatanotByText': `query FindMatanotByText($q: String) {
     matanots(
-      filters: {
-        archived: { eq: false }
+      filters: { and: [ { archived: { eq: false }
         status_of_voting: { eq: "active" }
-        name: { containsi: $q }
-      }
+        name: { containsi: $q } }, ${NOT_ARCHIVED} ] }
       pagination: { limit: 6 }
     ) {
       data {
@@ -12175,7 +12185,7 @@ export const qids = {
 
   '221mapOpenMissions': `query MapOpenMissions {
     openMissions(
-      filters: { archived: { eq: false } }
+      filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }
       pagination: { limit: 250 }
       sort: "createdAt:desc"
     ) {
@@ -12191,7 +12201,7 @@ export const qids = {
 
   '222mapOpenMashaabims': `query MapOpenMashaabims {
     openMashaabims(
-      filters: { archived: { eq: false } }
+      filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }
       pagination: { limit: 250 }
       sort: "createdAt:desc"
     ) {
@@ -12601,7 +12611,7 @@ export const qids = {
 
   '265listMyPersonalMatanots': `query ListMyPersonalMatanots($uid: ID!) {
     matanots(
-      filters: { owner_user: { id: { eq: $uid } }, origin: { eq: "personal" }, archived: { ne: true } }
+      filters: { and: [ { owner_user: { id: { eq: $uid } }, origin: { eq: "personal" }, archived: { ne: true } }, ${NOT_ARCHIVED} ] }
       pagination: { limit: 100 }
       sort: "createdAt:desc"
     ) {
@@ -12625,13 +12635,13 @@ export const qids = {
           pagination: { limit: 200 }
         ) { data { id } }
         mesimabetahaliches(
-          filters: { finnished: { ne: true }, forappruval: { ne: true } }
+          filters: { and: [ { finnished: { ne: true }, forappruval: { ne: true } }, ${NOT_ARCHIVED} ] }
           pagination: { limit: 200 }
         ) { data { id } }
         finnished_missions(pagination: { limit: 500 }) { data { id } }
         projects_1s(pagination: { limit: 100 }) {
           data { id attributes {
-            matanotofs(filters: { archived: { ne: true } }, pagination: { limit: 200 }) {
+            matanotofs(filters: { and: [ { archived: { ne: true } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 200 }) {
               data { id }
             }
           } }
@@ -12662,7 +12672,7 @@ export const qids = {
     usersPermissionsUser(id: $uid) {
       data { id attributes {
         mesimabetahaliches(
-          filters: { finnished: { ne: true }, forappruval: { ne: true } }
+          filters: { and: [ { finnished: { ne: true }, forappruval: { ne: true } }, ${NOT_ARCHIVED} ] }
           pagination: { limit: 100 }
         ) {
           data { id attributes {
@@ -12679,7 +12689,7 @@ export const qids = {
 
   '272myOfferingsCounts': `query MyOfferingsCounts($uid: ID!) {
     products: matanots(
-      filters: { projectcreates: { user_1s: { id: { eq: $uid } } }, archived: { ne: true } }
+      filters: { and: [ { projectcreates: { user_1s: { id: { eq: $uid } } }, archived: { ne: true } }, ${NOT_ARCHIVED} ] }
       pagination: { limit: 1 }
     ) { meta { pagination { total } } }
     offers: missionOffers(
@@ -12687,7 +12697,7 @@ export const qids = {
       pagination: { limit: 1 }
     ) { meta { pagination { total } } }
     doing: mesimabetahaliches(
-      filters: { users_permissions_user: { id: { eq: $uid } }, finnished: { ne: true }, archived: { ne: true } }
+      filters: { and: [ { users_permissions_user: { id: { eq: $uid } }, finnished: { ne: true }, archived: { ne: true } }, ${NOT_ARCHIVED} ] }
       pagination: { limit: 1 }
     ) { meta { pagination { total } } }
     done: finnishedMissions(
@@ -12698,7 +12708,7 @@ export const qids = {
 
   '273myMissionsFull': `query MyMissionsFull($uid: ID!) {
     doing: mesimabetahaliches(
-      filters: { users_permissions_user: { id: { eq: $uid } }, finnished: { ne: true }, archived: { ne: true } }
+      filters: { and: [ { users_permissions_user: { id: { eq: $uid } }, finnished: { ne: true }, archived: { ne: true } }, ${NOT_ARCHIVED} ] }
       pagination: { limit: 100 }
       sort: "createdAt:desc"
     ) {
@@ -12771,7 +12781,7 @@ export const qids = {
 
   '269mapProducts': `query MapProducts {
     matanots(
-      filters: { archived: { ne: true } }
+      filters: { and: [ { archived: { ne: true } }, ${NOT_ARCHIVED} ] }
       pagination: { limit: 200 }
       sort: "createdAt:desc"
     ) {
@@ -12800,13 +12810,13 @@ export const qids = {
       }
       pagination: { limit: 1 }
     ) { meta { pagination { total } } }
-    openMissions(filters: { archived: { eq: false } }, pagination: { limit: 1 }) {
+    openMissions(filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 1 }) {
       meta { pagination { total } }
     }
-    openMashaabims(filters: { archived: { eq: false } }, pagination: { limit: 1 }) {
+    openMashaabims(filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 1 }) {
       meta { pagination { total } }
     }
-    matanots(filters: { archived: { ne: true } }, pagination: { limit: 1 }) {
+    matanots(filters: { and: [ { archived: { ne: true } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 1 }) {
       meta { pagination { total } }
     }
   }`,
@@ -12836,9 +12846,9 @@ export const qids = {
         profilePic { data { attributes { url formats } } }
         location { lat lng radius location_hint location_mode }
         user_1s(pagination: { limit: 100 }) { data { id } }
-        open_missions(filters: { archived: { eq: false } }, pagination: { limit: 50 }) { data { id } }
-        open_mashaabims(filters: { archived: { eq: false } }, pagination: { limit: 50 }) { data { id } }
-        matanotofs(filters: { or: [{ archived: { eq: false } }, { archived: { null: true } }] }, pagination: { limit: 50 }) { data { id } }
+        open_missions(filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 50 }) { data { id } }
+        open_mashaabims(filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 50 }) { data { id } }
+        matanotofs(filters: { and: [ { or: [{ archived: { eq: false } }, { archived: { null: true } }] }, ${NOT_ARCHIVED} ] }, pagination: { limit: 50 }) { data { id } }
       } }
     }
   }`,
@@ -12846,7 +12856,7 @@ export const qids = {
   '282discoverProducts': `query DiscoverProducts {
     matanots(
       # Same NULL guard as 281 — never-archived products often have NULL here.
-      filters: { or: [{ archived: { eq: false } }, { archived: { null: true } }] }
+      filters: { and: [ { or: [{ archived: { eq: false } }, { archived: { null: true } }] }, ${NOT_ARCHIVED} ] }
       pagination: { limit: 200 }
       sort: "createdAt:desc"
     ) {
@@ -12865,7 +12875,7 @@ export const qids = {
   // card normalizer and normalizeOpenMission for the embedded map.
   '283discoverMissions': `query DiscoverMissions {
     openMissions(
-      filters: { archived: { eq: false } }
+      filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }
       pagination: { limit: 500 }
       sort: "createdAt:desc"
     ) {
@@ -12884,7 +12894,7 @@ export const qids = {
   // Field superset of 222mapOpenMashaabims — same dual use as 283.
   '284discoverResources': `query DiscoverResources {
     openMashaabims(
-      filters: { archived: { eq: false } }
+      filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }
       pagination: { limit: 500 }
       sort: "createdAt:desc"
     ) {
@@ -12918,7 +12928,7 @@ export const qids = {
       } }
     }
     matanots(
-      filters: { owner_user: { id: { eq: $uid } }, origin: { eq: "personal" }, archived: { ne: true } }
+      filters: { and: [ { owner_user: { id: { eq: $uid } }, origin: { eq: "personal" }, archived: { ne: true } }, ${NOT_ARCHIVED} ] }
       pagination: { limit: 50 }
     ) {
       data { id attributes {
@@ -13399,7 +13409,7 @@ export const qids = {
                     }
                   }
                 }
-                matanotofs(filters: { or: [{ quant: { gt: 0 } }, { quant: { eq: -1 } }] }) {
+                matanotofs(filters: { and: [ { or: [{ quant: { gt: 0 } }, { quant: { eq: -1 } }] }, ${NOT_ARCHIVED} ] }) {
                   data {
                     id
                     attributes {
@@ -13565,8 +13575,7 @@ export const qids = {
         { or: [
           { skills: { id: { in: $skillIds } } },
           { tafkidims: { id: { in: $roleIds } } }
-        ] }
-      ] }
+        ] }, ${NOT_ARCHIVED} ] }
       pagination: { limit: $limit }
     ) {
       data {
@@ -13627,8 +13636,7 @@ export const qids = {
     openMashaabims(
       filters: { and: [
         { archived: { eq: false } },
-        { mashaabim: { id: { in: $mashIds } } }
-      ] }
+        { mashaabim: { id: { in: $mashIds } } }, ${NOT_ARCHIVED} ] }
       pagination: { limit: $limit }
     ) {
       data {
@@ -13677,7 +13685,8 @@ export const qids = {
         { user: { id: { eq: $idL } } },
         { status: { ne: "dismissed" } },
         { kind: { eq: "mission" } },
-        { open_mission: { archived: { eq: false } } }
+        { open_mission: { archived: { eq: false } } },
+        { or: [{ open_mission: { lifecycle: { null: true } } }, { open_mission: { lifecycle: { ne: "archived" } } }] }
       ] }
       pagination: { limit: 200 }
       sort: "score:desc"
@@ -13766,7 +13775,8 @@ export const qids = {
         { user: { id: { eq: $idL } } },
         { status: { ne: "dismissed" } },
         { kind: { eq: "resource" } },
-        { open_mashaabim: { archived: { eq: false } } }
+        { open_mashaabim: { archived: { eq: false } } },
+        { or: [{ open_mashaabim: { lifecycle: { null: true } } }, { open_mashaabim: { lifecycle: { ne: "archived" } } }] }
       ] }
       pagination: { limit: 200 }
       sort: "score:desc"
@@ -13970,10 +13980,10 @@ export const qids = {
           profilePic { data { attributes { url formats } } }
           vallues(pagination: { limit: 50 }) { data { attributes { valueName localizations { data { attributes { valueName } } } } } }
           user_1s(pagination: { limit: 100 }) { data { id attributes { username profilePic { data { attributes { url } } } } } }
-          matanotofs(filters: { archived: { ne: true } }, pagination: { limit: 100 }) {
+          matanotofs(filters: { and: [ { archived: { ne: true } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 100 }) {
             data { id attributes { name price pic { data { attributes { url formats } } } } }
           }
-          open_missions(filters: { and: [{ archived: { eq: false } }, { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }] }, pagination: { limit: 200 }) {
+          open_missions(filters: { and: [{ archived: { eq: false } }, { or: [{ source: { null: true } }, { source: { ne: "selfNomination" } }] }, ${NOT_ARCHIVED} ] }, pagination: { limit: 200 }) {
             data {
               id
               attributes {
@@ -14153,13 +14163,13 @@ export const qids = {
     project(id: $pid) {
       data { id attributes {
         projectName publicDescription linkToWebsite
-        open_mashaabims(filters: { archived: { eq: false } }, pagination: { limit: 30 }) {
+        open_mashaabims(filters: { and: [ { archived: { eq: false } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 30 }) {
           data { id attributes { name kindOf price hm } }
         }
-        mashabetahaliches(filters: { finnished: { ne: true } }, pagination: { limit: 30 }) {
+        mashabetahaliches(filters: { and: [ { finnished: { ne: true } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 30 }) {
           data { id attributes { name kindOf } }
         }
-        mesimabetahaliches(filters: { finnished: { ne: true } }, pagination: { limit: 30 }) {
+        mesimabetahaliches(filters: { and: [ { finnished: { ne: true } }, ${NOT_ARCHIVED} ] }, pagination: { limit: 30 }) {
           data { id attributes {
             name
             users_permissions_user { data { id attributes { username } } }

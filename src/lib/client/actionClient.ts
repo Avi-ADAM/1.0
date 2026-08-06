@@ -427,6 +427,8 @@ export type ActionKey =
   | 'updateMissionOffer'
   | 'createPersonalMatanot'
   | 'archivePersonalMatanot'
+  | 'proposeObjectArchive'
+  | 'proposeObjectEdit'
   | 'refreshMySuggestions'
   | 'declineSpForMashaabim'
   | 'reportRecurringSaleCycle'
