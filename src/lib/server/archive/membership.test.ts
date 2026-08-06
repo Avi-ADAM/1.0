@@ -60,6 +60,7 @@ function target(over: Partial<ArchiveTarget> = {}): ArchiveTarget {
     recurring: false,
     cycleEnd: null,
     openOfferIds: [],
+    openCycleIds: [],
     openDecisionIds: [],
     origin: null,
     ...over,

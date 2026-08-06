@@ -8958,6 +8958,7 @@ export const moachQids = {
             data {
               id
               attributes {
+                lifecycle
                 name hearotMeyuchadot descrip noofhours perhour sqadualed
                 privatlinks publicklinks acts { data { id attributes { shem dateS } } }
                 tafkidims { data { id attributes { roleDescription } } }
@@ -9010,6 +9011,7 @@ export const moachQids = {
             data {
               id
               attributes {
+                lifecycle
                 name descrip kindOf price easy hm spnot linkto sqadualed sqadualedf
               }
             }

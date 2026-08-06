@@ -571,7 +571,7 @@ namespace `archive` בחמש שפות · 27 טסטים נוספים (סה"כ 107
   (`src/lib/translations/<locale>/archive.json`) + רישום ב-`routes.js`;
   `npm run check:i18n` + `npm run check:script`.
 
-**3ב׳ — משאבים, כולל מתחדשים**
+**3ב׳ — משאבים, כולל מתחדשים** ✅ יושמה
 - סילוק `mashabetahalich`: `quantityDelivered`/שעות דרך `maap`.
 - `recurring: true` + `cycleSize`: ה-outcome `endOfCycle` — המחזור הנוכחי
   מסולק, `archiveEffectiveFrom` נכתב, ו-timegrama לתאריך הזה הופך את
@@ -604,10 +604,20 @@ qid `archivedObjects` + מסך `moach/[projectId]/archive` +
 `src/lib/archive/archiveScreen.ts` + טאב בניווט (ליד ההצבעות) ·
 28 טסטים נוספים (סה"כ 135).
 
-**מה נשאר ב-3ב׳:** סילוק `mashabetahalich` דרך `maap` ותזמון בפועל של
-`endOfCycle` (הכתיבה של `archiveEffectiveFrom` כבר עובדת; חסר ה-timegrama
-שיהפוך אותו ל-`archived` בתאריך, שדורש `timegrama.mashabetahalich` +
-`timegrama.matanot` בסכימה).
+**3ב׳ שהושלמה:** סילוק `mashabetahalich` דרך ה-`maap`ים — `credit` משאיר
+את רישום המסירות על כנו, `waive` מארכב מחזורים שנפתחו ולא סופקו, ושניהם
+עוצרים את המנוע (`status_mashab: closed`). `transfer` נדחה מפורשות: אין
+לאן להעביר התחייבות משאב. `endOfCycle` **מתזמן בפועל** — נכתב
+`archiveEffectiveFrom` ונוצר timegrama לאותו תאריך
+(`timegrama/archiveEffective.svelte`), אחרת התאריך היה הבטחה שאיש לא
+מקיים. `/api/monthi` מכבד `lifecycle` **ו**-`archiveEffectiveFrom`, כך
+שמשאב מתחדש שאורכב מפסיק לפתוח מחזורים.
+
+**פאזה 4 — מה יושם:** `ProposeEditButton.svelte` — נקודת הכניסה לעריכה
+יזומה (תוספת שעות / עדכון שווי שעתי), שסוגרת סופית את
+`Decision.moreHours`/`newHours`. **מה נשאר:** האירועים החתומים
+(`src/lib/consent/specs/`) — shadow signing בלבד, ואפשר להוסיף אותו
+בנפרד כשמתקדמים ב-PLAN_user_sovereign_consent.
 
 **Exit:** הצעה שאיש לא הגיב לה מבשילה לבד בתום ה-restime; שעות שנצברו
 מופיעות כ-`finnished-mission` ונכנסות לחלוקה; משימה שנשכחה מעל

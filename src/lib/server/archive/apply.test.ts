@@ -76,6 +76,7 @@ function missionInProgress(over: Partial<ArchiveTarget> = {}): ArchiveTarget {
     recurring: false,
     cycleEnd: null,
     openOfferIds: [],
+    openCycleIds: [],
     openDecisionIds: [],
     origin: null,
     ...over,
@@ -179,14 +180,39 @@ describe('applyObjectChange — settling accrued hours', () => {
     expect(matching('activeTimer: null')).toHaveLength(1);
   });
 
-  it('refuses to settle an in-progress resource rather than dropping the delivery', async () => {
+  it('settles a resource through its cycles, never as FinnishedMission hours', async () => {
+    const { exec, matching } = fakeExec();
+    const result = await applyObjectChange(exec, {
+      target: missionInProgress({ kind: 'resourceInProgress', openCycleIds: ['70', '71'] }),
+      round: archiveRound({ hoursOutcome: 'credit' }),
+    });
+
+    // credit keeps the delivery record standing — nothing is archived away.
+    expect(matching('updateMaap')).toHaveLength(0);
+    expect(matching('createFinnishedMission')).toHaveLength(0);
+    // …but the engine stops, so no further cycle opens.
+    expect(matching('status_mashab: closed')).toHaveLength(1);
+    expect(result.lifecycle).toBe('archived');
+  });
+
+  it('waive archives the cycles that were opened but never delivered', async () => {
+    const { exec, matching } = fakeExec();
+    await applyObjectChange(exec, {
+      target: missionInProgress({ kind: 'resourceInProgress', openCycleIds: ['70', '71'] }),
+      round: archiveRound({ hoursOutcome: 'waive' }),
+    });
+    expect(matching('updateMaap')).toHaveLength(2);
+    expect(matching('status_mashab: closed')).toHaveLength(1);
+  });
+
+  it('refuses to transfer a resource commitment — there is nowhere to move it', async () => {
     const { exec } = fakeExec();
     await expect(
       applyObjectChange(exec, {
         target: missionInProgress({ kind: 'resourceInProgress' }),
-        round: archiveRound({ hoursOutcome: 'credit', hoursToCredit: 4 }),
+        round: archiveRound({ hoursOutcome: 'transfer', transferToId: '99' }),
       }),
-    ).rejects.toThrow(/not supported yet/);
+    ).rejects.toThrow(/cannot be transferred/);
   });
 });
 
@@ -246,6 +272,11 @@ describe('applyObjectChange — recurring commitments', () => {
     const [scheduled] = matching('updateMashabetahalich');
     expect(scheduled).toContain('archiveEffectiveFrom');
     expect(scheduled).toContain('lifecycle: archiveProposed');
+    // A date nothing acts on would read as archived while the object keeps
+    // running — the flip has to be scheduled.
+    const [clock] = matching('createTimegrama');
+    expect(clock).toContain('whatami: "mashabetahalich"');
+    expect(clock).toContain('2026-07-01');
   });
 
   it('refuses endOfCycle when no cycle boundary is known', async () => {

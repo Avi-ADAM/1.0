@@ -91,6 +91,8 @@ export interface ArchiveTarget {
   cycleEnd: string | null;
   /** Open offers that must be closed when the need disappears. */
   openOfferIds: string[];
+  /** Recurring cycles opened but not yet delivered (resource settlement). */
+  openCycleIds: string[];
   /** An already-running archive/edit Decision blocks a second proposal. */
   openDecisionIds: string[];
   /** Personal products stay sovereign — no rikma vote. */
@@ -137,6 +139,7 @@ const QUERIES: Record<TargetKind, (id: string) => string> = {
     recurring cycleSize end
     users_permissions_user { data { id } }
     mashaabim { data { id } }
+    maaps(filters: { archived: { ne: true } }) { data { id attributes { quantityDelivered } } }
     ${PROJECT_FRAGMENT}
     archive_decisions(filters: { archived: { eq: false } }) { data { id } }
   } } } }`,
@@ -214,6 +217,11 @@ export async function fetchTarget(
     recurring: !!a.recurring,
     cycleEnd: a.end ?? a.sqadualedf ?? a.finnishDate ?? null,
     openOfferIds: ids(openOffers),
+    // A cycle with nothing delivered is one the rikma has not received; a
+    // waive settlement archives exactly those.
+    openCycleIds: (a.maaps?.data ?? [])
+      .filter((m: any) => !(Number(m?.attributes?.quantityDelivered ?? 0) > 0))
+      .map((m: any) => String(m.id)),
     openDecisionIds: ids(a.archive_decisions),
     origin: a.origin ?? null,
   };

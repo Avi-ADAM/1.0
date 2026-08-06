@@ -9,6 +9,7 @@ import { Ask } from './ask.svelte';
 import { Askm } from './askm.svelte';
 import { Decision } from './decision.svelte';
 import { Dormancy } from './mesimabetahalich.svelte';
+import { ArchiveEffective } from './archiveEffective.svelte';
 //ask need to creater 0on first vote or on request if the requester is project member4
 //מעביר ראשון ראשון ברסק , אם מישהו ביקש מחכים למענה בעניינו ורק לאחר שיש כן 1 לפחות או לא 1 לפחות  ניתן לקבלו או לא 1 לפחות וניתן להציע לאנשים נוספים, בקשה של הקודם כאשר יש לא נשארת אך ניתן להוסיף עוד סקשות 
 import { SendToAdmin } from '$lib/server/sendToAdmin.js';
@@ -38,6 +39,9 @@ async function x(id,kind,taid, fetch){
       // Dormancy clock (PLAN_OBJECT_ARCHIVAL): a mission nobody touched for
       // dormancyDays opens its own release proposal.
       await Dormancy(id,taid)
+    }else if(kind == "mashabetahalich" || kind == "matanot"){
+      // A recurring commitment archived "at end of cycle" — this is the day.
+      await ArchiveEffective(id,taid,kind)
     }
 
 }

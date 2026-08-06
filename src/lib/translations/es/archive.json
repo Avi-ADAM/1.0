@@ -107,5 +107,14 @@
     "when": "Archivado el {{date}}",
     "hoursCredited": "{{count}} horas acreditadas",
     "openDecision": "Ver la decisión"
+  },
+  "edit": {
+    "button": "Pedir un cambio",
+    "title": "¿Qué debería cambiar?",
+    "whyPlaceholder": "Por qué deben cambiar los términos",
+    "note": "Es una propuesta — los demás podrán aprobar, proponer distinto o conversar",
+    "submit": "Enviar solicitud",
+    "applied": "El cambio se aplicó",
+    "proposed": "La solicitud se envió a la rikma"
   }
 }

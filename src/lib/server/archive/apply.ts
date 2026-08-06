@@ -252,6 +252,73 @@ async function reopenOpenMission(exec: Exec, openMissionId: string): Promise<voi
   );
 }
 
+/**
+ * A scheduled end-of-cycle archive needs something to actually flip it on the
+ * day. Without this the date is written and nothing ever acts on it, which
+ * reads as "archived" in the UI while the object keeps running.
+ *
+ * Only `mashabetahalich` and `matanot` can be scheduled — they are the two
+ * that carry recurring commitments — and both now have a timegrama relation.
+ */
+async function scheduleEndOfCycle(
+  exec: Exec,
+  kind: TargetKind,
+  id: string,
+  effectiveFrom: string,
+): Promise<void> {
+  const whatami =
+    kind === 'resourceInProgress' ? 'mashabetahalich' : kind === 'matanot' ? 'matanot' : null;
+  if (!whatami) {
+    console.warn(`[archive] ${kind} cannot carry a scheduled archive — applying now instead`);
+    return;
+  }
+  await run(
+    exec,
+    `mutation { createTimegrama(data: { ${fields(
+      dateField('date', effectiveFrom),
+      strField('whatami', whatami),
+      strField(whatami, id),
+      'done: false',
+    )} }) { data { id } } }`,
+    'scheduleEndOfCycle',
+  ).catch((e) =>
+    console.error('[archive] scheduling the end-of-cycle archive failed:', e),
+  );
+}
+
+/**
+ * Settle an in-progress resource. Deliveries are already recorded as maaps
+ * (and accumulated on the rikmash), so "credit" simply leaves that record
+ * standing; "waive" archives the cycles that were opened but never delivered,
+ * so nothing further is claimed against the rikma.
+ */
+async function settleResource(
+  exec: Exec,
+  target: ArchiveTarget,
+  outcome: HoursOutcome,
+): Promise<void> {
+  if (outcome === 'transfer') {
+    throw new Error('A resource commitment cannot be transferred — use credit or waive');
+  }
+  if (outcome === 'waive') {
+    for (const maapId of target.openCycleIds) {
+      await run(
+        exec,
+        `mutation { updateMaap(id: ${gqlStr(maapId)}, data: { archived: true }) { data { id } } }`,
+        'settleResource:waive',
+      ).catch((e) => console.warn(`[archive] archiving maap ${maapId} failed (non-fatal):`, e));
+    }
+  }
+  // Stop the engine either way, so /api/monthi opens no further cycles.
+  await run(
+    exec,
+    `mutation { updateMashabetahalich(id: ${gqlStr(target.id)}, data: {
+      status_mashab: closed, finnished: true
+    }) { data { id } } }`,
+    'settleResource:close',
+  ).catch((e) => console.warn('[archive] closing the resource engine failed (non-fatal):', e));
+}
+
 /** Stop a running timer so no hours land on an object that just left. */
 async function stopActiveTimer(exec: Exec, target: ArchiveTarget): Promise<void> {
   if (!target.hasActiveTimer) return;
@@ -312,6 +379,7 @@ export async function applyObjectChange(
       throw new Error('endOfCycle needs an effectiveFrom date or a known cycle end');
     }
     await setLifecycle(exec, target.kind, target.id, 'archiveProposed', effectiveFrom);
+    await scheduleEndOfCycle(exec, target.kind, target.id, effectiveFrom);
     return { ...base, lifecycle: 'archiveProposed', effectiveFrom };
   }
 
@@ -324,15 +392,10 @@ export async function applyObjectChange(
     const hours = round.hoursToCredit != null ? Number(round.hoursToCredit) : target.hoursAlready;
     const reason = why ?? round.why ?? 'archived by rikma decision';
 
-    if (outcome === 'credit' || outcome === 'transfer') {
-      if (target.kind === 'resourceInProgress') {
-        // Resource settlement runs through maap, not FinnishedMission —
-        // PLAN_OBJECT_ARCHIVAL phase 3ב. Refuse rather than silently drop
-        // someone's accrued delivery.
-        throw new Error(
-          'Settling an in-progress resource is not supported yet — use waive or endOfCycle (PLAN_OBJECT_ARCHIVAL phase 3ב)',
-        );
-      }
+    if (target.kind === 'resourceInProgress') {
+      // A resource's value lives in its maaps/rikmash, not in hours.
+      await settleResource(exec, target, outcome);
+    } else if (outcome === 'credit' || outcome === 'transfer') {
       const credited = await creditHours(
         exec,
         target,

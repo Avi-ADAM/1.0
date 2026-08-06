@@ -9,6 +9,7 @@
    */
   import { t, locale } from '$lib/translations';
   import Share from '$lib/components/share/shareButtons/index.svelte';
+  import ArchiveObjectButton from '$lib/components/archive/ArchiveObjectButton.svelte';
   import { htmlExcerpt } from '$lib/text/htmlExcerpt';
   import { openResourceTotals } from '$lib/resources/openResourceTotals';
 
@@ -173,6 +174,16 @@
         desc={excerpt || shareTitle}
         hashtags={['1💗1', 'consensus']}
         quote={shareTitle}
+      />
+    {/if}
+    {#if !pending && a.lifecycle !== 'archived'}
+      <!-- Opening the question of whether the rikma still needs this — a
+           proposal, never a delete, so it sits quietly beside share. -->
+      <ArchiveObjectButton
+        targetKind="openResource"
+        targetId={node.id}
+        targetName={a.name ?? ''}
+        className="text-xs px-2 py-1 rounded-lg border border-gold/30 text-gold-l hover:bg-gold/10"
       />
     {/if}
   </footer>
