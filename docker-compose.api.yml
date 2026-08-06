@@ -112,8 +112,19 @@ services:
     # the container crash-loops on "Config file not found". Point it at the file
     # explicitly. (Entrypoint is the vector binary itself, so this is argv.)
     command: ["--config", "/etc/vector/vector.toml"]
-    # AXIOM_TOKEN / AXIOM_DATASET come from .env; vector.toml expands them.
-    env_file: .env
+    # Vector 0.57 does NOT interpolate ${VAR} in config files unless this is on
+    # (it was on by default in older releases). Without it the sink literally
+    # POSTs to /v1/datasets/${AXIOM_DATASET}/ingest with `Bearer ${AXIOM_TOKEN}`
+    # and Axiom answers 401 — which reads like a bad token and isn't.
+    #
+    # Deliberately NOT `env_file: .env`: that handed Vector every production
+    # secret (OpenAI/Groq keys, admin tokens, DB passwords). With interpolation
+    # enabled and docker.sock mounted, this container should see the two
+    # variables it needs and nothing else. Compose reads ./.env for these.
+    environment:
+      - VECTOR_DANGEROUSLY_ALLOW_ENV_VAR_INTERPOLATION=true
+      - AXIOM_TOKEN=${AXIOM_TOKEN:?set AXIOM_TOKEN in .env}
+      - AXIOM_DATASET=${AXIOM_DATASET:-vps-docker}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./vector.toml:/etc/vector/vector.toml:ro
