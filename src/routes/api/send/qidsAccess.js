@@ -90,6 +90,7 @@ export const qidsAccess = {
   'donationProjectInfo': { allow: ['serviceAdmin'] }, // server-only callers (donation actions via StrapiClient)
   'createSaleClaimDecision': { allow: ['user', 'serviceAdmin'] },
   'updateSaleHolderLink': { allow: ['user', 'serviceAdmin'] },
+  'archivedObjects': { allow: ['user', 'serviceAdmin'] },
   'getSaleClaimDecision': { allow: ['user', 'serviceAdmin'] },
   'updateSaleClaimNego': { allow: ['user', 'serviceAdmin'] },
   'applySaleVersion': { allow: ['user', 'serviceAdmin'] },

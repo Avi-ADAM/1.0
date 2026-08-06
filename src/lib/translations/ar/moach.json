@@ -105,7 +105,8 @@
     "editDetails": "تعديل التفاصيل",
     "publicProfile": "الصفحة العامة",
     "activeNow": "نشط الآن",
-    "open": "مفتوح لشركاء"
+    "open": "مفتوح لشركاء",
+    "archive": "الأرشيف"
   },
   "create": {
     "mission": "إنشاء مهمة",

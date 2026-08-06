@@ -171,7 +171,7 @@
     // It sits after 'wishes' so the group keeps its landing page (and its
     // incoming-wishes badge) unchanged.
     { id: 'opps', label: 'opps', tabs: ['wishes', 'open', 'demand'] },
-    { id: 'votes', label: 'votes', tabs: ['votes'] }
+    { id: 'votes', label: 'votes', tabs: ['votes', 'archive'] }
   ];
 
   // /moach/{projectId}/{tab}[/...] — 'splits/[splitId]' belongs to the split tab

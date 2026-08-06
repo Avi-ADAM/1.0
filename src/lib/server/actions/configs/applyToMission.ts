@@ -1,5 +1,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
+import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
+import { execFromContext } from '$lib/server/archive/exec.js';
 
 const applyToMissionHandler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const { openMissionId, projectId } = params;
@@ -261,6 +263,12 @@ const applyToMissionHandler: ActionExecutionHandler = async (params, context, { 
     }
 
     const chiluzh: string = responseData.data?.createMesimabetahalich?.data?.id;
+    // Start the dormancy clock: from here on, silence has a deadline
+    // (PLAN_OBJECT_ARCHIVAL). Best-effort — a missing clock only means
+    // the mission is never asked about, not a failed assignment.
+    if (chiluzh) {
+      await touchDormancy(execFromContext(context), String(chiluzh)).catch(() => null);
+    }
     if (!chiluzh) throw new Error('Failed to create Mesimabetahalich (solo path)');
 
     // 3. Inherit process anchors (partofs) from OpenMission → Mesimabetahalich

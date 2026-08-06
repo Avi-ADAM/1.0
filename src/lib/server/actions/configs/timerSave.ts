@@ -1,5 +1,7 @@
 import type { ActionConfig } from '../types.js';
 import { calcDeadlineMs } from './actionUtils.js';
+import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
+import { execFromContext } from '$lib/server/archive/exec.js';
 
 /**
  * `why` on Finiapruval and FinnishedMission is a Strapi `string` — a 255-char
@@ -138,6 +140,9 @@ export const timerSaveConfig: ActionConfig = {
                 }, context.jwt, context.fetch);
             }
         }
+
+        // Logged hours mean the mission is alive (PLAN_OBJECT_ARCHIVAL).
+        await touchDormancy(execFromContext(context), String(mId)).catch(() => null);
 
         return { success: true, missionId: mId };
     },

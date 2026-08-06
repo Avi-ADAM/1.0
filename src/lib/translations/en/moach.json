@@ -105,7 +105,8 @@
     "editDetails": "Edit Details",
     "publicProfile": "Public Profile",
     "activeNow": "Active Now",
-    "open": "Open for partners"
+    "open": "Open for partners",
+    "archive": "Archive"
   },
   "create": {
     "mission": "Create Mission",

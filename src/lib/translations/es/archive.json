@@ -72,6 +72,40 @@
     "approved": "Firmaste la versión sobre la mesa",
     "matured": "Aprobado por unanimidad y aplicado",
     "countered": "Propuesta enviada — el reloj se reinició",
-    "error": "Algo salió mal, inténtalo de nuevo"
+    "error": "Algo salió mal, inténtalo de nuevo",
+    "applied": "El objeto fue archivado",
+    "appliedAndLeft": "Archivado, y la pertenencia a la rikma terminó con ello",
+    "proposed": "La propuesta se envió a la rikma",
+    "proposedEndsMembership": "Propuesta enviada — también termina una pertenencia"
+  },
+  "propose": {
+    "button": "Archivar",
+    "title": "¿Qué propones?",
+    "scopeQuestion": "¿Qué termina exactamente?",
+    "scopeRelease": "Liberar mi compromiso",
+    "scopeReleaseHint": "La misión vuelve al grupo abierto — la rikma sigue necesitándola",
+    "scopeArchive": "Quitar la necesidad de la rikma",
+    "scopeArchiveHint": "El objeto deja de existir en la rikma",
+    "why": "Por qué",
+    "whyPlaceholder": "Qué te trajo hasta aquí — sobre todo si hay horas acumuladas",
+    "whyRequired": "Aquí se acumularon horas, así que el motivo importa",
+    "alsoClose": "Y proponer cerrar la necesidad por completo",
+    "alsoCloseHint": "Tu liberación es inmediata; cerrar la necesidad va a votación de la rikma",
+    "immediateNote": "Estás solo en esta rikma, así que tendrá efecto de inmediato",
+    "proposalNote": "Es una propuesta — los demás podrán aprobar, proponer distinto o conversar",
+    "submit": "Enviar propuesta",
+    "submitImmediate": "Archivar ahora"
+  },
+  "chip": {
+    "proposed": "Retirada en discusión",
+    "archived": "Archivado",
+    "released": "Liberado"
+  },
+  "screen": {
+    "title": "Archivo de la rikma",
+    "empty": "Aquí todavía no se ha archivado nada",
+    "when": "Archivado el {{date}}",
+    "hoursCredited": "{{count}} horas acreditadas",
+    "openDecision": "Ver la decisión"
   }
 }

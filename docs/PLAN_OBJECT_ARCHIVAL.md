@@ -550,7 +550,7 @@ namespace `archive` בחמש שפות · 27 טסטים נוספים (סה"כ 107
 שעות; B פותח מו״מ ומציע `keep` עם 8 שעות מזוכות; A מאשר → המשימה נשארת,
 השעות עודכנו, ה-Decision arch.
 
-### פאזה 3 — שתיקה כהסכמה + סילוק בפועל + רדימות + מסך ארכיון
+### פאזה 3 — שתיקה כהסכמה + סילוק בפועל + רדימות + מסך ארכיון ✅ 3א׳+3ג׳ יושמו
 
 מפוצלת לשלוש כדי שכל אחת תוכל לצאת לבד:
 
@@ -590,6 +590,24 @@ namespace `archive` בחמש שפות · 27 טסטים נוספים (סה"כ 107
 - `dormancyDays` בטופסי יצירת הריקמה והמשימה + ענף `dormtoM` בהגדרות
   הריקמה לצד `restime`.
 - אותו דבר ל-`open_mission`/`open_mashaabim` דרך ה-relations החדשים.
+
+**מה נכתב בפועל (3א׳ + 3ג׳):**
+ענף `archiveObject|editObject` ב-`timegrama/decision.svelte` (קורא לאותו
+`applyStandingVersion` של ההצבעה) ·
+`src/lib/server/archive/dormancyClock.ts` (`touchDormancy` +
+`openDormancyProposal`) · handler
+`src/routes/api/timegrama/mesimabetahalich.svelte` + ענף ב-dispatcher ·
+חיווט `touchDormancy` ל-`applyToMission`, `finalizeAskAcceptance`,
+`finalizeJoinAcceptance`, `timerStart`, `timerSave`, `updateMissionStatus` ·
+`ArchiveObjectButton.svelte` (נקודת הכניסה — הדראוור של פתיחת הצעה) ·
+qid `archivedObjects` + מסך `moach/[projectId]/archive` +
+`src/lib/archive/archiveScreen.ts` + טאב בניווט (ליד ההצבעות) ·
+28 טסטים נוספים (סה"כ 135).
+
+**מה נשאר ב-3ב׳:** סילוק `mashabetahalich` דרך `maap` ותזמון בפועל של
+`endOfCycle` (הכתיבה של `archiveEffectiveFrom` כבר עובדת; חסר ה-timegrama
+שיהפוך אותו ל-`archived` בתאריך, שדורש `timegrama.mashabetahalich` +
+`timegrama.matanot` בסכימה).
 
 **Exit:** הצעה שאיש לא הגיב לה מבשילה לבד בתום ה-restime; שעות שנצברו
 מופיעות כ-`finnished-mission` ונכנסות לחלוקה; משימה שנשכחה מעל

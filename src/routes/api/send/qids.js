@@ -13498,6 +13498,54 @@ export const qids = {
     }
   }`,
 
+  // Everything a rikma has archived (PLAN_OBJECT_ARCHIVAL). Deliberately the
+  // one place that asks for `lifecycle: archived` rather than filtering it
+  // out: nothing is ever deleted, so the archive is where it stays readable.
+  'archivedObjects': `query ArchivedObjects($pid: ID!) {
+    project(id: $pid) {
+      data {
+        id
+        attributes {
+          projectName
+          open_missions(filters: { lifecycle: { eq: "archived" } }, pagination: { limit: 200 }, sort: "updatedAt:desc") {
+            data { id attributes { name descrip noofhours perhour updatedAt archiveEffectiveFrom } }
+          }
+          mesimabetahaliches(filters: { lifecycle: { in: ["archived", "released"] } }, pagination: { limit: 200 }, sort: "updatedAt:desc") {
+            data { id attributes {
+              name descrip howmanyhoursalready perhour lifecycle updatedAt archiveEffectiveFrom
+              users_permissions_user { data { id attributes { username } } }
+            } }
+          }
+          open_mashaabims(filters: { lifecycle: { eq: "archived" } }, pagination: { limit: 200 }, sort: "updatedAt:desc") {
+            data { id attributes { name descrip hm price updatedAt archiveEffectiveFrom } }
+          }
+          mashabetahaliches(filters: { lifecycle: { in: ["archived", "released"] } }, pagination: { limit: 200 }, sort: "updatedAt:desc") {
+            data { id attributes {
+              name descrip pricePerUnit lifecycle updatedAt archiveEffectiveFrom
+              users_permissions_user { data { id attributes { username } } }
+            } }
+          }
+          matanotofs(filters: { lifecycle: { eq: "archived" } }, pagination: { limit: 200 }, sort: "updatedAt:desc") {
+            data { id attributes { name desc price quant updatedAt archiveEffectiveFrom } }
+          }
+          decisions(filters: { kind: { in: ["archiveObject", "editObject"] } }, pagination: { limit: 300 }, sort: "updatedAt:desc") {
+            data { id attributes {
+              kind archived targetKind archScope archSource archWhy archEndsMembership
+              archMember { data { id attributes { username } } }
+              updatedAt
+              negoarch { ordern mode why hoursOutcome hoursToCredit effectiveFrom }
+              archOpenMission { data { id } }
+              archMesimabetahalich { data { id } }
+              archOpenMashaabim { data { id } }
+              archMashabetahalich { data { id } }
+              archMatanot { data { id } }
+            } }
+          }
+        }
+      }
+    }
+  }`,
+
   'meProfile': `query MeProfile($uid: ID!) {
     usersPermissionsUser(id: $uid) {
       data {
