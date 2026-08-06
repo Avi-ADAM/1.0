@@ -1,7 +1,9 @@
 # ארכוב ועריכה של אובייקטים בריקמה (Object Archival & Edit)
 
-> **סטטוס: תכנית לאישור.** אין עדיין יישום. הפאזות למטה נכתבו כדי שאפשר
-> יהיה לאשר/לתקן אותן לפני שכותבים שורת קוד.
+> **סטטוס: אושרה (סבב 1) — ביישום.** כל שמונה נקודות ההכרעה נענו; ראו
+> "החלטות שהתקבלו" בסוף המסמך. השינוי המהותי מול הטיוטה הראשונה: זמן
+> הרדימות הפך לפרמטר שנקבע ברמת הריקמה **וברמת המשימה** (סעיף 5), והוא
+> פותח הצעת שחרור אוטומטית — ראו "רדימות".
 
 ## Context — למה זה נבנה
 
@@ -126,6 +128,9 @@ lifecycle: enumeration [ active, archiveProposed, archived, released ]
 על: `open-mission`, `mesimabetahalich`, `open-mashaabim`,
 `mashabetahalich`, `matanot`.
 
+בנוסף `archiveEffectiveFrom: datetime` על אותן חמש — לארכוב שנכנס לתוקף
+בסוף המחזור הנוכחי (משאב מתחדש / מוצר עם מנויים, ראו `endOfCycle`).
+
 - `null` / `active` — פעיל. כל האובייקטים הקיימים היום (grandfathering).
 - `archiveProposed` — יש Decision פתוח. האובייקט **עדיין פעיל לכל דבר**,
   אבל מוצג עם chip "בדיון להסרה" ואי-אפשר לפתוח עליו הצעת ארכוב שנייה.
@@ -143,10 +148,14 @@ lifecycle: enumeration [ active, archiveProposed, archived, released ]
 ```
 kind        += 'archiveObject'   # הצעה להסיר
             += 'editObject'      # הצעה לשנות פרטים (כולל "עוד שעות")
+            += 'dormtoM'         # שינוי זמן הרדימות של הריקמה (אחות ל-timtoM)
 
 targetKind   enumeration [ openMission, missionInProgress,
                            openResource, resourceInProgress, matanot ]
 archWhy      text                # נימוק היוזם
+archScope    enumeration [ archive, release ]
+archSource   enumeration [ user, dormancy ]   # מי פתח: אדם או שעון הרדימות
+newDormancyDays  integer         # ל-kind 'dormtoM'
 
 # יעד — relation אחד לכל טיפוס, בדיוק כמו התבנית של timegrama.whatami
 archOpenMission       manyToOne → api::open-mission.open-mission
@@ -188,10 +197,17 @@ sqadualed      datetime
 sqadualedf     datetime
 
 # סילוק שעות/מסירות שנצברו (רק לאובייקט בתהליך)
-hoursOutcome   enumeration [ credit, waive, transfer ]
+hoursOutcome   enumeration [ credit, waive, transfer, endOfCycle ]
 hoursToCredit  decimal
 transferTo     relation oneToOne → api::mesimabetahalich.mesimabetahalich
+effectiveFrom  datetime          # ל-endOfCycle: מתי הארכוב נכנס לתוקף
 ```
+
+`endOfCycle` הוא ה-outcome של **התחייבות מתחדשת** (משאב עם
+`recurring: true` + `cycleSize`, או מוצר עם `monter` פעילים): המחזור
+הנוכחי מסולק כרגיל והארכוב נכנס לתוקף ב-`effectiveFrom`. בהבשלה נכתב
+`archiveEffectiveFrom` על היעד ונפתח `timegrama` לתאריך הזה שיהפוך את
+ה-`lifecycle` ל-`archived` — בלי מנגנון חדש.
 
 **סבב 1** נוצר תמיד על-ידי היוזם: `mode: 'archive'` בהצעת ארכוב,
 `mode: 'keep'` בהצעת עריכה. **סבב נגדי** של חבר אחר יכול להפוך את ה-mode
@@ -203,12 +219,43 @@ transferTo     relation oneToOne → api::mesimabetahalich.mesimabetahalich
 ב-`vots`, או כשה-`timegrama` פוקע בלי "לא" מפורש. הצעת סבב = הסכמת המציע
 לאותו סבב.
 
-### 4. אין שינוי ב-vote / timegrama / forum
+### 4. זמן רדימות — פרמטר של הריקמה ושל המשימה
+
+```
+Project.dormancyDays            integer   # ברירת המחדל של הריקמה; null → 30
+open-mission.dormancyDays       integer   # דריסה לכל משימה
+pendm.dormancyDays              integer   # נקבע כבר בהצעה, ונתון למו״מ ביצירה
+mesimabetahalich.dormancyDays   integer   # יורש מה-open-mission בהשמה
+open-mashaabim / pmash / mashabetahalich .dormancyDays   integer
+```
+
+הערך האפקטיבי: `object.dormancyDays ?? project.dormancyDays ?? 30`.
+
+- **ברמת הריקמה** — נקבע ביצירת הריקמה (לצד `restime`) ונערך אחר כך דרך
+  `Decision` `kind: 'dormtoM'` + `newDormancyDays`, בדיוק כמו ש-`timtoM`
+  משנה את ה-`restime` (ענף קיים ב-`applyDecisionKind`, ב-
+  `timegrama/decision.svelte`).
+- **ברמת המשימה** — כי יש משימות דחופות שרוצות לו״ז צפוף יותר וביטול
+  השמה מהיר. השדה נקבע בטופס יצירת המשימה, נכנס ל-`pendm`, ניתן למו״מ
+  בסבבי היצירה הקיימים, ועובר ל-`mesimabetahalich` בהשמה.
+
+### 5. Timegrama — שתי תוספות בלבד
+
+```
+timegrama.open_mission      oneToOne → api::open-mission.open-mission
+timegrama.open_mashaabim    oneToOne → api::open-mashaabim.open-mashaabim
+```
+
+(`timegrama.mesimabetahalich` **כבר קיים** — `timegramas` בצד השני —
+ולכן שעון הרדימות של משימה בתהליך לא דורש סכימה חדשה בכלל.)
+ה-dispatcher ב-`/api/timegrama/+server.js` שולף `element.attributes[whatami]`
+כשם relation, ולכן כל יעד חדש חייב relation משלו — זו הסיבה לשתי
+התוספות ולא לשדה `stage` חופשי.
 
 `decision.vots`, `decision.votes`, `timegrama.decision`,
-`decision.forums` — כולם קיימים ומחווטים. אפס עבודה.
+`decision.forums` — קיימים ומחווטים. אפס עבודה.
 
-### 5. אחרי השינויים ב-1.0b
+### 6. אחרי השינויים ב-1.0b
 
 `npm run types:update` ב-`1.0` (מעדכן `src/generated/graphql.ts`,
 `STRAPI_SCHEMA_REFERENCE.md`, `src/lib/generated/contentTypes.d.ts`,
@@ -273,30 +320,55 @@ outcomes (הצד המקביל ל-`finnished-mission` הוא `maap`), ואז אר
 
 ---
 
-## המסלול המהיר (Fast lane) — אובייקט רדום
+## רדימות — שעון שמבטל השמה בלי שאיש יצטרך לפעול
 
-המשתמש ביקש הפרדה: משימה בתהליך שנצברו בה שעות ⇐ דיון גם על מה עושים עם
-השעות; משימה שרק אושרה ולא קרה בה כלום זמן רב ⇐ ארכוב בלי סיבוך.
+הפרדה שביקשת: משימה בתהליך שנצברו בה שעות ⇐ הדיון הוא גם על מה עושים עם
+השעות; משימה שרק אושרה ולא קרה בה כלום זמן רב ⇐ יוצאת בלי סיבוך.
 
-**הגדרת "רדום"** (קבוע משותף `src/lib/archive/dormancy.ts`):
+**הגדרת "רדום"** (`src/lib/archive/dormancy.ts`):
 
 ```
 dormant = howmanyhoursalready ∈ {0, null}
         && finnished_missions.length === 0
         && activeTimer == null
-        && updatedAt < now - DORMANT_DAYS      # ברירת מחדל: 30 יום
+        && אין פעילות מזה dormancyDays אפקטיביים
 ```
 
-מה זה משנה בפועל:
+### השעון — timegrama על ה-mesimabetahalich
 
-1. **UI** — הדראוור נפתח בלי בלוק סילוק השעות בכלל, עם טקסט אחד
-   ("לא נעשתה כאן פעילות מאז {תאריך}") ונימוק אופציונלי.
-2. **נימוק** — חובה קשיחה רק כשיש שעות שנצברו; ברדום זה שדה מומלץ עם
-   nudge, לא חוסם.
-3. **המבצע עצמו** ברדום: שחרור (`release`) הוא הצהרה ריבונית מיידית —
-   בלי Decision, בלי המתנה. ארכוב הצורך עצמו עדיין דורש את הריקמה.
-4. **קלף הלב** מציג את הגרסה המקוצרת (`archobj-dormant`) בעדיפות נמוכה
-   יותר, כי אין לו דחיפות כספית.
+`timegrama.mesimabetahalich` כבר קיים, ולכן:
+
+1. **בהשמה** (`createMesimabetahalich.js`, `finalizeAskAcceptance`,
+   `finalizeJoinAcceptance`, `applyToMission`) נוצר timegrama
+   `whatami: 'mesimabetahalich'`, `date = now + dormancyDays`.
+2. **כל פעילות אמיתית דוחפת את השעון קדימה** — `touchDormancy(mId)`
+   ב-`src/lib/server/archive/touch.ts`, שנקרא מ-`timerStart/Stop/Save`,
+   `timerLogUpdate`, `updateMissionStatus`, `updateTask`, `addDiunEntry`,
+   `completeMission`. זו ההגדרה התפעולית של "לא נעשתה פעילות": שדה תאריך
+   אחד שנדחף, במקום סריקה יקרה.
+3. **כשהשעון פוקע** — הוא **לא מבטל את ההשמה על המקום**. הוא פותח את
+   ההצעה הסטנדרטית: `Decision` `kind:'archiveObject'`,
+   `archScope:'release'`, `archSource:'dormancy'`,
+   `archWhy` אוטומטי ("לא נרשמה פעילות במשך {N} ימים"), ו-`timegrama`
+   רגיל ל-`restime`.
+
+**וזה בדיוק "ביטול השמה אוטומטי"**: אף אחד לא צריך לעשות כלום כדי
+שההשמה תבוטל — שתיקה מבשילה אותה. אבל למבצע יש `restime` להגיב: לפתוח
+מו״מ עם `mode:'keep'` ("אני עליה, הנה לו״ז חדש"), או לענות בצ'אט. אין
+הפתעות, ואין צורך במנגנון חדש — הכול נופל לתוך אותו קלף, אותה הצבעה,
+אותו שעון.
+
+- **שעות > 0** ⇒ אותו מסלול בדיוק, רק שהקלף כולל את בלוק סילוק השעות.
+  ההבדל בין "רדום" ל"לא רדום" הוא בטופס ובניסוח, לא במכניקה.
+- **המבצע עצמו** יכול תמיד לשחרר משימה רדומה ללא שעות **מיידית**
+  (הצהרה ריבונית — הוא מוותר על מחויבות שלו, הצורך חוזר לבריכה). בטופס
+  השחרור יש גם תיבה "והצע לסגור את הצורך לגמריי" — השחרור מיידי, והצעת
+  הסגירה נפתחת כ-Decision רגיל להצבעת הריקמה.
+- **קלף הלב** של הצעה רדומה מוצג בגרסה מקוצרת ובעדיפות נמוכה יותר, כי
+  אין לה דחיפות כספית.
+- **משימה/משאב פתוחים** מקבלים שעון זהה דרך `timegrama.open_mission` /
+  `timegrama.open_mashaabim` החדשים (פאזה 3ג׳) — משימה פתוחה שאיש לא
+  ניגש אליה זמן רב פותחת הצעת ארכוב.
 
 ---
 
@@ -305,10 +377,15 @@ dormant = howmanyhoursalready ∈ {0, null}
 ### פאזה 0 — סכימה וטיפוסים
 
 **1.0b (branch `claude/object-archival-process-sdo5a2` מ-`origin/shabab`):**
-- `src/api/decision/content-types/decision/schema.json`: שני ה-kinds,
-  `targetKind`, חמשת ה-relations, `archWhy`, `negoarch`.
+- `src/api/decision/content-types/decision/schema.json`: שלושת ה-kinds,
+  `targetKind`, `archWhy`, `archScope`, `archSource`, `newDormancyDays`,
+  חמשת ה-relations, `negoarch`.
 - `src/components/desision/negoarch.json` — קומפוננטה חדשה.
-- `lifecycle` + `archive_decisions` בחמש הקולקציות.
+- `lifecycle` + `archiveEffectiveFrom` + `archive_decisions` בחמש
+  הקולקציות.
+- `dormancyDays` על `project`, `open-mission`, `pendm`,
+  `mesimabetahalich`, `open-mashaabim`, `pmash`, `mashabetahalich`.
+- `timegrama.open_mission` + `timegrama.open_mashaabim` (+ הצד ההופכי).
 
 **1.0:** `npm run types:update`, ואז `npm run check`.
 
@@ -398,7 +475,11 @@ params: { decisionId, projectId, ordern, mode, why?,
 שעות; B פותח מו״מ ומציע `keep` עם 8 שעות מזוכות; A מאשר → המשימה נשארת,
 השעות עודכנו, ה-Decision arch.
 
-### פאזה 3 — שתיקה כהסכמה + סילוק בפועל + מסך ארכיון
+### פאזה 3 — שתיקה כהסכמה + סילוק בפועל + רדימות + מסך ארכיון
+
+מפוצלת לשלוש כדי שכל אחת תוכל לצאת לבד:
+
+**3א׳ — משימות ומוצרים**
 
 - **`src/routes/api/timegrama/decision.svelte`**: ענף לשני ה-kinds →
   אותו `archive/apply.ts` (דרך ה-`exec` של `SendToAdmin`), עם
@@ -415,8 +496,30 @@ params: { decisionId, projectId, ordern, mode, why?,
   (`src/lib/translations/<locale>/archive.json`) + רישום ב-`routes.js`;
   `npm run check:i18n` + `npm run check:script`.
 
+**3ב׳ — משאבים, כולל מתחדשים**
+- סילוק `mashabetahalich`: `quantityDelivered`/שעות דרך `maap`.
+- `recurring: true` + `cycleSize`: ה-outcome `endOfCycle` — המחזור הנוכחי
+  מסולק, `archiveEffectiveFrom` נכתב, ו-timegrama לתאריך הזה הופך את
+  ה-`lifecycle` ל-`archived`. מה שמייצר את המחזור הבא
+  (`reportRecurringSaleCycle`, `customerReportRecurringSaleCycle`, מנועי
+  ה-`monter`) חייב לכבד `lifecycle` **ו**-`archiveEffectiveFrom`.
+- מוצר עם `monter` פעילים: אותו `endOfCycle`, והלקוחות מקבלים התראה עם
+  תאריך הסגירה בפועל.
+
+**3ג׳ — שעוני רדימות**
+- `touchDormancy` + יצירת השעון בהשמה (ראו "רדימות").
+- ענף `whatami === 'mesimabetahalich'` ב-dispatcher של
+  `/api/timegrama/+server.js` (היום אין לו ענף בכלל) +
+  `src/routes/api/timegrama/mesimabetahalich.svelte` שפותח את הצעת
+  השחרור עם `archSource: 'dormancy'`.
+- `dormancyDays` בטופסי יצירת הריקמה והמשימה + ענף `dormtoM` בהגדרות
+  הריקמה לצד `restime`.
+- אותו דבר ל-`open_mission`/`open_mashaabim` דרך ה-relations החדשים.
+
 **Exit:** הצעה שאיש לא הגיב לה מבשילה לבד בתום ה-restime; שעות שנצברו
-מופיעות כ-`finnished-mission` ונכנסות לחלוקה; האובייקט נראה בארכיון.
+מופיעות כ-`finnished-mission` ונכנסות לחלוקה; משימה שנשכחה מעל
+`dormancyDays` פותחת הצעת שחרור לבדה ומתבטלת בשתיקה; האובייקט נראה
+בארכיון.
 
 ### פאזה 4 — עריכה יזומה + חתימות
 
@@ -433,25 +536,33 @@ params: { decisionId, projectId, ordern, mode, why?,
 
 ---
 
-## החלטות ונקודות שצריכות את אישורך
+## החלטות שהתקבלו (סבב אישור 1)
 
-1. **שם השדה `lifecycle`** (במקום `isArchived`), עם
-   `active|archiveProposed|archived|released`. חלופה: `objectState`.
-2. **שני kinds** (`archiveObject` + `editObject`) ולא אחד — כי הצעת
-   עריכה יזומה קוראת רע תחת "ארכוב", גם אם המכניקה זהה.
-3. **קונסנזוס כלל-ריקמתי** (כמו `pendm`), לא דו-צדדי. בריקמת יחיד —
-   מיידי. האם רצוי סף נמוך יותר (למשל: מספיק שאין "לא" אחרי restime,
-   בלי לדרוש חתימה של כולם)? — ברירת המחדל בתכנית היא **פה-אחד או
-   שתיקה**, זהה ליצירה.
-4. **`scope: 'release'` ריבוני** לאובייקט רדום ללא שעות — המבצע משחרר
-   מיד והצורך חוזר לבריכה. לאישורך: זו הפרשנות שלי ל"בלי סיבוך".
-5. **`DORMANT_DAYS = 30`** — הפרמטר שמפריד "רדום" מ"פעיל". אפשר לגזור
-   אותו מ-`restime` במקום קבוע (למשל ×10).
-6. **חובת נימוק** — קשיחה רק כשיש שעות שנצברו, מומלצת בשאר.
-7. **משאב בתהליך** — מסלול הסילוק שלו פחות ממופה; מוצע לפצל לפאזה 3ב'
-   אם הוא מסבך את היציאה של פאזה 3.
-8. **מונים/מנויים (`monter`)** על מוצר מארוכב — נסגרים והלקוחות מקבלים
-   התראה. לאישור.
+1. **`lifecycle`** — אושר כשם השדה.
+2. **שני kinds נפרדים** — אושר: "הגיוני שאנשים ידעו בדיוק מה ההצעה".
+   הקלף והתראה חייבים לומר במפורש אם ההצעה היא להסיר או לשנות.
+3. **קונסנזוס כלל-ריקמתי, פה-אחד או שתיקה** — אושר, "כמו בכל מקום יש
+   timegrama שמחובר והתאריך שלו לפי restime".
+4. **`release` ריבוני ומיידי** למבצע של אובייקט רדום ללא שעות — אושר,
+   ובנוסף הוא יכול להציע סגירה מלאה של הצורך; **על הסגירה יש הצבעה**.
+   מכאן התיבה "והצע לסגור את הצורך לגמריי" בטופס השחרור.
+5. **זמן הרדימות הוא פרמטר, לא קבוע** — נקבע ברמת הריקמה (ביצירתה,
+   לצד `restime`, ונערך דרך `dormtoM`) **וברמת המשימה**, כי יש משימות
+   דחופות שרוצות לו״ז צפוף יותר וביטול השמה מהיר. הביטול הוא אוטומטי
+   במובן שאיש לא צריך לפעול — הוא נעשה דרך הצעת שחרור שמבשילה בשתיקה,
+   כדי שלמבצע יהיה `restime` להגיב.
+6. **חובת נימוק** — קשיחה כשיש שעות שנצברו, מומלצת בשאר. אושר.
+7. **משאבים בפאזה 3ב׳ נפרדת**, "מה שנוח" — עם דגש מפורש על **משאבים
+   מתחדשים**: מכאן ה-outcome `endOfCycle` + `archiveEffectiveFrom`.
+8. **`monter`/מנויים** נסגרים והלקוחות מקבלים התראה — אושר, ובמוצר עם
+   מנויים פעילים ברירת המחדל היא `endOfCycle` ולא סגירה באמצע מחזור.
+
+### נותר פתוח ליישום (החלטות קטנות שנלקחו כברירת מחדל)
+
+- `dormancyDays` הוא **integer בימים**, nullable, ברירת מחדל גלובלית 30.
+  (enum בסגנון `restime` נפסל — משימה דחופה צריכה רזולוציה חופשית.)
+- שעון הרדימות נדחף על ידי פעילות אמיתית בלבד (טיימר, סטטוס, משימות-בת,
+  דיון) — לא על ידי צפייה בדף.
 
 ---
 
@@ -471,7 +582,15 @@ params: { decisionId, projectId, ordern, mode, why?,
   נכון; `waive` לא יוצר; `transfer` זוקף למשימת היעד; `release` מחזיר
   את ה-open-mission לבריכה; ארכוב משימה פתוחה סוגר את ה-`ask`ים.
 - `dormancy.ts`: משימה עם שעות אינה רדומה; משימה עם טיימר פעיל אינה
-  רדומה; משימה בת יומיים אינה רדומה.
+  רדומה; משימה בת יומיים אינה רדומה; `dormancyDays` של המשימה גובר על
+  זה של הריקמה, ושל הריקמה על ברירת המחדל 30.
+- `touchDormancy`: הפעלת טיימר דוחפת את תאריך ה-timegrama; פעולה שאינה
+  פעילות (צפייה) לא דוחפת.
+- ענף `mesimabetahalich` ב-timegrama: פוקע → נוצר Decision
+  `archScope:'release'`, `archSource:'dormancy'`; אם המשימה כבר
+  `archived`/`released` — רק `done: true`.
+- `endOfCycle`: הבשלה כותבת `archiveEffectiveFrom` ולא `archived`,
+  ומייצר המחזור הבא מפסיק להנפיק אחרי התאריך הזה.
 - `extractDecisions`: ממפה רק הצעות פתוחות שבהן אני עוד לא חתום על הסבב
   העומד.
 
@@ -489,8 +608,15 @@ params: { decisionId, projectId, ordern, mode, why?,
 2. A מציע לארכב משימה בתהליך של B עם 12 שעות שנצברו, `credit` על 12 →
    B פותח מו״מ, מציע `keep` עם `hoursassinged` מוקטן → A מאשר → המשימה
    נשארת, השעות לא זוכו, הקלף נסגר לשניהם.
-3. משימה רדומה (0 שעות, 40 יום ללא פעילות) — B (המבצע) לוחץ "שחרור" →
-   מיידי, בלי קלף לאיש, והצורך חוזר לבריכה הפתוחה.
+3. משימה רדומה (0 שעות, מעבר ל-`dormancyDays`) — B (המבצע) לוחץ
+   "שחרור" → מיידי, בלי קלף לאיש, והצורך חוזר לבריכה הפתוחה. עם התיבה
+   "והצע לסגור את הצורך לגמריי" מסומנת → השחרור מיידי ובנוסף נפתח קלף
+   הצבעה לריקמה.
+3ב. משימה עם `dormancyDays: 3` שלא נגעו בה 3 ימים → הצעת שחרור נפתחת
+   לבדה עם `archSource: 'dormancy'`; B מקבל התראה, לא מגיב, ובתום
+   ה-restime ההשמה מבוטלת והמשימה חזרה לבריכה.
+3ג. אותה משימה, אבל B פותח מו״מ `mode:'keep'` עם תאריך יעד חדש → השעון
+   מתאפס וההשמה נשמרת.
 4. ריקמת יחיד — ארכוב מוצר → מיידי.
 5. שתיקה — A מציע, איש לא מגיב, אחרי פקיעת ה-timegrama האובייקט מארוכב
    ומסומן "אושר בשתיקה".
