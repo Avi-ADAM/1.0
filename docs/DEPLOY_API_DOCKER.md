@@ -148,16 +148,39 @@ AXIOM_DATASET=vps-docker  # dataset נפרד מזה של Vercel; סינון לפ
 docker logs vector | grep 'Loading configs'   # -> paths=["/etc/vector/vector.toml"]
 ```
 
-**2. ה-dataset חייב להיווצר מראש ב-Axiom.** Vector לא יוצר אותו, ורוב
-ה-API tokens לא מורשים ליצור datasets (`403 ... action: create`) — צריך
-Datasets → New ב-UI. כל עוד הוא חסר, ingest מחזיר `404 dataset not found`
-ו-Vector מדווח עליו כ-`Unauthorized` (הוא ממפה כל non-2xx לשם), מה ששולח
-לחיפוש אחרי בעיית הרשאות שלא קיימת. שים לב שה-**healthcheck של ה-sink עובר**
-גם כשה-dataset חסר, אז "Healthcheck passed" בלוג לא מוכיח כלום. בדיקה אמיתית:
+**2. ⚠️ Vector 0.57 לא מפענח `${VAR}` בקובץ הקונפיג — כברירת מחדל.**
+זו הייתה הסיבה האמיתית שכלום לא הגיע ל-Axiom, וזה הקשה ביותר לאיתור.
+בגרסאות ישנות ההצבה הייתה אוטומטית; היום צריך
+`VECTOR_DANGEROUSLY_ALLOW_ENV_VAR_INTERPOLATION=true` (מוגדר בשירות בקומפוז).
+בלעדיו Vector שולח את המחרוזת **כפשוטה**:
+
+```
+uri=https://api.axiom.co/v1/datasets/${AXIOM_DATASET}/ingest   ->  401
+```
+
+כלומר גם ה-token נשלח כ-`Bearer ${AXIOM_TOKEN}` מילולי. Axiom מחזיר **401**,
+לא 404 — ולכן זה נראה בדיוק כמו token פגום, ושולח לחפש בכיוון הלא נכון.
+הסימן המזהה הוא שהשגיאה **לא משתנה** גם אחרי שמתקנים הרשאות או יוצרים את
+ה-dataset. אבחון ודאי — הרצת קונטיינר חד-פעמי עם `VECTOR_LOG=debug` ובדיקת
+ה-`uri=` בשורת ה-`Sending HTTP request`.
+
+בגלל שההצבה דלוקה, השירות **לא** מקבל `env_file: .env` אלא רק שני משתנים
+מפורשים. אחרת כל סודות הפרודקשן (OpenAI, Groq, admin tokens, סיסמאות DB)
+היו נטענים לקונטיינר שגם ככה מחזיק את `docker.sock`.
+
+**3. ה-dataset חייב להיווצר מראש.** Vector לא יוצר אותו, ורוב ה-API tokens
+לא מורשים ליצור datasets (`403 ... action: create`) — צריך Datasets → New
+ב-UI. כשהוא חסר, ingest מחזיר `404 dataset not found`.
+
+שים לב שה-**healthcheck של ה-sink עובר גם כששני אלה שבורים**, אז
+"Healthcheck passed" בלוג לא מוכיח כלום. בדיקה אמיתית:
 ```bash
-docker logs vector | grep -i 'events dropped'          # ריק = הכל נשלח
+docker logs --since 60s vector | grep -ci 'events dropped'   # 0 = הכל נשלח
+docker exec vector printenv | grep -c OPENAI                 # 0 = אין דליפת סודות
 curl -s -H "Authorization: Bearer $AXIOM_TOKEN" https://api.axiom.co/v2/datasets
 ```
+> ה-token של ingest הוא לרוב **לא** בעל הרשאת query, ולכן אי אפשר לאמת מול
+> Axiom דרך ה-API (`403 ... query with action: read`) — האימות הוא מצד Vector.
 
 > **אבטחה:** ל-`vector` יש mount של `/var/run/docker.sock`. ה-`:ro` חל על קובץ
 > ה-socket, **לא** על ה-API — כלומר לקונטיינר יש למעשה גישת root לדוקר. זו
