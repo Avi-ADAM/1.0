@@ -444,6 +444,8 @@ export type ActionKey =
   | 'seedPlanBoards'
   // Products — newmatana.svelte has always called this; the key was just missing here.
   | 'createComplexMatanot'
+  // Mission progress percentage — the lev card and the moach progress board.
+  | 'updateMissionStatus'
   ;
 
 

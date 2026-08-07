@@ -9416,17 +9416,26 @@ export const moachQids = {
     }
   }`,
 
+  // The mission's own page (moach/[projectId]/progress/[missionId]) — the same
+  // picture the progress board row carries, plus the parts the board leaves
+  // out: the notes, the roles, the links, the dates and the monthly ledger.
   'getMissionInProgress': `query GetMissionInProgress($id: ID!) {
     mesimabetahalich(id: $id) {
       data {
         id
         attributes {
           name status iskvua howmanyhoursalready hoursassinged perhour
+          finnished createdAt start dates admaticedai privatlinks publicklinks
+          hearotMeyuchadot descrip
+          monter { monthStart hours isDone hoursDone }
           users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
-          forums { data { id attributes { messages { data { id attributes { content when } } } } } }
-          acts { data { id attributes { shem naasa status } } }
+          project { data { id attributes { projectName profilePic { data { attributes { url } } } } } }
+          tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+          forums { data { id } }
+          acts { data { id attributes { shem des naasa status myIshur valiIshur dateS dateF
+            my { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          } } }
           finiapruvals { data { id attributes { missname archived } } }
-          descrip
         }
       }
     }

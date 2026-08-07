@@ -28,6 +28,19 @@
   let projectId = $derived(page.params.projectId);
   let processId = $derived(page.params.processId);
 
+  // Where the visitor came from, so the first back button returns there instead
+  // of dropping them on the processes board they never saw. Whitelisted — the
+  // value ends up in an href, so it may only ever name a moach tab.
+  const FROM_TABS = ['progress', 'acts', 'kanban', 'gantt', 'timers', 'shifts', 'chains', 'open', 'main'];
+  let from = $derived(
+    FROM_TABS.includes(page.url.searchParams.get('from') ?? '')
+      ? page.url.searchParams.get('from')
+      : null
+  );
+  const FROM_LABEL_KEY = {
+    progress: 'moach.progress.backToBoard'
+  };
+
   let loading = $state(true);
   let loadError = $state(null);
   let attrs = $state(null);
@@ -102,6 +115,14 @@
 
 <div class="ppd" dir={$isRtl ? 'rtl' : 'ltr'}>
   <div class="ppd-nav">
+    {#if from}
+      <button type="button" class="ppd-back" onclick={() => goto(`/moach/${projectId}/${from}`)}>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          {#if $isRtl}<polyline points="9 18 15 12 9 6" />{:else}<polyline points="15 18 9 12 15 6" />{/if}
+        </svg>
+        {FROM_LABEL_KEY[from] ? $t(FROM_LABEL_KEY[from]) : $t('moach.process.back')}
+      </button>
+    {/if}
     <button type="button" class="ppd-back" onclick={() => goto(`/moach/${projectId}/processes`)}>
       <svg viewBox="0 0 24 24" aria-hidden="true">
         {#if $isRtl}<polyline points="9 18 15 12 9 6" />{:else}<polyline points="15 18 9 12 15 6" />{/if}
