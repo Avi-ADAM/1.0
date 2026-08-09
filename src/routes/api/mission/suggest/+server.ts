@@ -2,8 +2,10 @@
  * POST /api/mission/suggest
  *
  * Given a mission name + description, uses Gemini to extract skills/roles/
- * work-ways/values and an improved description, then runs `matchAllCategories`
- * to split them into matched / suggestion / new.
+ * work-ways/values, an improved description and an estimate of the mission's
+ * worth (total hours × value per hour — the two numbers the form's money row
+ * asks for), then runs `matchAllCategories` to split the vocabulary into
+ * matched / suggestion / new.
  *
  * Also queries the mission library for similar existing catalog entries
  * (so the UI can offer "use existing template" before creating a new one).
@@ -17,6 +19,12 @@ import { Agent } from '@mastra/core/agent';
 import { createGoogleModel } from '../../../../mastra/lib/createModel';
 import { matchAllCategories } from '$lib/embed/matcher.js';
 import { sendToSer } from '$lib/send/sendToSer.js';
+import {
+  buildCategory,
+  clampNumber,
+  HOURS_RANGE,
+  VALPH_RANGE
+} from './normalize.js';
 
 // ── Lang helpers ──────────────────────────────────────────────────────────────
 
@@ -41,6 +49,10 @@ interface MissionExtraction {
   workways: string[];
   vallues: string[];
   improvedDescrip: string;
+  /** Estimated total hours the mission takes. `null` when the model gave none. */
+  nhours: number | null;
+  /** Estimated value of one hour of this work. `null` when the model gave none. */
+  valph: number | null;
 }
 
 async function extractWithGemini(
@@ -63,7 +75,9 @@ async function extractWithGemini(
   "roles":           [],  // 1-3 roles/positions that match this mission (in ${langName})
   "workways":        [],  // 1-3 work modes from: remote, onsite, hybrid, full-time, part-time, freelance, shifts (translate to ${langName})
   "vallues":         [],  // 2-4 core values implied by the mission: creativity, innovation, community, impact... (in ${langName})
-  "improvedDescrip": ""   // Improved mission description: 2-3 sentences, clear and attractive, in ${langName}. May include simple HTML like <p>. Keep the original meaning.
+  "improvedDescrip": "",  // Improved mission description: 2-3 sentences, clear and attractive, in ${langName}. May include simple HTML like <p>. Keep the original meaning.
+  "nhours":          0,   // Estimated TOTAL hours this mission takes, as a number
+  "valph":           0    // Estimated fair value of ONE hour of this work, as a number (currency units)
 }
 
 Rules:
@@ -72,6 +86,9 @@ Rules:
 - workways: only real work modes — not skills or roles.
 - vallues: short noun phrases (1-2 words). No near-duplicates.
 - improvedDescrip: improve clarity and appeal while preserving all facts. If original is good, minimal changes.
+- nhours: a realistic total for the whole mission (not per week). Use the description when it states a scope; otherwise estimate from the kind of work. Between ${HOURS_RANGE.min} and ${HOURS_RANGE.max}.
+- valph: the going hourly rate for this work in the Israeli market, in shekels (₪), for a competent professional. Between ${VALPH_RANGE.min} and ${VALPH_RANGE.max}. Simple manual work is at the low end, specialised professional work at the high end.
+- nhours and valph: plain numbers only — no currency signs, no ranges, no text.
 - Return ONLY the JSON object, no other text.
 
 Mission Name: "${name}"
@@ -93,6 +110,8 @@ Description: "${descrip || '(no description provided)'}"`;
       workways:        Array.isArray(parsed.workways)  ? parsed.workways.slice(0, 3).map((v: any) => String(v).slice(0, 60)): [],
       vallues:         Array.isArray(parsed.vallues)   ? parsed.vallues.slice(0, 4).map((v: any) => String(v).slice(0, 40)) : [],
       improvedDescrip: String(parsed.improvedDescrip ?? '').slice(0, 3000),
+      nhours:          clampNumber(parsed.nhours, HOURS_RANGE),
+      valph:           clampNumber(parsed.valph,  VALPH_RANGE),
     };
   } catch (e) {
     console.error('[mission/suggest] Gemini parse failed:', cleaned.slice(0, 300));
@@ -181,20 +200,7 @@ export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
 
   // ── Build response ──────────────────────────────────────────────────────────
   // Normalize matchResults into a simple per-category shape for the client
-  const buildCategory = (namespace: 'skills' | 'roles' | 'methods' | 'vallues') => {
-    if (!matchResults) {
-      // Pinecone unavailable: return all as 'new' with just the name
-      const raw = namespace === 'methods' ? extraction.workways
-        : namespace === 'skills'  ? extraction.skills
-        : namespace === 'roles'   ? extraction.roles
-        : extraction.vallues;
-      return { matched: [], suggestions: raw.map(n => ({ input: n, status: 'new', existingId: null })), newItems: raw.map(n => ({ input: n })) };
-    }
-    const data = matchResults[namespace as keyof typeof matchResults] ??
-      (namespace === 'methods' ? (matchResults as any).methods : null);
-    return data ?? { matched: [], suggestions: [], newItems: [] };
-  };
-
+  // (see `buildCategory` — the transposition is the part that has been wrong).
   return json({
     ok: true,
     lang,
@@ -204,12 +210,14 @@ export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
       workways:        extraction.workways,
       vallues:         extraction.vallues,
       improvedDescrip: extraction.improvedDescrip,
+      nhours:          extraction.nhours,
+      valph:           extraction.valph,
     },
     matchResults: {
-      skills:   buildCategory('skills'),
-      roles:    buildCategory('roles'),
-      workways: buildCategory('methods'),
-      vallues:  buildCategory('vallues'),
+      skills:   buildCategory('skills',  matchResults, extraction.skills),
+      roles:    buildCategory('roles',   matchResults, extraction.roles),
+      workways: buildCategory('methods', matchResults, extraction.workways),
+      vallues:  buildCategory('vallues', matchResults, extraction.vallues),
     },
     similarMissions,
   });

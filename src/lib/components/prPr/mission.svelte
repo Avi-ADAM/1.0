@@ -31,6 +31,7 @@
   // AI suggest / improve / translate
   let aiSuggesting = $state(false);
   let aiSuggestResult = $state(null); // { extraction, matchResults, similarMissions }
+  let aiApplying = $state(false);
   let aiImproving = $state(false);
   let aiTranslating = $state(false);
   let aiTranslations = $state(null); // { he, en, ar }
@@ -64,33 +65,134 @@
     }
   }
 
-  function applyAiSuggestions() {
-    if (!aiSuggestResult) return;
+  /**
+   * The names one category of the suggestion offers, de-duplicated.
+   *
+   * A term the vector store already knows is taken with the catalogue's own
+   * spelling (`existingLabel`); everything else keeps what the model wrote.
+   * `extraction` is the floor: when the vector store is unavailable the match
+   * sections are empty, and the member must still get the model's suggestion.
+   */
+  function suggestedNames(category, fallback) {
+    const out = [];
+    const seen = new Set();
+    const push = (n) => {
+      const name = String(n ?? '').trim();
+      const key = name.toLowerCase();
+      if (!name || seen.has(key)) return;
+      seen.add(key);
+      out.push(name);
+    };
+    for (const r of category?.matched ?? []) push(r.existingLabel ?? r.input);
+    for (const r of category?.suggestions ?? []) push(r.existingLabel ?? r.input);
+    for (const r of category?.newItems ?? []) push(r.input);
+    for (const n of fallback ?? []) push(n);
+    return out;
+  }
+
+  /**
+   * Turn the suggested names into REAL catalogue entries before they become
+   * chips.
+   *
+   * `find_skill_id` & co. map a chip back to an id against the catalogue this
+   * component loaded on mount, and drop whatever they cannot find. A skill the
+   * model invented has no entry at all, and one whose canonical spelling
+   * differs from the model's is not found either — so the chip was shown to
+   * the member, survived until submit, and was then silently lost. This is the
+   * same resolution step the `?action=createmission` URL path runs before it
+   * opens this form; the ids land in `preresolvedVocab`, which the lookups
+   * consult first.
+   *
+   * Best-effort: on failure the plain names are used, which is the old
+   * behaviour — some chips resolve, the rest are dropped as before.
+   */
+  async function resolveSuggestedVocab(names) {
+    if (!names.skills.length && !names.roles.length && !names.workways.length) return null;
+    // Resolution embeds and may create entries, so it is not instant. Bound it:
+    // a slow vector store must delay the chips by seconds, never hang the form.
+    const abort = new AbortController();
+    const timer = setTimeout(() => abort.abort(), 12000);
+    try {
+      const res = await fetch('/api/vocab/resolve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...names,
+          name: miData[0].missionName ?? '',
+          lang: $lang
+        }),
+        signal: abort.signal
+      });
+      if (!res.ok) return null;
+      const body = await res.json();
+      if (!body?.ok) return null;
+      return {
+        skills: body.skills ?? [],
+        roles: body.roles ?? [],
+        workways: body.workways ?? []
+      };
+    } catch (err) {
+      console.warn('[mission] could not resolve AI vocabulary:', err);
+      return null;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  /** Add `names` to `current`, keeping what the member already picked. */
+  function mergeChips(current, names) {
+    const have = new Set((current ?? []).map((n) => String(n).trim().toLowerCase()));
+    const added = [];
+    for (const n of names) {
+      const key = String(n).trim().toLowerCase();
+      if (!key || have.has(key)) continue;
+      have.add(key);
+      added.push(n);
+    }
+    return [...(current ?? []), ...added];
+  }
+
+  async function applyAiSuggestions() {
+    if (!aiSuggestResult || aiApplying) return;
     const { extraction, matchResults } = aiSuggestResult;
 
-    // Merge skills — only add names not already selected
-    const addSkills = [
-      ...(matchResults?.skills?.matched ?? []).map(
-        (r) => r.existingLabel ?? r.input
-      ),
-      ...(matchResults?.skills?.suggestions ?? []).map(
-        (r) => r.existingLabel ?? r.input
-      ),
-      ...(matchResults?.skills?.newItems ?? []).map((r) => r.input)
-    ].filter((n) => n && !miData[0].selectedSkills.includes(n));
-    miData[0].selectedSkills = [...miData[0].selectedSkills, ...addSkills];
+    const names = {
+      skills: suggestedNames(matchResults?.skills, extraction.skills),
+      roles: suggestedNames(matchResults?.roles, extraction.roles),
+      workways: suggestedNames(matchResults?.workways, extraction.workways)
+    };
 
-    // Merge roles
-    const addRoles = extraction.roles.filter(
-      (n) => n && !miData[0].selectedRoles.includes(n)
-    );
-    miData[0].selectedRoles = [...miData[0].selectedRoles, ...addRoles];
+    aiApplying = true;
+    let vocab = null;
+    try {
+      vocab = await resolveSuggestedVocab(names);
+    } finally {
+      aiApplying = false;
+    }
 
-    // Merge workways
-    const addWw = extraction.workways.filter(
-      (n) => n && !miData[0].selectedWorkways.includes(n)
+    // Keep the ids the server resolved, so the chips survive submit even when
+    // the entry was created moments ago and this component's catalogue predates
+    // it. Merge — an earlier prefill may already hold ids for other chips.
+    if (vocab) {
+      preresolvedVocab = {
+        skills: { ...preresolvedVocab.skills, ...vocabMap(vocab.skills) },
+        roles: { ...preresolvedVocab.roles, ...vocabMap(vocab.roles) },
+        workways: { ...preresolvedVocab.workways, ...vocabMap(vocab.workways) }
+      };
+    }
+
+    // Canonical names when resolution succeeded, the model's names otherwise.
+    const chipNames = (kind) => {
+      const resolved = (vocab?.[kind] ?? []).map((p) => p?.name).filter(Boolean);
+      return resolved.length ? resolved : names[kind];
+    };
+
+    miData[0].selectedSkills = mergeChips(miData[0].selectedSkills, chipNames('skills'));
+    miData[0].selectedRoles = mergeChips(miData[0].selectedRoles, chipNames('roles'));
+    miData[0].selectedWorkways = mergeChips(
+      miData[0].selectedWorkways,
+      chipNames('workways')
     );
-    miData[0].selectedWorkways = [...miData[0].selectedWorkways, ...addWw];
 
     // Improve descrip if empty
     if (
@@ -100,6 +202,18 @@
       extraction.improvedDescrip
     ) {
       miData[0].descrip = extraction.improvedDescrip;
+    }
+
+    // The money row — the AI's estimate of what the mission is worth. Only
+    // written while it still holds the value it was opened with: a number the
+    // member typed themselves is theirs, and "apply all" must not overwrite it.
+    if (Number(extraction?.valph) > 0 && Number(miData[0].valph) === moneyBaseline.valph) {
+      miData[0].valph = Number(extraction.valph);
+      moneyBaseline.valph = miData[0].valph;
+    }
+    if (Number(extraction?.nhours) > 0 && Number(miData[0].nhours) === moneyBaseline.nhours) {
+      miData[0].nhours = Number(extraction.nhours);
+      moneyBaseline.nhours = miData[0].nhours;
     }
 
     miData = miData;
@@ -264,6 +378,14 @@
     }
   ]);
 
+  /**
+   * The money row as the form opened it — the defaults above, or the numbers an
+   * AI prefill supplied. Applying an AI suggestion writes the money row only
+   * while it still matches this: a number the member typed is theirs, and
+   * "apply all" must not overwrite it.
+   */
+  let moneyBaseline = $state({ valph: 50, nhours: 1 });
+
   let error1 = null;
   let gloading = $state(false);
   onMount(async () => {
@@ -303,10 +425,16 @@
           miData[0].descrip = initialSpec.descrip;
 
         const hours = initialSpec.hours ?? initialSpec.nhours;
-        if (hours != null) miData[0].nhours = Number(hours) || 0;
+        if (hours != null) {
+          miData[0].nhours = Number(hours) || 0;
+          moneyBaseline.nhours = miData[0].nhours;
+        }
 
         const rate = initialSpec.ratePerHour ?? initialSpec.valph;
-        if (rate != null) miData[0].valph = Number(rate) || 0;
+        if (rate != null) {
+          miData[0].valph = Number(rate) || 0;
+          moneyBaseline.valph = miData[0].valph;
+        }
 
         // AI-suggested vocabulary: pre-select it (the user can remove any chip).
         //
@@ -1201,6 +1329,28 @@
                       {aiSuggestResult.extraction.workways.join(', ')}
                     </p>
                   {/if}
+                  {#if aiSuggestResult.extraction.valph > 0 || aiSuggestResult.extraction.nhours > 0}
+                    <p>
+                      <span class="text-mturk"
+                        >{$trans('mission.ai.valueLabel')}</span
+                      >
+                      {#if aiSuggestResult.extraction.valph > 0}
+                        {aiSuggestResult.extraction.valph.toLocaleString('en-US', {
+                          maximumFractionDigits: 2
+                        })}
+                        {mf.perHour}
+                      {/if}
+                      {#if aiSuggestResult.extraction.valph > 0 && aiSuggestResult.extraction.nhours > 0}
+                        ✖
+                      {/if}
+                      {#if aiSuggestResult.extraction.nhours > 0}
+                        {aiSuggestResult.extraction.nhours.toLocaleString('en-US', {
+                          maximumFractionDigits: 2
+                        })}
+                        {mf.hours}
+                      {/if}
+                    </p>
+                  {/if}
                   {#if aiSuggestResult.similarMissions?.length > 0}
                     <p class="text-xs text-barbi/60">
                       {$trans('mission.ai.similarTemplates')}
@@ -1213,14 +1363,23 @@
                     <button
                       type="button"
                       onclick={applyAiSuggestions}
-                      class="px-3 py-1 rounded-full bg-gold text-barbi text-xs font-bold hover:bg-mturk transition-all"
+                      disabled={aiApplying}
+                      class="px-3 py-1 rounded-full bg-gold text-barbi text-xs font-bold hover:bg-mturk transition-all disabled:opacity-50 flex items-center gap-1"
                     >
-                      {$trans('mission.ai.applyAll')}
+                      {#if aiApplying}
+                        <span
+                          class="animate-spin inline-block w-3 h-3 border border-barbi rounded-full border-t-transparent"
+                        ></span>
+                        {$trans('mission.ai.applying')}
+                      {:else}
+                        {$trans('mission.ai.applyAll')}
+                      {/if}
                     </button>
                     <button
                       type="button"
                       onclick={() => (aiSuggestResult = null)}
-                      class="px-3 py-1 rounded-full border border-gold/60 text-barbi text-xs hover:bg-pink-950/30 transition-all"
+                      disabled={aiApplying}
+                      class="px-3 py-1 rounded-full border border-gold/60 text-barbi text-xs hover:bg-pink-950/30 transition-all disabled:opacity-50"
                     >
                       {$trans('mission.ai.dismiss')}
                     </button>
