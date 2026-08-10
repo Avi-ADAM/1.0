@@ -93,11 +93,12 @@ export async function GET({ fetch }) {
   suc = [];
 
   const que = `{
-    mesimabetahaliches(filters: {
-      iskvua: { eq: true },
-      forappruval: { eq: false },
-      finnished: { eq: false }
-    }) { data { id } }
+    mesimabetahaliches(filters: { and: [
+      { iskvua: { eq: true } },
+      { forappruval: { eq: false } },
+      { finnished: { eq: false } },
+      { or: [{ lifecycle: { null: true } }, { lifecycle: { notIn: ["archived", "released"] } }] }
+    ] }) { data { id } }
   }`;
 
   try {
@@ -251,11 +252,16 @@ async function runRecurringResources(fetchFn) {
 
   const listQue = `query MrGetRecurringForMonthi {
     mashabetahaliches(
-      filters: { recurring: { eq: true }, status_mashab: { eq: "active" }, finnished: { eq: false } }
+      filters: { and: [
+        { recurring: { eq: true } },
+        { status_mashab: { eq: "active" } },
+        { finnished: { eq: false } },
+        { or: [{ lifecycle: { null: true } }, { lifecycle: { ne: "archived" } }] }
+      ] }
       pagination: { limit: 300 }
     ) {
       data { id attributes {
-        name pricePerUnit start end cycleSize kindOf
+        name pricePerUnit start end cycleSize kindOf lifecycle archiveEffectiveFrom
         project { data { id attributes { projectName restime } } }
         users_permissions_user { data { id attributes { username email lang noMail } } }
         maaps(pagination: { limit: 500 }) { data { id attributes { cycleIndex cycleStart cycleEnd archived } } }
@@ -283,7 +289,10 @@ async function runRecurringResources(fetchFn) {
 
       if (start && now < start) continue; // not started yet
 
-      if (end && now > end) {
+      // An archive agreed "at end of cycle" ends the engine on its date, the
+      // same way the resource's own end date does (PLAN_OBJECT_ARCHIVAL).
+      const effectiveFrom = a.archiveEffectiveFrom ? new Date(a.archiveEffectiveFrom) : null;
+      if ((end && now > end) || (effectiveFrom && now >= effectiveFrom)) {
         // Past the end date — close the engine so no further cycles open.
         const closeMut = `mutation { updateMashabetahalich(id: "${id}", data: { status_mashab: "closed", finnished: true }) { data { id } } }`;
         await SendToAdmin(closeMut, ADMINMONTHER);

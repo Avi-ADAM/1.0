@@ -3,6 +3,8 @@
 // Kinds: 'user' (cookie JWT) | 'serviceAdmin' (isSer + internal secret) |
 //        'serviceConsensus' (isSer + x-consensus-secret) | 'apiKey' (Bearer 1lev1_…).
 // A qid missing here fails the coverage test (qidsAccess.test.ts) — classify it consciously.
+// NOTE: /api/send has out-of-repo consumers (magik-meetings proxies here). Before tightening a
+// qid to serviceAdmin as "unreferenced", grep those repos too — a repo-local grep is not enough.
 // Enforcement mode is controlled by AUTHZ_MODE (off | log | enforce; default enforce), see src/lib/server/authz/.
 
 export const qidsAccess = {
@@ -90,6 +92,7 @@ export const qidsAccess = {
   'donationProjectInfo': { allow: ['serviceAdmin'] }, // server-only callers (donation actions via StrapiClient)
   'createSaleClaimDecision': { allow: ['user', 'serviceAdmin'] },
   'updateSaleHolderLink': { allow: ['user', 'serviceAdmin'] },
+  'archivedObjects': { allow: ['user', 'serviceAdmin'] },
   'getSaleClaimDecision': { allow: ['user', 'serviceAdmin'] },
   'updateSaleClaimNego': { allow: ['user', 'serviceAdmin'] },
   'applySaleVersion': { allow: ['user', 'serviceAdmin'] },
@@ -137,8 +140,8 @@ export const qidsAccess = {
   '15createPgishauser': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '16createPgisha': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '17getUsers': { allow: ['user', 'serviceAdmin'] },
-  '170getMyCoMembers': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
-  '171findUserByExact': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  '170getMyCoMembers': { allow: ['user', 'serviceAdmin'] }, // called by magik-meetings (createNewMeeting.svelte) — not unreferenced
+  '171findUserByExact': { allow: ['user', 'serviceAdmin'] }, // called by magik-meetings (createNewMeeting.svelte) — not unreferenced
   '18createNewMeeting': { allow: ['user', 'serviceAdmin'] },
   '19CreatePendMeeting': { allow: ['user', 'serviceAdmin'] },
   '20CreateUserMeeting': { allow: ['user', 'serviceAdmin'] },

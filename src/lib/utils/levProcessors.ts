@@ -2103,6 +2103,30 @@ export function processDecisions(
         // the card at the end of the scroll. It genuinely awaits my action.
         pl: PRIORITY_BAND.VOTE_PENDING
       };
+    } else if (decision.kind === 'archiveObject' || decision.kind === 'editObject') {
+      // Archive/edit proposal (PLAN_OBJECT_ARCHIVAL). Rikma-wide consensus, but
+      // counted on the *standing round* only — a signature on round 1 says
+      // nothing about the counter that replaced it.
+      const av = (decision as any).archive;
+      const signedOnStanding = (av?.signedIds ?? []).length;
+      const noof = av?.memberCount ?? (projectInfo.noof || 0);
+      return {
+        ...commonFields,
+        ...decision,
+        ani: 'archObject',
+        azmi: 'hachla',
+        pendId: decision.id,
+        restime: getProjectRestime(decision.projectId),
+        created_at: decision.createdAt,
+        noof,
+        noofusersOk: signedOnStanding,
+        noofusersNo: 0,
+        noofusersWaiting: Math.max(0, noof - signedOnStanding),
+        // The extractor only emits it while it is my move, so it is never
+        // "already handled" — and it must not sink to the end of the scroll.
+        already: false,
+        pl: PRIORITY_BAND.VOTE_PENDING
+      };
     } else if (decision.kind === 'sheirutpends') {
       return {
         ...commonFields,

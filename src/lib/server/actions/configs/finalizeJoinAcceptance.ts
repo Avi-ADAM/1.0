@@ -4,6 +4,8 @@ import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { evaluateAskAcceptance } from '$lib/server/nego/askAcceptance.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
 import { resolveAcceptedActs } from '../helpers/roundActs.js';
+import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
+import { execFromContext } from '$lib/server/archive/exec.js';
 
 function formatVotesForInline(votes: any[]): string {
   if (!Array.isArray(votes) || votes.length === 0) return '';
@@ -224,6 +226,12 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
   }
 
   const chiluzh = responseData.data?.createMesimabetahalich?.data?.id;
+  // Start the dormancy clock: from here on, silence has a deadline
+  // (PLAN_OBJECT_ARCHIVAL). Best-effort — a missing clock only means
+  // the mission is never asked about, not a failed assignment.
+  if (chiluzh) {
+    await touchDormancy(execFromContext(context), String(chiluzh)).catch(() => null);
+  }
   const openMissionAttrs = responseData.data?.updateOpenMission?.data?.attributes || {};
   // The accepted checklist: the winning round's list when it has one, else the
   // OpenMission baseline (see helpers/roundActs.ts).

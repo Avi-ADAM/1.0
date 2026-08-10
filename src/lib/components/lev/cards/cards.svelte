@@ -22,6 +22,7 @@
   import SiteShareIncomeCard from './SiteShareIncomeCard.svelte';
   import SiteShareAutoApprovedCard from './SiteShareAutoApprovedCard.svelte';
   import WishOfferCard from './WishOfferCard.svelte';
+  import ArchiveObjectCard from './ArchiveObjectCard.svelte';
   //import { fly } from 'svelte/transition';
   import { onMount } from 'svelte';
   import Header from './../../header/header.svelte';
@@ -1190,6 +1191,25 @@
                   spnot={buble.spnot}
                   easy={buble.easy}
                   selfNomination={buble.source === 'selfNomination'}
+                /></SwiperSlide
+              >
+            {:else if buble.ani === 'archObject' && milon.hachla == true}
+              <SwiperSlide
+                class={isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'}
+                ><ArchiveObjectCard
+                  archive={buble.archive}
+                  projectId={buble.projectId}
+                  projectName={buble.projectName}
+                  logoSrc={buble.src}
+                  memberCount={buble.noof}
+                  timegramaDate={buble.timegramaDate}
+                  isFirst={currentIndex === i}
+                  onProj={proj}
+                  onUser={user}
+                  onChat={chat}
+                  onDone={delo}
                 /></SwiperSlide
               >
             {:else if buble.ani === 'hachla' && milon.hachla == true}

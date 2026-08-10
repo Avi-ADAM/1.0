@@ -20,6 +20,8 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { execFromContext } from '$lib/server/archive/exec.js';
+import { signObjectChange } from '$lib/server/archive/vote.js';
 import {
   fetchSaleClaim,
   standingOrder,
@@ -160,6 +162,77 @@ async function handleSaleClaimVote(
   };
 }
 
+/**
+ * archiveObject / editObject branch (PLAN_OBJECT_ARCHIVAL — phase 2).
+ *
+ * Consensus is rikma-wide and unanimous, the same bar the object's creation
+ * had to clear. What differs from the other kinds is that a vote belongs to a
+ * round: signing round 2 says nothing about round 1, and only the standing
+ * round can mature.
+ */
+async function handleObjectChangeVote(
+  params: Record<string, any>,
+  context: any,
+  notifier: any,
+) {
+  const decisionId = String(params.decisionId);
+  const exec = execFromContext(context);
+  const outcome = await signObjectChange(exec, decisionId, String(context.userId));
+
+  if (notifier && params.projectId) {
+    const applied = outcome.applied;
+    const endedFor = applied?.membershipEnded?.userId;
+    const recipients = outcome.consensus
+      ? undefined // everyone in the rikma sees the result
+      : outcome.awaiting;
+
+    notifier
+      .notify(
+        {
+          recipients: outcome.consensus
+            ? { type: 'projectMembers', config: { projectIdParam: 'projectId', excludeSender: false } }
+            : { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
+          templates: {
+            title: outcome.consensus
+              ? { he: 'ההצעה אושרה', en: 'The proposal was approved' }
+              : { he: 'נדרשת תגובתך', en: 'Your response is needed' },
+            body: outcome.consensus
+              ? {
+                  he: endedFor
+                    ? 'ההצעה אושרה פה אחד. עם האובייקט הסתיימה גם חברותו של החבר בריקמה.'
+                    : 'ההצעה אושרה פה אחד והוחלה.',
+                  en: endedFor
+                    ? 'Approved unanimously. The member’s membership of the rikma ended along with the object.'
+                    : 'Approved unanimously and applied.',
+                }
+              : {
+                  he: 'חבר נוסף חתם על הגרסה העומדת — נותרת תגובתך.',
+                  en: 'Another member signed the standing version — yours is still open.',
+                },
+          },
+          channels: ['socket'],
+          metadata: { type: 'voteUpdate', url: 'lev' },
+        },
+        { recipients, projectId: params.projectId },
+        { projectId: params.projectId, decisionId },
+        context,
+      )
+      .catch((e: unknown) => console.warn('[voteOnDecision:archive] notification failed:', e));
+  }
+
+  return {
+    data: {
+      decisionId,
+      kind: params.kind,
+      order: outcome.order,
+      consensus: outcome.consensus,
+      awaiting: outcome.awaiting,
+      applied: outcome.applied ?? null,
+    },
+    updateStrategy: { type: 'fullRefresh' as const },
+  };
+}
+
 const voteOnDecisionHandler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const { decisionId, projectId, kind, newpicid, timegramaId } = params;
   const { userId } = context;
@@ -168,6 +241,12 @@ const voteOnDecisionHandler: ActionExecutionHandler = async (params, context, { 
   // Bilateral sale-holder consent rides a distinct branch (two parties only).
   if (kind === 'saleClaim') {
     return handleSaleClaimVote(params, context, strapi, notifier);
+  }
+
+  // Archive/edit proposals vote per *round*, not once per decision — the
+  // question is which version you stand behind, and a counter opens a new one.
+  if (kind === 'archiveObject' || kind === 'editObject') {
+    return handleObjectChangeVote(params, context, notifier);
   }
 
   // 1. Fetch Decision with current vots

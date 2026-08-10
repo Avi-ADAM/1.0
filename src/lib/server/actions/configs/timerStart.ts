@@ -8,11 +8,18 @@
  */
 
 import type { ActionConfig } from '../types.js';
+import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
+import { execFromContext } from '$lib/server/archive/exec.js';
 
 export const timerStartConfig: ActionConfig = {
     key: 'timerStart',
     description: 'Start or resume a timer for a mission',
     graphqlOperation: async (params, context, { strapi }) => {
+        // Starting a timer is the loudest signal of activity there is — push
+        // the dormancy deadline out (PLAN_OBJECT_ARCHIVAL).
+        if (params.missionId) {
+            await touchDormancy(execFromContext(context), String(params.missionId)).catch(() => null);
+        }
         if (params.timerId && params.timerId !== '0') {
             // Resume/Update existing timer
             return strapi.execute('34UpdateTimer', params, context.jwt, context.fetch);
