@@ -113,8 +113,12 @@ onMessage(messaging, (payload) => {
       }
     }
 
-    // Connect to Socket.IO if user is authenticated
-    if (browser && data?.id) {
+    // Connect to Socket.IO only once there is a real session. `id` alone is not
+    // one: between signup and email confirmation the id cookie is already set
+    // while no JWT exists yet, and the socket authenticates from that JWT — so
+    // connecting on `id` meant every just-registered user watched the
+    // check-email screen throw "Authentication failed: Invalid or expired JWT".
+    if (browser && data?.id && data?.loggedIn) {
       console.log('[Layout] Connecting to Socket.IO for user', data.id);
 
       // Connect - will read JWT from cookie automatically

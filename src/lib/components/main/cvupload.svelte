@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { locale, t } from '$lib/translations';
+  import { save as saveCvDraft } from '$lib/onboard/cvDraft';
   import { get } from 'svelte/store';
   import { fly } from 'svelte/transition';
 
@@ -81,12 +82,7 @@
       }
       const data = await res.json();
 
-      try {
-        sessionStorage.setItem('onboard.cvResult', JSON.stringify(data));
-        sessionStorage.setItem('onboard.source', 'cv');
-      } catch {
-        // session storage may be disabled — non-fatal
-      }
+      saveCvDraft(data, 'cv');
 
       stopStages(true);
       // Small delay so the user sees the final ✓ row before navigating.
