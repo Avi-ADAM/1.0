@@ -40,6 +40,8 @@
   "membership": {
     "warning": "Approving also ends {{name}}’s membership of the rikma",
     "explain": "This is their only commitment here and nothing accrued, so no tie to the rikma remains.",
+    "warningSelf": "Approving this also ends your membership of the rikma",
+    "explainSelf": "This is your only commitment here and nothing has accrued, so no tie to the rikma remains.",
     "ended": "The membership ended along with the object"
   },
   "actions": {
@@ -87,7 +89,8 @@
     "scopeArchive": "Remove the need from the rikma",
     "scopeArchiveHint": "The object stops existing in the rikma",
     "why": "Why",
-    "whyPlaceholder": "What brought you here — especially where hours have accrued",
+    "whyPlaceholder": "What brought you here",
+    "whyPlaceholderAccrued": "What brought you here — especially where hours have accrued",
     "whyRequired": "Hours accrued here, so a reason matters",
     "alsoClose": "Also propose closing the need entirely",
     "alsoCloseHint": "Your release is immediate; closing the need goes to a rikma vote",

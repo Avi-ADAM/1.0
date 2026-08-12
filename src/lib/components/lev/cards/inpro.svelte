@@ -17,6 +17,8 @@
   import { isMobileOrTablet } from '$lib/utilities/device.js';
   import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
   import CardHeader from './CardHeader.svelte';
+  import ArchiveObjectButton from '$lib/components/archive/ArchiveObjectButton.svelte';
+  import ProposeEditButton from '$lib/components/archive/ProposeEditButton.svelte';
   /**
    * @typedef {Object} Props
    * @property {number} [x]
@@ -29,10 +31,12 @@
    * @property {number} [status]
    * @property {any} dueDateOrCountToDedline
    * @property {any} missionName
+   * @property {any} [missionId] - mesimabetahalich id (archive/edit proposal target)
    * @property {any} link
    * @property {any} missionDetails
    * @property {any} hoursdon
    * @property {any} hourstotal
+   * @property {any} [perhour]
    * @property {any} show
    * @property {any} running
    * @property {any} linkDescription
@@ -67,10 +71,12 @@
     status = 0,
     dueDateOrCountToDedline,
     missionName,
+    missionId = null,
     link,
     missionDetails,
     hoursdon,
     hourstotal,
+    perhour = null,
     show,
     running,
     linkDescription,
@@ -465,6 +471,27 @@
           </svg>
           <span>{$t('lev.cards.inpro.taskLink')}</span>
         </a>
+      {/if}
+
+      {#if missionId != null}
+        <ProposeEditButton
+          targetKind="missionInProgress"
+          targetId={missionId}
+          targetName={missionName}
+          currentHm={hourstotal}
+          currentPrice={perhour}
+          icon="✎"
+          className="flex-1 py-1.5 px-3 bg-white dark:bg-gray-800 border-2 border-indigo-500 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 font-bold rounded-xl transition-all flex items-center justify-center gap-1.5"
+        />
+        <ArchiveObjectButton
+          targetKind="missionInProgress"
+          targetId={missionId}
+          targetName={missionName}
+          accruedHours={hoursdon}
+          isMine={true}
+          icon="📦"
+          className="flex-1 py-1.5 px-3 bg-white dark:bg-gray-800 border-2 border-rose-400 dark:border-rose-400 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 font-bold rounded-xl transition-all flex items-center justify-center gap-1.5"
+        />
       {/if}
     {:else if low == true}
       <Lowbtn isCart="true" />

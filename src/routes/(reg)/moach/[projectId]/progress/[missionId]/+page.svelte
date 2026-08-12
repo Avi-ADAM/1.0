@@ -248,22 +248,29 @@
       {/if}
     </div>
 
-    <!-- the controls, at full size: this is where the work happens -->
-    {#if mine}
-      <section class="mp-card mp-actions">
-        <h2 class="mp-card-title">{$t('moach.progress.actions')}</h2>
-        <MissionControls
-          {missionId}
-          {projectId}
-          missionName={attrs.name}
-          {status}
-          {pendingApproval}
-          onStatus={(value) => (statusOverride = value)}
-          onCompleted={() => (submitted = true)}
-          onTimerSaved={loadSegments}
-        />
-      </section>
-    {/if}
+    <!-- the controls, at full size: this is where the work happens. A rikma
+         member who isn't the owner still gets the archive/edit proposal
+         buttons here — opening one is a rikma-wide consensus matter, not a
+         privilege of whoever carries the commitment (PLAN_OBJECT_ARCHIVAL). -->
+    <section class="mp-card mp-actions">
+      <h2 class="mp-card-title">{$t('moach.progress.actions')}</h2>
+      <MissionControls
+        {missionId}
+        {projectId}
+        missionName={attrs.name}
+        {status}
+        {pendingApproval}
+        isMine={mine}
+        ownerName={attrs.users_permissions_user?.data?.attributes?.username}
+        showArchiveActions={true}
+        accruedHours={attrs.howmanyhoursalready}
+        hoursAssigned={attrs.hoursassinged}
+        perhour={attrs.perhour}
+        onStatus={(value) => (statusOverride = value)}
+        onCompleted={() => (submitted = true)}
+        onTimerSaved={loadSegments}
+      />
+    </section>
 
     <div class="mp-cols">
       <div class="mp-col">

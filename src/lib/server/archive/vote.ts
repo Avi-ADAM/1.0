@@ -108,6 +108,9 @@ export async function applyStandingVersion(
     // distinction only matters when it is actually leaving.
     scope: round.mode === 'keep' ? 'archive' : decision.scope,
     why: round.why ?? decision.why,
+    // The standing round's author is the one whose version is being applied, so
+    // the counter rounds it sends to pending candidates are signed by them.
+    actorId: round.proposedById,
   });
 
   await closeDecision(exec, decision.id, decision.timegramaId);

@@ -75,7 +75,14 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
 
   // A rikma of one is unanimous by definition.
   if (otherMembers.length === 0) {
-    const result = await applyObjectChange(exec, { target, round, scope: 'archive', why: why || null });
+    const result = await applyObjectChange(exec, {
+      target,
+      round,
+      scope: 'archive',
+      why: why || null,
+      actorId: userId,
+      fetchFn: context.fetch,
+    });
     return {
       data: { ...result, immediate: true, decisionId: null },
       updateStrategy: { type: 'fullRefresh' as const },

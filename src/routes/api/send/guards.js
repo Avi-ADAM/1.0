@@ -23,6 +23,7 @@ import { error } from '@sveltejs/kit';
  * @property {Record<string, any>} keyValueObject  raw client `arg` (incl. support/body/issueId)
  * @property {Record<string, any>} variablesObject resolved GraphQL variables (incl. id)
  * @property {{ externalId?: string, [k: string]: any } | null} identity  server __identity
+ * @property {string} [callerId]     the `id` cookie — the JWT caller's own user id
  * @property {string} bearer1        Authorization header value ('Bearer …')
  * @property {string} ep             Strapi GraphQL endpoint
  * @property {typeof globalThis.fetch} [fetch]  injectable for tests
@@ -30,6 +31,19 @@ import { error } from '@sveltejs/kit';
 
 /** @type {Record<string, (ctx: SendGuardContext) => void | Promise<void>>} */
 const PRE_GUARDS = {
+  // Co-member lookup is self-only on the JWT path. The qid takes `uid` from the
+  // client and returns that account's projects plus every co-member's username,
+  // so an unpinned uid would let any logged-in user enumerate someone else's
+  // collaborators — the exact exposure this qid exists to avoid. Service calls
+  // legitimately read on another user's behalf and are left alone.
+  '170getMyCoMembers': ({ isSer, callerId, variablesObject }) => {
+    if (isSer) return;
+    if (!callerId) throw error(401, 'Unauthorized: No caller id');
+    if (String(variablesObject.uid) !== String(callerId)) {
+      throw error(403, 'Forbidden: Can only read your own co-members');
+    }
+  },
+
   // Editing a position (UpdatePosition without support:true) is registered-user
   // only. Votes (support:true) are handled earlier by the idempotent-vote path
   // and never reach here, so any service call at this point is a direct edit.

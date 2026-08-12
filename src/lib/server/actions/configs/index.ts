@@ -155,6 +155,7 @@ import { archivePersonalMatanotConfig } from './archivePersonalMatanot.js';
 import { proposeObjectArchiveConfig } from './proposeObjectArchive.js';
 import { proposeObjectEditConfig } from './proposeObjectEdit.js';
 import { counterObjectChangeConfig } from './counterObjectChange.js';
+import { previewArchiveMembershipConfig } from './previewArchiveMembership.js';
 
 
 /**
@@ -409,6 +410,7 @@ export function registerAllActions(): void {
   registerAction(proposeObjectArchiveConfig);
   registerAction(proposeObjectEditConfig);
   registerAction(counterObjectChangeConfig);
+  registerAction(previewArchiveMembershipConfig);
 
   // Future actions will be registered here
   // registerAction(createTaskAction);

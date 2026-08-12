@@ -136,9 +136,9 @@ export const qidsAccess = {
   '11saveTimer': { allow: ['user', 'serviceAdmin'] },
   '12mission': { allow: ['user', 'serviceAdmin'] },
   '13missionById': { allow: ['serviceAdmin'] }, // server-only callers
-  '14changeOnline': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
-  '15createPgishauser': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
-  '16createPgisha': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  '14changeOnline': { allow: ['user', 'serviceAdmin'] }, // meeting qid — magik-meetings surface
+  '15createPgishauser': { allow: ['user', 'serviceAdmin'] }, // meeting qid — magik-meetings surface
+  '16createPgisha': { allow: ['user', 'serviceAdmin'] }, // meeting qid — magik-meetings surface
   '17getUsers': { allow: ['user', 'serviceAdmin'] },
   '170getMyCoMembers': { allow: ['user', 'serviceAdmin'] }, // called by magik-meetings (createNewMeeting.svelte) — not unreferenced
   '171findUserByExact': { allow: ['user', 'serviceAdmin'] }, // called by magik-meetings (createNewMeeting.svelte) — not unreferenced
@@ -272,7 +272,7 @@ export const qidsAccess = {
   '57StartMeeting': { allow: ['user', 'serviceAdmin'] },
   '58CreateMeetingForum': { allow: ['user', 'serviceAdmin'] },
   '59GetMeetingDetails': { allow: ['user', 'serviceAdmin'] },
-  '60EndMeeting': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
+  '60EndMeeting': { allow: ['user', 'serviceAdmin'] }, // meeting qid — magik-meetings surface
   '61RequestMeetingStart': { allow: ['user', 'serviceAdmin'] },
   '62SetUserReadyForStart': { allow: ['user', 'serviceAdmin'] },
   '63CheckMeetingReadyStatus': { allow: ['user', 'serviceAdmin'] },

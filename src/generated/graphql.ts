@@ -2554,8 +2554,10 @@ export type DealRelationResponseCollection = {
 
 export type Decision = {
   __typename?: 'Decision';
+  archEndsMembership?: Maybe<Scalars['Boolean']['output']>;
   archMashabetahalich?: Maybe<MashabetahalichEntityResponse>;
   archMatanot?: Maybe<MatanotEntityResponse>;
+  archMember?: Maybe<UsersPermissionsUserEntityResponse>;
   archMesimabetahalich?: Maybe<MesimabetahalichEntityResponse>;
   archOpenMashaabim?: Maybe<OpenMashaabimEntityResponse>;
   archOpenMission?: Maybe<OpenMissionEntityResponse>;
@@ -2693,8 +2695,10 @@ export type DecisionEntityResponseCollection = {
 
 export type DecisionFiltersInput = {
   and?: InputMaybe<Array<InputMaybe<DecisionFiltersInput>>>;
+  archEndsMembership?: InputMaybe<BooleanFilterInput>;
   archMashabetahalich?: InputMaybe<MashabetahalichFiltersInput>;
   archMatanot?: InputMaybe<MatanotFiltersInput>;
+  archMember?: InputMaybe<UsersPermissionsUserFiltersInput>;
   archMesimabetahalich?: InputMaybe<MesimabetahalichFiltersInput>;
   archOpenMashaabim?: InputMaybe<OpenMashaabimFiltersInput>;
   archOpenMission?: InputMaybe<OpenMissionFiltersInput>;
@@ -2741,8 +2745,10 @@ export type DecisionFiltersInput = {
 };
 
 export type DecisionInput = {
+  archEndsMembership?: InputMaybe<Scalars['Boolean']['input']>;
   archMashabetahalich?: InputMaybe<Scalars['ID']['input']>;
   archMatanot?: InputMaybe<Scalars['ID']['input']>;
+  archMember?: InputMaybe<Scalars['ID']['input']>;
   archMesimabetahalich?: InputMaybe<Scalars['ID']['input']>;
   archOpenMashaabim?: InputMaybe<Scalars['ID']['input']>;
   archOpenMission?: InputMaybe<Scalars['ID']['input']>;
@@ -5645,6 +5651,7 @@ export type Mashabetahalich = {
   start?: Maybe<Scalars['DateTime']['output']>;
   status_mashab?: Maybe<Enum_Mashabetahalich_Status_Mashab>;
   summarizeOnClose?: Maybe<Scalars['Boolean']['output']>;
+  timegrama?: Maybe<TimegramaEntityResponse>;
   timers?: Maybe<TimerRelationResponseCollection>;
   unit?: Maybe<Enum_Mashabetahalich_Unit>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -5755,6 +5762,7 @@ export type MashabetahalichFiltersInput = {
   start?: InputMaybe<DateTimeFilterInput>;
   status_mashab?: InputMaybe<StringFilterInput>;
   summarizeOnClose?: InputMaybe<BooleanFilterInput>;
+  timegrama?: InputMaybe<TimegramaFiltersInput>;
   timers?: InputMaybe<TimerFiltersInput>;
   unit?: InputMaybe<StringFilterInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
@@ -5797,6 +5805,7 @@ export type MashabetahalichInput = {
   start?: InputMaybe<Scalars['DateTime']['input']>;
   status_mashab?: InputMaybe<Enum_Mashabetahalich_Status_Mashab>;
   summarizeOnClose?: InputMaybe<Scalars['Boolean']['input']>;
+  timegrama?: InputMaybe<Scalars['ID']['input']>;
   timers?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   unit?: InputMaybe<Enum_Mashabetahalich_Unit>;
   users_permissions_user?: InputMaybe<Scalars['ID']['input']>;
@@ -5866,6 +5875,7 @@ export type Matanot = {
   sp?: Maybe<SpEntityResponse>;
   startDate?: Maybe<Scalars['DateTime']['output']>;
   status_of_voting?: Maybe<Enum_Matanot_Status_Of_Voting>;
+  timegrama?: Maybe<TimegramaEntityResponse>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
@@ -6088,6 +6098,7 @@ export type MatanotFiltersInput = {
   sp?: InputMaybe<SpFiltersInput>;
   startDate?: InputMaybe<DateTimeFilterInput>;
   status_of_voting?: InputMaybe<StringFilterInput>;
+  timegrama?: InputMaybe<TimegramaFiltersInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
 };
 
@@ -6146,6 +6157,7 @@ export type MatanotInput = {
   sp?: InputMaybe<Scalars['ID']['input']>;
   startDate?: InputMaybe<Scalars['DateTime']['input']>;
   status_of_voting?: InputMaybe<Enum_Matanot_Status_Of_Voting>;
+  timegrama?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type MatanotRecipeMission = {
@@ -17286,6 +17298,8 @@ export type Timegrama = {
   done?: Maybe<Scalars['Boolean']['output']>;
   finiapruval?: Maybe<FiniapruvalEntityResponse>;
   maap?: Maybe<MaapEntityResponse>;
+  mashabetahalich?: Maybe<MashabetahalichEntityResponse>;
+  matanot?: Maybe<MatanotEntityResponse>;
   matanotpend?: Maybe<MatanotpendEntityResponse>;
   mesimabetahalich?: Maybe<MesimabetahalichEntityResponse>;
   open_mashaabim?: Maybe<OpenMashaabimEntityResponse>;
@@ -17330,6 +17344,8 @@ export type TimegramaFiltersInput = {
   finiapruval?: InputMaybe<FiniapruvalFiltersInput>;
   id?: InputMaybe<IdFilterInput>;
   maap?: InputMaybe<MaapFiltersInput>;
+  mashabetahalich?: InputMaybe<MashabetahalichFiltersInput>;
+  matanot?: InputMaybe<MatanotFiltersInput>;
   matanotpend?: InputMaybe<MatanotpendFiltersInput>;
   mesimabetahalich?: InputMaybe<MesimabetahalichFiltersInput>;
   not?: InputMaybe<TimegramaFiltersInput>;
@@ -17356,6 +17372,8 @@ export type TimegramaInput = {
   done?: InputMaybe<Scalars['Boolean']['input']>;
   finiapruval?: InputMaybe<Scalars['ID']['input']>;
   maap?: InputMaybe<Scalars['ID']['input']>;
+  mashabetahalich?: InputMaybe<Scalars['ID']['input']>;
+  matanot?: InputMaybe<Scalars['ID']['input']>;
   matanotpend?: InputMaybe<Scalars['ID']['input']>;
   mesimabetahalich?: InputMaybe<Scalars['ID']['input']>;
   open_mashaabim?: InputMaybe<Scalars['ID']['input']>;

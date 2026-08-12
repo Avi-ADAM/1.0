@@ -47,7 +47,11 @@ export type AskAcceptanceReason =
   | 'archived'
   /** The client asked to materialize under a user who isn't this Ask's candidate. */
   | 'takerMismatch'
-  /** Assigned offer whose assignee hasn't agreed yet — record the vote, don't materialize. */
+  /**
+   * The taker hasn't agreed to the standing version — an assigned offer whose
+   * assignee never answered, or a project round (counter / terms edit) they
+   * have yet to accept. Record the vote, don't materialize.
+   */
   | 'awaitingAssigneeConsent';
 
 export interface AskAcceptanceResult {
@@ -148,7 +152,16 @@ export function evaluateAskAcceptance({
   if (acceptedUserId != null && takerId && String(acceptedUserId) !== takerId) {
     return { allowed: false, reason: 'takerMismatch', ...base };
   }
-  if (assignedOffer && !gate.takerYes) {
+  // Nothing is registered under a person's name without their yes to the
+  // version being registered. Two ways `takerYes` is false:
+  //   - an assigned offer the invitee never answered (the original case), and
+  //   - a project-side round standing unanswered — a counter, or the round an
+  //     `editObject` sends to pending candidates when the rikma changes the
+  //     terms they applied to (src/lib/server/archive/pendingOffers.ts).
+  // The second is the one a member can reach by pressing approve, so the check
+  // cannot be limited to assigned offers: it would materialize terms the
+  // candidate never saw. This is the same bar the timegrama finalizer applies.
+  if (!gate.takerYes) {
     return { allowed: false, reason: 'awaitingAssigneeConsent', ...base };
   }
 

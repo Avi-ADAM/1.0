@@ -25,6 +25,12 @@ import {
 } from './gql.js';
 import { TARGET_META, type ArchiveTarget, type Lifecycle, type TargetKind } from './targets.js';
 import { assessMembership, endMembership } from './membership.js';
+import {
+  notifyRenegotiatedCandidates,
+  readOfferSnapshot,
+  renegotiatePendingOffers,
+  type RenegotiatedOffer,
+} from './pendingOffers.js';
 
 export type RoundMode = 'archive' | 'keep';
 export type HoursOutcome = 'credit' | 'waive' | 'transfer' | 'endOfCycle';
@@ -60,6 +66,12 @@ export interface ApplyResult {
   effectiveFrom?: string;
   /** Offers/asks closed because the need disappeared. */
   closedOfferIds: string[];
+  /**
+   * Pending candidacies handed a counter round because the terms they applied
+   * to moved under them. Until each of these candidates answers, nothing
+   * matures on their side — see ./pendingOffers.ts.
+   */
+  renegotiatedOffers?: RenegotiatedOffer[];
   /** The open mission a released assignment went back to. */
   reopenedOpenMissionId?: string;
   /**
@@ -335,6 +347,13 @@ export interface ApplyInput {
   scope?: ArchiveScope;
   /** Free text stored on the credited FinnishedMission. */
   why?: string | null;
+  /**
+   * Who stands behind the applied version — the standing round's author. Only
+   * used to sign the counter rounds a `keep` sends to pending candidates.
+   */
+  actorId?: string | null;
+  /** Request-scoped fetch for the candidate mail; falls back to the global. */
+  fetchFn?: typeof globalThis.fetch;
 }
 
 /**
@@ -344,7 +363,7 @@ export interface ApplyInput {
  */
 export async function applyObjectChange(
   exec: Exec,
-  { target, round, scope = 'archive', why }: ApplyInput,
+  { target, round, scope = 'archive', why, actorId = null, fetchFn }: ApplyInput,
 ): Promise<ApplyResult> {
   const base: ApplyResult = {
     targetKind: target.kind,
@@ -357,6 +376,10 @@ export async function applyObjectChange(
 
   // ── the object survives, with the negotiated values ────────────────────
   if (round.mode === 'keep') {
+    // Read the candidacies (and the terms they applied to) BEFORE the write —
+    // afterwards there is nothing left to diff the new terms against.
+    const snapshot = await readOfferSnapshot(exec, target.kind, target.id);
+
     const frag = editFragment(target.kind, round);
     const data = fields(frag || null, enumField('lifecycle', 'active', LIFECYCLES));
     await run(
@@ -364,7 +387,17 @@ export async function applyObjectChange(
       `mutation { ${TARGET_META[target.kind].mutation}(id: ${gqlStr(target.id)}, data: { ${data} }) { data { id } } }`,
       `keep:${target.kind}`,
     );
-    return { ...base, lifecycle: 'active' };
+
+    // The rikma agreed among itself; the people who applied did not. Hand each
+    // of them the new terms as a counter round so their earlier yes — and their
+    // silence — cannot be read as consent to something they never saw.
+    let renegotiatedOffers: RenegotiatedOffer[] = [];
+    if (snapshot) {
+      renegotiatedOffers = await renegotiatePendingOffers(exec, { snapshot, round, actorId });
+      await notifyRenegotiatedCandidates(snapshot, round, renegotiatedOffers, { fetch: fetchFn });
+    }
+
+    return { ...base, lifecycle: 'active', renegotiatedOffers };
   }
 
   // ── the object leaves ──────────────────────────────────────────────────

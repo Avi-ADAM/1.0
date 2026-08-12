@@ -137,7 +137,14 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   const sovereignRelease = scope === 'release' && !accrued && target.ownerId === userId;
 
   if (soleMember || sovereignRelease) {
-    const result = await applyObjectChange(exec, { target, round, scope, why: why || null });
+    const result = await applyObjectChange(exec, {
+      target,
+      round,
+      scope,
+      why: why || null,
+      actorId: userId,
+      fetchFn: context.fetch,
+    });
 
     // "…and propose closing the need entirely" — the release already happened;
     // the need's fate is still the rikma's to decide.

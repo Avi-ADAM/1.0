@@ -430,6 +430,7 @@ export type ActionKey =
   | 'proposeObjectArchive'
   | 'proposeObjectEdit'
   | 'counterObjectChange'
+  | 'previewArchiveMembership'
   | 'refreshMySuggestions'
   | 'declineSpForMashaabim'
   | 'reportRecurringSaleCycle'

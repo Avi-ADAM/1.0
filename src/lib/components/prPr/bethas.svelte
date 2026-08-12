@@ -529,8 +529,12 @@
             </div>
           </div>
 
-          <!-- the viewer's own mission: the controls it has on the lev card -->
-          {#if mine && projectId}
+          <!-- the viewer's own mission gets the full workbench (timer, status,
+               complete); any rikma member also gets the archive/edit proposal
+               buttons on someone else's mission — opening one is a rikma-wide
+               consensus matter, not a privilege of the owner
+               (PLAN_OBJECT_ARCHIVAL). -->
+          {#if projectId}
             <div class="pb-mine-bar">
               <MissionControls
                 missionId={m.id}
@@ -538,6 +542,12 @@
                 missionName={m.attributes?.name}
                 status={statusOf(m)}
                 pendingApproval={isPending(m)}
+                isMine={mine}
+                ownerName={m.attributes?.users_permissions_user?.data?.attributes?.username}
+                showArchiveActions={true}
+                accruedHours={m.attributes?.howmanyhoursalready}
+                hoursAssigned={m.attributes?.hoursassinged}
+                perhour={m.attributes?.perhour}
                 compact={true}
                 onStatus={(value) => (statusOverride = { ...statusOverride, [String(m.id)]: value })}
                 onCompleted={() => (submitted = { ...submitted, [String(m.id)]: true })}

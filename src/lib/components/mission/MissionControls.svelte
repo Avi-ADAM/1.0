@@ -25,6 +25,8 @@
   import { executeAction } from '$lib/client/actionClient';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import RangeSlider from 'svelte-range-slider-pips';
+  import ArchiveObjectButton from '$lib/components/archive/ArchiveObjectButton.svelte';
+  import ProposeEditButton from '$lib/components/archive/ProposeEditButton.svelte';
 
   /**
    * @typedef {Object} Props
@@ -34,6 +36,15 @@
    * @property {number} [status] - current progress percentage (0–100).
    * @property {boolean} [pendingApproval] - a finish approval is already open.
    * @property {boolean} [compact] - icon-sized buttons for a dense table row.
+   * @property {boolean} [isMine] - the viewer carries this mission. Off shows only the archive/edit
+   *   proposal buttons (any rikma member may open those — see PLAN_OBJECT_ARCHIVAL); the
+   *   timer/status/complete controls stay owner-only regardless of `showArchiveActions`.
+   * @property {string} [ownerName] - who carries the mission, for the archive drawer's
+   *   membership warning when the viewer isn't them.
+   * @property {boolean} [showArchiveActions] - offer "request update" / "propose to close" (PLAN_OBJECT_ARCHIVAL phase 4). Off by default — callers that don't have accrued-hours/terms data on hand should not show these.
+   * @property {number} [accruedHours] - hours already logged (`howmanyhoursalready`).
+   * @property {number|null} [hoursAssigned] - hours agreed for the mission (`hoursassinged`).
+   * @property {number|null} [perhour] - hourly value agreed for the mission.
    * @property {(status: number) => void} [onStatus] - progress was saved.
    * @property {() => void} [onCompleted] - mission was submitted for approval.
    * @property {() => void} [onTimerSaved] - logged time changed on the server.
@@ -47,6 +58,12 @@
     status = 0,
     pendingApproval = false,
     compact = false,
+    isMine = true,
+    ownerName = '',
+    showArchiveActions = false,
+    accruedHours = 0,
+    hoursAssigned = null,
+    perhour = null,
     onStatus,
     onCompleted,
     onTimerSaved
@@ -337,55 +354,79 @@
 {/if}
 
 <div class="mc" class:mc-compact={compact} dir={$isRtl ? 'rtl' : 'ltr'}>
-  {#if storeTimer}
-    <span class="mc-clock" class:running={isRunning} title={$t('lev.cards.inpro.timer')}>
-      {clock(localZman)}
-    </span>
-
-    <button
-      type="button"
-      class="mc-btn"
-      class:mc-stop={isRunning}
-      class:mc-go={!isRunning}
-      onclick={isRunning ? handleStop : handleStart}
-      title={isRunning ? $t('moach.progress.stopTimer') : $t('moach.progress.startTimer')}
-    >
-      <span aria-hidden="true">{isRunning ? '■' : '▶'}</span>
-      <span class="mc-label">
-        {isRunning ? $t('moach.progress.stopTimer') : $t('moach.progress.startTimer')}
+  {#if isMine}
+    {#if storeTimer}
+      <span class="mc-clock" class:running={isRunning} title={$t('lev.cards.inpro.timer')}>
+        {clock(localZman)}
       </span>
+
+      <button
+        type="button"
+        class="mc-btn"
+        class:mc-stop={isRunning}
+        class:mc-go={!isRunning}
+        onclick={isRunning ? handleStop : handleStart}
+        title={isRunning ? $t('moach.progress.stopTimer') : $t('moach.progress.startTimer')}
+      >
+        <span aria-hidden="true">{isRunning ? '■' : '▶'}</span>
+        <span class="mc-label">
+          {isRunning ? $t('moach.progress.stopTimer') : $t('moach.progress.startTimer')}
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="mc-btn"
+        class:mc-alert={hasUnsavedTime}
+        onclick={openTimerEditor}
+        title={$t('lev.cards.inpro.editTimer')}
+      >
+        <span aria-hidden="true">✎</span>
+        <span class="mc-label">
+          {hasUnsavedTime ? $t('moach.progress.saveTimer') : $t('lev.cards.inpro.editTimer')}
+        </span>
+      </button>
+    {:else}
+      <span class="mc-hint">{$t('moach.progress.timerUnavailable')}</span>
+    {/if}
+
+    <button type="button" class="mc-btn" onclick={openStatus} title={$t('moach.progress.status')}>
+      <span aria-hidden="true">◐</span>
+      <span class="mc-label">{$t('moach.progress.updateStatus')}</span>
     </button>
 
-    <button
-      type="button"
-      class="mc-btn"
-      class:mc-alert={hasUnsavedTime}
-      onclick={openTimerEditor}
-      title={$t('lev.cards.inpro.editTimer')}
-    >
-      <span aria-hidden="true">✎</span>
-      <span class="mc-label">
-        {hasUnsavedTime ? $t('moach.progress.saveTimer') : $t('lev.cards.inpro.editTimer')}
+    {#if pendingApproval}
+      <span class="mc-pending" title={$t('moach.progress.awaitingApprovalHint')}>
+        ⏳ {$t('moach.progress.awaitingApproval')}
       </span>
-    </button>
-  {:else}
-    <span class="mc-hint">{$t('moach.progress.timerUnavailable')}</span>
+    {:else}
+      <button type="button" class="mc-btn mc-done" onclick={openFinish} title={$t('lev.cards.inpro.completeTask')}>
+        <span aria-hidden="true">✓</span>
+        <span class="mc-label">{$t('lev.cards.inpro.completeTask')}</span>
+      </button>
+    {/if}
   {/if}
 
-  <button type="button" class="mc-btn" onclick={openStatus} title={$t('moach.progress.status')}>
-    <span aria-hidden="true">◐</span>
-    <span class="mc-label">{$t('moach.progress.updateStatus')}</span>
-  </button>
-
-  {#if pendingApproval}
-    <span class="mc-pending" title={$t('moach.progress.awaitingApprovalHint')}>
-      ⏳ {$t('moach.progress.awaitingApproval')}
-    </span>
-  {:else}
-    <button type="button" class="mc-btn mc-done" onclick={openFinish} title={$t('lev.cards.inpro.completeTask')}>
-      <span aria-hidden="true">✓</span>
-      <span class="mc-label">{$t('lev.cards.inpro.completeTask')}</span>
-    </button>
+  {#if showArchiveActions}
+    <ProposeEditButton
+      targetKind="missionInProgress"
+      targetId={missionId}
+      targetName={missionName}
+      currentHm={hoursAssigned}
+      currentPrice={perhour}
+      icon="✎"
+      className="mc-btn"
+    />
+    <ArchiveObjectButton
+      targetKind="missionInProgress"
+      targetId={missionId}
+      targetName={missionName}
+      {accruedHours}
+      {isMine}
+      {ownerName}
+      icon="📦"
+      className="mc-btn"
+    />
   {/if}
 </div>
 

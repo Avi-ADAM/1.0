@@ -198,3 +198,73 @@ describe('evaluateAskAcceptance — ordinary candidacies', () => {
     });
   });
 });
+
+describe('evaluateAskAcceptance — a project round standing unanswered', () => {
+  it('blocks approval while the candidate has not answered the new terms', () => {
+    // The rikma edited the open mission the candidate applied to, so
+    // pendingOffers put the new terms to them as a project round at order 1.
+    // A member pressing approve must not register the candidate on terms they
+    // have never seen — the same bar the timegrama finalizer applies.
+    const res = evaluateAskAcceptance({
+      askAttributes: askNode({
+        takerId: '2',
+        vots: [yes('2', 0), yes('1', 1)],
+        rounds: [{ ordern: 1, proposedBy: 'project' }],
+      }),
+      callerId: '3',
+      acceptedUserId: '2',
+      now: NOW,
+    });
+
+    expect(res.allowed).toBe(false);
+    expect(res.reason).toBe('awaitingAssigneeConsent');
+    expect(res.assignedOffer).toBe(false);
+    expect(res.L).toBe(1);
+    // The approver's yes is still captured at the standing round, so it is
+    // waiting the moment the candidate accepts.
+    expect(res.vots.find((v) => v.users_permissions_user === '3')).toMatchObject({ order: 1 });
+  });
+
+  it('allows it once the candidate accepts at that round', () => {
+    const res = evaluateAskAcceptance({
+      askAttributes: askNode({
+        takerId: '2',
+        vots: [yes('2', 0), yes('1', 1), yes('2', 1)],
+        rounds: [{ ordern: 1, proposedBy: 'project' }],
+      }),
+      callerId: '3',
+      acceptedUserId: '2',
+      now: NOW,
+    });
+
+    expect(res.allowed).toBe(true);
+    expect(res.gate.takerYes).toBe(true);
+  });
+
+  it('allows it when the standing round is the candidate’s own counter', () => {
+    const res = evaluateAskAcceptance({
+      askAttributes: askNode({
+        takerId: '2',
+        vots: [yes('2', 0)],
+        rounds: [{ ordern: 1, proposedBy: 'project' }, { ordern: 2, proposedBy: 'candidate' }],
+      }),
+      callerId: '3',
+      acceptedUserId: '2',
+      now: NOW,
+    });
+
+    expect(res.allowed).toBe(true);
+  });
+
+  it('leaves the ordinary candidacy — no rounds at all — untouched', () => {
+    const res = evaluateAskAcceptance({
+      askAttributes: askNode({ takerId: '2', vots: [yes('1')] }),
+      callerId: '3',
+      acceptedUserId: '2',
+      now: NOW,
+    });
+
+    expect(res.allowed).toBe(true);
+    expect(res.reason).toBe('ok');
+  });
+});

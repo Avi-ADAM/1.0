@@ -40,6 +40,8 @@
   "membership": {
     "warning": "Aprobar también termina la pertenencia de {{name}} a la rikma",
     "explain": "Es su único compromiso aquí y no se acumularon horas, así que no queda vínculo con la rikma.",
+    "warningSelf": "Aprobar esto también termina tu pertenencia a la rikma",
+    "explainSelf": "Es tu único compromiso aquí y no se acumularon horas, así que no te quedará vínculo con la rikma.",
     "ended": "La pertenencia terminó junto con el objeto"
   },
   "actions": {
@@ -87,7 +89,8 @@
     "scopeArchive": "Quitar la necesidad de la rikma",
     "scopeArchiveHint": "El objeto deja de existir en la rikma",
     "why": "Por qué",
-    "whyPlaceholder": "Qué te trajo hasta aquí — sobre todo si hay horas acumuladas",
+    "whyPlaceholder": "Qué te trajo hasta aquí",
+    "whyPlaceholderAccrued": "Qué te trajo hasta aquí — sobre todo si hay horas acumuladas",
     "whyRequired": "Aquí se acumularon horas, así que el motivo importa",
     "alsoClose": "Y proponer cerrar la necesidad por completo",
     "alsoCloseHint": "Tu liberación es inmediata; cerrar la necesidad va a votación de la rikma",
