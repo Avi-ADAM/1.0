@@ -148,7 +148,31 @@
     "b4_d": "Cuando el cálculo es transparente, sumar a un cuarto o a un décimo socio es cosa de un minuto, sin reabrir la negociación. Más socios = menos carga para cada uno, no más complicación.",
     "more": "Y además, un millón de herramientas de gestión en un solo paquete: tareas, kanban, Gantt, temporizadores, turnos, ventas, decisiones y votaciones, bot de Telegram y asistente de IA. Todo funciona con los mismos datos que alimentan el cálculo, así que gestionas una vez y obtienes tanto la gestión como un reparto justo.",
     "cta": "Iniciar una Rikma",
-    "ctaSecondary": "Ver cómo funciona"
+    "ctaSecondary": "Ver cómo funciona",
+    "calc": {
+      "title": "Pruébalo: ¿qué pasaría en la tuya?",
+      "sub": "Cambia los números y verás al instante lo que se lleva cada socio, frente a un reparto por partes iguales.",
+      "p1": "Ana",
+      "p2": "Diego",
+      "p3": "Lucía",
+      "p4": "Marc",
+      "nameLabel": "Nombre del socio",
+      "hours": "horas",
+      "rate": "por hora",
+      "res": "dinero/equipo",
+      "currency": "€",
+      "currencyCode": "EUR",
+      "revenue": "La Rikma ingresó",
+      "addPartner": "+ Añadir socio",
+      "removePartner": "Quitar socio",
+      "reset": "Reiniciar",
+      "calcLabel": "Según lo que diste:",
+      "equalLabel": "En reparto igual:",
+      "barLabel": "Reparto de porcentajes entre los socios",
+      "punch": "El mismo trabajo, el mismo dinero: solo un reparto que refleja lo que de verdad pasó.",
+      "empty": "Introduce horas, una tarifa o dinero/equipo para ver el reparto.",
+      "note": "Esta es exactamente la fórmula que ejecuta el sistema: el valor que diste dividido entre el valor que dieron todos. En una Rikma real cada una de estas líneas se registra y la aprueban los socios; no hay que teclear nada a mano."
+    }
   },
   "platform": {
     "projectMgmt_t": "Todo tu proyecto de un vistazo",

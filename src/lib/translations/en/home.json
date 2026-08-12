@@ -147,7 +147,31 @@
     "b4_d": "When the math is transparent, adding a fourth or a tenth partner takes a minute — no reopening negotiations. More partners = less load on each one, not more complexity.",
     "more": "And on top of that — a million business tools in one package: tasks, kanban, Gantt, timers, shifts, sales, decisions and votes, a Telegram bot and an AI assistant. It all runs on the same data that feeds the calculation, so you manage once and get both the management and a fair split.",
     "cta": "Start a Rikma",
-    "ctaSecondary": "See it working"
+    "ctaSecondary": "See it working",
+    "calc": {
+      "title": "Try it: what would happen in yours?",
+      "sub": "Change the numbers and see immediately what each partner takes home — against an equal split.",
+      "p1": "Alex",
+      "p2": "Sam",
+      "p3": "Robin",
+      "p4": "Noa",
+      "nameLabel": "Partner name",
+      "hours": "hours",
+      "rate": "per hour",
+      "res": "money/equipment",
+      "currency": "$",
+      "currencyCode": "USD",
+      "revenue": "The Rikma earned",
+      "addPartner": "+ Add a partner",
+      "removePartner": "Remove partner",
+      "reset": "Reset",
+      "calcLabel": "By what you gave:",
+      "equalLabel": "By an equal split:",
+      "barLabel": "Share of the split between partners",
+      "punch": "Same work, same money — just a split that matches what actually happened.",
+      "empty": "Enter hours, a rate or money/equipment to see the split.",
+      "note": "This is exactly the formula the system runs: the value you gave divided by the value everyone gave. In a real Rikma every line like this is recorded and approved by the partners — nothing is typed in by hand."
+    }
   },
   "platform": {
     "projectMgmt_t": "Your whole project at a glance",

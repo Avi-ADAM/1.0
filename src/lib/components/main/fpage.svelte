@@ -9,6 +9,7 @@
   import { Canvas } from '@threlte/core';
   import Scene from '$lib/components/main/1lev1.svelte';
   import ProductPeek from '$lib/components/main/ProductPeek.svelte';
+  import SplitCalculator from '$lib/components/main/SplitCalculator.svelte';
   import VideoModal from '$lib/components/main/VideoModal.svelte';
   import ResizeHandler from '$lib/components/ResizeHandler.svelte';
   import { useProgress } from '@threlte/extras';
@@ -591,6 +592,13 @@
           >
             {$t('home.split.formula')}
           </p>
+        </div>
+
+        <!-- ולא רק להסביר את הנוסחה — להריץ אותה. אותו חישוב שרץ ב‑
+             `prPr/hachcal.svelte` על נתוני ריקמה אמיתית, עם מספרים לשחק בהם
+             ובלי הרשמה. -->
+        <div class="mt-6">
+          <SplitCalculator />
         </div>
 
         <!-- מה זה נותן בפועל -->
