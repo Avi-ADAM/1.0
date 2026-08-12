@@ -6,6 +6,13 @@ const plugin = require('tailwindcss/plugin');
 
 const config = {
   content: ['./src/**/*.{html,js,svelte,ts}', './node_modules/@avitest/gridcraft/dist/themes/**/*.svelte'],
+  // `dark:` used to fall back to Tailwind's default `media` strategy, so the
+  // ~1.5k dark utilities followed the OS alone and the `.dark` token block in
+  // app.postcss never activated (nothing ever added the class). Switching to
+  // `selector` puts day/night under the appearance control; the inline script
+  // in app.html still seeds the class from `prefers-color-scheme` when the
+  // visitor has not chosen, so OS-following behaviour is preserved.
+  darkMode: 'selector',
   theme: {
     screens: {
       xs: '475px',
@@ -84,6 +91,12 @@ const config = {
         grbb: 'var(--grbb)',
         barbi: 'var(--barbi-pink)',
         gold: 'var(--gold)',
+        // `gold` is the *light* side of the gold/barbi pair — it is the page
+        // wash and the text laid on top of `bg-barbi`. Using it as ink on a
+        // white surface (the `bg-white border-gold text-gold` outline button)
+        // renders at ~1.2:1 and is effectively invisible. `goldink` is the
+        // readable counterpart for exactly that role.
+        goldink: 'var(--goldink)',
         neww: 'var(--neww)',
         lturk: 'var(--lturk)',
         mturk: 'var(--mturk)',
@@ -96,10 +109,19 @@ const config = {
         blueg: 'var(--blueg)',
         oranges: 'var(--oranges)',
         wowt: 'var(--wowt)'
+      },
+      borderRadius: {
+        theme: 'var(--radius-theme)'
+      },
+      boxShadow: {
+        theme: 'var(--shadow-theme)'
       }
     }
   },
-  Plugins: [
+  // Was `Plugins:` (capital P). Tailwind only reads `plugins`, so this whole
+  // block was silently ignored and the `personal:` / `business:` variants were
+  // never generated — every `business:bg-…` class in the tree was dead text.
+  plugins: [
     plugin(function ({ addVariant }) {
       // הוספת variants עבור personal ו-business
       addVariant('personal', '.personal &');

@@ -1,129 +1,196 @@
-import { writable, derived } from 'svelte/store';
+import { writable, derived, get } from 'svelte/store';
 import { browser } from '$app/environment';
 
-// הגדרת המשנים הזמינים
+/**
+ * Appearance is two independent axes, not one four-way choice:
+ *
+ *   theme  personal | business   — the visual identity (hue, radius, motion)
+ *   mode   light | dark | system — the brightness
+ *
+ * Both are expressed as classes on <html> and read by CSS alone. This module
+ * deliberately does NOT write CSS variables from JS: the previous version set
+ * `--color-gold`, `--color-lturk`… while the whole app consumes `--gold`,
+ * `--lturk`…, so every value it wrote landed on a variable nobody reads. The
+ * palette now lives entirely in the appearance layer at the end of app.postcss
+ * and is selected by these classes.
+ *
+ * The chosen values are persisted in cookies (not localStorage) so
+ * hooks.server.js can stamp the same classes into the server-rendered HTML —
+ * without that the first paint is always the default theme.
+ */
+
+/** @typedef {'personal' | 'business'} ThemeName */
+/** @typedef {'light' | 'dark' | 'system'} ModeName */
+
+/** @type {Record<ThemeName, ThemeName>} */
 export const THEMES = {
   personal: 'personal',
   business: 'business'
 };
 
-// קונפיגורציה של כל משנה
-export const themeConfigs = {
+/** @type {Record<ModeName, ModeName>} */
+export const MODES = {
+  light: 'light',
+  dark: 'dark',
+  system: 'system'
+};
+
+export const THEME_COOKIE = 'theme';
+export const MODE_COOKIE = 'mode';
+
+const DEFAULT_THEME = THEMES.personal;
+const DEFAULT_MODE = MODES.system;
+
+/**
+ * Descriptive metadata. `labelKey` points at a translation key — the label
+ * text itself must not live here, it belongs in the i18n namespaces.
+ * @type {Record<ThemeName, { labelKey: string, descKey: string, swatch: [string, string] }>}
+ */
+export const themeMeta = {
   personal: {
-    name: 'אישי',
-    colors: {
-      primary: '#3b82f6',
-      secondary: '#10b981',
-      background: '#f9fafb',
-      text: '#1f2937',
-      card: '#ffffff',
-      accent: '#8b5cf6',
-      muted: '#6b7280',
-      gold: '#EEE8AA',
-      barbiPink: '#FF0092',
-      pinki: 'rgb(242, 229, 242)',
-  
-      blue: 'rgb(182, 240, 255)',
-      naim: 'rgba(251, 207, 232)',
-      lturk: 'rgb(103, 232, 249)',
-      mturk: 'rgb(34, 211, 238)',
-      sturk: '#CCFBF1',
-      lpink: 'rgb(251, 207, 232)',
-      mpink: 'rgb(244, 114, 182)',
-    },
-    layout: {
-      showSidebar: false,
-      showFooter: true,
-      showNewsletter: true,
-      headerStyle: 'gradient',
-      cardStyle: 'rounded'
-    }
+    labelKey: 'ui.appearance.themePersonal',
+    descKey: 'ui.appearance.themePersonalDesc',
+    swatch: ['#eee8aa', '#ff0092']
   },
   business: {
-    name: 'עסקי',
-    colors: {
-      primary: '#1f2937',
-      secondary: '#374151',
-      background: '#f3f4f6',
-      text: '#111827',
-      card: '#ffffff',
-      accent: '#059669',
-      muted: '#9ca3af',
-      gold: '#1e3a8a',
-      barbiPink: '#0f766e',
-      pinki: '#f8fafc',
-
-      blue: '#e0f2fe',
-      backgroundWithoutOpacity: 'rgba(255, 255, 255, 0.9)',
-      columnWidth: '42rem',
-      columnMarginTop: '4rem',
-      naim: '#fefce8',
-      lturk: '#84cc16',
-      mturk: '#0369a1',
-      sturk: '#f0fdf4',
-      lpink: '#e5e7eb',
-      mpink: '#374151',    
-    },
-    layout: {
-      showSidebar: true,
-      showFooter: false,
-      showNewsletter: false,
-      headerStyle: 'minimal',
-      cardStyle: 'square'
-    }
+    labelKey: 'ui.appearance.themeBusiness',
+    descKey: 'ui.appearance.themeBusinessDesc',
+    swatch: ['#f8fafc', '#1d4ed8']
   }
 };
 
-// קריאה מ-localStorage או ברירת מחדל
-const defaultTheme = THEMES.personal;
-const initialTheme = browser ? localStorage.getItem('theme') || defaultTheme : defaultTheme;
+/**
+ * Kept for backwards compatibility with `+layout.svelte`, which imports
+ * `themeConfig`. Layout-level switches (sidebar/footer) stay data-driven.
+ * @type {Record<ThemeName, { layout: { headerStyle: string, cardStyle: string } }>}
+ */
+export const themeConfigs = {
+  personal: { layout: { headerStyle: 'gradient', cardStyle: 'rounded' } },
+  business: { layout: { headerStyle: 'minimal', cardStyle: 'square' } }
+};
 
-// Store של המשנה הנוכחי
-export const theme = writable(initialTheme);
+/**
+ * @param {string} name
+ * @returns {string | undefined}
+ */
+function readCookie(name) {
+  if (!browser) return undefined;
+  const hit = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith(`${name}=`));
+  return hit ? decodeURIComponent(hit.slice(name.length + 1)) : undefined;
+}
 
-// Store נגזר עם הקונפיגורציה המלאה
+/**
+ * @param {string} name
+ * @param {string} value
+ */
+function writeCookie(name, value) {
+  if (!browser) return;
+  const oneYear = 60 * 60 * 24 * 365;
+  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${oneYear}; SameSite=Lax`;
+}
+
+/** @returns {ThemeName} */
+function initialTheme() {
+  const fromCookie = readCookie(THEME_COOKIE);
+  if (fromCookie === 'personal' || fromCookie === 'business') return fromCookie;
+  return DEFAULT_THEME;
+}
+
+/** @returns {ModeName} */
+function initialMode() {
+  const fromCookie = readCookie(MODE_COOKIE);
+  if (fromCookie === 'light' || fromCookie === 'dark' || fromCookie === 'system') {
+    return fromCookie;
+  }
+  return DEFAULT_MODE;
+}
+
+/** @returns {boolean} */
+function osPrefersDark() {
+  return browser && window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+export const theme = writable(/** @type {ThemeName} */ (initialTheme()));
+export const mode = writable(/** @type {ModeName} */ (initialMode()));
+
+/**
+ * Bumped whenever the OS preference changes, so `resolvedMode` recomputes
+ * while the user is sitting on `system`.
+ */
+const osDark = writable(osPrefersDark());
+
+/** The mode actually in force: `system` collapsed to light or dark. */
+export const resolvedMode = derived([mode, osDark], ([$mode, $osDark]) =>
+  $mode === MODES.system ? ($osDark ? 'dark' : 'light') : $mode
+);
+
 export const themeConfig = derived(theme, ($theme) => themeConfigs[$theme]);
 
-// עדכון localStorage כשהמשנה משתנה
+/** True when the business identity is active — handy for `{#if}` branches. */
+export const isBusiness = derived(theme, ($theme) => $theme === THEMES.business);
+
+/**
+ * Mirrors the two stores onto <html>. Mode becomes the single `dark` class
+ * because Tailwind's `darkMode: 'selector'` looks for exactly that.
+ * @param {ThemeName} themeName
+ * @param {'light' | 'dark'} effectiveMode
+ */
+function applyToDocument(themeName, effectiveMode) {
+  if (!browser) return;
+  const root = document.documentElement;
+
+  root.classList.remove(THEMES.personal, THEMES.business);
+  root.classList.add(themeName);
+  root.classList.toggle('dark', effectiveMode === 'dark');
+
+  root.setAttribute('data-theme', themeName);
+  root.setAttribute('data-mode', effectiveMode);
+  // Lets form controls, scrollbars and the URL bar follow the choice.
+  root.style.colorScheme = effectiveMode;
+}
+
 if (browser) {
   theme.subscribe((value) => {
-    localStorage.setItem('theme', value);
-    updateCSSVariables(value);
+    writeCookie(THEME_COOKIE, value);
+    applyToDocument(value, /** @type {'light' | 'dark'} */ (get(resolvedMode)));
   });
+
+  mode.subscribe((value) => {
+    writeCookie(MODE_COOKIE, value);
+    applyToDocument(get(theme), /** @type {'light' | 'dark'} */ (get(resolvedMode)));
+  });
+
+  const mq = window.matchMedia('(prefers-color-scheme: dark)');
+  const onOsChange = () => {
+    osDark.set(mq.matches);
+    if (get(mode) === MODES.system) {
+      applyToDocument(get(theme), mq.matches ? 'dark' : 'light');
+    }
+  };
+  // Safari < 14 only has the deprecated listener API.
+  if (typeof mq.addEventListener === 'function') mq.addEventListener('change', onOsChange);
+  else mq.addListener(onOsChange);
 }
 
-// פונקציה לעדכון CSS Variables
-function updateCSSVariables(themeName) {
-  if (!browser) return;
-  
-  const config = themeConfigs[themeName];
-  const root = document.documentElement;
-  
-  // עדכון משתני CSS
-  Object.entries(config.colors).forEach(([key, value]) => {
-    root.style.setProperty(`--color-${key}`, value);
-  });
-  
-  // עדכון class על ה-document
-  root.classList.remove(...Object.keys(themeConfigs));
-  root.classList.add(themeName);
-  
-  // הוספת data attribute
-  root.setAttribute('data-theme', themeName);
-}
+/** @param {ThemeName} next */
+export const setTheme = (next) => {
+  if (next in THEMES) theme.set(next);
+};
 
-// פונקציות עזר
 export const toggleTheme = () => {
-  theme.update(t => t === THEMES.personal ? THEMES.business : THEMES.personal);
+  theme.update((t) => (t === THEMES.personal ? THEMES.business : THEMES.personal));
 };
 
-export const setTheme = (newTheme) => {
-  if (themeConfigs[newTheme]) {
-    theme.set(newTheme);
-  }
+/** @param {ModeName} next */
+export const setMode = (next) => {
+  if (next in MODES) mode.set(next);
 };
 
-// אתחול המשנה בטעינה
-if (browser) {
-  updateCSSVariables(initialTheme);
-}
+/** light → dark → system → light */
+export const cycleMode = () => {
+  mode.update((m) =>
+    m === MODES.light ? MODES.dark : m === MODES.dark ? MODES.system : MODES.light
+  );
+};

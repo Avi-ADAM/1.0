@@ -1,50 +1,44 @@
 ﻿<!DOCTYPE html>
-<html lang=%lang%>
+<html lang=%lang% class="%themeclass%">
   <head>
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script>
-  // מניעת flash של עיצוב לא נכון
-  (function() {
+  // מניעת flash של עיצוב לא נכון.
+  // hooks.server.js already stamps the class onto <html>, so this only has
+  // real work to do for mode:"system" — the server cannot know the visitor's
+  // OS preference. Runs before first paint, so there is still no flash.
+  // It writes CSS classes only; the palette itself lives in app.postcss.
+  (function () {
     try {
-      const theme = localStorage.getItem('theme') || 'personal';
-      document.documentElement.classList.add(theme);
-      document.documentElement.setAttribute('data-theme', theme);
-      
-      // עדכון CSS Variables מיד
-      const themeConfigs = {
-        personal: {
-          '--color-primary': '#3b82f6',
-          '--color-secondary': '#10b981',
-          '--color-background': '#f9fafb',
-          '--color-text': '#1f2937',
-          '--color-card': '#ffffff',
-          '--color-accent': '#8b5cf6',
-          '--color-muted': '#6b7280',
-          '--border-radius': '0.75rem',
-          '--shadow': '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
-        },
-        business: {
-          '--color-primary': '#1f2937',
-          '--color-secondary': '#374151',
-          '--color-background': '#f3f4f6',
-          '--color-text': '#111827',
-          '--color-card': '#ffffff',
-          '--color-accent': '#059669',
-          '--color-muted': '#9ca3af',
-          '--border-radius': '0.25rem',
-          '--shadow': '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
-        }
+      var read = function (name) {
+        var hit = document.cookie
+          .split('; ')
+          .filter(function (row) { return row.indexOf(name + '=') === 0; })[0];
+        return hit ? decodeURIComponent(hit.slice(name.length + 1)) : '';
       };
-      
-      const config = themeConfigs[theme];
-      if (config) {
-        Object.entries(config).forEach(([key, value]) => {
-          document.documentElement.style.setProperty(key, value);
-        });
-      }
+
+      var theme = read('theme');
+      if (theme !== 'personal' && theme !== 'business') theme = 'personal';
+
+      var mode = read('mode');
+      if (mode !== 'light' && mode !== 'dark' && mode !== 'system') mode = 'system';
+
+      var dark =
+        mode === 'dark' ||
+        (mode === 'system' &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+      var root = document.documentElement;
+      root.classList.remove('personal', 'business');
+      root.classList.add(theme);
+      root.classList.toggle('dark', dark);
+      root.setAttribute('data-theme', theme);
+      root.setAttribute('data-mode', dark ? 'dark' : 'light');
+      root.style.colorScheme = dark ? 'dark' : 'light';
     } catch (e) {
+      // A themeless render is still readable — never block the page on this.
       console.warn('Theme initialization failed:', e);
     }
   })();

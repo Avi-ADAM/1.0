@@ -15,33 +15,22 @@ onMessage(messaging, (payload) => {
   import { lang, doesLang, langUs } from '$lib/stores/lang.js';
   import SucssesConf from '$lib/celim/sucssesConf.svelte';
   import { confettiStore } from '$lib/stores/confettiStore';
-  import { theme, themeConfig } from '$lib/stores/theme';
+  // Side-effect import: the store wires <html> class syncing and the
+  // prefers-color-scheme listener on load. The classes themselves are already
+  // on the element (server-stamped + the inline script in app.html); this
+  // keeps them in step once the user changes a setting.
+  import '$lib/stores/theme';
   import { onMount } from 'svelte';
   import { locale, isRtl} from '$lib/translations';
   import { goto } from '$app/navigation';
   import { navigating } from '$app/state';
   import { browser } from '$app/environment';
-  import ThemeToggle from '$lib/celim/main/ThemeToggle.svelte';
   import { Bot } from '$lib/components/bot';
   import { socketClient } from '$lib/stores/socketClient';
   import { patchUser } from '$lib/stores/userStore.js';
   import { toast } from 'svelte-sonner';
   import { addMes } from '$lib/stores/pendMisMes.js';
   import { forumStore } from '$lib/stores/forumStore';
-
-  // עדכון המשנה בטעינה
-  onMount(() => {
-    const unsubscribe = theme.subscribe((currentTheme) => {
-      // עדכון classes על ה-document
-      document.documentElement.classList.remove('personal', 'business');
-      document.documentElement.classList.add(currentTheme);
-
-      // עדכון data attribute
-      document.documentElement.setAttribute('data-theme', currentTheme);
-    });
-
-    return unsubscribe;
-  });
 
   /**
    * @typedef {Object} Props

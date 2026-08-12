@@ -181,6 +181,20 @@ function getLanguage(event) {
   // would propagate into locals.lang and out to the metadata maps.
   return SUPPORTED_LANGS.includes(coociLang) ? coociLang : 'he';
 }
+// Appearance is two cookies: `theme` (personal|business) and `mode`
+// (light|dark|system). Both are user-writable, so both are validated here
+// before they reach the markup. `system` cannot be resolved server-side — the
+// OS preference is not in the request — so it renders without `dark` and the
+// inline script in app.html corrects it before first paint.
+const SUPPORTED_THEMES = ['personal', 'business'];
+
+/** @param {import('@sveltejs/kit').RequestEvent} event */
+function getThemeClass(event) {
+  const cookieTheme = event.cookies.get('theme');
+  const theme = SUPPORTED_THEMES.includes(cookieTheme) ? cookieTheme : 'personal';
+  return event.cookies.get('mode') === 'dark' ? `${theme} dark` : theme;
+}
+
 // Baseline security headers applied to every response. A full Content-Security-Policy
 // is intentionally NOT set here — it needs a dedicated, tested pass to whitelist all
 // external origins (Cloudinary, MapLibre, Google, Telegram, fonts, socket, etc.).
@@ -273,9 +287,11 @@ export async function handle({ event, resolve }) {
     return response;
   }
 
+  const themeClass = getThemeClass(event);
   const response = await resolve(event, {
     transformPageChunk: ({ html }) =>
       html
+        .replace('%themeclass%', themeClass)
         .replace('%lang%', lang)
         .replace('%xtitle%', title[lang])
         .replace('%title%', title[lang])

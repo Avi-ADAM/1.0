@@ -77,5 +77,19 @@
         "help": "הזהות לא הופעלה — ראה פרטים בעמוד הזהות"
       }
     }
+  },
+  "appearance": {
+    "title": "התאמה",
+    "language": "שפה",
+    "look": "מראה",
+    "brightness": "בהירות",
+    "themePersonal": "אישי",
+    "themePersonalDesc": "זהב וורוד, פינות רכות",
+    "themeBusiness": "עסקי",
+    "themeBusinessDesc": "ניגודיות גבוהה, פחות צבע",
+    "mode_light": "יום",
+    "mode_dark": "לילה",
+    "mode_system": "לפי המכשיר",
+    "followingSystem": "עוקב אחרי הגדרת המכשיר — כרגע {{mode}}"
   }
 }

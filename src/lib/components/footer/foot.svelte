@@ -23,6 +23,7 @@
     myUserMeeting
   } from '$lib/stores/pgishot';
   import MobileFooter from './mobileFooter.svelte';
+  import AppearanceMenu from './AppearanceMenu.svelte';
   import { goto } from '$app/navigation';
   let draggable = $state();
   $effect(() => {
@@ -296,7 +297,24 @@
   <MobileFooter {isAuthed} onChat={() => addi('chat')} onNew={() => addi()} />
 {/if}
 
+<!-- Outside the isAuthed guard on purpose: language and appearance are the
+     two settings a visitor may need before signing up. Floated rather than
+     slotted into the bar, which is already a tight 7-column grid. -->
+<div class="appearance-dock" class:above-bar={isAuthed}>
+  <AppearanceMenu />
+</div>
+
 <style>
+  .appearance-dock {
+    position: fixed;
+    inset-inline-start: 12px;
+    bottom: 14px;
+    z-index: 55;
+  }
+  .appearance-dock.above-bar {
+    bottom: 76px;
+  }
+
   .draggable {
     -webkit-touch-callout: none;
     -ms-touch-action: none;

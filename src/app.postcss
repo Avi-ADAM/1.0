@@ -371,6 +371,9 @@ textarea::-webkit-resizer {
   --heading-color: rgba(0, 0, 0, 0.7);
   --text-color: #444444;
   --gold: #eee8aa;
+  /* Fallback only — the real per-theme value lives in the appearance layer at
+     the end of this file. Kept here so an unclassed <html> still renders. */
+  --goldink: #8a6a15;
   --barbi-pink: #ff0092;
   --pinki: rgb(242, 229, 242);
 
@@ -401,38 +404,10 @@ textarea::-webkit-resizer {
   --oranges: rgb(254, 172, 49);
   --wowt: rgb(3, 55, 47);
 }
-.business {
-  --gold: #eee8aa; /* רקע בהיר עדין (במקום זהב בהיר) */
-  --barbi-pink: #1e40af; /* כחול כהה לטקסטים וכותרות */
-  --pinki: #f1f5f9; /* רקע בהיר מאוד עדין */
-
-  --blue: #e0f2fe; /* כחול בהיר עדין לרקעים */
-  --background-without-opacity: rgba(248, 250, 252, 0.7);
-  --column-width: 42rem;
-  --column-margin-top: 4rem;
-  --naim: #f0f9ff; /* כחול בהיר מאוד לרקעים */
-  --lturk: #0ea5e9; /* כחול בהיר לאלמנטים */
-  --mturk: #0284c7; /* כחול בינוני לאלמנטים */
-  --sturk: #f0f9ff; /* כחול בהיר מאוד לרקעים */
-  --lpink: #e2e8f0; /* אפור בהיר לרקעים עדינים */
-  --mpink: #475569; /* אפור כהה לטקסטים משניים */
-  --blu: #1e40af; /* כחול כהה מקצועי */
-  --silver: #e5e7eb; /* אפור כסף בהיר */
-  --stgold: #374151; /* אפור כהה (במקום זהב כהה) */
-  --gra: #6b7280; /* אפור בינוני */
-  --grb: #f9fafb; /* אפור בהיר מאוד */
-  --grc: #4b5563; /* אפור כהה בינוני */
-  --grd: #f3f4f6; /* אפור בהיר */
-  --gre: #374151; /* אפור כהה */
-  --graa: #059669; /* ירוק עסקי */
-  --grbb: #1f2937; /* אפור כהה מאוד */
-  --neww: #06b6d4; /* כחול-ירוק מקצועי */
-  --wow: #10b981; /* ירוק בהיר */
-  --wow2: #84cc16; /* ירוק חכם */
-  --blueg: #3b82f6; /* כחול בהיר */
-  --oranges: #f59e0b; /* כתום מקצועי */
-  --wowt: #064e3b; /* ירוק כהה מאוד */
-}
+/* The business palette used to live here. It has moved to the appearance
+   layer at the end of this file — a plain `.business` block at this position
+   is overruled by the `:root` further down (equal specificity, later wins),
+   which is why it never took effect. Do not re-add tokens here. */
 h1,
 h2,
 button {
@@ -1838,5 +1813,274 @@ body::before {
 @media (max-width: 600px) {
   .page-wrap {
     padding: 16px;
+  }
+}
+
+/* ==========================================================================
+   APPEARANCE LAYER — theme (personal | business) × mode (light | dark)
+   --------------------------------------------------------------------------
+   Deliberately the LAST block in this file, and written with `html.x`
+   selectors (specificity 0,1,1) rather than `:root` (0,1,0).
+   Both matter: the `:root` block further up redefines `--gold` *after* the
+   old `.business` rules, so a plain class block loses to it on source order
+   and the business palette never applied even when the class was present.
+
+   THE GOLD / BARBI CONTRACT
+   The two dominant tokens are a *pair*, not two independent colours:
+     --gold       the LIGHT side. Pale card wash (`bg-gold`) and the ink laid
+                  on top of the brand (`bg-barbi text-gold`, 103 call sites).
+                  It stays light in every theme and every mode — that is what
+                  keeps `bg-barbi text-gold` and `bg-gold text-barbi` legible
+                  without touching a single component.
+     --barbi-pink the SATURATED brand side. Dark enough that --gold reads on
+                  top of it, light enough to read as ink on a pale card.
+   The gold gradient ramp (--gra…--gre) is the light side too: components pair
+   `from-gra … text-barbi` with `hover:from-barbi … hover:text-gold`, i.e. the
+   ramp and the brand swap roles on hover. So the ramp must stay pale.
+
+     --goldink    NEW. --gold cannot double as ink on a white surface (at
+                  #eee8aa on white that is ~1.2:1 — invisible, an existing bug
+                  on 59 `bg-white border-gold text-gold` outline buttons).
+                  --goldink is the readable counterpart for exactly that role,
+                  and it flips with the mode: dark ink on light, light on dark.
+
+   Every value below is checked against its intended background for WCAG AA
+   (>=4.5:1 for text). The ratio is noted where it is not obvious.
+   ========================================================================== */
+
+/* --- shared scalars ------------------------------------------------------ */
+html.personal {
+  --radius-theme: 0.75rem;
+  --shadow-theme: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+html.business {
+  /* Sharper corners and a tighter shadow are most of what reads as
+     "professional" before a single colour changes. */
+  --radius-theme: 0.25rem;
+  --shadow-theme:
+    0 1px 2px rgb(15 23 42 / 0.08), 0 1px 3px rgb(15 23 42 / 0.06);
+  --radius: 0.25rem;
+}
+
+/* --- PERSONAL · LIGHT ---------------------------------------------------- */
+/* Pins today's look so a stray `:root` further up cannot drift it. Only
+   --goldink is genuinely new here; it fixes the invisible outline buttons. */
+html.personal {
+  --gold: #eee8aa;
+  --goldink: #8a6a15; /* 5.1:1 on white */
+  --barbi-pink: #ff0092;
+  --pinki: rgb(242, 229, 242);
+  --blue: rgb(182, 240, 255);
+  --naim: rgba(251, 207, 232);
+  --lturk: rgb(103, 232, 249);
+  --mturk: rgb(34, 211, 238);
+  --sturk: #ccfbf1;
+  --lpink: rgb(251, 207, 232);
+  --mpink: rgb(244, 114, 182);
+}
+
+/* --- PERSONAL · DARK ----------------------------------------------------- */
+/* Intentionally minimal. 1.4k hand-authored `dark:` utilities already carry
+   this theme's night look, and they were written against LIGHT --gold /
+   --barbi (e.g. `bg-gold text-gray-600`, `dark:bg-gray-800 text-gold`).
+   Inverting the pair here would break those pairings, so only --goldink —
+   which has no legacy call sites — flips. */
+html.personal.dark {
+  --goldink: #f0c040; /* 8.6:1 on slate-800 */
+}
+
+/* --- BUSINESS · LIGHT ---------------------------------------------------- */
+html.business {
+  /* the pair */
+  --gold: #f8fafc;
+  --goldink: #1e3a8a; /* 10.2:1 on white */
+  --barbi-pink: #1d4ed8; /* 6.6:1 on white · --gold on it = 6.4:1 */
+
+  /* surfaces */
+  --pinki: #f1f5f9;
+  --blue: #e0f2fe;
+  --naim: #f1f5f9;
+  --sturk: #f1f5f9;
+  --lpink: #e2e8f0;
+  --silver: #cbd5e1;
+  --background-without-opacity: rgb(255 255 255 / 0.92);
+  --column-width: 42rem;
+  --column-margin-top: 4rem;
+
+  /* ink & accents — all >=4.5:1 on white */
+  --lturk: #0369a1; /* 6.0:1 */
+  --mturk: #0f766e; /* 5.6:1 */
+  --mpink: #334155; /* 10.4:1 */
+  --blu: #1e3a8a;
+  --stgold: #334155;
+  --neww: #0e7490;
+  --wow: #047857;
+  --wow2: #15803d;
+  --wowt: #064e3b;
+  --blueg: #2563eb;
+  --oranges: #b45309;
+
+  /* the gradient ramp — brushed steel, kept pale so `text-barbi` on it is
+     5.1:1 at the ramp's darkest stop */
+  --gra: #e8edf3;
+  --grb: #f8fafc;
+  --grc: #dde3ea;
+  --grd: #f1f5f9;
+  --gre: #e8edf3;
+  --graa: #e8edf3;
+  --grbb: #1e293b;
+
+  /* the /deals design-system scalars — --bg and --text flip together, so any
+     component pairing them stays consistent */
+  --bg: #eef2f7;
+  --s1: #ffffff;
+  --s2: #f8fafc;
+  --s3: #f1f5f9;
+  --s4: #e2e8f0;
+  --text: #0f172a; /* 17.4:1 on white */
+  --tm: #475569; /* 7.4:1 on white */
+  --td: #94a3b8;
+  --border: rgb(15 23 42 / 0.12);
+  --border-g: rgb(29 78 216 / 0.28);
+  --pink: #1d4ed8;
+  --pink-l: #3b82f6;
+  --gold-l: #1e40af;
+  --gold-ll: #dbeafe;
+  --gold-d: rgb(29 78 216 / 0.12);
+  --gold-dd: rgb(29 78 216 / 0.05);
+  --success: #047857;
+
+  /* shadcn tokens */
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #1d4ed8;
+  --primary-foreground: #f8fafc;
+  --secondary: #e2e8f0;
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #475569;
+  --accent: #e0e7ff;
+  --accent-foreground: #1e3a8a;
+  --destructive: #b91c1c; /* 6.2:1 on white */
+  --input: #cbd5e1;
+  --ring: #1d4ed8;
+  --sidebar: #f1f5f9;
+  --sidebar-foreground: #0f172a;
+  --sidebar-primary: #1d4ed8;
+  --sidebar-primary-foreground: #f8fafc;
+  --sidebar-accent: #e2e8f0;
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: rgb(15 23 42 / 0.12);
+  --sidebar-ring: #1d4ed8;
+}
+
+/* --- BUSINESS · DARK ----------------------------------------------------- */
+html.business.dark {
+  /* --gold stays on the light side (see the contract above); it is only
+     dimmed so it does not glare. --barbi-pink is the compromise token: at
+     #2563eb it holds 4.8:1 against --gold for `bg-barbi text-gold`, and the
+     same 4.8:1 as ink on the pale cards where `text-barbi` overwhelmingly
+     sits. Bare `text-barbi` directly on the page background is the weak
+     case; components that put text there use `dark:text-*` utilities. */
+  --gold: #f1f5fb;
+  --goldink: #93c5fd; /* 8.1:1 on slate-800 */
+  --barbi-pink: #2563eb;
+
+  --pinki: #16223a;
+  --blue: #16334d;
+  --naim: #16223a;
+  --sturk: #16223a;
+  --lpink: #1f2f4d;
+  --silver: #475569;
+
+  --lturk: #7dd3fc;
+  --mturk: #5eead4;
+  --mpink: #cbd5e1;
+  --blu: #93c5fd;
+  --stgold: #cbd5e1;
+  --neww: #67e8f9;
+  --wow: #34d399;
+  --wow2: #a3e635;
+  --wowt: #d1fae5;
+  --blueg: #93c5fd;
+  --oranges: #fbbf24;
+
+  --background-without-opacity: rgb(17 27 46 / 0.92);
+
+  --bg: #0b1220;
+  --s1: #111b2e;
+  --s2: #172440;
+  --s3: #1f2f4d;
+  --s4: #2a3c5e;
+  --text: #e8eef7;
+  --tm: #a3b3c9;
+  --td: #64748b;
+  --border: rgb(255 255 255 / 0.12);
+  --border-g: rgb(96 165 250 / 0.30);
+  --pink: #2563eb;
+  --pink-l: #60a5fa;
+  --gold-l: #93c5fd;
+  --gold-ll: #dbeafe;
+  --gold-d: rgb(96 165 250 / 0.16);
+  --gold-dd: rgb(96 165 250 / 0.07);
+  --success: #34d399;
+
+  --background: #0b1220;
+  --foreground: #e8eef7;
+  --card: #111b2e;
+  --card-foreground: #e8eef7;
+  --popover: #172440;
+  --popover-foreground: #e8eef7;
+  --primary: #60a5fa;
+  --primary-foreground: #0b1220;
+  --secondary: #1f2f4d;
+  --secondary-foreground: #e8eef7;
+  --muted: #172440;
+  --muted-foreground: #a3b3c9;
+  --accent: #1e3a8a;
+  --accent-foreground: #dbeafe;
+  --destructive: #f87171;
+  --input: #2a3c5e;
+  --ring: #60a5fa;
+  --sidebar: #111b2e;
+  --sidebar-foreground: #e8eef7;
+  --sidebar-primary: #60a5fa;
+  --sidebar-primary-foreground: #0b1220;
+  --sidebar-accent: #1f2f4d;
+  --sidebar-accent-foreground: #e8eef7;
+  --sidebar-border: rgb(255 255 255 / 0.12);
+  --sidebar-ring: #60a5fa;
+}
+
+/* --- business restraint --------------------------------------------------
+   Half of what makes the current look "personal" is motion and shimmer, not
+   hue. The business theme turns it off rather than recolouring it. */
+html.business body {
+  background: var(--bg);
+  color: var(--text);
+}
+html.business .animate-shine,
+html.business .animate-gradientx,
+html.business .animate-gradientxslow,
+html.business .animate-gradienty {
+  animation: none;
+}
+html.business .boxright,
+html.business .boxleft {
+  box-shadow: var(--shadow-theme);
+}
+
+/* Respect the OS reduced-motion setting in every theme. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-shine,
+  .animate-gradientx,
+  .animate-gradientxslow,
+  .animate-gradienty,
+  .anim {
+    animation: none;
   }
 }
