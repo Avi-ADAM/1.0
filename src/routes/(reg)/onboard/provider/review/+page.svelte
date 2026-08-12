@@ -125,17 +125,22 @@
         ...g.suggestions[cat],
         ...g.newItems[cat]
       ];
+      // Several different inputs can be matched onto the SAME existing entry
+      // ("בסיסי נתונים", "ארכיטקטורת תוכנה" and "כתיבת קוד נקי" all landed on
+      // id 386), so dedupe by existingId — otherwise the relation is sent the
+      // same id three times.
+      const seenExisting = new Set();
       for (const r of all) {
         if (chipState[`${cat}:${r.input}`] !== 'on') continue;
         const useExisting = r.status === 'matched' || r.status === 'suggestion';
-        out[cat].push(
-          useExisting && r.existingId
-            ? {
-                name: r.existingLabel ?? r.input,
-                existingId: String(r.existingId)
-              }
-            : { name: r.input }
-        );
+        if (useExisting && r.existingId) {
+          const key = String(r.existingId);
+          if (seenExisting.has(key)) continue;
+          seenExisting.add(key);
+          out[cat].push({ name: r.existingLabel ?? r.input, existingId: key });
+        } else {
+          out[cat].push({ name: r.input });
+        }
       }
     }
     // Fold in the user's EXISTING profile items so the save (which REPLACES each
@@ -278,17 +283,27 @@
                   {r.existingLabel ?? r.input}
                 </button>
               {/each}
+              <!-- A suggestion is saved under the EXISTING entry it was matched
+                   to (see buildPayload), which can be a very different word than
+                   the one the user wrote. Rendering only r.input meant the
+                   profile silently filled up with terms the user never chose —
+                   "בסיסי נתונים" saved as "ממשל נתונים". The title tooltip alone
+                   does not carry on touch, so the mapping is shown inline. -->
               {#each sugg as r (r.input)}
                 {@const on = chipState[`${section.key}:${r.input}`] === 'on'}
+                {@const mapsTo = r.existingId && r.existingLabel && r.existingLabel !== r.input
+                  ? r.existingLabel
+                  : ''}
                 <button
                   type="button"
                   class="chip suggested"
                   class:off={!on}
                   onclick={() => toggle(section.key, r.input)}
-                  title={r.existingLabel ? $t('onboard.provider.review_page.close_to', { label: r.existingLabel }) : ''}
+                  title={mapsTo ? $t('onboard.provider.review_page.close_to', { label: mapsTo }) : ''}
                 >
                   {on ? '✓' : '?'}
                   {r.input}
+                  {#if mapsTo}<span class="maps-to">← {mapsTo}</span>{/if}
                 </button>
               {/each}
               {#each fresh as r (r.input)}
@@ -402,6 +417,16 @@
   .chip.off {
     opacity: 0.45;
     text-decoration: line-through;
+  }
+  /* The entry this suggestion is actually saved under. Kept readable even on an
+     `off` chip — it is the one piece of information the user needs in order to
+     decide whether turning the chip on is right. */
+  .maps-to {
+    text-decoration: none;
+    opacity: 0.75;
+    font-size: 0.85em;
+    margin-inline-start: 4px;
+    white-space: nowrap;
   }
   .chip:hover {
     transform: translateY(-1px);

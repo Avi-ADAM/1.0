@@ -14181,6 +14181,86 @@ export const qids = {
     }
   }`,
 
+  // ── Chat / forum bootstrap (src/lib/stores/pendMisMes.js) ────────────────
+  // These two replace the raw GraphQL strings initialForum() used to build by
+  // hand. Raw queries are dev-only, so in production every chat fetch 403'd and
+  // the whole forum subsystem never loaded for a logged-in user.
+  //
+  // `$idL` is resolved server-side from the `id` cookie (see +server.js), so
+  // the caller cannot ask for another user's forums.
+  '292initialForumAll': `query InitialForumAll($idL: ID!) {
+    usersPermissionsUser(id: $idL) { data { attributes {
+      username
+      profilePic { data { attributes { url formats } } }
+      projects_1s { data { id attributes {
+        projectName
+        profilePic { data { attributes { url formats } } }
+        forums { data { id attributes {
+          subject spec done
+          mesimabetahaliches { data { attributes { name } } }
+          messages(filters: { archived: { ne: true } }) { data { id attributes {
+            content when
+            users_permissions_user { data { id attributes {
+              username profilePic { data { attributes { url formats } } }
+            } } }
+          } } }
+        } } }
+      } } }
+      halukasres { data { id attributes {
+        amount
+        usersend { data { id attributes { username } } }
+        userrecive { data { id attributes { username } } }
+        project { data { id attributes {
+          projectName profilePic { data { attributes { url formats } } }
+        } } }
+        forum { data { id attributes {
+          subject spec done
+          messages(filters: { archived: { ne: true } }) { data { id attributes {
+            content when
+            users_permissions_user { data { id attributes {
+              username profilePic { data { attributes { url formats } } }
+            } } }
+          } } }
+        } } }
+      } } }
+      halukasend { data { id attributes {
+        amount
+        usersend { data { id attributes { username } } }
+        userrecive { data { id attributes { username } } }
+        project { data { id attributes {
+          projectName profilePic { data { attributes { url formats } } }
+        } } }
+        forum { data { id attributes {
+          subject spec done
+          messages(filters: { archived: { ne: true } }) { data { id attributes {
+            content when
+            users_permissions_user { data { id attributes {
+              username profilePic { data { attributes { url formats } } }
+            } } }
+          } } }
+        } } }
+      } } }
+    } } }
+  }`,
+
+  '293initialForumByIds': `query InitialForumByIds($fids: [ID]) {
+    forums(filters: { id: { in: $fids } }) { data { id attributes {
+      subject spec done
+      project { data { id attributes {
+        projectName profilePic { data { attributes { url formats } } }
+      } } }
+      mesimabetahaliches { data { attributes { name } } }
+      sheiruts { data { attributes { name } } }
+      decisions(pagination: { limit: 5 }) { data { attributes { kind decisionName } } }
+      messages(filters: { archived: { ne: true } }, sort: ["when:asc"]) { data { id attributes {
+        content when
+        users_permissions_user { data { id attributes {
+          username profilePic { data { attributes { url formats } } }
+        } } }
+      } } }
+    } } }
+  }`,
+
   ...qids_base,
   ...moachQids
 };

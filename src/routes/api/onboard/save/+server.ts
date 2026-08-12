@@ -9,6 +9,8 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 
 import { STRAPI_URL as baseUrl } from '$lib/server/strapiUrl.js';
+import { strapiClient } from '$lib/server/actions/index.js';
+import { matchUserToOpenEntities } from '$lib/server/matching/engine';
 
 type SaveItem = { name: string; existingId?: string; descrip?: string };
 type Lang = 'he' | 'en' | 'ar';
@@ -138,7 +140,7 @@ async function createSps(items: SaveItem[], userId: string, jwt: string, lang: L
   return ids;
 }
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
   const userId = cookies.get('id');
   const jwt = cookies.get('jwt');
 
@@ -195,6 +197,24 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
   } else {
     // Nothing to persist — let caller surface it via message + counts, but don't block.
     updateError = 'no_items_selected';
+  }
+
+  // Onboarding is the one path where a profile is filled in without ever going
+  // through the `updateUserRelation` action, so it also has to trigger the
+  // precomputed match-suggestions (PLAN_MATCH_SUGGESTIONS). Without this the
+  // lev page greets a freshly onboarded user with "no suggestions, go add
+  // skills" — the exact thing they just finished doing. Best effort: the save
+  // itself has already succeeded and must not fail on a matching hiccup.
+  if (updated && (skillIds.length || roleIds.length || workWayIds.length)) {
+    try {
+      await matchUserToOpenEntities(userId, 'profileUpdated', {
+        strapi: strapiClient,
+        fetch,
+        lang
+      });
+    } catch (e) {
+      console.error('[onboard/save] match-suggestion refresh failed', e);
+    }
   }
 
   return json({

@@ -507,4 +507,11 @@ export const qidsAccess = {
   '289createPlanItem': { allow: ['serviceAdmin'] },
   '290updatePlanItem': { allow: ['serviceAdmin'] },
   '291getProjectPlanningContext': { allow: ['user', 'serviceAdmin'] },
+
+  // Chat/forum bootstrap (src/lib/stores/pendMisMes.js). '292initialForumAll'
+  // reads $idL, which +server.js overwrites with the `id` cookie, so a user can
+  // only ever pull their own forums. '293initialForumByIds' takes forum ids the
+  // client already learned from that first query.
+  '292initialForumAll': { allow: ['user', 'serviceAdmin'] },
+  '293initialForumByIds': { allow: ['user', 'serviceAdmin'] },
 };
