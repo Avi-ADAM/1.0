@@ -107,7 +107,15 @@ export const actions = {
         domain: isProduction ? '.1lev1.com' : undefined
       };
 
-      cookies.set('jwt', jwt, { ...cookieOptions, httpOnly: true });
+      // With email confirmation enabled, Strapi's register returns no jwt —
+      // the user gets one only after confirming. Setting it unconditionally
+      // wrote the literal string "undefined" into the cookie, which then looks
+      // like a session to everything downstream: SocketClient immediately tried
+      // to authenticate with it and logged "Invalid or expired JWT" on the very
+      // first screen after signup.
+      if (jwt) {
+        cookies.set('jwt', jwt, { ...cookieOptions, httpOnly: true });
+      }
       cookies.set('id', String(user.id), { ...cookieOptions, httpOnly: false });
       cookies.set('un', user.name || displayName || user.username, {
         ...cookieOptions,

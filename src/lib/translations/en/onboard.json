@@ -146,7 +146,7 @@
         },
         "missions": {
           "label": "Missions you are capable of doing",
-          "hint": "Click on a mission to remove · It can be edited and added later"
+          "hint": "Click a mission to mark that you can do it · It can be edited and added later"
         }
       },
       "close_to": "Close to: {{label}}",
@@ -161,7 +161,9 @@
         "saving": "Saving...",
         "edit": "Continue to edit ✍️"
       },
-      "next_hint": "In editing we will add more values, refine skills, select missions and resources from the lists on the site. You can always edit from the profile."
+      "next_hint": "In editing we will add more values, refine skills, select missions and resources from the lists on the site. You can always edit from the profile.",
+      "no_draft": "We couldn't find your analysis — it is kept in this browser only, and it looks like it was cleared or opened in a new tab. It is a short write-up, so you can run it again.",
+      "no_draft_cta": "Back to building your profile ←"
     },
     "tabs": {
       "values": "Values",

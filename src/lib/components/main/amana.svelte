@@ -1874,8 +1874,30 @@
     background: rgba(255, 255, 255, 0.06);
   }
 
+  /* Visually hidden, but still focusable and still in the accessibility tree.
+     `display: none` took this input out of the tab order entirely, so a
+     keyboard or screen-reader user could never tick the terms — and the submit
+     button stays disabled until they do, which blocked registration outright.
+     A mouse click on the label always worked; this is purely about the users
+     who never get a pointer. */
   .checkbox-input {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* The custom box is the only thing the user can see, so it has to carry the
+     focus ring on the input's behalf. */
+  .checkbox-input:focus-visible + .checkbox-custom {
+    outline: 3px solid #ffb800;
+    outline-offset: 3px;
   }
 
   .checkbox-custom {

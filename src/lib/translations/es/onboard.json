@@ -147,7 +147,7 @@
         },
         "missions": {
           "label": "Misiones que eres capaz de realizar",
-          "hint": "Haz clic en una misión para quitarla · Se puede editar y añadir más tarde"
+          "hint": "Haz clic en una misión para marcar que puedes hacerla · Se puede editar y añadir más tarde"
         }
       },
       "close_to": "Cercano a: {{label}}",
@@ -162,7 +162,9 @@
         "saving": "Guardando...",
         "edit": "Continuar para editar ✍️"
       },
-      "next_hint": "En la edición añadiremos más valores, afinaremos habilidades y seleccionaremos misiones y recursos de las listas del sitio. Siempre puedes editar desde el perfil."
+      "next_hint": "En la edición añadiremos más valores, afinaremos habilidades y seleccionaremos misiones y recursos de las listas del sitio. Siempre puedes editar desde el perfil.",
+      "no_draft": "No encontramos tu análisis — se guarda solo en este navegador, y parece que se borró o que esta es una pestaña nueva. Es un texto corto, puedes analizarlo de nuevo.",
+      "no_draft_cta": "Volver a crear tu perfil ←"
     },
     "tabs": {
       "values": "Valores",

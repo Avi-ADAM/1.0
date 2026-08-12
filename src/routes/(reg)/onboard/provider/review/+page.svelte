@@ -11,6 +11,7 @@
   import { skil } from '$lib/components/prPr/mi.js';
   import { get } from 'svelte/store';
   import { page } from '$app/state';
+  import { load as loadCvDraft } from '$lib/onboard/cvDraft';
 
   /**
    * @typedef {{
@@ -46,6 +47,7 @@
   let resourceState = $state({});
   let saving = $state(false);
   let error = $state('');
+  let missing = $state(false);
 
   const CATEGORIES = /** @type {const} */ ([
     'vallues',
@@ -56,14 +58,12 @@
   ]);
 
   onMount(() => {
-    try {
-      const raw = sessionStorage.getItem('onboard.cvResult');
-      if (raw) data = JSON.parse(raw);
-    } catch {
-      // ignore
-    }
+    data = loadCvDraft();
     if (!data) {
-      goto('/onboard/provider');
+      // No draft to review (new tab, cleared storage, or a mirror older than a
+      // day). This used to `goto('/onboard/provider')` on the spot, which threw
+      // the user back a step with no explanation for where their analysis went.
+      missing = true;
       return;
     }
     // Ensure vallues exists even if older sessionStorage data lacks it.
@@ -237,7 +237,14 @@
     class="content"
     in:scale={{ duration: 600, opacity: 0.5, start: 0.96, easing: quintOut }}
   >
-    {#if !data}
+    {#if missing}
+      <div class="tile-info">
+        <p>{$t('onboard.provider.review_page.no_draft')}</p>
+        <a class="btn btn-barbi" href="/onboard/provider">
+          {$t('onboard.provider.review_page.no_draft_cta')}
+        </a>
+      </div>
+    {:else if !data}
       <div class="tile-info">{$t('onboard.provider.review_page.loading')}</div>
     {:else}
       <Plaque title={$t('onboard.provider.review_page.plaque.title')} sub={$t('onboard.provider.review_page.plaque.sub')} />
@@ -414,9 +421,14 @@
       opacity 0.18s,
       transform 0.18s;
   }
+  /* "Not picked yet", not "deleted". A line-through at 0.45 opacity reads as
+     struck out, and since suggestions start off, a user opening this screen saw
+     most of what the AI found already crossed out — and reasonably concluded
+     there was nothing left to decide. A dashed outline says the same thing
+     (inactive) while still inviting a tap. */
   .chip.off {
-    opacity: 0.45;
-    text-decoration: line-through;
+    opacity: 0.7;
+    border-style: dashed;
   }
   /* The entry this suggestion is actually saved under. Kept readable even on an
      `off` chip — it is the one piece of information the user needs in order to
