@@ -535,7 +535,13 @@
     "whyMoveAmount": "מדוע להזיז את הסכום? (יתפרסם בצ'אט)",
     "submitProposal": "שליחת ההצעה",
     "explainProposal": "יש לנמק את ההצעה",
-    "addHours": "הוסף שעות"
+    "addHours": "הוסף שעות",
+    "approveAria": "אישור קבלת המשאב",
+    "reportApproveAria": "דיווח ואישור ההוצאה",
+    "objectAria": "התנגדות",
+    "proposeAmountAria": "הצעת סכום אחר",
+    "awaitingReport": "⏳ ממתין לדיווח האחראי",
+    "awaitingReportHint": "ניתן לאשר רק אחרי שהאחראי ידווח את ההוצאה החודשית"
   },
   "levchat": {
     "messagePlaceholder": "כתוב הודעה..."

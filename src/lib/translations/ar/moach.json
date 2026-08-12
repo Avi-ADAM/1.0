@@ -24,13 +24,19 @@
     "stopTimerFirst": "أوقف المؤقت قبل تقديم المهمة.",
     "saveTimerFirst": "هناك وقت غير محفوظ. احفظه أو امسحه قبل التقديم.",
     "sentForApproval": "أُرسلت المهمة إلى الشبكة للموافقة",
+    "missionCompleted": "اكتملت المهمة وسُجّلت في الشبكة",
     "uploadFailed": "فشل رفع الملف، يرجى المحاولة مرة أخرى",
     "awaitingApproval": "بانتظار الموافقة",
     "awaitingApprovalHint": "تم التقديم بالفعل وبانتظار موافقة أعضاء الشبكة"
   },
   "split": {
     "calc": "حاسبة التقسيم",
-    "status": "حالة التقسيم"
+    "status": "حالة التقسيم",
+    "calcIntro": "أدخل الربح المتراكم وسيعرض الحاسب ما يستحقه كل شخص",
+    "calcTable": "جدول الحساب",
+    "calcName": "الاسم",
+    "calcShareOfProfit": "الحصة من الربح",
+    "calcPercentInProject": "النسبة في المشروع"
   },
   "process": {
     "title": "صفحة عملية مفصلة",

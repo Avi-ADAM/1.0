@@ -26,6 +26,13 @@
 function bighand (){
 onProgres?.();
 }    
+/** Space/Enter on an SVG control behaves like a click. */
+function onActivate (e, handler = hosa){
+  if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+    e.preventDefault();
+    handler();
+  }
+}
 function hosa (){
 onHosa?.(); 
 }
@@ -148,7 +155,19 @@ function trym (){
     </g>
     {/if}
     {#if addM == false}
-    <g id="button"  onmouseenter={bighand} onclick={hosa} style="">
+    <!-- The primary "add a mission" control. As a bare <g onclick> it was
+         invisible to the keyboard and to screen readers; role/tabindex/label +
+         the key handler make it an actual button. -->
+    <g
+      id="button"
+      role="button"
+      tabindex="0"
+      aria-label={hosafa}
+      onmouseenter={bighand}
+      onclick={hosa}
+      onkeydown={onActivate}
+      style=""
+    >
       <title>{hosafa}</title>
       <g transform="matrix(0.029858, 0, 0, 0.024393, -126.193626, 345.094269)" style="">
         <g id="Layer_2" style=""/>
@@ -231,7 +250,7 @@ function trym (){
           </g>
         </g>
       </g>
-      <circle r="100" cy="-538.166" cx="-365.389" id="button" style="opacity: 0.3; fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1; fill: url(#linearGradient41720);" transform="matrix(-1, 0, 0, -1, 0, 0)" role="button"/>
+      <circle r="100" cy="-538.166" cx="-365.389" id="button-halo" style="opacity: 0.3; fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1; fill: url(#linearGradient41720);" transform="matrix(-1, 0, 0, -1, 0, 0)" aria-hidden="true"/>
     </g>
 
     {/if}
@@ -239,8 +258,17 @@ function trym (){
   
 
   {#if showText && openMS === false}
-    <g class="gg" transform="matrix(1, 0, 0, 1, -1.574639, 41.588951)"  onclick={trym} style="">
-      <title>הצגת ועריכת פעולות פתוחות</title>
+    <g
+      class="gg"
+      role="button"
+      tabindex="0"
+      aria-label={$t('project.misc.showOpenActions')}
+      transform="matrix(1, 0, 0, 1, -1.574639, 41.588951)"
+      onclick={trym}
+      onkeydown={(e) => onActivate(e, trym)}
+      style=""
+    >
+      <title>{$t('project.misc.showOpenActions')}</title>
       <rect style=  "opacity: 0.9; fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1; " id="rect-1" width="340.857" height="100.571" x="202.619" y="620.895" ry="2.542"/>
       <text dominant-baseline="middle" style= "text-anchor: middle; font-style: normal; font-weight: normal; font-size: 96.8301px; line-height: 125%; font-family: sans-serif; letter-spacing: 0px; word-spacing: 0px; fill: rgb(171, 55, 200); fill-opacity: 1; stroke: none; stroke-width: 1px; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 1; white-space: pre;" x="371" y="682.429" id="text4238"><tspan id="tspan4240" x="371" y="682.429" style="text-anchor: middle; font-size: 96.8px; word-spacing: 0px;">{noofopen}</tspan></text>
       <text id= "text-4" y="682.429" x="371" dominant-baseline="middle" style=" text-anchor: middle; font-style: normal; font-weight: normal; font-size: 96.8301px; line-height: 125%; font-family: sans-serif; letter-spacing: 0px; word-spacing: 0px; fill-opacity: 1; stroke: none; stroke-width: 1px; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 1; white-space: pre; fill: url(#linearGradient4248-1);"><tspan y="682.429" x="371" id="tspan4246" style=" text-anchor: middle; fill-opacity: 1; font-size: 96.8px; word-spacing: 0px; fill: url(#linearGradient42481);">{noofopen}</tspan></text>
@@ -253,6 +281,15 @@ function trym (){
 
 
 <style>
+  /* SVG group acting as the add-mission button — the cursor and focus ring
+     that a real <button> gives for free. */
+  #button {
+    cursor: pointer;
+  }
+  #button:focus-visible {
+    outline: 3px solid #ffd700;
+    outline-offset: 2px;
+  }
     
 #curve {
     fill: transparent;

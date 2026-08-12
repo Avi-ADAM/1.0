@@ -19,7 +19,7 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { matchOpenMissionToUsers } from '$lib/server/matching/engine';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
-import { voteUrl } from './actionUtils.js';
+import { voteUrl, gqlString } from './actionUtils.js';
 
 // Helper: normalise a vote component row to a plain object for GraphQL variables
 function normalizeVote(v: any): Record<string, any> {
@@ -165,17 +165,17 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
         mission: "${missionId}",
         iskvua: ${attrs.iskvua ?? false},
         work_ways: [${workwayIds.join(',')}],
-        hearotMeyuchadot: """${(attrs.hearotMeyuchadot ?? '').replace(/"""/g, '"')}""",
-        name: "${(attrs.name ?? '').replace(/"/g, '\\"')}",
+        hearotMeyuchadot: ${gqlString(attrs.hearotMeyuchadot)},
+        name: ${gqlString(attrs.name)},
         publishedAt: "${now.toISOString()}",
-        descrip: """${(attrs.descrip ?? '').replace(/"""/g, '"')}""",
+        descrip: ${gqlString(attrs.descrip)},
         skills: [${skillIds.join(',')}],
         tafkidims: [${tafkidimIds.join(',')}],
         vallues: [${vallueIds.join(',')}],
         noofhours: ${attrs.noofhours ?? 0},
         perhour: ${attrs.perhour ?? 0},
-        privatlinks: """${(attrs.privatlinks ?? '').replace(/"""/g, '"')}""",
-        publicklinks: """${(attrs.publicklinks ?? '').replace(/"""/g, '"')}""",
+        privatlinks: ${gqlString(attrs.privatlinks)},
+        publicklinks: ${gqlString(attrs.publicklinks)},
         pendm: "${pendId}",
         ${assigneeId ? `isRishon: true, rishon: "${assigneeId}", archived: true,` : ''}
         ${sqadualedFrag}

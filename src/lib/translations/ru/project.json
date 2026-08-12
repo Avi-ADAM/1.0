@@ -352,7 +352,9 @@
     "sidurInDev": "В активной разработке — скоро здесь можно будет смотреть и составлять смены",
     "openActions": "Открытые действия",
     "awaitingHolderConsent": "Ожидает согласия {{holderName}}",
-    "verifiedSelf": "Подтверждено (самостоятельно)"
+    "verifiedSelf": "Подтверждено (самостоятельно)",
+    "showOpenActions": "Показать и изменить открытые действия",
+    "showResourceRequests": "Показать запросы ресурсов"
   },
   "recurringCycle": {
     "month": "Месяц",

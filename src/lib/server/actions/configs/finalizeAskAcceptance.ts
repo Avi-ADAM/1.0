@@ -4,6 +4,7 @@ import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { evaluateAskAcceptance } from '$lib/server/nego/askAcceptance.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
 import { resolveAcceptedActs } from '../helpers/roundActs.js';
+import { gqlString } from './actionUtils.js';
 
 function formatVotesForInline(votes: any[]): string {
   if (!Array.isArray(votes) || votes.length === 0) return '';
@@ -145,14 +146,14 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
     createMesimabetahalich(data: {
       project: "${projectId}",
       mission: "${missId}",
-      hearotMeyuchadot: "${finalHearotMeyuchadot}",
-      name: "${finalName}",
-      descrip: "${finalMissionDetails}",
+      hearotMeyuchadot: ${gqlString(finalHearotMeyuchadot)},
+      name: ${gqlString(finalName)},
+      descrip: ${gqlString(finalMissionDetails)},
       hoursassinged: ${finalNhours},
       perhour: ${finalValph},
       iskvua: ${iskvua},
-      privatlinks: "${privatlinks}",
-      publicklinks: "${publicklinks}",
+      privatlinks: ${gqlString(privatlinks)},
+      publicklinks: ${gqlString(publicklinks)},
       users_permissions_user: "${acceptedUserId}",
       tafkidims: [${tafkidimsStr}],
       publishedAt: "${now}",

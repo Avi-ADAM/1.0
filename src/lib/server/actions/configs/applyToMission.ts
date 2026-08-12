@@ -1,5 +1,6 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
+import { gqlString } from './actionUtils.js';
 
 const applyToMissionHandler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const { openMissionId, projectId } = params;
@@ -229,14 +230,14 @@ const applyToMissionHandler: ActionExecutionHandler = async (params, context, { 
       createMesimabetahalich(data: {
         project: "${projectId}",
         mission: "${missId}",
-        hearotMeyuchadot: "${omAttrs.hearotMeyuchadot ?? ''}",
-        name: "${omAttrs.name ?? ''}",
-        descrip: "${omAttrs.descrip ?? ''}",
+        hearotMeyuchadot: ${gqlString(omAttrs.hearotMeyuchadot)},
+        name: ${gqlString(omAttrs.name)},
+        descrip: ${gqlString(omAttrs.descrip)},
         hoursassinged: ${omAttrs.noofhours ?? 0},
         perhour: ${omAttrs.perhour ?? 0},
         iskvua: ${iskvua},
-        privatlinks: "${omAttrs.privatlinks ?? ''}",
-        publicklinks: "${omAttrs.publicklinks ?? ''}",
+        privatlinks: ${gqlString(omAttrs.privatlinks)},
+        publicklinks: ${gqlString(omAttrs.publicklinks)},
         users_permissions_user: "${context.userId}",
         tafkidims: [${tafkidimsStr}],
         publishedAt: "${nowISO}",

@@ -18,5 +18,11 @@
   "clearSuccess": "Timers cleared successfully",
   "clearError": "Failed to clear timers",
   "saveSuccess": "Timer saved successfully",
-  "saveError": "Error saving timer"
+  "saveError": "Error saving timer",
+  "stoppedAfter": "Timer stopped at {{duration}}. Would you like to save this time or clear it?",
+  "noTimerYet": "No time has been recorded on this mission yet. Start a timer, or clear and begin again.",
+  "calendarToday": "today",
+  "calendarPrevWeek": "Previous week",
+  "calendarNextWeek": "Next week",
+  "calendarAllDay": "all-day"
 }

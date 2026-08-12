@@ -24,13 +24,19 @@
     "stopTimerFirst": "יש לעצור את הטיימר לפני הגשת המשימה.",
     "saveTimerFirst": "יש זמן שלא נשמר. יש לשמור או לאפס לפני ההגשה.",
     "sentForApproval": "המשימה נשלחה לאישור הרִקמה",
+    "missionCompleted": "המשימה הושלמה ונרשמה בריקמה",
     "uploadFailed": "העלאת הקובץ נכשלה, יש לנסות שוב",
     "awaitingApproval": "ממתין לאישור",
     "awaitingApprovalHint": "המשימה כבר הוגשה וממתינה לאישור חברי הרִקמה"
   },
   "split": {
     "calc": "מחשבון חלוקה",
-    "status": "מצב חלוקות"
+    "status": "מצב חלוקות",
+    "calcIntro": "יש להזין את סכום הרווח שנצבר והמחשבון יציג כמה מגיע לכל אחד",
+    "calcTable": "טבלת חישוב",
+    "calcName": "שם",
+    "calcShareOfProfit": "החלק מהרווח",
+    "calcPercentInProject": "אחוז בפרויקט"
   },
   "process": {
     "title": "עמוד תהליך מפורט",

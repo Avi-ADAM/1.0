@@ -134,6 +134,13 @@
   let awaitingReport = $derived(
     isRecurringCycle && !isResponsible && !cycleReported
   );
+  // Accessible names for the two icon-only actions on this card.
+  let approveLabel = $derived(
+    isResponsible ? $t('lev.weget.reportApproveAria') : $t('lev.weget.approveAria')
+  );
+  let objectLabel = $derived(
+    isRecurringCycle ? $t('lev.weget.proposeAmountAria') : $t('lev.weget.objectAria')
+  );
   let amountInput = $state(0);
   // Counter-offer (negotiation) on a recurring cycle.
   let nego = $state(false);
@@ -908,19 +915,24 @@
               <p
                 class="cd"
                 style="grid-column:1/3; grid-row:4/5; margin:0; font-size:8px; line-height:1.1; color:#9aa0a6; text-align:center;"
-                onmouseenter={() => hover('ניתן לאשר רק אחרי שהאחראי ידווח את ההוצאה החודשית')}
+                onmouseenter={() => hover($t('lev.weget.awaitingReportHint'))}
                 onmouseleave={() => hover('0')}
               >
-                ⏳ ממתין לדיווח האחראי
+                {$t('lev.weget.awaitingReport')}
               </p>
             {:else if !already}
+              <!-- Icon-only, and it is the ONLY control that closes a resource
+                   receipt — without a name it is invisible to a screen reader
+                   and unexplained to everyone else until they hover. -->
               <button
-                onmouseenter={() => hover(isResponsible ? 'דיווח ואישור ההוצאה' : 'אישור')}
+                onmouseenter={() => hover(approveLabel)}
                 onmouseleave={() => hover('0')}
                 onclick={agree}
                 style="margin: 0;"
                 class="btn ga"
                 name="requestToJoin"
+                aria-label={approveLabel}
+                title={approveLabel}
                 ><svg
                   xmlns="http://www.w3.org/2000/svg"
                   xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -937,12 +949,14 @@
                    recurring cycle — they set the amount via the heart (report). -->
               {#if !(isRecurringCycle && isResponsible)}
               <button
-                onmouseenter={() => hover(isRecurringCycle ? 'הצעת סכום אחר' : 'התנגדות')}
+                onmouseenter={() => hover(objectLabel)}
                 onmouseleave={() => hover('0')}
                 onclick={isRecurringCycle ? counter : open}
                 style="margin: 0;"
                 class="btn gb"
                 name="decline"
+                aria-label={objectLabel}
+                title={objectLabel}
                 ><svg
                   xmlns="http://www.w3.org/2000/svg"
                   xmlns:xlink="http://www.w3.org/1999/xlink"

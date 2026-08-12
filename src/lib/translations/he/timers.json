@@ -18,5 +18,11 @@
   "clearSuccess": "ניקוי הטיימרים בוצע בהצלחה",
   "clearError": "ניקוי הטיימרים נכשל",
   "saveSuccess": "הטיימר נשמר בהצלחה",
-  "saveError": "שגיאה בשמירת הטיימר"
+  "saveError": "שגיאה בשמירת הטיימר",
+  "stoppedAfter": "הטיימר נעצר לאחר {{duration}}. האם ברצונך לשמור את הזמן או לנקות אותו?",
+  "noTimerYet": "עדיין לא נרשם זמן על המשימה הזו. אפשר להפעיל טיימר, או לנקות ולהתחיל מחדש.",
+  "calendarToday": "היום",
+  "calendarPrevWeek": "השבוע הקודם",
+  "calendarNextWeek": "השבוע הבא",
+  "calendarAllDay": "כל היום"
 }

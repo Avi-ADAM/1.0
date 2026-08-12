@@ -24,13 +24,19 @@
     "stopTimerFirst": "Stop the timer before submitting the mission.",
     "saveTimerFirst": "There is unsaved time. Save it or clear it before submitting.",
     "sentForApproval": "The mission was sent to the rikma for approval",
+    "missionCompleted": "Mission completed and recorded in the rikma",
     "uploadFailed": "The file upload failed, please try again",
     "awaitingApproval": "awaiting approval",
     "awaitingApprovalHint": "Already submitted and waiting for the rikma members to approve"
   },
   "split": {
     "calc": "Split Calculator",
-    "status": "Split Status"
+    "status": "Split Status",
+    "calcIntro": "Enter the accrued profit and the calculator will show what each person is owed",
+    "calcTable": "Calculation table",
+    "calcName": "Name",
+    "calcShareOfProfit": "Share of the profit",
+    "calcPercentInProject": "Percent of the project"
   },
   "process": {
     "title": "Detailed process page",

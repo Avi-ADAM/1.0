@@ -352,7 +352,9 @@
     "sidurInDev": "Under active development — shift viewing and scheduling are coming here soon",
     "openActions": "Open actions",
     "awaitingHolderConsent": "Awaiting {{holderName}}'s consent",
-    "verifiedSelf": "Verified (self)"
+    "verifiedSelf": "Verified (self)",
+    "showOpenActions": "Show and edit open actions",
+    "showResourceRequests": "Show resource requests"
   },
   "recurringCycle": {
     "month": "Month",

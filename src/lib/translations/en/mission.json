@@ -112,6 +112,7 @@
     "userIdNotFound": "User ID not found",
     "splitCreated": "Split created successfully!",
     "errorCreatingSplit": "Error creating split",
+    "splitApproved": "Split created and approved — nobody else to wait for 🙂",
     "cards": "Cards",
     "table": "Table",
     "balanced": "Balanced",

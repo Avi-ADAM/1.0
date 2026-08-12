@@ -130,6 +130,15 @@
 
   let q = $derived(search.trim().toLowerCase());
 
+  /**
+   * Missions the server closed outright in this session (solo rikma — the
+   * finish needs nobody else's approval). They are no longer in progress, so
+   * they leave the board immediately instead of sitting under a ⏳ badge that
+   * waits for an approval that was never created.
+   * @type {Record<string, boolean>}
+   */
+  let completedNow = $state({});
+
   let shown = $derived(
     (bmiData ?? []).filter((m) => {
       if (mineOnly && !isMine(m)) return false;
@@ -138,6 +147,7 @@
         if (!ids.some((id) => activeRoles.includes(id))) return false;
       }
       if (q && !haystack(m).includes(q)) return false;
+      if (completedNow[String(m.id)]) return false;
       return true;
     })
   );
@@ -540,7 +550,10 @@
                 pendingApproval={isPending(m)}
                 compact={true}
                 onStatus={(value) => (statusOverride = { ...statusOverride, [String(m.id)]: value })}
-                onCompleted={() => (submitted = { ...submitted, [String(m.id)]: true })}
+                onCompleted={(outcome) =>
+                  outcome === 'completed'
+                    ? (completedNow = { ...completedNow, [String(m.id)]: true })
+                    : (submitted = { ...submitted, [String(m.id)]: true })}
                 onTimerSaved={loadSegments}
               />
             </div>

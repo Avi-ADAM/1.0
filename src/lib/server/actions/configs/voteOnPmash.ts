@@ -18,6 +18,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { matchOpenMashaabimToUsers } from '$lib/server/matching/engine';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
+import { gqlString } from './actionUtils.js';
 
 function normalizeVote(v: any): Record<string, any> {
   const uid =
@@ -153,14 +154,14 @@ const voteOnPmashHandler: ActionExecutionHandler = async (params, context, { str
     const combinedMutation = `mutation {
       createOpenMashaabim(data: {
         project: "${projectId}",
-        spnot: """${(attrs.spnot ?? '').replace(/"""/g, '"')}""",
-        name: "${(attrs.name ?? '').replace(/"/g, '\\"')}",
-        descrip: """${(attrs.descrip ?? '').replace(/"""/g, '"')}""",
+        spnot: ${gqlString(attrs.spnot)},
+        name: ${gqlString(attrs.name)},
+        descrip: ${gqlString(attrs.descrip)},
         kindOf: ${attrs.kindOf ?? 'total'},
         hm: ${attrs.hm ?? 0},
         price: ${attrs.price ?? 0},
         easy: ${attrs.easy ?? 0},
-        linkto: "${(attrs.linkto ?? '').replace(/"/g, '\\"')}",
+        linkto: ${gqlString(attrs.linkto)},
         pmash: "${pmashId}",
         publishedAt: "${now.toISOString()}",
         mashaabim: "${mshaabId}",

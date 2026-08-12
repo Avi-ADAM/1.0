@@ -7935,9 +7935,13 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
    * existing project names for the uniqueness check). `crVallue` mints any
    * vallue the user typed that doesn't exist yet. `crWeaveFull` creates the
    * project itself with all the form fields (creator = sole member). */
+  // `locale` on each localization so the client can pick the row for the user's
+  // language instead of blindly taking localizations[0] — and can tell an
+  // untranslated value apart from a translated one (an untranslated row used to
+  // surface its raw slug, e.g. "altroisem", inside the Hebrew picker).
   'baciFormData': `query BaciFormData {
     vallues(sort: "valueName:asc") {
-      data { id attributes { valueName localizations { data { attributes { valueName } } } } }
+      data { id attributes { valueName localizations { data { attributes { valueName locale } } } } }
     }
     projects { data { attributes { projectName } } }
   }`,

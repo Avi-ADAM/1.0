@@ -8,6 +8,7 @@
   import RichText from '$lib/celim/ui/richText.svelte';
   import { invalidate } from '$app/navigation';
   import DonateDialog from '$lib/components/revenue/DonateDialog.svelte';
+  import { htmlExcerpt } from '$lib/text/htmlExcerpt';
 
   let { data } = $props();
 
@@ -291,8 +292,12 @@
                   {/if}
                 </div>
 
-                {#if om.attributes.descrip}
-                  <p class="text-white/60 text-sm line-clamp-3">{om.attributes.descrip}</p>
+                <!-- `descrip` is tiptap HTML — printing it raw showed visitors
+                     the literal `<p style="text-align: right;">…</p>` markup. -->
+                {#if htmlExcerpt(om.attributes.descrip)}
+                  <p class="text-white/60 text-sm line-clamp-3">
+                    {htmlExcerpt(om.attributes.descrip)}
+                  </p>
                 {/if}
 
                 <div class="flex flex-wrap items-center gap-2 text-sm text-white/70">

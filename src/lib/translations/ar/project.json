@@ -352,7 +352,9 @@
     "sidurInDev": "قيد التطوير النشط — قريبًا ستتمكن من عرض المناوبات وتنظيمها هنا",
     "openActions": "إجراءات مفتوحة",
     "awaitingHolderConsent": "بانتظار موافقة {{holderName}}",
-    "verifiedSelf": "مؤكَّد (ذاتيًا)"
+    "verifiedSelf": "مؤكَّد (ذاتيًا)",
+    "showOpenActions": "عرض الإجراءات المفتوحة وتعديلها",
+    "showResourceRequests": "عرض طلبات الموارد"
   },
   "recurringCycle": {
     "month": "الشهر",
