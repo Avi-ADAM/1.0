@@ -373,7 +373,7 @@
 </script>
 
 <div
-  class="w-full px-2 text-center bg-gold dark:bg-barbi dark:text-gold text-barbi"
+  class="acts-grid w-full px-2 text-center bg-gold dark:bg-barbi dark:text-gold text-barbi"
   dir={$isRtl ? 'rtl' : 'ltr'}
 >
   <div class="flex items-center gap-2">
@@ -439,3 +439,17 @@
   <Grid data={filteredActs} bind:columns {theme} {paging} />
   <span dir="ltr"> <GridFooter data={filteredActs} {theme} bind:paging /></span>
 </div>
+
+<style>
+  /* GridCraft's Preline theme hard-codes its row surfaces and brightens them
+     on hover (`dark:bg-slate-700/800` → `dark:hover:bg-slate-500`). In dark
+     mode the cell ink here is inherited `dark:text-gold`, which is
+     near-white — #eee8aa in personal, #f1f5fb in professional — so the
+     hovered row moved *toward* the ink and the task name all but vanished.
+     Hover on a darker surface instead, so the row still reacts to the pointer
+     while the ink keeps its contrast. Light mode is untouched: there the ink
+     is `text-barbi` and a pale hover row reads fine. */
+  :global(.dark) .acts-grid :global(tbody tr:hover) {
+    background-color: var(--s3);
+  }
+</style>
