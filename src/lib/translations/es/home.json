@@ -62,7 +62,8 @@
     "title": "¿Dónde estás hoy?",
     "a1": "Tengo una asociación (o una idea para una)",
     "a2": "Busco un proyecto al que unirme",
-    "a3": "Solo quiero ver el sistema"
+    "a3": "Solo quiero ver el sistema",
+    "a4": "Quiero entenderlo antes de empezar"
   },
   "sections": {
     "problemTitle": "¿Conoces esa sensación?",
