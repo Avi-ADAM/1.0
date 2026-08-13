@@ -28,6 +28,12 @@
  */
 
 import { env } from '$env/dynamic/private';
+// The owner's chat id comes from the *static* module, the same way `/api/ste`
+// and `/api/report` read it. Those are the two places that actually send
+// Telegram today, and a var that only exists at build time would read back
+// empty through the dynamic module — turning the notification into a silent
+// no-op, which is the one failure mode this whole endpoint exists to avoid.
+import { NEW_TELEGRAM } from '$env/static/private';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { createDemoTasks, centralRikmaId } from '$lib/server/demo/centralRikmaTasks.js';
 import { createDemoMeeting } from '$lib/server/demo/demoMeeting.js';
@@ -104,14 +110,44 @@ function adminToken(): string {
   return t;
 }
 
-async function notifyTelegram(text: string): Promise<void> {
-  const token = env.TELEGRAM_BOT_TOKEN_NEW;
-  const chatId = env.NEW_TELEGRAM;
-  if (!token || !chatId) return;
-  await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+/**
+ * Telegram's HTML mode rejects a message with a stray `&`, `<` or `>`, and the
+ * lead's own words go straight into one — so escape anything they wrote.
+ */
+function esc(v: string): string {
+  return v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+/**
+ * Notify the site owner through the existing bot at `/api/ste`.
+ *
+ * `/api/ste` has two shapes. The `{name, action, det}` one interpolates
+ * straight into a `sendMessage?text=…` query string without encoding, which is
+ * fine for the short telemetry lines that use it but would silently truncate a
+ * demo request at the first `&` or `#` someone types into the free-text field.
+ * The `isNew` shape POSTs through Telegraf instead, so it survives arbitrary
+ * text — and adds the inline "לצפייה ב‑1💗1" button. It wants an explicit
+ * `chat_id`, which is the owner's chat, the same destination the other shape
+ * defaults to.
+ */
+async function notifyOwner(
+  fetchFn: typeof globalThis.fetch,
+  title: string,
+  message: string
+): Promise<void> {
+  if (!NEW_TELEGRAM) return;
+  await fetchFn('/api/ste', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'Markdown' })
+    body: JSON.stringify({
+      isNew: true,
+      chat_id: NEW_TELEGRAM,
+      det: title,
+      message,
+      // The button lands on the heart page, where the two new tasks are waiting.
+      urladd: 'lev',
+      lang: 'he'
+    })
   });
 }
 
@@ -255,33 +291,33 @@ export const POST: RequestHandler = async ({ request, fetch, getClientAddress })
     }
   }
 
-  // ── 5. Tell the team ──────────────────────────────────────────────────────
+  // ── 5. Tell the owner ─────────────────────────────────────────────────────
   try {
     const projectId = centralRikmaId();
-    await notifyTelegram(
+    await notifyOwner(
+      fetch,
+      '💗 בקשה לדמו אישי',
       [
-        '💗 *בקשה לדמו אישי* — 1💗1',
-        '',
-        `👤 ${name}`,
-        email ? `📧 ${email}` : null,
-        phone ? `📱 ${phone}` : null,
+        `👤 <b>${esc(name)}</b>`,
+        email ? `📧 ${esc(email)}` : null,
+        phone ? `📱 ${esc(phone)}` : null,
         `🎯 ${TRACK_LABELS[track]}`,
-        `🕒 ${TIME_MODE_LABELS[timeMode]}${preferredTime ? ` · ${preferredTime}` : ''}`,
-        `🌐 ${lang} · 📍 ${page || '—'} · ${source}`,
+        `🕒 ${TIME_MODE_LABELS[timeMode]}${preferredTime ? ` · ${esc(preferredTime)}` : ''}`,
+        `🌐 ${esc(lang)} · 📍 ${esc(page || '—')} · ${esc(source)}`,
         strapiId ? `🗄 demo-request #${strapiId}` : null,
-        meetingLink ? `🚪 פגישת אורח: ${meetingLink}` : null,
+        meetingLink ? `🚪 פגישת אורח: ${esc(meetingLink)}` : null,
         tasks.coordActId && projectId
           ? `🛠️ מטלות בריקמה המרכזית: ${[tasks.coordActId, tasks.callActId]
               .filter(Boolean)
               .join(', ')}`
           : null,
-        goal ? `\n*מה הם רוצים ליצור:*\n${goal}` : null
+        goal ? `\n<b>מה הם רוצים ליצור:</b>\n${esc(goal)}` : null
       ]
         .filter((l) => l !== null)
         .join('\n')
     );
   } catch (e) {
-    console.error('[demo] Telegram notification error:', e);
+    console.error('[demo] owner notification error:', e);
     warnings.push('telegram:error');
   }
 

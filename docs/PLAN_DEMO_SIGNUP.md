@@ -130,10 +130,28 @@ visitor asking for a demo is exactly the intended caller):
 2. save the `demo-request` row;
 3. open the two unassigned central-rikma Acts (which notify the rikma);
 4. write the task ids back onto the row;
-5. Telegram the team.
+5. ping the owner on Telegram.
 
 Only step 2 is fatal. The lead is the thing that must not be lost, so
 everything else is best-effort and reports back in a `warnings` array.
+
+### The owner ping
+
+Step 5 goes through the site's existing bot at **`/api/ste`**, not a fresh
+Telegram call — same bot, same chat, alongside every other owner notification.
+
+It uses that endpoint's `isNew` shape rather than the `{name, action, det}`
+one. The latter interpolates into a `sendMessage?text=…` query string with no
+encoding, which is fine for the short telemetry lines that use it but would
+truncate a demo request at the first `&` or `#` somebody types into the
+free-text field. `isNew` POSTs through Telegraf, survives arbitrary text, and
+carries the inline "לצפייה ב‑1💗1" button — pointed at `/lev`, where the two
+new tasks are waiting. It needs an explicit `chat_id`, so `/api/demo` reads
+`NEW_TELEGRAM` from `$env/static/private` — the same module `/api/ste` and
+`/api/report` read it from, because a build-time-only var would come back empty
+through the dynamic module and turn the notification into a silent no-op.
+
+Since the message is HTML, everything the lead wrote is escaped on the way in.
 
 The bot reaches the same endpoint through `requestDemoTool`
 (`src/mastra/tools/requestDemoTool.ts`), with identical body and
