@@ -139,7 +139,8 @@
     "urgency": "דחיפות",
     "myTasks": "מטלות שאני מבצע",
     "myCreatedTasks": "מטלות שיצרתי",
-    "pendingAssignment": "מטלות ממתינות להשמה"
+    "pendingAssignment": "מטלות ממתינות להשמה",
+    "takeTask": "אני אבצע"
   },
   "chooseM": {
     "heading": "בחירת משימה בתהליך",

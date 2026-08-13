@@ -136,6 +136,9 @@
           pendingValidation: row.naasa && !row.valiIshur,
           isCompleted: row.naasa && row.valiIshur,
           progress: row.status || 0,
+          // Unassigned rows render as a bare "take it" button — without this the
+          // Button has no label at all (its `text` defaults to '').
+          text: $t('mission.actsTable.takeTask'),
           onClick: () => handleTaskClick(row, type, mid, isOpen, isPend),
           onApprove: () => handleApprove(row.id),
           onValidate: () => handleValidate(row.id)

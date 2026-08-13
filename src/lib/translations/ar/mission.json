@@ -139,7 +139,8 @@
     "urgency": "الأولوية",
     "myTasks": "مهامي المعيّنة",
     "myCreatedTasks": "المهام التي أنشأتها",
-    "pendingAssignment": "مهام في انتظار التعيين"
+    "pendingAssignment": "مهام في انتظار التعيين",
+    "takeTask": "سأقوم بها"
   },
   "chooseM": {
     "heading": "اختيار المهمة المتابعة",

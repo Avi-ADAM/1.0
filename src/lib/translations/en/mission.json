@@ -139,7 +139,8 @@
     "urgency": "Urgency",
     "myTasks": "my assigned tasks",
     "myCreatedTasks": "tasks I created",
-    "pendingAssignment": "tasks pending assignment"
+    "pendingAssignment": "tasks pending assignment",
+    "takeTask": "I'll do it"
   },
   "chooseM": {
     "heading": "choose mission in progress",

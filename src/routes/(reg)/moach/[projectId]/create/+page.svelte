@@ -387,6 +387,8 @@
 <div class="create-page p-4">
 
   {#if preparingMission}
+    <!-- On the page background, not on the ramp — so this one uses the token
+         that follows the mode (--stgold), not --ramp-ink. -->
     <p class="max-w-4xl mx-auto mt-6 text-center text-sm text-[color:var(--stgold,#574010)]">
       {$t('moach.create.preparingMission')}
     </p>
@@ -405,11 +407,11 @@
         🤖
       </div>
       <div class="flex flex-col gap-0.5 text-center sm:text-start flex-1 min-w-0">
-        <span class="text-xs font-semibold tracking-wide uppercase text-[color:var(--stgold,#574010)]">
+        <span class="text-xs font-semibold tracking-wide uppercase text-[color:var(--ramp-ink,#16131b)]">
           {$t('moach.create.aiBanner.eyebrow')}
         </span>
-        <p class="font-bold text-lg text-[color:var(--stgold,#574010)]">{$t('moach.create.aiBanner.title')}</p>
-        <p class="text-sm text-[color:var(--stgold,#574010)]">{$t('moach.create.aiBanner.desc')}</p>
+        <p class="font-bold text-lg text-[color:var(--ramp-ink,#16131b)]">{$t('moach.create.aiBanner.title')}</p>
+        <p class="text-sm text-[color:var(--ramp-ink,#16131b)]">{$t('moach.create.aiBanner.desc')}</p>
       </div>
       <div
         class="shrink-0 flex items-center gap-1.5 bg-barbi text-white font-bold px-4 py-2 rounded-xl group-hover:bg-white group-hover:text-barbi transition-all duration-300 text-sm whitespace-nowrap"
@@ -428,69 +430,107 @@
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto py-12">
 
       <!-- משימה -->
-      <div class="flex flex-col items-center gap-3 p-6 border border-barbi rounded-2xl bg-gradient-to-br from-gra via-grb to-gre drop-shadow-lg shadow-gold">
-        <h3 class="text-lg font-bold">{$t('moach.create.mission')}</h3>
-        <p class="text-sm text-gray-500 text-center">{$t('moach.create.missionDesc')}</p>
-        {#if hovered}
-          <button onclick={hosa} onmouseleave={() => (hovered = false)}>
-            <img
-              title={$t('moach.create.hosafa')}
-              style="max-width:45vw; max-height:45vw;"
-              width="240"
-              height="240"
-              src="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg"
-              alt="add mission"
+      <div class="create-card flex flex-col items-center gap-3 p-6 border border-barbi rounded-2xl bg-gradient-to-br from-gra via-grb to-gre drop-shadow-lg shadow-gold">
+        <h3 class="text-lg font-bold text-[color:var(--ramp-ink,#16131b)] theme-personal-only">{$t('moach.create.mission')}</h3>
+        <p class="text-sm text-center text-[color:var(--ramp-ink,#16131b)]">{$t('moach.create.missionDesc')}</p>
+
+        <div class="theme-personal-only flex flex-col items-center">
+          {#if hovered}
+            <button onclick={hosa} onmouseleave={() => (hovered = false)}>
+              <img
+                title={$t('moach.create.hosafa')}
+                style="max-width:45vw; max-height:45vw;"
+                width="240"
+                height="240"
+                src="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg"
+                alt="add mission"
+              />
+            </button>
+          {:else}
+            <Hand
+              onHosa={hosa}
+              onProgres={bighand}
+              onTrym={trym}
+              {noofopen}
+              {openMS}
+              {addM}
+              hosafa={$t('moach.create.hosafa')}
             />
+          {/if}
+        </div>
+
+        <div class="theme-business-only pro-actions">
+          <button type="button" class="pro-btn" onclick={hosa} title={$t('moach.create.hosafa')}>
+            <svg class="pro-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+            {$t('moach.create.mission')}
           </button>
-        {:else}
-          <Hand
-            onHosa={hosa}
-            onProgres={bighand}
-            onTrym={trym}
-            {noofopen}
-            {openMS}
-            {addM}
-            hosafa={$t('moach.create.hosafa')}
-          />
-        {/if}
+          <button type="button" class="pro-sub" onclick={trym}>
+            {$t('project.misc.showOpenActions')}
+            <span class="pro-count">{noofopen}</span>
+          </button>
+        </div>
       </div>
 
       <!-- משאב -->
-      <div class="flex flex-col items-center gap-3 p-6 border border-barbi rounded-2xl bg-gradient-to-br from-gra via-grb to-gre drop-shadow-lg shadow-gold">
-        <h3 class="text-lg font-bold">{$t('moach.create.resource')}</h3>
-        <p class="text-sm text-gray-500 text-center">{$t('moach.create.resourceDesc')}</p>
-        {#if hoveredd}
-          <button onclick={() => (addN = true)} onmouseleave={() => (hoveredd = false)}>
-            <img
-              title={$t('moach.create.hosafat')}
-              style="max-width:45vw; max-height:45vw;"
-              width="240"
-              height="240"
-              src="https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg"
-              alt="add resource"
+      <div class="create-card flex flex-col items-center gap-3 p-6 border border-barbi rounded-2xl bg-gradient-to-br from-gra via-grb to-gre drop-shadow-lg shadow-gold">
+        <h3 class="text-lg font-bold text-[color:var(--ramp-ink,#16131b)] theme-personal-only">{$t('moach.create.resource')}</h3>
+        <p class="text-sm text-center text-[color:var(--ramp-ink,#16131b)]">{$t('moach.create.resourceDesc')}</p>
+
+        <div class="theme-personal-only flex flex-col items-center">
+          {#if hoveredd}
+            <button onclick={() => (addN = true)} onmouseleave={() => (hoveredd = false)}>
+              <img
+                title={$t('moach.create.hosafat')}
+                style="max-width:45vw; max-height:45vw;"
+                width="240"
+                height="240"
+                src="https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg"
+                alt="add resource"
+              />
+            </button>
+          {:else}
+            <Handd
+              {addN}
+              {openMA}
+              hosafat={$t('moach.create.hosafat')}
+              noofopenm={combinedResources.length}
+              onMasi={() => (addN = true)}
+              onBighandd={() => (hoveredd = !hoveredd)}
+              onTrym={() => (openMA = true)}
             />
+          {/if}
+        </div>
+
+        <div class="theme-business-only pro-actions">
+          <button type="button" class="pro-btn" onclick={() => (addN = true)} title={$t('moach.create.hosafat')}>
+            <svg class="pro-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 7.5v9L12 21l9-4.5v-9L12 3Z" /><path d="M3 7.5 12 12l9-4.5M12 12v9" /></svg>
+            {$t('moach.create.resource')}
           </button>
-        {:else}
-          <Handd
-            {addN}
-            {openMA}
-            hosafat={$t('moach.create.hosafat')}
-            noofopenm={combinedResources.length}
-            onMasi={() => (addN = true)}
-            onBighandd={() => (hoveredd = !hoveredd)}
-            onTrym={() => (openMA = true)}
-          />
-        {/if}
+          <button type="button" class="pro-sub" onclick={() => (openMA = true)}>
+            {$t('project.misc.showResourceRequests')}
+            <span class="pro-count">{combinedResources.length}</span>
+          </button>
+        </div>
       </div>
 
       <!-- תהליך -->
-      <div class="flex flex-col items-center gap-3 p-6 border border-barbi rounded-2xl bg-gradient-to-br from-gra via-grb to-gre drop-shadow-lg shadow-gold">
-        <h3 class="text-lg font-bold">{$t('moach.create.process')}</h3>
-        <p class="text-sm text-gray-500 text-center">{$t('moach.create.processDesc')}</p>
-        <Handp
-          hosafap={$t('moach.create.process')}
-          onClick={() => (createMode = 'process')}
-        />
+      <div class="create-card flex flex-col items-center gap-3 p-6 border border-barbi rounded-2xl bg-gradient-to-br from-gra via-grb to-gre drop-shadow-lg shadow-gold">
+        <h3 class="text-lg font-bold text-[color:var(--ramp-ink,#16131b)] theme-personal-only">{$t('moach.create.process')}</h3>
+        <p class="text-sm text-center text-[color:var(--ramp-ink,#16131b)]">{$t('moach.create.processDesc')}</p>
+
+        <div class="theme-personal-only flex flex-col items-center">
+          <Handp
+            hosafap={$t('moach.create.process')}
+            onClick={() => (createMode = 'process')}
+          />
+        </div>
+
+        <div class="theme-business-only pro-actions">
+          <button type="button" class="pro-btn" onclick={() => (createMode = 'process')}>
+            <svg class="pro-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="5" rx="1" /><rect x="4" y="16" width="16" height="5" rx="1" /><path d="M12 8v4.5M9.5 12.5l2.5 3 2.5-3" /></svg>
+            {$t('moach.create.process')}
+          </button>
+        </div>
       </div>
 
     </div>
@@ -509,7 +549,7 @@
     <div class="max-w-4xl mx-auto">
       <button
         onclick={handleBack}
-        class="mb-6 flex items-center gap-2 text-gold hover:text-barbi hover:underline"
+        class="mb-6 flex items-center gap-2 text-[color:var(--goldink,#8a6a15)] hover:text-barbi hover:underline"
       >
         <svg
           class="w-4 h-4 transition-transform duration-200"
@@ -555,7 +595,7 @@
             <button
               onclick={closeM}
               aria-label={$t('moach.create.back')}
-              class="hover:bg-barbi text-gold hover:text-white font-bold p-1 rounded-full transition-colors"
+              class="hover:bg-barbi text-[color:var(--ramp-ink,#16131b)] hover:text-white font-bold p-1 rounded-full transition-colors"
             >
               <svg style="width:24px;height:24px" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
@@ -653,3 +693,119 @@
   {/if}
 
 </div>
+
+<style>
+  /* ── The two identities of this page ────────────────────────────────────
+     "personal" keeps the illustrated circles (hand.svelte / handd.svelte /
+     handp.svelte): they ARE the identity, a 240px drawing you click.
+     "professional" (html.business) trades them for plain, large, labelled
+     buttons — the same three actions, stated instead of drawn.
+
+     The switch is CSS, not `{#if $theme}`: the theme store is seeded from a
+     cookie in the browser only, so a JS branch renders the personal markup on
+     the server and swaps it after hydration — a visible flip on every load for
+     every business user. `html.business` is already on the server-rendered
+     <html> (hooks.server.js stamps %themeclass%), so the correct half is
+     painted on the first frame and a theme toggle takes effect instantly,
+     with no re-render.
+     ------------------------------------------------------------------- */
+  .theme-business-only {
+    display: none;
+  }
+  :global(html.business) .theme-personal-only {
+    display: none;
+  }
+  :global(html.business) .theme-business-only {
+    display: flex;
+  }
+
+  /* Sharper corners are most of what reads as "professional" — the same
+     scalar the appearance layer uses everywhere else. */
+  :global(html.business) .create-card {
+    border-radius: var(--radius-theme, 0.25rem);
+  }
+
+  /* No `margin-top: auto` here: the process card has no secondary control, so
+     pushing the block to the bottom of an equal-height grid cell would land
+     its primary button on the other cards' *secondary* row. Starting straight
+     after the description keeps the three primaries on one line. */
+  .pro-actions {
+    flex-direction: column;
+    gap: 0.625rem;
+    width: 100%;
+    padding-top: 0.5rem;
+  }
+
+  /* `bg-barbi` + `--gold` ink is the documented safe pairing (6.4:1 in
+     business light, 4.8:1 in business dark) — see the gold/barbi contract in
+     app.postcss. Hover brightens rather than swapping to --gold-l, which is a
+     pale blue in dark mode and would take the ink down with it. */
+  .pro-btn,
+  .pro-sub {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    border-radius: var(--radius-theme, 0.25rem);
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    transition:
+      filter 0.15s ease,
+      box-shadow 0.15s ease,
+      transform 0.15s ease,
+      background-color 0.15s ease;
+  }
+
+  .pro-btn {
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+    color: var(--gold, #f8fafc);
+    background: var(--barbi-pink, #1d4ed8);
+    border: 1px solid var(--barbi-pink, #1d4ed8);
+    box-shadow: var(--shadow-theme, 0 1px 3px rgb(15 23 42 / 0.12));
+  }
+  .pro-btn:hover {
+    filter: brightness(1.12);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgb(15 23 42 / 0.2);
+  }
+
+  /* The secondary control sits on the pale ramp, so its surface is a literal
+     white wash and its ink is --ramp-ink — both fixed, because the ramp does
+     not darken in dark mode. */
+  .pro-sub {
+    padding: 0.55rem 0.875rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--ramp-ink, #16131b);
+    background: rgb(255 255 255 / 0.7);
+    border: 1px solid var(--border-g, rgb(29 78 216 / 0.28));
+  }
+  .pro-sub:hover {
+    background: rgb(255 255 255 / 0.95);
+  }
+
+  .pro-btn:focus-visible,
+  .pro-sub:focus-visible {
+    outline: 2px solid var(--barbi-pink, #1d4ed8);
+    outline-offset: 2px;
+  }
+
+  .pro-ico {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .pro-count {
+    min-width: 1.75rem;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    background: var(--barbi-pink, #1d4ed8);
+    color: var(--gold, #f8fafc);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+</style>

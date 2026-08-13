@@ -395,6 +395,14 @@ textarea::-webkit-resizer {
   --grc: #b38728;
   --grd: #fbf5b7;
   --gre: #aa771c;
+  /* Ink for text laid directly on the gold/steel ramp above (and on the
+     `bg-white/xx` cards floating on it). The ramp is the LIGHT side of the
+     gold contract, so it stays pale in *every* theme and *every* mode — which
+     means its ink must stay DARK in every theme and every mode. Deliberately
+     absent from both `.dark` blocks: a `dark:text-gray-300` on a surface that
+     never darkens is invisible, which is the bug this token replaces.
+     4.7:1 on the ramp's darkest stop (--gre #aa771c), 17:1 on --grb. */
+  --ramp-ink: #16131b;
   --graa: #ffc857;
   --grbb: #3e2f5b;
   --neww: #49f3df;
@@ -1938,6 +1946,9 @@ html.business {
   --grc: #dde3ea;
   --grd: #f1f5f9;
   --gre: #e8edf3;
+  /* see --ramp-ink in :root — dark in both modes, because the steel ramp is
+     pale in both modes. 15.6:1 on #e8edf3. */
+  --ramp-ink: #0f172a;
   --graa: #e8edf3;
   --grbb: #1e293b;
 

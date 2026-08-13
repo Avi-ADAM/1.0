@@ -140,7 +140,8 @@
     "urgency": "Urgencia",
     "myTasks": "mis tareas asignadas",
     "myCreatedTasks": "tareas que creé",
-    "pendingAssignment": "tareas pendientes de asignación"
+    "pendingAssignment": "tareas pendientes de asignación",
+    "takeTask": "Yo la haré"
   },
   "chooseM": {
     "heading": "elige una misión en curso",
