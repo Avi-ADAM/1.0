@@ -1,6 +1,7 @@
 <script>
  import pic from './../../celim/pic.js'
    import { onMount } from 'svelte'; 
+   import { t } from '$lib/translations';
 
 // what about hours alrerady done to  mission in progres 
 function remove (id) {
@@ -13,8 +14,15 @@ function confirm (id) {
       console.log(id)
    
 }
+/**
+ * A brand-new rikma has no accrued value yet, so `totalValue` is 0 and the
+ * plain division renders "NaN" / "NaN%" — the first thing every new rikma
+ * showed on its money page. Nobody owns a share of nothing: report 0.
+ */
 function percentage(partialValue, totalValue) {
-   return (100 * partialValue) / totalValue;
+   if (!totalValue || !Number.isFinite(totalValue)) return 0;
+   const p = (100 * partialValue) / totalValue;
+   return Number.isFinite(p) ? p : 0;
 } 
 let ulist = $state([
 ]); 
@@ -138,16 +146,20 @@ $effect(() => {
   });
 </script>
 
-<h1>יש להזין את סכום הרווח שנצבר והמחשבון יציג כמה מגיע לכל 1</h1>
+<h1>{$t('moach.split.calcIntro')}</h1>
 
-<input type="number" bind:value={revach} />
+<input
+  type="number"
+  bind:value={revach}
+  aria-label={$t('moach.split.calcIntro')}
+/>
 <div class="dd md:items-center">
   <div class="body items-center">
   
   <table dir="rtl" >
     <caption class="sm:text-right md:text-center text-right ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
-      >טבלת חישוב </h1>
+      >{$t('moach.split.calcTable')}</h1>
     </caption>
     <thead>
         <tr class="gg">
@@ -158,12 +170,12 @@ $effect(() => {
         </td>
           {/each}
     </tr> <tr class="ggr">
-      <th class="ggr">שם</th>
+      <th class="ggr">{$t('moach.split.calcName')}</th>
       {#each ulist as data, i}
             <td class="ggr">{data.username}</td>
             {/each}
           </tr> <tr>
-          <th> החלק מהרווח</th>
+          <th>{$t('moach.split.calcShareOfProfit')}</th>
           {#each ulist as data, i}
           <td>
             {#if  revach > 0}
@@ -174,7 +186,7 @@ $effect(() => {
            </td>
            {/each}
       </tr><tr >
-      <th >אחוז בפרויקט</th>
+      <th>{$t('moach.split.calcPercentInProject')}</th>
       {#each ulist as data, i}
             <td >{data.p.toFixed(2)}%</td>
             {/each}

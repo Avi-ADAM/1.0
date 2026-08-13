@@ -6,6 +6,7 @@ import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
 import { resolveAcceptedActs } from '../helpers/roundActs.js';
 import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
+import { gqlString } from './actionUtils.js';
 
 function formatVotesForInline(votes: any[]): string {
   if (!Array.isArray(votes) || votes.length === 0) return '';
@@ -185,14 +186,14 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
     createMesimabetahalich(data: {
       project: "${projectId}",
       mission: "${missId}",
-      hearotMeyuchadot: """${fHearot}""",
-      name: """${fName}""",
-      descrip: """${fDescrip}""",
+      hearotMeyuchadot: ${gqlString(fHearot)},
+      name: ${gqlString(fName)},
+      descrip: ${gqlString(fDescrip)},
       hoursassinged: ${fHours},
       perhour: ${fPer},
       iskvua: ${iskvua},
-      privatlinks: "${privatlinks}",
-      publicklinks: "${publicklinks}",
+      privatlinks: ${gqlString(privatlinks)},
+      publicklinks: ${gqlString(publicklinks)},
       users_permissions_user: "${acceptedUserId}",
       tafkidims: [${tafkidimsStr}],
       publishedAt: "${now}",

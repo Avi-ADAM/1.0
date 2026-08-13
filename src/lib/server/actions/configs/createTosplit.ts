@@ -37,12 +37,19 @@ export const createTosplitConfig: ActionConfig = {
         if (!value.project) return false;
         if (!value.publishedAt) return false;
         
-        // Must have halukas array
-        if (!Array.isArray(value.halukas) || value.halukas.length === 0) {
+        // Must have a halukas array — but it MAY be empty. A proposal with no
+        // transfers is the normal, balanced outcome whenever everyone already
+        // holds exactly their share: always in a one-member rikma (the sole
+        // member holds the money and owes it to nobody), and in any rikma where
+        // the sales happen to land on the right people. Rejecting it left solo
+        // rikmas unable to ever close a split, with the sale stuck in
+        // "pending distribution" forever. See docs/QA_SOLO_RIKMA_2026-08.md B1.
+        if (!Array.isArray(value.halukas)) {
           return false;
         }
-        
-        // Must have hervachti array
+
+        // Must have hervachti array — this is what makes the proposal meaningful:
+        // who earned what. Without it there is nothing to approve.
         if (!Array.isArray(value.hervachti) || value.hervachti.length === 0) {
           return false;
         }

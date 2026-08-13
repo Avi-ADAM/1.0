@@ -1,4 +1,5 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
+import { isAuthFailure } from '$lib/server/session.js';
 
 // The page resolves these with $t — the server has no per-request locale of
 // its own to render them in.
@@ -9,9 +10,25 @@ const goneTitle = {
 };
 
 async function awaitapi(mId, lang, tok, fetch) {
-  const isSer = tok === false;
+  let isSer = tok === false;
+  // Reported back to the page: the visitor arrived with auth cookies we could
+  // not use. Without this the read below fails and the resource is announced as
+  // "gone" — a wrong answer to a stale session on a public page.
+  let authExpired = false;
   try {
-    const res = await sendToSer({ id: mId }, '50GetOpenMashaabimById', null, null, isSer, fetch);
+    let res = await sendToSer({ id: mId }, '50GetOpenMashaabimById', null, null, isSer, fetch)
+      .catch((error) => {
+        if (!isSer && isAuthFailure(null, error)) return null;
+        throw error;
+      });
+
+    if (!isSer && (res === null || isAuthFailure(res))) {
+      // The visitor's token is dead — read the public view as the service.
+      authExpired = true;
+      isSer = true;
+      res = await sendToSer({ id: mId }, '50GetOpenMashaabimById', null, null, true, fetch);
+    }
+
     const node = res?.data?.openMashaabim?.data?.attributes;
     if (node) {
       if (node.archived !== true) {
@@ -48,14 +65,14 @@ async function awaitapi(mId, lang, tok, fetch) {
           projectName: data.project?.data?.attributes?.projectName ?? ''
         };
         data.fullfild = true;
-        return data;
+        return { alld: data, authExpired };
       }
-      return goneTitle;
+      return { alld: goneTitle, authExpired };
     }
-    return goneTitle;
+    return { alld: goneTitle, authExpired };
   } catch (error) {
-    console.log(error);
-    return goneTitle;
+    console.error(`[availiableResorce/${mId}] resource read failed:`, error);
+    return { alld: goneTitle, authExpired };
   }
 }
 
@@ -66,12 +83,18 @@ export async function load({ locals, params, fetch }) {
   const uid = locals.uid;
   const fullfild = false;
 
+  const { alld, authExpired } = await awaitapi(mId, lang, tok, fetch);
+
   return {
     uid,
     lang,
     mId,
-    tok: tok == false ? false : true,
-    alld: await awaitapi(mId, lang, tok, fetch),
+    // Cookies we could not use are not a session — render the guest view and
+    // let `authExpired` explain why (see the banner on the page).
+    tok: tok !== false && !authExpired,
+    alld,
+    authExpired,
+    sessionExpired: locals.sessionExpired === true || authExpired,
     fullfild
   };
 }

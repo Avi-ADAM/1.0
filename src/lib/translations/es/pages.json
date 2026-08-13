@@ -192,7 +192,10 @@
       "maagad": "1💗1 | Misión del agregador de demanda: \"{{name}}\"",
       "wish": "1💗1 | Misión de un deseo: \"{{name}}\"",
       "project": "1💗1 | Misión \"{{name}}\" en la rikma {{projectName}}"
-    }
+    },
+    "gone": "Esta misión ya no está disponible",
+    "goneBody": "Puede que se haya asignado, cerrado o retirado. Hay muchas otras misiones abiertas.",
+    "otherMissions": "Ver otras misiones y todas tus novedades"
   },
   "gift": {
     "gift": "Producto",

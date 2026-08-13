@@ -353,7 +353,9 @@
     "sidurInDev": "En desarrollo activo: pronto podrás ver y organizar turnos aquí",
     "openActions": "Acciones abiertas",
     "awaitingHolderConsent": "Esperando el consentimiento de {{holderName}}",
-    "verifiedSelf": "Verificado (propio)"
+    "verifiedSelf": "Verificado (propio)",
+    "showOpenActions": "Ver y editar las acciones abiertas",
+    "showResourceRequests": "Ver las solicitudes de recursos"
   },
   "recurringCycle": {
     "month": "Mes",

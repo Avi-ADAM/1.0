@@ -535,7 +535,13 @@
     "whyMoveAmount": "Why change the amount? (will be posted in chat)",
     "submitProposal": "Submit proposal",
     "explainProposal": "Please explain the proposal",
-    "addHours": "Add hours"
+    "addHours": "Add hours",
+    "approveAria": "Approve receipt of the resource",
+    "reportApproveAria": "Report and approve the expense",
+    "objectAria": "Object",
+    "proposeAmountAria": "Propose a different amount",
+    "awaitingReport": "⏳ Waiting for the responsible member to report",
+    "awaitingReportHint": "Approval opens once the responsible member reports the monthly expense"
   },
   "levchat": {
     "messagePlaceholder": "Write your message..."

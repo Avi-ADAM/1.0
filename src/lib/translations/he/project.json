@@ -352,7 +352,9 @@
     "sidurInDev": "בפיתוח נמרץ, בקרוב ניתן יהיה לראות ולסדר משמרות כאן",
     "openActions": "פעולות פתוחות",
     "awaitingHolderConsent": "בהסכמה מול {{holderName}}",
-    "verifiedSelf": "מאומת (עצמי)"
+    "verifiedSelf": "מאומת (עצמי)",
+    "showOpenActions": "הצגת ועריכת פעולות פתוחות",
+    "showResourceRequests": "הצגת בקשות למשאבים"
   },
   "recurringCycle": {
     "month": "חודש",

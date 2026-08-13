@@ -1,4 +1,4 @@
-import { SendTo } from '$lib/send/sendTo.svelte';
+import { sendToSer } from '$lib/send/sendToSer.js';
 import { io } from 'socket.io-client';
 import { get, writable } from 'svelte/store';
 import { socketClient } from '$lib/stores/socketClient';
@@ -71,106 +71,26 @@ export async function initialForum (all = false,ids = [],myId = 0){
       forum.set(currentForums);
     }
   }
-  const idsLiteral = idsToFetch.map((fid) => `"${fid}"`).join(',');
-  let que = ``
+  // Which whitelisted query to run, and with which variables. Raw GraphQL is
+  // dev-only (/api/send answers 403 in production), so both branches go through
+  // a qid — see '292initialForumAll' / '293initialForumByIds' in qids.js.
+  /** @type {string} */
+  let queId = '';
+  /** @type {Record<string, any>} */
+  let arg = {};
   if(all == true){
     if (!myId || myId === false) {
       console.warn('[initialForum] Skipping: no valid user id');
       return;
     }
     isChatLoading.set(true)
-      que = `{
-       usersPermissionsUser (id:${myId}) {data{ attributes{
-                            username
-                            profilePic{data{attributes{url formats}}}
-                            projects_1s {data {id attributes{
-                              projectName
-                              profilePic{data{attributes{url formats}}} 
-                              forums{
-                                data{id attributes{
-                                  subject spec done 
-                                  mesimabetahaliches {data{attributes{name}}} 
-                                  messages(filters:{archived: {ne:true}}){data{id attributes{
-                                    content when users_permissions_user{data{id attributes{username profilePic{data{attributes{url formats}}}}}}
-                                  }}}
-                                }}
-                              }
-                            }}}
-                            halukasres{
-                              data {
-                                id
-                                attributes {
-                                  amount
-                                  usersend {data {id attributes {username}}}
-                                  userrecive {data {id attributes {username}}}
-                                  project {data {id attributes {projectName profilePic{data{attributes{url formats}}}}}}
-                                  forum {
-                                    data {
-                                      id
-                                      attributes {
-                                        subject spec done
-                                        messages(filters:{archived: {ne:true}}) {
-                                          data {
-                                            id
-                                            attributes {
-                                              content when 
-                                              users_permissions_user{data{id attributes{username profilePic{data{attributes{url formats}}}}}}
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                            halukasend{
-                              data {
-                                id
-                                attributes {
-                                  amount
-                                  usersend {data {id attributes {username}}}
-                                  userrecive {data {id attributes {username}}}
-                                  project {data {id attributes {projectName profilePic{data{attributes{url formats}}}}}}
-                                  forum {
-                                    data {
-                                      id
-                                      attributes {
-                                        subject spec done
-                                        messages(filters:{archived: {ne:true}}) {
-                                          data {
-                                            id
-                                            attributes {
-                                              content when 
-                                              users_permissions_user{data{id attributes{username profilePic{data{attributes{url formats}}}}}}
-                                            }
-                                          }
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                            } }}
-      }`;
-
+    // idL is replaced server-side with the authenticated user's cookie id.
+    queId = '292initialForumAll';
+    arg = { idL: myId };
   }else if(all == false && idsToFetch.length >0){
-       que = `{
-            forums(filters: {id:{in: [${idsLiteral}]}}){
-                data{id attributes{
-                    subject spec done
-                    project { data { id attributes { projectName profilePic{data{attributes{url formats}}} } } }
-                    mesimabetahaliches { data { attributes { name } } }
-                    sheiruts { data { attributes { name } } }
-                    decisions(pagination:{limit:5}) { data { attributes { kind decisionName } } }
-                    messages(filters:{archived: {ne:true}}, sort:["when:asc"]){data{id attributes{
-                        content when users_permissions_user{data{id attributes{username profilePic{data{attributes{url formats}}}}}}
-                    }}}
-                }}
-            }
-        }`;
-      }
+    queId = '293initialForumByIds';
+    arg = { fids: idsToFetch };
+  }
          try {
            if (all === false && idsToFetch.length === 0) {
              return "ok";
@@ -179,9 +99,10 @@ export async function initialForum (all = false,ids = [],myId = 0){
            if (all === false && idsToFetch.length > 0) {
              ids = idsToFetch;
            }
-           let res4 = await SendTo(que).then(
-             (res4) => (res4 = res4)
-           );
+           // silent: this is a background chat fetch (it also runs from the
+           // notification handler), so a 401 must not yank the user off the
+           // page mid-session — the catch below already handles the failure.
+           let res4 = await sendToSer(arg, queId, 0, 0, false, fetch, { silent: true });
             console.log(res4)
            if (res4.data != null) {
             console.log(res4.data,"res4")

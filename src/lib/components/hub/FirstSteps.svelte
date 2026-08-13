@@ -7,6 +7,10 @@
 
   let { username = '' }: Props = $props();
 
+  // The assistant card points at /chat — that is where Lev actually is.
+  // It used to point at /lev, the heart-cards screen, which has no chat input
+  // at all and greets a brand-new user with "no suggestions found": one of the
+  // three first steps we hand every new user led nowhere.
   const tr = {
     he: {
       hello: 'ברוכים הבאים',
@@ -23,7 +27,7 @@
           icon: '🤖',
           title: 'מכירים את Lev — העוזר החכם',
           desc: 'מנווט, פותח משימות ועונה על כל שאלה על המערכת',
-          href: '/lev',
+          href: '/chat',
           cta: 'לשיחה עם Lev'
         },
         {
@@ -50,7 +54,7 @@
           icon: '🤖',
           title: 'Meet Lev — the smart assistant',
           desc: 'Navigates, opens missions and answers any question about the system',
-          href: '/lev',
+          href: '/chat',
           cta: 'Talk to Lev'
         },
         {
@@ -77,7 +81,7 @@
           icon: '🤖',
           title: 'تعرف على Lev — المساعد الذكي',
           desc: 'يتنقل ويفتح المهام ويجيب على أي سؤال حول النظام',
-          href: '/lev',
+          href: '/chat',
           cta: 'تحدث إلى Lev'
         },
         {
@@ -104,7 +108,7 @@
           icon: '🤖',
           title: 'Познакомьтесь с Lev — умным помощником',
           desc: 'Навигирует, открывает задания и отвечает на любой вопрос о системе',
-          href: '/lev',
+          href: '/chat',
           cta: 'Поговорить с Lev'
         },
         {

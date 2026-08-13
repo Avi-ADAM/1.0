@@ -2122,10 +2122,13 @@ export function processDecisions(
         noofusersOk: signedOnStanding,
         noofusersNo: 0,
         noofusersWaiting: Math.max(0, noof - signedOnStanding),
-        // The extractor only emits it while it is my move, so it is never
-        // "already handled" — and it must not sink to the end of the scroll.
-        already: false,
-        pl: PRIORITY_BAND.VOTE_PENDING
+        // On the heart the extractor only emits it while it is my move, so it
+        // is never "already handled" — and it must not sink to the end of the
+        // scroll. A focused vote page can also show one I have already signed
+        // (`includeNotMyTurn`), and there `already` is what turns the card
+        // read-only.
+        already: av ? av.myTurn === false : false,
+        pl: av && av.myTurn === false ? PRIORITY_BAND.VOTE_DONE : PRIORITY_BAND.VOTE_PENDING
       };
     } else if (decision.kind === 'sheirutpends') {
       return {

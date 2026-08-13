@@ -19,6 +19,7 @@
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
+import { gqlString } from './actionUtils.js';
 
 function normalizeVote(v: any): Record<string, any> {
   const uid =
@@ -329,7 +330,7 @@ const voteOnMaapHandler: ActionExecutionHandler = async (params, context, { stra
       const kindOf: string = omAttrs.kindOf ?? 'total';
       const spnot: string = omAttrs.spnot ?? '';
       // Prefer om.name; fall back to the Maap's own name field
-      const missionBName: string = ((omAttrs.name ?? attrs.name ?? '') as string).replace(/"/g, '\\"');
+      const missionBName: string = (omAttrs.name ?? attrs.name ?? '') as string;
       const sqadualed: string | undefined = omAttrs.sqadualed;
       const sqadualedf: string | undefined = omAttrs.sqadualedf;
 
@@ -349,7 +350,7 @@ const voteOnMaapHandler: ActionExecutionHandler = async (params, context, { stra
       const votsStr = allVots
         .map((v) => {
           const parts = [`what:${v.what}`, `users_permissions_user:${parseInt(String(v.users_permissions_user), 10)}`];
-          if (v.why) parts.push(`why:"${v.why.replace(/"/g, '\\"')}"`);
+          if (v.why) parts.push(`why:${gqlString(v.why)}`);
           return `{${parts.join(' ')}}`;
         })
         .join(',');
@@ -368,14 +369,14 @@ const voteOnMaapHandler: ActionExecutionHandler = async (params, context, { stra
         createRikmash(data: {
           publishedAt: "${now.toISOString()}",
           total: ${total},
-          name: "${missionBName}",
+          name: ${gqlString(missionBName)},
           kindOf: ${kindOf},
           price: ${price},
           agprice: ${agprice},
           project: "${projectId}",
           hm: ${hm},
           ${openMidFrag}
-          spnot: """${spnot.replace(/"""/g, '"')}""",
+          spnot: ${gqlString(spnot)},
           maaps: ["${askId}"],
           users_permissions_user: "${applicantId}",
           sp: "${spId}",

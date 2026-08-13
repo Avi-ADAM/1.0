@@ -7,6 +7,7 @@
   import Plaque from '$lib/components/onboard/Plaque.svelte';
   import Tabs from '$lib/components/onboard/Tabs.svelte';
   import { t, locale } from '$lib/translations';
+  import { save as saveCvDraft } from '$lib/onboard/cvDraft';
 
   const providerTabs = $derived([
     { icon: '💡', label: $t('onboard.provider.tabs.values') },
@@ -37,8 +38,7 @@
         throw new Error(body?.message ?? `שגיאה ${res.status}`);
       }
       const result = await res.json();
-      sessionStorage.setItem('onboard.cvResult', JSON.stringify(result));
-      sessionStorage.setItem('onboard.source', 'describe');
+      saveCvDraft(result, 'describe');
       goto('/onboard/provider/review');
     } catch (e) {
       error = /** @type {any} */ (e)?.message || 'שגיאה — נסו שוב';

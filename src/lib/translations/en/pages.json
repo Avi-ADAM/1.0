@@ -191,7 +191,10 @@
       "maagad": "1💗1 | Demand-pool mission: \"{{name}}\"",
       "wish": "1💗1 | Wish mission: \"{{name}}\"",
       "project": "1💗1 | Mission \"{{name}}\" in the rikma {{projectName}}"
-    }
+    },
+    "gone": "This mission is no longer available",
+    "goneBody": "It may have been assigned, closed or removed. There are plenty of other open missions.",
+    "otherMissions": "See other missions and all your updates"
   },
   "gift": {
     "gift": "Product",

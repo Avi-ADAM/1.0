@@ -101,6 +101,15 @@
   function hover(x) {
     onHover?.({ x: x });
   }
+  // Accessible names for the two icon-only actions. They were reachable only by
+  // hovering, which leaves a screen reader — and anyone on touch — with a pair
+  // of unlabelled buttons on the one card that closes a resource receipt.
+  let approveLabel = $derived(
+    isRecurringCycle ? $t('lev.cards.dowegeot.approveMonthlyExpense') : $t('common.approve')
+  );
+  let declineLabel = $derived(
+    isRecurringCycle ? $t('lev.cards.dowegeot.counterOffer') : $t('lev.cards.confirmDecline')
+  );
   /** Inline bilingual helper for the recurring-cycle strings. */
   // The responsible owner types this month's actual spend right on the card.
   // `reportInput` is null until the owner edits it; until then we show the
@@ -446,6 +455,8 @@
           <button
             class="flex-1 py-2 px-4 flex justify-center items-center gap-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
             onclick={report}
+            aria-label={$t('lev.cards.dowegeot.reportApprove')}
+            title={$t('lev.cards.dowegeot.reportApprove')}
             onmouseenter={() => hover($t('lev.cards.dowegeot.reportApprove'))}
             onmouseleave={() => hover('0')}
           >
@@ -458,15 +469,22 @@
           <button
             class="flex-1 py-2 flex justify-center items-center gap-2 bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 font-bold rounded-xl transition-all"
             onclick={isRecurringCycle ? () => nego('f') : () => decline('f')}
-            onmouseenter={() => hover(isRecurringCycle ? $t('lev.cards.dowegeot.counterOffer') : $t('lev.cards.confirmDecline'))}
+            aria-label={declineLabel}
+            title={declineLabel}
+            onmouseenter={() => hover(declineLabel)}
             onmouseleave={() => hover('0')}
           >
             {#if isRecurringCycle}{$t('lev.cards.dowegeot.counterOffer')}{:else}<No />{/if}
           </button>
+          <!-- Icon-only, and the only control that closes a resource receipt:
+               without a name it is invisible to a screen reader and unexplained
+               to everyone else until they hover. -->
           <button
             class="flex-2 py-2 px-4 flex justify-center items-center gap-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
             onclick={() => agree('f')}
-            onmouseenter={() => hover(isRecurringCycle ? $t('lev.cards.dowegeot.approveMonthlyExpense') : $t('common.approve'))}
+            aria-label={approveLabel}
+            title={approveLabel}
+            onmouseenter={() => hover(approveLabel)}
             onmouseleave={() => hover('0')}
           >
             {#if isRecurringCycle}{$t('lev.cards.dowegeot.approveExpense')}{/if}

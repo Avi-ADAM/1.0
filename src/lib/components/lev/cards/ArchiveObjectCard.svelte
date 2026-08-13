@@ -49,6 +49,11 @@
   let approving = $state(false);
   let negoOpen = $state(false);
 
+  // On the heart a card only exists while it is my move. A focused vote page
+  // (or the member who opened the proposal) can also land on one I have
+  // already signed — then it is a status view: the chat stays open, but there
+  // is nothing left for me to approve or counter until someone else moves.
+  const mine = $derived(archive?.myTurn !== false);
   const standing = $derived(archive?.standing ?? {});
   const isKeep = $derived(standing.mode === 'keep');
   const isRelease = $derived(archive?.scope === 'release');
@@ -224,22 +229,28 @@
     >
       {$t('archive.actions.chat')}
     </button>
-    <button
-      type="button"
-      onclick={() => (negoOpen = true)}
-      class="flex-1 rounded-xl border border-gray-300 dark:border-gray-600 py-3 text-sm"
-      title={$t('archive.actions.negotiate')}
-    >
-      ⚖️ {$t('archive.actions.negotiate')}
-    </button>
-    <button
-      type="button"
-      onclick={approve}
-      disabled={approving}
-      class="flex-[2] rounded-xl bg-gradient-to-r from-barbi to-mpink text-white font-semibold py-3 text-sm disabled:opacity-60"
-    >
-      {approving ? $t('archive.actions.approving') : $t('archive.actions.approve')}
-    </button>
+    {#if mine}
+      <button
+        type="button"
+        onclick={() => (negoOpen = true)}
+        class="flex-1 rounded-xl border border-gray-300 dark:border-gray-600 py-3 text-sm"
+        title={$t('archive.actions.negotiate')}
+      >
+        ⚖️ {$t('archive.actions.negotiate')}
+      </button>
+      <button
+        type="button"
+        onclick={approve}
+        disabled={approving}
+        class="flex-[2] rounded-xl bg-gradient-to-r from-barbi to-mpink text-white font-semibold py-3 text-sm disabled:opacity-60"
+      >
+        {approving ? $t('archive.actions.approving') : $t('archive.actions.approve')}
+      </button>
+    {:else}
+      <p class="flex-[3] self-center text-center text-sm text-gray-500 dark:text-gray-400">
+        {$t('archive.card.signedByMe')}
+      </p>
+    {/if}
   </div>
 </div>
 

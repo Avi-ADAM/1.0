@@ -46,7 +46,10 @@
    * @property {number|null} [hoursAssigned] - hours agreed for the mission (`hoursassinged`).
    * @property {number|null} [perhour] - hourly value agreed for the mission.
    * @property {(status: number) => void} [onStatus] - progress was saved.
-   * @property {() => void} [onCompleted] - mission was submitted for approval.
+   * @property {(outcome: 'approvalPending'|'completed') => void} [onCompleted] -
+   *   the finish went through. `completed` means the server closed the mission
+   *   outright (solo rikma — nobody left to approve); `approvalPending` means a
+   *   finiapruval is now on the table.
    * @property {() => void} [onTimerSaved] - logged time changed on the server.
    */
 
@@ -312,8 +315,17 @@
       finishOpen = false;
       why = '';
       what = null;
-      toast.success($t('moach.progress.sentForApproval'));
-      onCompleted?.();
+      // In a one-member rikma completeMission skips the finiapruval entirely and
+      // writes the FinnishedMission straight away, so "sent for approval" would
+      // be a lie — and the row would show a ⏳ badge for an approval that will
+      // never exist. Follow the server's own answer.
+      const completedOutright = result.data?.createdType === 'finnishedMission';
+      toast.success(
+        completedOutright
+          ? $t('moach.progress.missionCompleted')
+          : $t('moach.progress.sentForApproval')
+      );
+      onCompleted?.(completedOutright ? 'completed' : 'approvalPending');
     } catch (e) {
       console.error('[MissionControls] complete failed', e);
       finishError = e?.message ?? $t('lev.missionInProgress.error');

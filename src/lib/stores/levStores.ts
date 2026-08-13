@@ -574,8 +574,11 @@ export const projectFilter: Writable<string | null> = writable(null);
  *  v7 — the saleClaim payload now also carries start/finish dates and a
  *  free-text `note`/`notes` on `current`/`standing` (renegotiable).
  *  v8 — saleClaim payload adds `reporterName` (for labeling negom rounds by
- *  proposer in the side-by-side version history). */
-const SNAPSHOT_VERSION = 8;
+ *  proposer in the side-by-side version history).
+ *  v9 — the main lev query now selects the archive half of a Decision, so
+ *  archive/edit proposals appear in `decisions`. A v8 snapshot was written
+ *  from the query that lacked those fields and would keep hiding them. */
+const SNAPSHOT_VERSION = 9;
 
 /** Snapshot data structure for localStorage */
 export interface SnapshotData {

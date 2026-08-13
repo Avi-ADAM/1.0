@@ -23,7 +23,8 @@
       "openResource": "משאב פתוח",
       "resourceInProgress": "משאב בתהליך",
       "matanot": "מוצר"
-    }
+    },
+    "signedByMe": "חתמת על הגרסה הזו — ממתינים לשאר חברי הריקמה"
   },
   "hours": {
     "title": "השעות שנצברו",

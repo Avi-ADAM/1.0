@@ -19,5 +19,11 @@
   "clearSuccess": "Temporizadores borrados correctamente",
   "clearError": "No se pudieron borrar los temporizadores",
   "saveSuccess": "Temporizador guardado correctamente",
-  "saveError": "Error al guardar el temporizador"
+  "saveError": "Error al guardar el temporizador",
+  "stoppedAfter": "El temporizador se detuvo en {{duration}}. ¿Quieres guardar este tiempo o borrarlo?",
+  "noTimerYet": "Todavía no se ha registrado tiempo en esta misión. Inicia un temporizador o bórralo y empieza de nuevo.",
+  "calendarToday": "hoy",
+  "calendarPrevWeek": "Semana anterior",
+  "calendarNextWeek": "Semana siguiente",
+  "calendarAllDay": "todo el día"
 }

@@ -23,7 +23,8 @@
       "openResource": "Recurso abierto",
       "resourceInProgress": "Recurso en curso",
       "matanot": "Producto"
-    }
+    },
+    "signedByMe": "Firmaste esta versión — esperando al resto de los miembros"
   },
   "hours": {
     "title": "Horas acumuladas",

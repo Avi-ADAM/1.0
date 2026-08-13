@@ -4,6 +4,7 @@
 import { env } from '$env/dynamic/private';
 import { getInternalSecret, INTERNAL_HEADER } from '$lib/server/internalSecret.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
+import { isExpiredJwt, clearStaleAuthCookies } from '$lib/server/session.js';
 
 // ── Strapi gate: stamp every server→Strapi request with a shared secret ─────
 // tovmeod's nginx blocks requests without x-strapi-gate once the gate is
@@ -202,9 +203,16 @@ export async function handle({ event, resolve }) {
   event.locals.lang = lang;
   event.locals.userAgent = event.request.headers.get('accept-language');
   event.locals.isDesktop = event.request.headers.get('sec-ch-ua-mobile') === '?0';
-  event.locals.tok = event.cookies.get('jwt') || false;
-  event.locals.uid = event.cookies.get('id') || false;
-  event.locals.un = event.cookies.get('un') || false;
+  // An expired cookie is worse than no cookie: it makes every layer below
+  // believe there is a session and then fail. Downgrade to guest and wipe it.
+  const rawTok = event.cookies.get('jwt') || false;
+  const sessionExpired = rawTok !== false && isExpiredJwt(rawTok);
+  if (sessionExpired) clearStaleAuthCookies(event);
+
+  event.locals.sessionExpired = sessionExpired;
+  event.locals.tok = sessionExpired ? false : rawTok;
+  event.locals.uid = sessionExpired ? false : event.cookies.get('id') || false;
+  event.locals.un = sessionExpired ? false : event.cookies.get('un') || false;
   event.locals.email = event.cookies.get('email') || false;
   const isSecure = event.url.protocol === 'https:';
   // Set language cookie based on URL path
@@ -253,9 +261,14 @@ export async function handle({ event, resolve }) {
       headers: { Location: '/lev' }
     });
   } else if (event.url.pathname.startsWith('/lev') && !event.locals.tok) {
+    // A member whose session just expired is not an anonymous visitor: send
+    // them to /login with a way back, instead of dumping them on the homepage.
+    const back = event.url.pathname.replace(/^\//, '') + event.url.search;
     return new Response('Redirect', {
       status: 303,
-      headers: { Location: '/' }
+      headers: {
+        Location: sessionExpired ? `/login?from=${encodeURIComponent(back)}&expired=1` : '/'
+      }
     });
   } else if (event.url.pathname.startsWith('/api')) {
     const origin = event.request.headers.get('origin');
@@ -286,6 +299,41 @@ export async function handle({ event, resolve }) {
         .replace('%manifest%', manifestLink[lang])
   });
   return applySecurityHeaders(response, isSecure);
+}
+
+/**
+ * Every uncaught server error used to reach the browser as a bare
+ * `500 · Internal Error` — no cause, no way out. Classify it instead: an
+ * auth-shaped failure (expired/misaligned token, 401/403 from the proxy) is
+ * labelled `code:'auth'` so the error screen can offer sign-in/sign-up, and the
+ * failing address rides along so the visitor can be returned to it afterwards.
+ *
+ * The raw message is logged, never localized here — the screen renders text
+ * with `$t()` from the `auth` namespace.
+ *
+ * @type {import('@sveltejs/kit').HandleServerError}
+ */
+export function handleError({ error, event, status, message }) {
+  const raw = error instanceof Error ? error.message : String(error ?? '');
+  const isAuth =
+    status === 401 ||
+    status === 403 ||
+    /unauthorized|invalid token|forbidden|jwt|\b401\b|\b403\b/i.test(raw);
+
+  console.error(
+    `[error] ${status} ${event.request.method} ${event.url.pathname}`,
+    raw,
+    error instanceof Error ? error.stack : ''
+  );
+
+  return {
+    message,
+    code: isAuth ? 'auth' : 'server',
+    // Where the visitor was trying to go, for the "sign in and come back" link.
+    from: event.url.pathname.replace(/^\//, '') + event.url.search,
+    // A session that expired mid-request is the likeliest cause of an auth error.
+    sessionExpired: event.locals?.sessionExpired === true
+  };
 }
 
 // Uncomment if using Sentry

@@ -57,6 +57,7 @@
   import Reqtom from '$lib/components/lev/reqtom.svelte';
   import Halukaask from '$lib/components/lev/halukaask.svelte';
   import DecisionMaking from '$lib/components/lev/decisionMaking.svelte';
+  import ArchiveObjectCard from '$lib/components/lev/cards/ArchiveObjectCard.svelte';
   import Lowding from '$lib/celim/lowding.svelte';
 
   let { kind, entity, projectId, projectBase, uid, backHref } = $props();
@@ -149,7 +150,10 @@
       const [item] = extractHalukas(userData);
       if (item) halukasStore.update((cur) => upsertById(cur, item));
     } else if (kind === 'decision') {
-      const [item] = extractDecisions(userData);
+      // Unlike the heart, this page is *about* one decision: show it even when
+      // I have already signed the standing round (typically the member who
+      // opened the proposal). The card turns read-only on its own.
+      const [item] = extractDecisions(userData, { includeNotMyTurn: true });
       if (item) decisionsStore.update((cur) => upsertById(cur, item));
     }
   }
@@ -459,6 +463,25 @@
         noofusersWaiting={buble.noofusersWaiting}
         already={buble.already}
         users={buble.users}
+      />
+    </div>
+  {:else if kind === 'decision' && buble.ani === 'archObject'}
+    <!-- Archive/edit proposals are Decisions too, but nothing about them fits
+         the generic decision card (which shows a proposed project detail).
+         PLAN_OBJECT_ARCHIVAL — same card the heart uses. -->
+    <div class="vote-card-wrap mx-auto">
+      <ArchiveObjectCard
+        archive={buble.archive}
+        projectId={buble.projectId}
+        projectName={buble.projectName}
+        logoSrc={buble.src}
+        memberCount={buble.noof}
+        timegramaDate={buble.timegramaDate}
+        isFirst={true}
+        onProj={proj}
+        onUser={user}
+        onChat={noop}
+        onDone={onCoinLapach}
       />
     </div>
   {:else if kind === 'decision'}

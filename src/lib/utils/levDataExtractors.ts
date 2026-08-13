@@ -1054,13 +1054,22 @@ export function extractTransfers(userData: any): TransferData[] {
 
 /**
  * Extract decisions (hachlatot) from GraphQL user data
- * 
+ *
  * @param userData - Raw GraphQL response data
+ * @param opts.includeNotMyTurn - keep the consent kinds (archive/edit, saleClaim)
+ *   even when I have already signed the standing round. The heart shows what
+ *   awaits *me*, so it stays false there; a focused vote page addresses one
+ *   decision by id and must still render it — read-only — for whoever opened
+ *   the link, including the member who proposed it.
  * @returns Array of decision data
- * 
+ *
  * **Validates: Requirements 1.1, 1.4**
  */
-export function extractDecisions(userData: any): DecisionData[] {
+export function extractDecisions(
+  userData: any,
+  opts: { includeNotMyTurn?: boolean } = {}
+): DecisionData[] {
+  const includeNotMyTurn = opts.includeNotMyTurn === true;
   const decisions: DecisionData[] = [];
 
   if (!userData?.attributes?.projects_1s?.data) {
@@ -1101,7 +1110,7 @@ export function extractDecisions(userData: any): DecisionData[] {
           if (!view) continue; // malformed proposal — nothing to decide on
           // Only surface it while it is actually my move; once I have signed
           // the standing round the ball is in someone else's court.
-          if (!view.myTurn) continue;
+          if (!view.myTurn && !includeNotMyTurn) continue;
 
           decisions.push({
             id: decision.id,
@@ -1166,7 +1175,7 @@ export function extractDecisions(userData: any): DecisionData[] {
             );
             continue;
           }
-          if (iSignedStanding) {
+          if (iSignedStanding && !includeNotMyTurn) {
             console.log(
               `[saleClaim][extract] decision ${decision.id} SKIPPED — I already signed standing round ${standingOrder}; waiting on the other side`
             );
