@@ -9,6 +9,7 @@
   import { Canvas } from '@threlte/core';
   import Scene from '$lib/components/main/1lev1.svelte';
   import ProductPeek from '$lib/components/main/ProductPeek.svelte';
+  import SplitCalculator from '$lib/components/main/SplitCalculator.svelte';
   import VideoModal from '$lib/components/main/VideoModal.svelte';
   import ResizeHandler from '$lib/components/ResizeHandler.svelte';
   import { useProgress } from '@threlte/extras';
@@ -284,6 +285,11 @@
     <button
       type="button"
       class="hover:text-gold transition-colors whitespace-nowrap"
+      onclick={() => scrollToId('split')}>{$t('home.sections.navSplit')}</button
+    >
+    <button
+      type="button"
+      class="hover:text-gold transition-colors whitespace-nowrap"
       onclick={() => scrollToId('demo')}>{$t('home.sections.navDemo')}</button
     >
     <button
@@ -468,11 +474,205 @@
         {/key}
       </div>
 
-      <!-- ===== מוביל: הבעיה / הכאב ===== -->
+      <!-- ===== ניווט קהלים: מי שכבר בפנים לא צריך לקרוא את הכאב של מי שבחוץ -->
       <section
-        class="w-full max-w-xl mt-4 animate-fade-in-up"
+        class="w-full max-w-xl animate-fade-in-up"
         style="font-family:'Sababa',sans-serif;"
       >
+        <p class="text-center text-slate-700 text-base sm:text-sm mb-2">
+          {$t('home.audience.title')}
+        </p>
+        <div class="flex flex-wrap justify-center gap-2">
+          {#each [['a1', 'split'], ['a2', 'discover'], ['a3', 'demo']] as [key, target]}
+            <button
+              type="button"
+              onclick={() => scrollToId(target)}
+              class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold hover:bg-gold/25 text-slate-800 hover:text-rose-800 font-semibold text-base sm:text-sm px-4 py-2 rounded-full shadow-sm transition-colors"
+            >
+              {$t(`home.audience.${key}`)}
+            </button>
+          {/each}
+        </div>
+      </section>
+
+      <!-- ===== מוביל: כבר יש שותפות — למה חצי‑חצי שוברת אותה, ומה במקום =====
+           הבלוק הראשון בעמוד בכוונה: הוא מדבר על המוצר עצמו (חישוב החלוקה)
+           ולא על כאב תעסוקתי, ולכן פחות מעורר התנגדות. בלוק ה"שכיר מול יזם
+           בודד" נשאר — רק ירד אחריו, עבור מי שעוד מחפש מיזם להצטרף אליו. -->
+      <section
+        id="split"
+        class="w-full max-w-xl mt-8 scroll-mt-16 animate-fade-in-up"
+        style="font-family:'Sababa',sans-serif;"
+      >
+        <p
+          class="text-center text-barbi font-bold text-base sm:text-sm tracking-widest mb-1"
+        >
+          {$t('home.split.eyebrow')}
+        </p>
+        <h2
+          class="text-rose-700 font-bold text-3xl sm:text-2xl mb-2 text-center"
+          style="text-shadow:1px 1px 2px rgba(0,0,0,0.15);"
+        >
+          {$t('home.split.title')}
+        </h2>
+        <p class="text-center text-slate-700 text-base sm:text-sm mb-4">
+          {$t('home.split.lead')}
+        </p>
+
+        <!-- מה חצי‑חצי עושה לשותפות -->
+        <div class="flex flex-col gap-2.5">
+          {#each ['f1', 'f2', 'f3', 'f4'] as f}
+            <div
+              class="flex items-start gap-3 bg-cyan-50/55 backdrop-blur-sm border border-slate-300/80 rounded-xl px-4 py-3 shadow-sm"
+            >
+              <span
+                dir="ltr"
+                class="shrink-0 mt-0.5 h-6 px-2 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold"
+                >50/50</span
+              >
+              <p
+                class="text-slate-800 text-base sm:text-sm leading-relaxed text-start"
+              >
+                {$t(`home.split.${f}`)}
+              </p>
+            </div>
+          {/each}
+        </div>
+
+        <p
+          class="mt-4 bg-cyan-50/60 backdrop-blur-sm border-2 border-gold rounded-2xl px-4 py-3 text-slate-900 text-base sm:text-sm leading-relaxed text-center shadow"
+        >
+          {$t('home.split.blame')}
+        </p>
+
+        <!-- הפתרון: פשוט לחשב -->
+        <div
+          class="mt-6 rounded-2xl border-2 border-gold bg-gradient-to-br from-amber-100 via-amber-50 to-rose-50 px-4 py-5 shadow-lg"
+        >
+          <h3
+            class="text-rose-700 font-bold text-2xl sm:text-xl mb-1 text-center"
+          >
+            {$t('home.split.solutionTitle')}
+          </h3>
+          <p
+            class="text-slate-800 text-base sm:text-sm leading-relaxed text-center mb-4"
+          >
+            {$t('home.split.solutionLead')}
+          </p>
+          <div class="flex flex-col gap-2">
+            {#each ['step1', 'step2', 'step3'] as s, i}
+              <div
+                class="flex items-start gap-3 bg-cyan-50/80 border border-gold/60 rounded-xl px-3 py-3"
+              >
+                <span
+                  class="shrink-0 w-7 h-7 rounded-full bg-barbi text-gold font-bold flex items-center justify-center text-sm"
+                  >{i + 1}</span
+                >
+                <div class="text-start">
+                  <h4 class="text-rose-700 font-bold text-lg sm:text-base">
+                    {$t(`home.split.${s}_t`)}
+                  </h4>
+                  <p class="text-slate-800 text-base sm:text-sm leading-relaxed">
+                    {$t(`home.split.${s}_d`)}
+                  </p>
+                </div>
+              </div>
+              {#if i < 2}
+                <div
+                  class="text-center text-gold text-xl leading-none"
+                  aria-hidden="true"
+                >
+                  ↓
+                </div>
+              {/if}
+            {/each}
+          </div>
+          <p
+            class="mt-4 text-center text-rose-700 font-bold text-lg sm:text-base"
+          >
+            {$t('home.split.formula')}
+          </p>
+        </div>
+
+        <!-- ולא רק להסביר את הנוסחה — להריץ אותה. אותו חישוב שרץ ב‑
+             `prPr/hachcal.svelte` על נתוני ריקמה אמיתית, עם מספרים לשחק בהם
+             ובלי הרשמה. -->
+        <div class="mt-6">
+          <SplitCalculator />
+        </div>
+
+        <!-- מה זה נותן בפועל -->
+        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {#each [['🔍', 'b1'], ['⚖️', 'b2'], ['🎯', 'b3'], ['🌱', 'b4']] as [icon, key] (key)}
+            <div
+              class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
+            >
+              <div class="text-2xl mb-1">{icon}</div>
+              <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
+                {$t(`home.split.${key}_t`)}
+              </h3>
+              <p class="text-slate-800 text-base sm:text-sm leading-relaxed">
+                {$t(`home.split.${key}_d`)}
+              </p>
+            </div>
+          {/each}
+
+          <!-- החישוב מכריע כמה כל אחד לקח; ההצבעות מכריעות מה בכלל עושים.
+               כרטיס רחב כי זו הפסקה היחידה כאן שמובילה הלאה — למנוע ההסכמה. -->
+          <div
+            class="sm:col-span-2 bg-cyan-50/70 backdrop-blur-sm border-2 border-barbi/60 rounded-lg p-4 shadow flex flex-col"
+          >
+            <div class="text-2xl mb-1">🤝</div>
+            <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
+              {$t('home.split.b5_t')}
+            </h3>
+            <p class="text-slate-800 text-base sm:text-sm leading-relaxed">
+              {$t('home.split.b5_d')}
+            </p>
+            <button
+              type="button"
+              class="mt-2 self-start text-barbi font-bold text-base sm:text-sm underline underline-offset-4 hover:text-rose-700 transition-colors"
+              onclick={() => scrollToId('consensus')}
+            >
+              {$t('home.split.b5_link')}
+            </button>
+          </div>
+        </div>
+
+        <p
+          class="mt-4 text-center bg-cyan-50/60 backdrop-blur-sm border border-gold/70 rounded-2xl px-4 py-3 text-slate-800 text-base sm:text-sm leading-relaxed"
+        >
+          {$t('home.split.more')}
+        </p>
+
+        <div class="mt-5 flex flex-wrap gap-3 justify-center">
+          <button
+            type="button"
+            class="bg-barbi hover:bg-white hover:text-barbi text-gold font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300"
+            onclick={() => gotoRegister()}
+          >
+            {$t('home.split.cta')}
+          </button>
+          <button
+            type="button"
+            class="bg-gold hover:bg-barbi hover:text-gold text-barbi font-bold text-lg sm:text-base px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-300 border-2 border-gold"
+            onclick={() => scrollToId('demo')}
+          >
+            {$t('home.split.ctaSecondary')}
+          </button>
+        </div>
+      </section>
+
+      <!-- ===== הבעיה / הכאב — לקהל שעוד אין לו שותפות ===== -->
+      <section
+        class="w-full max-w-xl mt-12 animate-fade-in-up"
+        style="font-family:'Sababa',sans-serif;"
+      >
+        <p
+          class="text-center text-barbi font-bold text-base sm:text-sm tracking-widest mb-1"
+        >
+          {$t('home.sections.problemEyebrow')}
+        </p>
         <h2
           class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center"
           style="text-shadow:1px 1px 2px rgba(0,0,0,0.15);"
@@ -638,7 +838,9 @@
       </section>
 
       <!-- ===== באנר /consensus — מנוע ההסכמה (מתחת לדמו החי) ===== -->
+      <!-- יעד הקישור מבלוק היתרונות שלמעלה (`split.b5_link`). -->
       <section
+        id="consensus"
         class="w-full max-w-xl mt-6 scroll-mt-16 animate-fade-in-up"
         style="font-family:'Sababa',sans-serif;"
       >
@@ -776,7 +978,7 @@
         <!-- Discovery strip: live counts linking into the public discovery
              pages (/project, /availableMission, /availiableResorce, /gift,
              /demand) — wander first, sign up later. -->
-        <div class="gold-frame rounded-xl p-[3px] shadow-lg">
+        <div id="discover" class="gold-frame rounded-xl p-[3px] shadow-lg scroll-mt-16">
         <section
           class="bg-cyan-50/85 backdrop-blur-sm rounded-lg px-4 py-4"
           style="font-family:'Sababa',sans-serif;"
