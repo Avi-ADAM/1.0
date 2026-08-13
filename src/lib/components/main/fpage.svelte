@@ -603,7 +603,7 @@
 
         <!-- מה זה נותן בפועל -->
         <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {#each [['🔍', 'b1'], ['⚖️', 'b2'], ['🎯', 'b3'], ['🌱', 'b4']] as [icon, key]}
+          {#each [['🔍', 'b1'], ['⚖️', 'b2'], ['🎯', 'b3'], ['🌱', 'b4']] as [icon, key] (key)}
             <div
               class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-lg p-4 shadow flex flex-col"
             >
@@ -616,6 +616,27 @@
               </p>
             </div>
           {/each}
+
+          <!-- החישוב מכריע כמה כל אחד לקח; ההצבעות מכריעות מה בכלל עושים.
+               כרטיס רחב כי זו הפסקה היחידה כאן שמובילה הלאה — למנוע ההסכמה. -->
+          <div
+            class="sm:col-span-2 bg-cyan-50/70 backdrop-blur-sm border-2 border-barbi/60 rounded-lg p-4 shadow flex flex-col"
+          >
+            <div class="text-2xl mb-1">🤝</div>
+            <h3 class="text-rose-700 font-bold text-lg sm:text-base mb-1">
+              {$t('home.split.b5_t')}
+            </h3>
+            <p class="text-slate-800 text-base sm:text-sm leading-relaxed">
+              {$t('home.split.b5_d')}
+            </p>
+            <button
+              type="button"
+              class="mt-2 self-start text-barbi font-bold text-base sm:text-sm underline underline-offset-4 hover:text-rose-700 transition-colors"
+              onclick={() => scrollToId('consensus')}
+            >
+              {$t('home.split.b5_link')}
+            </button>
+          </div>
         </div>
 
         <p
@@ -817,7 +838,9 @@
       </section>
 
       <!-- ===== באנר /consensus — מנוע ההסכמה (מתחת לדמו החי) ===== -->
+      <!-- יעד הקישור מבלוק היתרונות שלמעלה (`split.b5_link`). -->
       <section
+        id="consensus"
         class="w-full max-w-xl mt-6 scroll-mt-16 animate-fade-in-up"
         style="font-family:'Sababa',sans-serif;"
       >
