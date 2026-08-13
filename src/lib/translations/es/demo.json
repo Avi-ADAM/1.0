@@ -1,0 +1,82 @@
+{
+  "button": "Agendar una demo personal",
+  "buttonLong": "¿Quieres ver cómo funciona? Agenda una demo personal",
+  "reassure": "20 minutos, sin compromiso",
+  "close": "Cerrar",
+  "back": "Atrás",
+  "openAria": "Abrir la reserva de demo personal",
+  "section": {
+    "eyebrow": "¿Todavía lo estás pensando?",
+    "title": "Una demo personal, sin compromiso",
+    "lead": "En una charla corta te mostramos cómo una idea o una sociedad existente se convierte en un modelo transparente de aportes, misiones y reparto de ganancias.",
+    "cta": "Agendar mi demo personal",
+    "secondary": "Tengo preguntas — hablemos"
+  },
+  "track": {
+    "title": "Para que la demo sea relevante — ¿qué es lo más cercano a ti?",
+    "idea": "Tengo una idea para un proyecto",
+    "partnership": "Ya tengo una sociedad",
+    "provider": "Ofrezco un servicio y busco proyectos",
+    "curious": "Solo quiero conocer el sistema"
+  },
+  "mode": {
+    "title": "Genial. ¿Cómo prefieres continuar?",
+    "lead": "En la demo mostramos exactamente cómo 1💗1 encaja en tu situación: reparto de aportes, misiones, toma de decisiones e incorporación de socios.",
+    "scheduled": "Reservar hora para una demo de 20 minutos",
+    "scheduledSub": "Tú dices cuándo te viene bien y nosotros lo coordinamos",
+    "flexible": "Entrar cuando me venga bien",
+    "flexibleSub": "Te abrimos una sala de reunión personal: entras cuando quieras, sin registro",
+    "callback": "Dejar mis datos y que me contacten",
+    "callbackSub": "Sin coordinar nada ahora",
+    "recorded": "Ver primero una demo grabada",
+    "recordedSub": "Míralo por tu cuenta y, si quieres, hablamos después"
+  },
+  "watch": {
+    "title": "Con gusto: aquí está la demo grabada",
+    "desc": "El vídeo recorre 1💗1 de principio a fin. Si después quieres hablar, aquí estamos.",
+    "cta": "Ver la demo",
+    "instead": "Dejar mis datos igualmente"
+  },
+  "form": {
+    "title": "Una demo personal, sin compromiso",
+    "lead": "En una charla corta te mostramos cómo una idea o una sociedad existente se convierte en un modelo transparente de aportes, misiones y reparto de ganancias.",
+    "name": "Nombre",
+    "namePh": "¿Cómo te llamamos?",
+    "email": "Correo",
+    "emailPh": "tu@ejemplo.com",
+    "phone": "Teléfono",
+    "phonePh": "+34 600 000 000",
+    "contactHint": "Con uno basta: correo o teléfono",
+    "goal": "En pocas palabras: ¿qué te gustaría crear o resolver?",
+    "goalPh": "Quién participa ya y qué te falta para empezar",
+    "optional": "opcional",
+    "time": "Horario preferido",
+    "timePh": "por ejemplo: lun–mié después de las 18:00",
+    "submit": "Agendar mi demo personal",
+    "submitCallback": "Toma mis datos y contáctame",
+    "sending": "Un momento…",
+    "errName": "Necesitamos un nombre para saber cómo dirigirnos a ti",
+    "errContact": "Necesitamos un correo o un teléfono: con uno basta",
+    "errEmail": "Esa dirección de correo no parece correcta",
+    "errSend": "Algo falló al enviar. ¿Lo intentamos de nuevo?"
+  },
+  "thanks": {
+    "title": "Recibimos tus datos, gracias.",
+    "body": "Te contactaremos para coordinar una demo personal de unos 20 minutos. Si quieres, ya puedes escribirnos en una frase qué te gustaría crear, quién participa y qué te falta para empezar.",
+    "meeting": "Tu sala de reunión está lista: entra cuando te venga bien, sin registro:",
+    "meetingCta": "Entrar a la reunión",
+    "meetingHint": "Guarda el enlace: también va camino del correo que dejaste.",
+    "whatsapp": "Escríbeme por WhatsApp",
+    "explore": "Mientras tanto, echa un vistazo a las rikmot activas y a la demo en vivo del sitio.",
+    "exploreCta": "Ver las rikmot activas",
+    "done": "Cerrar"
+  },
+  "bot": {
+    "intro": "Hola, estoy aquí para ayudarte a encontrar la forma adecuada de empezar en 1💗1. ¿Qué te gustaría hacer?",
+    "demo": "Ver una demo personal",
+    "register": "Empezar una rikma / registrarme",
+    "question": "Tengo una pregunta",
+    "questionPrompt": "Tengo una pregunta sobre 1💗1",
+    "haveAccount": "¿Ya tienes cuenta? Inicia sesión"
+  }
+}

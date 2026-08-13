@@ -61,7 +61,8 @@
     "title": "Where are you today?",
     "a1": "I have a partnership (or an idea for one)",
     "a2": "I'm looking for a venture to join",
-    "a3": "I just want to see the system"
+    "a3": "I just want to see the system",
+    "a4": "I want to understand before I start"
   },
   "sections": {
     "problemTitle": "Know that feeling?",
