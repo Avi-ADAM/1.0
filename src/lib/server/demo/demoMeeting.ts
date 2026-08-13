@@ -7,7 +7,7 @@
  * reached through a signed invitation link, no account, no login. So for a lead
  * who picks "I'd rather join at a convenient time" we open a `Pgisha` for them
  * up front and hand them a guest link to it. They walk in when they want; the
- * coordination mission in the central rikma tells the team a room is waiting.
+ * coordination task in the central rikma tells the team a room is waiting.
  *
  * The link is self-contained (see `guestInvite.ts`) — the meetings app verifies
  * the signature and needs no lookup here — but it *is* email-bound, so this

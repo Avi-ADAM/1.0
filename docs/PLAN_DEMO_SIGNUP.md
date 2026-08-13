@@ -46,7 +46,7 @@ with no account and no login.
 
 So `mode: 'flexible'` opens a `Pgisha` for the lead up front and mints a guest
 link to it (`src/lib/server/demo/demoMeeting.ts`). They walk in when they want;
-the coordination mission tells the team a room is waiting.
+the coordination task tells the team a room is waiting.
 
 The token format is shared verbatim with the meetings app — `guestInvite.ts`
 here already *verified* those tokens (for importing an invited meeting after
@@ -60,18 +60,33 @@ verify.
 
 ## Follow-up is work, not a note in an inbox
 
-Every demo request opens **two open missions in the central rikma**
+Every demo request opens **two unassigned Acts in the central rikma**
 (`src/lib/server/demo/centralRikmaTasks.ts`):
 
-1. **coordinate** — reach the person, agree on a time (~15 min).
-2. **the call** — hold the 20-minute demo (~30 min).
+1. **coordinate** — reach the person, agree on a time. Due in 3 days: a
+   coordination task with no due date is exactly the task that rots while the
+   lead waits for a reply.
+2. **the call** — hold the 20-minute demo. No due date; that's whatever the two
+   of them agree on.
 
 They're separate because they want different people: coordination is short and
 anyone can take it, the call wants someone who can actually walk through the
-system. Both are ordinary `OpenMission`s (`archived:false`, `isRishon:false`,
-`source:'project'`) so they appear on the rikma's board and can be claimed,
-timed and split like anything else — no new machinery, and the platform
-dogfoods its own answer to "who does this and what is it worth".
+system.
+
+**Unassigned is the point.** With no `my`, no `assignedUserId` and no roles,
+`createTask` returns an empty `notifyUserIds`, and its notification rule falls
+back to the project's members — so every relevant member hears about the lead
+on every channel they have set up, and whoever is free takes it. Nobody is
+silently made responsible. (Promoting an Act into a full open mission is a
+separate feature arriving shortly; this deliberately doesn't pre-empt it.)
+
+Creation goes through `actionService.executeAction('createTask', …)` rather
+than a raw mutation, precisely so the notification fan-out is the same one a
+task created inside the app gets. `/api/demo` is anonymous, so the acting
+member comes from `DEMO_HOST_USER_ID` with the admin token standing in for
+their JWT — the same shape `/api/v1/actions` uses for API-key traffic. That
+member **must belong to the central rikma**, since `createTask` enforces
+`projectMember`.
 
 ## Storage
 
@@ -87,7 +102,7 @@ New Strapi collection **`demo-request`** (repo `1.0b`,
 | `lang`, `page`, `source` | where they came from (`fpage` \| `bot`) |
 | `status` | `new` → `contacted` → `scheduled` → `met` → `closed` |
 | `meetingId`, `meetingLink` | the drop-in meeting, when one was opened |
-| `coordMissionId`, `callMissionId` | the two central-rikma missions |
+| `coordActId`, `callActId` | the two unassigned central-rikma Acts |
 | `userId`, `notes`, `scheduledAt` | admin-side |
 
 One row shows the whole state of a lead.
@@ -113,8 +128,8 @@ visitor asking for a demo is exactly the intended caller):
 
 1. for `flexible`, open the meeting and mint the guest link;
 2. save the `demo-request` row;
-3. open the two central-rikma missions;
-4. write the mission ids back onto the row;
+3. open the two unassigned central-rikma Acts (which notify the rikma);
+4. write the task ids back onto the row;
 5. Telegram the team.
 
 Only step 2 is fatal. The lead is the thing that must not be lost, so
@@ -128,11 +143,10 @@ The bot reaches the same endpoint through `requestDemoTool`
 
 | env | effect when unset |
 |---|---|
-| `DEMO_CENTRAL_PROJECT_ID` | no central-rikma missions are created (`warnings: ['tasks:not_configured']`); the lead is still saved |
+| `DEMO_CENTRAL_PROJECT_ID` | no central-rikma tasks are created (`warnings: ['tasks:not_configured']`); the lead is still saved |
+| `DEMO_HOST_USER_ID` | same — no tasks, since `createTask` needs an acting member. Also leaves the drop-in meeting belonging to nobody, so it shows in no team member's meeting list. **Must be a member of the central rikma.** |
 | `MEETINGS_URL` | no drop-in link is minted; the request falls back to a callback |
-| `DEMO_HOST_USER_ID` | the drop-in meeting belongs to nobody — it exists, but shows in no team member's meeting list |
 | `GUEST_INVITE_SECRET` | dev fallback is used — links won't verify against a production meetings app |
-| `DEMO_COORD_HOURS` / `DEMO_CALL_HOURS` | default to 0.25 / 0.5 hours |
 | `DEMO_MEETING_TTL_DAYS` | defaults to 14 |
 | `VITE_WHATSAPP` | the WhatsApp shortcut on the thank-you screen isn't shown |
 
@@ -144,6 +158,9 @@ the floor this feature must never fall below.
 - The thank-you copy says the meeting link is also on its way by email; wiring
   that email (via the existing `src/lib/components/mail/*` path) is not done yet.
 - `status` transitions are admin-side only — there's no UI for the team to move
-  a lead from `new` to `contacted`; the central-rikma missions carry that state
-  in practice.
+  a lead from `new` to `contacted`; the central-rikma tasks carry that state in
+  practice.
+- Promoting one of these Acts into a full open mission is a platform feature
+  landing separately. When it does, nothing here needs to change — the tasks are
+  ordinary Acts and will be promotable like any other.
 - Recorded-demo option is Hebrew-only, following the existing home-page videos.

@@ -8,12 +8,12 @@
  *   1. saves a `demo-request` row in Strapi (the lead record);
  *   2. for "I'd rather drop in when it suits me", opens a meetings-app meeting
  *      and mints a guest link so they can join without an account;
- *   3. opens the two follow-up missions in the central rikma (coordinate the
- *      call, hold the call) so the follow-up is work someone can claim rather
- *      than a note in an inbox;
+ *   3. opens the two follow-up tasks in the central rikma (coordinate the call,
+ *      hold the call) — unassigned, so every member is notified and whoever is
+ *      free takes it, rather than the lead becoming a note in one inbox;
  *   4. pings the team on Telegram;
- *   5. writes the meeting/mission ids back onto the lead row, so one record
- *      shows the whole state.
+ *   5. writes the meeting/task ids back onto the lead row, so one record shows
+ *      the whole state.
  *
  * Steps 2–5 are all best-effort. The lead is the thing that must not be lost:
  * as long as Strapi took the row, the response is a success, and a `warnings`
@@ -23,8 +23,8 @@
  * visitor should be able to send, so this mirrors `/api/report`: no client
  * secret, no session, minimal validation, and nothing the caller sends is ever
  * echoed to another user. Unlike `/api/report` it does write more than one row
- * — two missions land on the central rikma's board — so it is rate-limited per
- * IP to keep that board from being usable as a spam target.
+ * — two tasks land on the central rikma's board and notify its members — so it
+ * is rate-limited per IP to keep that board from being usable as a spam target.
  */
 
 import { env } from '$env/dynamic/private';
@@ -233,8 +233,8 @@ export const POST: RequestHandler = async ({ request, fetch, getClientAddress })
   );
   if (!tasks.created) warnings.push(`tasks:${tasks.reason ?? 'error'}`);
 
-  // ── 4. Write the artefact ids back onto the lead ──────────────────────────
-  if (strapiId && (tasks.coordMissionId || tasks.callMissionId)) {
+  // ── 4. Write the task ids back onto the lead ──────────────────────────────
+  if (strapiId && (tasks.coordActId || tasks.callActId)) {
     try {
       await fetch(`${STRAPI_URL}/api/demo-requests/${strapiId}`, {
         method: 'PUT',
@@ -244,13 +244,13 @@ export const POST: RequestHandler = async ({ request, fetch, getClientAddress })
         },
         body: JSON.stringify({
           data: {
-            coordMissionId: tasks.coordMissionId ?? null,
-            callMissionId: tasks.callMissionId ?? null
+            coordActId: tasks.coordActId ?? null,
+            callActId: tasks.callActId ?? null
           }
         })
       });
     } catch (e) {
-      console.error('[demo] linking missions back to the lead failed:', e);
+      console.error('[demo] linking tasks back to the lead failed:', e);
       warnings.push('link:error');
     }
   }
@@ -270,8 +270,8 @@ export const POST: RequestHandler = async ({ request, fetch, getClientAddress })
         `🌐 ${lang} · 📍 ${page || '—'} · ${source}`,
         strapiId ? `🗄 demo-request #${strapiId}` : null,
         meetingLink ? `🚪 פגישת אורח: ${meetingLink}` : null,
-        tasks.coordMissionId && projectId
-          ? `🛠️ מטלות בריקמה המרכזית: ${[tasks.coordMissionId, tasks.callMissionId]
+        tasks.coordActId && projectId
+          ? `🛠️ מטלות בריקמה המרכזית: ${[tasks.coordActId, tasks.callActId]
               .filter(Boolean)
               .join(', ')}`
           : null,

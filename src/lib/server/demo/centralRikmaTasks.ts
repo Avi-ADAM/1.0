@@ -2,32 +2,45 @@
  * Turn a personal-demo request into real work in the central rikma.
  *
  * A lead who asks for a demo creates two obligations for the team, and the
- * platform's own answer to "who does this and what is it worth" is a mission
- * inside a rikma — not a row in a CRM. So each demo request opens two open
- * missions in the central rikma:
+ * platform's own answer to "who does this" is a task inside a rikma — not a row
+ * in a CRM. So each demo request opens two **Acts** in the central rikma:
  *
  *   1. **coordinate** — reach the person, agree on a time.
  *   2. **the call itself** — hold the 20-minute demo.
  *
  * They are separate on purpose: the coordination is short and anyone can pick
  * it up, the call is longer and usually wants someone who can actually walk
- * through the system. Both are ordinary `OpenMission`s (`archived:false`,
- * `isRishon:false`, `source:'project'`), so they show up on the rikma's board,
- * can be claimed, timed and split like any other mission — no new machinery.
+ * through the system.
  *
- * Configuration: `DEMO_CENTRAL_PROJECT_ID` names the central rikma. With it
- * unset the whole thing no-ops (`reason:'not_configured'`) and the demo request
- * is still saved — the tasks are a convenience, never a precondition for
- * capturing a lead. `DEMO_COORD_HOURS` / `DEMO_CALL_HOURS` override the default
- * hour estimates.
+ * Both are created **unassigned** (`isAssigned:false`, no `my`, no roles).
+ * That is the whole point: with no assignee, `createTask`'s notification rule
+ * falls back to the project's members, so everyone relevant hears about the
+ * lead instead of one person being silently made responsible for it. Whoever is
+ * free takes it. (Promoting an Act into a full open mission is a feature
+ * arriving separately — this deliberately doesn't pre-empt it.)
+ *
+ * Creation goes through `actionService.executeAction('createTask', …)` rather
+ * than a raw mutation, so validation, authorization and — crucially — the
+ * notification fan-out are exactly the ones a task created inside the app gets.
+ * `/api/demo` is anonymous, so the acting member comes from `DEMO_HOST_USER_ID`
+ * and the admin token stands in for their JWT, the same shape `/api/v1/actions`
+ * uses for API-key traffic.
+ *
+ * Configuration: `DEMO_CENTRAL_PROJECT_ID` names the central rikma and
+ * `DEMO_HOST_USER_ID` the team member the tasks are opened by — who **must be a
+ * member of that rikma**, since `createTask` enforces `projectMember`. With
+ * either unset the whole thing no-ops (`reason:'not_configured'`) and the demo
+ * request is still saved: the tasks are a convenience, never a precondition for
+ * capturing a lead.
  *
  * Best-effort throughout: a Strapi hiccup here must never fail `/api/demo`.
  */
 
 import { env } from '$env/dynamic/private';
-import { STRAPI_GRAPHQL } from '$lib/server/strapiUrl.js';
+import { actionService } from '$lib/server/actions/index.js';
+import type { ActionContext } from '$lib/server/actions/types.js';
 
-/** The two missions a demo request generates. */
+/** The two tasks a demo request generates. */
 export type DemoTaskKind = 'coordinate' | 'call';
 
 export interface DemoTaskLead {
@@ -43,7 +56,7 @@ export interface DemoTaskLead {
   /** Free-text time preference ("evenings", "Sunday after 18:00", …). */
   preferredTime?: string | null;
   lang?: string | null;
-  /** Strapi id of the `demo-request` row, so the mission points back at it. */
+  /** Strapi id of the `demo-request` row, so the task points back at it. */
   demoRequestId?: string | number | null;
   /** Guest link into the meetings app, when one was minted. */
   meetingLink?: string | null;
@@ -52,39 +65,10 @@ export interface DemoTaskLead {
 export interface DemoTasksResult {
   created: boolean;
   reason?: 'not_configured' | 'error';
-  /** OpenMission ids, keyed by kind — present for whichever ones succeeded. */
-  coordMissionId?: string;
-  callMissionId?: string;
+  /** Act ids, present for whichever of the two succeeded. */
+  coordActId?: string;
+  callActId?: string;
 }
-
-const CREATE_MISSION = `mutation DemoCreateMission($missionName: String, $descrip: String, $publishedAt: DateTime) {
-  createMission(data: { missionName: $missionName, descrip: $descrip, publishedAt: $publishedAt }) {
-    data { id }
-  }
-}`;
-
-const CREATE_OPEN_MISSION = `mutation DemoCreateOpenMission(
-  $projectId: ID!
-  $missionId: ID!
-  $name: String!
-  $descrip: String
-  $noofhours: Float
-  $publishedAt: DateTime!
-) {
-  createOpenMission(data: {
-    project: $projectId
-    mission: $missionId
-    name: $name
-    descrip: $descrip
-    noofhours: $noofhours
-    source: project
-    isRishon: false
-    archived: false
-    publishedAt: $publishedAt
-  }) {
-    data { id }
-  }
-}`;
 
 /** `ADMINMONTHER` occasionally arrives with its own name or whitespace glued on. */
 function adminToken(): string {
@@ -98,9 +82,9 @@ export function centralRikmaId(): string {
   return String(env.DEMO_CENTRAL_PROJECT_ID ?? '').trim();
 }
 
-function hours(name: 'DEMO_COORD_HOURS' | 'DEMO_CALL_HOURS', fallback: number): number {
-  const n = Number(env[name]);
-  return Number.isFinite(n) && n > 0 ? n : fallback;
+/** The team member the demo tasks are opened by, or '' when not configured. */
+export function demoHostId(): string {
+  return String(env.DEMO_HOST_USER_ID ?? '').trim();
 }
 
 const TRACK_LABELS: Record<string, string> = {
@@ -118,8 +102,8 @@ const TIME_MODE_LABELS: Record<string, string> = {
 };
 
 /**
- * The shared body of both missions: everything the person on the other end
- * needs in order to make the call useful, without opening another tab.
+ * The shared body of both tasks: everything the person who picks it up needs in
+ * order to make the call useful, without opening another tab.
  */
 function leadBrief(lead: DemoTaskLead): string {
   const contact = [lead.email, lead.phone].filter(Boolean).join(' · ') || '—';
@@ -138,82 +122,81 @@ function leadBrief(lead: DemoTaskLead): string {
     .join('\n');
 }
 
-/** Title + description + hour estimate for one of the two missions. */
+/** Days from now for a task's due date, or null to leave it open. */
+const DUE_DAYS: Record<DemoTaskKind, number | null> = {
+  // A coordination task with no due date is exactly the task that rots — the
+  // lead is waiting for a reply, so it carries a short one.
+  coordinate: 3,
+  // The call's date is whatever the two of them agree on; a made-up deadline
+  // here would only be noise on the board.
+  call: null
+};
+
+/** Title, description and urgency for one of the two tasks. */
 function taskSpec(kind: DemoTaskKind, lead: DemoTaskLead) {
   const brief = leadBrief(lead);
   if (kind === 'coordinate') {
     return {
       name: `תיאום שיחת דמו · ${lead.name}`,
-      descrip:
-        `ליצור קשר עם מי שביקש/ה דמו אישי ולסגור מועד לשיחה של כ‑20 דקות.\n\n${brief}`,
-      noofhours: hours('DEMO_COORD_HOURS', 0.25)
+      description: `ליצור קשר עם מי שביקש/ה דמו אישי ולסגור מועד לשיחה של כ‑20 דקות.\n\n${brief}`,
+      hashivut: 'yellow'
     };
   }
   return {
     name: `שיחת דמו אישית · ${lead.name}`,
-    descrip:
+    description:
       `להעביר דמו אישי של כ‑20 דקות: איך 1💗1 מתאימה למצב שלהם — חלוקת תרומות, ` +
       `משימות, קבלת החלטות והצטרפות שותפים.\n\n${brief}`,
-    noofhours: hours('DEMO_CALL_HOURS', 0.5)
+    hashivut: 'green'
   };
 }
 
-async function gql(
-  fetchFn: typeof globalThis.fetch,
-  query: string,
-  variables: Record<string, unknown>
-): Promise<any> {
-  const res = await fetchFn(STRAPI_GRAPHQL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${adminToken()}`
-    },
-    body: JSON.stringify({ query, variables })
-  });
-  const data = await res.json();
-  if (data?.errors) {
-    throw new Error(JSON.stringify(data.errors).slice(0, 300));
-  }
-  return data?.data;
+function dueDate(kind: DemoTaskKind): string | undefined {
+  const days = DUE_DAYS[kind];
+  if (days == null) return undefined;
+  return new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
 }
 
-/** Create one Mission + its OpenMission in the central rikma. Returns the OpenMission id. */
+/** Create one unassigned Act in the central rikma. Returns its id. */
 async function createOne(
-  fetchFn: typeof globalThis.fetch,
+  context: ActionContext,
   projectId: string,
   kind: DemoTaskKind,
   lead: DemoTaskLead
 ): Promise<string> {
   const spec = taskSpec(kind, lead);
-  const publishedAt = new Date().toISOString();
 
-  const missionData = await gql(fetchFn, CREATE_MISSION, {
-    missionName: spec.name,
-    descrip: spec.descrip,
-    publishedAt
-  });
-  const missionId = missionData?.createMission?.data?.id;
-  if (!missionId) throw new Error(`createMission returned no id for "${kind}"`);
+  const due = dueDate(kind);
 
-  const openData = await gql(fetchFn, CREATE_OPEN_MISSION, {
-    projectId,
-    missionId: String(missionId),
-    name: spec.name,
-    descrip: spec.descrip,
-    noofhours: spec.noofhours,
-    publishedAt
-  });
-  const openId = openData?.createOpenMission?.data?.id;
-  if (!openId) throw new Error(`createOpenMission returned no id for "${kind}"`);
+  const result = await actionService.executeAction(
+    'createTask',
+    {
+      projectId,
+      name: spec.name,
+      description: spec.description,
+      hashivut: spec.hashivut,
+      // Nobody is made responsible for this. An empty `notifyUserIds` is what
+      // makes createTask's notification rule fall back to the whole rikma.
+      isAssigned: false,
+      dateS: new Date().toISOString(),
+      ...(due ? { dateF: due } : {})
+    },
+    context
+  );
 
-  return String(openId);
+  if (!result.success) {
+    throw new Error(result.error?.message ?? `createTask failed for "${kind}"`);
+  }
+
+  const id = result.data?.id;
+  if (!id) throw new Error(`createTask returned no id for "${kind}"`);
+  return String(id);
 }
 
 /**
- * Open the coordinate + call missions for one demo request.
+ * Open the coordinate + call tasks for one demo request.
  *
- * Each mission is attempted independently: if the call mission fails, the
+ * Each task is attempted independently: if the call task fails, the
  * coordination one that already succeeded is still reported back, so the caller
  * can store what it got.
  */
@@ -222,18 +205,28 @@ export async function createDemoTasks(
   fetchFn: typeof globalThis.fetch = fetch
 ): Promise<DemoTasksResult> {
   const projectId = centralRikmaId();
-  if (!projectId) return { created: false, reason: 'not_configured' };
+  const hostId = demoHostId();
+  if (!projectId || !hostId) return { created: false, reason: 'not_configured' };
+
+  // Strapi has no notion of "the system": the tasks are opened by the demo
+  // host, with the admin token standing in for their JWT.
+  const context: ActionContext = {
+    userId: hostId,
+    jwt: adminToken(),
+    lang: 'he',
+    fetch: fetchFn
+  };
 
   const out: DemoTasksResult = { created: false };
 
   for (const kind of ['coordinate', 'call'] as const) {
     try {
-      const id = await createOne(fetchFn, projectId, kind, lead);
-      if (kind === 'coordinate') out.coordMissionId = id;
-      else out.callMissionId = id;
+      const id = await createOne(context, projectId, kind, lead);
+      if (kind === 'coordinate') out.coordActId = id;
+      else out.callActId = id;
       out.created = true;
     } catch (e) {
-      console.error(`[demo] central-rikma "${kind}" mission failed:`, e);
+      console.error(`[demo] central-rikma "${kind}" task failed:`, e);
       out.reason = 'error';
     }
   }
