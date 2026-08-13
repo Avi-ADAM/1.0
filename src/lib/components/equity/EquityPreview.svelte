@@ -426,20 +426,11 @@
   .row.picked {
     background: rgb(0 0 0 / 0.06);
   }
-  @media (prefers-color-scheme: dark) {
-    :root:where(:not([data-theme='light'])) .row:hover,
-    :root:where(:not([data-theme='light'])) .row:focus-visible {
-      background: rgb(255 255 255 / 0.06);
-    }
-    :root:where(:not([data-theme='light'])) .row.picked {
-      background: rgb(255 255 255 / 0.1);
-    }
-  }
-  :root[data-theme='dark'] .row:hover,
-  :root[data-theme='dark'] .row:focus-visible {
+  :global(html.dark) .row:hover,
+  :global(html.dark) .row:focus-visible {
     background: rgb(255 255 255 / 0.06);
   }
-  :root[data-theme='dark'] .row.picked {
+  :global(html.dark) .row.picked {
     background: rgb(255 255 255 / 0.1);
   }
 </style>

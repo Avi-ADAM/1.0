@@ -707,7 +707,8 @@
     "githubLink": "رابط جيت هاب الشبكة",
     "facebookLink": "رابط فيسبوك الشبكة",
     "valuesAndObjectives": "القيم والأهداف",
-    "openMissions": "مهام متاحة"
+    "openMissions": "مهام متاحة",
+    "loadError": "تعذر تحميل الشبكة. يرجى المحاولة مرة أخرى."
   },
   "hevel": {
     "skills": "المهارات",

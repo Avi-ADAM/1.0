@@ -85,7 +85,14 @@
     "discover_products": "Products",
     "discover_missions": "Open missions",
     "discover_resources": "Wanted resources",
-    "guide": "Guide"
+    "guide": "Guide",
+    "home": "Home",
+    "grow": "Grow together",
+    "quorum": "Quorum",
+    "consensus": "Agreement engine",
+    "faq": "FAQ",
+    "login": "Log in",
+    "signup": "Sign up"
   },
   "status": {
     "success": "Success",

@@ -708,7 +708,8 @@
     "githubLink": "Enlace al GitHub de la rikma",
     "facebookLink": "Enlace al Facebook de la rikma",
     "valuesAndObjectives": "Valores y objetivos",
-    "openMissions": "Misiones disponibles"
+    "openMissions": "Misiones disponibles",
+    "loadError": "No se pudo cargar la rikma. Inténtalo de nuevo."
   },
   "hevel": {
     "skills": "Habilidades",

@@ -128,7 +128,10 @@
         class="flex flex-col items-center justify-center mb-8 animate-fade-in-up"
       >
         <!-- The Badge Component -->
-        <div class="mb-6 drop-shadow-[0_0_25px_rgba(255,215,0,0.3)]">
+        <!-- ההילה הזהובה שייכת למראה האישי; בעסקי החותם עומד בלי זוהר. -->
+        <div
+          class="mb-6 drop-shadow-[0_0_25px_rgba(255,215,0,0.3)] business:drop-shadow-none"
+        >
           <AuthorityBadge
             logoSrc={srcP}
             projectName={project.attributes.projectName}

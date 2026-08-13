@@ -86,7 +86,14 @@
     "discover_products": "Productos",
     "discover_missions": "Misiones abiertas",
     "discover_resources": "Recursos buscados",
-    "guide": "Guía"
+    "guide": "Guía",
+    "home": "Inicio",
+    "grow": "Cultivar juntos",
+    "quorum": "Quórum",
+    "consensus": "Motor de acuerdo",
+    "faq": "Preguntas",
+    "login": "Entrar",
+    "signup": "Registrarse"
   },
   "status": {
     "success": "Hecho con éxito",

@@ -10,9 +10,11 @@
    * happens to accrued hours, and whether approving also ends someone's
    * membership of the rikma.
    */
-  import { t } from '$lib/translations';
+  import { t, isRtl } from '$lib/translations';
   import { executeAction } from '$lib/client/actionClient';
   import { toast } from 'svelte-sonner';
+  import { isMobileOrTablet } from '$lib/utilities/device';
+  import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
   import CardHeader from './CardHeader.svelte';
   import NegoArchive from '../negoArchive.svelte';
 
@@ -78,6 +80,11 @@
 
   const targetLabel = $derived($t(`archive.card.target.${archive?.targetKind}`));
 
+  // Same two colours the header glows with — keeping the object reads teal,
+  // removing it reads orange.
+  const glowColor = $derived(isKeep ? 'teal' : 'orange');
+  const glowRgb = $derived(isKeep ? '20, 184, 166' : '254, 172, 49');
+
   const deadline = $derived(
     timegramaDate ? new Date(timegramaDate).toLocaleDateString() : ''
   );
@@ -105,10 +112,30 @@
   }
 </script>
 
+<!--
+  Card shell — the shared lev convention (see docs/LEV_CARD_CONVENTIONS.md):
+  the slide centres its child, so the card must claim its own 90%/full size;
+  a click toggles `isScrolable`, which both frees inner scrolling (Swiper stops
+  eating the wheel) and moves the glow onto this card.
+-->
 <div
-  class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden flex flex-col h-full {isFirst
+  onclick={toggleScrollable}
+  role="button"
+  tabindex="0"
+  onkeypress={(e) => {
+    e.key === 'Enter' && toggleScrollable();
+  }}
+  dir={$isRtl ? 'rtl' : 'ltr'}
+  class="{isMobileOrTablet()
+    ? 'w-full h-full'
+    : 'w-[90%] h-[90%]'} lg:w-[90%] {isFirst
+    ? $isRtl
+      ? 'boxleft'
+      : 'boxright'
+    : ''} flex d flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isScrolable.value
     ? 'shadow-glow border-glow'
-    : 'shadow-lg border border-gray-200 dark:border-gray-700'}"
+    : 'shadow-lg border border-gray-100 dark:border-gray-700'} transition-all duration-300 relative"
+  style:--glow-rgb={glowRgb}
 >
   <CardHeader
     {logoSrc}
@@ -116,11 +143,15 @@
     {cardType}
     cardTitle={archive?.targetName ?? ''}
     memberCount={memberCount || archive?.memberCount || 0}
-    glowColor={isKeep ? 'teal' : 'orange'}
+    {glowColor}
     onProjectClick={() => onProj?.({ id: projectId })}
   />
 
-  <div class="flex-1 overflow-y-auto p-4 space-y-4">
+  <div
+    class="{isScrolable.value
+      ? 'bg-white dark:bg-slate-800'
+      : 'bg-gray-200 dark:bg-slate-700'} transition-all-300 flex-1 overflow-y-auto d p-4 space-y-4"
+  >
     <div class="flex items-center gap-2 flex-wrap">
       <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
         {targetLabel}
@@ -221,7 +252,9 @@
     {/if}
   </div>
 
-  <div class="p-4 bg-gray-50 dark:bg-gray-900/80 border-t border-gray-200 dark:border-gray-700 flex gap-2">
+  <div
+    class="p-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700 flex gap-2"
+  >
     <button
       type="button"
       onclick={() => onChat?.({ decisionId: archive?.decisionId, projectId })}
@@ -255,3 +288,27 @@
 </div>
 
 <NegoArchive bind:open={negoOpen} {archive} {projectId} onSent={onDone} />
+
+<style>
+  .shadow-glow {
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      0 0 20px rgba(var(--glow-rgb), 0.4),
+      0 0 40px rgba(var(--glow-rgb), 0.3),
+      0 0 60px rgba(var(--glow-rgb), 0.2),
+      inset 0 0 20px rgba(var(--glow-rgb), 0.05);
+  }
+
+  .border-glow {
+    border: 2px solid rgba(var(--glow-rgb), 0.5);
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      0 0 20px rgba(var(--glow-rgb), 0.4),
+      0 0 40px rgba(var(--glow-rgb), 0.3),
+      0 0 60px rgba(var(--glow-rgb), 0.2),
+      inset 0 0 20px rgba(var(--glow-rgb), 0.05),
+      0 0 0 1px rgba(var(--glow-rgb), 0.3);
+  }
+</style>

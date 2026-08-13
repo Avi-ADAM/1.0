@@ -694,7 +694,7 @@
           onmouseleave={() => hover('0')}
           onclick={() => isRishon ? nego('f') : decline('f')}
           class="flex-1 py-2 flex justify-center items-center font-bold rounded-xl transition-all {isRishon
-            ? 'bg-white dark:bg-gray-800 border-2 border-gold text-gold hover:bg-gold/10 ' + (negotiationMode ? 'ring-2 ring-gold' : '')
+            ? 'bg-white dark:bg-gray-800 border-2 border-gold text-goldink hover:bg-gold/10 ' + (negotiationMode ? 'ring-2 ring-gold' : '')
             : 'bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'}"
         >
           {#if isRishon}

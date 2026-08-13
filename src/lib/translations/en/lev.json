@@ -707,7 +707,8 @@
     "githubLink": "Link to the FreeMates GitHub",
     "facebookLink": "Link to the FreeMates Facebook",
     "valuesAndObjectives": "Values and objectives",
-    "openMissions": "Open missions"
+    "openMissions": "Open missions",
+    "loadError": "Could not load the rikma. Please try again."
   },
   "hevel": {
     "skills": "Skills",

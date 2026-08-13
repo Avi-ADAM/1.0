@@ -1,15 +1,9 @@
 <script>
   import Fpage from '$lib/components/main/fpage.svelte';
-  import { lang } from '$lib/stores/lang.js';
-  import { t } from '$lib/translations';
 </script>
 
-<svelte:head>
-  <title>{$t('pages.homeTitle')}</title>
-  <meta name="description" content={$t('pages.homeDescription')} />
-  <meta property="og:title" content={$t('pages.homeTitle')} />
-  <meta property="og:description" content={$t('pages.homeDescription')} />
-  <meta property="og:type" content="website" />
-</svelte:head>
-
-<Fpage/>
+<!-- No <svelte:head> here on purpose. Fpage carries the homepage's <Head>
+     (title, description, canonical, og, twitter) and is also what /he, /en and
+     /ar render — declaring a second title here gave `/` two <title> tags and
+     two og:title values, and crawlers keep the first one they see. -->
+<Fpage />

@@ -77,5 +77,19 @@
         "help": "Identity setup failed — see the identity page for details"
       }
     }
+  },
+  "appearance": {
+    "title": "Appearance",
+    "language": "Language",
+    "look": "Look",
+    "brightness": "Brightness",
+    "themePersonal": "Personal",
+    "themePersonalDesc": "Gold and pink, soft corners",
+    "themeBusiness": "Business",
+    "themeBusinessDesc": "High contrast, less colour",
+    "mode_light": "Day",
+    "mode_dark": "Night",
+    "mode_system": "Device",
+    "followingSystem": "Following your device — currently {{mode}}"
   }
 }

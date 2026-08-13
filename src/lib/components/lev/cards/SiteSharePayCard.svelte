@@ -239,4 +239,26 @@
   .border-gold {
     border-color: var(--gold, #c9a227);
   }
+
+  .shadow-glow {
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      0 0 20px rgba(var(--glow-rgb), 0.4),
+      0 0 40px rgba(var(--glow-rgb), 0.3),
+      0 0 60px rgba(var(--glow-rgb), 0.2),
+      inset 0 0 20px rgba(var(--glow-rgb), 0.05);
+  }
+
+  .border-glow {
+    border: 2px solid rgba(var(--glow-rgb), 0.5);
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      0 0 20px rgba(var(--glow-rgb), 0.4),
+      0 0 40px rgba(var(--glow-rgb), 0.3),
+      0 0 60px rgba(var(--glow-rgb), 0.2),
+      inset 0 0 20px rgba(var(--glow-rgb), 0.05),
+      0 0 0 1px rgba(var(--glow-rgb), 0.3);
+  }
 </style>

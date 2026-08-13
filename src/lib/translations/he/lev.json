@@ -707,7 +707,8 @@
     "githubLink": "לינק לגיטהב של הריקמה",
     "facebookLink": "לינק לפייסבוק של הריקמה",
     "valuesAndObjectives": "ערכים ומטרות",
-    "openMissions": "משימות פנויות בריקמה"
+    "openMissions": "משימות פנויות בריקמה",
+    "loadError": "טעינת הריקמה נכשלה. יש לנסות שנית."
   },
   "hevel": {
     "skills": "כישורים",

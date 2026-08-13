@@ -85,7 +85,14 @@
     "discover_products": "Продукты",
     "discover_missions": "Открытые миссии",
     "discover_resources": "Нужные ресурсы",
-    "guide": "Руководство"
+    "guide": "Руководство",
+    "home": "Главная",
+    "grow": "Растим вместе",
+    "quorum": "Кворум",
+    "consensus": "Механизм согласия",
+    "faq": "Вопросы",
+    "login": "Вход",
+    "signup": "Регистрация"
   },
   "status": {
     "success": "Успешно",

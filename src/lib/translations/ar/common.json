@@ -85,7 +85,14 @@
     "discover_products": "منتجات",
     "discover_missions": "مهام مفتوحة",
     "discover_resources": "موارد مطلوبة",
-    "guide": "الدليل"
+    "guide": "الدليل",
+    "home": "الرئيسية",
+    "grow": "نزرع معًا",
+    "quorum": "كوورَم",
+    "consensus": "محرّك الاتفاق",
+    "faq": "أسئلة شائعة",
+    "login": "دخول",
+    "signup": "تسجيل"
   },
   "status": {
     "success": "تم بنجاح",

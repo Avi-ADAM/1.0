@@ -707,7 +707,8 @@
     "githubLink": "Ссылка на GitHub рикмы",
     "facebookLink": "Ссылка на Facebook рикмы",
     "valuesAndObjectives": "Ценности и цели",
-    "openMissions": "Открытые задачи"
+    "openMissions": "Открытые задачи",
+    "loadError": "Не удалось загрузить рикму. Попробуйте ещё раз."
   },
   "hevel": {
     "skills": "Навыки",

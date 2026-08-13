@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-08-10
+> Last updated: 2026-08-13
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -23,7 +23,7 @@ import type { StrapiEntity, StrapiCollection, StrapiMedia } from '$lib/types/str
 
 ---
 
-## 🏗️ Content Type Entities (120)
+## 🏗️ Content Type Entities (121)
 
 These are the main content types in the Strapi backend.
 
@@ -361,6 +361,31 @@ These are the main content types in the Strapi backend.
 | `projects` | `Maybe<ProjectRelationResponseCollection>` |
 | `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
+
+### DemoRequest
+| Field | Type |
+|-------|------|
+| `callActId` | `Maybe<Scalars['String']['output']>` |
+| `coordActId` | `Maybe<Scalars['String']['output']>` |
+| `createdAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `email` | `Maybe<Scalars['String']['output']>` |
+| `goal` | `Maybe<Scalars['String']['output']>` |
+| `lang` | `Maybe<Scalars['String']['output']>` |
+| `meetingId` | `Maybe<Scalars['String']['output']>` |
+| `meetingLink` | `Maybe<Scalars['String']['output']>` |
+| `name` | `Scalars['String']['output']` |
+| `notes` | `Maybe<Scalars['String']['output']>` |
+| `page` | `Maybe<Scalars['String']['output']>` |
+| `phone` | `Maybe<Scalars['String']['output']>` |
+| `preferredTime` | `Maybe<Scalars['String']['output']>` |
+| `publishedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `scheduledAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `source` | `Maybe<Scalars['String']['output']>` |
+| `status` | `Maybe<Enum_Demorequest_Status>` |
+| `timeMode` | `Maybe<Enum_Demorequest_Timemode>` |
+| `track` | `Maybe<Enum_Demorequest_Track>` |
+| `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
+| `userId` | `Maybe<Scalars['String']['output']>` |
 
 ### Filtertag
 | Field | Type |
@@ -1065,6 +1090,7 @@ These are the main content types in the Strapi backend.
 | `createDecision` | `Maybe<DecisionEntityResponse>` |
 | `createDeffinition` | `Maybe<DeffinitionEntityResponse>` |
 | `createDeffinitionLocalization` | `Maybe<DeffinitionEntityResponse>` |
+| `createDemoRequest` | `Maybe<DemoRequestEntityResponse>` |
 | `createFiltertag` | `Maybe<FiltertagEntityResponse>` |
 | `createFiltertagLocalization` | `Maybe<FiltertagEntityResponse>` |
 | `createFiniapruval` | `Maybe<FiniapruvalEntityResponse>` |
@@ -1196,6 +1222,7 @@ These are the main content types in the Strapi backend.
 | `deleteDeal` | `Maybe<DealEntityResponse>` |
 | `deleteDecision` | `Maybe<DecisionEntityResponse>` |
 | `deleteDeffinition` | `Maybe<DeffinitionEntityResponse>` |
+| `deleteDemoRequest` | `Maybe<DemoRequestEntityResponse>` |
 | `deleteFiltertag` | `Maybe<FiltertagEntityResponse>` |
 | `deleteFiniapruval` | `Maybe<FiniapruvalEntityResponse>` |
 | `deleteFinnishedMission` | `Maybe<FinnishedMissionEntityResponse>` |
@@ -1309,6 +1336,7 @@ These are the main content types in the Strapi backend.
 | `updateDeal` | `Maybe<DealEntityResponse>` |
 | `updateDecision` | `Maybe<DecisionEntityResponse>` |
 | `updateDeffinition` | `Maybe<DeffinitionEntityResponse>` |
+| `updateDemoRequest` | `Maybe<DemoRequestEntityResponse>` |
 | `updateFileInfo` | `UploadFileEntityResponse` |
 | `updateFiltertag` | `Maybe<FiltertagEntityResponse>` |
 | `updateFiniapruval` | `Maybe<FiniapruvalEntityResponse>` |
@@ -2036,6 +2064,8 @@ These are the main content types in the Strapi backend.
 | `decisions` | `Maybe<DecisionEntityResponseCollection>` |
 | `deffinition` | `Maybe<DeffinitionEntityResponse>` |
 | `deffinitions` | `Maybe<DeffinitionEntityResponseCollection>` |
+| `demoRequest` | `Maybe<DemoRequestEntityResponse>` |
+| `demoRequests` | `Maybe<DemoRequestEntityResponseCollection>` |
 | `filtertag` | `Maybe<FiltertagEntityResponse>` |
 | `filtertags` | `Maybe<FiltertagEntityResponseCollection>` |
 | `finiapruval` | `Maybe<FiniapruvalEntityResponse>` |
@@ -4160,7 +4190,7 @@ These are Strapi components (reusable field groups).
 
 ---
 
-## 📝 Input Types (118)
+## 📝 Input Types (119)
 
 Used for creating/updating content.
 
@@ -4523,6 +4553,29 @@ Used for creating/updating content.
 | `free_people` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `projects` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+
+### DemoRequestInput
+| Field | Type |
+|-------|------|
+| `callActId` | `InputMaybe<Scalars['String']['input']>` |
+| `coordActId` | `InputMaybe<Scalars['String']['input']>` |
+| `email` | `InputMaybe<Scalars['String']['input']>` |
+| `goal` | `InputMaybe<Scalars['String']['input']>` |
+| `lang` | `InputMaybe<Scalars['String']['input']>` |
+| `meetingId` | `InputMaybe<Scalars['String']['input']>` |
+| `meetingLink` | `InputMaybe<Scalars['String']['input']>` |
+| `name` | `InputMaybe<Scalars['String']['input']>` |
+| `notes` | `InputMaybe<Scalars['String']['input']>` |
+| `page` | `InputMaybe<Scalars['String']['input']>` |
+| `phone` | `InputMaybe<Scalars['String']['input']>` |
+| `preferredTime` | `InputMaybe<Scalars['String']['input']>` |
+| `publishedAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `scheduledAt` | `InputMaybe<Scalars['DateTime']['input']>` |
+| `source` | `InputMaybe<Scalars['String']['input']>` |
+| `status` | `InputMaybe<Enum_Demorequest_Status>` |
+| `timeMode` | `InputMaybe<Enum_Demorequest_Timemode>` |
+| `track` | `InputMaybe<Enum_Demorequest_Track>` |
+| `userId` | `InputMaybe<Scalars['String']['input']>` |
 
 ### FileInfoInput
 | Field | Type |
@@ -6602,12 +6655,12 @@ Used for creating/updating content.
 
 ---
 
-## 🔍 Filter Input Types (107)
+## 🔍 Filter Input Types (108)
 
 Used for querying/filtering content. Each content type has a corresponding filter input.
 
 <details>
-<summary>Click to expand all 107 filter types</summary>
+<summary>Click to expand all 108 filter types</summary>
 
 #### ActFiltersInput
 Fields: `and`, `createdAt`, `dateF`, `dateS`, `des`, `forums`, `hashivut`, `id`, `isAssigned`, `link`, `locale`, `localizations`, `mesimabetahaliches`, `my`, `myIshur`, `naasa`, `negopendmissions`, `not`, `open_mission`, `or`, `partofs`, `pendm`, `project`, `publishedAt`, `shem`, `status`, `tafkidims`, `taskdis`, `timegrama`, `timers`, `updatedAt`, `userAndIshur`, `vali`, `valiIshur`
@@ -6668,6 +6721,9 @@ Fields: `and`, `archEndsMembership`, `archMashabetahalich`, `archMatanot`, `arch
 
 #### DeffinitionFiltersInput
 Fields: `and`, `countries`, `createdAt`, `deffinitionName`, `free_people`, `id`, `locale`, `localizations`, `not`, `or`, `projects`, `publishedAt`, `updatedAt`
+
+#### DemoRequestFiltersInput
+Fields: `and`, `callActId`, `coordActId`, `createdAt`, `email`, `goal`, `id`, `lang`, `meetingId`, `meetingLink`, `name`, `not`, `notes`, `or`, `page`, `phone`, `preferredTime`, `publishedAt`, `scheduledAt`, `source`, `status`, `timeMode`, `track`, `updatedAt`, `userId`
 
 #### FiltertagFiltersInput
 Fields: `and`, `createdAt`, `id`, `locale`, `localizations`, `name`, `not`, `or`, `publishedAt`, `updatedAt`, `users_permissions_users`
@@ -6934,12 +6990,12 @@ Fields: `allSubmited`, `and`, `createdAt`, `done`, `id`, `mesimabetahalich`, `no
 
 ---
 
-## 📦 Entity Response Types (414)
+## 📦 Entity Response Types (417)
 
 Wrapper types for GraphQL responses.
 
 <details>
-<summary>Click to expand all 414 response types</summary>
+<summary>Click to expand all 417 response types</summary>
 
 - **ActEntity**: `attributes: Maybe<Act>`, `id: Maybe<Scalars['ID']['output']>`
 - **ActEntityResponse**: `data: Maybe<ActEntity>`
@@ -7018,6 +7074,9 @@ Wrapper types for GraphQL responses.
 - **DeffinitionEntityResponse**: `data: Maybe<DeffinitionEntity>`
 - **DeffinitionEntityResponseCollection**: `data: Array<DeffinitionEntity>`, `meta: ResponseCollectionMeta`
 - **DeffinitionRelationResponseCollection**: `data: Array<DeffinitionEntity>`
+- **DemoRequestEntity**: `attributes: Maybe<DemoRequest>`, `id: Maybe<Scalars['ID']['output']>`
+- **DemoRequestEntityResponse**: `data: Maybe<DemoRequestEntity>`
+- **DemoRequestEntityResponseCollection**: `data: Array<DemoRequestEntity>`, `meta: ResponseCollectionMeta`
 - **FiltertagEntity**: `attributes: Maybe<Filtertag>`, `id: Maybe<Scalars['ID']['output']>`
 - **FiltertagEntityResponse**: `data: Maybe<FiltertagEntity>`
 - **FiltertagEntityResponseCollection**: `data: Array<FiltertagEntity>`, `meta: ResponseCollectionMeta`
@@ -7359,10 +7418,10 @@ Wrapper types for GraphQL responses.
 
 ---
 
-## 🔢 Enum Types (111)
+## 🔢 Enum Types (114)
 
 <details>
-<summary>Click to expand all 111 enum types</summary>
+<summary>Click to expand all 114 enum types</summary>
 
 - **Enum_Act_Hashivut**: 
 - **Enum_Argument_Authortype**: 
@@ -7385,6 +7444,9 @@ Wrapper types for GraphQL responses.
 - **Enum_Decision_Archsource**: 
 - **Enum_Decision_Kind**: 
 - **Enum_Decision_Targetkind**: 
+- **Enum_Demorequest_Status**: 
+- **Enum_Demorequest_Timemode**: 
+- **Enum_Demorequest_Track**: 
 - **Enum_Forum_Spec**: 
 - **Enum_Haluka_Adjustdirection**: 
 - **Enum_Issue_Origin**: 
@@ -7490,7 +7552,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 19765 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 19913 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

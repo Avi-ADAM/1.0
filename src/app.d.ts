@@ -27,6 +27,12 @@ declare global {
        * silently pretending the visitor was never logged in.
        */
       sessionExpired: boolean;
+      /**
+       * Visual identity for this request: the `theme` cookie, overridden by
+       * `?theme=` when a shared link pins one. Already stamped onto <html> by
+       * the hook — this is here for server code that has to branch on it.
+       */
+      theme: 'personal' | 'business';
     }
 
     /** Shape returned by `handleError` in hooks.server.js / hooks.client.js. */

@@ -300,34 +300,32 @@
     padding: 0 0 3rem;
   }
 
-  @media (prefers-color-scheme: dark) {
-    .pp {
-      --gold:   #fbbf24;
-      --gold-h: #f59e0b;
-      --rose:   #fb7185;
+  :global(html.dark) .pp {
+    --gold:   #fbbf24;
+    --gold-h: #f59e0b;
+    --rose:   #fb7185;
 
-      --pcv-bg:           #09090b;
-      --pcv-card:         #18181b;
-      --pcv-card-hover:   #1f1f23;
-      --pcv-node-bg:      #18181b;
-      --pcv-node-hover:   #27272a;
-      --pcv-node-border:  #3f3f46;
-      --pcv-border:       #27272a;
-      --pcv-text:         #fafaf9;
-      --pcv-text-2:       #a8a29e;
-      --pcv-text-3:       #52525b;
+    --pcv-bg:           #09090b;
+    --pcv-card:         #18181b;
+    --pcv-card-hover:   #1f1f23;
+    --pcv-node-bg:      #18181b;
+    --pcv-node-hover:   #27272a;
+    --pcv-node-border:  #3f3f46;
+    --pcv-border:       #27272a;
+    --pcv-text:         #fafaf9;
+    --pcv-text-2:       #a8a29e;
+    --pcv-text-3:       #52525b;
 
-      --badge-gold-bg:    rgba(251,191, 36, .14);
-      --badge-gold-text:  #fbbf24;
-      --badge-rose-bg:    rgba(251,113,133, .14);
-      --badge-rose-text:  #fb7185;
-      --badge-green-bg:   rgba( 52,211,153, .12);
-      --badge-green-text: #34d399;
-      --badge-sky-bg:     rgba( 56,189,248, .12);
-      --badge-sky-text:   #38bdf8;
-      --badge-grey-bg:    rgba(113,113,122, .12);
-      --badge-grey-text:  #71717a;
-    }
+    --badge-gold-bg:    rgba(251,191, 36, .14);
+    --badge-gold-text:  #fbbf24;
+    --badge-rose-bg:    rgba(251,113,133, .14);
+    --badge-rose-text:  #fb7185;
+    --badge-green-bg:   rgba( 52,211,153, .12);
+    --badge-green-text: #34d399;
+    --badge-sky-bg:     rgba( 56,189,248, .12);
+    --badge-sky-text:   #38bdf8;
+    --badge-grey-bg:    rgba(113,113,122, .12);
+    --badge-grey-text:  #71717a;
   }
 
   /* ── Layout wrapper ────────────────────────────────────────────────────── */

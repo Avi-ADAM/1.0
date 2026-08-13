@@ -1,143 +1,146 @@
-﻿<!DOCTYPE html>
-<html lang=%lang%>
+<!DOCTYPE html>
+<html lang=%lang% class="%themeclass%">
   <head>
+    <!-- charset first: the spec only guarantees it is honoured inside the first
+         1024 bytes, and the anti-flash script below is bigger than that. -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv='content-language' content='%cl%'>
+    <meta name="robots" content="follow, index" />
+    <meta name="theme-color" content="#EEE8AA">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script>
-  // מניעת flash של עיצוב לא נכון
-  (function() {
+  // מניעת flash של עיצוב לא נכון.
+  // hooks.server.js already stamps the class onto <html>, so this only has
+  // real work to do for mode:"system" — the server cannot know the visitor's
+  // OS preference. Runs before first paint, so there is still no flash.
+  // It writes CSS classes only; the palette itself lives in app.postcss.
+  (function () {
     try {
-      const theme = localStorage.getItem('theme') || 'personal';
-      document.documentElement.classList.add(theme);
-      document.documentElement.setAttribute('data-theme', theme);
-      
-      // עדכון CSS Variables מיד
-      const themeConfigs = {
-        personal: {
-          '--color-primary': '#3b82f6',
-          '--color-secondary': '#10b981',
-          '--color-background': '#f9fafb',
-          '--color-text': '#1f2937',
-          '--color-card': '#ffffff',
-          '--color-accent': '#8b5cf6',
-          '--color-muted': '#6b7280',
-          '--border-radius': '0.75rem',
-          '--shadow': '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
-        },
-        business: {
-          '--color-primary': '#1f2937',
-          '--color-secondary': '#374151',
-          '--color-background': '#f3f4f6',
-          '--color-text': '#111827',
-          '--color-card': '#ffffff',
-          '--color-accent': '#059669',
-          '--color-muted': '#9ca3af',
-          '--border-radius': '0.25rem',
-          '--shadow': '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
-        }
+      var read = function (name) {
+        var hit = document.cookie
+          .split('; ')
+          .filter(function (row) { return row.indexOf(name + '=') === 0; })[0];
+        return hit ? decodeURIComponent(hit.slice(name.length + 1)) : '';
       };
-      
-      const config = themeConfigs[theme];
-      if (config) {
-        Object.entries(config).forEach(([key, value]) => {
-          document.documentElement.style.setProperty(key, value);
-        });
+
+      // `?theme=` beats the cookie and is written back to it, so a shared
+      // link keeps its look for the rest of the visit. hooks.server.js does
+      // the same on the server; this copy covers the renders it never sees
+      // (prerendered/cached HTML, bfcache restores). Keep the spellings in
+      // step with src/lib/theme/themeParam.js.
+      var aliases = {
+        personal: 'personal', default: 'personal', classic: 'personal',
+        business: 'business', professional: 'business',
+        proffesional: 'business', pro: 'business'
+      };
+      // hasOwnProperty: a bare lookup would resolve `?theme=constructor` to a
+      // function off Object.prototype and hand it to classList.add().
+      var alias = function (raw) {
+        var key = String(raw || '').trim().toLowerCase();
+        return Object.prototype.hasOwnProperty.call(aliases, key) ? aliases[key] : '';
+      };
+      var fromUrl = '';
+      try {
+        fromUrl = alias(new URLSearchParams(window.location.search).get('theme'));
+      } catch (e) {}
+
+      var theme = fromUrl || alias(read('theme')) || 'personal';
+      if (fromUrl) {
+        document.cookie =
+          'theme=' + fromUrl + '; path=/; max-age=31536000; SameSite=Lax';
       }
+
+      var mode = read('mode');
+      if (mode !== 'light' && mode !== 'dark' && mode !== 'system') mode = 'system';
+
+      var dark =
+        mode === 'dark' ||
+        (mode === 'system' &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+      var root = document.documentElement;
+      root.classList.remove('personal', 'business');
+      root.classList.add(theme);
+      root.classList.toggle('dark', dark);
+      root.setAttribute('data-theme', theme);
+      root.setAttribute('data-mode', dark ? 'dark' : 'light');
+      root.style.colorScheme = dark ? 'dark' : 'light';
     } catch (e) {
+      // A themeless render is still readable — never block the page on this.
       console.warn('Theme initialization failed:', e);
     }
   })();
 </script>
-  <!--
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  --><!--
-<meta name="csrf-param" content="authenticity_token" />
-<meta name="csrf-token"
-  content="BDY+ivhZF7RWPaIqnjmr0eTU0xQJqKlMwT64KVMAE6A                                                                             3of5gM6ayHCASONneMjaOh5c4ul+eU27D6avjs0UG2Q==" />
-<link rel="shortcut icon" type="image/x-icon"
-  href="/assets/favicon-275918e6                                                                             b845b1c4c258584a852c4e0d2509f526629f4ae2abdc6888b25a7cd7.ico" />
 
-
-
-<meta name="keywords" content="" />
-
-<link rel="canonical" href="http://127.0.0.1/">
-
-
-<link rel="icon apple-touch-icon" type="image/png"
-  href="/assets/apple-t                                                                             ouch-icon-200-fd606bbb0cc28b73249bb636f25f21f61f7b8ae83cb5091e4d681e8c679d1629.p                                                                             ng"
-  sizes="200x200" /> -->
-<!-- Facebook OG --><!--
-<meta id="ogtitle" property="og:title" content="" />
-<meta property="article:publisher" content="http://example.com" />
-<meta id="ogurl" property="og:url" content="http://127.0.0.1/" />
-                                                                        a_icon.png" />
-<meta id="ogdescription" property="og:description" content="" />
-<meta property="fb:app_id" content="" />
-
--->
-<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-
-
-    <meta charset="UTF-8" />
-    <meta property="og:site_name" content="1lev1" />
-    <meta id="ogimage" property="og:image" content="https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png"/>     
-<meta property="og:type" content="website" />
-
+    <link rel="manifest" href="%manifest%">
+    <link rel="icon" href="/favicon.ico" />
     <link rel="apple-touch-icon"
       href="https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png">
-        <link rel="manifest" href="%manifest%">
-    <link rel="icon" href="/favicon.ico" />
     <meta name='mobile-web-app-capable' content='yes'>
     <meta name='apple-mobile-web-app-capable' content='yes'>
     <meta name='apple-mobile-web-app-status-bar-style' content='black'>
+
+    <!-- The site serves every locale from the same URLs and picks one from
+         `?lang=` / cookie / Accept-Language, so the alternates are query
+         variants and x-default is the bare address (Hebrew, the default). -->
+    <link rel="alternate" hreflang="he" href="https://1lev1.com/" />
+    <link rel="alternate" hreflang="en" href="https://1lev1.com/?lang=en" />
+    <link rel="alternate" hreflang="ar" href="https://1lev1.com/?lang=ar" />
+    <link rel="alternate" hreflang="ru" href="https://1lev1.com/?lang=ru" />
+    <link rel="alternate" hreflang="es" href="https://1lev1.com/?lang=es" />
+    <link rel="alternate" hreflang="x-default" href="https://1lev1.com/" />
+
+    <meta name="msvalidate.01" content="401F6E4E20E82CED795C21C85ED50935" />
+    <meta name="google-site-verification" content="OBaTsyCpA22qESpUMYcqAnafQf4NxOYLICeWuudw30Y" />
+
+    <meta property="og:site_name" content="1lev1" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="%canonical%" />
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@IOHTFzdIGHgPhoZ">
     <meta name="twitter:creator" content="@IOHTFzdIGHgPhoZ">
-    <meta name="twitter:title" content="%xtitle%">
-    <meta name="twitter:description"
-      content="%xdes%">
-    <meta name="twitter:image"
-      content="https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="robots" content="follow, index" />
-          <meta name="theme-color" content="#EEE8AA">
-    <meta name="description"
-      content="%desc%">
-
-    <!--<meta
-      content="1💗1 הסכמה עולמית על חירות"
-      name="description"
-    />-->
-    <title>%title%</title>
-    <meta http-equiv='content-language' content='%cl%'>
-    <meta name="msvalidate.01" content="401F6E4E20E82CED795C21C85ED50935" />
-    <meta property="og:url"
-      content="https://www.1lev1.com" />
-      <link rel="alternate" hreflang="ar" href="https://1lev1.com?lang=ar" />
-      <link rel="alternate" hreflang="en" href="https://1lev1.com?lang=en" />
-      <link rel="alternate" hreflang="he" href="https://1lev1.com?lang=he" />
-      <link rel="alternate" hreflang="ru" href="https://1lev1.com?lang=ru" />
-      <link rel="alternate" hreflang="es" href="https://1lev1.com?lang=es" />
-    <meta property="og:type" content="platform" />
-    <meta property="og:description" content="%desci%" />
-    <meta property="og:image" content="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png" />
-      <script type="application/ld+json">
+    <script type="application/ld+json">
       {
       "@context": "https://schema.org",
       "@type": "Organization",
+      "name": "1lev1",
+      "alternateName": "1💗1",
       "legalName": "1💗1",
       "email": "baruch@1lev1.com",
-      "slogan": "create together harmoniously, WorldWide consensus for Security and Peace",
-      "url": "https://1llev1.com/",
+      "slogan": "Create together, by agreement",
+      "url": "https://1lev1.com/",
       "logo": "https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png",
-      "description": "create harmonious partnerships, find partners and make the world better place together, manage agreements and trust your partners"
+      "description": "1lev1 is a partnership platform: build a rikma of partners, publish open missions and resources, log hours, decide by consensus and split profits transparently by contribution."
       }
-      </script>
-  <meta name="google-site-verification" content="OBaTsyCpA22qESpUMYcqAnafQf4NxOYLICeWuudw30Y" />
+    </script>
+
     %sveltekit.head%
+
+    <!--
+      Site-wide fallbacks. They sit AFTER %sveltekit.head% on purpose: a page
+      that declares its own title/description/og in svelte:head then owns the
+      first such tag in the document, and browsers and crawlers alike take the
+      first one they meet. Anything a page leaves undeclared falls through to
+      the values below. Moving this block above %sveltekit.head% would stamp
+      the homepage title onto all ~90 pages that set their own.
+      (Written without literal tag syntax: a tag name spelled out here, even
+      inside a comment, turns up when the raw HTML is grepped for it.)
+    -->
+    <title>%title%</title>
+    <meta name="description" content="%desc%">
+    <meta property="og:title" content="%xtitle%" />
+    <meta property="og:description" content="%desci%" />
+    <meta property="og:image" content="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png" />
+    <meta name="twitter:title" content="%xtitle%">
+    <meta name="twitter:description" content="%xdes%">
+    <meta name="twitter:image"
+      content="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png">
   </head>
   <body>
     <div id="svelte">%sveltekit.body%</div>
