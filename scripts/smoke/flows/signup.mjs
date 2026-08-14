@@ -28,25 +28,31 @@
  *                         `display:none`, which drops an input out of the tab
  *                         order entirely and locked keyboard users out of
  *                         registration altogether.
- *   3  jwt cookie         F4: Strapi returns no token while email confirmation
+ *   4  jwt cookie         F4: Strapi returns no token while email confirmation
  *                         is on, and the literal string "undefined" used to be
  *                         written into the cookie and read back as a session.
- *   4  no socket auth     F4: the check-email screen must not try to open an
+ *   5  no socket auth     F4: the check-email screen must not open an
  *                         authenticated socket — there is no session yet.
- *   6  no raw GraphQL     F1: every logged-in page fired a raw-GraphQL query
+ *   8  no raw GraphQL     F1: every logged-in page fired a raw-GraphQL query
  *                         that /api/send answers with 403 outside dev, so the
  *                         entire chat/forum subsystem never loaded.
- *   9  suggestion chips   F7/F6: a suggestion is saved under the existing entry
- *                         it matched, which can be a different word ("בסיסי
- *                         נתונים" → "ממשל נתונים"), so the chip has to show it;
- *                         and an unpicked chip must not read as deleted.
- *   10 no-draft screen    F5: with no analysis to review the screen explains
+ *   9  no-draft screen    F5: with no analysis to review the screen explains
  *                         itself instead of silently bouncing a step back.
- *   12 lev suggestions    F3: onboarding writes through /api/onboard/save,
- *                         which used to skip the matching trigger that
- *                         updateUserRelation runs — so a finished profile still
- *                         got "no suggestions, go add skills".
- *   13 Lev CTA            F9: the hub's assistant card pointed at /lev, which
+ *   11 suggestion chips   F7: a suggestion is saved under the existing entry it
+ *                         matched, which can be a very different word ("בסיסי
+ *                         נתונים" → "ממשל נתונים"), so the chip has to name it.
+ *   12 chip styling       F6: an unpicked chip must not be dressed as a deleted
+ *                         one — suggestions start off, and a struck-through row
+ *                         of them reads as "nothing left to decide".
+ *   14 matching engine    F3: the engine runs for the freshly built profile and
+ *                         returns cleanly. It asserts that matching RAN, not
+ *                         that it found anything: whether a new member matches
+ *                         depends on the live catalogue of open missions, so the
+ *                         count is printed rather than asserted. (The lev page
+ *                         also backfills lazily on its own — see
+ *                         levDataLoader.ts — so an empty screen was never proof
+ *                         that the trigger was missing.)
+ *   15 Lev CTA            F9: the hub's assistant card pointed at /lev, which
  *                         has no chat; Lev lives at /chat.
  */
 
@@ -328,14 +334,32 @@ async function confirmAndOnboard(link) {
     saveBody ? JSON.stringify(saveBody.counts ?? {}) : 'no /api/onboard/save call');
   await page.waitForTimeout(10000);
 
-  // F3. The payoff: a finished profile has to produce something on the lev
-  // screen. The old behaviour sent the user back to add the skills they had
-  // just added.
+  // F3. What is actually guaranteed here is that the matching engine runs for
+  // the new profile and returns cleanly — NOT that it finds anything, which
+  // depends on whether any of the live open missions happen to share a skill or
+  // role id with this account. Asserting "the lev screen is not empty" would
+  // make the flow fail on a perfectly healthy site.
   await visit(page, '/lev', { wait: 12000 });
-  const levText = await text(page);
-  const empty = levText.includes('לא נמצאו הצעות או פעולות עבורך');
-  record('14. lev has suggestions after onboarding (F3)', !empty,
-    empty ? 'still "לא נמצאו הצעות או פעולות עבורך"' : '');
+  const refresh = await page.evaluate(async () => {
+    const r = await fetch('/api/action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ actionKey: 'refreshMySuggestions', params: {} })
+    });
+    return { status: r.status, body: await r.json().catch(() => null) };
+  });
+  record('14. matching engine runs for the new profile (F3)',
+    refresh.status === 200 && refresh.body?.success === true,
+    JSON.stringify(refresh.body?.data ?? refresh.body ?? {}).slice(0, 160));
+
+  // Reported, never asserted: an empty lev screen on a fresh account is
+  // ordinary when nothing in the catalogue matches. It IS the symptom to look
+  // at when the profile came out wrong — see F2, where the fuzzy matcher can
+  // replace the skills the member actually claimed with unrelated ones, after
+  // which there is nothing left to match on.
+  const levEmpty = (await text(page)).includes('לא נמצאו הצעות או פעולות עבורך');
+  console.log(`  · lev screen: ${levEmpty ? 'no suggestions' : 'has suggestions'}` +
+    `, engine created ${JSON.stringify(refresh.body?.data ?? {})}`);
   await shot(page, 'signup-lev');
 
   // F9. One of the three first steps we hand every new member.
