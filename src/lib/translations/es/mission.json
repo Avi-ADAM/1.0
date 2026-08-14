@@ -172,7 +172,11 @@
     "linkFailed": "La misión se creó, pero no se pudo vincular la tarea. Puedes vincularla manualmente.",
     "sortBy": "Ordenar por {{column}}",
     "rowMenu": "Acciones de la tarea",
-    "openTask": "Abrir tarea"
+    "openTask": "Abrir tarea",
+    "decline": "Devolverla al grupo",
+    "declineHint": "No seré yo — la tarea vuelve a quedar pendiente para quien quiera tomarla",
+    "confirmDecline": "¿Devolver esta tarea al grupo de tareas sin asignar?",
+    "openingForm": "Abriendo el formulario de misión…"
   },
   "chooseM": {
     "heading": "elige una misión en curso",

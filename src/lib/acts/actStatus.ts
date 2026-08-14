@@ -79,7 +79,11 @@ export function getActStatus(row: ActRowLike | null | undefined): ActStatus {
 
   if (row.naasa) return row.valiIshur ? 'completed' : 'pendingValidation';
 
-  if (hasAssignee(row)) {
+  // `isAssigned === false` is the domain's own "nobody in particular owns
+  // this" — it is what an act opened to roles carries, and what handing an act
+  // back sets. It outranks a lingering `my` relation: only an explicit `false`
+  // counts, so legacy rows (null/undefined) keep reading off the relation.
+  if (row.isAssigned !== false && hasAssignee(row)) {
     // `myIshur` is the assignee accepting the assignment. Until then the row
     // is a request, not work in progress — someone else may still take it.
     return row.myIshur ? 'inProgress' : 'pendingApproval';
@@ -102,6 +106,13 @@ export function getActProgress(row: ActRowLike | null | undefined): number {
  * Quick actions this viewer may take on this row, in display order.
  *
  * - `approve`   — the assignee accepting the assignment (`myIshur`).
+ * - `decline`   — the assignee handing it back. Not a veto: it releases the
+ *                 act to the unplaced pool, where anyone can take it or turn
+ *                 it into a mission. Nothing is closed off, which is what the
+ *                 rikma's "no absolute no" asks for.
+ * - `progress`  — the doer moving `status` (0–100) while work is under way.
+ * - `done`      — the doer reporting the work finished (`naasa`), which hands
+ *                 it to the creator to validate.
  * - `validate`  — the creator confirming the work is done (`valiIshur`).
  * - `take`      — "I'll do it": opens the mission picker, since an act has to
  *                 hang off one of the taker's own missions-in-progress for the
@@ -112,10 +123,19 @@ export function getActProgress(row: ActRowLike | null | undefined): number {
  * on number-vs-string depending on the query, and `1 !== '1'` silently hid the
  * approve button for everyone.
  */
+export type ActQuickAction =
+  | 'approve'
+  | 'decline'
+  | 'progress'
+  | 'done'
+  | 'validate'
+  | 'take'
+  | 'publish';
+
 export function getQuickActions(
   row: ActRowLike | null | undefined,
   viewerId: string | number | null | undefined
-): Array<'approve' | 'validate' | 'take' | 'publish'> {
+): ActQuickAction[] {
   if (!row) return [];
   const me = String(viewerId ?? '');
   if (!me) return [];
@@ -124,9 +144,16 @@ export function getQuickActions(
   const isAssignee = (row.my?.data ?? []).some((u) => String(u?.id ?? '') === me);
   const isValidator = String(row.vali?.data?.id ?? '') === me;
 
-  const actions: Array<'approve' | 'validate' | 'take' | 'publish'> = [];
+  const actions: ActQuickAction[] = [];
 
-  if (status === 'pendingApproval' && isAssignee) actions.push('approve');
+  if (status === 'pendingApproval' && isAssignee) {
+    actions.push('approve');
+    actions.push('decline');
+  }
+  if (status === 'inProgress' && isAssignee) {
+    actions.push('progress');
+    actions.push('done');
+  }
   if (status === 'pendingValidation' && isValidator) actions.push('validate');
   if (status === 'unassigned') {
     actions.push('take');

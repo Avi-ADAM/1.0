@@ -471,10 +471,28 @@
 
   {#if preparingMission}
     <!-- On the page background, not on the ramp — so this one uses the token
-         that follows the mode (--stgold), not --ramp-ink. -->
-    <p class="max-w-4xl mx-auto mt-6 text-center text-sm text-[color:var(--stgold,#574010)]">
-      {$t('moach.create.preparingMission')}
-    </p>
+         that follows the mode (--stgold), not --ramp-ink.
+
+         A bare sentence was too quiet for what it covers: resolving the
+         vocabulary against the catalogue can take seconds, and arriving here
+         from an act's "publish as a mission" the member has already waited
+         through a route load. The pulsing rail gives the wait a visible
+         shape, so nothing looks stalled. -->
+    <div
+      class="prep-card mx-auto mt-6 flex max-w-md flex-col items-center gap-3 rounded-2xl px-6 py-5 text-center"
+      role="status"
+      aria-live="polite"
+    >
+      <svg class="prep-spin" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-opacity="0.2" stroke-width="2.5" />
+        <circle
+          cx="12" cy="12" r="9" fill="none" stroke="currentColor"
+          stroke-width="2.5" stroke-linecap="round" stroke-dasharray="30 27"
+        />
+      </svg>
+      <p class="text-sm font-semibold">{$t('moach.create.preparingMission')}</p>
+      <span class="prep-rail" aria-hidden="true"><span class="prep-rail__run"></span></span>
+    </div>
   {/if}
 
   <!-- כרטיסים עם עיגולים מוטמעים — נעלמים כשפורם פתוח -->
@@ -890,5 +908,51 @@
     color: var(--gold, #f8fafc);
     font-size: 0.75rem;
     font-weight: 700;
+  }
+  /* ── "Preparing the mission" wait ─────────────────────────────────
+     Sized and coloured off the page tokens so it reads in every theme.
+     `--stgold` is the mode-following ink already used by this page. */
+  .prep-card {
+    color: var(--stgold, #574010);
+    background: color-mix(in srgb, currentColor 7%, transparent);
+    border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  }
+
+  .prep-spin {
+    animation: prep-rotate 0.9s linear infinite;
+  }
+
+  @keyframes prep-rotate {
+    to { transform: rotate(360deg); }
+  }
+
+  .prep-rail {
+    display: block;
+    width: 100%;
+    height: 3px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: color-mix(in srgb, currentColor 14%, transparent);
+  }
+
+  .prep-rail__run {
+    display: block;
+    width: 40%;
+    height: 100%;
+    border-radius: 999px;
+    background: currentColor;
+    animation: prep-slide 1.3s ease-in-out infinite;
+  }
+
+  /* Indeterminate on purpose: the resolution has no progress to report, and
+     a fake percentage would be a lie about how much is left. */
+  @keyframes prep-slide {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(250%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .prep-spin { animation-duration: 2.6s; }
+    .prep-rail__run { animation: none; width: 100%; opacity: 0.5; }
   }
 </style>

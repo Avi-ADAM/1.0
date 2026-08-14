@@ -62,6 +62,20 @@ describe('getActStatus', () => {
     expect(getActStatus(null)).toBe('unassigned');
     expect(getActStatus(undefined)).toBe('unassigned');
   });
+
+  it('lets an explicit isAssigned:false win over a lingering my relation', () => {
+    // Handing an act back clears the assignment; if the relation write does
+    // not land, the row must still read as free rather than staying stuck on
+    // someone who already said no.
+    const handedBack = withAssignee({ isAssigned: false, myIshur: false });
+    expect(getActStatus(handedBack)).toBe('unassigned');
+  });
+
+  it('still reads the relation on legacy rows that never set isAssigned', () => {
+    const legacy = bare({ my: { data: [{ id: '20' }] }, myIshur: true });
+    expect(legacy.isAssigned).toBeUndefined();
+    expect(getActStatus(legacy)).toBe('inProgress');
+  });
 });
 
 describe('placement helpers', () => {
@@ -118,6 +132,40 @@ describe('getQuickActions', () => {
     expect(getQuickActions(row, '20')).toContain('approve');
     expect(getQuickActions(row, '99')).not.toContain('approve');
     expect(getQuickActions(withAssignee({ myIshur: true }), '20')).not.toContain('approve');
+  });
+
+  it('pairs approve with decline, so an assignment is never a one-way door', () => {
+    const row = withAssignee({ myIshur: false });
+    expect(getQuickActions(row, '20')).toEqual(['approve', 'decline']);
+  });
+
+  it('offers decline to nobody but the assignee', () => {
+    const row = withAssignee({ myIshur: false });
+    expect(getQuickActions(row, '10')).not.toContain('decline'); // the creator
+    expect(getQuickActions(row, '99')).not.toContain('decline'); // a bystander
+  });
+
+  it('offers progress and done to the doer once work is under way', () => {
+    const row = withAssignee({ myIshur: true });
+    expect(getQuickActions(row, '20')).toEqual(['progress', 'done']);
+  });
+
+  it('offers progress and done to nobody else', () => {
+    const row = withAssignee({ myIshur: true });
+    expect(getQuickActions(row, '10')).toEqual([]);
+    expect(getQuickActions(row, '99')).toEqual([]);
+  });
+
+  it('stops offering progress and done once the work is reported', () => {
+    const row = withAssignee({ myIshur: true, naasa: true });
+    expect(getQuickActions(row, '20')).not.toContain('done');
+    expect(getQuickActions(row, '20')).not.toContain('progress');
+  });
+
+  it('leaves a completed act with no actions at all', () => {
+    const row = withAssignee({ myIshur: true, naasa: true, valiIshur: true });
+    expect(getQuickActions(row, '20')).toEqual([]);
+    expect(getQuickActions(row, '10')).toEqual([]);
   });
 
   it('offers validate only to the creator, and only once work is reported done', () => {

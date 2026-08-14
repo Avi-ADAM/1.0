@@ -48,6 +48,15 @@
   });
 
   /**
+   * Held across the whole navigation, not just the click. The create page
+   * resolves the act's vocabulary against the catalogue before the form can
+   * open — seconds, sometimes — and `goto` resolves only once that load
+   * settles. Without awaiting it the modal would close instantly onto an
+   * unchanged screen with nothing to say a form was on its way.
+   */
+  let opening = $state(false);
+
+  /**
    * "I have no mission for this yet" — open the mission form prefilled from the
    * act, carrying `fromAct` so the act is attached to whatever gets created.
    *
@@ -57,10 +66,15 @@
    * (`openMission`), claiming the act now would assert an assignment nobody has
    * agreed to yet.
    */
-  function createMission() {
-    if (!act) return;
-    goto(`${buildPublishAsMissionUrl(projectId, act, $lang)}&assignActToMe=1`);
-    onClose?.();
+  async function createMission() {
+    if (!act || opening) return;
+    opening = true;
+    try {
+      await goto(`${buildPublishAsMissionUrl(projectId, act, $lang)}&assignActToMe=1`);
+      onClose?.();
+    } finally {
+      opening = false;
+    }
   }
 
   async function add() {
@@ -126,12 +140,38 @@
     <button
       type="button"
       onclick={createMission}
-      class="inline-flex items-center gap-1.5 rounded-lg border border-gold/40 px-3 py-2 text-sm font-bold text-gold transition-colors hover:bg-gold/10"
+      disabled={opening}
+      aria-busy={opening}
+      class="inline-flex items-center gap-1.5 rounded-lg border border-gold/40 px-3 py-2 text-sm font-bold text-gold transition-colors hover:bg-gold/10 disabled:opacity-60"
     >
-      <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true">
-        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-      </svg>
-      {$t('mission.chooseM.createMission')}
+      {#if opening}
+        <svg class="spin" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+          <circle
+            cx="12" cy="12" r="9" fill="none" stroke="currentColor"
+            stroke-width="3" stroke-linecap="round" stroke-dasharray="40 20"
+          />
+        </svg>
+        {$t('mission.actsTable.openingForm')}
+      {:else}
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true">
+          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+        </svg>
+        {$t('mission.chooseM.createMission')}
+      {/if}
     </button>
   </div>
 {/if}
+
+<style>
+  .spin {
+    animation: choose-spin 0.8s linear infinite;
+  }
+
+  @keyframes choose-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .spin { animation-duration: 2.4s; }
+  }
+</style>

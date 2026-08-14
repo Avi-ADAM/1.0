@@ -171,7 +171,11 @@
     "linkFailed": "The mission was created, but linking the task to it failed. You can link it manually.",
     "sortBy": "Sort by {{column}}",
     "rowMenu": "Task actions",
-    "openTask": "Open task"
+    "openTask": "Open task",
+    "decline": "Hand it back",
+    "declineHint": "Not me — the task returns to the pool for anyone to take",
+    "confirmDecline": "Return this task to the pool of unplaced tasks?",
+    "openingForm": "Opening the mission form…"
   },
   "chooseM": {
     "heading": "choose mission in progress",
