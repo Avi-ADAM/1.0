@@ -16,6 +16,8 @@
   import Crtask from '$lib/components/prPr/tasks/crtask.svelte';
   import Newmatana from '$lib/components/prPr/newmatana.svelte';
   import { executeAction } from '$lib/client/actionClient';
+  import { isLinkableMissionType } from '$lib/acts/publishAsMission.js';
+  import { toast } from 'svelte-sonner';
   import { invalidateAll } from '$app/navigation';
 
   const moachStore = getMoachStore();
@@ -92,6 +94,9 @@
         const params = page.url.searchParams;
         prefillMissionName    = params.get('name') ?? '';
         prefillMissionDescrip = params.get('descrip') ?? '';
+        // Set only here: the act is linked to whatever this form produces.
+        fromActId = params.get('fromAct');
+        assignActToMe = params.get('assignActToMe') === '1';
 
         const nhours = Number(params.get('nhours'));
         const valph  = Number(params.get('valph'));
@@ -342,11 +347,89 @@
     addM = true;
   }
 
+  // ── Publish an act as a mission ────────────────────────────────────
+  // An unplaced act (מטלה ממתינה להשמה) offers "publish as a mission" on the
+  // acts table. That button lands here with the act's details prefilled and
+  // `?fromAct=<id>` in tow; once the member actually publishes, the act is
+  // attached to whatever createMission produced. See PLAN docs and
+  // `src/lib/acts/publishAsMission.ts`.
+
+  /**
+   * The act this mission is being published from, if any.
+   *
+   * State rather than a `$derived` off the URL: it is cleared once the link
+   * lands, so a member who stays on this page and publishes a second mission
+   * does not file the same act under both.
+   */
+  let fromActId = $state(/** @type {string|null} */ (null));
+
+  /**
+   * Set when the member arrived via "I'll do it" → "create a mission" (the
+   * picker in `tasks/chooseM.svelte`), rather than via "publish as a mission".
+   * They are not publishing the act for the rikma to staff — they are taking
+   * it and needed a mission to hang it on.
+   */
+  let assignActToMe = $state(false);
+
+  /**
+   * Attach the source act to the mission that was just created.
+   *
+   * Best-effort and explicitly so: the mission exists and the rikma may
+   * already be voting on it, so a failure here is reported to the member as
+   * "link it yourself" rather than being allowed to look like the mission
+   * failed to publish.
+   */
+  async function linkSourceAct(createdType, createdId) {
+    const actId = fromActId;
+    if (!actId || !createdId || !isLinkableMissionType(createdType)) return;
+    try {
+      const res = await executeAction(
+        'linkActToMission',
+        {
+          actId: String(actId),
+          projectId: String(projectId),
+          missionId: String(createdId),
+          missionType: createdType
+        },
+        { showErrorToast: false }
+      );
+      if (!res?.success) throw new Error(res?.error?.message ?? 'link failed');
+
+      // Only a `mesimabetahalich` is a mission that actually exists and is
+      // being run by this member. A `pendm` is still awaiting the rikma's
+      // vote and an `openMission` is still looking for its doer — claiming
+      // the act against either would assert an assignment nobody agreed to.
+      if (assignActToMe && createdType === 'mesimabetahalich') {
+        await executeAction(
+          'updateTask',
+          {
+            id: String(actId),
+            projectId: String(projectId),
+            isAssigned: true,
+            uid: [String(page.data.uid)],
+            myIshur: true
+          },
+          { showErrorToast: false }
+        );
+      }
+
+      fromActId = null;
+      assignActToMe = false;
+      toast.success(
+        $t('mission.actsTable.linkedToMission', { name: res?.data?.actName ?? '' })
+      );
+    } catch (err) {
+      console.warn('[create] could not link the source act to the new mission:', err);
+      toast.error($t('mission.actsTable.linkFailed'));
+    }
+  }
+
   /** mission.svelte reports `{ md: { createdEntityType, createdEntityId } }`. */
   async function handleMissionClosed(payload) {
     const md = payload?.md;
     if (md?.createdEntityId) {
       await markPlanRowCreated(md.createdEntityType ?? 'mission', md.createdEntityId);
+      await linkSourceAct(md.createdEntityType, md.createdEntityId);
     } else {
       pendingPlanItem = null;
     }

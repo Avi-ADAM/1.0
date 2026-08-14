@@ -54,6 +54,7 @@
 <div class="acts-page">
   <ActsTable
     {acts}
+    {projectId}
     onTaskClick={handleTaskClick}
     onRowClick={handleRowClick}
     onCreateClick={() => (showCreate = true)}

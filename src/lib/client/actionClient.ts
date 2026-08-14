@@ -356,6 +356,7 @@ export interface CustomizeOpenMissionParams {
 
 export type ActionKey =
   | 'createTask'
+  | 'linkActToMission'
   | 'updateTask'
   | 'createMission'
   | 'completeMission'
@@ -431,6 +432,7 @@ export type ActionKey =
   | 'proposeObjectEdit'
   | 'counterObjectChange'
   | 'previewArchiveMembership'
+  | 'setMatanotDiscovery'
   | 'refreshMySuggestions'
   | 'declineSpForMashaabim'
   | 'reportRecurringSaleCycle'
@@ -467,8 +469,28 @@ export interface CreateTaskParams {
   dateF?: string;
 }
 
+/**
+ * Attach an act to the mission that was just published from it.
+ * `missionType` is what `createMission` reported — each maps to a different
+ * relation on `Act`. See `src/lib/acts/publishAsMission.ts`.
+ */
+export interface LinkActToMissionParams {
+  /** ID of the act (Act) to link */
+  actId: string;
+
+  /** ID of the project the act belongs to */
+  projectId: string;
+
+  /** ID of the entity createMission produced */
+  missionId: string;
+
+  /** Which kind of entity that was */
+  missionType: 'pendm' | 'openMission' | 'mesimabetahalich';
+}
+
 export interface ActionParamsMap {
   createTask: CreateTaskParams;
+  linkActToMission: LinkActToMissionParams;
   createProcess: CreateProcessParams;
   attachEntityToProcess: AttachEntityToProcessParams;
   ensureProcessForum: EnsureProcessForumParams;
@@ -547,6 +569,11 @@ export interface ActionParamsMap {
     entityId: string;
     projectId?: string;
     forumId?: string;
+  };
+  setMatanotDiscovery: {
+    matanotId: string;
+    /** true = keep this product out of the public /gift directory. */
+    hideFromDiscovery: boolean;
   };
 }
 

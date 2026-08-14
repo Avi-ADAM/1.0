@@ -5,6 +5,7 @@ import { env } from '$env/dynamic/private';
 import { getInternalSecret, INTERNAL_HEADER } from '$lib/server/internalSecret.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { isExpiredJwt, clearStaleAuthCookies } from '$lib/server/session.js';
+import { log, requestId } from '$lib/server/log.js';
 import {
   DEFAULT_THEME,
   THEME_COOKIE,
@@ -110,7 +111,7 @@ export async function handleFetch({ event, request, fetch }) {
 			request.headers.set(INTERNAL_HEADER, getInternalSecret());
 		}
 	} catch (e) {
-		console.error('handleFetch: failed to attach internal secret', e);
+		log.error('handleFetch: failed to attach internal secret', { err: e });
 	}
 	return fetch(request);
 }
@@ -250,8 +251,80 @@ function applySecurityHeaders(response, isSecure) {
   return response;
 }
 
-/** @type {import('@sveltejs/kit').Handle} */
+// Requests we deliberately never log: the Docker HEALTHCHECK hits /api/health
+// every 30s (≈2.9k lines/day of nothing) and the immutable build assets are
+// served by the same node process on the VPS.
+const LOG_SKIP = /^\/(api\/health|_app\/immutable|favicon|robots\.txt|sw\.js)/;
+
+/**
+ * Request logging + correlation id, wrapped around the real hook below.
+ *
+ * One JSON line per request — method, path, status, duration, uid — which is
+ * what makes the VPS containers queryable in Axiom (`vector.toml` parses these
+ * lines into fields). `x-request-id` is taken from the incoming request when
+ * present, so a call that starts on the Vercel front and lands on
+ * api.1lev1.com is one id end to end; it is echoed back on the response so a
+ * user can quote it from devtools.
+ *
+ * @type {import('@sveltejs/kit').Handle}
+ */
 export async function handle({ event, resolve }) {
+  const reqId = requestId(event.request);
+  event.locals.reqId = reqId;
+  event.locals.log = log.child({ reqId });
+
+  const quiet = LOG_SKIP.test(event.url.pathname);
+  const started = Date.now();
+  try {
+    const response = await handleRequest({ event, resolve });
+    try {
+      response.headers.set('x-request-id', reqId);
+    } catch {
+      // immutable headers (rare, e.g. a cached Response) — not worth failing
+    }
+    if (!quiet) {
+      const status = response.status;
+      const level = status >= 500 ? 'error' : status >= 400 ? 'warn' : 'info';
+      event.locals.log[level]('request', {
+        method: event.request.method,
+        path: event.url.pathname,
+        route: event.route?.id ?? null,
+        status,
+        dur: Date.now() - started,
+        uid: event.locals.uid || null,
+        lang: event.locals.lang,
+        ip: clientIp(event),
+        ua: event.request.headers.get('user-agent')?.slice(0, 160) ?? null
+      });
+    }
+    return response;
+  } catch (err) {
+    // handleError() reports the error itself; this line is what ties it to a
+    // request that produced no response at all.
+    event.locals.log.error('request failed', {
+      method: event.request.method,
+      path: event.url.pathname,
+      dur: Date.now() - started,
+      uid: event.locals.uid || null,
+      err
+    });
+    throw err;
+  }
+}
+
+/** @param {import('@sveltejs/kit').RequestEvent} event */
+function clientIp(event) {
+  try {
+    return event.getClientAddress();
+  } catch {
+    // adapter-node throws when the request arrived without the expected
+    // forwarding header; an unknown IP must never cost us the whole log line.
+    return null;
+  }
+}
+
+/** @type {import('@sveltejs/kit').Handle} */
+async function handleRequest({ event, resolve }) {
   lang = getLanguage(event);
 
   event.locals.lang = lang;
@@ -419,11 +492,14 @@ export function handleError({ error, event, status, message }) {
     status === 403 ||
     /unauthorized|invalid token|forbidden|jwt|\b401\b|\b403\b/i.test(raw);
 
-  console.error(
-    `[error] ${status} ${event.request.method} ${event.url.pathname}`,
-    raw,
-    error instanceof Error ? error.stack : ''
-  );
+  (event.locals?.log ?? log).error('server error', {
+    status,
+    method: event.request.method,
+    path: event.url.pathname,
+    code: isAuth ? 'auth' : 'server',
+    uid: event.locals?.uid || null,
+    err: error instanceof Error ? error : raw
+  });
 
   return {
     message,

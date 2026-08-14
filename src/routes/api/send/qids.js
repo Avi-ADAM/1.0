@@ -9146,7 +9146,7 @@ export const moachQids = {
             data {
               id
               attributes {
-                name price quant kindOf startDate finnishDate
+                name price quant kindOf startDate finnishDate hideFromDiscovery
               }
             }
           }
@@ -9542,6 +9542,9 @@ export const moachQids = {
           shem des status naasa dateS dateF link
           my { data { id attributes { username } } }
           vali { data { id attributes { username } } }
+          # Ownership check for linkActToMission: the caller names the project
+          # they claim membership of, and this is what proves the act is in it.
+          project { data { id } }
         }
       }
     }
@@ -12697,7 +12700,7 @@ ${ARCH_DECISION_FIELDS}
       sort: "createdAt:desc"
     ) {
       data { id attributes {
-        name price quant kindOf archived
+        name price quant kindOf archived hideFromDiscovery
         pic { data { attributes { url } } }
         sp { data { id attributes { name } } }
       } }
@@ -12862,7 +12865,12 @@ ${ARCH_DECISION_FIELDS}
 
   '269mapProducts': `query MapProducts {
     matanots(
-      filters: { and: [ { archived: { ne: true } }, ${NOT_ARCHIVED} ] }
+      # Sellers that opted a product out of the public directory (282) are opted
+      # out of the map pin too — same discovery surface, same NULL guard.
+      filters: { and: [ {
+        archived: { ne: true }
+        or: [{ hideFromDiscovery: { eq: false } }, { hideFromDiscovery: { null: true } }]
+      }, ${NOT_ARCHIVED} ] }
       pagination: { limit: 200 }
       sort: "createdAt:desc"
     ) {
@@ -12934,10 +12942,20 @@ ${ARCH_DECISION_FIELDS}
     }
   }`,
 
+  // hideFromDiscovery is the seller's own opt-out of this directory (a rikma
+  // that sells only to its members, a product not ready for the public). Same
+  // NULL guard as `archived` — rows created before the field exists read NULL,
+  // which means "not hidden". Hidden products stay reachable everywhere else:
+  // /gift/[id], the project page and the sales flows.
   '282discoverProducts': `query DiscoverProducts {
     matanots(
       # Same NULL guard as 281 — never-archived products often have NULL here.
-      filters: { and: [ { or: [{ archived: { eq: false } }, { archived: { null: true } }] }, ${NOT_ARCHIVED} ] }
+      filters: {
+        and: [
+          { or: [{ archived: { eq: false } }, { archived: { null: true } }] }, ${NOT_ARCHIVED} ] },
+          { or: [{ hideFromDiscovery: { eq: false } }, { hideFromDiscovery: { null: true } }] }
+        ]
+      }
       pagination: { limit: 200 }
       sort: "createdAt:desc"
     ) {
@@ -13026,15 +13044,27 @@ ${ARCH_DECISION_FIELDS}
     }
   }`,
 
+  // Also the authorization source for setMatanotDiscovery: origin + owner_user
+  // decide the personal-product owner check, projectcreates the rikma-member one.
   '266getMatanotSellerMeta': `query GetMatanotSellerMeta($id: ID!) {
     matanot(id: $id) {
       data { id attributes {
         origin
+        hideFromDiscovery
+        projectcreates { data { id } }
         owner_user { data { id attributes {
           username
           profilePic { data { attributes { url formats } } }
         } } }
       } }
+    }
+  }`,
+
+  // Discovery-directory visibility gate, flipped by the setMatanotDiscovery
+  // action (never by the client directly — see qidsAccess).
+  '285setMatanotDiscovery': `mutation SetMatanotDiscovery($id: ID!, $hideFromDiscovery: Boolean!) {
+    updateMatanot(id: $id, data: { hideFromDiscovery: $hideFromDiscovery }) {
+      data { id attributes { hideFromDiscovery } }
     }
   }`,
 
@@ -14388,6 +14418,33 @@ ${ARCH_DECISION_FIELDS}
           username profilePic { data { attributes { url formats } } }
         } } }
       } } }
+    } } }
+  }`,
+
+  /**
+   * Attach an act (מטלה) to the mission that was just created from it.
+   *
+   * `createMission` produces exactly one of three things depending on the
+   * rikma's size and whether an assignee was named — a `pendm` (proposal
+   * awaiting a vote), an `openMission`, or a `mesimabetahalich` — and `Act`
+   * has a separate relation for each. Only the matching variable is supplied;
+   * a GraphQL input-object field whose variable was not provided is dropped
+   * from the coerced input, so the other two relations are left alone rather
+   * than being cleared to null.
+   *
+   * Deliberately narrower than a general `updateAct`: this mutation cannot
+   * touch `naasa`, `valiIshur`, `my` or any other lifecycle field.
+   */
+  '294linkActToMission': `mutation LinkActToMission($id: ID!, $pendm: ID, $openMission: ID, $mesimabetahaliches: [ID]) {
+    updateAct(id: $id, data: {
+      pendm: $pendm,
+      open_mission: $openMission,
+      mesimabetahaliches: $mesimabetahaliches
+    }) { data { id attributes {
+      shem
+      pendm { data { id attributes { name } } }
+      open_mission { data { id attributes { name } } }
+      mesimabetahaliches { data { id attributes { name } } }
     } } }
   }`,
 

@@ -5,7 +5,11 @@ const defaultTheme = require('tailwindcss/defaultTheme');
 const plugin = require('tailwindcss/plugin');
 
 const config = {
-  content: ['./src/**/*.{html,js,svelte,ts}', './node_modules/@avitest/gridcraft/dist/themes/**/*.svelte'],
+  // The second glob used to scan a gridcraft theme's own markup for classes.
+  // The acts table was the only grid on the site and now renders its own
+  // markup, and `@avitest/gridcraft` was never an installed package anyway
+  // (the dependency was `@mediakular/gridcraft`), so the glob matched nothing.
+  content: ['./src/**/*.{html,js,svelte,ts}'],
   // `dark:` used to fall back to Tailwind's default `media` strategy, so the
   // ~1.5k dark utilities followed the OS alone and the `.dark` token block in
   // app.postcss never activated (nothing ever added the class). Switching to

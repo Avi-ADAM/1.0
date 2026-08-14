@@ -50,11 +50,26 @@ del(.label)
 '''
 
 # ---------------------------------------------------------------------------
+# Filter: drop the probe traffic before it costs anything.
+# ---------------------------------------------------------------------------
+# The Docker HEALTHCHECK hits /api/health every 30s and Nginx logs each one —
+# ~2.9k lines a day that say nothing. A *failing* probe still gets through:
+# only the ones Nginx answered 200 are dropped. (The SvelteKit hook skips
+# /api/health on its own side, so this covers the Nginx/Strapi text logs.)
+[transforms.drop_noise]
+type = "filter"
+inputs = ["prepare"]
+condition = '''
+line = to_string(.message) ?? ""
+!(contains(line, "/api/health") && contains(line, " 200 "))
+'''
+
+# ---------------------------------------------------------------------------
 # Sink: Axiom.
 # ---------------------------------------------------------------------------
 [sinks.axiom]
 type = "axiom"
-inputs = ["prepare"]
+inputs = ["drop_noise"]
 token = "${AXIOM_TOKEN}"
 dataset = "${AXIOM_DATASET:-vps-docker}"
 

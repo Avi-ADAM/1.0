@@ -468,6 +468,11 @@ export const qidsAccess = {
   '283discoverMissions': { allow: ['user', 'serviceAdmin'] },
   '284discoverResources': { allow: ['user', 'serviceAdmin'] },
 
+  // Discovery-visibility write: server-only caller (the setMatanotDiscovery
+  // action via StrapiClient, which checks rikma membership / personal-product
+  // ownership first). A client must never flip another seller's flag.
+  '285setMatanotDiscovery': { allow: ['serviceAdmin'] },
+
   // matching/engine.ts: always run through StrapiClient with the admin
   // token, never with a user JWT — writes suggestion data for *other* users.
   '213recentSuggestionEmailCounts': { allow: ['serviceAdmin'] },
@@ -517,4 +522,10 @@ export const qidsAccess = {
   // client already learned from that first query.
   '292initialForumAll': { allow: ['user', 'serviceAdmin'] },
   '293initialForumByIds': { allow: ['user', 'serviceAdmin'] },
+
+  // Reached only through the `linkActToMission` action, which checks the caller
+  // is a member of the act's project before executing. Not exposed to direct
+  // client calls: /api/send has no way to tell whether this caller may touch
+  // this act, and the mutation moves a chore under a mission.
+  '294linkActToMission': { allow: ['serviceAdmin'] },
 };

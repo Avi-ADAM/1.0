@@ -40,6 +40,7 @@ import { chatActions } from './chat.js';
 import { maagadActions } from './maagad.js';
 
 import { createTaskAction } from './createTask.js';
+import { linkActToMissionAction } from './linkActToMission.js';
 import { createResourceAction } from './createResource.js';
 import { toggleMoneyReceiverConfig } from './toggleMoneyReceiver.js';
 import { createSheirutHalukaConfig } from './createSheirutHaluka.js';
@@ -156,6 +157,7 @@ import { proposeObjectArchiveConfig } from './proposeObjectArchive.js';
 import { proposeObjectEditConfig } from './proposeObjectEdit.js';
 import { counterObjectChangeConfig } from './counterObjectChange.js';
 import { previewArchiveMembershipConfig } from './previewArchiveMembership.js';
+import { setMatanotDiscoveryConfig } from './setMatanotDiscovery.js';
 
 
 /**
@@ -167,6 +169,7 @@ import { previewArchiveMembershipConfig } from './previewArchiveMembership.js';
 export function registerAllActions(): void {
   // Register all actions
   registerAction(createTaskAction);
+  registerAction(linkActToMissionAction);
   registerAction(createResourceAction);
 
   registerAction(updateTaskAction);
@@ -402,6 +405,9 @@ export function registerAllActions(): void {
   // User offerings M3: personal products (matanot origin=personal)
   registerAction(createPersonalMatanotConfig);
   registerAction(archivePersonalMatanotConfig);
+
+  // Products discovery directory: per-product opt-out of the public /gift list
+  registerAction(setMatanotDiscoveryConfig);
 
   // Recurring monthly resources: close a mashabetahalich engine (mark done)
   registerAction(markResourceDoneConfig);

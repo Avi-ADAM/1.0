@@ -62,7 +62,13 @@
     "save_failed": "Saving failed",
     "seller_badge": "Independent provider",
     "seller_profile": "Seller profile",
-    "submitVote": "Отправить на голосование"
+    "submitVote": "Отправить на голосование",
+    "discovery": {
+      "shown": "В каталоге",
+      "hidden": "Скрыт",
+      "showTitle": "Показывать товар на публичной странице каталога",
+      "hideTitle": "Скрыть товар с публичной страницы каталога — он останется активным в рикме и по прямой ссылке"
+    }
   },
   "missions": {
     "title": "Missions I do",

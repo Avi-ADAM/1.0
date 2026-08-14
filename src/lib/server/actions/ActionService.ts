@@ -22,6 +22,7 @@ import { ValidationEngine } from './ValidationEngine.js';
 import { AuthorizationEngine } from './AuthorizationEngine.js';
 import { StrapiClient } from './StrapiClient.js';
 import { migrationMetrics } from '../metrics/MigrationMetrics.js';
+import { createLogger } from '../log.js';
 
 // Import to trigger action registration
 import './configs/index.js';
@@ -62,25 +63,30 @@ export interface ILogger {
 }
 
 /**
- * Default console logger implementation
+ * Default logger implementation.
+ *
+ * Delegates to the structured logger (`$lib/server/log.js`), so every action
+ * execution arrives in Axiom as queryable fields (`actionKey`, `userId`,
+ * `duration`, …) instead of a `[INFO] …` string the shipper cannot parse.
+ * `action: true` marks the lines so an action-only view is one filter.
  */
-class ConsoleLogger implements ILogger {
+class ActionLogger implements ILogger {
+  private log = createLogger({ action: true });
+
   info(message: string, data?: any): void {
-    console.log(`[INFO] ${message}`, data || '');
+    this.log.info(message, data);
   }
 
   warn(message: string, data?: any): void {
-    console.warn(`[WARN] ${message}`, data || '');
+    this.log.warn(message, data);
   }
 
   error(message: string, data?: any): void {
-    console.error(`[ERROR] ${message}`, data || '');
+    this.log.error(message, data);
   }
 
   debug(message: string, data?: any): void {
-    if (process.env.NODE_ENV === 'development') {
-      console.debug(`[DEBUG] ${message}`, data || '');
-    }
+    this.log.debug(message, data);
   }
 }
 
@@ -112,7 +118,7 @@ export class ActionService {
     private notifier?: INotificationOrchestrator,
     logger?: ILogger
   ) {
-    this.logger = logger || new ConsoleLogger();
+    this.logger = logger || new ActionLogger();
   }
 
   /**

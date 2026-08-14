@@ -43,6 +43,27 @@
     loading = false;
   }
 
+  // Public products directory (/gift) opt-out — the product itself stays live
+  // (own page, sales, storefront); it just leaves the discovery listing.
+  async function toggleDiscovery(product) {
+    const next = !product.attributes.hideFromDiscovery;
+    busyId = product.id;
+    const result = await executeAction('setMatanotDiscovery', {
+      matanotId: String(product.id),
+      hideFromDiscovery: next
+    });
+    if (result.success) {
+      products = products.map((p) =>
+        p.id === product.id
+          ? { ...p, attributes: { ...p.attributes, hideFromDiscovery: next } }
+          : p
+      );
+    } else {
+      error1 = result.error?.message || $t('offerings.products.save_failed');
+    }
+    busyId = null;
+  }
+
   async function archive(product) {
     if (!confirm($t('offerings.products.archive_confirm'))) return;
     busyId = product.id;
@@ -126,6 +147,22 @@
               >
                 {$t('offerings.products.edit')}
               </a>
+              <button
+                class="text-xs px-2 py-1 rounded-full border transition-colors {product
+                  .attributes.hideFromDiscovery
+                  ? 'border-gray-300 text-gray-400'
+                  : 'border-emerald-400 text-emerald-600 dark:text-emerald-400'}"
+                aria-pressed={!product.attributes.hideFromDiscovery}
+                title={product.attributes.hideFromDiscovery
+                  ? $t('offerings.products.discovery.showTitle')
+                  : $t('offerings.products.discovery.hideTitle')}
+                onclick={() => toggleDiscovery(product)}
+              >
+                {product.attributes.hideFromDiscovery ? '🙈' : '🌍'}
+                {product.attributes.hideFromDiscovery
+                  ? $t('offerings.products.discovery.hidden')
+                  : $t('offerings.products.discovery.shown')}
+              </button>
               <button
                 class="text-gray-400 hover:text-red-500 transition-colors"
                 title={$t('offerings.products.archive')}

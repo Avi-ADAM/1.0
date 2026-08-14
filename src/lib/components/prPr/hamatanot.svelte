@@ -23,6 +23,7 @@
   import { toast } from 'svelte-sonner';
   import SiteShareSaleNote from './SiteShareSaleNote.svelte';
   import { isSiteShareNote, parseSiteShareNote } from '$lib/revenue/parseSiteShareNote';
+  import { executeAction } from '$lib/client/actionClient';
 
   // Site-share income Sales created before the mutation set a `date` have a null
   // date, which dayjs renders as "Invalid Date". Fall back to a dash so the
@@ -128,6 +129,7 @@
    * @property {number} price - Gift price
    * @property {number} quant - Available quantity (-1 for unlimited)
    * @property {string} kindOf - Type: 'total', 'monthly', 'yearly', or 'unlimited'
+   * @property {boolean} [hideFromDiscovery] - Opted out of the public /gift directory
    */
 
   /**
@@ -138,6 +140,7 @@
    * @property {number} attributes.price
    * @property {number} attributes.quant
    * @property {string} attributes.kindOf
+   * @property {boolean} [attributes.hideFromDiscovery] - Opted out of the public /gift directory
    */
 
   /**
@@ -211,6 +214,42 @@
   function addnew() {
     isOpen = true;
     a = 1;
+  }
+
+  /** @type {string | null} */
+  let discoveryBusyId = $state(null);
+
+  /**
+   * Show / hide one product in the public products directory (/gift).
+   * Hiding is only about that listing — the product keeps its own page, stays
+   * on the rikma's page and can still be sold. null-legacy reads as "shown".
+   * @param {Matana} data
+   */
+  async function toggleDiscovery(data) {
+    if (discoveryBusyId) return;
+    const next = !data.attributes.hideFromDiscovery;
+    discoveryBusyId = data.id;
+    try {
+      const res = await executeAction('setMatanotDiscovery', {
+        matanotId: String(data.id),
+        hideFromDiscovery: next
+      });
+      if (!res.success) throw new Error(res.error?.message ?? 'failed');
+      bmiData = bmiData.map((p) =>
+        p.id === data.id
+          ? { ...p, attributes: { ...p.attributes, hideFromDiscovery: next } }
+          : p
+      );
+      toast.success(
+        next
+          ? $t('project.hamatanot.discovery.nowHidden')
+          : $t('project.hamatanot.discovery.nowShown')
+      );
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : String(e));
+    } finally {
+      discoveryBusyId = null;
+    }
   }
   const closer = () => {
     isOpen = false;
@@ -624,6 +663,23 @@
                     </p>
                   </div>
                   <div class="card-actions">
+                    <button
+                      class="discovery-btn"
+                      class:is-hidden={data.attributes.hideFromDiscovery}
+                      disabled={discoveryBusyId === data.id}
+                      aria-pressed={!data.attributes.hideFromDiscovery}
+                      title={data.attributes.hideFromDiscovery
+                        ? $t('project.hamatanot.discovery.showTitle')
+                        : $t('project.hamatanot.discovery.hideTitle')}
+                      onclick={() => toggleDiscovery(data)}
+                    >
+                      <span aria-hidden="true"
+                        >{data.attributes.hideFromDiscovery ? '🙈' : '🌍'}</span
+                      >
+                      {data.attributes.hideFromDiscovery
+                        ? $t('project.hamatanot.discovery.hidden')
+                        : $t('project.hamatanot.discovery.shown')}
+                    </button>
                     <div class="share-button-container">
                       <ShareButtons
                         slug="gift/{data.id}"
@@ -1211,6 +1267,38 @@
     justify-content: space-between;
     align-items: center;
     margin-top: 1rem;
+  }
+
+  /* Public-directory visibility toggle: turquoise = listed on /gift, grey = hidden. */
+  .discovery-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 9999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    border: 1px solid var(--mturk, #40e0d0);
+    color: var(--mturk, #40e0d0);
+    background: rgba(64, 224, 208, 0.08);
+    transition: all 0.2s ease;
+  }
+
+  .discovery-btn:hover:not(:disabled) {
+    background: rgba(64, 224, 208, 0.2);
+  }
+
+  .discovery-btn.is-hidden {
+    border-color: rgba(150, 150, 150, 0.8);
+    color: rgba(150, 150, 150, 1);
+    background: rgba(150, 150, 150, 0.12);
+  }
+
+  .discovery-btn:disabled {
+    opacity: 0.55;
+    cursor: default;
   }
 
   .share-button-container {

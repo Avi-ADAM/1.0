@@ -152,7 +152,15 @@
     "totalSales": "Total Sales:",
     "inVoting": "In Voting:",
     "status": "Status",
-    "perUnitUnlimited": "Unlimited"
+    "perUnitUnlimited": "Unlimited",
+    "discovery": {
+      "shown": "In discovery",
+      "hidden": "Hidden",
+      "showTitle": "Show this product on the public discovery page",
+      "hideTitle": "Hide this product from the public discovery page — it stays active in the rikma and by direct link",
+      "nowShown": "The product now appears on the discovery page",
+      "nowHidden": "The product was hidden from the discovery page"
+    }
   },
   "newmatana": {
     "unlimited": "unlimited",

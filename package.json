@@ -97,7 +97,6 @@
     "@mastra/mcp": "^1.4.2",
     "@mastra/memory": "^1.15.0",
     "@mastra/pg": "1.10.0",
-    "@mediakular/gridcraft": "1.0.5-beta",
     "@number-flow/svelte": "^0.3.3",
     "@pinecone-database/pinecone": "^7.1.0",
     "@sentry/sveltekit": "^8.27.0",

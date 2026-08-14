@@ -1,11 +1,13 @@
 <script>
   import { page } from '$app/state';
+  import { goto } from '$app/navigation';
   import Arrow from '$lib/celim/icons/arrow.svelte';
   import Button from '$lib/celim/ui/button.svelte';
   import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
   import { executeAction } from '$lib/client/actionClient';
   import { getMoachStore } from '$lib/stores/moachStore.svelte.js';
+  import { buildPublishAsMissionUrl } from '$lib/acts/publishAsMission.js';
 
   const moachStore = getMoachStore();
   let projectId = $derived(page.params.projectId);
@@ -29,6 +31,37 @@
   let filtered = $derived(bmiData.filter(
     (e) => e.attributes.users_permissions_user.data.id === page.data.uid
   ));
+
+  /**
+   * The act being taken, looked up from the store the acts page already fills.
+   *
+   * Only `modal.id` travels through `openModal('assign', id)`, but the
+   * create-a-mission path below wants the act's name, description and roles to
+   * prefill the mission form — so read the row back rather than widening the
+   * modal's contract.
+   */
+  let act = $derived.by(() => {
+    const acts = moachStore.state.projects[projectId]?.base?.acts?.data ?? [];
+    const found = acts.find((a) => String(a?.id ?? '') === String(taskId));
+    if (!found) return null;
+    return { id: found.id, ...(found.attributes ?? found) };
+  });
+
+  /**
+   * "I have no mission for this yet" — open the mission form prefilled from the
+   * act, carrying `fromAct` so the act is attached to whatever gets created.
+   *
+   * `assignActToMe` asks the create page to also put the act in this member's
+   * hands, but only once the mission is a real mesimabetahalich. If the rikma
+   * has to vote (`pendm`) or the mission goes out for candidates
+   * (`openMission`), claiming the act now would assert an assignment nobody has
+   * agreed to yet.
+   */
+  function createMission() {
+    if (!act) return;
+    goto(`${buildPublishAsMissionUrl(projectId, act, $lang)}&assignActToMe=1`);
+    onClose?.();
+  }
 
   async function add() {
     loading = true;
@@ -79,7 +112,26 @@
     {/if}
   </div>
 {:else}
-  <span class="text-sm text-gold block p-4 text-center">
+  <span class="text-sm text-gold block px-4 pt-4 text-center">
     {$t('mission.chooseM.emptyState')}
   </span>
+{/if}
+
+<!-- Available in both states: the picker only lists missions you already run,
+     and "none of these" is a legitimate answer even when the list is not
+     empty. The old empty state just told the member to go find the create tab
+     themselves, which ended the flow. -->
+{#if act}
+  <div class="flex justify-center pb-4 {filtered.length === 0 ? 'pt-3' : 'pt-0'}">
+    <button
+      type="button"
+      onclick={createMission}
+      class="inline-flex items-center gap-1.5 rounded-lg border border-gold/40 px-3 py-2 text-sm font-bold text-gold transition-colors hover:bg-gold/10"
+    >
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true">
+        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+      </svg>
+      {$t('mission.chooseM.createMission')}
+    </button>
+  </div>
 {/if}

@@ -3259,6 +3259,13 @@ export interface ApiMatanotMatanot extends Schema.CollectionType {
         };
       }> &
       Attribute.DefaultTo<false>;
+    hideFromDiscovery: Attribute.Boolean &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: false;
+        };
+      }> &
+      Attribute.DefaultTo<false>;
     pic: Attribute.Media &
       Attribute.SetPluginOptions<{
         i18n: {

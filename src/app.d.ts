@@ -33,6 +33,13 @@ declare global {
        * the hook — this is here for server code that has to branch on it.
        */
       theme: 'personal' | 'business';
+      /**
+       * Correlation id for this request (incoming `x-request-id` or a fresh
+       * uuid), echoed on the response and stamped on every log line below.
+       */
+      reqId: string;
+      /** Request-scoped structured logger — `locals.log.info('…', { … })`. */
+      log: import('$lib/server/log.js').Logger;
     }
 
     /** Shape returned by `handleError` in hooks.server.js / hooks.client.js. */
