@@ -72,7 +72,13 @@ if (!confirmUrl && !argv.includes('--yes')) {
 const ACCOUNT_FILE =
   process.env.SMOKE_SIGNUP_STATE || path.join(os.tmpdir(), '1lev1-smoke-signup.json');
 
-const DISPLAY_NAME = 'בדיקה אוטומטית';
+/**
+ * Throwaway runs stay anonymous; a persistent test account wants a name you can
+ * recognise in a members list, so `SMOKE_SIGNUP_NAME` overrides it. Pair it
+ * with `SMOKE_SIGNUP_EMAIL` — multi-member flows (consensus, negotiation, a
+ * two-person split) need a second standing account, not a fresh one each run.
+ */
+const DISPLAY_NAME = process.env.SMOKE_SIGNUP_NAME || 'בדיקה אוטומטית';
 const COUNTRY = process.env.SMOKE_SIGNUP_COUNTRY || 'ישראל';
 
 /** Five lines of a plausible member, in Hebrew, for the AI to extract from. */
