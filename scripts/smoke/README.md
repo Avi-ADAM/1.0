@@ -56,32 +56,33 @@ with the list of pages it hit, not as twenty-two separate failures.
     → 22 pages, e.g. /lev, /me, /moach/82/main
 ```
 
-That run is real: it is B3 from the QA report, still live because the fix is
-merged but not deployed. Once it ships those lines disappear, and anything left
-is new.
+That run is real: it is B3 from the QA report. It is also **fixed and deployed**
+— the same four pages now come back `4/4 pages clean`, which is what the output
+should look like. Anything that appears there is new.
 
 This sweep only reads.
 
 ## Write flows
 
+Each of these writes to the live database and requires `--yes`, so it cannot
+happen by accident. Nothing is cleaned up afterwards — the app has no delete for
+most of these objects yet (see `docs/PLAN_OBJECT_ARCHIVAL.md`).
+
+### `solo-money` — the money loop
+
 ```bash
 node scripts/smoke/flows/solo-money.mjs --yes
 ```
 
-⚠ **Writes to the live database.** `solo-money` walks a one-member rikma from
-nothing to a closed profit split — rikma → mission → take it → finish it →
-resource → approve it → product → sale → split — asserting at each step. It is
-the regression path for the two blockers that were fixed: the GraphQL escaping
-bug in `applyToMission` (a mission with a rich-text description used to 500)
-and the empty-`halukas` rejection that made a solo split impossible.
+Walks a one-member rikma from nothing to a closed profit split — rikma → mission
+→ take it → finish it → resource → approve it → product → sale → split —
+asserting at each step. It is the regression path for the two blockers in
+`docs/QA_SOLO_RIKMA_2026-08.md`: the GraphQL escaping bug in `applyToMission` (a
+mission with a rich-text description used to 500) and the empty-`halukas`
+rejection that made a solo split impossible.
 
-Each run leaves one throwaway rikma named `בדיקה אוטומטית <timestamp>` on the
-account. Nothing is cleaned up, because the app has no delete for these objects
-yet (see `docs/PLAN_OBJECT_ARCHIVAL.md`). The `--yes` flag is required so this
-cannot happen by accident.
-
-Against production as it stands today the flow scores 6/9, failing exactly the
-three assertions whose fixes are merged but not deployed:
+When that report was written the flow scored 6/9 against production, failing
+exactly the three assertions whose fixes had not yet shipped:
 
 ```
 ✗ 3. applied to my own mission (B2 — quoted description) — 500 INTERNAL_ERROR
@@ -89,7 +90,38 @@ three assertions whose fixes are merged but not deployed:
 ✗ 8b. split finalized immediately (solo rikma) — no approveHaluka call
 ```
 
-After the deploy it should be 9/9. If it is not, the fix did not take.
+Those fixes have since deployed, so it should now be 9/9. If it is not, the fix
+did not take.
+
+Leaves one throwaway rikma named `בדיקה אוטומטית <timestamp>` per run.
+
+### `signup` — the front door
+
+```bash
+node scripts/smoke/flows/signup.mjs --yes
+node scripts/smoke/flows/signup.mjs --confirm '<link from the email>'
+```
+
+Walks `/hascama` → `/signup` → email confirmation → `/login` → onboarding → a
+profile that produces match suggestions. This is the path every member walks
+exactly once, which is why it rots unnoticed: nobody on the team signs up again.
+`docs/QA_NEW_USER_WALKTHROUGH_2026-08.md` found nine defects along it, three of
+them severe, and the flow asserts all nine — each step names the finding it
+guards.
+
+It runs in two phases, because confirming the address needs a mailbox this
+harness cannot read. Phase one registers and stops at "check your mail", saving
+the account to `$TMPDIR/1lev1-smoke-signup.json`; phase two takes the link from
+that mail and carries the same account through to the lev screen. The address is
+a `+tag` on the test account's own mailbox, so the mail arrives somewhere you can
+read — `SMOKE_SIGNUP_EMAIL` overrides it for a provider without `+` addressing.
+
+Phase one is worth running on its own even without the mail: its five steps
+cover the consent screen, the registration itself, and the cookie and socket
+state immediately after it, which is where three of the nine findings lived.
+
+Leaves one account, which cannot be deleted, and one signature on the global
+agreement, per run.
 
 ## Writing a new check
 
