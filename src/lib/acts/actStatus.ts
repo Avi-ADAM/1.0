@@ -103,7 +103,9 @@ export function getActProgress(row: ActRowLike | null | undefined): number {
  *
  * - `approve`   — the assignee accepting the assignment (`myIshur`).
  * - `validate`  — the creator confirming the work is done (`valiIshur`).
- * - `take`      — an unplaced act; whoever presses it becomes the assignee.
+ * - `take`      — "I'll do it": opens the mission picker, since an act has to
+ *                 hang off one of the taker's own missions-in-progress for the
+ *                 hours it accrues to count. It does not assign on its own.
  * - `publish`   — turn an unplaced act into a mission the rikma can staff.
  *
  * `viewerId` is compared as a string: `page.data.uid` and Strapi ids disagree
