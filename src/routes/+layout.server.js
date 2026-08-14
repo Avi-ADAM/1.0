@@ -3,7 +3,7 @@ import { loadTranslations } from '$lib/translations';
 
 export const load = async ({ url, locals }) => {
   const { pathname } = url;
-  const { lang, uid, un, email, isDesktop, userAgent, tok } = locals;
+  const { lang, uid, un, email, isDesktop, userAgent, tok, sessionExpired } = locals;
   // `locale` (from sveltekit-i18n) is a single module-level store shared by
   // every concurrent request this server process handles — it is NOT
   // per-request state. Reading `locale.get()` here used to let one user's
@@ -26,6 +26,10 @@ export const load = async ({ url, locals }) => {
     // HttpOnly cookie; the socket authenticates from that cookie (withCredentials)
     // and all reads/mutations go through /api/send + /api/action which read it
     // server-side. Expose only a boolean login flag.
-    loggedIn: !!tok
+    loggedIn: !!tok,
+    // Set once, on the request where the dead cookie was found and cleared, so
+    // the layout can show "your session expired — sign in again" instead of
+    // letting a long-absent member think they were never logged in.
+    sessionExpired: sessionExpired === true
   };
 }

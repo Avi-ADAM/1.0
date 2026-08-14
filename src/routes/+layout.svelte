@@ -15,33 +15,26 @@ onMessage(messaging, (payload) => {
   import { lang, doesLang, langUs } from '$lib/stores/lang.js';
   import SucssesConf from '$lib/celim/sucssesConf.svelte';
   import { confettiStore } from '$lib/stores/confettiStore';
-  import { theme, themeConfig } from '$lib/stores/theme';
+  // Importing the store also wires <html> class syncing and the
+  // prefers-color-scheme listener on load. The classes themselves are already
+  // on the element (server-stamped + the inline script in app.html); this
+  // keeps them in step once the user changes a setting.
+  import { setTheme } from '$lib/stores/theme';
+  import { normalizeTheme, THEME_PARAM } from '$lib/theme/themeParam.js';
   import { onMount } from 'svelte';
-  import { locale, isRtl} from '$lib/translations';
+  import { locale, isRtl } from '$lib/translations';
   import { goto } from '$app/navigation';
-  import { navigating } from '$app/state';
+  import { navigating, page } from '$app/state';
   import { browser } from '$app/environment';
-  import ThemeToggle from '$lib/celim/main/ThemeToggle.svelte';
+  import SessionExpiredBanner from '$lib/components/screens/SessionExpiredBanner.svelte';
+  import MobileFooter from '$lib/components/footer/mobileFooter.svelte';
+  import { showFoot } from '$lib/stores/showFoot.js';
   import { Bot } from '$lib/components/bot';
   import { socketClient } from '$lib/stores/socketClient';
   import { patchUser } from '$lib/stores/userStore.js';
   import { toast } from 'svelte-sonner';
   import { addMes } from '$lib/stores/pendMisMes.js';
   import { forumStore } from '$lib/stores/forumStore';
-
-  // עדכון המשנה בטעינה
-  onMount(() => {
-    const unsubscribe = theme.subscribe((currentTheme) => {
-      // עדכון classes על ה-document
-      document.documentElement.classList.remove('personal', 'business');
-      document.documentElement.classList.add(currentTheme);
-
-      // עדכון data attribute
-      document.documentElement.setAttribute('data-theme', currentTheme);
-    });
-
-    return unsubscribe;
-  });
 
   /**
    * @typedef {Object} Props
@@ -51,6 +44,39 @@ onMessage(messaging, (payload) => {
 
   /** @type {Props} */
   let { data, children } = $props();
+
+  // The bottom bar, for the rest of the site.
+  //
+  // `(reg)` and `(regandnon)` mount it through `foot.svelte`, which also carries
+  // the chat panel and the meeting drawer a signed-in member needs — that stays
+  // where it is, so vaul/threlte/draggable never reach the landing page's
+  // bundle. Every other route is in **no group at all** (`/`, `/about`, `/guid`,
+  // `/deals`, `/chat`, …) and until now had no bar whatsoever. This mounts the
+  // bar there, for members and guests alike.
+  //
+  // `page.route.id` keeps the group in the path (`/(reg)/lev`), which is the
+  // only reliable way to ask "did a group layout already put a bar on screen?"
+  // — matching on pathnames would drift the moment a route moves.
+  const GROUPED = /^\/\((?:reg|regandnon)\)/;
+  // Auth screens are the exception: they *are* the login/signup buttons, and a
+  // bar offering the same two would only sit on top of the form.
+  const AUTH_ROUTES =
+    /^(?:\/(?:he|en|ar|ru|es))?\/(?:login|signup|confirm-email)(?:\/|$)/;
+  let showBar = $derived(
+    $showFoot &&
+      !GROUPED.test(page.route.id ?? '') &&
+      !AUTH_ROUTES.test(page.url.pathname)
+  );
+
+  // A `?theme=` link on a client-side navigation never reaches hooks.server.js,
+  // so honour it here too. Only a recognised value acts: navigating away to a
+  // plain address leaves the pinned look alone (the cookie is the memory), and
+  // a later switch in the appearance menu is not undone — this reads the URL,
+  // never the theme store, so it does not re-run when the theme changes.
+  $effect(() => {
+    const pinned = normalizeTheme(page.url.searchParams.get(THEME_PARAM));
+    if (pinned) setTheme(pinned);
+  });
 
   // Ensure locale and lang are synchronized
   $effect(() => {
@@ -203,6 +229,9 @@ onMessage(messaging, (payload) => {
 {/if}
 
 <main>
+  {#if data?.sessionExpired}
+    <SessionExpiredBanner />
+  {/if}
   {@render children?.()}
   <Toaster
     toastOptions={{
@@ -213,6 +242,9 @@ onMessage(messaging, (payload) => {
     position="top-center"
   />
   <SucssesConf success={$confettiStore} />
+  {#if showBar}
+    <MobileFooter isAuthed={!!data?.loggedIn} />
+  {/if}
   <Bot {data} />
 </main>
 

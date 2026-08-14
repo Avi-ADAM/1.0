@@ -147,18 +147,7 @@
     gap: 0.75rem 1rem;
   }
 
-  @media (prefers-color-scheme: dark) {
-    :root:where(:not([data-theme='light'])) .equity-pie {
-      --eq-mine: #d95926;
-      --eq-existing: #b7d3f6;
-      --eq-approved: #5598e7;
-      --eq-open: #256abf;
-      --eq-track: #33332f;
-      --eq-ink: #c3c2b7;
-      --eq-ink-strong: #ffffff;
-    }
-  }
-  :root[data-theme='dark'] .equity-pie {
+  :global(html.dark) .equity-pie {
     --eq-mine: #d95926;
     --eq-existing: #b7d3f6;
     --eq-approved: #5598e7;
@@ -167,7 +156,6 @@
     --eq-ink: #c3c2b7;
     --eq-ink-strong: #ffffff;
   }
-
   .ring-wrap {
     position: relative;
     flex: 0 0 auto;

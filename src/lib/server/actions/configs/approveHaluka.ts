@@ -121,7 +121,9 @@ export const approveHalukaConfig: ActionConfig = {
     halukot: {
       type: 'array',
       required: true,
-      validate: (value) => Array.isArray(value) && value.length > 0
+      // MAY be empty: a balanced proposal has nothing to transfer (always the
+      // case in a one-member rikma). Steps 1/2/4 still have work to do.
+      validate: (value) => Array.isArray(value)
     },
     sales: {
       type: 'array',
@@ -135,7 +137,11 @@ export const approveHalukaConfig: ActionConfig = {
     },
     projectId: {
       type: 'string',
-      required: false
+      // Required so the projectMember rule below always has something to check.
+      // Without it, `jwt` alone let any authenticated user finalize any tosplit
+      // by guessing its id — this is a money path.
+      required: true,
+      validate: (value) => !isNaN(Number(value))
     }
   },
 
@@ -143,6 +149,11 @@ export const approveHalukaConfig: ActionConfig = {
     {
       type: 'jwt',
       errorMessage: 'Must be authenticated to approve haluka'
+    },
+    {
+      type: 'projectMember',
+      config: { projectIdParam: 'projectId' },
+      errorMessage: 'Must be a member of the project to approve its haluka'
     }
   ],
 

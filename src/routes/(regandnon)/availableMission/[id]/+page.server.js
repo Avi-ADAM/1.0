@@ -5,56 +5,72 @@
 
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { langAdjast } from '$lib/func/langAdjast.svelte';
-import { redirect } from '@sveltejs/kit';
+import { isAuthFailure } from '$lib/server/session.js';
 
 /**
- * Fetch mission data from the API with authentication handling.
- * 
+ * One read of the mission, either as the visitor (JWT) or as the service.
+ * @param {string} mId
+ * @param {boolean} isSer
+ * @param {typeof globalThis.fetch} fetch
+ */
+async function readMission(mId, isSer, fetch) {
+  /** @type {StrapiResponse<{ openMission: StrapiEntity<any> }>} */
+  const res = await sendToSer({ id: mId }, '51GetOpenMissionById', null, null, isSer, fetch);
+  return res;
+}
+
+/**
+ * Fetch mission data, degrading gracefully when the visitor's session is dead.
+ *
+ * The page is public, so a stale cookie must never hide it (and must never
+ * bubble up as a 500): if the JWT read fails on auth, the same read is retried
+ * with the service token and the page renders its signed-out state, with
+ * `authExpired` telling the component to offer sign-in.
+ *
  * @param {string} mId - Mission ID to fetch
  * @param {string} lang - Language code ('he' or 'en')
  * @param {string | false} tok - Authentication token or false for server-side
  * @param {typeof globalThis.fetch} fetch - Fetch function from SvelteKit
- * @returns {Promise<any | null>} Mission data with language adjustments, or null if not found
- * 
- * @throws {import('@sveltejs/kit').Redirect} Redirects to login if authentication fails
- * 
+ * @returns {Promise<{ alld: any | null, authExpired: boolean, loadError: 'auth'|'notfound'|'server'|null }>}
+ *
  * @example
- * const mission = await awaitapi('123', 'he', token, fetch);
- * // Returns mission data with localized fields
+ * const { alld, authExpired } = await awaitapi('123', 'he', token, fetch);
  */
 async function awaitapi(mId, lang, tok, fetch) {
-  const isSer = tok === false;
+  let isSer = tok === false;
+  let authExpired = false;
+  /** @type {any} */
+  let res = null;
+
   try {
-    /** @type {StrapiResponse<{ openMission: StrapiEntity<any> }>} */
-    const res = await sendToSer(
-      { id: mId },
-      '51GetOpenMissionById',
-      null,
-      null,
-      isSer,
-      fetch
-    );
-
-    // Check for authentication errors
-    if (res?.error && res.error.status === 401) {
-      throw redirect(302, `/login?from=availableMission/${mId}`);
+    res = await readMission(mId, isSer, fetch);
+    if (!isSer && isAuthFailure(res)) {
+      authExpired = true;
+      res = null;
     }
-
-    if (res?.errors) {
-      // Check for GraphQL authentication errors
-      const authError = res.errors.find(
-        (error) =>
-          error.message === 'Invalid token.' ||
-          error.extensions?.code === 'UNAUTHENTICATED' ||
-          error.message.includes('401') ||
-          error.message.includes('Unauthorized')
-      );
-
-      if (authError) {
-        throw redirect(302, `/login?from=availableMission/${mId}`);
-      }
+  } catch (error) {
+    if (!isSer && isAuthFailure(null, error)) {
+      authExpired = true;
+    } else {
+      console.error(`[availableMission/${mId}] mission read failed:`, error);
+      return { alld: null, authExpired: false, loadError: 'server' };
     }
+    res = null;
+  }
 
+  // The visitor's token is dead — read the public view with the service token
+  // instead of failing. They still see the mission; they just see it as a guest.
+  if (authExpired) {
+    isSer = true;
+    try {
+      res = await readMission(mId, true, fetch);
+    } catch (error) {
+      console.error(`[availableMission/${mId}] public fallback read failed:`, error);
+      return { alld: null, authExpired: true, loadError: 'auth' };
+    }
+  }
+
+  try {
     const node = res?.data?.openMission?.data;
     if (node) {
       const langd = langAdjast(node, lang);
@@ -90,16 +106,17 @@ async function awaitapi(mId, lang, tok, fetch) {
           ? 'pages.availMission.titles.wish'
           : 'pages.availMission.titles.project';
       alld.titleParams = { name: alld.attributes.name, projectName };
-      return alld;
+      return { alld, authExpired, loadError: null };
     }
-    return null;
+    // No node: either the mission is gone, or the read came back with errors.
+    return {
+      alld: null,
+      authExpired,
+      loadError: res?.errors ? 'server' : 'notfound'
+    };
   } catch (error) {
-    // Re-throw redirect errors
-    if (error.status === 302) {
-      throw error;
-    }
-    console.log(error);
-    return null;
+    console.error(`[availableMission/${mId}] failed to shape mission data:`, error);
+    return { alld: null, authExpired, loadError: 'server' };
   }
 }
 
@@ -112,6 +129,7 @@ async function awaitapi(mId, lang, tok, fetch) {
  * @param {string} params.locals.lang - User's language preference
  * @param {string | false} params.locals.tok - Authentication token
  * @param {string} params.locals.uid - User ID
+ * @param {boolean} [params.locals.sessionExpired] - hooks.server.js found (and cleared) a dead JWT cookie
  * @param {Object} params.params - URL parameters
  * @param {string} params.params.id - Mission ID from URL
  * @param {typeof globalThis.fetch} params.fetch - SvelteKit fetch function
@@ -122,9 +140,12 @@ async function awaitapi(mId, lang, tok, fetch) {
  *   mId: string,
  *   tok: boolean,
  *   alld: any | null,
+ *   authExpired: boolean,
+ *   loadError: 'auth'|'notfound'|'server'|null,
+ *   sessionExpired: boolean,
  *   fullfild: boolean
  * }>} Page data for the component
- * 
+ *
  * @example
  * // In +page.svelte:
  * let { data } = $props();
@@ -134,26 +155,35 @@ async function awaitapi(mId, lang, tok, fetch) {
 export async function load({ locals, params, fetch }) {
   /** @type {string} */
   const mId = params.id;
-  
+
   /** @type {string} */
   const lang = locals.lang;
-  
+
   /** @type {string | false} */
   const tok = locals.tok;
-  console.log(tok);
-  
+  // Never log the raw JWT — a signed-in flag is all this trace ever needed.
+  console.log('[availableMission] signed in:', tok !== false);
+
   /** @type {string} */
   const uid = locals.uid;
-  
+
   /** @type {boolean} */
   const fullfild = false;
+
+  const { alld, authExpired, loadError } = await awaitapi(mId, lang, tok, fetch);
 
   return {
     uid,
     lang,
     mId,
-    tok: tok == false ? false : true,
-    alld: await awaitapi(mId, lang, tok, fetch),
+    // A cookie we could not use is not a session: render the guest view, and
+    // let `authExpired` explain why and offer the way back in.
+    tok: tok !== false && !authExpired,
+    alld,
+    authExpired,
+    loadError,
+    // Set once, on the request that found the dead cookie (hooks.server.js).
+    sessionExpired: locals.sessionExpired === true || authExpired,
     fullfild
   };
 }

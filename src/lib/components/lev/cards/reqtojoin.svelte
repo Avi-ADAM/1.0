@@ -717,7 +717,7 @@
             )}
           onmouseleave={() => hover('0')}
           onclick={() => nego('f')}
-          class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-gold text-gold hover:bg-gold/10 font-bold rounded-xl transition-all flex items-center justify-center gap-2 {negotiationMode
+          class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-gold text-goldink hover:bg-gold/10 font-bold rounded-xl transition-all flex items-center justify-center gap-2 {negotiationMode
             ? 'ring-2 ring-gold'
             : ''}"
           name="negotiate"

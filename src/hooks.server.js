@@ -4,6 +4,14 @@
 import { env } from '$env/dynamic/private';
 import { getInternalSecret, INTERNAL_HEADER } from '$lib/server/internalSecret.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
+import { isExpiredJwt, clearStaleAuthCookies } from '$lib/server/session.js';
+import {
+  DEFAULT_THEME,
+  THEME_COOKIE,
+  THEME_COOKIE_MAX_AGE,
+  THEME_PARAM,
+  normalizeTheme
+} from '$lib/theme/themeParam.js';
 
 // ── Strapi gate: stamp every server→Strapi request with a shared secret ─────
 // tovmeod's nginx blocks requests without x-strapi-gate once the gate is
@@ -129,21 +137,37 @@ const manifestLink = {
   es: "https://res.cloudinary.com/love1/raw/upload/v1749552534/eng-mani-updated_xpcxdf.json?v=2"
 };
 
+/* Site-wide <title>/description fallbacks, one per locale.
+ *
+ * They describe what 1lev1 actually is — a platform for running fair
+ * partnerships (rikmot): open missions and resources, logged hours, decisions
+ * by consensus, transparent profit splits. The old copy sold the "worldwide
+ * consensus for freedom and security" declaration, which now lives on its own
+ * site (agreement.1lev1.com); keep that out of this app's metadata.
+ *
+ * Only pages that declare no <title> of their own fall back to these — see the
+ * placement note in app.html. Titles are kept near 50–60 characters and
+ * descriptions near 110–160, which is what search results actually render.
+ */
 const desc = {
-  he: '1💗1 הסכמה עולמית על חירות | ליצור יחד בהסכמה. לכל 1 יש כישרונות ויכולות ייחודים, לכל 1 יש חלום. ביחד ניתן ליצור כל דבר, לשתף פעולה, לחלום, להעז, להצליח ולהרוויח בגדול.',
-  en: '1💗1 WorldWide consensus for Security and Peace | collaboration platform, create together harmoniously | consensus based partnerships management platform | we can together',
-  ar: '1💗1 اتفاق عالمي للحرية والسلام، منصة تعاون، نخلق معًا بتناغم | نظام إدارة الشراكات القائم على التوافق، يمكننا معًا',
-  ru: '1💗1 Всемирное согласие на свободу и безопасность | платформа сотрудничества, создавать вместе в согласии | система управления партнёрствами на основе консенсуса | вместе мы можем',
-  es: '1💗1 Consenso mundial por la libertad y la paz | plataforma de colaboración, crear juntos en armonía | plataforma de gestión de asociaciones basada en el consenso | juntos podemos'
+  he: '1💗1 היא פלטפורמה לשותפויות הוגנות: ריקמת שותפים ללא בוס וללא הון התחלתי, משימות ומשאבים פתוחים, תיעוד שעות, החלטות בהסכמה וחלוקת רווחים שקופה לפי תרומה.',
+  en: '1💗1 is a platform for fair partnerships: build a network with no boss and no upfront capital, publish open missions and resources, log hours, decide by consensus, split profits by contribution.',
+  ar: '1💗1 منصة للشراكات العادلة: شبكة شركاء بلا مدير وبلا رأس مال، مهام وموارد مفتوحة، تسجيل الساعات، قرارات بالتوافق، وتقاسم شفاف للأرباح حسب المساهمة.',
+  ru: '1💗1 — платформа честных партнёрств: сеть без начальника и стартового капитала, открытые задачи и ресурсы, учёт часов, решения по согласию и прозрачный раздел прибыли по вкладу.',
+  es: '1💗1 es una plataforma de asociaciones justas: una red sin jefe ni capital inicial, misiones y recursos abiertos, registro de horas, decisiones por consenso y reparto transparente de beneficios.'
 };
 
 const title = {
-  en: '1💗1 | Create together harmoniously | Worldwide Consensus for Freedom',
-  he: 'הסכמה עולמית על חירות וביטחון | 1💗1️ ליצור ביחד בהסכמה | 1💗1',
-  ar: '1💗1 | نخلق معًا بتناغم | اتفاق عالمي للحرية',
-  ru: '1💗1 | Создавать вместе в согласии | Всемирное согласие на свободу',
-  es: '1💗1 | Crear juntos en armonía | Consenso mundial por la libertad'
+  he: '1💗1 · שותפויות הוגנות: משימות, שעות וחלוקת רווחים',
+  en: '1💗1 · Fair Partnerships: Missions, Hours, Profit Split',
+  ar: '1💗1 · شراكات عادلة: مهام وساعات وتقاسم الأرباح',
+  ru: '1💗1 · Честные партнёрства: задачи, часы и доля прибыли',
+  es: '1💗1 · Asociaciones justas: misiones, horas y reparto'
 };
+
+// Public address of the site, used to build og:url. Not derived from
+// event.url.origin: behind the proxy that is an internal host.
+const SITE_ORIGIN = 'https://1lev1.com';
 
 const cl = {
   he: 'he-IL',
@@ -181,6 +205,37 @@ function getLanguage(event) {
   // would propagate into locals.lang and out to the metadata maps.
   return SUPPORTED_LANGS.includes(coociLang) ? coociLang : 'he';
 }
+// Appearance is two cookies: `theme` (personal|business) and `mode`
+// (light|dark|system). Both are user-writable, so both are validated here
+// before they reach the markup. `system` cannot be resolved server-side — the
+// OS preference is not in the request — so it renders without `dark` and the
+// inline script in app.html corrects it before first paint.
+//
+// `?theme=` overrides the cookie and is then written to it ("pinned"), which is
+// what makes a shared link like `…/?theme=professional` show the clean business
+// identity for the whole visit and not just the landing page. The spelling
+// table is shared with the client store — see $lib/theme/themeParam.js.
+
+/**
+ * @param {import('@sveltejs/kit').RequestEvent} event
+ * @returns {{ theme: import('$lib/theme/themeParam.js').ThemeName, pinned: boolean }}
+ */
+function resolveTheme(event) {
+  const fromUrl = normalizeTheme(event.url.searchParams.get(THEME_PARAM));
+  return {
+    theme: fromUrl ?? normalizeTheme(event.cookies.get(THEME_COOKIE)) ?? DEFAULT_THEME,
+    pinned: fromUrl !== undefined
+  };
+}
+
+/**
+ * @param {import('@sveltejs/kit').RequestEvent} event
+ * @param {string} theme
+ */
+function getThemeClass(event, theme) {
+  return event.cookies.get('mode') === 'dark' ? `${theme} dark` : theme;
+}
+
 // Baseline security headers applied to every response. A full Content-Security-Policy
 // is intentionally NOT set here — it needs a dedicated, tested pass to whitelist all
 // external origins (Cloudinary, MapLibre, Google, Telegram, fonts, socket, etc.).
@@ -202,11 +257,51 @@ export async function handle({ event, resolve }) {
   event.locals.lang = lang;
   event.locals.userAgent = event.request.headers.get('accept-language');
   event.locals.isDesktop = event.request.headers.get('sec-ch-ua-mobile') === '?0';
-  event.locals.tok = event.cookies.get('jwt') || false;
-  event.locals.uid = event.cookies.get('id') || false;
-  event.locals.un = event.cookies.get('un') || false;
+  // An expired cookie is worse than no cookie: it makes every layer below
+  // believe there is a session and then fail. Downgrade to guest and wipe it.
+  const rawTok = event.cookies.get('jwt') || false;
+  const sessionExpired = rawTok !== false && isExpiredJwt(rawTok);
+  if (sessionExpired) clearStaleAuthCookies(event);
+
+  event.locals.sessionExpired = sessionExpired;
+  event.locals.tok = sessionExpired ? false : rawTok;
+  event.locals.uid = sessionExpired ? false : event.cookies.get('id') || false;
+  event.locals.un = sessionExpired ? false : event.cookies.get('un') || false;
   event.locals.email = event.cookies.get('email') || false;
   const isSecure = event.url.protocol === 'https:';
+
+  // Resolved before the redirects below, because several of them (a member
+  // landing on `/?theme=business`, a logged-out visitor bounced off /lev) drop
+  // the query string — without pinning here the shared link would be forgotten
+  // at the very first hop.
+  const appearance = resolveTheme(event);
+  event.locals.theme = appearance.theme;
+  if (appearance.pinned) {
+    // httpOnly:false — the appearance menu and the anti-flash script in
+    // app.html both read this through document.cookie. `secure` follows the
+    // protocol rather than SvelteKit's default, which would mark the cookie
+    // Secure on the http dev host and have the browser drop it.
+    event.cookies.set(THEME_COOKIE, appearance.theme, {
+      path: '/',
+      maxAge: THEME_COOKIE_MAX_AGE,
+      httpOnly: false,
+      sameSite: 'lax',
+      secure: isSecure
+    });
+  }
+  /* SvelteKit only flushes `cookies.set()` onto responses that came out of
+     `resolve()`, so every hand-built Response below goes through this. */
+  const pinTheme = (/** @type {Response} */ response) => {
+    if (appearance.pinned) {
+      response.headers.append(
+        'set-cookie',
+        `${THEME_COOKIE}=${appearance.theme}; Path=/; Max-Age=${THEME_COOKIE_MAX_AGE}; SameSite=Lax${
+          isSecure ? '; Secure' : ''
+        }`
+      );
+    }
+    return response;
+  };
   // Set language cookie based on URL path
   if (event.url.pathname === '/en' || event.url.pathname === '/ar' || event.url.pathname === '/he' || event.url.pathname === '/ru') {
     event.cookies.set('lang', lang, { path: '/' });
@@ -214,10 +309,10 @@ export async function handle({ event, resolve }) {
 
   // Redirect logic based on authentication
   if (event.url.pathname === '/convention' || event.url.pathname === '/aitifaqia') {
-    return new Response('Redirect', {
+    return pinTheme(new Response('Redirect', {
       status: 303,
       headers: { Location: '/hascama' }
-    });
+    }));
   }
 
   // /hascama?ref=true&id=...&con=...&un=...&em=...&lang=...  ← sister-site referral
@@ -245,18 +340,23 @@ export async function handle({ event, resolve }) {
     if (id) setCookie('fpval', id);
     if (con) setCookie('contriesi', con);
 
-    return new Response('Redirect', { status: 303, headers });
+    return pinTheme(new Response('Redirect', { status: 303, headers }));
   }
   if (event.url.pathname === '/' && event.locals.tok) {
-    return new Response('Redirect', {
+    return pinTheme(new Response('Redirect', {
       status: 303,
       headers: { Location: '/lev' }
-    });
+    }));
   } else if (event.url.pathname.startsWith('/lev') && !event.locals.tok) {
-    return new Response('Redirect', {
+    // A member whose session just expired is not an anonymous visitor: send
+    // them to /login with a way back, instead of dumping them on the homepage.
+    const back = event.url.pathname.replace(/^\//, '') + event.url.search;
+    return pinTheme(new Response('Redirect', {
       status: 303,
-      headers: { Location: '/' }
-    });
+      headers: {
+        Location: sessionExpired ? `/login?from=${encodeURIComponent(back)}&expired=1` : '/'
+      }
+    }));
   } else if (event.url.pathname.startsWith('/api')) {
     const origin = event.request.headers.get('origin');
     const corsAllowed = origin && allowedCorsOrigins().includes(origin.replace(/\/+$/, ''));
@@ -273,19 +373,66 @@ export async function handle({ event, resolve }) {
     return response;
   }
 
+  const themeClass = getThemeClass(event, appearance.theme);
+  // og:url used to be the hardcoded homepage on every page, so every share of
+  // an inner page resolved back to "/" . Build it from the request instead —
+  // pathname only (percent-encoded, so it cannot break out of the attribute)
+  // plus the locale marker, matching the hreflang table in app.html.
+  const canonical =
+    `${SITE_ORIGIN}${event.url.pathname}` + (lang === 'he' ? '' : `?lang=${lang}`);
   const response = await resolve(event, {
+    // replaceAll, not replace: app.html reuses `%xtitle%` for both og:title and
+    // twitter:title, and `replace` would have left the second one rendering the
+    // literal placeholder into the share card.
     transformPageChunk: ({ html }) =>
       html
-        .replace('%lang%', lang)
-        .replace('%xtitle%', title[lang])
-        .replace('%title%', title[lang])
-        .replace('%desc%', desc[lang])
-        .replace('%xdes%', desc[lang])
-        .replace('%desci%', desc[lang])
-        .replace('%cl%', cl[lang])
-        .replace('%manifest%', manifestLink[lang])
+        .replaceAll('%themeclass%', themeClass)
+        .replaceAll('%lang%', lang)
+        .replaceAll('%canonical%', canonical)
+        .replaceAll('%xtitle%', title[lang])
+        .replaceAll('%title%', title[lang])
+        .replaceAll('%desc%', desc[lang])
+        .replaceAll('%xdes%', desc[lang])
+        .replaceAll('%desci%', desc[lang])
+        .replaceAll('%cl%', cl[lang])
+        .replaceAll('%manifest%', manifestLink[lang])
   });
   return applySecurityHeaders(response, isSecure);
+}
+
+/**
+ * Every uncaught server error used to reach the browser as a bare
+ * `500 · Internal Error` — no cause, no way out. Classify it instead: an
+ * auth-shaped failure (expired/misaligned token, 401/403 from the proxy) is
+ * labelled `code:'auth'` so the error screen can offer sign-in/sign-up, and the
+ * failing address rides along so the visitor can be returned to it afterwards.
+ *
+ * The raw message is logged, never localized here — the screen renders text
+ * with `$t()` from the `auth` namespace.
+ *
+ * @type {import('@sveltejs/kit').HandleServerError}
+ */
+export function handleError({ error, event, status, message }) {
+  const raw = error instanceof Error ? error.message : String(error ?? '');
+  const isAuth =
+    status === 401 ||
+    status === 403 ||
+    /unauthorized|invalid token|forbidden|jwt|\b401\b|\b403\b/i.test(raw);
+
+  console.error(
+    `[error] ${status} ${event.request.method} ${event.url.pathname}`,
+    raw,
+    error instanceof Error ? error.stack : ''
+  );
+
+  return {
+    message,
+    code: isAuth ? 'auth' : 'server',
+    // Where the visitor was trying to go, for the "sign in and come back" link.
+    from: event.url.pathname.replace(/^\//, '') + event.url.search,
+    // A session that expired mid-request is the likeliest cause of an auth error.
+    sessionExpired: event.locals?.sessionExpired === true
+  };
 }
 
 // Uncomment if using Sentry

@@ -14,17 +14,31 @@ let srcP = $state();
 let error1 = null;
 let vallues  = $state([])
 
-      let linkP  =$state([])
+      // `linkToWebsite` is a string or null — an empty array as the initial
+      // value is truthy, so `{#if linkP}` would open the link on nothing.
+      let linkP  =$state()
        let githublink = $state();
          let fblink = $state(), discordlink = $state(), twiterlink = $state();
 let projecto = $state([]);
+/**
+ * Resolves to the project and returns it — it must never write to `project`
+ * itself. `{#await project}` re-runs whenever its input changes, and the
+ * reassignment happened inside this promise's continuation: the await block
+ * then swapped pending→then from a microtask, outside the guard that stops it
+ * rendering into a subtree that is already destroyed or mid-outro (the lev
+ * dialog fades for a full second). Effects built under an inert parent read
+ * their deriveds back as Svelte's internal UNINITIALIZED symbol, so
+ * `title={$t(…)}` threw "Cannot convert a Symbol value to a string" and took
+ * the whole flush — every other card on the page — down with it.
+ */
 async function xyd () {
+        let proj;
         try {
             const res = await sendToSer({ id: projectId }, "49GetProjectById", 0, 0, false, fetch);
-            project = res.data.project.data;
-            projectUsers = project.attributes.user_1s.data;
-            projecto = project.attributes.open_missions.data;
-                vallues = project.attributes.vallues.data;
+            proj = res.data.project.data;
+            projectUsers = proj.attributes.user_1s.data;
+            projecto = proj.attributes.open_missions.data;
+                vallues = proj.attributes.vallues.data;
             if ($lang == "he"){
               for (var i = 0; i < vallues.length; i++){
                 if (vallues[i].attributes.localizations.data.length > 0){
@@ -33,18 +47,18 @@ async function xyd () {
               }
             }
             vallues = vallues
-            srcP =`${project.attributes.profilePic.data.attributes.formats.small.url}`
-       linkP = project.attributes.linkToWebsite;
-        githublink = project.attributes.githubLink;
-             fblink = project.attributes.fblink;
-              discordlink = project.attributes.discordLink;
-              twiterlink= project.attributes.twiterLink;
-            srcP =`${project.attributes.profilePic.data.attributes.formats.small.url}`
-           
+       linkP = proj.attributes.linkToWebsite;
+        githublink = proj.attributes.githubLink;
+             fblink = proj.attributes.fblink;
+              discordlink = proj.attributes.discordLink;
+              twiterlink= proj.attributes.twiterLink;
+            srcP =`${proj.attributes.profilePic.data.attributes.formats.small.url}`
+
         } catch (e) {
             error1 = e
+            throw e
         }
-        return project
+        return proj
     };
 
     function us (x){
@@ -56,7 +70,9 @@ async function xyd () {
     function hover(c){
       console.log("hover")
     }
-    let project = $state(xyd());
+    // Plain `let`, not `$state`: the await block's input has to stay the one
+    // stable promise for its whole life — see the note on `xyd`.
+    let project = xyd();
 
                      </script>
  {#await project}
@@ -175,6 +191,8 @@ async function xyd () {
     </div>
 </div>
 </div>
+{:catch}
+  <p dir="auto" class="p-4 text-center text-barbi">{$t('lev.rikma.loadError')}</p>
 {/await}
 <style>
   

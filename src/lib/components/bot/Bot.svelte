@@ -7,16 +7,51 @@
   import { browser, dev } from '$app/environment';
   import { page } from '$app/stores';
   import { chatMessages } from '$lib/stores/chatStore';
+  import DemoRequest from '$lib/components/main/DemoRequest.svelte';
 
   let { data } = $props();
   let user = $derived(data.uid ? true : false);
   let isOnChatPage = $derived($page.url.pathname === '/chat');
 
   let visible = $state(false);
+
+  // פתיחה לאורח: במקום לבקש ממנו לנסח שאלה, מציעים לו את שלושת המסלולים.
+  // "התחברות" בכוונה לא כאן — היא כפתור קבוע בראש האתר, ומי שכבר יש לו חשבון
+  // לא מחפש אותה בבוט. היא מוצעת רק כמשפט המשך אחרי בחירה ב"להתחיל ריקמה".
+  let showQuickActions = $state(true);
+  let demoOpen = $state(false);
+  let offeredLogin = $state(false);
+  let inputEl = $state(null);
+
   let messages = $state([]);
   let userInput = $state('');
   let loading = $state(false);
   let messagesContainer = $state(null);
+
+  function registerPath() {
+    return $locale == 'he'
+      ? '/hascama'
+      : $locale == 'ar'
+        ? '/aitifaqia'
+        : '/convention';
+  }
+
+  function startDemo() {
+    showQuickActions = false;
+    demoOpen = true;
+  }
+
+  function startRegister() {
+    showQuickActions = false;
+    offeredLogin = true;
+    visible = false;
+    goto(registerPath());
+  }
+
+  function startQuestion() {
+    showQuickActions = false;
+    inputEl?.focus();
+  }
 
   // Sync store → local state
   $effect(() => {
@@ -38,6 +73,7 @@
 
     const currentInput = userInput;
     const messageHistory = [...messages];
+    showQuickActions = false;
 
     chatMessages.addMessage({ text: currentInput, user: true });
     userInput = '';
@@ -194,9 +230,45 @@
               <div
                 class="chat-bubble bg-gradient-to-r from-gray-100 to-gray-50 text-gray-800 border border-gray-200 shadow-sm"
               >
-                {$t('bot.initialMessage')}
+                {showQuickActions ? $t('demo.bot.intro') : $t('bot.initialMessage')}
               </div>
             </div>
+            {#if showQuickActions}
+              <div class="flex flex-col gap-2 px-1">
+                <button
+                  type="button"
+                  onclick={startDemo}
+                  class="w-full text-start bg-barbi text-gold hover:bg-white hover:text-barbi border-2 border-barbi font-semibold px-3 py-2 rounded-xl shadow-sm transition-colors"
+                >
+                  💬 {$t('demo.bot.demo')}
+                  <span class="block text-xs opacity-90">{$t('demo.reassure')}</span>
+                </button>
+                <button
+                  type="button"
+                  onclick={startRegister}
+                  class="w-full text-start bg-gold text-barbi hover:bg-barbi hover:text-gold border-2 border-gold font-semibold px-3 py-2 rounded-xl shadow-sm transition-colors"
+                >
+                  ✍️ {$t('demo.bot.register')}
+                </button>
+                <button
+                  type="button"
+                  onclick={startQuestion}
+                  class="w-full text-start bg-white text-bluesun hover:bg-gray-100 border-2 border-gray-200 font-semibold px-3 py-2 rounded-xl shadow-sm transition-colors"
+                >
+                  ❓ {$t('demo.bot.question')}
+                </button>
+              </div>
+            {/if}
+            {#if offeredLogin}
+              <div class="px-1">
+                <a
+                  href="/login"
+                  class="block text-center text-bluesun underline text-sm hover:text-blue-600"
+                >
+                  {$t('demo.bot.haveAccount')}
+                </a>
+              </div>
+            {/if}
           {/if}
           {#each messages as message, i (i)}
             <div class="chat {message.user ? 'chat-end' : 'chat-start'}">
@@ -224,6 +296,7 @@
           <div class="flex items-center gap-2">
             <div class="flex-1 relative">
               <textarea
+                bind:this={inputEl}
                 bind:value={userInput}
                 onkeydown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
@@ -281,6 +354,9 @@
     {/if}
   </div>
 {/if}
+
+<!-- מסלול הדמו זמין מהבוט בכל עמוד, לא רק מדף הבית -->
+<DemoRequest bind:open={demoOpen} source="bot" />
 
 <style>
   .chat {

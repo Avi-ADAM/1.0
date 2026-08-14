@@ -20,6 +20,29 @@ declare global {
       un: string | false;
       /** Signed-in email, or false. */
       email: string | false;
+      /**
+       * The request arrived with a JWT cookie whose `exp` had passed. The
+       * request is treated as signed-out (`tok === false`) and the dead cookies
+       * are cleared, but pages can still say "your session expired" instead of
+       * silently pretending the visitor was never logged in.
+       */
+      sessionExpired: boolean;
+      /**
+       * Visual identity for this request: the `theme` cookie, overridden by
+       * `?theme=` when a shared link pins one. Already stamped onto <html> by
+       * the hook — this is here for server code that has to branch on it.
+       */
+      theme: 'personal' | 'business';
+    }
+
+    /** Shape returned by `handleError` in hooks.server.js / hooks.client.js. */
+    interface Error {
+      message: string;
+      /** `auth` = sign-in problem (expired/misaligned token); `server` = anything else. */
+      code?: 'auth' | 'server';
+      /** Path (without the leading slash) the visitor was trying to reach. */
+      from?: string;
+      sessionExpired?: boolean;
     }
   }
 }

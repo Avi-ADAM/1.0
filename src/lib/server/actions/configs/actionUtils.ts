@@ -68,3 +68,22 @@ export function normalizeLocationInput(loc?: RawLocation | null): Record<string,
   if (loc.location_hint) out.location_hint = loc.location_hint;
   return Object.keys(out).length > 0 ? out : null;
 }
+
+/**
+ * Quote a value as a GraphQL string literal, escaping included.
+ *
+ * A handful of handlers still build their mutation by interpolating strings
+ * into the query text instead of passing variables. Any value that reaches one
+ * of those templates MUST go through here: rich-text descriptions always carry
+ * `style="text-align: right;"`, and a single unescaped `"` turns the whole
+ * mutation into a syntax error (the server answers 500 and the user sees a
+ * button that does nothing). Newlines break it just as easily.
+ *
+ * `JSON.stringify` is exactly the right tool: every escape it emits
+ * (`\"`, `\\`, `\n`, `\uXXXX`, …) is also a valid GraphQL string escape.
+ * The quotes come with it, so use it WITHOUT surrounding quotes:
+ * `descrip: ${gqlString(value)}` — not `descrip: "${gqlString(value)}"`.
+ */
+export function gqlString(value: unknown): string {
+  return JSON.stringify(value == null ? '' : String(value));
+}

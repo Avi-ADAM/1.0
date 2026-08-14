@@ -46,7 +46,14 @@
   <title>{$t('auth.login.title')}</title>
 </svelte:head>
 
-<h1 class="auth-heading">{$t('auth.login.heading')}</h1>
+<!-- Both headings ship and CSS picks one, for the same reason the brand mark in
+     +layout.svelte does: `html.business` is stamped server-side, so a class
+     branch is right on the first frame. `display:none` also drops the unused
+     one from the accessibility tree, so a screen reader hears a single title. -->
+<h1 class="auth-heading">
+  <span class="heading-personal">{$t('auth.login.heading')}</span
+  ><span class="heading-business">{$t('auth.login.headingSharp')}</span>
+</h1>
 <p class="auth-sub">{$t('auth.login.subtitle')}</p>
 
 {#if data?.confirmed && !loginError}
@@ -239,6 +246,17 @@
 </form>
 
 <style>
+  /* personal keeps the warm greeting; business gets the plain one */
+  .heading-business {
+    display: none;
+  }
+  :global(html.business) .heading-personal {
+    display: none;
+  }
+  :global(html.business) .heading-business {
+    display: inline;
+  }
+
   .auth-ok {
     display: block;
     background: #effaf1;

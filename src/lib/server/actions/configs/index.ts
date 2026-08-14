@@ -152,6 +152,10 @@ import { createMissionOfferConfig } from './createMissionOffer.js';
 import { updateMissionOfferConfig } from './updateMissionOffer.js';
 import { createPersonalMatanotConfig } from './createPersonalMatanot.js';
 import { archivePersonalMatanotConfig } from './archivePersonalMatanot.js';
+import { proposeObjectArchiveConfig } from './proposeObjectArchive.js';
+import { proposeObjectEditConfig } from './proposeObjectEdit.js';
+import { counterObjectChangeConfig } from './counterObjectChange.js';
+import { previewArchiveMembershipConfig } from './previewArchiveMembership.js';
 
 
 /**
@@ -401,6 +405,12 @@ export function registerAllActions(): void {
 
   // Recurring monthly resources: close a mashabetahalich engine (mark done)
   registerAction(markResourceDoneConfig);
+
+  // Object archival & edit consent flow (PLAN_OBJECT_ARCHIVAL)
+  registerAction(proposeObjectArchiveConfig);
+  registerAction(proposeObjectEditConfig);
+  registerAction(counterObjectChangeConfig);
+  registerAction(previewArchiveMembershipConfig);
 
   // Future actions will be registered here
   // registerAction(createTaskAction);

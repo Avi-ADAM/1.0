@@ -39,8 +39,13 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
   // match the URL. Older entities (created before the project field was added)
   // have null project — skip the check for those; moach layout auth already
   // confirmed the user is a member of projectId.
-  const entityProjectId = entity.attributes?.project?.data?.id;
-  if (entityProjectId && String(entityProjectId) !== String(projectId)) {
+  // A Decision belongs to `projects` (many-to-many), not `project`.
+  const entityProjectIds: string[] = entity.attributes?.projects?.data
+    ? entity.attributes.projects.data.map((p: { id: string | number }) => String(p.id))
+    : entity.attributes?.project?.data?.id
+      ? [String(entity.attributes.project.data.id)]
+      : [];
+  if (entityProjectIds.length > 0 && !entityProjectIds.includes(String(projectId))) {
     throw error(404, 'Vote not found');
   }
 

@@ -536,7 +536,7 @@
         <button
           onmouseenter={() => hover($t('lev.cards.proposeOther'))}
           onmouseleave={() => hover('0')}
-          class="flex-1 py-2 flex justify-center items-center gap-2 bg-white dark:bg-gray-800 border-2 border-gold text-gold hover:bg-yellow-50 dark:hover:bg-yellow-900/20 font-bold rounded-xl transition-all"
+          class="flex-1 py-2 flex justify-center items-center gap-2 bg-white dark:bg-gray-800 border-2 border-gold text-goldink hover:bg-yellow-50 dark:hover:bg-yellow-900/20 font-bold rounded-xl transition-all"
           onclick={() => nego('f')}
         >
           <span class="whitespace-nowrap">{$t('lev.cards.proposeOther')}</span>
@@ -554,7 +554,7 @@
         <button
           onmouseenter={() => hover($t('lev.cards.common.counterProposal'))}
           onmouseleave={() => hover('0')}
-          class="flex-1 py-2 flex justify-center items-center gap-2 bg-white dark:bg-gray-800 border-2 border-gold text-gold hover:bg-yellow-50 dark:hover:bg-yellow-900/20 font-bold rounded-xl transition-all"
+          class="flex-1 py-2 flex justify-center items-center gap-2 bg-white dark:bg-gray-800 border-2 border-gold text-goldink hover:bg-yellow-50 dark:hover:bg-yellow-900/20 font-bold rounded-xl transition-all"
           onclick={() => nego('f')}
         >
           <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none">

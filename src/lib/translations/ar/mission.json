@@ -112,6 +112,7 @@
     "userIdNotFound": "لم يُعثر على معرّف المستخدم",
     "splitCreated": "تم إنشاء التقسيم بنجاح!",
     "errorCreatingSplit": "خطأ في إنشاء التقسيم",
+    "splitApproved": "تم إنشاء التقسيم واعتماده — لا أحد آخر بانتظاره 🙂",
     "cards": "بطاقات",
     "table": "جدول",
     "balanced": "متوازن",
@@ -138,7 +139,8 @@
     "urgency": "الأولوية",
     "myTasks": "مهامي المعيّنة",
     "myCreatedTasks": "المهام التي أنشأتها",
-    "pendingAssignment": "مهام في انتظار التعيين"
+    "pendingAssignment": "مهام في انتظار التعيين",
+    "takeTask": "سأقوم بها"
   },
   "chooseM": {
     "heading": "اختيار المهمة المتابعة",

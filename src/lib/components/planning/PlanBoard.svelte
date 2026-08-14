@@ -100,28 +100,30 @@
   const restore = (item) => patchItem(item, { status: 'proposed' });
 </script>
 
-<div class="plan-board rounded-2xl border border-barbi/40 p-4 bg-white/50 dark:bg-black/20">
+<!-- The board floats on the planning panel's ramp, which never darkens — so no
+     `dark:` background or ink here. See --ramp-ink in app.postcss. -->
+<div class="plan-board rounded-2xl border border-barbi/40 p-4 bg-white/60">
   {#if attrs.rationale}
-    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3 italic">{attrs.rationale}</p>
+    <p class="text-sm text-[color:var(--ramp-ink,#16131b)] mb-3 italic">{attrs.rationale}</p>
   {/if}
 
   {#if !isExpanded || items.length === 0}
-    <p class="text-sm text-gray-500 mb-3">{$t('planning.board.empty')}</p>
+    <p class="text-sm text-[color:var(--ramp-ink,#16131b)] mb-3">{$t('planning.board.empty')}</p>
     <Button onClick={expand} disabled={expanding}>
       {expanding ? $t('planning.board.expanding') : $t('planning.board.expand')}
     </Button>
   {:else}
     {#if siteUsed}
-      <p class="text-xs mb-3 text-gray-600 dark:text-gray-300">
+      <p class="text-xs mb-3 text-[color:var(--ramp-ink,#16131b)]">
         {$t('planning.board.siteRead')}
         <a class="underline break-all" href={siteUsed} target="_blank" rel="noopener noreferrer">{siteUsed}</a>
       </p>
     {/if}
 
     {#if hints.length > 0}
-      <div class="mb-3 rounded-xl border border-barbi/30 bg-white/60 dark:bg-black/20 p-3">
-        <p class="text-xs font-semibold mb-1 text-[color:var(--stgold,#574010)]">{$t('planning.board.hint')}</p>
-        <ul class="list-disc list-inside text-sm text-gray-700 dark:text-gray-300">
+      <div class="mb-3 rounded-xl border border-barbi/30 bg-white/70 p-3">
+        <p class="text-xs font-semibold mb-1 text-[color:var(--ramp-ink,#16131b)]">{$t('planning.board.hint')}</p>
+        <ul class="list-disc list-inside text-sm text-[color:var(--ramp-ink,#16131b)]">
           {#each hints as hint (hint.text)}
             <li>{hint.text}</li>
           {/each}
@@ -140,7 +142,7 @@
             : 'border-barbi/30'}"
         >
           <div class="flex flex-wrap items-center gap-2 mb-1">
-            <span class="text-xs px-2 py-0.5 rounded-full bg-barbi/15">
+            <span class="text-xs px-2 py-0.5 rounded-full bg-barbi/15 text-[color:var(--ramp-ink,#16131b)]">
               {$t(`planning.board.kinds.${a.kind}`)}
             </span>
 
@@ -171,12 +173,12 @@
             {/if}
           </div>
 
-          <p class="font-semibold text-gray-900 dark:text-gray-100">{a.name}</p>
+          <p class="font-semibold text-[color:var(--ramp-ink,#16131b)]">{a.name}</p>
           {#if a.descrip}
-            <p class="text-sm text-gray-600 dark:text-gray-300">{a.descrip}</p>
+            <p class="text-sm text-[color:var(--ramp-ink,#16131b)]">{a.descrip}</p>
           {/if}
           {#if rationaleOf(item)}
-            <p class="text-xs text-gray-500 dark:text-gray-400 italic mt-1">
+            <p class="text-xs text-[color:var(--ramp-ink,#16131b)] italic mt-1">
               {$t('planning.board.why')} {rationaleOf(item)}
             </p>
           {/if}
@@ -197,7 +199,7 @@
                 <Button onClick={() => onOpenItem?.(item, board)}>{$t('planning.board.openInForm')}</Button>
                 <button
                   type="button"
-                  class="text-sm underline text-gray-500"
+                  class="text-sm underline text-[color:var(--ramp-ink,#16131b)]"
                   disabled={busyItemId === String(item.id)}
                   onclick={() => dismiss(item)}
                 >
@@ -206,7 +208,7 @@
               {:else}
                 <button
                   type="button"
-                  class="text-sm underline text-gray-500"
+                  class="text-sm underline text-[color:var(--ramp-ink,#16131b)]"
                   disabled={busyItemId === String(item.id)}
                   onclick={() => restore(item)}
                 >
@@ -222,7 +224,7 @@
     <div class="mt-4">
       {#if showRevision}
         <textarea
-          class="w-full rounded-xl border border-barbi/40 p-2 text-sm"
+          class="w-full rounded-xl border border-barbi/40 p-2 text-sm bg-white/80 text-[color:var(--ramp-ink,#16131b)]"
           rows="2"
           bind:value={revisionNote}
           placeholder={$t('planning.board.revisePlaceholder')}
@@ -231,12 +233,12 @@
           <Button onClick={expand} disabled={expanding || !revisionNote.trim()}>
             {expanding ? $t('planning.board.expanding') : $t('planning.board.reviseSend')}
           </Button>
-          <button type="button" class="text-sm underline text-gray-500" onclick={() => (showRevision = false)}>
+          <button type="button" class="text-sm underline text-[color:var(--ramp-ink,#16131b)]" onclick={() => (showRevision = false)}>
             {$t('planning.board.cancel')}
           </button>
         </div>
       {:else}
-        <button type="button" class="text-sm underline text-gray-500" onclick={() => (showRevision = true)}>
+        <button type="button" class="text-sm underline text-[color:var(--ramp-ink,#16131b)]" onclick={() => (showRevision = true)}>
           {$t('planning.board.revise')}
         </button>
       {/if}

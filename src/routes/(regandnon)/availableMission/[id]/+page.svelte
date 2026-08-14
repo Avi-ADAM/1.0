@@ -188,7 +188,12 @@
   />
   <SucssesConf {success} />
 
-  {#if data != null}
+  <!-- `data` is never null — the load always returns an object. The condition
+       that matters is whether the mission itself came back: when it did not
+       (dead session, mission gone, downstream error) every `data.alld.attributes.…`
+       below would throw during SSR, which is exactly the unexplained 500 a
+       returning member used to get. -->
+  {#if data?.alld != null}
     {#if data?.alld?.attributes?.archived !== true}
       <div
         bind:clientWidth={wid}
@@ -200,6 +205,28 @@
         <div class="mb-3 flex justify-center">
           <DiscoveryNav current="missions" isLoggedIn={data.tok == true} />
         </div>
+        {#if data.authExpired}
+          <!-- The visitor arrived with auth cookies we could not use (expired
+               token, or cookies written on another domain scope). The mission
+               itself is public, so it is shown — signed out, with the way back
+               in, instead of the 500 this used to become. -->
+          <div class="mb-3 border border-gold bg-black/70 p-3 text-center" role="status">
+            <p class="text-barbi text-lg">{$t('auth.expired.title')}</p>
+            <p class="text-gold text-sm">{$t('auth.expired.body')}</p>
+            <div class="mt-2 flex flex-wrap justify-center gap-2">
+              <button
+                onclick={login}
+                class="button-perl text-barbi hover:text-black border border-gold px-4 py-1 font-bold"
+                >{$t('auth.expired.login')}</button
+              >
+              <button
+                onclick={reg}
+                class="text-gold hover:text-barbi hover:border-barbi border border-gold rounded px-4 py-1"
+                >{$t('auth.expired.signup')}</button
+              >
+            </div>
+          </div>
+        {/if}
         <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
     </div>-->
         <div
@@ -405,7 +432,7 @@
                         hover($t('common.valph'))}
                       onmouseleave={() => hover('0')}
                     >
-                      {data.alld.attributes.perhour.toLocaleString('en-US', {
+                      {(data.alld.attributes.perhour ?? 0).toLocaleString('en-US', {
                         maximumFractionDigits: 2
                       })}
                       {$t('pages.availMission.perho')}
@@ -417,7 +444,7 @@
                         hover($t('common.noofhours'))}
                       onmouseleave={() => hover('0')}
                     >
-                      {data.alld.attributes.noofhours.toLocaleString('en-US', {
+                      {(data.alld.attributes.noofhours ?? 0).toLocaleString('en-US', {
                         maximumFractionDigits: 2
                       })}
                       {$t('pages.availMission.hourss')}
@@ -428,8 +455,8 @@
                       onmouseenter={() => hover($t('lev.cards.voteCard.inTotal'))}
                       onmouseleave={() => hover('0')}
                       >{(
-                        data.alld.attributes.noofhours *
-                        data.alld.attributes.perhour
+                        (data.alld.attributes.noofhours ?? 0) *
+                        (data.alld.attributes.perhour ?? 0)
                       ).toLocaleString('en-US', { maximumFractionDigits: 2 })}
                       {data.alld.attributes.iskvua ? $t('pages.availMission.monhly') : ''}
                     </span>
@@ -451,7 +478,11 @@
                       />
                     </div>
                   {/if}
-                  {#if data.alld.attributes.acts.data.length > 0}
+                  <!-- Strapi answers a partially-authorized read with `data`
+                       present and the forbidden relations set to null, so every
+                       relation here is read optionally — a null one used to
+                       throw during SSR and surface as a bare 500. -->
+                  {#if data.alld.attributes.acts?.data?.length > 0}
                     <div class="border-2 border-gold">
                       <ul>
                         {#each data.alld.attributes.acts.data as datai, t}
@@ -483,7 +514,7 @@
                 </div>
               </div>
 
-              {#if data.alld.attributes.skills.data.length > 0}
+              {#if data.alld.attributes.skills?.data?.length > 0}
                 <small class="text-barbi text-sm lg:text-2xl"
                   >{$t('pages.availMission.requireSkills')}</small
                 >
@@ -506,7 +537,7 @@
                   {/each}
                 </div>
               {/if}
-              {#if data.alld.attributes.tafkidims.data.length > 0}
+              {#if data.alld.attributes.tafkidims?.data?.length > 0}
                 <small class="text-sm text-barbi lg:text-2xl"
                   >{$t('pages.availMission.requiredRoles')}</small
                 >
@@ -530,7 +561,7 @@
                     </p>{/each}
                 </div>
               {/if}
-              {#if data.alld.attributes.work_ways.data.length > 0}
+              {#if data.alld.attributes.work_ways?.data?.length > 0}
                 <small class="text-sm lg:text-2xl text-barbi"
                   >{$t('pages.availMission.requiredWW')}</small
                 >
@@ -571,7 +602,7 @@
                 </div>
               {:else if data.tok != false}
                 <div class="flex flex-wrap gap-3 justify-center items-center">
-                  {#if alr == false && !data.alld.attributes.users.data
+                  {#if alr == false && !(data.alld.attributes.users?.data ?? [])
                       .map((c) => c.id)
                       .includes(data.uid)}
                     <button
@@ -588,7 +619,7 @@
                       class="mt-7 text-xl px-4 py-3 border border-gold rounded-full text-gold hover:text-barbi hover:border-barbi"
                       >{$t('lev.cards.proposeOther')}</button
                     >
-                  {:else if data.alld.attributes.users.data
+                  {:else if (data.alld.attributes.users?.data ?? [])
                     .map((c) => c.id)
                     .includes(data.uid)}
                     <h3 class="button-perl text-barbi px-4 py-1">
@@ -677,7 +708,7 @@
           <a
             href="/lev"
             class="text-lturk hover:text-barbi hover:border-barbi border border-gold rounded-xl px-4 py-2 sm:text-xl"
-            >לצפיה במשימות אחרות ובכל העדכונים שלך</a
+            >{$t('pages.availMission.otherMissions')}</a
           >
         {:else}
           <div class="  w-screen">
@@ -699,28 +730,45 @@
       </div>
     {/if}
   {:else}
-    <div class="text-center pt-14">
-      <h3 class="text-barbi sm:text-xl my-5">error | שגיאה</h3>
+    <!-- Nothing to show. `loadError` says why, so the visitor gets an answer
+         and a next step instead of the word "error". -->
+    <div class="text-center pt-14 px-4">
+      <h3 class="text-barbi sm:text-xl my-5">
+        {#if data.loadError === 'notfound'}
+          {$t('pages.availMission.gone')}
+        {:else if data.authExpired || data.loadError === 'auth'}
+          {$t('auth.expired.title')}
+        {:else}
+          {$t('auth.errorScreen.serverTitle')}
+        {/if}
+      </h3>
+      <p class="text-gold mb-6">
+        {#if data.loadError === 'notfound'}
+          {$t('pages.availMission.goneBody')}
+        {:else if data.authExpired || data.loadError === 'auth'}
+          {$t('auth.expired.body')}
+        {:else}
+          {$t('common.misc.genericError')}
+        {/if}
+      </p>
       {#if data.tok != false}
         <a
           href="/lev"
           class="text-lturk hover:text-barbi hover:border-barbi border border-gold rounded-xl px-4 py-2 sm:text-xl"
-          >לצפיה במשימות אחרות ובכל העדכונים שלך</a
+          >{$t('pages.availMission.otherMissions')}</a
         >
       {:else}
-        <div class="  w-screen">
-          <div class="w-1/2 mx-auto border border-barbi button-bronze">
-            <h1 class=" font-bold text-2xl p-2">{$t('pages.availMission.info')}</h1>
-            <div class="flex flex-row flex-auto justify-between">
-              <button
-                class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4"
-                onclick={reg}>{$t('pages.availMission.registratio')}</button
-              >
-              <button
-                class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4"
-                onclick={login}>{$t('pages.availMission.logi')}</button
-              >
-            </div>
+        <div class="mx-auto max-w-md border border-barbi button-bronze">
+          <h1 class=" font-bold text-2xl p-2">{$t('pages.availMission.info')}</h1>
+          <div class="flex flex-row flex-auto justify-between">
+            <button
+              class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4"
+              onclick={reg}>{$t('pages.availMission.registratio')}</button
+            >
+            <button
+              class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4"
+              onclick={login}>{$t('pages.availMission.logi')}</button
+            >
           </div>
         </div>
       {/if}

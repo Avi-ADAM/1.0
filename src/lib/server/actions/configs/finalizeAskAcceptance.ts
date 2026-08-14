@@ -4,6 +4,9 @@ import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { evaluateAskAcceptance } from '$lib/server/nego/askAcceptance.js';
 import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
 import { resolveAcceptedActs } from '../helpers/roundActs.js';
+import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
+import { execFromContext } from '$lib/server/archive/exec.js';
+import { gqlString } from './actionUtils.js';
 
 function formatVotesForInline(votes: any[]): string {
   if (!Array.isArray(votes) || votes.length === 0) return '';
@@ -145,14 +148,14 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
     createMesimabetahalich(data: {
       project: "${projectId}",
       mission: "${missId}",
-      hearotMeyuchadot: "${finalHearotMeyuchadot}",
-      name: "${finalName}",
-      descrip: "${finalMissionDetails}",
+      hearotMeyuchadot: ${gqlString(finalHearotMeyuchadot)},
+      name: ${gqlString(finalName)},
+      descrip: ${gqlString(finalMissionDetails)},
       hoursassinged: ${finalNhours},
       perhour: ${finalValph},
       iskvua: ${iskvua},
-      privatlinks: "${privatlinks}",
-      publicklinks: "${publicklinks}",
+      privatlinks: ${gqlString(privatlinks)},
+      publicklinks: ${gqlString(publicklinks)},
       users_permissions_user: "${acceptedUserId}",
       tafkidims: [${tafkidimsStr}],
       publishedAt: "${now}",
@@ -185,6 +188,12 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
   // Hand the accepted checklist to the new mission: the winning round's list
   // when it carries one, else the OpenMission baseline.
   const newMbId = responseData.data?.createMesimabetahalich?.data?.id;
+  // Start the dormancy clock: from here on, silence has a deadline
+  // (PLAN_OBJECT_ARCHIVAL). Best-effort — a missing clock only means
+  // the mission is never asked about, not a failed assignment.
+  if (newMbId) {
+    await touchDormancy(execFromContext(context), String(newMbId)).catch(() => null);
+  }
   const acceptedActIds = resolveAcceptedActs(
     askAttributes?.negopendmissions?.data,
     responseData.data?.updateOpenMission?.data?.attributes?.acts

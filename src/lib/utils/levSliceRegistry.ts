@@ -131,7 +131,7 @@ export const LEV_SLICES: Record<string, LevSliceDef> = {
     qid: '87levSliceDecisions',
     extract: extractDecisions,
     store: decisionsStore,
-    anis: ['hachla'],
+    anis: ['hachla', 'archObject'],
     source: 'project'
   },
 

@@ -1,8 +1,8 @@
 {
   "_review": true,
   "meta": {
-    "title": "1💗1 | Crear juntos en armonía | Consenso mundial por la libertad",
-    "description": "1💗1 Consenso mundial por la seguridad y la paz | plataforma de colaboración, crear juntos en armonía | plataforma de gestión de asociaciones basada en el consenso | juntos podemos"
+    "title": "1💗1 · Asociaciones justas: misiones, horas y reparto",
+    "description": "Crea una red de socios sin jefe ni capital inicial: misiones y recursos abiertos, registra tus horas, decidid por consenso y repartid beneficios según la aportación real."
   },
   "hero": {
     "subtitle": "Asociación empresarial inteligente: crea con pasión, gana con justicia",
@@ -58,6 +58,13 @@
   "loading": {
     "title": "Cargando un elemento de diseño tridimensional"
   },
+  "audience": {
+    "title": "¿Dónde estás hoy?",
+    "a1": "Tengo una asociación (o una idea para una)",
+    "a2": "Busco un proyecto al que unirme",
+    "a3": "Solo quiero ver el sistema",
+    "a4": "Quiero entenderlo antes de empezar"
+  },
   "sections": {
     "problemTitle": "¿Conoces esa sensación?",
     "howTitle": "Cómo empezar — en 4 pasos",
@@ -110,7 +117,101 @@
     "colRikma_t": "En 1💗1 — una Rikma",
     "colRikma_badge": "El tercer camino",
     "colRikma_d": "Propiedad real en %•Plena libertad•Decisiones por consenso•Socios que te complementan•Beneficio de por vida",
-    "navDemo": "Demo en vivo"
+    "navDemo": "Demo en vivo",
+    "navSplit": "El método",
+    "problemEyebrow": "◈ ¿Y si aún no tienes una asociación? ◈"
+  },
+  "split": {
+    "eyebrow": "◈ ¿Tienes una asociación? ¿O una idea para una? ◈",
+    "title": "Mitad y mitad no es justicia. Es solo renunciar al cálculo.",
+    "lead": "Casi toda asociación empieza al cincuenta por ciento, porque parece lo más simple y lo más justo. Y entonces empiezan los problemas, y todos vienen exactamente del mismo sitio.",
+    "f1": "Uno siente que aporta mucho más, y a fin de mes los dos os lleváis exactamente lo mismo.",
+    "f2": "«¿Por qué no te implicas más?»: una discusión que vuelve una y otra vez, porque no hay forma de medir quién aportó qué.",
+    "f3": "Y quien sí aporta más no gana nada por ello, así que al final nadie aporta más.",
+    "f4": "¿Queréis sumar a un tercer socio? Habría que reabrir todo el acuerdo, así que simplemente no lo sumáis.",
+    "blame": "Fíjate: ninguno de estos es un problema de la asociación en sí. Todos nacen del método: mitad y mitad pase lo que pase, sin relación con lo que ocurrió de verdad. La complicación no viene de los socios, viene del reparto arbitrario.",
+    "solutionTitle": "Entonces, ¿por qué no calcularlo y ya está?",
+    "solutionLead": "Eso es exactamente lo que hace 1💗1. En lugar de acordar de antemano un número arbitrario, el sistema cuenta lo que cada socio dio realmente, y de ahí se deriva lo que cada socio se lleva a casa.",
+    "step1_t": "Lo que diste",
+    "step1_d": "Horas de trabajo, dinero, equipo, conocimiento, clientes: cada aportación se registra, con el acuerdo de todos, en el momento en que ocurre. No de memoria a fin de año.",
+    "step2_t": "Cuánto vale",
+    "step2_d": "Cada aportación se traduce a un valor acordado, y tu parte en la Rikma se actualiza sola. Es un cálculo vivo, no un acuerdo congelado el primer día.",
+    "step3_t": "Lo que te llevas a casa",
+    "step3_d": "Cuando entra dinero, el reparto ya está calculado según lo que realmente pasó. Sin discusiones, sin intuiciones, sin quien grita más fuerte.",
+    "formula": "(tiempo + dinero + equipo + conocimiento) que diste = tu % del beneficio",
+    "b1_t": "Transparencia",
+    "b1_d": "Cada hora, cada moneda y cada pieza de equipo son visibles para todos los socios en tiempo real. No hay nada que discutir cuando todos ven el mismo tablero.",
+    "b2_t": "Justicia",
+    "b2_d": "Quien dio más recibe más, y quien dio menos durante una temporada no tiene que disculparse. Lo acordado de antemano es la regla, no el número.",
+    "b3_t": "Precisión",
+    "b3_d": "Nada de «más o menos» ni cálculos a ojo. Un porcentaje derivado de datos que cada socio aprobó uno a uno.",
+    "b4_t": "Crecimiento",
+    "b4_d": "Cuando el cálculo es transparente, sumar a un cuarto o a un décimo socio es cosa de un minuto, sin reabrir la negociación. Más socios = menos carga para cada uno, no más complicación.",
+    "b5_t": "Decisiones por acuerdo",
+    "b5_d": "La misma transparencia rige las decisiones. Un presupuesto, un precio, sumar a un socio o repartir beneficios: todo pasa por una votación que todos los socios ven, y cada uno tiene voz. Y aquí no hay botón de \"no\": puedes aprobar, abrir una conversación o proponer una versión más precisa que vuelve a votación, hasta que todos firmen la misma. Cada votación tiene un plazo de decisión acordado, y a quien no responde antes de que se cierre se le cuenta el silencio como consentimiento, así que la propuesta pasa. Así la rikma no se atasca por alguien que olvidó contestar, y a nadie lo arrolla una mayoría.",
+    "b5_link": "Conoce el motor de acuerdos ↓",
+    "more": "Y además, un millón de herramientas de gestión en un solo paquete: tareas, kanban, Gantt, temporizadores, turnos, ventas, decisiones y votaciones, bot de Telegram y asistente de IA. Todo funciona con los mismos datos que alimentan el cálculo, así que gestionas una vez y obtienes tanto la gestión como un reparto justo.",
+    "cta": "Iniciar una Rikma",
+    "ctaSecondary": "Ver cómo funciona",
+    "calc": {
+      "title": "Pruébalo: ¿qué pasaría en la tuya?",
+      "sub": "Son datos de ejemplo de una Rikma: importar y vender online. Cambia cualquier línea y verás al instante lo que se lleva cada socio, frente a un reparto por partes iguales.",
+      "p1": "Ana",
+      "p2": "Diego",
+      "p3": "Lucía",
+      "p4": "Marc",
+      "nameLabel": "Nombre del socio",
+      "currencyCode": "EUR",
+      "revenue": "Ingresos totales:",
+      "addPartner": "+ Añadir socio",
+      "removePartner": "Quitar socio",
+      "reset": "Reiniciar",
+      "calcLabel": "Según lo que diste:",
+      "equalLabel": "En reparto igual:",
+      "barLabel": "Reparto de porcentajes entre los socios",
+      "punch": "El mismo trabajo, el mismo dinero: solo un reparto que refleja lo que de verdad pasó.",
+      "empty": "Añade una misión o dinero/equipo para ver el reparto.",
+      "note": "Esta es exactamente la fórmula que ejecuta el sistema: el valor que diste dividido entre el valor que dieron todos. En una Rikma real cada una de estas líneas se registra y la aprueban los socios; no hay que teclear nada a mano.",
+      "tasksTitle": "Misiones realizadas",
+      "costsTitle": "Dinero y equipo aportados",
+      "salesTitle": "Lo que vendió la Rikma",
+      "addTask": "+ misión",
+      "addCost": "+ dinero/equipo",
+      "addProduct": "+ producto",
+      "removeLine": "Quitar línea",
+      "taskLabel": "Nombre de la misión",
+      "costLabel": "Para qué fue el dinero",
+      "productLabel": "Nombre del producto",
+      "hoursLabel": "horas",
+      "minutesLabel": "minutos",
+      "rateLabel": "tarifa por hora",
+      "amountLabel": "importe",
+      "priceLabel": "precio por unidad",
+      "qtyLabel": "unidades vendidas",
+      "qtyUnit": "ventas",
+      "perHour": "por hora",
+      "timerNote": "El tiempo se mide con el temporizador del sistema y se registra al minuto: 15:25 son 15 horas y 25 minutos, no «más o menos una jornada».",
+      "seed": {
+        "p1t1": "Construir la web de ventas",
+        "p1t2": "Gestión de campañas y redes",
+        "p1t3": "Atención a clientes y gestión de pedidos",
+        "p1c1": "Plantilla de la web y suscripción de la tienda",
+        "p2t1": "Crear los contactos de importación con el proveedor",
+        "p2t2": "Papeleo continuo y aduanas",
+        "p2c1": "Anticipo al proveedor y gastos de envío",
+        "p3t1": "Empaquetado y envíos",
+        "p3t2": "Control de stock y nuevos pedidos",
+        "p3c1": "Material de embalaje y etiquetas",
+        "p4t1": "Fotografía de producto y vídeos de anuncio",
+        "p4c1": "Equipo de iluminación para las sesiones",
+        "s1": "Caja regalo de especias",
+        "s2": "Molinillo de pimienta manual",
+        "s3": "Envío exprés",
+        "task": "Nueva misión",
+        "cost": "Nuevo gasto",
+        "sale": "Nuevo producto"
+      }
+    }
   },
   "platform": {
     "projectMgmt_t": "Todo tu proyecto de un vistazo",
@@ -452,5 +553,5 @@
     "thirdWayLabel": "Vídeo: la tercera vía",
     "close": "Cerrar"
   },
-  "pageUrl": "https://1lev1.com/es"
+  "pageUrl": "https://1lev1.com/?lang=es"
 }

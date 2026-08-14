@@ -77,5 +77,19 @@
         "help": "فشل إعداد الهوية — راجع صفحة الهوية للتفاصيل"
       }
     }
+  },
+  "appearance": {
+    "title": "المظهر",
+    "language": "اللغة",
+    "look": "الشكل",
+    "brightness": "السطوع",
+    "themePersonal": "شخصي",
+    "themePersonalDesc": "ذهبي ووردي، زوايا ناعمة",
+    "themeBusiness": "أعمال",
+    "themeBusinessDesc": "تباين عالٍ، ألوان أقل",
+    "mode_light": "نهار",
+    "mode_dark": "ليل",
+    "mode_system": "حسب الجهاز",
+    "followingSystem": "يتبع إعداد جهازك — حاليًا {{mode}}"
   }
 }

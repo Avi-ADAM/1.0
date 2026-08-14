@@ -27,6 +27,7 @@ import type {
   SaleData,
   WishOfferData
 } from '$lib/stores/levStores';
+import { buildArchiveDecisionView } from '$lib/archive/decisionView.js';
 import { calculateScore } from './suggestionMatchers';
 
 /**
@@ -1053,13 +1054,22 @@ export function extractTransfers(userData: any): TransferData[] {
 
 /**
  * Extract decisions (hachlatot) from GraphQL user data
- * 
+ *
  * @param userData - Raw GraphQL response data
+ * @param opts.includeNotMyTurn - keep the consent kinds (archive/edit, saleClaim)
+ *   even when I have already signed the standing round. The heart shows what
+ *   awaits *me*, so it stays false there; a focused vote page addresses one
+ *   decision by id and must still render it — read-only — for whoever opened
+ *   the link, including the member who proposed it.
  * @returns Array of decision data
- * 
+ *
  * **Validates: Requirements 1.1, 1.4**
  */
-export function extractDecisions(userData: any): DecisionData[] {
+export function extractDecisions(
+  userData: any,
+  opts: { includeNotMyTurn?: boolean } = {}
+): DecisionData[] {
+  const includeNotMyTurn = opts.includeNotMyTurn === true;
   const decisions: DecisionData[] = [];
 
   if (!userData?.attributes?.projects_1s?.data) {
@@ -1087,6 +1097,37 @@ export function extractDecisions(userData: any): DecisionData[] {
 
         const kind = decision.attributes.kind || '';
         const vots = decision.attributes.vots || [];
+
+        // Archive/edit proposals (PLAN_OBJECT_ARCHIVAL). Same pipeline as the
+        // other decision kinds, with a payload the card needs: which version
+        // is on the table, what it costs in hours, and whether approving also
+        // ends someone's membership of the rikma.
+        if (kind === 'archiveObject' || kind === 'editObject') {
+          const memberIds = (project.attributes?.user_1s?.data ?? []).map((u: any) =>
+            String(u.id)
+          );
+          const view = buildArchiveDecisionView(decision, memberIds, String(userData.id));
+          if (!view) continue; // malformed proposal — nothing to decide on
+          // Only surface it while it is actually my move; once I have signed
+          // the standing round the ball is in someone else's court.
+          if (!view.myTurn && !includeNotMyTurn) continue;
+
+          decisions.push({
+            id: decision.id,
+            projectId: project.id,
+            decision: 'archObject',
+            priority: 10,
+            myid: userData.id,
+            kind,
+            createdAt: decision.attributes.createdAt,
+            vots,
+            users: vots,
+            timegramaId: decision.attributes.timegrama?.data?.id,
+            timegramaDate: decision.attributes.timegrama?.data?.attributes?.date,
+            archive: view
+          } as any);
+          continue;
+        }
 
         // Bilateral sale-holder consent (PLAN_sale_holder_consent). Only two
         // parties (reporter + holder), and it belongs on *my* heart only when
@@ -1134,7 +1175,7 @@ export function extractDecisions(userData: any): DecisionData[] {
             );
             continue;
           }
-          if (iSignedStanding) {
+          if (iSignedStanding && !includeNotMyTurn) {
             console.log(
               `[saleClaim][extract] decision ${decision.id} SKIPPED — I already signed standing round ${standingOrder}; waiting on the other side`
             );

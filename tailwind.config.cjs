@@ -6,6 +6,13 @@ const plugin = require('tailwindcss/plugin');
 
 const config = {
   content: ['./src/**/*.{html,js,svelte,ts}', './node_modules/@avitest/gridcraft/dist/themes/**/*.svelte'],
+  // `dark:` used to fall back to Tailwind's default `media` strategy, so the
+  // ~1.5k dark utilities followed the OS alone and the `.dark` token block in
+  // app.postcss never activated (nothing ever added the class). Switching to
+  // `selector` puts day/night under the appearance control; the inline script
+  // in app.html still seeds the class from `prefers-color-scheme` when the
+  // visitor has not chosen, so OS-following behaviour is preserved.
+  darkMode: 'selector',
   theme: {
     screens: {
       xs: '475px',
@@ -84,6 +91,12 @@ const config = {
         grbb: 'var(--grbb)',
         barbi: 'var(--barbi-pink)',
         gold: 'var(--gold)',
+        // `gold` is the *light* side of the gold/barbi pair — it is the page
+        // wash and the text laid on top of `bg-barbi`. Using it as ink on a
+        // white surface (the `bg-white border-gold text-gold` outline button)
+        // renders at ~1.2:1 and is effectively invisible. `goldink` is the
+        // readable counterpart for exactly that role.
+        goldink: 'var(--goldink)',
         neww: 'var(--neww)',
         lturk: 'var(--lturk)',
         mturk: 'var(--mturk)',
@@ -95,11 +108,120 @@ const config = {
         wow2: 'var(--wow2)',
         blueg: 'var(--blueg)',
         oranges: 'var(--oranges)',
-        wowt: 'var(--wowt)'
+        wowt: 'var(--wowt)',
+        // Identity colour families routed through CSS variables so the
+        // appearance layer can retheme them. The personal values below are
+        // byte-identical to stock Tailwind, so the default look is unchanged;
+        // only `html.business` overrides them. The rgb()/<alpha-value> form
+        // is what keeps opacity modifiers (`bg-pink-500/50`) working — a
+        // plain `var(--x)` would break the 66 call sites that use them.
+        // gray/slate/zinc/stone (already neutral), blue/sky/indigo (already
+        // business), green/emerald/teal (success) and red/orange (danger)
+        // deliberately keep their stock values in both themes.
+        pink: {
+          50: 'rgb(var(--c-pink-50) / <alpha-value>)',
+          100: 'rgb(var(--c-pink-100) / <alpha-value>)',
+          200: 'rgb(var(--c-pink-200) / <alpha-value>)',
+          300: 'rgb(var(--c-pink-300) / <alpha-value>)',
+          400: 'rgb(var(--c-pink-400) / <alpha-value>)',
+          500: 'rgb(var(--c-pink-500) / <alpha-value>)',
+          600: 'rgb(var(--c-pink-600) / <alpha-value>)',
+          700: 'rgb(var(--c-pink-700) / <alpha-value>)',
+          800: 'rgb(var(--c-pink-800) / <alpha-value>)',
+          900: 'rgb(var(--c-pink-900) / <alpha-value>)',
+          950: 'rgb(var(--c-pink-950) / <alpha-value>)',
+        },
+        fuchsia: {
+          50: 'rgb(var(--c-fuchsia-50) / <alpha-value>)',
+          100: 'rgb(var(--c-fuchsia-100) / <alpha-value>)',
+          200: 'rgb(var(--c-fuchsia-200) / <alpha-value>)',
+          300: 'rgb(var(--c-fuchsia-300) / <alpha-value>)',
+          400: 'rgb(var(--c-fuchsia-400) / <alpha-value>)',
+          500: 'rgb(var(--c-fuchsia-500) / <alpha-value>)',
+          600: 'rgb(var(--c-fuchsia-600) / <alpha-value>)',
+          700: 'rgb(var(--c-fuchsia-700) / <alpha-value>)',
+          800: 'rgb(var(--c-fuchsia-800) / <alpha-value>)',
+          900: 'rgb(var(--c-fuchsia-900) / <alpha-value>)',
+          950: 'rgb(var(--c-fuchsia-950) / <alpha-value>)',
+        },
+        rose: {
+          50: 'rgb(var(--c-rose-50) / <alpha-value>)',
+          100: 'rgb(var(--c-rose-100) / <alpha-value>)',
+          200: 'rgb(var(--c-rose-200) / <alpha-value>)',
+          300: 'rgb(var(--c-rose-300) / <alpha-value>)',
+          400: 'rgb(var(--c-rose-400) / <alpha-value>)',
+          500: 'rgb(var(--c-rose-500) / <alpha-value>)',
+          600: 'rgb(var(--c-rose-600) / <alpha-value>)',
+          700: 'rgb(var(--c-rose-700) / <alpha-value>)',
+          800: 'rgb(var(--c-rose-800) / <alpha-value>)',
+          900: 'rgb(var(--c-rose-900) / <alpha-value>)',
+          950: 'rgb(var(--c-rose-950) / <alpha-value>)',
+        },
+        purple: {
+          50: 'rgb(var(--c-purple-50) / <alpha-value>)',
+          100: 'rgb(var(--c-purple-100) / <alpha-value>)',
+          200: 'rgb(var(--c-purple-200) / <alpha-value>)',
+          300: 'rgb(var(--c-purple-300) / <alpha-value>)',
+          400: 'rgb(var(--c-purple-400) / <alpha-value>)',
+          500: 'rgb(var(--c-purple-500) / <alpha-value>)',
+          600: 'rgb(var(--c-purple-600) / <alpha-value>)',
+          700: 'rgb(var(--c-purple-700) / <alpha-value>)',
+          800: 'rgb(var(--c-purple-800) / <alpha-value>)',
+          900: 'rgb(var(--c-purple-900) / <alpha-value>)',
+          950: 'rgb(var(--c-purple-950) / <alpha-value>)',
+        },
+        violet: {
+          50: 'rgb(var(--c-violet-50) / <alpha-value>)',
+          100: 'rgb(var(--c-violet-100) / <alpha-value>)',
+          200: 'rgb(var(--c-violet-200) / <alpha-value>)',
+          300: 'rgb(var(--c-violet-300) / <alpha-value>)',
+          400: 'rgb(var(--c-violet-400) / <alpha-value>)',
+          500: 'rgb(var(--c-violet-500) / <alpha-value>)',
+          600: 'rgb(var(--c-violet-600) / <alpha-value>)',
+          700: 'rgb(var(--c-violet-700) / <alpha-value>)',
+          800: 'rgb(var(--c-violet-800) / <alpha-value>)',
+          900: 'rgb(var(--c-violet-900) / <alpha-value>)',
+          950: 'rgb(var(--c-violet-950) / <alpha-value>)',
+        },
+        amber: {
+          50: 'rgb(var(--c-amber-50) / <alpha-value>)',
+          100: 'rgb(var(--c-amber-100) / <alpha-value>)',
+          200: 'rgb(var(--c-amber-200) / <alpha-value>)',
+          300: 'rgb(var(--c-amber-300) / <alpha-value>)',
+          400: 'rgb(var(--c-amber-400) / <alpha-value>)',
+          500: 'rgb(var(--c-amber-500) / <alpha-value>)',
+          600: 'rgb(var(--c-amber-600) / <alpha-value>)',
+          700: 'rgb(var(--c-amber-700) / <alpha-value>)',
+          800: 'rgb(var(--c-amber-800) / <alpha-value>)',
+          900: 'rgb(var(--c-amber-900) / <alpha-value>)',
+          950: 'rgb(var(--c-amber-950) / <alpha-value>)',
+        },
+        yellow: {
+          50: 'rgb(var(--c-yellow-50) / <alpha-value>)',
+          100: 'rgb(var(--c-yellow-100) / <alpha-value>)',
+          200: 'rgb(var(--c-yellow-200) / <alpha-value>)',
+          300: 'rgb(var(--c-yellow-300) / <alpha-value>)',
+          400: 'rgb(var(--c-yellow-400) / <alpha-value>)',
+          500: 'rgb(var(--c-yellow-500) / <alpha-value>)',
+          600: 'rgb(var(--c-yellow-600) / <alpha-value>)',
+          700: 'rgb(var(--c-yellow-700) / <alpha-value>)',
+          800: 'rgb(var(--c-yellow-800) / <alpha-value>)',
+          900: 'rgb(var(--c-yellow-900) / <alpha-value>)',
+          950: 'rgb(var(--c-yellow-950) / <alpha-value>)',
+        },
+      },
+      borderRadius: {
+        theme: 'var(--radius-theme)'
+      },
+      boxShadow: {
+        theme: 'var(--shadow-theme)'
       }
     }
   },
-  Plugins: [
+  // Was `Plugins:` (capital P). Tailwind only reads `plugins`, so this whole
+  // block was silently ignored and the `personal:` / `business:` variants were
+  // never generated — every `business:bg-…` class in the tree was dead text.
+  plugins: [
     plugin(function ({ addVariant }) {
       // הוספת variants עבור personal ו-business
       addVariant('personal', '.personal &');

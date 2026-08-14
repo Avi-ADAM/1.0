@@ -368,6 +368,19 @@
                 <div class="mb-3 flex justify-center">
                     <DiscoveryNav current="resources" isLoggedIn={data.tok == true} />
                 </div>
+                {#if data.authExpired}
+                    <!-- The visitor arrived with auth cookies we could not use.
+                         The resource is public, so it is shown — signed out,
+                         with the way back in, instead of a false "it's gone". -->
+                    <div class="mb-3 border border-gold bg-black/70 p-3 text-center" role="status">
+                        <p class="text-barbi text-lg">{$t('auth.expired.title')}</p>
+                        <p class="text-gold text-sm">{$t('auth.expired.body')}</p>
+                        <div class="mt-2 flex flex-wrap justify-center gap-2">
+                            <button onclick={login} class="button-perl text-barbi hover:text-black border border-gold px-4 py-1 font-bold">{$t('auth.expired.login')}</button>
+                            <button onclick={reg} class="text-gold hover:text-barbi hover:border-barbi border border-gold rounded px-4 py-1">{$t('auth.expired.signup')}</button>
+                        </div>
+                    </div>
+                {/if}
                 <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
                     <div class="relative flex items-center space-x-1">
                         <div class="relative">

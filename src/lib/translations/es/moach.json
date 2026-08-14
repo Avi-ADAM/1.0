@@ -24,13 +24,19 @@
     "stopTimerFirst": "Detén el temporizador antes de enviar la misión.",
     "saveTimerFirst": "Hay tiempo sin guardar. Guárdalo o bórralo antes de enviar.",
     "sentForApproval": "La misión se envió a la rikma para su aprobación",
+    "missionCompleted": "Misión completada y registrada en la rikma",
     "uploadFailed": "La subida del archivo falló, inténtalo de nuevo",
     "awaitingApproval": "esperando aprobación",
     "awaitingApprovalHint": "Ya enviada y esperando la aprobación de los miembros de la rikma"
   },
   "split": {
     "calc": "Calculadora de reparto",
-    "status": "Estado del reparto"
+    "status": "Estado del reparto",
+    "calcIntro": "Introduce el beneficio acumulado y la calculadora mostrará cuánto le corresponde a cada persona",
+    "calcTable": "Tabla de cálculo",
+    "calcName": "Nombre",
+    "calcShareOfProfit": "Parte del beneficio",
+    "calcPercentInProject": "Porcentaje en el proyecto"
   },
   "process": {
     "title": "Página detallada del proceso",
@@ -128,7 +134,8 @@
     "editDetails": "Editar los datos",
     "publicProfile": "Página pública",
     "activeNow": "Activos ahora",
-    "open": "Abierto a socios"
+    "open": "Abierto a socios",
+    "archive": "Archivo"
   },
   "create": {
     "mission": "Crear una misión",

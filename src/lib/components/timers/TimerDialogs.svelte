@@ -384,14 +384,15 @@
             : Date.now() - new Date(lastTimer.start).getTime(),
           { lang: $lang as 'he' | 'en' }
         )
-      : 'No timer available'
+      : ''
   );
+  // With no timer on the mission there is no duration to name. The old code
+  // dropped the English words "No timer available" into the middle of the
+  // Hebrew sentence and still offered to save time that does not exist.
   let innerText = $derived(
-    $lang === 'he'
-      ? `הטיימר נעצר לאחר ${lastTimerDuration}. האם ברצונך לשמור את הזמן או לנקות אותו?`
-      : $lang === 'ar'
-        ? `توقف المؤقت عند ${lastTimerDuration}. هل تريد حفظ هذا الوقت أو مسحه؟`
-        : `Timer stopped at ${lastTimerDuration}. Would you like to save this time or clear it?`
+    lastTimer
+      ? $t('timers.stoppedAfter', { duration: lastTimerDuration })
+      : $t('timers.noTimerYet')
   );
   let filteredTasks = $derived(
     timer?.attributes?.acts?.data?.filter(

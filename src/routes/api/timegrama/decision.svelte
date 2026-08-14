@@ -2,6 +2,9 @@
   import { SendToAdmin } from '$lib/server/sendToAdmin.js';
   // Server-only secret — this module is imported only by timegrama/+server.js.
   import { ADMINMONTHER } from '$env/static/private';
+  import { execFromAdmin } from '$lib/server/archive/exec.js';
+  import { fetchObjectChangeDecision } from '$lib/server/archive/read.js';
+  import { applyStandingVersion } from '$lib/server/archive/vote.js';
 
   // GraphQL string-literal escaping for values interpolated into an inline
   // (non-parameterized) query — SendToAdmin takes a raw query string, no
@@ -132,6 +135,32 @@
       }
       const a = d.attributes || {};
       if (a.archived) return markDone();
+
+      // Archive/edit proposals mature on silence exactly the way they mature
+      // on a unanimous vote — same applyStandingVersion, so the two routes
+      // cannot produce different outcomes. Whatever version is on the table
+      // when the clock runs out is the one that takes effect.
+      if (a.kind === 'archiveObject' || a.kind === 'editObject') {
+        const exec = execFromAdmin(SendToAdmin, ADMINMONTHER);
+        const decision = await fetchObjectChangeDecision(exec, String(id));
+        if (!decision) {
+          console.warn(`[timegrama/decision] archive decision ${id} could not be read`);
+          return markDone();
+        }
+        try {
+          const applied = await applyStandingVersion(exec, decision);
+          console.log('[timegrama/decision] archive proposal matured on silence', {
+            decisionId: id,
+            lifecycle: applied.lifecycle,
+            membershipEnded: applied.membershipEnded ?? null
+          });
+        } catch (e) {
+          console.error('[timegrama/decision] archive maturation failed:', e);
+        }
+        // applyStandingVersion closes the decision and its own timegrama; this
+        // is the belt-and-braces for the case where that write failed.
+        return markDone();
+      }
 
       // Non-saleClaim kinds mature the same way sheirutpends/pmash decisions
       // do elsewhere: an explicit "ok" with no explicit "no" is enough — the

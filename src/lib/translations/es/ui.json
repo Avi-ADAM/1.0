@@ -78,5 +78,19 @@
         "help": "La configuración de la identidad falló: mira la página de identidad"
       }
     }
+  },
+  "appearance": {
+    "title": "Apariencia",
+    "language": "Idioma",
+    "look": "Estilo",
+    "brightness": "Brillo",
+    "themePersonal": "Personal",
+    "themePersonalDesc": "Dorado y rosa, esquinas suaves",
+    "themeBusiness": "Profesional",
+    "themeBusinessDesc": "Alto contraste, menos color",
+    "mode_light": "Día",
+    "mode_dark": "Noche",
+    "mode_system": "Del dispositivo",
+    "followingSystem": "Sigue la configuración del dispositivo — ahora {{mode}}"
   }
 }

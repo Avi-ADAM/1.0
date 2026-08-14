@@ -77,5 +77,19 @@
         "help": "Не удалось настроить личность — подробности на странице личности"
       }
     }
+  },
+  "appearance": {
+    "title": "Оформление",
+    "language": "Язык",
+    "look": "Вид",
+    "brightness": "Яркость",
+    "themePersonal": "Личный",
+    "themePersonalDesc": "Золото и розовый, мягкие углы",
+    "themeBusiness": "Деловой",
+    "themeBusinessDesc": "Высокий контраст, меньше цвета",
+    "mode_light": "День",
+    "mode_dark": "Ночь",
+    "mode_system": "Как на устройстве",
+    "followingSystem": "Следует настройке устройства — сейчас {{mode}}"
   }
 }

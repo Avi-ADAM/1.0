@@ -1,4 +1,5 @@
 <script>
+  import { t } from '$lib/translations';
   /**
    * @typedef {Object} Props
    * @property {boolean} [addN]
@@ -24,6 +25,13 @@
   } = $props();
   function bighand() {
     onMasi?.();
+  }
+  /** Space/Enter on an SVG control behaves like a click. */
+  function onActivate(e, handler = bighand) {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault();
+      handler();
+    }
   }
   function bighandd() {
     onBighandd?.();
@@ -371,21 +379,29 @@
       r="100"
     />
     {#if addN === false}
-      <a
+      <!-- The primary "request a resource" control. An <a> with no href is not
+           focusable and has no accessible name, so the keyboard could never
+           reach the one button that opens the resource form. -->
+      <g
+        role="button"
+        tabindex="0"
+        aria-label={hosafat}
         onclick={bighand}
+        onkeydown={onActivate}
         onmouseenter={bighandd}
         id="newbutton"
         class="buttonadd"
       >
+        <title>{hosafat}</title>
         <circle
           r="100"
           cy="-538.166"
           cx="-365.389"
-          id="newbutton"
+          aria-hidden="true"
           style="opacity: 0.3; fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1; fill: url(#newlinearGradient4172-0);"
           transform="matrix(-1, 0, 0, -1, 0, 0)"
         />
-      </a>
+      </g>
     {/if}
     <path
       style="opacity: 0.7; fill: rgb(31, 28, 36); fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1;"
@@ -560,12 +576,16 @@
   {/if}
   {#if showText && openMA === false}
     <g
+      role="button"
+      tabindex="0"
+      aria-label={$t('project.misc.showResourceRequests')}
       transform="matrix(1, 0, 0, 1, 359.919037, 204.900604)"
       onclick={trym}
+      onkeydown={(e) => onActivate(e, trym)}
       style=""
     >
       <g class="gg">
-        <title>הצגת בקשות למשאבים</title>
+        <title>{$t('project.misc.showResourceRequests')}</title>
         <rect
           style="opacity: 0.9; fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1; "
           id="rect-11"
@@ -609,6 +629,16 @@
 </svg>
 
 <style>
+  /* The control used to be an <a>, which came with a pointer cursor and a focus
+     ring for free; as a <g role="button"> both have to be asked for. */
+  .buttonadd {
+    cursor: pointer;
+  }
+  .buttonadd:focus-visible {
+    outline: 3px solid #ffd700;
+    outline-offset: 2px;
+  }
+
   #curve {
     fill: transparent;
   }

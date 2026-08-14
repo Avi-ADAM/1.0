@@ -22,8 +22,14 @@
 
   <div class="card-frame">
     <main class="auth-card">
+      <!-- The mark is switched by CSS, not by JS: `html.business` is stamped
+           server-side by hooks.server.js, so a class branch paints correctly on
+           the first frame while a store branch would flash the personal mark.
+           Both spans are aria-hidden — the link's aria-label is the name. -->
       <a href="/" class="brand" aria-label="1lev1">
-        <span class="brand-one">1</span><span class="brand-heart">💗</span><span
+        <span class="brand-one">1</span><span class="brand-heart" aria-hidden="true"
+          >💗</span
+        ><span class="brand-lev" aria-hidden="true">lev</span><span
           class="brand-one">1</span
         >
       </a>
@@ -194,6 +200,10 @@
     display: inline-block;
     transform-origin: center;
     animation: heartbeat 2.6s ease-in-out infinite;
+  }
+  /* the business half of the wordmark — revealed by the appearance layer below */
+  .brand-lev {
+    display: none;
   }
   @keyframes heartbeat {
     0%,
@@ -507,6 +517,208 @@
     border: 2px solid #cfa94e;
     box-shadow: 0 4px 14px -4px rgba(179, 135, 40, 0.55);
     font-size: 1.8rem;
+  }
+
+  /* ==========================================================================
+     BUSINESS APPEARANCE
+     --------------------------------------------------------------------------
+     Everything above is the personal identity: hearts, pink/gold, shimmer. The
+     business theme is not a recolour of it — it removes the atmosphere (the
+     hearts wallpaper, the drifting glows, the gold frame, the glint) and pays
+     for the missing decoration with structure: a square card, a hairline
+     border and one accent colour.
+
+     Values come from the appearance layer in app.postcss (--bg, --s1, --text,
+     --tm, --border, --primary, --radius-theme…), which already flips between
+     light and dark — so this one block covers business·light AND business·dark
+     without a second set of rules.
+     ========================================================================== */
+
+  :global(html.business) .auth-scene {
+    background: var(--bg);
+    font-family:
+      'Rubik',
+      ui-sans-serif,
+      system-ui,
+      sans-serif;
+  }
+  /* no hearts wallpaper, no drifting colour blobs */
+  :global(html.business) .glow {
+    display: none;
+  }
+
+  /* the gold gradient frame collapses to a hairline border */
+  :global(html.business) .card-frame {
+    padding: 0;
+    max-width: 25rem;
+    border-radius: var(--radius-theme, 0.25rem);
+    background: var(--border);
+    animation: card-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    box-shadow: var(--shadow-theme);
+  }
+  :global(html.business) .auth-card {
+    background: var(--s1);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-theme, 0.25rem);
+    padding: 2rem 1.75rem 1.75rem;
+    text-align: start;
+  }
+  /* the inner gold hairline is decoration the business card does not want */
+  :global(html.business) .auth-card::before {
+    display: none;
+  }
+
+  /* 1💗1 → 1lev1 */
+  :global(html.business) .brand-heart {
+    display: none;
+  }
+  :global(html.business) .brand-lev {
+    display: inline;
+  }
+  :global(html.business) .brand {
+    font-family: inherit;
+    font-size: 1.65rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+  :global(html.business) .brand-one {
+    background: none;
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    color: var(--text);
+    animation: none;
+  }
+  :global(html.business) .brand-lev {
+    color: var(--primary);
+  }
+  :global(html.business) .gold-divider {
+    display: none;
+  }
+
+  /* ---- the form, business ------------------------------------------------ */
+
+  :global(html.business) .auth-card :global(.auth-heading) {
+    font-family: inherit;
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    margin: 1.1rem 0 0.3rem;
+  }
+  :global(html.business) .auth-card :global(.auth-sub) {
+    color: var(--tm);
+    margin: 0 0 1.4rem;
+    max-width: none;
+  }
+
+  :global(html.business) .auth-card :global(.auth-alert) {
+    background: var(--gold-dd);
+    border-color: var(--destructive);
+    color: var(--destructive);
+    border-radius: var(--radius-theme, 0.25rem);
+  }
+  :global(html.business) .auth-card :global(.auth-alert a) {
+    color: var(--destructive);
+  }
+
+  :global(html.business) .auth-card :global(.auth-label) {
+    color: var(--text);
+    font-weight: 500;
+  }
+  :global(html.business) .auth-card :global(.auth-input) {
+    border: 1px solid var(--input);
+    background: var(--s1);
+    box-shadow: none;
+    border-radius: var(--radius-theme, 0.25rem);
+    color: var(--text);
+  }
+  :global(html.business) .auth-card :global(.auth-input::placeholder) {
+    color: var(--td);
+  }
+  :global(html.business) .auth-card :global(.auth-input:focus) {
+    border-color: var(--ring);
+    box-shadow: 0 0 0 3px var(--gold-d);
+  }
+  :global(html.business) .auth-card :global(.auth-input-icon) {
+    color: var(--td);
+  }
+  :global(html.business) .auth-card :global(.auth-toggle) {
+    color: var(--tm);
+    border-radius: var(--radius-theme, 0.25rem);
+  }
+  :global(html.business) .auth-card :global(.auth-toggle:hover) {
+    background: var(--s3);
+    color: var(--text);
+  }
+  :global(html.business) .auth-card :global(.auth-toggle:focus-visible),
+  :global(html.business) .auth-card :global(.auth-link:focus-visible),
+  :global(html.business) .auth-card :global(.auth-secondary:focus-visible) {
+    outline-color: var(--ring);
+  }
+  :global(html.business) .auth-card :global(.auth-link) {
+    color: var(--primary);
+    font-weight: 500;
+  }
+
+  /* solid accent button — no gradient, no glow, no heart cursor */
+  :global(html.business) .auth-card :global(.auth-submit) {
+    background: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: var(--radius-theme, 0.25rem);
+    color: var(--primary-foreground);
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0;
+    min-height: 46px;
+    cursor: pointer;
+    box-shadow: none;
+    transition:
+      background-color 150ms ease,
+      opacity 150ms ease;
+  }
+  :global(html.business) .auth-card :global(.auth-submit:hover:not(:disabled)) {
+    background: var(--gold-l);
+    border-color: var(--gold-l);
+    transform: none;
+    box-shadow: none;
+  }
+  :global(html.business) .auth-card :global(.auth-submit:focus-visible) {
+    outline-color: var(--ring);
+  }
+  :global(html.business) .auth-card :global(.auth-spinner) {
+    border-color: rgb(255 255 255 / 0.35);
+    border-top-color: var(--primary-foreground);
+  }
+
+  :global(html.business) .auth-card :global(.auth-divider) {
+    color: var(--tm);
+  }
+  :global(html.business) .auth-card :global(.auth-divider::before),
+  :global(html.business) .auth-card :global(.auth-divider::after) {
+    background: var(--border);
+  }
+
+  :global(html.business) .auth-card :global(.auth-secondary) {
+    border: 1px solid var(--input);
+    background: var(--s1);
+    border-radius: var(--radius-theme, 0.25rem);
+    color: var(--text);
+    font-weight: 500;
+  }
+  :global(html.business) .auth-card :global(.auth-secondary:hover) {
+    border-color: var(--primary);
+    background: var(--s3);
+    color: var(--primary);
+  }
+
+  :global(html.business) .auth-card :global(.auth-success-icon) {
+    background: var(--s3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-theme, 0.25rem);
+    box-shadow: none;
   }
 
   @media (prefers-reduced-motion: reduce) {

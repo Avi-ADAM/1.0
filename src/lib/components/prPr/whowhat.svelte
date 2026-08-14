@@ -55,9 +55,17 @@
   function confirm(id) {
     console.log(id);
   }
+  // A rikma with no accrued value yet has a zero denominator; 0/0 renders as
+  // "NaN%" on screen, which is the first thing a brand-new rikma shows.
   function percentage(partialValue, totalValue) {
+    if (!totalValue) return 0;
     return (100 * partialValue) / totalValue;
   }
+  /**
+   * One-member rikma: there is no second voter, so a split proposal is
+   * unanimous the moment it is created (see the solo branch in `ask()`).
+   */
+  let isSoloRikma = $derived((users?.length ?? 0) === 1);
   let ulist = $state([]);
   // Display preference: card grid (default) or the legacy spreadsheet table.
   // Both render the same ulist + platform site-share, just different layouts.
@@ -690,13 +698,18 @@
           : {})
       };
 
-      const tosplitResult = await executeAction('createTosplit', { data: tosplitData });
+      // The component words its own failure below; without this the user got the
+      // toast twice, once of them the raw internal string ("Parameter
+      // validation failed"), which tells them nothing about what to do.
+      const tosplitResult = await executeAction(
+        'createTosplit',
+        { data: tosplitData },
+        { showErrorToast: false }
+      );
 
       if (!tosplitResult.success || !tosplitResult.data?.createTosplit?.data?.id) {
-        const errorMsg = typeof tosplitResult.error === 'string' 
-          ? tosplitResult.error 
-          : tosplitResult.error?.message || 'Failed to create tosplit';
-        toast.error(errorMsg);
+        console.error('[split] createTosplit failed:', tosplitResult.error);
+        toast.error(get(t)('mission.whowhat.errorCreatingSplit'));
         isLoading = false;
         isError = true;
         return;
@@ -772,6 +785,51 @@
           false,
           fetch
         );
+      }
+
+      // Step 5.5 — SOLO RIKMA: the proposal is already unanimous.
+      // The creator's `what:true` sits inside the tosplit we just created, and
+      // there is nobody else to wait for. Opening a restime timegrama here would
+      // park the money for 48h waiting on a vote that can never arrive, so we
+      // finalize immediately — the same call halukaask makes when the last
+      // member approves. See docs/QA_SOLO_RIKMA_2026-08.md B1.
+      if (isSoloRikma) {
+        const soloRes = await executeAction('approveHaluka', {
+          tosplitId: String(tosplitId),
+          userId: cookieValueId,
+          // The creator's vote is written by approveHaluka itself; passing it
+          // again here would record it twice.
+          users: [],
+          halukot: halukaIds,
+          sales: salesIds,
+          hervachUpdates: hervachtiArray
+            .filter((h) => h.noten !== true && h.mekabel !== true)
+            .map((h) => ({
+              userId: String(h.users_permissions_user),
+              amountDelta: Number(h.amount ?? 0)
+            }))
+            .filter((u) => u.userId && Number.isFinite(u.amountDelta) && u.amountDelta !== 0),
+          projectId: String($idPr)
+        });
+        if (!soloRes?.success) {
+          // The proposal exists and is valid — only the auto-approval failed, so
+          // say so instead of pretending the whole thing worked.
+          console.error('[solo split] auto-approve failed:', soloRes?.error);
+          toast.error(get(t)('mission.whowhat.errorCreatingSplit'));
+          isLoading = false;
+          isError = true;
+          return;
+        }
+        console.log('✅ Solo tosplit created and approved in one step');
+        toast.success(get(t)('mission.whowhat.splitApproved'));
+        isLoading = false;
+        isSuccess = true;
+        hatzaa = true;
+        already = true;
+        noofok = 1;
+        noofno = 0;
+        noofw = 0;
+        return;
       }
 
       // Step 6: Create timegrama for the tosplit

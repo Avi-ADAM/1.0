@@ -1,5 +1,8 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
+import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
+import { execFromContext } from '$lib/server/archive/exec.js';
+import { gqlString } from './actionUtils.js';
 
 const applyToMissionHandler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const { openMissionId, projectId } = params;
@@ -229,14 +232,14 @@ const applyToMissionHandler: ActionExecutionHandler = async (params, context, { 
       createMesimabetahalich(data: {
         project: "${projectId}",
         mission: "${missId}",
-        hearotMeyuchadot: "${omAttrs.hearotMeyuchadot ?? ''}",
-        name: "${omAttrs.name ?? ''}",
-        descrip: "${omAttrs.descrip ?? ''}",
+        hearotMeyuchadot: ${gqlString(omAttrs.hearotMeyuchadot)},
+        name: ${gqlString(omAttrs.name)},
+        descrip: ${gqlString(omAttrs.descrip)},
         hoursassinged: ${omAttrs.noofhours ?? 0},
         perhour: ${omAttrs.perhour ?? 0},
         iskvua: ${iskvua},
-        privatlinks: "${omAttrs.privatlinks ?? ''}",
-        publicklinks: "${omAttrs.publicklinks ?? ''}",
+        privatlinks: ${gqlString(omAttrs.privatlinks)},
+        publicklinks: ${gqlString(omAttrs.publicklinks)},
         users_permissions_user: "${context.userId}",
         tafkidims: [${tafkidimsStr}],
         publishedAt: "${nowISO}",
@@ -261,6 +264,12 @@ const applyToMissionHandler: ActionExecutionHandler = async (params, context, { 
     }
 
     const chiluzh: string = responseData.data?.createMesimabetahalich?.data?.id;
+    // Start the dormancy clock: from here on, silence has a deadline
+    // (PLAN_OBJECT_ARCHIVAL). Best-effort — a missing clock only means
+    // the mission is never asked about, not a failed assignment.
+    if (chiluzh) {
+      await touchDormancy(execFromContext(context), String(chiluzh)).catch(() => null);
+    }
     if (!chiluzh) throw new Error('Failed to create Mesimabetahalich (solo path)');
 
     // 3. Inherit process anchors (partofs) from OpenMission → Mesimabetahalich

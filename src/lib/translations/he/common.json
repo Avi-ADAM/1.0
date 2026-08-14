@@ -85,7 +85,14 @@
     "discover_products": "מוצרים",
     "discover_missions": "משימות פתוחות",
     "discover_resources": "משאבים מבוקשים",
-    "guide": "מדריך"
+    "guide": "מדריך",
+    "home": "בית",
+    "grow": "לגדל ביחד",
+    "quorum": "קוורום",
+    "consensus": "מנוע ההסכמה",
+    "faq": "שאלות נפוצות",
+    "login": "כניסה",
+    "signup": "הרשמה"
   },
   "status": {
     "success": "בוצע בהצלחה",

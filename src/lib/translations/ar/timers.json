@@ -18,5 +18,11 @@
   "clearSuccess": "تم مسح المؤقتات بنجاح",
   "clearError": "فشل مسح المؤقتات",
   "saveSuccess": "تم حفظ المؤقت بنجاح",
-  "saveError": "خطأ في حفظ المؤقت"
+  "saveError": "خطأ في حفظ المؤقت",
+  "stoppedAfter": "توقف المؤقت عند {{duration}}. هل تريد حفظ هذا الوقت أو مسحه؟",
+  "noTimerYet": "لم يُسجَّل أي وقت على هذه المهمة بعد. ابدأ مؤقتًا أو امسح وابدأ من جديد.",
+  "calendarToday": "اليوم",
+  "calendarPrevWeek": "الأسبوع السابق",
+  "calendarNextWeek": "الأسبوع التالي",
+  "calendarAllDay": "طوال اليوم"
 }

@@ -22,6 +22,7 @@
   import SiteShareIncomeCard from './SiteShareIncomeCard.svelte';
   import SiteShareAutoApprovedCard from './SiteShareAutoApprovedCard.svelte';
   import WishOfferCard from './WishOfferCard.svelte';
+  import ArchiveObjectCard from './ArchiveObjectCard.svelte';
   //import { fly } from 'svelte/transition';
   import { onMount } from 'svelte';
   import Header from './../../header/header.svelte';
@@ -1192,6 +1193,25 @@
                   selfNomination={buble.source === 'selfNomination'}
                 /></SwiperSlide
               >
+            {:else if buble.ani === 'archObject' && milon.hachla == true}
+              <SwiperSlide
+                class={isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'}
+                ><ArchiveObjectCard
+                  archive={buble.archive}
+                  projectId={buble.projectId}
+                  projectName={buble.projectName}
+                  logoSrc={buble.src}
+                  memberCount={buble.noof}
+                  timegramaDate={buble.timegramaDate}
+                  isFirst={currentIndex === i}
+                  onProj={proj}
+                  onUser={user}
+                  onChat={chat}
+                  onDone={delo}
+                /></SwiperSlide
+              >
             {:else if buble.ani === 'hachla' && milon.hachla == true}
               <SwiperSlide
                 class={isMobileOrTablet()
@@ -1298,28 +1318,26 @@
     transition: background 0.5s ease;
   }
 
-  @media (prefers-color-scheme: dark) {
-    .body {
-      background:
-        radial-gradient(at 0% 0%, rgba(255, 0, 146, 0.2) 0%, transparent 50%),
-        radial-gradient(
-          at 100% 0%,
-          rgba(179, 135, 40, 0.25) 0%,
-          transparent 50%
-        ),
-        radial-gradient(
-          at 100% 100%,
-          rgba(255, 0, 146, 0.2) 0%,
-          transparent 50%
-        ),
-        radial-gradient(
-          at 0% 100%,
-          rgba(179, 135, 40, 0.25) 0%,
-          transparent 50%
-        ),
-        radial-gradient(at 50% 50%, rgba(15, 12, 0, 0.95) 0%, transparent 80%),
-        #0a0904; /* Very dark charcoal gold */
-    }
+  :global(html.dark) .body {
+    background:
+      radial-gradient(at 0% 0%, rgba(255, 0, 146, 0.2) 0%, transparent 50%),
+      radial-gradient(
+        at 100% 0%,
+        rgba(179, 135, 40, 0.25) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        at 100% 100%,
+        rgba(255, 0, 146, 0.2) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        at 0% 100%,
+        rgba(179, 135, 40, 0.25) 0%,
+        transparent 50%
+      ),
+      radial-gradient(at 50% 50%, rgba(15, 12, 0, 0.95) 0%, transparent 80%),
+      #0a0904; /* Very dark charcoal gold */
   }
 
   /* Support for manual .dark class if needed */

@@ -8,6 +8,8 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
+import { execFromContext } from '$lib/server/archive/exec.js';
 
 const updateMissionStatusHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { mId, projectId, status } = params;
@@ -21,6 +23,9 @@ const updateMissionStatusHandler: ActionExecutionHandler = async (params, contex
     context.jwt,
     context.fetch,
   );
+
+  // Real activity: push the dormancy deadline out (PLAN_OBJECT_ARCHIVAL).
+  await touchDormancy(execFromContext(context), String(mId)).catch(() => null);
 
   return {
     data: { mId, status: safeStatus },

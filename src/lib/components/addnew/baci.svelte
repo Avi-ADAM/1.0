@@ -187,15 +187,40 @@ let vallues = $state([]);
             });
             const json = await res.json();
             if (!res.ok || !json?.data) throw json;
-            vallues = json.data.vallues.data;
-            if ($lang == "he" ){
-              for (var i = 0; i < vallues.length; i++){
-                if (vallues[i].attributes.localizations.data.length > 0){
-                vallues[i].attributes.valueName = vallues[i].attributes.localizations.data[0].attributes.valueName
-                }
-              }
-            }
-            vallues = vallues
+            // Show each value in the reader's language. A value with no
+            // localization for that language would otherwise offer its raw
+            // English slug ("altroisem", "anarchy") inside a Hebrew list — and
+            // then carry that slug onto the rikma's public page — so those are
+            // dropped from the picker instead. English is the base language and
+            // always keeps the base name.
+            const rows = json.data.vallues.data ?? [];
+            vallues =
+              $lang === 'en'
+                ? rows
+                : rows
+                    .map((v) => {
+                      const loc = (v.attributes.localizations?.data ?? []).find(
+                        (l) => l.attributes?.locale === $lang
+                      );
+                      // No `locale` field yet (older API build) → fall back to
+                      // the single localization row, which is what shipped before.
+                      const only =
+                        v.attributes.localizations?.data?.length === 1 &&
+                        v.attributes.localizations.data[0].attributes?.locale == null
+                          ? v.attributes.localizations.data[0]
+                          : null;
+                      const named = loc ?? only;
+                      return named
+                        ? {
+                            ...v,
+                            attributes: {
+                              ...v.attributes,
+                              valueName: named.attributes.valueName
+                            }
+                          }
+                        : null;
+                    })
+                    .filter(Boolean)
                         newcontent = false
             const runi = json.data.projects.data;
            run = runi.map(c => c.attributes.projectName)

@@ -62,7 +62,12 @@
     const kind = decision?.attributes?.kind;
     const label = $trans(`headers.${kind}`);
     if (label && label !== `headers.${kind}`) return label;
-    return decision?.attributes?.newname || kind || '—';
+    // Archive/edit proposals carry no `newname`; their `decisionName` is the
+    // only thing that says *which object* the row is about, so without it the
+    // list would read "archiveObject" for every one of them.
+    return (
+      decision?.attributes?.newname || decision?.attributes?.decisionName || kind || '—'
+    );
   }
 
   // Join requests live nested inside the open missions (field is `open_missions`

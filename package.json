@@ -24,6 +24,7 @@
     "check:proxy": "node scripts/check-proxy-security.mjs",
     "check:i18n": "node scripts/check-i18n-routes.mjs",
     "check:script": "node scripts/check-mixed-script.mjs",
+    "smoke": "node scripts/smoke/smoke.mjs",
     "postinstall": "patch-package"
   },
   "engines": {

@@ -161,12 +161,12 @@
   >
     <div class="inline-flex items-center gap-1.5 mb-1">
       <span class="w-1.5 h-1.5 rounded-full bg-barbi animate-pulse"></span>
-      <span class="text-xs font-semibold tracking-wide uppercase text-[color:var(--stgold,#574010)]">
+      <span class="text-xs font-semibold tracking-wide uppercase text-[color:var(--ramp-ink,#16131b)]">
         {$t('planning.boards.aiBadge')}
       </span>
     </div>
-    <h2 class="text-xl font-bold text-[color:var(--stgold,#574010)]">{$t('planning.boards.heading')}</h2>
-    <p class="text-sm font-medium mb-4 text-[color:var(--stgold,#574010)]">{$t('planning.boards.intro')}</p>
+    <h2 class="text-xl font-bold text-[color:var(--ramp-ink,#16131b)]">{$t('planning.boards.heading')}</h2>
+    <p class="text-sm font-medium mb-4 text-[color:var(--ramp-ink,#16131b)]">{$t('planning.boards.intro')}</p>
 
     <!-- Tier 1 — the thin scan. Explicit click only. -->
     <div class="flex flex-wrap items-center gap-3 mb-2">
@@ -174,13 +174,13 @@
         {scanning ? $t('planning.boards.scanning') : scanned ? $t('planning.boards.rescan') : $t('planning.boards.scan')}
       </Button>
       {#if scanned && suggested.length === 0 && !scanning}
-        <span class="text-sm font-medium text-[color:var(--stgold,#574010)]">{$t('planning.boards.noDirections')}</span>
+        <span class="text-sm font-medium text-[color:var(--ramp-ink,#16131b)]">{$t('planning.boards.noDirections')}</span>
       {/if}
     </div>
 
     <!-- Website analysis: permission, not a command — the server still reads
          the site only when the rikma's own description is too thin. -->
-    <label class="flex items-start gap-2 mb-4 text-sm text-[color:var(--stgold,#574010)] cursor-pointer">
+    <label class="flex items-start gap-2 mb-4 text-sm text-[color:var(--ramp-ink,#16131b)] cursor-pointer">
       <input type="checkbox" bind:checked={allowSite} class="mt-0.5 accent-barbi" />
       <span>
         {$t('planning.boards.useSite')}
@@ -189,7 +189,7 @@
     </label>
 
     {#if siteUsed}
-      <p class="text-xs mb-4 text-[color:var(--stgold,#574010)]">
+      <p class="text-xs mb-4 text-[color:var(--ramp-ink,#16131b)]">
         {$t('planning.boards.siteRead')}
         <a class="underline break-all" href={siteUsed} target="_blank" rel="noopener noreferrer">{siteUsed}</a>
       </p>
@@ -200,20 +200,22 @@
       <ul class="flex flex-col gap-3 mb-6">
         {#each suggested as board (board.id)}
           {@const a = board.attributes}
-          <li class="rounded-xl border border-barbi/40 p-3 bg-white/50 dark:bg-black/20">
+          <!-- The card floats on the ramp, which never darkens — so no `dark:`
+               background or ink here. See --ramp-ink in app.postcss. -->
+          <li class="rounded-xl border border-barbi/40 p-3 bg-white/60">
             <div class="flex items-center gap-2 mb-1">
-              <span class="text-xs px-2 py-0.5 rounded-full bg-barbi/15">{$t('planning.boards.suggested')}</span>
-              <h3 class="font-semibold text-gray-900 dark:text-gray-100">{a.title}</h3>
+              <span class="text-xs px-2 py-0.5 rounded-full bg-barbi/15 text-[color:var(--ramp-ink,#16131b)]">{$t('planning.boards.suggested')}</span>
+              <h3 class="font-semibold text-[color:var(--ramp-ink,#16131b)]">{a.title}</h3>
             </div>
-            {#if a.descrip}<p class="text-sm text-gray-700 dark:text-gray-300">{a.descrip}</p>{/if}
+            {#if a.descrip}<p class="text-sm text-[color:var(--ramp-ink,#16131b)]">{a.descrip}</p>{/if}
             {#if a.rationale}
-              <p class="text-sm text-gray-600 dark:text-gray-300 italic mt-1">{a.rationale}</p>
+              <p class="text-sm text-[color:var(--ramp-ink,#16131b)] italic mt-1">{a.rationale}</p>
             {/if}
             <div class="flex gap-2 mt-3">
               <Button onClick={() => acceptDirection(board)}>{$t('planning.boards.open')}</Button>
               <button
                 type="button"
-                class="text-sm underline text-gray-500"
+                class="text-sm underline text-[color:var(--ramp-ink,#16131b)]"
                 onclick={() => setBoardStatus(board, 'archived')}
               >
                 {$t('planning.boards.dismissDirection')}
@@ -235,8 +237,8 @@
               class="w-full text-start font-semibold flex items-center justify-between gap-2 p-2 rounded-xl hover:bg-white/40"
               onclick={() => (openBoardId = isOpen ? null : String(board.id))}
             >
-              <span class="text-[color:var(--stgold,#574010)]">{board.attributes?.title}</span>
-              <span class="text-xs text-gray-500">{isOpen ? $t('planning.boards.close') : $t('planning.boards.open')}</span>
+              <span class="text-[color:var(--ramp-ink,#16131b)]">{board.attributes?.title}</span>
+              <span class="text-xs text-[color:var(--ramp-ink,#16131b)]">{isOpen ? $t('planning.boards.close') : $t('planning.boards.open')}</span>
             </button>
             {#if isOpen}
               <div class="mt-2">
@@ -247,15 +249,15 @@
         {/each}
       </ul>
     {:else if suggested.length === 0 && !scanning}
-      <p class="text-sm font-medium mb-4 text-[color:var(--stgold,#574010)]">{$t('planning.boards.empty')}</p>
+      <p class="text-sm font-medium mb-4 text-[color:var(--ramp-ink,#16131b)]">{$t('planning.boards.empty')}</p>
     {/if}
 
     <!-- Free text entry -->
     <div>
-      <label class="block text-sm font-medium mb-1" for="plan-free-text">{$t('planning.boards.freeTextLabel')}</label>
+      <label class="block text-sm font-medium mb-1 text-[color:var(--ramp-ink,#16131b)]" for="plan-free-text">{$t('planning.boards.freeTextLabel')}</label>
       <textarea
         id="plan-free-text"
-        class="w-full rounded-xl border border-barbi/40 p-2 text-sm"
+        class="w-full rounded-xl border border-barbi/40 p-2 text-sm bg-white/80 text-[color:var(--ramp-ink,#16131b)]"
         rows="3"
         bind:value={freeText}
         placeholder={$t('planning.boards.freeTextPlaceholder')}
@@ -265,7 +267,7 @@
           {submittingText ? $t('planning.boards.sending') : $t('planning.boards.freeTextSend')}
         </Button>
         {#if freeText.trim().length > 0 && freeText.trim().length < 20}
-          <span class="text-xs font-medium text-[color:var(--stgold,#574010)]">{$t('planning.boards.tooShort')}</span>
+          <span class="text-xs font-medium text-[color:var(--ramp-ink,#16131b)]">{$t('planning.boards.tooShort')}</span>
         {/if}
       </div>
     </div>

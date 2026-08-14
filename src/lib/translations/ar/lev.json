@@ -535,7 +535,13 @@
     "whyMoveAmount": "لماذا تغيير المبلغ؟ (سيُنشر في المحادثة)",
     "submitProposal": "إرسال الاقتراح",
     "explainProposal": "يرجى تعليل الاقتراح",
-    "addHours": "أضف ساعات"
+    "addHours": "أضف ساعات",
+    "approveAria": "الموافقة على استلام المورد",
+    "reportApproveAria": "الإبلاغ عن النفقة والموافقة عليها",
+    "objectAria": "اعتراض",
+    "proposeAmountAria": "اقتراح مبلغ آخر",
+    "awaitingReport": "⏳ بانتظار إبلاغ المسؤول",
+    "awaitingReportHint": "تُفتح الموافقة بعد أن يُبلغ المسؤول عن النفقة الشهرية"
   },
   "levchat": {
     "messagePlaceholder": "اكتب رسالتك..."
@@ -701,7 +707,8 @@
     "githubLink": "رابط جيت هاب الشبكة",
     "facebookLink": "رابط فيسبوك الشبكة",
     "valuesAndObjectives": "القيم والأهداف",
-    "openMissions": "مهام متاحة"
+    "openMissions": "مهام متاحة",
+    "loadError": "تعذر تحميل الشبكة. يرجى المحاولة مرة أخرى."
   },
   "hevel": {
     "skills": "المهارات",

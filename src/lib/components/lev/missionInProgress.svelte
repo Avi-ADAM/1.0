@@ -2118,11 +2118,13 @@
                   {missionDetails}
                   {link}
                   {missionName}
+                  missionId={mId}
                   {linkDescription}
                   {running}
                   {show}
                   {hourstotal}
                   {hoursdon}
+                  {perhour}
                   {status}
                 />
               </div>
@@ -2162,11 +2164,13 @@
     {missionDetails}
     {link}
     {missionName}
+    missionId={mId}
     {linkDescription}
     {running}
     {show}
     {hourstotal}
     {hoursdon}
+    {perhour}
     {status}
   />
 {/if}

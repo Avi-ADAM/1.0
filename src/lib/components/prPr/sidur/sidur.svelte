@@ -28,6 +28,16 @@
     let options = {
         nowIndicator: true,
         locale: $lang,
+        // `locale` only drives Intl date formatting — the toolbar words and the
+        // all-day row keep the library's English defaults, which read as raw
+        // English inside the Hebrew shifts board.
+        buttonText: (text) => ({
+            ...text,
+            today: $t('timers.calendarToday'),
+            prev: $t('timers.calendarPrevWeek'),
+            next: $t('timers.calendarNextWeek')
+        }),
+        allDayContent: () => $t('timers.calendarAllDay'),
         dateClick:  function (dateClickInfo) {
             //a. ani batvach, b. lo yazarti po  event cvar, c. ein po cvar yoter miday iventim
             console.log(dateClickInfo);
@@ -48,7 +58,6 @@
         slotMinTime:"11:00:00",
         flexibleSlotTimeLimits: true,
         events: eve,
-        nowIndicator: true,
         eventClick: function (eventClickInfo) { 
             //a. choose: in the tvach, not havig my max shift, noon alse has choosed, b.edit my shift , cencel , change hours 
             console.log(eventClickInfo);

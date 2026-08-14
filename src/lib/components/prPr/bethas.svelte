@@ -130,6 +130,15 @@
 
   let q = $derived(search.trim().toLowerCase());
 
+  /**
+   * Missions the server closed outright in this session (solo rikma — the
+   * finish needs nobody else's approval). They are no longer in progress, so
+   * they leave the board immediately instead of sitting under a ⏳ badge that
+   * waits for an approval that was never created.
+   * @type {Record<string, boolean>}
+   */
+  let completedNow = $state({});
+
   let shown = $derived(
     (bmiData ?? []).filter((m) => {
       if (mineOnly && !isMine(m)) return false;
@@ -138,6 +147,7 @@
         if (!ids.some((id) => activeRoles.includes(id))) return false;
       }
       if (q && !haystack(m).includes(q)) return false;
+      if (completedNow[String(m.id)]) return false;
       return true;
     })
   );
@@ -529,8 +539,12 @@
             </div>
           </div>
 
-          <!-- the viewer's own mission: the controls it has on the lev card -->
-          {#if mine && projectId}
+          <!-- the viewer's own mission gets the full workbench (timer, status,
+               complete); any rikma member also gets the archive/edit proposal
+               buttons on someone else's mission — opening one is a rikma-wide
+               consensus matter, not a privilege of the owner
+               (PLAN_OBJECT_ARCHIVAL). -->
+          {#if projectId}
             <div class="pb-mine-bar">
               <MissionControls
                 missionId={m.id}
@@ -538,9 +552,18 @@
                 missionName={m.attributes?.name}
                 status={statusOf(m)}
                 pendingApproval={isPending(m)}
+                isMine={mine}
+                ownerName={m.attributes?.users_permissions_user?.data?.attributes?.username}
+                showArchiveActions={true}
+                accruedHours={m.attributes?.howmanyhoursalready}
+                hoursAssigned={m.attributes?.hoursassinged}
+                perhour={m.attributes?.perhour}
                 compact={true}
                 onStatus={(value) => (statusOverride = { ...statusOverride, [String(m.id)]: value })}
-                onCompleted={() => (submitted = { ...submitted, [String(m.id)]: true })}
+                onCompleted={(outcome) =>
+                  outcome === 'completed'
+                    ? (completedNow = { ...completedNow, [String(m.id)]: true })
+                    : (submitted = { ...submitted, [String(m.id)]: true })}
                 onTimerSaved={loadSegments}
               />
             </div>

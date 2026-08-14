@@ -535,7 +535,13 @@
     "whyMoveAmount": "Почему вы меняете сумму? (будет опубликовано в чате)",
     "submitProposal": "Отправить предложение",
     "explainProposal": "Пожалуйста, объясните предложение",
-    "addHours": "Добавить часы"
+    "addHours": "Добавить часы",
+    "approveAria": "Подтвердить получение ресурса",
+    "reportApproveAria": "Сообщить о расходе и утвердить",
+    "objectAria": "Возразить",
+    "proposeAmountAria": "Предложить другую сумму",
+    "awaitingReport": "⏳ Ожидание отчёта ответственного",
+    "awaitingReportHint": "Утверждение откроется после того, как ответственный сообщит месячный расход"
   },
   "levchat": {
     "messagePlaceholder": "Написать сообщение..."
@@ -701,7 +707,8 @@
     "githubLink": "Ссылка на GitHub рикмы",
     "facebookLink": "Ссылка на Facebook рикмы",
     "valuesAndObjectives": "Ценности и цели",
-    "openMissions": "Открытые задачи"
+    "openMissions": "Открытые задачи",
+    "loadError": "Не удалось загрузить рикму. Попробуйте ещё раз."
   },
   "hevel": {
     "skills": "Навыки",

@@ -293,8 +293,19 @@
   >
 {/if}
 {:else}{/if}-->
-  <MobileFooter {isAuthed} onChat={() => addi('chat')} onNew={() => addi()} />
 {/if}
+
+<!-- Outside the auth branch on purpose: `(regandnon)` is a public group, so a
+     visitor browsing /project or /demand gets the bar too — in its guest form,
+     which carries login/signup instead of the member tabs. Only the chat panel
+     and the drawers above are members-only. -->
+<MobileFooter {isAuthed} onChat={() => addi('chat')} onNew={() => addi()} />
+
+<!-- The appearance handle rides the footer bar itself (see mobileFooter) —
+     floating it over the page put it on top of the bot bubble and the lev
+     demand map. A guest used to get a floating dock here instead, because they
+     had no bar at all; now they do, and it carries the same handle, so a dock
+     would only duplicate it. -->
 
 <style>
   .draggable {

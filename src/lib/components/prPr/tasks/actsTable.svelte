@@ -4,8 +4,7 @@
   import {
     Grid,
     PrelineTheme,
-    GridFooter,
-    PagingData
+    GridFooter
   } from '@mediakular/gridcraft';
   import { lang } from '$lib/stores/lang';
   import { t, isRtl} from '$lib/translations';
@@ -23,17 +22,27 @@
    * @typedef {Object} Props
    * @property {Array<any>} [acts]
    * @property {(payload: { id: any; kind: string }) => void} [onTaskClick] - Callback when a task is clicked.
+   * @property {(row: any) => void} [onRowClick] - Called when a row's name cell is clicked.
    * @property {(() => void) | undefined} [onCreateClick] - Called when the create task button is clicked.
    */
 
   /** @type {Props} */
   let { acts = $bindable([]), onTaskClick, onRowClick, onCreateClick } = $props();
 
-  let paging = $state(new PagingData(
-    1, // currentPage
-    20, // itemsPerPage
-    [10, 20, 50, 100] // itemsPerPageOptions
-  ));
+  // NOT `new PagingData(...)`: `$state()` only deep-proxies plain objects and
+  // arrays, never class instances. Wrapped in the class, `Grid`'s internal
+  // `paging.totalPages = …` write never reached this component, so the footer
+  // read `totalPages: 0` and disabled "Next" forever — 51 acts looked like one
+  // page. Changing items-per-page reassigned `paging` to a plain object, which
+  // is why 100-per-page was the only way to see everything. A plain object
+  // literal is reactive from the first render.
+  let paging = $state({
+    currentPage: 1,
+    itemsPerPage: 20,
+    itemsPerPageOptions: [10, 20, 50, 100],
+    totalPages: 0,
+    totalResults: 0
+  });
   function handleTaskClick(row, type, mid, isOpen, isPend) {
     let id;
     let kind;
@@ -136,6 +145,9 @@
           pendingValidation: row.naasa && !row.valiIshur,
           isCompleted: row.naasa && row.valiIshur,
           progress: row.status || 0,
+          // Unassigned rows render as a bare "take it" button — without this the
+          // Button has no label at all (its `text` defaults to '').
+          text: $t('mission.actsTable.takeTask'),
           onClick: () => handleTaskClick(row, type, mid, isOpen, isPend),
           onApprove: () => handleApprove(row.id),
           onValidate: () => handleValidate(row.id)
@@ -370,7 +382,7 @@
 </script>
 
 <div
-  class="w-full px-2 text-center bg-gold dark:bg-barbi dark:text-gold text-barbi"
+  class="acts-grid w-full px-2 text-center bg-gold dark:bg-barbi dark:text-gold text-barbi"
   dir={$isRtl ? 'rtl' : 'ltr'}
 >
   <div class="flex items-center gap-2">
@@ -434,5 +446,19 @@
     {/if}
   </div>
   <Grid data={filteredActs} bind:columns {theme} {paging} />
-  <span dir="ltr"> <GridFooter data={filteredActs} {theme} bind:paging /></span>
+  <span dir="ltr"> <GridFooter {theme} bind:paging /></span>
 </div>
+
+<style>
+  /* GridCraft's Preline theme hard-codes its row surfaces and brightens them
+     on hover (`dark:bg-slate-700/800` → `dark:hover:bg-slate-500`). In dark
+     mode the cell ink here is inherited `dark:text-gold`, which is
+     near-white — #eee8aa in personal, #f1f5fb in professional — so the
+     hovered row moved *toward* the ink and the task name all but vanished.
+     Hover on a darker surface instead, so the row still reacts to the pointer
+     while the ink keeps its contrast. Light mode is untouched: there the ink
+     is `text-barbi` and a pale hover row reads fine. */
+  :global(.dark) .acts-grid :global(tbody tr:hover) {
+    background-color: var(--s3);
+  }
+</style>

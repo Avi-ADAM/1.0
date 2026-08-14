@@ -155,11 +155,16 @@
   {@render utilityNav()}
 </div>
 
+<!-- Canonical is this page, not the homepage: `home.pageUrl` here told crawlers
+     /grow was a duplicate of "/" and kept it out of the index entirely. The
+     locale marker matches the hreflang table in app.html. -->
 <Head
   title={$t('grow.meta.title')}
   description={$t('grow.meta.description')}
   {image}
-  url={$t('home.pageUrl')}
+  url={$locale === 'he'
+    ? 'https://1lev1.com/grow'
+    : `https://1lev1.com/grow?lang=${$locale}`}
 />
 
 <div

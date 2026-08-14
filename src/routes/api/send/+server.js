@@ -231,7 +231,7 @@ export async function POST({ request, cookies }) {
 	// ── Entity-level guards (qid-specific ownership/visibility) ──────────────
 	// Registered in src/routes/api/send/guards.js; run here (after the vote
 	// handler, before the fetch). PRE guards throw error() to block.
-	await runSendGuards({ queId, isSer, keyValueObject, variablesObject, identity, bearer1, ep });
+	await runSendGuards({ queId, isSer, keyValueObject, variablesObject, identity, callerId: idL, bearer1, ep });
 
 	// ── Standard GraphQL fetch ───────────────────────────────────────────────
 	const controller = new AbortController();

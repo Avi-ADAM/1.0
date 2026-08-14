@@ -198,6 +198,38 @@ is with me" is a sovereign self-report (`holderStatus:'self'`), final immediatel
 A sale is counted in balances/tosplits only when **effective**
 (`holderStatus` is `self`, `confirmed`, or null-legacy) — never while `open`.
 
+## Object archival & edit (`kind: 'archiveObject' | 'editObject'`)
+
+See `docs/PLAN_OBJECT_ARCHIVAL.md`. Removing or changing a rikma object
+(open/in-progress mission, open/in-progress resource, product) goes through the
+same consent flow its creation did. **Never reuse `archived` for this** — it
+already means "taken/assigned" on an open mission and "vote closed" on
+pendm/pmash/decision. The archival state is the separate `lifecycle` enum
+(`active | archiveProposed | archived | released`; **null = legacy = active**,
+so every filter must be
+`or: [{lifecycle:{null:true}}, {lifecycle:{ne:"archived"}}]` — a bare `ne`
+excludes NULL rows in SQL and would hide every pre-existing object).
+
+A negotiation round carries `mode: 'archive' | 'keep'`, so countering a removal
+proposal *is* proposing an edit — the object survives with different terms
+instead of being removed. Accrued hours settle as `credit | waive | transfer`,
+or `endOfCycle` for a recurring commitment, which schedules
+`archiveEffectiveFrom` rather than cutting mid-cycle.
+
+**Membership follows the last commitment.** If the archived/released object was
+a member's only tie to the rikma **and nothing accrued** (no hours, no
+finnished-mission, no sale, no haluka, no open offer), their membership ends
+with it — otherwise they keep counting toward every future quorum in a rikma
+they have no stake in. The consequence is stated on the Decision
+(`archEndsMembership` + `archMember`) *before* anyone signs, re-checked at
+maturation, and never removes the rikma's last member.
+
+**Dormancy is a rikma parameter**, `Project.dormancyDays` with a per-mission
+override (urgent missions want a tighter clock). When it runs out the system
+does not cancel the assignment directly — it opens the standard release
+proposal, so silence still completes it while the assignee keeps a restime to
+respond.
+
 ## Match suggestions (lev recommendations)
 
 See `docs/PLAN_MATCH_SUGGESTIONS.md`. Lev mission/resource suggestions are

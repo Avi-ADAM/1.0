@@ -536,7 +536,13 @@
     "whyMoveAmount": "¿Por qué cambiar la cantidad? (se publicará en el chat)",
     "submitProposal": "Enviar propuesta",
     "explainProposal": "Explica la propuesta, por favor",
-    "addHours": "Añadir horas"
+    "addHours": "Añadir horas",
+    "approveAria": "Aprobar la recepción del recurso",
+    "reportApproveAria": "Informar y aprobar el gasto",
+    "objectAria": "Objetar",
+    "proposeAmountAria": "Proponer otro importe",
+    "awaitingReport": "⏳ Esperando el informe del responsable",
+    "awaitingReportHint": "La aprobación se abre cuando la persona responsable informa del gasto mensual"
   },
   "levchat": {
     "messagePlaceholder": "Escribe tu mensaje..."
@@ -702,7 +708,8 @@
     "githubLink": "Enlace al GitHub de la rikma",
     "facebookLink": "Enlace al Facebook de la rikma",
     "valuesAndObjectives": "Valores y objetivos",
-    "openMissions": "Misiones disponibles"
+    "openMissions": "Misiones disponibles",
+    "loadError": "No se pudo cargar la rikma. Inténtalo de nuevo."
   },
   "hevel": {
     "skills": "Habilidades",
