@@ -193,5 +193,21 @@
     "action": "Publish the request",
     "published": "The request is published",
     "publishedWithMatches": "Published and suggested to {{count}} matching people"
+  },
+  "mission": {
+    "title": "A subsistence stipend for this mission",
+    "hint": "A mission can come with a stipend — a low hourly payment that lets whoever takes it eat while they work on it.",
+    "whoPays": "Who carries the cost",
+    "noDilution": "The person doing it — nobody is diluted",
+    "noDilutionExplain": "Money now instead of part of the equity: their share drops by the stipend, and nobody else's percentage moves at all.",
+    "dilutes": "The whole rikma — everyone is diluted together",
+    "dilutesExplain": "The work is worth its full value regardless of who needed money, and the stipend counts as the funder's additional contribution. Every member is diluted pro-rata.",
+    "budget": "Stipend ceiling for this mission: {{count}}",
+    "budgetCycle": "Stipend ceiling per cycle: {{count}}",
+    "voteNoteBilateral": "These terms move nobody's percentage but the recipient's, so only they and the funder have to agree.",
+    "voteNoteRikma": "These terms dilute every member — so the vote on the mission is also the consent to that dilution. The ceiling above is the bound.",
+    "onMission": "This mission comes with a stipend of {{count}} per hour",
+    "seekingFunder": "Looking for someone to fund this mission's stipend",
+    "fundThis": "I'll fund this mission"
   }
 }

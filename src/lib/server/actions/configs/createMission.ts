@@ -86,6 +86,13 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     lng,
     radius,
     location_hint,
+    // The mission's own subsistence-stipend need (PLAN_STIPEND §13): "this
+    // mission also wants ₪X an hour of living money, and here is whether it
+    // dilutes". Stated on the proposal so the rikma answers both in one vote.
+    stipendRate,
+    stipendCostShare,
+    stipendMode,
+    stipendFunderId,
   } = params;
 
   const { userId } = context;
@@ -139,6 +146,27 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
 
   const locationInput = buildLocationInput(isOnline, lat, lng, radius, location_hint);
 
+  // A stipend rate above the mission's own market rate would drive the
+  // recipient's equity negative — the same guard the pledge action applies,
+  // enforced here so a mission can never be *created* carrying illegal terms.
+  const rate = Number(stipendRate) > 0 ? Number(stipendRate) : null;
+  if (rate != null && Number(valph) > 0 && rate > Number(valph)) {
+    throw new Error(
+      'The stipend rate cannot exceed the mission’s own hourly value — that would push the recipient’s equity below zero',
+    );
+  }
+  const stipendFields: Record<string, unknown> = rate == null
+    ? {}
+    : {
+        stipendRate: rate,
+        // α: 1 (the default) = the recipient carries it and nobody is diluted.
+        stipendCostShare:
+          stipendCostShare != null ? Math.min(1, Math.max(0, Number(stipendCostShare))) : 1,
+        stipendMode:
+          stipendMode === 'advance' || stipendMode === 'gift' ? stipendMode : 'equity',
+        ...(stipendFunderId ? { stipendFunder: String(stipendFunderId) } : {}),
+      };
+
   // 2b. Fire-and-forget: create Strapi localizations for newly created Mission entries
   if (!existingMissionId && missionId) {
     const sourceLocale = (context as any).lang ?? 'he';
@@ -172,6 +200,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     hearotMeyuchadot: spnot ?? null,
     publishedAt: nowISO,
     ...(locationInput ? { location: locationInput } : {}),
+    ...stipendFields,
   };
 
   const initialVote = [
@@ -297,6 +326,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
         publishedAt: nowISO,
         sqedualed: dateStart ?? null,
         deadline: dateEnd ?? null,
+        ...stipendFields,
       },
       context.jwt,
       context.fetch,
@@ -552,6 +582,10 @@ export const createMissionConfig: ActionConfig = {
     assignedUserId:     { type: 'string',  required: false, description: 'Assigned user ID (branch 2: specific member, branch 4: self = context.userId)' },
     checklist:          { type: 'array',   required: false, description: 'Checklist tasks [{shem, des?, link?, dateS?, dateF?}]' },
     processId:          { type: 'string',  required: false, description: 'Process ID to attach created entity to' },
+    stipendRate:        { type: 'number',  required: false, description: 'Subsistence stipend this mission comes with, ₪ per approved hour (≤ valph)' },
+    stipendCostShare:   { type: 'number',  required: false, description: 'α — 1 (default) the recipient carries it and nobody is diluted, 0 the whole rikma does' },
+    stipendMode:        { type: 'string',  required: false, description: 'equity (default) | advance | gift' },
+    stipendFunderId:    { type: 'string',  required: false, description: 'Member offering to fund it, when there already is one' },
   },
 
   authRules: [

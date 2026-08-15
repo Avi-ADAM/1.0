@@ -2533,6 +2533,10 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $tafkidims: [ID],
     $deadline: DateTime,
     $sqedualed: DateTime,
+    $stipendRate: Float,
+    $stipendCostShare: Float,
+    $stipendMode: ENUM_MESIMABETAHALICH_STIPENDMODE,
+    $stipendFunder: ID,
     $publishedAt: DateTime!
   ) {
     createMesimabetahalich(data: {
@@ -2551,7 +2555,11 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       publishedAt: $publishedAt,
       admaticedai: $deadline,
       start: $sqedualed,
-      open_missions: $openMid
+      open_missions: $openMid,
+      stipendRate: $stipendRate,
+      stipendCostShare: $stipendCostShare,
+      stipendMode: $stipendMode,
+      stipendFunder: $stipendFunder
     }) {
       data {
         id
@@ -2876,6 +2884,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         id
         attributes {
           name descrip hearotMeyuchadot noofhours perhour iskvua privatlinks publicklinks sqadualed dates
+          stipendRate stipendCostShare stipendMode
+          stipendFunder { data { id } }
           rishon { data { id } }
           mission { data { id } }
           skills { data { id } }
@@ -8293,6 +8303,10 @@ ${STIPEND_DECISION_FIELDS}
     $hearotMeyuchadot: String
     $users: [ComponentProjectsPendmnegoInput]
     $location: ComponentNewLocationInput
+    $stipendRate: Float
+    $stipendCostShare: Float
+    $stipendMode: ENUM_PENDM_STIPENDMODE
+    $stipendFunder: ID
     $publishedAt: DateTime!
   ) {
     createPendm(data: {
@@ -8314,6 +8328,10 @@ ${STIPEND_DECISION_FIELDS}
       hearotMeyuchadot: $hearotMeyuchadot
       users: $users
       location: $location
+      stipendRate: $stipendRate
+      stipendCostShare: $stipendCostShare
+      stipendMode: $stipendMode
+      stipendFunder: $stipendFunder
       publishedAt: $publishedAt
     }) {
       data { id }
@@ -8341,6 +8359,10 @@ ${STIPEND_DECISION_FIELDS}
     $rishon: ID
     $archived: Boolean
     $location: ComponentNewLocationInput
+    $stipendRate: Float
+    $stipendCostShare: Float
+    $stipendMode: ENUM_OPENMISSION_STIPENDMODE
+    $stipendFunder: ID
     $publishedAt: DateTime!
   ) {
     createOpenMission(data: {
@@ -8364,6 +8386,10 @@ ${STIPEND_DECISION_FIELDS}
       rishon: $rishon
       archived: $archived
       location: $location
+      stipendRate: $stipendRate
+      stipendCostShare: $stipendCostShare
+      stipendMode: $stipendMode
+      stipendFunder: $stipendFunder
       publishedAt: $publishedAt
     }) {
       data { id }

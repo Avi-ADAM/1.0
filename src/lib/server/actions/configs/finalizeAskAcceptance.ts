@@ -6,6 +6,7 @@ import { ensureCandidacyTimegrama } from '../../nego/timegrama.js';
 import { resolveAcceptedActs } from '../helpers/roundActs.js';
 import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
+import { carryStipendToMission } from '$lib/server/stipend/fromMission.js';
 import { gqlString } from './actionUtils.js';
 
 function formatVotesForInline(votes: any[]): string {
@@ -193,6 +194,23 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
   // the mission is never asked about, not a failed assignment.
   if (newMbId) {
     await touchDormancy(execFromContext(context), String(newMbId)).catch(() => null);
+  }
+
+  // A mission that was proposed with a subsistence stipend attached carries it
+  // to whoever takes it (PLAN_STIPEND §13): the terms move onto the mission in
+  // progress, and when a funder was already named the bilateral pledge opens
+  // itself with their signature on it. Best-effort — the assignment stands
+  // either way.
+  if (newMbId) {
+    await carryStipendToMission(execFromContext(context), {
+      openMissionId: String(openMid),
+      mesimabetahalichId: String(newMbId),
+      projectId: String(projectId),
+      recipientId: String(acceptedUserId),
+      hours: Number(finalNhours) || null,
+      iskvua: iskvua === true,
+      missionName: String(finalName ?? ""),
+    }).catch(() => null);
   }
   const acceptedActIds = resolveAcceptedActs(
     askAttributes?.negopendmissions?.data,

@@ -193,5 +193,21 @@
     "action": "Publicar la petición",
     "published": "Petición publicada",
     "publishedWithMatches": "Publicada y sugerida a {{count}} personas afines"
+  },
+  "mission": {
+    "title": "Una beca de subsistencia para esta misión",
+    "hint": "Una misión puede venir con una beca: un pago por hora modesto que permite a quien la tome comer mientras trabaja en ella.",
+    "whoPays": "Quién asume el coste",
+    "noDilution": "Quien la hace — sin diluir a nadie",
+    "noDilutionExplain": "Dinero ahora en lugar de parte de la participación: su parte baja lo que vale la beca, y el porcentaje de los demás no se mueve en absoluto.",
+    "dilutes": "Toda la rikma — todos se diluyen juntos",
+    "dilutesExplain": "El trabajo vale su valor completo sin importar quién necesitaba dinero, y la beca cuenta como aportación adicional de quien financia. Todos los miembros se diluyen a prorrata.",
+    "budget": "Tope de la beca para esta misión: {{count}}",
+    "budgetCycle": "Tope de la beca por ciclo: {{count}}",
+    "voteNoteBilateral": "Estas condiciones no mueven la parte de nadie salvo la de quien recibe, así que basta con su acuerdo y el de quien financia.",
+    "voteNoteRikma": "Estas condiciones diluyen a todos los miembros, así que la votación de la misión es también el consentimiento a esa dilución. El tope de arriba es el límite.",
+    "onMission": "Esta misión viene con una beca de {{count}} por hora",
+    "seekingFunder": "Buscamos quien financie la beca de esta misión",
+    "fundThis": "Yo financio esta misión"
   }
 }
