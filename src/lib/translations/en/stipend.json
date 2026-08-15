@@ -1,0 +1,197 @@
+{
+  "button": {
+    "offer": "Offer a subsistence stipend",
+    "request": "Ask for a subsistence stipend",
+    "program": "Stipend programme"
+  },
+  "mode": {
+    "equity": "Equity",
+    "advance": "Advance",
+    "gift": "Gift",
+    "equityExplain": "The money enters the rikma's books and moves the shares",
+    "advanceExplain": "Recorded as an advance, repaid out of profit splits only — never out of the recipient's pocket",
+    "giftExplain": "The money moves with no effect on anyone's share"
+  },
+  "policy": {
+    "off": "This rikma has stipends turned off",
+    "bilateral": "Only stipends that dilute nobody",
+    "collective": "Every route, including a rikma-wide programme"
+  },
+  "status": {
+    "proposed": "Proposed",
+    "active": "Active",
+    "exhausted": "Budget spent",
+    "closed": "Closed",
+    "withdrawn": "Withdrawn"
+  },
+  "terms": {
+    "mode": "What the money buys",
+    "rate": "Stipend rate (per hour)",
+    "marketRate": "The mission's market rate is {{count}} per hour. A stipend may not go above it",
+    "costShare": "Who carries the cost",
+    "costShareRikma": "The rikma",
+    "costShareRecipient": "The recipient",
+    "costShareExplainFull": "The recipient alone carries it: their equity drops by the stipend, and nobody else is affected",
+    "costShareExplainNone": "The whole rikma carries it: the recipient keeps their value and everyone is diluted together",
+    "costShareExplainMixed": "The cost is split between the recipient and the rest of the rikma",
+    "monthlyCap": "Monthly ceiling",
+    "totalCap": "Total budget",
+    "totalCapExplain": "This is also the automatic ending: when the budget runs out the pledge closes itself",
+    "noticeCycles": "Cycles of notice before stopping",
+    "revenueTrigger": "Monthly income that ends it",
+    "revenueTriggerExplain": "Once monthly income crosses this, the stipend ends and ordinary splits take over",
+    "revenueTriggerSet": "Ends by itself at monthly income of {{count}}",
+    "recoursePersonal": "The advance may also be collected from the recipient personally",
+    "recourseExplain": "By default an advance is repaid only out of splits. Otherwise we have created a personal debt for someone who needed subsistence money — the opposite of the point",
+    "more": "More terms",
+    "scopeBilateral": "A two-party agreement: nobody outside the two of you is affected",
+    "scopeRikma": "Needs the whole rikma: these terms raise the total value, so everyone is diluted"
+  },
+  "error": {
+    "rateRequired": "A stipend needs an hourly rate",
+    "rateAboveMarket": "The stipend rate is above the mission's market rate — the recipient's own equity would go negative",
+    "noMarketRate": "This mission has no market rate, so there is no share to give up. Propose it as a gift instead",
+    "policyOff": "This rikma has turned subsistence stipends off",
+    "policyBilateralOnly": "These terms dilute every other member, and this rikma allows only stipends that do not. Raise the recipient's share of the cost, or ask the rikma to open a stipend programme",
+    "outsideEnvelopeMode": "These terms use a different mode than the programme allows",
+    "outsideEnvelopeRate": "The rate is above what the programme allows",
+    "outsideEnvelopeCostShare": "The programme does not let the rikma carry this much of the cost",
+    "outsideEnvelopeMultiplier": "The risk premium is above what the programme allows",
+    "programExhausted": "The programme's budget is already spent"
+  },
+  "propose": {
+    "titleOffer": "Offer a subsistence stipend",
+    "titleRequest": "Ask for a subsistence stipend",
+    "titleProgram": "A stipend programme for the rikma",
+    "introPledge": "A subsistence stipend is a monthly payment for approved hours, at a rate well below what the work is worth. The only open question is what that money does to the shares.",
+    "introProgram": "The programme settles the policy once — rate, a closed budget, and who carries the cost. After it is approved each funder↔recipient pair signs its own terms inside it, with no further rikma vote.",
+    "forMission": "For the mission: {{name}}",
+    "funder": "Who funds",
+    "recipient": "Who receives",
+    "funderOptional": "Funder (if there already is one)",
+    "noFunderYet": "No funder yet",
+    "noFunderYetExplain": "A programme can be approved with no funder, and the need then published as a request for someone to fund it",
+    "pick": "Choose",
+    "why": "A word to the other side",
+    "scopeNoteBilateral": "This goes to the other party only. With no response within the rikma's response time it is approved on its own.",
+    "scopeNoteRikma": "This goes to every member of the rikma, with what it does to each of their shares shown on the card."
+  },
+  "tradeoff": {
+    "title": "What you give up and what you get",
+    "without": "Without a stipend: {{count}}% of the rikma",
+    "with": "With the stipend: {{count}}% of the rikma + {{cash}} now",
+    "noneGivenUp": "On these terms you give up no share at all — the cost is spread across the whole rikma"
+  },
+  "card": {
+    "typePledge": "Subsistence stipend",
+    "typeProgram": "Stipend programme",
+    "hour": "hour",
+    "round": "Round {{count}}",
+    "reason": "Reason",
+    "proposedBy": "Proposed by {{name}}",
+    "signed": "Signed: {{count}}",
+    "awaiting": "Awaiting: {{count}}",
+    "autoApprove": "With no response — approved on its own",
+    "signedByMe": "You signed the version on the table. Waiting on the other side.",
+    "dilutionTitle": "What this does to your share",
+    "dilutionNow": "Your share today: {{count}}%",
+    "dilutionAfter": "If the budget is spent: {{count}}% (−{{points}} points)",
+    "dilutionNone": "Your share does not move — these terms dilute nobody but the two parties"
+  },
+  "counter": {
+    "title": "Propose different terms",
+    "intro": "There is no \"no\" here. Propose a different rate, a different budget or a different cost split — and that becomes the version on the table.",
+    "why": "Why these terms",
+    "clockNote": "A counter-proposal restarts the response clock."
+  },
+  "pay": {
+    "cardType": "Stipend cycle to pay",
+    "body": "The cycle closed. This is what {{name}} accrued, from approved hours.",
+    "hours": "Approved hours: {{count}}",
+    "rate": "Rate: {{count}} per hour",
+    "total": "To pay: {{count}}",
+    "capped": {
+      "monthlyCap": "Capped by the monthly ceiling (the hours came to {{count}})",
+      "totalCap": "Capped by what is left of the pledge's budget (the hours came to {{count}})",
+      "programCap": "Capped by what is left of the programme's budget (the hours came to {{count}})"
+    },
+    "lastCycle": "This is the last cycle — the budget ends here",
+    "modeNote": {
+      "equity": "The payment moves the shares only once the recipient confirms it arrived",
+      "advance": "An advance: repaid out of profit splits only, with no effect on the shares",
+      "gift": "A gift: no effect on the shares at all"
+    },
+    "action": "Pay and close the cycle",
+    "sent": "Sent. Waiting for the recipient to confirm.",
+    "nothingThisCycle": "No approved hours accrued in this cycle"
+  },
+  "confirm": {
+    "cardType": "Did the stipend arrive?",
+    "body": "{{name}} marked {{count}} as sent.",
+    "equityNote": "Confirming is what updates the shares. Until then nothing moves — and with no response within the rikma's response time it is confirmed on its own.",
+    "notExactly": "Not exactly",
+    "howMuchArrived": "How much actually arrived",
+    "zeroNote": "0 = nothing arrived. The pledge keeps running and it can be sent again — this is not a stop and not a refusal.",
+    "sendCorrection": "Report what arrived",
+    "action": "Yes, it arrived",
+    "done": "Confirmed. The shares have moved.",
+    "reportedNothing": "Recorded as not arrived. The pledge is still running."
+  },
+  "actions": {
+    "cancel": "Cancel",
+    "sending": "Sending…",
+    "propose": "Send the proposal",
+    "sendCounter": "Send counter-terms",
+    "approve": "Approve",
+    "approving": "Approving…",
+    "negotiate": "Propose differently",
+    "chat": "Discuss"
+  },
+  "toast": {
+    "pledgeProposed": "Sent to the other party",
+    "programProposed": "The programme was proposed to the rikma",
+    "programLive": "The programme is live",
+    "countered": "Your counter-terms are on the table",
+    "signed": "Signed. Waiting on the others.",
+    "matured": "Everyone signed — the pledge is live",
+    "error": "Something went wrong"
+  },
+  "tab": {
+    "title": "Subsistence stipends",
+    "intro": "A partner funding a partner: a monthly payment for approved hours, at a rate below the market one. Here you can see who funds whom, what is left of each budget, and how much dilution has actually accrued.",
+    "policy": "Rikma policy",
+    "policyDefault": "default (never set explicitly)",
+    "paid": "Paid",
+    "pending": "Awaiting confirmation",
+    "budgetLeft": "Budget left",
+    "netAdded": "Added to the rikma's value",
+    "programs": "Programmes",
+    "noPrograms": "This rikma has no stipend programme yet",
+    "pledges": "Pledges",
+    "noPledges": "No pledges yet",
+    "perMember": "By member",
+    "perMemberNote": "A positive number means their equity grew by funding; a negative one means they traded equity for money now.",
+    "members": "Members",
+    "offerTo": "Offer to {{name}}",
+    "findFunder": "Find a funder",
+    "pledgeInside": "Pledge inside the programme",
+    "spentOf": "{{spent}} of {{cap}} used",
+    "paidSoFar": "Paid so far: {{count}}",
+    "funded": "Funded: {{count}}",
+    "received": "Received: {{count}}"
+  },
+  "funding": {
+    "title": "Find a partner to fund this",
+    "intro": "The rikma publishes the need as an ordinary resource request. It appears in search, is suggested to people who offer that kind of resource, and whoever takes it joins the rikma as a partner.",
+    "months": "For how many months",
+    "monthly": "About {{count}} per month",
+    "name": "Request title",
+    "namePlaceholder": "Funding subsistence stipends for our members",
+    "descrip": "Details",
+    "descripPlaceholder": "What the rikma does, why the stipends are needed, and what the funder gets",
+    "joinNote": "Whoever takes this goes through the ordinary joining flow and becomes a partner of the rikma.",
+    "action": "Publish the request",
+    "published": "The request is published",
+    "publishedWithMatches": "Published and suggested to {{count}} matching people"
+  }
+}

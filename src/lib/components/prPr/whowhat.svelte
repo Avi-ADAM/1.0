@@ -18,6 +18,7 @@
    * @typedef {Object} Props
    * @property {any} [fmiData]
    * @property {any} [rikmashes]
+   * @property {any} [stipendPayments]
    * @property {boolean} [hagdel]
    * @property {any} [salee]
    * @property {number} [allin]
@@ -31,6 +32,7 @@
   let {
     fmiData = [],
     rikmashes = [],
+    stipendPayments = [],
     hagdel = false,
     salee = [],
     allin = 0,
@@ -1167,6 +1169,25 @@
       }
     }
     
+    // Subsistence stipends (PLAN_STIPEND §5). The funder's contribution grows
+    // by k·P, the recipient's shrinks by α·P — a single ledger row with two
+    // signs, so the two books can never come apart. Only CONFIRMED payments
+    // reach here (the query filters on status), because an unconfirmed one has
+    // not moved anybody's share yet.
+    for (const p of stipendPayments) {
+      const a = p?.attributes ?? {};
+      const funderId = a.funder?.data?.id;
+      const recipientId = a.recipient?.data?.id;
+      const credit = Number(a.equityCredit) || 0;
+      const debit = Number(a.equityDebit) || 0;
+      if (funderId != null && credit !== 0) {
+        dictid[funderId] = (dictid[funderId] || 0) + credit;
+      }
+      if (recipientId != null && debit !== 0) {
+        dictid[recipientId] = (dictid[recipientId] || 0) - debit;
+      }
+    }
+
     // Calculate net total
     for (let j = 0; j < fmiData.length; j++) {
       if ('net' in dictid) {
@@ -1181,6 +1202,13 @@
       } else {
         dictid['net'] = rikmashes[j].attributes.total;
       }
+    }
+    // The rikma total moves by exactly (k − α)·P — zero for a plain bilateral
+    // stipend, which is precisely why that case needs nobody else's consent.
+    for (const p of stipendPayments) {
+      const a = p?.attributes ?? {};
+      const net = (Number(a.equityCredit) || 0) - (Number(a.equityDebit) || 0);
+      if (net !== 0) dictid['net'] = (dictid['net'] || 0) + net;
     }
 
     // Build ulist for ALL users

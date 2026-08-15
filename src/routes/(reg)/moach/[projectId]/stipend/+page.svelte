@@ -1,0 +1,338 @@
+<script>
+  /**
+   * The rikma's subsistence-stipend tab (docs/PLAN_STIPEND.md §8).
+   *
+   * What it has to show, and why each part is not optional:
+   *   - the programmes and what is **left** of their budgets, because the
+   *     budget is the bound on the dilution and an exhausted one closes itself;
+   *   - every pledge and both its ends, because "who is funding whom" in a
+   *     rikma should never be a private arrangement nobody else can see;
+   *   - the dilution actually incurred so far, because overlapping programmes
+   *     can add up past what anyone expected (§11.4) and the only defence is
+   *     that the running total is on one screen;
+   *   - and the two buttons: propose a programme, and — when the rikma has no
+   *     funder among its own members — publish the need as an open resource
+   *     request so someone outside can join by funding it.
+   */
+  import { page } from '$app/state';
+  import { onMount } from 'svelte';
+  import { t, isRtl } from '$lib/translations';
+  import { executeAction } from '$lib/client/actionClient';
+  import { toast } from 'svelte-sonner';
+  import Lowding from '$lib/celim/lowding.svelte';
+  import StipendButton from '$lib/components/stipend/StipendButton.svelte';
+  import StipendFundingRequestDialog from '$lib/components/stipend/StipendFundingRequestDialog.svelte';
+
+  let projectId = $derived(page.params.projectId);
+  let myId = $derived(String(page.data.uid ?? ''));
+  let projectName = $derived(page.data.projectBase?.projectName ?? '');
+
+  let loading = $state(true);
+  let overview = $state(null);
+  let fundingFor = $state(null);
+
+  async function load() {
+    loading = true;
+    try {
+      const res = await executeAction('getStipendOverview', { projectId });
+      if (res?.success) overview = res.data;
+      else toast.error($t('stipend.toast.error'));
+    } catch (e) {
+      console.error('[stipend tab] load failed:', e);
+      toast.error($t('stipend.toast.error'));
+    } finally {
+      loading = false;
+    }
+  }
+
+  onMount(load);
+
+  const members = $derived(overview?.members ?? []);
+  const totals = $derived(overview?.totals ?? null);
+  const programs = $derived(overview?.programs ?? []);
+  const pledges = $derived(overview?.pledges ?? []);
+  const policy = $derived(overview?.policyIsDefault ? null : (overview?.policy ?? null));
+
+  function money(n) {
+    return `₪${Number(n ?? 0).toLocaleString()}`;
+  }
+</script>
+
+<svelte:head>
+  <title>{projectName ? `${projectName} · ` : ''}{$t('stipend.tab.title')} · 1lev1</title>
+</svelte:head>
+
+<div class="stipend-page" dir={$isRtl ? 'rtl' : 'ltr'}>
+  {#if loading}
+    <div class="flex justify-center p-12"><Lowding /></div>
+  {:else if overview}
+    <header class="flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <h1 class="text-xl font-bold">{$t('stipend.tab.title')}</h1>
+        <p class="text-sm text-gray-500 max-w-prose">{$t('stipend.tab.intro')}</p>
+        <p class="mt-1 text-xs text-gray-500">
+          {$t('stipend.tab.policy')}: <b>{$t(`stipend.policy.${overview.policy}`)}</b>
+          {#if overview.policyIsDefault}
+            <span class="text-gray-400">· {$t('stipend.tab.policyDefault')}</span>
+          {/if}
+        </p>
+      </div>
+      <StipendButton
+        intent="program"
+        {projectId}
+        {projectName}
+        {members}
+        {myId}
+        {policy}
+        defaultRate={overview.defaultRate}
+        defaultCostShare={overview.defaultCostShare}
+        className="rounded-full border-2 border-teal-500 px-4 py-2 text-sm font-bold text-teal-600 dark:text-teal-300 hover:bg-teal-50 dark:hover:bg-teal-900/20 flex items-center gap-2"
+        onDone={load}
+      />
+    </header>
+
+    {#if totals}
+      <section class="totals">
+        <div class="stat">
+          <span class="stat-label">{$t('stipend.tab.paid')}</span>
+          <span class="stat-value">{money(totals.paid)}</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">{$t('stipend.tab.pending')}</span>
+          <span class="stat-value">{money(totals.pending)}</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">{$t('stipend.tab.budgetLeft')}</span>
+          <span class="stat-value">{money(totals.budgetLeft)}</span>
+        </div>
+        <div class="stat">
+          <!-- (k − α)·ΣP: what the stipends added to the rikma's total, i.e.
+               how much everyone else was diluted, in shekels rather than in
+               an abstract percentage. -->
+          <span class="stat-label">{$t('stipend.tab.netAdded')}</span>
+          <span class="stat-value">{money(totals.netAdded)}</span>
+        </div>
+      </section>
+    {/if}
+
+    <!-- Programmes -->
+    <section class="block">
+      <h2 class="block-title">{$t('stipend.tab.programs')}</h2>
+      {#if programs.length === 0}
+        <p class="empty">{$t('stipend.tab.noPrograms')}</p>
+      {:else}
+        <ul class="list">
+          {#each programs as p (p.id)}
+            <li class="row">
+              <div class="grow">
+                <p class="font-bold">{p.name}</p>
+                <p class="text-xs text-gray-500">
+                  ₪{p.stipendRate}/{$t('stipend.card.hour')} ·
+                  {$t('stipend.terms.costShare')} {Math.round(Number(p.costShare) * 100)}% ·
+                  {$t(`stipend.mode.${p.mode}`)} ·
+                  {$t(`stipend.status.${p.status}`)}
+                </p>
+                <p class="text-xs text-gray-500">
+                  {$t('stipend.tab.spentOf', {
+                    spent: money(p.spent),
+                    cap: money(p.totalCap ?? 0)
+                  })}
+                </p>
+              </div>
+              <div class="flex flex-col gap-2 items-stretch">
+                {#if !p.funderId}
+                  <!-- §12.2 — no funder inside the rikma: go and find one. -->
+                  <button
+                    type="button"
+                    class="rounded-full border border-teal-500 px-3 py-1.5 text-xs font-bold text-teal-600 dark:text-teal-300"
+                    onclick={() => (fundingFor = p)}
+                  >
+                    🔎 {$t('stipend.tab.findFunder')}
+                  </button>
+                {/if}
+                {#if p.status === 'active'}
+                  <StipendButton
+                    intent="offer"
+                    {projectId}
+                    {projectName}
+                    {members}
+                    {myId}
+                    {policy}
+                    programId={p.id}
+                    funderId={p.funderId ?? ''}
+                    defaultRate={p.stipendRate}
+                    defaultCostShare={p.costShare}
+                    label={$t('stipend.tab.pledgeInside')}
+                    className="rounded-full border border-gray-300 dark:border-gray-600 px-3 py-1.5 text-xs font-bold flex items-center gap-1"
+                    onDone={load}
+                  />
+                {/if}
+              </div>
+            </li>
+          {/each}
+        </ul>
+      {/if}
+    </section>
+
+    <!-- Pledges -->
+    <section class="block">
+      <h2 class="block-title">{$t('stipend.tab.pledges')}</h2>
+      {#if pledges.length === 0}
+        <p class="empty">{$t('stipend.tab.noPledges')}</p>
+      {:else}
+        <ul class="list">
+          {#each pledges as pl (pl.id)}
+            <li class="row">
+              <div class="grow">
+                <p class="font-bold">{pl.funderName} → {pl.recipientName}</p>
+                <p class="text-xs text-gray-500">
+                  ₪{pl.terms.stipendRate}/{$t('stipend.card.hour')} ·
+                  {$t(`stipend.mode.${pl.terms.mode}`)} ·
+                  {$t(`stipend.status.${pl.status}`)}
+                </p>
+                <p class="text-xs text-gray-500">
+                  {$t('stipend.tab.paidSoFar', { count: money(pl.paidTotal) })}
+                  {#if pl.terms.totalCap}
+                    · {$t('stipend.terms.totalCap')}: {money(pl.terms.totalCap)}
+                  {/if}
+                </p>
+              </div>
+            </li>
+          {/each}
+        </ul>
+      {/if}
+    </section>
+
+    <!-- Per-member ledger: who gained and who gave up equity through stipends -->
+    {#if overview.perMember?.length}
+      <section class="block">
+        <h2 class="block-title">{$t('stipend.tab.perMember')}</h2>
+        <ul class="list">
+          {#each overview.perMember as m (m.userId)}
+            <li class="row">
+              <div class="grow">
+                <p class="font-bold">{m.username}</p>
+                <p class="text-xs text-gray-500">
+                  {#if m.funded > 0}{$t('stipend.tab.funded', { count: money(m.funded) })}{/if}
+                  {#if m.received > 0}
+                    · {$t('stipend.tab.received', { count: money(m.received) })}
+                  {/if}
+                </p>
+              </div>
+              <span class="whitespace-nowrap font-bold {m.net >= 0 ? 'text-teal-600' : 'text-rose-600'}">
+                {m.net >= 0 ? '+' : ''}{money(m.net)}
+              </span>
+            </li>
+          {/each}
+        </ul>
+        <p class="mt-2 text-xs text-gray-500">{$t('stipend.tab.perMemberNote')}</p>
+      </section>
+    {/if}
+
+    <!-- Member-to-member offer: the "another user in the rikma" entry point -->
+    <section class="block">
+      <h2 class="block-title">{$t('stipend.tab.members')}</h2>
+      <ul class="list">
+        {#each members as m (m.id)}
+          <li class="row">
+            <span class="grow font-medium">{m.username}</span>
+            {#if String(m.id) !== myId}
+              <StipendButton
+                intent="offer"
+                {projectId}
+                {projectName}
+                {members}
+                {myId}
+                funderId={myId}
+                recipientId={String(m.id)}
+                {policy}
+                defaultRate={overview.defaultRate}
+                defaultCostShare={overview.defaultCostShare}
+                label={$t('stipend.tab.offerTo', { name: m.username })}
+                className="rounded-full border border-gray-300 dark:border-gray-600 px-3 py-1.5 text-xs font-bold flex items-center gap-1"
+                onDone={load}
+              />
+            {:else}
+              <StipendButton
+                intent="request"
+                {projectId}
+                {projectName}
+                {members}
+                {myId}
+                recipientId={myId}
+                {policy}
+                defaultRate={overview.defaultRate}
+                defaultCostShare={overview.defaultCostShare}
+                className="rounded-full border border-gray-300 dark:border-gray-600 px-3 py-1.5 text-xs font-bold flex items-center gap-1"
+                onDone={load}
+              />
+            {/if}
+          </li>
+        {/each}
+      </ul>
+    </section>
+  {/if}
+</div>
+
+<StipendFundingRequestDialog
+  bind:program={fundingFor}
+  {projectName}
+  onDone={load}
+/>
+
+<style>
+  .stipend-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 0.5rem 0 3rem;
+  }
+  .totals {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.75rem;
+  }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    border: 1px solid var(--gold, #d4af37);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+  }
+  .stat-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+  .stat-value {
+    font-size: 1.15rem;
+    font-weight: 800;
+  }
+  .block-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+  }
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: 1px solid rgba(128, 128, 128, 0.3);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+  }
+  .grow {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .empty {
+    font-size: 0.85rem;
+    opacity: 0.7;
+  }
+</style>

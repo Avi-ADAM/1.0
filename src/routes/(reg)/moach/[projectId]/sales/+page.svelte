@@ -70,6 +70,7 @@
       fmiData={financials.finnished_missions?.data || []}
       rikmashes={financials.rikmashes?.data || []}
       salee={financials.sales?.data || []}
+      stipendPayments={financials.stipend_payments?.data || []}
       restime={base?.restime}
       projectUsers={base?.user_1s?.data || []}
       bmiData={financials.matanotofs?.data || []}

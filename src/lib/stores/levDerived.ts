@@ -18,6 +18,8 @@ import {
   wishOffersStore,
   siteSharePayablesStore,
   openSiteShareDecisionsStore,
+  stipendPayablesStore,
+  stipendConfirmationsStore,
   askedResourcesStore,
   decisionsStore,
   projectsStore,
@@ -45,6 +47,8 @@ import {
   processWishOffers,
   processSiteSharePayables,
   processOpenSiteShareDecisions,
+  processStipendPayables,
+  processStipendConfirmations,
   mergeAndSort,
   type DisplayItem
 } from '$lib/utils/levProcessors';
@@ -280,6 +284,21 @@ export const processedSiteSharePayables: Readable<DisplayItem[]> = derived(
  * Depends on `processedHalukas` so the card auto-hides the moment that split's
  * haluka card (gate 2) is present — the member then decides there instead.
  */
+/**
+ * Stipend cycles I owe as a funder, and stipend money awaiting my confirmation
+ * as a recipient (PLAN_STIPEND §8). Both are loaded by `getStipendWork`, which
+ * derives the amounts from approved hours server-side.
+ */
+export const processedStipendPayables: Readable<DisplayItem[]> = derived(
+  [stipendPayablesStore, projectsStore],
+  ([$payables, $projects]) => processStipendPayables($payables, $projects)
+);
+
+export const processedStipendConfirmations: Readable<DisplayItem[]> = derived(
+  [stipendConfirmationsStore, projectsStore],
+  ([$confirmations, $projects]) => processStipendConfirmations($confirmations, $projects)
+);
+
 export const processedOpenSiteShareDecisions: Readable<DisplayItem[]> = derived(
   [openSiteShareDecisionsStore, projectsStore, processedHalukas],
   ([$decisions, $projects, $halukas]) => {
@@ -337,6 +356,8 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
     processedWishOffers,
     processedSiteSharePayables,
     processedOpenSiteShareDecisions,
+    processedStipendPayables,
+    processedStipendConfirmations,
     milon,
     projectFilter
   ],
@@ -360,6 +381,8 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
     $wishOffers,
     $siteSharePayables,
     $openSiteShareDecisions,
+    $stipendPayables,
+    $stipendConfirmations,
     $milon,
     $projectFilter
   ]) => {
@@ -383,7 +406,9 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
       $purchases,
       $wishOffers,
       $siteSharePayables,
-      $openSiteShareDecisions
+      $openSiteShareDecisions,
+      $stipendPayables,
+      $stipendConfirmations
     );
 
     // Step 2: Apply milon filtering (visibility settings)
@@ -428,6 +453,13 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
           return true; // Always show: an outstanding payment owed by the member
         case 'sitesharedecide':
           return true; // Always show: an open giving decision on an auto-approved split
+        case 'stipendpay':
+          return true; // Always show: a stipend cycle this member committed to fund
+        case 'stipendconfirm':
+          return true; // Always show: money is waiting on my word that it arrived
+        // A stipend proposal is a decision like any other — same filter.
+        case 'stipend':
+          return $milon.hachla;
         case 'hachla':
         // Archive/edit proposals are decisions too — same filter switch.
         case 'archObject':

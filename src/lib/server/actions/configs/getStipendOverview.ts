@@ -62,6 +62,10 @@ const handler: ActionExecutionHandler = async (params, context) => {
   return {
     data: {
       projectId,
+      // The member list rides along so a stipend dialog opened from a card
+      // (which knows a mission, not a rikma) can offer the funder/recipient
+      // pickers without a second round trip.
+      members: project.members,
       policy: effectiveStipendPolicy(project.policy),
       policyIsDefault: project.policy == null,
       defaultRate: project.defaultRate,
@@ -78,9 +82,7 @@ const handler: ActionExecutionHandler = async (params, context) => {
         pending: round2(
           payments.filter((p) => p.status === 'sent').reduce((sum, p) => sum + p.amount, 0)
         ),
-        budgetLeft: round2(
-          programs.reduce<number>((sum, p) => sum + (p.remainingCap ?? 0), 0)
-        )
+        budgetLeft: round2(sumBudgets(programs))
       },
       perMember: Array.from(perMember.values()).map((row) => ({
         ...row,
@@ -91,6 +93,13 @@ const handler: ActionExecutionHandler = async (params, context) => {
     updateStrategy: { type: 'none' as const }
   };
 };
+
+/** Σ of what is left in every open programme — the ceiling on future dilution. */
+function sumBudgets(programs: Array<{ remainingCap: number | null }>): number {
+  let total = 0;
+  for (const p of programs) total += p.remainingCap ?? 0;
+  return total;
+}
 
 function round2(n: number): number {
   return Math.round((n + Number.EPSILON) * 100) / 100;

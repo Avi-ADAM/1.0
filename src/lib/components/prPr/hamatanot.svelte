@@ -181,6 +181,13 @@
     fmiData = [],
     /** @type {Array<any>} */
     rikmashes = [],
+    /**
+     * Confirmed subsistence-stipend payments (PLAN_STIPEND). They carry the
+     * equity credit/debit lines the split table has to fold into each
+     * member's contribution total.
+     * @type {Array<any>}
+     */
+    stipendPayments = [],
     /** @type {string} */
     projectId,
     /** @type {Array<any>} */
@@ -925,6 +932,7 @@
             {fmiData}
             users={projectUsers}
             {rikmashes}
+            {stipendPayments}
             {restime}
           />
         {/if}
