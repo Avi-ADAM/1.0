@@ -437,6 +437,52 @@ export interface OpenSiteShareDecisionData {
   [key: string]: any;
 }
 
+/**
+ * One stipend cycle a funder owes (PLAN_STIPEND §6). `amount` is already
+ * capped by the monthly ceiling, the pledge's remaining budget and the
+ * program's — the funder confirms a derived number, never types one.
+ */
+export interface StipendPayableData {
+  pledgeId: string;
+  projectId: string;
+  recipientId: string;
+  recipientName: string;
+  hours: number;
+  amount: number;
+  gross: number;
+  cappedBy: 'monthlyCap' | 'totalCap' | 'programCap' | null;
+  /** This settlement finishes the pledge's budget — the last cycle. */
+  exhausts: boolean;
+  stipendRate: number;
+  mode: 'equity' | 'advance' | 'gift';
+  cycleStart: string;
+  cycleEnd: string;
+  [key: string]: any;
+}
+
+/**
+ * Money a funder marked as sent that I (the recipient) have not answered yet.
+ * Confirming is what lets the equity lines count; saying nothing for the
+ * rikma's restime does the same, and "nothing arrived" is a counter of 0.
+ */
+export interface StipendConfirmationData {
+  paymentId: string;
+  pledgeId: string | null;
+  projectId: string | null;
+  projectName?: string;
+  funderId: string | null;
+  funderName: string;
+  funderPic?: string | null;
+  amount: number;
+  hours: number;
+  stipendRate: number;
+  mode: 'equity' | 'advance' | 'gift';
+  cycleStart: string | null;
+  cycleEnd: string | null;
+  halukaId?: string | null;
+  [key: string]: any;
+}
+
 /** Filter configuration for what to display */
 export interface MilonConfig {
   hachla: boolean;   // החלטות
@@ -538,6 +584,16 @@ export const siteSharePayablesStore: Writable<SiteSharePayableData[]> = writable
 
 /** Open (pending) site-share decisions whose split already auto-approved */
 export const openSiteShareDecisionsStore: Writable<OpenSiteShareDecisionData[]> = writable([]);
+
+/**
+ * Subsistence-stipend cycles I owe as a funder (PLAN_STIPEND §8). The amount
+ * is computed server-side from approved hours, so the card shows the number
+ * the settlement will actually write — never an estimate.
+ */
+export const stipendPayablesStore: Writable<StipendPayableData[]> = writable([]);
+
+/** Stipend money sent to me that I have not yet confirmed arrived */
+export const stipendConfirmationsStore: Writable<StipendConfirmationData[]> = writable([]);
 
 // ========== UI State Stores ==========
 

@@ -19,6 +19,11 @@
   import SaleCard from './SaleCard.svelte';
   import CustomerSaleCard from './CustomerSaleCard.svelte';
   import SiteSharePayCard from './SiteSharePayCard.svelte';
+  // Subsistence stipend (PLAN_STIPEND): the proposal, the funder's cycle and
+  // the recipient's "it arrived".
+  import StipendDecisionCard from './StipendDecisionCard.svelte';
+  import StipendPayCard from './StipendPayCard.svelte';
+  import StipendConfirmCard from './StipendConfirmCard.svelte';
   import SiteShareIncomeCard from './SiteShareIncomeCard.svelte';
   import SiteShareAutoApprovedCard from './SiteShareAutoApprovedCard.svelte';
   import WishOfferCard from './WishOfferCard.svelte';
@@ -619,6 +624,31 @@
                   onProj={proj}
                 /></SwiperSlide
               >
+            {:else if buble.ani === 'stipendpay'}
+              <SwiperSlide
+                class="{isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'} "
+                ><StipendPayCard
+                  {buble}
+                  isFirst={currentIndex === i}
+                  onProj={proj}
+                  onDone={delo}
+                /></SwiperSlide
+              >
+            {:else if buble.ani === 'stipendconfirm'}
+              <SwiperSlide
+                class="{isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'} "
+                ><StipendConfirmCard
+                  {buble}
+                  isFirst={currentIndex === i}
+                  onProj={proj}
+                  onUser={user}
+                  onDone={delo}
+                /></SwiperSlide
+              >
             {:else if buble.ani === 'sitesharedecide'}
               <SwiperSlide
                 class="{isMobileOrTablet()
@@ -1204,6 +1234,24 @@
                   projectName={buble.projectName}
                   logoSrc={buble.src}
                   memberCount={buble.noof}
+                  timegramaDate={buble.timegramaDate}
+                  isFirst={currentIndex === i}
+                  onProj={proj}
+                  onUser={user}
+                  onChat={chat}
+                  onDone={delo}
+                /></SwiperSlide
+              >
+            {:else if buble.ani === 'stipend' && milon.hachla == true}
+              <SwiperSlide
+                class={isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'}
+                ><StipendDecisionCard
+                  stipend={buble.stipend}
+                  projectId={buble.projectId}
+                  projectName={buble.projectName}
+                  logoSrc={buble.src}
                   timegramaDate={buble.timegramaDate}
                   isFirst={currentIndex === i}
                   onProj={proj}

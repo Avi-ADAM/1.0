@@ -36,7 +36,12 @@
   import Coinsui from '$lib/components/lev/newcoinui.svelte';
   import Cardsui from '$lib/components/lev/cards/cards.svelte';
   import Tooltip from '$lib/celim/tooltip.svelte';
-  import { siteSharePayablesStore, openSiteShareDecisionsStore } from '$lib/stores/levStores';
+  import {
+    siteSharePayablesStore,
+    openSiteShareDecisionsStore,
+    stipendPayablesStore,
+    stipendConfirmationsStore
+  } from '$lib/stores/levStores';
   import { executeAction } from '$lib/client/actionClient';
 
   // Dialog components
@@ -170,6 +175,21 @@
     }
   }
 
+  // Subsistence stipend (PLAN_STIPEND §8): cycles I owe as a funder and money
+  // waiting on my "it arrived" as a recipient. Both amounts are derived
+  // server-side from approved hours, so the cards never do the math.
+  async function loadStipendWork() {
+    try {
+      const res = await executeAction('getStipendWork', {});
+      if (res?.success) {
+        stipendPayablesStore.set(res.data?.payables ?? []);
+        stipendConfirmationsStore.set(res.data?.confirmations ?? []);
+      }
+    } catch (e) {
+      console.error('[Stipend] load work failed:', e);
+    }
+  }
+
   function handleCoinLapach(event) {
     // Remove item from display optimistically
     displayItems = displayItems.filter(
@@ -220,6 +240,7 @@
     unsubscribeSocket = setupSocketListeners(page.data.uid, '', data.lang);
     loadSiteSharePayables();
     loadOpenSiteShareDecisions();
+    loadStipendWork();
 
     // Errors of a background refresh must not blank an already-rendered page —
     // only an expired session needs action.

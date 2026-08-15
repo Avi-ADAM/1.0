@@ -1,0 +1,197 @@
+{
+  "button": {
+    "offer": "Ofrecer una beca de subsistencia",
+    "request": "Pedir una beca de subsistencia",
+    "program": "Programa de becas"
+  },
+  "mode": {
+    "equity": "Participación",
+    "advance": "Anticipo",
+    "gift": "Donación",
+    "equityExplain": "El dinero entra en los libros de la rikma y mueve los porcentajes",
+    "advanceExplain": "Se registra como anticipo, devuelto solo con los repartos de beneficio — nunca del bolsillo de quien recibe",
+    "giftExplain": "El dinero pasa sin afectar la parte de nadie"
+  },
+  "policy": {
+    "off": "Esta rikma tiene las becas desactivadas",
+    "bilateral": "Solo becas que no diluyen a nadie",
+    "collective": "Todas las vías, incluido un programa de toda la rikma"
+  },
+  "status": {
+    "proposed": "Propuesta",
+    "active": "Activa",
+    "exhausted": "Presupuesto agotado",
+    "closed": "Cerrada",
+    "withdrawn": "Retirada"
+  },
+  "terms": {
+    "mode": "Qué compra el dinero",
+    "rate": "Tarifa de la beca (por hora)",
+    "marketRate": "La tarifa de mercado de la misión es {{count}} por hora. La beca no puede superarla",
+    "costShare": "Quién asume el coste",
+    "costShareRikma": "La rikma",
+    "costShareRecipient": "Quien recibe",
+    "costShareExplainFull": "Lo asume solo quien recibe: su participación baja lo que vale la beca y nadie más se ve afectado",
+    "costShareExplainNone": "Lo asume toda la rikma: quien recibe conserva su valor y todos se diluyen juntos",
+    "costShareExplainMixed": "El coste se reparte entre quien recibe y el resto de la rikma",
+    "monthlyCap": "Tope mensual",
+    "totalCap": "Presupuesto total",
+    "totalCapExplain": "Es también el final automático: cuando se acaba el presupuesto el compromiso se cierra solo",
+    "noticeCycles": "Ciclos de aviso antes de parar",
+    "revenueTrigger": "Ingreso mensual que la termina",
+    "revenueTriggerExplain": "Cuando el ingreso mensual supera el umbral, la beca termina y vuelve el reparto normal",
+    "revenueTriggerSet": "Termina sola con un ingreso mensual de {{count}}",
+    "recoursePersonal": "El anticipo también puede cobrarse personalmente a quien recibe",
+    "recourseExplain": "Por defecto un anticipo se devuelve solo con los repartos. De otro modo creamos una deuda personal a quien necesitaba dinero para vivir — justo lo contrario del objetivo",
+    "more": "Más condiciones",
+    "scopeBilateral": "Acuerdo entre dos: nadie fuera de las dos partes se ve afectado",
+    "scopeRikma": "Requiere a toda la rikma: estas condiciones aumentan el valor total y por tanto diluyen a todos"
+  },
+  "error": {
+    "rateRequired": "Una beca necesita una tarifa por hora",
+    "rateAboveMarket": "La tarifa de la beca supera la tarifa de mercado de la misión — la participación de quien recibe quedaría negativa",
+    "noMarketRate": "Esta misión no tiene tarifa de mercado, así que no hay parte que ceder. Propónla como donación",
+    "policyOff": "Esta rikma ha desactivado las becas de subsistencia",
+    "policyBilateralOnly": "Estas condiciones diluyen al resto de miembros y esta rikma solo admite becas que no lo hacen. Sube la parte del coste que asume quien recibe, o pide a la rikma que abra un programa de becas",
+    "outsideEnvelopeMode": "Las condiciones usan una modalidad distinta a la que permite el programa",
+    "outsideEnvelopeRate": "La tarifa supera lo que permite el programa",
+    "outsideEnvelopeCostShare": "El programa no permite cargar tanto coste sobre la rikma",
+    "outsideEnvelopeMultiplier": "La prima de riesgo supera lo que permite el programa",
+    "programExhausted": "El presupuesto del programa ya está agotado"
+  },
+  "propose": {
+    "titleOffer": "Ofrecer una beca de subsistencia",
+    "titleRequest": "Pedir una beca de subsistencia",
+    "titleProgram": "Un programa de becas para la rikma",
+    "introPledge": "Una beca de subsistencia es un pago mensual por horas aprobadas, a una tarifa muy inferior al valor del trabajo. La única pregunta que queda es qué hace ese dinero con los porcentajes.",
+    "introProgram": "El programa fija la política una sola vez — tarifa, presupuesto cerrado y quién asume el coste. Una vez aprobado, cada pareja financiador↔receptor firma sus condiciones dentro de él, sin otra votación.",
+    "forMission": "Para la misión: {{name}}",
+    "funder": "Quién financia",
+    "recipient": "Quién recibe",
+    "funderOptional": "Financiador (si ya lo hay)",
+    "noFunderYet": "Todavía sin financiador",
+    "noFunderYetExplain": "Se puede aprobar un programa sin financiador y publicar después la necesidad para que alguien la financie",
+    "pick": "Elegir",
+    "why": "Unas palabras para la otra parte",
+    "scopeNoteBilateral": "Se envía solo a la otra parte. Sin respuesta dentro del tiempo de la rikma, se aprueba sola.",
+    "scopeNoteRikma": "Se envía a todos los miembros, mostrando qué le pasa a la parte de cada uno."
+  },
+  "tradeoff": {
+    "title": "Qué cedes y qué recibes",
+    "without": "Sin beca: {{count}}% de la rikma",
+    "with": "Con la beca: {{count}}% de la rikma + {{cash}} ahora",
+    "noneGivenUp": "Con estas condiciones no cedes ninguna parte — el coste se reparte por toda la rikma"
+  },
+  "card": {
+    "typePledge": "Beca de subsistencia",
+    "typeProgram": "Programa de becas",
+    "hour": "hora",
+    "round": "Ronda {{count}}",
+    "reason": "Motivo",
+    "proposedBy": "Propuesto por {{name}}",
+    "signed": "Firmaron: {{count}}",
+    "awaiting": "Pendientes: {{count}}",
+    "autoApprove": "Sin respuesta — se aprueba sola",
+    "signedByMe": "Firmaste la versión sobre la mesa. Esperando a la otra parte.",
+    "dilutionTitle": "Qué hace esto con tu parte",
+    "dilutionNow": "Tu parte hoy: {{count}}%",
+    "dilutionAfter": "Si se gasta el presupuesto: {{count}}% (−{{points}} puntos)",
+    "dilutionNone": "Tu parte no se mueve — estas condiciones no diluyen a nadie salvo a las dos partes"
+  },
+  "counter": {
+    "title": "Proponer otras condiciones",
+    "intro": "Aquí no hay un «no». Propón otra tarifa, otro presupuesto u otro reparto del coste — y esa pasa a ser la versión sobre la mesa.",
+    "why": "Por qué así",
+    "clockNote": "Una contrapropuesta reinicia el reloj de respuesta."
+  },
+  "pay": {
+    "cardType": "Ciclo de beca por pagar",
+    "body": "El ciclo se cerró. Esto es lo acumulado por {{name}} según horas aprobadas.",
+    "hours": "Horas aprobadas: {{count}}",
+    "rate": "Tarifa: {{count}} por hora",
+    "total": "A pagar: {{count}}",
+    "capped": {
+      "monthlyCap": "Limitado por el tope mensual (por horas serían {{count}})",
+      "totalCap": "Limitado por lo que queda del presupuesto del compromiso (por horas serían {{count}})",
+      "programCap": "Limitado por lo que queda del presupuesto del programa (por horas serían {{count}})"
+    },
+    "lastCycle": "Este es el último ciclo — el presupuesto termina aquí",
+    "modeNote": {
+      "equity": "El pago moverá los porcentajes solo cuando quien recibe confirme que llegó",
+      "advance": "Anticipo: se devuelve solo con los repartos, sin efecto sobre los porcentajes",
+      "gift": "Donación: sin efecto alguno sobre los porcentajes"
+    },
+    "action": "Pagar y cerrar el ciclo",
+    "sent": "Enviado. Esperando la confirmación de recepción.",
+    "nothingThisCycle": "No se acumularon horas aprobadas en este ciclo"
+  },
+  "confirm": {
+    "cardType": "¿Llegó la beca?",
+    "body": "{{name}} marcó como enviado {{count}}.",
+    "equityNote": "Confirmar es lo que actualiza los porcentajes. Hasta entonces nada se mueve — y sin respuesta dentro del tiempo de la rikma se confirma solo.",
+    "notExactly": "No exactamente",
+    "howMuchArrived": "Cuánto llegó en realidad",
+    "zeroNote": "0 = no llegó nada. El compromiso sigue y puede enviarse otra vez — no es una parada ni un rechazo.",
+    "sendCorrection": "Informar lo que llegó",
+    "action": "Sí, llegó",
+    "done": "Confirmado. Los porcentajes se actualizaron.",
+    "reportedNothing": "Registrado que no llegó nada. El compromiso sigue."
+  },
+  "actions": {
+    "cancel": "Cancelar",
+    "sending": "Enviando…",
+    "propose": "Enviar la propuesta",
+    "sendCounter": "Enviar contracondiciones",
+    "approve": "Aprobar",
+    "approving": "Aprobando…",
+    "negotiate": "Proponer distinto",
+    "chat": "Conversar"
+  },
+  "toast": {
+    "pledgeProposed": "Enviado a la otra parte",
+    "programProposed": "El programa se propuso a la rikma",
+    "programLive": "El programa está en vigor",
+    "countered": "Tus contracondiciones están sobre la mesa",
+    "signed": "Firmado. Esperando al resto.",
+    "matured": "Todos firmaron — el compromiso está en vigor",
+    "error": "Algo salió mal"
+  },
+  "tab": {
+    "title": "Becas de subsistencia",
+    "intro": "Un socio financiando a otro: un pago mensual por horas aprobadas, a una tarifa inferior a la de mercado. Aquí se ve quién financia a quién, qué queda de cada presupuesto y cuánta dilución se ha acumulado de verdad.",
+    "policy": "Política de la rikma",
+    "policyDefault": "por defecto (nunca fijada explícitamente)",
+    "paid": "Pagado",
+    "pending": "Pendiente de confirmación",
+    "budgetLeft": "Queda de presupuesto",
+    "netAdded": "Añadido al valor de la rikma",
+    "programs": "Programas",
+    "noPrograms": "Esta rikma aún no tiene programa de becas",
+    "pledges": "Compromisos",
+    "noPledges": "Todavía no hay compromisos",
+    "perMember": "Por miembro",
+    "perMemberNote": "Un número positivo significa que su participación creció por financiar; uno negativo, que cedió participación a cambio de dinero ahora.",
+    "members": "Miembros",
+    "offerTo": "Ofrecer a {{name}}",
+    "findFunder": "Buscar financiador",
+    "pledgeInside": "Compromiso dentro del programa",
+    "spentOf": "Usado {{spent}} de {{cap}}",
+    "paidSoFar": "Pagado hasta ahora: {{count}}",
+    "funded": "Financió: {{count}}",
+    "received": "Recibió: {{count}}"
+  },
+  "funding": {
+    "title": "Buscar un socio que lo financie",
+    "intro": "La rikma publica la necesidad como una petición de recurso normal. Aparece en la búsqueda, se sugiere a quien ofrece ese tipo de recurso, y quien la tome se une a la rikma como socio.",
+    "months": "Para cuántos meses",
+    "monthly": "Unos {{count}} al mes",
+    "name": "Título de la petición",
+    "namePlaceholder": "Financiar becas de subsistencia para los miembros",
+    "descrip": "Detalles",
+    "descripPlaceholder": "Qué hace la rikma, por qué hacen falta las becas y qué recibe quien financia",
+    "joinNote": "Quien tome esta petición pasa por el flujo de incorporación normal y se convierte en socio de la rikma.",
+    "action": "Publicar la petición",
+    "published": "Petición publicada",
+    "publishedWithMatches": "Publicada y sugerida a {{count}} personas afines"
+  }
+}

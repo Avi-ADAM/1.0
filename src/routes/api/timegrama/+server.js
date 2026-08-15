@@ -10,6 +10,7 @@ import { Askm } from './askm.svelte';
 import { Decision } from './decision.svelte';
 import { Dormancy } from './mesimabetahalich.svelte';
 import { ArchiveEffective } from './archiveEffective.svelte';
+import { StipendPayment } from './stipendPayment.svelte';
 //ask need to creater 0on first vote or on request if the requester is project member4
 //מעביר ראשון ראשון ברסק , אם מישהו ביקש מחכים למענה בעניינו ורק לאחר שיש כן 1 לפחות או לא 1 לפחות  ניתן לקבלו או לא 1 לפחות וניתן להציע לאנשים נוספים, בקשה של הקודם כאשר יש לא נשארת אך ניתן להוסיף עוד סקשות 
 import { SendToAdmin } from '$lib/server/sendToAdmin.js';
@@ -42,6 +43,10 @@ async function x(id,kind,taid, fetch){
     }else if(kind == "mashabetahalich" || kind == "matanot"){
       // A recurring commitment archived "at end of cycle" — this is the day.
       await ArchiveEffective(id,taid,kind)
+    }else if(kind == "stipend_payment"){
+      // "Did the stipend arrive?" — no answer within restime confirms it
+      // (PLAN_STIPEND §6), which is what lets its equity lines count.
+      await StipendPayment(id,taid)
     }
 
 }
@@ -62,11 +67,14 @@ export async function GET({ fetch }) {
     mesimabetahalich{data{id}} 
     pendm{data{id}} 
     tosplit{data{id}} 
-    pmash{data{id}} 
-    act{data{id}} 
-    actt{data{id}} 
+    pmash{data{id}}
+    act{data{id}}
+    actt{data{id}}
     sheirutpend{data{id}}
-}}} 
+    stipend_payment{data{id}}
+    mashabetahalich{data{id}}
+    matanot{data{id}}
+}}}
  }
     `; 
  try {

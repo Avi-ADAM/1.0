@@ -28,6 +28,7 @@ import type {
   WishOfferData
 } from '$lib/stores/levStores';
 import { buildArchiveDecisionView } from '$lib/archive/decisionView.js';
+import { buildStipendDecisionView } from '$lib/stipend/decisionView.js';
 import { calculateScore } from './suggestionMatchers';
 
 /**
@@ -1125,6 +1126,37 @@ export function extractDecisions(
             timegramaId: decision.attributes.timegrama?.data?.id,
             timegramaDate: decision.attributes.timegrama?.data?.attributes?.date,
             archive: view
+          } as any);
+          continue;
+        }
+
+        // Subsistence stipend proposals (PLAN_STIPEND). A pledge is bilateral
+        // (funder + recipient); a program is rikma-wide because it raises the
+        // rikma's total value and so dilutes everyone. `buildStipendDecisionView`
+        // derives which of the two applies, so this branch handles both.
+        if (kind === 'stipendProgram' || kind === 'stipendPledge') {
+          const memberIds = (project.attributes?.user_1s?.data ?? []).map((u: any) =>
+            String(u.id)
+          );
+          const view = buildStipendDecisionView(decision, memberIds, String(userData.id));
+          if (!view) continue; // no terms on the table — nothing to decide on
+          // Not my proposal to answer, or I already signed the standing round.
+          if (!view.signerIds.includes(String(userData.id))) continue;
+          if (!view.myTurn && !includeNotMyTurn) continue;
+
+          decisions.push({
+            id: decision.id,
+            projectId: project.id,
+            decision: 'stipend',
+            priority: 10,
+            myid: userData.id,
+            kind,
+            createdAt: decision.attributes.createdAt,
+            vots,
+            users: vots,
+            timegramaId: decision.attributes.timegrama?.data?.id,
+            timegramaDate: decision.attributes.timegrama?.data?.attributes?.date,
+            stipend: view
           } as any);
           continue;
         }

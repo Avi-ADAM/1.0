@@ -73,6 +73,44 @@ const ARCH_DECISION_FIELDS = `
                       data { id attributes { name desc price quant kindOf } }
                     }`;
 
+/**
+ * The subsistence-stipend half of a Decision (PLAN_STIPEND §5).
+ *
+ * Same rule as ARCH_DECISION_FIELDS above: `buildStipendDecisionView` returns
+ * null — and the lev extractor then drops the card — when there are no rounds,
+ * so every query that feeds decisions into the lev pipeline must select these.
+ * A thinner selection anywhere makes the card appear and then vanish when the
+ * full lev load overwrites the slice store.
+ */
+const STIPEND_DECISION_FIELDS = `
+                    negostip {
+                      ordern
+                      why
+                      zman
+                      mode
+                      costShare
+                      equityMultiplier
+                      stipendRate
+                      monthlyCap
+                      totalCap
+                      noticeCycles
+                      revenueTrigger
+                      recourse
+                      scope
+                      start
+                      end
+                      cycleSize
+                      proposedBy { data { id attributes { username } } }
+                    }
+                    stipFunder {
+                      data { id attributes { username profilePic { data { attributes { url } } } } }
+                    }
+                    stipRecipient {
+                      data { id attributes { username profilePic { data { attributes { url } } } } }
+                    }
+                    stipendProgram { data { id attributes { name totalCap spent status } } }
+                    stipendPledge { data { id attributes { status paidTotal } } }`;
+
 const qids_base = {
   '1chatsend': `mutation  CreateMessage($fid : ID, $fidn: Int, $idL: ID , $da: DateTime, $mes: String)
     {createMessage(
@@ -3129,6 +3167,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
             users_permissions_user { data { id } }
           }
 ${ARCH_DECISION_FIELDS}
+${STIPEND_DECISION_FIELDS}
         }
       }
     }
@@ -4439,6 +4478,7 @@ ${ARCH_DECISION_FIELDS}
                       }
                     }
 ${ARCH_DECISION_FIELDS}
+${STIPEND_DECISION_FIELDS}
                   }
                 }
               }
@@ -9169,6 +9209,20 @@ export const moachQids = {
               }
             }
           }
+          # Subsistence-stipend equity lines (PLAN_STIPEND §5). Only CONFIRMED
+          # rows are selected: an unconfirmed payment must not move a single
+          # share, so the split page never even sees one.
+          stipend_payments(filters: { status: { eq: "confirmed" } }, pagination: { limit: -1 }) {
+            data {
+              id
+              attributes {
+                amount hours stipendRate equityCredit equityDebit mode costShare
+                equityMultiplier cycleStart cycleEnd
+                funder { data { id attributes { username } } }
+                recipient { data { id attributes { username } } }
+              }
+            }
+          }
         }
       }
     }
@@ -11083,6 +11137,7 @@ export const qids = {
                       }
                     }
 ${ARCH_DECISION_FIELDS}
+${STIPEND_DECISION_FIELDS}
                   }
                 }
               }

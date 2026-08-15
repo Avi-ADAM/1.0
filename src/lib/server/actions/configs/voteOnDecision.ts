@@ -22,6 +22,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
 import { signObjectChange } from '$lib/server/archive/vote.js';
+import { signStipend } from '$lib/server/stipend/vote.js';
 import {
   fetchSaleClaim,
   standingOrder,
@@ -233,6 +234,66 @@ async function handleObjectChangeVote(
   };
 }
 
+/**
+ * stipendProgram / stipendPledge branch (PLAN_STIPEND §5).
+ *
+ * Same round-based signing as the archive kinds; what differs is only the set
+ * of signers, and that set is derived from the terms, not stored: while the
+ * rikma's total value does not move, only the two parties are asked.
+ */
+async function handleStipendVote(
+  params: Record<string, any>,
+  context: any,
+  notifier: any,
+) {
+  const decisionId = String(params.decisionId);
+  const exec = execFromContext(context);
+  const outcome = await signStipend(exec, decisionId, String(context.userId));
+
+  if (notifier && params.projectId) {
+    notifier
+      .notify(
+        {
+          recipients: outcome.consensus
+            ? { type: 'projectMembers', config: { projectIdParam: 'projectId', excludeSender: false } }
+            : { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
+          templates: {
+            title: outcome.consensus
+              ? { he: 'המלגה אושרה', en: 'The stipend was approved' }
+              : { he: 'נדרשת תגובתך', en: 'Your response is needed' },
+            body: outcome.consensus
+              ? {
+                  he: 'ההסכמה הושלמה וההתחייבות נכנסה לתוקף. התשלום מחושב מהשעות שאושרו בכל מחזור.',
+                  en: 'Everyone signed and the pledge is live. Each cycle is paid from the hours the rikma approved.',
+                }
+              : {
+                  he: 'צד נוסף חתם על הגרסה שעל השולחן — נותרה תגובתך.',
+                  en: 'Another party signed the version on the table — yours is still open.',
+                },
+          },
+          channels: ['socket'],
+          metadata: { type: 'voteUpdate', url: 'lev' },
+        },
+        { recipients: outcome.consensus ? undefined : outcome.awaiting, projectId: params.projectId },
+        { projectId: params.projectId, decisionId },
+        context,
+      )
+      .catch((e: unknown) => console.warn('[voteOnDecision:stipend] notification failed:', e));
+  }
+
+  return {
+    data: {
+      decisionId,
+      kind: params.kind,
+      order: outcome.order,
+      consensus: outcome.consensus,
+      awaiting: outcome.awaiting,
+      applied: outcome.applied ?? null,
+    },
+    updateStrategy: { type: 'fullRefresh' as const },
+  };
+}
+
 const voteOnDecisionHandler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
   const { decisionId, projectId, kind, newpicid, timegramaId } = params;
   const { userId } = context;
@@ -247,6 +308,12 @@ const voteOnDecisionHandler: ActionExecutionHandler = async (params, context, { 
   // question is which version you stand behind, and a counter opens a new one.
   if (kind === 'archiveObject' || kind === 'editObject') {
     return handleObjectChangeVote(params, context, notifier);
+  }
+
+  // Stipend proposals vote per round too, and their signer set depends on
+  // whether the terms dilute anyone but the two parties.
+  if (kind === 'stipendProgram' || kind === 'stipendPledge') {
+    return handleStipendVote(params, context, notifier);
   }
 
   // 1. Fetch Decision with current vots

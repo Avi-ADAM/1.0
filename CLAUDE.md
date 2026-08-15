@@ -230,6 +230,37 @@ does not cancel the assignment directly — it opens the standard release
 proposal, so silence still completes it while the assignee keeps a restime to
 respond.
 
+## Subsistence stipend (`kind: 'stipendPledge' | 'stipendProgram'`)
+
+See `docs/PLAN_STIPEND.md`. One partner funds another's living costs at a rate
+**below** the mission's market rate; the market rate still buys the equity. The
+whole model is `(k − α)·P`, and `src/lib/stipend/computeStipendEquity.ts` is its
+single source of truth — never recompute it at a call site.
+
+**Who signs is derived, not chosen.** While the rikma's total value does not
+move (`(k−α)=0`: α=1 & k=1, or `advance`/`gift`) nobody outside the two parties
+is affected, so `stipendPledge` is **bilateral**. The moment it grows, every
+member is diluted, so it needs an approved `stipendProgram` — rikma-wide, with a
+closed `totalCap` that bounds the dilution, shown to each voter as their own
+before/after percentage.
+
+**Only a confirmed payment moves a share.** `stipend-payment.equityCredit /
+equityDebit` are the only place a stipend touches percentages, and they count
+only at `status:'confirmed'` — the same rule a `Sale` follows while its holder
+claim is open. The amount is derived from **approved** hours (`computeStipendCycle`),
+never typed: paying for hours a `finiapruval` later refuses has no way back.
+"I received nothing" is a counter of amount 0, not a veto.
+
+`Project.stipendPolicy` is `off | bilateral | collective`, and **null = legacy =
+`bilateral`** — the mode that cannot dilute a third party — so every filter needs
+`or: [{stipendPolicy:{null:true}}, …]`.
+
+Stopping a stipend is `proposeObjectArchive` on the pledge's recurring
+`mashabetahalich` with `endOfCycle`; no bespoke stop flow. A rikma with no funder
+among its members publishes the need through `publishStipendFundingRequest` as an
+ordinary `open-mashaabim` (`source: 'stipend'`), and whoever takes it joins as a
+partner.
+
 ## Match suggestions (lev recommendations)
 
 See `docs/PLAN_MATCH_SUGGESTIONS.md`. Lev mission/resource suggestions are

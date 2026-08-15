@@ -19,6 +19,7 @@
   import CardHeader from './CardHeader.svelte';
   import ArchiveObjectButton from '$lib/components/archive/ArchiveObjectButton.svelte';
   import ProposeEditButton from '$lib/components/archive/ProposeEditButton.svelte';
+  import StipendButton from '$lib/components/stipend/StipendButton.svelte';
   /**
    * @typedef {Object} Props
    * @property {number} [x]
@@ -32,6 +33,8 @@
    * @property {any} dueDateOrCountToDedline
    * @property {any} missionName
    * @property {any} [missionId] - mesimabetahalich id (archive/edit proposal target)
+   * @property {any} [projectId] - the rikma, for the subsistence-stipend proposal
+   * @property {any} [myId] - the signed-in member, who would receive the stipend
    * @property {any} link
    * @property {any} missionDetails
    * @property {any} hoursdon
@@ -72,6 +75,8 @@
     dueDateOrCountToDedline,
     missionName,
     missionId = null,
+    projectId = null,
+    myId = '',
     link,
     missionDetails,
     hoursdon,
@@ -492,6 +497,27 @@
           icon="📦"
           className="flex-1 py-1.5 px-3 bg-white dark:bg-gray-800 border-2 border-rose-400 dark:border-rose-400 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 font-bold rounded-xl transition-all flex items-center justify-center gap-1.5"
         />
+        <!--
+          Subsistence stipend (PLAN_STIPEND). This is the mission I am actually
+          doing, so from here the question is "can someone carry me while I do
+          it" — the pledge is scoped to this mission and priced against its own
+          market rate, which is also the ceiling the stipend rate may not cross.
+        -->
+        {#if projectId != null}
+          <StipendButton
+            intent="request"
+            projectId={String(projectId)}
+            {projectName}
+            {myId}
+            recipientId={String(myId ?? '')}
+            missionId={String(missionId)}
+            {missionName}
+            marketRate={perhour ?? null}
+            missionValue={perhour != null && hourstotal != null ? Number(perhour) * Number(hourstotal) : null}
+            icon="💗"
+            className="flex-1 py-1.5 px-3 bg-white dark:bg-gray-800 border-2 border-teal-500 dark:border-teal-400 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/20 font-bold rounded-xl transition-all flex items-center justify-center gap-1.5"
+          />
+        {/if}
       {/if}
     {:else if low == true}
       <Lowbtn isCart="true" />

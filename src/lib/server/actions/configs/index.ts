@@ -158,6 +158,14 @@ import { proposeObjectEditConfig } from './proposeObjectEdit.js';
 import { counterObjectChangeConfig } from './counterObjectChange.js';
 import { previewArchiveMembershipConfig } from './previewArchiveMembership.js';
 import { setMatanotDiscoveryConfig } from './setMatanotDiscovery.js';
+import { proposeStipendPledgeConfig } from './proposeStipendPledge.js';
+import { proposeStipendProgramConfig } from './proposeStipendProgram.js';
+import { counterStipendTermsConfig } from './counterStipendTerms.js';
+import { settleStipendCycleConfig } from './settleStipendCycle.js';
+import { confirmStipendPaymentConfig } from './confirmStipendPayment.js';
+import { publishStipendFundingRequestConfig } from './publishStipendFundingRequest.js';
+import { getStipendWorkConfig } from './getStipendWork.js';
+import { getStipendOverviewConfig } from './getStipendOverview.js';
 
 
 /**
@@ -417,6 +425,16 @@ export function registerAllActions(): void {
   registerAction(proposeObjectEditConfig);
   registerAction(counterObjectChangeConfig);
   registerAction(previewArchiveMembershipConfig);
+
+  // Subsistence stipend — a partner funding a partner (PLAN_STIPEND)
+  registerAction(proposeStipendPledgeConfig);
+  registerAction(proposeStipendProgramConfig);
+  registerAction(counterStipendTermsConfig);
+  registerAction(settleStipendCycleConfig);
+  registerAction(confirmStipendPaymentConfig);
+  registerAction(publishStipendFundingRequestConfig);
+  registerAction(getStipendWorkConfig);
+  registerAction(getStipendOverviewConfig);
 
   // Future actions will be registered here
   // registerAction(createTaskAction);

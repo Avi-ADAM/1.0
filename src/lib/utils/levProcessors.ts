@@ -17,6 +17,8 @@ import type {
   SaleData,
   SiteSharePayableData,
   OpenSiteShareDecisionData,
+  StipendPayableData,
+  StipendConfirmationData,
   WishOfferData
 } from '$lib/stores/levStores';
 // @ts-ignore
@@ -2130,6 +2132,31 @@ export function processDecisions(
         already: av ? av.myTurn === false : false,
         pl: av && av.myTurn === false ? PRIORITY_BAND.VOTE_DONE : PRIORITY_BAND.VOTE_PENDING
       };
+    } else if (decision.kind === 'stipendProgram' || decision.kind === 'stipendPledge') {
+      // Subsistence stipend (PLAN_STIPEND). Counted on the standing round, and
+      // against the *signers* — two people for a pledge, the whole rikma for a
+      // program — because that is who the terms actually affect.
+      const sv = (decision as any).stipend;
+      const signed = (sv?.signedIds ?? []).length;
+      const noof = sv?.signerCount ?? (projectInfo.noof || 0);
+      return {
+        ...commonFields,
+        ...decision,
+        ani: 'stipend',
+        azmi: 'hachla',
+        pendId: decision.id,
+        restime: getProjectRestime(decision.projectId),
+        created_at: decision.createdAt,
+        noof,
+        noofusersOk: signed,
+        noofusersNo: 0,
+        noofusersWaiting: Math.max(0, noof - signed),
+        // The extractor only emits it while it is my move; a focused vote page
+        // can also show one I signed (`includeNotMyTurn`), and there `already`
+        // is what turns the card read-only.
+        already: sv ? sv.myTurn === false : false,
+        pl: sv && sv.myTurn === false ? PRIORITY_BAND.VOTE_DONE : PRIORITY_BAND.VOTE_PENDING
+      };
     } else if (decision.kind === 'sheirutpends') {
       return {
         ...commonFields,
@@ -2402,6 +2429,71 @@ export function processPurchases(
 
       // Pass through all data
       ...purchase
+    };
+  });
+}
+
+/**
+ * Stipend cycles I owe as a funder (PLAN_STIPEND §8).
+ *
+ * "המחזור נסגר: 42 שעות × ₪50 = ₪2,100 — לשלם". These need my action, so they
+ * sit in the VOTE_PENDING band alongside the site-share payables. The amount
+ * arrives already computed from approved hours — the card never does the math.
+ *
+ * Pure function; does not modify input.
+ */
+export function processStipendPayables(
+  payables: StipendPayableData[],
+  projects: ProjectData[]
+): DisplayItem[] {
+  if (!payables || !Array.isArray(payables)) {
+    return [];
+  }
+
+  return payables.map(p => {
+    const projectInfo = createProjectInfo(p.projectId);
+    return {
+      ani: 'stipendpay',
+      azmi: 'stipendpay',
+      pl: PRIORITY_BAND.VOTE_PENDING + 22,
+      coinlapach: `stipendpay-${p.pledgeId}-${p.cycleEnd}`,
+      ...projectInfo,
+      projectId: p.projectId,
+      src: projectInfo.src2 || '',
+      ...p
+    };
+  });
+}
+
+/**
+ * Stipend money sent to me, awaiting my "it arrived" (PLAN_STIPEND §6).
+ *
+ * The highest-value card in the feature: nothing moves in the equity books
+ * until this is answered — and silence for the rikma's restime answers it the
+ * same way, so the card is a courtesy, not a gate.
+ *
+ * Pure function; does not modify input.
+ */
+export function processStipendConfirmations(
+  confirmations: StipendConfirmationData[],
+  projects: ProjectData[]
+): DisplayItem[] {
+  if (!confirmations || !Array.isArray(confirmations)) {
+    return [];
+  }
+
+  return confirmations.map(c => {
+    const projectInfo = createProjectInfo(c.projectId ?? '');
+    return {
+      ani: 'stipendconfirm',
+      azmi: 'stipendconfirm',
+      pl: PRIORITY_BAND.VOTE_PENDING + 23,
+      coinlapach: `stipendconfirm-${c.paymentId}`,
+      ...projectInfo,
+      projectId: c.projectId ?? '',
+      projectName: c.projectName || projectInfo.projectName || '',
+      src: projectInfo.src2 || '',
+      ...c
     };
   });
 }

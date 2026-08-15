@@ -42,5 +42,8 @@ export const ROUTED = {
     consensus: at('/consensus'),
     planning: at(/\/moach\/[^/]+\/create/),
     // Archive/edit proposals surface as lev cards and on the rikma's object pages.
-    archive: at('/lev', '/newlev', /\/moach\/[^/]+/)
+    archive: at('/lev', '/newlev', /\/moach\/[^/]+/),
+    // Subsistence stipends: the heart's proposal/pay/confirm cards, and the
+    // rikma's own stipend tab (plus the button on every mission card there).
+    stipend: at('/lev', '/newlev', /\/moach\/[^/]+/)
 };

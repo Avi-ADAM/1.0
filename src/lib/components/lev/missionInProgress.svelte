@@ -2119,6 +2119,8 @@
                   {link}
                   {missionName}
                   missionId={mId}
+                  {projectId}
+                  myId={String(page.data.uid ?? '')}
                   {linkDescription}
                   {running}
                   {show}
@@ -2165,6 +2167,8 @@
     {link}
     {missionName}
     missionId={mId}
+    {projectId}
+    myId={String(page.data.uid ?? '')}
     {linkDescription}
     {running}
     {show}
