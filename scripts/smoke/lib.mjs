@@ -21,9 +21,15 @@ const require = createRequire(import.meta.url);
 
 export const BASE = process.env.SMOKE_BASE_URL || 'https://www.1lev1.com';
 
-/** Where the logged-in session is cached between runs (never inside the repo). */
-const STATE_FILE =
-  process.env.SMOKE_STATE || path.join(os.tmpdir(), '1lev1-smoke-state.json');
+/**
+ * Where a logged-in session is cached between runs (never inside the repo).
+ * Keyed by account slot, so signing in as the second member does not evict the
+ * first one's session — a two-member flow drives both at once.
+ */
+const stateFile = (slot = 1) =>
+  slot === 1
+    ? process.env.SMOKE_STATE || path.join(os.tmpdir(), '1lev1-smoke-state.json')
+    : process.env[`SMOKE_STATE_${slot}`] || path.join(os.tmpdir(), `1lev1-smoke-state-${slot}.json`);
 
 /** Screenshots land here; handy when a run fails and you want to see why. */
 export const SHOTS_DIR = process.env.SMOKE_SHOTS || path.join(os.tmpdir(), '1lev1-smoke-shots');
@@ -31,17 +37,34 @@ export const SHOTS_DIR = process.env.SMOKE_SHOTS || path.join(os.tmpdir(), '1lev
 // ── credentials ──────────────────────────────────────────────────────────────
 
 /**
- * Read the test account from the environment. Never hard-code an account here:
+ * Read a test account from the environment. Never hard-code an account here:
  * this drives a real session against a real site.
+ *
+ *   claude_user_1 / claude_us_1_ps    the default account
+ *   claude_user_2 / claude_us_2_ps    the second member
+ *
+ * Anything that needs two people — consensus, a negotiation, a split between
+ * members, one member applying to another's mission — needs slot 2. A single
+ * account cannot stand in: the app is built around mutual agreement, and most
+ * of those flows refuse to let one member play both sides.
+ *
+ * `SMOKE_EMAIL` / `SMOKE_PASSWORD` (and `_2`) are accepted for slot 1 and 2 as
+ * a provider-neutral alias.
  */
-export function credentials() {
-  const email = process.env.claude_user_1 || process.env.CLAUDE_USER_1 || process.env.SMOKE_EMAIL;
+export function credentials(slot = 1) {
+  const suffix = slot === 1 ? '' : `_${slot}`;
+  const email =
+    process.env[`claude_user_${slot}`] ||
+    process.env[`CLAUDE_USER_${slot}`] ||
+    process.env[`SMOKE_EMAIL${suffix}`];
   const password =
-    process.env.claude_us_1_ps || process.env.CLAUDE_US_1_PS || process.env.SMOKE_PASSWORD;
+    process.env[`claude_us_${slot}_ps`] ||
+    process.env[`CLAUDE_US_${slot}_PS`] ||
+    process.env[`SMOKE_PASSWORD${suffix}`];
   if (!email || !password) {
     throw new Error(
-      'Missing test-account credentials. Set claude_user_1 and claude_us_1_ps ' +
-        '(or SMOKE_EMAIL / SMOKE_PASSWORD) in the environment.'
+      `Missing credentials for test account ${slot}. Set claude_user_${slot} and ` +
+        `claude_us_${slot}_ps (or SMOKE_EMAIL${suffix} / SMOKE_PASSWORD${suffix}) in the environment.`
     );
   }
   return { email, password };
@@ -132,11 +155,12 @@ export async function launch({ headed = false } = {}) {
  * console errors, uncaught exceptions and failed same-origin requests — read
  * it after each navigation and reset it between pages.
  */
-export async function session({ fresh = false, headed = false } = {}) {
+export async function session({ fresh = false, headed = false, account = 1 } = {}) {
   const browser = await launch({ headed });
-  const haveState = !fresh && fs.existsSync(STATE_FILE);
+  const state = stateFile(account);
+  const haveState = !fresh && fs.existsSync(state);
   const ctx = await browser.newContext({
-    storageState: haveState ? STATE_FILE : undefined,
+    storageState: haveState ? state : undefined,
     viewport: { width: 1400, height: 1000 },
     locale: process.env.SMOKE_LOCALE || 'he-IL'
   });
@@ -151,19 +175,19 @@ export async function session({ fresh = false, headed = false } = {}) {
   await page.goto(BASE + '/lev', { waitUntil: 'domcontentloaded' });
   await page.waitForTimeout(3000);
   if (!/\/lev\b/.test(new URL(page.url()).pathname)) {
-    await login(page);
-    await ctx.storageState({ path: STATE_FILE });
+    await login(page, account);
+    await ctx.storageState({ path: state });
   }
 
   const close = async () => {
-    await ctx.storageState({ path: STATE_FILE }).catch(() => {});
+    await ctx.storageState({ path: state }).catch(() => {});
     await browser.close();
   };
   return { browser, ctx, page, issues, close };
 }
 
-async function login(page) {
-  const { email, password } = credentials();
+async function login(page, slot = 1) {
+  const { email, password } = credentials(slot);
   if (!/\/login/.test(page.url())) {
     await page.goto(BASE + '/login', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(1500);

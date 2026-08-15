@@ -15,11 +15,28 @@ Credentials come from the environment — never put an account in the code:
 ```bash
 export claude_user_1=…        # test-account email
 export claude_us_1_ps=…       # its password
+
+export claude_user_2=…        # second member (see below)
+export claude_us_2_ps=…
 ```
 
-(`SMOKE_EMAIL` / `SMOKE_PASSWORD` work too.) Playwright is expected to be
-installed globally in the agent image; if `node` cannot find it, run with
-`NODE_PATH=/opt/node22/lib/node_modules`.
+(`SMOKE_EMAIL` / `SMOKE_PASSWORD`, and `SMOKE_EMAIL_2` / `SMOKE_PASSWORD_2`,
+work too.) Playwright is expected to be installed globally in the agent image;
+if `node` cannot find it, run with `NODE_PATH=/opt/node22/lib/node_modules`.
+
+**Two accounts.** Slot 1 is enough for the read-only sweep and for
+`solo-money`. Anything that needs two people needs slot 2 — consensus, a
+negotiation, a split between members, one member applying to another's mission.
+A single account cannot stand in: this app is built around mutual agreement, and
+those flows will not let one member sign both sides.
+
+```js
+const a = await session();                 // slot 1
+const b = await session({ account: 2 });   // slot 2, its own browser and cache
+```
+
+Each slot caches its session in its own file, so signing in as one does not
+evict the other and a two-member flow can drive both at once.
 
 ## Read-only sweep
 
