@@ -98,6 +98,17 @@ export const load = async ({ locals, params, fetch, depends }) => {
     }))
   });
 
+  // Which missions ask for a subsistence stipend and still have no funder — the
+  // one need on this page that money alone does not answer: somebody has to
+  // carry the person doing the work (PLAN_STIPEND §13).
+  const stipendMissions = (attrs.open_missions?.data ?? [])
+    .filter((d) => Number(d.attributes?.stipendRate) > 0)
+    .map((d) => ({
+      id: String(d.id),
+      stipendRate: Number(d.attributes.stipendRate),
+      hasFunder: Boolean(d.attributes?.stipendFunder?.data)
+    }));
+
   // The aggregates above are all the page needs — drop the raw money rows
   // so they never reach the (public) client.
   delete attrs.finnished_missions;
@@ -120,6 +131,7 @@ export const load = async ({ locals, params, fetch, depends }) => {
     available: true,
     members,
     projectData,
-    coverage
+    coverage,
+    stipendMissions
   };
 };

@@ -9200,6 +9200,18 @@ export const moachQids = {
       work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
     } } }
   }`,
+  // The mission a public-page supporter earmarked their donation to. Only what
+  // the notification needs: which mission, and whether it carries a stipend the
+  // money would be funding (PLAN_STIPEND §13).
+  'missionDonationTarget': `query MissionDonationTarget($id: ID!) {
+    openMission(id: $id) {
+      data {
+        id
+        attributes { name noofhours perhour stipendRate stipendCostShare stipendMode }
+      }
+    }
+  }`,
+
   'getProjectFinancials': `query GetProjectFinancials($pid: ID!) {
     project(id: $pid) {
       data {
@@ -14249,6 +14261,13 @@ ${STIPEND_DECISION_FIELDS}
                 descrip
                 noofhours
                 perhour
+                # The stipend the mission asks for (PLAN_STIPEND §13). Public on
+                # purpose: "this mission needs someone to carry its person" is
+                # exactly what a supporter is here to answer.
+                stipendRate
+                stipendCostShare
+                stipendMode
+                stipendFunder { data { id } }
                 users { data { id } }
                 skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
               }

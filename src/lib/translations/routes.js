@@ -43,7 +43,19 @@ export const ROUTED = {
     planning: at(/\/moach\/[^/]+\/create/),
     // Archive/edit proposals surface as lev cards and on the rikma's object pages.
     archive: at('/lev', '/newlev', /\/moach\/[^/]+/),
-    // Subsistence stipends: the heart's proposal/pay/confirm cards, and the
-    // rikma's own stipend tab (plus the button on every mission card there).
-    stipend: at('/lev', '/newlev', /\/moach\/[^/]+/)
+    // Subsistence stipends: the heart's proposal/pay/confirm cards, the rikma's
+    // own stipend tab — and the public support page, where a supporter can say
+    // "I'll fund this mission" and the donation dialog names the stipend.
+    // The last three carry the mission-creation form, which imports the stipend
+    // section — it stays hidden there (no rikma to fund from), but the gate has
+    // to match the import graph or the checker cannot tell the difference.
+    stipend: at(
+        '/lev',
+        '/newlev',
+        /\/moach\/[^/]+/,
+        /\/project\/[^/]+/,
+        '/concierge',
+        '/me',
+        '/onboard'
+    )
 };

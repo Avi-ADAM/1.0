@@ -209,5 +209,9 @@
     "onMission": "Esta misión viene con una beca de {{count}} por hora",
     "seekingFunder": "Buscamos quien financie la beca de esta misión",
     "fundThis": "Yo financio esta misión"
+  },
+  "fund": {
+    "forMission": "Financiar la misión: {{name}}",
+    "coordinateHelp": "Todavía no hay una vía de pago directa, así que esto es coordinación: se avisa a los miembros de la rikma de que alguien quiere financiar precisamente esta misión, acuerdan contigo la transferencia y la registran."
   }
 }
