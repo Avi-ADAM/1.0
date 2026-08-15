@@ -5,6 +5,7 @@
   import { execFromAdmin } from '$lib/server/archive/exec.js';
   import { fetchObjectChangeDecision } from '$lib/server/archive/read.js';
   import { applyStandingVersion } from '$lib/server/archive/vote.js';
+  import { applyStandingStipend, fetchStipendDecision } from '$lib/server/stipend/apply.js';
 
   // GraphQL string-literal escaping for values interpolated into an inline
   // (non-parameterized) query — SendToAdmin takes a raw query string, no
@@ -159,6 +160,30 @@
         }
         // applyStandingVersion closes the decision and its own timegrama; this
         // is the belt-and-braces for the case where that write failed.
+        return markDone();
+      }
+
+      // A stipend proposal matures on silence into exactly what a unanimous
+      // signature would have produced — same applyStandingStipend, so "everyone
+      // agreed" and "nobody objected in time" cannot diverge (PLAN_STIPEND §5).
+      if (a.kind === 'stipendProgram' || a.kind === 'stipendPledge') {
+        const exec = execFromAdmin(SendToAdmin, ADMINMONTHER);
+        const decision = await fetchStipendDecision(exec, String(id));
+        if (!decision) {
+          console.warn(`[timegrama/decision] stipend decision ${id} could not be read`);
+          return markDone();
+        }
+        try {
+          const applied = await applyStandingStipend(exec, decision);
+          console.log('[timegrama/decision] stipend proposal matured on silence', {
+            decisionId: id,
+            kind: applied.kind,
+            pledgeId: applied.pledgeId,
+            programId: applied.programId
+          });
+        } catch (e) {
+          console.error('[timegrama/decision] stipend maturation failed:', e);
+        }
         return markDone();
       }
 
