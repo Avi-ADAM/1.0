@@ -351,6 +351,10 @@ async function ensureEngine(
     'kindOf: monthly',
     'status_mashab: active',
     'lifecycle: active',
+    // Marks it as a life-cycle carrier rather than a resource the rikma bought:
+    // the monthly sweep and the equity preview both skip it, because the money's
+    // effect on the books is the stipend-payment row and nothing else.
+    'isStipend: true',
     numField('pricePerUnit', terms.stipendRate),
     numField('cycleSize', terms.cycleSize),
     dateField('start', terms.start ?? nowISO),

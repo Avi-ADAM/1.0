@@ -111,6 +111,24 @@ const STIPEND_DECISION_FIELDS = `
                     stipendProgram { data { id attributes { name totalCap spent status } } }
                     stipendPledge { data { id attributes { status paidTotal } } }`;
 
+/**
+ * "Not the engine of a subsistence-stipend pledge" (PLAN_STIPEND §5).
+ *
+ * A stipend pledge rides a recurring `mashabetahalich` purely for its life
+ * cycle — cycles, dormancy, "stop at the end of the cycle". The money's effect
+ * on the books is the `stipend-payment` ledger row and nothing else, so any
+ * query that turns recurring resources into rikma **value** (the monthly sweep,
+ * the equity preview) must skip it, or the same shekels are counted twice.
+ *
+ * `isStipend` is a new field, so existing rows carry NULL — and `ne: false` is
+ * NULL for those in SQL, which would hide every pre-existing resource. Same
+ * idiom as NOT_ARCHIVED above; do not "simplify" the null branch away.
+ */
+const NOT_STIPEND_ENGINE = `{ or: [{ isStipend: { null: true } }, { isStipend: { eq: false } }] }`;
+
+/** The open-mashaabim twin: a request to fund stipends is not pipeline value. */
+const NOT_STIPEND_REQUEST = `{ or: [{ source: { null: true } }, { source: { ne: "stipend" } }] }`;
+
 const qids_base = {
   '1chatsend': `mutation  CreateMessage($fid : ID, $fidn: Int, $idL: ID , $da: DateTime, $mes: String)
     {createMessage(
@@ -8664,7 +8682,7 @@ export const moachQids = {
   // Used by /api/monthi: every active, non-finished recurring resource.
   'mrGetRecurringForMonthi': `query MrGetRecurringForMonthi {
     mashabetahaliches(
-      filters: { and: [ { recurring: { eq: true }, status_mashab: { eq: "active" }, finnished: { eq: false } }, ${NOT_ARCHIVED} ] }
+      filters: { and: [ { recurring: { eq: true }, status_mashab: { eq: "active" }, finnished: { eq: false } }, ${NOT_ARCHIVED}, ${NOT_STIPEND_ENGINE} ] }
       pagination: { limit: 300 }
     ) {
       data { id attributes {
@@ -9257,13 +9275,13 @@ export const moachQids = {
             data { id attributes { noofhours perhour } }
           }
           mashabetahaliches(
-            filters: { and: [ { finnished: { ne: true }, forappruval: { ne: true }, recurring: { eq: true } }, ${NOT_ARCHIVED} ] }
+            filters: { and: [ { finnished: { ne: true }, forappruval: { ne: true }, recurring: { eq: true } }, ${NOT_ARCHIVED}, ${NOT_STIPEND_ENGINE} ] }
             pagination: { limit: -1 }
           ) {
             data { id attributes { pricePerUnit kindOf cycleSize recurring } }
           }
           open_mashaabims(
-            filters: { and: [ { archived: { ne: true } }, ${NOT_ARCHIVED} ] }
+            filters: { and: [ { archived: { ne: true } }, ${NOT_ARCHIVED}, ${NOT_STIPEND_REQUEST} ] }
             pagination: { limit: -1 }
           ) {
             data {
