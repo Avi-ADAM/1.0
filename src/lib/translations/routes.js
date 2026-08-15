@@ -56,6 +56,9 @@ export const ROUTED = {
         /\/project\/[^/]+/,
         '/concierge',
         '/me',
-        '/onboard'
+        '/onboard',
+        // The public offer page for a single open mission, where the stipend
+        // block states the split and the partnership disclaimer.
+        '/availableMission'
     )
 };

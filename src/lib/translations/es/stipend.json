@@ -213,5 +213,18 @@
   "fund": {
     "forMission": "Financiar la misión: {{name}}",
     "coordinateHelp": "Todavía no hay una vía de pago directa, así que esto es coordinación: se avisa a los miembros de la rikma de que alguien quiere financiar precisamente esta misión, acuerdan contigo la transferencia y la registran."
+  },
+  "offer": {
+    "title": "Esta misión viene con una beca de subsistencia",
+    "investment": "Inversión en el proyecto",
+    "investmentSub": "a {{count}} por hora — esto es lo que compra la parte de la rikma",
+    "stipend": "Beca de subsistencia",
+    "stipendSub": "a {{count}} por hora aprobada — dinero para vivir mientras se hace",
+    "perCycle": "(por ciclo)",
+    "funder": "Financia: {{name}}",
+    "noteRecipient": "La beca se descuenta de la parte de quien la recibe — el porcentaje de los demás no se mueve.",
+    "noteRikma": "El coste se reparte por toda la rikma — todos se diluyen juntos, y eso se aprobó en la votación de la misión.",
+    "noteGift": "La beca es una donación — no afecta al porcentaje de nadie.",
+    "legal": "Una beca de subsistencia entre socios de una rikma: no es un salario ni crea una relación laboral. Quien la recibe es un socio que recibe una ayuda de subsistencia, no un empleado. Esto no es asesoramiento legal ni fiscal."
   }
 }

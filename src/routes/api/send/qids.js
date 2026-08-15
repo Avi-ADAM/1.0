@@ -1777,6 +1777,10 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           work_ways { data { attributes { workWayName localizations { data { attributes { workWayName } } } } } }
           noofhours
           perhour
+          stipendRate
+          stipendCostShare
+          stipendMode
+          stipendFunder { data { id attributes { username } } }
         }
       }
     }
@@ -9113,6 +9117,8 @@ export const moachQids = {
               attributes {
                 lifecycle
                 name hearotMeyuchadot descrip noofhours perhour sqadualed
+                stipendRate stipendCostShare stipendMode
+                stipendFunder { data { id attributes { username } } }
                 privatlinks publicklinks acts { data { id attributes { shem dateS } } }
                 tafkidims { data { id attributes { roleDescription } } }
                 skills { data { id attributes { skillName } } }
@@ -13977,6 +13983,10 @@ ${STIPEND_DECISION_FIELDS}
                 hearotMeyuchadot
                 noofhours
                 perhour
+                stipendRate
+                stipendCostShare
+                stipendMode
+                stipendFunder { data { id attributes { username } } }
                 dates
                 sqadualed
                 source

@@ -213,5 +213,18 @@
   "fund": {
     "forMission": "Funding the mission: {{name}}",
     "coordinateHelp": "There is no direct payment rail yet, so this is coordination: the rikma's members are told that someone wants to fund this particular mission, arrange the transfer with you, and record it."
+  },
+  "offer": {
+    "title": "This mission comes with a subsistence stipend",
+    "investment": "Investment in the project",
+    "investmentSub": "at {{count}} per hour — this is what buys the share of the rikma",
+    "stipend": "Subsistence stipend",
+    "stipendSub": "at {{count}} per approved hour — money to live on while doing it",
+    "perCycle": "(per cycle)",
+    "funder": "Funded by {{name}}",
+    "noteRecipient": "The stipend is set against the recipient's own share — nobody else's percentage moves.",
+    "noteRikma": "The cost is spread across the whole rikma — every member is diluted together, and that was approved in the vote on this mission.",
+    "noteGift": "The stipend is a gift — it does not affect anyone's percentage.",
+    "legal": "A subsistence stipend between partners in a rikma — it is not a wage and creates no employer-employee relationship. The recipient is a partner receiving a living grant, not an employee. This is not legal or tax advice."
   }
 }
