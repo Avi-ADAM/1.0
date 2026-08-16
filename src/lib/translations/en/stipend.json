@@ -52,7 +52,7 @@
     "rateAboveMarket": "The stipend rate is above the mission's market rate — the recipient's own equity would go negative",
     "noMarketRate": "This mission has no market rate, so there is no share to give up. Propose it as a gift instead",
     "policyOff": "This rikma has turned subsistence stipends off",
-    "policyBilateralOnly": "These terms dilute every other member, and this rikma allows only stipends that do not. Raise the recipient's share of the cost, or ask the rikma to open a stipend programme",
+    "policyBilateralOnly": "These terms dilute every other member, and the rikma has not agreed to dilution. Raise the recipient’s share of the cost, or open a stipend program — which is exactly the vote that authorises it",
     "outsideEnvelopeMode": "These terms use a different mode than the programme allows",
     "outsideEnvelopeRate": "The rate is above what the programme allows",
     "outsideEnvelopeCostShare": "The programme does not let the rikma carry this much of the cost",
@@ -74,7 +74,11 @@
     "pick": "Choose",
     "why": "A word to the other side",
     "scopeNoteBilateral": "This goes to the other party only. With no response within the rikma's response time it is approved on its own.",
-    "scopeNoteRikma": "This goes to every member of the rikma, with what it does to each of their shares shown on the card."
+    "scopeNoteRikma": "This goes to every member of the rikma, with what it does to each of their shares shown on the card.",
+    "needsProgramTitle": "These terms need the rikma’s agreement",
+    "needsProgramExplain": "They dilute every member, and the rikma has not agreed to dilution. The way to have exactly these terms is a stipend program: the same terms, with a closed budget, that every member votes on while seeing what it does to their own percentage. You can open one here and keep what you have filled in.",
+    "openProgram": "Open a stipend program",
+    "escalated": "Your terms were kept. All that is missing is a total budget — that closed number is what makes the dilution votable."
   },
   "tradeoff": {
     "title": "What you give up and what you get",

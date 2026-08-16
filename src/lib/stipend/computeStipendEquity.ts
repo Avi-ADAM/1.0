@@ -149,10 +149,19 @@ export function validateStipendTerms(input: TermsValidationInput): TermsValidati
     errors.push('noMarketRate');
   }
 
-  if (policy === 'off') errors.push('policyOff');
-  if (policy === 'bilateral' && scope === 'rikma') errors.push('policyBilateralOnly');
-
   const env = input.envelope;
+
+  if (policy === 'off') errors.push('policyOff');
+  // `bilateral` means "this rikma has not agreed to be diluted" — so terms that
+  // dilute need the rikma's consent. An **active** program is exactly that
+  // consent, already given and already bounded by its cap, so a pledge sitting
+  // inside one is not asking again. Without that, an approved program was
+  // unusable: every pledge under it still failed on the policy it was voted to
+  // authorise.
+  if (policy === 'bilateral' && scope === 'rikma' && !env?.active) {
+    errors.push('policyBilateralOnly');
+  }
+
   if (env) {
     if (env.mode && env.mode !== t.mode) errors.push('outsideEnvelopeMode');
     if (env.stipendRate != null && t.stipendRate > Number(env.stipendRate)) {
