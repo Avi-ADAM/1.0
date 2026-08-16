@@ -295,6 +295,7 @@
   import { page } from '$app/state';
   import LocationPicker from '$lib/components/location/LocationPicker.svelte';
   import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
+  import MissionStipendSection from '$lib/components/stipend/MissionStipendSection.svelte';
 
   let {
     pu = [],
@@ -374,7 +375,13 @@
       myM: false,
       rishoni: [],
       publicklinks: ``,
-      privatlinks: ``
+      privatlinks: ``,
+      // The mission's own subsistence-stipend need (PLAN_STIPEND §13): 0 = the
+      // mission asks for nothing. α defaults to 1 — the model that dilutes
+      // nobody — so a member has to *choose* to spread the cost.
+      stipendRate: 0,
+      stipendCostShare: 1,
+      stipendMode: 'equity'
     }
   ]);
 
@@ -753,6 +760,10 @@
         spnot: element.spnot,
         assignedUserId,
         checklist: element.checklist || [],
+        stipendRate: Number(element.stipendRate) > 0 ? Number(element.stipendRate) : undefined,
+        stipendCostShare:
+          Number(element.stipendRate) > 0 ? Number(element.stipendCostShare ?? 1) : undefined,
+        stipendMode: Number(element.stipendRate) > 0 ? element.stipendMode || 'equity' : undefined,
         processId: processContext?.processId
           ? String(processContext.processId)
           : undefined
@@ -1589,6 +1600,19 @@
             <!-- שווי צפוי בריקמה — כמה מהריקמה תהווה המשימה החדשה שנוצרת כאן.
                  משימה חדשה שעדיין לא פורסמה ⇒ alreadyCountedIn="none".
                  specMode/publishMode הם ללא ריקמה, ולכן projectId ריק והתצוגה מוסתרת. -->
+            <!-- "This mission also wants a subsistence stipend" (PLAN_STIPEND
+                 §13). Right under the money row, because it is the same
+                 question: what this mission costs and what it pays. -->
+            {#if projectId && !specMode && !publishMode}
+              <MissionStipendSection
+                bind:rate={miData[0].stipendRate}
+                bind:costShare={miData[0].stipendCostShare}
+                bind:mode={miData[0].stipendMode}
+                marketRate={Number(miData[0].valph) || 0}
+                hours={Number(miData[0].nhours) || 0}
+                iskvua={miData[0].iskvua}
+              />
+            {/if}
             {#if projectId && !specMode && !publishMode}
               <div class="my-2">
                 <EquityPreview

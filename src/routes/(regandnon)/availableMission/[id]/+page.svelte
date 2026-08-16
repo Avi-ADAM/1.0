@@ -3,7 +3,7 @@
   import SucssesConf from '$lib/celim/sucssesConf.svelte';
   import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
   import Tile from '$lib/celim/tile.svelte';
-  import Share from '$lib/components/share/shareButtons/index.svelte';
+  import Share from '$lib/components/share/ShareLink.svelte';
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
   import { t } from '$lib/translations';
@@ -12,6 +12,7 @@
   import { executeAction } from '$lib/client/actionClient';
   import NegoM from '$lib/components/prPr/negoM.svelte';
   import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
+  import MissionStipendOffer from '$lib/components/stipend/MissionStipendOffer.svelte';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { fly } from 'svelte/transition';
 
@@ -461,6 +462,21 @@
                       {data.alld.attributes.iskvua ? $t('pages.availMission.monhly') : ''}
                     </span>
                   </p>
+                  <!-- מלגת קיום שהמשימה פורסמה איתה (PLAN_STIPEND §13):
+                       ההשקעה בפרויקט והמלגה זו לצד זו, עם מי שמממן אותה
+                       וההסתייגות שזו שותפות ולא יחסי עובד-מעביד. -->
+                  <div class="my-3">
+                    <MissionStipendOffer
+                      hours={data.alld.attributes.noofhours || 0}
+                      perhour={data.alld.attributes.perhour || 0}
+                      stipendRate={data.alld.attributes.stipendRate || 0}
+                      costShare={data.alld.attributes.stipendCostShare ?? 1}
+                      mode={data.alld.attributes.stipendMode || 'equity'}
+                      funderName={data.alld.attributes.stipendFunder?.data?.attributes
+                        ?.username || ''}
+                      monthly={data.alld.attributes.iskvua}
+                    />
+                  </div>
                   <!-- שווי צפוי בריקמה — עמוד ציבורי, ולכן isSer מושך דרך
                        טוקן השירות; מסתתר בשקט אם אין הרשאת קריאה. -->
                   {#if data.alld.attributes.project?.data?.id}
@@ -503,13 +519,11 @@
                 </div>
                 <div class="">
                   <Share
-                    slug={'availableMission/' + data.mId}
+                    path={'/availableMission/' + data.mId}
                     title={data.alld.titleKey ? $t(data.alld.titleKey, data.alld.titleParams) : ''}
-                    desc="a new mission"
-                    hashtags={['1💗1', 'consensus']}
+                    desc={$t('ui.share.mission')}
+                    hashtags={['1lev1', 'mission']}
                     quote={data.alld.titleKey ? $t(data.alld.titleKey, data.alld.titleParams) : ''}
-                    related={[]}
-                    via={''}
                   />
                 </div>
               </div>

@@ -90,6 +90,7 @@ export const qidsAccess = {
   'updateProjectSupportPage': { allow: ['serviceAdmin'] }, // server-only callers (setSupportPage action via StrapiClient)
   'createDonationSaleRecord': { allow: ['serviceAdmin'] }, // server-only callers (createDonationSale action via StrapiClient)
   'donationProjectInfo': { allow: ['serviceAdmin'] }, // server-only callers (donation actions via StrapiClient)
+  'missionDonationTarget': { allow: ['serviceAdmin'] }, // server-only: requestDonation reads the earmarked mission
   'createSaleClaimDecision': { allow: ['user', 'serviceAdmin'] },
   'updateSaleHolderLink': { allow: ['user', 'serviceAdmin'] },
   'archivedObjects': { allow: ['user', 'serviceAdmin'] },
@@ -503,6 +504,14 @@ export const qidsAccess = {
   // reachable with a user JWT or a plain apiKey principal.
   'salesApiProductInfo': { allow: ['serviceAdmin'] },
   'saleByExternalId': { allow: ['serviceAdmin'] },
+
+  // api/v1/tasks/+server.ts + the webhook dispatcher (External Tasks API):
+  // same story — executed with the ADMIN_TOKEN through strapiClient, never
+  // reachable with a user JWT or a plain apiKey principal.
+  'tasksApiActByExternalId': { allow: ['serviceAdmin'] },
+  'tasksApiProjectRefs': { allow: ['serviceAdmin'] },
+  'tasksApiActStatus': { allow: ['serviceAdmin'] },
+  'tasksApiWebhookTargets': { allow: ['serviceAdmin'] },
 
   // Planning boards (PLAN_PROJECT_PLANNING_BOARDS). Reads are done by project
   // members from the moach create page; writes go exclusively through the

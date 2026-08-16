@@ -2,6 +2,7 @@ import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
+import { carryStipendToMission } from '$lib/server/stipend/fromMission.js';
 import { gqlString } from './actionUtils.js';
 
 const applyToMissionHandler: ActionExecutionHandler = async (params, context, { strapi, notifier }) => {
@@ -271,6 +272,23 @@ const applyToMissionHandler: ActionExecutionHandler = async (params, context, { 
       await touchDormancy(execFromContext(context), String(chiluzh)).catch(() => null);
     }
     if (!chiluzh) throw new Error('Failed to create Mesimabetahalich (solo path)');
+
+  // A mission that was proposed with a subsistence stipend attached carries it
+  // to whoever takes it (PLAN_STIPEND §13): the terms move onto the mission in
+  // progress, and when a funder was already named the bilateral pledge opens
+  // itself with their signature on it. Best-effort — the assignment stands
+  // either way.
+  if (chiluzh) {
+    await carryStipendToMission(execFromContext(context), {
+      openMissionId: String(openMissionId),
+      mesimabetahalichId: String(chiluzh),
+      projectId: String(projectId),
+      recipientId: String(context.userId),
+      hours: Number(omAttrs.noofhours) || null,
+      iskvua: iskvua === true,
+      missionName: String(omAttrs.name ?? ""),
+    }).catch(() => null);
+  }
 
     // 3. Inherit process anchors (partofs) from OpenMission → Mesimabetahalich
     try {

@@ -4,7 +4,7 @@
   import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
   import RichText from '$lib/celim/ui/richText.svelte';
-  import { ShareButtons } from '@1lev1/svelte-share';
+  import ShareLink from '$lib/components/share/ShareLink.svelte';
   import { RingLoader } from 'svelte-loading-spinners';
   import { goto } from '$app/navigation';
   import SaleComponent from '$lib/components/sales/SaleComponent.svelte';
@@ -301,16 +301,12 @@
                 {data.alld.name}
               </h2>
               <div class="scale-90 origin-top-right rtl:origin-top-left">
-                <ShareButtons
-                  slug={'gift/' + data.mId}
-                  title={data.alld.titleKey ? $t(data.alld.titleKey, data.alld.titleParams) : null}
-                  desc={$t('pages.gift.gift')}
-                  hashtags={['1💗1', 'consensus']}
-                  quote={data.alld.titleKey ? $t(data.alld.titleKey, data.alld.titleParams) : null}
-                  related={[]}
-                  via={''}
-                  siteTitle={$t('pages.gift.gift')}
-                  siteUrl={page.url.toString()}
+                <ShareLink
+                  path={'/gift/' + data.mId}
+                  title={data.alld.name}
+                  desc={$t('ui.share.product')}
+                  hashtags={['1lev1', 'gift']}
+                  quote={data.alld.titleKey ? $t(data.alld.titleKey, data.alld.titleParams) : ''}
                 />
               </div>
             </div>

@@ -135,7 +135,8 @@
     "publicProfile": "Página pública",
     "activeNow": "Activos ahora",
     "open": "Abierto a socios",
-    "archive": "Archivo"
+    "archive": "Archivo",
+    "api": "API"
   },
   "create": {
     "mission": "Crear una misión",

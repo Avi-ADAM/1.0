@@ -253,6 +253,33 @@ export class ActionService {
         this.logger.debug('Notifications triggered', { actionKey });
       }
 
+      // Step 5b: Outgoing task webhooks (PLAN_EXTERNAL_TASKS_API).
+      // A task that arrived from an external system syncs back when a human
+      // accepts, advances or finishes it. Fire-and-forget like notifications:
+      // an unreachable receiver must never fail the member's action.
+      //
+      // The module is imported lazily because its signing secret reads
+      // API_KEY_NONCE at load time, and the action system has to stay
+      // importable in environments that never issue an API key.
+      if (actionKey === 'createTask' || actionKey === 'updateTask') {
+        import('../webhooks/dispatch.js')
+          .then(({ dispatchTaskWebhook }) =>
+            dispatchTaskWebhook({
+              actionKey,
+              params,
+              result: strapiResult,
+              context,
+              strapi: this.strapiClient
+            })
+          )
+          .catch((err) => {
+            this.logger.warn('Task webhook dispatch error', {
+              actionKey,
+              error: err instanceof Error ? err.message : String(err)
+            });
+          });
+      }
+
       // Calculate execution time
       const executionTime = Date.now() - startTime;
 

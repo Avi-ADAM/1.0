@@ -5,6 +5,8 @@
   import RichText from '$lib/celim/ui/richText.svelte';
   import { executeAction } from '$lib/client/actionClient';
   import { toast } from 'svelte-sonner';
+  import { t } from '$lib/translations';
+  import ShareLink from '$lib/components/share/ShareLink.svelte';
 
   /** @type {{ data: { wish: any | null; proposalsCount: number; myProposals: any[]; uid: string | null; isLoggedIn: boolean; loadOk: boolean } }} */
   let { data } = $props();
@@ -278,7 +280,16 @@
                 >מאת {wish.author} · {wish.project}</span
               >
             </div>
-            <h1 class="hero-title">{wish.title}</h1>
+            <div class="hero-titlerow">
+              <h1 class="hero-title">{wish.title}</h1>
+              <ShareLink
+                path={`/wish/${wishId}`}
+                title={wish.title}
+                desc={$t('ui.share.wish')}
+                hashtags={['1lev1', 'wish']}
+                size={24}
+              />
+            </div>
             <div class="hero-long rich-wrap">
               <RichText
                 outpot={wish.long}
@@ -985,6 +996,12 @@
   .dim {
     color: #52493e;
     font-size: 11px;
+  }
+  .hero-titlerow {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
   }
   .hero-title {
     margin: 0;

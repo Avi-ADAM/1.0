@@ -2,6 +2,7 @@
   import { invalidateAll } from '$app/navigation';
   import { page } from '$app/state';
   import MaagadOfferForm from '$lib/components/maagad/MaagadOfferForm.svelte';
+  import ShareLink from '$lib/components/share/ShareLink.svelte';
   import { t, isRtl } from '$lib/translations';
   import { Head } from 'svead';
 
@@ -87,6 +88,15 @@
       {#each maagad.categories as cat (cat)}
         <span class="badge soft">{cat}</span>
       {/each}
+    </div>
+    <div class="share-row">
+      <ShareLink
+        path={`/maagad/${maagad.id}`}
+        title={maagad.name || $t('demand.untitled')}
+        desc={$t('ui.share.maagad')}
+        hashtags={['1lev1', 'maagad']}
+        size={24}
+      />
     </div>
   </header>
 
@@ -293,6 +303,11 @@
     flex-wrap: wrap;
     gap: 0.4rem;
     margin-top: 0.6rem;
+  }
+  .share-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.4rem;
   }
   .badge {
     font-size: 0.75rem;

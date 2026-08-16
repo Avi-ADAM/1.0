@@ -135,7 +135,8 @@
     "publicProfile": "الصفحة العامة",
     "activeNow": "نشط الآن",
     "open": "مفتوح لشركاء",
-    "archive": "الأرشيف"
+    "archive": "الأرشيف",
+    "api": "API"
   },
   "create": {
     "mission": "إنشاء مهمة",

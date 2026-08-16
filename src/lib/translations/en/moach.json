@@ -135,7 +135,8 @@
     "publicProfile": "Public Profile",
     "activeNow": "Active Now",
     "open": "Open for partners",
-    "archive": "Archive"
+    "archive": "Archive",
+    "api": "API"
   },
   "create": {
     "mission": "Create Mission",

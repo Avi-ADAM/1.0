@@ -111,6 +111,24 @@ const STIPEND_DECISION_FIELDS = `
                     stipendProgram { data { id attributes { name totalCap spent status } } }
                     stipendPledge { data { id attributes { status paidTotal } } }`;
 
+/**
+ * "Not the engine of a subsistence-stipend pledge" (PLAN_STIPEND §5).
+ *
+ * A stipend pledge rides a recurring `mashabetahalich` purely for its life
+ * cycle — cycles, dormancy, "stop at the end of the cycle". The money's effect
+ * on the books is the `stipend-payment` ledger row and nothing else, so any
+ * query that turns recurring resources into rikma **value** (the monthly sweep,
+ * the equity preview) must skip it, or the same shekels are counted twice.
+ *
+ * `isStipend` is a new field, so existing rows carry NULL — and `ne: false` is
+ * NULL for those in SQL, which would hide every pre-existing resource. Same
+ * idiom as NOT_ARCHIVED above; do not "simplify" the null branch away.
+ */
+const NOT_STIPEND_ENGINE = `{ or: [{ isStipend: { null: true } }, { isStipend: { eq: false } }] }`;
+
+/** The open-mashaabim twin: a request to fund stipends is not pipeline value. */
+const NOT_STIPEND_REQUEST = `{ or: [{ source: { null: true } }, { source: { ne: "stipend" } }] }`;
+
 const qids_base = {
   '1chatsend': `mutation  CreateMessage($fid : ID, $fidn: Int, $idL: ID , $da: DateTime, $mes: String)
     {createMessage(
@@ -1759,6 +1777,10 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           work_ways { data { attributes { workWayName localizations { data { attributes { workWayName } } } } } }
           noofhours
           perhour
+          stipendRate
+          stipendCostShare
+          stipendMode
+          stipendFunder { data { id attributes { username } } }
         }
       }
     }
@@ -2515,6 +2537,10 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     $tafkidims: [ID],
     $deadline: DateTime,
     $sqedualed: DateTime,
+    $stipendRate: Float,
+    $stipendCostShare: Float,
+    $stipendMode: ENUM_MESIMABETAHALICH_STIPENDMODE,
+    $stipendFunder: ID,
     $publishedAt: DateTime!
   ) {
     createMesimabetahalich(data: {
@@ -2533,7 +2559,11 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       publishedAt: $publishedAt,
       admaticedai: $deadline,
       start: $sqedualed,
-      open_missions: $openMid
+      open_missions: $openMid,
+      stipendRate: $stipendRate,
+      stipendCostShare: $stipendCostShare,
+      stipendMode: $stipendMode,
+      stipendFunder: $stipendFunder
     }) {
       data {
         id
@@ -2858,6 +2888,8 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         id
         attributes {
           name descrip hearotMeyuchadot noofhours perhour iskvua privatlinks publicklinks sqadualed dates
+          stipendRate stipendCostShare stipendMode
+          stipendFunder { data { id } }
           rishon { data { id } }
           mission { data { id } }
           skills { data { id } }
@@ -8275,6 +8307,10 @@ ${STIPEND_DECISION_FIELDS}
     $hearotMeyuchadot: String
     $users: [ComponentProjectsPendmnegoInput]
     $location: ComponentNewLocationInput
+    $stipendRate: Float
+    $stipendCostShare: Float
+    $stipendMode: ENUM_PENDM_STIPENDMODE
+    $stipendFunder: ID
     $publishedAt: DateTime!
   ) {
     createPendm(data: {
@@ -8296,6 +8332,10 @@ ${STIPEND_DECISION_FIELDS}
       hearotMeyuchadot: $hearotMeyuchadot
       users: $users
       location: $location
+      stipendRate: $stipendRate
+      stipendCostShare: $stipendCostShare
+      stipendMode: $stipendMode
+      stipendFunder: $stipendFunder
       publishedAt: $publishedAt
     }) {
       data { id }
@@ -8323,6 +8363,10 @@ ${STIPEND_DECISION_FIELDS}
     $rishon: ID
     $archived: Boolean
     $location: ComponentNewLocationInput
+    $stipendRate: Float
+    $stipendCostShare: Float
+    $stipendMode: ENUM_OPENMISSION_STIPENDMODE
+    $stipendFunder: ID
     $publishedAt: DateTime!
   ) {
     createOpenMission(data: {
@@ -8346,6 +8390,10 @@ ${STIPEND_DECISION_FIELDS}
       rishon: $rishon
       archived: $archived
       location: $location
+      stipendRate: $stipendRate
+      stipendCostShare: $stipendCostShare
+      stipendMode: $stipendMode
+      stipendFunder: $stipendFunder
       publishedAt: $publishedAt
     }) {
       data { id }
@@ -8664,7 +8712,7 @@ export const moachQids = {
   // Used by /api/monthi: every active, non-finished recurring resource.
   'mrGetRecurringForMonthi': `query MrGetRecurringForMonthi {
     mashabetahaliches(
-      filters: { and: [ { recurring: { eq: true }, status_mashab: { eq: "active" }, finnished: { eq: false } }, ${NOT_ARCHIVED} ] }
+      filters: { and: [ { recurring: { eq: true }, status_mashab: { eq: "active" }, finnished: { eq: false } }, ${NOT_ARCHIVED}, ${NOT_STIPEND_ENGINE} ] }
       pagination: { limit: 300 }
     ) {
       data { id attributes {
@@ -9069,6 +9117,8 @@ export const moachQids = {
               attributes {
                 lifecycle
                 name hearotMeyuchadot descrip noofhours perhour sqadualed
+                stipendRate stipendCostShare stipendMode
+                stipendFunder { data { id attributes { username } } }
                 privatlinks publicklinks acts { data { id attributes { shem dateS } } }
                 tafkidims { data { id attributes { roleDescription } } }
                 skills { data { id attributes { skillName } } }
@@ -9156,6 +9206,18 @@ export const moachQids = {
       work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
     } } }
   }`,
+  // The mission a public-page supporter earmarked their donation to. Only what
+  // the notification needs: which mission, and whether it carries a stipend the
+  // money would be funding (PLAN_STIPEND §13).
+  'missionDonationTarget': `query MissionDonationTarget($id: ID!) {
+    openMission(id: $id) {
+      data {
+        id
+        attributes { name noofhours perhour stipendRate stipendCostShare stipendMode }
+      }
+    }
+  }`,
+
   'getProjectFinancials': `query GetProjectFinancials($pid: ID!) {
     project(id: $pid) {
       data {
@@ -9257,13 +9319,13 @@ export const moachQids = {
             data { id attributes { noofhours perhour } }
           }
           mashabetahaliches(
-            filters: { and: [ { finnished: { ne: true }, forappruval: { ne: true }, recurring: { eq: true } }, ${NOT_ARCHIVED} ] }
+            filters: { and: [ { finnished: { ne: true }, forappruval: { ne: true }, recurring: { eq: true } }, ${NOT_ARCHIVED}, ${NOT_STIPEND_ENGINE} ] }
             pagination: { limit: -1 }
           ) {
             data { id attributes { pricePerUnit kindOf cycleSize recurring } }
           }
           open_mashaabims(
-            filters: { and: [ { archived: { ne: true } }, ${NOT_ARCHIVED} ] }
+            filters: { and: [ { archived: { ne: true } }, ${NOT_ARCHIVED}, ${NOT_STIPEND_REQUEST} ] }
             pagination: { limit: -1 }
           ) {
             data {
@@ -13423,6 +13485,75 @@ ${STIPEND_DECISION_FIELDS}
     }
   }`,
 
+  /* ─────────────────────────────────────────────────────────────────────
+   * External Tasks API (PLAN_EXTERNAL_TASKS_API)
+   *
+   * Read exclusively by src/routes/api/v1/tasks/+server.ts and the webhook
+   * dispatcher with the ADMIN token via strapiClient.execute — they never
+   * travel through /api/send, hence serviceAdmin-only in qidsAccess.
+   * ───────────────────────────────────────────────────────────────────── */
+
+  // Idempotency: has this externalId already produced an Act in this rikma?
+  // A ticket system that retries must resolve to the existing task rather
+  // than opening a second one on the assignee's plate.
+  'tasksApiActByExternalId': `query TasksApiActByExternalId($pid: ID!, $externalId: String!) {
+    acts(filters: {
+      project: { id: { eq: $pid } },
+      externalId: { eq: $externalId }
+    }) {
+      data { id attributes { shem externalId myIshur naasa status isAssigned
+        my { data { id attributes { username } } }
+      } }
+    }
+  }`,
+
+  // Everything the endpoint needs to prove the payload's ids belong to the
+  // key's rikma: members, live in-progress missions, and the rikma's roles.
+  // One round trip instead of three.
+  'tasksApiProjectRefs': `query TasksApiProjectRefs($pid: ID!) {
+    project(id: $pid) {
+      data {
+        id
+        attributes {
+          projectName
+          user_1s { data { id } }
+          tafkidims { data { id } }
+          mesimabetahaliches(filters: { finnished: { ne: true } }) { data { id } }
+        }
+      }
+    }
+  }`,
+
+  // Status of a single Act — powers GET /api/v1/tasks/{externalId} and the
+  // body of every outgoing webhook.
+  'tasksApiActStatus': `query TasksApiActStatus($id: ID!) {
+    act(id: $id) {
+      data {
+        id
+        attributes {
+          shem externalId source myIshur naasa status isAssigned
+          project { data { id } }
+          my { data { id attributes { username } } }
+          tafkidims { data { id } }
+        }
+      }
+    }
+  }`,
+
+  // Which api-keys of this rikma asked to be called back. Cached in memory by
+  // the dispatcher, so a rikma with no integration costs nothing per update.
+  // A bare `revoked: { eq: false }` would drop every key minted before the
+  // field existed, because SQL excludes NULL from an equality test — the same
+  // trap `lifecycle` carries. NULL here means "never revoked".
+  'tasksApiWebhookTargets': `query TasksApiWebhookTargets($pid: ID!) {
+    apiKeys(filters: {
+      project: { id: { eq: $pid } },
+      or: [{ revoked: { null: true } }, { revoked: { eq: false } }]
+    }) {
+      data { id attributes { name callback_url webhook_events } }
+    }
+  }`,
+
   // ── Sale holder consent (PLAN_sale_holder_consent) ────────────────────────
   // Project restime + member ids, used to validate the claimed holder is a
   // rikma member and to schedule the silence-as-consent timegrama.
@@ -13921,6 +14052,10 @@ ${STIPEND_DECISION_FIELDS}
                 hearotMeyuchadot
                 noofhours
                 perhour
+                stipendRate
+                stipendCostShare
+                stipendMode
+                stipendFunder { data { id attributes { username } } }
                 dates
                 sqadualed
                 source
@@ -14205,6 +14340,13 @@ ${STIPEND_DECISION_FIELDS}
                 descrip
                 noofhours
                 perhour
+                # The stipend the mission asks for (PLAN_STIPEND §13). Public on
+                # purpose: "this mission needs someone to carry its person" is
+                # exactly what a supporter is here to answer.
+                stipendRate
+                stipendCostShare
+                stipendMode
+                stipendFunder { data { id } }
                 users { data { id } }
                 skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
               }

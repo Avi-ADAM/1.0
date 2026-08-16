@@ -26,6 +26,7 @@ export type Act = {
   dateF?: Maybe<Scalars['DateTime']['output']>;
   dateS?: Maybe<Scalars['DateTime']['output']>;
   des?: Maybe<Scalars['String']['output']>;
+  externalId?: Maybe<Scalars['String']['output']>;
   forums?: Maybe<ForumRelationResponseCollection>;
   hashivut?: Maybe<Enum_Act_Hashivut>;
   isAssigned?: Maybe<Scalars['Boolean']['output']>;
@@ -43,6 +44,7 @@ export type Act = {
   project?: Maybe<ProjectEntityResponse>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   shem?: Maybe<Scalars['String']['output']>;
+  source?: Maybe<Enum_Act_Source>;
   status?: Maybe<Scalars['Int']['output']>;
   tafkidims?: Maybe<TafkidimRelationResponseCollection>;
   taskdis?: Maybe<Array<Maybe<ComponentProjectsTaskdis>>>;
@@ -152,6 +154,7 @@ export type ActFiltersInput = {
   dateF?: InputMaybe<DateTimeFilterInput>;
   dateS?: InputMaybe<DateTimeFilterInput>;
   des?: InputMaybe<StringFilterInput>;
+  externalId?: InputMaybe<StringFilterInput>;
   forums?: InputMaybe<ForumFiltersInput>;
   hashivut?: InputMaybe<StringFilterInput>;
   id?: InputMaybe<IdFilterInput>;
@@ -172,6 +175,7 @@ export type ActFiltersInput = {
   project?: InputMaybe<ProjectFiltersInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   shem?: InputMaybe<StringFilterInput>;
+  source?: InputMaybe<StringFilterInput>;
   status?: InputMaybe<IntFilterInput>;
   tafkidims?: InputMaybe<TafkidimFiltersInput>;
   taskdis?: InputMaybe<ComponentProjectsTaskdisFiltersInput>;
@@ -187,6 +191,7 @@ export type ActInput = {
   dateF?: InputMaybe<Scalars['DateTime']['input']>;
   dateS?: InputMaybe<Scalars['DateTime']['input']>;
   des?: InputMaybe<Scalars['String']['input']>;
+  externalId?: InputMaybe<Scalars['String']['input']>;
   forums?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   hashivut?: InputMaybe<Enum_Act_Hashivut>;
   isAssigned?: InputMaybe<Scalars['Boolean']['input']>;
@@ -202,6 +207,7 @@ export type ActInput = {
   project?: InputMaybe<Scalars['ID']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   shem?: InputMaybe<Scalars['String']['input']>;
+  source?: InputMaybe<Enum_Act_Source>;
   status?: InputMaybe<Scalars['Int']['input']>;
   tafkidims?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   taskdis?: InputMaybe<Array<InputMaybe<ComponentProjectsTaskdisInput>>>;
@@ -267,6 +273,7 @@ export type ActtInput = {
 export type ApiKey = {
   __typename?: 'ApiKey';
   allowed_origins?: Maybe<Scalars['JSON']['output']>;
+  callback_url?: Maybe<Scalars['String']['output']>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   key_hash?: Maybe<Scalars['String']['output']>;
   key_prefix?: Maybe<Scalars['String']['output']>;
@@ -277,6 +284,7 @@ export type ApiKey = {
   scopes?: Maybe<Scalars['JSON']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   users_permissions_user?: Maybe<UsersPermissionsUserEntityResponse>;
+  webhook_events?: Maybe<Scalars['JSON']['output']>;
 };
 
 export type ApiKeyEntity = {
@@ -299,6 +307,7 @@ export type ApiKeyEntityResponseCollection = {
 export type ApiKeyFiltersInput = {
   allowed_origins?: InputMaybe<JsonFilterInput>;
   and?: InputMaybe<Array<InputMaybe<ApiKeyFiltersInput>>>;
+  callback_url?: InputMaybe<StringFilterInput>;
   createdAt?: InputMaybe<DateTimeFilterInput>;
   id?: InputMaybe<IdFilterInput>;
   key_hash?: InputMaybe<StringFilterInput>;
@@ -312,10 +321,12 @@ export type ApiKeyFiltersInput = {
   scopes?: InputMaybe<JsonFilterInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
   users_permissions_user?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  webhook_events?: InputMaybe<JsonFilterInput>;
 };
 
 export type ApiKeyInput = {
   allowed_origins?: InputMaybe<Scalars['JSON']['input']>;
+  callback_url?: InputMaybe<Scalars['String']['input']>;
   key_hash?: InputMaybe<Scalars['String']['input']>;
   key_prefix?: InputMaybe<Scalars['String']['input']>;
   lastUsedAt?: InputMaybe<Scalars['DateTime']['input']>;
@@ -324,6 +335,7 @@ export type ApiKeyInput = {
   revoked?: InputMaybe<Scalars['Boolean']['input']>;
   scopes?: InputMaybe<Scalars['JSON']['input']>;
   users_permissions_user?: InputMaybe<Scalars['ID']['input']>;
+  webhook_events?: InputMaybe<Scalars['JSON']['input']>;
 };
 
 export type ApiKeyRelationResponseCollection = {
@@ -1161,6 +1173,72 @@ export type ComponentDesisionNegom = {
   spnot?: Maybe<Scalars['String']['output']>;
   sqadualed?: Maybe<Scalars['DateTime']['output']>;
   sqadualedf?: Maybe<Scalars['DateTime']['output']>;
+};
+
+export type ComponentDesisionNegostipend = {
+  __typename?: 'ComponentDesisionNegostipend';
+  costShare?: Maybe<Scalars['Float']['output']>;
+  cycleSize?: Maybe<Scalars['Int']['output']>;
+  end?: Maybe<Scalars['DateTime']['output']>;
+  equityMultiplier?: Maybe<Scalars['Float']['output']>;
+  id: Scalars['ID']['output'];
+  mode?: Maybe<Enum_Componentdesisionnegostipend_Mode>;
+  monthlyCap?: Maybe<Scalars['Float']['output']>;
+  noticeCycles?: Maybe<Scalars['Int']['output']>;
+  ordern?: Maybe<Scalars['Int']['output']>;
+  proposedBy?: Maybe<UsersPermissionsUserEntityResponse>;
+  recourse?: Maybe<Enum_Componentdesisionnegostipend_Recourse>;
+  revenueTrigger?: Maybe<Scalars['Float']['output']>;
+  scope?: Maybe<Enum_Componentdesisionnegostipend_Scope>;
+  start?: Maybe<Scalars['DateTime']['output']>;
+  stipendRate?: Maybe<Scalars['Float']['output']>;
+  totalCap?: Maybe<Scalars['Float']['output']>;
+  why?: Maybe<Scalars['String']['output']>;
+  zman?: Maybe<Scalars['DateTime']['output']>;
+};
+
+export type ComponentDesisionNegostipendFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<ComponentDesisionNegostipendFiltersInput>>>;
+  costShare?: InputMaybe<FloatFilterInput>;
+  cycleSize?: InputMaybe<IntFilterInput>;
+  end?: InputMaybe<DateTimeFilterInput>;
+  equityMultiplier?: InputMaybe<FloatFilterInput>;
+  mode?: InputMaybe<StringFilterInput>;
+  monthlyCap?: InputMaybe<FloatFilterInput>;
+  not?: InputMaybe<ComponentDesisionNegostipendFiltersInput>;
+  noticeCycles?: InputMaybe<IntFilterInput>;
+  or?: InputMaybe<Array<InputMaybe<ComponentDesisionNegostipendFiltersInput>>>;
+  ordern?: InputMaybe<IntFilterInput>;
+  proposedBy?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  recourse?: InputMaybe<StringFilterInput>;
+  revenueTrigger?: InputMaybe<FloatFilterInput>;
+  scope?: InputMaybe<StringFilterInput>;
+  start?: InputMaybe<DateTimeFilterInput>;
+  stipendRate?: InputMaybe<FloatFilterInput>;
+  totalCap?: InputMaybe<FloatFilterInput>;
+  why?: InputMaybe<StringFilterInput>;
+  zman?: InputMaybe<DateTimeFilterInput>;
+};
+
+export type ComponentDesisionNegostipendInput = {
+  costShare?: InputMaybe<Scalars['Float']['input']>;
+  cycleSize?: InputMaybe<Scalars['Int']['input']>;
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  equityMultiplier?: InputMaybe<Scalars['Float']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  mode?: InputMaybe<Enum_Componentdesisionnegostipend_Mode>;
+  monthlyCap?: InputMaybe<Scalars['Float']['input']>;
+  noticeCycles?: InputMaybe<Scalars['Int']['input']>;
+  ordern?: InputMaybe<Scalars['Int']['input']>;
+  proposedBy?: InputMaybe<Scalars['ID']['input']>;
+  recourse?: InputMaybe<Enum_Componentdesisionnegostipend_Recourse>;
+  revenueTrigger?: InputMaybe<Scalars['Float']['input']>;
+  scope?: InputMaybe<Enum_Componentdesisionnegostipend_Scope>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+  stipendRate?: InputMaybe<Scalars['Float']['input']>;
+  totalCap?: InputMaybe<Scalars['Float']['input']>;
+  why?: InputMaybe<Scalars['String']['input']>;
+  zman?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type ComponentNewCoveredMissions = {
@@ -2578,6 +2656,7 @@ export type Decision = {
   negodes?: Maybe<Array<Maybe<ComponentProjectsNegodes>>>;
   negom?: Maybe<Array<Maybe<ComponentProjectsNegom>>>;
   negos?: Maybe<NegoRelationResponseCollection>;
+  negostip?: Maybe<Array<Maybe<ComponentDesisionNegostipend>>>;
   newDormancyDays?: Maybe<Scalars['Int']['output']>;
   newFlink?: Maybe<Scalars['String']['output']>;
   newHours?: Maybe<Scalars['Int']['output']>;
@@ -2589,6 +2668,10 @@ export type Decision = {
   projects?: Maybe<ProjectRelationResponseCollection>;
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   sale?: Maybe<SaleEntityResponse>;
+  stipFunder?: Maybe<UsersPermissionsUserEntityResponse>;
+  stipRecipient?: Maybe<UsersPermissionsUserEntityResponse>;
+  stipendPledge?: Maybe<StipendPledgeEntityResponse>;
+  stipendProgram?: Maybe<StipendProgramEntityResponse>;
   targetKind?: Maybe<Enum_Decision_Targetkind>;
   timegrama?: Maybe<TimegramaEntityResponse>;
   timtoM?: Maybe<Scalars['String']['output']>;
@@ -2635,6 +2718,13 @@ export type DecisionNegosArgs = {
   filters?: InputMaybe<NegoFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
   publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type DecisionNegostipArgs = {
+  filters?: InputMaybe<ComponentDesisionNegostipendFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
@@ -2720,6 +2810,7 @@ export type DecisionFiltersInput = {
   negodes?: InputMaybe<ComponentProjectsNegodesFiltersInput>;
   negom?: InputMaybe<ComponentProjectsNegomFiltersInput>;
   negos?: InputMaybe<NegoFiltersInput>;
+  negostip?: InputMaybe<ComponentDesisionNegostipendFiltersInput>;
   newDormancyDays?: InputMaybe<IntFilterInput>;
   newFlink?: InputMaybe<StringFilterInput>;
   newHours?: InputMaybe<IntFilterInput>;
@@ -2732,6 +2823,10 @@ export type DecisionFiltersInput = {
   projects?: InputMaybe<ProjectFiltersInput>;
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   sale?: InputMaybe<SaleFiltersInput>;
+  stipFunder?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  stipRecipient?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  stipendPledge?: InputMaybe<StipendPledgeFiltersInput>;
+  stipendProgram?: InputMaybe<StipendProgramFiltersInput>;
   targetKind?: InputMaybe<StringFilterInput>;
   timegrama?: InputMaybe<TimegramaFiltersInput>;
   timtoM?: InputMaybe<StringFilterInput>;
@@ -2768,6 +2863,7 @@ export type DecisionInput = {
   negodes?: InputMaybe<Array<InputMaybe<ComponentProjectsNegodesInput>>>;
   negom?: InputMaybe<Array<InputMaybe<ComponentProjectsNegomInput>>>;
   negos?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  negostip?: InputMaybe<Array<InputMaybe<ComponentDesisionNegostipendInput>>>;
   newDormancyDays?: InputMaybe<Scalars['Int']['input']>;
   newFlink?: InputMaybe<Scalars['String']['input']>;
   newHours?: InputMaybe<Scalars['Int']['input']>;
@@ -2779,6 +2875,10 @@ export type DecisionInput = {
   projects?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   sale?: InputMaybe<Scalars['ID']['input']>;
+  stipFunder?: InputMaybe<Scalars['ID']['input']>;
+  stipRecipient?: InputMaybe<Scalars['ID']['input']>;
+  stipendPledge?: InputMaybe<Scalars['ID']['input']>;
+  stipendProgram?: InputMaybe<Scalars['ID']['input']>;
   targetKind?: InputMaybe<Enum_Decision_Targetkind>;
   timegrama?: InputMaybe<Scalars['ID']['input']>;
   timtoM?: InputMaybe<Scalars['String']['input']>;
@@ -2985,6 +3085,11 @@ export enum Enum_Act_Hashivut {
   Yellow = 'yellow'
 }
 
+export enum Enum_Act_Source {
+  Api = 'api',
+  Ui = 'ui'
+}
+
 export enum Enum_Argument_Authortype {
   Charter = 'charter',
   Guest = 'guest',
@@ -3033,6 +3138,23 @@ export enum Enum_Componentdesisionnegom_Kindof {
   Rent = 'rent',
   Total = 'total',
   Yearly = 'yearly'
+}
+
+export enum Enum_Componentdesisionnegostipend_Mode {
+  Advance = 'advance',
+  Equity = 'equity',
+  Gift = 'gift'
+}
+
+export enum Enum_Componentdesisionnegostipend_Recourse {
+  NonRecourse = 'nonRecourse',
+  Personal = 'personal'
+}
+
+export enum Enum_Componentdesisionnegostipend_Scope {
+  AllMissions = 'allMissions',
+  SelectedMissions = 'selectedMissions',
+  SingleMission = 'singleMission'
 }
 
 export enum Enum_Componentnewextractedmissions_Importance {
@@ -3110,6 +3232,8 @@ export enum Enum_Decision_Kind {
   Prides = 'prides',
   Pubdes = 'pubdes',
   SaleClaim = 'saleClaim',
+  StipendPledge = 'stipendPledge',
+  StipendProgram = 'stipendProgram',
   TimtoM = 'timtoM',
   Twitter = 'twitter',
   Vallueadd = 'vallueadd',
@@ -3352,6 +3476,12 @@ export enum Enum_Mesimabetahalich_Lifecycle {
   Released = 'released'
 }
 
+export enum Enum_Mesimabetahalich_Stipendmode {
+  Advance = 'advance',
+  Equity = 'equity',
+  Gift = 'gift'
+}
+
 export enum Enum_Mission_Kindof {
   Admin = 'admin',
   Creative = 'creative',
@@ -3434,7 +3564,8 @@ export enum Enum_Openmashaabim_Source {
   Concierge = 'concierge',
   Maagad = 'maagad',
   Project = 'project',
-  SelfNomination = 'selfNomination'
+  SelfNomination = 'selfNomination',
+  Stipend = 'stipend'
 }
 
 export enum Enum_Openmission_Lifecycle {
@@ -3449,6 +3580,18 @@ export enum Enum_Openmission_Source {
   Maagad = 'maagad',
   Project = 'project',
   SelfNomination = 'selfNomination'
+}
+
+export enum Enum_Openmission_Stipendmode {
+  Advance = 'advance',
+  Equity = 'equity',
+  Gift = 'gift'
+}
+
+export enum Enum_Pendm_Stipendmode {
+  Advance = 'advance',
+  Equity = 'equity',
+  Gift = 'gift'
 }
 
 export enum Enum_Pledge_Status {
@@ -3533,6 +3676,12 @@ export enum Enum_Project_Restime {
 export enum Enum_Project_Spirit {
   Commercial = 'commercial',
   Volunteer = 'volunteer'
+}
+
+export enum Enum_Project_Stipendpolicy {
+  Bilateral = 'bilateral',
+  Collective = 'collective',
+  Off = 'off'
 }
 
 export enum Enum_Project_Supportpage {
@@ -3712,6 +3861,74 @@ export enum Enum_Sp_Offerscope {
   Both = 'both',
   Customers = 'customers',
   Rikma = 'rikma'
+}
+
+export enum Enum_Stipendpayment_Confirmedby {
+  Recipient = 'recipient',
+  Silence = 'silence'
+}
+
+export enum Enum_Stipendpayment_Mode {
+  Advance = 'advance',
+  Equity = 'equity',
+  Gift = 'gift'
+}
+
+export enum Enum_Stipendpayment_Status {
+  Cancelled = 'cancelled',
+  Confirmed = 'confirmed',
+  Pending = 'pending',
+  Sent = 'sent'
+}
+
+export enum Enum_Stipendpledge_Initiatedby {
+  Funder = 'funder',
+  Member = 'member',
+  Recipient = 'recipient'
+}
+
+export enum Enum_Stipendpledge_Mode {
+  Advance = 'advance',
+  Equity = 'equity',
+  Gift = 'gift'
+}
+
+export enum Enum_Stipendpledge_Recourse {
+  NonRecourse = 'nonRecourse',
+  Personal = 'personal'
+}
+
+export enum Enum_Stipendpledge_Scope {
+  AllMissions = 'allMissions',
+  SelectedMissions = 'selectedMissions',
+  SingleMission = 'singleMission'
+}
+
+export enum Enum_Stipendpledge_Status {
+  Active = 'active',
+  Closed = 'closed',
+  Exhausted = 'exhausted',
+  Proposed = 'proposed',
+  Withdrawn = 'withdrawn'
+}
+
+export enum Enum_Stipendprogram_Mode {
+  Advance = 'advance',
+  Equity = 'equity',
+  Gift = 'gift'
+}
+
+export enum Enum_Stipendprogram_Scope {
+  AllMissions = 'allMissions',
+  SelectedMissions = 'selectedMissions',
+  SingleMission = 'singleMission'
+}
+
+export enum Enum_Stipendprogram_Status {
+  Active = 'active',
+  Closed = 'closed',
+  Exhausted = 'exhausted',
+  Proposed = 'proposed'
 }
 
 export enum Enum_Tosplit_Split_Origin {
@@ -4403,7 +4620,7 @@ export type ForumRelationResponseCollection = {
   data: Array<ForumEntity>;
 };
 
-export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegoarch | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsNegom | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ConsentEvent | ContentReleasesRelease | ContentReleasesReleaseAction | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | DemoRequest | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maagad | MaagadMember | MaagadOffer | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | MatchSuggestion | Mesimabetahalich | Message | Mission | MissionOffer | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | OpenMashaabim | OpenMission | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pledge | Pmash | Position | Project | ProjectPlanBoard | ProjectPlanItem | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | Richtext | Rikmash | Sale | SealedEnvelope | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Sidur | SiteReport | SiteShareContribution | Skill | Solution | Sp | Tafkidim | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UserKey | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
+export type GenericMorph = Act | Actt | ApiKey | Argument | Ask | Askm | Askwant | Bakasha | Category | Chezin | Clause | ComponentDesisionEditPend | ComponentDesisionNegoarch | ComponentDesisionNegodes | ComponentDesisionNegom | ComponentDesisionNegostipend | ComponentNewCoveredMissions | ComponentNewCoveredResources | ComponentNewEdits | ComponentNewExtractedMissions | ComponentNewExtractedResources | ComponentNewLocation | ComponentNewMeeting | ComponentNewMonter | ComponentNewNego | ComponentNewNegom | ComponentNewSeen | ComponentNewTimes | ComponentNewUserAndIshur | ComponentNewWillingnessEntries | ComponentProjectsChatre | ComponentProjectsConsumedMashabetahalichDeliveries | ComponentProjectsConsumedMissionHours | ComponentProjectsConsumedOpenMu | ComponentProjectsDeliveries | ComponentProjectsHervachti | ComponentProjectsIGotMoney | ComponentProjectsMeeting | ComponentProjectsMonter | ComponentProjectsNegodes | ComponentProjectsNegom | ComponentProjectsPendmnego | ComponentProjectsShift | ComponentProjectsTaskdis | ComponentProjectsUsersOf | ComponentProjectsVots | ConsentEvent | ContentReleasesRelease | ContentReleasesReleaseAction | ConventionText | Cuntry | Dea | Deal | Decision | Deffinition | DemoRequest | Filtertag | Finiapruval | FinnishedMission | Forum | ForumLastSeen | Haamada | Haamadapruv | Haluka | Hatzaa | Hazbaah | I18NLocale | Issue | Maagad | MaagadMember | MaagadOffer | Maap | Machshir | Mashaabim | Mashabetahalich | Matanot | MatanotRecipeMission | MatanotRecipeResource | Matanotpend | Matbea | MatchSuggestion | Mesimabetahalich | Message | Mission | MissionOffer | Mode | Monter | Nego | NegoMash | Negopendmission | Negotiation | OpenMashaabim | OpenMission | Partof | Pendm | Pgisha | Pgishauser | Pgishauserpend | Pledge | Pmash | Position | Project | ProjectPlanBoard | ProjectPlanItem | ProviderProfile | Ratson | RatsonMatchJob | RatsonProposal | RatsonShare | Richtext | Rikmash | Sale | SealedEnvelope | Seeder | Sheirut | SheirutFulfillment | Sheirutnego | Sheirutpend | Sidur | SiteReport | SiteShareContribution | Skill | Solution | Sp | StipendPayment | StipendPledge | StipendProgram | Tafkidim | Tikunolam | Timegrama | Timer | Tosplit | Translate | UploadFile | UploadFolder | UserKey | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | Vallue | Vote | Want | WelcomTop | Whatandwhy | WorkWay | Yat | Zohar;
 
 export type Haamada = {
   __typename?: 'Haamada';
@@ -4576,6 +4793,7 @@ export type Haluka = {
   sheirut?: Maybe<SheirutEntityResponse>;
   site_share_contribution?: Maybe<SiteShareContributionEntityResponse>;
   source_tosplit?: Maybe<TosplitEntityResponse>;
+  stipend_payment?: Maybe<StipendPaymentEntityResponse>;
   tosplit?: Maybe<TosplitEntityResponse>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   userrecive?: Maybe<UsersPermissionsUserEntityResponse>;
@@ -4642,6 +4860,7 @@ export type HalukaFiltersInput = {
   sheirut?: InputMaybe<SheirutFiltersInput>;
   site_share_contribution?: InputMaybe<SiteShareContributionFiltersInput>;
   source_tosplit?: InputMaybe<TosplitFiltersInput>;
+  stipend_payment?: InputMaybe<StipendPaymentFiltersInput>;
   tosplit?: InputMaybe<TosplitFiltersInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
   userrecive?: InputMaybe<UsersPermissionsUserFiltersInput>;
@@ -4669,6 +4888,7 @@ export type HalukaInput = {
   sheirut?: InputMaybe<Scalars['ID']['input']>;
   site_share_contribution?: InputMaybe<Scalars['ID']['input']>;
   source_tosplit?: InputMaybe<Scalars['ID']['input']>;
+  stipend_payment?: InputMaybe<Scalars['ID']['input']>;
   tosplit?: InputMaybe<Scalars['ID']['input']>;
   userrecive?: InputMaybe<Scalars['ID']['input']>;
   usersend?: InputMaybe<Scalars['ID']['input']>;
@@ -5744,6 +5964,7 @@ export type Mashabetahalich = {
   hoursassigned?: Maybe<Scalars['Float']['output']>;
   howmanyhoursalready?: Maybe<Scalars['Float']['output']>;
   isMust?: Maybe<Scalars['Boolean']['output']>;
+  isStipend?: Maybe<Scalars['Boolean']['output']>;
   isYesod?: Maybe<Scalars['Boolean']['output']>;
   kindOf?: Maybe<Enum_Mashabetahalich_Kindof>;
   lifecycle?: Maybe<Enum_Mashabetahalich_Lifecycle>;
@@ -5764,6 +5985,7 @@ export type Mashabetahalich = {
   rikmash?: Maybe<RikmashEntityResponse>;
   start?: Maybe<Scalars['DateTime']['output']>;
   status_mashab?: Maybe<Enum_Mashabetahalich_Status_Mashab>;
+  stipend_pledge?: Maybe<StipendPledgeEntityResponse>;
   summarizeOnClose?: Maybe<Scalars['Boolean']['output']>;
   timegrama?: Maybe<TimegramaEntityResponse>;
   timers?: Maybe<TimerRelationResponseCollection>;
@@ -5853,6 +6075,7 @@ export type MashabetahalichFiltersInput = {
   howmanyhoursalready?: InputMaybe<FloatFilterInput>;
   id?: InputMaybe<IdFilterInput>;
   isMust?: InputMaybe<BooleanFilterInput>;
+  isStipend?: InputMaybe<BooleanFilterInput>;
   isYesod?: InputMaybe<BooleanFilterInput>;
   kindOf?: InputMaybe<StringFilterInput>;
   lifecycle?: InputMaybe<StringFilterInput>;
@@ -5875,6 +6098,7 @@ export type MashabetahalichFiltersInput = {
   rikmash?: InputMaybe<RikmashFiltersInput>;
   start?: InputMaybe<DateTimeFilterInput>;
   status_mashab?: InputMaybe<StringFilterInput>;
+  stipend_pledge?: InputMaybe<StipendPledgeFiltersInput>;
   summarizeOnClose?: InputMaybe<BooleanFilterInput>;
   timegrama?: InputMaybe<TimegramaFiltersInput>;
   timers?: InputMaybe<TimerFiltersInput>;
@@ -5898,6 +6122,7 @@ export type MashabetahalichInput = {
   hoursassigned?: InputMaybe<Scalars['Float']['input']>;
   howmanyhoursalready?: InputMaybe<Scalars['Float']['input']>;
   isMust?: InputMaybe<Scalars['Boolean']['input']>;
+  isStipend?: InputMaybe<Scalars['Boolean']['input']>;
   isYesod?: InputMaybe<Scalars['Boolean']['input']>;
   kindOf?: InputMaybe<Enum_Mashabetahalich_Kindof>;
   lifecycle?: InputMaybe<Enum_Mashabetahalich_Lifecycle>;
@@ -5918,6 +6143,7 @@ export type MashabetahalichInput = {
   rikmash?: InputMaybe<Scalars['ID']['input']>;
   start?: InputMaybe<Scalars['DateTime']['input']>;
   status_mashab?: InputMaybe<Enum_Mashabetahalich_Status_Mashab>;
+  stipend_pledge?: InputMaybe<Scalars['ID']['input']>;
   summarizeOnClose?: InputMaybe<Scalars['Boolean']['input']>;
   timegrama?: InputMaybe<Scalars['ID']['input']>;
   timers?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -6522,6 +6748,9 @@ export type Matbea = {
   publishedAt?: Maybe<Scalars['DateTime']['output']>;
   ratson_proposals?: Maybe<RatsonProposalRelationResponseCollection>;
   simbol?: Maybe<Scalars['String']['output']>;
+  stipend_payments?: Maybe<StipendPaymentRelationResponseCollection>;
+  stipend_pledges?: Maybe<StipendPledgeRelationResponseCollection>;
+  stipend_programs?: Maybe<StipendProgramRelationResponseCollection>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
@@ -6565,6 +6794,30 @@ export type MatbeaRatson_ProposalsArgs = {
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
+
+export type MatbeaStipend_PaymentsArgs = {
+  filters?: InputMaybe<StipendPaymentFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type MatbeaStipend_PledgesArgs = {
+  filters?: InputMaybe<StipendPledgeFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type MatbeaStipend_ProgramsArgs = {
+  filters?: InputMaybe<StipendProgramFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
 export type MatbeaEntity = {
   __typename?: 'MatbeaEntity';
   attributes?: Maybe<Matbea>;
@@ -6597,6 +6850,9 @@ export type MatbeaFiltersInput = {
   publishedAt?: InputMaybe<DateTimeFilterInput>;
   ratson_proposals?: InputMaybe<RatsonProposalFiltersInput>;
   simbol?: InputMaybe<StringFilterInput>;
+  stipend_payments?: InputMaybe<StipendPaymentFiltersInput>;
+  stipend_pledges?: InputMaybe<StipendPledgeFiltersInput>;
+  stipend_programs?: InputMaybe<StipendProgramFiltersInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
 };
 
@@ -6608,6 +6864,9 @@ export type MatbeaInput = {
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   ratson_proposals?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   simbol?: InputMaybe<Scalars['String']['input']>;
+  stipend_payments?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  stipend_pledges?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  stipend_programs?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
 };
 
 export type MatbeaRelationResponseCollection = {
@@ -6723,6 +6982,11 @@ export type Mesimabetahalich = {
   sheirut_fulfillments?: Maybe<SheirutFulfillmentRelationResponseCollection>;
   start?: Maybe<Scalars['DateTime']['output']>;
   status?: Maybe<Scalars['Int']['output']>;
+  stipendCostShare?: Maybe<Scalars['Float']['output']>;
+  stipendFunder?: Maybe<UsersPermissionsUserEntityResponse>;
+  stipendMode?: Maybe<Enum_Mesimabetahalich_Stipendmode>;
+  stipendRate?: Maybe<Scalars['Float']['output']>;
+  stipend_pledges?: Maybe<StipendPledgeRelationResponseCollection>;
   stname: Scalars['String']['output'];
   tafkidims?: Maybe<TafkidimRelationResponseCollection>;
   timegramas?: Maybe<TimegramaRelationResponseCollection>;
@@ -6836,6 +7100,14 @@ export type MesimabetahalichSheirut_FulfillmentsArgs = {
 };
 
 
+export type MesimabetahalichStipend_PledgesArgs = {
+  filters?: InputMaybe<StipendPledgeFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
 export type MesimabetahalichTafkidimsArgs = {
   filters?: InputMaybe<TafkidimFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
@@ -6926,6 +7198,11 @@ export type MesimabetahalichFiltersInput = {
   sheirut_fulfillments?: InputMaybe<SheirutFulfillmentFiltersInput>;
   start?: InputMaybe<DateTimeFilterInput>;
   status?: InputMaybe<IntFilterInput>;
+  stipendCostShare?: InputMaybe<FloatFilterInput>;
+  stipendFunder?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  stipendMode?: InputMaybe<StringFilterInput>;
+  stipendRate?: InputMaybe<FloatFilterInput>;
+  stipend_pledges?: InputMaybe<StipendPledgeFiltersInput>;
   stname?: InputMaybe<StringFilterInput>;
   tafkidims?: InputMaybe<TafkidimFiltersInput>;
   timegramas?: InputMaybe<TimegramaFiltersInput>;
@@ -6976,6 +7253,11 @@ export type MesimabetahalichInput = {
   sheirut_fulfillments?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   start?: InputMaybe<Scalars['DateTime']['input']>;
   status?: InputMaybe<Scalars['Int']['input']>;
+  stipendCostShare?: InputMaybe<Scalars['Float']['input']>;
+  stipendFunder?: InputMaybe<Scalars['ID']['input']>;
+  stipendMode?: InputMaybe<Enum_Mesimabetahalich_Stipendmode>;
+  stipendRate?: InputMaybe<Scalars['Float']['input']>;
+  stipend_pledges?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   stname?: InputMaybe<Scalars['String']['input']>;
   tafkidims?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   timegramas?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -7623,6 +7905,9 @@ export type Mutation = {
   createSolution?: Maybe<SolutionEntityResponse>;
   createSp?: Maybe<SpEntityResponse>;
   createSpLocalization?: Maybe<SpEntityResponse>;
+  createStipendPayment?: Maybe<StipendPaymentEntityResponse>;
+  createStipendPledge?: Maybe<StipendPledgeEntityResponse>;
+  createStipendProgram?: Maybe<StipendProgramEntityResponse>;
   createTafkidim?: Maybe<TafkidimEntityResponse>;
   createTafkidimLocalization?: Maybe<TafkidimEntityResponse>;
   createTikunolam?: Maybe<TikunolamEntityResponse>;
@@ -7739,6 +8024,9 @@ export type Mutation = {
   deleteSkill?: Maybe<SkillEntityResponse>;
   deleteSolution?: Maybe<SolutionEntityResponse>;
   deleteSp?: Maybe<SpEntityResponse>;
+  deleteStipendPayment?: Maybe<StipendPaymentEntityResponse>;
+  deleteStipendPledge?: Maybe<StipendPledgeEntityResponse>;
+  deleteStipendProgram?: Maybe<StipendProgramEntityResponse>;
   deleteTafkidim?: Maybe<TafkidimEntityResponse>;
   deleteTikunolam?: Maybe<TikunolamEntityResponse>;
   deleteTimegrama?: Maybe<TimegramaEntityResponse>;
@@ -7860,6 +8148,9 @@ export type Mutation = {
   updateSkill?: Maybe<SkillEntityResponse>;
   updateSolution?: Maybe<SolutionEntityResponse>;
   updateSp?: Maybe<SpEntityResponse>;
+  updateStipendPayment?: Maybe<StipendPaymentEntityResponse>;
+  updateStipendPledge?: Maybe<StipendPledgeEntityResponse>;
+  updateStipendProgram?: Maybe<StipendProgramEntityResponse>;
   updateTafkidim?: Maybe<TafkidimEntityResponse>;
   updateTikunolam?: Maybe<TikunolamEntityResponse>;
   updateTimegrama?: Maybe<TimegramaEntityResponse>;
@@ -8524,6 +8815,21 @@ export type MutationCreateSpLocalizationArgs = {
 };
 
 
+export type MutationCreateStipendPaymentArgs = {
+  data: StipendPaymentInput;
+};
+
+
+export type MutationCreateStipendPledgeArgs = {
+  data: StipendPledgeInput;
+};
+
+
+export type MutationCreateStipendProgramArgs = {
+  data: StipendProgramInput;
+};
+
+
 export type MutationCreateTafkidimArgs = {
   data: TafkidimInput;
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
@@ -9138,6 +9444,21 @@ export type MutationDeleteSolutionArgs = {
 export type MutationDeleteSpArgs = {
   id: Scalars['ID']['input'];
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
+};
+
+
+export type MutationDeleteStipendPaymentArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteStipendPledgeArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteStipendProgramArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -9838,6 +10159,24 @@ export type MutationUpdateSpArgs = {
   data: SpInput;
   id: Scalars['ID']['input'];
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
+};
+
+
+export type MutationUpdateStipendPaymentArgs = {
+  data: StipendPaymentInput;
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateStipendPledgeArgs = {
+  data: StipendPledgeInput;
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateStipendProgramArgs = {
+  data: StipendProgramInput;
+  id: Scalars['ID']['input'];
 };
 
 
@@ -10620,6 +10959,7 @@ export type OpenMashaabim = {
   sps?: Maybe<SpRelationResponseCollection>;
   sqadualed?: Maybe<Scalars['DateTime']['output']>;
   sqadualedf?: Maybe<Scalars['DateTime']['output']>;
+  stipend_program?: Maybe<StipendProgramEntityResponse>;
   timegrama?: Maybe<TimegramaEntityResponse>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   users?: Maybe<UsersPermissionsUserRelationResponseCollection>;
@@ -10784,6 +11124,7 @@ export type OpenMashaabimFiltersInput = {
   sps?: InputMaybe<SpFiltersInput>;
   sqadualed?: InputMaybe<DateTimeFilterInput>;
   sqadualedf?: InputMaybe<DateTimeFilterInput>;
+  stipend_program?: InputMaybe<StipendProgramFiltersInput>;
   timegrama?: InputMaybe<TimegramaFiltersInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
   users?: InputMaybe<UsersPermissionsUserFiltersInput>;
@@ -10831,6 +11172,7 @@ export type OpenMashaabimInput = {
   sps?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   sqadualed?: InputMaybe<Scalars['DateTime']['input']>;
   sqadualedf?: InputMaybe<Scalars['DateTime']['input']>;
+  stipend_program?: InputMaybe<Scalars['ID']['input']>;
   timegrama?: InputMaybe<Scalars['ID']['input']>;
   users?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
 };
@@ -10888,6 +11230,10 @@ export type OpenMission = {
   skills?: Maybe<SkillRelationResponseCollection>;
   source?: Maybe<Enum_Openmission_Source>;
   sqadualed?: Maybe<Scalars['DateTime']['output']>;
+  stipendCostShare?: Maybe<Scalars['Float']['output']>;
+  stipendFunder?: Maybe<UsersPermissionsUserEntityResponse>;
+  stipendMode?: Maybe<Enum_Openmission_Stipendmode>;
+  stipendRate?: Maybe<Scalars['Float']['output']>;
   tafkidims?: Maybe<TafkidimRelationResponseCollection>;
   timegrama?: Maybe<TimegramaEntityResponse>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -11097,6 +11443,10 @@ export type OpenMissionFiltersInput = {
   skills?: InputMaybe<SkillFiltersInput>;
   source?: InputMaybe<StringFilterInput>;
   sqadualed?: InputMaybe<DateTimeFilterInput>;
+  stipendCostShare?: InputMaybe<FloatFilterInput>;
+  stipendFunder?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  stipendMode?: InputMaybe<StringFilterInput>;
+  stipendRate?: InputMaybe<FloatFilterInput>;
   tafkidims?: InputMaybe<TafkidimFiltersInput>;
   timegrama?: InputMaybe<TimegramaFiltersInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
@@ -11150,6 +11500,10 @@ export type OpenMissionInput = {
   skills?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   source?: InputMaybe<Enum_Openmission_Source>;
   sqadualed?: InputMaybe<Scalars['DateTime']['input']>;
+  stipendCostShare?: InputMaybe<Scalars['Float']['input']>;
+  stipendFunder?: InputMaybe<Scalars['ID']['input']>;
+  stipendMode?: InputMaybe<Enum_Openmission_Stipendmode>;
+  stipendRate?: InputMaybe<Scalars['Float']['input']>;
   tafkidims?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   timegrama?: InputMaybe<Scalars['ID']['input']>;
   users?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -11428,6 +11782,10 @@ export type Pendm = {
   rishonves?: Maybe<UsersPermissionsUserRelationResponseCollection>;
   skills?: Maybe<SkillRelationResponseCollection>;
   sqadualed?: Maybe<Scalars['DateTime']['output']>;
+  stipendCostShare?: Maybe<Scalars['Float']['output']>;
+  stipendFunder?: Maybe<UsersPermissionsUserEntityResponse>;
+  stipendMode?: Maybe<Enum_Pendm_Stipendmode>;
+  stipendRate?: Maybe<Scalars['Float']['output']>;
   tafkidims?: Maybe<TafkidimRelationResponseCollection>;
   timegrama?: Maybe<TimegramaEntityResponse>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -11591,6 +11949,10 @@ export type PendmFiltersInput = {
   rishonves?: InputMaybe<UsersPermissionsUserFiltersInput>;
   skills?: InputMaybe<SkillFiltersInput>;
   sqadualed?: InputMaybe<DateTimeFilterInput>;
+  stipendCostShare?: InputMaybe<FloatFilterInput>;
+  stipendFunder?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  stipendMode?: InputMaybe<StringFilterInput>;
+  stipendRate?: InputMaybe<FloatFilterInput>;
   tafkidims?: InputMaybe<TafkidimFiltersInput>;
   timegrama?: InputMaybe<TimegramaFiltersInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
@@ -11633,6 +11995,10 @@ export type PendmInput = {
   rishonves?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   skills?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   sqadualed?: InputMaybe<Scalars['DateTime']['input']>;
+  stipendCostShare?: InputMaybe<Scalars['Float']['input']>;
+  stipendFunder?: InputMaybe<Scalars['ID']['input']>;
+  stipendMode?: InputMaybe<Enum_Pendm_Stipendmode>;
+  stipendRate?: InputMaybe<Scalars['Float']['input']>;
   tafkidims?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   timegrama?: InputMaybe<Scalars['ID']['input']>;
   users?: InputMaybe<Array<InputMaybe<ComponentProjectsPendmnegoInput>>>;
@@ -12376,6 +12742,12 @@ export type Project = {
   site_share_contributions?: Maybe<SiteShareContributionRelationResponseCollection>;
   spirit?: Maybe<Enum_Project_Spirit>;
   sps?: Maybe<SpRelationResponseCollection>;
+  stipendDefaultCostShare?: Maybe<Scalars['Float']['output']>;
+  stipendDefaultRate?: Maybe<Scalars['Float']['output']>;
+  stipendPolicy?: Maybe<Enum_Project_Stipendpolicy>;
+  stipend_payments?: Maybe<StipendPaymentRelationResponseCollection>;
+  stipend_pledges?: Maybe<StipendPledgeRelationResponseCollection>;
+  stipend_programs?: Maybe<StipendProgramRelationResponseCollection>;
   supportPage?: Maybe<Enum_Project_Supportpage>;
   tafkidims?: Maybe<TafkidimRelationResponseCollection>;
   timeToP?: Maybe<Enum_Project_Timetop>;
@@ -12714,6 +13086,30 @@ export type ProjectSpsArgs = {
 };
 
 
+export type ProjectStipend_PaymentsArgs = {
+  filters?: InputMaybe<StipendPaymentFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type ProjectStipend_PledgesArgs = {
+  filters?: InputMaybe<StipendPledgeFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type ProjectStipend_ProgramsArgs = {
+  filters?: InputMaybe<StipendProgramFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
 export type ProjectTafkidimsArgs = {
   filters?: InputMaybe<TafkidimFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
@@ -12871,6 +13267,12 @@ export type ProjectFiltersInput = {
   site_share_contributions?: InputMaybe<SiteShareContributionFiltersInput>;
   spirit?: InputMaybe<StringFilterInput>;
   sps?: InputMaybe<SpFiltersInput>;
+  stipendDefaultCostShare?: InputMaybe<FloatFilterInput>;
+  stipendDefaultRate?: InputMaybe<FloatFilterInput>;
+  stipendPolicy?: InputMaybe<StringFilterInput>;
+  stipend_payments?: InputMaybe<StipendPaymentFiltersInput>;
+  stipend_pledges?: InputMaybe<StipendPledgeFiltersInput>;
+  stipend_programs?: InputMaybe<StipendProgramFiltersInput>;
   supportPage?: InputMaybe<StringFilterInput>;
   tafkidims?: InputMaybe<TafkidimFiltersInput>;
   timeToP?: InputMaybe<StringFilterInput>;
@@ -12961,6 +13363,12 @@ export type ProjectInput = {
   site_share_contributions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   spirit?: InputMaybe<Enum_Project_Spirit>;
   sps?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  stipendDefaultCostShare?: InputMaybe<Scalars['Float']['input']>;
+  stipendDefaultRate?: InputMaybe<Scalars['Float']['input']>;
+  stipendPolicy?: InputMaybe<Enum_Project_Stipendpolicy>;
+  stipend_payments?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  stipend_pledges?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  stipend_programs?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   supportPage?: InputMaybe<Enum_Project_Supportpage>;
   tafkidims?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   timeToP?: InputMaybe<Enum_Project_Timetop>;
@@ -13422,6 +13830,12 @@ export type Query = {
   solutions?: Maybe<SolutionEntityResponseCollection>;
   sp?: Maybe<SpEntityResponse>;
   sps?: Maybe<SpEntityResponseCollection>;
+  stipendPayment?: Maybe<StipendPaymentEntityResponse>;
+  stipendPayments?: Maybe<StipendPaymentEntityResponseCollection>;
+  stipendPledge?: Maybe<StipendPledgeEntityResponse>;
+  stipendPledges?: Maybe<StipendPledgeEntityResponseCollection>;
+  stipendProgram?: Maybe<StipendProgramEntityResponse>;
+  stipendPrograms?: Maybe<StipendProgramEntityResponseCollection>;
   tafkidim?: Maybe<TafkidimEntityResponse>;
   tafkidims?: Maybe<TafkidimEntityResponseCollection>;
   tikunolam?: Maybe<TikunolamEntityResponse>;
@@ -14646,6 +15060,45 @@ export type QuerySpArgs = {
 export type QuerySpsArgs = {
   filters?: InputMaybe<SpFiltersInput>;
   locale?: InputMaybe<Scalars['I18NLocaleCode']['input']>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type QueryStipendPaymentArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryStipendPaymentsArgs = {
+  filters?: InputMaybe<StipendPaymentFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type QueryStipendPledgeArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryStipendPledgesArgs = {
+  filters?: InputMaybe<StipendPledgeFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type QueryStipendProgramArgs = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryStipendProgramsArgs = {
+  filters?: InputMaybe<StipendProgramFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
   publicationState?: InputMaybe<PublicationState>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -17156,6 +17609,397 @@ export type SpRelationResponseCollection = {
   data: Array<SpEntity>;
 };
 
+export type StipendPayment = {
+  __typename?: 'StipendPayment';
+  amount?: Maybe<Scalars['Float']['output']>;
+  confirmedAt?: Maybe<Scalars['DateTime']['output']>;
+  confirmedBy?: Maybe<Enum_Stipendpayment_Confirmedby>;
+  costShare?: Maybe<Scalars['Float']['output']>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  cycleEnd?: Maybe<Scalars['DateTime']['output']>;
+  cycleStart?: Maybe<Scalars['DateTime']['output']>;
+  equityCredit?: Maybe<Scalars['Float']['output']>;
+  equityDebit?: Maybe<Scalars['Float']['output']>;
+  equityMultiplier?: Maybe<Scalars['Float']['output']>;
+  funder?: Maybe<UsersPermissionsUserEntityResponse>;
+  haluka?: Maybe<HalukaEntityResponse>;
+  hours?: Maybe<Scalars['Float']['output']>;
+  matbea?: Maybe<MatbeaEntityResponse>;
+  mode?: Maybe<Enum_Stipendpayment_Mode>;
+  note?: Maybe<Scalars['String']['output']>;
+  project?: Maybe<ProjectEntityResponse>;
+  publishedAt?: Maybe<Scalars['DateTime']['output']>;
+  recipient?: Maybe<UsersPermissionsUserEntityResponse>;
+  repaid?: Maybe<Scalars['Float']['output']>;
+  status?: Maybe<Enum_Stipendpayment_Status>;
+  stipendRate?: Maybe<Scalars['Float']['output']>;
+  stipend_pledge?: Maybe<StipendPledgeEntityResponse>;
+  stipend_program?: Maybe<StipendProgramEntityResponse>;
+  timegrama?: Maybe<TimegramaEntityResponse>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+export type StipendPaymentEntity = {
+  __typename?: 'StipendPaymentEntity';
+  attributes?: Maybe<StipendPayment>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type StipendPaymentEntityResponse = {
+  __typename?: 'StipendPaymentEntityResponse';
+  data?: Maybe<StipendPaymentEntity>;
+};
+
+export type StipendPaymentEntityResponseCollection = {
+  __typename?: 'StipendPaymentEntityResponseCollection';
+  data: Array<StipendPaymentEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type StipendPaymentFiltersInput = {
+  amount?: InputMaybe<FloatFilterInput>;
+  and?: InputMaybe<Array<InputMaybe<StipendPaymentFiltersInput>>>;
+  confirmedAt?: InputMaybe<DateTimeFilterInput>;
+  confirmedBy?: InputMaybe<StringFilterInput>;
+  costShare?: InputMaybe<FloatFilterInput>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  cycleEnd?: InputMaybe<DateTimeFilterInput>;
+  cycleStart?: InputMaybe<DateTimeFilterInput>;
+  equityCredit?: InputMaybe<FloatFilterInput>;
+  equityDebit?: InputMaybe<FloatFilterInput>;
+  equityMultiplier?: InputMaybe<FloatFilterInput>;
+  funder?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  haluka?: InputMaybe<HalukaFiltersInput>;
+  hours?: InputMaybe<FloatFilterInput>;
+  id?: InputMaybe<IdFilterInput>;
+  matbea?: InputMaybe<MatbeaFiltersInput>;
+  mode?: InputMaybe<StringFilterInput>;
+  not?: InputMaybe<StipendPaymentFiltersInput>;
+  note?: InputMaybe<StringFilterInput>;
+  or?: InputMaybe<Array<InputMaybe<StipendPaymentFiltersInput>>>;
+  project?: InputMaybe<ProjectFiltersInput>;
+  publishedAt?: InputMaybe<DateTimeFilterInput>;
+  recipient?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  repaid?: InputMaybe<FloatFilterInput>;
+  status?: InputMaybe<StringFilterInput>;
+  stipendRate?: InputMaybe<FloatFilterInput>;
+  stipend_pledge?: InputMaybe<StipendPledgeFiltersInput>;
+  stipend_program?: InputMaybe<StipendProgramFiltersInput>;
+  timegrama?: InputMaybe<TimegramaFiltersInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+};
+
+export type StipendPaymentInput = {
+  amount?: InputMaybe<Scalars['Float']['input']>;
+  confirmedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  confirmedBy?: InputMaybe<Enum_Stipendpayment_Confirmedby>;
+  costShare?: InputMaybe<Scalars['Float']['input']>;
+  cycleEnd?: InputMaybe<Scalars['DateTime']['input']>;
+  cycleStart?: InputMaybe<Scalars['DateTime']['input']>;
+  equityCredit?: InputMaybe<Scalars['Float']['input']>;
+  equityDebit?: InputMaybe<Scalars['Float']['input']>;
+  equityMultiplier?: InputMaybe<Scalars['Float']['input']>;
+  funder?: InputMaybe<Scalars['ID']['input']>;
+  haluka?: InputMaybe<Scalars['ID']['input']>;
+  hours?: InputMaybe<Scalars['Float']['input']>;
+  matbea?: InputMaybe<Scalars['ID']['input']>;
+  mode?: InputMaybe<Enum_Stipendpayment_Mode>;
+  note?: InputMaybe<Scalars['String']['input']>;
+  project?: InputMaybe<Scalars['ID']['input']>;
+  publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  recipient?: InputMaybe<Scalars['ID']['input']>;
+  repaid?: InputMaybe<Scalars['Float']['input']>;
+  status?: InputMaybe<Enum_Stipendpayment_Status>;
+  stipendRate?: InputMaybe<Scalars['Float']['input']>;
+  stipend_pledge?: InputMaybe<Scalars['ID']['input']>;
+  stipend_program?: InputMaybe<Scalars['ID']['input']>;
+  timegrama?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type StipendPaymentRelationResponseCollection = {
+  __typename?: 'StipendPaymentRelationResponseCollection';
+  data: Array<StipendPaymentEntity>;
+};
+
+export type StipendPledge = {
+  __typename?: 'StipendPledge';
+  costShare?: Maybe<Scalars['Float']['output']>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  cycleSize?: Maybe<Scalars['Int']['output']>;
+  decision?: Maybe<DecisionEntityResponse>;
+  descrip?: Maybe<Scalars['String']['output']>;
+  end?: Maybe<Scalars['DateTime']['output']>;
+  equityMultiplier?: Maybe<Scalars['Float']['output']>;
+  funder?: Maybe<UsersPermissionsUserEntityResponse>;
+  initiatedBy?: Maybe<Enum_Stipendpledge_Initiatedby>;
+  lastSettledAt?: Maybe<Scalars['DateTime']['output']>;
+  mashabetahalich?: Maybe<MashabetahalichEntityResponse>;
+  matbea?: Maybe<MatbeaEntityResponse>;
+  mesimabetahaliches?: Maybe<MesimabetahalichRelationResponseCollection>;
+  mode?: Maybe<Enum_Stipendpledge_Mode>;
+  monthlyCap?: Maybe<Scalars['Float']['output']>;
+  noticeCycles?: Maybe<Scalars['Int']['output']>;
+  paidTotal?: Maybe<Scalars['Float']['output']>;
+  project?: Maybe<ProjectEntityResponse>;
+  proposedBy?: Maybe<UsersPermissionsUserEntityResponse>;
+  publishedAt?: Maybe<Scalars['DateTime']['output']>;
+  recipient?: Maybe<UsersPermissionsUserEntityResponse>;
+  recourse?: Maybe<Enum_Stipendpledge_Recourse>;
+  revenueTrigger?: Maybe<Scalars['Float']['output']>;
+  scope?: Maybe<Enum_Stipendpledge_Scope>;
+  start?: Maybe<Scalars['DateTime']['output']>;
+  status?: Maybe<Enum_Stipendpledge_Status>;
+  stipendRate?: Maybe<Scalars['Float']['output']>;
+  stipend_payments?: Maybe<StipendPaymentRelationResponseCollection>;
+  stipend_program?: Maybe<StipendProgramEntityResponse>;
+  totalCap?: Maybe<Scalars['Float']['output']>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+
+export type StipendPledgeMesimabetahalichesArgs = {
+  filters?: InputMaybe<MesimabetahalichFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type StipendPledgeStipend_PaymentsArgs = {
+  filters?: InputMaybe<StipendPaymentFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+export type StipendPledgeEntity = {
+  __typename?: 'StipendPledgeEntity';
+  attributes?: Maybe<StipendPledge>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type StipendPledgeEntityResponse = {
+  __typename?: 'StipendPledgeEntityResponse';
+  data?: Maybe<StipendPledgeEntity>;
+};
+
+export type StipendPledgeEntityResponseCollection = {
+  __typename?: 'StipendPledgeEntityResponseCollection';
+  data: Array<StipendPledgeEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type StipendPledgeFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<StipendPledgeFiltersInput>>>;
+  costShare?: InputMaybe<FloatFilterInput>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  cycleSize?: InputMaybe<IntFilterInput>;
+  decision?: InputMaybe<DecisionFiltersInput>;
+  descrip?: InputMaybe<StringFilterInput>;
+  end?: InputMaybe<DateTimeFilterInput>;
+  equityMultiplier?: InputMaybe<FloatFilterInput>;
+  funder?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  id?: InputMaybe<IdFilterInput>;
+  initiatedBy?: InputMaybe<StringFilterInput>;
+  lastSettledAt?: InputMaybe<DateTimeFilterInput>;
+  mashabetahalich?: InputMaybe<MashabetahalichFiltersInput>;
+  matbea?: InputMaybe<MatbeaFiltersInput>;
+  mesimabetahaliches?: InputMaybe<MesimabetahalichFiltersInput>;
+  mode?: InputMaybe<StringFilterInput>;
+  monthlyCap?: InputMaybe<FloatFilterInput>;
+  not?: InputMaybe<StipendPledgeFiltersInput>;
+  noticeCycles?: InputMaybe<IntFilterInput>;
+  or?: InputMaybe<Array<InputMaybe<StipendPledgeFiltersInput>>>;
+  paidTotal?: InputMaybe<FloatFilterInput>;
+  project?: InputMaybe<ProjectFiltersInput>;
+  proposedBy?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  publishedAt?: InputMaybe<DateTimeFilterInput>;
+  recipient?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  recourse?: InputMaybe<StringFilterInput>;
+  revenueTrigger?: InputMaybe<FloatFilterInput>;
+  scope?: InputMaybe<StringFilterInput>;
+  start?: InputMaybe<DateTimeFilterInput>;
+  status?: InputMaybe<StringFilterInput>;
+  stipendRate?: InputMaybe<FloatFilterInput>;
+  stipend_payments?: InputMaybe<StipendPaymentFiltersInput>;
+  stipend_program?: InputMaybe<StipendProgramFiltersInput>;
+  totalCap?: InputMaybe<FloatFilterInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+};
+
+export type StipendPledgeInput = {
+  costShare?: InputMaybe<Scalars['Float']['input']>;
+  cycleSize?: InputMaybe<Scalars['Int']['input']>;
+  decision?: InputMaybe<Scalars['ID']['input']>;
+  descrip?: InputMaybe<Scalars['String']['input']>;
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  equityMultiplier?: InputMaybe<Scalars['Float']['input']>;
+  funder?: InputMaybe<Scalars['ID']['input']>;
+  initiatedBy?: InputMaybe<Enum_Stipendpledge_Initiatedby>;
+  lastSettledAt?: InputMaybe<Scalars['DateTime']['input']>;
+  mashabetahalich?: InputMaybe<Scalars['ID']['input']>;
+  matbea?: InputMaybe<Scalars['ID']['input']>;
+  mesimabetahaliches?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  mode?: InputMaybe<Enum_Stipendpledge_Mode>;
+  monthlyCap?: InputMaybe<Scalars['Float']['input']>;
+  noticeCycles?: InputMaybe<Scalars['Int']['input']>;
+  paidTotal?: InputMaybe<Scalars['Float']['input']>;
+  project?: InputMaybe<Scalars['ID']['input']>;
+  proposedBy?: InputMaybe<Scalars['ID']['input']>;
+  publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  recipient?: InputMaybe<Scalars['ID']['input']>;
+  recourse?: InputMaybe<Enum_Stipendpledge_Recourse>;
+  revenueTrigger?: InputMaybe<Scalars['Float']['input']>;
+  scope?: InputMaybe<Enum_Stipendpledge_Scope>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+  status?: InputMaybe<Enum_Stipendpledge_Status>;
+  stipendRate?: InputMaybe<Scalars['Float']['input']>;
+  stipend_payments?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  stipend_program?: InputMaybe<Scalars['ID']['input']>;
+  totalCap?: InputMaybe<Scalars['Float']['input']>;
+};
+
+export type StipendPledgeRelationResponseCollection = {
+  __typename?: 'StipendPledgeRelationResponseCollection';
+  data: Array<StipendPledgeEntity>;
+};
+
+export type StipendProgram = {
+  __typename?: 'StipendProgram';
+  costShare?: Maybe<Scalars['Float']['output']>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  decision?: Maybe<DecisionEntityResponse>;
+  descrip?: Maybe<Scalars['String']['output']>;
+  end?: Maybe<Scalars['DateTime']['output']>;
+  equityMultiplier?: Maybe<Scalars['Float']['output']>;
+  funder?: Maybe<UsersPermissionsUserEntityResponse>;
+  matbea?: Maybe<MatbeaEntityResponse>;
+  mode?: Maybe<Enum_Stipendprogram_Mode>;
+  monthlyCap?: Maybe<Scalars['Float']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  open_mashaabims?: Maybe<OpenMashaabimRelationResponseCollection>;
+  project?: Maybe<ProjectEntityResponse>;
+  proposedBy?: Maybe<UsersPermissionsUserEntityResponse>;
+  publishedAt?: Maybe<Scalars['DateTime']['output']>;
+  revenueTrigger?: Maybe<Scalars['Float']['output']>;
+  scope?: Maybe<Enum_Stipendprogram_Scope>;
+  seekingFunder?: Maybe<Scalars['Boolean']['output']>;
+  spent?: Maybe<Scalars['Float']['output']>;
+  start?: Maybe<Scalars['DateTime']['output']>;
+  status?: Maybe<Enum_Stipendprogram_Status>;
+  stipendRate?: Maybe<Scalars['Float']['output']>;
+  stipend_payments?: Maybe<StipendPaymentRelationResponseCollection>;
+  stipend_pledges?: Maybe<StipendPledgeRelationResponseCollection>;
+  totalCap?: Maybe<Scalars['Float']['output']>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+
+export type StipendProgramOpen_MashaabimsArgs = {
+  filters?: InputMaybe<OpenMashaabimFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type StipendProgramStipend_PaymentsArgs = {
+  filters?: InputMaybe<StipendPaymentFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type StipendProgramStipend_PledgesArgs = {
+  filters?: InputMaybe<StipendPledgeFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+export type StipendProgramEntity = {
+  __typename?: 'StipendProgramEntity';
+  attributes?: Maybe<StipendProgram>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
+export type StipendProgramEntityResponse = {
+  __typename?: 'StipendProgramEntityResponse';
+  data?: Maybe<StipendProgramEntity>;
+};
+
+export type StipendProgramEntityResponseCollection = {
+  __typename?: 'StipendProgramEntityResponseCollection';
+  data: Array<StipendProgramEntity>;
+  meta: ResponseCollectionMeta;
+};
+
+export type StipendProgramFiltersInput = {
+  and?: InputMaybe<Array<InputMaybe<StipendProgramFiltersInput>>>;
+  costShare?: InputMaybe<FloatFilterInput>;
+  createdAt?: InputMaybe<DateTimeFilterInput>;
+  decision?: InputMaybe<DecisionFiltersInput>;
+  descrip?: InputMaybe<StringFilterInput>;
+  end?: InputMaybe<DateTimeFilterInput>;
+  equityMultiplier?: InputMaybe<FloatFilterInput>;
+  funder?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  id?: InputMaybe<IdFilterInput>;
+  matbea?: InputMaybe<MatbeaFiltersInput>;
+  mode?: InputMaybe<StringFilterInput>;
+  monthlyCap?: InputMaybe<FloatFilterInput>;
+  name?: InputMaybe<StringFilterInput>;
+  not?: InputMaybe<StipendProgramFiltersInput>;
+  open_mashaabims?: InputMaybe<OpenMashaabimFiltersInput>;
+  or?: InputMaybe<Array<InputMaybe<StipendProgramFiltersInput>>>;
+  project?: InputMaybe<ProjectFiltersInput>;
+  proposedBy?: InputMaybe<UsersPermissionsUserFiltersInput>;
+  publishedAt?: InputMaybe<DateTimeFilterInput>;
+  revenueTrigger?: InputMaybe<FloatFilterInput>;
+  scope?: InputMaybe<StringFilterInput>;
+  seekingFunder?: InputMaybe<BooleanFilterInput>;
+  spent?: InputMaybe<FloatFilterInput>;
+  start?: InputMaybe<DateTimeFilterInput>;
+  status?: InputMaybe<StringFilterInput>;
+  stipendRate?: InputMaybe<FloatFilterInput>;
+  stipend_payments?: InputMaybe<StipendPaymentFiltersInput>;
+  stipend_pledges?: InputMaybe<StipendPledgeFiltersInput>;
+  totalCap?: InputMaybe<FloatFilterInput>;
+  updatedAt?: InputMaybe<DateTimeFilterInput>;
+};
+
+export type StipendProgramInput = {
+  costShare?: InputMaybe<Scalars['Float']['input']>;
+  decision?: InputMaybe<Scalars['ID']['input']>;
+  descrip?: InputMaybe<Scalars['String']['input']>;
+  end?: InputMaybe<Scalars['DateTime']['input']>;
+  equityMultiplier?: InputMaybe<Scalars['Float']['input']>;
+  funder?: InputMaybe<Scalars['ID']['input']>;
+  matbea?: InputMaybe<Scalars['ID']['input']>;
+  mode?: InputMaybe<Enum_Stipendprogram_Mode>;
+  monthlyCap?: InputMaybe<Scalars['Float']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  open_mashaabims?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  project?: InputMaybe<Scalars['ID']['input']>;
+  proposedBy?: InputMaybe<Scalars['ID']['input']>;
+  publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  revenueTrigger?: InputMaybe<Scalars['Float']['input']>;
+  scope?: InputMaybe<Enum_Stipendprogram_Scope>;
+  seekingFunder?: InputMaybe<Scalars['Boolean']['input']>;
+  spent?: InputMaybe<Scalars['Float']['input']>;
+  start?: InputMaybe<Scalars['DateTime']['input']>;
+  status?: InputMaybe<Enum_Stipendprogram_Status>;
+  stipendRate?: InputMaybe<Scalars['Float']['input']>;
+  stipend_payments?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  stipend_pledges?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  totalCap?: InputMaybe<Scalars['Float']['input']>;
+};
+
+export type StipendProgramRelationResponseCollection = {
+  __typename?: 'StipendProgramRelationResponseCollection';
+  data: Array<StipendProgramEntity>;
+};
+
 export type StringFilterInput = {
   and?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   between?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -17455,6 +18299,7 @@ export type Timegrama = {
   pendm?: Maybe<PendmEntityResponse>;
   pmash?: Maybe<PmashEntityResponse>;
   sheirutpend?: Maybe<SheirutpendEntityResponse>;
+  stipend_payment?: Maybe<StipendPaymentEntityResponse>;
   timer?: Maybe<TimerEntityResponse>;
   tosplit?: Maybe<TosplitEntityResponse>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -17503,6 +18348,7 @@ export type TimegramaFiltersInput = {
   pendm?: InputMaybe<PendmFiltersInput>;
   pmash?: InputMaybe<PmashFiltersInput>;
   sheirutpend?: InputMaybe<SheirutpendFiltersInput>;
+  stipend_payment?: InputMaybe<StipendPaymentFiltersInput>;
   timer?: InputMaybe<TimerFiltersInput>;
   tosplit?: InputMaybe<TosplitFiltersInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
@@ -17529,6 +18375,7 @@ export type TimegramaInput = {
   pendm?: InputMaybe<Scalars['ID']['input']>;
   pmash?: InputMaybe<Scalars['ID']['input']>;
   sheirutpend?: InputMaybe<Scalars['ID']['input']>;
+  stipend_payment?: InputMaybe<Scalars['ID']['input']>;
   timer?: InputMaybe<Scalars['ID']['input']>;
   tosplit?: InputMaybe<Scalars['ID']['input']>;
   whatami?: InputMaybe<Scalars['String']['input']>;
@@ -18384,6 +19231,11 @@ export type UsersPermissionsUser = {
   socketId?: Maybe<Scalars['String']['output']>;
   sphmin?: Maybe<Scalars['Float']['output']>;
   sps?: Maybe<SpRelationResponseCollection>;
+  stipend_payments_funded?: Maybe<StipendPaymentRelationResponseCollection>;
+  stipend_payments_received?: Maybe<StipendPaymentRelationResponseCollection>;
+  stipend_pledges_funded?: Maybe<StipendPledgeRelationResponseCollection>;
+  stipend_pledges_received?: Maybe<StipendPledgeRelationResponseCollection>;
+  stipend_programs_funded?: Maybe<StipendProgramRelationResponseCollection>;
   tafkidims?: Maybe<TafkidimRelationResponseCollection>;
   telegramId?: Maybe<Scalars['String']['output']>;
   timeForVid?: Maybe<Scalars['DateTime']['output']>;
@@ -18910,6 +19762,46 @@ export type UsersPermissionsUserSpsArgs = {
 };
 
 
+export type UsersPermissionsUserStipend_Payments_FundedArgs = {
+  filters?: InputMaybe<StipendPaymentFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type UsersPermissionsUserStipend_Payments_ReceivedArgs = {
+  filters?: InputMaybe<StipendPaymentFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type UsersPermissionsUserStipend_Pledges_FundedArgs = {
+  filters?: InputMaybe<StipendPledgeFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type UsersPermissionsUserStipend_Pledges_ReceivedArgs = {
+  filters?: InputMaybe<StipendPledgeFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type UsersPermissionsUserStipend_Programs_FundedArgs = {
+  filters?: InputMaybe<StipendProgramFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
 export type UsersPermissionsUserTafkidimsArgs = {
   filters?: InputMaybe<TafkidimFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
@@ -19103,6 +19995,11 @@ export type UsersPermissionsUserFiltersInput = {
   socketId?: InputMaybe<StringFilterInput>;
   sphmin?: InputMaybe<FloatFilterInput>;
   sps?: InputMaybe<SpFiltersInput>;
+  stipend_payments_funded?: InputMaybe<StipendPaymentFiltersInput>;
+  stipend_payments_received?: InputMaybe<StipendPaymentFiltersInput>;
+  stipend_pledges_funded?: InputMaybe<StipendPledgeFiltersInput>;
+  stipend_pledges_received?: InputMaybe<StipendPledgeFiltersInput>;
+  stipend_programs_funded?: InputMaybe<StipendProgramFiltersInput>;
   tafkidims?: InputMaybe<TafkidimFiltersInput>;
   telegramId?: InputMaybe<StringFilterInput>;
   timeForVid?: InputMaybe<DateTimeFilterInput>;
@@ -19232,6 +20129,11 @@ export type UsersPermissionsUserInput = {
   socketId?: InputMaybe<Scalars['String']['input']>;
   sphmin?: InputMaybe<Scalars['Float']['input']>;
   sps?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  stipend_payments_funded?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  stipend_payments_received?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  stipend_pledges_funded?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  stipend_pledges_received?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  stipend_programs_funded?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   tafkidims?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   telegramId?: InputMaybe<Scalars['String']['input']>;
   timeForVid?: InputMaybe<Scalars['DateTime']['input']>;

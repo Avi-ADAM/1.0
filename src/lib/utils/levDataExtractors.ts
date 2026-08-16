@@ -573,6 +573,17 @@ export function buildSuggestionsFromMatchRecords(
       hearotMeyuchadot: mission.attributes?.hearotMeyuchadot || '',
       noofhours: mission.attributes?.noofhours || 0,
       perhour: mission.attributes?.perhour || 0,
+      // The stipend the mission was published with (PLAN_STIPEND §13). Two
+      // different numbers reach the card: what the work is worth (perhour) and
+      // what someone will pay you to live on while you do it (stipendRate).
+      stipendRate: mission.attributes?.stipendRate || 0,
+      stipendCostShare:
+        mission.attributes?.stipendCostShare != null
+          ? Number(mission.attributes.stipendCostShare)
+          : 1,
+      stipendMode: mission.attributes?.stipendMode || 'equity',
+      stipendFunderName:
+        mission.attributes?.stipendFunder?.data?.attributes?.username || '',
       sqadualed: mission.attributes?.sqadualed || '',
       dates: mission.attributes?.dates || '',
 

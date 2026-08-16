@@ -1171,6 +1171,10 @@
                   noOfHours={buble.noofhours}
                   perhour={buble.perhour}
                   total={buble.noofhours * buble.perhour}
+                  stipendRate={buble.stipendRate ?? 0}
+                  stipendCostShare={buble.stipendCostShare ?? 1}
+                  stipendMode={buble.stipendMode ?? 'equity'}
+                  stipendFunderName={buble.stipendFunderName ?? ''}
                   selfNomination={buble.source === 'selfNomination'}
                   cards="true"
                 /></SwiperSlide

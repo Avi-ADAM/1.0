@@ -132,6 +132,30 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
     const sqadualedFrag = attrs.sqadualed ? `sqadualed: "${attrs.sqadualed}"` : '';
     const datesFrag = attrs.dates ? `dates: "${attrs.dates}"` : '';
 
+    // The mission's subsistence-stipend need travels with it (PLAN_STIPEND §13).
+    // The rikma just approved hours × rate *and* the stipend attached to them,
+    // so the open mission has to carry the same terms — otherwise whoever takes
+    // it would arrive at a mission the rikma funded and find nothing there.
+    const stipRate = Number(attrs.stipendRate) > 0 ? Number(attrs.stipendRate) : null;
+    const stipFunderId = attrs.stipendFunder?.data?.id
+      ? String(attrs.stipendFunder.data.id)
+      : null;
+    const stipendFrag =
+      stipRate == null
+        ? ''
+        : [
+            `stipendRate: ${stipRate}`,
+            `stipendCostShare: ${attrs.stipendCostShare != null ? Number(attrs.stipendCostShare) : 1}`,
+            `stipendMode: ${
+              attrs.stipendMode === 'advance' || attrs.stipendMode === 'gift'
+                ? attrs.stipendMode
+                : 'equity'
+            }`,
+            stipFunderId ? `stipendFunder: "${stipFunderId}"` : null,
+          ]
+            .filter(Boolean)
+            .join(', ') + ',';
+
     const strapiUrl = STRAPI_URL;
     const graphqlUrl = `${strapiUrl}/graphql`;
     const headers = {
@@ -178,6 +202,7 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
         publicklinks: ${gqlString(attrs.publicklinks)},
         pendm: "${pendId}",
         ${assigneeId ? `isRishon: true, rishon: "${assigneeId}", archived: true,` : ''}
+        ${stipendFrag}
         ${sqadualedFrag}
         ${datesFrag}
       }) { data { id } }

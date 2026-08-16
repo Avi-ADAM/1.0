@@ -2,6 +2,7 @@
   import { page } from '$app/state';
   import DiscoveryMap from '$lib/components/location/DiscoveryMap.svelte';
   import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
+  import ShareLink from '$lib/components/share/ShareLink.svelte';
   import { LAYER_COLORS, type MapItem, type MapLayer } from '$lib/map/discoveryTypes';
   import { t, isRtl, locale } from '$lib/translations';
   import { Head } from 'svead';
@@ -82,7 +83,14 @@
 
 <div class="directory" dir={$isRtl ? 'rtl' : 'ltr'}>
   <header class="head">
-    <DiscoveryNav current="missions" isLoggedIn={data.isLoggedIn} />
+    <div class="navrow">
+      <DiscoveryNav current="missions" isLoggedIn={data.isLoggedIn} />
+      <ShareLink
+        path="/availableMission"
+        title={$t('discover.missions_title')}
+        desc={$t('ui.share.missions')}
+      />
+    </div>
     <h1>🛠️ {$t('discover.missions_title')}</h1>
     <p class="sub">{$t('discover.missions_subtitle')}</p>
 
@@ -225,6 +233,14 @@
 </div>
 
 <style>
+  /* The directory's own nav, and the button that passes it on. */
+  .navrow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
   .directory {
     max-width: 72rem;
     margin: 0 auto;

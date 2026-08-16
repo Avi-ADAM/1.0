@@ -41,6 +41,10 @@
    * @property {any} [workways] - Workways data
    * @property {number} [noOfHours] - Number of hours
    * @property {number} [perhour] - Per hour rate
+   * @property {number} [stipendRate] - subsistence stipend the mission carries, ₪/hour
+   * @property {number} [stipendCostShare] - α on that stipend
+   * @property {string} [stipendMode] - equity | advance | gift
+   * @property {string} [stipendFunderName] - the member funding it, when named
    * @property {number} [total] - Total value
    * @property {any} [askedarr] - Asked array
    * @property {any} [declineddarr] - Declined array
@@ -86,6 +90,13 @@
     workways = [],
     noOfHours = 0,
     perhour = 0,
+    // The stipend the mission was published with (PLAN_STIPEND §13) — passed
+    // straight through to the card, which shows it next to (never instead of)
+    // the mission's own value.
+    stipendRate = 0,
+    stipendCostShare = 1,
+    stipendMode = 'equity',
+    stipendFunderName = '',
     total = 0,
     askedarr = [],
     declineddarr = [],
@@ -2914,6 +2925,10 @@
               {missionName}
               {noOfHours}
               {perhour}
+              {stipendRate}
+              {stipendCostShare}
+              {stipendMode}
+              {stipendFunderName}
               {already}
               {missionDetails}
               {skills}
@@ -2959,6 +2974,10 @@
     {missionName}
     {noOfHours}
     {perhour}
+    {stipendRate}
+    {stipendCostShare}
+    {stipendMode}
+    {stipendFunderName}
     {already}
     {missionDetails}
     {skills}

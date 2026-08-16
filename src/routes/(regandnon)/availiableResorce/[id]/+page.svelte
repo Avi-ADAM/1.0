@@ -2,7 +2,7 @@
     import { toast } from 'svelte-sonner';
     import SucssesConf from '$lib/celim/sucssesConf.svelte';
     import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
-    import Share from '$lib/components/share/shareButtons/index.svelte';
+    import Share from '$lib/components/share/ShareLink.svelte';
     import { page } from '$app/state';
     import { lang } from '$lib/stores/lang.js';
     import { t } from '$lib/translations';
@@ -538,7 +538,7 @@
                                     {/if}
                                 </div>
                                 <div class="">
-                                    <Share slug={'availiableResorce/' + page.data?.mId} title={data.alld?.titleKey ? $t(data.alld.titleKey, data.alld.titleParams) : ''} desc="it's new thing" hashtags={['1💗1', 'consensus']} quote={data.alld?.titleKey ? $t(data.alld.titleKey, data.alld.titleParams) : ''} related={[]} via={''} />
+                                    <Share path={'/availiableResorce/' + page.data?.mId} title={data.alld?.titleKey ? $t(data.alld.titleKey, data.alld.titleParams) : ''} desc={$t('ui.share.resource')} hashtags={['1lev1', 'resource']} quote={data.alld?.titleKey ? $t(data.alld.titleKey, data.alld.titleParams) : ''} />
                                 </div>
                             </div>
 

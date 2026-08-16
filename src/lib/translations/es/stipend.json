@@ -193,5 +193,38 @@
     "action": "Publicar la petición",
     "published": "Petición publicada",
     "publishedWithMatches": "Publicada y sugerida a {{count}} personas afines"
+  },
+  "mission": {
+    "title": "Una beca de subsistencia para esta misión",
+    "hint": "Una misión puede venir con una beca: un pago por hora modesto que permite a quien la tome comer mientras trabaja en ella.",
+    "whoPays": "Quién asume el coste",
+    "noDilution": "Quien la hace — sin diluir a nadie",
+    "noDilutionExplain": "Dinero ahora en lugar de parte de la participación: su parte baja lo que vale la beca, y el porcentaje de los demás no se mueve en absoluto.",
+    "dilutes": "Toda la rikma — todos se diluyen juntos",
+    "dilutesExplain": "El trabajo vale su valor completo sin importar quién necesitaba dinero, y la beca cuenta como aportación adicional de quien financia. Todos los miembros se diluyen a prorrata.",
+    "budget": "Tope de la beca para esta misión: {{count}}",
+    "budgetCycle": "Tope de la beca por ciclo: {{count}}",
+    "voteNoteBilateral": "Estas condiciones no mueven la parte de nadie salvo la de quien recibe, así que basta con su acuerdo y el de quien financia.",
+    "voteNoteRikma": "Estas condiciones diluyen a todos los miembros, así que la votación de la misión es también el consentimiento a esa dilución. El tope de arriba es el límite.",
+    "onMission": "Esta misión viene con una beca de {{count}} por hora",
+    "seekingFunder": "Buscamos quien financie la beca de esta misión",
+    "fundThis": "Yo financio esta misión"
+  },
+  "fund": {
+    "forMission": "Financiar la misión: {{name}}",
+    "coordinateHelp": "Todavía no hay una vía de pago directa, así que esto es coordinación: se avisa a los miembros de la rikma de que alguien quiere financiar precisamente esta misión, acuerdan contigo la transferencia y la registran."
+  },
+  "offer": {
+    "title": "Esta misión viene con una beca de subsistencia",
+    "investment": "Inversión en el proyecto",
+    "investmentSub": "a {{count}} por hora — esto es lo que compra la parte de la rikma",
+    "stipend": "Beca de subsistencia",
+    "stipendSub": "a {{count}} por hora aprobada — dinero para vivir mientras se hace",
+    "perCycle": "(por ciclo)",
+    "funder": "Financia: {{name}}",
+    "noteRecipient": "La beca se descuenta de la parte de quien la recibe — el porcentaje de los demás no se mueve.",
+    "noteRikma": "El coste se reparte por toda la rikma — todos se diluyen juntos, y eso se aprobó en la votación de la misión.",
+    "noteGift": "La beca es una donación — no afecta al porcentaje de nadie.",
+    "legal": "Una beca de subsistencia entre socios de una rikma: no es un salario ni crea una relación laboral. Quien la recibe es un socio que recibe una ayuda de subsistencia, no un empleado. Esto no es asesoramiento legal ni fiscal."
   }
 }

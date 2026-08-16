@@ -165,7 +165,9 @@
   const groups = [
     { id: 'main', label: 'main', tabs: ['main'] },
     { id: 'work', label: 'work', tabs: ['progress', 'acts', 'kanban', 'gantt', 'timers', 'shifts'] },
-    { id: 'flows', label: 'flows', tabs: ['processes', 'chains'] },
+    // 'api' = how work reaches this rikma from systems outside it — the same
+    // group as the flows work moves along once it is here.
+    { id: 'flows', label: 'flows', tabs: ['processes', 'chains', 'api'] },
     { id: 'money', label: 'money', tabs: ['sales', 'split', 'stipend'] },
     // 'open' = the rikma's own open missions/resources looking for partners.
     // It sits after 'wishes' so the group keeps its landing page (and its

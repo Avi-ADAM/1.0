@@ -8,6 +8,7 @@
    * status badge and the primary link differ.
    */
   import { t, locale } from '$lib/translations';
+  import MissionStipendOffer from '$lib/components/stipend/MissionStipendOffer.svelte';
   import Tile from '$lib/celim/tile.svelte';
   import Share from '$lib/components/share/shareButtons/index.svelte';
   import ArchiveObjectButton from '$lib/components/archive/ArchiveObjectButton.svelte';
@@ -93,6 +94,19 @@
       </div>
     {/if}
   </header>
+
+  <!-- A mission the rikma published with a stipend attached (PLAN_STIPEND §13):
+       what it is worth and what someone is paying so it can be done, side by
+       side — never merged into one number. -->
+  <MissionStipendOffer
+    {hours}
+    {perhour}
+    stipendRate={Number(a.stipendRate) || 0}
+    costShare={a.stipendCostShare ?? 1}
+    mode={a.stipendMode || 'equity'}
+    funderName={a.stipendFunder?.data?.attributes?.username || ''}
+    compact={true}
+  />
 
   {#if excerpt}
     <p class="line-clamp-3 text-sm text-slate-300">{excerpt}</p>

@@ -13,6 +13,7 @@
   // ייבוא הקומפוננטה החדשה (נניח שהיא באותה תיקייה או בתיקיית הקומפוננטות)
   import AuthorityBadge from '$lib/components/ui/AuthorityBadge.svelte';
   import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
+  import ShareLink from '$lib/components/share/ShareLink.svelte';
 
   let { data } = $props();
   // Derived so navigating between /project/A and /project/B (same component
@@ -144,8 +145,11 @@
         </div>
 
         <!-- Social Links (Glassy container) -->
+        <!-- `relative z-30`: the door-cards below are `backdrop-filter` layers,
+             so without a stacking context of its own this row (and the open
+             share dropdown inside it) would be painted behind them. -->
         <div
-          class="flex gap-4 p-3 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm shadow-lg mb-6"
+          class="relative z-30 flex gap-4 p-3 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm shadow-lg mb-6"
         >
           {#if discordlink}
             <a
@@ -236,6 +240,18 @@
               />
             </a>
           {/if}
+          <!-- Sharing the rikma belongs with the rikma's own links, and it is
+               the one that is always there — a rikma with no website still
+               wants to be passed on. -->
+          <div class="social-btn">
+            <ShareLink
+              path={`/project/${projectId}`}
+              title={project.attributes.projectName}
+              desc={$t('ui.share.project')}
+              hashtags={['1lev1', 'rikma']}
+              size={24}
+            />
+          </div>
         </div>
 
         <!-- The two public doors: support (PLAN_VOLUNTEER_RIKMA §3) and

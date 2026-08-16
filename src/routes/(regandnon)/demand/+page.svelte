@@ -3,6 +3,7 @@
   import { page } from '$app/state';
   import DiscoveryMap from '$lib/components/location/DiscoveryMap.svelte';
   import DiscoveryNav from '$lib/components/discovery/DiscoveryNav.svelte';
+  import ShareLink from '$lib/components/share/ShareLink.svelte';
   import AddSupplySheet from '$lib/components/offerings/AddSupplySheet.svelte';
   import {
     LAYER_COLORS,
@@ -190,7 +191,14 @@
 
 <div class="demand-page" dir={$isRtl ? 'rtl' : 'ltr'}>
   <header class="head">
-    <DiscoveryNav current="map" isLoggedIn={data.isLoggedIn} />
+    <div class="navrow">
+      <DiscoveryNav current="map" isLoggedIn={data.isLoggedIn} />
+      <ShareLink
+        path="/demand"
+        title={$t('demand.title')}
+        desc={$t('ui.share.map')}
+      />
+    </div>
     <h1>{$t('demand.title')}</h1>
     <p class="sub">{$t('demand.subtitle')}</p>
 
@@ -338,6 +346,14 @@
 {/if}
 
 <style>
+  /* The directory's own nav, and the button that passes it on. */
+  .navrow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
   .add-supply {
     position: fixed;
     bottom: 4.5rem;

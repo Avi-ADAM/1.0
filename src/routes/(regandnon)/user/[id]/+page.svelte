@@ -6,6 +6,7 @@
  import { lang } from '$lib/stores/lang.js'
   import Header from '$lib/components/header/header.svelte'
   import UserStorefront from '$lib/components/offerings/UserStorefront.svelte'
+  import ShareLink from '$lib/components/share/ShareLink.svelte'
   let { data } = $props();
   let userId = data.userId; 
 
@@ -115,6 +116,18 @@ $effect(() => {
 <Header/>
 {/if}
   <div dir="rtl" >
+    <!-- Share the public profile. It sits outside the <svg>: every other piece
+         of this page lives in a foreignObject, which would clip the dropdown.
+         120px clears the header's own top-left/top-right buttons. -->
+    <div class="share-fab">
+      <ShareLink
+        path={`/user/${userId}`}
+        title={user ? user.username : ''}
+        desc={$t('ui.share.user')}
+        align="start"
+        size={24}
+      />
+    </div>
 
       <div class="middle" bind:clientHeight="{h}" bind:clientWidth="{w}">
         <svg class="bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400" width="100vw" height="100vh" id="eARfSi12ITv1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -290,6 +303,17 @@ $effect(() => {
 font-size: 50px;
 text-align: center;
 color: var(--barbi-pink);
+  }
+
+  .share-fab {
+    position: fixed;
+    top: 120px;
+    inset-inline-start: 0.75rem;
+    z-index: 20;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 9999px;
+    padding: 0.35rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
   }
 
    

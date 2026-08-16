@@ -122,7 +122,9 @@
       "Bash(curl *)",
       "Skill(update-config)",
       "Bash(npx svelte-kit *)",
-      "PowerShell(npx vitest run src/lib/recurring/missionMonths.test.ts 2>&1 | Select-Object -Last 30)"
+      "PowerShell(npx vitest run src/lib/recurring/missionMonths.test.ts 2>&1 | Select-Object -Last 30)",
+      "Read(//c/Users/babay/Documents/GitHub/106_ezrachi/**)",
+      "Bash(rm -rf src/routes/api/tickets/onelevone-webhook)"
     ],
     "additionalDirectories": [
       "c:\\Users\\babay\\Documents\\GitHub\\1.0main\\src\\routes\\deals\\request",

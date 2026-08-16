@@ -39,6 +39,13 @@
     uid = null,
     /** @type {'support' | 'record'} start mode: supporter-facing or member recording */
     mode = 'support',
+    /**
+     * Earmark the coordination to one open mission — "I'll fund *this* one"
+     * from the public support page. The rikma still receives and records the
+     * money; the earmark is what tells its members what the gift is for.
+     * @type {{ id: string, name?: string, suggested?: number, stipendRate?: number } | null}
+     */
+    mission = null,
     /** called after a successful record/request */
     onDone
   } = $props();
@@ -54,6 +61,12 @@
   let from = $state('');
   let msg = $state('');
   let contact = $state('');
+  // A mission earmark arrives with a suggested amount — what the mission (or
+  // its stipend) actually costs. Seeded on open rather than at construction:
+  // the same dialog instance serves every mission card on the page.
+  $effect(() => {
+    if (isOpen && mission?.suggested && !amount) amount = Number(mission.suggested);
+  });
   let holderId = $state(mode === 'record' && isMember && uid ? String(uid) : '');
   let busy = $state(false);
 
@@ -70,7 +83,8 @@
         from: from.trim() || undefined,
         amount: amount > 0 ? Number(amount) : undefined,
         msg: msg.trim() || undefined,
-        contact: contact.trim() || undefined
+        contact: contact.trim() || undefined,
+        openMissionId: mission?.id ? String(mission.id) : undefined
       });
       if (!res.success) throw new Error(res.error?.message ?? 'failed');
       toast.success($t('revenue.donate.okReq'));
@@ -143,7 +157,19 @@
           {/if}
 
           {#if tab === 'coordinate'}
-            <p class="dd-help">{$t('revenue.donate.coordinateHelp')}</p>
+            {#if mission}
+              <p class="dd-mission">
+                {$t('stipend.fund.forMission', { name: mission.name ?? '' })}
+                {#if mission.stipendRate}
+                  <span class="dd-mission-sub">
+                    {$t('stipend.mission.onMission', { count: mission.stipendRate })}
+                  </span>
+                {/if}
+              </p>
+            {/if}
+            <p class="dd-help">
+              {mission ? $t('stipend.fund.coordinateHelp') : $t('revenue.donate.coordinateHelp')}
+            </p>
             <label class="dd-field">
               <span>{$t('revenue.donate.name')}</span>
               <input type="text" bind:value={from} maxlength="80" />
@@ -235,6 +261,19 @@
     color: rgba(255, 255, 255, 0.6);
     font-size: 0.85rem;
     margin-bottom: 0.75rem;
+  }
+  .dd-mission {
+    border: 1px solid rgba(20, 184, 166, 0.5);
+    border-radius: 0.75rem;
+    padding: 0.6rem 0.8rem;
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+  }
+  .dd-mission-sub {
+    display: block;
+    font-weight: 400;
+    font-size: 0.8rem;
+    opacity: 0.75;
   }
   .dd-tabs {
     display: flex;

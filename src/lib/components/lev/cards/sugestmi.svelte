@@ -14,6 +14,7 @@
   import CardHeader from './CardHeader.svelte';
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
   import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
+  import MissionStipendOffer from '$lib/components/stipend/MissionStipendOffer.svelte';
 
   /**
    * @typedef {Object} Props
@@ -31,6 +32,13 @@
     src,
     perhour,
     noOfHours,
+    // A mission published with a stipend attached (PLAN_STIPEND §13). Shown as
+    // its own block: what the work is worth and what someone will pay you to
+    // live on while you do it are two different numbers.
+    stipendRate = 0,
+    stipendCostShare = 1,
+    stipendMode = 'equity',
+    stipendFunderName = '',
     missionDetails,
     missionName,
     skills = [],
@@ -316,6 +324,19 @@
         {isMonthly ? ' ' + $t('lev.cards.common.monthly') : ''}
       </span>
     </div>
+
+    <!-- מלגת קיום שמצורפת למשימה — ההשקעה בפרויקט והמלגה זו לצד זו, עם
+         ההסתייגות שמדובר בשותפות ולא ביחסי עובד-מעביד. -->
+    <MissionStipendOffer
+      hours={myRound?.noofhours ?? noOfHours}
+      perhour={myRound?.perhour ?? perhour}
+      {stipendRate}
+      costShare={stipendCostShare}
+      mode={stipendMode}
+      funderName={stipendFunderName}
+      monthly={isMonthly}
+      compact={isMobileOrTablet()}
+    />
 
     <!-- שווי צפוי בריקמה — כמה מהריקמה תהיה שווה המשימה אם תושלם היום.
          המשימה היא אחת מ-open_missions ⇒ alreadyCountedIn="pipeline". -->

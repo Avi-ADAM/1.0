@@ -8,6 +8,7 @@
   import RichText from '$lib/celim/ui/richText.svelte';
   import { invalidate } from '$app/navigation';
   import DonateDialog from '$lib/components/revenue/DonateDialog.svelte';
+  import ShareLink from '$lib/components/share/ShareLink.svelte';
   import { htmlExcerpt } from '$lib/text/htmlExcerpt';
 
   let { data } = $props();
@@ -24,7 +25,33 @@
   let uid = $derived(data.uid ?? null);
 
   let donateOpen = $state(false);
+  /**
+   * The mission a supporter said "I'll fund this one" about (PLAN_STIPEND §13).
+   * The dialog is the same coordination flow as a general donation — money
+   * still arrives to the rikma and is recorded by a member — with the earmark
+   * attached so its members know what the gift is for.
+   * @type {{ id: string, name?: string, suggested?: number, stipendRate?: number } | null}
+   */
+  let fundingMission = $state(null);
+
   function openDonate() {
+    fundingMission = null;
+    donateOpen = true;
+  }
+
+  /** @param {any} om @param {any} st */
+  function fundMission(om, st) {
+    const stip = stipendById.get(String(om.id));
+    fundingMission = {
+      id: String(om.id),
+      name: om.attributes?.name ?? '',
+      // Default to what the mission is worth, or — when it carries a stipend —
+      // to the stipend's own closed budget, which is the smaller, likelier ask.
+      suggested: stip
+        ? Math.round(stip.stipendRate * (Number(om.attributes?.noofhours) || 0))
+        : Math.round(Number(st?.value) || 0),
+      stipendRate: stip?.stipendRate
+    };
     donateOpen = true;
   }
   function onDonated() {
@@ -51,6 +78,11 @@
   // Coverage.missions (funding status) joined back onto the raw open missions.
   let missionStatusById = $derived(
     new Map((coverage?.missions || []).map((m) => [String(m.id), m]))
+  );
+
+  // Missions that asked for a subsistence stipend, by id.
+  let stipendById = $derived(
+    new Map((data.stipendMissions || []).map((m) => [String(m.id), m]))
   );
 
   // Values, translated for he like the main project page does.
@@ -84,22 +116,9 @@
     });
   }
 
-  // Share (so an amuta can hand this URL out as its homepage).
-  let copied = $state(false);
-  async function shareLink() {
-    const url = $page.url.href;
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: attrs?.projectName, url });
-        return;
-      }
-      await navigator.clipboard.writeText(url);
-      copied = true;
-      setTimeout(() => (copied = false), 2500);
-    } catch {
-      /* user dismissed the share sheet — nothing to do */
-    }
-  }
+  // Sharing (so an amuta can hand this URL out as its homepage) is the shared
+  // ShareLink button below: web-share where it exists, the networks and copy
+  // everywhere else, always on the canonical 1lev1.com link.
 
   let plainDescription = $derived(
     (attrs?.publicDescription || '')
@@ -208,9 +227,13 @@
           {#if attrs.discordlink}<a class="social-dot" target="_blank" rel="noopener" href={attrs.discordlink} title="Discord">🎮</a>{/if}
           {#if attrs.githublink}<a class="social-dot" target="_blank" rel="noopener" href={attrs.githublink} title="GitHub">🐙</a>{/if}
           {#if attrs.watsapplink}<a class="social-dot" target="_blank" rel="noopener" href={attrs.watsapplink} title="WhatsApp">💬</a>{/if}
-          <button class="btn-ghost !py-1.5 !px-4 text-sm" onclick={shareLink}>
-            {copied ? $t('pages.projectSupport.copied') : `🔗 ${$t('pages.projectSupport.share')}`}
-          </button>
+          <ShareLink
+            path={`/project/${$page.params.id}/support`}
+            title={attrs?.projectName ?? ''}
+            desc={$t('ui.share.support')}
+            hashtags={['1lev1', 'rikma']}
+            size={24}
+          />
         </div>
       </section>
 
@@ -317,14 +340,37 @@
                   </div>
                 {/if}
 
-                {#if !assigned}
-                  <button
-                    class="btn-primary !text-sm mt-auto self-start"
-                    onclick={() => goto(`/availableMission/${om.id}`)}
-                  >
-                    {$t('pages.projectSupport.iWillDoIt')}
-                  </button>
+                <!-- A mission that also asks for living money says so here:
+                     for a supporter, "somebody has to be able to eat while
+                     doing this" is a different ask from "this costs ₪X". -->
+                {#if stipendById.get(String(om.id))}
+                  {@const stip = stipendById.get(String(om.id))}
+                  <p class="stipend-note">
+                    💗 {$t('stipend.mission.onMission', { count: stip.stipendRate })}
+                    {#if !stip.hasFunder}
+                      <span class="stipend-seeking">
+                        {$t('stipend.mission.seekingFunder')}
+                      </span>
+                    {/if}
+                  </p>
                 {/if}
+
+                <div class="flex flex-wrap gap-2 mt-auto">
+                  {#if !assigned}
+                    <button
+                      class="btn-primary !text-sm self-start"
+                      onclick={() => goto(`/availableMission/${om.id}`)}
+                    >
+                      {$t('pages.projectSupport.iWillDoIt')}
+                    </button>
+                  {/if}
+                  <button
+                    class="btn-fund !text-sm self-start"
+                    onclick={() => fundMission(om, st)}
+                  >
+                    💗 {$t('stipend.mission.fundThis')}
+                  </button>
+                </div>
               </div>
             {/each}
           </div>
@@ -508,6 +554,7 @@
     {isRegisteredUser}
     {isMember}
     {uid}
+    mission={fundingMission}
     onDone={onDonated}
   />
 {/if}
@@ -646,6 +693,28 @@
     pointer-events: none;
   }
 
+  .stipend-note {
+    border: 1px solid rgba(20, 184, 166, 0.45);
+    border-radius: 0.6rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .stipend-seeking {
+    display: block;
+    opacity: 0.7;
+  }
+  .btn-fund {
+    border: 1px solid rgba(20, 184, 166, 0.7);
+    border-radius: 9999px;
+    padding: 0.45rem 1rem;
+    font-weight: 700;
+    color: rgb(94, 234, 212);
+    transition: all 0.2s;
+  }
+  .btn-fund:hover {
+    background: rgba(20, 184, 166, 0.15);
+  }
   .coverage-track {
     height: 1.4rem;
     border-radius: 9999px;

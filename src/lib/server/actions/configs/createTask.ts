@@ -62,11 +62,16 @@ const createTaskHandler: ActionExecutionHandler = async (params, context, { stra
     hashivut = 'white',
     dateS,
     dateF,
-    myIshur = false
+    myIshur = false,
+    // External Tasks API (PLAN_EXTERNAL_TASKS_API): the id this task carries in
+    // the system that opened it, and where it came from. Both absent on the
+    // in-app path, which keeps Strapi's `source` default of 'ui'.
+    externalId,
+    source
   } = params;
 
   const now = new Date().toISOString();
-  
+
   // Build the data object for Strapi
   const data: any = {
     project: projectId,
@@ -78,6 +83,9 @@ const createTaskHandler: ActionExecutionHandler = async (params, context, { stra
     hashivut: hashivut,
     vali: context.userId // Creator is the "validator"
   };
+
+  if (externalId) data.externalId = String(externalId);
+  if (source) data.source = String(source);
 
   // Add assignment details
   if (isAssigned) {
@@ -200,6 +208,16 @@ export const createTaskAction: ActionConfig = {
       type: 'string',
       required: false,
       description: 'End date'
+    },
+    externalId: {
+      type: 'string',
+      required: false,
+      description: "Id of this task in the system that opened it (External Tasks API — idempotency + webhook key)"
+    },
+    source: {
+      type: 'string',
+      required: false,
+      description: "Where the task came from: 'ui' (default in Strapi) or 'api'"
     }
   },
 

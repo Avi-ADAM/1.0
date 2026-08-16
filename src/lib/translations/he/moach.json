@@ -135,7 +135,8 @@
     "publicProfile": "פרופיל ציבורי",
     "activeNow": "פעיל כעת",
     "open": "פתוח לשותפים",
-    "archive": "ארכיון"
+    "archive": "ארכיון",
+    "api": "API"
   },
   "create": {
     "mission": "יצירת משימה",
