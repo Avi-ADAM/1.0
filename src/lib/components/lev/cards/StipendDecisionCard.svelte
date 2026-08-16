@@ -158,7 +158,7 @@
         <p>
           {$t('stipend.terms.costShare')}:
           <b>{Math.round(Number(standing.costShare ?? 1) * 100)}%</b>
-          <span class="text-xs text-gray-500">
+          <span class="text-xs text-gray-600 dark:text-gray-300">
             {Number(standing.costShare ?? 1) >= 0.999
               ? $t('stipend.terms.costShareExplainFull')
               : Number(standing.costShare ?? 1) <= 0.001
@@ -174,7 +174,7 @@
         <p>{$t('stipend.terms.monthlyCap')}: <b>₪{standing.monthlyCap}</b></p>
       {/if}
       {#if standing.revenueTrigger != null}
-        <p class="text-xs text-gray-500">
+        <p class="text-xs text-gray-600 dark:text-gray-300">
           {$t('stipend.terms.revenueTriggerSet', { count: standing.revenueTrigger })}
         </p>
       {/if}
@@ -183,8 +183,8 @@
     <!-- What approving does to me. Abstract percentages are how people agree to
          things they would not agree to in shekels. -->
     {#if dilution}
-      <div class="rounded-xl border-2 border-teal-400/70 bg-teal-50 dark:bg-teal-900/20 p-3">
-        <p class="text-xs uppercase font-bold text-teal-700 dark:text-teal-200 mb-1">
+      <div class="rounded-xl border-2 border-goldink bg-gray-50 dark:bg-slate-900/60 p-3">
+        <p class="text-xs uppercase font-bold text-goldink mb-1">
           {$t('stipend.card.dilutionTitle')}
         </p>
         {#if dilution.moves}
@@ -207,12 +207,12 @@
 
     {#if standing.why || stipend?.why}
       <div class="rounded-xl bg-gray-50 dark:bg-gray-900/60 p-3">
-        <p class="text-xs text-gray-500 mb-1">{$t('stipend.card.reason')}</p>
+        <p class="text-xs text-gray-600 dark:text-gray-300 mb-1">{$t('stipend.card.reason')}</p>
         <p class="text-sm text-gray-800 dark:text-gray-200">{standing.why || stipend?.why}</p>
         {#if standing.proposedByName}
           <button
             type="button"
-            class="text-xs text-gray-500 mt-2 underline"
+            class="text-xs text-gray-600 dark:text-gray-300 mt-2 underline"
             onclick={() => onUser?.({ id: standing.proposedById })}
           >
             {$t('stipend.card.proposedBy', { name: standing.proposedByName })}
@@ -221,12 +221,12 @@
       </div>
     {/if}
 
-    <div class="flex items-center justify-between text-xs text-gray-500">
+    <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
       <span>{$t('stipend.card.signed', { count: stipend?.signedIds?.length ?? 0 })}</span>
       <span>{$t('stipend.card.awaiting', { count: stipend?.awaitingIds?.length ?? 0 })}</span>
     </div>
     {#if deadline}
-      <p class="text-xs text-gray-400">{$t('stipend.card.autoApprove')} · {deadline}</p>
+      <p class="text-xs text-gray-500 dark:text-gray-400">{$t('stipend.card.autoApprove')} · {deadline}</p>
     {/if}
   </div>
 
@@ -236,7 +236,7 @@
     <button
       type="button"
       onclick={() => onChat?.({ decisionId: stipend?.decisionId, projectId })}
-      class="flex-1 rounded-xl border border-gray-300 dark:border-gray-600 py-3 text-sm"
+      class="flex-1 rounded-xl border border-gray-300 dark:border-slate-600 py-3 text-sm"
     >
       {$t('stipend.actions.chat')}
     </button>
@@ -244,7 +244,7 @@
       <button
         type="button"
         onclick={() => (counterOpen = true)}
-        class="flex-1 rounded-xl border border-gray-300 dark:border-gray-600 py-3 text-sm"
+        class="flex-1 rounded-xl border border-gray-300 dark:border-slate-600 py-3 text-sm"
       >
         ⚖️ {$t('stipend.actions.negotiate')}
       </button>
@@ -252,12 +252,12 @@
         type="button"
         onclick={approve}
         disabled={approving}
-        class="flex-[2] rounded-xl bg-gradient-to-r from-barbi to-mpink text-white font-semibold py-3 text-sm disabled:opacity-60"
+        class="flex-[2] rounded-xl bg-barbi text-gold font-bold py-3 text-sm disabled:opacity-60"
       >
         {approving ? $t('stipend.actions.approving') : $t('stipend.actions.approve')}
       </button>
     {:else}
-      <p class="flex-[3] self-center text-center text-sm text-gray-500 dark:text-gray-400">
+      <p class="flex-[3] self-center text-center text-sm text-gray-500 dark:text-gray-500 dark:text-gray-400">
         {$t('stipend.card.signedByMe')}
       </p>
     {/if}

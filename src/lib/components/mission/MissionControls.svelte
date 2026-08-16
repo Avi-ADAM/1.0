@@ -27,6 +27,7 @@
   import RangeSlider from 'svelte-range-slider-pips';
   import ArchiveObjectButton from '$lib/components/archive/ArchiveObjectButton.svelte';
   import ProposeEditButton from '$lib/components/archive/ProposeEditButton.svelte';
+  import StipendButton from '$lib/components/stipend/StipendButton.svelte';
 
   /**
    * @typedef {Object} Props
@@ -41,6 +42,12 @@
    *   timer/status/complete controls stay owner-only regardless of `showArchiveActions`.
    * @property {string} [ownerName] - who carries the mission, for the archive drawer's
    *   membership warning when the viewer isn't them.
+   * @property {string|number|null} [ownerId] - who carries the mission. Lets the stipend
+   *   dialog preselect the recipient when a *different* member offers to fund it.
+   * @property {boolean} [showStipendAction] - offer "add a subsistence stipend" for a
+   *   mission that already exists (PLAN_STIPEND §8). A stipend is not part of the
+   *   mission's own terms — it is a separate agreement between two members about the
+   *   same work — so it gets its own button rather than riding the edit proposal.
    * @property {boolean} [showArchiveActions] - offer "request update" / "propose to close" (PLAN_OBJECT_ARCHIVAL phase 4). Off by default — callers that don't have accrued-hours/terms data on hand should not show these.
    * @property {number} [accruedHours] - hours already logged (`howmanyhoursalready`).
    * @property {number|null} [hoursAssigned] - hours agreed for the mission (`hoursassinged`).
@@ -63,7 +70,9 @@
     compact = false,
     isMine = true,
     ownerName = '',
+    ownerId = null,
     showArchiveActions = false,
+    showStipendAction = true,
     accruedHours = 0,
     hoursAssigned = null,
     perhour = null,
@@ -71,6 +80,9 @@
     onCompleted,
     onTimerSaved
   } = $props();
+
+  /** The viewer, for the stipend dialog's funder/recipient preselection. */
+  let myId = $derived(page.data?.uid != null ? String(page.data.uid) : '');
 
   // ── Timer state, derived from the store (same model as timers/timer.svelte) ──
   let storeTimer = $derived($timers?.find((x) => String(x.mId) === String(missionId)));
@@ -440,6 +452,35 @@
       className="mc-btn"
     />
   {/if}
+
+  <!-- A mission that already exists can still grow a stipend: the need usually
+       appears *after* the work starts, not while the mission is being written.
+       Deliberately its own button and not a field on the edit proposal — an
+       edit renegotiates the mission's terms with the whole rikma, while a
+       stipend is an agreement between the two members about who funds whose
+       living costs, and (as long as it dilutes nobody) only they sign it.
+       Which one it is stays derived from the terms, in the dialog.
+
+       Whose question it is flips with the viewer: on my own mission it reads
+       "I need a stipend to keep at this"; on someone else's, "I'll fund this",
+       with them already filled in as the recipient. -->
+  {#if showStipendAction && projectId}
+    <StipendButton
+      intent={isMine ? 'request' : 'offer'}
+      projectId={String(projectId)}
+      {myId}
+      recipientId={isMine ? myId : ownerId != null ? String(ownerId) : ''}
+      funderId={isMine ? '' : myId}
+      missionId={String(missionId)}
+      {missionName}
+      marketRate={perhour != null ? Number(perhour) : null}
+      missionValue={hoursAssigned != null && perhour != null
+        ? Number(hoursAssigned) * Number(perhour)
+        : null}
+      icon="💗"
+      className="mc-btn"
+    />
+  {/if}
 </div>
 
 <!-- progress percentage -->
@@ -532,7 +573,13 @@
     box-shadow: 0 0 10px rgba(46, 255, 168, 0.25);
   }
 
-  .mc-btn {
+  /* `mc-btn` is also handed to child components (`ArchiveObjectButton`,
+     `ProposeEditButton`, `StipendButton`) via their `className` prop. Svelte
+     scopes a plain `.mc-btn` rule to this component's own markup, so those
+     three rendered as unstyled browser buttons in the middle of the strip.
+     Scoping on the wrapper and reaching in with `:global` covers both: the
+     local buttons are descendants of `.mc` too. */
+  .mc :global(.mc-btn) {
     display: inline-flex;
     align-items: center;
     gap: 5px;
@@ -547,7 +594,7 @@
     cursor: pointer;
     transition: border-color 0.12s, color 0.12s, background 0.12s;
   }
-  .mc-btn:hover {
+  .mc :global(.mc-btn:hover) {
     border-color: var(--gold, #eee8aa);
     color: var(--gold, #eee8aa);
     background: rgba(238, 232, 170, 0.12);
@@ -595,11 +642,11 @@
   }
 
   /* In a dense table row only the icons stay; the words return from sm up. */
-  .mc-compact .mc-label {
+  .mc-compact :global(.mc-label) {
     display: none;
   }
   @media (min-width: 640px) {
-    .mc-compact .mc-label {
+    .mc-compact :global(.mc-label) {
       display: inline;
     }
   }

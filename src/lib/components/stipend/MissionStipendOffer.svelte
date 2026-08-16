@@ -19,6 +19,11 @@
    * at the moment someone considers taking the mission, not buried in terms.
    */
   import { t } from '$lib/translations';
+  // This block is mounted on three very different hosts (a lev swiper card, the
+  // offer page, the rikma's open board), each with its own background, so it
+  // states its own ground and ink for all four appearance combinations rather
+  // than inheriting whatever is behind it. See ./ui.js.
+  import { SURFACE, ACCENT, MUTED, FAINT } from './ui.js';
 
   /**
    * @typedef {Object} Props
@@ -53,23 +58,23 @@
 </script>
 
 {#if active}
-  <div class="stipend-offer" class:compact>
-    <p class="so-title">💗 {$t('stipend.offer.title')}</p>
+  <div class="stipend-offer {SURFACE}" class:compact>
+    <p class="so-title {ACCENT}">💗 {$t('stipend.offer.title')}</p>
 
     <div class="so-lines">
       <div class="so-line">
-        <span class="so-label">{$t('stipend.offer.investment')}</span>
+        <span class="so-label {MUTED}">{$t('stipend.offer.investment')}</span>
         <span class="so-value">₪{fmt(investment)}</span>
-        <span class="so-sub">
+        <span class="so-sub {FAINT}">
           {$t('stipend.offer.investmentSub', { count: fmt(perhour) })}
           {monthly ? $t('stipend.offer.perCycle') : ''}
         </span>
       </div>
 
-      <div class="so-line so-line-stipend">
-        <span class="so-label">{$t('stipend.offer.stipend')}</span>
-        <span class="so-value">₪{fmt(stipend)}</span>
-        <span class="so-sub">
+      <div class="so-line">
+        <span class="so-label {MUTED}">{$t('stipend.offer.stipend')}</span>
+        <span class="so-value {ACCENT}">₪{fmt(stipend)}</span>
+        <span class="so-sub {FAINT}">
           {$t('stipend.offer.stipendSub', { count: fmt(stipendRate) })}
           {monthly ? $t('stipend.offer.perCycle') : ''}
         </span>
@@ -77,12 +82,12 @@
     </div>
 
     {#if funderName}
-      <p class="so-funder">{$t('stipend.offer.funder', { name: funderName })}</p>
+      <p class="so-funder text-sm font-bold">{$t('stipend.offer.funder', { name: funderName })}</p>
     {:else}
-      <p class="so-funder so-seeking">{$t('stipend.mission.seekingFunder')}</p>
+      <p class="so-funder {MUTED}">{$t('stipend.mission.seekingFunder')}</p>
     {/if}
 
-    <p class="so-note">
+    <p class={MUTED}>
       {mode === 'gift'
         ? $t('stipend.offer.noteGift')
         : dilutes
@@ -93,19 +98,19 @@
     <!-- §11.1. Not legal advice, and deliberately not hidden behind a link:
          a monthly sum computed from hours is the exact shape of a salary, and
          the difference here is real — a partner's stipend, not wages. -->
-    <p class="so-legal">⚖️ {$t('stipend.offer.legal')}</p>
+    <p class="so-legal {FAINT}">⚖️ {$t('stipend.offer.legal')}</p>
   </div>
 {/if}
 
 <style>
+  /* Layout only. Every colour comes from the shared class set in ./ui.js, so
+     the block follows the identity (gold ↔ blue) and the mode; the previous
+     hard-coded teal ignored both. */
   .stipend-offer {
-    border: 1px solid rgba(20, 184, 166, 0.5);
-    border-radius: 0.9rem;
     padding: 0.85rem 1rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    background: rgba(20, 184, 166, 0.06);
   }
   .stipend-offer.compact {
     padding: 0.6rem 0.75rem;
@@ -128,40 +133,17 @@
   }
   .so-label {
     font-size: 0.9rem;
-    opacity: 0.85;
   }
   .so-value {
     font-size: 1.15rem;
     font-weight: 800;
     justify-self: end;
   }
-  .so-line-stipend .so-value {
-    color: rgb(13, 148, 136);
-  }
-  :global(.dark) .so-line-stipend .so-value {
-    color: rgb(94, 234, 212);
-  }
   .so-sub {
     grid-column: 1 / -1;
-    font-size: 0.75rem;
-    opacity: 0.65;
-  }
-  .so-funder {
-    font-size: 0.8rem;
-    font-weight: 700;
-  }
-  .so-seeking {
-    font-weight: 400;
-    opacity: 0.75;
-  }
-  .so-note {
-    font-size: 0.75rem;
-    opacity: 0.75;
   }
   .so-legal {
-    font-size: 0.72rem;
-    opacity: 0.7;
-    border-top: 1px dashed rgba(128, 128, 128, 0.4);
+    border-top: 1px dashed currentColor;
     padding-top: 0.4rem;
   }
 </style>

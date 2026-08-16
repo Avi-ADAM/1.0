@@ -108,7 +108,7 @@
       {/if}
     </div>
 
-    <p class="text-xs text-gray-500">
+    <p class="text-xs text-gray-600 dark:text-gray-300">
       {$t(`stipend.pay.modeNote.${buble.mode ?? 'equity'}`)}
     </p>
   </div>
@@ -118,7 +118,7 @@
       type="button"
       onclick={pay}
       disabled={busy}
-      class="w-full rounded-xl bg-gradient-to-r from-barbi to-mpink py-3 text-sm font-semibold text-white disabled:opacity-60"
+      class="w-full rounded-xl bg-barbi text-gold py-3 text-sm font-bold disabled:opacity-60"
     >
       {busy ? $t('stipend.actions.sending') : $t('stipend.pay.action')}
     </button>

@@ -16,6 +16,10 @@
    */
   import { t } from '$lib/translations';
   import { computeRecipientTradeoff } from '$lib/stipend/computeStipendEquity.js';
+  // The mission form paints its own dark pink panel, so this block cannot
+  // inherit its ink from the page — it states its own ground and its own
+  // neutrals, for both identities and both modes. See ./ui.js.
+  import { SURFACE, ACCENT, LABEL, MUTED, FAINT, INPUT, WELL, WARN } from './ui.js';
 
   /**
    * @typedef {Object} Props
@@ -67,42 +71,36 @@
   }
 </script>
 
-<div class="rounded-xl border border-teal-500/50 p-3 my-2">
+<div class="{SURFACE} p-3 my-2">
   <button
     type="button"
     class="flex w-full items-center justify-between gap-2 text-start"
     onclick={toggle}
   >
-    <span class="font-bold text-teal-600 dark:text-teal-300">
+    <span class="font-bold {ACCENT}">
       💗 {$t('stipend.mission.title')}
     </span>
-    <span class="text-sm text-gray-500">{open || active ? '−' : '+'}</span>
+    <span class="text-sm {MUTED}">{open || active ? '−' : '+'}</span>
   </button>
 
   {#if !open && !active}
-    <p class="mt-1 text-xs text-gray-500">{$t('stipend.mission.hint')}</p>
+    <p class="mt-1 {MUTED}">{$t('stipend.mission.hint')}</p>
   {/if}
 
   {#if open || active}
     <div class="mt-3 flex flex-col gap-3">
       <label class="flex flex-col gap-1">
-        <span class="text-xs font-bold uppercase text-gray-500">{$t('stipend.terms.rate')}</span>
-        <input
-          type="number"
-          min="0"
-          step="1"
-          bind:value={rate}
-          class="rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent px-3 py-2"
-        />
+        <span class={LABEL}>{$t('stipend.terms.rate')}</span>
+        <input type="number" min="0" step="1" bind:value={rate} class={INPUT} />
         {#if Number(marketRate) > 0}
-          <span class="text-xs text-gray-500">
+          <span class={MUTED}>
             {$t('stipend.terms.marketRate', { count: marketRate })}
           </span>
         {/if}
       </label>
 
       {#if tooHigh}
-        <p class="rounded-xl border border-amber-300 bg-amber-50 dark:bg-amber-900/20 p-2 text-sm text-amber-800 dark:text-amber-200">
+        <p class="{WARN} p-2 text-sm">
           {$t('stipend.error.rateAboveMarket')}
         </p>
       {/if}
@@ -111,7 +109,7 @@
         <!-- The dilution question, asked as a question and not as a slider
              labelled with a Greek letter. -->
         <fieldset class="flex flex-col gap-1">
-          <legend class="text-xs font-bold uppercase text-gray-500">
+          <legend class={LABEL}>
             {$t('stipend.mission.whoPays')}
           </legend>
           <label class="flex items-start gap-2 text-sm cursor-pointer">
@@ -126,7 +124,7 @@
             />
             <span>
               <b>{$t('stipend.mission.noDilution')}</b>
-              <span class="block text-xs text-gray-500">
+              <span class="block {MUTED}">
                 {$t('stipend.mission.noDilutionExplain')}
               </span>
             </span>
@@ -143,7 +141,7 @@
             />
             <span>
               <b>{$t('stipend.mission.dilutes')}</b>
-              <span class="block text-xs text-gray-500">
+              <span class="block {MUTED}">
                 {$t('stipend.mission.dilutesExplain')}
               </span>
             </span>
@@ -160,7 +158,7 @@
             />
             <span>
               <b>{$t('stipend.mode.gift')}</b>
-              <span class="block text-xs text-gray-500">{$t('stipend.mode.giftExplain')}</span>
+              <span class="block {MUTED}">{$t('stipend.mode.giftExplain')}</span>
             </span>
           </label>
         </fieldset>
@@ -174,7 +172,7 @@
         {/if}
 
         {#if tradeoff}
-          <div class="rounded-xl bg-gray-50 dark:bg-gray-900/60 p-2 text-xs">
+          <div class="{WELL} p-2 text-xs">
             <p>{$t('stipend.tradeoff.without', { count: tradeoff.sharePctWithout.toFixed(1) })}</p>
             <p class="font-semibold">
               {$t('stipend.tradeoff.with', {
@@ -185,7 +183,7 @@
           </div>
         {/if}
 
-        <p class="text-xs text-gray-500">
+        <p class={FAINT}>
           {dilutes ? $t('stipend.mission.voteNoteRikma') : $t('stipend.mission.voteNoteBilateral')}
         </p>
       {/if}
