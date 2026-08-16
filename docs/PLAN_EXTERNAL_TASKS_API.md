@@ -240,21 +240,50 @@ i18n: namespace חדש `rikmaApi` בכל חמש השפות, עם שער מסלו
 
 ## Phase 3 — ההדגמה ב‑106_ezrachi
 
-`SupportWidget.svelte` יוצר טיקט מול ה‑Strapi של 106. נוסף:
+שני מקורות עבודה ב‑106 ממופים לריקמה, דרך מודול משותף אחד.
 
-- `src/routes/api/tickets/report-to-1lev1/+server.js` — endpoint צד־שרת
-  שמקבל את פרטי הטיקט, מוסיף את המפתח מ‑`$env/dynamic/private` וקורא
-  ל‑1lev1. **המפתח לא מגיע לדפדפן.** בלי `ONELEVONE_API_KEY` הוא פשוט
-  לא רץ, והווידג'ט מתנהג בדיוק כמו קודם.
-- `src/routes/api/tickets/onelevone-webhook/+server.js` — מקבל הסנכרון
-  החוזר: מאמת את החתימה מול הגוף **הגולמי** וממפה
-  `accepted ⇒ in_progress`, `done ⇒ closed`. הטיקט זז רק קדימה, כדי
-  שביטול אישור בצד השני לא יפתח מחדש טיקט שמנהל כבר סגר כאן.
-- קריאה מ‑`submit()` אחרי יצירת הטיקט, לא‑חוסמת ולא‑מוצגת: אם 1lev1 לא
-  זמין, זה לא עניינו של מי שדיווח על באג.
-- `externalId = ticket_<documentId>`, `link` חזרה לטיקט, `urgency` נגזרת
-  מ‑`type` (`support` ⇒ `red`, `feature` ⇒ `green`).
-- ההגדרות מתועדות ב‑`.env.example` של 106.
+**התשתית המשותפת**
+
+- `src/lib/server/onelevone.js` — כל מה שנוגע ל‑1lev1: קריאת המפתח
+  (`$env/dynamic/private` — **המפתח לא מגיע לדפדפן**), `reportTaskTo1lev1`,
+  אימות חתימת ה‑webhook, ומיפוי סטטוס. בלי `ONELEVONE_API_KEY` הכול
+  no‑op שקט ושני הזרימות מתנהגות בדיוק כמו קודם.
+- ניתוב פר‑מקור: `ONELEVONE_<SOURCE>_MISSION_ID/_ASSIGNEE_ID/_ROLE_ID`
+  עם נפילה חזרה ל‑`ONELEVONE_*`, כדי שדיווחי באגים ורעיונות קהילתיים
+  יגיעו לאנשים שונים.
+- `src/routes/api/onelevone/webhook/+server.js` — **מקבל אחד לכל
+  הסוגים**: מאמת את החתימה מול הגוף **הגולמי** פעם אחת, ואז מנתב לפי
+  הקידומת של ה‑`externalId` שאנחנו עצמנו בחרנו. מקור שלישי בעתיד =
+  שורה אחת ב‑`ROUTES`, לא URL וסוד נוספים.
+- שני הצדדים זזים **רק קדימה** (`open → in_progress → closed`), כדי
+  שביטול אישור בצד השני לא יפתח מחדש פריט שמנהל כבר סגר כאן.
+
+**1. טיקטי תמיכה** (`SupportWidget.svelte`)
+
+- מופה **ביצירה** — כל דיווח משתמש הוא עבודה אמיתית.
+- `externalId = ticket_<documentId>`, `urgency` מ‑`type`
+  (`support` ⇒ `red`, `feature` ⇒ `green`), `ticket_status` מתעדכן חזרה.
+- הקריאה מ‑`submit()` לא‑חוסמת ולא‑מוצגת: אם 1lev1 לא זמין, זה לא
+  עניינו של מי שדיווח על באג.
+
+**2. הצעות צוות** (`suggestion-for-team`)
+
+- מופה **באישור המודרטור ולא בהגשה**. הצעה ב‑`pending_moderation` היא
+  עדיין לא העבודה של הצוות; מיפוי שלה היה דוחף תוכן לא‑מבוקר ישר לצלחת
+  של שותף. האישור הוא הרגע שבו זה הופך למשהו שמישהו באמת צריך לעשות.
+- הלקוח שולח **רק `documentId`**; ה‑BFF קורא את ההצעה עצמה עם
+  ה‑system token, כך שאי אפשר להכתיב מבחוץ מה יופיע בריקמה. השער האמיתי
+  הוא הסירוב לכל מה שאינו `approved` ופעיל, ואידמפוטנטיות ה‑`externalId`
+  הופכת קריאה חוזרת ל‑no‑op.
+- `externalId = teamsug_<documentId>`; `urgency` נגזרת מ‑**מיקומה בתור
+  העיר** (`devOrder` 1 ⇒ `red`, ‏2–5 ⇒ `yellow`, השאר ⇒ `green`, בלי
+  מספר ⇒ `white`) — דירוג אנושי אמיתי שחבל לשטח.
+- הסנכרון החוזר כותב `execStatus`, ו‑`closed` גם משחרר את המספר ומרנמר
+  את תור העיר. לכן לוגיקת התור חולצה ל‑`src/lib/server/teamSuggestionQueue.ts`
+  ומשמשת גם את `/api/team-suggestion-moderation`: שני עותקים של החשבון
+  הזה היו נפרדים, והתסמין היה תור עם חורים שאיש לא יודע להסביר.
+
+ההגדרות מתועדות ב‑`.env.example` של 106.
 
 ---
 

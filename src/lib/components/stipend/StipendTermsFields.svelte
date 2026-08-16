@@ -11,6 +11,8 @@
    */
   import { t } from '$lib/translations';
   import { consensusScope, validateStipendTerms } from '$lib/stipend/computeStipendEquity.js';
+  // Neutrals and inputs that hold up in personal/business × light/dark. ./ui.js
+  import { LABEL, MUTED, INPUT, WELL, WARN, BODY } from './ui.js';
 
   /**
    * @typedef {Object} Props
@@ -54,14 +56,14 @@
 <div class="flex flex-col gap-4">
   <!-- Mode: what the money buys -->
   <fieldset class="flex flex-col gap-1">
-    <legend class="text-xs font-bold uppercase text-gray-500">{$t('stipend.terms.mode')}</legend>
+    <legend class={LABEL}>{$t('stipend.terms.mode')}</legend>
     <div class="flex flex-wrap gap-2">
       {#each ['equity', 'advance', 'gift'] as m (m)}
         <label
           class="cursor-pointer rounded-full border px-3 py-1.5 text-sm transition-colors
             {terms.mode === m
             ? 'border-barbi bg-barbi/10 text-barbi'
-            : 'border-gray-300 dark:border-gray-600'}"
+            : 'border-gray-300 dark:border-slate-600 text-gray-800 dark:text-gray-100'}"
         >
           <input
             type="radio"
@@ -74,21 +76,21 @@
         </label>
       {/each}
     </div>
-    <p class="text-xs text-gray-500">{$t(`stipend.mode.${terms.mode}Explain`)}</p>
+    <p class={MUTED}>{$t(`stipend.mode.${terms.mode}Explain`)}</p>
   </fieldset>
 
   <!-- Rate -->
   <label class="flex flex-col gap-1">
-    <span class="text-xs font-bold uppercase text-gray-500">{$t('stipend.terms.rate')}</span>
+    <span class={LABEL}>{$t('stipend.terms.rate')}</span>
     <input
       type="number"
       min="0"
       step="1"
       bind:value={terms.stipendRate}
-      class="rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent px-3 py-2"
+      class={INPUT}
     />
     {#if marketRate != null && marketRate > 0}
-      <span class="text-xs text-gray-500">
+      <span class={MUTED}>
         {$t('stipend.terms.marketRate', { count: marketRate })}
       </span>
     {/if}
@@ -97,7 +99,7 @@
   <!-- α — who carries the cost -->
   {#if terms.mode === 'equity'}
     <div class="flex flex-col gap-1">
-      <span class="text-xs font-bold uppercase text-gray-500">{$t('stipend.terms.costShare')}</span>
+      <span class={LABEL}>{$t('stipend.terms.costShare')}</span>
       <input
         type="range"
         min="0"
@@ -106,14 +108,14 @@
         bind:value={terms.costShare}
         class="accent-[var(--barbi-pink,#ff00ae)]"
       />
-      <div class="flex justify-between text-xs text-gray-500">
+      <div class="flex justify-between {MUTED}">
         <span>{$t('stipend.terms.costShareRikma')}</span>
-        <span class="font-bold text-gray-700 dark:text-gray-200">
+        <span class="font-bold text-gray-900 dark:text-gray-50">
           {Math.round(Number(terms.costShare) * 100)}%
         </span>
         <span>{$t('stipend.terms.costShareRecipient')}</span>
       </div>
-      <p class="text-xs text-gray-500">
+      <p class={MUTED}>
         {Number(terms.costShare) >= 0.999
           ? $t('stipend.terms.costShareExplainFull')
           : Number(terms.costShare) <= 0.001
@@ -125,68 +127,68 @@
 
   {#if showBudget}
     <label class="flex flex-col gap-1">
-      <span class="text-xs font-bold uppercase text-gray-500">{$t('stipend.terms.totalCap')}</span>
+      <span class={LABEL}>{$t('stipend.terms.totalCap')}</span>
       <input
         type="number"
         min="0"
         step="100"
         bind:value={terms.totalCap}
-        class="rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent px-3 py-2"
+        class={INPUT}
       />
-      <span class="text-xs text-gray-500">{$t('stipend.terms.totalCapExplain')}</span>
+      <span class={MUTED}>{$t('stipend.terms.totalCapExplain')}</span>
     </label>
   {/if}
 
   {#if showAdvanced}
-    <details class="rounded-xl border border-gray-200 dark:border-gray-700 p-3">
-      <summary class="cursor-pointer text-sm font-semibold">{$t('stipend.terms.more')}</summary>
+    <details class="{WELL} p-3">
+      <summary class="cursor-pointer text-sm font-semibold {BODY}">{$t('stipend.terms.more')}</summary>
       <div class="mt-3 flex flex-col gap-3">
         <label class="flex flex-col gap-1">
-          <span class="text-xs font-bold uppercase text-gray-500">{$t('stipend.terms.monthlyCap')}</span>
+          <span class={LABEL}>{$t('stipend.terms.monthlyCap')}</span>
           <input
             type="number"
             min="0"
             step="100"
             bind:value={terms.monthlyCap}
-            class="rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent px-3 py-2"
+            class={INPUT}
           />
         </label>
         {#if !showBudget}
           <label class="flex flex-col gap-1">
-            <span class="text-xs font-bold uppercase text-gray-500">{$t('stipend.terms.totalCap')}</span>
+            <span class={LABEL}>{$t('stipend.terms.totalCap')}</span>
             <input
               type="number"
               min="0"
               step="100"
               bind:value={terms.totalCap}
-              class="rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent px-3 py-2"
+              class={INPUT}
             />
-            <span class="text-xs text-gray-500">{$t('stipend.terms.totalCapExplain')}</span>
+            <span class={MUTED}>{$t('stipend.terms.totalCapExplain')}</span>
           </label>
         {/if}
         <label class="flex flex-col gap-1">
-          <span class="text-xs font-bold uppercase text-gray-500">{$t('stipend.terms.noticeCycles')}</span>
+          <span class={LABEL}>{$t('stipend.terms.noticeCycles')}</span>
           <input
             type="number"
             min="0"
             step="1"
             bind:value={terms.noticeCycles}
-            class="rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent px-3 py-2"
+            class={INPUT}
           />
         </label>
         <label class="flex flex-col gap-1">
-          <span class="text-xs font-bold uppercase text-gray-500">{$t('stipend.terms.revenueTrigger')}</span>
+          <span class={LABEL}>{$t('stipend.terms.revenueTrigger')}</span>
           <input
             type="number"
             min="0"
             step="100"
             bind:value={terms.revenueTrigger}
-            class="rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent px-3 py-2"
+            class={INPUT}
           />
-          <span class="text-xs text-gray-500">{$t('stipend.terms.revenueTriggerExplain')}</span>
+          <span class={MUTED}>{$t('stipend.terms.revenueTriggerExplain')}</span>
         </label>
         {#if terms.mode === 'advance'}
-          <label class="flex items-center gap-2 text-sm">
+          <label class="flex items-center gap-2 text-sm {BODY}">
             <input
               type="checkbox"
               checked={terms.recourse === 'personal'}
@@ -195,16 +197,16 @@
             />
             {$t('stipend.terms.recoursePersonal')}
           </label>
-          <p class="text-xs text-gray-500">{$t('stipend.terms.recourseExplain')}</p>
+          <p class={MUTED}>{$t('stipend.terms.recourseExplain')}</p>
         {/if}
       </div>
     </details>
   {/if}
 
-  <p class="text-sm font-semibold text-gray-700 dark:text-gray-200">{scopeLine}</p>
+  <p class="text-sm font-semibold text-gray-900 dark:text-gray-50">{scopeLine}</p>
 
   {#if !validation.ok}
-    <ul class="rounded-xl border border-amber-300 bg-amber-50 dark:bg-amber-900/20 p-3 text-sm text-amber-800 dark:text-amber-200">
+    <ul class="{WARN} p-3 text-sm">
       {#each validation.errors as err (err)}
         <li>{$t(`stipend.error.${err}`)}</li>
       {/each}

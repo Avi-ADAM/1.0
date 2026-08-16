@@ -13,6 +13,9 @@
   import { t } from '$lib/translations';
   import { effectiveStipendPolicy } from '$lib/stipend/computeStipendEquity.js';
   import StipendProposeDialog from './StipendProposeDialog.svelte';
+  // The default fill is the gold/barbi contract pair, so the button reads the
+  // same in personal and business, day and night. See ./ui.js.
+  import { BTN_PRIMARY } from './ui.js';
 
   /**
    * @typedef {Object} Props
@@ -79,7 +82,7 @@
   <button
     type="button"
     class={className ||
-      'flex-1 py-1.5 px-3 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-1.5'}
+      `flex-1 py-1.5 px-3 ${BTN_PRIMARY} transform hover:-translate-y-0.5 flex items-center justify-center gap-1.5`}
     onclick={(e) => {
       e.stopPropagation();
       open = true;

@@ -17,6 +17,7 @@
   import { t, isRtl } from '$lib/translations';
   import { executeAction } from '$lib/client/actionClient';
   import { toast } from 'svelte-sonner';
+  import { LABEL, MUTED, INPUT, WELL, BTN_PRIMARY, BTN_GHOST } from './ui.js';
 
   /**
    * @typedef {Object} Props
@@ -76,78 +77,78 @@
     dir={$isRtl ? 'rtl' : 'ltr'}
   >
     <div
-      class="w-full sm:max-w-lg max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-white dark:bg-gray-800 p-5 shadow-2xl"
+      class="w-full sm:max-w-lg max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-50 p-5 shadow-2xl"
     >
       <div class="flex items-start justify-between gap-3">
         <div>
           <h2 class="text-lg font-bold">{$t('stipend.funding.title')}</h2>
-          {#if projectName}<p class="text-xs text-gray-500">{projectName}</p>{/if}
+          {#if projectName}<p class={MUTED}>{projectName}</p>{/if}
         </div>
-        <button type="button" class="text-2xl leading-none text-gray-400" onclick={close}>×</button>
+        <button type="button" class="text-2xl leading-none text-gray-600 dark:text-gray-300 hover:text-goldink" onclick={close}>×</button>
       </div>
 
-      <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">{$t('stipend.funding.intro')}</p>
+      <p class="mt-2 text-sm text-gray-800 dark:text-gray-100">{$t('stipend.funding.intro')}</p>
 
       <div class="mt-4 flex flex-col gap-4">
-        <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-3 text-sm space-y-1">
+        <div class="{WELL} p-3 text-sm space-y-1">
           <p class="font-bold">{program.name}</p>
           <p>{$t('stipend.terms.rate')}: ₪{program.stipendRate}</p>
           <p>{$t('stipend.terms.totalCap')}: ₪{budget.toLocaleString()}</p>
-          <p class="text-xs text-gray-500">
+          <p class={MUTED}>
             {$t(`stipend.mode.${program.mode}Explain`)}
           </p>
         </div>
 
         <label class="flex flex-col gap-1">
-          <span class="text-xs font-bold uppercase text-gray-500">{$t('stipend.funding.months')}</span>
+          <span class={LABEL}>{$t('stipend.funding.months')}</span>
           <input
             type="number"
             min="1"
             step="1"
             bind:value={months}
-            class="rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent px-3 py-2"
+            class={INPUT}
           />
           {#if monthly > 0}
-            <span class="text-xs text-gray-500">
+            <span class={MUTED}>
               {$t('stipend.funding.monthly', { count: monthly.toLocaleString() })}
             </span>
           {/if}
         </label>
 
         <label class="flex flex-col gap-1">
-          <span class="text-xs font-bold uppercase text-gray-500">{$t('stipend.funding.name')}</span>
+          <span class={LABEL}>{$t('stipend.funding.name')}</span>
           <input
             type="text"
             bind:value={name}
             placeholder={$t('stipend.funding.namePlaceholder')}
-            class="rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent px-3 py-2"
+            class={INPUT}
           />
         </label>
 
         <label class="flex flex-col gap-1">
-          <span class="text-xs font-bold uppercase text-gray-500">{$t('stipend.funding.descrip')}</span>
+          <span class={LABEL}>{$t('stipend.funding.descrip')}</span>
           <textarea
             bind:value={descrip}
             rows="3"
             placeholder={$t('stipend.funding.descripPlaceholder')}
-            class="rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent px-3 py-2"
+            class={INPUT}
           ></textarea>
         </label>
 
-        <p class="text-xs text-gray-500">{$t('stipend.funding.joinNote')}</p>
+        <p class={MUTED}>{$t('stipend.funding.joinNote')}</p>
       </div>
 
       <div class="mt-5 flex gap-2">
         <button
           type="button"
-          class="flex-1 rounded-xl border border-gray-300 dark:border-gray-600 py-3 text-sm"
+          class="flex-1 {BTN_GHOST} py-3 text-sm"
           onclick={close}
         >
           {$t('stipend.actions.cancel')}
         </button>
         <button
           type="button"
-          class="flex-[2] rounded-xl bg-gradient-to-r from-barbi to-mpink py-3 text-sm font-semibold text-white disabled:opacity-60"
+          class="flex-[2] {BTN_PRIMARY} py-3 text-sm"
           disabled={busy}
           onclick={publish}
         >

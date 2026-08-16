@@ -69,11 +69,11 @@
     <header class="flex flex-wrap items-start justify-between gap-3">
       <div>
         <h1 class="text-xl font-bold">{$t('stipend.tab.title')}</h1>
-        <p class="text-sm text-gray-500 max-w-prose">{$t('stipend.tab.intro')}</p>
-        <p class="mt-1 text-xs text-gray-500">
+        <p class="text-sm text-slate-300 max-w-prose">{$t('stipend.tab.intro')}</p>
+        <p class="mt-1 text-xs text-slate-300">
           {$t('stipend.tab.policy')}: <b>{$t(`stipend.policy.${overview.policy}`)}</b>
           {#if overview.policyIsDefault}
-            <span class="text-gray-400">· {$t('stipend.tab.policyDefault')}</span>
+            <span class="text-slate-400">· {$t('stipend.tab.policyDefault')}</span>
           {/if}
         </p>
       </div>
@@ -86,7 +86,7 @@
         {policy}
         defaultRate={overview.defaultRate}
         defaultCostShare={overview.defaultCostShare}
-        className="rounded-full border-2 border-teal-500 px-4 py-2 text-sm font-bold text-teal-600 dark:text-teal-300 hover:bg-teal-50 dark:hover:bg-teal-900/20 flex items-center gap-2"
+        className="rounded-full border-2 border-gold px-4 py-2 text-sm font-bold text-gold hover:bg-slate-700 flex items-center gap-2"
         onDone={load}
       />
     </header>
@@ -126,13 +126,13 @@
             <li class="row">
               <div class="grow">
                 <p class="font-bold">{p.name}</p>
-                <p class="text-xs text-gray-500">
+                <p class="text-xs text-slate-300">
                   ₪{p.stipendRate}/{$t('stipend.card.hour')} ·
                   {$t('stipend.terms.costShare')} {Math.round(Number(p.costShare) * 100)}% ·
                   {$t(`stipend.mode.${p.mode}`)} ·
                   {$t(`stipend.status.${p.status}`)}
                 </p>
-                <p class="text-xs text-gray-500">
+                <p class="text-xs text-slate-300">
                   {$t('stipend.tab.spentOf', {
                     spent: money(p.spent),
                     cap: money(p.totalCap ?? 0)
@@ -144,7 +144,7 @@
                   <!-- §12.2 — no funder inside the rikma: go and find one. -->
                   <button
                     type="button"
-                    class="rounded-full border border-teal-500 px-3 py-1.5 text-xs font-bold text-teal-600 dark:text-teal-300"
+                    class="rounded-full border border-gold px-3 py-1.5 text-xs font-bold text-gold"
                     onclick={() => (fundingFor = p)}
                   >
                     🔎 {$t('stipend.tab.findFunder')}
@@ -163,7 +163,7 @@
                     defaultRate={p.stipendRate}
                     defaultCostShare={p.costShare}
                     label={$t('stipend.tab.pledgeInside')}
-                    className="rounded-full border border-gray-300 dark:border-gray-600 px-3 py-1.5 text-xs font-bold flex items-center gap-1"
+                    className="rounded-full border border-slate-400 px-3 py-1.5 text-xs font-bold text-slate-200 flex items-center gap-1"
                     onDone={load}
                   />
                 {/if}
@@ -185,12 +185,12 @@
             <li class="row">
               <div class="grow">
                 <p class="font-bold">{pl.funderName} → {pl.recipientName}</p>
-                <p class="text-xs text-gray-500">
+                <p class="text-xs text-slate-300">
                   ₪{pl.terms.stipendRate}/{$t('stipend.card.hour')} ·
                   {$t(`stipend.mode.${pl.terms.mode}`)} ·
                   {$t(`stipend.status.${pl.status}`)}
                 </p>
-                <p class="text-xs text-gray-500">
+                <p class="text-xs text-slate-300">
                   {$t('stipend.tab.paidSoFar', { count: money(pl.paidTotal) })}
                   {#if pl.terms.totalCap}
                     · {$t('stipend.terms.totalCap')}: {money(pl.terms.totalCap)}
@@ -212,20 +212,20 @@
             <li class="row">
               <div class="grow">
                 <p class="font-bold">{m.username}</p>
-                <p class="text-xs text-gray-500">
+                <p class="text-xs text-slate-300">
                   {#if m.funded > 0}{$t('stipend.tab.funded', { count: money(m.funded) })}{/if}
                   {#if m.received > 0}
                     · {$t('stipend.tab.received', { count: money(m.received) })}
                   {/if}
                 </p>
               </div>
-              <span class="whitespace-nowrap font-bold {m.net >= 0 ? 'text-teal-600' : 'text-rose-600'}">
+              <span class="whitespace-nowrap font-bold {m.net >= 0 ? 'text-emerald-300' : 'text-rose-300'}">
                 {m.net >= 0 ? '+' : ''}{money(m.net)}
               </span>
             </li>
           {/each}
         </ul>
-        <p class="mt-2 text-xs text-gray-500">{$t('stipend.tab.perMemberNote')}</p>
+        <p class="mt-2 text-xs text-slate-300">{$t('stipend.tab.perMemberNote')}</p>
       </section>
     {/if}
 
@@ -249,7 +249,7 @@
                 defaultRate={overview.defaultRate}
                 defaultCostShare={overview.defaultCostShare}
                 label={$t('stipend.tab.offerTo', { name: m.username })}
-                className="rounded-full border border-gray-300 dark:border-gray-600 px-3 py-1.5 text-xs font-bold flex items-center gap-1"
+                className="rounded-full border border-slate-400 px-3 py-1.5 text-xs font-bold text-slate-200 flex items-center gap-1"
                 onDone={load}
               />
             {:else}
@@ -263,7 +263,7 @@
                 {policy}
                 defaultRate={overview.defaultRate}
                 defaultCostShare={overview.defaultCostShare}
-                className="rounded-full border border-gray-300 dark:border-gray-600 px-3 py-1.5 text-xs font-bold flex items-center gap-1"
+                className="rounded-full border border-slate-400 px-3 py-1.5 text-xs font-bold text-slate-200 flex items-center gap-1"
                 onDone={load}
               />
             {/if}

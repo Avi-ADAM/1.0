@@ -22,6 +22,7 @@
   import MonthlyHours from '$lib/components/mission/MonthlyHours.svelte';
   import MissionControls from '$lib/components/mission/MissionControls.svelte';
   import EquityPreview from '$lib/components/equity/EquityPreview.svelte';
+  import MissionStipendOffer from '$lib/components/stipend/MissionStipendOffer.svelte';
   import { forum, isChatOpen, newChat, nowChatId } from '$lib/stores/pendMisMes.js';
 
   let { data } = $props();
@@ -252,6 +253,24 @@
          member who isn't the owner still gets the archive/edit proposal
          buttons here — opening one is a rikma-wide consensus matter, not a
          privilege of whoever carries the commitment (PLAN_OBJECT_ARCHIVAL). -->
+    <!-- If this mission is already funded, the two numbers belong here, above
+         the button that would propose another one: what buys the share and
+         what pays the rent are different sums, and the partnership disclaimer
+         travels with them (PLAN_STIPEND §11.1). -->
+    {#if Number(attrs.stipendRate) > 0}
+      <section class="mp-card">
+        <MissionStipendOffer
+          hours={Number(attrs.hoursassinged) || 0}
+          perhour={Number(attrs.perhour) || 0}
+          stipendRate={Number(attrs.stipendRate) || 0}
+          costShare={attrs.stipendCostShare != null ? Number(attrs.stipendCostShare) : 1}
+          mode={attrs.stipendMode || 'equity'}
+          funderName={attrs.stipendFunder?.data?.attributes?.username ?? ''}
+          monthly={!!attrs.iskvua}
+        />
+      </section>
+    {/if}
+
     <section class="mp-card mp-actions">
       <h2 class="mp-card-title">{$t('moach.progress.actions')}</h2>
       <MissionControls
@@ -262,6 +281,7 @@
         {pendingApproval}
         isMine={mine}
         ownerName={attrs.users_permissions_user?.data?.attributes?.username}
+        {ownerId}
         showArchiveActions={true}
         accruedHours={attrs.howmanyhoursalready}
         hoursAssigned={attrs.hoursassinged}

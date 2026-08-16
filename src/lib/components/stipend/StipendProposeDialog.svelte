@@ -21,6 +21,7 @@
   import { toast } from 'svelte-sonner';
   import StipendTermsFields from './StipendTermsFields.svelte';
   import { consensusScope, computeRecipientTradeoff } from '$lib/stipend/computeStipendEquity.js';
+  import { LABEL, MUTED, FAINT, INPUT, WELL, BTN_PRIMARY, BTN_GHOST } from './ui.js';
 
   /**
    * @typedef {Object} Props
@@ -234,24 +235,24 @@
     dir={$isRtl ? 'rtl' : 'ltr'}
   >
     <div
-      class="w-full sm:max-w-lg max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-white dark:bg-gray-800 p-5 shadow-2xl"
+      class="w-full sm:max-w-lg max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-50 p-5 shadow-2xl"
     >
       <div class="flex items-start justify-between gap-3">
         <div>
-          <h2 class="text-lg font-bold text-gray-900 dark:text-gray-50">{title}</h2>
+          <h2 class="text-lg font-bold">{title}</h2>
           {#if projectName}
-            <p class="text-xs text-gray-500">{projectName}</p>
+            <p class={MUTED}>{projectName}</p>
           {/if}
         </div>
-        <button type="button" class="text-2xl leading-none text-gray-400" onclick={close}>×</button>
+        <button type="button" class="text-2xl leading-none text-gray-600 dark:text-gray-300 hover:text-goldink" onclick={close}>×</button>
       </div>
 
-      <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+      <p class="mt-2 text-sm text-gray-800 dark:text-gray-100">
         {isProgram ? $t('stipend.propose.introProgram') : $t('stipend.propose.introPledge')}
       </p>
 
       {#if missionName}
-        <p class="mt-2 text-xs text-gray-500">
+        <p class="mt-2 {MUTED}">
           {$t('stipend.propose.forMission', { name: missionName })}
         </p>
       {/if}
@@ -259,10 +260,10 @@
       <div class="mt-4 flex flex-col gap-4">
         {#if !isProgram}
           <label class="flex flex-col gap-1">
-            <span class="text-xs font-bold uppercase text-gray-500">{$t('stipend.propose.funder')}</span>
+            <span class={LABEL}>{$t('stipend.propose.funder')}</span>
             <select
               bind:value={chosenFunder}
-              class="rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent px-3 py-2"
+              class={INPUT}
             >
               <option value="">{$t('stipend.propose.pick')}</option>
               {#each memberOptions as m (m.id)}
@@ -272,10 +273,10 @@
           </label>
 
           <label class="flex flex-col gap-1">
-            <span class="text-xs font-bold uppercase text-gray-500">{$t('stipend.propose.recipient')}</span>
+            <span class={LABEL}>{$t('stipend.propose.recipient')}</span>
             <select
               bind:value={chosenRecipient}
-              class="rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent px-3 py-2"
+              class={INPUT}
             >
               <option value="">{$t('stipend.propose.pick')}</option>
               {#each memberOptions as m (m.id)}
@@ -285,17 +286,17 @@
           </label>
         {:else}
           <label class="flex flex-col gap-1">
-            <span class="text-xs font-bold uppercase text-gray-500">{$t('stipend.propose.funderOptional')}</span>
+            <span class={LABEL}>{$t('stipend.propose.funderOptional')}</span>
             <select
               bind:value={chosenFunder}
-              class="rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent px-3 py-2"
+              class={INPUT}
             >
               <option value="">{$t('stipend.propose.noFunderYet')}</option>
               {#each memberOptions as m (m.id)}
                 <option value={m.id}>{m.username}</option>
               {/each}
             </select>
-            <span class="text-xs text-gray-500">{$t('stipend.propose.noFunderYetExplain')}</span>
+            <span class={MUTED}>{$t('stipend.propose.noFunderYetExplain')}</span>
           </label>
         {/if}
 
@@ -303,8 +304,8 @@
 
         <!-- §8: the recipient must see both numbers before signing. -->
         {#if tradeoff && terms.mode === 'equity'}
-          <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-3 text-sm">
-            <p class="text-xs uppercase font-bold text-gray-500 mb-2">
+          <div class="{WELL} p-3 text-sm">
+            <p class="{LABEL} mb-2 block">
               {$t('stipend.tradeoff.title')}
             </p>
             <p>
@@ -317,21 +318,21 @@
               })}
             </p>
             {#if tradeoff.equityGivenUp === 0}
-              <p class="mt-1 text-xs text-gray-500">{$t('stipend.tradeoff.noneGivenUp')}</p>
+              <p class="mt-1 {FAINT}">{$t('stipend.tradeoff.noneGivenUp')}</p>
             {/if}
           </div>
         {/if}
 
         <label class="flex flex-col gap-1">
-          <span class="text-xs font-bold uppercase text-gray-500">{$t('stipend.propose.why')}</span>
+          <span class={LABEL}>{$t('stipend.propose.why')}</span>
           <textarea
             bind:value={why}
             rows="2"
-            class="rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent px-3 py-2"
+            class={INPUT}
           ></textarea>
         </label>
 
-        <p class="text-xs text-gray-500">
+        <p class={MUTED}>
           {scope === 'bilateral'
             ? $t('stipend.propose.scopeNoteBilateral')
             : $t('stipend.propose.scopeNoteRikma')}
@@ -341,14 +342,14 @@
       <div class="mt-5 flex gap-2">
         <button
           type="button"
-          class="flex-1 rounded-xl border border-gray-300 dark:border-gray-600 py-3 text-sm"
+          class="flex-1 {BTN_GHOST} py-3 text-sm"
           onclick={close}
         >
           {$t('stipend.actions.cancel')}
         </button>
         <button
           type="button"
-          class="flex-[2] rounded-xl bg-gradient-to-r from-barbi to-mpink py-3 text-sm font-semibold text-white disabled:opacity-60"
+          class="flex-[2] {BTN_PRIMARY} py-3 text-sm"
           disabled={busy || !canSend}
           onclick={send}
         >

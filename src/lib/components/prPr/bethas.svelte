@@ -418,6 +418,14 @@
                 {#if isPending(m)}
                   <span class="pb-badge pb-badge-wait">⏳ {$t('moach.progress.awaitingApproval')}</span>
                 {/if}
+                <!-- Already funded: the row says so, so the 💗 button in the
+                     strip below reads as "another one" and not as "the first
+                     one" (PLAN_STIPEND §8). -->
+                {#if Number(m.attributes?.stipendRate) > 0}
+                  <span class="pb-badge pb-badge-stipend" title={$t('stipend.mission.title')}>
+                    💗 ₪{Number(m.attributes.stipendRate).toLocaleString()}
+                  </span>
+                {/if}
               </div>
             </div>
 
@@ -554,6 +562,7 @@
                 pendingApproval={isPending(m)}
                 isMine={mine}
                 ownerName={m.attributes?.users_permissions_user?.data?.attributes?.username}
+                ownerId={m.attributes?.users_permissions_user?.data?.id}
                 showArchiveActions={true}
                 accruedHours={m.attributes?.howmanyhoursalready}
                 hoursAssigned={m.attributes?.hoursassinged}
@@ -897,6 +906,13 @@
   .pb-badge-wait {
     background: rgba(255, 0, 146, 0.16);
     color: #ff9ad5;
+  }
+  /* The board's shell is dark in every theme and mode, so the badge takes the
+     *light* half of the gold/barbi pair — the same `--pb-gold` the "mine" badge
+     uses — and not `--goldink`, which is dark ink on the light side. */
+  .pb-badge-stipend {
+    background: color-mix(in srgb, var(--pb-gold) 16%, transparent);
+    color: var(--pb-gold);
   }
 
   .pb-owner {

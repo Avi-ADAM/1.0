@@ -104,12 +104,12 @@
       <p>{$t('stipend.pay.rate', { count: buble.stipendRate })}</p>
     </div>
 
-    <p class="text-xs text-gray-500">{$t('stipend.confirm.equityNote')}</p>
+    <p class="text-xs text-gray-600 dark:text-gray-300">{$t('stipend.confirm.equityNote')}</p>
 
     {#if counterOpen}
       <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-3 flex flex-col gap-2">
         <label class="flex flex-col gap-1">
-          <span class="text-xs font-bold uppercase text-gray-500"
+          <span class="text-xs font-bold uppercase text-gray-600 dark:text-gray-300"
             >{$t('stipend.confirm.howMuchArrived')}</span
           >
           <input
@@ -119,13 +119,13 @@
             step="1"
             value={correction}
             oninput={(e) => (received = e.currentTarget.value)}
-            class="rounded-xl border border-gray-300 dark:border-gray-600 bg-transparent px-3 py-2"
+            class="rounded-xl border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-50 px-3 py-2"
           />
         </label>
-        <p class="text-xs text-gray-500">{$t('stipend.confirm.zeroNote')}</p>
+        <p class="text-xs text-gray-600 dark:text-gray-300">{$t('stipend.confirm.zeroNote')}</p>
         <button
           type="button"
-          class="rounded-xl border border-gray-300 dark:border-gray-600 py-2 text-sm"
+          class="rounded-xl border border-gray-300 dark:border-slate-600 py-2 text-sm"
           disabled={busy}
           onclick={() => send(correction)}
         >
@@ -140,14 +140,14 @@
   >
     <button
       type="button"
-      class="flex-1 rounded-xl border border-gray-300 dark:border-gray-600 py-3 text-sm"
+      class="flex-1 rounded-xl border border-gray-300 dark:border-slate-600 py-3 text-sm"
       onclick={() => (counterOpen = !counterOpen)}
     >
       {$t('stipend.confirm.notExactly')}
     </button>
     <button
       type="button"
-      class="flex-[2] rounded-xl bg-gradient-to-r from-barbi to-mpink py-3 text-sm font-semibold text-white disabled:opacity-60"
+      class="flex-[2] rounded-xl bg-barbi text-gold py-3 text-sm font-bold disabled:opacity-60"
       disabled={busy}
       onclick={() => send(null)}
     >

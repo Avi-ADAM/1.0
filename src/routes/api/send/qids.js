@@ -9137,6 +9137,8 @@ export const moachQids = {
               attributes {
                 name status iskvua finnished howmanyhoursalready perhour hoursassinged createdAt start dates
                 hearotMeyuchadot descrip admaticedai privatlinks publicklinks
+                stipendRate stipendCostShare stipendMode
+                stipendFunder { data { id attributes { username } } }
                 monter { monthStart hours isDone hoursDone }
                 forums { data { id } }
                 open_missions { data { id } }
@@ -9626,6 +9628,8 @@ export const moachQids = {
           name status iskvua howmanyhoursalready hoursassinged perhour
           finnished createdAt start dates admaticedai privatlinks publicklinks
           hearotMeyuchadot descrip
+          stipendRate stipendCostShare stipendMode
+          stipendFunder { data { id attributes { username } } }
           monter { monthStart hours isDone hoursDone }
           users_permissions_user { data { id attributes { username profilePic { data { attributes { url } } } } } }
           project { data { id attributes { projectName profilePic { data { attributes { url } } } } } }
