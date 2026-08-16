@@ -162,8 +162,10 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
         // α: 1 (the default) = the recipient carries it and nobody is diluted.
         stipendCostShare:
           stipendCostShare != null ? Math.min(1, Math.max(0, Number(stipendCostShare))) : 1,
+        // `advance` was removed as a choice; a value arriving from an old
+        // client is read as the gift it always behaved like.
         stipendMode:
-          stipendMode === 'advance' || stipendMode === 'gift' ? stipendMode : 'equity',
+          stipendMode === 'gift' || stipendMode === 'advance' ? 'gift' : 'equity',
         ...(stipendFunderId ? { stipendFunder: String(stipendFunderId) } : {}),
       };
 
@@ -584,7 +586,7 @@ export const createMissionConfig: ActionConfig = {
     processId:          { type: 'string',  required: false, description: 'Process ID to attach created entity to' },
     stipendRate:        { type: 'number',  required: false, description: 'Subsistence stipend this mission comes with, ₪ per approved hour (≤ valph)' },
     stipendCostShare:   { type: 'number',  required: false, description: 'α — 1 (default) the recipient carries it and nobody is diluted, 0 the whole rikma does' },
-    stipendMode:        { type: 'string',  required: false, description: 'equity (default) | advance | gift' },
+    stipendMode:        { type: 'string',  required: false, description: 'equity (default) | gift' },
     stipendFunderId:    { type: 'string',  required: false, description: 'Member offering to fund it, when there already is one' },
   },
 

@@ -41,8 +41,6 @@
     "revenueTrigger": "Monthly income that ends it",
     "revenueTriggerExplain": "Once monthly income crosses this, the stipend ends and ordinary splits take over",
     "revenueTriggerSet": "Ends by itself at monthly income of {{count}}",
-    "recoursePersonal": "The advance may also be collected from the recipient personally",
-    "recourseExplain": "By default an advance is repaid only out of splits. Otherwise we have created a personal debt for someone who needed subsistence money — the opposite of the point",
     "more": "More terms",
     "scopeBilateral": "A two-party agreement: nobody outside the two of you is affected",
     "scopeRikma": "Needs the whole rikma: these terms raise the total value, so everyone is diluted"

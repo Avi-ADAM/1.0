@@ -30,7 +30,10 @@ import type { PartialStipendTerms, StipendTerms } from '$lib/stipend/types.js';
 
 export type StipendDecisionKind = 'stipendProgram' | 'stipendPledge';
 
-const MODES = ['equity', 'advance', 'gift'] as const;
+// `advance` stays in the Strapi enum (dropping a deployed enum value is a
+// migration, and rows may already carry it) but is no longer writable from
+// here — see src/lib/stipend/ADVANCE_MODE.md.
+const MODES = ['equity', 'gift'] as const;
 const SCOPES = ['allMissions', 'selectedMissions', 'singleMission'] as const;
 const RECOURSES = ['nonRecourse', 'personal'] as const;
 const KINDS = ['stipendProgram', 'stipendPledge'] as const;

@@ -41,8 +41,6 @@
     "revenueTrigger": "Ingreso mensual que la termina",
     "revenueTriggerExplain": "Cuando el ingreso mensual supera el umbral, la beca termina y vuelve el reparto normal",
     "revenueTriggerSet": "Termina sola con un ingreso mensual de {{count}}",
-    "recoursePersonal": "El anticipo también puede cobrarse personalmente a quien recibe",
-    "recourseExplain": "Por defecto un anticipo se devuelve solo con los repartos. De otro modo creamos una deuda personal a quien necesitaba dinero para vivir — justo lo contrario del objetivo",
     "more": "Más condiciones",
     "scopeBilateral": "Acuerdo entre dos: nadie fuera de las dos partes se ve afectado",
     "scopeRikma": "Requiere a toda la rikma: estas condiciones aumentan el valor total y por tanto diluyen a todos"

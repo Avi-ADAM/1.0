@@ -34,7 +34,10 @@ import { normalizeTerms } from '$lib/stipend/computeStipendEquity.js';
 import { openStipendDecision } from './decision.js';
 import { fetchProjectContext } from './read.js';
 
-const MODES = ['equity', 'advance', 'gift'] as const;
+// `advance` stays in the Strapi enum (dropping a deployed enum value is a
+// migration, and rows may already carry it) but is no longer writable from
+// here — see src/lib/stipend/ADVANCE_MODE.md.
+const MODES = ['equity', 'gift'] as const;
 const RECOURSES = ['nonRecourse', 'personal'] as const;
 const SCOPES = ['allMissions', 'selectedMissions', 'singleMission'] as const;
 
@@ -201,7 +204,7 @@ export async function carryStipendToMission(
 
   const funderId = need.stipendFunder?.data?.id ? String(need.stipendFunder.data.id) : null;
   const mode =
-    need.stipendMode === 'advance' || need.stipendMode === 'gift' ? need.stipendMode : 'equity';
+    need.stipendMode === 'gift' || need.stipendMode === 'advance' ? 'gift' : 'equity';
 
   await run(
     exec,

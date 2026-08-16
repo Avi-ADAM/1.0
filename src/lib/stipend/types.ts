@@ -8,13 +8,37 @@
  * shekels do to the rikma's books.
  */
 
-/** What the money buys. */
-export type StipendMode = 'equity' | 'advance' | 'gift';
+/**
+ * What the money buys. Three answers, and the third is a mode of its own:
+ *
+ *   equity + costShare 0 — the whole rikma carries it. The recipient still
+ *                          accrues the mission's full M×H, the funder accrues
+ *                          the stipend as a contributed resource, and the sum
+ *                          of the rikma grows, so everyone is diluted together.
+ *   equity + costShare 1 — only the recipient carries it. The stipend is still
+ *                          a resource the funder gave, but the recipient
+ *                          accrues only the difference M×H − P. Nobody else
+ *                          moves.
+ *   gift                 — the funder is not buying a partnership at all. This
+ *                          is the donation case: the pledge only records what
+ *                          they committed to, and paying it settles it.
+ *
+ * A fourth mode, `advance` (a repayable loan, with `recourse` deciding whether
+ * it could ever be collected from the recipient personally), was removed
+ * deliberately. See ./ADVANCE_MODE.md for what it was, what still exists in
+ * storage, and what re-enabling it would take.
+ */
+export type StipendMode = 'equity' | 'gift';
 
 /** Who the pledge covers. */
 export type StipendScope = 'allMissions' | 'selectedMissions' | 'singleMission';
 
-/** Whether an advance can ever be collected from the recipient personally. */
+/**
+ * Dormant. Belonged to the removed `advance` mode — whether the loan could
+ * ever be collected from the recipient personally. Nothing offers it and
+ * nothing reads it; every row is written `nonRecourse`. Kept so the stored
+ * column keeps a name in the type system (see ./ADVANCE_MODE.md).
+ */
 export type StipendRecourse = 'nonRecourse' | 'personal';
 
 /** `Project.stipendPolicy`. **null = legacy = `bilateral`** (§7). */

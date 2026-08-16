@@ -71,9 +71,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
         `תעריף המלגה: ₪${program.stipendRate} לשעה שאושרה. תקציב התוכנית: ₪${budget}.`,
         program.mode === 'equity'
           ? `הכסף נספר כתרומה לריקמה ומזכה בחלק בה (מקדם ${program.equityMultiplier}).`
-          : program.mode === 'advance'
-            ? `הכסף נרשם כמקדמה שנפרעת מחלוקות רווח בלבד.`
-            : `הכסף נרשם כתרומה — בלי חלק בריקמה.`,
+          : `הכסף נרשם כתרומה — בלי חלק בריקמה.`,
         `מי שייקח את המשאב הזה מצטרף לריקמה כשותף.`
       ].join(' ');
 
