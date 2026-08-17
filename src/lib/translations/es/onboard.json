@@ -41,7 +41,7 @@
       "matches": {
         "title": "A tu perfil + guía de usuario",
         "sub": "La Conserjería ya está buscando Rikmas y demandas de clientes que coincidan. Aprendamos a gestionar una asociación por consenso sobre la marcha.",
-        "meta": "Recomendado — La forma natural de continuar",
+        "meta": "Recomendado - La forma natural de continuar",
         "chips": {
           "realtime": "✨ Sugerencias en tiempo real",
           "guide": "📖 Guía breve"
@@ -163,7 +163,7 @@
         "edit": "Continuar para editar ✍️"
       },
       "next_hint": "En la edición añadiremos más valores, afinaremos habilidades y seleccionaremos misiones y recursos de las listas del sitio. Siempre puedes editar desde el perfil.",
-      "no_draft": "No encontramos tu análisis — se guarda solo en este navegador, y parece que se borró o que esta es una pestaña nueva. Es un texto corto, puedes analizarlo de nuevo.",
+      "no_draft": "No encontramos tu análisis - se guarda solo en este navegador, y parece que se borró o que esta es una pestaña nueva. Es un texto corto, puedes analizarlo de nuevo.",
       "no_draft_cta": "Volver a crear tu perfil ←"
     },
     "tabs": {

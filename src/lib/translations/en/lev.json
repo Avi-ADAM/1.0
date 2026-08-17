@@ -200,7 +200,7 @@
       "cycle": "cycle",
       "howMuchThisMonth": "How much did you spend this month?",
       "planned": "planned",
-      "toApproveReported": "To approve — the monthly expense reported by",
+      "toApproveReported": "To approve - the monthly expense reported by",
       "forLabel": "for",
       "notYetReported": "(not yet reported by the responsible member)",
       "approveOnlyAfterReport": "You can approve only after the responsible member reports this month's spend",
@@ -216,7 +216,7 @@
       "askedVal": "Asked value",
       "myval": "My value",
       "offerAtSource": "Offer on the source page",
-      "withdrawSelfNomination": "Withdraw your self-nomination — the resource offer you authored closes entirely",
+      "withdrawSelfNomination": "Withdraw your self-nomination - the resource offer you authored closes entirely",
       "value": "Value",
       "acceptedVal": "accepted value",
       "perCycleHint": "Estimated cost per cycle",
@@ -224,7 +224,7 @@
       "everyNYears": "· every {{count}} years",
       "totalInvest": "Estimated total investment",
       "totalInvestHint": "Estimated total investment over the whole period",
-      "noEndDate": "No end date — until marked as completed",
+      "noEndDate": "No end date - until marked as completed",
       "cycleApprovalNote": "Each cycle opens a charge for the rikma to approve the actual expense"
     },
     "welcome": {
@@ -259,8 +259,8 @@
       "senderLabel": "Sender",
       "receiverLabel": "Receiver",
       "chat": "Private chat",
-      "confirmSent": "Confirm — I sent it",
-      "confirmReceived": "Confirm — I received it",
+      "confirmSent": "Confirm - I sent it",
+      "confirmReceived": "Confirm - I received it",
       "senderConfirmed": "Sender confirmed",
       "receiverConfirmed": "Receiver confirmed",
       "pendingConfirm": "Pending",
@@ -356,7 +356,7 @@
     "sugestmi": {
       "head": "Suggested mission",
       "offerAtSource": "Offer on the pool page",
-      "withdrawSelfNomination": "Withdraw your self-nomination — the mission you authored closes entirely"
+      "withdrawSelfNomination": "Withdraw your self-nomination - the mission you authored closes entirely"
     },
     "wishApplied": "Your offer was sent successfully",
     "toProfile": "to the profile page"
@@ -396,7 +396,7 @@
       "resolved": "The consensus discussion reached a decision",
       "resolvedShare": "Agreed share",
       "toDiscussion": "Open full discussion ←",
-      "voteStillNeeded": "The decision guides the vote — final approval stays here on the card."
+      "voteStillNeeded": "The decision guides the vote - final approval stays here on the card."
     },
     "successMessage": "Division approved successfully! 🎉",
     "errorMessage": "Error approving division. Please try again.",
@@ -463,7 +463,7 @@
   "revenue": {
     "siteShareDecision": {
       "title": "Your contribution to 1💗1",
-      "sub": "Out of what you earned ({{basis}} {{currency}}) — 1💗1's management & partnership service. Suggested: {{proposed}} {{currency}}. Give as suggested, more, or less — it's your personal contribution and doesn't change the other partners' shares.",
+      "sub": "Out of what you earned ({{basis}} {{currency}}) - 1💗1's management & partnership service. Suggested: {{proposed}} {{currency}}. Give as suggested, more, or less - it's your personal contribution and doesn't change the other partners' shares.",
       "skipped": "You chose not to give this time. You can change it.",
       "gave": "You gave {{amount}} {{currency}}. You can update it.",
       "asIs": "As suggested ({{proposed}})",
@@ -498,12 +498,12 @@
       "saved": "Saved 💗",
       "errSave": "Save failed",
       "errNet": "Save error",
-      "autoNotice": "This split already auto-approved and closed. You did not block it — all that is left is to confirm your personal giving to 1💗1.",
+      "autoNotice": "This split already auto-approved and closed. You did not block it - all that is left is to confirm your personal giving to 1💗1.",
       "body": "Choose how much to give 1💗1 from your personal share of this split, or skip this time. It doesn't affect what the partners split."
     },
     "siteShareIncomeCard": {
       "cardType": "SITE SHARE INCOME",
-      "body": "This is site-share income from a rikma's members. There's no product or delivery step — just make sure someone volunteers to receive, and that giver and receiver confirm the money moved.",
+      "body": "This is site-share income from a rikma's members. There's no product or delivery step - just make sure someone volunteers to receive, and that giver and receiver confirm the money moved.",
       "totalIncome": "Total income",
       "you": "You",
       "transfers": "Member transfers",
@@ -524,7 +524,7 @@
     "reportedExpenseOf": "reported an expense of:",
     "actualAmountPlaceholder": "Actual amount spent this month",
     "confirmExpense": "Confirm expense",
-    "doneResourceTitle": "End monthly resource — no more monthly charges will be opened",
+    "doneResourceTitle": "End monthly resource - no more monthly charges will be opened",
     "doneResource": "Done (End resource)",
     "mustExplain": "Please explain",
     "missingForApproval": "What is missing to confirm that the resource was received?",
@@ -565,7 +565,7 @@
     "accepted": "Accepted",
     "awaitingAccept": "Awaiting acceptance",
     "openForRoles": "Open for roles:",
-    "openUnassigned": "Open – unassigned",
+    "openUnassigned": "Open - unassigned",
     "start": "Start:",
     "due": "Due:",
     "description": "Description",
@@ -609,7 +609,7 @@
     "exit": "Exit",
     "chat": "Chat",
     "notAFit": "Not a fit right now",
-    "closeSelfNomination": "Close the whole self-nomination — the candidate gets a respectful note",
+    "closeSelfNomination": "Close the whole self-nomination - the candidate gets a respectful note",
     "notNow": "Not now",
     "willJoinRikma": "Approving also brings them into the weave",
     "baselineTerms": "The weave's baseline terms (the live offer is above):",
@@ -625,7 +625,7 @@
     "everyNYears": "· every {{count}} years",
     "totalInvest": "Estimated total investment:",
     "totalInvestHint": "Estimated total investment for the whole period",
-    "noEndDate": "No end date — until marked complete",
+    "noEndDate": "No end date - until marked complete",
     "recurringApprovalNote": "Approval starts the recurring-resource engine; each cycle then opens its own charge for the weave to approve the actual spend",
     "recurringJoinNote": "Approval brings the offerer into the weave and starts the recurring-resource engine; only afterwards does each cycle open its own charge for the actual spend"
   },
@@ -659,7 +659,7 @@
     "pendingApproval": "Pending approval"
   },
   "decisionMaking": {
-    "refinementSent": "Refinement sent — the ball is in their court.",
+    "refinementSent": "Refinement sent - the ball is in their court.",
     "couldNotSend": "Could not send refinement",
     "refineSaleClaim": "Refine the sale claim",
     "proposeVersion": "Propose the version you can sign. Silence for the response window means the standing version is auto-approved.",
@@ -681,7 +681,7 @@
     "focusChip": "Focused view",
     "showAll": "Show all",
     "stillLoading": "Loading the rest…",
-    "diamondsHint": "1💗1 heart — click the diamonds to filter the actions",
+    "diamondsHint": "1💗1 heart - click the diamonds to filter the actions",
     "heartTitle": "Heart of 1💗1",
     "toggleCoinsCards": "Switch the view from coins to cards",
     "negotiationLocation": "Location"
@@ -749,7 +749,7 @@
     "joinSuggestion": "Suggested rikma to join and do a mission",
     "chatOnJoining": "Chat about joining",
     "openPublicPage": "Double-click to view the public page of {{projectName}}",
-    "missionNameHint": "Mission name — double-click to expand",
+    "missionNameHint": "Mission name - double-click to expand",
     "suggestedMission": "Suggested mission",
     "neededSkills": "Needed skills",
     "lastDate": "Last date to do the mission",

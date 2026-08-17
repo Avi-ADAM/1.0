@@ -51,7 +51,7 @@
 
 <svelte:head>
   {#if sale}
-    <title>Sale — {saleId}</title>
+    <title>Sale - {saleId}</title>
     <meta name="moach:entity-type" content="sale" />
     <meta name="moach:entity-id" content={saleId} />
     <meta name="moach:project-id" content={projectId} />

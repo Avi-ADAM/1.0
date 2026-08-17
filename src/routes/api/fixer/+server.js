@@ -222,7 +222,7 @@ export async function GET({ url, request }) {
   if (!ids.length && start < report.total) report.nextStart = start;
 
   console.log(
-    `fixer: ${report.mode} — scanned ${report.scanned}, changed ${report.changed.length},`,
+    `fixer: ${report.mode} - scanned ${report.scanned}, changed ${report.changed.length},`,
     `skipped ${report.skipped.length}, errors ${report.errors.length}`
   );
   return json(report);

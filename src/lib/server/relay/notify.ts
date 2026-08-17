@@ -24,7 +24,7 @@ export function notifySpaceChanged(spaceId: string): void {
     .catch((e) => {
       if (!warned) {
         warned = true;
-        console.warn('[relay/notify] space-changed emit failed — polling fallback only:', e?.message ?? e);
+        console.warn('[relay/notify] space-changed emit failed - polling fallback only:', e?.message ?? e);
       }
     })
     .finally(() => clearTimeout(timer));

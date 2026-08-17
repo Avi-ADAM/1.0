@@ -158,7 +158,7 @@
       "shown": "En descubrimiento",
       "hidden": "Oculto",
       "showTitle": "Mostrar el producto en la página pública de descubrimiento",
-      "hideTitle": "Ocultar el producto de la página pública de descubrimiento — sigue activo en la rikma y por enlace directo",
+      "hideTitle": "Ocultar el producto de la página pública de descubrimiento - sigue activo en la rikma y por enlace directo",
       "nowShown": "El producto aparece en la página de descubrimiento",
       "nowHidden": "El producto se ocultó de la página de descubrimiento"
     }
@@ -290,8 +290,8 @@
     "participated": "repartos"
   },
   "siteShareArchive": {
-    "titleIn": "Archivo de la parte del sitio — recibido",
-    "titleOut": "Archivo de la parte del sitio — lo que dimos a 1💗1",
+    "titleIn": "Archivo de la parte del sitio - recibido",
+    "titleOut": "Archivo de la parte del sitio - lo que dimos a 1💗1",
     "totalIn": "Total recibido",
     "totalOut": "Total entregado",
     "committed": "Comprometido",

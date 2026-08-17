@@ -529,7 +529,7 @@
               <span
                 class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full"
               >
-                —
+                -
               </span>
             {/if}
           </div>
@@ -579,7 +579,7 @@
               <span
                 class="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full"
               >
-                —
+                -
               </span>
             {/if}
           </div>

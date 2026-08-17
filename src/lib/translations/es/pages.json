@@ -100,8 +100,8 @@
     "guestBody": "Tu oferta abre una conversación real con la rikma, y para eso hace falta una identidad. El registro es abierto y gratuito.",
     "login": "Registro / Iniciar sesión",
     "supportInstead": "¿Solo quieres apoyar? A la página de apoyo →",
-    "pageTitle": "{{projectName}} — unirse",
-    "metaDescription": "Propón tu candidatura a {{projectName}} — en tus propios términos"
+    "pageTitle": "{{projectName}} - unirse",
+    "metaDescription": "Propón tu candidatura a {{projectName}} - en tus propios términos"
   },
   "restime": {
     "feh": "48 horas",

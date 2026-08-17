@@ -124,9 +124,9 @@ export const counterOnAskConfig: ActionConfig = {
   paramSchema: {
     askId: { type: 'string', required: true, description: 'Ask being negotiated' },
     openMissionId: { type: 'string', required: false, description: 'Open mission the Ask targets' },
-    projectId: { type: 'string', required: true, description: 'Project (rikma) ID — auth' },
+    projectId: { type: 'string', required: true, description: 'Project (rikma) ID - auth' },
     ordern: { type: 'number', required: false, description: 'Current max round (new round = ordern+1)' },
-    candidateUserId: { type: 'string', required: false, description: 'Ask owner (candidate) — notified of the counter' },
+    candidateUserId: { type: 'string', required: false, description: 'Ask owner (candidate) - notified of the counter' },
     newValues: {
       type: 'object',
       required: false,

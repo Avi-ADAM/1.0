@@ -99,7 +99,7 @@ export async function createDemoMeeting(
         variables: {
           name: meetingName,
           desc:
-            'פגישת דמו אישית של כ‑20 דקות. אפשר להיכנס בזמן שנוח — ' +
+            'פגישת דמו אישית של כ‑20 דקות. אפשר להיכנס בזמן שנוח - ' +
             'הקישור פתוח, ואין צורך בהרשמה.',
           publishedAt: new Date().toISOString()
         }

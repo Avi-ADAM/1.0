@@ -175,8 +175,8 @@
         const holderName = selected?.[0] ?? '';
         toast.info(
           $lang === 'en'
-            ? `Report sent — awaiting ${holderName}'s consent. It will auto-approve after the rikma's response time if there is no reply.`
-            : `הדיווח נשלח — ממתין להסכמת ${holderName}. יאושר אוטומטית בתום זמן התגובה של הריקמה אם לא תגיע תגובה.`
+            ? `Report sent - awaiting ${holderName}'s consent. It will auto-approve after the rikma's response time if there is no reply.`
+            : `הדיווח נשלח - ממתין להסכמת ${holderName}. יאושר אוטומטית בתום זמן התגובה של הריקמה אם לא תגיע תגובה.`
         );
       }
 
@@ -279,8 +279,8 @@
        customer confirms the transfer every month. -->
   <small class="text-barbi text-center mt-2">
     {$lang === 'en'
-      ? `Customer (optional${isRecurring ? '' : ' · paid'}) — exact 1lev1 username or email`
-      : `לקוח (אופציונלי${isRecurring ? '' : ' · שולם'}) — שם משתמש או אימייל מדויק ב-1lev1`}
+      ? `Customer (optional${isRecurring ? '' : ' · paid'}) - exact 1lev1 username or email`
+      : `לקוח (אופציונלי${isRecurring ? '' : ' · שולם'}) - שם משתמש או אימייל מדויק ב-1lev1`}
   </small>
   <input
     class="bg-gold hover:bg-mtork border-2 border-barbi rounded text-barbi placeholder-barbi/70 p-1"
@@ -295,8 +295,8 @@
         : 'מכירה מתחדשת פותחת כרטיס דיווח חודשי; לקוח מזוהה גם יעדכן כל חודש כמה העביר.'}
     {:else}
       {$lang === 'en'
-        ? 'The sale is recorded as already paid — the purchase appears on the customer\'s deals page, no confirmation needed.'
-        : 'המכירה נרשמת כשולמה — הרכישה תופיע בעמוד העסקאות של הלקוח, ללא צורך באשרור.'}
+        ? 'The sale is recorded as already paid - the purchase appears on the customer\'s deals page, no confirmation needed.'
+        : 'המכירה נרשמת כשולמה - הרכישה תופיע בעמוד העסקאות של הלקוח, ללא צורך באשרור.'}
     {/if}
   </small>
 

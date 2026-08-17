@@ -299,7 +299,7 @@ export function summarizeProjectContext(ctx: ProjectContext, lang: string = 'he'
         '<<<' +
         ctx.products
           .slice(0, 12)
-          .map((p) => (p.price != null ? `${p.name} — ${p.price}` : p.name))
+          .map((p) => (p.price != null ? `${p.name} - ${p.price}` : p.name))
           .join(' | ') +
         '>>>'
     );

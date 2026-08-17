@@ -10,7 +10,7 @@ import type { ActionConfig } from '../types.js';
 
 export const approveMatanotConfig: ActionConfig = {
   key: 'approveMatanot',
-  description: 'Approve a matanot product — flips status_of_voting to active',
+  description: 'Approve a matanot product - flips status_of_voting to active',
   graphqlOperation: '135approveMatanot',
   paramSchema: {
     id: { type: 'string', required: true },

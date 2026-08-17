@@ -40,7 +40,7 @@ export async function loadLevSlice(
     return;
   }
   if (!def.qid) {
-    console.warn(`[levSliceLoader] No qid for slice type: ${typeKey} — skipping`);
+    console.warn(`[levSliceLoader] No qid for slice type: ${typeKey} - skipping`);
     return;
   }
 

@@ -120,9 +120,9 @@ export const dismissSelfNominationConfig: ActionConfig = {
         ar: 'تحديث على الترشيح الذاتي',
       },
       body: {
-        he: 'ההצעה העצמית נסגרה. תודה על הפתיחות — מוזמנים להמשיך לעקוב ולהציע שוב בעתיד 💗',
-        en: 'The self-nomination was closed. Thank you for reaching out — feel free to follow along and propose again in the future 💗',
-        ar: 'تم إغلاق الترشيح الذاتي. شكرًا على المبادرة — يمكنكم المتابعة والاقتراح مجددًا مستقبلاً 💗',
+        he: 'ההצעה העצמית נסגרה. תודה על הפתיחות - מוזמנים להמשיך לעקוב ולהציע שוב בעתיד 💗',
+        en: 'The self-nomination was closed. Thank you for reaching out - feel free to follow along and propose again in the future 💗',
+        ar: 'تم إغلاق الترشيح الذاتي. شكرًا على المبادرة - يمكنكم المتابعة والاقتراح مجددًا مستقبلاً 💗',
       },
     },
     channels: ['socket', 'email', 'push'],

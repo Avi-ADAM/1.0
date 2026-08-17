@@ -821,7 +821,7 @@
             <p class="p cd">
               {#if cycleReported}
                 <span
-                  onmouseenter={() => hover('ההוצאה שדווחה החודש — לחצו על הלב לאישור')}
+                  onmouseenter={() => hover('ההוצאה שדווחה החודש - לחצו על הלב לאישור')}
                   onmouseleave={() => hover('0')}
                   style="color:var(--gold)">🔁 {shownAmount} ₪</span
                 >
@@ -830,7 +830,7 @@
                   onmouseenter={() =>
                     hover(
                       isResponsible
-                        ? 'טרם דיווחת את ההוצאה החודש — לחצו על הלב לדיווח'
+                        ? 'טרם דיווחת את ההוצאה החודש - לחצו על הלב לדיווח'
                         : 'ממתין לדיווח ההוצאה ע"י האחראי'
                     )}
                   onmouseleave={() => hover('0')}

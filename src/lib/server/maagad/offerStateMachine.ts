@@ -35,7 +35,7 @@ function deadlineMs(deadline: string | number | null): number | null {
 /** Is this offer currently accepting new signatures? */
 export function canSign(offer: OfferState, nowMs: number = Date.now()): { ok: boolean; reason?: string } {
   if (offer.status !== 'open' && offer.status !== 'quorum_reached') {
-    return { ok: false, reason: `offer is ${offer.status} — signing is closed` };
+    return { ok: false, reason: `offer is ${offer.status} - signing is closed` };
   }
   const dl = deadlineMs(offer.signDeadline);
   if (dl != null && dl <= nowMs) {

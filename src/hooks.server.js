@@ -154,7 +154,7 @@ const desc = {
   he: '1💗1 היא פלטפורמה לשותפויות הוגנות: ריקמת שותפים ללא בוס וללא הון התחלתי, משימות ומשאבים פתוחים, תיעוד שעות, החלטות בהסכמה וחלוקת רווחים שקופה לפי תרומה.',
   en: '1💗1 is a platform for fair partnerships: build a network with no boss and no upfront capital, publish open missions and resources, log hours, decide by consensus, split profits by contribution.',
   ar: '1💗1 منصة للشراكات العادلة: شبكة شركاء بلا مدير وبلا رأس مال، مهام وموارد مفتوحة، تسجيل الساعات، قرارات بالتوافق، وتقاسم شفاف للأرباح حسب المساهمة.',
-  ru: '1💗1 — платформа честных партнёрств: сеть без начальника и стартового капитала, открытые задачи и ресурсы, учёт часов, решения по согласию и прозрачный раздел прибыли по вкладу.',
+  ru: '1💗1 - платформа честных партнёрств: сеть без начальника и стартового капитала, открытые задачи и ресурсы, учёт часов, решения по согласию и прозрачный раздел прибыли по вкладу.',
   es: '1💗1 es una plataforma de asociaciones justas: una red sin jefe ni capital inicial, misiones y recursos abiertos, registro de horas, decisiones por consenso y reparto transparente de beneficios.'
 };
 

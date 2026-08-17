@@ -169,7 +169,7 @@ const updatePlanBoardHandler: ActionExecutionHandler = async (params, context, {
 
 export const updatePlanBoardAction: ActionConfig = {
   key: 'updatePlanBoard',
-  description: 'Update a planning board — accept a suggested direction, rename it, archive it, or record a revision request',
+  description: 'Update a planning board - accept a suggested direction, rename it, archive it, or record a revision request',
   graphqlOperation: updatePlanBoardHandler,
   paramSchema: {
     boardId: { type: 'string', required: true, description: 'ID of the board' },
@@ -313,7 +313,7 @@ const updatePlanItemHandler: ActionExecutionHandler = async (params, context, { 
 
 export const updatePlanItemAction: ActionConfig = {
   key: 'updatePlanItem',
-  description: 'Edit a planning row — rename, flip must/nice, accept it, or dismiss it',
+  description: 'Edit a planning row - rename, flip must/nice, accept it, or dismiss it',
   graphqlOperation: updatePlanItemHandler,
   paramSchema: {
     itemId: { type: 'string', required: true, description: 'ID of the plan item' },

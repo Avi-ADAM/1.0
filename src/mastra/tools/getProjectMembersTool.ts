@@ -48,7 +48,7 @@ export async function fetchProjectPeopleAndRoles(
 export const getProjectMembersTool = createTool({
   id: 'getProjectMembersTool',
   description:
-    'List the people (members) and roles (tafkidim) of a project. Use this to resolve a task assignee — a person or a role — to its ID before calling createTaskTool.',
+    'List the people (members) and roles (tafkidim) of a project. Use this to resolve a task assignee - a person or a role - to its ID before calling createTaskTool.',
   inputSchema: z.object({
     projectId: z.string().describe('ID of the project'),
     query: z

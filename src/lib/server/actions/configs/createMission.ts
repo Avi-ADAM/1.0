@@ -381,8 +381,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
                 en: `New mission up for a vote: "${missionName}"`,
               },
               body: {
-                he: `${creatorName} הציע/ה בריקמה "${projectName}" את המשימה "${missionName}". במהלך ${restimeHe} של זמן התגובה אפשר לאשר, לפתוח שיחה או להציע גרסה מדויקת משלך — ההצעה משתנה כרצונך וההצעה האחרונה שעל השולחן מאושרת אוטומטית בתום הזמן. לחצו להצבעה.`,
-                en: `${creatorName} proposed the mission "${missionName}" in the "${projectName}" rikma. During the ${restimeEn} response window you can approve, open a discussion or counter with your own refined version — the proposal is yours to shape, and the last version on the table is auto-approved when time runs out. Tap to vote.`,
+                he: `${creatorName} הציע/ה בריקמה "${projectName}" את המשימה "${missionName}". במהלך ${restimeHe} של זמן התגובה אפשר לאשר, לפתוח שיחה או להציע גרסה מדויקת משלך - ההצעה משתנה כרצונך וההצעה האחרונה שעל השולחן מאושרת אוטומטית בתום הזמן. לחצו להצבעה.`,
+                en: `${creatorName} proposed the mission "${missionName}" in the "${projectName}" rikma. During the ${restimeEn} response window you can approve, open a discussion or counter with your own refined version - the proposal is yours to shape, and the last version on the table is auto-approved when time runs out. Tap to vote.`,
               },
             },
             channels: ['socket', 'push', 'email'],
@@ -423,8 +423,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
                 en: `✨ ${creatorName} thinks you're the one for "${missionName}"`,
               },
               body: {
-                he: `בריקמה "${projectName}" נולדה משימה חדשה — "${missionName}" — ו${creatorName} בחר/ה דווקא בך. שום דבר לא קורה בלי ההסכמה שלך: המשימה תירשם על שמך רק אם תאשר/י אותה. יש לך ${restimeHe} לאשר, לדייק את התנאים בהצעה נגדית או לפתוח שיחה; אם לא תגיב/י עד אז, ההצעה תיפתח לכל החברים והריקמה תחפש מישהו אחר. לחצו כדי לצפות בכל הפרטים ולהצביע.`,
-                en: `A new mission was born in "${projectName}" — "${missionName}" — and ${creatorName} picked you for it. Nothing happens without your consent: the mission is registered under your name only once you approve. You have ${restimeEn} to approve, refine the terms with a counter-offer or open a discussion; if you don't respond in time the offer opens up to everyone and the rikma looks for someone else. Tap to see the full details and vote.`,
+                he: `בריקמה "${projectName}" נולדה משימה חדשה - "${missionName}" - ו${creatorName} בחר/ה דווקא בך. שום דבר לא קורה בלי ההסכמה שלך: המשימה תירשם על שמך רק אם תאשר/י אותה. יש לך ${restimeHe} לאשר, לדייק את התנאים בהצעה נגדית או לפתוח שיחה; אם לא תגיב/י עד אז, ההצעה תיפתח לכל החברים והריקמה תחפש מישהו אחר. לחצו כדי לצפות בכל הפרטים ולהצביע.`,
+                en: `A new mission was born in "${projectName}" - "${missionName}" - and ${creatorName} picked you for it. Nothing happens without your consent: the mission is registered under your name only once you approve. You have ${restimeEn} to approve, refine the terms with a counter-offer or open a discussion; if you don't respond in time the offer opens up to everyone and the rikma looks for someone else. Tap to see the full details and vote.`,
               },
             },
             channels: ['socket', 'push', 'email'],
@@ -463,8 +463,8 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
                 en: `${creatorName} offers to take on "${missionName}"`,
               },
               body: {
-                he: `${creatorName} הציע/ה בריקמה "${projectName}" את המשימה "${missionName}" ומציע/ה לבצע אותה בעצמו/ה. במהלך ${restimeHe} של זמן התגובה אפשר לאשר, לדייק את התנאים או לפתוח שיחה — ההצעה האחרונה שעל השולחן מאושרת אוטומטית בתום הזמן. לחצו להצבעה.`,
-                en: `${creatorName} proposed the mission "${missionName}" in "${projectName}" and offers to carry it out themselves. During the ${restimeEn} response window you can approve, refine the terms or open a discussion — the last version on the table is auto-approved when time runs out. Tap to vote.`,
+                he: `${creatorName} הציע/ה בריקמה "${projectName}" את המשימה "${missionName}" ומציע/ה לבצע אותה בעצמו/ה. במהלך ${restimeHe} של זמן התגובה אפשר לאשר, לדייק את התנאים או לפתוח שיחה - ההצעה האחרונה שעל השולחן מאושרת אוטומטית בתום הזמן. לחצו להצבעה.`,
+                en: `${creatorName} proposed the mission "${missionName}" in "${projectName}" and offers to carry it out themselves. During the ${restimeEn} response window you can approve, refine the terms or open a discussion - the last version on the table is auto-approved when time runs out. Tap to vote.`,
               },
             }
           : {
@@ -474,7 +474,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
               },
               body: {
                 he: `${creatorName} הציע/ה בריקמה "${projectName}" את המשימה "${missionName}" והועיד/ה אותה ל${assigneeName}. ההצעה ממתינה להסכמתו/ה, וגם אתם מוזמנים להביע עמדה, לדייק או לפתוח שיחה במהלך ${restimeHe} של זמן התגובה. לחצו להצבעה.`,
-                en: `${creatorName} proposed the mission "${missionName}" in "${projectName}" and offered it to ${assigneeName}. It now awaits their consent — and you too can weigh in, refine or open a discussion during the ${restimeEn} response window. Tap to vote.`,
+                en: `${creatorName} proposed the mission "${missionName}" in "${projectName}" and offered it to ${assigneeName}. It now awaits their consent - and you too can weigh in, refine or open a discussion during the ${restimeEn} response window. Tap to vote.`,
               },
             };
         notifier

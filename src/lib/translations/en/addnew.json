@@ -22,7 +22,7 @@
     "teure": "Short description, publicly visible",
     "prte": "Detailed description, visible only inside the rikma",
     "wel": "Link to a website (if any)",
-    "naex": "That name already exists — please choose another",
+    "naex": "That name already exists - please choose another",
     "whva": "Which values and goals will the rikma promote",
     "ladd": "Add a logo",
     "su": "Logo added successfully",
@@ -35,7 +35,7 @@
     "continuous": "Ongoing rikma",
     "oneTimed": "One-off rikma",
     "continuousLevel": "Is the rikma meant to be a one-off or an ongoing thing? For example: producing one event, versus founding an event-production business",
-    "seedPlanWaiting": "We drafted {{count}} proposals for this rikma — products, missions and resources. They will be waiting on your board after it is created, for you to approve one by one."
+    "seedPlanWaiting": "We drafted {{count}} proposals for this rikma - products, missions and resources. They will be waiting on your board after it is created, for you to approve one by one."
   },
   "addNewNeed": {
     "hekind": "Kind of value",
@@ -56,7 +56,7 @@
   "addNewSkill": {
     "cencel": "Cancel",
     "adds": "Add new skill",
-    "nom": "Not on the list yet — add it with the \"Add new role\" button below",
+    "nom": "Not on the list yet - add it with the \"Add new role\" button below",
     "addn": "Add new role",
     "valn": "Skill name",
     "des": "Short description",
@@ -75,18 +75,18 @@
     "des": "Short description",
     "btnTitles": "Add",
     "errmsg": "Name already exists",
-    "nom": "Not on the list yet — add it with the \"Add new skill\" button below"
+    "nom": "Not on the list yet - add it with the \"Add new skill\" button below"
   },
   "addNewMission": {
     "placeholder": "Choose needed skills",
     "chsk": "Choose needed skills",
-    "nom": "Not on the list yet — add it with the \"Add new skill\" button below",
+    "nom": "Not on the list yet - add it with the \"Add new skill\" button below",
     "yeve": "Create and add a new mission",
     "sho": "Short description",
     "placeholderr": "Choose needed roles",
     "miname": "Mission name",
     "adds": "Choose needed roles",
-    "nomv": "Not on the list yet — add it with the \"Add new role\" button below",
+    "nomv": "Not on the list yet - add it with the \"Add new role\" button below",
     "addnewhed": "Add a new mission"
   },
   "addnewval": {
@@ -108,8 +108,8 @@
     "placeholder": "Choose users to add to your meeting",
     "addn": "Add meeting details",
     "head": "Create a new Gold Meeting",
-    "explanetion": "A Gold Meeting has no predefined date — it happens at the golden moment that suits every participant.",
-    "second": "For the magic to happen, set your status to live whenever you have time to meet — from up here, or through our Telegram bot."
+    "explanetion": "A Gold Meeting has no predefined date - it happens at the golden moment that suits every participant.",
+    "second": "For the magic to happen, set your status to live whenever you have time to meet - from up here, or through our Telegram bot."
   },
   "addNewSkillToRole": {
     "adds": "Add new skill",
@@ -127,7 +127,7 @@
   },
   "choosRole": {
     "adds": "Choose needed roles",
-    "nom": "Not on the list yet — add it with the \"Add new role\" button below"
+    "nom": "Not on the list yet - add it with the \"Add new role\" button below"
   },
   "meeting": {
     "nameLabel": "Meeting Name"

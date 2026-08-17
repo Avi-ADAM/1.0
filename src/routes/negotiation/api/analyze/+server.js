@@ -58,7 +58,7 @@ export async function POST({ request }) {
 
         const existingPositions = positions.length
           ? positions
-              .map((p, i) => `Position ${i + 1} (${p.author}, location ${p.location}): ${p.heading} — ${p.description}`)
+              .map((p, i) => `Position ${i + 1} (${p.author}, location ${p.location}): ${p.heading} - ${p.description}`)
               .join('\n')
           : 'No existing positions yet.';
 
@@ -94,7 +94,7 @@ Return JSON:
         const { topic, positions } = body;
 
         const posText = positions
-          .map((p, i) => `Position ${i + 1} (${p.author}): ${p.heading} — ${p.description}`)
+          .map((p, i) => `Position ${i + 1} (${p.author}): ${p.heading} - ${p.description}`)
           .join('\n\n');
 
         const result = await callGroq(
@@ -135,7 +135,7 @@ Return JSON:
         const { topic, positions, userPosition, currentRound } = body;
 
         const allPos = positions
-          .map((p, i) => `[${i}] ${p.author} (location ${p.location}, ${p.votes} supports): ${p.heading} — ${p.description}`)
+          .map((p, i) => `[${i}] ${p.author} (location ${p.location}, ${p.votes} supports): ${p.heading} - ${p.description}`)
           .join('\n');
 
         const result = await callGroq(
@@ -148,7 +148,7 @@ All positions:
 ${allPos}
 
 User's current position:
-${userPosition.heading} — ${userPosition.description}
+${userPosition.heading} - ${userPosition.description}
 Location: ${userPosition.location}
 Supports received: ${userPosition.votes}
 return the texts in the same language as the input

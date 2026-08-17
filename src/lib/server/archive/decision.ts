@@ -166,7 +166,7 @@ export async function openObjectChangeDecision(
     );
     timegramaId = tg?.createTimegrama?.data?.id ? String(tg.createTimegrama.data.id) : null;
   } catch (e) {
-    console.warn('[archive] timegrama creation failed — decision will not mature on silence:', e);
+    console.warn('[archive] timegrama creation failed - decision will not mature on silence:', e);
   }
 
   return { decisionId: String(decisionId), timegramaId, deadline: deadline.toISOString() };

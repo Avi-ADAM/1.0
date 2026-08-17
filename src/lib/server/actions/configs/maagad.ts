@@ -225,7 +225,7 @@ const leaveMaagadHandler: ActionExecutionHandler = async (params, context, { str
   const st = existing.attributes?.status_member;
   if (st === 'signed' || st === 'active') {
     // A signature is a commitment (§2.7) — it must be withdrawn explicitly.
-    throw new Error('you signed an offer here — cancel the signature first (unsignMaagadOffer)');
+    throw new Error('you signed an offer here - cancel the signature first (unsignMaagadOffer)');
   }
   if (st === 'left') return { data: { maagadId, left: true } };
 
@@ -374,7 +374,7 @@ const signMaagadOfferHandler: ActionExecutionHandler = async (params, context, {
   if (!offer) throw new Error(`Offer ${offerId} not found on maagad ${maagadId}`);
   const oa = offer.attributes ?? {};
   if (oa.status_offer !== 'open' && oa.status_offer !== 'quorum_reached') {
-    throw new Error(`offer is ${oa.status_offer} — signing is closed`);
+    throw new Error(`offer is ${oa.status_offer} - signing is closed`);
   }
   if (oa.sign_deadline && new Date(oa.sign_deadline).getTime() <= Date.now()) {
     throw new Error('sign_deadline has passed');
@@ -394,7 +394,7 @@ const signMaagadOfferHandler: ActionExecutionHandler = async (params, context, {
     // Double-signing two different offers is allowed but explicit (§7.2.4) —
     // the UI warns; here we only block silent replacement.
     throw new Error(
-      `you already signed offer ${signedOn} — unsign it first, or sign both deliberately from separate memberships (not supported yet)`
+      `you already signed offer ${signedOn} - unsign it first, or sign both deliberately from separate memberships (not supported yet)`
     );
   }
   if (!member) {
@@ -468,7 +468,7 @@ const unsignMaagadOfferHandler: ActionExecutionHandler = async (params, context,
   if (!offer) throw new Error(`Offer ${offerId} not found on maagad ${maagadId}`);
   const oa = offer.attributes ?? {};
   if (oa.status_offer === 'activated') {
-    throw new Error('offer already activated — exit is governed by its cancellation terms');
+    throw new Error('offer already activated - exit is governed by its cancellation terms');
   }
 
   const member = await fetchMyMember(strapi, context, maagadId);
@@ -855,7 +855,7 @@ export const maagadActions: ActionConfig[] = [
   },
   {
     key: 'joinMaagad',
-    description: 'Soft, reversible join to a demand pool (interested — not a commitment)',
+    description: 'Soft, reversible join to a demand pool (interested - not a commitment)',
     graphqlOperation: joinMaagadHandler,
     paramSchema: {
       maagadId: { type: 'string', required: true, description: 'Pool to join' },
@@ -884,14 +884,14 @@ export const maagadActions: ActionConfig[] = [
       description: { type: 'string', required: false, description: 'Details of the offer' },
       unitPrice: { type: 'number', required: true, description: 'Price per consumer (basket/seat/subscription)' },
       currencyId: { type: 'string', required: false, description: 'Matbea id' },
-      priceTiers: { type: 'array', required: false, description: '[{min, price}] — the reached tier is billed to everyone' },
-      minParticipants: { type: 'number', required: true, description: 'Quorum (≥2) — below it no deal happens' },
+      priceTiers: { type: 'array', required: false, description: '[{min, price}] - the reached tier is billed to everyone' },
+      minParticipants: { type: 'number', required: true, description: 'Quorum (≥2) - below it no deal happens' },
       maxParticipants: { type: 'number', required: false, description: 'Capacity' },
-      signDeadline: { type: 'string', required: true, description: 'ISO datetime — signatures collected until then' },
+      signDeadline: { type: 'string', required: true, description: 'ISO datetime - signatures collected until then' },
       options: { type: 'array', required: false, description: 'Personal options [{key, choices, priceDelta}]' },
       recurrence: { type: 'string', required: false, description: 'one_time | weekly | biweekly | monthly' },
       cycleTerms: { type: 'object', required: false, description: 'Recurring terms (exit notice etc.)' },
-      cancellationTerms: { type: 'string', required: false, description: 'Cancellation terms — part of the signed contract' },
+      cancellationTerms: { type: 'string', required: false, description: 'Cancellation terms - part of the signed contract' },
       proposerProjectId: { type: 'string', required: false, description: 'Offering rikma (project) id' }
     },
     authRules: [jwtRule],
@@ -899,7 +899,7 @@ export const maagadActions: ActionConfig[] = [
       recipients: { type: 'specificUsers', config: { userIdsParam: 'notifyUserIds', excludeSender: true } },
       templates: {
         title: { he: 'הצעה חדשה במאגד שלך', en: 'New offer on your demand pool', ar: 'عرض جديد في تجمع الطلب الخاص بك' },
-        body: { he: 'ספק הגיש הצעה לביקוש שהצטרפת אליו — כל חתימה היא אישית', en: 'A supplier made an offer on a demand you joined — every signature is personal', ar: 'قدّم مزوّد عرضًا على طلب انضممت إليه — كل توقيع شخصي' }
+        body: { he: 'ספק הגיש הצעה לביקוש שהצטרפת אליו - כל חתימה היא אישית', en: 'A supplier made an offer on a demand you joined - every signature is personal', ar: 'قدّم مزوّد عرضًا على طلب انضممت إليه - كل توقيع شخصي' }
       },
       channels: ['socket', 'push'],
       metadata: { type: 'maagad', url: 'maagad' }
@@ -920,7 +920,7 @@ export const maagadActions: ActionConfig[] = [
       recipients: { type: 'specificUsers', config: { userIdsParam: 'notifyUserIds', excludeSender: true } },
       templates: {
         title: { he: 'ההצעה שלך הגיעה לסף!', en: 'Your offer reached its quorum!', ar: 'وصل عرضك إلى الحد الأدنى!' },
-        body: { he: 'מספיק חתומים — אשר סופית כדי להפעיל את העסקאות', en: 'Enough signatures — confirm to activate the deals', ar: 'توقيعات كافية — أكّد لتفعيل الصفقات' }
+        body: { he: 'מספיק חתומים - אשר סופית כדי להפעיל את העסקאות', en: 'Enough signatures - confirm to activate the deals', ar: 'توقيعات كافية - أكّد لتفعيل الصفقات' }
       },
       channels: ['socket', 'push'],
       metadata: { type: 'maagad', url: 'maagad' }
@@ -949,7 +949,7 @@ export const maagadActions: ActionConfig[] = [
       recipients: { type: 'specificUsers', config: { userIdsParam: 'notifyUserIds', excludeSender: true } },
       templates: {
         title: { he: 'יצאנו לדרך!', en: "We're a go!", ar: 'انطلقنا!' },
-        body: { he: 'ההצעה שחתמת עליה הופעלה — העסקה שלך יוצאת לפועל', en: 'The offer you signed is activated — your deal is going ahead', ar: 'العرض الذي وقّعت عليه مُفعّل — صفقتك تمضي قُدُمًا' }
+        body: { he: 'ההצעה שחתמת עליה הופעלה - העסקה שלך יוצאת לפועל', en: 'The offer you signed is activated - your deal is going ahead', ar: 'العرض الذي وقّعت عليه مُفعّل - صفقتك تمضي قُدُمًا' }
       },
       channels: ['socket', 'push'],
       metadata: { type: 'maagad', url: 'maagad' }

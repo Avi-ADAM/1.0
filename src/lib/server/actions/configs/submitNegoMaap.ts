@@ -54,14 +54,14 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const attrs = maapData.attributes;
 
   const mashab = attrs.mashabetahalich?.data;
-  if (!mashab) throw new Error(`Maap ${askId} is not a recurring cycle — cannot counter-offer`);
+  if (!mashab) throw new Error(`Maap ${askId} is not a recurring cycle - cannot counter-offer`);
   const mashId = String(mashab.id);
   const mashAttrs = mashab.attributes ?? {};
 
   // A counter-offer only makes sense once an amount has been reported.
   const oldAmount = attrs.quantityDelivered;
   if (oldAmount == null) {
-    throw new Error('submitNegoMaap: nothing reported yet — cannot counter-offer');
+    throw new Error('submitNegoMaap: nothing reported yet - cannot counter-offer');
   }
 
   const cycleIndex = attrs.cycleIndex ?? 1;
@@ -156,7 +156,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
 export const submitNegoMaapConfig: ActionConfig = {
   key: 'submitNegoMaap',
   description:
-    'Counter-offer on a recurring monthly cycle Maap: propose a different amount with a reason. Snapshots the old amount into a Nego, rewrites the cycle amount, opens a new voting round (order+1) with the proposer\'s YES, resets the timegrama deadline, posts the reason to the engine chat forum, and notifies members. Server fetches all state — client sends askId + projectId + newAmount + reason.',
+    'Counter-offer on a recurring monthly cycle Maap: propose a different amount with a reason. Snapshots the old amount into a Nego, rewrites the cycle amount, opens a new voting round (order+1) with the proposer\'s YES, resets the timegrama deadline, posts the reason to the engine chat forum, and notifies members. Server fetches all state - client sends askId + projectId + newAmount + reason.',
   graphqlOperation: handler,
 
   paramSchema: {
@@ -182,7 +182,7 @@ export const submitNegoMaapConfig: ActionConfig = {
     },
     templates: {
       title: { he: 'הצעת סכום חדשה למשאב חודשי', en: 'New monthly amount proposed' },
-      body: { he: 'חבר צוות הציע סכום אחר למחזור החודשי — נדרש אישור מחדש', en: 'A member proposed a different monthly amount — re-approval needed' },
+      body: { he: 'חבר צוות הציע סכום אחר למחזור החודשי - נדרש אישור מחדש', en: 'A member proposed a different monthly amount - re-approval needed' },
     },
     channels: ['socket', 'push', 'email'],
     metadata: { type: 'maapNego', url: 'lev' },

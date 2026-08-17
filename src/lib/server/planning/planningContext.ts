@@ -241,7 +241,7 @@ export function summarizePlanningExtras(
         ? '<<<' +
           extras.missionsInProgress
             .slice(0, 12)
-            .map((m) => (m.holder ? `${m.name} — ${m.holder}` : m.name))
+            .map((m) => (m.holder ? `${m.name} - ${m.holder}` : m.name))
             .join(' | ') +
           '>>>'
         : L.none

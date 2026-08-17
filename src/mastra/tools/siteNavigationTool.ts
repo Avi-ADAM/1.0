@@ -112,97 +112,97 @@ export const getSitePagesTool = createTool({
             "authRequired": true
           },
           {
-            "name": "Moach – My Projects List",
+            "name": "Moach - My Projects List",
             "path": "/moach",
             "description": "Select or manage your Rikma (FreeMate) projects. Landing page that redirects to a specific project if one is already selected (registered users only)",
             "authRequired": true
           },
           {
-            "name": "Moach – Specific Project Overview",
+            "name": "Moach - Specific Project Overview",
             "path": "/moach/[projectId]",
             "description": "Main overview page for a specific project (registered users only)",
             "authRequired": true,
             "params": ["projectId"]
           },
           {
-            "name": "Moach – Project Kanban",
+            "name": "Moach - Project Kanban",
             "path": "/moach/[projectId]/kanban",
             "description": "Kanban board for tasks within a specific project (registered users only)",
             "authRequired": true,
             "params": ["projectId"]
           },
           {
-            "name": "Moach – Project Gantt",
+            "name": "Moach - Project Gantt",
             "path": "/moach/[projectId]/gantt",
             "description": "Gantt / timeline view for a specific project (registered users only)",
             "authRequired": true,
             "params": ["projectId"]
           },
           {
-            "name": "Moach – Project Members / Acts",
+            "name": "Moach - Project Members / Acts",
             "path": "/moach/[projectId]/acts",
             "description": "Members and activity management for a specific project (registered users only)",
             "authRequired": true,
             "params": ["projectId"]
           },
           {
-            "name": "Moach – Project Votes",
+            "name": "Moach - Project Votes",
             "path": "/moach/[projectId]/votes",
             "description": "Voting page for decisions within a specific project (registered users only)",
             "authRequired": true,
             "params": ["projectId"]
           },
           {
-            "name": "Moach – Project Shifts",
+            "name": "Moach - Project Shifts",
             "path": "/moach/[projectId]/shifts",
             "description": "Shift scheduling for a specific project (registered users only)",
             "authRequired": true,
             "params": ["projectId"]
           },
           {
-            "name": "Moach – Project Sales",
+            "name": "Moach - Project Sales",
             "path": "/moach/[projectId]/sales",
             "description": "Sales management within a specific project (registered users only)",
             "authRequired": true,
             "params": ["projectId"]
           },
           {
-            "name": "Moach – Project Services",
+            "name": "Moach - Project Services",
             "path": "/moach/[projectId]/services",
             "description": "Services offered by a specific project (registered users only)",
             "authRequired": true,
             "params": ["projectId"]
           },
           {
-            "name": "Moach – Project Wishes",
+            "name": "Moach - Project Wishes",
             "path": "/moach/[projectId]/wishes",
             "description": "Wishes / requests linked to a specific project (registered users only)",
             "authRequired": true,
             "params": ["projectId"]
           },
           {
-            "name": "Moach – Project Processes",
+            "name": "Moach - Project Processes",
             "path": "/moach/[projectId]/processes",
             "description": "Process management for a specific project (registered users only)",
             "authRequired": true,
             "params": ["projectId"]
           },
           {
-            "name": "Moach – Project Progress",
+            "name": "Moach - Project Progress",
             "path": "/moach/[projectId]/progress",
             "description": "Progress tracking for a specific project (registered users only)",
             "authRequired": true,
             "params": ["projectId"]
           },
           {
-            "name": "Moach – Project Chains",
+            "name": "Moach - Project Chains",
             "path": "/moach/[projectId]/chains",
             "description": "Chain / workflow management for a specific project (registered users only)",
             "authRequired": true,
             "params": ["projectId"]
           },
           {
-            "name": "Moach – Process Detail",
+            "name": "Moach - Process Detail",
             "path": "/moach/process/[processid]",
             "description": "Detail page for a specific process (registered users only)",
             "authRequired": true,
@@ -235,13 +235,13 @@ export const getSitePagesTool = createTool({
             "authRequired": true
           },
           {
-            "name": "Concierge – New Wish",
+            "name": "Concierge - New Wish",
             "path": "/concierge/new",
             "description": "Create a new wish / request in the concierge system (registered users only)",
             "authRequired": true
           },
           {
-            "name": "Concierge – Wish Detail",
+            "name": "Concierge - Wish Detail",
             "path": "/concierge/[id]",
             "description": "Detail page for a specific wish, showing proposals, missions, and resources (registered users only)",
             "authRequired": true,

@@ -7,10 +7,10 @@
   "notifications": "Notifications",
   "personal_concierge": "Personal Concierge",
   "hero_title": "What would you like to happen?",
-  "hero_sub": "Tell us in your own words — Lev will break it down, find suitable partnerships, and return a complete plan for your approval.",
+  "hero_sub": "Tell us in your own words - Lev will break it down, find suitable partnerships, and return a complete plan for your approval.",
   "privacy_warm": "Nothing goes public until you publish the wish.",
   "new_wish_btn": "✨ Create New Wish",
-  "browse_btn": "Or — browse the community",
+  "browse_btn": "Or - browse the community",
   "seed_gift": "Gift for a loved one",
   "seed_task_hard": "Task I can't do alone",
   "seed_community_event": "Small community event",
@@ -31,7 +31,7 @@
   "no_search_results": "No wishes match your search yet",
   "try_another_word": "Try another word, or create a new wish.",
   "new_wish_card_title": "New Wish",
-  "new_wish_card_sub": "Describe in your own words — Lev will break it down, and we'll look for partnerships.",
+  "new_wish_card_sub": "Describe in your own words - Lev will break it down, and we'll look for partnerships.",
   "no_matches_found": "No matching wishes found",
   "clear_filter_sub": "Try clearing the search or choosing another filter.",
   "no_drafts_title": "No saved drafts at the moment",
@@ -66,11 +66,11 @@
   "location_not_specified": "Location not specified",
   "km_away": "{{distance}} km away",
   "new": {
-    "titlePlaceholder": "In one sentence — what would you like to happen?",
+    "titlePlaceholder": "In one sentence - what would you like to happen?",
     "readyStatus": "Ready to send to Lev",
     "notReadyStatus": "Almost there…",
     "readyHint": "Once you confirm, I will look for matching partnerships and bring back a plan for your approval.",
-    "notReadyHint": "Write a short title and a few lines of description — that is enough.",
+    "notReadyHint": "Write a short title and a few lines of description - that is enough.",
     "saveDraft": "Save draft",
     "publish": "✨ Publish the wish",
     "publishing": "⏳ Sending to Lev…",
@@ -179,7 +179,7 @@
       },
       "invite": {
         "label": "Invite partners?",
-        "placeholder": "yes — personally, or via Lev"
+        "placeholder": "yes - personally, or via Lev"
       },
       "joinKind": {
         "label": "Shared initiative",
@@ -221,7 +221,7 @@
       },
       "none": {
         "label": "No invitations",
-        "hint": "No invitations up front — choose from the proposals that arrive."
+        "hint": "No invitations up front - choose from the proposals that arrive."
       }
     },
     "joinKind": {
@@ -297,7 +297,7 @@
       "month": "Within a month",
       "clear": "Clear"
     },
-    "dateHint": "Optional — leave it empty and Lev will suggest flexible dates.",
+    "dateHint": "Optional - leave it empty and Lev will suggest flexible dates.",
     "budgetLabel": "Maximum amount (₪)",
     "budgetPlaceholder": "e.g. 500",
     "budgetNoCap": "No ceiling",
@@ -309,7 +309,7 @@
     "maxJoinersPlaceholder": "No ceiling",
     "joinDeadline": "Joining closes on (optional)",
     "groupHint": "Once {{count}} participants join you can lock the group, decide together and pay together. Until then the wish is gathering.",
-    "soloHint": "The default — you organise and the community proposes. Choosing a group kind opens joining, shared decisions and shared payment."
+    "soloHint": "The default - you organise and the community proposes. Choosing a group kind opens joining, shared decisions and shared payment."
   },
   "no_wishes_found_title": "No wishes found",
   "proposals_so_far": "Proposals so far"

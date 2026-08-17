@@ -76,7 +76,7 @@ const finalizeAskAcceptanceHandler: ActionExecutionHandler = async (params, cont
   } catch (e) {
     console.error('[finalizeAskAcceptance] ask fetch failed:', e);
   }
-  if (!askAttributes) throw new Error(`Ask ${askId} could not be loaded — acceptance aborted`);
+  if (!askAttributes) throw new Error(`Ask ${askId} could not be loaded - acceptance aborted`);
 
   // Consent gate — see finalizeJoinAcceptance / askAcceptance.ts. An assigned
   // offer (open_mission.isRishon) never materializes without the assignee's yes.

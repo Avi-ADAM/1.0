@@ -79,12 +79,12 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
             body:
               mode === 'keep'
                 ? {
-                    he: 'חבר הציע להשאיר את האובייקט עם פרטים שונים במקום להסיר אותו. השעון התאפס — אפשר לאשר, לדייק שוב או לפתוח שיחה.',
-                    en: 'A member proposed keeping the object with different terms instead of removing it. The clock reset — approve, refine again, or open a discussion.',
+                    he: 'חבר הציע להשאיר את האובייקט עם פרטים שונים במקום להסיר אותו. השעון התאפס - אפשר לאשר, לדייק שוב או לפתוח שיחה.',
+                    en: 'A member proposed keeping the object with different terms instead of removing it. The clock reset - approve, refine again, or open a discussion.',
                   }
                 : {
-                    he: 'חבר דייק את תנאי ההסרה. השעון התאפס — אפשר לאשר, לדייק שוב או לפתוח שיחה.',
-                    en: 'A member refined the removal terms. The clock reset — approve, refine again, or open a discussion.',
+                    he: 'חבר דייק את תנאי ההסרה. השעון התאפס - אפשר לאשר, לדייק שוב או לפתוח שיחה.',
+                    en: 'A member refined the removal terms. The clock reset - approve, refine again, or open a discussion.',
                   },
           },
           channels: ['socket', 'push'],

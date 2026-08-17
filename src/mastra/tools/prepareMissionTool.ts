@@ -19,7 +19,7 @@ export const prepareMissionTool = createTool({
   description:
     'Generate a URL that opens the mission creation form pre-filled with the provided details. ' +
     'Use this when you want the user to review and confirm the mission before it is published. ' +
-    'Requires a projectId — use findUserProjects first if not known.',
+    'Requires a projectId - use findUserProjects first if not known.',
   inputSchema: z.object({
     projectId: z.string().describe('ID of the project where the mission will be created.'),
     name: z.string().describe('Mission name (required).'),

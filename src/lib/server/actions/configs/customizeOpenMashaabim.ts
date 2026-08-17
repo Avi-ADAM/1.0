@@ -13,7 +13,7 @@ import { openMashaabimProposalHandler } from './proposeOnOpenMashaabim.js';
 export const customizeOpenMashaabimConfig: ActionConfig = {
   key: 'customizeOpenMashaabim',
   description:
-    'Take an open resource on customized terms (Path D). Shares proposeOnOpenMashaabim\'s server-side membership routing — the key is semantic only.',
+    'Take an open resource on customized terms (Path D). Shares proposeOnOpenMashaabim\'s server-side membership routing - the key is semantic only.',
   graphqlOperation: openMashaabimProposalHandler,
 
   paramSchema: {

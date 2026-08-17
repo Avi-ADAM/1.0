@@ -133,7 +133,7 @@
   const browserSnippet = $derived(
     [
       '<script>',
-      '  // 1lev1 — automatic sale report. Run after a successful checkout.',
+      '  // 1lev1 - automatic sale report. Run after a successful checkout.',
       `  fetch('${apiBase}/api/v1/sales', {`,
       "    method: 'POST',",
       '    headers: {',
@@ -168,13 +168,13 @@
       `Authorization: Bearer ${keyForSnippet} and JSON body: ` +
       `productId (fixed: ${productForSnippet}), holderUserId (fixed: ` +
       `${holderForSnippet}), amount (the total paid, number), quantity ` +
-      `(units sold, default 1), externalId (my order id — required for ` +
+      `(units sold, default 1), externalId (my order id - required for ` +
       `retry-safety), and optionally saleDate (ISO, defaults to now) and ` +
       `startDate/finishDate for subscriptions. Fire it server-side if ` +
       `possible (payment webhook); browser-side from the thank-you page is ` +
       `acceptable. A 201 with {success:true} means reported; treat a ` +
       `repeated externalId returning duplicated:true as success. Do not ` +
-      `block or fail the customer's checkout if this call fails — log and ` +
+      `block or fail the customer's checkout if this call fails - log and ` +
       `retry up to 3 times with backoff.`
   );
 

@@ -129,8 +129,8 @@ regHelperL = 0;
   <meta
     name="description"
     content={$lang === 'he'
-      ? 'הצהרת העקרונות של 1lev1 — חיים בחופש, בהסכמה הדדית ובלי אלימות'
-      : '1lev1 principles declaration — living in freedom, mutual agreement and without violence'}
+      ? 'הצהרת העקרונות של 1lev1 - חיים בחופש, בהסכמה הדדית ובלי אלימות'
+      : '1lev1 principles declaration - living in freedom, mutual agreement and without violence'}
   />
   <meta
     property="og:title"
@@ -139,8 +139,8 @@ regHelperL = 0;
   <meta
     property="og:description"
     content={$lang === 'he'
-      ? 'הצהרת העקרונות של 1lev1 — חיים בחופש, בהסכמה הדדית ובלי אלימות'
-      : '1lev1 principles declaration — living in freedom, mutual agreement and without violence'}
+      ? 'הצהרת העקרונות של 1lev1 - חיים בחופש, בהסכמה הדדית ובלי אלימות'
+      : '1lev1 principles declaration - living in freedom, mutual agreement and without violence'}
   />
   <meta property="og:type" content="website" />
   <!-- The vendored NagishLi toolbar used to be loaded here, for this page alone

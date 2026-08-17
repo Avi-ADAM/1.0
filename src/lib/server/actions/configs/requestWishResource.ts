@@ -71,7 +71,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
     const mRes = await strapi.execute(
       '139createWishMatanot',
       {
-        name: `${wishName} — חבילה`,
+        name: `${wishName} - חבילה`,
         desc: '',
         pricingMode: 'quote',
         estimatedPrice: 0,

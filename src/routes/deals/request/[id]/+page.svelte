@@ -60,7 +60,7 @@
       localVoteCount += 1;
 
       if (data.memberCount === 1 || result.data?._deleted) {
-        toast.success('הבקשה אושרה — נוצר שירות חדש!');
+        toast.success('הבקשה אושרה - נוצר שירות חדש!');
         await goto('/deals');
       } else {
         toast.success(`הצבעתך נרשמה (${localVoteCount}/${data.memberCount})`);

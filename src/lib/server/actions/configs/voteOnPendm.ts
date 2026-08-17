@@ -246,8 +246,8 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
                     en: `The mission "${attrs.name ?? ''}" is waiting for your consent`,
                   },
                   body: {
-                    he: 'הריקמה אישרה את ההצעה והועידה אותה אליך. שום דבר לא נרשם על שמך בלי הסכמתך — אפשר לאשר, לדייק את התנאים בהצעה נגדית או לפתוח שיחה.',
-                    en: "The rikma approved the proposal and offered it to you. Nothing is registered under your name without your consent — approve, refine the terms with a counter-offer or open a discussion.",
+                    he: 'הריקמה אישרה את ההצעה והועידה אותה אליך. שום דבר לא נרשם על שמך בלי הסכמתך - אפשר לאשר, לדייק את התנאים בהצעה נגדית או לפתוח שיחה.',
+                    en: "The rikma approved the proposal and offered it to you. Nothing is registered under your name without your consent - approve, refine the terms with a counter-offer or open a discussion.",
                   },
                 },
                 channels: ['socket', 'push', 'email'],
@@ -324,7 +324,7 @@ const voteOnPendmHandler: ActionExecutionHandler = async (params, context, { str
 export const voteOnPendmConfig: ActionConfig = {
   key: 'voteOnPendm',
   description:
-    'Vote on a pending mission (pendm). YES with full quorum creates OpenMission + archives pendm. NO archives on full rejection. Server fetches current state from DB — client only sends pendId + projectId + what (+ optional why).',
+    'Vote on a pending mission (pendm). YES with full quorum creates OpenMission + archives pendm. NO archives on full rejection. Server fetches current state from DB - client only sends pendId + projectId + what (+ optional why).',
   graphqlOperation: voteOnPendmHandler,
 
   paramSchema: {

@@ -86,7 +86,7 @@
       <div class="text-xs tracking-[.22em] uppercase text-rose-500 font-semibold mb-1">CONCIERGE · קונסיירז׳</div>
       <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">משאלות שהפרויקט מועמד לספק</h1>
       <p class="text-sm text-slate-500 mt-2 max-w-xl">
-        Lev התאימה את המוצרים שלכם למשאלות לקוחות פתוחות. אין צורך בפעולה — אם לקוחה תבחר, תקבלו התראה במסך הדילים.
+        Lev התאימה את המוצרים שלכם למשאלות לקוחות פתוחות. אין צורך בפעולה - אם לקוחה תבחר, תקבלו התראה במסך הדילים.
       </p>
     </div>
     <div class="flex items-center gap-3 text-sm text-slate-500">
@@ -130,7 +130,7 @@
       <div class="font-medium text-slate-700 mb-1">אין משאלות במסך הזה</div>
       <div class="text-sm">
         {#if activeFilter === 'active'}
-          ברגע ש־Lev תתאים את אחד המוצרים שלכם למשאלה — היא תופיע כאן.
+          ברגע ש־Lev תתאים את אחד המוצרים שלכם למשאלה - היא תופיע כאן.
         {:else if activeFilter === 'won'}
           טרם נסגר דיל ממשאלה. הצלחות יופיעו כאן.
         {:else}

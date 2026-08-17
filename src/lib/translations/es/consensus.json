@@ -17,7 +17,7 @@
   },
   "essence": {
     "kicker": "Qué es esto realmente",
-    "title": "Un lugar para construir juntos un sustento — por acuerdo",
+    "title": "Un lugar para construir juntos un sustento - por acuerdo",
     "body": "1💗1 no es solo una idea bonita. Es una plataforma donde las personas gestionan asociaciones reales (rikmot): un proyecto compartido, sus misiones, sus ingresos y su reparto de beneficios, todo por acuerdo mutuo, sin jefe ni imposición de la mayoría. El motor de acuerdos que ves aquí es la forma en que se toma cada decisión en una asociación así: dinero, roles, tareas; cada parte propone, y solo se avanza con una versión que ambas partes sostienen.",
     "point1": { "title": "Asociaciones compartidas", "desc": "Gestiona un proyecto, sus misiones y su dinero en conjunto, con total transparencia." },
     "point2": { "title": "Reparto justo de beneficios", "desc": "La contribución de cada uno se mide y se reparte por acuerdo, no por la fuerza." },
@@ -74,8 +74,8 @@
   "mainCta": {
     "kicker": "La mayoría viene aquí por esto",
     "title": "Gestiona una asociación real por consenso",
-    "body": "Abre una rikma, invita a socios y gestiona cada decisión —dinero, roles, misiones— a través del motor de acuerdos. Regístrate y empieza a construir juntos.",
-    "button": "Regístrate — inicia una asociación"
+    "body": "Abre una rikma, invita a socios y gestiona cada decisión -dinero, roles, misiones- a través del motor de acuerdos. Regístrate y empieza a construir juntos.",
+    "button": "Regístrate - inicia una asociación"
   },
   "links": {
     "philTitle": "Un mundo gestionado por acuerdo mutuo",
@@ -85,5 +85,5 @@
     "pracBody": "¿No estás seguro de una asociación? Abre un nuevo deseo y la conserjería te conectará con el proveedor adecuado.",
     "pracCta": "Abrir un nuevo deseo"
   },
-  "footer": "1💗1 — crear juntos, por acuerdo"
+  "footer": "1💗1 - crear juntos, por acuerdo"
 }

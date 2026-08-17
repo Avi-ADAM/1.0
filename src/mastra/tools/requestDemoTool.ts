@@ -19,7 +19,7 @@ export const requestDemoTool = createTool({
 Use this tool when the user asks to see a demo, asks to talk to a person, asks how to get started with help, or says they want to understand the model before registering.
 Before calling it, gather in conversation:
 - their name,
-- an email OR a phone number (either one is enough — do not insist on both),
+- an email OR a phone number (either one is enough - do not insist on both),
 - which of the four tracks is closest to them (track),
 - how they'd like to meet (timeMode).
 Optionally ask, in one sentence, what they want to build or solve, and when suits them.
@@ -107,12 +107,12 @@ Never invent contact details. If the user hasn't given a name or any way to reac
 
       const linkLine = link
         ? lang === 'he'
-          ? ` חדר הפגישה שלכם כבר מוכן — אפשר להיכנס בזמן שנוח, בלי הרשמה: ${link}`
+          ? ` חדר הפגישה שלכם כבר מוכן - אפשר להיכנס בזמן שנוח, בלי הרשמה: ${link}`
           : lang === 'ar'
-            ? ` غرفة اللقاء جاهزة — يمكنكم الدخول في الوقت المناسب بدون تسجيل: ${link}`
+            ? ` غرفة اللقاء جاهزة - يمكنكم الدخول في الوقت المناسب بدون تسجيل: ${link}`
             : lang === 'ru'
-              ? ` Ваша комната встречи уже готова — заходите, когда удобно, без регистрации: ${link}`
-              : ` Your meeting room is already open — walk in whenever it suits you, no sign-up: ${link}`
+              ? ` Ваша комната встречи уже готова - заходите, когда удобно, без регистрации: ${link}`
+              : ` Your meeting room is already open - walk in whenever it suits you, no sign-up: ${link}`
         : '';
 
       return {

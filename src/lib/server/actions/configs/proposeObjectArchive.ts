@@ -58,7 +58,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     throw new Error('This object is already archived');
   }
   if (target.openDecisionIds.length > 0) {
-    throw new Error('There is already an open proposal on this object — respond to it instead');
+    throw new Error('There is already an open proposal on this object - respond to it instead');
   }
   if (target.projectId && !target.memberIds.includes(userId)) {
     throw new Error('Only a member of the rikma may propose archiving its objects');
@@ -79,7 +79,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   // A removal that touches someone's accrued value must say why. Where nothing
   // accrued, a reason is welcome but never a gate.
   if (accrued && !why) {
-    throw new Error('Please say why — this object carries accrued hours');
+    throw new Error('Please say why - this object carries accrued hours');
   }
 
   let hoursOutcome = params.hoursOutcome as HoursOutcome | undefined;
@@ -98,7 +98,7 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   // A recurring commitment defaults to ending at its cycle boundary rather
   // than being cut in the middle of one.
   if (hoursOutcome === 'endOfCycle' && !params.effectiveFrom && !target.cycleEnd) {
-    throw new Error('endOfCycle needs an effectiveFrom date — this object has no known cycle end');
+    throw new Error('endOfCycle needs an effectiveFrom date - this object has no known cycle end');
   }
 
   const dormant = isDormant(
@@ -212,8 +212,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
               en: `Proposal to ${scope === 'release' ? 'release' : 'archive'}: ${target.name}`,
             },
             body: {
-              he: `${why || 'ללא נימוק'}${membership.isLastTie ? ' · שימו לב: זו המשימה היחידה של החבר בריקמה ולא נצברו בה שעות, ולכן אישור ההצעה יסיים גם את חברותו בריקמה.' : ''} — אפשר לאשר, להציע נוסחה חליפית או לפתוח שיחה. ללא תגובה תוך ${restimeLabel(target.projectRestime, 'he')} ההצעה תאושר מעצמה.`,
-              en: `${why || 'No reason given'}${membership.isLastTie ? ' · Note: this is the member’s only commitment here and nothing accrued, so approving also ends their membership of the rikma.' : ''} — approve, propose different terms, or open a discussion. With no response within ${window} it is approved on its own.`,
+              he: `${why || 'ללא נימוק'}${membership.isLastTie ? ' · שימו לב: זו המשימה היחידה של החבר בריקמה ולא נצברו בה שעות, ולכן אישור ההצעה יסיים גם את חברותו בריקמה.' : ''} - אפשר לאשר, להציע נוסחה חליפית או לפתוח שיחה. ללא תגובה תוך ${restimeLabel(target.projectRestime, 'he')} ההצעה תאושר מעצמה.`,
+              en: `${why || 'No reason given'}${membership.isLastTie ? ' · Note: this is the member’s only commitment here and nothing accrued, so approving also ends their membership of the rikma.' : ''} - approve, propose different terms, or open a discussion. With no response within ${window} it is approved on its own.`,
             },
           },
           channels: ['socket', 'push'],
@@ -263,7 +263,7 @@ export const proposeObjectArchiveConfig: ActionConfig = {
     targetKind: { type: 'string', required: true, description: 'openMission | missionInProgress | openResource | resourceInProgress | matanot' },
     targetId: { type: 'string', required: true, description: 'Id of the object' },
     scope: { type: 'string', required: false, description: "'archive' (default) removes the need; 'release' withdraws the commitment" },
-    why: { type: 'string', required: false, description: 'Reason — required when hours have accrued' },
+    why: { type: 'string', required: false, description: 'Reason - required when hours have accrued' },
     hoursOutcome: { type: 'string', required: false, description: 'credit | waive | transfer | endOfCycle' },
     hoursToCredit: { type: 'number', required: false, description: 'Hours to settle (defaults to the accrued hours)' },
     transferToId: { type: 'string', required: false, description: 'Mesimabetahalich to move the hours onto (hoursOutcome=transfer)' },

@@ -91,7 +91,7 @@
     "mode_light": "Día",
     "mode_dark": "Noche",
     "mode_system": "Del dispositivo",
-    "followingSystem": "Sigue la configuración del dispositivo — ahora {{mode}}"
+    "followingSystem": "Sigue la configuración del dispositivo - ahora {{mode}}"
   },
   "a11y": {
     "title": "Accesibilidad",

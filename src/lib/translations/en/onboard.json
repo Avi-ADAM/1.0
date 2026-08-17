@@ -5,7 +5,7 @@
     "title": "We'd love to know you",
     "sub": "How would you like to integrate into the Rikma network of 1💗1?"
   },
-  "tile_info": "This affects what we offer — we match the pace to who you are.",
+  "tile_info": "This affects what we offer - we match the pace to who you are.",
   "tracks": {
     "provider": {
       "title": "Want to offer skills and join a Rikma",
@@ -19,7 +19,7 @@
     },
     "business": {
       "title": "Have a business or a project idea",
-      "sub": "Set up a new Rikma (consensual partnership) or wrap an existing business — to recruit equal partners, manage profits and decisions together, and above all connect directly to a stream of clients and projects in the system.",
+      "sub": "Set up a new Rikma (consensual partnership) or wrap an existing business - to recruit equal partners, manage profits and decisions together, and above all connect directly to a stream of clients and projects in the system.",
       "meta": "~ 5 min · Extracted from site or free description",
       "chips": [
         "Set up Rikma & Partners",
@@ -40,7 +40,7 @@
       "matches": {
         "title": "To your profile + user guide",
         "sub": "The Concierge is already looking for matching Rikmas and client demands. Let's learn how to manage a consensual partnership on the go.",
-        "meta": "Recommended — The natural way to continue",
+        "meta": "Recommended - The natural way to continue",
         "chips": {
           "realtime": "✨ Real-time suggestions",
           "guide": "📖 Short guide"
@@ -104,9 +104,9 @@
       "stage_extract": "AI extraction",
       "stage_match": "Matching with site lists",
       "stage_ready": "Ready for confirmation",
-      "err_size": "File is too large — up to 5MB",
+      "err_size": "File is too large - up to 5MB",
       "err_format": "Unsupported format",
-      "info": "✨ The AI will extract your skills and experience from the CV — so we can offer you suitable Rikmas and consensual co-management. You can always edit.",
+      "info": "✨ The AI will extract your skills and experience from the CV - so we can offer you suitable Rikmas and consensual co-management. You can always edit.",
       "back_choice": "← Back to choice"
     },
     "describe_page": {
@@ -152,17 +152,17 @@
       "close_to": "Close to: {{label}}",
       "resources": {
         "label": "📦 Resources to share",
-        "hint": "Physical items in your possession that can be offered — click to select"
+        "hint": "Physical items in your possession that can be offered - click to select"
       },
       "save_failed": "Save failed ({{status}})",
-      "network_error": "Network error — please try again",
+      "network_error": "Network error - please try again",
       "actions": {
         "skip": "Skip to finish 🗝",
         "saving": "Saving...",
         "edit": "Continue to edit ✍️"
       },
       "next_hint": "In editing we will add more values, refine skills, select missions and resources from the lists on the site. You can always edit from the profile.",
-      "no_draft": "We couldn't find your analysis — it is kept in this browser only, and it looks like it was cleared or opened in a new tab. It is a short write-up, so you can run it again.",
+      "no_draft": "We couldn't find your analysis - it is kept in this browser only, and it looks like it was cleared or opened in a new tab. It is a short write-up, so you can run it again.",
       "no_draft_cta": "Back to building your profile ←"
     },
     "tabs": {
@@ -190,7 +190,7 @@
     "choices": {
       "url": {
         "title": "I have a website or business page",
-        "sub": "Paste URL — AI will set up the Rikma, define areas of activity, and extract matches for partners and client projects.",
+        "sub": "Paste URL - AI will set up the Rikma, define areas of activity, and extract matches for partners and client projects.",
         "meta": "~ 45 sec · Everything can be edited",
         "chips": {
           "fast": "⚡ Fastest",
@@ -215,10 +215,10 @@
         "title": "Paste Rikma link",
         "sub": "Website / Landing Page / Facebook / Instagram"
       },
-      "info": "⚡ AI will read the page and automatically set up the Rikma, including the project name, description, and required skills for partners — you can always edit.",
+      "info": "⚡ AI will read the page and automatically set up the Rikma, including the project name, description, and required skills for partners - you can always edit.",
       "label": "Link",
       "hint_ok": "✓ Looks good",
-      "hint_err": "Paste full address — including https://",
+      "hint_err": "Paste full address - including https://",
       "analyzing": "✨ Analyzing the page...",
       "scanning": "Lev is scanning..."
     },
@@ -240,7 +240,7 @@
     },
     "seed_plan": {
       "label": "Draft a starter plan for the rikma too",
-      "help": "We will propose products, missions and resources from what we read here. Nothing is created — you approve each row yourself."
+      "help": "We will propose products, missions and resources from what we read here. Nothing is created - you approve each row yourself."
     }
   },
   "trackFork": {
@@ -250,7 +250,7 @@
     },
     "business": {
       "title": "Business Owner",
-      "sub": "Established business — products, services, partnerships"
+      "sub": "Established business - products, services, partnerships"
     }
   }
 }

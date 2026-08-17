@@ -58,7 +58,7 @@
 
   async function handleFile(file: File) {
     if (file.size > 5 * 1024 * 1024) {
-      error = $t('onboard.provider.cv_page.err_size') || 'הקובץ גדול מדי — עד 5MB';
+      error = $t('onboard.provider.cv_page.err_size') || 'הקובץ גדול מדי - עד 5MB';
       return;
     }
     if (!ACCEPTED_TYPES.includes(file.type)) {
@@ -136,7 +136,7 @@
     >
       <p class="icon">📄</p>
       <p class="big">{$t('onboard.provider.cv_page.drop_title') || 'גררו לכאן או לחצו להעלאה'}</p>
-      <p class="sub">PDF · Word · RTF · טקסט — עד 5MB</p>
+      <p class="sub">PDF · Word · RTF · טקסט - עד 5MB</p>
     </div>
     <input
       id="cv-input"

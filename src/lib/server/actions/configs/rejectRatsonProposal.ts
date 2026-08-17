@@ -64,7 +64,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
 export const rejectRatsonProposalConfig: ActionConfig = {
   key: 'rejectRatsonProposal',
   description:
-    'Wisher dismisses a ratson_proposal. Silent — no Sheirutpend opened, low-priority notification only.',
+    'Wisher dismisses a ratson_proposal. Silent - no Sheirutpend opened, low-priority notification only.',
   graphqlOperation: handler,
   paramSchema: {
     proposalId: { type: 'string', required: true },

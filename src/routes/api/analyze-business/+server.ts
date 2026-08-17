@@ -51,15 +51,15 @@ async function fetchUrlText(url: string): Promise<string> {
   switch (site.error) {
     case 'unusable-url':
     case 'unsafe-redirect':
-      throw new Error('That address cannot be read — use a public http(s) website address.');
+      throw new Error('That address cannot be read - use a public http(s) website address.');
     case 'timeout':
       throw new Error('The site took too long to answer. Try again, or describe the business instead.');
     case 'not-html':
       throw new Error('That link is not a web page we can read. Try the site home page.');
     case 'empty':
-      throw new Error('Could not extract text from page — it may require JavaScript or be empty.');
+      throw new Error('Could not extract text from page - it may require JavaScript or be empty.');
     default:
-      throw new Error('Could not reach the URL — make sure it is publicly accessible.');
+      throw new Error('Could not reach the URL - make sure it is publicly accessible.');
   }
 }
 
@@ -88,7 +88,7 @@ async function extractWithGemini(
 ): Promise<ExtractedBusiness> {
   const agent = makeAgent(
     'BusinessExtractor',
-    'You extract project/business details from a website page or free-text description. Return JSON only — no explanations, no markdown fences.'
+    'You extract project/business details from a website page or free-text description. Return JSON only - no explanations, no markdown fences.'
   );
 
   const langName = LANG_NAMES[lang];
@@ -102,7 +102,7 @@ async function extractWithGemini(
 
 Rules:
 - Output language: **ALWAYS ${langName}** (translate if source is a different language).
-- Do not invent — if no name is explicit, distill the central topic into a short title.
+- Do not invent - if no name is explicit, distill the central topic into a short title.
 - vals: short noun phrases (1-2 words). No near-duplicates.
 - Do NOT add any other fields.
 
@@ -165,7 +165,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 
   const extracted = await extractWithGemini(inputText, sourceHint, lang);
 
-  // The starter boards. Best-effort by design — see the file header.
+  // The starter boards. Best-effort by design - see the file header.
   let plan: { boards: unknown[]; sourceUrl: string | null } | null = null;
   let planItemCount = 0;
   if (body.withPlan !== false) {

@@ -45,7 +45,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     throw new Error('This sale is not a recurring-sale cycle');
   }
   if (attrs.pending !== true) {
-    throw new Error('This cycle is already settled — nothing to report');
+    throw new Error('This cycle is already settled - nothing to report');
   }
 
   // Entity-level auth: only the named customer reports the transfer.

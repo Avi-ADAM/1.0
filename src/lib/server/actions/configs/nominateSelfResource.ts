@@ -142,9 +142,9 @@ export const nominateSelfResourceConfig: ActionConfig = {
         ar: 'شخص ما يعرض جلب مورد لنسيجكم 🌱',
       },
       body: {
-        he: 'התקבלה הצעה עצמית חדשה — משאב בתנאי המציע/ה. היכנסו ללב כדי להגיב.',
-        en: 'A new self-nomination arrived — a resource on the candidate’s terms. Open Lev to respond.',
-        ar: 'وصل ترشيح ذاتي جديد — مورد بشروط المرشّح. افتحوا ليف للرد.',
+        he: 'התקבלה הצעה עצמית חדשה - משאב בתנאי המציע/ה. היכנסו ללב כדי להגיב.',
+        en: 'A new self-nomination arrived - a resource on the candidate’s terms. Open Lev to respond.',
+        ar: 'وصل ترشيح ذاتي جديد - مورد بشروط المرشّح. افتحوا ليف للرد.',
       },
     },
     channels: ['socket', 'email', 'push'],

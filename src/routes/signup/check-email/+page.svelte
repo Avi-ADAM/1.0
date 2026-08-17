@@ -82,7 +82,7 @@
       </span>
     </div>
 
-    <Plaque title="המייל בדרך" sub="ניצור חיבור — תכף תקבלו לינק" />
+    <Plaque title="המייל בדרך" sub="ניצור חיבור - תכף תקבלו לינק" />
 
     <div class="tile-info">
       שלחנו אליכם מייל ל-{#if email}<b dir="ltr">{email}</b>{/if}<br />
@@ -94,7 +94,7 @@
     {:else}
       <div class="actions">
         <button class="btn btn-ghost" onclick={resend} disabled={resending || !email}>
-          {resending ? '⟳ שולח...' : '📨 לא הגיע — שליחה חוזרת'}
+          {resending ? '⟳ שולח...' : '📨 לא הגיע - שליחה חוזרת'}
         </button>
         <a href="/signup" class="btn btn-skip">✏️ תיקון כתובת</a>
       </div>

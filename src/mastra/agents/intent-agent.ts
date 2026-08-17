@@ -41,7 +41,7 @@ const systemPrompt =
 - general: עזרה כללית, שאלות, הסברים, ופעולות יצירה כמו יצירת פרויקטים חדשים
 - report: דיווח על תקלה/באג, הצעת פיצ'ר חדש, פנייה לשותפות, יצירת קשר עם צוות האתר
 - sale: דיווח מכירה של מוצר/מתנה מפרויקט (מכירה, ריפורט מכירה, מכרתי, דיווח על תשלום)
-- task: יצירת מטלה (Act) בתוך פרויקט, למשל "צור מטלה", "פתח מטלה חדשה בפרויקט X", "תוסיף מטלה לדנה", "מטלה עבור תפקיד העיצוב". שים לב: מטלה שונה מטיימר וממשימה בתהליך — זו יצירת פריט עבודה חדש עבור אדם או תפקיד.
+- task: יצירת מטלה (Act) בתוך פרויקט, למשל "צור מטלה", "פתח מטלה חדשה בפרויקט X", "תוסיף מטלה לדנה", "מטלה עבור תפקיד העיצוב". שים לב: מטלה שונה מטיימר וממשימה בתהליך - זו יצירת פריט עבודה חדש עבור אדם או תפקיד.
 
 **טיפול באישורים והכחשות:**
 - אם המשתמש אומר "כן", "תודה", "בסדר", "אישור" וכו' - בדוק את ההקשר הקודם
@@ -105,7 +105,7 @@ Intent types:
 - general: General help, questions, explanations, and creation actions like creating new projects
 - report: Reporting a bug/issue, suggesting a feature, partnership inquiry, or contacting the site team
 - sale: Reporting a sale of a product/gift from a project (sold something, report sale, sold a package)
-- task: Creating a task (Act) inside a project, e.g. "create a task", "add a task in project X", "add a task for Dana", "open a task for the design role". Note: a task is distinct from a timer or an in-progress mission — it is a new work item for a person or a role.
+- task: Creating a task (Act) inside a project, e.g. "create a task", "add a task in project X", "add a task for Dana", "open a task for the design role". Note: a task is distinct from a timer or an in-progress mission - it is a new work item for a person or a role.
 
 **Handling confirmations and denials:**
 - If user says "yes", "thanks", "ok", "confirm", etc. - check previous context

@@ -64,7 +64,7 @@ async function extractWithGemini(
     id: 'MissionExtractor',
     name: 'MissionExtractor',
     instructions:
-      'You extract mission metadata from a name and description. Return JSON only — no explanations, no markdown fences.',
+      'You extract mission metadata from a name and description. Return JSON only - no explanations, no markdown fences.',
     model: createGoogleModel(undefined, 'gemini-3-flash-preview', { thinkingBudget: 0 })
   });
 
@@ -83,12 +83,12 @@ async function extractWithGemini(
 Rules:
 - Output language: ALWAYS ${langName}.
 - skills: atomic nouns only (e.g. "React", "video editing", "node.js"). No phrases like "experience in X".
-- workways: only real work modes — not skills or roles.
+- workways: only real work modes - not skills or roles.
 - vallues: short noun phrases (1-2 words). No near-duplicates.
 - improvedDescrip: improve clarity and appeal while preserving all facts. If original is good, minimal changes.
 - nhours: a realistic total for the whole mission (not per week). Use the description when it states a scope; otherwise estimate from the kind of work. Between ${HOURS_RANGE.min} and ${HOURS_RANGE.max}.
 - valph: the going hourly rate for this work in the Israeli market, in shekels (₪), for a competent professional. Between ${VALPH_RANGE.min} and ${VALPH_RANGE.max}. Simple manual work is at the low end, specialised professional work at the high end.
-- nhours and valph: plain numbers only — no currency signs, no ranges, no text.
+- nhours and valph: plain numbers only - no currency signs, no ranges, no text.
 - Return ONLY the JSON object, no other text.
 
 Mission Name: "${name}"
@@ -182,7 +182,7 @@ export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
   // 1. Gemini extraction
   const extraction = await extractWithGemini(name, descrip, lang);
 
-  // 2. Vector match against Pinecone (best-effort — won't throw)
+  // 2. Vector match against Pinecone (best-effort - won't throw)
   let matchResults: Awaited<ReturnType<typeof matchAllCategories>> | null = null;
   try {
     matchResults = await matchAllCategories({
@@ -200,7 +200,7 @@ export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
 
   // ── Build response ──────────────────────────────────────────────────────────
   // Normalize matchResults into a simple per-category shape for the client
-  // (see `buildCategory` — the transposition is the part that has been wrong).
+  // (see `buildCategory` - the transposition is the part that has been wrong).
   return json({
     ok: true,
     lang,

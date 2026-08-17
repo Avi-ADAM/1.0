@@ -22,7 +22,7 @@
   };
 
   let badgeClass = $derived(badgeMap[statusColor] ?? 'bdg-grey');
-  let ariaLabel  = $derived(status ? `${label}: ${name} — ${status}` : `${label}: ${name}`);
+  let ariaLabel  = $derived(status ? `${label}: ${name} - ${status}` : `${label}: ${name}`);
 
 </script>
 

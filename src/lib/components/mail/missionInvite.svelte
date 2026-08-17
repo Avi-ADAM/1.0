@@ -80,16 +80,16 @@
 	}
 
 	const previewText = {
-		he: `${un} מהריקמה ${pn} חשב/ה בדיוק עליך — "${name}" מחכה לאישורך`,
-		en: `${un} from the ${pn} rikma thought of you — "${name}" awaits your consent`
+		he: `${un} מהריקמה ${pn} חשב/ה בדיוק עליך - "${name}" מחכה לאישורך`,
+		en: `${un} from the ${pn} rikma thought of you - "${name}" awaits your consent`
 	};
 	const headr = {
 		he: `${username}, חשבנו בדיוק עליך! ✨`,
 		en: `${username}, we thought exactly of you! ✨`
 	};
 	const opening = {
-		he: `בריקמה "${pn}" נולדה משימה חדשה — "${name}" — ו${un} בחר/ה דווקא בך להוביל אותה. הכישורים שלך, הדרך שלך — זה בדיוק מה שההצעה הזו מחפשת.`,
-		en: `A new mission was just born in the "${pn}" rikma — "${name}" — and ${un} picked you, specifically, to take it on. Your skills and your way of working are exactly what this offer is looking for.`
+		he: `בריקמה "${pn}" נולדה משימה חדשה - "${name}" - ו${un} בחר/ה דווקא בך להוביל אותה. הכישורים שלך, הדרך שלך - זה בדיוק מה שההצעה הזו מחפשת.`,
+		en: `A new mission was just born in the "${pn}" rikma - "${name}" - and ${un} picked you, specifically, to take it on. Your skills and your way of working are exactly what this offer is looking for.`
 	};
 	const detailsTitle = { he: 'מה על השולחן', en: "What's on the table" };
 	const hoursLabel = { he: 'היקף שעות', en: 'Hours' };
@@ -97,8 +97,8 @@
 	const startLabel = { he: 'התחלה', en: 'Starts' };
 	const endLabel = { he: 'יעד סיום', en: 'Due' };
 	const consent = {
-		he: `וחשוב מכל: שום דבר לא קורה בלי ההסכמה שלך. המשימה תירשם על שמך רק אם תאשר/י אותה. לרשותך ${restimeTxt.he} לאשר, לדייק את התנאים בהצעה נגדית או לפתוח שיחה — ואם לא תגיב/י עד אז, ההצעה תיפתח לכל חברי הריקמה והיא תחפש מישהו אחר.`,
-		en: `Most importantly: nothing happens without your consent. The mission is registered under your name only once you approve it. You have ${restimeTxt.en} to approve, refine the terms with a counter-offer or open a discussion — and if you don't respond in time, the offer opens up to all rikma members and it will look for someone else.`
+		he: `וחשוב מכל: שום דבר לא קורה בלי ההסכמה שלך. המשימה תירשם על שמך רק אם תאשר/י אותה. לרשותך ${restimeTxt.he} לאשר, לדייק את התנאים בהצעה נגדית או לפתוח שיחה - ואם לא תגיב/י עד אז, ההצעה תיפתח לכל חברי הריקמה והיא תחפש מישהו אחר.`,
+		en: `Most importantly: nothing happens without your consent. The mission is registered under your name only once you approve it. You have ${restimeTxt.en} to approve, refine the terms with a counter-offer or open a discussion - and if you don't respond in time, the offer opens up to all rikma members and it will look for someone else.`
 	};
 	const cta = { he: 'לצפייה בהצעה ולהצבעה', en: 'View the offer & vote' };
 	const slogen = {

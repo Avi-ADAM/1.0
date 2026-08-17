@@ -62,14 +62,14 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
 
   if (target.lifecycle === 'archived') throw new Error('This object is archived');
   if (target.openDecisionIds.length > 0) {
-    throw new Error('There is already an open proposal on this object — respond to it instead');
+    throw new Error('There is already an open proposal on this object - respond to it instead');
   }
   if (target.projectId && !target.memberIds.includes(userId)) {
     throw new Error('Only a member of the rikma may propose changes to its objects');
   }
 
   const round = buildRound(values, why);
-  if (!hasAnyChange(round)) throw new Error('Nothing to change — send at least one new value');
+  if (!hasAnyChange(round)) throw new Error('Nothing to change - send at least one new value');
 
   const otherMembers = target.memberIds.filter((id) => id !== userId);
 
@@ -116,8 +116,8 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
               en: `Proposed change: ${target.name}`,
             },
             body: {
-              he: `${why || 'ללא נימוק'} — האובייקט נשאר, רק הפרטים משתנים. אפשר לאשר, להציע נוסחה אחרת או לפתוח שיחה.`,
-              en: `${why || 'No reason given'} — the object stays, only its terms change. Approve, propose different terms, or open a discussion. No response within ${restimeLabel(target.projectRestime, lang)} approves it.`,
+              he: `${why || 'ללא נימוק'} - האובייקט נשאר, רק הפרטים משתנים. אפשר לאשר, להציע נוסחה אחרת או לפתוח שיחה.`,
+              en: `${why || 'No reason given'} - the object stays, only its terms change. Approve, propose different terms, or open a discussion. No response within ${restimeLabel(target.projectRestime, lang)} approves it.`,
             },
           },
           channels: ['socket', 'push'],

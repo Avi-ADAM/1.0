@@ -1137,7 +1137,7 @@ export function extractDecisions(
           const sale = decision.attributes.sale?.data;
           if (!sale) {
             console.warn(
-              `[saleClaim][extract] decision ${decision.id} SKIPPED — no linked sale`,
+              `[saleClaim][extract] decision ${decision.id} SKIPPED - no linked sale`,
               { decisionId: decision.id, projectId: project.id }
             );
             continue; // malformed claim — nothing to consent to
@@ -1171,13 +1171,13 @@ export function extractDecisions(
           });
           if (!isParty) {
             console.log(
-              `[saleClaim][extract] decision ${decision.id} SKIPPED — I am not a party (reporter/holder)`
+              `[saleClaim][extract] decision ${decision.id} SKIPPED - I am not a party (reporter/holder)`
             );
             continue;
           }
           if (iSignedStanding && !includeNotMyTurn) {
             console.log(
-              `[saleClaim][extract] decision ${decision.id} SKIPPED — I already signed standing round ${standingOrder}; waiting on the other side`
+              `[saleClaim][extract] decision ${decision.id} SKIPPED - I already signed standing round ${standingOrder}; waiting on the other side`
             );
             continue; // waiting on the other side, not my move
           }

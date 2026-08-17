@@ -151,12 +151,12 @@ async function handleRefetchScope(
   for (const key of keys) {
     const def = LEV_SLICES[key];
     if (!def) {
-      console.warn(`[levSocketHandler] refetchScope: unknown key "${key}" — will full-refresh`);
+      console.warn(`[levSocketHandler] refetchScope: unknown key "${key}" - will full-refresh`);
       needsFullRefresh = true;
       continue;
     }
     if (!def.qid) {
-      console.warn(`[levSocketHandler] refetchScope: no qid for "${key}" — will full-refresh`);
+      console.warn(`[levSocketHandler] refetchScope: no qid for "${key}" - will full-refresh`);
       needsFullRefresh = true;
       continue;
     }
@@ -345,13 +345,13 @@ async function handlePartialUpdate(
             updateSheirutpStore(data);
           } else {
             // No item payload — refetch the slice for this type (much cheaper than full refresh)
-            console.log('🔁 [levSocketHandler] No data for sheirutpends — refetching slice');
+            console.log('🔁 [levSocketHandler] No data for sheirutpends - refetching slice');
             await handleRefetchScope({ dataKeys: ['sheirutpends'] }, userId, lang);
           }
           break;
 
         case 'tasks':
-          console.log('📋 [levSocketHandler] Task updated — applying targeted store update');
+          console.log('📋 [levSocketHandler] Task updated - applying targeted store update');
           updateTaskInMtahaStore(data);
           break;
 

@@ -1,8 +1,8 @@
 {
   "title": "The Complete 1💗1 Guide",
   "tagline": "What everything in the system is, where it lives, and how it is born and grows",
-  "intro": "1💗1 is a system for doing things together. A group of people — a rikma — decides together what needs doing, who does it, what it is worth, and how what is created gets shared. Instead of a manager who decides, there is one consent engine that everything passes through.",
-  "intro2": "This guide walks through every object type in the system and every stage of its life, and links straight to the screen where you actually act. Every heading here is a link — click it and you are there.",
+  "intro": "1💗1 is a system for doing things together. A group of people - a rikma - decides together what needs doing, who does it, what it is worth, and how what is created gets shared. Instead of a manager who decides, there is one consent engine that everything passes through.",
+  "intro2": "This guide walks through every object type in the system and every stage of its life, and links straight to the screen where you actually act. Every heading here is a link - click it and you are there.",
   "backToTop": "Back to top",
   "toc": {
     "title": "In short",
@@ -35,33 +35,33 @@
       },
       "offerings": {
         "title": "Your offering",
-        "text": "What you are willing to give the world — a service, a product, knowledge, equipment or time. This is what lets other rikmas and the community find you, instead of only the other way round.",
+        "text": "What you are willing to give the world - a service, a product, knowledge, equipment or time. This is what lets other rikmas and the community find you, instead of only the other way round.",
         "cta": "Set your offering"
       },
       "rikma": {
-        "title": "A rikma — open one or join one",
+        "title": "A rikma - open one or join one",
         "text": "You can open a new rikma in a minute, or join an existing one from its public page. If you are not sure yet, joining something that already runs and watching it from the inside is the better start.",
         "cta": "Open a rikma"
       },
       "lev": {
-        "title": "Lev — your daily screen",
+        "title": "Lev - your daily screen",
         "text": "Lev gathers in one place everything that is waiting specifically for you: proposals to approve, sales to confirm, splits awaiting your signature, match suggestions and missions in progress. If you open one screen a day, this is the one.",
         "cta": "Go to Lev"
       },
       "hub": {
-        "title": "Hub — the overview",
+        "title": "Hub - the overview",
         "text": "The hub shows the big numbers: how many votes are open, what is urgent, what has sold, and what is happening on the demand map. From there you jump straight to the relevant item in Lev.",
         "cta": "Go to Hub"
       }
     }
   },
   "map": {
-    "title": "System map — where everything is",
+    "title": "System map - where everything is",
     "desc": "Every screen there is, grouped by what you come there to do.",
     "groups": {
       "daily": {
         "title": "Your day to day",
-        "desc": "What is open every day — the decisions, the tasks and the time."
+        "desc": "What is open every day - the decisions, the tasks and the time."
       },
       "rikma": {
         "title": "The rikma's brain",
@@ -73,7 +73,7 @@
       },
       "wish": {
         "title": "Wishes and concierge",
-        "desc": "The consumer side — say what you need and get an answer."
+        "desc": "The consumer side - say what you need and get an answer."
       },
       "money": {
         "title": "Money and deals",
@@ -95,33 +95,33 @@
       "timers": { "label": "Timers", "desc": "Start and stop time tracking, and your hours history." },
       "calendar": { "label": "Calendar", "desc": "Shifts, dates and deadlines that involve you." },
       "meeting": { "label": "Meetings", "desc": "Video meetings and scheduling between rikma members." },
-      "moach": { "label": "Rikma brain", "desc": "Pick a rikma — and from there everything happening inside it." },
-      "moachCreate": { "label": "Create", "desc": "Create a mission, request a resource, or build a process — with AI help too." },
+      "moach": { "label": "Rikma brain", "desc": "Pick a rikma - and from there everything happening inside it." },
+      "moachCreate": { "label": "Create", "desc": "Create a mission, request a resource, or build a process - with AI help too." },
       "moachWork": { "label": "Work", "desc": "In progress, acts, kanban, gantt, timers and shifts." },
-      "moachFlows": { "label": "Flows", "desc": "Processes and chains — the order in which things happen." },
+      "moachFlows": { "label": "Flows", "desc": "Processes and chains - the order in which things happen." },
       "moachMoney": { "label": "Money", "desc": "The rikma's sales and products, and how what accrued is split." },
       "moachOpps": { "label": "Opportunities", "desc": "Incoming wishes, what the rikma is open to, and its demand map." },
       "moachVotes": { "label": "Votes", "desc": "Every open proposal in the rikma, each with its own clock." },
-      "projectPublic": { "label": "Rikma public profile", "desc": "The face a rikma shows outward — and where you ask to join." },
+      "projectPublic": { "label": "Rikma public profile", "desc": "The face a rikma shows outward - and where you ask to join." },
       "demand": { "label": "Demand map", "desc": "One map, two sides: what is wanted nearby and who can supply it." },
-      "projects": { "label": "Rikmas", "desc": "All open rikmas — look for partnership and join." },
+      "projects": { "label": "Rikmas", "desc": "All open rikmas - look for partnership and join." },
       "products": { "label": "Products", "desc": "What rikmas sell, with price and availability." },
-      "missions": { "label": "Open missions", "desc": "Work looking for hands — you can ask to take it on." },
+      "missions": { "label": "Open missions", "desc": "Work looking for hands - you can ask to take it on." },
       "resources": { "label": "Wanted resources", "desc": "Money, equipment, space or information that rikmas are looking for." },
       "concierge": { "label": "Concierge", "desc": "Takes your wish, understands it, and looks for an answer." },
-      "newWish": { "label": "New wish", "desc": "Write what you need in your own words — no forms." },
+      "newWish": { "label": "New wish", "desc": "Write what you need in your own words - no forms." },
       "deals": { "label": "Deals", "desc": "What you bought, what you sell, and what awaits coordination." },
       "salesCenter": { "label": "Sales center", "desc": "Reporting sales, customers and recurring sales." },
       "dealsRequest": { "label": "Purchase request", "desc": "Request a product or service from an existing rikma." },
       "profile": { "label": "Profile", "desc": "Skills, values, roles and the area you work in." },
       "settings": { "label": "Settings", "desc": "Language, notifications and display preferences." },
-      "offerings": { "label": "My offering", "desc": "What you offer the world — the basis for matches." },
+      "offerings": { "label": "My offering", "desc": "What you offer the world - the basis for matches." },
       "identity": { "label": "Identity", "desc": "Verification and identity details, used in deals." },
       "devices": { "label": "Devices", "desc": "Connected devices and access permissions." },
       "onboard": { "label": "Onboarding", "desc": "The short tour that reintroduces the system." },
       "faq": { "label": "FAQ", "desc": "Short answers to what gets asked most." },
       "consensus": { "label": "Consent engine", "desc": "The separate site for deep discussion and precise framing of a disagreement." },
-      "agreement": { "label": "The agreement", "desc": "The agreement the system rests on — and the people who signed it." },
+      "agreement": { "label": "The agreement", "desc": "The agreement the system rests on - and the people who signed it." },
       "love": { "label": "Agreement map", "desc": "Who agreed, from where in the world, and how many." }
     }
   },
@@ -132,7 +132,7 @@
       "rikma": {
         "name": "Rikma",
         "code": "Project",
-        "what": "A rikma is a group of people creating something together and sharing what they create. It is the container for everything: the values, the members, the missions, the resources, the products, the sales and the splits. Every rikma has its own decision time — how long a proposal stays open for a response before it is accepted on its own. A fast rikma sets a day, a careful one sets two weeks; that is the group's call, not the system's.",
+        "what": "A rikma is a group of people creating something together and sharing what they create. It is the container for everything: the values, the members, the missions, the resources, the products, the sales and the splits. Every rikma has its own decision time - how long a proposal stays open for a response before it is accepted on its own. A fast rikma sets a day, a careful one sets two weeks; that is the group's call, not the system's.",
         "stages": "Idea → open a rikma → set values and decision time → add members → ongoing activity → split what accrued",
         "where": "All your rikmas live in the rikma brain. A rikma's public face is its project page, and that is also where people ask to join.",
         "do": "Open a rikma, edit its name, description, image and external links, set the decision time, publish it as open to partners, and manage members."
@@ -140,7 +140,7 @@
       "user": {
         "name": "Your profile and offering",
         "code": "User · Offerings",
-        "what": "Your profile is not a CV but an interface: the skills, values and roles you pick come from one vocabulary shared across the whole site, so the system can cross what you know with what rikmas are looking for. Your personal offering is the active side: what you are willing to give — a service, a product, knowledge, equipment or time.",
+        "what": "Your profile is not a CV but an interface: the skills, values and roles you pick come from one vocabulary shared across the whole site, so the system can cross what you know with what rikmas are looking for. Your personal offering is the active side: what you are willing to give - a service, a product, knowledge, equipment or time.",
         "stages": "Sign up → onboarding → skills, values and roles → area of activity → personal offering → match suggestions in Lev",
         "where": "In your profile, and on the my-offering page. The match suggestions built from them reach you as cards in Lev.",
         "do": "Update skills and values, add a new item to the shared vocabulary, set your area, and publish a personal offering that is visible on the discovery pages."
@@ -148,7 +148,7 @@
       "mission": {
         "name": "Mission",
         "code": "Mission → Pendm → Open Mission → in progress → finished",
-        "what": "A mission is work someone takes on in the rikma's name. It starts as a template from the shared vocabulary ('build a landing page'), becomes a concrete proposal with hours, a rate and required skills, and only after consent does it open for execution. The hours approved at the end are the material your value in the rikma is derived from — which is why every step along the way needs agreement rather than an announcement.",
+        "what": "A mission is work someone takes on in the rikma's name. It starts as a template from the shared vocabulary ('build a landing page'), becomes a concrete proposal with hours, a rate and required skills, and only after consent does it open for execution. The hours approved at the end are the material your value in the rikma is derived from - which is why every step along the way needs agreement rather than an announcement.",
         "stages": "Mission template → proposal in a vote → open mission → request to take it on → in progress with a timer → finished → completion approval → archive and value",
         "where": "Created in the brain → Create. Tracked in the brain → Work (in progress, kanban, gantt). Site-wide open missions live on the open missions page. Any proposal waiting for you shows up in Lev.",
         "do": "Propose a mission, negotiate hours and rate, ask to take it on, run a timer, break it into small acts, upload proof of work, and approve other people's completions."
@@ -156,7 +156,7 @@
       "resource": {
         "name": "Resource",
         "code": "Mashaabim → Pmash → Open Mashaabim → provided",
-        "what": "A resource is anything the rikma needs that is not work hours: money, equipment, materials, a space, a vehicle, information or a contact. The system treats it exactly like a mission — it enters by consent, it has a quantity and a price per unit, and it too counts toward the value of whoever provided it. That is what lets someone with no time but with equipment be a full partner.",
+        "what": "A resource is anything the rikma needs that is not work hours: money, equipment, materials, a space, a vehicle, information or a contact. The system treats it exactly like a mission - it enters by consent, it has a quantity and a price per unit, and it too counts toward the value of whoever provided it. That is what lets someone with no time but with equipment be a full partner.",
         "stages": "Need identified → resource request in a vote → wanted and open resource → offer to provide → provided and received → approval → value in the rikma",
         "where": "Created in the brain → Create → request a resource. Site-wide wanted resources live on the wanted resources page and on the demand map.",
         "do": "Request a resource, set quantity, unit and price per unit, offer to supply a resource to another rikma, mark partial delivery, and confirm receipt."
@@ -164,7 +164,7 @@
       "product": {
         "name": "Product",
         "code": "Matanot · simple and complex",
-        "what": "A product is what the rikma sells. A simple product is a name, a description, an image and a price. A complex product is exactly the same, plus a recipe on top: which missions and which resources one unit requires, and how much of each. Complex extends simple rather than replacing it — every field a simple product has, a complex one has too. From the recipe the system derives cost per unit, and from there a price by margin or a fixed price you set.",
+        "what": "A product is what the rikma sells. A simple product is a name, a description, an image and a price. A complex product is exactly the same, plus a recipe on top: which missions and which resources one unit requires, and how much of each. Complex extends simple rather than replacing it - every field a simple product has, a complex one has too. From the recipe the system derives cost per unit, and from there a price by margin or a fixed price you set.",
         "stages": "Idea → product proposal in a vote → approved product → recipe (for a complex product) → pricing: fixed or by margin → published on the products page → sale → split",
         "where": "The rikma's products live in the brain → Money → Sales. All products on the site are on the public products page, which is also where people ask to buy.",
         "do": "Propose a product, build a recipe from existing missions and resources, choose a pricing method, set available quantity and location, and publish or archive."
@@ -172,7 +172,7 @@
       "sale": {
         "name": "Sale",
         "code": "Sale",
-        "what": "A sale is a record of money that came in thanks to the rikma. Its critical field is not the amount but who actually holds the money. 'The money is with me' is a sovereign self-report and is final immediately. But reporting that 'the money is with X' is a claim about someone else's financial state, so it opens as a bilateral consent between the reporter and the person said to hold it. A sale counts in balances and splits only once it is effective — never while the claim is still open.",
+        "what": "A sale is a record of money that came in thanks to the rikma. Its critical field is not the amount but who actually holds the money. 'The money is with me' is a sovereign self-report and is final immediately. But reporting that 'the money is with X' is a claim about someone else's financial state, so it opens as a bilateral consent between the reporter and the person said to hold it. A sale counts in balances and splits only once it is effective - never while the claim is still open.",
         "stages": "Report a sale → link a product and a customer → who holds the money → if someone else: bilateral consent → sale effective → enters the split",
         "where": "Brain → Money → Sales, and the personal sales center. Any holding claim waiting for you appears in Lev as a card with approve, chat or counter-proposal.",
         "do": "Report a sale, link product and customer, define it as recurring, approve or counter a holding claim, and record a payment that was transferred."
@@ -180,7 +180,7 @@
       "split": {
         "name": "Split",
         "code": "Tosplit · Haluka · hervachti",
-        "what": "A split is the moment what accrued gets divided among the members. The system computes each member's share from what they actually contributed — approved hours, resources they provided, products sold — and puts the proposal to everyone, not only to whoever created it. If 1lev1 itself took part as a service-providing partner, it too receives a share by exactly the same rules and with the same transparency.",
+        "what": "A split is the moment what accrued gets divided among the members. The system computes each member's share from what they actually contributed - approved hours, resources they provided, products sold - and puts the proposal to everyone, not only to whoever created it. If 1lev1 itself took part as a service-providing partner, it too receives a share by exactly the same rules and with the same transparency.",
         "stages": "Value accrues → create a split proposal → a personal share per member → approve, chat or counter-proposal → split closed → actual transfer",
         "where": "Brain → Money → Split. A split waiting for your signature appears in Lev.",
         "do": "Create a split, see what makes up each person's share, approve, propose a different split, and mark transfers as done."
@@ -188,9 +188,9 @@
       "decision": {
         "name": "Decision and voting",
         "code": "Decision · Vots · Timegrama",
-        "what": "Anything needing more than one person's consent goes through the same mechanism: a proposal with a clock. There is no absolute 'no' — a unilateral rejection ends a conversation. There are three ways to respond: approve, open a chat to understand, or make a precise counter-proposal. 'I received nothing' is said as a counter-proposal for an amount of 0, not as a veto. Every counter-proposal resets the clock and starts a new round, until both sides sign the same version.",
+        "what": "Anything needing more than one person's consent goes through the same mechanism: a proposal with a clock. There is no absolute 'no' - a unilateral rejection ends a conversation. There are three ways to respond: approve, open a chat to understand, or make a precise counter-proposal. 'I received nothing' is said as a counter-proposal for an amount of 0, not as a veto. Every counter-proposal resets the clock and starts a new round, until both sides sign the same version.",
         "stages": "Proposal → the clock starts at the rikma's decision time → approve / chat / counter-proposal → new round or maturity → decision",
-        "where": "All of a rikma's open votes are in the brain → Votes, each with its own clock. What awaits you personally arrives in Lev. Deep discussion has a separate site — the consent engine.",
+        "where": "All of a rikma's open votes are in the brain → Votes, each with its own clock. What awaits you personally arrives in Lev. Deep discussion has a separate site - the consent engine.",
         "do": "Approve, open a chat, make a counter-proposal, see who has voted and how long is left, and follow earlier rounds."
       },
       "nego": {
@@ -212,7 +212,7 @@
       "maagad": {
         "name": "Demand aggregate",
         "code": "Maagad · shared purchase",
-        "what": "A demand aggregate is similar wishes from different people joining into one buying power. While it is small it is shown only as a range, without revealing who joined. Once enough demand accumulates in an area it becomes visible to suppliers, and a supplier can make a threshold-conditional offer — 'a minibus, runs at 10 sign-ups'. The offer only takes effect if the threshold is crossed in time, so no side commits alone.",
+        "what": "A demand aggregate is similar wishes from different people joining into one buying power. While it is small it is shown only as a range, without revealing who joined. Once enough demand accumulates in an area it becomes visible to suppliers, and a supplier can make a threshold-conditional offer - 'a minibus, runs at 10 sign-ups'. The offer only takes effect if the threshold is crossed in time, so no side commits alone.",
         "stages": "Similar wishes → aggregate forming → exposure threshold crossed → visible to suppliers → threshold-conditional offer → threshold crossed → it happens",
         "where": "On the public demand map, and on the aggregate's own page. A rikma also sees relevant aggregates in the brain → Opportunities.",
         "do": "Join an aggregate, see how many are missing for the threshold, make a supplier offer, and follow the closing date."
@@ -220,7 +220,7 @@
       "service": {
         "name": "Service and purchase request",
         "code": "Sheirut · Sheirutpend",
-        "what": "A purchase request is the market's incoming side: someone outside wants to buy a product or receive a service from the rikma. The request arrives as a proposal, gets coordinated between the customer and the rikma (date, quantity, price), and once both sides agree it becomes work — and at the end a sale and a split. This is the path by which outside money enters the system by consent rather than as an anonymous order.",
+        "what": "A purchase request is the market's incoming side: someone outside wants to buy a product or receive a service from the rikma. The request arrives as a proposal, gets coordinated between the customer and the rikma (date, quantity, price), and once both sides agree it becomes work - and at the end a sale and a split. This is the path by which outside money enters the system by consent rather than as an anonymous order.",
         "stages": "Customer request → offer and coordination → both sides agree → execution → sale → split",
         "where": "The deals page and the sales center. Requests waiting for you appear in Lev, and the products you can request are on the products page.",
         "do": "Send a purchase request, coordinate date and quantity, approve or counter, mark it as done, and convert it into a sale."
@@ -228,7 +228,7 @@
       "timer": {
         "name": "Timer and acts",
         "code": "Timer · Act",
-        "what": "A timer is the actual measurement of time on a mission in progress, and acts are the mission broken into small steps you can tick off. The measured hours are the material your share in a split is derived from, so they have to be accurate — which is also why they are approved at the end by the rikma rather than closed on your own.",
+        "what": "A timer is the actual measurement of time on a mission in progress, and acts are the mission broken into small steps you can tick off. The measured hours are the material your share in a split is derived from, so they have to be accurate - which is also why they are approved at the end by the rikma rather than closed on your own.",
         "stages": "Mission in progress → start a timer → stop and resume → hours summarised → completion approval → hours counted into value",
         "where": "On the timers page, on the mission card in Lev, and in the brain → Work → Timers. Also through the Telegram bot and the MCP interface.",
         "do": "Start, stop and correct a timer, tick off completed acts, review your hours history, and submit for approval."
@@ -236,7 +236,7 @@
       "process": {
         "name": "Process and chain",
         "code": "Process · Chain",
-        "what": "A process is a container grouping missions and resources into one order — a 'product launch' holding design, development, materials and marketing. A chain is the same thing from the life-cycle angle: what is still a proposal, what is already open, what is in progress and what has finished. Together they let you see a whole project rather than a list of chores.",
+        "what": "A process is a container grouping missions and resources into one order - a 'product launch' holding design, development, materials and marketing. A chain is the same thing from the life-cycle angle: what is still a proposal, what is already open, what is in progress and what has finished. Together they let you see a whole project rather than a list of chores.",
         "stages": "Define a process → attach missions and resources → order and dependencies → track it in the chain → close",
         "where": "Brain → Flows, and in the gantt and kanban views that show the same information on a timeline and on a board.",
         "do": "Create a process, attach existing or new missions and resources to it, set the order, and track progress."
@@ -249,37 +249,37 @@
     "steps": {
       "open_rikma": {
         "title": "Opening a rikma",
-        "text": "A rikma opens with a name, a description and values. The values are not decoration: they are chosen from the shared vocabulary, which is what lets people with similar values find you. At this stage you also set the decision time — how long each proposal stays open before it is accepted on its own. You can change it later, but it is better to start from a number that matches the group's real pace.",
+        "text": "A rikma opens with a name, a description and values. The values are not decoration: they are chosen from the shared vocabulary, which is what lets people with similar values find you. At this stage you also set the decision time - how long each proposal stays open before it is accepted on its own. You can change it later, but it is better to start from a number that matches the group's real pace.",
         "where": "Profile → create a rikma. After creating it you land straight in the new rikma's brain.",
         "cta": "Open a rikma"
       },
       "create_task": {
         "title": "Proposing a mission or a resource",
-        "text": "In the brain, the create tab offers three routes: a mission, a resource request, or a process that holds both. You define what needs doing, how many hours it takes, the hourly rate and the required skills — or, for a resource, what quantity at what price per unit. At this stage it is still only a proposal: it goes into a vote, not into the task list.",
+        "text": "In the brain, the create tab offers three routes: a mission, a resource request, or a process that holds both. You define what needs doing, how many hours it takes, the hourly rate and the required skills - or, for a resource, what quantity at what price per unit. At this stage it is still only a proposal: it goes into a vote, not into the task list.",
         "where": "Brain → Create. There is also an AI route that scans the rikma and proposes ready-made missions for your approval.",
         "cta": "Go to Create"
       },
       "negotiation": {
         "title": "Negotiation and consent",
-        "text": "Every proposal enters a negotiation period as long as the rikma's decision time. A member can approve, open a chat to understand, or make a precise counter-proposal — 'not 20 hours but 12', 'not 150 an hour but 120'. A counter-proposal is not a rejection: it is a new version on the table, and it resets the clock and starts another round. This continues until both sides sign the same version.",
+        "text": "Every proposal enters a negotiation period as long as the rikma's decision time. A member can approve, open a chat to understand, or make a precise counter-proposal - 'not 20 hours but 12', 'not 150 an hour but 120'. A counter-proposal is not a rejection: it is a new version on the table, and it resets the clock and starts another round. This continues until both sides sign the same version.",
         "where": "Brain → Votes, and everything waiting for you personally in Lev.",
         "cta": "My votes"
       },
       "auto_approve": {
         "title": "Approval by silence",
         "text": "If the decision time passes and nobody responded, the last version on the table is approved automatically. This is not a technical detail but a position: silence is consent, at the pace the group itself chose. Whoever wants to influence responds in time; whoever does not, trusts the group. After approval a mission becomes open and can be taken on, and a resource becomes wanted and can be provided.",
-        "where": "Each proposal shows its own clock — in the brain → Votes and on the card in Lev.",
+        "where": "Each proposal shows its own clock - in the brain → Votes and on the card in Lev.",
         "cta": "Go to Lev"
       },
       "execution": {
         "title": "Execution and timers",
-        "text": "An open mission waits for someone to ask to take it on. Once the request is accepted the mission moves to 'in progress' and a timer opens on it. You can start and stop it from anywhere — the timers page, the mission card in Lev, the brain, the Telegram bot or the MCP interface — and the hours accumulate. You can also break the mission into small acts and tick them off as you go.",
+        "text": "An open mission waits for someone to ask to take it on. Once the request is accepted the mission moves to 'in progress' and a timer opens on it. You can start and stop it from anywhere - the timers page, the mission card in Lev, the brain, the Telegram bot or the MCP interface - and the hours accumulate. You can also break the mission into small acts and tick them off as you go.",
         "where": "Timers, my tasks, and brain → Work → In progress.",
         "cta": "Go to timers"
       },
       "finish": {
         "title": "Finishing, approval and archive",
-        "text": "When you finish you submit the mission for approval, and you can attach proof of work — a file, a link or an image. Rikma members approve, and if someone thinks the hours are inaccurate they propose a different number instead of rejecting. After approval the mission moves to the archive and the hours count toward your value in the rikma — which is what will determine your share in the next split.",
+        "text": "When you finish you submit the mission for approval, and you can attach proof of work - a file, a link or an image. Rikma members approve, and if someone thinks the hours are inaccurate they propose a different number instead of rejecting. After approval the mission moves to the archive and the hours count toward your value in the rikma - which is what will determine your share in the next split.",
         "where": "Brain → Work → In progress, and the completion approvals waiting for you in Lev.",
         "cta": "My approvals"
       },
@@ -297,7 +297,7 @@
     "items": {
       "noHardNo": {
         "title": "There is no absolute 'no'",
-        "text": "A unilateral rejection ends a conversation, so it does not exist here. In its place there are three ways to respond: approve, open a chat, or make a precise counter-proposal. Even 'I received nothing' is said as a counter-proposal for an amount of 0 — a claim that can be discussed, not a veto that leaves nothing to say."
+        "text": "A unilateral rejection ends a conversation, so it does not exist here. In its place there are three ways to respond: approve, open a chat, or make a precise counter-proposal. Even 'I received nothing' is said as a counter-proposal for an amount of 0 - a claim that can be discussed, not a veto that leaves nothing to say."
       },
       "silence": {
         "title": "Silence is consent, at the rikma's pace",
@@ -328,5 +328,5 @@
     "desc": "A separate technical guide for agents acting on a user's behalf: URL map, the discovery contract for each entity, workflows and safety rules.",
     "cta": "To the agent guide"
   },
-  "footer": "1💗1 — Create together, harmoniously"
+  "footer": "1💗1 - Create together, harmoniously"
 }

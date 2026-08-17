@@ -13,7 +13,7 @@ import { openMissionProposalHandler } from './proposeOnOpenMission.js';
 export const customizeOpenMissionConfig: ActionConfig = {
   key: 'customizeOpenMission',
   description:
-    'Take an open mission on customized terms (Path D). Shares proposeOnOpenMission\'s server-side membership routing — the key is semantic only.',
+    'Take an open mission on customized terms (Path D). Shares proposeOnOpenMission\'s server-side membership routing - the key is semantic only.',
   graphqlOperation: openMissionProposalHandler,
 
   paramSchema: {

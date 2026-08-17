@@ -57,41 +57,41 @@
 
   const holderTexts = $derived({
     he: {
-      title: 'מכירה מתחדשת — דיווח חודשי 🔁',
+      title: 'מכירה מתחדשת - דיווח חודשי 🔁',
       greeting: `שלום ${username},`,
       intro: `הגיע הזמן לדווח כמה נכנס החודש (${monthLabel}) מ"${productName}"${projectName ? ` בריקמה "${projectName}"` : ''}.`,
       amountLabel: 'הסכום הצפוי',
-      ask: 'היכנסו למרכז המכירות, אשרו או עדכנו את הסכום שנכנס בפועל החודש — גם 0 הוא דיווח (הוראת קבע שבוטלה אפשר לסגור באותו מקום).',
+      ask: 'היכנסו למרכז המכירות, אשרו או עדכנו את הסכום שנכנס בפועל החודש - גם 0 הוא דיווח (הוראת קבע שבוטלה אפשר לסגור באותו מקום).',
       cta: 'דיווח במרכז המכירות',
       link: 'https://www.1lev1.com/deals/sales-center',
       footer: '1💗1 - קשה לבד? קל ביחד!'
     },
     en: {
-      title: 'Recurring sale — monthly report 🔁',
+      title: 'Recurring sale - monthly report 🔁',
       greeting: `Hello ${username},`,
       intro: `Time to report how much came in this month (${monthLabel}) from "${productName}"${projectName ? ` in "${projectName}"` : ''}.`,
       amountLabel: 'Expected amount',
-      ask: 'Go to the sales center and confirm or update what actually came in this month — 0 is a valid report (a cancelled standing order can be closed right there).',
+      ask: 'Go to the sales center and confirm or update what actually came in this month - 0 is a valid report (a cancelled standing order can be closed right there).',
       cta: 'Report in the sales center',
       link: 'https://www.1lev1.com/deals/sales-center',
       footer: '1💗1 - We can together'
     },
     ar: {
-      title: 'بيع متكرر — تقرير شهري 🔁',
+      title: 'بيع متكرر - تقرير شهري 🔁',
       greeting: `مرحبا ${username}،`,
       intro: `حان الوقت للإبلاغ عن المبلغ الذي دخل هذا الشهر (${monthLabel}) من "${productName}"${projectName ? ` في "${projectName}"` : ''}.`,
       amountLabel: 'المبلغ المتوقع',
-      ask: 'ادخل إلى مركز المبيعات وأكّد أو حدّث المبلغ الفعلي لهذا الشهر — 0 هو تقرير صالح أيضاً.',
+      ask: 'ادخل إلى مركز المبيعات وأكّد أو حدّث المبلغ الفعلي لهذا الشهر - 0 هو تقرير صالح أيضاً.',
       cta: 'الإبلاغ في مركز المبيعات',
       link: 'https://www.1lev1.com/deals/sales-center',
       footer: '1💗1'
     },
     ru: {
-      title: 'Повторяющаяся продажа — месячный отчёт 🔁',
+      title: 'Повторяющаяся продажа - месячный отчёт 🔁',
       greeting: `Здравствуйте, ${username},`,
       intro: `Пора сообщить, сколько поступило в этом месяце (${monthLabel}) от «${productName}»${projectName ? ` в плетении «${projectName}»` : ''}.`,
       amountLabel: 'Ожидаемая сумма',
-      ask: 'Зайдите в центр продаж и подтвердите или обновите фактическую сумму за месяц — 0 тоже считается отчётом.',
+      ask: 'Зайдите в центр продаж и подтвердите или обновите фактическую сумму за месяц - 0 тоже считается отчётом.',
       cta: 'Отчёт в центре продаж',
       link: 'https://www.1lev1.com/deals/sales-center',
       footer: '1💗1 - Вместе проще!'
@@ -100,17 +100,17 @@
 
   const customerTexts = $derived({
     he: {
-      title: 'הוראת קבע — עדכון חודשי 💳',
+      title: 'הוראת קבע - עדכון חודשי 💳',
       greeting: `שלום ${username},`,
       intro: `נפתח חלון הדיווח החודשי (${monthLabel}) עבור "${productName}"${projectName ? ` של הריקמה "${projectName}"` : ''}.`,
       amountLabel: 'הסכום הצפוי',
-      ask: 'היכנסו לעמוד העסקאות ועדכנו כמה העברתם החודש — כך המוכר יוכל לאשרר שהתקבל. גם 0 הוא עדכון לגיטימי.',
+      ask: 'היכנסו לעמוד העסקאות ועדכנו כמה העברתם החודש - כך המוכר יוכל לאשרר שהתקבל. גם 0 הוא עדכון לגיטימי.',
       cta: 'עדכון בעמוד העסקאות',
       link: 'https://www.1lev1.com/deals',
       footer: '1💗1 - קשה לבד? קל ביחד!'
     },
     en: {
-      title: 'Standing order — monthly update 💳',
+      title: 'Standing order - monthly update 💳',
       greeting: `Hello ${username},`,
       intro: `The monthly reporting window (${monthLabel}) opened for "${productName}"${projectName ? ` of "${projectName}"` : ''}.`,
       amountLabel: 'Expected amount',
@@ -120,7 +120,7 @@
       footer: '1💗1 - We can together'
     },
     ar: {
-      title: 'أمر دفع دائم — تحديث شهري 💳',
+      title: 'أمر دفع دائم - تحديث شهري 💳',
       greeting: `مرحبا ${username}،`,
       intro: `فُتحت نافذة التقرير الشهري (${monthLabel}) لـ "${productName}"${projectName ? ` لدى "${projectName}"` : ''}.`,
       amountLabel: 'المبلغ المتوقع',
@@ -130,7 +130,7 @@
       footer: '1💗1'
     },
     ru: {
-      title: 'Постоянное поручение — месячное обновление 💳',
+      title: 'Постоянное поручение - месячное обновление 💳',
       greeting: `Здравствуйте, ${username},`,
       intro: `Открылось окно месячного отчёта (${monthLabel}) для «${productName}»${projectName ? ` у «${projectName}»` : ''}.`,
       amountLabel: 'Ожидаемая сумма',
