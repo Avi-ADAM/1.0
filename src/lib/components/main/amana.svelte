@@ -425,6 +425,25 @@
     msg1: 'baruch@1lev1.com'
   });
   let selected = $state([]);
+
+  /**
+   * svelte-multiselect puts `role="searchbox"` on its outer div and gives that
+   * div no accessible name, which axe-core reports as a WCAG 4.1.2 failure
+   * (aria-input-field-name). The div takes no props we could name it through -
+   * the component only forwards `class` and `style` to it - so the label is
+   * applied here, from the wrapper, once the component has rendered.
+   *
+   * The `id="location"` passed to MultiSelect is the other half: it lands on
+   * the real combobox input, which is what finally connects the existing
+   * `<label for="location">` to the control the visitor actually types in.
+   */
+  let locationField = $state();
+  $effect(() => {
+    const box = locationField?.querySelector('[role="searchbox"]');
+    if (box && !box.getAttribute('aria-label')) {
+      box.setAttribute('aria-label', $t('home.amana.form.locationLabel'));
+    }
+  });
   let already = $state(false);
   let erorims = $state(false);
   let agreeToBasicTerms = $state(false);
@@ -877,9 +896,10 @@
               <span class="label-icon">🌍</span>
               {$t('home.amana.form.locationLabel')}
             </label>
-            <div class="multiselect-wrapper">
+            <div class="multiselect-wrapper" bind:this={locationField}>
               <MultiSelect
                 bind:selected
+                id="location"
                 outerDivClass="custom-multiselect-outer"
                 inputClass="custom-multiselect-input"
                 liSelectedClass="custom-multiselect-selected"

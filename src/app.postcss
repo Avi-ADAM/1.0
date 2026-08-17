@@ -1887,7 +1887,15 @@ html.business {
 html.personal {
   --gold: #eee8aa;
   --goldink: #8a6a15; /* 5.1:1 on white */
-  --barbi-pink: #ff0092;
+  /* Was #ff0092, the only value in this block with no ratio noted - because it
+     did not meet the contract stated above. --gold on it measured 2.96:1 and
+     it measured 3.71:1 as ink on white, against the 4.5:1 this file requires;
+     axe-core flagged 17 nodes across five pages, all of them the primary CTA
+     (`bg-barbi text-gold`, 131 call sites) and the pink-on-white hover it
+     swaps to. No brand-appropriate ink passes on #ff0092 - even white reaches
+     only 3.71:1 - so the saturated side is what had to move. Same hue family,
+     one step deeper, and now it satisfies the pair contract in both roles. */
+  --barbi-pink: #b80069; /* 6.5:1 on white · --gold on it = 5.2:1 */
   --pinki: rgb(242, 229, 242);
   --blue: rgb(182, 240, 255);
   --naim: rgba(251, 207, 232);

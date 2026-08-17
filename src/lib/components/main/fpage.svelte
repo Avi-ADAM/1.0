@@ -566,7 +566,7 @@
             >
               <span
                 dir="ltr"
-                class="shrink-0 mt-0.5 h-6 px-2 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold"
+                class="shrink-0 mt-0.5 h-6 px-2 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold"
                 >50/50</span
               >
               <p
