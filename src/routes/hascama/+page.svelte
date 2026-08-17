@@ -143,14 +143,14 @@ regHelperL = 0;
       : '1lev1 principles declaration — living in freedom, mutual agreement and without violence'}
   />
   <meta property="og:type" content="website" />
-  <script>
-    nl_pos = 'br';
-    nl_color = 'pink';
-    nl_compact = '1';
-    nl_accordion = '1';
-  </script>
-  <script src="https://1lev1.com/nagishli.js?v=2.3" charset="utf-8" defer>
-  </script>
+  <!-- The vendored NagishLi toolbar used to be loaded here, for this page alone
+       out of ~90. It never actually ran: the library needs a `<nagishli>`
+       element in the body that no page provides, and it pulls jQuery 1.8.0
+       (2012) off a CDN when none is present. Accessibility controls now come
+       from $lib/components/a11y/AccessibilityPanel.svelte, mounted in the root
+       layout, so every page has them and no third-party script is involved.
+       static/nagishli.js and static/nl-files/ are left in place, unreferenced,
+       in case the widget is ever revisited. -->
 </svelte:head>
 
 <svelte:window onbeforeunload={reportExit} />

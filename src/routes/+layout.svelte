@@ -22,12 +22,16 @@ onMessage(messaging, (payload) => {
   import { setTheme } from '$lib/stores/theme';
   import { normalizeTheme, THEME_PARAM } from '$lib/theme/themeParam.js';
   import { onMount } from 'svelte';
-  import { locale, isRtl } from '$lib/translations';
+  import { locale, isRtl, t } from '$lib/translations';
   import { goto } from '$app/navigation';
   import { navigating, page } from '$app/state';
   import { browser } from '$app/environment';
   import SessionExpiredBanner from '$lib/components/screens/SessionExpiredBanner.svelte';
   import MobileFooter from '$lib/components/footer/mobileFooter.svelte';
+  import AccessibilityPanel from '$lib/components/a11y/AccessibilityPanel.svelte';
+  // Importing the store wires the <html> classes for the saved display
+  // preferences, the same way the theme store does above.
+  import '$lib/stores/a11y.js';
   import { showFoot } from '$lib/stores/showFoot.js';
   import { Bot } from '$lib/components/bot';
   import { socketClient } from '$lib/stores/socketClient';
@@ -228,7 +232,13 @@ onMessage(messaging, (payload) => {
   </div>
 {/if}
 
-<main>
+<!-- WCAG 2.4.1 (Bypass Blocks): every page here opens with the same header and
+     navigation, and without this a keyboard or screen-reader user has to walk
+     through all of it again on each page before reaching the content. Visible
+     only while focused. -->
+<a class="skip-to-content" href="#main-content">{$t('ui.a11y.skip')}</a>
+
+<main id="main-content" tabindex="-1">
   {#if data?.sessionExpired}
     <SessionExpiredBanner />
   {/if}
@@ -248,7 +258,36 @@ onMessage(messaging, (payload) => {
   <Bot {data} />
 </main>
 
+<AccessibilityPanel />
+
 <style>
+  /* Off-screen until focused, then pinned to the top of the viewport. Left
+     physical rather than logical so it lands in the same place in all five
+     locales, RTL included. */
+  .skip-to-content {
+    position: fixed;
+    top: -100px;
+    left: 1rem;
+    z-index: 10000;
+    padding: 0.6rem 1rem;
+    border-radius: 0 0 0.5rem 0.5rem;
+    background: #ff0092;
+    color: #ffffff;
+    font-weight: 700;
+    text-decoration: none;
+    transition: top 0.15s ease-in-out;
+  }
+
+  .skip-to-content:focus {
+    top: 0;
+  }
+
+  /* The target takes focus programmatically via the skip link, but it is not
+     an interactive control — no focus ring on it. */
+  main:focus {
+    outline: none;
+  }
+
   .nav-progress-track {
     position: fixed;
     top: 0;

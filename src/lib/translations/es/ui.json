@@ -92,5 +92,17 @@
     "mode_dark": "Noche",
     "mode_system": "Del dispositivo",
     "followingSystem": "Sigue la configuración del dispositivo — ahora {{mode}}"
+  },
+  "a11y": {
+    "title": "Accesibilidad",
+    "skip": "Saltar al contenido principal",
+    "textSize": "Tamaño del texto",
+    "contrast": "Alto contraste",
+    "links": "Resaltar enlaces",
+    "font": "Fuente legible",
+    "motionOn": "Movimiento: activo",
+    "motionPaused": "Movimiento: en pausa",
+    "motionHidden": "Movimiento: oculto",
+    "reset": "Restablecer ajustes"
   }
 }

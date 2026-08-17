@@ -2296,3 +2296,103 @@ html.business .boxleft {
     animation: none;
   }
 }
+
+/* ===================================================================
+   Accessibility preferences — $lib/stores/a11y.js
+
+   The store writes one custom property and three classes onto <html>;
+   everything below is the CSS half of that contract. Keeping the rules here
+   rather than writing styles from JS is the same division theme.js documents:
+   JS decides *which* state is active, the stylesheet decides what it looks
+   like.
+   =================================================================== */
+
+:root {
+  /* Overridden by the store. Declared here so the var always resolves, even
+     before hydration and on the server-rendered page. */
+  --a11y-text-scale: 1;
+}
+
+/* Text size, applied at the root.
+
+   Tailwind's type and spacing scales are both rem-based, i.e. relative to this
+   one value, so scaling it behaves like browser zoom: the hierarchy between
+   sizes is preserved and the padding grows with the text instead of letting
+   larger text overflow boxes that stayed put.
+
+   The tempting alternative — `font-size: calc(1em * scale)` on every text
+   element — is wrong twice over: `em` is relative to the *parent*, so a span
+   inside a paragraph inside a div multiplies the scale three times, and
+   rem-based Tailwind utilities would ignore it entirely. */
+html {
+  font-size: calc(100% * var(--a11y-text-scale));
+}
+
+/* --- high contrast ------------------------------------------------------
+   Aimed at this site's specific weak spot: headings painted with
+   `text-transparent` + `bg-clip-text` over an animated gradient. That text
+   has no measurable contrast ratio at all — automated checkers skip it and
+   it fails outright against several of the gradient's own stops. Under
+   high contrast the gradient is dropped and the text becomes solid. */
+html.a11y-contrast {
+  --tw-text-opacity: 1;
+}
+
+html.a11y-contrast :is(h1, h2, h3, h4, p, li, span, a, button, label) {
+  text-shadow: none !important;
+}
+
+html.a11y-contrast .text-transparent {
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+  background-image: none !important;
+}
+
+html.a11y-contrast.dark .text-transparent {
+  color: #f9fafb !important;
+  -webkit-text-fill-color: #f9fafb !important;
+}
+
+/* Backdrop blur over a busy 3D scene is the other place text loses contrast. */
+html.a11y-contrast :is(.backdrop-blur-sm, .backdrop-blur-md, .backdrop-blur-lg) {
+  backdrop-filter: none !important;
+  background-color: #ffffff !important;
+}
+
+html.a11y-contrast.dark :is(.backdrop-blur-sm, .backdrop-blur-md, .backdrop-blur-lg) {
+  background-color: #0b1120 !important;
+}
+
+/* --- highlight links ----------------------------------------------------
+   WCAG 1.4.1: colour alone must not be the only way to identify a link.
+   Off by default because the site's own styling is a design decision; on
+   demand it becomes unambiguous. */
+html.a11y-links a {
+  text-decoration: underline !important;
+  text-underline-offset: 2px;
+  outline: 1px dotted currentColor;
+  outline-offset: 2px;
+}
+
+/* --- readable font ------------------------------------------------------
+   'Sababa' is a display face carrying most of the site's Hebrew headings.
+   Swapping it for the system UI stack helps dyslexic readers and anyone
+   who finds the decorative letterforms hard going. */
+html.a11y-font,
+html.a11y-font :is(h1, h2, h3, h4, p, li, span, a, button, label, div) {
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Rubik,
+    Arial,
+    sans-serif !important;
+  letter-spacing: 0.01em;
+}
+
+/* A visible focus ring everywhere, not only where a component remembered to
+   add one. WCAG 2.4.7 — and the panel below is itself keyboard-driven. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid #ff0092;
+  outline-offset: 2px;
+}

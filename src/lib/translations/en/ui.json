@@ -91,5 +91,17 @@
     "mode_dark": "Night",
     "mode_system": "Device",
     "followingSystem": "Following your device — currently {{mode}}"
+  },
+  "a11y": {
+    "title": "Accessibility",
+    "skip": "Skip to main content",
+    "textSize": "Text size",
+    "contrast": "High contrast",
+    "links": "Highlight links",
+    "font": "Readable font",
+    "motionOn": "Motion: on",
+    "motionPaused": "Motion: paused",
+    "motionHidden": "Motion: hidden",
+    "reset": "Reset settings"
   }
 }
