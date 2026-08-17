@@ -553,5 +553,15 @@
     "thirdWayLabel": "Vídeo: la tercera vía",
     "close": "Cerrar"
   },
-  "pageUrl": "https://1lev1.com/?lang=es"
+  "pageUrl": "https://1lev1.com/?lang=es",
+  "motion": {
+    "label": "Control de movimiento",
+    "playing": "Movimiento activo",
+    "paused": "Movimiento en pausa",
+    "hidden": "Animación oculta",
+    "toPlay": "Activar el movimiento",
+    "toPause": "Pausar el movimiento",
+    "toHide": "Ocultar la animación",
+    "auto": "Volver al valor predeterminado"
+  }
 }

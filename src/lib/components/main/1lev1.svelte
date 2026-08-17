@@ -7,14 +7,22 @@ import Withlev from './withlev.svelte'
 import Rikma from './story/Rikma.svelte'
 import Fruit from './story/Fruit.svelte'
 import { T } from '@threlte/core'
+import { sceneAnimates, motionSpeed } from '$lib/stores/motion.js'
 let s = $state(true)
 onMount(()=>{
-  console.log("GLTFFF")
-
-    s = true;
-    setTimeout(function () {
-        s = false;
-    }, 4300);
+  // Someone who arrives with motion already quietened (paused by choice, an OS
+  // `prefers-reduced-motion`, or the professional theme) should meet the scene
+  // already composed rather than watch a frozen entrance: skip straight to the
+  // settled state instead of playing the fly-in.
+  if (!$sceneAnimates) {
+    s = false;
+    return;
+  }
+  s = true;
+  const id = setTimeout(function () {
+    s = false;
+  }, 4300);
+  return () => clearTimeout(id);
 })
 
 
@@ -49,9 +57,6 @@ let poz = $state({z:0, y:0, x:0});
 // ה-GLB הכבד (static/3d/כדור.glb ~45MB).
 const clamp01 = (x) => Math.min(1, Math.max(0, x))
 const smooth = (x) => x * x * (3 - 2 * x)
-const reduceMotion =
-  typeof window !== 'undefined' &&
-  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
 // מערכה 1 — פתיחה מינימליסטית: אין לוגו ואין גלובוס, רק נקודות בודדות
 // שנסחפות לאט (Rikma). כל השאר נכנס בהמשך הגלילה.
@@ -76,24 +81,28 @@ let heartSpin = 0
 
 let up = $state(true)
  useTask((delta) => {
-    if (heartRef && !reduceMotion) {
-      heartSpin += delta * 0.25
+    // 0 while paused, easing toward a slow drift once the visitor has been
+    // still. The ambient loops below are frame-stepped rather than delta-based,
+    // so the multiplier scales their step directly.
+    const speed = motionSpeed()
+    if (heartRef) {
+      heartSpin += delta * 0.25 * speed
       heartRef.rotation.y = heartSpin
     }
     if (s == false){
       ss =0
     if(poz.y < 2.5 && up == false){
-	poz.y += 0.01
+	poz.y += 0.01 * speed
 } else if(poz.y > -2.5){
 	up = true
-	poz.y -= 0.01
+	poz.y -= 0.01 * speed
 } else{
 	up = false
     poz.y = -2.49
 }
-   
+
   if(isHovering == false){
-	rotationt += 0.01
+	rotationt += 0.01 * speed
   } else{
     rotationt = 0
 

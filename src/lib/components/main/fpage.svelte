@@ -13,6 +13,8 @@
   import VideoModal from '$lib/components/main/VideoModal.svelte';
   import DemoRequest from '$lib/components/main/DemoRequest.svelte';
   import ResizeHandler from '$lib/components/ResizeHandler.svelte';
+  import MotionControl from '$lib/components/main/MotionControl.svelte';
+  import { sceneVisible, noteMotionActivity } from '$lib/stores/motion.js';
   import { useProgress } from '@threlte/extras';
   import CircleProgresBar from '$lib/celim/ui/circleProgresBar.svelte';
   import { lang, langUs, doesLang } from '$lib/stores/lang';
@@ -183,6 +185,12 @@
   {image}
   url={$t('home.pageUrl')}
 />
+
+<!-- Waking the scene is a page-wide concern, so it listens on the window rather
+     than on the scroll container: moving the pointer over the 3D half counts as
+     engagement just as much as scrolling the text does. Keyboard scrolling
+     already surfaces as a scroll event, which calls the same function. -->
+<svelte:window onpointermove={noteMotionActivity} />
 {#snippet utilityNav(compact = false)}
   {#if trans === false}
     <button type="button" onclick={() => (trans = !trans)}>
@@ -366,9 +374,15 @@
   dir={$isRtl ? 'rtl' : 'ltr'}
   class="relative h-screen w-screen overflow-hidden bg-[length:200%_auto] animate-gradientx bg-gradient-to-br from-[#e0e7ff] via-[#f3e8ff] to-[#e0e7ff]"
 >
-  <!-- 3D Scene Background -->
+  <!-- 3D Scene Background.
+       `aria-hidden`: the scene is decoration — it restates in pictures what the
+       content panel says in words, and a screen reader announcing a bare canvas
+       would only add noise. It is unmounted entirely (not merely frozen) when
+       the visitor chooses "hide", so its GLB models are never fetched. -->
+  {#if $sceneVisible}
   <div
     id="levi"
+    aria-hidden="true"
     bind:clientHeight={h}
     bind:clientWidth={w}
     class:flex={$progress == 1}
@@ -405,12 +419,16 @@
       </Canvas>
     </div>
   </div>
+  {/if}
 
   <!-- Main Scrollable Content -->
   <div
     id="text"
     class="relative d z-10 w-full h-screen overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-barbi scrollbar-track-transparent"
     onscroll={(e) => {
+      // Engaging with the page is what tells us the movement is still wanted;
+      // going quiet is what lets the scene ease down. See $lib/stores/motion.js.
+      noteMotionActivity();
       scrolli = true;
       const el = e.currentTarget;
       const max = el.scrollHeight - el.clientHeight;
@@ -1724,6 +1742,11 @@
       </div>
     </div>
   </div>
+
+  <!-- Pause / hide the scene. Rendered outside the `{#if $sceneVisible}` block
+       above on purpose: the control that hides the artwork is also the only way
+       back to it. -->
+  <MotionControl />
 
   <!-- Float Buttons Desktop -->
   <div

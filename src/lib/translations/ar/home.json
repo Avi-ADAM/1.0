@@ -552,5 +552,15 @@
     "thirdWayLabel": "فيديو: الطريق الثالث",
     "close": "إغلاق"
   },
-  "pageUrl": "https://1lev1.com/?lang=ar"
+  "pageUrl": "https://1lev1.com/?lang=ar",
+  "motion": {
+    "label": "التحكم في الحركة",
+    "playing": "الحركة مفعّلة",
+    "paused": "الحركة متوقفة",
+    "hidden": "الرسوم المتحركة مخفية",
+    "toPlay": "تشغيل الحركة",
+    "toPause": "إيقاف الحركة مؤقتاً",
+    "toHide": "إخفاء الرسوم المتحركة",
+    "auto": "العودة إلى الوضع الافتراضي"
+  }
 }

@@ -552,5 +552,15 @@
     "thirdWayLabel": "Video: the third way",
     "close": "Close"
   },
-  "pageUrl": "https://1lev1.com/?lang=en"
+  "pageUrl": "https://1lev1.com/?lang=en",
+  "motion": {
+    "label": "Motion control",
+    "playing": "Motion on",
+    "paused": "Motion paused",
+    "hidden": "Animation hidden",
+    "toPlay": "Turn motion on",
+    "toPause": "Pause the motion",
+    "toHide": "Hide the animation",
+    "auto": "Back to the default"
+  }
 }
