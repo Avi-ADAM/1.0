@@ -52,10 +52,10 @@
   );
 </script>
 
-<!-- `left-3`, not the logical `start-3`: the NagishLi toolbar is pinned to the
-     bottom-right corner (nl_pos='br' in app.html), and a logical property would
-     swing this control into that same corner on the Hebrew and Arabic renders.
-     A physical side keeps the two apart in every language. -->
+<!-- `left-3`, not the logical `start-3`: the site-wide accessibility panel is
+     pinned to the bottom-right corner, and a logical property would swing this
+     control into that same corner on the Hebrew and Arabic renders. A physical
+     side keeps the two apart in every language. -->
 <div
   class="fixed bottom-20 sm:bottom-4 left-3 z-[700] print:hidden"
   role="group"

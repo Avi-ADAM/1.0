@@ -144,13 +144,10 @@ regHelperL = 0;
   />
   <meta property="og:type" content="website" />
   <!-- The vendored NagishLi toolbar used to be loaded here, for this page alone
-       out of ~90. It never actually ran: the library needs a `<nagishli>`
-       element in the body that no page provides, and it pulls jQuery 1.8.0
-       (2012) off a CDN when none is present. Accessibility controls now come
-       from $lib/components/a11y/AccessibilityPanel.svelte, mounted in the root
-       layout, so every page has them and no third-party script is involved.
-       static/nagishli.js and static/nl-files/ are left in place, unreferenced,
-       in case the widget is ever revisited. -->
+       out of ~90, and it never actually ran. It has been removed along with its
+       assets; accessibility controls now come from
+       $lib/components/a11y/AccessibilityPanel.svelte, mounted in the root
+       layout, so every page has them and no third-party script is involved. -->
 </svelte:head>
 
 <svelte:window onbeforeunload={reportExit} />

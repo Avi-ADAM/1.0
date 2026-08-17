@@ -5,12 +5,12 @@ import { browser } from '$app/environment';
  * a11y.js — the visitor's display preferences, the ones an accessibility
  * toolbar exists to offer.
  *
- * The site vendored NagishLi (`static/nagishli.js`, v2.3, 2019) and loaded it
- * from a single route, but it never ran on any page: the library needs a
- * `<nagishli>` element in the body, which no page has, and it pulls jQuery
- * 1.8.0 (2012) off a CDN when none is present. Rather than adopt a
- * seven-year-old dependency with known advisories on every page, these are the
- * controls it would have offered, implemented natively:
+ * The site used to vendor NagishLi (v2.3, 2019) and load it from a single
+ * route, but it never ran on any page: the library appends into a `<nagishli>`
+ * element that no page provided, and it pulled jQuery 1.8.0 (2012) off a CDN
+ * when none was present. Rather than adopt a seven-year-old dependency with
+ * known advisories on every page, it was removed and these are the controls it
+ * would have offered, implemented natively:
  *
  *   textScale       three steps of body text size
  *   contrast        a high-contrast pass over the palette

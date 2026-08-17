@@ -1,13 +1,13 @@
 <!--
   AccessibilityPanel.svelte — the site-wide accessibility toolbar.
 
-  Replaces the vendored NagishLi widget, which was loaded from exactly one
-  route and never ran on any of them: the library needs a `<nagishli>` element
-  in the body that no page provides, and it injects jQuery 1.8.0 (2012) from a
-  CDN when none is present. The controls below are the ones it would have
-  offered, without taking on a seven-year-old dependency with known advisories
-  on every page — and unlike the widget, they work in all five of the site's
-  languages and follow its RTL layout.
+  Replaces the vendored NagishLi widget (removed in the same change), which was
+  loaded from exactly one route out of ~90 and never ran on any of them: the
+  library appends into a `<nagishli>` element that no page provided, and it
+  injected jQuery 1.8.0 (2012) from a CDN when none was present. The controls
+  below are the ones it would have offered, without taking on a seven-year-old
+  dependency with known advisories on every page — and unlike the widget, they
+  work in all five of the site's languages and follow its RTL layout.
 
   Mounted from the root layout, so it is present on every page rather than one.
 
