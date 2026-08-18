@@ -14,18 +14,18 @@
   const tr = {
     he: {
       hello: 'ברוכים הבאים',
-      sub: 'ההרשמה הושלמה 🎉 עדיין אין כאן פעילות — ככה מתחילים בשלושה צעדים:',
+      sub: 'ההרשמה הושלמה 🎉 עדיין אין כאן פעילות - ככה מתחילים בשלושה צעדים:',
       steps: [
         {
           icon: '🚀',
           title: 'בונים פרופיל או מקימים ריקמה',
-          desc: 'כ־4 דקות — אפשר להעלות קורות חיים או אתר קיים וה־AI ימלא בשבילכם',
+          desc: 'כ־4 דקות - אפשר להעלות קורות חיים או אתר קיים וה־AI ימלא בשבילכם',
           href: '/onboard',
           cta: 'להתחלה'
         },
         {
           icon: '🤖',
-          title: 'מכירים את Lev — העוזר החכם',
+          title: 'מכירים את Lev - העוזר החכם',
           desc: 'מנווט, פותח משימות ועונה על כל שאלה על המערכת',
           href: '/chat',
           cta: 'לשיחה עם Lev'
@@ -41,18 +41,18 @@
     },
     en: {
       hello: 'Welcome',
-      sub: "You're in 🎉 Nothing here yet — here's how to start in three steps:",
+      sub: "You're in 🎉 Nothing here yet - here's how to start in three steps:",
       steps: [
         {
           icon: '🚀',
           title: 'Build your profile or start a partnership',
-          desc: 'About 4 minutes — upload a CV or a website and the AI fills it in for you',
+          desc: 'About 4 minutes - upload a CV or a website and the AI fills it in for you',
           href: '/onboard',
           cta: 'Start'
         },
         {
           icon: '🤖',
-          title: 'Meet Lev — the smart assistant',
+          title: 'Meet Lev - the smart assistant',
           desc: 'Navigates, opens missions and answers any question about the system',
           href: '/chat',
           cta: 'Talk to Lev'
@@ -68,18 +68,18 @@
     },
     ar: {
       hello: 'مرحباً بك',
-      sub: 'أنت هنا 🎉 لا يوجد شيء بعد — إليك كيفية البدء في ثلاث خطوات:',
+      sub: 'أنت هنا 🎉 لا يوجد شيء بعد - إليك كيفية البدء في ثلاث خطوات:',
       steps: [
         {
           icon: '🚀',
           title: 'بناء ملفك الشخصي أو إطلاق شراكة',
-          desc: 'نحو 4 دقائق — حمّل سيرتك الذاتية أو موقعك الحالي وسيملأ الذكاء الاصطناعي البقية',
+          desc: 'نحو 4 دقائق - حمّل سيرتك الذاتية أو موقعك الحالي وسيملأ الذكاء الاصطناعي البقية',
           href: '/onboard',
           cta: 'ابدأ'
         },
         {
           icon: '🤖',
-          title: 'تعرف على Lev — المساعد الذكي',
+          title: 'تعرف على Lev - المساعد الذكي',
           desc: 'يتنقل ويفتح المهام ويجيب على أي سؤال حول النظام',
           href: '/chat',
           cta: 'تحدث إلى Lev'
@@ -95,18 +95,18 @@
     },
     ru: {
       hello: 'Добро пожаловать',
-      sub: 'Вы здесь 🎉 Пока ничего нет — вот как начать за три шага:',
+      sub: 'Вы здесь 🎉 Пока ничего нет - вот как начать за три шага:',
       steps: [
         {
           icon: '🚀',
           title: 'Создайте профиль или запустите партнёрство',
-          desc: 'Около 4 минут — загрузите резюме или сайт, и ИИ заполнит всё за вас',
+          desc: 'Около 4 минут - загрузите резюме или сайт, и ИИ заполнит всё за вас',
           href: '/onboard',
           cta: 'Начать'
         },
         {
           icon: '🤖',
-          title: 'Познакомьтесь с Lev — умным помощником',
+          title: 'Познакомьтесь с Lev - умным помощником',
           desc: 'Навигирует, открывает задания и отвечает на любой вопрос о системе',
           href: '/chat',
           cta: 'Поговорить с Lev'

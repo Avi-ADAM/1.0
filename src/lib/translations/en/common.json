@@ -47,13 +47,13 @@
     "tasks": "Tasks",
     "specialNotes": "Special notes",
     "name": "Name",
-    "unlimitedPerUnit": "Per unit — unlimited",
+    "unlimitedPerUnit": "Per unit - unlimited",
     "oneProductPerProject": "One product per project",
     "whatDoYouNeed": "What do you need"
   },
   "chat": {
     "sent": "Your message was sent successfully",
-    "error": "Error — please try again. If the problem continues, contact baruch@1lev1.com",
+    "error": "Error - please try again. If the problem continues, contact baruch@1lev1.com",
     "missionChat": "Chat on a mission in progress",
     "backToList": "Back to the chat list",
     "cancel": "Cancel",
@@ -154,7 +154,7 @@
   },
   "misc": {
     "loadingData": "Loading data...",
-    "genericError": "Error — please try again. If the problem continues, contact baruch@1lev1.com",
+    "genericError": "Error - please try again. If the problem continues, contact baruch@1lev1.com",
     "profile": "Profile",
     "urgencyNormal": "Normal",
     "urgencyLow": "Low",

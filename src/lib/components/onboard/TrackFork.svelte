@@ -36,8 +36,8 @@
     </span>
     <span class="plaque-sub">
       {$lang === 'en'
-        ? 'Choose your track — you can change it later'
-        : 'בחרו את המסלול שלכם — אפשר לשנות אחר כך'}
+        ? 'Choose your track - you can change it later'
+        : 'בחרו את המסלול שלכם - אפשר לשנות אחר כך'}
     </span>
   </div>
 
@@ -68,7 +68,7 @@
     class="skip-link"
     in:fly={{ y: 10, duration: 400, delay: 500, easing: quintOut }}
   >
-    {$lang === 'en' ? 'Skip — go to profile' : 'דלגו — עברו לפרופיל'}
+    {$lang === 'en' ? 'Skip - go to profile' : 'דלגו - עברו לפרופיל'}
   </a>
 </div>
 

@@ -419,7 +419,7 @@
             <span class="mx-1">
               {effStart ? new Date(effStart).toLocaleDateString($lang) : '—'}
               {#if effEnd}
-                – {new Date(effEnd).toLocaleDateString($lang)}
+                - {new Date(effEnd).toLocaleDateString($lang)}
               {/if}
             </span>
           </div>

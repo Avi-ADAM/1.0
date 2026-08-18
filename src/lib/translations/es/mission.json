@@ -155,7 +155,7 @@
     "clearFilters": "Limpiar filtros",
     "filterByStatus": "Filtrar por estado",
     "filterByRole": "Filtrar por rol",
-    "showingRange": "Mostrando {{from}}–{{to}} de {{total}}",
+    "showingRange": "Mostrando {{from}}-{{to}} de {{total}}",
     "perPage": "Filas por página",
     "prevPage": "Anterior",
     "nextPage": "Siguiente",
@@ -174,7 +174,7 @@
     "rowMenu": "Acciones de la tarea",
     "openTask": "Abrir tarea",
     "decline": "Devolverla al grupo",
-    "declineHint": "No seré yo — la tarea vuelve a quedar pendiente para quien quiera tomarla",
+    "declineHint": "No seré yo - la tarea vuelve a quedar pendiente para quien quiera tomarla",
     "confirmDecline": "¿Devolver esta tarea al grupo de tareas sin asignar?",
     "openingForm": "Abriendo el formulario de misión…"
   },

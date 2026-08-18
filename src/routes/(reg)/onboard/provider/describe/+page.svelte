@@ -41,7 +41,7 @@
       saveCvDraft(result, 'describe');
       goto('/onboard/provider/review');
     } catch (e) {
-      error = /** @type {any} */ (e)?.message || 'שגיאה — נסו שוב';
+      error = /** @type {any} */ (e)?.message || 'שגיאה - נסו שוב';
       submitting = false;
     }
   }

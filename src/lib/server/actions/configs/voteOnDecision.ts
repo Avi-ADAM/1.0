@@ -67,7 +67,7 @@ async function handleSaleClaimVote(
     (v) => String(v.userId) === userId && Number(v.order) === order && v.what,
   );
   if (alreadySigned) {
-    throw new Error('You already agreed to the current version — waiting for the other side');
+    throw new Error('You already agreed to the current version - waiting for the other side');
   }
 
   // Append this YES vote to the standing round.
@@ -206,8 +206,8 @@ async function handleObjectChangeVote(
                     : 'Approved unanimously and applied.',
                 }
               : {
-                  he: 'חבר נוסף חתם על הגרסה העומדת — נותרת תגובתך.',
-                  en: 'Another member signed the standing version — yours is still open.',
+                  he: 'חבר נוסף חתם על הגרסה העומדת - נותרת תגובתך.',
+                  en: 'Another member signed the standing version - yours is still open.',
                 },
           },
           channels: ['socket'],
@@ -260,7 +260,7 @@ const voteOnDecisionHandler: ActionExecutionHandler = async (params, context, { 
   if (!decisionData) throw new Error(`Decision ${decisionId} not found`);
 
   if (decisionData.attributes.archived) {
-    throw new Error('Decision is already archived — voting is closed');
+    throw new Error('Decision is already archived - voting is closed');
   }
 
   // 2. Fetch project members for consensus check

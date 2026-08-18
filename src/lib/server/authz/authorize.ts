@@ -58,7 +58,7 @@ function unrestricted(list: string[] | undefined): boolean {
 export function authorizeOperation(principal: Principal, op: string): AuthzDecision {
   const sep = op.indexOf(':');
   if (sep <= 0 || sep === op.length - 1) {
-    return denied(`Malformed operation "${op}" — expected send:<qid> or action:<actionKey>`);
+    return denied(`Malformed operation "${op}" - expected send:<qid> or action:<actionKey>`);
   }
   const ns = op.slice(0, sep);
   const key = op.slice(sep + 1);

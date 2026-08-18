@@ -294,7 +294,7 @@ async function syncNamespace(
 
     console.log(`[${namespace}] שולח ${records.length} records ל-Pinecone...`);
     console.log(`first record:`, JSON.stringify(records[0]).slice(0, 200));
-    console.log(`[${namespace}] sample record — id: ${records[0]?.id}, vector length: ${records[0]?.values?.length}`);
+    console.log(`[${namespace}] sample record - id: ${records[0]?.id}, vector length: ${records[0]?.values?.length}`);
 
     await upsertVectors(namespace, records);
     console.log(`[${namespace}] ✓ הועלו ${records.length} vectors`);

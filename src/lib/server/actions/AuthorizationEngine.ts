@@ -448,7 +448,7 @@ export class AuthorizationEngine {
     }
 
     console.error(
-      `Role-based authorization is not implemented — denying by default. ` +
+      `Role-based authorization is not implemented - denying by default. ` +
       `Required role: ${requiredRole}, User: ${userId}`
     );
 

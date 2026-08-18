@@ -53,12 +53,12 @@
           onlyPartOfHelp:
             'המשימה תיווצר כסקיצה (onlyPartOf=true) ותופעל כשמישהו יקנה את המוצר',
           pendmFlow:
-            '⚠ פרויקט עם 2+ חברים — כל משימה חדשה תיווצר ראשית כ-pendm להצבעה',
-          singleFlow: '👤 חבר יחיד בפרויקט — המשימה תיווצר ישירות אצלך',
+            '⚠ פרויקט עם 2+ חברים - כל משימה חדשה תיווצר ראשית כ-pendm להצבעה',
+          singleFlow: '👤 חבר יחיד בפרויקט - המשימה תיווצר ישירות אצלך',
           ownerFromExisting: 'הבעלים יורש מהמשימה הקיימת',
           fullDetails: '⚙ פרטים מלאים (כישורים, תפקיד, הערות...)',
           fullDetailsSet: '✓ פרטים מלאים נשמרו',
-          detailsSubtitle: 'אופציונלי — אפשר להשאיר ריק ולהמשיך'
+          detailsSubtitle: 'אופציונלי - אפשר להשאיר ריק ולהמשיך'
         }
       : {
           empty: 'No missions yet. Add a row to start pricing.',
@@ -84,13 +84,13 @@
           onlyPartOfHelp:
             'The mission will be created as a draft (onlyPartOf=true) and activated when someone buys the product',
           pendmFlow:
-            '⚠ Multi-member project — every new mission first becomes a pendm for vote',
+            '⚠ Multi-member project - every new mission first becomes a pendm for vote',
           singleFlow:
-            '👤 Single project member — the mission will be created directly under you',
+            '👤 Single project member - the mission will be created directly under you',
           ownerFromExisting: 'Owner is inherited from the existing mission',
           fullDetails: '⚙ Full details (skills, role, notes...)',
           fullDetailsSet: '✓ Full details saved',
-          detailsSubtitle: 'optional — you can skip and continue'
+          detailsSubtitle: 'optional - you can skip and continue'
         }
   );
 
@@ -367,7 +367,7 @@
           <div class="warning">⚠ {t.unassignedWarning}</div>
         {/if}
       {:else if r.mesimabetahalichId}
-        <div class="info-line">👤 {memberLabel(r.assignedMemberId)} — {t.ownerFromExisting}</div>
+        <div class="info-line">👤 {memberLabel(r.assignedMemberId)} - {t.ownerFromExisting}</div>
       {/if}
 
       <div class="row-foot">

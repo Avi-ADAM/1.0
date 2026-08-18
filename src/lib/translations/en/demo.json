@@ -10,10 +10,10 @@
     "title": "A personal demo, no commitment",
     "lead": "In a short call we'll show you how an idea or an existing partnership becomes a transparent model of contributions, missions and profit sharing.",
     "cta": "Book my personal demo",
-    "secondary": "I have questions — let's talk"
+    "secondary": "I have questions - let's talk"
   },
   "track": {
-    "title": "So the demo is actually relevant — which is closest to you?",
+    "title": "So the demo is actually relevant - which is closest to you?",
     "idea": "I have an idea for a venture",
     "partnership": "I already have a partnership",
     "provider": "I provide a service and I'm looking for ventures",
@@ -21,18 +21,18 @@
   },
   "mode": {
     "title": "Great. How would you like to continue?",
-    "lead": "In the demo we'll show exactly how 1💗1 fits your situation — contribution splits, missions, decision-making and bringing partners on board.",
+    "lead": "In the demo we'll show exactly how 1💗1 fits your situation - contribution splits, missions, decision-making and bringing partners on board.",
     "scheduled": "Book a time for a 20-minute demo",
     "scheduledSub": "You say when it suits you, we'll arrange it",
     "flexible": "Let me drop in whenever it suits me",
-    "flexibleSub": "We'll open a personal meeting room — walk in when you like, no sign-up",
+    "flexibleSub": "We'll open a personal meeting room - walk in when you like, no sign-up",
     "callback": "Leave my details and get back to me",
     "callbackSub": "Nothing to schedule right now",
     "recorded": "Watch a recorded demo first",
-    "recordedSub": "See it on your own — and if you'd like, we'll talk after"
+    "recordedSub": "See it on your own - and if you'd like, we'll talk after"
   },
   "watch": {
-    "title": "Of course — here's the recorded demo",
+    "title": "Of course - here's the recorded demo",
     "desc": "The video walks through 1💗1 end to end. If you'd like to talk afterwards, we're here.",
     "cta": "Watch the demo",
     "instead": "Leave my details anyway"
@@ -46,33 +46,33 @@
     "emailPh": "you@example.com",
     "phone": "Phone",
     "phonePh": "+1 555 000 0000",
-    "contactHint": "Either one is enough — email or phone",
+    "contactHint": "Either one is enough - email or phone",
     "goal": "In a few words: what would you like to build or solve?",
     "goalPh": "Who's already involved, and what's missing to get started",
     "optional": "optional",
     "time": "Preferred time",
-    "timePh": "e.g. Mon–Wed after 6pm",
+    "timePh": "e.g. Mon-Wed after 6pm",
     "submit": "Book my personal demo",
     "submitCallback": "Take my details and get back to me",
     "sending": "One moment…",
     "errName": "We need a name so we know how to address you",
-    "errContact": "We need an email or a phone — either one is enough",
+    "errContact": "We need an email or a phone - either one is enough",
     "errEmail": "That email address doesn't look right",
     "errSend": "Something went wrong sending this. Try again?"
   },
   "thanks": {
     "title": "Got your details, thank you.",
     "body": "We'll get back to you to arrange a personal demo of about 20 minutes. If you'd like, you can already write us one sentence about what you'd like to create, who's involved and what's missing to get started.",
-    "meeting": "Your meeting room is ready — walk in whenever it suits you, no sign-up:",
+    "meeting": "Your meeting room is ready - walk in whenever it suits you, no sign-up:",
     "meetingCta": "Enter the meeting",
-    "meetingHint": "Keep the link — it's also on its way to the email you left.",
+    "meetingHint": "Keep the link - it's also on its way to the email you left.",
     "whatsapp": "Message me on WhatsApp",
     "explore": "In the meantime, take a look at the active rikmot and the live demo on the site.",
     "exploreCta": "See the active rikmot",
     "done": "Close"
   },
   "bot": {
-    "intro": "Hi — I'm here to help you find the right way to start with 1💗1. What would you like to do?",
+    "intro": "Hi - I'm here to help you find the right way to start with 1💗1. What would you like to do?",
     "demo": "See a personal demo",
     "register": "Start a rikma / sign up",
     "question": "I have a question",

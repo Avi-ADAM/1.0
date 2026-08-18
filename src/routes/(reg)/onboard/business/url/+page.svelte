@@ -56,7 +56,7 @@
       stashSeedPlan(body?.plan, 'url');
       toMeWithPrefill({ ...body, url: url.trim() });
     } catch (e) {
-      error = /** @type {any} */ (e)?.message || 'שגיאה — נסי שוב';
+      error = /** @type {any} */ (e)?.message || 'שגיאה - נסי שוב';
       submitting = false;
     }
   }

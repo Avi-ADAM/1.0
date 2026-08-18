@@ -579,12 +579,12 @@ const createResourceHandler: ActionExecutionHandler = async (params, context, { 
         };
     const body = selfProposal
       ? {
-          he: `${creatorName} הציע/ה בריקמה "${projectName}" את המשאב "${name}"${isReceived ? ' — שכבר סופק על ידו/ה' : ' ומציע/ה לספק אותו בעצמו/ה'}. במהלך ${restimeHe} של זמן התגובה אפשר לאשר, לפתוח שיחה או להציע גרסה מדויקת משלך — ההצעה האחרונה שעל השולחן מאושרת אוטומטית בתום הזמן. לחצו להצבעה.`,
-          en: `${creatorName} proposed the resource "${name}" in the "${projectName}" rikma${isReceived ? ' — already delivered by them' : ' and offers to provide it themselves'}. During the ${restimeEn} response window you can approve, open a discussion or counter with your own refined version — the last version on the table is auto-approved when time runs out. Tap to vote.`,
+          he: `${creatorName} הציע/ה בריקמה "${projectName}" את המשאב "${name}"${isReceived ? ' - שכבר סופק על ידו/ה' : ' ומציע/ה לספק אותו בעצמו/ה'}. במהלך ${restimeHe} של זמן התגובה אפשר לאשר, לפתוח שיחה או להציע גרסה מדויקת משלך - ההצעה האחרונה שעל השולחן מאושרת אוטומטית בתום הזמן. לחצו להצבעה.`,
+          en: `${creatorName} proposed the resource "${name}" in the "${projectName}" rikma${isReceived ? ' - already delivered by them' : ' and offers to provide it themselves'}. During the ${restimeEn} response window you can approve, open a discussion or counter with your own refined version - the last version on the table is auto-approved when time runs out. Tap to vote.`,
         }
       : {
-          he: `${creatorName} הציע/ה בריקמה "${projectName}" את המשאב "${name}". במהלך ${restimeHe} של זמן התגובה אפשר לאשר, לפתוח שיחה או להציע גרסה מדויקת משלך — ההצעה משתנה כרצונך וההצעה האחרונה שעל השולחן מאושרת אוטומטית בתום הזמן. לחצו להצבעה.`,
-          en: `${creatorName} proposed the resource "${name}" in the "${projectName}" rikma. During the ${restimeEn} response window you can approve, open a discussion or counter with your own refined version — the proposal is yours to shape, and the last version on the table is auto-approved when time runs out. Tap to vote.`,
+          he: `${creatorName} הציע/ה בריקמה "${projectName}" את המשאב "${name}". במהלך ${restimeHe} של זמן התגובה אפשר לאשר, לפתוח שיחה או להציע גרסה מדויקת משלך - ההצעה משתנה כרצונך וההצעה האחרונה שעל השולחן מאושרת אוטומטית בתום הזמן. לחצו להצבעה.`,
+          en: `${creatorName} proposed the resource "${name}" in the "${projectName}" rikma. During the ${restimeEn} response window you can approve, open a discussion or counter with your own refined version - the proposal is yours to shape, and the last version on the table is auto-approved when time runs out. Tap to vote.`,
         };
 
     notifier

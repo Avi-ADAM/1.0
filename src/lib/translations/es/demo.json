@@ -10,10 +10,10 @@
     "title": "Una demo personal, sin compromiso",
     "lead": "En una charla corta te mostramos cómo una idea o una sociedad existente se convierte en un modelo transparente de aportes, misiones y reparto de ganancias.",
     "cta": "Agendar mi demo personal",
-    "secondary": "Tengo preguntas — hablemos"
+    "secondary": "Tengo preguntas - hablemos"
   },
   "track": {
-    "title": "Para que la demo sea relevante — ¿qué es lo más cercano a ti?",
+    "title": "Para que la demo sea relevante - ¿qué es lo más cercano a ti?",
     "idea": "Tengo una idea para un proyecto",
     "partnership": "Ya tengo una sociedad",
     "provider": "Ofrezco un servicio y busco proyectos",
@@ -51,7 +51,7 @@
     "goalPh": "Quién participa ya y qué te falta para empezar",
     "optional": "opcional",
     "time": "Horario preferido",
-    "timePh": "por ejemplo: lun–mié después de las 18:00",
+    "timePh": "por ejemplo: lun-mié después de las 18:00",
     "submit": "Agendar mi demo personal",
     "submitCallback": "Toma mis datos y contáctame",
     "sending": "Un momento…",

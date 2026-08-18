@@ -104,8 +104,8 @@
   let pageTitle = $derived(
     attrs?.projectName
       ? $lang === 'he'
-        ? `${attrs.projectName} — הצטרפות`
-        : `${attrs.projectName} — Join`
+        ? `${attrs.projectName} - הצטרפות`
+        : `${attrs.projectName} - Join`
       : '1💗1'
   );
 </script>
@@ -115,8 +115,8 @@
   <meta
     name="description"
     content={$lang === 'he'
-      ? `הציעו את עצמכם לריקמה ${attrs?.projectName ?? ''} — בתנאים שלכם`
-      : `Nominate yourself to ${attrs?.projectName ?? ''} — on your own terms`}
+      ? `הציעו את עצמכם לריקמה ${attrs?.projectName ?? ''} - בתנאים שלכם`
+      : `Nominate yourself to ${attrs?.projectName ?? ''} - on your own terms`}
   />
 </svelte:head>
 

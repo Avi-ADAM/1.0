@@ -32,7 +32,7 @@ const applyToMissionHandler: ActionExecutionHandler = async (params, context, { 
 
     const ratsonId = omAttrs.ratson?.data?.id ? String(omAttrs.ratson.data.id) : null;
     if (!ratsonId) {
-      throw new Error('This mission has no project and no linked wish — cannot apply');
+      throw new Error('This mission has no project and no linked wish - cannot apply');
     }
 
     // Load the wish so we can (a) link this offer to the exact extracted need it

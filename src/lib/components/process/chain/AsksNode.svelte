@@ -8,7 +8,7 @@
 
   const i18n = {
     he: {
-      countLabel:    (n) => `${n} בקשות — לחץ להרחבה`,
+      countLabel:    (n) => `${n} בקשות - לחץ להרחבה`,
       collapseLabel: 'כווץ בקשות',
       asks:          'בקשות',
       noAsks:        'אין בקשות',
@@ -16,7 +16,7 @@
       noForum:       'אין פורום'
     },
     en: {
-      countLabel:    (n) => `${n} ${n === 1 ? 'ask' : 'asks'} — expand`,
+      countLabel:    (n) => `${n} ${n === 1 ? 'ask' : 'asks'} - expand`,
       collapseLabel: 'Collapse',
       asks:          'Asks',
       noAsks:        'No asks',
@@ -24,7 +24,7 @@
       noForum:       'No forum'
     },
     ar: {
-      countLabel:    (n) => `${n} طلبات — توسيع`,
+      countLabel:    (n) => `${n} طلبات - توسيع`,
       collapseLabel: 'طي',
       asks:          'طلبات',
       noAsks:        'لا توجد طلبات',

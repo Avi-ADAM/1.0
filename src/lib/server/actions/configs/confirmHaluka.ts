@@ -132,7 +132,7 @@ export const confirmHalukaConfig: ActionConfig = {
     kind: {
       type: 'string',
       required: true,
-      description: '"send" — sender confirms; "receive" — receiver confirms',
+      description: '"send" - sender confirms; "receive" - receiver confirms',
     },
   },
 

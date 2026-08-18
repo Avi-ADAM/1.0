@@ -43,14 +43,14 @@ export const planProjectWorkTool = createTool({
   id: 'planProjectWorkTool',
   description:
     'Turn a free-text brief into a planning board for a project: proposed missions, chores (acts) and resources, deduplicated against what the project already has. ' +
-    'Nothing is created — the tool returns a reviewUrl where the user approves each row in the real form. ' +
+    'Nothing is created - the tool returns a reviewUrl where the user approves each row in the real form. ' +
     'Use this when the user describes something they want the project to achieve. Requires a projectId (use findUserProjectsTool first if unknown).',
   inputSchema: z.object({
     projectId: z.string().describe('ID of the project to plan for.'),
     text: z
       .string()
       .describe(
-        'What the user wants to advance, in their own words. At least ~20 characters — the richer the brief, the better the breakdown.'
+        'What the user wants to advance, in their own words. At least ~20 characters - the richer the brief, the better the breakdown.'
       ),
     title: z.string().optional().describe('Optional title for the board; otherwise one is suggested.')
   }),
@@ -104,7 +104,7 @@ export const planProjectWorkTool = createTool({
         navigation: { url: reviewUrl, pageName: 'Planning board' },
         message:
           `Drafted a plan "${boardTitle}" with ${itemCount} proposed item(s).${dupNote} ` +
-          `Nothing has been created yet — the user reviews and approves each row at ${reviewUrl}.`
+          `Nothing has been created yet - the user reviews and approves each row at ${reviewUrl}.`
       };
     } catch (error: any) {
       console.error('❌ planProjectWorkTool error:', error);
@@ -118,7 +118,7 @@ export const planProjectWorkTool = createTool({
 export const scanProjectDirectionsTool = createTool({
   id: 'scanProjectDirectionsTool',
   description:
-    "Cheaply scan a project's real current state and propose a few DIRECTIONS for advancing it — strategic angles, not task lists. " +
+    "Cheaply scan a project's real current state and propose a few DIRECTIONS for advancing it - strategic angles, not task lists. " +
     'Use this when the user asks something open-ended like "what should we do next?" or "how do we move this forward?" and has not described a specific goal. ' +
     'These are saved as suggested directions only: nothing is created, and no mission, chore or resource comes out of this call. ' +
     'To break one direction down into concrete missions and resources afterwards, the user opens it on the returned reviewUrl and approves each row there. Requires a projectId.',

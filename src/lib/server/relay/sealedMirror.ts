@@ -28,7 +28,7 @@ let warned = false;
 function warnOnce(what: string, e: unknown) {
   if (warned) return;
   warned = true;
-  console.warn(`[relay/sealedMirror] ${what} failed — running memory-only:`, e);
+  console.warn(`[relay/sealedMirror] ${what} failed - running memory-only:`, e);
 }
 
 class ReqError extends Error {
@@ -56,7 +56,7 @@ async function req(path: string, init?: RequestInit): Promise<unknown> {
       throw new ReqError(
         res.status,
         detail,
-        `${init?.method ?? 'GET'} ${path} → ${res.status}${detail ? ` — ${detail.slice(0, 500)}` : ''}`
+        `${init?.method ?? 'GET'} ${path} → ${res.status}${detail ? ` - ${detail.slice(0, 500)}` : ''}`
       );
     }
     return await res.json();

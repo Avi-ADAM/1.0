@@ -15,7 +15,7 @@
   const i18n = {
     he: {
       product: 'מוצר',
-      recipe: 'מתכון המוצר — משימות ומשאבים',
+      recipe: 'מתכון המוצר - משימות ומשאבים',
       recipeMissions: 'משימות במתכון',
       recipeResources: 'משאבים במתכון',
       sales: 'מכירות',
@@ -52,7 +52,7 @@
     },
     en: {
       product: 'Product',
-      recipe: 'Product recipe — missions & resources',
+      recipe: 'Product recipe - missions & resources',
       recipeMissions: 'Recipe missions',
       recipeResources: 'Recipe resources',
       sales: 'Sales',
@@ -89,7 +89,7 @@
     },
     ar: {
       product: 'منتج',
-      recipe: 'وصفة المنتج — مهام وموارد',
+      recipe: 'وصفة المنتج - مهام وموارد',
       recipeMissions: 'مهام الوصفة',
       recipeResources: 'موارد الوصفة',
       sales: 'مبيعات',

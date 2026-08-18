@@ -408,7 +408,7 @@ export async function expandDirection(
   let usedFallback = false;
 
   if (items.length === 0) {
-    console.warn('[expandDirection] planning agent produced no rows — falling back to concierge');
+    console.warn('[expandDirection] planning agent produced no rows - falling back to concierge');
     const fb = await fallbackToConcierge(brief, options.apiKey);
     items = fb.items;
     hints = fb.hints;

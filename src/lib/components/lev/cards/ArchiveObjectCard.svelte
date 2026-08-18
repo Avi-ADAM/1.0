@@ -196,7 +196,7 @@
           <p class="text-sm font-semibold mt-1 text-gray-900 dark:text-gray-100">
             {$t(`archive.hours.${standing.hoursOutcome}`)}
             {#if standing.hoursOutcome === 'credit' && standing.hoursToCredit != null}
-              — {$t('archive.hours.creditAmount', { count: standing.hoursToCredit })}
+              - {$t('archive.hours.creditAmount', { count: standing.hoursToCredit })}
             {/if}
           </p>
           {#if standing.hoursOutcome === 'transfer' && standing.transferToName}

@@ -35,7 +35,7 @@
           console.warn(`[timegrama/archiveEffective] ${whatami} ${id} not found`);
         } else if (a.lifecycle === 'active' || a.lifecycle == null) {
           // The removal was called off while the cycle ran out.
-          console.log(`[timegrama/archiveEffective] ${whatami} ${id} is active again — skipping`);
+          console.log(`[timegrama/archiveEffective] ${whatami} ${id} is active again - skipping`);
         } else if (a.lifecycle === 'archived') {
           console.log(`[timegrama/archiveEffective] ${whatami} ${id} already archived`);
         } else {

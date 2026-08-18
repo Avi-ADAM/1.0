@@ -96,7 +96,7 @@ export const candidateCounterOnAskmConfig: ActionConfig = {
   paramSchema: {
     askmId: { type: 'string', required: true, description: 'Askm being negotiated' },
     openMashaabimId: { type: 'string', required: false, description: 'Open resource the Askm targets' },
-    projectId: { type: 'string', required: true, description: 'Project (rikma) ID — notifications' },
+    projectId: { type: 'string', required: true, description: 'Project (rikma) ID - notifications' },
     ordern: { type: 'number', required: false, description: 'Current max round (new round = ordern+1)' },
     newValues: {
       type: 'object',

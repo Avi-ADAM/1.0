@@ -146,7 +146,7 @@ export async function counterObjectChange(
 
   const current = standingOrder(decision);
   if (!isMyTurn(decision, current, uid)) {
-    throw new Error("It's not your turn — you already stand behind the current version");
+    throw new Error("It's not your turn - you already stand behind the current version");
   }
 
   const newOrder = current + 1;

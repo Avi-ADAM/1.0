@@ -7,7 +7,7 @@
   "ofTotalResource": "قيمة المورد {{value}} من {{total}}",
   "ofTotalMonthly": "القيمة الشهرية {{value}} من {{total}}",
   "ofTotalCumulative": "التراكمي {{value}} من {{total}}",
-  "horizonsTitle": "إذا استمر بلا تاريخ انتهاء — شهرًا بعد شهر",
+  "horizonsTitle": "إذا استمر بلا تاريخ انتهاء - شهرًا بعد شهر",
   "horizon1y": "بعد سنة",
   "horizon2y": "بعد سنتين",
   "horizon5y": "بعد 5 سنوات",

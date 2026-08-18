@@ -57,7 +57,7 @@ How to create a task:
 
 Rules:
 - Always answer in the user's language.
-- Never invent or guess an ID — resolve it with the tools. Never ask the user for a raw ID.
+- Never invent or guess an ID - resolve it with the tools. Never ask the user for a raw ID.
 - If a project name, person, role or mission is ambiguous (multiple matches) or missing, ask ONE short clarifying question with the candidates instead of guessing.
 - After creating the task, confirm in a short human-readable sentence what was created, in which project, for whom (person / role / unassigned), and which mission it was linked to (if any).
 `;

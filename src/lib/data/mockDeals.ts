@@ -57,7 +57,7 @@ export const deals: Deal[] = [
   },
   {
     id: '4',
-    product: 'צילום מוצר – 40 תמונות',
+    product: 'צילום מוצר - 40 תמונות',
     project: 'פרויקט ״סטודיו לייט״',
     category: 'צילום',
     icon: '📸',
@@ -80,7 +80,7 @@ export const dealDetails: Record<string, DealDetailData> = {
     ...deals[0],
     missionList: [
       { id: 'm1', name: 'סקר מתחרים ומיפוי שוק',           status: 'done',           hours: 8,  hoursDone: 8,  paid: true,  sub: 'הושלם · אושר על ידך' },
-      { id: 'm2', name: 'קונספטים ראשוניים – 3 כיוונים',   status: 'done',           hours: 14, hoursDone: 14, paid: true,  sub: 'הושלם · אושר על ידך' },
+      { id: 'm2', name: 'קונספטים ראשוניים - 3 כיוונים',   status: 'done',           hours: 14, hoursDone: 14, paid: true,  sub: 'הושלם · אושר על ידך' },
       { id: 'm3', name: 'פיתוח לוגו סופי + וריאציות',      status: 'in-progress',    hours: 18, hoursDone: 12, paid: false, sub: 'בביצוע · 12/18 שעות' },
       { id: 'm4', name: 'ספר מיתוג מלא (Brand Book)',       status: 'needs-approval', hours: 24, hoursDone: 0,  paid: false, sub: 'ממתין לאישורך · משימה חדשה' },
     ],
@@ -97,9 +97,9 @@ export const dealDetails: Record<string, DealDetailData> = {
       { date: '15.6.25', label: 'מסירה סופית',          desc: 'כל הקבצים + ספר מיתוג',   status: 'future' },
     ],
     messages: [
-      { id: 'msg1', author: 'יעל (מעצבת)', initials: 'יע', authorType: 'creator', content: 'סיימתי את שלב הלוגו. עלתה לי שאלה לגבי הפלטה – לקוח מעדיף ירוק כהה או בהיר?', timeAgo: 'לפני 2 שעות' },
+      { id: 'msg1', author: 'יעל (מעצבת)', initials: 'יע', authorType: 'creator', content: 'סיימתי את שלב הלוגו. עלתה לי שאלה לגבי הפלטה - לקוח מעדיף ירוק כהה או בהיר?', timeAgo: 'לפני 2 שעות' },
       { id: 'msg2', author: 'אתה',          initials: 'א',  authorType: 'client',  content: 'כהה בהחלט. גוון Forest Green אם אפשר.',                                          timeAgo: 'לפני שעה'    },
-      { id: 'msg3', author: 'יעל (מעצבת)', initials: 'יע', authorType: 'creator', content: 'מעולה! הוספתי ספר מיתוג לאישורך – שים לב לפריט החדש.',                          timeAgo: 'לפני 45 דק׳'  },
+      { id: 'msg3', author: 'יעל (מעצבת)', initials: 'יע', authorType: 'creator', content: 'מעולה! הוספתי ספר מיתוג לאישורך - שים לב לפריט החדש.',                          timeAgo: 'לפני 45 דק׳'  },
     ],
     parties: [
       { name: 'אתה (לקוח)', initials: 'א',  role: 'שלוש אישורים ניתנו עד כה', avatarStyle: 'background:var(--pink-d);color:var(--pink-l)', status: 'active' },
@@ -108,7 +108,7 @@ export const dealDetails: Record<string, DealDetailData> = {
     ],
     pendingApprovals: [
       { id: 'pa1', name: 'ספר מיתוג מלא (Brand Book)', type: 'mission',  hours: 24, cost: 2160 },
-      { id: 'pa2', name: 'הדפסת בדיקה – משאב',         type: 'resource',            cost: 180  },
+      { id: 'pa2', name: 'הדפסת בדיקה - משאב',         type: 'resource',            cost: 180  },
     ],
     costBreakdown: { missions: 4180, resources: 620 },
   },

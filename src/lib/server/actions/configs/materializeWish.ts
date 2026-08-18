@@ -51,7 +51,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
     ? String(ratAttrs.derivedComplexMatanot.data.id)
     : null;
   if (!matanotId) {
-    throw new Error('אין עדיין מוצר מורכב — צריך קודם להזמין ספקים ולהרכיב את התכנית');
+    throw new Error('אין עדיין מוצר מורכב - צריך קודם להזמין ספקים ולהרכיב את התכנית');
   }
 
   const wishName = ratAttrs.name || 'משאלה';
@@ -70,13 +70,13 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   const recipeResources: any[] = mAttrs.matanot_recipe_resources?.data ?? [];
   const allLines = [...recipeMissions, ...recipeResources];
   if (allLines.length === 0) {
-    throw new Error('אין חלקים בתכנית כדי לייצר — הוסיפי משימות/משאבים קודם');
+    throw new Error('אין חלקים בתכנית כדי לייצר - הוסיפי משימות/משאבים קודם');
   }
 
   const unassigned = allLines.filter((l) => !l.attributes?.assignedMember?.data?.id);
   if (unassigned.length > 0) {
     throw new Error(
-      `עוד יש ${unassigned.length} חלקים ללא ספק מאושר — לא ניתן לסגור את ההסכמה עדיין`
+      `עוד יש ${unassigned.length} חלקים ללא ספק מאושר - לא ניתן לסגור את ההסכמה עדיין`
     );
   }
 
@@ -129,7 +129,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
     '166crWishWeave',
     {
       members: providers,
-      projectName: `${wishName} — ריקמה`,
+      projectName: `${wishName} - ריקמה`,
       descripFor: `ריקמת שותפים שנוצרה מהמשאלה "${wishName}".`,
       isOt: true,
       publishedAt: now
@@ -188,7 +188,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
     serviceId = (out as any)?.data?.serviceId ?? null;
   } catch (e) {
     console.error('[materializeWish] createSheirutFromPending failed:', e);
-    throw new Error('הריקמה נוצרה אך פתיחת הדיל נכשלה — אפשר לנסות שוב מתוך הדילים');
+    throw new Error('הריקמה נוצרה אך פתיחת הדיל נכשלה - אפשר לנסות שוב מתוך הדילים');
   }
 
   // ── 8. Mark the wish fulfilled ─────────────────────────────────────────────
@@ -209,7 +209,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
           fidn: parseInt(String(chatForumId), 10),
           idL: context.userId,
           da: now,
-          mes: 'המעגל נסגר — נוצרה ריקמת שותפים והדיל יצא לדרך. 💗'
+          mes: 'המעגל נסגר - נוצרה ריקמת שותפים והדיל יצא לדרך. 💗'
         },
         context.jwt,
         context.fetch
@@ -255,9 +255,9 @@ export const materializeWishConfig: ActionConfig = {
         ar: 'تحققت الأمنية 💗'
       },
       body: {
-        he: 'נוצרה ריקמת שותפים והדיל נפתח — אפשר להתחיל לעבוד.',
-        en: 'A partner weave was created and the deal opened — you can start working.',
-        ar: 'تم إنشاء نسيج شركاء وفُتحت الصفقة — يمكنكم البدء.'
+        he: 'נוצרה ריקמת שותפים והדיל נפתח - אפשר להתחיל לעבוד.',
+        en: 'A partner weave was created and the deal opened - you can start working.',
+        ar: 'تم إنشاء نسيج شركاء وفُتحت الصفقة - يمكنكم البدء.'
       }
     },
     channels: ['socket', 'push'],

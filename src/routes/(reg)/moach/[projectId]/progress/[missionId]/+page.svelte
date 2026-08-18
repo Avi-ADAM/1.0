@@ -229,7 +229,7 @@
           <span class="mp-stat-label">{$t('project.bethas.monthCol')}</span>
           <span class="mp-stat-value mp-stat-dates">
             {showDate(attrs.start) ?? ''}{showDate(attrs.start) && showDate(attrs.dates)
-              ? ' – '
+              ? ' - '
               : ''}{showDate(attrs.dates) ?? ''}
           </span>
         </div>

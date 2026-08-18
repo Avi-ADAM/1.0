@@ -17,7 +17,7 @@
   /* ===== Mock fallback (§8 of PLAN_CONCIERGE) — used when wish not loaded yet ===== */
   const MOCK_WISH_TEXT = 'אני רוצה לארגן יום חופש לאמא שלי';
   const MOCK_WISH_LONG =
-    'אמא שלי מטפלת בילדים כל יום ובקרוב יום הולדתה. אני רוצה לתת לה יום שלם משוחרר — טיפול ספא, ארוחה טובה, מישהי שתשגיח על הילדים, ובן אדם שיבטיח שתגיע ותחזור בשלום. מבקשת לארגן את הכל מראש בלי שתעשה אפילו פנייה אחת.';
+    'אמא שלי מטפלת בילדים כל יום ובקרוב יום הולדתה. אני רוצה לתת לה יום שלם משוחרר - טיפול ספא, ארוחה טובה, מישהי שתשגיח על הילדים, ובן אדם שיבטיח שתגיע ותחזור בשלום. מבקשת לארגן את הכל מראש בלי שתעשה אפילו פנייה אחת.';
   const MOCK_WISH_AVATAR = 'נב';
   const MOCK_WISH_AUTHOR = 'נעה ב.';
   const MOCK_WISH_CODE = 'R-7f3a91';
@@ -149,7 +149,7 @@
           score: 0.72,
           hours: 2,
           price: 110,
-          note: 'אני שם ממילא בבוקר. אקח ואחזיר ללא תשלום נוסף — רק דלק.',
+          note: 'אני שם ממילא בבוקר. אקח ואחזיר ללא תשלום נוסף - רק דלק.',
           badges: ['פעמיים שותף מאחרת', 'דירוג 4.9']
         }
       ]
@@ -1121,7 +1121,7 @@
       const out = await res.json();
       if (!out?.success) throw new Error(out?.error || 'הפרסום נכשל');
       publishDone = { ...publishDone, [key]: true };
-      toast.success('הצורך פורסם לקהילה — יופיע בלב של מי שמתאים 📣');
+      toast.success('הצורך פורסם לקהילה - יופיע בלב של מי שמתאים 📣');
     } catch (err) {
       console.error('[concierge/[id]] submitPublishMission failed:', err);
       toast.error(err instanceof Error ? err.message : 'אירעה שגיאה');
@@ -1171,7 +1171,7 @@
       const out = await res.json();
       if (!out?.success) throw new Error(out?.error || 'הפרסום נכשל');
       publishDone = { ...publishDone, [key]: true };
-      toast.success('המשאב פורסם לקהילה — נציע אותו למי שמחזיק אותו 📣');
+      toast.success('המשאב פורסם לקהילה - נציע אותו למי שמחזיק אותו 📣');
     } catch (err) {
       console.error('[concierge/[id]] submitPublishResource failed:', err);
       toast.error(err instanceof Error ? err.message : 'אירעה שגיאה');
@@ -1209,7 +1209,7 @@
     {
       color: 'blue',
       time: 'לפני 41ד׳',
-      text: 'יואב כ. (Lift) צירף הצעה — ממתינה לתיאום שעה.'
+      text: 'יואב כ. (Lift) צירף הצעה - ממתינה לתיאום שעה.'
     },
     {
       color: 'pink',
@@ -1301,7 +1301,7 @@
       });
       const out = await res.json();
       if (!out?.success) throw new Error(out?.error || 'סגירת ההסכמה נכשלה');
-      toast.success('המעגל נסגר — נוצרה ריקמת שותפים והדיל נפתח 💗');
+      toast.success('המעגל נסגר - נוצרה ריקמת שותפים והדיל נפתח 💗');
       goto('/deals');
     } catch (err) {
       console.error('[concierge/[id]] materializeWish failed:', err);
@@ -1482,7 +1482,7 @@
             <div class="lev-sub">
               {extractionApproved
                 ? 'אישרת את הפירוק להלן. ההצעות בנויות סביבו.'
-                : 'הנה איך פירקתי את המשאלה — אשרי או הגיהי לפני שאחפש ספקים.'}
+                : 'הנה איך פירקתי את המשאלה - אשרי או הגיהי לפני שאחפש ספקים.'}
             </div>
           </div>
           {#if editing}
@@ -1758,7 +1758,7 @@
                       : sugP.filter((p) => p.id).length}
                     <div class="sug-wrap">
                       <div class="sug-lbl-row">
-                        <div class="sug-lbl">✶ אולי מתאימים — שלחי פנייה</div>
+                        <div class="sug-lbl">✶ אולי מתאימים - שלחי פנייה</div>
                         {#if isOwner && invitable > 1}
                           <button
                             class="btn-jewel"
@@ -2309,7 +2309,7 @@
             <div
               style="margin-top:16px;font-family:'Bellefair',serif;font-size:12px;color:#9a8f80;line-height:1.55"
             >
-              כשארבעת הצדדים מאשרים — התכנית סגורה והקשת תיהפך זהובה.
+              כשארבעת הצדדים מאשרים - התכנית סגורה והקשת תיהפך זהובה.
             </div>
           </div>
 
@@ -2435,10 +2435,10 @@
                 {#if !isOwner}
                   רק יוצר/ת המשאלה יכול/ה לסגור את ההסכמה.
                 {:else if !readyToClose}
-                  כשכל החלקים יקבלו ספק מאושר — אפשר יהיה לסגור ולפתוח ריקמת
+                  כשכל החלקים יקבלו ספק מאושר - אפשר יהיה לסגור ולפתוח ריקמת
                   שותפים.
                 {:else}
-                  בלחיצה ייווצרו ריקמת שותפים ודיל — אחד לכל שותף/ה שהצטרף/ה.
+                  בלחיצה ייווצרו ריקמת שותפים ודיל - אחד לכל שותף/ה שהצטרף/ה.
                 {/if}
               </span>
             </div>
@@ -2504,7 +2504,7 @@
         >
       </div>
       <p class="spec-hint">
-        פרטי את המשימה שתרצי להציע — זו ההצעה שהספק יקבל ויאשר.
+        פרטי את המשימה שתרצי להציע - זו ההצעה שהספק יקבל ויאשר.
       </p>
       <Mission
         specMode={true}
@@ -2530,7 +2530,7 @@
         >
       </div>
       <p class="spec-hint">
-        פרטי את המשאב שתרצי להציע — זו ההצעה שהספק יקבל ויאשר.
+        פרטי את המשאב שתרצי להציע - זו ההצעה שהספק יקבל ויאשר.
       </p>
       <ResourceCreator
         specMode={true}
@@ -2553,7 +2553,7 @@
         >
       </div>
       <p class="spec-hint">
-        הגדירי את המשימה הנדרשת — תיווצר שורה בתכנית להערכת עלות. אפשר לשבץ ספק
+        הגדירי את המשימה הנדרשת - תיווצר שורה בתכנית להערכת עלות. אפשר לשבץ ספק
         בהמשך.
       </p>
       <Mission
@@ -2580,7 +2580,7 @@
         >
       </div>
       <p class="spec-hint">
-        הגדירי את המשאב הנדרש — תיווצר שורה בתכנית. אפשר לשבץ ספק בהמשך.
+        הגדירי את המשאב הנדרש - תיווצר שורה בתכנית. אפשר לשבץ ספק בהמשך.
       </p>
       <ResourceCreator
         specMode={true}
@@ -2603,7 +2603,7 @@
         >
       </div>
       <p class="spec-hint">
-        מלאי את פרטי המשאב — בחירה מהרשימה מקשרת אותו למשאב מוכר כך שנציע אותו
+        מלאי את פרטי המשאב - בחירה מהרשימה מקשרת אותו למשאב מוכר כך שנציע אותו
         אוטומטית למי שמחזיק אותו. השווי, הטווח, התאריכים והמיקום ייכנסו להצעה.
       </p>
       <ResourceCreator
@@ -2637,7 +2637,7 @@
         >
       </div>
       <p class="spec-hint">
-        מלאי את פרטי המשימה — הכישורים, התפקיד והשעות יקבעו למי נציע אותה
+        מלאי את פרטי המשימה - הכישורים, התפקיד והשעות יקבעו למי נציע אותה
         אוטומטית מהלב.
       </p>
       <Mission
@@ -2671,7 +2671,7 @@
           aria-label="סגירה">✕</button
         >
       </div>
-      <p class="spec-hint">ערכי את כל פרטי הצורך — השינוי יישמר בתכנית.</p>
+      <p class="spec-hint">ערכי את כל פרטי הצורך - השינוי יישמר בתכנית.</p>
       {#if editTarget.isResource}
         <ResourceCreator
           specMode={true}
@@ -2706,7 +2706,7 @@
         >
       </div>
       <p class="spec-hint">
-        נסחי הצעה אחת — היא תישלח לכל {inviteAllTarget.targets.length} הספקים שמתאימים
+        נסחי הצעה אחת - היא תישלח לכל {inviteAllTarget.targets.length} הספקים שמתאימים
         לצורך.
       </p>
       {#if inviteAllTarget.isResource}

@@ -267,7 +267,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
 export const matchRatsonConfig: ActionConfig = {
   key: 'matchRatson',
   description:
-    'Run keyword matching for a Ratson — scores existing matanots and creates ratson_proposal rows',
+    'Run keyword matching for a Ratson - scores existing matanots and creates ratson_proposal rows',
   graphqlOperation: handler,
   paramSchema: {
     ratsonId: { type: 'string', required: true },

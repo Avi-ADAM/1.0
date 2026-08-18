@@ -40,6 +40,7 @@ export const ROUTED = {
     concierge: at('/concierge', '/wish'),
     offerings: at('/me', '/onboard', '/gift', '/user', '/deals/sales-center', /\/moach\/[^/]+\/sales/),
     consensus: at('/consensus'),
+    uses: at('/uses'),
     planning: at(/\/moach\/[^/]+\/create/),
     // Archive/edit proposals surface as lev cards and on the rikma's object pages.
     archive: at('/lev', '/newlev', /\/moach\/[^/]+/)

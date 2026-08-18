@@ -3,13 +3,13 @@
     "typeArchive": "Removal proposal",
     "typeEdit": "Change proposal",
     "typeRelease": "Release proposal",
-    "byDormancy": "Opened automatically — no activity recorded",
+    "byDormancy": "Opened automatically - no activity recorded",
     "reason": "Reason",
     "noReason": "No reason given",
     "round": "Round {{count}}",
     "standing": "The version on the table",
     "original": "The original proposal",
-    "keepMode": "The object stays — its terms change",
+    "keepMode": "The object stays - its terms change",
     "archiveMode": "The object leaves the rikma",
     "releaseMode": "The commitment ends and the need returns to the open pool",
     "proposedBy": "Proposed by {{name}}",
@@ -24,7 +24,7 @@
       "resourceInProgress": "Resource in progress",
       "matanot": "Product"
     },
-    "signedByMe": "You signed this version — waiting for the other members"
+    "signedByMe": "You signed this version - waiting for the other members"
   },
   "hours": {
     "title": "Accrued hours",
@@ -74,29 +74,29 @@
   "toast": {
     "approved": "You signed the version on the table",
     "matured": "Approved unanimously and applied",
-    "countered": "Proposal sent — the clock reset",
+    "countered": "Proposal sent - the clock reset",
     "error": "Something went wrong, please try again",
     "applied": "The object was archived",
     "appliedAndLeft": "Archived, and the rikma membership ended with it",
     "proposed": "The proposal was sent to the rikma",
-    "proposedEndsMembership": "Proposal sent — it also ends a rikma membership"
+    "proposedEndsMembership": "Proposal sent - it also ends a rikma membership"
   },
   "propose": {
     "button": "Archive",
     "title": "What are you proposing?",
     "scopeQuestion": "What exactly is ending?",
     "scopeRelease": "Release my commitment",
-    "scopeReleaseHint": "The mission returns to the open pool — the rikma still needs it",
+    "scopeReleaseHint": "The mission returns to the open pool - the rikma still needs it",
     "scopeArchive": "Remove the need from the rikma",
     "scopeArchiveHint": "The object stops existing in the rikma",
     "why": "Why",
     "whyPlaceholder": "What brought you here",
-    "whyPlaceholderAccrued": "What brought you here — especially where hours have accrued",
+    "whyPlaceholderAccrued": "What brought you here - especially where hours have accrued",
     "whyRequired": "Hours accrued here, so a reason matters",
     "alsoClose": "Also propose closing the need entirely",
     "alsoCloseHint": "Your release is immediate; closing the need goes to a rikma vote",
     "immediateNote": "You are alone in this rikma, so this takes effect immediately",
-    "proposalNote": "This is a proposal — the others can approve, propose differently, or discuss",
+    "proposalNote": "This is a proposal - the others can approve, propose differently, or discuss",
     "submit": "Send proposal",
     "submitImmediate": "Archive now"
   },
@@ -116,7 +116,7 @@
     "button": "Request a change",
     "title": "What should change?",
     "whyPlaceholder": "Why the terms need to change",
-    "note": "This is a proposal — the others can approve, propose differently, or discuss",
+    "note": "This is a proposal - the others can approve, propose differently, or discuss",
     "submit": "Send request",
     "applied": "The change was applied",
     "proposed": "The request was sent to the rikma"

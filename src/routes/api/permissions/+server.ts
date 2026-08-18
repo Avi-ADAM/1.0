@@ -90,7 +90,7 @@ export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
     throw error(400, 'Body must be { ops: string[] }');
   }
   if (ops.length > MAX_OPS_PER_CHECK) {
-    throw error(400, `Too many ops — max ${MAX_OPS_PER_CHECK} per request`);
+    throw error(400, `Too many ops - max ${MAX_OPS_PER_CHECK} per request`);
   }
 
   const paramsByOp: Record<string, Record<string, any>> =

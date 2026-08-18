@@ -150,7 +150,7 @@ const scanHandler: ActionExecutionHandler = async (params, context, { strapi }) 
 export const scanProjectDirectionsAction: ActionConfig = {
   key: 'scanProjectDirections',
   description:
-    'Tier 1 — a thin, cheap scan of the project that proposes a few directions for advancing it, saved as suggested boards. Never runs automatically.',
+    'Tier 1 - a thin, cheap scan of the project that proposes a few directions for advancing it, saved as suggested boards. Never runs automatically.',
   graphqlOperation: scanHandler,
   paramSchema: {
     projectId: { type: 'string', required: true, description: 'ID of the project to scan' },
@@ -159,7 +159,7 @@ export const scanProjectDirectionsAction: ActionConfig = {
       type: 'string',
       required: false,
       description:
-        "Whether to read the rikma's own website for extra context: auto (default — only when its description is too thin) | always | never"
+        "Whether to read the rikma's own website for extra context: auto (default - only when its description is too thin) | always | never"
     }
   },
   access: ['user', 'serviceAdmin'],
@@ -231,7 +231,7 @@ const expandHandler: ActionExecutionHandler = async (params, context, { strapi }
 export const expandPlanBoardAction: ActionConfig = {
   key: 'expandPlanBoard',
   description:
-    'Tier 2 — break one direction into concrete proposed rows (missions/resources), deduplicated against what the project already has. Runs only on explicit request.',
+    'Tier 2 - break one direction into concrete proposed rows (missions/resources), deduplicated against what the project already has. Runs only on explicit request.',
   graphqlOperation: expandHandler,
   paramSchema: {
     boardId: { type: 'string', required: true, description: 'ID of the board to expand' },
@@ -457,7 +457,7 @@ function seedSpec(row: any): Record<string, unknown> {
 export const seedPlanBoardsAction: ActionConfig = {
   key: 'seedPlanBoards',
   description:
-    'Persist the starter planning boards drafted during business onboarding into a newly created rikma. Creates proposals only — no mission, resource or product is created.',
+    'Persist the starter planning boards drafted during business onboarding into a newly created rikma. Creates proposals only - no mission, resource or product is created.',
   graphqlOperation: seedHandler,
   paramSchema: {
     projectId: { type: 'string', required: true, description: 'ID of the rikma just created' },
@@ -474,7 +474,7 @@ export const seedPlanBoardsAction: ActionConfig = {
     lang: {
       type: 'string',
       required: false,
-      description: 'he | en | ar — the language new vocabulary entries are created in'
+      description: 'he | en | ar - the language new vocabulary entries are created in'
     }
   },
   access: ['user', 'serviceAdmin'],

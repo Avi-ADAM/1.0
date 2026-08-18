@@ -97,7 +97,7 @@ const TRACK_LABELS: Record<string, string> = {
 const TIME_MODE_LABELS: Record<string, string> = {
   scheduled: 'רוצה לקבוע זמן מראש',
   flexible: 'מעדיף/ה להיכנס בזמן שנוח (פגישת אורח)',
-  callback: 'השאיר/ה פרטים — נחזור אליו/ה',
+  callback: 'השאיר/ה פרטים - נחזור אליו/ה',
   recorded: 'ביקש/ה קודם דמו מוקלט'
 };
 
@@ -145,7 +145,7 @@ function taskSpec(kind: DemoTaskKind, lead: DemoTaskLead) {
   return {
     name: `שיחת דמו אישית · ${lead.name}`,
     description:
-      `להעביר דמו אישי של כ‑20 דקות: איך 1💗1 מתאימה למצב שלהם — חלוקת תרומות, ` +
+      `להעביר דמו אישי של כ‑20 דקות: איך 1💗1 מתאימה למצב שלהם - חלוקת תרומות, ` +
       `משימות, קבלת החלטות והצטרפות שותפים.\n\n${brief}`,
     hashivut: 'green'
   };

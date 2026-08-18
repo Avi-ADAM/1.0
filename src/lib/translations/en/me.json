@@ -8,7 +8,7 @@
   },
   "identity": {
     "title": "Your cryptographic identity",
-    "explainer": "This site generates a digital signing key for you that lives only in your browser. The server never holds a copy. Once it is set up, every meaningful action you take (vote, approve, join) is signed by you — and even we cannot forge it.",
+    "explainer": "This site generates a digital signing key for you that lives only in your browser. The server never holds a copy. Once it is set up, every meaningful action you take (vote, approve, join) is signed by you - and even we cannot forge it.",
     "status": "Status",
     "fingerprint": "Fingerprint",
     "fullKey": "Show full key",
@@ -18,6 +18,6 @@
     "signedEvents": "Your signed events",
     "retry": "Retry",
     "backToMe": "Back to profile",
-    "nothing": "— no data —"
+    "nothing": "- no data -"
   }
 }

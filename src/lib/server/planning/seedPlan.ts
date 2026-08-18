@@ -53,7 +53,7 @@ export const MAX_SEED_ITEMS_PER_BOARD = 6;
 
 const OUTPUT_CONTRACT = `## Output
 
-Return ONLY valid JSON — no markdown, no code fences, no commentary. Start with
+Return ONLY valid JSON - no markdown, no code fences, no commentary. Start with
 { and end with }. Exact shape:
 
 {
@@ -84,19 +84,19 @@ Return ONLY valid JSON — no markdown, no code fences, no commentary. Start wit
 }
 
 Rules for this first plan:
-- 2 to ${MAX_SEED_BOARDS} boards. Each board is one FRONT the rikma has to open —
+- 2 to ${MAX_SEED_BOARDS} boards. Each board is one FRONT the rikma has to open -
   not a phase, not a week. "What we sell", "Reaching the first customers",
   "Setting the workshop up" are fronts. "Q1" is not.
 - ${MAX_SEED_ITEMS_PER_BOARD} rows per board at most; 3-4 is usually right.
 - title = 2-5 words. rationale = one sentence tying the board to something the
   source text actually says about this business.
 - If the business clearly sells or offers something, ONE board must be about
-  that, and it must contain "product" rows for what is being sold — with a
+  that, and it must contain "product" rows for what is being sold - with a
   price only when the source states one.
 - Include at least a few "resource" rows if the business obviously needs
   equipment, a space, or money to operate. Do not invent amounts.
 - "act" rows are for the small first steps that need no hour accounting
-  ("photograph the three best dishes"). They have no assignee yet — this rikma
+  ("photograph the three best dishes"). They have no assignee yet - this rikma
   has no members and no running missions, so never name a person or a mission.
 - Everything else follows the row rules above.`;
 

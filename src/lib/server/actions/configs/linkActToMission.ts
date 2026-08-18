@@ -34,7 +34,7 @@ const linkActToMissionHandler: ActionExecutionHandler = async (params, context, 
   const relation = RELATION_BY_TYPE[missionType];
   if (!relation) {
     throw new Error(
-      `Unknown missionType "${missionType}" — expected pendm, openMission or mesimabetahalich`
+      `Unknown missionType "${missionType}" - expected pendm, openMission or mesimabetahalich`
     );
   }
 

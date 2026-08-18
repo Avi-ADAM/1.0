@@ -53,7 +53,7 @@
   function actAriaLabel(act) {
     const name   = act?.attributes?.shem ?? '';
     const status = act?.attributes?.status ?? '';
-    return status ? `${t.actLabel}: ${name} — ${status}` : `${t.actLabel}: ${name}`;
+    return status ? `${t.actLabel}: ${name} - ${status}` : `${t.actLabel}: ${name}`;
   }
 </script>
 

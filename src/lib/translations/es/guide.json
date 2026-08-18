@@ -2,7 +2,7 @@
   "_review": true,
   "title": "La guía completa de 1💗1",
   "tagline": "Qué es cada cosa en el sistema, dónde está y cómo nace y crece",
-  "intro": "1💗1 es un sistema para hacer cosas juntos. Un grupo de personas — una rikma — decide en conjunto qué hay que hacer, quién lo hace, cuánto vale y cómo se reparte lo creado. En lugar de un jefe que decide, hay un único motor de consentimiento por el que pasa todo.",
+  "intro": "1💗1 es un sistema para hacer cosas juntos. Un grupo de personas - una rikma - decide en conjunto qué hay que hacer, quién lo hace, cuánto vale y cómo se reparte lo creado. En lugar de un jefe que decide, hay un único motor de consentimiento por el que pasa todo.",
   "intro2": "Esta guía recorre todos los tipos de objeto del sistema y cada etapa de su vida, y enlaza directamente con la pantalla donde realmente se actúa. Cada título aquí es un enlace: pulsa y llegas.",
   "backToTop": "Volver arriba",
   "toc": {
@@ -141,7 +141,7 @@
       "user": {
         "name": "Tu perfil y tu oferta",
         "code": "User · Offerings",
-        "what": "Tu perfil no es un currículum sino una interfaz: las habilidades, los valores y los roles que eliges vienen de un vocabulario común a todo el sitio, de modo que el sistema puede cruzar lo que sabes con lo que buscan las rikmas. Tu oferta personal es el lado activo: lo que estás dispuesto a dar — un servicio, un producto, conocimiento, equipo o tiempo.",
+        "what": "Tu perfil no es un currículum sino una interfaz: las habilidades, los valores y los roles que eliges vienen de un vocabulario común a todo el sitio, de modo que el sistema puede cruzar lo que sabes con lo que buscan las rikmas. Tu oferta personal es el lado activo: lo que estás dispuesto a dar - un servicio, un producto, conocimiento, equipo o tiempo.",
         "stages": "Registro → introducción → habilidades, valores y roles → zona de actividad → oferta personal → sugerencias de coincidencia en Lev",
         "where": "En tu perfil y en la página de mi oferta. Las coincidencias construidas a partir de ellos te llegan como tarjetas en Lev.",
         "do": "Actualizar habilidades y valores, añadir un elemento nuevo al vocabulario común, fijar tu zona y publicar una oferta personal visible en las páginas de descubrimiento."
@@ -181,7 +181,7 @@
       "split": {
         "name": "Reparto",
         "code": "Tosplit · Haluka · hervachti",
-        "what": "El reparto es el momento en que lo acumulado se divide entre los miembros. El sistema calcula la parte de cada uno según lo que aportó realmente — horas aprobadas, recursos aportados, productos vendidos — y presenta la propuesta a todos, no solo a quien la creó. Si la propia 1lev1 participó como socia prestadora de servicio, también recibe una parte con exactamente las mismas reglas y la misma transparencia.",
+        "what": "El reparto es el momento en que lo acumulado se divide entre los miembros. El sistema calcula la parte de cada uno según lo que aportó realmente - horas aprobadas, recursos aportados, productos vendidos - y presenta la propuesta a todos, no solo a quien la creó. Si la propia 1lev1 participó como socia prestadora de servicio, también recibe una parte con exactamente las mismas reglas y la misma transparencia.",
         "stages": "Acumulación de valor → crear una propuesta de reparto → parte personal de cada miembro → aprobar, conversar o contraproponer → reparto cerrado → transferencia real",
         "where": "Cerebro → Dinero → Reparto. Un reparto que espera tu firma aparece en Lev.",
         "do": "Crear un reparto, ver de qué se compone la parte de cada uno, aprobar, proponer otro reparto y marcar las transferencias hechas."
@@ -329,5 +329,5 @@
     "desc": "Una guía técnica aparte para agentes que actúan en nombre de un usuario: mapa de direcciones, contrato de descubrimiento de cada entidad, flujos de trabajo y reglas de seguridad.",
     "cta": "A la guía de agentes"
   },
-  "footer": "1💗1 — Creamos juntos, en armonía"
+  "footer": "1💗1 - Creamos juntos, en armonía"
 }

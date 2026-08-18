@@ -236,13 +236,13 @@
     <section class="cycles-section anim">
       <h2 class="cycles-title">
         {$lang === 'he'
-          ? `🔁 מכירות מתחדשות — דיווח חודשי (${pendingCycles.length})`
-          : `🔁 Recurring sales — monthly report (${pendingCycles.length})`}
+          ? `🔁 מכירות מתחדשות - דיווח חודשי (${pendingCycles.length})`
+          : `🔁 Recurring sales - monthly report (${pendingCycles.length})`}
       </h2>
       <p class="cycles-sub">
         {$lang === 'he'
-          ? 'כמה נכנס החודש מכל הוראת קבע? גם 0 הוא דיווח — והוראה שבוטלה אפשר לסגור כאן.'
-          : 'How much came in this month from each standing order? 0 is a valid report — and a cancelled order can be closed here.'}
+          ? 'כמה נכנס החודש מכל הוראת קבע? גם 0 הוא דיווח - והוראה שבוטלה אפשר לסגור כאן.'
+          : 'How much came in this month from each standing order? 0 is a valid report - and a cancelled order can be closed here.'}
       </p>
       <div class="cycles-grid">
         {#each pendingCycles as cycle (cycle.id)}

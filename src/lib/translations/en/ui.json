@@ -74,7 +74,7 @@
       },
       "error": {
         "label": "Error",
-        "help": "Identity setup failed — see the identity page for details"
+        "help": "Identity setup failed - see the identity page for details"
       }
     }
   },
@@ -90,6 +90,18 @@
     "mode_light": "Day",
     "mode_dark": "Night",
     "mode_system": "Device",
-    "followingSystem": "Following your device — currently {{mode}}"
+    "followingSystem": "Following your device - currently {{mode}}"
+  },
+  "a11y": {
+    "title": "Accessibility",
+    "skip": "Skip to main content",
+    "textSize": "Text size",
+    "contrast": "High contrast",
+    "links": "Highlight links",
+    "font": "Readable font",
+    "motionOn": "Motion: on",
+    "motionPaused": "Motion: paused",
+    "motionHidden": "Motion: hidden",
+    "reset": "Reset settings"
   }
 }

@@ -264,7 +264,7 @@ const voteOnMaapHandler: ActionExecutionHandler = async (params, context, { stra
   const sp = attrs.sp?.data;
   const om = attrs.open_mashaabim?.data;
 
-  if (!sp) throw new Error(`Maap ${askId} has no associated Sp — cannot proceed`);
+  if (!sp) throw new Error(`Maap ${askId} has no associated Sp - cannot proceed`);
   // om (open_mashaabim) is optional: some Maaps come from Pmash/Sherut flows and have no om.
   // If present → full Rikmash with om data.
   // If absent but sp present → Rikmash with Sp+Maap data only (no open_mashaabim link).
@@ -428,7 +428,7 @@ const voteOnMaapHandler: ActionExecutionHandler = async (params, context, { stra
 export const voteOnMaapConfig: ActionConfig = {
   key: 'voteOnMaap',
   description:
-    'Vote on a resource application (Maap/weget). YES with full project-member quorum creates Rikmash + archives Maap + marks Sp.panui=false. NO votes are recorded. Server fetches all data from DB — client only sends askId + projectId + what (+ optional why).',
+    'Vote on a resource application (Maap/weget). YES with full project-member quorum creates Rikmash + archives Maap + marks Sp.panui=false. NO votes are recorded. Server fetches all data from DB - client only sends askId + projectId + what (+ optional why).',
   graphqlOperation: voteOnMaapHandler,
 
   paramSchema: {

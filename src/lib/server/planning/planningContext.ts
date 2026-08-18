@@ -241,6 +241,11 @@ export function summarizePlanningExtras(
         ? '<<<' +
           extras.missionsInProgress
             .slice(0, 12)
+            // Em dash, deliberately, and not the plain hyphen the rest of the
+            // copy now uses: both sides of this separator are user-authored
+            // text that gets wrapped in untrusted delimiters below, and Hebrew
+            // names legitimately contain hyphens ("achar-kach"), so a hyphen
+            // here would be ambiguous to the model reading it.
             .map((m) => (m.holder ? `${m.name} — ${m.holder}` : m.name))
             .join(' | ') +
           '>>>'

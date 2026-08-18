@@ -87,6 +87,6 @@ export function setConsentStore(): ConsentStore {
 
 export function getConsentStore(): ConsentStore {
   const s = getContext<ConsentStore>(CONSENT_STORE_KEY);
-  if (!s) throw new Error('ConsentStore not initialized — call setConsentStore() in a layout');
+  if (!s) throw new Error('ConsentStore not initialized - call setConsentStore() in a layout');
   return s;
 }
