@@ -141,9 +141,9 @@ export const nominateSelfMissionConfig: ActionConfig = {
         ar: 'شخص ما يرشّح نفسه لنسيجكم 🌱',
       },
       body: {
-        he: 'התקבלה הצעה עצמית חדשה — משימה בתנאי המציע/ה. היכנסו ללב כדי להגיב.',
-        en: 'A new self-nomination arrived — a mission on the candidate’s terms. Open Lev to respond.',
-        ar: 'وصل ترشيح ذاتي جديد — مهمة بشروط المرشّح. افتحوا ليف للرد.',
+        he: 'התקבלה הצעה עצמית חדשה - משימה בתנאי המציע/ה. היכנסו ללב כדי להגיב.',
+        en: 'A new self-nomination arrived - a mission on the candidate’s terms. Open Lev to respond.',
+        ar: 'وصل ترشيح ذاتي جديد - مهمة بشروط المرشّح. افتحوا ليف للرد.',
       },
     },
     channels: ['socket', 'email', 'push'],

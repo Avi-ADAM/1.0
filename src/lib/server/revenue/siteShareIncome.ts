@@ -68,7 +68,7 @@ export async function ensurePlatformIncomeSheirut(
   // createSheirutFromPending — Sheirut reads live without it). The chosen
   // receiver/volunteer is resolved later via iCanGetMonay (empty-state until then).
   const name = sourceProjectName
-    ? `חלק האתר — ${sourceProjectName}`
+    ? `חלק האתר - ${sourceProjectName}`
     : 'חלק האתר';
   const created = await exec('87createSheirut', {
     data: {
@@ -77,7 +77,7 @@ export async function ensurePlatformIncomeSheirut(
       source_tosplit: String(tosplitId),
       source_project: sourceProjectId ? String(sourceProjectId) : undefined,
       name,
-      descrip: 'הכנסת שירות הניהול והשותפות של 1💗1 — מאוגדת לכל חלוקת מקור.',
+      descrip: 'הכנסת שירות הניהול והשותפות של 1💗1 - מאוגדת לכל חלוקת מקור.',
       price: total,
       total,
       isApruved: true,

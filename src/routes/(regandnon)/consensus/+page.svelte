@@ -284,7 +284,7 @@
             </div>
             <div class="cp-window-row">
               <span class="cp-window-note">
-                {$t('consensus.demo.windowLabel')}: {demo.timeLeft}s — {$t('consensus.demo.windowNote')}
+                {$t('consensus.demo.windowLabel')}: {demo.timeLeft}s - {$t('consensus.demo.windowNote')}
               </span>
               <button type="button" class="cp-skip-link" onclick={skipWait}>{$t('consensus.demo.skip')}</button>
             </div>

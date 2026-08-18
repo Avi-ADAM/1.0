@@ -10476,7 +10476,7 @@ export const qids = {
             id
             attributes {
               projectName
-              # Mission applications – members vote via pendms.users (ordered)
+              # Mission applications - members vote via pendms.users (ordered)
               pendms(filters: { archived: { eq: false } }) {
                 data {
                   id
@@ -10507,7 +10507,7 @@ export const qids = {
                   }
                 }
               }
-              # Completion approvals – members vote via finiapruvals.vots (no order)
+              # Completion approvals - members vote via finiapruvals.vots (no order)
               finiapruvals(filters: { archived: { eq: false } }) {
                 data {
                   id
@@ -10532,7 +10532,7 @@ export const qids = {
                   }
                 }
               }
-              # Resource requests – members vote via askms.vots (no order)
+              # Resource requests - members vote via askms.vots (no order)
               askms(filters: { archived: { eq: false } }) {
                 data {
                   id
@@ -10577,7 +10577,7 @@ export const qids = {
                   }
                 }
               }
-              # Resource approvals – members vote via maaps.vots (no order)
+              # Resource approvals - members vote via maaps.vots (no order)
               maaps(filters: { archived: { eq: false } }) {
                 data {
                   id
@@ -10609,7 +10609,7 @@ export const qids = {
                   }
                 }
               }
-              # Project decisions – members vote via decisions.vots (no orderon, any vote counts)
+              # Project decisions - members vote via decisions.vots (no orderon, any vote counts)
               decisions(filters: { archived: { eq: false } }) {
                 data {
                   id
@@ -10634,7 +10634,7 @@ export const qids = {
                   }
                 }
               }
-              # Split proposals – members vote via tosplits.vots (ordered)
+              # Split proposals - members vote via tosplits.vots (ordered)
               tosplits(filters: { finished: { eq: false } }) {
                 data {
                   id
@@ -10653,7 +10653,7 @@ export const qids = {
                   }
                 }
               }
-              # Service purchase requests – members vote via sheirutpends.votes (relational, ordered)
+              # Service purchase requests - members vote via sheirutpends.votes (relational, ordered)
               sheirutpends(filters: { archived: { eq: false } }) {
                 data {
                   id
@@ -13034,7 +13034,7 @@ ${STIPEND_DECISION_FIELDS}
   '269mapProducts': `query MapProducts {
     matanots(
       # Sellers that opted a product out of the public directory (282) are opted
-      # out of the map pin too — same discovery surface, same NULL guard.
+      # out of the map pin too - same discovery surface, same NULL guard.
       filters: { and: [ {
         archived: { ne: true }
         or: [{ hideFromDiscovery: { eq: false } }, { hideFromDiscovery: { null: true } }]
@@ -13117,7 +13117,7 @@ ${STIPEND_DECISION_FIELDS}
   // /gift/[id], the project page and the sales flows.
   '282discoverProducts': `query DiscoverProducts {
     matanots(
-      # Same NULL guard as 281 — never-archived products often have NULL here.
+      # Same NULL guard as 281 - never-archived products often have NULL here.
       filters: {
         and: [
           { or: [{ archived: { eq: false } }, { archived: { null: true } }] }, ${NOT_ARCHIVED} ] },

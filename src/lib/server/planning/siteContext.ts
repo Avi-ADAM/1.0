@@ -158,7 +158,7 @@ export function htmlToText(html: string, maxChars: number = SITE_MAX_CHARS): str
     if (blocks.length >= 120) break;
   }
 
-  // A site built entirely of divs yields no blocks — fall back to all text.
+  // A site built entirely of divs yields no blocks - fall back to all text.
   if (blocks.length === 0) {
     const flat = decodeEntities(body.replace(/<[^>]+>/g, ' '))
       .replace(/\s+/g, ' ')
@@ -217,7 +217,7 @@ async function readCapped(res: Response, maxBytes: number): Promise<string> {
  *
  * @param rawUrl        whatever `linkToWebsite` holds
  * @param options.fetchImpl  injected for tests; defaults to the global fetch
- *   (NOT SvelteKit's request-bound fetch — see the module header)
+ *   (NOT SvelteKit's request-bound fetch - see the module header)
  */
 export async function fetchSiteSummary(
   rawUrl: string | null | undefined,
@@ -265,7 +265,7 @@ export async function fetchSiteSummary(
         next = null;
       }
       // A redirect into a private address is exactly the SSRF case the host
-      // check exists for — re-check every hop, never trust the first one.
+      // check exists for - re-check every hop, never trust the first one.
       if (!next) {
         return { url: current.href, ok: false, title: '', text: '', error: 'unsafe-redirect' };
       }
@@ -309,11 +309,11 @@ export async function fetchSiteSummary(
  * Should this run read the website?
  *
  * `mode`:
- *  - `'auto'` (default) — only when the project's own text is too thin to plan
+ *  - `'auto'` (default) - only when the project's own text is too thin to plan
  *    from. This is the whole point: extra context where context is missing,
  *    no cost where the rikma already described itself.
- *  - `'always'` — the member ticked the box.
- *  - `'never'` — the member unticked it.
+ *  - `'always'` - the member ticked the box.
+ *  - `'never'` - the member unticked it.
  */
 export function shouldAnalyzeSite(
   input: { description?: string | null; linkToWebsite?: string | null },

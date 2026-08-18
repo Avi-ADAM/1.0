@@ -328,7 +328,7 @@ function detectRenderComponents(userText: string) {
     components.push({
       type: 'voting',
       props: {
-        proposal: 'חלוקת רווח שנתית 2024 — 70% הון עצמי / 30% השקעה חוזרת',
+        proposal: 'חלוקת רווח שנתית 2024 - 70% הון עצמי / 30% השקעה חוזרת',
         options: ['בעד', 'נגד', 'נמנע'],
         deadline: '28.02.2025',
         partnership: 'אלון נכסים',

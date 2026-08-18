@@ -42,7 +42,7 @@
 
 <svelte:head>
   {#if vote}
-    <title>{vote.attributes.what} — Vote</title>
+    <title>{vote.attributes.what} - Vote</title>
     <meta name="moach:entity-type" content="vot" />
     <meta name="moach:entity-id" content={voteId} />
     <meta name="moach:project-id" content={projectId} />

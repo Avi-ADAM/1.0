@@ -7,7 +7,7 @@
   "votedOn": "voted only on other versions",
   "voteDetail": {
     "back": "→ All project votes",
-    "closed": "This vote is resolved — thanks for taking part!",
+    "closed": "This vote is resolved - thanks for taking part!",
     "missing": "This item was not found or has already been archived."
   }
 }

@@ -30,7 +30,7 @@ export async function embedText(text: string): Promise<Embedding> {
 
     if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(`Gemini embed failed: ${res.status} — ${JSON.stringify(err)}`);
+        throw new Error(`Gemini embed failed: ${res.status} - ${JSON.stringify(err)}`);
     }
 
     const data = await res.json();
@@ -56,9 +56,9 @@ export async function embedBatch(texts: string[]): Promise<Embedding[]> {
         // כל 100 בקשות — עצור ותחכה דקה
         if (totalSent > 0 && totalSent % RATE_LIMIT === 0) {
             if (typeof process !== 'undefined' && process.stdout) {
-                process.stdout.write(`\n  ⏳ rate limit — ממתין 61 שניות...`);
+                process.stdout.write(`\n  ⏳ rate limit - ממתין 61 שניות...`);
             } else {
-                console.log(`\n  ⏳ rate limit — ממתין 61 שניות...`);
+                console.log(`\n  ⏳ rate limit - ממתין 61 שניות...`);
             }
             await new Promise(r => setTimeout(r, RATE_LIMIT_MS));
             if (typeof process !== 'undefined' && process.stdout) {

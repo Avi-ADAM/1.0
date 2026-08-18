@@ -32,10 +32,10 @@
     "stateFiled": "Closed",
     "stateMismatch": "From the timers",
     "stateUnverified": "No timer",
-    "noteFiled": "The monthly ledger says {{hours}} — the number here is computed from the timers.",
+    "noteFiled": "The monthly ledger says {{hours}} - the number here is computed from the timers.",
     "noteMissing": "This month was never written to the monthly ledger; the number is computed from the timers.",
-    "noteUnverified": "No timers cover this month — showing what the ledger holds.",
-    "noteRunning": "A timer is running — this number updates live.",
+    "noteUnverified": "No timers cover this month - showing what the ledger holds.",
+    "noteRunning": "A timer is running - this number updates live.",
     "noteOpen": "The month is still open; it is filed at the start of the next one.",
     "openProcess": "Process page"
   },

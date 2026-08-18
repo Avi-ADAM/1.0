@@ -35,7 +35,13 @@
 
   h1 {
     text-align: center;
-    color: #333;
+    /* Was a hardcoded #333. The heading sits on the page background - the
+       cards below set their own white surface, but this does not - and in the
+       personal palette that background is --bg: #070606, in every mode. The
+       result measured 1.6:1 and read as an almost invisible title, which
+       axe-core flagged. --text is the token defined to flip together with
+       --bg in all three palettes, so it is legible on each of them. */
+    color: var(--text, #333);
     margin-bottom: 2rem;
   }
 

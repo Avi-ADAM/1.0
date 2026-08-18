@@ -1,0 +1,53 @@
+{
+  "meta": {
+    "title": "Para quién es · 1💗1",
+    "description": "Un programa de socios para ventas, un equipo para un proyecto, una idea que busca gente, la petición de un cliente, trabajar la tierra y la compra en grupo: cómo funciona cada uno en 1💗1."
+  },
+  "hero": {
+    "title": "¿Qué tipo de colaboración buscas?",
+    "sub": "El mecanismo es uno: el sistema cuenta lo que aportó cada persona, y de ahí se deriva lo que cada una se lleva. Lo que cambia es qué cuenta como aporte. Elige el caso más cercano al tuyo."
+  },
+  "cases": {
+    "sales": {
+      "title": "Un programa de socios para vender",
+      "who": "Tienes un producto y quieres que otras personas lo vendan y se lleven parte del beneficio.",
+      "how": "Aquí no hay comisión por cliente. Lo que se registra es lo que pusisteis: el dinero gastado en publicidad queda anotado como recurso, y las horas en llamadas con clientes potenciales como misión, ambos con el acuerdo de los socios. De ahí se deriva vuestra parte en la rikma, y el dinero que entra por ventas se reparte según ella. Quien invirtió más este mes se lleva más, y vuestra inversión ya está registrada antes de que se cierre la primera venta.",
+      "cta": "Crear una rikma de ventas"
+    },
+    "team": {
+      "title": "Un equipo que se junta para un proyecto",
+      "who": "Varios profesionales que se unen para un solo trabajo y prefieren no discutir el reparto al final.",
+      "how": "Cada uno registra las horas que trabajó y el dinero y el equipo que aportó, en el momento y con el consentimiento de todos. Cuando llega el pago, el reparto ya está calculado según lo que ocurrió de verdad, no según quién recuerda qué. Quien aportó menos en un mes cargado no tiene que disculparse, y la cifra se corrige sola.",
+      "cta": "Crear una rikma de equipo"
+    },
+    "idea": {
+      "title": "Una idea que necesita gente",
+      "who": "Tienes un proyecto en mente y te faltan personas que aporten lo que tú no tienes.",
+      "how": "Publicas misiones y recursos abiertos, y quien encaja se ofrece. Entra como socio por lo que aporta, sin un sueldo que todavía no puedes pagar. Si no sale nada, no perdió salario; y si sale, su parte ya está registrada.",
+      "cta": "Publicar una misión abierta"
+    },
+    "concierge": {
+      "title": "Queréis algo que aún no existe",
+      "who": "No venís a montar una sociedad: venís como clientes, y lo que necesitáis no se vende hecho en ninguna parte.",
+      "how": "Contáis con vuestras palabras qué queréis y el sistema lo desglosa en componentes. Alrededor de la petición se forma una rikma de proveedores que se complementan, y recibís un plan entero para aprobar: nada arranca hasta que lo aprobéis. Es el mismo círculo que los demás casos de aquí, solo que empieza en vosotros.",
+      "cta": "Contadnos qué necesitáis"
+    },
+    "land": {
+      "title": "Cultivar y trabajar la tierra",
+      "who": "Agricultores, gente con huerto y quien quiera vivir de la tierra sin capital inicial.",
+      "how": "Esto tiene su propia página, con los itinerarios y los ejemplos.",
+      "cta": "A la página de crecer desde la tierra"
+    },
+    "group": {
+      "title": "Compra colectiva",
+      "who": "Una caja de verduras, una ruta de transporte, un taller: cosas que solo existen cuando bastantes personas las quieren.",
+      "how": "Esto tiene su propia página: firmas solo en tu nombre, y arranca únicamente cuando han firmado suficientes.",
+      "cta": "Descubrir Quorum"
+    }
+  },
+  "closing": {
+    "title": "¿No encontraste tu caso?",
+    "sub": "El mecanismo no depende del tipo de negocio. Si no tienes claro cómo encaja con lo que haces, reserva una demo personal de 20 minutos y lo vemos juntos.",
+    "cta": "Reservar una demo personal"
+  }
+}

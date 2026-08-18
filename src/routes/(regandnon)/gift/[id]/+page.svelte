@@ -411,8 +411,8 @@
                   <span class="text-lg">⏳</span>
                   <span>
                     {$lang === 'he'
-                      ? 'כבר שלחת בקשת רכישה — לצפייה בבקשה'
-                      : 'You already submitted a purchase request — view it'}
+                      ? 'כבר שלחת בקשת רכישה - לצפייה בבקשה'
+                      : 'You already submitted a purchase request - view it'}
                   </span>
                   <span class="mr-auto rtl:ml-auto rtl:mr-0">←</span>
                 </a>

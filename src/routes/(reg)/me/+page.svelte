@@ -323,7 +323,7 @@
 
     if (incoming.length === 0 && existing.length > 0) {
       console.warn(
-        `[me/close] ignored empty list for "${a}" — kept ${existing.length} existing item(s) to avoid wiping the relation`
+        `[me/close] ignored empty list for "${a}" - kept ${existing.length} existing item(s) to avoid wiping the relation`
       );
     } else if (a == 'tafkidims') {
       meData.tafkidims.data = event.list;
@@ -464,8 +464,8 @@
 {#if (!online || data.loadError) && meData}
   <div class="stale-banner" dir="rtl">
     {$lang === 'he'
-      ? 'אין חיבור — מוצג מידע שמור'
-      : 'No connection — showing saved data'}
+      ? 'אין חיבור - מוצג מידע שמור'
+      : 'No connection - showing saved data'}
   </div>
 {/if}
 {#if data.loadError && !meData}

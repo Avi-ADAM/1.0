@@ -26,7 +26,7 @@ import {
 export const getProjectContextTool = createTool({
   id: 'getProjectContextTool',
   description:
-    "Get a live summary of what's happening in a project: its name, values, members, open missions, the current user's in-progress missions (with active timers), and products. Use this when the user asks about the state of a project (\"what's going on here?\", \"what's open?\", \"what am I working on?\") — especially when they're on a /moach/[projectId] page.",
+    "Get a live summary of what's happening in a project: its name, values, members, open missions, the current user's in-progress missions (with active timers), and products. Use this when the user asks about the state of a project (\"what's going on here?\", \"what's open?\", \"what am I working on?\") - especially when they're on a /moach/[projectId] page.",
   inputSchema: z.object({
     projectId: z
       .string()

@@ -7,7 +7,7 @@
   "ofTotalResource": "valor del recurso {{value}} de {{total}}",
   "ofTotalMonthly": "valor mensual {{value}} de {{total}}",
   "ofTotalCumulative": "acumulado {{value}} de {{total}}",
-  "horizonsTitle": "Si continúa sin fecha de fin — mes tras mes",
+  "horizonsTitle": "Si continúa sin fecha de fin - mes tras mes",
   "horizon1y": "Al cabo de 1 año",
   "horizon2y": "Al cabo de 2 años",
   "horizon5y": "Al cabo de 5 años",

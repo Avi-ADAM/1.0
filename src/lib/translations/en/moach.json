@@ -105,7 +105,7 @@
     "resourceChain": "Resource Chain",
     "processPage": "Process Page",
     "id": "ID",
-    "chatSoon": "Process discussion — coming soon",
+    "chatSoon": "Process discussion - coming soon",
     "chatDesc": "Discussion threads and chat integration will appear here."
   },
   "layout": {
@@ -153,7 +153,7 @@
     "aiBanner": {
       "eyebrow": "🤖 AI-powered",
       "title": "Come build with AI",
-      "desc": "Our AI scans the project and suggests directions and tasks ready for your approval — try it below",
+      "desc": "Our AI scans the project and suggests directions and tasks ready for your approval - try it below",
       "cta": "Plan with AI"
     },
     "preparingMission": "Matching the suggested skills to the platform’s vocabulary…"
@@ -172,7 +172,7 @@
     "backProcess": "Full process page",
     "backList": "All objects of this type",
     "active": "Active",
-    "archived": "Archived — read only",
+    "archived": "Archived - read only",
     "readOnly": "This object is archived: the page is read-only, no actions.",
     "actions": "Actions",
     "votePage": "Vote & negotiation page",
@@ -249,18 +249,18 @@
     "sale": "Sales"
   },
   "tour": {
-    "badge": "FreeMates is a collaboration group — everyone contributes their skills and earns according to their contribution",
-    "members": "FreeMates members — a pulsing green ring means a member is currently working on the project. Click a photo to visit their profile",
-    "tabsIntro": "The tabs are the management hub of the FreeMates — each tab shows a different aspect of the project",
-    "create": "📋 Create: add missions and request resources (money, gear, info) — for existing members or to find new partners. Every published mission or resource gets a unique shareable link with a beautiful page optimized for social networks and partner recruitment",
-    "progress": "🔄 Progress: list of all active missions — who is working on what and at which stage",
-    "acts": "✅ Acts & Tasks: manage small tasks — what is done, what is on the way",
+    "badge": "FreeMates is a collaboration group - everyone contributes their skills and earns according to their contribution",
+    "members": "FreeMates members - a pulsing green ring means a member is currently working on the project. Click a photo to visit their profile",
+    "tabsIntro": "The tabs are the management hub of the FreeMates - each tab shows a different aspect of the project",
+    "create": "📋 Create: add missions and request resources (money, gear, info) - for existing members or to find new partners. Every published mission or resource gets a unique shareable link with a beautiful page optimized for social networks and partner recruitment",
+    "progress": "🔄 Progress: list of all active missions - who is working on what and at which stage",
+    "acts": "✅ Acts & Tasks: manage small tasks - what is done, what is on the way",
     "timers": "⏱️ Timers: see when each member was active for the project and what they worked on. When a member starts a timer, a green ring appears around their avatar above",
-    "wishes": "💌 Incoming Wishes: warm leads from concierge customers that your project is a match for — ready business opportunities",
+    "wishes": "💌 Incoming Wishes: warm leads from concierge customers that your project is a match for - ready business opportunities",
     "sales": "🛒 Sales & Products: Simple product = fixed price. Complex product = price shaped by missions, resources and decisions made together during the purchase process. Every product gets a beautiful shareable page optimized for social media and attracting customers",
-    "split": "💰 Split: revenue-split calculator — everyone gets paid according to their contribution",
-    "votes": "🗳️ Votes: decisions made through consensus — unique negotiation tools until everyone is genuinely happy with the outcome. Not majority vote, but real agreement from all FreeMates members",
-    "chains": "🔗 Chains: every mission and resource across its entire lifecycle — from the opening proposal through voting all the way to the archive. Full transparency and deep understanding of every project process",
+    "split": "💰 Split: revenue-split calculator - everyone gets paid according to their contribution",
+    "votes": "🗳️ Votes: decisions made through consensus - unique negotiation tools until everyone is genuinely happy with the outcome. Not majority vote, but real agreement from all FreeMates members",
+    "chains": "🔗 Chains: every mission and resource across its entire lifecycle - from the opening proposal through voting all the way to the archive. Full transparency and deep understanding of every project process",
     "gantt": "📊 Gantt & Kanban: visual project management and timeline",
     "helpBtn": "Show guide again"
   },
@@ -279,7 +279,7 @@
     "status": {
       "suggested": {
         "label": "Matched by Lev",
-        "desc": "Auto matched — wisher has not viewed yet."
+        "desc": "Auto matched - wisher has not viewed yet."
       },
       "viewed": {
         "label": "Wisher viewed",
@@ -287,11 +287,11 @@
       },
       "accepted": {
         "label": "Wisher chose you",
-        "desc": "A service request was opened — head to deals to approve."
+        "desc": "A service request was opened - head to deals to approve."
       },
       "rejected": {
         "label": "Dismissed",
-        "desc": "Wisher dismissed — no action needed."
+        "desc": "Wisher dismissed - no action needed."
       },
       "expired": {
         "label": "Expired",
@@ -301,7 +301,7 @@
   },
   "open": {
     "title": "Open for partners",
-    "subtitle": "Every mission and resource this rikma is still looking for someone for — in one place",
+    "subtitle": "Every mission and resource this rikma is still looking for someone for - in one place",
     "searchPh": "Search by name, description, skill or role…",
     "tabAll": "All",
     "tabMissions": "Missions",
@@ -313,7 +313,7 @@
     "pendingBadge": "Awaiting the rikma’s approval",
     "pendingToggle": "Also show items awaiting approval",
     "pendingHeading": "Awaiting the rikma’s approval",
-    "pendingNote": "Proposals that have not passed a vote yet — they are not open to anyone outside the rikma.",
+    "pendingNote": "Proposals that have not passed a vote yet - they are not open to anyone outside the rikma.",
     "empty": "This rikma has no open missions or needed resources right now.",
     "emptyCta": "Create a mission or request a resource",
     "emptyFiltered": "Nothing matches this search.",

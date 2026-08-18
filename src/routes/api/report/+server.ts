@@ -192,7 +192,7 @@ export const POST: RequestHandler = async ({ request, fetch: eventFetch, url }) 
     const strapiLine = strapiId ? `\n🗄 Strapi #${strapiId}` : '';
 
     const msgParts = [
-      `${label.emoji} *${lang === 'he' ? label.he : label.en}* — 1💗1 Bot`,
+      `${label.emoji} *${lang === 'he' ? label.he : label.en}* - 1💗1 Bot`,
       '',
       userLine,
       userEmail ? `📧 ${userEmail}` : null,

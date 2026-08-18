@@ -100,7 +100,7 @@ export function isDonationNote(note: string | null | undefined): boolean {
 
 /**
  * Builds the structured note `createDonationSale` should persist.
- * Quotes in the message are stripped rather than escaped — the parser's
+ * Quotes in the message are stripped rather than escaped - the parser's
  * regex treats `"` as a hard delimiter.
  */
 export function buildDonationNote(input: {

@@ -11,7 +11,7 @@
   "hero_sub": "Cuéntanoslo con tus palabras: Lev lo desglosará, buscará asociaciones adecuadas y te devolverá un plan completo para tu aprobación.",
   "privacy_warm": "Nada se hace público hasta que publicas el deseo.",
   "new_wish_btn": "✨ Crear nuevo deseo",
-  "browse_btn": "O — explora la comunidad",
+  "browse_btn": "O - explora la comunidad",
   "seed_gift": "Regalo para un ser querido",
   "seed_task_hard": "Una tarea que no puedo hacer solo",
   "seed_community_event": "Pequeño evento comunitario",
@@ -180,7 +180,7 @@
       },
       "invite": {
         "label": "¿Invitar socios?",
-        "placeholder": "sí — en persona, o vía Lev"
+        "placeholder": "sí - en persona, o vía Lev"
       },
       "joinKind": {
         "label": "Iniciativa compartida",
@@ -222,7 +222,7 @@
       },
       "none": {
         "label": "Sin invitaciones",
-        "hint": "Sin invitación previa — eliges entre las propuestas que lleguen."
+        "hint": "Sin invitación previa - eliges entre las propuestas que lleguen."
       }
     },
     "joinKind": {
@@ -298,7 +298,7 @@
       "month": "En un mes",
       "clear": "Limpiar"
     },
-    "dateHint": "No es obligatorio — puedes dejarlo vacío y Lev propondrá fechas flexibles.",
+    "dateHint": "No es obligatorio - puedes dejarlo vacío y Lev propondrá fechas flexibles.",
     "budgetLabel": "Importe máximo (₪)",
     "budgetPlaceholder": "p. ej. 500",
     "budgetNoCap": "Sin tope",
@@ -310,7 +310,7 @@
     "maxJoinersPlaceholder": "Sin tope",
     "joinDeadline": "Fecha de cierre de incorporación (opcional)",
     "groupHint": "Cuando se unan {{count}} participantes se podrá cerrar el grupo, decidir juntos y pagar juntos. Hasta entonces el deseo está en modo de reunión.",
-    "soloHint": "La opción por defecto — tú organizas y la comunidad propone. Elegir un tipo grupal abre la incorporación, las decisiones compartidas y el pago compartido."
+    "soloHint": "La opción por defecto - tú organizas y la comunidad propone. Elegir un tipo grupal abre la incorporación, las decisiones compartidas y el pago compartido."
   },
   "no_wishes_found_title": "No se encontraron deseos",
   "proposals_so_far": "Propuestas hasta ahora"

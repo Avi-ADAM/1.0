@@ -135,7 +135,7 @@ const extractTextStep = createStep({
     ) {
       const mammothPkg = 'mammoth';
       const mod = await import(/* @vite-ignore */ mammothPkg).catch(() => {
-        throw new Error('חבילת mammoth לא מותקנת — הריצי npm i mammoth');
+        throw new Error('חבילת mammoth לא מותקנת - הריצי npm i mammoth');
       });
       const mammoth = (mod as any).default ?? mod;
       text = (await mammoth.extractRawText({ buffer })).value;
@@ -151,7 +151,7 @@ const extractTextStep = createStep({
     }
 
     if (text.trim().length < 50) {
-      throw new Error('לא ניתן לחלץ טקסט — ייתכן שהקובץ סרוק כתמונה.');
+      throw new Error('לא ניתן לחלץ טקסט - ייתכן שהקובץ סרוק כתמונה.');
     }
 
     return { text: text.trim(), detectedFormat, lang };
@@ -237,7 +237,7 @@ const analyzeWithGeminiStep = createStep({
       id: 'CvExtractor',
       name: 'CvExtractor',
       instructions:
-        'You extract structured data from CVs and free-text descriptions. Return JSON only — no explanations, no markdown fences.',
+        'You extract structured data from CVs and free-text descriptions. Return JSON only - no explanations, no markdown fences.',
       model: models,
     });
 
@@ -249,31 +249,31 @@ const analyzeWithGeminiStep = createStep({
   "tasks":         [],   // discrete tasks the person can do: logo design, website build, moving help
   "vallues":       [],   // leading values: honesty, creativity, curiosity, responsibility, growth, freedom
   "proposed_sps":  [],   // physically-shareable resources: iPad Pro, car, studio space, camera
-  "sourceLang":    "he"  // 'he' | 'en' | 'ar' | 'mixed' | 'other' — source language
+  "sourceLang":    "he"  // 'he' | 'en' | 'ar' | 'mixed' | 'other' - source language
 }
 
 Critical i18n rules:
-- Output language: **ALWAYS ${primaryName}** for every item — translate if the source is in a different language.
+- Output language: **ALWAYS ${primaryName}** for every item - translate if the source is in a different language.
 - Each item is either a plain string in ${primaryName}, OR an object carrying same-meaning labels in other languages
   as synonyms, e.g. { "${lang}": "...", "${others[0]}": "...", "${others[1]}": "..." }.
-  Only include alt-lang fields when the source actually contained that wording — do not invent.
-- Mandatory: at least 3 items in EACH of skills/roles/tasks/vallues — you may infer leading values
+  Only include alt-lang fields when the source actually contained that wording - do not invent.
+- Mandatory: at least 3 items in EACH of skills/roles/tasks/vallues - you may infer leading values
   from tone, focus, and work style even if not stated explicitly.
-- If truly no info exists for a category (nothing inferable) — empty array; never fabricate.
+- If truly no info exists for a category (nothing inferable) - empty array; never fabricate.
 - methods: 1–4 items. proposed_sps: only if physical equipment/space/property is explicitly mentioned.
 - Each proposed_sp: { "name": "...", "descrip": "..." } (descrip optional, name in ${primaryName}).
 - sourceLang: report the dominant language of the SOURCE text ('he' / 'en' / 'ar' / 'mixed' / 'other').
 
 ATOMICITY rules (very important for skills):
-- **skills must be ATOMIC** — one concept per item, never a bundle.
+- **skills must be ATOMIC** - one concept per item, never a bundle.
   ✗ BAD:  "Cloud Technologies AWS S3"          → one chip with 3 things lumped together.
   ✓ GOOD: "Cloud Technologies", "AWS", "S3"    → three separate chips.
   ✗ BAD:  "Python, Django, FastAPI"             → comma-separated list as one skill.
   ✓ GOOD: "Python", "Django", "FastAPI"         → three skills.
   ✗ BAD:  "React/Vue/Angular"                   → multiple frameworks bundled.
   ✓ GOOD: "React", "Vue", "Angular".
-  Split umbrella terms from their concrete tools — keep BOTH the family ("Cloud Technologies") and the specific tools ("AWS", "S3") as separate skills.
-- roles, methods, tasks, vallues: keep as written by the source — they CAN be multi-word phrases
+  Split umbrella terms from their concrete tools - keep BOTH the family ("Cloud Technologies") and the specific tools ("AWS", "S3") as separate skills.
+- roles, methods, tasks, vallues: keep as written by the source - they CAN be multi-word phrases
   (e.g. role "Senior Backend Engineer", method "hybrid work", task "build a logo for a non-profit").
   Atomization applies to SKILLS ONLY.
 
@@ -330,7 +330,7 @@ const matchToExistingStep = createStep({
     const { skills, roles, methods, tasks, vallues, proposed_sps, sourceLang } = inputData;
     const lang: Lang = inputData.lang ?? 'he';
 
-    // Normalize each item to { canonical, synonyms } — canonical is in the
+    // Normalize each item to { canonical, synonyms } - canonical is in the
     // user's locale; synonyms are the alt-lang labels Gemini supplied so the
     // UI can show them and so we can save them as sinanames on the vocab.
     const skillsN = skills.map((r) => normalizeItemFor(r, lang)).filter((x) => x.canonical);

@@ -91,7 +91,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     if (msg?.trim()) details.push(msg.trim());
     if (contact?.trim())
       details.push((context.lang === 'en' ? 'Contact: ' : 'ליצירת קשר: ') + contact.trim());
-    const tail = details.length ? ` — ${details.join(' · ')}` : '';
+    const tail = details.length ? ` - ${details.join(' · ')}` : '';
 
     await notifier.notify(
       {

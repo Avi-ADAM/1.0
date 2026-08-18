@@ -142,7 +142,7 @@
 </script>
 
 <svelte:head>
-  <title>{chainName} — {$t('moach.chains.processPage')}</title>
+  <title>{chainName} - {$t('moach.chains.processPage')}</title>
 </svelte:head>
 
 <div class="pp" dir={$isRtl ? 'rtl' : 'ltr'}>

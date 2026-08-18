@@ -68,7 +68,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   const ratsonFinish = ratsonAttrs.finnishDate ?? null;
 
   if (owners.length === 0) {
-    throw new Error('Ratson has no owner — cannot create Sheirutpend');
+    throw new Error('Ratson has no owner - cannot create Sheirutpend');
   }
   const wisherUserId = String(owners[0].id);
 
@@ -234,10 +234,10 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
   }
 
   if (!matanotId) {
-    throw new Error('Proposal has no matanot — cannot open Sheirutpend (custom_offer flow handled separately in M7)');
+    throw new Error('Proposal has no matanot - cannot open Sheirutpend (custom_offer flow handled separately in M7)');
   }
   if (!projectId) {
-    throw new Error('Proposal has no proposer project — cannot open Sheirutpend');
+    throw new Error('Proposal has no proposer project - cannot open Sheirutpend');
   }
 
   // ── 2. Flip status to 'accepted' (wisher side of the gate) ──────────────
@@ -284,7 +284,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
       );
     } catch (err) {
       console.warn(
-        '[acceptRatsonProposal] could not link sheirutpend.ratson_proposal — schema field may be missing:',
+        '[acceptRatsonProposal] could not link sheirutpend.ratson_proposal - schema field may be missing:',
         err
       );
     }
@@ -314,7 +314,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
           da: now,
           mes: note
             ? `אישרתי את ההצעה. ${note}`
-            : 'אישרתי את ההצעה — Sheirutpend נפתח לאישור הספקים.'
+            : 'אישרתי את ההצעה - Sheirutpend נפתח לאישור הספקים.'
         },
         context.jwt,
         context.fetch
@@ -339,7 +339,7 @@ const handler: ActionExecutionHandler = async (params, context, util) => {
 export const acceptRatsonProposalConfig: ActionConfig = {
   key: 'acceptRatsonProposal',
   description:
-    'Wisher accepts a ratson_proposal — opens a Sheirutpend so the proposer project members can vote.',
+    'Wisher accepts a ratson_proposal - opens a Sheirutpend so the proposer project members can vote.',
   graphqlOperation: handler,
   paramSchema: {
     proposalId: { type: 'string', required: true },
@@ -357,9 +357,9 @@ export const acceptRatsonProposalConfig: ActionConfig = {
     },
     templates: {
       title: {
-        he: 'הצעה אושרה — נדרשת הסכמה',
-        en: 'Proposal accepted — your consent needed',
-        ar: 'تمت الموافقة على العرض — مطلوبة موافقتك'
+        he: 'הצעה אושרה - נדרשת הסכמה',
+        en: 'Proposal accepted - your consent needed',
+        ar: 'تمت الموافقة على العرض - مطلوبة موافقتك'
       },
       body: {
         he: 'הלקוחה אישרה את ההצעה. נא לאשר את הבקשה ב־Sheirutpend כדי שהדיל ייסגר.',

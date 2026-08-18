@@ -147,7 +147,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi }) => {
 export const acceptWishOfferConfig: ActionConfig = {
   key: 'acceptWishOffer',
   description:
-    "An invited provider approves their placement on a wish: sets assignedMember on the customer-authored BOM slot, marks the proposal accepted, and records willingness. No creation — the slot already exists.",
+    "An invited provider approves their placement on a wish: sets assignedMember on the customer-authored BOM slot, marks the proposal accepted, and records willingness. No creation - the slot already exists.",
   graphqlOperation: handler,
   paramSchema: {
     proposalId: { type: 'string', required: true },

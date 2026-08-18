@@ -21,8 +21,8 @@
 
   const i18n = {
     he: {
-      pendm: 'החלטה ראשונית — משימה',
-      pmash: 'החלטה ראשונית — משאב',
+      pendm: 'החלטה ראשונית - משימה',
+      pmash: 'החלטה ראשונית - משאב',
       openMission: 'הצעה פתוחה',
       openMashaabim: 'משאב פתוח',
       asks: 'בקשות הצטרפות',
@@ -32,7 +32,7 @@
       approvals: 'אשרורי סיום',
       maap: 'אספקה בתהליך',
       archive: 'ארכיון רשמי',
-      rikmash: 'התקבל — ארכיון',
+      rikmash: 'התקבל - ארכיון',
       votes: 'הצבעות ומו״מ',
       chat: 'צ׳אט',
       objectPage: 'לעמוד האובייקט',
@@ -62,8 +62,8 @@
       noEntity: '—'
     },
     en: {
-      pendm: 'Initial decision — mission',
-      pmash: 'Initial decision — resource',
+      pendm: 'Initial decision - mission',
+      pmash: 'Initial decision - resource',
       openMission: 'Open offer',
       openMashaabim: 'Open resource',
       asks: 'Join requests',
@@ -73,7 +73,7 @@
       approvals: 'Finish approvals',
       maap: 'Delivery in progress',
       archive: 'Official archive',
-      rikmash: 'Received — archive',
+      rikmash: 'Received - archive',
       votes: 'Votes & negotiation',
       chat: 'Chat',
       objectPage: 'Object page',
@@ -103,8 +103,8 @@
       noEntity: '—'
     },
     ar: {
-      pendm: 'قرار أولي — مهمة',
-      pmash: 'قرار أولي — مورد',
+      pendm: 'قرار أولي - مهمة',
+      pmash: 'قرار أولي - مورد',
       openMission: 'عرض مفتوح',
       openMashaabim: 'مورد مفتوح',
       asks: 'طلبات انضمام',
@@ -114,7 +114,7 @@
       approvals: 'موافقات الإنهاء',
       maap: 'توريد قيد التنفيذ',
       archive: 'الأرشيف الرسمي',
-      rikmash: 'تم الاستلام — أرشيف',
+      rikmash: 'تم الاستلام - أرشيف',
       votes: 'التصويت والتفاوض',
       chat: 'دردشة',
       objectPage: 'صفحة الكائن',

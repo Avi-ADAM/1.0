@@ -57,7 +57,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
   try {
     extraction = await extractWish(text, GEMINI_API_KEY);
     console.log(
-      `[concierge-extract] ✓ extracted in ${Date.now() - t0}ms — ` +
+      `[concierge-extract] ✓ extracted in ${Date.now() - t0}ms - ` +
         `missions:${extraction.missions.length} resources:${extraction.resources.length} ` +
         `skills:${extraction.skills.length}`
     );
@@ -74,7 +74,7 @@ export const POST: RequestHandler = async ({ request, fetch }) => {
     try {
       enrichment = await enrichWish(extraction, fetch);
       console.log(
-        `[concierge-extract] ✓ enriched in ${Date.now() - t1}ms — ` +
+        `[concierge-extract] ✓ enriched in ${Date.now() - t1}ms - ` +
           `missions:${enrichment.missions.length} people:${enrichment.people.length}`
       );
     } catch (err) {

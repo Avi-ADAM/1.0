@@ -78,8 +78,8 @@
     <section class="cycles-section anim">
       <h2 class="cycles-title">
         {$lang === 'he'
-          ? `💳 הוראות קבע — עדכון חודשי (${customerCycles.length})`
-          : `💳 Standing orders — monthly update (${customerCycles.length})`}
+          ? `💳 הוראות קבע - עדכון חודשי (${customerCycles.length})`
+          : `💳 Standing orders - monthly update (${customerCycles.length})`}
       </h2>
       <p class="cycles-sub">
         {$lang === 'he'

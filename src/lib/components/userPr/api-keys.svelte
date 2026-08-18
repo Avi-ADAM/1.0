@@ -37,7 +37,7 @@
         ✅ המפתח <strong>{form.keyName}</strong> נוצר בהצלחה
       </p>
       <p class="text-sm text-green-700 mb-2">
-        שמור אותו עכשיו — הוא לא יוצג שוב.
+        שמור אותו עכשיו - הוא לא יוצג שוב.
       </p>
       <div
         class="flex items-center gap-2 bg-white border border-green-200 rounded p-2 font-mono text-sm break-all"

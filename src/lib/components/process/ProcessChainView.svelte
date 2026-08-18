@@ -99,21 +99,21 @@
     he: {
       missionSection:  'שרשראות משימות',
       resourceSection: 'שרשראות משאבים',
-      archiveSection:  'ארכיון — תהליכים שהסתיימו',
+      archiveSection:  'ארכיון - תהליכים שהסתיימו',
       empty:           'לא נמצאו שרשראות תהליך לפרויקט זה',
       loadingExtra:    'טוען נתונים נוספים…'
     },
     en: {
       missionSection:  'Mission Chains',
       resourceSection: 'Resource Chains',
-      archiveSection:  'Archive — Completed Processes',
+      archiveSection:  'Archive - Completed Processes',
       empty:           'No process chains found for this project',
       loadingExtra:    'Loading additional data…'
     },
     ar: {
       missionSection:  'سلاسل المهام',
       resourceSection: 'سلاسل الموارد',
-      archiveSection:  'الأرشيف — العمليات المكتملة',
+      archiveSection:  'الأرشيف - العمليات المكتملة',
       empty:           'لم يتم العثور على سلاسل عمليات لهذا المشروع',
       loadingExtra:    'جارٍ تحميل بيانات إضافية…'
     }

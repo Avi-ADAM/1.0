@@ -110,7 +110,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
       ? String(found.data.usersPermissionsUsers.data[0].id)
       : null;
     if (!customerId) {
-      throw new Error(`Customer "${q}" not found — use their exact 1lev1 username or email`);
+      throw new Error(`Customer "${q}" not found - use their exact 1lev1 username or email`);
     }
   }
 
@@ -287,7 +287,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
                 en: 'A sale report awaits your consent'
               },
               body: {
-                he: `דווח שקיבלת ${Number(total)}₪ ממכירת ${productName}. אפשר לאשר, לדייק (משא-ומתן) או לברר. אם לא תגיב — יאושר אוטומטית בתום זמן התגובה של הריקמה.`,
+                he: `דווח שקיבלת ${Number(total)}₪ ממכירת ${productName}. אפשר לאשר, לדייק (משא-ומתן) או לברר. אם לא תגיב - יאושר אוטומטית בתום זמן התגובה של הריקמה.`,
                 en: `It was reported that you hold ${Number(total)}₪ from the sale of ${productName}. You can approve, refine (negotiate) or discuss. If you don't respond it is auto-approved after the rikma's response time.`
               }
             },

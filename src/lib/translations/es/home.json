@@ -10,7 +10,7 @@
     "headline2": "Gestión empresarial inteligente con el corazón abierto",
     "headline3": "Plena independencia dentro de una comunidad que te apoya",
     "headline4": "Deja de alquilar tu tiempo",
-    "headline5": "Convierte cada hora en propiedad — juntos, por consenso"
+    "headline5": "Convierte cada hora en propiedad - juntos, por consenso"
   },
   "intro": {
     "q1": "¿Tienes un talento increíble pero te cuesta monetizarlo solo?",
@@ -67,7 +67,7 @@
   },
   "sections": {
     "problemTitle": "¿Conoces esa sensación?",
-    "howTitle": "Cómo empezar — en 4 pasos",
+    "howTitle": "Cómo empezar - en 4 pasos",
     "faqTitle": "Preguntas frecuentes",
     "featuresTitle": "Todo lo que necesitas para gestionar una asociación, en un solo lugar",
     "featuresSub": "Herramientas reales ya integradas en el sistema, no promesas.",
@@ -114,7 +114,7 @@
     "colEmployee_d": "Seguridad falsa•Sin propiedad•Otro decide por ti•El sueldo se acaba cada mes",
     "colSolo_t": "Emprendedor solitario",
     "colSolo_d": "Todo el riesgo sobre ti•Soledad•Carga de gestión pesada•Sin red de seguridad",
-    "colRikma_t": "En 1💗1 — una Rikma",
+    "colRikma_t": "En 1💗1 - una Rikma",
     "colRikma_badge": "El tercer camino",
     "colRikma_d": "Propiedad real en %•Plena libertad•Decisiones por consenso•Socios que te complementan•Beneficio de por vida",
     "navDemo": "Demo en vivo",
@@ -133,7 +133,7 @@
     "solutionTitle": "Entonces, ¿por qué no calcularlo y ya está?",
     "solutionLead": "Eso es exactamente lo que hace 1💗1. En lugar de acordar de antemano un número arbitrario, el sistema cuenta lo que cada socio dio realmente, y de ahí se deriva lo que cada socio se lleva a casa.",
     "step1_t": "Lo que diste",
-    "step1_d": "Horas de trabajo, dinero, equipo, conocimiento, clientes: cada aportación se registra, con el acuerdo de todos, en el momento en que ocurre. No de memoria a fin de año.",
+    "step1_d": "Horas de trabajo, dinero y equipo: cada aportación se registra, con el acuerdo de todos, en el momento en que ocurre. No de memoria a fin de año. El marketing entra igual: el gasto en publicidad es un recurso, y las horas con clientes son una misión.",
     "step2_t": "Cuánto vale",
     "step2_d": "Cada aportación se traduce a un valor acordado, y tu parte en la Rikma se actualiza sola. Es un cálculo vivo, no un acuerdo congelado el primer día.",
     "step3_t": "Lo que te llevas a casa",
@@ -244,7 +244,7 @@
     "title": "Aclaremos las cosas",
     "subtitle": "Todo lo que necesitas saber antes de unirte",
     "tabs": {
-      "platform": "La plataforma – 1💗1",
+      "platform": "La plataforma - 1💗1",
       "agreement": "Los acuerdos"
     },
     "platform": {
@@ -553,5 +553,46 @@
     "thirdWayLabel": "Vídeo: la tercera vía",
     "close": "Cerrar"
   },
-  "pageUrl": "https://1lev1.com/?lang=es"
+  "pageUrl": "https://1lev1.com/?lang=es",
+  "motion": {
+    "label": "Control de movimiento",
+    "playing": "Movimiento activo",
+    "paused": "Movimiento en pausa",
+    "hidden": "Animación oculta",
+    "toPlay": "Activar el movimiento",
+    "toPause": "Pausar el movimiento",
+    "toHide": "Ocultar la animación",
+    "auto": "Volver al valor predeterminado"
+  },
+  "deeper": {
+    "eyebrow": "◈ Profundizar ◈",
+    "title": "Hay más, por tema",
+    "sub": "Ya tienes el principio. Estos son los tres lugares donde se explica por completo."
+  },
+  "flow": {
+    "toPain": "Esto era para quien ya tiene una sociedad. ¿Y si aún no tienes una?",
+    "toDemo": "Esa es la idea. Ahora míralo funcionar.",
+    "toFeatures": "Ya viste cómo se siente. Esto es lo que hay dentro.",
+    "toConcierge": "Y esa dirección, desde el cliente hacia dentro, es lo que ocurre aquí:"
+  },
+  "uses": {
+    "eyebrow": "◈ ¿Y tu caso? ◈",
+    "title": "¿Un programa de socios? ¿Un equipo para un proyecto? ¿Una idea que busca gente?",
+    "sub": "El mecanismo es uno y solo cambia qué cuenta como aporte. Hay una página que muestra cómo se ve en cada caso.",
+    "cta": "Encuentra tu caso"
+  },
+  "circle": {
+    "eyebrow": "◈ Un círculo, dos entradas ◈",
+    "title": "Entréis por donde entréis, es el mismo círculo",
+    "lead": "Se abre una rikma, entran socios, nace un producto y lo recibe un cliente. Y la petición de un cliente abre el círculo siguiente. Podéis subiros como emprendedor que abre una rikma, o como cliente que pide algo que aún no existe.",
+    "n1": "Rikma",
+    "n2": "Socios",
+    "n3": "Producto",
+    "n4": "Cliente",
+    "n5": "Petición",
+    "entryFounder": "el emprendedor entra en Rikma",
+    "entryCustomer": "el cliente entra en Petición",
+    "core": "lo que cada uno dio decide lo que se lleva",
+    "note": "Las dos entradas llevan al mismo círculo y al mismo cálculo exacto."
+  }
 }

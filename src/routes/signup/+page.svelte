@@ -60,7 +60,7 @@
   <div class="content" in:scale={{ duration: 600, opacity: 0.5, start: 0.96, easing: quintOut }}>
     <Plaque
       title={displayName ? `שלום ${displayName}!` : 'שלום! יוצרים חשבון'}
-      sub="רק מייל וסיסמה — הכל אחר־כך"
+      sub="רק מייל וסיסמה - הכל אחר־כך"
     />
 
     <form
@@ -156,7 +156,7 @@
 
       <div class="terms">
         בלחיצה אתם מסכימים ל<u>תנאים</u> ול<u>מדיניות הפרטיות</u>.<br />
-        זה לוקח 15 שניות — הצעדים הבאים יחכו לכם אחרי אישור מייל.
+        זה לוקח 15 שניות - הצעדים הבאים יחכו לכם אחרי אישור מייל.
       </div>
 
       <div class="footer">

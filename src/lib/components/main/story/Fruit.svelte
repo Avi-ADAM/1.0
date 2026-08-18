@@ -19,6 +19,7 @@
     Object3D,
     Color
   } from 'three';
+  import { motionSpeed } from '$lib/stores/motion.js';
 
   /**
    * @typedef {Object} Props
@@ -28,10 +29,6 @@
 
   /** @type {Props} */
   let { scrollProgress = 0, count = 18 } = $props();
-
-  const reduce =
-    typeof window !== 'undefined' &&
-    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
   const rnd = (s) => {
     const x = Math.sin(s * 91.37 + 47.13) * 43758.5453;
@@ -85,7 +82,10 @@
 
   let time = 0;
   useTask((delta) => {
-    if (!reduce) time += delta;
+    // `motionSpeed()` is 0 when the visitor paused the scene and eases toward a
+    // slow drift once they have been still, so the coins keep their positions
+    // and their scroll-driven bloom either way — only their travel stops.
+    time += delta * motionSpeed();
     // the coins belong to the globe act: they bloom with it and draw back in
     // at the end, clearing the stage for the 1💗1 reveal.
     const flow =

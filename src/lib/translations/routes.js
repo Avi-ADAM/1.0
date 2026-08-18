@@ -40,6 +40,7 @@ export const ROUTED = {
     concierge: at('/concierge', '/wish'),
     offerings: at('/me', '/onboard', '/gift', '/user', '/deals/sales-center', /\/moach\/[^/]+\/sales/),
     consensus: at('/consensus'),
+    uses: at('/uses'),
     planning: at(/\/moach\/[^/]+\/create/),
     // The rikma's API page — one route, one namespace, nowhere else.
     rikmaApi: at(/\/moach\/[^/]+\/api/),

@@ -118,7 +118,7 @@ export const candidateCounterOnAskConfig: ActionConfig = {
   paramSchema: {
     askId: { type: 'string', required: true, description: 'Ask being negotiated' },
     openMissionId: { type: 'string', required: false, description: 'Open mission the Ask targets' },
-    projectId: { type: 'string', required: true, description: 'Project (rikma) ID — notifications' },
+    projectId: { type: 'string', required: true, description: 'Project (rikma) ID - notifications' },
     ordern: { type: 'number', required: false, description: 'Current max round (new round = ordern+1)' },
     newValues: {
       type: 'object',

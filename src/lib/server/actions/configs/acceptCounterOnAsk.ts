@@ -63,7 +63,7 @@ export const acceptCounterOnAskConfig: ActionConfig = {
 
   paramSchema: {
     askId: { type: 'string', required: true, description: 'Ask being negotiated' },
-    projectId: { type: 'string', required: true, description: 'Project (rikma) ID — notifications' },
+    projectId: { type: 'string', required: true, description: 'Project (rikma) ID - notifications' },
     ordern: { type: 'number', required: false, description: 'Latest round order being accepted' },
     users: { type: 'array', required: false, description: 'Existing Ask vots array' },
   },

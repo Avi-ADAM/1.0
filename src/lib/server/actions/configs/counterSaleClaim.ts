@@ -47,7 +47,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
     (v) => String(v.userId) === userId && Number(v.order) === currentOrder && v.what,
   );
   if (iSignedStanding) {
-    throw new Error("It's the other side's turn — you already stand behind the current version");
+    throw new Error("It's the other side's turn - you already stand behind the current version");
   }
 
   const newOrder = currentOrder + 1;

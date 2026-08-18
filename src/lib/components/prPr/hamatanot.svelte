@@ -49,7 +49,7 @@
           ? $t('project.hamatanot.siteShare.less')
           : $t('project.hamatanot.siteShare.more');
       const proposed = p.proposed !== null ? ` (₪${p.proposed})` : '';
-      const reason = p.reason ? ` — ${p.reason}` : '';
+      const reason = p.reason ? ` - ${p.reason}` : '';
       parts.push(`${dir}${proposed}${reason}`);
     }
     return parts.join(' · ');

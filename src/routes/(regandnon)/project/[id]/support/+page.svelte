@@ -131,8 +131,8 @@
   let pageTitle = $derived(
     attrs?.projectName
       ? $lang === 'he'
-        ? `${attrs.projectName} — תמיכה ושקיפות`
-        : `${attrs.projectName} — Support & Transparency`
+        ? `${attrs.projectName} - תמיכה ושקיפות`
+        : `${attrs.projectName} - Support & Transparency`
       : '1💗1'
   );
 </script>

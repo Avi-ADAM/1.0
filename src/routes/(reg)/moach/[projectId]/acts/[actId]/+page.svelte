@@ -41,7 +41,7 @@
 
 <svelte:head>
   {#if act}
-    <title>{act.attributes.shem} — Act</title>
+    <title>{act.attributes.shem} - Act</title>
     <meta name="moach:entity-type" content="act" />
     <meta name="moach:entity-id" content={actId} />
     <meta name="moach:project-id" content={projectId} />

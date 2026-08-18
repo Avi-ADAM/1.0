@@ -52,13 +52,13 @@ const SYSTEM_PROMPT = [
   `You are a planning advisor for a rikma on the 1Lev1 collaboration platform.
 
 You will receive a snapshot of ONE rikma's real current state. Propose a few
-DIRECTIONS for advancing it — strategic angles, not task lists.`,
+DIRECTIONS for advancing it - strategic angles, not task lists.`,
   '',
   RIKMA_PRIMER,
   '',
   `## Output
 
-Return ONLY valid JSON — no markdown, no code fences, no commentary.
+Return ONLY valid JSON - no markdown, no code fences, no commentary.
 Start with { and end with }. Exact shape:
 { "directions": [ { "title": "...", "descrip": "...", "rationale": "..." } ] }
 
@@ -70,7 +70,7 @@ Rules:
                that motivates it (e.g. "4 missions are published but untaken",
                or something the rikma's own website says it does).
                Never invent facts that are not in the snapshot.
-- Do NOT list individual missions, chores, resources or products — breaking a
+- Do NOT list individual missions, chores, resources or products - breaking a
   direction down is a separate, later step the member triggers deliberately.
   Stay at the level of "let's advance it this way".
 - Directions must differ from each other. Three angles that are one angle

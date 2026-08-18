@@ -449,7 +449,7 @@ export function saveCurrentSnapshot(): void {
   // Guard: never snapshot a partial session — a snapshot saved from a slice-only
   // load would make returning /lev visitors see incomplete data as "everything".
   if (get(dataMode) !== 'full') {
-    console.log('⏭️ [levDataLoader] Skipping snapshot — dataMode is not full');
+    console.log('⏭️ [levDataLoader] Skipping snapshot - dataMode is not full');
     return;
   }
 
@@ -572,7 +572,7 @@ async function loadSuggestionsFromMatchRecords(userData: any, userId: string | n
         (userData?.attributes?.sps?.data?.length || 0) > 0;
 
       if (hasCaps) {
-        console.log('🌐 [levDataLoader] No stored suggestions — running one-time backfill');
+        console.log('🌐 [levDataLoader] No stored suggestions - running one-time backfill');
         try {
           const refresh = await executeAction('refreshMySuggestions', {});
           const created =
@@ -597,6 +597,6 @@ async function loadSuggestionsFromMatchRecords(userData: any, userId: string | n
       console.log(`✅ [levDataLoader] Resource suggestions loaded from match records (${resourceSuggestions.length} items)`);
     }
   } catch (err) {
-    console.warn('⚠️ [levDataLoader] Failed to load match suggestions — keeping fallback', err);
+    console.warn('⚠️ [levDataLoader] Failed to load match suggestions - keeping fallback', err);
   }
 }

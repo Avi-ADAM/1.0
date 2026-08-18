@@ -25,6 +25,7 @@
     CanvasTexture,
     AdditiveBlending
   } from 'three';
+  import { motionSpeed } from '$lib/stores/motion.js';
 
   // soft round sprite so nodes read as glowing dots, not squares.
   function dotTexture() {
@@ -50,10 +51,6 @@
 
   /** @type {Props} */
   let { scrollProgress = 0, count = 120 } = $props();
-
-  const reduce =
-    typeof window !== 'undefined' &&
-    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
   // --- deterministic pseudo-random (stable between SSR and client) ---------
   const rnd = (s) => {
@@ -177,14 +174,18 @@
   let time = 0;
   let spin = 0;
   useTask((delta) => {
-    if (!reduce) time += delta;
+    // One multiplier for both clocks: paused (0) freezes the drift and the spin
+    // while leaving the scroll-driven morph fully responsive, which is the
+    // point — the story still tells itself as you scroll, it just stops moving
+    // on its own while you read.
+    const step = delta * motionSpeed();
+    time += step;
     const p = scrollProgress;
 
     // act weights: gather (scatter→globe) then bloom (globe→heart)
     const gather = smooth(clamp01((p - 0.1) / 0.34)); //  0.10 .. 0.44
     const bloom = smooth(clamp01((p - 0.62) / 0.3)); //   0.62 .. 0.92
-    if (!reduce && gather > 0.001)
-      spin += delta * (0.12 + gather * 0.45) * (1 - bloom);
+    if (gather > 0.001) spin += step * (0.12 + gather * 0.45) * (1 - bloom);
 
     const drift = (1 - gather) * 0.25; // gentle isolation float, gone once joined
     for (let i = 0; i < count; i++) {

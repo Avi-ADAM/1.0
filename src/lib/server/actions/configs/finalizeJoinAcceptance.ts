@@ -92,7 +92,7 @@ const finalizeJoinAcceptanceHandler: ActionExecutionHandler = async (params, con
   } catch (e) {
     console.error('[finalizeJoinAcceptance] ask fetch failed:', e);
   }
-  if (!askAttributes) throw new Error(`Ask ${askId} could not be loaded — acceptance aborted`);
+  if (!askAttributes) throw new Error(`Ask ${askId} could not be loaded - acceptance aborted`);
 
   // ── Consent gate ──────────────────────────────────────────────────────────
   // The same bilateral rule the timegrama finalizer applies at restime: an

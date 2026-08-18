@@ -172,7 +172,7 @@ export const proposeOnOpenMashaabimConfig: ActionConfig = {
     originalValues: {
       type: 'object',
       required: false,
-      description: "The rikma's baseline terms (reference only — not written anywhere)",
+      description: "The rikma's baseline terms (reference only - not written anywhere)",
     },
   },
 

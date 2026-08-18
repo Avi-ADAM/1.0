@@ -281,7 +281,7 @@ async function scheduleEndOfCycle(
   const whatami =
     kind === 'resourceInProgress' ? 'mashabetahalich' : kind === 'matanot' ? 'matanot' : null;
   if (!whatami) {
-    console.warn(`[archive] ${kind} cannot carry a scheduled archive — applying now instead`);
+    console.warn(`[archive] ${kind} cannot carry a scheduled archive - applying now instead`);
     return;
   }
   await run(
@@ -310,7 +310,7 @@ async function settleResource(
   outcome: HoursOutcome,
 ): Promise<void> {
   if (outcome === 'transfer') {
-    throw new Error('A resource commitment cannot be transferred — use credit or waive');
+    throw new Error('A resource commitment cannot be transferred - use credit or waive');
   }
   if (outcome === 'waive') {
     for (const maapId of target.openCycleIds) {

@@ -478,8 +478,8 @@ function mailBody(
       en: `The terms of "${snapshot.terms.name ?? ''}" have changed`,
     },
     body: {
-      he: `${listHe} של ${what.he} "${next.name ?? snapshot.terms.name ?? ''}"${inProjectHe} השתנו אחרי שהגשת מועמדות.${detailHe} המועמדות שלך נשמרה ולא תאושר עד שתגיב/י — אפשר לאשר את התנאים החדשים, להציע תנאים אחרים, או לפתוח שיחה. היכנס/י לעמוד הלב.`,
-      en: `${listEn} of ${what.en} "${next.name ?? snapshot.terms.name ?? ''}"${inProjectEn} changed after you applied.${detailEn} Your application is kept and will not be approved until you respond — accept the new terms, propose different ones, or open a discussion. Visit your heart page.`,
+      he: `${listHe} של ${what.he} "${next.name ?? snapshot.terms.name ?? ''}"${inProjectHe} השתנו אחרי שהגשת מועמדות.${detailHe} המועמדות שלך נשמרה ולא תאושר עד שתגיב/י - אפשר לאשר את התנאים החדשים, להציע תנאים אחרים, או לפתוח שיחה. היכנס/י לעמוד הלב.`,
+      en: `${listEn} of ${what.en} "${next.name ?? snapshot.terms.name ?? ''}"${inProjectEn} changed after you applied.${detailEn} Your application is kept and will not be approved until you respond - accept the new terms, propose different ones, or open a discussion. Visit your heart page.`,
     },
   };
 }

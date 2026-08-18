@@ -113,7 +113,7 @@
       "revoke": "Revoke key",
       "revokeConfirm": "Revoke the API key? Any site using it will stop reporting.",
       "revoked": "Revoked",
-      "saveWarning": "Save the key now — it won't be shown again.",
+      "saveWarning": "Save the key now - it won't be shown again.",
       "copy": "Copy",
       "copied": "Copied ✓",
       "selectTitle": "Choose a product and money-holder",
@@ -123,7 +123,7 @@
       "codeTitle": "Snippet to embed",
       "tabBrowser": "Browser",
       "tabServer": "Server / Webhook",
-      "serverHint": "Prefer calling from your server (payment webhook) — that way the key isn't exposed in the browser.",
+      "serverHint": "Prefer calling from your server (payment webhook) - that way the key isn't exposed in the browser.",
       "createKeyFirst": "Create an API key to see the embed code.",
       "varsTitle": "Variables",
       "varField": "Field",
@@ -157,7 +157,7 @@
       "shown": "In discovery",
       "hidden": "Hidden",
       "showTitle": "Show this product on the public discovery page",
-      "hideTitle": "Hide this product from the public discovery page — it stays active in the rikma and by direct link",
+      "hideTitle": "Hide this product from the public discovery page - it stays active in the rikma and by direct link",
       "nowShown": "The product now appears on the discovery page",
       "nowHidden": "The product was hidden from the discovery page"
     }
@@ -215,7 +215,7 @@
     "successMulti": "Changes submitted for voting!",
     "successNoChange": "No changes detected",
     "errorMsg": "Error saving, please try again",
-    "multiUserNote": "Multi-member project — changes will go to a vote",
+    "multiUserNote": "Multi-member project - changes will go to a vote",
     "addValue": "Add value",
     "uploadPic": "Profile Picture"
   },
@@ -289,8 +289,8 @@
     "participated": "splits"
   },
   "siteShareArchive": {
-    "titleIn": "Site-share archive — received",
-    "titleOut": "Site-share archive — what we gave to 1💗1",
+    "titleIn": "Site-share archive - received",
+    "titleOut": "Site-share archive - what we gave to 1💗1",
     "totalIn": "Total received",
     "totalOut": "Total given",
     "committed": "Committed",
@@ -357,7 +357,7 @@
     "equaliSplitedLevel": "Are the service costs split equally, or do subscribers pay what they want?"
   },
   "misc": {
-    "sidurInDev": "Under active development — shift viewing and scheduling are coming here soon",
+    "sidurInDev": "Under active development - shift viewing and scheduling are coming here soon",
     "openActions": "Open actions",
     "awaitingHolderConsent": "Awaiting {{holderName}}'s consent",
     "verifiedSelf": "Verified (self)",
@@ -373,7 +373,7 @@
     "report": "Report",
     "confirmReceived": "Confirm received",
     "closeEngine": "Close this standing order (no further monthly cycles)",
-    "reported": "Report recorded — thanks!",
+    "reported": "Report recorded - thanks!",
     "customer": "Customer",
     "seller": "Seller",
     "invalid": "A valid amount (0 or more) is required",
@@ -406,7 +406,7 @@
     "datesRequired": "Start and end dates are required",
     "recurring": "Recurring monthly expense",
     "recurringHint": "A fixed payment that repeats every month (server, rent, stall). Each month you will be asked to confirm the amount spent, and it is archived after the weave approves it.",
-    "recurringEndOptional": "End date (optional — until marked done)",
+    "recurringEndOptional": "End date (optional - until marked done)",
     "cycleSize": "Billing frequency",
     "cycleSizeHintMonthly": "Open a confirmation every N months (1 = every month)",
     "cycleSizeHintYearly": "Open a confirmation every N years (1 = every year)",

@@ -29,7 +29,7 @@
     "scope_both_hint": "Both partnership and direct sale",
     "scope_customers": "Customers only",
     "scope_customers_hint": "Direct sale as a product",
-    "scope_note": "Offering to customers creates a product page with the price above. If you do not yet have a weave to manage the sales, one will be created for you — and you can always invite partners into it.",
+    "scope_note": "Offering to customers creates a product page with the price above. If you do not yet have a weave to manage the sales, one will be created for you - and you can always invite partners into it.",
     "submit": "Publish resources",
     "submit_one": "Save & publish",
     "remove": "Remove resource",
@@ -39,7 +39,7 @@
   },
   "products": {
     "title": "My products",
-    "subtitle": "Products you sell directly to customers — no weave setup needed",
+    "subtitle": "Products you sell directly to customers - no weave setup needed",
     "empty": "No products yet. Create your first!",
     "add": "New product",
     "name": "Product name",
@@ -67,12 +67,12 @@
       "shown": "In discovery",
       "hidden": "Hidden",
       "showTitle": "Show this product on the public discovery page",
-      "hideTitle": "Hide this product from the public discovery page — it stays active in the rikma and by direct link"
+      "hideTitle": "Hide this product from the public discovery page - it stays active in the rikma and by direct link"
     }
   },
   "missions": {
     "title": "Missions I do",
-    "subtitle": "Priced service offers — what you can do, for how much and where",
+    "subtitle": "Priced service offers - what you can do, for how much and where",
     "empty": "You haven't added any missions you offer yet. Add your first!",
     "add": "New offer",
     "per_hour": "per hour",
@@ -87,7 +87,7 @@
     "save_failed": "Saving failed",
     "online": "Online",
     "form_title": "What I offer to do",
-    "form_note": "The offer is shown to customers and the concierge — mission, scope, rate and location"
+    "form_note": "The offer is shown to customers and the concierge - mission, scope, rate and location"
   },
   "storefront": {
     "title": "Storefront",
@@ -104,12 +104,12 @@
   },
   "onboard": {
     "title": "What would you like to offer?",
-    "sub": "Priced missions and products — this is what the concierge and customers will see. You can also skip and add later from your profile.",
+    "sub": "Priced missions and products - this is what the concierge and customers will see. You can also skip and add later from your profile.",
     "journey": "My offerings",
     "continue": "Finish ✨",
     "skip": "Skip to finish",
     "done_supply_title": "See what's in demand right now",
-    "done_supply_sub": "The demand map: missions and resources weaves and customers seek around you — plus the button to add your supply.",
+    "done_supply_sub": "The demand map: missions and resources weaves and customers seek around you - plus the button to add your supply.",
     "done_supply_meta": "For suppliers who want to start now",
     "done_supply_chip_map": "🗺 Demand map",
     "done_supply_chip_add": "➕ Add supply"
@@ -127,17 +127,17 @@
     "title": "New product",
     "where": "Where should the product live?",
     "new_rikma": "In a new weave",
-    "new_rikma_hint": "We'll create a weave to hold the product — partners can join it",
+    "new_rikma_hint": "We'll create a weave to hold the product - partners can join it",
     "existing_rikma": "In an existing weave",
     "existing_rikma_hint": "The product is created in the weave you pick",
     "pick_rikma": "Pick a weave",
     "rikma_name": "New weave name",
     "rikma_name_ph": "e.g. Dana's Studio",
     "back": "Back",
-    "draft_note": "The draft is saved automatically — you can come back anytime",
+    "draft_note": "The draft is saved automatically - you can come back anytime",
     "created": "Product created! 🎉",
     "expand": "Expand to the full form",
-    "expand_hint": "Image, complex product (missions & resources), dates and more — the draft travels with you"
+    "expand_hint": "Image, complex product (missions & resources), dates and more - the draft travels with you"
   },
   "page": {
     "title": "My missions",

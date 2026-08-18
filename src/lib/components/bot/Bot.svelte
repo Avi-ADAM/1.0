@@ -8,6 +8,7 @@
   import { page } from '$app/stores';
   import { chatMessages } from '$lib/stores/chatStore';
   import DemoRequest from '$lib/components/main/DemoRequest.svelte';
+  import { ambientAnimates } from '$lib/stores/motion.js';
 
   let { data } = $props();
   let user = $derived(data.uid ? true : false);
@@ -150,9 +151,14 @@
       ? 'left-4'
       : 'right-4'} z-50"
   >
+    <!-- The float loop runs forever, so it answers to the same motion setting
+         the 3D scene does: a visitor who paused motion, or asked the OS for
+         less of it, or is on the business theme, gets a still button. -->
     <button
       onclick={() => (visible = !visible)}
-      class="p-0 rounded-full shadow-lg {!visible ? 'floating-button' : ''}"
+      class="p-0 rounded-full shadow-lg {!visible && $ambientAnimates
+        ? 'floating-button'
+        : ''}"
     >
       <img
         src="/botlogo.png"

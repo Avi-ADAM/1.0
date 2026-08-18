@@ -217,7 +217,12 @@
     font-size: 1.6rem;
     font-weight: 700;
     margin-top: 0.75rem;
-    color: var(--stgold, #574010);
+    /* Was --stgold, a deep gold intended for light surfaces. This heading sits
+       on the page background, which is --bg: #070606 in the personal palette,
+       so it measured 1.6:1. --text flips together with --bg in all three
+       palettes; the gold accent the heading wants is still carried by the
+       ::after underline below. */
+    color: var(--text, #574010);
   }
   .head h1::after {
     content: '';

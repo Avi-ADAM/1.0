@@ -652,7 +652,7 @@
       // The Sale references the transfer halukas so an archive can link the two
       // sides. The adjustment (less/more) is auto-approved (PLAN §5); reason kept.
       // See docs/PLAN_SITE_SHARE.md §6.1 and src/generated/SITE_SHARE_TRANSFER_SPEC.md.
-      console.log('[SiteShare] submit — platformInfo:', JSON.stringify(platformInfo),
+      console.log('[SiteShare] submit - platformInfo:', JSON.stringify(platformInfo),
                   '| direction:', siteShareDirection, '| final:', siteShareFinal,
                   '| transferHalukas:', JSON.stringify(platformHalukaIds));
       if (SITE_SHARE_FLAGS.manualSplit && platformInfo?.configured && siteShareFinal > 0) {
@@ -1554,8 +1554,8 @@
         </div>
         <p class="ss-sub">
           {$lang === 'he'
-            ? `1💗1 נכנסת לחלוקה כשותפה נותנת־שירות. הסכום הזה יורד מהרווח שמתחלק בין השותפים (נשאר לחלוקה: ${(revach - siteShareFinal).toFixed(2)} מתוך ${revach.toFixed(2)}). מוצע: ${siteShareProposed.toFixed(2)} — אפשר לתת יותר או לבקש הנחה, וזה מאושר מיד.`
-            : `1💗1 joins the split as a service-providing partner. This amount is deducted from the profit shared between partners (left to split: ${(revach - siteShareFinal).toFixed(2)} of ${revach.toFixed(2)}). Suggested: ${siteShareProposed.toFixed(2)} — you may give more or ask for less; approved instantly.`}
+            ? `1💗1 נכנסת לחלוקה כשותפה נותנת־שירות. הסכום הזה יורד מהרווח שמתחלק בין השותפים (נשאר לחלוקה: ${(revach - siteShareFinal).toFixed(2)} מתוך ${revach.toFixed(2)}). מוצע: ${siteShareProposed.toFixed(2)} - אפשר לתת יותר או לבקש הנחה, וזה מאושר מיד.`
+            : `1💗1 joins the split as a service-providing partner. This amount is deducted from the profit shared between partners (left to split: ${(revach - siteShareFinal).toFixed(2)} of ${revach.toFixed(2)}). Suggested: ${siteShareProposed.toFixed(2)} - you may give more or ask for less; approved instantly.`}
         </p>
 
         <div class="ss-options">
@@ -1633,11 +1633,11 @@
           <p class="creator-ss-note">
             {#if $lang === 'he'}
               {creatorSSDecision.decision === 'skipped'
-                ? 'בחרת לא לתת הפעם — יירשם עם יצירת החלוקה.'
+                ? 'בחרת לא לתת הפעם - יירשם עם יצירת החלוקה.'
                 : `הנתינה שלך (${Number(creatorSSDecision.amount).toFixed(2)}) תירשם עם יצירת החלוקה.`}
             {:else}
               {creatorSSDecision.decision === 'skipped'
-                ? 'You chose not to give — saved when the split is created.'
+                ? 'You chose not to give - saved when the split is created.'
                 : `Your contribution (${Number(creatorSSDecision.amount).toFixed(2)}) will be saved when the split is created.`}
             {/if}
           </p>

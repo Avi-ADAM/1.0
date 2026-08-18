@@ -162,7 +162,7 @@ const handler: ActionExecutionHandler = async (params, context, { strapi, notifi
                 en: 'A reported donation awaits your confirmation'
               },
               body: {
-                he: `דווח שהתקבלה אצלך תרומה של ${Number(amount)}₪${from ? ` מ${from}` : ''}. אפשר לאשר, לדייק (משא-ומתן) או לברר. אם לא תגיב — תאושר אוטומטית בתום זמן התגובה של הריקמה.`,
+                he: `דווח שהתקבלה אצלך תרומה של ${Number(amount)}₪${from ? ` מ${from}` : ''}. אפשר לאשר, לדייק (משא-ומתן) או לברר. אם לא תגיב - תאושר אוטומטית בתום זמן התגובה של הריקמה.`,
                 en: `It was reported that you received a ${Number(amount)}₪ donation${from ? ` from ${from}` : ''}. You can approve, refine (negotiate) or discuss. If you don't respond it is auto-approved after the rikma's response time.`
               }
             },

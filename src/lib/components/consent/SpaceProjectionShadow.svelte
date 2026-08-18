@@ -92,7 +92,7 @@
 
   const statusLabel = $derived(
     comparison.status === 'unsigned'
-      ? 'projection ריק — אין עדיין אירועים חתומים'
+      ? 'projection ריק - אין עדיין אירועים חתומים'
       : comparison.status === 'signed'
         ? 'ה-projection המקומי תואם את נתוני השרת'
         : 'אי-התאמה בין ה-projection לנתוני השרת'
@@ -135,7 +135,7 @@
     if (!res.ok) genesisMsg = 'החתימה נכשלה: ' + (res.reason ?? '');
     else if (res.diffs && res.diffs.length > 0) {
       // Advisory: the balances moved since the proposal was signed.
-      genesisMsg = 'נחתם; שים לב — סטייה מהייצוא הנוכחי: ' + res.diffs.join(' · ');
+      genesisMsg = 'נחתם; שים לב - סטייה מהייצוא הנוכחי: ' + res.diffs.join(' · ');
     }
     genesisBusy = false;
   }
@@ -175,7 +175,7 @@
           ייסוד (Genesis): חתום על מצב הפתיחה מ-Strapi
         </button>
         <span class="text-zinc-500 dark:text-zinc-400">
-          מייבא חברים ויתרות כ-snapshot חתום — ההורה הראשון של השרשרת
+          מייבא חברים ויתרות כ-snapshot חתום - ההורה הראשון של השרשרת
         </span>
       {:else if genesis}
         <span class="font-semibold text-zinc-700 dark:text-zinc-200">

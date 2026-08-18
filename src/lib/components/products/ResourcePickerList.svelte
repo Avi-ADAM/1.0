@@ -100,12 +100,12 @@
           onlyPartOfHelp:
             'המשאב יוקם כסקיצה (onlyPartOf=true) וייצא לרכש רק כשמישהו יקנה את המוצר',
           pendmFlow:
-            '⚠ פרויקט עם 2+ חברים — כל משאב חדש ייווצר ראשית כ-pmash להצבעה',
-          singleFlow: '👤 חבר יחיד בפרויקט — המשאב ייווצר ישירות אצלך',
+            '⚠ פרויקט עם 2+ חברים - כל משאב חדש ייווצר ראשית כ-pmash להצבעה',
+          singleFlow: '👤 חבר יחיד בפרויקט - המשאב ייווצר ישירות אצלך',
           ownerFromExisting: 'האחראי יורש מהמשאב הקיים',
           fullDetails: '⚙ פרטים מלאים (קישור, מפרט, תאריכים...)',
           fullDetailsSet: '✓ פרטים מלאים נשמרו',
-          detailsSubtitle: 'אופציונלי — אפשר להשאיר ריק ולהמשיך',
+          detailsSubtitle: 'אופציונלי - אפשר להשאיר ריק ולהמשיך',
           rowTotal: 'סה"כ לשורה',
           remove: 'הסר שורה',
           fromPmash: 'בתהליך הצבעה',
@@ -135,15 +135,15 @@
             'No owner → the resource will be flagged to customers as "supplier not yet found"',
           onlyPartOfTag: 'Idle until purchase',
           onlyPartOfHelp:
-            'Resource is created as a draft (onlyPartOf=true) — procurement triggered only when product is sold',
+            'Resource is created as a draft (onlyPartOf=true) - procurement triggered only when product is sold',
           pendmFlow:
-            '⚠ Multi-member project — every new resource first becomes a pmash for vote',
+            '⚠ Multi-member project - every new resource first becomes a pmash for vote',
           singleFlow:
-            '👤 Single project member — the resource will be created directly under you',
+            '👤 Single project member - the resource will be created directly under you',
           ownerFromExisting: 'Owner is inherited from the existing resource',
           fullDetails: '⚙ Full details (link, spec, dates...)',
           fullDetailsSet: '✓ Full details saved',
-          detailsSubtitle: 'optional — you can skip and continue',
+          detailsSubtitle: 'optional - you can skip and continue',
           rowTotal: 'Row total',
           remove: 'Remove row',
           fromPmash: 'pending vote',
@@ -396,7 +396,7 @@
           <div class="warning">⚠ {t.unassignedWarning}</div>
         {/if}
       {:else if r.pmashId || r.openMashaabimId}
-        <div class="info-line">👤 {memberLabel(r.assignedMemberId)} — {t.ownerFromExisting}</div>
+        <div class="info-line">👤 {memberLabel(r.assignedMemberId)} - {t.ownerFromExisting}</div>
       {/if}
 
       <div class="row-foot">

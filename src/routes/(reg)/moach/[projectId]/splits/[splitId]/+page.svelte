@@ -42,7 +42,7 @@
 
 <svelte:head>
   {#if split}
-    <title>{split.attributes.name} — Split</title>
+    <title>{split.attributes.name} - Split</title>
     <meta name="moach:entity-type" content="tosplit" />
     <meta name="moach:entity-id" content={splitId} />
     <meta name="moach:project-id" content={projectId} />

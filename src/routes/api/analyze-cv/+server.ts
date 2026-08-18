@@ -59,7 +59,7 @@ export const POST: RequestHandler = async ({ request, cookies, url }) => {
             throw error(400, 'לא התקבל קובץ');
         }
         if (file.size > MAX_FILE_SIZE) {
-            throw error(413, 'הקובץ גדול מדי — מקסימום 5MB');
+            throw error(413, 'הקובץ גדול מדי - מקסימום 5MB');
         }
         if (!ALLOWED_TYPES.has(file.type)) {
             throw error(415, 'פורמט לא נתמך. אנא העלה PDF, Word (.docx), או קובץ טקסט');

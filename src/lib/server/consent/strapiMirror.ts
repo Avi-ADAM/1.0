@@ -31,7 +31,7 @@ let warned = false;
 function warnOnce(what: string, e: unknown) {
   if (warned) return;
   warned = true;
-  console.warn(`[consent/strapiMirror] ${what} failed — running memory-only:`, e);
+  console.warn(`[consent/strapiMirror] ${what} failed - running memory-only:`, e);
 }
 
 // Carries the HTTP status so callers can branch on it (e.g. a 400 unique-key
@@ -63,7 +63,7 @@ async function req(path: string, init?: RequestInit): Promise<unknown> {
       throw new ReqError(
         res.status,
         detail,
-        `${init?.method ?? 'GET'} ${path} → ${res.status}${detail ? ` — ${detail.slice(0, 500)}` : ''}`
+        `${init?.method ?? 'GET'} ${path} → ${res.status}${detail ? ` - ${detail.slice(0, 500)}` : ''}`
       );
     }
     return await res.json();

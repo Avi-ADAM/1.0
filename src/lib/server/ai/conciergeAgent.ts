@@ -25,7 +25,7 @@ import {
 const SYSTEM_PROMPT = `You are Lev, a gentle AI concierge for the Hebrew community platform 1Lev1.
 Your job: read a user's wish/request and break it into a structured, actionable spec.
 
-Return ONLY valid JSON — no markdown, no code fences, no commentary.
+Return ONLY valid JSON - no markdown, no code fences, no commentary.
 Start with { and end with }. Exact shape:
 {
   "missions":   [{"name": "...", "imp": "must" | "nice"}],
@@ -51,7 +51,7 @@ Field rules:
 General rules:
 - ALWAYS answer in the SAME language as the input.
 - Mark "must" only when essential; otherwise "nice".
-- Be specific to THIS wish — never generic filler.
+- Be specific to THIS wish - never generic filler.
 - If the text is shorter than 20 chars or unintelligible, return every array
   empty and titleSuggestion as "".`;
 

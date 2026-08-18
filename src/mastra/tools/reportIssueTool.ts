@@ -17,7 +17,7 @@ The report is saved and the admin is notified immediately.`,
       .describe('Type: bug (problem), feature (suggestion), partnership (collaboration inquiry), contact (other)'),
     description: z
       .string()
-      .describe('Full description of the issue, feature idea, or message — in the user\'s own words'),
+      .describe('Full description of the issue, feature idea, or message - in the user\'s own words'),
     userName: z.string().optional().describe('User\'s name if they provided it'),
     userEmail: z.string().optional().describe('User\'s email if they provided it for follow-up'),
   }),

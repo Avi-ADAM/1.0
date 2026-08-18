@@ -29,7 +29,7 @@ function getPeriodBounds(
   // custom
   const s = startDate ? new Date(startDate) : todayStart;
   const e = endDate ? new Date(endDate) : now;
-  return { start: s, end: e, label: `${s.toLocaleDateString('he-IL')} – ${e.toLocaleDateString('he-IL')}` };
+  return { start: s, end: e, label: `${s.toLocaleDateString('he-IL')} - ${e.toLocaleDateString('he-IL')}` };
 }
 
 function calcOverlapHours(

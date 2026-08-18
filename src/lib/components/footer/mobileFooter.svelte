@@ -266,7 +266,7 @@
         type="button"
         onclick={() => setMode('mini')}
         title={L('minimize')}
-        class="absolute -top-2.5 end-3 w-5 h-5 flex items-center justify-center rounded-full bg-white border border-gray-300 text-gray-400 shadow-sm hover:text-barbi dark:bg-gray-700 dark:border-gray-500"
+        class="absolute -top-2.5 end-3 z-10 w-6 h-6 flex items-center justify-center rounded-full bg-white border border-gray-300 text-gray-400 shadow-sm hover:text-barbi dark:bg-gray-700 dark:border-gray-500"
       >
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3 h-3">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />

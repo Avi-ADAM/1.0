@@ -13,6 +13,8 @@
   import VideoModal from '$lib/components/main/VideoModal.svelte';
   import DemoRequest from '$lib/components/main/DemoRequest.svelte';
   import ResizeHandler from '$lib/components/ResizeHandler.svelte';
+  import MotionControl from '$lib/components/main/MotionControl.svelte';
+  import { sceneVisible, noteMotionActivity } from '$lib/stores/motion.js';
   import { useProgress } from '@threlte/extras';
   import CircleProgresBar from '$lib/celim/ui/circleProgresBar.svelte';
   import { lang, langUs, doesLang } from '$lib/stores/lang';
@@ -77,6 +79,80 @@
   let btnb = $state(false);
 
   // מודל וידאו (עברית בלבד כרגע): הסרטון נטען ומתחיל לנגן אוטומטית עם הפתיחה
+  /* --- the circle diagram (#circle) ---------------------------------------
+     Five stations on one ring, travelled in a single direction: a rikma
+     forms, partners join, a product exists, a customer receives it, and a
+     customer's request starts the next one. The two audiences differ by where
+     they step on, not by which way they walk - the founder opens the rikma,
+     the customer arrives with a request - which is why this is one loop with
+     two entry markers rather than two opposing rows.
+
+     Angles start at the top and travel with the reading direction, so the eye
+     follows the arrows the same way it follows the text.
+
+     The ring is drawn as one unbroken circle and the station pills, which are
+     opaque, sit on top of it. Cutting the circle into five arcs was the first
+     attempt: clearing the widest pill needs ~20 degrees of padding at each
+     end, which leaves 32 of every 72 degrees actually drawn, and it read as
+     scattered chevrons instead of a loop. */
+  const RING_KEYS = ['n1', 'n2', 'n3', 'n4', 'n5'];
+  const RING_ENTRY = { n1: 'entryFounder', n5: 'entryCustomer' };
+  /* 30, not the 34 this started at: the entry arrows come in radially and have
+     to clear the station pill they point at. A pill at the ring's horizontal
+     extreme is as wide as its label - "Request" is 83px on a 384px box, i.e.
+     ~11 viewBox units of radius - so at 34 the arrowhead landed underneath the
+     pill and was invisible. */
+  const RING_R = 30; // ring radius, in viewBox units == % of the square box
+  const RING_STEP = 360 / RING_KEYS.length;
+
+  let ringDir = $derived($isRtl ? -1 : 1);
+
+  /* The ring's centre sits below the middle of its square box. Only the top
+     of the diagram carries an entry arrow, which reaches out to r=48, while
+     the lowest thing below the centre is a station pill ending near r=35 -
+     so a centred ring leaves ~80px of dead space under it and almost none
+     above. This offset balances the two margins. */
+  const RING_CY = 59;
+
+  const ringPoint = (deg, r = RING_R) => {
+    const a = ((deg - 90) * Math.PI) / 180;
+    return [50 + r * Math.cos(a), RING_CY + r * Math.sin(a)];
+  };
+
+  let ringNodes = $derived(
+    RING_KEYS.map((key, i) => {
+      const [x, y] = ringPoint(ringDir * i * RING_STEP);
+      return { key, entry: RING_ENTRY[key], x, y };
+    })
+  );
+
+  /* One arrowhead per leg, at the midpoint between two stations, turned along
+     the tangent there. */
+  let ringHeads = $derived(
+    RING_KEYS.map((key, i) => {
+      const deg = ringDir * (i * RING_STEP + RING_STEP / 2);
+      const [x, y] = ringPoint(deg);
+      return { key, x, y, r: deg + ringDir * 90 };
+    })
+  );
+
+  /* The two stations someone can step onto get a short arrow coming in from
+     outside the ring. A badge stacked on the pill was the first attempt and it
+     does not survive translation - "вход предпринимателя" made that node 163px
+     wide and pushed it out of the box at the ring's horizontal extremes. An
+     arrow is the same width in every language, and the wording moves to the
+     legend under the diagram. */
+  let ringEntries = $derived(
+    RING_KEYS.flatMap((key, i) => {
+      if (!RING_ENTRY[key]) return [];
+      const deg = ringDir * i * RING_STEP;
+      const [x1, y1] = ringPoint(deg, 48);
+      const [x2, y2] = ringPoint(deg, 43);
+      // the head points inward, i.e. opposite the outward radial direction
+      return [{ key, x1, y1, x2, y2, r: deg + 90 }];
+    })
+  );
+
   const VIDEO_HOW_IT_WORKS = 'l0d1yv6Qtz4'; //'FqzccJ4lqTc'; // איך 1💗1 עובדת (הפתרון)
   const VIDEO_THIRD_WAY = 'FcyaiAIqeA4'; // הבעיה והדרך השלישית
   let videoOpen = $state(false);
@@ -183,6 +259,29 @@
   {image}
   url={$t('home.pageUrl')}
 />
+
+<!-- Waking the scene is a page-wide concern, so it listens on the window rather
+     than on the scroll container: moving the pointer over the 3D half counts as
+     engagement just as much as scrolling the text does. Keyboard scrolling
+     already surfaces as a scroll event, which calls the same function. -->
+<svelte:window onpointermove={noteMotionActivity} />
+<!-- A one-line handoff between two acts of the page.
+
+     The homepage was 23 sections that each opened cold, so it read as 23
+     separate pitches rather than one argument - the thing both customers
+     described as "heavy" and "hard to understand". These lines carry the
+     reader across the seams: what they just read, and why the next block
+     follows from it. Rules on either side mark it as connective tissue and
+     not another heading. -->
+{#snippet flowLine(text)}
+  <p
+    class="w-full max-w-xl my-7 flex items-center gap-3 text-center text-slate-600 text-base sm:text-sm italic
+           before:h-px before:flex-1 before:bg-gold/60 after:h-px after:flex-1 after:bg-gold/60"
+  >
+    {text}
+  </p>
+{/snippet}
+
 {#snippet utilityNav(compact = false)}
   {#if trans === false}
     <button type="button" onclick={() => (trans = !trans)}>
@@ -366,9 +465,15 @@
   dir={$isRtl ? 'rtl' : 'ltr'}
   class="relative h-screen w-screen overflow-hidden bg-[length:200%_auto] animate-gradientx bg-gradient-to-br from-[#e0e7ff] via-[#f3e8ff] to-[#e0e7ff]"
 >
-  <!-- 3D Scene Background -->
+  <!-- 3D Scene Background.
+       `aria-hidden`: the scene is decoration — it restates in pictures what the
+       content panel says in words, and a screen reader announcing a bare canvas
+       would only add noise. It is unmounted entirely (not merely frozen) when
+       the visitor chooses "hide", so its GLB models are never fetched. -->
+  {#if $sceneVisible}
   <div
     id="levi"
+    aria-hidden="true"
     bind:clientHeight={h}
     bind:clientWidth={w}
     class:flex={$progress == 1}
@@ -405,12 +510,16 @@
       </Canvas>
     </div>
   </div>
+  {/if}
 
   <!-- Main Scrollable Content -->
   <div
     id="text"
     class="relative d z-10 w-full h-screen overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-barbi scrollbar-track-transparent"
     onscroll={(e) => {
+      // Engaging with the page is what tells us the movement is still wanted;
+      // going quiet is what lets the scene ease down. See $lib/stores/motion.js.
+      noteMotionActivity();
       scrolli = true;
       const el = e.currentTarget;
       const max = el.scrollHeight - el.clientHeight;
@@ -548,7 +657,7 @@
             >
               <span
                 dir="ltr"
-                class="shrink-0 mt-0.5 h-6 px-2 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold"
+                class="shrink-0 mt-0.5 h-6 px-2 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold"
                 >50/50</span
               >
               <p
@@ -683,6 +792,8 @@
           </button>
         </div>
       </section>
+
+      {@render flowLine($t('home.flow.toPain'))}
 
       <!-- ===== הבעיה / הכאב — לקהל שעוד אין לו שותפות ===== -->
       <section
@@ -848,6 +959,8 @@
           </div>
         {/if}
       </section>
+
+      {@render flowLine($t('home.flow.toDemo'))}
 
       <!-- ===== הצצה חיה למערכת (דמו לפני הרשמה) ===== -->
       <section
@@ -1134,6 +1247,8 @@
         style="font-family:'Sababa',sans-serif;"
       >
         <!-- בלוק: יכולות הפלטפורמה -->
+        {@render flowLine($t('home.flow.toFeatures'))}
+
         <section id="features" class="scroll-mt-16">
           <h2
             class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center"
@@ -1187,6 +1302,139 @@
             {/each}
           </div>
         </section>
+
+        <!-- ===== מעגל אחד, שתי כניסות =====
+             עד כאן העמוד סיפר כיוון אחד בלבד: יזם שפותח ריקמה, מגיעים שותפים,
+             נולד מוצר, מגיע לקוח. הקונסיירז' שמתחת הוא אותו מעגל מהקצה
+             השני - לקוח שמבקש משהו שעוד לא קיים, וסביב הבקשה שלו נבנית הריקמה
+             שתייצר אותו. בלי שהמעגל נאמר מפורשת קודם, הקונסיירז' נקרא כמוצר אחר
+             שנשתל באמצע העמוד. הבלוק הזה אומר את המעגל, ואז הוא פשוט הכיוון השני שלו. -->
+        <section id="circle" class="scroll-mt-16">
+          <p
+            class="text-center text-barbi font-bold text-base sm:text-sm tracking-widest mb-1"
+          >
+            {$t('home.circle.eyebrow')}
+          </p>
+          <h2
+            class="text-rose-700 font-bold text-3xl sm:text-2xl mb-2 text-center"
+          >
+            {$t('home.circle.title')}
+          </h2>
+          <p
+            class="text-center text-slate-800 text-lg sm:text-base mb-5 leading-relaxed"
+          >
+            {$t('home.circle.lead')}
+          </p>
+
+          <div
+            class="mx-auto rounded-2xl border-2 border-gold bg-cyan-50/80 p-3 shadow backdrop-blur-md"
+          >
+            <div class="relative mx-auto aspect-square w-full max-w-sm">
+              <!-- Decoration: every word the ring carries is in the list below
+                   it, in travel order, so a screen reader gets the sequence
+                   without hearing five arrow glyphs. -->
+              <svg
+                viewBox="0 0 100 100"
+                class="absolute inset-0 h-full w-full"
+                aria-hidden="true"
+              >
+                <!-- the pale disc gives the centre line something to sit on -->
+                <circle
+                  cx="50"
+                  cy={RING_CY}
+                  r="19"
+                  class="text-gold"
+                  fill="currentColor"
+                  opacity="0.45"
+                />
+                <circle
+                  cx="50"
+                  cy={RING_CY}
+                  r={RING_R}
+                  class="text-stgold"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.1"
+                  opacity="0.4"
+                />
+
+                {#each ringHeads as head (head.key)}
+                  <polygon
+                    points="0,-2.4 5,0 0,2.4"
+                    class="text-stgold"
+                    fill="currentColor"
+                    transform="translate({head.x} {head.y}) rotate({head.r})"
+                  />
+                {/each}
+
+                {#each ringEntries as e (e.key)}
+                  <line
+                    x1={e.x1}
+                    y1={e.y1}
+                    x2={e.x2}
+                    y2={e.y2}
+                    class="text-barbi"
+                    stroke="currentColor"
+                    stroke-width="1.4"
+                    stroke-linecap="round"
+                  />
+                  <polygon
+                    points="0,-2.8 5.6,0 0,2.8"
+                    class="text-barbi"
+                    fill="currentColor"
+                    transform="translate({e.x2} {e.y2}) rotate({e.r})"
+                  />
+                {/each}
+              </svg>
+
+              <!-- The invariant, at the centre of the circle on purpose: it is
+                   the one thing that does not change whichever station you
+                   enter from. -->
+              <p
+                class="absolute w-36 text-center text-base sm:text-sm font-bold leading-snug text-rose-900"
+                style="left: 50%; top: {RING_CY}%; transform: translate(-50%, -50%);"
+              >
+                {$t('home.circle.core')}
+              </p>
+
+              <ol class="absolute inset-0 m-0 list-none p-0">
+                {#each ringNodes as node (node.key)}
+                  <li
+                    class="absolute rounded-full bg-white px-3 py-1 text-base sm:text-sm font-semibold text-slate-800 whitespace-nowrap {node.entry
+                      ? 'border-2 border-barbi shadow-md'
+                      : 'border border-stgold/40 shadow-sm'}"
+                    style="left: {node.x}%; top: {node.y}%; transform: translate(-50%, -50%);"
+                  >
+                    {$t(`home.circle.${node.key}`)}
+                  </li>
+                {/each}
+              </ol>
+            </div>
+          </div>
+
+          <!-- The legend carries the two entry markers in words. The arrow glyph
+               repeats the shape drawn on the ring, so the pairing does not rest
+               on the pink alone (WCAG 1.4.1). -->
+          <ul
+            class="mt-2 flex flex-col items-center gap-1 text-slate-800 text-base sm:text-sm"
+          >
+            {#each ringEntries as e (e.key)}
+              <li class="flex items-center gap-2">
+                <span
+                  class="text-barbi font-bold {$isRtl ? 'scale-x-[-1]' : ''}"
+                  aria-hidden="true">➜</span
+                >
+                {$t(`home.circle.${RING_ENTRY[e.key]}`)}
+              </li>
+            {/each}
+          </ul>
+
+          <p class="mt-3 text-center text-slate-700 text-base sm:text-sm">
+            {$t('home.circle.note')}
+          </p>
+        </section>
+
+        {@render flowLine($t('home.flow.toConcierge'))}
 
         <!-- בלוק: הקונסיירז' (דו‑קהלי) -->
         <section id="concierge" class="scroll-mt-16">
@@ -1252,6 +1500,39 @@
         </section>
 
         <!-- בלוק: למי זה מתאים -->
+        <!-- ===== המקרה שלכם: הכניסה ל/uses =====
+             לקוח פוטנציאלי שאל "אני רוצה תוכנית שותפים לגיוס מכירות של פירות
+             וירקות" - ולאתר לא הייתה שום כניסה לפי סוג עסק. הוא כבר הבין את
+             העיקרון לבד; מה שחסר לו היה לדעת אם הוא חל עליו. הבלוק הזה יושב
+             מיד אחרי "למי זה מתאים", שעונה על אותה שאלה בהפשטה, ומחליף אותה
+             בתשובה קונקרטית. -->
+        <section id="yourcase" class="scroll-mt-16">
+          <a
+            href="/uses"
+            data-sveltekit-prefetch
+            class="group block rounded-2xl border-2 border-gold bg-gradient-to-br from-cyan-50/80 to-fuchsia-50/70 backdrop-blur-sm px-5 py-5 shadow hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 text-center"
+          >
+            <p
+              class="text-barbi font-bold text-base sm:text-sm tracking-widest mb-1"
+            >
+              {$t('home.uses.eyebrow')}
+            </p>
+            <h2 class="text-rose-700 font-bold text-2xl sm:text-xl mb-2">
+              {$t('home.uses.title')}
+            </h2>
+            <p
+              class="text-slate-700 text-base sm:text-sm mb-3 max-w-xl mx-auto leading-relaxed"
+            >
+              {$t('home.uses.sub')}
+            </p>
+            <span
+              class="inline-block bg-barbi text-gold font-bold text-base sm:text-sm px-5 py-2 rounded-xl shadow group-hover:scale-105 transition-transform"
+            >
+              {$t('home.uses.cta')} {$isRtl ? '←' : '→'}
+            </span>
+          </a>
+        </section>
+
         <section id="who" class="scroll-mt-16">
           <h2
             class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center"
@@ -1472,207 +1753,52 @@
 
         <!-- בלוק: באנר /guid — המדריך המלא. יושב מיד אחרי השאלות הנפוצות: מי
              שקרא תשובות קצרות ורוצה להעמיק, ממשיך לכאן. -->
-        <section class="scroll-mt-16">
-          <a
-            href="/guid"
-            data-sveltekit-prefetch
-            class="group relative flex flex-col sm:flex-row items-center gap-5 w-full overflow-hidden rounded-3xl border-2 border-gold/70 bg-gradient-to-br from-[#fffaf0] via-[#fdf3e3] to-[#f7ecfb] px-6 py-6 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+        <!-- ===== להעמיק: שלושת העמודים הייעודיים, כרטיס אחד לכל אחד =====
+             כאן ישבו שלושה באנרים ברוחב מלא, כ‑67 שורות כל אחד, זה אחרי זה.
+             שלושתם אומרים בדיוק את אותו דבר מבחינת מבנה — "יש עוד עמוד, לך
+             אליו" — ורצף של שלושה כאלה נקרא כקיר פרסומות, לא כהמשך של הסיפור.
+             אותו מידע, בשליש מהגלילה, עם משפט אחד שמסביר למה הם מופיעים דווקא
+             כאן: מי שהגיע עד לפה כבר יודע מה המערכת עושה, ורק צריך לדעת לאן
+             ללכת הלאה. הטקסטים עצמם לא נגעו — הם חיים ב‑home.guide/quorum/grow. -->
+        <section id="deeper" class="scroll-mt-16">
+          <p
+            class="text-center text-barbi font-bold text-base sm:text-sm tracking-widest mb-1"
           >
-            <!-- רקע דקורטיבי -->
-            <div
-              class="pointer-events-none absolute -top-12 -end-12 w-48 h-48 rounded-full bg-gold/25 blur-2xl"
-            ></div>
-            <div
-              class="pointer-events-none absolute -bottom-10 -start-10 w-36 h-36 rounded-full bg-barbi/15 blur-2xl"
-            ></div>
-
-            <!-- אייקון -->
-            <div
-              class="relative shrink-0 w-16 h-16 rounded-2xl bg-gold/15 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300"
-            >
-              <span class="text-3xl">📖</span>
-            </div>
-
-            <!-- טקסט -->
-            <div
-              class="relative flex flex-col gap-1.5 text-center sm:text-start flex-1 min-w-0"
-            >
-              <div
-                class="inline-flex items-center gap-1.5 justify-center sm:justify-start"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-gold animate-pulse"></span>
-                <span
-                  class="text-barbi font-semibold text-xs tracking-wide uppercase"
-                >
-                  {$t('home.guide.eyebrow')}
-                </span>
-              </div>
-              <p class="text-rose-800 font-bold text-xl sm:text-lg leading-snug">
-                {$t('home.guide.title')}
-              </p>
-              <p class="text-slate-700/90 text-base sm:text-sm leading-relaxed">
-                {$t('home.guide.desc')}
-              </p>
-            </div>
-
-            <!-- חץ / CTA -->
-            <div
-              class="relative shrink-0 flex items-center gap-2 bg-barbi text-gold font-bold px-5 py-2.5 rounded-xl shadow group-hover:bg-white group-hover:text-barbi group-hover:scale-105 transition-all duration-300 whitespace-nowrap text-base sm:text-sm"
-            >
-              {$t('home.guide.cta')}
-              <svg
-                class="w-4 h-4 group-hover:translate-x-0.5 transition-transform"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d={$isRtl ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7'}
-                />
-              </svg>
-            </div>
-          </a>
-        </section>
-
-        <!-- בלוק: באנר /quorum — קנייה קבוצתית מבוססת סף -->
-        <section class="scroll-mt-16">
-          <a
-            href="/quorum"
-            class="group relative flex flex-col sm:flex-row items-center gap-5 w-full overflow-hidden rounded-3xl border-2 border-gold/60 bg-gradient-to-br from-[#1b1633] via-[#241d4b] to-[#2a1230] px-6 py-6 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+            {$t('home.deeper.eyebrow')}
+          </p>
+          <h2
+            class="text-rose-700 font-bold text-2xl sm:text-xl mb-1 text-center"
           >
-            <!-- רקע דקורטיבי -->
-            <div
-              class="pointer-events-none absolute -top-12 -end-12 w-48 h-48 rounded-full bg-gold/20 blur-2xl"
-            ></div>
-            <div
-              class="pointer-events-none absolute -bottom-10 -start-10 w-36 h-36 rounded-full bg-barbi/20 blur-2xl"
-            ></div>
-
-            <!-- אייקון -->
-            <div
-              class="relative shrink-0 w-16 h-16 rounded-2xl bg-gold/15 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300"
-            >
-              <span class="text-3xl">◉</span>
-            </div>
-
-            <!-- טקסט -->
-            <div
-              class="relative flex flex-col gap-1.5 text-center sm:text-start flex-1 min-w-0"
-            >
-              <div
-                class="inline-flex items-center gap-1.5 justify-center sm:justify-start"
-              >
-                <span
-                  class="w-1.5 h-1.5 rounded-full bg-gold animate-pulse"
-                ></span>
-                <span
-                  class="text-gold font-semibold text-xs tracking-wide uppercase"
-                >
-                  {$t('home.quorum.eyebrow')}
-                </span>
-              </div>
-              <p class="text-amber-50 font-bold text-xl sm:text-lg leading-snug">
-                {$t('home.quorum.title')}
-              </p>
-              <p class="text-amber-100/70 text-base sm:text-sm leading-relaxed">
-                {$t('home.quorum.desc')}
-              </p>
-            </div>
-
-            <!-- חץ / CTA -->
-            <div
-              class="relative shrink-0 flex items-center gap-2 bg-gold text-[#241c05] font-bold px-5 py-2.5 rounded-xl shadow group-hover:bg-white group-hover:scale-105 transition-all duration-300 whitespace-nowrap text-base sm:text-sm"
-            >
-              {$t('home.quorum.cta')}
-              <svg
-                class="w-4 h-4 group-hover:translate-x-0.5 transition-transform"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d={$isRtl ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7'}
-                />
-              </svg>
-            </div>
-          </a>
-        </section>
-
-        <!-- בלוק: באנר /grow — לאנשים שרוצים לצמוח ולבנות שותפויות -->
-        <section class="scroll-mt-16">
-          <a
-            href="/grow"
-            class="group relative flex flex-col sm:flex-row items-center gap-5 w-full overflow-hidden rounded-3xl border-2 border-emerald-300/60 bg-gradient-to-br from-[#f4faf1] via-[#e8f5e3] to-[#f0f4e3] px-6 py-6 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+            {$t('home.deeper.title')}
+          </h2>
+          <p
+            class="text-slate-700 text-base sm:text-sm mb-4 text-center max-w-md mx-auto"
           >
-            <!-- רקע דקורטיבי -->
-            <div
-              class="pointer-events-none absolute -top-12 -end-12 w-48 h-48 rounded-full bg-emerald-200/30 blur-2xl"
-            ></div>
-            <div
-              class="pointer-events-none absolute -bottom-10 -start-10 w-36 h-36 rounded-full bg-amber-200/20 blur-2xl"
-            ></div>
-
-            <!-- אמוג׳י / אייקון -->
-            <div
-              class="relative shrink-0 w-16 h-16 rounded-2xl bg-emerald-100 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300"
-            >
-              <span class="text-3xl">🌱</span>
-            </div>
-
-            <!-- טקסט -->
-            <div
-              class="relative flex flex-col gap-1.5 text-center sm:text-start flex-1 min-w-0"
-            >
-              <div
-                class="inline-flex items-center gap-1.5 justify-center sm:justify-start"
+            {$t('home.deeper.sub')}
+          </p>
+          <div class="grid gap-3 sm:grid-cols-3">
+            {#each [{ href: '/guid', icon: '📖', title: $t('home.guide.title'), desc: $t('home.guide.desc'), cta: $t('home.guide.cta') }, { href: '/quorum', icon: '◉', title: $t('home.quorum.title'), desc: $t('home.quorum.desc'), cta: $t('home.quorum.cta') }, { href: '/grow', icon: '🌱', title: $t('home.grow.title'), desc: $t('home.grow.desc'), cta: $t('home.grow.cta') }] as card}
+              <a
+                href={card.href}
+                data-sveltekit-prefetch
+                class="group flex flex-col gap-1.5 rounded-2xl border-2 border-gold/70 bg-cyan-50/70 backdrop-blur-sm px-4 py-4 shadow hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
               >
+                <span class="text-2xl" aria-hidden="true">{card.icon}</span>
                 <span
-                  class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"
-                ></span>
-                <span
-                  class="text-emerald-700 font-semibold text-xs tracking-wide uppercase"
+                  class="font-bold text-rose-800 text-base sm:text-sm leading-snug"
+                  >{card.title}</span
                 >
-                  {$t('home.grow.eyebrow')}
-                </span>
-              </div>
-              <p
-                class="text-emerald-900 font-bold text-xl sm:text-lg leading-snug"
-              >
-                {$t('home.grow.title')}
-              </p>
-              <p
-                class="text-emerald-800/80 text-base sm:text-sm leading-relaxed"
-              >
-                {$t('home.grow.desc')}
-              </p>
-            </div>
-
-            <!-- חץ / CTA -->
-            <div
-              class="relative shrink-0 flex items-center gap-2 bg-emerald-700 text-amber-50 font-bold px-5 py-2.5 rounded-xl shadow group-hover:bg-emerald-800 group-hover:scale-105 transition-all duration-300 whitespace-nowrap text-base sm:text-sm"
-            >
-              {$t('home.grow.cta')}
-              <svg
-                class="w-4 h-4 group-hover:translate-x-0.5 transition-transform"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d={$isRtl ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7'}
-                />
-              </svg>
-            </div>
-          </a>
+                <span
+                  class="text-slate-700 text-sm sm:text-xs leading-relaxed grow"
+                  >{card.desc}</span
+                >
+                <span
+                  class="text-barbi font-semibold text-sm sm:text-xs mt-1 group-hover:underline"
+                  >{card.cta} {$isRtl ? '←' : '→'}</span
+                >
+              </a>
+            {/each}
+          </div>
         </section>
 
         <!-- בלוק: קריאה לפעולה סופית -->
@@ -1724,6 +1850,11 @@
       </div>
     </div>
   </div>
+
+  <!-- Pause / hide the scene. Rendered outside the `{#if $sceneVisible}` block
+       above on purpose: the control that hides the artwork is also the only way
+       back to it. -->
+  <MotionControl />
 
   <!-- Float Buttons Desktop -->
   <div

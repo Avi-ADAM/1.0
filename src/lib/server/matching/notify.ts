@@ -36,8 +36,8 @@ function buildNotification(
         en: 'There is a new suggestion that could fit you 💚'
       },
       body: {
-        he: `מחפשים את המשאב "${entityName}"${inProjectHe} — בדיוק מה שיש לך להציע. היכנסו לעמוד הלב כדי להגיב.`,
-        en: `The resource "${entityName}"${inProjectEn} is wanted — exactly what you have to offer. Visit your heart page to respond.`
+        he: `מחפשים את המשאב "${entityName}"${inProjectHe} - בדיוק מה שיש לך להציע. היכנסו לעמוד הלב כדי להגיב.`,
+        en: `The resource "${entityName}"${inProjectEn} is wanted - exactly what you have to offer. Visit your heart page to respond.`
       },
       metadata: { url: 'lev', priority: 'normal' }
     };

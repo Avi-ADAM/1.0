@@ -1031,7 +1031,7 @@
         {#if points.length > 0}
           <div class="mt-4 space-y-2">
             <p class="text-white/60 text-xs font-medium px-1">
-              עמדות קיימות — לעיון
+              עמדות קיימות - לעיון
             </p>
             {#each points as p}
               <div

@@ -753,7 +753,7 @@ diunim = ` ${diu},`
               </p>
               <p class="recur-note">
                 {#if recurringNoEnd}
-                  ♾️ ללא תאריך סיום — עד שיסומן כהושלם
+                  ♾️ ללא תאריך סיום - עד שיסומן כהושלם
                 {:else}
                   עד {sqadualedf
                     ? new Date(sqadualedf).toLocaleDateString('he-IL')

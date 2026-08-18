@@ -139,7 +139,7 @@ export function buildScanSignals(ctx: ProjectContext, extra: ExtraSignals = {}):
       );
     }
     if (memberCount <= 1) {
-      facts.push('the project has a single member — it cannot share work or split revenue yet');
+      facts.push('the project has a single member - it cannot share work or split revenue yet');
     }
   } else {
     if (!hasDescription) facts.push('there is no public description yet');
