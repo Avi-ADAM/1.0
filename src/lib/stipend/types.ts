@@ -61,6 +61,12 @@ export interface StipendEnvelope {
   stipendRate?: number | null;
   /** What is left of the program's budget. */
   remainingCap?: number | null;
+  /**
+   * The program is approved and running (`status: 'active'`), not still on the
+   * table. Only then is it the rikma's consent to being diluted — a *proposed*
+   * program is a question, and a pledge cannot lean on an answer nobody gave.
+   */
+  active?: boolean;
 }
 
 export const DEFAULT_TERMS: StipendTerms = {

@@ -52,7 +52,7 @@
     "rateAboveMarket": "La tarifa de la beca supera la tarifa de mercado de la misión — la participación de quien recibe quedaría negativa",
     "noMarketRate": "Esta misión no tiene tarifa de mercado, así que no hay parte que ceder. Propónla como donación",
     "policyOff": "Esta rikma ha desactivado las becas de subsistencia",
-    "policyBilateralOnly": "Estas condiciones diluyen al resto de miembros y esta rikma solo admite becas que no lo hacen. Sube la parte del coste que asume quien recibe, o pide a la rikma que abra un programa de becas",
+    "policyBilateralOnly": "Estas condiciones diluyen al resto de los miembros, y la rikmá aún no ha aceptado la dilución. Puedes subir la parte del coste que asume quien recibe, o abrir un programa de becas, que es justamente la votación que lo autoriza",
     "outsideEnvelopeMode": "Las condiciones usan una modalidad distinta a la que permite el programa",
     "outsideEnvelopeRate": "La tarifa supera lo que permite el programa",
     "outsideEnvelopeCostShare": "El programa no permite cargar tanto coste sobre la rikma",
@@ -74,7 +74,11 @@
     "pick": "Elegir",
     "why": "Unas palabras para la otra parte",
     "scopeNoteBilateral": "Se envía solo a la otra parte. Sin respuesta dentro del tiempo de la rikma, se aprueba sola.",
-    "scopeNoteRikma": "Se envía a todos los miembros, mostrando qué le pasa a la parte de cada uno."
+    "scopeNoteRikma": "Se envía a todos los miembros, mostrando qué le pasa a la parte de cada uno.",
+    "needsProgramTitle": "Estas condiciones necesitan el acuerdo de la rikmá",
+    "needsProgramExplain": "Diluyen a todos los miembros, y la rikmá aún no ha aceptado la dilución. La forma de tener exactamente estas condiciones es un programa de becas: las mismas condiciones, con un presupuesto cerrado, que cada miembro vota viendo qué le hace a su propio porcentaje. Puedes abrirlo aquí y conservar lo que ya has rellenado.",
+    "openProgram": "Abrir un programa de becas",
+    "escalated": "Se han conservado tus condiciones. Solo falta un presupuesto total: ese número cerrado es lo que hace que la dilución sea votable."
   },
   "tradeoff": {
     "title": "Qué cedes y qué recibes",

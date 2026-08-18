@@ -513,6 +513,12 @@ export const qidsAccess = {
   'tasksApiActStatus': { allow: ['serviceAdmin'] },
   'tasksApiWebhookTargets': { allow: ['serviceAdmin'] },
 
+  // Site reports mirrored into the central rikma — same story, and a report
+  // carries the reporter's email, so it is never reachable with a user JWT.
+  'siteReportStatus': { allow: ['serviceAdmin'] },
+  'updateSiteReportStatus': { allow: ['serviceAdmin'] },
+  'centralRikmaMembers': { allow: ['serviceAdmin'] },
+
   // Planning boards (PLAN_PROJECT_PLANNING_BOARDS). Reads are done by project
   // members from the moach create page; writes go exclusively through the
   // planning actions (projectMember-gated) via StrapiClient, so the mutations

@@ -40,7 +40,7 @@ const ERROR_TEXT: Record<string, string> = {
     'This mission has no market rate, so there is no share to give up — propose it as a gift instead',
   policyOff: 'This rikma has turned subsistence stipends off',
   policyBilateralOnly:
-    'These terms dilute every other member, and this rikma only allows stipends that do not. Raise costShare to 1, or ask the rikma to open a stipend program',
+    'These terms dilute every other member, and the rikma has not agreed to dilution. Raise costShare to 1, or open a stipend program — that vote is what authorises it',
   outsideEnvelopeMode: 'These terms use a different mode than the program allows',
   outsideEnvelopeRate: 'The rate is above what the program allows',
   outsideEnvelopeCostShare: 'The program does not let the rikma carry this much of the cost',
@@ -123,7 +123,10 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
           costShare: program.costShare,
           equityMultiplier: program.equityMultiplier,
           stipendRate: program.stipendRate,
-          remainingCap: program.remainingCap
+          remainingCap: program.remainingCap,
+          // Only an approved program authorises dilution; one still on the
+          // table authorises nothing.
+          active: program.status === 'active'
         }
       : null
   });

@@ -67,16 +67,15 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     marketRate: params.marketRate != null ? Number(params.marketRate) : null,
     policy: project.policy
   });
-  if (!validation.ok && !validation.errors.every((e) => e === 'policyBilateralOnly')) {
-    throw new Error(validation.errors[0]);
-  }
-  // A program is exactly the thing a `bilateral` rikma has not agreed to. Say
-  // so in terms of the setting the rikma can change, not as a dead end.
-  if (validation.errors.includes('policyBilateralOnly')) {
-    throw new Error(
-      'This rikma allows only stipends that dilute nobody. Change the rikma’s stipend policy to “collective” to allow programs'
-    );
-  }
+  // `policyBilateralOnly` is not a blocker *here*, and blocking on it was a
+  // dead end: a diluting pledge sent members to open a program, and the program
+  // refused because the rikma had not agreed to dilution — which is precisely
+  // the question the program puts to them. Proposing one **is** asking; every
+  // member votes on it, sees their own before/after percentage, and the cap
+  // bounds the answer. Only `off` — the rikma having said "not at all" — stops
+  // it, and that is checked above.
+  const blockers = validation.errors.filter((e) => e !== 'policyBilateralOnly');
+  if (blockers.length > 0) throw new Error(blockers[0]);
   if (!(Number(terms.totalCap) > 0)) {
     throw new Error(
       'A program needs a total budget — that closed number is what makes the dilution votable'

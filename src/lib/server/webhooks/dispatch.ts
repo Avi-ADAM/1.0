@@ -1,19 +1,26 @@
 // src/lib/server/webhooks/dispatch.ts
 //
-// Outgoing task webhooks (PLAN_EXTERNAL_TASKS_API §1d).
+// What happens when a mirrored task changes (PLAN_EXTERNAL_TASKS_API §1d, §4).
 //
-// A task that entered the rikma from an external system carries an
-// `externalId`; when a human then accepts, advances or finishes it, the system
-// that opened it deserves to hear about it. This module is the whole of that
-// path: decide the event, load the task's state once, sign, deliver, retry.
+// A task that did not originate in the app carries an `externalId`; when a human
+// accepts, advances or finishes it, whatever opened it deserves to hear about
+// that. There are two kinds of "whatever":
 //
-// It is fire-and-forget by construction. Nothing here may fail — or even slow
-// down — the action that triggered it: a broken receiver on the other side of
-// the internet is not a reason for a member's "done" click to error.
+//   • an outside system   → a signed HTTP callback (the webhook path);
+//   • a 1lev1 site report → a status update one function call away, no HTTP.
+//
+// Both hang off the same trigger and the same single read of the task's state.
+//
+// The whole module is fire-and-forget by construction. Nothing here may fail —
+// or even slow down — the action that triggered it: a broken receiver on the
+// other side of the internet is not a reason for a member's "done" click to
+// error.
 
 import type { ActionContext } from '$lib/server/actions/types.js';
 import type { WebhookEvent } from '$lib/server/tasksApi.js';
 import { toTaskStatusView } from '$lib/server/tasksApi.js';
+import { SITE_REPORT_PREFIX } from '$lib/server/siteReport.js';
+import { centralProjectId, syncSiteReportFromTask } from '$lib/server/siteReportMirror.js';
 import { webhookSecretForKey, signWebhookBody } from './secret.js';
 import { getWebhookTargets, wants, type WebhookTarget } from './targets.js';
 
@@ -123,13 +130,15 @@ async function deliver(
 /**
  * Entry point called by ActionService after a successful action.
  *
- * Ordered cheapest-check-first so the common case (a rikma with no
- * integration) costs one Set lookup and one cached Map read:
+ * Ordered cheapest-check-first so the common case — a rikma with no integration
+ * at all — costs one Set lookup and one cached Map read, and never touches
+ * Strapi:
  *   1. is this an action that can produce an event at all?
- *   2. does the rikma have any webhook target? (cached)
- *   3. only then load the task and see whether it came from an API.
+ *   2. does anybody care? a webhook target (cached), or the central rikma,
+ *      whose tasks may be mirroring site reports;
+ *   3. only then load the task once and see where it came from.
  */
-export async function dispatchTaskWebhook(opts: {
+export async function onTaskChanged(opts: {
   actionKey: string;
   params: Record<string, any>;
   result: any;
@@ -146,9 +155,14 @@ export async function dispatchTaskWebhook(opts: {
   if (!projectId) return;
 
   const fetchFn = context.fetch ?? globalThis.fetch;
+
+  // Site reports live in exactly one rikma, so only that rikma pays the cost of
+  // looking. Every other project keeps the original "no targets ⇒ stop" path.
+  const mayHoldSiteReports = projectId === centralProjectId();
+
   const targets = await getWebhookTargets(projectId, strapi, fetchFn);
   const interested = targets.filter((t) => wants(t, event));
-  if (interested.length === 0) return;
+  if (interested.length === 0 && !mayHoldSiteReports) return;
 
   const actId = actIdFor(actionKey, params, result);
   if (!actId) return;
@@ -161,9 +175,22 @@ export async function dispatchTaskWebhook(opts: {
     console.warn('[webhooks] could not read act', actId, e);
     return;
   }
-  // No externalId ⇒ this task was born in the app, not in someone's system.
+  // No externalId ⇒ this task was born in the app, not mirroring anything.
   // There is nobody on the other side waiting to hear about it.
   if (!view?.externalId) return;
+
+  // Internal first: a site report's own status is 1lev1's business, and it must
+  // not depend on some third party's endpoint answering.
+  if (view.externalId.startsWith(SITE_REPORT_PREFIX)) {
+    await syncSiteReportFromTask({
+      externalId: view.externalId,
+      taskStatus: view.status,
+      fetch: fetchFn,
+      strapi
+    });
+  }
+
+  if (interested.length === 0) return;
 
   const body = JSON.stringify({
     event,

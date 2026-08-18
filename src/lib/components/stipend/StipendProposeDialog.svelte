@@ -20,7 +20,11 @@
   import { executeAction } from '$lib/client/actionClient';
   import { toast } from 'svelte-sonner';
   import StipendTermsFields from './StipendTermsFields.svelte';
-  import { consensusScope, computeRecipientTradeoff } from '$lib/stipend/computeStipendEquity.js';
+  import {
+    consensusScope,
+    computeRecipientTradeoff,
+    effectiveStipendPolicy
+  } from '$lib/stipend/computeStipendEquity.js';
   import { LABEL, MUTED, FAINT, INPUT, WELL, BTN_PRIMARY, BTN_GHOST } from './ui.js';
 
   /**
@@ -67,7 +71,19 @@
     onDone
   } = $props();
 
-  const isProgram = $derived(intent === 'program');
+  /**
+   * The dialog can change its own mind about which agreement this is.
+   *
+   * A member sets terms that dilute the rikma, is told the rikma only allows
+   * stipends that dilute nobody, and is pointed at "a stipend program" — which
+   * used to be a dead end: the program lives on the moach tab, and nothing on
+   * this screen led there. The escalation now happens in place, carrying the
+   * terms already typed, because it is the same conversation: the program *is*
+   * how you ask the rikma for exactly these terms.
+   */
+  let intentOverride = $state(/** @type {'offer'|'request'|'program'|null} */ (null));
+  const activeIntent = $derived(intentOverride ?? intent);
+  const isProgram = $derived(activeIntent === 'program');
 
   // Opened from a card, the caller knows a mission — not the rikma's member
   // list, its stipend policy or its defaults. Fetch them once on open rather
@@ -84,14 +100,19 @@
    * construction: the same button can be re-opened after the rikma's defaults
    * changed, and a dialog that quietly kept the first values it ever saw would
    * send terms nobody chose.
+   * Takes the intent as an argument rather than reading `activeIntent`: this
+   * runs inside the on-open effect, and reading the override there would make
+   * the effect depend on state it also resets — clicking "open a program"
+   * would immediately undo itself.
+   * @param {'offer'|'request'|'program'} forIntent
    * @returns {import('$lib/stipend/types.js').StipendTerms}
    */
-  function seedTerms() {
+  function seedTerms(forIntent) {
     return {
       mode: 'equity',
       // A programme exists precisely to let the rikma carry the cost; a
       // bilateral pledge defaults to the model that dilutes nobody.
-      costShare: intent === 'program' ? (defaultCostShare ?? 0) : (defaultCostShare ?? 1),
+      costShare: forIntent === 'program' ? (defaultCostShare ?? 0) : (defaultCostShare ?? 1),
       equityMultiplier: 1,
       stipendRate: defaultRate ?? 0,
       monthlyCap: null,
@@ -103,7 +124,9 @@
   }
 
   /** @type {import('$lib/stipend/types.js').StipendTerms} */
-  let terms = $state(seedTerms());
+  // A placeholder only: the dialog renders nothing until `open`, and the effect
+  // below reseeds from the caller's intent every time it opens.
+  let terms = $state(seedTerms('offer'));
 
   $effect(() => {
     if (!open || members.length > 0 || fetchedMembers.length > 0 || loadingContext || !projectId) {
@@ -133,12 +156,25 @@
   // opening, not from whenever the component happened to be created.
   $effect(() => {
     if (!open) return;
-    terms = seedTerms();
+    terms = seedTerms(intent);
     chosenFunder = funderId || (intent === 'offer' ? myId : '');
     chosenRecipient = recipientId || (intent === 'request' ? myId : '');
   });
 
   const scope = $derived(consensusScope(terms));
+
+  /**
+   * These terms dilute every member, and the rikma has not agreed to that in
+   * general — so they need the rikma's vote. That is what a program is.
+   * (An existing program the caller already pointed at is the vote, so no
+   * escalation is offered there.)
+   */
+  const needsProgram = $derived(
+    !isProgram &&
+      scope === 'rikma' &&
+      !programId &&
+      effectiveStipendPolicy(activePolicy) === 'bilateral'
+  );
 
   // What the recipient actually trades away, in the two numbers §8 demands are
   // on screen *before* anyone signs: the share and the cash.
@@ -153,16 +189,24 @@
       : null
   );
 
+  /** Keep every number the member already typed; only the ask changes. */
+  function escalateToProgram() {
+    intentOverride = 'program';
+  }
+
   const title = $derived(
     isProgram
       ? $t('stipend.propose.titleProgram')
-      : intent === 'request'
+      : activeIntent === 'request'
         ? $t('stipend.propose.titleRequest')
         : $t('stipend.propose.titleOffer')
   );
 
   function close() {
     open = false;
+    // Next opening starts from the caller's intent again, not from wherever
+    // this session escalated to.
+    intentOverride = null;
   }
 
   async function send() {
@@ -205,13 +249,13 @@
           missionIds: missionId ? [String(missionId)] : undefined,
           programId: programId ?? undefined,
           marketRate: marketRate ?? undefined,
-          initiatedBy: intent === 'request' ? 'recipient' : chosenFunder === myId ? 'funder' : 'member',
+          initiatedBy: activeIntent === 'request' ? 'recipient' : chosenFunder === myId ? 'funder' : 'member',
           why: why || undefined
         });
         if (res?.success === false) throw new Error(String(res?.error?.message ?? res?.error ?? 'failed'));
         toast.success($t('stipend.toast.pledgeProposed'));
       }
-      open = false;
+      close();
       onDone?.();
     } catch (e) {
       console.error('[StipendProposeDialog] send failed:', e);
@@ -250,6 +294,10 @@
       <p class="mt-2 text-sm text-gray-800 dark:text-gray-100">
         {isProgram ? $t('stipend.propose.introProgram') : $t('stipend.propose.introPledge')}
       </p>
+
+      {#if isProgram && intentOverride === 'program'}
+        <p class="mt-2 {MUTED}">{$t('stipend.propose.escalated')}</p>
+      {/if}
 
       {#if missionName}
         <p class="mt-2 {MUTED}">
@@ -300,7 +348,29 @@
           </label>
         {/if}
 
-        <StipendTermsFields bind:terms {marketRate} policy={activePolicy} showBudget={isProgram} />
+        <StipendTermsFields
+          bind:terms
+          {marketRate}
+          policy={activePolicy}
+          showBudget={isProgram}
+          allowRikmaScope={isProgram}
+        />
+
+        {#if needsProgram}
+          <!-- Not a refusal: the way to have exactly these terms, stated as the
+               next step rather than as a rule the member broke. -->
+          <div class="{WELL} p-3 flex flex-col gap-2">
+            <p class="text-sm font-semibold">{$t('stipend.propose.needsProgramTitle')}</p>
+            <p class={MUTED}>{$t('stipend.propose.needsProgramExplain')}</p>
+            <button
+              type="button"
+              class="{BTN_GHOST} self-start px-3 py-2 text-sm"
+              onclick={escalateToProgram}
+            >
+              🗳️ {$t('stipend.propose.openProgram')}
+            </button>
+          </div>
+        {/if}
 
         <!-- §8: the recipient must see both numbers before signing. -->
         {#if tradeoff && terms.mode === 'equity'}

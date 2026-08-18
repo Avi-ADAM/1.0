@@ -128,6 +128,30 @@ describe('validateStipendTerms', () => {
     expect(v.ok).toBe(true);
   });
 
+  // An approved program *is* the rikma agreeing to be diluted, bounded by its
+  // cap. Without this the vote bought nothing: every pledge under the program
+  // still failed on the policy the program was approved to authorise.
+  it('lets an active program authorise a diluting pledge in a bilateral rikma', () => {
+    const v = validateStipendTerms({
+      terms: { ...base, costShare: 0 },
+      marketRate: 200,
+      policy: 'bilateral',
+      envelope: { costShare: 0, remainingCap: 10_000, active: true }
+    });
+    expect(v.errors).not.toContain('policyBilateralOnly');
+    expect(v.ok).toBe(true);
+  });
+
+  it('does not let a program still on the table authorise it', () => {
+    const v = validateStipendTerms({
+      terms: { ...base, costShare: 0 },
+      marketRate: 200,
+      policy: 'bilateral',
+      envelope: { costShare: 0, remainingCap: 10_000, active: false }
+    });
+    expect(v.errors).toContain('policyBilateralOnly');
+  });
+
   it('refuses everything where the policy is off', () => {
     const v = validateStipendTerms({ terms: base, marketRate: 200, policy: 'off' });
     expect(v.errors).toContain('policyOff');

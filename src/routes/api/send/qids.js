@@ -13544,6 +13544,32 @@ ${STIPEND_DECISION_FIELDS}
     }
   }`,
 
+  /* ─────────────────────────────────────────────────────────────────────
+   * Site reports mirrored into the central rikma (PLAN_EXTERNAL_TASKS_API §4).
+   * Read/written only by src/lib/server/siteReportMirror.ts with the ADMIN
+   * token — serviceAdmin-only, like the rest of this block.
+   * ───────────────────────────────────────────────────────────────────── */
+
+  'siteReportStatus': `query SiteReportStatus($id: ID!) {
+    siteReport(id: $id) {
+      data { id attributes { status type userEmail lang } }
+    }
+  }`,
+
+  'updateSiteReportStatus': `mutation UpdateSiteReportStatus($id: ID!, $status: ENUM_SITEREPORT_STATUS!) {
+    updateSiteReport(id: $id, data: { status: $status }) {
+      data { id attributes { status } }
+    }
+  }`,
+
+  // Members of a rikma, used to pick who a mirrored site report is filed by.
+  // Deliberately tiny — this runs on a path that must not get expensive.
+  'centralRikmaMembers': `query CentralRikmaMembers($pid: ID!) {
+    project(id: $pid) {
+      data { id attributes { user_1s { data { id } } } }
+    }
+  }`,
+
   // Which api-keys of this rikma asked to be called back. Cached in memory by
   // the dispatcher, so a rikma with no integration costs nothing per update.
   // A bare `revoked: { eq: false }` would drop every key minted before the

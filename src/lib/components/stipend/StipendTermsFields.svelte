@@ -21,6 +21,9 @@
    * @property {any} [policy] - the rikma's stipendPolicy (null = legacy = bilateral)
    * @property {boolean} [showBudget] - programs need a total budget; a pledge may skip it
    * @property {boolean} [showAdvanced] - caps, notice, revenue trigger
+   * @property {boolean} [allowRikmaScope] - this form *is* the rikma-wide ask (a
+   *   program proposal), so "these terms dilute and the rikma only allows
+   *   bilateral" is not an error here — it is the question being put.
    */
 
   /** @type {Props} */
@@ -39,11 +42,17 @@
     marketRate = null,
     policy = null,
     showBudget = false,
-    showAdvanced = true
+    showAdvanced = true,
+    allowRikmaScope = false
   } = $props();
 
   const scope = $derived(consensusScope(terms));
   const validation = $derived(validateStipendTerms({ terms, marketRate, policy }));
+  // A program proposal carries `policyBilateralOnly` by definition — it is the
+  // vote that would lift it — so the form does not flag it as a mistake.
+  const shownErrors = $derived(
+    validation.errors.filter((e) => !(allowRikmaScope && e === 'policyBilateralOnly'))
+  );
 
   // The one number that says what kind of agreement this is. Shown as text
   // rather than hidden in a tooltip: who has to agree is the consequence
@@ -205,9 +214,9 @@
 
   <p class="text-sm font-semibold text-gray-900 dark:text-gray-50">{scopeLine}</p>
 
-  {#if !validation.ok}
+  {#if shownErrors.length > 0}
     <ul class="{WARN} p-3 text-sm">
-      {#each validation.errors as err (err)}
+      {#each shownErrors as err (err)}
         <li>{$t(`stipend.error.${err}`)}</li>
       {/each}
     </ul>
