@@ -18,7 +18,7 @@
     · the whole panel is a labelled dialog, so it is announced as a unit
 -->
 <script>
-  import { t } from '$lib/translations';
+  import { t, isRtl } from '$lib/translations';
   import {
     a11y,
     a11yTouched,
@@ -68,7 +68,19 @@
 
 <svelte:window onkeydown={onKeydown} />
 
-<div class="a11y-root" dir="auto">
+<!-- The side is picked from `$isRtl`, the same signal the bot launcher uses,
+     rather than from a logical `inset-inline-start`. The <html> dir attribute
+     and the active locale can disagree here (dir is stamped server-side and
+     does not follow a `?lang=` switch), and a logical property reads the
+     former while the bot reads the latter - so they collide exactly when the
+     two disagree. Reading the one signal keeps this off the bot in every
+     language. -->
+<div
+  class="a11y-root"
+  dir="auto"
+  style="{$isRtl ? 'right' : 'left'}: var(--rail-inset, 0.75rem);
+         align-items: {$isRtl ? 'flex-end' : 'flex-start'};"
+>
   {#if open}
     <div
       id="a11y-panel"
@@ -156,25 +168,19 @@
 </div>
 
 <style>
-  /* Bottom-right, matching where the NagishLi toolbar was configured to sit
-     (nl_pos='br'). A physical side rather than a logical one: the homepage's
-     motion control is pinned bottom-left, and logical properties would swing
-     the two into the same corner on the Hebrew and Arabic renders. */
+  /* Bottom slot of the rail (see `--rail-*` in app.postcss). The horizontal
+     side and the cross-axis alignment are set inline from `$isRtl` - see the
+     note on the element - so only the vertical slot lives here. This first
+     shipped pinned to a hardcoded `right`, which put it on top of the bot
+     launcher in the LTR locales; axe caught the bot as a partially-obscured
+     48x21 target. */
   .a11y-root {
     position: fixed;
-    right: 0.75rem;
-    bottom: 5rem;
+    bottom: var(--rail-bottom, 5rem);
     z-index: 998;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
     gap: 0.5rem;
-  }
-
-  @media (min-width: 640px) {
-    .a11y-root {
-      bottom: 1rem;
-    }
   }
 
   .a11y-trigger {

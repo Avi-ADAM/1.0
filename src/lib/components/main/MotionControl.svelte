@@ -20,7 +20,7 @@
   be able to bring it back.
 -->
 <script>
-  import { t } from '$lib/translations';
+  import { t, isRtl } from '$lib/translations';
   import {
     motionMode,
     motionChoice,
@@ -52,12 +52,17 @@
   );
 </script>
 
-<!-- `left-3`, not the logical `start-3`: the site-wide accessibility panel is
-     pinned to the bottom-right corner, and a logical property would swing this
-     control into that same corner on the Hebrew and Arabic renders. A physical
-     side keeps the two apart in every language. -->
+<!-- Second slot of the rail (see `--rail-*` in app.postcss): the accessibility
+     trigger holds the bottom slot, this sits one step above it, and the bot
+     launcher keeps the opposite corner to itself. The side comes from `$isRtl`
+     because that is what the bot reads too - see the longer note in
+     AccessibilityPanel.svelte on why a logical property is not equivalent
+     here. Sharing one set of variables is what keeps three independently
+     positioned `fixed` widgets off each other. -->
 <div
-  class="fixed bottom-20 sm:bottom-4 left-3 z-[700] print:hidden"
+  class="fixed z-[700] print:hidden"
+  style="{$isRtl ? 'right' : 'left'}: var(--rail-inset, 0.75rem);
+         bottom: calc(var(--rail-bottom, 5rem) + var(--rail-step, 3.5rem));"
   role="group"
   aria-label={$t('home.motion.label')}
 >

@@ -2321,6 +2321,33 @@ html.business .boxleft {
   --a11y-text-scale: 1;
 }
 
+/* --- the floating-widget rail -------------------------------------------
+   Three widgets want a bottom corner: the bot launcher (pre-existing), the
+   accessibility trigger, and the homepage motion control. The bot picks its
+   side from the locale - `left-4` in Hebrew and Arabic, `right-4` everywhere
+   else - so the other two take the opposite side and stack up it. Each one
+   picks that side from `$isRtl` in its own markup, which is the same signal
+   the bot reads; a logical property is NOT equivalent, because it resolves
+   against the <html> dir attribute and that can disagree with the active
+   locale. Before this rail existed the trigger was pinned to a hardcoded
+   `right` and axe flagged the bot underneath it as a partially-obscured
+   48x21 target.
+
+   Only the vertical slots live here. `--rail-bottom` clears the mobile
+   footer; the step is one widget plus a gap, so a widget one slot up never
+   overlaps the one below it. */
+:root {
+  --rail-inset: 0.75rem;
+  --rail-bottom: 5rem;
+  --rail-step: 3.5rem;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --rail-bottom: 1rem;
+  }
+}
+
 /* Text size, applied at the root.
 
    Tailwind's type and spacing scales are both rem-based, i.e. relative to this

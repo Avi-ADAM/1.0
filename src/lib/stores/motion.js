@@ -144,6 +144,13 @@ export const sceneVisible = derived(motionMode, ($mode) => $mode !== MOTION_MODE
 /** Whether anything in the scene may animate on its own. */
 export const sceneAnimates = derived(motionMode, ($mode) => $mode === MOTION_MODES.full);
 
+/** The same decision, named for consumers that are not the 3D scene. The
+    complaint that started this store was "the movement bothers the eye after a
+    few minutes", and it was never only about the scene - the bot launcher
+    bobs on an infinite loop too. Anything that animates unprompted, forever,
+    reads this. */
+export const ambientAnimates = sceneAnimates;
+
 /* --- per-frame speed ----------------------------------------------------- */
 
 /*
