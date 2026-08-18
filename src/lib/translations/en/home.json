@@ -562,5 +562,15 @@
     "toPause": "Pause the motion",
     "toHide": "Hide the animation",
     "auto": "Back to the default"
+  },
+  "deeper": {
+    "eyebrow": "◈ Go deeper ◈",
+    "title": "There is more, by subject",
+    "sub": "You have the principle. These are the three places it is laid out in full."
+  },
+  "flow": {
+    "toPain": "That was for people who already have a partnership. And if you do not have one yet?",
+    "toDemo": "That is the idea. Now watch it work.",
+    "toFeatures": "You have seen how it feels. Here is what is inside."
   }
 }

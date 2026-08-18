@@ -191,6 +191,23 @@
      engagement just as much as scrolling the text does. Keyboard scrolling
      already surfaces as a scroll event, which calls the same function. -->
 <svelte:window onpointermove={noteMotionActivity} />
+<!-- A one-line handoff between two acts of the page.
+
+     The homepage was 23 sections that each opened cold, so it read as 23
+     separate pitches rather than one argument - the thing both customers
+     described as "heavy" and "hard to understand". These lines carry the
+     reader across the seams: what they just read, and why the next block
+     follows from it. Rules on either side mark it as connective tissue and
+     not another heading. -->
+{#snippet flowLine(text)}
+  <p
+    class="w-full max-w-xl my-7 flex items-center gap-3 text-center text-slate-600 text-base sm:text-sm italic
+           before:h-px before:flex-1 before:bg-gold/60 after:h-px after:flex-1 after:bg-gold/60"
+  >
+    {text}
+  </p>
+{/snippet}
+
 {#snippet utilityNav(compact = false)}
   {#if trans === false}
     <button type="button" onclick={() => (trans = !trans)}>
@@ -702,6 +719,8 @@
         </div>
       </section>
 
+      {@render flowLine($t('home.flow.toPain'))}
+
       <!-- ===== הבעיה / הכאב — לקהל שעוד אין לו שותפות ===== -->
       <section
         class="w-full max-w-xl mt-12 animate-fade-in-up"
@@ -866,6 +885,8 @@
           </div>
         {/if}
       </section>
+
+      {@render flowLine($t('home.flow.toDemo'))}
 
       <!-- ===== הצצה חיה למערכת (דמו לפני הרשמה) ===== -->
       <section
@@ -1152,6 +1173,8 @@
         style="font-family:'Sababa',sans-serif;"
       >
         <!-- בלוק: יכולות הפלטפורמה -->
+        {@render flowLine($t('home.flow.toFeatures'))}
+
         <section id="features" class="scroll-mt-16">
           <h2
             class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center"
@@ -1490,207 +1513,52 @@
 
         <!-- בלוק: באנר /guid — המדריך המלא. יושב מיד אחרי השאלות הנפוצות: מי
              שקרא תשובות קצרות ורוצה להעמיק, ממשיך לכאן. -->
-        <section class="scroll-mt-16">
-          <a
-            href="/guid"
-            data-sveltekit-prefetch
-            class="group relative flex flex-col sm:flex-row items-center gap-5 w-full overflow-hidden rounded-3xl border-2 border-gold/70 bg-gradient-to-br from-[#fffaf0] via-[#fdf3e3] to-[#f7ecfb] px-6 py-6 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+        <!-- ===== להעמיק: שלושת העמודים הייעודיים, כרטיס אחד לכל אחד =====
+             כאן ישבו שלושה באנרים ברוחב מלא, כ‑67 שורות כל אחד, זה אחרי זה.
+             שלושתם אומרים בדיוק את אותו דבר מבחינת מבנה — "יש עוד עמוד, לך
+             אליו" — ורצף של שלושה כאלה נקרא כקיר פרסומות, לא כהמשך של הסיפור.
+             אותו מידע, בשליש מהגלילה, עם משפט אחד שמסביר למה הם מופיעים דווקא
+             כאן: מי שהגיע עד לפה כבר יודע מה המערכת עושה, ורק צריך לדעת לאן
+             ללכת הלאה. הטקסטים עצמם לא נגעו — הם חיים ב‑home.guide/quorum/grow. -->
+        <section id="deeper" class="scroll-mt-16">
+          <p
+            class="text-center text-barbi font-bold text-base sm:text-sm tracking-widest mb-1"
           >
-            <!-- רקע דקורטיבי -->
-            <div
-              class="pointer-events-none absolute -top-12 -end-12 w-48 h-48 rounded-full bg-gold/25 blur-2xl"
-            ></div>
-            <div
-              class="pointer-events-none absolute -bottom-10 -start-10 w-36 h-36 rounded-full bg-barbi/15 blur-2xl"
-            ></div>
-
-            <!-- אייקון -->
-            <div
-              class="relative shrink-0 w-16 h-16 rounded-2xl bg-gold/15 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300"
-            >
-              <span class="text-3xl">📖</span>
-            </div>
-
-            <!-- טקסט -->
-            <div
-              class="relative flex flex-col gap-1.5 text-center sm:text-start flex-1 min-w-0"
-            >
-              <div
-                class="inline-flex items-center gap-1.5 justify-center sm:justify-start"
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-gold animate-pulse"></span>
-                <span
-                  class="text-barbi font-semibold text-xs tracking-wide uppercase"
-                >
-                  {$t('home.guide.eyebrow')}
-                </span>
-              </div>
-              <p class="text-rose-800 font-bold text-xl sm:text-lg leading-snug">
-                {$t('home.guide.title')}
-              </p>
-              <p class="text-slate-700/90 text-base sm:text-sm leading-relaxed">
-                {$t('home.guide.desc')}
-              </p>
-            </div>
-
-            <!-- חץ / CTA -->
-            <div
-              class="relative shrink-0 flex items-center gap-2 bg-barbi text-gold font-bold px-5 py-2.5 rounded-xl shadow group-hover:bg-white group-hover:text-barbi group-hover:scale-105 transition-all duration-300 whitespace-nowrap text-base sm:text-sm"
-            >
-              {$t('home.guide.cta')}
-              <svg
-                class="w-4 h-4 group-hover:translate-x-0.5 transition-transform"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d={$isRtl ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7'}
-                />
-              </svg>
-            </div>
-          </a>
-        </section>
-
-        <!-- בלוק: באנר /quorum — קנייה קבוצתית מבוססת סף -->
-        <section class="scroll-mt-16">
-          <a
-            href="/quorum"
-            class="group relative flex flex-col sm:flex-row items-center gap-5 w-full overflow-hidden rounded-3xl border-2 border-gold/60 bg-gradient-to-br from-[#1b1633] via-[#241d4b] to-[#2a1230] px-6 py-6 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+            {$t('home.deeper.eyebrow')}
+          </p>
+          <h2
+            class="text-rose-700 font-bold text-2xl sm:text-xl mb-1 text-center"
           >
-            <!-- רקע דקורטיבי -->
-            <div
-              class="pointer-events-none absolute -top-12 -end-12 w-48 h-48 rounded-full bg-gold/20 blur-2xl"
-            ></div>
-            <div
-              class="pointer-events-none absolute -bottom-10 -start-10 w-36 h-36 rounded-full bg-barbi/20 blur-2xl"
-            ></div>
-
-            <!-- אייקון -->
-            <div
-              class="relative shrink-0 w-16 h-16 rounded-2xl bg-gold/15 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300"
-            >
-              <span class="text-3xl">◉</span>
-            </div>
-
-            <!-- טקסט -->
-            <div
-              class="relative flex flex-col gap-1.5 text-center sm:text-start flex-1 min-w-0"
-            >
-              <div
-                class="inline-flex items-center gap-1.5 justify-center sm:justify-start"
-              >
-                <span
-                  class="w-1.5 h-1.5 rounded-full bg-gold animate-pulse"
-                ></span>
-                <span
-                  class="text-gold font-semibold text-xs tracking-wide uppercase"
-                >
-                  {$t('home.quorum.eyebrow')}
-                </span>
-              </div>
-              <p class="text-amber-50 font-bold text-xl sm:text-lg leading-snug">
-                {$t('home.quorum.title')}
-              </p>
-              <p class="text-amber-100/70 text-base sm:text-sm leading-relaxed">
-                {$t('home.quorum.desc')}
-              </p>
-            </div>
-
-            <!-- חץ / CTA -->
-            <div
-              class="relative shrink-0 flex items-center gap-2 bg-gold text-[#241c05] font-bold px-5 py-2.5 rounded-xl shadow group-hover:bg-white group-hover:scale-105 transition-all duration-300 whitespace-nowrap text-base sm:text-sm"
-            >
-              {$t('home.quorum.cta')}
-              <svg
-                class="w-4 h-4 group-hover:translate-x-0.5 transition-transform"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d={$isRtl ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7'}
-                />
-              </svg>
-            </div>
-          </a>
-        </section>
-
-        <!-- בלוק: באנר /grow — לאנשים שרוצים לצמוח ולבנות שותפויות -->
-        <section class="scroll-mt-16">
-          <a
-            href="/grow"
-            class="group relative flex flex-col sm:flex-row items-center gap-5 w-full overflow-hidden rounded-3xl border-2 border-emerald-300/60 bg-gradient-to-br from-[#f4faf1] via-[#e8f5e3] to-[#f0f4e3] px-6 py-6 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+            {$t('home.deeper.title')}
+          </h2>
+          <p
+            class="text-slate-700 text-base sm:text-sm mb-4 text-center max-w-md mx-auto"
           >
-            <!-- רקע דקורטיבי -->
-            <div
-              class="pointer-events-none absolute -top-12 -end-12 w-48 h-48 rounded-full bg-emerald-200/30 blur-2xl"
-            ></div>
-            <div
-              class="pointer-events-none absolute -bottom-10 -start-10 w-36 h-36 rounded-full bg-amber-200/20 blur-2xl"
-            ></div>
-
-            <!-- אמוג׳י / אייקון -->
-            <div
-              class="relative shrink-0 w-16 h-16 rounded-2xl bg-emerald-100 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300"
-            >
-              <span class="text-3xl">🌱</span>
-            </div>
-
-            <!-- טקסט -->
-            <div
-              class="relative flex flex-col gap-1.5 text-center sm:text-start flex-1 min-w-0"
-            >
-              <div
-                class="inline-flex items-center gap-1.5 justify-center sm:justify-start"
+            {$t('home.deeper.sub')}
+          </p>
+          <div class="grid gap-3 sm:grid-cols-3">
+            {#each [{ href: '/guid', icon: '📖', title: $t('home.guide.title'), desc: $t('home.guide.desc'), cta: $t('home.guide.cta') }, { href: '/quorum', icon: '◉', title: $t('home.quorum.title'), desc: $t('home.quorum.desc'), cta: $t('home.quorum.cta') }, { href: '/grow', icon: '🌱', title: $t('home.grow.title'), desc: $t('home.grow.desc'), cta: $t('home.grow.cta') }] as card}
+              <a
+                href={card.href}
+                data-sveltekit-prefetch
+                class="group flex flex-col gap-1.5 rounded-2xl border-2 border-gold/70 bg-cyan-50/70 backdrop-blur-sm px-4 py-4 shadow hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
               >
+                <span class="text-2xl" aria-hidden="true">{card.icon}</span>
                 <span
-                  class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"
-                ></span>
-                <span
-                  class="text-emerald-700 font-semibold text-xs tracking-wide uppercase"
+                  class="font-bold text-rose-800 text-base sm:text-sm leading-snug"
+                  >{card.title}</span
                 >
-                  {$t('home.grow.eyebrow')}
-                </span>
-              </div>
-              <p
-                class="text-emerald-900 font-bold text-xl sm:text-lg leading-snug"
-              >
-                {$t('home.grow.title')}
-              </p>
-              <p
-                class="text-emerald-800/80 text-base sm:text-sm leading-relaxed"
-              >
-                {$t('home.grow.desc')}
-              </p>
-            </div>
-
-            <!-- חץ / CTA -->
-            <div
-              class="relative shrink-0 flex items-center gap-2 bg-emerald-700 text-amber-50 font-bold px-5 py-2.5 rounded-xl shadow group-hover:bg-emerald-800 group-hover:scale-105 transition-all duration-300 whitespace-nowrap text-base sm:text-sm"
-            >
-              {$t('home.grow.cta')}
-              <svg
-                class="w-4 h-4 group-hover:translate-x-0.5 transition-transform"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d={$isRtl ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7'}
-                />
-              </svg>
-            </div>
-          </a>
+                <span
+                  class="text-slate-700 text-sm sm:text-xs leading-relaxed grow"
+                  >{card.desc}</span
+                >
+                <span
+                  class="text-barbi font-semibold text-sm sm:text-xs mt-1 group-hover:underline"
+                  >{card.cta} {$isRtl ? '←' : '→'}</span
+                >
+              </a>
+            {/each}
+          </div>
         </section>
 
         <!-- בלוק: קריאה לפעולה סופית -->

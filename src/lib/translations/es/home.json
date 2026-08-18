@@ -563,5 +563,15 @@
     "toPause": "Pausar el movimiento",
     "toHide": "Ocultar la animación",
     "auto": "Volver al valor predeterminado"
+  },
+  "deeper": {
+    "eyebrow": "◈ Profundizar ◈",
+    "title": "Hay más, por tema",
+    "sub": "Ya tienes el principio. Estos son los tres lugares donde se explica por completo."
+  },
+  "flow": {
+    "toPain": "Esto era para quien ya tiene una sociedad. ¿Y si aún no tienes una?",
+    "toDemo": "Esa es la idea. Ahora míralo funcionar.",
+    "toFeatures": "Ya viste cómo se siente. Esto es lo que hay dentro."
   }
 }
