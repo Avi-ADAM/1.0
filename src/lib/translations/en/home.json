@@ -571,12 +571,31 @@
   "flow": {
     "toPain": "That was for people who already have a partnership. And if you do not have one yet?",
     "toDemo": "That is the idea. Now watch it work.",
-    "toFeatures": "You have seen how it feels. Here is what is inside."
+    "toFeatures": "You have seen how it feels. Here is what is inside.",
+    "toConcierge": "And that direction, starting from the customer, is what happens here:"
   },
   "uses": {
     "eyebrow": "◈ And your case? ◈",
     "title": "A partner programme? A team for one project? An idea looking for people?",
     "sub": "The mechanism is one, and only what counts as giving changes. There is a page showing how it looks in each case.",
     "cta": "Find your case"
+  },
+  "circle": {
+    "eyebrow": "◈ One circle, two ways in ◈",
+    "title": "Wherever you enter, it is the same circle",
+    "lead": "A founder opens a rikma, partners join, a product is born, a customer arrives. It also runs the other way: a customer asks for something that does not exist yet, and the rikma that will make it is built around the request.",
+    "aLabel": "From the founder",
+    "a1": "Founder",
+    "a2": "Rikma",
+    "a3": "Partners",
+    "a4": "Product",
+    "a5": "Customer",
+    "bLabel": "From the customer - this is the concierge",
+    "b1": "Customer",
+    "b2": "Request",
+    "b3": "Rikma",
+    "b4": "Partners",
+    "b5": "Product",
+    "note": "Both directions close the same circle, and the maths is identical: what each person gave decides what they take."
   }
 }

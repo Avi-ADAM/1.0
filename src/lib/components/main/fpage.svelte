@@ -1229,6 +1229,62 @@
           </div>
         </section>
 
+        <!-- ===== מעגל אחד, שתי כניסות =====
+             עד כאן העמוד סיפר כיוון אחד בלבד: יזם שפותח ריקמה, מגיעים שותפים,
+             נולד מוצר, מגיע לקוח. הקונסיירז' שמתחת הוא אותו מעגל מהקצה
+             השני - לקוח שמבקש משהו שעוד לא קיים, וסביב הבקשה שלו נבנית הריקמה
+             שתייצר אותו. בלי שהמעגל נאמר מפורשת קודם, הקונסיירז' נקרא כמוצר אחר
+             שנשתל באמצע העמוד. הבלוק הזה אומר את המעגל, ואז הוא פשוט הכיוון השני שלו. -->
+        <section id="circle" class="scroll-mt-16">
+          <p
+            class="text-center text-barbi font-bold text-base sm:text-sm tracking-widest mb-1"
+          >
+            {$t('home.circle.eyebrow')}
+          </p>
+          <h2
+            class="text-rose-700 font-bold text-3xl sm:text-2xl mb-2 text-center"
+          >
+            {$t('home.circle.title')}
+          </h2>
+          <p
+            class="text-center text-slate-800 text-lg sm:text-base mb-5 leading-relaxed"
+          >
+            {$t('home.circle.lead')}
+          </p>
+
+          <div class="flex flex-col gap-3">
+            {#each ['a', 'b'] as dir}
+              <div
+                class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-3 shadow"
+              >
+                <p class="text-rose-700 font-bold text-base sm:text-sm mb-2">
+                  {$t(`home.circle.${dir}Label`)}
+                </p>
+                <ol class="flex flex-wrap items-center gap-2">
+                  {#each [1, 2, 3, 4, 5] as n}
+                    {#if n > 1}
+                      <li aria-hidden="true" class="text-barbi font-bold">
+                        {$isRtl ? '←' : '→'}
+                      </li>
+                    {/if}
+                    <li
+                      class="bg-white/80 border border-gold/70 rounded-full px-3 py-1 text-slate-800 text-base sm:text-sm"
+                    >
+                      {$t(`home.circle.${dir}${n}`)}
+                    </li>
+                  {/each}
+                </ol>
+              </div>
+            {/each}
+          </div>
+
+          <p class="mt-4 text-center text-slate-700 text-base sm:text-sm">
+            {$t('home.circle.note')}
+          </p>
+        </section>
+
+        {@render flowLine($t('home.flow.toConcierge'))}
+
         <!-- בלוק: הקונסיירז' (דו‑קהלי) -->
         <section id="concierge" class="scroll-mt-16">
           <p

@@ -572,12 +572,31 @@
   "flow": {
     "toPain": "Esto era para quien ya tiene una sociedad. ¿Y si aún no tienes una?",
     "toDemo": "Esa es la idea. Ahora míralo funcionar.",
-    "toFeatures": "Ya viste cómo se siente. Esto es lo que hay dentro."
+    "toFeatures": "Ya viste cómo se siente. Esto es lo que hay dentro.",
+    "toConcierge": "Y esa dirección, desde el cliente hacia dentro, es lo que ocurre aquí:"
   },
   "uses": {
     "eyebrow": "◈ ¿Y tu caso? ◈",
     "title": "¿Un programa de socios? ¿Un equipo para un proyecto? ¿Una idea que busca gente?",
     "sub": "El mecanismo es uno y solo cambia qué cuenta como aporte. Hay una página que muestra cómo se ve en cada caso.",
     "cta": "Encuentra tu caso"
+  },
+  "circle": {
+    "eyebrow": "◈ Un círculo, dos entradas ◈",
+    "title": "Entréis por donde entréis, es el mismo círculo",
+    "lead": "Un emprendedor abre una rikma, entran socios, nace un producto y llega un cliente. También funciona al revés: un cliente pide algo que aún no existe, y alrededor de su petición se construye la rikma que lo hará.",
+    "aLabel": "Desde el emprendedor",
+    "a1": "Emprendedor",
+    "a2": "Rikma",
+    "a3": "Socios",
+    "a4": "Producto",
+    "a5": "Cliente",
+    "bLabel": "Desde el cliente: esto es la conserjería",
+    "b1": "Cliente",
+    "b2": "Petición",
+    "b3": "Rikma",
+    "b4": "Socios",
+    "b5": "Producto",
+    "note": "Ambas direcciones cierran el mismo círculo, y el cálculo es idéntico: lo que cada uno dio decide lo que se lleva."
   }
 }
