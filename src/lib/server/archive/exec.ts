@@ -30,6 +30,19 @@ export function execFromContext(context: {
       },
       body: JSON.stringify({ query }),
     });
+    // A permission failure and a closed nginx gate both answer with a status
+    // and a non-JSON body, and `res.json()` on its own turned either one into
+    // an unrelated parse error — which is how a missing role permission on a
+    // freshly added collection reads as "Unexpected token < in JSON".
+    // 403 in particular has two very different causes worth telling apart:
+    // Strapi (the Authenticated role lacks find/create/update on the
+    // collection) or the gate in front of it (no `x-strapi-gate`).
+    if (!res.ok) {
+      const body = await res.text().catch(() => '');
+      throw new Error(
+        `Strapi ${res.status} ${res.statusText} — ${body.slice(0, 300) || '(empty body)'}`,
+      );
+    }
     return res.json();
   };
 }

@@ -237,8 +237,16 @@ See `docs/PLAN_STIPEND.md`. One partner funds another's living costs at a rate
 whole model is `(k − α)·P`, and `src/lib/stipend/computeStipendEquity.ts` is its
 single source of truth — never recompute it at a call site.
 
+**Three shapes, and the third is a mode.** `equity` with α=0 (the whole rikma
+carries it, everyone diluted together), `equity` with α=1 (only the recipient
+carries it — they accrue the difference `M×H − P`), and `gift` (the funder is a
+supporter, not a partner; nothing moves). A fourth mode, `advance` — a repayable
+loan — was removed deliberately; `src/lib/stipend/ADVANCE_MODE.md` records what
+it was and what re-enabling would take. Legacy `advance` rows read as `gift`,
+which is exactly how they always behaved.
+
 **Who signs is derived, not chosen.** While the rikma's total value does not
-move (`(k−α)=0`: α=1 & k=1, or `advance`/`gift`) nobody outside the two parties
+move (`(k−α)=0`: α=1 & k=1, or `gift`) nobody outside the two parties
 is affected, so `stipendPledge` is **bilateral**. The moment it grows, every
 member is diluted, so it needs an approved `stipendProgram` — rikma-wide, with a
 closed `totalCap` that bounds the dilution, shown to each voter as their own

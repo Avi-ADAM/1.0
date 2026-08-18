@@ -26,7 +26,10 @@ import {
 import { validateStipendTerms, normalizeTerms } from '$lib/stipend/computeStipendEquity.js';
 import type { PartialStipendTerms } from '$lib/stipend/types.js';
 
-const MODES = ['equity', 'advance', 'gift'] as const;
+// `advance` stays in the Strapi enum (dropping a deployed enum value is a
+// migration, and rows may already carry it) but is no longer writable from
+// here — see src/lib/stipend/ADVANCE_MODE.md.
+const MODES = ['equity', 'gift'] as const;
 const SCOPES = ['allMissions', 'selectedMissions', 'singleMission'] as const;
 const RECOURSES = ['nonRecourse', 'personal'] as const;
 const INITIATORS = ['funder', 'recipient', 'member'] as const;

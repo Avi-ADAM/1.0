@@ -67,7 +67,7 @@
   <fieldset class="flex flex-col gap-1">
     <legend class={LABEL}>{$t('stipend.terms.mode')}</legend>
     <div class="flex flex-wrap gap-2">
-      {#each ['equity', 'advance', 'gift'] as m (m)}
+      {#each ['equity', 'gift'] as m (m)}
         <label
           class="cursor-pointer rounded-full border px-3 py-1.5 text-sm transition-colors
             {terms.mode === m
@@ -196,18 +196,6 @@
           />
           <span class={MUTED}>{$t('stipend.terms.revenueTriggerExplain')}</span>
         </label>
-        {#if terms.mode === 'advance'}
-          <label class="flex items-center gap-2 text-sm {BODY}">
-            <input
-              type="checkbox"
-              checked={terms.recourse === 'personal'}
-              onchange={(e) =>
-                (terms.recourse = e.currentTarget.checked ? 'personal' : 'nonRecourse')}
-            />
-            {$t('stipend.terms.recoursePersonal')}
-          </label>
-          <p class={MUTED}>{$t('stipend.terms.recourseExplain')}</p>
-        {/if}
       </div>
     </details>
   {/if}

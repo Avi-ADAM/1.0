@@ -25,7 +25,10 @@ import {
   fetchProjectContext
 } from '$lib/server/stipend/read.js';
 
-const MODES = ['equity', 'advance', 'gift'] as const;
+// `advance` stays in the Strapi enum (dropping a deployed enum value is a
+// migration, and rows may already carry it) but is no longer writable from
+// here — see src/lib/stipend/ADVANCE_MODE.md.
+const MODES = ['equity', 'gift'] as const;
 
 const handler: ActionExecutionHandler = async (params, context, { notifier }) => {
   const pledgeId = String(params.pledgeId ?? '');

@@ -14,7 +14,7 @@ import {
 const P = 10_000;
 const MISSION_VALUE = 40_000;
 
-describe('computeStipendEquity — the four routes as special cases', () => {
+describe('computeStipendEquity — the three routes as special cases', () => {
   it('B (α=1, k=1): only the difference lands, rikma total unchanged', () => {
     const lines = computeStipendEquity(P, { mode: 'equity', costShare: 1, equityMultiplier: 1 });
     expect(lines.equityCredit).toBe(10_000);
@@ -38,11 +38,22 @@ describe('computeStipendEquity — the four routes as special cases', () => {
     expect(MISSION_VALUE - lines.equityDebit).toBe(35_000);
   });
 
-  it('advance and gift never touch equity', () => {
-    for (const mode of ['advance', 'gift'] as const) {
-      const lines = computeStipendEquity(P, { mode, costShare: 0, equityMultiplier: 3 });
-      expect(lines).toEqual({ equityCredit: 0, equityDebit: 0, netChange: 0 });
-    }
+  it('a gift never touches equity', () => {
+    const lines = computeStipendEquity(P, { mode: 'gift', costShare: 0, equityMultiplier: 3 });
+    expect(lines).toEqual({ equityCredit: 0, equityDebit: 0, netChange: 0 });
+  });
+
+  // `advance` was removed as a choice (src/lib/stipend/ADVANCE_MODE.md). Rows
+  // written while it existed must keep the behaviour they always had — which
+  // was the gift's, exactly: zeros. Reading them as `equity` would hand out
+  // percentages nobody agreed to.
+  it('reads a legacy advance row as the gift it always behaved like', () => {
+    const lines = computeStipendEquity(P, {
+      mode: 'advance' as unknown as 'gift',
+      costShare: 0,
+      equityMultiplier: 3
+    });
+    expect(lines).toEqual({ equityCredit: 0, equityDebit: 0, netChange: 0 });
   });
 
   it('a risk premium k>1 grows the rikma even at α=1', () => {
@@ -75,7 +86,6 @@ describe('normalizeTerms', () => {
 describe('consensusScope — derived from (k − α), never chosen', () => {
   it('is bilateral exactly while the rikma total does not move', () => {
     expect(consensusScope({ mode: 'equity', costShare: 1, equityMultiplier: 1 })).toBe('bilateral');
-    expect(consensusScope({ mode: 'advance', costShare: 0 })).toBe('bilateral');
     expect(consensusScope({ mode: 'gift', costShare: 0, equityMultiplier: 5 })).toBe('bilateral');
   });
 

@@ -40,8 +40,12 @@ function num(value: unknown, fallback: number): number {
 /** Fill in the blanks and clamp α to [0,1] and k to ≥ 1. */
 export function normalizeTerms(input: PartialStipendTerms | null | undefined): StipendTerms {
   const t = { ...DEFAULT_TERMS, ...(input ?? {}) };
-  const mode: StipendMode =
-    t.mode === 'advance' || t.mode === 'gift' ? t.mode : 'equity';
+  // `advance` was removed as a choice, but rows written while it existed can
+  // still arrive here. It is read as `gift`, which is what it always was in
+  // this function — both produced zeros — so a legacy row keeps its true
+  // behaviour instead of silently becoming an equity stake nobody agreed to.
+  const raw = String(t.mode ?? '');
+  const mode: StipendMode = raw === 'gift' || raw === 'advance' ? 'gift' : 'equity';
   return {
     ...t,
     mode,
