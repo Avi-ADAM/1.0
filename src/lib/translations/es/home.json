@@ -584,19 +584,15 @@
   "circle": {
     "eyebrow": "◈ Un círculo, dos entradas ◈",
     "title": "Entréis por donde entréis, es el mismo círculo",
-    "lead": "Un emprendedor abre una rikma, entran socios, nace un producto y llega un cliente. También funciona al revés: un cliente pide algo que aún no existe, y alrededor de su petición se construye la rikma que lo hará.",
-    "aLabel": "Desde el emprendedor",
-    "a1": "Emprendedor",
-    "a2": "Rikma",
-    "a3": "Socios",
-    "a4": "Producto",
-    "a5": "Cliente",
-    "bLabel": "Desde el cliente: esto es la conserjería",
-    "b1": "Cliente",
-    "b2": "Petición",
-    "b3": "Rikma",
-    "b4": "Socios",
-    "b5": "Producto",
-    "note": "Ambas direcciones cierran el mismo círculo, y el cálculo es idéntico: lo que cada uno dio decide lo que se lleva."
+    "lead": "Se abre una rikma, entran socios, nace un producto y lo recibe un cliente. Y la petición de un cliente abre el círculo siguiente. Podéis subiros como emprendedor que abre una rikma, o como cliente que pide algo que aún no existe.",
+    "n1": "Rikma",
+    "n2": "Socios",
+    "n3": "Producto",
+    "n4": "Cliente",
+    "n5": "Petición",
+    "entryFounder": "el emprendedor entra en Rikma",
+    "entryCustomer": "el cliente entra en Petición",
+    "core": "lo que cada uno dio decide lo que se lleva",
+    "note": "Las dos entradas llevan al mismo círculo y al mismo cálculo exacto."
   }
 }

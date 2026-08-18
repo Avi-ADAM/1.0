@@ -79,6 +79,80 @@
   let btnb = $state(false);
 
   // מודל וידאו (עברית בלבד כרגע): הסרטון נטען ומתחיל לנגן אוטומטית עם הפתיחה
+  /* --- the circle diagram (#circle) ---------------------------------------
+     Five stations on one ring, travelled in a single direction: a rikma
+     forms, partners join, a product exists, a customer receives it, and a
+     customer's request starts the next one. The two audiences differ by where
+     they step on, not by which way they walk - the founder opens the rikma,
+     the customer arrives with a request - which is why this is one loop with
+     two entry markers rather than two opposing rows.
+
+     Angles start at the top and travel with the reading direction, so the eye
+     follows the arrows the same way it follows the text.
+
+     The ring is drawn as one unbroken circle and the station pills, which are
+     opaque, sit on top of it. Cutting the circle into five arcs was the first
+     attempt: clearing the widest pill needs ~20 degrees of padding at each
+     end, which leaves 32 of every 72 degrees actually drawn, and it read as
+     scattered chevrons instead of a loop. */
+  const RING_KEYS = ['n1', 'n2', 'n3', 'n4', 'n5'];
+  const RING_ENTRY = { n1: 'entryFounder', n5: 'entryCustomer' };
+  /* 30, not the 34 this started at: the entry arrows come in radially and have
+     to clear the station pill they point at. A pill at the ring's horizontal
+     extreme is as wide as its label - "Request" is 83px on a 384px box, i.e.
+     ~11 viewBox units of radius - so at 34 the arrowhead landed underneath the
+     pill and was invisible. */
+  const RING_R = 30; // ring radius, in viewBox units == % of the square box
+  const RING_STEP = 360 / RING_KEYS.length;
+
+  let ringDir = $derived($isRtl ? -1 : 1);
+
+  /* The ring's centre sits below the middle of its square box. Only the top
+     of the diagram carries an entry arrow, which reaches out to r=48, while
+     the lowest thing below the centre is a station pill ending near r=35 -
+     so a centred ring leaves ~80px of dead space under it and almost none
+     above. This offset balances the two margins. */
+  const RING_CY = 59;
+
+  const ringPoint = (deg, r = RING_R) => {
+    const a = ((deg - 90) * Math.PI) / 180;
+    return [50 + r * Math.cos(a), RING_CY + r * Math.sin(a)];
+  };
+
+  let ringNodes = $derived(
+    RING_KEYS.map((key, i) => {
+      const [x, y] = ringPoint(ringDir * i * RING_STEP);
+      return { key, entry: RING_ENTRY[key], x, y };
+    })
+  );
+
+  /* One arrowhead per leg, at the midpoint between two stations, turned along
+     the tangent there. */
+  let ringHeads = $derived(
+    RING_KEYS.map((key, i) => {
+      const deg = ringDir * (i * RING_STEP + RING_STEP / 2);
+      const [x, y] = ringPoint(deg);
+      return { key, x, y, r: deg + ringDir * 90 };
+    })
+  );
+
+  /* The two stations someone can step onto get a short arrow coming in from
+     outside the ring. A badge stacked on the pill was the first attempt and it
+     does not survive translation - "вход предпринимателя" made that node 163px
+     wide and pushed it out of the box at the ring's horizontal extremes. An
+     arrow is the same width in every language, and the wording moves to the
+     legend under the diagram. */
+  let ringEntries = $derived(
+    RING_KEYS.flatMap((key, i) => {
+      if (!RING_ENTRY[key]) return [];
+      const deg = ringDir * i * RING_STEP;
+      const [x1, y1] = ringPoint(deg, 48);
+      const [x2, y2] = ringPoint(deg, 43);
+      // the head points inward, i.e. opposite the outward radial direction
+      return [{ key, x1, y1, x2, y2, r: deg + 90 }];
+    })
+  );
+
   const VIDEO_HOW_IT_WORKS = 'l0d1yv6Qtz4'; //'FqzccJ4lqTc'; // איך 1💗1 עובדת (הפתרון)
   const VIDEO_THIRD_WAY = 'FcyaiAIqeA4'; // הבעיה והדרך השלישית
   let videoOpen = $state(false);
@@ -1252,33 +1326,110 @@
             {$t('home.circle.lead')}
           </p>
 
-          <div class="flex flex-col gap-3">
-            {#each ['a', 'b'] as dir}
-              <div
-                class="bg-cyan-50/70 backdrop-blur-sm border-2 border-gold rounded-lg px-4 py-3 shadow"
+          <div
+            class="mx-auto rounded-2xl border-2 border-gold bg-cyan-50/80 p-3 shadow backdrop-blur-md"
+          >
+            <div class="relative mx-auto aspect-square w-full max-w-sm">
+              <!-- Decoration: every word the ring carries is in the list below
+                   it, in travel order, so a screen reader gets the sequence
+                   without hearing five arrow glyphs. -->
+              <svg
+                viewBox="0 0 100 100"
+                class="absolute inset-0 h-full w-full"
+                aria-hidden="true"
               >
-                <p class="text-rose-700 font-bold text-base sm:text-sm mb-2">
-                  {$t(`home.circle.${dir}Label`)}
-                </p>
-                <ol class="flex flex-wrap items-center gap-2">
-                  {#each [1, 2, 3, 4, 5] as n}
-                    {#if n > 1}
-                      <li aria-hidden="true" class="text-barbi font-bold">
-                        {$isRtl ? '←' : '→'}
-                      </li>
-                    {/if}
-                    <li
-                      class="bg-white/80 border border-gold/70 rounded-full px-3 py-1 text-slate-800 text-base sm:text-sm"
-                    >
-                      {$t(`home.circle.${dir}${n}`)}
-                    </li>
-                  {/each}
-                </ol>
-              </div>
-            {/each}
+                <!-- the pale disc gives the centre line something to sit on -->
+                <circle
+                  cx="50"
+                  cy={RING_CY}
+                  r="19"
+                  class="text-gold"
+                  fill="currentColor"
+                  opacity="0.45"
+                />
+                <circle
+                  cx="50"
+                  cy={RING_CY}
+                  r={RING_R}
+                  class="text-stgold"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.1"
+                  opacity="0.4"
+                />
+
+                {#each ringHeads as head (head.key)}
+                  <polygon
+                    points="0,-2.4 5,0 0,2.4"
+                    class="text-stgold"
+                    fill="currentColor"
+                    transform="translate({head.x} {head.y}) rotate({head.r})"
+                  />
+                {/each}
+
+                {#each ringEntries as e (e.key)}
+                  <line
+                    x1={e.x1}
+                    y1={e.y1}
+                    x2={e.x2}
+                    y2={e.y2}
+                    class="text-barbi"
+                    stroke="currentColor"
+                    stroke-width="1.4"
+                    stroke-linecap="round"
+                  />
+                  <polygon
+                    points="0,-2.8 5.6,0 0,2.8"
+                    class="text-barbi"
+                    fill="currentColor"
+                    transform="translate({e.x2} {e.y2}) rotate({e.r})"
+                  />
+                {/each}
+              </svg>
+
+              <!-- The invariant, at the centre of the circle on purpose: it is
+                   the one thing that does not change whichever station you
+                   enter from. -->
+              <p
+                class="absolute w-36 text-center text-base sm:text-sm font-bold leading-snug text-rose-900"
+                style="left: 50%; top: {RING_CY}%; transform: translate(-50%, -50%);"
+              >
+                {$t('home.circle.core')}
+              </p>
+
+              <ol class="absolute inset-0 m-0 list-none p-0">
+                {#each ringNodes as node (node.key)}
+                  <li
+                    class="absolute rounded-full bg-white px-3 py-1 text-base sm:text-sm font-semibold text-slate-800 whitespace-nowrap {node.entry
+                      ? 'border-2 border-barbi shadow-md'
+                      : 'border border-stgold/40 shadow-sm'}"
+                    style="left: {node.x}%; top: {node.y}%; transform: translate(-50%, -50%);"
+                  >
+                    {$t(`home.circle.${node.key}`)}
+                  </li>
+                {/each}
+              </ol>
+            </div>
           </div>
 
-          <p class="mt-4 text-center text-slate-700 text-base sm:text-sm">
+          <!-- The legend carries the two entry markers in words. The arrow glyph
+               repeats the shape drawn on the ring, so the pairing does not rest
+               on the pink alone (WCAG 1.4.1). -->
+          <ul
+            class="mt-2 flex flex-col items-center gap-1 text-slate-800 text-base sm:text-sm"
+          >
+            {#each ringEntries as e (e.key)}
+              <li class="flex items-center gap-2">
+                <span
+                  class="text-barbi font-bold {$isRtl ? 'scale-x-[-1]' : ''}"
+                  aria-hidden="true">➜</span
+                >
+                {$t(`home.circle.${RING_ENTRY[e.key]}`)}
+              </li>
+            {/each}
+          </ul>
+
+          <p class="mt-3 text-center text-slate-700 text-base sm:text-sm">
             {$t('home.circle.note')}
           </p>
         </section>

@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Who it is for · 1💗1",
-    "description": "A partner programme for sales, a team for one project, an idea looking for people, working the land and group buying - how each one works on 1💗1."
+    "description": "A partner programme for sales, a team for a project, an idea looking for people, a customer's request, working the land and group buying - how each of them works on 1💗1."
   },
   "hero": {
     "title": "What kind of sharing are you after?",
@@ -25,6 +25,12 @@
       "who": "You have a venture in mind and you are missing the people who bring what you do not have.",
       "how": "You publish open missions and resources, and whoever fits offers themselves. They join as a partner on what they give, without a salary you cannot pay yet. If nothing comes of it they lost no wages, and if it does, their share is already on record.",
       "cta": "Publish an open mission"
+    },
+    "concierge": {
+      "title": "You want something that does not exist yet",
+      "who": "You are not here to start a partnership - you are here as a customer, and what you need is not sold ready-made anywhere.",
+      "how": "You describe what you want in your own words, and the system breaks it into components. A rikma of providers who complete each other forms around the request, and you get a whole plan to approve - nothing starts until you approve it. It is the same circle as the other cases here, only it begins with you.",
+      "cta": "Tell us what you need"
     },
     "land": {
       "title": "Growing and working the land",

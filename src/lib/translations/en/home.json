@@ -583,19 +583,15 @@
   "circle": {
     "eyebrow": "◈ One circle, two ways in ◈",
     "title": "Wherever you enter, it is the same circle",
-    "lead": "A founder opens a rikma, partners join, a product is born, a customer arrives. It also runs the other way: a customer asks for something that does not exist yet, and the rikma that will make it is built around the request.",
-    "aLabel": "From the founder",
-    "a1": "Founder",
-    "a2": "Rikma",
-    "a3": "Partners",
-    "a4": "Product",
-    "a5": "Customer",
-    "bLabel": "From the customer - this is the concierge",
-    "b1": "Customer",
-    "b2": "Request",
-    "b3": "Rikma",
-    "b4": "Partners",
-    "b5": "Product",
-    "note": "Both directions close the same circle, and the maths is identical: what each person gave decides what they take."
+    "lead": "A rikma opens, partners join, a product is born, a customer receives it. And a customer's request opens the next circle. You can step on as a founder opening a rikma, or as a customer asking for something that does not exist yet.",
+    "n1": "Rikma",
+    "n2": "Partners",
+    "n3": "Product",
+    "n4": "Customer",
+    "n5": "Request",
+    "entryFounder": "the founder enters at Rikma",
+    "entryCustomer": "the customer enters at Request",
+    "core": "what each person gave decides what they take",
+    "note": "Both entrances lead into the same circle, and into exactly the same calculation."
   }
 }

@@ -9,12 +9,12 @@
   five different ways; it never once says what it looks like for a particular
   kind of work.
 
-  Five doors. Two of them (land, group buying) already had dedicated pages and
-  only link out. The other three are explained here because nothing covered
-  them - and the first is his question, answered directly.
+  Six doors. Two of them (land, group buying) already had dedicated pages and
+  only link out. The rest are explained here because nothing covered them -
+  and the first is his question, answered directly.
 
   The framing matters more than the list: the mechanism is one, and only what
-  counts as "gave" changes between cases. Otherwise this reads as five products.
+  counts as "gave" changes between cases. Otherwise this reads as six products.
 -->
 <script>
   import { t, locale, isRtl } from '$lib/translations';
@@ -26,12 +26,21 @@
     $locale === 'he' ? '/hascama' : $locale === 'ar' ? '/aitifaqia' : '/convention'
   );
 
-  // Order is deliberate: the three cases this page had to explain come first,
-  // then the two that only hand off to a page of their own.
+  // Order is deliberate: the cases this page had to explain come first, then
+  // the two that only hand off to a page of their own.
+  //
+  // `concierge` is the odd one and sits last of the explained group on
+  // purpose. The four above it are people forming a partnership; this one is
+  // a customer, who is not forming anything - they arrive with a request and
+  // the rikma is built around it. It goes to /wish/new rather than /concierge,
+  // because the latter is the providers' side and lives behind registration,
+  // while the visitor this card is written for is not registered and does not
+  // intend to be.
   let cases = $derived([
     { key: 'sales', icon: '📈', href: registerHref },
     { key: 'team', icon: '🛠️', href: registerHref },
     { key: 'idea', icon: '💡', href: '/availableMission' },
+    { key: 'concierge', icon: '✨', href: '/wish/new' },
     { key: 'land', icon: '🌱', href: '/grow' },
     { key: 'group', icon: '◉', href: '/quorum' }
   ]);

@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Para quién es · 1💗1",
-    "description": "Un programa de socios para ventas, un equipo para un proyecto, una idea que busca gente, trabajar la tierra y compra colectiva: cómo funciona cada caso en 1💗1."
+    "description": "Un programa de socios para ventas, un equipo para un proyecto, una idea que busca gente, la petición de un cliente, trabajar la tierra y la compra en grupo: cómo funciona cada uno en 1💗1."
   },
   "hero": {
     "title": "¿Qué tipo de colaboración buscas?",
@@ -25,6 +25,12 @@
       "who": "Tienes un proyecto en mente y te faltan personas que aporten lo que tú no tienes.",
       "how": "Publicas misiones y recursos abiertos, y quien encaja se ofrece. Entra como socio por lo que aporta, sin un sueldo que todavía no puedes pagar. Si no sale nada, no perdió salario; y si sale, su parte ya está registrada.",
       "cta": "Publicar una misión abierta"
+    },
+    "concierge": {
+      "title": "Queréis algo que aún no existe",
+      "who": "No venís a montar una sociedad: venís como clientes, y lo que necesitáis no se vende hecho en ninguna parte.",
+      "how": "Contáis con vuestras palabras qué queréis y el sistema lo desglosa en componentes. Alrededor de la petición se forma una rikma de proveedores que se complementan, y recibís un plan entero para aprobar: nada arranca hasta que lo aprobéis. Es el mismo círculo que los demás casos de aquí, solo que empieza en vosotros.",
+      "cta": "Contadnos qué necesitáis"
     },
     "land": {
       "title": "Cultivar y trabajar la tierra",
