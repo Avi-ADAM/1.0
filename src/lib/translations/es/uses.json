@@ -11,13 +11,13 @@
     "sales": {
       "title": "Un programa de socios para vender",
       "who": "Tienes un producto y quieres que otras personas lo vendan y se lleven parte del beneficio.",
-      "how": "Cada vendedor entra en la rikma, y cada venta que trae queda registrada a su nombre con el acuerdo de ambas partes. Su parte del beneficio se deriva de lo que realmente trajo, no de un porcentaje pactado al aire de antemano. Quien trajo más este mes se lleva más, sin reabrir ningún acuerdo, y sumar al décimo vendedor lleva un minuto.",
+      "how": "Aquí no hay comisión por cliente. Lo que se registra es lo que pusisteis: el dinero gastado en publicidad queda anotado como recurso, y las horas en llamadas con clientes potenciales como misión, ambos con el acuerdo de los socios. De ahí se deriva vuestra parte en la rikma, y el dinero que entra por ventas se reparte según ella. Quien invirtió más este mes se lleva más, y vuestra inversión ya está registrada antes de que se cierre la primera venta.",
       "cta": "Crear una rikma de ventas"
     },
     "team": {
       "title": "Un equipo que se junta para un proyecto",
       "who": "Varios profesionales que se unen para un solo trabajo y prefieren no discutir el reparto al final.",
-      "how": "Cada uno registra las horas, el equipo y los clientes que trajo, en el momento y con el consentimiento de todos. Cuando llega el pago, el reparto ya está calculado según lo que ocurrió de verdad, no según quién recuerda qué. Quien aportó menos en un mes cargado no tiene que disculparse, y la cifra se corrige sola.",
+      "how": "Cada uno registra las horas que trabajó y el dinero y el equipo que aportó, en el momento y con el consentimiento de todos. Cuando llega el pago, el reparto ya está calculado según lo que ocurrió de verdad, no según quién recuerda qué. Quien aportó menos en un mes cargado no tiene que disculparse, y la cifra se corrige sola.",
       "cta": "Crear una rikma de equipo"
     },
     "idea": {
