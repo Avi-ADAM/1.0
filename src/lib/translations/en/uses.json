@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "title": "Who it is for · 1💗1",
+    "description": "A partner programme for sales, a team for one project, an idea looking for people, working the land and group buying - how each one works on 1💗1."
+  },
+  "hero": {
+    "title": "What kind of sharing are you after?",
+    "sub": "The mechanism is one: the system counts what each person gave, and what each takes home follows from it. What changes is what counts as giving. Pick the case closest to you."
+  },
+  "cases": {
+    "sales": {
+      "title": "A partner programme for sales",
+      "who": "You have a product, and you want people to sell it and take a share of the profit.",
+      "how": "Each seller joins the rikma, and every sale they bring is recorded against them with both sides agreeing. Their share of the profit follows from what they actually brought, not from a percentage agreed in the air beforehand. Whoever brought more this month takes more, with no agreement to reopen, and adding a tenth seller takes a minute.",
+      "cta": "Start a sales rikma"
+    },
+    "team": {
+      "title": "A team that meets for one project",
+      "who": "A few professionals joining for a single job, who would rather not argue about the split at the end.",
+      "how": "Each logs the hours, equipment and clients they brought, as it happens and with everyone's consent. When payment arrives the split is already calculated from what actually happened, not from who remembers what. Someone who gave less during a busy month owes no apology, and the number corrects itself.",
+      "cta": "Start a team rikma"
+    },
+    "idea": {
+      "title": "An idea that needs people",
+      "who": "You have a venture in mind and you are missing the people who bring what you do not have.",
+      "how": "You publish open missions and resources, and whoever fits offers themselves. They join as a partner on what they give, without a salary you cannot pay yet. If nothing comes of it they lost no wages, and if it does, their share is already on record.",
+      "cta": "Publish an open mission"
+    },
+    "land": {
+      "title": "Growing and working the land",
+      "who": "Farmers, gardeners and anyone who wants a living from the land without starting capital.",
+      "how": "This one has a page of its own, with the routes and the examples.",
+      "cta": "To the growing page"
+    },
+    "group": {
+      "title": "Group buying",
+      "who": "A vegetable box, a shuttle route, a workshop - things that only exist when enough people want them.",
+      "how": "This one has a page of its own: you sign only in your own name, and it goes ahead only once enough have signed.",
+      "cta": "Discover Quorum"
+    }
+  },
+  "closing": {
+    "title": "Did not find your case?",
+    "sub": "The mechanism does not depend on the kind of business. If you are unsure how it fits what you do, book a personal 20-minute demo and we will go through it together.",
+    "cta": "Book a personal demo"
+  }
+}

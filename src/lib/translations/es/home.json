@@ -573,5 +573,11 @@
     "toPain": "Esto era para quien ya tiene una sociedad. ¿Y si aún no tienes una?",
     "toDemo": "Esa es la idea. Ahora míralo funcionar.",
     "toFeatures": "Ya viste cómo se siente. Esto es lo que hay dentro."
+  },
+  "uses": {
+    "eyebrow": "◈ ¿Y tu caso? ◈",
+    "title": "¿Un programa de socios? ¿Un equipo para un proyecto? ¿Una idea que busca gente?",
+    "sub": "El mecanismo es uno y solo cambia qué cuenta como aporte. Hay una página que muestra cómo se ve en cada caso.",
+    "cta": "Encuentra tu caso"
   }
 }

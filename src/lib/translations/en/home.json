@@ -572,5 +572,11 @@
     "toPain": "That was for people who already have a partnership. And if you do not have one yet?",
     "toDemo": "That is the idea. Now watch it work.",
     "toFeatures": "You have seen how it feels. Here is what is inside."
+  },
+  "uses": {
+    "eyebrow": "◈ And your case? ◈",
+    "title": "A partner programme? A team for one project? An idea looking for people?",
+    "sub": "The mechanism is one, and only what counts as giving changes. There is a page showing how it looks in each case.",
+    "cta": "Find your case"
   }
 }

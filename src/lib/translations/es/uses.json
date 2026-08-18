@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "title": "Para quién es · 1💗1",
+    "description": "Un programa de socios para ventas, un equipo para un proyecto, una idea que busca gente, trabajar la tierra y compra colectiva: cómo funciona cada caso en 1💗1."
+  },
+  "hero": {
+    "title": "¿Qué tipo de colaboración buscas?",
+    "sub": "El mecanismo es uno: el sistema cuenta lo que aportó cada persona, y de ahí se deriva lo que cada una se lleva. Lo que cambia es qué cuenta como aporte. Elige el caso más cercano al tuyo."
+  },
+  "cases": {
+    "sales": {
+      "title": "Un programa de socios para vender",
+      "who": "Tienes un producto y quieres que otras personas lo vendan y se lleven parte del beneficio.",
+      "how": "Cada vendedor entra en la rikma, y cada venta que trae queda registrada a su nombre con el acuerdo de ambas partes. Su parte del beneficio se deriva de lo que realmente trajo, no de un porcentaje pactado al aire de antemano. Quien trajo más este mes se lleva más, sin reabrir ningún acuerdo, y sumar al décimo vendedor lleva un minuto.",
+      "cta": "Crear una rikma de ventas"
+    },
+    "team": {
+      "title": "Un equipo que se junta para un proyecto",
+      "who": "Varios profesionales que se unen para un solo trabajo y prefieren no discutir el reparto al final.",
+      "how": "Cada uno registra las horas, el equipo y los clientes que trajo, en el momento y con el consentimiento de todos. Cuando llega el pago, el reparto ya está calculado según lo que ocurrió de verdad, no según quién recuerda qué. Quien aportó menos en un mes cargado no tiene que disculparse, y la cifra se corrige sola.",
+      "cta": "Crear una rikma de equipo"
+    },
+    "idea": {
+      "title": "Una idea que necesita gente",
+      "who": "Tienes un proyecto en mente y te faltan personas que aporten lo que tú no tienes.",
+      "how": "Publicas misiones y recursos abiertos, y quien encaja se ofrece. Entra como socio por lo que aporta, sin un sueldo que todavía no puedes pagar. Si no sale nada, no perdió salario; y si sale, su parte ya está registrada.",
+      "cta": "Publicar una misión abierta"
+    },
+    "land": {
+      "title": "Cultivar y trabajar la tierra",
+      "who": "Agricultores, gente con huerto y quien quiera vivir de la tierra sin capital inicial.",
+      "how": "Esto tiene su propia página, con los itinerarios y los ejemplos.",
+      "cta": "A la página de crecer desde la tierra"
+    },
+    "group": {
+      "title": "Compra colectiva",
+      "who": "Una caja de verduras, una ruta de transporte, un taller: cosas que solo existen cuando bastantes personas las quieren.",
+      "how": "Esto tiene su propia página: firmas solo en tu nombre, y arranca únicamente cuando han firmado suficientes.",
+      "cta": "Descubrir Quorum"
+    }
+  },
+  "closing": {
+    "title": "¿No encontraste tu caso?",
+    "sub": "El mecanismo no depende del tipo de negocio. Si no tienes claro cómo encaja con lo que haces, reserva una demo personal de 20 minutos y lo vemos juntos.",
+    "cta": "Reservar una demo personal"
+  }
+}

@@ -1293,6 +1293,39 @@
         </section>
 
         <!-- בלוק: למי זה מתאים -->
+        <!-- ===== המקרה שלכם: הכניסה ל/uses =====
+             לקוח פוטנציאלי שאל "אני רוצה תוכנית שותפים לגיוס מכירות של פירות
+             וירקות" - ולאתר לא הייתה שום כניסה לפי סוג עסק. הוא כבר הבין את
+             העיקרון לבד; מה שחסר לו היה לדעת אם הוא חל עליו. הבלוק הזה יושב
+             מיד אחרי "למי זה מתאים", שעונה על אותה שאלה בהפשטה, ומחליף אותה
+             בתשובה קונקרטית. -->
+        <section id="yourcase" class="scroll-mt-16">
+          <a
+            href="/uses"
+            data-sveltekit-prefetch
+            class="group block rounded-2xl border-2 border-gold bg-gradient-to-br from-cyan-50/80 to-fuchsia-50/70 backdrop-blur-sm px-5 py-5 shadow hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 text-center"
+          >
+            <p
+              class="text-barbi font-bold text-base sm:text-sm tracking-widest mb-1"
+            >
+              {$t('home.uses.eyebrow')}
+            </p>
+            <h2 class="text-rose-700 font-bold text-2xl sm:text-xl mb-2">
+              {$t('home.uses.title')}
+            </h2>
+            <p
+              class="text-slate-700 text-base sm:text-sm mb-3 max-w-xl mx-auto leading-relaxed"
+            >
+              {$t('home.uses.sub')}
+            </p>
+            <span
+              class="inline-block bg-barbi text-gold font-bold text-base sm:text-sm px-5 py-2 rounded-xl shadow group-hover:scale-105 transition-transform"
+            >
+              {$t('home.uses.cta')} {$isRtl ? '←' : '→'}
+            </span>
+          </a>
+        </section>
+
         <section id="who" class="scroll-mt-16">
           <h2
             class="text-rose-700 font-bold text-3xl sm:text-2xl mb-1 text-center"
