@@ -108,8 +108,28 @@ const STIPEND_DECISION_FIELDS = `
                     stipRecipient {
                       data { id attributes { username profilePic { data { attributes { url } } } } }
                     }
-                    stipendProgram { data { id attributes { name totalCap spent status } } }
-                    stipendPledge { data { id attributes { status paidTotal } } }`;
+                    stipendProgram { data { id attributes { name totalCap monthlyCap spent status seekingFunder } } }
+                    stipendPledge {
+                      data {
+                        id
+                        attributes {
+                          status paidTotal scope
+                          # Which work is being funded, and what that work is
+                          # worth — a voter cannot judge a stipend without it
+                          # (hoursassigned × perhour is the mission's market
+                          # value, the same M×H the equity math uses).
+                          mesimabetahaliches(pagination: { limit: 20 }) {
+                            data {
+                              id
+                              attributes {
+                                name descrip hoursassinged howmanyhoursalready perhour iskvua
+                                users_permissions_user { data { id attributes { username } } }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }`;
 
 /**
  * "Not the engine of a subsistence-stipend pledge" (PLAN_STIPEND §5).
@@ -9340,6 +9360,33 @@ export const moachQids = {
           }
           matanotofs(filters: ${NOT_ARCHIVED} pagination: { limit: -1 }) {
             data { id attributes { price kindOf } }
+          }
+        }
+      }
+    }
+  }`,
+  // One member's contribution total inside a rikma — the numerator of "my
+  // share", where `getProjectValueSummary` gives the denominator. Deliberately
+  // the *same* two collections that make up `currentValue` there (and the net
+  // of the split page): Σ finnished_missions.total + Σ rikmashes.total. Anything
+  // else and the percentage on the stipend card would not match the split page.
+  // Nested under `project` so it rides the project's own read permission.
+  'getMemberValueTotal': `query GetMemberValueTotal($pid: ID!, $uid: ID!) {
+    project(id: $pid) {
+      data {
+        id
+        attributes {
+          finnished_missions(
+            filters: { users_permissions_user: { id: { eq: $uid } } }
+            pagination: { limit: -1 }
+          ) {
+            data { id attributes { total } }
+          }
+          rikmashes(
+            filters: { users_permissions_user: { id: { eq: $uid } } }
+            pagination: { limit: -1 }
+          ) {
+            data { id attributes { total } }
           }
         }
       }

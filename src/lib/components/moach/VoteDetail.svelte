@@ -58,6 +58,7 @@
   import Halukaask from '$lib/components/lev/halukaask.svelte';
   import DecisionMaking from '$lib/components/lev/decisionMaking.svelte';
   import ArchiveObjectCard from '$lib/components/lev/cards/ArchiveObjectCard.svelte';
+  import StipendDecisionCard from '$lib/components/lev/cards/StipendDecisionCard.svelte';
   import Lowding from '$lib/celim/lowding.svelte';
 
   let { kind, entity, projectId, projectBase, uid, backHref } = $props();
@@ -476,6 +477,26 @@
         projectName={buble.projectName}
         logoSrc={buble.src}
         memberCount={buble.noof}
+        timegramaDate={buble.timegramaDate}
+        isFirst={true}
+        onProj={proj}
+        onUser={user}
+        onChat={noop}
+        onDone={onCoinLapach}
+      />
+    </div>
+  {:else if kind === 'decision' && buble.ani === 'stipend'}
+    <!-- Subsistence stipend proposals (PLAN_STIPEND). Like archObject above,
+         nothing about them fits the generic decision card — the terms, the
+         two parties and the dilution are the whole content. Same card the
+         heart uses; it turns read-only on its own once I have signed. -->
+    <div class="vote-card-wrap mx-auto">
+      <StipendDecisionCard
+        stipend={buble.stipend}
+        myId={uid}
+        projectId={buble.projectId}
+        projectName={buble.projectName}
+        logoSrc={buble.src}
         timegramaDate={buble.timegramaDate}
         isFirst={true}
         onProj={proj}

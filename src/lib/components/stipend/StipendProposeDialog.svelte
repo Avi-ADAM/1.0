@@ -217,8 +217,11 @@
         const res = await executeAction('proposeStipendProgram', {
           projectId,
           stipendRate: Number(terms.stipendRate) || 0,
-          totalCap: Number(terms.totalCap) || 0,
-          monthlyCap: terms.monthlyCap != null ? Number(terms.monthlyCap) : undefined,
+          // Exactly one of the two is sent: a closed total, or a monthly
+          // ceiling that runs until stopped. Sending 0 for the unused one
+          // would read as "a budget of nothing" on the card.
+          totalCap: Number(terms.totalCap) > 0 ? Number(terms.totalCap) : undefined,
+          monthlyCap: Number(terms.monthlyCap) > 0 ? Number(terms.monthlyCap) : undefined,
           mode: terms.mode,
           costShare: Number(terms.costShare),
           equityMultiplier: Number(terms.equityMultiplier),
@@ -268,7 +271,10 @@
   const canSend = $derived(
     Number(terms.stipendRate) > 0 &&
       (isProgram
-        ? Number(terms.totalCap) > 0
+        ? // Either ceiling will do — a closed total, or a monthly amount that
+          // renews until someone stops it. What a program may not have is
+          // neither, which would put an unknown sum to the vote.
+          Number(terms.totalCap) > 0 || Number(terms.monthlyCap) > 0
         : !!chosenFunder && !!chosenRecipient && chosenFunder !== chosenRecipient)
   );
 </script>
@@ -346,6 +352,12 @@
             </select>
             <span class={MUTED}>{$t('stipend.propose.noFunderYetExplain')}</span>
           </label>
+        {/if}
+
+        <!-- Naming someone else as the payer is a request, not a decision:
+             their signature is required and silence will not stand in for it. -->
+        {#if chosenFunder && chosenFunder !== myId}
+          <p class={MUTED}>{$t('stipend.propose.funderMustSign')}</p>
         {/if}
 
         <StipendTermsFields

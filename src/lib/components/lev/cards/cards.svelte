@@ -1253,6 +1253,7 @@
                   : 'swiper-slidec'}
                 ><StipendDecisionCard
                   stipend={buble.stipend}
+                  myId={buble.myid}
                   projectId={buble.projectId}
                   projectName={buble.projectName}
                   logoSrc={buble.src}

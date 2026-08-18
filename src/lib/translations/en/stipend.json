@@ -43,7 +43,11 @@
     "revenueTriggerSet": "Ends by itself at monthly income of {{count}}",
     "more": "More terms",
     "scopeBilateral": "A two-party agreement: nobody outside the two of you is affected",
-    "scopeRikma": "Needs the whole rikma: these terms raise the total value, so everyone is diluted"
+    "scopeRikma": "Needs the whole rikma: these terms raise the total value, so everyone is diluted",
+    "budgetShape": "Shape of the budget",
+    "budgetShape_total": "A closed total",
+    "budgetShape_monthly": "Monthly, until stopped",
+    "openEndedExplain": "No end date and no total: the programme renews every month until someone stops it. The monthly ceiling is what the rikma approves."
   },
   "error": {
     "rateRequired": "A stipend needs an hourly rate",
@@ -55,7 +59,8 @@
     "outsideEnvelopeRate": "The rate is above what the programme allows",
     "outsideEnvelopeCostShare": "The programme does not let the rikma carry this much of the cost",
     "outsideEnvelopeMultiplier": "The risk premium is above what the programme allows",
-    "programExhausted": "The programme's budget is already spent"
+    "programExhausted": "The programme's budget is already spent",
+    "budgetRequired": "A programme needs a total budget or a monthly ceiling — the vote is on an amount"
   },
   "propose": {
     "titleOffer": "Offer a subsistence stipend",
@@ -76,7 +81,8 @@
     "needsProgramTitle": "These terms need the rikma’s agreement",
     "needsProgramExplain": "They dilute every member, and the rikma has not agreed to dilution. The way to have exactly these terms is a stipend program: the same terms, with a closed budget, that every member votes on while seeing what it does to their own percentage. You can open one here and keep what you have filled in.",
     "openProgram": "Open a stipend program",
-    "escalated": "Your terms were kept. All that is missing is a total budget — that closed number is what makes the dilution votable."
+    "escalated": "Your terms were kept. All that is missing is a total budget — that closed number is what makes the dilution votable.",
+    "funderMustSign": "The person you named has to approve explicitly. Silence does not commit someone else’s money."
   },
   "tradeoff": {
     "title": "What you give up and what you get",
@@ -98,7 +104,29 @@
     "dilutionTitle": "What this does to your share",
     "dilutionNow": "Your share today: {{count}}%",
     "dilutionAfter": "If the budget is spent: {{count}}% (−{{points}} points)",
-    "dilutionNone": "Your share does not move — these terms dilute nobody but the two parties"
+    "dilutionNone": "Your share does not move — these terms dilute nobody but the two parties",
+    "funder": "Who pays",
+    "recipient": "Who receives",
+    "noFunderYet": "No funder yet",
+    "anyMember": "Any eligible member",
+    "youPayTitle": "You are the funder in this proposal",
+    "youPayBody": "If you approve, you pay {{count}} for every approved hour — out of your own pocket.",
+    "youPayMonthly": "Monthly ceiling: up to {{count}} a month.",
+    "youPayTotal": "Total across the whole programme: up to {{count}}.",
+    "youPayOpenEnded": "There is no final budget — it renews every month until someone stops it.",
+    "youReceiveTitle": "This stipend is for you",
+    "youReceiveBody": "{{name}} would fund you at {{count}} per approved hour.",
+    "missionsTitle": "What work this pays for",
+    "missionValue": "{{hours}} hours × {{rate}} = {{value}} of market value",
+    "missionRecurring": "a standing monthly commitment",
+    "missionHoursDone": "{{count}} hours already logged",
+    "coversAllRikma": "Covers every approved hour in the rikma, not one mission",
+    "coversAllMine": "Covers every approved hour of the recipient in this rikma",
+    "openEnded": "No final budget — it renews every month until stopped",
+    "dilutionPerYear": "Calculated over the next {{count}} months; the dilution continues for as long as the programme runs",
+    "needsFunderSignature": "This will not approve itself: paying needs {{name}} to sign explicitly, however long everyone else stays silent",
+    "confirmFunderTitle": "One moment before you approve",
+    "confirmFunderBody": "Approving here commits you to pay {{name}} {{count}} for every approved hour, until it is stopped or the budget runs out."
   },
   "counter": {
     "title": "Propose different terms",
@@ -147,7 +175,9 @@
     "approve": "Approve",
     "approving": "Approving…",
     "negotiate": "Propose differently",
-    "chat": "Discuss"
+    "chat": "Discuss",
+    "approveAsFunder": "Approve — I commit to pay",
+    "confirmPay": "Yes, I commit"
   },
   "toast": {
     "pledgeProposed": "Sent to the other party",

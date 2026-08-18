@@ -46,6 +46,25 @@
     allowRikmaScope = false
   } = $props();
 
+  /**
+   * Which of the two budget shapes the form is on. Derived from the terms
+   * themselves (a total budget or a monthly ceiling), so re-opening a proposal
+   * lands on the shape it was written in — with one piece of local state for
+   * the moment the member has switched but not yet typed the new number.
+   */
+  let shapeOverride = $state(/** @type {'total'|'monthly'|null} */ (null));
+  const budgetShape = $derived(
+    shapeOverride ??
+      (Number(terms.totalCap) > 0 ? 'total' : Number(terms.monthlyCap) > 0 ? 'monthly' : 'total')
+  );
+
+  /** Switching shape clears the other number — a program has one ceiling, not two. */
+  function setBudgetShape(shape) {
+    shapeOverride = shape;
+    if (shape === 'total') terms.monthlyCap = null;
+    else terms.totalCap = null;
+  }
+
   const scope = $derived(consensusScope(terms));
   const validation = $derived(validateStipendTerms({ terms, marketRate, policy }));
   // A program proposal carries `policyBilateralOnly` by definition — it is the
@@ -135,33 +154,67 @@
   {/if}
 
   {#if showBudget}
-    <label class="flex flex-col gap-1">
-      <span class={LABEL}>{$t('stipend.terms.totalCap')}</span>
-      <input
-        type="number"
-        min="0"
-        step="100"
-        bind:value={terms.totalCap}
-        class={INPUT}
-      />
-      <span class={MUTED}>{$t('stipend.terms.totalCapExplain')}</span>
-    </label>
+    <!-- Two honest ways to bound a program, and members need both: a closed
+         total ("₪6,000 and that's it"), or a monthly ceiling that runs until
+         someone stops it — which is the shape subsistence usually has, since
+         nobody knows in advance how many months they will need. What neither
+         may skip is a ceiling: the vote has to be on an amount. -->
+    <fieldset class="flex flex-col gap-2">
+      <legend class={LABEL}>{$t('stipend.terms.budgetShape')}</legend>
+      <div class="flex flex-wrap gap-2">
+        {#each ['total', 'monthly'] as shape (shape)}
+          <label
+            class="cursor-pointer rounded-full border px-3 py-1.5 text-sm transition-colors
+              {budgetShape === shape
+              ? 'border-barbi bg-barbi/10 text-barbi'
+              : 'border-gray-300 dark:border-slate-600 text-gray-800 dark:text-gray-100'}"
+          >
+            <input
+              type="radio"
+              class="sr-only"
+              name="stipend-budget-shape"
+              checked={budgetShape === shape}
+              onchange={() => setBudgetShape(shape)}
+            />
+            {$t(`stipend.terms.budgetShape_${shape}`)}
+          </label>
+        {/each}
+      </div>
+
+      {#if budgetShape === 'total'}
+        <label class="flex flex-col gap-1">
+          <span class={LABEL}>{$t('stipend.terms.totalCap')}</span>
+          <input type="number" min="0" step="100" bind:value={terms.totalCap} class={INPUT} />
+          <span class={MUTED}>{$t('stipend.terms.totalCapExplain')}</span>
+        </label>
+      {:else}
+        <label class="flex flex-col gap-1">
+          <span class={LABEL}>{$t('stipend.terms.monthlyCap')}</span>
+          <input type="number" min="0" step="100" bind:value={terms.monthlyCap} class={INPUT} />
+          <span class={MUTED}>{$t('stipend.terms.openEndedExplain')}</span>
+        </label>
+      {/if}
+    </fieldset>
   {/if}
 
   {#if showAdvanced}
     <details class="{WELL} p-3">
       <summary class="cursor-pointer text-sm font-semibold {BODY}">{$t('stipend.terms.more')}</summary>
       <div class="mt-3 flex flex-col gap-3">
-        <label class="flex flex-col gap-1">
-          <span class={LABEL}>{$t('stipend.terms.monthlyCap')}</span>
-          <input
-            type="number"
-            min="0"
-            step="100"
-            bind:value={terms.monthlyCap}
-            class={INPUT}
-          />
-        </label>
+        {#if !showBudget}
+          <!-- A program already chose its ceiling above; showing a second
+               monthlyCap field here would let it contradict itself. -->
+          <label class="flex flex-col gap-1">
+            <span class={LABEL}>{$t('stipend.terms.monthlyCap')}</span>
+            <input
+              type="number"
+              min="0"
+              step="100"
+              bind:value={terms.monthlyCap}
+              class={INPUT}
+            />
+          </label>
+        {/if}
         {#if !showBudget}
           <label class="flex flex-col gap-1">
             <span class={LABEL}>{$t('stipend.terms.totalCap')}</span>

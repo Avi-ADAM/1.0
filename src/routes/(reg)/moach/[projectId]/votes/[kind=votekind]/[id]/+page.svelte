@@ -6,13 +6,22 @@
   // `data` merges the moach [projectId] layout load (projectBase, uid,
   // projectId) with this route's load (kind, entity).
   let { data } = $props();
+
+  // A Decision carries no `name` — its title is `decisionName` (and `newname`
+  // for the kinds that propose one). Without this the tab reads "rikma ·  · vote".
+  let entityTitle = $derived(
+    data.entity?.attributes?.name ??
+      data.entity?.attributes?.newname ??
+      data.entity?.attributes?.decisionName ??
+      ''
+  );
 </script>
 
 <svelte:head>
   <title
     >{data.projectBase?.projectName
       ? `${data.projectBase.projectName} · `
-      : ''}{data.entity?.attributes?.name ?? ''} · {$lang === 'he'
+      : ''}{entityTitle ? `${entityTitle} · ` : ''}{$lang === 'he'
       ? 'הצבעה'
       : $lang === 'ar'
         ? 'تصويت'

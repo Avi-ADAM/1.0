@@ -60,14 +60,18 @@
   import { t as trans } from '$lib/translations';
   function decisionLabel(decision) {
     const kind = decision?.attributes?.kind;
+    // The row's own name first: archive/edit proposals carry no `newname`, and
+    // their `decisionName` ("הסרת המשימה X") — like a stipend's rate — is the
+    // only thing that says *which* object or terms the row is about. Without
+    // it the list would read the same generic sentence for every one of them.
+    const specific = decision?.attributes?.newname || decision?.attributes?.decisionName;
+    if (specific) return specific;
+    // Nameless kinds (a logo vote, a value add/remove) fall back to the
+    // per-kind header. A missing key resolves to the key itself, not '', so
+    // compare before trusting it.
     const label = $trans(`headers.${kind}`);
     if (label && label !== `headers.${kind}`) return label;
-    // Archive/edit proposals carry no `newname`; their `decisionName` is the
-    // only thing that says *which object* the row is about, so without it the
-    // list would read "archiveObject" for every one of them.
-    return (
-      decision?.attributes?.newname || decision?.attributes?.decisionName || kind || '—'
-    );
+    return kind || '—';
   }
 
   // Join requests live nested inside the open missions (field is `open_missions`

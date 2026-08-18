@@ -210,32 +210,61 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     pledgeId
   });
 
-  // The other party gets asked; when a third member opened it, both do.
-  const recipients = [funderId, recipientId].filter((id) => id !== userId);
-  if (notifier && recipients.length > 0) {
+  // The other party gets asked; when a third member opened it, both do — but
+  // not with the same sentence. Being funded and funding are different
+  // questions, and only one of them is a commitment to pay.
+  const asked = [funderId, recipientId].filter((id) => id !== userId);
+  if (notifier && asked.length > 0) {
     const lang = (context.lang === 'he' ? 'he' : 'en') as 'he' | 'en';
-    notifier
-      .notify(
-        {
-          recipients: { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
-          templates: {
-            title: {
-              he: 'הצעה למלגת קיום',
-              en: 'A subsistence stipend was proposed'
+    const missionHe = missionIds.length > 0 ? ' עבור המשימה שסוכמה' : ' על שעות שאושרו';
+    const missionEn = missionIds.length > 0 ? ' for the agreed mission' : ' on approved hours';
+
+    if (asked.includes(recipientId)) {
+      notifier
+        .notify(
+          {
+            recipients: { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
+            templates: {
+              title: { he: 'הצעה למלגת קיום', en: 'A subsistence stipend was proposed' },
+              body: {
+                he: `${funderName} מציע/ה לממן לך ₪${terms.stipendRate} לשעה${missionHe}. הקלף מראה מה את/ה מקבל/ת ומה זה עושה לחלק שלך. אפשר לאשר, לפתוח שיחה או להציע תנאים אחרים. ללא תגובה תוך ${restimeLabel(project.restime, 'he')} ההצעה תאושר מעצמה.`,
+                en: `${funderName} offers to fund you at ${terms.stipendRate} per hour${missionEn}. The card shows what you receive and what it does to your share. Approve, open a discussion, or propose different terms — with no response within ${restimeLabel(project.restime, lang)} it is approved on its own.`
+              }
             },
-            body: {
-              he: `${funderName} יממן ל${recipientName} ₪${terms.stipendRate} לשעה על שעות שאושרו. אפשר לאשר, לפתוח שיחה או להציע תנאים אחרים. ללא תגובה תוך ${restimeLabel(project.restime, 'he')} ההצעה תאושר מעצמה.`,
-              en: `${funderName} would fund ${recipientName} at ${terms.stipendRate} per approved hour. Approve, open a discussion, or propose different terms — with no response within ${restimeLabel(project.restime, lang)} it is approved on its own.`
-            }
+            channels: ['socket', 'push'],
+            metadata: { type: 'voteUpdate', url: 'lev', priority: 'high' }
           },
-          channels: ['socket', 'push'],
-          metadata: { type: 'voteUpdate', url: 'lev', priority: 'high' }
-        },
-        { recipients, projectId },
-        { projectId, decisionId: opened.decisionId },
-        context
-      )
-      .catch((e: unknown) => console.warn('[proposeStipendPledge] notification failed:', e));
+          { recipients: [recipientId], projectId },
+          { projectId, decisionId: opened.decisionId },
+          context
+        )
+        .catch((e: unknown) => console.warn('[proposeStipendPledge] notification failed:', e));
+    }
+
+    if (asked.includes(funderId)) {
+      notifier
+        .notify(
+          {
+            recipients: { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
+            templates: {
+              title: {
+                he: 'הוצעת כמממן/ת של מלגת קיום',
+                en: 'You were named as the funder of a stipend'
+              },
+              body: {
+                he: `הוצע שאת/ה תממן/י את ${recipientName} ב־₪${terms.stipendRate} לשעה${missionHe}. זו התחייבות לתשלום מכיסך: היא לא תיכנס לתוקף בלי אישור מפורש שלך — שתיקה לא מאשרת אותה. אפשר לאשר, לפתוח שיחה או להציע תנאים אחרים.`,
+                en: `It was proposed that you fund ${recipientName} at ${terms.stipendRate} per hour${missionEn}. This is a commitment to pay out of your own pocket: it cannot take effect without your explicit approval — silence will not approve it. Approve, open a discussion, or propose different terms.`
+              }
+            },
+            channels: ['socket', 'push', 'email'],
+            metadata: { type: 'voteUpdate', url: 'lev', priority: 'high' }
+          },
+          { recipients: [funderId], projectId },
+          { projectId, decisionId: opened.decisionId },
+          context
+        )
+        .catch((e: unknown) => console.warn('[proposeStipendPledge] funder notification failed:', e));
+    }
   }
 
   return {

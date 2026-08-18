@@ -2,5 +2,18 @@
   "misfini": "approval of sucsessfully finishing a mission",
   "pic": "vote on changing FreeMates logo",
   "sheirutpends": "vote on creating new service to the FreeMates",
-  "haluka": "money splitting offer"
+  "haluka": "money splitting offer",
+  "name": "vote on changing the rikma's name",
+  "prides": "vote on changing the internal description",
+  "pubdes": "vote on changing the public description",
+  "newFlink": "vote on changing the Facebook link",
+  "newWlink": "vote on changing the website link",
+  "timtoM": "vote on changing the response time",
+  "vallueadd": "vote on adding a value to the rikma",
+  "vallueles": "vote on removing a value from the rikma",
+  "saleClaim": "confirming who holds the money from a sale",
+  "archiveObject": "proposal to remove an item from the rikma",
+  "editObject": "proposal to change the terms",
+  "stipendProgram": "proposal for a subsistence stipend program",
+  "stipendPledge": "proposal for a subsistence stipend"
 }

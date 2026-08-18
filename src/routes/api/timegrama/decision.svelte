@@ -5,7 +5,11 @@
   import { execFromAdmin } from '$lib/server/archive/exec.js';
   import { fetchObjectChangeDecision } from '$lib/server/archive/read.js';
   import { applyStandingVersion } from '$lib/server/archive/vote.js';
-  import { applyStandingStipend, fetchStipendDecision } from '$lib/server/stipend/apply.js';
+  import {
+    applyStandingStipend,
+    fetchStipendDecision,
+    funderHasSigned
+  } from '$lib/server/stipend/apply.js';
 
   // GraphQL string-literal escaping for values interpolated into an inline
   // (non-parameterized) query — SendToAdmin takes a raw query string, no
@@ -166,11 +170,25 @@
       // A stipend proposal matures on silence into exactly what a unanimous
       // signature would have produced — same applyStandingStipend, so "everyone
       // agreed" and "nobody objected in time" cannot diverge (PLAN_STIPEND §5).
+      //
+      // With one exception, and it is the whole point of the exception: the
+      // **funder** has to have signed. Everyone else's silence is consent to
+      // being diluted; the funder's silence would be consent to paying money
+      // out of their own pocket, which nobody gives by saying nothing. When
+      // they have not signed, the clock simply ends — the proposal stays open,
+      // waiting for an explicit signature that only they can give.
       if (a.kind === 'stipendProgram' || a.kind === 'stipendPledge') {
         const exec = execFromAdmin(SendToAdmin, ADMINMONTHER);
         const decision = await fetchStipendDecision(exec, String(id));
         if (!decision) {
           console.warn(`[timegrama/decision] stipend decision ${id} could not be read`);
+          return markDone();
+        }
+        if (!funderHasSigned(decision)) {
+          console.log(
+            '[timegrama/decision] stipend restime ran out but the funder never signed — left open',
+            { decisionId: id, kind: a.kind, funderId: decision.funderId }
+          );
           return markDone();
         }
         try {

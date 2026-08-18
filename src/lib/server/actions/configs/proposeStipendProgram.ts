@@ -79,9 +79,19 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   // it, and that is checked above.
   const blockers = validation.errors.filter((e) => e !== 'policyBilateralOnly');
   if (blockers.length > 0) throw new Error(blockers[0]);
-  if (!(Number(terms.totalCap) > 0)) {
+  // A program has to be **bounded**, but there are two honest ways to bound
+  // one and members need both: a closed total budget ("₪6,000 and that's it"),
+  // or a monthly ceiling that runs until somebody stops it ("₪1,500 a month
+  // for as long as this lasts") — the shape most subsistence actually has,
+  // since nobody knows in advance how many months they will need.
+  //
+  // What the open-ended form gives up is the single final number, so the card
+  // shows a year of the monthly ceiling and says it keeps going; what it must
+  // never give up is a ceiling, or the vote would be on an unknown amount.
+  const openEnded = !(Number(terms.totalCap) > 0);
+  if (openEnded && !(Number(terms.monthlyCap) > 0)) {
     throw new Error(
-      'A program needs a total budget — that closed number is what makes the dilution votable'
+      'A program needs either a total budget or a monthly ceiling — members are voting on an amount, and there has to be one'
     );
   }
 
@@ -91,9 +101,15 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   }
 
   const nowISO = new Date().toISOString();
+  // The name is what the votes list and every notification show, so it carries
+  // the shape of the budget too — "up to ₪6,000" reads very differently from
+  // "₪1,500 a month until stopped", and a member should not have to open the
+  // card to tell which one they were asked about.
   const name = params.name
     ? String(params.name)
-    : `תוכנית מלגות קיום · ₪${terms.stipendRate}/ש׳`;
+    : openEnded
+      ? `תוכנית מלגות קיום · ₪${terms.stipendRate}/ש׳ · עד ₪${terms.monthlyCap} לחודש, עד עצירה`
+      : `תוכנית מלגות קיום · ₪${terms.stipendRate}/ש׳ · תקציב ₪${terms.totalCap}`;
 
   const created = await run(
     exec,
@@ -155,25 +171,64 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
 
   if (notifier) {
     const lang = (context.lang === 'he' ? 'he' : 'en') as 'he' | 'en';
-    notifier
-      .notify(
-        {
-          recipients: { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
-          templates: {
-            title: { he: 'הצעה לתוכנית מלגות קיום', en: 'A subsistence stipend program was proposed' },
-            body: {
-              he: `₪${terms.stipendRate} לשעה, תקציב כולל ₪${terms.totalCap}. הקלף מראה מה יקרה לחלק שלך אם התקציב ינוצל במלואו. אפשר לאשר, לפתוח שיחה או להציע תקציב או חלוקת-עלות אחרת. ללא תגובה תוך ${restimeLabel(project.restime, 'he')} ההצעה תאושר מעצמה.`,
-              en: `${terms.stipendRate} per hour, total budget ${terms.totalCap}. The card shows what happens to your share if the whole budget is spent. Approve, discuss, or propose a different budget or cost split — with no response within ${restimeLabel(project.restime, lang)} it is approved on its own.`
-            }
+    const budgetHe = openEnded
+      ? `עד ₪${terms.monthlyCap} לחודש, ללא תאריך סיום — ממשיך עד שעוצרים אותו`
+      : `תקציב כולל ₪${terms.totalCap}`;
+    const budgetEn = openEnded
+      ? `up to ${terms.monthlyCap} a month, with no end date — it runs until someone stops it`
+      : `a total budget of ${terms.totalCap}`;
+
+    // Two different questions, so two different messages. The rikma is asked
+    // "may we be diluted"; the named funder is asked "will you pay", which is
+    // the one question silence cannot answer — their card says so, and so does
+    // this.
+    const votersOnly = others.filter((id) => id !== funderId);
+    if (votersOnly.length > 0) {
+      notifier
+        .notify(
+          {
+            recipients: { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
+            templates: {
+              title: { he: 'הצעה לתוכנית מלגות קיום', en: 'A subsistence stipend program was proposed' },
+              body: {
+                he: `₪${terms.stipendRate} לשעה, ${budgetHe}. הקלף מראה מה יקרה לחלק שלך. אפשר לאשר, לפתוח שיחה או להציע תקציב או חלוקת-עלות אחרת. ללא תגובה תוך ${restimeLabel(project.restime, 'he')} ההצעה תאושר מעצמה — אלא אם המממן עדיין לא חתם.`,
+                en: `${terms.stipendRate} per hour, ${budgetEn}. The card shows what happens to your share. Approve, discuss, or propose a different budget or cost split — with no response within ${restimeLabel(project.restime, lang)} it is approved on its own, unless the funder has yet to sign.`
+              }
+            },
+            channels: ['socket', 'push'],
+            metadata: { type: 'voteUpdate', url: 'lev', priority: 'high' }
           },
-          channels: ['socket', 'push'],
-          metadata: { type: 'voteUpdate', url: 'lev', priority: 'high' }
-        },
-        { recipients: others, projectId },
-        { projectId, decisionId: opened.decisionId },
-        context
-      )
-      .catch((e: unknown) => console.warn('[proposeStipendProgram] notification failed:', e));
+          { recipients: votersOnly, projectId },
+          { projectId, decisionId: opened.decisionId },
+          context
+        )
+        .catch((e: unknown) => console.warn('[proposeStipendProgram] notification failed:', e));
+    }
+
+    if (funderId && funderId !== userId) {
+      notifier
+        .notify(
+          {
+            recipients: { type: 'specificUsers', config: { userIdsParam: 'recipients' } },
+            templates: {
+              title: {
+                he: 'הוצעת כמממן/ת של תוכנית מלגות קיום',
+                en: 'You were named as the funder of a stipend program'
+              },
+              body: {
+                he: `הוצע שאת/ה תממן/י מלגת קיום ב־₪${terms.stipendRate} לשעה מאושרת, ${budgetHe}. זו התחייבות לתשלום מכיסך: היא לא תיכנס לתוקף בלי אישור מפורש שלך, גם אם אף אחד אחר לא יגיב. אפשר לאשר, לפתוח שיחה או להציע תנאים אחרים.`,
+                en: `You have been proposed as the funder of a subsistence stipend at ${terms.stipendRate} per approved hour, ${budgetEn}. This is a commitment to pay out of your own pocket: it cannot take effect without your explicit approval, no matter who else stays silent. Approve, open a discussion, or propose different terms.`
+              }
+            },
+            channels: ['socket', 'push', 'email'],
+            metadata: { type: 'voteUpdate', url: 'lev', priority: 'high' }
+          },
+          { recipients: [funderId], projectId },
+          { projectId, decisionId: opened.decisionId },
+          context
+        )
+        .catch((e: unknown) => console.warn('[proposeStipendProgram] funder notification failed:', e));
+    }
   }
 
   return {

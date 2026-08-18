@@ -79,6 +79,90 @@ describe('buildStipendDecisionView', () => {
     expect(v?.myTurn).toBe(false);
   });
 
+  it('keeps the funder a signer of a rikma-wide programme even when they are not a member row', () => {
+    // A programme is rikma-wide, but the one member who writes the cheque is
+    // never merely one of the voters: they are always in the signer list.
+    const v = buildStipendDecisionView(
+      decision({ kind: 'stipendProgram' }),
+      ['7', '9'],
+      '9'
+    );
+    expect(v?.signerIds).toContain('2');
+  });
+
+  it('will not let silence approve a stipend the funder has not signed', () => {
+    // The recipient proposed it; nobody has committed to paying.
+    const v = buildStipendDecisionView(
+      decision({
+        vots: [{ what: true, order: 1, users_permissions_user: { data: { id: '7' } } }]
+      }),
+      ['2', '7'],
+      '7'
+    );
+    expect(v?.funderSigned).toBe(false);
+    expect(v?.awaitingFunder).toBe(true);
+    expect(v?.maturesOnSilence).toBe(false);
+  });
+
+  it('lets the clock finish the job once the funder has signed', () => {
+    const v = buildStipendDecisionView(decision(), ['2', '7'], '7');
+    expect(v?.funderSigned).toBe(true);
+    expect(v?.maturesOnSilence).toBe(true);
+  });
+
+  it('reads the missions the pledge pays for, with their market value', () => {
+    const v = buildStipendDecisionView(
+      decision({
+        stipendPledge: {
+          data: {
+            id: '3',
+            attributes: {
+              status: 'proposed',
+              mesimabetahaliches: {
+                data: [
+                  {
+                    id: '88',
+                    attributes: {
+                      name: 'בניית האתר',
+                      descrip: 'עמודי נחיתה',
+                      hoursassinged: 100,
+                      howmanyhoursalready: 12,
+                      perhour: 80,
+                      iskvua: true
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }),
+      ['2', '7'],
+      '7'
+    );
+    expect(v?.missions).toHaveLength(1);
+    expect(v?.missions[0]).toMatchObject({
+      id: '88',
+      name: 'בניית האתר',
+      hours: 100,
+      perhour: 80,
+      value: 8000,
+      recurring: true
+    });
+  });
+
+  it('marks a programme with no total budget as open-ended', () => {
+    const v = buildStipendDecisionView(
+      decision({
+        kind: 'stipendProgram',
+        negostip: [{ ordern: 1, mode: 'equity', costShare: 0, stipendRate: 50, monthlyCap: 2000 }]
+      }),
+      ['2', '7'],
+      '7'
+    );
+    expect(v?.openEnded).toBe(true);
+  });
+
   it('returns null for a decision of another kind', () => {
     expect(buildStipendDecisionView(decision({ kind: 'saleClaim' }), ['2'], '2')).toBeNull();
   });
@@ -112,12 +196,32 @@ describe('dilutionForVoter', () => {
     expect(d?.deltaPoints).toBe(10);
   });
 
-  it('shows nothing rather than a fake number when there is no budget', () => {
+  it('shows nothing rather than a fake number when there is no budget at all', () => {
     const v = buildStipendDecisionView(
       decision({ negostip: [{ ordern: 1, mode: 'equity', costShare: 0, stipendRate: 50 }] }),
       ['2', '7'],
       '7'
     )!;
     expect(dilutionForVoter(v, 20_000, 100_000)).toBeNull();
+  });
+
+  it('projects an open-ended programme over a year and says so', () => {
+    // No closed budget, so there is no "when it is spent" — a year of the
+    // monthly ceiling is the honest stand-in, flagged as one.
+    const v = buildStipendDecisionView(
+      decision({
+        kind: 'stipendProgram',
+        negostip: [
+          { ordern: 1, mode: 'equity', costShare: 0, equityMultiplier: 1, stipendRate: 50, monthlyCap: 5000 }
+        ]
+      }),
+      ['2', '7'],
+      '7'
+    )!;
+    const d = dilutionForVoter(v, 20_000, 100_000);
+    expect(d?.openEnded).toBe(true);
+    expect(d?.horizonMonths).toBe(12);
+    expect(d?.budget).toBe(60_000);
+    expect(d?.moves).toBe(true);
   });
 });

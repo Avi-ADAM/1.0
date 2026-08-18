@@ -20,6 +20,28 @@ export interface StipendRoundView extends StipendTerms {
   zman: string | null;
 }
 
+/**
+ * The work a stipend pays for, as the card must state it: a voter is being
+ * asked to dilute themselves (or to pay), and neither question can be answered
+ * without knowing which mission this is and what it is worth.
+ */
+export interface StipendMissionView {
+  id: string;
+  name: string;
+  descrip: string | null;
+  /** Hours committed on the mission. */
+  hours: number | null;
+  /** Hours already logged against it. */
+  hoursDone: number | null;
+  /** The mission's market rate — the M in M×H. */
+  perhour: number | null;
+  /** M×H, the market value of the work. Null when either factor is missing. */
+  value: number | null;
+  /** A standing monthly commitment rather than a one-off. */
+  recurring: boolean;
+  assigneeName: string | null;
+}
+
 export interface StipendDecisionView {
   decisionId: string;
   kind: StipendDecisionKind;
@@ -43,9 +65,32 @@ export interface StipendDecisionView {
   /** Who has to sign — the two parties, or the whole rikma. */
   signerIds: string[];
   signerCount: number;
+  /** The viewer this view was built for — the card reads it back for lookups. */
+  myId: string;
   /** Am I the one who would be paying? Drives the card's wording. */
   iAmFunder: boolean;
   iAmRecipient: boolean;
+  /** The missions this stipend pays for — empty when it covers all of them. */
+  missions: StipendMissionView[];
+  /** A program nobody has agreed to fund yet (`seekingFunder`). */
+  seekingFunder: boolean;
+  /**
+   * No closed budget: the stipend runs month after month until somebody stops
+   * it. Honest but unbounded, so the card says it in words rather than leaving
+   * a blank where the budget should be.
+   */
+  openEnded: boolean;
+  /**
+   * Has the member who would actually pay signed the version on the table?
+   * Paying is not something silence can agree to (PLAN_STIPEND §5), so this
+   * decides whether the restime clock may mature the proposal at all — the
+   * same rule the server enforces in `applyStandingStipend`.
+   */
+  funderSigned: boolean;
+  /** There is a named funder and they have not signed the standing round. */
+  awaitingFunder: boolean;
+  /** May silence approve this? False while the funder has not signed. */
+  maturesOnSilence: boolean;
 }
 
 function num(v: unknown): number | null {
@@ -80,6 +125,29 @@ function roundOf(raw: any): StipendRoundView {
   };
 }
 
+/** The missions on the proposed pledge, in the shape the card reads. */
+function missionsOf(raw: any): StipendMissionView[] {
+  const rows = raw?.mesimabetahaliches?.data ?? [];
+  return rows
+    .filter((m: any) => m?.id)
+    .map((m: any): StipendMissionView => {
+      const at = m.attributes ?? {};
+      const hours = num(at.hoursassinged);
+      const perhour = num(at.perhour);
+      return {
+        id: String(m.id),
+        name: at.name ?? '',
+        descrip: at.descrip ?? null,
+        hours,
+        hoursDone: num(at.howmanyhoursalready),
+        perhour,
+        value: hours != null && perhour != null ? hours * perhour : null,
+        recurring: at.iskvua === true,
+        assigneeName: at.users_permissions_user?.data?.attributes?.username ?? null
+      };
+    });
+}
+
 /**
  * Build the view, or return null when the Decision is not a stipend one or is
  * too malformed to act on. Never throws — it runs inside the lev extractor,
@@ -109,11 +177,16 @@ export function buildStipendDecisionView(
   const recipientId = recipient?.id ? String(recipient.id) : null;
 
   // Bilateral for a pledge, rikma-wide for a program — the same rule the
-  // server derives, kept here so the card's counts match the server's.
-  const signerIds =
+  // server derives, kept here so the card's counts match the server's. The
+  // funder is always in the list even when they are not otherwise a signer:
+  // nobody is committed to paying without signing for it.
+  const baseSigners =
     kind === 'stipendPledge'
       ? ([funderId, recipientId].filter(Boolean) as string[])
       : memberIds.map(String);
+  const signerIds = Array.from(
+    new Set(funderId ? [...baseSigners, funderId] : baseSigners)
+  );
 
   // Signatures are per round: standing behind round 1 says nothing about
   // round 2, which is what makes a counter a real question.
@@ -126,6 +199,11 @@ export function buildStipendDecisionView(
       )
     ) as string[]
   ).filter(Boolean);
+
+  // Paying is a commitment, not an omission: while the funder has not signed
+  // the standing round, silence must not approve it (PLAN_STIPEND §5).
+  const funderSigned = funderId != null && signedIds.includes(funderId);
+  const awaitingFunder = funderId != null && !funderSigned;
 
   return {
     decisionId: String(decision.id),
@@ -149,23 +227,48 @@ export function buildStipendDecisionView(
     myTurn: signerIds.includes(String(myId)) && !signedIds.includes(String(myId)),
     signerIds,
     signerCount: signerIds.length,
+    myId: String(myId),
     iAmFunder: funderId != null && funderId === String(myId),
-    iAmRecipient: recipientId != null && recipientId === String(myId)
+    iAmRecipient: recipientId != null && recipientId === String(myId),
+    missions: missionsOf(a.stipendPledge?.data?.attributes),
+    seekingFunder:
+      funderId == null && a.stipendProgram?.data?.attributes?.seekingFunder === true,
+    openEnded: standing.totalCap == null || Number(standing.totalCap) <= 0,
+    funderSigned,
+    awaitingFunder,
+    maturesOnSilence: !awaitingFunder
   };
 }
 
+/** Months an open-ended stipend is projected over, for want of a closed budget. */
+export const OPEN_ENDED_HORIZON_MONTHS = 12;
+
 /**
  * What the standing version does to *my* share if the whole budget is spent.
- * Returns null where there is nothing to show — no budget, or terms that move
- * nobody (which is the honest answer, not a missing feature).
+ * Returns null where there is nothing to show — no budget at all, or terms that
+ * move nobody (which is the honest answer, not a missing feature).
+ *
+ * An **open-ended** stipend has no closed budget to spend, so there is no final
+ * number to show; the honest substitute is one year of its monthly ceiling,
+ * flagged as such (`openEnded`) so the card can say "per year, and it keeps
+ * going" rather than pretending the dilution stops there.
  */
 export function dilutionForVoter(
   view: StipendDecisionView,
   myTotal: number,
   rikmaTotal: number
 ) {
-  const budget = Number(view.standing.totalCap ?? 0);
+  const totalCap = Number(view.standing.totalCap ?? 0);
+  const monthlyCap = Number(view.standing.monthlyCap ?? 0);
+  const openEnded = !(totalCap > 0);
+  const budget = openEnded ? monthlyCap * OPEN_ENDED_HORIZON_MONTHS : totalCap;
   if (!(budget > 0) || !(rikmaTotal > 0)) return null;
   const result = computeStipendDilution({ myTotal, rikmaTotal, budget, terms: view.standing });
-  return result.deltaPoints === 0 ? { ...result, moves: false } : { ...result, moves: true };
+  return {
+    ...result,
+    moves: result.deltaPoints !== 0,
+    openEnded,
+    horizonMonths: openEnded ? OPEN_ENDED_HORIZON_MONTHS : null,
+    budget
+  };
 }

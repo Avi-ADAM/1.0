@@ -71,12 +71,37 @@ export function standingOrder(decision: StipendDecision): number {
   return decision.rounds.reduce((max, r) => Math.max(max, r.ordern), 1);
 }
 
-/** Who must sign this kind of proposal — derived, never stored. */
+/**
+ * Who must sign this kind of proposal — derived, never stored.
+ *
+ * The funder is always in the list, whatever the kind: a stipend program is
+ * rikma-wide, but the one member who ends up writing the cheque is not just
+ * another voter in it.
+ */
 export function signerIds(decision: StipendDecision): string[] {
-  if (decision.kind === 'stipendPledge') {
-    return [decision.funderId, decision.recipientId].filter(Boolean).map(String) as string[];
-  }
-  return decision.memberIds;
+  const base =
+    decision.kind === 'stipendPledge'
+      ? ([decision.funderId, decision.recipientId].filter(Boolean).map(String) as string[])
+      : decision.memberIds;
+  return Array.from(
+    new Set(decision.funderId ? [...base, String(decision.funderId)] : base)
+  );
+}
+
+/**
+ * Has the member who would actually pay signed the version on the table?
+ *
+ * Silence-as-consent is the rikma's rule for *proposals about the rikma*: not
+ * answering a question about the logo, or about someone else's mission, is
+ * fairly read as "fine by me". A stipend asks one named person to pay money
+ * out of their own pocket every month, and there is no honest reading of their
+ * silence as a commitment to do that. So this is the one place where the clock
+ * cannot finish the job (PLAN_STIPEND §5) — everyone else may stay silent, the
+ * funder has to sign.
+ */
+export function funderHasSigned(decision: StipendDecision): boolean {
+  if (!decision.funderId) return true; // nobody named yet — nothing to withhold
+  return signedIdsOn(decision, standingOrder(decision)).includes(String(decision.funderId));
 }
 
 export function signedIdsOn(decision: StipendDecision, order: number): string[] {
@@ -210,6 +235,15 @@ export async function applyStandingStipend(
   decision: StipendDecision,
   opts: { missionIds?: string[]; matbeaId?: string | null; fundedBy?: string | null } = {}
 ): Promise<AppliedStipend> {
+  // The one gate both callers share, so neither can skip it: no stipend takes
+  // effect until the funder has signed the version on the table. The explicit
+  // vote reaches this line only when every signer signed (the funder among
+  // them); the restime clock has to check, and stop.
+  if (!funderHasSigned(decision)) {
+    throw new Error(
+      'This stipend cannot be approved until the funder signs it — paying is not something silence agrees to'
+    );
+  }
   const round = standingRound(decision);
   const terms: StipendTerms = normalizeTerms(round);
   const nowISO = new Date().toISOString();

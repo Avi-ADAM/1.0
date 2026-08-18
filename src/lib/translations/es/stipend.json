@@ -43,7 +43,11 @@
     "revenueTriggerSet": "Termina sola con un ingreso mensual de {{count}}",
     "more": "Más condiciones",
     "scopeBilateral": "Acuerdo entre dos: nadie fuera de las dos partes se ve afectado",
-    "scopeRikma": "Requiere a toda la rikma: estas condiciones aumentan el valor total y por tanto diluyen a todos"
+    "scopeRikma": "Requiere a toda la rikma: estas condiciones aumentan el valor total y por tanto diluyen a todos",
+    "budgetShape": "Forma del presupuesto",
+    "budgetShape_total": "Un total cerrado",
+    "budgetShape_monthly": "Mensual, hasta detenerlo",
+    "openEndedExplain": "Sin fecha de fin ni total: el programa se renueva cada mes hasta que alguien lo detenga. La rikma aprueba el techo mensual."
   },
   "error": {
     "rateRequired": "Una beca necesita una tarifa por hora",
@@ -55,7 +59,8 @@
     "outsideEnvelopeRate": "La tarifa supera lo que permite el programa",
     "outsideEnvelopeCostShare": "El programa no permite cargar tanto coste sobre la rikma",
     "outsideEnvelopeMultiplier": "La prima de riesgo supera lo que permite el programa",
-    "programExhausted": "El presupuesto del programa ya está agotado"
+    "programExhausted": "El presupuesto del programa ya está agotado",
+    "budgetRequired": "Un programa necesita un total o un techo mensual — se vota una cantidad"
   },
   "propose": {
     "titleOffer": "Ofrecer una beca de subsistencia",
@@ -76,7 +81,8 @@
     "needsProgramTitle": "Estas condiciones necesitan el acuerdo de la rikmá",
     "needsProgramExplain": "Diluyen a todos los miembros, y la rikmá aún no ha aceptado la dilución. La forma de tener exactamente estas condiciones es un programa de becas: las mismas condiciones, con un presupuesto cerrado, que cada miembro vota viendo qué le hace a su propio porcentaje. Puedes abrirlo aquí y conservar lo que ya has rellenado.",
     "openProgram": "Abrir un programa de becas",
-    "escalated": "Se han conservado tus condiciones. Solo falta un presupuesto total: ese número cerrado es lo que hace que la dilución sea votable."
+    "escalated": "Se han conservado tus condiciones. Solo falta un presupuesto total: ese número cerrado es lo que hace que la dilución sea votable.",
+    "funderMustSign": "La persona que elegiste debe aprobar explícitamente. El silencio no compromete el dinero de otro."
   },
   "tradeoff": {
     "title": "Qué cedes y qué recibes",
@@ -98,7 +104,29 @@
     "dilutionTitle": "Qué hace esto con tu parte",
     "dilutionNow": "Tu parte hoy: {{count}}%",
     "dilutionAfter": "Si se gasta el presupuesto: {{count}}% (−{{points}} puntos)",
-    "dilutionNone": "Tu parte no se mueve — estas condiciones no diluyen a nadie salvo a las dos partes"
+    "dilutionNone": "Tu parte no se mueve — estas condiciones no diluyen a nadie salvo a las dos partes",
+    "funder": "Quién paga",
+    "recipient": "Quién recibe",
+    "noFunderYet": "Aún sin financiador",
+    "anyMember": "Cualquier miembro con derecho",
+    "youPayTitle": "Tú eres quien financia esta propuesta",
+    "youPayBody": "Si apruebas, pagas {{count}} por cada hora aprobada — de tu propio bolsillo.",
+    "youPayMonthly": "Techo mensual: hasta {{count}} al mes.",
+    "youPayTotal": "Total de todo el programa: hasta {{count}}.",
+    "youPayOpenEnded": "No hay presupuesto final — se renueva cada mes hasta que alguien lo detenga.",
+    "youReceiveTitle": "Esta beca es para ti",
+    "youReceiveBody": "{{name}} te financiaría con {{count}} por hora aprobada.",
+    "missionsTitle": "De qué trabajo hablamos",
+    "missionValue": "{{hours}} horas × {{rate}} = {{value}} de valor de mercado",
+    "missionRecurring": "compromiso mensual permanente",
+    "missionHoursDone": "{{count}} horas ya realizadas",
+    "coversAllRikma": "Cubre todas las horas aprobadas de la rikma, no una misión",
+    "coversAllMine": "Cubre todas las horas aprobadas de quien recibe en esta rikma",
+    "openEnded": "Sin presupuesto final — se renueva cada mes hasta detenerlo",
+    "dilutionPerYear": "Calculado sobre los próximos {{count}} meses; la dilución sigue mientras el programa esté activo",
+    "needsFunderSignature": "Esto no se aprobará solo: pagar exige la firma explícita de {{name}}, por mucho que los demás callen",
+    "confirmFunderTitle": "Un momento antes de aprobar",
+    "confirmFunderBody": "Aprobar aquí te compromete a pagar a {{name}} {{count}} por cada hora aprobada, hasta que se detenga o se agote el presupuesto."
   },
   "counter": {
     "title": "Proponer otras condiciones",
@@ -147,7 +175,9 @@
     "approve": "Aprobar",
     "approving": "Aprobando…",
     "negotiate": "Proponer distinto",
-    "chat": "Conversar"
+    "chat": "Conversar",
+    "approveAsFunder": "Aprobar y comprometerme a pagar",
+    "confirmPay": "Sí, me comprometo"
   },
   "toast": {
     "pledgeProposed": "Enviado a la otra parte",

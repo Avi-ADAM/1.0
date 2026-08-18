@@ -98,6 +98,13 @@
     kind === 'saleClaim' ? (saleClaim?.standingOrder ?? 1) : activeOrder
   );
 
+  // A missing translation resolves to the key itself (`headers.stipendProgram`),
+  // not to '' — so `$t(…) || kind` would print the key at the top of the card.
+  let cardTypeLabel = $derived.by(() => {
+    const label = $t(`headers.${kind}`);
+    return label && label !== `headers.${kind}` ? label : kind;
+  });
+
   // Prefer the standing round; fall back to the sale's own values (current) so
   // the numbers still render even if only `current` arrived.
   let saleClaimQty = $derived(Number(saleClaim?.standing?.hm ?? saleClaim?.current?.unit ?? 0));
@@ -297,7 +304,7 @@
   <CardHeader
     logoSrc={src}
     {projectName}
-    cardType={$t(`headers.${kind}`) || kind}
+    cardType={cardTypeLabel}
     cardTitle={kind === 'sheirutpends' &&
     spdata?.sheirut?.data?.attributes?.name
       ? spdata.sheirut.data.attributes.name
