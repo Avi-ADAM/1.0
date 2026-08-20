@@ -22,6 +22,111 @@ function num(v: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+/**
+ * One mission a stipend can be about.
+ *
+ * The mission is not decoration on a stipend — it is its **meter**. Each cycle
+ * pays `hours approved on this mission that month × the stipend rate`, so a
+ * stipend with no mission has no way to compute what is owed. Every stipend
+ * therefore names one (PLAN_STIPEND §6).
+ *
+ * The *performer* is a different question and a softer one: an open mission
+ * has nobody on it yet. Then the stipend rides on the mission itself and the
+ * person who takes it signs the pledge (see ./fromMission.ts) — which is why
+ * `userId` is nullable while the mission never is.
+ */
+export interface StipendMissionRow {
+  /** `inProgress` = a mesimabetahalich with someone on it; `open` = nobody yet. */
+  kind: 'inProgress' | 'open';
+  id: string;
+  name: string;
+  descrip: string | null;
+  /** The market rate — the ceiling a stipend rate may never exceed. */
+  perhour: number | null;
+  hours: number | null;
+  hoursDone: number | null;
+  recurring: boolean;
+  /** Who is doing it, when anyone is — the recipient of a stipend for it. */
+  userId: string | null;
+  username: string | null;
+  /** An open mission that already advertises a stipend need. */
+  stipendRate: number | null;
+}
+
+/**
+ * Every mission in the rikma a stipend could be attached to: the ones in
+ * progress (someone is on them) and the ones still open (nobody is). Finished,
+ * for-approval and archived rows are left out — a stipend pays for work that is
+ * still ahead. `isStipend`-style filtering is not needed here: a stipend engine
+ * is a *resource*, not a mission.
+ */
+export async function fetchProjectStipendMissions(
+  exec: Exec,
+  projectId: string
+): Promise<StipendMissionRow[]> {
+  const data = await run(
+    exec,
+    `{
+      mesimabetahaliches(filters: {
+        project: { id: { eq: ${gqlStr(projectId)} } },
+        finnished: { ne: true },
+        forappruval: { ne: true },
+        or: [{ lifecycle: { null: true } }, { lifecycle: { ne: "archived" } }]
+      }, pagination: { limit: 200 }, sort: "createdAt:desc") {
+        data { id attributes {
+          name descrip perhour hoursassinged howmanyhoursalready iskvua
+          users_permissions_user { data { id attributes { username } } }
+        } }
+      }
+      openMissions(filters: {
+        project: { id: { eq: ${gqlStr(projectId)} } },
+        archived: { eq: false },
+        or: [{ lifecycle: { null: true } }, { lifecycle: { ne: "archived" } }]
+      }, pagination: { limit: 200 }, sort: "createdAt:desc") {
+        data { id attributes { name descrip perhour noofhours iskvua stipendRate } }
+      }
+    }`,
+    'projectStipendMissions'
+  );
+
+  const inProgress = (data?.mesimabetahaliches?.data ?? []).map((row: any): StipendMissionRow => {
+    const a = row.attributes ?? {};
+    const user = a.users_permissions_user?.data;
+    return {
+      kind: 'inProgress',
+      id: String(row.id),
+      name: String(a.name ?? ''),
+      descrip: a.descrip ?? null,
+      perhour: num(a.perhour),
+      hours: num(a.hoursassinged),
+      hoursDone: num(a.howmanyhoursalready),
+      recurring: a.iskvua === true,
+      userId: user?.id ? String(user.id) : null,
+      username: user?.attributes?.username ?? null,
+      stipendRate: null
+    };
+  });
+
+  const open = (data?.openMissions?.data ?? []).map((row: any): StipendMissionRow => {
+    const a = row.attributes ?? {};
+    return {
+      kind: 'open',
+      id: String(row.id),
+      name: String(a.name ?? ''),
+      descrip: a.descrip ?? null,
+      perhour: num(a.perhour),
+      hours: num(a.noofhours),
+      hoursDone: null,
+      recurring: a.iskvua === true,
+      userId: null,
+      username: null,
+      stipendRate: num(a.stipendRate)
+    };
+  });
+
+  return [...inProgress, ...open];
+}
+
 export interface StipendProjectContext {
   projectId: string;
   projectName: string;
@@ -147,7 +252,14 @@ export interface StipendPledgeRow {
   paidTotal: number;
   lastSettledAt: string | null;
   mashabetahalichId: string | null;
+  /** Missions in progress — what a cycle meters approved hours against. */
   missionIds: string[];
+  /**
+   * Open missions the stipend is attached to but nobody has taken yet. They
+   * carry no approved hours, so they never meter a payment — they are what
+   * `carryStipendToMission` looks the pledge up by when the work is taken.
+   */
+  openMissionIds: string[];
   matbeaId: string | null;
   decisionId: string | null;
 }
@@ -162,6 +274,7 @@ const PLEDGE_FIELDS = `
   recipient { data { id attributes { username } } }
   mashabetahalich { data { id } }
   mesimabetahaliches { data { id } }
+  open_missions { data { id attributes { name } } }
   matbea { data { id } }
   decision { data { id } }`;
 
@@ -196,6 +309,7 @@ export function toPledge(row: any): StipendPledgeRow | null {
     lastSettledAt: a.lastSettledAt ?? null,
     mashabetahalichId: a.mashabetahalich?.data?.id ? String(a.mashabetahalich.data.id) : null,
     missionIds: (a.mesimabetahaliches?.data ?? []).map((m: any) => String(m.id)),
+    openMissionIds: (a.open_missions?.data ?? []).map((m: any) => String(m.id)),
     matbeaId: a.matbea?.data?.id ? String(a.matbea.data.id) : null,
     decisionId: a.decision?.data?.id ? String(a.decision.data.id) : null
   };

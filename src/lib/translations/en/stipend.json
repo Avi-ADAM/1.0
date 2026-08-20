@@ -60,7 +60,8 @@
     "outsideEnvelopeCostShare": "The programme does not let the rikma carry this much of the cost",
     "outsideEnvelopeMultiplier": "The risk premium is above what the programme allows",
     "programExhausted": "The programme's budget is already spent",
-    "budgetRequired": "A programme needs a total budget or a monthly ceiling — the vote is on an amount"
+    "budgetRequired": "A programme needs a total budget or a monthly ceiling — the vote is on an amount",
+    "missionRequired": "A subsistence stipend has to be tied to a mission — without one there is nothing to compute the monthly payment from"
   },
   "propose": {
     "titleOffer": "Offer a subsistence stipend",
@@ -82,7 +83,15 @@
     "needsProgramExplain": "They dilute every member, and the rikma has not agreed to dilution. The way to have exactly these terms is a stipend program: the same terms, with a closed budget, that every member votes on while seeing what it does to their own percentage. You can open one here and keep what you have filled in.",
     "openProgram": "Open a stipend program",
     "escalated": "Your terms were kept. All that is missing is a total budget — that closed number is what makes the dilution votable.",
-    "funderMustSign": "The person you named has to approve explicitly. Silence does not commit someone else’s money."
+    "funderMustSign": "The person you named has to approve explicitly. Silence does not commit someone else’s money.",
+    "noRecipientYet": "Not decided yet",
+    "recipientExplain": "A subsistence stipend is always for someone doing particular work. Without naming them, the rikma votes on a budget without knowing what it buys.",
+    "mission": "For which mission",
+    "missionExplain": "The mission is the stipend’s meter: each month pays the hours approved on it × the stipend’s hourly rate. Its own rate is also the ceiling the stipend is checked against.",
+    "missionPick": "Choose a mission",
+    "recipientDerived": "Whoever does the mission is who the stipend pays — so it is not chosen separately.",
+    "openMissionNoTaker": "This mission is still open — nobody is on it",
+    "openMissionExplain": "The stipend attaches to the mission itself, and whoever takes it signs for it. Until then nobody is committed."
   },
   "tradeoff": {
     "title": "What you give up and what you get",
@@ -108,7 +117,6 @@
     "funder": "Who pays",
     "recipient": "Who receives",
     "noFunderYet": "No funder yet",
-    "anyMember": "Any eligible member",
     "youPayTitle": "You are the funder in this proposal",
     "youPayBody": "If you approve, you pay {{count}} for every approved hour — out of your own pocket.",
     "youPayMonthly": "Monthly ceiling: up to {{count}} a month.",
@@ -126,7 +134,9 @@
     "dilutionPerYear": "Calculated over the next {{count}} months; the dilution continues for as long as the programme runs",
     "needsFunderSignature": "This will not approve itself: paying needs {{name}} to sign explicitly, however long everyone else stays silent",
     "confirmFunderTitle": "One moment before you approve",
-    "confirmFunderBody": "Approving here commits you to pay {{name}} {{count}} for every approved hour, until it is stopped or the budget runs out."
+    "confirmFunderBody": "Approving here commits you to pay {{name}} {{count}} for every approved hour, until it is stopped or the budget runs out.",
+    "noRecipientYet": "Not named yet — a general budget",
+    "missionOpen": "The mission is still open — whoever takes it signs the stipend"
   },
   "counter": {
     "title": "Propose different terms",

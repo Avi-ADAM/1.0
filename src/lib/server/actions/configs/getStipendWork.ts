@@ -35,6 +35,7 @@ const handler: ActionExecutionHandler = async (_params, context) => {
           recipient { data { id attributes { username profilePic { data { attributes { url } } } } } }
           mashabetahalich { data { id } }
           mesimabetahaliches { data { id } }
+          open_missions { data { id attributes { name } } }
           matbea { data { id } }
           decision { data { id } }
         } }
@@ -49,6 +50,7 @@ const handler: ActionExecutionHandler = async (_params, context) => {
           recipient { data { id attributes { username } } }
           mashabetahalich { data { id } }
           mesimabetahaliches { data { id } }
+          open_missions { data { id attributes { name } } }
           matbea { data { id } }
           decision { data { id } }
         } }

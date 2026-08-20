@@ -194,7 +194,15 @@ export async function fetchStipendDecision(
   };
 }
 
-function termFields(terms: StipendTerms): Array<string | null> {
+/**
+ * The terms both collections carry — the envelope itself.
+ *
+ * `stipend-program` holds only the policy (PLAN_STIPEND §13): mode, the two
+ * knobs, the rate and the budget. Anything about *how one commitment ends* —
+ * `noticeCycles`, `recourse`, `cycleSize` — lives on the pledge, because that
+ * is what actually runs on a cycle and what actually gets stopped.
+ */
+function envelopeFields(terms: StipendTerms): Array<string | null> {
   return [
     enumField('mode', terms.mode, MODES),
     numField('costShare', terms.costShare),
@@ -202,12 +210,26 @@ function termFields(terms: StipendTerms): Array<string | null> {
     numField('stipendRate', terms.stipendRate),
     numField('monthlyCap', terms.monthlyCap),
     numField('totalCap', terms.totalCap),
-    numField('noticeCycles', terms.noticeCycles),
     numField('revenueTrigger', terms.revenueTrigger),
-    enumField('recourse', terms.recourse, RECOURSES),
     enumField('scope', terms.scope, SCOPES),
     dateField('start', terms.start),
-    dateField('end', terms.end),
+    dateField('end', terms.end)
+  ];
+}
+
+/**
+ * The pledge's own fields: the envelope plus the ending.
+ *
+ * Sending these to `createStipendProgram` is not a no-op — Strapi rejects the
+ * whole mutation with "Field \"noticeCycles\" is not defined by type
+ * \"StipendProgramInput\"", so a programme that every member had already
+ * approved died at maturation and could never become active.
+ */
+function termFields(terms: StipendTerms): Array<string | null> {
+  return [
+    ...envelopeFields(terms),
+    numField('noticeCycles', terms.noticeCycles),
+    enumField('recourse', terms.recourse, RECOURSES),
     numField('cycleSize', terms.cycleSize)
   ];
 }
@@ -250,8 +272,27 @@ export async function applyStandingStipend(
 
   if (decision.kind === 'stipendProgram') {
     const programId = await upsertProgram(exec, decision, terms, nowISO, opts.matbeaId ?? null);
+
+    // A program proposed *for* a named person — or for one named open mission —
+    // carries the concrete pledge on the same decision, and the rikma just voted
+    // on both: the dilution and what it buys. Activating the envelope without
+    // the commitment inside it would leave an approved budget and no stipend.
+    let pledgeId: string | null = null;
+    let mashabetahalichId: string | null = null;
+    if (decision.pledgeId || (decision.recipientId && decision.funderId)) {
+      const applied = await upsertPledge(
+        exec,
+        { ...decision, programId },
+        terms,
+        nowISO,
+        opts
+      );
+      pledgeId = applied.pledgeId;
+      mashabetahalichId = applied.mashabetahalichId;
+    }
+
     await closeStipendDecision(exec, decision.id, decision.timegramaId);
-    return { kind: decision.kind, programId, pledgeId: null, mashabetahalichId: null, terms };
+    return { kind: decision.kind, programId, pledgeId, mashabetahalichId, terms };
   }
 
   const { pledgeId, mashabetahalichId } = await upsertPledge(exec, decision, terms, nowISO, opts);
@@ -267,7 +308,7 @@ async function upsertProgram(
   matbeaId: string | null
 ): Promise<string | null> {
   const common = fields(
-    ...termFields(terms),
+    ...envelopeFields(terms),
     strField('name', decision.decisionName),
     strField('descrip', decision.why),
     'status: active',
@@ -315,9 +356,15 @@ async function upsertPledge(
   opts: { missionIds?: string[]; matbeaId?: string | null }
 ): Promise<{ pledgeId: string | null; mashabetahalichId: string | null }> {
   const missionIds = opts.missionIds ?? [];
+  // A stipend on an **open** mission has nobody to pay yet. The rikma has
+  // approved the terms, so the pledge is real — but it stays `proposed` until
+  // someone takes the mission and becomes its recipient (fromMission.ts).
+  // An `active` pledge with no recipient would enter the monthly settlement
+  // against nobody.
+  const hasTaker = !!decision.recipientId;
   const common = fields(
     ...termFields(terms),
-    'status: active',
+    hasTaker ? 'status: active' : 'status: proposed',
     strField('descrip', decision.why),
     decision.funderId ? strField('funder', decision.funderId) : null,
     decision.recipientId ? strField('recipient', decision.recipientId) : null,
@@ -359,6 +406,9 @@ async function upsertPledge(
     }
   }
   if (!pledgeId) return { pledgeId: null, mashabetahalichId: null };
+  // No taker, no cycles to run yet — the engine is created when the mission is
+  // taken, together with the recipient.
+  if (!hasTaker) return { pledgeId, mashabetahalichId: null };
 
   // The engine. Ending the stipend is `proposeObjectArchive` on this row, with
   // `endOfCycle` scheduling `archiveEffectiveFrom` — no bespoke stop flow.

@@ -89,6 +89,8 @@
   // list, its stipend policy or its defaults. Fetch them once on open rather
   // than making every call site thread them through.
   let fetchedMembers = $state([]);
+  /** In-progress missions of the rikma, so the proposal can name the work. */
+  let fetchedMissions = $state([]);
   let fetchedPolicy = $state(undefined);
   let loadingContext = $state(false);
   const memberOptions = $derived(members.length > 0 ? members : fetchedMembers);
@@ -128,15 +130,23 @@
   // below reseeds from the caller's intent every time it opens.
   let terms = $state(seedTerms('offer'));
 
+  /**
+   * Fetched once per dialog session. The guard used to skip the fetch whenever
+   * the caller had passed `members` — which silently starved everything *else*
+   * the overview carries (the mission list above all), because no call site
+   * passes those.
+   */
+  let contextLoaded = $state(false);
+
   $effect(() => {
-    if (!open || members.length > 0 || fetchedMembers.length > 0 || loadingContext || !projectId) {
-      return;
-    }
+    if (!open || contextLoaded || loadingContext || !projectId) return;
     loadingContext = true;
+    contextLoaded = true;
     executeAction('getStipendOverview', { projectId })
       .then((res) => {
         if (res?.success) {
           fetchedMembers = res.data?.members ?? [];
+          fetchedMissions = res.data?.missions ?? [];
           fetchedPolicy = res.data?.policyIsDefault ? null : (res.data?.policy ?? null);
           if (!terms.stipendRate && res.data?.defaultRate) {
             terms.stipendRate = Number(res.data.defaultRate);
@@ -149,6 +159,18 @@
 
   let chosenFunder = $state('');
   let chosenRecipient = $state('');
+  /**
+   * Which work the stipend is for. A subsistence stipend is never abstract —
+   * somebody is doing something they cannot afford to keep doing — so the
+   * mission travels with the proposal through every intent, including the
+   * escalation to a rikma-wide program.
+   *
+   * Held as `"<kind>:<id>"`, because a mission in progress and an open mission
+   * are different tables that share an id space — keying either the options or
+   * the choice on the bare id makes `mesimabetahalich 142` and
+   * `open_mission 142` the same row, which they are not.
+   */
+  let chosenMission = $state('');
   let why = $state('');
   let busy = $state(false);
 
@@ -159,6 +181,35 @@
     terms = seedTerms(intent);
     chosenFunder = funderId || (intent === 'offer' ? myId : '');
     chosenRecipient = recipientId || (intent === 'request' ? myId : '');
+    // The prop is a mission *in progress* — that is the only kind a card can
+    // open this dialog from.
+    chosenMission = missionId ? `inProgress:${missionId}` : '';
+  });
+
+  /**
+   * Every mission a stipend could be attached to. Not filtered by recipient —
+   * it is the other way round: **the mission decides who is paid**. Picking one
+   * that is in progress names its performer; picking one that is still open
+   * names nobody, and whoever takes it signs the pledge then.
+   */
+  const missionOptions = $derived(fetchedMissions);
+  const missionKey = (m) => `${m.kind}:${m.id}`;
+  const chosenMissionRow = $derived(
+    fetchedMissions.find((m) => missionKey(m) === chosenMission) ?? null
+  );
+  /** True while the chosen mission has nobody on it yet. */
+  const missionIsOpen = $derived(chosenMissionRow?.kind === 'open');
+  /** The mission's own ₪/hour is the ceiling; the caller's prop wins if given. */
+  const effectiveMarketRate = $derived(marketRate ?? chosenMissionRow?.perhour ?? null);
+
+  /**
+   * The recipient is derived from the work, never picked on its own: a stipend
+   * pays the person doing the mission. This runs after the mission changes and
+   * is the only writer of `chosenRecipient` once a mission is chosen.
+   */
+  $effect(() => {
+    if (!chosenMissionRow) return;
+    chosenRecipient = chosenMissionRow.userId ? String(chosenMissionRow.userId) : '';
   });
 
   const scope = $derived(consensusScope(terms));
@@ -176,18 +227,46 @@
       effectiveStipendPolicy(activePolicy) === 'bilateral'
   );
 
+  // M×H of the work being funded — the caller's number when it opened from a
+  // mission card, otherwise the mission the member just picked here.
+  const effectiveMissionValue = $derived(
+    missionValue ??
+      (chosenMissionRow?.hours != null && chosenMissionRow?.perhour != null
+        ? Number(chosenMissionRow.hours) * Number(chosenMissionRow.perhour)
+        : null)
+  );
+
   // What the recipient actually trades away, in the two numbers §8 demands are
   // on screen *before* anyone signs: the share and the cash.
   const tradeoff = $derived(
-    missionValue != null && missionValue > 0 && Number(terms.stipendRate) > 0 && marketRate
+    effectiveMissionValue != null &&
+    effectiveMissionValue > 0 &&
+    Number(terms.stipendRate) > 0 &&
+    effectiveMarketRate
       ? computeRecipientTradeoff({
-          missionValue,
-          stipendTotal: (Number(terms.stipendRate) / Number(marketRate)) * missionValue,
-          rikmaTotalWithout: Math.max(0, (rikmaTotal ?? missionValue) - missionValue),
+          missionValue: effectiveMissionValue,
+          stipendTotal:
+            (Number(terms.stipendRate) / Number(effectiveMarketRate)) * effectiveMissionValue,
+          rikmaTotalWithout: Math.max(
+            0,
+            (rikmaTotal ?? effectiveMissionValue) - effectiveMissionValue
+          ),
           terms
         })
       : null
   );
+
+
+  /**
+   * The sentence the action actually threw. The action framework replaces
+   * `message` with a generic "An unexpected error occurred" and keeps the real
+   * one in `details` — and for a stipend the real one is the whole point ("the
+   * rate is above the mission's market rate", "name the mission it pays for").
+   * @param {any} res
+   */
+  function actionError(res) {
+    return String(res?.error?.details ?? res?.error?.message ?? res?.error ?? 'failed');
+  }
 
   /** Keep every number the member already typed; only the ask changes. */
   function escalateToProgram() {
@@ -227,10 +306,19 @@
           equityMultiplier: Number(terms.equityMultiplier),
           revenueTrigger: terms.revenueTrigger != null ? Number(terms.revenueTrigger) : undefined,
           funderId: chosenFunder || undefined,
-          marketRate: marketRate ?? undefined,
+          // A program is normally *for* someone, for a named piece of work —
+          // the rikma is voting on being diluted, and it deserves to know for
+          // what. These write the concrete pledge under the programme.
+          recipientId: chosenRecipient || undefined,
+          // One of the two, never both: an open mission has no
+          // `mesimabetahalich` to scope hours by yet — it carries the need
+          // itself until somebody takes it.
+          missionIds: chosenMissionRow && !missionIsOpen ? [String(chosenMissionRow.id)] : undefined,
+          openMissionId: chosenMissionRow && missionIsOpen ? String(chosenMissionRow.id) : undefined,
+          marketRate: effectiveMarketRate ?? undefined,
           why: why || undefined
         });
-        if (res?.success === false) throw new Error(String(res?.error?.message ?? res?.error ?? 'failed'));
+        if (res?.success === false) throw new Error(actionError(res));
         toast.success(
           res?.data?.immediate ? $t('stipend.toast.programLive') : $t('stipend.toast.programProposed')
         );
@@ -248,14 +336,14 @@
           noticeCycles: terms.noticeCycles != null ? Number(terms.noticeCycles) : undefined,
           revenueTrigger: terms.revenueTrigger != null ? Number(terms.revenueTrigger) : undefined,
           recourse: terms.recourse,
-          scope: missionId ? 'singleMission' : 'allMissions',
-          missionIds: missionId ? [String(missionId)] : undefined,
+          scope: 'singleMission',
+          missionIds: chosenMissionRow ? [String(chosenMissionRow.id)] : undefined,
           programId: programId ?? undefined,
-          marketRate: marketRate ?? undefined,
+          marketRate: effectiveMarketRate ?? undefined,
           initiatedBy: activeIntent === 'request' ? 'recipient' : chosenFunder === myId ? 'funder' : 'member',
           why: why || undefined
         });
-        if (res?.success === false) throw new Error(String(res?.error?.message ?? res?.error ?? 'failed'));
+        if (res?.success === false) throw new Error(actionError(res));
         toast.success($t('stipend.toast.pledgeProposed'));
       }
       close();
@@ -270,6 +358,9 @@
 
   const canSend = $derived(
     Number(terms.stipendRate) > 0 &&
+      // The mission is the meter: no mission, no monthly amount, nothing to
+      // propose. Same rule the server enforces.
+      !!chosenMission &&
       (isProgram
         ? // Either ceiling will do — a closed total, or a monthly amount that
           // renews until someone stops it. What a program may not have is
@@ -312,57 +403,86 @@
       {/if}
 
       <div class="mt-4 flex flex-col gap-4">
-        {#if !isProgram}
-          <label class="flex flex-col gap-1">
-            <span class={LABEL}>{$t('stipend.propose.funder')}</span>
-            <select
-              bind:value={chosenFunder}
-              class={INPUT}
-            >
-              <option value="">{$t('stipend.propose.pick')}</option>
-              {#each memberOptions as m (m.id)}
-                <option value={m.id}>{m.username}</option>
-              {/each}
-            </select>
-          </label>
+        <!-- The mission comes first, because it decides the rest: it is the
+             meter the monthly payment is computed on (hours approved on it
+             that month × the stipend rate), its ₪/hour is the ceiling the rate
+             is checked against, and whoever is doing it is who gets paid. -->
+        <label class="flex flex-col gap-1">
+          <span class={LABEL}>{$t('stipend.propose.mission')} *</span>
+          <select bind:value={chosenMission} class={INPUT}>
+            <option value="">{$t('stipend.propose.missionPick')}</option>
+            {#each missionOptions as m (missionKey(m))}
+              <option value={missionKey(m)}>
+                {m.kind === 'open' ? `🔓 ${m.name}` : m.name}{m.username
+                  ? ` · ${m.username}`
+                  : ''}{m.perhour ? ` · ₪${m.perhour}/${$t('stipend.card.hour')}` : ''}
+              </option>
+            {/each}
+          </select>
+          {#if chosenMissionRow}
+            <span class={MUTED}>
+              {chosenMissionRow.hours != null && chosenMissionRow.perhour != null
+                ? $t('stipend.card.missionValue', {
+                    hours: chosenMissionRow.hours,
+                    rate: chosenMissionRow.perhour,
+                    value: Math.round(
+                      Number(chosenMissionRow.hours) * Number(chosenMissionRow.perhour)
+                    )
+                  })
+                : $t('stipend.propose.missionExplain')}
+            </span>
+          {:else}
+            <span class={MUTED}>{$t('stipend.propose.missionExplain')}</span>
+          {/if}
+        </label>
 
-          <label class="flex flex-col gap-1">
+        <!-- Derived, not chosen: the person doing the mission is the person the
+             stipend pays. An open mission has nobody yet, and that is a legal
+             state — the taker signs the pledge when they take it. -->
+        {#if chosenMissionRow}
+          <div class="flex flex-col gap-1">
             <span class={LABEL}>{$t('stipend.propose.recipient')}</span>
-            <select
-              bind:value={chosenRecipient}
-              class={INPUT}
-            >
-              <option value="">{$t('stipend.propose.pick')}</option>
-              {#each memberOptions as m (m.id)}
-                <option value={m.id}>{m.username}</option>
-              {/each}
-            </select>
-          </label>
-        {:else}
-          <label class="flex flex-col gap-1">
-            <span class={LABEL}>{$t('stipend.propose.funderOptional')}</span>
-            <select
-              bind:value={chosenFunder}
-              class={INPUT}
-            >
-              <option value="">{$t('stipend.propose.noFunderYet')}</option>
-              {#each memberOptions as m (m.id)}
-                <option value={m.id}>{m.username}</option>
-              {/each}
-            </select>
-            <span class={MUTED}>{$t('stipend.propose.noFunderYetExplain')}</span>
-          </label>
+            {#if missionIsOpen}
+              <p class="text-sm font-semibold text-goldink">
+                {$t('stipend.propose.openMissionNoTaker')}
+              </p>
+              <span class={MUTED}>{$t('stipend.propose.openMissionExplain')}</span>
+            {:else}
+              <p class="text-sm font-bold text-gray-900 dark:text-white">
+                {chosenMissionRow.username || $t('stipend.propose.noRecipientYet')}
+              </p>
+              <span class={MUTED}>{$t('stipend.propose.recipientDerived')}</span>
+            {/if}
+          </div>
         {/if}
 
-        <!-- Naming someone else as the payer is a request, not a decision:
-             their signature is required and silence will not stand in for it. -->
-        {#if chosenFunder && chosenFunder !== myId}
-          <p class={MUTED}>{$t('stipend.propose.funderMustSign')}</p>
-        {/if}
+        <label class="flex flex-col gap-1">
+          <span class={LABEL}>
+            {isProgram ? $t('stipend.propose.funderOptional') : $t('stipend.propose.funder')}
+          </span>
+          <select bind:value={chosenFunder} class={INPUT}>
+            <option value="">
+              {isProgram ? $t('stipend.propose.noFunderYet') : $t('stipend.propose.pick')}
+            </option>
+            {#each memberOptions as m (m.id)}
+              {#if m.id !== chosenRecipient}
+                <option value={m.id}>{m.username}</option>
+              {/if}
+            {/each}
+          </select>
+          {#if isProgram}
+            <span class={MUTED}>{$t('stipend.propose.noFunderYetExplain')}</span>
+          {/if}
+          <!-- Naming someone else as the payer is a request, not a decision:
+               their signature is required and silence will not stand in for it. -->
+          {#if chosenFunder && chosenFunder !== myId}
+            <span class={MUTED}>{$t('stipend.propose.funderMustSign')}</span>
+          {/if}
+        </label>
 
         <StipendTermsFields
           bind:terms
-          {marketRate}
+          marketRate={effectiveMarketRate}
           policy={activePolicy}
           showBudget={isProgram}
           allowRikmaScope={isProgram}

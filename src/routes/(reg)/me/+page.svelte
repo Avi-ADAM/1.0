@@ -421,7 +421,11 @@
       // Settings page sent us back here to resume the guided tour, whose
       // TourItems only exist on this page.
       await tick();
-      await goto('/me', { replaceState: true, noScroll: true, keepFocus: true });
+      await goto('/me', {
+        replaceState: true,
+        noScroll: true,
+        keepFocus: true
+      });
       guid();
     }
   });
@@ -449,13 +453,10 @@
       window.removeEventListener('online', goOnline);
       window.removeEventListener('offline', goOffline);
     });
-  });  let width = $state(),
+  });
+  let width = $state(),
     height = $state();
   let showSaveDialog = $state(data.showGuide);
-
-
-
-
 </script>
 
 <svelte:head>
@@ -670,6 +671,7 @@
                   onClose={close}
                   onRemove={remove}
                   onOpen={open}
+                  bgi={'green'}
                   onAdd={add}
                   addSl={addSl1}
                   meData={odata}

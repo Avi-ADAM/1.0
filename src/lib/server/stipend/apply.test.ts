@@ -96,15 +96,82 @@ describe('signerIds', () => {
   });
 });
 
+/** Records every mutation and answers the reads the apply path makes. */
+function fakeExec() {
+  const sent: string[] = [];
+  const exec = async (query: string) => {
+    sent.push(query);
+    if (query.includes('createStipendProgram')) {
+      return { data: { createStipendProgram: { data: { id: '9' } } } };
+    }
+    if (query.includes('createStipendPledge')) {
+      return { data: { createStipendPledge: { data: { id: '77' } } } };
+    }
+    if (query.includes('createMashabetahalich')) {
+      return { data: { createMashabetahalich: { data: { id: '500' } } } };
+    }
+    if (query.includes('stipendPledge(id:')) {
+      return { data: { stipendPledge: { data: { attributes: { mashabetahalich: null } } } } };
+    }
+    return { data: {} };
+  };
+  return { exec, sent };
+}
+
+/** The signature that lets a programme mature: proposer + funder on round 1. */
+const signedByBoth = [
+  { userId: '1', order: 1, what: true },
+  { userId: '2', order: 1, what: true }
+];
+
 describe('applyStandingStipend', () => {
   it('refuses to take effect while the funder has not signed', async () => {
-    const sent: string[] = [];
-    const exec = async (q: string) => {
-      sent.push(q);
-      return { data: {} };
-    };
+    const { exec, sent } = fakeExec();
     await expect(applyStandingStipend(exec as any, decision())).rejects.toThrow(/funder/i);
     // Nothing was written: no half-created programme left behind.
     expect(sent).toHaveLength(0);
+  });
+
+  it('activates the pledge under a programme proposed for a named person', async () => {
+    // The rikma voted on being diluted *for someone*. Approving the envelope
+    // without the commitment inside it would leave them with a budget and no
+    // stipend.
+    const { exec, sent } = fakeExec();
+    const applied = await applyStandingStipend(
+      exec as any,
+      decision({ vots: signedByBoth, programId: '9', pledgeId: '77', recipientId: '7' })
+    );
+    expect(applied.programId).toBe('9');
+    expect(applied.pledgeId).toBe('77');
+    expect(sent.some((q) => q.includes('updateStipendProgram'))).toBe(true);
+    expect(sent.some((q) => q.includes('updateStipendPledge'))).toBe(true);
+    // …and the recurring engine that gives the stipend its cycles and its stop.
+    expect(sent.some((q) => q.includes('createMashabetahalich'))).toBe(true);
+  });
+
+  it('keeps a stipend on an open mission proposed — there is nobody to pay yet', async () => {
+    // The rikma approved the terms, but the work has no taker. An `active`
+    // pledge with no recipient would enter the monthly settlement against
+    // nobody, and the engine would start cycling for no one.
+    const { exec, sent } = fakeExec();
+    const applied = await applyStandingStipend(
+      exec as any,
+      decision({ vots: signedByBoth, programId: '9', pledgeId: '77', recipientId: null })
+    );
+    expect(applied.pledgeId).toBe('77');
+    expect(applied.mashabetahalichId).toBeNull();
+    const pledgeWrite = sent.find((q) => q.includes('updateStipendPledge')) ?? '';
+    expect(pledgeWrite).toContain('status: proposed');
+    expect(sent.some((q) => q.includes('createMashabetahalich'))).toBe(false);
+  });
+
+  it('leaves a budget-only programme without a pledge', async () => {
+    const { exec, sent } = fakeExec();
+    const applied = await applyStandingStipend(
+      exec as any,
+      decision({ vots: signedByBoth, recipientId: null, pledgeId: null })
+    );
+    expect(applied.pledgeId).toBeNull();
+    expect(sent.some((q) => q.includes('StipendPledge'))).toBe(false);
   });
 });

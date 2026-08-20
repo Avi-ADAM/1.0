@@ -82,8 +82,10 @@
   const funderLabel = $derived(
     stipend?.funderName || (stipend?.seekingFunder ? $t('stipend.card.noFunderYet') : '—')
   );
+  // A programme *should* name the person it is for; when it does not, say that
+  // plainly rather than implying anyone may claim it.
   const recipientLabel = $derived(
-    stipend?.recipientName || (isProgram ? $t('stipend.card.anyMember') : '—')
+    stipend?.recipientName || (isProgram ? $t('stipend.card.noRecipientYet') : '—')
   );
 
   /** No closed budget: it renews every month until somebody stops it. */
@@ -105,10 +107,14 @@
   let fetchedMyTotal = $state(/** @type {number|null} */ (null));
   let fetchedRikmaTotal = $state(/** @type {number|null} */ (null));
 
+  const viewerId = $derived(String(myId || stipend?.myId || ''));
+
   $effect(() => {
-    if (!projectId || myTotal != null) return;
+    // No viewer id means no "my share" to compute — and `uid: ""` would be a
+    // GraphQL error, not an empty answer.
+    if (!projectId || !viewerId || myTotal != null) return;
     let alive = true;
-    getMemberValueTotal(String(projectId), String(myId || stipend?.myId || ''))
+    getMemberValueTotal(String(projectId), viewerId)
       .then((v) => alive && (fetchedMyTotal = v))
       .catch(() => {});
     return () => (alive = false);
@@ -285,7 +291,12 @@
         </p>
         {#each missions as m (m.id)}
           <div class="border-t first:border-t-0 border-gray-100 dark:border-gray-700 pt-2 first:pt-0">
-            <p class="font-bold text-gray-900 dark:text-white">{m.name}</p>
+            <p class="font-bold text-gray-900 dark:text-white">
+              {m.kind === 'open' ? '🔓 ' : ''}{m.name}
+            </p>
+            {#if m.kind === 'open'}
+              <p class="text-xs font-semibold text-goldink">{$t('stipend.card.missionOpen')}</p>
+            {/if}
             {#if m.descrip}
               <p class="text-xs text-gray-700 dark:text-gray-200 line-clamp-3">{m.descrip}</p>
             {/if}
@@ -312,9 +323,24 @@
         {/each}
       </div>
     {:else}
-      <p class="text-xs text-gray-600 dark:text-gray-300">
-        {isProgram ? $t('stipend.card.coversAllRikma') : $t('stipend.card.coversAllMine')}
-      </p>
+      <!-- No linked mission row: either a legacy "every approved hour" stipend,
+           or a stipend on a mission nobody has taken yet — which has no
+           `mesimabetahalich` to link to, and is named in the proposal instead. -->
+      <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-3 space-y-1 text-sm">
+        <p class="text-xs uppercase font-bold text-gray-600 dark:text-gray-300">
+          {$t('stipend.card.missionsTitle')}
+        </p>
+        {#if stipend?.decisionName}
+          <p class="font-bold text-gray-900 dark:text-white">{stipend.decisionName}</p>
+        {/if}
+        <p class="text-xs text-gray-600 dark:text-gray-300">
+          {standing.scope === 'allMissions'
+            ? isProgram
+              ? $t('stipend.card.coversAllRikma')
+              : $t('stipend.card.coversAllMine')
+            : $t('stipend.card.missionOpen')}
+        </p>
+      </div>
     {/if}
 
     <!-- The terms, in the order a person asks about them. -->

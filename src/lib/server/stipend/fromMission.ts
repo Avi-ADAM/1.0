@@ -30,9 +30,9 @@ import {
   strField,
   type Exec
 } from '$lib/server/archive/gql.js';
-import { normalizeTerms } from '$lib/stipend/computeStipendEquity.js';
+import { consensusScope, normalizeTerms, validateStipendTerms } from '$lib/stipend/computeStipendEquity.js';
 import { openStipendDecision } from './decision.js';
-import { fetchProjectContext } from './read.js';
+import { fetchActivePrograms, fetchProjectContext } from './read.js';
 
 // `advance` stays in the Strapi enum (dropping a deployed enum value is a
 // migration, and rows may already carry it) but is no longer writable from
@@ -64,7 +64,7 @@ export interface OpenPledgeInput {
 
 export interface OpenPledgeResult {
   opened: boolean;
-  reason?: 'noStipend' | 'noFunder' | 'funderIsRecipient' | 'failed';
+  reason?: 'noStipend' | 'noFunder' | 'funderIsRecipient' | 'needsProgram' | 'failed';
   pledgeId?: string;
   decisionId?: string;
 }
@@ -110,6 +110,34 @@ export async function openPledgeFromMission(
 
   try {
     const project = await fetchProjectContext(exec, input.projectId);
+
+    // A mission may advertise a stipend before the rikma has agreed to be
+    // diluted for it (an open mission can be given a need while the programme
+    // that authorises the dilution is still on the table). While the terms
+    // move the rikma's total value, only an **active** programme is that
+    // consent — so until one exists the need stays visible and nothing opens.
+    if (consensusScope(terms) === 'rikma') {
+      const programs = await fetchActivePrograms(exec, input.projectId).catch(() => []);
+      const covering = programs.find(
+        (p) =>
+          p.status === 'active' &&
+          validateStipendTerms({
+            terms,
+            marketRate: null,
+            policy: project?.policy ?? null,
+            envelope: {
+              mode: p.mode,
+              costShare: p.costShare,
+              equityMultiplier: p.equityMultiplier,
+              stipendRate: p.stipendRate,
+              remainingCap: p.remainingCap,
+              active: true
+            }
+          }).ok
+      );
+      if (!covering) return { opened: false, reason: 'needsProgram' };
+    }
+
     const nowISO = new Date().toISOString();
     const name = input.missionName ?? '';
 
@@ -217,5 +245,136 @@ export async function carryStipendToMission(
     'fromMission:carry'
   ).catch((e) => console.warn('[stipend] copying the need onto the mission failed:', e));
 
+  // A stipend the rikma already voted on is waiting on this mission as a
+  // pledge with no recipient. Claim it rather than opening a second one.
+  const waiting = await findPledgeOnOpenMission(exec, input.openMissionId);
+  if (waiting) return adoptPledgeIntoMission(exec, waiting, input);
+
   return openPledgeFromMission(exec, need, input);
+}
+
+interface WaitingPledge {
+  id: string;
+  funderId: string | null;
+  programId: string | null;
+  terms: ReturnType<typeof normalizeTerms>;
+  name: string;
+}
+
+/** A pledge already attached to this open mission and still without a taker. */
+async function findPledgeOnOpenMission(
+  exec: Exec,
+  openMissionId: string
+): Promise<WaitingPledge | null> {
+  const data = await run(
+    exec,
+    `{ stipendPledges(filters: {
+        open_missions: { id: { eq: ${gqlStr(openMissionId)} } },
+        status: { in: ["proposed","active"] },
+        recipient: { id: { null: true } }
+      }, pagination: { limit: 1 }) {
+      data { id attributes {
+        mode costShare equityMultiplier stipendRate monthlyCap totalCap
+        noticeCycles revenueTrigger recourse scope start end cycleSize descrip
+        funder { data { id } }
+        stipend_program { data { id } }
+      } } } }`,
+    'fromMission:findWaitingPledge'
+  ).catch(() => null);
+
+  const row = data?.stipendPledges?.data?.[0];
+  if (!row?.id) return null;
+  const a = row.attributes ?? {};
+  return {
+    id: String(row.id),
+    funderId: a.funder?.data?.id ? String(a.funder.data.id) : null,
+    programId: a.stipend_program?.data?.id ? String(a.stipend_program.data.id) : null,
+    name: String(a.descrip ?? ''),
+    terms: normalizeTerms({
+      mode: a.mode,
+      costShare: a.costShare != null ? Number(a.costShare) : undefined,
+      equityMultiplier: a.equityMultiplier != null ? Number(a.equityMultiplier) : undefined,
+      stipendRate: a.stipendRate != null ? Number(a.stipendRate) : undefined,
+      monthlyCap: a.monthlyCap != null ? Number(a.monthlyCap) : null,
+      totalCap: a.totalCap != null ? Number(a.totalCap) : null,
+      noticeCycles: a.noticeCycles != null ? Number(a.noticeCycles) : null,
+      revenueTrigger: a.revenueTrigger != null ? Number(a.revenueTrigger) : null,
+      recourse: a.recourse ?? undefined,
+      scope: 'singleMission',
+      start: a.start ?? null,
+      end: a.end ?? null,
+      cycleSize: a.cycleSize != null ? Number(a.cycleSize) : null
+    })
+  };
+}
+
+/**
+ * Hand the waiting pledge its taker.
+ *
+ * This is the step that makes an open-mission stipend payable at all: the
+ * monthly amount is computed from approved hours, and approved hours hang off
+ * the **mesimabetahalich**, never off the open mission. Until the pledge holds
+ * that link the cycle would find no hours and pay nothing, so the conversion
+ * happens here, in the one place every assignment path goes through.
+ *
+ * The terms are not re-opened — the rikma already approved them, and the funder
+ * already signed for them. What is new is *who receives*, and that person signs
+ * for themselves: the bilateral decision gives them the same three answers as
+ * everywhere else (approve · discuss · counter).
+ */
+async function adoptPledgeIntoMission(
+  exec: Exec,
+  pledge: WaitingPledge,
+  input: CarryInput
+): Promise<OpenPledgeResult> {
+  if (pledge.funderId && pledge.funderId === String(input.recipientId)) {
+    return { opened: false, reason: 'funderIsRecipient' };
+  }
+
+  try {
+    await run(
+      exec,
+      `mutation { updateStipendPledge(id: ${gqlStr(pledge.id)}, data: { ${fields(
+        strField('recipient', String(input.recipientId)),
+        `mesimabetahaliches: [${gqlStr(input.mesimabetahalichId)}]`,
+        // Still `proposed`: the taker has not signed yet. Their signature on
+        // the decision below is what turns it on.
+        'status: proposed'
+      )} }) { data { id } } }`,
+      'fromMission:adoptPledge'
+    );
+  } catch (e) {
+    console.warn('[stipend] attaching the waiting pledge to the mission failed:', e);
+    return { opened: false, reason: 'failed' };
+  }
+
+  // Nobody has agreed to pay yet (a programme published while still seeking a
+  // funder). The pledge keeps the mission and waits; any member can still take
+  // the funding side through the ordinary offer button.
+  if (!pledge.funderId) return { opened: false, reason: 'noFunder' };
+
+  try {
+    const project = await fetchProjectContext(exec, input.projectId);
+    const name = input.missionName ?? pledge.name;
+    const opened = await openStipendDecision(exec, {
+      kind: 'stipendPledge',
+      projectId: input.projectId,
+      projectRestime: project?.restime ?? null,
+      decisionName: name ? `מלגת קיום: ${name}` : 'מלגת קיום',
+      terms: pledge.terms,
+      why: null,
+      // The funder committed when the rikma approved the programme, so their
+      // signature is already on round 1 — exactly as when a mission carries its
+      // own need.
+      initiatorId: pledge.funderId,
+      funderId: pledge.funderId,
+      recipientId: String(input.recipientId),
+      programId: pledge.programId,
+      pledgeId: pledge.id
+    });
+    return { opened: true, pledgeId: pledge.id, decisionId: opened.decisionId };
+  } catch (e) {
+    console.warn('[stipend] opening the taker’s decision failed (non-fatal):', e);
+    return { opened: true, pledgeId: pledge.id };
+  }
 }

@@ -136,7 +136,8 @@
     "activeNow": "Activos ahora",
     "open": "Abierto a socios",
     "archive": "Archivo",
-    "api": "API"
+    "api": "API",
+    "stipend": "Becas"
   },
   "create": {
     "mission": "Crear una misión",

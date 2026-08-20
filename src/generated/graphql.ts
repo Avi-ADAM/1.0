@@ -11234,6 +11234,7 @@ export type OpenMission = {
   stipendFunder?: Maybe<UsersPermissionsUserEntityResponse>;
   stipendMode?: Maybe<Enum_Openmission_Stipendmode>;
   stipendRate?: Maybe<Scalars['Float']['output']>;
+  stipend_pledges?: Maybe<StipendPledgeRelationResponseCollection>;
   tafkidims?: Maybe<TafkidimRelationResponseCollection>;
   timegrama?: Maybe<TimegramaEntityResponse>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -11345,6 +11346,14 @@ export type OpenMissionSkillsArgs = {
 };
 
 
+export type OpenMissionStipend_PledgesArgs = {
+  filters?: InputMaybe<StipendPledgeFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
 export type OpenMissionTafkidimsArgs = {
   filters?: InputMaybe<TafkidimFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
@@ -11447,6 +11456,7 @@ export type OpenMissionFiltersInput = {
   stipendFunder?: InputMaybe<UsersPermissionsUserFiltersInput>;
   stipendMode?: InputMaybe<StringFilterInput>;
   stipendRate?: InputMaybe<FloatFilterInput>;
+  stipend_pledges?: InputMaybe<StipendPledgeFiltersInput>;
   tafkidims?: InputMaybe<TafkidimFiltersInput>;
   timegrama?: InputMaybe<TimegramaFiltersInput>;
   updatedAt?: InputMaybe<DateTimeFilterInput>;
@@ -11504,6 +11514,7 @@ export type OpenMissionInput = {
   stipendFunder?: InputMaybe<Scalars['ID']['input']>;
   stipendMode?: InputMaybe<Enum_Openmission_Stipendmode>;
   stipendRate?: InputMaybe<Scalars['Float']['input']>;
+  stipend_pledges?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   tafkidims?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   timegrama?: InputMaybe<Scalars['ID']['input']>;
   users?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
@@ -17739,6 +17750,7 @@ export type StipendPledge = {
   mode?: Maybe<Enum_Stipendpledge_Mode>;
   monthlyCap?: Maybe<Scalars['Float']['output']>;
   noticeCycles?: Maybe<Scalars['Int']['output']>;
+  open_missions?: Maybe<OpenMissionRelationResponseCollection>;
   paidTotal?: Maybe<Scalars['Float']['output']>;
   project?: Maybe<ProjectEntityResponse>;
   proposedBy?: Maybe<UsersPermissionsUserEntityResponse>;
@@ -17759,6 +17771,14 @@ export type StipendPledge = {
 
 export type StipendPledgeMesimabetahalichesArgs = {
   filters?: InputMaybe<MesimabetahalichFiltersInput>;
+  pagination?: InputMaybe<PaginationArg>;
+  publicationState?: InputMaybe<PublicationState>;
+  sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type StipendPledgeOpen_MissionsArgs = {
+  filters?: InputMaybe<OpenMissionFiltersInput>;
   pagination?: InputMaybe<PaginationArg>;
   publicationState?: InputMaybe<PublicationState>;
   sort?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -17809,6 +17829,7 @@ export type StipendPledgeFiltersInput = {
   monthlyCap?: InputMaybe<FloatFilterInput>;
   not?: InputMaybe<StipendPledgeFiltersInput>;
   noticeCycles?: InputMaybe<IntFilterInput>;
+  open_missions?: InputMaybe<OpenMissionFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<StipendPledgeFiltersInput>>>;
   paidTotal?: InputMaybe<FloatFilterInput>;
   project?: InputMaybe<ProjectFiltersInput>;
@@ -17843,6 +17864,7 @@ export type StipendPledgeInput = {
   mode?: InputMaybe<Enum_Stipendpledge_Mode>;
   monthlyCap?: InputMaybe<Scalars['Float']['input']>;
   noticeCycles?: InputMaybe<Scalars['Int']['input']>;
+  open_missions?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   paidTotal?: InputMaybe<Scalars['Float']['input']>;
   project?: InputMaybe<Scalars['ID']['input']>;
   proposedBy?: InputMaybe<Scalars['ID']['input']>;

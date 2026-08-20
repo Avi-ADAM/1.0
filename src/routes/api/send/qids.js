@@ -127,6 +127,15 @@ const STIPEND_DECISION_FIELDS = `
                               }
                             }
                           }
+                          # The same link before anyone has taken the work: a
+                          # stipend can be agreed on an open mission, and then
+                          # the card must still be able to name it.
+                          open_missions(pagination: { limit: 20 }) {
+                            data {
+                              id
+                              attributes { name descrip noofhours perhour iskvua }
+                            }
+                          }
                         }
                       }
                     }`;

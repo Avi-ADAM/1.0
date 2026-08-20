@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-08-16
+> Last updated: 2026-08-19
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -1681,6 +1681,7 @@ These are the main content types in the Strapi backend.
 | `stipendFunder` | `Maybe<UsersPermissionsUserEntityResponse>` |
 | `stipendMode` | `Maybe<Enum_Openmission_Stipendmode>` |
 | `stipendRate` | `Maybe<Scalars['Float']['output']>` |
+| `stipend_pledges` | `Maybe<StipendPledgeRelationResponseCollection>` |
 | `tafkidims` | `Maybe<TafkidimRelationResponseCollection>` |
 | `timegrama` | `Maybe<TimegramaEntityResponse>` |
 | `updatedAt` | `Maybe<Scalars['DateTime']['output']>` |
@@ -2782,6 +2783,7 @@ These are the main content types in the Strapi backend.
 | `mode` | `Maybe<Enum_Stipendpledge_Mode>` |
 | `monthlyCap` | `Maybe<Scalars['Float']['output']>` |
 | `noticeCycles` | `Maybe<Scalars['Int']['output']>` |
+| `open_missions` | `Maybe<OpenMissionRelationResponseCollection>` |
 | `paidTotal` | `Maybe<Scalars['Float']['output']>` |
 | `project` | `Maybe<ProjectEntityResponse>` |
 | `proposedBy` | `Maybe<UsersPermissionsUserEntityResponse>` |
@@ -5753,6 +5755,7 @@ Used for creating/updating content.
 | `stipendFunder` | `InputMaybe<Scalars['ID']['input']>` |
 | `stipendMode` | `InputMaybe<Enum_Openmission_Stipendmode>` |
 | `stipendRate` | `InputMaybe<Scalars['Float']['input']>` |
+| `stipend_pledges` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `tafkidims` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `timegrama` | `InputMaybe<Scalars['ID']['input']>` |
 | `users` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
@@ -6525,6 +6528,7 @@ Used for creating/updating content.
 | `mode` | `InputMaybe<Enum_Stipendpledge_Mode>` |
 | `monthlyCap` | `InputMaybe<Scalars['Float']['input']>` |
 | `noticeCycles` | `InputMaybe<Scalars['Int']['input']>` |
+| `open_missions` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `paidTotal` | `InputMaybe<Scalars['Float']['input']>` |
 | `project` | `InputMaybe<Scalars['ID']['input']>` |
 | `proposedBy` | `InputMaybe<Scalars['ID']['input']>` |
@@ -7183,7 +7187,7 @@ Fields: `and`, `arguments`, `clauses`, `createdAt`, `createdByEmail`, `creator`,
 Fields: `and`, `archiveEffectiveFrom`, `archive_decisions`, `archived`, `askms`, `createdAt`, `cycleSize`, `declinedsps`, `descrip`, `dormancyDays`, `easy`, `extractedKey`, `haamadapruvs`, `haamadas`, `hm`, `howMeny`, `id`, `isMust`, `isYesod`, `kindOf`, `lifecycle`, `linkto`, `locale`, `localizations`, `location`, `maagad`, `maap`, `mashaabim`, `match_suggestions`, `name`, `nego_mashes`, `not`, `or`, `partofs`, `pmash`, `price`, `project`, `publishedAt`, `ratson`, `ratson_proposal`, `recurring`, `rikmashes`, `source`, `splited`, `spnot`, `sps`, `sqadualed`, `sqadualedf`, `stipend_program`, `timegrama`, `updatedAt`, `users`
 
 #### OpenMissionFiltersInput
-Fields: `acts`, `and`, `archiveEffectiveFrom`, `archive_decisions`, `archived`, `asks`, `createdAt`, `dates`, `declined`, `descrip`, `dormancyDays`, `extractedKey`, `hatzaas`, `hearotMeyuchadot`, `howMeny`, `id`, `isMust`, `isRishon`, `isYesod`, `isglobal`, `iskvua`, `isshift`, `lifecycle`, `locale`, `localizations`, `location`, `maagad`, `match_suggestions`, `mesimabetahaliches`, `mission`, `name`, `negopendmissions`, `noofhours`, `not`, `or`, `partofs`, `pendm`, `perhour`, `pledges`, `privatlinks`, `project`, `publicklinks`, `publishedAt`, `ratson`, `ratson_proposals`, `rishon`, `rishonves`, `skills`, `source`, `sqadualed`, `stipendCostShare`, `stipendFunder`, `stipendMode`, `stipendRate`, `tafkidims`, `timegrama`, `updatedAt`, `users`, `usersNotRelevant`, `vallues`, `work_ways`
+Fields: `acts`, `and`, `archiveEffectiveFrom`, `archive_decisions`, `archived`, `asks`, `createdAt`, `dates`, `declined`, `descrip`, `dormancyDays`, `extractedKey`, `hatzaas`, `hearotMeyuchadot`, `howMeny`, `id`, `isMust`, `isRishon`, `isYesod`, `isglobal`, `iskvua`, `isshift`, `lifecycle`, `locale`, `localizations`, `location`, `maagad`, `match_suggestions`, `mesimabetahaliches`, `mission`, `name`, `negopendmissions`, `noofhours`, `not`, `or`, `partofs`, `pendm`, `perhour`, `pledges`, `privatlinks`, `project`, `publicklinks`, `publishedAt`, `ratson`, `ratson_proposals`, `rishon`, `rishonves`, `skills`, `source`, `sqadualed`, `stipendCostShare`, `stipendFunder`, `stipendMode`, `stipendRate`, `stipend_pledges`, `tafkidims`, `timegrama`, `updatedAt`, `users`, `usersNotRelevant`, `vallues`, `work_ways`
 
 #### PartofFiltersInput
 Fields: `acts`, `and`, `askms`, `asks`, `createdAt`, `default`, `finiapruvals`, `forums`, `id`, `maaps`, `mashabetahaliches`, `matanot`, `matanot_recipe_missions`, `matanots`, `mesimabetahaliches`, `not`, `open_mashaabims`, `open_missions`, `or`, `pendms`, `pmashes`, `ratson`, `sheirut_fulfillments`, `updatedAt`
@@ -7282,7 +7286,7 @@ Fields: `and`, `archived`, `askms`, `createdAt`, `declinedm`, `descrip`, `fdate`
 Fields: `amount`, `and`, `confirmedAt`, `confirmedBy`, `costShare`, `createdAt`, `cycleEnd`, `cycleStart`, `equityCredit`, `equityDebit`, `equityMultiplier`, `funder`, `haluka`, `hours`, `id`, `matbea`, `mode`, `not`, `note`, `or`, `project`, `publishedAt`, `recipient`, `repaid`, `status`, `stipendRate`, `stipend_pledge`, `stipend_program`, `timegrama`, `updatedAt`
 
 #### StipendPledgeFiltersInput
-Fields: `and`, `costShare`, `createdAt`, `cycleSize`, `decision`, `descrip`, `end`, `equityMultiplier`, `funder`, `id`, `initiatedBy`, `lastSettledAt`, `mashabetahalich`, `matbea`, `mesimabetahaliches`, `mode`, `monthlyCap`, `not`, `noticeCycles`, `or`, `paidTotal`, `project`, `proposedBy`, `publishedAt`, `recipient`, `recourse`, `revenueTrigger`, `scope`, `start`, `status`, `stipendRate`, `stipend_payments`, `stipend_program`, `totalCap`, `updatedAt`
+Fields: `and`, `costShare`, `createdAt`, `cycleSize`, `decision`, `descrip`, `end`, `equityMultiplier`, `funder`, `id`, `initiatedBy`, `lastSettledAt`, `mashabetahalich`, `matbea`, `mesimabetahaliches`, `mode`, `monthlyCap`, `not`, `noticeCycles`, `open_missions`, `or`, `paidTotal`, `project`, `proposedBy`, `publishedAt`, `recipient`, `recourse`, `revenueTrigger`, `scope`, `start`, `status`, `stipendRate`, `stipend_payments`, `stipend_program`, `totalCap`, `updatedAt`
 
 #### StipendProgramFiltersInput
 Fields: `and`, `costShare`, `createdAt`, `decision`, `descrip`, `end`, `equityMultiplier`, `funder`, `id`, `matbea`, `mode`, `monthlyCap`, `name`, `not`, `open_mashaabims`, `or`, `project`, `proposedBy`, `publishedAt`, `revenueTrigger`, `scope`, `seekingFunder`, `spent`, `start`, `status`, `stipendRate`, `stipend_payments`, `stipend_pledges`, `totalCap`, `updatedAt`
@@ -7941,7 +7945,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 20815 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 20837 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

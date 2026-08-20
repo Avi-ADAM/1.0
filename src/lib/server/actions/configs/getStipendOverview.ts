@@ -16,6 +16,7 @@ import { execFromContext } from '$lib/server/archive/exec.js';
 import {
   fetchActivePrograms,
   fetchProjectContext,
+  fetchProjectStipendMissions,
   fetchProjectPayments,
   fetchProjectPledges
 } from '$lib/server/stipend/read.js';
@@ -27,11 +28,12 @@ const handler: ActionExecutionHandler = async (params, context) => {
 
   const exec = execFromContext(context);
 
-  const [project, programs, pledges, payments] = await Promise.all([
+  const [project, programs, pledges, payments, missions] = await Promise.all([
     fetchProjectContext(exec, projectId),
     fetchActivePrograms(exec, projectId).catch(() => []),
     fetchProjectPledges(exec, projectId, ['proposed', 'active', 'exhausted', 'closed']).catch(() => []),
-    fetchProjectPayments(exec, projectId).catch(() => [])
+    fetchProjectPayments(exec, projectId).catch(() => []),
+    fetchProjectStipendMissions(exec, projectId).catch(() => [])
   ]);
   if (!project) throw new Error(`Project ${projectId} not found`);
 
@@ -66,6 +68,11 @@ const handler: ActionExecutionHandler = async (params, context) => {
       // (which knows a mission, not a rikma) can offer the funder/recipient
       // pickers without a second round trip.
       members: project.members,
+      // Every stipend is about a specific piece of work, so the form that
+      // proposes one has to be able to name it — and the market rate that
+      // comes with the mission is also the ceiling the stipend rate is
+      // measured against.
+      missions,
       policy: effectiveStipendPolicy(project.policy),
       policyIsDefault: project.policy == null,
       defaultRate: project.defaultRate,

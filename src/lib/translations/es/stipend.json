@@ -60,7 +60,8 @@
     "outsideEnvelopeCostShare": "El programa no permite cargar tanto coste sobre la rikma",
     "outsideEnvelopeMultiplier": "La prima de riesgo supera lo que permite el programa",
     "programExhausted": "El presupuesto del programa ya está agotado",
-    "budgetRequired": "Un programa necesita un total o un techo mensual — se vota una cantidad"
+    "budgetRequired": "Un programa necesita un total o un techo mensual — se vota una cantidad",
+    "missionRequired": "Una beca de subsistencia debe ir ligada a una misión — sin ella no hay de dónde calcular el pago mensual"
   },
   "propose": {
     "titleOffer": "Ofrecer una beca de subsistencia",
@@ -82,7 +83,15 @@
     "needsProgramExplain": "Diluyen a todos los miembros, y la rikmá aún no ha aceptado la dilución. La forma de tener exactamente estas condiciones es un programa de becas: las mismas condiciones, con un presupuesto cerrado, que cada miembro vota viendo qué le hace a su propio porcentaje. Puedes abrirlo aquí y conservar lo que ya has rellenado.",
     "openProgram": "Abrir un programa de becas",
     "escalated": "Se han conservado tus condiciones. Solo falta un presupuesto total: ese número cerrado es lo que hace que la dilución sea votable.",
-    "funderMustSign": "La persona que elegiste debe aprobar explícitamente. El silencio no compromete el dinero de otro."
+    "funderMustSign": "La persona que elegiste debe aprobar explícitamente. El silencio no compromete el dinero de otro.",
+    "noRecipientYet": "Aún sin decidir",
+    "recipientExplain": "Una beca de subsistencia siempre es para alguien que hace un trabajo concreto. Sin nombrarlo, la rikma vota un presupuesto sin saber qué compra.",
+    "mission": "Para qué misión",
+    "missionExplain": "La misión es el contador de la beca: cada mes se pagan las horas aprobadas en ella × la tarifa horaria de la beca. Su propia tarifa es también el techo con el que se compara.",
+    "missionPick": "Elige una misión",
+    "recipientDerived": "Quien hace la misión es quien cobra la beca — por eso no se elige aparte.",
+    "openMissionNoTaker": "La misión sigue abierta — no hay nadie en ella",
+    "openMissionExplain": "La beca se asocia a la misión misma, y quien la tome la firmará. Hasta entonces nadie se compromete."
   },
   "tradeoff": {
     "title": "Qué cedes y qué recibes",
@@ -108,7 +117,6 @@
     "funder": "Quién paga",
     "recipient": "Quién recibe",
     "noFunderYet": "Aún sin financiador",
-    "anyMember": "Cualquier miembro con derecho",
     "youPayTitle": "Tú eres quien financia esta propuesta",
     "youPayBody": "Si apruebas, pagas {{count}} por cada hora aprobada — de tu propio bolsillo.",
     "youPayMonthly": "Techo mensual: hasta {{count}} al mes.",
@@ -126,7 +134,9 @@
     "dilutionPerYear": "Calculado sobre los próximos {{count}} meses; la dilución sigue mientras el programa esté activo",
     "needsFunderSignature": "Esto no se aprobará solo: pagar exige la firma explícita de {{name}}, por mucho que los demás callen",
     "confirmFunderTitle": "Un momento antes de aprobar",
-    "confirmFunderBody": "Aprobar aquí te compromete a pagar a {{name}} {{count}} por cada hora aprobada, hasta que se detenga o se agote el presupuesto."
+    "confirmFunderBody": "Aprobar aquí te compromete a pagar a {{name}} {{count}} por cada hora aprobada, hasta que se detenga o se agote el presupuesto.",
+    "noRecipientYet": "Aún sin nombrar — presupuesto general",
+    "missionOpen": "La misión sigue abierta — quien la tome firmará la beca"
   },
   "counter": {
     "title": "Proponer otras condiciones",

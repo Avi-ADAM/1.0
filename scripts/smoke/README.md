@@ -38,6 +38,26 @@ const b = await session({ account: 2 });   // slot 2, its own browser and cache
 Each slot caches its session in its own file, so signing in as one does not
 evict the other and a two-member flow can drive both at once.
 
+## Testing code that is not deployed yet
+
+`SMOKE_BASE_URL` points the whole harness somewhere else:
+
+```bash
+npm run dev &
+SMOKE_BASE_URL=http://localhost:5173 node scripts/smoke/flows/stipend.mjs --yes
+```
+
+The dev server talks to the **same Strapi** as production, so this is not a
+sandbox: the writes are real and land in the same database. What it buys is the
+ability to drive a feature that has not shipped yet — which is the only way to
+smoke-test a branch, since the flows need the real backend either way.
+
+Two Windows notes, if that is where you are running: Git Bash rewrites an
+argument that starts with `/` into a Windows path (`npm run smoke -- /lev`
+becomes `C:/Program Files/Git/lev`), so prefix the command with
+`MSYS_NO_PATHCONV=1`; and playwright installed globally is not on node's
+resolution path, so set `NODE_PATH` to the global `node_modules`.
+
 ## Read-only sweep
 
 ```bash
@@ -111,6 +131,59 @@ Those fixes have since deployed, so it should now be 9/9. If it is not, the fix
 did not take.
 
 Leaves one throwaway rikma named `בדיקה אוטומטית <timestamp>` per run.
+
+### `two-member` — the fixture every consent flow needs
+
+```bash
+node scripts/smoke/flows/two-member.mjs --yes      # build it (once)
+node scripts/smoke/flows/two-member.mjs --yes --fresh
+```
+
+Slot 2 starts out belonging to no rikma at all, so every two-person feature
+needs a rikma to exist in first — and standing one up is not a call, it is a
+join: an open mission, an application from slot 2, and slot 1 approving it.
+This flow does that once and caches the result in
+`$TMPDIR/1lev1-smoke-pair.json`; `archive-object` and `stipend` read it.
+
+A run whose join did not complete is **resumed**, not rebuilt — the rikma and
+its missions already exist and nothing can delete the extra ones.
+
+Two things it asserts that are easy to get wrong elsewhere: an application from
+a non-member opens an `Ask` rather than assigning the mission, and the
+membership is verified from *slot 2's own* `/moach`, never from the approving
+side.
+
+### `archive-object` — removal as a proposal
+
+```bash
+node scripts/smoke/flows/archive-object.mjs --yes
+```
+
+Walks `docs/PLAN_OBJECT_ARCHIVAL.md` end to end with two real members: a new
+mission (which in a rikma of two is itself a vote), an archive proposal that
+must come back as a Decision rather than a done deed, the card the other member
+sees, a counter in `keep` mode, and the maturation that leaves the object
+alive under its new terms. It also checks that the card offers approve · chat ·
+counter and **no** reject — a reject button here would be the bug.
+
+### `stipend` — who has to sign is derived
+
+```bash
+node scripts/smoke/flows/stipend.mjs --yes
+```
+
+The rule from `docs/PLAN_STIPEND.md`: while the rikma's total value does not
+move the pledge is bilateral, and the moment it grows it needs a rikma-wide
+programme with a closed budget. Step 4 is the one worth having — the same form,
+one slider moved from "the recipient bears it" to "the rikma bears it", must
+stop offering to send it to the other side alone and offer the programme
+instead.
+
+This is the flow that found the programme blocker: applying a matured
+`stipendProgram` sent the *pledge's* field list to `StipendProgramInput`, so
+Strapi rejected the whole mutation and a programme every member had approved
+could never become active. Unit tests could not see it — they mock Strapi, and
+a mock accepts any field.
 
 ### `signup` — the front door
 

@@ -232,7 +232,7 @@ export function watch(page, issues) {
 
 /** Visible text of the page, with the nav chrome and blank runs stripped. */
 export async function text(page) {
-  const raw = await page.evaluate(() => document.body.innerText);
+  const raw = await page.evaluate(() => document.body?.innerText ?? "");
   const chrome = new Set([
     'מזעור', 'מרכז', 'רקמות', 'צ׳אט', 'עסקאות', 'קונסיירז׳',
     'גילוי', 'הלב', 'פרופיל', 'עוד', 'תפריט פרופיל'
@@ -364,4 +364,81 @@ export async function firstProjectId(page) {
     await visit(page, '/moach', { wait: 5000 });
   }
   return null;
+}
+
+// ── action calls ─────────────────────────────────────────────────────────────
+
+/**
+ * Watch every `/api/action` POST and keep the parsed request/response, so a
+ * flow can assert on what the server actually answered rather than on what the
+ * UI chose to show. The UI is frequently silent about a failure the payload
+ * states plainly — that is how both blockers in QA_SOLO_RIKMA were found.
+ *
+ *   const api = actionCatcher(page);
+ *   api.clear();
+ *   await button.click();
+ *   const res = api.last('proposeObjectArchive');
+ */
+export function actionCatcher(page) {
+  const seen = [];
+  page.on('response', async (r) => {
+    if (!r.url().includes('/api/action') || r.request().method() !== 'POST') return;
+    let key = '';
+    let body = '';
+    try {
+      body = r.request().postData() || '';
+      key = JSON.parse(body).actionKey;
+    } catch {
+      return;
+    }
+    let json = null;
+    try {
+      json = JSON.parse(await r.text());
+    } catch {
+      /* non-JSON body */
+    }
+    seen.push({ key, status: r.status(), json, body });
+  });
+  return {
+    /** Newest call for `key`, or null. */
+    last: (key) => [...seen].reverse().find((s) => s.key === key) ?? null,
+    /** Every call for `key`, oldest first. */
+    all: (key) => seen.filter((s) => s.key === key),
+    /** Every action key seen since the last clear — handy when a click did something else. */
+    keys: () => seen.map((s) => s.key),
+    clear: () => (seen.length = 0)
+  };
+}
+
+/**
+ * Click the first control whose text matches `pattern`, by dispatching the
+ * event on the element itself.
+ *
+ * Playwright's own click lands at the element's screen position, so anything
+ * on top of it — a first-visit guide, a toast, a drawer overlay — silently
+ * eats the click and the control looks broken instead of blocked. `force`
+ * does not help: it skips the actionability *checks*, not the hit test. This
+ * dispatches straight onto the node, which is what the SVG "add" buttons
+ * already needed (see the README).
+ *
+ * Returns the label it clicked, or null when nothing matched — never throws,
+ * so a flow can report "the button was not there" as a finding rather than a
+ * stack trace.
+ */
+export async function clickText(page, pattern, { selector = 'button, a[href], [role="button"]' } = {}) {
+  const re = pattern instanceof RegExp ? pattern.source : String(pattern);
+  const flags = pattern instanceof RegExp ? pattern.flags : '';
+  return page.evaluate(
+    ({ sel, src, fl }) => {
+      const rx = new RegExp(src, fl);
+      const el = [...document.querySelectorAll(sel)].find((e) => {
+        const r = e.getBoundingClientRect();
+        return (r.width || r.height) && rx.test((e.innerText || e.textContent || '').trim());
+      });
+      if (!el) return null;
+      el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+      return (el.innerText || el.textContent || '').trim().slice(0, 60);
+    },
+    { sel: selector, src: re, fl: flags }
+  );
 }

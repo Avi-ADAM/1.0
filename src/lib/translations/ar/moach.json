@@ -136,7 +136,8 @@
     "activeNow": "نشط الآن",
     "open": "مفتوح لشركاء",
     "archive": "الأرشيف",
-    "api": "API"
+    "api": "API",
+    "stipend": "منح المعيشة"
   },
   "create": {
     "mission": "إنشاء مهمة",

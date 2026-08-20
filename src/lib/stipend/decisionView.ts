@@ -26,6 +26,8 @@ export interface StipendRoundView extends StipendTerms {
  * without knowing which mission this is and what it is worth.
  */
 export interface StipendMissionView {
+  /** `open` = nobody has taken this work yet; the stipend waits with it. */
+  kind: 'inProgress' | 'open';
   id: string;
   name: string;
   descrip: string | null;
@@ -125,16 +127,21 @@ function roundOf(raw: any): StipendRoundView {
   };
 }
 
-/** The missions on the proposed pledge, in the shape the card reads. */
+/**
+ * The missions on the proposed pledge, in the shape the card reads — both the
+ * ones already being worked on and the still-open ones the stipend was agreed
+ * for. A stipend always names its mission (it is what the monthly amount is
+ * metered on); only the *performer* can be missing.
+ */
 function missionsOf(raw: any): StipendMissionView[] {
-  const rows = raw?.mesimabetahaliches?.data ?? [];
-  return rows
+  const inProgress = (raw?.mesimabetahaliches?.data ?? [])
     .filter((m: any) => m?.id)
     .map((m: any): StipendMissionView => {
       const at = m.attributes ?? {};
       const hours = num(at.hoursassinged);
       const perhour = num(at.perhour);
       return {
+        kind: 'inProgress',
         id: String(m.id),
         name: at.name ?? '',
         descrip: at.descrip ?? null,
@@ -146,6 +153,28 @@ function missionsOf(raw: any): StipendMissionView[] {
         assigneeName: at.users_permissions_user?.data?.attributes?.username ?? null
       };
     });
+
+  const open = (raw?.open_missions?.data ?? [])
+    .filter((m: any) => m?.id)
+    .map((m: any): StipendMissionView => {
+      const at = m.attributes ?? {};
+      const hours = num(at.noofhours);
+      const perhour = num(at.perhour);
+      return {
+        kind: 'open',
+        id: String(m.id),
+        name: at.name ?? '',
+        descrip: at.descrip ?? null,
+        hours,
+        hoursDone: null,
+        perhour,
+        value: hours != null && perhour != null ? hours * perhour : null,
+        recurring: at.iskvua === true,
+        assigneeName: null
+      };
+    });
+
+  return [...inProgress, ...open];
 }
 
 /**

@@ -68,7 +68,7 @@
         },
         why: why || undefined
       });
-      if (res?.success === false) throw new Error(String(res?.error?.message ?? res?.error ?? 'failed'));
+      if (res?.success === false) throw new Error(actionError(res));
       toast.success($t('stipend.toast.countered'));
       open = false;
       onSent?.();
@@ -78,6 +78,17 @@
     } finally {
       busy = false;
     }
+  }
+
+  /**
+   * The sentence the action actually threw. The action framework replaces
+   * `message` with a generic "An unexpected error occurred" and keeps the real
+   * one in `details` — and for a stipend the real one is the whole point ("the
+   * rate is above the mission's market rate", "name the mission it pays for").
+   * @param {any} res
+   */
+  function actionError(res) {
+    return String(res?.error?.details ?? res?.error?.message ?? res?.error ?? 'failed');
   }
 </script>
 

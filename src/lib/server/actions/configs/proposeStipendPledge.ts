@@ -16,20 +16,17 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { restimeLabel } from './actionUtils.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
-import { fields, gqlStr, numField, run, strField, dateField, enumField } from '$lib/server/archive/gql.js';
 import { openStipendDecision } from '$lib/server/stipend/decision.js';
+import { createProposedPledge } from '$lib/server/stipend/create.js';
 import {
   fetchProgram,
   fetchProjectContext,
+  fetchProjectStipendMissions,
   fetchApprovedHours
 } from '$lib/server/stipend/read.js';
 import { validateStipendTerms, normalizeTerms } from '$lib/stipend/computeStipendEquity.js';
 import type { PartialStipendTerms } from '$lib/stipend/types.js';
 
-// `advance` stays in the Strapi enum (dropping a deployed enum value is a
-// migration, and rows may already carry it) but is no longer writable from
-// here — see src/lib/stipend/ADVANCE_MODE.md.
-const MODES = ['equity', 'gift'] as const;
 const SCOPES = ['allMissions', 'selectedMissions', 'singleMission'] as const;
 const RECOURSES = ['nonRecourse', 'personal'] as const;
 const INITIATORS = ['funder', 'recipient', 'member'] as const;
@@ -94,20 +91,51 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     cycleSize: params.cycleSize != null ? Number(params.cycleSize) : 1
   });
 
+  // **The mission is mandatory.** Not for tidiness: each cycle pays `hours
+  // approved on that mission that month × the stipend rate` (§6), so a stipend
+  // with no mission has no meter and the amount would have to be typed by hand.
   const missionIds: string[] = Array.isArray(params.missionIds)
     ? params.missionIds.map((m: unknown) => String(m)).filter(Boolean)
     : [];
-  if (terms.scope !== 'allMissions' && missionIds.length === 0) {
-    throw new Error('A scoped stipend needs the missions it covers');
+  if (missionIds.length === 0) {
+    throw new Error(
+      'A stipend has to name the mission it pays for — each month is that mission’s approved hours times the stipend rate, and without it there is nothing to compute'
+    );
+  }
+  if (terms.scope === 'allMissions') {
+    terms.scope = missionIds.length > 1 ? 'selectedMissions' : 'singleMission';
+  }
+
+  // The missions, read back rather than trusted: they must belong to this
+  // rikma, and a stipend pays the person actually doing the work — naming
+  // someone else's mission would meter the payment off hours the recipient
+  // never worked.
+  const projectMissions = await fetchProjectStipendMissions(exec, projectId).catch(() => []);
+  const missions = projectMissions.filter(
+    (m) => m.kind === 'inProgress' && missionIds.includes(m.id)
+  );
+  if (missions.length === 0) {
+    throw new Error('Those missions are not missions in progress in this rikma');
+  }
+  const wrongHands = missions.filter((m) => m.userId && m.userId !== recipientId);
+  if (wrongHands.length > 0) {
+    throw new Error(
+      'A stipend pays the member doing the mission — this mission is being done by someone else'
+    );
   }
 
   // The market rate the ceiling is measured against: the lowest rate among the
-  // covered missions, so the guard holds for every one of them.
+  // covered missions, so the guard holds for every one of them. Approved hours
+  // carry the rate they were approved at; a mission with none yet still has its
+  // own ₪/hour, which is the number the rikma agreed to.
   const approved = await fetchApprovedHours(exec, projectId, recipientId);
-  const relevant = missionIds.length
-    ? approved.filter((a) => a.mesimabetahalichId && missionIds.includes(a.mesimabetahalichId))
-    : approved;
-  const rates = relevant.map((a) => a.perhour).filter((r): r is number => r != null && r > 0);
+  const relevant = approved.filter(
+    (a) => a.mesimabetahalichId && missionIds.includes(a.mesimabetahalichId)
+  );
+  const rates = [
+    ...relevant.map((a) => a.perhour),
+    ...missions.map((m) => m.perhour)
+  ].filter((r): r is number => r != null && r > 0);
   const marketRate =
     params.marketRate != null
       ? Number(params.marketRate)
@@ -144,7 +172,6 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
     );
   }
 
-  const nowISO = new Date().toISOString();
   const initiatedBy = INITIATORS.includes(params.initiatedBy as any)
     ? (params.initiatedBy as (typeof INITIATORS)[number])
     : userId === funderId
@@ -156,41 +183,18 @@ const handler: ActionExecutionHandler = async (params, context, { notifier }) =>
   // The row is born `proposed`, so both parties (and the moach tab) can see the
   // exact terms while they are still being negotiated. Maturation flips it to
   // active; it never has to be re-created from the decision's rounds.
-  const created = await run(
-    exec,
-    `mutation { createStipendPledge(data: { ${fields(
-      strField('project', projectId),
-      strField('funder', funderId),
-      strField('recipient', recipientId),
-      program ? strField('stipend_program', program.id) : null,
-      enumField('mode', terms.mode, MODES),
-      numField('costShare', terms.costShare),
-      numField('equityMultiplier', terms.equityMultiplier),
-      numField('stipendRate', terms.stipendRate),
-      numField('monthlyCap', terms.monthlyCap),
-      numField('totalCap', terms.totalCap),
-      numField('noticeCycles', terms.noticeCycles),
-      numField('revenueTrigger', terms.revenueTrigger),
-      enumField('recourse', terms.recourse, RECOURSES),
-      enumField('scope', terms.scope, SCOPES),
-      enumField('initiatedBy', initiatedBy, INITIATORS),
-      'status: proposed',
-      strField('descrip', params.why ? String(params.why) : null),
-      strField('proposedBy', userId),
-      numField('cycleSize', terms.cycleSize),
-      dateField('start', terms.start ?? nowISO),
-      dateField('end', terms.end),
-      params.matbeaId ? strField('matbea', String(params.matbeaId)) : null,
-      missionIds.length > 0
-        ? `mesimabetahaliches: [${missionIds.map((m) => gqlStr(m)).join(', ')}]`
-        : null,
-      dateField('publishedAt', nowISO)
-    )} }) { data { id } } }`,
-    'createProposedPledge'
-  );
-  const pledgeId = created?.createStipendPledge?.data?.id
-    ? String(created.createStipendPledge.data.id)
-    : null;
+  const pledgeId = await createProposedPledge(exec, {
+    projectId,
+    funderId,
+    recipientId,
+    programId: program?.id ?? null,
+    terms,
+    why: params.why ? String(params.why) : null,
+    proposedById: userId,
+    initiatedBy,
+    missionIds,
+    matbeaId: params.matbeaId ? String(params.matbeaId) : null
+  });
   if (!pledgeId) throw new Error('Failed to record the stipend proposal');
 
   const funderName = project.members.find((m) => m.id === funderId)?.username ?? '';

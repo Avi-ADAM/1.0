@@ -136,7 +136,8 @@
     "activeNow": "Active Now",
     "open": "Open for partners",
     "archive": "Archive",
-    "api": "API"
+    "api": "API",
+    "stipend": "Stipends"
   },
   "create": {
     "mission": "Create Mission",

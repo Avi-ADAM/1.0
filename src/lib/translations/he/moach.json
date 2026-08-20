@@ -136,7 +136,8 @@
     "activeNow": "פעיל כעת",
     "open": "פתוח לשותפים",
     "archive": "ארכיון",
-    "api": "API"
+    "api": "API",
+    "stipend": "מלגות קיום"
   },
   "create": {
     "mission": "יצירת משימה",
