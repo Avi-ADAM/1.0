@@ -96,6 +96,16 @@
   const termRows = $derived(buildTermRows(archive));
   const changedRows = $derived(termRows.filter((r) => r.changed));
 
+  // Approving a new hourly value on a running mission does one thing before
+  // anything else: it closes the hours logged so far at the old value. That is
+  // a consequence of the vote, so it is stated on the card rather than
+  // discovered afterwards (src/lib/server/timers/flushRateChange.ts).
+  const cutsRateEra = $derived(
+    isKeep &&
+      archive?.targetKind === 'missionInProgress' &&
+      changedRows.some((r) => r.field === 'price')
+  );
+
   const FIELD_LABEL = {
     name: 'archive.nego.name',
     hm: 'archive.nego.hm',
@@ -281,6 +291,15 @@
             </p>
           {/if}
         {/if}
+      </div>
+    {/if}
+
+    <!-- Neither must a change that re-opens the books on work already done. -->
+    {#if cutsRateEra}
+      <div class="rounded-xl border border-amber-300 dark:border-amber-500/60 bg-amber-50 dark:bg-amber-900/30 p-3">
+        <p class="text-xs text-amber-900 dark:text-amber-100">
+          {$t('archive.card.rateNote')}
+        </p>
       </div>
     {/if}
 

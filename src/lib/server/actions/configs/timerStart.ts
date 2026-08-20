@@ -10,6 +10,31 @@
 import type { ActionConfig } from '../types.js';
 import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
+import { run } from '$lib/server/archive/gql.js';
+
+/**
+ * The mission's hourly value right now — stamped onto the timer at creation so
+ * these hours keep their price when the mission's value is renegotiated later
+ * (src/lib/timers/rate.ts). Read server-side and never taken from the client:
+ * the rate is what the hours are worth, not something the browser may assert.
+ */
+async function currentMissionRate(context: any, missionId: string): Promise<number | null> {
+    try {
+        const data = await run(
+            execFromContext(context),
+            `{ mesimabetahalich(id: "${missionId}") { data { attributes { perhour } } } }`,
+            'timerStart:rate',
+        );
+        const v = data?.mesimabetahalich?.data?.attributes?.perhour;
+        return v == null ? null : Number(v);
+    } catch (e) {
+        // A missing stamp reads as legacy and prices at the mission's value on
+        // close — the behaviour before stamps existed. Losing the timer over it
+        // would be far worse.
+        console.warn('[timerStart] could not read the mission rate (non-fatal):', e);
+        return null;
+    }
+}
 
 export const timerStartConfig: ActionConfig = {
     key: 'timerStart',
@@ -25,7 +50,8 @@ export const timerStartConfig: ActionConfig = {
             return strapi.execute('34UpdateTimer', params, context.jwt, context.fetch);
         } else {
             // Create new timer
-            return strapi.execute('33CreateTimer', params, context.jwt, context.fetch);
+            const rate = await currentMissionRate(context, String(params.missionId));
+            return strapi.execute('33CreateTimer', { ...params, rate }, context.jwt, context.fetch);
         }
     },
 
@@ -74,6 +100,11 @@ export const timerStartConfig: ActionConfig = {
             type: 'number',
             required: false,
             description: 'Total hours'
+        },
+        rate: {
+            type: 'number',
+            required: false,
+            description: 'Hourly value stamped on the timer — resolved server-side, ignored from the client'
         }
     },
 

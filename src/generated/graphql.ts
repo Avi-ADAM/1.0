@@ -18423,6 +18423,7 @@ export type Timer = {
   mashabetahalich?: Maybe<MashabetahalichEntityResponse>;
   mesimabetahalich?: Maybe<MesimabetahalichEntityResponse>;
   project?: Maybe<ProjectEntityResponse>;
+  rate?: Maybe<Scalars['Float']['output']>;
   saveFiles?: Maybe<UploadFileRelationResponseCollection>;
   saveLinks?: Maybe<Scalars['String']['output']>;
   saveText?: Maybe<Scalars['String']['output']>;
@@ -18515,6 +18516,7 @@ export type TimerFiltersInput = {
   not?: InputMaybe<TimerFiltersInput>;
   or?: InputMaybe<Array<InputMaybe<TimerFiltersInput>>>;
   project?: InputMaybe<ProjectFiltersInput>;
+  rate?: InputMaybe<FloatFilterInput>;
   saveLinks?: InputMaybe<StringFilterInput>;
   saveText?: InputMaybe<StringFilterInput>;
   saved?: InputMaybe<BooleanFilterInput>;
@@ -18538,6 +18540,7 @@ export type TimerInput = {
   mashabetahalich?: InputMaybe<Scalars['ID']['input']>;
   mesimabetahalich?: InputMaybe<Scalars['ID']['input']>;
   project?: InputMaybe<Scalars['ID']['input']>;
+  rate?: InputMaybe<Scalars['Float']['input']>;
   saveFiles?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   saveLinks?: InputMaybe<Scalars['String']['input']>;
   saveText?: InputMaybe<Scalars['String']['input']>;

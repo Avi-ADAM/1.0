@@ -28,7 +28,8 @@
     "terms": "The terms",
     "current": "Now",
     "proposed": "Proposed",
-    "noChanges": "The terms stay as they are"
+    "noChanges": "The terms stay as they are",
+    "rateNote": "Approving this first sends the hours logged so far to approval at the old value, and a running timer continues at the new one - so no hour is ever re-priced."
   },
   "hours": {
     "title": "Accrued hours",
@@ -124,6 +125,7 @@
     "note": "This is a proposal - the others can approve, propose differently, or discuss",
     "submit": "Send request",
     "applied": "The change was applied",
-    "proposed": "The request was sent to the rikma"
+    "proposed": "The request was sent to the rikma",
+    "rateNote": "A new hourly value applies from here on: the hours logged until the change is approved go to approval at the current value, and a running timer continues at the new one."
   }
 }

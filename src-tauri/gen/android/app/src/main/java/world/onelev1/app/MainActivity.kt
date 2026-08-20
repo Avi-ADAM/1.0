@@ -5,6 +5,9 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.view.View
+import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.activity.enableEdgeToEdge
 import androidx.core.content.ContextCompat
@@ -83,17 +86,55 @@ class MainActivity : TauriActivity() {
    * שפרוש מקצה לקצה — והכותרת נמשכת אל מתחת לשעון ולסמלי הרשת.
    *
    * לכבות `enableEdgeToEdge()` לא יעזור: מ-API 35 המערכת כופה edge-to-edge על
-   * `targetSdk` שלנו בכל מקרה. לכן ה-WebView מרופד בעצמו לפי ה-insets, וזה
-   * עובד זהה בכל הגרסאות. הריפוד נצבע בצבע המותג כי הוא שטח של ה-WebView.
+   * `targetSdk` שלנו בכל מקרה (ומ-36 גם דגל ה-opt-out כבר לא נשמע). לכן
+   * ה-WebView מוקטן בעצמו לפי ה-insets, וזה עובד זהה בכל הגרסאות. הרצועות
+   * שנשארות מסביבו צבועות בצבע המותג דרך windowBackground.
+   *
+   * `adb logcat -s Lev1Splash:I` מדפיס את ערכי ה-insets שהתקבלו בפועל — אם
+   * שורת ה-`insets` לא מופיעה, ה-listener לא נקרא; אם היא מופיעה עם אפסים,
+   * מישהו בשרשרת צרך אותם לפנינו.
    */
   private fun applyBarInsets(webView: WebView, chrome: Int) {
+    // הרצועות שנפתחות מתחת לסרגלים הן שטח של החלון, לא של ה-WebView, ולכן
+    // הרקע שנראה בהן הוא windowBackground.
+    window.setBackgroundDrawable(ColorDrawable(chrome))
+
     ViewCompat.setOnApplyWindowInsetsListener(webView) { view, insets ->
-      val bars = insets.getInsets(
+      // ה-insets שמגיעים בשרשרת הדיספאץ' עלולים להגיע כבר צרוכים: מעל
+      // ה-WebView יושב ה-sub-decor של AppCompat‏ (FitWindowsLinearLayout עם
+      // fitsSystemWindows="true"), ומי שמרפד את עצמו גם צורך. לכן המקור הוא
+      // getRootWindowInsets — מה שהחלון באמת מקבל — ומה שהגיע בשרשרת משמש רק
+      // כגיבוי אם אין root insets עדיין.
+      val source = ViewCompat.getRootWindowInsets(view) ?: insets
+      val bars = source.getInsets(
         WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
       )
-      view.setPadding(bars.left, bars.top, bars.right, bars.bottom)
+      Log.i(TAG, "insets l=${bars.left} t=${bars.top} r=${bars.right} b=${bars.bottom}")
+
+      // מרג'ין ולא padding: הוא מקטין את ה-View עצמו, ולכן ה-viewport של
+      // ה-WebView מתעדכן ודאית. ההשוואה לפני ההשמה חוסמת לולאת layout
+      // אינסופית — כל השמה של layoutParams מזמינה דיספאץ' חדש של insets.
+      val lp = view.layoutParams as? ViewGroup.MarginLayoutParams
+      if (lp == null) {
+        view.setPadding(bars.left, bars.top, bars.right, bars.bottom)
+      } else if (lp.leftMargin != bars.left || lp.topMargin != bars.top ||
+        lp.rightMargin != bars.right || lp.bottomMargin != bars.bottom
+      ) {
+        lp.setMargins(bars.left, bars.top, bars.right, bars.bottom)
+        view.layoutParams = lp
+      }
       insets
     }
+    // ה-listener נרשם ב-onWebViewCreate, לפני ש-wry מצרף את ה-WebView לחלון;
+    // בקשה מפורשת ברגע החיבור מבטיחה שהוא ייקרא גם אם הדיספאץ' הראשון חלף.
+    webView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+      override fun onViewAttachedToWindow(v: View) {
+        ViewCompat.requestApplyInsets(v)
+      }
+
+      override fun onViewDetachedFromWindow(v: View) {}
+    })
+    if (webView.isAttachedToWindow) ViewCompat.requestApplyInsets(webView)
     // סמלי שורת הסטטוס: כהים על רקע בהיר, בהירים על כהה. הצבע מגיע
     // מ-values/ או מ-values-night/ ולכן החישוב תופס את שני המצבים.
     val light = (0.299 * Color.red(chrome) + 0.587 * Color.green(chrome) +

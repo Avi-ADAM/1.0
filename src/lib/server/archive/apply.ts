@@ -25,6 +25,8 @@ import {
 } from './gql.js';
 import { TARGET_META, type ArchiveTarget, type Lifecycle, type TargetKind } from './targets.js';
 import { assessMembership, endMembership } from './membership.js';
+import { flushHoursBeforeRateChange, type FlushResult } from '../timers/flushRateChange.js';
+import { pickRateRow, rowRate } from '$lib/timers/rate.js';
 import {
   notifyRenegotiatedCandidates,
   readOfferSnapshot,
@@ -74,6 +76,13 @@ export interface ApplyResult {
   renegotiatedOffers?: RenegotiatedOffer[];
   /** The open mission a released assignment went back to. */
   reopenedOpenMissionId?: string;
+  /**
+   * Set when an approved change to the hourly value closed the books first:
+   * the hours logged until now went to approval at the old value, and a
+   * running timer came back stamped with the new one. See
+   * ../timers/flushRateChange.ts.
+   */
+  rateFlush?: FlushResult;
   /**
    * Set when this was the member's last tie to the rikma and their membership
    * ended with the object. Never a silent side effect — the proposal says so
@@ -153,9 +162,36 @@ function editFragment(kind: TargetKind, round: StandingRound): string {
 }
 
 /**
+ * Close the old rate era before a new hourly value is written.
+ *
+ * Only an in-progress mission can have hours running against it, and only a
+ * price that actually moves needs the cut — everything else (a name, more
+ * hours, a resource's unit price, whose cycles carry their own amounts) is
+ * safe to write straight through.
+ */
+async function flushRateEra(
+  exec: Exec,
+  target: ArchiveTarget,
+  round: StandingRound,
+  why?: string | null,
+): Promise<FlushResult | null> {
+  if (target.kind !== 'missionInProgress') return null;
+  if (round.price == null) return null;
+  const newRate = Number(round.price);
+  if (!Number.isFinite(newRate)) return null;
+  if (Number(target.perhour ?? 0) === newRate) return null;
+
+  return flushHoursBeforeRateChange(exec, {
+    missionId: target.id,
+    newRate,
+    why: why ?? round.why ?? null,
+  });
+}
+
+/**
  * Credit accrued hours as a FinnishedMission, so the work keeps its value in
  * the rikma's splits after the mission itself is gone. Mirrors the timer-save
- * branch of closeFiniapruval — one active FinnishedMission per mission, grown
+ * branch of closeFiniapruval — one active FinnishedMission per rate era, grown
  * rather than duplicated.
  */
 async function creditHours(
@@ -175,25 +211,27 @@ async function creditHours(
   // row — merging into that mission's own active row would silently rewrite a
   // number its owner never agreed to.
   const holderId = onMissionId ?? target.id;
-  const existingId = onMissionId ? null : target.finnishedMissionIds[0] ?? null;
+  // One row per rate era, so hours settled at today's value never re-price a
+  // row that was filled at an older one (src/lib/timers/rate.ts).
+  const existingRow = onMissionId ? null : pickRateRow(target.finnishedMissionRows, perhour);
 
-  if (existingId) {
+  if (existingRow) {
     const cur = await run(
       exec,
-      `{ finnishedMission(id: ${gqlStr(existingId)}) { data { id attributes { noofhours } } } }`,
+      `{ finnishedMission(id: ${gqlStr(existingRow.id)}) { data { id attributes { noofhours } } } }`,
       'credit:read',
     );
     const prev = Number(cur?.finnishedMission?.data?.attributes?.noofhours ?? 0);
     const grown = prev + hours;
     await run(
       exec,
-      `mutation { updateFinnishedMission(id: ${gqlStr(existingId)}, data: { ${fields(
+      `mutation { updateFinnishedMission(id: ${gqlStr(existingRow.id)}, data: { ${fields(
         numField('noofhours', grown),
-        numField('total', grown * perhour),
+        numField('total', grown * rowRate(existingRow, perhour)),
       )} }) { data { id } } }`,
       'credit:grow',
     );
-    return { finnishedMissionId: existingId, hoursCredited: hours };
+    return { finnishedMissionId: existingRow.id, hoursCredited: hours };
   }
 
   const data = fields(
@@ -380,6 +418,13 @@ export async function applyObjectChange(
     // afterwards there is nothing left to diff the new terms against.
     const snapshot = await readOfferSnapshot(exec, target.kind, target.id);
 
+    // A new hourly value cuts the mission into two rate eras. Everything
+    // logged until this instant belongs to the old one, so it is sent to
+    // approval at the old value *before* the new one is written — otherwise
+    // nothing downstream could tell the two apart. A running timer is handed
+    // straight back, stamped with the new rate.
+    const rateFlush = await flushRateEra(exec, target, round, why);
+
     const frag = editFragment(target.kind, round);
     const data = fields(frag || null, enumField('lifecycle', 'active', LIFECYCLES));
     await run(
@@ -397,7 +442,12 @@ export async function applyObjectChange(
       await notifyRenegotiatedCandidates(snapshot, round, renegotiatedOffers, { fetch: fetchFn });
     }
 
-    return { ...base, lifecycle: 'active', renegotiatedOffers };
+    return {
+      ...base,
+      lifecycle: 'active',
+      renegotiatedOffers,
+      ...(rateFlush?.flushed ? { rateFlush } : {}),
+    };
   }
 
   // ── the object leaves ──────────────────────────────────────────────────

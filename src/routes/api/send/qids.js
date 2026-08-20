@@ -780,8 +780,11 @@ const qids_base = {
     }   
   }
 }`,
+  // $rate stamps the mission's hourly value onto the timer at the moment the
+  // work starts, so an approved change to that value later cannot re-price
+  // hours that were worked under the old one (src/lib/timers/rate.ts).
   '33CreateTimer': `
-        mutation CreateTimer($missionId: ID!, $start: DateTime!, $userId: ID!, $projectId: ID!) {
+        mutation CreateTimer($missionId: ID!, $start: DateTime!, $userId: ID!, $projectId: ID!, $rate: Float) {
           createTimer(
             data: {
               activeMesimabetahalich: $missionId,
@@ -789,6 +792,7 @@ const qids_base = {
               users_permissions_user: $userId,
               project: $projectId,
               start: $start,
+              rate: $rate,
               isActive: true,
               totalHours: 0,
               timers: [{ start: $start }]
@@ -797,7 +801,7 @@ const qids_base = {
             data {
               id
               attributes {
-              start totalHours timers{start stop} acts{data{id}} isActive saved
+              start totalHours rate timers{start stop} acts{data{id}} isActive saved
               }
             }
           }
@@ -819,7 +823,7 @@ const qids_base = {
           data {
             id
             attributes {
-             start totalHours timers{start stop} acts{data{id}} isActive saved saveText
+             start totalHours rate timers{start stop} acts{data{id}} isActive saved saveText
             }
           }
         }
@@ -6641,7 +6645,8 @@ ${STIPEND_DECISION_FIELDS}
     $vots: [ComponentProjectsVotsInput],
     $timer: ID,
     $month: Date,
-    $why: String
+    $why: String,
+    $perhour: Float
   ) {
     createFiniapruval(
       data: {
@@ -6655,7 +6660,8 @@ ${STIPEND_DECISION_FIELDS}
         isTimerSave: true,
         timer: $timer,
         month: $month,
-        why: $why
+        why: $why,
+        perhour: $perhour
       }
     ) { data { id } }
   }`,
@@ -6790,6 +6796,8 @@ ${STIPEND_DECISION_FIELDS}
           why
           iskvua
           month
+          # The rate these hours were worked at, stamped when they were saved.
+          perhour
           vots { what users_permissions_user { data { id } } }
           mesimabetahalich {
             data {
@@ -6808,7 +6816,7 @@ ${STIPEND_DECISION_FIELDS}
           project { data { id } }
           users_permissions_user { data { id } }
           what { data { id } }
-          timer { data { id } }
+          timer { data { id attributes { rate } } }
         }
       }
     }

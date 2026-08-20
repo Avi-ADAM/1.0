@@ -18,7 +18,7 @@
         }
     ],
     "background_color": "#FF0092",
-    "display": "fullscreen",
+    "display": "standalone",
     "scope": "https://www.1lev1.com/",
     "shortcuts": [
         {

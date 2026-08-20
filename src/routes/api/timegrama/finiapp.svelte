@@ -4,6 +4,7 @@
   import { SendToAdmin } from '$lib/server/sendToAdmin.js';
   // Server-only secret — this module is imported only by timegrama/+server.js.
   import { ADMINMONTHER } from '$env/static/private';
+  import { blendedRate, pickRateRow, resolveRate, rowRate, sumRowsValue } from '$lib/timers/rate.js';
 
   export async function finiapp(id, taid) {
     console.log('finiapp auto-close', id);
@@ -11,7 +12,8 @@
 
     // Fetch finiapruval with all data needed to decide close path
     const qu = `{ finiapruval(id: ${id}) { data { id attributes {
-      archived isTimerSave noofhours missname why iskvua month
+      archived isTimerSave noofhours missname why iskvua month perhour
+      timer { data { id attributes { rate } } }
       vots { what users_permissions_user { data { id } } }
       mesimabetahalich { data { id attributes {
         perhour totalHoursSaved
@@ -47,22 +49,33 @@
       const mba = fa.mesimabetahalich.data;
       const mbaa = mba.attributes;
       const noofhours = fa.noofhours ?? 0;
-      const perhour = mbaa.perhour ?? 0;
+      // The rate the hours were worked at, not the mission's value now — the
+      // whole reason silence-maturation can fire months later
+      // (src/lib/timers/rate.ts).
+      const perhour = resolveRate(fa.perhour, fa.timer?.data?.attributes?.rate, mbaa.perhour);
+      const fmRows = (mbaa.finnished_missions?.data ?? []).map((fm) => ({
+        id: String(fm.id),
+        noofhours: Number(fm.attributes?.noofhours ?? 0),
+        perhour: fm.attributes?.perhour == null ? null : Number(fm.attributes.perhour)
+      }));
       const projectId = fa.project.data.id;
       const userId = fa.users_permissions_user.data.id;
 
       let finnishedMissionMutation = '';
 
       if (isTimerSave) {
-        // Timer save: update or create the single active FinnishedMission (isNotFinished:true)
-        const existingFm = mbaa.finnished_missions?.data?.[0];
+        // Timer save: accumulate into the active FinnishedMission of this rate era
+        const targetRow = pickRateRow(fmRows, perhour);
+        const existingFm = targetRow
+          ? mbaa.finnished_missions?.data?.find((fm) => String(fm.id) === targetRow.id)
+          : null;
 
-        if (existingFm) {
+        if (existingFm && targetRow) {
           const newHours = (existingFm.attributes.noofhours ?? 0) + noofhours;
           finnishedMissionMutation = `
             updateFinnishedMission(id: "${existingFm.id}", data: {
               noofhours: ${newHours},
-              total: ${newHours * perhour}
+              total: ${newHours * rowRate(targetRow, perhour)}
             }) { data { id } }
             updateMesimabetahalich(id: "${mba.id}", data: {
               totalHoursSaved: ${(mbaa.totalHoursSaved ?? 0) + noofhours}
@@ -90,10 +103,12 @@
           `;
         }
       } else {
-        // Mission completion: create final FinnishedMission + mark mission done
-        const existingFms = mbaa.finnished_missions?.data ?? [];
-        const accumulatedHours = existingFms.reduce((sum, fm) => sum + (fm.attributes?.noofhours ?? 0), 0);
-        const totalHours = accumulatedHours + noofhours;
+        // Mission completion: create final FinnishedMission + mark mission done.
+        // Every accumulated row keeps its own rate; collapsing them at the
+        // mission's current value would re-price the whole history.
+        const accumulated = sumRowsValue(fmRows, perhour);
+        const totalHours = accumulated.hours + noofhours;
+        const totalValue = accumulated.value + noofhours * perhour;
 
         finnishedMissionMutation = `
           createFinnishedMission(data: {
@@ -102,8 +117,8 @@
             noofhours: ${totalHours},
             mesimabetahalich: "${mba.id}",
             mission: "${mbaa.mission.data.id}",
-            perhour: ${perhour},
-            total: ${totalHours * perhour},
+            perhour: ${blendedRate(totalHours, totalValue, perhour)},
+            total: ${totalValue},
             project: "${projectId}",
             users_permissions_user: "${userId}",
             isFinished: true,

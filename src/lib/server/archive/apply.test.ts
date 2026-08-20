@@ -69,6 +69,7 @@ function missionInProgress(over: Partial<ArchiveTarget> = {}): ArchiveTarget {
     perhour: 50,
     hoursAssigned: 20,
     finnishedMissionIds: [],
+    finnishedMissionRows: [],
     hasActiveTimer: false,
     lastActivityAt: '2026-05-01T00:00:00.000Z',
     openMissionId: '33',
@@ -108,6 +109,132 @@ describe('applyObjectChange — mode "keep"', () => {
   });
 });
 
+/**
+ * A new hourly value splits the mission into two rate eras. The books are
+ * closed on the old one before the new value is written, or nothing
+ * downstream could tell which hours were worked at which price
+ * (src/lib/timers/rate.ts).
+ */
+describe('applyObjectChange — a kept mission whose hourly value moved', () => {
+  function execWithRunningTimer() {
+    const sent: string[] = [];
+    const exec = async (query: string) => {
+      sent.push(query);
+      if (query.includes('activeTimer { data { id attributes { rate')) {
+        return {
+          data: {
+            mesimabetahalich: {
+              data: {
+                id: '10',
+                attributes: {
+                  name: 'עיצוב לוגו',
+                  perhour: 50,
+                  howmanyhoursalready: 4,
+                  totalHoursSaved: 9,
+                  users_permissions_user: { data: { id: '2' } },
+                  mission: { data: { id: '44' } },
+                  project: {
+                    data: {
+                      id: '5',
+                      attributes: { restime: 'feh', user_1s: { data: [{ id: '1' }, { id: '2' }] } },
+                    },
+                  },
+                  activeTimer: {
+                    data: {
+                      id: '700',
+                      attributes: {
+                        rate: 50,
+                        isActive: true,
+                        saved: false,
+                        totalHours: 2,
+                        timers: [{ start: '2026-08-20T10:00:00.000Z', stop: null }],
+                      },
+                    },
+                  },
+                  finnished_missions: { data: [] },
+                },
+              },
+            },
+          },
+        };
+      }
+      if (query.includes('createFiniapruval')) {
+        return { data: { createFiniapruval: { data: { id: '801' } } } };
+      }
+      if (query.includes('createTimer')) {
+        return { data: { createTimer: { data: { id: '701' } } } };
+      }
+      return { data: {} };
+    };
+    return { exec, sent, matching: (token: string) => sent.filter((q) => q.includes(token)) };
+  }
+
+  const priceRound = (price: number): StandingRound => ({ ordern: 2, mode: 'keep', price });
+
+  it('sends the hours worked so far to approval at the old value', async () => {
+    const { exec, matching } = execWithRunningTimer();
+    const result = await applyObjectChange(exec, {
+      target: missionInProgress({ perhour: 50 }),
+      round: priceRound(80),
+    });
+
+    expect(result.rateFlush?.flushed).toBe(true);
+    expect(result.rateFlush?.rate).toBe(50);
+    expect(matching('createFiniapruval')[0]).toContain('perhour: 50');
+  });
+
+  it('closes the old era before writing the new value, never after', async () => {
+    const { exec, sent } = execWithRunningTimer();
+    await applyObjectChange(exec, {
+      target: missionInProgress({ perhour: 50 }),
+      round: priceRound(80),
+    });
+
+    const closedAt = sent.findIndex((q) => q.includes('createFiniapruval'));
+    const writtenAt = sent.findIndex((q) => q.includes('perhour: 80'));
+    expect(closedAt).toBeGreaterThan(-1);
+    expect(writtenAt).toBeGreaterThan(closedAt);
+  });
+
+  it('hands the running timer back at the new value', async () => {
+    const { exec, matching } = execWithRunningTimer();
+    await applyObjectChange(exec, {
+      target: missionInProgress({ perhour: 50 }),
+      round: priceRound(80),
+    });
+    expect(matching('createTimer')[0]).toContain('rate: 80');
+  });
+
+  it('leaves the timer alone when only the hours changed', async () => {
+    const { exec, matching } = execWithRunningTimer();
+    const result = await applyObjectChange(exec, {
+      target: missionInProgress({ perhour: 50 }),
+      round: { ordern: 2, mode: 'keep', hm: 30 },
+    });
+    expect(result.rateFlush).toBeUndefined();
+    expect(matching('createFiniapruval')).toHaveLength(0);
+    expect(matching('updateTimer')).toHaveLength(0);
+  });
+
+  it('leaves the timer alone when the value is restated unchanged', async () => {
+    const { exec, matching } = execWithRunningTimer();
+    await applyObjectChange(exec, {
+      target: missionInProgress({ perhour: 50 }),
+      round: priceRound(50),
+    });
+    expect(matching('createFiniapruval')).toHaveLength(0);
+  });
+
+  it('does not cut a resource — its cycles already carry their own price', async () => {
+    const { exec, matching } = execWithRunningTimer();
+    await applyObjectChange(exec, {
+      target: { ...missionInProgress({ perhour: 50 }), kind: 'resourceInProgress' },
+      round: priceRound(80),
+    });
+    expect(matching('createFiniapruval')).toHaveLength(0);
+  });
+});
+
 describe('applyObjectChange — settling accrued hours', () => {
   it('credit turns the accrued hours into a FinnishedMission at the agreed rate', async () => {
     const { exec, matching } = fakeExec();
@@ -139,7 +266,10 @@ describe('applyObjectChange — settling accrued hours', () => {
   it('credit grows the mission’s existing FinnishedMission instead of duplicating it', async () => {
     const { exec, matching } = fakeExec();
     await applyObjectChange(exec, {
-      target: missionInProgress({ finnishedMissionIds: ['77'] }),
+      target: missionInProgress({
+        finnishedMissionIds: ['77'],
+        finnishedMissionRows: [{ id: '77', noofhours: 5, perhour: 50 }],
+      }),
       round: archiveRound({ hoursOutcome: 'credit', hoursToCredit: 3 }),
     });
     expect(matching('createFinnishedMission')).toHaveLength(0);
@@ -162,7 +292,10 @@ describe('applyObjectChange — settling accrued hours', () => {
   it('transfer books the hours onto the receiving mission, never merging silently', async () => {
     const { exec, matching } = fakeExec();
     await applyObjectChange(exec, {
-      target: missionInProgress({ finnishedMissionIds: ['77'] }),
+      target: missionInProgress({
+        finnishedMissionIds: ['77'],
+        finnishedMissionRows: [{ id: '77', noofhours: 5, perhour: 50 }],
+      }),
       round: archiveRound({ hoursOutcome: 'transfer', hoursToCredit: 12, transferToId: '99' }),
     });
     const [created] = matching('createFinnishedMission');

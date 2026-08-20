@@ -1,4 +1,12 @@
 import type { ActionConfig } from '../types.js';
+import {
+    blendedRate,
+    pickRateRow,
+    resolveRate,
+    rowRate,
+    sumRowsValue,
+    type RateRow,
+} from '$lib/timers/rate.js';
 
 export const closeFiniapruvalConfig: ActionConfig = {
     key: 'closeFiniapruval',
@@ -52,18 +60,37 @@ export const closeFiniapruvalConfig: ActionConfig = {
         // All voted yes — close based on type
         const isTimerSave: boolean = fa.isTimerSave === true;
         const noofhours: number = fa.noofhours ?? 0;
-        const perhour: number = mbaa?.perhour ?? 0;
+
+        // The rate these hours were *worked* at, in the order the stamp was
+        // copied: the approval carries it, the timer carries it, and only a
+        // pre-stamp row falls back to the mission's value now. A vote that
+        // lands after the mission was renegotiated must not re-price the work
+        // it is approving (src/lib/timers/rate.ts).
+        const perhour: number = resolveRate(
+            fa.perhour,
+            fa.timer?.data?.attributes?.rate,
+            mbaa?.perhour,
+        );
+
+        const fmRows: RateRow[] = (mbaa?.finnished_missions?.data ?? []).map((fm: any) => ({
+            id: String(fm.id),
+            noofhours: Number(fm.attributes?.noofhours ?? 0),
+            perhour: fm.attributes?.perhour == null ? null : Number(fm.attributes.perhour),
+        }));
 
         if (isTimerSave) {
-            // Timer save approval: accumulate hours into the single active FinnishedMission
-            const existingFm = mbaa?.finnished_missions?.data?.[0];
+            // Timer save approval: accumulate hours into the row of this rate era
+            const targetRow = pickRateRow(fmRows, perhour);
+            const existingFm = targetRow
+                ? mbaa?.finnished_missions?.data?.find((fm: any) => String(fm.id) === targetRow.id)
+                : null;
 
-            if (existingFm) {
+            if (existingFm && targetRow) {
                 const newHours = (existingFm.attributes.noofhours ?? 0) + noofhours;
                 await strapi.execute('114updateFinnishedMissionHours', {
                     id: existingFm.id,
                     noofhours: newHours,
-                    total: newHours * perhour
+                    total: newHours * rowRate(targetRow, perhour)
                 }, context.jwt, context.fetch);
             } else {
                 await strapi.execute('113createFinnishedMissionForTimerSave', {
@@ -86,20 +113,22 @@ export const closeFiniapruvalConfig: ActionConfig = {
             }, context.jwt, context.fetch);
 
         } else {
-            // Mission completion: create final FinnishedMission and mark mission done
-            const existingFms = mbaa?.finnished_missions?.data ?? [];
-            const accumulatedHours = existingFms.reduce(
-                (sum: number, fm: any) => sum + (fm.attributes?.noofhours ?? 0), 0
-            );
-            const totalHours = accumulatedHours + noofhours;
+            // Mission completion: create final FinnishedMission and mark mission done.
+            // Each accumulated row keeps its own rate — `Σ hours × currentRate`
+            // would hand the whole mission the last value it ever had.
+            const accumulated = sumRowsValue(fmRows, perhour);
+            const totalHours = accumulated.hours + noofhours;
+            const totalValue = accumulated.value + noofhours * perhour;
 
             await strapi.execute('119createFinnishedMissionFinal', {
                 missionName: fa.missname,
                 why: fa.why ?? '',
                 noofhours: totalHours,
                 mesimabetahalich: mba?.id,
-                perhour,
-                total: totalHours * perhour,
+                // The one rate that keeps `noofhours × perhour === total` when
+                // several eras are collapsed into a single row.
+                perhour: blendedRate(totalHours, totalValue, perhour),
+                total: totalValue,
                 project: fa.project?.data?.id,
                 mission: mbaa?.mission?.data?.id,
                 users_permissions_user: fa.users_permissions_user?.data?.id,

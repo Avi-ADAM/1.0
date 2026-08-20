@@ -2,6 +2,39 @@ import type { ActionConfig } from '../types.js';
 import { calcDeadlineMs } from './actionUtils.js';
 import { touchDormancy } from '$lib/server/archive/dormancyClock.js';
 import { execFromContext } from '$lib/server/archive/exec.js';
+import { run } from '$lib/server/archive/gql.js';
+import { pickRateRow, resolveRate, rowRate, type RateRow } from '$lib/timers/rate.js';
+
+/**
+ * The timer as the server sees it, read before anything is written to it.
+ *
+ * `rate` is the hourly value stamped when the work started — what these hours
+ * are worth, whatever the mission is worth now (src/lib/timers/rate.ts).
+ * `saved` is the guard: a timer can be saved once. A client whose store went
+ * stale — most plausibly because an approved change to the hourly value closed
+ * this timer's books already (flushRateChange.ts) — would otherwise send the
+ * same hours to approval a second time.
+ */
+async function readTimer(
+    context: any,
+    timerId: string,
+): Promise<{ rate: number | null; saved: boolean } | null> {
+    try {
+        const data = await run(
+            execFromContext(context),
+            `{ timer(id: "${timerId}") { data { attributes { rate saved } } } }`,
+            'timerSave:timer',
+        );
+        const a = data?.timer?.data?.attributes;
+        if (!a) return null;
+        return { rate: a.rate == null ? null : Number(a.rate), saved: a.saved === true };
+    } catch (e) {
+        // Unreadable is not "already saved" — fall through to the legacy
+        // behaviour rather than dropping the member's hours on the floor.
+        console.warn('[timerSave] could not read the timer (non-fatal):', e);
+        return null;
+    }
+}
 
 /**
  * `why` on Finiapruval and FinnishedMission is a Strapi `string` — a 255-char
@@ -42,8 +75,21 @@ export const timerSaveConfig: ActionConfig = {
         // finished-mission row — so the rikma reads it wherever the hours land.
         const saveText: string = (params.saveText ?? '').toString().trim();
 
+        // Step 0: read the timer before touching it — its stamped rate, and
+        // whether it has already been saved.
+        const hasTimer = Boolean(params.timerId && params.timerId !== '0');
+        const timerBefore = hasTimer ? await readTimer(context, String(params.timerId)) : null;
+
+        if (timerBefore?.saved) {
+            console.log('[timerSave] timer already saved — refusing to book the same hours twice', {
+                timerId: params.timerId,
+                missionId: mId
+            });
+            return { success: true, missionId: mId, alreadySaved: true };
+        }
+
         // Step 1: Mark timer as saved
-        if (params.timerId && params.timerId !== '0') {
+        if (hasTimer) {
             await strapi.execute('34UpdateTimer', {
                 timerId: params.timerId,
                 isActive: false,
@@ -66,6 +112,17 @@ export const timerSaveConfig: ActionConfig = {
         const sessionHoursTotal: number = params.sessionHoursTotal ?? params.totalHours ?? 0;
         const newHowManyHours: number = params.howmanyhoursalready ?? (at.howmanyhoursalready ?? 0);
 
+        // What these hours are worth: the value stamped on the timer when the
+        // work started, not the mission's value now. Without this an approved
+        // `editObject` re-prices every hour ever logged (src/lib/timers/rate.ts).
+        const rate = resolveRate(timerBefore?.rate, at.perhour);
+
+        const fmRows: RateRow[] = (at.finnished_missions?.data ?? []).map((fm: any) => ({
+            id: String(fm.id),
+            noofhours: Number(fm.attributes?.noofhours ?? 0),
+            perhour: fm.attributes?.perhour == null ? null : Number(fm.attributes.perhour),
+        }));
+
         // Step 3: Update mission monthly hours counter + clear activeTimer
         await strapi.execute('112updateMissionMonthlyHours', {
             id: mId,
@@ -75,9 +132,14 @@ export const timerSaveConfig: ActionConfig = {
 
         if (userCount === 1) {
             // --- Single-user: directly write to FinnishedMission ---
-            const existingFm = at.finnished_missions?.data?.[0];
+            // One row per rate era: hours worked at the old value never land on
+            // a row priced at the new one.
+            const targetRow = pickRateRow(fmRows, rate);
+            const existingFm = targetRow
+                ? at.finnished_missions?.data?.find((fm: any) => String(fm.id) === targetRow.id)
+                : null;
 
-            if (existingFm) {
+            if (existingFm && targetRow) {
                 const newHours = (existingFm.attributes.noofhours ?? 0) + sessionHoursTotal;
                 // The row accumulates sessions, so the notes accumulate too —
                 // one line per save, oldest first, rather than the last one winning.
@@ -88,7 +150,7 @@ export const timerSaveConfig: ActionConfig = {
                 await strapi.execute('114updateFinnishedMissionHours', {
                     id: existingFm.id,
                     noofhours: newHours,
-                    total: newHours * (at.perhour ?? 0),
+                    total: newHours * rowRate(targetRow, rate),
                     ...(mergedWhy ? { why: clampWhy(mergedWhy) } : {})
                 }, context.jwt, context.fetch);
             } else {
@@ -100,8 +162,8 @@ export const timerSaveConfig: ActionConfig = {
                     project: at.project?.data?.id,
                     publishedAt: now.toISOString(),
                     users_permissions_user: at.users_permissions_user?.data?.id,
-                    perhour: at.perhour,
-                    total: sessionHoursTotal * (at.perhour ?? 0),
+                    perhour: rate,
+                    total: sessionHoursTotal * rate,
                     why: saveText ? clampWhy(saveText) : 'timer save'
                 }, context.jwt, context.fetch);
             }
@@ -123,8 +185,11 @@ export const timerSaveConfig: ActionConfig = {
                 publishedAt: now.toISOString(),
                 users_permissions_user: at.users_permissions_user?.data?.id,
                 vots,
-                timer: params.timerId && params.timerId !== '0' ? params.timerId : undefined,
+                timer: hasTimer ? params.timerId : undefined,
                 month: todayDateString(),
+                // Carried onto the approval so a vote that lands after the
+                // mission's value changed still prices these hours correctly.
+                perhour: rate,
                 ...(saveText ? { why: clampWhy(saveText) } : {})
             }, context.jwt, context.fetch);
 

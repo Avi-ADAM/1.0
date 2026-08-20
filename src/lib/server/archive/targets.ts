@@ -7,6 +7,7 @@
  */
 
 import { run, type Exec } from './gql.js';
+import type { RateRow } from '$lib/timers/rate.js';
 
 export type TargetKind =
   | 'openMission'
@@ -81,6 +82,12 @@ export interface ArchiveTarget {
   perhour: number | null;
   hoursAssigned: number | null;
   finnishedMissionIds: string[];
+  /**
+   * The still-open FinnishedMission rows with their own rates. One row per
+   * rate era (src/lib/timers/rate.ts) — settled hours must grow the row that
+   * was priced the same way, never whichever row happens to come first.
+   */
+  finnishedMissionRows: RateRow[];
   hasActiveTimer: boolean;
   lastActivityAt: string | null;
   /** Where a released mission goes back to, and what it was cut from. */
@@ -117,7 +124,9 @@ const QUERIES: Record<TargetKind, (id: string) => string> = {
     howmanyhoursalready hoursassinged perhour totalHoursSaved finnished
     users_permissions_user { data { id } }
     activeTimer { data { id } }
-    finnished_missions { data { id } }
+    finnished_missions(filters: { isNotFinished: { eq: true } }) {
+      data { id attributes { noofhours perhour } }
+    }
     mission { data { id } }
     open_missions { data { id } }
     ${PROJECT_FRAGMENT}
@@ -210,6 +219,11 @@ export async function fetchTarget(
     perhour: num(a.perhour),
     hoursAssigned: num(a.hoursassinged ?? a.hoursassigned),
     finnishedMissionIds: ids(a.finnished_missions),
+    finnishedMissionRows: (a.finnished_missions?.data ?? []).map((fm: any) => ({
+      id: String(fm.id),
+      noofhours: num(fm.attributes?.noofhours) ?? 0,
+      perhour: num(fm.attributes?.perhour),
+    })),
     hasActiveTimer: !!a.activeTimer?.data?.id,
     lastActivityAt: a.updatedAt ?? null,
     openMissionId: firstId(a.open_missions),

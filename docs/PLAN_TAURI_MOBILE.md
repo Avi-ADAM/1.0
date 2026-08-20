@@ -171,7 +171,12 @@ jobs:
 ### 4.3 UX מובייל
 - כפתור Back של אנדרואיד: ברירת המחדל של Tauri v2 מנווטת אחורה ב-WebView; לוודא התנהגות סבירה ולחסום יציאה בטעות ממסך הבית.
 - Deep links (`tauri-plugin-deep-link`) לקישורי הזמנה/שיתוף.
-- `viewport-fit=cover` + safe-area ב-CSS למסכים עם notch.
+- **סרגלי המערכת — נייטיבי, לא CSS.** `targetSdk=36` ⇒ המערכת כופה edge-to-edge
+  ואין דגל opt-out; ב-WebView של אנדרואיד `env(safe-area-inset-*)` משקף רק את
+  ה-cutout ולא את שורת הסטטוס/הניווט, ולכן CSS לבדו לא יכול לפתור את זה.
+  `MainActivity.applyBarInsets` מקטין את ה-WebView לפי ה-insets בפועל.
+  `viewport-fit=cover` באתר יחזיר את החפיפה — לא להוסיף אותו בלי ריפוד
+  safe-area מלא בכל כותרת וכל סרגל תחתון.
 
 ---
 

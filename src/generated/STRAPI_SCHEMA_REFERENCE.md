@@ -1,6 +1,6 @@
 # Strapi GraphQL Schema Reference
 > Auto-generated from `src/generated/graphql.ts`
-> Last updated: 2026-08-19
+> Last updated: 2026-08-20
 > Source: `codegen.ts` → `http://localhost:1337/graphql`
 
 This file provides a compact reference of all types available from the Strapi backend.
@@ -2914,6 +2914,7 @@ These are the main content types in the Strapi backend.
 | `mashabetahalich` | `Maybe<MashabetahalichEntityResponse>` |
 | `mesimabetahalich` | `Maybe<MesimabetahalichEntityResponse>` |
 | `project` | `Maybe<ProjectEntityResponse>` |
+| `rate` | `Maybe<Scalars['Float']['output']>` |
 | `saveFiles` | `Maybe<UploadFileRelationResponseCollection>` |
 | `saveLinks` | `Maybe<Scalars['String']['output']>` |
 | `saveText` | `Maybe<Scalars['String']['output']>` |
@@ -6669,6 +6670,7 @@ Used for creating/updating content.
 | `mashabetahalich` | `InputMaybe<Scalars['ID']['input']>` |
 | `mesimabetahalich` | `InputMaybe<Scalars['ID']['input']>` |
 | `project` | `InputMaybe<Scalars['ID']['input']>` |
+| `rate` | `InputMaybe<Scalars['Float']['input']>` |
 | `saveFiles` | `InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>` |
 | `saveLinks` | `InputMaybe<Scalars['String']['input']>` |
 | `saveText` | `InputMaybe<Scalars['String']['input']>` |
@@ -7301,7 +7303,7 @@ Fields: `amort`, `amortf`, `amorth`, `amorts`, `amortt`, `and`, `createdAt`, `em
 Fields: `act`, `actt`, `and`, `ask`, `askm`, `askwant`, `createdAt`, `date`, `decision`, `done`, `finiapruval`, `id`, `maap`, `mashabetahalich`, `matanot`, `matanotpend`, `mesimabetahalich`, `not`, `open_mashaabim`, `open_mission`, `or`, `pendm`, `pmash`, `sheirutpend`, `stipend_payment`, `timer`, `tosplit`, `updatedAt`, `whatami`
 
 #### TimerFiltersInput
-Fields: `activeMesimabetahalich`, `acts`, `and`, `appruved`, `createdAt`, `finiapruvals`, `finnish`, `forApruve`, `id`, `isActive`, `locale`, `localizations`, `mashabetahalich`, `mesimabetahalich`, `not`, `or`, `project`, `saveLinks`, `saveText`, `saved`, `start`, `timegrama`, `timers`, `totalHours`, `updatedAt`, `users_permissions_user`, `votes`
+Fields: `activeMesimabetahalich`, `acts`, `and`, `appruved`, `createdAt`, `finiapruvals`, `finnish`, `forApruve`, `id`, `isActive`, `locale`, `localizations`, `mashabetahalich`, `mesimabetahalich`, `not`, `or`, `project`, `rate`, `saveLinks`, `saveText`, `saved`, `start`, `timegrama`, `timers`, `totalHours`, `updatedAt`, `users_permissions_user`, `votes`
 
 #### TosplitFiltersInput
 Fields: `and`, `createdAt`, `finished`, `halukas`, `hervachti`, `id`, `locale`, `localizations`, `name`, `not`, `or`, `prectentage`, `project`, `publishedAt`, `ratson_proposal`, `sales`, `sheiruts`, `siteShareHalukas`, `site_share_contributions`, `split_origin`, `timegrama`, `updatedAt`, `vots`, `whynow`
@@ -7945,7 +7947,7 @@ Wrapper types for GraphQL responses.
 ```
 src/
 ├── generated/
-│   ├── graphql.ts              # Auto-generated types (codegen) - 20837 lines
+│   ├── graphql.ts              # Auto-generated types (codegen) - 20840 lines
 │   ├── index.ts                # Re-export hub
 │   └── STRAPI_SCHEMA_REFERENCE.md  # This file (AI agent reference)
 ├── lib/

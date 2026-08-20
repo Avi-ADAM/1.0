@@ -22,7 +22,7 @@
     ],
     "background_color": "#FF0092",
     "display": "standalone",
-    "display_override": ["tabbed","window-controls-overlay","fullscreen","minimal-ui"],
+    "display_override": ["tabbed","window-controls-overlay"],
     "scope": "https://www.1lev1.com/",
     "shortcuts": [
         {

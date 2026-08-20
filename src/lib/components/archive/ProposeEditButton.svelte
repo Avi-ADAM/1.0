@@ -65,6 +65,17 @@
       (price != null && Number(price) !== Number(currentPrice))
   );
 
+  // Moving the hourly value of a mission that is already running is the one
+  // change with a consequence beyond the terms themselves: the hours logged so
+  // far are closed at the old value first. Nobody should discover that after
+  // signing (src/lib/server/timers/flushRateChange.ts).
+  const priceMoved = $derived(
+    targetKind === 'missionInProgress' &&
+      price != null &&
+      currentPrice != null &&
+      Number(price) !== Number(currentPrice)
+  );
+
   async function submit() {
     if (sending || !changed) return;
     sending = true;
@@ -171,6 +182,14 @@
             class="mt-1 w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-900 p-2"
           ></textarea>
         </label>
+
+        {#if priceMoved}
+          <p
+            class="text-xs rounded-lg border border-amber-300 dark:border-amber-500/60 bg-amber-50 dark:bg-amber-900/30 text-amber-900 dark:text-amber-100 p-2.5"
+          >
+            {$t('archive.edit.rateNote')}
+          </p>
+        {/if}
 
         <p class="text-xs text-gray-500">
           {soleMember
