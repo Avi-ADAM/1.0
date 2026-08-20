@@ -1,0 +1,7 @@
+<resources>
+    <!-- ברירת המחדל היא עברית, כמו שפת המקור של האתר.
+         שים לב: `tauri android init` מייצר את הקובץ הזה מחדש מתוך productName
+         ומחזיר אותו ל-"1lev1". אם הרצת אותו שוב — החזר את התווית הזאת. -->
+    <string name="app_name">"1לב1"</string>
+    <string name="main_activity_title">"1לב1"</string>
+</resources>

@@ -1,0 +1,16 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.app" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <!-- מסך הפתיחה. זו ה-theme של ה-Activity ב-AndroidManifest;
+         androidx.core:core-splashscreen מחליף אותה ב-postSplashScreenTheme
+         ברגע שהמסך יורד, כך שה-WebView רץ תחת Theme.app. מ-API 31 זהו ה-splash
+         של המערכת; מתחת לזה הספרייה מחקה אותו — ולכן זה זהה מ-API 24 והלאה. -->
+    <style name="Theme.Lev1.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>
+        <item name="postSplashScreenTheme">@style/Theme.app</item>
+    </style>
+</resources>

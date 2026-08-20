@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- הקדמה של האייקון האדפטיבי. הקנבס הוא 108dp אבל מסכת המשגר חותכת 18dp מכל
+     צד (אזור בטוח 72dp), ו-`tauri icon` פורש את הסמל על כל ה-108dp — כלומר
+     מסכה עגולה הייתה מגלחת את שפת המטבע. 65dp ≈ 60% מהקנבס: בתוך האזור הבטוח
+     עם מעט אוויר. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:width="65dp"
+        android:height="65dp"
+        android:gravity="center"
+        android:drawable="@mipmap/ic_launcher_foreground" />
+</layer-list>

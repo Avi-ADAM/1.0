@@ -17,6 +17,7 @@
   import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
   import CardHeader from './CardHeader.svelte';
   import NegoArchive from '../negoArchive.svelte';
+  import { buildTermRows } from '$lib/archive/decisionView.js';
 
   /**
    * @typedef {Object} Props
@@ -88,6 +89,74 @@
   const deadline = $derived(
     timegramaDate ? new Date(timegramaDate).toLocaleDateString() : ''
   );
+
+  // The terms, current beside proposed. What is being voted on is the
+  // *difference* — a card that shows only the new rate asks people to sign a
+  // number they have nothing to place it against.
+  const termRows = $derived(buildTermRows(archive));
+  const changedRows = $derived(termRows.filter((r) => r.changed));
+
+  const FIELD_LABEL = {
+    name: 'archive.nego.name',
+    hm: 'archive.nego.hm',
+    price: 'archive.nego.price',
+    sqadualed: 'archive.nego.startDate',
+    sqadualedf: 'archive.nego.endDate',
+    kindOf: 'archive.nego.kindOf',
+    descrip: 'archive.nego.descrip'
+  };
+
+  function fmt(row, v) {
+    if (v == null || v === '') return '—';
+    if (row.isDate) {
+      const d = new Date(v);
+      return Number.isNaN(d.getTime()) ? String(v) : d.toLocaleDateString();
+    }
+    return String(v);
+  }
+
+  /** "+2" / "-2" — the size of the move, which is the thing being agreed to. */
+  function deltaLabel(row) {
+    if (row.delta == null || row.delta === 0) return '';
+    return `${row.delta > 0 ? '+' : '-'}${Math.abs(row.delta)}`;
+  }
+
+  // The discussion hangs off the Decision itself (`Decision.forums`, already in
+  // the schema), created on first use by `ensureVoteForum` — the same path the
+  // saleClaim and pendm/pmash cards take. Handing the page a bare
+  // `{ decisionId }` dropped it into its no-payload fallback, which is the
+  // chat that opened on nothing.
+  let forumId = $state(null);
+  let openingChat = $state(false);
+
+  async function openChat() {
+    if (openingChat) return;
+    openingChat = true;
+    try {
+      if (!forumId) {
+        const res = await executeAction('ensureVoteForum', {
+          entityType: 'decision',
+          entityId: String(archive?.decisionId),
+          projectId: String(projectId)
+        });
+        if (res?.success) forumId = res.data?.forumId ?? null;
+      }
+      if (forumId) {
+        onChat?.({
+          forumId: String(forumId),
+          decisionId: archive?.decisionId,
+          projectId
+        });
+      } else {
+        toast.error($t('archive.toast.error'));
+      }
+    } catch (e) {
+      console.error('[ArchiveObjectCard] opening the chat failed:', e);
+      toast.error($t('archive.toast.error'));
+    } finally {
+      openingChat = false;
+    }
+  }
 
   async function approve() {
     if (approving) return;
@@ -229,16 +298,57 @@
       </div>
     {/if}
 
-    <!-- The standing version, with the original beside it once they differ. -->
-    {#if isKeep}
-      <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-3 space-y-1">
-        <p class="text-xs text-gray-500">{$t('archive.card.standing')}</p>
-        {#if standing.name}<p class="text-sm">{standing.name}</p>{/if}
-        {#if standing.hm != null}
-          <p class="text-sm">{$t('archive.nego.hm')}: {standing.hm}</p>
-        {/if}
-        {#if standing.price != null}
-          <p class="text-sm">{$t('archive.nego.price')}: {standing.price}</p>
+    <!--
+      The terms as they stand today, and what the standing round makes of them.
+      Every line carries its current value, so an unchanged field reads as
+      context and a changed one reads as the actual question.
+    -->
+    {#if termRows.length}
+      <div class="rounded-xl border border-gray-200 dark:border-gray-700 p-3">
+        <div class="flex items-baseline justify-between gap-2 mb-2">
+          <p class="text-xs text-gray-500">{$t('archive.card.terms')}</p>
+          {#if changedRows.length}
+            <p class="text-[11px] text-gray-400">
+              {$t('archive.card.current')} {$isRtl ? '←' : '→'} {$t('archive.card.proposed')}
+            </p>
+          {/if}
+        </div>
+
+        <div class="space-y-1.5">
+          {#each termRows as row (row.field)}
+            <div class="flex items-start justify-between gap-3 text-sm">
+              <span class="shrink-0 text-gray-500 dark:text-gray-400">
+                {$t(FIELD_LABEL[row.field])}
+              </span>
+              {#if row.changed}
+                <span class="text-end break-words">
+                  <span class="text-gray-400 line-through">{fmt(row, row.from)}</span>
+                  <span class="mx-1 text-gray-400">{$isRtl ? '←' : '→'}</span>
+                  <span class="font-semibold text-gray-900 dark:text-gray-100">
+                    {fmt(row, row.to)}
+                  </span>
+                  {#if deltaLabel(row)}
+                    <span
+                      dir="ltr"
+                      class="ms-1 text-xs {row.delta > 0
+                        ? 'text-teal-600 dark:text-teal-400'
+                        : 'text-orange-600 dark:text-orange-400'}"
+                    >
+                      ({deltaLabel(row)})
+                    </span>
+                  {/if}
+                </span>
+              {:else}
+                <span class="text-end break-words text-gray-700 dark:text-gray-300">
+                  {fmt(row, row.from)}
+                </span>
+              {/if}
+            </div>
+          {/each}
+        </div>
+
+        {#if isKeep && !changedRows.length}
+          <p class="text-xs text-gray-400 mt-2">{$t('archive.card.noChanges')}</p>
         {/if}
       </div>
     {/if}
@@ -257,8 +367,9 @@
   >
     <button
       type="button"
-      onclick={() => onChat?.({ decisionId: archive?.decisionId, projectId })}
-      class="flex-1 rounded-xl border border-gray-300 dark:border-gray-600 py-3 text-sm"
+      onclick={openChat}
+      disabled={openingChat}
+      class="flex-1 rounded-xl border border-gray-300 dark:border-gray-600 py-3 text-sm disabled:opacity-60"
     >
       {$t('archive.actions.chat')}
     </button>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- אייקון מסך הפתיחה. מפרט אנדרואיד: קנבס 240dp, מסכה 160dp — ולכן הסמל
+     ממורכז ב-60% מהקנבס, בתוך המסכה ועם קצת אוויר. `tauri icon` פורש את
+     ic_launcher_foreground על כל הקנבס, ומסירתו כמות שהיא הייתה נחתכת. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:width="144dp"
+        android:height="144dp"
+        android:gravity="center"
+        android:drawable="@mipmap/ic_launcher_foreground" />
+</layer-list>

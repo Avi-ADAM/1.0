@@ -25,7 +25,9 @@
     "check:i18n": "node scripts/check-i18n-routes.mjs",
     "check:script": "node scripts/check-mixed-script.mjs",
     "smoke": "node scripts/smoke/smoke.mjs",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "android:apk": "tauri android build --debug --apk --target aarch64",
+    "android:install": "node scripts/android-install.mjs"
   },
   "engines": {
     "node": "22.x"

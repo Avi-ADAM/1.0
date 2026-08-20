@@ -46,6 +46,14 @@ export interface StipendMissionRow {
   hours: number | null;
   hoursDone: number | null;
   recurring: boolean;
+  /**
+   * When the work runs, when it says so. On a **recurring** mission these are
+   * what decides whether the stipend has a final number at all: with both, the
+   * months are countable and the budget is closed; with no end date it is
+   * "this much a month, until stopped" (see $lib/stipend/suggestBudget.ts).
+   */
+  start: string | null;
+  end: string | null;
   /** Who is doing it, when anyone is — the recipient of a stipend for it. */
   userId: string | null;
   username: string | null;
@@ -74,7 +82,7 @@ export async function fetchProjectStipendMissions(
         or: [{ lifecycle: { null: true } }, { lifecycle: { ne: "archived" } }]
       }, pagination: { limit: 200 }, sort: "createdAt:desc") {
         data { id attributes {
-          name descrip perhour hoursassinged howmanyhoursalready iskvua
+          name descrip perhour hoursassinged howmanyhoursalready iskvua start dates
           users_permissions_user { data { id attributes { username } } }
         } }
       }
@@ -83,7 +91,7 @@ export async function fetchProjectStipendMissions(
         archived: { eq: false },
         or: [{ lifecycle: { null: true } }, { lifecycle: { ne: "archived" } }]
       }, pagination: { limit: 200 }, sort: "createdAt:desc") {
-        data { id attributes { name descrip perhour noofhours iskvua stipendRate } }
+        data { id attributes { name descrip perhour noofhours iskvua stipendRate dates } }
       }
     }`,
     'projectStipendMissions'
@@ -101,6 +109,8 @@ export async function fetchProjectStipendMissions(
       hours: num(a.hoursassinged),
       hoursDone: num(a.howmanyhoursalready),
       recurring: a.iskvua === true,
+      start: a.start ?? null,
+      end: a.dates ?? null,
       userId: user?.id ? String(user.id) : null,
       username: user?.attributes?.username ?? null,
       stipendRate: null
@@ -118,6 +128,10 @@ export async function fetchProjectStipendMissions(
       hours: num(a.noofhours),
       hoursDone: null,
       recurring: a.iskvua === true,
+      // An open mission has not started — whoever takes it starts it — so only
+      // its end date is known here.
+      start: null,
+      end: a.dates ?? null,
       userId: null,
       username: null,
       stipendRate: num(a.stipendRate)

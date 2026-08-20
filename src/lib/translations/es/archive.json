@@ -24,7 +24,11 @@
       "resourceInProgress": "Recurso en curso",
       "matanot": "Producto"
     },
-    "signedByMe": "Firmaste esta versión - esperando al resto de los miembros"
+    "signedByMe": "Firmaste esta versión - esperando al resto de los miembros",
+    "terms": "Las condiciones",
+    "current": "Ahora",
+    "proposed": "Propuesto",
+    "noChanges": "Las condiciones quedan igual"
   },
   "hours": {
     "title": "Horas acumuladas",
@@ -69,7 +73,8 @@
     "submit": "Enviar propuesta",
     "cancel": "Cancelar",
     "sending": "Enviando…",
-    "clockReset": "Enviar reinicia el reloj de la decisión"
+    "clockReset": "Enviar reinicia el reloj de la decisión",
+    "kindOf": "Tipo"
   },
   "toast": {
     "approved": "Firmaste la versión sobre la mesa",

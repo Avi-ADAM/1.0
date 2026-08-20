@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- מצב לילה. בלי זה יצרנים מסוימים (MIUI) מחשיכים בכוח צבע בהיר ומקבלים
+         גוון אקראי; צבע שכבר כהה לא עובר את ההמרה הזאת. -->
+    <color name="splash_background">#2A2610</color>
+</resources>

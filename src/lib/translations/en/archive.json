@@ -24,7 +24,11 @@
       "resourceInProgress": "Resource in progress",
       "matanot": "Product"
     },
-    "signedByMe": "You signed this version - waiting for the other members"
+    "signedByMe": "You signed this version - waiting for the other members",
+    "terms": "The terms",
+    "current": "Now",
+    "proposed": "Proposed",
+    "noChanges": "The terms stay as they are"
   },
   "hours": {
     "title": "Accrued hours",
@@ -69,7 +73,8 @@
     "submit": "Send proposal",
     "cancel": "Cancel",
     "sending": "Sending…",
-    "clockReset": "Sending resets the decision clock"
+    "clockReset": "Sending resets the decision clock",
+    "kindOf": "Kind"
   },
   "toast": {
     "approved": "You signed the version on the table",

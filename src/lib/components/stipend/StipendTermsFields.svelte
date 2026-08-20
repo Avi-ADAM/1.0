@@ -24,6 +24,10 @@
    * @property {boolean} [allowRikmaScope] - this form *is* the rikma-wide ask (a
    *   program proposal), so "these terms dilute and the rikma only allows
    *   bilateral" is not an error here — it is the question being put.
+   * @property {import('$lib/stipend/suggestBudget.js').StipendBudgetSuggestion|null} [suggestion] -
+   *   the budget derived from the chosen mission (rate × its hours, and the
+   *   months when it has an end date). Fills the ceiling in so nobody has to
+   *   compute it, and keeps following the rate until the member types their own.
    */
 
   /** @type {Props} */
@@ -43,7 +47,8 @@
     policy = null,
     showBudget = false,
     showAdvanced = true,
-    allowRikmaScope = false
+    allowRikmaScope = false,
+    suggestion = null
   } = $props();
 
   /**
@@ -51,11 +56,18 @@
    * themselves (a total budget or a monthly ceiling), so re-opening a proposal
    * lands on the shape it was written in — with one piece of local state for
    * the moment the member has switched but not yet typed the new number.
+   *
+   * With nothing typed yet the **mission** decides: a one-off has a size and
+   * therefore a closed total, a recurring one is a monthly amount.
    */
   let shapeOverride = $state(/** @type {'total'|'monthly'|null} */ (null));
   const budgetShape = $derived(
     shapeOverride ??
-      (Number(terms.totalCap) > 0 ? 'total' : Number(terms.monthlyCap) > 0 ? 'monthly' : 'total')
+      (Number(terms.totalCap) > 0
+        ? 'total'
+        : Number(terms.monthlyCap) > 0
+          ? 'monthly'
+          : (suggestion?.shape ?? 'total'))
   );
 
   /** Switching shape clears the other number — a program has one ceiling, not two. */
@@ -64,6 +76,57 @@
     if (shape === 'total') terms.monthlyCap = null;
     else terms.totalCap = null;
   }
+
+  /**
+   * Has the member taken the budget into their own hands? Until they do, the
+   * ceiling keeps following the mission and the rate — change the rate and the
+   * budget changes with it, which is the whole reason it is derived. The moment
+   * they type a number of their own it stops moving under them.
+   */
+  let budgetTouched = $state(false);
+
+  $effect(() => {
+    const s = suggestion;
+    // Only where the budget is actually on screen: filling a number a member
+    // cannot see would be a term nobody agreed to.
+    if (!s || !showBudget || budgetTouched) return;
+    const shape = shapeOverride ?? s.shape;
+    if (shape === 'total') {
+      // An open-ended mission has no total to derive; leave it to be typed.
+      if (s.totalCap != null) {
+        terms.totalCap = s.totalCap;
+        terms.monthlyCap = null;
+      }
+    } else if (s.monthlyCap != null) {
+      terms.monthlyCap = s.monthlyCap;
+      terms.totalCap = null;
+    }
+  });
+
+  /** Back to the number the mission implies. */
+  function recomputeBudget() {
+    budgetTouched = false;
+    shapeOverride = null;
+  }
+
+  // How the number on screen was arrived at. Said in words, because a member
+  // who does not recognise where a figure came from cannot judge it.
+  // …and only about the ceiling actually on screen: explaining how the total
+  // was derived under a monthly field the member switched to themselves would
+  // describe a number that is not there.
+  const budgetHint = $derived(
+    !suggestion || budgetShape !== suggestion.shape
+      ? null
+      : suggestion.months != null
+        ? $t('stipend.terms.budgetFromMonths', {
+            amount: suggestion.amount,
+            count: suggestion.months,
+            total: suggestion.totalCap
+          })
+        : suggestion.shape === 'monthly'
+          ? $t('stipend.terms.budgetFromMonthly', { amount: suggestion.amount })
+          : $t('stipend.terms.budgetFromMission', { amount: suggestion.amount })
+  );
 
   const scope = $derived(consensusScope(terms));
   const validation = $derived(validateStipendTerms({ terms, marketRate, policy }));
@@ -184,15 +247,44 @@
       {#if budgetShape === 'total'}
         <label class="flex flex-col gap-1">
           <span class={LABEL}>{$t('stipend.terms.totalCap')}</span>
-          <input type="number" min="0" step="100" bind:value={terms.totalCap} class={INPUT} />
+          <input
+            type="number"
+            min="0"
+            step="100"
+            bind:value={terms.totalCap}
+            oninput={() => (budgetTouched = true)}
+            class={INPUT}
+          />
           <span class={MUTED}>{$t('stipend.terms.totalCapExplain')}</span>
         </label>
       {:else}
         <label class="flex flex-col gap-1">
           <span class={LABEL}>{$t('stipend.terms.monthlyCap')}</span>
-          <input type="number" min="0" step="100" bind:value={terms.monthlyCap} class={INPUT} />
+          <input
+            type="number"
+            min="0"
+            step="100"
+            bind:value={terms.monthlyCap}
+            oninput={() => (budgetTouched = true)}
+            class={INPUT}
+          />
           <span class={MUTED}>{$t('stipend.terms.openEndedExplain')}</span>
         </label>
+      {/if}
+
+      <!-- The derivation, and the way back to it. The number above is only a
+           proposal: it came from the mission, and it can be argued with. -->
+      {#if budgetHint}
+        <p class={MUTED}>{budgetHint}</p>
+      {/if}
+      {#if budgetTouched && suggestion}
+        <button
+          type="button"
+          class="self-start text-xs underline text-gray-600 dark:text-gray-300 hover:text-goldink"
+          onclick={recomputeBudget}
+        >
+          {$t('stipend.terms.budgetRecompute')}
+        </button>
       {/if}
     </fieldset>
   {/if}

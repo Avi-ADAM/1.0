@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>1לב1</title>
+    <style>
+      :root {
+        --bg: #eee8aa;
+        --fg: #3b2f00;
+        --muted: #6b5d20;
+        --accent: #ff0092;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #1a1608;
+          --fg: #eee8aa;
+          --muted: #b8ad72;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        padding: calc(env(safe-area-inset-top) + 2rem) 1.5rem
+          calc(env(safe-area-inset-bottom) + 2rem);
+        background: var(--bg);
+        color: var(--fg);
+        font-family: system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+        text-align: center;
+      }
+      h1 {
+        margin: 0;
+        font-size: 1.25rem;
+      }
+      p {
+        margin: 0;
+        max-width: 32ch;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+      button {
+        margin-top: 0.5rem;
+        padding: 0.75rem 2rem;
+        border: 0;
+        border-radius: 9999px;
+        background: var(--accent);
+        color: #fff;
+        font: inherit;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>אין חיבור לאינטרנט</h1>
+    <p>לא הצלחנו לטעון את 1לב1. בדקו את החיבור ונסו שוב.</p>
+    <button type="button" onclick="location.replace('https://www.1lev1.com/?app=1')">
+      נסו שוב
+    </button>
+  </body>
+</html>

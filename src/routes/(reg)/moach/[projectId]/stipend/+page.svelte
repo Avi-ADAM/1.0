@@ -22,6 +22,27 @@
   import Lowding from '$lib/celim/lowding.svelte';
   import StipendButton from '$lib/components/stipend/StipendButton.svelte';
   import StipendFundingRequestDialog from '$lib/components/stipend/StipendFundingRequestDialog.svelte';
+  // Every block here states its own ground and its own ink. The moach shell
+  // paints a radial gradient that runs from slate-400 in the middle to almost
+  // black at the edges, so a card with no background of its own is readable in
+  // one half of the page and invisible in the other — which is exactly what a
+  // bare `text-slate-300` on this page looked like. The palette in
+  // $lib/components/stipend/ui.js exists for that reason; use it, don't
+  // hand-pick colours here.
+  import {
+    SURFACE,
+    WELL,
+    TITLE,
+    BODY,
+    MUTED,
+    FAINT,
+    LABEL,
+    ACCENT,
+    BTN_PRIMARY,
+    BTN_GHOST
+  } from '$lib/components/stipend/ui.js';
+
+  const BTN_SMALL = `${BTN_GHOST} px-3 py-1.5 text-xs font-bold flex items-center gap-1`;
 
   let projectId = $derived(page.params.projectId);
   let myId = $derived(String(page.data.uid ?? ''));
@@ -66,14 +87,15 @@
   {#if loading}
     <div class="flex justify-center p-12"><Lowding /></div>
   {:else if overview}
-    <header class="flex flex-wrap items-start justify-between gap-3">
+    <header class="{SURFACE} flex flex-wrap items-start justify-between gap-3 p-4">
       <div>
-        <h1 class="text-xl font-bold">{$t('stipend.tab.title')}</h1>
-        <p class="text-sm text-slate-300 max-w-prose">{$t('stipend.tab.intro')}</p>
-        <p class="mt-1 text-xs text-slate-300">
-          {$t('stipend.tab.policy')}: <b>{$t(`stipend.policy.${overview.policy}`)}</b>
+        <h1 class="text-xl {TITLE}">{$t('stipend.tab.title')}</h1>
+        <p class="text-sm {BODY} max-w-prose">{$t('stipend.tab.intro')}</p>
+        <p class="mt-1 {MUTED}">
+          {$t('stipend.tab.policy')}:
+          <b class={ACCENT}>{$t(`stipend.policy.${overview.policy}`)}</b>
           {#if overview.policyIsDefault}
-            <span class="text-slate-400">· {$t('stipend.tab.policyDefault')}</span>
+            <span class={FAINT}>· {$t('stipend.tab.policyDefault')}</span>
           {/if}
         </p>
       </div>
@@ -86,53 +108,53 @@
         {policy}
         defaultRate={overview.defaultRate}
         defaultCostShare={overview.defaultCostShare}
-        className="rounded-full border-2 border-gold px-4 py-2 text-sm font-bold text-gold hover:bg-slate-700 flex items-center gap-2"
+        className="{BTN_PRIMARY} px-4 py-2 text-sm flex items-center gap-2"
         onDone={load}
       />
     </header>
 
     {#if totals}
       <section class="totals">
-        <div class="stat">
-          <span class="stat-label">{$t('stipend.tab.paid')}</span>
-          <span class="stat-value">{money(totals.paid)}</span>
+        <div class="stat {SURFACE}">
+          <span class="stat-label {LABEL}">{$t('stipend.tab.paid')}</span>
+          <span class="stat-value {ACCENT}">{money(totals.paid)}</span>
         </div>
-        <div class="stat">
-          <span class="stat-label">{$t('stipend.tab.pending')}</span>
-          <span class="stat-value">{money(totals.pending)}</span>
+        <div class="stat {SURFACE}">
+          <span class="stat-label {LABEL}">{$t('stipend.tab.pending')}</span>
+          <span class="stat-value {ACCENT}">{money(totals.pending)}</span>
         </div>
-        <div class="stat">
-          <span class="stat-label">{$t('stipend.tab.budgetLeft')}</span>
-          <span class="stat-value">{money(totals.budgetLeft)}</span>
+        <div class="stat {SURFACE}">
+          <span class="stat-label {LABEL}">{$t('stipend.tab.budgetLeft')}</span>
+          <span class="stat-value {ACCENT}">{money(totals.budgetLeft)}</span>
         </div>
-        <div class="stat">
+        <div class="stat {SURFACE}">
           <!-- (k − α)·ΣP: what the stipends added to the rikma's total, i.e.
                how much everyone else was diluted, in shekels rather than in
                an abstract percentage. -->
-          <span class="stat-label">{$t('stipend.tab.netAdded')}</span>
-          <span class="stat-value">{money(totals.netAdded)}</span>
+          <span class="stat-label {LABEL}">{$t('stipend.tab.netAdded')}</span>
+          <span class="stat-value {ACCENT}">{money(totals.netAdded)}</span>
         </div>
       </section>
     {/if}
 
     <!-- Programmes -->
-    <section class="block">
-      <h2 class="block-title">{$t('stipend.tab.programs')}</h2>
+    <section class="block {SURFACE} p-4">
+      <h2 class="block-title {TITLE}">{$t('stipend.tab.programs')}</h2>
       {#if programs.length === 0}
-        <p class="empty">{$t('stipend.tab.noPrograms')}</p>
+        <p class="empty {FAINT}">{$t('stipend.tab.noPrograms')}</p>
       {:else}
         <ul class="list">
           {#each programs as p (p.id)}
-            <li class="row">
+            <li class="row {WELL}">
               <div class="grow">
-                <p class="font-bold">{p.name}</p>
-                <p class="text-xs text-slate-300">
+                <p class={TITLE}>{p.name}</p>
+                <p class={MUTED}>
                   ₪{p.stipendRate}/{$t('stipend.card.hour')} ·
                   {$t('stipend.terms.costShare')} {Math.round(Number(p.costShare) * 100)}% ·
                   {$t(`stipend.mode.${p.mode}`)} ·
                   {$t(`stipend.status.${p.status}`)}
                 </p>
-                <p class="text-xs text-slate-300">
+                <p class={MUTED}>
                   {$t('stipend.tab.spentOf', {
                     spent: money(p.spent),
                     cap: money(p.totalCap ?? 0)
@@ -144,7 +166,7 @@
                   <!-- §12.2 — no funder inside the rikma: go and find one. -->
                   <button
                     type="button"
-                    class="rounded-full border border-gold px-3 py-1.5 text-xs font-bold text-gold"
+                    class={BTN_SMALL}
                     onclick={() => (fundingFor = p)}
                   >
                     🔎 {$t('stipend.tab.findFunder')}
@@ -163,7 +185,7 @@
                     defaultRate={p.stipendRate}
                     defaultCostShare={p.costShare}
                     label={$t('stipend.tab.pledgeInside')}
-                    className="rounded-full border border-slate-400 px-3 py-1.5 text-xs font-bold text-slate-200 flex items-center gap-1"
+                    className={BTN_SMALL}
                     onDone={load}
                   />
                 {/if}
@@ -175,22 +197,22 @@
     </section>
 
     <!-- Pledges -->
-    <section class="block">
-      <h2 class="block-title">{$t('stipend.tab.pledges')}</h2>
+    <section class="block {SURFACE} p-4">
+      <h2 class="block-title {TITLE}">{$t('stipend.tab.pledges')}</h2>
       {#if pledges.length === 0}
-        <p class="empty">{$t('stipend.tab.noPledges')}</p>
+        <p class="empty {FAINT}">{$t('stipend.tab.noPledges')}</p>
       {:else}
         <ul class="list">
           {#each pledges as pl (pl.id)}
-            <li class="row">
+            <li class="row {WELL}">
               <div class="grow">
-                <p class="font-bold">{pl.funderName} → {pl.recipientName}</p>
-                <p class="text-xs text-slate-300">
+                <p class={TITLE}>{pl.funderName} → {pl.recipientName}</p>
+                <p class={MUTED}>
                   ₪{pl.terms.stipendRate}/{$t('stipend.card.hour')} ·
                   {$t(`stipend.mode.${pl.terms.mode}`)} ·
                   {$t(`stipend.status.${pl.status}`)}
                 </p>
-                <p class="text-xs text-slate-300">
+                <p class={MUTED}>
                   {$t('stipend.tab.paidSoFar', { count: money(pl.paidTotal) })}
                   {#if pl.terms.totalCap}
                     · {$t('stipend.terms.totalCap')}: {money(pl.terms.totalCap)}
@@ -205,37 +227,37 @@
 
     <!-- Per-member ledger: who gained and who gave up equity through stipends -->
     {#if overview.perMember?.length}
-      <section class="block">
-        <h2 class="block-title">{$t('stipend.tab.perMember')}</h2>
+      <section class="block {SURFACE} p-4">
+        <h2 class="block-title {TITLE}">{$t('stipend.tab.perMember')}</h2>
         <ul class="list">
           {#each overview.perMember as m (m.userId)}
-            <li class="row">
+            <li class="row {WELL}">
               <div class="grow">
-                <p class="font-bold">{m.username}</p>
-                <p class="text-xs text-slate-300">
+                <p class={TITLE}>{m.username}</p>
+                <p class={MUTED}>
                   {#if m.funded > 0}{$t('stipend.tab.funded', { count: money(m.funded) })}{/if}
                   {#if m.received > 0}
                     · {$t('stipend.tab.received', { count: money(m.received) })}
                   {/if}
                 </p>
               </div>
-              <span class="whitespace-nowrap font-bold {m.net >= 0 ? 'text-emerald-300' : 'text-rose-300'}">
+              <span class="whitespace-nowrap font-bold {m.net >= 0 ? 'text-emerald-700 dark:text-emerald-300' : 'text-rose-700 dark:text-rose-300'}">
                 {m.net >= 0 ? '+' : ''}{money(m.net)}
               </span>
             </li>
           {/each}
         </ul>
-        <p class="mt-2 text-xs text-slate-300">{$t('stipend.tab.perMemberNote')}</p>
+        <p class="mt-2 {FAINT}">{$t('stipend.tab.perMemberNote')}</p>
       </section>
     {/if}
 
     <!-- Member-to-member offer: the "another user in the rikma" entry point -->
-    <section class="block">
-      <h2 class="block-title">{$t('stipend.tab.members')}</h2>
+    <section class="block {SURFACE} p-4">
+      <h2 class="block-title {TITLE}">{$t('stipend.tab.members')}</h2>
       <ul class="list">
         {#each members as m (m.id)}
-          <li class="row">
-            <span class="grow font-medium">{m.username}</span>
+          <li class="row {WELL}">
+            <span class="grow font-medium {BODY}">{m.username}</span>
             {#if String(m.id) !== myId}
               <StipendButton
                 intent="offer"
@@ -249,7 +271,7 @@
                 defaultRate={overview.defaultRate}
                 defaultCostShare={overview.defaultCostShare}
                 label={$t('stipend.tab.offerTo', { name: m.username })}
-                className="rounded-full border border-slate-400 px-3 py-1.5 text-xs font-bold text-slate-200 flex items-center gap-1"
+                className={BTN_SMALL}
                 onDone={load}
               />
             {:else}
@@ -263,7 +285,7 @@
                 {policy}
                 defaultRate={overview.defaultRate}
                 defaultCostShare={overview.defaultCostShare}
-                className="rounded-full border border-slate-400 px-3 py-1.5 text-xs font-bold text-slate-200 flex items-center gap-1"
+                className={BTN_SMALL}
                 onDone={load}
               />
             {/if}
@@ -292,18 +314,16 @@
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 0.75rem;
   }
+  /* Ground, edge and radius come from SURFACE; only the layout is here. */
   .stat {
     display: flex;
     flex-direction: column;
     gap: 0.15rem;
-    border: 1px solid var(--gold, #d4af37);
-    border-radius: 0.75rem;
     padding: 0.75rem 1rem;
   }
   .stat-label {
     font-size: 0.7rem;
     text-transform: uppercase;
-    opacity: 0.7;
   }
   .stat-value {
     font-size: 1.15rem;
@@ -319,12 +339,11 @@
     flex-direction: column;
     gap: 0.5rem;
   }
+  /* Ground, edge and radius come from WELL; only the layout is here. */
   .row {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    border: 1px solid rgba(128, 128, 128, 0.3);
-    border-radius: 0.75rem;
     padding: 0.75rem 1rem;
   }
   .grow {
@@ -333,6 +352,5 @@
   }
   .empty {
     font-size: 0.85rem;
-    opacity: 0.7;
   }
 </style>

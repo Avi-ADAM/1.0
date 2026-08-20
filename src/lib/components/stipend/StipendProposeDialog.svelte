@@ -25,6 +25,7 @@
     computeRecipientTradeoff,
     effectiveStipendPolicy
   } from '$lib/stipend/computeStipendEquity.js';
+  import { suggestStipendBudget } from '$lib/stipend/suggestBudget.js';
   import { LABEL, MUTED, FAINT, INPUT, WELL, BTN_PRIMARY, BTN_GHOST } from './ui.js';
 
   /**
@@ -203,6 +204,24 @@
   const effectiveMarketRate = $derived(marketRate ?? chosenMissionRow?.perhour ?? null);
 
   /**
+   * The budget, computed rather than asked for. The mission already says how
+   * many hours it is (per month, when it is recurring), and the stipend rate is
+   * on the form — so `rate × hours` is the ceiling, and a recurring mission
+   * that names an end date turns that into a closed total.
+   */
+  const budgetSuggestion = $derived(
+    chosenMissionRow
+      ? suggestStipendBudget({
+          stipendRate: Number(terms.stipendRate),
+          hours: chosenMissionRow.hours,
+          recurring: chosenMissionRow.recurring === true,
+          start: chosenMissionRow.start ?? null,
+          end: chosenMissionRow.end ?? null
+        })
+      : null
+  );
+
+  /**
    * The recipient is derived from the work, never picked on its own: a stipend
    * pays the person doing the mission. This runs after the mission changes and
    * is the only writer of `chosenRecipient` once a mission is chosen.
@@ -316,6 +335,11 @@
           missionIds: chosenMissionRow && !missionIsOpen ? [String(chosenMissionRow.id)] : undefined,
           openMissionId: chosenMissionRow && missionIsOpen ? String(chosenMissionRow.id) : undefined,
           marketRate: effectiveMarketRate ?? undefined,
+          // The window the budget was counted over, when the mission had one —
+          // recorded so the programme says on its own row why the total is
+          // that number and not another.
+          start: chosenMissionRow?.start || undefined,
+          end: budgetSuggestion?.months != null ? chosenMissionRow?.end || undefined : undefined,
           why: why || undefined
         });
         if (res?.success === false) throw new Error(actionError(res));
@@ -486,6 +510,7 @@
           policy={activePolicy}
           showBudget={isProgram}
           allowRikmaScope={isProgram}
+          suggestion={budgetSuggestion}
         />
 
         {#if needsProgram}

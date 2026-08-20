@@ -52,7 +52,11 @@
     hoursToCredit = archive.standing?.hoursToCredit ?? archive.accruedHours ?? 0;
   });
 
-  const previous = $derived(archive?.standing ?? {});
+  // The baseline each field opens on: the standing round where it has an
+  // opinion, the object's own values where it does not. Reading it off the
+  // standing round alone left every hint empty on an archive proposal — those
+  // rounds carry settlement terms, not object values.
+  const previous = $derived(archive ? counterDefaults(archive) : {});
 
   /** "was: X" hint — only when the standing version actually had a value. */
   function was(field) {

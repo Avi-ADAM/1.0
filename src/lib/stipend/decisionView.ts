@@ -8,6 +8,10 @@
  */
 
 import { computeStipendDilution, normalizeTerms } from './computeStipendEquity.js';
+// Mission descriptions are rich text. The card prints them as text, so the tags
+// have to come off here — rendering them raw would put markup in front of a
+// voter, and rendering them as HTML would put someone else's markup in the card.
+import { htmlToPlainText } from '$lib/acts/publishAsMission.js';
 import type { StipendTerms } from './types.js';
 
 export type StipendDecisionKind = 'stipendProgram' | 'stipendPledge';
@@ -144,7 +148,7 @@ function missionsOf(raw: any): StipendMissionView[] {
         kind: 'inProgress',
         id: String(m.id),
         name: at.name ?? '',
-        descrip: at.descrip ?? null,
+        descrip: htmlToPlainText(at.descrip) || null,
         hours,
         hoursDone: num(at.howmanyhoursalready),
         perhour,
@@ -164,7 +168,7 @@ function missionsOf(raw: any): StipendMissionView[] {
         kind: 'open',
         id: String(m.id),
         name: at.name ?? '',
-        descrip: at.descrip ?? null,
+        descrip: htmlToPlainText(at.descrip) || null,
         hours,
         hoursDone: null,
         perhour,

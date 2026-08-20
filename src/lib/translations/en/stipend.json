@@ -47,7 +47,11 @@
     "budgetShape": "Shape of the budget",
     "budgetShape_total": "A closed total",
     "budgetShape_monthly": "Monthly, until stopped",
-    "openEndedExplain": "No end date and no total: the programme renews every month until someone stops it. The monthly ceiling is what the rikma approves."
+    "openEndedExplain": "No end date and no total: the programme renews every month until someone stops it. The monthly ceiling is what the rikma approves.",
+    "budgetFromMission": "Computed from the mission: the stipend rate × its hours = {{amount}}. You can change it.",
+    "budgetFromMonthly": "Computed from the mission: {{amount}} a month — the stipend rate × its monthly hours. The mission has no end date, so there is no total: it runs until someone stops it.",
+    "budgetFromMonths": "Computed from the mission: {{amount}} a month × {{count}} months = {{total}}.",
+    "budgetRecompute": "Recompute from the mission"
   },
   "error": {
     "rateRequired": "A stipend needs an hourly rate",
@@ -136,7 +140,8 @@
     "confirmFunderTitle": "One moment before you approve",
     "confirmFunderBody": "Approving here commits you to pay {{name}} {{count}} for every approved hour, until it is stopped or the budget runs out.",
     "noRecipientYet": "Not named yet — a general budget",
-    "missionOpen": "The mission is still open — whoever takes it signs the stipend"
+    "missionOpen": "The mission is still open — whoever takes it signs the stipend",
+    "noTakerYet": "Waiting for whoever takes the mission"
   },
   "counter": {
     "title": "Propose different terms",

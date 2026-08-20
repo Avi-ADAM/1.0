@@ -39,6 +39,41 @@ export interface ArchVersion {
   sqadualedf: string | null;
 }
 
+/** The fields a round can move, in the order the card lists them. */
+export const TERM_FIELDS = [
+  'name',
+  'hm',
+  'price',
+  'sqadualed',
+  'sqadualedf',
+  'kindOf',
+  'descrip',
+] as const;
+
+export type ArchTermField = (typeof TERM_FIELDS)[number];
+
+const NUMERIC_FIELDS: readonly ArchTermField[] = ['hm', 'price'];
+const DATE_FIELDS: readonly ArchTermField[] = ['sqadualed', 'sqadualedf'];
+
+/**
+ * One line of the card's terms table: what the object is today, and what the
+ * standing round proposes it becomes. The vote is about the difference, so
+ * `from` is never optional — a card that shows only `to` asks people to sign a
+ * number they cannot place.
+ */
+export interface ArchTermRow {
+  field: ArchTermField;
+  /** The object's own live value. */
+  from: string | number | null;
+  /** The standing round's value — null when the round leaves this field alone. */
+  to: string | number | null;
+  changed: boolean;
+  /** Signed difference, numeric fields only and only when both sides exist. */
+  delta: number | null;
+  isNumeric: boolean;
+  isDate: boolean;
+}
+
 export interface ArchRoundView extends ArchVersion {
   ordern: number;
   mode: ArchMode;
@@ -72,6 +107,11 @@ export interface ArchiveDecisionView {
   /** Accrued value, which is what makes the settlement block appear. */
   accruedHours: number;
   perhour: number | null;
+  /**
+   * The object's values as they stand right now, normalised across the five
+   * collections. This is what the standing round is compared against.
+   */
+  current: ArchVersion;
   standingOrder: number;
   standing: ArchRoundView;
   /** Round 1 — shown next to the standing version as the reference. */
@@ -168,6 +208,7 @@ export function buildArchiveDecisionView(
     ownerPic: owner?.attributes?.profilePic?.data?.attributes?.url ?? null,
     accruedHours: num(ta.howmanyhoursalready) ?? 0,
     perhour: num(ta.perhour ?? ta.pricePerUnit ?? ta.price),
+    current: currentOf(targetKind, ta),
     standingOrder,
     standing,
     original,
@@ -187,13 +228,141 @@ export function buildArchiveDecisionView(
  */
 export function counterDefaults(view: ArchiveDecisionView, target: Partial<ArchVersion> = {}): ArchVersion {
   const s = view.standing;
+  const c = view.current ?? ({} as ArchVersion);
   return {
-    name: s.name ?? target.name ?? view.targetName ?? null,
-    descrip: s.descrip ?? target.descrip ?? null,
-    hm: s.hm ?? target.hm ?? null,
-    price: s.price ?? target.price ?? view.perhour ?? null,
-    kindOf: s.kindOf ?? target.kindOf ?? null,
-    sqadualed: s.sqadualed ?? target.sqadualed ?? null,
-    sqadualedf: s.sqadualedf ?? target.sqadualedf ?? null,
+    name: s.name ?? target.name ?? c.name ?? view.targetName ?? null,
+    descrip: s.descrip ?? target.descrip ?? c.descrip ?? null,
+    hm: s.hm ?? target.hm ?? c.hm ?? null,
+    price: s.price ?? target.price ?? c.price ?? view.perhour ?? null,
+    kindOf: s.kindOf ?? target.kindOf ?? c.kindOf ?? null,
+    sqadualed: s.sqadualed ?? target.sqadualed ?? c.sqadualed ?? null,
+    sqadualedf: s.sqadualedf ?? target.sqadualedf ?? c.sqadualedf ?? null,
   };
+}
+
+/**
+ * The object's live values, normalised. Each collection spells the same three
+ * ideas differently (`noofhours` / `hoursassinged` / `hm` / `quantityAssigned`
+ * / `quant`), and this is the read-side mirror of `editFragment` in
+ * `src/lib/server/archive/apply.ts` — the two must be changed together, or the
+ * card would compare the proposal against a field the apply step never writes.
+ */
+function currentOf(kind: ArchTargetKind, ta: any): ArchVersion {
+  const name = ta?.name ?? null;
+  const descrip = typeof ta?.descrip === 'string' ? ta.descrip : null;
+  switch (kind) {
+    case 'openMission':
+      return {
+        name,
+        descrip,
+        hm: num(ta?.noofhours),
+        price: num(ta?.perhour),
+        kindOf: null,
+        sqadualed: ta?.sqadualed ?? null,
+        sqadualedf: ta?.dates ?? null,
+      };
+    case 'missionInProgress':
+      return {
+        name,
+        descrip,
+        hm: num(ta?.hoursassinged),
+        price: num(ta?.perhour),
+        kindOf: null,
+        sqadualed: ta?.start ?? null,
+        sqadualedf: ta?.dates ?? null,
+      };
+    case 'openResource':
+      return {
+        name,
+        descrip,
+        hm: num(ta?.hm),
+        price: num(ta?.price),
+        kindOf: ta?.kindOf ?? null,
+        sqadualed: ta?.sqadualed ?? null,
+        sqadualedf: ta?.sqadualedf ?? null,
+      };
+    case 'resourceInProgress':
+      return {
+        name,
+        descrip,
+        hm: num(ta?.quantityAssigned),
+        price: num(ta?.pricePerUnit),
+        kindOf: ta?.kindOf ?? null,
+        sqadualed: ta?.start ?? null,
+        sqadualedf: ta?.end ?? null,
+      };
+    case 'matanot':
+      // `desc` is a JSON field on matanot; only a plain string is comparable.
+      return {
+        name,
+        descrip: typeof ta?.desc === 'string' ? ta.desc : null,
+        hm: num(ta?.quant),
+        price: num(ta?.price),
+        kindOf: ta?.kindOf ?? null,
+        sqadualed: ta?.startDate ?? null,
+        sqadualedf: ta?.finnishDate ?? null,
+      };
+  }
+}
+
+/** Same calendar day, whatever precision either side was stored with. */
+function sameDay(a: unknown, b: unknown): boolean {
+  const da = new Date(String(a));
+  const db = new Date(String(b));
+  if (Number.isNaN(da.getTime()) || Number.isNaN(db.getTime())) return String(a) === String(b);
+  return da.toISOString().slice(0, 10) === db.toISOString().slice(0, 10);
+}
+
+/**
+ * The terms table the card votes on: every field that either side has a value
+ * for, current beside proposed. A round leaves most fields null — that is not
+ * "clear it", it is "no opinion" — so an untouched field shows its current
+ * value alone rather than a change to nothing.
+ */
+export function buildTermRows(view: ArchiveDecisionView | null | undefined): ArchTermRow[] {
+  if (!view) return [];
+  const current = view.current ?? ({} as ArchVersion);
+  const standing = view.standing ?? ({} as ArchRoundView);
+  // An 'archive' round carries settlement terms, not object values; anything
+  // sitting in its value fields is leftover, and comparing against it would
+  // invent changes nobody proposed.
+  const proposes = standing.mode === 'keep';
+
+  const rows: ArchTermRow[] = [];
+  for (const field of TERM_FIELDS) {
+    const isNumeric = NUMERIC_FIELDS.includes(field);
+    const isDate = DATE_FIELDS.includes(field);
+    const from = current?.[field] ?? null;
+    const raw = proposes ? standing?.[field] ?? null : null;
+    const to = raw === '' ? null : raw;
+    if (from == null && to == null) continue;
+
+    const changed =
+      to != null &&
+      from != null &&
+      (isNumeric
+        ? Number(from) !== Number(to)
+        : isDate
+          ? !sameDay(from, to)
+          : String(from) !== String(to));
+    // A field the object never had, that the round now sets, is also a change.
+    const added = to != null && from == null;
+
+    rows.push({
+      field,
+      from,
+      to,
+      changed: changed || added,
+      delta:
+        isNumeric && to != null && from != null ? Number(to) - Number(from) : null,
+      isNumeric,
+      isDate,
+    });
+  }
+  return rows;
+}
+
+/** Only the lines that actually move — what the vote is really about. */
+export function standingChanges(view: ArchiveDecisionView | null | undefined): ArchTermRow[] {
+  return buildTermRows(view).filter((r) => r.changed);
 }

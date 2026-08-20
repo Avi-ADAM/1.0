@@ -63,14 +63,14 @@ const ARCH_DECISION_FIELDS = `
                     }
                     archMashabetahalich {
                       data { id attributes {
-                        name descrip quantityAssigned pricePerUnit recurring end
+                        name descrip quantityAssigned pricePerUnit kindOf recurring start end
                         users_permissions_user { data { id attributes {
                           username profilePic { data { attributes { url formats } } }
                         } } }
                       } }
                     }
                     archMatanot {
-                      data { id attributes { name desc price quant kindOf } }
+                      data { id attributes { name desc price quant kindOf startDate finnishDate } }
                     }`;
 
 /**

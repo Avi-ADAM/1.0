@@ -62,6 +62,42 @@
   let approving = $state(false);
   let counterOpen = $state(false);
 
+  // The discussion hangs off the Decision itself (`Decision.forums`), created
+  // on first use by `ensureVoteForum` — the same path the saleClaim and
+  // pendm/pmash cards take. Handing the page a bare `{ decisionId }` dropped it
+  // into its no-payload fallback, which is a chat that opens on nothing.
+  let forumId = $state(null);
+  let openingChat = $state(false);
+
+  async function openChat() {
+    if (openingChat) return;
+    openingChat = true;
+    try {
+      if (!forumId) {
+        const res = await executeAction('ensureVoteForum', {
+          entityType: 'decision',
+          entityId: String(stipend?.decisionId),
+          projectId: String(projectId)
+        });
+        if (res?.success) forumId = res.data?.forumId ?? null;
+      }
+      if (forumId) {
+        onChat?.({
+          forumId: String(forumId),
+          decisionId: stipend?.decisionId,
+          projectId
+        });
+      } else {
+        toast.error($t('stipend.toast.error'));
+      }
+    } catch (e) {
+      console.error('[StipendDecisionCard] opening the chat failed:', e);
+      toast.error($t('stipend.toast.error'));
+    } finally {
+      openingChat = false;
+    }
+  }
+
   const mine = $derived(stipend?.myTurn !== false);
   const standing = $derived(stipend?.standing ?? {});
   const isProgram = $derived(stipend?.kind === 'stipendProgram');
@@ -82,10 +118,18 @@
   const funderLabel = $derived(
     stipend?.funderName || (stipend?.seekingFunder ? $t('stipend.card.noFunderYet') : '—')
   );
-  // A programme *should* name the person it is for; when it does not, say that
-  // plainly rather than implying anyone may claim it.
+  // A stipend *should* name the person it is for; when it does not, say why.
+  // There are two different reasons, and they mean different things: the work
+  // is still open and waiting for a taker, or the rikma is approving a budget
+  // before there is anyone to spend it on.
+  const awaitingTaker = $derived((stipend?.missions ?? []).some((m) => m.kind === 'open'));
   const recipientLabel = $derived(
-    stipend?.recipientName || (isProgram ? $t('stipend.card.noRecipientYet') : '—')
+    stipend?.recipientName ||
+      (awaitingTaker
+        ? $t('stipend.card.noTakerYet')
+        : isProgram
+          ? $t('stipend.card.noRecipientYet')
+          : '—')
   );
 
   /** No closed budget: it renews every month until somebody stops it. */
@@ -457,8 +501,9 @@
   >
     <button
       type="button"
-      onclick={() => (confirmingFunder ? (confirmingFunder = false) : onChat?.({ decisionId: stipend?.decisionId, projectId }))}
-      class="flex-1 rounded-xl border border-gray-300 dark:border-slate-600 py-3 text-sm"
+      onclick={() => (confirmingFunder ? (confirmingFunder = false) : openChat())}
+      disabled={openingChat}
+      class="flex-1 rounded-xl border border-gray-300 dark:border-slate-600 py-3 text-sm disabled:opacity-60"
     >
       {confirmingFunder ? $t('stipend.actions.cancel') : $t('stipend.actions.chat')}
     </button>

@@ -1,0 +1,11 @@
+{
+  "_comment": "Copy to tauri.dev-local.json (gitignored) and set your LAN IP, then: npx vite dev --host 0.0.0.0 and npx tauri android build --debug --apk --config ./src-tauri/tauri.dev-local.json. Overrides the url ONLY — never the identifier (Tauri binds gen/android to one identifier).",
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "url": "http://192.168.1.x:5173/?app=1"
+      }
+    ]
+  }
+}

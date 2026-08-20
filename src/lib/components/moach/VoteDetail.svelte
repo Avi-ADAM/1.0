@@ -34,6 +34,7 @@
     decisionsStore,
     projectsStore
   } from '$lib/stores/levStores';
+  import { isChatOpen, nowChatId } from '$lib/stores/pendMisMes.js';
   import {
     processedPends,
     processedPmashes,
@@ -238,6 +239,19 @@
     if (id) goto(`/user/${id}`);
   };
   const noop = () => {};
+
+  /**
+   * Chat on this site lives in the global footer overlay, the same one the lev
+   * card opens — so a card that already resolved its forum (archive/edit and
+   * stipend Decisions do) only needs the id handed to the store. Without this
+   * their chat button was wired to `noop` and did nothing here.
+   */
+  const chat = (payload) => {
+    const forumId = payload?.forumId;
+    if (!forumId) return;
+    nowChatId.set(forumId);
+    isChatOpen.set(true);
+  };
 </script>
 
 <div class="vote-detail mx-auto max-w-xl px-3 py-4" dir={$isRtl ? 'rtl' : 'ltr'}>
@@ -481,7 +495,7 @@
         isFirst={true}
         onProj={proj}
         onUser={user}
-        onChat={noop}
+        onChat={chat}
         onDone={onCoinLapach}
       />
     </div>
@@ -501,7 +515,7 @@
         isFirst={true}
         onProj={proj}
         onUser={user}
-        onChat={noop}
+        onChat={chat}
         onDone={onCoinLapach}
       />
     </div>

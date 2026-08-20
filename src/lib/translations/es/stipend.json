@@ -47,7 +47,11 @@
     "budgetShape": "Forma del presupuesto",
     "budgetShape_total": "Un total cerrado",
     "budgetShape_monthly": "Mensual, hasta detenerlo",
-    "openEndedExplain": "Sin fecha de fin ni total: el programa se renueva cada mes hasta que alguien lo detenga. La rikma aprueba el techo mensual."
+    "openEndedExplain": "Sin fecha de fin ni total: el programa se renueva cada mes hasta que alguien lo detenga. La rikma aprueba el techo mensual.",
+    "budgetFromMission": "Calculado a partir de la misión: la tarifa del estipendio × sus horas = {{amount}}. Puedes cambiarlo.",
+    "budgetFromMonthly": "Calculado a partir de la misión: {{amount}} al mes — la tarifa del estipendio × sus horas mensuales. La misión no tiene fecha de fin, así que no hay total: sigue hasta que alguien la detenga.",
+    "budgetFromMonths": "Calculado a partir de la misión: {{amount}} al mes × {{count}} meses = {{total}}.",
+    "budgetRecompute": "Recalcular desde la misión"
   },
   "error": {
     "rateRequired": "Una beca necesita una tarifa por hora",
@@ -136,7 +140,8 @@
     "confirmFunderTitle": "Un momento antes de aprobar",
     "confirmFunderBody": "Aprobar aquí te compromete a pagar a {{name}} {{count}} por cada hora aprobada, hasta que se detenga o se agote el presupuesto.",
     "noRecipientYet": "Aún sin nombrar — presupuesto general",
-    "missionOpen": "La misión sigue abierta — quien la tome firmará la beca"
+    "missionOpen": "La misión sigue abierta — quien la tome firmará la beca",
+    "noTakerYet": "Esperando a quien tome la misión"
   },
   "counter": {
     "title": "Proponer otras condiciones",
