@@ -757,5 +757,49 @@
     "requestedRole": "Requested role",
     "iWant": "Yes, I want",
     "notForMe": "Not for me"
+  },
+  "list": {
+    "count": "{{count}} items",
+    "back": "Back to the list",
+    "toList": "Compact view",
+    "toCards": "Cards view",
+    "toCoins": "Coins view",
+    "time": {
+      "over": "Time is up",
+      "d": "{{count}} days left",
+      "h": "{{count}} hours left",
+      "m": "{{count}} minutes left",
+      "s": "{{count}} seconds left",
+      "dOne": "1 day left",
+      "hOne": "1 hour left",
+      "mOne": "1 minute left",
+      "sOne": "1 second left"
+    },
+    "kind": {
+      "haluk": "Split proposal",
+      "sheirutp": "Product request",
+      "sale": "Sale",
+      "buy": "Purchase",
+      "vidu": "Transfer",
+      "mtaha": "Mission in progress",
+      "pmashes": "Resource approval",
+      "pends": "Mission vote",
+      "wegets": "Resource investment",
+      "fiapp": "Completion approval",
+      "walcomen": "Welcome",
+      "askedcoin": "Join request",
+      "askedm": "Mission request",
+      "meData": "Mission suggestion",
+      "huca": "Resource suggestion",
+      "archObject": "Item removal",
+      "stipend": "Subsistence stipend",
+      "hachla": "Decision",
+      "wishoffer": "Volunteer offer",
+      "sitesharepay": "Site-share payment",
+      "stipendpay": "Stipend payment",
+      "stipendconfirm": "Stipend received",
+      "sitesharedecide": "Site-share decision",
+      "other": "Item"
+    }
   }
 }

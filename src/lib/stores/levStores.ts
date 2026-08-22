@@ -600,6 +600,45 @@ export const stipendConfirmationsStore: Writable<StipendConfirmationData[]> = wr
 /** Current view mode: true = cards, false = coins */
 export const isCardsView: Writable<boolean> = writable(true);
 
+/**
+ * How the heart is laid out.
+ *
+ * `list` is the condensed overview: one cheap row per item, expanded into its
+ * full card on tap. `cards` is the swiper of full cards, `coins` the radial
+ * canvas. The pair `isCardsView` above only ever knew about the last two, so it
+ * is kept in sync from here for the pages that still read it.
+ */
+export type LevView = 'list' | 'cards' | 'coins';
+
+const LEV_VIEW_KEY = 'lev:view';
+
+/**
+ * Default to the overview on phones, where mounting every card at once is what
+ * makes the heart slow, and to the swiper on desktop where it never was.
+ */
+function initialLevView(): LevView {
+  if (typeof window === 'undefined') return 'cards';
+  try {
+    const saved = window.localStorage.getItem(LEV_VIEW_KEY);
+    if (saved === 'list' || saved === 'cards' || saved === 'coins') return saved;
+  } catch {
+    /* private mode / disabled storage — fall through to the device default */
+  }
+  return window.matchMedia?.('(max-width: 768px)')?.matches ? 'list' : 'cards';
+}
+
+export const levView: Writable<LevView> = writable(initialLevView());
+
+levView.subscribe((v) => {
+  if (typeof window === 'undefined') return;
+  isCardsView.set(v !== 'coins');
+  try {
+    window.localStorage.setItem(LEV_VIEW_KEY, v);
+  } catch {
+    /* ignore */
+  }
+});
+
 /** Filter configuration for what to display */
 export const milon: Writable<MilonConfig> = writable({
   hachla: true,   // החלטות

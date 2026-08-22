@@ -6,7 +6,7 @@
   import Lev from '../../../celim/lev.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import RichText from '$lib/celim/ui/richText.svelte';
-  import { calculateTimeLeft } from '$lib/func/uti/timeLeft';
+  import { secondsLeft } from '$lib/stores/clock.svelte';
   import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
 
   // רכיבים מודרניים
@@ -104,38 +104,10 @@
     console.log('Nego Mashes:', timeGramaDate);
   });
 
-  let timeLeft = $state(0);
-  let timerInterval = null;
-
-  function initTimer(timegramaDate) {
-    if (timerInterval) clearInterval(timerInterval);
-    timeLeft = calculateTimeLeft(timegramaDate);
-    timerInterval = setInterval(() => {
-      const newTimeLeft = calculateTimeLeft(timegramaDate);
-      if (newTimeLeft <= 0) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-        timeLeft = 0;
-        console.log('Time expired - auto approval triggered');
-      } else {
-        timeLeft = newTimeLeft;
-      }
-    }, 1000);
-  }
-
-  function cleanup() {
-    if (timerInterval) {
-      clearInterval(timerInterval);
-      timerInterval = null;
-    }
-  }
-
-  $effect(() => {
-    if (timeGramaDate) {
-      initTimer(timeGramaDate);
-    }
-    return () => cleanup();
-  });
+  // Was a per-card setInterval(1000) restarted from an $effect; now it reads the
+  // one shared clock. `secondsLeft` clamps at zero exactly as the old
+  // `calculateTimeLeft` loop did once the timegrama passed.
+  let timeLeft = $derived(secondsLeft(timeGramaDate));
 
   const previousOffer =
     nego_mashes && nego_mashes.length > 0
