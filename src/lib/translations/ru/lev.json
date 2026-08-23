@@ -799,13 +799,81 @@
       "stipendpay": "Выплата стипендии",
       "stipendconfirm": "Подтверждение стипендии",
       "sitesharedecide": "Решение о доле площадки",
-      "other": "Элемент"
+      "other": "Элемент",
+      "saleIncome": "Доход платформы",
+      "editObject": "Изменение объекта",
+      "releaseObject": "Освобождение объекта",
+      "stipendProgram": "Программа стипендии",
+      "saleClaim": "Согласие держателя оплаты",
+      "newService": "Новая услуга",
+      "picVote": "Смена логотипа"
     },
     "fact": {
       "hours": "часов: {{value}}",
       "rate": "{{value}} в час",
       "amount": "стоимость {{value}}",
-      "qty": "кол-во {{value}}"
+      "qty": "кол-во {{value}}",
+      "hoursDone": "{{value}} ч выполнено",
+      "price": "Цена {{value}}",
+      "profit": "Прибыль {{value}}",
+      "shares": "{{value}} долей",
+      "members": "{{value}} партнёров",
+      "round": "Раунд {{value}}",
+      "basis": "из {{value}}",
+      "transfers": "{{value}} переводов"
+    },
+    "decision": {
+      "name": "Смена названия рикмы",
+      "pubdes": "Изменение публичного описания",
+      "prides": "Изменение внутреннего описания",
+      "newFlink": "Смена ссылки Facebook",
+      "newWlink": "Смена сайта рикмы",
+      "timtoM": "Изменение времени голосования",
+      "vallueadd": "Добавление ценностей",
+      "vallueles": "Удаление ценностей",
+      "pic": "Смена логотипа рикмы",
+      "sheirutpends": "Новый продукт или услуга",
+      "saleClaim": "Согласие держателя оплаты",
+      "saleClaimSub": "У кого находятся деньги",
+      "generic": "Решение ждёт вашей подписи"
+    },
+    "sub": {
+      "stipendFrom": "Финансирует {{name}}",
+      "stipendSeeking": "Ищет финансирование",
+      "suggestedForMe": "Подходящее предложение для вас",
+      "reportedBy": "Сообщил {{name}}",
+      "deliveredBy": "Предоставил {{name}}",
+      "welcome": "Вы присоединились к рикме",
+      "offeredOn": "Предложение по «{{name}}»",
+      "requestedBy": "Запросил {{name}}",
+      "siteShareIncome": "Доход от доли платформы",
+      "customer": "Клиент: {{name}}",
+      "seller": "Продавец: {{name}}",
+      "transfer": "Перевод ожидает подтверждения",
+      "transferSend": "Перевод, который вы отправляете",
+      "transferRecive": "Перевод, ожидаемый вами",
+      "siteSharePay": "Доля платформы, которую вы обещали",
+      "siteShareDecide": "Раздел утверждён — подтвердите свою долю",
+      "stipendCycle": "Цикл стипендии закрыт — к оплате",
+      "stipendSent": "Отмечено как отправленное — ждёт вашего подтверждения"
+    },
+    "title": {
+      "transfer": "{{from}} → {{to}}",
+      "sitesharepay": "Оплата доли платформы",
+      "sitesharedecide": "Подтверждение доли платформы",
+      "stipendpay": "Выплата стипендии",
+      "stipendconfirm": "Подтверждение получения стипендии"
+    },
+    "cta": {
+      "vote": "Голосовать",
+      "answer": "Ответить",
+      "pay": "Оплатить",
+      "confirm": "Подтвердить",
+      "view": "Открыть"
+    },
+    "act": {
+      "chat": "Открыть чат",
+      "project": "О рикме"
     }
   }
 }

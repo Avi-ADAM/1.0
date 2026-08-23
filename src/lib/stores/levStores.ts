@@ -499,6 +499,8 @@ export interface MilonConfig {
   askmap: boolean;   // בקשות משאבים ממני
   sheirutp: boolean; // בקשות שירות/מוצר
   sales: boolean;    // מכירות מאושרות
+  purchases: boolean;// קניות שלי
+  vidu: boolean;     // העברות כספים
 }
 
 // ========== Raw Data Stores ==========
@@ -655,7 +657,11 @@ export const milon: Writable<MilonConfig> = writable({
   askmap: true,   // בקשות משאבים ממני
   sheirutp: true, // בקשות שירות
   sales: true,    // מכירות מאושרות
-  purchases: true // קניות שלי
+  purchases: true,// קניות שלי
+  // Every `ani` LevCard can render needs its milon key here. The list view
+  // gates rows on this store and LevCard gates its branches on the same map, so
+  // a missing key is not "unfiltered" — it is a row that opens onto nothing.
+  vidu: true      // העברות כספים
 });
 
 /** Current project filter (null = all projects) */

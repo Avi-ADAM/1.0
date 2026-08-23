@@ -799,13 +799,81 @@
       "stipendpay": "Stipend payment",
       "stipendconfirm": "Stipend received",
       "sitesharedecide": "Site-share decision",
-      "other": "Item"
+      "other": "Item",
+      "saleIncome": "Platform income",
+      "editObject": "Object change",
+      "releaseObject": "Object release",
+      "stipendProgram": "Stipend program",
+      "saleClaim": "Sale holder consent",
+      "newService": "New service",
+      "picVote": "Logo change"
     },
     "fact": {
       "hours": "{{value}} hours",
       "rate": "{{value}} per hour",
       "amount": "value {{value}}",
-      "qty": "qty {{value}}"
+      "qty": "qty {{value}}",
+      "hoursDone": "{{value}} h done",
+      "price": "Price {{value}}",
+      "profit": "Profit {{value}}",
+      "shares": "{{value}} shares",
+      "members": "{{value}} partners",
+      "round": "Round {{value}}",
+      "basis": "of {{value}}",
+      "transfers": "{{value}} transfers"
+    },
+    "decision": {
+      "name": "Rikma name change",
+      "pubdes": "Public description change",
+      "prides": "Private description change",
+      "newFlink": "Facebook link change",
+      "newWlink": "Website change",
+      "timtoM": "Voting duration change",
+      "vallueadd": "Adding values",
+      "vallueles": "Removing values",
+      "pic": "Rikma logo change",
+      "sheirutpends": "New product or service",
+      "saleClaim": "Sale holder consent",
+      "saleClaimSub": "Who holds the money",
+      "generic": "A decision awaiting your signature"
+    },
+    "sub": {
+      "stipendFrom": "Funded by {{name}}",
+      "stipendSeeking": "Looking for a funder",
+      "suggestedForMe": "A match suggested for you",
+      "reportedBy": "Reported by {{name}}",
+      "deliveredBy": "Delivered by {{name}}",
+      "welcome": "You joined the rikma",
+      "offeredOn": "Offered on {{name}}",
+      "requestedBy": "Requested by {{name}}",
+      "siteShareIncome": "Income from the platform share",
+      "customer": "Customer: {{name}}",
+      "seller": "Seller: {{name}}",
+      "transfer": "A money transfer to confirm",
+      "transferSend": "A transfer you're sending",
+      "transferRecive": "A transfer coming to you",
+      "siteSharePay": "The platform share you committed to",
+      "siteShareDecide": "The split is approved — confirm your share",
+      "stipendCycle": "A stipend cycle closed — to pay",
+      "stipendSent": "Marked as sent — awaiting your confirmation"
+    },
+    "title": {
+      "transfer": "{{from}} → {{to}}",
+      "sitesharepay": "Platform share payment",
+      "sitesharedecide": "Platform share approval",
+      "stipendpay": "Stipend payment",
+      "stipendconfirm": "Stipend receipt confirmation"
+    },
+    "cta": {
+      "vote": "Vote",
+      "answer": "Respond",
+      "pay": "Pay",
+      "confirm": "Confirm",
+      "view": "View"
+    },
+    "act": {
+      "chat": "Open chat",
+      "project": "About the rikma"
     }
   }
 }

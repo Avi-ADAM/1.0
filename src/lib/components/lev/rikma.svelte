@@ -35,27 +35,49 @@ async function xyd () {
         let proj;
         try {
             const res = await sendToSer({ id: projectId }, "49GetProjectById", 0, 0, false, fetch);
+            // A GraphQL error comes back as `{ errors: [...] }` with no `data`,
+            // and a project the user cannot read comes back as `data: null`.
+            // Both used to blow up on the next line and land in {:catch} with
+            // nothing to go on, so name them.
+            if (!res?.data?.project?.data) {
+              throw new Error(
+                `49GetProjectById returned no project for id=${projectId}` +
+                  (res?.errors ? `: ${JSON.stringify(res.errors)}` : '')
+              );
+            }
             proj = res.data.project.data;
-            projectUsers = proj.attributes.user_1s.data;
-            projecto = proj.attributes.open_missions.data;
-                vallues = proj.attributes.vallues.data;
+            const a = proj.attributes ?? {};
+            projectUsers = a.user_1s?.data ?? [];
+            projecto = a.open_missions?.data ?? [];
+            vallues = a.vallues?.data ?? [];
             if ($lang == "he"){
               for (var i = 0; i < vallues.length; i++){
-                if (vallues[i].attributes.localizations.data.length > 0){
-                vallues[i].attributes.valueName = vallues[i].attributes.localizations.data[0].attributes.valueName
+                const loc = vallues[i]?.attributes?.localizations?.data ?? [];
+                if (loc.length > 0){
+                vallues[i].attributes.valueName = loc[0].attributes.valueName
                 }
               }
             }
             vallues = vallues
-       linkP = proj.attributes.linkToWebsite;
-        githublink = proj.attributes.githubLink;
-             fblink = proj.attributes.fblink;
-              discordlink = proj.attributes.discordLink;
-              twiterlink= proj.attributes.twiterLink;
-            srcP =`${proj.attributes.profilePic.data.attributes.formats.small.url}`
+       linkP = a.linkToWebsite;
+        // The schema spells these all-lowercase (see STRAPI_SCHEMA_REFERENCE);
+        // the camelCase reads here always resolved to undefined, so the icons
+        // never appeared even for a rikma that has the links.
+        githublink = a.githublink;
+             fblink = a.fblink;
+              discordlink = a.discordlink;
+              twiterlink= a.twiterlink;
+            // Strapi only generates a size when the upload is bigger than it, so
+            // a small logo has a `thumbnail` and nothing else. Reading `.small`
+            // unconditionally threw a TypeError, and the {:catch} then reported
+            // the whole rikma as unloadable over a missing image size.
+            const pic = a.profilePic?.data?.attributes;
+            const fmts = pic?.formats ?? {};
+            srcP = fmts.small?.url || fmts.medium?.url || fmts.thumbnail?.url || pic?.url || '';
 
         } catch (e) {
             error1 = e
+            console.error('[rikma] load failed for project', projectId, e)
             throw e
         }
         return proj

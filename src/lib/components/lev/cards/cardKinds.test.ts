@@ -9,6 +9,9 @@ import {
   kindLabelKey,
   kindAccent
 } from './cardKinds.js';
+import { MILON_KEY_BY_ANI } from './cardKinds.js';
+import { milon as milonStore } from '$lib/stores/levStores';
+import { get } from 'svelte/store';
 import { letters } from '$lib/utils/levDataProcessors.js';
 
 describe('isCardVisible', () => {
@@ -32,6 +35,18 @@ describe('isCardVisible', () => {
 
   it('treats a missing milon entry as visible rather than hiding the card', () => {
     expect(isCardVisible({ ani: 'pends' }, {})).toBe(true);
+  });
+
+  // The regression this guards: `isCardVisible` reads a missing key as visible
+  // while every LevCard branch is written `milon.x == true`, which reads it as
+  // hidden. `vidu` was missing from the store, so a transfer got a row in the
+  // list that expanded onto an empty sheet. Either the two gates agree or the
+  // list shows rows that open onto nothing.
+  it('has a default in the milon store for every gated kind', () => {
+    const defaults = get(milonStore);
+    for (const key of new Set(Object.values(MILON_KEY_BY_ANI))) {
+      expect(defaults[key], `milon store is missing "${key}"`).toBe(true);
+    }
   });
 });
 

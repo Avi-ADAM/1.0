@@ -799,13 +799,81 @@
       "stipendpay": "תשלום מלגה",
       "stipendconfirm": "אישור קבלת מלגה",
       "sitesharedecide": "החלטה על חלק האתר",
-      "other": "פריט"
+      "other": "פריט",
+      "saleIncome": "הכנסת פלטפורמה",
+      "editObject": "שינוי אובייקט",
+      "releaseObject": "שחרור אובייקט",
+      "stipendProgram": "תוכנית מלגה",
+      "saleClaim": "אישור מחזיק התמורה",
+      "newService": "מוצר חדש",
+      "picVote": "החלפת לוגו"
     },
     "fact": {
       "hours": "{{value}} שעות",
       "rate": "{{value}} לשעה",
       "amount": "שווי {{value}}",
-      "qty": "כמות {{value}}"
+      "qty": "כמות {{value}}",
+      "hoursDone": "{{value}} שעות בוצעו",
+      "price": "מחיר {{value}}",
+      "profit": "רווח {{value}}",
+      "shares": "{{value}} חלקים",
+      "members": "{{value}} שותפים",
+      "round": "סבב {{value}}",
+      "basis": "מתוך {{value}}",
+      "transfers": "{{value}} העברות"
+    },
+    "decision": {
+      "name": "שינוי שם הרקמה",
+      "pubdes": "שינוי תיאור ציבורי",
+      "prides": "שינוי תיאור פנימי",
+      "newFlink": "שינוי קישור פייסבוק",
+      "newWlink": "שינוי אתר הרקמה",
+      "timtoM": "שינוי זמן ההצבעה",
+      "vallueadd": "הוספת ערכים",
+      "vallueles": "הסרת ערכים",
+      "pic": "שינוי לוגו הרקמה",
+      "sheirutpends": "מוצר או שירות חדש",
+      "saleClaim": "אישור מחזיק התמורה",
+      "saleClaimSub": "מי מחזיק את הכסף",
+      "generic": "החלטה שממתינה לחתימתך"
+    },
+    "sub": {
+      "stipendFrom": "במימון {{name}}",
+      "stipendSeeking": "מחפשת מממן",
+      "suggestedForMe": "הצעה שמתאימה לך",
+      "reportedBy": "דווח על ידי {{name}}",
+      "deliveredBy": "סופק על ידי {{name}}",
+      "welcome": "הצטרפת לרקמה",
+      "offeredOn": "הצעה למשימה: {{name}}",
+      "requestedBy": "התבקש על ידי {{name}}",
+      "siteShareIncome": "הכנסה מחלק הפלטפורמה",
+      "customer": "לקוח: {{name}}",
+      "seller": "מוכר: {{name}}",
+      "transfer": "העברת כספים לאישור",
+      "transferSend": "העברה שעליך להעביר",
+      "transferRecive": "העברה שאמורה להגיע אליך",
+      "siteSharePay": "חלק הפלטפורמה שהתחייבת לו",
+      "siteShareDecide": "החלוקה אושרה — נותר לאשר את חלקך",
+      "stipendCycle": "מחזור מלגה שנסגר — לתשלום",
+      "stipendSent": "סומן כנשלח — ממתין לאישור שלך"
+    },
+    "title": {
+      "transfer": "{{from}} ← {{to}}",
+      "sitesharepay": "תשלום חלק הפלטפורמה",
+      "sitesharedecide": "אישור חלק הפלטפורמה",
+      "stipendpay": "תשלום מלגה",
+      "stipendconfirm": "אישור קבלת מלגה"
+    },
+    "cta": {
+      "vote": "להצבעה",
+      "answer": "לתשובה",
+      "pay": "לתשלום",
+      "confirm": "לאישור",
+      "view": "לצפייה"
+    },
+    "act": {
+      "chat": "פתיחת צ׳אט",
+      "project": "על הרקמה"
     }
   }
 }
