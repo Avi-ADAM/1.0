@@ -800,6 +800,12 @@
       "stipendconfirm": "تأكيد استلام المنحة",
       "sitesharedecide": "قرار حصة الموقع",
       "other": "عنصر"
+    },
+    "fact": {
+      "hours": "{{value}} ساعات",
+      "rate": "{{value}} للساعة",
+      "amount": "القيمة {{value}}",
+      "qty": "الكمية {{value}}"
     }
   }
 }

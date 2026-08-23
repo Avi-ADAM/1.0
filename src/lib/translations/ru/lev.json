@@ -800,6 +800,12 @@
       "stipendconfirm": "Подтверждение стипендии",
       "sitesharedecide": "Решение о доле площадки",
       "other": "Элемент"
+    },
+    "fact": {
+      "hours": "часов: {{value}}",
+      "rate": "{{value}} в час",
+      "amount": "стоимость {{value}}",
+      "qty": "кол-во {{value}}"
     }
   }
 }

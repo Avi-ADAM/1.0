@@ -309,7 +309,9 @@
     /* The user's ask: about a third of a phone screen per card, clamped so it
        neither collapses on a short viewport nor becomes a full-page card on a
        tall one. */
-    --lev-row-h: clamp(140px, 30vh, 240px);
+    /* The floor is set by what the row must always show — the header strip,
+       one line of title, the chips and the bottom line — not by taste. */
+    --lev-row-h: clamp(170px, 30vh, 240px);
     height: 100dvh;
     display: flex;
     flex-direction: column;

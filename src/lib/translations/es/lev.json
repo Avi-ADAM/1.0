@@ -801,6 +801,12 @@
       "stipendconfirm": "Beca recibida",
       "sitesharedecide": "Decisión sobre la parte del sitio",
       "other": "Elemento"
+    },
+    "fact": {
+      "hours": "{{value}} horas",
+      "rate": "{{value}} por hora",
+      "amount": "valor {{value}}",
+      "qty": "cant. {{value}}"
     }
   }
 }

@@ -16,11 +16,14 @@
    * box has to match what the row will actually be.
    */
   import { t, isRtl } from '$lib/translations';
+  import { lang } from '$lib/stores/lang.js';
   import { msLeft } from '$lib/stores/clock.svelte';
   import {
     kindLabelKey,
     kindAccent,
     rowTitle,
+    rowSubtitle,
+    rowFacts,
     rowTimegrama,
     rowIsActionable
   } from '../cards/cardKinds.js';
@@ -36,6 +39,8 @@
 
   let accent = $derived(kindAccent(item.ani));
   let title = $derived(rowTitle(item));
+  let subtitle = $derived(rowSubtitle(item));
+  let facts = $derived(rowFacts(item));
   let deadline = $derived(rowTimegrama(item));
   let actionable = $derived(rowIsActionable(item));
 
@@ -103,6 +108,22 @@
 
   <span class="title" dir="auto">{title}</span>
 
+  {#if subtitle}
+    <span class="desc" dir="auto">{subtitle}</span>
+  {/if}
+
+  {#if facts.length}
+    <span class="facts">
+      {#each facts as fact (fact.key)}
+        <span class="fact">
+          {$t(`lev.list.fact.${fact.key}`, {
+            value: fact.value.toLocaleString($lang)
+          })}
+        </span>
+      {/each}
+    </span>
+  {/if}
+
   <span class="bottom">
     <span class="project" dir="auto">{item.projectName ?? ''}</span>
     {#if hasTally}
@@ -125,8 +146,8 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    gap: 0.35rem;
+    align-items: stretch;
+    gap: 0.3rem;
     position: relative;
     text-align: start;
     padding: 0.75rem 0.9rem;
@@ -162,6 +183,7 @@
     align-items: center;
     gap: 0.5rem;
     min-width: 0;
+    flex: none;
   }
 
   .logo {
@@ -214,13 +236,62 @@
     line-height: 1.3;
     color: #111827;
     display: -webkit-box;
+    /* Two lines now that a description follows it; the row is a fixed height
+       and the description is the part that tells you what this actually is. */
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    /* Shrinkable, not fixed. On a short viewport --lev-row-h bottoms out and
+       the fixed-size children alone would outgrow the card; anything that can
+       give up a line has to, or the row's own overflow:hidden would clip the
+       bottom line — the one carrying the project and the vote tally. */
+    flex: 0 1 auto;
+    min-height: 0;
+  }
+  :global(html.dark) .title {
+    color: #f3f4f6;
+  }
+
+  .desc {
+    font-size: 0.8rem;
+    line-height: 1.35;
+    color: #4b5563;
+    display: -webkit-box;
     -webkit-line-clamp: 3;
     line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    /* Takes whatever vertical room is left over, so a row with a long
+       description fills the card and a row without one simply has less. */
+    flex: 1 1 auto;
+    min-height: 0;
   }
-  :global(html.dark) .title {
-    color: #f3f4f6;
+  :global(html.dark) .desc {
+    color: #9ca3af;
+  }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    /* One line of chips at most, and the first thing to go when the card is
+       short — the figures are a bonus, the bottom line is not. */
+    flex: 0 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    max-height: 1.5rem;
+  }
+
+  .fact {
+    font-size: 0.7rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    padding: 0.1rem 0.45rem;
+    border-radius: 0.4rem;
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--accent);
+    font-weight: 600;
   }
 
   .bottom {
@@ -228,6 +299,7 @@
     align-items: center;
     gap: 0.5rem;
     min-width: 0;
+    flex: none;
     font-size: 0.72rem;
     color: #6b7280;
   }

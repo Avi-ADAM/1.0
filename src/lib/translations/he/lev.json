@@ -800,6 +800,12 @@
       "stipendconfirm": "אישור קבלת מלגה",
       "sitesharedecide": "החלטה על חלק האתר",
       "other": "פריט"
+    },
+    "fact": {
+      "hours": "{{value}} שעות",
+      "rate": "{{value}} לשעה",
+      "amount": "שווי {{value}}",
+      "qty": "כמות {{value}}"
     }
   }
 }

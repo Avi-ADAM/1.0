@@ -132,9 +132,16 @@ export function kindAccent(ani) {
  * The one-line title for a row. Items carry their human name under a handful of
  * different field names depending on which processor built them, so try them in
  * the order the cards themselves do before falling back to the project.
+ *
+ * `nameRaw` comes first and matters: four processors build `name` through
+ * `letters()`, which reverses every Hebrew/Arabic word and then the word order
+ * so the string can be dropped into an SVG `<text>` (the coin view), where no
+ * bidi engine runs. Rendered as ordinary HTML — which is what a row is — that
+ * pre-reversed string reads backwards. `nameRaw` is the untouched original.
  */
 export function rowTitle(item) {
   return (
+    item?.nameRaw ||
     item?.name ||
     item?.openmissionName ||
     item?.missionName ||
@@ -143,6 +150,57 @@ export function rowTitle(item) {
     item?.projectName ||
     ''
   );
+}
+
+/**
+ * A short description for the row, so a condensed card carries some of what the
+ * full one says instead of a name and a lot of white space. Kinds name this
+ * field differently; take the first that has text.
+ *
+ * Some of these are rich text, which arrives either as an HTML string or as a
+ * block array, so flatten to plain text — a row is one clamped line, and raw
+ * markup in it would render as literal angle brackets.
+ */
+export function rowSubtitle(item) {
+  const raw =
+    item?.descrip ??
+    item?.missionDetails ??
+    item?.hearotMeyuchadot ??
+    item?.spnot ??
+    item?.note ??
+    '';
+  const text = Array.isArray(raw)
+    ? raw
+        .map((b) => (b?.children ?? []).map((c) => c?.text ?? '').join(''))
+        .join(' ')
+    : String(raw ?? '');
+  return text
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Up to three figures worth showing on a row, as `{ key, value }` where `key`
+ * names a `lev.list.fact.*` translation. Numbers only — anything that needs a
+ * sentence belongs on the full card.
+ */
+export function rowFacts(item) {
+  const num = (v) => {
+    const n = Number(v);
+    return Number.isFinite(n) && n > 0 ? n : null;
+  };
+  const hours = num(item?.noofhours);
+  const rate = num(item?.perhour);
+  const qty = num(item?.hm);
+  const amount = num(item?.easy) ?? num(item?.price) ?? (hours && rate ? hours * rate : null);
+
+  const facts = [];
+  if (hours) facts.push({ key: 'hours', value: hours });
+  if (rate) facts.push({ key: 'rate', value: rate });
+  if (amount) facts.push({ key: 'amount', value: amount });
+  if (qty) facts.push({ key: 'qty', value: qty });
+  return facts.slice(0, 3);
 }
 
 /**

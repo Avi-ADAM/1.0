@@ -800,6 +800,12 @@
       "stipendconfirm": "Stipend received",
       "sitesharedecide": "Site-share decision",
       "other": "Item"
+    },
+    "fact": {
+      "hours": "{{value}} hours",
+      "rate": "{{value}} per hour",
+      "amount": "value {{value}}",
+      "qty": "qty {{value}}"
     }
   }
 }

@@ -489,7 +489,10 @@ export function processFiapp(
     const myid = approval.myid;
 
     // Logic from ishursium
-    const rt = letters(approval.missname || '');
+    // `letters()` returns the name pre-reversed for SVG <text>, which has no
+    // bidi engine. Keep the original for anything rendered as real HTML.
+    const rawName = approval.missname || '';
+    const rt = letters(rawName);
 
     // Access nested data safely
     // Note: extractFiapp puts attributes in mesimabetahlichData
@@ -576,6 +579,9 @@ export function processFiapp(
 
       // Mapped fields
       name: rt[0],
+      // Un-reversed name for HTML surfaces (the list rows); `name` stays
+      // pre-reversed because the coin view feeds it to SVG <text>.
+      nameRaw: rawName,
       stylef: rt[1],
       st: rt[2],
 
@@ -882,11 +888,15 @@ export function processAsked(
     // 6. Priority Calculation
     const priority = votePriority(already);
 
-    const rt = letters(omData.name || '');
+    const rawName = omData.name || '';
+    const rt = letters(rawName);
 
     return {
       // Common display fields
       name: rt[0],
+      // Un-reversed name for HTML surfaces (the list rows); `name` stays
+      // pre-reversed because the coin view feeds it to SVG <text>.
+      nameRaw: rawName,
       stylef: rt[1],
       st: rt[2],
       ani: isResource ? 'askedm' : 'askedcoin',
@@ -1013,7 +1023,8 @@ export function processAskedResources(
     const basePriority = votePriority(already);
 
     // Letters styling
-    const rt = letters(res.openName || '');
+    const rawName = res.openName || '';
+    const rt = letters(rawName);
 
     return {
       // Common
@@ -1048,6 +1059,9 @@ export function processAskedResources(
 
       // Helper fields
       name: rt[0],
+      // Un-reversed name for HTML surfaces (the list rows); `name` stays
+      // pre-reversed because the coin view feeds it to SVG <text>.
+      nameRaw: rawName,
       stylef: rt[1],
       st: rt[2],
 
@@ -1611,7 +1625,8 @@ export function processWegets(
     const myid = weget.myid;
 
     // Logic from crMaap - letters function for name styling
-    const rt = letters(weget.spName || '');
+    const rawName = weget.spName || '';
+    const rt = letters(rawName);
 
     // Voting logic from crMaap
     const users = weget.vots || [];
@@ -1699,6 +1714,9 @@ export function processWegets(
       spnot: weget.spnot,
       kindOf: weget.kindOf,
       name: rt[0],
+      // Un-reversed name for HTML surfaces (the list rows); `name` stays
+      // pre-reversed because the coin view feeds it to SVG <text>.
+      nameRaw: rawName,
       stylef: rt[1],
       st: rt[2],
       projectId: weget.projectId,
