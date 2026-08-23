@@ -42,9 +42,11 @@ export function ishursium(dati, fiapp, fia, lang, idL) {
   
   for (let i = 0; i < start.length; i++) {
     for (let j = 0; j < start[i].attributes.finiapruvals.data.length; j++) {
-      const rt = letters(
-        start[i].attributes.finiapruvals.data[j].attributes.missname
-      );
+      // `letters()` returns the name pre-reversed for SVG <text>, which has no
+      // bidi engine. Keep the original for anything rendered as real HTML.
+      const rawName =
+        start[i].attributes.finiapruvals.data[j].attributes.missname;
+      const rt = letters(rawName);
       let src22 = getProjectData(
         start[i].id,
         'upic',
@@ -88,6 +90,9 @@ export function ishursium(dati, fiapp, fia, lang, idL) {
           start[i].attributes.finiapruvals.data[j].attributes.what?.data?.id,
         users: start[i].attributes.finiapruvals.data[j].attributes.vots,
         name: rt[0],
+        // Un-reversed name for HTML surfaces (the list rows); `name` stays
+        // pre-reversed because the coin view feeds it to SVG <text>.
+        nameRaw: rawName,
         stylef: rt[1],
         st: rt[2],
         projectId:

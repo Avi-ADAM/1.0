@@ -3,7 +3,7 @@
   import { toggleScrollable, isScrolable } from './isScrolable.svelte.js';
   import { t } from '$lib/translations';
   import { get } from 'svelte/store';
-  import { onMount } from 'svelte';
+  import { msLeft } from '$lib/stores/clock.svelte';
   import Lev from '../../../celim/lev.svelte';
   import { lang } from '$lib/stores/lang.js';
   import { formatTime } from '../utils';
@@ -239,15 +239,14 @@
     });
   });
 
-  let zman = $state();
-
-  onMount(() => {
-    let x = restim(restime);
-    let cr = new Date(timegramaDate);
-    setInterval(() => {
-      zman = -(Date.now() - cr - x);
-    }, 1);
-  });
+  // Was `setInterval(…, 1)` with no clearInterval — one leaking 1ms timer per
+  // mounted card. Now a single shared 100ms clock drives every countdown on the
+  // page; `precise` keeps the tenths digit animating exactly as before. The
+  // deadline is still timegrama + restime, as it was.
+  let timegramaDeadline = $derived(
+    new Date(timegramaDate).getTime() + restim(restime)
+  );
+  let zman = $derived(msLeft(timegramaDeadline, { precise: true }));
 
 
   function hover(x) {

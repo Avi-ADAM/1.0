@@ -11,7 +11,7 @@
 
   // New architecture imports
   import { finalSwiperArray } from '$lib/stores/levDerived';
-  import { isCardsView, projectFilter } from '$lib/stores/levStores';
+  import { isCardsView, projectFilter, levView, milon } from '$lib/stores/levStores';
   import { initializeLevData, hasValidSnapshot } from '$lib/utils/levDataLoader';
   import { setupSocketListeners } from '$lib/utils/levSocketHandler';
   import { loadLevSlice } from '$lib/utils/levSliceLoader';
@@ -35,6 +35,7 @@
   // UI Components
   import Coinsui from '$lib/components/lev/newcoinui.svelte';
   import Cardsui from '$lib/components/lev/cards/cards.svelte';
+  import Levlist from '$lib/components/lev/list/LevList.svelte';
   import Tooltip from '$lib/celim/tooltip.svelte';
   import {
     siteSharePayablesStore,
@@ -80,6 +81,84 @@
       : $finalSwiperArray;
     cards = $isCardsView;
   });
+
+  // One pass over the feed instead of the thirty separate `displayItems.filter`
+  // scans this markup used to run — fifteen for the cards view and the same
+  // fifteen again for the coins view, on every reactive update.
+  let aniCounts = $derived.by(() => {
+    /** @type {Record<string, number>} */
+    const c = {};
+    for (const item of displayItems) c[item.ani] = (c[item.ani] ?? 0) + 1;
+    return c;
+  });
+
+  /**
+   * Counts keyed by the milon key each filter tile actually gates, so a tile is
+   * offered exactly when it would filter something. Two of these were wired to
+   * the wrong `ani` before: `desi` gates `haluk` (it was counting `hachla`), and
+   * `hachla` gates the decision kinds (it was counting `hachlatot`, which no
+   * processor emits, so the decisions tile could never appear).
+   */
+  let counts = $derived({
+    sugg: aniCounts.meData ?? 0,
+    pend: aniCounts.pends ?? 0,
+    asks: aniCounts.askedcoin ?? 0,
+    welc: aniCounts.walcomen ?? 0,
+    betaha: aniCounts.mtaha ?? 0,
+    desi: aniCounts.haluk ?? 0,
+    fiap: aniCounts.fiapp ?? 0,
+    ppmash: aniCounts.pmashes ?? 0,
+    pmashs: aniCounts.huca ?? 0,
+    pmaap: aniCounts.wegets ?? 0,
+    askmap: aniCounts.askedm ?? 0,
+    hachla:
+      (aniCounts.hachla ?? 0) +
+      (aniCounts.stipend ?? 0) +
+      (aniCounts.archObject ?? 0),
+    sales: aniCounts.sale ?? 0,
+    sheirutp: aniCounts.sheirutp ?? 0,
+    purchases: aniCounts.buy ?? 0
+  });
+
+  /** Projects represented in the feed, for the list view's project filter. */
+  let uniqueProjects = $derived.by(() => {
+    const map = new Map();
+    for (const item of displayItems) {
+      if (!item.projectId || !item.projectName) continue;
+      const row = map.get(item.projectId);
+      if (row) row.count++;
+      else
+        map.set(item.projectId, {
+          projectId: item.projectId,
+          projectName: item.projectName,
+          count: 1
+        });
+    }
+    return [...map.values()];
+  });
+
+  /** The list view's filter panel drives the page-level stores directly. */
+  function listShowonly(event) {
+    if (event?.kind === 'projects') {
+      projectFilter.set(event.id);
+      return;
+    }
+    milon.update((m) => {
+      const next = { ...m };
+      for (const key of Object.keys(next)) next[key] = false;
+      next[event.data] = true;
+      return next;
+    });
+  }
+
+  function listShowall() {
+    projectFilter.set(null);
+    milon.update((m) => {
+      const next = { ...m };
+      for (const key of Object.keys(next)) next[key] = true;
+      return next;
+    });
+  }
 
 
   function clearFocus() {
@@ -146,7 +225,9 @@
   }
 
   function handleViewChange(event) {
-    isCardsView.set(event.cards);
+    // The in-card Switch only ever knew cards↔coins; route it through the
+    // three-way store so the list stays the one source of truth.
+    levView.set(event.cards ? 'cards' : 'coins');
   }
 
   // M4 receiving side: load committed-but-unpaid site-share contributions so they
@@ -419,9 +500,49 @@
     </div>
   {/if}
   
+  <!-- Back to the condensed overview. The cards/coins views carry their own
+       cards↔coins switch but know nothing about the list, so the way back
+       lives here, clear of both (the mobile switch bar sits at bottom:3rem). -->
+  {#if $levView !== 'list'}
+    <button
+      type="button"
+      class="to-list"
+      aria-label={$t('lev.list.toList')}
+      onclick={() => levView.set('list')}
+    >
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path
+          d="M4 6h16M4 12h16M4 18h16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        />
+      </svg>
+    </button>
+  {/if}
+
   <!-- Main Content -->
   <Tooltip title={u} ispic={true}>
-    {#if cards}
+    {#if $levView === 'list'}
+      <Levlist
+        low={false}
+        arr1={displayItems}
+        milon={$milon}
+        askedarr={[]}
+        declineddarr={[]}
+        onHover={hover}
+        onUser={user}
+        onProj={proj}
+        onChat={chat}
+        onStart={handleCoinLapach}
+        onShowonly={listShowonly}
+        onShowall={listShowall}
+        onView={(v) => levView.set(v)}
+        {uniqueProjects}
+        {counts}
+      />
+    {:else if cards}
       <div class="cards-ui">
         <Cardsui
           low={false}
@@ -434,21 +555,21 @@
           arr1={displayItems}
           askedarr={[]}
           declineddarr={[]}
-          sug={displayItems.filter((i) => i.ani === 'meData').length}
-          pen={displayItems.filter((i) => i.ani === 'pends').length}
-          ask={displayItems.filter((i) => i.ani === 'askedcoin').length}
-          wel={displayItems.filter((i) => i.ani === 'walcomen').length}
-          beta={displayItems.filter((i) => i.ani === 'mtaha').length}
-          des={displayItems.filter((i) => i.ani === 'hachla').length}
-          fia={displayItems.filter((i) => i.ani === 'fiapp').length}
-          pmash={displayItems.filter((i) => i.ani === 'pmashes').length}
-          mashs={displayItems.filter((i) => i.ani === 'huca').length}
-          maap={displayItems.filter((i) => i.ani === 'wegets').length}
-          askma={displayItems.filter((i) => i.ani === 'askedm').length}
-          hachlot={displayItems.filter((i) => i.ani === 'hachlatot').length}
-          saless={displayItems.filter((i) => i.ani === 'sale').length}
-          sheirutps={displayItems.filter((i) => i.ani === 'sheirutp').length}
-          purchasesn={displayItems.filter((i) => i.ani === 'buy').length}
+          sug={counts.sugg}
+          pen={counts.pend}
+          ask={counts.asks}
+          wel={counts.welc}
+          beta={counts.betaha}
+          des={counts.desi}
+          fia={counts.fiap}
+          pmash={counts.ppmash}
+          mashs={counts.pmashs}
+          maap={counts.pmaap}
+          askma={counts.askmap}
+          hachlot={counts.hachla}
+          saless={counts.sales}
+          sheirutps={counts.sheirutp}
+          purchasesn={counts.purchases}
         />
       </div>
     {:else}
@@ -482,20 +603,20 @@
         arr1={displayItems}
         askedarr={[]}
         declineddarr={[]}
-        halu={displayItems.filter((i) => i.ani === 'haluk').length}
-        askma={displayItems.filter((i) => i.ani === 'askedm').length}
-        maap={displayItems.filter((i) => i.ani === 'wegets').length}
-        mashs={displayItems.filter((i) => i.ani === 'huca').length}
-        pmashd={displayItems.filter((i) => i.ani === 'pmashes').length}
-        fia={displayItems.filter((i) => i.ani === 'fiapp').length}
-        beta={displayItems.filter((i) => i.ani === 'mtaha').length}
-        pen={displayItems.filter((i) => i.ani === 'pends').length}
-        sug={displayItems.filter((i) => i.ani === 'meData').length}
-        wel={displayItems.filter((i) => i.ani === 'walcomen').length}
-        ask={displayItems.filter((i) => i.ani === 'askedcoin').length}
-        saless={displayItems.filter((i) => i.ani === 'sale').length}
-        sheirutps={displayItems.filter((i) => i.ani === 'sheirutp').length}
-        purchasesn={displayItems.filter((i) => i.ani === 'buy').length}
+        halu={counts.desi}
+        askma={counts.askmap}
+        maap={counts.pmaap}
+        mashs={counts.pmashs}
+        pmashd={counts.ppmash}
+        fia={counts.fiap}
+        beta={counts.betaha}
+        pen={counts.pend}
+        sug={counts.sugg}
+        wel={counts.welc}
+        ask={counts.asks}
+        saless={counts.sales}
+        sheirutps={counts.sheirutp}
+        purchasesn={counts.purchases}
         nam={$userStore?.username || page.data.username}
         picLink={$userStore?.profilePic || ''}
         total={''}
@@ -545,6 +666,28 @@
       opacity: 1;
       transform: scale(1.1);
     }
+  }
+
+  .to-list {
+    position: fixed;
+    bottom: 0.4rem;
+    inset-inline-start: 0.75rem;
+    z-index: 1001;
+    width: 2.25rem;
+    height: 2.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    border: 1px solid var(--barbi-pink);
+    background: rgba(255, 255, 255, 0.9);
+    color: #374151;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+  :global(html.dark) .to-list {
+    background: rgba(17, 24, 39, 0.9);
+    color: #e5e7eb;
   }
 
   .focus-chip button {

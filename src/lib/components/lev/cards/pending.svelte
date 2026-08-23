@@ -1,13 +1,12 @@
 ﻿<script>
   import { isRtl } from '$lib/translations';
   import Chaticon from '../../../celim/chaticon.svelte';
-  import { onMount } from 'svelte';
   import { t as trans } from '$lib/translations';
   import { lang } from '$lib/stores/lang.js';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import Lev from '../../../celim/lev.svelte';
   import Tile from '$lib/celim/tile.svelte';
-  import { restim } from '$lib/func/restime.svelte';
+  import { msLeft } from '$lib/stores/clock.svelte';
   import { formatTime } from '../utils';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device';
@@ -96,16 +95,10 @@
   let user_1s = $derived.by(() => {
     return getProjectData(projectId, 'us') || [];
   });
-  let zman = $state();
-
-  onMount(() => {
-    let x = restim(restime);
-    let cr = new Date(timegramaDate);
-    let crr = cr.getTime();
-    setInterval(() => {
-      zman = -(Date.now() - cr);
-    }, 1);
-  });
+  // Was `setInterval(…, 1)` with no clearInterval — one leaking 1ms timer per
+  // mounted card. Now a single shared 100ms clock drives every countdown on the
+  // page; `precise` keeps the tenths digit animating exactly as before.
+  let zman = $derived(msLeft(timegramaDate, { precise: true }));
 
   function hover(x) {
     onHover?.({ x: x });

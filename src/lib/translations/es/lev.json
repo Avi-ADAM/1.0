@@ -758,5 +758,55 @@
     "requestedRole": "Rol solicitado",
     "iWant": "Sí, quiero",
     "notForMe": "No es para mí"
+  },
+  "list": {
+    "count": "{{count}} elementos",
+    "back": "Volver a la lista",
+    "toList": "Vista compacta",
+    "toCards": "Vista de tarjetas",
+    "toCoins": "Vista de monedas",
+    "time": {
+      "over": "Se acabó el tiempo",
+      "d": "quedan {{count}} días",
+      "h": "quedan {{count}} horas",
+      "m": "quedan {{count}} minutos",
+      "s": "quedan {{count}} segundos",
+      "dOne": "queda 1 día",
+      "hOne": "queda 1 hora",
+      "mOne": "queda 1 minuto",
+      "sOne": "queda 1 segundo"
+    },
+    "kind": {
+      "haluk": "Propuesta de reparto",
+      "sheirutp": "Solicitud de producto",
+      "sale": "Venta",
+      "buy": "Compra",
+      "vidu": "Transferencia",
+      "mtaha": "Misión en curso",
+      "pmashes": "Aprobación de recurso",
+      "pends": "Votación de misión",
+      "wegets": "Inversión en recurso",
+      "fiapp": "Aprobación de finalización",
+      "walcomen": "Bienvenida",
+      "askedcoin": "Solicitud de ingreso",
+      "askedm": "Solicitud de misión",
+      "meData": "Sugerencia de misión",
+      "huca": "Sugerencia de recurso",
+      "archObject": "Retirada de elemento",
+      "stipend": "Beca de subsistencia",
+      "hachla": "Decisión",
+      "wishoffer": "Oferta de voluntariado",
+      "sitesharepay": "Pago de la parte del sitio",
+      "stipendpay": "Pago de beca",
+      "stipendconfirm": "Beca recibida",
+      "sitesharedecide": "Decisión sobre la parte del sitio",
+      "other": "Elemento"
+    },
+    "fact": {
+      "hours": "{{value}} horas",
+      "rate": "{{value}} por hora",
+      "amount": "valor {{value}}",
+      "qty": "cant. {{value}}"
+    }
   }
 }
