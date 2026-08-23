@@ -51,6 +51,13 @@ const RENDERABLE = new Set([
 ]);
 
 /**
+ * The same set as an array, so a test can walk every kind the heart can render
+ * and assert the list view has something to say about each one. Both views
+ * dispatch through `<LevCard>`, so this list *is* the contract between them.
+ */
+export const RENDERABLE_ANIS = [...RENDERABLE];
+
+/**
  * Would `<LevCard>` render anything for this item under the current filter?
  *
  * @param {any} item a DisplayItem off finalSwiperArray
@@ -173,7 +180,11 @@ export function rowSubtitle(item) {
     ? raw
         .map((b) => (b?.children ?? []).map((c) => c?.text ?? '').join(''))
         .join(' ')
-    : String(raw ?? '');
+    : // A relation object here is not prose — stringifying it would print
+      // `[object Object]` into the row. Same rule as `T` below.
+      typeof raw === 'object' && raw !== null
+      ? ''
+      : String(raw ?? '');
   return text
     .replace(/<[^>]*>/g, ' ')
     .replace(/\s+/g, ' ')
@@ -219,4 +230,389 @@ export function rowTimegrama(item) {
 export function rowIsActionable(item) {
   if (item?.already === true) return false;
   return (item?.pl ?? 999) < 700;
+}
+
+/* ==========================================================================
+ * Per-kind row content
+ * --------------------------------------------------------------------------
+ * `rowTitle`/`rowSubtitle`/`rowFacts` above sniff a fixed list of field names.
+ * That is the right *fallback*, but it is not enough on its own: the twenty-odd
+ * kinds the heart renders were each built by a different processor and name
+ * their payload differently. A stipend payable has `recipientName`/`amount`, a
+ * wish offer has `volunteerName`/`missionName`, a transfer has
+ * `sendname`/`resname`/`amount` — none of which the generic sniffer knows, so
+ * those rows came out as a project name and a blank body while the full card
+ * showed a whole story.
+ *
+ * `rowContent` closes that gap: one small builder per `ani`, falling back to
+ * the sniffer for anything it does not override. The card view is the
+ * better-maintained surface, so each builder mirrors what its card puts in its
+ * header and its first block — never more, because a row is a third of a phone
+ * screen.
+ *
+ * Text comes back as `{ text }` (already-human data) or `{ key, params }` (a
+ * `$t()` lookup), because this module is pure and has no access to the store.
+ * The row resolves whichever it gets.
+ */
+
+/** @typedef {{ text?: string, key?: string, params?: Record<string, any> }} RowText */
+/** @typedef {{ key: string, value: number | string }} RowFact */
+/** @typedef {{ kindKey: string, title: RowText | null, subtitle: RowText | null, facts: RowFact[] }} RowContent */
+
+/**
+ * Plain human text, or null when there is none — so `??` chains work.
+ *
+ * Objects and arrays are treated as "no text" rather than stringified: a good
+ * half of these payload fields are Strapi relations or component arrays, and
+ * `String(someRelation)` renders the literal `[object Object]` into the row.
+ * Failing to null instead lets the `??` chain fall through to a field that
+ * really is text.
+ */
+const T = (v) => {
+  if (v == null || typeof v === 'object') return null;
+  const s = typeof v === 'string' ? v.trim() : String(v);
+  return s ? { text: s } : null;
+};
+
+/** A `$t()` lookup the row will resolve. */
+const K = (key, params) => ({ key, params });
+
+/** Positive finite numbers only; anything else is not worth a chip. */
+const n = (v) => {
+  const x = Number(v);
+  return Number.isFinite(x) && x > 0 ? x : null;
+};
+
+const f = (key, value) => (value == null ? null : { key, value });
+
+/** Drop the empties, keep at most three — a fourth chip wraps and eats a line. */
+const chips = (...list) => list.filter(Boolean).slice(0, 3);
+
+/**
+ * Decision `kind`s that are a project-field change; each has its own label,
+ * mirroring KIND_LABELS in the getDecisionDetails action. The full card fetches
+ * the label from the server; a row cannot wait for a round-trip per row, so the
+ * same list lives here as translation keys.
+ */
+const FIELD_DECISIONS = new Set([
+  'name',
+  'pubdes',
+  'prides',
+  'newFlink',
+  'newWlink',
+  'timtoM',
+  'vallueadd',
+  'vallueles',
+  'pic'
+]);
+
+/**
+ * One builder per `ani`. Each returns any subset of
+ * `{ title, subtitle, facts }`; whatever it leaves out falls back to the
+ * generic sniffer, so a builder only has to state what it knows better.
+ */
+const ROW_CONTENT = {
+  // ── consent & votes ──────────────────────────────────────────────────────
+  haluk: (b) => ({
+    facts: chips(
+      f('profit', n(b.hervach)),
+      f('shares', n(b.halukot?.length)),
+      f('members', n(b.noofusers))
+    )
+  }),
+
+  hachla: (b) => ({
+    title:
+      b.kind === 'saleClaim'
+        ? (T(b.saleClaim?.productName) ?? K('lev.list.decision.saleClaim'))
+        : FIELD_DECISIONS.has(b.kind)
+          ? K(`lev.list.decision.${b.kind}`)
+          : b.kind === 'sheirutpends'
+            ? K('lev.list.decision.sheirutpends')
+            : (T(b.name) ?? T(b.projectName)),
+    subtitle:
+      b.kind === 'saleClaim'
+        ? K('lev.list.decision.saleClaimSub')
+        : (T(rowSubtitle(b)) ?? K('lev.list.decision.generic')),
+    facts:
+      b.kind === 'saleClaim'
+        ? chips(
+            f('price', n(b.saleClaim?.standing?.price ?? b.saleClaim?.current?.price)),
+            f('qty', n(b.saleClaim?.standing?.hm ?? b.saleClaim?.current?.unit))
+          )
+        : []
+  }),
+
+  archObject: (b) => ({
+    title: T(b.archive?.targetName) ?? T(b.name),
+    subtitle: b.archive?.targetKind
+      ? K(`archive.card.target.${b.archive.targetKind}`)
+      : null,
+    facts: chips(
+      f('hours', n(b.archive?.accruedHours)),
+      f('round', n(b.archive?.standingOrder))
+    )
+  }),
+
+  stipend: (b) => ({
+    title:
+      T(b.stipend?.recipientName) ??
+      T(b.stipend?.funderName) ??
+      T(b.projectName),
+    subtitle: b.stipend?.funderName
+      ? K('lev.list.sub.stipendFrom', { name: b.stipend.funderName })
+      : K('lev.list.sub.stipendSeeking'),
+    facts: chips(
+      f('rate', n(b.stipend?.standing?.stipendRate)),
+      f('hours', n(b.stipend?.standing?.monthlyHours ?? b.stipend?.standing?.hours)),
+      f('round', n(b.stipend?.standingOrder))
+    )
+  }),
+
+  // ── missions & resources ─────────────────────────────────────────────────
+  mtaha: (b) => ({
+    facts: chips(
+      f('hoursDone', n(b.howmanyhoursalready)),
+      f('hours', n(b.hoursassinged)),
+      f('rate', n(b.perhour))
+    )
+  }),
+
+  pends: (b) => ({
+    facts: chips(
+      f('hours', n(b.noofhours)),
+      f('rate', n(b.perhour)),
+      f('amount', n(b.noofhours) && n(b.perhour) ? b.noofhours * b.perhour : null)
+    )
+  }),
+
+  pmashes: (b) => ({
+    facts: chips(f('qty', n(b.hm)), f('price', n(b.price)), f('amount', n(b.easy)))
+  }),
+
+  meData: (b) => ({
+    subtitle: T(rowSubtitle(b)) ?? K('lev.list.sub.suggestedForMe'),
+    facts: chips(
+      f('hours', n(b.noofhours)),
+      f('rate', n(b.perhour)),
+      f('amount', n(b.noofhours) && n(b.perhour) ? b.noofhours * b.perhour : null)
+    )
+  }),
+
+  huca: (b) => ({
+    title: T(b.mashname) ?? T(b.nameRaw) ?? T(b.name),
+    facts: chips(f('price', n(b.price)), f('qty', n(b.myp)), f('amount', n(b.easy)))
+  }),
+
+  // ── people asking / approving ────────────────────────────────────────────
+  askedcoin: (b) => ({
+    title: T(b.username) ?? T(b.useraplyname),
+    subtitle: T(b.openName) ?? T(rowSubtitle(b)),
+    facts: chips(f('hours', n(b.nhours)), f('rate', n(b.perhour)))
+  }),
+
+  askedm: (b) => ({
+    title: T(b.username) ?? T(b.useraplyname),
+    subtitle: T(b.openName) ?? T(rowSubtitle(b)),
+    facts: chips(f('price', n(b.price)), f('qty', n(b.myp)), f('amount', n(b.easy)))
+  }),
+
+  fiapp: (b) => ({
+    subtitle: b.username
+      ? K('lev.list.sub.reportedBy', { name: b.username })
+      : T(rowSubtitle(b)),
+    facts: chips(
+      f('hours', n(b.nhours)),
+      f('rate', n(b.perhour)),
+      f('amount', n(b.nhours) && n(b.perhour) ? b.nhours * b.perhour : null)
+    )
+  }),
+
+  wegets: (b) => ({
+    subtitle: b.username
+      ? K('lev.list.sub.deliveredBy', { name: b.username })
+      : T(rowSubtitle(b)),
+    facts: chips(f('qty', n(b.hm)), f('price', n(b.price)), f('amount', n(b.easy)))
+  }),
+
+  walcomen: (b) => ({
+    title: T(b.username) ?? T(b.projectName),
+    subtitle: T(b.details) ?? T(b.message) ?? K('lev.list.sub.welcome')
+  }),
+
+  wishoffer: (b) => ({
+    title: T(b.volunteerName),
+    subtitle: b.missionName
+      ? K('lev.list.sub.offeredOn', { name: b.missionName })
+      : (T(b.ratsonDesc) ?? T(b.ratsonName)),
+    facts: chips(f('hours', n(b.hours)), f('price', n(b.price)))
+  }),
+
+  // ── money ────────────────────────────────────────────────────────────────
+  sheirutp: (b) => ({
+    subtitle: b.username
+      ? K('lev.list.sub.requestedBy', { name: b.username })
+      : T(rowSubtitle(b)),
+    facts: chips(f('price', n(b.price)), f('qty', n(b.quant)), f('amount', n(b.total)))
+  }),
+
+  sale: (b) =>
+    b.isSiteShareIncome
+      ? {
+          subtitle: K('lev.list.sub.siteShareIncome'),
+          facts: chips(
+            f('amount', n(b.total) ?? n(b.price)),
+            f('transfers', n(b.transferHalukas?.length))
+          )
+        }
+      : {
+          subtitle: b.customerName
+            ? K('lev.list.sub.customer', { name: b.customerName })
+            : T(rowSubtitle(b)),
+          facts: chips(
+            f('price', n(b.price)),
+            f('qty', n(b.quant)),
+            f('amount', n(b.total))
+          )
+        },
+
+  buy: (b) => ({
+    subtitle: b.projectName
+      ? K('lev.list.sub.seller', { name: b.projectName })
+      : T(rowSubtitle(b)),
+    facts: chips(f('price', n(b.price)), f('qty', n(b.quant)), f('amount', n(b.total)))
+  }),
+
+  // `hervachti` and `shear` are *arrays* off the transfer's tosplit (the split
+  // rows and the per-member entitlements), not a name and not a count — feeding
+  // either to a text slot printed "[object Object]". The only thing a transfer
+  // row can say beyond the two names is which side of it the user is on, which
+  // is what `kind` already carries.
+  vidu: (b) => ({
+    title:
+      b.sendname && b.resname
+        ? K('lev.list.title.transfer', { from: b.sendname, to: b.resname })
+        : (T(b.resname) ?? T(b.projectName)),
+    subtitle:
+      b.kind === 'send'
+        ? K('lev.list.sub.transferSend')
+        : b.kind === 'recive'
+          ? K('lev.list.sub.transferRecive')
+          : K('lev.list.sub.transfer'),
+    facts: chips(f('amount', n(b.amount)), f('shares', n(b.shear?.length)))
+  }),
+
+  sitesharepay: (b) => ({
+    title: K('lev.list.title.sitesharepay'),
+    // Not `fromRikma`: the processor already sets `projectName` to the giving
+    // rikma, so naming it here would print it twice on one row — once as the
+    // description and again in the footer.
+    subtitle: K('lev.list.sub.siteSharePay'),
+    facts: chips(f('amount', n(b.amount)))
+  }),
+
+  sitesharedecide: (b) => ({
+    title: K('lev.list.title.sitesharedecide'),
+    subtitle: K('lev.list.sub.siteShareDecide'),
+    facts: chips(f('amount', n(b.proposedAmount)), f('basis', n(b.basisAmount)))
+  }),
+
+  stipendpay: (b) => ({
+    title: T(b.recipientName) ?? K('lev.list.title.stipendpay'),
+    subtitle: K('lev.list.sub.stipendCycle'),
+    facts: chips(
+      f('hours', n(b.hours)),
+      f('rate', n(b.stipendRate)),
+      f('amount', n(b.amount))
+    )
+  }),
+
+  stipendconfirm: (b) => ({
+    title: T(b.funderName) ?? K('lev.list.title.stipendconfirm'),
+    subtitle: K('lev.list.sub.stipendSent'),
+    facts: chips(
+      f('amount', n(b.amount)),
+      f('hours', n(b.hours)),
+      f('rate', n(b.stipendRate))
+    )
+  })
+};
+
+/**
+ * The kind label a row (and the expanded sheet's header) should show. Mostly
+ * `ani`, but a few kinds carry a sub-kind the card names differently — a
+ * site-share income sale is not "a sale", and an `archObject` whose decision is
+ * an `editObject` is not "an archive".
+ */
+export function rowKindKey(item) {
+  const ani = item?.ani;
+  if (ani === 'sale' && item?.isSiteShareIncome) return 'lev.list.kind.saleIncome';
+  if (ani === 'archObject') {
+    if (item?.archive?.kind === 'editObject') return 'lev.list.kind.editObject';
+    if (item?.archive?.scope === 'release') return 'lev.list.kind.releaseObject';
+  }
+  if (ani === 'stipend' && item?.stipend?.kind === 'stipendProgram')
+    return 'lev.list.kind.stipendProgram';
+  if (ani === 'hachla') {
+    if (item?.kind === 'saleClaim') return 'lev.list.kind.saleClaim';
+    if (item?.kind === 'sheirutpends') return 'lev.list.kind.newService';
+    if (item?.kind === 'pic') return 'lev.list.kind.picVote';
+  }
+  return kindLabelKey(ani);
+}
+
+/**
+ * Everything a row needs to render, per kind. Always returns a title (falling
+ * back through the generic name fields to the project) so no row is ever blank.
+ *
+ * @param {any} item a DisplayItem off finalSwiperArray
+ * @returns {RowContent}
+ */
+export function rowContent(item) {
+  const built = ROW_CONTENT[item?.ani]?.(item ?? {}) ?? {};
+  const generic = rowSubtitle(item);
+  return {
+    kindKey: rowKindKey(item),
+    title: built.title ?? T(rowTitle(item)),
+    subtitle: built.subtitle ?? T(generic),
+    facts: built.facts?.length ? built.facts : rowFacts(item)
+  };
+}
+
+/**
+ * What the row's primary button should say. It always does the same thing —
+ * open the full card — but a button that names the pending act ("to vote", "to
+ * pay") is what makes a scrolled list scannable, and the grouping is coarse on
+ * purpose: four verbs, not twenty.
+ */
+const CTA_BY_ANI = {
+  haluk: 'vote',
+  sheirutp: 'vote',
+  pends: 'vote',
+  pmashes: 'vote',
+  hachla: 'vote',
+  archObject: 'vote',
+  stipend: 'vote',
+  huca: 'answer',
+  meData: 'answer',
+  askedcoin: 'answer',
+  askedm: 'answer',
+  wegets: 'answer',
+  fiapp: 'answer',
+  wishoffer: 'answer',
+  sitesharepay: 'pay',
+  stipendpay: 'pay',
+  sale: 'confirm',
+  buy: 'confirm',
+  vidu: 'confirm',
+  stipendconfirm: 'confirm',
+  sitesharedecide: 'confirm',
+  mtaha: 'view',
+  walcomen: 'view'
+};
+
+/** Translation key for the row's primary button. */
+export function rowCtaKey(item) {
+  if (!rowIsActionable(item)) return 'lev.list.cta.view';
+  return `lev.list.cta.${CTA_BY_ANI[item?.ani] ?? 'view'}`;
 }

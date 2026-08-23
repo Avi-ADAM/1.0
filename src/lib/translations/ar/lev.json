@@ -799,13 +799,81 @@
       "stipendpay": "دفع المنحة",
       "stipendconfirm": "تأكيد استلام المنحة",
       "sitesharedecide": "قرار حصة الموقع",
-      "other": "عنصر"
+      "other": "عنصر",
+      "saleIncome": "دخل المنصة",
+      "editObject": "تعديل عنصر",
+      "releaseObject": "تحرير عنصر",
+      "stipendProgram": "برنامج المنحة",
+      "saleClaim": "موافقة حائز المبلغ",
+      "newService": "خدمة جديدة",
+      "picVote": "تغيير الشعار"
     },
     "fact": {
       "hours": "{{value}} ساعات",
       "rate": "{{value}} للساعة",
       "amount": "القيمة {{value}}",
-      "qty": "الكمية {{value}}"
+      "qty": "الكمية {{value}}",
+      "hoursDone": "{{value}} ساعة أُنجزت",
+      "price": "السعر {{value}}",
+      "profit": "ربح {{value}}",
+      "shares": "{{value}} حصص",
+      "members": "{{value}} شركاء",
+      "round": "جولة {{value}}",
+      "basis": "من {{value}}",
+      "transfers": "{{value}} تحويلات"
+    },
+    "decision": {
+      "name": "تغيير اسم الشبكة",
+      "pubdes": "تغيير الوصف العام",
+      "prides": "تغيير الوصف الداخلي",
+      "newFlink": "تغيير رابط فيسبوك",
+      "newWlink": "تغيير موقع الشبكة",
+      "timtoM": "تغيير مدة التصويت",
+      "vallueadd": "إضافة قيم",
+      "vallueles": "إزالة قيم",
+      "pic": "تغيير شعار الشبكة",
+      "sheirutpends": "منتج أو خدمة جديدة",
+      "saleClaim": "موافقة حائز المبلغ",
+      "saleClaimSub": "من يحتفظ بالمال",
+      "generic": "قرار بانتظار توقيعك"
+    },
+    "sub": {
+      "stipendFrom": "بتمويل {{name}}",
+      "stipendSeeking": "تبحث عن ممول",
+      "suggestedForMe": "اقتراح يناسبك",
+      "reportedBy": "أبلغ عنه {{name}}",
+      "deliveredBy": "قدّمه {{name}}",
+      "welcome": "انضممت إلى الشبكة",
+      "offeredOn": "عرض على {{name}}",
+      "requestedBy": "طلبه {{name}}",
+      "siteShareIncome": "دخل من حصة المنصة",
+      "customer": "الزبون: {{name}}",
+      "seller": "البائع: {{name}}",
+      "transfer": "تحويل مالي بانتظار التأكيد",
+      "transferSend": "تحويل عليك إرساله",
+      "transferRecive": "تحويل في طريقه إليك",
+      "siteSharePay": "حصة المنصة التي التزمت بها",
+      "siteShareDecide": "تمت الموافقة على التقسيم — أكّد حصتك",
+      "stipendCycle": "دورة منحة انتهت — للدفع",
+      "stipendSent": "وُسم كمُرسل — بانتظار تأكيدك"
+    },
+    "title": {
+      "transfer": "{{from}} ← {{to}}",
+      "sitesharepay": "دفع حصة المنصة",
+      "sitesharedecide": "إقرار حصة المنصة",
+      "stipendpay": "دفع المنحة",
+      "stipendconfirm": "تأكيد استلام المنحة"
+    },
+    "cta": {
+      "vote": "للتصويت",
+      "answer": "للرد",
+      "pay": "للدفع",
+      "confirm": "للتأكيد",
+      "view": "للعرض"
+    },
+    "act": {
+      "chat": "فتح المحادثة",
+      "project": "عن الشبكة"
     }
   }
 }

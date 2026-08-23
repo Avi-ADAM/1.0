@@ -800,13 +800,81 @@
       "stipendpay": "Pago de beca",
       "stipendconfirm": "Beca recibida",
       "sitesharedecide": "Decisión sobre la parte del sitio",
-      "other": "Elemento"
+      "other": "Elemento",
+      "saleIncome": "Ingreso de plataforma",
+      "editObject": "Cambio de objeto",
+      "releaseObject": "Liberación de objeto",
+      "stipendProgram": "Programa de estipendio",
+      "saleClaim": "Consentimiento del receptor",
+      "newService": "Servicio nuevo",
+      "picVote": "Cambio de logo"
     },
     "fact": {
       "hours": "{{value}} horas",
       "rate": "{{value}} por hora",
       "amount": "valor {{value}}",
-      "qty": "cant. {{value}}"
+      "qty": "cant. {{value}}",
+      "hoursDone": "{{value}} h hechas",
+      "price": "Precio {{value}}",
+      "profit": "Ganancia {{value}}",
+      "shares": "{{value}} partes",
+      "members": "{{value}} socios",
+      "round": "Ronda {{value}}",
+      "basis": "de {{value}}",
+      "transfers": "{{value}} transferencias"
+    },
+    "decision": {
+      "name": "Cambio de nombre de la rikma",
+      "pubdes": "Cambio de descripción pública",
+      "prides": "Cambio de descripción interna",
+      "newFlink": "Cambio de enlace de Facebook",
+      "newWlink": "Cambio de sitio web",
+      "timtoM": "Cambio de duración del voto",
+      "vallueadd": "Añadir valores",
+      "vallueles": "Quitar valores",
+      "pic": "Cambio de logo de la rikma",
+      "sheirutpends": "Nuevo producto o servicio",
+      "saleClaim": "Consentimiento del receptor",
+      "saleClaimSub": "Quién tiene el dinero",
+      "generic": "Una decisión espera tu firma"
+    },
+    "sub": {
+      "stipendFrom": "Financiado por {{name}}",
+      "stipendSeeking": "Busca financiador",
+      "suggestedForMe": "Una sugerencia para ti",
+      "reportedBy": "Reportado por {{name}}",
+      "deliveredBy": "Entregado por {{name}}",
+      "welcome": "Te uniste a la rikma",
+      "offeredOn": "Ofrecido en {{name}}",
+      "requestedBy": "Solicitado por {{name}}",
+      "siteShareIncome": "Ingreso de la parte de la plataforma",
+      "customer": "Cliente: {{name}}",
+      "seller": "Vendedor: {{name}}",
+      "transfer": "Una transferencia por confirmar",
+      "transferSend": "Una transferencia que envías",
+      "transferRecive": "Una transferencia que recibirás",
+      "siteSharePay": "La parte de plataforma que comprometiste",
+      "siteShareDecide": "El reparto está aprobado — confirma tu parte",
+      "stipendCycle": "Ciclo de estipendio cerrado — a pagar",
+      "stipendSent": "Marcado como enviado — espera tu confirmación"
+    },
+    "title": {
+      "transfer": "{{from}} → {{to}}",
+      "sitesharepay": "Pago de la parte de plataforma",
+      "sitesharedecide": "Aprobación de la parte de plataforma",
+      "stipendpay": "Pago de estipendio",
+      "stipendconfirm": "Confirmación de estipendio recibido"
+    },
+    "cta": {
+      "vote": "Votar",
+      "answer": "Responder",
+      "pay": "Pagar",
+      "confirm": "Confirmar",
+      "view": "Ver"
+    },
+    "act": {
+      "chat": "Abrir chat",
+      "project": "Sobre la rikma"
     }
   }
 }

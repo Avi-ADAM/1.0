@@ -591,7 +591,8 @@
           askmap: true,
           sheirutp: true,
           sales: true,
-          purchases: true
+          purchases: true,
+          vidu: true
         }}
         onMesima={mesima}
         onUser={user}

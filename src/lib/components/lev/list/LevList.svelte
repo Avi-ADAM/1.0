@@ -16,7 +16,7 @@
   import { t, isRtl } from '$lib/translations';
   import LevRow from './LevRow.svelte';
   import LevCard from '../cards/LevCard.svelte';
-  import { isCardVisible, kindLabelKey } from '../cards/cardKinds.js';
+  import { isCardVisible, rowKindKey } from '../cards/cardKinds.js';
   import Filter from '../cards/filter.svelte';
   import FilterIcon from '$lib/celim/icons/filterIcon.svelte';
   import '../cards/stylec.css';
@@ -220,6 +220,7 @@
     <div class="filter-strip">
       <Filter
         filterKind="kind"
+        edgeToEdge
         onShowonly={pickFilter}
         onShowall={clearFilter}
         sug={counts.sugg ?? 0}
@@ -243,6 +244,7 @@
       <Filter
         filterKind="projects"
         allIds={uniqueProjects}
+        edgeToEdge
         onShowonly={pickFilter}
         onShowall={clearFilter}
       />
@@ -255,7 +257,12 @@
     <div class="scroller">
       {#each rows as item (item.coinlapach)}
         <div class="cell">
-          <LevRow {item} onOpen={() => open(item)} />
+          <LevRow
+            {item}
+            onOpen={() => open(item)}
+            {onProj}
+            {onChat}
+          />
         </div>
       {/each}
     </div>
@@ -280,7 +287,7 @@
       >
         {$isRtl ? '→' : '←'}
       </button>
-      <span class="handle-title">{$t(kindLabelKey(openItem.ani))}</span>
+      <span class="handle-title">{$t(rowKindKey(openItem))}</span>
       <span class="grip" aria-hidden="true"></span>
     </div>
 
@@ -311,7 +318,7 @@
        tall one. */
     /* The floor is set by what the row must always show — the header strip,
        one line of title, the chips and the bottom line — not by taste. */
-    --lev-row-h: clamp(170px, 30vh, 240px);
+    --lev-row-h: clamp(190px, 30vh, 240px);
     height: 100dvh;
     display: flex;
     flex-direction: column;

@@ -131,6 +131,8 @@
    * @property {number} [askma]
    * @property {number} [hachlot]
    * @property {boolean} [low]
+   * @property {boolean} [edgeToEdge] - fill the host's width instead of leaving
+   *   room for the swiper's side chrome (the list view has none)
    * @property {(payload: { id: any }) => void} [onHover] - Callback for hover event
    * @property {(payload: { data: any, kind: string, id: any }) => void} [onShowonly] - Callback for showonly event
    * @property {() => void} [onShowall] - Callback for showall event
@@ -155,6 +157,7 @@
     sheirutps = 13,
     purchasesn = 0,
     low = true,
+    edgeToEdge = false,
     onHover,
     onShowonly,
     onShowall
@@ -192,8 +195,15 @@
   let milon = $derived(filterKind === 'projects' ? milonProjects : milonItems);
 </script>
 
+<!-- The `max-w` is not styling for its own sake: inside the card swiper the strip
+     has to clear the nav arrows and the view switch, so it stops 180-200px short
+     of the viewport. A host with no such chrome — the list view — asks for
+     `edgeToEdge` and gets the full width, rather than a strip that ends in a
+     wide unexplained gap. -->
 <div
-  class="flex flex-nowrap overflow-x-auto whitespace-nowrap w-full sm:max-w-[calc(100vw-200px)] max-w-[calc(100vw-180px)] d"
+  class="flex flex-nowrap overflow-x-auto whitespace-nowrap w-full d {edgeToEdge
+    ? ''
+    : 'sm:max-w-[calc(100vw-200px)] max-w-[calc(100vw-180px)]'}"
 >
   {#if filterKind == 'kind'}
     {#each milon.filter((item) => {
