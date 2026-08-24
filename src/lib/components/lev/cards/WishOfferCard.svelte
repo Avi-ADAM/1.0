@@ -4,7 +4,6 @@
   import { toast } from 'svelte-sonner';
   import { wishOffersStore } from '$lib/stores/levStores';
   import { isMobileOrTablet } from '$lib/utilities/device';
-  import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
   import CardHeader from './CardHeader.svelte';
 
   let { buble, isFirst = false, onUser, onChat } = $props();
@@ -99,12 +98,6 @@
 </script>
 
 <div
-  onclick={toggleScrollable}
-  role="button"
-  tabindex="0"
-  onkeypress={(e) => {
-    e.key === 'Enter' && toggleScrollable();
-  }}
   dir={$isRtl ? 'rtl' : 'ltr'}
   class="{isMobileOrTablet()
     ? 'w-full h-full'
@@ -124,9 +117,7 @@
   />
 
   <div
-    class="d {isScrolable.value
-      ? 'bg-white dark:bg-slate-800'
-      : 'bg-gray-50 dark:bg-slate-700/50'} transition-all duration-300 p-5 flex-1 overflow-y-auto space-y-5 text-gray-800 dark:text-gray-100"
+    class="d bg-white dark:bg-slate-800 transition-all duration-300 p-5 flex-1 overflow-y-auto space-y-5 text-gray-800 dark:text-gray-100"
   >
     <!-- The volunteer — clicking opens the user modal (cards `onUser`) -->
     <button

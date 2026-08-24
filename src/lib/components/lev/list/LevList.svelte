@@ -19,6 +19,7 @@
   import { isCardVisible, rowKindKey } from '../cards/cardKinds.js';
   import Filter from '../cards/filter.svelte';
   import FilterIcon from '$lib/celim/icons/filterIcon.svelte';
+  import LevViewSwitch from '../LevViewSwitch.svelte';
   import '../cards/stylec.css';
 
   /**
@@ -176,43 +177,11 @@
         </button>
       {/if}
 
-      <button
-        type="button"
-        class="icon"
-        aria-label={$t('lev.list.toCards')}
-        onclick={() => onView?.('cards')}
-      >
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-          <rect
-            x="3"
-            y="4"
-            width="18"
-            height="16"
-            rx="2"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          />
-        </svg>
-      </button>
-
-      <button
-        type="button"
-        class="icon"
-        aria-label={$t('lev.list.toCoins')}
-        onclick={() => onView?.('coins')}
-      >
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-          <circle
-            cx="12"
-            cy="12"
-            r="8"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          />
-        </svg>
-      </button>
+      <LevViewSwitch
+        compact
+        value="list"
+        onChange={(v) => onView?.(v)}
+      />
     </div>
   </header>
 

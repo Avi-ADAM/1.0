@@ -278,6 +278,7 @@ export const qidsAccess = {
   '62SetUserReadyForStart': { allow: ['user', 'serviceAdmin'] },
   '63CheckMeetingReadyStatus': { allow: ['user', 'serviceAdmin'] },
   '64ClearPendingStart': { allow: ['user', 'serviceAdmin'] },
+  '172getMeetingMemberIds': { allow: ['user', 'serviceAdmin'] }, // meeting qid — magik-meetings guest-invite membership check
   'updateMeetingAvailability': { allow: ['user', 'serviceAdmin'] },
   '65GetAskById': { allow: ['user', 'serviceAdmin'] },
   '66CreateForumForAsk': { allow: ['user', 'serviceAdmin'] },

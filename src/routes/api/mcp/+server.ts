@@ -1,7 +1,7 @@
 import { MCPServer } from '@mastra/mcp';
 import { mastra } from '../../../mastra'; // Our global instance
 import { verifyApiKey } from '$lib/server/apiKeys';
-import { setMcpContex } from '$lib/server/mcpContext';
+import { setMcpContext } from '$lib/server/mcpContext';
 import { toReqRes, toFetchResponse } from 'fetch-to-node';
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';

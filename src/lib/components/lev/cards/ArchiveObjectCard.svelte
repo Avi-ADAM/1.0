@@ -14,7 +14,6 @@
   import { executeAction } from '$lib/client/actionClient';
   import { toast } from 'svelte-sonner';
   import { isMobileOrTablet } from '$lib/utilities/device';
-  import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
   import CardHeader from './CardHeader.svelte';
   import NegoArchive from '../negoArchive.svelte';
   import { buildTermRows } from '$lib/archive/decisionView.js';
@@ -193,17 +192,10 @@
 
 <!--
   Card shell — the shared lev convention (see docs/LEV_CARD_CONVENTIONS.md):
-  the slide centres its child, so the card must claim its own 90%/full size;
-  a click toggles `isScrolable`, which both frees inner scrolling (Swiper stops
-  eating the wheel) and moves the glow onto this card.
+  the host centres its child, so the card must claim its own 90%/full size, and
+  the glow follows `isFirst` — the one card the reader is actually on.
 -->
 <div
-  onclick={toggleScrollable}
-  role="button"
-  tabindex="0"
-  onkeypress={(e) => {
-    e.key === 'Enter' && toggleScrollable();
-  }}
   dir={$isRtl ? 'rtl' : 'ltr'}
   class="{isMobileOrTablet()
     ? 'w-full h-full'
@@ -211,7 +203,7 @@
     ? $isRtl
       ? 'boxleft'
       : 'boxright'
-    : ''} flex d flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isScrolable.value
+    : ''} flex d flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isFirst
     ? 'shadow-glow border-glow'
     : 'shadow-lg border border-gray-100 dark:border-gray-700'} transition-all duration-300 relative"
   style:--glow-rgb={glowRgb}
@@ -227,9 +219,7 @@
   />
 
   <div
-    class="{isScrolable.value
-      ? 'bg-white dark:bg-slate-800'
-      : 'bg-gray-200 dark:bg-slate-700'} transition-all-300 flex-1 overflow-y-auto d p-4 space-y-4"
+    class="bg-white dark:bg-slate-800 transition-all-300 flex-1 overflow-y-auto d p-4 space-y-4"
   >
     <div class="flex items-center gap-2 flex-wrap">
       <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">

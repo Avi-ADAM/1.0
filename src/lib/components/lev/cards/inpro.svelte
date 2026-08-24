@@ -15,7 +15,6 @@
   // import Chaticon from '../../../celim/chaticon.svelte'
   import RichText from '$lib/celim/ui/richText.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device.js';
-  import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
   import CardHeader from './CardHeader.svelte';
   import ArchiveObjectButton from '$lib/components/archive/ArchiveObjectButton.svelte';
   import ProposeEditButton from '$lib/components/archive/ProposeEditButton.svelte';
@@ -182,12 +181,6 @@
 </script>
 
 <div
-  onclick={toggleScrollable}
-  role="button"
-  tabindex="0"
-  onkeypress={(e) => {
-    e.key === 'Enter' && toggleScrollable();
-  }}
   dir={$isRtl ? 'rtl' : 'ltr'}
   style="overflow-y:auto"
   class="{isMobileOrTablet()
@@ -196,7 +189,7 @@
     ? $lang == 'he'
       ? 'boxleft'
       : 'boxright'
-    : ''} flex d flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isScrolable.value
+    : ''} flex d flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isVisible
     ? 'shadow-glow border-glow'
     : 'shadow-lg border border-gray-100 dark:border-gray-700'} transition-all duration-300 relative"
   style:--glow-rgb={glowColor === 'gold'
@@ -255,9 +248,7 @@
 
   <!-- Content -->
   <div
-    class="{isScrolable.value
-      ? 'bg-white dark:bg-slate-800'
-      : 'bg-gray-200 dark:bg-slate-700'} d transition-all-300 p-4 flex-1 overflow-y-auto space-y-4"
+    class="bg-white dark:bg-slate-800 d transition-all-300 p-4 flex-1 overflow-y-auto space-y-4"
   >
     <!-- Timer Display -->
     <div class="flex items-center justify-center">

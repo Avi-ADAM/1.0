@@ -84,6 +84,12 @@
     const want = FOOT_PAD[footMode] ?? '0px';
     const root = document.documentElement;
     const body = document.body;
+    // `--foot-pad` below is conditional — a page that fits the viewport gets
+    // none. But such a page still has to keep its own bottom row out from under
+    // the bar, and it cannot do that with a reserve that reads 0. So publish the
+    // bar's height unconditionally as `--foot-h`, for anything laid out against
+    // the viewport rather than against the document flow (the lev deck).
+    root.style.setProperty('--foot-h', want);
     // Only pages that actually scroll get the reserve. One laid out to fill the
     // viewport exactly — the lev deck, a full-screen hero — was drawn around the
     // bar already, and a tail there would turn a fixed screen into a scrolling
@@ -110,7 +116,10 @@
       // The pages that hide the bar (the wish composer, onboarding) must not
       // keep a reserve for a bar that is gone — but a handover between the two
       // mount points must not clear the one that just took over either.
-      if (--live === 0) root.style.removeProperty('--foot-pad');
+      if (--live === 0) {
+        root.style.removeProperty('--foot-pad');
+        root.style.removeProperty('--foot-h');
+      }
     };
   });
 
@@ -120,8 +129,8 @@
     moach: 'common.nav.moach',
     chat: 'lev.cards.saleCard.chat',
     // `common.*` — the footer renders on every route, so its labels must come
-    // from globally-loaded namespaces. `deals.*` is route-gated to /deals,
-    // /lev, /newlev, so this key rendered raw everywhere else.
+    // from globally-loaded namespaces. `deals.*` is route-gated to /deals and
+    // /lev, so this key rendered raw everywhere else.
     concierge: 'common.footer.concierge',
     deals: 'common.footer.deals',
     lev: 'common.nav.lev',

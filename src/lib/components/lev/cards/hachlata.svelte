@@ -1,6 +1,5 @@
 ﻿<script>
   import { isRtl } from '$lib/translations';
-  import { toggleScrollable, isScrolable } from './isScrolable.svelte.js';
   import { t } from '$lib/translations';
   import { get } from 'svelte/store';
   import { msLeft } from '$lib/stores/clock.svelte';
@@ -274,12 +273,6 @@
 </script>
 
 <div
-  onclick={toggleScrollable}
-  role="button"
-  tabindex="0"
-  onkeypress={(e) => {
-    e.key === 'Enter' && toggleScrollable();
-  }}
   dir={$isRtl ? 'rtl' : 'ltr'}
   style="overflow-y:auto"
   class="d {isMobileOrTablet()
@@ -288,7 +281,7 @@
     ? $isRtl
       ? 'boxleft'
       : 'boxright'
-    : ''} flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isScrolable.value
+    : ''} flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isVisible
     ? 'shadow-glow border-glow'
     : 'shadow-lg border border-gray-100 dark:border-gray-700'} transition-all duration-300 relative"
   style:--glow-rgb={glowColor === 'gold'
@@ -346,9 +339,7 @@
 
   <!-- Content Area -->
   <div
-    class="d {isScrolable.value
-      ? 'bg-white dark:bg-slate-800'
-      : 'bg-gray-50 dark:bg-slate-700/50'} transition-all duration-300 p-4 flex-1 overflow-y-auto flex flex-col space-y-4"
+    class="d bg-white dark:bg-slate-800 transition-all duration-300 p-4 flex-1 overflow-y-auto flex flex-col space-y-4"
   >
     {#if kind == 'sheirutpends'}
       <div

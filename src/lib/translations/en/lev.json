@@ -764,6 +764,7 @@
     "toList": "Compact view",
     "toCards": "Cards view",
     "toCoins": "Coins view",
+    "switchLabel": "Choose view",
     "time": {
       "over": "Time is up",
       "d": "{{count}} days left",

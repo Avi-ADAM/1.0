@@ -9,7 +9,6 @@
   import { isMobileOrTablet } from '$lib/utilities/device';
   import { formatTime } from '../utils';
   import TimetToTimegrama from './timetToTimegrama.svelte';
-  import { toggleScrollable, isScrolable } from './isScrolable.svelte.js';
 
   // רכיבים מודרניים חדשים
   import CardHeader from './CardHeader.svelte';
@@ -104,12 +103,6 @@
 </script>
 
 <div
-  onclick={toggleScrollable}
-  role="button"
-  tabindex="0"
-  onkeypress={(e) => {
-    e.key === 'Enter' && toggleScrollable();
-  }}
   dir={$isRtl ? 'rtl' : 'ltr'}
   style="overflow-y:auto"
   class="d {isMobileOrTablet()
@@ -118,7 +111,7 @@
     ? $lang == 'he'
       ? 'boxleft'
       : 'boxright'
-    : ''} flex d flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isScrolable.value
+    : ''} flex d flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isVisible
     ? 'shadow-glow border-glow'
     : 'shadow-lg border border-gray-100 dark:border-gray-700'} transition-all duration-300 relative"
   style:--glow-rgb={glowColor === 'gold'
@@ -168,9 +161,7 @@
 
   <!-- תוכן הקלף -->
   <div
-    class="{isScrolable.value
-      ? 'bg-white dark:bg-slate-800'
-      : 'bg-gray-50 dark:bg-slate-700/50'} transition-all duration-300 p-4 flex-1 overflow-y-auto d space-y-4"
+    class="bg-white dark:bg-slate-800 transition-all duration-300 p-4 flex-1 overflow-y-auto d space-y-4"
   >
     <!-- חישוב תשלום / שעות -->
     <div

@@ -1,11 +1,13 @@
 # Lev card conventions
 
-Every card on the heart page (`/lev`) is a Swiper slide rendered from
-`src/lib/components/lev/cards/cards.svelte`. The slide is a **flex container
-that centres its child** (`.swiper-slidec` / `.swipr-slidemobile` in
-`stylec.css`) — it does *not* stretch it. So a card that does not claim its own
-size collapses to its content width and looks half-screen next to every other
-card.
+Every card on the heart page (`/lev`) is rendered through `LevCard.svelte` into
+one of two hosts: a slide of the **deck** in
+`src/lib/components/lev/cards/cards.svelte`, or the expanded sheet of the
+condensed list in `src/lib/components/lev/list/`. The deck is a native CSS
+scroll-snap container — **not Swiper any more**; see §3 and §8 for what that
+changed. Its slide (`.deck-slide`) is a **flex container that centres its
+child** — it does *not* stretch it. So a card that does not claim its own size
+collapses to its content width and looks half-screen next to every other card.
 
 A new card is not "a div with a header and buttons". It is the shell below,
 copied verbatim. `SaleCard.svelte` is the reference implementation; `haluka`,
@@ -20,7 +22,6 @@ copied verbatim. `SaleCard.svelte` is the reference implementation; `haluka`,
 <script>
   import { t, isRtl } from '$lib/translations';
   import { isMobileOrTablet } from '$lib/utilities/device';
-  import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
   import CardHeader from './CardHeader.svelte';
 
   let { buble, isFirst = false, onProj, onChat } = $props();
@@ -29,12 +30,6 @@ copied verbatim. `SaleCard.svelte` is the reference implementation; `haluka`,
 </script>
 
 <div
-  onclick={toggleScrollable}
-  role="button"
-  tabindex="0"
-  onkeypress={(e) => {
-    e.key === 'Enter' && toggleScrollable();
-  }}
   dir={$isRtl ? 'rtl' : 'ltr'}
   class="{isMobileOrTablet()
     ? 'w-full h-full'
@@ -42,7 +37,7 @@ copied verbatim. `SaleCard.svelte` is the reference implementation; `haluka`,
     ? $isRtl
       ? 'boxleft'
       : 'boxright'
-    : ''} flex d flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isScrolable.value
+    : ''} flex d flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isFirst
     ? 'shadow-glow border-glow'
     : 'shadow-lg border border-gray-100 dark:border-gray-700'} transition-all duration-300 relative"
   style:--glow-rgb={glowRgb}
@@ -51,9 +46,7 @@ copied verbatim. `SaleCard.svelte` is the reference implementation; `haluka`,
 
   <!-- content -->
   <div
-    class="{isScrolable.value
-      ? 'bg-white dark:bg-slate-800'
-      : 'bg-gray-200 dark:bg-slate-700'} transition-all-300 flex-1 overflow-y-auto d p-4 space-y-4"
+    class="bg-white dark:bg-slate-800 transition-all-300 flex-1 overflow-y-auto d p-4 space-y-4"
   >
     …
   </div>
@@ -84,28 +77,33 @@ Without it the flex-centred slide shrink-wraps the card. `h-full` alone is not
 enough — the width is the half that breaks. Never rely on the slide to size the
 card.
 
-## 3. `isScrolable` — click once to scroll, click again to swipe
+## 3. Scrolling a card — nothing to wire
 
-`isScrolable.svelte.js` holds one global `$state({ value: true })`.
-`cards.svelte` watches it and, while it is `false`, calls `swiperRef.disable()`
-+ `mousewheel.disable()` — that is the only reason inner content can be scrolled
-at all. A card that does not wire `toggleScrollable` onto its root can never be
-scrolled with the wheel: Swiper eats it and slides to the next card.
+Nothing. That is the whole rule, and it is worth stating because it used to be
+the opposite.
 
-So the root **must** carry `onclick={toggleScrollable}` plus `role="button"`,
-`tabindex="0"` and the `Enter` handler (a11y — without them `svelte-check`
-warns).
+A card's middle row is `flex-1 overflow-y-auto` and it scrolls. On the deck the
+wheel handler (`contentConsumesWheel` in `cards.svelte`) walks up from the
+event's target and, if anything on the way still has room to scroll in that
+direction, leaves the event alone; on the phone's vertical deck native scroll
+chaining does the same. In the list view the card is inside a sheet and scrolls
+outright.
 
-Two visible consequences, both intentional:
+**Do not** put `onclick`, `role="button"` or `tabindex="0"` on a card root.
+There used to be a global `isScrolable` store that every card toggled from its
+root, because Swiper ate the wheel unconditionally and `swiperRef.disable()` was
+the only way to give it back. It was one global for all cards, so clicking one
+changed the look of every other, and a whole card announced itself to a screen
+reader as a button. Swiper is gone and so is the store (`isScrolable.svelte.js`
+was deleted); a card root is a plain `<div>` again.
 
-- the content background turns `bg-gray-200 / dark:bg-slate-700` while
-  `isScrolable.value === false`, i.e. while the card is in scroll mode;
-- the glow follows `isScrolable.value`, not `isFirst` — the card you are
-  reading is the one that glows.
+The glow now follows the card's own `isFirst` / `isVisible` prop — true for the
+centred slide in the deck and for the single open card in the list, so exactly
+one card is lit in either host. That is what this section always claimed the
+behaviour was.
 
-Buttons inside the card do **not** `stopPropagation` — toggling scroll mode as a
-side effect of pressing a button is accepted behaviour across all cards.
-
+Buttons inside a card no longer need to think about `stopPropagation` for this
+reason (`CardHeader`'s `onProjectClick` still does it for its own navigation).
 ## 4. Glow — `shadow-glow` / `border-glow` are per-card scoped styles
 
 They are **not** in `app.postcss` and not Tailwind utilities. Each card repeats
@@ -174,10 +172,16 @@ without toggling scroll mode.
 
 ## 8. Overlays must portal
 
-Swiper puts a `transform` on the slide, which makes `position: fixed` resolve
-against the slide instead of the viewport. Any modal/drawer a card opens has to
-render through a portal (`bits-ui` `<Portal>`, or `Drawer.Portal` as in
-`negoArchive.svelte`) — otherwise it appears clipped inside the card.
+A transformed ancestor is a containing block, so `position: fixed` inside one
+resolves against *it* instead of the viewport, and the modal ends up clipped
+inside the card.
+
+The deck no longer does this — it centres itself with `inset: 0; margin: auto`
+precisely so there is no transform on the scroll container or its slides. But
+the **list view's expanded sheet still does** (`translateY` drives its
+drag-to-close), so the rule is unchanged: any modal/drawer a card opens renders
+through a portal (`bits-ui` `<Portal>`, or `Drawer.Portal` as in
+`negoArchive.svelte`). A card must work in both hosts.
 
 ## 9. Text
 

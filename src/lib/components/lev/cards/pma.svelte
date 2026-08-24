@@ -7,7 +7,6 @@
   import { isMobileOrTablet } from '$lib/utilities/device';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { secondsLeft } from '$lib/stores/clock.svelte';
-  import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
 
   // רכיבים מודרניים
   import CardHeader from './CardHeader.svelte';
@@ -304,12 +303,6 @@
 </script>
 
 <div
-  onclick={toggleScrollable}
-  role="button"
-  tabindex="0"
-  onkeypress={(e) => {
-    e.key === 'Enter' && toggleScrollable();
-  }}
   dir={$isRtl ? 'rtl' : 'ltr'}
   style="overflow-y:auto"
   class="{isMobileOrTablet()
@@ -318,7 +311,7 @@
     ? $lang == 'he'
       ? 'boxleft'
       : 'boxright'
-    : ''} flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isScrolable.value
+    : ''} flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isVisible
     ? 'shadow-glow border-glow'
     : 'shadow-lg border border-gray-100 dark:border-gray-700'} transition-all duration-300 relative"
   style:--glow-rgb={glowColor === 'gold'
@@ -363,9 +356,7 @@
 
   <!-- אזור תוכן מרכזי נגלל -->
   <div
-    class="d {isScrolable.value
-      ? 'bg-white dark:bg-slate-800'
-      : 'bg-gray-50 dark:bg-slate-700/50'} transition-all duration-300 p-4 flex-1 overflow-y-auto space-y-4"
+    class="d bg-white dark:bg-slate-800 transition-all duration-300 p-4 flex-1 overflow-y-auto space-y-4"
   >
     <!-- טיימר (מיקום מודרני מותאם) -->
     {#if timeLeft > 0}

@@ -16,9 +16,6 @@
   $effect(() => {
     center = { x: w / 2, y: h / 2 };
   });
-  $effect(() => {
-    console.log('עדכון מרכז:', center);
-  });
   // Call this function whenever you add new circles
   //placeCircles();
 
@@ -41,8 +38,6 @@
           // חישוב מיקום הגלילה
           const scrollLeft = contentCenter.x - container.clientWidth / 2;
           const scrollTop = contentCenter.y - container.clientHeight / 2;
-
-          console.log('גלילה למיקום:', scrollLeft, scrollTop);
 
           // גלילה למרכז
           container.scrollTo({
@@ -173,17 +168,7 @@
   function chat(payload) {
     // Forward a card's chat request (e.g. saleClaim → { forumId }) to the page,
     // which opens the shared chat drawer.
-    console.log('[saleClaim][chat] newcoinui.chat forwarding to page', {
-      payload,
-      hasOnChat: typeof onChat === 'function'
-    });
     onChat?.(payload);
-  }
-
-  function cards() {
-    onCards?.({
-      cards: true
-    });
   }
 
   function proj(event) {
@@ -236,7 +221,7 @@
    * @property {(payload: { id: any }) => void} [onUser] - Callback for 'user' event
    * @property {(payload: { id: any }) => void} [onMesima] - Callback for 'mesima' event
    * @property {(payload: { id: any }) => void} [onHover] - Callback for 'hover' event
-   * @property {(payload: { cards: boolean }) => void} [onCards] - Callback for 'cards' event
+   * @property {(view: 'list' | 'cards' | 'coins') => void} [onView] - the heart's three-way view switch
    * @property {(payload: { id: any }) => void} [onProj] - Callback for 'proj' event
    */
 
@@ -246,7 +231,7 @@
     onUser,
     onMesima,
     onHover,
-    onCards,
+    onView,
     onProj,
     onChat,
     adder = [],
@@ -347,24 +332,21 @@
     // מירכוז התצוגה
     centerViewOnLoad();
 
-    // האזנה לשינויי גודל החלון
-    window.addEventListener('resize', () => {
+    // האזנה לשינויי גודל החלון — with the teardown it never had. Every mount
+    // used to leave a live listener behind, so a session that visited the heart
+    // three times re-placed the whole field three times per resize event.
+    const onResize = () => {
       updateSizes();
       centerViewOnLoad();
-    });
-
-    console.log(orders, w, 'mount');
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
   });
 
   let orders = $state([]);
   $effect(() => {
     orders = checkLines(arr1, w, h);
   });
-
-  export const snapshot = {
-    capture: () => JSON.parse(JSON.stringify(orders)),
-    restore: (value) => (orders = value)
-  };
 </script>
 
 <div
@@ -1005,7 +987,7 @@
       <div class="midCom">
         <Mid
           {sml}
-          onCards={cards}
+          {onView}
           onHover={hover}
           onShowall={showall}
           onShowonly={showonly}
@@ -1060,9 +1042,11 @@
 
   .normSml {
     position: absolute;
-    transition: transform 500ms ease-in-out;
     border-radius: 50%;
-    /* Position your elements based on the center */
+    /* Placed by `left`/`top` from `orders[i]`. There used to be a
+       `transition: transform 500ms` here, which could never fire — nothing
+       animates `transform`. Moving the field onto transforms (and getting the
+       animation this was reaching for) is Stage 1 of docs/PLAN_LEV_COINS.md. */
   }
 
   .control-buttons {

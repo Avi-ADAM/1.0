@@ -765,6 +765,7 @@
     "toList": "Vista compacta",
     "toCards": "Vista de tarjetas",
     "toCoins": "Vista de monedas",
+    "switchLabel": "Elegir vista",
     "time": {
       "over": "Se acabó el tiempo",
       "d": "quedan {{count}} días",

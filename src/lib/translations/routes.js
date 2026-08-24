@@ -28,7 +28,7 @@ const at = (...paths) =>
 export const ROUTED = {
     onboard: at('/onboard'),
     tasks: at('/myacts', /\/moach\/[^/]+\/acts/),
-    deals: at('/deals', '/lev', '/newlev'),
+    deals: at('/deals', '/lev'),
     negotiation: at('/negotiation'),
     guide: at('/guid'),
     faq: at('/faq'),
@@ -45,7 +45,7 @@ export const ROUTED = {
     // The rikma's API page — one route, one namespace, nowhere else.
     rikmaApi: at(/\/moach\/[^/]+\/api/),
     // Archive/edit proposals surface as lev cards and on the rikma's object pages.
-    archive: at('/lev', '/newlev', /\/moach\/[^/]+/),
+    archive: at('/lev', /\/moach\/[^/]+/),
     // Subsistence stipends: the heart's proposal/pay/confirm cards, the rikma's
     // own stipend tab — and the public support page, where a supporter can say
     // "I'll fund this mission" and the donation dialog names the stipend.
@@ -54,7 +54,6 @@ export const ROUTED = {
     // to match the import graph or the checker cannot tell the difference.
     stipend: at(
         '/lev',
-        '/newlev',
         /\/moach\/[^/]+/,
         /\/project\/[^/]+/,
         '/concierge',
