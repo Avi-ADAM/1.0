@@ -6,7 +6,6 @@
   import Chaticon from '$lib/celim/chaticon.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import RichText from '$lib/celim/ui/richText.svelte';
-  import { toggleScrollable, isScrolable } from './isScrolable.svelte.js';
   import CardHeader from './CardHeader.svelte';
 
   import VoteStatusDisplay from './VoteStatusDisplay.svelte';
@@ -131,16 +130,10 @@
   import { getProjectData } from '$lib/stores/projectStore';
   function getSkillNames(arr) {
     return arr.map((s) => s.attributes.skillName);
-  } //    isMobileOrTablet() ? (isScrolable = !isScrolable) : (isScrolable = true)}
+  }
 </script>
 
 <div
-  onclick={toggleScrollable}
-  role="button"
-  tabindex="0"
-  onkeypress={(e) => {
-    e.key === 'Enter' && toggleScrollable();
-  }}
   dir={$isRtl ? 'rtl' : 'ltr'}
   style="overflow-y:auto"
   class="{isMobileOrTablet()
@@ -149,7 +142,7 @@
     ? $isRtl
       ? 'boxleft'
       : 'boxright'
-    : ''} flex d flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isScrolable.value
+    : ''} flex d flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isVisible
     ? 'shadow-glow border-glow'
     : 'shadow-lg border border-gray-100 dark:border-gray-700'} transition-all duration-300 relative"
   style:--glow-rgb={glowColor === 'gold'
@@ -206,9 +199,7 @@
     {/snippet}
   </CardHeader>
   <div
-    class="{isScrolable.value
-      ? 'bg-white dark:bg-slate-800'
-      : 'bg-gray-200 dark:bg-slate-700'} transition-all-300 p-4 flex-1 overflow-y-auto d space-y-4"
+    class="bg-white dark:bg-slate-800 transition-all-300 p-4 flex-1 overflow-y-auto d space-y-4"
   >
     <div class="space-y-3">
       <!-- User Info -->

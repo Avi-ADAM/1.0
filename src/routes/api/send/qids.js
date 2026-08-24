@@ -3581,6 +3581,34 @@ ${STIPEND_DECISION_FIELDS}
       }
     }
   }`,
+  // magik-meetings: "is this user on this meeting?" — the guest-invite link is
+  // minted locally there (signed token, no upstream write), so that app has to
+  // do its own membership check before minting. Invitees who have not approved
+  // yet count as members: they are legitimate participants of the meeting.
+  '172getMeetingMemberIds': `query GetMeetingMemberIds($id: ID!) {
+    pgisha(id: $id) {
+      data {
+        id
+        attributes {
+          name
+          pgishausers {
+            data {
+              attributes {
+                users_permissions_user { data { id } }
+              }
+            }
+          }
+          pgishauserpends(filters: { archived: { ne: true } }) {
+            data {
+              attributes {
+                users_permissions_user { data { id } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
   '64ClearPendingStart': `mutation ClearPendingStart($id: ID!) {
     updatePgisha(id: $id, data: { pendingStart: false }) {
       data {

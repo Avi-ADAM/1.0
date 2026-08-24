@@ -30,7 +30,6 @@ async function onChatClick() {
 }
 let isHovered = $state(false);
 let showConfetti = $state(false);
-let isScrolable = $state(true);
 
 function handleCardClick() {
   showConfetti = true;

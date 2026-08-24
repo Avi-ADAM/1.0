@@ -224,12 +224,6 @@
     u = event.id;
   }
 
-  function handleViewChange(event) {
-    // The in-card Switch only ever knew cards↔coins; route it through the
-    // three-way store so the list stays the one source of truth.
-    levView.set(event.cards ? 'cards' : 'coins');
-  }
-
   // M4 receiving side: load committed-but-unpaid site-share contributions so they
   // surface as cards in the swiper (replaces the old top-of-page banner).
   async function loadSiteSharePayables() {
@@ -500,28 +494,6 @@
     </div>
   {/if}
   
-  <!-- Back to the condensed overview. The cards/coins views carry their own
-       cards↔coins switch but know nothing about the list, so the way back
-       lives here, clear of both (the mobile switch bar sits at bottom:3rem). -->
-  {#if $levView !== 'list'}
-    <button
-      type="button"
-      class="to-list"
-      aria-label={$t('lev.list.toList')}
-      onclick={() => levView.set('list')}
-    >
-      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-        <path
-          d="M4 6h16M4 12h16M4 18h16"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-        />
-      </svg>
-    </button>
-  {/if}
-
   <!-- Main Content -->
   <Tooltip title={u} ispic={true}>
     {#if $levView === 'list'}
@@ -547,7 +519,7 @@
         <Cardsui
           low={false}
           onHover={hover}
-          onCards={handleViewChange}
+          onView={(v) => levView.set(v)}
           onUser={user}
           onProj={proj}
           onChat={chat}
@@ -575,6 +547,7 @@
     {:else}
       <Coinsui
         onHover={hover}
+        onView={(v) => levView.set(v)}
         low={false}
         milon={{
           hachla: true,
@@ -599,7 +572,6 @@
         onProj={proj}
         onChat={chat}
         onStart={handleCoinLapach}
-        onCards={handleViewChange}
         adder={[]}
         arr1={displayItems}
         askedarr={[]}
@@ -667,28 +639,6 @@
       opacity: 1;
       transform: scale(1.1);
     }
-  }
-
-  .to-list {
-    position: fixed;
-    bottom: 0.4rem;
-    inset-inline-start: 0.75rem;
-    z-index: 1001;
-    width: 2.25rem;
-    height: 2.25rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 9999px;
-    border: 1px solid var(--barbi-pink);
-    background: rgba(255, 255, 255, 0.9);
-    color: #374151;
-    backdrop-filter: blur(6px);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  }
-  :global(html.dark) .to-list {
-    background: rgba(17, 24, 39, 0.9);
-    color: #e5e7eb;
   }
 
   .focus-chip button {

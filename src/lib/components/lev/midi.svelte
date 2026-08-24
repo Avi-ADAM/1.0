@@ -171,7 +171,7 @@ u = 'lev.page.diamondsHint'
   }
   onHover?.({ id: $t(u) });
  }
-  import Switch from './../../celim/switch.svelte'
+  import LevViewSwitch from './LevViewSwitch.svelte'
   /**
    * @typedef {Object} Props
    * @property {any} picLink
@@ -193,7 +193,7 @@ u = 'lev.page.diamondsHint'
 
   /** @type {Props} */
   let {
-    onShowonly, onShowall, onHover, onCards,
+    onShowonly, onShowall, onHover, onView,
     picLink,
     name = "",
     sug = 13,
@@ -210,15 +210,9 @@ u = 'lev.page.diamondsHint'
     saless = 0,
     sheirutps = 0,
     purchasesn = 0,
-    low = true,
-    cards = $bindable(false)
+    low = true
   } = $props();
 
-$effect(() => {
-    if (cards == true){
-          onCards?.({ cards: true });
-  }
-  });
 console.log(mashs)
 
 </script>
@@ -257,7 +251,7 @@ role="contentinfo"
 onmouseenter={()=> hoverede("x")} 
 onmouseleave={()=> hoverede()}
  style:visibility={low == true ? "hidden":  "visible"} class="bg">
-<Switch bind:value={cards} design="multi" options={[false, true]} />
+<LevViewSwitch compact value="coins" onChange={(v) => onView?.(v)} />
 </div>
 
 <Sv 

@@ -3,7 +3,6 @@
   import Chaticon from '$lib/celim/chaticon.svelte';
   import { lang } from '$lib/stores/lang.js';
   import { t, isRtl } from '$lib/translations';
-  import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import Lev from '$lib/celim/lev.svelte';
   import No from '$lib/celim/no.svelte';
@@ -107,12 +106,6 @@
 
 <!-- 1. Container מרכזי עם אפקטי Glow -->
 <div
-  onclick={toggleScrollable}
-  role="button"
-  tabindex="0"
-  onkeypress={(e) => {
-    e.key === 'Enter' && toggleScrollable();
-  }}
   dir={$isRtl ? 'rtl' : 'ltr'}
   class="{isMobileOrTablet()
     ? 'w-full h-full'
@@ -122,7 +115,7 @@
       : 'boxright'
     : ''} 
   flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden transition-all duration-300 relative
-  {isScrolable.value
+  {isVisible
     ? 'shadow-glow border-glow'
     : 'shadow-lg border border-gray-100 dark:border-gray-700'}"
   style:--glow-rgb="2, 255, 187"
@@ -140,9 +133,7 @@
 
   <!-- 3. אזור התוכן -->
   <div
-    class="d {isScrolable.value
-      ? 'bg-white dark:bg-slate-800'
-      : 'bg-gray-50 dark:bg-slate-700/50'} 
+    class="d bg-white dark:bg-slate-800 
     transition-all duration-300 p-5 flex-1 overflow-y-auto space-y-6 text-gray-800 dark:text-gray-100"
   >
     <!-- ההצעה שלי — מוצגת כשהגשתי התאמה אישית (סבב מו"מ על המועמדות שלי) -->
