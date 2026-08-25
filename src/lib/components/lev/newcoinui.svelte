@@ -35,7 +35,8 @@
   import { flip } from 'svelte/animate';
   import { onDestroy, onMount, untrack } from 'svelte';
   import { t } from '$lib/translations';
-  import { coinSize } from '$lib/stores/levStores';
+  import { coinSize, coinSkin } from '$lib/stores/levStores';
+  import { RIM_GILT } from './coins/coinSkin.js';
   import { confettiStore } from '$lib/stores/confettiStore';
   import { deckPosition, rememberCard } from './cards/deckPosition.svelte.js';
   import { isMobileOrTablet } from '$lib/utilities/device';
@@ -589,6 +590,21 @@
       {/each}
     </div>
 
+    <!-- The face the coins wear, remembered per browser. Two states, so a
+         toggle rather than a row of steps: the button shows the skin you would
+         switch *to*. -->
+    <button
+      type="button"
+      class="control-button skin-button"
+      class:on={$coinSkin === 'classic'}
+      aria-pressed={$coinSkin === 'classic'}
+      aria-label={$t('lev.coins.skin.label')}
+      title={$t(`lev.coins.skin.${$coinSkin === 'classic' ? 'plate' : 'classic'}`)}
+      onclick={() => coinSkin.set($coinSkin === 'classic' ? 'plate' : 'classic')}
+    >
+      <span class="skin-dot" aria-hidden="true"></span>
+    </button>
+
     <button
       class="control-button center-button"
       onclick={() => centerView()}
@@ -603,6 +619,20 @@
          identical field — so the button had nothing left to do. Stage 6 of
          docs/PLAN_LEV_COINS.md puts the zoom controls in its place. -->
   </div>
+
+  <!-- One gilt gradient for the whole field. The original coins defined one
+       *per coin* — part of why 137 of them cost 31,540 DOM nodes — and an SVG
+       paint server resolves document-wide, so a single hidden <defs> serves
+       every coin's rim lettering. -->
+  <svg class="coin-defs" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="lev-coin-gilt" x1="0" y1="0" x2="0" y2="1">
+        {#each RIM_GILT as stop, i}
+          <stop offset={i / (RIM_GILT.length - 1)} stop-color={stop} />
+        {/each}
+      </linearGradient>
+    </defs>
+  </svg>
 
   <div
     id="content-area"
@@ -805,6 +835,32 @@
 
   .control-button:active {
     transform: scale(0.95);
+  }
+
+  /* Not `display: none` — Chrome and Safari stop resolving `url(#…)` paint
+     servers that live inside a hidden subtree. Present, laid out, zero size. */
+  .coin-defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+
+  /* The skin toggle: the little coin on the button wears the *other* face, so
+     it shows what you would switch to rather than what you have. */
+  .skin-dot {
+    display: block;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: #fdfcf4;
+    border: 2px solid rgba(255, 255, 255, 0.75);
+    box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.15);
+  }
+  .skin-button.on .skin-dot {
+    background: radial-gradient(circle at 30% 30%, #fbec9b, #bd8328 60%, #6b4a14);
+    border-color: #f6e9a0;
+    box-shadow: none;
   }
 
   .size-control {

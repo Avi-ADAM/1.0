@@ -885,6 +885,11 @@
       "s": "Monedas pequeñas",
       "m": "Monedas medianas",
       "l": "Monedas grandes"
+    },
+    "skin": {
+      "label": "Cara de la moneda",
+      "plate": "Cara legible",
+      "classic": "Cara clásica"
     }
   }
 }

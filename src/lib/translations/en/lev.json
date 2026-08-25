@@ -884,6 +884,11 @@
       "s": "Small coins",
       "m": "Medium coins",
       "l": "Large coins"
+    },
+    "skin": {
+      "label": "Coin face",
+      "plate": "Readable face",
+      "classic": "Classic face"
     }
   }
 }

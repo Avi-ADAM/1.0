@@ -44,6 +44,8 @@
     rowIsActionable
   } from '../cards/cardKinds.js';
   import { coinArc } from './coinArc.js';
+  import { coinFace, RIM_GILT, RIM_STROKE } from './coinSkin.js';
+  import { coinSkin } from '$lib/stores/levStores';
 
   /**
    * @typedef {Object} Props
@@ -54,6 +56,29 @@
 
   /** @type {Props} */
   let { item, size, onOpen } = $props();
+
+  let classic = $derived($coinSkin === 'classic');
+  /**
+   * The rim path needs an id, and there are up to 137 of these in one document.
+   * `coinlapach` is the item identity the whole heart already keys on, so no
+   * counter is needed and the id survives a re-render.
+   */
+  let rimId = $derived(`lev-rim-${item.coinlapach}`);
+
+  /**
+   * The rim label's size, in viewBox units — i.e. as a percentage of the coin's
+   * diameter — floored so that it never renders below **10px**, whatever the
+   * member's size step. That is the same floor the plate keeps for its kind cap
+   * and meta line, and it is not a style choice: 8–10px inside a small circle
+   * is the complaint this whole view was shelved over, and a curved line is
+   * already harder to read than a straight one. At the S step (96px, or 81px on
+   * a phone) 8.5 units would be 8.2px, so this lifts it; at M and L the natural
+   * size already clears the floor.
+   */
+  const RIM_UNITS = 8.5;
+  let rimFont = $derived(Math.max(RIM_UNITS, (10 / Math.max(size, 1)) * 100));
+  /** The artwork this kind's original coin was painted with. */
+  let face = $derived(coinFace(item.ani));
 
   let accent = $derived(kindAccent(item.ani));
   let content = $derived(rowContent(item));
@@ -149,20 +174,57 @@
   class:done={!actionable}
   class:has-clock={arc !== null}
   class:urgent
+  class:classic
   style:--accent={accent}
   style:--size={`${size}px`}
   style:--arc={arcPct}
+  style:--face={classic ? `url(${face})` : 'none'}
   aria-label={label}
   onclick={onOpen}
 >
-  <!-- The project logo as the coin's face, at watermark strength. It is the
+  <!-- The project logo. On the plate it is the coin's face at watermark
+       strength; on the classic skin the *kind's* artwork is the face, so the
+       logo becomes a small badge at the foot of the coin. Either way it is the
        only image on a coin, it repeats across the field, and it is what lets a
        member find "the ones from that rikma" before reading a word. -->
   {#if item.src}
     <img class="face" src={item.src} alt="" loading="lazy" decoding="async" />
   {/if}
 
-  <span class="ring" aria-hidden="true"></span>
+  <!-- The kind/clock ring belongs to the plate. On the classic skin the coin's
+       edge is the artwork's own edge — that is what a coin looks like — and a
+       coloured band drawn around a painted sphere reads as a frame bolted onto
+       it, not as part of it. Nothing is lost: the clock the arc encodes is
+       already spelled out in words on the meta line (`countdown` is set
+       whenever `arc` is), and the kind is lettered around the rim. -->
+  {#if !classic}
+    <span class="ring" aria-hidden="true"></span>
+  {/if}
+
+  {#if classic}
+    <!-- The kind, lettered in gilt around the rim — the one thing the original
+         coins did that a flat disc cannot. It is `aria-hidden` because the
+         accessible name above already says it, and it carries the *kind*, not
+         the title: a curved line is harder to read than a straight one, so what
+         goes on it is the shortest and least load-bearing of the three labels.
+         The title and the clock stay flat and horizontal in the middle.
+
+         `fill` names the shared gradient with a solid gilt fallback, so a coin
+         still letters correctly if the field's <defs> is not in the document
+         (a lone coin in a test, a screenshot of one). -->
+    <svg class="rim" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+      <path id={rimId} d="M 6,50 A 44,44 0 0 1 94,50" fill="none" />
+      <text
+        text-anchor="middle"
+        dominant-baseline="hanging"
+        font-size={rimFont}
+        fill="url(#lev-coin-gilt) {RIM_GILT[2]}"
+        stroke={RIM_STROKE}
+      >
+        <textPath href="#{rimId}" startOffset="50%">{kindLabel}</textPath>
+      </text>
+    </svg>
+  {/if}
 
   <span class="inner">
     <span class="kind">{kindLabel}</span>
@@ -367,5 +429,104 @@
   }
   .coin.done .meta {
     color: #6b7280;
+  }
+
+  /* ══ the classic skin ═════════════════════════════════════════════════════
+     Each kind on the artwork its original coin was painted with, and the kind
+     lettered in gilt around the rim. Everything that carries *information* —
+     the ring's clock arc, the accent, the accessible name, the two flat lines
+     in the middle — is untouched; only the surface changes.
+
+     The one thing it does drop is the ring: see the `{#if !classic}` above.
+
+     Cost, for the record: no extra elements on the plate skin, and three net on
+     the classic one (an <svg>, a <path>, a <text>, a <textPath>, less the ring
+     span). At 137 coins that is ~410 nodes on top of 4,297 — about +10%,
+     against the 31,540 the original coins cost. No Swiper, no per-coin timer,
+     no per-coin gradient definition. */
+  .coin.classic {
+    /* The face is a photograph or a painted sphere, so nothing may rely on the
+       surface being light: the ink is set here, not inherited. */
+    background-image: var(--face);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: #1b1408;
+  }
+
+  /* The logo stops being the face and becomes a badge at the foot of the coin —
+     the rim lettering has taken the top, which is where the originals put it. */
+  .coin.classic .face {
+    inset: auto 50% 6% auto;
+    width: 22%;
+    height: 22%;
+    transform: translateX(50%);
+    z-index: 1;
+    opacity: 1;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  }
+
+  .rim {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .rim text {
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    /* The originals stroked their lettering and painted the stroke *under* the
+       fill, which is what lets gilt sit on any face without a halo. */
+    paint-order: stroke;
+    stroke-width: 1.6px;
+    stroke-linejoin: round;
+  }
+
+  /* The middle of a textured coin is not a legible background, so the words get
+     their own ground: a soft well that fades out before it reaches the rim, so
+     the artwork still reads as the coin's face. Without it the title lands on
+     whatever the photograph happens to be doing there. */
+  .coin.classic .inner {
+    inset: 12% 10% 22%;
+    background: radial-gradient(
+      closest-side,
+      rgba(10, 8, 3, 0.78) 0%,
+      rgba(10, 8, 3, 0.62) 62%,
+      rgba(10, 8, 3, 0) 100%
+    );
+  }
+
+  /* The kind is on the rim now; a second copy in the middle would spend one of
+     the three lines a circle has. The title gets it instead. */
+  .coin.classic .kind {
+    display: none;
+  }
+
+  .coin.classic .title {
+    color: #fff;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95);
+  }
+
+  .coin.classic .meta {
+    color: #f3e2b2;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.95);
+  }
+
+  .coin.classic.urgent .meta {
+    color: #ffb4b4;
+  }
+
+  /* A settled coin quietens the same way it does on the plate — the face is
+     dimmed rather than swapped, so the field still reads as one set. */
+  .coin.classic.done {
+    filter: grayscale(0.7);
+  }
+  .coin.classic.done .meta {
+    color: #d1d5db;
   }
 </style>

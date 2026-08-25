@@ -615,18 +615,28 @@ export type LevView = 'list' | 'cards' | 'coins';
 const LEV_VIEW_KEY = 'lev:view';
 
 /**
- * Default to the overview on phones, where mounting every card at once is what
- * makes the heart slow, and to the swiper on desktop where it never was.
+ * First visit opens on the **coins**, everywhere.
+ *
+ * This used to be a performance decision — the overview on phones, where
+ * mounting every card at once is what made the heart slow, and the swiper on
+ * desktop where it never was — and the coin field was never offered because it
+ * was the slowest of the three. It is not any more: it mounts one cheap circle
+ * per item and exactly one full card, the open one (137 coins measured at 4,297
+ * DOM nodes and no Swiper at all, against 31,540 and 129 before). So the
+ * fallback goes back to being about the heart rather than about the machine.
+ *
+ * It is only a *fallback*: the moment a member picks a view it is remembered
+ * here, per browser, and never overridden.
  */
 function initialLevView(): LevView {
-  if (typeof window === 'undefined') return 'cards';
+  if (typeof window === 'undefined') return 'coins';
   try {
     const saved = window.localStorage.getItem(LEV_VIEW_KEY);
     if (saved === 'list' || saved === 'cards' || saved === 'coins') return saved;
   } catch {
-    /* private mode / disabled storage — fall through to the device default */
+    /* private mode / disabled storage — fall through to the default */
   }
-  return window.matchMedia?.('(max-width: 768px)')?.matches ? 'list' : 'cards';
+  return 'coins';
 }
 
 export const levView: Writable<LevView> = writable(initialLevView());
@@ -672,6 +682,47 @@ coinSize.subscribe((v) => {
   if (typeof window === 'undefined') return;
   try {
     window.localStorage.setItem(COIN_SIZE_KEY, v);
+  } catch {
+    /* ignore */
+  }
+});
+
+/**
+ * Which face the coins wear.
+ *
+ * `plate` is the readable disc Stage 2 built — a light surface, the kind's
+ * accent as a ring, every word in ordinary HTML. `classic` is the heart as it
+ * was first drawn: each kind on the artwork its original coin was painted with,
+ * and the kind lettered in gilt around the rim.
+ *
+ * It is a skin, not the old coin view. Both faces are the same `LevCoin`
+ * element with the same accessible name, the same clock arc and the same
+ * coverage of every kind — so choosing the one you like cannot cost you sight
+ * of a consent item, which is exactly what choosing the old coin view did.
+ *
+ * Remembered per browser, like `coinSize`.
+ */
+export type CoinSkin = 'plate' | 'classic';
+
+const COIN_SKIN_KEY = 'lev:coinSkin';
+
+function initialCoinSkin(): CoinSkin {
+  if (typeof window === 'undefined') return 'plate';
+  try {
+    const saved = window.localStorage.getItem(COIN_SKIN_KEY);
+    if (saved === 'plate' || saved === 'classic') return saved;
+  } catch {
+    /* private mode / disabled storage */
+  }
+  return 'plate';
+}
+
+export const coinSkin: Writable<CoinSkin> = writable(initialCoinSkin());
+
+coinSkin.subscribe((v) => {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(COIN_SKIN_KEY, v);
   } catch {
     /* ignore */
   }

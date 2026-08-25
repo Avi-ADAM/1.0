@@ -199,6 +199,7 @@ describe('the new keys exist in every locale', () => {
     // size control, which is the answer to "older members cannot read this".
     'lev.coins.center',
     ...['label', 's', 'm', 'l'].map((k) => `lev.coins.size.${k}`),
+    ...['label', 'plate', 'classic'].map((k) => `lev.coins.skin.${k}`),
     ...['transfer', 'transferSend', 'transferRecive'].map((k) => `lev.list.sub.${k}`),
     ...[
       'hours',

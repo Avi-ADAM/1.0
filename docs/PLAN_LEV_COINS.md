@@ -1,15 +1,14 @@
 # PLAN — Lev coins view (תצוגת המטבעות): החזרת עטרה ליושנה
 
-> Status: **stages 0–5 landed (2026-08-25);** 4 was absorbed by 2 and 3.
+> Status: **stages 0–5 landed (2026-08-25),** plus **5b** (the classic coin
+> skin), which was not in the original plan. 4 was absorbed by 2 and 3.
 > This is the working document for the coin view's restoration. Each stage below
 > is one commit with its own acceptance criteria — except 2 and 3, which cannot
 > ship apart and landed together. Tick the boxes as they land.
 >
-> **What is left:** one decision inside Stage 5 (which view a member sees on
-> their *first* visit, now that the coins are no longer the slow one), Stage 6
-> (pan, zoom, keyboard, minimap) and Stage 7 (delete the now unreachable
-> coin-mode branches from the 12 giant components and drop `swiper` from
-> `package.json`).
+> **What is left:** Stage 6 (pan, zoom, keyboard, minimap) and Stage 7 (delete
+> the now unreachable coin-mode branches from the 12 giant components and drop
+> `swiper` from `package.json`).
 >
 > The four open questions were **decided by the owner on 2026-08-24** — see §6.
 > In short: `/newlev` redirects to `/lev`; distance from the heart *is* urgency;
@@ -589,13 +588,105 @@ Two of these were not optional once the coins became a keyed `{#each}`:
       where the centre was (324, 719)" was not a stale aim at all; it was an
       animation caught in flight. Automatic centring is `'instant'` now; the ⌘
       button still asks for `'smooth'`, because there the movement is the point.
-- [ ] **The view is the member's choice, remembered** (decided). `levView`
-      already persists per browser, and opening a coin or a row now leaves you
-      where you were when you switch. What is still open is the **first-visit
-      fallback**, which today is a performance decision — `list` on a phone,
-      `cards` on desktop (`initialLevView()`, `levStores.ts`) — and, as of
-      Stage 3, no longer a true one. Owner's call. Promoting the preference to
-      the account is explicitly out of scope.
+- [x] **The view is the member's choice, remembered** (decided). `levView`
+      persists per browser, and opening a coin or a row now leaves you where you
+      were when you switch. The **first-visit fallback** was a performance
+      decision — `list` on a phone, `cards` on desktop — and, as of Stage 3, no
+      longer a true one; **the owner's call (2026-08-25) is coins, everywhere**,
+      so `initialLevView()` returns `'coins'` and the heart opens as the heart
+      again. It is only a fallback: the moment a member picks a view it is
+      remembered and never overridden. Promoting the preference to the account
+      stays out of scope.
+
+### Stage 5b — the two faces of a coin ✅ *(done 2026-08-25)*
+
+Not in the original plan. It came out of the owner looking at the rebuilt view
+and saying the new coins are good — *and* that the old ones were colourful, with
+the text curved around the rim, and asking what it would cost to have both.
+
+The honest answer was that there are two different things called "the old
+coins", and only one of them is affordable:
+
+- **The old coin *view*** — the `{#if cards == false}` branch of twelve
+  components — cannot be a toggle. Keeping it alive means keeping `swiper@8`
+  and those branches forever (so Stage 7 never happens), 31,540 DOM nodes
+  against 4,297, ~13s to a usable paint, hard-coded Hebrew, and nine money and
+  consent kinds with **no coin at all**. Offering a member a mode in which a
+  sale claim is invisible is not a preference, it is missed consent.
+- **The old coin's *face*** — the artwork, the colour, the gilt lettering
+  around the rim — is a skin on `LevCoin`, and it is cheap.
+
+So: a skin. The decision, in the owner's words, was to use *the original's own*
+backgrounds and colours rather than to reproduce the original coins.
+
+- [x] `coins/coinSkin.js` — the faces themselves, harvested from the twelve
+      components' coin branches so that when Stage 7 deletes those, this is what
+      survives of them: `haluk`/`vidu` on the prismatic sphere, `mtaha` on the
+      diamond light, `pends` on the pink, `pmashes` on the nice coin, `huca` on
+      the turquoise, `wegets` on the flower, `fiapp` on the new coin,
+      `askedcoin` on the coin, `askedm`/`hachla` on the decision coin, `meData`
+      on the clean coin. The nine kinds that never had a coin take the face of
+      the family they belong to, so the field reads as one set rather than as
+      eleven painted coins and nine blanks. `coinSkin.test.ts` walks
+      `RENDERABLE_ANIS` and fails if a kind has no face.
+- [x] The **kind, lettered in gilt around the rim** — `missionInProgress`'s own
+      rim gradient — in one inline `<svg>` per coin with a `<path>` and a
+      `<textPath>`. What goes on the curve is the *kind*, the shortest and least
+      load-bearing of the three labels; the title and the clock stay flat and
+      horizontal in the middle, because a curved line is harder to read and
+      "older members cannot read it" is what shelved this view.
+      - Floored at **10px rendered**, at every size step — the same floor the
+        plate keeps for its cap and meta line. At the S step the natural 8.5
+        units would be 8.2px, so it is lifted; verified at 96px.
+      - **`letters()` is not needed, and that is a finding.** The original coins
+        pre-reversed Hebrew word by word because "SVG `<text>` has no bidi
+        engine". Modern browsers apply the bidi algorithm to `<textPath>` too:
+        the rim renders `השקעה במשאב` correctly from the plain translated
+        string. Stage 7's retirement of `letters()` is therefore still on the
+        table *with* curved text, not despite it.
+      - **One gradient for the whole field.** An SVG paint server resolves
+        document-wide, so a single hidden `<defs>` in `newcoinui` serves all 137
+        rims; the originals defined one per coin. The `<defs>` is sized to zero
+        rather than `display: none`, because a hidden subtree stops resolving
+        `url(#…)` in Chrome and Safari. `fill` also names a solid gilt fallback,
+        so a coin still letters correctly on its own.
+- [x] **No accent ring on the classic skin.** The plate's kind/clock band is a
+      frame drawn *around* a disc; on a painted coin the artwork's own edge is
+      the coin's edge, and a coloured band bolted onto it reads as a badge
+      holder rather than as part of the coin. The `<span class="ring">` is not
+      rendered at all when the skin is `classic` (one element fewer per coin,
+      not merely `display:none`), and it comes back untouched on the plate.
+      Nothing is lost: `meta` spells the clock out in words whenever there is an
+      arc to draw — `countdown` is set exactly when `deadline` is — the kind is
+      lettered around the rim, and the accessible name still carries both.
+- [x] The middle of a textured coin is not a legible background, so the words
+      get a soft well that fades out before the rim — the artwork still reads as
+      the face, and the title never lands on whatever the photograph is doing
+      there. The project logo stops being a 14% watermark and becomes a badge at
+      the **foot** of the coin, since the rim lettering has taken the top.
+- [x] `coinSkin` store (`plate | classic`), remembered per browser like
+      `coinSize`, with a toggle in the field's chrome that shows the face you
+      would switch **to**. Four new keys, `lev.coins.skin.*`, in all five
+      locales, asserted by `rowContent.test.ts`.
+
+**What it costs, measured on the same 137-coin heart:**
+
+| | plate | classic |
+|---|---:|---:|
+| DOM nodes on the page | 4,403 | **4,942** (+539, ≈ +12%) |
+| extra elements per coin | 0 | 4 (`svg`, `path`, `text`, `textPath`) |
+| … since the ring was dropped | 0 | **3** net (−137 nodes on this field) |
+| gradient definitions | 0 | **1**, shared by all 137 |
+| Swiper instances | 0 | **0** |
+| per-coin timers | 0 | **0** |
+| layout work per clock tick | none | none |
+
+For scale, the original coin view cost **31,540** nodes and 129 Swipers for the
+same field. Both skins keep the always-visible label, the accessible name, the
+deadline (as the ring's arc on the plate, as words on the meta line in both),
+the actionable/settled distinction and all 23 kinds — measured: 0
+empty titles and 0 missing `aria-label`s in classic, 15 distinct kind labels on
+the rims.
 
 ### Stage 6 — the field, restored as the good idea it was
 
@@ -622,7 +713,11 @@ tab-and-arrow navigation reaches every coin.
       `swiper` from `package.json`.
 - [ ] Retire `letters()` and the `nameRaw` duplication once nothing renders
       Hebrew into raw SVG `<text>` (see `project_lev_letters_reverses` memory —
-      update it when this lands).
+      update it when this lands). **Stage 5b settled the doubt this raised:**
+      the classic skin letters its rim through a `<textPath>` from the plain
+      translated string and it renders in the right order, so curved SVG text is
+      *not* a reason to keep `letters()` alive. Only `sv.svelte` and the old
+      coin branches still need it.
 - [ ] `docs/LEV_CARD_CONVENTIONS.md` gains §10 — *coins*: a new kind needs
       nothing beyond `cardKinds.js` + `LevCard`; here is how to add an ornament
       if it deserves one.
