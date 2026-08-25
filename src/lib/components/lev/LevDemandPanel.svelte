@@ -101,7 +101,19 @@
   });
 </script>
 
-<button class="map-fab" onclick={openPanel} dir={$isRtl ? 'rtl' : 'ltr'}>
+<!-- Second slot of the rail (see `--rail-*` in app.postcss): the accessibility
+     trigger owns the bottom slot, so this sits one step above it instead of on
+     top of it. The side comes from `$isRtl` rather than a logical
+     `inset-inline-start`, for the reason spelled out in
+     AccessibilityPanel.svelte - the <html> dir attribute and the active locale
+     can disagree, and then the two widgets land on the same corner again. -->
+<button
+  class="map-fab"
+  onclick={openPanel}
+  dir={$isRtl ? 'rtl' : 'ltr'}
+  style="{$isRtl ? 'right' : 'left'}: var(--rail-inset, 0.75rem);
+         bottom: calc(var(--rail-bottom, 5rem) + var(--rail-step, 3.5rem));"
+>
   🗺️ <span class="fab-label">{$t('demand.lev_panel_fab')}</span>
 </button>
 
@@ -216,10 +228,10 @@
 {/if}
 
 <style>
+  /* Horizontal side and vertical slot are set inline from `$isRtl` - see the
+     note on the element - so only what is slot-independent lives here. */
   .map-fab {
     position: fixed;
-    bottom: 4.5rem;
-    inset-inline-start: 0.75rem;
     z-index: 40;
     display: inline-flex;
     align-items: center;
