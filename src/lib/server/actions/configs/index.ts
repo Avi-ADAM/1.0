@@ -11,6 +11,8 @@ import { approveHalukaConfig } from './approveHaluka.js';
 import { createHalukaConfig } from './createHaluka.js';
 import { createTosplitConfig } from './createTosplit.js';
 import { createSheirutpendConfig } from './createSheirutpend.js';
+import { proposeSheirutConfig } from './proposeSheirut.js';
+import { requestSheirutJoinConfig } from './requestSheirutJoin.js';
 import { createNewMeetingConfig } from './createNewMeeting.js';
 import { approveMeetingConfig } from './approveMeeting.js';
 import { toggleOnlineConfig } from './toggleOnline.js';
@@ -185,6 +187,10 @@ export function registerAllActions(): void {
   registerAction(createHalukaConfig);
   registerAction(createTosplitConfig);
   registerAction(createSheirutpendConfig);
+  // Service catalogue — the two flows that used to run as raw GraphQL from the
+  // browser (PLAN_TIMEGRAMA B6), each with a timegrama finalizer behind it.
+  registerAction(proposeSheirutConfig);
+  registerAction(requestSheirutJoinConfig);
   registerAction(createNewMeetingConfig);
   registerAction(approveMeetingConfig);
   registerAction(toggleOnlineConfig);
@@ -486,5 +492,7 @@ export {
   confirmHalukaConfig,
   addHalukaChatEntryConfig,
   voteOnDecisionConfig,
-  getDecisionDetailsConfig
+  getDecisionDetailsConfig,
+  proposeSheirutConfig,
+  requestSheirutJoinConfig
 };

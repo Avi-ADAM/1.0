@@ -312,30 +312,19 @@ export const processedOpenSiteShareDecisions: Readable<DisplayItem[]> = derived(
 // ========== Final Merged Array ==========
 
 /**
- * The main array that combines all processed items, sorted by priority.
- * This replaces the old arr1 array.
- * 
- * Automatically recomputes when:
- * - Any of the processed stores change
- * - The milon filter configuration changes
- * - The project filter changes
- * 
- * Applies two levels of filtering:
- * 1. Milon filtering - based on item type visibility settings
- * 2. Project filtering - based on selected project (if any)
- * 
- * Items are sorted by priority (pl field), with lower numbers appearing first.
- * 
- * @example
- * ```typescript
- * import { finalSwiperArray } from '$lib/stores/levDerived';
- * 
- * $effect(() => {
- *   console.log('Display items:', $finalSwiperArray);
- * });
- * ```
+ * Everything the heart holds, merged and sorted, **before any filter**.
+ *
+ * The filter panel is the reason this is exported separately. Its tiles are
+ * offered per kind with a count, and its project chips come from the projects
+ * present — and both used to be counted off `finalSwiperArray`, which is
+ * already filtered. So picking a kind dropped every *other* kind's count to
+ * zero and its tile off the strip (you could clear the filter but never move
+ * to another kind), and picking a project left exactly one project chip, with
+ * no way back to "all". A filter panel has to see what it is filtering.
+ *
+ * Sorted by priority (`pl`) so the order matches `finalSwiperArray`'s.
  */
-export const finalSwiperArray: Readable<DisplayItem[]> = derived(
+export const mergedFeed: Readable<DisplayItem[]> = derived(
   [
     processedPends,
     processedMtaha,
@@ -357,9 +346,7 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
     processedSiteSharePayables,
     processedOpenSiteShareDecisions,
     processedStipendPayables,
-    processedStipendConfirmations,
-    milon,
-    projectFilter
+    processedStipendConfirmations
   ],
   ([
     $pends,
@@ -382,12 +369,9 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
     $siteSharePayables,
     $openSiteShareDecisions,
     $stipendPayables,
-    $stipendConfirmations,
-    $milon,
-    $projectFilter
+    $stipendConfirmations
   ]) => {
-    // Step 1: Merge all processed arrays and sort by priority
-    const merged = mergeAndSort(
+    return mergeAndSort(
       $pends,
       $mtaha,
       $fiapp,
@@ -410,9 +394,42 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
       $stipendPayables,
       $stipendConfirmations
     );
+  }
+);
 
+/**
+ * The main array that combines all processed items, sorted by priority.
+ * This replaces the old arr1 array.
+ *
+ * Automatically recomputes when:
+ * - Any of the processed stores change
+ * - The milon filter configuration changes
+ * - The project filter changes
+ *
+ * Applies two levels of filtering:
+ * 1. Milon filtering - based on item type visibility settings
+ * 2. Project filtering - based on selected project (if any)
+ *
+ * Items are sorted by priority (pl field), with lower numbers appearing first.
+ *
+ * The three views gate a second time on `isCardVisible` (`cards/cardKinds.js`),
+ * which is the heart's one visibility predicate; the switch below predates it
+ * and disagrees with it in places. Do not add kinds here — add them there.
+ *
+ * @example
+ * ```typescript
+ * import { finalSwiperArray } from '$lib/stores/levDerived';
+ *
+ * $effect(() => {
+ *   console.log('Display items:', $finalSwiperArray);
+ * });
+ * ```
+ */
+export const finalSwiperArray: Readable<DisplayItem[]> = derived(
+  [mergedFeed, milon, projectFilter],
+  ([$merged, $milon, $projectFilter]) => {
     // Step 2: Apply milon filtering (visibility settings)
-    let filtered = merged.filter(item => {
+    let filtered = $merged.filter(item => {
       switch (item.ani) {
         case 'pends':
           return $milon.pend;
@@ -470,26 +487,9 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
     });
 
     // Step 3: Apply project filtering (if a project is selected)
-    const _scMerged = merged.filter((i: any) => i.kind === 'saleClaim').length;
-    const _scAfterMilon = filtered.filter((i: any) => i.kind === 'saleClaim').length;
     if ($projectFilter !== null) {
       filtered = filtered.filter(item => item.projectId === $projectFilter);
     }
-    const _scAfterProject = filtered.filter((i: any) => i.kind === 'saleClaim').length;
-    if (_scMerged > 0 || _scAfterMilon > 0) {
-      console.log('[saleClaim][swiper] pipeline counts', {
-        afterMerge: _scMerged,
-        afterMilonFilter: _scAfterMilon,
-        afterProjectFilter: _scAfterProject,
-        milonHachla: $milon.hachla,
-        projectFilter: $projectFilter
-      });
-    }
-    console.log(filtered.sort((a, b) => {
-      const priorityA = a.pl ?? 999;
-      const priorityB = b.pl ?? 999;
-      return priorityA - priorityB;
-    }))
     // Step 4: Ensure final sort by priority (pl)
     return filtered.sort((a, b) => {
       const priorityA = a.pl ?? 999;

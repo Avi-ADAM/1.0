@@ -876,5 +876,14 @@
       "chat": "Open chat",
       "project": "About the rikma"
     }
+  },
+  "coins": {
+    "center": "Back to the heart",
+    "size": {
+      "label": "Coin size",
+      "s": "Small coins",
+      "m": "Medium coins",
+      "l": "Large coins"
+    }
   }
 }

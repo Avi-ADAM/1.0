@@ -641,6 +641,42 @@ levView.subscribe((v) => {
   }
 });
 
+/**
+ * How big a coin is in the coin view.
+ *
+ * This is not decoration. The coin view's oldest complaint is that older
+ * members "מתקשים" with it — a 75px circle with 8px of text inside is below
+ * both the WCAG 2.5.8 target-size floor and anything a 70-year-old will read,
+ * and there was no way to change it. Three steps, remembered per browser, is
+ * the concrete answer; `LevCoin` scales its type with the diameter so a larger
+ * coin is a larger *word*, not just a larger circle.
+ */
+export type CoinSize = 's' | 'm' | 'l';
+
+const COIN_SIZE_KEY = 'lev:coinSize';
+
+function initialCoinSize(): CoinSize {
+  if (typeof window === 'undefined') return 'm';
+  try {
+    const saved = window.localStorage.getItem(COIN_SIZE_KEY);
+    if (saved === 's' || saved === 'm' || saved === 'l') return saved;
+  } catch {
+    /* private mode / disabled storage */
+  }
+  return 'm';
+}
+
+export const coinSize: Writable<CoinSize> = writable(initialCoinSize());
+
+coinSize.subscribe((v) => {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(COIN_SIZE_KEY, v);
+  } catch {
+    /* ignore */
+  }
+});
+
 /** Filter configuration for what to display */
 export const milon: Writable<MilonConfig> = writable({
   hachla: true,   // החלטות

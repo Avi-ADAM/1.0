@@ -369,6 +369,8 @@ export type ActionKey =
   | 'addVote'
   | 'approveSheirutpend'
   | 'rejectSheirutpend'
+  | 'proposeSheirut'
+  | 'requestSheirutJoin'
   | 'createProcess'
   | 'attachEntityToProcess'
   | 'ensureProcessForum'
@@ -511,6 +513,22 @@ export interface ActionParamsMap {
     projectId: string;
     existingComponentData?: any[];
     order?: number;
+  };
+  /**
+   * Propose a service for the rikma's catalogue. The server decides whether it
+   * publishes at once (solo rikma) or opens a vote with a clock.
+   */
+  proposeSheirut: {
+    projectId: string;
+    name: string;
+    descrip?: string;
+    oneTime?: boolean;
+    equaliSplited?: boolean;
+  };
+  /** Ask to receive one of a rikma's services. Requester = the session user. */
+  requestSheirutJoin: {
+    projectId: string;
+    sheirutId: string;
   };
   approveSheirutpend: {
     id: string;
@@ -949,6 +967,26 @@ export async function addVote(
   options: ExecuteActionOptions = {}
 ): Promise<ActionResponse> {
   return executeAction('addVote', params, options);
+}
+
+/**
+ * Propose a new service for a rikma's catalogue (PLAN_TIMEGRAMA 4.3).
+ */
+export async function proposeSheirut(
+  params: ActionParamsMap['proposeSheirut'],
+  options: ExecuteActionOptions = {}
+): Promise<ActionResponse> {
+  return executeAction('proposeSheirut', params, options);
+}
+
+/**
+ * Ask to receive one of a rikma's services (PLAN_TIMEGRAMA 4.4 / D2).
+ */
+export async function requestSheirutJoin(
+  params: ActionParamsMap['requestSheirutJoin'],
+  options: ExecuteActionOptions = {}
+): Promise<ActionResponse> {
+  return executeAction('requestSheirutJoin', params, options);
 }
 
 /**

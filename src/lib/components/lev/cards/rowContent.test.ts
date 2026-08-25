@@ -189,6 +189,16 @@ describe('the new keys exist in every locale', () => {
     ...RENDERABLE_ANIS.map((ani) => rowCtaKey(base(ani))),
     ...['vote', 'answer', 'pay', 'confirm', 'view'].map((k) => `lev.list.cta.${k}`),
     ...['chat', 'project'].map((k) => `lev.list.act.${k}`),
+    // The countdown, shown by the row and by the coin. `over` is what a passed
+    // deadline reads as, and each unit carries its own singular because no
+    // locale here agrees with a bare "{{count}} ימים" at one.
+    ...['over', 'd', 'h', 'm', 's', 'dOne', 'hOne', 'mOne', 'sOne'].map(
+      (k) => `lev.list.time.${k}`
+    ),
+    // The coin field's own chrome: the return-to-heart button and the three-step
+    // size control, which is the answer to "older members cannot read this".
+    'lev.coins.center',
+    ...['label', 's', 'm', 'l'].map((k) => `lev.coins.size.${k}`),
     ...['transfer', 'transferSend', 'transferRecive'].map((k) => `lev.list.sub.${k}`),
     ...[
       'hours',

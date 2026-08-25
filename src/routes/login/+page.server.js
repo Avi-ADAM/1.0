@@ -1,4 +1,5 @@
 import { STRAPI_URL as baseUrl } from '$lib/server/strapiUrl.js';
+import { safeRedirectTarget } from '$lib/auth/redirectTarget.js';
 
 /**
  * The address is remembered at signup and re-stamped by /confirm-email, so the
@@ -14,7 +15,9 @@ export const actions = {
         const data = await request.formData();
         const email = data.get('email');
         const password = data.get('password');
-        const redirectTo = String(data.get('from') || '/onboard');
+        // The hidden field is filled from an already-checked value, but the form
+        // is a public POST endpoint: anyone can send their own `from`.
+        const redirectTo = safeRedirectTarget(data.get('from'));
 
         if (!email || !password) {
             return { success: false, error: 'Please fill all fields.' };

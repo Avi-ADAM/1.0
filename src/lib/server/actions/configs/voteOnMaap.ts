@@ -20,6 +20,7 @@
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
 import { STRAPI_URL } from '$lib/server/strapiUrl.js';
 import { gqlString } from './actionUtils.js';
+import { settleCycleMaap } from '$lib/server/recurring/settleCycleMaap';
 
 function normalizeVote(v: any): Record<string, any> {
   const uid =
@@ -79,7 +80,6 @@ async function handleCycleMaapVote(
   const mashId = String(mashab.id);
   const mashAttrs = mashab.attributes ?? {};
   const responsibleId = String(mashAttrs.users_permissions_user?.data?.id ?? '');
-  const kindOf = mashAttrs.kindOf ?? 'monthly';
   const hasAmount = amount != null && !Number.isNaN(amount);
 
   // Two-card model: the responsible user reports the actual monthly spend, and
@@ -162,74 +162,25 @@ async function handleCycleMaapVote(
   }
 
   // ── Consensus: archive the month's spend as a delivery on the Rikmash ──────
-  const cycleIndex = attrs.cycleIndex ?? 1;
-  let rikmashId: string | null = mashAttrs.rikmash?.data?.id ?? null;
-
-  if (rikmashId) {
-    const rRes = await strapi.execute('mrGetRikmashForDelivery', { id: rikmashId }, context.jwt, context.fetch);
-    const rAttrs = rRes?.data?.rikmash?.data?.attributes ?? {};
-    const existingDeliveries = (rAttrs.deliveries ?? []).map((d: any) => ({
-      id: d.id,
-      cycleIndex: d.cycleIndex,
-      deliveredAt: d.deliveredAt,
-      quantity: d.quantity,
-      ...(d.note ? { note: d.note } : {}),
-      ...(d.maap?.data?.id ? { maap: d.maap.data.id } : {}),
-    }));
-    const deliveries = [
-      ...existingDeliveries,
-      { cycleIndex, deliveredAt: now.toISOString(), quantity: spend, maap: askId, confirmedBy: strUserId },
-    ];
-    await strapi.execute('mrUpdateRikmash', {
-      id: rikmashId,
-      data: {
-        deliveries,
-        total: (rAttrs.total ?? 0) + spend,
-        cyclesCount: (rAttrs.cyclesCount ?? 0) + 1,
-        lastDeliveryAt: now.toISOString(),
-      },
-    }, context.jwt, context.fetch);
-  } else {
-    const created = await strapi.execute('mrCreateRikmash', {
-      data: {
-        name: mashAttrs.name ?? attrs.name ?? 'משאב',
-        project: projectId,
-        mashabetahalich: mashId,
-        kindOf,
-        ...(responsibleId ? { users_permissions_user: responsibleId } : {}),
-        total: spend,
-        agprice: mashAttrs.pricePerUnit ?? spend,
-        cyclesCount: 1,
-        firstDeliveryAt: now.toISOString(),
-        lastDeliveryAt: now.toISOString(),
-        deliveries: [
-          { cycleIndex, deliveredAt: now.toISOString(), quantity: spend, maap: askId, confirmedBy: strUserId },
-        ],
-        maaps: [askId],
-        publishedAt: now.toISOString(),
-      },
-    }, context.jwt, context.fetch);
-    rikmashId = created?.data?.createRikmash?.data?.id ?? null;
-    if (rikmashId) {
-      await strapi.execute('mrLinkRikmashToMashabetahalich', { id: mashId, rikmash: rikmashId }, context.jwt, context.fetch);
+  // Shared with the restime maturation in the timegrama finalizer so a month
+  // settled by signature and one settled by silence cannot differ.
+  const { rikmashId } = await settleCycleMaap(
+    strapi,
+    { jwt: context.jwt, fetch: context.fetch },
+    {
+      maapId: askId,
+      projectId,
+      mashId,
+      mashAttrs,
+      maapName: attrs.name,
+      cycleIndex: attrs.cycleIndex ?? 1,
+      spend,
+      vots: allVots,
+      confirmedBy: strUserId,
+      timegramaId,
+      now
     }
-  }
-
-  // Archive the cycle Maap + accumulate the engine's running total.
-  await strapi.execute('mrUpdateCycleMaap', {
-    id: askId,
-    data: { archived: true, vots: allVots, quantityDelivered: spend, ...(rikmashId ? { rikmash: rikmashId } : {}) },
-  }, context.jwt, context.fetch);
-
-  await strapi.execute('mrUpdateMashabetahalich', {
-    id: mashId,
-    data: { quantityDelivered: (mashAttrs.quantityDelivered ?? 0) + spend },
-  }, context.jwt, context.fetch);
-
-  // Stop the deadline clock — the cycle is settled.
-  if (timegramaId) {
-    await strapi.execute('mrSetTimegramaDone', { id: timegramaId, done: true }, context.jwt, context.fetch);
-  }
+  );
 
   return { data: { askId, rikmashId, consensus: true }, updateStrategy: { type: 'fullRefresh' } };
 }

@@ -4,7 +4,6 @@
   import { fade } from 'svelte/transition';
   import { goto } from '$app/navigation';
   import { enhance } from '$app/forms';
-  import { page } from '$app/state';
 
   import {
     emailValidator,
@@ -34,7 +33,8 @@
   // Writable derived: tracks the form action's error, but can be cleared
   // locally when a new submit starts.
   let loginError = $derived(form?.error ?? null);
-  let redirectTo = $derived(page.url.searchParams.get('from') || '');
+  // Already filtered by the load — see $lib/auth/redirectTarget.js.
+  let redirectTo = $derived(data?.from || '');
 
   const [validity, validate] = createFieldValidator(
     requiredValidator(),
@@ -55,6 +55,13 @@
   ><span class="heading-business">{$t('auth.login.headingSharp')}</span>
 </h1>
 <p class="auth-sub">{$t('auth.login.subtitle')}</p>
+
+{#if data?.expired && !loginError}
+  <div class="auth-note" role="status" in:fade>
+    <strong>{$t('auth.expired.title')}</strong>
+    {$t('auth.expired.body')}
+  </div>
+{/if}
 
 {#if data?.confirmed && !loginError}
   <div class="auth-ok" role="status" in:fade>
@@ -78,7 +85,7 @@
     active = true;
     loginError = null;
     // Capture the intended destination before the async response arrives.
-    const fallbackDest = page.url.searchParams.get('from') || '/onboard';
+    const fallbackDest = data?.from || '/onboard';
     return async ({ result, update }) => {
       // NB: result.type === 'success' just means the action returned
       // (didn't throw / didn't call fail()). It does NOT mean the login
@@ -239,7 +246,8 @@
   <button
     type="button"
     class="auth-secondary"
-    onclick={() => goto(`/${data?.from ? `?from=${data.from}` : ``}`)}
+    onclick={() =>
+      goto(`/${data?.from ? `?from=${encodeURIComponent(data.from)}` : ``}`)}
   >
     {$t('auth.login.signupLink')}
   </button>
@@ -255,6 +263,26 @@
   }
   :global(html.business) .heading-business {
     display: inline;
+  }
+
+  /* "your session expired" — an explanation, not an error and not good news */
+  .auth-note {
+    display: block;
+    background: #fff8ec;
+    border: 1px solid rgba(180, 130, 20, 0.35);
+    color: #8a5a00;
+    border-radius: 0.9rem;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    margin-bottom: 1.1rem;
+    text-align: start;
+  }
+  :global(html.business) .auth-note {
+    background: var(--s1);
+    border-color: var(--border, var(--input));
+    color: var(--tm);
+    border-radius: var(--radius-theme, 0.25rem);
   }
 
   .auth-ok {

@@ -26,7 +26,12 @@
  }`;
     try {
       let res = await SendToAdmin(qu, ADMINMONTHER).then((res) => (res = res));
-      if (res.data == null || res.data.ask?.data == null) return;
+      // The candidacy is gone. Nothing to mature, and no later run will change
+      // that — tg#192 sat here for 286 days.
+      if (res.data == null || res.data.ask?.data == null) {
+        console.warn(`ask finalizer: ask ${id} no longer exists`);
+        return markDone(taid);
+      }
       const a = res.data.ask.data.attributes;
 
       // Already resolved → just close the timegrama.
@@ -96,7 +101,10 @@
         }}}
          }`;
       let res2 = await SendToAdmin(qua, ADMINMONTHER).then((res2) => (res2 = res2));
-      if (res2.data == null) return;
+      if (res2.data == null) {
+        console.warn(`ask finalizer: ask ${id} open_mission read returned nothing`);
+        return markDone(taid);
+      }
       const om = res2.data.ask.data.attributes.open_mission.data.attributes;
       const omId = res2.data.ask.data.attributes.open_mission.data.id;
 
@@ -175,7 +183,16 @@ updateOpenMission(
 }
 `;
       let res3 = await SendToAdmin(qub, ADMINMONTHER).then((res3) => (res3 = res3));
-      if (res3.data == null) return;
+      if (res3.data == null) {
+        // Deliberately NOT closed. Unlike the reads above, this is the write
+        // that performs the maturation: both sides agreed and the mission is
+        // supposed to exist now. Closing the clock here would drop an agreed
+        // outcome on the floor, so we let the next run retry.
+        // The cost is an unbounded retry with no record of the failure — that
+        // is what `attempts`/`lastError` fix (PLAN_TIMEGRAMA phase 5).
+        console.error(`ask finalizer: materialization failed for ask ${id}, will retry`, res3);
+        return;
+      }
       let chiluzh = res3.data.createMesimabetahalich.data.id;
 
       // Recurring mission → spin up its Monter.

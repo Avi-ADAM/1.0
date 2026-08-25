@@ -2710,6 +2710,21 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }`,
 
+  // Everything the timegrama finalizer needs to mature a split on silence:
+  // whether it already closed, who voted, the transfers, and the earnings rows
+  // it has to turn into balance deltas.
+  '173getTosplitForFinalize': `query GetTosplitForFinalize($id: ID!) {
+    tosplit(id: $id) {
+      data { id attributes {
+        finished
+        vots { what users_permissions_user { data { id } } }
+        hervachti { amount noten mekabel users_permissions_user { data { id } } }
+        halukas { data { id } }
+        sales { data { id } }
+        project { data { id } }
+      } }
+    }
+  }`,
   "79approveTosplit": `mutation ApproveTosplit(
     $tosplitId: ID!
     $vots: [ComponentProjectsVotsInput]
@@ -3053,6 +3068,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         id
         attributes {
           name
+          archived
           quantityDelivered
           cycleIndex
           cycleStart
@@ -14765,6 +14781,118 @@ ${STIPEND_DECISION_FIELDS}
       open_mission { data { id attributes { name } } }
       mesimabetahaliches { data { id attributes { name } } }
     } } }
+  }`,
+
+
+  // ── TIMEGRAMA phase 4.3 / 4.4 — sheirutpend + askwant ────────────────────
+  // docs/PLAN_TIMEGRAMA.md. Both kinds had a clock and no finalizer; these are
+  // the reads/writes those finalizers and their client Actions need.
+
+  /**
+   * Everything the sheirutpend finalizer judges on: whether it is still open,
+   * who the rikma's members are, and the votes in BOTH stores — `votes`
+   * (relation, written by the addVote action) and `vots` (component, written by
+   * the old raw-GraphQL client). A row can carry either.
+   */
+  '295getSheirutpendForFinalize': `query GetSheirutpendForFinalize($id: ID!) {
+    sheirutpend(id: $id) {
+      data {
+        id
+        attributes {
+          archived
+          appruved
+          project { data { id attributes { projectName user_1s { data { id } } } } }
+          sheirut { data { id attributes { name isApruved archived } } }
+          users_permissions_user { data { id } }
+          vots { what order why zman users_permissions_user { data { id } } }
+          votes { data { id attributes { what order users_permissions_user { data { id } } } } }
+        }
+      }
+    }
+  }`,
+
+  /**
+   * A proposal to add a service to the rikma's catalogue. Distinct from
+   * `71createSheirutpend`, which creates the *product request* shape
+   * (price/quant/matanots) — this one only points at the service being proposed.
+   */
+  '296createSheirutpendProposal': `mutation CreateSheirutpendProposal($sheirut: ID!, $project: ID!, $userId: ID) {
+    createSheirutpend(data: { sheirut: $sheirut, project: $project, users_permissions_user: $userId, archived: false, appruved: false }) {
+      data { id }
+    }
+  }`,
+
+  '297createTimegramaForSheirutpend': `mutation CreateTimegramaForSheirutpend($date: DateTime!, $sheirutpendId: ID!) {
+    createTimegrama(data: { date: $date, done: false, whatami: "sheirutpend", sheirutpend: $sheirutpendId }) {
+      data { id }
+    }
+  }`,
+
+  /** The asker, the service, and the rikma that has to answer (D2). */
+  '298getAskwantForFinalize': `query GetAskwantForFinalize($id: ID!) {
+    askwant(id: $id) {
+      data {
+        id
+        attributes {
+          archived
+          project { data { id attributes { projectName user_1s { data { id } } } } }
+          sheirut { data { id attributes { name isApruved archived } } }
+          users_permissions_user { data { id } }
+          vots { what order why zman users_permissions_user { data { id } } }
+        }
+      }
+    }
+  }`,
+
+  '299createAskwant': `mutation CreateAskwant($sheirut: ID!, $project: ID!, $userId: ID!) {
+    createAskwant(data: { sheirut: $sheirut, project: $project, users_permissions_user: $userId, archived: false }) {
+      data { id }
+    }
+  }`,
+
+  '300createTimegramaForAskwant': `mutation CreateTimegramaForAskwant($date: DateTime!, $askwantId: ID!) {
+    createTimegrama(data: { date: $date, done: false, whatami: "askwant", askwant: $askwantId }) {
+      data { id }
+    }
+  }`,
+
+  '301updateAskwant': `mutation UpdateAskwant($id: ID!, $data: AskwantInput!) {
+    updateAskwant(id: $id, data: $data) {
+      data { id }
+    }
+  }`,
+
+  /**
+   * The subscription an approved askwant becomes: this member now receives this
+   * service. `Sheirut.wants` is what the billing side reads.
+   */
+  '302createWant': `mutation CreateWant($sheirut: ID!, $userId: ID!, $starte: DateTime) {
+    createWant(data: { sheirut: $sheirut, users_permissions_user: $userId, starte: $starte, appruved: true, archived: false }) {
+      data { id }
+    }
+  }`,
+
+  /**
+   * Does this member already receive this service? The askwant finalizer writes
+   * the Want before it archives the request, so a run that dies between the two
+   * retries next time — without this check that retry would subscribe the same
+   * person twice.
+   */
+  '303findWantForUser': `query FindWantForUser($sheirut: ID!, $userId: ID!) {
+    wants(filters: { sheirut: { id: { eq: $sheirut } }, users_permissions_user: { id: { eq: $userId } } }, pagination: { limit: 5 }) {
+      data { id attributes { archived appruved } }
+    }
+  }`,
+
+  /**
+   * Who has to answer, and how long they have. Both service actions read this
+   * server-side rather than trusting a client-sent `restime` / member count —
+   * those decide the deadline and whether a vote is needed at all.
+   */
+  '304getProjectMembersAndRestime': `query GetProjectMembersAndRestime($pid: ID!) {
+    project(id: $pid) {
+      data { id attributes { projectName restime user_1s { data { id } } } }
+    }
   }`,
 
   ...qids_base,

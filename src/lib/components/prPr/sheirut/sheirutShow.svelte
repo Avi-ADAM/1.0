@@ -2,8 +2,7 @@
   import { t } from '$lib/translations';
   import SucssesConf from '$lib/celim/sucssesConf.svelte';
   import Share from '$lib/components/share/shareButtons/index.svelte';
-  import { calcX } from '$lib/func/calcX.svelte';
-  import { SendTo } from '$lib/send/sendTo.svelte';
+  import { requestSheirutJoin } from '$lib/client/actionClient';
 import { toast } from 'svelte-sonner';
 import { onMount } from 'svelte';/**
    * @typedef {Object} Props
@@ -25,57 +24,33 @@ import { onMount } from 'svelte';/**
 let alr = $state({})
 let success = $state(false)
 let hovered = $state(false)
+/**
+ * Ask to receive this service. One call, replacing two raw GraphQL mutations
+ * (PLAN_TIMEGRAMA B6) — and the requester is now the session user rather than
+ * whatever the `id` cookie says, which the browser can rewrite.
+ *
+ * The clock this opens does NOT approve on silence: per D2 a rikma taking on a
+ * customer needs at least one member's yes (timegrama/askwant.svelte).
+ */
 async function ask(id,i){
   alr[i] = true
-    const cookieValueId = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('id='))
-        .split('=')[1];
-   let idL = cookieValueId;
-     let que4 = `mutation { 
-             createAskwant(
-                data:{
-                    sheirut:"${id}",
-                    users_permissions_user:"${idL}",
-                    project:"${pid}"
-                }
-             ){data{id}}
-            }
-              `
-               try {
-      let res4 = await SendTo(que4).then((res4) => (res4 = res4));
-      console.log(res4,"ask res4 ")      
-      if (res4.data != null) {
-              console.log(res4.data,"ask res4 ")
-                   let x = calcX(restime)
-              let fd = new Date(Date.now() + x)
-              let hiluz = res4.data.createAskwant.data.id   
-               let que5 = `mutation { 
-             createTimegrama(
-             data:{
-               date: "${fd.toISOString()}",
-              whatami: "askwant",
-              askwant: "${hiluz}",
-            }){
-              data{id}}
-            }`
-              try {
-      let res5 = await SendTo(que5).then((res5) => (res5 = res5));
-      console.log(res5,"ask res5 ")      
-      if (res5.data != null) {
-        success = true
-     setTimeout(function(){  
+
+  const result = await requestSheirutJoin({
+    projectId: String(pid),
+    sheirutId: String(id)
+  });
+
+  if (!result.success) {
+    // The action client already showed the error; let them try again.
+    alr[i] = false;
+    return;
+  }
+
+  success = true
+  setTimeout(function(){
     success = false
   },15000)
-   toast.success(`${$t('project.sheirut.requestSent')}`);
-           }
- } catch (e) {
-      console.error(e);
-    } 
-               }
- } catch (e) {
-      console.error(e);
-    } 
+  toast.success(`${$t('project.sheirut.requestSent')}`);
 }
 onMount(()=>{
   for (let i = 0; i < sheirutim.data.length; i++) {

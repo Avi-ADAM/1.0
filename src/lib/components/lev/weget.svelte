@@ -150,19 +150,6 @@
   // (lev data is client-side), so we optimistically override the shown amount.
   let amountOverride = $state(/** @type {number | null} */ (null));
   let shownAmount = $derived(amountOverride ?? quantityDelivered);
-  // True once the cycle's deadline has elapsed without being settled — a member's
-  // client then auto-approves the reported amount (checked once on mount below).
-  function isTimerExpired() {
-    return (
-      isRecurringCycle &&
-      cycleReported &&
-      !already &&
-      !isResponsible &&
-      !!timegramaDate &&
-      !timegramaDone &&
-      new Date(timegramaDate).getTime() < Date.now()
-    );
-  }
   let resP = [];
   let lang;
   import { Swiper, SwiperSlide } from 'swiper/svelte';
@@ -273,8 +260,6 @@
     var b = moment(sqadualed);
     yers = a.diff(b, 'years', true).toFixed(2);
     monts = a.diff(b, 'months', true).toFixed(2);
-    // Auto-approve the reported amount if this cycle's deadline already elapsed.
-    if (isTimerExpired()) autoApprove();
   });
 
   async function agree() {
@@ -380,27 +365,11 @@
     }
   }
 
-  // Auto-approve the reported amount once the deadline has elapsed (member side).
-  async function autoApprove() {
-    if (already) return;
-    already = true;
-    noofusersOk += 1;
-    noofusersWaiting -= 1;
-    ser = xyz();
-    try {
-      const result = await executeAction('voteOnMaap', {
-        askId: String(askId),
-        projectId: String(projectId),
-        what: true
-      });
-      if (result.success && result.data?.consensus) {
-        onAcsept?.({ ani: 'finim', coinlapach });
-      }
-    } catch (e) {
-      error1 = e;
-      console.log(error1);
-    }
-  }
+  // An expired cycle used to be settled right here, on mount, by whichever
+  // member's browser happened to open the lev page first — so a month's expense
+  // was recorded or not depending on who looked. The clock now matures it
+  // server-side (src/routes/api/timegrama/maap.svelte, PLAN_TIMEGRAMA D1), and
+  // this card only shows the countdown.
 
   // Close the recurring resource entirely (stops future monthly cycles).
   async function markDone() {

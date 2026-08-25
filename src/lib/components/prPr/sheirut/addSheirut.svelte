@@ -3,115 +3,56 @@
   import Close from '$lib/celim/close.svelte';
   import SucssesConf from '$lib/celim/sucssesConf.svelte';
   import Chooser from '$lib/celim/ui/chooser.svelte';
-  import { calcX } from '$lib/func/calcX.svelte';
-  import { sanitizeUserInput } from '$lib/func/uti/sanitizeUserInput.svelte';
-  import {SendTo} from '$lib/send/sendTo.svelte';
+  import { proposeSheirut } from '$lib/client/actionClient';
   import { idPr } from '$lib/stores/idPr';
   import { toast } from 'svelte-sonner';
   /**
    * @typedef {Object} Props
-   * @property {string} [restime]
-   * @property {number} [usersNum]
+   * @property {string} [restime] - Kept for the caller's sake; the deadline is
+   *   now derived server-side from the rikma's own restime.
+   * @property {number} [usersNum] - Likewise: the server counts the members.
    * @property {() => void} [onClose] - Callback when the component should close.
    */
 
   /** @type {Props} */
   let { restime = "feh", usersNum = 1, onClose } = $props();
-    let name = $state() , descrip = $state(),oneTime = $state(false),isPublik = false,already = $state(false), success = $state(false) , equaliSplited = $state(true)
+    let name = $state() , descrip = $state(),oneTime = $state(false),already = $state(false), success = $state(false) , equaliSplited = $state(true)
     let open = $state(false)
+
+    /**
+     * One call, replacing three raw GraphQL mutations (PLAN_TIMEGRAMA B6).
+     * `proposeSheirut` decides on the server whether the rikma has partners to
+     * ask: a solo rikma publishes the service at once, anything larger gets a
+     * proposal, the proposer's vote, and the clock that matures it on silence
+     * (timegrama/sheirutpend.svelte). The old client did the reverse — it
+     * published for multi-member rikmas and left solo ones unapprovable.
+     */
     async function create(){
         already = true
-        let isApruved = false
-        if (usersNum > 1){
-          isApruved = true
+
+        const result = await proposeSheirut({
+          projectId: String($idPr),
+          name: String(name ?? ''),
+          descrip: String(descrip ?? ''),
+          oneTime,
+          equaliSplited
+        });
+
+        if (!result.success) {
+          // The action client already surfaced the error; let them try again.
+          already = false;
+          return;
         }
-            const cookieValueId = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('id='))
-        .split('=')[1];
-    let idL = cookieValueId;
-    let d = new Date()
-        console.log(isPublik,oneTime)//add vots, ispublic, apruved
-         let que = `mutation { 
-  createSheirut(
-      data:{ name: """${sanitizeUserInput(name)}""",
-            project: ${$idPr},
-            descrip: """${sanitizeUserInput(descrip)}""",
-            oneTime:${oneTime},
-            equaliSplited:${equaliSplited},
-            isApruved: ${isApruved},
+
+        success = true
+        open = false
+        setTimeout(function(){
+          success = false
+        },15000)
+        toast.success(`${$t('project.sheirut.fnnnCreated')}`);
+        onClose?.()
     }
-  ){
-    data {id}
-  }
-}`
- const d2 = await SendTo(que) 
-    .then()
-    const r2 = d2.data
-    console.log(r2)
-    if (r2 != null){
-      if(usersNum > 1){
-      let hilutz = r2.createSheirut.data.id
-let pendque = `mutation {
-    createSheirutpend(
-    data:{
-      sheirut: "${hilutz}",
-      project:${$idPr},
-      vots: [{
-        what:true
-        order: 0
-        users_permissions_user: ${idL}
-        ide:${idL}
-        zman:"${d.toISOString()}"
-      }]
-    }
-  ){data{id}}
-  }`
-     const dp = await SendTo(pendque) 
-    .then()
-    const rp = dp.data
-    console.log(rp)
-    if (rp != null){
-       let x = calcX(restime)
-     let fd = new Date(Date.now() + x)
-         let hiluzId = rp.createSheirutpend.data.id
-                        let quee = `mutation 
-                        {createTimegrama(
-         data:{
-           date: "${fd.toISOString()}",
-           whatami: "sheirutpend",
-      sheirutpend: ${hiluzId},
-          }
-        ){
-          data {id}
-        }
-      }`
-    const d3 = await SendTo(quee)
-    .then()
-    const r3 = d3.data
-    console.log(r3)
-    if (r3 != null){
-      success = true
-      open = false
-     setTimeout(function(){  
-    success = false
-  },15000)
-   toast.success(`${$t('project.sheirut.fnnnCreated')}`);
-   onClose?.()
-}
-    }
-  }else{
-      success = true
-      open = false
-     setTimeout(function(){  
-    success = false
-  },15000)
-  toast.success(`${$t('project.sheirut.fnnnCreated')}`);
-      onClose?.()
-  }
-  }
-}
-    
+
 </script>
 <SucssesConf {success} />
 
