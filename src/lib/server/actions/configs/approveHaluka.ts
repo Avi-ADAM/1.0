@@ -12,6 +12,7 @@
  */
 
 import type { ActionConfig, ActionExecutionHandler } from '../types.js';
+import { applyTosplitApproval } from '$lib/server/haluka/applyTosplitApproval';
 
 const approveHalukaHandler: ActionExecutionHandler = async (params, context, { strapi }) => {
   const { tosplitId, userId, users = [], halukot = [], sales = [], hervachUpdates = [] } = params;
@@ -23,68 +24,13 @@ const approveHalukaHandler: ActionExecutionHandler = async (params, context, { s
   }));
   vots.push({ what: true, users_permissions_user: String(userId) });
 
-  // Step 1: update tosplit — finished + votes
-  const tosplitResult = await strapi.execute(
-    '79approveTosplit',
-    { tosplitId, vots },
-    context.jwt,
-    context.fetch
+  // Steps 1-4 live in the shared helper so that this path and the restime
+  // maturation in the timegrama finalizer cannot drift apart.
+  const tosplitResult = await applyTosplitApproval(
+    strapi,
+    { jwt: context.jwt, fetch: context.fetch },
+    { tosplitId, vots, halukot, sales, hervachUpdates }
   );
-
-  if (!tosplitResult?.data?.updateTosplit?.data) {
-    throw new Error('Failed to update tosplit');
-  }
-
-  const salesData: any[] =
-    tosplitResult.data.updateTosplit.data.attributes?.sales?.data ||
-    (Array.isArray(sales) ? sales.map((s: any) => ({ id: s.id ?? s })) : []);
-
-  // Step 2: mark each sale as splited
-  for (const sale of salesData) {
-    try {
-      await strapi.execute('80updateSale', { saleId: sale.id }, context.jwt, context.fetch);
-    } catch (e) {
-      console.error(`[approveHaluka] sale ${sale.id} update failed:`, e);
-    }
-  }
-
-  // Step 3: mark each haluka as ushar
-  for (const haluka of (Array.isArray(halukot) ? halukot : [])) {
-    try {
-      await strapi.execute('81updateHaluka', { halukaId: haluka.id ?? haluka }, context.jwt, context.fetch);
-    } catch (e) {
-      console.error(`[approveHaluka] haluka ${haluka.id ?? haluka} update failed:`, e);
-    }
-  }
-
-  // Step 4: hervachti balance updates for participants (excluding giver/receiver).
-  // Client passes [{ userId, amountDelta }]; server reads CURRENT hervachti
-  // from DB and applies delta, so a malicious client cannot set arbitrary values.
-  for (const upd of (Array.isArray(hervachUpdates) ? hervachUpdates : [])) {
-    const uid = String(upd?.userId ?? '');
-    const delta = Number(upd?.amountDelta ?? 0);
-    if (!uid || !Number.isFinite(delta) || delta === 0) continue;
-    try {
-      const cur = await strapi.execute(
-        '167getUserHervachti',
-        { id: uid },
-        context.jwt,
-        context.fetch
-      );
-      const currentBalance = Number(
-        cur?.data?.usersPermissionsUser?.data?.attributes?.hervachti ?? 0
-      );
-      const next = currentBalance + delta;
-      await strapi.execute(
-        '158updateUserHervachti',
-        { id: uid, hervachti: next },
-        context.jwt,
-        context.fetch
-      );
-    } catch (e) {
-      console.error(`[approveHaluka] hervachti update for user ${uid} failed:`, e);
-    }
-  }
 
   return {
     data: tosplitResult,

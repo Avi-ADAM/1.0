@@ -10,7 +10,7 @@
   import { locale, t } from '$lib/translations';
 
   // New architecture imports
-  import { finalSwiperArray } from '$lib/stores/levDerived';
+  import { finalSwiperArray, mergedFeed } from '$lib/stores/levDerived';
   import { isCardsView, projectFilter, levView, milon } from '$lib/stores/levStores';
   import { initializeLevData, hasValidSnapshot } from '$lib/utils/levDataLoader';
   import { setupSocketListeners } from '$lib/utils/levSocketHandler';
@@ -82,13 +82,32 @@
     cards = $isCardsView;
   });
 
+  /**
+   * What the filter panel is allowed to see: the whole feed, before the kind
+   * and project filters, but after a `?focus=` deep-link (which is not a filter
+   * the member can clear from the panel — it has its own chip).
+   *
+   * Counting off `displayItems` instead — which is what this did — meant the
+   * panel counted the *filtered* feed: pick one kind and every other kind's
+   * count fell to zero, its tile left the strip, and there was no way to move
+   * from one kind to another. Same for projects: after picking one, one chip.
+   */
+  let filterSource = $derived(
+    focusFilter ? $mergedFeed.filter((i) => focusFilter.has(i.ani)) : $mergedFeed
+  );
+
   // One pass over the feed instead of the thirty separate `displayItems.filter`
   // scans this markup used to run — fifteen for the cards view and the same
   // fifteen again for the coins view, on every reactive update.
   let aniCounts = $derived.by(() => {
     /** @type {Record<string, number>} */
     const c = {};
-    for (const item of displayItems) c[item.ani] = (c[item.ani] ?? 0) + 1;
+    // The kind tiles count within the project the member is looking at — the
+    // two filters are orthogonal — so this one *does* honour `projectFilter`.
+    for (const item of filterSource) {
+      if ($projectFilter !== null && item.projectId !== $projectFilter) continue;
+      c[item.ani] = (c[item.ani] ?? 0) + 1;
+    }
     return c;
   });
 
@@ -120,10 +139,14 @@
     purchases: aniCounts.buy ?? 0
   });
 
-  /** Projects represented in the feed, for the list view's project filter. */
+  /**
+   * Projects represented in the feed, for the project filter — counted before
+   * the project filter itself, so the chip you are *not* on is still offered
+   * and "all" is always reachable.
+   */
   let uniqueProjects = $derived.by(() => {
     const map = new Map();
-    for (const item of displayItems) {
+    for (const item of filterSource) {
       if (!item.projectId || !item.projectName) continue;
       const row = map.get(item.projectId);
       if (row) row.count++;
@@ -137,8 +160,12 @@
     return [...map.values()];
   });
 
-  /** The list view's filter panel drives the page-level stores directly. */
-  function listShowonly(event) {
+  /**
+   * The filter panel drives the page-level stores directly. Shared by the list
+   * and the coin views — and by the coin field's centre diamonds, which used to
+   * keep a filter map of their own inside `midi.svelte`.
+   */
+  function filterShowonly(event) {
     if (event?.kind === 'projects') {
       projectFilter.set(event.id);
       return;
@@ -151,7 +178,7 @@
     });
   }
 
-  function listShowall() {
+  function filterShowall() {
     projectFilter.set(null);
     milon.update((m) => {
       const next = { ...m };
@@ -508,8 +535,8 @@
         onProj={proj}
         onChat={chat}
         onStart={handleCoinLapach}
-        onShowonly={listShowonly}
-        onShowall={listShowall}
+        onShowonly={filterShowonly}
+        onShowall={filterShowall}
         onView={(v) => levView.set(v)}
         {uniqueProjects}
         {counts}
@@ -549,24 +576,11 @@
         onHover={hover}
         onView={(v) => levView.set(v)}
         low={false}
-        milon={{
-          hachla: true,
-          fiap: true,
-          welc: true,
-          sugg: true,
-          pend: true,
-          asks: true,
-          betaha: true,
-          desi: true,
-          ppmash: true,
-          pmashs: true,
-          pmaap: true,
-          askmap: true,
-          sheirutp: true,
-          sales: true,
-          purchases: true,
-          vidu: true
-        }}
+        milon={$milon}
+        onShowonly={filterShowonly}
+        onShowall={filterShowall}
+        {uniqueProjects}
+        {counts}
         onMesima={mesima}
         onUser={user}
         onProj={proj}

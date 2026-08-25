@@ -8,15 +8,15 @@
    * and mounts a single <LevCard> only when the user opens one, so the cost of
    * scrolling the heart no longer scales with how much is waiting there.
    *
-   * Closing the expanded card is deliberately over-served: the back button, the
-   * hardware/browser back gesture (via a pushed history entry — this is what
-   * makes the Tauri Android build behave), Escape, and a drag down on the
-   * handle. A view you can only leave one way is a trap on a phone.
+   * The expanded card itself — the overlay, its five ways out, and the history
+   * entry that makes the Android back gesture behave — is `../LevSheet.svelte`,
+   * shared with the coin field so the two cheap views cannot drift apart.
    */
   import { t, isRtl } from '$lib/translations';
   import LevRow from './LevRow.svelte';
-  import LevCard from '../cards/LevCard.svelte';
-  import { isCardVisible, rowKindKey } from '../cards/cardKinds.js';
+  import LevSheet from '../LevSheet.svelte';
+  import { isCardVisible } from '../cards/cardKinds.js';
+  import { deckPosition, rememberCard } from '../cards/deckPosition.svelte.js';
   import Filter from '../cards/filter.svelte';
   import FilterIcon from '$lib/celim/icons/filterIcon.svelte';
   import LevViewSwitch from '../LevViewSwitch.svelte';
@@ -36,7 +36,7 @@
    * @property {(payload: any) => void} [onStart] - a card finished with itself
    * @property {(payload: any) => void} [onShowonly] - filter panel selection
    * @property {() => void} [onShowall] - clear filters
-   * @property {(view: 'cards' | 'coins') => void} [onView] - leave the list
+   * @property {(view: 'list' | 'cards' | 'coins') => void} [onView] - leave the list
    * @property {any[]} [uniqueProjects]
    * @property {Record<string, number>} [counts] - per-milon-key counts for the filter panel
    */
@@ -74,69 +74,39 @@
   let filterKind = $state(false);
   let filterProjects = $state(false);
 
-  function open(item) {
-    openId = item.coinlapach;
-    // A history entry so the phone's back gesture closes the card instead of
-    // leaving the heart entirely.
-    try {
-      history.pushState({ levCard: openId }, '');
-    } catch {
-      /* history is unavailable in some embedded webviews; the ✕ still works */
-    }
-  }
+  /**
+   * Where the member is, so switching view does not lose it.
+   *
+   * `deckPosition` was the deck's own memory of which card it was parked on;
+   * it is the heart's now. Opening a row marks the item, and arriving in this
+   * view scrolls that item into sight — so list → cards → coins and back keeps
+   * you on the same object instead of dropping you at the top three times.
+   */
+  let scroller = $state();
+  let restored = false;
+  $effect(() => {
+    const el = scroller;
+    const wanted = deckPosition.id;
+    if (!el || restored || !wanted || rows.length === 0) return;
+    restored = true;
+    const idx = rows.findIndex((r) => String(r.coinlapach) === wanted);
+    if (idx < 0) return;
+    const child = el.children[idx];
+    if (child instanceof HTMLElement)
+      child.scrollIntoView({ behavior: 'auto', block: 'center' });
+  });
 
-  function close({ fromPop = false } = {}) {
-    if (openId === null) return;
-    openId = null;
-    dragY = 0;
-    if (fromPop) return;
-    try {
-      if (history.state?.levCard) history.back();
-    } catch {
-      /* ignore */
-    }
+  /** @param {any} item */
+  function openRow(item) {
+    rememberCard(item.coinlapach);
+    openId = item.coinlapach;
   }
 
   // A card that reports itself done (voted, accepted, dismissed) has left the
   // feed; drop the overlay with it rather than waiting for the lookup to miss.
   function cardFinished(payload) {
-    close();
+    openId = null;
     onStart?.(payload);
-  }
-
-  $effect(() => {
-    const onPop = () => close({ fromPop: true });
-    const onKey = (e) => {
-      if (e.key === 'Escape') close();
-    };
-    window.addEventListener('popstate', onPop);
-    window.addEventListener('keydown', onKey);
-    return () => {
-      window.removeEventListener('popstate', onPop);
-      window.removeEventListener('keydown', onKey);
-    };
-  });
-
-  // ── drag-down-to-close ────────────────────────────────────────────────────
-  // Bound to the handle strip only. Putting it on the whole sheet would fight
-  // the card's own internal scrolling, which is where every card puts its body.
-  const CLOSE_AT = 90;
-  let dragStart = null;
-  let dragY = $state(0);
-
-  function dragBegin(e) {
-    dragStart = e.touches?.[0]?.clientY ?? null;
-  }
-  function dragMove(e) {
-    if (dragStart === null) return;
-    const y = e.touches?.[0]?.clientY ?? dragStart;
-    dragY = Math.max(0, y - dragStart);
-  }
-  function dragEnd() {
-    if (dragStart === null) return;
-    dragStart = null;
-    if (dragY > CLOSE_AT) close();
-    else dragY = 0;
   }
 
   function pickFilter(payload) {
@@ -223,12 +193,12 @@
   {#if rows.length === 0}
     <p class="empty">{$t('lev.cards.nav.nothing')}</p>
   {:else}
-    <div class="scroller">
+    <div class="scroller" bind:this={scroller}>
       {#each rows as item (item.coinlapach)}
         <div class="cell">
           <LevRow
             {item}
-            onOpen={() => open(item)}
+            onOpen={() => openRow(item)}
             {onProj}
             {onChat}
           />
@@ -239,45 +209,19 @@
 </div>
 
 {#if openItem}
-  <div class="sheet" style:transform={`translateY(${dragY}px)`}>
-    <div
-      class="handle"
-      role="presentation"
-      ontouchstart={dragBegin}
-      ontouchmove={dragMove}
-      ontouchend={dragEnd}
-      ontouchcancel={dragEnd}
-    >
-      <button
-        type="button"
-        class="back"
-        aria-label={$t('lev.list.back')}
-        onclick={() => close()}
-      >
-        {$isRtl ? '→' : '←'}
-      </button>
-      <span class="handle-title">{$t(rowKindKey(openItem))}</span>
-      <span class="grip" aria-hidden="true"></span>
-    </div>
-
-    <div class="sheet-body">
-      <div class="swiper-slidec">
-        <LevCard
-          buble={openItem}
-          {milon}
-          {low}
-          {askedarr}
-          {declineddarr}
-          isVisible={true}
-          onHover={onHover}
-          onProj={onProj}
-          onUser={onUser}
-          onChat={onChat}
-          onCoinLapach={cardFinished}
-        />
-      </div>
-    </div>
-  </div>
+  <LevSheet
+    item={openItem}
+    {milon}
+    {low}
+    {askedarr}
+    {declineddarr}
+    onClose={() => (openId = null)}
+    onFinished={cardFinished}
+    {onHover}
+    {onProj}
+    {onUser}
+    {onChat}
+  />
 {/if}
 
 <style>
@@ -375,78 +319,4 @@
     color: #6b7280;
   }
 
-  .sheet {
-    position: fixed;
-    inset: 0;
-    z-index: 900;
-    display: flex;
-    flex-direction: column;
-    background: #fdfcf4;
-    /* Only the drag gesture moves this, and only while a finger is down. */
-    will-change: transform;
-  }
-  :global(html.dark) .sheet {
-    background: #0a0904;
-  }
-
-  .handle {
-    flex: none;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    touch-action: none;
-  }
-  :global(html.dark) .handle {
-    border-bottom-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .back {
-    width: 2.25rem;
-    height: 2.25rem;
-    flex: none;
-    border-radius: 9999px;
-    font-size: 1.25rem;
-    line-height: 1;
-    background: rgba(0, 0, 0, 0.05);
-    color: #374151;
-  }
-  :global(html.dark) .back {
-    background: rgba(255, 255, 255, 0.1);
-    color: #e5e7eb;
-  }
-
-  .handle-title {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #374151;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  :global(html.dark) .handle-title {
-    color: #e5e7eb;
-  }
-
-  .grip {
-    margin-inline-start: auto;
-    width: 2.5rem;
-    height: 0.25rem;
-    border-radius: 9999px;
-    background: rgba(0, 0, 0, 0.15);
-  }
-  :global(html.dark) .grip {
-    background: rgba(255, 255, 255, 0.2);
-  }
-
-  .sheet-body {
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    padding: 0.5rem;
-  }
 </style>

@@ -239,6 +239,7 @@ export const qidsAccess = {
   '77createMonter': { allow: ['user', 'serviceAdmin'] },
   '78archiveMultipleAsks': { allow: ['serviceAdmin'] }, // unreferenced in codebase (2026-07-18) — tightened to serviceAdmin-only
   '79approveTosplit': { allow: ['user', 'serviceAdmin'] },
+  '173getTosplitForFinalize': { allow: ['serviceAdmin'] }, // cron-side read only (timegrama finalizer)
   '72getSheirutpendById': { allow: ['user', 'serviceAdmin'] },
   '80updateSale': { allow: ['user', 'serviceAdmin'] },
   '81updateHaluka': { allow: ['user', 'serviceAdmin'] },
@@ -545,4 +546,21 @@ export const qidsAccess = {
   // client calls: /api/send has no way to tell whether this caller may touch
   // this act, and the mutation moves a chore under a mission.
   '294linkActToMission': { allow: ['serviceAdmin'] },
+
+  // TIMEGRAMA phase 4.3/4.4 (docs/PLAN_TIMEGRAMA.md). Every one of these is
+  // reached only through an Action (`proposeSheirut`, `requestSheirutJoin`)
+  // or through the cron's finalizers — never from a client. /api/send has no
+  // way to tell whether a given caller may approve a service or subscribe a
+  // user to one, so these stay serviceAdmin-only. The raw-GraphQL client code
+  // they replace (addSheirut.svelte, sheirutShow.svelte) is what B6 was about.
+  '295getSheirutpendForFinalize': { allow: ['serviceAdmin'] },
+  '296createSheirutpendProposal': { allow: ['serviceAdmin'] },
+  '297createTimegramaForSheirutpend': { allow: ['serviceAdmin'] },
+  '298getAskwantForFinalize': { allow: ['serviceAdmin'] },
+  '299createAskwant': { allow: ['serviceAdmin'] },
+  '300createTimegramaForAskwant': { allow: ['serviceAdmin'] },
+  '301updateAskwant': { allow: ['serviceAdmin'] },
+  '302createWant': { allow: ['serviceAdmin'] },
+  '303findWantForUser': { allow: ['serviceAdmin'] },
+  '304getProjectMembersAndRestime': { allow: ['serviceAdmin'] },
 };

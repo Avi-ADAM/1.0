@@ -4,6 +4,19 @@
      import { ADMINMONTHER } from '$env/static/private';
      import { strapiClient } from '$lib/server/actions/index.js';
      import { matchOpenMashaabimToUsers } from '$lib/server/matching/engine';
+
+/** Close the clock. Every path that decides not to act ends here. */
+async function markDone(taid, why) {
+  try {
+    await SendToAdmin(
+      `mutation { updateTimegrama(id: ${taid}, data: { done: true }) { data { id } } }`,
+      ADMINMONTHER
+    );
+    console.log(`[timegrama/pendM] closed #${taid} — ${why}`);
+  } catch (e) {
+    console.error('[timegrama/pendM] markDone failed:', e);
+  }
+}
 //get by id
 //calculate votes
 //if no no create open mission
@@ -19,9 +32,16 @@ export async function PendM(id,taid,fetchFn){
     try {
       let res = await SendToAdmin(qu, ADMINMONTHER).then((res) => (res = res));
       console.log(res);
-      if (res.data != null) {
-        console.log(res.data, 'pip');
-        if(res.data.pmash.data.attributes.archived != true){// && res.data.pendm.data.attributes.rishon != true){
+      if (res.data == null) return markDone(taid, `pmash ${id}: empty response`);
+      {
+        // `?.` all the way down: a deleted pmash used to throw here, get
+        // swallowed by the catch below, and leave the clock open forever.
+        const pmashAttrs = res.data.pmash?.data?.attributes ?? null;
+        if (pmashAttrs == null) return markDone(taid, `pmash ${id} no longer exists`);
+        // Voted through or declined already — nothing left to mature. This is
+        // the branch tg#17 and tg#18 fell into, and sat in for ~1040 days.
+        if (pmashAttrs.archived === true) return markDone(taid, `pmash ${id} already archived`);
+        {
                 //cr openm
                 let qua = `{
   pmash (id:${id}) {data{ id attributes{

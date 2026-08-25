@@ -1,8 +1,14 @@
 # PLAN — Lev coins view (תצוגת המטבעות): החזרת עטרה ליושנה
 
-> Status: **draft / not started.** This is the working document for the coin
-> view's restoration. Each stage below is one commit, independently shippable,
-> with its own acceptance criteria. Tick the boxes as they land.
+> Status: **stages 0–3 landed (2026-08-25); 4 and 5 partly absorbed by them.**
+> This is the working document for the coin view's restoration. Each stage below
+> is one commit with its own acceptance criteria — except 2 and 3, which cannot
+> ship apart and landed together. Tick the boxes as they land.
+>
+> **What is left:** the rest of Stage 5 (one filter panel across the three
+> views), Stage 6 (pan, zoom, keyboard, minimap) and Stage 7 (delete the now
+> unreachable coin-mode branches from the 12 giant components and drop `swiper`
+> from `package.json`).
 >
 > The four open questions were **decided by the owner on 2026-08-24** — see §6.
 > In short: `/newlev` redirects to `/lev`; distance from the heart *is* urgency;
@@ -41,15 +47,19 @@ pop-them-one-by-one feeling is the point and must survive.
 
 ---
 
-## 1. Audit — what is on the ground today (2026-08-24)
+## 1. Audit — what was on the ground (2026-08-24)
+
+> Kept as written, because it is the *why*. Everything §1.2–§1.7 describes is
+> fixed as of Stage 3 except the dead coin-mode branches inside the 12 card
+> components (§1.3), which are now unreachable but not yet deleted — Stage 7.
 
 ### 1.1 Which files are live
 
 | File | Lines | Status |
 |---|---:|---|
-| `lev/newcoinui.svelte` | 1104 | **live** — the coin view, mounted by `/lev` and `/newlev` |
+| `lev/newcoinui.svelte` | 1104 → **722** | **live** — the coin view. `/newlev` now redirects here (Stage 0); the 15 per-kind branches are gone (Stage 3) |
 | `lev/midi.svelte` + `lev/sv.svelte` | 299 + 3325 | **live** — the centre piece (the user's own coin + the kind filter) |
-| `lev/ProductRequestCoin.svelte` | 66 | **live** — the only purpose-built coin component |
+| `lev/ProductRequestCoin.svelte` | 66 | **dead as of Stage 3** — `LevCoin` renders every kind |
 | `lev/coinui.svelte` | 1478 | **dead** — nothing imports it |
 | `lev/mid.svelte` | 3299 | **dead** — nothing imports it (holds a `setInterval`) |
 | `routes/(reg)/newlev/+page.svelte` | 341 | **stale fork** of `/lev` (no list view, no filters, older loader) |
@@ -197,19 +207,20 @@ The coin view becomes the third host of that same spine:
 finalSwiperArray ──► cardKinds.js (isCardVisible / rowKindKey / rowContent /
       │                            rowFacts / rowTimegrama / rowCtaKey / kindAccent)
       │
-      ├─► cards/cards.svelte  ──► LevCard   (deck: one heavy card per slide)
-      ├─► list/LevList.svelte ──► LevRow    (cheap) + LevCard on demand (sheet)
-      └─► coins/CoinField.svelte ─► LevCoin (cheap) + LevCard on demand (sheet)   ← new
+      ├─► cards/cards.svelte  ──► LevCard  (deck: one heavy card per slide)
+      ├─► list/LevList.svelte ──► LevRow   (cheap) + LevCard on demand (sheet)
+      └─► newcoinui.svelte    ──► LevCoin  (cheap) + LevCard on demand (sheet)
 ```
 
 New files:
 
 | File | Job |
 |---|---|
-| `lev/coins/coinLayout.ts` | pure placement maths + urgency ordering, unit-tested |
-| `lev/coins/CoinField.svelte` | the pannable/zoomable field: viewport, virtualization, keyboard nav, centre-return |
+| `lev/coins/coinLayout.ts` | pure placement maths + urgency ordering, unit-tested (23 tests) |
+| `lev/coins/coinArc.ts` | pure: how much of the rikma's response window a coin has left, unit-tested (9 tests) |
+| ~~`lev/coins/CoinField.svelte`~~ | not extracted. `newcoinui.svelte` **is** the field now, at 722 lines rather than 1104, and splitting it further before Stage 6 would only move code. Revisit when pan/zoom lands |
 | `lev/coins/LevCoin.svelte` | one coin, driven entirely by `cardKinds` metadata (+ a small per-kind ornament map) |
-| `lev/coins/CoinSheet.svelte` | the on-demand expanded `LevCard`, portalled — shared with the list's sheet if it can be lifted out of `LevList` |
+| ~~`lev/coins/CoinSheet.svelte`~~ → `lev/LevSheet.svelte` | the on-demand expanded `LevCard`. It *was* liftable out of `LevList`, so it lives at the `lev/` root and both cheap views mount the same one |
 
 `newcoinui.svelte` shrinks to a thin adapter and is eventually deleted; the
 `{#if cards == false}` branches inside the 12 giant components are deleted with
@@ -224,157 +235,328 @@ assertion so a kind without a coin fails CI (see stage 4).
 
 ## 3. The stages
 
-Each stage: one commit, green `npm run check` + `npm test`, and a manual pass on
-`/lev` at 375 px and 1440 px, he + en.
+Each stage: one commit, **no new** `npm run check` errors or `npm test`
+failures (see §5 — neither is clean on this branch, so the gate is the delta,
+not zero), and a manual pass on `/lev` at 375 px and 1440 px, he + en.
 
-### Stage 0 — clear the ground
+### Stage 0 — clear the ground ✅ *(done 2026-08-25)*
 
-- [ ] Delete `lev/coinui.svelte` and `lev/mid.svelte` (nothing imports them; git
-      keeps them).
-- [ ] **`/newlev` → redirect to `/lev`** (decided). Replace the 341-line fork
-      with a `+page.server.js` `redirect(308, '/lev')` so old links and any
-      bookmarked session still land somewhere alive, and drop its three entries
-      from `src/lib/translations/routes.js` (`deals`, `archive`, and the
-      namespace list) — the route gate must not keep loading namespaces for a
-      page that no longer renders.
-- [ ] Remove the three `console.log`s in `newcoinui.svelte`, the dead
-      `snapshot` export, and the never-firing `transition: transform`.
-- [ ] Snapshot the baseline: with ~40 items, record mount time, node count and a
-      10 s performance profile of an idle field (see §5). This is the number
-      every later stage is measured against.
+- [x] Delete `lev/coinui.svelte` (1478) and `lev/mid.svelte` (3299) — nothing
+      imported them; git keeps them. `coinui.svelte` carried an uncommitted
+      one-line edit, which went with it.
+- [x] **`/newlev` → redirect to `/lev`** (decided). The 341-line fork is
+      replaced by a `+page.server.js` with `redirect(308, '/lev')`, and its
+      three entries are gone from `src/lib/translations/routes.js` (`deals`,
+      `archive`, `stipend`) — the route gate must not keep loading namespaces
+      for a page that no longer renders. `svelte-kit sync` accepts the route
+      with no `+page.svelte` (it generates `PageServerLoad` for it), which
+      `moach/process/[processid]` already relied on.
+- [x] Remove the three `console.log`s in `newcoinui.svelte`, the dead
+      `snapshot` export (SvelteKit only reads `snapshot` from a `+page.svelte`,
+      never from a component), and the never-firing `transition: transform`.
+- [x] Fixed in passing (§1.8): the `resize` listener now has the teardown it
+      never had — every mount used to leave a live one behind.
+- [x] **The perf baseline**, measured 2026-08-25 on the owner's own heart at
+      `localhost:5173/lev`, coin view, 1270×536 viewport:
 
-*Acceptance:* the coin view behaves exactly as before; the repo is ~4800 lines
-lighter.
+      | | measured |
+      |---|---|
+      | coins in the field | **137** |
+      | Swiper instances | **129** |
+      | DOM nodes on the page | **31,540** (~230 per coin) |
+      | time to first usable paint | ~13 s |
+      | DOM mutations in 6 s of an idle field | **0** (after Stage 1) |
 
-### Stage 1 — `coinLayout.ts`: a field that stops re-placing itself
+      137 coins is not an edge case — it is one real member's heart, and it is
+      three times the 40 this plan had been sizing for. Every per-coin cost in
+      §1.3 should be read against 137, not 40.
 
-- [ ] Replace the ring loop with a **Vogel/phyllotaxis spiral**:
-      `r = spacing · √i`, `θ = i · 137.507°`. O(1) per item, uniform density, no
-      seams between rings, and — crucially — **no holes**: index `i` is the
-      item's rank in the *visible* list, so filtering closes ranks instead of
-      leaving gaps.
-- [ ] **Distance from the heart is urgency** (decided). Rank = soonest
-      `rowTimegrama` first, actionable (`rowIsActionable`) before passive,
-      then feed order; ties broken by `coinlapach` so the order is stable and
-      does not shuffle between renders. "Pop the closest one" therefore *is*
-      "do the most urgent one", and the field teaches that by itself: as an
-      item's restime runs down it drifts inward, so the ring around the heart
-      is always what needs you now.
+*Acceptance:* the coin view behaves exactly as before; ~5100 lines of dead or
+forked code gone. Verified: `npm run check` 1476 errors — **unchanged**, and
+none on a line this stage touched; `npm test` 47 failures in 10 files — all
+pre-existing (none of those files import anything this stage touched);
+`npm run check:i18n` passes with 19 route-gated namespaces.
+
+### Stage 1 — `coinLayout.ts`: a field that stops re-placing itself ✅ *(done 2026-08-25)*
+
+- [x] Replaced the ring loop with a **Vogel/phyllotaxis spiral**, in the new
+      pure module `lev/coins/coinLayout.ts`: `r = √(hole² + c²·i)`,
+      `θ = i · 137.507°`. O(1) per item, uniform density, no seams between
+      rings, and — crucially — **no holes**: `i` is the item's rank among the
+      *visible* items, so filtering closes ranks instead of leaving gaps.
+      The hole under the root (rather than the textbook `c·√i`) keeps the
+      density uniform *and* clears the middle for the heart.
+      `c = size · spacing / 1.6`, where 1.6 is under the measured nearest-pair
+      ratio of 1.657·c — so coins always keep a real gap.
+- [x] **Distance from the heart is urgency** (decided). Implemented in
+      `rankCoins`, in this order: **actionable first** (`rowIsActionable`),
+      then timed before undated, then soonest `rowTimegrama`, then the feed's
+      own `pl` band, then feed order, then `coinlapach` — a total order, so two
+      renders of the same set can never disagree about who sits where.
+      - *Deviation from the draft, deliberate:* actionable is the **primary**
+        key, not the secondary one. A vote the member has already cast is not
+        urgent however soon it matures, and it must not sit in the inner ring
+        holding a seat that an open item needs.
       - Items with **no** timegrama (a sale to acknowledge, a welcome) sort
         after every timed one — they are not urgent, they are pending.
-      - The inward drift is a layout change like any other, so it goes through
-        the same FLIP below; a coin must never jump while the user is reading it.
-- [ ] Cache positions by `coinlapach` in a `Map`; recompute only when the
-      **id set** changes (the `idsSig` trick from `cards.svelte:212`), not on
-      every feed re-emit. A tick that only moves a countdown must not move a
-      single coin.
-- [ ] Animate the layout change that *does* happen with a transform (FLIP), for
-      visible coins only, and skip it entirely under `prefers-reduced-motion`.
-- [ ] Unit tests (`coinLayout.test.ts`): no two coins overlap at any n ≤ 500;
-      removing an item from the middle moves the ones after it by at most one
-      slot; the same input always yields the same output.
+      - The deadline is compared as an **absolute** timestamp, never as "time
+        left": both shrink together, so the order is identical a minute later.
+        The field cannot churn once a second. A coin therefore drifts inward
+        only when something nearer the heart is resolved and leaves — which is
+        the movement that actually means something.
+- [x] ~~Cache positions by `coinlapach`~~ — **dropped, and the reason matters.**
+      Memoising on the id set would pin each coin to the item object it was
+      first placed with, and the feeds hand out *rebuilt* objects on every tick:
+      a member who had just voted would keep seeing the old count. The layout is
+      recomputed on every change instead, which is affordable precisely because
+      it is now deterministic — same set, same order, same numbers, so the style
+      string is identical and the DOM is never written to. Determinism buys what
+      the cache was for, without the staleness.
+- [x] FLIP: the whole `{#if}` chain now sits in **one** positioned slot `<div>`
+      per item, which is the immediate child of a **keyed** `{#each}` — both
+      required for `animate:flip`, and the `{#each}` was not keyed before. The
+      duration collapses to 0 under `prefers-reduced-motion`, read from a live
+      `matchMedia` listener seeded synchronously.
+- [x] Unit tests — `coinLayout.test.ts`, 23 of them: no two coins closer than a
+      coin's diameter at n ∈ {1…500}; a removal from the middle moves the coins
+      behind it in by exactly one slot and leaves none ahead of it touched;
+      every rotation of the same input ranks identically; the field extent
+      contains every coin.
+- [x] Fixed in passing: the field size came from four hard-coded buckets
+      (1200/1500/2000/2500 px) while the ring loop kept placing coins outward,
+      so a heart with enough items placed some of them **outside the scrollable
+      area**. `fieldExtent()` now derives the size from the outermost coin, and
+      a test asserts containment.
+- [x] Removed the "פיזור מחדש" (⟳) button: placement is deterministic, so
+      recomputing produces the identical field and the button had nothing left
+      to do. Stage 6 puts the zoom controls in its place.
 
-*Acceptance:* an idle field with 40 items does **zero** layout work per clock
-tick.
+- [x] **The seating must not depend on anything a coin can write back.**
+      Found the hard way, in the browser — see the box below. `rankCoins` reads
+      `already` and `pl`; the coin components write to exactly those through
+      `bind:already` / `bind:noofusersOk` as they initialise. So the layout is
+      computed in two steps: `seating` (id → seat) is recomputed only when the
+      **set of ids** changes and runs the ranking inside `untrack`, and `placed`
+      then maps the **current** items onto those stable seats on every change.
+      Fresh data, stable seats, no feedback edge.
+- [x] The field now opens **on the heart**. The old centring was a
+      `setTimeout(…, 300)` from `onMount` racing a field whose size is derived
+      from data that had not arrived: measured on the real heart, it left the
+      scroll at (143, 216) where the centre was (598, 965) — the member landed
+      in an empty corner of a 2465×2465 field and saw two coins. It now waits
+      for the size to settle, once, and re-centres on resize.
 
-### Stage 2 — `LevCoin.svelte`: a coin you can actually read
+> ### The loop this stage walked into, and what it costs
+>
+> The first browser run of the new layout **pegged the main thread and the page
+> never finished loading**. Cause: deriving the seats straight from `arr1` made
+> the layout depend on `already`/`pl`, which the coins write back through
+> `bind:` while they mount — child writes → ranking invalidates → the keyed
+> `{#each}` re-renders → child mounts again → writes again. At 137 coins that
+> never settles. (Symptom, for the next person: CDP `Runtime.evaluate` timing
+> out at 45 s, three times running; instant again once the dependency was cut.)
+>
+> The old ring loop was immune **by accident** — it only ever read
+> `arr1.length`. Any future work here inherits the same hazard, so the rule is:
+> **nothing that decides layout may read a field a card binds to.** Stage 3
+> removes the `bind:`s along with the coin-mode branches, which retires the
+> hazard rather than dodging it.
+
+*Acceptance:* an idle field does **zero DOM writes** per clock tick — the layout
+still recomputes but returns identical numbers. Verified in the browser on a
+137-coin heart: `MutationObserver` over the whole field subtree recorded **0**
+attribute and childList mutations in 6 s, and the field measured 2465×2465,
+exactly what `fieldExtent` predicts for 137 coins at `size` 125. Static gates:
+`npm run check` **1474** errors, down 2 from the 1476 baseline (the two dead
+`orders = checkLines(…)` type errors are gone) and no new one; `newcoinui`'s own
+error count 18 → 16; `npm test` 47 failures, the same pre-existing ones, +23
+passing; `check:i18n` and `check:script` clean.
+
+### Stage 2 — `LevCoin.svelte`: a coin you can actually read ✅ *(done 2026-08-25)*
 
 Built from what `LevRow` already uses, so a coin, a row and a card describe the
-same object in the same words.
+same object in the same words. Landed together with Stage 3 — see the box at the
+end of Stage 3 for why the two could not be separate commits.
 
-- [ ] **Always-visible label**, never hover-only: kind (`kindLabelKey`) as a
-      small cap, `rowTitle` clamped to two lines, project logo as the coin's
-      face. Text goes **inside** the circle in ordinary HTML with
-      `overflow: hidden` — no SVG `<text>`, hence no `letters()`, hence RTL is
-      handled by the browser.
-- [ ] **The ring carries the state**: `kindAccent` for the colour (through the
-      `oklch` lightness clamp `LevRow` already applies — the glow tokens fail AA
-      as ink), and the arc's fill is the timegrama progress. One glance = which
-      kind, whose rikma, how long left.
-- [ ] **Actionable coins are visibly different** (`rowIsActionable`): a solid
-      ring and the `rowCtaKey` verb; passive/FYI coins are quiet. Today
-      everything shouts equally.
-- [ ] **Size**: default diameter 112 px desktop / 96 px phone, with a three-step
-      size control (`S / M / L`, persisted) in the field's chrome. This is the
-      concrete answer to "אנשים מבוגרים שמתקשים".
-- [ ] Every string through `$t()` — the `lev.list.kind.*`, `lev.list.fact.*`,
-      `lev.list.time.*` and `lev.list.cta.*` namespaces already exist in all
-      five locales, so this stage should add **no** new keys.
-- [ ] `role="button"`, `tabindex`, `aria-label` = kind + title + time left.
+- [x] **Always-visible label**, never hover-only: the kind cap (`rowKindKey`),
+      `rowContent`'s title clamped to two lines, and one meta line. Text is
+      ordinary HTML inside the circle with `overflow: hidden` and
+      `overflow-wrap: anywhere` — **no SVG `<text>`, hence no `letters()`**, so
+      RTL is the browser's job and a single unbreakable word can no longer push
+      the circle open (`טקסטים שבולטים מהמקום`, the original sin).
+- [x] **The ring carries the state**: `kindAccent` for the hue, through the
+      `oklch` lightness clamp `LevRow` already applies, and a conic gradient for
+      the timegrama.
+      - The arc's denominator is the rikma's own `restime` — the clock every
+        consent flow already runs on — in the new pure module
+        `coins/coinArc.ts` (9 tests). An item with **no** restime falls back to
+        the *longest* one (a week), never the shortest: guessing long is the
+        direction that cannot mislead.
+      - An item with no timegrama at all draws a plain unfilled band rather than
+        an empty arc. **Absent and expired must not look the same.**
+- [x] **Actionable coins are visibly different** (`rowIsActionable`): full
+      accent, a 5px ring and the coloured bloom. A settled one drops to a 3px
+      grey ring, grey ink and 0.62 opacity. Measured live: 97 actionable, 40
+      settled, and the difference reads at a glance.
+- [x] **Size**: a three-step `S / M / L` control in the field's chrome,
+      persisted per browser as `lev:coinSize` (`levStores.ts`). 96 / 124 / 160px
+      on desktop, ×0.84 on a phone. Type scales with the diameter
+      (`clamp(11px, size/8.6, 16px)`), so **L is a bigger word, not just a
+      bigger circle** — 16px titles, against the 8–10px this view was shelved
+      over. The kind cap and the meta line are floored at 10px, which is exactly
+      what `LevRow` gives the same two labels.
+      - *Deviation, deliberate:* the control sits at `bottom: 7.5rem`, not in the
+        corner. Measured on the real page, the bottom-right corner is already
+        occupied by the demand map's chip and the accessibility button — and the
+        old ⌘ button had been sitting on top of both.
+- [x] Every string through `$t()`. The coin's own text added **no** new keys —
+      `lev.list.kind.*`, `.fact.*`, `.time.*` and `.cta.*` already existed in all
+      five locales. The *chrome* needed four: `lev.coins.center` and
+      `lev.coins.size.{label,s,m,l}`, added to he/en/ar/ru/es, which also retires
+      the hard-coded Hebrew `title="חזרה למרכז"` from §1.7.
+      `rowContent.test.ts` now asserts those four, and the nine
+      `lev.list.time.*` keys the coin shares with the row, in every locale.
+- [x] `<button>` rather than `<div onclick>`, so role and tabindex come for free,
+      plus an `aria-label` that says the whole sentence: kind · title · rikma ·
+      time left · what it wants.
 
-*Acceptance:* `npm run check:i18n` and `npm run check:script` pass; every coin
-is legible at 100 % zoom without hovering; contrast ≥ 4.5:1 on the label.
+*Acceptance — verified in the browser on the owner's own 137-coin heart:*
 
-### Stage 3 — tap a coin → the real card, once
+| | measured |
+|---|---|
+| coins with an empty title | **0** (he **and** en) |
+| coins with no `aria-label` / unfocusable | **0 / 0** |
+| DOM order | inside-out, nearest the heart first — so tab order is urgency order |
+| kind-cap contrast on the coin surface | **5.65 – 7.36:1** across the ten kinds present |
+| all eight accent tokens, clamped | **5.65 – 7.95:1** (raw: 1.27 – 6.29, five of eight failing AA) |
+| title / meta / settled-grey / urgent-red | 17.24 · 7.34 · 4.70 · 6.29:1 |
+| nearest pair of coin centres | 144px at a 124px diameter (ratio 1.16) — **no overlap** |
 
-- [ ] Tapping a coin opens `LevCard` in a portalled sheet (`CoinSheet`), reusing
-      the list's sheet behaviour — back button, backdrop, Escape, drag-down
-      (`LevList.svelte:120-139`). One card mounted at a time, for the whole
-      field.
-- [ ] Delete the coin-mode dialogs from the 12 components as each kind is
-      covered — the card *is* the expanded state now, and there is exactly one
-      of it to maintain instead of two.
-- [ ] **The pop** (decided): a coin bursts when it is **decided — approved *or*
-      rejected — and therefore stops being shown.** The trigger is the
-      resolution, not the direction: agreeing and countering both close a
-      circle, and per the project's own principle there is no "no" to mourn.
-      Burst = scale-up + fade + `confettiStore.trigger()`, then the field closes
-      ranks (§Stage 1's FLIP) — replacing `delo()`'s in-place `splice` of the
-      `$bindable` array.
-      - It must **not** fire when a coin merely stops being displayed for
-        another reason: a filter change, a project filter, a refetch that drops
-        it, or a view switch. Only a resolution the user just caused, so the
-        signal keeps meaning something.
-      - Under `prefers-reduced-motion` the coin fades out without confetti.
-      - One burst at a time: `confettiStore` is a single global flag with an
-        11 s reset, so resolving three coins quickly must not stack.
+`npm run check:i18n` and `npm run check:script` both pass.
 
-*Acceptance:* no `Swiper` instance is created anywhere in the coin view; opening
-and closing 20 coins in a row leaves the node count flat (this is the "נתקע אחרי
-כמה לחיצות" test).
+> ### Two things about a circle, learned by filling one
+>
+> A disc is a hostile text box: at the default 124px the usable band is about
+> 89px wide and three lines tall. That is the budget, and the plan's "kind +
+> title + the `rowCtaKey` verb + the clock" is four things. So the fourth
+> resolves by information value: **the clock if there is one, else the kind's
+> headline figure, else the verb.** The verb is never lost — it is in the
+> accessible name, and the card is one tap away — and actionable-ness is carried
+> by the ring and the bloom rather than by a word.
+>
+> The project logo is a **watermark at 0.14 opacity**, not the coin's face. At
+> full strength it is the one thing on a coin that can put arbitrary contrast
+> behind the title; at watermark strength a fully black logo still leaves the
+> title above 10:1, and it is still enough to find "the ones from that rikma" by
+> eye.
 
-### Stage 4 — full coverage, enforced by a test
+### Stage 3 — tap a coin → the real card, once ✅ *(done 2026-08-25)*
 
-- [ ] Every kind in `RENDERABLE_ANIS` renders a coin, including the eight that
-      have none today (`sale`, site-share income, `buy`, `wishoffer`,
-      `sitesharepay`, `sitesharedecide`, `stipend`, `stipendpay`,
-      `stipendconfirm`).
-- [ ] Money kinds get an amount ornament on the coin (`rowFacts` already returns
-      `amount` / `price` / `shares`), consent kinds get the voter strip dots.
-- [ ] `cardKinds.test.ts` gains: for every `ani` in `RENDERABLE_ANIS`,
-      `kindLabelKey` resolves to a real translation **and** the coin renderer
-      produces a non-empty label — so the next new kind cannot land coin-less.
-- [ ] `archObject` stops rendering `ArchiveObjectCard` inside a round div.
+- [x] Tapping a coin opens `LevCard` in a sheet over the field. The sheet was
+      **lifted out of `LevList` into `lev/LevSheet.svelte`**, and both cheap
+      views now mount the same one — back button, backdrop, Escape, drag-down.
+      - *Deviation from the draft, deliberate:* it is `lev/LevSheet.svelte`, not
+        `coins/CoinSheet.svelte`. It is not a coin thing — the list had it first
+        — and a second copy of a history-entry dance is a second chance for the
+        Android back gesture to behave differently in one of the two views.
+      - The history entry now belongs to the **sheet's own lifetime**: pushed on
+        mount, popped on unmount. A host only mounts and unmounts, so the entry
+        and the overlay cannot drift apart, which is what an `open()`/`close()`
+        pair on the caller invites.
+- [x] **`delo()` is gone.** It spliced the `$bindable` `arr1` in place and
+      reassigned it — mutating the page's own array behind the store's back
+      (§1.8.1). A finished card now closes the sheet, pops the coin, and calls
+      `onStart`, which is the page's existing optimistic removal.
+- [x] **The pop** (decided): a coin bursts when it is **decided — approved *or*
+      rejected**. It fires from exactly one place, a card reporting itself
+      finished, so it cannot go off for a coin that merely disappeared: a filter
+      change, a project filter, a refetch that dropped it, or a view switch.
+      Burst = a ghost at the coin's last position, scaling and fading over 700ms,
+      plus `confettiStore.trigger()`; then the field closes ranks behind it via
+      the Stage 1 FLIP.
+      - Under `prefers-reduced-motion` the ghost fades over 240ms and no confetti
+        fires.
+      - One at a time: the trigger is guarded on `$confettiStore` already being
+        up. That store is a single global flag with an 11s reset, so a second
+        `trigger()` would cut the running animation short rather than add to it.
+      - *Verified by wiring, not by a live vote:* the burst's scoped keyframes
+        and the `.burst` rule that references them were confirmed in the page's
+        CSSOM. Actually watching one pop needs a real vote on the owner's real
+        heart, which is not a thing to do from a test pass.
+- [ ] The `{#if cards == false}` branches inside the 12 giant components are now
+      **unreachable** — nothing renders a card in coin mode any more — but they
+      are still in the files. Deleting them, and `swiper` with them, is Stage 7.
 
-*Acceptance:* a member on the coin view sees, and can act on, every consent item
-a member on the cards view sees. Verified item-by-item against `RENDERABLE_ANIS`.
+*Acceptance — measured in the browser on the same 137-coin heart:*
 
-### Stage 5 — one filter, three views
+| | before | after |
+|---|---|---|
+| Swiper instances in the coin view | 129 | **0** |
+| DOM nodes on the page | 31,540 | **4,297** (≈31 per coin, was ≈230) |
+| heavy card components mounted | one per coin | **1**, and only while a coin is open |
+| open→close 20 coins in a row | "נתקע אחרי כמה לחיצות" | node count **4,298 → 4,298**, never more than one sheet, `history.length` unchanged |
+| DOM mutations in 7s of an idle field | — | **2** — two countdowns crossing a boundary. The coins render text clocks now, so this is the floor, not a regression on Stage 1's zero |
 
+> ### Why Stages 2 and 3 are one commit
+>
+> They cannot ship apart. The old coins *were* the card components, so the tap
+> handler lived inside them; replacing the coin face without replacing the
+> expanded state leaves a field of pretty circles that do nothing when touched.
+> Either both land or neither does.
+
+### Stage 4 — full coverage, enforced by a test — *mostly absorbed by Stage 2*
+
+Coverage stopped being a stage's worth of work the moment the coin became
+generic. `LevCoin` never branches on `ani`; it reads `rowContent`, `rowKindKey`,
+`kindAccent`, `rowTimegrama`, `rowIsActionable` and `rowCtaKey`. There is no
+per-kind table left to go stale.
+
+- [x] Every kind in `RENDERABLE_ANIS` renders a coin, including the nine that had
+      none (`sale`, site-share income, `buy`, `wishoffer`, `sitesharepay`,
+      `sitesharedecide`, `stipend`, `stipendpay`, `stipendconfirm`) — by
+      construction, not by nine new branches. Confirmed live: 15 distinct kind
+      labels on the owner's heart, in both he and en, none blank.
+- [x] `archObject` stops rendering `ArchiveObjectCard` inside a round div — it is
+      an ordinary coin like everything else, and the card is what the sheet
+      mounts.
+- [x] Money kinds carry a figure: `rowFacts`' first chip is the coin's meta line
+      when there is no clock (`Price 5,790`, `value 221.03`, `qty 1`).
+- [x] The enforcement test the plan asked for **already exists** and did not need
+      writing: `rowContent.test.ts` walks `RENDERABLE_ANIS` and asserts, per
+      kind, a non-empty title, a resolvable `kindKey`, a resolvable CTA, a real
+      accent, and that every fact key exists with a `{{value}}` placeholder — in
+      all five locales. Since those are precisely the fields the coin renders,
+      **a kind that would land coin-less already fails CI.** It gained the
+      `lev.list.time.*` and `lev.coins.*` keys this stage introduced.
+- [ ] Still open, and genuinely cosmetic: a voter-strip of dots on consent kinds.
+      A tally (`3/7`) is what `LevRow` shows; whether a 124px disc has room for
+      either is an open question, and the answer may be "no, that is what the
+      card is for".
+
+### Stage 5 — one filter, three views — *two bullets landed early*
+
+Two of these were not optional once the coins became a keyed `{#each}`:
+
+- [x] **Gate every coin through `isCardVisible(item, milon)`.** The old markup
+      carried a per-branch `milon.x == true`, and with the branches gone there
+      was no gate left. This also fixes the `vidu → desi` mismatch of §1.5 by
+      construction: one predicate, three views.
+- [x] **De-duplicate by `coinlapach`**, like the deck does. This stopped being
+      cosmetic when the `{#each}` became keyed — a double-delivered socket update
+      used to paint the same coin twice; now it would throw.
 - [ ] The coin view uses `cards/filter.svelte` and the same `milon` store as the
-      deck and the list; `midi.svelte`'s 14-branch `if/else` goes away.
-- [ ] Gate every coin through `isCardVisible(item, milon)` — which fixes the
-      `vidu → desi` mismatch by construction.
-- [ ] De-duplicate by `coinlapach`, like the deck does.
+      deck and the list; `midi.svelte`'s 14-branch `if/else` goes away. **Note
+      for whoever does it:** the lev page currently passes the coin view an
+      inline all-true `milon` literal rather than `$milon` — that is the other
+      half of the same bug and has to go with it.
 - [ ] Add the project filter the other two views have.
-- [ ] Switching view keeps the filter *and* keeps you on the same item: the coin
-      you were looking at becomes the card the deck opens on (`deckPosition`
-      already stores exactly this).
-- [ ] **The view is the member's choice, remembered** (decided) — no forced
-      default for anyone. The mechanism already exists: `levView` persists to
-      `localStorage['lev:view']` (`levStores.ts:616-642`), and only the *first*
-      visit falls back to a device guess (`list` on a phone, `cards` on
-      desktop). Two things this stage owes it:
-      - once coins are no longer the slow view, that first-visit guess should
-        stop being about performance and just be `cards` everywhere, with all
-        three equally reachable from `LevViewSwitch`;
-      - the preference is per-browser today. Promoting it to the account (so it
-        follows a member between phone and desktop) is a small `users_permissions_user`
-        field + an action — **out of scope here**, noted so it is a deliberate
-        choice and not an oversight.
-
-*Acceptance:* set a filter in any view, switch views twice, and both the filter
-and the current item survive; pick coins, reload, and the heart opens on coins.
+- [ ] Switching view keeps the filter *and* keeps you on the same item
+      (`deckPosition` already stores exactly this).
+- [ ] **The view is the member's choice, remembered** (decided). `levView`
+      already persists; once coins are no longer the slow view — which, as of
+      Stage 3, they are not — the first-visit fallback should stop being a
+      performance decision. Promoting the preference to the account is
+      explicitly out of scope.
 
 ### Stage 6 — the field, restored as the good idea it was
 
@@ -410,27 +592,40 @@ tab-and-arrow navigation reaches every coin.
 
 ## 4. Performance budget
 
-Measured with ~40 items on a mid-range phone profile, and again at 200 items:
+The "today" column was measured in Stage 0 on the owner's own heart (137 coins,
+1270×536); the "now" column on the same heart after Stage 3.
 
-| | today (measure in stage 0) | target |
-|---|---|---|
-| Swiper instances | one per coin | 0 |
-| heavy card components mounted | one per coin | 1 (the open sheet) |
-| DOM nodes | ~40 × card | ~1 small subtree per *visible* coin |
-| layout work per clock tick | full re-place of every coin | none |
-| timers | shared clock + `mid.svelte`'s stray interval | shared clock only |
-| pan | reflow of n absolutely-positioned elements | one composited transform |
+| | today (stage 0) | target | now |
+|---|---|---|---|
+| Swiper instances | 129 (one per coin) | 0 | **0** |
+| heavy card components mounted | one per coin | 1 (the open sheet) | **1**, only while open |
+| DOM nodes | 31,540 (~230/coin) | ~1 small subtree per *visible* coin | **4,297** (~31/coin) |
+| layout work per clock tick | full re-place of every coin | none | **none** — deterministic, identical numbers |
+| timers | shared clock + `mid.svelte`'s stray interval | shared clock only | **shared clock only** |
+| pan | reflow of n absolutely-positioned elements | one composited transform | still n — **Stage 6** |
 
----
+Virtualization was in the plan for Stage 6 and is worth re-costing before it is
+built: 31 nodes per coin means 200 items is ~6,200 nodes, which a phone renders
+without help. The remaining Stage 6 win is the *pan*, not the node count.
 
 ## 5. How to verify (the same commands every stage)
 
 ```
-npm run check        # svelte-check — the gate
+npm run check        # svelte-check
 npm test             # vitest, includes cardKinds + coinLayout
 npm run check:i18n   # no silently-empty $t() on /lev
 npm run check:script # no mixed-alphabet glyphs in the new strings
 ```
+
+**Two of these are not clean on this branch, so read them as a delta, not as a
+pass/fail.** Baseline recorded at the end of Stage 0 (2026-08-25):
+
+| command | baseline | what "green" means here |
+|---|---|---|
+| `npm run check` | **1476 errors**, 1365 warnings, 9043 files → **1457** after Stage 3 | no *new* error, and none on a line the stage touched. 18 of those errors were in `newcoinui.svelte` — its prop wiring was never typed. Stage 3 retired 17 of them the intended way, by deleting the wiring rather than by adding `@ts-ignore`; the one left is `sml` on `<Mid>`, which Stage 6 touches. |
+| `npm test` | **47 failures in 10 files** (incl. `levDerived`, `levDataLoader`, `levDataExtractors`, `TaskApprovalButton`, and the action-registry suites) | no *new* failure. Still exactly 47 after Stage 3, with 32 new passing tests alongside them. These are unrelated to the coins and predate this plan; whoever fixes them should do it in its own commit. |
+| `npm run check:i18n` | **clean** — 52 namespaces × 5 locales, 19 route-gated | must stay clean. This is the one that catches a coin rendering an empty string. |
+| `npm run check:script` | clean | must stay clean. |
 
 Manual: `/lev` at 375 px and 1440 px, `he` and `en`, light and dark, with the
 coin view selected; open and close twenty coins; hide and show a kind; rotate

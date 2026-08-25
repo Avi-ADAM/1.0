@@ -130,6 +130,8 @@
    * @property {number} [maap]
    * @property {number} [askma]
    * @property {number} [hachlot]
+   * @property {number} [sheirutps]
+   * @property {number} [purchasesn]
    * @property {boolean} [low]
    * @property {boolean} [edgeToEdge] - fill the host's width instead of leaving
    *   room for the swiper's side chrome (the list view has none)

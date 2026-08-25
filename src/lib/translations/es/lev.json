@@ -877,5 +877,14 @@
       "chat": "Abrir chat",
       "project": "Sobre la rikma"
     }
+  },
+  "coins": {
+    "center": "Volver al centro del corazón",
+    "size": {
+      "label": "Tamaño de las monedas",
+      "s": "Monedas pequeñas",
+      "m": "Monedas medianas",
+      "l": "Monedas grandes"
+    }
   }
 }

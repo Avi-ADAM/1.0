@@ -6,6 +6,27 @@
   import { ADMINMONTHER } from '$env/static/private';
   import { blendedRate, pickRateRow, resolveRate, rowRate, sumRowsValue } from '$lib/timers/rate.js';
 
+  // Free-text the user typed (`why`, `missname`) goes into an inline mutation
+  // string, so it has to be escaped. An unescaped quote or newline breaks the
+  // whole mutation — and because the input never changes, the retry breaks
+  // again every hour, forever. Same helper decision.svelte:17 already makes.
+  function gqlStr(s) {
+    return JSON.stringify(String(s ?? ''));
+  }
+
+  /** Close the clock. Every path that decides not to act ends here. */
+  async function markDone(taid, why) {
+    try {
+      await SendToAdmin(
+        `mutation { updateTimegrama(id: ${taid}, data: { done: true }) { data { id } } }`,
+        ADMINMONTHER
+      );
+      console.log(`[timegrama/finiapp] closed #${taid} — ${why}`);
+    } catch (e) {
+      console.error('[timegrama/finiapp] markDone failed:', e);
+    }
+  }
+
   export async function finiapp(id, taid) {
     console.log('finiapp auto-close', id);
     const d = new Date();
@@ -30,19 +51,22 @@
 
     try {
       const res = await SendToAdmin(qu, ADMINMONTHER);
-      if (!res?.data?.finiapruval?.data) return;
+      if (!res?.data?.finiapruval?.data) return markDone(taid, `finiapruval ${id} not found`);
 
       const fini = res.data.finiapruval.data;
       const fa = fini.attributes;
 
-      if (fa.archived) return;
+      // Already resolved by an explicit vote. Nothing left to mature — this is
+      // how tg#127 sat in the queue for 522 days.
+      if (fa.archived) return markDone(taid, `finiapruval ${id} already archived`);
 
       // Check that all votes are yes (auto-close: no new vote added, just trigger deadline)
       const vots = fa.vots ?? [];
       const hasNo = vots.some(v => v.what === false);
       if (hasNo) {
-        console.log('finiapp: has negative vote, skipping auto-close', id);
-        return;
+        // An objection is an answer, and the window it had is over. The clock
+        // has nothing more to do; resuming the discussion opens a fresh one.
+        return markDone(taid, `finiapruval ${id} has a negative vote`);
       }
 
       const isTimerSave = fa.isTimerSave === true;
@@ -84,8 +108,8 @@
         } else {
           finnishedMissionMutation = `
             createFinnishedMission(data: {
-              missionName: "${fa.missname}",
-              why: "${fa.why ?? 'timer save'}",
+              missionName: ${gqlStr(fa.missname)},
+              why: ${gqlStr(fa.why ?? 'timer save')},
               noofhours: ${noofhours},
               mesimabetahalich: "${mba.id}",
               mission: "${mbaa.mission.data.id}",
@@ -112,8 +136,8 @@
 
         finnishedMissionMutation = `
           createFinnishedMission(data: {
-            missionName: "${fa.missname}",
-            why: "${fa.why ?? ''}",
+            missionName: ${gqlStr(fa.missname)},
+            why: ${gqlStr(fa.why ?? '')},
             noofhours: ${totalHours},
             mesimabetahalich: "${mba.id}",
             mission: "${mbaa.mission.data.id}",

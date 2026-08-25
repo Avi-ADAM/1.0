@@ -1,168 +1,176 @@
 <script>
-  let w = $state(1200);
-
-  let h = $state(1200);
-
-  let ow = $state(500);
-
-  let oh = $state(500);
-
-  let screen;
-  let top = $derived(0);
-  let left = $derived(0);
-  let maxW = $derived(100);
-  let maxH = $derived(100);
-  let center;
-  $effect(() => {
-    center = { x: w / 2, y: h / 2 };
-  });
-  // Call this function whenever you add new circles
-  //placeCircles();
-
-  // Add your infinite scroll mechanism here
-
-  let size = $derived(ow > 550 ? 125 : 115);
-  let bigsize = $derived(ow > 550 ? 225 : 100);
-  let add = $derived(ow > 550 ? 70 : 70);
-
-  // פונקציה למירכוז המסך על אזור התוכן
-  function centerViewOnLoad() {
-    setTimeout(() => {
-      const container = document.getElementById('screen');
-      const content = document.getElementById('content-area');
-      if (container && content) {
-        try {
-          // מציאת מרכז התוכן
-          const contentCenter = { x: w / 2, y: h / 2 };
-
-          // חישוב מיקום הגלילה
-          const scrollLeft = contentCenter.x - container.clientWidth / 2;
-          const scrollTop = contentCenter.y - container.clientHeight / 2;
-
-          // גלילה למרכז
-          container.scrollTo({
-            left: Math.max(0, scrollLeft),
-            top: Math.max(0, scrollTop),
-            behavior: 'smooth'
-          });
-        } catch (err) {
-          console.error('שגיאה במירכוז:', err);
-        }
-      }
-    }, 300);
-  }
-
-  function checkLine(i) {
-    // נחשב את המיקום של האלמנטים במעגלים סביב האלמנט המרכזי
-    // תחילה נחשב באיזה מעגל אנחנו נמצאים (myLine)
-    let myLine = 1; // מתחילים ממעגל ראשון סביב המרכז
-    let calculated = 0;
-    let maxElementsInCurrentCircle = 0;
-
-    // מחשבים כמה אלמנטים יכולים להכנס בכל מעגל
-    while (true) {
-      // מחשב כמה אלמנטים מתאימים למעגל הנוכחי - זה מבוסס על היקף המעגל
-      const radius = myLine * (size * 1.1); // צמצום הרדיוס מ-1.3 ל-1.1
-      const circumference = 2 * Math.PI * radius; // היקף המעגל
-      maxElementsInCurrentCircle = Math.max(
-        1,
-        Math.floor(circumference / (size * 1.0))
-      ); // הגדלת כמות האלמנטים במעגל מ-1.2 ל-1.0
-
-      // בדיקה האם האלמנט הנוכחי שייך למעגל הזה
-      if (i < calculated + maxElementsInCurrentCircle) {
-        break; // מצאנו את המעגל שבו האלמנט נמצא
-      }
-
-      calculated += maxElementsInCurrentCircle; // עוברים למעגל הבא
-      myLine++; // עוברים למעגל הבא
-    }
-
-    // חישוב המיקום של האלמנט במעגל
-    const positionInCircle = i - calculated; // מיקום האלמנט במעגל הנוכחי (0 עד maxElementsInCurrentCircle-1)
-    const angleStep = (2 * Math.PI) / maxElementsInCurrentCircle; // הזווית בין אלמנטים במעגל
-    const angle = positionInCircle * angleStep; // הזווית של האלמנט הנוכחי
-
-    // חישוב המיקום במישור דו-ממדי
-    // נוסיף מרווח התחלתי (initialRadius) שהוא קטן יותר מהקודם
-    const initialRadius = bigsize * 0.6; // הקטנת המרווח בין המרכז לעיגול הראשון מ-0.8 ל-0.6
-    const radius = initialRadius + myLine * (size * 1.1); // עדכון הרדיוס כדי להתאים לשינויים
-    const x = center.x + radius * Math.cos(angle) - size / 2; // מיקום X, עם התחשבות בגודל האלמנט
-    const y = center.y + radius * Math.sin(angle) - size / 2; // מיקום Y, עם התחשבות בגודל האלמנט
-
-    return {
-      myline: myLine,
-      lineCircels: maxElementsInCurrentCircle,
-      realCircels: maxElementsInCurrentCircle,
-      x,
-      y
-    };
-  }
-
-  import {
-    animateScroll,
-    scrollto,
-    scrolltobottom,
-    scrolltotop
-  } from 'svelte-scrollto-element';
-  import Vid from './didiget.svelte';
-  import ArchiveObjectCard from './cards/ArchiveObjectCard.svelte';
-  import ProductRequestCoin from './ProductRequestCoin.svelte';
-  import Desi from './decisionMaking.svelte';
+  /**
+   * The heart's coin field.
+   *
+   * Two things live here and nothing else: **where the coins go** and **what
+   * happens when you touch one**. Everything else was moved out —
+   *
+   * - placement and urgency ordering are `coins/coinLayout.ts`, a pure module
+   *   with its own tests (§Stage 1 of docs/PLAN_LEV_COINS.md);
+   * - a coin's face is `coins/LevCoin.svelte`, driven entirely by `cardKinds`
+   *   metadata, so it is uniform across all 23 kinds the heart can render;
+   * - the expanded card is `LevSheet.svelte`, the same one the list view uses.
+   *
+   * What used to be here was a 15-branch `{#each}` in which every coin mounted
+   * the **whole card component** for its kind in coin mode — a Swiper 8
+   * instance with EffectFlip, a 2.2s fly-in and its own modal, per coin, out of
+   * files 2400–3300 lines long. Measured on the owner's own heart: 137 coins,
+   * 129 Swipers, 31,540 DOM nodes, ~13s to a usable paint. It also meant a kind
+   * without a hand-written branch had *no coin at all*, which is how every
+   * money and consent flow added in the last year — sales, site-share,
+   * stipends, wish offers — became invisible to anyone who preferred coins.
+   * That was not cosmetic; it was missed consent.
+   *
+   * The rule that keeps it from rotting again: **a new heart kind is added to
+   * `cardKinds.js` and to `LevCard`, and that is all.** Nothing in this file
+   * knows any kind's name.
+   */
+  import { rankCoins, placeIndex, fieldExtent } from './coins/coinLayout.js';
+  import { isCardVisible, kindAccent } from './cards/cardKinds.js';
+  import LevCoin from './coins/LevCoin.svelte';
+  import LevSheet from './LevSheet.svelte';
   import Mid from './midi.svelte';
-  import MissionInProgress from './missionInProgress.svelte';
-  import ProjectSuggestor from './projectSuggestor.svelte';
-  import Reqtojoin from './reqtojoin.svelte';
-  import PendingM from './pandingMesima.svelte';
-  import PendingMa from './pmas.svelte';
-  import Welcomt from './welcomTo.svelte';
-  import Fiappru from './fiappru.svelte';
-  import Mashsug from './mashsuggest.svelte';
-  import Reqtom from './reqtom.svelte';
-  import Weget from './weget.svelte';
-  import Hal from './halukaask.svelte';
-  import { fly } from 'svelte/transition';
-
-  import { onMount } from 'svelte';
-  import { page } from '$app/state';
+  import Filter from './cards/filter.svelte';
+  import FilterIcon from '$lib/celim/icons/filterIcon.svelte';
+  import { flip } from 'svelte/animate';
+  import { onDestroy, onMount, untrack } from 'svelte';
+  import { t } from '$lib/translations';
+  import { coinSize } from '$lib/stores/levStores';
+  import { confettiStore } from '$lib/stores/confettiStore';
+  import { deckPosition, rememberCard } from './cards/deckPosition.svelte.js';
   import { isMobileOrTablet } from '$lib/utilities/device';
 
-  let modal = $state(false);
+  /** Viewport (the scroll container). */
+  let ow = $state(500);
+  let oh = $state(500);
 
-  function modali() {
-    modal = true;
-    animateScroll.scrollToTop();
+  /**
+   * Coin diameter, in px, per step of the member's own size control.
+   *
+   * The floor is not taste: the old coins dropped to 75px on a phone with 8–10px
+   * of text inside, which is under both the WCAG 2.5.8 target-size minimum and
+   * anything an older member will read — the complaint this view was shelved
+   * over. `LevCoin` scales its type with the diameter, so the L step is a
+   * larger *word*, not just a larger circle.
+   */
+  const SIZES = { s: 96, m: 124, l: 160 };
+  /** The three steps, in order, for the control in the field's chrome. */
+  const SIZE_STEPS = /** @type {const} */ (['s', 'm', 'l']);
+  /**
+   * Phones get the same three steps, scaled to a screen a thumb has to reach
+   * across. Not smaller than this: at 0.84 the middle step is 104px, which is
+   * where `LevCoin`'s type still clears 12px — go lower and the title lands on
+   * the same 8–10px that got this view shelved.
+   */
+  const NARROW_FACTOR = 0.84;
+
+  let size = $derived(
+    Math.round(
+      (SIZES[$coinSize] ?? SIZES.m) * (ow > 550 ? 1 : NARROW_FACTOR)
+    )
+  );
+
+  /**
+   * The heart in the middle is roughly this wide, and the field keeps a hole
+   * that size clear for it.
+   */
+  let heartRadius = $derived(ow > 550 ? 225 : 165);
+
+  let layoutOptions = $derived({ size, centerHole: heartRadius });
+
+  /** The scroll container. */
+  let screenEl = $state();
+
+  /**
+   * Put a point of the field — measured from its centre, the way a placement
+   * is — in the middle of the viewport.
+   *
+   * **`'instant'`, not `'auto'`, for anything the member did not ask for.**
+   * `behavior: 'auto'` means "defer to CSS", and `.coin-container` sets
+   * `scroll-behavior: smooth` — so every automatic re-centre started a ~700px
+   * animation, and the next one (the field grows as the feed streams in)
+   * restarted it from wherever it had crawled to. Measured: the scroll sat at
+   * (0, 0) and then (271, 576) against a centre of (324, 719) — an animation
+   * caught in flight, not a field that had been centred. The ⌘ button still
+   * asks for `'smooth'`, because there the movement is the point.
+   *
+   * @param {number} x
+   * @param {number} y
+   * @param {ScrollBehavior} behavior
+   */
+  function centerOn(x, y, behavior = 'smooth') {
+    if (!screenEl) return;
+    screenEl.scrollTo({
+      left: Math.max(0, w / 2 + x - screenEl.clientWidth / 2),
+      top: Math.max(0, h / 2 + y - screenEl.clientHeight / 2),
+      behavior
+    });
   }
 
-  function delo(event) {
-    let oldob = arr1;
-    const x = oldob.map((c) => c.coinlapach);
-    const indexy = x.indexOf(event.coinlapach);
-    oldob.splice(indexy, 1);
-    arr1 = oldob;
-    onStart?.({
-      cards: false,
-      ani: event.ani,
-      coinlapach: event.coinlapach
+  /**
+   * Put the heart in the middle of the viewport.
+   *
+   * @param {ScrollBehavior} behavior
+   */
+  function centerView(behavior = 'smooth') {
+    centerOn(0, 0, behavior);
+  }
+
+  /**
+   * Open on the heart, once.
+   *
+   * This used to be a `setTimeout(…, 300)` fired from `onMount`, and it was
+   * simply losing the race: the field's size is derived from the coins, the
+   * coins arrive with the data, and 300ms after mount the container was still
+   * the wrong size — so the "centring" scrolled to the middle of a field that
+   * no longer existed and the member landed in an empty corner. Measured on a
+   * real heart: scroll (143, 216) where the centre was (598, 965).
+   *
+   * Waiting for the size to actually settle removes the race — and settling is
+   * not one frame. The coins do not all arrive at once (the page loads the
+   * urgent kinds first and streams the rest in behind them), so the field keeps
+   * growing, and a single centring aims at a size that is about to change:
+   * measured again on the same heart, it left the scroll at (271, 576) where
+   * the centre had become (324, 691). So this re-aims on **every size change**
+   * and stops the moment the member moves the field themselves. Neither flag is
+   * `$state` on purpose — they must not re-trigger this effect.
+   */
+  let userMoved = false;
+  $effect(() => {
+    const ready = screenEl && w > 0 && h > 0;
+    if (!ready || userMoved) return;
+    // Arriving from another view, land on the item the member was on rather
+    // than on the heart — `deckPosition` is the heart's shared "where I was",
+    // not the deck's private one. Nothing remembered, or that item has since
+    // left the feed: the heart, as before. Read untracked: `placed` is rebuilt
+    // on every feed tick, and this must follow the field's *size*, not its data.
+    const seat = untrack(() => {
+      const wanted = deckPosition.id;
+      return wanted ? placed.find((q) => q.id === wanted) : null;
     });
+    // After the browser has laid the field out at its new size.
+    requestAnimationFrame(() =>
+      seat ? centerOn(seat.x, seat.y, 'instant') : centerView('instant')
+    );
+  });
+
+  /** Any deliberate move of the field hands the scroll back to the member. */
+  function takeOver() {
+    userMoved = true;
+  }
+
+  /** @param {string} id */
+  function openCoin(id) {
+    rememberCard(id);
+    openId = id;
   }
 
   function user(event) {
-    onUser?.({
-      id: event.id
-    });
-  }
-
-  function mesima(event) {
-    onMesima?.({
-      id: event.id
-    });
+    onUser?.({ id: event.id });
   }
 
   function hover(event) {
-    onHover?.({
-      id: event.id
-    });
+    onHover?.({ id: event.id });
   }
 
   function chat(payload) {
@@ -172,25 +180,36 @@
   }
 
   function proj(event) {
-    onProj?.({
-      id: event.id
-    });
+    onProj?.({ id: event.id });
   }
 
+  /**
+   * The filter belongs to the page, not to this view.
+   *
+   * These two used to mutate a `$bindable` `milon` **literal** that the page
+   * passed in with every key hard-coded `true` — so the coin field had a filter
+   * map of its own that no other view could see, could not be pre-set from a
+   * deep link, and reset itself every time you switched away and back. They now
+   * forward to the same `milon` store the deck and the list drive, which is
+   * what makes one filter mean one thing across the three views.
+   *
+   * Both the strip's tiles and the centre's diamonds arrive here.
+   */
   function showonly(event) {
-    const value = event.data;
-    for (const key in milon) {
-      milon[key] = false;
-    }
-
-    milon[value] = true;
+    filterKind = false;
+    filterProjects = false;
+    onShowonly?.(event);
   }
 
-  function showall(event) {
-    for (const key in milon) {
-      milon[key] = true;
-    }
+  function showall() {
+    filterKind = false;
+    filterProjects = false;
+    onShowall?.();
   }
+
+  /** Which filter strip, if any, is open over the field. */
+  let filterKind = $state(false);
+  let filterProjects = $state(false);
   /**
    * @typedef {Object} Props
    * @property {any} [adder]
@@ -215,7 +234,11 @@
    * @property {number} [ask]
    * @property {any} picLink
    * @property {any} total
-   * @property {any} [milon]
+   * @property {any} [milon] - the shared card-type visibility map (`$milon`)
+   * @property {any[]} [uniqueProjects] - projects present in the feed, for the project filter
+   * @property {Record<string, number>} [counts] - per-milon-key counts for the filter panel
+   * @property {(payload: { data: any, kind?: string, id?: any }) => void} [onShowonly] - filter panel selection
+   * @property {() => void} [onShowall] - clear filters
    * @property {boolean} [sml]
    * @property {(payload: { cards: boolean, ani: any }) => void} [onStart] - Callback for 'start' event
    * @property {(payload: { id: any }) => void} [onUser] - Callback for 'user' event
@@ -223,18 +246,17 @@
    * @property {(payload: { id: any }) => void} [onHover] - Callback for 'hover' event
    * @property {(view: 'list' | 'cards' | 'coins') => void} [onView] - the heart's three-way view switch
    * @property {(payload: { id: any }) => void} [onProj] - Callback for 'proj' event
+   * @property {(payload: any) => void} [onChat] - Callback for 'chat' event
    */
 
   /** @type {Props} */
   let {
     onStart,
     onUser,
-    onMesima,
     onHover,
     onView,
     onProj,
     onChat,
-    adder = [],
     arr1 = $bindable([]),
     askedarr = [],
     declineddarr = [],
@@ -247,769 +269,405 @@
     beta = 13,
     pen = 17,
     sug = 17,
-    saless = 0,
-    sheirutps = 0,
-    purchasesn = 0,
     low = false,
     nam,
     wel = 13,
     ask = 13,
     picLink,
     total,
-    milon = $bindable({
-      hachla: true,
-      fiap: true,
-      welc: true,
-      sugg: true,
-      pend: true,
-      asks: true,
-      betaha: true,
-      desi: true,
-      ppmash: true,
-      pmashs: true,
-      pmaap: true,
-      askmap: true,
-      sheirutp: true,
-      sales: true,
-      purchases: true
-    }),
+    milon = {},
+    uniqueProjects = [],
+    counts = {},
+    onShowonly,
+    onShowall,
     sml = false
   } = $props();
-  function checkLines(arr, w, h) {
-    let c = {};
-    for (let i = 0; i < arr.length; i++) {
-      c[i] = checkLine(i);
-      c = c;
+
+  /**
+   * What the field is actually holding, in three steps.
+   *
+   * **De-duplicated**, because the deck already does and this view never did: a
+   * double-delivered socket update used to paint the same coin twice, and with
+   * a *keyed* `{#each}` a repeated `coinlapach` is no longer a cosmetic bug but
+   * a crash.
+   *
+   * **Gated through `isCardVisible`**, the same predicate the deck and the list
+   * use, instead of the per-branch `milon.x == true` the old markup carried.
+   * That mismatch was real: the coin view gated `vidu` on `milon.desi` while
+   * `LevCard` gates it on `milon.vidu`, so one filter chip hid different things
+   * in different views.
+   */
+  let visible = $derived.by(() => {
+    const seen = new Set();
+    const out = [];
+    for (const item of arr1) {
+      const id = String(item?.coinlapach ?? '');
+      if (!id || seen.has(id)) continue;
+      if (!isCardVisible(item, milon)) continue;
+      seen.add(id);
+      out.push(item);
     }
-    return c;
-  }
-
-  // פונקציה לעדכון מידות והתאמת האזור
-  function updateSizes() {
-    // קבלת גודל החלון
-    ow = window.innerWidth;
-    oh = window.innerHeight;
-
-    // התאמת גודל האזור לפי מספר האלמנטים
-    if (arr1.length > 50) {
-      w = 2500;
-      h = 2500;
-    } else if (arr1.length > 30) {
-      w = 2000;
-      h = 2000;
-    } else if (arr1.length > 15) {
-      w = 1500;
-      h = 1500;
-    } else {
-      w = 1200;
-      h = 1200;
-    }
-
-    // עדכון מידות האלמנטים לפי גודל המסך
-    size = ow > 550 ? 125 : 75;
-    bigsize = ow > 550 ? 225 : 165;
-
-    // חישוב מחדש של מרכז האזור
-    center = { x: w / 2, y: h / 2 };
-
-    // עדכון המיקומים
-    orders = checkLines(arr1, w, h);
-  }
-
-  // פונקציה לפיזור מחדש של האלמנטים
-  function redistributeElements() {
-    // עדכון מידות ומיקומים
-    updateSizes();
-
-    // מירכוז התצוגה
-    centerViewOnLoad();
-  }
-
-  onMount(() => {
-    // עדכון מידות ראשוני
-    updateSizes();
-
-    // מירכוז התצוגה
-    centerViewOnLoad();
-
-    // האזנה לשינויי גודל החלון — with the teardown it never had. Every mount
-    // used to leave a live listener behind, so a session that visited the heart
-    // three times re-placed the whole field three times per resize event.
-    const onResize = () => {
-      updateSizes();
-      centerViewOnLoad();
-    };
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    return out;
   });
 
-  let orders = $state([]);
-  $effect(() => {
-    orders = checkLines(arr1, w, h);
+  /**
+   * Seating, then placing — deliberately two steps.
+   *
+   * **The seating must not depend on anything a card can write back.** Ranking
+   * reads `already` and `pl` off each item, and the full cards write to exactly
+   * those through `bind:already` / `bind:noofusersOk` as they initialise.
+   * Deriving the seats straight off `arr1` therefore closes a loop: child
+   * writes a bound prop → the ranking invalidates → the keyed `{#each}`
+   * re-renders → the child initialises again → it writes again. On a heart with
+   * 137 coins that pegs the main thread and the page never finishes loading —
+   * which is exactly what it did the first time this was wired up. The old ring
+   * loop was accidentally immune: it only ever read `arr1.length`.
+   *
+   * The coins themselves no longer bind to anything, but the open `LevSheet`
+   * still does, so the hazard is real and the guard stays.
+   *
+   * So: `seating` is the **order of ids**, recomputed only when the *set* of ids
+   * changes (`idsSig`), with the ranking itself run inside `untrack` so none of
+   * those mutable fields become dependencies.
+   *
+   * `placed` then maps the **current** items onto those seats every time the
+   * feed changes. That keeps the data fresh — a member who just voted sees the
+   * new count — while the seat itself is stable. Memoising the whole placement
+   * would have pinned each coin to a stale copy of its item.
+   */
+  let idsSig = $derived(visible.map((b) => b?.coinlapach).join('|'));
+  let seating = $derived.by(() => {
+    idsSig;
+    layoutOptions;
+    return untrack(
+      () =>
+        new Map(
+          rankCoins(visible).map((b, index) => [String(b?.coinlapach), index])
+        )
+    );
+  });
+
+  let placed = $derived.by(() =>
+    visible
+      .map((item) => {
+        const id = String(item?.coinlapach);
+        const index = seating.get(id) ?? seating.size;
+        return { item, id, index, ...placeIndex(index, layoutOptions) };
+      })
+      // Render in seat order, so the DOM order matches the field's own
+      // reading order (nearest the heart first) for tab and screen-reader.
+      .sort((a, b) => a.index - b.index)
+  );
+
+  /** The field is square and centred; every placement is relative to its middle. */
+  let field = $derived(fieldExtent(placed.length, layoutOptions));
+  let w = $derived(field.width);
+  let h = $derived(field.height);
+
+  /**
+   * The absolute box for one placement: the field's centre, plus the coin's
+   * offset, minus half a coin — placements are centres, CSS wants corners.
+   * @param {{ x: number, y: number }} p
+   */
+  function slotStyle(p) {
+    const left = w / 2 + p.x - size / 2;
+    const top = h / 2 + p.y - size / 2;
+    return `width:${size}px; height:${size}px; left:${left}px; top:${top}px`;
+  }
+
+  /**
+   * A coin only changes seat when one nearer the heart is resolved and leaves,
+   * so the whole field slides inward by one. `animate:flip` turns that jump
+   * into a movement the eye can follow — on `transform`, so it composites
+   * instead of re-laying out.
+   *
+   * Seeded synchronously (not in `onMount`) so the very first re-rank already
+   * respects the preference, and kept live because someone can change it while
+   * the heart is open.
+   */
+  let reduceMotion = $state(
+    typeof window !== 'undefined' &&
+      !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  );
+  let flipMs = $derived(reduceMotion ? 0 : 420);
+
+  // ── opening a coin ────────────────────────────────────────────────────────
+  // Exactly one heavy card is mounted for the whole field, and it is tracked by
+  // id rather than by object: the feed hands out a fresh array on every socket
+  // message, so holding the item itself would pin a stale copy. Looking it up
+  // each time also means the sheet closes by itself if the item leaves.
+  let openId = $state(null);
+  let openItem = $derived(
+    openId === null
+      ? null
+      : (visible.find((b) => String(b?.coinlapach) === openId) ?? null)
+  );
+
+  // ── the pop ───────────────────────────────────────────────────────────────
+  /**
+   * A coin bursts when it is **decided — approved or rejected — and therefore
+   * stops being shown**. What is celebrated is the circle closing, not the
+   * direction it closed in; the consent model has no absolute "no" to mourn,
+   * and countering is as much an answer as agreeing.
+   *
+   * It fires from one place only — a card reporting itself finished — so it can
+   * never go off for a coin that merely disappeared: a filter change, a project
+   * filter, a refetch that dropped it, or a view switch. That is what keeps the
+   * signal meaning something.
+   */
+  let bursts = $state([]);
+  let burstSeq = 0;
+  const burstTimers = new Set();
+
+  const BURST_MS = 700;
+  const FADE_MS = 240;
+
+  function burstAt(p) {
+    const key = ++burstSeq;
+    const ms = reduceMotion ? FADE_MS : BURST_MS;
+    bursts = [
+      ...bursts,
+      {
+        key,
+        left: w / 2 + p.x - size / 2,
+        top: h / 2 + p.y - size / 2,
+        accent: kindAccent(p.item?.ani)
+      }
+    ];
+    // One burst at a time: `confettiStore` is a single global flag with an 11s
+    // reset, so re-triggering while it is already up would cut the running
+    // animation short instead of adding to it. Under reduced motion the coin
+    // fades out and nothing else happens.
+    if (!reduceMotion && !$confettiStore) confettiStore.trigger();
+    const timer = setTimeout(() => {
+      burstTimers.delete(timer);
+      bursts = bursts.filter((b) => b.key !== key);
+    }, ms);
+    burstTimers.add(timer);
+  }
+
+  /**
+   * The card said it is done with itself. Close the sheet, pop the coin where
+   * it stood, and tell the page — which drops it from the feed, at which point
+   * the field closes ranks behind it (the `animate:flip` above).
+   *
+   * This replaces `delo()`, which spliced the `$bindable` `arr1` in place and
+   * reassigned it — mutating the page's own array behind the store's back.
+   */
+  function cardFinished(payload) {
+    const id = String(payload?.coinlapach ?? openId ?? '');
+    const p = placed.find((q) => q.id === id);
+    openId = null;
+    if (p) burstAt(p);
+    onStart?.(payload);
+  }
+
+  onDestroy(() => {
+    for (const timer of burstTimers) clearTimeout(timer);
+    burstTimers.clear();
+  });
+
+  onMount(() => {
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => (reduceMotion = motion.matches);
+    motion.addEventListener('change', sync);
+    sync();
+    return () => motion.removeEventListener('change', sync);
+  });
+
+  onMount(() => {
+    // האזנה לשינויי גודל החלון — with the teardown it never had. Every mount
+    // used to leave a live listener behind. It only re-centres now: `ow`/`oh`
+    // are `bind:clientWidth/clientHeight`, so the sizes follow the viewport by
+    // themselves, and the field follows the sizes.
+    const onResize = () => centerView('instant');
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
   });
 </script>
 
 <div
   id="screen"
+  bind:this={screenEl}
   bind:clientWidth={ow}
   bind:clientHeight={oh}
+  onwheel={takeOver}
+  onpointerdown={takeOver}
+  ontouchstart={takeOver}
   dir="ltr"
-  style="position:fixed; width:100vw; height:100vh; overflow: auto; top:0; left:0; 
+  style="position:fixed; width:100vw; height:100dvh; overflow: auto; top:0; left:0;
             max-width: 100vw; max-height:{isMobileOrTablet()
-    ? 'calc(100vh - 3rem)'
-    : '100vh'};"
+    ? 'calc(100dvh - 3rem)'
+    : '100dvh'};"
   class="coin-container d"
 >
+  <!-- The same filter panel the deck and the list use, over the field.
+       The coin view used to have its own: fourteen `if/else` branches inside
+       `midi.svelte` driving a local map, with no project filter and no way to
+       show two kinds at once. One panel, one store, three views. -->
+  {#if filterKind || filterProjects}
+    <div class="filter-strip">
+      {#if filterKind}
+        <Filter
+          filterKind="kind"
+          edgeToEdge
+          onShowonly={showonly}
+          onShowall={showall}
+          sug={counts.sugg ?? 0}
+          pen={counts.pend ?? 0}
+          ask={counts.asks ?? 0}
+          wel={counts.welc ?? 0}
+          beta={counts.betaha ?? 0}
+          des={counts.desi ?? 0}
+          fia={counts.fiap ?? 0}
+          pmash={counts.ppmash ?? 0}
+          mashs={counts.pmashs ?? 0}
+          maap={counts.pmaap ?? 0}
+          askma={counts.askmap ?? 0}
+          hachlot={counts.hachla ?? 0}
+          sheirutps={counts.sheirutp ?? 0}
+          purchasesn={counts.purchases ?? 0}
+        />
+      {:else}
+        <Filter
+          filterKind="projects"
+          allIds={uniqueProjects}
+          edgeToEdge
+          onShowonly={showonly}
+          onShowall={showall}
+        />
+      {/if}
+    </div>
+  {/if}
+
   <!-- כפתורי שליטה -->
   <div class="control-buttons">
     <button
-      class="control-button center-button"
-      onclick={centerViewOnLoad}
-      title="חזרה למרכז"
+      type="button"
+      class="control-button"
+      aria-label={$t('lev.cards.nav.filter')}
+      title={$t('lev.cards.nav.filter')}
+      aria-pressed={filterKind}
+      onclick={() =>
+        filterKind ? showall() : ((filterProjects = false), (filterKind = true))}
     >
-      <span>⌘</span>
+      <FilterIcon filterType="cardType" isX={filterKind} />
     </button>
 
+    {#if uniqueProjects.length >= 2}
+      <button
+        type="button"
+        class="control-button"
+        aria-label={$t('lev.cards.nav.filter')}
+        title={$t('lev.cards.nav.filter')}
+        aria-pressed={filterProjects}
+        onclick={() =>
+          filterProjects
+            ? showall()
+            : ((filterKind = false), (filterProjects = true))}
+      >
+        <FilterIcon isX={filterProjects} />
+      </button>
+    {/if}
+
+    <!-- The member's own coin size, remembered. The concrete answer to
+         "אנשים מבוגרים שמתקשים": three dots, no words to translate wrong, and
+         a label for anyone who cannot see them. -->
+    <div class="size-control" role="group" aria-label={$t('lev.coins.size.label')}>
+      {#each SIZE_STEPS as step}
+        <button
+          type="button"
+          class="size-step"
+          class:on={$coinSize === step}
+          aria-pressed={$coinSize === step}
+          aria-label={$t(`lev.coins.size.${step}`)}
+          title={$t(`lev.coins.size.${step}`)}
+          onclick={() => coinSize.set(step)}
+        >
+          <span class="dot dot-{step}" aria-hidden="true"></span>
+        </button>
+      {/each}
+    </div>
+
     <button
-      class="control-button redistribute-button"
-      onclick={redistributeElements}
-      title="פיזור מחדש"
+      class="control-button center-button"
+      onclick={() => centerView()}
+      aria-label={$t('lev.coins.center')}
+      title={$t('lev.coins.center')}
     >
-      <span>⟳</span>
+      <span aria-hidden="true">⌘</span>
     </button>
+
+    <!-- The "פיזור מחדש" button that used to sit here recomputed the
+         positions. Placement is deterministic now — recomputing produces the
+         identical field — so the button had nothing left to do. Stage 6 of
+         docs/PLAN_LEV_COINS.md puts the zoom controls in its place. -->
   </div>
 
   <div
-      id="content-area"
-      dir="ltr"
-      bind:clientWidth={w}
-      bind:clientHeight={h}
-      style="position: relative; width: {w}px; height: {h}px;"
-      class="screen d"
-    >
-      {#each arr1 as buble, i}
-        {@const myline = orders[i] ?? { x: 0, y: 0 }}
-        {#if buble.ani === 'vidu' && milon.desi == true}
-          <div
-            class="vidu normSml"
-            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
-          >
-            <Vid
-              onModal={() => (modal = true)}
-              onHover={hover}
-              onProj={proj}
-              onUser={user}
-              onCoinLapach={delo}
-              shear={buble.shear}
-              hervachti={buble.hervachti}
-              sendpropic={buble.sendpropic}
-              sendname={buble.sendname}
-              respropic={buble.respropic}
-              resname={buble.resname}
-              projectId={buble.projectId}
-              kind={buble.kind}
-              projectName={buble.projectName}
-              src={buble.src}
-              myid={buble.myid}
-              pendId={buble.pendId}
-              chat={buble.chat}
-              amount={buble.amount}
-              send={buble.send}
-              recive={buble.recive}
-              sendcon={buble.senderconf}
-              confirmed={buble.confirmed}
-              coinlapach={buble.coinlapach}
-              messege={buble.messege}
-              already={buble.already}
-              {low}
-            />
-          </div>
-        {:else if buble.ani === 'haluk' && milon.desi == true}
-          <div
-            class=" halu normSml"
-            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
-          >
-            <Hal
-              onModal={() => (modal = true)}
-              onCoinLapach={delo}
-              user_1s={buble.user_1s}
-              onHover={hover}
-              onProj={proj}
-              onUser={user}
-              hervach={buble.hervach}
-              halukot={buble.halukot}
-              forumId={buble.forumId}
-              coinlapach={buble.coinlapach}
-              myid={buble.myid}
-              pendId={buble.pendId}
-              mypos={buble.mypos}
-              projectName={buble.projectName}
-              name={buble.name}
-              src={buble.src}
-              projectId={buble.projectId}
-              bind:noofusersOk={buble.noofusersOk}
-              bind:noofusersNo={buble.noofusersNo}
-              bind:noofusersWaiting={buble.noofusersWaiting}
-              noofusers={buble.noofusers}
-              bind:already={buble.already}
-              created_at={buble.created_at}
-              bind:users={buble.users}
-              diun={buble.diun}
-              order={buble.order}
-              {low}
-            />
-          </div>
-        {:else if buble.ani === 'sheirutp' && milon.sheirutp == true}
-          <div
-            class="sheirutp normSml"
-            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
-          >
-            <ProductRequestCoin {buble} />
-          </div>
-        {:else if buble.ani === 'mtaha' && milon.betaha == true}
-          <div
-            class="betaha normSml"
-            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
-          >
-            <MissionInProgress
-              onProj={proj}
-              onUser={user}
-              onHover={hover}
-              onCoinLapach={delo}
-              onModal={() => (modal = true)}
-              pu={buble.pu}
-              tasks={buble.acts.data}
-              status={buble.status}
-              tx={buble.tx}
-              iskvua={buble.iskvua}
-              coinlapach={buble.coinlapach}
-              usernames={buble.usernames}
-              noofpu={buble.noof}
-              oldzman={buble.timer}
-              stname={buble.stname}
-              mId={buble.id}
-              missId={buble.missionId}
-              missionName={buble.name}
-              projectId={buble.projectId}
-              projectName={buble.projectName}
-              missionDetails={buble.descrip}
-              src={buble.src}
-              link={buble.privatlinks}
-              hearotMeyuchadot={buble.hearotMeyuchadot}
-              dueDateOrCountToDedline={buble.admaticedai}
-              hoursdon={buble.howmanyhoursalready}
-              hourstotal={buble.hoursassinged}
-              perhour={buble.perhour}
-              onDone={delo}
-              {low}
-            />
-          </div>
-        {:else if buble.ani === 'pmashes' && milon.ppmash == true}
-          <div
-            class="normSml ppmash"
-            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
-          >
-            <PendingMa
-              onHover={hover}
-              onProj={proj}
-              onUser={user}
-              onCoinLapach={delo}
-              onModal={modali}
-              ordern={buble.orderon}
-              timegramaId={buble.timegramaId}
-              restime={buble.restime}
-              coinlapach={buble.coinlapach}
-              messege={buble.messege}
-              mysrc={buble.mysrc}
-              mypos={buble.mypos}
-              diun={buble.diun}
-              descrip={buble.descrip}
-              projectName={buble.projectName}
-              name={buble.name}
-              hearotMeyuchadot={buble.hearotMeyuchadot}
-              kindOf={buble.kindOf}
-              src={buble.src}
-              noofusersWaiting={buble.noofusersWaiting}
-              projectId={buble.projectId}
-              noofusersOk={buble.noofusersOk}
-              created_at={buble.created_at}
-              noofusersNo={buble.noofusersNo}
-              already={buble.already}
-              noofusers={buble.noofusers}
-              mshaabId={buble.mshaabId}
-              hm={buble.hm}
-              price={buble.price}
-              easy={buble.easy}
-              sqadualed={buble.sqadualed}
-              sqadualedf={buble.sqadualedf}
-              linkto={buble.linkto}
-              pendId={buble.pendId}
-              users={buble.users}
-              acts={buble.acts || []}
-              {low}
-            />
-          </div>
-        {:else if buble.ani === 'pends' && milon.pend == true}
-          <div
-            class="normSml pend"
-            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
-          >
-            <PendingM
-              onHover={hover}
-              onModal={modali}
-              onProj={proj}
-              onUser={user}
-              onCoinLapach={delo}
-              diun={buble.diun}
-              timegramaId={buble.timegramaId}
-              timegramaDate={buble.timegramaDate}
-              publicklinks={buble.publicklinks}
-              privatlinks={buble.privatlinks}
-              coinlapach={buble.coinlapach}
-              isKavua={buble.isKavua}
-              createdAt={buble.createdAt}
-              messege={buble.messege}
-              restime={buble.restime}
-              mysrc={buble.mysrc}
-              mypos={buble.mypos}
-              descrip={buble.descrip}
-              projectName={buble.projectName}
-              name={buble.name}
-              hearotMeyuchadot={buble.hearotMeyuchadot}
-              noofhours={buble.noofhours}
-              src={buble.src}
-              noofusersWaiting={buble.noofusersWaiting}
-              projectId={buble.projectId}
-              uids={buble.uids}
-              what={buble.what}
-              noofusersOk={buble.noofusersOk}
-              total={buble.noOfHours * buble.perhour}
-              perhour={buble.perhour}
-              noofusersNo={buble.noofusersNo}
-              already={buble.already}
-              noofusers={buble.noofusers}
-              missionId={buble.missionId}
-              ordern={buble.orderon}
-              skills={buble.skills}
-              tafkidims={buble.tafkidims}
-              workways={buble.workways}
-              mdate={buble.mdate}
-              mdates={buble.dates}
-              vallues={buble.vallues}
-              pendId={buble.pendId}
-              users={buble.users}
-              {low}
-            />
-          </div>
-        {:else if buble.ani === 'wegets' && milon.pmaap == true}
-          <div
-            class="pmaap normSml"
-            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
-          >
-            <Weget
-              onAcsept={delo}
-              onDecline={delo}
-              onHover={hover}
-              onModal={modali}
-              onProj={proj}
-              onUser={user}
-              coinlapach={buble.coinlapach}
-              mId={buble.mId}
-              noofusersWaiting={buble.noofusersWaiting}
-              uids={buble.uids}
-              kindOf={buble.kindOf}
-              noofusersOk={buble.noofusersOk}
-              noofusersNo={buble.noofusersNo}
-              already={buble.already}
-              users={buble.users}
-              askId={buble.askId}
-              myp={buble.myp}
-              projectName={buble.projectName}
-              useraplyname={buble.username}
-              userId={buble.uid}
-              spid={buble.spid}
-              src={buble.src}
-              price={buble.price}
-              hm={buble.hm}
-              src2={buble.src2}
-              why={buble.why}
-              whatt={buble.whatt}
-              missionBName={buble.openName}
-              name={buble.name}
-              projectId={buble.projectId}
-              noofpu={buble.noof}
-              sqadualedf={buble.sqadualedf}
-              sqadualed={buble.sqadualed}
-              spnot={buble.spnot}
-              easy={buble.easy}
-              nhours={buble.nhours}
-              deadline={buble.deadline}
-              missId={buble.missId}
-              id={buble.id}
-              openMid={buble.omid}
-              stylef={buble.stylef}
-              st={buble.st}
-              declined={buble.decid}
-              {low}
-            />
-          </div>
-        {:else if buble.ani === 'fiapp' && milon.fiap == true}
-          <div
-            class="fiap normSml"
-            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
-          >
-            <Fiappru
-              onAcsept={delo}
-              onDecline={delo}
-              onHover={hover}
-              onModal={modali}
-              onProj={proj}
-              onUser={user}
-              coinlapach={buble.coinlapach}
-              mId={buble.mId}
-              noofusersWaiting={buble.noofusersWaiting}
-              uids={buble.uids}
-              what={buble.what}
-              noofusersOk={buble.noofusersOk}
-              noofusersNo={buble.noofusersNo}
-              already={buble.already}
-              users={buble.users}
-              askId={buble.askId}
-              projectName={buble.projectName}
-              useraplyname={buble.username}
-              userId={buble.uid}
-              missionDetails={buble.descrip}
-              src={buble.src}
-              src2={buble.src2}
-              why={buble.why}
-              whatt={buble.whatt}
-              whattid={buble.whattid}
-              missionBName={buble.openName}
-              name={buble.name}
-              projectId={buble.projectId}
-              noofpu={buble.noof}
-              publicklinks={buble.publicklinks}
-              privatlinks={buble.privatlinks}
-              hearotMeyuchadot={buble.hearotMeyuchadot}
-              valph={buble.perhour}
-              nhours={buble.nhours}
-              deadline={buble.deadline}
-              missId={buble.missId}
-              id={buble.id}
-              openMid={buble.omid}
-              stylef={buble.stylef}
-              st={buble.st}
-              declined={buble.decid}
-              {low}
-            />
-          </div>
-        {:else if buble.ani === 'walcomen' && milon.welc == true}
-          <div
-            class="welc normSml"
-            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
-          >
-            <Welcomt
-              welcomId={buble.welcomeId}
-              id={buble.id}
-              src={buble.src}
-              onHover={hover}
-              coinlapach={buble.coinlapach}
-              onCoinLapach={delo}
-              username={buble.username}
-              projectName={buble.projectName}
-              projectId={buble.projectId}
-              partnershipDetails={buble.details}
-              pd={buble.pd}
-            />
-          </div>
-        {:else if buble.ani === 'askedcoin' && milon.asks == true}
-          <div
-            class="asks normSml"
-            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
-          >
-            <Reqtojoin
-              onAcsept={delo}
-              onHover={hover}
-              onModal={modali}
-              onProj={proj}
-              onUser={user}
-              onDecline={delo}
-              iskvua={buble.iskvua}
-              email={buble.email}
-              role={buble.role}
-              workways={buble.workways}
-              userSkills={buble.userSkills}
-              userRole={buble.userRole}
-              userWorkway={buble.userWorkway}
-              skills={buble.skills}
-              coinlapach={buble.coinlapach}
-              pid={buble.pid}
-              noofusersWaiting={buble.noofusersWaiting}
-              uids={buble.uids}
-              what={buble.what}
-              noofusersOk={buble.noofusersOk}
-              noofusersNo={buble.noofusersNo}
-              already={buble.already}
-              users={buble.users}
-              askId={buble.askId}
-              projectName={buble.projectName}
-              useraplyname={buble.username}
-              userId={buble.uid}
-              missionDetails={buble.missionDetails}
-              src={buble.src}
-              src2={buble.src2}
-              openmissionName={buble.openName}
-              name={buble.name}
-              projectId={buble.projectId}
-              noofpu={buble.noof}
-              publicklinks={buble.publicklinks}
-              privatlinks={buble.privatlinks}
-              hearotMeyuchadot={buble.hearotMeyuchadot}
-              valph={buble.perhour}
-              nhours={buble.nhours}
-              deadline={buble.deadline}
-              sqedualed={buble.sqedualed}
-              missId={buble.missId}
-              id={buble.id}
-              acts={buble.acts}
-              openMid={buble.omid}
-              stylef={buble.stylef}
-              st={buble.st}
-              chat={buble.chat}
-              declined={buble.decid}
-              isRishon={buble?.openMissionData?.isRishon || buble.isRishon}
-              myid={buble.myid}
-              forumId={buble.forumId}
-              timegramaId={buble.timegramaId}
-              timegramaDate={buble.timegramaDate}
-              negopendmissions={buble.negopendmissions || []}
-              orderon={buble.orderon || 0}
-              {low}
-            />
-          </div>
-        {:else if buble.ani === 'askedm' && milon.askmap == true}
-          <div
-            class="askmap normSml"
-            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
-          >
-            <Reqtom
-              onAcsept={delo}
-              onDecline={delo}
-              onHover={hover}
-              onModal={modali}
-              onProj={proj}
-              onUser={user}
-              onChat={chat}
-              coinlapach={buble.coinlapach}
-              pid={buble.pid}
-              noofusersWaiting={buble.noofusersWaiting}
-              uids={buble.uids}
-              what={buble.what}
-              noofusersOk={buble.noofusersOk}
-              noofusersNo={buble.noofusersNo}
-              already={buble.already}
-              users={buble.users}
-              askId={buble.askId}
-              projectName={buble.projectName}
-              useraplyname={buble.username}
-              userId={buble.uid}
-              missionDetails={buble.descrip}
-              src={buble.src}
-              src2={buble.src2}
-              openmissionName={buble.openName}
-              name={buble.name}
-              projectId={buble.projectId}
-              noofpu={buble.noof}
-              myp={buble.myp}
-              easy={buble.easy}
-              spnot={buble.spnot}
-              hearotMeyuchadot={buble.spnot}
-              price={buble.price}
-              deadline={buble.deadline}
-              missId={buble.missId}
-              id={buble.id}
-              openMid={buble.omid}
-              stylef={buble.stylef}
-              st={buble.st}
-              declined={buble.decid}
-              spid={buble.spid}
-              timegramaId={buble.timegramaId}
-              isRishon={buble.isSelfProposal === true}
-              pendingMainVote={buble.pendingMainVote === true}
-              negopendmissions={buble.negopendmissions || []}
-              orderon={buble.orderon || 0}
-              {low}
-            />
-          </div>
-        {:else if buble.ani === 'archObject' && milon.hachla == true}
-          <div
-            class="hachla normSml"
-            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
-          >
-            <ArchiveObjectCard
-              archive={buble.archive}
-              projectId={buble.projectId}
-              projectName={buble.projectName}
-              logoSrc={buble.src}
-              memberCount={buble.noof}
-              timegramaDate={buble.timegramaDate}
-              onProj={proj}
-              onUser={user}
-              onChat={chat}
-              onDone={delo}
-            />
-          </div>
-        {:else if buble.ani === 'hachla' && milon.hachla == true}
-          <div
-            class="hachla normSml"
-            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
-          >
-            <Desi
-              onAcsept={delo}
-              onDecline={delo}
-              onHover={hover}
-              onModal={modali}
-              onProj={proj}
-              onChat={chat}
-              noofpu={buble.noof}
-              newpicid={buble?.newpicid}
-              coinlapach={buble.coinlapach}
-              created_at={buble.created_at}
-              spdata={buble.spdata}
-              kind={buble.kind}
-              timegramaId={buble.timegramaId}
-              timegramaDate={buble.timegramaDate}
-              restime={buble.restime}
-              messege={buble.messege}
-              myid={buble.myid}
-              noofusersWaiting={buble.noofusersWaiting}
-              uids={buble.uids}
-              what={buble.mypos}
-              noofusersOk={buble.noofusersOk}
-              noofusersNo={buble.noofusersNo}
-              already={buble.already}
-              users={buble.users}
-              askId={buble.pendId}
-              projectName={buble.projectName}
-              projectId={buble.projectId}
-              userId={buble.uid}
-              src={buble.src}
-              src2={buble?.newpic}
-              stylef={buble.stylef}
-              st={buble.st}
-              spid={buble.spid}
-              saleClaim={buble.saleClaim}
-              {low}
-            />
-          </div>
-        {:else if buble.ani === 'meData' && milon.sugg == true}
-          <div
-            class="sugg normSml"
-            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
-          >
-            <ProjectSuggestor
-              onModal={modali}
-              onLess={delo}
-              onHover={hover}
-              onProj={proj}
-              onUser={user}
-              onMesima={mesima}
-              coinlapach={buble.coinlapach}
-              acts={buble.acts}
-              restime={buble.restime}
-              {askedarr}
-              {declineddarr}
-              pid={buble.pid}
-              chat={buble.chat ?? null}
-              askId={buble.askId ?? null}
-              alreadyi={buble.alreadyi}
-              deadLine={buble.sqadualed}
-              oid={buble.id}
-              hst={buble.hst}
-              stb={buble.stb}
-              projectName={buble.projectName}
-              sourceHref={buble.sourceHref ?? null}
-              offerHref={buble.offerHref ?? null}
-              role={buble.tafkidims}
-              skills={buble.skills}
-              missionDetails={buble.descrip}
-              notes={buble.hearotMeyuchadot}
-              src={buble.src}
-              missionName={buble.name}
-              projectId={buble.projectId}
-              workways={buble.work_ways}
-              noOfHours={buble.noofhours}
-              perhour={buble.perhour}
-              total={(buble.noofhours || 0) * (buble.perhour || 0)}
-              noOfusers={buble.noOfusers}
-              {low}
-            />
-          </div>
-        {:else if buble.ani === 'huca' && milon.pmashs == true}
-          <div
-            class="pmashs normSml"
-            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
-          >
-            <Mashsug
-              onLess={delo}
-              onHover={hover}
-              onProj={proj}
-              onUser={user}
-              messege={buble.messege}
-              {i}
-              coinlapach={buble.coinlapach}
-              {askedarr}
-              declineddarra={buble.declineddarra}
-              deadLine={buble.sqadualed}
-              sqadualedf={buble.sqadualedf}
-              oid={buble.oid}
-              id={buble.id}
-              price={buble.price}
-              myp={buble.myp}
-              already={buble.already}
-              projectName={buble.projectName}
-              sourceHref={buble.sourceHref ?? null}
-              offerHref={buble.offerHref ?? null}
-              missionDetails={buble.descrip}
-              notes={buble.hearotMeyuchadot}
-              src={buble.srcb}
-              mashName={buble.mashname}
-              projectId={buble.projectId}
-              descrip={buble.descrip}
-              spnot={buble.spnot}
-              easy={buble.easy}
-              {low}
-            />
-          </div>
-        {/if}
-      {/each}
-
-      <div class="midCom">
-        <Mid
-          {sml}
-          {onView}
-          onHover={hover}
-          onShowall={showall}
-          onShowonly={showonly}
-          {total}
-          {picLink}
-          {ask}
-          {wel}
-          name={nam}
-          {low}
-          {sug}
-          {pen}
-          {beta}
-          {fia}
-          pmash={pmashd}
-          {mashs}
-          {maap}
-          {askma}
-          des={halu}
-        />
+    id="content-area"
+    dir="ltr"
+    style="position: relative; width: {w}px; height: {h}px;"
+    class="screen d"
+  >
+    {#each placed as p (p.id)}
+      <div class="normSml" style={slotStyle(p)} animate:flip={{ duration: flipMs }}>
+        <LevCoin item={p.item} {size} onOpen={() => openCoin(p.id)} />
       </div>
+    {/each}
+
+    {#each bursts as b (b.key)}
+      <span
+        class="burst"
+        class:still={reduceMotion}
+        style="left:{b.left}px; top:{b.top}px; width:{size}px; height:{size}px; --accent:{b.accent}"
+        aria-hidden="true"
+      ></span>
+    {/each}
+
+    <div class="midCom">
+      <Mid
+        {sml}
+        {onView}
+        {milon}
+        onHover={hover}
+        onShowall={showall}
+        onShowonly={showonly}
+        {total}
+        {picLink}
+        {ask}
+        {wel}
+        name={nam}
+        {low}
+        {sug}
+        {pen}
+        {beta}
+        {fia}
+        pmash={pmashd}
+        {mashs}
+        {maap}
+        {askma}
+        des={halu}
+      />
     </div>
+  </div>
 </div>
+
+{#if openItem}
+  <LevSheet
+    item={openItem}
+    {milon}
+    {low}
+    {askedarr}
+    {declineddarr}
+    onClose={() => (openId = null)}
+    onFinished={cardFinished}
+    onHover={hover}
+    onProj={proj}
+    onUser={user}
+    onChat={chat}
+  />
+{/if}
 
 <style>
   .coin-container {
@@ -1043,18 +701,83 @@
   .normSml {
     position: absolute;
     border-radius: 50%;
-    /* Placed by `left`/`top` from `orders[i]`. There used to be a
-       `transition: transform 500ms` here, which could never fire — nothing
-       animates `transform`. Moving the field onto transforms (and getting the
-       animation this was reaching for) is Stage 1 of docs/PLAN_LEV_COINS.md. */
+    /* Placed by `left`/`top` from `slotStyle()`. Moving the whole field onto a
+       single composited transform, so panning and zooming cost one layer
+       instead of n repositioned elements, is Stage 6 of
+       docs/PLAN_LEV_COINS.md. */
+  }
+
+  /* The pop: the coin's ghost, left behind for as long as the animation runs.
+     A ghost rather than the coin itself because the item is already gone from
+     the feed by then — that is what "decided" means. */
+  .burst {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 20;
+    background: radial-gradient(
+      circle,
+      color-mix(in srgb, var(--accent) 70%, transparent) 0%,
+      transparent 70%
+    );
+    box-shadow: 0 0 0 3px var(--accent);
+    animation: coin-burst 700ms ease-out forwards;
+  }
+  /* Reduced motion gets the fade and nothing else — no scale, no confetti. */
+  .burst.still {
+    animation: coin-fade 240ms linear forwards;
+  }
+
+  @keyframes coin-burst {
+    0% {
+      opacity: 0.95;
+      transform: scale(1);
+    }
+    60% {
+      opacity: 0.5;
+      transform: scale(1.7);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(2.1);
+    }
+  }
+
+  @keyframes coin-fade {
+    from {
+      opacity: 0.8;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  /* Over the field, not inside it: the field is a scroll container the size of
+     the whole heart, so a strip placed in it would scroll away from the member
+     who opened it. */
+  .filter-strip {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1001;
+    padding: 0.4rem 0.5rem 0.5rem;
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   }
 
   .control-buttons {
     position: fixed;
-    bottom: 1.5rem;
-    right: 1.5rem;
+    /* Clear of the page's own bottom-right furniture — the demand map's chip
+       (`.map-fab`) and the accessibility button both anchor there, and the ⌘
+       button used to sit on top of them. Measured on a real heart: the chip's
+       top edge is 109px off the bottom, so this stack starts above it. */
+    bottom: 7.5rem;
+    right: 1rem;
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 1rem;
     z-index: 999;
   }
@@ -1084,11 +807,58 @@
     transform: scale(0.95);
   }
 
-  .redistribute-button {
-    background-color: rgba(100, 200, 255, 0.15);
+  .size-control {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.35rem 0.25rem;
+    border-radius: 9999px;
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   }
 
-  .redistribute-button:hover {
-    background-color: rgba(100, 200, 255, 0.25);
+  /* 44px of target for a 12px dot — WCAG 2.5.8, and the reason this control
+     exists at all is members who cannot hit small things. */
+  .size-step {
+    width: 2.4rem;
+    height: 2.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+  }
+  .size-step:hover,
+  .size-step:focus-visible {
+    background-color: rgba(255, 255, 255, 0.18);
+  }
+  .size-step.on {
+    background-color: rgba(255, 255, 255, 0.35);
+  }
+
+  .dot {
+    display: block;
+    border-radius: 50%;
+    background: #fff;
+    opacity: 0.8;
+  }
+  .size-step.on .dot {
+    opacity: 1;
+  }
+  .dot-s {
+    width: 0.5rem;
+    height: 0.5rem;
+  }
+  .dot-m {
+    width: 0.8rem;
+    height: 0.8rem;
+  }
+  .dot-l {
+    width: 1.1rem;
+    height: 1.1rem;
   }
 </style>
