@@ -31,9 +31,8 @@ FROM node:22-alpine AS build
 
 WORKDIR /app
 
-# patches/ must land BEFORE npm ci: the postinstall hook is patch-package.
+# Stage 1b build dependencies and run npm ci
 COPY package*.json .npmrc ./
-COPY patches ./patches
 # Shared npm tarball cache (both stages use id=npm). Not a layer, so it costs
 # nothing in image size; it only skips the re-download when the lockfile moves.
 RUN --mount=type=cache,id=npm,target=/root/.npm \
@@ -65,7 +64,7 @@ COPY --from=build /app/package.json ./
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+    CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
 USER node
 

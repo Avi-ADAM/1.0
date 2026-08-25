@@ -154,6 +154,7 @@ u = 'lev.page.diamondsHint'
    * @property {boolean} [low]
    * @property {boolean} [cards]
    * @property {any} [milon] - the shared card-type visibility map (`$milon`)
+   * @property {any} [total]
    * @property {boolean} [sml]
    * @property {number} [saless]
    * @property {number} [sheirutps]

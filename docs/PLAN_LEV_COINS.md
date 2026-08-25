@@ -1,14 +1,15 @@
 # PLAN — Lev coins view (תצוגת המטבעות): החזרת עטרה ליושנה
 
-> Status: **stages 0–3 landed (2026-08-25); 4 and 5 partly absorbed by them.**
+> Status: **stages 0–5 landed (2026-08-25);** 4 was absorbed by 2 and 3.
 > This is the working document for the coin view's restoration. Each stage below
 > is one commit with its own acceptance criteria — except 2 and 3, which cannot
 > ship apart and landed together. Tick the boxes as they land.
 >
-> **What is left:** the rest of Stage 5 (one filter panel across the three
-> views), Stage 6 (pan, zoom, keyboard, minimap) and Stage 7 (delete the now
-> unreachable coin-mode branches from the 12 giant components and drop `swiper`
-> from `package.json`).
+> **What is left:** one decision inside Stage 5 (which view a member sees on
+> their *first* visit, now that the coins are no longer the slow one), Stage 6
+> (pan, zoom, keyboard, minimap) and Stage 7 (delete the now unreachable
+> coin-mode branches from the 12 giant components and drop `swiper` from
+> `package.json`).
 >
 > The four open questions were **decided by the owner on 2026-08-24** — see §6.
 > In short: `/newlev` redirects to `/lev`; distance from the heart *is* urgency;
@@ -533,7 +534,7 @@ per-kind table left to go stale.
       either is an open question, and the answer may be "no, that is what the
       card is for".
 
-### Stage 5 — one filter, three views — *two bullets landed early*
+### Stage 5 — one filter, three views ✅ *(done 2026-08-25, bar one decision)*
 
 Two of these were not optional once the coins became a keyed `{#each}`:
 
@@ -544,19 +545,57 @@ Two of these were not optional once the coins became a keyed `{#each}`:
 - [x] **De-duplicate by `coinlapach`**, like the deck does. This stopped being
       cosmetic when the `{#each}` became keyed — a double-delivered socket update
       used to paint the same coin twice; now it would throw.
-- [ ] The coin view uses `cards/filter.svelte` and the same `milon` store as the
-      deck and the list; `midi.svelte`'s 14-branch `if/else` goes away. **Note
-      for whoever does it:** the lev page currently passes the coin view an
-      inline all-true `milon` literal rather than `$milon` — that is the other
-      half of the same bug and has to go with it.
-- [ ] Add the project filter the other two views have.
-- [ ] Switching view keeps the filter *and* keeps you on the same item
-      (`deckPosition` already stores exactly this).
+- [x] The coin view uses `cards/filter.svelte` and the same `milon` store as the
+      deck and the list, reached from two icon buttons in the field's chrome.
+      The inline all-true `milon` **literal** the lev page was passing is gone
+      with it — that was the other half of the same bug: the coin field had a
+      filter map of its own that no other view could see, that no deep link
+      could pre-set, and that reset itself on every view switch.
+- [x] `midi.svelte`'s 14-branch `if/else` is gone. The diamonds still filter,
+      but each one now derives the string it sends back from the shared `milon`
+      (`soleKey === key ? 'true' : key`), so picking a kind in the strip arms
+      the matching diamond to clear it and the other way round. `disp()` is four
+      lines; the fourteen `$state` strings and a stray `console.log` went with
+      the branches.
+- [x] Added the project filter the other two views have.
+- [x] **Fixed in passing, and it was the reason the shared panel was unusable:**
+      both the kind counts and the project chips were computed off
+      `finalSwiperArray`, which is *already* filtered. So picking a kind dropped
+      every other kind's count to zero and its tile off the strip — you could
+      clear the filter but never move from one kind to another — and picking a
+      project left exactly one chip, with no way back to "all". `levDerived.ts`
+      now exports `mergedFeed` (merged and sorted, before either filter) and the
+      panel counts off that; the kind tiles still honour the project filter,
+      because the two filters are orthogonal. Verified live: with a kind filter
+      active all ten tiles are still offered with their true counts, and with a
+      project filter active the project button is still there.
+      - Two debug `console.log`s went with it, one of which dumped the **whole
+        feed** — and sorted it a second time to do so — on every recompute.
+- [x] Switching view keeps the filter *and* keeps you on the same item.
+      `deckPosition` stops being the deck's private memory and becomes the
+      heart's: the list and the coin field both `rememberCard` on open, the list
+      scrolls that row into view on arrival, and the field opens centred on that
+      **coin** rather than on the heart.
+- [x] **Fixed in passing: the field was not opening on the heart**, which Stage 1
+      believed it had fixed. Two causes, and the second explains the first.
+      *One:* it centred once, on the first frame that had a coin — but the page
+      streams the urgent kinds in first, so the field keeps growing and that aim
+      is stale. It now re-aims on every size change and stops the moment the
+      member touches the field. *Two, and this is the one worth remembering:*
+      `scrollTo({ behavior: 'auto' })` does **not** mean "jump" — it means
+      "defer to CSS", and `.coin-container` sets `scroll-behavior: smooth`. So
+      every automatic centring started a ~700px animation that the next one
+      restarted from wherever it had crawled to. Stage 1's measured "(271, 576)
+      where the centre was (324, 719)" was not a stale aim at all; it was an
+      animation caught in flight. Automatic centring is `'instant'` now; the ⌘
+      button still asks for `'smooth'`, because there the movement is the point.
 - [ ] **The view is the member's choice, remembered** (decided). `levView`
-      already persists; once coins are no longer the slow view — which, as of
-      Stage 3, they are not — the first-visit fallback should stop being a
-      performance decision. Promoting the preference to the account is
-      explicitly out of scope.
+      already persists per browser, and opening a coin or a row now leaves you
+      where you were when you switch. What is still open is the **first-visit
+      fallback**, which today is a performance decision — `list` on a phone,
+      `cards` on desktop (`initialLevView()`, `levStores.ts`) — and, as of
+      Stage 3, no longer a true one. Owner's call. Promoting the preference to
+      the account is explicitly out of scope.
 
 ### Stage 6 — the field, restored as the good idea it was
 
@@ -622,8 +661,8 @@ pass/fail.** Baseline recorded at the end of Stage 0 (2026-08-25):
 
 | command | baseline | what "green" means here |
 |---|---|---|
-| `npm run check` | **1476 errors**, 1365 warnings, 9043 files → **1457** after Stage 3 | no *new* error, and none on a line the stage touched. 18 of those errors were in `newcoinui.svelte` — its prop wiring was never typed. Stage 3 retired 17 of them the intended way, by deleting the wiring rather than by adding `@ts-ignore`; the one left is `sml` on `<Mid>`, which Stage 6 touches. |
-| `npm test` | **47 failures in 10 files** (incl. `levDerived`, `levDataLoader`, `levDataExtractors`, `TaskApprovalButton`, and the action-registry suites) | no *new* failure. Still exactly 47 after Stage 3, with 32 new passing tests alongside them. These are unrelated to the coins and predate this plan; whoever fixes them should do it in its own commit. |
+| `npm run check` | **1476 errors**, 1365 warnings, 9043 files → **1457** after Stage 3 → **1445** after Stage 5 | no *new* error, and none on a line the stage touched. 18 of those errors were in `newcoinui.svelte` — its prop wiring was never typed. Stage 3 retired 17 of them the intended way, by deleting the wiring rather than by adding `@ts-ignore`; the one left is `sml` on `<Mid>`, which Stage 6 touches. |
+| `npm test` | **47 failures in 10 files** (incl. `levDerived`, `levDataLoader`, `levDataExtractors`, `TaskApprovalButton`, and the action-registry suites) | no *new* failure. Still exactly 47 after Stage 5. These are unrelated to the coins and predate this plan; whoever fixes them should do it in its own commit. |
 | `npm run check:i18n` | **clean** — 52 namespaces × 5 locales, 19 route-gated | must stay clean. This is the one that catches a coin rendering an empty string. |
 | `npm run check:script` | clean | must stay clean. |
 
